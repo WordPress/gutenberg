@@ -970,66 +970,45 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				blockUsage: {},
-				recentlyUsedBlocks: [],
-				mode: 'visual',
-				sidebars: {
-					desktop: true,
-					mobile: false,
-					publish: false,
+				activeGeneralSidebar: null,
+				activeSidebarPanel: {
+					editor: null,
+					plugins: null,
 				},
+				blockUsage: {},
+				editorMode: 'visual',
+				recentlyUsedBlocks: [],
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
+				viewportType: 'desktop',
 			} );
 		} );
 
-		it( 'should toggle the given sidebar flag', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-				desktop: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
+		it( 'should set the general sidebar active panel', () => {
+			const state = preferences( deepFreeze( {
+				activeGeneralSidebar: 'editor',
+				activeSidebarPanel: {
+					editor: null,
+					plugins: null,
+				},
+			} ), {
+				type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
+				sidebar: 'editor',
+				panel: 'document',
 			} );
 
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: false,
-			} );
-		} );
-
-		it( 'should set the sidebar open flag to true if unset', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
-			} );
-
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: true,
-			} );
-		} );
-
-		it( 'should force the given sidebar flag', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
-				forcedValue: false,
-			} );
-
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: false,
+			expect( state ).toEqual( {
+				activeGeneralSidebar: 'editor',
+				activeSidebarPanel: {
+					editor: 'document',
+					plugins: null,
+				},
 			} );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
 			const state = preferences( deepFreeze( {} ), {
-				type: 'TOGGLE_SIDEBAR_PANEL',
+				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
@@ -1038,7 +1017,7 @@ describe( 'state', () => {
 
 		it( 'should toggle the sidebar panel open flag', () => {
 			const state = preferences( deepFreeze( { panels: { 'post-taxonomies': true } } ), {
-				type: 'TOGGLE_SIDEBAR_PANEL',
+				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 

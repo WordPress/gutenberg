@@ -20,15 +20,19 @@ import {
 } from '../../components';
 import EllipsisMenu from './ellipsis-menu';
 import HeaderToolbar from './header-toolbar';
-import { isSidebarOpened } from '../../store/selectors';
-import { toggleSidebar } from '../../store/actions';
-
-function Header( {
-	onToggleDefaultSidebar,
-	onTogglePublishSidebar,
-	isDefaultSidebarOpened,
+import {
+	getOpenedGeneralSidebar,
 	isPublishSidebarOpened,
-} ) {
+} from '../../store/selectors';
+import {
+	openGeneralSidebar,
+	closeGeneralSidebar,
+	togglePublishSidebar,
+} from '../../store/actions';
+
+function Header( { isGeneralSidebarEditorOpen, isPublishSidebarOpen, onOpenGeneralSidebar, onCloseGeneralSidebar, onTogglePublishSidebar } ) {
+	const toggleGeneralSidebar = isGeneralSidebarEditorOpen ? onCloseGeneralSidebar : onOpenGeneralSidebar;
+
 	return (
 		<div
 			role="region"
@@ -37,20 +41,20 @@ function Header( {
 			tabIndex="-1"
 		>
 			<HeaderToolbar />
-			{ ! isPublishSidebarOpened && (
+			{ ! isPublishSidebarOpen && (
 				<div className="editor-header__settings">
 					<PostSavedState />
 					<PostPreviewButton />
 					<PostPublishPanelToggle
-						isOpen={ isPublishSidebarOpened }
+						isOpen={ isPublishSidebarOpen }
 						onToggle={ onTogglePublishSidebar }
 					/>
 					<IconButton
 						icon="admin-generic"
-						onClick={ onToggleDefaultSidebar }
-						isToggled={ isDefaultSidebarOpened }
+						onClick={ toggleGeneralSidebar }
+						isToggled={ isGeneralSidebarEditorOpen }
 						label={ __( 'Settings' ) }
-						aria-expanded={ isDefaultSidebarOpened }
+						aria-expanded={ isGeneralSidebarEditorOpen }
 					/>
 					<EllipsisMenu key="ellipsis-menu" />
 				</div>
@@ -61,11 +65,12 @@ function Header( {
 
 export default connect(
 	( state ) => ( {
-		isDefaultSidebarOpened: isSidebarOpened( state ),
-		isPublishSidebarOpened: isSidebarOpened( state, 'publish' ),
+		isGeneralSidebarEditorOpen: getOpenedGeneralSidebar( state ) === 'editor',
+		isPublishSidebarOpen: isPublishSidebarOpened( state ),
 	} ),
 	{
-		onToggleDefaultSidebar: () => toggleSidebar(),
-		onTogglePublishSidebar: () => toggleSidebar( 'publish' ),
-	}
+		onOpenGeneralSidebar: () => openGeneralSidebar( 'editor' ),
+		onCloseGeneralSidebar: closeGeneralSidebar,
+		onTogglePublishSidebar: togglePublishSidebar,
+	},
 )( Header );

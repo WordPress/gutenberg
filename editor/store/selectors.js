@@ -37,7 +37,7 @@ const MAX_FREQUENT_BLOCKS = 3;
  * @returns {string} Editing mode.
  */
 export function getEditorMode( state ) {
-	return getPreference( state, 'mode', 'visual' );
+	return getPreference( state, 'editorMode', 'visual' );
 }
 
 /**
@@ -94,8 +94,18 @@ export function isSavingMetaBoxes( state ) {
  *
  * @returns {string} Active sidebar panel.
  */
-export function getActivePanel( state ) {
-	return state.panel;
+export function getActiveEditorPanel( state ) {
+	return getPreference( state, 'activeSidebarPanel', {} ).editor;
+}
+
+/**
+ * Returns the current active plugin for the plugin sidebar.
+ * 
+ * @param  {Object}  state Global application state
+ * @return {String}        Active plugin sidebar plugin
+ */
+export function getActivePlugin( state ) {
+	return getPreference( state, 'activeSidebarPanel', {} ).plugins;
 }
 
 /**
@@ -124,20 +134,37 @@ export function getPreference( state, preferenceKey, defaultValue ) {
 }
 
 /**
- * Returns true if the sidebar is open, or false otherwise.
+ * Returns the opened general sidebar and null if the sidebar is closed.
  *
- * @param {Object} state   Global application state.
- * @param {string} sidebar Sidebar name (leave undefined for the default sidebar).
- *
- * @returns {boolean} Whether the given sidebar is open.
+ * @param {Object} state Global application state.
+ * @returns {String}     The opened general sidebar panel.
  */
-export function isSidebarOpened( state, sidebar ) {
-	const sidebars = getPreference( state, 'sidebars' );
-	if ( sidebar !== undefined ) {
-		return sidebars[ sidebar ];
-	}
+export function getOpenedGeneralSidebar( state ) {
+	return getPreference( state, 'activeGeneralSidebar' );
+}
 
-	return isMobile( state ) ? sidebars.mobile : sidebars.desktop;
+/**
+ * Returns true if the panel is open in the currently opened sidebar.
+ *
+ * @param  {Object}  state   Global application state
+ * @param  {string}  sidebar Sidebar name (leave undefined for the default sidebar)
+ * @param  {string}  panel   Sidebar panel name (leave undefined for the default panel)
+ * @returns {Boolean}        Whether the given general sidebar panel is open
+ */
+export function isGeneralSidebarPanelOpened( state, sidebar, panel ) {
+	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar' );
+	const activeSidebarPanel = getPreference( state, 'activeSidebarPanel' );
+	return activeGeneralSidebar === sidebar && activeSidebarPanel === panel;
+}
+
+/**
+ * Returns true if the publish sidebar is opened.
+ *
+ * @param {Object} state Global application state
+ * @returns {bool}       Whether the publish sidebar is open.
+ */
+export function isPublishSidebarOpened( state ) {
+	return state.publishSidebarActive;
 }
 
 /**
@@ -148,19 +175,18 @@ export function isSidebarOpened( state, sidebar ) {
  * @returns {boolean} Whether sidebar is open.
  */
 export function hasOpenSidebar( state ) {
-	const sidebars = getPreference( state, 'sidebars' );
-	return isMobile( state ) ?
-		sidebars.mobile || sidebars.publish :
-		sidebars.desktop || sidebars.publish;
+	const generalSidebarOpen = getPreference( state, 'activeGeneralSidebar' ) !== null;
+	const publishSidebarOpen = state.publishSidebarActive;
+
+	return generalSidebarOpen || publishSidebarOpen;
 }
 
 /**
  * Returns true if the editor sidebar panel is open, or false otherwise.
  *
- * @param {Object} state Global application state.
- * @param {string} panel Sidebar panel name.
- *
- * @returns {boolean} Whether sidebar is open.
+ * @param  {Object}  state Global application state
+ * @param  {String}  panel Sidebar panel name
+ * @returns {Boolean}       Whether sidebar is open
  */
 export function isEditorSidebarPanelOpened( state, panel ) {
 	const panels = getPreference( state, 'panels' );
@@ -1277,7 +1303,7 @@ export function hasFixedToolbar( state ) {
  * @param {Object} state   Global application state.
  * @param {string} feature Feature slug.
  *
- * @returns {booleean} Is active.
+ * @returns {boolean} Is active.
  */
 export function isFeatureActive( state, feature ) {
 	return !! state.preferences.features[ feature ];

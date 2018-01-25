@@ -14,7 +14,7 @@ import { PanelBody } from '@wordpress/components';
  */
 import { DocumentOutline, DocumentOutlineCheck } from '../../../components';
 import { isEditorSidebarPanelOpened } from '../../../store/selectors';
-import { toggleSidebarPanel } from '../../../store/actions';
+import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
 
 /**
  * Module constants
@@ -39,7 +39,7 @@ export default connect(
 	},
 	{
 		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
+			return toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
 	}
 )( DocumentOutlinePanel );
