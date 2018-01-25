@@ -569,7 +569,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				viewportType: action.viewportType,
 			};
 		case 'UPDATE_MOBILE_STATE':
-			if ( action.isMobile ){
+			if ( action.isMobile ) {
 				return {
 					...state,
 					viewportType: 'mobile',
