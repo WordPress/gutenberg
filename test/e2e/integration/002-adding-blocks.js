@@ -16,17 +16,17 @@ describe( 'Adding blocks', () => {
 		cy.get( lastBlockSelector ).type( 'Quote block' );
 
 		// Using the regular inserter
-		cy.get( '.editor-header [aria-label="Add block"]' ).click();
+		cy.get( '.edit-post-header [aria-label="Add block"]' ).click();
 		cy.get( '[placeholder="Search for a block"]' ).type( 'code' );
 		cy.get( '.editor-inserter__block' ).contains( 'Code' ).click();
 		cy.get( '[placeholder="Write code…"]' ).type( 'Code block' );
 
 		// Switch to Text Mode to check HTML Output
-		cy.get( '.editor-ellipsis-menu [aria-label="More"]' ).click();
+		cy.get( '.edit-post-ellipsis-menu [aria-label="More"]' ).click();
 		cy.get( 'button' ).contains( 'Code Editor' ).click();
 
 		// Assertions
-		cy.get( '.editor-post-text-editor' )
+		cy.get( '.edit-post-text-editor' )
 			.should( 'contain', 'Paragraph block' )
 			.should( 'contain', 'Quote block' )
 			.should( 'contain', 'Code block' );
