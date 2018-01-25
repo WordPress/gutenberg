@@ -39,8 +39,8 @@ BEFORE POSTING YOUR ISSUE:
 ## Next Actions
 <!-- Not obligatory, but suggest next actions required for closure, -->
 <!-- or ideas about how to implement the addition or change. -->
-<!-- See also: http://bit.ly/gettings-things-done -->
+<!-- See also: http://bit.ly/importance-of-next-actions -->
+- [ ] Determine next actions, such as...
 - [ ] Change a specific line or file.
 - [ ] Add or update unit tests.
 - [ ] Add or update documentation.
-- [ ] Determine next actions.
