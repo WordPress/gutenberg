@@ -15,6 +15,7 @@ import {
 	BlockSelectionClearer,
 	InserterWithShortcuts,
 } from '@wordpress/editor';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,7 +32,12 @@ function VisualEditor( props ) {
 				<PostTitle />
 				<BlockList
 					showContextualToolbar={ ! props.hasFixedToolbar }
-					renderBlockMenu={ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
+					renderBlockMenu={ ( { children, onClose } ) => (
+						<Fragment>
+							<BlockInspectorButton onClick={ onClose } />
+							{ children }
+						</Fragment>
+					) }
 				/>
 				<DefaultBlockAppender />
 			</WritingFlow>

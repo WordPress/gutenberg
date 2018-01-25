@@ -53,12 +53,13 @@ function BlockSettingsMenu( { uids, onSelect, focus, renderBlockMenu = () => nul
 			renderContent={ ( { onClose } ) => (
 				// Should this just use a DropdownMenu instead of a DropDown ?
 				<NavigableMenu className="editor-block-settings-menu__content">
-					{ renderBlockMenu( { onClose } ) }
-					{ count === 1 && <BlockModeToggle uid={ uids[ 0 ] } onToggle={ onClose } /> }
-					{ count === 1 && <UnknownConverter uid={ uids[ 0 ] } /> }
-					<BlockRemoveButton uids={ uids } />
-					{ count === 1 && <ReusableBlockSettings uid={ uids[ 0 ] } onToggle={ onClose } /> }
-					<BlockTransformations uids={ uids } onClick={ onClose } />
+					{ renderBlockMenu( { onClose, children: [
+						count === 1 && <BlockModeToggle key="mode-toggle" uid={ uids[ 0 ] } onToggle={ onClose } />,
+						count === 1 && <UnknownConverter key="unknown-converter" uid={ uids[ 0 ] } />,
+						<BlockRemoveButton key="remove" uids={ uids } />,
+						count === 1 && <ReusableBlockSettings key="reusable-block" uid={ uids[ 0 ] } onToggle={ onClose } />,
+						<BlockTransformations key="transformations" uids={ uids } onClick={ onClose } />,
+					] } ) }
 				</NavigableMenu>
 			) }
 		/>
