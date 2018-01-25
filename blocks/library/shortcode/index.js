@@ -8,9 +8,11 @@ import TextareaAutosize from 'react-autosize-textarea';
  */
 import { __ } from '@wordpress/i18n';
 import { withInstanceId, Dashicon, Spinner, SandBox } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import BlockControls from '../../block-controls';
+import { getCurrentPostId } from '../../../editor/store/selectors';
+import { connect } from 'react-redux';
 
 /**
  * Internal dependencies
@@ -64,7 +66,14 @@ registerBlockType( 'core/shortcode', {
 
 	},
 
-	edit: withInstanceId(
+	edit: compose( [
+		connect( ( state ) => {
+			return {
+				postId: getCurrentPostId( state ),
+			};
+		} ),
+		withInstanceId,
+	] )(
 		class extends Component {
 			constructor() {
 				super();
@@ -76,24 +85,6 @@ registerBlockType( 'core/shortcode', {
 				};
 				this.doServerSideRender = this.doServerSideRender.bind( this );
 				this.handlePreviewClick = this.handlePreviewClick.bind( this );
-				this.getUriParameters = this.getUriParameters.bind( this );
-				this.convertToJSON = this.convertToJSON.bind( this );
-			}
-
-			getUriParameters() {
-				//Function to parse the GET params to obtain the post ID
-				const paramString = window.location.search.substr( 1 );
-				return paramString !== null && paramString !== '' ? this.convertToJSON( paramString ) : {};
-			}
-
-			convertToJSON( paramString ) {
-				const params = {};
-				const paramsArr = paramString.split( '&' );
-				for ( let i = 0, paramsArrLength = paramsArr.length; i < paramsArrLength; i++ ) {
-					const tmpArr = paramsArr[ i ].split( '=' );
-					params[ tmpArr[0] ] = tmpArr[1];
-				}
-				return params;
 			}
 
 			doServerSideRender( event ) {
@@ -104,17 +95,17 @@ registerBlockType( 'core/shortcode', {
 					event.preventDefault();
 				}
 
-				//Get post ID from GET params 
-				const params = this.getUriParameters();
+				//Get post ID from redux store
+				const postId = this.props.postId;
 				let shortcode = this.props.attributes.text;
 				const apiUrl = addQueryArgs( wpApiSettings.root + 'gutenberg/v1/shortcodes', {
 					shortcode: shortcode,
-					postId: params.post,
+					postId: postId,
 					_wpnonce: wpApiSettings.nonce,
 
 				} );
 				shortcode = ( shortcode ) ? shortcode.trim() : '';
-				if ( 0 === params.length || ! ( 'post' in params ) ) {
+				if ( 0 === postId.length || null === postId ) {
 					//We don't have a post ID yet
 					this.setState( { html: __( 'Something went wrong. Try saving the post and try again' ) } );
 					return null;
