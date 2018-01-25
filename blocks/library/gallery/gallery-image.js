@@ -61,6 +61,7 @@ class GalleryImage extends Component {
 									<IconButton
 										icon="arrow-left-alt"
 										onClick={ (event) => onReorder(event, 'left') }
+										onKeyPress={ (event) => onReorder(event, 'left') }
 										className="blocks-gallery-item__arrow-left"
 										label={ __( 'Reorder Image Left' ) }
 									/>
@@ -72,6 +73,7 @@ class GalleryImage extends Component {
 									<IconButton
 										icon="arrow-right-alt"
 										onClick={ (event) => onReorder(event, 'right') }
+										onKeyPress={ (event) => onReorder(event, 'right') }
 										className="blocks-gallery-item__arrow-right"
 										label={ __( 'Reorder Image Right' ) }
 									/>
