@@ -33,17 +33,18 @@ const babelDefaultConfig = require( '../packages/babel-preset-default' );
 babelDefaultConfig.babelrc = false;
 const presetEnvConfig = babelDefaultConfig.presets[ 0 ][ 1 ];
 const babelConfigs = {
-	main: babelDefaultConfig,
-	module: Object.assign(
+	main: Object.assign(
 		{},
 		babelDefaultConfig,
 		{ presets: [
-			[ "env", Object.assign( {},
-					presetEnvConfig,
-					{ modules: false }
+			[ 'env', Object.assign(
+				{},
+				presetEnvConfig,
+				{ modules: 'commonjs' },
 			) ],
 		] }
 	),
+	module: babelDefaultConfig,
 };
 
 /**

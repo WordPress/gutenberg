@@ -10,7 +10,6 @@
 		"check-node-version": "^3.1.1",
 		"codecov": "^2.2.0",
 		"glob": "^7.1.2",
-		"jest": "^22.0.3",
 		"lerna": "^2.5.1",
 		"mkdirp": "^0.5.1",
 		"rimraf": "^2.6.1"
@@ -30,10 +29,10 @@
 		"prebuild": "check-node-version --package",
 		"build": "node ./scripts/build.js",
 		"postinstall": "lerna bootstrap --hoist && npm run build",
-		"test": "jest",
-		"test:coverage": "jest --coverage",
-		"test:coverage-ci": "jest --coverage && codecov",
-		"test:watch": "jest --watch",
+		"test": "./packages/scripts/bin/wp-scripts.js test",
+		"test:coverage": "npm run test -- --coverage",
+		"test:coverage-ci": "npm run test -- --coverage && codecov",
+		"test:watch": "npm run test -- --watch",
 		"publish:dev": "npm run build-clean && npm run build && lerna publish --npm-tag next",
 		"publish:prod": "npm run build-clean && npm run build && lerna publish"
 	}
