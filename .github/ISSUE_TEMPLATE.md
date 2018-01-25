@@ -30,16 +30,17 @@ BEFORE POSTING YOUR ISSUE:
 <!-- If describing a bug, tell us what happens instead of the expected behavior -->
 <!-- If suggesting a change/improvement, explain the difference from current behavior -->
 
-## Possible Solution
-<!-- Not obligatory, but suggest a fix/reason for the bug, -->
-<!-- or ideas how to implement the addition or change -->
-
 ## Screenshots / Video
 <!-- Visual records are oxygen for others to understand what you are sharing -->
 
 ## Related Issues and/or PRs
 <!-- List related issues or PRs against other branches -->
 
-## Todos
-- [ ] Tests
-- [ ] Documentation
+## Next Actions
+<!-- Not obligatory, but suggest next actions required for closure, -->
+<!-- or ideas about how to implement the addition or change. -->
+<!-- See also: http://bit.ly/gettings-things-done -->
+- [ ] Change a specific line or file.
+- [ ] Add or update unit tests.
+- [ ] Add or update documentation.
+- [ ] Determine next actions.
