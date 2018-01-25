@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { Button, Dashicon, withContext } from '@wordpress/components';
+import { withContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -110,14 +110,6 @@ class PostTitle extends Component {
 				className={ className }
 				tabIndex={ -1 /* Necessary for Firefox to include relatedTarget in blur event */ }
 			>
-				{ ! isSelected &&
-					<Button
-						className="editor-post-title__permalink-button"
-						onClick={ this.onSelect }
-					>
-						<Dashicon icon="admin-links" />
-					</Button>
-				}
 				{ isSelected && <PostPermalink /> }
 				<div>
 					<Textarea
