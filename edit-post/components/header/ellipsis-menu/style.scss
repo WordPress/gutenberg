@@ -1,0 +1,20 @@
+.edit-post-ellipsis-menu {
+	// the padding and margin of the ellipsis menu is intentionally non-standard
+	@include break-small() {
+		margin-left: 4px;
+	}
+
+	.components-icon-button {
+		padding: 8px 4px;
+		width: auto;
+	}
+
+	.components-button svg {
+		transform: rotate( 90deg );
+	}
+}
+
+.edit-post-ellipsis-menu__separator {
+	height: 1px;
+	background: $light-gray-500;
+}

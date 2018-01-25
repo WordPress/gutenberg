@@ -19,12 +19,12 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo } from '../../store/actions';
+import { setupEditor, undo, initializeMetaBoxState } from '../../store/actions';
 import store from '../../store';
 
 /**
  * The default editor settings
- * You can override any default settings when calling createEditorInstance
+ * You can override any default settings when calling initializeEditor
  *
  *  alignWide   boolean   Enable/Disable Wide/Full Alignments
  *
@@ -68,6 +68,10 @@ class EditorProvider extends Component {
 			// eslint-disable-next-line no-console
 			console.error( 'The Editor Provider Props are immutable.' );
 		}
+	}
+
+	initializeMetaBoxes( metaBoxes ) {
+		this.store.dispatch( initializeMetaBoxState( metaBoxes ) );
 	}
 
 	render() {

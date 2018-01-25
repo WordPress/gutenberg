@@ -12,7 +12,7 @@ describe( 'Multi-block selection', () => {
 		// Creating test blocks
 		cy.get( '.editor-default-block-appender' ).click();
 		cy.get( lastBlockSelector ).type( 'First Paragraph' );
-		cy.get( '.editor-visual-editor__inserter [aria-label="Add Paragraph"]' ).click();
+		cy.get( '.editor-inserter-with-shortcuts [aria-label="Add Paragraph"]' ).click();
 		cy.get( lastBlockSelector ).type( 'Second Paragraph' );
 
 		// Default: No selection
