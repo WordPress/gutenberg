@@ -32,7 +32,7 @@ class BlockSelectionClearer extends Component {
 	}
 
 	render() {
-		const { children, ...props } = this.props;
+		const { ...props } = this.props;
 
 		// Disable reason: Clicking the canvas should clear the selection
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -42,9 +42,7 @@ class BlockSelectionClearer extends Component {
 				onTouchStart={ this.onClick }
 				ref={ this.bindContainer }
 				{ ...omit( props, 'clearSelectedBlock' ) }
-			>
-				{ children }
-			</div>
+			/>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
