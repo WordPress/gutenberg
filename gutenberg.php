@@ -529,14 +529,18 @@ function gutenberg_replace_default_add_new_button() {
 			button.remove();
 
 			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
+			var dropdown = expander.parentNode.getElementsByClassName( 'dropdown' ).item( 0 );
+			function toggleDropdown() {
+				dropdown.classList.toggle( 'visible' );
+			}
 			expander.addEventListener( 'click', function( e ) {
 				e.preventDefault();
-				e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
+				toggleDropdown();
 			} );
 			expander.addEventListener( 'keydown', function( e ) {
 				if ( 13 === e.which || 32 === e.which ) {
 					e.preventDefault();
-					e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
+					toggleDropdown();
 				}
 			} );
 		} );
