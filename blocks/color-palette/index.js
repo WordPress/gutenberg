@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { ChromePicker } from 'react-color';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,7 +25,7 @@ export function ColorPalette( { defaultColors, colors, value, onChange } ) {
 
 	return (
 		<div className="blocks-color-palette">
-			{ usedColors.map( ( color ) => {
+			{ map( usedColors, ( color ) => {
 				const style = { color: color };
 				const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
 
