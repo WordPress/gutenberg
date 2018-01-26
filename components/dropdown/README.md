@@ -23,9 +23,11 @@ function MyDropdownMenu() {
 				</button>
 			) }
 			renderContent={ () => (
-				This is the content of the popover.
+				<div>
+					This is the content of the popover.
+				</div>
 			) }
-		>
+		/>
 	);
 }
 ```
