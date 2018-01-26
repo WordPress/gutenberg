@@ -619,6 +619,9 @@ function gutenberg_prepare_blocks_for_js() {
  * @since 0.4.0
  */
 function gutenberg_common_scripts_and_styles() {
+	if ( array_key_exists( 'classic-editor', $_GET ) ) {
+		return;
+	}
 	// Enqueue basic styles built out of Gutenberg through `npm build`.
 	wp_enqueue_style( 'wp-blocks' );
 
