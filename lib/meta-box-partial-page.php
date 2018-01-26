@@ -126,6 +126,9 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 					if ( isset( $data['callback'] ) && in_array( $data['callback'], $taxonomy_callbacks_to_unset ) ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
 					}
+					if ( isset( $data['args']['__original_callback'] )  && in_array( $data['args']['__original_callback'], $taxonomy_callbacks_to_unset ) ) {
+						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
+					}
 					// Filter out meta boxes that are just registered for back compat.
 					if ( isset( $data['args']['__back_compat_meta_box'] ) && $data['args']['__back_compat_meta_box'] ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
