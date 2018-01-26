@@ -681,29 +681,6 @@ add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 
 /**
- * Returns a default color palette.
- *
- * @return array Color strings in hex format.
- *
- * @since 0.7.0
- */
-function gutenberg_color_palette() {
-	return array(
-		'#f78da7',
-		'#cf2e2e',
-		'#ff6900',
-		'#fcb900',
-		'#7bdcb5',
-		'#00d084',
-		'#8ed1fc',
-		'#0693e3',
-		'#eee',
-		'#abb8c3',
-		'#313131',
-	);
-}
-
-/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -877,12 +854,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$color_palette           = get_theme_support( 'editor-color-palette' );
 
 	// Backcompat for Color Palette set through `gutenberg` array.
-	if ( empty( $color_palette ) ) {
-		if ( ! empty( $gutenberg_theme_support[0]['colors'] ) ) {
-			$color_palette = $gutenberg_theme_support[0]['colors'];
-		} else {
-			$color_palette = gutenberg_color_palette();
-		}
+	if ( empty( $color_palette ) && ! empty( $gutenberg_theme_support[0]['colors'] ) ) {
+		$color_palette = $gutenberg_theme_support[0]['colors'];
 	}
 
 	if ( ! empty( $gutenberg_theme_support ) ) {
@@ -906,10 +879,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$editor_settings = array(
 		'alignWide'          => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'availableTemplates' => wp_get_theme()->get_page_templates( get_post( $post_to_edit['id'] ) ),
-		'colors'             => $color_palette,
 		'blockTypes'         => $allowed_block_types,
 		'titlePlaceholder'   => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 	);
+
+	if ( ! empty( $color_palette ) ) {
+		$editor_settings['colors'] = $color_palette;
+	}
 
 	$post_type_object = get_post_type_object( $post_to_edit['type'] );
 	if ( ! empty( $post_type_object->template ) ) {
