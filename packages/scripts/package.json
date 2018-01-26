@@ -28,9 +28,9 @@
 	"bin": {
 		"wp-scripts": "./bin/wp-scripts.js"
 	},
-	"devDependencies": {
+	"dependencies": {
 		"babel-jest": "^22.0.4",
-		"cross-spawn": "5.1.0",
+		"cross-spawn": "^5.1.0",
 		"jest": "^22.0.4"
 	},
 	"publishConfig": {
