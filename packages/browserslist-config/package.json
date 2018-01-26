@@ -24,9 +24,6 @@
 	"devDependencies": {
 		"browserslist": "^2.11.3"
 	},
-	"peerDependencies": {
-		"browserslist": "^2.11.3"
-	},
 	"publishConfig": {
 		"access": "public"
 	}
