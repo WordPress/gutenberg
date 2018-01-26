@@ -7,7 +7,7 @@ describe( 'Managing links', () => {
 	const fixedIsOff = 'button:contains("Fix toolbar to block"):not(".is-selected")';
 
 	const setFixedToolbar = ( b ) => {
-		cy.get( '.editor-ellipsis-menu button' ).click();
+		cy.get( '.edit-post-ellipsis-menu button' ).click();
 
 		cy.get( 'body' ).then( ( $body ) => {
 			const candidate = b ? fixedIsOff : fixedIsOn;
@@ -16,7 +16,7 @@ describe( 'Managing links', () => {
 				return 'button:contains("Fix toolbar to block")';
 			}
 
-			return '.editor-ellipsis-menu button';
+			return '.edit-post-ellipsis-menu button';
 		} ).then( ( selector ) => {
 			cy.log( ' selector " + selector ', selector );
 			cy.get( selector ).click();

@@ -15,7 +15,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockEdit from '../../block-edit';
-import { registerBlockType } from '../../api';
 import ReusableBlockEditPanel from './edit-panel';
 
 class ReusableBlockEdit extends Component {
@@ -156,7 +155,9 @@ const ConnectedReusableBlockEdit = connect(
 	} )
 )( ReusableBlockEdit );
 
-registerBlockType( 'core/block', {
+export const name = 'core/block';
+
+export const settings = {
 	title: __( 'Reusable Block' ),
 	category: 'reusable-blocks',
 	isPrivate: true,
@@ -174,4 +175,4 @@ registerBlockType( 'core/block', {
 
 	edit: ConnectedReusableBlockEdit,
 	save: () => null,
-} );
+};

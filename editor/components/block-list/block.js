@@ -104,6 +104,7 @@ export class BlockListBlock extends Component {
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
@@ -274,12 +275,40 @@ export class BlockListBlock extends Component {
 		this.props.onInsertBlocks( blocks, this.props.order + 1 );
 	}
 
+	/**
+	 * Marks the block as selected when focused and not already selected. This
+	 * specifically handles the case where block does not set focus on its own
+	 * (via `setFocus`), typically if there is no focusable input in the block.
+	 *
+	 * @param {FocusEvent} event A focus event
+	 *
+	 * @returns {void}
+	 */
 	onFocus( event ) {
-		if ( event.target === this.node ) {
+		if ( event.target === this.node && ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
 	}
 
+	/**
+	 * Prevents default dragging behavior within a block to allow for multi-
+	 * selection to take effect unhampered.
+	 *
+	 * @param {DragEvent} event Drag event.
+	 *
+	 * @returns {void}
+	 */
+	preventDrag( event ) {
+		event.preventDefault();
+	}
+
+	/**
+	 * Begins tracking cursor multi-selection when clicking down within block.
+	 *
+	 * @param {MouseEvent} event A mousedown event.
+	 *
+	 * @returns {void}
+	 */
 	onPointerDown( event ) {
 		// Not the main button.
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -294,7 +323,10 @@ export class BlockListBlock extends Component {
 			}
 		} else {
 			this.props.onSelectionStart( this.props.uid );
-			this.props.onSelect();
+
+			if ( ! this.props.isSelected ) {
+				this.props.onSelect();
+			}
 		}
 	}
 
@@ -357,7 +389,7 @@ export class BlockListBlock extends Component {
 	}
 
 	render() {
-		const { block, order, mode, showContextualToolbar, isLocked } = this.props;
+		const { block, order, mode, showContextualToolbar, isLocked, renderBlockMenu } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -401,13 +433,13 @@ export class BlockListBlock extends Component {
 			>
 				<BlockDropZone index={ order } />
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } renderBlockMenu={ renderBlockMenu } /> }
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls /> }
 				<div
 					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
-					onDragStart={ ( event ) => event.preventDefault() }
+					onDragStart={ this.preventDrag }
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
@@ -444,7 +476,7 @@ export class BlockListBlock extends Component {
 							/>,
 						] }
 					</BlockCrashBoundary>
-					{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
+					{ showUI && <BlockMobileToolbar uid={ block.uid } renderBlockMenu={ renderBlockMenu } /> }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
 				<BlockListSiblingInserter uid={ block.uid } />

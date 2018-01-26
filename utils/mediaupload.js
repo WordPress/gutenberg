@@ -60,3 +60,19 @@ export function createMediaFromFile( file ) {
 		contentType: false,
 	} );
 }
+
+/**
+ * Utility used to preload an image before displaying it.
+ *
+ * @param   {string}  url Image Url.
+ * @returns {Promise}     Pormise resolved once the image is preloaded.
+ */
+export function preloadImage( url ) {
+	return new Promise( resolve => {
+		const newImg = new window.Image();
+		newImg.onload = function() {
+			resolve( url );
+		};
+		newImg.src = url;
+	} );
+}
