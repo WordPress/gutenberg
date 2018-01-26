@@ -1,0 +1,16 @@
+.edit-post-block-inspector-panel .components-panel__body {
+	border: none;
+	margin: 0 -16px;
+
+	.blocks-base-control {
+		margin: 0 0 1em 0;
+	}
+
+	&.is-opened > .components-panel__body-title {
+		margin-bottom: 5px;
+	}
+
+	.components-panel__body-toggle {
+		color: $dark-gray-500;
+	}
+}

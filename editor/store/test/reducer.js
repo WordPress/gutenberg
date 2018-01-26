@@ -7,7 +7,12 @@ import deepFreeze from 'deep-freeze';
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType, getBlockType } from '@wordpress/blocks';
+import {
+	registerCoreBlocks,
+	registerBlockType,
+	unregisterBlockType,
+	getBlockType,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -24,9 +29,16 @@ import {
 	notices,
 	blocksMode,
 	blockInsertionPoint,
+	isSavingMetaBoxes,
 	metaBoxes,
 	reusableBlocks,
 } from '../reducer';
+
+jest.mock( '../../utils/meta-boxes', () => {
+	return {
+		getMetaBoxContainer: () => ( { innerHTML: 'meta boxes content' } ),
+	};
+} );
 
 describe( 'state', () => {
 	describe( 'getPostRawValue', () => {
@@ -802,6 +814,15 @@ describe( 'state', () => {
 			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
 		} );
 
+		it( 'should return same reference if already multi-selecting', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
+			const state = blockSelection( original, {
+				type: 'START_MULTI_SELECT',
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
 		it( 'should end multi selection with selection', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: true } );
 			const state = blockSelection( original, {
@@ -809,6 +830,15 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+		} );
+
+		it( 'should return same reference if already ended multi-selecting', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+			const state = blockSelection( original, {
+				type: 'STOP_MULTI_SELECT',
+			} );
+
+			expect( state ).toBe( original );
 		} );
 
 		it( 'should end multi selection without selection', () => {
@@ -831,7 +861,7 @@ describe( 'state', () => {
 			expect( state1 ).toBe( original );
 		} );
 
-		it( 'should unset multi selection and select inserted block', () => {
+		it( 'should unset multi selection', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'chicken' } );
 
 			const state1 = blockSelection( original, {
@@ -839,6 +869,20 @@ describe( 'state', () => {
 			} );
 
 			expect( state1 ).toEqual( { start: null, end: null, focus: null, isMultiSelecting: false } );
+		} );
+
+		it( 'should return same reference if clearing selection but no selection', () => {
+			const original = deepFreeze( { start: null, end: null, focus: null, isMultiSelecting: false } );
+
+			const state1 = blockSelection( original, {
+				type: 'CLEAR_SELECTED_BLOCK',
+			} );
+
+			expect( state1 ).toBe( original );
+		} );
+
+		it( 'should select inserted block', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'chicken' } );
 
 			const state3 = blockSelection( original, {
 				type: 'INSERT_BLOCKS',
@@ -918,92 +962,17 @@ describe( 'state', () => {
 	} );
 
 	describe( 'preferences()', () => {
+		beforeAll( () => {
+			registerCoreBlocks();
+		} );
+
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
 				blockUsage: {},
 				recentlyUsedBlocks: [],
-				mode: 'visual',
-				sidebars: {
-					desktop: true,
-					mobile: false,
-					publish: false,
-				},
-				panels: { 'post-status': true },
-				features: { fixedToolbar: false },
 			} );
-		} );
-
-		it( 'should toggle the given sidebar flag', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-				desktop: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
-			} );
-
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: false,
-			} );
-		} );
-
-		it( 'should set the sidebar open flag to true if unset', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
-			} );
-
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: true,
-			} );
-		} );
-
-		it( 'should force the given sidebar flag', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
-				forcedValue: false,
-			} );
-
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: false,
-			} );
-		} );
-
-		it( 'should set the sidebar panel open flag to true if unset', () => {
-			const state = preferences( deepFreeze( {} ), {
-				type: 'TOGGLE_SIDEBAR_PANEL',
-				panel: 'post-taxonomies',
-			} );
-
-			expect( state ).toEqual( { panels: { 'post-taxonomies': true } } );
-		} );
-
-		it( 'should toggle the sidebar panel open flag', () => {
-			const state = preferences( deepFreeze( { panels: { 'post-taxonomies': true } } ), {
-				type: 'TOGGLE_SIDEBAR_PANEL',
-				panel: 'post-taxonomies',
-			} );
-
-			expect( state ).toEqual( { panels: { 'post-taxonomies': false } } );
-		} );
-
-		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( {} ), {
-				type: 'SWITCH_MODE',
-				mode: 'text',
-			} );
-
-			expect( state ).toEqual( { mode: 'text' } );
 		} );
 
 		it( 'should record recently used blocks', () => {
@@ -1076,14 +1045,6 @@ describe( 'state', () => {
 				type: 'SETUP_EDITOR',
 			} );
 			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 88 } );
-		} );
-
-		it( 'should toggle a feature flag', () => {
-			const state = preferences( deepFreeze( { features: { chicken: true } } ), {
-				type: 'TOGGLE_FEATURE',
-				feature: 'chicken',
-			} );
-			expect( state ).toEqual( { features: { chicken: false } } );
 		} );
 	} );
 
@@ -1236,29 +1197,49 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'isSavingMetaBoxes', () => {
+		it( 'should return default state', () => {
+			const actual = isSavingMetaBoxes( undefined, {} );
+			expect( actual ).toBe( false );
+		} );
+
+		it( 'should set saving flag to true', () => {
+			const action = {
+				type: 'REQUEST_META_BOX_UPDATES',
+			};
+			const actual = isSavingMetaBoxes( false, action );
+
+			expect( actual ).toBe( true );
+		} );
+
+		it( 'should set saving flag to false', () => {
+			const action = {
+				type: 'META_BOX_UPDATES_SUCCESS',
+			};
+			const actual = isSavingMetaBoxes( true, action );
+
+			expect( actual ).toBe( false );
+		} );
+	} );
+
 	describe( 'metaBoxes()', () => {
 		it( 'should return default state', () => {
 			const actual = metaBoxes( undefined, {} );
 			const expected = {
 				normal: {
 					isActive: false,
-					isDirty: false,
-					isUpdating: false,
 				},
 				side: {
 					isActive: false,
-					isDirty: false,
-					isUpdating: false,
 				},
 				advanced: {
 					isActive: false,
-					isDirty: false,
-					isUpdating: false,
 				},
 			};
 
 			expect( actual ).toEqual( expected );
 		} );
+
 		it( 'should set the sidebar to active', () => {
 			const theMetaBoxes = {
 				normal: false,
@@ -1275,73 +1256,32 @@ describe( 'state', () => {
 			const expected = {
 				normal: {
 					isActive: false,
-					isDirty: false,
-					isUpdating: false,
-					isLoaded: false,
 				},
 				side: {
 					isActive: true,
-					isDirty: false,
-					isUpdating: false,
-					isLoaded: false,
 				},
 				advanced: {
 					isActive: false,
-					isDirty: false,
-					isUpdating: false,
-					isLoaded: false,
 				},
 			};
 
 			expect( actual ).toEqual( expected );
 		} );
-		it( 'should switch updating to off', () => {
+
+		it( 'should set the meta boxes saved data', () => {
 			const action = {
-				type: 'HANDLE_META_BOX_RELOAD',
-				location: 'normal',
+				type: 'META_BOX_SET_SAVED_DATA',
+				dataPerLocation: {
+					side: 'a=b',
+				},
 			};
 
-			const theMetaBoxes = metaBoxes( { normal: { isUpdating: true, isActive: false, isDirty: true } }, action );
-			const actual = theMetaBoxes.normal;
-			const expected = {
-				isActive: false,
-				isUpdating: false,
-				isDirty: false,
-			};
-
-			expect( actual ).toEqual( expected );
-		} );
-		it( 'should switch updating to on', () => {
-			const action = {
-				type: 'REQUEST_META_BOX_UPDATES',
-				locations: [ 'normal' ],
-			};
-
-			const theMetaBoxes = metaBoxes( undefined, action );
-			const actual = theMetaBoxes.normal;
-			const expected = {
-				isActive: false,
-				isUpdating: true,
-				isDirty: false,
-			};
-
-			expect( actual ).toEqual( expected );
-		} );
-		it( 'should return with the isDirty flag as true', () => {
-			const action = {
-				type: 'META_BOX_STATE_CHANGED',
-				location: 'normal',
-				hasChanged: true,
-			};
-			const theMetaBoxes = metaBoxes( undefined, action );
-			const actual = theMetaBoxes.normal;
-			const expected = {
-				isActive: false,
-				isDirty: true,
-				isUpdating: false,
-			};
-
-			expect( actual ).toEqual( expected );
+			const theMetaBoxes = metaBoxes( { normal: { isActive: true }, side: { isActive: false } }, action );
+			expect( theMetaBoxes ).toEqual( {
+				advanced: { data: undefined },
+				normal: { isActive: true, data: undefined },
+				side: { isActive: false, data: 'a=b' },
+			} );
 		} );
 	} );
 

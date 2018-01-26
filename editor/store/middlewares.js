@@ -8,7 +8,6 @@ import { flowRight } from 'lodash';
 /**
  * Internal dependencies
  */
-import { mobileMiddleware } from '../utils/mobile';
 import effects from './effects';
 
 /**
@@ -20,7 +19,6 @@ import effects from './effects';
  */
 function applyMiddlewares( store ) {
 	const middlewares = [
-		mobileMiddleware,
 		refx( effects ),
 		multi,
 	];

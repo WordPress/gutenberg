@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { DropZone, FormFileUpload, Placeholder, Button } from '@wordpress/components';
@@ -9,6 +14,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import MediaUpload from '../media-upload';
+import { rawHandler } from '../api';
 
 /**
  *  ImagePlaceHolder is a react component used by blocks containing user configurable images e.g: image and cover image.
@@ -19,7 +25,12 @@ import MediaUpload from '../media-upload';
  */
 export default function ImagePlaceHolder( { className, icon, label, onSelectImage } ) {
 	const setImage = ( [ image ] ) => onSelectImage( image );
-	const dropFiles = ( files ) => mediaUpload( files, setImage );
+	const onFilesDrop = ( files ) => mediaUpload( files, setImage );
+	const onHTMLDrop = ( HTML ) => setImage( map(
+		rawHandler( { HTML, mode: 'BLOCKS' } )
+			.filter( ( { name } ) => name === 'core/image' ),
+		'attributes'
+	) );
 	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setImage );
 	return (
 		<Placeholder
@@ -28,7 +39,8 @@ export default function ImagePlaceHolder( { className, icon, label, onSelectImag
 			icon={ icon }
 			label={ label } >
 			<DropZone
-				onFilesDrop={ dropFiles }
+				onFilesDrop={ onFilesDrop }
+				onHTMLDrop={ onHTMLDrop }
 			/>
 			<FormFileUpload
 				isLarge

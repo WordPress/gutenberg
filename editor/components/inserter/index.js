@@ -17,7 +17,7 @@ import { Component, compose } from '@wordpress/element';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint, getEditorMode } from '../../store/selectors';
+import { getBlockInsertionPoint } from '../../store/selectors';
 import {
 	insertBlock,
 	hideInsertionPoint,
@@ -99,7 +99,6 @@ export default compose( [
 		( state ) => {
 			return {
 				insertionPoint: getBlockInsertionPoint( state ),
-				mode: getEditorMode( state ),
 			};
 		},
 		( dispatch ) => ( {

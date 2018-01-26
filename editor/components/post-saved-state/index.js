@@ -24,9 +24,16 @@ import {
 	isEditedPostSaveable,
 	getCurrentPost,
 	getEditedPostAttribute,
+	hasMetaBoxes,
 } from '../../store/selectors';
 
-export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
+/**
+ * Component showing whether the post is saved or not and displaying save links.
+ *
+ * @param   {Object}    Props Component Props.
+ * @returns {WPElement}       WordPress Element.
+ */
+export function PostSavedState( { hasActiveMetaboxes, isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
 	const className = 'editor-post-saved-state';
 
 	if ( isSaving ) {
@@ -45,7 +52,7 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 		return null;
 	}
 
-	if ( ! isNew && ! isDirty ) {
+	if ( ! isNew && ! isDirty && ! hasActiveMetaboxes ) {
 		return (
 			<span className={ className }>
 				<Dashicon icon="saved" />
@@ -79,6 +86,7 @@ export default connect(
 		isSaving: isSavingPost( state ),
 		isSaveable: isEditedPostSaveable( state ),
 		status: getEditedPostAttribute( state, 'status' ),
+		hasActiveMetaboxes: hasMetaBoxes( state ),
 	} ),
 	{
 		onStatusChange: ( status ) => editPost( { status } ),

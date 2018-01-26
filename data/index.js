@@ -6,6 +6,11 @@ import { createStore, combineReducers } from 'redux';
 import { flowRight } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+export { loadAndPersist, withRehydratation } from './persist';
+
+/**
  * Module constants
  */
 const reducers = {};

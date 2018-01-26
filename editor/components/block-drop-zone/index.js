@@ -8,20 +8,26 @@ import { reduce, get, find } from 'lodash';
  * WordPress dependencies
  */
 import { DropZone, withContext } from '@wordpress/components';
-import { getBlockTypes } from '@wordpress/blocks';
+import { getBlockTypes, rawHandler } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { insertBlocks } from '../../store/actions';
+import { insertBlocks, updateBlockAttributes } from '../../store/actions';
 
 function BlockDropZone( { index, isLocked, ...props } ) {
 	if ( isLocked ) {
 		return null;
 	}
 
-	const dropFiles = ( files, position ) => {
+	const getInsertPosition = ( position ) => {
+		if ( index !== undefined ) {
+			return position.y === 'top' ? index : index + 1;
+		}
+	};
+
+	const onDropFiles = ( files, position ) => {
 		const transformation = reduce( getBlockTypes(), ( ret, blockType ) => {
 			if ( ret ) {
 				return ret;
@@ -33,19 +39,24 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		}, false );
 
 		if ( transformation ) {
-			let insertPosition;
-			if ( index !== undefined ) {
-				insertPosition = position.y === 'top' ? index : index + 1;
-			}
-			transformation.transform( files ).then( ( blocks ) => {
-				props.insertBlocks( blocks, insertPosition );
-			} );
+			const insertPosition = getInsertPosition( position );
+			const blocks = transformation.transform( files, props.updateBlockAttributes );
+			props.insertBlocks( blocks, insertPosition );
+		}
+	};
+
+	const onHTMLDrop = ( HTML, position ) => {
+		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
+
+		if ( blocks.length ) {
+			props.insertBlocks( blocks, getInsertPosition( position ) );
 		}
 	};
 
 	return (
 		<DropZone
-			onFilesDrop={ dropFiles }
+			onFilesDrop={ onDropFiles }
+			onHTMLDrop={ onHTMLDrop }
 		/>
 	);
 }
@@ -53,7 +64,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 export default compose(
 	connect(
 		undefined,
-		{ insertBlocks }
+		{ insertBlocks, updateBlockAttributes }
 	),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;

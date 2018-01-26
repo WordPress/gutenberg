@@ -153,10 +153,19 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 			...omit( blockType, [ 'attributes', 'save', 'supports' ] ), // Parsing/Serialization properties
 			...blockType.deprecated[ i ],
 		};
-		const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
-		const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
-		if ( isValid ) {
-			return deprecatedBlockAttributes;
+
+		try {
+			// Parse using the deprecated block version .
+			// Try to validate the parsed block using this same deprecated version.
+			// Ignore this version if the the validation fails.
+			const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
+			const migratedBlockAttributes = deprecatedBlockType.migrate ? deprecatedBlockType.migrate( deprecatedBlockAttributes ) : deprecatedBlockAttributes;
+			const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
+			if ( isValid ) {
+				return migratedBlockAttributes;
+			}
+		} catch ( error ) {
+			// ignore error, it means this deprecated version is invalid
 		}
 	}
 }
