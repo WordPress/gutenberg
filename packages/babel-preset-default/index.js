@@ -27,7 +27,7 @@ module.exports = {
 		[ require( 'babel-plugin-transform-react-jsx' ), {
 			pragma: 'wp.element.createElement',
 		} ],
-		require( 'babel-plugin-transform-runtime' ),
+		! isTestEnv && require( 'babel-plugin-transform-runtime' ),
 		! isTestEnv && require( 'babel-plugin-lodash' ),
 	].filter( Boolean ),
 };
