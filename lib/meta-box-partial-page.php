@@ -314,7 +314,7 @@ function the_gutenberg_metaboxes() {
 		<?php foreach ( $locations as $location ) : ?>
 			<form class="metabox-location-<?php echo esc_attr( $location ); ?>">
 				<div class="sidebar-open">
-					<div id="postbox-container-2" class="postbox-container">
+					<div class="postbox-container">
 						<?php
 						do_meta_boxes(
 							$current_screen,
