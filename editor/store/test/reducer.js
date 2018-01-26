@@ -7,7 +7,12 @@ import deepFreeze from 'deep-freeze';
 /**
  * WordPress dependencies
  */
-import { registerBlockType, unregisterBlockType, getBlockType } from '@wordpress/blocks';
+import {
+	registerCoreBlocks,
+	registerBlockType,
+	unregisterBlockType,
+	getBlockType,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -29,7 +34,7 @@ import {
 	reusableBlocks,
 } from '../reducer';
 
-jest.mock( '../../edit-post/meta-boxes', () => {
+jest.mock( '../../utils/meta-boxes', () => {
 	return {
 		getMetaBoxContainer: () => ( { innerHTML: 'meta boxes content' } ),
 	};
@@ -809,6 +814,15 @@ describe( 'state', () => {
 			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
 		} );
 
+		it( 'should return same reference if already multi-selecting', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
+			const state = blockSelection( original, {
+				type: 'START_MULTI_SELECT',
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
 		it( 'should end multi selection with selection', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: true } );
 			const state = blockSelection( original, {
@@ -816,6 +830,15 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+		} );
+
+		it( 'should return same reference if already ended multi-selecting', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+			const state = blockSelection( original, {
+				type: 'STOP_MULTI_SELECT',
+			} );
+
+			expect( state ).toBe( original );
 		} );
 
 		it( 'should end multi selection without selection', () => {
@@ -838,7 +861,7 @@ describe( 'state', () => {
 			expect( state1 ).toBe( original );
 		} );
 
-		it( 'should unset multi selection and select inserted block', () => {
+		it( 'should unset multi selection', () => {
 			const original = deepFreeze( { start: 'ribs', end: 'chicken' } );
 
 			const state1 = blockSelection( original, {
@@ -846,6 +869,20 @@ describe( 'state', () => {
 			} );
 
 			expect( state1 ).toEqual( { start: null, end: null, focus: null, isMultiSelecting: false } );
+		} );
+
+		it( 'should return same reference if clearing selection but no selection', () => {
+			const original = deepFreeze( { start: null, end: null, focus: null, isMultiSelecting: false } );
+
+			const state1 = blockSelection( original, {
+				type: 'CLEAR_SELECTED_BLOCK',
+			} );
+
+			expect( state1 ).toBe( original );
+		} );
+
+		it( 'should select inserted block', () => {
+			const original = deepFreeze( { start: 'ribs', end: 'chicken' } );
 
 			const state3 = blockSelection( original, {
 				type: 'INSERT_BLOCKS',
@@ -925,92 +962,17 @@ describe( 'state', () => {
 	} );
 
 	describe( 'preferences()', () => {
+		beforeAll( () => {
+			registerCoreBlocks();
+		} );
+
 		it( 'should apply all defaults', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
 				blockUsage: {},
 				recentlyUsedBlocks: [],
-				mode: 'visual',
-				sidebars: {
-					desktop: true,
-					mobile: false,
-					publish: false,
-				},
-				panels: { 'post-status': true },
-				features: { fixedToolbar: false },
 			} );
-		} );
-
-		it( 'should toggle the given sidebar flag', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-				desktop: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
-			} );
-
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: false,
-			} );
-		} );
-
-		it( 'should set the sidebar open flag to true if unset', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
-			} );
-
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: true,
-			} );
-		} );
-
-		it( 'should force the given sidebar flag', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
-				forcedValue: false,
-			} );
-
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: false,
-			} );
-		} );
-
-		it( 'should set the sidebar panel open flag to true if unset', () => {
-			const state = preferences( deepFreeze( {} ), {
-				type: 'TOGGLE_SIDEBAR_PANEL',
-				panel: 'post-taxonomies',
-			} );
-
-			expect( state ).toEqual( { panels: { 'post-taxonomies': true } } );
-		} );
-
-		it( 'should toggle the sidebar panel open flag', () => {
-			const state = preferences( deepFreeze( { panels: { 'post-taxonomies': true } } ), {
-				type: 'TOGGLE_SIDEBAR_PANEL',
-				panel: 'post-taxonomies',
-			} );
-
-			expect( state ).toEqual( { panels: { 'post-taxonomies': false } } );
-		} );
-
-		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( {} ), {
-				type: 'SWITCH_MODE',
-				mode: 'text',
-			} );
-
-			expect( state ).toEqual( { mode: 'text' } );
 		} );
 
 		it( 'should record recently used blocks', () => {
@@ -1083,14 +1045,6 @@ describe( 'state', () => {
 				type: 'SETUP_EDITOR',
 			} );
 			expect( state.blockUsage ).toEqual( { 'core-embed/youtube': 88 } );
-		} );
-
-		it( 'should toggle a feature flag', () => {
-			const state = preferences( deepFreeze( { features: { chicken: true } } ), {
-				type: 'TOGGLE_FEATURE',
-				feature: 'chicken',
-			} );
-			expect( state ).toEqual( { features: { chicken: false } } );
 		} );
 	} );
 

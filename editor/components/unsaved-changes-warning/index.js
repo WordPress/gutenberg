@@ -15,7 +15,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import { isEditedPostDirty, getMetaBoxes } from '../../store/selectors';
-import { getMetaBoxContainer } from '../../edit-post/meta-boxes';
+import { getMetaBoxContainer } from '../../utils/meta-boxes';
 
 class UnsavedChangesWarning extends Component {
 	/**

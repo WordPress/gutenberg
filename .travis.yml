@@ -20,6 +20,10 @@ cache:
 before_install:
   - nvm install && nvm use
 
+branches:
+  only:
+    - master
+
 jobs:
   include:
     - stage: test

@@ -57,7 +57,7 @@ import {
 	getMetaBoxes,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
-import { getMetaBoxContainer } from '../edit-post/meta-boxes';
+import { getMetaBoxContainer } from '../utils/meta-boxes';
 
 /**
  * Module Constants

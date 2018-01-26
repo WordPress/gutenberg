@@ -93,6 +93,7 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 		'formatdiv',
 		'categorydiv',
 		'tagsdiv-post_tag',
+		'pageparentdiv',
 		'postimagediv',
 	);
 
