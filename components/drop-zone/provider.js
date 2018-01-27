@@ -140,7 +140,6 @@ class DropZoneProvider extends Component {
 		} );
 
 		event.preventDefault();
-		event.stopPropagation();
 	}
 
 	isWithinZoneBounds( dropzone, x, y ) {
