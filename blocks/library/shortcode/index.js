@@ -18,9 +18,10 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType } from '../../api';
 
-registerBlockType( 'core/shortcode', {
+export const name = 'core/shortcode';
+
+export const settings = {
 	title: __( 'Shortcode' ),
 
 	description: __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ),
@@ -79,6 +80,9 @@ registerBlockType( 'core/shortcode', {
 				super();
 				this.state = {
 					html: '',
+					js: '',
+					style: '',
+					type: '',
 					preview: false,
 					focus: false,
 					fetching: false,
@@ -118,9 +122,9 @@ registerBlockType( 'core/shortcode', {
 				window.fetch( apiUrl, {
 					credentials: 'include',
 				} ).then( ( response ) => {
-					response.json().then( ( obj ) => {
-						obj = ( 0 < obj.length ) ? obj : __( 'Sorry, couldn\'t render a preview' );
-						this.setState( { html: obj, fetching: false } );
+					response.json().then( ( { html, type, style, js } ) => {
+						html = ( 0 < html.length ) ? html : __( 'Sorry, couldn\'t render a preview' );
+						this.setState( { html: html, js: js, style: style, type: type, fetching: false } );
 					} );
 				} );
 			}
@@ -131,7 +135,7 @@ registerBlockType( 'core/shortcode', {
 			}
 
 			render() {
-				const { fetching, preview, html } = this.state;
+				const { fetching, preview, html, type, js, style } = this.state;
 				const { instanceId, setAttributes, attributes, focus, setFocus } = this.props;
 				const inputId = `blocks-shortcode-input-${ instanceId }`;
 
@@ -189,7 +193,9 @@ registerBlockType( 'core/shortcode', {
 						<SandBox
 							html={ html }
 							title="Preview"
-							type="video"
+							type={ type }
+							js={ js }
+							style={ style }
 							onFocus={ () => setFocus() }
 						/>
 					</figure>,
@@ -200,4 +206,4 @@ registerBlockType( 'core/shortcode', {
 	save( { attributes } ) {
 		return attributes.text;
 	},
-} );
+};
