@@ -96,9 +96,9 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		// TODO: Extend embed video compare to other services too, such as videopress.
 		if ( has_shortcode( $args['shortcode'], 'video' ) ) {
 			$type = 'video';
-		} elseif( has_shortcode( $args['shortcode'], 'embed' ) && preg_match( $yt_pattern, $args['shortcode'] ) ) {
+		} elseif ( has_shortcode( $args['shortcode'], 'embed' ) && preg_match( $yt_pattern, $args['shortcode'] ) ) {
 			$type = 'video';
-		} elseif( has_shortcode( $args['shortcode'], 'embed' ) && preg_match( $vimeo_pattern, $args['shortcode'] ) ) {
+		} elseif ( has_shortcode( $args['shortcode'], 'embed' ) && preg_match( $vimeo_pattern, $args['shortcode'] ) ) {
 			$type = 'video';
 		} else {
 			$type = 'html';
@@ -148,16 +148,16 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'required'    => true,
 				),
-                'style' => array(
+				'style' => array(
 					'description' => __( 'Links to external style sheets needed to render the shortcode', 'gutenberg' ),
-                    'type'        => 'string',
+					'type'        => 'string',
 					'required'    => true,
 				),
 				'js'    => array(
 					'description' => __( 'Links to external javascript and inline scripts needed to render the shortcode', 'gutenberg' ),
-                    'type'        => 'string',
+					'type'        => 'string',
 					'required'    => true,
-				),              
+				),
 			),
 		);
 	}
