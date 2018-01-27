@@ -96,6 +96,12 @@ export default class Sandbox extends Component {
 
 				function sendResize() {
 					var clientBoundingRect = document.body.getBoundingClientRect();
+					if ( 0 === clientBoundingRect.height ) {
+						clientBoundingRect.height = document.getElementById( 'content' ).clientHeight;
+					}
+					if ( 0 === clientBoundingRect.width ) {
+						clientBoundingRect.width = document.getElementById( 'content' ).clientWidth;
+					}
 					window.parent.postMessage( {
 						action: 'resize',
 						width: clientBoundingRect.width,
@@ -141,12 +147,18 @@ export default class Sandbox extends Component {
 			body {
 				margin: 0;
 			}
+			
+			body.html {
+				width: 100%;
+			}
+
 			body.video,
 			body.video > div,
 			body.video > div > iframe {
 				width: 100%;
 				height: 100%;
 			}
+
 			body > div > * {
 				margin-top: 0 !important;	/* has to have !important to override inline styles */
 				margin-bottom: 0 !important;
@@ -162,8 +174,11 @@ export default class Sandbox extends Component {
 					<style dangerouslySetInnerHTML={ { __html: style } } />
 				</head>
 				<body data-resizable-iframe-connected="data-resizable-iframe-connected" className={ this.props.type }>
-					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
+					<div id="content" dangerouslySetInnerHTML={ { __html: this.props.html } } />
 					<script type="text/javascript" dangerouslySetInnerHTML={ { __html: observeAndResizeJS } } />
+
+					<div dangerouslySetInnerHTML={ { __html: this.props.js } } />
+					<div dangerouslySetInnerHTML={ { __html: this.props.style } } />
 				</body>
 			</html>
 		);
