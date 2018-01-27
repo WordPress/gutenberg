@@ -77,14 +77,15 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 	public function get_shortcode_output( $request ) {
 		global $post;
 		global $wp_embed;
+		$style = '';
+		$js = '';
+		$yt_pattern = '#https?://(?:www\.)?(?:youtube\.com/watch|youtu\.be/)#';
+	    $vimeo_pattern = '#https?://(.+\.)?vimeo\.com/.*#';
 		$args = $request->get_params();
 		$post = get_post( $args['postId'] );
 		setup_postdata( $post );
-		$yt_pattern    = '#https?://(?:www\.)?(?:youtube\.com/watch|youtu\.be/)#';
-	        $vimeo_pattern = '#https?://(.+\.)?vimeo\.com/.*#';
-		$style = $js = '';
-
-		//Since the [embed] shortcode needs to be run earlier than other shortcodes. 
+		
+		//Since the [embed] shortcode needs to be run earlier than other shortcodes.
 		if ( has_shortcode( $args['shortcode'], 'embed' ) ) {
 			$output = $wp_embed->run_shortcode( $args['shortcode'] );
 		} else {
