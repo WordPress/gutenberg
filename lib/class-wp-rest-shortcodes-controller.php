@@ -80,7 +80,7 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		$style = '';
 		$js = '';
 		$yt_pattern = '#https?://(?:www\.)?(?:youtube\.com/watch|youtu\.be/)#';
-	    $vimeo_pattern = '#https?://(.+\.)?vimeo\.com/.*#';
+		$vimeo_pattern = '#https?://(.+\.)?vimeo\.com/.*#';
 		$args = $request->get_params();
 		$post = get_post( $args['postId'] );
 		setup_postdata( $post );
