@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -52,13 +47,13 @@ export default class OldEditor extends Component {
 
 	componentWillUnmount() {
 		window.addEventListener( 'DOMContentLoaded', this.initialize );
-		wp.oldEditor.remove( this.props.id );
+		wp.oldEditor.remove( `editor-${ this.props.id }` );
 	}
 
 	componentDidUpdate( prevProps ) {
 		const { id, attributes: { content } } = this.props;
 
-		const editor = window.tinymce.get( id );
+		const editor = window.tinymce.get( `editor-${ id }` );
 
 		if ( prevProps.attributes.content !== content ) {
 			editor.setContent( content || '' );
@@ -68,13 +63,12 @@ export default class OldEditor extends Component {
 	initialize() {
 		const { id } = this.props;
 		const { settings } = window.wpEditorL10n.tinymce;
-
-		wp.oldEditor.initialize( id, {
+		wp.oldEditor.initialize( `editor-${ id }`, {
 			tinymce: {
 				...settings,
 				inline: true,
 				content_css: false,
-				fixed_toolbar_container: '#' + id + '-toolbar',
+				fixed_toolbar_container: `#toolbar-${ id }`,
 				setup: this.onSetup,
 			},
 		} );
@@ -168,20 +162,20 @@ export default class OldEditor extends Component {
 	}
 
 	render() {
-		const { isSelected, id, className } = this.props;
+		const { isSelected, id } = this.props;
 
 		return [
 			<div
 				key="toolbar"
-				id={ id + '-toolbar' }
+				id={ `toolbar-${ id }` }
 				ref={ ref => this.ref = ref }
 				className="freeform-toolbar"
 				style={ ! isSelected ? { display: 'none' } : {} }
 			/>,
 			<div
 				key="editor"
-				id={ id }
-				className={ classnames( className, 'blocks-rich-text__tinymce' ) }
+				id={ `editor-${ id }` }
+				className="wp-block-freeform blocks-rich-text__tinymce"
 			/>,
 		];
 	}
