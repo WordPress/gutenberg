@@ -77,50 +77,49 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 	public function get_shortcode_output( $request ) {
 		global $post;
 		global $wp_embed;
-		$style = '';
-		$js = '';
-		$yt_pattern = '#https?://(?:www\.)?(?:youtube\.com/watch|youtu\.be/)#';
+		$style         = '';
+		$js            = '';
+		$yt_pattern    = '#https?://(?:www\.)?(?:youtube\.com/watch|youtu\.be/)#';
 		$vimeo_pattern = '#https?://(.+\.)?vimeo\.com/.*#';
-		$args = $request->get_params();
-		$post = get_post( $args['postId'] );
+		$args          = $request->get_params();
+		$post          = get_post( $args['postId'] );
 		setup_postdata( $post );
-		
-		//Since the [embed] shortcode needs to be run earlier than other shortcodes.
+
+		// Since the [embed] shortcode needs to be run earlier than other shortcodes.
 		if ( has_shortcode( $args['shortcode'], 'embed' ) ) {
 			$output = $wp_embed->run_shortcode( $args['shortcode'] );
 		} else {
 			$output = do_shortcode( $args['shortcode'] );
 		}
 
-		//Check if shortcode is returning a video. The video type will be used by the frontend to maintain 16:9 aspect ratio
-		//TODO: Extend embed video compare to other services too, such as videopress
+		// Check if shortcode is returning a video. The video type will be used by the frontend to maintain 16:9 aspect ratio.
+		// TODO: Extend embed video compare to other services too, such as videopress.
 		if ( has_shortcode( $args['shortcode'], 'video' ) ) {
 			$type = 'video';
-		} elseif ( has_shortcode( $args['shortcode'], 'embed' ) && preg_match( $yt_pattern, $args['shortcode'] ) ) {
+		} elseif( has_shortcode( $args['shortcode'], 'embed' ) && preg_match( $yt_pattern, $args['shortcode'] ) ) {
 			$type = 'video';
-		} elseif ( has_shortcode( $args['shortcode'], 'embed' ) && preg_match( $vimeo_pattern, $args['shortcode'] ) ) {	
+		} elseif( has_shortcode( $args['shortcode'], 'embed' ) && preg_match( $vimeo_pattern, $args['shortcode'] ) ) {
 			$type = 'video';
 		} else {
 			$type = 'html';
-			//Gallery and caption shortcodes need the theme style to be embedded in the shortcode preview iframe
+			// Gallery and caption shortcodes need the theme style to be embedded in the shortcode preview iframe.
 			if ( has_shortcode( $args['shortcode'], 'gallery' ) || has_shortcode( $args['shortcode'], 'caption' ) || has_shortcode( $args['shortcode'], 'wp_caption' ) ) {
 				$style = '<link rel="stylesheet" type="text/css" href="' . get_stylesheet_uri() . '" />';
 			}
 
-			//Playlist shortcodes need the playlist JS to be embedded in the shortcode preview iframe
+			// Playlist shortcodes need the playlist JS to be embedded in the shortcode preview iframe.
 			if ( has_shortcode( $args['shortcode'], 'playlist' ) ) {
 				ob_start();
 				wp_print_scripts( 'wp-playlist' );
 				$js = ob_get_clean();
-							
 			}
 		}
 
 		$data = array(
-			'html'	=> $output,
-			'type'	=> $type,
-			'style'	=> $style,
-			'js'	=> $js,
+			'html'  => $output,
+			'type'  => $type,
+			'style' => $style,
+			'js'    => $js,
 		);
 		return rest_ensure_response( $data );
 	}
@@ -139,26 +138,26 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			'title'      => 'shortcode-block',
 			'type'       => 'object',
 			'properties' => array(
-				'html' => array(
+				'html'  => array(
 					'description' => __( 'The block\'s content with shortcodes filtered through hooks.', 'gutenberg' ),
 					'type'        => 'string',
 					'required'    => true,
 				),
-				'type' => array(
-                                        'description' => __( 'The filtered content type - video or otherwise', 'gutenberg' ),
-                                        'type'        => 'string',
-                                        'required'    => true,
-                                ),
-				'style' => array(
-                                        'description' => __( 'Links to external style sheets needed to render the shortcode', 'gutenberg' ),
-                                        'type'        => 'string',
-                                        'required'    => true,
-                                ),
-				'js' => array(
-                                        'description' => __( 'Links to external javascript and inline scripts needed to render the shortcode', 'gutenberg' ),
-                                        'type'        => 'string',
-                                        'required'    => true,
-                                ),
+				'type'  => array(
+					'description' => __( 'The filtered content type - video or otherwise', 'gutenberg' ),
+					'type'        => 'string',
+					'required'    => true,
+				),
+                'style' => array(
+					'description' => __( 'Links to external style sheets needed to render the shortcode', 'gutenberg' ),
+                    'type'        => 'string',
+					'required'    => true,
+				),
+				'js'    => array(
+					'description' => __( 'Links to external javascript and inline scripts needed to render the shortcode', 'gutenberg' ),
+                    'type'        => 'string',
+					'required'    => true,
+				),              
 			),
 		);
 	}
