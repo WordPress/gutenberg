@@ -41,16 +41,12 @@ import {
 	removeBlocks,
 	removeBlock,
 	toggleBlockMode,
-	toggleSidebar,
-	setActivePanel,
-	toggleSidebarPanel,
 	createNotice,
 	createSuccessNotice,
 	createInfoNotice,
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
-	toggleFeature,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -376,34 +372,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'toggleSidebar', () => {
-		it( 'should return TOGGLE_SIDEBAR action', () => {
-			expect( toggleSidebar( 'publish', true ) ).toEqual( {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'publish',
-				forcedValue: true,
-			} );
-		} );
-	} );
-
-	describe( 'setActivePanel', () => {
-		const panel = 'panelName';
-		expect( setActivePanel( panel ) ).toEqual( {
-			type: 'SET_ACTIVE_PANEL',
-			panel,
-		} );
-	} );
-
-	describe( 'toggleSidebarPanel', () => {
-		it( 'should return TOGGLE_SIDEBAR_PANEL action', () => {
-			const panel = 'panelName';
-			expect( toggleSidebarPanel( panel ) ).toEqual( {
-				type: 'TOGGLE_SIDEBAR_PANEL',
-				panel,
-			} );
-		} );
-	} );
-
 	describe( 'createNotice', () => {
 		const status = 'status';
 		const content = <p>element</p>;
@@ -508,16 +476,6 @@ describe( 'actions', () => {
 			expect( removeNotice( noticeId ) ).toEqual( {
 				type: 'REMOVE_NOTICE',
 				noticeId,
-			} );
-		} );
-	} );
-
-	describe( 'toggleFeature', () => {
-		it( 'should return TOGGLE_FEATURE action', () => {
-			const feature = 'name';
-			expect( toggleFeature( feature ) ).toEqual( {
-				type: 'TOGGLE_FEATURE',
-				feature,
 			} );
 		} );
 	} );

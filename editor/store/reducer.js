@@ -7,7 +7,6 @@ import {
 	flow,
 	partialRight,
 	difference,
-	get,
 	reduce,
 	keyBy,
 	keys,
@@ -532,27 +531,6 @@ export function blockInsertionPoint( state = {}, action ) {
  */
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
-		case 'TOGGLE_SIDEBAR':
-			return {
-				...state,
-				sidebars: {
-					...state.sidebars,
-					[ action.sidebar ]: action.forcedValue !== undefined ? action.forcedValue : ! state.sidebars[ action.sidebar ],
-				},
-			};
-		case 'TOGGLE_SIDEBAR_PANEL':
-			return {
-				...state,
-				panels: {
-					...state.panels,
-					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
-				},
-			};
-		case 'SWITCH_MODE':
-			return {
-				...state,
-				mode: action.mode,
-			};
 		case 'INSERT_BLOCKS':
 			// record the block usage and put the block in the recently used blocks
 			let blockUsage = state.blockUsage;
@@ -584,25 +562,6 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					.slice( 0, MAX_RECENT_BLOCKS ),
 				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
-		case 'TOGGLE_FEATURE':
-			return {
-				...state,
-				features: {
-					...state.features,
-					[ action.feature ]: ! state.features[ action.feature ],
-				},
-			};
-		case 'REDUX_SERIALIZE':
-			return omit( state, [ 'sidebars.mobile', 'sidebars.publish' ] );
-	}
-
-	return state;
-}
-
-export function panel( state = 'document', action ) {
-	switch ( action.type ) {
-		case 'SET_ACTIVE_PANEL':
-			return action.panel;
 	}
 
 	return state;
@@ -737,13 +696,6 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
-export function mobile( state = false, action ) {
-	if ( action.type === 'UPDATE_MOBILE_STATE' ) {
-		return action.isMobile;
-	}
-	return state;
-}
-
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
@@ -848,11 +800,9 @@ export default optimist( combineReducers( {
 	blocksMode,
 	blockInsertionPoint,
 	preferences,
-	panel,
 	saving,
 	notices,
 	metaBoxes,
 	isSavingMetaBoxes,
-	mobile,
 	reusableBlocks,
 } ) );

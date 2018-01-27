@@ -23,8 +23,8 @@ import { rawHandler } from '../api';
  *
  * @returns {Object} Rendered placeholder.
  */
-export default function ImagePlaceHolder( { className, icon, label, onSelectImage } ) {
-	const setImage = ( [ image ] ) => onSelectImage( image );
+export default function ImagePlaceHolder( { className, icon, label, onSelectImage, multiple = false } ) {
+	const setImage = multiple ? onSelectImage : ( [ image ] ) => onSelectImage( image );
 	const onFilesDrop = ( files ) => mediaUpload( files, setImage );
 	const onHTMLDrop = ( HTML ) => setImage( map(
 		rawHandler( { HTML, mode: 'BLOCKS' } )
@@ -35,7 +35,9 @@ export default function ImagePlaceHolder( { className, icon, label, onSelectImag
 	return (
 		<Placeholder
 			className={ className }
-			instructions={ __( 'Drag image here or add from media library' ) }
+			instructions={ multiple ?
+				__( 'Drag images here or add from media library' ) :
+				__( 'Drag image here or add from media library' ) }
 			icon={ icon }
 			label={ label } >
 			<DropZone
@@ -43,6 +45,7 @@ export default function ImagePlaceHolder( { className, icon, label, onSelectImag
 				onHTMLDrop={ onHTMLDrop }
 			/>
 			<FormFileUpload
+				multiple={ multiple }
 				isLarge
 				className="wp-block-image__upload-button"
 				onChange={ uploadFromFiles }
@@ -51,6 +54,8 @@ export default function ImagePlaceHolder( { className, icon, label, onSelectImag
 				{ __( 'Upload' ) }
 			</FormFileUpload>
 			<MediaUpload
+				gallery={ multiple }
+				multiple={ multiple }
 				onSelect={ onSelectImage }
 				type="image"
 				render={ ( { open } ) => (
