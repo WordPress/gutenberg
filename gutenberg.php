@@ -44,7 +44,7 @@ function the_gutenberg_project() {
  * @since 0.1.0
  */
 function gutenberg_menu() {
-	global $menu, $submenu;
+	global $submenu;
 
 	add_menu_page(
 		'Gutenberg',
