@@ -137,6 +137,7 @@
 		"build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
 		"gettext-strings": "cross-env BABEL_ENV=gettext webpack",
 		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
 		"predev": "check-node-version --package",
 		"dev": "cross-env BABEL_ENV=default webpack --watch",
