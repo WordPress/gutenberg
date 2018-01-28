@@ -110,7 +110,7 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			// Playlist shortcodes need the playlist JS to be embedded in the shortcode preview iframe.
 			if ( has_shortcode( $args['shortcode'], 'playlist' ) ) {
 				ob_start();
-				wp_print_scripts( 'wp-playlist' );
+				wp_footer();
 				$js = ob_get_clean();
 			}
 		}
