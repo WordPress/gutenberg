@@ -44,6 +44,7 @@ class LatestPostsBlock extends Component {
 
 	render() {
 		const latestPosts = this.props.latestPosts.data;
+		const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 		const { attributes, focus, setAttributes } = this.props;
 		const { displayPostDate, align, layout, columns, order, orderBy, categories, postsToShow } = attributes;
 
@@ -64,7 +65,7 @@ class LatestPostsBlock extends Component {
 					checked={ displayPostDate }
 					onChange={ this.toggleDisplayPostDate }
 				/>
-				{ layout === 'grid' &&
+				{ layout === 'grid' && hasPosts &&
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
@@ -76,7 +77,6 @@ class LatestPostsBlock extends Component {
 			</InspectorControls>
 		);
 
-		const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 		if ( ! hasPosts ) {
 			return [
 				inspectorControls,
