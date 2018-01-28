@@ -495,6 +495,13 @@ export class BlockListBlock extends Component {
 				data-type={ block.name }
 				onTouchStart={ this.onTouchStart }
 				onClick={ this.onClick }
+				childHandledEvents={ [
+					'onKeyPress',
+					'onDragStart',
+					'onMouseDown',
+					'onKeyDown',
+					'onFocus',
+				] }
 				{ ...wrapperProps }
 			>
 				<BlockDropZone

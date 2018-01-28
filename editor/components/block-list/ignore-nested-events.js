@@ -9,10 +9,16 @@ import { reduce } from 'lodash';
 import { Component } from '@wordpress/element';
 
 /**
- * Component which renders a div with all passed props applied, replacing all
- * event prop handlers with a proxying event handler to capture and prevent
- * events from being handled by its ancestor IgnoreNestedEvents components by
- * testing the presence of a private flag value on the event object.
+ * Component which renders a div with passed props applied except the optional
+ * `childHandledEvents` prop. Event prop handlers are replaced with a proxying
+ * event handler to capture and prevent events from being handled by ancestor
+ * `IgnoreNestedEvents` elements by testing the presence of a private property
+ * assigned on the event object.
+ *
+ * Optionally accepts an `childHandledEvents` prop array, which can be used in
+ * instances where an inner `IgnoreNestedEvents` element exists and the outer
+ * element should stop propagation but not invoke a callback handler, since it
+ * would be assumed these are invoked by the child element.
  *
  * @type {Component}
  */
@@ -50,11 +56,18 @@ class IgnoreNestedEvents extends Component {
 
 		// Invoke original prop handler
 		const propKey = this.eventMap[ event.type ];
-		this.props[ propKey ]( event );
+		if ( this.props[ propKey ] ) {
+			this.props[ propKey ]( event );
+		}
 	}
 
 	render() {
-		const eventHandlers = reduce( this.props, ( result, handler, key ) => {
+		const { childHandledEvents = [], ...props } = this.props;
+
+		const eventHandlers = reduce( [
+			...childHandledEvents,
+			...Object.keys( props ),
+		], ( result, key ) => {
 			// Try to match prop key as event handler
 			const match = key.match( /^on([A-Z][a-zA-Z]+)$/ );
 			if ( match ) {
@@ -71,7 +84,7 @@ class IgnoreNestedEvents extends Component {
 			return result;
 		}, {} );
 
-		return <div { ...this.props } { ...eventHandlers } />;
+		return <div { ...props } { ...eventHandlers } />;
 	}
 }
 
