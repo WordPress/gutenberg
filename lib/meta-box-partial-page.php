@@ -14,10 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The HTML returned by this page is irrelevant, it's being called in AJAX ignoring its output
  *
  * @since 1.8.0
- *
- * @param string $post_type Current post type.
  */
-function gutenberg_meta_box_save( $post_type ) {
+function gutenberg_meta_box_save() {
 	/**
 	 * Needs classic editor to be active.
 	 *
@@ -49,7 +47,7 @@ function gutenberg_meta_box_save( $post_type ) {
 	the_gutenberg_metaboxes();
 }
 
-add_action( 'do_meta_boxes', 'gutenberg_meta_box_save', 1000, 2 );
+add_action( 'do_meta_boxes', 'gutenberg_meta_box_save', 1000 );
 
 /**
  * Allows the meta box endpoint to correctly redirect to the meta box endpoint
@@ -86,6 +84,7 @@ add_filter( 'redirect_post_location', 'gutenberg_meta_box_save_redirect', 10, 2 
  * @since 1.5.0
  *
  * @param array $meta_boxes Meta box data.
+ * @return array Meta box data without core meta boxes.
  */
 function gutenberg_filter_meta_boxes( $meta_boxes ) {
 	$core_side_meta_boxes = array(
@@ -119,8 +118,7 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 				foreach ( $boxes as $name => $data ) {
 					if ( 'normal' === $context && in_array( $name, $core_normal_meta_boxes ) ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
-					}
-					if ( 'side' === $context && in_array( $name, $core_side_meta_boxes ) ) {
+					} elseif ( 'side' === $context && in_array( $name, $core_side_meta_boxes ) ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
 					}
 					// Filter out any taxonomies as Gutenberg already provides JS alternative.
