@@ -361,7 +361,7 @@ export class BlockListBlock extends Component {
 	/*
 	 * Reorder via Drag & Drop. Step 1 of 4.
 	 * Strategy:
-	 * 	- Clone the current block and spawn over original block. Hide original block.
+	 *  - Clone the current block and spawn clone over original block. Hide original block and set inset.
 	 *  - Set transfer data.
 	 *  - Add dragover listener.
 	 */
@@ -376,16 +376,15 @@ export class BlockListBlock extends Component {
 		const blockLeftOffset = parseInt( blockRect.left, 10 );
 
 		// Set a fake drag image to avoid browser defaults.
+		// It has been observed that some browsers change the cursor if a drag image is missing.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
 			const dragImage = document.createElement( 'div' );
 
 			dragImage.id = `drag-image-${ block.id }`;
 			dragImage.classList.add( 'invisible-drag-image' );
-
 			document.body.appendChild( dragImage );
-
+			// Set the invisible dragImage and remove from DOM right after.
 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
-
 			setTimeout( ( ( _dragImage ) => () => {
 				document.body.removeChild( _dragImage );
 			} )( dragImage ), 0 );
@@ -401,7 +400,6 @@ export class BlockListBlock extends Component {
 		);
 
 		// Prepare block clone and append to blocks list.
-
 		clone.id = `clone-${ block.id }`;
 		cloneWrapper.id = `clone-wrapper-${ block.id }`;
 		cloneWrapper.classList.add( 'editor-block-list__block-clone' );
@@ -641,23 +639,18 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onChange( uid, attributes ) {
 		dispatch( updateBlockAttributes( uid, attributes ) );
 	},
-
 	onSelect() {
 		dispatch( selectBlock( ownProps.uid ) );
 	},
-
 	onDeselect() {
 		dispatch( clearSelectedBlock() );
 	},
-
 	onStartTyping() {
 		dispatch( startTyping() );
 	},
-
 	onStopTyping() {
 		dispatch( stopTyping() );
 	},
-
 	onHover() {
 		dispatch( {
 			type: 'TOGGLE_BLOCK_HOVERED',
@@ -665,7 +658,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 			uid: ownProps.uid,
 		} );
 	},
-
 	onMouseLeave() {
 		dispatch( {
 			type: 'TOGGLE_BLOCK_HOVERED',
@@ -673,35 +665,27 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 			uid: ownProps.uid,
 		} );
 	},
-
 	onInsertBlocks( blocks, position ) {
 		dispatch( insertBlocks( blocks, position ) );
 	},
-
 	onFocus( ...args ) {
 		dispatch( focusBlock( ...args ) );
 	},
-
 	onRemove( uid ) {
 		dispatch( removeBlock( uid ) );
 	},
-
 	onMerge( ...args ) {
 		dispatch( mergeBlocks( ...args ) );
 	},
-
 	onReplace( blocks ) {
 		dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
 	},
-
 	onMetaChange( meta ) {
 		dispatch( editPost( { meta } ) );
 	},
-
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
 	},
-
 	moveBlockToIndex( uid, index ) {
 		dispatch( moveBlockToIndex( uid, index ) );
 	},
