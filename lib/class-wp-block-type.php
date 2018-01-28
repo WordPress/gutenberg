@@ -108,17 +108,13 @@ class WP_Block_Type {
 	 * @return string Rendered block type output.
 	 */
 	public function render( $attributes = array(), $content = null ) {
-		if ( ! is_callable( $this->render_callback ) ) {
-			if ( ! $content ) {
-				return '';
-			}
+		if ( is_callable( $this->render_callback ) ) {
+			$attributes = $this->prepare_attributes_for_render( $attributes );
 
-			return $content;
+			return (string) call_user_func( $this->render_callback, $attributes, $content );
 		}
 
-		$attributes = $this->prepare_attributes_for_render( $attributes );
-
-		return call_user_func( $this->render_callback, $attributes, $content );
+		return (string) $content;
 	}
 
 	/**
