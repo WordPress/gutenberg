@@ -1,7 +1,7 @@
-.wp-block-gallery,
-.wp-block-gallery.alignleft,
-.wp-block-gallery.alignright,
-.wp-block-gallery.aligncenter {
+.wp-block-gallery:not( .is-masonry-layout ),
+.wp-block-gallery.alignleft:not( .is-masonry-layout ),
+.wp-block-gallery.alignright:not( .is-masonry-layout ),
+.wp-block-gallery.aligncenter:not( .is-masonry-layout ) {
 	display: flex;
 	flex-wrap: wrap;
 	list-style-type: none;
@@ -62,5 +62,39 @@
 				width: calc(100% / #{ $i } - 16px );
 			}
 		}
+	}
+}
+
+.wp-block-gallery.is-masonry-layout,
+.wp-block-gallery.alignleft.is-masonry-layout,
+.wp-block-gallery.alignright.is-masonry-layout,
+.wp-block-gallery.aligncenter.is-masonry-layout {
+	column-gap: 0;
+	margin: 0;
+	padding: 0;
+	display: block;
+
+	// Responsive fallback value, 2 columns
+	column-count: 2;
+
+	&.columns-1 {
+		column-count: 1;
+	}
+
+	@include break-small {
+		@for $i from 3 through 8 {
+			&.columns-#{ $i } {
+				column-count: #{ $i };
+			}
+		}
+	}
+
+	li,
+	figure {
+		margin: 0;
+	}
+
+	img {
+		display: block;
 	}
 }
