@@ -145,7 +145,7 @@
 	},
 	{
 		"title": "Repository Management",
-		"slug": "release",
+		"slug": "repository-management",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/repository-management.md",
 		"parent": "reference"
 	},
