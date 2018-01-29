@@ -274,30 +274,69 @@
 		}
 	}
 
-	> .editor-block-settings-menu {
+	// Left side inserter
+	> .editor-inserter {
 		position: absolute;
-		top: 2px;
-		right: 4px;
-		padding: 13px 0 17px 8px; // handles hover area
+		left: 2px;
+		top: 16px;
 
 		// Mobile
 		display: none;
+		@include break-small {
+			display: block;
+		}
 
+		.editor-inserter__toggle {
+			width: $icon-button-size-small;
+			padding: 2px;
+
+			// Adjust inserter design
+			box-shadow: inset 0 0 0 1px $light-gray-500;
+			border-radius: 50%;
+
+			// Hide the outer ring on the inserter, to visually lighten it
+			&:before {
+				content: '';
+				position: absolute;
+				top: 2px;
+				right: 2px;
+				bottom: 2px;
+				left: 2px;
+				display: block;
+				border: 4px solid $white;
+				border-radius: 50%;
+			}
+		}
+	}
+
+	// Left and right side UI
+	> .editor-block-settings-menu,
+	> .editor-block-mover {
+		position: absolute;
+		top: 0;
+		padding: 0;
+	}
+
+	// Right side UI
+	> .editor-block-settings-menu {
+		right: $block-mover-margin;
+		padding-top: 2px;
+
+		// Mobile
+		display: none;
 		@include break-small {
 			display: flex;
 			flex-direction: column;
 		}
 	}
 
+	// Left side UI
 	> .editor-block-mover {
-		position: absolute;
-		top: 2px;
-		left: 4px;
-		height: $text-editor-font-size * 4; // same height as an empty paragraph
-		padding: 4px 14px 6px 0; // handles hover area
+		left: $block-mover-margin + 2px;
+		padding-top: 6px;
 		z-index: z-index( '.editor-block-mover' );
 
-		// Mobile, to be revisited
+		// Mobile
 		display: none;
 		@include break-small {
 			display: block;
@@ -314,14 +353,22 @@
 			display: none;
 		}
 
-		// Movers & trash
+		// Movers, inserter, trash & ellipsis
+		.editor-inserter {
+			position: relative;
+			left: auto;
+			top: auto;
+			margin: 0;
+		}
+
+		.editor-inserter__toggle,
 		.editor-block-settings-menu__toggle,
 		& > .editor-block-settings-menu__control,
 		.editor-block-mover__control {
-			width: 36px;
-			height: 36px;
+			width: $icon-button-size;
+			height: $icon-button-size;
 			padding: 3px;
-			text-indent: 100%;
+			margin: 0;
 			justify-content: center;
 			align-items: center;
 
@@ -334,8 +381,8 @@
 		.editor-block-mover {
 			margin-right: auto;
 
-			.editor-block-mover__control:first-child {
-				margin: 0;
+			.editor-inserter,
+			.editor-block-mover__control {
 				float: left;
 			}
 		}
@@ -369,6 +416,19 @@
 	}
 }
 
+.editor-block-list__block > .editor-block-list__insertion-point {
+	position: absolute;
+	bottom: -10px;
+	top: auto;
+	left: 0;
+	right: 0;
+
+	@include break-small {
+		left: $block-mover-padding-visible;
+		right: $block-mover-padding-visible;
+	}
+}
+
 .editor-block-list__block .editor-block-list__block-html-textarea {
 	display: block;
 	margin: 0;
@@ -385,83 +445,6 @@
 
 	&:focus {
 		box-shadow: none;
-	}
-}
-
-.editor-block-list__sibling-inserter {
-	z-index: z-index( '.editor-block-list__sibling-inserter' );
-	position: relative;
-
-	&[data-insert-index="0"] {
-		max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
-		margin: 0 auto;
-		@include break-small {
-			max-width: $visual-editor-max-width - ( 2 * $block-padding );
-		}
-	}
-
-	&:before {
-		content: '';
-		position: absolute;
-		left: 0;
-		width: 100%;
-		height: 28px;
-		transition: 0.1s height;
-		transform: translateY( -50% );
-	}
-
-	&:hover:before {
-		height: 44px;
-	}
-
-	.editor-inserter {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate( -50%, -50% );
-		margin: 0;
-	}
-
-	.editor-inserter__toggle {
-		opacity: 0;
-		transition: opacity 0.25s ease-in-out;
-
-		&:not( :focus ) {
-			transition-delay: 0.3s;
-		}
-	}
-
-	&.is-forced-visible .editor-inserter__toggle,
-	&:hover .editor-inserter__toggle,
-	.editor-inserter__toggle:focus {
-		opacity: 1;
-	}
-
-	.editor-inserter__toggle.components-button {
-		margin: 0;
-		padding: 4px;
-		background: $white;
-
-		&:focus {
-			background: $light-gray-300;
-		}
-
-		.dashicon {
-			vertical-align: bottom;
-		}
-	}
-}
-
-.editor-block-list__block > .editor-block-list__sibling-inserter {
-	position: absolute;
-	bottom: 0;
-	top: auto;
-	left: 0;
-	right: 0;
-
-	@include break-small {
-		left: $block-mover-padding-visible;
-		right: $block-mover-padding-visible;
 	}
 }
 

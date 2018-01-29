@@ -63,7 +63,6 @@ export { default as BlockToolbar } from './block-toolbar';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';
-export { default as InserterWithShortcuts } from './inserter-with-shortcuts';
 export { default as MultiBlocksSwitcher } from './block-switcher/multi-blocks-switcher';
 export { default as NavigableToolbar } from './navigable-toolbar';
 export { default as Warning } from './warning';
