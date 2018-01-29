@@ -292,6 +292,7 @@
 
 			// Adjust inserter design
 			box-shadow: inset 0 0 0 1px $light-gray-500;
+			border-radius: 50%;
 
 			// Hide the outer ring on the inserter, to visually lighten it
 			&:before {
