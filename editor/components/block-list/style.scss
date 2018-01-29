@@ -77,7 +77,7 @@
 
 	// focused block-style
 	&.is-selected:before {
- 		outline: 1px solid $light-gray-500;
+		outline: 1px solid $light-gray-500;
 	}
 
 	// give reusable blocks a dashed outline
@@ -255,7 +255,7 @@
 	& > .components-drop-zone {
 		border: none;
 		top: -4px;
-		bottom: -4px;
+		bottom: -3px;
 		margin: 0 $block-mover-padding-visible;
 		border-radius: 0;
 
