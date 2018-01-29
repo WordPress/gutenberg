@@ -100,7 +100,7 @@ Reducer tests are also be a great fit for snapshots. They are often large, compl
 
 #### Working with snapshots
 
-You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. In Calypso you can do that as follows:
+You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
 
 ```sh
 npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
