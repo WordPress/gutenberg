@@ -8,8 +8,6 @@ import {
 	has,
 	last,
 	reduce,
-	keys,
-	without,
 	compact,
 	find,
 	some,
@@ -27,7 +25,6 @@ import { addQueryArgs } from '@wordpress/url';
  * Module constants
  */
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
-const MAX_FREQUENT_BLOCKS = 3;
 
 /**
  * Returns the state of legacy meta boxes.
@@ -1130,28 +1127,6 @@ export function getRecentInserterItems( state, enabledBlockTypes = true ) {
 
 	return compact( items );
 }
-
-/**
- * Resolves the block usage stats into a list of the most frequently used blocks.
- * Memoized so we're not generating block lists every time we render the list
- * in the inserter.
- *
- * @param {Object} state Global application state.
- *
- * @returns {Array} List of block type settings.
- */
-export const getMostFrequentlyUsedBlocks = createSelector(
-	( state ) => {
-		const { blockUsage } = state.preferences;
-		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
-		// add in paragraph and image blocks if they're not already in the usage data
-		return compact(
-			[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
-				.map( blockType => getBlockType( blockType ) )
-		).slice( 0, MAX_FREQUENT_BLOCKS );
-	},
-	( state ) => state.preferences.blockUsage
-);
 
 /**
  * Returns the reusable block with the given ID.

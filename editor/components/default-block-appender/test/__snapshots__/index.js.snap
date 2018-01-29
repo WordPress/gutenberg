@@ -1,6 +1,12 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DefaultBlockAppender blocks present should match snapshot 1`] = `""`;
+exports[`DefaultBlockAppender blocks present should match snapshot 1`] = `
+<div
+  className="editor-default-block-appender"
+>
+  <Connect(WrappedComponent) />
+</div>
+`;
 
 exports[`DefaultBlockAppender no block present should match snapshot 1`] = `
 <div

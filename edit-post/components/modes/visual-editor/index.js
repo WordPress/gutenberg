@@ -13,7 +13,6 @@ import {
 	DefaultBlockAppender,
 	EditorGlobalKeyboardShortcuts,
 	BlockSelectionClearer,
-	InserterWithShortcuts,
 } from '@wordpress/editor';
 import { Fragment } from '@wordpress/element';
 
@@ -41,7 +40,6 @@ function VisualEditor( props ) {
 				/>
 				<DefaultBlockAppender />
 			</WritingFlow>
-			<InserterWithShortcuts />
 		</BlockSelectionClearer>
 	);
 }

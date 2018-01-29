@@ -34,6 +34,7 @@ $text-editor-max-width: 760px;
 $visual-editor-max-width: 636px;
 $block-controls-height: 36px;
 $icon-button-size: 36px;
+$icon-button-size-small: 24px;
 $inserter-tabs-height: 36px;
 $block-toolbar-height: 37px;
 $sidebar-width: 280px;
@@ -41,9 +42,10 @@ $sidebar-width: 280px;
 // Blocks
 $block-padding: 14px;
 $block-mover-margin: 18px;
-$block-mover-padding-hidden: 10px;
-$block-mover-padding-visible: 32px;
 $block-spacing: 4px;
+// old $block-mover-padding-visible: 32px;
+$block-mover-padding-visible: $icon-button-size-small + $icon-button-size-small;
+
 
 // Buttons & UI Widgets
 $button-style__radius-roundrect: 4px;

@@ -12,7 +12,7 @@ Assuming you've followed the instructions above to install Node and project depe
 npm test
 ```
 
-Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`.
+Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`. ESLint can also fix not all, but many issues automatically by running `npm run lint:fix`.
 
 To run unit tests only, without the linter, use `npm run test-unit` instead.
 
@@ -100,7 +100,7 @@ Reducer tests are also be a great fit for snapshots. They are often large, compl
 
 #### Working with snapshots
 
-You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. In Calypso you can do that as follows:
+You might be blindsided by CI tests failing when snapshots don't match. You'll need to [update snapshots] if the changes are expected. The quick and dirty solution is to invoke Jest with `--updateSnapshot`. That can be done as follows:
 
 ```sh
 npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
