@@ -112,6 +112,7 @@ export class BlockListBlock extends Component {
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
+		this.selectOnOpen = this.selectOnOpen.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -389,6 +390,12 @@ export class BlockListBlock extends Component {
 		this.setState( { error } );
 	}
 
+	selectOnOpen( open ) {
+		if ( open && ! this.props.isSelected ) {
+			this.props.onSelect();
+		}
+	}
+
 	render() {
 		const { block, order, mode, showContextualToolbar, isLocked, renderBlockMenu } = this.props;
 		const { name: blockName, isValid } = block;
@@ -433,7 +440,7 @@ export class BlockListBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
-				{ ( showUI || isHovered ) && <VisualEditorInserter /> }
+				{ ( showUI || isHovered ) && <VisualEditorInserter onToggle={ this.selectOnOpen } /> }
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } renderBlockMenu={ renderBlockMenu } /> }
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
@@ -562,6 +569,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onMetaChange( meta ) {
 		dispatch( editPost( { meta } ) );
 	},
+
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
 	},
