@@ -80,15 +80,8 @@ class DropZoneProvider extends Component {
 		// See: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
 		const detail = window.CustomEvent && event instanceof window.CustomEvent ? event.detail : event;
 
-		// Computing state
-		const { onVerifyValidTransfer } = this.props;
-		const isValidDrag = ! onVerifyValidTransfer || onVerifyValidTransfer( detail.dataTransfer );
-
-		// Always true (onVerifyValidTransfer is not defined).
-		const isDraggingOverDocument = isValidDrag; // && this.dragEnterNodes.length;
-
 		// Index of hovered dropzone.
-		const hoveredDropZone = isDraggingOverDocument && findIndex( this.dropzones, ( { element } ) =>
+		const hoveredDropZone = findIndex( this.dropzones, ( { element } ) =>
 			this.isWithinZoneBounds( element, detail.clientX, detail.clientY )
 		);
 
@@ -106,7 +99,7 @@ class DropZoneProvider extends Component {
 		// Optimisation: Only update the changed dropzones
 		let dropzonesToUpdate = [];
 
-		if ( this.state.isDraggingOverDocument !== isDraggingOverDocument ) {
+		if ( ! this.state.isDraggingOverDocument ) {
 			dropzonesToUpdate = this.dropzones;
 		} else if ( hoveredDropZone !== this.state.hoveredDropZone ) {
 			if ( this.state.hoveredDropZone !== -1 ) {
@@ -129,12 +122,12 @@ class DropZoneProvider extends Component {
 			dropzone.updateState( {
 				isDraggingOverElement: index === hoveredDropZone,
 				position: index === hoveredDropZone ? position : null,
-				isDraggingOverDocument,
+				isDraggingOverDocument: true,
 			} );
 		} );
 
 		this.setState( {
-			isDraggingOverDocument,
+			isDraggingOverDocument: true,
 			hoveredDropZone,
 			position,
 		} );
@@ -172,12 +165,6 @@ class DropZoneProvider extends Component {
 
 		if ( !! dropzone && !! dropzone.onDrop ) {
 			dropzone.onDrop( event, position );
-		}
-
-		const { onVerifyValidTransfer } = this.props;
-
-		if ( onVerifyValidTransfer && ! onVerifyValidTransfer( event.dataTransfer ) ) {
-			return;
 		}
 
 		if ( event.dataTransfer && !! dropzone ) {
