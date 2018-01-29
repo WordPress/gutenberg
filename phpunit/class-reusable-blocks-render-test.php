@@ -1,14 +1,14 @@
 <?php
 /**
- * Reusuable block rendering tests.
+ * Reusable block rendering tests.
  *
  * @package Gutenberg
  */
 
 /**
- * Tests reusuable block rendering.
+ * Tests reusable block rendering.
  */
-class Reusuable_Blocks_Render_Test extends WP_UnitTestCase {
+class Reusable_Blocks_Render_Test extends WP_UnitTestCase {
 	/**
 	 * Fake user ID.
 	 *
