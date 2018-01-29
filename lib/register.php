@@ -401,11 +401,48 @@ function gutenberg_register_post_types() {
 			'singular_name' => 'Block',
 		),
 		'public'                => false,
-		'capability_type'       => 'post',
 		'show_in_rest'          => true,
 		'rest_base'             => 'blocks',
 		'rest_controller_class' => 'WP_REST_Blocks_Controller',
+		'capability_type'       => 'block',
+		'capabilities'          => array(
+			'read'         => 'read_blocks',
+			'create_posts' => 'create_blocks',
+		),
+		'map_meta_cap'          => true,
 	) );
+
+	foreach ( array( 'administrator', 'editor' ) as $role_name ) {
+		$editor = get_role( $role_name );
+		$editor->add_cap( 'edit_blocks' );
+		$editor->add_cap( 'edit_others_blocks' );
+		$editor->add_cap( 'publish_blocks' );
+		$editor->add_cap( 'read_private_blocks' );
+		$editor->add_cap( 'read_blocks' );
+		$editor->add_cap( 'delete_blocks' );
+		$editor->add_cap( 'delete_private_blocks' );
+		$editor->add_cap( 'delete_published_blocks' );
+		$editor->add_cap( 'delete_others_blocks' );
+		$editor->add_cap( 'edit_private_blocks' );
+		$editor->add_cap( 'edit_published_blocks' );
+		$editor->add_cap( 'create_blocks' );
+	}
+
+	$author = get_role( 'author' );
+	$author->add_cap( 'edit_blocks' );
+	$author->add_cap( 'publish_blocks' );
+	$author->add_cap( 'read_blocks' );
+	$author->add_cap( 'delete_blocks' );
+	$author->add_cap( 'delete_published_blocks' );
+	$author->add_cap( 'edit_published_blocks' );
+	$author->add_cap( 'create_blocks' );
+
+	$contributor = get_role( 'contributor' );
+	$contributor->add_cap( 'edit_blocks' );
+	$contributor->add_cap( 'read_blocks' );
+	$contributor->add_cap( 'delete_blocks' );
+	$contributor->add_cap( 'delete_published_blocks' );
+	$contributor->add_cap( 'edit_published_blocks' );
 }
 add_action( 'init', 'gutenberg_register_post_types' );
 
