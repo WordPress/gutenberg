@@ -33,7 +33,7 @@ export function addGeneratedClassName( extraProps, blockType ) {
 			extraProps.className = uniq( [
 				getBlockDefaultClassname( blockType.name ),
 				...extraProps.className.split( ' ' ),
-			] ).join( ' ' );
+			] ).join( ' ' ).trim();
 		} else {
 			// There is no string in the className variable,
 			// so we just dump the default name in there
