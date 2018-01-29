@@ -1,12 +1,16 @@
 .wp-block-cover-image {
-	position: relative;
-	background-size: cover;
 	height: 430px;
 	width: 100%;
 	margin: 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	overflow: hidden;
+
+	position: relative;
+
+	clip-path: inset( 1px 1px );
+	margin: -1px -1px;
 
 	&.has-left-content {
 		justify-content: flex-start;
@@ -35,7 +39,7 @@
 	}
 
 	&.has-parallax {
-		background-attachment: fixed;
+		//background-attachment: fixed;
 	}
 
 	&.has-background-dim:before {
@@ -58,4 +62,13 @@
 		height: inherit;
 	}
 
+	.wp-block-cover-image__image {
+		position: fixed;
+	    top: 0;
+	    right: 0;
+	    bottom: 0;
+	    left: 0;
+		z-index: -1;
+		background-size: cover;
+	}
 }

@@ -196,9 +196,9 @@ export const settings = {
 			<section
 				key="preview"
 				data-url={ url }
-				style={ style }
 				className={ classes }
 			>
+				<div className="wp-block-cover-image__image" style={ style }></div>
 				{ title || !! focus ? (
 					<Editable
 						tagName="h2"
