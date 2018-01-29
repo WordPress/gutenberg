@@ -73,6 +73,13 @@ function gutenberg_get_script_polyfill( $tests ) {
  * @since 0.1.0
  */
 function gutenberg_register_scripts_and_styles() {
+	// If this file doesn't exist yet, we need a `npm run build`.
+	if ( isset( $_GET['page'] ) && in_array( $_GET['page'], array( 'gutenberg', 'gutenberg-demo' ) ) && ! file_exists( gutenberg_dir_path() . 'blocks/build/edit-blocks.css' ) ) {
+		$error = esc_html__( 'Gutenberg is installed, but some assets still need to be built.  On the command line, run the following:', 'gutenberg' );
+		$error .= sprintf( "\r\n\r\n<code>cd %s\r\nnpm install\r\nnpm run build</code>", escapeshellarg( gutenberg_dir_path() ) );
+		wp_die( nl2br( $error ) );
+	}
+
 	gutenberg_register_vendor_scripts();
 
 	// Editor Scripts.
