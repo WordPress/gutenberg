@@ -52,15 +52,37 @@ class Block_Type_Test extends WP_UnitTestCase {
 	}
 
 	function test_render_without_callback() {
-		$attributes = array(
-			'foo' => 'bar',
-			'bar' => 'foo',
-		);
+		$attributes = array();
 		$content    = '<p>Test content.</p>';
 
 		$block_type = new WP_Block_Type( 'core/dummy' );
 		$output     = $block_type->render( $attributes, $content );
 		$this->assertSame( $content, $output );
+	}
+
+	function test_render_without_arguments() {
+		$block_type = new WP_Block_Type( 'core/dummy' );
+		$output     = $block_type->render();
+		$this->assertSame( '', $output );
+	}
+
+	function test_render_without_callback_for_string_zero() {
+		$attributes = array();
+		$content    = '0';
+
+		$block_type = new WP_Block_Type( 'core/dummy' );
+		$output     = $block_type->render( $attributes, $content );
+		$this->assertSame( $content, $output );
+	}
+
+	function test_render_without_callback_for_object_with_toString() {
+		$attributes = array();
+		$value      = '0';
+		$content    = new WP_String_Type( $value );
+
+		$block_type = new WP_Block_Type( 'core/dummy' );
+		$output     = $block_type->render( $attributes, $content );
+		$this->assertSame( $value, $output );
 	}
 
 	function test_prepare_attributes() {
