@@ -5,9 +5,84 @@ When updating static blocks markup and attributes, block authors need to conside
  - Do not deprecate the block and create a new one (a different name)
  - Provide a "deprecated" version of the block allowing users opening these blocks in Gutenberg to edit them using the updated block.
 
-A block can have several deprecated versions, Gutenberg will try them one after another until finding the one that matches the saved markup.
+A block can have several deprecated versions. Gutenberg will try them one after another until finding the one that matches the saved markup.
 
-To declare a "deprecated version", you need to copy the old `attributes`, `support` and `save` properties from the previous old definition to the `deprecated` property of the udpated block.
+To declare a deprecated version, you need to copy the old `attributes`, `support` and `save` properties from the old definition to the `deprecated` property of the udpated block.
+
+### Example:
+
+{% codetabs %}
+{% ES5 %}
+```js
+var el = wp.element.createElement,
+	registerBlockType = wp.blocks.registerBlockType,
+	attributes = {
+		text: {
+			type: 'string',
+			default: 'some random value',
+		}
+	};
+
+registerBlockType( 'gutenberg/block-with-deprecated-version', {
+
+	// ... other block properties go here
+
+	attributes: attributes,
+
+	save: function( props ) {
+		return el( 'div', {}, props.attributes.text );
+	},
+
+	deprecated: [
+		{
+			attributes: attributes,
+
+			save: function( props ) {
+				return el( 'p', {}, props.attributes.text );
+			},
+		}
+	]
+} );
+```
+{% ESNext %}
+```js
+const { registerBlockType } = wp.blocks;
+const attributes = {
+	text: {
+		type: 'string',
+		default: 'some random value',
+	}
+};
+
+registerBlockType( 'gutenberg/block-with-deprecated-version', {
+
+	// ... other block properties go here
+
+	attributes,
+
+	save( props ) {
+		return <div>{ props.attributes.text }</div>;
+	},
+
+	deprecated: [
+		{
+			attributes,
+
+			save( props ) {
+				return <p>{ props.attributes.text }</p>;
+			},
+		}
+	]
+} );
+```
+{% end %}
+
+In the example above we updated the markup of the block to use a `div` instead of `p`.
+
+
+## Changing the attributes set
+
+Sometimes, you need to update the attributes set to rename or modify old attributes.
 
 ### Example:
 
@@ -22,7 +97,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	// ... other block properties go here
 
 	attributes: {
-		text: {
+		content: {
 			type: 'string',
 			default: 'some random value',
 		}
@@ -36,8 +111,15 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 		{
 			attributes: {
 				text: {
-					type: 'string'
+					type: 'string',
+					default: 'some random value',
 				}
+			},
+
+			migrate: function( attributes ) {
+				return {
+					content: attributes.text
+				};
 			},
 
 			save: function( props ) {
@@ -56,13 +138,13 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	// ... other block properties go here
 
 	attributes: {
-		text: {
+		content: {
 			type: 'string',
 			default: 'some random value',
 		}
 	},
 
-	save: function( props ) {
+	save( props ) {
 		return <div>{ props.attributes.text }</div>;
 	},
 
@@ -70,11 +152,18 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 		{
 			attributes: {
 				text: {
-					type: 'string'
+					type: 'string',
+					default: 'some random value',
 				}
 			},
 
-			save: function( props ) {
+			migrate( { text } ) {
+				return {
+					content: text
+				};
+			},
+
+			save( props ) {
 				return <p>{ props.attributes.text }</p>;
 			},
 		}
@@ -83,4 +172,4 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 ```
 {% end %}
 
-In the example above we updated the markup of the block to use a `div` instead of `p` and we added a default value to the `text` attribute.
+In the example above we updated the markup of the block to use a `div` instead of `p` and rename the `text` attribute to `content`.
