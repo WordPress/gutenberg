@@ -32,14 +32,12 @@ describe( 'BlockMover', () => {
 			expect( moveUp.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
-				icon: 'arrow-up-alt2',
 				label: 'Move 2 blocks from position 1 up by one place',
 				'aria-disabled': undefined,
 			} );
 			expect( moveDown.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
-				icon: 'arrow-down-alt2',
 				label: 'Move 2 blocks from position 1 down by one place',
 				'aria-disabled': undefined,
 			} );

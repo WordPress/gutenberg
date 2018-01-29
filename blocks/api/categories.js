@@ -21,7 +21,7 @@ const categories = [
 ];
 
 /**
- * Returns all the block categories
+ * Returns all the block categories.
  *
  * @returns {Array} Block categories.
  */

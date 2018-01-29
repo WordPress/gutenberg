@@ -12,7 +12,7 @@ Assuming you've followed the instructions above to install Node and project depe
 npm test
 ```
 
-Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`.
+Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The above `npm test` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint`. ESLint can also fix not all, but many issues automatically by running `npm run lint:fix`.
 
 To run unit tests only, without the linter, use `npm run test-unit` instead.
 

@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import '../';
+import { name, settings } from '../';
 import { blockEditRender } from 'blocks/test/helpers';
 
 describe( 'core/html', () => {
 	test( 'block edit matches snapshot', () => {
-		const wrapper = blockEditRender( 'core/html' );
+		const wrapper = blockEditRender( name, settings );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );

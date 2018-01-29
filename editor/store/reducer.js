@@ -7,7 +7,6 @@ import {
 	flow,
 	partialRight,
 	difference,
-	get,
 	reduce,
 	keyBy,
 	keys,
@@ -42,7 +41,7 @@ const MAX_RECENT_BLOCKS = 8;
  * Returns a post attribute value, flattening nested rendered content using its
  * raw value in place of its original object form.
  *
- * @param  {*} value Original value
+ * @param {*} value Original value.
  *
  * @returns {*} Raw value.
  */
@@ -64,8 +63,8 @@ export function getPostRawValue( value ) {
  *  - blocksByUid: post content blocks keyed by UID
  *  - blockOrder: list of block UIDs in order
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -311,8 +310,8 @@ export const editor = flow( [
  * Reducer returning the last-known state of the current post, in the format
  * returned by the WP REST API.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -341,10 +340,10 @@ export function currentPost( state = {}, action ) {
 /**
  * Reducer returning typing state.
  *
- * @param  {Boolean} state  Current state
- * @param  {Object}  action Dispatched action
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
  *
- * @returns {Boolean} Updated state.
+ * @returns {boolean} Updated state.
  */
 export function isTyping( state = false, action ) {
 	switch ( action.type ) {
@@ -361,8 +360,8 @@ export function isTyping( state = false, action ) {
 /**
  * Reducer returning the block selection's state.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -375,6 +374,11 @@ export function blockSelection( state = {
 }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
+			if ( state.start === null && state.end === null &&
+					state.focus === null && ! state.isMultiSelecting ) {
+				return state;
+			}
+
 			return {
 				...state,
 				start: null,
@@ -383,15 +387,24 @@ export function blockSelection( state = {
 				isMultiSelecting: false,
 			};
 		case 'START_MULTI_SELECT':
+			if ( state.isMultiSelecting ) {
+				return state;
+			}
+
 			return {
 				...state,
 				isMultiSelecting: true,
 			};
 		case 'STOP_MULTI_SELECT':
+			const nextFocus = state.start === state.end ? state.focus : null;
+			if ( ! state.isMultiSelecting && nextFocus === state.focus ) {
+				return state;
+			}
+
 			return {
 				...state,
 				isMultiSelecting: false,
-				focus: state.start === state.end ? state.focus : null,
+				focus: nextFocus,
 			};
 		case 'MULTI_SELECT':
 			return {
@@ -449,8 +462,8 @@ export function blockSelection( state = {
 /**
  * Reducer returning hovered block state.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -486,10 +499,10 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point
+ * Reducer returning the block insertion point.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -506,39 +519,18 @@ export function blockInsertionPoint( state = {}, action ) {
 }
 
 /**
- * Reducer returning the user preferences:
+ * Reducer returning the user preferences.
  *
- * @param  {Object}  state                 Current state
- * @param  {string}  state.mode            Current editor mode, either "visual" or "text".
- * @param  {Boolean} state.isSidebarOpened Whether the sidebar is opened or closed
- * @param  {Object}  state.panels          The state of the different sidebar panels
- * @param  {Object}  action                Dispatched action
+ * @param {Object}  state                 Current state.
+ * @param {string}  state.mode            Current editor mode, either "visual" or "text".
+ * @param {boolean} state.isSidebarOpened Whether the sidebar is opened or closed.
+ * @param {Object}  state.panels          The state of the different sidebar panels.
+ * @param {Object}  action                Dispatched action.
  *
  * @returns {string} Updated state.
  */
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
-		case 'TOGGLE_SIDEBAR':
-			return {
-				...state,
-				sidebars: {
-					...state.sidebars,
-					[ action.sidebar ]: action.forcedValue !== undefined ? action.forcedValue : ! state.sidebars[ action.sidebar ],
-				},
-			};
-		case 'TOGGLE_SIDEBAR_PANEL':
-			return {
-				...state,
-				panels: {
-					...state.panels,
-					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
-				},
-			};
-		case 'SWITCH_MODE':
-			return {
-				...state,
-				mode: action.mode,
-			};
 		case 'INSERT_BLOCKS':
 			// record the block usage and put the block in the recently used blocks
 			let blockUsage = state.blockUsage;
@@ -570,34 +562,17 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					.slice( 0, MAX_RECENT_BLOCKS ),
 				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
 			};
-		case 'TOGGLE_FEATURE':
-			return {
-				...state,
-				features: {
-					...state.features,
-					[ action.feature ]: ! state.features[ action.feature ],
-				},
-			};
-	}
-
-	return state;
-}
-
-export function panel( state = 'document', action ) {
-	switch ( action.type ) {
-		case 'SET_ACTIVE_PANEL':
-			return action.panel;
 	}
 
 	return state;
 }
 
 /**
- * Reducer returning current network request state (whether a request to the WP
- * REST API is in progress, successful, or failed).
+ * Reducer returning current network request state (whether a request to
+ * the WP REST API is in progress, successful, or failed).
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -661,70 +636,64 @@ const locations = [
 const defaultMetaBoxState = locations.reduce( ( result, key ) => {
 	result[ key ] = {
 		isActive: false,
-		isDirty: false,
-		isUpdating: false,
 	};
 
 	return result;
 }, {} );
 
+/**
+ * Reducer keeping track of the meta boxes isSaving state.
+ * A "true" value means the meta boxes saving request is in-flight.
+ *
+ *
+ * @param {boolean}  state   Previous state.
+ * @param {Object}   action  Action Object.
+ * @returns {Object}         Updated state.
+ */
+export function isSavingMetaBoxes( state = false, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_META_BOX_UPDATES':
+			return true;
+		case 'META_BOX_UPDATES_SUCCESS':
+			return false;
+		default:
+			return state;
+	}
+}
+
+/**
+ * Reducer keeping track of the state of each meta box location.
+ * This includes:
+ *  - isActive: Whether the location is active or not.
+ *  - data: The last saved form data for this location.
+ *    This is used to check whether the form is dirty
+ *    before leaving the page.
+ *
+ * @param {boolean}  state   Previous state.
+ * @param {Object}   action  Action Object.
+ * @returns {Object}         Updated state.
+ */
 export function metaBoxes( state = defaultMetaBoxState, action ) {
 	switch ( action.type ) {
 		case 'INITIALIZE_META_BOX_STATE':
 			return locations.reduce( ( newState, location ) => {
 				newState[ location ] = {
 					...state[ location ],
-					isLoaded: false,
 					isActive: action.metaBoxes[ location ],
 				};
 				return newState;
 			}, { ...state } );
-		case 'META_BOX_LOADED':
-			return {
-				...state,
-				[ action.location ]: {
-					...state[ action.location ],
-					isLoaded: true,
-					isUpdating: false,
-					isDirty: false,
-				},
-			};
-		case 'HANDLE_META_BOX_RELOAD':
-			return {
-				...state,
-				[ action.location ]: {
-					...state[ action.location ],
-					isUpdating: false,
-					isDirty: false,
-				},
-			};
-		case 'REQUEST_META_BOX_UPDATES':
-			return action.locations.reduce( ( newState, location ) => {
+		case 'META_BOX_SET_SAVED_DATA':
+			return locations.reduce( ( newState, location ) => {
 				newState[ location ] = {
 					...state[ location ],
-					isUpdating: true,
-					isDirty: false,
+					data: action.dataPerLocation[ location ],
 				};
 				return newState;
 			}, { ...state } );
-		case 'META_BOX_STATE_CHANGED':
-			return {
-				...state,
-				[ action.location ]: {
-					...state[ action.location ],
-					isDirty: action.hasChanged,
-				},
-			};
 		default:
 			return state;
 	}
-}
-
-export function mobile( state = false, action ) {
-	if ( action.type === 'UPDATE_MOBILE_STATE' ) {
-		return action.isMobile;
-	}
-	return state;
 }
 
 export const reusableBlocks = combineReducers( {
@@ -831,10 +800,9 @@ export default optimist( combineReducers( {
 	blocksMode,
 	blockInsertionPoint,
 	preferences,
-	panel,
 	saving,
 	notices,
 	metaBoxes,
-	mobile,
+	isSavingMetaBoxes,
 	reusableBlocks,
 } ) );

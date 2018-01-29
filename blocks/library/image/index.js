@@ -2,17 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createMediaFromFile } from '@wordpress/utils';
+import { createMediaFromFile, preloadImage } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, createBlock, getBlockAttributes, getBlockType } from '../../api';
+import { createBlock, getBlockAttributes, getBlockType } from '../../api';
 import ImageBlock from './block';
 
-registerBlockType( 'core/image', {
+export const name = 'core/image';
+
+export const settings = {
 	title: __( 'Image' ),
 
 	description: __( 'Worth a thousand words.' ),
@@ -88,12 +90,18 @@ registerBlockType( 'core/image', {
 				isMatch( files ) {
 					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
 				},
-				transform( files ) {
-					return createMediaFromFile( files[ 0 ] )
-						.then( ( media ) => createBlock( 'core/image', {
-							id: media.id,
-							url: media.source_url,
-						} ) );
+				transform( files, onChange ) {
+					const file = files[ 0 ];
+					const block = createBlock( 'core/image', {
+						url: window.URL.createObjectURL( file ),
+					} );
+
+					createMediaFromFile( file )
+						.then( ( media ) => preloadImage( media.source_url ).then(
+							() => onChange( block.uid, { id: media.id, url: media.source_url } )
+						) );
+
+					return block;
 				},
 			},
 			{
@@ -173,4 +181,4 @@ registerBlockType( 'core/image', {
 			</figure>
 		);
 	},
-} );
+};

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"description": "A new WordPress editor experience",
 	"main": "build/app.js",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -31,7 +31,7 @@
 		"jquery": "3.2.1",
 		"js-beautify": "1.6.14",
 		"lodash": "4.17.4",
-		"memize": "1.0.4",
+		"memize": "1.0.5",
 		"moment": "2.18.1",
 		"moment-timezone": "0.5.13",
 		"mousetrap": "1.6.1",
@@ -49,7 +49,7 @@
 		"redux-multi": "0.1.12",
 		"redux-optimist": "0.0.2",
 		"refx": "2.1.0",
-		"rememo": "2.3.3",
+		"rememo": "2.3.4",
 		"showdown": "1.7.4",
 		"simple-html-tokenizer": "0.4.1",
 		"tinycolor2": "1.4.1",
@@ -75,7 +75,6 @@
 		"deep-freeze": "0.0.1",
 		"enzyme": "3.2.0",
 		"enzyme-adapter-react-16": "1.1.0",
-		"eslines": "1.1.0",
 		"eslint": "4.9.0",
 		"eslint-config-wordpress": "2.0.0",
 		"eslint-plugin-jest": "21.5.0",
@@ -105,7 +104,7 @@
 	},
 	"jest": {
 		"collectCoverageFrom": [
-			"(blocks|components|date|editor|element|i18n|data|utils)/**/*.js"
+			"(blocks|components|date|editor|element|i18n|data|utils|edit-post)/**/*.js"
 		],
 		"coveragePathIgnorePatterns": [
 			"<rootDir>/[^/]+/build/index.js"
@@ -113,7 +112,7 @@
 		"coverageDirectory": "coverage",
 		"moduleNameMapper": {
 			"\\.(scss|css)$": "<rootDir>/test/unit/style-mock.js",
-			"@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils)": "$1"
+			"@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils|edit-post)": "$1"
 		},
 		"modulePaths": [
 			"<rootDir>"
@@ -124,7 +123,7 @@
 		],
 		"setupTestFrameworkScriptFile": "<rootDir>/test/unit/setup-test-framework.js",
 		"testMatch": [
-			"<rootDir>/(blocks|components|date|editor|element|i18n|data|utils)/**/test/*.js"
+			"<rootDir>/(blocks|components|date|editor|element|i18n|data|utils|edit-post)/**/test/*.js"
 		],
 		"timers": "fake",
 		"transform": {
@@ -137,7 +136,8 @@
 		"prebuild": "check-node-version --package",
 		"build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
 		"gettext-strings": "cross-env BABEL_ENV=gettext webpack",
-		"lint": "eslint -f json . | eslines",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
 		"predev": "check-node-version --package",
 		"dev": "cross-env BABEL_ENV=default webpack --watch",

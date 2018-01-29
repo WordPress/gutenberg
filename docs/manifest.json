@@ -90,6 +90,12 @@
 		"parent": "blocks"
 	},
 	{
+		"title": "Generate Blocks with WP-CLI",
+		"slug": "generate-blocks-with-wp-cli",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks-scaffolding.md",
+		"parent": "blocks"
+	},
+	{
 		"title": "Reference",
 		"slug": "reference",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference.md",
