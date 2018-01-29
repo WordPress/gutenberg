@@ -18,7 +18,7 @@ class WP_String_Type {
 	/**
 	 * Constructor.
 	 *
-	 * @param string $value
+	 * @param string $value Value for string representation.
 	 */
 	public function __construct( $value ) {
 
