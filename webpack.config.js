@@ -161,7 +161,7 @@ switch ( process.env.NODE_ENV ) {
 		break;
 
 	default:
-		config.devtool = 'source-map';
+		config.devtool = 'cheap-module-eval-source-map';
 }
 
 module.exports = config;
