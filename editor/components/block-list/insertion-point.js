@@ -11,20 +11,13 @@ import {
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 } from '../../store/selectors';
-import {
-	clearSelectedBlock,
-} from '../../store/actions';
 
-/**
- * Component showing the block's insertion point.
- *
- * @param   {Object}       props  React props passed to the component.
- * @returns {Object|false}        Rendered insertion point.
- */
-function BlockListInsertionPoint( { showInsertionPoint } ) {
-	return showInsertionPoint && (
-		<div className="editor-block-list__insertion-point" />
-	);
+function BlockInsertionPoint( { showInsertionPoint } ) {
+	if ( ! showInsertionPoint ) {
+		return null;
+	}
+
+	return <div className="editor-block-list__insertion-point" />;
 }
 
 export default connect(
@@ -39,7 +32,4 @@ export default connect(
 			),
 		};
 	},
-	{
-		clearSelectedBlock,
-	}
-)( BlockListInsertionPoint );
+)( BlockInsertionPoint );

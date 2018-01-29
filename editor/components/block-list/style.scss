@@ -416,6 +416,19 @@
 	}
 }
 
+.editor-block-list__block > .editor-block-list__insertion-point {
+	position: absolute;
+	bottom: -10px;
+	top: auto;
+	left: 0;
+	right: 0;
+
+	@include break-small {
+		left: $block-mover-padding-visible;
+		right: $block-mover-padding-visible;
+	}
+}
+
 .editor-block-list__block .editor-block-list__block-html-textarea {
 	display: block;
 	margin: 0;
@@ -432,83 +445,6 @@
 
 	&:focus {
 		box-shadow: none;
-	}
-}
-
-.editor-block-list__sibling-inserter {
-	z-index: z-index( '.editor-block-list__sibling-inserter' );
-	position: relative;
-
-	&[data-insert-index="0"] {
-		max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible ) - ( 2 * $block-padding );
-		margin: 0 auto;
-		@include break-small {
-			max-width: $visual-editor-max-width - ( 2 * $block-padding );
-		}
-	}
-
-	&:before {
-		content: '';
-		position: absolute;
-		left: 0;
-		width: 100%;
-		height: 28px;
-		transition: 0.1s height;
-		transform: translateY( -50% );
-	}
-
-	&:hover:before {
-		height: 44px;
-	}
-
-	.editor-inserter {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate( -50%, -50% );
-		margin: 0;
-	}
-
-	.editor-inserter__toggle {
-		opacity: 0;
-		transition: opacity 0.25s ease-in-out;
-
-		&:not( :focus ) {
-			transition-delay: 0.3s;
-		}
-	}
-
-	&.is-forced-visible .editor-inserter__toggle,
-	&:hover .editor-inserter__toggle,
-	.editor-inserter__toggle:focus {
-		opacity: 1;
-	}
-
-	.editor-inserter__toggle.components-button {
-		margin: 0;
-		padding: 4px;
-		background: $white;
-
-		&:focus {
-			background: $light-gray-300;
-		}
-
-		.dashicon {
-			vertical-align: bottom;
-		}
-	}
-}
-
-.editor-block-list__block > .editor-block-list__sibling-inserter {
-	position: absolute;
-	bottom: 0;
-	top: auto;
-	left: 0;
-	right: 0;
-
-	@include break-small {
-		left: $block-mover-padding-visible;
-		right: $block-mover-padding-visible;
 	}
 }
 
