@@ -20,6 +20,8 @@ const types = [
 	'ms-word-online',
 	'evernote',
 	'iframe-embed',
+	'one-image',
+	'two-images',
 ];
 
 describe( 'raw handling: integration', () => {
