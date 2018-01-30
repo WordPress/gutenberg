@@ -32,8 +32,11 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$block_type = new WP_Block_Type( 'core/dummy', array(
 			'render_callback' => array( $this, 'render_dummy_block' ),
 		) );
-		$output     = $block_type->render( $attributes );
-		$this->assertEquals( $attributes, json_decode( $output, true ) );
+		$output     = json_decode( $block_type->render( $attributes ), true );
+
+		$this->assertSame( $attributes, $output['attributes'] );
+		$this->assertNull( $output['content'] );
+		$this->assertSame( 'core/dummy', $output['name'] );
 	}
 
 	function test_render_with_content() {
@@ -43,12 +46,14 @@ class Block_Type_Test extends WP_UnitTestCase {
 		);
 		$content    = '<p>Test content.</p>';
 
-		$block_type             = new WP_Block_Type( 'core/dummy', array(
+		$block_type = new WP_Block_Type( 'core/dummy', array(
 			'render_callback' => array( $this, 'render_dummy_block_with_content' ),
 		) );
-		$output                 = $block_type->render( $attributes, $content );
-		$attributes['_content'] = $content;
-		$this->assertSame( $attributes, json_decode( $output, true ) );
+		$output     = json_decode( $block_type->render( $attributes, $content ), true );
+
+		$this->assertSame( $attributes, $output['attributes'] );
+		$this->assertSame( $content, $output['content'] );
+		$this->assertSame( 'core/dummy', $output['name'] );
 	}
 
 	function test_render_without_callback() {
@@ -101,13 +106,19 @@ class Block_Type_Test extends WP_UnitTestCase {
 		), $prepared_attributes );
 	}
 
-	function render_dummy_block( $attributes ) {
-		return json_encode( $attributes );
+	function render_dummy_block( $attributes, $content, $name ) {
+		return json_encode( array(
+			'attributes' => $attributes,
+			'content'    => $content,
+			'name'       => $name,
+		) );
 	}
 
-	function render_dummy_block_with_content( $attributes, $content ) {
-		$attributes['_content'] = $content;
-
-		return json_encode( $attributes );
+	function render_dummy_block_with_content( $attributes, $content, $name ) {
+		return json_encode( array(
+			'attributes' => $attributes,
+			'content'    => $content,
+			'name'       => $name,
+		) );
 	}
 }
