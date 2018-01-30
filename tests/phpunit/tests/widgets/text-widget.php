@@ -29,14 +29,16 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 	/**
 	 * Clean up global scope.
 	 *
-	 * @global WP_Scripts $wp_scripts
-	 * @global WP_Styles  $wp_style
+	 * @global WP_Scripts           $wp_scripts
+	 * @global WP_Styles            $wp_style
+	 * @global WP_Customize_Manager $wp_customize
 	 */
 	function clean_up_global_scope() {
-		global $wp_scripts, $wp_styles;
+		global $wp_scripts, $wp_styles, $wp_customize;
 		parent::clean_up_global_scope();
-		$wp_scripts = null;
-		$wp_styles = null;
+		$wp_scripts   = null;
+		$wp_styles    = null;
+		$wp_customize = null;
 	}
 
 	/**
@@ -66,6 +68,60 @@ class Test_WP_Widget_Text extends WP_UnitTestCase {
 		$this->assertEquals( 10, has_action( 'admin_print_scripts-widgets.php', array( $widget, 'enqueue_admin_scripts' ) ) );
 		$this->assertEquals( 10, has_action( 'admin_footer-widgets.php', array( 'WP_Widget_Text', 'render_control_template_scripts' ) ) );
 		$this->assertContains( 'wp.textWidgets.idBases.push( "text" );', wp_scripts()->registered['text-widgets']->extra['after'] );
+		$this->assertFalse( has_action( 'wp_enqueue_scripts', array( $widget, 'enqueue_preview_scripts' ) ) );
+	}
+
+	/**
+	 * Test register in customize preview.
+	 *
+	 * @global WP_Customize_Manager $wp_customize
+	 * @covers WP_Widget_Text::__construct()
+	 * @covers WP_Widget_Text::_register()
+	 */
+	function test__register_in_customize_preview() {
+		global $wp_customize;
+		wp_set_current_user(
+			$this->factory()->user->create(
+				array(
+					'role' => 'administrator',
+				)
+			)
+		);
+		require_once ABSPATH . WPINC . '/class-wp-customize-manager.php';
+		$wp_customize = new WP_Customize_Manager(
+			array(
+				'changeset_uuid' => wp_generate_uuid4(),
+			)
+		);
+		$wp_customize->start_previewing_theme();
+
+		$widget = new WP_Widget_Text();
+		$widget->_register();
+		$this->assertEquals( 10, has_action( 'wp_enqueue_scripts', array( $widget, 'enqueue_preview_scripts' ) ) );
+	}
+
+	/**
+	 * Test enqueue_preview_scripts method.
+	 *
+	 * @global WP_Scripts $wp_scripts
+	 * @global WP_Styles $wp_styles
+	 * @covers WP_Widget_Text::enqueue_preview_scripts
+	 */
+	function test_enqueue_preview_scripts() {
+		global $wp_scripts, $wp_styles;
+		$wp_scripts = null;
+		$wp_styles  = null;
+		$widget     = new WP_Widget_Text();
+
+		$this->assertFalse( wp_style_is( 'wp-mediaelement' ) );
+		$this->assertFalse( wp_script_is( 'wp-playlist' ) );
+
+		ob_start();
+		$widget->enqueue_preview_scripts();
+		ob_end_clean();
+
+		$this->assertTrue( wp_style_is( 'wp-mediaelement' ) );
+		$this->assertTrue( wp_script_is( 'wp-playlist' ) );
 	}
 
 	/**
