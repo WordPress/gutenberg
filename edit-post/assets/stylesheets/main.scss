@@ -87,6 +87,22 @@ body.gutenberg-editor-page {
 	.components-navigate-regions {
 		height: 100%;
 	}
+
+	.alignright {
+		float: right;
+		margin: 0.5em 0 0.5em 1em;
+	}
+
+	.alignleft {
+		float: left;
+		margin: 0.5em 1em 0.5em 0;
+	}
+
+	.aligncenter {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+	}
 }
 
 .editor-post-title,
