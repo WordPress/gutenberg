@@ -267,7 +267,7 @@ describe( 'block parser', () => {
 
 			const block = createBlockWithFallback( null, 'content' );
 			expect( block.name ).toEqual( 'core/unknown-block' );
-			expect( block.attributes ).toEqual( { content: 'content' } );
+			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
 
 		it( 'should not create a block if no unknown type handler', () => {
