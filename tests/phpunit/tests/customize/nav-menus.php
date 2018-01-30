@@ -353,6 +353,18 @@ class Test_WP_Customize_Nav_Menus extends WP_UnitTestCase {
 		$this->assertInternalType( 'array', $results );
 		$this->assertEquals( 2, count( $results ) );
 		remove_filter( 'customize_nav_menu_searched_items', array( $this, 'filter_search' ), 10 );
+
+		// Test home.
+		$title   = _x( 'Home', 'nav menu home label' );
+		$results = $menus->search_available_items_query(
+			array(
+				'pagenum' => 1,
+				's'       => $title,
+			)
+		);
+		$this->assertCount( 1, $results );
+		$this->assertEquals( 'home', $results[0]['id'] );
+		$this->assertEquals( 'custom', $results[0]['type'] );
 	}
 
 	/**
