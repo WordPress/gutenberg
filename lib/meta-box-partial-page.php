@@ -351,6 +351,9 @@ function gutenberg_meta_box_post_form_hidden_fields( $post ) {
 	$referer      = wp_get_referer();
 	$current_user = wp_get_current_user();
 	$user_id      = $current_user->ID;
+	if ( ! wp_check_post_lock( $post->ID ) ) {
+		$active_post_lock = wp_set_post_lock( $post->ID );
+	}
 	wp_nonce_field( $nonce_action );
 	?>
 	<input type="hidden" id="user-id" name="user_ID" value="<?php echo (int) $user_id; ?>" />
