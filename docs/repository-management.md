@@ -128,7 +128,9 @@ Make sure to:
 
 If you’d like a template to follow:
 
-> Thanks ________ for the time you’ve spent on this pull request.
-> I’m closing this pull request because ________. To clarify further, ________.
-> For more details, please see ________ and ____.
+> Thanks ____ for the time you’ve spent on this pull request.
+>
+> I’m closing this pull request because ____. To clarify further, ____.
+>
+> For more details, please see ____ and ____.
 
