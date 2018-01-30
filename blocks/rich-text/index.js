@@ -452,21 +452,18 @@ export default class RichText extends Component {
 	getFocusPosition() {
 		const position = this.getEditorSelectionRect();
 
-		// Find the parent "relative" positioned container
-		const container = this.props.inlineToolbar ?
-			this.editor.getBody().closest( '.blocks-rich-text' ) :
-			this.editor.getBody().closest( '.editor-block-list__block' );
+		// Find the parent "relative" or "absolute" positioned container
+		const findRelativeParent = ( node ) => {
+			const style = window.getComputedStyle( node );
+			if ( style.position === 'relative' || style.position === 'absolute' ) {
+				return node;
+			}
+			return findRelativeParent( node.parentNode );
+		};
+		const container = findRelativeParent( this.editor.getBody() );
 		const containerPosition = container.getBoundingClientRect();
-		const blockPadding = 14;
-		const blockMoverMargin = 18;
-
-		// These offsets are necessary because the toolbar where the link modal lives
-		// is absolute positioned and it's not shown when we compute the position here
-		// so we compute the position about its parent relative position and adds the offset
-		const toolbarOffset = this.props.inlineToolbar ?
-			{ top: 10, left: 0 } :
-			{ top: 0, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
-		const linkModalWidth = 305;
+		const toolbarOffset = { top: 10, left: 0 };
+		const linkModalWidth = 298;
 
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
