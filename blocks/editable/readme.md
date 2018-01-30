@@ -65,13 +65,18 @@ a traditional `input` field, usually when the user exits the field.
 
 ## Example
 
+{% codetabs %}
+{% ES5 %}
 ```js
 wp.blocks.registerBlockType( /* ... */, {
-
 	// ...
 
 	attributes: {
-		content: wp.blocks.query.children(),
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'h2',
+		},
 	},
 
 	edit: function( props ) {
@@ -79,15 +84,42 @@ wp.blocks.registerBlockType( /* ... */, {
 			tagName: 'h2',
 			className: props.className,
 			value: props.attributes.content,
-			onChange: function( newContent ) {
-				props.setAttributes( { content: newContent } );
+			onChange: function( content ) {
+				props.setAttributes( { content: content } );
 			},
 			focus: props.focus,
 			onFocus: props.setFocus,
 		} );
 	},
-
-	// ...
-
 } );
 ```
+{% ESNext %}
+```js
+const { registerBlockType, Editable } = wp.blocks;
+
+registerBlockType( /* ... */, {
+	// ...
+
+	attributes: {
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'h2',
+		},
+	},
+
+	edit( { className, attributes, setAttributes, focus, setFocus } ) {
+		return (
+			<Editable
+				tagName="h2"
+				className={ className }
+				value={ attributes.content }
+				onChange={ ( content ) => setAttributes( { content } ) }
+				focus={ focus }
+				setFocus={ setFocus }
+			/>
+		);
+	},
+} );
+```
+{% end %}
