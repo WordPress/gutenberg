@@ -322,15 +322,15 @@ export default {
 		return effects;
 	},
 	FETCH_REUSABLE_BLOCKS( action, store ) {
-		const { id } = action;
-		const { dispatch } = store;
-
-		let result;
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
 		if ( ! has( wp, 'api.models.Blocks' ) && ! has( wp, 'api.collections.Blocks' ) ) {
 			return;
 		}
+		const { id } = action;
+		const { dispatch } = store;
+
+		let result;
 		if ( id ) {
 			result = new wp.api.models.Blocks( { id } ).fetch();
 		} else {
@@ -395,6 +395,12 @@ export default {
 		);
 	},
 	DELETE_REUSABLE_BLOCK( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		if ( ! has( wp, 'api.models.Blocks' ) ) {
+			return;
+		}
+
 		const { id } = action;
 		const { getState, dispatch } = store;
 
@@ -418,11 +424,6 @@ export default {
 			optimist: { type: BEGIN, id: transactionId },
 		} );
 
-		// TODO: these are potentially undefined, this fix is in place
-		// until there is a filter to not use reusable blocks if undefined
-		if ( ! has( wp, 'api.models.Blocks' ) ) {
-			return;
-		}
 		new wp.api.models.Blocks( { id } ).destroy().then(
 			() => {
 				dispatch( {
