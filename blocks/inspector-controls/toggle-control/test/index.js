@@ -18,4 +18,26 @@ describe( 'ToggleControl', () => {
 
 		expect( onChange ).toHaveBeenCalledWith( true );
 	} );
+
+	describe( 'help', () => {
+		it( 'does not render input with describedby if no help prop', () => {
+			// Mount: With shallow, cannot find input child of BaseControl
+			const onChange = jest.fn();
+			const wrapper = mount( <ToggleControl onChange={ onChange } /> );
+
+			const input = wrapper.find( 'input' );
+
+			expect( input.prop( 'aria-describedby' ) ).toBeUndefined();
+		} );
+
+		it( 'renders input with describedby if help prop', () => {
+			// Mount: With shallow, cannot find input child of BaseControl
+			const onChange = jest.fn();
+			const wrapper = mount( <ToggleControl help onChange={ onChange } /> );
+
+			const input = wrapper.find( 'input' );
+
+			expect( input.prop( 'aria-describedby' ) ).toMatch( /^inspector-toggle-control-.*__help$/ );
+		} );
+	} );
 } );
