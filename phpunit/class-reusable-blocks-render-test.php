@@ -81,7 +81,7 @@ class Reusable_Blocks_Render_Test extends WP_UnitTestCase {
 	 */
 	public function test_ref_empty() {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/block' );
-		$output     = $block_type->render( array(), 'foo' );
+		$output     = $block_type->render( array() );
 		$this->assertSame( '', $output );
 	}
 
@@ -91,7 +91,7 @@ class Reusable_Blocks_Render_Test extends WP_UnitTestCase {
 	 */
 	public function test_ref_wrong_post_type() {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/block' );
-		$output     = $block_type->render( array( 'ref' => self::$post_id ), 'foo' );
+		$output     = $block_type->render( array( 'ref' => self::$post_id ) );
 		$this->assertSame( '', $output );
 	}
 }

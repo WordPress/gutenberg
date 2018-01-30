@@ -71,6 +71,24 @@ function gutenberg_parse_blocks( $content ) {
 }
 
 /**
+ * Returns an array of the names of all registered dynamic block types.
+ *
+ * @return array Array of dynamic block names.
+ */
+function get_dynamic_block_names() {
+	$dynamic_block_names = array();
+
+	$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+	foreach ( $block_types as $block_type ) {
+		if ( $block_type->is_dynamic() ) {
+			$dynamic_block_names[] = $block_type->name;
+		}
+	}
+
+	return $dynamic_block_names;
+}
+
+/**
  * Renders a single block into a HTML string.
  *
  * @since 1.9.0
@@ -85,8 +103,8 @@ function gutenberg_render_block( $block ) {
 
 	if ( $block_name ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-		if ( null !== $block_type ) {
-			return $block_type->render( $attributes, $raw_content );
+		if ( null !== $block_type && $block_type->is_dynamic() ) {
+			return $block_type->render( $attributes );
 		}
 	}
 
@@ -106,12 +124,81 @@ function gutenberg_render_block( $block ) {
  * @return string          Updated post content.
  */
 function do_blocks( $content ) {
-	$blocks = gutenberg_parse_blocks( $content );
+	$rendered_content = '';
 
-	$content_after_blocks = '';
-	foreach ( $blocks as $block ) {
-		$content_after_blocks .= gutenberg_render_block( $block );
+	$dynamic_block_names   = get_dynamic_block_names();
+	$dynamic_block_pattern = (
+		'/<!--\s+wp:(' .
+		str_replace( '/', '\/',                 // Escape namespace, not handled by preg_quote.
+			str_replace( 'core/', '(?:core/)?', // Allow implicit core namespace, but don't capture.
+				implode( '|',                   // Join block names into capture group alternation.
+					array_map( 'preg_quote',    // Escape block name for regular expression.
+						$dynamic_block_names
+					)
+				)
+			)
+		) .
+		')(\s+(\{.*?\}))?\s+(\/)?-->/'
+	);
+
+	while ( preg_match( $dynamic_block_pattern, $content, $block_match, PREG_OFFSET_CAPTURE ) ) {
+		$opening_tag     = $block_match[0][0];
+		$offset          = $block_match[0][1];
+		$block_name      = $block_match[1][0];
+		$is_self_closing = isset( $block_match[4] );
+
+		// Reset attributes JSON to prevent scope bleed from last iteration.
+		$block_attributes_json = null;
+		if ( isset( $block_match[3] ) ) {
+			$block_attributes_json = $block_match[3][0];
+		}
+
+		// Since content is a working copy since the last match, append to
+		// rendered content up to the matched offset...
+		$rendered_content .= substr( $content, 0, $offset );
+
+		// ...then update the working copy of content.
+		$content = substr( $content, $offset + strlen( $opening_tag ) );
+
+		// Make implicit core namespace explicit.
+		$is_implicit_core_namespace = ( false === strpos( $block_name, '/' ) );
+		$normalized_block_name      = $is_implicit_core_namespace ? 'core/' . $block_name : $block_name;
+
+		// Find registered block type. We can assume it exists since we use the
+		// `get_dynamic_block_names` function as a source for pattern matching.
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $normalized_block_name );
+
+		// Attempt to parse attributes JSON, if available.
+		$attributes = array();
+		if ( ! empty( $block_attributes_json ) ) {
+			$decoded_attributes = json_decode( $block_attributes_json, true );
+			if ( ! is_null( $decoded_attributes ) ) {
+				$attributes = $decoded_attributes;
+			}
+		}
+
+		// Replace dynamic block with server-rendered output.
+		$rendered_content .= $block_type->render( $attributes );
+
+		if ( ! $is_self_closing ) {
+			$end_tag_pattern = '/<!--\s+\/wp:' . str_replace( '/', '\/', preg_quote( $block_name ) ) . '\s+-->/';
+			if ( ! preg_match( $end_tag_pattern, $content, $block_match_end, PREG_OFFSET_CAPTURE ) ) {
+				// If no closing tag is found, abort all matching, and continue
+				// to append remainder of content to rendered output.
+				break;
+			}
+
+			// Update content to omit text up to and including closing tag.
+			$end_tag    = $block_match_end[0][0];
+			$end_offset = $block_match_end[0][1];
+
+			$content = substr( $content, $end_offset + strlen( $end_tag ) );
+		}
 	}
-	return $content_after_blocks;
+
+	// Append remaining unmatched content.
+	$rendered_content .= $content;
+
+	return $rendered_content;
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
