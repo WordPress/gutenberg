@@ -851,7 +851,7 @@ export function getBlockInsertionPoint( state ) {
  * @returns {?Boolean} Whether the insertion point is visible or not.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return !! state.blockInsertionPoint.visible;
+	return state.isInsertionPointVisible;
 }
 
 /**

@@ -1584,7 +1584,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
-				blockInsertionPoint: {},
+				isInsertionPointVisible: false,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
@@ -1602,7 +1602,7 @@ describe( 'selectors', () => {
 						blockOrder: [ 1, 2, 3 ],
 					},
 				},
-				blockInsertionPoint: {},
+				isInsertionPointVisible: false,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
@@ -1617,7 +1617,7 @@ describe( 'selectors', () => {
 						blockOrder: [ 1, 2, 3 ],
 					},
 				},
-				blockInsertionPoint: {},
+				isInsertionPointVisible: false,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
@@ -1627,9 +1627,7 @@ describe( 'selectors', () => {
 	describe( 'isBlockInsertionPointVisible', () => {
 		it( 'should return the value in state', () => {
 			const state = {
-				blockInsertionPoint: {
-					visible: true,
-				},
+				isInsertionPointVisible: true,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
