@@ -6,7 +6,6 @@ import { combineReducers } from 'redux';
 import {
 	flow,
 	partialRight,
-	difference,
 	reduce,
 	keyBy,
 	first,
@@ -21,7 +20,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, getBlockType } from '@wordpress/blocks';
+import { isReusableBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -29,11 +28,6 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
 import { PREFERENCES_DEFAULTS } from './defaults';
-
-/***
- * Module constants
- */
-const MAX_RECENT_BLOCKS = 8;
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -530,28 +524,29 @@ export function blockInsertionPoint( state = {}, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
-			// put the block in the recently used blocks
-			let recentlyUsedBlocks = [ ...state.recentlyUsedBlocks ];
-			action.blocks.forEach( ( block ) => {
-				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, MAX_RECENT_BLOCKS );
-			} );
-			return {
-				...state,
-				recentlyUsedBlocks,
-			};
-		case 'SETUP_EDITOR':
-			const isBlockDefined = name => getBlockType( name ) !== undefined;
-			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
-			const commonBlocks = getBlockTypes()
-				.filter( ( blockType ) => 'common' === blockType.category )
-				.map( ( blockType ) => blockType.name );
+			return action.blocks.reduce( ( prevState, block ) => {
+				let insert;
+				if ( isReusableBlock( block ) ) {
+					insert = { name: block.name, ref: block.attributes.ref };
+				} else {
+					insert = { name: block.name };
+				}
 
+				const isSameAsInsert = ( { name, ref } ) => name === insert.name && ref === insert.ref;
+
+				return {
+					...prevState,
+					recentInserts: [
+						insert,
+						...reject( prevState.recentInserts, isSameAsInsert ),
+					],
+				};
+			}, state );
+
+		case 'REMOVE_REUSABLE_BLOCK':
 			return {
 				...state,
-				// recently used gets filled up to `MAX_RECENT_BLOCKS` with blocks from the common category
-				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
-					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
-					.slice( 0, MAX_RECENT_BLOCKS ),
+				recentInserts: reject( state.recentInserts, insert => insert.ref === action.id ),
 			};
 	}
 
