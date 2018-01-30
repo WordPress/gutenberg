@@ -498,6 +498,16 @@ class Tests_WP_Customize_Manager extends WP_UnitTestCase {
 			),
 			wp_list_pluck( $wp_customize->changeset_data(), 'value' )
 		);
+
+		// If there is no user, don't fetch the most recent autosave. See #42450.
+		wp_set_current_user( 0 );
+		$wp_customize = new WP_Customize_Manager(
+			array(
+				'changeset_uuid' => $uuid,
+				'autosaved'      => true,
+			)
+		);
+		$this->assertEquals( $data, $wp_customize->changeset_data() );
 	}
 
 	/**
