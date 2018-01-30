@@ -1,4 +1,8 @@
 .wp-block-freeform.blocks-editable__tinymce {
+	overflow: hidden;
+	margin: -4px;
+	padding: 4px;
+
 	p {
 		line-height: $editor-line-height;
 	}
