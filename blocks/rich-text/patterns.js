@@ -14,25 +14,11 @@ import { keycodes } from '@wordpress/utils';
  */
 import { getBlockTypes } from '../api/registration';
 
-/**
- * Browser dependencies
- */
-const { setTimeout } = window;
-
 const { ESCAPE, ENTER, SPACE, BACKSPACE } = keycodes;
-
-/**
- * Sets a timeout and checks if the given editor still exists.
- *
- * @param {Editor}   editor   TinyMCE editor instance.
- * @param {Function} callback The function to call.
- */
-function setSafeTimeout( editor, callback ) {
-	setTimeout( () => ! editor.removed && callback() );
-}
 
 export default function( editor ) {
 	const getContent = this.getContent.bind( this );
+	const setSafeTimeout = this.setSafeTimeout.bind( this );
 	const { onReplace } = this.props;
 
 	const VK = tinymce.util.VK;
@@ -74,9 +60,9 @@ export default function( editor ) {
 			enter();
 		// Wait for the browser to insert the character.
 		} else if ( keyCode === SPACE ) {
-			setSafeTimeout( editor, () => searchFirstText( spacePatterns ) );
+			setSafeTimeout( () => searchFirstText( spacePatterns ) );
 		} else if ( keyCode > 47 && ! ( keyCode >= 91 && keyCode <= 93 ) ) {
-			setSafeTimeout( editor, inline );
+			setSafeTimeout( inline );
 		}
 	}, true );
 
