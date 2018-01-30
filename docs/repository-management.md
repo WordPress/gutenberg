@@ -29,7 +29,6 @@ To better organize the issue backlog, all issues should have [one or more labels
 - [[Type] Enhancement](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Enhancement) - Gutenberg would be better with this improvement added.
 - [[Type] Plugin / Extension Conflict](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Plugin%20%2F%20Extension%20Conflict) - Documentation of a conflict between Gutenberg and a plugin or extension. The plugin author should be informed and provided documentation on how to address.
 - [[Status] Needs More Info](https://github.com/WordPress/gutenberg/labels/%5BStatus%5D%20Needs%20More%20Info) - The issue needs more information in order to be actionable and relevant. Typically this requires follow-up from the original reporter.
-- [Needs Product Decision](https://github.com/WordPress/gutenberg/labels/Needs%20Product%20Decision) - A person with decision-making authority needs to decide whether the project should support this issue.
 
 [Check out the label directory](https://github.com/WordPress/gutenberg/labels) for a listing of all labels.
 
