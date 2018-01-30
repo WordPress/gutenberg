@@ -200,16 +200,14 @@ export function insertBlocks( blocks, position ) {
 }
 
 /**
- * Returns an action object showing the insertion point at a given index.
- *
- * @param {Number?} index Index of the insertion point.
+ * Returns an action object used in signalling that the insertion point should
+ * be shown.
  *
  * @returns {Object} Action object.
  */
-export function showInsertionPoint( index ) {
+export function showInsertionPoint() {
 	return {
 		type: 'SHOW_INSERTION_POINT',
-		index,
 	};
 }
 

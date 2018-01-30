@@ -830,11 +830,6 @@ export function isTyping( state ) {
  * @returns {?String} Unique ID after which insertion will occur.
  */
 export function getBlockInsertionPoint( state ) {
-	const position = getBlockSiblingInserterPosition( state );
-	if ( null !== position ) {
-		return position;
-	}
-
 	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
 	if ( lastMultiSelectedBlock ) {
 		return getBlockIndex( state, lastMultiSelectedBlock ) + 1;
@@ -846,23 +841,6 @@ export function getBlockInsertionPoint( state ) {
 	}
 
 	return state.editor.present.blockOrder.length;
-}
-
-/**
- * Returns the position at which the block inserter will insert a new adjacent
- * sibling block, or null if the inserter is not actively visible.
- *
- * @param {Object} state Global application state.
- *
- * @returns {?Number} Whether the inserter is currently visible.
- */
-export function getBlockSiblingInserterPosition( state ) {
-	const { position } = state.blockInsertionPoint;
-	if ( ! Number.isInteger( position ) ) {
-		return null;
-	}
-
-	return position;
 }
 
 /**

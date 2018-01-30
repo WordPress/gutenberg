@@ -728,14 +728,12 @@ describe( 'state', () => {
 			expect( state ).toEqual( {} );
 		} );
 
-		it( 'should set insertion point position', () => {
+		it( 'should set insertion point visible', () => {
 			const state = blockInsertionPoint( undefined, {
 				type: 'SHOW_INSERTION_POINT',
-				index: 5,
 			} );
 
 			expect( state ).toEqual( {
-				position: 5,
 				visible: true,
 			} );
 		} );
@@ -745,7 +743,7 @@ describe( 'state', () => {
 				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).toEqual( { visible: false, position: null } );
+			expect( state ).toEqual( { visible: false } );
 		} );
 	} );
 
