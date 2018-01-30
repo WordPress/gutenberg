@@ -20,7 +20,7 @@ A healthy issue backlog is one where issues are relevant and actionable. *Releva
 
 Any issues that are irrelevant or not actionable should be closed, because they get in the way of making progress on the project. Imagine the issue backlog as a desk: the more clutter you have on it, the more difficult it is to use the space to get work done.
 
-**Labels**
+### Labels
 
 To better organize the issue backlog, all issues should have [one or more labels](https://github.com/WordPress/gutenberg/labels). Here are some you might commonly see:
 
@@ -33,7 +33,7 @@ To better organize the issue backlog, all issues should have [one or more labels
 
 [Check out the label directory](https://github.com/WordPress/gutenberg/labels) for a listing of all labels.
 
-**Milestones**
+### Milestones
 
 We put issues into [milestones](https://github.com/wordpress/gutenberg/milestones) to better categorize them. Here are some you might see:
 
@@ -43,7 +43,7 @@ We put issues into [milestones](https://github.com/wordpress/gutenberg/milestone
 - [Bonus Features](https://github.com/WordPress/gutenberg/milestone/32): Again likely not part of triage and includes nice to haves for the project, if time before merge. A few examples include collaborative editing and footnotes.
 - [Future](https://github.com/WordPress/gutenberg/milestone/35): this is something that is confirmed by everyone as a good thing but doesn’t fall into other criteria.
 
-**Triaging Issues**
+### Triaging Issues
 
 To keep the issue backlog healthy, it needs to be triaged regularly. *Triage* is the practice of reviewing existing issues to make sure they’re relevant, actionable, and have all the information they need.
 
@@ -82,7 +82,7 @@ Along with this process, there are a few important points to mention:
 - To make it far easier to merge your code, each pull request should only contain one conceptual change. Keeping contributions atomic keeps the pull request discussion focused on one topic and makes it possible to approve changes on a case-by-case basis.
 - Separate pull requests can address different items or todos from their linked issue, there’s no need for a single pull request to cover a single issue if the issue is non-trivial.
 
-**Code Review**
+### Code Review
 
 Every pull request goes through a manual code review, in addition to automated tests. The objectives for the code review are best thought of as:
 
@@ -96,7 +96,7 @@ Every pull request goes through a manual code review, in addition to automated t
 
 *As a contributor*, your responsibility is to learn from suggestions and iterate your pull request should it be needed based on feedback. Seek to collaborate and produce the best possible contribution to the greater whole.
 
-**Design Review**
+### Design Review
 
 If your pull request impacts the design, you can ask for a designer to review. Most pull requests that have an impact on design are reviewed. However, you can request a design review on something by adding the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label. As a guide, this could be:
 
@@ -104,7 +104,7 @@ If your pull request impacts the design, you can ask for a designer to review. M
 - Anything that changes something visually.
 - If you just want design feedback on an idea or exploration.
 
-**Merging Pull Requests**
+### Merging Pull Requests
 
 A pull request can generally be merged once it is:
 
@@ -116,7 +116,7 @@ A pull request can generally be merged once it is:
 
 The final pull request merge decision is made by [Gutenberg core team members](https://github.com/orgs/WordPress/teams/gutenberg-core/members).
 
-**Closing Pull Requests**
+### Closing Pull Requests
 
 Sometimes, a pull request may not be mergeable, no matter how much additional effort is applied to it (e.g. out of scope). In these cases, it’s best to communicate with the contributor graciously while describing why the pull request was closed, this encourages productive future involvement.
 
