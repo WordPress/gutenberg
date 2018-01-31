@@ -8,10 +8,9 @@ import {
 	has,
 	last,
 	reduce,
-	keys,
-	without,
 	compact,
 	find,
+	some,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -26,25 +25,12 @@ import { addQueryArgs } from '@wordpress/url';
  * Module constants
  */
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
-const MAX_FREQUENT_BLOCKS = 3;
-
-/**
- * Returns the current editing mode.
- *
- * @param {Object} state Global application state.
- *
- * @returns {string} Editing mode.
- */
-export function getEditorMode( state ) {
-	return getPreference( state, 'mode', 'visual' );
-}
 
 /**
  * Returns the state of legacy meta boxes.
  *
- * @param {Object} state Global application state.
- *
- * @returns {Object} State of meta boxes.
+ * @param   {Object} state Global application state.
+ * @returns {Object}       State of meta boxes.
  */
 export function getMetaBoxes( state ) {
 	return state.metaBoxes;
@@ -63,113 +49,28 @@ export function getMetaBox( state, location ) {
 }
 
 /**
- * Returns a list of dirty meta box locations.
+ * Returns true if the post is using Meta Boxes
  *
- * @param {Object} state Global application state.
- *
- * @returns {Array} Array of locations for dirty meta boxes.
+ * @param  {Object} state Global application state
+ * @return {boolean}      Whether there are metaboxes or not.
  */
-export const getDirtyMetaBoxes = createSelector(
+export const hasMetaBoxes = createSelector(
 	( state ) => {
-		return reduce( getMetaBoxes( state ), ( result, metaBox, location ) => {
-			return metaBox.isDirty && metaBox.isActive ?
-				[ ...result, location ] :
-				result;
-		}, [] );
+		return some( getMetaBoxes( state ), ( metaBox ) => {
+			return metaBox.isActive;
+		} );
 	},
 	( state ) => state.metaBoxes,
 );
 
 /**
- * Returns the dirty state of legacy meta boxes.
+ * Returns true if the the Meta Boxes are being saved.
  *
- * Checks whether the entire meta box state is dirty. So if a sidebar is dirty,
- * but a normal area is not dirty, this will overall return dirty.
- *
- * @param {Object} state Global application state.
- *
- * @returns {boolean} Whether state is dirty. True if dirty, false if not.
+ * @param   {Object}  state Global application state.
+ * @returns {boolean}       Whether the metaboxes are being saved.
  */
-export const isMetaBoxStateDirty = ( state ) => getDirtyMetaBoxes( state ).length > 0;
-
-/**
- * Returns the current active panel for the sidebar.
- *
- * @param {Object} state Global application state.
- *
- * @returns {string} Active sidebar panel.
- */
-export function getActivePanel( state ) {
-	return state.panel;
-}
-
-/**
- * Returns the preferences (these preferences are persisted locally).
- *
- * @param {Object} state Global application state.
- *
- * @returns {Object} Preferences Object.
- */
-export function getPreferences( state ) {
-	return state.preferences;
-}
-
-/**
- *
- * @param {Object} state         Global application state.
- * @param {string} preferenceKey Preference Key.
- * @param {Mixed}  defaultValue  Default Value.
- *
- * @returns {Mixed} Preference Value.
- */
-export function getPreference( state, preferenceKey, defaultValue ) {
-	const preferences = getPreferences( state );
-	const value = preferences[ preferenceKey ];
-	return value === undefined ? defaultValue : value;
-}
-
-/**
- * Returns true if the sidebar is open, or false otherwise.
- *
- * @param {Object} state   Global application state.
- * @param {string} sidebar Sidebar name (leave undefined for the default sidebar).
- *
- * @returns {boolean} Whether the given sidebar is open.
- */
-export function isSidebarOpened( state, sidebar ) {
-	const sidebars = getPreference( state, 'sidebars' );
-	if ( sidebar !== undefined ) {
-		return sidebars[ sidebar ];
-	}
-
-	return isMobile( state ) ? sidebars.mobile : sidebars.desktop;
-}
-
-/**
- * Returns true if there's any open sidebar (mobile, desktop or publish).
- *
- * @param {Object} state Global application state.
- *
- * @returns {boolean} Whether sidebar is open.
- */
-export function hasOpenSidebar( state ) {
-	const sidebars = getPreference( state, 'sidebars' );
-	return isMobile( state ) ?
-		sidebars.mobile || sidebars.publish :
-		sidebars.desktop || sidebars.publish;
-}
-
-/**
- * Returns true if the editor sidebar panel is open, or false otherwise.
- *
- * @param {Object} state Global application state.
- * @param {string} panel Sidebar panel name.
- *
- * @returns {boolean} Whether sidebar is open.
- */
-export function isEditorSidebarPanelOpened( state, panel ) {
-	const panels = getPreference( state, 'panels' );
-	return panels ? !! panels[ panel ] : false;
+export function isSavingMetaBoxes( state ) {
+	return state.isSavingMetaBoxes;
 }
 
 /**
@@ -216,7 +117,7 @@ export function isEditedPostNew( state ) {
  * @returns {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
-	return state.editor.isDirty || isMetaBoxStateDirty( state );
+	return state.editor.isDirty;
 }
 
 /**
@@ -229,18 +130,6 @@ export function isEditedPostDirty( state ) {
  */
 export function isCleanNewPost( state ) {
 	return ! isEditedPostDirty( state ) && isEditedPostNew( state );
-}
-
-/**
- * Returns true if the current window size corresponds to mobile resolutions (<= medium breakpoint).
- *
- * @param {Object} state Global application state.
- *
- * @returns {boolean} Whether current window size corresponds to
- *                    mobile resolutions.
- */
-export function isMobile( state ) {
-	return state.mobile;
 }
 
 /**
@@ -374,7 +263,7 @@ export function isCurrentPostPublished( state ) {
  */
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
-	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
+	return isEditedPostDirty( state ) || hasMetaBoxes( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
 }
 
 /**
@@ -941,10 +830,6 @@ export function isTyping( state ) {
  * @returns {?String} Unique ID after which insertion will occur.
  */
 export function getBlockInsertionPoint( state ) {
-	if ( getEditorMode( state ) !== 'visual' ) {
-		return state.editor.present.blockOrder.length;
-	}
-
 	const position = getBlockSiblingInserterPosition( state );
 	if ( null !== position ) {
 		return position;
@@ -999,7 +884,7 @@ export function isBlockInsertionPointVisible( state ) {
  * @returns {boolean} Whether post is being saved.
  */
 export function isSavingPost( state ) {
-	return state.saving.requesting;
+	return state.saving.requesting || isSavingMetaBoxes( state );
 }
 
 /**
@@ -1241,51 +1126,6 @@ export function getRecentInserterItems( state, enabledBlockTypes = true ) {
 	// TODO: Merge in recently used reusable blocks
 
 	return compact( items );
-}
-
-/**
- * Resolves the block usage stats into a list of the most frequently used blocks.
- * Memoized so we're not generating block lists every time we render the list
- * in the inserter.
- *
- * @param {Object} state Global application state.
- *
- * @returns {Array} List of block type settings.
- */
-export const getMostFrequentlyUsedBlocks = createSelector(
-	( state ) => {
-		const { blockUsage } = state.preferences;
-		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
-		// add in paragraph and image blocks if they're not already in the usage data
-		return compact(
-			[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
-				.map( blockType => getBlockType( blockType ) )
-		).slice( 0, MAX_FREQUENT_BLOCKS );
-	},
-	( state ) => state.preferences.blockUsage
-);
-
-/**
- * Returns whether the toolbar should be fixed or not.
- *
- * @param {Object} state Global application state.
- *
- * @returns {boolean} True if toolbar is fixed.
- */
-export function hasFixedToolbar( state ) {
-	return ! isMobile( state ) && isFeatureActive( state, 'fixedToolbar' );
-}
-
-/**
- * Returns whether the given feature is enabled or not.
- *
- * @param {Object} state   Global application state.
- * @param {string} feature Feature slug.
- *
- * @returns {booleean} Is active.
- */
-export function isFeatureActive( state, feature ) {
-	return !! state.preferences.features[ feature ];
 }
 
 /**

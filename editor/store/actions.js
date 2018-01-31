@@ -346,54 +346,6 @@ export function stopTyping() {
 }
 
 /**
- * Returns an action object used in signalling that the user toggled the
- * sidebar.
- *
- * @param {string}   sidebar     Name of the sidebar to toggle
- *                               (desktop, mobile or publish).
- * @param {boolean?} forcedValue Force a sidebar state.
- *
- * @returns {Object} Action object.
- */
-export function toggleSidebar( sidebar, forcedValue ) {
-	return {
-		type: 'TOGGLE_SIDEBAR',
-		sidebar,
-		forcedValue,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the user switched the active
- * sidebar tab panel.
- *
- * @param {string} panel The panel name.
- *
- * @returns {Object} Action object.
- */
-export function setActivePanel( panel ) {
-	return {
-		type: 'SET_ACTIVE_PANEL',
-		panel,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the user toggled a
- * sidebar panel.
- *
- * @param {string} panel The panel name.
- *
- * @returns {Object} Action object.
- */
-export function toggleSidebarPanel( panel ) {
-	return {
-		type: 'TOGGLE_SIDEBAR_PANEL',
-		panel,
-	};
-}
-
-/**
  * Returns an action object used to create a notice.
  *
  * @param {string}    status  The notice status.
@@ -459,78 +411,38 @@ export function initializeMetaBoxState( metaBoxes ) {
 }
 
 /**
- * Returns an action object used to signify that a meta box finished reloading.
- *
- * @param {string} location Location of meta box: 'normal', 'side'
- *                          or 'advanced'.
- *
- * @returns {Object} Action object.
- */
-export function handleMetaBoxReload( location ) {
-	return {
-		type: 'HANDLE_META_BOX_RELOAD',
-		location,
-	};
-}
-
-/**
- * Returns an action object used to signify that a meta box finished loading.
- *
- * @param {string} location Location of meta box: 'normal', 'side'
- *                          or 'advanced'.
- *
- * @returns {Object} Action object.
- */
-export function metaBoxLoaded( location ) {
-	return {
-		type: 'META_BOX_LOADED',
-		location,
-	};
-}
-
-/**
  * Returns an action object used to request meta box update.
  *
- * @param {Array} locations Locations of meta boxes: ['normal', 'side',
- *                          'advanced' ].
- *
  * @returns {Object} Action object.
  */
-export function requestMetaBoxUpdates( locations ) {
+export function requestMetaBoxUpdates() {
 	return {
 		type: 'REQUEST_META_BOX_UPDATES',
-		locations,
 	};
 }
 
 /**
- * Returns an action object used to set meta box state changed.
- *
- * @param {string}  location   Location of meta box: 'normal', 'side'
- *                             or 'advanced'.
- * @param {boolean} hasChanged Whether the meta box has changed.
+ * Returns an action object used signal a successfull meta nox update.
  *
  * @returns {Object} Action object.
  */
-export function metaBoxStateChanged( location, hasChanged ) {
+export function metaBoxUpdatesSuccess() {
 	return {
-		type: 'META_BOX_STATE_CHANGED',
-		location,
-		hasChanged,
+		type: 'META_BOX_UPDATES_SUCCESS',
 	};
 }
 
 /**
- * Returns an action object used to toggle a feature flag.
+ * Returns an action object used set the saved meta boxes data.
+ * This is used to check if the meta boxes have been touched when leaving the editor.
  *
- * @param {string} feature Featurre name.
- *
- * @returns {Object} Action object.
+ * @param   {Object} dataPerLocation Meta Boxes Data per location.
+ * @returns {Object}                 Action object.
  */
-export function toggleFeature( feature ) {
+export function setMetaBoxSavedData( dataPerLocation ) {
 	return {
-		type: 'TOGGLE_FEATURE',
-		feature,
+		type: 'META_BOX_SET_SAVED_DATA',
+		dataPerLocation,
 	};
 }
 
@@ -635,12 +547,5 @@ export function convertBlockToReusable( uid ) {
 export function appendDefaultBlock() {
 	return {
 		type: 'APPEND_DEFAULT_BLOCK',
-	};
-}
-
-export function switchEditorMode( mode ) {
-	return {
-		type: 'SWITCH_MODE',
-		mode,
 	};
 }

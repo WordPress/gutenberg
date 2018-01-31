@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 2.0.0
+ * Version: 2.1.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -44,7 +44,7 @@ function the_gutenberg_project() {
  * @since 0.1.0
  */
 function gutenberg_menu() {
-	global $menu, $submenu;
+	global $submenu;
 
 	add_menu_page(
 		'Gutenberg',

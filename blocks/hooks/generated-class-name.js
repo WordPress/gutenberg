@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import { uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -26,13 +26,20 @@ import { hasBlockSupport, getBlockDefaultClassname } from '../api';
 export function addGeneratedClassName( extraProps, blockType ) {
 	// Adding the generated className
 	if ( hasBlockSupport( blockType, 'className', true ) ) {
-		const updatedClassName = classnames(
-			getBlockDefaultClassname( blockType.name ),
-			extraProps.className,
-		);
-		extraProps.className = updatedClassName;
-	}
+		if ( typeof extraProps.className === 'string' ) {
+			// We have some extra classes and want to add the default classname
+			// We use uniq to prevent duplicate classnames
 
+			extraProps.className = uniq( [
+				getBlockDefaultClassname( blockType.name ),
+				...extraProps.className.split( ' ' ),
+			] ).join( ' ' ).trim();
+		} else {
+			// There is no string in the className variable,
+			// so we just dump the default name in there
+			extraProps.className = getBlockDefaultClassname( blockType.name );
+		}
+	}
 	return extraProps;
 }
 

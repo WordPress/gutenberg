@@ -250,9 +250,7 @@ export class InserterMenu extends Component {
 			return 1; // Move focus forward
 		}
 
-		// Prevent cases of focus being unexpectedly stolen up in the tree,
-		// notably when using VisualEditorSiblingInserter, where focus is
-		// moved to sibling blocks.
+		// Prevent cases of focus being unexpectedly stolen up in the tree.
 		if ( includes( ARROWS, event.keyCode ) ) {
 			return 0; // Don't move focus, but prevent event propagation
 		}

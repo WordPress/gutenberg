@@ -1,0 +1,102 @@
+.edit-post-layout,
+.edit-post-layout__content {
+	height: 100%;
+}
+
+.edit-post-layout {
+	position: relative;
+
+	.components-notice-list {
+		position: sticky;
+		top: $header-height;
+		left: 0;
+		right: 0;
+
+		@include break-small {
+			position: fixed;
+			top: inherit;
+		}
+
+		.notice {
+			margin: 0 0 5px;
+			padding: 6px 12px;
+			min-height: $panel-header-height;
+
+			.notice-dismiss {
+				margin: 5px;
+			}
+		}
+	}
+
+	// on mobile, toolbars behave differently
+	@include break-small {
+		padding-top: $header-height;
+	}
+
+	&.has-fixed-toolbar {
+		.edit-post-layout__content {
+			padding-top: $block-controls-height;
+		}
+
+		// on mobile, toolbars behave differently
+		@include break-small {
+			padding-top: $header-height + $block-toolbar-height;
+
+			.edit-post-layout__content {
+				padding-top: 0;
+			}
+		}
+
+		@include break-large {
+			padding-top: $header-height;
+		}
+	}
+}
+
+@include editor-left('.components-notice-list');
+@include editor-right('.components-notice-list');
+
+.edit-post-layout__metaboxes:not(:empty) {
+	border-top: 1px solid $light-gray-500;
+	margin-top: 10px;
+	padding: 10px 0 10px;
+	clear: both;
+
+	.editor-meta-boxes-area {
+		max-width: $visual-editor-max-width;
+		margin: auto;
+	}
+}
+
+.edit-post-layout__content {
+	position: relative;
+
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	@include break-small {
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+}
+
+.edit-post-layout .editor-post-publish-panel {
+	position: fixed;
+	z-index: z-index( '.edit-post-layout .edit-post-post-publish-panel' );
+	top: $admin-bar-height-big;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	overflow: auto;
+
+	@include break-medium() {
+		top: $admin-bar-height;
+		left: auto;
+		width: $sidebar-width;
+		border-left: 1px solid $light-gray-500;
+		@include slide_in_right;
+	}
+}
+
+.edit-post-layout .editor-post-publish-panel__header-publish-button {
+	margin-right: 52px; // This number is approximative to keep the publish button at the same position when opening the panel
+}
