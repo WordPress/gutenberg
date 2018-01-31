@@ -497,20 +497,21 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point.
+ * Reducer returning the block insertion point visibility, a boolean value
+ * reflecting whether the insertion point should be shown.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
-export function blockInsertionPoint( state = {}, action ) {
+export function isInsertionPointVisible( state = false, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
-			return { ...state, visible: true, position: action.index };
+			return true;
 
 		case 'HIDE_INSERTION_POINT':
-			return { ...state, visible: false, position: null };
+			return false;
 	}
 
 	return state;
@@ -789,7 +790,7 @@ export default optimist( combineReducers( {
 	blockSelection,
 	hoveredBlock,
 	blocksMode,
-	blockInsertionPoint,
+	isInsertionPointVisible,
 	preferences,
 	saving,
 	notices,

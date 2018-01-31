@@ -28,7 +28,7 @@ import {
 	saving,
 	notices,
 	blocksMode,
-	blockInsertionPoint,
+	isInsertionPointVisible,
 	isSavingMetaBoxes,
 	metaBoxes,
 	reusableBlocks,
@@ -721,31 +721,27 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'blockInsertionPoint', () => {
-		it( 'should default to an empty object', () => {
-			const state = blockInsertionPoint( undefined, {} );
+	describe( 'isInsertionPointVisible', () => {
+		it( 'should default to false', () => {
+			const state = isInsertionPointVisible( undefined, {} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toBe( false );
 		} );
 
-		it( 'should set insertion point position', () => {
-			const state = blockInsertionPoint( undefined, {
+		it( 'should set insertion point visible', () => {
+			const state = isInsertionPointVisible( false, {
 				type: 'SHOW_INSERTION_POINT',
-				index: 5,
 			} );
 
-			expect( state ).toEqual( {
-				position: 5,
-				visible: true,
-			} );
+			expect( state ).toBe( true );
 		} );
 
 		it( 'should clear the insertion point', () => {
-			const state = blockInsertionPoint( deepFreeze( {} ), {
+			const state = isInsertionPointVisible( true, {
 				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).toEqual( { visible: false, position: null } );
+			expect( state ).toBe( false );
 		} );
 	} );
 
