@@ -45,6 +45,7 @@ class GalleryBlock extends Component {
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
+		this.toggleMasonryLayout = this.toggleMasonryLayout.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.dropFiles = this.dropFiles.bind( this );
@@ -93,6 +94,10 @@ class GalleryBlock extends Component {
 		this.props.setAttributes( { imageCrop: ! this.props.attributes.imageCrop } );
 	}
 
+	toggleMasonryLayout() {
+		this.props.setAttributes( { masonryLayout: ! this.props.attributes.masonryLayout } );
+	}
+
 	setImageAttributes( index, attributes ) {
 		const { attributes: { images }, setAttributes } = this.props;
 
@@ -132,7 +137,7 @@ class GalleryBlock extends Component {
 
 	render() {
 		const { attributes, focus, className } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, masonryLayout, linkTo } = attributes;
 
 		const dropZone = (
 			<DropZone
@@ -200,6 +205,11 @@ class GalleryBlock extends Component {
 						checked={ !! imageCrop }
 						onChange={ this.toggleImageCrop }
 					/>
+					<ToggleControl
+						label={ __( 'Masonry Layout' ) }
+						checked={ !! masonryLayout }
+						onChange={ this.toggleMasonryLayout }
+					/>
 					<SelectControl
 						label={ __( 'Link to' ) }
 						value={ linkTo }
@@ -208,7 +218,7 @@ class GalleryBlock extends Component {
 					/>
 				</InspectorControls>
 			),
-			<ul key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+			<ul key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' } ${ masonryLayout ? 'is-masonry-layout' : '' }` }>
 				{ dropZone }
 				{ images.map( ( img, index ) => (
 					<li className="blocks-gallery-item" key={ img.id || img.url }>
