@@ -27,7 +27,7 @@ class DropZoneProvider extends Component {
 	}
 
 	dragOverListener( event ) {
-		this.toggleDraggingOverDocument.call( this, event );
+		this.toggleDraggingOverDocument( event );
 		event.preventDefault();
 	}
 
