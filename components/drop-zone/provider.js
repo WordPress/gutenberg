@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, without, some, filter, findIndex, noop } from 'lodash';
+import { isEqual, without, some, filter, findIndex, noop, throttle } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,13 @@ class DropZoneProvider extends Component {
 		this.toggleDraggingOverDocument = this.toggleDraggingOverDocument.bind( this );
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 		this.onDrop = this.onDrop.bind( this );
+
+		const throttledAction = throttle( this.toggleDraggingOverDocument, 500 );
+
+		this.dragOverListener = ( event ) => {
+			throttledAction( event );
+			event.preventDefault();
+		}
 
 		this.state = {
 			isDraggingOverDocument: false,
@@ -39,13 +46,13 @@ class DropZoneProvider extends Component {
 	}
 
 	componentDidMount() {
-		window.addEventListener( 'dragover', this.toggleDraggingOverDocument );
+		window.addEventListener( 'dragover', this.dragOverListener );
 		window.addEventListener( 'drop', this.onDrop );
 		window.addEventListener( 'mouseup', this.resetDragState );
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'dragover', this.toggleDraggingOverDocument );
+		window.removeEventListener( 'dragover', this.dragOverListener );
 		window.removeEventListener( 'drop', this.onDrop );
 		window.removeEventListener( 'mouseup', this.resetDragState );
 	}
