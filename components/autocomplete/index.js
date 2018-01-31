@@ -433,10 +433,10 @@ export class Autocomplete extends Component {
 	}
 
 	toggleKeyEvents( isListening ) {
-		// This exists because we must capture ENTER key presses before Editable.
+		// This exists because we must capture ENTER key presses before RichText.
 		// It seems that react fires the simulated capturing events after the
 		// native browser event has already bubbled so we can't stopPropagation
-		// and avoid Editable getting the event from TinyMCE, hence we must
+		// and avoid RichText getting the event from TinyMCE, hence we must
 		// register a native event handler.
 		const handler = isListening ? 'addEventListener' : 'removeEventListener';
 		this.node[ handler ]( 'keydown', this.handleKeyDown, true );

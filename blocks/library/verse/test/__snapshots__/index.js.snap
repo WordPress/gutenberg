@@ -2,15 +2,15 @@
 
 exports[`core/verse block edit matches snapshot 1`] = `
 <div
-  class="wp-block-verse blocks-editable"
+  class="wp-block-verse blocks-rich-text"
 >
   <pre
     aria-label="Write…"
-    class="blocks-editable__tinymce"
+    class="blocks-rich-text__tinymce"
     contenteditable="true"
   />
   <pre
-    class="blocks-editable__tinymce"
+    class="blocks-rich-text__tinymce"
   >
     Write…
   </pre>

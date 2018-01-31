@@ -1,4 +1,4 @@
-# `Editable`
+# `RichText`
 
 Render a rich
 [`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content),
@@ -45,7 +45,7 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `onReplace( blocks: Array ): Function`
 
-*Optional.* Called when the `Editable` instance is empty and it can be replaced with the given blocks.
+*Optional.* Called when the `RichText` instance is empty and it can be replaced with the given blocks.
 
 ### `onMerge( forward: Boolean ): Function`
 
@@ -80,7 +80,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.blocks.Editable, {
+		return wp.element.createElement( wp.blocks.RichText, {
 			tagName: 'h2',
 			className: props.className,
 			value: props.attributes.content,
@@ -95,7 +95,7 @@ wp.blocks.registerBlockType( /* ... */, {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType, Editable } = wp.blocks;
+const { registerBlockType, RichText } = wp.blocks;
 
 registerBlockType( /* ... */, {
 	// ...
@@ -110,7 +110,7 @@ registerBlockType( /* ... */, {
 
 	edit( { className, attributes, setAttributes, focus, setFocus } ) {
 		return (
-			<Editable
+			<RichText
 				tagName="h2"
 				className={ className }
 				value={ attributes.content }

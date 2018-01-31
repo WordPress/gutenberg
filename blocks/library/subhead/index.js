@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import './style.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
@@ -68,7 +68,7 @@ export const settings = {
 					</BlockDescription>
 				</InspectorControls>
 			),
-			<Editable
+			<RichText
 				tagName="p"
 				key="editable"
 				value={ content }

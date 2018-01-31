@@ -9,7 +9,7 @@ import { flow, pick, noop } from 'lodash';
  * WordPress Dependencies
  */
 import { createElement, Component } from '@wordpress/element';
-import { EditableProvider } from '@wordpress/blocks';
+import { RichTextProvider } from '@wordpress/blocks';
 import {
 	APIProvider,
 	DropZoneProvider,
@@ -89,11 +89,11 @@ class EditorProvider extends Component {
 				{ store: this.store },
 			],
 
-			// Editable provider:
+			// RichText provider:
 			//
 			//  - context.onUndo
 			[
-				EditableProvider,
+				RichTextProvider,
 				bindActionCreators( {
 					onUndo: undo,
 				}, this.store.dispatch ),

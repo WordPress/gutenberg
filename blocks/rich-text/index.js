@@ -72,7 +72,7 @@ function getFormatProperties( formatName, parents ) {
 
 const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
-export default class Editable extends Component {
+export default class RichText extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -81,9 +81,9 @@ export default class Editable extends Component {
 					! Array.isArray( value ) ) {
 			// eslint-disable-next-line no-console
 			console.error(
-				`Invalid value of type ${ typeof value } passed to Editable ` +
+				`Invalid value of type ${ typeof value } passed to RichText ` +
 				'(expected array). Attribute values should be sourced using ' +
-				'the `children` source when used with Editable.\n\n' +
+				'the `children` source when used with RichText.\n\n' +
 				'See: https://wordpress.org/gutenberg/handbook/block-api/attributes/#children'
 			);
 		}
@@ -162,7 +162,7 @@ export default class Editable extends Component {
 	/**
 	 * Allows prop event handlers to handle an event.
 	 *
-	 * Allow props an opportunity to handle the event, before default Editable
+	 * Allow props an opportunity to handle the event, before default RichText
 	 * behavior takes effect. Should the event be handled by a prop, it should
 	 * `stopImmediatePropagation` on the event to stop continued event handling.
 	 *
@@ -180,7 +180,7 @@ export default class Editable extends Component {
 			}
 
 			// Allow props an opportunity to handle the event, before default
-			// Editable behavior takes effect. Should the event be handled by a
+			// RichText behavior takes effect. Should the event be handled by a
 			// prop, it should `stopImmediatePropagation` on the event to stop
 			// continued event handling.
 			if ( 'function' === typeof this.props[ 'on' + name ] ) {
@@ -454,7 +454,7 @@ export default class Editable extends Component {
 
 		// Find the parent "relative" positioned container
 		const container = this.props.inlineToolbar ?
-			this.editor.getBody().closest( '.blocks-editable' ) :
+			this.editor.getBody().closest( '.blocks-rich-text' ) :
 			this.editor.getBody().closest( '.editor-block-list__block' );
 		const containerPosition = container.getBoundingClientRect();
 		const blockPadding = 14;
@@ -552,7 +552,7 @@ export default class Editable extends Component {
 			event.preventDefault();
 		}
 
-		// If we click shift+Enter on inline Editables, we avoid creating two contenteditables
+		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
 		if ( event.keyCode === ENTER ) {
 			if ( this.props.multiline ) {
@@ -848,7 +848,7 @@ export default class Editable extends Component {
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ( ! focus || keepPlaceholderOnFocus ) && this.state.empty;
-		const classes = classnames( wrapperClassName, 'blocks-editable' );
+		const classes = classnames( wrapperClassName, 'blocks-rich-text' );
 
 		const formatToolbar = (
 			<FormatToolbar
@@ -869,7 +869,7 @@ export default class Editable extends Component {
 					</Fill>
 				}
 				{ focus && inlineToolbar &&
-					<div className="block-editable__inline-toolbar">
+					<div className="block-rich-text__inline-toolbar">
 						{ formatToolbar }
 					</div>
 				}
@@ -887,23 +887,23 @@ export default class Editable extends Component {
 				/>
 				{ isPlaceholderVisible &&
 					<Tagname
-						className={ classnames( 'blocks-editable__tinymce', className ) }
+						className={ classnames( 'blocks-rich-text__tinymce', className ) }
 						style={ style }
 					>
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
-				{ focus && <Slot name="Editable.Siblings" /> }
+				{ focus && <Slot name="RichText.Siblings" /> }
 			</div>
 		);
 	}
 }
 
-Editable.contextTypes = {
+RichText.contextTypes = {
 	onUndo: noop,
 };
 
-Editable.defaultProps = {
+RichText.defaultProps = {
 	formattingControls: DEFAULT_FORMATS,
 	formatters: [],
 };

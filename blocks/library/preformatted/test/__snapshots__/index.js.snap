@@ -2,15 +2,15 @@
 
 exports[`core/preformatted block edit matches snapshot 1`] = `
 <div
-  class="wp-block-preformatted blocks-editable"
+  class="wp-block-preformatted blocks-rich-text"
 >
   <pre
     aria-label="Write preformatted text…"
-    class="blocks-editable__tinymce"
+    class="blocks-rich-text__tinymce"
     contenteditable="true"
   />
   <pre
-    class="blocks-editable__tinymce"
+    class="blocks-rich-text__tinymce"
   >
     Write preformatted text…
   </pre>

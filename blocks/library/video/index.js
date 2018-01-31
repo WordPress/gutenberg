@@ -15,7 +15,7 @@ import { Component } from '@wordpress/element';
 import './style.scss';
 import './editor.scss';
 import MediaUpload from '../../media-upload';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
@@ -155,7 +155,7 @@ export const settings = {
 				<figure key="video" className={ className }>
 					<video controls src={ src } />
 					{ ( ( caption && caption.length ) || !! focus ) && (
-						<Editable
+						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
