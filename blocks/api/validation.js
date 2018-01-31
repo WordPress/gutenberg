@@ -162,7 +162,7 @@ const log = ( () => {
  *
  * @param {string} text Original text.
  *
- * @returns {String[]} Text pieces split on whitespace.
+ * @returns {string[]} Text pieces split on whitespace.
  */
 export function getTextPiecesSplitOnWhitespace( text ) {
 	return text.trim().split( REGEXP_WHITESPACE );

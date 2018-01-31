@@ -37,7 +37,7 @@ import shortcodeConverter from './shortcode-converter';
  * @param {Array}  [options.tagName]   The tag into which content will be
  *                                     inserted.
  *
- * @returns {Array|String} A list of blocks or a string, depending on `handlerMode`.
+ * @returns {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
 export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName } ) {
 	// First of all, strip any meta tags.

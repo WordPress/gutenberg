@@ -178,7 +178,7 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param {?String} name       Block type name.
+ * @param {?string} name       Block type name.
  * @param {string}  innerHTML  Raw block content.
  * @param {?Object} attributes Attributes obtained from block delimiters.
  *

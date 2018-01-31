@@ -162,7 +162,7 @@ export function getCurrentPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?Number} ID of current post.
+ * @returns {?number} ID of current post.
  */
 export function getCurrentPostId( state ) {
 	return getCurrentPost( state ).id || null;
@@ -185,7 +185,7 @@ export function getCurrentPostRevisionsCount( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?Number} ID of the last revision.
+ * @returns {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
 	return get( getCurrentPost( state ), 'revisions.last_id', null );
@@ -541,7 +541,7 @@ export const getMultiSelectedBlocks = createSelector(
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} First unique block ID in the multi-selection set.
+ * @returns {?string} First unique block ID in the multi-selection set.
  */
 export function getFirstMultiSelectedBlockUid( state ) {
 	return first( getMultiSelectedBlockUids( state ) ) || null;
@@ -553,7 +553,7 @@ export function getFirstMultiSelectedBlockUid( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} Last unique block ID in the multi-selection set.
+ * @returns {?string} Last unique block ID in the multi-selection set.
  */
 export function getLastMultiSelectedBlockUid( state ) {
 	return last( getMultiSelectedBlockUids( state ) ) || null;
@@ -595,7 +595,7 @@ export function isBlockMultiSelected( state, uid ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} Unique ID of block beginning multi-selection.
+ * @returns {?string} Unique ID of block beginning multi-selection.
  */
 export function getMultiSelectedBlocksStartUid( state ) {
 	const { start, end } = state.blockSelection;
@@ -614,7 +614,7 @@ export function getMultiSelectedBlocksStartUid( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} Unique ID of block ending multi-selection.
+ * @returns {?string} Unique ID of block ending multi-selection.
  */
 export function getMultiSelectedBlocksEndUid( state ) {
 	const { start, end } = state.blockSelection;
@@ -827,7 +827,7 @@ export function isTyping( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} Unique ID after which insertion will occur.
+ * @returns {?string} Unique ID after which insertion will occur.
  */
 export function getBlockInsertionPoint( state ) {
 	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
@@ -848,7 +848,7 @@ export function getBlockInsertionPoint( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?Boolean} Whether the insertion point is visible or not.
+ * @returns {?boolean} Whether the insertion point is visible or not.
  */
 export function isBlockInsertionPointVisible( state ) {
 	return state.isInsertionPointVisible;
@@ -896,7 +896,7 @@ export function didPostSaveRequestFail( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} Suggested post format.
+ * @returns {?string} Suggested post format.
  */
 export function getSuggestedPostFormat( state ) {
 	const blocks = state.editor.present.blockOrder;
