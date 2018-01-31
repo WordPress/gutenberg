@@ -14,7 +14,7 @@ import { NavigableMenu, withInstanceId, IconButton, MenuItemsSeparator } from '@
  * Internal dependencies
  */
 import './style.scss';
-import { getEllipsisMenuItems } from '../../../api/ellipsis-menu';
+import { getEditorMenuItems } from '../../../api/editor-menu-item';
 
 /**
  * Renders a list of plugins that will activate different UI elements.

@@ -27,7 +27,7 @@ const menuItems = {};
  *
  * @returns {Object} The final sidebar settings object.
  */
-export function registerEllipsisMenuItem( name, settings ) {
+export function registerEditorMenuItem( name, settings ) {
 	settings = {
 		name,
 		...settings,
@@ -94,6 +94,6 @@ export function registerEllipsisMenuItem( name, settings ) {
  *
  * @returns {Object} Registered menu items.
  */
-export function getEllipsisMenuItems() {
+export function getEditorMenuItems() {
 	return menuItems;
 }
