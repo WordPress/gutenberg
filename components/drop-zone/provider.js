@@ -13,16 +13,10 @@ class DropZoneProvider extends Component {
 		super( ...arguments );
 
 		this.resetDragState = this.resetDragState.bind( this );
-		this.toggleDraggingOverDocument = this.toggleDraggingOverDocument.bind( this );
+		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
+		this.dragOverListener = this.dragOverListener.bind( this );
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 		this.onDrop = this.onDrop.bind( this );
-
-		const throttledAction = throttle( this.toggleDraggingOverDocument, 300 );
-
-		this.dragOverListener = ( event ) => {
-			throttledAction( event );
-			event.preventDefault();
-		};
 
 		this.state = {
 			isDraggingOverDocument: false,
@@ -30,6 +24,11 @@ class DropZoneProvider extends Component {
 			position: null,
 		};
 		this.dropzones = [];
+	}
+
+	dragOverListener( event ) {
+		this.toggleDraggingOverDocument.call( this, event );
+		event.preventDefault();
 	}
 
 	getChildContext() {
