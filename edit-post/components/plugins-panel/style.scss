@@ -1,7 +1,8 @@
-.editor-sidebar {
+.edit-post-layout {
   .editor-plugins-panel {
     position: fixed;
-    top: 0;
+    z-index: z-index( '.edit-post-sidebar' );
+    top: $admin-bar-height + $header-height;
     right: 0;
     bottom: 0;
     width: $sidebar-width;
@@ -21,6 +22,7 @@
 
     @include break-medium() {
       top: $admin-bar-height + $header-height;
+      border-left: 1px solid $light-gray-500;
     }
 
     > .components-panel .components-panel__header {
@@ -57,20 +59,12 @@
   }
 }
 
-.edit-post-layout .editor-plugins-panel {
-  position: fixed;
-  z-index: z-index( '.edit-post-sidebar' );
-  top: $admin-bar-height-big;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  overflow: auto;
+.edit-post-layout.is-sidebar-opened .editor-plugins-panel {
+  /* Sidebar covers screen on mobile */
+  width: 100%;
 
+  /* Sidebar sits on the side on larger breakpoints */
   @include break-medium() {
-    top: $admin-bar-height;
-    left: auto;
     width: $sidebar-width;
-    border-left: 1px solid $light-gray-500;
-    @include slide_in_right;
   }
 }

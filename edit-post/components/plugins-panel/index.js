@@ -50,7 +50,7 @@ function PluginsPanel( { onClose, plugin } ) {
 	} = getPluginSidebar( plugin );
 	return (
 		<div
-			className="editor-sidebar"
+			className="editor-plugins-panel"
 			role="region"
 			aria-label={ __( 'Editor plugins' ) }
 			tabIndex="-1">
