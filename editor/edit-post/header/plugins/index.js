@@ -23,7 +23,7 @@ import { getEditorMenuItems } from '../../../api/editor-menu-item';
  * @returns {Object} The rendered list of menu items.
  */
 function Plugins( props ) {
-	const ellipsisMenuItems = getEllipsisMenuItems();
+	const ellipsisMenuItems = getEditorMenuItems();
 
 	if ( isEmpty( ellipsisMenuItems ) ) {
 		return null;
