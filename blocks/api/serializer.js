@@ -47,6 +47,15 @@ export function getSaveElement( blockType, attributes ) {
 		saveElement = save( { attributes } );
 	}
 
+	/**
+	 * Filters the save result of a block during serialization.
+	 *
+	 * @param {WPElement}   saveElement Block save result.
+	 * @param {WPBlockType} blockType   Block type definition.
+	 * @param {Object}      attributes  Block attributes.
+	 */
+	saveElement = applyFilters( 'blocks.getSaveContent.saveElement', saveElement, blockType, attributes );
+
 	const addExtraContainerProps = ( element ) => {
 		if ( ! element || ! isObject( element ) ) {
 			return element;

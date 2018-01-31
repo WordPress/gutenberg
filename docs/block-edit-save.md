@@ -90,27 +90,49 @@ edit( { attributes, setAttributes, className, focus } ) {
 
 The `save` function defines the way in which the different attributes should be combined into the final markup, which is then serialized by Gutenberg into `post_content`.
 
+{% codetabs %}
+{% ES5 %}
 ```js
-// Defining the save interface
+save() {
+	return wp.element.createElement( 'hr' );
+}
+```
+{% ESNext %}
+```jsx
 save() {
 	return <hr />;
 }
 ```
+{% end %}
 
-This function can return a `null` value, in which case the block is considered to be _dynamic_—that means that only an HTML comment with attributes is serialized and the server has to provide the render function. (This is the equivalent to purely dynamic shortcodes, with the advantage that the grammar parsing it is assertive and they can remain invisible in contexts that are unable to compute them on the server, instead of showing gibberish as text.)
+For most blocks, the return value of `save` should be an [instance of WordPress Element](https://github.com/WordPress/gutenberg/blob/master/element/README.md) representing how the block is to appear on the front of the site.
 
-`save` can also receive properties.
+_Note:_ While it is possible to return a string value from `save`, it _will be escaped_. If the string includes HTML markup, the markup will be shown on the front of the site verbatim, not as the equivalent HTML node content. If you must return raw HTML from `save`, use `wp.element.RawHTML`. As the name implies, this is prone to [cross-site scripting](https://en.wikipedia.org/wiki/Cross-site_scripting) and therefore is discouraged in favor of a WordPress Element hierarchy whenever possible.
+
+For [dynamic blocks](https://wordpress.org/gutenberg/handbook/blocks/creating-dynamic-blocks/), the return value of `save` could either represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled. Alternatively, return a `null` (empty) value to save no markup in post content for the dynamic block, instead deferring this to always be calculated when the block is shown on the front of the site.
 
 ### attributes
 
-It operates the same way as it does on `edit` and allows to save certain attributes directly to the markup, so they don't have to be computed on the server. This is how most _static_ blocks are expected to work.
+As with `edit`, the `save` function also receives an object argument including attributes which can be inserted into the markup.
 
+{% codetabs %}
+{% ES5 %}
 ```js
-// Defining the edit interface
+save( props ) {
+	return wp.element.createElement(
+		'div',
+		null,
+		props.attributes.content
+	);
+}
+```
+{% ESNext %}
+```jsx
 save( { attributes } ) {
 	return <div>{ attributes.content }</div>;
 }
 ```
+{% end %}
 
 ## Validation
 
