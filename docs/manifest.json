@@ -30,6 +30,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Editable API",
+		"slug": "editable-api",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/blocks\/editable\/readme.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Deprecated Blocks",
 		"slug": "deprecated-blocks",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/deprecated-blocks.md",
