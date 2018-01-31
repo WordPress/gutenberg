@@ -105,7 +105,7 @@ Adding a background by default to all blocks.
 ```js
 // Our filter function
 function addBackgroundProp( props ) {
-	return Object.assign( props, { backgroundColor: 'red' } );
+	return Object.assign( props, { style: { backgroundColor: 'red' } } );
 }
 
 // Adding the filter
