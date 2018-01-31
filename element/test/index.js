@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { shallow } from 'enzyme';
+
+/**
  * Internal dependencies
  */
 import {
@@ -8,6 +13,7 @@ import {
 	renderToString,
 	switchChildrenNodeName,
 	getWrapperDisplayName,
+	RawHTML,
 } from '../';
 
 describe( 'element', () => {
@@ -43,6 +49,14 @@ describe( 'element', () => {
 			expect( renderToString(
 				createElement( 'strong', null, 'Courgette' )
 			) ).toBe( '<strong>Courgette</strong>' );
+		} );
+
+		it( 'strips raw html wrapper', () => {
+			const html = '<p>So scary!</p>';
+
+			expect( renderToString(
+				<RawHTML>{ html }</RawHTML>,
+			) ).toBe( html );
 		} );
 	} );
 
@@ -130,6 +144,21 @@ describe( 'element', () => {
 			SomeComponent.displayName = 'CustomDisplayName';
 
 			expect( getWrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(CustomDisplayName)' );
+		} );
+	} );
+
+	describe( 'RawHTML', () => {
+		it( 'is dangerous', () => {
+			const html = '<p>So scary!</p>';
+			const element = shallow(
+				<RawHTML>
+					{ html }
+				</RawHTML>
+			);
+
+			expect( element.type() ).toBe( 'wp-raw-html' );
+			expect( element.prop( 'dangerouslySetInnerHTML' ).__html ).toBe( html );
+			expect( element.prop( 'children' ) ).toBe( undefined );
 		} );
 	} );
 } );

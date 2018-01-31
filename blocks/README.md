@@ -250,9 +250,9 @@ editor interface where blocks are implemented.
   editor. A block can update its own state in response to events using the
   `setAttributes` function, passing an object of properties to be applied as a
   partial update.
-- `save( { attributes: Object } ): WPElement | String` - Returns an element
-  describing the markup of a block to be saved in the published content. This
-  function is called before save and when switching to an editor's HTML view.
+- `save( { attributes: Object } ): WPElement` - Returns an element describing
+  the markup of a block to be saved in the published content. This function is
+  called before save and when switching to an editor's HTML view.
 - `keywords` - An optional array of keywords used to filter the block list.
 
 ### `wp.blocks.getBlockType( name: string )`
