@@ -206,13 +206,10 @@ export default {
 	TRASH_POST_SUCCESS( action ) {
 		const { postId, postType } = action;
 
-		// Delay redirect to ensure store has been updated with the successful trash.
-		setTimeout( () => {
-			window.location.href = getWPAdminURL( 'edit.php', {
-				trashed: 1,
-				post_type: postType,
-				ids: postId,
-			} );
+		window.location.href = getWPAdminURL( 'edit.php', {
+			trashed: 1,
+			post_type: postType,
+			ids: postId,
 		} );
 	},
 	TRASH_POST_FAILURE( action, store ) {
@@ -308,16 +305,16 @@ export default {
 			effects.push( resetBlocks( blocks ) );
 		}
 
-		// Resetting post should occur after blocks have been reset, since it's
-		// the post reset that restarts history (used in dirty detection).
-		effects.push( resetPost( post ) );
-
 		// Include auto draft title in edits while not flagging post as dirty
 		if ( post.status === 'auto-draft' ) {
 			effects.push( setupNewPost( {
 				title: post.title.raw,
 			} ) );
 		}
+
+		// Resetting post should occur after blocks have been reset, since it's
+		// the post reset that restarts history (used in dirty detection).
+		effects.push( resetPost( post ) );
 
 		return effects;
 	},
