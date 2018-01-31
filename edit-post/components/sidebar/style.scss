@@ -29,14 +29,12 @@
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 		height: 100%;
-		padding-top: $panel-header-height;
 		margin-top: -1px;
 		margin-bottom: -1px;
 
 		@include break-small() {
 			overflow: inherit;
 			height: auto;
-			padding-top: 0;
 		}
 	}
 

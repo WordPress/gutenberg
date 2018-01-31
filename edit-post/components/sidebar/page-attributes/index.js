@@ -16,7 +16,7 @@ import { query } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { toggleSidebarPanel } from '../../../store/actions';
+import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
 import { isEditorSidebarPanelOpened } from '../../../store/selectors';
 
 /**
@@ -57,7 +57,7 @@ const applyConnect = connect(
 	},
 	{
 		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
+			return toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
 	},
 	undefined,
