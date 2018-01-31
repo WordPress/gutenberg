@@ -30,9 +30,9 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Editable API",
-		"slug": "editable-api",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/blocks\/editable\/readme.md",
+		"title": "RichText API",
+		"slug": "rich-text-api",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/blocks\/rich-text\/README.md",
 		"parent": "block-api"
 	},
 	{

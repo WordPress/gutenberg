@@ -6,13 +6,13 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import Editable from '../';
+import RichText from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
 
-describe( 'Editable', () => {
+describe( 'RichText', () => {
 	describe( 'Component', () => {
 		describe( '.adaptFormatter', () => {
-			const wrapper = shallow( <Editable value={ [ 'valid' ] } /> );
+			const wrapper = shallow( <RichText value={ [ 'valid' ] } /> );
 			const options = {
 				type: 'inline-style',
 				style: {
@@ -34,7 +34,7 @@ describe( 'Editable', () => {
 			};
 
 			test( 'should return expected settings', () => {
-				const wrapper = shallow( <Editable value={ value } /> );
+				const wrapper = shallow( <RichText value={ value } /> );
 				expect( wrapper.instance().getSettings( settings ) ).toEqual( {
 					setting: 'hi',
 					forced_root_block: false,
@@ -44,7 +44,7 @@ describe( 'Editable', () => {
 			test( 'should be overriden', () => {
 				const mock = jest.fn().mockImplementation( () => 'mocked' );
 
-				expect( shallow( <Editable value={ value } multiline={ true } getSettings={ mock } /> ).instance().getSettings( settings ) ).toEqual( 'mocked' );
+				expect( shallow( <RichText value={ value } multiline={ true } getSettings={ mock } /> ).instance().getSettings( settings ) ).toEqual( 'mocked' );
 			} );
 		} );
 	} );
@@ -61,19 +61,19 @@ describe( 'Editable', () => {
 		} );
 
 		it( 'should warn when rendered with string value', () => {
-			shallow( <Editable value="Uh oh!" /> );
+			shallow( <RichText value="Uh oh!" /> );
 
 			expect( console.error ).toHaveBeenCalled();
 		} );
 
 		it( 'should not warn when rendered with undefined value', () => {
-			shallow( <Editable /> );
+			shallow( <RichText /> );
 
 			expect( console.error ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should not warn when rendered with array value', () => {
-			shallow( <Editable value={ [ 'Oh, good' ] } /> );
+			shallow( <RichText value={ [ 'Oh, good' ] } /> );
 
 			expect( console.error ).not.toHaveBeenCalled();
 		} );

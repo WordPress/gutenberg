@@ -55,7 +55,7 @@ Use `html` to extract the inner HTML from markup.
 
 ### `children`
 
-Use `children` to extract child nodes of the matched element, returned as an array of virtual elements. This is most commonly used in combination with the `Editable` component.
+Use `children` to extract child nodes of the matched element, returned as an array of virtual elements. This is most commonly used in combination with the `RichText` component.
 
 _Example_: Extract child nodes from a paragraph of rich text.
 

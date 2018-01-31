@@ -16,7 +16,7 @@ import classnames from 'classnames';
 import './editor.scss';
 import './style.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import AlignmentToolbar from '../../alignment-toolbar';
 import MediaUpload from '../../media-upload';
 import ImagePlaceHolder from '../../image-placeholder';
@@ -173,7 +173,7 @@ export const settings = {
 			const hasTitle = ! isEmpty( title );
 			const icon = hasTitle ? undefined : 'format-image';
 			const label = hasTitle ? (
-				<Editable
+				<RichText
 					tagName="h2"
 					value={ title }
 					focus={ focus }
@@ -200,7 +200,7 @@ export const settings = {
 				className={ classes }
 			>
 				{ title || !! focus ? (
-					<Editable
+					<RichText
 						tagName="h2"
 						placeholder={ __( 'Write title…' ) }
 						value={ title }
