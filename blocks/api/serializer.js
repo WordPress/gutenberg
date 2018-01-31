@@ -45,11 +45,6 @@ export function getSaveElement( blockType, attributes ) {
 		saveElement = createElement( save, { attributes } );
 	} else {
 		saveElement = save( { attributes } );
-
-		// Special-case function render implementation to allow raw HTML return
-		if ( 'string' === typeof saveElement ) {
-			return saveElement;
-		}
 	}
 
 	const addExtraContainerProps = ( element ) => {
@@ -76,15 +71,7 @@ export function getSaveElement( blockType, attributes ) {
  * @return {string} Save content.
  */
 export function getSaveContent( blockType, attributes ) {
-	const saveElement = getSaveElement( blockType, attributes );
-
-	// Special-case function render implementation to allow raw HTML return
-	if ( 'string' === typeof saveElement ) {
-		return saveElement;
-	}
-
-	// Otherwise, infer as element
-	return renderToString( saveElement );
+	return renderToString( getSaveElement( blockType, attributes ) );
 }
 
 /**

@@ -46,18 +46,6 @@ describe( 'block serializer', () => {
 
 	describe( 'getSaveContent()', () => {
 		describe( 'function save', () => {
-			it( 'should return string verbatim', () => {
-				const saved = getSaveContent(
-					{
-						save: ( { attributes } ) => attributes.fruit,
-						name: 'core/fruit',
-					},
-					{ fruit: 'Bananas' }
-				);
-
-				expect( saved ).toBe( 'Bananas' );
-			} );
-
 			it( 'should return element as string if save returns element', () => {
 				const saved = getSaveContent(
 					{
@@ -411,11 +399,11 @@ describe( 'block serializer', () => {
 			const block =	{
 				name: 'core/chicken',
 				attributes: {
-					content: '<p>chicken   </p>',
+					content: 'chicken',
 				},
 				isValid: true,
 			};
-			expect( getBlockContent( block ) ).toBe( '<p>chicken </p>' );
+			expect( getBlockContent( block ) ).toBe( 'chicken' );
 		} );
 	} );
 } );
