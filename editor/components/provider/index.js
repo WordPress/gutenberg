@@ -46,6 +46,7 @@ class EditorProvider extends Component {
 		super( ...arguments );
 
 		this.store = store;
+		this.initializeMetaBoxes = this.initializeMetaBoxes.bind( this );
 
 		this.settings = {
 			...DEFAULT_SETTINGS,
