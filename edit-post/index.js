@@ -100,6 +100,6 @@ export function initializeEditor( id, post, settings ) {
 	);
 
 	return {
-		initializeMetaBoxState: provider.initializeMetaBoxState,
+		initializeMetaBoxes: provider.initializeMetaBoxes,
 	};
 }
