@@ -14,10 +14,6 @@
 		margin-top: 0;
 	}
 
-	&.mce-content-body > p {	// needs specificity
-		line-height: inherit;
-	}
-
 	&:focus {
 		outline: none;
 	}

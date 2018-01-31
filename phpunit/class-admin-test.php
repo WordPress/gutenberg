@@ -34,8 +34,7 @@ class Admin_Test extends WP_UnitTestCase {
 	/**
 	 * Set up before class.
 	 */
-	public static function setUpBeforeClass() {
-
+	public static function wpSetUpBeforeClass() {
 		self::$editor_user_id      = self::factory()->user->create( array(
 			'role' => 'editor',
 		) );
@@ -47,7 +46,6 @@ class Admin_Test extends WP_UnitTestCase {
 			'post_title'   => 'Example',
 			'post_content' => 'Tester',
 		) );
-		return parent::setUpBeforeClass();
 	}
 
 	/**

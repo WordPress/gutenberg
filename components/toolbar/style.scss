@@ -87,6 +87,7 @@ div.components-toolbar {
 	}
 
 	// focus style
+	&:hover,
 	&:focus {
 		outline: none;
 		box-shadow: none;
