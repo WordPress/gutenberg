@@ -22,7 +22,7 @@ class DropZoneProvider extends Component {
 		this.dragOverListener = ( event ) => {
 			throttledAction( event );
 			event.preventDefault();
-		}
+		};
 
 		this.state = {
 			isDraggingOverDocument: false,
