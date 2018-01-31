@@ -17,7 +17,7 @@ class DropZoneProvider extends Component {
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 		this.onDrop = this.onDrop.bind( this );
 
-		const throttledAction = throttle( this.toggleDraggingOverDocument, 500 );
+		const throttledAction = throttle( this.toggleDraggingOverDocument, 300 );
 
 		this.dragOverListener = ( event ) => {
 			throttledAction( event );
