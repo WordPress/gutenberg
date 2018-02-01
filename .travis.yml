@@ -34,7 +34,7 @@ jobs:
     - stage: test
       env: WP_VERSION=latest DOCKER=true
       script:
-        - ./bin/run-wp-unit-tests.sh
+        - ./bin/run-wp-unit-tests.sh --coverage
 
     - stage: test
       php: 5.6

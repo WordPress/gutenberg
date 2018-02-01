@@ -344,8 +344,13 @@ It's tempting to snapshot deep renders, but that makes for huge snapshots. Addit
 
 ### Code Coverage
 
-Code coverage is measured for each PR using the [codecov.io](https://codecov.io/gh/WordPress/gutenberg) tool.
-[Code coverage](https://en.wikipedia.org/wiki/Code_coverage) is a way of measuring the amount of code covered by the tests in the test suite of a project.  In Gutenberg, it is currently measured for JavaScript code only.
+Code coverage is automatically measured for each PR using the [codecov.io](https://codecov.io/gh/WordPress/gutenberg) service. [Code coverage](https://en.wikipedia.org/wiki/Code_coverage) is a way of measuring the amount of code covered by the tests in the test suite of a project.
+
+A JavaScript code coverage analysis can also be performed locally. If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the analysis with this command:
+
+```bash
+npm run test-unit:coverage
+```
 
 ## End to end Testing
 
@@ -372,12 +377,40 @@ cypress_base_url=http://my-custom-basee-url cypress_username=myusername cypress_
 Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the PHP tests locally using this command:
 
 ```bash
-npm run test-php
+composer run-script test
 ```
 
-Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test-php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint-php`.
+Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `composer run-script test` will execute both unit tests and code linting. Code linting can be verified independently by running `composer run-script lint`.
 
-To run unit tests only, without the linter, use `npm run test-unit-php` instead.
+To run unit tests only, without the linter, use `composer run-script test-unit` instead.
 
 [snapshot testing]: https://facebook.github.io/jest/docs/en/snapshot-testing.html
 [update snapshots]: https://facebook.github.io/jest/docs/en/snapshot-testing.html#updating-snapshots
+
+### Code Coverage
+
+Code coverage is automatically measured for each PR using the [codecov.io](https://codecov.io/gh/WordPress/gutenberg) service. [Code coverage](https://en.wikipedia.org/wiki/Code_coverage) is a way of measuring the amount of code covered by the tests in the test suite of a project.
+
+A PHP code coverage analysis can also be performed locally. If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the analysis with this command:
+
+```bash
+composer run-script test-unit:coverage
+```
+
+For more detailed HTML output at `coverage/phpunit/`, run:
+
+```bash
+composer run-script test-unit:coverage-html
+```
+
+To run the same analysis with a multisite network:
+
+```bash
+composer run-script test-unit-multisite:coverage
+```
+
+For more detailed HTML output at `coverage/phpunit/multisite/`, run:
+
+```bash
+composer run-script test-unit-multisite:coverage-html
+```
