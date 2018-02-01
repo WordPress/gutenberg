@@ -463,6 +463,7 @@ export class Autocomplete extends Component {
 
 	componentWillUnmount() {
 		this.toggleKeyEvents( false );
+		this.debouncedLoadOptions.cancel();
 	}
 
 	render() {
