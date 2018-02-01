@@ -73,7 +73,7 @@ describe( 'state', () => {
 				mode: 'text',
 			} );
 
-			expect( state ).toEqual( { mode: 'text' } );
+			expect( state ).toEqual( { editorMode: 'text' } );
 		} );
 
 		it( 'should toggle a feature flag', () => {
