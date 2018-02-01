@@ -23,6 +23,7 @@ import {
 	getCurrentPostLastRevisionId,
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
+	getCurrentPostSlug,
 	getPostEdits,
 	getEditedPostTitle,
 	getDocumentTitle,
@@ -372,6 +373,16 @@ describe( 'selectors', () => {
 			};
 
 			expect( getCurrentPostId( state ) ).toBe( 1 );
+		} );
+	} );
+
+	describe( 'getCurrentPostSlug', () => {
+		it( 'should return the current post\'s slug', () => {
+			const state = {
+				currentPost: { slug: 'post slug' },
+			};
+
+			expect( getCurrentPostSlug( state ) ).toBe( 'post slug' );
 		} );
 	} );
 

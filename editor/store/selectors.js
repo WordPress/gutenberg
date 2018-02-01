@@ -157,6 +157,17 @@ export function getCurrentPostType( state ) {
 }
 
 /**
+ * Returns the slug of the post currently being edited.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @returns {string} Slug.
+ */
+export function getCurrentPostSlug( state ) {
+	return getCurrentPost( state ).slug;
+}
+
+/**
  * Returns the ID of the post currently being edited, or null if the post has
  * not yet been saved.
  *
