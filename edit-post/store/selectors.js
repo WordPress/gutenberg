@@ -24,7 +24,7 @@ export function getActiveEditorPanel( state ) {
  * Returns the current active plugin for the plugin sidebar.
  *
  * @param  {Object}  state Global application state
- * @return {String}        Active plugin sidebar plugin
+ * @returns {string}        Active plugin sidebar plugin
  */
 export function getActivePlugin( state ) {
 	return getPreference( state, 'activeSidebarPanel', {} ).plugins;
@@ -59,7 +59,7 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  * Returns the opened general sidebar and null if the sidebar is closed.
  *
  * @param {Object} state Global application state.
- * @returns {String}     The opened general sidebar panel.
+ * @returns {string}     The opened general sidebar panel.
  */
 export function getOpenedGeneralSidebar( state ) {
 	return getPreference( state, 'activeGeneralSidebar' );
@@ -71,7 +71,7 @@ export function getOpenedGeneralSidebar( state ) {
  * @param  {Object}  state   Global application state
  * @param  {string}  sidebar Sidebar name (leave undefined for the default sidebar)
  * @param  {string}  panel   Sidebar panel name (leave undefined for the default panel)
- * @returns {Boolean}        Whether the given general sidebar panel is open
+ * @returns {boolean}        Whether the given general sidebar panel is open
  */
 export function isGeneralSidebarPanelOpened( state, sidebar, panel ) {
 	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar' );
@@ -83,7 +83,7 @@ export function isGeneralSidebarPanelOpened( state, sidebar, panel ) {
  * Returns true if the publish sidebar is opened.
  *
  * @param {Object} state Global application state
- * @returns {bool}       Whether the publish sidebar is open.
+ * @returns {boolean}       Whether the publish sidebar is open.
  */
 export function isPublishSidebarOpened( state ) {
 	return state.publishSidebarActive;
@@ -107,8 +107,8 @@ export function hasOpenSidebar( state ) {
  * Returns true if the editor sidebar panel is open, or false otherwise.
  *
  * @param  {Object}  state Global application state.
- * @param  {String}  panel Sidebar panel name.
- * @returns {Boolean}       Whether sidebar is open.
+ * @param  {string}  panel Sidebar panel name.
+ * @returns {boolean}       Whether sidebar is open.
  */
 export function isEditorSidebarPanelOpened( state, panel ) {
 	const panels = getPreference( state, 'panels' );
