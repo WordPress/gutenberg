@@ -28,7 +28,7 @@ import {
 	getMultiSelectedBlocks,
 	getSelectedBlock,
 } from '../../store/selectors';
-import { multiSelect, appendDefaultBlock } from '../../store/actions';
+import { multiSelect, appendDefaultBlock, focusBlock } from '../../store/actions';
 
 /**
  * Module Constants
@@ -140,6 +140,12 @@ class WritingFlow extends Component {
 		this.props.onMultiSelect( currentStartUid, blocks[ nextIndex ] );
 	}
 
+	moveSelection( blocks, currentUid, delta ) {
+		const currentIndex = blocks.indexOf( currentUid );
+		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, currentIndex + delta ) );
+		this.props.onFocusBlock( blocks[ nextIndex ] );
+	}
+
 	isEditableEdge( moveUp, target ) {
 		const editables = this.getEditables( target );
 		const index = editables.indexOf( target );
@@ -177,6 +183,10 @@ class WritingFlow extends Component {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
+		} else if ( isNav && hasMultiSelection ) {
+			// Moving from multi block selection to single block selection
+			event.preventDefault();
+			this.moveSelection( blocks, selectionEnd, isReverse ? -1 : +1 );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
@@ -225,5 +235,6 @@ export default connect(
 	{
 		onMultiSelect: multiSelect,
 		onBottomReached: appendDefaultBlock,
+		onFocusBlock: focusBlock,
 	}
 )( WritingFlow );
