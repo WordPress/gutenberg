@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -12,6 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
+import PlainText from '../../plain-text';
 import { createBlock } from '../../api';
 
 export const name = 'core/code';
@@ -60,9 +56,9 @@ export const settings = {
 	edit( { attributes, setAttributes, className } ) {
 		return (
 			<div className={ className }>
-				<TextareaAutosize
+				<PlainText
 					value={ attributes.content }
-					onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+					onChange={ ( content ) => setAttributes( { content } ) }
 					placeholder={ __( 'Write code…' ) }
 					aria-label={ __( 'Code' ) }
 				/>
