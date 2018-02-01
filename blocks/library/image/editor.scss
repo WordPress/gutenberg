@@ -84,6 +84,7 @@
 	}
 	&[data-resized="true"] {
 		width: auto;
+		max-width: none;
 	}
 }
 
