@@ -29,7 +29,6 @@
 		"wp-scripts": "./bin/wp-scripts.js"
 	},
 	"dependencies": {
-		"babel-jest": "^22.0.4",
 		"cross-spawn": "^5.1.0",
 		"jest": "^22.0.4"
 	},
