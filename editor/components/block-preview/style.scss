@@ -15,7 +15,16 @@
 }
 
 .editor-block-preview__content {
-	padding: 10px;
-	transform: scale( 0.9 );
-	transform-origin: center top;
+	padding: $block-padding;
+	border: 1px solid $light-gray-500;
+
+	> div {
+		transform: scale( 0.9 );
+		transform-origin: center top;
+		font-family: $editor-font;
+	}
+
+	> div section {
+		height: auto;
+	}
 }
