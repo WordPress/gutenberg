@@ -13,7 +13,7 @@ import { compose, Fragment } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import PostTypeSupportCheck from '../post-type-support-check';
+import ifPostTypeSupports from '../higher-order/if-post-type-supports';
 import { editPost } from '../../store/actions';
 import { getEditedPostAttribute } from '../../store/selectors';
 
@@ -43,14 +43,6 @@ export function PageAttributesOrder( { onUpdateOrder, instanceId, order } ) {
 	);
 }
 
-function PageAttributesOrderWithChecks( props ) {
-	return (
-		<PostTypeSupportCheck supportKeys="page-attributes">
-			<PageAttributesOrder { ...props } />
-		</PostTypeSupportCheck>
-	);
-}
-
 const applyConnect = connect(
 	( state ) => {
 		return {
@@ -67,6 +59,7 @@ const applyConnect = connect(
 );
 
 export default compose( [
+	ifPostTypeSupports( 'page-attributes' ),
 	applyConnect,
 	withInstanceId,
-] )( PageAttributesOrderWithChecks );
+] )( PageAttributesOrder );

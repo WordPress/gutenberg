@@ -4,24 +4,34 @@
 import { connect } from 'react-redux';
 
 /**
+ * WordPress dependencies
+ */
+import { compose } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
+import ifPostTypeSupports from '../higher-order/if-post-type-supports';
 import { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } from '../../store/selectors';
-import PostTypeSupportCheck from '../post-type-support-check';
 
 export function PostLastRevisionCheck( { lastRevisionId, revisionsCount, children } ) {
 	if ( ! lastRevisionId || revisionsCount < 2 ) {
 		return null;
 	}
 
-	return <PostTypeSupportCheck supportKeys="revisions" >{ children }</PostTypeSupportCheck>;
+	return children;
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			lastRevisionId: getCurrentPostLastRevisionId( state ),
 			revisionsCount: getCurrentPostRevisionsCount( state ),
 		};
 	}
-)( PostLastRevisionCheck );
+);
+
+export default compose( [
+	ifPostTypeSupports( 'revisions' ),
+	applyConnect,
+] )( PostLastRevisionCheck );

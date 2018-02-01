@@ -16,7 +16,7 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import PostFeaturedImageCheck from './check';
+import ifPostTypeSupports from '../higher-order/if-post-type-supports';
 import { getCurrentPostType, getEditedPostAttribute } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
@@ -28,54 +28,52 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 	const postLabel = get( postType, 'data.labels', {} );
 
 	return (
-		<PostFeaturedImageCheck>
-			<div className="editor-post-featured-image">
-				{ !! featuredImageId &&
-					<MediaUpload
-						title={ postLabel.set_featured_image }
-						onSelect={ onUpdateImage }
-						type="image"
-						modalClass="editor-post-featured-image__media-modal"
-						render={ ( { open } ) => (
-							<Button className="button-link editor-post-featured-image__preview" onClick={ open } >
-								{ media && !! media.data &&
-									<ResponsiveWrapper
-										naturalWidth={ media.data.media_details.width }
-										naturalHeight={ media.data.media_details.height }
-									>
-										<img src={ media.data.source_url } alt={ __( 'Featured image' ) } />
-									</ResponsiveWrapper>
-								}
-								{ media && media.isLoading && <Spinner /> }
-							</Button>
-						) }
-					/>
-				}
-				{ !! featuredImageId && media && ! media.isLoading &&
-					<p className="editor-post-featured-image__howto">
-						{ __( 'Click the image to edit or update' ) }
-					</p>
-				}
-				{ ! featuredImageId &&
-					<MediaUpload
-						title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-						onSelect={ onUpdateImage }
-						type="image"
-						modalClass="editor-post-featured-image__media-modal"
-						render={ ( { open } )=>(
-							<Button className="editor-post-featured-image__toggle button-link" onClick={ open }>
-								{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-							</Button>
-						) }
-					/>
-				}
-				{ !! featuredImageId &&
-					<Button className="editor-post-featured-image__toggle button-link" onClick={ onRemoveImage }>
-						{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
-					</Button>
-				}
-			</div>
-		</PostFeaturedImageCheck>
+		<div className="editor-post-featured-image">
+			{ !! featuredImageId &&
+				<MediaUpload
+					title={ postLabel.set_featured_image }
+					onSelect={ onUpdateImage }
+					type="image"
+					modalClass="editor-post-featured-image__media-modal"
+					render={ ( { open } ) => (
+						<Button className="button-link editor-post-featured-image__preview" onClick={ open } >
+							{ media && !! media.data &&
+								<ResponsiveWrapper
+									naturalWidth={ media.data.media_details.width }
+									naturalHeight={ media.data.media_details.height }
+								>
+									<img src={ media.data.source_url } alt={ __( 'Featured image' ) } />
+								</ResponsiveWrapper>
+							}
+							{ media && media.isLoading && <Spinner /> }
+						</Button>
+					) }
+				/>
+			}
+			{ !! featuredImageId && media && ! media.isLoading &&
+				<p className="editor-post-featured-image__howto">
+					{ __( 'Click the image to edit or update' ) }
+				</p>
+			}
+			{ ! featuredImageId &&
+				<MediaUpload
+					title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+					onSelect={ onUpdateImage }
+					type="image"
+					modalClass="editor-post-featured-image__media-modal"
+					render={ ( { open } )=>(
+						<Button className="editor-post-featured-image__toggle button-link" onClick={ open }>
+							{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+						</Button>
+					) }
+				/>
+			}
+			{ !! featuredImageId &&
+				<Button className="editor-post-featured-image__toggle button-link" onClick={ onRemoveImage }>
+					{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
+				</Button>
+			}
+		</div>
 	);
 }
 
@@ -104,6 +102,7 @@ const applyWithAPIData = withAPIData( ( { featuredImageId, postTypeName } ) => {
 } );
 
 export default compose(
+	ifPostTypeSupports( 'thumbnail' ),
 	applyConnect,
 	applyWithAPIData,
 )( PostFeaturedImage );
