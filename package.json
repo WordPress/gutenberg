@@ -5,6 +5,7 @@
 		"npm": ">=5.0.0"
 	},
 	"devDependencies": {
+		"@wordpress/browserslist-config": "^2.0.0",
 		"babel-core": "^6.26.0",
 		"chalk": "^2.0.1",
 		"check-node-version": "^3.1.1",

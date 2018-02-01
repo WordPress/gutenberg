@@ -22,6 +22,7 @@
 		"node": ">=8"
 	},
 	"dependencies": {
+		"@wordpress/browserslist-config": "^2.0.0",
 		"babel-plugin-lodash": "^3.3.2",
 		"babel-plugin-transform-object-rest-spread": "^6.23.0",
 		"babel-plugin-transform-react-jsx": "^6.24.1",

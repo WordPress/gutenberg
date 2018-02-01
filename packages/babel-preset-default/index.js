@@ -6,18 +6,7 @@ module.exports = {
 		! isTestEnv && [ require( 'babel-preset-env' ), {
 			modules: false,
 			targets: {
-				browsers: [
-					'last 2 Chrome versions',
-					'last 2 Firefox versions',
-					'last 2 Safari versions',
-					'last 2 Edge versions',
-					'last 2 Opera versions',
-					'last 2 iOS versions',
-					'last 1 Android version',
-					'last 1 ChromeAndroid version',
-					'ie 11',
-					'> 1%',
-				],
+				browsers: [ 'extends @wordpress/browserslist-config' ],
 			},
 		} ],
 		isTestEnv && [ require( 'babel-preset-env' ) ],
