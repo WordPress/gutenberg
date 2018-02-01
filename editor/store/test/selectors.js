@@ -377,12 +377,27 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getCurrentPostSlug', () => {
-		it( 'should return the current post\'s slug', () => {
+		it( 'should return the current post\'s slug is no edits have been made', () => {
 			const state = {
 				currentPost: { slug: 'post slug' },
 			};
 
 			expect( getCurrentPostSlug( state ) ).toBe( 'post slug' );
+		} );
+
+		it( 'should return the latest slug if edits have been made to the post', () => {
+			const state = {
+				currentPost: { slug: 'old slug' },
+				editor: {
+					present: {
+						edits: {
+							slug: 'new slug',
+						},
+					},
+				},
+			};
+
+			expect( getCurrentPostSlug( state ) ).toBe( 'new slug' );
 		} );
 	} );
 
