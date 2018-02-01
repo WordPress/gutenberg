@@ -11,6 +11,7 @@ import {
 	compact,
 	find,
 	some,
+	unionWith,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -24,6 +25,7 @@ import { addQueryArgs } from '@wordpress/url';
 /***
  * Module constants
  */
+const MAX_RECENT_BLOCKS = 8;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 
 /**
@@ -1084,6 +1086,22 @@ export function getInserterItems( state, enabledBlockTypes = true ) {
 	return compact( items );
 }
 
+const getRecentInserts = createSelector(
+	state => {
+		// Filter out any inserts that are associated with a block type that isn't registered
+		const inserts = state.preferences.recentInserts.filter( insert => getBlockType( insert.name ) );
+
+		// Common blocks that we'll use to pad out our list
+		const commonInserts = getBlockTypes()
+			.filter( blockType => blockType.category === 'common' )
+			.map( blockType => ( { name: blockType.name } ) );
+
+		const areInsertsEqual = ( a, b ) => a.name === b.name && a.ref === b.ref;
+		return unionWith( inserts, commonInserts, areInsertsEqual );
+	},
+	state => state.preferences.recentInserts
+);
+
 /**
  * Determines the items that appear in the 'Recent' tab of the inserter.
  *
@@ -1097,13 +1115,17 @@ export function getRecentInserterItems( state, enabledBlockTypes = true ) {
 		return [];
 	}
 
-	const items = state.preferences.recentlyUsedBlocks.map( name =>
-		buildInserterItemFromBlockType( state, enabledBlockTypes, getBlockType( name ) )
-	);
+	const items = getRecentInserts( state ).map( insert => {
+		if ( insert.ref ) {
+			const reusableBlock = getReusableBlock( state, insert.ref );
+			return buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock );
+		}
 
-	// TODO: Merge in recently used reusable blocks
+		const blockType = getBlockType( insert.name );
+		return buildInserterItemFromBlockType( state, enabledBlockTypes, blockType );
+	} );
 
-	return compact( items );
+	return compact( items ).slice( 0, MAX_RECENT_BLOCKS );
 }
 
 /**

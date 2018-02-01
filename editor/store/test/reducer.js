@@ -11,7 +11,6 @@ import {
 	registerCoreBlocks,
 	registerBlockType,
 	unregisterBlockType,
-	getBlockType,
 } from '@wordpress/blocks';
 
 /**
@@ -966,12 +965,12 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				recentlyUsedBlocks: [],
+				recentInserts: [],
 			} );
 		} );
 
 		it( 'should record recently used blocks', () => {
-			const state = preferences( deepFreeze( { recentlyUsedBlocks: [] } ), {
+			const state = preferences( deepFreeze( { recentInserts: [] } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'bacon',
@@ -979,42 +978,52 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
+			expect( state ).toEqual( {
+				recentInserts: [
+					{ name: 'core-embed/twitter' },
+				],
+			} );
 
-			const twoRecentBlocks = preferences( deepFreeze( { recentlyUsedBlocks: [] } ), {
+			const twoRecentBlocks = preferences( deepFreeze( { recentInserts: [] } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'eggs',
 					name: 'core-embed/twitter',
 				}, {
 					uid: 'bacon',
-					name: 'core-embed/youtube',
+					name: 'core/block',
+					attributes: { ref: 123 },
 				} ],
 			} );
 
-			expect( twoRecentBlocks.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
-			expect( twoRecentBlocks.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/twitter' );
+			expect( twoRecentBlocks ).toEqual( {
+				recentInserts: [
+					{ name: 'core/block', ref: 123 },
+					{ name: 'core-embed/twitter' },
+				],
+			} );
 		} );
 
-		it( 'should populate recentlyUsedBlocks, filling up with common blocks, on editor setup', () => {
-			const state = preferences( deepFreeze( { recentlyUsedBlocks: [ 'core-embed/twitter', 'core-embed/youtube' ] } ), {
-				type: 'SETUP_EDITOR',
+		it( 'should remove recorded reusable blocks that are deleted', () => {
+			const initialState = {
+				recentInserts: [
+					{ name: 'core-embed/twitter' },
+					{ name: 'core/block', ref: 123 },
+					{ name: 'core/block', ref: 456 },
+				],
+			};
+
+			const state = preferences( deepFreeze( initialState ), {
+				type: 'REMOVE_REUSABLE_BLOCK',
+				id: 123,
 			} );
 
-			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/twitter' );
-			expect( state.recentlyUsedBlocks[ 1 ] ).toEqual( 'core-embed/youtube' );
-
-			state.recentlyUsedBlocks.slice( 2 ).forEach(
-				block => expect( getBlockType( block ).category ).toEqual( 'common' )
-			);
-			expect( state.recentlyUsedBlocks ).toHaveLength( 8 );
-		} );
-
-		it( 'should remove unregistered blocks from persisted recent usage', () => {
-			const state = preferences( deepFreeze( { recentlyUsedBlocks: [ 'core-embed/i-do-not-exist', 'core-embed/youtube' ] } ), {
-				type: 'SETUP_EDITOR',
+			expect( state ).toEqual( {
+				recentInserts: [
+					{ name: 'core-embed/twitter' },
+					{ name: 'core/block', ref: 456 },
+				],
 			} );
-			expect( state.recentlyUsedBlocks[ 0 ] ).toEqual( 'core-embed/youtube' );
 		} );
 	} );
 

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import moment from 'moment';
+import { union } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -1921,18 +1922,70 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getRecentInserterItems', () => {
-		beforeEach( () => {
+		beforeAll( () => {
 			registerCoreBlocks();
 		} );
-		it( 'should return the most recently used blocks', () => {
+
+		it( 'should return the 8 most recently used blocks', () => {
 			const state = {
 				preferences: {
-					recentlyUsedBlocks: [ 'core/deleted-block', 'core/paragraph', 'core/image' ],
+					recentInserts: [
+						{ name: 'core/deleted-block' }, // Deleted blocks should be filtered out
+						{ name: 'core/block', ref: 456 }, // Deleted reusable blocks should be filtered out
+						{ name: 'core/paragraph' },
+						{ name: 'core/block', ref: 123 },
+						{ name: 'core/image' },
+						{ name: 'core/quote' },
+						{ name: 'core/gallery' },
+						{ name: 'core/heading' },
+						{ name: 'core/list' },
+						{ name: 'core/video' },
+						{ name: 'core/audio' },
+						{ name: 'core/code' },
+					],
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {
+						123: { id: 123, type: 'core/test-block' },
+					},
 				},
 			};
 
-			expect( getRecentInserterItems( state ).map( ( item ) => item.name ) )
-				.toEqual( [ 'core/paragraph', 'core/image' ] );
+			expect( getRecentInserterItems( state ) ).toMatchObject( [
+				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/block', initialAttributes: { ref: 123 } },
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/quote', initialAttributes: {} },
+				{ name: 'core/gallery', initialAttributes: {} },
+				{ name: 'core/heading', initialAttributes: {} },
+				{ name: 'core/list', initialAttributes: {} },
+				{ name: 'core/video', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should pad list out with blocks from the common category', () => {
+			const state = {
+				preferences: {
+					recentInserts: [
+						{ name: 'core/paragraph' },
+					],
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+			};
+
+			// We should get back 8 items with no duplicates
+			const items = getRecentInserterItems( state );
+			const blockNames = items.map( item => item.name );
+			expect( union( blockNames ) ).toHaveLength( 8 );
 		} );
 	} );
 
