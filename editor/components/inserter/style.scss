@@ -21,10 +21,6 @@
 	border: none;
 	outline: none;
 	transition: color .2s ease;
-
-	.editor-layout__content & {
-		border-radius: $button-style__radius-round;
-	}
 }
 
 input[type="search"].editor-inserter__search {

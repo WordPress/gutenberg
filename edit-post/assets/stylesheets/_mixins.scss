@@ -197,11 +197,11 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
  * Applies editor right position to the selector passed as argument
  */
  @mixin editor-right( $selector ) {
-	#{$selector} {
+	#{ $selector } {
 		right: 0;
 	}
 
-	.editor-layout.is-sidebar-opened #{$selector} {
+	.edit-post-layout.is-sidebar-opened #{ $selector } {
 		right: $sidebar-width;
 	}
 }

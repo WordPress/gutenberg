@@ -1,4 +1,4 @@
-.editor-block-list__block {
+.edit-post-visual-editor .editor-block-list__block {
 	margin-bottom: $block-spacing;
 	position: relative;
 	padding: $block-padding;
@@ -126,6 +126,7 @@
 	&[data-align="right"] {
 		// Without z-index, won't be clickable as "above" adjacent content
 		z-index: z-index( '.editor-block-list__block {core/image aligned left or right}' );
+		width: 100%;
 		max-width: 370px;
 	}
 
@@ -136,21 +137,21 @@
 		margin-right: $block-padding;
 
 		// sidebar (folded)
-		.auto-fold .editor-layout:not( .is-sidebar-opened ) & {
+		.auto-fold .edit-post-layout:not( .is-sidebar-opened ) & {
 			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
 				margin-left: $float-margin;
 			}
 		}
 
 		// sidebar (sticky)
-		.sticky-menu .editor-layout:not( .is-sidebar-opened ) & {
+		.sticky-menu .edit-post-layout:not( .is-sidebar-opened ) & {
 			@include editor-width( $admin-sidebar-width + $visual-editor-max-width - $block-padding ) {
 				margin-left: $float-margin;
 			}
 		}
 
 		// sidebar (sticky) and post settings
-		.sticky-menu .editor-layout & {
+		.sticky-menu .edit-post-layout & {
 			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
 				margin-left: $float-margin;
 			}
@@ -171,21 +172,21 @@
 		margin-right: $block-padding;
 
 		// sidebar (folded)
-		.auto-fold .editor-layout:not( .is-sidebar-opened ) & {
+		.auto-fold .edit-post-layout:not( .is-sidebar-opened ) & {
 			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
 				margin-right: $float-margin;
 			}
 		}
 
 		// sidebar (sticky)
-		.sticky-menu .editor-layout:not( .is-sidebar-opened ) & {
+		.sticky-menu .edit-post-layout:not( .is-sidebar-opened ) & {
 			@include editor-width( $admin-sidebar-width + $visual-editor-max-width - $block-padding ) {
 				margin-right: $float-margin;
 			}
 		}
 
 		// sidebar (sticky) and post settings
-		.sticky-menu .editor-layout & {
+		.sticky-menu .edit-post-layout & {
 			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
 				margin-right: $float-margin;
 			}
