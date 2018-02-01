@@ -1,16 +1,23 @@
 body.gutenberg-editor-page {
 	background: $white;
 
-	#update-nag, .update-nag {
-		display: none;
-	}
-
 	#wpcontent {
 		padding-left: 0;
 	}
 
 	#wpbody-content {
 		padding-bottom: 0;
+	}
+
+	// Show all notice above
+	#wpbody-content > div:not( .gutenberg ):not( #screen-meta ) {
+		position: relative;
+		z-index: z-index( '.components-notice-list' );
+		box-shadow: $shadow-popover;
+		display: inline-block;
+		margin: 10px;
+		float: left;
+		clear: both;
 	}
 
 	#wpfooter {
