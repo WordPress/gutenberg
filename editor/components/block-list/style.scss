@@ -1,4 +1,4 @@
-.editor-block-list__block {
+.edit-post-visual-editor .editor-block-list__block {
 	margin-bottom: $block-spacing;
 	position: relative;
 	padding: $block-padding;
@@ -126,6 +126,7 @@
 	&[data-align="right"] {
 		// Without z-index, won't be clickable as "above" adjacent content
 		z-index: z-index( '.editor-block-list__block {core/image aligned left or right}' );
+		width: 100%;
 		max-width: 370px;
 	}
 
