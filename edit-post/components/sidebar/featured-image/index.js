@@ -7,10 +7,10 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, withAPIData } from '@wordpress/components';
-import { PostFeaturedImage, PostFeaturedImageCheck } from '@wordpress/editor';
-import { compose } from '@wordpress/element';
+import { PostFeaturedImage, ifPostTypeSupports } from '@wordpress/editor';
 import { query } from '@wordpress/data';
 
 /**
@@ -26,19 +26,17 @@ const PANEL_NAME = 'featured-image';
 
 function FeaturedImage( { isOpened, postType, onTogglePanel } ) {
 	return (
-		<PostFeaturedImageCheck>
-			<PanelBody
-				title={ get(
-					postType,
-					[ 'data', 'labels', 'featured_image' ],
-					__( 'Featured Image' )
-				) }
-				opened={ isOpened }
-				onToggle={ onTogglePanel }
-			>
-				<PostFeaturedImage />
-			</PanelBody>
-		</PostFeaturedImageCheck>
+		<PanelBody
+			title={ get(
+				postType,
+				[ 'data', 'labels', 'featured_image' ],
+				__( 'Featured Image' )
+			) }
+			opened={ isOpened }
+			onToggle={ onTogglePanel }
+		>
+			<PostFeaturedImage />
+		</PanelBody>
 	);
 }
 
@@ -69,6 +67,7 @@ const applyWithAPIData = withAPIData( ( props ) => {
 } );
 
 export default compose(
+	ifPostTypeSupports( 'thumbnail' ),
 	applyQuery,
 	applyConnect,
 	applyWithAPIData,

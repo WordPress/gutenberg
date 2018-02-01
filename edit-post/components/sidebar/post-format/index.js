@@ -2,16 +2,14 @@
  * WordPress dependencies
  */
 import { PanelRow } from '@wordpress/components';
-import { PostFormat as PostFormatForm, PostFormatCheck } from '@wordpress/editor';
+import { PostFormat as PostFormatForm, ifPostTypeSupports } from '@wordpress/editor';
 
 export function PostFormat() {
 	return (
-		<PostFormatCheck>
-			<PanelRow>
-				<PostFormatForm />
-			</PanelRow>
-		</PostFormatCheck>
+		<PanelRow>
+			<PostFormatForm />
+		</PanelRow>
 	);
 }
 
-export default PostFormat;
+export default ifPostTypeSupports( 'post-formats' )( PostFormat );
