@@ -723,63 +723,70 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	gutenberg_extend_wp_api_backbone_client();
 
 	gutenberg_fix_jetpack_freeform_block_conflict();
+
+	$tinymce_settings = apply_filters( 'tiny_mce_before_init', array(
+		'plugins'          => implode( ',', array_unique( apply_filters( 'tiny_mce_plugins', array(
+			'charmap',
+			'colorpicker',
+			'hr',
+			'lists',
+			'media',
+			'paste',
+			'tabfocus',
+			'textcolor',
+			'fullscreen',
+			'wordpress',
+			'wpautoresize',
+			'wpeditimage',
+			'wpemoji',
+			'wpgallery',
+			'wplink',
+			'wpdialogs',
+			'wptextpattern',
+			'wpview',
+		) ) ) ),
+		'toolbar1'         => implode( ',', array_merge( apply_filters( 'mce_buttons', array(
+			'formatselect',
+			'bold',
+			'italic',
+			'bullist',
+			'numlist',
+			'blockquote',
+			'alignleft',
+			'aligncenter',
+			'alignright',
+			'link',
+			'unlink',
+			'wp_more',
+			'spellchecker',
+		), 'editor' ), array( 'kitchensink' ) ) ),
+		'toolbar2'         => implode( ',', apply_filters( 'mce_buttons_2', array(
+			'strikethrough',
+			'hr',
+			'forecolor',
+			'pastetext',
+			'removeformat',
+			'charmap',
+			'outdent',
+			'indent',
+			'undo',
+			'redo',
+			'wp_help',
+		), 'editor' ) ),
+		'toolbar3'         => implode( ',', apply_filters( 'mce_buttons_3', array(), 'editor' ) ),
+		'toolbar4'         => implode( ',', apply_filters( 'mce_buttons_4', array(), 'editor' ) ),
+		'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
+	), 'editor' );
+	if ( isset( $tinymce_settings['style_formats'] ) && is_string( $tinymce_settings['style_formats'] ) ) {
+		// Decode the options as we used to recommende json_encoding the TinyMCE settings.
+		$tinymce_settings['style_formats'] = json_decode( $tinymce_settings['style_formats'] );
+	}
+
 	wp_localize_script( 'wp-editor', 'wpEditorL10n', array(
 		'tinymce' => array(
 			'baseURL'  => includes_url( 'js/tinymce' ),
 			'suffix'   => SCRIPT_DEBUG ? '' : '.min',
-			'settings' => apply_filters( 'tiny_mce_before_init', array(
-				'plugins'          => implode( ',', array_unique( apply_filters( 'tiny_mce_plugins', array(
-					'charmap',
-					'colorpicker',
-					'hr',
-					'lists',
-					'media',
-					'paste',
-					'tabfocus',
-					'textcolor',
-					'fullscreen',
-					'wordpress',
-					'wpautoresize',
-					'wpeditimage',
-					'wpemoji',
-					'wpgallery',
-					'wplink',
-					'wpdialogs',
-					'wptextpattern',
-					'wpview',
-				) ) ) ),
-				'toolbar1'         => implode( ',', array_merge( apply_filters( 'mce_buttons', array(
-					'formatselect',
-					'bold',
-					'italic',
-					'bullist',
-					'numlist',
-					'blockquote',
-					'alignleft',
-					'aligncenter',
-					'alignright',
-					'link',
-					'unlink',
-					'wp_more',
-					'spellchecker',
-				), 'editor' ), array( 'kitchensink' ) ) ),
-				'toolbar2'         => implode( ',', apply_filters( 'mce_buttons_2', array(
-					'strikethrough',
-					'hr',
-					'forecolor',
-					'pastetext',
-					'removeformat',
-					'charmap',
-					'outdent',
-					'indent',
-					'undo',
-					'redo',
-					'wp_help',
-				), 'editor' ) ),
-				'toolbar3'         => implode( ',', apply_filters( 'mce_buttons_3', array(), 'editor' ) ),
-				'toolbar4'         => implode( ',', apply_filters( 'mce_buttons_4', array(), 'editor' ) ),
-				'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
-			), 'editor' ),
+			'settings' => $tinymce_settings,
 		),
 	) );
 
@@ -805,12 +812,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			'raw'      => '',
 			'rendered' => apply_filters( 'the_title', '', $post->ID ),
 		);
-	}
-
-	// Set initial content to apply autop on unknown blocks, preserving this
-	// behavior for classic content while otherwise disabling for blocks.
-	if ( ! $is_new_post && is_array( $post_to_edit['content'] ) ) {
-		$post_to_edit['content']['raw'] = gutenberg_wpautop_block_content( $post_to_edit['content']['raw'] );
 	}
 
 	// Set the post type name.
@@ -903,10 +904,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$allowed_block_types = apply_filters( 'allowed_block_types', true );
 
 	$editor_settings = array(
-		'alignWide'        => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
-		'colors'           => $color_palette,
-		'blockTypes'       => $allowed_block_types,
-		'titlePlaceholder' => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
+		'alignWide'          => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
+		'availableTemplates' => wp_get_theme()->get_page_templates( get_post( $post_to_edit['id'] ) ),
+		'colors'             => $color_palette,
+		'blockTypes'         => $allowed_block_types,
+		'titlePlaceholder'   => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 	);
 
 	$post_type_object = get_post_type_object( $post_to_edit['type'] );

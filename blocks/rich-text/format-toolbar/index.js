@@ -147,7 +147,7 @@ class FormatToolbar extends Component {
 				{ ( isAddingLink || isEditingLink ) &&
 					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 					/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-					<Fill name="Editable.Siblings">
+					<Fill name="RichText.Siblings">
 						<form
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
@@ -167,7 +167,7 @@ class FormatToolbar extends Component {
 				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
 					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 					/* eslint-disable jsx-a11y/no-static-element-interactions */
-					<Fill name="Editable.Siblings">
+					<Fill name="RichText.Siblings">
 						<div
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }

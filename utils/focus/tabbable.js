@@ -13,7 +13,7 @@ import { find as findFocusable } from './focusable';
  *
  * @param {Element} element Element from which to retrieve.
  *
- * @returns {?Number} Tab index of element (default 0).
+ * @returns {?number} Tab index of element (default 0).
  */
 function getTabIndex( element ) {
 	const tabIndex = element.getAttribute( 'tabindex' );

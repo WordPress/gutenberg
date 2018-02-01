@@ -30,6 +30,18 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "RichText API",
+		"slug": "rich-text-api",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/blocks\/rich-text\/README.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Deprecated Blocks",
+		"slug": "deprecated-blocks",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/deprecated-blocks.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Templates",
 		"slug": "templates",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/templates.md",

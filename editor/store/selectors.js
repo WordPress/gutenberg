@@ -8,11 +8,10 @@ import {
 	has,
 	last,
 	reduce,
-	keys,
-	without,
 	compact,
 	find,
 	some,
+	unionWith,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -26,8 +25,8 @@ import { addQueryArgs } from '@wordpress/url';
 /***
  * Module constants
  */
+const MAX_RECENT_BLOCKS = 8;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
-const MAX_FREQUENT_BLOCKS = 3;
 
 /**
  * Returns the state of legacy meta boxes.
@@ -165,7 +164,7 @@ export function getCurrentPostType( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?Number} ID of current post.
+ * @returns {?number} ID of current post.
  */
 export function getCurrentPostId( state ) {
 	return getCurrentPost( state ).id || null;
@@ -188,7 +187,7 @@ export function getCurrentPostRevisionsCount( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?Number} ID of the last revision.
+ * @returns {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
 	return get( getCurrentPost( state ), 'revisions.last_id', null );
@@ -544,7 +543,7 @@ export const getMultiSelectedBlocks = createSelector(
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} First unique block ID in the multi-selection set.
+ * @returns {?string} First unique block ID in the multi-selection set.
  */
 export function getFirstMultiSelectedBlockUid( state ) {
 	return first( getMultiSelectedBlockUids( state ) ) || null;
@@ -556,7 +555,7 @@ export function getFirstMultiSelectedBlockUid( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} Last unique block ID in the multi-selection set.
+ * @returns {?string} Last unique block ID in the multi-selection set.
  */
 export function getLastMultiSelectedBlockUid( state ) {
 	return last( getMultiSelectedBlockUids( state ) ) || null;
@@ -598,7 +597,7 @@ export function isBlockMultiSelected( state, uid ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} Unique ID of block beginning multi-selection.
+ * @returns {?string} Unique ID of block beginning multi-selection.
  */
 export function getMultiSelectedBlocksStartUid( state ) {
 	const { start, end } = state.blockSelection;
@@ -617,7 +616,7 @@ export function getMultiSelectedBlocksStartUid( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} Unique ID of block ending multi-selection.
+ * @returns {?string} Unique ID of block ending multi-selection.
  */
 export function getMultiSelectedBlocksEndUid( state ) {
 	const { start, end } = state.blockSelection;
@@ -830,14 +829,9 @@ export function isTyping( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} Unique ID after which insertion will occur.
+ * @returns {?string} Unique ID after which insertion will occur.
  */
 export function getBlockInsertionPoint( state ) {
-	const position = getBlockSiblingInserterPosition( state );
-	if ( null !== position ) {
-		return position;
-	}
-
 	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
 	if ( lastMultiSelectedBlock ) {
 		return getBlockIndex( state, lastMultiSelectedBlock ) + 1;
@@ -852,31 +846,14 @@ export function getBlockInsertionPoint( state ) {
 }
 
 /**
- * Returns the position at which the block inserter will insert a new adjacent
- * sibling block, or null if the inserter is not actively visible.
- *
- * @param {Object} state Global application state.
- *
- * @returns {?Number} Whether the inserter is currently visible.
- */
-export function getBlockSiblingInserterPosition( state ) {
-	const { position } = state.blockInsertionPoint;
-	if ( ! Number.isInteger( position ) ) {
-		return null;
-	}
-
-	return position;
-}
-
-/**
  * Returns true if we should show the block insertion point.
  *
  * @param {Object} state Global application state.
  *
- * @returns {?Boolean} Whether the insertion point is visible or not.
+ * @returns {?boolean} Whether the insertion point is visible or not.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return !! state.blockInsertionPoint.visible;
+	return state.isInsertionPointVisible;
 }
 
 /**
@@ -921,7 +898,7 @@ export function didPostSaveRequestFail( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {?String} Suggested post format.
+ * @returns {?string} Suggested post format.
  */
 export function getSuggestedPostFormat( state ) {
 	const blocks = state.editor.present.blockOrder;
@@ -1109,6 +1086,22 @@ export function getInserterItems( state, enabledBlockTypes = true ) {
 	return compact( items );
 }
 
+const getRecentInserts = createSelector(
+	state => {
+		// Filter out any inserts that are associated with a block type that isn't registered
+		const inserts = state.preferences.recentInserts.filter( insert => getBlockType( insert.name ) );
+
+		// Common blocks that we'll use to pad out our list
+		const commonInserts = getBlockTypes()
+			.filter( blockType => blockType.category === 'common' )
+			.map( blockType => ( { name: blockType.name } ) );
+
+		const areInsertsEqual = ( a, b ) => a.name === b.name && a.ref === b.ref;
+		return unionWith( inserts, commonInserts, areInsertsEqual );
+	},
+	state => state.preferences.recentInserts
+);
+
 /**
  * Determines the items that appear in the 'Recent' tab of the inserter.
  *
@@ -1122,36 +1115,18 @@ export function getRecentInserterItems( state, enabledBlockTypes = true ) {
 		return [];
 	}
 
-	const items = state.preferences.recentlyUsedBlocks.map( name =>
-		buildInserterItemFromBlockType( state, enabledBlockTypes, getBlockType( name ) )
-	);
+	const items = getRecentInserts( state ).map( insert => {
+		if ( insert.ref ) {
+			const reusableBlock = getReusableBlock( state, insert.ref );
+			return buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock );
+		}
 
-	// TODO: Merge in recently used reusable blocks
+		const blockType = getBlockType( insert.name );
+		return buildInserterItemFromBlockType( state, enabledBlockTypes, blockType );
+	} );
 
-	return compact( items );
+	return compact( items ).slice( 0, MAX_RECENT_BLOCKS );
 }
-
-/**
- * Resolves the block usage stats into a list of the most frequently used blocks.
- * Memoized so we're not generating block lists every time we render the list
- * in the inserter.
- *
- * @param {Object} state Global application state.
- *
- * @returns {Array} List of block type settings.
- */
-export const getMostFrequentlyUsedBlocks = createSelector(
-	( state ) => {
-		const { blockUsage } = state.preferences;
-		const orderedByUsage = keys( blockUsage ).sort( ( a, b ) => blockUsage[ b ] - blockUsage[ a ] );
-		// add in paragraph and image blocks if they're not already in the usage data
-		return compact(
-			[ ...orderedByUsage, ...without( [ 'core/paragraph', 'core/image' ], ...orderedByUsage ) ]
-				.map( blockType => getBlockType( blockType ) )
-		).slice( 0, MAX_FREQUENT_BLOCKS );
-	},
-	( state ) => state.preferences.blockUsage
-);
 
 /**
  * Returns the reusable block with the given ID.

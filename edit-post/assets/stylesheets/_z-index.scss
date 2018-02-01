@@ -9,7 +9,6 @@ $z-layers: (
 	'.editor-block-list__block {core/image aligned left or right}': 20,
 	'.freeform-toolbar': 10,
 	'.editor-warning': 1,
-	'.editor-block-list__sibling-inserter': 1,
 	'.components-form-toggle__input': 1,
 	'.editor-format-list__menu': 1,
 	'.editor-inserter__tabs': 1,
@@ -25,7 +24,6 @@ $z-layers: (
 	'.blocks-gallery-item__inline-menu': 20,
 	'.editor-block-settings-menu__popover': 20, // Below the header
 	'.edit-post-header': 30,
-	'.edit-post-text-editor__formatting': 30,
 	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
 
 	// Show drop zone above most standard content, but below any overlays

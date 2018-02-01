@@ -8,15 +8,16 @@ import { get } from 'lodash';
  *
  * @param {Function} reducer    The reducer to enhance.
  * @param {string}   reducerKey The reducer key to persist.
+ * @param {string}   storageKey The storage key to use.
  *
  * @returns {Function} Enhanced reducer.
  */
-export function withRehydratation( reducer, reducerKey ) {
+export function withRehydratation( reducer, reducerKey, storageKey ) {
 	// EnhancedReducer with auto-rehydration
 	const enhancedReducer = ( state, action ) => {
 		const nextState = reducer( state, action );
 
-		if ( action.type === 'REDUX_REHYDRATE' ) {
+		if ( action.type === 'REDUX_REHYDRATE' && action.storageKey === storageKey ) {
 			return {
 				...nextState,
 				[ reducerKey ]: action.payload,
@@ -44,13 +45,14 @@ export function loadAndPersist( store, reducer, reducerKey, storageKey ) {
 	const persistedString = window.localStorage.getItem( storageKey );
 	if ( persistedString ) {
 		const persistedState = {
-			...get( reducer( undefined, { type: 'DEFAULTS' } ), reducerKey ),
+			...get( reducer( undefined, { type: '@@gutenberg/init' } ), reducerKey ),
 			...JSON.parse( persistedString ),
 		};
 
 		store.dispatch( {
 			type: 'REDUX_REHYDRATE',
 			payload: persistedState,
+			storageKey,
 		} );
 	}
 
@@ -60,7 +62,7 @@ export function loadAndPersist( store, reducer, reducerKey, storageKey ) {
 		const newStateValue = get( store.getState(), reducerKey );
 		if ( newStateValue !== currentStateValue ) {
 			currentStateValue = newStateValue;
-			const stateToSave = get( reducer( store.getState(), { type: 'REDUX_SERIALIZE' } ), reducerKey );
+			const stateToSave = get( reducer( store.getState(), { type: 'SERIALIZE' } ), reducerKey );
 			window.localStorage.setItem( storageKey, JSON.stringify( stateToSave ) );
 		}
 	} );

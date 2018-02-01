@@ -12,8 +12,8 @@
 	margin-left: -$block-padding - 1px;	// stack borders
 	margin-right: -$block-padding - 1px;
 	@include break-small() {
-		margin-left: auto;
-		margin-right: auto;
+		margin-left: -1px;
+		margin-right: -1px;
 	}
 }
 

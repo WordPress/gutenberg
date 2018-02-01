@@ -24,6 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
+import VisualEditorInserter from '../inserter';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
@@ -33,7 +34,7 @@ import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
-import BlockListSiblingInserter from './sibling-inserter';
+import BlockInsertionPoint from './insertion-point';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -111,6 +112,7 @@ export class BlockListBlock extends Component {
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
+		this.selectOnOpen = this.selectOnOpen.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -388,6 +390,12 @@ export class BlockListBlock extends Component {
 		this.setState( { error } );
 	}
 
+	selectOnOpen( open ) {
+		if ( open && ! this.props.isSelected ) {
+			this.props.onSelect();
+		}
+	}
+
 	render() {
 		const { block, order, mode, showContextualToolbar, isLocked, renderBlockMenu } = this.props;
 		const { name: blockName, isValid } = block;
@@ -432,6 +440,7 @@ export class BlockListBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
+				{ ( showUI || isHovered ) && <VisualEditorInserter onToggle={ this.selectOnOpen } /> }
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
 				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } renderBlockMenu={ renderBlockMenu } /> }
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
@@ -479,7 +488,7 @@ export class BlockListBlock extends Component {
 					{ showUI && <BlockMobileToolbar uid={ block.uid } renderBlockMenu={ renderBlockMenu } /> }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
-				<BlockListSiblingInserter uid={ block.uid } />
+				<BlockInsertionPoint uid={ block.uid } />
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -560,6 +569,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onMetaChange( meta ) {
 		dispatch( editPost( { meta } ) );
 	},
+
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
 	},
