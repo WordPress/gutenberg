@@ -44,7 +44,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	/**
 	 * Test dynamic blocks that lack content, including void blocks.
 	 *
-	 * @covers do_blocks
+	 * @covers ::do_blocks
 	 */
 	function test_dynamic_block_rendering() {
 		$settings = array(
