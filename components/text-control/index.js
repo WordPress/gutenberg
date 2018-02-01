@@ -1,16 +1,12 @@
 /**
- * WordPress dependencies
- */
-import { withInstanceId } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
-import BaseControl from './../base-control';
+import BaseControl from '../base-control';
+import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
 function TextControl( { label, value, help, instanceId, onChange, type = 'text', ...props } ) {
-	const id = 'inspector-text-control-' + instanceId;
+	const id = `inspector-text-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (

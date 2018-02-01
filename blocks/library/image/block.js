@@ -18,6 +18,8 @@ import { Component, compose } from '@wordpress/element';
 import { createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	IconButton,
+	SelectControl,
+	TextControl,
 	Toolbar,
 	withAPIData,
 	withContext,
@@ -30,8 +32,6 @@ import RichText from '../../rich-text';
 import ImagePlaceHolder from '../../image-placeholder';
 import MediaUpload from '../../media-upload';
 import InspectorControls from '../../inspector-controls';
-import TextControl from '../../inspector-controls/text-control';
-import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import UrlInputButton from '../../url-input/button';

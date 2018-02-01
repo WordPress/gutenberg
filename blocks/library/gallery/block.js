@@ -9,7 +9,14 @@ import { filter } from 'lodash';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mediaUpload } from '@wordpress/utils';
-import { IconButton, DropZone, Toolbar } from '@wordpress/components';
+import {
+	IconButton,
+	DropZone,
+	RangeControl,
+	SelectControl,
+	ToggleControl,
+	Toolbar,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,9 +24,6 @@ import { IconButton, DropZone, Toolbar } from '@wordpress/components';
 import MediaUpload from '../../media-upload';
 import ImagePlaceHolder from '../../image-placeholder';
 import InspectorControls from '../../inspector-controls';
-import RangeControl from '../../inspector-controls/range-control';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';

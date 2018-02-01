@@ -8,7 +8,14 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren, Component } from '@wordpress/element';
-import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpress/components';
+import {
+	Autocomplete,
+	PanelBody,
+	PanelColor,
+	RangeControl,
+	ToggleControl,
+	withFallbackStyles,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,8 +29,6 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
 import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
 

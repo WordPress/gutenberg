@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { IconButton, PanelBody, Toolbar } from '@wordpress/components';
+import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 
@@ -23,8 +23,6 @@ import ImagePlaceHolder from '../../image-placeholder';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import RangeControl from '../../inspector-controls/range-control';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
