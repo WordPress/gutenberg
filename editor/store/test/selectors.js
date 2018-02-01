@@ -2,22 +2,18 @@
  * External dependencies
  */
 import moment from 'moment';
+import { union } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, registerCoreBlocks, getBlockTypes } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import {
-	getEditorMode,
-	getPreference,
-	isSidebarOpened,
-	hasOpenSidebar,
-	isEditorSidebarPanelOpened,
 	hasEditorUndo,
 	hasEditorRedo,
 	isEditedPostNew,
@@ -37,7 +33,6 @@ import {
 	isEditedPostPublishable,
 	isEditedPostSaveable,
 	isEditedPostBeingScheduled,
-	isMobile,
 	getEditedPostPreviewLink,
 	getBlock,
 	getBlocks,
@@ -63,33 +58,26 @@ import {
 	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
-	getBlockSiblingInserterPosition,
 	isBlockInsertionPointVisible,
 	isSavingPost,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
-	getMostFrequentlyUsedBlocks,
-	getRecentlyUsedBlocks,
 	getMetaBoxes,
-	getDirtyMetaBoxes,
+	hasMetaBoxes,
+	isSavingMetaBoxes,
 	getMetaBox,
-	isMetaBoxStateDirty,
 	getReusableBlock,
 	isSavingReusableBlock,
 	isSelectionEnabled,
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
-	hasFixedToolbar,
-	isFeatureActive,
 	isPublishingPost,
+	getInserterItems,
+	getRecentInserterItems,
 	POST_UPDATE_TRANSACTION_ID,
 } from '../selectors';
-
-jest.mock( '../constants', () => ( {
-	BREAK_MEDIUM: 500,
-} ) );
 
 describe( 'selectors', () => {
 	beforeAll( () => {
@@ -97,11 +85,13 @@ describe( 'selectors', () => {
 			save: ( props ) => props.attributes.text,
 			category: 'common',
 			title: 'test block',
+			icon: 'test',
+			keywords: [ 'testing' ],
+			useOnce: true,
 		} );
 	} );
 
 	beforeEach( () => {
-		getDirtyMetaBoxes.clear();
 		getBlock.clear();
 		getBlocks.clear();
 		getEditedPostContent.clear();
@@ -113,42 +103,53 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block' );
 	} );
 
-	describe( 'getEditorMode', () => {
-		it( 'should return the selected editor mode', () => {
-			const state = {
-				preferences: { mode: 'text' },
-			};
-
-			expect( getEditorMode( state ) ).toEqual( 'text' );
-		} );
-
-		it( 'should fallback to visual if not set', () => {
-			const state = {
-				preferences: {},
-			};
-
-			expect( getEditorMode( state ) ).toEqual( 'visual' );
-		} );
-	} );
-
-	describe( 'getDirtyMetaBoxes', () => {
-		it( 'should return array of just the side location', () => {
+	describe( 'hasMetaBoxes', () => {
+		it( 'should return true if there are active meta boxes', () => {
 			const state = {
 				metaBoxes: {
 					normal: {
 						isActive: false,
-						isDirty: false,
-						isUpdating: false,
 					},
 					side: {
 						isActive: true,
-						isDirty: true,
-						isUpdating: false,
 					},
 				},
 			};
 
-			expect( getDirtyMetaBoxes( state ) ).toEqual( [ 'side' ] );
+			expect( hasMetaBoxes( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if there are no active meta boxes', () => {
+			const state = {
+				metaBoxes: {
+					normal: {
+						isActive: false,
+					},
+					side: {
+						isActive: false,
+					},
+				},
+			};
+
+			expect( hasMetaBoxes( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isSavingMetaBoxes', () => {
+		it( 'should return true if some meta boxes are saving', () => {
+			const state = {
+				isSavingMetaBoxes: true,
+			};
+
+			expect( isSavingMetaBoxes( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if no meta boxes are saving', () => {
+			const state = {
+				isSavingMetaBoxes: false,
+			};
+
+			expect( isSavingMetaBoxes( state ) ).toBe( false );
 		} );
 	} );
 
@@ -157,24 +158,20 @@ describe( 'selectors', () => {
 			const state = {
 				metaBoxes: {
 					normal: {
-						isDirty: false,
-						isUpdating: false,
+						isActive: true,
 					},
 					side: {
-						isDirty: false,
-						isUpdating: false,
+						isActive: true,
 					},
 				},
 			};
 
 			expect( getMetaBoxes( state ) ).toEqual( {
 				normal: {
-					isDirty: false,
-					isUpdating: false,
+					isActive: true,
 				},
 				side: {
-					isDirty: false,
-					isUpdating: false,
+					isActive: true,
 				},
 			} );
 		} );
@@ -186,315 +183,16 @@ describe( 'selectors', () => {
 				metaBoxes: {
 					normal: {
 						isActive: false,
-						isDirty: false,
-						isUpdating: false,
 					},
 					side: {
 						isActive: true,
-						isDirty: false,
-						isUpdating: false,
 					},
 				},
 			};
 
 			expect( getMetaBox( state, 'side' ) ).toEqual( {
 				isActive: true,
-				isDirty: false,
-				isUpdating: false,
 			} );
-		} );
-	} );
-
-	describe( 'isMetaBoxStateDirty', () => {
-		it( 'should return false', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-						isDirty: false,
-						isUpdating: false,
-					},
-					side: {
-						isActive: false,
-						isDirty: false,
-						isUpdating: false,
-					},
-				},
-			};
-
-			expect( isMetaBoxStateDirty( state ) ).toEqual( false );
-		} );
-
-		it( 'should return false when a dirty meta box is not active.', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-						isDirty: true,
-						isUpdating: false,
-					},
-					side: {
-						isActive: false,
-						isDirty: false,
-						isUpdating: false,
-					},
-				},
-			};
-
-			expect( isMetaBoxStateDirty( state ) ).toEqual( false );
-		} );
-
-		it( 'should return false when both meta boxes are dirty but inactive.', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-						isDirty: true,
-						isUpdating: false,
-					},
-					side: {
-						isActive: false,
-						isDirty: true,
-						isUpdating: false,
-					},
-				},
-			};
-
-			expect( isMetaBoxStateDirty( state ) ).toEqual( false );
-		} );
-
-		it( 'should return false when a dirty meta box is active.', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: true,
-						isDirty: true,
-						isUpdating: false,
-					},
-					side: {
-						isActive: false,
-						isDirty: false,
-						isUpdating: false,
-					},
-				},
-			};
-
-			expect( isMetaBoxStateDirty( state ) ).toEqual( true );
-		} );
-
-		it( 'should return false when both meta boxes are dirty and active.', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: true,
-						isDirty: true,
-						isUpdating: false,
-					},
-					side: {
-						isActive: true,
-						isDirty: true,
-						isUpdating: false,
-					},
-				},
-			};
-
-			expect( isMetaBoxStateDirty( state ) ).toEqual( true );
-		} );
-	} );
-
-	describe( 'getPreference', () => {
-		it( 'should return the preference value if set', () => {
-			const state = {
-				preferences: { chicken: true },
-			};
-
-			expect( getPreference( state, 'chicken' ) ).toBe( true );
-		} );
-
-		it( 'should return undefined if the preference is unset', () => {
-			const state = {
-				preferences: { chicken: true },
-			};
-
-			expect( getPreference( state, 'ribs' ) ).toBeUndefined();
-		} );
-
-		it( 'should return the default value if provided', () => {
-			const state = {
-				preferences: {},
-			};
-
-			expect( getPreference( state, 'ribs', 'chicken' ) ).toEqual( 'chicken' );
-		} );
-	} );
-
-	describe( 'isSidebarOpened', () => {
-		it( 'should return true when is not mobile and the normal sidebar is opened', () => {
-			const state = {
-				mobile: false,
-				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when is not mobile and the normal sidebar is closed', () => {
-			const state = {
-				mobile: false,
-				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state ) ).toBe( false );
-		} );
-
-		it( 'should return true when is mobile and the mobile sidebar is opened', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when is mobile and the mobile sidebar is closed', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state ) ).toBe( false );
-		} );
-
-		it( 'should return true when the given is opened', () => {
-			const state = {
-				preferences: {
-					sidebars: {
-						publish: true,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state, 'publish' ) ).toBe( true );
-		} );
-
-		it( 'should return false when the given is not opened', () => {
-			const state = {
-				preferences: {
-					sidebars: {
-						publish: false,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state, 'publish' ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'hasOpenSidebar', () => {
-		it( 'should return true if at least one sidebar is open (using the desktop sidebar as default)', () => {
-			const state = {
-				mobile: false,
-				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-						publish: false,
-					},
-				},
-			};
-
-			expect( hasOpenSidebar( state ) ).toBe( true );
-		} );
-
-		it( 'should return true if at no sidebar is open (using the desktop sidebar as default)', () => {
-			const state = {
-				mobile: false,
-				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-						publish: false,
-					},
-				},
-			};
-
-			expect( hasOpenSidebar( state ) ).toBe( false );
-		} );
-
-		it( 'should return true if at least one sidebar is open (using the mobile sidebar as default)', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-						publish: false,
-					},
-				},
-			};
-
-			expect( hasOpenSidebar( state ) ).toBe( true );
-		} );
-
-		it( 'should return true if at no sidebar is open (using the mobile sidebar as default)', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-						publish: false,
-					},
-				},
-			};
-
-			expect( hasOpenSidebar( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isEditorSidebarPanelOpened', () => {
-		it( 'should return false if no panels preference', () => {
-			const state = {
-				preferences: {},
-			};
-
-			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
-		} );
-
-		it( 'should return false if the panel value is not set', () => {
-			const state = {
-				preferences: { panels: {} },
-			};
-
-			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
-		} );
-
-		it( 'should return the panel value', () => {
-			const state = {
-				preferences: { panels: { 'post-taxonomies': true } },
-			};
-
-			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( true );
 		} );
 	} );
 
@@ -579,38 +277,11 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostDirty', () => {
-		const metaBoxes = {
-			normal: {
-				isActive: false,
-				isDirty: false,
-				isUpdating: false,
-			},
-			side: {
-				isActive: false,
-				isDirty: false,
-				isUpdating: false,
-			},
-		};
-		// Those dirty dang meta boxes.
-		const dirtyMetaBoxes = {
-			normal: {
-				isActive: true,
-				isDirty: true,
-				isUpdating: false,
-			},
-			side: {
-				isActive: false,
-				isDirty: false,
-				isUpdating: false,
-			},
-		};
-
 		it( 'should return true when post saved state dirty', () => {
 			const state = {
 				editor: {
 					isDirty: true,
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
@@ -621,26 +292,14 @@ describe( 'selectors', () => {
 				editor: {
 					isDirty: false,
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( false );
 		} );
-
-		it( 'should return true when post saved state not dirty, but meta box state has changed.', () => {
-			const state = {
-				editor: {
-					isDirty: false,
-				},
-				metaBoxes: dirtyMetaBoxes,
-			};
-
-			expect( isEditedPostDirty( state ) ).toBe( true );
-		} );
 	} );
 
 	describe( 'isCleanNewPost', () => {
-		const metaBoxes = { isDirty: false, isUpdating: false };
+		const metaBoxes = {};
 
 		it( 'should return true when the post is not dirty and has not been saved before', () => {
 			const state = {
@@ -685,24 +344,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isMobile', () => {
-		it( 'should return true if resolution is equal or less than medium breakpoint', () => {
-			const state = {
-				mobile: true,
-			};
-
-			expect( isMobile( state ) ).toBe( true );
-		} );
-
-		it( 'should return true if resolution is greater than medium breakpoint', () => {
-			const state = {
-				mobile: false,
-			};
-
-			expect( isMobile( state ) ).toBe( false );
 		} );
 	} );
 
@@ -837,7 +478,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getDocumentTitle', () => {
-		const metaBoxes = { isDirty: false, isUpdating: false };
+		const metaBoxes = {};
 		it( 'should return current title unedited existing post', () => {
 			const state = {
 				currentPost: {
@@ -1063,7 +704,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostPublishable', () => {
-		const metaBoxes = { isDirty: false, isUpdating: false };
+		const metaBoxes = {};
 
 		it( 'should return true for pending posts', () => {
 			const state = {
@@ -1944,24 +1585,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
-				blockInsertionPoint: {},
-			};
-
-			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
-		} );
-
-		it( 'should return the assigned insertion point', () => {
-			const state = {
-				preferences: { mode: 'visual' },
-				blockSelection: {},
-				editor: {
-					present: {
-						blockOrder: [ 1, 2, 3 ],
-					},
-				},
-				blockInsertionPoint: {
-					position: 2,
-				},
+				isInsertionPointVisible: false,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
@@ -1979,7 +1603,7 @@ describe( 'selectors', () => {
 						blockOrder: [ 1, 2, 3 ],
 					},
 				},
-				blockInsertionPoint: {},
+				isInsertionPointVisible: false,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
@@ -1994,54 +1618,17 @@ describe( 'selectors', () => {
 						blockOrder: [ 1, 2, 3 ],
 					},
 				},
-				blockInsertionPoint: {},
+				isInsertionPointVisible: false,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
-		} );
-
-		it( 'should return the last block for the text mode', () => {
-			const state = {
-				preferences: { mode: 'text' },
-				blockSelection: { start: 2, end: 2 },
-				editor: {
-					present: {
-						blockOrder: [ 1, 2, 3 ],
-					},
-				},
-				blockInsertionPoint: {},
-			};
-
-			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
-		} );
-	} );
-
-	describe( 'getBlockSiblingInserterPosition', () => {
-		it( 'should return null if no sibling insertion point', () => {
-			const state = {
-				blockInsertionPoint: {},
-			};
-
-			expect( getBlockSiblingInserterPosition( state ) ).toBe( null );
-		} );
-
-		it( 'should return sibling insertion point', () => {
-			const state = {
-				blockInsertionPoint: {
-					position: 5,
-				},
-			};
-
-			expect( getBlockSiblingInserterPosition( state ) ).toBe( 5 );
 		} );
 	} );
 
 	describe( 'isBlockInsertionPointVisible', () => {
 		it( 'should return the value in state', () => {
 			const state = {
-				blockInsertionPoint: {
-					visible: true,
-				},
+				isInsertionPointVisible: true,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
@@ -2054,19 +1641,32 @@ describe( 'selectors', () => {
 				saving: {
 					requesting: true,
 				},
+				isSavingMetaBoxes: false,
 			};
 
 			expect( isSavingPost( state ) ).toBe( true );
 		} );
 
-		it( 'should return false if the post is currently being saved', () => {
+		it( 'should return false if the post is not currently being saved', () => {
 			const state = {
 				saving: {
 					requesting: false,
 				},
+				isSavingMetaBoxes: false,
 			};
 
 			expect( isSavingPost( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if the post is not currently being saved but meta boxes are saving', () => {
+			const state = {
+				saving: {
+					requesting: false,
+				},
+				isSavingMetaBoxes: true,
+			};
+
+			expect( isSavingPost( state ) ).toBe( true );
 		} );
 	} );
 
@@ -2219,45 +1819,173 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getMostFrequentlyUsedBlocks', () => {
-		it( 'should have paragraph and image to bring frequently used blocks up to three blocks', () => {
-			const noUsage = { preferences: { blockUsage: {} } };
-			const someUsage = { preferences: { blockUsage: { 'core/paragraph': 1 } } };
-
-			expect( getMostFrequentlyUsedBlocks( noUsage ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/paragraph', 'core/image' ] );
-
-			expect( getMostFrequentlyUsedBlocks( someUsage ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/paragraph', 'core/image' ] );
-		} );
-		it( 'should return the top 3 most recently used blocks', () => {
+	describe( 'getInserterItems', () => {
+		it( 'should list all non-private regular block types', () => {
 			const state = {
-				preferences: {
-					blockUsage: {
-						'core/deleted-block': 20,
-						'core/paragraph': 4,
-						'core/image': 11,
-						'core/quote': 2,
-						'core/gallery': 1,
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			const blockTypes = getBlockTypes().filter( blockType => ! blockType.isPrivate );
+			expect( getInserterItems( state ) ).toHaveLength( blockTypes.length );
+		} );
+
+		it( 'should properly list a regular block type', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			expect( getInserterItems( state, [ 'core/test-block' ] ) ).toEqual( [
+				{
+					id: 'core/test-block',
+					name: 'core/test-block',
+					initialAttributes: {},
+					title: 'test block',
+					icon: 'test',
+					category: 'common',
+					keywords: [ 'testing' ],
+					isDisabled: false,
+				},
+			] );
+		} );
+
+		it( 'should set isDisabled when a regular block type with useOnce has been used', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+							1: { uid: 1, name: 'core/test-block', attributes: {} },
+						},
+						blockOrder: [ 1 ],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			const items = getInserterItems( state, [ 'core/test-block' ] );
+			expect( items[ 0 ].isDisabled ).toBe( true );
+		} );
+
+		it( 'should properly list reusable blocks', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {
+						123: {
+							id: 123,
+							title: 'My reusable block',
+							type: 'core/test-block',
+						},
 					},
 				},
 			};
 
-			expect( getMostFrequentlyUsedBlocks( state ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/image', 'core/paragraph', 'core/quote' ] );
+			expect( getInserterItems( state, [ 'core/block' ] ) ).toEqual( [
+				{
+					id: 'core/block/123',
+					name: 'core/block',
+					initialAttributes: { ref: 123 },
+					title: 'My reusable block',
+					icon: 'test',
+					category: 'reusable-blocks',
+					keywords: [],
+					isDisabled: false,
+				},
+			] );
+		} );
+
+		it( 'should return nothing when all block types are disabled', () => {
+			expect( getInserterItems( {}, false ) ).toEqual( [] );
 		} );
 	} );
 
-	describe( 'getRecentlyUsedBlocks', () => {
-		it( 'should return the most recently used blocks', () => {
+	describe( 'getRecentInserterItems', () => {
+		beforeAll( () => {
+			registerCoreBlocks();
+		} );
+
+		it( 'should return the 8 most recently used blocks', () => {
 			const state = {
 				preferences: {
-					recentlyUsedBlocks: [ 'core/deleted-block', 'core/paragraph', 'core/image' ],
+					recentInserts: [
+						{ name: 'core/deleted-block' }, // Deleted blocks should be filtered out
+						{ name: 'core/block', ref: 456 }, // Deleted reusable blocks should be filtered out
+						{ name: 'core/paragraph' },
+						{ name: 'core/block', ref: 123 },
+						{ name: 'core/image' },
+						{ name: 'core/quote' },
+						{ name: 'core/gallery' },
+						{ name: 'core/heading' },
+						{ name: 'core/list' },
+						{ name: 'core/video' },
+						{ name: 'core/audio' },
+						{ name: 'core/code' },
+					],
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {
+						123: { id: 123, type: 'core/test-block' },
+					},
 				},
 			};
 
-			expect( getRecentlyUsedBlocks( state ).map( ( block ) => block.name ) )
-				.toEqual( [ 'core/paragraph', 'core/image' ] );
+			expect( getRecentInserterItems( state ) ).toMatchObject( [
+				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/block', initialAttributes: { ref: 123 } },
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/quote', initialAttributes: {} },
+				{ name: 'core/gallery', initialAttributes: {} },
+				{ name: 'core/heading', initialAttributes: {} },
+				{ name: 'core/list', initialAttributes: {} },
+				{ name: 'core/video', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should pad list out with blocks from the common category', () => {
+			const state = {
+				preferences: {
+					recentInserts: [
+						{ name: 'core/paragraph' },
+					],
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+			};
+
+			// We should get back 8 items with no duplicates
+			const items = getRecentInserterItems( state );
+			const blockNames = items.map( item => item.name );
+			expect( union( blockNames ) ).toHaveLength( 8 );
 		} );
 	} );
 
@@ -2293,97 +2021,6 @@ describe( 'selectors', () => {
 
 			const reusableBlock = getReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
 			expect( reusableBlock ).toBeNull();
-		} );
-	} );
-
-	describe( 'hasFixedToolbar', () => {
-		it( 'should return true if fixedToolbar is active and is not mobile screen size', () => {
-			const state = {
-				mobile: false,
-				preferences: {
-					features: {
-						fixedToolbar: true,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if fixedToolbar is active and is mobile screen size', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					features: {
-						fixedToolbar: true,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( false );
-		} );
-
-		it( 'should return false if fixedToolbar is disable and is not mobile screen size', () => {
-			const state = {
-				mobile: false,
-				preferences: {
-					features: {
-						fixedToolbar: false,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( false );
-		} );
-
-		it( 'should return false if fixedToolbar is disable and is mobile screen size', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					features: {
-						fixedToolbar: false,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isFeatureActive', () => {
-		it( 'should return true if feature is active', () => {
-			const state = {
-				preferences: {
-					features: {
-						chicken: true,
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( true );
-		} );
-
-		it( 'should return false if feature is not active', () => {
-			const state = {
-				preferences: {
-					features: {
-						chicken: false,
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-
-		it( 'should return false if feature is not referred', () => {
-			const state = {
-				preferences: {
-					features: {
-					},
-				},
-			};
-
-			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
 		} );
 	} );
 

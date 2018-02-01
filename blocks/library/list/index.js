@@ -13,11 +13,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
-import Editable from '../../editable';
+import { createBlock } from '../../api';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 
-registerBlockType( 'core/list', {
+export const name = 'core/list';
+
+export const settings = {
 	title: __( 'List' ),
 	description: __( 'List. Numbered or bulleted.' ),
 	icon: 'editor-ul',
@@ -212,10 +214,10 @@ registerBlockType( 'core/list', {
 			};
 		}
 
-		getEditorSettings( settings ) {
+		getEditorSettings( editorSettings ) {
 			return {
-				...settings,
-				plugins: ( settings.plugins || [] ).concat( 'lists' ),
+				...editorSettings,
+				plugins: ( editorSettings.plugins || [] ).concat( 'lists' ),
 				lists_indent_on_tab: false,
 			};
 		}
@@ -266,7 +268,7 @@ registerBlockType( 'core/list', {
 						] }
 					/>
 				),
-				<Editable
+				<RichText
 					multiline="li"
 					key="editable"
 					tagName={ nodeName.toLowerCase() }
@@ -313,4 +315,4 @@ registerBlockType( 'core/list', {
 			values
 		);
 	},
-} );
+};

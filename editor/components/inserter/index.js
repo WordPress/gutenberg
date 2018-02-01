@@ -17,7 +17,7 @@ import { Component, compose } from '@wordpress/element';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint, getEditorMode } from '../../store/selectors';
+import { getBlockInsertionPoint } from '../../store/selectors';
 import {
 	insertBlock,
 	hideInsertionPoint,
@@ -32,13 +32,10 @@ class Inserter extends Component {
 	}
 
 	onToggle( isOpen ) {
-		const {
-			insertIndex,
-			onToggle,
-		} = this.props;
+		const { onToggle } = this.props;
 
 		if ( isOpen ) {
-			this.props.showInsertionPoint( insertIndex );
+			this.props.showInsertionPoint();
 		} else {
 			this.props.hideInsertionPoint();
 		}
@@ -82,17 +79,12 @@ class Inserter extends Component {
 					</IconButton>
 				) }
 				renderContent={ ( { onClose } ) => {
-					const onInsert = ( name, initialAttributes ) => {
-						onInsertBlock(
-							name,
-							initialAttributes,
-							insertionPoint
-						);
-
+					const onSelect = ( item ) => {
+						onInsertBlock( item, insertionPoint );
 						onClose();
 					};
 
-					return <InserterMenu onSelect={ onInsert } />;
+					return <InserterMenu onSelect={ onSelect } />;
 				} }
 			/>
 		);
@@ -104,13 +96,12 @@ export default compose( [
 		( state ) => {
 			return {
 				insertionPoint: getBlockInsertionPoint( state ),
-				mode: getEditorMode( state ),
 			};
 		},
 		( dispatch ) => ( {
-			onInsertBlock( name, initialAttributes, position ) {
+			onInsertBlock( item, position ) {
 				dispatch( insertBlock(
-					createBlock( name, initialAttributes ),
+					createBlock( item.name, item.initialAttributes ),
 					position
 				) );
 			},

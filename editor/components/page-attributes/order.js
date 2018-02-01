@@ -8,12 +8,12 @@ import { connect } from 'react-redux';
  */
 import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import PageAttributesCheck from './check';
+import PostTypeSupportCheck from '../post-type-support-check';
 import { editPost } from '../../store/actions';
 import { getEditedPostAttribute } from '../../store/selectors';
 
@@ -28,7 +28,7 @@ export function PageAttributesOrder( { onUpdateOrder, instanceId, order } ) {
 	const inputId = `editor-page-attributes__order-${ instanceId }`;
 
 	return (
-		<PageAttributesCheck>
+		<Fragment>
 			<label htmlFor={ inputId }>
 				{ __( 'Order' ) }
 			</label>
@@ -39,7 +39,15 @@ export function PageAttributesOrder( { onUpdateOrder, instanceId, order } ) {
 				id={ inputId }
 				size={ 6 }
 			/>
-		</PageAttributesCheck>
+		</Fragment>
+	);
+}
+
+function PageAttributesOrderWithChecks( props ) {
+	return (
+		<PostTypeSupportCheck supportKeys="page-attributes">
+			<PageAttributesOrder { ...props } />
+		</PostTypeSupportCheck>
 	);
 }
 
@@ -61,4 +69,4 @@ const applyConnect = connect(
 export default compose( [
 	applyConnect,
 	withInstanceId,
-] )( PageAttributesOrder );
+] )( PageAttributesOrderWithChecks );

@@ -9,13 +9,15 @@ import { Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
-import Editable from '../../editable';
+import { createBlock } from '../../api';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
 
-registerBlockType( 'core/heading', {
+export const name = 'core/heading';
+
+export const settings = {
 	title: __( 'Heading' ),
 
 	description: __( 'Search engines use the headings to index the structure and content of your web pages.' ),
@@ -141,7 +143,7 @@ registerBlockType( 'core/heading', {
 					/>
 				</InspectorControls>
 			),
-			<Editable
+			<RichText
 				key="editable"
 				wrapperClassName="wp-block-heading"
 				tagName={ nodeName.toLowerCase() }
@@ -178,4 +180,4 @@ registerBlockType( 'core/heading', {
 			</Tag>
 		);
 	},
-} );
+};

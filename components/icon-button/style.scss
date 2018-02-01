@@ -22,4 +22,14 @@
 	&:not( :disabled ):hover {
 		@include button-style__hover;
 	}
+
+	&:not( :disabled ):active {
+		@include button-style__active;
+	}
+
+	&[aria-disabled=true]:focus,
+	&:disabled:focus {
+		box-shadow: none;
+	}
+
 }

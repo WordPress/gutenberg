@@ -1,0 +1,55 @@
+// Stores a list of z-index values in a central location.  For clarity, when a
+// specific value is needed, add a comment explaining why (what other rules the
+// value is designed to work with).
+
+$z-layers: (
+	'.editor-block-switcher__arrow': 1,
+	'.editor-block-list__block:before': -1,
+	'.editor-block-list__block .wp-block-more:before': -1,
+	'.editor-block-list__block {core/image aligned left or right}': 20,
+	'.freeform-toolbar': 10,
+	'.editor-warning': 1,
+	'.components-form-toggle__input': 1,
+	'.editor-format-list__menu': 1,
+	'.editor-inserter__tabs': 1,
+	'.editor-inserter__tab.is-active': 1,
+	'.components-panel__header': 1,
+	'.editor-meta-boxes-area.is-loading:before': 1,
+	'.editor-meta-boxes-area .spinner': 2,
+	'.blocks-format-toolbar__link-modal': 2,
+	'.editor-block-contextual-toolbar': 2,
+	'.editor-block-switcher__menu': 2,
+	'.components-popover__close': 2,
+	'.editor-block-mover': 1,
+	'.blocks-gallery-item__inline-menu': 20,
+	'.editor-block-settings-menu__popover': 20, // Below the header
+	'.edit-post-header': 30,
+	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
+
+	// Show drop zone above most standard content, but below any overlays
+	'.components-drop-zone': 100,
+	'.components-drop-zone__content': 110,
+
+	// Show sidebar above wp-admin navigation bar for mobile viewports:
+	// #wpadminbar { z-index: 99999 }
+	'.edit-post-sidebar': 100000,
+	'.edit-post-layout .edit-post-post-publish-panel': 100001,
+
+	// Show notices below expanded wp-admin submenus:
+	// #adminmenuwrap { z-index: 9990 }
+	'.components-notice-list': 9989,
+
+	// Show popovers above wp-admin menus and submenus and sidebar:
+	// #adminmenuwrap { z-index: 9990 }
+	'.components-popover': 1000000,
+	'.components-autocomplete__results': 1000000,
+	'.blocks-url-input__suggestions': 9999,
+);
+
+@function z-index( $key ) {
+	@if map-has-key( $z-layers, $key ) {
+		@return map-get( $z-layers, $key );
+	}
+
+	@error "Error: Specified z-index `#{$key}` does not exist in the mapping";
+}

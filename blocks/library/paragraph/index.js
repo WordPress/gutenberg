@@ -15,12 +15,12 @@ import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpr
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, createBlock, setDefaultBlockName } from '../../api';
+import { createBlock } from '../../api';
 import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
@@ -146,7 +146,7 @@ class ParagraphBlock extends Component {
 					userAutocompleter(),
 				] }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
-						<Editable
+						<RichText
 							tagName="p"
 							className={ classnames( 'wp-block-paragraph', className, {
 								[ `align${ width }` ]: width,
@@ -192,7 +192,9 @@ class ParagraphBlock extends Component {
 	}
 }
 
-registerBlockType( 'core/paragraph', {
+export const name = 'core/paragraph';
+
+export const settings = {
 	title: __( 'Paragraph' ),
 
 	description: __( 'This is a simple text only block for adding a single paragraph of content.' ),
@@ -281,6 +283,4 @@ registerBlockType( 'core/paragraph', {
 
 		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
 	},
-} );
-
-setDefaultBlockName( 'core/paragraph' );
+};

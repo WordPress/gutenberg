@@ -3,27 +3,27 @@
 	&[data-align="right"] {
 		max-width: 400px;
 
-		& .blocks-pullquote__content .blocks-editable__tinymce[data-is-empty="true"]:before,
-		& .blocks-editable p {
+		& .blocks-pullquote__content .blocks-rich-text__tinymce[data-is-empty="true"]:before,
+		& .blocks-rich-text p {
 			font-size: 20px;
 		}
 	}
 }
 
 .wp-block-pullquote {
-	cite .blocks-editable__tinymce[data-is-empty="true"]:before {
+	cite .blocks-rich-text__tinymce[data-is-empty="true"]:before {
 		font-size: 14px;
 		font-family: $default-font;
 	}
 
-	.blocks-editable__tinymce[data-is-empty="true"]:before {
+	.blocks-rich-text__tinymce[data-is-empty="true"]:before {
 		width: 100%;
 		left: 50%;
 		transform: translateX( -50% );
 	}
 
-	& > .blocks-pullquote__content .blocks-editable__tinymce[data-is-empty="true"]:before,
-	& > .blocks-editable p {
+	& > .blocks-pullquote__content .blocks-rich-text__tinymce[data-is-empty="true"]:before,
+	& > .blocks-rich-text p {
 		font-size: 24px;
 		font-weight: 900;
 		line-height: 1.6;

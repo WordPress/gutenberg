@@ -3,7 +3,6 @@
  */
 import {
 	filter,
-	find,
 	findIndex,
 	flow,
 	groupBy,
@@ -27,7 +26,7 @@ import {
 	withSpokenMessages,
 	withContext,
 } from '@wordpress/components';
-import { getCategories, getBlockTypes } from '@wordpress/blocks';
+import { getCategories } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -35,16 +34,16 @@ import { keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 
-import { getBlocks, getRecentlyUsedBlocks, getReusableBlocks } from '../../store/selectors';
+import { getInserterItems, getRecentInserterItems } from '../../store/selectors';
 import { fetchReusableBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
 
-export const searchBlocks = ( blocks, searchTerm ) => {
+export const searchItems = ( items, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
 	const matchSearch = ( string ) => string.toLowerCase().indexOf( normalizedSearchTerm ) !== -1;
 
-	return blocks.filter( ( block ) =>
-		matchSearch( block.title ) || some( block.keywords, matchSearch )
+	return items.filter( ( item ) =>
+		matchSearch( item.title ) || some( item.keywords, matchSearch )
 	);
 };
 
@@ -62,11 +61,10 @@ export class InserterMenu extends Component {
 			tab: 'recent',
 		};
 		this.filter = this.filter.bind( this );
-		this.searchBlocks = this.searchBlocks.bind( this );
-		this.getBlocksForTab = this.getBlocksForTab.bind( this );
-		this.sortBlocks = this.sortBlocks.bind( this );
-		this.bindReferenceNode = this.bindReferenceNode.bind( this );
-		this.selectBlock = this.selectBlock.bind( this );
+		this.searchItems = this.searchItems.bind( this );
+		this.getItemsForTab = this.getItemsForTab.bind( this );
+		this.sortItems = this.sortItems.bind( this );
+		this.selectItem = this.selectItem.bind( this );
 
 		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
@@ -77,8 +75,8 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const searchResults = this.searchBlocks( this.getBlockTypes() );
-		// Announce the blocks search results to screen readers.
+		const searchResults = this.searchItems( this.props.items );
+		// Announce the search results to screen readers.
 		if ( this.state.filterValue && !! searchResults.length ) {
 			this.props.debouncedSpeak( sprintf( _n(
 				'%d result found',
@@ -94,152 +92,91 @@ export class InserterMenu extends Component {
 		}
 	}
 
-	isDisabledBlock( blockType ) {
-		return blockType.useOnce && find( this.props.blocks, ( { name } ) => blockType.name === name );
-	}
-
-	bindReferenceNode( nodeName ) {
-		return ( node ) => this.nodes[ nodeName ] = node;
-	}
-
 	filter( event ) {
 		this.setState( {
 			filterValue: event.target.value,
 		} );
 	}
 
-	selectBlock( block ) {
-		return () => {
-			this.props.onSelect( block.name, block.initialAttributes );
-			this.setState( {
-				filterValue: '',
-			} );
-		};
-	}
-
-	getStaticBlockTypes() {
-		const { blockTypes } = this.props;
-
-		// If all block types disabled, return empty set
-		if ( ! blockTypes ) {
-			return [];
-		}
-
-		// Block types that are marked as private should not appear in the inserter
-		return getBlockTypes().filter( ( block ) => {
-			if ( block.isPrivate ) {
-				return false;
-			}
-
-			// Block types defined as either `true` or array:
-			//  - True: Allow
-			//  - Array: Check block name within whitelist
-			return (
-				! Array.isArray( blockTypes ) ||
-				includes( blockTypes, block.name )
-			);
+	selectItem( item ) {
+		this.props.onSelect( item );
+		this.setState( {
+			filterValue: '',
 		} );
 	}
 
-	getReusableBlockTypes() {
-		const { reusableBlocks } = this.props;
-
-		// Display reusable blocks that we've fetched in the inserter
-		return reusableBlocks.map( ( reusableBlock ) => ( {
-			name: 'core/block',
-			initialAttributes: {
-				ref: reusableBlock.id,
-			},
-			title: reusableBlock.title,
-			icon: 'layout',
-			category: 'reusable-blocks',
-		} ) );
+	searchItems( items ) {
+		return searchItems( items, this.state.filterValue );
 	}
 
-	getBlockTypes() {
-		return [
-			...this.getStaticBlockTypes(),
-			...this.getReusableBlockTypes(),
-		];
-	}
+	getItemsForTab( tab ) {
+		const { items, recentItems } = this.props;
 
-	searchBlocks( blockTypes ) {
-		return searchBlocks( blockTypes, this.state.filterValue );
-	}
-
-	getBlocksForTab( tab ) {
-		const blockTypes = this.getBlockTypes();
-		// if we're searching, use everything, otherwise just get the blocks visible in this tab
+		// If we're searching, use everything, otherwise just get the items visible in this tab
 		if ( this.state.filterValue ) {
-			return blockTypes;
+			return items;
 		}
 
 		let predicate;
 		switch ( tab ) {
 			case 'recent':
-				return filter( this.props.recentlyUsedBlocks,
-					( { name } ) => find( blockTypes, { name } ) );
+				return recentItems;
 
 			case 'blocks':
-				predicate = ( block ) => block.category !== 'embed' && block.category !== 'reusable-blocks';
+				predicate = ( item ) => item.category !== 'embed' && item.category !== 'reusable-blocks';
 				break;
 
 			case 'embeds':
-				predicate = ( block ) => block.category === 'embed';
+				predicate = ( item ) => item.category === 'embed';
 				break;
 
 			case 'saved':
-				predicate = ( block ) => block.category === 'reusable-blocks';
+				predicate = ( item ) => item.category === 'reusable-blocks';
 				break;
 		}
 
-		return filter( blockTypes, predicate );
+		return filter( items, predicate );
 	}
 
-	sortBlocks( blockTypes ) {
+	sortItems( items ) {
 		if ( 'recent' === this.state.tab && ! this.state.filterValue ) {
-			return blockTypes;
+			return items;
 		}
 
 		const getCategoryIndex = ( item ) => {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
 		};
 
-		return sortBy( blockTypes, getCategoryIndex );
+		return sortBy( items, getCategoryIndex );
 	}
 
-	groupByCategory( blockTypes ) {
-		return groupBy( blockTypes, ( blockType ) => blockType.category );
+	groupByCategory( items ) {
+		return groupBy( items, ( item ) => item.category );
 	}
 
-	getVisibleBlocksByCategory( blockTypes ) {
+	getVisibleItemsByCategory( items ) {
 		return flow(
-			this.searchBlocks,
-			this.sortBlocks,
+			this.searchItems,
+			this.sortItems,
 			this.groupByCategory
-		)( blockTypes );
+		)( items );
 	}
 
-	renderBlocks( blockTypes, separatorSlug ) {
+	renderItems( items, separatorSlug ) {
 		const { instanceId } = this.props;
 		const labelledBy = separatorSlug === undefined ? null : `editor-inserter__separator-${ separatorSlug }-${ instanceId }`;
-		const blockTypesInfo = blockTypes.map( ( blockType ) => (
-			{ ...blockType, disabled: this.isDisabledBlock( blockType ) }
-		) );
-
 		return (
 			<InserterGroup
-				blockTypes={ blockTypesInfo }
+				items={ items }
 				labelledBy={ labelledBy }
-				bindReferenceNode={ this.bindReferenceNode }
-				selectBlock={ this.selectBlock }
+				onSelectItem={ this.selectItem }
 			/>
 		);
 	}
 
-	renderCategory( category, blockTypes ) {
+	renderCategory( category, items ) {
 		const { instanceId } = this.props;
-		return blockTypes && (
+		return items && (
 			<div key={ category.slug }>
 				<div
 					className="editor-inserter__separator"
@@ -248,13 +185,13 @@ export class InserterMenu extends Component {
 				>
 					{ category.title }
 				</div>
-				{ this.renderBlocks( blockTypes, category.slug ) }
+				{ this.renderItems( items, category.slug ) }
 			</div>
 		);
 	}
 
-	renderCategories( visibleBlocksByCategory ) {
-		if ( isEmpty( visibleBlocksByCategory ) ) {
+	renderCategories( visibleItemsByCategory ) {
+		if ( isEmpty( visibleItemsByCategory ) ) {
 			return (
 				<span className="editor-inserter__no-results">
 					{ __( 'No blocks found' ) }
@@ -263,7 +200,7 @@ export class InserterMenu extends Component {
 		}
 
 		return getCategories().map(
-			( category ) => this.renderCategory( category, visibleBlocksByCategory[ category.slug ] )
+			( category ) => this.renderCategory( category, visibleItemsByCategory[ category.slug ] )
 		);
 	}
 
@@ -274,15 +211,15 @@ export class InserterMenu extends Component {
 	}
 
 	renderTabView( tab ) {
-		const blocksForTab = this.getBlocksForTab( tab );
+		const itemsForTab = this.getItemsForTab( tab );
 
 		// If the Recent tab is selected, don't render category headers
 		if ( 'recent' === tab ) {
-			return this.renderBlocks( blocksForTab );
+			return this.renderItems( itemsForTab );
 		}
 
 		// If the Saved tab is selected and we have no results, display a friendly message
-		if ( 'saved' === tab && blocksForTab.length === 0 ) {
+		if ( 'saved' === tab && itemsForTab.length === 0 ) {
 			return (
 				<p className="editor-inserter__no-tab-content-message">
 					{ __( 'No saved blocks.' ) }
@@ -290,16 +227,16 @@ export class InserterMenu extends Component {
 			);
 		}
 
-		const visibleBlocksByCategory = this.getVisibleBlocksByCategory( blocksForTab );
+		const visibleItemsByCategory = this.getVisibleItemsByCategory( itemsForTab );
 
-		// If our results have only blocks from one category, don't render category headers
-		const categories = Object.keys( visibleBlocksByCategory );
+		// If our results have only items from one category, don't render category headers
+		const categories = Object.keys( visibleItemsByCategory );
 		if ( categories.length === 1 ) {
 			const [ soleCategory ] = categories;
-			return this.renderBlocks( visibleBlocksByCategory[ soleCategory ] );
+			return this.renderItems( visibleItemsByCategory[ soleCategory ] );
 		}
 
-		return this.renderCategories( visibleBlocksByCategory );
+		return this.renderCategories( visibleItemsByCategory );
 	}
 
 	// Passed to TabbableContainer, extending its event-handling logic
@@ -313,9 +250,7 @@ export class InserterMenu extends Component {
 			return 1; // Move focus forward
 		}
 
-		// Prevent cases of focus being unexpectedly stolen up in the tree,
-		// notably when using VisualEditorSiblingInserter, where focus is
-		// moved to sibling blocks.
+		// Prevent cases of focus being unexpectedly stolen up in the tree.
 		if ( includes( ARROWS, event.keyCode ) ) {
 			return 0; // Don't move focus, but prevent event propagation
 		}
@@ -324,7 +259,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId } = this.props;
+		const { instanceId, items } = this.props;
 		const isSearching = this.state.filterValue;
 
 		return (
@@ -340,7 +275,6 @@ export class InserterMenu extends Component {
 					placeholder={ __( 'Search for a block' ) }
 					className="editor-inserter__search"
 					onChange={ this.filter }
-					ref={ this.bindReferenceNode( 'search' ) }
 				/>
 				{ ! isSearching &&
 					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
@@ -377,7 +311,7 @@ export class InserterMenu extends Component {
 				}
 				{ isSearching &&
 					<div role="menu" className="editor-inserter__search-results">
-						{ this.renderCategories( this.getVisibleBlocksByCategory( this.getBlockTypes() ) ) }
+						{ this.renderCategories( this.getVisibleItemsByCategory( items ) ) }
 					</div>
 				}
 			</TabbableContainer>
@@ -385,20 +319,23 @@ export class InserterMenu extends Component {
 	}
 }
 
-const connectComponent = connect(
-	( state ) => {
-		return {
-			recentlyUsedBlocks: getRecentlyUsedBlocks( state ),
-			blocks: getBlocks( state ),
-			reusableBlocks: getReusableBlocks( state ),
-		};
-	},
-	{ fetchReusableBlocks }
-);
-
 export default compose(
-	connectComponent,
-	withContext( 'editor' )( ( settings ) => pick( settings, 'blockTypes' ) ),
+	withContext( 'editor' )( ( settings ) => {
+		const { blockTypes } = settings;
+
+		return {
+			enabledBlockTypes: blockTypes,
+		};
+	} ),
+	connect(
+		( state, ownProps ) => {
+			return {
+				items: getInserterItems( state, ownProps.enabledBlockTypes ),
+				recentItems: getRecentInserterItems( state, ownProps.enabledBlockTypes ),
+			};
+		},
+		{ fetchReusableBlocks }
+	),
 	withSpokenMessages,
 	withInstanceId
 )( InserterMenu );

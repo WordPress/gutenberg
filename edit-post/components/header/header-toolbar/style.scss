@@ -1,0 +1,66 @@
+// hide all action buttons except the inserter on mobile
+.edit-post-header-toolbar > .components-button {
+	display: none;
+
+	@include break-small() {
+		display: inline-flex;
+	}
+}
+
+.edit-post-header-toolbar {
+	display: inline-flex;
+	align-items: center;
+
+	.editor-block-switcher .components-toolbar {
+		border: none;
+	}
+}
+
+.edit-post-header-toolbar__block-toolbar {
+	// stacked toolbar
+	position: absolute;
+	top: $header-height;
+	left: 0;
+	right: 0;
+	background: $white;
+	border-bottom: 1px solid $light-gray-500;
+	min-height: $block-toolbar-height;
+
+	.is-sidebar-opened & {
+		display: none;
+	}
+
+	@include break-medium {
+		.is-sidebar-opened & {
+			display: block;
+			right: $sidebar-width;
+		}
+	}
+
+	// merge toolbars after this breakpoint
+	@include break-large {	// we should try and lower this breakpoint through an ellipsis overflow feature
+		padding-left: $item-spacing;
+		position: static;
+		left: auto;
+		right: auto;
+		background: none;
+		border-bottom: none;
+		min-height: auto;
+
+		.is-sidebar-opened & {
+			right: auto;
+		}
+	}
+}
+
+.edit-post-header-toolbar .table-of-contents {
+	display: none;
+
+	.is-sidebar-opened & {
+		right: $sidebar-width + 16px;
+	}
+
+	@include break-small() {
+		display: block;
+	}
+}

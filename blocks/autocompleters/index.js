@@ -61,7 +61,7 @@ import BlockIcon from '../block-icon';
  * Returns an "completer" definition for selecting from available blocks to replace the current one.
  * The definition can be understood by the Autocomplete component.
  *
- * @param  {Function} onReplace  Callback to replace the current block.
+ * @param {Function} onReplace  Callback to replace the current block.
  *
  * @returns {Completer} Completer object used by the Autocomplete component.
  */

@@ -3,7 +3,7 @@
 exports[`core/html block edit matches snapshot 1`] = `
 <textarea
   aria-label="HTML"
-  class="wp-block-html"
+  class="blocks-plain-text wp-block-html"
   rows="1"
 />
 `;

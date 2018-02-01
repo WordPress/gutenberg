@@ -24,6 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
+import VisualEditorInserter from '../inserter';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
@@ -33,7 +34,7 @@ import BlockHtml from './block-html';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
-import BlockListSiblingInserter from './sibling-inserter';
+import BlockInsertionPoint from './insertion-point';
 import {
 	clearSelectedBlock,
 	editPost,
@@ -70,7 +71,7 @@ const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
 /**
  * Given a DOM node, finds the closest scrollable container node.
  *
- * @param  {Element}  node Node from which to start
+ * @param {Element} node Node from which to start.
  *
  * @returns {?Element} Scrollable container node, if found.
  */
@@ -104,12 +105,14 @@ export class BlockListBlock extends Component {
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
+		this.selectOnOpen = this.selectOnOpen.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -274,12 +277,40 @@ export class BlockListBlock extends Component {
 		this.props.onInsertBlocks( blocks, this.props.order + 1 );
 	}
 
+	/**
+	 * Marks the block as selected when focused and not already selected. This
+	 * specifically handles the case where block does not set focus on its own
+	 * (via `setFocus`), typically if there is no focusable input in the block.
+	 *
+	 * @param {FocusEvent} event A focus event
+	 *
+	 * @returns {void}
+	 */
 	onFocus( event ) {
-		if ( event.target === this.node ) {
+		if ( event.target === this.node && ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
 	}
 
+	/**
+	 * Prevents default dragging behavior within a block to allow for multi-
+	 * selection to take effect unhampered.
+	 *
+	 * @param {DragEvent} event Drag event.
+	 *
+	 * @returns {void}
+	 */
+	preventDrag( event ) {
+		event.preventDefault();
+	}
+
+	/**
+	 * Begins tracking cursor multi-selection when clicking down within block.
+	 *
+	 * @param {MouseEvent} event A mousedown event.
+	 *
+	 * @returns {void}
+	 */
 	onPointerDown( event ) {
 		// Not the main button.
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -294,7 +325,10 @@ export class BlockListBlock extends Component {
 			}
 		} else {
 			this.props.onSelectionStart( this.props.uid );
-			this.props.onSelect();
+
+			if ( ! this.props.isSelected ) {
+				this.props.onSelect();
+			}
 		}
 	}
 
@@ -356,8 +390,14 @@ export class BlockListBlock extends Component {
 		this.setState( { error } );
 	}
 
+	selectOnOpen( open ) {
+		if ( open && ! this.props.isSelected ) {
+			this.props.onSelect();
+		}
+	}
+
 	render() {
-		const { block, order, mode, showContextualToolbar, isLocked } = this.props;
+		const { block, order, mode, showContextualToolbar, isLocked, renderBlockMenu } = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -400,14 +440,15 @@ export class BlockListBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<BlockDropZone index={ order } />
+				{ ( showUI || isHovered ) && <VisualEditorInserter onToggle={ this.selectOnOpen } /> }
 				{ ( showUI || isHovered ) && <BlockMover uids={ [ block.uid ] } /> }
-				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } /> }
+				{ ( showUI || isHovered ) && <BlockSettingsMenu uids={ [ block.uid ] } renderBlockMenu={ renderBlockMenu } /> }
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls /> }
 				<div
 					ref={ this.bindBlockNode }
 					onKeyPress={ this.maybeStartTyping }
-					onDragStart={ ( event ) => event.preventDefault() }
+					onDragStart={ this.preventDrag }
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
@@ -444,10 +485,10 @@ export class BlockListBlock extends Component {
 							/>,
 						] }
 					</BlockCrashBoundary>
-					{ showUI && <BlockMobileToolbar uid={ block.uid } /> }
+					{ showUI && <BlockMobileToolbar uid={ block.uid } renderBlockMenu={ renderBlockMenu } /> }
 				</div>
 				{ !! error && <BlockCrashWarning /> }
-				<BlockListSiblingInserter uid={ block.uid } />
+				<BlockInsertionPoint uid={ block.uid } />
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -528,6 +569,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onMetaChange( meta ) {
 		dispatch( editPost( { meta } ) );
 	},
+
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
 	},

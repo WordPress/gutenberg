@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
- * Description: Printing since 1440. This is the development plugin for the new block editor in core. <strong>Meant for development, do not run on real sites.</strong>
- * Version: 2.0.0
+ * Description: Printing since 1440. This is the development plugin for the new block editor in core.
+ * Version: 2.1.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -44,7 +44,7 @@ function the_gutenberg_project() {
  * @since 0.1.0
  */
 function gutenberg_menu() {
-	global $menu, $submenu;
+	global $submenu;
 
 	add_menu_page(
 		'Gutenberg',
@@ -99,7 +99,7 @@ function gutenberg_wordpress_version_notice() {
  */
 function gutenberg_build_files_notice() {
 	echo '<div class="error"><p>';
-	echo __( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, and <code>npm run dev</code> to build and watch the files. Read the <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">contributing</a> file for more information.', 'gutenberg' );
+	echo __( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, <code>npm run build</code> to build the files or <code>npm run dev</code> to build the files and watch for changes. Read the <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">contributing</a> file for more information.', 'gutenberg' );
 	echo '</p></div>';
 }
 
@@ -127,12 +127,13 @@ function gutenberg_pre_init() {
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 
-	if ( version_compare( $version, '4.9-beta1-41829', '>=' ) ) {
-		add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
-	} else {
+	if ( version_compare( $version, '4.9-beta1-41829', '<' ) ) {
 		add_action( 'load-post.php', 'gutenberg_intercept_edit_post' );
 		add_action( 'load-post-new.php', 'gutenberg_intercept_post_new' );
+		return;
 	}
+
+	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 }
 
 /**

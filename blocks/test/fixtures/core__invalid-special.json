@@ -4,8 +4,8 @@
         "name": "core/freeform",
         "isValid": true,
         "attributes": {
-            "content": "<!-- wp:core/invalid-$special /-->"
+            "content": "<p><!-- wp:core/invalid-$special /--></p>"
         },
-        "originalContent": "<!-- wp:core/invalid-$special /-->"
+        "originalContent": "<p><!-- wp:core/invalid-$special /--></p>"
     }
 ]

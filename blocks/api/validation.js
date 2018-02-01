@@ -132,7 +132,7 @@ const log = ( () => {
 	/**
 	 * Creates a logger with block validation prefix.
 	 *
-	 * @param  {Function} logger Original logger function
+	 * @param {Function} logger Original logger function.
 	 *
 	 * @returns {Function} Augmented logger function.
 	 */
@@ -160,9 +160,9 @@ const log = ( () => {
  * Given a specified string, returns an array of strings split by consecutive
  * whitespace, ignoring leading or trailing whitespace.
  *
- * @param  {String}   text Original text
+ * @param {string} text Original text.
  *
- * @returns {String[]} Text pieces split on whitespace.
+ * @returns {string[]} Text pieces split on whitespace.
  */
 export function getTextPiecesSplitOnWhitespace( text ) {
 	return text.trim().split( REGEXP_WHITESPACE );
@@ -172,9 +172,9 @@ export function getTextPiecesSplitOnWhitespace( text ) {
  * Given a specified string, returns a new trimmed string where all consecutive
  * whitespace is collapsed to a single space.
  *
- * @param  {String} text Original text
+ * @param {string} text Original text.
  *
- * @returns {String} Trimmed text with consecutive whitespace collapsed.
+ * @returns {string} Trimmed text with consecutive whitespace collapsed.
  */
 export function getTextWithCollapsedWhitespace( text ) {
 	return getTextPiecesSplitOnWhitespace( text ).join( ' ' );
@@ -187,7 +187,7 @@ export function getTextWithCollapsedWhitespace( text ) {
  *
  * @see MEANINGFUL_ATTRIBUTES
  *
- * @param  {Object}  token StartTag token
+ * @param {Object} token StartTag token.
  *
  * @returns {Array[]} Attribute pairs.
  */
@@ -206,10 +206,10 @@ export function getMeaningfulAttributePairs( token ) {
  * Returns true if two text tokens (with `chars` property) are equivalent, or
  * false otherwise.
  *
- * @param  {Object}  actual   Actual token
- * @param  {Object}  expected Expected token
+ * @param {Object} actual   Actual token.
+ * @param {Object} expected Expected token.
  *
- * @returns {Boolean} Whether two text tokens are equivalent.
+ * @returns {boolean} Whether two text tokens are equivalent.
  */
 export function isEqualTextTokensWithCollapsedWhitespace( actual, expected ) {
 	// This is an overly simplified whitespace comparison. The specification is
@@ -229,9 +229,9 @@ export function isEqualTextTokensWithCollapsedWhitespace( actual, expected ) {
  * Given a style value, returns a normalized style value for strict equality
  * comparison.
  *
- * @param  {String} value Style value
+ * @param {string} value Style value.
  *
- * @returns {String} Normalized style value.
+ * @returns {string} Normalized style value.
  */
 export function getNormalizedStyleValue( value ) {
 	return value
@@ -242,7 +242,7 @@ export function getNormalizedStyleValue( value ) {
 /**
  * Given a style attribute string, returns an object of style properties.
  *
- * @param  {String} text Style attribute
+ * @param {string} text Style attribute.
  *
  * @returns {Object} Style properties.
  */
@@ -285,12 +285,12 @@ export const isEqualAttributesOfName = {
 
 /**
  * Given two sets of attribute tuples, returns true if the attribute sets are
- * equivalent
+ * equivalent.
  *
- * @param  {Array[]} actual   Actual attributes tuples
- * @param  {Array[]} expected Expected attributes tuples
+ * @param {Array[]} actual   Actual attributes tuples.
+ * @param {Array[]} expected Expected attributes tuples.
  *
- * @returns {Boolean} Whether attributes are equivalent.
+ * @returns {boolean} Whether attributes are equivalent.
  */
 export function isEqualTagAttributePairs( actual, expected ) {
 	// Attributes is tokenized as tuples. Their lengths should match. This also
@@ -357,7 +357,7 @@ export const isEqualTokensOfType = {
  *
  * Mutates the tokens array.
  *
- * @param  {Object[]} tokens Set of tokens to search
+ * @param {Object[]} tokens Set of tokens to search.
  *
  * @returns {Object} Next non-whitespace token.
  */
@@ -378,10 +378,10 @@ export function getNextNonWhitespaceToken( tokens ) {
  * Returns true if there is given HTML strings are effectively equivalent, or
  * false otherwise.
  *
- * @param  {String}  actual Actual HTML string
- * @param  {String}  expected Expected HTML string
+ * @param {string} actual Actual HTML string.
+ * @param {string} expected Expected HTML string.
  *
- * @returns {Boolean} Whether HTML strings are equivalent.
+ * @returns {boolean} Whether HTML strings are equivalent.
  */
 export function isEquivalentHTML( actual, expected ) {
 	// Tokenize input content and reserialized save content
@@ -428,11 +428,11 @@ export function isEquivalentHTML( actual, expected ) {
  *
  * Logs to console in development environments when invalid.
  *
- * @param  {String}  innerHTML  Original block content
- * @param  {String}  blockType  Block type
- * @param  {Object}  attributes Parsed block attributes
+ * @param {string} innerHTML  Original block content.
+ * @param {string} blockType  Block type.
+ * @param {Object} attributes Parsed block attributes.
  *
- * @returns {Boolean} Whether block is valid.
+ * @returns {boolean} Whether block is valid.
  */
 export function isValidBlock( innerHTML, blockType, attributes ) {
 	let saveContent;

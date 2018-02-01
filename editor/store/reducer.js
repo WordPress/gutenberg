@@ -6,15 +6,11 @@ import { combineReducers } from 'redux';
 import {
 	flow,
 	partialRight,
-	difference,
-	get,
 	reduce,
 	keyBy,
-	keys,
 	first,
 	last,
 	omit,
-	pick,
 	without,
 	mapValues,
 	findIndex,
@@ -24,7 +20,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, getBlockType } from '@wordpress/blocks';
+import { isReusableBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -33,16 +29,11 @@ import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
 import { PREFERENCES_DEFAULTS } from './defaults';
 
-/***
- * Module constants
- */
-const MAX_RECENT_BLOCKS = 8;
-
 /**
  * Returns a post attribute value, flattening nested rendered content using its
  * raw value in place of its original object form.
  *
- * @param  {*} value Original value
+ * @param {*} value Original value.
  *
  * @returns {*} Raw value.
  */
@@ -64,8 +55,8 @@ export function getPostRawValue( value ) {
  *  - blocksByUid: post content blocks keyed by UID
  *  - blockOrder: list of block UIDs in order
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -75,9 +66,9 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	partialRight( withHistory, { resetTypes: [ 'SETUP_EDITOR' ] } ),
 
-	// Track whether changes exist, starting at editor initialization and
-	// resetting at each post save.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
+	// Track whether changes exist, resetting at each post save. Relies on
+	// editor initialization firing post reset as an effect.
+	partialRight( withChangeDetection, { resetTypes: [ 'RESET_POST' ] } ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
@@ -311,8 +302,8 @@ export const editor = flow( [
  * Reducer returning the last-known state of the current post, in the format
  * returned by the WP REST API.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -341,10 +332,10 @@ export function currentPost( state = {}, action ) {
 /**
  * Reducer returning typing state.
  *
- * @param  {Boolean} state  Current state
- * @param  {Object}  action Dispatched action
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
  *
- * @returns {Boolean} Updated state.
+ * @returns {boolean} Updated state.
  */
 export function isTyping( state = false, action ) {
 	switch ( action.type ) {
@@ -361,8 +352,8 @@ export function isTyping( state = false, action ) {
 /**
  * Reducer returning the block selection's state.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -375,6 +366,11 @@ export function blockSelection( state = {
 }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
+			if ( state.start === null && state.end === null &&
+					state.focus === null && ! state.isMultiSelecting ) {
+				return state;
+			}
+
 			return {
 				...state,
 				start: null,
@@ -383,15 +379,24 @@ export function blockSelection( state = {
 				isMultiSelecting: false,
 			};
 		case 'START_MULTI_SELECT':
+			if ( state.isMultiSelecting ) {
+				return state;
+			}
+
 			return {
 				...state,
 				isMultiSelecting: true,
 			};
 		case 'STOP_MULTI_SELECT':
+			const nextFocus = state.start === state.end ? state.focus : null;
+			if ( ! state.isMultiSelecting && nextFocus === state.focus ) {
+				return state;
+			}
+
 			return {
 				...state,
 				isMultiSelecting: false,
-				focus: state.start === state.end ? state.focus : null,
+				focus: nextFocus,
 			};
 		case 'MULTI_SELECT':
 			return {
@@ -449,8 +454,8 @@ export function blockSelection( state = {
 /**
  * Reducer returning hovered block state.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -486,118 +491,73 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point
+ * Reducer returning the block insertion point visibility, a boolean value
+ * reflecting whether the insertion point should be shown.
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
-export function blockInsertionPoint( state = {}, action ) {
+export function isInsertionPointVisible( state = false, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
-			return { ...state, visible: true, position: action.index };
+			return true;
 
 		case 'HIDE_INSERTION_POINT':
-			return { ...state, visible: false, position: null };
+			return false;
 	}
 
 	return state;
 }
 
 /**
- * Reducer returning the user preferences:
+ * Reducer returning the user preferences.
  *
- * @param  {Object}  state                 Current state
- * @param  {string}  state.mode            Current editor mode, either "visual" or "text".
- * @param  {Boolean} state.isSidebarOpened Whether the sidebar is opened or closed
- * @param  {Object}  state.panels          The state of the different sidebar panels
- * @param  {Object}  action                Dispatched action
+ * @param {Object}  state                 Current state.
+ * @param {string}  state.mode            Current editor mode, either "visual" or "text".
+ * @param {boolean} state.isSidebarOpened Whether the sidebar is opened or closed.
+ * @param {Object}  state.panels          The state of the different sidebar panels.
+ * @param {Object}  action                Dispatched action.
  *
  * @returns {string} Updated state.
  */
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
-		case 'TOGGLE_SIDEBAR':
-			return {
-				...state,
-				sidebars: {
-					...state.sidebars,
-					[ action.sidebar ]: action.forcedValue !== undefined ? action.forcedValue : ! state.sidebars[ action.sidebar ],
-				},
-			};
-		case 'TOGGLE_SIDEBAR_PANEL':
-			return {
-				...state,
-				panels: {
-					...state.panels,
-					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
-				},
-			};
-		case 'SWITCH_MODE':
-			return {
-				...state,
-				mode: action.mode,
-			};
 		case 'INSERT_BLOCKS':
-			// record the block usage and put the block in the recently used blocks
-			let blockUsage = state.blockUsage;
-			let recentlyUsedBlocks = [ ...state.recentlyUsedBlocks ];
-			action.blocks.forEach( ( block ) => {
-				const uses = ( blockUsage[ block.name ] || 0 ) + 1;
-				blockUsage = omit( blockUsage, block.name );
-				blockUsage[ block.name ] = uses;
-				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, MAX_RECENT_BLOCKS );
-			} );
+			return action.blocks.reduce( ( prevState, block ) => {
+				const insert = { name: block.name };
+				if ( isReusableBlock( block ) ) {
+					insert.ref = block.attributes.ref;
+				}
+
+				const isSameAsInsert = ( { name, ref } ) => name === insert.name && ref === insert.ref;
+
+				return {
+					...prevState,
+					recentInserts: [
+						insert,
+						...reject( prevState.recentInserts, isSameAsInsert ),
+					],
+				};
+			}, state );
+
+		case 'REMOVE_REUSABLE_BLOCK':
 			return {
 				...state,
-				blockUsage,
-				recentlyUsedBlocks,
+				recentInserts: reject( state.recentInserts, insert => insert.ref === action.id ),
 			};
-		case 'SETUP_EDITOR':
-			const isBlockDefined = name => getBlockType( name ) !== undefined;
-			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
-			const filterInvalidBlocksFromObject = obj => pick( obj, keys( obj ).filter( isBlockDefined ) );
-			const commonBlocks = getBlockTypes()
-				.filter( ( blockType ) => 'common' === blockType.category )
-				.map( ( blockType ) => blockType.name );
-
-			return {
-				...state,
-				// recently used gets filled up to `MAX_RECENT_BLOCKS` with blocks from the common category
-				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
-					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
-					.slice( 0, MAX_RECENT_BLOCKS ),
-				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
-			};
-		case 'TOGGLE_FEATURE':
-			return {
-				...state,
-				features: {
-					...state.features,
-					[ action.feature ]: ! state.features[ action.feature ],
-				},
-			};
-	}
-
-	return state;
-}
-
-export function panel( state = 'document', action ) {
-	switch ( action.type ) {
-		case 'SET_ACTIVE_PANEL':
-			return action.panel;
 	}
 
 	return state;
 }
 
 /**
- * Reducer returning current network request state (whether a request to the WP
- * REST API is in progress, successful, or failed).
+ * Reducer returning current network request state (whether a request to
+ * the WP REST API is in progress, successful, or failed).
  *
- * @param  {Object} state  Current state
- * @param  {Object} action Dispatched action
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
@@ -661,70 +621,64 @@ const locations = [
 const defaultMetaBoxState = locations.reduce( ( result, key ) => {
 	result[ key ] = {
 		isActive: false,
-		isDirty: false,
-		isUpdating: false,
 	};
 
 	return result;
 }, {} );
 
+/**
+ * Reducer keeping track of the meta boxes isSaving state.
+ * A "true" value means the meta boxes saving request is in-flight.
+ *
+ *
+ * @param {boolean}  state   Previous state.
+ * @param {Object}   action  Action Object.
+ * @returns {Object}         Updated state.
+ */
+export function isSavingMetaBoxes( state = false, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_META_BOX_UPDATES':
+			return true;
+		case 'META_BOX_UPDATES_SUCCESS':
+			return false;
+		default:
+			return state;
+	}
+}
+
+/**
+ * Reducer keeping track of the state of each meta box location.
+ * This includes:
+ *  - isActive: Whether the location is active or not.
+ *  - data: The last saved form data for this location.
+ *    This is used to check whether the form is dirty
+ *    before leaving the page.
+ *
+ * @param {boolean}  state   Previous state.
+ * @param {Object}   action  Action Object.
+ * @returns {Object}         Updated state.
+ */
 export function metaBoxes( state = defaultMetaBoxState, action ) {
 	switch ( action.type ) {
 		case 'INITIALIZE_META_BOX_STATE':
 			return locations.reduce( ( newState, location ) => {
 				newState[ location ] = {
 					...state[ location ],
-					isLoaded: false,
 					isActive: action.metaBoxes[ location ],
 				};
 				return newState;
 			}, { ...state } );
-		case 'META_BOX_LOADED':
-			return {
-				...state,
-				[ action.location ]: {
-					...state[ action.location ],
-					isLoaded: true,
-					isUpdating: false,
-					isDirty: false,
-				},
-			};
-		case 'HANDLE_META_BOX_RELOAD':
-			return {
-				...state,
-				[ action.location ]: {
-					...state[ action.location ],
-					isUpdating: false,
-					isDirty: false,
-				},
-			};
-		case 'REQUEST_META_BOX_UPDATES':
-			return action.locations.reduce( ( newState, location ) => {
+		case 'META_BOX_SET_SAVED_DATA':
+			return locations.reduce( ( newState, location ) => {
 				newState[ location ] = {
 					...state[ location ],
-					isUpdating: true,
-					isDirty: false,
+					data: action.dataPerLocation[ location ],
 				};
 				return newState;
 			}, { ...state } );
-		case 'META_BOX_STATE_CHANGED':
-			return {
-				...state,
-				[ action.location ]: {
-					...state[ action.location ],
-					isDirty: action.hasChanged,
-				},
-			};
 		default:
 			return state;
 	}
-}
-
-export function mobile( state = false, action ) {
-	if ( action.type === 'UPDATE_MOBILE_STATE' ) {
-		return action.isMobile;
-	}
-	return state;
 }
 
 export const reusableBlocks = combineReducers( {
@@ -829,12 +783,11 @@ export default optimist( combineReducers( {
 	blockSelection,
 	hoveredBlock,
 	blocksMode,
-	blockInsertionPoint,
+	isInsertionPointVisible,
 	preferences,
-	panel,
 	saving,
 	notices,
 	metaBoxes,
-	mobile,
+	isSavingMetaBoxes,
 	reusableBlocks,
 } ) );

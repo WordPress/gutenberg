@@ -1,12 +1,12 @@
 # Block Controls: Toolbars and Inspector
 
-To simplify block customization and ensure a consistent experience for users, there are a number of built-in UI patterns to help generate the editor preview. Like with the `Editable` component covered in the previous chapter, the `wp.blocks` global includes a few other common components to render editing interfaces. In this chapter, we'll explore toolbars and the block inspector.
+To simplify block customization and ensure a consistent experience for users, there are a number of built-in UI patterns to help generate the editor preview. Like with the `RichText` component covered in the previous chapter, the `wp.blocks` global includes a few other common components to render editing interfaces. In this chapter, we'll explore toolbars and the block inspector.
 
 ## Toolbar
 
 <img src="https://cldup.com/jUslj672CK.png" width="391" height="79" alt="toolbar">
 
-When the user selects a block, a number of control buttons may be shown in a toolbar above the selected block. Some of these block-level controls are included automatically if the editor is able to transform the block to another type, or if the focused element is an Editable component.
+When the user selects a block, a number of control buttons may be shown in a toolbar above the selected block. Some of these block-level controls are included automatically if the editor is able to transform the block to another type, or if the focused element is an RichText component.
 
 You can also customize the toolbar to include controls specific to your block type. If the return value of your block type's `edit` function includes a `BlockControls` element, those controls will be shown in the selected block's toolbar.
 
@@ -15,7 +15,7 @@ You can also customize the toolbar to include controls specific to your block ty
 ```js
 var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
-	Editable = wp.blocks.Editable,
+	RichText = wp.blocks.RichText,
 	BlockControls = wp.blocks.BlockControls,
 	AlignmentToolbar = wp.blocks.AlignmentToolbar;
 
@@ -63,7 +63,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 				)
 			),
 			el(
-				Editable,
+				RichText,
 				{
 					key: 'editable',
 					tagName: 'p',
@@ -90,7 +90,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 ```js
 const {
 	registerBlockType,
-	Editable,
+	RichText,
 	BlockControls,
 	AlignmentToolbar,
 	source
@@ -134,7 +134,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 					/>
 				</BlockControls>
 			),
-			<Editable
+			<RichText
 				key="editable"
 				tagName="p"
 				className={ className }

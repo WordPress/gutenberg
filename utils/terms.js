@@ -4,9 +4,9 @@
 import { groupBy } from 'lodash';
 
 /**
- * Returns terms in a tree form
- ª
- * @param  {Array} flatTerms  Array of terms in flat format.
+ * Returns terms in a tree form.
+ *
+ * @param {Array} flatTerms  Array of terms in flat format.
  *
  * @returns {Array} Array of terms in tree format.
  */

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray, uniqueId, some } from 'lodash';
+import { get, has, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,14 +36,15 @@ import {
 	savePost,
 	editPost,
 	requestMetaBoxUpdates,
+	metaBoxUpdatesSuccess,
 	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
+	setMetaBoxSavedData,
 } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
-	getDirtyMetaBoxes,
 	getEditedPostContent,
 	getPostEdits,
 	isCurrentPostPublished,
@@ -53,8 +54,10 @@ import {
 	getBlock,
 	getBlocks,
 	getReusableBlock,
+	getMetaBoxes,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
+import { getMetaBoxContainer } from '../utils/meta-boxes';
 
 /**
  * Module Constants
@@ -108,7 +111,7 @@ export default {
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
-		const { dispatch, getState } = store;
+		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = includes( publishStatus, previousPost.status );
@@ -148,7 +151,7 @@ export default {
 		}
 
 		// Update dirty meta boxes.
-		dispatch( requestMetaBoxUpdates( getDirtyMetaBoxes( getState() ) ) );
+		dispatch( requestMetaBoxUpdates() );
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
@@ -203,13 +206,10 @@ export default {
 	TRASH_POST_SUCCESS( action ) {
 		const { postId, postType } = action;
 
-		// Delay redirect to ensure store has been updated with the successful trash.
-		setTimeout( () => {
-			window.location.href = getWPAdminURL( 'edit.php', {
-				trashed: 1,
-				post_type: postType,
-				ids: postId,
-			} );
+		window.location.href = getWPAdminURL( 'edit.php', {
+			trashed: 1,
+			post_type: postType,
+			ids: postId,
 		} );
 	},
 	TRASH_POST_FAILURE( action, store ) {
@@ -305,10 +305,6 @@ export default {
 			effects.push( resetBlocks( blocks ) );
 		}
 
-		// Resetting post should occur after blocks have been reset, since it's
-		// the post reset that restarts history (used in dirty detection).
-		effects.push( resetPost( post ) );
-
 		// Include auto draft title in edits while not flagging post as dirty
 		if ( post.status === 'auto-draft' ) {
 			effects.push( setupNewPost( {
@@ -316,9 +312,18 @@ export default {
 			} ) );
 		}
 
+		// Resetting post should occur after blocks have been reset, since it's
+		// the post reset that restarts history (used in dirty detection).
+		effects.push( resetPost( post ) );
+
 		return effects;
 	},
 	FETCH_REUSABLE_BLOCKS( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		if ( ! has( wp, 'api.models.Blocks' ) && ! has( wp, 'api.collections.Blocks' ) ) {
+			return;
+		}
 		const { id } = action;
 		const { dispatch } = store;
 
@@ -353,12 +358,19 @@ export default {
 		);
 	},
 	SAVE_REUSABLE_BLOCK( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		if ( ! has( wp, 'api.models.Blocks' ) ) {
+			return;
+		}
+
 		const { id } = action;
 		const { getState, dispatch } = store;
 
 		const { title, type, attributes, isTemporary } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
 		const requestData = isTemporary ? { title, content } : { id, title, content };
+
 		new wp.api.models.Blocks( requestData ).save().then(
 			( updatedReusableBlock ) => {
 				dispatch( {
@@ -380,6 +392,12 @@ export default {
 		);
 	},
 	DELETE_REUSABLE_BLOCK( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		if ( ! has( wp, 'api.models.Blocks' ) ) {
+			return;
+		}
+
 		const { id } = action;
 		const { getState, dispatch } = store;
 
@@ -452,10 +470,42 @@ export default {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
 	},
-	INITIALIZE_META_BOX_STATE( action ) {
+	INITIALIZE_META_BOX_STATE( action, store ) {
 		// Allow toggling metaboxes panels
 		if ( some( action.metaBoxes ) ) {
 			window.postboxes.add_postbox_toggles( 'post' );
 		}
+		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
+			if ( isActive ) {
+				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
+			}
+			return memo;
+		}, {} );
+		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
+	},
+	REQUEST_META_BOX_UPDATES( action, store ) {
+		const dataPerLocation = reduce( getMetaBoxes( store.getState() ), ( memo, metabox, location ) => {
+			if ( metabox.isActive ) {
+				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
+			}
+			return memo;
+		}, {} );
+		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
+
+		// To save the metaboxes, we serialize each one of the location forms and combine them
+		// We also add the "common" hidden fields from the base .metabox-base-form
+		const formData = values( dataPerLocation ).concat(
+			jQuery( '.metabox-base-form' ).serialize()
+		).join( '&' );
+		const fetchOptions = {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: formData,
+			credentials: 'include',
+		};
+
+		// Save the metaboxes
+		window.fetch( window._wpMetaBoxUrl, fetchOptions )
+			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 };

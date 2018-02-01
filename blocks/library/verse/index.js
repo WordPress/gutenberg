@@ -7,10 +7,12 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
-import Editable from '../../editable';
+import { createBlock } from '../../api';
+import RichText from '../../rich-text';
 
-registerBlockType( 'core/verse', {
+export const name = 'core/verse';
+
+export const settings = {
 	title: __( 'Verse' ),
 
 	description: __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ),
@@ -52,7 +54,7 @@ registerBlockType( 'core/verse', {
 		const { content } = attributes;
 
 		return (
-			<Editable
+			<RichText
 				tagName="pre"
 				value={ content }
 				onChange={ ( nextContent ) => {
@@ -72,4 +74,4 @@ registerBlockType( 'core/verse', {
 	save( { attributes, className } ) {
 		return <pre className={ className }>{ attributes.content }</pre>;
 	},
-} );
+};

@@ -25,9 +25,10 @@ const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } = keycodes;
 
 /**
  * Recursively select the firstChild until hitting a leaf node.
- * @param {Node} node the node to find the recursive first child.
  *
- * @returns {Node} the first leaf-node >= node in the ordering.
+ * @param {Node} node The node to find the recursive first child.
+ *
+ * @returns {Node} The first leaf-node >= node in the ordering.
  */
 function descendFirst( node ) {
 	let n = node;
@@ -39,9 +40,10 @@ function descendFirst( node ) {
 
 /**
  * Recursively select the lastChild until hitting a leaf node.
- * @param {Node} node the node to find the recursive last child.
  *
- * @returns {Node} the first leaf-node <= node in the ordering.
+ * @param {Node} node The node to find the recursive last child.
+ *
+ * @returns {Node} The first leaf-node <= node in the ordering.
  */
 function descendLast( node ) {
 	let n = node;
@@ -53,9 +55,10 @@ function descendLast( node ) {
 
 /**
  * Is the node a text node.
- * @param {?Node} node the node to check.
  *
- * @returns {boolean} true if the node is a text node.
+ * @param {?Node} node The node to check.
+ *
+ * @returns {boolean} True if the node is a text node.
  */
 function isTextNode( node ) {
 	return node !== null && node.nodeType === 3;
@@ -63,9 +66,10 @@ function isTextNode( node ) {
 
 /**
  * Return the node only if it is a text node, otherwise return null.
- * @param {?Node} node the node to filter.
  *
- * @returns {?Node} the node or null if it is not a text node.
+ * @param {?Node} node The node to filter.
+ *
+ * @returns {?Node} The node or null if it is not a text node.
  */
 function onlyTextNode( node ) {
 	return isTextNode( node ) ? node : null;
@@ -73,9 +77,10 @@ function onlyTextNode( node ) {
 
 /**
  * Find the index of the last charater in the text that is whitespace.
- * @param {String} text the text to search.
  *
- * @returns {Number} the last index of a white space character in the text or -1.
+ * @param {string} text The text to search.
+ *
+ * @returns {number} The last index of a white space character in the text or -1.
  */
 function lastIndexOfSpace( text ) {
 	for ( let i = text.length - 1; i >= 0; i-- ) {
@@ -439,10 +444,10 @@ export class Autocomplete extends Component {
 	}
 
 	toggleKeyEvents( isListening ) {
-		// This exists because we must capture ENTER key presses before Editable.
+		// This exists because we must capture ENTER key presses before RichText.
 		// It seems that react fires the simulated capturing events after the
 		// native browser event has already bubbled so we can't stopPropagation
-		// and avoid Editable getting the event from TinyMCE, hence we must
+		// and avoid RichText getting the event from TinyMCE, hence we must
 		// register a native event handler.
 		const handler = isListening ? 'addEventListener' : 'removeEventListener';
 		this.node[ handler ]( 'keydown', this.handleKeyDown, true );

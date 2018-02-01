@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 
 function isTableSelected( editor ) {
@@ -95,7 +95,7 @@ export default class TableBlock extends Component {
 		const { content, focus, onFocus, onChange, className } = this.props;
 
 		return [
-			<Editable
+			<RichText
 				key="editor"
 				tagName="table"
 				wrapperClassName={ className }

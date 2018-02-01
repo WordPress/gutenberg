@@ -6,6 +6,11 @@ import { createStore, combineReducers } from 'redux';
 import { flowRight } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+export { loadAndPersist, withRehydratation } from './persist';
+
+/**
  * Module constants
  */
 const reducers = {};
@@ -21,10 +26,10 @@ const store = createStore( initialReducer, {}, flowRight( enhancers ) );
 /**
  * Registers a new sub-reducer to the global state and returns a Redux-like store object.
  *
- * @param {string}  reducerKey Reducer key.
- * @param {Object}  reducer    Reducer function.
+ * @param {string} reducerKey Reducer key.
+ * @param {Object} reducer    Reducer function.
  *
- * @returns {Object}           Store Object.
+ * @returns {Object} Store Object.
  */
 export function registerReducer( reducerKey, reducer ) {
 	reducers[ reducerKey ] = reducer;
@@ -52,11 +57,11 @@ export function registerReducer( reducerKey, reducer ) {
 /**
  * Registers selectors for external usage.
  *
- * @param {string} reducerKey          Part of the state shape to register the
- *                                     selectors for.
- * @param {Object} newSelectors        Selectors to register. Keys will be used
- *                                     as the public facing API. Selectors will
- *                                     get passed the state as first argument.
+ * @param {string} reducerKey   Part of the state shape to register the
+ *                              selectors for.
+ * @param {Object} newSelectors Selectors to register. Keys will be used as the
+ *                              public facing API. Selectors will get passed the
+ *                              state as first argument.
  */
 export function registerSelectors( reducerKey, newSelectors ) {
 	selectors[ reducerKey ] = newSelectors;
@@ -66,9 +71,10 @@ export function registerSelectors( reducerKey, newSelectors ) {
  * Higher Order Component used to inject data using the registered selectors.
  *
  * @param {Function} mapSelectorsToProps Gets called with the selectors object
- *                                       to determine the data for the component.
+ *                                       to determine the data for the
+ *                                       component.
  *
- * @returns {Func}                       Renders the wrapped component and passes it data.
+ * @returns {Function} Renders the wrapped component and passes it data.
  */
 export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
 	const connectWithStore = ( ...args ) => {
@@ -95,7 +101,7 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
  * @param {string} selectorName Selector name.
  * @param {*}      args         Selectors arguments.
  *
- * @returns {*}                 The selector's returned value.
+ * @returns {*} The selector's returned value.
  */
 export const select = ( reducerKey, selectorName, ...args ) => {
 	return selectors[ reducerKey ][ selectorName ]( store.getState()[ reducerKey ], ...args );

@@ -7,10 +7,12 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
-import Editable from '../../editable';
+import { createBlock } from '../../api';
+import RichText from '../../rich-text';
 
-registerBlockType( 'core/preformatted', {
+export const name = 'core/preformatted';
+
+export const settings = {
 	title: __( 'Preformatted' ),
 
 	description: __( 'Preformatted text keeps your spaces, tabs and linebreaks as they are.' ),
@@ -60,7 +62,7 @@ registerBlockType( 'core/preformatted', {
 		const { content } = attributes;
 
 		return [
-			<Editable
+			<RichText
 				key="block"
 				tagName="pre"
 				value={ content }
@@ -82,4 +84,4 @@ registerBlockType( 'core/preformatted', {
 
 		return <pre>{ content }</pre>;
 	},
-} );
+};
