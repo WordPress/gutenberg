@@ -525,11 +525,9 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
-				let insert;
+				const insert = { name: block.name };
 				if ( isReusableBlock( block ) ) {
-					insert = { name: block.name, ref: block.attributes.ref };
-				} else {
-					insert = { name: block.name };
+					insert.ref = block.attributes.ref;
 				}
 
 				const isSameAsInsert = ( { name, ref } ) => name === insert.name && ref === insert.ref;
