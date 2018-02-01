@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/babel-preset-default",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Default Babel preset for WordPress development",
 	"author": "WordPress",
 	"license": "GPL-2.0-or-later",
