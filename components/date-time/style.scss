@@ -1,4 +1,44 @@
-@import '~react-datepicker/dist/react-datepicker';
+$datepicker__background-color: $light-gray-300;
+$datepicker__border-color: $light-gray-500;
+$datepicker__highlighted-color: $blue-wordpress;
+$datepicker__muted-color: #ccc;
+$datepicker__selected-color: $blue-wordpress;
+$datepicker__text-color: $dark-gray-500;
+$datepicker__header-color: $black;
+$datepicker__navigation-disabled-color: lighten($datepicker__muted-color, 10%);
+
+$datepicker__border-radius: 0;
+$datepicker__day-margin: 0.166rem;
+$datepicker__font-size: 13px;
+$datepicker__font-family: inherit;
+$datepicker__item-size: 28px;
+$datepicker__margin: 0.4rem;
+$datepicker__navigation-size: 6px;
+$datepicker__triangle-size: 6px;
+
+@import '~react-datepicker/src/stylesheets/datepicker';
+
+.react-datepicker__month-container {
+    float: none;
+}
+
+.react-datepicker-time__header,
+.react-datepicker__current-month {
+    font-size: $datepicker__font-size;
+}
+
+.react-datepicker__navigation {
+    top: 12px;
+    
+    &--previous,
+    &--previous:hover {
+        border-right-color: $black;
+    }
+    &--next,
+    &--next:hover {
+        border-left-color: $black;
+    }
+}
 
 .components-time-picker {
 	display: flex;
