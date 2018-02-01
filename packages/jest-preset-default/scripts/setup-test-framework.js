@@ -1,7 +1,4 @@
-/**
- * WordPress dependencies
- */
-import '@wordpress/jest-console';
+require( '@wordpress/jest-console' );
 
 // It "mocks" enzyme, so that we can delay loading of
 // the utility functions until enzyme is imported in tests.

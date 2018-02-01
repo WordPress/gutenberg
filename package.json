@@ -6,6 +6,7 @@
 	},
 	"devDependencies": {
 		"@wordpress/browserslist-config": "^2.0.0",
+		"@wordpress/jest-console": "^1.0.3",
 		"@wordpress/jest-preset-default": "^1.0.0",
 		"babel-core": "^6.26.0",
 		"chalk": "^2.0.1",
