@@ -78,7 +78,7 @@ export const settings = {
 			};
 			const onSelectAudio = ( media ) => {
 				if ( media && media.url ) {
-					// sets the block's attribure and updates the edit component from the
+					// sets the block's attribute and updates the edit component from the
 					// selected media, then switches off the editing UI
 					setAttributes( { src: media.url, id: media.id } );
 					this.setState( { src: media.url, editing: false } );
