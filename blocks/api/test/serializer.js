@@ -257,7 +257,7 @@ describe( 'block serializer', () => {
 						},
 					},
 
-					save: ( { attributes } ) => attributes.customText,
+					save: () => null,
 				} );
 			} );
 
