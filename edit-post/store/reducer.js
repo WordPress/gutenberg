@@ -73,7 +73,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'SWITCH_MODE':
 			return {
 				...state,
-				mode: action.mode,
+				editorMode: action.mode,
 			};
 		case 'TOGGLE_FEATURE':
 			return {
