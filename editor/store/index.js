@@ -13,6 +13,7 @@ import {
 	getEditedPostContent,
 	getEditedPostTitle,
 	getSelectedBlockCount,
+	getCurrentPostSlug,
 } from './selectors';
 
 /**
@@ -31,6 +32,7 @@ registerSelectors( MODULE_KEY, {
 	getEditedPostContent,
 	getEditedPostTitle,
 	getSelectedBlockCount,
+	getCurrentPostSlug,
 } );
 
 export default store;
