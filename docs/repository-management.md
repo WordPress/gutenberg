@@ -113,7 +113,7 @@ A pull request can generally be merged once it is:
 - Vetted against all potential edge cases.
 - Reviewed by someone other than the original author.
 
-The final pull request merge decision is made by [Gutenberg core team members](https://github.com/orgs/WordPress/teams/gutenberg-core/members).
+The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
 ### Closing Pull Requests
 
