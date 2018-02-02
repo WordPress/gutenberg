@@ -377,7 +377,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getCurrentPostSlug', () => {
-		it( 'should return the current post\'s slug is no edits have been made', () => {
+		it( 'should return the current post\'s slug if no edits have been made', () => {
 			const state = {
 				currentPost: { slug: 'post slug' },
 			};
