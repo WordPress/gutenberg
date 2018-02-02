@@ -83,6 +83,12 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		$vimeo_pattern = '#https?://(.+\.)?vimeo\.com/.*#';
 		$args          = $request->get_params();
 		$post          = get_post( $args['postId'] );
+		$cache_key     = 'shortcode_' . md5( serialize( $args ) );
+        $data          = get_transient( $cache_key );
+        if ( ! empty( $data ) ) {
+            return rest_ensure_response( $data );
+        }
+
 		setup_postdata( $post );
 
 		// Since the [embed] shortcode needs to be run earlier than other shortcodes.
@@ -121,6 +127,10 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			'style' => $style,
 			'js'    => $js,
 		);
+
+		//Caches the result for 12 hours
+        set_transient( $cache_key, $data, 12 * HOUR_IN_SECONDS );
+
 		return rest_ensure_response( $data );
 	}
 
