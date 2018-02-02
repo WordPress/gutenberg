@@ -9,7 +9,7 @@
 	color: $dark-gray-300;
 	cursor: pointer;
 	border-radius: 50%;
-	width: $icon-button-size-small;
+	width: $icon-button-size-small + 2px;
 
 	&[aria-disabled="true"] {
 		cursor: default;
@@ -25,18 +25,20 @@
 		&:not(:disabled):focus {
 			box-shadow: none;
 			color: inherit;
+			border: none;
 		}
 
 		svg {
 			display: block;
 			position: relative; // Fixing the Safari bug for `<button>`s overflow
 			border-radius: 50%;
-			margin: auto;
-
+			width: 20px;
+			height: 20px;
+			@include button-style__neutral;
 		}
 
 		&:not(:disabled):hover svg {
-			box-shadow: inset 0 0 0 1px $light-gray-500;
+			@include button-style__hover;
 		}
 
 		&:not(:disabled):active svg {

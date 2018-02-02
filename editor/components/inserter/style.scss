@@ -18,7 +18,6 @@
 	color: $dark-gray-500;
 	background: none;
 	cursor: pointer;
-	border: none;
 	outline: none;
 	transition: color .2s ease;
 }
@@ -79,6 +78,7 @@ input[type="search"].editor-inserter__search {
 	border: none;
 	line-height: 20px;
 	background: transparent;
+	@include button-style__neutral;
 
 	&:disabled {
 		@include button-style__disabled;

@@ -1,7 +1,6 @@
 .components-icon-button {
 	display: flex;
 	align-items: center;
-	padding: 8px;
 	margin: 0;
 	border: none;
 	background: none;
@@ -9,6 +8,9 @@
 	position: relative;
 	width: $icon-button-size;	// show only icon on small breakpoints
 	overflow: hidden;
+
+	padding: 7px;				// should be 8px, subtract 1px to account for a transparent border
+	@include button-style__neutral;
 
 	.dashicon {
 		display: inline-block;

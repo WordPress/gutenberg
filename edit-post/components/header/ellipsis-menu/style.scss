@@ -5,7 +5,7 @@
 	}
 
 	.components-icon-button {
-		padding: 8px 4px;
+		padding: 7px 3px;	// should be 8px 4px but subtract 1px to account for a transparent border
 		width: auto;
 	}
 

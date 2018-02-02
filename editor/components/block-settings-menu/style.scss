@@ -18,10 +18,9 @@
 // The ellipsis icon button
 .editor-block-settings-menu__toggle {
 	border-radius: 50%;
-	width: auto;
+	margin: 13px 2px 13px 8px;
 	padding: 2px;
-	margin: 14px 4px 14px 8px;
-	width: $icon-button-size-small;
+	width: $icon-button-size-small + 2px;	 // add 2px to account for a transparent border
 
 	.dashicon {
 		transform: rotate( 90deg );
