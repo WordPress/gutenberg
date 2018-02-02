@@ -8,7 +8,7 @@ Printing since 1440.
 
 This is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in core</a>. Gutenberg is the project name. If you want to use the latest release with your WordPress, <a href="https://wordpress.org/plugins/gutenberg/">download Gutenberg from the WordPress.org plugins repository</a>. Conversations and discussions take place in #core-editor on <a href="https://make.wordpress.org/chat/">the core WordPress Slack</a>.
 
-Discover more about the project <a href="https://wordpress.org/gutenberg">here</a>.
+Discover more about the project <a href="https://wordpress.org/gutenberg">here</a> or read the <a href="https://wordpress.org/gutenberg/handbook/">handbook</a>.
 
 Gutenberg is more than an editor. While the editor is the focus right now, the project will ultimately impact the entire publishing experience including customization (the next focus area).
 
