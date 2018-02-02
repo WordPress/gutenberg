@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { Dashicon } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
 import './style.scss';
@@ -11,7 +6,6 @@ import './style.scss';
 function Warning( { children } ) {
 	return (
 		<div className="editor-warning">
-			<Dashicon icon="warning" />
 			{ children }
 		</div>
 	);

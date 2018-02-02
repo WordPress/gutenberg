@@ -30,7 +30,7 @@ function InvalidBlockWarning( { block, attemptFixParagraph, ignoreInvalid, switc
 		<Warning>
 			<p>{ defaultBlockType && htmlBlockType && sprintf( __(
 				'This block appears to have been modified externally. ' +
-				'Overwrite the external changes or Convert to %s or %s to keep ' +
+				'Overwrite the changes or Convert to %s or %s to keep ' +
 				'your changes.'
 			), defaultBlockType.title, htmlBlockType.title ) }</p>
 			<p>
@@ -66,7 +66,7 @@ function InvalidBlockWarning( { block, attemptFixParagraph, ignoreInvalid, switc
 						isLarge
 					>
 						{
-							sprintf( __( 'Edit as HTML block' ) )
+							sprintf( __( 'Edit as HTML' ) )
 						}
 					</Button>
 				) }

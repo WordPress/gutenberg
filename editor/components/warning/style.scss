@@ -1,4 +1,4 @@
-.editor-warning {
+.edit-post-visual-editor .editor-warning {
 	z-index: z-index( '.editor-warning' );
 	position: absolute;
 	top: 50%;
@@ -10,12 +10,21 @@
 	align-items: center;
 	width: 96%;
 	max-width: 780px;
-	padding: 20px 20px 10px 20px;
+	padding: 20px 20px 0px 20px;
 	background-color: $white;
 	border: 1px solid $light-gray-500;
 	text-align: center;
 	line-height: $default-line-height;
 	box-shadow: $shadow-popover;
+
+	p {
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
+
+	p:first-child {
+		margin-top: 0;
+	}
 
 	.editor-visual-editor & p {
 		width: 100%;
