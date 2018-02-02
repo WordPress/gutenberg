@@ -30,6 +30,7 @@ function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIc
 				className="blocks-range-control__number"
 				type="number"
 				onChange={ onChangeValue }
+				aria-label={ label }
 				value={ value }
 				{ ...props }
 			/>
