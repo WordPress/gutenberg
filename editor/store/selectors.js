@@ -159,6 +159,17 @@ export function getCurrentPostType( state ) {
 }
 
 /**
+ * Returns the slug of the post currently being edited.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @returns {string} Slug.
+ */
+export function getCurrentPostSlug( state ) {
+	return getEditedPostAttribute( state, 'slug' );
+}
+
+/**
  * Returns the ID of the post currently being edited, or null if the post has
  * not yet been saved.
  *
@@ -202,7 +213,7 @@ export function getCurrentPostLastRevisionId( state ) {
  * @returns {Object} Object of key value pairs comprising unsaved edits.
  */
 export function getPostEdits( state ) {
-	return state.editor.present.edits;
+	return get( state, [ 'editor', 'present', 'edits' ], {} );
 }
 
 /**
@@ -216,9 +227,10 @@ export function getPostEdits( state ) {
  * @returns {*} Post attribute value.
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	return state.editor.present.edits[ attributeName ] === undefined ?
+	const edits = getPostEdits( state );
+	return edits[ attributeName ] === undefined ?
 		state.currentPost[ attributeName ] :
-		state.editor.present.edits[ attributeName ];
+		edits[ attributeName ];
 }
 
 /**
