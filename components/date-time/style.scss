@@ -19,25 +19,25 @@ $datepicker__triangle-size: 6px;
 @import '~react-datepicker/src/stylesheets/datepicker';
 
 .react-datepicker__month-container {
-    float: none;
+	float: none;
 }
 
 .react-datepicker-time__header,
 .react-datepicker__current-month {
-    font-size: $datepicker__font-size;
+	font-size: $datepicker__font-size;
 }
 
 .react-datepicker__navigation {
-    top: 12px;
-    
-    &--previous,
-    &--previous:hover {
-        border-right-color: $black;
-    }
-    &--next,
-    &--next:hover {
-        border-left-color: $black;
-    }
+	top: 12px;
+	
+	&--previous,
+	&--previous:hover {
+		border-right-color: $black;
+	}
+	&--next,
+	&--next:hover {
+		border-left-color: $black;
+	}
 }
 
 .components-time-picker {
