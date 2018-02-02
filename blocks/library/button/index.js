@@ -108,12 +108,14 @@ class ButtonBlock extends Component {
 							<ColorPalette
 								value={ color }
 								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
+                                allowCustom
 							/>
 						</PanelColor>
 						<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
 							<ColorPalette
 								value={ textColor }
 								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+                                allowCustom
 							/>
 						</PanelColor>
 						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
