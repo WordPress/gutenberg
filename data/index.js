@@ -2,8 +2,8 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { createStore, combineReducers } from 'redux';
-import { flowRight } from 'lodash';
+import { createStore } from 'redux';
+import { flowRight, without, mapValues } from 'lodash';
 
 /**
  * Internal dependencies
@@ -13,15 +13,35 @@ export { loadAndPersist, withRehydratation } from './persist';
 /**
  * Module constants
  */
-const reducers = {};
+const stores = {};
 const selectors = {};
 const enhancers = [];
+let listeners = [];
 if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
 	enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__() );
 }
 
-const initialReducer = () => ( {} );
-const store = createStore( initialReducer, {}, flowRight( enhancers ) );
+/**
+ * Global listener called for each store's update.
+ */
+export function globalListener() {
+	listeners.forEach( listener => listener() );
+}
+
+/**
+ * Subscribe to changes to any data.
+ *
+ * @param {Function}   listener Listener function.
+ *
+ * @returns {Function}          Unsubscribe function.
+ */
+export const subscribe = ( listener ) => {
+	listeners.push( listener );
+
+	return () => {
+		listeners = without( listeners, listener );
+	};
+};
 
 /**
  * Registers a new sub-reducer to the global state and returns a Redux-like store object.
@@ -32,26 +52,11 @@ const store = createStore( initialReducer, {}, flowRight( enhancers ) );
  * @return {Object} Store Object.
  */
 export function registerReducer( reducerKey, reducer ) {
-	reducers[ reducerKey ] = reducer;
-	store.replaceReducer( combineReducers( reducers ) );
-	const getState = () => store.getState()[ reducerKey ];
+	const store = createStore( reducer, flowRight( enhancers ) );
+	stores[ reducerKey ] = store;
+	store.subscribe( globalListener );
 
-	return {
-		dispatch: store.dispatch,
-		subscribe( listener ) {
-			let previousState = getState();
-			const unsubscribe = store.subscribe( () => {
-				const newState = getState();
-				if ( newState !== previousState ) {
-					listener();
-					previousState = newState;
-				}
-			} );
-
-			return unsubscribe;
-		},
-		getState,
-	};
+	return store;
 }
 
 /**
@@ -77,6 +82,16 @@ export function registerSelectors( reducerKey, newSelectors ) {
  * @return {Function} Renders the wrapped component and passes it data.
  */
 export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
+	const store = {
+		getState() {
+			return mapValues( stores, subStore => subStore.getState() );
+		},
+		subscribe,
+		dispatch() {
+			// eslint-disable-next-line no-console
+			console.warn( 'Dispatch is not supported.' );
+		},
+	};
 	const connectWithStore = ( ...args ) => {
 		const ConnectedWrappedComponent = connect( ...args )( WrappedComponent );
 		return ( props ) => {
@@ -104,5 +119,5 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
  * @return {*} The selector's returned value.
  */
 export const select = ( reducerKey, selectorName, ...args ) => {
-	return selectors[ reducerKey ][ selectorName ]( store.getState()[ reducerKey ], ...args );
+	return selectors[ reducerKey ][ selectorName ]( stores[ reducerKey ].getState(), ...args );
 };
