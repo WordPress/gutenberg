@@ -55,7 +55,7 @@ Here are a couple places you can start:
 
 When reviewing the issue backlog, here are some steps you can perform:
 
-- If it’s a bug report, test to confirm the report.
+- If it’s a bug report, test to confirm the report. If there is not enough information to confirm the report, add the `[Status] Needs More Info` label.
 - If the issue is missing labels, add some to better categorize it.
 - If the issue is duplicate of another already in the backlog, close the issue by commenting with “Duplicate of #<original-id>”. Add any relevant new details to the existing issue.
 - If there was conversation on the issue but no actionable steps identified, follow up with the participants to see what’s actionable.
