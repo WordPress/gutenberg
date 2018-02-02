@@ -13,6 +13,7 @@ import {
 	findDOMNode,
 	concatChildren,
 } from '@wordpress/element';
+import { firstCharacterUppercase } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -178,7 +179,7 @@ class Tooltip extends Component {
 					className="components-tooltip"
 					aria-hidden="true"
 				>
-					{ text }
+					{ firstCharacterUppercase( text ) }
 				</Popover>,
 			),
 		} );
