@@ -550,6 +550,11 @@ export default class RichText extends Component {
 			}
 
 			event.preventDefault();
+
+			// Calling onMerge() or onRemove() will destroy the editor, so it's important
+			// that we stop other handlers (e.g. ones registered by TinyMCE) from
+			// also handling this event.
+			event.stopImmediatePropagation();
 		}
 
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables

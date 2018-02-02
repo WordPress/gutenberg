@@ -362,9 +362,6 @@ function gutenberg_meta_box_post_form_hidden_fields( $post ) {
 	<input type="hidden" id="referredby" name="referredby" value="<?php echo $referer ? esc_url( $referer ) : ''; ?>" />
 	<!-- These fields are not part of the standard post form. Used to redirect back to this page on save. -->
 	<input type="hidden" name="gutenberg_meta_boxes" value="gutenberg_meta_boxes" />
-	<?php if ( ! empty( $active_post_lock ) ) : ?>
-	<input type="hidden" id="active_post_lock" value="<?php echo esc_attr( implode( ':', $active_post_lock ) ); ?>" />
-	<?php endif; ?>
 
 	<?php
 	if ( 'draft' !== get_post_status( $post ) ) {

@@ -32,6 +32,10 @@ const blockAttributes = {
 				source: 'attribute',
 				attribute: 'src',
 			},
+			link: {
+				source: 'attribute',
+				attribute: 'data-link',
+			},
 			alt: {
 				source: 'attribute',
 				attribute: 'alt',
@@ -131,6 +135,7 @@ export const settings = {
 						images: medias.map( media => ( {
 							id: media.id,
 							url: media.source_url,
+							link: media.link,
 						} ) ),
 					} ) );
 
@@ -177,7 +182,7 @@ export const settings = {
 							break;
 					}
 
-					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } />;
+					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } />;
 
 					return (
 						<li key={ image.id || image.url } className="blocks-gallery-item">
