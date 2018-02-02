@@ -66,13 +66,13 @@ wp.data.query( select => {
 
 ### `wp.data.subscribe( listener: func )`
 
-Function used to subscribe to changes to data changes. The listener function is called each time a change is made to any of the registered reducers. This function returns a `unsubscribe` function used to abort the subscription.
+Function used to subscribe to data changes. The listener function is called each time a change is made to any of the registered reducers. This function returns a `unsubscribe` function used to abort the subscription.
 
 ```js
 // Subscribe.
-let unsubscribe = wp.data.subscribe( () => {
-  const data = {
-    slug: wp.data.select( "core/editor", "getEditedPostSlug" ),
+const unsubscribe = wp.data.subscribe( () => {
+	const data = {
+		slug: wp.data.select( "core/editor", "getEditedPostSlug" ),
 	};
 
 	console.log( 'data changed', data );
