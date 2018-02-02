@@ -79,6 +79,8 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		global $wp_embed;
 		$style         = '';
 		$js            = '';
+		$type          = 'html';
+		$output        = '';
 		$yt_pattern    = '#https?://(?:www\.)?(?:youtube\.com/watch|youtu\.be/)#';
 		$vimeo_pattern = '#https?://(.+\.)?vimeo\.com/.*#';
 		$args          = $request->get_params();
@@ -96,6 +98,16 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			$output = $wp_embed->run_shortcode( $args['shortcode'] );
 		} else {
 			$output = do_shortcode( $args['shortcode'] );
+		}
+
+		if ( empty( $output ) ) {
+			$data = array(
+				'html'  => $output,
+				'type'  => $type,
+				'style' => $style,
+				'js'    => $js,
+			);
+			return rest_ensure_response( $data );
 		}
 
 		// Check if shortcode is returning a video. The video type will be used by the frontend to maintain 16:9 aspect ratio.
@@ -129,9 +141,7 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		);
 
 		// Caches the result for 12 hours.
-		if ( ! empty( $output ) ) {
-			set_transient( $cache_key, $data, 12 * HOUR_IN_SECONDS );
-		}
+		set_transient( $cache_key, $data, 12 * HOUR_IN_SECONDS );
 
 		return rest_ensure_response( $data );
 	}
