@@ -129,7 +129,9 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		);
 
 		// Caches the result for 12 hours.
-		set_transient( $cache_key, $data, 12 * HOUR_IN_SECONDS );
+		if ( ! empty( $output ) ) {
+			set_transient( $cache_key, $data, 12 * HOUR_IN_SECONDS );
+		}
 
 		return rest_ensure_response( $data );
 	}
