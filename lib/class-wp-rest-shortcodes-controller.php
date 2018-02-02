@@ -84,10 +84,10 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		$args          = $request->get_params();
 		$post          = get_post( $args['postId'] );
 		$cache_key     = 'shortcode_' . md5( serialize( $args ) );
-        $data          = get_transient( $cache_key );
-        if ( ! empty( $data ) ) {
-            return rest_ensure_response( $data );
-        }
+		$data          = get_transient( $cache_key );
+		if ( ! empty( $data ) ) {
+			return rest_ensure_response( $data );
+		}
 
 		setup_postdata( $post );
 
@@ -128,8 +128,8 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			'js'    => $js,
 		);
 
-		//Caches the result for 12 hours
-        set_transient( $cache_key, $data, 12 * HOUR_IN_SECONDS );
+		// Caches the result for 12 hours.
+		set_transient( $cache_key, $data, 12 * HOUR_IN_SECONDS );
 
 		return rest_ensure_response( $data );
 	}
