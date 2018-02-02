@@ -118,7 +118,7 @@ export const editor = flow( [
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
-	partialRight( withChangeDetection, { resetTypes: [ 'RESET_POST' ] } ),
+	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_NEW_POST', 'RESET_POST' ] } ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {

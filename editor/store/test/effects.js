@@ -469,8 +469,8 @@ describe( 'effects', () => {
 			const result = handler( { post, settings: {} } );
 
 			expect( result ).toEqual( [
-				setupNewPost( { title: 'A History of Pork' } ),
 				resetPost( post ),
+				setupNewPost( { title: 'A History of Pork' } ),
 			] );
 		} );
 	} );
