@@ -118,14 +118,14 @@ class ParagraphBlock extends Component {
 						<ColorPalette
 							value={ backgroundColor }
 							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
-                            allowCustom
+							allowCustom
 						/>
 					</PanelColor>
 					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
 						<ColorPalette
 							value={ textColor }
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
-                            allowCustom
+							allowCustom
 						/>
 					</PanelColor>
 					{ this.nodeRef && <ContrastCheckerWithFallbackStyles

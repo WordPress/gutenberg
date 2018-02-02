@@ -42,32 +42,32 @@ export function ColorPalette( { defaultColors, colors, value, onChange, allowCus
 					</div>
 				);
 			} ) }
-            
-            { allowCustom &&
-    			<Dropdown
-    				className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color"
-    				contentClassName="blocks-color-palette__picker "
-    				renderToggle={ ( { isOpen, onToggle } ) => (
-    					<button
-    						type="button"
-    						aria-expanded={ isOpen }
-    						className="blocks-color-palette__item"
-    						onClick={ onToggle }
-    						aria-label={ __( 'Custom color picker' ) }
-    					>
-    						<span className="blocks-color-palette__custom-color-gradient" />
-    					</button>
-    				) }
-    				renderContent={ () => (
-    					<ChromePicker
-    						color={ value }
-    						onChangeComplete={ ( color ) => onChange( color.hex ) }
-    						style={ { width: '100%' } }
-    						disableAlpha
-    					/>
-    				) }
-    			/>
-            }
+			
+			{ allowCustom &&
+				<Dropdown
+					className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color"
+					contentClassName="blocks-color-palette__picker "
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<button
+							type="button"
+							aria-expanded={ isOpen }
+							className="blocks-color-palette__item"
+							onClick={ onToggle }
+							aria-label={ __( 'Custom color picker' ) }
+						>
+							<span className="blocks-color-palette__custom-color-gradient" />
+						</button>
+					) }
+					renderContent={ () => (
+						<ChromePicker
+							color={ value }
+							onChangeComplete={ ( color ) => onChange( color.hex ) }
+							style={ { width: '100%' } }
+							disableAlpha
+						/>
+					) }
+				/>
+			}
 
 			<button
 				className="button-link blocks-color-palette__clear"
