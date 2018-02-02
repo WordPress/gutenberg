@@ -50,7 +50,7 @@ For example, `add/gallery-block` means you're working on adding a new gallery bl
 
 You can pick among all the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue">Good First Issue</a>.
 
-If you're interested, feel free to [read on about how the repository is managed](./docs/repository-management.md).
+The workflow is documented in greater detail in the [repository management](./docs/repository-management.md) document.
 
 ## Testing
 
