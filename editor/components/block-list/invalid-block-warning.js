@@ -42,12 +42,12 @@ function InvalidBlockWarning( { block, attemptFixParagraph, ignoreInvalid, switc
 						{ sprintf( __( 'Attempt Fix' ) ) }
 					</Button>
 				) }
-				<Button
+				{ block.name !== 'core/paragraph' && ( <Button
 					onClick={ ignoreInvalid }
 					isLarge
 				>
 					{ sprintf( __( 'Overwrite' ) ) }
-				</Button>
+				</Button> ) }
 				{ defaultBlockType && (
 					<Button
 						onClick={ switchTo( defaultBlockType ) }
