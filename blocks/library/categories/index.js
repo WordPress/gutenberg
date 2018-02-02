@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import './style.scss';
 import CategoriesBlock from './block';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 export const name = 'core/categories';
 
@@ -37,6 +38,10 @@ export const settings = {
 		align: {
 			type: 'string',
 		},
+	},
+
+	transforms: {
+		to: alignmentShortcuts,
 	},
 
 	supports: {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString, get } from 'lodash';
+import { isString, get, flatMap } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -19,6 +19,7 @@ import { createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import RichText from '../../rich-text';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 const toRichTextValue = value => value.map( ( subValue => subValue.children ) );
 const fromRichTextValue = value => value.map( ( subValue ) => ( {
@@ -100,6 +101,18 @@ export const settings = {
 				type: 'raw',
 				isMatch: ( node ) => node.nodeName === 'BLOCKQUOTE',
 			},
+			{
+				type: 'shortcut',
+				blocks: [ 'core/paragraph' ],
+				shortcut: 'q',
+				transform( blocks ) {
+					return createBlock( 'core/quote', {
+						value: blocks.map( ( { attributes: { content }, i } ) => ( {
+							children: <p key={ i }>{ content }</p>,
+						} ) ),
+					} );
+				},
+			},
 		],
 		to: [
 			{
@@ -150,6 +163,21 @@ export const settings = {
 					} );
 				},
 			},
+			{
+				type: 'shortcut',
+				shortcut: 'q',
+				transform( blocks ) {
+					return flatMap( blocks, ( { attributes: { value, citation } } ) => [
+						...value.map( ( paragraph ) => createBlock( 'core/paragraph', {
+							content: [ get( paragraph, 'children.props.children', '' ) ],
+						} ) ),
+						...( citation ? [ createBlock( 'core/paragraph', {
+							content: citation,
+						} ) ] : [] ),
+					] );
+				},
+			},
+			...alignmentShortcuts,
 		],
 	},
 

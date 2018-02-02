@@ -434,11 +434,12 @@ export function blockSelection( state = {
 			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
 				return state;
 			}
+
 			return {
 				...state,
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
-				focus: {},
+				start: first( action.blocks ).uid,
+				end: last( action.blocks ).uid,
+				focus: action.blocks.length > 1 ? null : {},
 				isMultiSelecting: false,
 			};
 		case 'TOGGLE_SELECTION':

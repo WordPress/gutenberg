@@ -18,6 +18,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
 import InspectorControls from '../../inspector-controls';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 const { getComputedStyle } = window;
 
@@ -184,6 +185,10 @@ export const settings = {
 	category: 'layout',
 
 	attributes: blockAttributes,
+
+	transforms: {
+		to: alignmentShortcuts,
+	},
 
 	getEditWrapperProps( attributes ) {
 		const { align, clear } = attributes;

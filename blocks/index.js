@@ -14,6 +14,7 @@ import './hooks';
 // and then stored as objects in state, from which it is then rendered for editing.
 export * from './api';
 export { registerCoreBlocks } from './library';
+export { default as alignmentShortcuts } from './alignment-shortcuts';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockControls } from './block-controls';

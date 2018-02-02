@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { first } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -14,6 +19,7 @@ import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 export const name = 'core/heading';
 
@@ -81,6 +87,19 @@ export const settings = {
 					} );
 				},
 			},
+			...'23456'.split( '' ).map( ( level ) => ( {
+				type: 'shortcut',
+				blocks: [ 'core/paragraph' ],
+				shortcut: level,
+				transform( blocks ) {
+					return blocks.map( ( { attributes: { content } } ) => {
+						return createBlock( 'core/heading', {
+							nodeName: `H${ level }`,
+							content,
+						} );
+					} );
+				},
+			} ) ),
 		],
 		to: [
 			{
@@ -92,6 +111,26 @@ export const settings = {
 					} );
 				},
 			},
+			...'23456'.split( '' ).map( ( level ) => ( {
+				type: 'shortcut',
+				shortcut: level,
+				transform( blocks ) {
+					const firstNodeName = first( blocks ).attributes.nodeName;
+					const isSame = blocks.every( ( { attributes: { nodeName } } ) => nodeName === firstNodeName );
+
+					// If already at level, set back to paragraphs.
+					if ( isSame && firstNodeName === `H${ level }` ) {
+						return blocks.map( ( { attributes: { content } } ) => {
+							return createBlock( 'core/paragraph', {
+								content,
+							} );
+						} );
+					}
+
+					return { nodeName: `H${ level }` };
+				},
+			} ) ),
+			...alignmentShortcuts,
 		],
 	},
 
@@ -112,6 +151,7 @@ export const settings = {
 						'234'.split( '' ).map( ( level ) => ( {
 							icon: 'heading',
 							title: sprintf( __( 'Heading %s' ), level ),
+							shortcut: level,
 							isActive: 'H' + level === nodeName,
 							onClick: () => setAttributes( { nodeName: 'H' + level } ),
 							subscript: level,
@@ -128,6 +168,7 @@ export const settings = {
 							'123456'.split( '' ).map( ( level ) => ( {
 								icon: 'heading',
 								title: sprintf( __( 'Heading %s' ), level ),
+								shortcut: level === '1' ? undefined : level,
 								isActive: 'H' + level === nodeName,
 								onClick: () => setAttributes( { nodeName: 'H' + level } ),
 								subscript: level,

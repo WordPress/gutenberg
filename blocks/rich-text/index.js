@@ -35,7 +35,7 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 
-const { BACKSPACE, DELETE, ENTER } = keycodes;
+const { BACKSPACE, DELETE, ENTER, isAccess } = keycodes;
 
 function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -192,6 +192,9 @@ export default class RichText extends Component {
 	onInit() {
 		this.updateFocus();
 		this.registerCustomFormatters();
+
+		// Remove all default block-level shortcuts.
+		'123456789'.split( '' ).forEach( ( number ) => this.editor.shortcuts.remove( `access+${ number }` ) );
 	}
 
 	adaptFormatter( options ) {
@@ -528,6 +531,10 @@ export default class RichText extends Component {
 	onKeyDown( event ) {
 		const dom = this.editor.dom;
 		const rootNode = this.editor.getBody();
+
+		if ( isAccess( event ) ) {
+			this.fireChange();
+		}
 
 		if (
 			( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||

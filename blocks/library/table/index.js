@@ -11,6 +11,7 @@ import './style.scss';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 export const name = 'core/table';
 
@@ -44,6 +45,7 @@ export const settings = {
 				isMatch: ( node ) => node.nodeName === 'TABLE',
 			},
 		],
+		to: alignmentShortcuts,
 	},
 
 	getEditWrapperProps( attributes ) {

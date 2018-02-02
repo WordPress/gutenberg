@@ -16,6 +16,7 @@ import './style.scss';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 const toRichTextValue = value => map( value, ( subValue => subValue.children ) );
 const fromRichTextValue = value => map( value, ( subValue ) => ( {
@@ -56,6 +57,10 @@ export const settings = {
 	category: 'formatting',
 
 	attributes: blockAttributes,
+
+	transforms: {
+		to: alignmentShortcuts,
+	},
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;

@@ -27,6 +27,7 @@ import './style.scss';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 import BlockSelectionClearer from '../block-selection-clearer';
+import BlockListShortcuts from './shortcuts';
 import {
 	getBlockUids,
 	getMultiSelectedBlocksStartUid,
@@ -246,10 +247,14 @@ class BlockList extends Component {
 	}
 
 	render() {
-		const { blocks, showContextualToolbar, renderBlockMenu } = this.props;
+		const { blocks, showContextualToolbar, renderBlockMenu, selectedBlock, multiSelectedBlocks } = this.props;
 
 		return (
 			<BlockSelectionClearer>
+				<BlockListShortcuts
+					selectedBlock={ selectedBlock }
+					multiSelectedBlocks={ multiSelectedBlocks }
+				/>
 				{ !! blocks.length && <BlockInsertionPoint /> }
 				{ map( blocks, ( uid ) => (
 					<BlockListBlock

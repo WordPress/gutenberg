@@ -941,6 +941,23 @@ describe( 'state', () => {
 			expect( state ).toEqual( { start: 'wings', end: 'wings', focus: {}, isMultiSelecting: false } );
 		} );
 
+		it( 'should replace the multi selected blocks', () => {
+			const original = deepFreeze( { start: 'chicken', end: 'chicken', focus: { editable: 'citation' } } );
+			const state = blockSelection( original, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'chicken' ],
+				blocks: [ {
+					uid: 'wings',
+					name: 'core/freeform',
+				}, {
+					uid: 'feather',
+					name: 'core/freeform',
+				} ],
+			} );
+
+			expect( state ).toEqual( { start: 'wings', end: 'feather', focus: null, isMultiSelecting: false } );
+		} );
+
 		it( 'should keep the selected block', () => {
 			const original = deepFreeze( { start: 'chicken', end: 'chicken', focus: { editable: 'citation' } } );
 			const state = blockSelection( original, {

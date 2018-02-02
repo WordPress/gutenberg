@@ -26,6 +26,7 @@ import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
+import alignmentShortcuts from '../../alignment-shortcuts';
 
 const { getComputedStyle } = window;
 
@@ -250,6 +251,7 @@ export const settings = {
 				),
 			},
 		],
+		to: alignmentShortcuts,
 	},
 
 	merge( attributes, attributesToMerge ) {

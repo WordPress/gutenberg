@@ -9,6 +9,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
         "icon": "editor-alignleft",
         "isActive": true,
         "onClick": [Function],
+        "shortcut": "l",
         "title": "Align left",
       },
       Object {
@@ -16,6 +17,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
         "icon": "editor-aligncenter",
         "isActive": false,
         "onClick": [Function],
+        "shortcut": "c",
         "title": "Align center",
       },
       Object {
@@ -23,6 +25,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
         "icon": "editor-alignright",
         "isActive": false,
         "onClick": [Function],
+        "shortcut": "r",
         "title": "Align right",
       },
     ]
