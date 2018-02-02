@@ -150,7 +150,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	save( { attributes, className } ) {
 		const { content, alignment } = attributes;
 
-		return <p className={ className } style={ textAlign: alignment }>{ content }</p>;
+		return <p className={ className } style={ { textAlign: alignment } }>{ content }</p>;
 	},
 } );
 ```
