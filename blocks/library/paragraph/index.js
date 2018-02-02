@@ -7,6 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType,
+	setDefaultBlockName,
+} from '@wordpress/blocks';
 import { concatChildren, Component } from '@wordpress/element';
 import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpress/components';
 
@@ -15,7 +20,6 @@ import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpr
  */
 import './editor.scss';
 import './style.scss';
-import { createBlock } from '../../api';
 import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -192,9 +196,7 @@ class ParagraphBlock extends Component {
 	}
 }
 
-export const name = 'core/paragraph';
-
-export const settings = {
+registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
 
 	description: __( 'This is a simple text only block for adding a single paragraph of content.' ),
@@ -283,4 +285,6 @@ export const settings = {
 
 		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
 	},
-};
+} );
+
+setDefaultBlockName( 'core/paragraph' );

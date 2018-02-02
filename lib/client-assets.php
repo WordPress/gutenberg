@@ -78,27 +78,27 @@ function gutenberg_register_scripts_and_styles() {
 	// Editor Scripts.
 	wp_register_script(
 		'wp-data',
-		gutenberg_url( 'data/build/index.js' ),
+		gutenberg_url( 'build/data.js' ),
 		array( 'wp-element' ),
-		filemtime( gutenberg_dir_path() . 'data/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'build/data.js' )
 	);
 	wp_register_script(
 		'wp-utils',
-		gutenberg_url( 'utils/build/index.js' ),
+		gutenberg_url( 'build/utils.js' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'utils/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'build/utils.js' )
 	);
 	wp_register_script(
 		'wp-hooks',
-		gutenberg_url( 'hooks/build/index.js' ),
+		gutenberg_url( 'build/hooks.js' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'hooks/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'build/hooks.js' )
 	);
 	wp_register_script(
 		'wp-date',
-		gutenberg_url( 'date/build/index.js' ),
+		gutenberg_url( 'build/date.js' ),
 		array( 'moment' ),
-		filemtime( gutenberg_dir_path() . 'date/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'build/date.js' )
 	);
 	global $wp_locale;
 	wp_add_inline_script( 'wp-date', 'window._wpDateSettings = ' . wp_json_encode( array(
@@ -128,27 +128,27 @@ function gutenberg_register_scripts_and_styles() {
 	) ), 'before' );
 	wp_register_script(
 		'wp-i18n',
-		gutenberg_url( 'i18n/build/index.js' ),
+		gutenberg_url( 'build/i18n.js' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'i18n/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'build/i18n.js' )
 	);
 	wp_register_script(
 		'wp-element',
-		gutenberg_url( 'element/build/index.js' ),
+		gutenberg_url( 'build/element.js' ),
 		array( 'react', 'react-dom', 'react-dom-server' ),
-		filemtime( gutenberg_dir_path() . 'element/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'build/element.js' )
 	);
 	wp_register_script(
 		'wp-components',
-		gutenberg_url( 'components/build/index.js' ),
+		gutenberg_url( 'build/components.js' ),
 		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-hooks', 'wp-api-request', 'moment' ),
-		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'build/components.js' )
 	);
 	wp_register_script(
 		'wp-blocks',
-		gutenberg_url( 'blocks/build/index.js' ),
+		gutenberg_url( 'build/blocks.js' ),
 		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-hooks', 'wp-i18n', 'tinymce-latest', 'tinymce-latest-lists', 'tinymce-latest-paste', 'tinymce-latest-table', 'media-views', 'media-models', 'shortcode' ),
-		filemtime( gutenberg_dir_path() . 'blocks/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'build/blocks.js' )
 	);
 	wp_add_inline_script(
 		'wp-blocks',
@@ -161,16 +161,16 @@ function gutenberg_register_scripts_and_styles() {
 
 	wp_register_script(
 		'wp-editor',
-		gutenberg_url( 'editor/build/index.js' ),
+		gutenberg_url( 'build/editor.js' ),
 		array( 'postbox', 'jquery', 'wp-api', 'wp-data', 'wp-date', 'wp-i18n', 'wp-blocks', 'wp-element', 'wp-components', 'wp-utils', 'word-count', 'editor' ),
-		filemtime( gutenberg_dir_path() . 'editor/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'build/editor.js' )
 	);
 
 	wp_register_script(
 		'wp-edit-post',
-		gutenberg_url( 'edit-post/build/index.js' ),
+		gutenberg_url( 'build/editPost.js' ),
 		array( 'jquery', 'heartbeat', 'wp-element', 'wp-components', 'wp-editor', 'wp-i18n', 'wp-date', 'wp-utils', 'wp-data' ),
-		filemtime( gutenberg_dir_path() . 'edit-post/build/index.js' ),
+		filemtime( gutenberg_dir_path() . 'build/editPost.js' ),
 		true
 	);
 
@@ -897,8 +897,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
 	$script .= <<<JS
 		window._wpLoadGutenbergEditor = wp.api.init().then( function() {
-			wp.blocks.registerCoreBlocks();
-			return wp[ 'edit-post' ].initializeEditor( 'editor', window._wpGutenbergPost, editorSettings );
+			return wp.editPost.initializeEditor( 'editor', window._wpGutenbergPost, editorSettings );
 		} );
 JS;
 	$script .= '} )();';

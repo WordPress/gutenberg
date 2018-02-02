@@ -4,6 +4,8 @@
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+const fs = require( 'fs' );
+const { camelCase, castArray } = require( 'lodash' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -53,7 +55,11 @@ const entryPointNames = [
 	'i18n',
 	'utils',
 	'data',
-	'edit-post',
+	[ 'editPost', 'edit-post' ],
+	...fs.readdirSync( './blocks/library' ).map( ( block ) => [
+		'__block_' + camelCase( block ),
+		'blocks/library/' + block,
+	] ),
 ];
 
 const packageNames = [
@@ -77,8 +83,10 @@ const externals = {
 
 const config = {
 	entry: Object.assign(
-		entryPointNames.reduce( ( memo, entryPointName ) => {
-			memo[ entryPointName ] = `./${ entryPointName }/index.js`;
+		entryPointNames.reduce( ( memo, entryPoint ) => {
+			entryPoint = castArray( entryPoint );
+			const [ name, path = name ] = entryPoint;
+			memo[ name ] = `./${ path }/index.js`;
 			return memo;
 		}, {} ),
 		packageNames.reduce( ( memo, packageName ) => {
@@ -87,7 +95,7 @@ const config = {
 		}, {} )
 	),
 	output: {
-		filename: '[name]/build/index.js',
+		filename: 'build/[name].js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
