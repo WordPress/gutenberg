@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 
 export const name = 'core/verse';
 
@@ -54,7 +54,7 @@ export const settings = {
 		const { content } = attributes;
 
 		return (
-			<Editable
+			<RichText
 				tagName="pre"
 				value={ content }
 				onChange={ ( nextContent ) => {

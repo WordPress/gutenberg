@@ -30,7 +30,7 @@ $scheme-sunrise__spot-color: #de823f;
 @mixin admin-scheme-color-overrides( $scheme: fresh, $spot-color: $scheme-fresh__spot-color ) {
 	body.admin-color-#{ ( $scheme ) } {
 		// Tab indicators
-		.editor-sidebar__panel-tab.is-active,
+		.edit-post-sidebar__panel-tab.is-active,
 		.editor-inserter__tab.is-active {
 			border-bottom-color: $spot-color;
 		}

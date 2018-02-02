@@ -267,7 +267,7 @@ function gutenberg_collect_meta_box_data() {
 	 * this, and try to get this data to load directly into the editor settings.
 	 */
 	wp_add_inline_script(
-		'wp-editor',
+		'wp-edit-post',
 		'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
 	);
 

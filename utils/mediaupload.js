@@ -34,7 +34,7 @@ export function mediaUpload( filesList, onImagesChange ) {
 
 		return createMediaFromFile( mediaFile ).then(
 			( savedMedia ) => {
-				setAndUpdateImages( idx, { id: savedMedia.id, url: savedMedia.source_url } );
+				setAndUpdateImages( idx, { id: savedMedia.id, url: savedMedia.source_url, link: savedMedia.link } );
 			},
 			() => {
 				// Reset to empty on failure.

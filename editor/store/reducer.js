@@ -6,14 +6,11 @@ import { combineReducers } from 'redux';
 import {
 	flow,
 	partialRight,
-	difference,
 	reduce,
 	keyBy,
-	keys,
 	first,
 	last,
 	omit,
-	pick,
 	without,
 	mapValues,
 	findIndex,
@@ -23,7 +20,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, getBlockType } from '@wordpress/blocks';
+import { isReusableBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,11 +28,6 @@ import { getBlockTypes, getBlockType } from '@wordpress/blocks';
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
 import { PREFERENCES_DEFAULTS } from './defaults';
-
-/***
- * Module constants
- */
-const MAX_RECENT_BLOCKS = 8;
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -74,9 +66,9 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	partialRight( withHistory, { resetTypes: [ 'SETUP_EDITOR' ] } ),
 
-	// Track whether changes exist, starting at editor initialization and
-	// resetting at each post save.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
+	// Track whether changes exist, resetting at each post save. Relies on
+	// editor initialization firing post reset as an effect.
+	partialRight( withChangeDetection, { resetTypes: [ 'RESET_POST' ] } ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
@@ -499,20 +491,21 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point.
+ * Reducer returning the block insertion point visibility, a boolean value
+ * reflecting whether the insertion point should be shown.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @returns {Object} Updated state.
  */
-export function blockInsertionPoint( state = {}, action ) {
+export function isInsertionPointVisible( state = false, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
-			return { ...state, visible: true, position: action.index };
+			return true;
 
 		case 'HIDE_INSERTION_POINT':
-			return { ...state, visible: false, position: null };
+			return false;
 	}
 
 	return state;
@@ -532,35 +525,27 @@ export function blockInsertionPoint( state = {}, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
-			// record the block usage and put the block in the recently used blocks
-			let blockUsage = state.blockUsage;
-			let recentlyUsedBlocks = [ ...state.recentlyUsedBlocks ];
-			action.blocks.forEach( ( block ) => {
-				const uses = ( blockUsage[ block.name ] || 0 ) + 1;
-				blockUsage = omit( blockUsage, block.name );
-				blockUsage[ block.name ] = uses;
-				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, MAX_RECENT_BLOCKS );
-			} );
-			return {
-				...state,
-				blockUsage,
-				recentlyUsedBlocks,
-			};
-		case 'SETUP_EDITOR':
-			const isBlockDefined = name => getBlockType( name ) !== undefined;
-			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
-			const filterInvalidBlocksFromObject = obj => pick( obj, keys( obj ).filter( isBlockDefined ) );
-			const commonBlocks = getBlockTypes()
-				.filter( ( blockType ) => 'common' === blockType.category )
-				.map( ( blockType ) => blockType.name );
+			return action.blocks.reduce( ( prevState, block ) => {
+				const insert = { name: block.name };
+				if ( isReusableBlock( block ) ) {
+					insert.ref = block.attributes.ref;
+				}
 
+				const isSameAsInsert = ( { name, ref } ) => name === insert.name && ref === insert.ref;
+
+				return {
+					...prevState,
+					recentInserts: [
+						insert,
+						...reject( prevState.recentInserts, isSameAsInsert ),
+					],
+				};
+			}, state );
+
+		case 'REMOVE_REUSABLE_BLOCK':
 			return {
 				...state,
-				// recently used gets filled up to `MAX_RECENT_BLOCKS` with blocks from the common category
-				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
-					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
-					.slice( 0, MAX_RECENT_BLOCKS ),
-				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
+				recentInserts: reject( state.recentInserts, insert => insert.ref === action.id ),
 			};
 	}
 
@@ -798,7 +783,7 @@ export default optimist( combineReducers( {
 	blockSelection,
 	hoveredBlock,
 	blocksMode,
-	blockInsertionPoint,
+	isInsertionPointVisible,
 	preferences,
 	saving,
 	notices,

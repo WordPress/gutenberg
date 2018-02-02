@@ -21,7 +21,12 @@ import ReusableBlockSettings from './reusable-block-settings';
 import UnknownConverter from './unknown-converter';
 import { selectBlock } from '../../store/actions';
 
-function BlockSettingsMenu( { uids, onSelect, focus, renderBlockMenu = () => null } ) {
+function BlockSettingsMenu( {
+	uids,
+	onSelect,
+	focus,
+	renderBlockMenu = ( { children } ) => children }
+) {
 	const count = uids.length;
 
 	return (

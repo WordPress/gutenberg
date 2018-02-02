@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -18,6 +13,7 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import './editor.scss';
+import PlainText from '../../plain-text';
 
 export class Shortcode extends Component {
 	constructor() {
@@ -36,7 +32,7 @@ export class Shortcode extends Component {
 	}
 
 	doServerSideRender( event ) {
-		//This function sends the shortcode content and post ID to the rest endpoint, 
+		//This function sends the shortcode content and post ID to the rest endpoint,
 		//and retrieves the filtered shortcode content to be rendered in Preview
 
 		if ( event ) {
@@ -46,13 +42,13 @@ export class Shortcode extends Component {
 		//Get post ID from redux store
 		const postId = this.props.postId;
 		let shortcode = this.props.attributes.text;
+		shortcode = ( shortcode ) ? shortcode.trim() : '';
 		const apiUrl = addQueryArgs( wpApiSettings.root + 'gutenberg/v1/shortcodes', {
 			shortcode: shortcode,
 			postId: postId,
 			_wpnonce: wpApiSettings.nonce,
 
 		} );
-		shortcode = ( shortcode ) ? shortcode.trim() : '';
 		if ( 0 === postId.length || null === postId ) {
 			//We don't have a post ID yet
 			this.setState( { html: __( 'Something went wrong. Try saving the post and try again' ) } );
@@ -107,15 +103,11 @@ export class Shortcode extends Component {
 						<Dashicon icon="editor-code" />
 						{ __( 'Shortcode' ) }
 					</label>
-					<TextareaAutosize
+					<PlainText
 						id={ inputId }
-						autoComplete="off"
 						value={ attributes.text }
 						placeholder={ __( 'Write shortcode here…' ) }
-						onFocus={ setFocus }
-						onChange={ ( event ) => setAttributes( {
-							text: event.target.value,
-						} ) }
+						onChange={ ( text ) => setAttributes( { text } ) }
 					/>
 				</div>,
 			];

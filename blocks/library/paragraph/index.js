@@ -20,7 +20,7 @@ import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
 import RangeControl from '../../inspector-controls/range-control';
@@ -146,7 +146,7 @@ class ParagraphBlock extends Component {
 					userAutocompleter(),
 				] }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
-						<Editable
+						<RichText
 							tagName="p"
 							className={ classnames( 'wp-block-paragraph', className, {
 								[ `align${ width }` ]: width,

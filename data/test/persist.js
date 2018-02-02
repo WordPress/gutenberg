@@ -48,7 +48,7 @@ describe( 'loadAndPersist', () => {
 	it( 'should persist to local storage once the state value changes', () => {
 		const storageKey = 'dumbStorageKey2';
 		const reducer = ( state, action ) => {
-			if ( action.type === 'REDUX_SERIALIZE' ) {
+			if ( action.type === 'SERIALIZE' ) {
 				return state;
 			}
 
