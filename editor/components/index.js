@@ -69,3 +69,6 @@ export { default as WritingFlow } from './writing-flow';
 
 // State Related Components
 export { default as EditorProvider } from './provider';
+
+// Higher-Order Components
+export { default as ifPostTypeSupports } from './higher-order/if-post-type-supports';
