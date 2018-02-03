@@ -38,6 +38,13 @@
 		max-width: $visual-editor-max-width;
 		padding: $block-padding;
 		text-align: center;
+
+		a,
+		a:hover,
+		a:focus,
+		a:active {
+			color: white;
+		}
 	}
 
 	&.has-parallax {
