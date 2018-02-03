@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { debounce, includes } from 'lodash';
+import { debounce, includes, upperFirst, toLower } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,6 @@ import {
 	findDOMNode,
 	concatChildren,
 } from '@wordpress/element';
-import { firstCharacterUppercase } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -179,7 +178,7 @@ class Tooltip extends Component {
 					className="components-tooltip"
 					aria-hidden="true"
 				>
-					{ firstCharacterUppercase( text ) }
+					{ upperFirst( toLower( text ) ) }
 				</Popover>,
 			),
 		} );
