@@ -84,49 +84,57 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		$yt_pattern    = '#https?://(?:www\.)?(?:youtube\.com/watch|youtu\.be/)#';
 		$vimeo_pattern = '#https?://(.+\.)?vimeo\.com/.*#';
 		$args          = $request->get_params();
-		$post          = get_post( $args['postId'] );
+		$post          = isset( $args['postId'] ) ? get_post( $args['postId'] ) : null;
+		$shortcode     = isset( $args['shortcode'] ) ? $args['shortcode'] : '';
 		$cache_key     = 'shortcode_' . md5( serialize( $args ) );
 		$data          = get_transient( $cache_key );
 		if ( ! empty( $data ) ) {
 			return rest_ensure_response( $data );
 		}
+		// Initialize $data.
+		$data = array(
+			'html'  => $output,
+			'type'  => $type,
+			'style' => $style,
+			'js'    => $js,
+		);
 
-		setup_postdata( $post );
+		if ( empty( $shortcode ) ) {
+			return rest_ensure_response( $data );
+		}
+
+		if ( ! empty( $post ) ) {
+			setup_postdata( $post );
+		}
 
 		// Since the [embed] shortcode needs to be run earlier than other shortcodes.
-		if ( has_shortcode( $args['shortcode'], 'embed' ) ) {
-			$output = $wp_embed->run_shortcode( $args['shortcode'] );
+		if ( has_shortcode( $shortcode, 'embed' ) ) {
+			$output = $wp_embed->run_shortcode( $shortcode );
 		} else {
-			$output = do_shortcode( $args['shortcode'] );
+			$output = do_shortcode( $shortcode );
 		}
 
 		if ( empty( $output ) ) {
-			$data = array(
-				'html'  => $output,
-				'type'  => $type,
-				'style' => $style,
-				'js'    => $js,
-			);
 			return rest_ensure_response( $data );
 		}
 
 		// Check if shortcode is returning a video. The video type will be used by the frontend to maintain 16:9 aspect ratio.
 		// TODO: Extend embed video compare to other services too, such as videopress.
-		if ( has_shortcode( $args['shortcode'], 'video' ) ) {
+		if ( has_shortcode( $shortcode, 'video' ) ) {
 			$type = 'video';
-		} elseif ( has_shortcode( $args['shortcode'], 'embed' ) && preg_match( $yt_pattern, $args['shortcode'] ) ) {
+		} elseif ( has_shortcode( $shortcode, 'embed' ) && preg_match( $yt_pattern, $shortcode ) ) {
 			$type = 'video';
-		} elseif ( has_shortcode( $args['shortcode'], 'embed' ) && preg_match( $vimeo_pattern, $args['shortcode'] ) ) {
+		} elseif ( has_shortcode( $shortcode, 'embed' ) && preg_match( $vimeo_pattern, $shortcode ) ) {
 			$type = 'video';
 		} else {
 			$type = 'html';
 			// Gallery and caption shortcodes need the theme style to be embedded in the shortcode preview iframe.
-			if ( has_shortcode( $args['shortcode'], 'gallery' ) || has_shortcode( $args['shortcode'], 'caption' ) || has_shortcode( $args['shortcode'], 'wp_caption' ) ) {
+			if ( has_shortcode( $shortcode, 'gallery' ) || has_shortcode( $shortcode, 'caption' ) || has_shortcode( $shortcode, 'wp_caption' ) ) {
 				$style = '<link rel="stylesheet" type="text/css" href="' . get_stylesheet_uri() . '" />';
 			}
 
 			// Playlist shortcodes need the playlist JS to be embedded in the shortcode preview iframe.
-			if ( has_shortcode( $args['shortcode'], 'playlist' ) ) {
+			if ( has_shortcode( $shortcode, 'playlist' ) ) {
 				ob_start();
 				wp_footer();
 				$js = ob_get_clean();
