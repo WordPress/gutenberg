@@ -85,7 +85,7 @@ export class Shortcode extends Component {
 					<button
 						className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` }
 						onClick={ () => this.setState( { preview: false } ) }>
-						<span>Shortcode</span>
+						<span>{ __( 'Shortcode' ) }</span>
 					</button>
 					<button
 						className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
