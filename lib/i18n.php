@@ -41,6 +41,9 @@ function gutenberg_get_jed_locale_data( $domain ) {
 		$locale['locale_data'][ $domain ][ $msgid ] = $entry->translations;
 	}
 
+	/*
+	 * Get Third Party textdomains to add custom translation to Jed local data
+	 */
 	$third_party_translation_domains = apply_filters( 'gutenberg_get_third_party_translation_domains', array() );
 	if ( ! empty( $third_party_translation_domains ) ) {
 		foreach ( $third_party_translation_domains as $third_party_domain ) {
