@@ -45,7 +45,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	S( momentDate ) {
 		// Do - D
@@ -60,7 +60,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	z( momentDate ) {
 		// DDD - 1
@@ -80,7 +80,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	t( momentDate ) {
 		return momentDate.daysInMonth();
@@ -92,7 +92,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	L( momentDate ) {
 		return momentDate.isLeapYear() ? '1' : '0';
@@ -109,7 +109,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	B( momentDate ) {
 		const timezoned = moment( momentDate ).utcOffset( 60 );
@@ -140,7 +140,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	I( momentDate ) {
 		return momentDate.isDST() ? '1' : '0';
@@ -153,7 +153,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	Z( momentDate ) {
 		// Timezone offset in seconds.
@@ -226,7 +226,7 @@ function setupLocale( settings ) {
  * @param {(Date|string|moment|null)} dateValue  Date object or string,
  *                                               parsable by moment.js.
  *
- * @returns {string} Formatted date.
+ * @return {string} Formatted date.
  */
 export function format( dateFormat, dateValue = new Date() ) {
 	let i, char;
@@ -267,7 +267,7 @@ export function format( dateFormat, dateValue = new Date() ) {
  * @param {(Date|string|moment|null)} dateValue  Date object or string,
  *                                               parsable by moment.js.
  *
- * @returns {string} Formatted date.
+ * @return {string} Formatted date.
  */
 export function date( dateFormat, dateValue = new Date() ) {
 	const offset = window._wpDateSettings.timezone.offset * HOUR_IN_MINUTES;
@@ -283,7 +283,7 @@ export function date( dateFormat, dateValue = new Date() ) {
  * @param {(Date|string|moment|null)} dateValue  Date object or string,
  *                                               parsable by moment.js.
  *
- * @returns {string} Formatted date.
+ * @return {string} Formatted date.
  */
 export function gmdate( dateFormat, dateValue = new Date() ) {
 	const dateMoment = moment( dateValue ).utc();
@@ -300,7 +300,7 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
  * @param {boolean}                   gmt        True for GMT/UTC, false for
  *                                               site's timezone.
  *
- * @returns {string} Formatted date.
+ * @return {string} Formatted date.
  */
 export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 	// Defaults.

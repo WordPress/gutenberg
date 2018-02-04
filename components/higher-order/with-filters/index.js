@@ -19,7 +19,7 @@ const ANIMATION_FRAME_PERIOD = 16;
  *
  * @param {string} hookName Hook name exposed to be used by filters.
  *
- * @returns {Function} Higher-order component factory.
+ * @return {Function} Higher-order component factory.
  */
 export default function withFilters( hookName ) {
 	return ( OriginalComponent ) => {

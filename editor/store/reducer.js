@@ -35,7 +35,7 @@ import { PREFERENCES_DEFAULTS } from './defaults';
  *
  * @param {*} value Original value.
  *
- * @returns {*} Raw value.
+ * @return {*} Raw value.
  */
 export function getPostRawValue( value ) {
 	if ( value && 'object' === typeof value && 'raw' in value ) {
@@ -305,7 +305,7 @@ export const editor = flow( [
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
@@ -335,7 +335,7 @@ export function currentPost( state = {}, action ) {
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @returns {boolean} Updated state.
+ * @return {boolean} Updated state.
  */
 export function isTyping( state = false, action ) {
 	switch ( action.type ) {
@@ -355,7 +355,7 @@ export function isTyping( state = false, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export function blockSelection( state = {
 	start: null,
@@ -457,7 +457,7 @@ export function blockSelection( state = {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export function hoveredBlock( state = null, action ) {
 	switch ( action.type ) {
@@ -497,7 +497,7 @@ export function blocksMode( state = {}, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export function isInsertionPointVisible( state = false, action ) {
 	switch ( action.type ) {
@@ -520,7 +520,7 @@ export function isInsertionPointVisible( state = false, action ) {
  * @param {Object}  state.panels          The state of the different sidebar panels.
  * @param {Object}  action                Dispatched action.
  *
- * @returns {string} Updated state.
+ * @return {string} Updated state.
  */
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
@@ -559,7 +559,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export function saving( state = {}, action ) {
 	switch ( action.type ) {
@@ -633,7 +633,7 @@ const defaultMetaBoxState = locations.reduce( ( result, key ) => {
  *
  * @param {boolean}  state   Previous state.
  * @param {Object}   action  Action Object.
- * @returns {Object}         Updated state.
+ * @return {Object}         Updated state.
  */
 export function isSavingMetaBoxes( state = false, action ) {
 	switch ( action.type ) {
@@ -656,7 +656,7 @@ export function isSavingMetaBoxes( state = false, action ) {
  *
  * @param {boolean}  state   Previous state.
  * @param {Object}   action  Action Object.
- * @returns {Object}         Updated state.
+ * @return {Object}         Updated state.
  */
 export function metaBoxes( state = defaultMetaBoxState, action ) {
 	switch ( action.type ) {
