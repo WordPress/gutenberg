@@ -40,6 +40,20 @@ function gutenberg_get_jed_locale_data( $domain ) {
 	foreach ( $translations->entries as $msgid => $entry ) {
 		$locale['locale_data'][ $domain ][ $msgid ] = $entry->translations;
 	}
+	
+	$third_party_translation_domains = apply_filters( 'gutenberg_get_third_party_translation_domains', array() );
+	if ( ! empty( $third_party_translation_domains ) ) {
+		foreach ( $third_party_translation_domains as $third_party_domain ) {
+			$translations = get_translations_for_domain( $third_party_domain );
+			if ( ! $translations ) {
+				continue;
+			}
+			foreach ( $translations->entries as $msgid => $entry ) {
+				$locale['locale_data'][ $domain ][ $msgid ] = $entry->translations;
+				$locale['locale_data'][ $domain ]['domain'] = $third_party_domain;
+			}
+		}
+	}
 
 	return $locale;
 }
