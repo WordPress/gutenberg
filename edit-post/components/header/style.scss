@@ -49,10 +49,10 @@
 		position: absolute;
 		z-index: -1;
 		background: $dark-gray-500;
-		top: 0px;
-		right: 0px;
-		bottom: 0px;
-		left: 0px;
+		top: 1px;
+		right: 1px;
+		bottom: 1px;
+		left: 1px;
 	}
 
 	&.is-toggled:hover,

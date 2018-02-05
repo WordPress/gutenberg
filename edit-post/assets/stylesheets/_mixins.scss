@@ -119,11 +119,10 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 @mixin button-style__disabled {
 	opacity: 0.6;
 	cursor: default;
-	border: 1px solid transparent;
 }
 
 @mixin button-style__neutral {
-	border: 1px solid transparent;
+	transition: unset;
 }
 
 @mixin button-style__hover {
@@ -148,7 +147,6 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 
 // Tabs
 @mixin tab-style__neutral() {
-	outline: 1px solid transparent;
 	outline-offset: -1px;
 }
 
@@ -159,24 +157,25 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 
 // Inputs
 @mixin input-style__neutral() {
-	border: 1px solid transparent;
+	outline-offset: -1px;
 }
 
 @mixin input-style__focus-active() {
-	outline: none;
 	color: $dark-gray-900;
-	border: 1px solid $dark-gray-300;
+	outline: 1px solid $dark-gray-300;
 }
 
 // Inputs
 @mixin menu-style__neutral() {
-	border: 1px solid transparent;
+	border: none;
+	box-shadow: none;
 }
 
 @mixin menu-style__focus() {
-	outline: none;
+	border: none;
+	outline-offset: -1px;
 	color: $dark-gray-900;
-	border: 1px dotted $dark-gray-300;
+	outline: 1px dotted $dark-gray-300;
 }
 
 

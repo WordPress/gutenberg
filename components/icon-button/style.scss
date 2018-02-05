@@ -9,7 +9,7 @@
 	width: $icon-button-size;	// show only icon on small breakpoints
 	overflow: hidden;
 
-	padding: 7px;				// should be 8px, subtract 1px to account for a transparent border
+	padding: 8px;
 	@include button-style__neutral;
 
 	.dashicon {
@@ -19,6 +19,12 @@
 
 	@include break-medium() {
 		width: auto;
+	}
+
+	&:not( :disabled ):hover,
+	&:not( :disabled ):active,
+	&:not( :disabled ):focus {
+		padding: 7px;				// subtract 1px to account for a transparent border
 	}
 
 	&:not( :disabled ):hover {

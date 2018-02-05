@@ -26,6 +26,7 @@
 	}
 
 	&:hover {
+		@include menu-style__neutral()
 		color: $black;
 	}
 

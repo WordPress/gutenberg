@@ -5,8 +5,14 @@
 	}
 
 	.components-icon-button {
-		padding: 7px 3px;	// should be 8px 4px but subtract 1px to account for a transparent border
+		padding: 8px 4px;
 		width: auto;
+
+		&:hover,
+		&:active,
+		&:focus {
+			padding: 7px 3px;	// subtract 1px to account for a transparent border
+		}
 	}
 
 	.components-button svg {
