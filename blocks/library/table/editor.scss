@@ -17,10 +17,9 @@
 }
 
 .wp-block-table {
-	td,
-	th {
-		padding: 0.5em;
-		border: 1px solid currentColor;
+	table {
+		border-collapse: collapse;
+		width: 100%;
 	}
 
 	td[data-mce-selected="1"], th[data-mce-selected="1"] {
