@@ -27,7 +27,7 @@ export class DefaultBlockAppender extends Component {
 
 		return (
 			<div className="editor-default-block-appender">
-				<BlockDropZone />
+				{ ( count === 0 || showAppender ) && <BlockDropZone /> }
 				{ count === 0 &&
 					<input
 						className="editor-default-block-appender__content"
