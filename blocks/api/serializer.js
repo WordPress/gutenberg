@@ -3,12 +3,13 @@
  */
 import { isEmpty, reduce, isObject, castArray, compact, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
+import isEqualShallow from 'is-equal-shallow';
 
 /**
  * WordPress dependencies
  */
-import { Component, createElement, renderToString, cloneElement, Children } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
+import { Component, cloneElement, renderToString } from '@wordpress/element';
+import { hasFilter, applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -37,37 +38,46 @@ export function getBlockDefaultClassname( blockName ) {
  * @return {Object|string} Save content.
  */
 export function getSaveElement( blockType, attributes ) {
-	const { save } = blockType;
+	let { save } = blockType;
 
-	let saveElement;
-
+	// Component classes are unsupported for save since serialization must
+	// occur synchronously. For improved interoperability with higher-order
+	// components which often return component class, emulate basic support.
 	if ( save.prototype instanceof Component ) {
-		saveElement = createElement( save, { attributes } );
-	} else {
-		saveElement = save( { attributes } );
+		const instance = new save( { attributes } );
+		save = instance.render.bind( instance );
+	}
+
+	let element = save( { attributes } );
+
+	if ( isObject( element ) && hasFilter( 'blocks.getSaveContent.extraProps' ) ) {
+		/**
+		 * Filters the props applied to the block save result element.
+		 *
+		 * @param {Object}      props      Props applied to save element.
+		 * @param {WPBlockType} blockType  Block type definition.
+		 * @param {Object}      attributes Block attributes.
+		 */
+		const props = applyFilters(
+			'blocks.getSaveContent.extraProps',
+			{ ...element.props },
+			blockType,
+			attributes
+		);
+
+		if ( ! isEqualShallow( props, element.props ) ) {
+			element = cloneElement( element, props );
+		}
 	}
 
 	/**
 	 * Filters the save result of a block during serialization.
 	 *
-	 * @param {WPElement}   saveElement Block save result.
-	 * @param {WPBlockType} blockType   Block type definition.
-	 * @param {Object}      attributes  Block attributes.
+	 * @param {WPElement}   element    Block save result.
+	 * @param {WPBlockType} blockType  Block type definition.
+	 * @param {Object}      attributes Block attributes.
 	 */
-	saveElement = applyFilters( 'blocks.getSaveContent.saveElement', saveElement, blockType, attributes );
-
-	const addExtraContainerProps = ( element ) => {
-		if ( ! element || ! isObject( element ) ) {
-			return element;
-		}
-
-		// Applying the filters adding extra props
-		const props = applyFilters( 'blocks.getSaveContent.extraProps', { ...element.props }, blockType, attributes );
-
-		return cloneElement( element, props );
-	};
-
-	return Children.map( saveElement, addExtraContainerProps );
+	return applyFilters( 'blocks.getSaveElement', element, blockType, attributes );
 }
 
 /**

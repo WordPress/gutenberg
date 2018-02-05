@@ -117,7 +117,7 @@ describe( 'block serializer', () => {
 					{ fruit: 'Bananas' }
 				);
 
-				expect( saved ).toBe( '<div>Bananas</div>' );
+				expect( saved ).toBe( '<div class="wp-block-fruit">Bananas</div>' );
 			} );
 		} );
 	} );
