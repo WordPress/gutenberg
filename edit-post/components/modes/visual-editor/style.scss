@@ -78,6 +78,11 @@
 	@include break-small() {
 		padding: 0 $block-mover-padding-visible;	// don't subtract 1px border because it's a border not an outline
 
+		.components-drop-zone {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
+
 		.editor-default-block-appender__content {
 			padding: 0 $block-padding;
 		}
