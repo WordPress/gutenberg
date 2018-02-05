@@ -17,7 +17,7 @@ import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
 import formattingTransformer from './formatting-transformer';
 import msListConverter from './ms-list-converter';
-import listMerger from './list-merger';
+import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
 import tableNormaliser from './table-normaliser';
@@ -113,7 +113,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 		] );
 
 		piece = deepFilterHTML( piece, [
-			listMerger,
+			listReducer,
 			imageCorrector,
 			// Add semantic formatting before attributes are stripped.
 			formattingTransformer,
