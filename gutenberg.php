@@ -390,38 +390,6 @@ function gutenberg_add_edit_link( $actions, $post ) {
 }
 
 /**
- * Sets the default behaviour for the "Add New" button to go to the classic editor.
- * If JavaScript is enabled, this will be replaced by a button that goes to Gutenberg.
- *
- * @since 1.5.0
- *
- * @param string $url  The URL to modify.
- * @param string $path The path part of $url.
- *
- * @return string The URL with the classic-editor parameter added.
- */
-function gutenberg_modify_add_new_button_url( $url, $path ) {
-	global $pagenow;
-
-	if ( 'edit.php' !== $pagenow ) {
-		return $url;
-	}
-
-	if ( ! preg_match( '/^post-new.php(\?post_type=[^&]*)?$/', $path ) ) {
-		return $url;
-	}
-
-	// The Add New button should be the only thing calling admin_url() from global scope.
-	$stack = wp_debug_backtrace_summary( null, 0, false );
-	if ( 'admin_url' !== end( $stack ) ) {
-		return $url;
-	}
-
-	return add_query_arg( 'classic-editor', '', $url );
-}
-add_filter( 'admin_url', 'gutenberg_modify_add_new_button_url', 10, 2 );
-
-/**
  * Prints the JavaScript to replace the default "Add New" button.$_COOKIE
  *
  * @since 1.5.0
@@ -518,13 +486,14 @@ function gutenberg_replace_default_add_new_button() {
 			}
 
 			var url = button.href;
-			var newUrl = url.replace( /[&\?]?classic-editor/, '' );
+			var urlHasParams = ( -1 !== url.indexOf( '?' ) ); 
+			var classicUrl = url + ( urlHasParams ? '&' : '?' ) + 'classic-editor';
 
 			var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
-			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a>';
+			newbutton += '<a href="' + url + '">' + button.innerText + '</a>';
 			newbutton += '<span class="expander" tabindex="0" role="button" aria-haspopup="true" aria-label="<?php echo esc_js( __( 'Toggle editor selection menu', 'gutenberg' ) ); ?>"></span>';
-			newbutton += '<span class="dropdown"><a href="' + newUrl + '">Gutenberg</a>';
-			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
+			newbutton += '<span class="dropdown"><a href="' + url + '">Gutenberg</a>';
+			newbutton += '<a href="' + classicUrl + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
 
 			button.insertAdjacentHTML( 'afterend', newbutton );
 			button.remove();
