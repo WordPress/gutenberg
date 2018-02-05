@@ -529,7 +529,7 @@ function gutenberg_replace_default_add_new_button() {
 			button.remove();
 
 			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
-			var dropdown = expander.parentNode.getElementsByClassName( 'dropdown' ).item( 0 );
+			var dropdown = expander.parentNode.querySelector( '.dropdown' );
 			function toggleDropdown() {
 				dropdown.classList.toggle( 'visible' );
 			}
