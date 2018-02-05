@@ -10,3 +10,4 @@ A list of meetups about Gutenberg so far:
 - [Gutenberg Editor & Review](https://wpmeetups.de/termin/29-wp-meetup-stuttgart-gutenberg-editor-rueckblick-wordcamp-europe/), WordCamp Europe
 - [Diving into Gutenberg by Tammie Lister](https://www.meetup.com/Big-Media-Enterprise-WordPress-London-Meetup/events/243302081/), London, UK
 - [What's New In WordPress 4.9 and Gutenberg 1.5](https://www.meetup.com/Tuscaloosa-WordPress-Meetup/events/244584939/), Tuscaloosa, Alabama, USA
+- [WordPress & JavaScript: Let's talk Gutenberg!](https://www.meetup.com/WordPress-Lahore/events/246446478/), Lahore, PK
