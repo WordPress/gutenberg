@@ -4,11 +4,14 @@
 import { sortBy } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { createBlock, BlockIcon } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
-import { createBlock, getBlockTypes } from '../api';
-import BlockIcon from '../block-icon';
 
 /**
  * @typedef {Object} CompleterOption
@@ -65,15 +68,15 @@ import BlockIcon from '../block-icon';
  *
  * @returns {Completer} Completer object used by the Autocomplete component.
  */
-export function blockAutocompleter( { onReplace } ) {
+export function blockAutocompleter( { items, onReplace } ) {
 	// Prioritize common category in block type options
 	const options = sortBy(
-		getBlockTypes(),
+		items,
 		( { category } ) => 'common' !== category
-	).map( ( blockType ) => {
-		const { name, title, icon, keywords = [] } = blockType;
+	).map( ( item ) => {
+		const { title, icon, keywords = [] } = item;
 		return {
-			value: name,
+			value: item,
 			label: [
 				<BlockIcon key="icon" icon={ icon } />,
 				title,
@@ -88,8 +91,8 @@ export function blockAutocompleter( { onReplace } ) {
 		return ! ( /\S/.test( before.toString() ) || /\S/.test( after.toString() ) );
 	};
 
-	const onSelect = ( blockName ) => {
-		onReplace( createBlock( blockName ) );
+	const onSelect = ( item ) => {
+		onReplace( createBlock( item.name, item.initialAttributes ) );
 	};
 
 	return {

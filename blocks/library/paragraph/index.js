@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren, Component } from '@wordpress/element';
-import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpress/components';
+import { PanelBody, PanelColor, withFallbackStyles } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -16,7 +16,6 @@ import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpr
 import './editor.scss';
 import './style.scss';
 import { createBlock } from '../../api';
-import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -141,52 +140,41 @@ class ParagraphBlock extends Component {
 				</InspectorControls>
 			),
 			<div key="editable" ref={ this.bindRef }>
-				<Autocomplete completers={ [
-					blockAutocompleter( { onReplace } ),
-					userAutocompleter(),
-				] }>
-					{ ( { isExpanded, listBoxId, activeId } ) => (
-						<RichText
-							tagName="p"
-							className={ classnames( 'wp-block-paragraph', className, {
-								[ `align${ width }` ]: width,
-								'has-background': backgroundColor,
-							} ) }
-							style={ {
-								backgroundColor: backgroundColor,
-								color: textColor,
-								fontSize: fontSize ? fontSize + 'px' : undefined,
-								textAlign: align,
-							} }
-							value={ content }
-							onChange={ ( nextContent ) => {
-								setAttributes( {
-									content: nextContent,
-								} );
-							} }
-							focus={ focus }
-							onFocus={ setFocus }
-							onSplit={ insertBlocksAfter ?
-								( before, after, ...blocks ) => {
-									setAttributes( { content: before } );
-									insertBlocksAfter( [
-										...blocks,
-										createBlock( 'core/paragraph', { content: after } ),
-									] );
-								} :
-								undefined
-							}
-							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
-							onRemove={ () => onReplace( [] ) }
-							placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-							aria-autocomplete="list"
-							aria-expanded={ isExpanded }
-							aria-owns={ listBoxId }
-							aria-activedescendant={ activeId }
-						/>
-					) }
-				</Autocomplete>
+				<RichText
+					tagName="p"
+					className={ classnames( 'wp-block-paragraph', className, {
+						[ `align${ width }` ]: width,
+						'has-background': backgroundColor,
+					} ) }
+					style={ {
+						backgroundColor: backgroundColor,
+						color: textColor,
+						fontSize: fontSize ? fontSize + 'px' : undefined,
+						textAlign: align,
+					} }
+					value={ content }
+					onChange={ ( nextContent ) => {
+						setAttributes( {
+							content: nextContent,
+						} );
+					} }
+					focus={ focus }
+					onFocus={ setFocus }
+					onSplit={ insertBlocksAfter ?
+						( before, after, ...blocks ) => {
+							setAttributes( { content: before } );
+							insertBlocksAfter( [
+								...blocks,
+								createBlock( 'core/paragraph', { content: after } ),
+							] );
+						} :
+						undefined
+					}
+					onMerge={ mergeBlocks }
+					onReplace={ onReplace }
+					onRemove={ () => onReplace( [] ) }
+					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+				/>
 			</div>,
 		];
 	}
