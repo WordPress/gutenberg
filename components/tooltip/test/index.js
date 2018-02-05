@@ -35,7 +35,7 @@ describe( 'Tooltip', () => {
 			expect( popover.prop( 'isOpen' ) ).toBe( false );
 			expect( popover.prop( 'focusOnOpen' ) ).toBe( false );
 			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
-			expect( popover.children().text() ).toBe( 'Help Text' );
+			expect( popover.children().text() ).toBe( 'Help text' );
 		} );
 
 		it( 'should show popover on focus', () => {
