@@ -425,11 +425,14 @@ export function initializeMetaBoxState( metaBoxes ) {
 /**
  * Returns an action object used to request meta box update.
  *
- * @return {Object} Action object.
+ * @param   {Object} post Post object.
+ *
+ * @return {Object}      Action object.
  */
-export function requestMetaBoxUpdates() {
+export function requestMetaBoxUpdates( post ) {
 	return {
 		type: 'REQUEST_META_BOX_UPDATES',
+		post,
 	};
 }
 
