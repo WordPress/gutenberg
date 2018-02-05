@@ -59,7 +59,7 @@ class TimePicker extends Component {
 	}
 
 	updateHours() {
-		const { is12Hour, onChange } = this.props;
+		const { is12Hour, onChange, format } = this.props;
 		const { am, hours, date } = this.state;
 		const value = parseInt( hours, 10 );
 		if (
@@ -75,12 +75,12 @@ class TimePicker extends Component {
 			date.clone().hours( am === 'AM' ? value % 12 : ( ( ( value % 12 ) + 12 ) % 24 ) ) :
 			date.clone().hours( value );
 		this.setState( { date: newDate } );
-		const formattedDate = newDate.format( TIMEZONELESS_FORMAT );
+		const formattedDate = newDate.format( format || TIMEZONELESS_FORMAT );
 		onChange( formattedDate );
 	}
 
 	updateMinutes() {
-		const { onChange } = this.props;
+		const { onChange, format } = this.props;
 		const { minutes, date } = this.state;
 		const value = parseInt( minutes, 10 );
 		if ( ! isInteger( value ) || value < 0 || value > 59 ) {
@@ -89,13 +89,13 @@ class TimePicker extends Component {
 		}
 		const newDate = date.clone().minutes( value );
 		this.setState( { date: newDate } );
-		const formattedDate = newDate.format( TIMEZONELESS_FORMAT );
+		const formattedDate = newDate.format( format || TIMEZONELESS_FORMAT );
 		onChange( formattedDate );
 	}
 
 	updateAmPm( value ) {
 		return () => {
-			const { onChange } = this.props;
+			const { onChange, format } = this.props;
 			const { am, date, hours } = this.state;
 			if ( am === value ) {
 				return;
@@ -107,7 +107,7 @@ class TimePicker extends Component {
 				newDate = date.clone().hours( parseInt( hours, 10 ) % 12 );
 			}
 			this.setState( { date: newDate } );
-			const formattedDate = newDate.format( TIMEZONELESS_FORMAT );
+			const formattedDate = newDate.format( format || TIMEZONELESS_FORMAT );
 			onChange( formattedDate );
 		};
 	}

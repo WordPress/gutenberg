@@ -58,6 +58,13 @@ The localization for the display of the date and time.
 - Type: `string`
 - Required: No
 
+### format
+
+The format to transform the date and time to on save.
+
+- Type: `string`
+- Required: No
+
 ### is12Hour
 
 Whether the current timezone is a 12 hour time.

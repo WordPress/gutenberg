@@ -9,9 +9,9 @@ import moment from 'moment';
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
-function DatePicker( { currentDate, onChange, ...args } ) {
+function DatePicker( { currentDate, onChange, format, ...args } ) {
 	const momentDate = currentDate ? moment( currentDate ) : moment();
-	const onChangeMoment = ( newDate ) => onChange( newDate.format( TIMEZONELESS_FORMAT ) );
+	const onChangeMoment = ( newDate ) => onChange( newDate.format( format || TIMEZONELESS_FORMAT ) );
 
 	return <ReactDatePicker
 		inline
