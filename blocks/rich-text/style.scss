@@ -70,6 +70,10 @@
 		opacity: 0.5;
 		pointer-events: none;
 	}
+
+	&.mce-content-body {
+		line-height: $editor-line-height;
+	}
 }
 
 .has-drop-cap .blocks-rich-text__tinymce:not( :focus )  {
