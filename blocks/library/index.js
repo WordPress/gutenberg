@@ -23,6 +23,7 @@ import * as html from './html';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
 import * as more from './more';
+import * as navigationMenu from './navigation-menu';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
@@ -79,6 +80,7 @@ export const registerCoreBlocks = () => {
 		html,
 		latestPosts,
 		more,
+		navigationMenu,
 		preformatted,
 		pullquote,
 		reusableBlock,
