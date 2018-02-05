@@ -15,6 +15,7 @@
 	text-align: left;
 	padding-left: 25px;
 	color: $dark-gray-500;
+	@include menu-style__neutral()
 
 	.dashicon {
 		margin-right: 5px;
@@ -27,4 +28,9 @@
 	&:hover {
 		color: $black;
 	}
+
+	&:focus {
+		@include menu-style__focus()
+	}
+
 }

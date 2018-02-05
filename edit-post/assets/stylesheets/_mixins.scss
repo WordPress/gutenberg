@@ -168,6 +168,17 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 	border: 1px solid $dark-gray-300;
 }
 
+// Inputs
+@mixin menu-style__neutral() {
+	border: 1px solid transparent;
+}
+
+@mixin menu-style__focus() {
+	outline: none;
+	color: $dark-gray-900;
+	border: 1px dotted $dark-gray-300;
+}
+
 
 /**
  * Applies editor left position to the selector passed as argument
