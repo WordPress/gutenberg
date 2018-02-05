@@ -181,16 +181,12 @@ function gutenberg_intercept_edit_post() {
 		return;
 	}
 
-	if ( empty( $_GET['post'] ) ) {
+	if ( empty( $_GET['post'] ) || ! is_numeric( $_GET['post'] ) ) {
 		return;
 	}
 
 	$post_ID = (int) $_GET['post'];
 	$post_id = $post_ID;
-
-	if ( ! $post_id ) {
-		return;
-	}
 
 	$post = get_post( $post_id );
 
