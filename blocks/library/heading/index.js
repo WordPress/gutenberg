@@ -164,6 +164,7 @@ export const settings = {
 				onRemove={ () => onReplace( [] ) }
 				style={ { textAlign: align } }
 				placeholder={ placeholder || __( 'Write heading…' ) }
+				isSelected={ isSelected }
 			/>,
 		];
 	},

@@ -79,6 +79,7 @@ export const settings = {
 				} }
 				className={ className }
 				placeholder={ placeholder || __( 'Write subhead…' ) }
+				isSelected={ isSelected }
 			/>,
 		];
 	},

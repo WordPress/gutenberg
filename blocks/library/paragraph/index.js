@@ -181,6 +181,7 @@ class ParagraphBlock extends Component {
 							aria-expanded={ isExpanded }
 							aria-owns={ listBoxId }
 							aria-activedescendant={ activeId }
+							isSelected={ isSelected }
 						/>
 					) }
 				</Autocomplete>

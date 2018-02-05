@@ -92,6 +92,7 @@ class ButtonBlock extends Component {
 						backgroundColor: color,
 						color: textColor,
 					} }
+					isSelected={ isSelected }
 					keepPlaceholderOnFocus
 				/>
 				{ isSelected &&

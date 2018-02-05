@@ -7,6 +7,7 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { withState } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -64,9 +65,12 @@ export const settings = {
 		}
 	},
 
-	edit( { attributes, setAttributes, isSelected, className } ) {
+	edit: withState( {
+		editable: 'content',
+	} )( ( { attributes, setAttributes, isSelected, className, editable, setState } ) => {
 		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
 		return [
 			isSelected && (
@@ -88,6 +92,8 @@ export const settings = {
 					}
 					placeholder={ __( 'Write quote…' ) }
 					wrapperClassName="blocks-pullquote__content"
+					isSelected={ isSelected && editable === 'content' }
+					onFocus={ onSetActiveEditable( 'content' ) }
 				/>
 				{ ( citation || isSelected ) && (
 					<RichText
@@ -99,11 +105,13 @@ export const settings = {
 								citation: nextCitation,
 							} )
 						}
+						isSelected={ isSelected && editable === 'cite' }
+						onFocus={ onSetActiveEditable( 'cite' ) }
 					/>
 				) }
 			</blockquote>,
 		];
-	},
+	} ),
 
 	save( { attributes } ) {
 		const { value, citation, align } = attributes;

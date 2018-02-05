@@ -298,6 +298,7 @@ export const settings = {
 							undefined
 					}
 					onRemove={ () => onReplace( [] ) }
+					isSelected={ isSelected }
 				/>,
 			];
 		}

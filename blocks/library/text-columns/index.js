@@ -98,6 +98,7 @@ export const settings = {
 								} );
 							} }
 							placeholder={ __( 'New Column' ) }
+							isSelected={ isSelected }
 						/>
 					</div>
 				) }

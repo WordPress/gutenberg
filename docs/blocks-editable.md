@@ -44,6 +44,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 				className: props.className,
 				onChange: onChangeContent,
 				value: content,
+				isSelected: props.isSelected,
 			}
 		);
 	},
@@ -75,7 +76,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	},
 
 	edit( { attributes, className, setAttributes } ) {
-		const { content } = attributes;
+		const { content, isSelected } = attributes;
 
 		function onChangeContent( newContent ) {
 			setAttributes( { content: newContent } );
@@ -87,6 +88,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 				className={ className }
 				onChange={ onChangeContent }
 				value={ content }
+				isSelected={ isSelected }
 			/>
 		);
 	},

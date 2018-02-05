@@ -209,6 +209,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
 								onChange={ ( value ) => setAttributes( { caption: value } ) }
+								isSelected={ isSelected }
 								inlineToolbar
 							/>
 						) : null }

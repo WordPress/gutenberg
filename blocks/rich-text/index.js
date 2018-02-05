@@ -105,7 +105,6 @@ export default class RichText extends Component {
 		this.state = {
 			formats: {},
 			empty: ! value || ! value.length,
-			active: false,
 			selectedNodeId: 0,
 		};
 	}
@@ -207,9 +206,6 @@ export default class RichText extends Component {
 	 */
 	onSelectionChange() {
 		const isActive = document.activeElement === this.editor.getBody();
-		if ( this.state.isActive !== isActive ) {
-			this.setState( { isActive } );
-		}
 		// We must check this because selectionChange is a global event.
 		if ( ! isActive ) {
 			return;
@@ -782,9 +778,10 @@ export default class RichText extends Component {
 			placeholder,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
+			isSelected = false,
 			formatters,
 		} = this.props;
-		const { empty, isActive } = this.state;
+		const { empty } = this.state;
 
 		const ariaProps = pickAriaProps( this.props );
 
@@ -792,7 +789,7 @@ export default class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ( ! isActive || keepPlaceholderOnFocus ) && empty;
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && empty;
 		const classes = classnames( wrapperClassName, 'blocks-rich-text' );
 
 		const formatToolbar = (
@@ -808,12 +805,12 @@ export default class RichText extends Component {
 
 		return (
 			<div className={ classes }>
-				{ isActive &&
+				{ isSelected &&
 					<Fill name="Formatting.Toolbar">
 						{ ! inlineToolbar && formatToolbar }
 					</Fill>
 				}
-				{ isActive && inlineToolbar &&
+				{ isSelected && inlineToolbar &&
 					<div className="block-rich-text__inline-toolbar">
 						{ formatToolbar }
 					</div>
@@ -838,7 +835,7 @@ export default class RichText extends Component {
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
-				{ isActive && <Slot name="RichText.Siblings" /> }
+				{ isSelected && <Slot name="RichText.Siblings" /> }
 			</div>
 		);
 	}

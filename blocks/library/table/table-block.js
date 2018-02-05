@@ -107,6 +107,7 @@ export default class TableBlock extends Component {
 				onSetup={ ( editor ) => this.handleSetup( editor, isSelected ) }
 				onChange={ onChange }
 				value={ content }
+				isSelected={ isSelected }
 			/>,
 			isSelected && (
 				<BlockControls key="menu">

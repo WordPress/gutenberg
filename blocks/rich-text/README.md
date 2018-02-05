@@ -51,6 +51,10 @@ a traditional `input` field, usually when the user exits the field.
 
 *Optional.* By default, all formatting controls are present. This setting can be used to fine-tune formatting controls. Possible items: `[ 'bold', 'italic', 'strikethrough', 'link' ]`.
 
+### `isSelected: Boolean`
+
+*Optional.* Whether to show the input is selected or not in order to show the formatting contros.
+
 ### `keepPlaceholderOnFocus: Boolean`
 
 *Optional.* By default, the placeholder will hide as soon as the editable field receives focus. With this setting it can be be kept while the field is focussed and empty.

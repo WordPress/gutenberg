@@ -177,6 +177,7 @@ export const settings = {
 					tagName="h2"
 					value={ title }
 					onChange={ ( value ) => setAttributes( { title: value } ) }
+					isSelected={ isSelected }
 					inlineToolbar
 				/>
 			) : __( 'Cover Image' );
@@ -203,6 +204,7 @@ export const settings = {
 						placeholder={ __( 'Write title…' ) }
 						value={ title }
 						onChange={ ( value ) => setAttributes( { title: value } ) }
+						isSelected={ isSelected }
 						inlineToolbar
 					/>
 				) : null }

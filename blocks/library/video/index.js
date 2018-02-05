@@ -158,6 +158,7 @@ export const settings = {
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							isSelected={ isSelected }
 							inlineToolbar
 						/>
 					) }
