@@ -18,6 +18,7 @@ const types = [
 	'google-docs',
 	'ms-word',
 	'ms-word-online',
+	'evernote',
 ];
 
 describe( 'raw handling: integration', () => {
