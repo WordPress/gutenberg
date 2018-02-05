@@ -5,7 +5,7 @@ const { ELEMENT_NODE } = window.Node;
 
 function shallowTextContent( element ) {
 	return [ ...element.childNodes ]
-		.map( ( { nodeValue } ) => nodeValue || '' )
+		.map( ( { nodeValue = '' } ) => nodeValue )
 		.join( '' );
 }
 
