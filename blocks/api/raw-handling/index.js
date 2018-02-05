@@ -58,6 +58,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 		converter.setOption( 'noHeaderId', true );
 		converter.setOption( 'tables', true );
 		converter.setOption( 'omitExtraWLInCodeBlocks', true );
+		converter.setOption( 'simpleLineBreaks', true );
 
 		plainText = slackMarkdownVariantCorrector( plainText );
 
