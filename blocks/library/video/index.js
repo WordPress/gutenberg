@@ -71,7 +71,7 @@ export const settings = {
 
 		render() {
 			const { align, caption, id } = this.props.attributes;
-			const { setAttributes, focus, setFocus } = this.props;
+			const { setAttributes, isSelected } = this.props;
 			const { editing, className, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
@@ -94,7 +94,7 @@ export const settings = {
 				}
 				return false;
 			};
-			const controls = focus && (
+			const controls = isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -110,8 +110,6 @@ export const settings = {
 					</Toolbar>
 				</BlockControls>
 			);
-
-			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
 			if ( editing ) {
 				return [
@@ -154,13 +152,11 @@ export const settings = {
 				controls,
 				<figure key="video" className={ className }>
 					<video controls src={ src } />
-					{ ( ( caption && caption.length ) || !! focus ) && (
+					{ ( ( caption && caption.length ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							focus={ focus && focus.editable === 'caption' ? focus : undefined }
-							onFocus={ focusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							inlineToolbar
 						/>

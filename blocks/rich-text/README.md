@@ -27,14 +27,6 @@ a traditional `input` field, usually when the user exits the field.
 *Optional.* Placeholder text to show when the field is empty, similar to the
   [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 
-### `focus: { offset: Number }`
-
-*Optional.* Whether to focus the editable or not. We currently support an offset of -1 to move the focus to the end of the editable.
-
-### `onFocus( focus: Object ): Function`
-
-*Optional.* Called when the editable receives focus.
-
 ### `multiline: String`
 
 *Optional.* By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to `p` to create new paragraphs on <kbd>Enter</kbd>.
@@ -86,9 +78,7 @@ wp.blocks.registerBlockType( /* ... */, {
 			value: props.attributes.content,
 			onChange: function( content ) {
 				props.setAttributes( { content: content } );
-			},
-			focus: props.focus,
-			onFocus: props.setFocus,
+			}
 		} );
 	},
 } );
@@ -108,15 +98,13 @@ registerBlockType( /* ... */, {
 		},
 	},
 
-	edit( { className, attributes, setAttributes, focus, setFocus } ) {
+	edit( { className, attributes, setAttributes } ) {
 		return (
 			<RichText
 				tagName="h2"
 				className={ className }
 				value={ attributes.content }
 				onChange={ ( content ) => setAttributes( { content } ) }
-				focus={ focus }
-				setFocus={ setFocus }
 			/>
 		);
 	},

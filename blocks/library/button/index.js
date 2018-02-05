@@ -60,8 +60,7 @@ class ButtonBlock extends Component {
 		const {
 			attributes,
 			setAttributes,
-			focus,
-			setFocus,
+			isSelected,
 			className,
 		} = this.props;
 
@@ -76,7 +75,7 @@ class ButtonBlock extends Component {
 		} = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
@@ -86,8 +85,6 @@ class ButtonBlock extends Component {
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
 					value={ text }
-					focus={ focus }
-					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 					className="wp-block-button__link"
@@ -97,7 +94,7 @@ class ButtonBlock extends Component {
 					} }
 					keepPlaceholderOnFocus
 				/>
-				{ focus &&
+				{ isSelected &&
 					<InspectorControls key="inspector">
 						<ToggleControl
 							label={ __( 'Wrap text' ) }
@@ -125,7 +122,7 @@ class ButtonBlock extends Component {
 					</InspectorControls>
 				}
 			</span>,
-			focus && (
+			isSelected && (
 				<form
 					key="form-link"
 					className="blocks-button__inline-link"

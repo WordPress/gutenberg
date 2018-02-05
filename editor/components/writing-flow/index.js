@@ -4,6 +4,8 @@
 import { connect } from 'react-redux';
 import 'element-closest';
 import { find, last, reverse } from 'lodash';
+import tinymce from 'tinymce';
+
 /**
  * WordPress dependencies
  */
@@ -25,11 +27,15 @@ import {
 	getPreviousBlock,
 	getNextBlock,
 	getMultiSelectedBlocksStartUid,
-	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
+	getSelectedBlocksInitialPosition,
 } from '../../store/selectors';
-import { multiSelect, appendDefaultBlock, focusBlock } from '../../store/actions';
+import {
+	multiSelect,
+	appendDefaultBlock,
+	selectBlock,
+} from '../../store/actions';
 
 /**
  * Module Constants
@@ -104,6 +110,19 @@ class WritingFlow extends Component {
 		} );
 	}
 
+	getInnerTabbable( target, isReverse ) {
+		let focusableNodes = this.getVisibleTabbables();
+		if ( isReverse ) {
+			focusableNodes = reverse( focusableNodes );
+		}
+
+		const innerItem = find( focusableNodes, ( node ) => {
+			return target !== node && target.contains( node );
+		} );
+
+		return innerItem ? innerItem : target;
+	}
+
 	isInLastNonEmptyBlock( target ) {
 		const tabbables = this.getVisibleTabbables();
 
@@ -144,12 +163,12 @@ class WritingFlow extends Component {
 		}
 	}
 
-	moveSelection( currentUid, isReverse ) {
+	moveSelection( isReverse ) {
 		const { previousBlock, nextBlock } = this.props;
 
 		const focusedBlock = isReverse ? previousBlock : nextBlock;
 		if ( focusedBlock ) {
-			this.props.onFocusBlock( focusedBlock.uid );
+			this.props.onSelectBlock( focusedBlock.uid );
 		}
 	}
 
@@ -161,7 +180,7 @@ class WritingFlow extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { selectedBlock, selectionStart, selectionEnd, hasMultiSelection } = this.props;
+		const { selectedBlock, selectionStart, hasMultiSelection } = this.props;
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -193,7 +212,7 @@ class WritingFlow extends Component {
 		} else if ( isNav && hasMultiSelection ) {
 			// Moving from multi block selection to single block selection
 			event.preventDefault();
-			this.moveSelection( selectionEnd, isReverse );
+			this.moveSelection( isReverse );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
@@ -209,6 +228,31 @@ class WritingFlow extends Component {
 				isVerticalEdge( target, false, false )
 		) {
 			this.props.onBottomReached();
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		// When selecting a new block, we focus its first editable or the container
+		if (
+			this.props.selectedBlock &&
+			( ! prevProps.selectedBlock || this.props.selectedBlock.uid !== prevProps.selectedBlock.uid )
+		) {
+			const blockContainer = this.container.querySelector( `[data-block="${ this.props.selectedBlock.uid }"]` );
+			if ( ! blockContainer.contains( document.activeElement ) ) {
+				const target = this.getInnerTabbable( blockContainer, this.props.initialPosition === -1 );
+				target.focus();
+				if ( this.props.initialPosition === -1 ) {
+					// Special casing richtext because the two functions at the bo bottomare not working as expected.
+					const editor = tinymce.get( target.getAttribute( 'id' ) );
+					if ( editor ) {
+						editor.selection.select( editor.getBody(), true );
+						editor.selection.collapse( false );
+					} else {
+						placeCaretAtHorizontalEdge( target, true );
+						placeCaretAtVerticalEdge( target, true );
+					}
+				}
+			}
 		}
 	}
 
@@ -236,13 +280,13 @@ export default connect(
 		previousBlock: getPreviousBlock( state ),
 		nextBlock: getNextBlock( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
-		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
 		selectedBlock: getSelectedBlock( state ),
+		initialPosition: getSelectedBlocksInitialPosition( state ),
 	} ),
 	{
 		onMultiSelect: multiSelect,
 		onBottomReached: appendDefaultBlock,
-		onFocusBlock: focusBlock,
+		onSelectBlock: selectBlock,
 	}
 )( WritingFlow );

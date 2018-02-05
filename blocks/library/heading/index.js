@@ -101,11 +101,11 @@ export const settings = {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter, onReplace } ) {
+	edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls
 					key="controls"
 					controls={
@@ -119,7 +119,7 @@ export const settings = {
 					}
 				/>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<h3>{ __( 'Heading Settings' ) }</h3>
 					<p>{ __( 'Level' ) }</p>
@@ -148,8 +148,6 @@ export const settings = {
 				wrapperClassName="wp-block-heading"
 				tagName={ nodeName.toLowerCase() }
 				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
 				onSplit={

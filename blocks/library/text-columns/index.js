@@ -58,11 +58,11 @@ export const settings = {
 		}
 	},
 
-	edit( { attributes, setAttributes, className, focus, setFocus } ) {
+	edit( { attributes, setAttributes, className, isSelected } ) {
 		const { width, content, columns } = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ width }
@@ -71,7 +71,7 @@ export const settings = {
 					/>
 				</BlockControls>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<RangeControl
 						label={ __( 'Columns' ) }
@@ -97,8 +97,6 @@ export const settings = {
 									],
 								} );
 							} }
-							focus={ focus && focus.column === index }
-							onFocus={ () => setFocus( { column: index } ) }
 							placeholder={ __( 'New Column' ) }
 						/>
 					</div>

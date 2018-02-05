@@ -93,7 +93,6 @@ export default class RichText extends Component {
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
-		this.onFocus = this.onFocus.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
@@ -106,6 +105,7 @@ export default class RichText extends Component {
 		this.state = {
 			formats: {},
 			empty: ! value || ! value.length,
+			active: false,
 			selectedNodeId: 0,
 		};
 	}
@@ -143,7 +143,6 @@ export default class RichText extends Component {
 		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
-		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
@@ -172,13 +171,6 @@ export default class RichText extends Component {
 	*/
 	proxyPropHandler( name ) {
 		return ( event ) => {
-			// TODO: Reconcile with `onFocus` instance handler which does not
-			// pass the event object. Otherwise we have double focus handling
-			// and editor instance being stored into state.
-			if ( name === 'Focus' ) {
-				return;
-			}
-
 			// Allow props an opportunity to handle the event, before default
 			// RichText behavior takes effect. Should the event be handled by a
 			// prop, it should `stopImmediatePropagation` on the event to stop
@@ -190,7 +182,6 @@ export default class RichText extends Component {
 	}
 
 	onInit() {
-		this.updateFocus();
 		this.registerCustomFormatters();
 	}
 
@@ -211,44 +202,22 @@ export default class RichText extends Component {
 		} );
 	}
 
-	onFocus() {
-		if ( ! this.props.onFocus ) {
-			return;
-		}
-
-		// TODO: We need a way to save the focus position ( bookmark maybe )
-		this.props.onFocus();
-	}
-
-	isActive() {
-		return document.activeElement === this.editor.getBody();
-	}
-
 	/**
 	 * Handles the global selection change event.
-	 *
-	 * Will call the onFocus handler if one is defined and this block is focused.
 	 */
 	onSelectionChange() {
+		const isActive = document.activeElement === this.editor.getBody();
+		if ( this.state.isActive !== isActive ) {
+			this.setState( { isActive } );
+		}
 		// We must check this because selectionChange is a global event.
-		if ( ! this.isActive() ) {
+		if ( ! isActive ) {
 			return;
 		}
 
-		const collapsed = this.editor.selection.isCollapsed();
-
-		this.setState( {
-			empty: tinymce.DOM.isEmpty( this.editor.getBody() ),
-		} );
-
-		if (
-			this.props.focus && this.props.onFocus &&
-			this.props.focus.collapsed !== collapsed
-		) {
-			this.props.onFocus( {
-				...this.props.focus,
-				collapsed,
-			} );
+		const isEmpty = tinymce.DOM.isEmpty( this.editor.getBody() );
+		if ( this.state.empty !== isEmpty ) {
+			this.setState( { empty: isEmpty } );
 		}
 	}
 
@@ -733,40 +702,11 @@ export default class RichText extends Component {
 		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
-	updateFocus() {
-		// We can't update focus if the editor hasn't finished initializing.
-		// Initialization callback `onInit` will call this function anyways.
-		if ( ! this.editor ) {
-			return;
-		}
-
-		const { focus } = this.props;
-		const isActive = this.isActive();
-
-		if ( focus ) {
-			if ( ! isActive ) {
-				this.editor.focus();
-			}
-
-			// Offset = -1 means we should focus the end of the editable
-			if ( focus.offset === -1 && ! this.isEndOfEditor() ) {
-				this.editor.selection.select( this.editor.getBody(), true );
-				this.editor.selection.collapse( false );
-			}
-		} else if ( isActive ) {
-			this.editor.getBody().blur();
-		}
-	}
-
 	componentWillUnmount() {
 		this.onChange();
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( ! isEqual( this.props.focus, prevProps.focus ) ) {
-			this.updateFocus();
-		}
-
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
 			this.props.tagName === prevProps.tagName &&
@@ -835,7 +775,6 @@ export default class RichText extends Component {
 			tagName: Tagname = 'div',
 			style,
 			value,
-			focus,
 			wrapperClassName,
 			className,
 			inlineToolbar = false,
@@ -845,6 +784,7 @@ export default class RichText extends Component {
 			keepPlaceholderOnFocus = false,
 			formatters,
 		} = this.props;
+		const { empty, isActive } = this.state;
 
 		const ariaProps = pickAriaProps( this.props );
 
@@ -852,7 +792,7 @@ export default class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ( ! focus || keepPlaceholderOnFocus ) && this.state.empty;
+		const isPlaceholderVisible = placeholder && ( ! isActive || keepPlaceholderOnFocus ) && empty;
 		const classes = classnames( wrapperClassName, 'blocks-rich-text' );
 
 		const formatToolbar = (
@@ -868,12 +808,12 @@ export default class RichText extends Component {
 
 		return (
 			<div className={ classes }>
-				{ focus &&
+				{ isActive &&
 					<Fill name="Formatting.Toolbar">
 						{ ! inlineToolbar && formatToolbar }
 					</Fill>
 				}
-				{ focus && inlineToolbar &&
+				{ isActive && inlineToolbar &&
 					<div className="block-rich-text__inline-toolbar">
 						{ formatToolbar }
 					</div>
@@ -898,7 +838,7 @@ export default class RichText extends Component {
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
-				{ focus && <Slot name="RichText.Siblings" /> }
+				{ isActive && <Slot name="RichText.Siblings" /> }
 			</div>
 		);
 	}

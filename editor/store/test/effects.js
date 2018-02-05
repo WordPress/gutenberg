@@ -22,7 +22,6 @@ import {
 	setupNewPost,
 	resetBlocks,
 	mergeBlocks,
-	focusBlock,
 	replaceBlocks,
 	editPost,
 	savePost,
@@ -33,6 +32,7 @@ import {
 	fetchReusableBlocks,
 	convertBlockToStatic,
 	convertBlockToReusable,
+	selectBlock,
 } from '../../store/actions';
 import reducer from '../reducer';
 import effects from '../effects';
@@ -69,7 +69,7 @@ describe( 'effects', () => {
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken' ) );
+			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken' ) );
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
@@ -97,7 +97,7 @@ describe( 'effects', () => {
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
+			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken', -1 ) );
 			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -184,7 +184,7 @@ describe( 'effects', () => {
 			handler( mergeBlocks( blockA, blockB ), { dispatch } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
+			// expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
 				name: 'core/test-block',

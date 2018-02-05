@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, partial, reduce, size, castArray, noop } from 'lodash';
+import { get, reduce, size, castArray, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,7 +41,6 @@ import { createInnerBlockList } from './utils';
 import {
 	clearSelectedBlock,
 	editPost,
-	focusBlock,
 	insertBlocks,
 	mergeBlocks,
 	removeBlock,
@@ -54,7 +53,6 @@ import {
 } from '../../store/actions';
 import {
 	getBlock,
-	getBlockFocus,
 	isMultiSelecting,
 	getBlockIndex,
 	getEditedPostAttribute,
@@ -142,10 +140,6 @@ export class BlockListBlock extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.focus ) {
-			this.node.focus();
-		}
-
 		if ( this.props.isTyping ) {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
@@ -171,11 +165,6 @@ export class BlockListBlock extends Component {
 			}
 
 			this.previousOffset = null;
-		}
-
-		// Focus node when focus state is programmatically transferred.
-		if ( this.props.focus && ! prevProps.focus && ! this.node.contains( document.activeElement ) ) {
-			this.node.focus();
 		}
 
 		// Bind or unbind mousemove from page when user starts or stops typing
@@ -405,13 +394,13 @@ export class BlockListBlock extends Component {
 			case DELETE:
 				// Remove block on backspace.
 				if ( target === this.node ) {
-					const { uid, onRemove, previousBlock, onFocus, isLocked } = this.props;
+					const { uid, onRemove, isLocked, previousBlock, onSelect } = this.props;
 					event.preventDefault();
 					if ( ! isLocked ) {
 						onRemove( uid );
 
 						if ( previousBlock ) {
-							onFocus( previousBlock.uid, { offset: -1 } );
+							onSelect( previousBlock.uid, -1 );
 						}
 					}
 				}
@@ -458,8 +447,8 @@ export class BlockListBlock extends Component {
 		// (mover, toolbar, wrapper) and the display of the block content.
 
 		// Generate the wrapper class names handling the different states of the block.
-		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
-		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
+		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected } = this.props;
+		const showUI = isSelected && ! this.props.isTyping;
 		const { error } = this.state;
 		const wrapperClassName = classnames( 'editor-block-list__block', {
 			'has-warning': ! isValid || !! error,
@@ -469,7 +458,7 @@ export class BlockListBlock extends Component {
 			'is-reusable': isReusableBlock( blockType ),
 		} );
 
-		const { onMouseLeave, onFocus, onReplace } = this.props;
+		const { onMouseLeave, onReplace } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -543,17 +532,17 @@ export class BlockListBlock extends Component {
 					className={ BlockListBlock.className }
 					tabIndex="0"
 					aria-label={ blockLabel }
+					data-block={ block.uid }
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
 								name={ blockName }
-								focus={ focus }
+								isSelected={ isSelected }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
 								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 								onReplace={ isLocked ? undefined : onReplace }
-								setFocus={ partial( onFocus, block.uid ) }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
 								id={ block.uid }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
@@ -595,7 +584,6 @@ const mapStateToProps = ( state, { uid, rootUID } ) => ( {
 	isMultiSelected: isBlockMultiSelected( state, uid ),
 	isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
 	isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
-	focus: getBlockFocus( state, uid ),
 	isTyping: isTyping( state ),
 	order: getBlockIndex( state, uid, rootUID ),
 	meta: getEditedPostAttribute( state, 'meta' ),
@@ -608,9 +596,10 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 		dispatch( updateBlockAttributes( uid, attributes ) );
 	},
 
-	onSelect() {
-		dispatch( selectBlock( ownProps.uid ) );
+	onSelect( uid = ownProps.uid, initialPosition ) {
+		dispatch( selectBlock( uid, initialPosition ) );
 	},
+
 	onDeselect() {
 		dispatch( clearSelectedBlock() );
 	},
@@ -644,10 +633,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 		blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
 
 		dispatch( insertBlocks( blocks, index, rootUID ) );
-	},
-
-	onFocus( ...args ) {
-		dispatch( focusBlock( ...args ) );
 	},
 
 	onRemove( uid ) {

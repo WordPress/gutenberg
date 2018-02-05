@@ -57,11 +57,11 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { content, placeholder } = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<BlockDescription>
 						<p>{ __( 'Explanatory text under the main heading of an article.' ) }</p>
@@ -77,8 +77,6 @@ export const settings = {
 						content: nextContent,
 					} );
 				} }
-				focus={ focus }
-				onFocus={ setFocus }
 				className={ className }
 				placeholder={ placeholder || __( 'Write subhead…' ) }
 			/>,

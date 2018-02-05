@@ -66,8 +66,7 @@ class ParagraphBlock extends Component {
 			attributes,
 			setAttributes,
 			insertBlocksAfter,
-			focus,
-			setFocus,
+			isSelected,
 			mergeBlocks,
 			onReplace,
 		} = this.props;
@@ -86,7 +85,7 @@ class ParagraphBlock extends Component {
 		const className = dropCap ? 'has-drop-cap' : null;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<AlignmentToolbar
 						value={ align }
@@ -96,7 +95,7 @@ class ParagraphBlock extends Component {
 					/>
 				</BlockControls>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<PanelBody title={ __( 'Text Settings' ) }>
 						<ToggleControl
@@ -164,8 +163,6 @@ class ParagraphBlock extends Component {
 									content: nextContent,
 								} );
 							} }
-							focus={ focus }
-							onFocus={ setFocus }
 							onSplit={ insertBlocksAfter ?
 								( before, after, ...blocks ) => {
 									setAttributes( { content: before } );

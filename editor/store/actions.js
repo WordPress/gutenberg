@@ -101,17 +101,10 @@ export function updateBlock( uid, updates ) {
 	};
 }
 
-export function focusBlock( uid, config ) {
-	return {
-		type: 'UPDATE_FOCUS',
-		uid,
-		config,
-	};
-}
-
-export function selectBlock( uid ) {
+export function selectBlock( uid, initialPosition = null ) {
 	return {
 		type: 'SELECT_BLOCK',
+		initialPosition,
 		uid,
 	};
 }

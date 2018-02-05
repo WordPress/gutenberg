@@ -44,10 +44,10 @@ class LatestPostsBlock extends Component {
 
 	render() {
 		const latestPosts = this.props.latestPosts.data;
-		const { attributes, focus, setAttributes } = this.props;
+		const { attributes, isSelected, setAttributes } = this.props;
 		const { displayPostDate, align, layout, columns, order, orderBy, categories, postsToShow } = attributes;
 
-		const inspectorControls = focus && (
+		const inspectorControls = isSelected && (
 			<InspectorControls key="inspector">
 				<h3>{ __( 'Latest Posts Settings' ) }</h3>
 				<QueryPanel
@@ -114,7 +114,7 @@ class LatestPostsBlock extends Component {
 
 		return [
 			inspectorControls,
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }

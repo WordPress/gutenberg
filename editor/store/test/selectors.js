@@ -54,7 +54,6 @@ import {
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	isBlockHovered,
-	getBlockFocus,
 	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
@@ -1620,56 +1619,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isBlockHovered( state, 23 ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'getBlockFocus', () => {
-		it( 'should return the block focus if the block is selected', () => {
-			const state = {
-				blockSelection: {
-					start: 123,
-					end: 123,
-					focus: { editable: 'cite' },
-				},
-			};
-
-			expect( getBlockFocus( state, 123 ) ).toEqual( { editable: 'cite' } );
-		} );
-
-		it( 'should return the block focus for the start if the block is multi-selected', () => {
-			const state = {
-				blockSelection: {
-					start: 123,
-					end: 124,
-					focus: { editable: 'cite' },
-				},
-			};
-
-			expect( getBlockFocus( state, 123 ) ).toEqual( { editable: 'cite' } );
-		} );
-
-		it( 'should return null for the end if the block is multi-selected', () => {
-			const state = {
-				blockSelection: {
-					start: 123,
-					end: 124,
-					focus: { editable: 'cite' },
-				},
-			};
-
-			expect( getBlockFocus( state, 124 ) ).toEqual( null );
-		} );
-
-		it( 'should return null if the block is not selected', () => {
-			const state = {
-				blockSelection: {
-					start: 123,
-					end: 123,
-					focus: { editable: 'cite' },
-				},
-			};
-
-			expect( getBlockFocus( state, 23 ) ).toEqual( null );
 		} );
 	} );
 

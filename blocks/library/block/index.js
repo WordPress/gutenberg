@@ -86,7 +86,7 @@ class ReusableBlockEdit extends Component {
 	}
 
 	render() {
-		const { focus, reusableBlock, isFetching, isSaving } = this.props;
+		const { isSelected, reusableBlock, isFetching, isSaving } = this.props;
 		const { isEditing, title, attributes } = this.state;
 
 		if ( ! reusableBlock && isFetching ) {
@@ -105,12 +105,12 @@ class ReusableBlockEdit extends Component {
 				<BlockEdit
 					{ ...this.props }
 					name={ reusableBlock.type }
-					focus={ isEditing ? focus : null }
+					isSelected={ isEditing ? isSelected : false }
 					attributes={ reusableBlockAttributes }
 					setAttributes={ isEditing ? this.setAttributes : noop }
 				/>
 			</div>,
-			focus && (
+			isSelected && (
 				<ReusableBlockEditPanel
 					key="panel"
 					isEditing={ isEditing }

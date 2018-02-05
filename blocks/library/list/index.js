@@ -229,8 +229,7 @@ export const settings = {
 		render() {
 			const {
 				attributes,
-				focus,
-				setFocus,
+				isSelected,
 				insertBlocksAfter,
 				setAttributes,
 				mergeBlocks,
@@ -239,7 +238,7 @@ export const settings = {
 			const { nodeName, values } = attributes;
 
 			return [
-				focus && (
+				isSelected && (
 					<BlockControls
 						key="controls"
 						controls={ [
@@ -276,8 +275,6 @@ export const settings = {
 					onSetup={ this.setupEditor }
 					onChange={ this.setNextValues }
 					value={ values }
-					focus={ focus }
-					onFocus={ setFocus }
 					wrapperClassName="blocks-list"
 					placeholder={ __( 'Write list…' ) }
 					onMerge={ mergeBlocks }

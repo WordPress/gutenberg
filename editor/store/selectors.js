@@ -618,6 +618,22 @@ export function getNextBlock( state, startUID ) {
 }
 
 /**
+ * Returns the initial position of the cursor in the selected block
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?Object} Selected block.
+ */
+export function getSelectedBlocksInitialPosition( state ) {
+	const { start, end } = state.blockSelection;
+	if ( start !== end || ! start ) {
+		return null;
+	}
+
+	return state.blockSelection.initialPosition;
+}
+
+/**
  * Returns the current multi-selection set of blocks unique IDs, or an empty
  * array if there is no multi-selection.
  *
@@ -847,25 +863,6 @@ export function isBlockWithinSelection( state, uid ) {
  */
 export function isBlockHovered( state, uid ) {
 	return state.hoveredBlock === uid;
-}
-
-/**
- * Returns focus state of the block corresponding to the specified unique ID,
- * or null if the block is not selected. It is left to a block's implementation
- * to manage the content of this object, defaulting to an empty object.
- *
- * @param {Object} state Global application state.
- * @param {string} uid   Block unique ID.
- *
- * @return {Object} Block focus state.
- */
-export function getBlockFocus( state, uid ) {
-	// If there is multi-selection, keep returning the focus object for the start block.
-	if ( ! isBlockSelected( state, uid ) && state.blockSelection.start !== uid ) {
-		return null;
-	}
-
-	return state.blockSelection.focus;
 }
 
 /**

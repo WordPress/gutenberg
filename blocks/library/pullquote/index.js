@@ -64,12 +64,12 @@ export const settings = {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -87,11 +87,9 @@ export const settings = {
 						} )
 					}
 					placeholder={ __( 'Write quote…' ) }
-					focus={ focus && focus.editable === 'value' ? focus : null }
-					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					wrapperClassName="blocks-pullquote__content"
 				/>
-				{ ( citation || !! focus ) && (
+				{ ( citation || isSelected ) && (
 					<RichText
 						tagName="cite"
 						value={ citation }
@@ -101,8 +99,6 @@ export const settings = {
 								citation: nextCitation,
 							} )
 						}
-						focus={ focus && focus.editable === 'citation' ? focus : null }
-						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
 					/>
 				) }
 			</blockquote>,

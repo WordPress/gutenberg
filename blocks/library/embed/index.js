@@ -131,10 +131,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			render() {
 				const { html, type, error, fetching } = this.state;
 				const { align, url, caption } = this.props.attributes;
-				const { setAttributes, focus, setFocus } = this.props;
+				const { setAttributes, isSelected } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
-				const controls = focus && (
+				const controls = isSelected && (
 					<BlockControls key="controls">
 						<BlockAlignmentToolbar
 							value={ align }
@@ -200,17 +200,14 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 									html={ html }
 									title={ iframeTitle }
 									type={ type }
-									onFocus={ () => setFocus() }
 								/>
 							</div>
 						) }
-						{ ( caption && caption.length > 0 ) || !! focus ? (
+						{ ( caption && caption.length > 0 ) || isSelected ? (
 							<RichText
 								tagName="figcaption"
 								placeholder={ __( 'Write caption…' ) }
 								value={ caption }
-								focus={ focus }
-								onFocus={ setFocus }
 								onChange={ ( value ) => setAttributes( { caption: value } ) }
 								inlineToolbar
 							/>

@@ -40,8 +40,8 @@ export const settings = {
 
 	edit: withState( {
 		preview: false,
-	} )( ( { attributes, setAttributes, setState, focus, preview } ) => [
-		focus && (
+	} )( ( { attributes, setAttributes, setState, isSelected, preview } ) => [
+		isSelected && (
 			<BlockControls key="controls">
 				<div className="components-toolbar">
 					<button

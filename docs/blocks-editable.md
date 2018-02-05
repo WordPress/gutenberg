@@ -31,8 +31,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	},
 
 	edit: function( props ) {
-		var content = props.attributes.content,
-			focus = props.focus;
+		var content = props.attributes.content;
 
 		function onChangeContent( newContent ) {
 			props.setAttributes( { content: newContent } );
@@ -45,8 +44,6 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 				className: props.className,
 				onChange: onChangeContent,
 				value: content,
-				focus: focus,
-				onFocus: props.setFocus
 			}
 		);
 	},
@@ -77,7 +74,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 		},
 	},
 
-	edit( { attributes, className, focus, setAttributes, setFocus } ) {
+	edit( { attributes, className, setAttributes } ) {
 		const { content } = attributes;
 
 		function onChangeContent( newContent ) {
@@ -90,8 +87,6 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 				className={ className }
 				onChange={ onChangeContent }
 				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
 			/>
 		);
 	},

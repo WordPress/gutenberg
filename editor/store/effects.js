@@ -28,7 +28,6 @@ import {
 	resetPost,
 	setupNewPost,
 	resetBlocks,
-	focusBlock,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
@@ -41,6 +40,7 @@ import {
 	saveReusableBlock,
 	insertBlock,
 	setMetaBoxSavedData,
+	selectBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -223,7 +223,7 @@ export default {
 
 		// Only focus the previous block if it's not mergeable
 		if ( ! blockType.merge ) {
-			dispatch( focusBlock( blockA.uid ) );
+			dispatch( selectBlock( blockA.uid ) );
 			return;
 		}
 
@@ -244,7 +244,7 @@ export default {
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		dispatch( focusBlock( blockA.uid, { offset: -1 } ) );
+		dispatch( selectBlock( blockA.uid, -1 ) );
 		dispatch( replaceBlocks(
 			[ blockA.uid, blockB.uid ],
 			[
