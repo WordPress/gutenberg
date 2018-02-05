@@ -231,7 +231,7 @@ editor interface where blocks are implemented.
 
 - `title: string` - A human-readable
   [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files)
-  label for the block. Shown in the block picker.
+  label for the block. Shown in the block inserter.
 - `icon: string | WPElement | Function` - Slug of the
   [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards)
   to be shown in the control's button, or an element (or function returning an
