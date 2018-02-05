@@ -486,7 +486,7 @@ function gutenberg_replace_default_add_new_button() {
 			}
 
 			var url = button.href;
-			var urlHasParams = ( -1 !== url.indexOf( '?' ) ); 
+			var urlHasParams = ( -1 !== url.indexOf( '?' ) );
 			var classicUrl = url + ( urlHasParams ? '&' : '?' ) + 'classic-editor';
 
 			var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
