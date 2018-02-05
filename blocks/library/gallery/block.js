@@ -73,6 +73,30 @@ class GalleryBlock extends Component {
 		};
 	}
 
+	onReorderImage( event, index, direction ) {
+		event.stopPropagation();
+		const { attributes: { images }, setAttributes } = this.props;
+		let to = 0;
+		switch(direction) {
+			case 'left':
+				to = index - 1;
+				break;
+			case 'right':
+				to = index + 1;
+				break;
+			default:
+				return false;
+		}
+
+		const newImages = Array.from(images);
+		
+		newImages.splice(to, 0, newImages.splice(index, 1)[0]);
+
+		this.setState({selectedImage: to});
+		setAttributes( { images: newImages } );
+		
+	}
+
 	onSelectImages( imgs ) {
 		this.props.setAttributes( { images: imgs } );
 	}
@@ -219,6 +243,9 @@ class GalleryBlock extends Component {
 							isSelected={ this.state.selectedImage === index }
 							onRemove={ this.onRemoveImage( index ) }
 							onClick={ this.onSelectImage( index ) }
+							onReorder={(event, direction) => this.onReorderImage( event, index, direction )}
+							isFirst={index === 0}
+							isLast={index === images.length - 1}
 							setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 						/>
 					</li>
