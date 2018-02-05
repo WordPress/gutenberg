@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import 'element-closest';
-import { find, last, reverse } from 'lodash';
+import { find, last, reverse, clamp } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -136,13 +136,13 @@ class WritingFlow extends Component {
 
 	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
 		const lastIndex = blocks.indexOf( currentEndUid );
-		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
+		const nextIndex = clamp( lastIndex + delta, 0, blocks.length - 1 );
 		this.props.onMultiSelect( currentStartUid, blocks[ nextIndex ] );
 	}
 
 	moveSelection( blocks, currentUid, delta ) {
 		const currentIndex = blocks.indexOf( currentUid );
-		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, currentIndex + delta ) );
+		const nextIndex = clamp( currentIndex + delta, 0, blocks.length - 1 );
 		this.props.onFocusBlock( blocks[ nextIndex ] );
 	}
 
