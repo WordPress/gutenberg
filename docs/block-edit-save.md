@@ -140,3 +140,7 @@ Before starting to debug, be sure to familiarize yourself with the validation st
 If you're using [attribute sources](https://wordpress.org/gutenberg/handbook/block-api/attributes/), be sure that attributes sourced from markup are saved exactly as you expect, and in the correct type (usually a `'string'` or `'number'`).
 
 When a block is detected as invalid, a warning will be logged into your browser's developer tools console. The warning will include specific details about the exact point at which a difference in markup occurred. Be sure to look closely at any differences in the expected and actual markups to see where problems are occurring.
+
+**I've changed my block's `save` behavior and old content now includes invalid blocks. How can I fix this?**
+
+Refer to the guide on [Deprecated Blocks](https://wordpress.org/gutenberg/handbook/block-api/deprecated-blocks/) to learn more about how to accommodate legacy content in intentional markup changes.
