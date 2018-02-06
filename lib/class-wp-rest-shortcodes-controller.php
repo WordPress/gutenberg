@@ -85,7 +85,7 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		$vimeo_pattern = '#https?://(.+\.)?vimeo\.com/.*#';
 		$args          = $request->get_params();
 		$post          = isset( $args['postId'] ) ? get_post( $args['postId'] ) : null;
-		$shortcode     = isset( $args['shortcode'] ) ? $args['shortcode'] : '';
+		$shortcode     = isset( $args['shortcode'] ) ? trim( $args['shortcode'] ) : '';
 		$cache_key     = 'shortcode_' . md5( serialize( $args ) );
 		$data          = get_transient( $cache_key );
 		if ( ! empty( $data ) ) {
@@ -100,6 +100,7 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		);
 
 		if ( empty( $shortcode ) ) {
+			$data['html'] = __( 'Enter something to preview', 'gutenberg' );
 			return rest_ensure_response( $data );
 		}
 
@@ -115,6 +116,7 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		}
 
 		if ( empty( $output ) ) {
+			$data['html'] = __( 'Sorry, couldn\'t render a preview', 'gutenberg' );
 			return rest_ensure_response( $data );
 		}
 
