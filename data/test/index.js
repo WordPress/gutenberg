@@ -62,27 +62,27 @@ describe( 'query', () => {
 
 describe( 'subscribe', () => {
 	it( 'registers multiple selectors to the public API', () => {
-		let inrecementedValue = null;
+		let incrementedValue = null;
 		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
 		registerSelectors( 'myAwesomeReducer', {
 			globalSelector: ( state ) => state,
 		} );
 		const unsubscribe = subscribe( () => {
-			inrecementedValue = select( 'myAwesomeReducer', 'globalSelector' );
+			incrementedValue = select( 'myAwesomeReducer', 'globalSelector' );
 		} );
 		const action = { type: 'dummy' };
 
 		store.dispatch( action ); // increment the data by => data = 2
-		expect( inrecementedValue ).toBe( 2 );
+		expect( incrementedValue ).toBe( 2 );
 
 		store.dispatch( action ); // increment the data by => data = 3
-		expect( inrecementedValue ).toBe( 3 );
+		expect( incrementedValue ).toBe( 3 );
 
 		unsubscribe(); // Store subscribe to changes, the data variable stops upgrading.
 
 		store.dispatch( action );
 		store.dispatch( action );
 
-		expect( inrecementedValue ).toBe( 3 );
+		expect( incrementedValue ).toBe( 3 );
 	} );
 } );
