@@ -177,8 +177,6 @@ export default class Sandbox extends Component {
 					<div id="content" dangerouslySetInnerHTML={ { __html: this.props.html } } />
 					<script type="text/javascript" dangerouslySetInnerHTML={ { __html: observeAndResizeJS } } />
 
-					<div dangerouslySetInnerHTML={ { __html: this.props.js } } />
-					<div dangerouslySetInnerHTML={ { __html: this.props.style } } />
 				</body>
 			</html>
 		);

@@ -14,14 +14,13 @@ function ShortcodePreview( { response, setFocus } ) {
 		);
 	}
 
+	const html = response.data.html + ' ' + response.data.js + ' ' + response.data.style;
 	return (
 		<figure className="wp-block-embed" key="embed">
 			<SandBox
-				html={ response.data.html }
+				html={ html }
 				title="Preview"
 				type={ response.data.type }
-				js={ response.data.js }
-				style={ response.data.style }
 				onFocus={ setFocus }
 			/>
 		</figure>
