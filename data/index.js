@@ -33,7 +33,7 @@ export function globalListener() {
  *
  * @param {Function}   listener Listener function.
  *
- * @returns {Function}          Unsubscribe function.
+ * @return {Function}           Unsubscribe function.
  */
 export const subscribe = ( listener ) => {
 	listeners.push( listener );
