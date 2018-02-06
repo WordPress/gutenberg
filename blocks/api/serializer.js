@@ -20,7 +20,7 @@ import { getBlockType, getUnknownTypeHandlerName } from './registration';
  *
  * @param {string} blockName The block name.
  *
- * @returns {string} The block's default class.
+ * @return {string} The block's default class.
  */
 export function getBlockDefaultClassname( blockName ) {
 	// Drop common prefixes: 'core/' or 'core-' (in 'core-embed/')
@@ -34,7 +34,7 @@ export function getBlockDefaultClassname( blockName ) {
  * @param {Object} blockType  Block type.
  * @param {Object} attributes Block attributes.
  *
- * @returns {Object|string} Save content.
+ * @return {Object|string} Save content.
  */
 export function getSaveElement( blockType, attributes ) {
 	const { save } = blockType;
@@ -73,7 +73,7 @@ export function getSaveElement( blockType, attributes ) {
  * @param {Object} blockType  Block type.
  * @param {Object} attributes Block attributes.
  *
- * @returns {string} Save content.
+ * @return {string} Save content.
  */
 export function getSaveContent( blockType, attributes ) {
 	const saveElement = getSaveElement( blockType, attributes );
@@ -101,7 +101,7 @@ export function getSaveContent( blockType, attributes ) {
  * @param {Object<string,*>} allAttributes Attributes from in-memory block data.
  * @param {Object<string,*>} blockType     Block type.
  *
- * @returns {Object<string,*>} Subset of attributes for comment serialization.
+ * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( allAttributes, blockType ) {
 	const attributes = reduce( blockType.attributes, ( result, attributeSchema, key ) => {
@@ -145,7 +145,7 @@ export function serializeAttributes( attrs ) {
  *
  * @param {string} content Original HTML.
  *
- * @returns {string} Beautiful HTML.
+ * @return {string} Beautiful HTML.
  */
 export function getBeautifulContent( content ) {
 	return beautifyHtml( content, {
@@ -159,7 +159,7 @@ export function getBeautifulContent( content ) {
  *
  * @param {Object} block Block Object.
  *
- * @returns {string} HTML.
+ * @return {string} HTML.
  */
 export function getBlockContent( block ) {
 	const blockType = getBlockType( block.name );
@@ -183,7 +183,7 @@ export function getBlockContent( block ) {
  * @param {Object} attributes   Block attributes.
  * @param {string} content      Block save content.
  *
- * @returns {string} Comment-delimited block content.
+ * @return {string} Comment-delimited block content.
  */
 export function getCommentDelimitedContent( rawBlockName, attributes, content ) {
 	const serializedAttributes = ! isEmpty( attributes ) ?
@@ -212,7 +212,7 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
  *
  * @param {Object} block Block instance.
  *
- * @returns {string} Serialized block.
+ * @return {string} Serialized block.
  */
 export function serializeBlock( block ) {
 	const blockName = block.name;
@@ -247,7 +247,7 @@ export function serializeBlock( block ) {
  *
  * @param {Array} blocks Block(s) to serialize.
  *
- * @returns {string} The post content.
+ * @return {string} The post content.
  */
 export default function serialize( blocks ) {
 	return castArray( blocks ).map( serializeBlock ).join( '\n\n' );

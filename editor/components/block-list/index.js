@@ -108,7 +108,7 @@ class BlockList extends Component {
 	 *
 	 * @param {MouseEvent} event A mousemove event object.
 	 *
-	 * @returns {void}
+	 * @return {void}
 	 */
 	onPointerMove( { clientY } ) {
 		// We don't start multi-selection until the mouse starts moving, so as
@@ -160,7 +160,7 @@ class BlockList extends Component {
 	 *
 	 * @param {string} uid UID of the block where mousedown occurred.
 	 *
-	 * @returns {void}
+	 * @return {void}
 	 */
 	onSelectionStart( uid ) {
 		if ( ! this.props.isSelectionEnabled ) {
@@ -208,7 +208,7 @@ class BlockList extends Component {
 	/**
 	 * Handles a mouseup event to end the current cursor multi-selection.
 	 *
-	 * @returns {void}
+	 * @return {void}
 	 */
 	onSelectionEnd() {
 		// Cancel throttled calls.

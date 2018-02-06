@@ -7,7 +7,7 @@
  *                               (desktop, mobile or publish).
  * @param {boolean?} forcedValue Force a sidebar state.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function toggleSidebar( sidebar, forcedValue ) {
 	return {
@@ -23,7 +23,7 @@ export function toggleSidebar( sidebar, forcedValue ) {
  *
  * @param {string} panel The panel name.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function setActivePanel( panel ) {
 	return {
@@ -38,7 +38,7 @@ export function setActivePanel( panel ) {
  *
  * @param {string} panel The panel name.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function toggleSidebarPanel( panel ) {
 	return {
@@ -52,7 +52,7 @@ export function toggleSidebarPanel( panel ) {
  *
  * @param {string} feature Featurre name.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function toggleFeature( feature ) {
 	return {

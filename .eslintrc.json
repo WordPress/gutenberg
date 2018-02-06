@@ -186,7 +186,7 @@
 				"arg": "param",
 				"argument": "param",
 				"extends": "augments",
-				"return": "returns"
+				"returns": "return"
 			},
 			"preferType": {
 				"array": "Array",

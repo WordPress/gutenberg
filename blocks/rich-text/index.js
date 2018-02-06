@@ -116,7 +116,7 @@ export default class RichText extends Component {
 	 * Allows passing in settings which will be overwritten.
 	 *
 	 * @param {Object} settings The settings to overwrite.
-	 * @returns {Object} The settings for this block.
+	 * @return {Object} The settings for this block.
 	 */
 	getSettings( settings ) {
 		return ( this.props.getSettings || identity )( {
@@ -168,7 +168,7 @@ export default class RichText extends Component {
 	 *
 	 * @param {string} name The name of the event.
 	 *
-	 * @returns {void} Void.
+	 * @return {void} Void.
 	*/
 	proxyPropHandler( name ) {
 		return ( event ) => {
@@ -412,7 +412,7 @@ export default class RichText extends Component {
 	/**
 	 * Determines the DOM rectangle for the selection in the editor.
 	 *
-	 * @returns {DOMRect} The DOMRect based on the selection in the editor.
+	 * @return {DOMRect} The DOMRect based on the selection in the editor.
 	 */
 	getEditorSelectionRect() {
 		let range = this.editor.selection.getRng();
@@ -447,7 +447,7 @@ export default class RichText extends Component {
 	 * absolutely position the toolbar. It does this by finding the closest
 	 * relative element.
 	 *
-	 * @returns {{top: number, left: number}} The desired position of the toolbar.
+	 * @return {{top: number, left: number}} The desired position of the toolbar.
 	 */
 	getFocusPosition() {
 		const position = this.getEditorSelectionRect();
@@ -477,7 +477,7 @@ export default class RichText extends Component {
 	/**
 	 * Determines if the current selection within the editor is at the start.
 	 *
-	 * @returns {boolean} Whether or not the selection is at the start of the editor.
+	 * @return {boolean} Whether or not the selection is at the start of the editor.
 	 */
 	isStartOfEditor() {
 		const range = this.editor.selection.getRng();
@@ -500,7 +500,7 @@ export default class RichText extends Component {
 	/**
 	 * Determines if the current selection within the editor is at the end.
 	 *
-	 * @returns {boolean} Whether or not the selection is at the end of the editor.
+	 * @return {boolean} Whether or not the selection is at the end of the editor.
 	 */
 	isEndOfEditor() {
 		const range = this.editor.selection.getRng();

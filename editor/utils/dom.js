@@ -16,7 +16,7 @@ const { TEXT_NODE } = window.Node;
  * @param {boolean} isReverse      Set to true to check left, false for right.
  * @param {boolean} collapseRanges Whether or not to collapse the selection range before the check.
  *
- * @returns {boolean} True if at the horizontal edge, false if not.
+ * @return {boolean} True if at the horizontal edge, false if not.
  */
 export function isHorizontalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
@@ -82,7 +82,7 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
  * @param {boolean} isReverse      Set to true to check top, false for bottom.
  * @param {boolean} collapseRanges Whether or not to collapse the selection range before the check.
  *
- * @returns {boolean} True if at the edge, false if not.
+ * @return {boolean} True if at the edge, false if not.
  */
 export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
@@ -204,7 +204,7 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
  * @param {number}    x   Horizontal position within the current viewport.
  * @param {number}    y   Vertical position within the current viewport.
  *
- * @returns {?Range} The best range for the given point.
+ * @return {?Range} The best range for the given point.
  */
 function caretRangeFromPoint( doc, x, y ) {
 	if ( doc.caretRangeFromPoint ) {
@@ -234,7 +234,7 @@ function caretRangeFromPoint( doc, x, y ) {
  * @param {number}    y         Vertical position within the current viewport.
  * @param {Element}  container Container in which the range is expected to be found.
  *
- * @returns {?Range} The best range for the given point.
+ * @return {?Range} The best range for the given point.
  */
 function hiddenCaretRangeFromPoint( doc, x, y, container ) {
 	container.style.zIndex = '10000';
@@ -315,7 +315,7 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
  *
  * @param {HTMLElement} element The HTML element.
  *
- * @returns {boolean} True if the element is an input field, false if not.
+ * @return {boolean} True if the element is an input field, false if not.
  */
 export function isInputField( { nodeName, contentEditable } ) {
 	return (
@@ -329,7 +329,7 @@ export function isInputField( { nodeName, contentEditable } ) {
  * Check wether the current document has a selection.
  * This checks both for focus in an input field and general text selection.
  *
- * @returns {boolean} True if there is selection, false if not.
+ * @return {boolean} True if there is selection, false if not.
  */
 export function documentHasSelection() {
 	if ( isInputField( document.activeElement ) ) {

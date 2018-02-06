@@ -18,7 +18,7 @@ import { PREFERENCES_DEFAULTS } from './defaults';
  * @param {Object}  state.panels          The state of the different sidebar panels.
  * @param {Object}  action                Dispatched action.
  *
- * @returns {string} Updated state.
+ * @return {string} Updated state.
  */
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {

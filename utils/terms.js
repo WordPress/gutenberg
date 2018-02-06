@@ -8,7 +8,7 @@ import { groupBy } from 'lodash';
  *
  * @param {Array} flatTerms  Array of terms in flat format.
  *
- * @returns {Array} Array of terms in tree format.
+ * @return {Array} Array of terms in tree format.
  */
 export function buildTermsTree( flatTerms ) {
 	const termsByParent = groupBy( flatTerms, 'parent' );
