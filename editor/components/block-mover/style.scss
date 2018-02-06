@@ -1,7 +1,6 @@
 // Mover icon buttons$
 .editor-block-mover__control {
 	display: block;
-	padding: 2px;
 	margin: 0 6px 0 4px;
 	border: none;
 	outline: none;
@@ -9,7 +8,18 @@
 	color: $dark-gray-300;
 	cursor: pointer;
 	border-radius: 50%;
-	width: $icon-button-size-small + 2px;
+	width: $icon-button-size-small;
+	height: $icon-button-size-small;
+	padding: 0;
+
+	padding: 3px;
+
+	// subtract 1px to account for a transparent border
+	&:not( :disabled ):hover,
+	&:not( :disabled ):active,
+	&:not( :disabled ):focus {
+		padding: 2px;
+	}
 
 	&[aria-disabled="true"] {
 		cursor: default;
@@ -32,12 +42,12 @@
 			display: block;
 			position: relative; // Fixing the Safari bug for `<button>`s overflow
 			border-radius: 50%;
-			width: 20px;
-			height: 20px;
 			@include button-style__neutral;
 		}
 
 		&:not(:disabled):hover svg {
+			width: 20px;
+			height: 20px;
 			@include button-style__hover;
 		}
 
@@ -47,6 +57,15 @@
 
 		&:not(:disabled):focus svg {
 			@include button-style__focus-active;
+		}
+
+
+
+		&:not(:disabled):hover svg,
+		&:not(:disabled):active svg,
+		&:not(:disabled):focus svg {
+			width: 20px;
+			height: 20px;
 		}
 	}
 }

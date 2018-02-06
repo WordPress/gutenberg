@@ -58,7 +58,7 @@
 	&.is-selected > .editor-block-mover:before,
 	&.is-hovered > .editor-block-mover:before {
 		border-right: 1px solid $light-gray-500;
-		right: 8px;
+		right: 6px;
 	}
 
 	&.is-reusable.is-selected > .editor-block-mover:before {
@@ -68,7 +68,7 @@
 	&.is-selected > .editor-block-settings-menu:before,
 	&.is-hovered > .editor-block-settings-menu:before {
 		border-left: 1px solid $light-gray-500;
-		left: 6px;
+		left: 4px;
 	}
 
 	&.is-reusable.is-selected > .editor-block-settings-menu:before {
@@ -321,7 +321,7 @@
 	// Right side UI
 	> .editor-block-settings-menu {
 		right: $block-mover-margin;
-		padding-top: 2px;
+		padding-top: 3px;
 
 		// Mobile
 		display: none;
