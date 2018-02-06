@@ -8,11 +8,13 @@
             "images": [
                 {
                     "url": "https://cldup.com/uuUqE_dXzy.jpg",
-                    "alt": "title"
+                    "alt": "title",
+                    "caption": []
                 },
                 {
                     "url": "http://google.com/hi.png",
-                    "alt": "title"
+                    "alt": "title",
+                    "caption": []
                 }
             ],
             "columns": 1,
