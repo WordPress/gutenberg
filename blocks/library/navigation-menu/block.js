@@ -10,7 +10,7 @@ import { stringify } from 'querystringify';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Toolbar, Spinner, withAPIData } from '@wordpress/components';
+import { Toolbar, withAPIData } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
 
@@ -19,32 +19,26 @@ import { decodeEntities } from '@wordpress/utils';
  */
 import './editor.scss';
 import './style.scss';
-import QueryPanel from '../../query-panel';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import RangeControl from '../../inspector-controls/range-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-
-const MAX_POSTS_COLUMNS = 6;
+import MenuPlaceholder from './placeholder';
 
 class NavigationMenuBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.toggleDisplayPostDate = this.toggleDisplayPostDate.bind( this );
+		this.setMenu = this.setMenu.bind( this );
 	}
 
-	toggleDisplayPostDate() {
-		const { displayPostDate } = this.props.attributes;
+	setMenu( value ) {
 		const { setAttributes } = this.props;
-
-		setAttributes( { displayPostDate: ! displayPostDate } );
+		setAttributes( { selected: value } );
 	}
 
 	render() {
 		const { attributes, focus, setAttributes } = this.props;
-		const { align, layout } = attributes;
+		const { align, layout, selected } = attributes;
 		const menus = this.props.menus.data;
 
 		const inspectorControls = focus && (
@@ -52,22 +46,6 @@ class NavigationMenuBlock extends Component {
 				<h3>{ __( 'Menu Settings' ) }</h3>
 			</InspectorControls>
 		);
-
-		const hasPosts = Array.isArray( menus ) && menus.length;
-		if ( ! hasPosts ) {
-			return [
-				inspectorControls,
-				<Placeholder key="placeholder"
-					icon="admin-post"
-					label={ __( 'Navigation Menu' ) }
-				>
-					{ ! Array.isArray( menus ) ?
-						<Spinner /> :
-						__( 'No posts found.' )
-					}
-				</Placeholder>,
-			];
-		}
 
 		const layoutControls = [
 			{
@@ -84,6 +62,19 @@ class NavigationMenuBlock extends Component {
 			},
 		];
 
+		let displayBlock = (
+			<MenuPlaceholder
+				key="navigation-menu"
+				menus={ menus }
+				selected={ false }
+				setMenu={ this.setMenu }
+			/>
+		);
+
+		if ( !! selected ) {
+			displayBlock = selected;
+		}
+
 		return [
 			inspectorControls,
 			focus && (
@@ -98,13 +89,7 @@ class NavigationMenuBlock extends Component {
 					<Toolbar controls={ layoutControls } />
 				</BlockControls>
 			),
-			<Placeholder
-				key="block-placeholder"
-				instructions={ __( 'Select an existing menu' ) }
-				icon={ 'menu' }
-				label={ __( 'Navigation Menu' ) } >
-				Test child
-			</Placeholder>,
+			displayBlock,
 		];
 	}
 }
