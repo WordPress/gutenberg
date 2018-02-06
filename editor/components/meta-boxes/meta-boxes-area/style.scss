@@ -3,10 +3,10 @@
 	position: relative;
 
 		/* Match width and positioning of the meta boxes. Override default styles. */
-	#poststuff {
+	.postbox-container {
 		margin: 0 auto;
 		padding-top: 0;
-		min-width: auto;
+		width: 100%
 	}
 
 	#post {
@@ -15,9 +15,9 @@
 
 	/* Override Default meta box stylings */
 
-	#poststuff h3.hndle,
-	#poststuff .stuffbox > h3,
-	#poststuff h2.hndle { /* WordPress selectors yolo */
+	.postbox h3.hndle,
+	.postbox .stuffbox > h3,
+	.postbox h2.hndle { /* WordPress selectors yolo */
 		border-bottom: 1px solid $light-gray-500;
 		box-sizing: border-box;
 		color: $dark-gray-500;
