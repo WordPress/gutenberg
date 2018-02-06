@@ -21,6 +21,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -237,12 +238,24 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	return transformationResults.map( ( result, index ) => ( {
-		...result,
-		// The first transformed block whose type matches the "destination"
-		// type gets to keep the existing UID of the first block.
-		uid: index === firstSwitchedBlock ? firstBlock.uid : result.uid,
-	} ) );
+	return transformationResults.map( ( result, index ) => {
+		const transformedBlock = {
+			...result,
+			// The first transformed block whose type matches the "destination"
+			// type gets to keep the existing UID of the first block.
+			uid: index === firstSwitchedBlock ? firstBlock.uid : result.uid,
+		};
+
+		/**
+		 * Filters an individual transform result from block transformation.
+		 * All of the original blocks are passed, since transformations are
+		 * many-to-many, not one-to-one.
+		 *
+		 * @param {Object}   transformedBlock The transformed block.
+		 * @param {Object[]} blocks           Original blocks transformed.
+		 */
+		return applyFilters( 'blocks.switchToBlockType.transformedBlock', transformedBlock, blocks );
+	} );
 }
 
 /**

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, compact } from 'lodash';
+import { assign, compact, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -49,5 +49,27 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
+/**
+ * Given a transformed block, assigns the layout from the original block. Since
+ * layout is a "global" attribute implemented via hooks, the individual block
+ * transforms are not expected to handle this themselves, and a transform would
+ * otherwise lose assigned layout.
+ *
+ * @param {Object} transformedBlock Original transformed block.
+ * @param {Object} blocks           Blocks on which transform was applied.
+ *
+ * @return {Object} Modified transformed block, with layout preserved.
+ */
+function preserveLayoutAttribute( transformedBlock, blocks ) {
+	// Since block transforms are many-to-many, use the layout attribute from
+	// the first of the source blocks.
+	const layout = get( blocks, [ 0, 'attributes', 'layout' ] );
+
+	transformedBlock.attributes.layout = layout;
+
+	return transformedBlock;
+}
+
 addFilter( 'blocks.registerBlockType', 'core/layout/attribute', addAttribute );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/layout/save-props', addSaveProps );
+addFilter( 'blocks.switchToBlockType.transformedBlock', 'core/layout/preserve-layout', preserveLayoutAttribute );

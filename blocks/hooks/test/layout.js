@@ -42,4 +42,15 @@ describe( 'layout', () => {
 			expect( extraProps.className ).toBe( 'wizard layout-wide' );
 		} );
 	} );
+
+	describe( 'preserveLayoutAttribute', () => {
+		const transformBlock = applyFilters.bind( null, 'blocks.switchToBlockType.transformedBlock' );
+
+		it( 'should preserve layout attribute', () => {
+			const blocks = [ { attributes: { layout: 'wide' } } ];
+			const transformedBlock = transformBlock( { attributes: {} }, blocks );
+
+			expect( transformedBlock.attributes.layout ).toBe( 'wide' );
+		} );
+	} );
 } );
