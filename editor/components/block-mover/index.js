@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { first, last } from 'lodash';
+import { first } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import { compose } from '@wordpress/element';
  */
 import './style.scss';
 import { getBlockMoverLabel } from './mover-label';
-import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../store/selectors';
+import { getBlockIndex, getBlock } from '../../store/selectors';
 import { selectBlock } from '../../store/actions';
 
 export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked } ) {
@@ -65,39 +65,42 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 	);
 }
 
+/**
+ * Action creator creator which, given the action type to dispatch and the
+ * arguments of mapDispatchToProps, creates a prop dispatcher callback for
+ * managing block movement.
+ *
+ * @param {string}   type     Action type to dispatch.
+ * @param {Function} dispatch Store dispatch.
+ * @param {Object}   ownProps The wrapped component's own props.
+ *
+ * @return {Function} Prop dispatcher callback.
+ */
+function createOnMove( type, dispatch, ownProps ) {
+	return () => {
+		const { uids, rootUID } = ownProps;
+		if ( uids.length === 1 ) {
+			dispatch( selectBlock( first( uids ) ) );
+		}
+
+		dispatch( { type, uids, rootUID } );
+	};
+}
+
 export default compose(
 	connect(
 		( state, ownProps ) => {
-			const block = getBlock( state, first( ownProps.uids ) );
+			const { uids, rootUID } = ownProps;
+			const block = getBlock( state, first( uids ) );
 
 			return ( {
-				isFirst: isFirstBlock( state, first( ownProps.uids ) ),
-				isLast: isLastBlock( state, last( ownProps.uids ) ),
-				firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
+				firstIndex: getBlockIndex( state, first( uids ), rootUID ),
 				blockType: block ? getBlockType( block.name ) : null,
 			} );
 		},
-		( dispatch, ownProps ) => ( {
-			onMoveDown() {
-				if ( ownProps.uids.length === 1 ) {
-					dispatch( selectBlock( first( ownProps.uids ) ) );
-				}
-
-				dispatch( {
-					type: 'MOVE_BLOCKS_DOWN',
-					uids: ownProps.uids,
-				} );
-			},
-			onMoveUp() {
-				if ( ownProps.uids.length === 1 ) {
-					dispatch( selectBlock( first( ownProps.uids ) ) );
-				}
-
-				dispatch( {
-					type: 'MOVE_BLOCKS_UP',
-					uids: ownProps.uids,
-				} );
-			},
+		( ...args ) => ( {
+			onMoveDown: createOnMove( 'MOVE_BLOCKS_DOWN', ...args ),
+			onMoveUp: createOnMove( 'MOVE_BLOCKS_UP', ...args ),
 		} )
 	),
 	withContext( 'editor' )( ( settings ) => {

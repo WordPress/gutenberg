@@ -1,12 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DefaultBlockAppender blocks present should match snapshot 1`] = `
+exports[`DefaultBlockAppender should append a default block when input focused 1`] = `
 <div
   className="editor-default-block-appender"
-/>
+>
+  <Connect(WrappedComponent) />
+  <input
+    className="editor-default-block-appender__content"
+    onClick={
+      [MockFunction] {
+        "calls": Array [
+          Array [],
+        ],
+      }
+    }
+    onFocus={
+      [MockFunction] {
+        "calls": Array [
+          Array [],
+        ],
+      }
+    }
+    onKeyDown={
+      [MockFunction] {
+        "calls": Array [
+          Array [],
+        ],
+      }
+    }
+    readOnly={true}
+    type="text"
+    value="Write your story"
+  />
+</div>
 `;
 
-exports[`DefaultBlockAppender no block present should match snapshot 1`] = `
+exports[`DefaultBlockAppender should match snapshot 1`] = `
 <div
   className="editor-default-block-appender"
 >
@@ -19,6 +48,23 @@ exports[`DefaultBlockAppender no block present should match snapshot 1`] = `
     readOnly={true}
     type="text"
     value="Write your story"
+  />
+</div>
+`;
+
+exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
+<div
+  className="editor-default-block-appender"
+>
+  <Connect(WrappedComponent) />
+  <input
+    className="editor-default-block-appender__content"
+    onClick={[MockFunction]}
+    onFocus={[MockFunction]}
+    onKeyDown={[MockFunction]}
+    readOnly={true}
+    type="text"
+    value=""
   />
 </div>
 `;

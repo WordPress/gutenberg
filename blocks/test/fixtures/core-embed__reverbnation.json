@@ -9,6 +9,7 @@
                 "Embedded content from reverbnation"
             ]
         },
+        "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-reverbnation\">\n    https://reverbnation.com/\n    <figcaption>Embedded content from reverbnation</figcaption>\n</figure>"
     }
 ]

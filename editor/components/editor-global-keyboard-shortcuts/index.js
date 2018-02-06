@@ -13,7 +13,7 @@ import { KeyboardShortcuts, withContext } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getBlockUids, getMultiSelectedBlockUids } from '../../store/selectors';
+import { getBlockOrder, getMultiSelectedBlockUids } from '../../store/selectors';
 import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../store/actions';
 
 class EditorGlobalKeyboardShortcuts extends Component {
@@ -69,7 +69,7 @@ export default compose(
 	connect(
 		( state ) => {
 			return {
-				uids: getBlockUids( state ),
+				uids: getBlockOrder( state ),
 				multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 			};
 		},
