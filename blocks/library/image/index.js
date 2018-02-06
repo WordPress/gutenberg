@@ -162,9 +162,17 @@ export const settings = {
 	edit: ImageBlock,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height } = attributes;
-		const extraImageProps = width || height ? { width, height } : {};
-		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+		const { url, alt, caption, align, href, width, height, id } = attributes;
+
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ id ? `wp-image-${ id }` : null }
+				width={ width }
+				height={ height }
+			/>
+		);
 
 		let figureStyle = {};
 
