@@ -4,18 +4,10 @@
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
-import SelectControl from '../../inspector-controls/select-control';
 
 class MenuPlaceholder extends Component {
-	getOptionsFromMenu( menu ) {
-		return {
-			value: menu.id,
-			label: menu.name,
-		};
-	}
-
 	render() {
-		const { menus, selected, setMenu } = this.props;
+		const { children, menus } = this.props;
 		const hasMenus = Array.isArray( menus ) && menus.length;
 
 		if ( ! hasMenus ) {
@@ -37,12 +29,7 @@ class MenuPlaceholder extends Component {
 				key="block-placeholder"
 				icon={ 'menu' }
 				label={ __( 'Navigation Menu' ) } >
-				<SelectControl
-					label={ __( 'Select an existing menu' ) }
-					value={ selected }
-					onChange={ setMenu }
-					options={ menus.map( this.getOptionsFromMenu ) }
-				/>
+				{ children }
 			</Placeholder>
 		);
 	}

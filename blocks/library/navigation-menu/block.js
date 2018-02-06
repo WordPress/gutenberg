@@ -11,10 +11,26 @@ import { decodeEntities } from '@wordpress/utils';
  */
 import './editor.scss';
 import './style.scss';
-import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import InspectorControls from '../../inspector-controls';
 import MenuPlaceholder from './placeholder';
+import SelectControl from '../../inspector-controls/select-control';
+
+function getOptionsFromMenu( menus, selected ) {
+	if ( ! menus ) {
+		return [];
+	}
+
+	const options = menus.map( item => ( {
+		value: item.id,
+		label: item.name,
+	} ) );
+	if ( ! selected ) {
+		options.unshift( { value: '', label: __( 'Select' ) } );
+	}
+	return options;
+}
 
 class NavigationMenuBlock extends Component {
 	constructor() {
@@ -26,7 +42,9 @@ class NavigationMenuBlock extends Component {
 
 	setMenu( value ) {
 		const { setAttributes } = this.props;
-		setAttributes( { selected: value } );
+		if ( value ) {
+			setAttributes( { selected: value } );
+		}
 	}
 
 	renderMenu() {
@@ -62,11 +80,21 @@ class NavigationMenuBlock extends Component {
 	render() {
 		const { attributes, focus, setAttributes } = this.props;
 		const { align, layout, selected } = attributes;
-		const menus = this.props.menus.data;
+		const { data: menus, isLoading } = this.props.menus;
+
+		const menuSelectControl = (
+			<SelectControl
+				label={ __( 'Select an existing menu' ) }
+				value={ selected }
+				onChange={ this.setMenu }
+				options={ getOptionsFromMenu( menus, selected ) }
+			/>
+		);
 
 		const inspectorControls = focus && (
 			<InspectorControls key="inspector">
 				<h3>{ __( 'Menu Settings' ) }</h3>
+				{ ! isLoading && menuSelectControl }
 			</InspectorControls>
 		);
 
@@ -90,8 +118,9 @@ class NavigationMenuBlock extends Component {
 				key="navigation-menu"
 				menus={ menus }
 				selected={ false }
-				setMenu={ this.setMenu }
-			/>
+				setMenu={ this.setMenu } >
+				{ menuSelectControl }
+			</MenuPlaceholder>
 		);
 
 		if ( !! selected ) {
