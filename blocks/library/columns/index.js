@@ -22,7 +22,12 @@ import InnerBlocks from '../../inner-blocks';
 export const name = 'core/columns';
 
 export const settings = {
-	title: __( 'Columns' ),
+	title: sprintf(
+		/* translators: Block title modifier */
+		__( '%1$s (%2$s)' ),
+		__( 'Columns' ),
+		__( 'Experimental' )
+	),
 
 	icon: 'columns',
 
