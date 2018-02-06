@@ -192,6 +192,40 @@ class ParagraphBlock extends Component {
 	}
 }
 
+const supports = {
+	className: false,
+};
+
+const schema = {
+	content: {
+		type: 'array',
+		source: 'children',
+		selector: 'p',
+	},
+	align: {
+		type: 'string',
+	},
+	dropCap: {
+		type: 'boolean',
+		default: false,
+	},
+	placeholder: {
+		type: 'string',
+	},
+	width: {
+		type: 'string',
+	},
+	textColor: {
+		type: 'string',
+	},
+	backgroundColor: {
+		type: 'string',
+	},
+	fontSize: {
+		type: 'number',
+	},
+};
+
 export const name = 'core/paragraph';
 
 export const settings = {
@@ -205,39 +239,9 @@ export const settings = {
 
 	keywords: [ __( 'text' ) ],
 
-	supports: {
-		className: false,
-	},
+	supports,
 
-	attributes: {
-		content: {
-			type: 'array',
-			source: 'children',
-			selector: 'p',
-		},
-		align: {
-			type: 'string',
-		},
-		dropCap: {
-			type: 'boolean',
-			default: false,
-		},
-		placeholder: {
-			type: 'string',
-		},
-		width: {
-			type: 'string',
-		},
-		textColor: {
-			type: 'string',
-		},
-		backgroundColor: {
-			type: 'string',
-		},
-		fontSize: {
-			type: 'number',
-		},
-	},
+	attributes: schema,
 
 	transforms: {
 		from: [
@@ -251,6 +255,28 @@ export const settings = {
 			},
 		],
 	},
+
+	deprecated: [
+		{
+			supports,
+			attributes: {
+				...schema,
+				content: {
+					type: 'string',
+					source: 'html',
+				},
+			},
+			save( { attributes } ) {
+				return attributes.content;
+			},
+			migrate( attributes ) {
+				return {
+					...attributes,
+					content: [ attributes.content ],
+				};
+			},
+		},
+	],
 
 	merge( attributes, attributesToMerge ) {
 		return {
