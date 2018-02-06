@@ -43,6 +43,7 @@
 		"react": "16.2.0",
 		"react-autosize-textarea": "2.0.0",
 		"react-click-outside": "2.3.1",
+    "react-codemirror": "1.0.0",
 		"react-color": "2.13.4",
 		"react-datepicker": "0.61.0",
 		"react-dom": "16.2.0",
