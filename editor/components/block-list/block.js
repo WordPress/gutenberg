@@ -114,12 +114,14 @@ export class BlockListBlock extends Component {
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
+		this.onSelectionChange = this.onSelectionChange.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
 
 		this.state = {
 			error: null,
+			isSelectionCollapsed: true,
 		};
 	}
 
@@ -143,6 +145,7 @@ export class BlockListBlock extends Component {
 		if ( this.props.isTyping ) {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -179,6 +182,7 @@ export class BlockListBlock extends Component {
 
 	componentWillUnmount() {
 		this.removeStopTypingListener();
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	removeStopTypingListener() {
@@ -230,6 +234,7 @@ export class BlockListBlock extends Component {
 		// Detect touchstart to disable hover on iOS
 		this.hadTouchStart = true;
 	}
+
 	onClick() {
 		// Clear touchstart detection
 		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
@@ -365,6 +370,10 @@ export class BlockListBlock extends Component {
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
 
+		if ( keyCode !== ESCAPE && ! this.props.isSelected ) {
+			this.props.onSelect();
+		}
+
 		switch ( keyCode ) {
 			case ENTER:
 				// Insert default block after current block if enter and event
@@ -426,6 +435,15 @@ export class BlockListBlock extends Component {
 		}
 	}
 
+	onSelectionChange() {
+		const selection = window.getSelection();
+		const range = selection.getRangeAt( 0 );
+		// We only keep track of the collapsed selection for selected blocks.
+		if ( range.collapsed !== this.state.isSelectionCollapsed && this.props.isSelected ) {
+			this.setState( { isSelectionCollapsed: range.collapsed } );
+		}
+	}
+
 	render() {
 		const {
 			block,
@@ -448,7 +466,10 @@ export class BlockListBlock extends Component {
 
 		// Generate the wrapper class names handling the different states of the block.
 		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected } = this.props;
-		const showUI = isSelected && ! this.props.isTyping;
+
+		// If the block is selected and we're typing we hide the sidebar
+		// unless the selection is not collapsed.
+		const showUI = isSelected && ( ! this.props.isTyping || ! this.state.isSelectionCollapsed );
 		const { error } = this.state;
 		const wrapperClassName = classnames( 'editor-block-list__block', {
 			'has-warning': ! isValid || !! error,
