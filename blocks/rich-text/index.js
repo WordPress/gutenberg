@@ -22,7 +22,7 @@ import 'element-closest';
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
 import { keycodes, createBlobURL } from '@wordpress/utils';
-import { Slot, Fill } from '@wordpress/components';
+import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -72,7 +72,7 @@ export function getFormatProperties( formatName, parents ) {
 
 const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
-export default class RichText extends Component {
+export class RichText extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -267,11 +267,11 @@ export default class RichText extends Component {
 
 			if ( isEmpty && this.props.onReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
-				setTimeout( () => this.props.onReplace( content ) );
+				this.props.setTimeout( () => this.props.onReplace( content ) );
 			} else if ( this.props.onSplit ) {
 				// Necessary to get the right range.
 				// Also done in the TinyMCE paste plugin.
-				setTimeout( () => this.splitContent( content ) );
+				this.props.setTimeout( () => this.splitContent( content ) );
 			}
 
 			event.preventDefault();
@@ -855,3 +855,5 @@ RichText.defaultProps = {
 	formattingControls: DEFAULT_FORMATS,
 	formatters: [],
 };
+
+export default withSafeTimeout( RichText );
