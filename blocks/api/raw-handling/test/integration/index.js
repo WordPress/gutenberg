@@ -8,7 +8,6 @@ import path from 'path';
 /**
  * Internal dependencies
  */
-import { registerCoreBlocks } from '../../../../library';
 import rawHandler from '../../index';
 import serialize from '../../../serializer';
 
@@ -25,7 +24,8 @@ describe( 'raw handling: integration', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
 		require( 'blocks/hooks' );
-		registerCoreBlocks();
+
+		// TODO: Need to load/register core blocks. Maybe requireIndex ?
 	} );
 
 	types.forEach( ( type ) => {

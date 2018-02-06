@@ -13,7 +13,6 @@ import './hooks';
 // Blocks are inferred from the HTML source of a post through a parsing mechanism
 // and then stored as objects in state, from which it is then rendered for editing.
 export * from './api';
-export { registerCoreBlocks } from './library';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockControls } from './block-controls';

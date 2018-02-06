@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { createBlock, registerCoreBlocks } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ import { createBlock, registerCoreBlocks } from '@wordpress/blocks';
 import { DocumentOutline } from '../';
 
 describe( 'DocumentOutline', () => {
-	registerCoreBlocks();
+	// TODO: Need to load/register core blocks. Maybe requireIndex ?
 
 	const paragraph = createBlock( 'core/paragraph' );
 	const headingH1 = createBlock( 'core/heading', {
