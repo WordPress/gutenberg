@@ -242,7 +242,8 @@ class WritingFlow extends Component {
 				const target = this.getInnerTabbable( blockContainer, this.props.initialPosition === -1 );
 				target.focus();
 				if ( this.props.initialPosition === -1 ) {
-					// Special casing richtext because the two functions at the bo bottomare not working as expected.
+					// Special casing RichText components because the two functions at the bottom are not working as expected.
+					// When merging two sibling paragraph blocks (backspacing) the focus is not moved to the right position.
 					const editor = tinymce.get( target.getAttribute( 'id' ) );
 					if ( editor ) {
 						editor.selection.select( editor.getBody(), true );

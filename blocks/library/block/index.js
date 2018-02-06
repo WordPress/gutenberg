@@ -105,7 +105,7 @@ class ReusableBlockEdit extends Component {
 				<BlockEdit
 					{ ...this.props }
 					name={ reusableBlock.type }
-					isSelected={ isEditing ? isSelected : false }
+					isSelected={ isEditing && isSelected }
 					attributes={ reusableBlockAttributes }
 					setAttributes={ isEditing ? this.setAttributes : noop }
 				/>
