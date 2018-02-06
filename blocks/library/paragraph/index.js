@@ -8,7 +8,13 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren, Component } from '@wordpress/element';
-import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpress/components';
+import {
+	Autocomplete,
+	PanelBody,
+	PanelColor,
+	withFallbackStyles,
+	withContext,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -70,6 +76,7 @@ class ParagraphBlock extends Component {
 			setFocus,
 			mergeBlocks,
 			onReplace,
+			allowedBlockTypes,
 		} = this.props;
 
 		const {
@@ -142,7 +149,7 @@ class ParagraphBlock extends Component {
 			),
 			<div key="editable" ref={ this.bindRef }>
 				<Autocomplete completers={ [
-					blockAutocompleter( { onReplace } ),
+					blockAutocompleter( { onReplace, allowedBlockTypes } ),
 					userAutocompleter(),
 				] }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
@@ -265,7 +272,9 @@ export const settings = {
 		}
 	},
 
-	edit: ParagraphBlock,
+	edit: withContext( 'editor' )( ( settings ) => ( {
+		allowedBlockTypes: settings.blockTypes,
+	} ) )( ParagraphBlock ),
 
 	save( { attributes } ) {
 		const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
