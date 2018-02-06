@@ -32,12 +32,13 @@ Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The abo
 To run unit tests only, without the linter, use `npm run test-unit` instead.
 
 ### Folder structure
+
 Keep your tests in a `test` folder in your working directory. The test file should have the same name as the test subject file.
 
 ```
 +-- test
 |   +-- bar.js
-+-- bar.jsx
++-- bar.js
 ```
 
 Only test files (with at least one test case) should live directly under `/test`. If you need to add external mocks or fixtures, place them in a sub folder, for example:
@@ -60,6 +61,7 @@ Given the previous folder structure, try to use relative paths when importing of
 It will make your life easier should you decide to relocate your code to another position in the application directory.
 
 ### Describing tests
+
 Use a `describe` block to group test cases. Each test case should ideally describe one behaviour only.
 
 In test cases, try to describe in plain words the expected behaviour. For UI components, this might entail describing expected behaviour from a user perspective rather than explaining code internals.
@@ -68,7 +70,7 @@ In test cases, try to describe in plain words the expected behaviour. For UI com
 
 ```javascript
 describe( 'CheckboxWithLabel', () => {
-    test('checking checkbox should disable the form submit button', () => {
+    test( 'checking checkbox should disable the form submit button', () => {
         ...
     } );
 } );
@@ -78,7 +80,7 @@ describe( 'CheckboxWithLabel', () => {
 
 ```javascript
 describe( 'CheckboxWithLabel', () => {
-    test('checking checkbox should set this.state.disableButton to `true`', () => {
+    test( 'checking checkbox should set this.state.disableButton to `true`', () => {
         ...
     } );
 } );
