@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -48,6 +53,7 @@ class NavigationMenuBlock extends Component {
 	}
 
 	renderMenu() {
+		const { layout } = this.props.attributes;
 		const { data, isLoading } = this.props.items;
 		if ( ! data || isLoading ) {
 			return (
@@ -65,7 +71,12 @@ class NavigationMenuBlock extends Component {
 		}
 
 		return (
-			<ul key="navigation-menu">
+			<ul
+				key="navigation-menu"
+				className={ classnames( this.props.className, {
+					'is-horizontal': layout === 'horizontal',
+				} ) }
+			>
 				{ data.map( ( item, i ) => {
 					return (
 						<li key={ i }>
