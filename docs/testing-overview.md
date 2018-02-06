@@ -19,9 +19,9 @@ When writing tests consider the following:
 
 ## JavaScript Testing
 
-Tests for JavaScript use [Jest](http://facebook.github.io/jest/) as the test runner. If needed, you can also use [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
+Tests for JavaScript use [Jest](http://facebook.github.io/jest/) as the test runner and its API for [globals](https://facebook.github.io/jest/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](http://facebook.github.io/jest/docs/en/expect.html), [mocks](http://facebook.github.io/jest/docs/en/mock-functions.html), [spies](http://facebook.github.io/jest/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://facebook.github.io/jest/docs/en/mock-function-api.html). If needed, you can also use [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
 
-Assuming you've followed the instructions above to install Node and project dependencies, tests can be run from the command-line with NPM:
+Assuming you've followed the [instructions](../CONTRIBUTING.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
 ```
 npm test
@@ -31,13 +31,7 @@ Code style in JavaScript is enforced using [ESLint](http://eslint.org/). The abo
 
 To run unit tests only, without the linter, use `npm run test-unit` instead.
 
-## Writing tests
-
-We use [Jest](https://facebook.github.io/jest) testing framework for unit tests, and [Enzyme](https://github.com/airbnb/enzyme) for testing React components. You can find more information on testing components at [component tests](component-tests.md).
-
-Though you'll still see Chai assertions and Sinon spies/mocks throughout the code base, for all new tests we use the Jest API for [globals](https://facebook.github.io/jest/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](http://facebook.github.io/jest/docs/en/expect.html), [mocks](http://facebook.github.io/jest/docs/en/mock-functions.html), [spies](http://facebook.github.io/jest/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://facebook.github.io/jest/docs/en/mock-function-api.html).
-
-## Folder structure
+### Folder structure
 Keep your tests in a `test` folder in your working directory. The test file should have the same name as the test subject file.
 
 ```
@@ -89,9 +83,6 @@ describe( 'CheckboxWithLabel', () => {
     } );
 } );
 ```
-
-### Snapshot testing
-Snapshot testing is useful for verifying that any data produced during a test is not inadvertently changed. This is especially useful for large and complex data structures like component or state trees. See the [our full reference](snapshot-testing.md) for more information.
 
 ### Setup and Teardown methods
 
@@ -161,7 +152,7 @@ Because we're passing the list as an argument, we can pass mock  `validValuesLis
 
 Often our code will use methods and properties from imported external and internal libraries in multiple places, which makes passing around arguments messy and impracticable. For these cases `jest.mock` offers a neat way to stub these dependencies. 
 
-For instance, in Calypso, we use the ['config'](https://github.com/Automattic/wp-calypso/tree/master/client/config) module to control a great deal of functionality via feature flags. 
+For instance, lets assume we have `config` module to control a great deal of functionality via feature flags. 
 
 ```javascript
 // bilbo.js
@@ -197,14 +188,7 @@ describe( 'The bilbo module', () => {
 
 We can use [Jest spies](http://facebook.github.io/jest/docs/en/jest-object.html#jestspyonobject-methodname) to test code that calls global methods.
 
-When stubbing DOM properties or methods in the global scope, make sure to include the `@jest-environment jsdom` comment to ensure there's a DOM to stub :)
-
 ```javascript
-
-/**
- * @format
- * @jest-environment jsdom
- */
 import { myModuleFunctionThatOpensANewWindow } from '../my-module';
 
 describe( 'my module', () => {
