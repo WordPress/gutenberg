@@ -2,12 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isEmpty, isUndefined } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Toolbar, Spinner, withAPIData } from '@wordpress/components';
+import { Button, Placeholder, Toolbar, Spinner, withAPIData } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
 
@@ -55,7 +56,9 @@ class NavigationMenuBlock extends Component {
 	renderMenu() {
 		const { layout } = this.props.attributes;
 		const { data, isLoading } = this.props.items;
-		if ( ! data || isLoading ) {
+		const customizerUrl = '';
+
+		if ( isUndefined( data ) || isEmpty( data ) || isLoading ) {
 			return (
 				<Placeholder
 					key="navigation-menu"
@@ -64,7 +67,9 @@ class NavigationMenuBlock extends Component {
 				>
 					{ ! Array.isArray( data ) ?
 						<Spinner /> :
-						__( 'No items found in this menu.' )
+						<Button href={ `${ customizerUrl }?autofocus%5Bpanel%5D=nav_menus` }>
+							{ __( 'No items found in this menu.' ) }
+						</Button>
 					}
 				</Placeholder>
 			);
