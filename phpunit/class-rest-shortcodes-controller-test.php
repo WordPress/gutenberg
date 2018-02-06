@@ -117,7 +117,7 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'js'    => '',
 				),
 			),
-			// Sending empty string.
+			// Sending an empty string.
 			array(
 				array(
 					'shortcode' => ' ',
