@@ -20,7 +20,7 @@ import {
 import { replaceBlock } from '../../store/actions';
 import Warning from '../warning';
 
-function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
+function InvalidBlockWarning( { block, attemptFixParagraph, ignoreInvalid, switchToBlockType } ) {
 	const htmlBlockName = 'core/html';
 	const defaultBlockType = getBlockType( getUnknownTypeHandlerName() );
 	const htmlBlockType = getBlockType( htmlBlockName );
@@ -30,16 +30,24 @@ function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
 		<Warning>
 			<p>{ defaultBlockType && htmlBlockType && sprintf( __(
 				'This block appears to have been modified externally. ' +
-				'Overwrite the external changes or Convert to %s or %s to keep ' +
+				'Overwrite the changes or Convert to %s or %s to keep ' +
 				'your changes.'
 			), defaultBlockType.title, htmlBlockType.title ) }</p>
 			<p>
-				<Button
+				{ block.name === 'core/paragraph' && (
+					<Button
+						onClick={ attemptFixParagraph }
+						isLarge
+					>
+						{ sprintf( __( 'Attempt Fix' ) ) }
+					</Button>
+				) }
+				{ block.name !== 'core/paragraph' && ( <Button
 					onClick={ ignoreInvalid }
 					isLarge
 				>
 					{ sprintf( __( 'Overwrite' ) ) }
-				</Button>
+				</Button> ) }
 				{ defaultBlockType && (
 					<Button
 						onClick={ switchTo( defaultBlockType ) }
@@ -58,7 +66,7 @@ function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
 						isLarge
 					>
 						{
-							sprintf( __( 'Edit as HTML block' ) )
+							sprintf( __( 'Edit as HTML' ) )
 						}
 					</Button>
 				) }
@@ -71,6 +79,13 @@ export default connect(
 	null,
 	( dispatch, ownProps ) => {
 		return {
+			attemptFixParagraph() {
+				const { block } = ownProps;
+				const nextBlock = createBlock( block.name, {
+					content: block.originalContent,
+				} );
+				dispatch( replaceBlock( block.uid, nextBlock ) );
+			},
 			ignoreInvalid() {
 				const { block } = ownProps;
 				const { name, attributes } = block;

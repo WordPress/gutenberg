@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import 'element-closest';
-import { find, last, reverse } from 'lodash';
+import { find, last, reverse, clamp } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -28,7 +28,7 @@ import {
 	getMultiSelectedBlocks,
 	getSelectedBlock,
 } from '../../store/selectors';
-import { multiSelect, appendDefaultBlock } from '../../store/actions';
+import { multiSelect, appendDefaultBlock, focusBlock } from '../../store/actions';
 
 /**
  * Module Constants
@@ -136,8 +136,14 @@ class WritingFlow extends Component {
 
 	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
 		const lastIndex = blocks.indexOf( currentEndUid );
-		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
+		const nextIndex = clamp( lastIndex + delta, 0, blocks.length - 1 );
 		this.props.onMultiSelect( currentStartUid, blocks[ nextIndex ] );
+	}
+
+	moveSelection( blocks, currentUid, delta ) {
+		const currentIndex = blocks.indexOf( currentUid );
+		const nextIndex = clamp( currentIndex + delta, 0, blocks.length - 1 );
+		this.props.onFocusBlock( blocks[ nextIndex ] );
 	}
 
 	isEditableEdge( moveUp, target ) {
@@ -177,6 +183,10 @@ class WritingFlow extends Component {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
 			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
+		} else if ( isNav && hasMultiSelection ) {
+			// Moving from multi block selection to single block selection
+			event.preventDefault();
+			this.moveSelection( blocks, selectionEnd, isReverse ? -1 : +1 );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
@@ -225,5 +235,6 @@ export default connect(
 	{
 		onMultiSelect: multiSelect,
 		onBottomReached: appendDefaultBlock,
+		onFocusBlock: focusBlock,
 	}
 )( WritingFlow );

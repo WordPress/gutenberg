@@ -31,7 +31,7 @@ import {
  * Component showing whether the post is saved or not and displaying save links.
  *
  * @param   {Object}    Props Component Props.
- * @returns {WPElement}       WordPress Element.
+ * @return {WPElement}       WordPress Element.
  */
 export function PostSavedState( { hasActiveMetaboxes, isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
 	const className = 'editor-post-saved-state';

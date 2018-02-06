@@ -11,7 +11,7 @@ import { includes } from 'lodash';
  * @param {?Object}  options            Optional options.
  * @param {?Array}   options.resetTypes Action types upon which to clear past.
  *
- * @returns {Function} Enhanced reducer.
+ * @return {Function} Enhanced reducer.
  */
 export default function withHistory( reducer, options = {} ) {
 	const initialState = {

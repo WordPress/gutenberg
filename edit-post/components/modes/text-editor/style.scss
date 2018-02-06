@@ -1,48 +1,3 @@
-.edit-post-text-editor__formatting {
-	background: $white;
-	border-bottom: 1px solid $light-gray-500;
-	min-height: $admin-sidebar-width-collapsed;
-	top: $admin-bar-height-big + $header-height;
-
-	@include break-medium() {
-		top: $admin-bar-height + $header-height;
-	}
-
-	margin-left: -20px;
-	margin-right: -20px;
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-
-	@include break-small() {
-		left: 0px;
-		right: 0px;
-		margin-left: 0;
-		margin-right: 0;
-		position: fixed;
-		z-index: z-index( '.edit-post-text-editor__formatting' );
-	}
-
-	.auto-fold.sticky-menu &,
-	.auto-fold & {
-		@include break-medium() {
-			left: $admin-sidebar-width-collapsed;
-		}
-
-		@include break-large() {
-			left: $admin-sidebar-width;
-		}
-	}
-
-	.folded & {
-		left: $admin-sidebar-width-collapsed;
-	}
-
-	.sticky-menu & {
-		left: $admin-sidebar-width;
-	}
-}
-
 .edit-post-text-editor__body {
 	padding-top: 40px;
 
@@ -55,7 +10,7 @@
 	}
 }
 
-/* Use padding to center text in the textarea, this allows you to click anywhere to focus it */
+// Use padding to center text in the textarea, this allows you to click anywhere to focus it
 .edit-post-text-editor {
 	padding-left: 20px;
 	padding-right: 20px;
@@ -65,14 +20,21 @@
 		padding-right: calc( 50% - #{ $text-editor-max-width / 2 } );
 	}
 
-	.edit-post-post-text-editor {
-		padding-top: 20px;
-		padding-bottom: 0;
-	}
-
 	.edit-post-post-text-editor__toolbar {
 		width: 100%;
 		max-width: $text-editor-max-width;
 		margin: 0 auto;
+	}
+
+	// Always show outlines in code editor
+	.editor-post-title div,
+	.editor-post-text-editor {
+		border: 1px solid $light-gray-500;
+	}
+
+	.editor-post-text-editor {
+		padding: $block-padding;
+		min-height: 200px;
+		line-height: 1.8;
 	}
 }

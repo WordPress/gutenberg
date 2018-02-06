@@ -33,7 +33,7 @@ import { getBlockType, getBlockTypes } from './registration';
  * @param {string} name            Block name.
  * @param {Object} blockAttributes Block attributes.
  *
- * @returns {Object} Block object.
+ * @return {Object} Block object.
  */
 export function createBlock( name, blockAttributes = {} ) {
 	// Get the type definition associated with a registered block.
@@ -70,7 +70,7 @@ export function createBlock( name, blockAttributes = {} ) {
  * @param {string}  sourceName   Block name.
  * @param {boolean} isMultiBlock Array of possible block transformations.
  *
- * @returns {Function} Predicate that receives a block type.
+ * @return {Function} Predicate that receives a block type.
  */
 const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( transform ) => (
 	transform.type === 'block' &&
@@ -86,7 +86,7 @@ const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( tran
  * @param {string}  sourceName   Block name.
  * @param {boolean} isMultiBlock Array of possible block transformations.
  *
- * @returns {Function} Predicate that receives a block type.
+ * @return {Function} Predicate that receives a block type.
  */
 const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( type ) => (
 	!! find(
@@ -101,7 +101,7 @@ const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( 
  *
  * @param {Array} blocks Blocks array.
  *
- * @returns {Array} Array of possible block transformations.
+ * @return {Array} Array of possible block transformations.
  */
 export function getPossibleBlockTransformations( blocks ) {
 	const sourceBlock = first( blocks );
@@ -149,7 +149,7 @@ export function getPossibleBlockTransformations( blocks ) {
  * @param {Array|Object} blocks Blocks array or block object.
  * @param {string}       name   Block name.
  *
- * @returns {Array} Array of blocks.
+ * @return {Array} Array of blocks.
  */
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );
@@ -229,7 +229,7 @@ export function switchToBlockType( blocks, name ) {
  * @param {Object} attributes The attributes of the block referenced by the
  *                            reusable block.
  *
- * @returns {Object} A reusable block object.
+ * @return {Object} A reusable block object.
  */
 export function createReusableBlock( type, attributes ) {
 	return {

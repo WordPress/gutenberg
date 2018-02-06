@@ -26,7 +26,7 @@ import {
 /**
  * Internal dependencies
  */
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import ImagePlaceHolder from '../../image-placeholder';
 import MediaUpload from '../../media-upload';
 import InspectorControls from '../../inspector-controls';
@@ -247,7 +247,7 @@ class ImageBlock extends Component {
 					} }
 				</ImageSize>
 				{ ( caption && caption.length > 0 ) || !! focus ? (
-					<Editable
+					<RichText
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }

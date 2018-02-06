@@ -73,7 +73,7 @@ const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
  *
  * @param {Element} node Node from which to start.
  *
- * @returns {?Element} Scrollable container node, if found.
+ * @return {?Element} Scrollable container node, if found.
  */
 function getScrollContainer( node ) {
 	if ( ! node ) {
@@ -284,7 +284,7 @@ export class BlockListBlock extends Component {
 	 *
 	 * @param {FocusEvent} event A focus event
 	 *
-	 * @returns {void}
+	 * @return {void}
 	 */
 	onFocus( event ) {
 		if ( event.target === this.node && ! this.props.isSelected ) {
@@ -298,7 +298,7 @@ export class BlockListBlock extends Component {
 	 *
 	 * @param {DragEvent} event Drag event.
 	 *
-	 * @returns {void}
+	 * @return {void}
 	 */
 	preventDrag( event ) {
 		event.preventDefault();
@@ -309,7 +309,7 @@ export class BlockListBlock extends Component {
 	 *
 	 * @param {MouseEvent} event A mousedown event.
 	 *
-	 * @returns {void}
+	 * @return {void}
 	 */
 	onPointerDown( event ) {
 		// Not the main button.

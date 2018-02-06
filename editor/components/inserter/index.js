@@ -32,13 +32,10 @@ class Inserter extends Component {
 	}
 
 	onToggle( isOpen ) {
-		const {
-			insertIndex,
-			onToggle,
-		} = this.props;
+		const { onToggle } = this.props;
 
 		if ( isOpen ) {
-			this.props.showInsertionPoint( insertIndex );
+			this.props.showInsertionPoint();
 		} else {
 			this.props.hideInsertionPoint();
 		}

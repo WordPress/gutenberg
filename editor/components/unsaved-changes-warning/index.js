@@ -44,7 +44,7 @@ class UnsavedChangesWarning extends Component {
 	 * Warns the user if there are unsaved changes before leaving the editor.
 	 *
 	 * @param   {Event}   event Event Object.
-	 * @returns {string?}       Warning message.
+	 * @return {string?}       Warning message.
 	 */
 	warnIfUnsavedChanges( event ) {
 		const areMetaBoxesDirty = some( this.props.metaBoxes, ( metaBox, location ) => {

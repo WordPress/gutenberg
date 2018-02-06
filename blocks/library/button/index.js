@@ -10,7 +10,7 @@ import { Dashicon, IconButton, PanelColor, withFallbackStyles } from '@wordpress
  */
 import './editor.scss';
 import './style.scss';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
 import ToggleControl from '../../inspector-controls/toggle-control';
@@ -82,7 +82,7 @@ class ButtonBlock extends Component {
 				</BlockControls>
 			),
 			<span key="button" className={ className } title={ title } ref={ this.bindRef }>
-				<Editable
+				<RichText
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
 					value={ text }

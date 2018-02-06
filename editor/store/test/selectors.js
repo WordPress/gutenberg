@@ -2,6 +2,7 @@
  * External dependencies
  */
 import moment from 'moment';
+import { union } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,6 +24,7 @@ import {
 	getCurrentPostLastRevisionId,
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
+	getCurrentPostSlug,
 	getPostEdits,
 	getEditedPostTitle,
 	getDocumentTitle,
@@ -57,7 +59,6 @@ import {
 	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
-	getBlockSiblingInserterPosition,
 	isBlockInsertionPointVisible,
 	isSavingPost,
 	didPostSaveRequestSucceed,
@@ -372,6 +373,31 @@ describe( 'selectors', () => {
 			};
 
 			expect( getCurrentPostId( state ) ).toBe( 1 );
+		} );
+	} );
+
+	describe( 'getCurrentPostSlug', () => {
+		it( 'should return the current post\'s slug if no edits have been made', () => {
+			const state = {
+				currentPost: { slug: 'post slug' },
+			};
+
+			expect( getCurrentPostSlug( state ) ).toBe( 'post slug' );
+		} );
+
+		it( 'should return the latest slug if edits have been made to the post', () => {
+			const state = {
+				currentPost: { slug: 'old slug' },
+				editor: {
+					present: {
+						edits: {
+							slug: 'new slug',
+						},
+					},
+				},
+			};
+
+			expect( getCurrentPostSlug( state ) ).toBe( 'new slug' );
 		} );
 	} );
 
@@ -1585,24 +1611,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
-				blockInsertionPoint: {},
-			};
-
-			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
-		} );
-
-		it( 'should return the assigned insertion point', () => {
-			const state = {
-				preferences: { mode: 'visual' },
-				blockSelection: {},
-				editor: {
-					present: {
-						blockOrder: [ 1, 2, 3 ],
-					},
-				},
-				blockInsertionPoint: {
-					position: 2,
-				},
+				isInsertionPointVisible: false,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
@@ -1620,7 +1629,7 @@ describe( 'selectors', () => {
 						blockOrder: [ 1, 2, 3 ],
 					},
 				},
-				blockInsertionPoint: {},
+				isInsertionPointVisible: false,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
@@ -1635,39 +1644,17 @@ describe( 'selectors', () => {
 						blockOrder: [ 1, 2, 3 ],
 					},
 				},
-				blockInsertionPoint: {},
+				isInsertionPointVisible: false,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
 		} );
 	} );
 
-	describe( 'getBlockSiblingInserterPosition', () => {
-		it( 'should return null if no sibling insertion point', () => {
-			const state = {
-				blockInsertionPoint: {},
-			};
-
-			expect( getBlockSiblingInserterPosition( state ) ).toBe( null );
-		} );
-
-		it( 'should return sibling insertion point', () => {
-			const state = {
-				blockInsertionPoint: {
-					position: 5,
-				},
-			};
-
-			expect( getBlockSiblingInserterPosition( state ) ).toBe( 5 );
-		} );
-	} );
-
 	describe( 'isBlockInsertionPointVisible', () => {
 		it( 'should return the value in state', () => {
 			const state = {
-				blockInsertionPoint: {
-					visible: true,
-				},
+				isInsertionPointVisible: true,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
@@ -1961,18 +1948,70 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getRecentInserterItems', () => {
-		beforeEach( () => {
+		beforeAll( () => {
 			registerCoreBlocks();
 		} );
-		it( 'should return the most recently used blocks', () => {
+
+		it( 'should return the 8 most recently used blocks', () => {
 			const state = {
 				preferences: {
-					recentlyUsedBlocks: [ 'core/deleted-block', 'core/paragraph', 'core/image' ],
+					recentInserts: [
+						{ name: 'core/deleted-block' }, // Deleted blocks should be filtered out
+						{ name: 'core/block', ref: 456 }, // Deleted reusable blocks should be filtered out
+						{ name: 'core/paragraph' },
+						{ name: 'core/block', ref: 123 },
+						{ name: 'core/image' },
+						{ name: 'core/quote' },
+						{ name: 'core/gallery' },
+						{ name: 'core/heading' },
+						{ name: 'core/list' },
+						{ name: 'core/video' },
+						{ name: 'core/audio' },
+						{ name: 'core/code' },
+					],
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {
+						123: { id: 123, type: 'core/test-block' },
+					},
 				},
 			};
 
-			expect( getRecentInserterItems( state ).map( ( item ) => item.name ) )
-				.toEqual( [ 'core/paragraph', 'core/image' ] );
+			expect( getRecentInserterItems( state ) ).toMatchObject( [
+				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/block', initialAttributes: { ref: 123 } },
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/quote', initialAttributes: {} },
+				{ name: 'core/gallery', initialAttributes: {} },
+				{ name: 'core/heading', initialAttributes: {} },
+				{ name: 'core/list', initialAttributes: {} },
+				{ name: 'core/video', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should pad list out with blocks from the common category', () => {
+			const state = {
+				preferences: {
+					recentInserts: [
+						{ name: 'core/paragraph' },
+					],
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+			};
+
+			// We should get back 8 items with no duplicates
+			const items = getRecentInserterItems( state );
+			const blockNames = items.map( item => item.name );
+			expect( union( blockNames ) ).toHaveLength( 8 );
 		} );
 	} );
 

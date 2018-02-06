@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 
 export const name = 'core/list';
@@ -268,7 +268,7 @@ export const settings = {
 						] }
 					/>
 				),
-				<Editable
+				<RichText
 					multiline="li"
 					key="editable"
 					tagName={ nodeName.toLowerCase() }

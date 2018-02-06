@@ -34,7 +34,7 @@ export function mediaUpload( filesList, onImagesChange ) {
 
 		return createMediaFromFile( mediaFile ).then(
 			( savedMedia ) => {
-				setAndUpdateImages( idx, { id: savedMedia.id, url: savedMedia.source_url } );
+				setAndUpdateImages( idx, { id: savedMedia.id, url: savedMedia.source_url, link: savedMedia.link } );
 			},
 			() => {
 				// Reset to empty on failure.
@@ -48,7 +48,7 @@ export function mediaUpload( filesList, onImagesChange ) {
 /**
  * @param {File} file Media File to Save.
  *
- * @returns {Promise} Media Object Promise.
+ * @return {Promise} Media Object Promise.
  */
 export function createMediaFromFile( file ) {
 	// Create upload payload
@@ -65,7 +65,7 @@ export function createMediaFromFile( file ) {
  * Utility used to preload an image before displaying it.
  *
  * @param   {string}  url Image Url.
- * @returns {Promise}     Pormise resolved once the image is preloaded.
+ * @return {Promise}     Pormise resolved once the image is preloaded.
  */
 export function preloadImage( url ) {
 	return new Promise( resolve => {

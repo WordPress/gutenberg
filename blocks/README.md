@@ -332,7 +332,7 @@ To create divisions between sets of controls within the same `BlockControls`
 element, passing `controls` instead as a nested array (array of arrays of
 objects). A divider will be shown between each set of controls.
 
-### `Editable`
+### `RichText`
 
 Render a rich
 [`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content),
@@ -344,7 +344,7 @@ a traditional `input` field, usually when the user exits the field.
 
 The following properties (non-exhaustive list) are made available:
 
-- `value: string` - Markup value of the editable field. Only valid markup is
+- `value: string` - Markup value of the field. Only valid markup is
   allowed, as determined by `inline` value and available controls.
 - `onChange: Function` - Callback handler when the value of the field changes,
   passing the new value as its only argument.
@@ -362,14 +362,14 @@ Example:
 ```js
 ( function( blocks, element ) {
 	var el = element.createElement,
-		Editable = blocks.Editable;
+		RichText = blocks.RichText;
 
 	function edit( props ) {
 		function onChange( value ) {
 			props.setAttributes( { text: value } );
 		}
 
-		return el( Editable, {
+		return el( RichText, {
 			value: props.attributes.text,
 			onChange: onChange
 		} );

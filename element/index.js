@@ -89,7 +89,7 @@ export { renderToStaticMarkup as renderToString };
  *
  * @param {...?Object} childrenArguments Array of children arguments (array of arrays/strings/objects) to concatenate.
  *
- * @returns {Array} The concatenated value.
+ * @return {Array} The concatenated value.
  */
 export function concatChildren( ...childrenArguments ) {
 	return childrenArguments.reduce( ( memo, children, i ) => {
@@ -113,7 +113,7 @@ export function concatChildren( ...childrenArguments ) {
  * @param {?Object} children Children object.
  * @param {string}  nodeName Node name.
  *
- * @returns {?Object} The updated children object.
+ * @return {?Object} The updated children object.
  */
 export function switchChildrenNodeName( children, nodeName ) {
 	return children && Children.map( children, ( elt, index ) => {
@@ -142,7 +142,7 @@ export { flowRight as compose };
  * @param {Function|Component} BaseComponent Used to detect the existing display name.
  * @param {string} wrapperName Wrapper name to prepend to the display name.
  *
- * @returns {string} Wrapped display name.
+ * @return {string} Wrapped display name.
  */
 export function getWrapperDisplayName( BaseComponent, wrapperName ) {
 	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;

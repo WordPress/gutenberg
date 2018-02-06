@@ -33,7 +33,7 @@ export function openGeneralSidebar( sidebar, panel = null ) {
 /**
  * Returns an action object signalling that the user closed the sidebar.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function closeGeneralSidebar() {
 	return {
@@ -57,7 +57,7 @@ export function openPublishSidebar() {
  * Returns an action object used in signalling that the user closed the
  * publish sidebar.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function closePublishSidebar() {
 	return {
@@ -107,7 +107,7 @@ export function setViewportType( viewportType ) {
  *
  * @param {string} feature Featurre name.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function toggleFeature( feature ) {
 	return {

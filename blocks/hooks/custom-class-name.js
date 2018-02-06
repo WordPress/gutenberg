@@ -23,7 +23,7 @@ import InspectorControls from '../inspector-controls';
  *
  * @param {Object} settings Original block settings.
  *
- * @returns {Object} Filtered block settings.
+ * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
@@ -44,7 +44,7 @@ export function addAttribute( settings ) {
  *
  * @param {function|Component} BlockEdit Original component.
  *
- * @returns {string} Wrapped component.
+ * @return {string} Wrapped component.
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
@@ -79,7 +79,7 @@ export function withInspectorControl( BlockEdit ) {
  * @param {Object} blockType  Block type.
  * @param {Object} attributes Current block attributes.
  *
- * @returns {Object} Filtered props applied to save element.
+ * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
 	if ( hasBlockSupport( blockType, 'customClassName', true ) && attributes.className ) {
