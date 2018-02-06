@@ -436,11 +436,15 @@ export class BlockListBlock extends Component {
 	}
 
 	onSelectionChange() {
+		if ( ! this.props.isSelected ) {
+			return;
+		}
+
 		const selection = window.getSelection();
-		const range = selection.getRangeAt( 0 );
+		const isCollapsed = selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
 		// We only keep track of the collapsed selection for selected blocks.
-		if ( range.collapsed !== this.state.isSelectionCollapsed && this.props.isSelected ) {
-			this.setState( { isSelectionCollapsed: range.collapsed } );
+		if ( isCollapsed !== this.state.isSelectionCollapsed && this.props.isSelected ) {
+			this.setState( { isSelectionCollapsed: isCollapsed } );
 		}
 	}
 
