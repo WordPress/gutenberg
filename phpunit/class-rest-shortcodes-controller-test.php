@@ -117,14 +117,27 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'js'    => '',
 				),
 			),
-			// Sending empty string will return empty string as is.
+			// Sending empty string.
 			array(
 				array(
 					'shortcode' => ' ',
 					'postId'    => self::$post_id,
 				),
 				array(
-					'html'  => ' ',
+					'html'  => 'Enter something to preview',
+					'type'  => 'html',
+					'style' => '',
+					'js'    => '',
+				),
+			),
+			// Sending invalid shortcode attribute.
+			array(
+				array(
+					'shortcode' => '[audio ids="1"]',
+					'postId'    => self::$post_id,
+				),
+				array(
+					'html'  => 'Sorry, couldn\'t render a preview',
 					'type'  => 'html',
 					'style' => '',
 					'js'    => '',
@@ -160,7 +173,7 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array(
 				array(),
 				array(
-					'html'  => '',
+					'html'  => 'Enter something to preview',
 					'type'  => 'html',
 					'style' => '',
 					'js'    => '',

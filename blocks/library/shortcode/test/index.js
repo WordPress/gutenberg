@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import { name, settings, Shortcode } from '../';
+import { name, settings } from '../';
+import { Shortcode } from '../block';
 import { blockEditRender } from 'blocks/test/helpers';
 
 settings.edit = Shortcode;
