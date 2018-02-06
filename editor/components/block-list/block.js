@@ -370,10 +370,6 @@ export class BlockListBlock extends Component {
 	onKeyDown( event ) {
 		const { keyCode, target } = event;
 
-		if ( keyCode !== ESCAPE && ! this.props.isSelected ) {
-			this.props.onSelect();
-		}
-
 		switch ( keyCode ) {
 			case ENTER:
 				// Insert default block after current block if enter and event
