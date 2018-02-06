@@ -1,4 +1,10 @@
-{
+// For the most part, this file mirrors the same configuration from the root
+// `.eslintrc.json`, the exceptions being that since Cypress is preconfigured
+// with Mocha & Chai, we need to broadly disable the Jest rules, which is
+// otherwise difficult to do. This file could be made more minimal once all of
+// the Gutenberg-specific rules are migrated to a common WordPress config.
+
+module.exports = {
 	"root": true,
 	"parser": "babel-eslint",
 	"extends": [
@@ -172,4 +178,4 @@
 		"valid-typeof": "error",
 		"yoda": "off"
 	}
-}
+};
