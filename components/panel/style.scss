@@ -73,10 +73,10 @@
 	font-weight: 600;
 	text-align: left;
 	padding: 14px;
-	@include button-style__neutral;
+	@include menu-style__neutral;
 
 	&:focus {
-		@include button-style__focus-active;
+		@include menu-style__focus;
 	}
 
 	.dashicon {

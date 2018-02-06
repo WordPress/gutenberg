@@ -123,7 +123,7 @@
 	padding: 0 20px;
 	margin-left: 0;
 	font-weight: 400;
-	@include tab-style__neutral;
+	@include square-style__neutral;
 
 	&.is-active {
 		border-bottom-color: $blue-medium-500;
@@ -131,6 +131,6 @@
 	}
 
 	&:focus {
-		@include tab-style__focus-active;
+		@include square-style__focus-active;
 	}
 }

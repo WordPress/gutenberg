@@ -38,19 +38,39 @@ div.components-toolbar {
 	display: inline-flex;
 	align-items: flex-end;
 	margin: 0;
-	padding: 3px;
 	outline: none;
 	cursor: pointer;
 	position: relative;
 	width: $icon-button-size;
 	height: $icon-button-size;
 
+	padding: 3px;
+
+	// subtract 1px to account for a transparent border
+	&:not( :disabled ):hover,
+	&:not( :disabled ):active,
+	&:not( :disabled ):focus,
+	&.is-active {
+		padding: 2px;
+	}
+
+	// unset icon button styles
+	&:active,
+	&:hover,
+	&:focus {
+		outline: none;
+		box-shadow: none;
+		background: none;
+		border: none;
+	}
+
+	// disabled
 	&:disabled {
 		cursor: default;
 	}
 
 	& > svg {
-		padding: 5px;
+		padding: 4px;
 		box-sizing: content-box;
 		border-radius: $button-style__radius-roundrect;
 	}
@@ -70,42 +90,20 @@ div.components-toolbar {
 		bottom: 8px;
 	}
 
-	// special hover style
-	&:not(:disabled) {
-		&.is-active > svg,
-		&:hover > svg {
-			box-shadow: inset 0 0 0 1px $dark-gray-500;
-		}
+	// hover style
+	&:not(:disabled).is-active > svg,
+	&:not(:disabled):hover > svg {
+		@include formatting-button-style__hover;
 	}
 
-	// special active style
-	&.is-active {
-		color: $white;
-		> svg {
-			background: $dark-gray-500;
-		}
+	// active & toggled style
+	&:not(:disabled).is-active > svg {
+		@include formatting-button-style__active;
 	}
 
 	// focus style
-	&:hover,
-	&:focus {
-		outline: none;
-		box-shadow: none;
-		background: none;
-	}
-
-	&:focus > svg {
-		@include button-style__focus-active;
-	}
-	&:focus:hover > svg {
-		@include button-style__focus-active;
-	}
-
-	// active focus style
-	&.is-active:focus > svg {
-		background: $dark-gray-500;
-		color: $white;
-		box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
+	&:not(:disabled):focus > svg {
+		@include formatting-button-style__focus;
 	}
 }
 

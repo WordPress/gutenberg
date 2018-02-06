@@ -12,6 +12,13 @@
 	padding: 8px;
 	@include button-style__neutral;
 
+	// subtract 1px to account for a transparent border
+	&:not( :disabled ):hover,
+	&:not( :disabled ):active,
+	&:not( :disabled ):focus {
+		padding: 7px;
+	}
+
 	.dashicon {
 		display: inline-block;
 		flex: 0 0 auto;
@@ -19,12 +26,6 @@
 
 	@include break-medium() {
 		width: auto;
-	}
-
-	&:not( :disabled ):hover,
-	&:not( :disabled ):active,
-	&:not( :disabled ):focus {
-		padding: 7px;				// subtract 1px to account for a transparent border
 	}
 
 	&:not( :disabled ):hover {
