@@ -37,6 +37,7 @@ import './style.scss';
 import { getInserterItems, getRecentInserterItems } from '../../store/selectors';
 import { fetchReusableBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
+import {applyFilters, addFilter} from "@wordpress/hooks/build/index";
 
 export const searchItems = ( items, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
@@ -279,28 +280,7 @@ export class InserterMenu extends Component {
 				{ ! isSearching &&
 					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
 						onSelect={ this.switchTab }
-						tabs={ [
-							{
-								name: 'recent',
-								title: __( 'Recent' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'blocks',
-								title: __( 'Blocks' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'embeds',
-								title: __( 'Embeds' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'saved',
-								title: __( 'Saved' ),
-								className: 'editor-inserter__tab',
-							},
-						] }
+						tabs={ this.props.tabs }
 					>
 						{ ( tabKey ) => (
 							<div ref={ ( ref ) => this.tabContainer = ref }>
@@ -318,6 +298,70 @@ export class InserterMenu extends Component {
 		);
 	}
 }
+
+/**
+ * I'm not sure where I should move this filter @TODO
+ */
+addFilter( 'editor.inserterMenu.tabs', 'core/editor/inserterMenu', ( tabs, items ) => {
+	let embeds = _.filter(items, function(o) {
+		return o.category === 'embed';
+	});
+
+	if ( embeds.length > 0 ) {
+		tabs.push({
+			name: 'embeds',
+			title: __( 'Embeds' ),
+			className: 'editor-inserter__tab',
+		});
+	}
+
+	return tabs;
+});
+
+/**
+ * I'm not sure where I should move this filter @TODO
+ */
+addFilter( 'editor.inserterMenu.tabs', 'core/editor/inserterMenu', ( tabs, items ) => {
+	let reusableBlocks = _.filter(items, function(o) {
+		return o.category === 'reusable-blocks';
+	});
+
+	if ( reusableBlocks.length > 0 ) {
+		tabs.push({
+			name: 'saved',
+			title: __( 'Saved' ),
+			className: 'editor-inserter__tab',
+		});
+	}
+
+	return tabs;
+});
+
+/**
+ * I'm not sure where I should move this function @TODO
+ */
+const filterTabs = (InserterMenu) => (props) => {
+	// init the default tabs;
+	let newProps = {
+		tabs: [
+			{
+				name: 'recent',
+				title: __( 'Recent' ),
+				className: 'editor-inserter__tab',
+			},
+			{
+				name: 'blocks',
+				title: __( 'Blocks' ),
+				className: 'editor-inserter__tab',
+			},
+		],
+		...props
+	};
+
+	newProps.tabs = applyFilters( 'editor.inserterMenu.tabs', newProps.tabs, newProps.items);
+
+	return <InserterMenu {...newProps} />
+};
 
 export default compose(
 	withContext( 'editor' )( ( settings ) => {
@@ -337,5 +381,6 @@ export default compose(
 		{ fetchReusableBlocks }
 	),
 	withSpokenMessages,
-	withInstanceId
+	withInstanceId,
+	filterTabs
 )( InserterMenu );
