@@ -21,7 +21,7 @@ class MenuPlaceholder extends Component {
 		if ( ! hasMenus ) {
 			return (
 				<Placeholder key="placeholder"
-					icon="admin-post"
+					icon="menu"
 					label={ __( 'Navigation Menu' ) }
 				>
 					{ ! Array.isArray( menus ) ?

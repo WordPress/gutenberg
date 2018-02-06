@@ -1,16 +1,8 @@
 /**
- * External dependencies
- */
-import { isUndefined, pickBy } from 'lodash';
-import moment from 'moment';
-import classnames from 'classnames';
-import { stringify } from 'querystringify';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Toolbar, withAPIData } from '@wordpress/components';
+import { Placeholder, Toolbar, Spinner, withAPIData } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
 
@@ -29,11 +21,42 @@ class NavigationMenuBlock extends Component {
 		super( ...arguments );
 
 		this.setMenu = this.setMenu.bind( this );
+		this.renderMenu = this.renderMenu.bind( this );
 	}
 
 	setMenu( value ) {
 		const { setAttributes } = this.props;
 		setAttributes( { selected: value } );
+	}
+
+	renderMenu() {
+		const { data, isLoading } = this.props.items;
+		if ( ! data || isLoading ) {
+			return (
+				<Placeholder
+					key="navigation-menu"
+					icon="menu"
+					label={ __( 'Navigation Menu' ) }
+				>
+					{ ! Array.isArray( data ) ?
+						<Spinner /> :
+						__( 'No items found in this menu.' )
+					}
+				</Placeholder>
+			);
+		}
+
+		return (
+			<ul key="navigation-menu">
+				{ data.map( ( item, i ) => {
+					return (
+						<li key={ i }>
+							{ decodeEntities( item.title.trim() ) || __( '(Untitled)' ) }
+						</li>
+					);
+				} ) }
+			</ul>
+		);
 	}
 
 	render() {
@@ -72,7 +95,7 @@ class NavigationMenuBlock extends Component {
 		);
 
 		if ( !! selected ) {
-			displayBlock = selected;
+			displayBlock = this.renderMenu();
 		}
 
 		return [
@@ -94,6 +117,13 @@ class NavigationMenuBlock extends Component {
 	}
 }
 
-export default withAPIData( () => ( {
-	menus: '/wp/v2/menus',
-} ) )( NavigationMenuBlock );
+export default withAPIData( props => {
+	const { selected } = props.attributes;
+	const queryString = selected ? `menus=${ selected }` : '';
+	const itemsUrl = selected ? `/wp/v2/menu-items?${ queryString }` : false;
+
+	return {
+		menus: '/wp/v2/menus',
+		items: itemsUrl,
+	};
+} )( NavigationMenuBlock );
