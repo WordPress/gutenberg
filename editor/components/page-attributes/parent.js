@@ -75,6 +75,8 @@ const applyWithAPIDataItems = withAPIData( ( props, { type } ) => {
 		exclude: postId,
 		parent_exclude: postId,
 		_fields: [ 'id', 'parent', 'title' ],
+		orderby: 'menu_order',
+		order: 'asc',
 	} );
 	return isHierarchical ? { items: `/wp/v2/${ type( postTypeSlug ) }?${ queryString }` } : {};
 } );
