@@ -6,7 +6,24 @@ import { render } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { registerReducer, registerSelectors, select, query, subscribe } from '../';
+let registerReducer, registerSelectors, select, query, subscribe;
+
+const loadModule = () => {
+	const module = require( '../' );
+	registerReducer = module.registerReducer;
+	registerSelectors = module.registerSelectors;
+	select = module.select;
+	query = module.query;
+	subscribe = module.subscribe;
+};
+
+/**
+ * Make sure every test is ran with a fresh data/index.js module.
+ */
+beforeEach( () => {
+	jest.resetModules();
+	loadModule();
+} );
 
 describe( 'store', () => {
 	it( 'Should append reducers to the state', () => {
@@ -37,6 +54,33 @@ describe( 'select', () => {
 
 		expect( select( 'reducer1', 'selector2' ) ).toEqual( 'result2' );
 		expect( selector2 ).toBeCalledWith( store.getState() );
+	} );
+
+	it( 'prints an error when a selector is called on a non-existing reducer', () => {
+		/* eslint-disable no-console */
+		const originalConsoleError = console.error;
+		console.error = jest.fn( () => {} );
+
+		expect( select( 'reducer1', 'selector1' ) ).toBeUndefined();
+		expect( console.error ).toHaveBeenCalled();
+
+		console.error = originalConsoleError;
+		/* eslint-enable no-console */
+	} );
+
+	it( 'prints an error when a non-existing selector is called', () => {
+		/* eslint-disable no-console */
+		const originalConsoleError = console.error;
+		console.error = jest.fn( () => {} );
+
+		// Call register reducer to make sure the store is created.
+		registerReducer( 'reducer1', () => 'state1' );
+
+		expect( select( 'reducer1', 'selector1' ) ).toBeUndefined();
+		expect( console.error ).toHaveBeenCalled();
+
+		console.error = originalConsoleError;
+		/* eslint-enable no-console */
 	} );
 } );
 
