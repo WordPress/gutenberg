@@ -20,7 +20,7 @@ export function setLocaleData( data ) {
  * Returns the current Jed instance, initializing with a default configuration
  * if not already assigned.
  *
- * @returns {Jed} Jed instance.
+ * @return {Jed} Jed instance.
  */
 export function getI18n() {
 	if ( ! i18n ) {
@@ -37,7 +37,7 @@ export function getI18n() {
  *
  * @param {string} text Text to translate.
  *
- * @returns {string} Translated text.
+ * @return {string} Translated text.
  */
 export function __( text ) {
 	return getI18n().gettext( text );
@@ -51,7 +51,7 @@ export function __( text ) {
  * @param {string} text    Text to translate.
  * @param {string} context Context information for the translators.
  *
- * @returns {string} Translated context string without pipe.
+ * @return {string} Translated context string without pipe.
  */
 export function _x( text, context ) {
 	return getI18n().pgettext( context, text );
@@ -68,7 +68,7 @@ export function _x( text, context ) {
  * @param {number} number The number to compare against to use either the
  *                         singular or plural form.
  *
- * @returns {string} The translated singular or plural form.
+ * @return {string} The translated singular or plural form.
  */
 export function _n( single, plural, number ) {
 	return getI18n().ngettext( single, plural, number );
@@ -86,7 +86,7 @@ export function _n( single, plural, number ) {
  *                          singular or plural form.
  * @param {string} context Context information for the translators.
  *
- * @returns {string} The translated singular or plural form.
+ * @return {string} The translated singular or plural form.
  */
 export function _nx( single, plural, number, context ) {
 	return getI18n().npgettext( context, single, plural, number );

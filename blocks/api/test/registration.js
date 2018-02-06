@@ -95,6 +95,9 @@ describe( 'blocks', () => {
 					className: {
 						type: 'string',
 					},
+					layout: {
+						type: 'string',
+					},
 				},
 			} );
 		} );
@@ -183,6 +186,9 @@ describe( 'blocks', () => {
 					className: {
 						type: 'string',
 					},
+					layout: {
+						type: 'string',
+					},
 				},
 			} );
 		} );
@@ -200,6 +206,9 @@ describe( 'blocks', () => {
 				icon: 'block-default',
 				attributes: {
 					className: {
+						type: 'string',
+					},
+					layout: {
 						type: 'string',
 					},
 				},
@@ -227,6 +236,9 @@ describe( 'blocks', () => {
 						className: {
 							type: 'string',
 						},
+						layout: {
+							type: 'string',
+						},
 					},
 				},
 			] );
@@ -240,6 +252,9 @@ describe( 'blocks', () => {
 				icon: 'block-default',
 				attributes: {
 					className: {
+						type: 'string',
+					},
+					layout: {
 						type: 'string',
 					},
 				},
@@ -289,6 +304,9 @@ describe( 'blocks', () => {
 					className: {
 						type: 'string',
 					},
+					layout: {
+						type: 'string',
+					},
 				},
 			} );
 		} );
@@ -305,6 +323,9 @@ describe( 'blocks', () => {
 				icon: 'block-default',
 				attributes: {
 					className: {
+						type: 'string',
+					},
+					layout: {
 						type: 'string',
 					},
 				},
@@ -332,6 +353,9 @@ describe( 'blocks', () => {
 						className: {
 							type: 'string',
 						},
+						layout: {
+							type: 'string',
+						},
 					},
 				},
 				{
@@ -343,6 +367,9 @@ describe( 'blocks', () => {
 					icon: 'block-default',
 					attributes: {
 						className: {
+							type: 'string',
+						},
+						layout: {
 							type: 'string',
 						},
 					},

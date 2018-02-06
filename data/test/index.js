@@ -6,7 +6,7 @@ import { render } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { registerReducer, registerSelectors, select, query } from '../';
+import { registerReducer, registerSelectors, select, query, subscribe } from '../';
 
 describe( 'store', () => {
 	it( 'Should append reducers to the state', () => {
@@ -57,5 +57,32 @@ describe( 'query', () => {
 		const tree = render( <Component keyName="reactKey" /> );
 
 		expect( tree ).toMatchSnapshot();
+	} );
+} );
+
+describe( 'subscribe', () => {
+	it( 'registers multiple selectors to the public API', () => {
+		let incrementedValue = null;
+		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
+		registerSelectors( 'myAwesomeReducer', {
+			globalSelector: ( state ) => state,
+		} );
+		const unsubscribe = subscribe( () => {
+			incrementedValue = select( 'myAwesomeReducer', 'globalSelector' );
+		} );
+		const action = { type: 'dummy' };
+
+		store.dispatch( action ); // increment the data by => data = 2
+		expect( incrementedValue ).toBe( 2 );
+
+		store.dispatch( action ); // increment the data by => data = 3
+		expect( incrementedValue ).toBe( 3 );
+
+		unsubscribe(); // Store subscribe to changes, the data variable stops upgrading.
+
+		store.dispatch( action );
+		store.dispatch( action );
+
+		expect( incrementedValue ).toBe( 3 );
 	} );
 } );

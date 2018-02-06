@@ -22,13 +22,14 @@ import {
 	placeCaretAtVerticalEdge,
 } from '../../utils/dom';
 import {
-	getBlockUids,
+	getPreviousBlock,
+	getNextBlock,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
 } from '../../store/selectors';
-import { multiSelect, appendDefaultBlock } from '../../store/actions';
+import { multiSelect, appendDefaultBlock, focusBlock } from '../../store/actions';
 
 /**
  * Module Constants
@@ -134,10 +135,22 @@ class WritingFlow extends Component {
 				blockEl.contains( el ) && isElementNonEmpty( el ) );
 	}
 
-	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
-		const lastIndex = blocks.indexOf( currentEndUid );
-		const nextIndex = Math.max( 0, Math.min( blocks.length - 1, lastIndex + delta ) );
-		this.props.onMultiSelect( currentStartUid, blocks[ nextIndex ] );
+	expandSelection( currentStartUid, isReverse ) {
+		const { previousBlock, nextBlock } = this.props;
+
+		const expandedBlock = isReverse ? previousBlock : nextBlock;
+		if ( expandedBlock ) {
+			this.props.onMultiSelect( currentStartUid, expandedBlock.uid );
+		}
+	}
+
+	moveSelection( currentUid, isReverse ) {
+		const { previousBlock, nextBlock } = this.props;
+
+		const focusedBlock = isReverse ? previousBlock : nextBlock;
+		if ( focusedBlock ) {
+			this.props.onFocusBlock( focusedBlock.uid );
+		}
 	}
 
 	isEditableEdge( moveUp, target ) {
@@ -148,7 +161,7 @@ class WritingFlow extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { selectedBlock, selectionStart, selectionEnd, blocks, hasMultiSelection } = this.props;
+		const { selectedBlock, selectionStart, selectionEnd, hasMultiSelection } = this.props;
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -172,11 +185,15 @@ class WritingFlow extends Component {
 		if ( isNav && isShift && hasMultiSelection ) {
 			// Shift key is down and existing block selection
 			event.preventDefault();
-			this.expandSelection( blocks, selectionStart, selectionEnd, isReverse ? -1 : +1 );
+			this.expandSelection( selectionStart, isReverse );
 		} else if ( isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
 			// Shift key is down, but no existing block selection
 			event.preventDefault();
-			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
+			this.expandSelection( selectedBlock.uid, isReverse );
+		} else if ( isNav && hasMultiSelection ) {
+			// Moving from multi block selection to single block selection
+			event.preventDefault();
+			this.moveSelection( selectionEnd, isReverse );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
@@ -216,7 +233,8 @@ class WritingFlow extends Component {
 
 export default connect(
 	( state ) => ( {
-		blocks: getBlockUids( state ),
+		previousBlock: getPreviousBlock( state ),
+		nextBlock: getNextBlock( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
@@ -225,5 +243,6 @@ export default connect(
 	{
 		onMultiSelect: multiSelect,
 		onBottomReached: appendDefaultBlock,
+		onFocusBlock: focusBlock,
 	}
 )( WritingFlow );

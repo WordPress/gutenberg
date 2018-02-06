@@ -57,7 +57,7 @@ function makeAutocompleter( completers, AutocompleteComponent = Autocomplete ) {
  *
  * @param {string} text Text of text node.
 
- * @returns {Node} A text node.
+ * @return {Node} A text node.
  */
 function tx( text ) {
 	return document.createTextNode( text );
@@ -66,7 +66,7 @@ function tx( text ) {
 /**
  * Create a paragraph node with the arguments as children.
 
- * @returns {Node} A paragraph node.
+ * @return {Node} A paragraph node.
  */
 function par( /* arguments */ ) {
 	const p = document.createElement( 'p' );

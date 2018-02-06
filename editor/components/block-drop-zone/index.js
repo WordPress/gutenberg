@@ -2,13 +2,13 @@
  * External Dependencies
  */
 import { connect } from 'react-redux';
-import { reduce, get, find } from 'lodash';
+import { reduce, get, find, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { DropZone, withContext } from '@wordpress/components';
-import { getBlockTypes, rawHandler } from '@wordpress/blocks';
+import { getBlockTypes, rawHandler, cloneBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 
 /**
@@ -21,7 +21,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		return null;
 	}
 
-	const getInsertPosition = ( position ) => {
+	const getInsertIndex = ( position ) => {
 		if ( index !== undefined ) {
 			return position.y === 'top' ? index : index + 1;
 		}
@@ -39,9 +39,9 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		}, false );
 
 		if ( transformation ) {
-			const insertPosition = getInsertPosition( position );
+			const insertIndex = getInsertIndex( position );
 			const blocks = transformation.transform( files, props.updateBlockAttributes );
-			props.insertBlocks( blocks, insertPosition );
+			props.insertBlocks( blocks, insertIndex );
 		}
 	};
 
@@ -49,7 +49,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
-			props.insertBlocks( blocks, getInsertPosition( position ) );
+			props.insertBlocks( blocks, getInsertIndex( position ) );
 		}
 	};
 
@@ -64,7 +64,28 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 export default compose(
 	connect(
 		undefined,
-		{ insertBlocks, updateBlockAttributes }
+		( dispatch, ownProps ) => {
+			return {
+				insertBlocks( blocks, insertIndex ) {
+					const { rootUID, layout } = ownProps;
+
+					if ( layout ) {
+						// A block's transform function may return a single
+						// transformed block or an array of blocks, so ensure
+						// to first coerce to an array before mapping to inject
+						// the layout attribute.
+						blocks = castArray( blocks ).map( ( block ) => (
+							cloneBlock( block, { layout } )
+						) );
+					}
+
+					dispatch( insertBlocks( blocks, insertIndex, rootUID ) );
+				},
+				updateBlockAttributes( ...args ) {
+					dispatch( updateBlockAttributes( ...args ) );
+				},
+			};
+		}
 	),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;

@@ -26,10 +26,11 @@ const blockAttributes = {
 		type: 'array',
 		default: [],
 		source: 'query',
-		selector: 'ul.wp-block-gallery .blocks-gallery-item img',
+		selector: 'ul.wp-block-gallery .blocks-gallery-item',
 		query: {
 			url: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'src',
 			},
 			link: {
@@ -38,12 +39,19 @@ const blockAttributes = {
 			},
 			alt: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'alt',
 				default: '',
 			},
 			id: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'data-id',
+			},
+			caption: {
+				type: 'array',
+				source: 'children',
+				selector: 'figcaption',
 			},
 		},
 	},
@@ -80,7 +88,7 @@ export const settings = {
 					const validImages = filter( attributes, ( { id, url } ) => id && url );
 					if ( validImages.length > 0 ) {
 						return createBlock( 'core/gallery', {
-							images: validImages.map( ( { id, url, alt } ) => ( { id, url, alt } ) ),
+							images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
 						} );
 					}
 					return createBlock( 'core/gallery' );
@@ -149,7 +157,7 @@ export const settings = {
 				blocks: [ 'core/image' ],
 				transform: ( { images } ) => {
 					if ( images.length > 0 ) {
-						return images.map( ( { id, url, alt } ) => createBlock( 'core/image', { id, url, alt } ) );
+						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption } ) );
 					}
 					return createBlock( 'core/image' );
 				},
@@ -188,6 +196,7 @@ export const settings = {
 						<li key={ image.id || image.url } className="blocks-gallery-item">
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
+								{ image.caption && image.caption.length > 0 && <figcaption>{ image.caption }</figcaption> }
 							</figure>
 						</li>
 					);

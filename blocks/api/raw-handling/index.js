@@ -17,7 +17,7 @@ import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
 import formattingTransformer from './formatting-transformer';
 import msListConverter from './ms-list-converter';
-import listMerger from './list-merger';
+import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
 import tableNormaliser from './table-normaliser';
@@ -37,7 +37,7 @@ import shortcodeConverter from './shortcode-converter';
  * @param {Array}  [options.tagName]   The tag into which content will be
  *                                     inserted.
  *
- * @returns {Array|string} A list of blocks or a string, depending on `handlerMode`.
+ * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
 export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName } ) {
 	// First of all, strip any meta tags.
@@ -113,7 +113,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 		] );
 
 		piece = deepFilterHTML( piece, [
-			listMerger,
+			listReducer,
 			imageCorrector,
 			// Add semantic formatting before attributes are stripped.
 			formattingTransformer,

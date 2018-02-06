@@ -13,16 +13,30 @@
 		flex-grow: 1;
 		flex-direction: column;
 		justify-content: center;
+		position: relative;
+
 
 		figure {
-			height: 100%;
 			margin: 0;
+			height: 100%;
+			display: flex;
+			align-items: flex-end;
 		}
 
 		img {
 			display: block;
 			max-width: 100%;
 			height: auto;
+		}
+
+		figcaption {
+			padding-top: 3px;
+			color: $white;
+			text-align: center;
+			font-size: $default-font-size;
+			background-color: rgba($color: $black, $alpha: 0.7);
+			position: absolute;
+			width: 100%;
 		}
 	}
 
