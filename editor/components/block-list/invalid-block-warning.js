@@ -20,7 +20,7 @@ import {
 import { replaceBlock } from '../../store/actions';
 import Warning from '../warning';
 
-function InvalidBlockWarning( { block, attemptFixParagraph, ignoreInvalid, switchToBlockType } ) {
+function InvalidBlockWarning( { ignoreInvalid, switchToBlockType } ) {
 	const htmlBlockName = 'core/html';
 	const defaultBlockType = getBlockType( getUnknownTypeHandlerName() );
 	const htmlBlockType = getBlockType( htmlBlockName );
@@ -34,20 +34,12 @@ function InvalidBlockWarning( { block, attemptFixParagraph, ignoreInvalid, switc
 				'your changes.'
 			), defaultBlockType.title, htmlBlockType.title ) }</p>
 			<p>
-				{ block.name === 'core/paragraph' && (
-					<Button
-						onClick={ attemptFixParagraph }
-						isLarge
-					>
-						{ sprintf( __( 'Attempt Fix' ) ) }
-					</Button>
-				) }
-				{ block.name !== 'core/paragraph' && ( <Button
+				<Button
 					onClick={ ignoreInvalid }
 					isLarge
 				>
 					{ sprintf( __( 'Overwrite' ) ) }
-				</Button> ) }
+				</Button>
 				{ defaultBlockType && (
 					<Button
 						onClick={ switchTo( defaultBlockType ) }
@@ -79,13 +71,6 @@ export default connect(
 	null,
 	( dispatch, ownProps ) => {
 		return {
-			attemptFixParagraph() {
-				const { block } = ownProps;
-				const nextBlock = createBlock( block.name, {
-					content: block.originalContent,
-				} );
-				dispatch( replaceBlock( block.uid, nextBlock ) );
-			},
 			ignoreInvalid() {
 				const { block } = ownProps;
 				const { name, attributes } = block;
