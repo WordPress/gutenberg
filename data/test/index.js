@@ -58,28 +58,20 @@ describe( 'select', () => {
 
 	it( 'prints an error when a selector is called on a non-existing reducer', () => {
 		/* eslint-disable no-console */
-		const originalConsoleError = console.error;
-		console.error = jest.fn( () => {} );
-
 		expect( select( 'reducer1', 'selector1' ) ).toBeUndefined();
-		expect( console.error ).toHaveBeenCalled();
-
-		console.error = originalConsoleError;
+		expect( console ).toHaveErroredWith( 'Invalid selector called, with name "selector1" for reducer "reducer1".' +
+			' Make sure the reducerName and selectorName are correct!' );
 		/* eslint-enable no-console */
 	} );
 
 	it( 'prints an error when a non-existing selector is called', () => {
 		/* eslint-disable no-console */
-		const originalConsoleError = console.error;
-		console.error = jest.fn( () => {} );
-
 		// Call register reducer to make sure the store is created.
-		registerReducer( 'reducer1', () => 'state1' );
+		registerReducer( 'reducer2', () => 'state1' );
 
-		expect( select( 'reducer1', 'selector1' ) ).toBeUndefined();
-		expect( console.error ).toHaveBeenCalled();
-
-		console.error = originalConsoleError;
+		expect( select( 'reducer2', 'selector2' ) ).toBeUndefined();
+		expect( console ).toHaveErroredWith( 'Invalid selector called, with name "selector2" for reducer "reducer2".' +
+			' Make sure the reducerName and selectorName are correct!' );
 		/* eslint-enable no-console */
 	} );
 } );
