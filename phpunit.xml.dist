@@ -46,8 +46,37 @@
 		</listener>
 	</listeners>
 	<filter>
-		<whitelist processUncoveredFilesFromWhitelist="true">
+		<whitelist addUncoveredFilesFromWhitelist="true">
 			<directory suffix=".php">src</directory>
+			<exclude>
+				<!-- Third party library exclusions -->
+				<file>src/wp-admin/includes/class-ftp*</file>
+				<file>src/wp-admin/includes/class-pclzip.php</file>
+				<file>src/wp-admin/includes/deprecated.php</file>
+				<file>src/wp-admin/includes/ms-deprecated.php</file>
+
+				<file>src/wp-includes/atomlib.php</file>
+				<file>src/wp-includes/class-IXR.php</file>
+				<file>src/wp-includes/class-json.php</file>
+				<file>src/wp-includes/class-phpass.php</file>
+				<file>src/wp-includes/class-phpmailer.php</file>
+				<file>src/wp-includes/class-pop3.php</file>
+				<file>src/wp-includes/class-requests.php</file>
+				<file>src/wp-includes/class-simplepie.php</file>
+				<file>src/wp-includes/class-smtp.php</file>
+				<file>src/wp-includes/class-snoopy.php</file>
+				<file>src/wp-includes/deprecated.php</file>
+				<file>src/wp-includes/ms-deprecated.php</file>
+				<file>src/wp-includes/pluggable-deprecated.php</file>
+				<file>src/wp-includes/rss.php</file>
+
+				<directory suffix=".php">src/wp-includes/ID3</directory>
+				<directory suffix=".php">src/wp-includes/IXR</directory>
+				<directory suffix=".php">src/wp-includes/random_compat</directory>
+				<directory suffix=".php">src/wp-includes/Requests</directory>
+				<directory suffix=".php">src/wp-includes/SimplePie</directory>
+				<directory suffix=".php">src/wp-includes/Text</directory>
+			</exclude>
 		</whitelist>
 	</filter>
 </phpunit>
