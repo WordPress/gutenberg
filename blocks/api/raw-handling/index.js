@@ -56,6 +56,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 
 		converter.setOption( 'noHeaderId', true );
 		converter.setOption( 'tables', true );
+		converter.setOption( 'literalMidWordUnderscores', true );
 
 		HTML = converter.makeHtml( plainText );
 
