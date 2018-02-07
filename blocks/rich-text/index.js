@@ -660,6 +660,9 @@ export default class RichText extends Component {
 	}
 
 	onNodeChange( { parents } ) {
+		if ( document.activeElement !== this.editor.getBody() ) {
+			return;
+		}
 		const formatNames = this.props.formattingControls;
 		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
 			accFormats[ activeFormat ] = {
