@@ -26,7 +26,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, imageIndex, isSelected, caption, onClick, onRemove, focus, setAttributes, onFocus } = this.props;
+		const { url, alt, id, linkTo, link, isSelected, caption, onSelect, onUnselect, onRemove, setAttributes } = this.props;
 
 		let href;
 
@@ -49,7 +49,7 @@ class GalleryImage extends Component {
 		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<figure className={ className } onClick={ onClick }>
+			<figure className={ className } onClick={ isSelected ? onUnselect : onSelect }>
 				{ isSelected &&
 					<div className="blocks-gallery-item__inline-menu">
 						<IconButton
@@ -61,14 +61,14 @@ class GalleryImage extends Component {
 					</div>
 				}
 				{ href ? <a href={ href }>{ img }</a> : img }
-				{ ( caption && caption.length > 0 ) || ( focus && isSelected ) ? (
+				{ ( caption && caption.length > 0 ) || isSelected ? (
 					<RichText
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
-						focus={ focus && focus.editableIndex === imageIndex ? focus : undefined }
-						onFocus={ onFocus }
+						isSelected={ isSelected }
 						onChange={ newCaption => setAttributes( { caption: newCaption } ) }
+						onFocus={ ! isSelected ? onSelect : undefined }
 						inlineToolbar
 					/>
 				) : null }
