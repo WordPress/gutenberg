@@ -1,4 +1,4 @@
-.edit-post-visual-editor .editor-warning {
+.editor-warning {
 	z-index: z-index( '.editor-warning' );
 	position: absolute;
 	top: 50%;
@@ -17,16 +17,11 @@
 	line-height: $default-line-height;
 	box-shadow: $shadow-popover;
 
-	p {
-		font-family: $default-font;
-		font-size: $default-font-size;
-	}
-
 	p:first-child {
 		margin-top: 0;
 	}
 
-	.editor-visual-editor & p {
+	.edit-post-visual-editor & p {
 		width: 100%;
 		font-family: $default-font;
 		font-size: $default-font-size;
