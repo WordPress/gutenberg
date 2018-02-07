@@ -29,7 +29,7 @@ import {
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
-	getSelectedBlocksInitialPosition,
+	getSelectedBlocksInitialCaretPosition,
 } from '../../store/selectors';
 import {
 	multiSelect,
@@ -304,7 +304,7 @@ export default connect(
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
 		selectedBlock: getSelectedBlock( state ),
-		initialPosition: getSelectedBlocksInitialPosition( state ),
+		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
 	} ),
 	{
 		onMultiSelect: multiSelect,

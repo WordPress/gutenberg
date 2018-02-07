@@ -618,13 +618,14 @@ export function getNextBlock( state, startUID ) {
 }
 
 /**
- * Returns the initial position of the cursor in the selected block
+ * Returns the initial caret position for the selected block.
+ * This position is to used to position the caret properly when the selected block changes.
  *
  * @param {Object} state Global application state.
  *
  * @return {?Object} Selected block.
  */
-export function getSelectedBlocksInitialPosition( state ) {
+export function getSelectedBlocksInitialCaretPosition( state ) {
 	const { start, end } = state.blockSelection;
 	if ( start !== end || ! start ) {
 		return null;
