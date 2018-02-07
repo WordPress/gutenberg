@@ -38,8 +38,6 @@ const FORMATTING_CONTROLS = [
 		format: 'strikethrough',
 	},
 	{
-		icon: 'admin-links',
-		title: __( 'Link' ),
 		format: 'link',
 	},
 ];
@@ -133,13 +131,24 @@ class FormatToolbar extends Component {
 		const { isEditingLink, newLinkValue } = this.state;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
-			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
+			.filter( control => enabledControls.includes( control.format ) )
 			.map( ( control ) => {
-				const isLink = control.format === 'link';
+				const isActive = this.isFormatActive( control.format );
+
+				if ( control.format === 'link' ) {
+					return {
+						...control,
+						icon: isActive ? 'editor-unlink' : 'admin-links', // TODO: proper unlink icon
+						title: isActive ? __( 'Unlink' ) : __( 'Link' ),
+						isActive,
+						onClick: isActive ? this.dropLink : this.addLink,
+					};
+				}
+
 				return {
 					...control,
-					onClick: isLink ? this.addLink : this.toggleFormat( control.format ),
-					isActive: this.isFormatActive( control.format ),
+					isActive,
+					onClick: this.toggleFormat( control.format ),
 				};
 			} );
 
@@ -165,7 +174,6 @@ class FormatToolbar extends Component {
 							<div className="blocks-format-toolbar__link-modal-line">
 								<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
 								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-								<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 							</div>
 						</form>
 					</Fill>
@@ -190,7 +198,6 @@ class FormatToolbar extends Component {
 									{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
 								</a>
 								<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
-								<IconButton icon="editor-unlink" label={ __( 'Remove link' ) } onClick={ this.dropLink } />
 							</div>
 						</div>
 					</Fill>
