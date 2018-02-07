@@ -58,7 +58,7 @@ function mapBlockOrder( blocks, rootUID = '' ) {
 	const result = { [ rootUID ]: [] };
 
 	blocks.forEach( ( block ) => {
-		const { uid, innerBlocks } = block;
+		const { uid, innerBlocks = [] } = block;
 
 		result[ rootUID ].push( uid );
 
@@ -84,7 +84,7 @@ function getFlattenedBlocks( blocks ) {
 	while ( stack.length ) {
 		// `innerBlocks` is redundant data which can fall out of sync, since
 		// this is reflected in `blockOrder`, so exclude from appended block.
-		const { innerBlocks, ...block } = stack.shift();
+		const { innerBlocks = [], ...block } = stack.shift();
 
 		stack.push( ...innerBlocks );
 
