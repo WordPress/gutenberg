@@ -6,6 +6,7 @@
         "attributes": {
             "postsToShow": 5,
             "displayPostDate": true,
+            "postLayout": "list",
             "columns": 3,
             "align": "center",
             "order": "desc",
