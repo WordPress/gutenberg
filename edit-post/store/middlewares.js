@@ -13,7 +13,7 @@ import { mobileMiddleware } from '../utils/mobile';
  *
  * @param {Object} store Store Object.
  *
- * @returns {Object} Update Store Object.
+ * @return {Object} Update Store Object.
  */
 function applyMiddlewares( store ) {
 	const middlewares = [

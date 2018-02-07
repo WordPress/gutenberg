@@ -240,9 +240,8 @@ describe( 'actions', () => {
 
 	describe( 'showInsertionPoint', () => {
 		it( 'should return the SHOW_INSERTION_POINT action', () => {
-			expect( showInsertionPoint( 1 ) ).toEqual( {
+			expect( showInsertionPoint() ).toEqual( {
 				type: 'SHOW_INSERTION_POINT',
-				index: 1,
 			} );
 		} );
 	} );

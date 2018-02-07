@@ -29,7 +29,7 @@ const store = createStore( initialReducer, {}, flowRight( enhancers ) );
  * @param {string} reducerKey Reducer key.
  * @param {Object} reducer    Reducer function.
  *
- * @returns {Object} Store Object.
+ * @return {Object} Store Object.
  */
 export function registerReducer( reducerKey, reducer ) {
 	reducers[ reducerKey ] = reducer;
@@ -74,7 +74,7 @@ export function registerSelectors( reducerKey, newSelectors ) {
  *                                       to determine the data for the
  *                                       component.
  *
- * @returns {Function} Renders the wrapped component and passes it data.
+ * @return {Function} Renders the wrapped component and passes it data.
  */
 export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
 	const connectWithStore = ( ...args ) => {
@@ -101,7 +101,7 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
  * @param {string} selectorName Selector name.
  * @param {*}      args         Selectors arguments.
  *
- * @returns {*} The selector's returned value.
+ * @return {*} The selector's returned value.
  */
 export const select = ( reducerKey, selectorName, ...args ) => {
 	return selectors[ reducerKey ][ selectorName ]( store.getState()[ reducerKey ], ...args );

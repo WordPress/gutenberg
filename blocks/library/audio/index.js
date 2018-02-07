@@ -15,7 +15,7 @@ import { Component } from '@wordpress/element';
 import './style.scss';
 import './editor.scss';
 import MediaUpload from '../../media-upload';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
@@ -78,7 +78,7 @@ export const settings = {
 			};
 			const onSelectAudio = ( media ) => {
 				if ( media && media.url ) {
-					// sets the block's attribure and updates the edit component from the
+					// sets the block's attribute and updates the edit component from the
 					// selected media, then switches off the editing UI
 					setAttributes( { src: media.url, id: media.id } );
 					this.setState( { src: media.url, editing: false } );
@@ -154,7 +154,7 @@ export const settings = {
 				<figure key="audio" className={ className }>
 					<audio controls="controls" src={ src } />
 					{ ( ( caption && caption.length ) || !! focus ) && (
-						<Editable
+						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }

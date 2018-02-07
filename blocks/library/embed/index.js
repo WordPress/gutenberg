@@ -18,7 +18,7 @@ import { addQueryArgs } from '@wordpress/url';
 import './style.scss';
 import './editor.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
@@ -205,7 +205,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 							</div>
 						) }
 						{ ( caption && caption.length > 0 ) || !! focus ? (
-							<Editable
+							<RichText
 								tagName="figcaption"
 								placeholder={ __( 'Write caption…' ) }
 								value={ caption }

@@ -18,10 +18,10 @@ import './editor.scss';
 import { createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 
-const toEditableValue = value => value.map( ( subValue => subValue.children ) );
-const fromEditableValue = value => value.map( ( subValue ) => ( {
+const toRichTextValue = value => value.map( ( subValue => subValue.children ) );
+const fromRichTextValue = value => value.map( ( subValue ) => ( {
 	children: subValue,
 } ) );
 
@@ -182,12 +182,12 @@ export const settings = {
 				className={ containerClassname }
 				style={ { textAlign: align } }
 			>
-				<Editable
+				<RichText
 					multiline="p"
-					value={ toEditableValue( value ) }
+					value={ toRichTextValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: fromEditableValue( nextValue ),
+							value: fromRichTextValue( nextValue ),
 						} )
 					}
 					focus={ focusedEditable === 'value' ? focus : null }
@@ -202,7 +202,7 @@ export const settings = {
 					placeholder={ __( 'Write quote…' ) }
 				/>
 				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
-					<Editable
+					<RichText
 						tagName="cite"
 						value={ citation }
 						onChange={

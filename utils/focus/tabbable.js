@@ -13,7 +13,7 @@ import { find as findFocusable } from './focusable';
  *
  * @param {Element} element Element from which to retrieve.
  *
- * @returns {?Number} Tab index of element (default 0).
+ * @return {?number} Tab index of element (default 0).
  */
 function getTabIndex( element ) {
 	const tabIndex = element.getAttribute( 'tabindex' );
@@ -25,7 +25,7 @@ function getTabIndex( element ) {
  *
  * @param {Element} element Element to test.
  *
- * @returns {boolean} Whether element is tabbable.
+ * @return {boolean} Whether element is tabbable.
  */
 function isTabbableIndex( element ) {
 	return getTabIndex( element ) !== -1;
@@ -40,7 +40,7 @@ function isTabbableIndex( element ) {
  * @param {Element} element Element.
  * @param {number}  index   Array index of element.
  *
- * @returns {Object} Mapped object with element, index.
+ * @return {Object} Mapped object with element, index.
  */
 function mapElementToObjectTabbable( element, index ) {
 	return { element, index };
@@ -52,7 +52,7 @@ function mapElementToObjectTabbable( element, index ) {
  *
  * @param {Object} object Mapped object with index.
  *
- * @returns {Element} Mapped object element.
+ * @return {Element} Mapped object element.
  */
 function mapObjectTabbableToElement( object ) {
 	return object.element;
@@ -66,7 +66,7 @@ function mapObjectTabbableToElement( object ) {
  * @param {Object} a First object to compare.
  * @param {Object} b Second object to compare.
  *
- * @returns {number} Comparator result.
+ * @return {number} Comparator result.
  */
 function compareObjectTabbables( a, b ) {
 	const aTabIndex = getTabIndex( a.element );

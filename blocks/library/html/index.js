@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -14,6 +9,7 @@ import { withState } from '@wordpress/components';
  */
 import './editor.scss';
 import BlockControls from '../../block-controls';
+import PlainText from '../../plain-text';
 
 export const name = 'core/html';
 
@@ -64,11 +60,11 @@ export const settings = {
 			<div
 				key="preview"
 				dangerouslySetInnerHTML={ { __html: attributes.content } } /> :
-			<TextareaAutosize
+			<PlainText
 				className="wp-block-html"
 				key="editor"
 				value={ attributes.content }
-				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+				onChange={ ( content ) => setAttributes( { content } ) }
 				aria-label={ __( 'HTML' ) }
 			/>,
 	] ),

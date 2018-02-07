@@ -9,12 +9,12 @@ import { pick, noop } from 'lodash';
 import { Component } from '@wordpress/element';
 
 /**
- * The Editable Provider allows a rendering context to define global behaviors
- * without requiring intermediate props to be passed through to the Editable.
+ * The RichText Provider allows a rendering context to define global behaviors
+ * without requiring intermediate props to be passed through to the RichText.
  * The provider accepts as props its `childContextTypes` which are passed to
- * any Editable instance.
+ * any RichText instance.
  */
-class EditableProvider extends Component {
+class RichTextProvider extends Component {
 	getChildContext() {
 		return pick(
 			this.props,
@@ -27,8 +27,8 @@ class EditableProvider extends Component {
 	}
 }
 
-EditableProvider.childContextTypes = {
+RichTextProvider.childContextTypes = {
 	onUndo: noop,
 };
 
-export default EditableProvider;
+export default RichTextProvider;

@@ -10,7 +10,7 @@ import { Toolbar } from '@wordpress/components';
  */
 import './editor.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
@@ -143,7 +143,7 @@ export const settings = {
 					/>
 				</InspectorControls>
 			),
-			<Editable
+			<RichText
 				key="editable"
 				wrapperClassName="wp-block-heading"
 				tagName={ nodeName.toLowerCase() }
