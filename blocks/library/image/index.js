@@ -14,6 +14,45 @@ import ImageBlock from './block';
 
 export const name = 'core/image';
 
+const blockAttributes = {
+	url: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
+	},
+	alt: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'alt',
+		default: '',
+	},
+	caption: {
+		type: 'array',
+		source: 'children',
+		selector: 'figcaption',
+	},
+	href: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'href',
+	},
+	id: {
+		type: 'number',
+	},
+	align: {
+		type: 'string',
+	},
+	width: {
+		type: 'number',
+	},
+	height: {
+		type: 'number',
+	},
+};
+
 export const settings = {
 	title: __( 'Image' ),
 
@@ -25,44 +64,7 @@ export const settings = {
 
 	keywords: [ __( 'photo' ) ],
 
-	attributes: {
-		url: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'img',
-			attribute: 'src',
-		},
-		alt: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'img',
-			attribute: 'alt',
-			default: '',
-		},
-		caption: {
-			type: 'array',
-			source: 'children',
-			selector: 'figcaption',
-		},
-		href: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'a',
-			attribute: 'href',
-		},
-		id: {
-			type: 'number',
-		},
-		align: {
-			type: 'string',
-		},
-		width: {
-			type: 'number',
-		},
-		height: {
-			type: 'number',
-		},
-	},
+	attributes: blockAttributes,
 
 	transforms: {
 		from: [
@@ -162,9 +164,17 @@ export const settings = {
 	edit: ImageBlock,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height } = attributes;
-		const extraImageProps = width || height ? { width, height } : {};
-		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+		const { url, alt, caption, align, href, width, height, id } = attributes;
+
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ id ? `wp-image-${ id }` : null }
+				width={ width }
+				height={ height }
+			/>
+		);
 
 		let figureStyle = {};
 
@@ -181,4 +191,30 @@ export const settings = {
 			</figure>
 		);
 	},
+
+	deprecated: [
+		{
+			attributes: blockAttributes,
+			save( { attributes } ) {
+				const { url, alt, caption, align, href, width, height } = attributes;
+				const extraImageProps = width || height ? { width, height } : {};
+				const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+
+				let figureStyle = {};
+
+				if ( width ) {
+					figureStyle = { width };
+				} else if ( align === 'left' || align === 'right' ) {
+					figureStyle = { maxWidth: '50%' };
+				}
+
+				return (
+					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+					</figure>
+				);
+			},
+		},
+	],
 };
