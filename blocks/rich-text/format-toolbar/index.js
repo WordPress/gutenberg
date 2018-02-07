@@ -15,6 +15,12 @@ import { filterURLForDisplay } from '../../../editor/utils/url';
 
 const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } = keycodes;
 
+/**
+ * When inserting a new link, we insert an <a> tag with this placeholder href
+ * so that there is a visual indication of which text will be made into a link.
+ */
+const NEW_LINK_PLACEHOLDER_VALUE = '_wp_link_placeholder';
+
 const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',
@@ -49,7 +55,6 @@ class FormatToolbar extends Component {
 		super( ...arguments );
 
 		this.state = {
-			isAddingLink: false,
 			isEditingLink: false,
 			newLinkValue: '',
 		};
@@ -77,7 +82,6 @@ class FormatToolbar extends Component {
 	componentWillReceiveProps( nextProps ) {
 		if ( this.props.selectedNodeId !== nextProps.selectedNodeId ) {
 			this.setState( {
-				isAddingLink: false,
 				isEditingLink: false,
 				newLinkValue: '',
 			} );
@@ -97,25 +101,27 @@ class FormatToolbar extends Component {
 	}
 
 	addLink() {
-		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: '' } );
+		this.props.onChange( { link: { value: NEW_LINK_PLACEHOLDER_VALUE } } );
 	}
 
 	dropLink() {
 		this.props.onChange( { link: undefined } );
-		this.setState( { isEditingLink: false, isAddingLink: false, newLinkValue: '' } );
 	}
 
 	editLink( event ) {
 		event.preventDefault();
-		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: this.props.formats.link.value } );
+		this.setState( { isEditingLink: true, newLinkValue: this.props.formats.link.value } );
 	}
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: { value: this.state.newLinkValue } } );
-		if ( this.state.isAddingLink ) {
+		this.setState( { isEditingLink: false, newLinkValue: '' } );
+
+		if ( this.props.formats.link.value === NEW_LINK_PLACEHOLDER_VALUE ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
+
+		this.props.onChange( { link: { value: this.state.newLinkValue } } );
 	}
 
 	isFormatActive( format ) {
@@ -124,10 +130,7 @@ class FormatToolbar extends Component {
 
 	render() {
 		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
-		const { isAddingLink, isEditingLink, newLinkValue } = this.state;
-		const linkStyle = focusPosition ?
-			{ position: 'absolute', ...focusPosition } :
-			null;
+		const { isEditingLink, newLinkValue } = this.state;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
 			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
@@ -136,15 +139,20 @@ class FormatToolbar extends Component {
 				return {
 					...control,
 					onClick: isLink ? this.addLink : this.toggleFormat( control.format ),
-					isActive: this.isFormatActive( control.format ) || ( isLink && isAddingLink ),
+					isActive: this.isFormatActive( control.format ),
 				};
 			} );
+
+		const hasEditLinkUI = formats.link && ( isEditingLink || formats.link.value === NEW_LINK_PLACEHOLDER_VALUE );
+		const hasViewLinkUI = formats.link && ! isEditingLink && formats.link.value !== NEW_LINK_PLACEHOLDER_VALUE;
+
+		const linkStyle = focusPosition ? { position: 'absolute', ...focusPosition } : null;
 
 		return (
 			<div className="blocks-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
 
-				{ ( isAddingLink || isEditingLink ) &&
+				{ hasEditLinkUI &&
 					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 					/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 					<Fill name="RichText.Siblings">
@@ -164,7 +172,7 @@ class FormatToolbar extends Component {
 					/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 				}
 
-				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
+				{ hasViewLinkUI &&
 					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 					/* eslint-disable jsx-a11y/no-static-element-interactions */
 					<Fill name="RichText.Siblings">
