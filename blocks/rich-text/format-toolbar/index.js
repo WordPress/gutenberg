@@ -153,56 +153,55 @@ class FormatToolbar extends Component {
 				};
 			} );
 
-		const hasEditLinkUI = formats.link && ( isEditingLink || formats.link.value === NEW_LINK_PLACEHOLDER_VALUE );
-		const hasViewLinkUI = formats.link && ! isEditingLink && formats.link.value !== NEW_LINK_PLACEHOLDER_VALUE;
-
-		const linkStyle = focusPosition ? { position: 'absolute', ...focusPosition } : null;
+		const hasLinkUI = !! formats.link;
+		const hasEditLinkUI = hasLinkUI && ( isEditingLink || formats.link.value === NEW_LINK_PLACEHOLDER_VALUE );
+		const hasViewLinkUI = hasLinkUI && ! isEditingLink && formats.link.value !== NEW_LINK_PLACEHOLDER_VALUE;
 
 		return (
 			<div className="blocks-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
 
-				{ hasEditLinkUI &&
-					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-					/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+				{ hasLinkUI &&
 					<Fill name="RichText.Siblings">
-						<form
-							className="blocks-format-toolbar__link-modal"
-							style={ linkStyle }
-							onKeyPress={ stopKeyPropagation }
-							onKeyDown={ this.onKeyDown }
-							onSubmit={ this.submitLink }>
-							<div className="blocks-format-toolbar__link-modal-line">
-								<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
-								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-							</div>
-						</form>
-					</Fill>
-					/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-				}
+						<div style={ focusPosition && { position: 'absolute', ...focusPosition } }>
+							{ hasEditLinkUI &&
+								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+								<form
+									className="blocks-format-toolbar__link-modal"
+									onKeyPress={ stopKeyPropagation }
+									onKeyDown={ this.onKeyDown }
+									onSubmit={ this.submitLink }>
+									<div className="blocks-format-toolbar__link-modal-line">
+										<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
+										<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+									</div>
+								</form>
+								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+							}
 
-				{ hasViewLinkUI &&
-					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-					/* eslint-disable jsx-a11y/no-static-element-interactions */
-					<Fill name="RichText.Siblings">
-						<div
-							className="blocks-format-toolbar__link-modal"
-							style={ linkStyle }
-							onKeyPress={ stopKeyPropagation }
-						>
-							<div className="blocks-format-toolbar__link-modal-line">
-								<a
-									className="blocks-format-toolbar__link-value"
-									href={ formats.link.value }
-									target="_blank"
+							{ hasViewLinkUI &&
+								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+								/* eslint-disable jsx-a11y/no-static-element-interactions */
+								<div
+									className="blocks-format-toolbar__link-modal"
+									onKeyPress={ stopKeyPropagation }
 								>
-									{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
-								</a>
-								<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
-							</div>
+									<div className="blocks-format-toolbar__link-modal-line">
+										<a
+											className="blocks-format-toolbar__link-value"
+											href={ formats.link.value }
+											target="_blank"
+										>
+											{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
+										</a>
+										<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
+									</div>
+								</div>
+								/* eslint-enable jsx-a11y/no-static-element-interactions */
+							}
 						</div>
 					</Fill>
-					/* eslint-enable jsx-a11y/no-static-element-interactions */
 				}
 			</div>
 		);

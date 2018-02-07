@@ -428,11 +428,10 @@ export default class RichText extends Component {
 		const container = findRelativeParent( this.editor.getBody() );
 		const containerPosition = container.getBoundingClientRect();
 		const toolbarOffset = { top: 10, left: 0 };
-		const linkModalWidth = 298;
 
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
-			left: position.left - containerPosition.left - ( linkModalWidth / 2 ) + ( position.width / 2 ) + toolbarOffset.left,
+			left: position.left - containerPosition.left + ( position.width / 2 ) + toolbarOffset.left,
 		};
 	}
 
