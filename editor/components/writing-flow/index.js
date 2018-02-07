@@ -259,7 +259,7 @@ class WritingFlow extends Component {
 			( ! prevProps.selectedBlock || this.props.selectedBlock.uid !== prevProps.selectedBlock.uid )
 		) {
 			const blockContainer = this.container.querySelector( `[data-block="${ this.props.selectedBlock.uid }"]` );
-			if ( ! blockContainer.contains( document.activeElement ) ) {
+			if ( blockContainer && ! blockContainer.contains( document.activeElement ) ) {
 				const target = this.getInnerTabbable( blockContainer, this.props.initialPosition === -1 );
 				target.focus();
 				if ( this.props.initialPosition === -1 ) {
