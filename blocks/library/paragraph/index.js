@@ -284,6 +284,10 @@ export const settings = {
 		};
 	},
 
+	isEmpty( attributes ) {
+		return ! attributes.content || ! attributes.content.length;
+	},
+
 	getEditWrapperProps( attributes ) {
 		const { width } = attributes;
 		if ( [ 'wide', 'full', 'left', 'right' ].indexOf( width ) !== -1 ) {
