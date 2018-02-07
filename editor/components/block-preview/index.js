@@ -17,7 +17,7 @@ import './style.scss';
  * Block Preview Component: It renders a preview given a block name and attributes.
  *
  * @param   {Object}    props Component props.
- * @returns {WPElement}       Rendered element.
+ * @return {WPElement}       Rendered element.
  */
 function BlockPreview( { name, attributes } ) {
 	const block = createBlock( name, attributes );
