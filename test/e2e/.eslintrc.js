@@ -1,41 +1,32 @@
-{
+// For the most part, this file mirrors the same configuration from the root
+// `.eslintrc.json`, the exceptions being that since Cypress is preconfigured
+// with Mocha & Chai, we need to broadly disable the Jest rules, which is
+// otherwise difficult to do. This file could be made more minimal once all of
+// the Gutenberg-specific rules are migrated to a common WordPress config.
+
+module.exports = {
 	"root": true,
 	"parser": "babel-eslint",
 	"extends": [
-		"wordpress",
-		"plugin:react/recommended",
-		"plugin:jsx-a11y/recommended",
-		"plugin:jest/recommended"
+		"wordpress"
 	],
 	"env": {
 		"browser": false,
 		"es6": true,
 		"node": true,
-		"jest/globals": true
+		"mocha": true
 	},
 	"parserOptions": {
-		"sourceType": "module",
-		"ecmaFeatures": {
-			"jsx": true
-		}
+		"sourceType": "module"
 	},
 	"globals": {
-		"wp": true,
-		"wpApiSettings": true,
-		"window": true,
-		"document": true
+		"cy": true,
+		"Cypress": true,
+		"expect": true
 	},
 	"plugins": [
-		"wordpress",
-		"react",
-		"jsx-a11y",
-		"jest"
+		"wordpress"
 	],
-	"settings": {
-		"react": {
-			"pragma": "wp"
-		}
-	},
 	"rules": {
 		"array-bracket-spacing": [ "error", "always" ],
 		"brace-style": [ "error", "1tbs" ],
@@ -50,13 +41,6 @@
 		"eqeqeq": "error",
 		"func-call-spacing": "error",
 		"indent": [ "error", "tab", { "SwitchCase": 1 } ],
-		"jsx-a11y/label-has-for": [ "error", {
-			"required": "id"
-		} ],
-		"jsx-a11y/media-has-caption": "off",
-		"jsx-a11y/no-noninteractive-tabindex": "off",
-		"jsx-a11y/role-has-required-aria-props": "off",
-		"jsx-quotes": "error",
 		"key-spacing": "error",
 		"keyword-spacing": "error",
 		"lines-around-comment": "off",
@@ -155,19 +139,6 @@
 		"padded-blocks": [ "error", "never" ],
 		"prefer-const": "error",
 		"quote-props": [ "error", "as-needed" ],
-		"react/display-name": "off",
-		"react/jsx-curly-spacing": [ "error", {
-			"when": "always",
-			"children": true
-		} ],
-		"react/jsx-equals-spacing": "error",
-		"react/jsx-indent": [ "error", "tab" ],
-		"react/jsx-indent-props": [ "error", "tab" ],
-		"react/jsx-key": "error",
-		"react/jsx-tag-spacing": "error",
-		"react/no-children-prop": "off",
-		"react/no-find-dom-node": "warn",
-		"react/prop-types": "off",
 		"semi": "error",
 		"semi-spacing": "error",
 		"space-before-blocks": [ "error", "always" ],
@@ -207,4 +178,4 @@
 		"valid-typeof": "error",
 		"yoda": "off"
 	}
-}
+};
