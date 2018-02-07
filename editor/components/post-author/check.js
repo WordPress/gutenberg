@@ -13,7 +13,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import PostTypeSupportCheck from '../post-type-support-check';
+import ifPostTypeSupports from '../higher-order/if-post-type-supports';
 import { getCurrentPostType } from '../../store/selectors';
 
 export function PostAuthorCheck( { user, users, children } ) {
@@ -24,7 +24,7 @@ export function PostAuthorCheck( { user, users, children } ) {
 		return null;
 	}
 
-	return <PostTypeSupportCheck supportKeys="author">{ children }</PostTypeSupportCheck>;
+	return children;
 }
 
 const applyConnect = connect(
@@ -45,6 +45,7 @@ const applyWithAPIData = withAPIData( ( props ) => {
 } );
 
 export default compose( [
+	ifPostTypeSupports( 'author' ),
 	applyConnect,
 	applyWithAPIData,
 	withInstanceId,

@@ -6,9 +6,10 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
+import { compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow } from '@wordpress/components';
-import { PostComments, PostPingbacks, PostTypeSupportCheck } from '@wordpress/editor';
+import { PostComments, PostPingbacks, ifPostTypeSupports } from '@wordpress/editor';
 
 /**
  * Internal Dependencies
@@ -21,27 +22,32 @@ import { toggleSidebarPanel } from '../../../store/actions';
  */
 const PANEL_NAME = 'discussion-panel';
 
+const PostCommentsRow = ifPostTypeSupports( 'comments' )( () => (
+	<PanelRow>
+		<PostComments />
+	</PanelRow>
+) );
+
+const PostPingbacksRow = ifPostTypeSupports( 'trackbacks' )( () => (
+	<PanelRow>
+		<PostPingbacks />
+	</PanelRow>
+) );
+
 function DiscussionPanel( { isOpened, onTogglePanel } ) {
 	return (
-		<PostTypeSupportCheck supportKeys={ [ 'comments', 'trackbacks' ] }>
-			<PanelBody title={ __( 'Discussion' ) } opened={ isOpened } onToggle={ onTogglePanel }>
-				<PostTypeSupportCheck supportKeys="comments">
-					<PanelRow>
-						<PostComments />
-					</PanelRow>
-				</PostTypeSupportCheck>
-
-				<PostTypeSupportCheck supportKeys="trackbacks">
-					<PanelRow>
-						<PostPingbacks />
-					</PanelRow>
-				</PostTypeSupportCheck>
-			</PanelBody>
-		</PostTypeSupportCheck>
+		<PanelBody
+			title={ __( 'Discussion' ) }
+			opened={ isOpened }
+			onToggle={ onTogglePanel }
+		>
+			<PostCommentsRow />
+			<PostPingbacksRow />
+		</PanelBody>
 	);
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
@@ -54,5 +60,9 @@ export default connect(
 	},
 	undefined,
 	{ storeKey: 'edit-post' }
-)( DiscussionPanel );
+);
 
+export default compose( [
+	ifPostTypeSupports( [ 'comments', 'trackbacks' ] ),
+	applyConnect,
+] )( DiscussionPanel );
