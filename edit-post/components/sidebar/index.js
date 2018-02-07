@@ -23,7 +23,7 @@ import { getActiveEditorPanel } from '../../store/selectors';
  *
  * @param {string} panel The currently active panel.
  *
- * @returns {Object} The React element to render as a panel.
+ * @return {Object} The React element to render as a panel.
  */
 function getPanel( panel ) {
 	switch ( panel ) {
@@ -41,7 +41,7 @@ function getPanel( panel ) {
  *
  * @param {string} panel The currently active panel.
  *
- * @returns {Object} The rendered sidebar.
+ * @return {Object} The rendered sidebar.
  */
 const Sidebar = ( { panel } ) => {
 	const ActivePanel = getPanel( panel );

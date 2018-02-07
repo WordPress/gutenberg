@@ -23,7 +23,7 @@ import { closeGeneralSidebar } from '../../store/actions';
  *
  * @param {string} plugin The currently active plugin.
  *
- * @returns {Object} The React element to render as a panel.
+ * @return {Object} The React element to render as a panel.
  */
 export function getPluginSidebar( plugin ) {
 	const pluginSidebar = getSidebarSettings( plugin );

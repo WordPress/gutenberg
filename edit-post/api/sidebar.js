@@ -22,7 +22,7 @@ const sidebars = {};
  * @param {string}   settings.title  The name to show in the settings menu.
  * @param {Function} settings.render The function that renders the sidebar.
  *
- * @returns {Object} The final sidebar settings object.
+ * @return {Object} The final sidebar settings object.
  */
 export function registerSidebar( name, settings ) {
 	settings = {
@@ -77,7 +77,7 @@ export function registerSidebar( name, settings ) {
  *
  * @param {string} name The name of the sidebar to retrieve the settings for.
  *
- * @returns {Object} The settings object of the sidebar. Or null if the
+ * @return {Object} The settings object of the sidebar. Or null if the
  *                         sidebar doesn't exist.
  */
 export function getSidebarSettings( name ) {
@@ -95,7 +95,7 @@ export function getSidebarSettings( name ) {
  * @param {string}   settings.title  The name to show in the settings menu.
  * @param {Function} settings.render The function that renders the sidebar.
  *
- * @returns {void}
+ * @return {void}
  */
 export function renderSidebar( name, settings ) {
 	registerSidebar( name, settings );
@@ -106,7 +106,7 @@ export function renderSidebar( name, settings ) {
  * Activates the given sidebar.
  *
  * @param  {string} name The name of the sidebar to activate.
- * @returns {void}
+ * @return {void}
  */
 function activateSidebar( name ) {
 	store.dispatch( openGeneralSidebar( 'plugins' ) );

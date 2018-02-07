@@ -5,7 +5,7 @@
  *
  * @param  {string} sidebar Sidebar name
  * @param  {string} panel   Panel name
- * @returns {Object}         Action object
+ * @return {Object}         Action object
  */
 export function setGeneralSidebarActivePanel( sidebar, panel ) {
 	return {
@@ -20,7 +20,7 @@ export function setGeneralSidebarActivePanel( sidebar, panel ) {
  *
  * @param {string} sidebar        Sidebar to open.
  * @param {string} [panel = null] Panel to open in the sidebar. Null if unchanged.
- * @returns {Object}              Action object.
+ * @return {Object}              Action object.
  */
 export function openGeneralSidebar( sidebar, panel = null ) {
 	return {
@@ -45,7 +45,7 @@ export function closeGeneralSidebar() {
  * Returns an action object used in signalling that the user opened the publish
  * sidebar.
  *
- * @returns {Object} Action object
+ * @return {Object} Action object
  */
 export function openPublishSidebar() {
 	return {
@@ -68,7 +68,7 @@ export function closePublishSidebar() {
 /**
  * Returns an action object used in signalling that the user toggles the publish sidebar
  *
- * @returns {Object} Action object
+ * @return {Object} Action object
  */
 export function togglePublishSidebar() {
 	return {
@@ -80,7 +80,7 @@ export function togglePublishSidebar() {
  * Returns an action object used in signalling that use toggled a panel in the editor.
  *
  * @param {string}  panel The panel to toggle.
- * @returns {Object} Action object.
+ * @return {Object} Action object.
 */
 export function toggleGeneralSidebarEditorPanel( panel ) {
 	return {
@@ -93,7 +93,7 @@ export function toggleGeneralSidebarEditorPanel( panel ) {
  * Returns an action object used in signalling that the viewport type preference should be set.
  *
  * @param {string} viewportType The viewport type (desktop or mobile).
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function setViewportType( viewportType ) {
 	return {
