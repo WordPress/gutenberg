@@ -1,12 +1,12 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /**
- * External dependencies 
+ * External dependencies
  */
 import { isFunction } from 'lodash';
 
 /**
- * Internal dependencies 
+ * Internal dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
 import { isString } from 'util';
@@ -25,7 +25,7 @@ const menuItems = {};
  *                                     when the menu item is clicked.
  * @param {string}   [settings.icon]   SVG Icon url.
  *
- * @returns {Object} The final sidebar settings object.
+ * @return {Object} The final sidebar settings object.
  */
 export function registerEditorMenuItem( name, settings ) {
 	settings = {
@@ -92,7 +92,7 @@ export function registerEditorMenuItem( name, settings ) {
 /**
  * Retrieves all menu items that are registered.
  *
- * @returns {Object} Registered menu items.
+ * @return {Object} Registered menu items.
  */
 export function getEditorMenuItems() {
 	return menuItems;
