@@ -201,6 +201,7 @@ const schema = {
 		type: 'array',
 		source: 'children',
 		selector: 'p',
+		default: [],
 	},
 	align: {
 		type: 'string',
@@ -282,10 +283,6 @@ export const settings = {
 		return {
 			content: concatChildren( attributes.content, attributesToMerge.content ),
 		};
-	},
-
-	isEmpty( attributes ) {
-		return ! attributes.content || ! attributes.content.length;
 	},
 
 	getEditWrapperProps( attributes ) {

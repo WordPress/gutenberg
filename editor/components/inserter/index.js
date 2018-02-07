@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, withContext } from '@wordpress/components';
-import { createBlock, getBlockType } from '@wordpress/blocks';
+import { createBlock, isUntouchedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 
 /**
@@ -114,16 +114,10 @@ export default compose( [
 			onInsertBlock( item, index ) {
 				const { name, initialAttributes } = item;
 				const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
-
-				if ( selectedBlock ) {
-					const blockType = getBlockType( selectedBlock.name );
-					const isEmptyBlock = blockType.isEmpty && blockType.isEmpty( selectedBlock.attributes );
-					if ( isEmptyBlock ) {
-						dispatchProps.replaceBlocks( selectedBlock.uid, insertedBlock );
-						return;
-					}
+				if ( selectedBlock && isUntouchedDefaultBlock( selectedBlock ) ) {
+					dispatchProps.replaceBlocks( selectedBlock.uid, insertedBlock );
+					return;
 				}
-
 				dispatchProps.insertBlock( insertedBlock, index, rootUID );
 			},
 		} )

@@ -27,4 +27,6 @@ export {
 	hasBlockSupport,
 	isReusableBlock,
 } from './registration';
-
+export {
+	isUntouchedDefaultBlock,
+} from './helpers';
