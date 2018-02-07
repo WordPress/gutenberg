@@ -18,6 +18,10 @@ import { diffAriaProps, pickAriaProps } from './aria';
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
 export default class TinyMCE extends Component {
 	componentDidMount() {
+		if ( this.props.onMount ) {
+			this.props.onMount( this.editorNode );
+		}
+
 		this.initialize();
 	}
 

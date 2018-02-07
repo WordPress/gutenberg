@@ -231,7 +231,10 @@ export class BlockListBlock extends Component {
 			return;
 		}
 
-		target.focus();
+		// If there is a contenteditable element, it will move focus by itself.
+		if ( ! target.querySelector( '[contenteditable="true"]' ) ) {
+			target.focus();
+		}
 
 		// In reverse case, need to explicitly place caret position.
 		if ( isReverse ) {

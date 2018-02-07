@@ -16,12 +16,13 @@ import {
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import 'element-closest';
+import scrollIntoView from 'dom-scroll-into-view';
 
 /**
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
-import { keycodes, createBlobURL, isHorizontalEdge } from '@wordpress/utils';
+import { keycodes, createBlobURL, getScrollContainer, isHorizontalEdge } from '@wordpress/utils';
 import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
 /**
@@ -36,6 +37,11 @@ import patterns from './patterns';
 import { EVENTS } from './constants';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
+
+/**
+ * Holds the offset of the root node, to use across instances when needed.
+ */
+let offsetTop;
 
 export function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -139,6 +145,8 @@ export class RichText extends Component {
 		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
+		this.onTinyMCEMount = this.onTinyMCEMount.bind( this );
+		this.onFocus = this.onFocus.bind( this );
 
 		this.state = {
 			formats: {},
@@ -182,6 +190,7 @@ export class RichText extends Component {
 		} );
 
 		editor.on( 'init', this.onInit );
+		editor.on( 'focusin', this.onFocus );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
@@ -242,6 +251,25 @@ export class RichText extends Component {
 		forEach( this.props.formatters, ( formatter ) => {
 			this.editor.formatter.register( formatter.format, this.adaptFormatter( formatter ) );
 		} );
+	}
+
+	onFocus() {
+		// For virtual keyboards, always scroll the focussed editor into view.
+		// Unfortunately we cannot detect virtual keyboards, so we check UA.
+		if ( /iPad|iPhone|iPod|Android/i.test( window.navigator.userAgent ) ) {
+			const rootNode = this.editor.getBody();
+			const rootRect = rootNode.getBoundingClientRect();
+			const caretRect = this.editor.selection.getRng().getClientRects()[ 0 ];
+			const offset = caretRect ? caretRect.top - rootRect.top : 0;
+
+			scrollIntoView( rootNode, getScrollContainer( rootNode ), {
+				// Give enough room for toolbar. Must be top.
+				// Unfortunately we cannot scroll to bottom as the virtual
+				// keyboard does not change the window size.
+				offsetTop: 100 - offset,
+				alignWithTop: true,
+			} );
+		}
 	}
 
 	/**
@@ -541,6 +569,11 @@ export class RichText extends Component {
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
 				} else {
+					// For type writing offect, save the root node offset so it
+					// can the position can be scrolled to in the next focussed
+					// instance.
+					offsetTop = rootNode.getBoundingClientRect().top;
+
 					this.splitContent();
 				}
 			}
@@ -770,6 +803,21 @@ export class RichText extends Component {
 		this.props.onSplit( before, after, ...blocks );
 	}
 
+	onTinyMCEMount( node ) {
+		if ( ! offsetTop ) {
+			return;
+		}
+
+		// When a new instance is created, scroll the root node into the
+		// position of the root node that captured ENTER.
+		scrollIntoView( node, getScrollContainer( node ), {
+			offsetTop,
+			alignWithTop: true,
+		} );
+
+		offsetTop = null;
+	}
+
 	render() {
 		const {
 			tagName: Tagname = 'div',
@@ -829,6 +877,7 @@ export class RichText extends Component {
 					{ ...ariaProps }
 					className={ className }
 					key={ key }
+					onMount={ this.onTinyMCEMount }
 				/>
 				{ isPlaceholderVisible &&
 					<Tagname
