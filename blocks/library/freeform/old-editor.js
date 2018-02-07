@@ -63,10 +63,6 @@ export default class OldEditor extends Component {
 		if ( prevProps.attributes.content !== content ) {
 			editor.setContent( content || '' );
 		}
-
-		if ( ! prevProps.focus && !! this.props.focus && document.activeElement !== editor.getBody() ) {
-			editor.getBody().focus();
-		}
 	}
 
 	initialize() {
@@ -127,10 +123,6 @@ export default class OldEditor extends Component {
 		// See wp-includes/js/tinymce/plugins/wordpress/plugin.js
 		// Swaps node.nodeName === 'BODY' to node === editor.getBody()
 		editor.on( 'init', () => {
-			if ( this.props.focus && document.activeElement !== editor.getBody() ) {
-				editor.getBody().focus();
-			}
-
 			editor.addCommand( 'WP_More', function( tag ) {
 				var parent, html, title,
 					classname = 'wp-more-tag',
@@ -176,7 +168,7 @@ export default class OldEditor extends Component {
 	}
 
 	render() {
-		const { focus, id, className } = this.props;
+		const { isSelected, id, className } = this.props;
 
 		return [
 			<div
@@ -184,7 +176,7 @@ export default class OldEditor extends Component {
 				id={ id + '-toolbar' }
 				ref={ ref => this.ref = ref }
 				className="freeform-toolbar"
-				style={ ! focus ? { display: 'none' } : {} }
+				style={ ! isSelected ? { display: 'none' } : {} }
 			/>,
 			<div
 				key="editor"

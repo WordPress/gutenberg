@@ -950,50 +950,66 @@ describe( 'state', () => {
 			const state = blockSelection( undefined, {
 				type: 'SELECT_BLOCK',
 				uid: 'kumquat',
+				initialPosition: -1,
 			} );
 
 			expect( state ).toEqual( {
 				start: 'kumquat',
 				end: 'kumquat',
-				focus: {},
+				initialPosition: -1,
 				isMultiSelecting: false,
 				isEnabled: true,
 			} );
 		} );
 
 		it( 'should set multi selection', () => {
-			const original = deepFreeze( { focus: { editable: 'citation' }, isMultiSelecting: false } );
+			const original = deepFreeze( { isMultiSelecting: false } );
 			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
 				start: 'ribs',
 				end: 'chicken',
 			} );
 
-			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+			expect( state ).toEqual( {
+				start: 'ribs',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
 		} );
 
 		it( 'should set continuous multi selection', () => {
-			const original = deepFreeze( { focus: { editable: 'citation' }, isMultiSelecting: true } );
+			const original = deepFreeze( { isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'MULTI_SELECT',
 				start: 'ribs',
 				end: 'chicken',
 			} );
 
-			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: true } );
+			expect( state ).toEqual( {
+				start: 'ribs',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: true,
+			} );
 		} );
 
 		it( 'should start multi selection', () => {
-			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: false } );
+			const original = deepFreeze( { start: 'ribs', end: 'ribs', isMultiSelecting: false } );
 			const state = blockSelection( original, {
 				type: 'START_MULTI_SELECT',
 			} );
 
-			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
+			expect( state ).toEqual( {
+				start: 'ribs',
+				end: 'ribs',
+				initialPosition: null,
+				isMultiSelecting: true,
+			} );
 		} );
 
 		it( 'should return same reference if already multi-selecting', () => {
-			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
+			const original = deepFreeze( { start: 'ribs', end: 'ribs', isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'START_MULTI_SELECT',
 			} );
@@ -1002,16 +1018,21 @@ describe( 'state', () => {
 		} );
 
 		it( 'should end multi selection with selection', () => {
-			const original = deepFreeze( { start: 'ribs', end: 'chicken', focus: { editable: 'citation' }, isMultiSelecting: true } );
+			const original = deepFreeze( { start: 'ribs', end: 'chicken', isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'STOP_MULTI_SELECT',
 			} );
 
-			expect( state ).toEqual( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+			expect( state ).toEqual( {
+				start: 'ribs',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
 		} );
 
 		it( 'should return same reference if already ended multi-selecting', () => {
-			const original = deepFreeze( { start: 'ribs', end: 'chicken', focus: null, isMultiSelecting: false } );
+			const original = deepFreeze( { start: 'ribs', end: 'chicken', isMultiSelecting: false } );
 			const state = blockSelection( original, {
 				type: 'STOP_MULTI_SELECT',
 			} );
@@ -1020,12 +1041,17 @@ describe( 'state', () => {
 		} );
 
 		it( 'should end multi selection without selection', () => {
-			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
+			const original = deepFreeze( { start: 'ribs', end: 'ribs', isMultiSelecting: true } );
 			const state = blockSelection( original, {
 				type: 'STOP_MULTI_SELECT',
 			} );
 
-			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: false } );
+			expect( state ).toEqual( {
+				start: 'ribs',
+				end: 'ribs',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
 		} );
 
 		it( 'should not update the state if the block is already selected', () => {
@@ -1046,11 +1072,16 @@ describe( 'state', () => {
 				type: 'CLEAR_SELECTED_BLOCK',
 			} );
 
-			expect( state1 ).toEqual( { start: null, end: null, focus: null, isMultiSelecting: false } );
+			expect( state1 ).toEqual( {
+				start: null,
+				end: null,
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
 		} );
 
 		it( 'should return same reference if clearing selection but no selection', () => {
-			const original = deepFreeze( { start: null, end: null, focus: null, isMultiSelecting: false } );
+			const original = deepFreeze( { start: null, end: null, isMultiSelecting: false } );
 
 			const state1 = blockSelection( original, {
 				type: 'CLEAR_SELECTED_BLOCK',
@@ -1070,11 +1101,16 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( state3 ).toEqual( { start: 'ribs', end: 'ribs', focus: {}, isMultiSelecting: false } );
+			expect( state3 ).toEqual( {
+				start: 'ribs',
+				end: 'ribs',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
 		} );
 
 		it( 'should not update the state if the block moved is already selected', () => {
-			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: {} } );
+			const original = deepFreeze( { start: 'ribs', end: 'ribs' } );
 			const state = blockSelection( original, {
 				type: 'MOVE_BLOCKS_UP',
 				uids: [ 'ribs' ],
@@ -1083,35 +1119,8 @@ describe( 'state', () => {
 			expect( state ).toBe( original );
 		} );
 
-		it( 'should update the focus and selects the block', () => {
-			const state = blockSelection( undefined, {
-				type: 'UPDATE_FOCUS',
-				uid: 'chicken',
-				config: { editable: 'citation' },
-			} );
-
-			expect( state ).toEqual( {
-				start: 'chicken',
-				end: 'chicken',
-				focus: { editable: 'citation' },
-				isMultiSelecting: false,
-				isEnabled: true,
-			} );
-		} );
-
-		it( 'should update the focus and merge the existing state', () => {
-			const original = deepFreeze( { start: 'ribs', end: 'ribs', focus: {}, isMultiSelecting: true } );
-			const state = blockSelection( original, {
-				type: 'UPDATE_FOCUS',
-				uid: 'ribs',
-				config: { editable: 'citation' },
-			} );
-
-			expect( state ).toEqual( { start: 'ribs', end: 'ribs', focus: { editable: 'citation' }, isMultiSelecting: true } );
-		} );
-
 		it( 'should replace the selected block', () => {
-			const original = deepFreeze( { start: 'chicken', end: 'chicken', focus: { editable: 'citation' } } );
+			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
@@ -1121,11 +1130,16 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( state ).toEqual( { start: 'wings', end: 'wings', focus: {}, isMultiSelecting: false } );
+			expect( state ).toEqual( {
+				start: 'wings',
+				end: 'wings',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
 		} );
 
 		it( 'should keep the selected block', () => {
-			const original = deepFreeze( { start: 'chicken', end: 'chicken', focus: { editable: 'citation' } } );
+			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'ribs' ],

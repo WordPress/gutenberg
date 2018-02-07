@@ -23,6 +23,7 @@ function BlockToolbar( { block, mode } ) {
 	return (
 		<div className="editor-block-toolbar">
 			<BlockSwitcher uids={ [ block.uid ] } />
+			<Slot name="Block.Toolbar" />
 			<Slot name="Formatting.Toolbar" />
 		</div>
 	);
