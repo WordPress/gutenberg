@@ -13,7 +13,7 @@ import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
 
-const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } = keycodes;
+const { ESCAPE } = keycodes;
 
 /**
  * When inserting a new link, we insert an <a> tag with this placeholder href
@@ -66,14 +66,14 @@ class FormatToolbar extends Component {
 	}
 
 	onKeyDown( event ) {
+		event.stopPropagation();
+
 		if ( event.keyCode === ESCAPE ) {
-			if ( this.state.isEditingLink ) {
-				event.stopPropagation();
+			this.setState( { isEditingLink: false, newLinkValue: '' } );
+
+			if ( this.props.formats.link.value === NEW_LINK_PLACEHOLDER_VALUE ) {
 				this.dropLink();
 			}
-		}
-		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
-			stopKeyPropagation( event );
 		}
 	}
 
@@ -113,6 +113,7 @@ class FormatToolbar extends Component {
 
 	submitLink( event ) {
 		event.preventDefault();
+
 		this.setState( { isEditingLink: false, newLinkValue: '' } );
 
 		if ( this.props.formats.link.value === NEW_LINK_PLACEHOLDER_VALUE ) {
