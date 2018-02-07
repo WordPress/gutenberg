@@ -72,10 +72,9 @@ export const settings = {
 				type: 'raw',
 				isMatch( node ) {
 					const tag = node.nodeName.toLowerCase();
-					const hasText = !! node.textContent.trim();
 					const hasImage = node.querySelector( 'img' );
 
-					return tag === 'img' || ( hasImage && ! hasText ) || ( hasImage && tag === 'figure' );
+					return tag === 'img' || ( hasImage && tag === 'figure' );
 				},
 				transform( node ) {
 					const targetNode = node.parentNode.querySelector( 'figure,img' );

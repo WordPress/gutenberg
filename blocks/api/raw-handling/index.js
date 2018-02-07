@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get } from 'lodash';
+import { find, get, compact } from 'lodash';
 import showdown from 'showdown';
 
 /**
@@ -22,24 +22,26 @@ import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
 import tableNormaliser from './table-normaliser';
 import inlineContentConverter from './inline-content-converter';
+import embeddedContentReducer from './embedded-content-reducer';
 import { deepFilterHTML, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
 import shortcodeConverter from './shortcode-converter';
 
 /**
  * Converts an HTML string to known blocks. Strips everything else.
  *
- * @param {string} [options.HTML]      The HTML to convert.
- * @param {string} [options.plainText] Plain text version.
- * @param {string} [options.mode]      Handle content as blocks or inline content.
- *                                     * 'AUTO': Decide based on the content passed.
- *                                     * 'INLINE': Always handle as inline content, and return string.
- *                                     * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param {Array}  [options.tagName]   The tag into which content will be
- *                                     inserted.
+ * @param {string}  [options.HTML]         The HTML to convert.
+ * @param {string}  [options.plainText]    Plain text version.
+ * @param {string}  [options.mode]         Handle content as blocks or inline content.
+ *                                         * 'AUTO': Decide based on the content passed.
+ *                                         * 'INLINE': Always handle as inline content, and return string.
+ *                                         * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param {Array}   [options.tagName]      The tag into which content will be
+ *                                         inserted.
+ * @param {boolean} [options.allowIframes] Whether or not to allow iframes.
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName } ) {
+export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName, allowIframes = false } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
@@ -112,18 +114,20 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 			msListConverter,
 		] );
 
-		piece = deepFilterHTML( piece, [
+		piece = deepFilterHTML( piece, compact( [
 			listReducer,
 			imageCorrector,
 			// Add semantic formatting before attributes are stripped.
 			formattingTransformer,
 			stripAttributes,
 			commentRemover,
+			! allowIframes && createUnwrapper( ( element ) => element.nodeName === 'IFRAME' ),
+			embeddedContentReducer,
 			createUnwrapper( isNotWhitelisted ),
 			blockquoteNormaliser,
 			tableNormaliser,
 			inlineContentConverter,
-		] );
+		] ) );
 
 		piece = deepFilterHTML( piece, [
 			createUnwrapper( isInvalidInline ),
