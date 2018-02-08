@@ -407,29 +407,31 @@ export const getBlock = createSelector(
 			return null;
 		}
 
+		let { attributes } = block;
+
+		// Inject custom source attribute values.
+		//
+		// TODO: Create generic external sourcing pattern, not explicitly
+		// targeting meta attributes.
 		const type = getBlockType( block.name );
-		if ( ! type || ! type.attributes ) {
-			return block;
-		}
+		if ( type ) {
+			attributes = reduce( type.attributes, ( result, value, key ) => {
+				if ( value.source === 'meta' ) {
+					if ( result === attributes ) {
+						result = { ...result };
+					}
 
-		const metaAttributes = reduce( type.attributes, ( result, value, key ) => {
-			if ( value.source === 'meta' ) {
-				result[ key ] = getPostMeta( state, value.meta );
-			}
+					result[ key ] = getPostMeta( state, value.meta );
+				}
 
-			return result;
-		}, {} );
-
-		if ( ! Object.keys( metaAttributes ).length ) {
-			return block;
+				return result;
+			}, attributes );
 		}
 
 		return {
 			...block,
-			attributes: {
-				...block.attributes,
-				...metaAttributes,
-			},
+			attributes,
+			innerBlocks: getBlocks( state, uid ),
 		};
 	},
 	( state, uid ) => [
@@ -457,10 +459,10 @@ function getPostMeta( state, key ) {
  */
 export const getBlocks = createSelector(
 	( state, rootUID ) => {
-		return map( getBlockOrder( state, rootUID ), ( uid ) => ( {
-			...getBlock( state, uid ),
-			innerBlocks: getBlocks( state, uid ),
-		} ) );
+		return map(
+			getBlockOrder( state, rootUID ),
+			( uid ) => getBlock( state, uid )
+		);
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
