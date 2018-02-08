@@ -149,7 +149,7 @@ function gutenberg_init( $return, $post ) {
 		return $return;
 	}
 
-	if ( array_key_exists('classic-editor', $_GET ) ) {
+	if ( isset( $_GET['classic-editor'] ) ) {
 		return false;
 	}
 
