@@ -287,6 +287,7 @@ export default class RichText extends Component {
 			event.clipboardData ||
 			event.dataTransfer ||
 			this.editor.getDoc().dataTransfer ||
+			// Removes the need for further `dataTransfer` checks.
 			{ getData: () => '' };
 
 		const { items = [], files = [], types = [] } = dataTransfer;
@@ -295,6 +296,7 @@ export default class RichText extends Component {
 		const HTML = dataTransfer.getData( 'text/html' );
 
 		// Only process file if no HTML is present.
+		// Note: a pasted file may have the URL as plain text.
 		if ( item && ! HTML ) {
 			const blob = item.getAsFile ? item.getAsFile() : item;
 			const rootNode = this.editor.getBody();
