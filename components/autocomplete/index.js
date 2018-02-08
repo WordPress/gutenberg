@@ -235,8 +235,8 @@ export class Autocomplete extends Component {
 	/**
 	 * Load options for an autocompleter.
 	 *
-	 * @param  {number} index    The autocompleter index.
-	 * @param  {string} query The query, if any.
+	 * @param {number} index    The autocompleter index.
+	 * @param {string} query The query, if any.
 	 */
 	loadOptions( index, query ) {
 		this.props.completers[ index ]
