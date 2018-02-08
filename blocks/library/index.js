@@ -30,7 +30,6 @@ import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as subhead from './subhead';
 import * as table from './table';
-import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 
@@ -81,7 +80,6 @@ export const registerCoreBlocks = () => {
 		separator,
 		subhead,
 		table,
-		textColumns,
 		verse,
 		video,
 	].forEach( ( { name, settings } ) => {
