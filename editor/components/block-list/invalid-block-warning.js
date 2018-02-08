@@ -20,21 +20,8 @@ import {
 import { replaceBlock } from '../../store/actions';
 import Warning from '../warning';
 
-function InvalidBlockWarning( { block, onReplace } ) {
+function InvalidBlockWarning( { convertToHTML, convertToBlocks } ) {
 	const hasHTMLBlock = !! getBlockType( 'core/html' );
-
-	const convertToHTML = () => {
-		onReplace( block.uid, createBlock( 'core/html', {
-			content: block.originalContent,
-		} ) );
-	};
-
-	const convertToBlocks = () => {
-		onReplace( block.uid, rawHandler( {
-			HTML: block.originalContent,
-			mode: 'BLOCKS',
-		} ) );
-	};
 
 	return (
 		<Warning>
@@ -55,7 +42,17 @@ function InvalidBlockWarning( { block, onReplace } ) {
 
 export default connect(
 	null,
-	{
-		onReplace: replaceBlock,
-	}
+	( dispatch, { block } ) => ( {
+		convertToHTML() {
+			dispatch( replaceBlock( block.uid, createBlock( 'core/html', {
+				content: block.originalContent,
+			} ) ) );
+		},
+		convertToBlocks() {
+			dispatch( replaceBlock( block.uid, rawHandler( {
+				HTML: block.originalContent,
+				mode: 'BLOCKS',
+			} ) ) );
+		},
+	} )
 )( InvalidBlockWarning );
