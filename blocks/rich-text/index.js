@@ -581,6 +581,10 @@ export default class RichText extends Component {
 	 * @param {Array} blocks The blocks to add after the split point.
 	 */
 	splitContent( blocks = [] ) {
+		if ( ! this.props.onSplit ) {
+			return;
+		}
+
 		const { dom } = this.editor;
 		const rootNode = this.editor.getBody();
 		const beforeRange = dom.createRng();
