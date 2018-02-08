@@ -268,7 +268,7 @@ export default class RichText extends Component {
 			if ( isEmpty && this.props.onReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
 				setTimeout( () => this.props.onReplace( content ) );
-			} else {
+			} else if ( this.props.onSplit ) {
 				// Necessary to get the right range.
 				// Also done in the TinyMCE paste plugin.
 				setTimeout( () => this.splitContent( content ) );
@@ -582,6 +582,10 @@ export default class RichText extends Component {
 	 * @param {Array} blocks The blocks to add after the split point.
 	 */
 	splitContent( blocks = [] ) {
+		if ( ! this.props.onSplit ) {
+			return;
+		}
+
 		const { dom } = this.editor;
 		const rootNode = this.editor.getBody();
 		const beforeRange = dom.createRng();
