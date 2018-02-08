@@ -29,7 +29,7 @@ export function UnknownConverter( { block, onReplace, small, user } ) {
 		onReplace( block.uid, rawHandler( {
 			HTML: serialize( block ),
 			mode: 'BLOCKS',
-			allowIframes: get( user, [ 'data', 'capabilities', 'unfiltered_html' ], false ),
+			canUserUseUnfilteredHTML: get( user, [ 'data', 'capabilities', 'unfiltered_html' ], false ),
 		} ) );
 	};
 

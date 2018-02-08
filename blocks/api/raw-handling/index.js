@@ -29,19 +29,18 @@ import shortcodeConverter from './shortcode-converter';
 /**
  * Converts an HTML string to known blocks. Strips everything else.
  *
- * @param {string}  [options.HTML]         The HTML to convert.
- * @param {string}  [options.plainText]    Plain text version.
- * @param {string}  [options.mode]         Handle content as blocks or inline content.
- *                                         * 'AUTO': Decide based on the content passed.
- *                                         * 'INLINE': Always handle as inline content, and return string.
- *                                         * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param {Array}   [options.tagName]      The tag into which content will be
- *                                         inserted.
- * @param {boolean} [options.allowIframes] Whether or not to allow iframes.
+ * @param {string}  [options.HTML]                     The HTML to convert.
+ * @param {string}  [options.plainText]                Plain text version.
+ * @param {string}  [options.mode]                     Handle content as blocks or inline content.
+ *                                                     * 'AUTO': Decide based on the content passed.
+ *                                                     * 'INLINE': Always handle as inline content, and return string.
+ *                                                     * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param {Array}   [options.tagName]                  The tag into which content will be inserted.
+ * @param {boolean} [options.canUserUseUnfilteredHTML] Whether or not to user can use unfiltered HTML.
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName, allowIframes = false } ) {
+export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
@@ -121,7 +120,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 			formattingTransformer,
 			stripAttributes,
 			commentRemover,
-			! allowIframes && createUnwrapper( ( element ) => element.nodeName === 'IFRAME' ),
+			! canUserUseUnfilteredHTML && createUnwrapper( ( element ) => element.nodeName === 'IFRAME' ),
 			embeddedContentReducer,
 			createUnwrapper( isNotWhitelisted ),
 			blockquoteNormaliser,

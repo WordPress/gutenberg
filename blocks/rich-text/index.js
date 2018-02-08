@@ -371,7 +371,7 @@ export default class RichText extends Component {
 			plainText: this.pastedPlainText,
 			mode,
 			tagName: this.props.tagName,
-			allowIframes: this.context.canUserUseUnfilteredHTML,
+			canUserUseUnfilteredHTML: this.context.canUserUseUnfilteredHTML,
 		} );
 
 		if ( typeof content === 'string' ) {

@@ -68,7 +68,7 @@ const whitelist = {
 };
 
 export function isWhitelisted( element ) {
-	return !! whitelist.hasOwnProperty( element.nodeName.toLowerCase() );
+	return whitelist.hasOwnProperty( element.nodeName.toLowerCase() );
 }
 
 export function isNotWhitelisted( element ) {
@@ -104,7 +104,7 @@ function isInlineForTag( nodeName, tagName ) {
 
 export function isInline( node, tagName ) {
 	const nodeName = node.nodeName.toLowerCase();
-	return !! inlineWhitelist.hasOwnProperty( nodeName ) || isInlineForTag( nodeName, tagName );
+	return inlineWhitelist.hasOwnProperty( nodeName ) || isInlineForTag( nodeName, tagName );
 }
 
 export function isClassWhitelisted( tag, name ) {
@@ -125,11 +125,11 @@ export function isClassWhitelisted( tag, name ) {
  * @return {boolean} True if embedded content, false if not.
  */
 export function isEmbedded( node ) {
-	return !! embeddedWhiteList.hasOwnProperty( node.nodeName.toLowerCase() );
+	return embeddedWhiteList.hasOwnProperty( node.nodeName.toLowerCase() );
 }
 
 export function isInlineWrapper( node ) {
-	return !! inlineWrapperWhiteList.hasOwnProperty( node.nodeName.toLowerCase() );
+	return inlineWrapperWhiteList.hasOwnProperty( node.nodeName.toLowerCase() );
 }
 
 export function isAllowedBlock( parentNode, node ) {
