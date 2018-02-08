@@ -199,6 +199,7 @@ const schema = {
 		type: 'array',
 		source: 'children',
 		selector: 'p',
+		default: [],
 	},
 	align: {
 		type: 'string',
