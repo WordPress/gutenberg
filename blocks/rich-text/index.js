@@ -37,7 +37,7 @@ import { EVENTS } from './constants';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
-function createTinyMCEElement( type, props, ...children ) {
+export function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -53,13 +53,13 @@ function createTinyMCEElement( type, props, ...children ) {
 	);
 }
 
-function isLinkBoundary( fragment ) {
+export function isLinkBoundary( fragment ) {
 	return fragment.childNodes && fragment.childNodes.length === 1 &&
 		fragment.childNodes[ 0 ].nodeName === 'A' && fragment.childNodes[ 0 ].text.length === 1 &&
 		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
 }
 
-function getFormatProperties( formatName, parents ) {
+export function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
 		case 'link' : {
 			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
@@ -93,7 +93,6 @@ export default class RichText extends Component {
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
-		this.onFocus = this.onFocus.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
@@ -116,7 +115,7 @@ export default class RichText extends Component {
 	 * Allows passing in settings which will be overwritten.
 	 *
 	 * @param {Object} settings The settings to overwrite.
-	 * @returns {Object} The settings for this block.
+	 * @return {Object} The settings for this block.
 	 */
 	getSettings( settings ) {
 		return ( this.props.getSettings || identity )( {
@@ -143,7 +142,6 @@ export default class RichText extends Component {
 		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
-		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
@@ -168,17 +166,10 @@ export default class RichText extends Component {
 	 *
 	 * @param {string} name The name of the event.
 	 *
-	 * @returns {void} Void.
+	 * @return {void} Void.
 	*/
 	proxyPropHandler( name ) {
 		return ( event ) => {
-			// TODO: Reconcile with `onFocus` instance handler which does not
-			// pass the event object. Otherwise we have double focus handling
-			// and editor instance being stored into state.
-			if ( name === 'Focus' ) {
-				return;
-			}
-
 			// Allow props an opportunity to handle the event, before default
 			// RichText behavior takes effect. Should the event be handled by a
 			// prop, it should `stopImmediatePropagation` on the event to stop
@@ -190,7 +181,6 @@ export default class RichText extends Component {
 	}
 
 	onInit() {
-		this.updateFocus();
 		this.registerCustomFormatters();
 	}
 
@@ -211,44 +201,19 @@ export default class RichText extends Component {
 		} );
 	}
 
-	onFocus() {
-		if ( ! this.props.onFocus ) {
-			return;
-		}
-
-		// TODO: We need a way to save the focus position ( bookmark maybe )
-		this.props.onFocus();
-	}
-
-	isActive() {
-		return document.activeElement === this.editor.getBody();
-	}
-
 	/**
 	 * Handles the global selection change event.
-	 *
-	 * Will call the onFocus handler if one is defined and this block is focused.
 	 */
 	onSelectionChange() {
+		const isActive = document.activeElement === this.editor.getBody();
 		// We must check this because selectionChange is a global event.
-		if ( ! this.isActive() ) {
+		if ( ! isActive ) {
 			return;
 		}
 
-		const collapsed = this.editor.selection.isCollapsed();
-
-		this.setState( {
-			empty: tinymce.DOM.isEmpty( this.editor.getBody() ),
-		} );
-
-		if (
-			this.props.focus && this.props.onFocus &&
-			this.props.focus.collapsed !== collapsed
-		) {
-			this.props.onFocus( {
-				...this.props.focus,
-				collapsed,
-			} );
+		const isEmpty = tinymce.DOM.isEmpty( this.editor.getBody() );
+		if ( this.state.empty !== isEmpty ) {
+			this.setState( { empty: isEmpty } );
 		}
 	}
 
@@ -303,7 +268,7 @@ export default class RichText extends Component {
 			if ( isEmpty && this.props.onReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
 				setTimeout( () => this.props.onReplace( content ) );
-			} else {
+			} else if ( this.props.onSplit ) {
 				// Necessary to get the right range.
 				// Also done in the TinyMCE paste plugin.
 				setTimeout( () => this.splitContent( content ) );
@@ -371,6 +336,7 @@ export default class RichText extends Component {
 			plainText: this.pastedPlainText,
 			mode,
 			tagName: this.props.tagName,
+			canUserUseUnfilteredHTML: this.context.canUserUseUnfilteredHTML,
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -395,7 +361,7 @@ export default class RichText extends Component {
 	fireChange() {
 		this.savedContent = this.getContent();
 		this.editor.save();
-		this.props.onChange( this.savedContent );
+		this.props.onChange( this.state.empty ? [] : this.savedContent );
 	}
 
 	/**
@@ -412,7 +378,7 @@ export default class RichText extends Component {
 	/**
 	 * Determines the DOM rectangle for the selection in the editor.
 	 *
-	 * @returns {DOMRect} The DOMRect based on the selection in the editor.
+	 * @return {DOMRect} The DOMRect based on the selection in the editor.
 	 */
 	getEditorSelectionRect() {
 		let range = this.editor.selection.getRng();
@@ -447,26 +413,23 @@ export default class RichText extends Component {
 	 * absolutely position the toolbar. It does this by finding the closest
 	 * relative element.
 	 *
-	 * @returns {{top: number, left: number}} The desired position of the toolbar.
+	 * @return {{top: number, left: number}} The desired position of the toolbar.
 	 */
 	getFocusPosition() {
 		const position = this.getEditorSelectionRect();
 
-		// Find the parent "relative" positioned container
-		const container = this.props.inlineToolbar ?
-			this.editor.getBody().closest( '.blocks-rich-text' ) :
-			this.editor.getBody().closest( '.editor-block-list__block' );
+		// Find the parent "relative" or "absolute" positioned container
+		const findRelativeParent = ( node ) => {
+			const style = window.getComputedStyle( node );
+			if ( style.position === 'relative' || style.position === 'absolute' ) {
+				return node;
+			}
+			return findRelativeParent( node.parentNode );
+		};
+		const container = findRelativeParent( this.editor.getBody() );
 		const containerPosition = container.getBoundingClientRect();
-		const blockPadding = 14;
-		const blockMoverMargin = 18;
-
-		// These offsets are necessary because the toolbar where the link modal lives
-		// is absolute positioned and it's not shown when we compute the position here
-		// so we compute the position about its parent relative position and adds the offset
-		const toolbarOffset = this.props.inlineToolbar ?
-			{ top: 10, left: 0 } :
-			{ top: 0, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
-		const linkModalWidth = 305;
+		const toolbarOffset = { top: 10, left: 0 };
+		const linkModalWidth = 298;
 
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
@@ -477,7 +440,7 @@ export default class RichText extends Component {
 	/**
 	 * Determines if the current selection within the editor is at the start.
 	 *
-	 * @returns {boolean} Whether or not the selection is at the start of the editor.
+	 * @return {boolean} Whether or not the selection is at the start of the editor.
 	 */
 	isStartOfEditor() {
 		const range = this.editor.selection.getRng();
@@ -500,7 +463,7 @@ export default class RichText extends Component {
 	/**
 	 * Determines if the current selection within the editor is at the end.
 	 *
-	 * @returns {boolean} Whether or not the selection is at the end of the editor.
+	 * @return {boolean} Whether or not the selection is at the end of the editor.
 	 */
 	isEndOfEditor() {
 		const range = this.editor.selection.getRng();
@@ -550,6 +513,11 @@ export default class RichText extends Component {
 			}
 
 			event.preventDefault();
+
+			// Calling onMerge() or onRemove() will destroy the editor, so it's important
+			// that we stop other handlers (e.g. ones registered by TinyMCE) from
+			// also handling this event.
+			event.stopImmediatePropagation();
 		}
 
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
@@ -614,6 +582,10 @@ export default class RichText extends Component {
 	 * @param {Array} blocks The blocks to add after the split point.
 	 */
 	splitContent( blocks = [] ) {
+		if ( ! this.props.onSplit ) {
+			return;
+		}
+
 		const { dom } = this.editor;
 		const rootNode = this.editor.getBody();
 		const beforeRange = dom.createRng();
@@ -690,6 +662,9 @@ export default class RichText extends Component {
 	}
 
 	onNodeChange( { parents } ) {
+		if ( document.activeElement !== this.editor.getBody() ) {
+			return;
+		}
 		const formatNames = this.props.formattingControls;
 		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
 			accFormats[ activeFormat ] = {
@@ -728,40 +703,11 @@ export default class RichText extends Component {
 		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
-	updateFocus() {
-		// We can't update focus if the editor hasn't finished initializing.
-		// Initialization callback `onInit` will call this function anyways.
-		if ( ! this.editor ) {
-			return;
-		}
-
-		const { focus } = this.props;
-		const isActive = this.isActive();
-
-		if ( focus ) {
-			if ( ! isActive ) {
-				this.editor.focus();
-			}
-
-			// Offset = -1 means we should focus the end of the editable
-			if ( focus.offset === -1 && ! this.isEndOfEditor() ) {
-				this.editor.selection.select( this.editor.getBody(), true );
-				this.editor.selection.collapse( false );
-			}
-		} else if ( isActive ) {
-			this.editor.getBody().blur();
-		}
-	}
-
 	componentWillUnmount() {
 		this.onChange();
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( ! isEqual( this.props.focus, prevProps.focus ) ) {
-			this.updateFocus();
-		}
-
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
 			this.props.tagName === prevProps.tagName &&
@@ -830,7 +776,6 @@ export default class RichText extends Component {
 			tagName: Tagname = 'div',
 			style,
 			value,
-			focus,
 			wrapperClassName,
 			className,
 			inlineToolbar = false,
@@ -838,8 +783,10 @@ export default class RichText extends Component {
 			placeholder,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
+			isSelected = false,
 			formatters,
 		} = this.props;
+		const { empty } = this.state;
 
 		const ariaProps = pickAriaProps( this.props );
 
@@ -847,7 +794,7 @@ export default class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ( ! focus || keepPlaceholderOnFocus ) && this.state.empty;
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && empty;
 		const classes = classnames( wrapperClassName, 'blocks-rich-text' );
 
 		const formatToolbar = (
@@ -863,12 +810,12 @@ export default class RichText extends Component {
 
 		return (
 			<div className={ classes }>
-				{ focus &&
+				{ isSelected &&
 					<Fill name="Formatting.Toolbar">
 						{ ! inlineToolbar && formatToolbar }
 					</Fill>
 				}
-				{ focus && inlineToolbar &&
+				{ isSelected && inlineToolbar &&
 					<div className="block-rich-text__inline-toolbar">
 						{ formatToolbar }
 					</div>
@@ -893,7 +840,7 @@ export default class RichText extends Component {
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
-				{ focus && <Slot name="RichText.Siblings" /> }
+				{ isSelected && <Slot name="RichText.Siblings" /> }
 			</div>
 		);
 	}
@@ -901,6 +848,7 @@ export default class RichText extends Component {
 
 RichText.contextTypes = {
 	onUndo: noop,
+	canUserUseUnfilteredHTML: noop,
 };
 
 RichText.defaultProps = {

@@ -13,7 +13,7 @@ import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
 
-const { ESCAPE, LEFT, RIGHT, UP, DOWN } = keycodes;
+const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } = keycodes;
 
 const FORMATTING_CONTROLS = [
 	{
@@ -69,7 +69,7 @@ class FormatToolbar extends Component {
 				this.dropLink();
 			}
 		}
-		if ( [ LEFT, DOWN, RIGHT, UP ].indexOf( event.keyCode ) > -1 ) {
+		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
 			stopKeyPropagation( event );
 		}
 	}

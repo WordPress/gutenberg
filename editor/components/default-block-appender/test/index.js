@@ -9,52 +9,47 @@ import { shallow } from 'enzyme';
 import { DefaultBlockAppender } from '../';
 
 describe( 'DefaultBlockAppender', () => {
-	const expectAppendDefaultBlockCalled = ( appendDefaultBlock ) => {
-		expect( appendDefaultBlock ).toHaveBeenCalledTimes( 1 );
-		expect( appendDefaultBlock ).toHaveBeenCalledWith();
+	const expectOnAppendCalled = ( onAppend ) => {
+		expect( onAppend ).toHaveBeenCalledTimes( 1 );
+		expect( onAppend ).toHaveBeenCalledWith();
 	};
 
-	describe( 'no block present', () => {
-		it( 'should match snapshot', () => {
-			const appendDefaultBlock = jest.fn();
-			const wrapper = shallow( <DefaultBlockAppender count={ 0 } appendDefaultBlock={ appendDefaultBlock } /> );
+	it( 'should match snapshot', () => {
+		const onAppend = jest.fn();
+		const wrapper = shallow( <DefaultBlockAppender onAppend={ onAppend } /> );
 
-			expect( wrapper ).toMatchSnapshot();
-		} );
-
-		it( 'should append a default block when input clicked', () => {
-			const appendDefaultBlock = jest.fn();
-			const wrapper = shallow( <DefaultBlockAppender count={ 0 } appendDefaultBlock={ appendDefaultBlock } /> );
-
-			wrapper.find( 'input.editor-default-block-appender__content' ).simulate( 'click' );
-
-			expectAppendDefaultBlockCalled( appendDefaultBlock );
-		} );
-
-		it( 'should append a default block when input focused', () => {
-			const appendDefaultBlock = jest.fn();
-			const wrapper = shallow( <DefaultBlockAppender count={ 0 } appendDefaultBlock={ appendDefaultBlock } /> );
-
-			wrapper.find( 'input.editor-default-block-appender__content' ).simulate( 'focus' );
-
-			expectAppendDefaultBlockCalled( appendDefaultBlock );
-		} );
+		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	describe( 'blocks present', () => {
-		it( 'should match snapshot', () => {
-			const wrapper = shallow( <DefaultBlockAppender count={ 5 } /> );
+	it( 'should append a default block when input clicked', () => {
+		const onAppend = jest.fn();
+		const wrapper = shallow( <DefaultBlockAppender onAppend={ onAppend } /> );
+		const input = wrapper.find( 'input.editor-default-block-appender__content' );
 
-			expect( wrapper ).toMatchSnapshot();
-		} );
+		expect( input.prop( 'value' ) ).toEqual( 'Write your story' );
+		input.simulate( 'click' );
 
-		it( 'should append a default block when button clicked', () => {
-			const insertBlock = jest.fn();
-			const wrapper = shallow( <DefaultBlockAppender count={ 5 } blocks={ [ { name: 'core/image' } ] } appendDefaultBlock={ insertBlock } /> );
+		expectOnAppendCalled( onAppend );
+	} );
 
-			wrapper.find( 'input.editor-default-block-appender__content' ).simulate( 'click' );
+	it( 'should append a default block when input focused', () => {
+		const onAppend = jest.fn();
+		const wrapper = shallow( <DefaultBlockAppender onAppend={ onAppend } /> );
 
-			expectAppendDefaultBlockCalled( insertBlock );
-		} );
+		wrapper.find( 'input.editor-default-block-appender__content' ).simulate( 'focus' );
+
+		expect( wrapper ).toMatchSnapshot();
+
+		expectOnAppendCalled( onAppend );
+	} );
+
+	it( 'should optionally show without prompt', () => {
+		const onAppend = jest.fn();
+		const wrapper = shallow( <DefaultBlockAppender onAppend={ onAppend } showPrompt={ false } /> );
+		const input = wrapper.find( 'input.editor-default-block-appender__content' );
+
+		expect( input.prop( 'value' ) ).toEqual( '' );
+
+		expect( wrapper ).toMatchSnapshot();
 	} );
 } );

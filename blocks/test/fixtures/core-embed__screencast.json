@@ -9,6 +9,7 @@
                 "Embedded content from screencast"
             ]
         },
+        "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-screencast\">\n    https://screencast.com/\n    <figcaption>Embedded content from screencast</figcaption>\n</figure>"
     }
 ]

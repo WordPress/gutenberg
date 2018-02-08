@@ -21,6 +21,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -32,10 +33,11 @@ import { getBlockType, getBlockTypes } from './registration';
  *
  * @param {string} name            Block name.
  * @param {Object} blockAttributes Block attributes.
+ * @param {?Array} innerBlocks     Nested blocks.
  *
- * @returns {Object} Block object.
+ * @return {Object} Block object.
  */
-export function createBlock( name, blockAttributes = {} ) {
+export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
@@ -59,6 +61,29 @@ export function createBlock( name, blockAttributes = {} ) {
 		name,
 		isValid: true,
 		attributes,
+		innerBlocks,
+	};
+}
+
+/**
+ * Given a block object, returns a copy of the block object, optionally merging
+ * new attributes and/or replacing its inner blocks.
+ *
+ * @param {Object} block           Block object.
+ * @param {Object} mergeAttributes Block attributes.
+ * @param {?Array} innerBlocks     Nested blocks.
+ *
+ * @return {Object} A cloned block.
+ */
+export function cloneBlock( block, mergeAttributes = {}, innerBlocks = block.innerBlocks ) {
+	return {
+		...block,
+		uid: uuid(),
+		attributes: {
+			...block.attributes,
+			...mergeAttributes,
+		},
+		innerBlocks,
 	};
 }
 
@@ -70,7 +95,7 @@ export function createBlock( name, blockAttributes = {} ) {
  * @param {string}  sourceName   Block name.
  * @param {boolean} isMultiBlock Array of possible block transformations.
  *
- * @returns {Function} Predicate that receives a block type.
+ * @return {Function} Predicate that receives a block type.
  */
 const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( transform ) => (
 	transform.type === 'block' &&
@@ -86,7 +111,7 @@ const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( tran
  * @param {string}  sourceName   Block name.
  * @param {boolean} isMultiBlock Array of possible block transformations.
  *
- * @returns {Function} Predicate that receives a block type.
+ * @return {Function} Predicate that receives a block type.
  */
 const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( type ) => (
 	!! find(
@@ -101,7 +126,7 @@ const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( 
  *
  * @param {Array} blocks Blocks array.
  *
- * @returns {Array} Array of possible block transformations.
+ * @return {Array} Array of possible block transformations.
  */
 export function getPossibleBlockTransformations( blocks ) {
 	const sourceBlock = first( blocks );
@@ -149,7 +174,7 @@ export function getPossibleBlockTransformations( blocks ) {
  * @param {Array|Object} blocks Blocks array or block object.
  * @param {string}       name   Block name.
  *
- * @returns {Array} Array of blocks.
+ * @return {Array} Array of blocks.
  */
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );
@@ -213,12 +238,24 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	return transformationResults.map( ( result, index ) => ( {
-		...result,
-		// The first transformed block whose type matches the "destination"
-		// type gets to keep the existing UID of the first block.
-		uid: index === firstSwitchedBlock ? firstBlock.uid : result.uid,
-	} ) );
+	return transformationResults.map( ( result, index ) => {
+		const transformedBlock = {
+			...result,
+			// The first transformed block whose type matches the "destination"
+			// type gets to keep the existing UID of the first block.
+			uid: index === firstSwitchedBlock ? firstBlock.uid : result.uid,
+		};
+
+		/**
+		 * Filters an individual transform result from block transformation.
+		 * All of the original blocks are passed, since transformations are
+		 * many-to-many, not one-to-one.
+		 *
+		 * @param {Object}   transformedBlock The transformed block.
+		 * @param {Object[]} blocks           Original blocks transformed.
+		 */
+		return applyFilters( 'blocks.switchToBlockType.transformedBlock', transformedBlock, blocks );
+	} );
 }
 
 /**
@@ -229,7 +266,7 @@ export function switchToBlockType( blocks, name ) {
  * @param {Object} attributes The attributes of the block referenced by the
  *                            reusable block.
  *
- * @returns {Object} A reusable block object.
+ * @return {Object} A reusable block object.
  */
 export function createReusableBlock( type, attributes ) {
 	return {

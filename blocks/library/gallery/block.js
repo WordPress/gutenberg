@@ -39,7 +39,7 @@ class GalleryBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onSelectImage = this.onSelectImage.bind( this );
+		this.onUnselectImage = this.onUnselectImage.bind( this );
 		this.onSelectImages = this.onSelectImages.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
@@ -55,11 +55,29 @@ class GalleryBlock extends Component {
 	}
 
 	onSelectImage( index ) {
-		return () => {
-			this.setState( ( state ) => ( {
-				selectedImage: index === state.selectedImage ? null : index,
-			} ) );
+		return ( event ) => {
+			// ignore clicks in the editable caption.
+			// Without this logic, text operations like selection, select / unselects the images.
+			if ( event.target.tagName === 'FIGCAPTION' ) {
+				return;
+			}
+
+			this.setState( {
+				selectedImage: index,
+			} );
 		};
+	}
+
+	onUnselectImage( event ) {
+		// ignore clicks in the editable caption.
+		// Without this logic, text operations like selection, select / unselects the images.
+		if ( event.target.tagName === 'FIGCAPTION' ) {
+			return;
+		}
+
+		this.setState( {
+			selectedImage: null,
+		} );
 	}
 
 	onRemoveImage( index ) {
@@ -73,8 +91,13 @@ class GalleryBlock extends Component {
 		};
 	}
 
-	onSelectImages( imgs ) {
-		this.props.setAttributes( { images: imgs } );
+	onSelectImages( images ) {
+		this.props.setAttributes( {
+			images: images.map( ( attributes ) => ( {
+				...attributes,
+				caption: attributes.caption ? [ attributes.caption ] : [],
+			} ) ),
+		} );
 	}
 
 	setLinkTo( value ) {
@@ -122,8 +145,8 @@ class GalleryBlock extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		// Deselect images when losing focus
-		if ( ! nextProps.focus && this.props.focus ) {
+		// Deselect images when deselecting the block
+		if ( ! nextProps.isSelected && this.props.isSelected ) {
 			this.setState( {
 				selectedImage: null,
 			} );
@@ -131,7 +154,7 @@ class GalleryBlock extends Component {
 	}
 
 	render() {
-		const { attributes, focus, className } = this.props;
+		const { attributes, isSelected, className } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
 		const dropZone = (
@@ -141,7 +164,7 @@ class GalleryBlock extends Component {
 		);
 
 		const controls = (
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -185,7 +208,7 @@ class GalleryBlock extends Component {
 
 		return [
 			controls,
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<h2>{ __( 'Gallery Settings' ) }</h2>
 					{ images.length > 1 && <RangeControl
@@ -216,10 +239,12 @@ class GalleryBlock extends Component {
 							url={ img.url }
 							alt={ img.alt }
 							id={ img.id }
-							isSelected={ this.state.selectedImage === index }
+							isSelected={ isSelected && this.state.selectedImage === index }
 							onRemove={ this.onRemoveImage( index ) }
-							onClick={ this.onSelectImage( index ) }
+							onSelect={ this.onSelectImage( index ) }
+							onUnselect={ this.onUnselectImage }
 							setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
+							caption={ img.caption }
 						/>
 					</li>
 				) ) }

@@ -54,7 +54,7 @@ function Layout( {
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
 			<Header />
-			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
+			<div id="poststuff" className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<EditorNotices />
 				<div className="edit-post-layout__editor">
 					<EditorModeKeyboardShortcuts />

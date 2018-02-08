@@ -9,6 +9,7 @@
                 "Embedded content from vimeo"
             ]
         },
+        "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-vimeo\">\n    https://vimeo.com/\n    <figcaption>Embedded content from vimeo</figcaption>\n</figure>"
     }
 ]

@@ -39,7 +39,7 @@ export const settings = {
 		},
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, isSelected } ) {
 		const { customText, noTeaser } = attributes;
 
 		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
@@ -48,7 +48,7 @@ export const settings = {
 		const inputLength = value.length ? value.length + 1 : 1;
 
 		return [
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<ToggleControl
 						label={ __( 'Hide the teaser before the "More" tag' ) }
@@ -63,7 +63,6 @@ export const settings = {
 					value={ value }
 					size={ inputLength }
 					onChange={ ( event ) => setAttributes( { customText: event.target.value } ) }
-					onFocus={ setFocus }
 				/>
 			</div>,
 		];

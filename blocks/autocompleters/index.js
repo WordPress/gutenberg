@@ -63,7 +63,7 @@ import BlockIcon from '../block-icon';
  *
  * @param {Function} onReplace  Callback to replace the current block.
  *
- * @returns {Completer} Completer object used by the Autocomplete component.
+ * @return {Completer} Completer object used by the Autocomplete component.
  */
 export function blockAutocompleter( { onReplace } ) {
 	// Prioritize common category in block type options
@@ -104,7 +104,7 @@ export function blockAutocompleter( { onReplace } ) {
  * Returns a "completer" definition for inserting a user mention.
  * The definition can be understood by the Autocomplete component.
  *
- * @returns {Completer} Completer object used by the Autocomplete component.
+ * @return {Completer} Completer object used by the Autocomplete component.
  */
 export function userAutocompleter() {
 	const getOptions = ( search ) => {

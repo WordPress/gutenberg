@@ -4,7 +4,7 @@
  * If the MetaBox Area is visible returns it, and returns the original container instead.
  *
  * @param   {string} location Meta Box location.
- * @returns {string}          HTML content.
+ * @return {string}          HTML content.
  */
 export const getMetaBoxContainer = ( location ) => {
 	const area = document.querySelector( `.editor-meta-boxes-area.is-${ location } .metabox-location-${ location }` );

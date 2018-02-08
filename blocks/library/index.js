@@ -10,6 +10,7 @@ import * as audio from './audio';
 import * as button from './button';
 import * as categories from './categories';
 import * as code from './code';
+import * as columns from './columns';
 import * as coverImage from './cover-image';
 import * as embed from './embed';
 import * as freeform from './freeform';
@@ -59,6 +60,7 @@ export const registerCoreBlocks = () => {
 		button,
 		categories,
 		code,
+		columns,
 		coverImage,
 		embed,
 		...embed.common,

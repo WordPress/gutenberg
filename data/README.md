@@ -49,7 +49,7 @@ This function allows calling any registered selector. Given a module's key, a se
 wp.data.select( 'myPlugin', 'getTitle' ); // Returns "My post title"
 ```
 
-### `wp.data.query( mapSelectorsToProps: func )( WrappedComponent: Component )`
+### `wp.data.query( mapSelectorsToProps: function )( WrappedComponent: Component )`
 
 If you use a React or WordPress Element, a Higher Order Component is made available to inject data into your components like so:
 
@@ -61,4 +61,22 @@ wp.data.query( select => {
 		title: select( 'myPlugin', 'getTitle' ),
 	};
 } )( Component );
+```
+
+### `wp.data.subscribe( listener: function )`
+
+Function used to subscribe to data changes. The listener function is called each time a change is made to any of the registered reducers. This function returns a `unsubscribe` function used to abort the subscription.
+
+```js
+// Subscribe.
+const unsubscribe = wp.data.subscribe( () => {
+	const data = {
+		slug: wp.data.select( 'core/editor', 'getEditedPostSlug' ),
+	};
+
+	console.log( 'data changed', data );
+} );
+
+// Unsubcribe.
+unsubscribe();
 ```

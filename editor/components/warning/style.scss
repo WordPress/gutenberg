@@ -10,14 +10,18 @@
 	align-items: center;
 	width: 96%;
 	max-width: 780px;
-	padding: 20px 20px 10px 20px;
+	padding: 20px 20px 0px 20px;
 	background-color: $white;
 	border: 1px solid $light-gray-500;
 	text-align: center;
 	line-height: $default-line-height;
 	box-shadow: $shadow-popover;
 
-	.editor-visual-editor & p {
+	p:first-child {
+		margin-top: 0;
+	}
+
+	.edit-post-visual-editor & p {
 		width: 100%;
 		font-family: $default-font;
 		font-size: $default-font-size;
