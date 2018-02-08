@@ -4,7 +4,7 @@ Cypress.Commands.add( 'newPost', () => {
 
 Cypress.Commands.add( 'visitAdmin', ( adminPath ) => {
 	cy.visit( '/wp-admin/' + adminPath ).location( 'pathname' ).then( ( path ) => {
-		if ( /\/wp-login\.php$/.test( path ) ) {
+		if ( path.endsWith( '/wp-login.php' ) ) {
 			cy.login();
 		}
 	} );

@@ -4,7 +4,7 @@ Cypress.Commands.add( 'login', ( username = Cypress.env( 'username' ), password 
 	// (not sure this is possible in WP)
 
 	cy.location( 'pathname' ).then( ( path ) => {
-		if ( ! /\/wp-login\.php$/.test( path ) ) {
+		if ( ! path.endsWith( '/wp-login.php' ) ) {
 			cy.visit( '/wp-login.php' );
 		}
 	} );
