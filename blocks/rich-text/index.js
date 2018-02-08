@@ -182,6 +182,9 @@ export default class RichText extends Component {
 
 	onInit() {
 		this.registerCustomFormatters();
+
+		const focusPosition = this.getFocusPosition();
+		this.setState( { focusPosition } );
 	}
 
 	adaptFormatter( options ) {
