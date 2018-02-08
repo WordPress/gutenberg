@@ -137,6 +137,6 @@ export function userAutocompleter() {
 		getOptions,
 		allowNode,
 		onSelect,
-		isDebouncedCompleter: true,
+		isDebounced: true,
 	};
 }

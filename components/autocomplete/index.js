@@ -344,7 +344,7 @@ export class Autocomplete extends Component {
 		const { open, query, range } = match || {};
 		// asynchronously load the options for the open completer
 		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx || query !== wasQuery ) ) {
-			if ( this.props.completers[ open.idx ].isDebouncedCompleter ) {
+			if ( this.props.completers[ open.idx ].isDebounced ) {
 				this.debouncedLoadOptions( open.idx, query );
 			} else {
 				this.loadOptions( open.idx, query );
