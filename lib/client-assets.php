@@ -895,7 +895,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script .= <<<JS
 		window._wpLoadGutenbergEditor = wp.api.init().then( function() {
 			wp.blocks.registerCoreBlocks();
-			return wp[ 'edit-post' ].initializeEditor( 'editor', window._wpGutenbergPost, editorSettings );
+			return wp.editPost.initializeEditor( 'editor', window._wpGutenbergPost, editorSettings );
 		} );
 JS;
 	$script .= '} )();';

@@ -4,7 +4,7 @@
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
-const { reduce, escapeRegExp, get } = require( 'lodash' );
+const { reduce, escapeRegExp, castArray, get } = require( 'lodash' );
 const { basename, dirname } = require( 'path' );
 
 // Main CSS loader for everything but blocks..
@@ -55,7 +55,7 @@ const entryPointNames = [
 	'i18n',
 	'utils',
 	'data',
-	'edit-post',
+	[ 'editPost', 'edit-post' ],
 ];
 
 const packageNames = [
@@ -127,8 +127,10 @@ class CustomTemplatedPathPlugin {
 
 const config = {
 	entry: Object.assign(
-		entryPointNames.reduce( ( memo, entryPointName ) => {
-			memo[ entryPointName ] = `./${ entryPointName }/index.js`;
+		entryPointNames.reduce( ( memo, entryPoint ) => {
+			entryPoint = castArray( entryPoint );
+			const [ name, path = name ] = entryPoint;
+			memo[ name ] = `./${ path }/index.js`;
 			return memo;
 		}, {} ),
 		packageNames.reduce( ( memo, packageName ) => {
