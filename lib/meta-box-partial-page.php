@@ -310,7 +310,7 @@ function the_gutenberg_metaboxes() {
 	<form class="metabox-base-form">
 	<?php gutenberg_meta_box_post_form_hidden_fields( $post ); ?>
 	</form>
-	<div id="poststuff">
+	<div class="metabox-location-container">
 		<?php foreach ( $locations as $location ) : ?>
 			<form class="metabox-location-<?php echo esc_attr( $location ); ?>">
 				<div class="sidebar-open">
