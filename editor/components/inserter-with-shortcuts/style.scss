@@ -1,0 +1,13 @@
+.editor-inserter-with-shortcuts {
+	display: flex;
+	align-items: center;
+	flex-direction: row-reverse;
+}
+
+.editor-inserter-with-shortcuts__block {
+	margin-right: 5px;
+	width: 36px;
+	height: 36px;
+	border-radius: 0;
+	padding-top: 8px;
+}

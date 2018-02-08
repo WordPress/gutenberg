@@ -17,6 +17,7 @@ import {
 	getBlockType,
 	getSaveElement,
 	isReusableBlock,
+	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { withFilters, withContext, withAPIData } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -25,7 +26,6 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
-import VisualEditorInserter from '../inserter';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
 import InvalidBlockWarning from './invalid-block-warning';
@@ -37,6 +37,7 @@ import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from './ignore-nested-events';
+import InserterWithShortcuts from '../inserter-with-shortcuts';
 import { createInnerBlockList } from './utils';
 import {
 	clearSelectedBlock,
@@ -522,13 +523,6 @@ export class BlockListBlock extends Component {
 					layout={ layout }
 				/>
 				{ ( showUI || isHovered ) && (
-					<VisualEditorInserter
-						onToggle={ this.selectOnOpen }
-						rootUID={ rootUID }
-						layout={ layout }
-					/>
-				) }
-				{ ( showUI || isHovered ) && (
 					<BlockMover
 						uids={ [ block.uid ] }
 						rootUID={ rootUID }
@@ -593,6 +587,11 @@ export class BlockListBlock extends Component {
 					rootUID={ rootUID }
 					layout={ layout }
 				/>
+				{ ( showUI || isHovered ) && isUnmodifiedDefaultBlock( block ) && (
+					<div className="editor-block-list__side-inserter">
+						<InserterWithShortcuts uid={ block.uid } layout={ layout } onToggle={ this.selectOnOpen } />
+					</div>
+				) }
 			</IgnoreNestedEvents>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

@@ -1198,10 +1198,11 @@ const getRecentInserts = createSelector(
  *
  * @param {Object}           state             Global application state.
  * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {number}           maximum           Number of items to return.
  *
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
-export function getRecentInserterItems( state, enabledBlockTypes = true ) {
+export function getRecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
 	if ( ! enabledBlockTypes ) {
 		return [];
 	}
@@ -1216,7 +1217,7 @@ export function getRecentInserterItems( state, enabledBlockTypes = true ) {
 		return buildInserterItemFromBlockType( state, enabledBlockTypes, blockType );
 	} );
 
-	return compact( items ).slice( 0, MAX_RECENT_BLOCKS );
+	return compact( items ).slice( 0, maximum );
 }
 
 /**
