@@ -77,12 +77,10 @@ export const settings = {
 					return tag === 'img' || ( hasImage && tag === 'figure' );
 				},
 				transform( node ) {
-					const targetNode = node.parentNode.querySelector( 'figure,img' );
-					const matches = /align(left|center|right)/.exec( targetNode.className );
+					const matches = /align(left|center|right)/.exec( node.className );
 					const align = matches ? matches[ 1 ] : undefined;
 					const blockType = getBlockType( 'core/image' );
-					const attributes = getBlockAttributes( blockType, targetNode.outerHTML, { align } );
-
+					const attributes = getBlockAttributes( blockType, node.outerHTML, { align } );
 					return createBlock( 'core/image', attributes );
 				},
 			},
