@@ -149,6 +149,7 @@ export default class RichText extends Component {
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
+		editor.on( 'input', this.onChange );
 
 		patterns.apply( this, [ editor ] );
 
@@ -358,21 +359,12 @@ export default class RichText extends Component {
 		}
 	}
 
-	fireChange() {
-		this.savedContent = this.getContent();
-		this.editor.save();
-		this.props.onChange( this.state.empty ? [] : this.savedContent );
-	}
-
 	/**
 	 * Handles any case where the content of the tinyMCE instance has changed.
 	 */
 	onChange() {
-		// Note that due to efficiency, speed and low cost requirements isDirty may
-		// not reflect reality for a brief period immediately after a change.
-		if ( this.editor.isDirty() ) {
-			this.fireChange();
-		}
+		this.savedContent = this.state.empty ? [] : this.getContent();
+		this.props.onChange( this.savedContent );
 	}
 
 	/**
@@ -499,8 +491,6 @@ export default class RichText extends Component {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
 			}
-
-			this.fireChange();
 
 			const forward = event.keyCode === DELETE;
 
@@ -680,19 +670,10 @@ export default class RichText extends Component {
 		this.savedContent = this.props.value;
 		this.setContent( this.savedContent );
 		this.editor.selection.moveToBookmark( bookmark );
-
-		// Saving the editor on updates avoid unecessary onChanges calls
-		// These calls can make the focus jump
-		this.editor.save();
 	}
 
-	setContent( content ) {
-		if ( ! content ) {
-			content = '';
-		}
-
-		content = renderToString( content );
-		this.editor.setContent( content );
+	setContent( content = '' ) {
+		this.editor.setContent( renderToString( content ) );
 	}
 
 	getContent() {
