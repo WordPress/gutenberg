@@ -116,26 +116,26 @@
 	}
 }
 
-// freeform toolbar
-.freeform-toolbar {
-	position: sticky;
-	width: auto;
-	top: -1px;	// stack borders
-	margin-top: -$block-controls-height - 16px;
-	border: 1px solid $light-gray-500;
-	z-index: z-index( '.freeform-toolbar' );
-	background-color: $white;
-	min-height: $block-controls-height;
-	margin-bottom: 14px;
-
-	@include break-small() {
-		margin-left: - $block-padding - 1px;
-		margin-right: - $block-padding - 1px;
-	}
+.edit-post-visual-editor div[data-type="core/freeform"]:before {
+	outline: 1px solid #e2e4e7;
 }
 
-.freeform-toolbar.has-advanced-toolbar {
-	margin-top: -89px;	// pull upwards the classic block toolbar when enabled, height is manually entered
+div[data-type="core/freeform"] .editor-block-contextual-toolbar {
+	display: none;
+}
+
+div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+// freeform toolbar
+.freeform-toolbar {
+	width: auto;
+	margin: - $block-padding;
+	margin-bottom: $block-padding;
+	// TinyMCE hides on blur with inline styles.
+	display: block !important;
 }
 
 // Overwrite inline styles.
@@ -149,145 +149,19 @@
 	width: 100% !important;
 }
 
-.freeform-toolbar .mce-tinymce-inline .mce-flow-layout {
-    white-space: normal;
-}
-
 .freeform-toolbar .mce-container-body.mce-abs-layout {
 	overflow: visible;
 }
 
-.freeform-toolbar .mce-menubar {
-	position: static;
-}
-
+.freeform-toolbar .mce-menubar,
 .freeform-toolbar div.mce-toolbar-grp {
-	background-color: transparent;
-	border: none;
 	position: static;
-}
-
-.freeform-toolbar div.mce-toolbar-grp > div {
-    padding: 0;
 }
 
 .freeform-toolbar .mce-toolbar-grp .mce-toolbar:not(:first-child) {
 	display: none;
-	border-top: 1px solid $light-gray-500;
 }
 
 .freeform-toolbar.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
 	display: block;
-}
-
-.freeform-toolbar div.mce-btn-group {
-	padding: 0;
-	margin: 0;
-	border: 0;
-}
-
-.freeform-toolbar .mce-toolbar-grp .mce-toolbar .mce-btn {
-	margin: 0;
-	padding: 3px;
-	background: none;
-	outline: none;
-	color: $dark-gray-500;
-	cursor: pointer;
-	position: relative;
-	min-width: $icon-button-size;
-	height: $icon-button-size;
-
-	// Overwrite
-	border: none;
-	box-sizing: border-box;
-	box-shadow: none;
-	border-radius: 0;
-
-	&:hover,
-	/* the ":not(:disabled)" is needed to make it specific enough */
-	&:hover:not(:disabled),
-	&:focus,
-	&:focus:active {
-		color: $dark-gray-500;
-		outline: none;
-		box-shadow: none;
-		background: inherit;
-	}
-
-	&.mce-active,
-	&.mce-active:hover {
-		background: none;
-		color: $white;
-	}
-
-	&:disabled {
-		cursor: default;
-	}
-
-	&> button {
-		border: 1px solid transparent;
-		padding: 4px;
-		box-sizing: content-box;
-	}
-
-	&:hover button,
-	&:focus button {
-		color: $dark-gray-500;
-	}
-
-	&:not(:disabled) {
-		&.mce-active button,
-		&:hover button,
-		&:focus button {
-			border: 1px solid $dark-gray-500;
-		}
-	}
-
-	&.mce-active button,
-	&.mce-active:hover button {
-		background-color: $dark-gray-500;
-		color: $white;
-	}
-
-	&.mce-active .mce-ico {
-		color: $white;
-	}
-
-	&.mce-listbox,
-	&.mce-colorbutton {
-		width: auto;
-		border: none;
-		box-shadow: none;
-	}
-
-	&.mce-colorbutton .mce-preview {
-		bottom: 8px;
-		left: 8px;
-	}
-}
-
-.components-toolbar__control .dashicon {
-	display: block;
-}
-
-
-.mce-widget.mce-tooltip {
-	display: block;
-	opacity: initial;
-
-	.mce-tooltip-inner {
-		padding: 4px 12px;
-		background: $dark-gray-400;
-		border-width: 0;
-		color: white;
-		white-space: nowrap;
-		box-shadow: none;
-		font-size: $default-font-size;
-		border-radius: 0;
-	}
-
-	.mce-tooltip-arrow {
-		border-top-color: $dark-gray-400;
-		border-bottom-color: $dark-gray-400;
-	}
 }
