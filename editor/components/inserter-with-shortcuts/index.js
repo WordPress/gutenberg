@@ -17,7 +17,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import './style.scss';
 import Inserter from '../inserter';
-import { getRecentInserterItems } from '../../store/selectors';
+import { getMostFrequentlyUsedBlocks } from '../../store/selectors';
 import { replaceBlocks } from '../../store/actions';
 
 function InserterWithShortcuts( { items, isLocked, onToggle, onInsert } ) {
@@ -56,7 +56,7 @@ function InserterWithShortcuts( { items, isLocked, onToggle, onInsert } ) {
 export default compose(
 	connect(
 		( state ) => ( {
-			items: getRecentInserterItems( state, true, 3 ),
+			items: getMostFrequentlyUsedBlocks( state, true, 3 ),
 		} ),
 		( dispatch, { uid, layout } ) => ( {
 			onInsert( { name, initialAttributes } ) {

@@ -14,6 +14,7 @@ import {
 	mapValues,
 	findIndex,
 	reject,
+	omitBy,
 } from 'lodash';
 
 /**
@@ -614,10 +615,16 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
+				let id = block.name;
 				const insert = { name: block.name };
 				if ( isReusableBlock( block ) ) {
 					insert.ref = block.attributes.ref;
+					id += '/' + block.attributes.ref;
 				}
+				const usage = prevState.insertUsage[ id ] ?
+					{ ...prevState.insertUsage[ id ] } :
+					{ count: 0, insert };
+				usage.count = usage.count + 1;
 
 				const isSameAsInsert = ( { name, ref } ) => name === insert.name && ref === insert.ref;
 
@@ -627,12 +634,17 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 						insert,
 						...reject( prevState.recentInserts, isSameAsInsert ),
 					],
+					insertUsage: {
+						...prevState.insertUsage,
+						[ id ]: usage,
+					},
 				};
 			}, state );
 
 		case 'REMOVE_REUSABLE_BLOCK':
 			return {
 				...state,
+				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
 				recentInserts: reject( state.recentInserts, insert => insert.ref === action.id ),
 			};
 	}
