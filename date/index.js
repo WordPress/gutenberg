@@ -197,22 +197,24 @@ function setupLocale( settings ) {
 			LLL: settings.formats.datetime,
 			LLLL: null,
 		},
-		// From human_time_diff?
-		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
+		// Required by humanTimeDiff() utility in this file.
+		// Maybe set to `(number, withoutSuffix, key, isFuture) => {}` in the future?
+		// i.e., Moment allows this to be a callback Function also: https://git.io/vN8EL
 		relativeTime: {
 			future: settings.l10n.relative.future,
 			past: settings.l10n.relative.past,
-			s: 'seconds',
-			m: 'a minute',
-			mm: '%d minutes',
-			h: 'an hour',
-			hh: '%d hours',
-			d: 'a day',
-			dd: '%d days',
-			M: 'a month',
-			MM: '%d months',
-			y: 'a year',
-			yy: '%d years',
+			s: settings.l10n.relative.s,
+			ss: settings.l10n.relative.ss,
+			m: settings.l10n.relative.m,
+			mm: settings.l10n.relative.mm,
+			h: settings.l10n.relative.h,
+			hh: settings.l10n.relative.hh,
+			d: settings.l10n.relative.d,
+			dd: settings.l10n.relative.dd,
+			M: settings.l10n.relative.M,
+			MM: settings.l10n.relative.MM,
+			y: settings.l10n.relative.y,
+			yy: settings.l10n.relative.yy,
 		},
 	} );
 	moment.locale( currentLocale );
@@ -312,6 +314,29 @@ export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 	dateMoment.locale( window._wpDateSettings.l10n.locale );
 	// Format and return.
 	return format( dateFormat, dateMoment );
+}
+
+/**
+ * Human time difference (like `human_time_diff()` in PHP).
+ *
+ * @param  {?(Date|String|Number|Moment|null)} from    Value parsable by moment.js or 'now'. Default is now.
+ * @param  {?(Date|String|Number|Moment|null)} to      Value parsable by moment.js or 'now'. Default is now.
+ * @param  {?Boolean}                          verbose True to add an an 'ago' (past) or 'from now' (future) suffix.
+ *                                                     Defaults to false so it matches `human_time_diff()` in PHP,
+ *                                                     which doesn't support this additional argument yet.
+ *
+ * @return {String}                                    Difference; e.g., 3 days, in 3 days, 3 days ago, 3 days from now.
+ */
+export function humanTimeDiff( from, to, verbose = false ) {
+	// Establish 'from' and 'to' times.
+	from = ! from || from === 'now' ? new Date() : from;
+	to = ! to || to === 'now' ? new Date() : to;
+	// Convert to moment.
+	const fromMoment = moment( from );
+	// Set the locale.
+	fromMoment.locale( window._wpDateSettings.l10n.locale );
+	// Return human time difference.
+	return fromMoment.to( to, ! verbose ? true : false );
 }
 
 export const settings = window._wpDateSettings;

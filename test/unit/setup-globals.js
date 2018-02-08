@@ -34,6 +34,18 @@ global.window._wpDateSettings = {
 		relative: {
 			future: '%s from now',
 			past: '%s ago',
+			s: 'seconds',
+			m: 'a minute',
+			h: 'an hour',
+			d: 'a day',
+			M: 'a month',
+			y: 'a year',
+			ss: '%d seconds',
+			mm: '%d minutes',
+			hh: '%d hours',
+			dd: '%d days',
+			MM: '%d months',
+			yy: '%d years',
 		},
 	},
 	timezone: {
