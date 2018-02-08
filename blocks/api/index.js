@@ -28,5 +28,5 @@ export {
 	isReusableBlock,
 } from './registration';
 export {
-	isUntouchedDefaultBlock,
-} from './helpers';
+	isUnmodifiedDefaultBlock,
+} from './utils';

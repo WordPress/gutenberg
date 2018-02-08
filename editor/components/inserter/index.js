@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, withContext } from '@wordpress/components';
-import { createBlock, isUntouchedDefaultBlock } from '@wordpress/blocks';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 
 /**
@@ -114,7 +114,7 @@ export default compose( [
 			onInsertBlock( item, index ) {
 				const { name, initialAttributes } = item;
 				const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
-				if ( selectedBlock && isUntouchedDefaultBlock( selectedBlock ) ) {
+				if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					dispatchProps.replaceBlocks( selectedBlock.uid, insertedBlock );
 					return;
 				}

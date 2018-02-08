@@ -8,7 +8,7 @@ import { noop } from 'lodash';
  */
 import { createBlock } from '../factory';
 import { getBlockTypes, unregisterBlockType, registerBlockType, setDefaultBlockName } from '../registration';
-import { isUntouchedDefaultBlock } from '../helpers';
+import { isUnmodifiedDefaultBlock } from '../utils';
 
 describe( 'block helpers', () => {
 	afterEach( () => {
@@ -18,8 +18,8 @@ describe( 'block helpers', () => {
 		} );
 	} );
 
-	describe( 'isUntouchedDefaultBlock()', () => {
-		it( 'should return true if the default block is untouched', () => {
+	describe( 'isUnmodifiedDefaultBlock()', () => {
+		it( 'should return true if the default block is unmodified', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
 					align: {
@@ -35,8 +35,8 @@ describe( 'block helpers', () => {
 				title: 'test block',
 			} );
 			setDefaultBlockName( 'core/test-block' );
-			const untouchedBlock = createBlock( 'core/test-block' );
-			expect( isUntouchedDefaultBlock( untouchedBlock ) ).toBe( true );
+			const unmodifiedBlock = createBlock( 'core/test-block' );
+			expect( isUnmodifiedDefaultBlock( unmodifiedBlock ) ).toBe( true );
 		} );
 
 		it( 'should return false if the default block is updated', () => {
@@ -58,7 +58,7 @@ describe( 'block helpers', () => {
 			const block = createBlock( 'core/test-block' );
 			block.attributes.align = 'left';
 
-			expect( isUntouchedDefaultBlock( block ) ).toBe( false );
+			expect( isUnmodifiedDefaultBlock( block ) ).toBe( false );
 		} );
 	} );
 } );
