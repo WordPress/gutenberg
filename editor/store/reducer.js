@@ -14,7 +14,13 @@ import {
 	mapValues,
 	findIndex,
 	reject,
+	keys,
+	isString,
+	isArray,
+	isPlainObject,
+	every,
 } from 'lodash';
+import diff from 'fast-diff';
 
 /**
  * WordPress dependencies
@@ -95,6 +101,55 @@ function getFlattenedBlocks( blocks ) {
 }
 
 /**
+ * Check whether two values are considered equivalent
+ * Two values are considered equivalent if the only
+ * possible difference between these two values is a character in a string.
+ *
+ * @param {*} value1
+ * @param {*} value2
+ *
+ * @return {boolean} Whether the values are equivalent.
+ */
+function areValuesEquivalent( value1, value2 ) {
+	if ( isString( value1 ) && isString( value2 ) ) {
+		const diffResult = diff( value1, value2 ).filter( ( [ type ] ) => type !== 0 );
+		if (
+			diffResult.length === 0 ||
+			( diffResult.length === 1 && diffResult[ 0 ][ 1 ].match( /\S/ ) !== null )
+		) {
+			return true;
+		}
+
+		// For some reason comparing text adding a char after a space is creating two diffs,
+		// let's run the diff again for more accurate results
+		if ( diffResult.length === 2 ) {
+			const diffResult2 = diff( diffResult[ 0 ][ 1 ], diffResult[ 1 ][ 1 ] ).filter( ( [ type ] ) => type !== 0 );
+			return diffResult2.length === 0 ||
+				( diffResult2.length === 1 && diffResult2[ 0 ][ 1 ].match( /\S/ ) !== null );
+		}
+
+		return false;
+	}
+
+	if ( isArray( value1 ) && isArray( value2 ) && value1.length === value2.length ) {
+		return every( value1, ( subvalue, key ) => areValuesEquivalent( subvalue, value2[ key ] ) );
+	}
+
+	if ( isPlainObject( value1 ) && isPlainObject( value2 ) ) {
+		const keys1 = keys( value1 );
+		const keys2 = keys( value2 );
+		return (
+			keys1.length === keys2.length &&
+			every( keys1, ( key, index ) =>
+				keys2[ index ] === key && areValuesEquivalent( value1[ key ], value2[ key ] )
+			)
+		);
+	}
+
+	return value1 === value2;
+}
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -114,7 +169,26 @@ export const editor = flow( [
 	combineReducers,
 
 	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, { resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ] } ),
+	partialRight( withHistory, {
+		resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ],
+		shouldOverwriteState: ( previous, next ) => {
+			if ( previous.type !== next.type || previous.type !== 'UPDATE_BLOCK_ATTRIBUTES' ) {
+				return false;
+			}
+
+			const previousAttributes = keys( previous.attributes );
+			const nextAttributes = keys( next.attributes );
+			if (
+				previousAttributes.length !== 1 ||
+				nextAttributes.length !== 1 ||
+				previousAttributes[ 0 ] !== nextAttributes[ 0 ]
+			) {
+				return false;
+			}
+
+			return areValuesEquivalent( previous.attributes[ previousAttributes[ 0 ] ], next.attributes[ nextAttributes[ 0 ] ] );
+		},
+	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
