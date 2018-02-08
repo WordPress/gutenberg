@@ -395,7 +395,7 @@ export default class RichText extends Component {
 	fireChange() {
 		this.savedContent = this.getContent();
 		this.editor.save();
-		this.props.onChange( this.savedContent );
+		this.props.onChange( this.state.empty ? [] : this.savedContent );
 	}
 
 	/**
