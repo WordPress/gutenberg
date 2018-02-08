@@ -72,6 +72,8 @@ const applyWithAPIDataItems = withAPIData( ( props, { type } ) => {
 	const queryString = stringify( {
 		context: 'edit',
 		per_page: 100,
+		orderby: 'menu_order',
+		order: 'asc',
 		exclude: postId,
 		parent_exclude: postId,
 		_fields: [ 'id', 'parent', 'title' ],
