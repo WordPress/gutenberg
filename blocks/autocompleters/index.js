@@ -108,21 +108,23 @@ export function blockAutocompleter( { onReplace } ) {
  */
 export function userAutocompleter() {
 	const getOptions = ( search ) => {
-		return ( new wp.api.collections.Users() )
-			.fetch( search ? { data: { search } } : null )
-			.then( ( users ) => {
-				return users.map( ( user ) => {
-					return {
-						value: user,
-						label: [
-							<img key="avatar" className="blocks-autocompleters__user-avatar" alt="" src={ user.avatar_urls[ 24 ] } />,
-							<span key="name" className="blocks-autocompleters__user-name">{ user.name }</span>,
-							<span key="slug" className="blocks-autocompleters__user-slug">{ user.slug }</span>,
-						],
-						keywords: [ user.slug, user.name ],
-					};
-				} );
+		let payload;
+		if ( search ) {
+			payload = { data: { search } };
+		}
+		return ( new wp.api.collections.Users() ).fetch( payload ).then( ( users ) => {
+			return users.map( ( user ) => {
+				return {
+					value: user,
+					label: [
+						<img key="avatar" className="blocks-autocompleters__user-avatar" alt="" src={ user.avatar_urls[ 24 ] } />,
+						<span key="name" className="blocks-autocompleters__user-name">{ user.name }</span>,
+						<span key="slug" className="blocks-autocompleters__user-slug">{ user.slug }</span>,
+					],
+					keywords: [ user.slug, user.name ],
+				};
 			} );
+		} );
 	};
 
 	const allowNode = () => {
