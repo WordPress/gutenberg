@@ -11,15 +11,10 @@ import { keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 import UrlInput from '../../url-input';
+import { LINK_PLACEHOLDER_VALUE } from '../';
 import { filterURLForDisplay } from '../../../editor/utils/url';
 
 const { ESCAPE } = keycodes;
-
-/**
- * When inserting a new link, we insert an <a> tag with this placeholder href
- * so that there is a visual indication of which text will be made into a link.
- */
-const NEW_LINK_PLACEHOLDER_VALUE = '_wp_link_placeholder';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -71,7 +66,7 @@ class FormatToolbar extends Component {
 		if ( event.keyCode === ESCAPE ) {
 			this.setState( { isEditingLink: false, newLinkValue: '' } );
 
-			if ( this.props.formats.link.value === NEW_LINK_PLACEHOLDER_VALUE ) {
+			if ( this.props.formats.link.value === LINK_PLACEHOLDER_VALUE ) {
 				this.dropLink();
 			}
 		}
@@ -99,7 +94,7 @@ class FormatToolbar extends Component {
 	}
 
 	addLink() {
-		this.props.onChange( { link: { value: NEW_LINK_PLACEHOLDER_VALUE } } );
+		this.props.onChange( { link: { value: LINK_PLACEHOLDER_VALUE } } );
 	}
 
 	dropLink() {
@@ -116,7 +111,7 @@ class FormatToolbar extends Component {
 
 		this.setState( { isEditingLink: false, newLinkValue: '' } );
 
-		if ( this.props.formats.link.value === NEW_LINK_PLACEHOLDER_VALUE ) {
+		if ( this.props.formats.link.value === LINK_PLACEHOLDER_VALUE ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
 
@@ -154,8 +149,8 @@ class FormatToolbar extends Component {
 			} );
 
 		const hasLinkUI = !! formats.link;
-		const hasEditLinkUI = hasLinkUI && ( isEditingLink || formats.link.value === NEW_LINK_PLACEHOLDER_VALUE );
-		const hasViewLinkUI = hasLinkUI && ! isEditingLink && formats.link.value !== NEW_LINK_PLACEHOLDER_VALUE;
+		const hasEditLinkUI = hasLinkUI && ( isEditingLink || formats.link.value === LINK_PLACEHOLDER_VALUE );
+		const hasViewLinkUI = hasLinkUI && ! isEditingLink && formats.link.value !== LINK_PLACEHOLDER_VALUE;
 
 		return (
 			<div className="blocks-format-toolbar">
