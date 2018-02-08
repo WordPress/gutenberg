@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty, isUndefined } from 'lodash';
+import { filter, forEach, isEmpty, isUndefined } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,7 +10,6 @@ import { isEmpty, isUndefined } from 'lodash';
 import { Component } from '@wordpress/element';
 import { Button, Placeholder, Toolbar, Spinner, withAPIData } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -20,6 +19,7 @@ import './style.scss';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
+import MenuItem from './item';
 import MenuPlaceholder from './placeholder';
 import SelectControl from '../../inspector-controls/select-control';
 
@@ -38,12 +38,28 @@ function getOptionsFromMenu( menus, selected ) {
 	return options;
 }
 
+function getMenuChildren( list, data ) {
+	forEach( list, function( item, i ) {
+		list[ i ].children = filter( data, { menu_item_parent: item.id } );
+		list[ i ].children = getMenuChildren( list[ i ].children, data );
+	} );
+	// return sortBy( list, 'menu_order' );
+	return list;
+}
+
+function getMenuWithChildren( data ) {
+	const sorted = filter( data, { menu_item_parent: 0 } );
+	getMenuChildren( sorted, data );
+	return sorted;
+}
+
 class NavigationMenuBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.setMenu = this.setMenu.bind( this );
 		this.renderMenu = this.renderMenu.bind( this );
+		this.renderMenuLevel = this.renderMenuLevel.bind( this );
 	}
 
 	setMenu( value ) {
@@ -51,6 +67,33 @@ class NavigationMenuBlock extends Component {
 		if ( value ) {
 			setAttributes( { selected: value } );
 		}
+	}
+
+	renderMenuLevel( items ) {
+		if ( ! items || items.length < 1 ) {
+			return null;
+		}
+
+		const { layout } = this.props.attributes;
+		const isTopLevel = items[ 0 ].menu_item_parent === 0;
+		const className = classnames( this.props.className, {
+			'is-horizontal': layout === 'horizontal',
+		} );
+
+		return (
+			<ul
+				key="navigation-menu"
+				className={ isTopLevel ? className : '' }
+			>
+				{ items.map( ( item, i ) => {
+					return (
+						<MenuItem key={ i } item={ item }>
+							{ item.children && this.renderMenuLevel( item.children ) }
+						</MenuItem>
+					);
+				} ) }
+			</ul>
+		);
 	}
 
 	renderMenu() {
@@ -75,22 +118,12 @@ class NavigationMenuBlock extends Component {
 			);
 		}
 
-		return (
-			<ul
-				key="navigation-menu"
-				className={ classnames( this.props.className, {
-					'is-horizontal': layout === 'horizontal',
-				} ) }
-			>
-				{ data.map( ( item, i ) => {
-					return (
-						<li key={ i }>
-							{ decodeEntities( item.title.trim() ) || __( '(Untitled)' ) }
-						</li>
-					);
-				} ) }
-			</ul>
-		);
+		if ( 'horizontal' === layout ) {
+			const nestedData = getMenuWithChildren( data );
+			return this.renderMenuLevel( nestedData );
+		}
+
+		return this.renderMenuLevel( data );
 	}
 
 	render() {

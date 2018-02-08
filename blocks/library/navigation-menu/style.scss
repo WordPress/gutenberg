@@ -1,0 +1,50 @@
+.wp-block-navigation-menu {
+	&.is-horizontal {
+		display: flex;
+		flex-wrap: wrap;
+		padding: 0;
+
+		ul {
+			float: left;
+			position: absolute;
+			top: 100%;
+			left: -999em;
+			z-index: 99999;
+
+			ul {
+				left: -999em;
+				top: 0;
+			}
+
+			li {
+				&:hover > ul,
+				&.focus > ul {
+					left: 100%;
+				}
+			}
+
+			a {
+				width: 200px;
+			}
+		}
+
+		li {
+			float: left;
+			position: relative;
+			margin: 0 16px 16px 0;
+			list-style: none;
+			width: auto;
+
+			&:hover > ul,
+			&.focus > ul {
+				left: auto;
+				display: block;
+			}
+		}
+
+		a {
+			display: block;
+			text-decoration: none;
+		}
+	}
+}
