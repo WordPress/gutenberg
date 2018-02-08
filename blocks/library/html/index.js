@@ -38,10 +38,19 @@ export const settings = {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'IFRAME',
+			},
+		],
+	},
+
 	edit: withState( {
 		preview: false,
-	} )( ( { attributes, setAttributes, setState, focus, preview } ) => [
-		focus && (
+	} )( ( { attributes, setAttributes, setState, isSelected, preview } ) => [
+		isSelected && (
 			<BlockControls key="controls">
 				<div className="components-toolbar">
 					<button

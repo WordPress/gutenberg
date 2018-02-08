@@ -96,7 +96,7 @@ export const settings = {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
@@ -124,7 +124,7 @@ export const settings = {
 				} }
 			/>
 		);
-		const controls = focus && [
+		const controls = isSelected && [
 			<BlockControls key="controls">
 				<BlockAlignmentToolbar
 					value={ align }
@@ -176,9 +176,8 @@ export const settings = {
 				<RichText
 					tagName="h2"
 					value={ title }
-					focus={ focus }
-					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { title: value } ) }
+					isSelected={ isSelected }
 					inlineToolbar
 				/>
 			) : __( 'Cover Image' );
@@ -199,14 +198,13 @@ export const settings = {
 				style={ style }
 				className={ classes }
 			>
-				{ title || !! focus ? (
+				{ title || isSelected ? (
 					<RichText
 						tagName="h2"
 						placeholder={ __( 'Write title…' ) }
 						value={ title }
-						focus={ focus }
-						onFocus={ setFocus }
 						onChange={ ( value ) => setAttributes( { title: value } ) }
+						isSelected={ isSelected }
 						inlineToolbar
 					/>
 				) : null }

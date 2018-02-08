@@ -28,7 +28,6 @@ import {
 	resetPost,
 	setupNewPost,
 	resetBlocks,
-	focusBlock,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
@@ -41,6 +40,7 @@ import {
 	saveReusableBlock,
 	insertBlock,
 	setMetaBoxSavedData,
+	selectBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -223,7 +223,7 @@ export default {
 
 		// Only focus the previous block if it's not mergeable
 		if ( ! blockType.merge ) {
-			dispatch( focusBlock( blockA.uid ) );
+			dispatch( selectBlock( blockA.uid ) );
 			return;
 		}
 
@@ -244,7 +244,7 @@ export default {
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		dispatch( focusBlock( blockA.uid, { offset: -1 } ) );
+		dispatch( selectBlock( blockA.uid, -1 ) );
 		dispatch( replaceBlocks(
 			[ blockA.uid, blockB.uid ],
 			[
@@ -305,16 +305,16 @@ export default {
 			effects.push( resetBlocks( blocks ) );
 		}
 
+		// Resetting post should occur after blocks have been reset, since it's
+		// the post reset that restarts history (used in dirty detection).
+		effects.push( resetPost( post ) );
+
 		// Include auto draft title in edits while not flagging post as dirty
 		if ( post.status === 'auto-draft' ) {
 			effects.push( setupNewPost( {
 				title: post.title.raw,
 			} ) );
 		}
-
-		// Resetting post should occur after blocks have been reset, since it's
-		// the post reset that restarts history (used in dirty detection).
-		effects.push( resetPost( post ) );
 
 		return effects;
 	},

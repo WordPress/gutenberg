@@ -407,33 +407,35 @@ export const getBlock = createSelector(
 			return null;
 		}
 
+		let { attributes } = block;
+
+		// Inject custom source attribute values.
+		//
+		// TODO: Create generic external sourcing pattern, not explicitly
+		// targeting meta attributes.
 		const type = getBlockType( block.name );
-		if ( ! type || ! type.attributes ) {
-			return block;
-		}
+		if ( type ) {
+			attributes = reduce( type.attributes, ( result, value, key ) => {
+				if ( value.source === 'meta' ) {
+					if ( result === attributes ) {
+						result = { ...result };
+					}
 
-		const metaAttributes = reduce( type.attributes, ( result, value, key ) => {
-			if ( value.source === 'meta' ) {
-				result[ key ] = getPostMeta( state, value.meta );
-			}
+					result[ key ] = getPostMeta( state, value.meta );
+				}
 
-			return result;
-		}, {} );
-
-		if ( ! Object.keys( metaAttributes ).length ) {
-			return block;
+				return result;
+			}, attributes );
 		}
 
 		return {
 			...block,
-			attributes: {
-				...block.attributes,
-				...metaAttributes,
-			},
+			attributes,
+			innerBlocks: getBlocks( state, uid ),
 		};
 	},
-	( state, uid ) => [
-		get( state, [ 'editor', 'present', 'blocksByUid', uid ] ),
+	( state ) => [
+		get( state, [ 'editor', 'present', 'blocksByUid' ] ),
 		get( state, [ 'editor', 'present', 'edits', 'meta' ] ),
 		get( state, 'currentPost.meta' ),
 	]
@@ -457,10 +459,10 @@ function getPostMeta( state, key ) {
  */
 export const getBlocks = createSelector(
 	( state, rootUID ) => {
-		return map( getBlockOrder( state, rootUID ), ( uid ) => ( {
-			...getBlock( state, uid ),
-			innerBlocks: getBlocks( state, uid ),
-		} ) );
+		return map(
+			getBlockOrder( state, rootUID ),
+			( uid ) => getBlock( state, uid )
+		);
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
@@ -615,6 +617,23 @@ export function getPreviousBlock( state, startUID ) {
  */
 export function getNextBlock( state, startUID ) {
 	return getAdjacentBlock( state, startUID, 1 );
+}
+
+/**
+ * Returns the initial caret position for the selected block.
+ * This position is to used to position the caret properly when the selected block changes.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?Object} Selected block.
+ */
+export function getSelectedBlocksInitialCaretPosition( state ) {
+	const { start, end } = state.blockSelection;
+	if ( start !== end || ! start ) {
+		return null;
+	}
+
+	return state.blockSelection.initialPosition;
 }
 
 /**
@@ -847,25 +866,6 @@ export function isBlockWithinSelection( state, uid ) {
  */
 export function isBlockHovered( state, uid ) {
 	return state.hoveredBlock === uid;
-}
-
-/**
- * Returns focus state of the block corresponding to the specified unique ID,
- * or null if the block is not selected. It is left to a block's implementation
- * to manage the content of this object, defaulting to an empty object.
- *
- * @param {Object} state Global application state.
- * @param {string} uid   Block unique ID.
- *
- * @return {Object} Block focus state.
- */
-export function getBlockFocus( state, uid ) {
-	// If there is multi-selection, keep returning the focus object for the start block.
-	if ( ! isBlockSelected( state, uid ) && state.blockSelection.start !== uid ) {
-		return null;
-	}
-
-	return state.blockSelection.focus;
 }
 
 /**

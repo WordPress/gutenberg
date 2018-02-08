@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	focusBlock,
 	replaceBlocks,
 	startTyping,
 	stopTyping,
@@ -122,26 +121,13 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'focusBlock', () => {
-		it( 'should return the UPDATE_FOCUS action', () => {
-			const focusConfig = {
-				editable: 'cite',
-			};
-
-			expect( focusBlock( 'chicken', focusConfig ) ).toEqual( {
-				type: 'UPDATE_FOCUS',
-				uid: 'chicken',
-				config: focusConfig,
-			} );
-		} );
-	} );
-
 	describe( 'selectBlock', () => {
 		it( 'should return the SELECT_BLOCK action', () => {
 			const uid = 'my-uid';
-			const result = selectBlock( uid );
+			const result = selectBlock( uid, -1 );
 			expect( result ).toEqual( {
 				type: 'SELECT_BLOCK',
+				initialPosition: -1,
 				uid,
 			} );
 		} );

@@ -86,7 +86,7 @@ add_action( 'admin_menu', 'gutenberg_menu' );
  */
 function gutenberg_wordpress_version_notice() {
 	echo '<div class="error"><p>';
-	echo __( 'Gutenberg requires WordPress 4.8 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
+	echo __( 'Gutenberg requires WordPress 4.9 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
 	echo '</p></div>';
 
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
@@ -120,7 +120,7 @@ function gutenberg_pre_init() {
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
 
-	if ( version_compare( $version, '4.8', '<' ) ) {
+	if ( version_compare( $version, '4.9', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
 		return;
 	}
@@ -182,14 +182,12 @@ function gutenberg_intercept_edit_post() {
 		return;
 	}
 
-	if ( isset( $_GET['post'] ) ) {
-		$post_ID = (int) $_GET['post'];
-		$post_id = $post_ID;
-	}
-
-	if ( empty( $post_id ) ) {
+	if ( empty( $_GET['post'] ) || ! is_numeric( $_GET['post'] ) ) {
 		return;
 	}
+
+	$post_ID = (int) $_GET['post'];
+	$post_id = $post_ID;
 
 	$post = get_post( $post_id );
 
@@ -205,7 +203,7 @@ function gutenberg_intercept_edit_post() {
 		return;
 	}
 
-	if ( ! in_array( $typenow, get_post_types( array( 'show_ui' => true ) ) ) ) {
+	if ( ! in_array( $typenow, get_post_types( array( 'show_ui' => true ) ), true ) ) {
 		return;
 	}
 
@@ -213,7 +211,7 @@ function gutenberg_intercept_edit_post() {
 		return;
 	}
 
-	if ( 'trash' == $post->post_status ) {
+	if ( 'trash' === $post->post_status ) {
 		return;
 	}
 
@@ -227,12 +225,11 @@ function gutenberg_intercept_edit_post() {
 	$editing = true;
 	$title   = $post_type_object->labels->edit_item;
 
-	$post_type = $post->post_type;
-	if ( 'post' == $post_type ) {
+	if ( 'post' === $post_type ) {
 		$parent_file   = 'edit.php';
 		$submenu_file  = 'edit.php';
 		$post_new_file = 'post-new.php';
-	} elseif ( 'attachment' == $post_type ) {
+	} elseif ( 'attachment' === $post_type ) {
 		$parent_file   = 'upload.php';
 		$submenu_file  = 'upload.php';
 		$post_new_file = 'media-new.php';
@@ -262,17 +259,17 @@ function gutenberg_intercept_post_new() {
 
 	if ( ! isset( $_GET['post_type'] ) ) {
 		$post_type = 'post';
-	} elseif ( in_array( $_GET['post_type'], get_post_types( array( 'show_ui' => true ) ) ) ) {
+	} elseif ( in_array( $_GET['post_type'], get_post_types( array( 'show_ui' => true ) ), true ) ) {
 		$post_type = $_GET['post_type'];
 	} else {
 		return;
 	}
 	$post_type_object = get_post_type_object( $post_type );
 
-	if ( 'post' == $post_type ) {
+	if ( 'post' === $post_type ) {
 		$parent_file  = 'edit.php';
 		$submenu_file = 'post-new.php';
-	} elseif ( 'attachment' == $post_type ) {
+	} elseif ( 'attachment' === $post_type ) {
 		if ( wp_redirect( admin_url( 'media-new.php' ) ) ) {
 			exit;
 		}

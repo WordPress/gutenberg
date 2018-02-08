@@ -51,7 +51,7 @@ To achieve distinct arrangements of nested blocks, you may assign layout as an a
 
 Because `InnerBlocks.Content` will generate a single continuous flow of block markup for nested content, it may be advisable to use [CSS Grid Layout](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Grid_Layout) to assign layout positions. Be aware that CSS grid is [not suported in legacy browsers](https://caniuse.com/#feat=css-grid), and therefore you should consider how this might impact your block's appearance when viewed on the front end of a site in such browsers.
 
-Layouts can be assigned either either as an object (ungrouped layouts) or an array of objects (grouped layouts). These are documented below.
+Layouts can be assigned either as an object (ungrouped layouts) or an array of objects (grouped layouts). These are documented below.
 
 In both cases, each layout consists of:
 

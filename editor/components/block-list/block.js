@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, partial, reduce, size, castArray, noop } from 'lodash';
+import { get, reduce, size, castArray, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ import {
 	getSaveElement,
 	isReusableBlock,
 } from '@wordpress/blocks';
-import { withFilters, withContext } from '@wordpress/components';
+import { withFilters, withContext, withAPIData } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -41,7 +41,6 @@ import { createInnerBlockList } from './utils';
 import {
 	clearSelectedBlock,
 	editPost,
-	focusBlock,
 	insertBlocks,
 	mergeBlocks,
 	removeBlock,
@@ -54,7 +53,6 @@ import {
 } from '../../store/actions';
 import {
 	getBlock,
-	getBlockFocus,
 	isMultiSelecting,
 	getBlockIndex,
 	getEditedPostAttribute,
@@ -67,6 +65,7 @@ import {
 	isSelectionEnabled,
 	isTyping,
 	getBlockMode,
+	getCurrentPostType,
 } from '../../store/selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
@@ -116,12 +115,14 @@ export class BlockListBlock extends Component {
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
+		this.onSelectionChange = this.onSelectionChange.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
 
 		this.state = {
 			error: null,
+			isSelectionCollapsed: true,
 		};
 	}
 
@@ -138,17 +139,15 @@ export class BlockListBlock extends Component {
 				renderBlockMenu,
 				showContextualToolbar
 			),
+			canUserUseUnfilteredHTML: get( this.props.user, [ 'data', 'capabilities', 'unfiltered_html' ], false ),
 		};
 	}
 
 	componentDidMount() {
-		if ( this.props.focus ) {
-			this.node.focus();
-		}
-
 		if ( this.props.isTyping ) {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -173,11 +172,6 @@ export class BlockListBlock extends Component {
 			this.previousOffset = null;
 		}
 
-		// Focus node when focus state is programmatically transferred.
-		if ( this.props.focus && ! prevProps.focus && ! this.node.contains( document.activeElement ) ) {
-			this.node.focus();
-		}
-
 		// Bind or unbind mousemove from page when user starts or stops typing
 		if ( this.props.isTyping !== prevProps.isTyping ) {
 			if ( this.props.isTyping ) {
@@ -190,6 +184,7 @@ export class BlockListBlock extends Component {
 
 	componentWillUnmount() {
 		this.removeStopTypingListener();
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	removeStopTypingListener() {
@@ -241,6 +236,7 @@ export class BlockListBlock extends Component {
 		// Detect touchstart to disable hover on iOS
 		this.hadTouchStart = true;
 	}
+
 	onClick() {
 		// Clear touchstart detection
 		// Browser will try to emulate mouse events also see https://www.html5rocks.com/en/mobile/touchandmouse/
@@ -405,13 +401,13 @@ export class BlockListBlock extends Component {
 			case DELETE:
 				// Remove block on backspace.
 				if ( target === this.node ) {
-					const { uid, onRemove, previousBlock, onFocus, isLocked } = this.props;
+					const { uid, onRemove, isLocked, previousBlock, onSelect } = this.props;
 					event.preventDefault();
 					if ( ! isLocked ) {
 						onRemove( uid );
 
 						if ( previousBlock ) {
-							onFocus( previousBlock.uid, { offset: -1 } );
+							onSelect( previousBlock.uid, -1 );
 						}
 					}
 				}
@@ -437,6 +433,19 @@ export class BlockListBlock extends Component {
 		}
 	}
 
+	onSelectionChange() {
+		if ( ! this.props.isSelected ) {
+			return;
+		}
+
+		const selection = window.getSelection();
+		const isCollapsed = selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
+		// We only keep track of the collapsed selection for selected blocks.
+		if ( isCollapsed !== this.state.isSelectionCollapsed && this.props.isSelected ) {
+			this.setState( { isSelectionCollapsed: isCollapsed } );
+		}
+	}
+
 	render() {
 		const {
 			block,
@@ -458,8 +467,11 @@ export class BlockListBlock extends Component {
 		// (mover, toolbar, wrapper) and the display of the block content.
 
 		// Generate the wrapper class names handling the different states of the block.
-		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected, focus } = this.props;
-		const showUI = isSelected && ( ! this.props.isTyping || ( focus && focus.collapsed === false ) );
+		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected } = this.props;
+
+		// If the block is selected and we're typing we hide the sidebar
+		// unless the selection is not collapsed.
+		const showUI = isSelected && ( ! this.props.isTyping || ! this.state.isSelectionCollapsed );
 		const { error } = this.state;
 		const wrapperClassName = classnames( 'editor-block-list__block', {
 			'has-warning': ! isValid || !! error,
@@ -469,7 +481,7 @@ export class BlockListBlock extends Component {
 			'is-reusable': isReusableBlock( blockType ),
 		} );
 
-		const { onMouseLeave, onFocus, onReplace } = this.props;
+		const { onMouseLeave, onReplace } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -543,17 +555,17 @@ export class BlockListBlock extends Component {
 					className={ BlockListBlock.className }
 					tabIndex="0"
 					aria-label={ blockLabel }
+					data-block={ block.uid }
 				>
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
 								name={ blockName }
-								focus={ focus }
+								isSelected={ isSelected }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
 								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 								onReplace={ isLocked ? undefined : onReplace }
-								setFocus={ partial( onFocus, block.uid ) }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
 								id={ block.uid }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
@@ -595,12 +607,12 @@ const mapStateToProps = ( state, { uid, rootUID } ) => ( {
 	isMultiSelected: isBlockMultiSelected( state, uid ),
 	isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
 	isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
-	focus: getBlockFocus( state, uid ),
 	isTyping: isTyping( state ),
 	order: getBlockIndex( state, uid, rootUID ),
 	meta: getEditedPostAttribute( state, 'meta' ),
 	mode: getBlockMode( state, uid ),
 	isSelectionEnabled: isSelectionEnabled( state ),
+	postType: getCurrentPostType( state ),
 } );
 
 const mapDispatchToProps = ( dispatch, ownProps ) => ( {
@@ -608,9 +620,10 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 		dispatch( updateBlockAttributes( uid, attributes ) );
 	},
 
-	onSelect() {
-		dispatch( selectBlock( ownProps.uid ) );
+	onSelect( uid = ownProps.uid, initialPosition ) {
+		dispatch( selectBlock( uid, initialPosition ) );
 	},
+
 	onDeselect() {
 		dispatch( clearSelectedBlock() );
 	},
@@ -646,10 +659,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 		dispatch( insertBlocks( blocks, index, rootUID ) );
 	},
 
-	onFocus( ...args ) {
-		dispatch( focusBlock( ...args ) );
-	},
-
 	onRemove( uid ) {
 		dispatch( removeBlock( uid ) );
 	},
@@ -681,6 +690,7 @@ BlockListBlock.className = 'editor-block-list__block-edit';
 
 BlockListBlock.childContextTypes = {
 	BlockList: noop,
+	canUserUseUnfilteredHTML: noop,
 };
 
 export default compose(
@@ -693,4 +703,7 @@ export default compose(
 		};
 	} ),
 	withFilters( 'editor.BlockListBlock' ),
+	withAPIData( ( { postType } ) => ( {
+		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
+	} ) ),
 )( BlockListBlock );

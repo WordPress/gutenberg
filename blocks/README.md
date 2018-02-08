@@ -277,9 +277,9 @@ want to display alignment options in the selected block's toolbar.
 
 Because the toolbar should only be shown when the block is selected, it is
 important that a `BlockControls` element is only returned when the block's
-`focus` prop is
+`isSelected` prop is
 [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy),
-meaning that focus is currently within the block.
+meaning that the block is currently selected.
 
 Example:
 
@@ -291,8 +291,8 @@ Example:
 
 	function edit( props ) {
 		return [
-			// Controls: (only visible when focused)
-			props.focus && (
+			// Controls: (only visible when block is selected)
+			props.isSelected && (
 				el( BlockControls, { key: 'controls' },
 					el( AlignmentToolbar, {
 						value: props.align,

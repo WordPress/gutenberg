@@ -41,18 +41,18 @@ edit( { attributes, className } ) {
 }
 ```
 
-### focus
+### isSelected
 
-The focus property is an object that communicates whether the block is currently focused, and which children of the block may be in focus.
+The isSelected property is an object that communicates whether the block is currently selected.
 
 ```js
 // Defining the edit interface
-edit( { attributes, className, focus } ) {
+edit( { attributes, className, isSelected } ) {
 	return (
 		<div className={ className }>
 			{ attributes.content }
-			{ focus &&
-				<span>Shows only when the block is focused.</span>
+			{ isSelected &&
+				<span>Shows only when the block is selected.</span>
 			}
 		</div>
 	);
@@ -65,7 +65,7 @@ This function allows the block to update individual attributes based on user int
 
 ```js
 // Defining the edit interface
-edit( { attributes, setAttributes, className, focus } ) {
+edit( { attributes, setAttributes, className, isSelected } ) {
 	// Simplify access to attributes
 	const { content, mySetting } = attributes;
 
@@ -74,17 +74,13 @@ edit( { attributes, setAttributes, className, focus } ) {
 	return (
 		<div className={ className }>
 			{ content }
-			{ focus &&
+			{ isSelected &&
 				<button onClick={ toggleSetting }>Toggle setting</button>
 			}
 		</div>
 	);
 }
 ```
-
-### setFocus
-
-// Todo ...
 
 ## Save
 
