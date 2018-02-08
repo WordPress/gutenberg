@@ -239,17 +239,19 @@ export class Autocomplete extends Component {
 	 * @param  {string} query The query, if any.
 	 */
 	loadOptions( index, query ) {
-		this.props.completers[ index ].getOptions( query ).then( ( options ) => {
-			const keyedOptions = map( options, ( option, i ) => ( { ...option, key: index + '-' + ( option.value.slug ? option.value.slug : i ) } ) );
-			const filteredOptions = filterOptions( this.state.search, keyedOptions );
-			const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
-			this.setState( {
-				[ 'options_' + index ]: keyedOptions,
-				filteredOptions,
-				selectedIndex,
+		this.props.completers[ index ]
+			.getOptions( query )
+			.then( ( options ) => {
+				const keyedOptions = map( options, ( option, i ) => ( { ...option, key: index + '-' + ( option.value.slug ? option.value.slug : i ) } ) );
+				const filteredOptions = filterOptions( this.state.search, keyedOptions );
+				const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
+				this.setState( {
+					[ 'options_' + index ]: keyedOptions,
+					filteredOptions,
+					selectedIndex,
+				} );
+				this.announce( filteredOptions );
 			} );
-			this.announce( filteredOptions );
-		} );
 	}
 
 	findMatch( container, cursor, allCompleters, wasOpen ) {
