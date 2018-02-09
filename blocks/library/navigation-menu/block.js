@@ -40,8 +40,8 @@ function getOptionsFromMenu( menus, selected ) {
 
 function getMenuChildren( list, data ) {
 	forEach( list, function( item, i ) {
-		list[ i ].children = filter( data, { menu_item_parent: item.id } );
-		list[ i ].children = getMenuChildren( list[ i ].children, data );
+		const children = filter( data, { menu_item_parent: item.id } );
+		list[ i ].children = getMenuChildren( children, data );
 	} );
 	return sortBy( list, 'menu_order' );
 }
@@ -75,14 +75,15 @@ class NavigationMenuBlock extends Component {
 
 		const { layout } = this.props.attributes;
 		const isTopLevel = items[ 0 ].menu_item_parent === 0;
+		const isHorizontal = layout === 'horizontal';
 		const className = classnames( this.props.className, {
-			'is-horizontal': layout === 'horizontal',
+			'is-horizontal': isHorizontal,
 		} );
 
 		return (
 			<ul
 				key="navigation-menu"
-				className={ isTopLevel ? className : '' }
+				className={ isTopLevel || ! isHorizontal ? className : '' }
 			>
 				{ items.map( ( item, i ) => {
 					return (
@@ -96,7 +97,6 @@ class NavigationMenuBlock extends Component {
 	}
 
 	renderMenu() {
-		const { layout } = this.props.attributes;
 		const { data, isLoading } = this.props.items;
 		const customizerUrl = '';
 
@@ -117,12 +117,8 @@ class NavigationMenuBlock extends Component {
 			);
 		}
 
-		if ( 'horizontal' === layout ) {
-			const nestedData = getMenuWithChildren( data );
-			return this.renderMenuLevel( nestedData );
-		}
-
-		return this.renderMenuLevel( data );
+		const nestedData = getMenuWithChildren( data );
+		return this.renderMenuLevel( nestedData );
 	}
 
 	render() {
