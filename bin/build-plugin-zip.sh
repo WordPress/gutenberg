@@ -99,19 +99,8 @@ zip -r gutenberg.zip \
 	blocks/library/*/*.php \
 	post-content.js \
 	$vendor_scripts \
-	blocks/build/*.{js,map} \
-	components/build/*.{js,map} \
-	date/build/*.{js,map} \
-	editor/build/*.{js,map} \
-	element/build/*.{js,map} \
-	hooks/build/*.{js,map} \
-	i18n/build/*.{js,map} \
-	data/build/*.{js,map} \
-	utils/build/*.{js,map} \
-	edit-post/build/*.{js,map} \
-	blocks/build/*.css \
-	components/build/*.css \
-	editor/build/*.css \
+	{blocks,components,date,editor,element,hooks,i18n,data,utils,edit-post}/build/*.{js,map} \
+	{blocks,components,editor,edit-post}/build/*.css \
 	languages/gutenberg.pot \
 	README.md
 
