@@ -42,7 +42,7 @@ const element = (
 /**
  * Returns the EllipsisMenu component.
  *
- * @returns {ReactElement} The EllipsisMenu component.
+ * @return {ReactElement} The EllipsisMenu component.
  */
 function EllipsisMenu() {
 	return element;
