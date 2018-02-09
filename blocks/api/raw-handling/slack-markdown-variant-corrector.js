@@ -6,7 +6,7 @@
  *
  * @param {string} text The potential Markdown text to correct.
  *
- * @returns {string} The corrected Markdown.
+ * @return {string} The corrected Markdown.
  */
 export default function( text ) {
 	return text.replace(
