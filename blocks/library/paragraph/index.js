@@ -51,7 +51,22 @@ class ParagraphBlock extends Component {
 		super( ...arguments );
 		this.nodeRef = null;
 		this.bindRef = this.bindRef.bind( this );
+		this.onReplace = this.onReplace.bind( this );
 		this.toggleDropCap = this.toggleDropCap.bind( this );
+	}
+
+	onReplace( blocks ) {
+		const { attributes, onReplace } = this.props;
+		onReplace( blocks.map( ( block, index ) => (
+			index === 0 && block.name === name ?
+				{ ...block,
+					attributes: {
+						...attributes,
+						...block.attributes,
+					},
+				} :
+				block
+		) ) );
 	}
 
 	toggleDropCap() {
@@ -179,7 +194,7 @@ class ParagraphBlock extends Component {
 								undefined
 							}
 							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
+							onReplace={ this.onReplace }
 							onRemove={ () => onReplace( [] ) }
 							placeholder={ placeholder || __( 'Add text or type / to add content' ) }
 							aria-autocomplete="list"
