@@ -13,19 +13,30 @@
  * @return string Returns the post content with navigtion menu added.
  */
 function gutenberg_render_block_core_navigation_menu( $attributes ) {
-	// get menu.
+
+	$menu_id = (int) $attributes['selected'];
+
+	if ( ! $menu_id ) {
+		return '';
+	}
+
+	$menu = wp_get_nav_menu_object( $menu_id );
+
+	if ( ! $menu ) {
+		return '';
+	}
+
 	$class = "wp-block-navigation-menu align{$attributes['align']}";
 	if ( isset( $attributes['layout'] ) && 'horizontal' === $attributes['layout'] ) {
 		$class .= ' is-horizontal';
 	}
 
-	$block_content = sprintf(
-		'<ul class="%1$s">%2$s</ul>',
-		esc_attr( $class ),
-		''
-	);
-
-	return $block_content;
+	return wp_nav_menu( array(
+		'menu' => $menu,
+		'menu_class' => $class,
+		'fallback_cb' => false,
+		'echo' => false,
+	) );
 }
 
 register_block_type( 'core/navigation-menu', array(
