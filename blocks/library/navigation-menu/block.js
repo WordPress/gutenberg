@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { filter, forEach, isEmpty, isUndefined } from 'lodash';
+import { filter, forEach, isEmpty, isUndefined, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -43,12 +43,11 @@ function getMenuChildren( list, data ) {
 		list[ i ].children = filter( data, { menu_item_parent: item.id } );
 		list[ i ].children = getMenuChildren( list[ i ].children, data );
 	} );
-	// return sortBy( list, 'menu_order' );
-	return list;
+	return sortBy( list, 'menu_order' );
 }
 
 function getMenuWithChildren( data ) {
-	const sorted = filter( data, { menu_item_parent: 0 } );
+	const sorted = sortBy( filter( data, { menu_item_parent: 0 } ), 'menu_order' );
 	getMenuChildren( sorted, data );
 	return sorted;
 }
