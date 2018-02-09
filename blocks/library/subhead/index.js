@@ -60,19 +60,21 @@ export const settings = {
 	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { content, placeholder } = attributes;
 
-		return <RichText
-			tagName="p"
-			key="editable"
-			value={ content }
-			onChange={ ( nextContent ) => {
-				setAttributes( {
-					content: nextContent,
-				} );
-			} }
-			className={ className }
-			placeholder={ placeholder || __( 'Write subhead…' ) }
-			isSelected={ isSelected }
-		/>;
+		return (
+			<RichText
+				tagName="p"
+				key="editable"
+				value={ content }
+				onChange={ ( nextContent ) => {
+					setAttributes( {
+						content: nextContent,
+					} );
+				} }
+				className={ className }
+				placeholder={ placeholder || __( 'Write subhead…' ) }
+				isSelected={ isSelected }
+			/>
+		);
 	},
 
 	save( { attributes, className } ) {
