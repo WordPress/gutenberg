@@ -153,7 +153,7 @@ export default {
 
 		// Update dirty meta boxes.
 		if ( hasMetaBoxes( store.getState() ) ) {
-			dispatch( requestMetaBoxUpdates( post ) );
+			dispatch( requestMetaBoxUpdates() );
 		}
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
@@ -492,8 +492,9 @@ export default {
 		}, {} );
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 	},
-	REQUEST_META_BOX_UPDATES( { post }, store ) {
-		const dataPerLocation = reduce( getMetaBoxes( store.getState() ), ( memo, metabox, location ) => {
+	REQUEST_META_BOX_UPDATES( action, store ) {
+		const state = store.getState();
+		const dataPerLocation = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
 			if ( metabox.isActive ) {
 				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
 			}
@@ -503,6 +504,7 @@ export default {
 
 		// Additional data needed for backwards compatibility.
 		// If we do not provide this data the post will be overriden with the default values.
+		const post = getCurrentPost( state );
 		const additionalData = [
 			post.comment_status && `comment_status=${ post.comment_status }`,
 			post.ping_status && `ping_status=${ post.ping_status }`,
