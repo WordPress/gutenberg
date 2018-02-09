@@ -7,6 +7,7 @@ import { times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { RangeControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -15,7 +16,6 @@ import './style.scss';
 import './editor.scss';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import RangeControl from '../../inspector-controls/range-control';
 import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 

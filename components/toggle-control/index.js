@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withInstanceId, FormToggle } from '@wordpress/components';
+import FormToggle from '../form-toggle';
+import withInstanceId from '../higher-order/with-instance-id';
 
 /**
  * Internal dependencies
@@ -25,7 +26,7 @@ class ToggleControl extends Component {
 
 	render() {
 		const { label, checked, help, instanceId } = this.props;
-		const id = 'inspector-toggle-control-' + instanceId;
+		const id = `inspector-toggle-control-${ instanceId }`;
 
 		let describedBy;
 		if ( help ) {

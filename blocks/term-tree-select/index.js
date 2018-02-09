@@ -4,9 +4,9 @@
 import { unescape as unescapeString, repeat, flatMap, compact } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import SelectControl from '../inspector-controls/select-control';
+import { SelectControl } from '@wordpress/components';
 
 function getSelectOptions( terms, level = 0 ) {
 	return flatMap( terms, ( term ) => [

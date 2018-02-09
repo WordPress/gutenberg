@@ -8,6 +8,7 @@ import { assign } from 'lodash';
  */
 import { getWrapperDisplayName } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -62,7 +63,7 @@ export function withInspectorControl( BlockEdit ) {
 		return [
 			<BlockEdit key="block-edit-anchor" { ...props } />,
 			hasAnchor && <InspectorControls key="inspector-anchor">
-				<InspectorControls.TextControl
+				<TextControl
 					label={ __( 'HTML Anchor' ) }
 					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
 					value={ props.attributes.anchor || '' }

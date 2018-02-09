@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { getWrapperDisplayName } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -53,7 +54,7 @@ export function withInspectorControl( BlockEdit ) {
 		return [
 			<BlockEdit key="block-edit-custom-class-name" { ...props } />,
 			hasCustomClassName && <InspectorControls key="inspector-custom-class-name">
-				<InspectorControls.TextControl
+				<TextControl
 					label={ __( 'Additional CSS Class' ) }
 					value={ props.attributes.className || '' }
 					onChange={ ( nextValue ) => {

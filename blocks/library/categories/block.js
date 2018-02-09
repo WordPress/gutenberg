@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Spinner, withAPIData } from '@wordpress/components';
+import { Placeholder, Spinner, ToggleControl, withAPIData } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { times, unescape } from 'lodash';
 
@@ -12,7 +12,6 @@ import { times, unescape } from 'lodash';
 import './editor.scss';
 import './style.scss';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
