@@ -114,6 +114,7 @@ export class BlockListBlock extends Component {
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.onDragOver = this.onDragOver.bind( this );
+		this.resetDragging = this.resetDragging.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -460,32 +461,47 @@ export class BlockListBlock extends Component {
 	 * Strategy: Remove inset and block clone, reset cursor, and remove drag listener.
 	 */
 	onDragEnd( event ) {
-		const block = document.getElementById( `block-${ this.props.uid }` );
-		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
-		const blockList = block.parentNode;
-		const cloneWrapper = document.getElementById( `clone-wrapper-${ block.id }` );
-
-		// Remove clone.
-		blockList.removeChild( cloneWrapper );
-
-		// Hide inset and reset block display.
-		setTimeout( () => {
-			this.setState( { dragging: false } );
-		}, 0 );
-
-		// Reset cursor.
-		document.body.classList.remove( 'dragging' );
-
-		document.removeEventListener( 'dragover', this.onDragOver );
+		this.resetDragging();
 		event.stopPropagation();
 	}
 
 	/*
+	 * Remove inset and block clone, reset cursor, and remove drag listener.
+	 * Called onDrop and onDragEnd (to ensure the dropzone does not prevent this call,
+	 * as onDrop goes through the dropzone provider).
+	 */
+	resetDragging() {
+		const block = document.getElementById( `block-${ this.props.uid }` );
+		const cloneWrapper = document.getElementById( `clone-wrapper-${ block.id }` );
+
+		if ( block && cloneWrapper ) {
+			// Remove clone.
+			block.parentNode.removeChild( cloneWrapper );
+		}
+
+		// Hide inset and reset block display.
+		setTimeout( () => {
+			this.setState( { dragging: false } );
+		} );
+
+		// Reset cursor.
+		document.body.classList.remove( 'dragging' );
+		document.removeEventListener( 'dragover', this.onDragOver );
+	}
+
+	/*
 	 * Reorder via Drag & Drop. Step 4 of 4.
-	 * Strategy: Initiate reordering.
+	 * Strategy:
+	 *  - Remove inset and block clone, reset cursor, and remove drag listener.
+	 *  - Initiate reordering.
 	 */
 	reorderBlock( uid, toIndex ) {
-		this.props.moveBlockToIndex( uid, toIndex );
+		this.resetDragging();
+		// This call needs to fire after the clone is removed from the DOM
+		// and the state is updated ( { dragging: false } ) in Step 3 above.
+		setTimeout( () => {
+			this.props.moveBlockToIndex( uid, toIndex );
+		}, 300 );
 	}
 
 	render() {
