@@ -88,7 +88,14 @@
 	}
 }
 
-.editor-block-list__block[data-type="core/image"][data-align="center"] .wp-block-image {
-	margin-left: auto;
-	margin-right: auto;
+.editor-block-list__block[data-type="core/image"][data-align="center"] {
+	.wp-block-image {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	&[data-resized="false"] .wp-block-image div {
+		margin-left: auto;
+		margin-right: auto;
+	}
 }
