@@ -40,13 +40,13 @@ export function registerEditorMenuItem( menuItemId, settings ) {
 	}
 	if ( menuItems[ menuItemId ] ) {
 		console.error(
-			'Menu item "' + menuItemId + '" is already registered.'
+			`Menu item "${ menuItemId }" is already registered.`
 		);
 	}
 
 	if ( ! settings.title ) {
 		console.error(
-			'Menu item "' + menuItemId + '" must have a title.'
+			`Menu item "${ menuItemId }" must have a title.`
 		);
 		return null;
 	}
