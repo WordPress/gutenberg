@@ -72,6 +72,12 @@ export function getFormatProperties( formatName, parents ) {
 
 const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
+/**
+ * When inserting a new link, we insert an <a> tag with this placeholder href
+ * so that there is a visual indication of which text will be made into a link.
+ */
+export const LINK_PLACEHOLDER_VALUE = '_wp_link_placeholder';
+
 export default class RichText extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -429,11 +435,10 @@ export default class RichText extends Component {
 		const container = findRelativeParent( this.editor.getBody() );
 		const containerPosition = container.getBoundingClientRect();
 		const toolbarOffset = { top: 10, left: 0 };
-		const linkModalWidth = 298;
 
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
-			left: position.left - containerPosition.left - ( linkModalWidth / 2 ) + ( position.width / 2 ) + toolbarOffset.left,
+			left: position.left - containerPosition.left + ( position.width / 2 ) + toolbarOffset.left,
 		};
 	}
 
@@ -661,22 +666,41 @@ export default class RichText extends Component {
 		);
 	}
 
-	onNodeChange( { parents } ) {
+	removePlaceholderLinks() {
+		this.editor.$( 'a' ).each( ( index, element ) => {
+			if ( element.getAttribute( 'href' ) === LINK_PLACEHOLDER_VALUE ) {
+				this.editor.dom.remove( element, true );
+			}
+		} );
+	}
+
+	getFormats( parents ) {
+		return this.editor.formatter.matchAll( this.props.formattingControls ).reduce( ( formats, format ) => {
+			formats[ format ] = {
+				isActive: true,
+				...getFormatProperties( format, parents ),
+			};
+			return formats;
+		}, {} );
+	}
+
+	onNodeChange( event ) {
 		if ( document.activeElement !== this.editor.getBody() ) {
 			return;
 		}
-		const formatNames = this.props.formattingControls;
-		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
-			accFormats[ activeFormat ] = {
-				isActive: true,
-				...getFormatProperties( activeFormat, parents ),
-			};
 
-			return accFormats;
-		}, {} );
+		const formats = this.getFormats( event.parents );
 
-		const focusPosition = this.getFocusPosition();
-		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
+		// Remove all placeholder links if selection moves away from a placeholder link
+		if ( ! formats.link || formats.link.value !== LINK_PLACEHOLDER_VALUE ) {
+			this.removePlaceholderLinks();
+		}
+
+		this.setState( {
+			formats,
+			focusPosition: this.getFocusPosition(),
+			selectedNodeId: this.state.selectedNodeId + 1,
+		} );
 	}
 
 	updateContent() {

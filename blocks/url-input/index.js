@@ -177,11 +177,9 @@ class UrlInput extends Component {
 	render() {
 		const { value, instanceId } = this.props;
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
-		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className="blocks-url-input">
 				<input
-					autoFocus
 					type="text"
 					aria-label={ __( 'URL' ) }
 					required
@@ -227,7 +225,6 @@ class UrlInput extends Component {
 				}
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
