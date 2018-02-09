@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { createStore } from 'redux';
-import { flowRight, without, mapValues } from 'lodash';
+import { flowRight, without, mapValues, get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -100,10 +100,6 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
 	};
 
 	return connectWithStore( ( state, ownProps ) => {
-		const select = ( key, selectorName, ...args ) => {
-			return selectors[ key ][ selectorName ]( state[ key ], ...args );
-		};
-
 		return mapSelectorsToProps( select, ownProps );
 	} );
 };
@@ -119,5 +115,12 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
  * @return {*} The selector's returned value.
  */
 export const select = ( reducerKey, selectorName, ...args ) => {
+	const selector = get( selectors, [ reducerKey, selectorName ] );
+	if ( typeof selector !== 'function' ) {
+		// eslint-disable-next-line no-console
+		console.error( `Invalid selector called, with name "${ selectorName }" for reducer "${ reducerKey }".` +
+			' Make sure the reducerName and selectorName are correct!' );
+		return undefined;
+	}
 	return selectors[ reducerKey ][ selectorName ]( stores[ reducerKey ].getState(), ...args );
 };
