@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import RichText, { createTinyMCEElement, isLinkBoundary, getFormatProperties } from '../';
+import { RichText, createTinyMCEElement, isLinkBoundary, getFormatProperties } from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
 
 describe( 'createTinyMCEElement', () => {
