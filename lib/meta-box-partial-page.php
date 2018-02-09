@@ -310,23 +310,21 @@ function the_gutenberg_metaboxes() {
 	<form class="metabox-base-form">
 	<?php gutenberg_meta_box_post_form_hidden_fields( $post ); ?>
 	</form>
-	<div class="metabox-location-container">
-		<?php foreach ( $locations as $location ) : ?>
-			<form class="metabox-location-<?php echo esc_attr( $location ); ?>">
-				<div class="sidebar-open">
-					<div class="postbox-container">
-						<?php
-						do_meta_boxes(
-							$current_screen,
-							$location,
-							$post
-						);
-						?>
-					</div>
+	<?php foreach ( $locations as $location ) : ?>
+		<form class="metabox-location-<?php echo esc_attr( $location ); ?>">
+			<div id="poststuff" class="sidebar-open">
+				<div id="postbox-container-2" class="postbox-container">
+					<?php
+					do_meta_boxes(
+						$current_screen,
+						$location,
+						$post
+					);
+					?>
 				</div>
-			</form>
-		<?php endforeach; ?>
-	</div>
+			</div>
+		</form>
+	<?php endforeach; ?>
 	<?php
 
 	// Reset meta box data.
