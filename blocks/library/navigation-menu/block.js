@@ -8,7 +8,14 @@ import { filter, forEach, isEmpty, isUndefined, sortBy } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Button, Placeholder, Toolbar, Spinner, withAPIData } from '@wordpress/components';
+import {
+	Button,
+	Placeholder,
+	Toolbar,
+	SelectControl,
+	Spinner,
+	withAPIData,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -21,7 +28,6 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 import MenuItem from './item';
 import MenuPlaceholder from './placeholder';
-import SelectControl from '../../inspector-controls/select-control';
 
 function getOptionsFromMenu( menus, selected ) {
 	if ( ! menus ) {
