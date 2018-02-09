@@ -76,14 +76,16 @@ class NavigationMenuBlock extends Component {
 		const { layout } = this.props.attributes;
 		const isTopLevel = items[ 0 ].menu_item_parent === 0;
 		const isHorizontal = layout === 'horizontal';
-		const className = classnames( this.props.className, {
+		const className = classnames( {
+			[ this.props.className ]: isTopLevel,
 			'is-horizontal': isHorizontal,
+			'is-vertical': ! isHorizontal,
 		} );
 
 		return (
 			<ul
 				key="navigation-menu"
-				className={ isTopLevel || ! isHorizontal ? className : '' }
+				className={ className }
 			>
 				{ items.map( ( item, i ) => {
 					return (

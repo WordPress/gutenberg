@@ -1,5 +1,8 @@
 .gutenberg .wp-block-navigation-menu {
 	padding-left: 2.5em;
+	&.is-vertical ul {
+		padding-left: 2.5em;
+	}
 	&.is-horizontal {
 		padding-left: 0;
 	}
