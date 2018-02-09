@@ -503,15 +503,16 @@ export default {
 
 		// Additional data needed for backwards compatibility.
 		// If we do not provide this data the post will be overriden with the default values.
-		const additionData = []
-			.concat( post[ 'comment_status' ] ? [ `comment_status=${ post[ 'comment_status' ] }` ] : [] )
-			.concat( post[ 'ping_status' ] ? [ `ping_status=${ post[ 'ping_status' ] }` ] : [] );
+		const additionalData = [
+			post.comment_status && `comment_status=${ post.comment_status }`,
+			post.ping_status && `ping_status=${ post.ping_status }`,
+		].filter( Boolean );
 
 		// To save the metaboxes, we serialize each one of the location forms and combine them
 		// We also add the "common" hidden fields from the base .metabox-base-form
 		const formData = values( dataPerLocation )
 			.concat( jQuery( '.metabox-base-form' ).serialize() )
-			.concat( additionData )
+			.concat( additionalData )
 			.join( '&' );
 		const fetchOptions = {
 			method: 'POST',
