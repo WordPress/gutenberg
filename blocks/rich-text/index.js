@@ -691,14 +691,11 @@ export default class RichText extends Component {
 		if (
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent &&
-			! isEqual( this.props.value, prevProps.value ) &&
-			! isEqual( this.props.value, this.savedContent )
+			this.props.value !== this.savedContent
 		) {
 			this.updateContent();
 		}
 	}
-
 	componentWillReceiveProps( nextProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
 			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
