@@ -20,7 +20,7 @@ import { getEditorMenuItems } from '../../../api';
  * Renders a list of plugins that will activate different UI elements.
  *
  * @param   {Object} props The component props.
- * @returns {Object} The rendered list of menu items.
+ * @return {Object} The rendered list of menu items.
  */
 function Plugins( props ) {
 	const ellipsisMenuItems = getEditorMenuItems();
@@ -37,7 +37,7 @@ function Plugins( props ) {
 	 * Does nothing currently, but should be used to trigger the plugins sidebar
 	 *
 	 * @param {string} pluginId The plugin id.
-	 * @returns {void}
+	 * @return {void}
 	 */
 	function onSelect( pluginId ) {
 		props.onSelect();
@@ -65,7 +65,7 @@ function Plugins( props ) {
 
 						return (
 							<IconButton
-								key={ menuItem.name }
+								key={ menuItem.menuItemId }
 								className={ buttonClassName }
 								icon={
 									menuItem.icon ?
@@ -73,7 +73,7 @@ function Plugins( props ) {
 											{ menuItem.icon }
 										</div> : null
 								}
-								onClick={ () => onSelect( menuItem.name ) }>
+								onClick={ () => onSelect( menuItem.menuItemId ) }>
 								{ menuItem.title }
 							</IconButton>
 						);
