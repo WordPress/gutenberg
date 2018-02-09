@@ -123,7 +123,11 @@
 		"setupFiles": [
 			"<rootDir>/test/unit/setup-blocks.js",
 			"<rootDir>/test/unit/setup-wp-aliases.js"
-		]
+		],
+		"transform": {
+			"^.+\\.jsx?$": "babel-jest",
+			"\\.pegjs$": "<rootDir>/test/unit/pegjs-transform.js"
+		}
 	},
 	"scripts": {
 		"prebuild": "check-node-version --package",
