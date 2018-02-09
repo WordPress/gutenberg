@@ -28,6 +28,7 @@
 		"escape-string-regexp": "1.0.5",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#327b6bdec434177a6e841bd3210e87627ccfcecb",
 		"hpq": "1.2.0",
+		"is-equal-shallow": "0.1.3",
 		"jed": "1.1.1",
 		"jquery": "3.2.1",
 		"js-beautify": "1.6.14",

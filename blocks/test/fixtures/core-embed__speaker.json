@@ -9,6 +9,7 @@
                 "Embedded content from speaker"
             ]
         },
+        "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-speaker\">\n    https://speaker.com/\n    <figcaption>Embedded content from speaker</figcaption>\n</figure>"
     }
 ]

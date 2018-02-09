@@ -13,7 +13,7 @@ import {
 	isMultiSelecting,
 } from '../../store/selectors';
 
-function BlockListMultiControls( { multiSelectedBlockUids, isSelecting } ) {
+function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting } ) {
 	if ( isSelecting ) {
 		return null;
 	}
@@ -21,6 +21,7 @@ function BlockListMultiControls( { multiSelectedBlockUids, isSelecting } ) {
 	return [
 		<BlockMover
 			key="mover"
+			rootUID={ rootUID }
 			uids={ multiSelectedBlockUids }
 		/>,
 		<BlockSettingsMenu

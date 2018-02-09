@@ -3,11 +3,13 @@
 	margin: -4px;
 	padding: 4px;
 
-	p {
+	p,
+	li {
 		line-height: $editor-line-height;
 	}
 
-	ul, ol {
+	ul,
+	ol {
 		padding-left: 2.5em;
 		margin-left: 0;
 	}

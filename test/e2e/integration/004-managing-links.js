@@ -3,8 +3,8 @@ describe( 'Managing links', () => {
 		cy.newPost();
 	} );
 
-	const fixedIsOn = 'button.is-selected:contains("Fix toolbar to block")';
-	const fixedIsOff = 'button:contains("Fix toolbar to block"):not(".is-selected")';
+	const fixedIsOn = 'button.is-selected:contains("Fix Toolbar to Top")';
+	const fixedIsOff = 'button:contains("Fix Toolbar to Top"):not(".is-selected")';
 
 	const setFixedToolbar = ( b ) => {
 		cy.get( '.edit-post-ellipsis-menu button' ).click();
@@ -13,7 +13,7 @@ describe( 'Managing links', () => {
 			const candidate = b ? fixedIsOff : fixedIsOn;
 			const toggleNeeded = $body.find( candidate );
 			if ( toggleNeeded.length ) {
-				return 'button:contains("Fix toolbar to block")';
+				return 'button:contains("Fix Toolbar to Top")';
 			}
 
 			return '.edit-post-ellipsis-menu button';

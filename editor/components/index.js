@@ -41,7 +41,6 @@ export { default as PostSwitchToDraftButton } from './post-switch-to-draft-butto
 export { default as PostTaxonomies } from './post-taxonomies';
 export { default as PostTaxonomiesCheck } from './post-taxonomies/check';
 export { default as PostTextEditor } from './post-text-editor';
-export { default as PostTextEditorToolbar } from './post-text-editor/toolbar';
 export { default as PostTitle } from './post-title';
 export { default as PostTrash } from './post-trash';
 export { default as PostTrashCheck } from './post-trash/check';

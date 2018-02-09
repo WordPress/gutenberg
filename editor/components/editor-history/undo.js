@@ -21,6 +21,7 @@ function EditorHistoryUndo( { hasUndo, undo } ) {
 			label={ __( 'Undo' ) }
 			disabled={ ! hasUndo }
 			onClick={ undo }
+			className="editor-history__undo"
 		/>
 	);
 }

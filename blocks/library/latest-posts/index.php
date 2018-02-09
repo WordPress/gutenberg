@@ -48,11 +48,11 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 	}
 
 	$class = "wp-block-latest-posts align{$attributes['align']}";
-	if ( isset( $attributes['layout'] ) && 'grid' === $attributes['layout'] ) {
+	if ( isset( $attributes['postLayout'] ) && 'grid' === $attributes['postLayout'] ) {
 		$class .= ' is-grid';
 	}
 
-	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['layout'] ) {
+	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['postLayout'] ) {
 		$class .= ' columns-' . $attributes['columns'];
 	}
 
@@ -78,7 +78,7 @@ register_block_type( 'core/latest-posts', array(
 			'type'    => 'boolean',
 			'default' => false,
 		),
-		'layout'          => array(
+		'postLayout'      => array(
 			'type'    => 'string',
 			'default' => 'list',
 		),

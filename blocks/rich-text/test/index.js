@@ -6,8 +6,111 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import RichText from '../';
+import RichText, { createTinyMCEElement, isLinkBoundary, getFormatProperties } from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
+
+describe( 'createTinyMCEElement', () => {
+	const type = 'p';
+	const children = <p>Child</p>;
+
+	test( 'should return null', () => {
+		const props = {
+			'data-mce-bogus': 'all',
+		};
+
+		expect( createTinyMCEElement( type, props, children ) ).toBeNull();
+	} );
+
+	test( 'should return children', () => {
+		const props = {
+			'data-mce-bogus': '',
+		};
+
+		const wrapper = createTinyMCEElement( type, props, children );
+		expect( wrapper ).toEqual( [ children ] );
+	} );
+
+	test( 'should render a TinyMCE element', () => {
+		const props = {
+			'a-prop': 'hi',
+		};
+
+		const wrapper = shallow( createTinyMCEElement( type, props, children ) );
+		expect( wrapper ).toMatchSnapshot();
+	} );
+} );
+
+describe( 'isLinkBoundary', () => {
+	const fragment = {
+		childNodes: [
+			{
+				nodeName: 'A',
+				text: '\uFEFF',
+
+			},
+		],
+	};
+
+	test( 'should return true for a valid link boundary', () => {
+		expect( isLinkBoundary( fragment ) ).toBe( true );
+	} );
+
+	test( 'should return false for an invalid link boundary', () => {
+		const invalid = { ...fragment, childNodes: [] };
+		expect( isLinkBoundary( invalid ) ).toBe( false );
+	} );
+} );
+
+describe( 'getFormatProperties', () => {
+	const formatName = 'link';
+	const node = {
+		nodeName: 'A',
+		attributes: {
+			href: 'https://www.testing.com',
+		},
+	};
+
+	test( 'should return an empty object', () => {
+		expect( getFormatProperties( 'ofSomething' ) ).toEqual( {} );
+	} );
+
+	test( 'should return an empty object if no anchor element is found', () => {
+		expect( getFormatProperties( formatName, [ { ...node, nodeName: 'P' } ] ) ).toEqual( {} );
+	} );
+
+	test( 'should return an object of value and node for a link', () => {
+		const mockNode = {
+			...node,
+			getAttribute: jest.fn().mockImplementation( ( attr ) => mockNode.attributes[ attr ] ),
+		};
+
+		const parents = [
+			mockNode,
+		];
+
+		expect( getFormatProperties( formatName, parents ) ).toEqual( {
+			value: 'https://www.testing.com',
+			node: mockNode,
+		} );
+	} );
+
+	test( 'should return an object of value and node of empty values when no values are found.', () => {
+		const mockNode = {
+			...node,
+			attributes: {},
+			getAttribute: jest.fn().mockImplementation( ( attr ) => mockNode.attributes[ attr ] ),
+		};
+
+		const parents = [
+			mockNode,
+		];
+
+		expect( getFormatProperties( formatName, parents ) ).toEqual( {
+			value: '',
+			node: mockNode,
+		} );
+	} );
+} );
 
 describe( 'RichText', () => {
 	describe( 'Component', () => {
@@ -48,6 +151,7 @@ describe( 'RichText', () => {
 			} );
 		} );
 	} );
+
 	describe( '.propTypes', () => {
 		/* eslint-disable no-console */
 		let consoleError;

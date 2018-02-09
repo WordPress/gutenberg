@@ -57,6 +57,9 @@ class DropZoneProvider extends Component {
 	}
 
 	resetDragState() {
+		// Avoid throttled drag over handler calls
+		this.toggleDraggingOverDocument.cancel();
+
 		const { isDraggingOverDocument, hoveredDropZone } = this.state;
 		if ( ! isDraggingOverDocument && hoveredDropZone === -1 ) {
 			return;

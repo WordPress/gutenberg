@@ -21,7 +21,7 @@ import { rawHandler } from '../api';
  *
  * @param   {Object} props  React props passed to the component.
  *
- * @returns {Object} Rendered placeholder.
+ * @return {Object} Rendered placeholder.
  */
 export default function ImagePlaceHolder( { className, icon, label, onSelectImage, multiple = false } ) {
 	const setImage = multiple ? onSelectImage : ( [ image ] ) => onSelectImage( image );
