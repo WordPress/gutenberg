@@ -248,11 +248,21 @@ export default class RichText extends Component {
 	 * @param {PasteEvent} event The paste event as triggered by tinyMCE.
 	 */
 	onPaste( event ) {
-		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
-		const { items = [], files = [] } = dataTransfer;
-		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+		const dataTransfer =
+			event.clipboardData ||
+			event.dataTransfer ||
+			this.editor.getDoc().dataTransfer ||
+			// Removes the need for further `dataTransfer` checks.
+			{ getData: () => '' };
 
-		if ( item ) {
+		const { items = [], files = [], types = [] } = dataTransfer;
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+		const plainText = dataTransfer.getData( 'text/plain' );
+		const HTML = dataTransfer.getData( 'text/html' );
+
+		// Only process file if no HTML is present.
+		// Note: a pasted file may have the URL as plain text.
+		if ( item && ! HTML ) {
 			const blob = item.getAsFile ? item.getAsFile() : item;
 			const rootNode = this.editor.getBody();
 			const isEmpty = this.editor.dom.isEmpty( rootNode );
@@ -277,10 +287,8 @@ export default class RichText extends Component {
 			event.preventDefault();
 		}
 
-		this.pastedPlainText = dataTransfer ? dataTransfer.getData( 'text/plain' ) : '';
-		this.isPlainTextPaste = ( dataTransfer &&
-			dataTransfer.types.length === 1 &&
-			dataTransfer.types[ 0 ] === 'text/plain' );
+		this.pastedPlainText = plainText;
+		this.isPlainTextPaste = types.length === 1 && types[ 0 ] === 'text/plain';
 	}
 
 	/**
