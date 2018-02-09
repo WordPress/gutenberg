@@ -18,7 +18,6 @@
 		"@wordpress/a11y": "1.0.3",
 		"@wordpress/autop": "1.0.0",
 		"@wordpress/hooks": "1.1.1",
-		"@wordpress/jest-console": "1.0.0",
 		"@wordpress/url": "1.0.0",
 		"classnames": "2.2.5",
 		"clipboard": "1.7.1",
@@ -58,16 +57,13 @@
 		"uuid": "3.1.0"
 	},
 	"devDependencies": {
+		"@wordpress/babel-preset-default": "1.0.3",
+		"@wordpress/jest-preset-default": "1.0.1",
+		"@wordpress/scripts": "1.0.2",
 		"autoprefixer": "6.7.7",
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
-		"babel-jest": "22.0.4",
 		"babel-loader": "7.1.2",
-		"babel-plugin-lodash": "3.2.11",
-		"babel-plugin-transform-object-rest-spread": "6.26.0",
-		"babel-plugin-transform-react-jsx": "6.24.1",
-		"babel-plugin-transform-runtime": "6.23.0",
-		"babel-preset-env": "1.6.0",
 		"babel-traverse": "6.26.0",
 		"check-node-version": "3.1.1",
 		"codecov": "3.0.0",
@@ -75,8 +71,6 @@
 		"cross-env": "3.2.4",
 		"cypress": "1.4.1",
 		"deep-freeze": "0.0.1",
-		"enzyme": "3.2.0",
-		"enzyme-adapter-react-16": "1.1.0",
 		"eslint": "4.16.0",
 		"eslint-config-wordpress": "2.0.0",
 		"eslint-plugin-jest": "21.5.0",
@@ -85,9 +79,6 @@
 		"expose-loader": "0.7.3",
 		"extract-text-webpack-plugin": "3.0.0",
 		"gettext-parser": "1.3.0",
-		"jest": "22.0.4",
-		"jest-enzyme": "4.0.2",
-		"jest-matcher-utils": "22.0.3",
 		"node-sass": "4.7.2",
 		"pegjs": "0.10.0",
 		"pegjs-loader": "0.5.4",
@@ -104,35 +95,39 @@
 		"webpack": "3.10.0",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
 	},
+	"babel": {
+		"presets": [
+			"@wordpress/default"
+		],
+		"env": {
+			"gettext": {
+				"plugins": [
+					[
+						"./i18n/babel-plugin",
+						{
+							"output": "languages/gutenberg.pot"
+						}
+					]
+				]
+			}
+		}
+	},
 	"jest": {
 		"collectCoverageFrom": [
 			"(blocks|components|date|editor|element|i18n|data|utils|edit-post)/**/*.js"
 		],
-		"coveragePathIgnorePatterns": [
-			"<rootDir>/[^/]+/build/index.js"
-		],
-		"coverageDirectory": "coverage",
 		"moduleNameMapper": {
-			"\\.(scss|css)$": "<rootDir>/test/unit/style-mock.js",
 			"@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils|edit-post)": "$1"
 		},
-		"modulePaths": [
-			"<rootDir>"
-		],
+		"preset": "@wordpress/jest-preset-default",
 		"setupFiles": [
-			"<rootDir>/test/unit/setup-globals.js",
+			"<rootDir>/test/unit/setup-blocks.js",
 			"<rootDir>/test/unit/setup-wp-aliases.js"
 		],
-		"setupTestFrameworkScriptFile": "<rootDir>/test/unit/setup-test-framework.js",
-		"testMatch": [
-			"<rootDir>/(blocks|components|date|editor|element|i18n|data|utils|edit-post)/**/test/*.js"
-		],
-		"timers": "fake",
 		"transform": {
 			"^.+\\.jsx?$": "babel-jest",
 			"\\.pegjs$": "<rootDir>/test/unit/pegjs-transform.js"
-		},
-		"verbose": true
+		}
 	},
 	"scripts": {
 		"prebuild": "check-node-version --package",
@@ -151,12 +146,12 @@
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"package-plugin": "./bin/build-plugin-zip.sh",
-		"test-unit": "jest",
+		"test-unit": "wp-scripts test",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
 		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit",
-		"test-unit:coverage": "jest --coverage",
-		"test-unit:coverage-ci": "jest --coverage --maxWorkers 1 && codecov",
-		"test-unit:watch": "jest --watch",
+		"test-unit:coverage": "npm run test-unit -- --coverage",
+		"test-unit:coverage-ci": "npm run test-unit -- --coverage --maxWorkers 1 && codecov",
+		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-e2e": "cypress run --browser chrome",
 		"test-e2e:watch": "cypress open"
 	}
