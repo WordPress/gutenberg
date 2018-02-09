@@ -32,7 +32,7 @@ export function registerPlugin( id, activate, settings ) {
  * @param {string} id Plugin identifier.
  * @return {boolean} Whether the pluginId is valid.
  */
-function validatePluginId( id ) {
+export function validatePluginId( id ) {
 	if ( typeof id !== 'string' ) {
 		console.error(
 			'Plugin identifier must be a string.'

@@ -9,7 +9,7 @@
  */
 import { applyFilters } from '@wordpress/hooks';
 import { isString } from 'util';
-import { activatePlugin } from './plugins-core';
+import { activatePlugin, validatePluginId } from './plugins-core';
 
 const menuItems = {};
 
@@ -32,13 +32,7 @@ export function registerEditorMenuItem( menuItemId, settings ) {
 		...settings,
 	};
 
-	if ( typeof name !== 'string' ) {
-		console.error(
-			'Ellipsis menu items names must be strings.'
-		);
-		return null;
-	}
-	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( menuItemId ) ) {
+	if ( ! validatePluginId( menuItemId ) ) {
 		console.error(
 			'Ellipsis menu item names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-sidebar'
 		);
