@@ -5,11 +5,11 @@ const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const { reduce, escapeRegExp, castArray, get } = require( 'lodash' );
-const { basename, dirname } = require( 'path' );
+const { basename } = require( 'path' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './[dir]/build/style.css',
+	filename: './[basename]/build/style.css',
 } );
 
 // CSS loader for styles specific to block editing.
@@ -130,7 +130,7 @@ const config = {
 		entryPointNames.reduce( ( memo, entryPoint ) => {
 			entryPoint = castArray( entryPoint );
 			const [ name, path = name ] = entryPoint;
-			memo[ name ] = `./${ path }/index.js`;
+			memo[ name ] = `./${ path }`;
 			return memo;
 		}, {} ),
 		packageNames.reduce( ( memo, packageName ) => {
@@ -139,7 +139,7 @@ const config = {
 		}, {} )
 	),
 	output: {
-		filename: '[dir]/build/index.js',
+		filename: '[basename]/build/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
@@ -202,10 +202,10 @@ const config = {
 			debug: process.env.NODE_ENV !== 'production',
 		} ),
 		new CustomTemplatedPathPlugin( {
-			dir( path, data ) {
-				const request = get( data, [ 'chunk', 'entryModule', 'request' ] );
-				if ( request ) {
-					return basename( dirname( request ) );
+			basename( path, data ) {
+				const rawRequest = get( data, [ 'chunk', 'entryModule', 'rawRequest' ] );
+				if ( rawRequest ) {
+					return basename( rawRequest );
 				}
 
 				return path;
