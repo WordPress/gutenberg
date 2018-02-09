@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -10,8 +15,8 @@ class MenuItem extends Component {
 		const { children, item } = this.props;
 
 		return (
-			<li>
-				<a href={ item.url } target="_blank">
+			<li className={ classnames( item.classes ) }>
+				<a title={ item.title } rel={ item.xfn } href={ item.url } target="_blank">
 					{ decodeEntities( item.title.trim() ) || __( '(Untitled)' ) }
 				</a>
 				{ children }
