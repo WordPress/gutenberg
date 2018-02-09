@@ -13,6 +13,7 @@ import {
 	find,
 	defer,
 	noop,
+	throttle,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import 'element-closest';
@@ -92,6 +93,7 @@ export class RichText extends Component {
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
+		this.throttledOnChange = throttle( this.onChange.bind( this ), 500 );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -149,7 +151,7 @@ export class RichText extends Component {
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
-		editor.on( 'input', this.onChange );
+		editor.on( 'input', this.throttledOnChange );
 
 		patterns.apply( this, [ editor ] );
 
