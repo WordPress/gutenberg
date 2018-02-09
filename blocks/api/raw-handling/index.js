@@ -25,6 +25,7 @@ import inlineContentConverter from './inline-content-converter';
 import embeddedContentReducer from './embedded-content-reducer';
 import { deepFilterHTML, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
 import shortcodeConverter from './shortcode-converter';
+import slackMarkdownVariantCorrector from './slack-markdown-variant-corrector';
 
 /**
  * Converts an HTML string to known blocks. Strips everything else.
@@ -57,6 +58,10 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 
 		converter.setOption( 'noHeaderId', true );
 		converter.setOption( 'tables', true );
+		converter.setOption( 'omitExtraWLInCodeBlocks', true );
+		converter.setOption( 'simpleLineBreaks', true );
+
+		plainText = slackMarkdownVariantCorrector( plainText );
 
 		HTML = converter.makeHtml( plainText );
 
