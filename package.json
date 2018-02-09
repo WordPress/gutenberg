@@ -5,9 +5,6 @@
 		"npm": ">=5.0.0"
 	},
 	"devDependencies": {
-		"@wordpress/browserslist-config": "^2.0.0",
-		"@wordpress/jest-console": "^1.0.3",
-		"@wordpress/jest-preset-default": "^1.0.1",
 		"babel-core": "^6.26.0",
 		"chalk": "^2.0.1",
 		"check-node-version": "^3.1.1",
@@ -17,18 +14,21 @@
 		"mkdirp": "^0.5.1",
 		"rimraf": "^2.6.1"
 	},
+	"babel": {
+		"presets": "@wordpress/default"
+	},
 	"jest": {
 		"collectCoverageFrom": [
 			"packages/*/**/*.js"
 		],
-		"preset": "./node_modules/@wordpress/jest-preset-default/jest-preset.json"
+		"preset": "@wordpress/jest-preset-default"
 	},
 	"scripts": {
 		"build-clean": "rimraf ./packages/*/build ./packages/*/build-module",
 		"prebuild": "check-node-version --package",
 		"build": "node ./scripts/build.js",
-		"postinstall": "lerna bootstrap --hoist && npm run build",
-		"test": "./packages/scripts/bin/wp-scripts.js test",
+		"postinstall": "lerna bootstrap --hoist && ./scripts/create-symlinks.sh && npm run build",
+		"test": "wp-scripts test",
 		"test:coverage": "npm run test -- --coverage",
 		"test:coverage-ci": "npm run test -- --coverage && codecov",
 		"test:watch": "npm run test -- --watch",
