@@ -41,6 +41,7 @@ import * as table from './table';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as tagCloud from './tag-cloud';
 
 export const registerCoreBlocks = () => {
 	[
@@ -79,6 +80,7 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
+		tagCloud,
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );
