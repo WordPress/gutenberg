@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { FormToggle, withInstanceId } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -15,19 +15,15 @@ import { FormToggle, withInstanceId } from '@wordpress/components';
 import { getEditedPostAttribute } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
-function PostPingbacks( { pingStatus = 'open', instanceId, ...props } ) {
+function PostPingbacks( { pingStatus = 'open', ...props } ) {
 	const onTogglePingback = () => props.editPost( { ping_status: pingStatus === 'open' ? 'closed' : 'open' } );
 
-	const pingbacksToggleId = 'allow-pingbacks-toggle-' + instanceId;
-
 	return [
-		<label key="label" htmlFor={ pingbacksToggleId }>{ __( 'Allow Pingbacks & Trackbacks' ) }</label>,
-		<FormToggle
-			key="toggle"
+		<ToggleControl
+			label={ __( 'Allow Pingbacks & Trackbacks' ) }
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }
 			showHint={ false }
-			id={ pingbacksToggleId }
 		/>,
 	];
 }
@@ -41,5 +37,4 @@ export default connect(
 	{
 		editPost,
 	}
-)( withInstanceId( PostPingbacks ) );
-
+)( PostPingbacks );

@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { FormToggle, withInstanceId } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 
 /**
@@ -17,8 +17,7 @@ import PostPendingStatusCheck from './check';
 import { getEditedPostAttribute } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
-export function PostPendingStatus( { instanceId, status, onUpdateStatus } ) {
-	const pendingId = 'pending-toggle-' + instanceId;
+export function PostPendingStatus( { status, onUpdateStatus } ) {
 	const togglePendingStatus = () => {
 		const updatedStatus = status === 'pending' ? 'draft' : 'pending';
 		onUpdateStatus( updatedStatus );
@@ -26,9 +25,8 @@ export function PostPendingStatus( { instanceId, status, onUpdateStatus } ) {
 
 	return (
 		<PostPendingStatusCheck>
-			<label htmlFor={ pendingId }>{ __( 'Pending Review' ) }</label>
-			<FormToggle
-				id={ pendingId }
+			<ToggleControl
+				label={ __( 'Pending Review' ) }
 				checked={ status === 'pending' }
 				onChange={ togglePendingStatus }
 				showHint={ false }
@@ -50,5 +48,4 @@ const applyConnect = connect(
 
 export default compose(
 	applyConnect,
-	withInstanceId
 )( PostPendingStatus );

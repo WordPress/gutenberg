@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { FormToggle, withInstanceId } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -15,21 +15,17 @@ import { FormToggle, withInstanceId } from '@wordpress/components';
 import { getEditedPostAttribute } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
-function PostComments( { commentStatus = 'open', instanceId, ...props } ) {
+function PostComments( { commentStatus = 'open', ...props } ) {
 	const onToggleComments = () => props.editPost( { comment_status: commentStatus === 'open' ? 'closed' : 'open' } );
 
-	const commentsToggleId = 'allow-comments-toggle-' + instanceId;
-
-	return [
-		<label key="label" htmlFor={ commentsToggleId }>{ __( 'Allow Comments' ) }</label>,
-		<FormToggle
-			key="toggle"
+	return (
+		<ToggleControl
+			label={ __( 'Allow Comments' ) }
 			checked={ commentStatus === 'open' }
 			onChange={ onToggleComments }
 			showHint={ false }
-			id={ commentsToggleId }
-		/>,
-	];
+		/>
+	);
 }
 
 export default connect(
@@ -41,5 +37,5 @@ export default connect(
 	{
 		editPost,
 	}
-)( withInstanceId( PostComments ) );
+)( PostComments );
 
