@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ExternalLink, withInstanceId } from '@wordpress/components';
+import { ExternalLink, TextareaControl } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -16,17 +16,13 @@ import './style.scss';
 import { getEditedPostExcerpt } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
-function PostExcerpt( { excerpt, onUpdateExcerpt, instanceId } ) {
-	const id = `editor-post-excerpt-${ instanceId }`;
-	const onChange = ( event ) => onUpdateExcerpt( event.target.value );
-
+function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	return (
-		<div>
-			<label key="label" htmlFor={ id }>{ __( 'Write an excerpt (optional)' ) }</label>
-			<textarea
-				id={ id }
+		<div class="editor-post-excerpt">
+			<TextareaControl
+				label={ __( 'Write an excerpt (optional)' ) }
 				className="editor-post-excerpt__textarea"
-				onChange={ onChange }
+				onChange={ ( value ) => onUpdateExcerpt( value ) }
 				value={ excerpt }
 			/>
 			<ExternalLink href="https://codex.wordpress.org/Excerpt">
@@ -47,4 +43,4 @@ export default connect(
 			return editPost( { excerpt } );
 		},
 	}
-)( withInstanceId( PostExcerpt ) );
+)( PostExcerpt );
