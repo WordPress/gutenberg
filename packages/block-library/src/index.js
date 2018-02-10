@@ -47,6 +47,7 @@ import * as template from './template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as tagCloud from './tag-cloud';
 
 import * as classic from './classic';
 
@@ -94,11 +95,8 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
-	].forEach( ( block ) => {
-		if ( ! block ) {
-			return;
-		}
-		const { name, settings } = block;
+		tagCloud,
+	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );
 
