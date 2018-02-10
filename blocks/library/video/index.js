@@ -7,12 +7,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Placeholder, Toolbar, IconButton, Button, withState } from '@wordpress/components';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
+import { createBlock } from '../../api';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
@@ -22,6 +24,8 @@ const enhance = withState( ( props ) => ( {
 	editing: ! props.attributes.src,
 	src: props.attributes.src,
 	className: props.className,
+	hasError: false,
+	hasDismissedError: false,
 } ) );
 
 export const name = 'core/video';
@@ -67,10 +71,14 @@ export const settings = {
 		editing,
 		src,
 		className,
+		hasError,
+		hasDismissedError,
 		setState,
-		// Provided by parent:
+		// Provided by editor:
 		...props
 	} ) => {
+		console.log( 'Rendering' );
+
 		const { align, caption, id } = props.attributes;
 		const { setAttributes, isSelected } = props;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -95,6 +103,40 @@ export const settings = {
 			return false;
 		};
 
+		const convertToEmbed = () => {
+			const { onReplace } = props;
+			if ( ! src ) {
+				return;
+			}
+			onReplace( createBlock( 'core/embed', { url: src } ) );
+		};
+
+		const tryEmbed = () => {
+			if ( ! src ) {
+				return;
+			}
+
+			const apiURL = addQueryArgs( wpApiSettings.root + 'oembed/1.0/proxy', {
+				url: src,
+				_wpnonce: wpApiSettings.nonce,
+			} );
+
+			console.log( 'tryEmbed; querying' );
+			window.fetch( apiURL, { credentials: 'include' } ).then(
+				( response ) => {
+					response.json().then( ( obj ) => {
+						if ( obj.type ) {
+							console.log( 'Embed found!' );
+							convertToEmbed();
+						} else {
+							console.log( 'No embed…' );
+							setState( { hasError } );
+						}
+					} );
+				}
+			);
+		};
+
 		const controls = isSelected && (
 			<BlockControls key="controls">
 				<BlockAlignmentToolbar
@@ -111,6 +153,29 @@ export const settings = {
 				</Toolbar>
 			</BlockControls>
 		);
+
+		if ( hasError && ! hasDismissedError ) {
+			return [
+				controls,
+				<Placeholder
+					key="placeholder"
+					icon="media-video"
+					label={ __( 'Error' ) }
+					instructions={ __( 'Fix it?' ) }
+					className={ className }>
+					<Button
+						isLarge
+						onClick={ convertToEmbed }>
+						{ __( 'Fix it' ) }
+					</Button>
+					<Button
+						isLarge
+						onClick={ () => setState( { hasDismissedError: true } ) }>
+						{ __( 'Ignore' ) }
+					</Button>
+				</Placeholder>,
+			];
+		}
 
 		if ( editing ) {
 			return [
@@ -152,7 +217,7 @@ export const settings = {
 		return [
 			controls,
 			<figure key="video" className={ className }>
-				<video controls src={ src } />
+				<video controls src={ src } onError={ tryEmbed } />
 				{ ( ( caption && caption.length ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
