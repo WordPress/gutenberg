@@ -33,7 +33,7 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
-import NoBlocks from '../no-blocks';
+import NoBlocks from './no-blocks';
 
 import { getInserterItems, getRecentInserterItems } from '../../store/selectors';
 import { fetchReusableBlocks } from '../../store/actions';
