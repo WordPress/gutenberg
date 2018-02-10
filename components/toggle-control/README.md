@@ -48,3 +48,9 @@ A function that receives the checked state (boolean) as input.
 - Type: `function`
 - Required: Yes
 
+### showHint
+
+If set to false the On/Off hint text will not appear alongside the toggle control. Default is true.
+
+- Type: `Boolean`
+- Required: No
