@@ -29,4 +29,14 @@ export default withState( {
 } )( MyCounter );
 ```
 
-`withState` optionally accepts an object argument to define the initial state. It returns a function which can then be used in composing your component.
+`withState` optionally accepts an object argument to define the initial state. Instead of an object, it also accept a function which will be called with parent props; its return value will be used as the initial state. It returns a function which can then be used in composing your component.
+
+An alternative example with a function as the initial state resolver:
+
+```js
+const applyWithState = withState( ( props ) => ( {
+	count: props.initialCount,
+} ) );
+
+export default applyWithState( MyCounter );
+```
