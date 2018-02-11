@@ -20,6 +20,7 @@ function PostPingbacks( { pingStatus = 'open', ...props } ) {
 
 	return [
 		<ToggleControl
+			key="toggle"
 			label={ __( 'Allow Pingbacks & Trackbacks' ) }
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }

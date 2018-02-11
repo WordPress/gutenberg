@@ -21,6 +21,7 @@ export function PostSticky( { onUpdateSticky, postSticky = false } ) {
 	return (
 		<PostStickyCheck>
 			<ToggleControl
+				key="toggle"
 				label={ __( 'Stick to the Front Page' ) }
 				checked={ postSticky }
 				onChange={ () => onUpdateSticky( ! postSticky ) }
