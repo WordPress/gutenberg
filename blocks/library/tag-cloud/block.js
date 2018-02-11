@@ -14,6 +14,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import InspectorControls from '../../inspector-controls';
+import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 class TagCloudBlock extends Component {
 	constructor() {
@@ -52,8 +54,8 @@ class TagCloudBlock extends Component {
 	}
 
 	render() {
-		const { attributes, focus } = this.props;
-		const { taxonomy, showTagCounts } = attributes;
+		const { attributes, focus, setAttributes } = this.props;
+		const { taxonomy, showTagCounts, align } = attributes;
 		const taxonomies = this.getTaxonomies();
 		const options = [
 			{
@@ -99,6 +101,17 @@ class TagCloudBlock extends Component {
 
 		return [
 			inspectorControls,
+			focus && (
+				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+						controls={ [ 'left', 'center', 'right', 'full' ] }
+					/>
+				</BlockControls>
+			),
 			taxonomy,
 		];
 	}

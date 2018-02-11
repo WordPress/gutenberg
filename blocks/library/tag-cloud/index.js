@@ -27,6 +27,9 @@ export const settings = {
 		taxonomy: {
 			type: 'string',
 		},
+		align: {
+			type: 'string',
+		},
 	},
 
 	supports: {

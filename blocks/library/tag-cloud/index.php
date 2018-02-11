@@ -13,8 +13,13 @@
  * @return string Returns the tag cloud for selected taxonomy.
  */
 function gutenberg_render_block_core_tag_cloud( $attributes ) {
+	$align = 'center';
+	if ( isset( $attributes['align'] ) && in_array( $attributes['align'], array( 'left', 'right', 'full' ), true ) ) {
+		$align = $attributes['align'];
+	}
+
 	$wrapper_markup = '<p class="%1$s">%2$s</p>';
-	$class = "wp-block-tag-cloud";
+	$class = "wp-block-tag-cloud align{$align}";
 
 	$args = array(
 		'echo'       => false,
