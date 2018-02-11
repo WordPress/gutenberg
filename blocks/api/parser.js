@@ -84,7 +84,7 @@ export function matcherFromSource( sourceConfig ) {
 			return query( sourceConfig.selector, subMatchers );
 		default:
 			// eslint-disable-next-line no-console
-			console.error( `Unkown source type "${ sourceConfig.source }"` );
+			console.error( `Unknown source type "${ sourceConfig.source }"` );
 	}
 }
 
