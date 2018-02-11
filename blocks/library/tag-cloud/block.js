@@ -7,7 +7,7 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { ToggleControl, SelectControl, withAPIData } from '@wordpress/components';
+import { Placeholder, ToggleControl, SelectControl, withAPIData } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -55,13 +55,21 @@ class TagCloudBlock extends Component {
 		const { attributes, focus } = this.props;
 		const { taxonomy, showTagCounts } = attributes;
 		const taxonomies = this.getTaxonomies();
+		const options = [
+			{
+				label: __( '- Select -' ),
+				value: '',
+			},
+			...taxonomies,
+		];
 
 		const inspectorControls = focus && (
 			<InspectorControls key="inspector">
 				<h3>{ __( 'Tag Cloud Settings' ) }</h3>
 				<SelectControl
 					label={ __( 'Taxonomy' ) }
-					options={ taxonomies }
+					options={ options }
+					value={ taxonomy }
 					onChange={ this.setTaxonomy }
 				/>
 				<ToggleControl
@@ -75,7 +83,17 @@ class TagCloudBlock extends Component {
 		if ( ! taxonomy ) {
 			return [
 				inspectorControls,
-				'Taxonomy not selected...',
+				<Placeholder
+					key="placeholder"
+					icon="tag"
+					label={ __( 'Tag Cloud' ) }
+					instructions={ __( 'Select a Taxonomy' ) }
+				>
+					<SelectControl
+						options={ options }
+						onChange={ this.setTaxonomy }
+					/>
+				</Placeholder>,
 			];
 		}
 
