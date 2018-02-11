@@ -32,7 +32,7 @@ class TagCloudBlock extends Component {
 
 		return map( taxonomies, taxonomy => {
 			return {
-				value: taxonomy.rest_base,
+				value: taxonomy.slug,
 				label: taxonomy.name,
 			};
 		} );
