@@ -18,7 +18,7 @@ import { editPost } from '../../store/actions';
 
 function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	return (
-		<div class="editor-post-excerpt">
+		<div className="editor-post-excerpt">
 			<TextareaControl
 				label={ __( 'Write an excerpt (optional)' ) }
 				className="editor-post-excerpt__textarea"
