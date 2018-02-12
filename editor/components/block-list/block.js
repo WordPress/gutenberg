@@ -459,6 +459,10 @@ export class BlockListBlock extends Component {
 			rootUID,
 			layout,
 			renderBlockMenu,
+			isHovered,
+			isSelected,
+			isMultiSelected,
+			isFirstMultiSelected,
 		} = this.props;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
@@ -467,13 +471,13 @@ export class BlockListBlock extends Component {
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content.
 
-		// Generate the wrapper class names handling the different states of the block.
-		const { isHovered, isSelected, isMultiSelected, isFirstMultiSelected } = this.props;
-
 		// If the block is selected and we're typing we hide the sidebar
 		// unless the selection is not collapsed.
+		const showSideInserter = ( isSelected || isHovered ) && isUnmodifiedDefaultBlock( block );
 		const showUI = isSelected && ( ! this.props.isTyping || ! this.state.isSelectionCollapsed );
 		const { error } = this.state;
+
+		// Generate the wrapper class names handling the different states of the block.
 		const wrapperClassName = classnames( 'editor-block-list__block', {
 			'has-warning': ! isValid || !! error,
 			'is-selected': showUI,
@@ -587,7 +591,7 @@ export class BlockListBlock extends Component {
 					rootUID={ rootUID }
 					layout={ layout }
 				/>
-				{ ( showUI || isHovered ) && isUnmodifiedDefaultBlock( block ) && (
+				{ showSideInserter && (
 					<div className="editor-block-list__side-inserter">
 						<InserterWithShortcuts uid={ block.uid } layout={ layout } onToggle={ this.selectOnOpen } />
 					</div>
