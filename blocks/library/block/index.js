@@ -99,6 +99,7 @@ class ReusableBlockEdit extends Component {
 		let element = (
 			<BlockEdit
 				{ ...this.props }
+				id={ reusableBlock.uid }
 				name={ reusableBlock.type }
 				isSelected={ isEditing && isSelected }
 				attributes={ reusableBlockAttributes }
