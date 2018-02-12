@@ -26,9 +26,7 @@ const {
 	getCurrentPostLastRevisionId,
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
-	getCurrentPostSlug,
 	getPostEdits,
-	getEditedPostTitle,
 	getDocumentTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
@@ -42,6 +40,7 @@ const {
 	getBlockCount,
 	getSelectedBlock,
 	getBlockRootUID,
+	getEditedPostAttribute,
 	getMultiSelectedBlockUids,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
@@ -374,13 +373,13 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getCurrentPostSlug', () => {
+	describe( 'getEditedPostAttribute', () => {
 		it( 'should return the current post\'s slug if no edits have been made', () => {
 			const state = {
 				currentPost: { slug: 'post slug' },
 			};
 
-			expect( getCurrentPostSlug( state ) ).toBe( 'post slug' );
+			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'post slug' );
 		} );
 
 		it( 'should return the latest slug if edits have been made to the post', () => {
@@ -395,7 +394,37 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getCurrentPostSlug( state ) ).toBe( 'new slug' );
+			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'new slug' );
+		} );
+
+		it( 'should return the post saved title if the title is not edited', () => {
+			const state = {
+				currentPost: {
+					title: 'sassel',
+				},
+				editor: {
+					present: {
+						edits: { status: 'private' },
+					},
+				},
+			};
+
+			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'sassel' );
+		} );
+
+		it( 'should return the edited title', () => {
+			const state = {
+				currentPost: {
+					title: 'sassel',
+				},
+				editor: {
+					present: {
+						edits: { title: 'youcha' },
+					},
+				},
+			};
+
+			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'youcha' );
 		} );
 	} );
 
@@ -466,38 +495,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPostEdits( state ) ).toEqual( { title: 'terga' } );
-		} );
-	} );
-
-	describe( 'getEditedPostTitle', () => {
-		it( 'should return the post saved title if the title is not edited', () => {
-			const state = {
-				currentPost: {
-					title: 'sassel',
-				},
-				editor: {
-					present: {
-						edits: { status: 'private' },
-					},
-				},
-			};
-
-			expect( getEditedPostTitle( state ) ).toBe( 'sassel' );
-		} );
-
-		it( 'should return the edited title', () => {
-			const state = {
-				currentPost: {
-					title: 'sassel',
-				},
-				editor: {
-					present: {
-						edits: { title: 'youcha' },
-					},
-				},
-			};
-
-			expect( getEditedPostTitle( state ) ).toBe( 'youcha' );
 		} );
 	} );
 

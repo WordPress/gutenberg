@@ -292,7 +292,7 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostExcerpt( state ) ||
-		!! getEditedPostAttribute( state, 'content' )
+		!! getEditedPostContent( state )
 	);
 }
 
