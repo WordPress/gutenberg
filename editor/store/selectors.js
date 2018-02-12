@@ -1223,7 +1223,7 @@ export function getRecentInserterItems( state, enabledBlockTypes = true, maximum
 }
 
 /**
- * Determines the items that appear in the inserter with shortcodes based on the block usage
+ * Determines the items that appear in the inserter with shortcuts based on the block usage
  *
  * @param {Object}           state             Global application state.
  * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
@@ -1231,7 +1231,7 @@ export function getRecentInserterItems( state, enabledBlockTypes = true, maximum
  *
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
-export function getMostFrequentlyUsedBlocks( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
+export function getFrequentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
 	const sortedInserts = values( state.preferences.insertUsage )
 		.sort( ( a, b ) => b.count - a.count )
 		.map( ( { insert } ) => insert );

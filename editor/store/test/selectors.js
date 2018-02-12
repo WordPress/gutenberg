@@ -75,7 +75,7 @@ const {
 	isPublishingPost,
 	getInserterItems,
 	getRecentInserterItems,
-	getMostFrequentlyUsedBlocks,
+	getFrequentInserterItems,
 	POST_UPDATE_TRANSACTION_ID,
 } = selectors;
 
@@ -2200,7 +2200,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getMostFrequentlyUsedBlocks', () => {
+	describe( 'getFrequentInserterItems', () => {
 		beforeAll( () => {
 			registerCoreBlocks();
 		} );
@@ -2228,7 +2228,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getMostFrequentlyUsedBlocks( state, true, 3 ) ).toMatchObject( [
+			expect( getFrequentInserterItems( state, true, 3 ) ).toMatchObject( [
 				{ name: 'core/block', initialAttributes: { ref: 123 } },
 				{ name: 'core/image', initialAttributes: {} },
 				{ name: 'core/paragraph', initialAttributes: {} },
@@ -2249,8 +2249,8 @@ describe( 'selectors', () => {
 				},
 			};
 
-			// We should get back 8 items with no duplicates
-			const items = getMostFrequentlyUsedBlocks( state, true, 4 );
+			// We should get back 4 items with no duplicates
+			const items = getFrequentInserterItems( state, true, 4 );
 			const blockNames = items.map( item => item.name );
 			expect( union( blockNames ) ).toHaveLength( 4 );
 		} );

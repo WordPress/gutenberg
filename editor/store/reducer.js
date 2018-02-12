@@ -621,10 +621,6 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					insert.ref = block.attributes.ref;
 					id += '/' + block.attributes.ref;
 				}
-				const usage = prevState.insertUsage[ id ] ?
-					{ ...prevState.insertUsage[ id ] } :
-					{ count: 0, insert };
-				usage.count = usage.count + 1;
 
 				const isSameAsInsert = ( { name, ref } ) => name === insert.name && ref === insert.ref;
 
@@ -636,7 +632,10 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					],
 					insertUsage: {
 						...prevState.insertUsage,
-						[ id ]: usage,
+						[ id ]: {
+							count: prevState.insertUsage[ id ] ? prevState.insertUsage[ id ].count + 1 : 1,
+							insert,
+						},
 					},
 				};
 			}, state );

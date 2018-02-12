@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { filter } from 'lodash';
+import { filter, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import './style.scss';
 import Inserter from '../inserter';
-import { getMostFrequentlyUsedBlocks } from '../../store/selectors';
+import { getFrequentInserterItems } from '../../store/selectors';
 import { replaceBlocks } from '../../store/actions';
 
 function InserterWithShortcuts( { items, isLocked, onToggle, onInsert } ) {
@@ -25,9 +25,9 @@ function InserterWithShortcuts( { items, isLocked, onToggle, onInsert } ) {
 		return null;
 	}
 
-	const itemsWithTheDefaultBlock =
-		filter( items, ( item ) => item.name !== getDefaultBlockName() || ! item.initialAttributes )
-			.slice( 0, 2 );
+	const itemsWithoutDefaultBlock = filter( items, ( item ) =>
+		item.name !== getDefaultBlockName() || ! isEmpty( item.initialAttributes )
+	).slice( 0, 2 );
 
 	return (
 		<div className="editor-inserter-with-shortcuts">
@@ -36,7 +36,7 @@ function InserterWithShortcuts( { items, isLocked, onToggle, onInsert } ) {
 				onToggle={ onToggle }
 			/>
 
-			{ itemsWithTheDefaultBlock.map( ( item ) => (
+			{ itemsWithoutDefaultBlock.map( ( item ) => (
 				<IconButton
 					key={ item.id }
 					className="editor-inserter-with-shortcuts__block"
@@ -54,9 +54,17 @@ function InserterWithShortcuts( { items, isLocked, onToggle, onInsert } ) {
 }
 
 export default compose(
+	withContext( 'editor' )( ( settings ) => {
+		const { templateLock, blockTypes } = settings;
+
+		return {
+			isLocked: !! templateLock,
+			enabledBlockTypes: blockTypes,
+		};
+	} ),
 	connect(
-		( state ) => ( {
-			items: getMostFrequentlyUsedBlocks( state, true, 3 ),
+		( state, { enabledBlockTypes } ) => ( {
+			items: getFrequentInserterItems( state, enabledBlockTypes, 3 ),
 		} ),
 		( dispatch, { uid, layout } ) => ( {
 			onInsert( { name, initialAttributes } ) {
@@ -65,11 +73,4 @@ export default compose(
 			},
 		} )
 	),
-	withContext( 'editor' )( ( settings ) => {
-		const { templateLock } = settings;
-
-		return {
-			isLocked: !! templateLock,
-		};
-	} ),
 )( InserterWithShortcuts );
