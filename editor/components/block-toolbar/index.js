@@ -16,22 +16,17 @@ import BlockSwitcher from '../block-switcher';
 import { getBlockMode, getSelectedBlock } from '../../store/selectors';
 
 function BlockToolbar( { block, mode } ) {
-	if ( ! block || ! block.isValid ) {
+	if ( ! block || ! block.isValid || mode !== 'visual' ) {
 		return null;
 	}
 
-	// Disable reason: Toolbar itself is non-interactive, but must capture
-	// bubbling events from children to determine focus shift intents.
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div className="editor-block-toolbar">
-			{ mode === 'visual' && [
-				<BlockSwitcher key="switcher" uids={ [ block.uid ] } />,
-				<Slot key="slot" name="Formatting.Toolbar" />,
-			] }
+			<BlockSwitcher uids={ [ block.uid ] } />
+			<Slot name="Block.Toolbar" />
+			<Slot name="Formatting.Toolbar" />
 		</div>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
 
 export default connect( ( state ) => {

@@ -9,13 +9,15 @@ import { Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
-import Editable from '../../editable';
+import { createBlock } from '../../api';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
 
-registerBlockType( 'core/heading', {
+export const name = 'core/heading';
+
+export const settings = {
 	title: __( 'Heading' ),
 
 	description: __( 'Search engines use the headings to index the structure and content of your web pages.' ),
@@ -99,11 +101,11 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter, onReplace } ) {
+	edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls
 					key="controls"
 					controls={
@@ -117,10 +119,10 @@ registerBlockType( 'core/heading', {
 					}
 				/>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<h3>{ __( 'Heading Settings' ) }</h3>
-					<p>{ __( 'Size' ) }</p>
+					<p>{ __( 'Level' ) }</p>
 					<Toolbar
 						controls={
 							'123456'.split( '' ).map( ( level ) => ( {
@@ -141,13 +143,11 @@ registerBlockType( 'core/heading', {
 					/>
 				</InspectorControls>
 			),
-			<Editable
+			<RichText
 				key="editable"
 				wrapperClassName="wp-block-heading"
 				tagName={ nodeName.toLowerCase() }
 				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
 				onSplit={
@@ -164,6 +164,7 @@ registerBlockType( 'core/heading', {
 				onRemove={ () => onReplace( [] ) }
 				style={ { textAlign: align } }
 				placeholder={ placeholder || __( 'Write heading…' ) }
+				isSelected={ isSelected }
 			/>,
 		];
 	},
@@ -178,4 +179,4 @@ registerBlockType( 'core/heading', {
 			</Tag>
 		);
 	},
-} );
+};

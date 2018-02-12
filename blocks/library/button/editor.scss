@@ -9,6 +9,10 @@
 }
 
 .wp-block-button {
+	display: inline-block;
+	margin-bottom: 0;
+	position: relative;
+
 	.blocks-format-toolbar__link-modal {
 		z-index: 2;
 		top: calc( 100% + 2px );
@@ -20,7 +24,7 @@
 		right: -35px;
 	}
 
-	.blocks-editable__tinymce {
+	.blocks-rich-text__tinymce {
 		cursor: text;
 	}
 }

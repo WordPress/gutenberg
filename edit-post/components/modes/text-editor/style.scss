@@ -1,0 +1,40 @@
+.edit-post-text-editor__body {
+	padding-top: 40px;
+
+	@include break-small() {
+		padding-top: 40px + $admin-bar-height-big;
+	}
+
+	@include break-medium() {
+		padding-top: 40px + $admin-bar-height;
+	}
+}
+
+// Use padding to center text in the textarea, this allows you to click anywhere to focus it
+.edit-post-text-editor {
+	padding-left: 20px;
+	padding-right: 20px;
+
+	@include break-large() {
+		padding-left: calc( 50% - #{ $text-editor-max-width / 2 } );
+		padding-right: calc( 50% - #{ $text-editor-max-width / 2 } );
+	}
+
+	.edit-post-post-text-editor__toolbar {
+		width: 100%;
+		max-width: $text-editor-max-width;
+		margin: 0 auto;
+	}
+
+	// Always show outlines in code editor
+	.editor-post-title div,
+	.editor-post-text-editor {
+		border: 1px solid $light-gray-500;
+	}
+
+	.editor-post-text-editor {
+		padding: $block-padding;
+		min-height: 200px;
+		line-height: 1.8;
+	}
+}

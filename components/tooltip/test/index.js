@@ -10,14 +10,9 @@ import Tooltip from '../';
 
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
-		// Disable reason: The Tooltip component leverages array return values
-		// from render, which is not available until React 16.x
-		//
-		// TODO: When on React 16.x, unskip test
-		//
-		// eslint-disable-next-line jest/no-disabled-tests
-		it.skip( 'should render children (abort) if multiple children passed', () => {
-			const wrapper = shallow(
+		it( 'should render children (abort) if multiple children passed', () => {
+			// Mount: Enzyme shallow does not support wrapping multiple nodes
+			const wrapper = mount(
 				<Tooltip><div /><div /></Tooltip>
 			);
 
@@ -40,7 +35,7 @@ describe( 'Tooltip', () => {
 			expect( popover.prop( 'isOpen' ) ).toBe( false );
 			expect( popover.prop( 'focusOnOpen' ) ).toBe( false );
 			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
-			expect( popover.children().text() ).toBe( 'Help Text' );
+			expect( popover.children().text() ).toBe( 'Help text' );
 		} );
 
 		it( 'should show popover on focus', () => {

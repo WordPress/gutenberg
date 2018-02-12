@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get } from 'lodash';
+import { find, get, compact } from 'lodash';
 import showdown from 'showdown';
 
 /**
@@ -17,27 +17,31 @@ import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
 import formattingTransformer from './formatting-transformer';
 import msListConverter from './ms-list-converter';
-import listMerger from './list-merger';
+import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
 import tableNormaliser from './table-normaliser';
 import inlineContentConverter from './inline-content-converter';
+import embeddedContentReducer from './embedded-content-reducer';
 import { deepFilterHTML, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
 import shortcodeConverter from './shortcode-converter';
+import slackMarkdownVariantCorrector from './slack-markdown-variant-corrector';
 
 /**
  * Converts an HTML string to known blocks. Strips everything else.
  *
- * @param  {String}       options.HTML        The HTML to convert.
- * @param  {String}       [options.plainText] Plain text version.
- * @param  {String}       [options.mode]      Handle content as blocks or inline content.
- *                                            * 'AUTO': Decide based on the content passed.
- *                                            * 'INLINE': Always handle as inline content, and return string.
- *                                            * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param  {Array}         [options.tagName]  The tag into which content will be inserted.
- * @return {Array|String}                     A list of blocks or a string, depending on `handlerMode`.
+ * @param {string}  [options.HTML]                     The HTML to convert.
+ * @param {string}  [options.plainText]                Plain text version.
+ * @param {string}  [options.mode]                     Handle content as blocks or inline content.
+ *                                                     * 'AUTO': Decide based on the content passed.
+ *                                                     * 'INLINE': Always handle as inline content, and return string.
+ *                                                     * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param {Array}   [options.tagName]                  The tag into which content will be inserted.
+ * @param {boolean} [options.canUserUseUnfilteredHTML] Whether or not to user can use unfiltered HTML.
+ *
+ * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName } ) {
+export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
@@ -46,16 +50,34 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 		return parseWithGrammar( HTML );
 	}
 
-	// If there is a plain text version, the HTML version has no formatting,
-	// and there is at least a double line break,
-	// parse any Markdown inside the plain text.
-	if ( plainText && isPlain( HTML ) && plainText.indexOf( '\n\n' ) !== -1 ) {
+	// Parse Markdown (and HTML) if:
+	// * There is a plain text version.
+	// * The HTML version has no formatting.
+	if ( plainText && isPlain( HTML ) ) {
 		const converter = new showdown.Converter();
 
 		converter.setOption( 'noHeaderId', true );
 		converter.setOption( 'tables', true );
+		converter.setOption( 'omitExtraWLInCodeBlocks', true );
+		converter.setOption( 'simpleLineBreaks', true );
+
+		plainText = slackMarkdownVariantCorrector( plainText );
 
 		HTML = converter.makeHtml( plainText );
+
+		// Switch to inline mode if:
+		// * The current mode is AUTO.
+		// * The original plain text had no line breaks.
+		// * The original plain text was not an HTML paragraph.
+		// * The converted text is just a paragraph.
+		if (
+			mode === 'AUTO' &&
+			plainText.indexOf( '\n' ) === -1 &&
+			plainText.indexOf( '<p>' ) !== 0 &&
+			HTML.indexOf( '<p>' ) === 0
+		) {
+			mode = 'INLINE';
+		}
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched shortcodes.
@@ -96,18 +118,20 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 			msListConverter,
 		] );
 
-		piece = deepFilterHTML( piece, [
-			listMerger,
+		piece = deepFilterHTML( piece, compact( [
+			listReducer,
 			imageCorrector,
 			// Add semantic formatting before attributes are stripped.
 			formattingTransformer,
 			stripAttributes,
 			commentRemover,
+			! canUserUseUnfilteredHTML && createUnwrapper( ( element ) => element.nodeName === 'IFRAME' ),
+			embeddedContentReducer,
 			createUnwrapper( isNotWhitelisted ),
 			blockquoteNormaliser,
 			tableNormaliser,
 			inlineContentConverter,
-		] );
+		] ) );
 
 		piece = deepFilterHTML( piece, [
 			createUnwrapper( isInvalidInline ),

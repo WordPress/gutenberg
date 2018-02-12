@@ -3,23 +3,26 @@
  */
 import { isEmpty, reduce, isObject, castArray, compact, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
+import isEqualShallow from 'is-equal-shallow';
 
 /**
  * WordPress dependencies
  */
-import { Component, createElement, renderToString, cloneElement, Children } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
+import { Component, cloneElement, renderToString } from '@wordpress/element';
+import { hasFilter, applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import BlockContentProvider from '../block-content-provider';
 
 /**
- * Returns the block's default classname from its name
+ * Returns the block's default classname from its name.
  *
- * @param {String}   blockName  The block name
- * @return {string}             The block's default class
+ * @param {string} blockName The block name.
+ *
+ * @return {string} The block's default class.
  */
 export function getBlockDefaultClassname( blockName ) {
 	// Drop common prefixes: 'core/' or 'core-' (in 'core-embed/')
@@ -30,58 +33,73 @@ export function getBlockDefaultClassname( blockName ) {
  * Given a block type containg a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {Object|string}     Save content
+ * @param {Object} blockType   Block type.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
+ *
+ * @return {Object|string} Save element or raw HTML string.
  */
-export function getSaveElement( blockType, attributes ) {
-	const { save } = blockType;
+export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
+	let { save } = blockType;
 
-	let saveElement;
-
+	// Component classes are unsupported for save since serialization must
+	// occur synchronously. For improved interoperability with higher-order
+	// components which often return component class, emulate basic support.
 	if ( save.prototype instanceof Component ) {
-		saveElement = createElement( save, { attributes } );
-	} else {
-		saveElement = save( { attributes } );
+		const instance = new save( { attributes } );
+		save = instance.render.bind( instance );
+	}
 
-		// Special-case function render implementation to allow raw HTML return
-		if ( 'string' === typeof saveElement ) {
-			return saveElement;
+	let element = save( { attributes, innerBlocks } );
+
+	if ( isObject( element ) && hasFilter( 'blocks.getSaveContent.extraProps' ) ) {
+		/**
+		 * Filters the props applied to the block save result element.
+		 *
+		 * @param {Object}      props      Props applied to save element.
+		 * @param {WPBlockType} blockType  Block type definition.
+		 * @param {Object}      attributes Block attributes.
+		 */
+		const props = applyFilters(
+			'blocks.getSaveContent.extraProps',
+			{ ...element.props },
+			blockType,
+			attributes
+		);
+
+		if ( ! isEqualShallow( props, element.props ) ) {
+			element = cloneElement( element, props );
 		}
 	}
 
-	const addExtraContainerProps = ( element ) => {
-		if ( ! element || ! isObject( element ) ) {
-			return element;
-		}
+	/**
+	 * Filters the save result of a block during serialization.
+	 *
+	 * @param {WPElement}   element    Block save result.
+	 * @param {WPBlockType} blockType  Block type definition.
+	 * @param {Object}      attributes Block attributes.
+	 */
+	element = applyFilters( 'blocks.getSaveElement', element, blockType, attributes );
 
-		// Applying the filters adding extra props
-		const props = applyFilters( 'blocks.getSaveContent.extraProps', { ...element.props }, blockType, attributes );
-
-		return cloneElement( element, props );
-	};
-
-	return Children.map( saveElement, addExtraContainerProps );
+	return (
+		<BlockContentProvider innerBlocks={ innerBlocks }>
+			{ element }
+		</BlockContentProvider>
+	);
 }
 
 /**
  * Given a block type containg a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {string}            Save content
+ * @param {Object} blockType   Block type.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
+ *
+ * @return {string} Save content.
  */
-export function getSaveContent( blockType, attributes ) {
-	const saveElement = getSaveElement( blockType, attributes );
-
-	// Special-case function render implementation to allow raw HTML return
-	if ( 'string' === typeof saveElement ) {
-		return saveElement;
-	}
-
-	// Otherwise, infer as element
-	return renderToString( saveElement );
+export function getSaveContent( blockType, attributes, innerBlocks ) {
+	return renderToString( getSaveElement( blockType, attributes, innerBlocks ) );
 }
 
 /**
@@ -95,9 +113,10 @@ export function getSaveContent( blockType, attributes ) {
  * This function returns only those attributes which are needed to persist and
  * which cannot be matched from the block content.
  *
- * @param   {Object<String,*>} allAttributes Attributes from in-memory block data
- * @param   {Object<String,*>} blockType     Block type
- * @returns {Object<String,*>}               Subset of attributes for comment serialization
+ * @param {Object<string,*>} allAttributes Attributes from in-memory block data.
+ * @param {Object<string,*>} blockType     Block type.
+ *
+ * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
 export function getCommentAttributes( allAttributes, blockType ) {
 	const attributes = reduce( blockType.attributes, ( result, attributeSchema, key ) => {
@@ -139,8 +158,9 @@ export function serializeAttributes( attrs ) {
  * Returns HTML markup processed by a markup beautifier configured for use in
  * block serialization.
  *
- * @param  {String} content Original HTML
- * @return {String}         Beautiful HTML
+ * @param {string} content Original HTML.
+ *
+ * @return {string} Beautiful HTML.
  */
 export function getBeautifulContent( content ) {
 	return beautifyHtml( content, {
@@ -150,19 +170,24 @@ export function getBeautifulContent( content ) {
 }
 
 /**
- * Given a block object, returns the Block's Inner HTML markup
- * @param  {Object} block Block Object
- * @return {String}       HTML
+ * Given a block object, returns the Block's Inner HTML markup.
+ *
+ * @param {Object} block Block Object.
+ *
+ * @return {string} HTML.
  */
 export function getBlockContent( block ) {
 	const blockType = getBlockType( block.name );
 
 	// If block was parsed as invalid or encounters an error while generating
-	// save content, use original content instead to avoid content loss.
+	// save content, use original content instead to avoid content loss. If a
+	// block contains nested content, exempt it from this condition because we
+	// otherwise have no access to its original content and content loss would
+	// still occur.
 	let saveContent = block.originalContent;
-	if ( block.isValid ) {
+	if ( block.isValid || block.innerBlocks.length ) {
 		try {
-			saveContent = getSaveContent( blockType, block.attributes );
+			saveContent = getSaveContent( blockType, block.attributes, block.innerBlocks );
 		} catch ( error ) {}
 	}
 
@@ -172,10 +197,11 @@ export function getBlockContent( block ) {
 /**
  * Returns the content of a block, including comment delimiters.
  *
- * @param  {String} rawBlockName  Block name
- * @param  {Object} attributes    Block attributes
- * @param  {String} content       Block save content
- * @return {String}               Comment-delimited block content
+ * @param {string} rawBlockName Block name.
+ * @param {Object} attributes   Block attributes.
+ * @param {string} content      Block save content.
+ *
+ * @return {string} Comment-delimited block content.
  */
 export function getCommentDelimitedContent( rawBlockName, attributes, content ) {
 	const serializedAttributes = ! isEmpty( attributes ) ?
@@ -202,8 +228,9 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
  * Returns the content of a block, including comment delimiters, determining
  * serialized attributes and content form from the current state of the block.
  *
- * @param  {Object} block Block instance
- * @return {String}       Serialized block
+ * @param {Object} block Block instance.
+ *
+ * @return {string} Serialized block.
  */
 export function serializeBlock( block ) {
 	const blockName = block.name;
@@ -236,8 +263,9 @@ export function serializeBlock( block ) {
 /**
  * Takes a block or set of blocks and returns the serialized post content.
  *
- * @param  {Array}  blocks Block(s) to serialize
- * @return {String}        The post content
+ * @param {Array} blocks Block(s) to serialize.
+ *
+ * @return {string} The post content.
  */
 export default function serialize( blocks ) {
 	return castArray( blocks ).map( serializeBlock ).join( '\n\n' );

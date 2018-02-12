@@ -7,10 +7,11 @@ import { includes } from 'lodash';
  * Reducer enhancer which transforms the result of the original reducer into an
  * object tracking its own history (past, present, future).
  *
- * @param  {Function} reducer            Original reducer
- * @param  {?Object}  options            Optional options
- * @param  {?Array}   options.resetTypes Action types upon which to clear past
- * @return {Function}                    Enhanced reducer
+ * @param {Function} reducer            Original reducer.
+ * @param {?Object}  options            Optional options.
+ * @param {?Array}   options.resetTypes Action types upon which to clear past.
+ *
+ * @return {Function} Enhanced reducer.
  */
 export default function withHistory( reducer, options = {} ) {
 	const initialState = {

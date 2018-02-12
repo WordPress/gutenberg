@@ -15,13 +15,26 @@
 	width: 100%;
 }
 
+// The ellipsis icon button
 .editor-block-settings-menu__toggle {
 	border-radius: 50%;
-	padding: 0;
-	transform: rotate( 90deg );
 	width: auto;
+	padding: 2px;
+	margin: 14px 4px 14px 8px;
+	width: $icon-button-size-small;
+
+	.dashicon {
+		transform: rotate( 90deg );
+	}
 }
 
+.editor-block-settings-menu__section {
+	margin-top: $item-spacing;
+	padding-top: $item-spacing;
+	border-top: 1px solid $light-gray-500;
+}
+
+// Popout menu
 .editor-block-settings-menu__control {
 	width: 100%;
 	justify-content: flex-start;
@@ -46,7 +59,7 @@
 	}
 }
 
-.editor-block-settings-menu__block-transformations {
+.editor-block-settings-menu__section {
 	margin-top: $item-spacing;
 	padding-top: $item-spacing;
 	border-top: 1px solid $light-gray-500;

@@ -1,0 +1,44 @@
+.blocks-format-toolbar {
+	display: inline-flex;
+}
+
+.blocks-format-toolbar__link-modal {
+	position: absolute;
+	box-shadow: 0px 3px 20px rgba( 18, 24, 30, .1 ), 0px 1px 3px rgba( 18, 24, 30, .1 );
+	border: 1px solid #e0e5e9;
+	background: #fff;
+	width: 300px;
+	display: flex;
+	flex-direction: column;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+	z-index: z-index( '.blocks-format-toolbar__link-modal' );
+}
+
+.blocks-format-toolbar__link-modal-line {
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	flex-shrink: 1;
+	min-width: 0;
+	align-items: center;
+
+	.components-button {
+		flex-shrink: 0;
+	}
+}
+
+.blocks-format-toolbar__link-value {
+	margin: 10px;
+	flex-grow: 1;
+	flex-shrink: 1;
+	overflow: hidden;
+	position: relative;
+	white-space: nowrap;
+	min-width: 0;
+
+	&:after {
+		@include long-content-fade( $size: 40% );
+	}
+}

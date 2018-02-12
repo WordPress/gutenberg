@@ -1,0 +1,20 @@
+.wp-block-audio .components-placeholder__input {
+	margin-top: 0.5em;
+}
+
+.wp-block-audio .button.button-large {
+	margin-top: 0.5em;
+}
+
+.wp-block-audio audio {
+	width: 100%;
+}
+
+.wp-block-audio .components-placeholder__fieldset {
+	display: block;
+	max-width: 400px;
+
+	form {
+		max-width: none;
+	}
+}

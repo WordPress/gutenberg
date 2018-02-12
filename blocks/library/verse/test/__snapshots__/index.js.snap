@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/verse block edit matches snapshot 1`] = `
+<div
+  class="wp-block-verse blocks-rich-text"
+>
+  <pre
+    aria-label="Write…"
+    class="blocks-rich-text__tinymce"
+    contenteditable="true"
+  />
+  <pre
+    class="blocks-rich-text__tinymce"
+  >
+    Write…
+  </pre>
+</div>
+`;

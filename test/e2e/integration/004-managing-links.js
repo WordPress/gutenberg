@@ -3,20 +3,20 @@ describe( 'Managing links', () => {
 		cy.newPost();
 	} );
 
-	const fixedIsOn = 'button.is-selected:contains("Fix toolbar to block")';
-	const fixedIsOff = 'button:contains("Fix toolbar to block"):not(".is-selected")';
+	const fixedIsOn = 'button.is-selected:contains("Fix Toolbar to Top")';
+	const fixedIsOff = 'button:contains("Fix Toolbar to Top"):not(".is-selected")';
 
 	const setFixedToolbar = ( b ) => {
-		cy.get( '.editor-ellipsis-menu button' ).click();
+		cy.get( '.edit-post-ellipsis-menu button' ).click();
 
 		cy.get( 'body' ).then( ( $body ) => {
 			const candidate = b ? fixedIsOff : fixedIsOn;
 			const toggleNeeded = $body.find( candidate );
 			if ( toggleNeeded.length ) {
-				return 'button:contains("Fix toolbar to block")';
+				return 'button:contains("Fix Toolbar to Top")';
 			}
 
-			return '.editor-ellipsis-menu button';
+			return '.edit-post-ellipsis-menu button';
 		} ).then( ( selector ) => {
 			cy.log( ' selector " + selector ', selector );
 			cy.get( selector ).click();

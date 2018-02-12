@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/heading block edit matches snapshot 1`] = `
+<div
+  class="wp-block-heading blocks-rich-text"
+>
+  <h2
+    aria-label="Write heading…"
+    class="blocks-rich-text__tinymce"
+    contenteditable="true"
+  />
+  <h2
+    class="blocks-rich-text__tinymce"
+  >
+    Write heading…
+  </h2>
+</div>
+`;

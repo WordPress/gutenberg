@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/quote block edit matches snapshot 1`] = `
+<blockquote
+  class="wp-block-quote"
+>
+  <div
+    class="blocks-rich-text"
+  >
+    <div
+      aria-label="Write quote…"
+      class="blocks-rich-text__tinymce"
+      contenteditable="true"
+    />
+    <div
+      class="blocks-rich-text__tinymce"
+    >
+      <p>
+        Write quote…
+      </p>
+    </div>
+  </div>
+</blockquote>
+`;

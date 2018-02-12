@@ -8,20 +8,20 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import { Toolbar, withState } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
+import { createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 
-const toEditableValue = value => value.map( ( subValue => subValue.children ) );
-const fromEditableValue = value => value.map( ( subValue ) => ( {
+const toRichTextValue = value => value.map( ( subValue => subValue.children ) );
+const fromRichTextValue = value => value.map( ( subValue ) => ( {
 	children: subValue,
 } ) );
 
@@ -51,7 +51,9 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/quote', {
+export const name = 'core/quote';
+
+export const settings = {
 	title: __( 'Quote' ),
 	description: __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ),
 	icon: 'format-quote',
@@ -151,13 +153,15 @@ registerBlockType( 'core/quote', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, onReplace, className } ) {
+	edit: withState( {
+		editable: 'content',
+	} )( ( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className, editable, setState } ) => {
 		const { align, value, citation, style } = attributes;
-		const focusedEditable = focus ? focus.editable || 'value' : null;
 		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
+		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
 						icon: 1 === variation ? 'format-quote' : 'testimonial',
@@ -178,17 +182,16 @@ registerBlockType( 'core/quote', {
 			<blockquote
 				key="quote"
 				className={ containerClassname }
+				style={ { textAlign: align } }
 			>
-				<Editable
+				<RichText
 					multiline="p"
-					value={ toEditableValue( value ) }
+					value={ toRichTextValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: fromEditableValue( nextValue ),
+							value: fromRichTextValue( nextValue ),
 						} )
 					}
-					focus={ focusedEditable === 'value' ? focus : null }
-					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					onMerge={ mergeBlocks }
 					onRemove={ ( forward ) => {
 						const hasEmptyCitation = ! citation || citation.length === 0;
@@ -196,31 +199,27 @@ registerBlockType( 'core/quote', {
 							onReplace( [] );
 						}
 					} }
-					style={ { textAlign: align } }
 					placeholder={ __( 'Write quote…' ) }
+					isSelected={ isSelected && editable === 'content' }
+					onFocus={ onSetActiveEditable( 'content' ) }
 				/>
-				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
-					<Editable
+				{ ( ( citation && citation.length > 0 ) || isSelected ) && (
+					<RichText
 						tagName="cite"
 						value={ citation }
-						placeholder={ __( 'Write citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
 							} )
 						}
-						focus={ focusedEditable === 'citation' ? focus : null }
-						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
-						onRemove={ ( forward ) => {
-							if ( ! forward ) {
-								setFocus( { ...focus, editable: 'value' } );
-							}
-						} }
+						placeholder={ __( 'Write citation…' ) }
+						isSelected={ isSelected && editable === 'cite' }
+						onFocus={ onSetActiveEditable( 'cite' ) }
 					/>
 				) }
 			</blockquote>,
 		];
-	},
+	} ),
 
 	save( { attributes } ) {
 		const { align, value, citation, style } = attributes;
@@ -270,4 +269,4 @@ registerBlockType( 'core/quote', {
 			},
 		},
 	],
-} );
+};

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, find } from 'lodash';
+import { isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,8 +10,8 @@ import { Component } from '@wordpress/element';
 import { NavigableMenu } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/blocks';
 
-function deriveActiveBlocks( blocks ) {
-	return blocks.filter( ( block ) => ! block.disabled );
+function deriveActiveItems( items ) {
+	return items.filter( ( item ) => ! item.isDisabled );
 }
 
 export default class InserterGroup extends Component {
@@ -20,61 +20,77 @@ export default class InserterGroup extends Component {
 
 		this.onNavigate = this.onNavigate.bind( this );
 
-		this.activeBlocks = deriveActiveBlocks( this.props.blockTypes );
+		this.activeItems = deriveActiveItems( this.props.items );
 		this.state = {
-			current: this.activeBlocks.length > 0 ? this.activeBlocks[ 0 ].name : null,
+			current: this.activeItems.length > 0 ? this.activeItems[ 0 ] : null,
 		};
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		if ( ! isEqual( this.props.blockTypes, nextProps.blockTypes ) ) {
-			this.activeBlocks = deriveActiveBlocks( nextProps.blockTypes );
+		if ( ! isEqual( this.props.items, nextProps.items ) ) {
+			this.activeItems = deriveActiveItems( nextProps.items );
+
 			// Try and preserve any still valid selected state.
-			const current = find( this.activeBlocks, { name: this.state.current } );
-			if ( ! current ) {
+			const currentIsStillActive = this.state.current && this.activeItems.some( item =>
+				item.id === this.state.current.id
+			);
+
+			if ( ! currentIsStillActive ) {
 				this.setState( {
-					current: this.activeBlocks.length > 0 ? this.activeBlocks[ 0 ].name : null,
+					current: this.activeItems.length > 0 ? this.activeItems[ 0 ] : null,
 				} );
 			}
 		}
 	}
 
-	renderItem( block ) {
+	/**
+	 * Returns an event handler triggered when hovering a block.
+	 *
+	 * @param   {Object} block Block object.
+	 * @return  {Func}         Event Handler.
+	 */
+	createToggleBlockHover( block ) {
+		if ( ! this.props.onHover ) {
+			return null;
+		}
+		return () => this.props.onHover( block );
+	}
+
+	renderItem( item ) {
 		const { current } = this.state;
-		const { selectBlock, bindReferenceNode } = this.props;
-		const { disabled } = block;
+		const { onSelectItem } = this.props;
+
+		const isCurrent = current && current.id === item.id;
 
 		return (
 			<button
 				role="menuitem"
-				key={ block.name === 'core/block' && block.initialAttributes ?
-					block.name + block.initialAttributes.ref :
-					block.name
-				}
+				key={ item.id }
 				className="editor-inserter__block"
-				onClick={ selectBlock( block ) }
-				ref={ bindReferenceNode( block.name ) }
-				tabIndex={ current === block.name || disabled ? null : '-1' }
-				disabled={ disabled }
+				onClick={ () => onSelectItem( item ) }
+				tabIndex={ isCurrent || item.isDisabled ? null : '-1' }
+				disabled={ item.isDisabled }
+				onMouseEnter={ this.createToggleBlockHover( item ) }
+				onMouseLeave={ this.createToggleBlockHover( null ) }
 			>
-				<BlockIcon icon={ block.icon } />
-				{ block.title }
+				<BlockIcon icon={ item.icon } />
+				{ item.title }
 			</button>
 		);
 	}
 
 	onNavigate( index ) {
-		const { activeBlocks } = this;
-		const dest = activeBlocks[ index ];
+		const { activeItems } = this;
+		const dest = activeItems[ index ];
 		if ( dest ) {
 			this.setState( {
-				current: dest.name,
+				current: dest,
 			} );
 		}
 	}
 
 	render() {
-		const { labelledBy, blockTypes } = this.props;
+		const { labelledBy, items } = this.props;
 
 		return (
 			<NavigableMenu
@@ -83,7 +99,7 @@ export default class InserterGroup extends Component {
 				aria-labelledby={ labelledBy }
 				cycle={ false }
 				onNavigate={ this.onNavigate }>
-				{ blockTypes.map( this.renderItem, this ) }
+				{ items.map( this.renderItem, this ) }
 			</NavigableMenu>
 		);
 	}

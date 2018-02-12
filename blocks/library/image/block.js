@@ -15,13 +15,12 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { mediaUpload, createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
+import { createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
-	Placeholder,
-	Dashicon,
+	IconButton,
+	SelectControl,
+	TextControl,
 	Toolbar,
-	DropZone,
-	FormFileUpload,
 	withAPIData,
 	withContext,
 } from '@wordpress/components';
@@ -29,11 +28,10 @@ import {
 /**
  * Internal dependencies
  */
-import Editable from '../../editable';
-import MediaUploadButton from '../../media-upload-button';
+import RichText from '../../rich-text';
+import ImagePlaceHolder from '../../image-placeholder';
+import MediaUpload from '../../media-upload';
 import InspectorControls from '../../inspector-controls';
-import TextControl from '../../inspector-controls/text-control';
-import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import UrlInputButton from '../../url-input/button';
@@ -111,18 +109,15 @@ class ImageBlock extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, focus, setFocus, className, settings, toggleSelection } = this.props;
+		const { attributes, setAttributes, isSelected, className, settings, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const availableSizes = this.getAvailableSizes();
 		const figureStyle = width ? { width } : {};
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
-		const uploadButtonProps = { isLarge: true };
-		const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAttributes );
-		const dropFiles = ( files ) => mediaUpload( files, setAttributes );
 
 		const controls = (
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -130,17 +125,19 @@ class ImageBlock extends Component {
 					/>
 
 					<Toolbar>
-						<MediaUploadButton
-							buttonProps={ {
-								className: 'components-icon-button components-toolbar__control',
-								'aria-label': __( 'Edit image' ),
-							} }
+						<MediaUpload
 							onSelect={ this.onSelectImage }
 							type="image"
 							value={ id }
-						>
-							<Dashicon icon="edit" />
-						</MediaUploadButton>
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
 						<UrlInputButton onChange={ this.onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>
@@ -150,39 +147,20 @@ class ImageBlock extends Component {
 		if ( ! url ) {
 			return [
 				controls,
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
+				<ImagePlaceHolder
+					className={ className }
+					key="image-placeholder"
 					icon="format-image"
 					label={ __( 'Image' ) }
-					className={ className }>
-					<DropZone
-						onFilesDrop={ dropFiles }
-					/>
-					<FormFileUpload
-						isLarge
-						className="wp-block-image__upload-button"
-						onChange={ uploadFromFiles }
-						accept="image/*"
-					>
-						{ __( 'Upload' ) }
-					</FormFileUpload>
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ this.onSelectImage }
-						type="image"
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
+					onSelectImage={ this.onSelectImage }
+				/>,
 			];
 		}
 
-		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
 			'is-resized': !! width,
-			'is-focused': !! focus,
+			'is-focused': isSelected,
 		} );
 
 		// Disable reason: Each block can be selected by clicking on it
@@ -190,7 +168,7 @@ class ImageBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return [
 			controls,
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<h2>{ __( 'Image Settings' ) }</h2>
 					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
@@ -220,7 +198,7 @@ class ImageBlock extends Component {
 						// Disable reason: Image itself is not meant to be
 						// interactive, but should direct focus to block
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
+						const img = <img src={ url } alt={ alt } />;
 
 						if ( ! isResizable || ! imageWidthWithinContainer ) {
 							return img;
@@ -267,14 +245,13 @@ class ImageBlock extends Component {
 						);
 					} }
 				</ImageSize>
-				{ ( caption && caption.length > 0 ) || !! focus ? (
-					<Editable
+				{ ( caption && caption.length > 0 ) || isSelected ? (
+					<RichText
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
-						focus={ focus && focus.editable === 'caption' ? focus : undefined }
-						onFocus={ focusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						isSelected={ isSelected }
 						inlineToolbar
 					/>
 				) : null }

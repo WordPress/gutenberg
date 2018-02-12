@@ -16,15 +16,6 @@ import {
 	setUnknownTypeHandlerName,
 } from '../registration';
 
-const expectFailingBlockValidation = () => {
-	/* eslint-disable no-console */
-	expect( console.error ).toHaveBeenCalled();
-	expect( console.warn ).toHaveBeenCalled();
-	console.warn.mockClear();
-	console.error.mockClear();
-	/* eslint-enable no-console */
-};
-
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
 		attributes: {
@@ -32,7 +23,7 @@ describe( 'block parser', () => {
 				type: 'string',
 			},
 		},
-		save: ( { attributes } ) => attributes.fruit,
+		save: ( { attributes } ) => attributes.fruit || null,
 		category: 'common',
 		title: 'block title',
 	};
@@ -46,7 +37,7 @@ describe( 'block parser', () => {
 				source: 'html',
 			},
 		},
-		save: ( { attributes } ) => attributes.content,
+		save: ( { attributes } ) => attributes.content || null,
 	};
 
 	beforeAll( () => {
@@ -206,7 +197,8 @@ describe( 'block parser', () => {
 				{},
 			);
 			expect( attributes ).toBeUndefined();
-			expectFailingBlockValidation();
+			expect( console ).toHaveErrored();
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should return the attributes parsed by the deprecated version', () => {
@@ -239,11 +231,11 @@ describe( 'block parser', () => {
 		it( 'should create the requested block if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = createBlockWithFallback(
-				'core/test-block',
-				'Bananas',
-				{ fruit: 'Bananas' }
-			);
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: 'Bananas',
+				attrs: { fruit: 'Bananas' },
+			} );
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
@@ -251,7 +243,10 @@ describe( 'block parser', () => {
 		it( 'should create the requested block with no attributes if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = createBlockWithFallback( 'core/test-block', '' );
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: '',
+			} );
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {} );
 		} );
@@ -260,11 +255,11 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
-			const block = createBlockWithFallback(
-				'core/test-block',
-				'Bananas',
-				{ fruit: 'Bananas' }
-			);
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: 'Bananas',
+				attrs: { fruit: 'Bananas' },
+			} );
 			expect( block.name ).toBe( 'core/unknown-block' );
 			expect( block.attributes.content ).toContain( 'wp:test-block' );
 		} );
@@ -273,13 +268,18 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
-			const block = createBlockWithFallback( null, 'content' );
+			const block = createBlockWithFallback( {
+				innerHTML: 'content',
+			} );
 			expect( block.name ).toEqual( 'core/unknown-block' );
-			expect( block.attributes ).toEqual( { content: 'content' } );
+			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
 
 		it( 'should not create a block if no unknown type handler', () => {
-			const block = createBlockWithFallback( 'core/test-block', '' );
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: '',
+			} );
 			expect( block ).toBeUndefined();
 		} );
 
@@ -304,19 +304,21 @@ describe( 'block parser', () => {
 							},
 						},
 						save: ( { attributes } ) => <span>{ attributes.fruit }</span>,
+						migrate: ( attributes ) => ( { fruit: 'Big ' + attributes.fruit } ),
 					},
 				],
 			} );
 
-			const block = createBlockWithFallback(
-				'core/test-block',
-				'<span class="wp-block-test-block">Bananas</span>',
-				{ fruit: 'Bananas' }
-			);
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: '<span class="wp-block-test-block">Bananas</span>',
+				attrs: { fruit: 'Bananas' },
+			} );
 			expect( block.name ).toEqual( 'core/test-block' );
-			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
+			expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
 			expect( block.isValid ).toBe( true );
-			expectFailingBlockValidation();
+			expect( console ).toHaveErrored();
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

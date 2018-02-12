@@ -2,8 +2,8 @@
 /**
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
- * Description: Printing since 1440. This is the development plugin for the new block editor in core. <strong>Meant for development, do not run on real sites.</strong>
- * Version: 1.9.0
+ * Description: Printing since 1440. This is the development plugin for the new block editor in core.
+ * Version: 2.1.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -44,7 +44,7 @@ function the_gutenberg_project() {
  * @since 0.1.0
  */
 function gutenberg_menu() {
-	global $menu, $submenu;
+	global $submenu;
 
 	add_menu_page(
 		'Gutenberg',
@@ -80,16 +80,27 @@ function gutenberg_menu() {
 add_action( 'admin_menu', 'gutenberg_menu' );
 
 /**
- * Display a notice and deactivate the Gutenberg plugin.
+ * Display a version notice and deactivate the Gutenberg plugin.
  *
  * @since 0.1.0
  */
 function gutenberg_wordpress_version_notice() {
 	echo '<div class="error"><p>';
-	echo __( 'Gutenberg requires WordPress 4.8 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
+	echo __( 'Gutenberg requires WordPress 4.9 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
 	echo '</p></div>';
 
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
+}
+
+/**
+ * Display a build notice.
+ *
+ * @since 0.1.0
+ */
+function gutenberg_build_files_notice() {
+	echo '<div class="error"><p>';
+	echo __( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, <code>npm run build</code> to build the files or <code>npm run dev</code> to build the files and watch for changes. Read the <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">contributing</a> file for more information.', 'gutenberg' );
+	echo '</p></div>';
 }
 
 /**
@@ -98,25 +109,31 @@ function gutenberg_wordpress_version_notice() {
  * @since 1.5.0
  */
 function gutenberg_pre_init() {
+	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/blocks/build' ) ) {
+		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
+		return;
+	}
+
 	// Get unmodified $wp_version.
-	include( ABSPATH . WPINC . '/version.php' );
+	include ABSPATH . WPINC . '/version.php';
 
 	// Strip '-src' from the version string. Messes up version_compare().
 	$version = str_replace( '-src', '', $wp_version );
 
-	if ( version_compare( $version, '4.8', '<' ) ) {
+	if ( version_compare( $version, '4.9', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
 		return;
 	}
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 
-	if ( version_compare( $version, '4.9-beta1-41829', '>=' ) ) {
-		add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
-	} else {
+	if ( version_compare( $version, '4.9-beta1-41829', '<' ) ) {
 		add_action( 'load-post.php', 'gutenberg_intercept_edit_post' );
 		add_action( 'load-post-new.php', 'gutenberg_intercept_post_new' );
+		return;
 	}
+
+	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 }
 
 /**
@@ -145,7 +162,7 @@ function gutenberg_init( $return, $post ) {
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
-	require_once( ABSPATH . 'wp-admin/admin-header.php' );
+	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
 
 	return true;
@@ -165,30 +182,28 @@ function gutenberg_intercept_edit_post() {
 		return;
 	}
 
-	if ( isset( $_GET['post'] ) ) {
-		$post_ID = (int) $_GET['post'];
-		$post_id = $post_ID;
-	}
-
-	if ( empty( $post_id ) ) {
+	if ( empty( $_GET['post'] ) || ! is_numeric( $_GET['post'] ) ) {
 		return;
 	}
+
+	$post_ID = (int) $_GET['post'];
+	$post_id = $post_ID;
 
 	$post = get_post( $post_id );
 
 	// Errors and invalid requests are handled in post.php, do not intercept.
-	if ( $post ) {
-		$post_type        = $post->post_type;
-		$post_type_object = get_post_type_object( $post_type );
-	} else {
+	if ( ! $post ) {
 		return;
 	}
+
+	$post_type        = $post->post_type;
+	$post_type_object = get_post_type_object( $post_type );
 
 	if ( ! $post_type_object ) {
 		return;
 	}
 
-	if ( ! in_array( $typenow, get_post_types( array( 'show_ui' => true ) ) ) ) {
+	if ( ! in_array( $typenow, get_post_types( array( 'show_ui' => true ) ), true ) ) {
 		return;
 	}
 
@@ -196,7 +211,7 @@ function gutenberg_intercept_edit_post() {
 		return;
 	}
 
-	if ( 'trash' == $post->post_status ) {
+	if ( 'trash' === $post->post_status ) {
 		return;
 	}
 
@@ -210,12 +225,11 @@ function gutenberg_intercept_edit_post() {
 	$editing = true;
 	$title   = $post_type_object->labels->edit_item;
 
-	$post_type = $post->post_type;
-	if ( 'post' == $post_type ) {
+	if ( 'post' === $post_type ) {
 		$parent_file   = 'edit.php';
 		$submenu_file  = 'edit.php';
 		$post_new_file = 'post-new.php';
-	} elseif ( 'attachment' == $post_type ) {
+	} elseif ( 'attachment' === $post_type ) {
 		$parent_file   = 'upload.php';
 		$submenu_file  = 'upload.php';
 		$post_new_file = 'media-new.php';
@@ -231,7 +245,7 @@ function gutenberg_intercept_edit_post() {
 	}
 
 	if ( gutenberg_init( false, $post ) ) {
-		include( ABSPATH . 'wp-admin/admin-footer.php' );
+		include ABSPATH . 'wp-admin/admin-footer.php';
 		exit;
 	}
 }
@@ -245,17 +259,17 @@ function gutenberg_intercept_post_new() {
 
 	if ( ! isset( $_GET['post_type'] ) ) {
 		$post_type = 'post';
-	} elseif ( in_array( $_GET['post_type'], get_post_types( array( 'show_ui' => true ) ) ) ) {
+	} elseif ( in_array( $_GET['post_type'], get_post_types( array( 'show_ui' => true ) ), true ) ) {
 		$post_type = $_GET['post_type'];
 	} else {
 		return;
 	}
 	$post_type_object = get_post_type_object( $post_type );
 
-	if ( 'post' == $post_type ) {
+	if ( 'post' === $post_type ) {
 		$parent_file  = 'edit.php';
 		$submenu_file = 'post-new.php';
-	} elseif ( 'attachment' == $post_type ) {
+	} elseif ( 'attachment' === $post_type ) {
 		if ( wp_redirect( admin_url( 'media-new.php' ) ) ) {
 			exit;
 		}
@@ -295,7 +309,7 @@ function gutenberg_intercept_post_new() {
 	$post_ID = $post->ID;
 
 	if ( gutenberg_init( false, $post ) ) {
-		include( ABSPATH . 'wp-admin/admin-footer.php' );
+		include ABSPATH . 'wp-admin/admin-footer.php';
 		exit;
 	}
 }
@@ -373,38 +387,6 @@ function gutenberg_add_edit_link( $actions, $post ) {
 }
 
 /**
- * Sets the default behaviour for the "Add New" button to go to the classic editor.
- * If JavaScript is enabled, this will be replaced by a button that goes to Gutenberg.
- *
- * @since 1.5.0
- *
- * @param string $url  The URL to modify.
- * @param string $path The path part of $url.
- *
- * @return string The URL with the classic-editor parameter added.
- */
-function gutenberg_modify_add_new_button_url( $url, $path ) {
-	global $pagenow;
-
-	if ( 'edit.php' !== $pagenow ) {
-		return $url;
-	}
-
-	if ( ! preg_match( '/^post-new.php(\?post_type=[^&]*)?$/', $path ) ) {
-		return $url;
-	}
-
-	// The Add New button should be the only thing calling admin_url() from global scope.
-	$stack = wp_debug_backtrace_summary( null, 0, false );
-	if ( 'admin_url' !== end( $stack ) ) {
-		return $url;
-	}
-
-	return add_query_arg( 'classic-editor', '', $url );
-}
-add_filter( 'admin_url', 'gutenberg_modify_add_new_button_url', 10, 2 );
-
-/**
  * Prints the JavaScript to replace the default "Add New" button.$_COOKIE
  *
  * @since 1.5.0
@@ -427,7 +409,6 @@ function gutenberg_replace_default_add_new_button() {
 			position: relative;
 			top: -3px;
 			text-decoration: none;
-			border: none;
 			border: 1px solid #ccc;
 			border-radius: 2px;
 			background: #f7f7f7;
@@ -465,8 +446,6 @@ function gutenberg_replace_default_add_new_button() {
 			<?php endif; ?>
 			position: relative;
 			vertical-align: top;
-			-webkit-font-smoothing: antialiased;
-			-moz-osx-font-smoothing: grayscale;
 			text-decoration: none !important;
 			padding: 4px 5px 4px 3px;
 		}
@@ -504,13 +483,14 @@ function gutenberg_replace_default_add_new_button() {
 			}
 
 			var url = button.href;
-			var newUrl = url.replace( /[&\?]?classic-editor/, '' );
+			var urlHasParams = ( -1 !== url.indexOf( '?' ) );
+			var classicUrl = url + ( urlHasParams ? '&' : '?' ) + 'classic-editor';
 
 			var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
-			newbutton += '<a href="' + newUrl + '">' + button.innerText + '</a>';
+			newbutton += '<a href="' + url + '">' + button.innerText + '</a>';
 			newbutton += '<span class="expander" tabindex="0" role="button" aria-haspopup="true" aria-label="<?php echo esc_js( __( 'Toggle editor selection menu', 'gutenberg' ) ); ?>"></span>';
-			newbutton += '<span class="dropdown"><a href="' + newUrl + '">Gutenberg</a>';
-			newbutton += '<a href="' + url + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
+			newbutton += '<span class="dropdown"><a href="' + url + '">Gutenberg</a>';
+			newbutton += '<a href="' + classicUrl + '"><?php echo esc_js( __( 'Classic Editor', 'gutenberg' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
 
 			button.insertAdjacentHTML( 'afterend', newbutton );
 			button.remove();

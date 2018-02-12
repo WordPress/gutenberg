@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/list block edit matches snapshot 1`] = `
+<div
+  class="blocks-list blocks-rich-text"
+>
+  <ul
+    aria-label="Write list…"
+    class="blocks-rich-text__tinymce"
+    contenteditable="true"
+  />
+  <ul
+    class="blocks-rich-text__tinymce"
+  >
+    <li>
+      Write list…
+    </li>
+  </ul>
+</div>
+`;

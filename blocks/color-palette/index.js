@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { ChromePicker } from 'react-color';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,9 +19,13 @@ import './style.scss';
 export function ColorPalette( { defaultColors, colors, value, onChange } ) {
 	const usedColors = colors || defaultColors;
 
+	function applyOrUnset( color ) {
+		return () => onChange( value === color ? undefined : color );
+	}
+
 	return (
 		<div className="blocks-color-palette">
-			{ usedColors.map( ( color ) => {
+			{ map( usedColors, ( color ) => {
 				const style = { color: color };
 				const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
 
@@ -30,7 +35,7 @@ export function ColorPalette( { defaultColors, colors, value, onChange } ) {
 							type="button"
 							className={ className }
 							style={ style }
-							onClick={ () => onChange( value === color ? undefined : color ) }
+							onClick={ applyOrUnset( color ) }
 							aria-label={ sprintf( __( 'Color: %s' ), color ) }
 							aria-pressed={ value === color }
 						/>

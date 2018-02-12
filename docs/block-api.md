@@ -105,7 +105,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](https://wordpress.org/gutenberg/handbook/reference/attributes/).**
+* **See: [Attributes](https://wordpress.org/gutenberg/handbook/block-api/attributes/).**
 
 #### Transforms (optional)
 
@@ -116,7 +116,7 @@ Work in progress...
 * **Type:** `Bool`
 * **Default:** `false`
 
-Whether a block can only be used once per post.
+A once-only block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A once-only block's icon is automatically dimmed (unclickable) to prevent multiple instances.
 
 ```js
 // Use the block just once per post

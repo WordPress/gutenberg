@@ -174,7 +174,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array(
 				'deleted'  => true,
 				'previous' => array(
-					'id'      => 8,
+					'id'      => self::$post_id,
 					'title'   => 'My cool block',
 					'content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
 				),

@@ -14,6 +14,7 @@ import { Dashicon, Button } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
+import PostSwitchToDraftButton from '../post-switch-to-draft-button';
 import { editPost, savePost } from '../../store/actions';
 import {
 	isEditedPostNew,
@@ -23,9 +24,16 @@ import {
 	isEditedPostSaveable,
 	getCurrentPost,
 	getEditedPostAttribute,
+	hasMetaBoxes,
 } from '../../store/selectors';
 
-export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
+/**
+ * Component showing whether the post is saved or not and displaying save links.
+ *
+ * @param   {Object}    Props Component Props.
+ * @return {WPElement}       WordPress Element.
+ */
+export function PostSavedState( { hasActiveMetaboxes, isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
 	const className = 'editor-post-saved-state';
 
 	if ( isSaving ) {
@@ -36,11 +44,15 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 		);
 	}
 
-	if ( ! isSaveable || isPublished ) {
+	if ( isPublished ) {
+		return <PostSwitchToDraftButton className={ classnames( className, 'button-link' ) } />;
+	}
+
+	if ( ! isSaveable ) {
 		return null;
 	}
 
-	if ( ! isNew && ! isDirty ) {
+	if ( ! isNew && ! isDirty && ! hasActiveMetaboxes ) {
 		return (
 			<span className={ className }>
 				<Dashicon icon="saved" />
@@ -74,6 +86,7 @@ export default connect(
 		isSaving: isSavingPost( state ),
 		isSaveable: isEditedPostSaveable( state ),
 		status: getEditedPostAttribute( state, 'status' ),
+		hasActiveMetaboxes: hasMetaBoxes( state ),
 	} ),
 	{
 		onStatusChange: ( status ) => editPost( { status } ),

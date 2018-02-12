@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/button block edit matches snapshot 1`] = `
+<span
+  class="wp-block-button"
+>
+  <div
+    class="blocks-rich-text"
+  >
+    <span
+      aria-label="Add text…"
+      class="wp-block-button__link blocks-rich-text__tinymce"
+      contenteditable="true"
+    />
+    <span
+      class="blocks-rich-text__tinymce wp-block-button__link"
+    >
+      Add text…
+    </span>
+  </div>
+</span>
+`;

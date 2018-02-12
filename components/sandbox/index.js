@@ -6,12 +6,15 @@ import { Component, renderToString } from '@wordpress/element';
 export default class Sandbox extends Component {
 	constructor() {
 		super( ...arguments );
+
+		this.trySandbox = this.trySandbox.bind( this );
+		this.checkMessageForResize = this.checkMessageForResize.bind( this );
+		this.checkFocus = this.checkFocus.bind( this );
+
 		this.state = {
 			width: 0,
 			height: 0,
 		};
-		this.trySandbox = this.trySandbox.bind( this );
-		this.checkMessageForResize = this.checkMessageForResize.bind( this );
 	}
 
 	isFrameAccessible() {
@@ -50,6 +53,7 @@ export default class Sandbox extends Component {
 
 	componentDidMount() {
 		window.addEventListener( 'message', this.checkMessageForResize, false );
+		window.addEventListener( 'blur', this.checkFocus );
 		this.trySandbox();
 	}
 
@@ -59,6 +63,13 @@ export default class Sandbox extends Component {
 
 	componentWillUnmount() {
 		window.removeEventListener( 'message', this.checkMessageForResize );
+		window.removeEventListener( 'blur', this.checkFocus );
+	}
+
+	checkFocus() {
+		if ( this.props.onFocus && document.activeElement === this.iframe ) {
+			this.props.onFocus();
+		}
 	}
 
 	trySandbox() {
@@ -121,6 +132,7 @@ export default class Sandbox extends Component {
 				} );
 
 				document.body.style.position = 'absolute';
+				document.body.style.width = '100%';
 				document.body.setAttribute( 'data-resizable-iframe-connected', '' );
 
 				sendResize();

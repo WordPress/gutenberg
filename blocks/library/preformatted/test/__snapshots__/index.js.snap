@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/preformatted block edit matches snapshot 1`] = `
+<div
+  class="wp-block-preformatted blocks-rich-text"
+>
+  <pre
+    aria-label="Write preformatted text…"
+    class="blocks-rich-text__tinymce"
+    contenteditable="true"
+  />
+  <pre
+    class="blocks-rich-text__tinymce"
+  >
+    Write preformatted text…
+  </pre>
+</div>
+`;

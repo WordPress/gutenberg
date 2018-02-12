@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { first, last } from 'lodash';
+import { first } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import { compose } from '@wordpress/element';
  */
 import './style.scss';
 import { getBlockMoverLabel } from './mover-label';
-import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../store/selectors';
+import { getBlockIndex, getBlock } from '../../store/selectors';
 import { selectBlock } from '../../store/actions';
 
 export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, draggable, onDragStart, onDragEnd } ) {
@@ -42,7 +42,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				draggable={ draggable }
 				onDragStart={ onDragStart }
 				onDragEnd={ onDragEnd }
-				icon="arrow-up-alt2"
+				icon={ <svg tabIndex="-1" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M12.293 12.207L9 8.914l-3.293 3.293-1.414-1.414L9 6.086l4.707 4.707z" /></svg> }
 				tooltip={ __( 'Move Up' ) }
 				label={ getBlockMoverLabel(
 					uids.length,
@@ -60,7 +60,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				draggable={ draggable }
 				onDragStart={ onDragStart }
 				onDragEnd={ onDragEnd }
-				icon="arrow-down-alt2"
+				icon={ <svg tabIndex="-1" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M12.293 6.086L9 9.379 5.707 6.086 4.293 7.5 9 12.207 13.707 7.5z" /></svg> }
 				tooltip={ __( 'Move Down' ) }
 				label={ getBlockMoverLabel(
 					uids.length,
@@ -76,39 +76,42 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 	);
 }
 
+/**
+ * Action creator creator which, given the action type to dispatch and the
+ * arguments of mapDispatchToProps, creates a prop dispatcher callback for
+ * managing block movement.
+ *
+ * @param {string}   type     Action type to dispatch.
+ * @param {Function} dispatch Store dispatch.
+ * @param {Object}   ownProps The wrapped component's own props.
+ *
+ * @return {Function} Prop dispatcher callback.
+ */
+function createOnMove( type, dispatch, ownProps ) {
+	return () => {
+		const { uids, rootUID } = ownProps;
+		if ( uids.length === 1 ) {
+			dispatch( selectBlock( first( uids ) ) );
+		}
+
+		dispatch( { type, uids, rootUID } );
+	};
+}
+
 export default compose(
 	connect(
 		( state, ownProps ) => {
-			const block = getBlock( state, first( ownProps.uids ) );
+			const { uids, rootUID } = ownProps;
+			const block = getBlock( state, first( uids ) );
 
 			return ( {
-				isFirst: isFirstBlock( state, first( ownProps.uids ) ),
-				isLast: isLastBlock( state, last( ownProps.uids ) ),
-				firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
+				firstIndex: getBlockIndex( state, first( uids ), rootUID ),
 				blockType: block ? getBlockType( block.name ) : null,
 			} );
 		},
-		( dispatch, ownProps ) => ( {
-			onMoveDown() {
-				if ( ownProps.uids.length === 1 ) {
-					dispatch( selectBlock( first( ownProps.uids ) ) );
-				}
-
-				dispatch( {
-					type: 'MOVE_BLOCKS_DOWN',
-					uids: ownProps.uids,
-				} );
-			},
-			onMoveUp() {
-				if ( ownProps.uids.length === 1 ) {
-					dispatch( selectBlock( first( ownProps.uids ) ) );
-				}
-
-				dispatch( {
-					type: 'MOVE_BLOCKS_UP',
-					uids: ownProps.uids,
-				} );
-			},
+		( ...args ) => ( {
+			onMoveDown: createOnMove( 'MOVE_BLOCKS_DOWN', ...args ),
+			onMoveUp: createOnMove( 'MOVE_BLOCKS_UP', ...args ),
 		} )
 	),
 	withContext( 'editor' )( ( settings ) => {

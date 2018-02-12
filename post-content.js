@@ -48,11 +48,11 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:heading -->',
 
 		'<!-- wp:paragraph -->',
-		'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That&#x27;s the spirit behind the inserter—the <code>(+)</code> button you&#x27;ll see around the editor—which allows you to browse all available content blocks and insert them into your post. Plugins and themes are able to register their own, opening up all sort of possibilities for rich editing and publishing.</p>',
+		'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That&#x27;s the spirit behind the inserter—the <code>(+)</code> button you&#x27;ll see around the editor—which allows you to browse all available content blocks and add them into your post. Plugins and themes are able to register their own, opening up all sort of possibilities for rich editing and publishing.</p>',
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:paragraph -->',
-		'<p>Go give it a try, you may discover things WordPress can already insert into your posts that you didn&#x27;t know about. Here&#x27;s a short list of what you can currently find there:</p>',
+		'<p>Go give it a try, you may discover things WordPress can already add into your posts that you didn&#x27;t know about. Here&#x27;s a short list of what you can currently find there:</p>',
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:list -->',
@@ -80,15 +80,15 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:paragraph -->',
-		'<p>Blocks can be anything you need. For instance, you may want to insert a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.</p>',
+		'<p>Blocks can be anything you need. For instance, you may want to add a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.</p>',
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:gallery {"columns":2} -->',
-		'<div class="wp-block-gallery alignnone columns-2 is-cropped">',
-		'<figure class="blocks-gallery-image"><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure>',
-		'<figure class="blocks-gallery-image"><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure>',
-		'<figure class="blocks-gallery-image"><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure>',
-		'</div>',
+		'<ul class="wp-block-gallery alignnone columns-2 is-cropped">',
+		'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure></li>',
+		'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure></li>',
+		'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/EKNF8xD2UM.jpg" alt="" /></figure></li>',
+		'</ul>',
 		'<!-- /wp:gallery -->',
 
 		'<!-- wp:paragraph -->',
@@ -112,10 +112,10 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:gallery {"align":"wide","images":[{"url":"https://cldup.com/_rSwtEeDGD.jpg","alt":""},{"url":"https://cldup.com/L-cC3qX2DN.jpg","alt":""}]} -->',
-		'<div class="wp-block-gallery alignwide columns-2 is-cropped">',
-		'<figure class="blocks-gallery-image"><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure>',
-		'<figure class="blocks-gallery-image"><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure>',
-		'</div>',
+		'<ul class="wp-block-gallery alignwide columns-2 is-cropped">',
+		'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure></li>',
+		'<li class="blocks-gallery-item"><figure><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure></li>',
+		'</ul>',
 		'<!-- /wp:gallery -->',
 
 		'<!-- wp:paragraph -->',
@@ -143,7 +143,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:button { "align": "center" } -->',
-		'<div class="wp-block-button aligncenter"><a href="https://github.com/WordPress/gutenberg"><span>Help build Gutenberg</span></a></div>',
+		'<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>',
 		'<!-- /wp:button -->',
 
 		'<!-- wp:separator -->',

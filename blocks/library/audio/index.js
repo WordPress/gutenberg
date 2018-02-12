@@ -6,20 +6,22 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Dashicon, Placeholder, Toolbar } from '@wordpress/components';
+import { Button, IconButton, Placeholder, Toolbar } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType } from '../../api';
-import MediaUploadButton from '../../media-upload-button';
-import Editable from '../../editable';
+import './editor.scss';
+import MediaUpload from '../../media-upload';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-registerBlockType( 'core/audio', {
+export const name = 'core/audio';
+
+export const settings = {
 	title: __( 'Audio' ),
 
 	description: __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ),
@@ -43,6 +45,9 @@ registerBlockType( 'core/audio', {
 			source: 'children',
 			selector: 'figcaption',
 		},
+		id: {
+			type: 'number',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -64,8 +69,8 @@ registerBlockType( 'core/audio', {
 			};
 		}
 		render() {
-			const { align, caption } = this.props.attributes;
-			const { setAttributes, focus, setFocus } = this.props;
+			const { align, caption, id } = this.props.attributes;
+			const { setAttributes, isSelected } = this.props;
 			const { editing, className, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
@@ -73,9 +78,9 @@ registerBlockType( 'core/audio', {
 			};
 			const onSelectAudio = ( media ) => {
 				if ( media && media.url ) {
-					// sets the block's attribure and updates the edit component from the
+					// sets the block's attribute and updates the edit component from the
 					// selected media, then switches off the editing UI
-					setAttributes( { src: media.url } );
+					setAttributes( { src: media.url, id: media.id } );
 					this.setState( { src: media.url, editing: false } );
 				}
 			};
@@ -88,26 +93,22 @@ registerBlockType( 'core/audio', {
 				}
 				return false;
 			};
-			const controls = focus && (
+			const controls = isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
 					/>
 					<Toolbar>
-						<Button
+						<IconButton
 							className="components-icon-button components-toolbar__control"
-							aria-label={ __( 'Edit audio' ) }
-							type="audio"
+							label={ __( 'Edit audio' ) }
 							onClick={ switchToEditing }
-						>
-							<Dashicon icon="edit" />
-						</Button>
+							icon="edit"
+						/>
 					</Toolbar>
 				</BlockControls>
 			);
-
-			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
 			if ( editing ) {
 				return [
@@ -116,7 +117,7 @@ registerBlockType( 'core/audio', {
 						key="placeholder"
 						icon="media-audio"
 						label={ __( 'Audio' ) }
-						instructions={ __( 'Select an audio file from your library, or upload a new one:' ) }
+						instructions={ __( 'Select an audio file from your library, or upload a new one' ) }
 						className={ className }>
 						<form onSubmit={ onSelectUrl }>
 							<input
@@ -131,13 +132,16 @@ registerBlockType( 'core/audio', {
 								{ __( 'Use URL' ) }
 							</Button>
 						</form>
-						<MediaUploadButton
-							buttonProps={ { isLarge: true } }
+						<MediaUpload
 							onSelect={ onSelectAudio }
 							type="audio"
-						>
-							{ __( 'Insert from Media Library' ) }
-						</MediaUploadButton>
+							value={ id }
+							render={ ( { open } ) => (
+								<Button isLarge onClick={ open }>
+									{ __( 'Add from Media Library' ) }
+								</Button>
+							) }
+						/>
 					</Placeholder>,
 				];
 			}
@@ -147,14 +151,13 @@ registerBlockType( 'core/audio', {
 				controls,
 				<figure key="audio" className={ className }>
 					<audio controls="controls" src={ src } />
-					{ ( ( caption && caption.length ) || !! focus ) && (
-						<Editable
+					{ ( ( caption && caption.length ) || !! isSelected ) && (
+						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							focus={ focus && focus.editable === 'caption' ? focus : undefined }
-							onFocus={ focusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							isSelected={ isSelected }
 							inlineToolbar
 						/>
 					) }
@@ -173,4 +176,4 @@ registerBlockType( 'core/audio', {
 			</figure>
 		);
 	},
-} );
+};

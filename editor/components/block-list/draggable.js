@@ -11,8 +11,8 @@ import { Component } from '@wordpress/element';
  * - Provides "dragStart" and "dragEnd" handlers as properties to the wrapped component.
  *   - These can be used on any draggable element and the effect will be the same.
  * - Styling and drop handlers implemented by the consuming component.
- * @param { Component } OriginalComponent Original Component.
- * @returns { Component } The original component wrapped with the additional properties.
+ * @param {Component} OriginalComponent Original Component.
+ * @return {Component} The original component wrapped with the additional properties.
  */
 const withDragging = ( OriginalComponent ) => {
 	class Draggable extends Component {
@@ -35,7 +35,7 @@ const withDragging = ( OriginalComponent ) => {
 		/**
 		 * Reorder via Drag & Drop. Step 3 of 4.
 		 * Strategy: Remove inset and block clone, reset cursor, and remove drag listener.
-		 * @param  {object} event     The non-custom DragEvent.
+		 * @param  {Object} event     The non-custom DragEvent.
 		 */
 		onDragEnd( event ) {
 			const { elementId, cloneNodeId } = this.state;
@@ -61,7 +61,7 @@ const withDragging = ( OriginalComponent ) => {
 		/*
 		 * Reorder via Drag & Drop. Step 2 of 4.
 		 * Strategy: Update positioning of element clone based on mouse movement.
-		 * @param  {object} event     The non-custom DragEvent.
+		 * @param  {Object} event     The non-custom DragEvent.
 		 */
 		onDragOver( event ) {
 			const { cloneNodeId } = this.state;
@@ -83,11 +83,11 @@ const withDragging = ( OriginalComponent ) => {
 		 *  - Clone the current element and spawn clone over original element. Hide original element and set inset.
 		 *  - Set transfer data.
 		 *  - Add dragover listener.
-		 * @param  {object} event     The non-custom DragEvent.
-		 * @param  {String} uid       The unique identifier of the element to be dragged.
-		 * @param  {String} elementId The HTML id of the element to be dragged.
-		 * @param  {Number} order     The current index of the element to be dragged.
-		 * @param  {String} type      A unique constant identifying the type of dragging operation.
+		 * @param  {Object} event     The non-custom DragEvent.
+		 * @param  {string} uid       The unique identifier of the element to be dragged.
+		 * @param  {string} elementId The HTML id of the element to be dragged.
+		 * @param  {number} order     The current index of the element to be dragged.
+		 * @param  {string} type      A unique constant identifying the type of dragging operation.
 		 */
 		onDragStart( event, uid, elementId, order, type ) {
 			const element = document.getElementById( elementId );

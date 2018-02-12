@@ -15,7 +15,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockEdit from '../../block-edit';
-import { registerBlockType } from '../../api';
 import ReusableBlockEditPanel from './edit-panel';
 
 class ReusableBlockEdit extends Component {
@@ -38,6 +37,15 @@ class ReusableBlockEdit extends Component {
 	componentDidMount() {
 		if ( ! this.props.reusableBlock ) {
 			this.props.fetchReusableBlock();
+		}
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	componentWillReceiveProps( nextProps ) {
+		if ( this.props.focus && ! nextProps.focus ) {
+			this.stopEditing();
 		}
 	}
 
@@ -78,11 +86,15 @@ class ReusableBlockEdit extends Component {
 	}
 
 	render() {
-		const { focus, reusableBlock, isSaving, convertBlockToStatic } = this.props;
+		const { isSelected, reusableBlock, isFetching, isSaving } = this.props;
 		const { isEditing, title, attributes } = this.state;
 
-		if ( ! reusableBlock ) {
+		if ( ! reusableBlock && isFetching ) {
 			return <Placeholder><Spinner /></Placeholder>;
+		}
+
+		if ( ! reusableBlock ) {
+			return <Placeholder>{ __( 'Block has been deleted or is unavailable.' ) }</Placeholder>;
 		}
 
 		const reusableBlockAttributes = { ...reusableBlock.attributes, ...attributes };
@@ -93,19 +105,18 @@ class ReusableBlockEdit extends Component {
 				<BlockEdit
 					{ ...this.props }
 					name={ reusableBlock.type }
-					focus={ isEditing ? focus : null }
+					isSelected={ isEditing && isSelected }
 					attributes={ reusableBlockAttributes }
 					setAttributes={ isEditing ? this.setAttributes : noop }
 				/>
 			</div>,
-			focus && (
+			isSelected && (
 				<ReusableBlockEditPanel
 					key="panel"
 					isEditing={ isEditing }
 					title={ title !== null ? title : reusableBlock.title }
-					isSaving={ isSaving }
+					isSaving={ isSaving && ! reusableBlock.isTemporary }
 					onEdit={ this.startEditing }
-					onDetach={ convertBlockToStatic }
 					onChangeTitle={ this.setTitle }
 					onSave={ this.updateReusableBlock }
 					onCancel={ this.stopEditing }
@@ -118,6 +129,7 @@ class ReusableBlockEdit extends Component {
 const ConnectedReusableBlockEdit = connect(
 	( state, ownProps ) => ( {
 		reusableBlock: state.reusableBlocks.data[ ownProps.attributes.ref ],
+		isFetching: state.reusableBlocks.isFetching[ ownProps.attributes.ref ],
 		isSaving: state.reusableBlocks.isSaving[ ownProps.attributes.ref ],
 	} ),
 	( dispatch, ownProps ) => ( {
@@ -140,16 +152,12 @@ const ConnectedReusableBlockEdit = connect(
 				id: ownProps.attributes.ref,
 			} );
 		},
-		convertBlockToStatic() {
-			dispatch( {
-				type: 'CONVERT_BLOCK_TO_STATIC',
-				uid: ownProps.id,
-			} );
-		},
 	} )
 )( ReusableBlockEdit );
 
-registerBlockType( 'core/block', {
+export const name = 'core/block';
+
+export const settings = {
 	title: __( 'Reusable Block' ),
 	category: 'reusable-blocks',
 	isPrivate: true,
@@ -162,8 +170,9 @@ registerBlockType( 'core/block', {
 
 	supports: {
 		customClassName: false,
+		html: false,
 	},
 
 	edit: ConnectedReusableBlockEdit,
 	save: () => null,
-} );
+};

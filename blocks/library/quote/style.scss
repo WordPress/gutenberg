@@ -1,9 +1,9 @@
 .wp-block-quote {
 	margin: 0 0 16px;
-	box-shadow: inset 0px 0px 0px 0px $light-gray-500;
 
-	cite {
-		color: $dark-gray-100;
+	cite,
+	footer {
+		color: $dark-gray-300;
 		margin-top: 1em;
 		position: relative;
 		font-size: $default-font-size;
@@ -12,12 +12,15 @@
 
 	&.is-large {
 		padding: 0 1em;
+
 		p {
 			font-size: 24px;
 			font-style: italic;
 			line-height: 1.6;
 		}
-		cite {
+
+		cite,
+		footer {
 			font-size: 19px;
 			text-align: right;
 		}

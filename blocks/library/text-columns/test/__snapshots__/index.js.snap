@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/text-columns block edit matches snapshot 1`] = `
+<div
+  class="wp-block-text-columns alignundefined columns-2"
+>
+  <div
+    class="wp-block-column"
+  >
+    <div
+      class="blocks-rich-text"
+    >
+      <p
+        aria-label="New Column"
+        class="blocks-rich-text__tinymce"
+        contenteditable="true"
+      />
+      <p
+        class="blocks-rich-text__tinymce"
+      >
+        New Column
+      </p>
+    </div>
+  </div>
+  <div
+    class="wp-block-column"
+  >
+    <div
+      class="blocks-rich-text"
+    >
+      <p
+        aria-label="New Column"
+        class="blocks-rich-text__tinymce"
+        contenteditable="true"
+      />
+      <p
+        class="blocks-rich-text__tinymce"
+      >
+        New Column
+      </p>
+    </div>
+  </div>
+</div>
+`;

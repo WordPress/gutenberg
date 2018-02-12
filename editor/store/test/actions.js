@@ -2,17 +2,15 @@
  * Internal dependencies
  */
 import {
-	focusBlock,
 	replaceBlocks,
 	startTyping,
 	stopTyping,
 	requestMetaBoxUpdates,
-	handleMetaBoxReload,
-	metaBoxStateChanged,
 	initializeMetaBoxState,
 	fetchReusableBlocks,
 	updateReusableBlock,
 	saveReusableBlock,
+	deleteReusableBlock,
 	convertBlockToStatic,
 	convertBlockToReusable,
 	toggleSelection,
@@ -42,17 +40,12 @@ import {
 	removeBlocks,
 	removeBlock,
 	toggleBlockMode,
-	toggleSidebar,
-	setActivePanel,
-	toggleSidebarPanel,
 	createNotice,
 	createSuccessNotice,
 	createInfoNotice,
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
-	metaBoxLoaded,
-	toggleFeature,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -128,26 +121,13 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'focusBlock', () => {
-		it( 'should return the UPDATE_FOCUS action', () => {
-			const focusConfig = {
-				editable: 'cite',
-			};
-
-			expect( focusBlock( 'chicken', focusConfig ) ).toEqual( {
-				type: 'UPDATE_FOCUS',
-				uid: 'chicken',
-				config: focusConfig,
-			} );
-		} );
-	} );
-
 	describe( 'selectBlock', () => {
 		it( 'should return the SELECT_BLOCK action', () => {
 			const uid = 'my-uid';
-			const result = selectBlock( uid );
+			const result = selectBlock( uid, -1 );
 			expect( result ).toEqual( {
 				type: 'SELECT_BLOCK',
+				initialPosition: -1,
 				uid,
 			} );
 		} );
@@ -221,11 +201,11 @@ describe( 'actions', () => {
 			const block = {
 				uid: 'ribs',
 			};
-			const position = 5;
-			expect( insertBlock( block, position ) ).toEqual( {
+			const index = 5;
+			expect( insertBlock( block, index ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks: [ block ],
-				position,
+				index,
 			} );
 		} );
 	} );
@@ -235,20 +215,19 @@ describe( 'actions', () => {
 			const blocks = [ {
 				uid: 'ribs',
 			} ];
-			const position = 3;
-			expect( insertBlocks( blocks, position ) ).toEqual( {
+			const index = 3;
+			expect( insertBlocks( blocks, index ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks,
-				position,
+				index,
 			} );
 		} );
 	} );
 
 	describe( 'showInsertionPoint', () => {
 		it( 'should return the SHOW_INSERTION_POINT action', () => {
-			expect( showInsertionPoint( 1 ) ).toEqual( {
+			expect( showInsertionPoint() ).toEqual( {
 				type: 'SHOW_INSERTION_POINT',
-				index: 1,
 			} );
 		} );
 	} );
@@ -378,34 +357,6 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'toggleSidebar', () => {
-		it( 'should return TOGGLE_SIDEBAR action', () => {
-			expect( toggleSidebar( 'publish', true ) ).toEqual( {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'publish',
-				force: true,
-			} );
-		} );
-	} );
-
-	describe( 'setActivePanel', () => {
-		const panel = 'panelName';
-		expect( setActivePanel( panel ) ).toEqual( {
-			type: 'SET_ACTIVE_PANEL',
-			panel,
-		} );
-	} );
-
-	describe( 'toggleSidebarPanel', () => {
-		it( 'should return TOGGLE_SIDEBAR_PANEL action', () => {
-			const panel = 'panelName';
-			expect( toggleSidebarPanel( panel ) ).toEqual( {
-				type: 'TOGGLE_SIDEBAR_PANEL',
-				panel,
-			} );
-		} );
-	} );
-
 	describe( 'createNotice', () => {
 		const status = 'status';
 		const content = <p>element</p>;
@@ -514,50 +465,10 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'metaBoxLoaded', () => {
-		it( 'should return META_BOX_LOADED action', () => {
-			const location = 'normal';
-			expect( metaBoxLoaded( location ) ).toEqual( {
-				type: 'META_BOX_LOADED',
-				location,
-			} );
-		} );
-	} );
-
-	describe( 'toggleFeature', () => {
-		it( 'should return TOGGLE_FEATURE action', () => {
-			const feature = 'name';
-			expect( toggleFeature( feature ) ).toEqual( {
-				type: 'TOGGLE_FEATURE',
-				feature,
-			} );
-		} );
-	} );
-
 	describe( 'requestMetaBoxUpdates', () => {
 		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
-			expect( requestMetaBoxUpdates( [ 'normal' ] ) ).toEqual( {
+			expect( requestMetaBoxUpdates() ).toEqual( {
 				type: 'REQUEST_META_BOX_UPDATES',
-				locations: [ 'normal' ],
-			} );
-		} );
-	} );
-
-	describe( 'handleMetaBoxReload', () => {
-		it( 'should return the HANDLE_META_BOX_RELOAD action with a location and node', () => {
-			expect( handleMetaBoxReload( 'normal' ) ).toEqual( {
-				type: 'HANDLE_META_BOX_RELOAD',
-				location: 'normal',
-			} );
-		} );
-	} );
-
-	describe( 'metaBoxStateChanged', () => {
-		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
-			expect( metaBoxStateChanged( 'normal', true ) ).toEqual( {
-				type: 'META_BOX_STATE_CHANGED',
-				location: 'normal',
-				hasChanged: true,
 			} );
 		} );
 	} );
@@ -616,6 +527,14 @@ describe( 'actions', () => {
 		const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 		expect( saveReusableBlock( id ) ).toEqual( {
 			type: 'SAVE_REUSABLE_BLOCK',
+			id,
+		} );
+	} );
+
+	describe( 'deleteReusableBlock', () => {
+		const id = 123;
+		expect( deleteReusableBlock( id ) ).toEqual( {
+			type: 'DELETE_REUSABLE_BLOCK',
 			id,
 		} );
 	} );
