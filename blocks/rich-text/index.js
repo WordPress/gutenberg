@@ -13,6 +13,7 @@ import {
 	find,
 	defer,
 	noop,
+	throttle,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import 'element-closest';
@@ -92,6 +93,7 @@ export class RichText extends Component {
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
+		this.throttledOnChange = throttle( this.onChange.bind( this ), 500 );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -149,6 +151,7 @@ export class RichText extends Component {
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
+		editor.on( 'input', this.throttledOnChange );
 
 		patterns.apply( this, [ editor ] );
 
@@ -366,21 +369,16 @@ export class RichText extends Component {
 		}
 	}
 
-	fireChange() {
-		this.savedContent = this.getContent();
-		this.editor.save();
-		this.props.onChange( this.state.empty ? [] : this.savedContent );
-	}
-
 	/**
 	 * Handles any case where the content of the tinyMCE instance has changed.
 	 */
 	onChange() {
-		// Note that due to efficiency, speed and low cost requirements isDirty may
-		// not reflect reality for a brief period immediately after a change.
-		if ( this.editor.isDirty() ) {
-			this.fireChange();
+		if ( ! this.editor.isDirty() ) {
+			return;
 		}
+		this.savedContent = this.state.empty ? [] : this.getContent();
+		this.props.onChange( this.savedContent );
+		this.editor.save();
 	}
 
 	/**
@@ -507,8 +505,6 @@ export class RichText extends Component {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
 			}
-
-			this.fireChange();
 
 			const forward = event.keyCode === DELETE;
 
@@ -698,13 +694,8 @@ export class RichText extends Component {
 		this.editor.save();
 	}
 
-	setContent( content ) {
-		if ( ! content ) {
-			content = '';
-		}
-
-		content = renderToString( content );
-		this.editor.setContent( content );
+	setContent( content = '' ) {
+		this.editor.setContent( renderToString( content ) );
 	}
 
 	getContent() {
@@ -713,21 +704,20 @@ export class RichText extends Component {
 
 	componentWillUnmount() {
 		this.onChange();
+		this.throttledOnChange.cancel();
 	}
 
 	componentDidUpdate( prevProps ) {
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
+			!! this.editor &&
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent &&
-			! isEqual( this.props.value, prevProps.value ) &&
-			! isEqual( this.props.value, this.savedContent )
+			this.props.value !== this.savedContent
 		) {
 			this.updateContent();
 		}
 	}
-
 	componentWillReceiveProps( nextProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
 			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
@@ -745,6 +735,7 @@ export class RichText extends Component {
 		this.editor.focus();
 		this.editor.formatter.remove( format );
 	}
+
 	applyFormat( format, args, node ) {
 		this.editor.focus();
 		this.editor.formatter.apply( format, args, node );
