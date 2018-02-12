@@ -509,6 +509,8 @@ export class RichText extends Component {
 				return;
 			}
 
+			this.onChange( false );
+
 			const forward = event.keyCode === DELETE;
 
 			if ( this.props.onMerge ) {
@@ -721,6 +723,7 @@ export class RichText extends Component {
 			this.updateContent();
 		}
 	}
+
 	componentWillReceiveProps( nextProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
 			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
