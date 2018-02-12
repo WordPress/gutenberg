@@ -696,6 +696,7 @@ export class RichText extends Component {
 
 	componentWillUnmount() {
 		this.onChange();
+		this.throttledOnChange.cancel();
 	}
 
 	componentDidUpdate( prevProps ) {
