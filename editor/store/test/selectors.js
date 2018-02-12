@@ -2217,6 +2217,12 @@ describe( 'selectors', () => {
 						[ id ]: expectedReusableBlock,
 					},
 				},
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
+					},
+				},
 			};
 
 			const actualReusableBlock = getReusableBlock( state, id );
