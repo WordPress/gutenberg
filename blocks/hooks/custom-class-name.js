@@ -49,7 +49,7 @@ export function addAttribute( settings ) {
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
-		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true ) && props.focus;
+		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true ) && props.isSelected;
 
 		return [
 			<BlockEdit key="block-edit-custom-class-name" { ...props } />,

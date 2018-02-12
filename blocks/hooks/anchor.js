@@ -58,8 +58,7 @@ export function addAttribute( settings ) {
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
-		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.focus;
-
+		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.isSelected;
 		return [
 			<BlockEdit key="block-edit-anchor" { ...props } />,
 			hasAnchor && <InspectorControls key="inspector-anchor">
