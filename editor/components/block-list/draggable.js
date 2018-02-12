@@ -1,7 +1,7 @@
 /**
  * WordPress Dependencies
  */
-import { Component, Children, cloneElement } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 /**
  * withDragging provides dragStart and dragEnd properties for the component being wrapped.
@@ -11,6 +11,8 @@ import { Component, Children, cloneElement } from '@wordpress/element';
  * - Provides "dragStart" and "dragEnd" handlers as properties to the wrapped component.
  *   - These can be used on any draggable element and the effect will be the same.
  * - Styling and drop handlers implemented by the consuming component.
+ * @param { Component } OriginalComponent Original Component.
+ * @returns { Component } The original component wrapped with the additional properties.
  */
 const withDragging = ( OriginalComponent ) => {
 	class Draggable extends Component {
@@ -24,7 +26,7 @@ const withDragging = ( OriginalComponent ) => {
 			this.state = {
 				cloneNodeId: null,
 				elementId: null,
-			}
+			};
 
 			this.cursorTop = null;
 			this.cursorLeft = null;
@@ -39,10 +41,6 @@ const withDragging = ( OriginalComponent ) => {
 			const { elementId, cloneNodeId } = this.state;
 			const element = document.getElementById( elementId );
 			const cloneWrapper = document.getElementById( cloneNodeId );
-
-			console.log( !! element );
-			console.log( elementId );
-			console.log( !! cloneWrapper );
 
 			if ( element && cloneWrapper ) {
 				// Remove clone.
@@ -118,7 +116,7 @@ const withDragging = ( OriginalComponent ) => {
 				} )( dragImage ), 0 );
 			}
 
-			event.dataTransfer.setData( 'text', JSON.stringify( { uid: uid, fromIndex: order, type: type, } ) );
+			event.dataTransfer.setData( 'text', JSON.stringify( { uid: uid, fromIndex: order, type: type } ) );
 
 			// Prepare element clone and append to element wrapper.
 			clone.id = `clone-${ element.id }`;
@@ -165,6 +163,6 @@ const withDragging = ( OriginalComponent ) => {
 	}
 
 	return Draggable;
-}
+};
 
 export default withDragging;

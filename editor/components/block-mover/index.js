@@ -20,7 +20,7 @@ import { getBlockMoverLabel } from './mover-label';
 import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../store/selectors';
 import { selectBlock } from '../../store/actions';
 
-export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, draggable, onDragStart, onDragEnd, } ) {
+export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, draggable, onDragStart, onDragEnd } ) {
 	if ( isLocked ) {
 		return null;
 	}
