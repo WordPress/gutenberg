@@ -373,8 +373,12 @@ export class RichText extends Component {
 	 * Handles any case where the content of the tinyMCE instance has changed.
 	 */
 	onChange() {
+		if ( ! this.editor.isDirty() ) {
+			return;
+		}
 		this.savedContent = this.state.empty ? [] : this.getContent();
 		this.props.onChange( this.savedContent );
+		this.editor.save();
 	}
 
 	/**
@@ -684,6 +688,10 @@ export class RichText extends Component {
 		this.savedContent = this.props.value;
 		this.setContent( this.savedContent );
 		this.editor.selection.moveToBookmark( bookmark );
+
+		// Saving the editor on updates avoid unecessary onChanges calls
+		// These calls can make the focus jump
+		this.editor.save();
 	}
 
 	setContent( content = '' ) {
@@ -727,6 +735,7 @@ export class RichText extends Component {
 		this.editor.focus();
 		this.editor.formatter.remove( format );
 	}
+
 	applyFormat( format, args, node ) {
 		this.editor.focus();
 		this.editor.formatter.apply( format, args, node );
