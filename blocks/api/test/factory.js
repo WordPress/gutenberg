@@ -706,9 +706,11 @@ describe( 'block factory', () => {
 			const type = 'core/test-block';
 			const attributes = { name: 'Big Bird' };
 
-			expect( createReusableBlock( type, attributes ) ).toMatchObject( {
+			expect( createReusableBlock( type, attributes ) ).toEqual( {
 				id: expect.any( Number ),
+				isTemporary: true,
 				title: 'Untitled block',
+				innerBlocks: [],
 				type,
 				attributes,
 			} );

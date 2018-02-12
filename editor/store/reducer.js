@@ -169,6 +169,12 @@ export const editor = flow( [
 			case 'RESET_BLOCKS':
 				return getFlattenedBlocks( action.blocks );
 
+			case 'FETCH_REUSABLE_BLOCKS_SUCCESS':
+				return {
+					...state,
+					...getFlattenedBlocks( action.reusableBlocks ),
+				};
+
 			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
 				if ( ! state[ action.uid ] ) {
@@ -271,6 +277,14 @@ export const editor = flow( [
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 				return mapBlockOrder( action.blocks );
+
+			case 'FETCH_REUSABLE_BLOCKS_SUCCESS':
+				return {
+					...state,
+					...reduce( action.reusableBlocks, ( result, block ) => (
+						Object.assign( result, mapBlockOrder( block.innerBlocks, block.uid ) )
+					), {} ),
+				};
 
 			case 'INSERT_BLOCKS': {
 				const { rootUID = '', blocks } = action;

@@ -340,8 +340,8 @@ export default {
 					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
 					id,
 					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, title, content } ) => {
-						const [ { name: type, attributes } ] = parse( content );
-						return { id: itemId, title, type, attributes };
+						const [ { uid, name: type, attributes, innerBlocks } ] = parse( content );
+						return { uid, id: itemId, title, type, attributes, innerBlocks };
 					} ),
 				} );
 			},
@@ -367,8 +367,8 @@ export default {
 		const { id } = action;
 		const { getState, dispatch } = store;
 
-		const { title, type, attributes, isTemporary } = getReusableBlock( getState(), id );
-		const content = serialize( createBlock( type, attributes ) );
+		const { title, type, attributes, isTemporary, innerBlocks } = getReusableBlock( getState(), id );
+		const content = serialize( createBlock( type, attributes, innerBlocks ) );
 		const requestData = isTemporary ? { title, content } : { id, title, content };
 
 		new wp.api.models.Blocks( requestData ).save().then(
@@ -457,14 +457,15 @@ export default {
 		const { getState, dispatch } = store;
 
 		const oldBlock = getBlock( getState(), action.uid );
-		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
+		const { uid, name, attributes, innerBlocks } = oldBlock;
+		const reusableBlock = createReusableBlock( name, attributes, innerBlocks );
 		const newBlock = createBlock( 'core/block', {
 			ref: reusableBlock.id,
-			layout: oldBlock.attributes.layout,
+			layout: attributes.layout,
 		} );
 		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
 		dispatch( saveReusableBlock( reusableBlock.id ) );
-		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
+		dispatch( replaceBlocks( [ uid ], [ newBlock ] ) );
 	},
 	APPEND_DEFAULT_BLOCK( action ) {
 		const { attributes, rootUID } = action;

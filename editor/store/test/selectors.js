@@ -2156,6 +2156,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
+						blocksByUid: {},
 						blockOrder: [],
 					},
 				},

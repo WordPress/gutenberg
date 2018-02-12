@@ -506,7 +506,7 @@ describe( 'effects', () => {
 			it( 'should fetch multiple reusable blocks', () => {
 				const promise = Promise.resolve( [
 					{
-						id: 'a9691cf9-ecaa-42bd-a9ca-49587e817647',
+						id: 1,
 						title: 'My cool block',
 						content: '<!-- wp:core/test-block {"name":"Big Bird"} /-->',
 					},
@@ -528,12 +528,14 @@ describe( 'effects', () => {
 						type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
 						reusableBlocks: [
 							{
-								id: 'a9691cf9-ecaa-42bd-a9ca-49587e817647',
+								id: 1,
+								uid: expect.any( String ),
 								title: 'My cool block',
 								type: 'core/test-block',
 								attributes: {
 									name: 'Big Bird',
 								},
+								innerBlocks: [],
 							},
 						],
 					} );
@@ -573,11 +575,13 @@ describe( 'effects', () => {
 						reusableBlocks: [
 							{
 								id,
+								uid: expect.any( String ),
 								title: 'My cool block',
 								type: 'core/test-block',
 								attributes: {
 									name: 'Big Bird',
 								},
+								innerBlocks: [],
 							},
 						],
 					} );
@@ -831,6 +835,7 @@ describe( 'effects', () => {
 						title: 'Untitled block',
 						type: staticBlock.name,
 						attributes: staticBlock.attributes,
+						innerBlocks: [],
 					} )
 				);
 				expect( dispatch ).toHaveBeenCalledWith(
