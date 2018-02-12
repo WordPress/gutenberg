@@ -76,5 +76,7 @@ export default connect(
 		};
 	}, {
 		onClose: closeGeneralSidebar,
-	}
+	},
+	undefined,
+	{ storeKey: 'edit-post' }
 )( withFocusReturn( PluginsPanel ) );
