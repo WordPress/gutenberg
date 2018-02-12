@@ -20,8 +20,7 @@ const menuItems = {};
  *                                     `[namespace]/[name]` format.
  * @param {Object}   settings          The settings for this menu item.
  * @param {string}   settings.title    The name to show in the settings menu.
- * @param {func}     settings.pluginId The registerd plugin activation function that is called
- *                                     when the menu item is clicked.
+ * @param {func}     settings.target   The registered plugin that should be activated.
  * @param {string}   [settings.icon]   SVG Icon url.
  *
  * @return {Object} The final sidebar settings object.
@@ -64,7 +63,20 @@ export function registerEditorMenuItem( menuItemId, settings ) {
 		return null;
 	}
 
-	settings.callback = activatePlugin.bind( null, settings.pluginId );
+	if ( ! settings.target ) {
+		console.error(
+			`Menu item "${ menuItemId }" must have a target.`
+		);
+		return null;
+	}
+	if ( typeof settings.target !== 'string' ) {
+		console.error(
+			'Menu items target must be strings.'
+		);
+		return null;
+	}
+
+	settings.callback = activatePlugin.bind( null, settings.target );
 
 	settings = applyFilters( 'editor.registerEllipsisMenuItem', settings, menuItemId );
 
