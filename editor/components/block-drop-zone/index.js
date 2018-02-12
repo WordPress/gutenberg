@@ -54,15 +54,17 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 				}
 
 				if ( position.y === 'top' && index > fromIndex ) {
-					props.onDrop( uid, index - 1 );
+					props.onDrop( event, uid, index - 1 );
 					return;
 				} else if ( position.y === 'bottom' && index < fromIndex ) {
-					props.onDrop( uid, index + 1 );
+					props.onDrop( event, uid, index + 1 );
 					return;
 				}
 
-				props.onDrop( uid, index );
-			} catch ( err ) { }
+				props.onDrop( event, uid, index );
+			} catch ( err ) {
+				console.log( err );
+			}
 		}
 	};
 

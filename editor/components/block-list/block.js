@@ -113,19 +113,13 @@ export class BlockListBlock extends Component {
 		this.onClick = this.onClick.bind( this );
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
-		this.onDragOver = this.onDragOver.bind( this );
-		this.resetDragging = this.resetDragging.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
 
 		this.state = {
 			error: null,
-			dragging: false,
 		};
-
-		this.cursorLeft = 0;
-		this.cursorTop = 0;
 	}
 
 	componentDidMount() {
@@ -359,146 +353,38 @@ export class BlockListBlock extends Component {
 		this.setState( { error } );
 	}
 
-	/*
-	 * Reorder via Drag & Drop. Step 1 of 4.
-	 * Strategy:
-	 *  - Clone the current block and spawn clone over original block. Hide original block and set inset.
-	 *  - Set transfer data.
-	 *  - Add dragover listener.
-	 */
 	onDragStart( event ) {
-		const dragInset = document.getElementById( `block-drag-inset-${ this.props.uid }` );
-		const block = document.getElementById( `block-${ this.props.uid }` );
-		const blockList = block.parentNode;
-		const cloneWrapper = document.createElement( 'div' );
-		const clone = block.cloneNode( true );
-		const blockRect = block.getBoundingClientRect();
-		const blockTopOffset = parseInt( blockRect.top, 10 );
-		const blockLeftOffset = parseInt( blockRect.left, 10 );
-
-		// Set a fake drag image to avoid browser defaults.
-		// It has been observed that some browsers change the cursor if a drag image is missing.
-		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-			const dragImage = document.createElement( 'div' );
-
-			dragImage.id = `drag-image-${ block.id }`;
-			dragImage.classList.add( 'invisible-drag-image' );
-			document.body.appendChild( dragImage );
-			// Set the invisible dragImage and remove from DOM right after.
-			event.dataTransfer.setDragImage( dragImage, 0, 0 );
-			setTimeout( ( ( _dragImage ) => () => {
-				document.body.removeChild( _dragImage );
-			} )( dragImage ), 0 );
-		}
-
-		event.dataTransfer.setData(
-			'text',
-			JSON.stringify( {
-				uid: this.props.uid,
-				fromIndex: this.props.order,
-				type: BLOCK_REORDER,
-			} )
+		this.props.onDragStart(
+			event,
+			this.props.uid,
+			`block-${ this.props.uid }`,
+			this.props.order,
+			BLOCK_REORDER
 		);
-
-		// Prepare block clone and append to blocks list.
-		clone.id = `clone-${ block.id }`;
-		cloneWrapper.id = `clone-wrapper-${ block.id }`;
-		cloneWrapper.classList.add( 'editor-block-list__block-clone' );
-		cloneWrapper.style.width = `${ blockRect.width + 40 }px`;
-
-		if ( blockRect.height > 700 ) {
-			// Scale down clone if original block is larger than 700px.
-			cloneWrapper.style.transform = 'scale(0.5)';
-			cloneWrapper.style.transformOrigin = 'top left';
-			// Position clone near the cursor.
-			cloneWrapper.style.top = `${ parseInt( event.clientY, 10 ) - 100 }px`;
-			cloneWrapper.style.left = `${ parseInt( event.clientX, 10 ) }px`;
-		} else {
-			// Position clone right over the original block (20px padding).
-			cloneWrapper.style.top = `${ blockTopOffset - 20 }px`;
-			cloneWrapper.style.left = `${ blockLeftOffset - 20 }px`;
-		}
-
-		cloneWrapper.appendChild( clone );
-		blockList.appendChild( cloneWrapper );
-
-		// Mark the current cursor coordinates.
-		this.cursorLeft = event.clientX;
-		this.cursorTop = event.clientY;
-
-		// Hide the visible block and show inset in its place.
+		// Following fires after the events in props.onDragStart.
 		setTimeout( () => {
 			this.setState( { dragging: true } );
 		}, 0 );
-
-		// Update cursor to 'grabbing', document wide.
-		document.body.classList.add( 'dragging' );
-
-		document.addEventListener( 'dragover', this.onDragOver );
-		event.stopPropagation();
 	}
 
-	/*
-	 * Reorder via Drag & Drop. Step 2 of 4.
-	 * Strategy: Update positioning of block clone based on mouse movement.
-	 */
-	onDragOver( event ) {
-		const block = document.getElementById( `block-${ this.props.uid }` );
-		const cloneWrapper = document.getElementById( `clone-wrapper-${ block.id }` );
-
-		cloneWrapper.style.top =
-			`${ parseInt( cloneWrapper.style.top, 10 ) + parseInt( event.clientY, 10 ) - parseInt( this.cursorTop, 10 ) }px`;
-		cloneWrapper.style.left =
-			`${ parseInt( cloneWrapper.style.left, 10 ) + parseInt( event.clientX, 10 ) - parseInt( this.cursorLeft, 10 ) }px`;
-
-		// Update cursor coordinates.
-		this.cursorLeft = event.clientX;
-		this.cursorTop = event.clientY;
-	}
-
-	/*
-	 * Reorder via Drag & Drop. Step 3 of 4.
-	 * Strategy: Remove inset and block clone, reset cursor, and remove drag listener.
-	 */
 	onDragEnd( event ) {
-		this.resetDragging();
-		event.stopPropagation();
-	}
-
-	/*
-	 * Remove inset and block clone, reset cursor, and remove drag listener.
-	 * Called onDrop and onDragEnd (to ensure the dropzone does not prevent this call,
-	 * as onDrop goes through the dropzone provider).
-	 */
-	resetDragging() {
-		const block = document.getElementById( `block-${ this.props.uid }` );
-		const cloneWrapper = document.getElementById( `clone-wrapper-${ block.id }` );
-
-		if ( block && cloneWrapper ) {
-			// Remove clone.
-			block.parentNode.removeChild( cloneWrapper );
-		}
-
-		// Hide inset and reset block display.
+		this.props.onDragEnd( event );
+		// Following fires after the events in props.onDragStart.
 		setTimeout( () => {
 			this.setState( { dragging: false } );
-		} );
-
-		// Reset cursor.
-		document.body.classList.remove( 'dragging' );
-		document.removeEventListener( 'dragover', this.onDragOver );
+		}, 0 );
 	}
 
 	/*
-	 * Reorder via Drag & Drop. Step 4 of 4.
+	 * Reorder via Drag & Drop. Final step.
 	 * Strategy:
-	 *  - Remove inset and block clone, reset cursor, and remove drag listener.
+	 *  - Call dragEnd handler.
+	 *    - We call the dragEnd handler here to ensure the dropzone does not prevent this call.
 	 *  - Initiate reordering.
 	 */
-	reorderBlock( uid, toIndex ) {
-		this.resetDragging();
-		// This call needs to fire after the clone is removed from the DOM
-		// and the state is updated ( { dragging: false } ) in Step 3 above.
+	reorderBlock( event, uid, toIndex ) {
+		this.onDragEnd( event );
+		// Following fires after the events in props.onDragEnd.
 		setTimeout( () => {
 			this.props.moveBlockToIndex( uid, toIndex );
 		}, 300 );
@@ -553,7 +439,6 @@ export class BlockListBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<div
-					id={ `block-drag-inset-${ this.props.uid }` }
 					draggable={ true }
 					onDragStart={ this.onDragStart }
 					onDragEnd={ this.onDragEnd }
@@ -569,18 +454,18 @@ export class BlockListBlock extends Component {
 
 				{ ( showUI || isHovered ) &&
 					<BlockMover
+						uids={ [ block.uid ] }
 						draggable={ true }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
-						uids={ [ block.uid ] }
 					/>
 				}
 				{ ( showUI || isHovered ) &&
 					<BlockSettingsMenu
+						uids={ [ block.uid ] }
 						draggable={ true }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
-						uids={ [ block.uid ] }
 					/>
 				}
 				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }

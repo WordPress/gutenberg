@@ -26,6 +26,7 @@ import { serialize } from '@wordpress/blocks';
 import './style.scss';
 import BlockListBlock from './block';
 import BlockListSiblingInserter from './sibling-inserter';
+import withDragging from './draggable';
 import {
 	getBlockUids,
 	getMultiSelectedBlocksStartUid,
@@ -215,7 +216,7 @@ class BlockList extends Component {
 	}
 
 	render() {
-		const { blocks, showContextualToolbar } = this.props;
+		const { blocks, showContextualToolbar, onDragStart, onDragEnd } = this.props;
 
 		return (
 			<div>
@@ -228,6 +229,8 @@ class BlockList extends Component {
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 						showContextualToolbar={ showContextualToolbar }
+						onDragStart={ onDragStart }
+						onDragEnd={ onDragEnd }
 					/>,
 					<BlockListSiblingInserter
 						key={ 'sibling-inserter-' + uid }
@@ -266,4 +269,4 @@ export default connect(
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
 		},
 	} )
-)( BlockList );
+)( withDragging( BlockList ) );
