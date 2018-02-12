@@ -95,6 +95,7 @@ class ReusableBlockEdit extends Component {
 			<div key="edit" style={ { pointerEvents: isEditing ? 'auto' : 'none' } }>
 				<BlockEdit
 					{ ...this.props }
+					id={ reusableBlock.uid }
 					name={ reusableBlock.type }
 					isSelected={ isEditing && isSelected }
 					attributes={ reusableBlockAttributes }

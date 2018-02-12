@@ -4,11 +4,6 @@
 import { Component } from '@wordpress/element';
 
 /**
- * Internal dependencies
- */
-import BlockList from './';
-
-/**
  * An object of cached BlockList components
  *
  * @type {Object}
@@ -48,8 +43,12 @@ export function createInnerBlockList( uid, renderBlockMenu, showContextualToolba
 				}
 
 				render() {
+					// TODO: We shouldn't access BlockList via the global. Need
+					// to explore better merging of overlapping editor / blocks
+					// modules pieces.
 					return (
-						<BlockList
+						// eslint-disable-next-line react/jsx-no-undef
+						<wp.editor.BlockList
 							rootUID={ uid }
 							renderBlockMenu={ renderBlockMenu }
 							showContextualToolbar={ showContextualToolbar }
