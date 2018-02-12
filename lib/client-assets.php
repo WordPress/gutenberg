@@ -155,6 +155,7 @@ function gutenberg_register_scripts_and_styles() {
 		gutenberg_get_script_polyfill( array(
 			'\'Promise\' in window' => 'promise',
 			'\'fetch\' in window'   => 'fetch',
+			'\'WeakMap\' in window' => 'WeakMap',
 		) ),
 		'before'
 	);
@@ -894,7 +895,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script .= <<<JS
 		window._wpLoadGutenbergEditor = wp.api.init().then( function() {
 			wp.blocks.registerCoreBlocks();
-			return wp[ 'edit-post' ].initializeEditor( 'editor', window._wpGutenbergPost, editorSettings );
+			return wp.editPost.initializeEditor( 'editor', window._wpGutenbergPost, editorSettings );
 		} );
 JS;
 	$script .= '} )();';

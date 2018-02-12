@@ -4,18 +4,14 @@
 import { isEmpty } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { withInstanceId } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
-import BaseControl from './../base-control';
+import BaseControl from '../base-control';
+import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
 function RadioControl( { label, selected, help, instanceId, onChange, options = [] } ) {
-	const id = 'inspector-radio-control-' + instanceId;
+	const id = `inspector-radio-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return ! isEmpty( options ) && (

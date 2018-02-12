@@ -1,17 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { Dashicon, withInstanceId, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import BaseControl from './../base-control';
+import { BaseControl, Button, Dashicon } from '../';
+import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
 function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIcon, help, allowReset, ...props } ) {
-	const id = 'inspector-range-control-' + instanceId;
+	const id = `inspector-range-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 
 	return (

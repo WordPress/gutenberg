@@ -1,16 +1,12 @@
 /**
- * WordPress dependencies
- */
-import { withInstanceId } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
-import BaseControl from './../base-control';
+import BaseControl from '../base-control';
+import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
 function CheckboxControl( { label, heading, checked, help, instanceId, onChange, ...props } ) {
-	const id = 'inspector-checkbox-control-' + instanceId;
+	const id = `inspector-checkbox-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (

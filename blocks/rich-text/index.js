@@ -13,6 +13,7 @@ import {
 	find,
 	defer,
 	noop,
+	throttle,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import 'element-closest';
@@ -22,7 +23,7 @@ import 'element-closest';
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
 import { keycodes, createBlobURL } from '@wordpress/utils';
-import { Slot, Fill } from '@wordpress/components';
+import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -72,7 +73,7 @@ export function getFormatProperties( formatName, parents ) {
 
 const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
-export default class RichText extends Component {
+export class RichText extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -92,6 +93,7 @@ export default class RichText extends Component {
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
+		this.throttledOnChange = throttle( this.onChange.bind( this ), 500 );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -149,6 +151,7 @@ export default class RichText extends Component {
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
+		editor.on( 'input', this.throttledOnChange );
 
 		patterns.apply( this, [ editor ] );
 
@@ -248,11 +251,21 @@ export default class RichText extends Component {
 	 * @param {PasteEvent} event The paste event as triggered by tinyMCE.
 	 */
 	onPaste( event ) {
-		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
-		const { items = [], files = [] } = dataTransfer;
-		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+		const dataTransfer =
+			event.clipboardData ||
+			event.dataTransfer ||
+			this.editor.getDoc().dataTransfer ||
+			// Removes the need for further `dataTransfer` checks.
+			{ getData: () => '' };
 
-		if ( item ) {
+		const { items = [], files = [], types = [] } = dataTransfer;
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+		const plainText = dataTransfer.getData( 'text/plain' );
+		const HTML = dataTransfer.getData( 'text/html' );
+
+		// Only process file if no HTML is present.
+		// Note: a pasted file may have the URL as plain text.
+		if ( item && ! HTML ) {
 			const blob = item.getAsFile ? item.getAsFile() : item;
 			const rootNode = this.editor.getBody();
 			const isEmpty = this.editor.dom.isEmpty( rootNode );
@@ -267,20 +280,18 @@ export default class RichText extends Component {
 
 			if ( isEmpty && this.props.onReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
-				setTimeout( () => this.props.onReplace( content ) );
+				this.props.setTimeout( () => this.props.onReplace( content ) );
 			} else if ( this.props.onSplit ) {
 				// Necessary to get the right range.
 				// Also done in the TinyMCE paste plugin.
-				setTimeout( () => this.splitContent( content ) );
+				this.props.setTimeout( () => this.splitContent( content ) );
 			}
 
 			event.preventDefault();
 		}
 
-		this.pastedPlainText = dataTransfer ? dataTransfer.getData( 'text/plain' ) : '';
-		this.isPlainTextPaste = ( dataTransfer &&
-			dataTransfer.types.length === 1 &&
-			dataTransfer.types[ 0 ] === 'text/plain' );
+		this.pastedPlainText = plainText;
+		this.isPlainTextPaste = types.length === 1 && types[ 0 ] === 'text/plain';
 	}
 
 	/**
@@ -358,21 +369,16 @@ export default class RichText extends Component {
 		}
 	}
 
-	fireChange() {
-		this.savedContent = this.getContent();
-		this.editor.save();
-		this.props.onChange( this.state.empty ? [] : this.savedContent );
-	}
-
 	/**
 	 * Handles any case where the content of the tinyMCE instance has changed.
 	 */
 	onChange() {
-		// Note that due to efficiency, speed and low cost requirements isDirty may
-		// not reflect reality for a brief period immediately after a change.
-		if ( this.editor.isDirty() ) {
-			this.fireChange();
+		if ( ! this.editor.isDirty() ) {
+			return;
 		}
+		this.savedContent = this.state.empty ? [] : this.getContent();
+		this.props.onChange( this.savedContent );
+		this.editor.save();
 	}
 
 	/**
@@ -499,8 +505,6 @@ export default class RichText extends Component {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
 			}
-
-			this.fireChange();
 
 			const forward = event.keyCode === DELETE;
 
@@ -690,13 +694,8 @@ export default class RichText extends Component {
 		this.editor.save();
 	}
 
-	setContent( content ) {
-		if ( ! content ) {
-			content = '';
-		}
-
-		content = renderToString( content );
-		this.editor.setContent( content );
+	setContent( content = '' ) {
+		this.editor.setContent( renderToString( content ) );
 	}
 
 	getContent() {
@@ -705,21 +704,20 @@ export default class RichText extends Component {
 
 	componentWillUnmount() {
 		this.onChange();
+		this.throttledOnChange.cancel();
 	}
 
 	componentDidUpdate( prevProps ) {
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
+			!! this.editor &&
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent &&
-			! isEqual( this.props.value, prevProps.value ) &&
-			! isEqual( this.props.value, this.savedContent )
+			this.props.value !== this.savedContent
 		) {
 			this.updateContent();
 		}
 	}
-
 	componentWillReceiveProps( nextProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
 			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
@@ -737,6 +735,7 @@ export default class RichText extends Component {
 		this.editor.focus();
 		this.editor.formatter.remove( format );
 	}
+
 	applyFormat( format, args, node ) {
 		this.editor.focus();
 		this.editor.formatter.apply( format, args, node );
@@ -855,3 +854,5 @@ RichText.defaultProps = {
 	formattingControls: DEFAULT_FORMATS,
 	formatters: [],
 };
+
+export default withSafeTimeout( RichText );

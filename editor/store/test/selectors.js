@@ -2,7 +2,7 @@
  * External dependencies
  */
 import moment from 'moment';
-import { union } from 'lodash';
+import { filter, property, union } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,9 @@ import { registerBlockType, unregisterBlockType, registerCoreBlocks, getBlockTyp
 /**
  * Internal dependencies
  */
-import {
+import * as selectors from '../selectors';
+
+const {
 	hasEditorUndo,
 	hasEditorRedo,
 	isEditedPostNew,
@@ -40,9 +42,7 @@ import {
 	getBlockCount,
 	getSelectedBlock,
 	getBlockRootUID,
-	getEditedPostContent,
 	getMultiSelectedBlockUids,
-	getMultiSelectedBlocks,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getBlockOrder,
@@ -76,9 +76,11 @@ import {
 	getInserterItems,
 	getRecentInserterItems,
 	POST_UPDATE_TRANSACTION_ID,
-} from '../selectors';
+} = selectors;
 
 describe( 'selectors', () => {
+	let cachedSelectors;
+
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
 			save: ( props ) => props.attributes.text,
@@ -88,14 +90,12 @@ describe( 'selectors', () => {
 			keywords: [ 'testing' ],
 			useOnce: true,
 		} );
+
+		cachedSelectors = filter( selectors, property( 'clear' ) );
 	} );
 
 	beforeEach( () => {
-		getBlock.clear();
-		getBlocks.clear();
-		getEditedPostContent.clear();
-		getMultiSelectedBlockUids.clear();
-		getMultiSelectedBlocks.clear();
+		cachedSelectors.forEach( ( { clear } ) => clear() );
 	} );
 
 	afterAll( () => {

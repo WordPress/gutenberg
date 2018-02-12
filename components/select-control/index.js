@@ -4,18 +4,14 @@
 import { isEmpty } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { withInstanceId } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
-import BaseControl from './../base-control';
+import BaseControl from '../base-control';
+import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
 function SelectControl( { label, help, instanceId, onChange, options = [], ...props } ) {
-	const id = 'inspector-select-control-' + instanceId;
+	const id = `inspector-select-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	// Disable reason: A select with an onchange throws a warning

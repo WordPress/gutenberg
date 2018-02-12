@@ -8,12 +8,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { RangeControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import RangeControl from '../../inspector-controls/range-control';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';

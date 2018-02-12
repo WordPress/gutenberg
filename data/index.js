@@ -15,11 +15,7 @@ export { loadAndPersist, withRehydratation } from './persist';
  */
 const stores = {};
 const selectors = {};
-const enhancers = [];
 let listeners = [];
-if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
-	enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__() );
-}
 
 /**
  * Global listener called for each store's update.
@@ -52,6 +48,10 @@ export const subscribe = ( listener ) => {
  * @return {Object} Store Object.
  */
 export function registerReducer( reducerKey, reducer ) {
+	const enhancers = [];
+	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
+		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
+	}
 	const store = createStore( reducer, flowRight( enhancers ) );
 	stores[ reducerKey ] = store;
 	store.subscribe( globalListener );

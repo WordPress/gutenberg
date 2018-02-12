@@ -1,16 +1,12 @@
 /**
- * WordPress dependencies
- */
-import { withInstanceId } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
-import BaseControl from './../base-control';
+import BaseControl from '../base-control';
+import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
 function TextareaControl( { label, value, help, instanceId, onChange, rows = 4, ...props } ) {
-	const id = 'inspector-textarea-control-' + instanceId;
+	const id = `inspector-textarea-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.value );
 
 	return (

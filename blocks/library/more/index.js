@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { ToggleControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
 
 export const name = 'core/more';
 
