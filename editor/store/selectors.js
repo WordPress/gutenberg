@@ -232,7 +232,7 @@ export function getEditedPostAttribute( state, attributeName ) {
 	// Special cases
 	switch ( attributeName ) {
 		case 'content':
-			return getEditedPostContent();
+			return getEditedPostContent( state );
 	}
 
 	return edits[ attributeName ] === undefined ?
