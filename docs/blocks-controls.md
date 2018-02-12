@@ -40,7 +40,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 	edit: function( props ) {
 		var content = props.attributes.content,
 			alignment = props.attributes.alignment,
-			focus = props.focus;
+			isSelected = props.isSelected;
 
 		function onChangeContent( newContent ) {
 			props.setAttributes( { content: newContent } );
@@ -51,7 +51,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 		}
 
 		return [
-			!! focus && el(
+			isSelected && el(
 				BlockControls,
 				{ key: 'controls' },
 				el(
@@ -71,8 +71,6 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 					style: { textAlign: alignment },
 					onChange: onChangeContent,
 					value: content,
-					focus: focus,
-					onFocus: props.setFocus
 				}
 			)
 		];
@@ -114,7 +112,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 		},
 	},
 
-	edit( { attributes, className, focus, setAttributes, setFocus } ) {
+	edit( { attributes, className, isSelected, setAttributes } ) {
 		const { content, alignment } = attributes;
 
 		function onChangeContent( newContent ) {
@@ -126,7 +124,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 		}
 
 		return [
-			!! focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<AlignmentToolbar
 						value={ alignment }
@@ -141,8 +139,6 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 				style={ { textAlign: alignment } }
 				onChange={ onChangeContent }
 				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
 			/>
 		];
 	},
@@ -156,7 +152,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 ```
 {% end %}
 
-Note that you should only include `BlockControls` if the block is currently selected. We must test that the `focus` value is truthy before rendering the element, otherwise you will inadvertently cause controls to be shown for the incorrect block type.
+Note that you should only include `BlockControls` if the block is currently selected. We must test that the `isSelected` value is truthy before rendering the element, otherwise you will inadvertently cause controls to be shown for the incorrect block type.
 
 ## Inspector
 

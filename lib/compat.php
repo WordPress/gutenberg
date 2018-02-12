@@ -70,25 +70,6 @@ function _gutenberg_utf8_split( $str ) {
 }
 
 /**
- * Fixes a conflict with the Jetpack plugin trying to read an undefined global
- * variable `grunionEditorView` during the initialization of the
- * `core/freeform` block.
- *
- * @since 0.7.1
- */
-function gutenberg_fix_jetpack_freeform_block_conflict() {
-	if (
-		defined( 'JETPACK__VERSION' ) &&
-		version_compare( JETPACK__VERSION, '5.2.2', '<' )
-	) {
-		remove_filter(
-			'mce_external_plugins',
-			array( 'Grunion_Editor_View', 'mce_external_plugins' )
-		);
-	}
-}
-
-/**
  * Shims wp-api-request for WordPress installations not running 4.9-alpha or
  * newer.
  *

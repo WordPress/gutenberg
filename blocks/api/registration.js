@@ -16,9 +16,34 @@ import { applyFilters } from '@wordpress/hooks';
 import { getCategories } from './categories';
 
 /**
- * Block settings keyed by block name.
+ * Defined behavior of a block type.
  *
- * @type {Object}
+ * @typedef {WPBlockType}
+ *
+ * @property {string}             name       Block's namespaced name.
+ * @property {string}             title      Human-readable label for a block.
+ *                                           Shown in the block inserter.
+ * @property {string}             category   Category classification of block,
+ *                                           impacting where block is shown in
+ *                                           inserter results.
+ * @property {(string|WPElement)} icon       Slug of the Dashicon to be shown
+ *                                           as the icon for the block in the
+ *                                           inserter, or element.
+ * @property {?string[]}          keywords   Additional keywords to produce
+ *                                           block as inserter search result.
+ * @property {?Object}            attributes Block attributes.
+ * @property {Function}           save       Serialize behavior of a block,
+ *                                           returning an element describing
+ *                                           structure of the block's post
+ *                                           content markup.
+ * @property {WPComponent}        edit       Component rendering element to be
+ *                                           interacted with in an editor.
+ */
+
+/**
+ * Block type definitions keyed by block name.
+ *
+ * @type {Object.<string,WPBlockType>}
  */
 const blocks = {};
 

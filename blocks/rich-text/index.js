@@ -13,6 +13,7 @@ import {
 	find,
 	defer,
 	noop,
+	throttle,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import 'element-closest';
@@ -22,7 +23,7 @@ import 'element-closest';
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
 import { keycodes, createBlobURL } from '@wordpress/utils';
-import { Slot, Fill } from '@wordpress/components';
+import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -37,7 +38,7 @@ import { EVENTS } from './constants';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
-function createTinyMCEElement( type, props, ...children ) {
+export function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
 		return null;
 	}
@@ -53,13 +54,13 @@ function createTinyMCEElement( type, props, ...children ) {
 	);
 }
 
-function isLinkBoundary( fragment ) {
+export function isLinkBoundary( fragment ) {
 	return fragment.childNodes && fragment.childNodes.length === 1 &&
 		fragment.childNodes[ 0 ].nodeName === 'A' && fragment.childNodes[ 0 ].text.length === 1 &&
 		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
 }
 
-function getFormatProperties( formatName, parents ) {
+export function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
 		case 'link' : {
 			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
@@ -72,7 +73,7 @@ function getFormatProperties( formatName, parents ) {
 
 const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
-export default class RichText extends Component {
+export class RichText extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
@@ -92,8 +93,8 @@ export default class RichText extends Component {
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
+		this.throttledOnChange = throttle( this.onChange.bind( this ), 500 );
 		this.onNewBlock = this.onNewBlock.bind( this );
-		this.onFocus = this.onFocus.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
@@ -143,7 +144,6 @@ export default class RichText extends Component {
 		editor.on( 'init', this.onInit );
 		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
-		editor.on( 'focusin', this.onFocus );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
@@ -151,6 +151,7 @@ export default class RichText extends Component {
 		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
+		editor.on( 'input', this.throttledOnChange );
 
 		patterns.apply( this, [ editor ] );
 
@@ -172,13 +173,6 @@ export default class RichText extends Component {
 	*/
 	proxyPropHandler( name ) {
 		return ( event ) => {
-			// TODO: Reconcile with `onFocus` instance handler which does not
-			// pass the event object. Otherwise we have double focus handling
-			// and editor instance being stored into state.
-			if ( name === 'Focus' ) {
-				return;
-			}
-
 			// Allow props an opportunity to handle the event, before default
 			// RichText behavior takes effect. Should the event be handled by a
 			// prop, it should `stopImmediatePropagation` on the event to stop
@@ -190,7 +184,6 @@ export default class RichText extends Component {
 	}
 
 	onInit() {
-		this.updateFocus();
 		this.registerCustomFormatters();
 	}
 
@@ -211,44 +204,19 @@ export default class RichText extends Component {
 		} );
 	}
 
-	onFocus() {
-		if ( ! this.props.onFocus ) {
-			return;
-		}
-
-		// TODO: We need a way to save the focus position ( bookmark maybe )
-		this.props.onFocus();
-	}
-
-	isActive() {
-		return document.activeElement === this.editor.getBody();
-	}
-
 	/**
 	 * Handles the global selection change event.
-	 *
-	 * Will call the onFocus handler if one is defined and this block is focused.
 	 */
 	onSelectionChange() {
+		const isActive = document.activeElement === this.editor.getBody();
 		// We must check this because selectionChange is a global event.
-		if ( ! this.isActive() ) {
+		if ( ! isActive ) {
 			return;
 		}
 
-		const collapsed = this.editor.selection.isCollapsed();
-
-		this.setState( {
-			empty: tinymce.DOM.isEmpty( this.editor.getBody() ),
-		} );
-
-		if (
-			this.props.focus && this.props.onFocus &&
-			this.props.focus.collapsed !== collapsed
-		) {
-			this.props.onFocus( {
-				...this.props.focus,
-				collapsed,
-			} );
+		const isEmpty = tinymce.DOM.isEmpty( this.editor.getBody() );
+		if ( this.state.empty !== isEmpty ) {
+			this.setState( { empty: isEmpty } );
 		}
 	}
 
@@ -283,11 +251,21 @@ export default class RichText extends Component {
 	 * @param {PasteEvent} event The paste event as triggered by tinyMCE.
 	 */
 	onPaste( event ) {
-		const dataTransfer = event.clipboardData || event.dataTransfer || this.editor.getDoc().dataTransfer;
-		const { items = [], files = [] } = dataTransfer;
-		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+		const dataTransfer =
+			event.clipboardData ||
+			event.dataTransfer ||
+			this.editor.getDoc().dataTransfer ||
+			// Removes the need for further `dataTransfer` checks.
+			{ getData: () => '' };
 
-		if ( item ) {
+		const { items = [], files = [], types = [] } = dataTransfer;
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+		const plainText = dataTransfer.getData( 'text/plain' );
+		const HTML = dataTransfer.getData( 'text/html' );
+
+		// Only process file if no HTML is present.
+		// Note: a pasted file may have the URL as plain text.
+		if ( item && ! HTML ) {
 			const blob = item.getAsFile ? item.getAsFile() : item;
 			const rootNode = this.editor.getBody();
 			const isEmpty = this.editor.dom.isEmpty( rootNode );
@@ -302,20 +280,18 @@ export default class RichText extends Component {
 
 			if ( isEmpty && this.props.onReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
-				setTimeout( () => this.props.onReplace( content ) );
-			} else {
+				this.props.setTimeout( () => this.props.onReplace( content ) );
+			} else if ( this.props.onSplit ) {
 				// Necessary to get the right range.
 				// Also done in the TinyMCE paste plugin.
-				setTimeout( () => this.splitContent( content ) );
+				this.props.setTimeout( () => this.splitContent( content ) );
 			}
 
 			event.preventDefault();
 		}
 
-		this.pastedPlainText = dataTransfer ? dataTransfer.getData( 'text/plain' ) : '';
-		this.isPlainTextPaste = ( dataTransfer &&
-			dataTransfer.types.length === 1 &&
-			dataTransfer.types[ 0 ] === 'text/plain' );
+		this.pastedPlainText = plainText;
+		this.isPlainTextPaste = types.length === 1 && types[ 0 ] === 'text/plain';
 	}
 
 	/**
@@ -371,6 +347,7 @@ export default class RichText extends Component {
 			plainText: this.pastedPlainText,
 			mode,
 			tagName: this.props.tagName,
+			canUserUseUnfilteredHTML: this.context.canUserUseUnfilteredHTML,
 		} );
 
 		if ( typeof content === 'string' ) {
@@ -392,21 +369,16 @@ export default class RichText extends Component {
 		}
 	}
 
-	fireChange() {
-		this.savedContent = this.getContent();
-		this.editor.save();
-		this.props.onChange( this.savedContent );
-	}
-
 	/**
 	 * Handles any case where the content of the tinyMCE instance has changed.
 	 */
 	onChange() {
-		// Note that due to efficiency, speed and low cost requirements isDirty may
-		// not reflect reality for a brief period immediately after a change.
-		if ( this.editor.isDirty() ) {
-			this.fireChange();
+		if ( ! this.editor.isDirty() ) {
+			return;
 		}
+		this.savedContent = this.state.empty ? [] : this.getContent();
+		this.props.onChange( this.savedContent );
+		this.editor.save();
 	}
 
 	/**
@@ -452,21 +424,18 @@ export default class RichText extends Component {
 	getFocusPosition() {
 		const position = this.getEditorSelectionRect();
 
-		// Find the parent "relative" positioned container
-		const container = this.props.inlineToolbar ?
-			this.editor.getBody().closest( '.blocks-rich-text' ) :
-			this.editor.getBody().closest( '.editor-block-list__block' );
+		// Find the parent "relative" or "absolute" positioned container
+		const findRelativeParent = ( node ) => {
+			const style = window.getComputedStyle( node );
+			if ( style.position === 'relative' || style.position === 'absolute' ) {
+				return node;
+			}
+			return findRelativeParent( node.parentNode );
+		};
+		const container = findRelativeParent( this.editor.getBody() );
 		const containerPosition = container.getBoundingClientRect();
-		const blockPadding = 14;
-		const blockMoverMargin = 18;
-
-		// These offsets are necessary because the toolbar where the link modal lives
-		// is absolute positioned and it's not shown when we compute the position here
-		// so we compute the position about its parent relative position and adds the offset
-		const toolbarOffset = this.props.inlineToolbar ?
-			{ top: 10, left: 0 } :
-			{ top: 0, left: -( ( blockPadding * 2 ) + blockMoverMargin ) };
-		const linkModalWidth = 305;
+		const toolbarOffset = { top: 10, left: 0 };
+		const linkModalWidth = 298;
 
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
@@ -536,8 +505,6 @@ export default class RichText extends Component {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
 			}
-
-			this.fireChange();
 
 			const forward = event.keyCode === DELETE;
 
@@ -619,6 +586,10 @@ export default class RichText extends Component {
 	 * @param {Array} blocks The blocks to add after the split point.
 	 */
 	splitContent( blocks = [] ) {
+		if ( ! this.props.onSplit ) {
+			return;
+		}
+
 		const { dom } = this.editor;
 		const rootNode = this.editor.getBody();
 		const beforeRange = dom.createRng();
@@ -695,6 +666,9 @@ export default class RichText extends Component {
 	}
 
 	onNodeChange( { parents } ) {
+		if ( document.activeElement !== this.editor.getBody() ) {
+			return;
+		}
 		const formatNames = this.props.formattingControls;
 		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
 			accFormats[ activeFormat ] = {
@@ -720,65 +694,30 @@ export default class RichText extends Component {
 		this.editor.save();
 	}
 
-	setContent( content ) {
-		if ( ! content ) {
-			content = '';
-		}
-
-		content = renderToString( content );
-		this.editor.setContent( content );
+	setContent( content = '' ) {
+		this.editor.setContent( renderToString( content ) );
 	}
 
 	getContent() {
 		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
-	updateFocus() {
-		// We can't update focus if the editor hasn't finished initializing.
-		// Initialization callback `onInit` will call this function anyways.
-		if ( ! this.editor ) {
-			return;
-		}
-
-		const { focus } = this.props;
-		const isActive = this.isActive();
-
-		if ( focus ) {
-			if ( ! isActive ) {
-				this.editor.focus();
-			}
-
-			// Offset = -1 means we should focus the end of the editable
-			if ( focus.offset === -1 && ! this.isEndOfEditor() ) {
-				this.editor.selection.select( this.editor.getBody(), true );
-				this.editor.selection.collapse( false );
-			}
-		} else if ( isActive ) {
-			this.editor.getBody().blur();
-		}
-	}
-
 	componentWillUnmount() {
 		this.onChange();
+		this.throttledOnChange.cancel();
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( ! isEqual( this.props.focus, prevProps.focus ) ) {
-			this.updateFocus();
-		}
-
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
+			!! this.editor &&
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent &&
-			! isEqual( this.props.value, prevProps.value ) &&
-			! isEqual( this.props.value, this.savedContent )
+			this.props.value !== this.savedContent
 		) {
 			this.updateContent();
 		}
 	}
-
 	componentWillReceiveProps( nextProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
 			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
@@ -796,6 +735,7 @@ export default class RichText extends Component {
 		this.editor.focus();
 		this.editor.formatter.remove( format );
 	}
+
 	applyFormat( format, args, node ) {
 		this.editor.focus();
 		this.editor.formatter.apply( format, args, node );
@@ -835,7 +775,6 @@ export default class RichText extends Component {
 			tagName: Tagname = 'div',
 			style,
 			value,
-			focus,
 			wrapperClassName,
 			className,
 			inlineToolbar = false,
@@ -843,8 +782,10 @@ export default class RichText extends Component {
 			placeholder,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
+			isSelected = false,
 			formatters,
 		} = this.props;
+		const { empty } = this.state;
 
 		const ariaProps = pickAriaProps( this.props );
 
@@ -852,7 +793,7 @@ export default class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ( ! focus || keepPlaceholderOnFocus ) && this.state.empty;
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && empty;
 		const classes = classnames( wrapperClassName, 'blocks-rich-text' );
 
 		const formatToolbar = (
@@ -868,12 +809,12 @@ export default class RichText extends Component {
 
 		return (
 			<div className={ classes }>
-				{ focus &&
+				{ isSelected &&
 					<Fill name="Formatting.Toolbar">
 						{ ! inlineToolbar && formatToolbar }
 					</Fill>
 				}
-				{ focus && inlineToolbar &&
+				{ isSelected && inlineToolbar &&
 					<div className="block-rich-text__inline-toolbar">
 						{ formatToolbar }
 					</div>
@@ -898,7 +839,7 @@ export default class RichText extends Component {
 						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 					</Tagname>
 				}
-				{ focus && <Slot name="RichText.Siblings" /> }
+				{ isSelected && <Slot name="RichText.Siblings" /> }
 			</div>
 		);
 	}
@@ -906,9 +847,12 @@ export default class RichText extends Component {
 
 RichText.contextTypes = {
 	onUndo: noop,
+	canUserUseUnfilteredHTML: noop,
 };
 
 RichText.defaultProps = {
 	formattingControls: DEFAULT_FORMATS,
 	formatters: [],
 };
+
+export default withSafeTimeout( RichText );

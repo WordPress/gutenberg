@@ -42,9 +42,9 @@ echo ''
 
 # Install WordPress
 echo -e $(status_message "Installing WordPress...")
-docker-compose run --rm cli core install --url=localhost:$HOST_PORT --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=test@test.com >/dev/null
+docker-compose run --rm -u 33 cli core install --url=localhost:$HOST_PORT --title=Gutenberg --admin_user=admin --admin_password=password --admin_email=test@test.com >/dev/null
 # Check for WordPress updates, just in case the WordPress image isn't up to date.
-docker-compose run --rm cli core update >/dev/null
+docker-compose run --rm -u 33 cli core update >/dev/null
 
 # If the 'wordpress' volume wasn't during the down/up earlier, but the post port has changed, we need to update it.
 CURRENT_URL=$(docker-compose run -T --rm cli option get siteurl)

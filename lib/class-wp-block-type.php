@@ -113,7 +113,7 @@ class WP_Block_Type {
 
 		$attributes = $this->prepare_attributes_for_render( $attributes );
 
-		return call_user_func( $this->render_callback, $attributes );
+		return (string) call_user_func( $this->render_callback, $attributes );
 	}
 
 	/**

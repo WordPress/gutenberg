@@ -10,7 +10,6 @@ import {
 	BlockList,
 	PostTitle,
 	WritingFlow,
-	DefaultBlockAppender,
 	EditorGlobalKeyboardShortcuts,
 	BlockSelectionClearer,
 } from '@wordpress/editor';
@@ -38,7 +37,6 @@ function VisualEditor( props ) {
 						</Fragment>
 					) }
 				/>
-				<DefaultBlockAppender />
 			</WritingFlow>
 		</BlockSelectionClearer>
 	);

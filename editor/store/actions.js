@@ -101,17 +101,10 @@ export function updateBlock( uid, updates ) {
 	};
 }
 
-export function focusBlock( uid, config ) {
-	return {
-		type: 'UPDATE_FOCUS',
-		uid,
-		config,
-	};
-}
-
-export function selectBlock( uid ) {
+export function selectBlock( uid, initialPosition = null ) {
 	return {
 		type: 'SELECT_BLOCK',
+		initialPosition,
 		uid,
 	};
 }
@@ -187,15 +180,36 @@ export function replaceBlock( uid, block ) {
 	return replaceBlocks( uid, block );
 }
 
-export function insertBlock( block, position ) {
-	return insertBlocks( [ block ], position );
+/**
+ * Returns an action object used in signalling that a single block should be
+ * inserted, optionally at a specific index respective a root block list.
+ *
+ * @param {Object}  block   Block object to insert.
+ * @param {?number} index   Index at which block should be inserted.
+ * @param {?string} rootUID Optional root UID of block list to insert.
+ *
+ * @return {Object} Action object.
+ */
+export function insertBlock( block, index, rootUID ) {
+	return insertBlocks( [ block ], index, rootUID );
 }
 
-export function insertBlocks( blocks, position ) {
+/**
+ * Returns an action object used in signalling that an array of blocks should
+ * be inserted, optionally at a specific index respective a root block list.
+ *
+ * @param {Object[]} blocks  Block objects to insert.
+ * @param {?number}  index   Index at which block should be inserted.
+ * @param {?string}  rootUID Optional root UID of block list to insert.
+ *
+ * @return {Object} Action object.
+ */
+export function insertBlocks( blocks, index, rootUID ) {
 	return {
 		type: 'INSERT_BLOCKS',
 		blocks: castArray( blocks ),
-		position,
+		index,
+		rootUID,
 	};
 }
 
@@ -541,9 +555,19 @@ export function convertBlockToReusable( uid ) {
 		uid,
 	};
 }
-
-export function appendDefaultBlock() {
+/**
+ * Returns an action object used in signalling that a new block of the default
+ * type should be appended to the block list.
+ *
+ * @param {?Object} attributes Optional attributes of the block to assign.
+ * @param {?string} rootUID    Optional root UID of block list to append.
+ *
+ * @return {Object} Action object
+ */
+export function appendDefaultBlock( attributes, rootUID ) {
 	return {
 		type: 'APPEND_DEFAULT_BLOCK',
+		attributes,
+		rootUID,
 	};
 }

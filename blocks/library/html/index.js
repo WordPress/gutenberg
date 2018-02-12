@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withState } from '@wordpress/components';
 
@@ -37,10 +38,19 @@ export const settings = {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'IFRAME',
+			},
+		],
+	},
+
 	edit: withState( {
 		preview: false,
-	} )( ( { attributes, setAttributes, setState, focus, preview } ) => [
-		focus && (
+	} )( ( { attributes, setAttributes, setState, isSelected, preview } ) => [
+		isSelected && (
 			<BlockControls key="controls">
 				<div className="components-toolbar">
 					<button
@@ -70,6 +80,6 @@ export const settings = {
 	] ),
 
 	save( { attributes } ) {
-		return attributes.content;
+		return <RawHTML>{ attributes.content }</RawHTML>;
 	},
 };

@@ -66,8 +66,6 @@ export default class TinyMCE extends Component {
 	}
 
 	initialize() {
-		const { focus } = this.props;
-
 		const settings = this.props.getSettings( {
 			theme: false,
 			inline: true,
@@ -92,10 +90,6 @@ export default class TinyMCE extends Component {
 				this.props.onSetup( editor );
 			},
 		} );
-
-		if ( focus ) {
-			this.editorNode.focus();
-		}
 	}
 
 	render() {
