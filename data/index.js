@@ -82,7 +82,20 @@ export function registerSelectors( reducerKey, newSelectors ) {
  *
  * @return {*} The selector's returned value.
  */
-export const select = ( reducerKey ) => selectors[ reducerKey ];
+export function select( reducerKey ) {
+	if ( arguments.length > 1 ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'Deprecated: `select` now accepts only a single argument: the reducer key. ' +
+			'The return value is an object of selector functions.'
+		);
+
+		const [ , selectorKey, ...args ] = arguments;
+		return select( reducerKey )[ selectorKey ]( ...args );
+	}
+
+	return selectors[ reducerKey ];
+}
 
 /**
  * Higher Order Component used to inject data using the registered selectors.
