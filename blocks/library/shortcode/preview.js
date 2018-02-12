@@ -30,7 +30,7 @@ function ShortcodePreview( { response, setFocus } ) {
 const applyWithAPIData = withAPIData( ( props ) => {
 	const { shortcode, postId } = props;
 	return {
-		response: `/gutenberg/v1/shortcodes?shortcode=${ shortcode }&postId=${ postId }`,
+		response: `/gutenberg/v1/shortcodes?shortcode=${ encodeURIComponent( shortcode ) }&postId=${ postId }`,
 	};
 } );
 
