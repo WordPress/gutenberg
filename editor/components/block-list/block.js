@@ -586,11 +586,13 @@ export class BlockListBlock extends Component {
 					{ showUI && <BlockMobileToolbar uid={ block.uid } renderBlockMenu={ renderBlockMenu } /> }
 				</IgnoreNestedEvents>
 				{ !! error && <BlockCrashWarning /> }
-				<BlockInsertionPoint
-					uid={ block.uid }
-					rootUID={ rootUID }
-					layout={ layout }
-				/>
+				{ ! showSideInserter && (
+					<BlockInsertionPoint
+						uid={ block.uid }
+						rootUID={ rootUID }
+						layout={ layout }
+					/>
+				) }
 				{ showSideInserter && (
 					<div className="editor-block-list__side-inserter">
 						<InserterWithShortcuts uid={ block.uid } layout={ layout } onToggle={ this.selectOnOpen } />
