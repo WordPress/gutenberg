@@ -13,6 +13,7 @@
 	&:focus {
 		box-shadow: none;
 		outline: none;
+		border: none;	// remove this when core moves to border styles for focus
 	}
 
 	&:hover {

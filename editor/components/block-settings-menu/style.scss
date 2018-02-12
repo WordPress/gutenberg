@@ -8,6 +8,7 @@
 
 	.components-popover__content {
 		width: 182px;
+		padding: $item-spacing;
 	}
 }
 
@@ -18,10 +19,17 @@
 // The ellipsis icon button
 .editor-block-settings-menu__toggle {
 	border-radius: 50%;
-	width: auto;
-	padding: 2px;
-	margin: 14px 4px 14px 8px;
+	margin: 13px 3px 13px 7px;
 	width: $icon-button-size-small;
+
+	padding: 2px;
+
+	// subtract 1px to account for a transparent border
+	&:not( :disabled ):hover,
+	&:not( :disabled ):active,
+	&:not( :disabled ):focus {
+		padding: 1px;
+	}
 
 	.dashicon {
 		transform: rotate( 90deg );
@@ -31,6 +39,10 @@
 .editor-block-settings-menu__section {
 	margin-top: $item-spacing;
 	padding-top: $item-spacing;
+	margin-left: -$item-spacing;
+	margin-right: -$item-spacing;
+	margin-bottom: -$item-spacing;
+	padding: $item-spacing;
 	border-top: 1px solid $light-gray-500;
 }
 
@@ -44,14 +56,12 @@
 	border-radius: 0;
 	color: $dark-gray-500;
 	cursor: pointer;
-	border: 1px solid transparent;
+	@include menu-style__neutral();
 
 	&:hover,
 	&:focus,
 	&:not(:disabled):hover {
-		box-shadow: none;
-		color: $dark-gray-500;
-		border: 1px solid $dark-gray-500;
+		@include menu-style__focus();
 	}
 
 	.dashicon {

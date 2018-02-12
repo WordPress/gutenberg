@@ -115,39 +115,79 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
  * Button states and focus styles
  */
 
+// Buttons with rounded corners
 @mixin button-style__disabled {
 	opacity: 0.6;
 	cursor: default;
 }
 
+@mixin button-style__neutral {
+	transition: unset;
+}
+
 @mixin button-style__hover {
 	color: $dark-gray-900;
-	box-shadow: inset 0 0 0 1px $light-gray-500, inset 0 0 0 2px $white, 0 1px 1px rgba( $dark-gray-900, .2 );
+	border: 1px solid $light-gray-500;
+	box-shadow: inset 0 0 0 2px $white, 0 1px 1px rgba( $dark-gray-900, .2 );
 }
 
 @mixin button-style__active() {
 	outline: none;
 	color: $dark-gray-900;
-	box-shadow: inset 0 0 0 1px $light-gray-700, inset 0 0 0 2px $white;
+	border: 1px solid $light-gray-700;
+	box-shadow: inset 0 0 0 2px $white;
 }
 
 @mixin button-style__focus-active() {
 	outline: none;
 	color: $dark-gray-900;
-	box-shadow: inset 0 0 0 1px $dark-gray-300, inset 0 0 0 2px $white;
+	border: 1px solid $dark-gray-300;
+	box-shadow: inset 0 0 0 2px $white;
 }
 
-@mixin tab-style__focus-active() {
-	outline: none;
-	color: $dark-gray-900;
-	box-shadow: inset 0 0 0 1px $dark-gray-300;
+// Formatting Buttons
+@mixin formatting-button-style__hover {
+	color: $dark-gray-500;
+	border: 1px solid $dark-gray-500;
+	box-shadow: inset 0 0 0 1px $white;
 }
 
-@mixin input-style__focus-active() {
+@mixin formatting-button-style__active() {
 	outline: none;
-	color: $dark-gray-900;
-	box-shadow: 0 0 0 1px $dark-gray-300;
+	color: $white;
+	box-shadow: none;
+	background: $dark-gray-500;
 }
+
+@mixin formatting-button-style__focus() {
+	outline: none;
+	border: 1px solid $dark-gray-500;
+	box-shadow: inset 0 0 0 1px $white;
+}
+
+// Tabs, Inputs, Square buttons
+@mixin square-style__neutral() {
+	outline-offset: -1px;
+}
+
+@mixin square-style__focus-active() {
+	color: $dark-gray-900;
+	outline: 1px solid $dark-gray-300;
+}
+
+// Menu items
+@mixin menu-style__neutral() {
+	border: none;
+	box-shadow: none;
+}
+
+@mixin menu-style__focus() {
+	border: none;
+	outline-offset: -1px;
+	color: $dark-gray-900;
+	outline: 1px dotted $dark-gray-300;
+}
+
 
 /**
  * Applies editor left position to the selector passed as argument

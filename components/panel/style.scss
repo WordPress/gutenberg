@@ -68,11 +68,16 @@
 
 .components-panel__body-toggle.components-button {
 	position: relative;
-	padding: 15px;
 	outline: none;
 	width: 100%;
 	font-weight: 600;
 	text-align: left;
+	padding: 14px;
+	@include menu-style__neutral;
+
+	&:focus {
+		@include menu-style__focus;
+	}
 
 	.dashicon {
 		position: absolute;
