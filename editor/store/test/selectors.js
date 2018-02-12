@@ -41,6 +41,7 @@ const {
 	getSelectedBlock,
 	getBlockRootUID,
 	getEditedPostAttribute,
+	getEditedPostAttributes,
 	getMultiSelectedBlockUids,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
@@ -425,6 +426,47 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'youcha' );
+		} );
+	} );
+
+	describe( 'getEditedPostAttributes', () => {
+		it( 'should return the current post\'s slug and type if no edits have been made', () => {
+			const state = {
+				currentPost: {
+					slug: 'post slug',
+					type: 'post',
+				},
+			};
+
+			const expected = {
+				slug: 'post slug',
+				type: 'post',
+			};
+
+			expect( getEditedPostAttributes( state, [ 'slug', 'type' ] ) ).toEqual( expected );
+		} );
+
+		it( 'should return the current post\'s slug and type if only the slug is edited', () => {
+			const state = {
+				currentPost: {
+					slug: 'old slug',
+					type: 'post',
+				},
+				editor: {
+					present: {
+						edits: {
+							slug: 'new slug',
+						},
+					},
+				},
+			};
+
+			const expected = {
+				slug: 'new slug',
+				type: 'post',
+			};
+
+			expect( getEditedPostAttributes( state, [ 'slug', 'type' ] ) ).toEqual( expected );
 		} );
 	} );
 

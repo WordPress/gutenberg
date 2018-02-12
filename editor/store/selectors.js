@@ -252,8 +252,11 @@ export function getEditedPostAttribute( state, attributeName ) {
  */
 export function getEditedPostAttributes( state, attributeNames ) {
 	const attributes = {};
-	attributeNames.map( attributeName => {
-		attributes[ attributeName ] = getEditedPostAttribute( state, attributeName );
+	map( attributeNames, attributeName => {
+		const value = getEditedPostAttribute( state, attributeName );
+		if ( value ) {
+			attributes[ attributeName ] = getEditedPostAttribute( state, attributeName );
+		}
 	} );
 	return attributes;
 }
