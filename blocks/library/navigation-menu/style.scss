@@ -2,7 +2,6 @@
 	&.is-horizontal {
 		display: flex;
 		flex-wrap: wrap;
-		padding: 0;
 
 		ul {
 			float: left;
@@ -10,21 +9,22 @@
 			top: 100%;
 			left: -999em;
 			z-index: 99999;
+			margin: 0;
+			padding: 0 10px 10px;
 
 			ul {
-				left: -999em;
+				position: static;
+				left: 0;
 				top: 0;
+				padding: 0 0 0 10px;
 			}
 
 			li {
-				&:hover > ul,
-				&.focus > ul {
-					left: 100%;
-				}
+				margin: 0;
 			}
 
 			a {
-				width: 200px;
+				width: 160px;
 			}
 		}
 
@@ -42,9 +42,29 @@
 			}
 		}
 
+		.menu-item-has-children > a:after {
+			content: "\f347";
+			display: inline-block;
+			width: 10px;
+			height: 10px;
+			font-size: 10px;
+			line-height: 1;
+			font-family: dashicons;
+			text-decoration: inherit;
+			vertical-align: baseline;
+			text-align: center;
+			padding-left: 6px;
+		}
+
 		a {
 			display: block;
 			text-decoration: none;
 		}
+	}
+
+	[data-align="full"] &,
+	&.alignfull {
+		padding-left: 2em;
+		padding-right: 2em;
 	}
 }
