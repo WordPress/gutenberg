@@ -128,9 +128,13 @@ class CustomTemplatedPathPlugin {
 const config = {
 	entry: Object.assign(
 		entryPointNames.reduce( ( memo, entryPoint ) => {
+			// Normalized entry point as an array of [ name, path ]. If a path
+			// is not explicitly defined, use the name.
 			entryPoint = castArray( entryPoint );
 			const [ name, path = name ] = entryPoint;
+
 			memo[ name ] = `./${ path }`;
+
 			return memo;
 		}, {} ),
 		packageNames.reduce( ( memo, packageName ) => {
