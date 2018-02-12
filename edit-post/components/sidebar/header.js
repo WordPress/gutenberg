@@ -49,7 +49,7 @@ const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
 
 export default compose(
 	query( ( select ) => ( {
-		count: select( 'core/editor', 'getSelectedBlockCount' ),
+		count: select( 'core/editor' ).getSelectedBlockCount(),
 	} ) ),
 	connect(
 		( state ) => ( {

@@ -32,10 +32,10 @@ describe( 'select', () => {
 			selector2,
 		} );
 
-		expect( select( 'reducer1', 'selector1' ) ).toEqual( 'result1' );
+		expect( select( 'reducer1' ).selector1() ).toEqual( 'result1' );
 		expect( selector1 ).toBeCalledWith( store.getState() );
 
-		expect( select( 'reducer1', 'selector2' ) ).toEqual( 'result2' );
+		expect( select( 'reducer1' ).selector2() ).toEqual( 'result2' );
 		expect( selector2 ).toBeCalledWith( store.getState() );
 	} );
 } );
@@ -48,7 +48,7 @@ describe( 'query', () => {
 		} );
 		const Component = query( ( selectFunc, ownProps ) => {
 			return {
-				data: selectFunc( 'reactReducer', 'reactSelector', ownProps.keyName ),
+				data: selectFunc( 'reactReducer' ).reactSelector( ownProps.keyName ),
 			};
 		} )( ( props ) => {
 			return <div>{ props.data }</div>;
@@ -68,7 +68,7 @@ describe( 'subscribe', () => {
 			globalSelector: ( state ) => state,
 		} );
 		const unsubscribe = subscribe( () => {
-			incrementedValue = select( 'myAwesomeReducer', 'globalSelector' );
+			incrementedValue = select( 'myAwesomeReducer' ).globalSelector();
 		} );
 		const action = { type: 'dummy' };
 
