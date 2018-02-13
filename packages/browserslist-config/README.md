@@ -21,3 +21,5 @@ Add this to your `package.json` file:
 ```
 
 This package when imported returns an array of supported browsers, for more configuration examples including Autoprefixer, Babel, ESLint, PostCSS, and stylelint see https://github.com/ai/browserslist-example#browserslist-example.
+
+<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)

@@ -12,3 +12,5 @@ Check out our [CONTRIBUTING.md](CONTRIBUTING.md) to get started with setting up 
 
 - If you have already joined Slack, join our [#core-js](https://wordpress.slack.com/messages/core-js) channel and say hi!
 - Check out the issues with the [good first issue](https://github.com/WordPress/packages/labels/Good%20First%20Issue) and [help wanted](https://github.com/WordPress/packages/labels/help%20wanted) label. We suggest also looking at the closed ones to get a sense of the kinds of issues you can tackle.
+
+<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)

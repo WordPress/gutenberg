@@ -37,3 +37,5 @@ Launches the test runner. It uses [Jest](https://facebook.github.io/jest/) behin
 ## Inspiration
 
 This is inspired by [react-scripts](https://www.npmjs.com/package/react-scripts) and [kcd-scripts](https://www.npmjs.com/package/kcd-scripts).
+
+<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)

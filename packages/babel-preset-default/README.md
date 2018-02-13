@@ -32,3 +32,6 @@ babel script.js --presets @wordpress/default
 require( 'babel-core' ).transform( 'code', {
   presets: [ '@wordpress/default' ]
 } );
+```
+
+<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)

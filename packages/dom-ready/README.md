@@ -23,3 +23,5 @@ domReady( function() {
 ## Browser support
 
 See https://make.wordpress.org/design/handbook/design-guide/browser-support/
+
+<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)

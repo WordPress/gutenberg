@@ -88,3 +88,5 @@ Use `.toHaveWarneddWith` to ensure that `console.warn` function was called with
 specific arguments.
 
 Almost identical usage as `.toHaveErroredWith()`.
+
+<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)

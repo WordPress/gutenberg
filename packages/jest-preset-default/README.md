@@ -45,3 +45,5 @@ import '@wordpress/jest-preset-default';
 
 // Your code goes here
 ```
+
+<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)
