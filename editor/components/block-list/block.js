@@ -57,8 +57,8 @@ import {
 	isMultiSelecting,
 	getBlockIndex,
 	getEditedPostAttribute,
-	getNextBlock,
-	getPreviousBlock,
+	getNextBlockUid,
+	getPreviousBlockUid,
 	isBlockHovered,
 	isBlockMultiSelected,
 	isBlockSelected,
@@ -610,17 +610,17 @@ export class BlockListBlock extends Component {
 }
 
 const mapStateToProps = ( state, { uid, rootUID } ) => {
-	const previousBlock = getPreviousBlock( state, uid );
-	const nextBlock = getNextBlock( state, uid );
 	const isSelected = isBlockSelected( state, uid );
 	return {
-		previousBlockUid: !! previousBlock && previousBlock.uid,
-		nextBlockUid: !! nextBlock && nextBlock.uid,
+		previousBlockUid: getPreviousBlockUid( state, uid ),
+		nextBlockUid: getNextBlockUid( state, uid ),
 		block: getBlock( state, uid ),
 		isMultiSelected: isBlockMultiSelected( state, uid ),
 		isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
 		isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
-		isTyping: isTyping( state ),
+		// We only care about this prop when the block is selected
+		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
+		isTyping: isSelected && isTyping( state ),
 		order: getBlockIndex( state, uid, rootUID ),
 		meta: getEditedPostAttribute( state, 'meta' ),
 		mode: getBlockMode( state, uid ),

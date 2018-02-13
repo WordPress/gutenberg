@@ -538,7 +538,7 @@ export function getBlockRootUID( state, uid ) {
 }
 
 /**
- * Returns the block adjacent one at the given reference startUID and modifier
+ * Returns the UID of the block adjacent one at the given reference startUID and modifier
  * directionality. Defaults start UID to the selected block, and direction as
  * next block. Returns null if there is no adjacent block.
  *
@@ -546,9 +546,9 @@ export function getBlockRootUID( state, uid ) {
  * @param {?string} startUID Optional UID of block from which to search.
  * @param {?number} modifier Directionality multiplier (1 next, -1 previous).
  *
- * @return {?Object} Adjacent block object, or null if none exists.
+ * @return {?string} Return the UID of the block, or null if none exists.
  */
-export function getAdjacentBlock( state, startUID, modifier = 1 ) {
+export function getAdjacentBlockUid( state, startUID, modifier = 1 ) {
 	// Default to selected block.
 	if ( startUID === undefined ) {
 		startUID = get( getSelectedBlock( state ), 'uid' );
@@ -591,33 +591,33 @@ export function getAdjacentBlock( state, startUID, modifier = 1 ) {
 	}
 
 	// Assume incremented index is within the set.
-	return getBlock( state, orderSet[ nextIndex ] );
+	return orderSet[ nextIndex ];
 }
 
 /**
- * Returns the previous block from the given reference startUID. Defaults start
+ * Returns the previous block's UID from the given reference startUID. Defaults start
  * UID to the selected block. Returns null if there is no previous block.
  *
  * @param {Object}  state    Global application state.
  * @param {?string} startUID Optional UID of block from which to search.
  *
- * @return {?Object} Adjacent block object, or null if none exists.
+ * @return {?string} Adjacent block's UID, or null if none exists.
  */
-export function getPreviousBlock( state, startUID ) {
-	return getAdjacentBlock( state, startUID, -1 );
+export function getPreviousBlockUid( state, startUID ) {
+	return getAdjacentBlockUid( state, startUID, -1 );
 }
 
 /**
- * Returns the next block from the given reference startUID. Defaults start UID
+ * Returns the next block's UID from the given reference startUID. Defaults start UID
  * to the selected block. Returns null if there is no next block.
  *
  * @param {Object}  state    Global application state.
  * @param {?string} startUID Optional UID of block from which to search.
  *
- * @return {?Object} Adjacent block object, or null if none exists.
+ * @return {?string} Adjacent block's UID, or null if none exists.
  */
-export function getNextBlock( state, startUID ) {
-	return getAdjacentBlock( state, startUID, 1 );
+export function getNextBlockUid( state, startUID ) {
+	return getAdjacentBlockUid( state, startUID, 1 );
 }
 
 /**

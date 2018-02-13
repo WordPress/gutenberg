@@ -24,8 +24,8 @@ import {
 	placeCaretAtVerticalEdge,
 } from '../../utils/dom';
 import {
-	getPreviousBlock,
-	getNextBlock,
+	getPreviousBlockUid,
+	getNextBlockUid,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
@@ -155,20 +155,20 @@ class WritingFlow extends Component {
 	}
 
 	expandSelection( currentStartUid, isReverse ) {
-		const { previousBlock, nextBlock } = this.props;
+		const { previousBlockUid, nextBlockUid } = this.props;
 
-		const expandedBlock = isReverse ? previousBlock : nextBlock;
-		if ( expandedBlock ) {
-			this.props.onMultiSelect( currentStartUid, expandedBlock.uid );
+		const expandedBlockUid = isReverse ? previousBlockUid : nextBlockUid;
+		if ( expandedBlockUid ) {
+			this.props.onMultiSelect( currentStartUid, expandedBlockUid );
 		}
 	}
 
 	moveSelection( isReverse ) {
-		const { previousBlock, nextBlock } = this.props;
+		const { previousBlockUid, nextBlockUid } = this.props;
 
-		const focusedBlock = isReverse ? previousBlock : nextBlock;
-		if ( focusedBlock ) {
-			this.props.onSelectBlock( focusedBlock.uid );
+		const focusedBlockUid = isReverse ? previousBlockUid : nextBlockUid;
+		if ( focusedBlockUid ) {
+			this.props.onSelectBlock( focusedBlockUid );
 		}
 	}
 
@@ -299,8 +299,8 @@ class WritingFlow extends Component {
 
 export default connect(
 	( state ) => ( {
-		previousBlock: getPreviousBlock( state ),
-		nextBlock: getNextBlock( state ),
+		previousBlockUid: getPreviousBlockUid( state ),
+		nextBlockUid: getNextBlockUid( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
 		selectedBlock: getSelectedBlock( state ),
