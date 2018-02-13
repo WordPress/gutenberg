@@ -241,27 +241,6 @@ export function getEditedPostAttribute( state, attributeName ) {
 }
 
 /**
- * Returns a single attribute of the post being edited, preferring the unsaved
- * edit if one exists, but falling back to the attribute for the last known
- * saved state of the post.
- *
- * @param {Object}   state          Global application state.
- * @param {string[]} attributeNames Post attribute name.
- *
- * @return {Object}  Post attributes mapped to object by name.
- */
-export function getEditedPostAttributes( state, attributeNames ) {
-	const attributes = {};
-	map( attributeNames, attributeName => {
-		const value = getEditedPostAttribute( state, attributeName );
-		if ( value ) {
-			attributes[ attributeName ] = getEditedPostAttribute( state, attributeName );
-		}
-	} );
-	return attributes;
-}
-
-/**
  * Returns the current visibility of the post being edited, preferring the
  * unsaved value if different than the saved post. The return value is one of
  * "private", "password", or "public".
