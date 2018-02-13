@@ -100,6 +100,10 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
 	};
 
 	return connectWithStore( ( state, ownProps ) => {
+		const select = ( key, selectorName, ...args ) => {
+			return selectors[ key ][ selectorName ]( state[ key ], ...args );
+		};
+
 		return mapSelectorsToProps( select, ownProps );
 	} );
 };
