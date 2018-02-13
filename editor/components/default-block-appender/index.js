@@ -15,7 +15,7 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import './style.scss';
 import BlockDropZone from '../block-drop-zone';
-import { appendDefaultBlock } from '../../store/actions';
+import { appendDefaultBlock, startTyping } from '../../store/actions';
 import { getBlock, getBlockCount } from '../../store/selectors';
 
 export function DefaultBlockAppender( { isVisible, onAppend, showPrompt } ) {
@@ -60,6 +60,7 @@ export default connect(
 			}
 
 			dispatch( appendDefaultBlock( attributes, rootUID ) );
+			dispatch( startTyping() );
 		},
 	} ),
 )( DefaultBlockAppender );
