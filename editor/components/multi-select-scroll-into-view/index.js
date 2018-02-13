@@ -40,6 +40,12 @@ class MultiSelectScrollIntoView extends Component {
 
 		const scrollContainer = getScrollContainer( extentNode );
 
+		// If there's no scroll container, it follows that there's no scrollbar
+		// and thus there's no need to try to scroll into view.
+		if ( ! scrollContainer ) {
+			return;
+		}
+
 		scrollIntoView( extentNode, scrollContainer, {
 			onlyScrollIfNeeded: true,
 		} );
