@@ -50,6 +50,8 @@ For example, `add/gallery-block` means you're working on adding a new gallery bl
 
 You can pick among all the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue">Good First Issue</a>.
 
+The workflow is documented in greater detail in the [repository management](./docs/repository-management.md) document.
+
 ## Testing
 
 Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Cypress](https://www.cypress.io/). You can find out more details in [Testing Overview document](./docs/testing-overview.md).
