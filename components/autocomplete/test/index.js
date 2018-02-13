@@ -127,7 +127,7 @@ function expectInitialState( wrapper ) {
 	expect( wrapper.state( 'query' ) ).toBeUndefined();
 	expect( wrapper.state( 'search' ) ).toEqual( /./ );
 	expect( wrapper.state( 'filteredOptions' ) ).toEqual( [] );
-	expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( false );
+	expect( wrapper.find( 'Popover' ) ).toHaveLength( 0 );
 	expect( wrapper.find( '.components-autocomplete__result' ) ).toHaveLength( 0 );
 }
 
@@ -206,7 +206,6 @@ describe( 'Autocomplete', () => {
 		it( 'renders children', () => {
 			const wrapper = makeAutocompleter( [] );
 			expect( wrapper.state().open ).toBeUndefined();
-			expect( wrapper.find( 'Popover' ).prop( 'focusOnOpen' ) ).toBe( false );
 			expect( wrapper.childAt( 0 ).hasClass( 'components-autocomplete' ) ).toBe( true );
 			expect( wrapper.find( '.fake-editor' ) ).toHaveLength( 1 );
 		} );
@@ -226,7 +225,8 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
 					{ key: '0-0', value: 1, label: 'Bananas', keywords: [ 'fruit' ] },
 				] );
-				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
+				expect( wrapper.find( 'Popover' ) ).toHaveLength( 1 );
+				expect( wrapper.find( 'Popover' ).prop( 'focusOnMount' ) ).toBe( false );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 1 );
 				done();
 			} );
@@ -245,7 +245,7 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'query' ) ).toEqual( 'zzz' );
 				expect( wrapper.state( 'search' ) ).toEqual( /(?:\b|\s|^)zzz/i );
 				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [] );
-				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( false );
+				expect( wrapper.find( 'Popover' ) ).toHaveLength( 0 );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 0 );
 				done();
 			} );
@@ -283,7 +283,7 @@ describe( 'Autocomplete', () => {
 					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 					{ key: '0-2', value: 3, label: 'Avocado', keywords: [ 'fruit' ] },
 				] );
-				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
+				expect( wrapper.find( 'Popover' ) ).toHaveLength( 1 );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 3 );
 				done();
 			} );
@@ -307,7 +307,7 @@ describe( 'Autocomplete', () => {
 					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 					{ key: '0-2', value: 3, label: 'Avocado', keywords: [ 'fruit' ] },
 				] );
-				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
+				expect( wrapper.find( 'Popover' ) ).toHaveLength( 1 );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 3 );
 				done();
 			} );
@@ -330,7 +330,7 @@ describe( 'Autocomplete', () => {
 					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 					{ key: '0-2', value: 3, label: 'Avocado', keywords: [ 'fruit' ] },
 				] );
-				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
+				expect( wrapper.find( 'Popover' ) ).toHaveLength( 1 );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 2 );
 				// simulate typing 'p'
 				simulateInput( wrapper, [ tx( 'ap' ) ] );
@@ -342,7 +342,7 @@ describe( 'Autocomplete', () => {
 				expect( wrapper.state( 'filteredOptions' ) ).toEqual( [
 					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 				] );
-				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( true );
+				expect( wrapper.find( 'Popover' ) ).toHaveLength( 1 );
 				expect( wrapper.find( 'button.components-autocomplete__result' ) ).toHaveLength( 1 );
 				// simulate typing ' '
 				simulateInput( wrapper, [ tx( 'ap ' ) ] );
@@ -445,7 +445,7 @@ describe( 'Autocomplete', () => {
 					{ key: '0-1', value: 2, label: 'Apple', keywords: [ 'fruit' ] },
 					{ key: '0-2', value: 3, label: 'Avocado', keywords: [ 'fruit' ] },
 				] );
-				expect( wrapper.find( 'Popover' ).prop( 'isOpen' ) ).toBe( false );
+				expect( wrapper.find( 'Popover' ) ).toHaveLength( 0 );
 				// the editor should not have gotten the event
 				expect( editorKeydown ).not.toHaveBeenCalled();
 				done();
