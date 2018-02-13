@@ -80,18 +80,19 @@ class Dropdown extends Component {
 				   */ }
 				<div>
 					{ renderToggle( args ) }
-					<Popover
-						className={ contentClassName }
-						isOpen={ isOpen }
-						position={ position }
-						onClose={ this.close }
-						onClickOutside={ this.clickOutside }
-						expandOnMobile={ expandOnMobile }
-					>
-						<FocusManaged>
-							{ renderContent( args ) }
-						</FocusManaged>
-					</Popover>
+					{ isOpen && (
+						<Popover
+							className={ contentClassName }
+							position={ position }
+							onClose={ this.close }
+							onClickOutside={ this.clickOutside }
+							expandOnMobile={ expandOnMobile }
+						>
+							<FocusManaged>
+								{ renderContent( args ) }
+							</FocusManaged>
+						</Popover>
+					) }
 				</div>
 			</div>
 		);

@@ -65,9 +65,7 @@ describe( 'DropdownMenu', () => {
 				keyCode: DOWN,
 			} );
 
-			const popover = wrapper.find( 'Popover' );
-
-			expect( popover.prop( 'isOpen' ) ).toBe( true );
+			expect( wrapper.find( 'Popover' ) ).toHaveLength( 1 );
 		} );
 	} );
 } );
