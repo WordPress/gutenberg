@@ -272,15 +272,11 @@ describe( 'actions', () => {
 
 	describe( 'mergeBlocks', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
-			const blockA = {
-				uid: 'blockA',
-			};
-			const blockB = {
-				uid: 'blockB',
-			};
-			expect( mergeBlocks( blockA, blockB ) ).toEqual( {
+			const blockAUid = 'blockA';
+			const blockBUid = 'blockB';
+			expect( mergeBlocks( blockAUid, blockBUid ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
-				blocks: [ blockA, blockB ],
+				blocks: [ blockAUid, blockBUid ],
 			} );
 		} );
 	} );
