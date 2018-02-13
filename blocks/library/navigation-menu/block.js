@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { filter, forEach, isEmpty, isUndefined, sortBy } from 'lodash';
+import { filter, forEach, isEmpty, isUndefined } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -44,18 +44,24 @@ function getOptionsFromMenu( menus, selected ) {
 	return options;
 }
 
+function sortMenuItems( items ) {
+	return [ ...items ].sort( ( a, b ) => {
+		return a.menu_order - b.menu_order;
+	} );
+}
+
 function getMenuChildren( list, data ) {
 	forEach( list, function( item, i ) {
 		const children = filter( data, { menu_item_parent: item.id } );
 		list[ i ].children = getMenuChildren( children, data );
 	} );
-	return sortBy( list, 'menu_order' );
+	return sortMenuItems( list );
 }
 
 function getMenuWithChildren( data ) {
-	const sorted = sortBy( filter( data, { menu_item_parent: 0 } ), 'menu_order' );
-	getMenuChildren( sorted, data );
-	return sorted;
+	const items = filter( data, { menu_item_parent: 0 } );
+	const sorted = sortMenuItems( items );
+	return getMenuChildren( sorted, data );
 }
 
 class NavigationMenuBlock extends Component {
