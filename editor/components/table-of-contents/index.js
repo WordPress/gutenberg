@@ -33,6 +33,6 @@ function TableOfContents( { hasBlocks } ) {
 
 export default query( ( select ) => {
 	return {
-		hasBlocks: !! select( 'core/editor', 'getBlocks' ),
+		hasBlocks: !! select( 'core/editor', 'getBlockCount' ),
 	};
 } )( TableOfContents );
