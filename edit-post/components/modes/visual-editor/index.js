@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
  */
 import {
 	BlockList,
+	CopyHandler,
 	PostTitle,
 	WritingFlow,
 	EditorGlobalKeyboardShortcuts,
@@ -26,6 +27,7 @@ function VisualEditor( props ) {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor">
 			<EditorGlobalKeyboardShortcuts />
+			<CopyHandler />
 			<WritingFlow>
 				<PostTitle />
 				<BlockList

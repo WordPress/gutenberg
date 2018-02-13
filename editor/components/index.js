@@ -59,6 +59,7 @@ export { default as BlockMover } from './block-mover';
 export { default as BlockSelectionClearer } from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockToolbar } from './block-toolbar';
+export { default as CopyHandler } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';

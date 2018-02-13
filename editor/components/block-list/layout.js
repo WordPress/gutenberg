@@ -6,21 +6,19 @@ import {
 	findLast,
 	map,
 	invert,
-	isEqual,
 	mapValues,
 	sortBy,
 	throttle,
 	get,
 	last,
 } from 'lodash';
-import scrollIntoView from 'dom-scroll-into-view';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { serialize, getDefaultBlockName } from '@wordpress/blocks';
+import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -30,16 +28,11 @@ import BlockListBlock from './block';
 import BlockSelectionClearer from '../block-selection-clearer';
 import DefaultBlockAppender from '../default-block-appender';
 import {
-	getMultiSelectedBlocksStartUid,
-	getMultiSelectedBlocksEndUid,
-	getMultiSelectedBlocks,
-	getMultiSelectedBlockUids,
 	getSelectedBlock,
 	isSelectionEnabled,
 	isMultiSelecting,
 } from '../../store/selectors';
 import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
-import { documentHasSelection } from '../../utils/dom';
 
 class BlockListLayout extends Component {
 	constructor( props ) {
@@ -48,8 +41,6 @@ class BlockListLayout extends Component {
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
 		this.onShiftSelection = this.onShiftSelection.bind( this );
-		this.onCopy = this.onCopy.bind( this );
-		this.onCut = this.onCut.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
@@ -62,30 +53,11 @@ class BlockListLayout extends Component {
 	}
 
 	componentDidMount() {
-		document.addEventListener( 'copy', this.onCopy );
-		document.addEventListener( 'cut', this.onCut );
 		window.addEventListener( 'mousemove', this.setLastClientY );
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener( 'copy', this.onCopy );
-		document.removeEventListener( 'cut', this.onCut );
 		window.removeEventListener( 'mousemove', this.setLastClientY );
-	}
-
-	componentWillReceiveProps( nextProps ) {
-		if ( isEqual( this.props.multiSelectedBlockUids, nextProps.multiSelectedBlockUids ) ) {
-			return;
-		}
-
-		if ( nextProps.multiSelectedBlockUids && nextProps.multiSelectedBlockUids.length > 0 ) {
-			const extent = this.nodes[ nextProps.selectionEnd ];
-			if ( extent ) {
-				scrollIntoView( extent, extent.closest( '.edit-post-layout__content' ), {
-					onlyScrollIfNeeded: true,
-				} );
-			}
-		}
 	}
 
 	setLastClientY( { clientY } ) {
@@ -123,36 +95,6 @@ class BlockListLayout extends Component {
 		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
 
 		this.onSelectionChange( this.coordMap[ key ] );
-	}
-
-	onCopy( event ) {
-		const { multiSelectedBlocks, selectedBlock } = this.props;
-
-		if ( ! multiSelectedBlocks.length && ! selectedBlock ) {
-			return;
-		}
-
-		// Let native copy behaviour take over in input fields.
-		if ( selectedBlock && documentHasSelection() ) {
-			return;
-		}
-
-		const serialized = serialize( selectedBlock || multiSelectedBlocks );
-
-		event.clipboardData.setData( 'text/plain', serialized );
-		event.clipboardData.setData( 'text/html', serialized );
-
-		event.preventDefault();
-	}
-
-	onCut( event ) {
-		const { multiSelectedBlockUids } = this.props;
-
-		this.onCopy( event );
-
-		if ( multiSelectedBlockUids.length ) {
-			this.props.onRemove( multiSelectedBlockUids );
-		}
 	}
 
 	/**
@@ -295,10 +237,6 @@ class BlockListLayout extends Component {
 
 export default connect(
 	( state ) => ( {
-		selectionStart: getMultiSelectedBlocksStartUid( state ),
-		selectionEnd: getMultiSelectedBlocksEndUid( state ),
-		multiSelectedBlocks: getMultiSelectedBlocks( state ),
-		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
 		selectedBlock: getSelectedBlock( state ),
 		isSelectionEnabled: isSelectionEnabled( state ),
 		isMultiSelecting: isMultiSelecting( state ),
@@ -315,9 +253,6 @@ export default connect(
 		},
 		onSelect( uid ) {
 			dispatch( selectBlock( uid ) );
-		},
-		onRemove( uids ) {
-			dispatch( { type: 'REMOVE_BLOCKS', uids } );
 		},
 	} )
 )( BlockListLayout );
