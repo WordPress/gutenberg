@@ -19,6 +19,7 @@ import {
 	getBlockDefaultClassName,
 	hasBlockSupport,
 } from '../api';
+import { withEditBlockContextProvider } from './context';
 
 export class BlockEdit extends Component {
 	getChildContext() {
@@ -75,6 +76,7 @@ BlockEdit.childContextTypes = {
 };
 
 export default compose( [
+	withEditBlockContextProvider,
 	withFilters( 'blocks.BlockEdit' ),
 	withSelect( ( select ) => ( {
 		postType: select( 'core/editor' ).getEditedPostAttribute( 'type' ),

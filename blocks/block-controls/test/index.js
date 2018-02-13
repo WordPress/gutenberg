@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import BlockControls from '../';
+import { BlockControls } from '../';
 
 describe( 'BlockControls', () => {
 	const controls = [

@@ -8,7 +8,12 @@ import { findKey, isFinite, map, omit } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { concatChildren, Component, RawHTML } from '@wordpress/element';
+import {
+	concatChildren,
+	Component,
+	Fragment,
+	RawHTML,
+} from '@wordpress/element';
 import {
 	PanelBody,
 	PanelColor,
@@ -139,9 +144,9 @@ class ParagraphBlock extends Component {
 
 		const fontSize = this.getFontSize();
 
-		return [
-			isSelected && (
-				<BlockControls key="controls">
+		return (
+			<Fragment>
+				<BlockControls>
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -149,9 +154,7 @@ class ParagraphBlock extends Component {
 						} }
 					/>
 				</BlockControls>
-			),
-			isSelected && (
-				<InspectorControls key="inspector">
+				<InspectorControls>
 					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
 						<div className="blocks-font-size__main">
 							<ButtonGroup aria-label={ __( 'Font Size' ) }>
@@ -224,8 +227,6 @@ class ParagraphBlock extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-			),
-			<div key="editable">
 				<RichText
 					tagName="p"
 					className={ classnames( 'wp-block-paragraph', className, {
@@ -261,8 +262,8 @@ class ParagraphBlock extends Component {
 					isSelected={ isSelected }
 					autocompleters={ autocompleters }
 				/>
-			</div>,
-		];
+			</Fragment>
+		);
 	}
 }
 
