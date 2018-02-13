@@ -80,7 +80,7 @@ export function registerSidebar( name, settings ) {
  * @return {Object} The settings object of the sidebar. Or null if the
  *                         sidebar doesn't exist.
  */
-export function getSidebarSettings( name ) {
+function getSidebarSettings( name ) {
 	if ( ! sidebars.hasOwnProperty( name ) ) {
 		return null;
 	}
