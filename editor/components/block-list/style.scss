@@ -335,6 +335,8 @@
 	> .editor-block-settings-menu {
 		right: $block-mover-margin;
 		padding-top: 2px;
+		cursor: move;/* Fallback for IE/Edge < 14 */
+		cursor: grab;
 
 		// Mobile
 		display: none;
