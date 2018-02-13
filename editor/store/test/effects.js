@@ -323,19 +323,23 @@ describe( 'effects', () => {
 
 		it( 'should dispatch meta box updates on success for dirty meta boxes', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const post = getDraftPost();
 
 			handler( { post: post, previousPost: post }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates() );
+			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( post ) );
 		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
@@ -357,7 +361,9 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
@@ -383,7 +389,9 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when just updating a published post again', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();

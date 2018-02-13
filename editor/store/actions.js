@@ -425,7 +425,7 @@ export function initializeMetaBoxState( metaBoxes ) {
 /**
  * Returns an action object used to request meta box update.
  *
- * @return {Object} Action object.
+ * @return {Object}      Action object.
  */
 export function requestMetaBoxUpdates() {
 	return {
