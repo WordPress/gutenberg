@@ -80,28 +80,12 @@ export function registerSidebar( name, settings ) {
  * @return {Object} The settings object of the sidebar. Or null if the
  *                         sidebar doesn't exist.
  */
-function getSidebarSettings( name ) {
+export function getSidebarSettings( name ) {
 	if ( ! sidebars.hasOwnProperty( name ) ) {
 		return null;
 	}
 	return sidebars[ name ];
 }
-
-/**
- * Renders a plugin sidebar.
- *
- * @param {string}   name      The name of the plugin sidebar.
- * @param {Object}   settings  The settings for this sidebar.
- * @param {string}   settings.title  The name to show in the settings menu.
- * @param {Function} settings.render The function that renders the sidebar.
- *
- * @return {void}
- */
-export function renderSidebar( name, settings ) {
-	registerSidebar( name, settings );
-	activateSidebar( name );
-}
-
 /**
  * Activates the given sidebar.
  *

@@ -1,4 +1,4 @@
 export {
-	renderSidebar,
+	registerSidebar,
 	activateSidebar,
 } from './sidebar';

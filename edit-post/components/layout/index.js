@@ -85,7 +85,6 @@ function Layout( {
 			{ publishSidebarOpen && <PostPublishPanel onClose={ onClosePublishSidebar } /> }
 			{
 				openedGeneralSidebar !== null && <GeneralSidebar
-					onCloseGeneralSidebar={ onCloseGeneralSidebar }
 					openedGeneralSidebar={ openedGeneralSidebar } />
 			}
 			<Popover.Slot />

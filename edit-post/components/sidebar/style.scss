@@ -88,13 +88,16 @@
 	}
 }
 
-.edit-post-layout.is-sidebar-opened .edit-post-sidebar {
-	/* Sidebar covers screen on mobile */
-	width: 100%;
+.edit-post-layout.is-sidebar-opened {
+	.edit-post-sidebar,
+	.edit-post-plugins-panel {
+		/* Sidebar covers screen on mobile */
+		width: 100%;
 
-	/* Sidebar sits on the side on larger breakpoints */
-	@include break-medium() {
-		width: $sidebar-width;
+		/* Sidebar sits on the side on larger breakpoints */
+		@include break-medium() {
+			width: $sidebar-width;
+		}
 	}
 }
 

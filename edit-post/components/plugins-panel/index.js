@@ -50,11 +50,11 @@ function PluginsPanel( { onClose, plugin } ) {
 	} = getPluginSidebar( plugin );
 	return (
 		<div
-			className="editor-plugins-panel"
+			className="edit-post-sidebar edit-post-plugins-panel"
 			role="region"
 			aria-label={ __( 'Editor plugins' ) }
 			tabIndex="-1">
-			<div className="editor-plugins-panel__header">
+			<div className="edit-post-plugins-panel__header">
 				<h3>{ title }</h3>
 				<IconButton
 					onClick={ onClose }
@@ -62,7 +62,7 @@ function PluginsPanel( { onClose, plugin } ) {
 					label={ __( 'Close settings' ) }
 				/>
 			</div>
-			<div className="editor-plugins-panel__content">
+			<div className="edit-post-plugins-panel__content">
 				{ render() }
 			</div>
 		</div>
