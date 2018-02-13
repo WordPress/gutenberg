@@ -34,7 +34,7 @@ import {
 	getOpenedGeneralSidebar,
 	isPublishSidebarOpened,
 } from '../../store/selectors';
-import { closeGeneralSidebar, closePublishSidebar } from '../../store/actions';
+import { closePublishSidebar } from '../../store/actions';
 import PluginsPanel from '../../components/plugins-panel/index.js';
 
 function GeneralSidebar( { openedGeneralSidebar } ) {
@@ -54,7 +54,6 @@ function Layout( {
 	publishSidebarOpen,
 	openedGeneralSidebar,
 	hasFixedToolbar,
-	onCloseGeneralSidebar,
 	onClosePublishSidebar,
 } ) {
 	const className = classnames( 'edit-post-layout', {
@@ -101,7 +100,6 @@ export default connect(
 		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 	} ),
 	{
-		onCloseGeneralSidebar: closeGeneralSidebar,
 		onClosePublishSidebar: closePublishSidebar,
 	},
 	undefined,

@@ -16,7 +16,7 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				activeGeneralSidebar: null,
+				activeGeneralSidebar: 'editor',
 				activeSidebarPanel: {
 					editor: null,
 					plugin: null,
