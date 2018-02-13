@@ -41,7 +41,7 @@ function GeneralSidebar( { openedGeneralSidebar } ) {
 	switch ( openedGeneralSidebar ) {
 		case 'editor':
 			return <Sidebar />;
-		case 'plugins':
+		case 'plugin':
 			return <PluginsPanel />;
 		default:
 	}

@@ -19,7 +19,7 @@ describe( 'state', () => {
 				activeGeneralSidebar: null,
 				activeSidebarPanel: {
 					editor: null,
-					plugins: null,
+					plugin: null,
 				},
 				editorMode: 'visual',
 				panels: { 'post-status': true },
@@ -33,7 +33,7 @@ describe( 'state', () => {
 				activeGeneralSidebar: 'editor',
 				activeSidebarPanel: {
 					editor: null,
-					plugins: null,
+					plugin: null,
 				},
 			} ), {
 				type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
@@ -44,7 +44,7 @@ describe( 'state', () => {
 				activeGeneralSidebar: 'editor',
 				activeSidebarPanel: {
 					editor: 'document',
-					plugins: null,
+					plugin: null,
 				},
 			} );
 		} );

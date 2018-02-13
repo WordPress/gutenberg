@@ -27,7 +27,7 @@ export function getActiveEditorPanel( state ) {
  * @return {string}        Active plugin sidebar plugin
  */
 export function getActivePlugin( state ) {
-	return getPreference( state, 'activeSidebarPanel', {} ).plugins;
+	return getPreference( state, 'activeSidebarPanel', {} ).plugin;
 }
 
 /**
