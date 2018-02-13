@@ -49,13 +49,6 @@ body.dragging * {
 	cursor: grabbing !important;
 }
 
-.invisible-drag-image {
-	position: fixed;
-	left: -1000px;
-	height: 50px;
-	width: 50px;
-}
-
 body.gutenberg-editor-page {
 	background: $white;
 
