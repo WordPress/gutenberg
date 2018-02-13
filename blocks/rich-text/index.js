@@ -735,11 +735,14 @@ export class RichText extends Component {
 			this.props.value !== prevProps.value &&
 			this.props.value !== this.savedContent
 		) {
-			const bookmark = this.editor.selection.getBookmark( 2, true );
+			// Do not trigger a `addUndo` event.
+			this.editor.undoManager.ignore( () => {
+				const bookmark = this.editor.selection.getBookmark( 2, true );
 
-			this.savedContent = this.props.value;
-			this.setContent( this.savedContent );
-			this.editor.selection.moveToBookmark( bookmark );
+				this.savedContent = this.props.value;
+				this.setContent( this.savedContent );
+				this.editor.selection.moveToBookmark( bookmark );
+			} );
 		}
 	}
 
