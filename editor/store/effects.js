@@ -514,4 +514,29 @@ export default {
 		window.fetch( window._wpMetaBoxUrl, fetchOptions )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
+	FETCH_TAXONOMIES( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		if ( ! has( wp, 'api.collections.Taxonomies' ) ) {
+			return;
+		}
+
+		const { dispatch } = store;
+
+		const collection = new wp.api.collections.Taxonomies();
+		collection.fetch().done( ( taxonomies ) => {
+			dispatch( {
+				type: 'FETCH_TAXONOMIES_SUCCESS',
+				taxonomies,
+			} );
+		} ).fail( ( err ) => {
+			dispatch( {
+				type: 'FETCH_TAXONOMIES_FAILURE',
+				error: get( err, 'responseJSON', {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} ),
+			} );
+		} );
+	},
 };

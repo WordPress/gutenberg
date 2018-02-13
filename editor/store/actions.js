@@ -571,3 +571,14 @@ export function appendDefaultBlock( attributes, rootUID ) {
 		rootUID,
 	};
 }
+
+/**
+ * Returns an action object used to fetch all taxonomies from the REST API into the store.
+ *
+ * @return {Object} Action object.
+ */
+export function fetchTaxonomies() {
+	return {
+		type: 'FETCH_TAXONOMIES',
+	};
+}

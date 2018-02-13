@@ -15,6 +15,9 @@ import {
 	getSelectedBlockCount,
 	getCurrentPostSlug,
 } from './selectors';
+import {
+	fetchTaxonomies,
+} from './actions';
 
 /**
  * Module Constants
@@ -26,6 +29,8 @@ const store = applyMiddlewares(
 	registerReducer( MODULE_KEY, withRehydratation( reducer, 'preferences', STORAGE_KEY ) )
 );
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
+
+store.dispatch( fetchTaxonomies() );
 
 registerSelectors( MODULE_KEY, {
 	getCurrentPostType,

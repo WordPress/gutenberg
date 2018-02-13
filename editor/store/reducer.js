@@ -864,6 +864,32 @@ export const reusableBlocks = combineReducers( {
 	},
 } );
 
+export const taxonomies = combineReducers( {
+	data( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_TAXONOMIES_SUCCESS': {
+				return action.taxonomies;
+			}
+		}
+
+		return state;
+	},
+
+	isFetching( state = false, action ) {
+		switch ( action.type ) {
+			case 'FETCH_TAXONOMIES': {
+				return true;
+			}
+			case 'FETCH_TAXONOMIES_SUCCESS':
+			case 'FETCH_TAXONOMIES_FAILURE': {
+				return false;
+			}
+		}
+
+		return state;
+	},
+} );
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -878,4 +904,5 @@ export default optimist( combineReducers( {
 	metaBoxes,
 	isSavingMetaBoxes,
 	reusableBlocks,
+	taxonomies,
 } ) );
