@@ -47,9 +47,15 @@ class ImageBlock extends Component {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
+
+		this.state = {
+			captionFocused: false,
+		};
 	}
 
 	componentDidMount() {
@@ -77,6 +83,14 @@ class ImageBlock extends Component {
 		}
 	}
 
+	componentWillReceiveProps( { isSelected } ) {
+		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: false,
+			} );
+		}
+	}
+
 	onSelectImage( media ) {
 		const attributes = { url: media.url, alt: media.alt, id: media.id };
 		if ( media.caption ) {
@@ -87,6 +101,22 @@ class ImageBlock extends Component {
 
 	onSetHref( value ) {
 		this.props.setAttributes( { href: value } );
+	}
+
+	onFocusCaption() {
+		if ( ! this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: true,
+			} );
+		}
+	}
+
+	onImageClick() {
+		if ( this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: false,
+			} );
+		}
 	}
 
 	updateAlt( newAlt ) {
@@ -198,7 +228,7 @@ class ImageBlock extends Component {
 						// Disable reason: Image itself is not meant to be
 						// interactive, but should direct focus to block
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-						const img = <img src={ url } alt={ alt } />;
+						const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
 
 						if ( ! isResizable || ! imageWidthWithinContainer ) {
 							return img;
@@ -250,8 +280,9 @@ class ImageBlock extends Component {
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
+						onFocus={ this.onFocusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						isSelected={ isSelected }
+						isSelected={ this.state.captionFocused }
 						inlineToolbar
 					/>
 				) : null }

@@ -14,6 +14,7 @@ import {
 	some,
 	unionWith,
 	includes,
+	values,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -171,17 +172,6 @@ export function getCurrentPostType( state ) {
 }
 
 /**
- * Returns the slug of the post currently being edited.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Slug.
- */
-export function getCurrentPostSlug( state ) {
-	return getEditedPostAttribute( state, 'slug' );
-}
-
-/**
  * Returns the ID of the post currently being edited, or null if the post has
  * not yet been saved.
  *
@@ -240,6 +230,13 @@ export function getPostEdits( state ) {
  */
 export function getEditedPostAttribute( state, attributeName ) {
 	const edits = getPostEdits( state );
+
+	// Special cases
+	switch ( attributeName ) {
+		case 'content':
+			return getEditedPostContent( state );
+	}
+
 	return edits[ attributeName ] === undefined ?
 		state.currentPost[ attributeName ] :
 		edits[ attributeName ];
@@ -302,9 +299,24 @@ export function isEditedPostPublishable( state ) {
  */
 export function isEditedPostSaveable( state ) {
 	return (
-		!! getEditedPostTitle( state ) ||
+		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostExcerpt( state ) ||
-		!! getEditedPostContent( state )
+		! isEditedPostEmpty( state )
+	);
+}
+
+/**
+ * Returns true if the edited post has content. A post has content if it has at
+ * least one block or otherwise has a non-empty content property assigned.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether post has content.
+ */
+export function isEditedPostEmpty( state ) {
+	return (
+		! getBlockCount( state ) &&
+		! getEditedPostAttribute( state, 'content' )
 	);
 }
 
@@ -325,26 +337,6 @@ export function isEditedPostBeingScheduled( state ) {
 }
 
 /**
- * Returns the raw title of the post being edited, preferring the unsaved value
- * if different than the saved post.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Raw post title.
- */
-export function getEditedPostTitle( state ) {
-	const editedTitle = getPostEdits( state ).title;
-	if ( editedTitle !== undefined ) {
-		return editedTitle;
-	}
-	const currentPost = getCurrentPost( state );
-	if ( currentPost.title && currentPost.title ) {
-		return currentPost.title;
-	}
-	return '';
-}
-
-/**
  * Gets the document title to be used.
  *
  * @param {Object} state Global application state.
@@ -352,7 +344,7 @@ export function getEditedPostTitle( state ) {
  * @return {string} Document title.
  */
 export function getDocumentTitle( state ) {
-	let title = getEditedPostTitle( state );
+	let title = getEditedPostAttribute( state, 'title' );
 
 	if ( ! title.trim() ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
@@ -1178,36 +1170,25 @@ export function getInserterItems( state, enabledBlockTypes = true ) {
 	return compact( items );
 }
 
-const getRecentInserts = createSelector(
-	state => {
-		// Filter out any inserts that are associated with a block type that isn't registered
-		const inserts = state.preferences.recentInserts.filter( insert => getBlockType( insert.name ) );
+function fillWithCommonBlocks( inserts ) {
+	// Filter out any inserts that are associated with a block type that isn't registered
+	const items = inserts.filter( insert => getBlockType( insert.name ) );
 
-		// Common blocks that we'll use to pad out our list
-		const commonInserts = getBlockTypes()
-			.filter( blockType => blockType.category === 'common' )
-			.map( blockType => ( { name: blockType.name } ) );
+	// Common blocks that we'll use to pad out our list
+	const commonInserts = getBlockTypes()
+		.filter( blockType => blockType.category === 'common' )
+		.map( blockType => ( { name: blockType.name } ) );
 
-		const areInsertsEqual = ( a, b ) => a.name === b.name && a.ref === b.ref;
-		return unionWith( inserts, commonInserts, areInsertsEqual );
-	},
-	state => state.preferences.recentInserts
-);
+	const areInsertsEqual = ( a, b ) => a.name === b.name && a.ref === b.ref;
+	return unionWith( items, commonInserts, areInsertsEqual );
+}
 
-/**
- * Determines the items that appear in the 'Recent' tab of the inserter.
- *
- * @param {Object}           state             Global application state.
- * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
- *
- * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
- */
-export function getRecentInserterItems( state, enabledBlockTypes = true ) {
+function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
 	if ( ! enabledBlockTypes ) {
 		return [];
 	}
 
-	const items = getRecentInserts( state ).map( insert => {
+	const items = fillWithCommonBlocks( inserts ).map( insert => {
 		if ( insert.ref ) {
 			const reusableBlock = getReusableBlock( state, insert.ref );
 			return buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock );
@@ -1217,7 +1198,36 @@ export function getRecentInserterItems( state, enabledBlockTypes = true ) {
 		return buildInserterItemFromBlockType( state, enabledBlockTypes, blockType );
 	} );
 
-	return compact( items ).slice( 0, MAX_RECENT_BLOCKS );
+	return compact( items ).slice( 0, maximum );
+}
+
+/**
+ * Determines the items that appear in the 'Recent' tab of the inserter.
+ *
+ * @param {Object}           state             Global application state.
+ * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {number}           maximum           Number of items to return.
+ *
+ * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
+ */
+export function getRecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
+	return getItemsFromInserts( state, state.preferences.recentInserts, enabledBlockTypes, maximum );
+}
+
+/**
+ * Determines the items that appear in the inserter with shortcuts based on the block usage
+ *
+ * @param {Object}           state             Global application state.
+ * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {number}           maximum           Number of items to return.
+ *
+ * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
+ */
+export function getFrequentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
+	const sortedInserts = values( state.preferences.insertUsage )
+		.sort( ( a, b ) => b.count - a.count )
+		.map( ( { insert } ) => insert );
+	return getItemsFromInserts( state, sortedInserts, enabledBlockTypes, maximum );
 }
 
 /**

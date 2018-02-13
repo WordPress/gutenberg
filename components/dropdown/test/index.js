@@ -9,7 +9,7 @@ import { mount } from 'enzyme';
 import Dropdown from '../';
 
 describe( 'Dropdown', () => {
-	const expectPopoverOpened = ( wrapper, opened ) => expect( wrapper.find( 'Popover' ) ).toHaveProp( 'isOpen', opened );
+	const expectPopoverVisible = ( wrapper, visible ) => expect( wrapper.find( 'Popover' ) ).toHaveLength( visible ? 1 : 0 );
 
 	it( 'should toggle the dropdown properly', () => {
 		const expectButtonExpanded = ( wrapper, expanded ) => {
@@ -26,13 +26,13 @@ describe( 'Dropdown', () => {
 		/> );
 
 		expectButtonExpanded( wrapper, false );
-		expectPopoverOpened( wrapper, false );
+		expectPopoverVisible( wrapper, false );
 
 		wrapper.find( 'button' ).simulate( 'click' );
 		wrapper.update();
 
 		expectButtonExpanded( wrapper, true );
-		expectPopoverOpened( wrapper, true );
+		expectPopoverVisible( wrapper, true );
 	} );
 
 	it( 'should close the dropdown when calling onClose', () => {
@@ -46,16 +46,16 @@ describe( 'Dropdown', () => {
 			renderContent={ () => null }
 		/> );
 
-		expectPopoverOpened( wrapper, false );
+		expectPopoverVisible( wrapper, false );
 
 		wrapper.find( '.open' ).simulate( 'click' );
 		wrapper.update();
 
-		expectPopoverOpened( wrapper, true );
+		expectPopoverVisible( wrapper, true );
 
 		wrapper.find( '.close' ).simulate( 'click' );
 		wrapper.update();
 
-		expectPopoverOpened( wrapper, false );
+		expectPopoverVisible( wrapper, false );
 	} );
 } );
