@@ -43,7 +43,7 @@ function FeaturedImage( { isOpened, postType, onTogglePanel } ) {
 }
 
 const applyQuery = query( ( select ) => ( {
-	postTypeSlug: select( 'core/editor', 'getEditedPostAttribute', 'type' ),
+	postTypeSlug: select( 'core/editor' ).getEditedPostAttribute( 'type' ),
 } ) );
 
 const applyConnect = connect(
