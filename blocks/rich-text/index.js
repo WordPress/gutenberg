@@ -162,6 +162,9 @@ export class RichText extends Component {
 		return ( this.props.getSettings || identity )( {
 			...settings,
 			forced_root_block: this.props.multiline || false,
+			// Allow TinyMCE to keep one undo level for comparing changes.
+			// Prevent it otherwise from accumulating any history.
+			custom_undo_redo_levels: 1,
 		} );
 	}
 
