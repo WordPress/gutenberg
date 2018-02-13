@@ -2156,6 +2156,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
+						blocksByUid: {},
 						blockOrder: [],
 					},
 				},
@@ -2214,6 +2215,12 @@ describe( 'selectors', () => {
 				reusableBlocks: {
 					data: {
 						[ id ]: expectedReusableBlock,
+					},
+				},
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: [],
 					},
 				},
 			};

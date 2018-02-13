@@ -1228,7 +1228,15 @@ export function getRecentInserterItems( state, enabledBlockTypes = true ) {
  * @return {Object} The reusable block, or null if none exists.
  */
 export function getReusableBlock( state, ref ) {
-	return state.reusableBlocks.data[ ref ] || null;
+	const reusableBlock = state.reusableBlocks.data[ ref ];
+	if ( ! reusableBlock ) {
+		return null;
+	}
+
+	return {
+		...state.reusableBlocks.data[ ref ],
+		...getBlock( state, reusableBlock.uid ),
+	};
 }
 
 /**

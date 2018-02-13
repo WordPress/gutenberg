@@ -40,15 +40,6 @@ class ReusableBlockEdit extends Component {
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 */
-	componentWillReceiveProps( nextProps ) {
-		if ( this.props.focus && ! nextProps.focus ) {
-			this.stopEditing();
-		}
-	}
-
 	startEditing() {
 		this.setState( { isEditing: true } );
 	}
@@ -104,13 +95,14 @@ class ReusableBlockEdit extends Component {
 			<div key="edit" style={ { pointerEvents: isEditing ? 'auto' : 'none' } }>
 				<BlockEdit
 					{ ...this.props }
+					id={ reusableBlock.uid }
 					name={ reusableBlock.type }
 					isSelected={ isEditing && isSelected }
 					attributes={ reusableBlockAttributes }
 					setAttributes={ isEditing ? this.setAttributes : noop }
 				/>
 			</div>,
-			isSelected && (
+			( isSelected || isEditing ) && (
 				<ReusableBlockEditPanel
 					key="panel"
 					isEditing={ isEditing }

@@ -261,19 +261,21 @@ export function switchToBlockType( blocks, name ) {
 /**
  * Creates a new reusable block.
  *
- * @param {string} type       The type of the block referenced by the reusable
- *                            block.
- * @param {Object} attributes The attributes of the block referenced by the
- *                            reusable block.
+ * @param {string} type        The type of the block referenced by the reusable
+ *                             block.
+ * @param {Object} attributes  The attributes of the block referenced by the
+ *                             reusable block.
+ * @param {?Array} innerBlocks Nested blocks.
  *
  * @return {Object} A reusable block object.
  */
-export function createReusableBlock( type, attributes ) {
+export function createReusableBlock( type, attributes = {}, innerBlocks = [] ) {
 	return {
 		id: -uniqueId(), // Temorary id replaced when the block is saved server side
 		isTemporary: true,
 		title: __( 'Untitled block' ),
 		type,
 		attributes,
+		innerBlocks,
 	};
 }

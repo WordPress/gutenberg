@@ -92,20 +92,21 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
 			console.warn( 'Dispatch is not supported.' );
 		},
 	};
-	const connectWithStore = ( ...args ) => {
-		const ConnectedWrappedComponent = connect( ...args )( WrappedComponent );
-		return ( props ) => {
-			return <ConnectedWrappedComponent { ...props } store={ store } />;
-		};
-	};
 
-	return connectWithStore( ( state, ownProps ) => {
-		const select = ( key, selectorName, ...args ) => {
-			return selectors[ key ][ selectorName ]( state[ key ], ...args );
-		};
+	const ConnectedWrappedComponent = connect(
+		( state, ownProps ) => {
+			const select = ( key, selectorName, ...args ) => {
+				return selectors[ key ][ selectorName ]( state[ key ], ...args );
+			};
 
-		return mapSelectorsToProps( select, ownProps );
-	} );
+			return mapSelectorsToProps( select, ownProps );
+		},
+		null,
+		null,
+		{ storeKey: 'wpDataStore' }
+	)( WrappedComponent );
+
+	return ( props ) => <ConnectedWrappedComponent { ...props } wpDataStore={ store } />;
 };
 
 /**
