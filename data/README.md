@@ -70,12 +70,24 @@ Function used to subscribe to data changes. The listener function is called each
 ```js
 // Subscribe.
 const unsubscribe = wp.data.subscribe( () => {
-	const data = {
-		slug: wp.data.select( 'core/editor', 'getEditedPostSlug' ),
-	};
+    const data = {
+        //Post title
+        title: wp.data.select( 'core/editor', 'getEditedPostAttribute', 'title' ),
+        //Post slug
+        slug: wp.data.select( 'core/editor', 'getEditedPostAttribute', 'slug' ),
+        //Post type
+        type: wp.data.select( 'core/editor', 'getEditedPostAttribute', 'type' ),
+        //Post content
+        content :wp.data.select( 'core/editor', 'getEditedPostAttribute', 'content' ),
+        //Number of blocks currently selected
+        selectedBlockCount: wp.data.select( 'core/editor', 'getSelectedBlockCount' ),
+    };
 
-	console.log( 'data changed', data );
+    //This will log every time data is updated
+    console.log(data);
+
 } );
+
 
 // Unsubcribe.
 unsubscribe();
