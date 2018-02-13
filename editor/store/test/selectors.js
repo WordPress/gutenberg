@@ -33,6 +33,7 @@ const {
 	isCurrentPostPublished,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
+	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
 	getBlock,
@@ -900,6 +901,99 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isEditedPostEmpty', () => {
+		it( 'should return true if no blocks and no content', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if blocks', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+							123: {
+								uid: 123,
+								name: 'core/test-block',
+								attributes: {
+									text: '',
+								},
+							},
+						},
+						blockOrder: {
+							'': [ 123 ],
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if the post has an empty content property', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {
+					content: '',
+				},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if the post has a non-empty content property', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {
+					content: 'sassel',
+				},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if edits include a non-empty content property', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {
+							content: 'sassel',
+						},
+					},
+				},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( false );
 		} );
 	} );
 
