@@ -46,10 +46,12 @@ class PostPublishPanel extends Component {
 				loading: false,
 			} );
 		}
+	}
 
-		// Automatically collapse the publish sidebar when
-		// a post is published and the user makes an edit.
-		if ( this.props.isPublished && newProps.isDirty ) {
+	componentDidUpdate( prevProps ) {
+		// Automatically collapse the publish sidebar when a post
+		// is published and the user makes an edit.
+		if ( prevProps.isPublished && this.props.isDirty ) {
 			this.props.onClose();
 		}
 	}
