@@ -2,11 +2,13 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,8 +16,13 @@ import { __ } from '@wordpress/i18n';
 import './style.scss';
 import BlockDropZone from '../block-drop-zone';
 import { appendDefaultBlock } from '../../store/actions';
+import { getBlock, getBlockCount } from '../../store/selectors';
 
-export function DefaultBlockAppender( { onAppend, showPrompt = true } ) {
+export function DefaultBlockAppender( { isVisible, onAppend, showPrompt } ) {
+	if ( ! isVisible ) {
+		return null;
+	}
+
 	return (
 		<div className="editor-default-block-appender">
 			<BlockDropZone />
@@ -33,7 +40,16 @@ export function DefaultBlockAppender( { onAppend, showPrompt = true } ) {
 }
 
 export default connect(
-	null,
+	( state, ownProps ) => {
+		const isEmpty = ! getBlockCount( state, ownProps.rootUID );
+		const lastBlock = getBlock( state, ownProps.lastBlockUID );
+		const isLastBlockDefault = get( lastBlock, 'name' ) === getDefaultBlockName();
+
+		return {
+			isVisible: isEmpty || ! isLastBlockDefault,
+			showPrompt: isEmpty,
+		};
+	},
 	( dispatch, ownProps ) => ( {
 		onAppend() {
 			const { layout, rootUID } = ownProps;

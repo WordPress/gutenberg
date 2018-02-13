@@ -9,16 +9,15 @@ import {
 	mapValues,
 	sortBy,
 	throttle,
-	get,
 	last,
 } from 'lodash';
+import classnames from 'classnames';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -187,7 +186,7 @@ class BlockListLayout extends Component {
 
 	render() {
 		const {
-			blocks,
+			blockUIDs,
 			showContextualToolbar,
 			layout,
 			isGroupedByLayout,
@@ -200,15 +199,17 @@ class BlockListLayout extends Component {
 			defaultLayout = layout;
 		}
 
-		const isLastBlockDefault = get( last( blocks ), 'name' ) === getDefaultBlockName();
+		const classes = classnames( {
+			[ `layout-${ layout }` ]: layout,
+		} );
 
 		return (
-			<BlockSelectionClearer className={ 'layout-' + layout }>
-				{ map( blocks, ( block, blockIndex ) => (
+			<BlockSelectionClearer className={ classes }>
+				{ map( blockUIDs, ( uid, blockIndex ) => (
 					<BlockListBlock
-						key={ 'block-' + block.uid }
+						key={ 'block-' + uid }
 						index={ blockIndex }
-						uid={ block.uid }
+						uid={ uid }
 						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
@@ -216,17 +217,15 @@ class BlockListLayout extends Component {
 						rootUID={ rootUID }
 						layout={ defaultLayout }
 						isFirst={ blockIndex === 0 }
-						isLast={ blockIndex === blocks.length - 1 }
+						isLast={ blockIndex === blockUIDs.length - 1 }
 						renderBlockMenu={ renderBlockMenu }
 					/>
 				) ) }
-				{ ( ! blocks.length || ! isLastBlockDefault ) && (
-					<DefaultBlockAppender
-						rootUID={ rootUID }
-						layout={ defaultLayout }
-						showPrompt={ ! blocks.length }
-					/>
-				) }
+				<DefaultBlockAppender
+					rootUID={ rootUID }
+					lastBlockUID={ last( blockUIDs ) }
+					layout={ defaultLayout }
+				/>
 			</BlockSelectionClearer>
 		);
 	}
