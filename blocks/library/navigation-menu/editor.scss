@@ -4,6 +4,7 @@
 		padding-left: 2.5em;
 	}
 	&.is-horizontal {
+		padding-left: 0;
 		ul {
 			border: 1px solid $light-gray-500;
 			border-top: none;
@@ -15,4 +16,9 @@
 
 		}
 	}
+}
+
+.gutenberg [data-align="full"] .wp-block-navigation-menu {
+	padding-left: 2em;
+	padding-right: 2em;
 }
