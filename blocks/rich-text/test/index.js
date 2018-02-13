@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { RichText, createTinyMCEElement, isLinkBoundary, getFormatProperties } from '../';
+import { RichText, createTinyMCEElement, isEmptyInlineBoundary, isEmptyNode, getFormatProperties } from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
 
 describe( 'createTinyMCEElement', () => {
@@ -40,24 +40,66 @@ describe( 'createTinyMCEElement', () => {
 	} );
 } );
 
-describe( 'isLinkBoundary', () => {
-	const fragment = {
-		childNodes: [
-			{
-				nodeName: 'A',
-				text: '\uFEFF',
+describe( 'isEmptyInlineBoundary', () => {
+	describe( 'link', () => {
+		const node = document.createElement( 'a' );
+		node.innerText = '\uFEFF';
 
-			},
-		],
-	};
+		test( 'should return true for a valid link boundary', () => {
+			expect( isEmptyInlineBoundary( node ) ).toBe( true );
+		} );
 
-	test( 'should return true for a valid link boundary', () => {
-		expect( isLinkBoundary( fragment ) ).toBe( true );
+		test( 'should return false for an invalid link boundary', () => {
+			const invalid = { ...node, childNodes: [] };
+			expect( isEmptyInlineBoundary( invalid ) ).toBe( false );
+		} );
 	} );
 
-	test( 'should return false for an invalid link boundary', () => {
-		const invalid = { ...fragment, childNodes: [] };
-		expect( isLinkBoundary( invalid ) ).toBe( false );
+	describe( 'code', () => {
+		const node = document.createElement( 'code' );
+		node.textContent = '\uFEFF';
+
+		test( 'should return true for a valid link boundary', () => {
+			expect( isEmptyInlineBoundary( node ) ).toBe( true );
+		} );
+
+		test( 'should return false for an invalid link boundary', () => {
+			const invalid = { ...node, childNodes: [] };
+			expect( isEmptyInlineBoundary( invalid ) ).toBe( false );
+		} );
+	} );
+} );
+
+describe( 'isEmptyNode', () => {
+	it( 'returns false for document', () => {
+		const node = document;
+
+		expect( isEmptyNode( node ) ).toBe( false );
+	} );
+
+	it( 'returns true for empty text node', () => {
+		const node = document.createTextNode( '' );
+
+		expect( isEmptyNode( node ) ).toBe( true );
+	} );
+
+	it( 'returns false for non-empty text node', () => {
+		const node = document.createTextNode( 'rabbit' );
+
+		expect( isEmptyNode( node ) ).toBe( false );
+	} );
+
+	it( 'returns true for empty element node', () => {
+		const node = document.createElement( 'div' );
+
+		expect( isEmptyNode( node ) ).toBe( true );
+	} );
+
+	it( 'returns false for non-empty element node', () => {
+		const node = document.createElement( 'div' );
+		node.textContent = 'rabbit';
+
+		expect( isEmptyNode( node ) ).toBe( false );
 	} );
 } );
 

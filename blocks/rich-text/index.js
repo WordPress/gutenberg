@@ -14,7 +14,7 @@ import {
 	defer,
 	noop,
 	throttle,
-	get,
+	reject,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import 'element-closest';
@@ -56,36 +56,49 @@ export function createTinyMCEElement( type, props, ...children ) {
 }
 
 /**
- * Returns true if the fragment is the inline node boundary. This is used in
- * fragment emptiness check to prevent the inline boundary from being included
- * in the split which occurs while within but at the end of an inline node,
- * since TinyMCE includes a placeholder caret character at the end.
+ * Returns true if the node is the inline node boundary. This is used in node
+ * filtering prevent the inline boundary from being included in the split which
+ * occurs while within but at the end of an inline node, since TinyMCE includes
+ * a placeholder caret character at the end.
  *
- * @param {DocumentFragment} fragment Fragment to test.
+ * @param {Node} node Node to test.
  *
- * @return {boolean} Whether fragment is inline boundary.
+ * @return {boolean} Whether node is inline boundary.
  */
-export function isInlineBoundary( fragment ) {
-	return get( fragment.childNodes, [ 0, 'text' ] ) === '\uFEFF';
+export function isEmptyInlineBoundary( node ) {
+	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
+	return text === '\uFEFF';
 }
 
 /**
- * Returns true if the fragment is empty, meaning it contains only the
- * placeholder caret character or has no text content of its own.
+ * Returns true if the node is empty, meaning it contains only the placeholder
+ * caret character or has no text content of its own.
  *
- * @param {DocumentFragment} fragment Fragment to test.
+ * @param {Node} node Node to test.
  *
- * @return {boolean} Whether fragment is empty.
+ * @return {boolean} Whether node is empty.
  */
-export function isEmptyFragment( fragment ) {
+export function isEmptyNode( node ) {
 	return (
 		// Use strict equality because this value can be null in the case of a
 		// document value (`null === document.textContent`)
 		//
 		// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
-		'' === fragment.textContent ||
-		isInlineBoundary( fragment )
+		'' === node.textContent ||
+		isEmptyInlineBoundary( node )
 	);
+}
+
+/**
+ * Given a set of Nodes, filters to set to exclude any empty nodes: those with
+ * either no text of their own or only including the inline boundary caret.
+ *
+ * @param {Node[]} childNodes Nodes to filter.
+ *
+ * @return {Node[]} Non-empty nodes.
+ */
+export function filterEmptyNodes( childNodes ) {
+	return reject( childNodes, isEmptyNode );
 }
 
 export function getFormatProperties( formatName, parents ) {
@@ -640,7 +653,7 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = isEmptyFragment( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+			const afterElement = nodeListToReact( filterEmptyNodes( afterFragment.childNodes ), createTinyMCEElement );
 			this.setContent( beforeElement );
 			this.props.onSplit( beforeElement, afterElement, ...blocks );
 		} else {
