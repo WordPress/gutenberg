@@ -43,6 +43,7 @@ const {
 	getBlockRootUID,
 	getEditedPostAttribute,
 	getMultiSelectedBlockUids,
+	getMultiSelectedBlocks,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getBlockOrder,
@@ -1345,6 +1346,26 @@ describe( 'selectors', () => {
 			};
 
 			expect( getMultiSelectedBlockUids( state ) ).toEqual( [ 9, 8, 7 ] );
+		} );
+	} );
+
+	describe( 'getMultiSelectedBlocks', () => {
+		it( 'should return the same reference on subsequent invocations of empty selection', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				blockSelection: { start: null, end: null },
+				currentPost: {},
+			};
+
+			expect(
+				getMultiSelectedBlocks( state )
+			).toBe( getMultiSelectedBlocks( state ) );
 		} );
 	} );
 

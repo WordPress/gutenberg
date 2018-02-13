@@ -32,13 +32,15 @@ const MAX_RECENT_BLOCKS = 8;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 
 /**
- * Shared reference to an empty array used as the default block order return
- * value when the state value is not explicitly assigned, since we want to
- * avoid returning a new array reference on every invocation.
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
  *
  * @type {Array}
  */
-const DEFAULT_BLOCK_ORDER = [];
+const EMPTY_ARRAY = [];
 
 /**
  * Returns the state of legacy meta boxes.
@@ -677,7 +679,14 @@ export const getMultiSelectedBlockUids = createSelector(
  * @return {Array} Multi-selected block objects.
  */
 export const getMultiSelectedBlocks = createSelector(
-	( state ) => getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) ),
+	( state ) => {
+		const multiSelectedBlockUids = getMultiSelectedBlockUids( state );
+		if ( ! multiSelectedBlockUids.length ) {
+			return EMPTY_ARRAY;
+		}
+
+		return multiSelectedBlockUids.map( ( uid ) => getBlock( state, uid ) );
+	},
 	( state ) => [
 		state.editor.present.blockOrder,
 		state.blockSelection.start,
@@ -789,7 +798,7 @@ export function getMultiSelectedBlocksEndUid( state ) {
  * @return {Array} Ordered unique IDs of post blocks.
  */
 export function getBlockOrder( state, rootUID ) {
-	return state.editor.present.blockOrder[ rootUID || '' ] || DEFAULT_BLOCK_ORDER;
+	return state.editor.present.blockOrder[ rootUID || '' ] || EMPTY_ARRAY;
 }
 
 /**
