@@ -303,7 +303,22 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostTitle( state ) ||
 		!! getEditedPostExcerpt( state ) ||
-		!! getEditedPostContent( state )
+		! isEditedPostEmpty( state )
+	);
+}
+
+/**
+ * Returns true if the edited post has content. A post has content if it has at
+ * least one block or otherwise has a non-empty content property assigned.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether post has content.
+ */
+export function isEditedPostEmpty( state ) {
+	return (
+		! getBlockCount( state ) &&
+		! getEditedPostAttribute( state, 'content' )
 	);
 }
 
