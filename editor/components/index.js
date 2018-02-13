@@ -64,6 +64,7 @@ export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';
 export { default as MultiBlocksSwitcher } from './block-switcher/multi-blocks-switcher';
+export { default as MultiSelectScrollIntoView } from './multi-select-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
