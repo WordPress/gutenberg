@@ -38,13 +38,13 @@ class UrlInputButton extends Component {
 	render() {
 		const { url, onChange } = this.props;
 		const { expanded } = this.state;
-		const buttonLabel = url ? "Edit Link" : "Insert Link";
+		const buttonLabel = url ? __( 'Edit Link' ) : __( 'Insert Link' );
 
 		return (
 			<div className="blocks-url-input__button">
 				<IconButton
 					icon="admin-links"
-					label={ __( buttonLabel ) }
+					label={ buttonLabel }
 					onClick={ this.toggle }
 					className={ classnames( 'components-toolbar__control', {
 						'is-active': url,
