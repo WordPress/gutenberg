@@ -61,6 +61,8 @@ export function createTinyMCEElement( type, props, ...children ) {
  * occurs while within but at the end of an inline node, since TinyMCE includes
  * a placeholder caret character at the end.
  *
+ * @see https://github.com/tinymce/tinymce/blob/master/src/plugins/link/main/ts/core/Utils.ts
+ *
  * @param {Node} node Node to test.
  *
  * @return {boolean} Whether node is inline boundary.
