@@ -88,9 +88,7 @@ class Dropdown extends Component {
 							onClickOutside={ this.clickOutside }
 							expandOnMobile={ expandOnMobile }
 						>
-							<FocusManaged>
-								{ renderContent( args ) }
-							</FocusManaged>
+							{ renderContent( args ) }
 						</Popover>
 					) }
 				</div>
