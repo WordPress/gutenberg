@@ -171,17 +171,6 @@ export function getCurrentPostType( state ) {
 }
 
 /**
- * Returns the slug of the post currently being edited.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Slug.
- */
-export function getCurrentPostSlug( state ) {
-	return getEditedPostAttribute( state, 'slug' );
-}
-
-/**
  * Returns the ID of the post currently being edited, or null if the post has
  * not yet been saved.
  *
@@ -240,6 +229,13 @@ export function getPostEdits( state ) {
  */
 export function getEditedPostAttribute( state, attributeName ) {
 	const edits = getPostEdits( state );
+
+	// Special cases
+	switch ( attributeName ) {
+		case 'content':
+			return getEditedPostContent( state );
+	}
+
 	return edits[ attributeName ] === undefined ?
 		state.currentPost[ attributeName ] :
 		edits[ attributeName ];
@@ -302,7 +298,7 @@ export function isEditedPostPublishable( state ) {
  */
 export function isEditedPostSaveable( state ) {
 	return (
-		!! getEditedPostTitle( state ) ||
+		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostExcerpt( state ) ||
 		!! getEditedPostContent( state )
 	);
@@ -325,26 +321,6 @@ export function isEditedPostBeingScheduled( state ) {
 }
 
 /**
- * Returns the raw title of the post being edited, preferring the unsaved value
- * if different than the saved post.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Raw post title.
- */
-export function getEditedPostTitle( state ) {
-	const editedTitle = getPostEdits( state ).title;
-	if ( editedTitle !== undefined ) {
-		return editedTitle;
-	}
-	const currentPost = getCurrentPost( state );
-	if ( currentPost.title && currentPost.title ) {
-		return currentPost.title;
-	}
-	return '';
-}
-
-/**
  * Gets the document title to be used.
  *
  * @param {Object} state Global application state.
@@ -352,7 +328,7 @@ export function getEditedPostTitle( state ) {
  * @return {string} Document title.
  */
 export function getDocumentTitle( state ) {
-	let title = getEditedPostTitle( state );
+	let title = getEditedPostAttribute( state, 'title' );
 
 	if ( ! title.trim() ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
