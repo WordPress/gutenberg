@@ -962,23 +962,6 @@ describe( 'selectors', () => {
 			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
-		it( 'should return false if the post has a non-empty content property', () => {
-			const state = {
-				editor: {
-					present: {
-						blocksByUid: {},
-						blockOrder: {},
-						edits: {},
-					},
-				},
-				currentPost: {
-					content: 'sassel',
-				},
-			};
-
-			expect( isEditedPostEmpty( state ) ).toBe( false );
-		} );
-
 		it( 'should return false if edits include a non-empty content property', () => {
 			const state = {
 				editor: {
