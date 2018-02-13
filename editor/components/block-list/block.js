@@ -57,8 +57,8 @@ import {
 	isMultiSelecting,
 	getBlockIndex,
 	getEditedPostAttribute,
-	getNextBlock,
-	getPreviousBlock,
+	getNextBlockUid,
+	getPreviousBlockUid,
 	isBlockHovered,
 	isBlockMultiSelected,
 	isBlockSelected,
@@ -290,20 +290,20 @@ export class BlockListBlock extends Component {
 	}
 
 	mergeBlocks( forward = false ) {
-		const { block, previousBlock, nextBlock, onMerge } = this.props;
+		const { block, previousBlockUid, nextBlockUid, onMerge } = this.props;
 
 		// Do nothing when it's the first block.
 		if (
-			( ! forward && ! previousBlock ) ||
-			( forward && ! nextBlock )
+			( ! forward && ! previousBlockUid ) ||
+			( forward && ! nextBlockUid )
 		) {
 			return;
 		}
 
 		if ( forward ) {
-			onMerge( block, nextBlock );
+			onMerge( block.uid, nextBlockUid );
 		} else {
-			onMerge( previousBlock, block );
+			onMerge( previousBlockUid, block.uid );
 		}
 
 		// Manually trigger typing mode, since merging will remove this block and
@@ -612,8 +612,8 @@ export class BlockListBlock extends Component {
 const mapStateToProps = ( state, { uid, rootUID } ) => {
 	const isSelected = isBlockSelected( state, uid );
 	return {
-		previousBlock: getPreviousBlock( state, uid ),
-		nextBlock: getNextBlock( state, uid ),
+		previousBlockUid: getPreviousBlockUid( state, uid ),
+		nextBlockUid: getNextBlockUid( state, uid ),
 		block: getBlock( state, uid ),
 		isMultiSelected: isBlockMultiSelected( state, uid ),
 		isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),

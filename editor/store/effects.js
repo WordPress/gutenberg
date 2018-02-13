@@ -221,7 +221,10 @@ export default {
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
-		const [ blockA, blockB ] = action.blocks;
+		const state = store.getState();
+		const [ blockAUid, blockBUid ] = action.blocks;
+		const blockA = getBlock( state, blockAUid );
+		const blockB = getBlock( state, blockBUid );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
