@@ -255,9 +255,9 @@ export class BlockListBlock extends Component {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
 	 */
 	maybeHover() {
-		const { isHovered, isSelected, isMultiSelected, onHover } = this.props;
+		const { isHovered, isMultiSelected, onHover } = this.props;
 
-		if ( isHovered || isSelected || isMultiSelected || this.hadTouchStart ) {
+		if ( isHovered || isMultiSelected || this.hadTouchStart ) {
 			return;
 		}
 
@@ -471,16 +471,21 @@ export class BlockListBlock extends Component {
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content.
 
-		// If the block is selected and we're typing we hide the sidebar
-		// unless the selection is not collapsed.
-		const showSideInserter = ( isSelected || isHovered ) && isUnmodifiedDefaultBlock( block );
-		const showUI = isSelected && ( ! this.props.isTyping || ! this.state.isSelectionCollapsed );
+		// If the block is selected and we're typing the block should not appear as selected unless the selection is not collapsed.
+		// Empty paragraph blocks should always show up as unselected.
+		const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( block );
+		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
+		const shouldAppearSelected = ! showSideInserter && isSelected && ( ! this.props.isTyping || ! this.state.isSelectionCollapsed );
+		const shouldShowMovers = shouldAppearSelected || isHovered;
+		const shouldShowSettingsMenu = shouldShowMovers;
+		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
+		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error } = this.state;
 
 		// Generate the wrapper class names handling the different states of the block.
 		const wrapperClassName = classnames( 'editor-block-list__block', {
 			'has-warning': ! isValid || !! error,
-			'is-selected': showUI,
+			'is-selected': shouldAppearSelected,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
 			'is-reusable': isReusableBlock( blockType ),
@@ -526,7 +531,7 @@ export class BlockListBlock extends Component {
 					rootUID={ rootUID }
 					layout={ layout }
 				/>
-				{ ( showUI || isHovered ) && (
+				{ shouldShowMovers && (
 					<BlockMover
 						uids={ [ block.uid ] }
 						rootUID={ rootUID }
@@ -535,13 +540,13 @@ export class BlockListBlock extends Component {
 						isLast={ isLast }
 					/>
 				) }
-				{ ( showUI || isHovered ) && (
+				{ shouldShowSettingsMenu && (
 					<BlockSettingsMenu
 						uids={ [ block.uid ] }
 						renderBlockMenu={ renderBlockMenu }
 					/>
 				) }
-				{ showUI && isValid && showContextualToolbar && <BlockContextualToolbar /> }
+				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
 				<IgnoreNestedEvents
 					ref={ this.bindBlockNode }
@@ -583,7 +588,7 @@ export class BlockListBlock extends Component {
 							/>,
 						] }
 					</BlockCrashBoundary>
-					{ showUI && <BlockMobileToolbar uid={ block.uid } renderBlockMenu={ renderBlockMenu } /> }
+					{ shouldShowMobileToolbar && <BlockMobileToolbar uid={ block.uid } renderBlockMenu={ renderBlockMenu } /> }
 				</IgnoreNestedEvents>
 				{ !! error && <BlockCrashWarning /> }
 				{ ! showSideInserter && (
