@@ -72,7 +72,7 @@ describe( 'state', () => {
 		it( 'should return history (empty edits, blocksByUid, blockOrder), dirty flag by default', () => {
 			const state = editor( undefined, {} );
 
-			expect( state.past ).toEqual( [] );
+			expect( state.past ).toEqual( [ state.present ] );
 			expect( state.future ).toEqual( [] );
 			expect( state.present.edits ).toEqual( {} );
 			expect( state.present.blocksByUid ).toEqual( {} );
@@ -817,6 +817,70 @@ describe( 'state', () => {
 				} );
 
 				expect( state.present.blocksByUid ).toBe( state.present.blocksByUid );
+			} );
+		} );
+
+		describe( 'withHistory', () => {
+			it( 'should overwrite present history if updating same attributes', () => {
+				let state;
+
+				state = editor( state, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {},
+						innerBlocks: [],
+					} ],
+				} );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 1,
+					},
+				} );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 2,
+					},
+				} );
+
+				expect( state.past ).toHaveLength( 2 );
+			} );
+
+			it( 'should not overwrite present history if updating same attributes', () => {
+				let state;
+
+				state = editor( state, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {},
+						innerBlocks: [],
+					} ],
+				} );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 1,
+					},
+				} );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						other: 1,
+					},
+				} );
+
+				expect( state.past ).toHaveLength( 3 );
 			} );
 		} );
 	} );

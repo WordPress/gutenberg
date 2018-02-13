@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import tinymce from 'tinymce';
 import classnames from 'classnames';
 import {
 	last,
@@ -131,22 +130,24 @@ export class RichText extends Component {
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.onInput = this.onChange.bind( this, false );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
-		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
+		this.onPropagateUndo = this.onPropagateUndo.bind( this );
 		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
+		this.onAddUndo = this.onAddUndo.bind( this );
+		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 
 		this.state = {
 			formats: {},
 			empty: ! value || ! value.length,
 			selectedNodeId: 0,
 		};
+
+		this.isEmpty = ! value || ! value.length || ( value.length === 1 && ! value[ 0 ] );
 	}
 
 	/**
@@ -180,16 +181,15 @@ export class RichText extends Component {
 		} );
 
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
-		editor.on( 'selectionChange', this.onSelectionChange );
-		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
+		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
-		editor.on( 'input', this.onInput );
+		editor.on( 'input', this.onChange );
+		editor.on( 'addundo', this.onAddUndo );
 
 		patterns.apply( this, [ editor ] );
 
@@ -243,41 +243,17 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles the global selection change event.
-	 */
-	onSelectionChange() {
-		const isActive = document.activeElement === this.editor.getBody();
-		// We must check this because selectionChange is a global event.
-		if ( ! isActive ) {
-			return;
-		}
-
-		const isEmpty = tinymce.DOM.isEmpty( this.editor.getBody() );
-		if ( this.state.empty !== isEmpty ) {
-			this.setState( { empty: isEmpty } );
-		}
-	}
-
-	/**
 	 * Handles an undo event from tinyMCE.
 	 *
-	 * When user attempts Undo when empty Undo stack, propagate undo
-	 * action to context handler. The compromise here is that: TinyMCE
-	 * handles Undo until change, at which point `editor.save` resets
-	 * history. If no history exists, let context handler have a turn.
-	 * Defer in case an immediate undo causes TinyMCE to be destroyed,
-	 * if other undo behaviors test presence of an input field.
-	 *
-	 * @param {UndoEvent} event The undo event as triggered by tinyMCE.
+	 * @param {UndoEvent} event The undo event as triggered by TinyMCE.
 	 */
-	maybePropagateUndo( event ) {
+	onPropagateUndo( event ) {
 		const { onUndo } = this.context;
-		if ( onUndo && event.command === 'Undo' && ! this.editor.undoManager.hasUndo() ) {
-			defer( onUndo );
+		const { command } = event;
 
-			// We could return false here to stop other TinyMCE event handlers
-			// from running, but we assume TinyMCE won't do anything on an
-			// empty undo stack anyways.
+		if ( onUndo && ( command === 'Undo' || command === 'Redo' ) ) {
+			defer( onUndo );
+			event.preventDefault();
 		}
 	}
 
@@ -412,14 +388,25 @@ export class RichText extends Component {
 	 *
 	 * @param {boolean} checkIfDirty Check whether the editor is dirty before calling onChange.
 	 */
-	onChange( checkIfDirty = true ) {
-		if ( checkIfDirty && ! this.editor.isDirty() ) {
+
+	onChange() {
+		this.isEmpty = this.editor.dom.isEmpty( this.editor.getBody() );
+		this.savedContent = this.isEmpty ? [] : this.getContent();
+		this.props.onChange( this.savedContent );
+	}
+
+	onAddUndo( { lastLevel } ) {
+		if ( ! lastLevel ) {
 			return;
 		}
-		const isEmpty = tinymce.DOM.isEmpty( this.editor.getBody() );
-		this.savedContent = isEmpty ? [] : this.getContent();
-		this.props.onChange( this.savedContent );
-		this.editor.save();
+
+		this.onCreateUndoLevel();
+	}
+
+	onCreateUndoLevel() {
+		// Always ensure the content is up-to-date.
+		this.onChange();
+		this.context.onCreateUndoLevel();
 	}
 
 	/**
@@ -547,7 +534,7 @@ export class RichText extends Component {
 				return;
 			}
 
-			this.onChange( false );
+			this.onCreateUndoLevel();
 
 			const forward = event.keyCode === DELETE;
 
@@ -586,6 +573,7 @@ export class RichText extends Component {
 				}
 
 				event.preventDefault();
+				this.onCreateUndoLevel();
 
 				const childNodes = Array.from( rootNode.childNodes );
 				const index = dom.nodeIndex( selectedNode );
@@ -598,6 +586,7 @@ export class RichText extends Component {
 				this.props.onSplit( beforeElement, afterElement );
 			} else {
 				event.preventDefault();
+				this.onCreateUndoLevel();
 
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
@@ -614,8 +603,9 @@ export class RichText extends Component {
 	 * @param {number} keyCode The key code that has been pressed on the keyboard.
 	 */
 	onKeyUp( { keyCode } ) {
+		// See https://bugs.chromium.org/p/chromium/issues/detail?id=725890
 		if ( keyCode === BACKSPACE ) {
-			this.onSelectionChange();
+			this.onChange();
 		}
 	}
 
@@ -725,17 +715,6 @@ export class RichText extends Component {
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
 	}
 
-	updateContent() {
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.savedContent = this.props.value;
-		this.setContent( this.savedContent );
-		this.editor.selection.moveToBookmark( bookmark );
-
-		// Saving the editor on updates avoid unecessary onChanges calls
-		// These calls can make the focus jump
-		this.editor.save();
-	}
-
 	setContent( content = '' ) {
 		this.editor.setContent( renderToString( content ) );
 	}
@@ -756,7 +735,11 @@ export class RichText extends Component {
 			this.props.value !== prevProps.value &&
 			this.props.value !== this.savedContent
 		) {
-			this.updateContent();
+			const bookmark = this.editor.selection.getBookmark( 2, true );
+
+			this.savedContent = this.props.value;
+			this.setContent( this.savedContent );
+			this.editor.selection.moveToBookmark( bookmark );
 		}
 	}
 
@@ -827,7 +810,6 @@ export class RichText extends Component {
 			isSelected = false,
 			formatters,
 		} = this.props;
-		const { empty } = this.state;
 
 		const ariaProps = pickAriaProps( this.props );
 
@@ -835,7 +817,7 @@ export class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && empty;
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty;
 		const classes = classnames( wrapperClassName, 'blocks-rich-text' );
 
 		const formatToolbar = (
@@ -890,6 +872,7 @@ export class RichText extends Component {
 RichText.contextTypes = {
 	onUndo: noop,
 	canUserUseUnfilteredHTML: noop,
+	onCreateUndoLevel: noop,
 };
 
 RichText.defaultProps = {

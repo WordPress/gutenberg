@@ -19,7 +19,7 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo, initializeMetaBoxState } from '../../store/actions';
+import { setupEditor, undo, createUndoLevel, initializeMetaBoxState } from '../../store/actions';
 import store from '../../store';
 
 /**
@@ -105,10 +105,12 @@ class EditorProvider extends Component {
 			// RichText provider:
 			//
 			//  - context.onUndo
+			//  - context.onCreateUndoLevel
 			[
 				RichTextProvider,
 				bindActionCreators( {
 					onUndo: undo,
+					onCreateUndoLevel: createUndoLevel,
 				}, this.store.dispatch ),
 			],
 

@@ -15,6 +15,9 @@ import {
 	findIndex,
 	reject,
 	omitBy,
+	includes,
+	keys,
+	isEqual,
 } from 'lodash';
 
 /**
@@ -115,7 +118,27 @@ export const editor = flow( [
 	combineReducers,
 
 	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, { resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ] } ),
+	partialRight( withHistory, {
+		resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ],
+		shouldOverwriteState( action, previousAction ) {
+			if ( ! includes( [ 'UPDATE_BLOCK_ATTRIBUTES', 'EDIT_POST', 'RESET_POST' ], action.type ) ) {
+				return false;
+			}
+
+			if (
+				previousAction &&
+				action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+				action.type === previousAction.type
+			) {
+				const attributes = keys( action.attributes );
+				const previousAttributes = keys( previousAction.attributes );
+
+				return action.uid === previousAction.uid && isEqual( attributes, previousAttributes );
+			}
+
+			return true;
+		},
+	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
