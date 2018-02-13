@@ -26,9 +26,7 @@ const {
 	getCurrentPostLastRevisionId,
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
-	getCurrentPostSlug,
 	getPostEdits,
-	getEditedPostTitle,
 	getDocumentTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
@@ -42,6 +40,7 @@ const {
 	getBlockCount,
 	getSelectedBlock,
 	getBlockRootUID,
+	getEditedPostAttribute,
 	getMultiSelectedBlockUids,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
@@ -75,6 +74,7 @@ const {
 	isPublishingPost,
 	getInserterItems,
 	getRecentInserterItems,
+	getFrequentInserterItems,
 	POST_UPDATE_TRANSACTION_ID,
 } = selectors;
 
@@ -374,13 +374,13 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getCurrentPostSlug', () => {
+	describe( 'getEditedPostAttribute', () => {
 		it( 'should return the current post\'s slug if no edits have been made', () => {
 			const state = {
 				currentPost: { slug: 'post slug' },
 			};
 
-			expect( getCurrentPostSlug( state ) ).toBe( 'post slug' );
+			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'post slug' );
 		} );
 
 		it( 'should return the latest slug if edits have been made to the post', () => {
@@ -395,7 +395,37 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getCurrentPostSlug( state ) ).toBe( 'new slug' );
+			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'new slug' );
+		} );
+
+		it( 'should return the post saved title if the title is not edited', () => {
+			const state = {
+				currentPost: {
+					title: 'sassel',
+				},
+				editor: {
+					present: {
+						edits: { status: 'private' },
+					},
+				},
+			};
+
+			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'sassel' );
+		} );
+
+		it( 'should return the edited title', () => {
+			const state = {
+				currentPost: {
+					title: 'sassel',
+				},
+				editor: {
+					present: {
+						edits: { title: 'youcha' },
+					},
+				},
+			};
+
+			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'youcha' );
 		} );
 	} );
 
@@ -466,38 +496,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPostEdits( state ) ).toEqual( { title: 'terga' } );
-		} );
-	} );
-
-	describe( 'getEditedPostTitle', () => {
-		it( 'should return the post saved title if the title is not edited', () => {
-			const state = {
-				currentPost: {
-					title: 'sassel',
-				},
-				editor: {
-					present: {
-						edits: { status: 'private' },
-					},
-				},
-			};
-
-			expect( getEditedPostTitle( state ) ).toBe( 'sassel' );
-		} );
-
-		it( 'should return the edited title', () => {
-			const state = {
-				currentPost: {
-					title: 'sassel',
-				},
-				editor: {
-					present: {
-						edits: { title: 'youcha' },
-					},
-				},
-			};
-
-			expect( getEditedPostTitle( state ) ).toBe( 'youcha' );
 		} );
 	} );
 
@@ -2196,6 +2194,62 @@ describe( 'selectors', () => {
 			const items = getRecentInserterItems( state );
 			const blockNames = items.map( item => item.name );
 			expect( union( blockNames ) ).toHaveLength( 8 );
+		} );
+	} );
+
+	describe( 'getFrequentInserterItems', () => {
+		beforeAll( () => {
+			registerCoreBlocks();
+		} );
+
+		it( 'should return the 8 most recently used blocks', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/deleted-block': { count: 10, insert: { name: 'core/deleted-block' } }, // Deleted blocks should be filtered out
+						'core/block/456': { count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted reusable blocks should be filtered out
+						'core/image': { count: 3, insert: { name: 'core/image' } },
+						'core/block/123': { count: 5, insert: { name: 'core/block', ref: 123 } },
+						'core/paragraph': { count: 2, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {
+						123: { id: 123, type: 'core/test-block' },
+					},
+				},
+			};
+
+			expect( getFrequentInserterItems( state, true, 3 ) ).toMatchObject( [
+				{ name: 'core/block', initialAttributes: { ref: 123 } },
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/paragraph', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should pad list out with blocks from the common category', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/image': { count: 2, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+			};
+
+			// We should get back 4 items with no duplicates
+			const items = getFrequentInserterItems( state, true, 4 );
+			const blockNames = items.map( item => item.name );
+			expect( union( blockNames ) ).toHaveLength( 4 );
 		} );
 	} );
 

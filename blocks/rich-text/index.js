@@ -93,7 +93,7 @@ export class RichText extends Component {
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.throttledOnChange = throttle( this.onChange.bind( this ), 500 );
+		this.throttledOnChange = throttle( this.onChange.bind( this, false ), 500, { leading: true } );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -371,12 +371,15 @@ export class RichText extends Component {
 
 	/**
 	 * Handles any case where the content of the tinyMCE instance has changed.
+	 *
+	 * @param {boolean} checkIfDirty Check whether the editor is dirty before calling onChange.
 	 */
-	onChange() {
-		if ( ! this.editor.isDirty() ) {
+	onChange( checkIfDirty = true ) {
+		if ( checkIfDirty && ! this.editor.isDirty() ) {
 			return;
 		}
-		this.savedContent = this.state.empty ? [] : this.getContent();
+		const isEmpty = tinymce.DOM.isEmpty( this.editor.getBody() );
+		this.savedContent = isEmpty ? [] : this.getContent();
 		this.props.onChange( this.savedContent );
 		this.editor.save();
 	}
@@ -505,6 +508,8 @@ export class RichText extends Component {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
 			}
+
+			this.onChange( false );
 
 			const forward = event.keyCode === DELETE;
 
@@ -718,6 +723,7 @@ export class RichText extends Component {
 			this.updateContent();
 		}
 	}
+
 	componentWillReceiveProps( nextProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
 			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
