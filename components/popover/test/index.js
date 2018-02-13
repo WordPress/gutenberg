@@ -70,11 +70,12 @@ describe( 'Popover', () => {
 		it( 'should focus when opening', () => {
 			// An ideal test here would mount with an input child and focus the
 			// child, but in context of JSDOM the inputs are not visible and
-			// are therefore skipped as tabbable, defaulting to popover.
+			// are therefore skipped as tabbable, defaulting to the popover wrapper.
 			wrapper = mount( <Popover /> );
 			wrapper.setProps( { isOpen: true } );
 
-			const content = wrapper.find( '.components-popover__content' ).getDOMNode();
+			// Should focus the withFocusReturn wrapper
+			const content = wrapper.find( '.components-popover' ).getDOMNode().parentNode;
 
 			expect( document.activeElement ).toBe( content );
 		} );

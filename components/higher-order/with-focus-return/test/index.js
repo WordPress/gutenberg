@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { mount } from 'enzyme';
 import { Component } from '../../../../element';
 
 /**
@@ -10,9 +10,9 @@ import { Component } from '../../../../element';
 import withFocusReturn from '../';
 
 class Test extends Component {
-	render() {
+	render( props ) {
 		return (
-			<div className="test">Testing</div>
+			<div className="test" { ...props }>Testing</div>
 		);
 	}
 }
@@ -32,19 +32,18 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should render a basic Test component inside the HOC', () => {
-			const renderedComposite = shallow( <Composite /> );
-			const wrappedElement = renderedComposite.find( 'Test' );
-			const wrappedElementShallow = wrappedElement.shallow();
-			expect( wrappedElementShallow.hasClass( 'test' ) ).toBe( true );
-			expect( wrappedElementShallow.type() ).toBe( 'div' );
-			expect( wrappedElementShallow.text() ).toBe( 'Testing' );
+			const renderedComposite = mount( <Composite /> );
+			expect( renderedComposite ).toMatchSnapshot();
 		} );
 
 		it( 'should pass additional props through to the wrapped element', () => {
-			const renderedComposite = shallow( <Composite test="test" /> );
-			const wrappedElement = renderedComposite.find( 'Test' );
-			// Ensure that the wrapped Test element has the appropriate props.
-			expect( wrappedElement.props().test ).toBe( 'test' );
+			const renderedComposite = mount( <Composite data-test="test" /> );
+			expect( renderedComposite ).toMatchSnapshot();
+		} );
+
+		it( 'should focus the container on mount', () => {
+			mount( <Composite data-test="test" /> );
+			expect( document.activeElement.outerHTML ).toMatchSnapshot();
 		} );
 
 		it( 'should not switch focus back to the bound focus element', () => {

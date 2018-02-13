@@ -8,7 +8,7 @@ import { isEqual, noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -35,7 +35,6 @@ class Popover extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.focus = this.focus.bind( this );
 		this.bindNode = this.bindNode.bind( this );
 		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.setOffset = this.setOffset.bind( this );
@@ -73,10 +72,6 @@ class Popover extends Component {
 		const { isOpen: prevIsOpen, position: prevPosition } = prevProps;
 		if ( isOpen !== prevIsOpen ) {
 			this.toggleWindowEvents( isOpen );
-
-			if ( isOpen ) {
-				this.focus();
-			}
 		}
 
 		if ( ! isOpen ) {
@@ -102,27 +97,6 @@ class Popover extends Component {
 		window.cancelAnimationFrame( this.rafHandle );
 		window[ handler ]( 'resize', this.throttledSetOffset );
 		window[ handler ]( 'scroll', this.throttledSetOffset, true );
-	}
-
-	focus() {
-		const { focusOnOpen = true } = this.props;
-		if ( ! focusOnOpen ) {
-			return;
-		}
-
-		const { content } = this.nodes;
-		if ( ! content ) {
-			return;
-		}
-
-		// Find first tabbable node within content and shift focus, falling
-		// back to the popover panel itself.
-		const firstTabbable = focus.tabbable.find( content )[ 0 ];
-		if ( firstTabbable ) {
-			firstTabbable.focus();
-		} else {
-			content.focus();
-		}
 	}
 
 	throttledSetOffset() {
@@ -303,7 +277,6 @@ class Popover extends Component {
 					<div
 						ref={ this.bindNode( 'content' ) }
 						className="components-popover__content"
-						tabIndex="-1"
 					>
 						{ children }
 					</div>

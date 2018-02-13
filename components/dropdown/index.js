@@ -6,10 +6,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal Dependencies
  */
-import withFocusReturn from '../higher-order/with-focus-return';
 import Popover from '../popover';
-
-const FocusManaged = withFocusReturn( ( { children } ) => children );
 
 class Dropdown extends Component {
 	constructor() {
@@ -88,9 +85,7 @@ class Dropdown extends Component {
 						onClickOutside={ this.clickOutside }
 						expandOnMobile={ expandOnMobile }
 					>
-						<FocusManaged>
-							{ renderContent( args ) }
-						</FocusManaged>
+						{ renderContent( args ) }
 					</Popover>
 				</div>
 			</div>
