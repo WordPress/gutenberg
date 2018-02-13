@@ -4,17 +4,10 @@
 import { Component } from '@wordpress/element';
 
 /**
- * Provides dragStart and dragEnd properties to the component being wrapped.
- * When used, a cross-browser drag image is created. The component clones the specified
- * element on drag-start and uses the clone as a drag image during drag-over.
- * Discards the clone on drag-end.
- *  - See block-list/layout and block-list/block for example use.
- *  - Provides "dragStart" and "dragEnd" handlers as properties to the wrapped component.
- *    - These can be used on any draggable element and the effect will be the same.
- *  - Styling and drop handlers implemented by the consuming component.
- * @param {Component} OriginalComponent Original Component.
- * @return {Component} The original component wrapped with the additional properties.
+ * Internal Dependencies
  */
+import './style.scss';
+
 const withDragging = ( OriginalComponent ) => {
 	class Draggable extends Component {
 		constructor() {
@@ -26,8 +19,8 @@ const withDragging = ( OriginalComponent ) => {
 			this.cursorTop = null;
 			this.cursorLeft = null;
 			this.config = {
-				dragImageClass: 'editor-block-list__draggable-invisible-drag-image',
-				cloneWrapperClass: 'editor-block-list__draggable-clone',
+				dragImageClass: 'components-with-dragging__invisible-drag-image',
+				cloneWrapperClass: 'components-with-dragging__clone',
 				cloneHeightTransformationBreakpoint: 700,
 				clonePadding: 20,
 			};
@@ -53,7 +46,9 @@ const withDragging = ( OriginalComponent ) => {
 
 			// Reset cursor.
 			document.body.classList.remove( 'dragging' );
+
 			this.setState( { elementId: null, cloneNodeId: null } );
+
 			document.removeEventListener( 'dragover', this.onDragOver );
 			event.stopPropagation();
 		}

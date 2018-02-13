@@ -1,17 +1,4 @@
-.editor-block-list__draggable-invisible-drag-image {
-	position: fixed;
-	left: -1000px;
-	height: 50px;
-	width: 50px;
-}
-
-.editor-block-list__draggable-clone {
-	position: fixed;
-	padding: 20px;
-	background: transparent;
-	pointer-events: none;
-	z-index: z-index( '.editor-block-list__draggable-clone' );
-
+.components-with-dragging__clone {
 	.editor-block-list__block-drag-inset .inner {
 		visibility: visible;
 		background: white !important;

@@ -55,3 +55,4 @@ export { default as withInstanceId } from './higher-order/with-instance-id';
 export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 export { default as withState } from './higher-order/with-state';
+export { default as withDragging } from './higher-order/with-dragging';

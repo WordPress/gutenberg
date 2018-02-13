@@ -21,13 +21,13 @@ import 'element-closest';
  */
 import { Component } from '@wordpress/element';
 import { serialize, getDefaultBlockName } from '@wordpress/blocks';
+import { withDragging } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockListBlock from './block';
-import withDragging from './draggable';
 import BlockSelectionClearer from '../block-selection-clearer';
 import DefaultBlockAppender from '../default-block-appender';
 import {

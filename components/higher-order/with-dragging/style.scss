@@ -1,0 +1,14 @@
+.components-with-dragging__invisible-drag-image {
+	position: fixed;
+	left: -1000px;
+	height: 50px;
+	width: 50px;
+}
+
+.components-with-dragging__clone {
+	position: fixed;
+	padding: 20px;
+	background: transparent;
+	pointer-events: none;
+	z-index: z-index( '.components-with-dragging__clone' );
+}
