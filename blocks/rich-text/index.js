@@ -612,8 +612,9 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
-
+			const afterElement = isLinkBoundary( afterFragment ) || tinymce.DOM.isEmpty( afterFragment ) ?
+				[] :
+				nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
 			this.setContent( beforeElement );
 			this.props.onSplit( beforeElement, afterElement, ...blocks );
 		} else {
