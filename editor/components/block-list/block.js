@@ -599,21 +599,26 @@ export class BlockListBlock extends Component {
 	}
 }
 
-const mapStateToProps = ( state, { uid, rootUID } ) => ( {
-	previousBlock: getPreviousBlock( state, uid ),
-	nextBlock: getNextBlock( state, uid ),
-	block: getBlock( state, uid ),
-	isSelected: isBlockSelected( state, uid ),
-	isMultiSelected: isBlockMultiSelected( state, uid ),
-	isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
-	isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
-	isTyping: isTyping( state ),
-	order: getBlockIndex( state, uid, rootUID ),
-	meta: getEditedPostAttribute( state, 'meta' ),
-	mode: getBlockMode( state, uid ),
-	isSelectionEnabled: isSelectionEnabled( state ),
-	postType: getCurrentPostType( state ),
-} );
+const mapStateToProps = ( state, { uid, rootUID } ) => {
+	const isSelected = isBlockSelected( state, uid );
+	return {
+		previousBlock: getPreviousBlock( state, uid ),
+		nextBlock: getNextBlock( state, uid ),
+		block: getBlock( state, uid ),
+		isMultiSelected: isBlockMultiSelected( state, uid ),
+		isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
+		isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
+		// We only care about this prop when the block is selected
+		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
+		isTyping: isSelected && isTyping( state ),
+		order: getBlockIndex( state, uid, rootUID ),
+		meta: getEditedPostAttribute( state, 'meta' ),
+		mode: getBlockMode( state, uid ),
+		isSelectionEnabled: isSelectionEnabled( state ),
+		postType: getCurrentPostType( state ),
+		isSelected,
+	};
+};
 
 const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onChange( uid, attributes ) {
