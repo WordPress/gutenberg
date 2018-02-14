@@ -451,8 +451,9 @@ export class BlockListBlock extends Component {
 		// Empty paragraph blocks should always show up as unselected.
 		const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( block );
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
-		const shouldAppearSelected = ! showSideInserter && isSelected && ( ! this.props.isTyping || ! this.state.isSelectionCollapsed );
-		const shouldShowMovers = shouldAppearSelected || isHovered;
+		const isSelectedNotTyping = isSelected && ( ! this.props.isTyping || ! this.state.isSelectionCollapsed );
+		const shouldAppearSelected = ! showSideInserter && isSelectedNotTyping;
+		const shouldShowMovers = shouldAppearSelected || isHovered || ( isEmptyDefaultBlock && isSelectedNotTyping );
 		const shouldShowSettingsMenu = shouldShowMovers;
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
 		const shouldShowMobileToolbar = shouldAppearSelected;
