@@ -588,7 +588,6 @@ export class BlockListBlock extends Component {
 					<BlockInsertionPoint
 						uid={ block.uid }
 						rootUID={ rootUID }
-						layout={ layout }
 					/>
 				) }
 				{ showSideInserter && (
