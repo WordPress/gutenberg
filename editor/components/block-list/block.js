@@ -25,6 +25,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { getScrollContainer } from '../../utils/dom';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
@@ -70,31 +71,6 @@ import {
 } from '../../store/selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
-
-/**
- * Given a DOM node, finds the closest scrollable container node.
- *
- * @param {Element} node Node from which to start.
- *
- * @return {?Element} Scrollable container node, if found.
- */
-function getScrollContainer( node ) {
-	if ( ! node ) {
-		return;
-	}
-
-	// Scrollable if scrollable height exceeds displayed...
-	if ( node.scrollHeight > node.clientHeight ) {
-		// ...except when overflow is defined to be hidden or visible
-		const { overflowY } = window.getComputedStyle( node );
-		if ( /(auto|scroll)/.test( overflowY ) ) {
-			return node;
-		}
-	}
-
-	// Continue traversing
-	return getScrollContainer( node.parentNode );
-}
 
 export class BlockListBlock extends Component {
 	constructor() {
