@@ -60,6 +60,6 @@ function TableOfContentsPanel( { blocks } ) {
 
 export default query( ( select ) => {
 	return {
-		blocks: select( 'core/editor', 'getBlocks' ),
+		blocks: select( 'core/editor' ).getBlocks(),
 	};
 } )( TableOfContentsPanel );

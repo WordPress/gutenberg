@@ -26,13 +26,13 @@ function TableOfContents( { hasBlocks } ) {
 					disabled={ ! hasBlocks }
 				/>
 			) }
-			renderContent={ TableOfContentsPanel }
+			renderContent={ () => <TableOfContentsPanel /> }
 		/>
 	);
 }
 
 export default query( ( select ) => {
 	return {
-		hasBlocks: !! select( 'core/editor', 'getBlockCount' ),
+		hasBlocks: !! select( 'core/editor' ).getBlockCount(),
 	};
 } )( TableOfContents );
