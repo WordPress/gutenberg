@@ -55,6 +55,7 @@ import {
 	getBlocks,
 	getReusableBlock,
 	getMetaBoxes,
+	hasMetaBoxes,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
@@ -151,7 +152,9 @@ export default {
 		}
 
 		// Update dirty meta boxes.
-		dispatch( requestMetaBoxUpdates() );
+		if ( hasMetaBoxes( store.getState() ) ) {
+			dispatch( requestMetaBoxUpdates() );
+		}
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
@@ -218,7 +221,10 @@ export default {
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
-		const [ blockA, blockB ] = action.blocks;
+		const state = store.getState();
+		const [ blockAUid, blockBUid ] = action.blocks;
+		const blockA = getBlock( state, blockAUid );
+		const blockB = getBlock( state, blockBUid );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
@@ -490,7 +496,8 @@ export default {
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
-		const dataPerLocation = reduce( getMetaBoxes( store.getState() ), ( memo, metabox, location ) => {
+		const state = store.getState();
+		const dataPerLocation = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
 			if ( metabox.isActive ) {
 				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
 			}
@@ -498,11 +505,20 @@ export default {
 		}, {} );
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
+		// Additional data needed for backwards compatibility.
+		// If we do not provide this data the post will be overriden with the default values.
+		const post = getCurrentPost( state );
+		const additionalData = [
+			post.comment_status && `comment_status=${ post.comment_status }`,
+			post.ping_status && `ping_status=${ post.ping_status }`,
+		].filter( Boolean );
+
 		// To save the metaboxes, we serialize each one of the location forms and combine them
 		// We also add the "common" hidden fields from the base .metabox-base-form
-		const formData = values( dataPerLocation ).concat(
-			jQuery( '.metabox-base-form' ).serialize()
-		).join( '&' );
+		const formData = values( dataPerLocation )
+			.concat( jQuery( '.metabox-base-form' ).serialize() )
+			.concat( additionalData )
+			.join( '&' );
 		const fetchOptions = {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

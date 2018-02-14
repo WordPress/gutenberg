@@ -69,7 +69,32 @@ export function registerReducer( reducerKey, reducer ) {
  *                              state as first argument.
  */
 export function registerSelectors( reducerKey, newSelectors ) {
-	selectors[ reducerKey ] = newSelectors;
+	const store = stores[ reducerKey ];
+	const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
+	selectors[ reducerKey ] = mapValues( newSelectors, createStateSelector );
+}
+
+/**
+ * Calls a selector given the current state and extra arguments.
+ *
+ * @param {string} reducerKey Part of the state shape to register the
+ *                            selectors for.
+ *
+ * @return {*} The selector's returned value.
+ */
+export function select( reducerKey ) {
+	if ( arguments.length > 1 ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'Deprecated: `select` now accepts only a single argument: the reducer key. ' +
+			'The return value is an object of selector functions.'
+		);
+
+		const [ , selectorKey, ...args ] = arguments;
+		return select( reducerKey )[ selectorKey ]( ...args );
+	}
+
+	return selectors[ reducerKey ];
 }
 
 /**
@@ -100,24 +125,6 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
 	};
 
 	return connectWithStore( ( state, ownProps ) => {
-		const select = ( key, selectorName, ...args ) => {
-			return selectors[ key ][ selectorName ]( state[ key ], ...args );
-		};
-
 		return mapSelectorsToProps( select, ownProps );
 	} );
-};
-
-/**
- * Calls a selector given the current state and extra arguments.
- *
- * @param {string} reducerKey   Part of the state shape to register the
- *                              selectors for.
- * @param {string} selectorName Selector name.
- * @param {*}      args         Selectors arguments.
- *
- * @return {*} The selector's returned value.
- */
-export const select = ( reducerKey, selectorName, ...args ) => {
-	return selectors[ reducerKey ][ selectorName ]( stores[ reducerKey ].getState(), ...args );
 };

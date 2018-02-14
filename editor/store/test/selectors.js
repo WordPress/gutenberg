@@ -26,29 +26,31 @@ const {
 	getCurrentPostLastRevisionId,
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
-	getCurrentPostSlug,
 	getPostEdits,
-	getEditedPostTitle,
 	getDocumentTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
 	isCurrentPostPublished,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
+	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
+	getBlockDependantsCacheBust,
 	getBlock,
 	getBlocks,
 	getBlockCount,
 	getSelectedBlock,
 	getBlockRootUID,
+	getEditedPostAttribute,
 	getMultiSelectedBlockUids,
+	getMultiSelectedBlocks,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocksEndUid,
 	getBlockOrder,
 	getBlockIndex,
-	getPreviousBlock,
-	getNextBlock,
+	getPreviousBlockUid,
+	getNextBlockUid,
 	isBlockSelected,
 	isBlockWithinSelection,
 	isBlockMultiSelected,
@@ -75,6 +77,7 @@ const {
 	isPublishingPost,
 	getInserterItems,
 	getRecentInserterItems,
+	getFrequentInserterItems,
 	POST_UPDATE_TRANSACTION_ID,
 } = selectors;
 
@@ -374,13 +377,13 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getCurrentPostSlug', () => {
+	describe( 'getEditedPostAttribute', () => {
 		it( 'should return the current post\'s slug if no edits have been made', () => {
 			const state = {
 				currentPost: { slug: 'post slug' },
 			};
 
-			expect( getCurrentPostSlug( state ) ).toBe( 'post slug' );
+			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'post slug' );
 		} );
 
 		it( 'should return the latest slug if edits have been made to the post', () => {
@@ -395,7 +398,37 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getCurrentPostSlug( state ) ).toBe( 'new slug' );
+			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'new slug' );
+		} );
+
+		it( 'should return the post saved title if the title is not edited', () => {
+			const state = {
+				currentPost: {
+					title: 'sassel',
+				},
+				editor: {
+					present: {
+						edits: { status: 'private' },
+					},
+				},
+			};
+
+			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'sassel' );
+		} );
+
+		it( 'should return the edited title', () => {
+			const state = {
+				currentPost: {
+					title: 'sassel',
+				},
+				editor: {
+					present: {
+						edits: { title: 'youcha' },
+					},
+				},
+			};
+
+			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'youcha' );
 		} );
 	} );
 
@@ -466,38 +499,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPostEdits( state ) ).toEqual( { title: 'terga' } );
-		} );
-	} );
-
-	describe( 'getEditedPostTitle', () => {
-		it( 'should return the post saved title if the title is not edited', () => {
-			const state = {
-				currentPost: {
-					title: 'sassel',
-				},
-				editor: {
-					present: {
-						edits: { status: 'private' },
-					},
-				},
-			};
-
-			expect( getEditedPostTitle( state ) ).toBe( 'sassel' );
-		} );
-
-		it( 'should return the edited title', () => {
-			const state = {
-				currentPost: {
-					title: 'sassel',
-				},
-				editor: {
-					present: {
-						edits: { title: 'youcha' },
-					},
-				},
-			};
-
-			expect( getEditedPostTitle( state ) ).toBe( 'youcha' );
 		} );
 	} );
 
@@ -905,6 +906,82 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isEditedPostEmpty', () => {
+		it( 'should return true if no blocks and no content', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if blocks', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+							123: {
+								uid: 123,
+								name: 'core/test-block',
+								attributes: {
+									text: '',
+								},
+							},
+						},
+						blockOrder: {
+							'': [ 123 ],
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if the post has an empty content property', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {
+					content: '',
+				},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if edits include a non-empty content property', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {
+							content: 'sassel',
+						},
+					},
+				},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isEditedPostBeingScheduled', () => {
 		it( 'should return true for posts with a future date', () => {
 			const state = {
@@ -951,6 +1028,233 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getBlockDependantsCacheBust', () => {
+		const rootBlock = { uid: 123, name: 'core/paragraph', attributes: {} };
+		const rootOrder = [ 123 ];
+
+		it( 'returns an unchanging reference', () => {
+			const rootBlockOrder = [];
+
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const nextState = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect(
+				getBlockDependantsCacheBust( state, 123 )
+			).toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+
+		it( 'returns a new reference on added inner block', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: [],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const nextState = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: [ 456 ],
+							456: [],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect(
+				getBlockDependantsCacheBust( state, 123 )
+			).not.toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+
+		it( 'returns an unchanging reference on unchanging inner block', () => {
+			const rootBlockOrder = [ 456 ];
+			const childBlock = { uid: 456, name: 'core/paragraph', attributes: {} };
+			const childBlockOrder = [];
+
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: childBlock,
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const nextState = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: childBlock,
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect(
+				getBlockDependantsCacheBust( state, 123 )
+			).toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+
+		it( 'returns a new reference on updated inner block', () => {
+			const rootBlockOrder = [ 456 ];
+			const childBlockOrder = [];
+
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const nextState = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: { uid: 456, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect(
+				getBlockDependantsCacheBust( state, 123 )
+			).not.toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+
+		it( 'returns a new reference on updated grandchild inner block', () => {
+			const rootBlockOrder = [ 456 ];
+			const childBlock = { uid: 456, name: 'core/paragraph', attributes: {} };
+			const childBlockOrder = [ 789 ];
+			const grandChildBlockOrder = [];
+
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: childBlock,
+							789: { uid: 789, name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+							789: grandChildBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const nextState = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: childBlock,
+							789: { uid: 789, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+							789: grandChildBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect(
+				getBlockDependantsCacheBust( state, 123 )
+			).not.toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+	} );
+
 	describe( 'getBlock', () => {
 		it( 'should return the block', () => {
 			const state = {
@@ -983,7 +1287,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocksByUid: {},
-						borderOrder: {},
+						blockOrder: {},
 						edits: {},
 					},
 				},
@@ -1273,6 +1577,26 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getMultiSelectedBlocks', () => {
+		it( 'should return the same reference on subsequent invocations of empty selection', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				blockSelection: { start: null, end: null },
+				currentPost: {},
+			};
+
+			expect(
+				getMultiSelectedBlocks( state )
+			).toBe( getMultiSelectedBlocks( state ) );
+		} );
+	} );
+
 	describe( 'getMultiSelectedBlocksStartUid', () => {
 		it( 'returns null if there is no multi selection', () => {
 			const state = {
@@ -1371,15 +1695,11 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getPreviousBlock', () => {
+	describe( 'getPreviousBlockUid', () => {
 		it( 'should return the previous block', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-						},
 						blockOrder: {
 							'': [ 123, 23 ],
 						},
@@ -1387,24 +1707,13 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlock( state, 23 ) ).toEqual( {
-				uid: 123,
-				name: 'core/paragraph',
-				attributes: {},
-				innerBlocks: [],
-			} );
+			expect( getPreviousBlockUid( state, 23 ) ).toEqual( 123 );
 		} );
 
 		it( 'should return the previous block (nested context)', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-							56: { uid: 56, name: 'core/heading', attributes: {} },
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
-						},
 						blockOrder: {
 							'': [ 123, 23 ],
 							123: [ 456, 56 ],
@@ -1413,22 +1722,13 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlock( state, 56, '123' ) ).toEqual( {
-				uid: 456,
-				name: 'core/paragraph',
-				attributes: {},
-				innerBlocks: [],
-			} );
+			expect( getPreviousBlockUid( state, 56, '123' ) ).toEqual( 456 );
 		} );
 
 		it( 'should return null for the first block', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-						},
 						blockOrder: {
 							'': [ 123, 23 ],
 						},
@@ -1436,19 +1736,13 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlock( state, 123 ) ).toBeNull();
+			expect( getPreviousBlockUid( state, 123 ) ).toBeNull();
 		} );
 
 		it( 'should return null for the first block (nested context)', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-							56: { uid: 56, name: 'core/heading', attributes: {} },
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
-						},
 						blockOrder: {
 							'': [ 123, 23 ],
 							123: [ 456, 56 ],
@@ -1457,19 +1751,15 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getPreviousBlock( state, 456, '123' ) ).toBeNull();
+			expect( getPreviousBlockUid( state, 456, '123' ) ).toBeNull();
 		} );
 	} );
 
-	describe( 'getNextBlock', () => {
+	describe( 'getNextBlockUid', () => {
 		it( 'should return the following block', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-						},
 						blockOrder: {
 							'': [ 123, 23 ],
 						},
@@ -1477,24 +1767,13 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNextBlock( state, 123 ) ).toEqual( {
-				uid: 23,
-				name: 'core/heading',
-				attributes: {},
-				innerBlocks: [],
-			} );
+			expect( getNextBlockUid( state, 123 ) ).toEqual( 23 );
 		} );
 
 		it( 'should return the following block (nested context)', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-							56: { uid: 56, name: 'core/heading', attributes: {} },
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
-						},
 						blockOrder: {
 							'': [ 123, 23 ],
 							123: [ 456, 56 ],
@@ -1503,22 +1782,13 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNextBlock( state, 456, '123' ) ).toEqual( {
-				uid: 56,
-				name: 'core/heading',
-				attributes: {},
-				innerBlocks: [],
-			} );
+			expect( getNextBlockUid( state, 456, '123' ) ).toEqual( 56 );
 		} );
 
 		it( 'should return null for the last block', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-						},
 						blockOrder: {
 							'': [ 123, 23 ],
 						},
@@ -1526,19 +1796,13 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNextBlock( state, 23 ) ).toBeNull();
+			expect( getNextBlockUid( state, 23 ) ).toBeNull();
 		} );
 
 		it( 'should return null for the last block (nested context)', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-							56: { uid: 56, name: 'core/heading', attributes: {} },
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
-						},
 						blockOrder: {
 							'': [ 123, 23 ],
 							123: [ 456, 56 ],
@@ -1547,7 +1811,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getNextBlock( state, 56, '123' ) ).toBeNull();
+			expect( getNextBlockUid( state, 56, '123' ) ).toBeNull();
 		} );
 	} );
 
@@ -2196,6 +2460,62 @@ describe( 'selectors', () => {
 			const items = getRecentInserterItems( state );
 			const blockNames = items.map( item => item.name );
 			expect( union( blockNames ) ).toHaveLength( 8 );
+		} );
+	} );
+
+	describe( 'getFrequentInserterItems', () => {
+		beforeAll( () => {
+			registerCoreBlocks();
+		} );
+
+		it( 'should return the 8 most recently used blocks', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/deleted-block': { count: 10, insert: { name: 'core/deleted-block' } }, // Deleted blocks should be filtered out
+						'core/block/456': { count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted reusable blocks should be filtered out
+						'core/image': { count: 3, insert: { name: 'core/image' } },
+						'core/block/123': { count: 5, insert: { name: 'core/block', ref: 123 } },
+						'core/paragraph': { count: 2, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {
+						123: { id: 123, type: 'core/test-block' },
+					},
+				},
+			};
+
+			expect( getFrequentInserterItems( state, true, 3 ) ).toMatchObject( [
+				{ name: 'core/block', initialAttributes: { ref: 123 } },
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/paragraph', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should pad list out with blocks from the common category', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/image': { count: 2, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+			};
+
+			// We should get back 4 items with no duplicates
+			const items = getFrequentInserterItems( state, true, 4 );
+			const blockNames = items.map( item => item.name );
+			expect( union( blockNames ) ).toHaveLength( 4 );
 		} );
 	} );
 

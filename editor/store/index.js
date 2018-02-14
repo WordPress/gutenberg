@@ -9,11 +9,11 @@ import { registerReducer, registerSelectors, withRehydratation, loadAndPersist }
 import reducer from './reducer';
 import applyMiddlewares from './middlewares';
 import {
-	getCurrentPostType,
-	getEditedPostContent,
-	getEditedPostTitle,
+	getBlockCount,
+	getBlocks,
+	getEditedPostAttribute,
+	getLastMultiSelectedBlockUid,
 	getSelectedBlockCount,
-	getCurrentPostSlug,
 } from './selectors';
 import {
 	fetchTaxonomies,
@@ -34,11 +34,11 @@ loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 store.dispatch( fetchTaxonomies() );
 
 registerSelectors( MODULE_KEY, {
-	getCurrentPostType,
-	getEditedPostContent,
-	getEditedPostTitle,
+	getBlockCount,
+	getBlocks,
+	getEditedPostAttribute,
+	getLastMultiSelectedBlockUid,
 	getSelectedBlockCount,
-	getCurrentPostSlug,
 } );
 
 export default store;

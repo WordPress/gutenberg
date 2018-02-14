@@ -1163,11 +1163,12 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				recentInserts: [],
+				insertUsage: {},
 			} );
 		} );
 
 		it( 'should record recently used blocks', () => {
-			const state = preferences( deepFreeze( { recentInserts: [] } ), {
+			const state = preferences( deepFreeze( { recentInserts: [], insertUsage: {} } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'bacon',
@@ -1179,9 +1180,23 @@ describe( 'state', () => {
 				recentInserts: [
 					{ name: 'core-embed/twitter' },
 				],
+				insertUsage: {
+					'core-embed/twitter': {
+						count: 1,
+						insert: { name: 'core-embed/twitter' },
+					},
+				},
 			} );
 
-			const twoRecentBlocks = preferences( deepFreeze( { recentInserts: [] } ), {
+			const twoRecentBlocks = preferences( deepFreeze( {
+				recentInserts: [],
+				insertUsage: {
+					'core-embed/twitter': {
+						count: 1,
+						insert: { name: 'core-embed/twitter' },
+					},
+				},
+			} ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'eggs',
@@ -1198,6 +1213,16 @@ describe( 'state', () => {
 					{ name: 'core/block', ref: 123 },
 					{ name: 'core-embed/twitter' },
 				],
+				insertUsage: {
+					'core-embed/twitter': {
+						count: 2,
+						insert: { name: 'core-embed/twitter' },
+					},
+					'core/block/123': {
+						count: 1,
+						insert: { name: 'core/block', ref: 123 },
+					},
+				},
 			} );
 		} );
 
@@ -1208,6 +1233,12 @@ describe( 'state', () => {
 					{ name: 'core/block', ref: 123 },
 					{ name: 'core/block', ref: 456 },
 				],
+				insertUsage: {
+					'core/block/123': {
+						count: 1,
+						insert: { name: 'core/block', ref: 123 },
+					},
+				},
 			};
 
 			const state = preferences( deepFreeze( initialState ), {
@@ -1220,6 +1251,7 @@ describe( 'state', () => {
 					{ name: 'core-embed/twitter' },
 					{ name: 'core/block', ref: 456 },
 				],
+				insertUsage: {},
 			} );
 		} );
 	} );

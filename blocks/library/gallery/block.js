@@ -43,7 +43,7 @@ class GalleryBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onUnselectImage = this.onUnselectImage.bind( this );
+		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectImages = this.onSelectImages.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
@@ -59,29 +59,13 @@ class GalleryBlock extends Component {
 	}
 
 	onSelectImage( index ) {
-		return ( event ) => {
-			// ignore clicks in the editable caption.
-			// Without this logic, text operations like selection, select / unselects the images.
-			if ( event.target.tagName === 'FIGCAPTION' ) {
-				return;
+		return () => {
+			if ( this.state.selectedImage !== index ) {
+				this.setState( {
+					selectedImage: index,
+				} );
 			}
-
-			this.setState( {
-				selectedImage: index,
-			} );
 		};
-	}
-
-	onUnselectImage( event ) {
-		// ignore clicks in the editable caption.
-		// Without this logic, text operations like selection, select / unselects the images.
-		if ( event.target.tagName === 'FIGCAPTION' ) {
-			return;
-		}
-
-		this.setState( {
-			selectedImage: null,
-		} );
 	}
 
 	onRemoveImage( index ) {
@@ -153,6 +137,7 @@ class GalleryBlock extends Component {
 		if ( ! nextProps.isSelected && this.props.isSelected ) {
 			this.setState( {
 				selectedImage: null,
+				captionSelected: false,
 			} );
 		}
 	}
@@ -246,7 +231,6 @@ class GalleryBlock extends Component {
 							isSelected={ isSelected && this.state.selectedImage === index }
 							onRemove={ this.onRemoveImage( index ) }
 							onSelect={ this.onSelectImage( index ) }
-							onUnselect={ this.onUnselectImage }
 							setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 							caption={ img.caption }
 						/>

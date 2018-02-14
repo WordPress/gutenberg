@@ -257,10 +257,18 @@ export function trashPost( postId, postType ) {
 	};
 }
 
-export function mergeBlocks( blockA, blockB ) {
+/**
+ * Returns an action object used in signalling that two blocks should be merged
+ *
+ * @param {string} blockAUid UID of the first block to merge.
+ * @param {string} blockBUid UID of the second block to merge.
+ *
+ * @return {Object} Action object.
+ */
+export function mergeBlocks( blockAUid, blockBUid ) {
 	return {
 		type: 'MERGE_BLOCKS',
-		blocks: [ blockA, blockB ],
+		blocks: [ blockAUid, blockBUid ],
 	};
 }
 
@@ -425,7 +433,7 @@ export function initializeMetaBoxState( metaBoxes ) {
 /**
  * Returns an action object used to request meta box update.
  *
- * @return {Object} Action object.
+ * @return {Object}      Action object.
  */
 export function requestMetaBoxUpdates() {
 	return {

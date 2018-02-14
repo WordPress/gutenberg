@@ -48,11 +48,13 @@ describe( 'effects', () => {
 
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;
+		const defaultGetBlock = selectors.getBlock;
 
 		afterEach( () => {
 			getBlockTypes().forEach( ( block ) => {
 				unregisterBlockType( block.name );
 			} );
+			selectors.getBlock = defaultGetBlock;
 		} );
 
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
@@ -65,8 +67,13 @@ describe( 'effects', () => {
 				uid: 'ribs',
 				name: 'core/test-block',
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
+
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken' ) );
@@ -93,8 +100,12 @@ describe( 'effects', () => {
 				name: 'core/test-block',
 				attributes: { content: 'ribs' },
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken', -1 ) );
@@ -127,8 +138,12 @@ describe( 'effects', () => {
 				name: 'core/test-block2',
 				attributes: { content: 'ribs' },
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -180,8 +195,12 @@ describe( 'effects', () => {
 				name: 'core/test-block-2',
 				attributes: { content2: 'ribs' },
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			// expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
@@ -323,19 +342,23 @@ describe( 'effects', () => {
 
 		it( 'should dispatch meta box updates on success for dirty meta boxes', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const post = getDraftPost();
 
 			handler( { post: post, previousPost: post }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates() );
+			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( post ) );
 		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
@@ -357,7 +380,9 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
@@ -383,7 +408,9 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when just updating a published post again', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
