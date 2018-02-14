@@ -428,8 +428,8 @@ export const getBlock = createSelector(
 			innerBlocks: getBlocks( state, uid ),
 		};
 	},
-	( state, uid ) => [
-		get( state, [ 'editor', 'present', 'blocksByUid', uid ] ),
+	( state ) => [
+		get( state, [ 'editor', 'present', 'blocksByUid' ] ),
 		get( state, [ 'editor', 'present', 'edits', 'meta' ] ),
 		get( state, 'currentPost.meta' ),
 	]
