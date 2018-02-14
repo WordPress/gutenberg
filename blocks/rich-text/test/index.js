@@ -6,7 +6,14 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { RichText, createTinyMCEElement, isEmptyInlineBoundary, isEmptyNode, getFormatProperties } from '../';
+import {
+	RichText,
+	createTinyMCEElement,
+	isEmptyInlineBoundary,
+	isEmptyNode,
+	filterEmptyNodes,
+	getFormatProperties,
+} from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
 
 describe( 'createTinyMCEElement', () => {
@@ -71,12 +78,6 @@ describe( 'isEmptyInlineBoundary', () => {
 } );
 
 describe( 'isEmptyNode', () => {
-	it( 'returns false for document', () => {
-		const node = document;
-
-		expect( isEmptyNode( node ) ).toBe( false );
-	} );
-
 	it( 'returns true for empty text node', () => {
 		const node = document.createTextNode( '' );
 
@@ -89,17 +90,52 @@ describe( 'isEmptyNode', () => {
 		expect( isEmptyNode( node ) ).toBe( false );
 	} );
 
-	it( 'returns true for empty element node', () => {
-		const node = document.createElement( 'div' );
-
-		expect( isEmptyNode( node ) ).toBe( true );
-	} );
-
-	it( 'returns false for non-empty element node', () => {
-		const node = document.createElement( 'div' );
-		node.textContent = 'rabbit';
+	it( 'returns false for element node', () => {
+		const node = document.createElement( 'br' );
 
 		expect( isEmptyNode( node ) ).toBe( false );
+	} );
+} );
+
+describe( 'filterEmptyNodes', () => {
+	it( 'preserves newlines', () => {
+		const node = document.createElement( 'div' );
+		node.innerHTML = 'a<br>foo';
+
+		expect( filterEmptyNodes( node.childNodes ) ).toEqual( [
+			document.createTextNode( 'a' ),
+			document.createElement( 'br' ),
+			document.createTextNode( 'foo' ),
+		] );
+	} );
+
+	it( 'omits text node', () => {
+		const node = document.createElement( 'div' );
+		node.appendChild( document.createTextNode( '' ) );
+
+		expect( filterEmptyNodes( node.childNodes ) ).toHaveLength( 0 );
+	} );
+
+	it( 'omits prefixing text node', () => {
+		const node = document.createElement( 'div' );
+		node.innerHTML = '<br>foo';
+		node.insertBefore( document.createTextNode( '' ), node.firstChild );
+
+		expect( filterEmptyNodes( node.childNodes ) ).toEqual( [
+			document.createElement( 'br' ),
+			document.createTextNode( 'foo' ),
+		] );
+	} );
+
+	it( 'omits trailing text node', () => {
+		const node = document.createElement( 'div' );
+		node.innerHTML = '<br>foo';
+		node.appendChild( document.createTextNode( '' ) );
+
+		expect( filterEmptyNodes( node.childNodes ) ).toEqual( [
+			document.createElement( 'br' ),
+			document.createTextNode( 'foo' ),
+		] );
 	} );
 } );
 

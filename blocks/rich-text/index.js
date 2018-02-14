@@ -74,7 +74,7 @@ export function isEmptyInlineBoundary( node ) {
 
 /**
  * Returns true if the node is empty, meaning it contains only the placeholder
- * caret character or has no text content of its own.
+ * caret character or is an empty text node.
  *
  * @param {Node} node Node to test.
  *
@@ -82,18 +82,14 @@ export function isEmptyInlineBoundary( node ) {
  */
 export function isEmptyNode( node ) {
 	return (
-		// Use strict equality because this value can be null in the case of a
-		// document value (`null === document.textContent`)
-		//
-		// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
-		'' === node.textContent ||
+		'' === node.nodeValue ||
 		isEmptyInlineBoundary( node )
 	);
 }
 
 /**
  * Given a set of Nodes, filters to set to exclude any empty nodes: those with
- * either no text of their own or only including the inline boundary caret.
+ * either empty text nodes or only including the inline boundary caret.
  *
  * @param {Node[]} childNodes Nodes to filter.
  *
