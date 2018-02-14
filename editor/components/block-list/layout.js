@@ -28,7 +28,6 @@ import BlockListBlock from './block';
 import BlockSelectionClearer from '../block-selection-clearer';
 import DefaultBlockAppender from '../default-block-appender';
 import {
-	getSelectedBlock,
 	isSelectionEnabled,
 	isMultiSelecting,
 } from '../../store/selectors';
@@ -177,12 +176,10 @@ class BlockListLayout extends Component {
 			return;
 		}
 
-		const { selectedBlock, selectionStart, onMultiSelect, onSelect } = this.props;
+		const { selectionStartUID, onMultiSelect, onSelect } = this.props;
 
-		if ( selectedBlock ) {
-			onMultiSelect( selectedBlock.uid, uid );
-		} else if ( selectionStart ) {
-			onMultiSelect( selectionStart, uid );
+		if ( selectionStartUID ) {
+			onMultiSelect( selectionStartUID, uid );
 		} else {
 			onSelect( uid );
 		}
@@ -237,7 +234,10 @@ class BlockListLayout extends Component {
 
 export default connect(
 	( state ) => ( {
-		selectedBlock: getSelectedBlock( state ),
+		// Reference block selection value directly, since current selectors
+		// assume either multi-selection (getMultiSelectedBlocksStartUid) or
+		// singular-selection (getSelectedBlock) exclusively.
+		selectionStartUID: state.blockSelection.start,
 		isSelectionEnabled: isSelectionEnabled( state ),
 		isMultiSelecting: isMultiSelecting( state ),
 	} ),
