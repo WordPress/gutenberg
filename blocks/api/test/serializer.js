@@ -24,6 +24,7 @@ import {
 } from '../registration';
 import { createBlock } from '../';
 import InnerBlocks from '../../inner-blocks';
+import { settings as moreSettings } from '../../library/more';
 
 describe( 'block serializer', () => {
 	beforeAll( () => {
@@ -285,29 +286,18 @@ describe( 'block serializer', () => {
 	describe( 'serializeBlock()', () => {
 		describe( '"more" block', () => {
 			beforeEach( () => {
-				registerBlockType( 'core/more', {
-					category: 'layout',
-					title: 'more',
-					attributes: {
-						customText: {
-							type: 'string',
-						},
-						noTeaser: {
-							type: 'boolean',
-							default: false,
-						},
-					},
-
-					save: () => null,
-				} );
+				registerBlockType( 'core/more', moreSettings );
 			} );
+
+			// FIXME: These tests aren't relevant anymore, but I kept them in
+			// the diff to better illustrate the changes.
 
 			it( 'serializes without text', () => {
 				const block = createBlock( 'core/more', {} );
 
 				const content = serializeBlock( block );
 
-				expect( content ).toBe( '<!--more-->' );
+				expect( content ).toBe( '<!-- wp:more -->\n<!--more-->\n<!-- /wp:more -->' );
 			} );
 
 			it( 'serializes with text', () => {
@@ -317,7 +307,7 @@ describe( 'block serializer', () => {
 
 				const content = serializeBlock( block );
 
-				expect( content ).toBe( '<!--more Read more!-->' );
+				expect( content ).toBe( '<!-- wp:more {"customText":"Read more!"} -->\n<!--more Read more!-->\n<!-- /wp:more -->' );
 			} );
 
 			it( 'serializes with no teaser', () => {
@@ -327,7 +317,7 @@ describe( 'block serializer', () => {
 
 				const content = serializeBlock( block );
 
-				expect( content ).toBe( '<!--more-->\n<!--noteaser-->' );
+				expect( content ).toBe( '<!-- wp:more {"noTeaser":true} -->\n<!--more-->\n<!--noteaser-->\n<!-- /wp:more -->' );
 			} );
 		} );
 

@@ -12,6 +12,7 @@ import { getBlockTypes, getUnknownTypeHandlerName } from '../registration';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import stripAttributes from './strip-attributes';
+import specialCommentConverter from './special-comment-converter';
 import commentRemover from './comment-remover';
 import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
@@ -96,6 +97,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 			// Add semantic formatting before attributes are stripped.
 			formattingTransformer,
 			stripAttributes,
+			specialCommentConverter,
 			commentRemover,
 			createUnwrapper( ( node ) => ! isInline( node, tagName ) ),
 		] );
@@ -124,6 +126,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 			// Add semantic formatting before attributes are stripped.
 			formattingTransformer,
 			stripAttributes,
+			specialCommentConverter,
 			commentRemover,
 			! canUserUseUnfilteredHTML && createUnwrapper( ( element ) => element.nodeName === 'IFRAME' ),
 			embeddedContentReducer,
