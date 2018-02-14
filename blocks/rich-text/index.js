@@ -14,6 +14,7 @@ import {
 	defer,
 	noop,
 	throttle,
+	reject,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import 'element-closest';
@@ -54,10 +55,48 @@ export function createTinyMCEElement( type, props, ...children ) {
 	);
 }
 
-export function isLinkBoundary( fragment ) {
-	return fragment.childNodes && fragment.childNodes.length === 1 &&
-		fragment.childNodes[ 0 ].nodeName === 'A' && fragment.childNodes[ 0 ].text.length === 1 &&
-		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
+/**
+ * Returns true if the node is the inline node boundary. This is used in node
+ * filtering prevent the inline boundary from being included in the split which
+ * occurs while within but at the end of an inline node, since TinyMCE includes
+ * a placeholder caret character at the end.
+ *
+ * @see https://github.com/tinymce/tinymce/blob/master/src/plugins/link/main/ts/core/Utils.ts
+ *
+ * @param {Node} node Node to test.
+ *
+ * @return {boolean} Whether node is inline boundary.
+ */
+export function isEmptyInlineBoundary( node ) {
+	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
+	return text === '\uFEFF';
+}
+
+/**
+ * Returns true if the node is empty, meaning it contains only the placeholder
+ * caret character or is an empty text node.
+ *
+ * @param {Node} node Node to test.
+ *
+ * @return {boolean} Whether node is empty.
+ */
+export function isEmptyNode( node ) {
+	return (
+		'' === node.nodeValue ||
+		isEmptyInlineBoundary( node )
+	);
+}
+
+/**
+ * Given a set of Nodes, filters to set to exclude any empty nodes: those with
+ * either empty text nodes or only including the inline boundary caret.
+ *
+ * @param {Node[]} childNodes Nodes to filter.
+ *
+ * @return {Node[]} Non-empty nodes.
+ */
+export function filterEmptyNodes( childNodes ) {
+	return reject( childNodes, isEmptyNode );
 }
 
 export function getFormatProperties( formatName, parents ) {
@@ -612,8 +651,7 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
-
+			const afterElement = nodeListToReact( filterEmptyNodes( afterFragment.childNodes ), createTinyMCEElement );
 			this.setContent( beforeElement );
 			this.props.onSplit( beforeElement, afterElement, ...blocks );
 		} else {
