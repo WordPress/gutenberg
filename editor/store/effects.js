@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, has, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
+import { get, has, includes, map, castArray, uniqueId, reduce, values, some, forEach, upperFirst } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -529,9 +529,50 @@ export default {
 				type: 'FETCH_TAXONOMIES_SUCCESS',
 				taxonomies,
 			} );
+			forEach( taxonomies, function( taxonomy, key ) {
+				dispatch( {
+					type: 'FETCH_TAXONOMY_TERMS',
+					taxonomy: key,
+				} );
+			} );
 		} ).fail( ( err ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMIES_FAILURE',
+				error: get( err, 'responseJSON', {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} ),
+			} );
+		} );
+	},
+	FETCH_TAXONOMY_TERMS( action, store ) {
+		const { getState, dispatch } = store;
+		const state = getState();
+
+		// Only proceed if the state knows about this taxonomy
+		if ( ! has( state, `taxonomies.data.${ action.taxonomy }` ) ) {
+			return;
+		}
+
+		const taxonomy = state.taxonomies.data[ action.taxonomy ];
+		const className = upperFirst( taxonomy.rest_base );
+
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		if ( ! has( wp, `api.collections.${ className }` ) ) {
+			return;
+		}
+
+		const collection = new wp.api.collections[ className ]();
+		collection.fetch().done( ( taxonomyTerms ) => {
+			dispatch( {
+				type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
+				taxonomy: action.taxonomy,
+				taxonomyTerms,
+			} );
+		} ).fail( ( err ) => {
+			dispatch( {
+				type: 'FETCH_TAXONOMY_TERMS_FAILURE',
 				error: get( err, 'responseJSON', {
 					code: 'unknown_error',
 					message: __( 'An unknown error occurred.' ),

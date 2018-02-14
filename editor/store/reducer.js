@@ -864,6 +864,15 @@ export const reusableBlocks = combineReducers( {
 	},
 } );
 
+/**
+ * Reducer to save the WP REST API Taxonomy Terms to the state.
+ *
+ * State:
+ * - data:        The data that is returned by the WP REST API.
+ * - fetchStatus: Per Term boolean to specify if this Term is currently being fetched.
+ *
+ * @return {Object} Updated state.
+ */
 export const taxonomies = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
@@ -875,14 +884,94 @@ export const taxonomies = combineReducers( {
 		return state;
 	},
 
-	isFetching( state = false, action ) {
+	fetchStatus( state = false, action ) {
 		switch ( action.type ) {
 			case 'FETCH_TAXONOMIES': {
-				return true;
+				return {
+					requesting: true,
+					successful: false,
+					error: null,
+				};
 			}
-			case 'FETCH_TAXONOMIES_SUCCESS':
+			case 'FETCH_TAXONOMIES_SUCCESS': {
+				return {
+					requesting: false,
+					successful: true,
+					error: null,
+				};
+			}
 			case 'FETCH_TAXONOMIES_FAILURE': {
-				return false;
+				const { error } = action;
+				return {
+					requesting: false,
+					successful: false,
+					error,
+				};
+			}
+		}
+
+		return state;
+	},
+} );
+
+/**
+ * Reducer to save the WP REST API Taxonomy Terms to the state.
+ *
+ * State:
+ * - data:        The data that is returned by the WP REST API.
+ * - fetchStatus: Per Term boolean to specify if this Term is currently being fetched.
+ *
+ * @return {Object} Updated state.
+ */
+export const taxonomyTerms = combineReducers( {
+	data( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_TAXONOMY_TERMS_SUCCESS': {
+				const { taxonomy } = action;
+				return {
+					...state,
+					[ taxonomy ]: action.taxonomyTerms,
+				};
+			}
+		}
+
+		return state;
+	},
+
+	fetchStatus( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_TAXONOMY_TERMS': {
+				const { taxonomy } = action;
+				return {
+					...state,
+					[ taxonomy ]: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+				};
+			}
+			case 'FETCH_TAXONOMY_TERMS_SUCCESS': {
+				const { taxonomy } = action;
+				return {
+					...state,
+					[ taxonomy ]: {
+						requesting: false,
+						successful: true,
+						error: null,
+					},
+				};
+			}
+			case 'FETCH_TAXONOMY_TERMS_FAILURE': {
+				const { error, taxonomy } = action;
+				return {
+					...state,
+					[ taxonomy ]: {
+						requesting: false,
+						successful: false,
+						error,
+					},
+				};
 			}
 		}
 
@@ -905,4 +994,5 @@ export default optimist( combineReducers( {
 	isSavingMetaBoxes,
 	reusableBlocks,
 	taxonomies,
+	taxonomyTerms,
 } ) );

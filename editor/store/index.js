@@ -17,6 +17,7 @@ import {
 } from './selectors';
 import {
 	fetchTaxonomies,
+	fetchTaxonomyTerms,
 } from './actions';
 
 /**
