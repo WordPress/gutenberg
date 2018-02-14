@@ -302,6 +302,12 @@ export function undo() {
 	return { type: 'UNDO' };
 }
 
+/**
+ * Returns an action object used in signalling that undo history record should
+ * be created.
+ *
+ * @return {Object} Action object.
+ */
 export function createUndoLevel() {
 	return { type: 'CREATE_UNDO_LEVEL' };
 }

@@ -143,7 +143,6 @@ export class RichText extends Component {
 
 		this.state = {
 			formats: {},
-			empty: ! value || ! value.length,
 			selectedNodeId: 0,
 		};
 
@@ -251,11 +250,16 @@ export class RichText extends Component {
 	 * @param {UndoEvent} event The undo event as triggered by TinyMCE.
 	 */
 	onPropagateUndo( event ) {
-		const { onUndo } = this.context;
+		const { onUndo, onRedo } = this.context;
 		const { command } = event;
 
-		if ( onUndo && ( command === 'Undo' || command === 'Redo' ) ) {
+		if ( command === 'Undo' && onUndo ) {
 			defer( onUndo );
+			event.preventDefault();
+		}
+
+		if ( command === 'Redo' && onRedo ) {
+			defer( onRedo );
 			event.preventDefault();
 		}
 	}
@@ -874,6 +878,7 @@ export class RichText extends Component {
 
 RichText.contextTypes = {
 	onUndo: noop,
+	onRedo: noop,
 	canUserUseUnfilteredHTML: noop,
 	onCreateUndoLevel: noop,
 };
