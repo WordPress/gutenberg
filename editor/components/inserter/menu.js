@@ -202,7 +202,7 @@ export class InserterMenu extends Component {
 	renderCategories( visibleItemsByCategory ) {
 		if ( isEmpty( visibleItemsByCategory ) ) {
 			return (
-				<NoBlocks/>
+				<NoBlocks />
 			);
 		}
 
