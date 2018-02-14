@@ -10,6 +10,7 @@ import {
 	getBlockIndex,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
+	getBlockCount,
 } from '../../store/selectors';
 
 function BlockInsertionPoint( { showInsertionPoint } ) {
@@ -23,7 +24,7 @@ function BlockInsertionPoint( { showInsertionPoint } ) {
 export default connect(
 	( state, { uid, rootUID } ) => {
 		const blockIndex = uid ? getBlockIndex( state, uid, rootUID ) : -1;
-		const insertIndex = blockIndex > -1 ? blockIndex + 1 : 0;
+		const insertIndex = blockIndex > -1 ? blockIndex + 1 : getBlockCount( state );
 		const insertionPoint = getBlockInsertionPoint( state );
 
 		return {
