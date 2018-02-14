@@ -384,6 +384,27 @@ export function getEditedPostPreviewLink( state ) {
 }
 
 /**
+ * Returns a new reference when the inner blocks of a given block UID change.
+ * This is used exclusively as a memoized selector dependant, relying on this
+ * selector's shared return value and recursively those of its inner blocks
+ * defined as dependencies. This abuses mechanics of the selector memoization
+ * to return from the original selector function only when dependants change.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {*} A value whose reference will change only when inner blocks of
+ *             the given block UID change.
+ */
+export const getBlockDependantsCacheBust = createSelector(
+	() => [],
+	( state, uid ) => map(
+		getBlockOrder( state, uid ),
+		( innerBlockUID ) => getBlock( state, innerBlockUID ),
+	),
+);
+
+/**
  * Returns a block given its unique ID. This is a parsed copy of the block,
  * containing its `blockName`, identifier (`uid`), and current `attributes`
  * state. This is not the block's registration settings, which must be
@@ -430,6 +451,7 @@ export const getBlock = createSelector(
 	},
 	( state, uid ) => [
 		get( state, [ 'editor', 'present', 'blocksByUid', uid ] ),
+		getBlockDependantsCacheBust( state, uid ),
 		get( state, [ 'editor', 'present', 'edits', 'meta' ] ),
 		get( state, 'currentPost.meta' ),
 	]

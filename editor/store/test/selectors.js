@@ -36,6 +36,7 @@ const {
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
+	getBlockDependantsCacheBust,
 	getBlock,
 	getBlocks,
 	getBlockCount,
@@ -1027,6 +1028,233 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getBlockDependantsCacheBust', () => {
+		const rootBlock = { uid: 123, name: 'core/paragraph', attributes: {} };
+		const rootOrder = [ 123 ];
+
+		it( 'returns an unchanging reference', () => {
+			const rootBlockOrder = [];
+
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const nextState = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect(
+				getBlockDependantsCacheBust( state, 123 )
+			).toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+
+		it( 'returns a new reference on added inner block', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: [],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const nextState = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: [ 456 ],
+							456: [],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect(
+				getBlockDependantsCacheBust( state, 123 )
+			).not.toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+
+		it( 'returns an unchanging reference on unchanging inner block', () => {
+			const rootBlockOrder = [ 456 ];
+			const childBlock = { uid: 456, name: 'core/paragraph', attributes: {} };
+			const childBlockOrder = [];
+
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: childBlock,
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const nextState = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: childBlock,
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect(
+				getBlockDependantsCacheBust( state, 123 )
+			).toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+
+		it( 'returns a new reference on updated inner block', () => {
+			const rootBlockOrder = [ 456 ];
+			const childBlockOrder = [];
+
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const nextState = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: { uid: 456, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect(
+				getBlockDependantsCacheBust( state, 123 )
+			).not.toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+
+		it( 'returns a new reference on updated grandchild inner block', () => {
+			const rootBlockOrder = [ 456 ];
+			const childBlock = { uid: 456, name: 'core/paragraph', attributes: {} };
+			const childBlockOrder = [ 789 ];
+			const grandChildBlockOrder = [];
+
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: childBlock,
+							789: { uid: 789, name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+							789: grandChildBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const nextState = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							123: rootBlock,
+							456: childBlock,
+							789: { uid: 789, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
+						},
+						blockOrder: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+							789: grandChildBlockOrder,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect(
+				getBlockDependantsCacheBust( state, 123 )
+			).not.toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+	} );
+
 	describe( 'getBlock', () => {
 		it( 'should return the block', () => {
 			const state = {
@@ -1059,7 +1287,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocksByUid: {},
-						borderOrder: {},
+						blockOrder: {},
 						edits: {},
 					},
 				},
