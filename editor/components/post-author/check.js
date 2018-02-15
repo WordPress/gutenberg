@@ -17,7 +17,7 @@ import PostTypeSupportCheck from '../post-type-support-check';
 import { getCurrentPostType } from '../../store/selectors';
 
 export function PostAuthorCheck( { user, users, children } ) {
-	const authors = filter( users.data, ( { capabilities } ) => capabilities.level_1 );
+	const authors = filter( users.data, ( { capabilities } ) => undefined !== capabilities && capabilities.level_1 );
 	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
 	if ( ! userCanPublishPosts || authors.length < 2 ) {
