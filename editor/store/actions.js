@@ -583,18 +583,21 @@ export function appendDefaultBlock( attributes, rootUID ) {
 /**
  * Returns an action object used to fetch all Taxonomies from the REST API into the store.
  *
+ * @param {string} postType The post type of taxonomies to fetch.
+ *
  * @return {Object} Action object.
  */
-export function fetchTaxonomies() {
+export function fetchTaxonomies( postType ) {
 	return {
 		type: 'FETCH_TAXONOMIES',
+		postType,
 	};
 }
 
 /**
  * Returns an action object used to fetch a Taxonomy's Terms from the REST API into the store.
  *
- * @param taxonomy {string} The unique identifier of the taxonomy.
+ * @param {string} taxonomy The unique identifier of the taxonomy.
  *
  * @return {Object} Action object.
  */

@@ -531,16 +531,29 @@ export default {
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 	FETCH_TAXONOMIES( action, store ) {
-		// TODO: these are potentially undefined, this fix is in place
-		// until there is a filter to not use reusable blocks if undefined
+		// Only proceed if the api collections has the Taxonomies class
 		if ( ! has( wp, 'api.collections.Taxonomies' ) ) {
+			// TODO: Use more appropriate error
+			dispatch( {
+				type: 'FETCH_TAXONOMIES_FAILURE',
+				error: {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				},
+			} );
 			return;
 		}
 
 		const { dispatch } = store;
-
 		const collection = new wp.api.collections.Taxonomies();
-		collection.fetch().done( ( taxonomies ) => {
+		const fetchData = {};
+		if ( has( action, 'postType' ) ) {
+			fetchData.data = {
+				type: action.postType,
+			};
+		}
+
+		collection.fetch( fetchData ).done( ( taxonomies ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMIES_SUCCESS',
 				taxonomies,
@@ -567,15 +580,29 @@ export default {
 
 		// Only proceed if the state knows about this taxonomy
 		if ( ! has( state, `taxonomies.data.${ action.taxonomy }` ) ) {
+			// TODO: Use more appropriate error
+			dispatch( {
+				type: 'FETCH_TAXONOMIES_FAILURE',
+				error: {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				},
+			} );
 			return;
 		}
 
 		const taxonomy = state.taxonomies.data[ action.taxonomy ];
 		const className = upperFirst( taxonomy.rest_base );
 
-		// TODO: these are potentially undefined, this fix is in place
-		// until there is a filter to not use reusable blocks if undefined
+		// Only proceed if the api collections has this taxonomy class
 		if ( ! has( wp, `api.collections.${ className }` ) ) {
+			dispatch( {
+				type: 'FETCH_TAXONOMIES_FAILURE',
+				error: {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				},
+			} );
 			return;
 		}
 

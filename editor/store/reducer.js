@@ -879,8 +879,11 @@ export const reusableBlocks = combineReducers( {
  * Reducer to save the WP REST API Taxonomy Terms to the state.
  *
  * State:
- * - data:        The data that is returned by the WP REST API.
- * - fetchStatus: Per Term boolean to specify if this Term is currently being fetched.
+ * - data:         The data that is returned by the WP REST API.
+ * - fetchStatus:
+ *   - requesting: Boolean indicating if the Taxonomies are currently being fetched.
+ *   - successful: Boolean indicating if the Taxonomies where successfully fetched.
+ *   - error:      Object when not null contains the error that occurred during fetching.
  *
  * @return {Object} Updated state.
  */
@@ -930,7 +933,10 @@ export const taxonomies = combineReducers( {
  *
  * State:
  * - data:        The data that is returned by the WP REST API.
- * - fetchStatus: Per Term boolean to specify if this Term is currently being fetched.
+ * - fetchStatus; Object with per Taxonomy:
+ *   - requesting: Boolean indicating if the Taxonomies are currently being fetched.
+ *   - successful: Boolean indicating if the Taxonomies where successfully fetched.
+ *   - error:      Object when not null contains the error that occurred during fetching.
  *
  * @return {Object} Updated state.
  */
