@@ -524,7 +524,14 @@ export default {
 		const { dispatch } = store;
 
 		const collection = new wp.api.collections.Taxonomies();
-		collection.fetch().done( ( taxonomies ) => {
+		const fetchData = {};
+		if ( has( action, 'postType' ) ) {
+			fetchData.data = {
+				type: action.postType,
+			};
+		}
+
+		collection.fetch( fetchData ).done( ( taxonomies ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMIES_SUCCESS',
 				taxonomies,
