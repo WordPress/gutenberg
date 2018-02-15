@@ -97,8 +97,7 @@ export function isSavingMetaBoxes( state ) {
  * @return {boolean} Whether undo history exists.
  */
 export function hasEditorUndo( state ) {
-	const { past, present } = state.editor;
-	return past.length > 1 || last( past ) !== present;
+	return state.editor.past.length > 0;
 }
 
 /**
