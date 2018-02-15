@@ -553,7 +553,7 @@ export default {
 			};
 		}
 
-		collection.fetch( fetchData ).done( ( taxonomies ) => {
+		collection.fetch( fetchData ).then( ( taxonomies ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMIES_SUCCESS',
 				taxonomies,
@@ -564,7 +564,7 @@ export default {
 					taxonomy: key,
 				} );
 			} );
-		} ).fail( ( err ) => {
+		}, ( err ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMIES_FAILURE',
 				error: get( err, 'responseJSON', {
@@ -607,13 +607,13 @@ export default {
 		}
 
 		const collection = new wp.api.collections[ className ]();
-		collection.fetch().done( ( taxonomyTerms ) => {
+		collection.fetch().then( ( taxonomyTerms ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
 				taxonomy: action.taxonomy,
 				taxonomyTerms,
 			} );
-		} ).fail( ( err ) => {
+		}, ( err ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMY_TERMS_FAILURE',
 				error: get( err, 'responseJSON', {
