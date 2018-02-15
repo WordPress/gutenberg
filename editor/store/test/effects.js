@@ -876,7 +876,7 @@ describe( 'effects', () => {
 		describe( '.FETCH_TAXONOMIES', () => {
 			const handler = effects.FETCH_TAXONOMIES;
 
-			it( 'should get the taxonomies', () => {
+			it( 'should get the taxonomies and dispatch actions to get the terms', () => {
 				const promise = Promise.resolve( {
 					data: {
 						category: {
