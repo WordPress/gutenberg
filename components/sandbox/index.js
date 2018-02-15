@@ -96,12 +96,6 @@ export default class Sandbox extends Component {
 
 				function sendResize() {
 					var clientBoundingRect = document.body.getBoundingClientRect();
-					if ( 0 === clientBoundingRect.height ) {
-						clientBoundingRect.height = document.getElementById( 'content' ).clientHeight;
-					}
-					if ( 0 === clientBoundingRect.width ) {
-						clientBoundingRect.width = document.getElementById( 'content' ).clientWidth;
-					}
 					window.parent.postMessage( {
 						action: 'resize',
 						width: clientBoundingRect.width,
