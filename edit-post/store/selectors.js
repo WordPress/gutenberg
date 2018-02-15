@@ -3,7 +3,7 @@
  *
  * @param {Object} state Global application state.
  *
- * @returns {string} Editing mode.
+ * @return {string} Editing mode.
  */
 export function getEditorMode( state ) {
 	return getPreference( state, 'mode', 'visual' );
@@ -14,7 +14,7 @@ export function getEditorMode( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {string} Active sidebar panel.
+ * @return {string} Active sidebar panel.
  */
 export function getActivePanel( state ) {
 	return state.panel;
@@ -25,7 +25,7 @@ export function getActivePanel( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {Object} Preferences Object.
+ * @return {Object} Preferences Object.
  */
 export function getPreferences( state ) {
 	return state.preferences;
@@ -37,7 +37,7 @@ export function getPreferences( state ) {
  * @param {string} preferenceKey Preference Key.
  * @param {Mixed}  defaultValue  Default Value.
  *
- * @returns {Mixed} Preference Value.
+ * @return {Mixed} Preference Value.
  */
 export function getPreference( state, preferenceKey, defaultValue ) {
 	const preferences = getPreferences( state );
@@ -51,7 +51,7 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  * @param {Object} state   Global application state.
  * @param {string} sidebar Sidebar name (leave undefined for the default sidebar).
  *
- * @returns {boolean} Whether the given sidebar is open.
+ * @return {boolean} Whether the given sidebar is open.
  */
 export function isSidebarOpened( state, sidebar ) {
 	const sidebars = getPreference( state, 'sidebars' );
@@ -67,7 +67,7 @@ export function isSidebarOpened( state, sidebar ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {boolean} Whether sidebar is open.
+ * @return {boolean} Whether sidebar is open.
  */
 export function hasOpenSidebar( state ) {
 	const sidebars = getPreference( state, 'sidebars' );
@@ -82,7 +82,7 @@ export function hasOpenSidebar( state ) {
  * @param {Object} state Global application state.
  * @param {string} panel Sidebar panel name.
  *
- * @returns {boolean} Whether sidebar is open.
+ * @return {boolean} Whether sidebar is open.
  */
 export function isEditorSidebarPanelOpened( state, panel ) {
 	const panels = getPreference( state, 'panels' );
@@ -94,7 +94,7 @@ export function isEditorSidebarPanelOpened( state, panel ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {boolean} Whether current window size corresponds to
+ * @return {boolean} Whether current window size corresponds to
  *                    mobile resolutions.
  */
 export function isMobile( state ) {
@@ -106,7 +106,7 @@ export function isMobile( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @returns {boolean} True if toolbar is fixed.
+ * @return {boolean} True if toolbar is fixed.
  */
 export function hasFixedToolbar( state ) {
 	return ! isMobile( state ) && isFeatureActive( state, 'fixedToolbar' );
@@ -118,7 +118,7 @@ export function hasFixedToolbar( state ) {
  * @param {Object} state   Global application state.
  * @param {string} feature Feature slug.
  *
- * @returns {booleean} Is active.
+ * @return {booleean} Is active.
  */
 export function isFeatureActive( state, feature ) {
 	return !! state.preferences.features[ feature ];

@@ -7,6 +7,7 @@ import { times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { RangeControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -15,7 +16,6 @@ import './style.scss';
 import './editor.scss';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import RangeControl from '../../inspector-controls/range-control';
 import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 
@@ -58,11 +58,11 @@ export const settings = {
 		}
 	},
 
-	edit( { attributes, setAttributes, className, focus, setFocus } ) {
+	edit( { attributes, setAttributes, className, isSelected } ) {
 		const { width, content, columns } = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ width }
@@ -71,7 +71,7 @@ export const settings = {
 					/>
 				</BlockControls>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<RangeControl
 						label={ __( 'Columns' ) }
@@ -97,9 +97,8 @@ export const settings = {
 									],
 								} );
 							} }
-							focus={ focus && focus.column === index }
-							onFocus={ () => setFocus( { column: index } ) }
 							placeholder={ __( 'New Column' ) }
+							isSelected={ isSelected }
 						/>
 					</div>
 				) }

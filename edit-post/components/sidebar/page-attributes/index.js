@@ -46,7 +46,7 @@ export function PageAttributes( { isOpened, onTogglePanel, postType } ) {
 }
 
 const applyQuery = query( ( select ) => ( {
-	postTypeSlug: select( 'core/editor', 'getCurrentPostType' ),
+	postTypeSlug: select( 'core/editor' ).getEditedPostAttribute( 'type' ),
 } ) );
 
 const applyConnect = connect(

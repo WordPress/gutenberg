@@ -3,11 +3,13 @@
 	margin: -4px;
 	padding: 4px;
 
-	p {
+	p,
+	li {
 		line-height: $editor-line-height;
 	}
 
-	ul, ol {
+	ul,
+	ol {
 		padding-left: 2.5em;
 		margin-left: 0;
 	}
@@ -85,6 +87,22 @@
 
 	&:focus code[data-mce-selected] {
 		background: $light-gray-400;
+	}
+
+	.alignright {
+		float: right;
+		margin: 0.5em 0 0.5em 1em;
+	}
+
+	.alignleft {
+		float: left;
+		margin: 0.5em 1em 0.5em 0;
+	}
+
+	.aligncenter {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
 	}
 }
 

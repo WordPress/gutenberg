@@ -6,7 +6,7 @@
  */
 
 /**
- * Test do_blocks
+ * Test do_blocks, WP_Block_Type::render
  */
 class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 
@@ -27,6 +27,15 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	function render_dummy_block( $attributes ) {
 		$this->dummy_block_instance_number += 1;
 		return $this->dummy_block_instance_number . ':' . $attributes['value'];
+	}
+
+	/**
+	 * Dummy block rendering function, returning numeric value.
+	 *
+	 * @return number Block output.
+	 */
+	function render_dummy_block_numeric() {
+		return 10;
 	}
 
 	/**
@@ -75,5 +84,27 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			'4:b2' .
 			'after'
 		);
+	}
+
+	/**
+	 * Test dynamic blocks return string value from render, even if render
+	 * callback does not.
+	 *
+	 * @covers WP_Block_Type::render
+	 */
+	function test_dynamic_block_renders_string() {
+		$settings = array(
+			'render_callback' => array(
+				$this,
+				'render_dummy_block_numeric',
+			),
+		);
+
+		register_block_type( 'core/dummy', $settings );
+		$block_type = new WP_Block_Type( 'core/dummy', $settings );
+
+		$rendered = $block_type->render();
+
+		$this->assertEquals( '10', $rendered );
 	}
 }

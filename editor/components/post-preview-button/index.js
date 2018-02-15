@@ -80,6 +80,9 @@ export class PostPreviewButton extends Component {
 				<p>Generating preview.</p>
 			</div>
 			<style>
+				body {
+					margin: 0;
+				}
 				div {
 					display: flex;
 					flex-direction: column;

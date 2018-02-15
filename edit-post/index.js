@@ -81,7 +81,7 @@ export function reinitializeEditor( target, settings ) {
  * @param {Object}  post     API entity for post to edit.
  * @param {?Object} settings Editor settings object.
  *
- * @returns {Object} Editor interface.
+ * @return {Object} Editor interface.
  */
 export function initializeEditor( id, post, settings ) {
 	const target = document.getElementById( id );

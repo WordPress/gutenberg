@@ -18,6 +18,8 @@ import { Component, compose } from '@wordpress/element';
 import { createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	IconButton,
+	SelectControl,
+	TextControl,
 	Toolbar,
 	withAPIData,
 	withContext,
@@ -30,8 +32,6 @@ import RichText from '../../rich-text';
 import ImagePlaceHolder from '../../image-placeholder';
 import MediaUpload from '../../media-upload';
 import InspectorControls from '../../inspector-controls';
-import TextControl from '../../inspector-controls/text-control';
-import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import UrlInputButton from '../../url-input/button';
@@ -47,9 +47,15 @@ class ImageBlock extends Component {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
+
+		this.state = {
+			captionFocused: false,
+		};
 	}
 
 	componentDidMount() {
@@ -77,6 +83,14 @@ class ImageBlock extends Component {
 		}
 	}
 
+	componentWillReceiveProps( { isSelected } ) {
+		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: false,
+			} );
+		}
+	}
+
 	onSelectImage( media ) {
 		const attributes = { url: media.url, alt: media.alt, id: media.id };
 		if ( media.caption ) {
@@ -87,6 +101,22 @@ class ImageBlock extends Component {
 
 	onSetHref( value ) {
 		this.props.setAttributes( { href: value } );
+	}
+
+	onFocusCaption() {
+		if ( ! this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: true,
+			} );
+		}
+	}
+
+	onImageClick() {
+		if ( this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: false,
+			} );
+		}
 	}
 
 	updateAlt( newAlt ) {
@@ -109,7 +139,7 @@ class ImageBlock extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, focus, setFocus, className, settings, toggleSelection } = this.props;
+		const { attributes, setAttributes, isSelected, className, settings, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const availableSizes = this.getAvailableSizes();
@@ -117,7 +147,7 @@ class ImageBlock extends Component {
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 
 		const controls = (
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -157,11 +187,10 @@ class ImageBlock extends Component {
 			];
 		}
 
-		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
 			'is-resized': !! width,
-			'is-focused': !! focus,
+			'is-focused': isSelected,
 		} );
 
 		// Disable reason: Each block can be selected by clicking on it
@@ -169,7 +198,7 @@ class ImageBlock extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return [
 			controls,
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<h2>{ __( 'Image Settings' ) }</h2>
 					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
@@ -199,7 +228,7 @@ class ImageBlock extends Component {
 						// Disable reason: Image itself is not meant to be
 						// interactive, but should direct focus to block
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-						const img = <img src={ url } alt={ alt } onClick={ setFocus } />;
+						const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
 
 						if ( ! isResizable || ! imageWidthWithinContainer ) {
 							return img;
@@ -246,14 +275,14 @@ class ImageBlock extends Component {
 						);
 					} }
 				</ImageSize>
-				{ ( caption && caption.length > 0 ) || !! focus ? (
+				{ ( caption && caption.length > 0 ) || isSelected ? (
 					<RichText
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
-						focus={ focus && focus.editable === 'caption' ? focus : undefined }
-						onFocus={ focusCaption }
+						onFocus={ this.onFocusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
+						isSelected={ this.state.captionFocused }
 						inlineToolbar
 					/>
 				) : null }

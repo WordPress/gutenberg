@@ -231,7 +231,7 @@ editor interface where blocks are implemented.
 
 - `title: string` - A human-readable
   [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files)
-  label for the block. Shown in the block picker.
+  label for the block. Shown in the block inserter.
 - `icon: string | WPElement | Function` - Slug of the
   [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards)
   to be shown in the control's button, or an element (or function returning an
@@ -250,9 +250,9 @@ editor interface where blocks are implemented.
   editor. A block can update its own state in response to events using the
   `setAttributes` function, passing an object of properties to be applied as a
   partial update.
-- `save( { attributes: Object } ): WPElement | String` - Returns an element
-  describing the markup of a block to be saved in the published content. This
-  function is called before save and when switching to an editor's HTML view.
+- `save( { attributes: Object } ): WPElement` - Returns an element describing
+  the markup of a block to be saved in the published content. This function is
+  called before save and when switching to an editor's HTML view.
 - `keywords` - An optional array of keywords used to filter the block list.
 
 ### `wp.blocks.getBlockType( name: string )`
@@ -277,9 +277,9 @@ want to display alignment options in the selected block's toolbar.
 
 Because the toolbar should only be shown when the block is selected, it is
 important that a `BlockControls` element is only returned when the block's
-`focus` prop is
+`isSelected` prop is
 [truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy),
-meaning that focus is currently within the block.
+meaning that the block is currently selected.
 
 Example:
 
@@ -291,8 +291,8 @@ Example:
 
 	function edit( props ) {
 		return [
-			// Controls: (only visible when focused)
-			props.focus && (
+			// Controls: (only visible when block is selected)
+			props.isSelected && (
 				el( BlockControls, { key: 'controls' },
 					el( AlignmentToolbar, {
 						value: props.align,

@@ -10,7 +10,14 @@ import { stringify } from 'querystringify';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Toolbar, Spinner, withAPIData } from '@wordpress/components';
+import {
+	Placeholder,
+	RangeControl,
+	Spinner,
+	ToggleControl,
+	Toolbar,
+	withAPIData,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
 
@@ -21,8 +28,6 @@ import './editor.scss';
 import './style.scss';
 import QueryPanel from '../../query-panel';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import RangeControl from '../../inspector-controls/range-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
@@ -44,10 +49,10 @@ class LatestPostsBlock extends Component {
 
 	render() {
 		const latestPosts = this.props.latestPosts.data;
-		const { attributes, focus, setAttributes } = this.props;
+		const { attributes, isSelected, setAttributes } = this.props;
 		const { displayPostDate, align, layout, columns, order, orderBy, categories, postsToShow } = attributes;
 
-		const inspectorControls = focus && (
+		const inspectorControls = isSelected && (
 			<InspectorControls key="inspector">
 				<h3>{ __( 'Latest Posts Settings' ) }</h3>
 				<QueryPanel
@@ -114,7 +119,7 @@ class LatestPostsBlock extends Component {
 
 		return [
 			inspectorControls,
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }

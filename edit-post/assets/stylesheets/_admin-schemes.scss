@@ -66,11 +66,3 @@ $scheme-sunrise__spot-color: #de823f;
 		}
 	}
 }
-
-// Output overrides for each scheme
-@include admin-scheme-color-overrides( 'blue', $scheme-blue__spot-color );
-@include admin-scheme-color-overrides( 'coffee', $scheme-coffee__spot-color );
-@include admin-scheme-color-overrides( 'ectoplasm', $scheme-ectoplasm__spot-color );
-@include admin-scheme-color-overrides( 'midnight', $scheme-midnight__spot-color );
-@include admin-scheme-color-overrides( 'ocean', $scheme-ocean__spot-color );
-@include admin-scheme-color-overrides( 'sunrise', $scheme-sunrise__spot-color );

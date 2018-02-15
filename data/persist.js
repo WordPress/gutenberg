@@ -10,7 +10,7 @@ import { get } from 'lodash';
  * @param {string}   reducerKey The reducer key to persist.
  * @param {string}   storageKey The storage key to use.
  *
- * @returns {Function} Enhanced reducer.
+ * @return {Function} Enhanced reducer.
  */
 export function withRehydratation( reducer, reducerKey, storageKey ) {
 	// EnhancedReducer with auto-rehydration

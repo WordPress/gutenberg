@@ -14,17 +14,20 @@ function ToggleButton( { isVisible, toggleVisible } ) {
 	return (
 		<button onClick={ toggleVisible }>
 			Toggle Popover!
-			<Popover
-				isOpen={ isVisible }
-				onClose={ toggleVisible }
-				onClick={ ( event ) => event.stopPropagation() }
-			>
-				Popover is toggled!
-			</Popover>
+			{ isVisible && (
+				<Popover
+					onClose={ toggleVisible }
+					onClick={ ( event ) => event.stopPropagation() }
+				>
+					Popover is toggled!
+				</Popover>
+			) }
 		</button>
 	);
 }
 ```
+
+If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
 
 If you want Popover elementss to render to a specific location on the page to allow style cascade to take effect, you must render a `Popover.Slot` further up the element tree:
 
@@ -48,17 +51,9 @@ render(
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
 
-### isOpen
+### focusOnMount
 
-As a controlled component, it is expected that you will pass `isOpen` to control whether the popover is visible. Refer to the `onClose` documentation for the complementary behavior for determining when this value should be toggled in your parent component state.
-
-- Type: `Boolean`
-- Required: No
-- Default: `false`
-
-### focusOnOpen
-
-By default, the popover will receive focus when it transitions from closed to open. To suppress this behavior, assign `focusOnOpen` to `true`. This should only be assigned when an appropriately accessible substitute behavior exists.
+By default, the popover will receive focus when it mounts. To suppress this behavior, assign `focusOnMount` to `false`. This should only be assigned when an appropriately accessible substitute behavior exists.
 
 - Type: `Boolean`
 - Required: No

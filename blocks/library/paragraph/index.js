@@ -8,7 +8,14 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { concatChildren, Component } from '@wordpress/element';
-import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpress/components';
+import {
+	Autocomplete,
+	PanelBody,
+	PanelColor,
+	RangeControl,
+	ToggleControl,
+	withFallbackStyles,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,8 +29,6 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
 import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
 
@@ -46,7 +51,22 @@ class ParagraphBlock extends Component {
 		super( ...arguments );
 		this.nodeRef = null;
 		this.bindRef = this.bindRef.bind( this );
+		this.onReplace = this.onReplace.bind( this );
 		this.toggleDropCap = this.toggleDropCap.bind( this );
+	}
+
+	onReplace( blocks ) {
+		const { attributes, onReplace } = this.props;
+		onReplace( blocks.map( ( block, index ) => (
+			index === 0 && block.name === name ?
+				{ ...block,
+					attributes: {
+						...attributes,
+						...block.attributes,
+					},
+				} :
+				block
+		) ) );
 	}
 
 	toggleDropCap() {
@@ -66,8 +86,7 @@ class ParagraphBlock extends Component {
 			attributes,
 			setAttributes,
 			insertBlocksAfter,
-			focus,
-			setFocus,
+			isSelected,
 			mergeBlocks,
 			onReplace,
 		} = this.props;
@@ -86,7 +105,7 @@ class ParagraphBlock extends Component {
 		const className = dropCap ? 'has-drop-cap' : null;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<AlignmentToolbar
 						value={ align }
@@ -96,7 +115,7 @@ class ParagraphBlock extends Component {
 					/>
 				</BlockControls>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<PanelBody title={ __( 'Text Settings' ) }>
 						<ToggleControl
@@ -164,8 +183,6 @@ class ParagraphBlock extends Component {
 									content: nextContent,
 								} );
 							} }
-							focus={ focus }
-							onFocus={ setFocus }
 							onSplit={ insertBlocksAfter ?
 								( before, after, ...blocks ) => {
 									setAttributes( { content: before } );
@@ -177,13 +194,14 @@ class ParagraphBlock extends Component {
 								undefined
 							}
 							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
+							onReplace={ this.onReplace }
 							onRemove={ () => onReplace( [] ) }
 							placeholder={ placeholder || __( 'Add text or type / to add content' ) }
 							aria-autocomplete="list"
 							aria-expanded={ isExpanded }
 							aria-owns={ listBoxId }
 							aria-activedescendant={ activeId }
+							isSelected={ isSelected }
 						/>
 					) }
 				</Autocomplete>
@@ -191,6 +209,41 @@ class ParagraphBlock extends Component {
 		];
 	}
 }
+
+const supports = {
+	className: false,
+};
+
+const schema = {
+	content: {
+		type: 'array',
+		source: 'children',
+		selector: 'p',
+		default: [],
+	},
+	align: {
+		type: 'string',
+	},
+	dropCap: {
+		type: 'boolean',
+		default: false,
+	},
+	placeholder: {
+		type: 'string',
+	},
+	width: {
+		type: 'string',
+	},
+	textColor: {
+		type: 'string',
+	},
+	backgroundColor: {
+		type: 'string',
+	},
+	fontSize: {
+		type: 'number',
+	},
+};
 
 export const name = 'core/paragraph';
 
@@ -205,39 +258,9 @@ export const settings = {
 
 	keywords: [ __( 'text' ) ],
 
-	supports: {
-		className: false,
-	},
+	supports,
 
-	attributes: {
-		content: {
-			type: 'array',
-			source: 'children',
-			selector: 'p',
-		},
-		align: {
-			type: 'string',
-		},
-		dropCap: {
-			type: 'boolean',
-			default: false,
-		},
-		placeholder: {
-			type: 'string',
-		},
-		width: {
-			type: 'string',
-		},
-		textColor: {
-			type: 'string',
-		},
-		backgroundColor: {
-			type: 'string',
-		},
-		fontSize: {
-			type: 'number',
-		},
-	},
+	attributes: schema,
 
 	transforms: {
 		from: [
@@ -251,6 +274,28 @@ export const settings = {
 			},
 		],
 	},
+
+	deprecated: [
+		{
+			supports,
+			attributes: {
+				...schema,
+				content: {
+					type: 'string',
+					source: 'html',
+				},
+			},
+			save( { attributes } ) {
+				return attributes.content;
+			},
+			migrate( attributes ) {
+				return {
+					...attributes,
+					content: [ attributes.content ],
+				};
+			},
+		},
+	],
 
 	merge( attributes, attributesToMerge ) {
 		return {

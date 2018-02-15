@@ -28,7 +28,6 @@ import {
 	resetPost,
 	setupNewPost,
 	resetBlocks,
-	focusBlock,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
@@ -41,6 +40,7 @@ import {
 	saveReusableBlock,
 	insertBlock,
 	setMetaBoxSavedData,
+	selectBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -55,6 +55,7 @@ import {
 	getBlocks,
 	getReusableBlock,
 	getMetaBoxes,
+	hasMetaBoxes,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
@@ -151,7 +152,9 @@ export default {
 		}
 
 		// Update dirty meta boxes.
-		dispatch( requestMetaBoxUpdates() );
+		if ( hasMetaBoxes( store.getState() ) ) {
+			dispatch( requestMetaBoxUpdates() );
+		}
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
@@ -218,12 +221,15 @@ export default {
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
-		const [ blockA, blockB ] = action.blocks;
+		const state = store.getState();
+		const [ blockAUid, blockBUid ] = action.blocks;
+		const blockA = getBlock( state, blockAUid );
+		const blockB = getBlock( state, blockBUid );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
 		if ( ! blockType.merge ) {
-			dispatch( focusBlock( blockA.uid ) );
+			dispatch( selectBlock( blockA.uid ) );
 			return;
 		}
 
@@ -244,7 +250,7 @@ export default {
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		dispatch( focusBlock( blockA.uid, { offset: -1 } ) );
+		dispatch( selectBlock( blockA.uid, -1 ) );
 		dispatch( replaceBlocks(
 			[ blockA.uid, blockB.uid ],
 			[
@@ -305,16 +311,16 @@ export default {
 			effects.push( resetBlocks( blocks ) );
 		}
 
+		// Resetting post should occur after blocks have been reset, since it's
+		// the post reset that restarts history (used in dirty detection).
+		effects.push( resetPost( post ) );
+
 		// Include auto draft title in edits while not flagging post as dirty
 		if ( post.status === 'auto-draft' ) {
 			effects.push( setupNewPost( {
 				title: post.title.raw,
 			} ) );
 		}
-
-		// Resetting post should occur after blocks have been reset, since it's
-		// the post reset that restarts history (used in dirty detection).
-		effects.push( resetPost( post ) );
 
 		return effects;
 	},
@@ -458,13 +464,19 @@ export default {
 
 		const oldBlock = getBlock( getState(), action.uid );
 		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
-		const newBlock = createBlock( 'core/block', { ref: reusableBlock.id } );
+		const newBlock = createBlock( 'core/block', {
+			ref: reusableBlock.id,
+			layout: oldBlock.attributes.layout,
+		} );
 		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
-	APPEND_DEFAULT_BLOCK() {
-		return insertBlock( createBlock( getDefaultBlockName() ) );
+	APPEND_DEFAULT_BLOCK( action ) {
+		const { attributes, rootUID } = action;
+		const block = createBlock( getDefaultBlockName(), attributes );
+
+		return insertBlock( block, undefined, rootUID );
 	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;
@@ -484,7 +496,8 @@ export default {
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
-		const dataPerLocation = reduce( getMetaBoxes( store.getState() ), ( memo, metabox, location ) => {
+		const state = store.getState();
+		const dataPerLocation = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
 			if ( metabox.isActive ) {
 				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
 			}
@@ -492,11 +505,20 @@ export default {
 		}, {} );
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
+		// Additional data needed for backwards compatibility.
+		// If we do not provide this data the post will be overriden with the default values.
+		const post = getCurrentPost( state );
+		const additionalData = [
+			post.comment_status && `comment_status=${ post.comment_status }`,
+			post.ping_status && `ping_status=${ post.ping_status }`,
+		].filter( Boolean );
+
 		// To save the metaboxes, we serialize each one of the location forms and combine them
 		// We also add the "common" hidden fields from the base .metabox-base-form
-		const formData = values( dataPerLocation ).concat(
-			jQuery( '.metabox-base-form' ).serialize()
-		).join( '&' );
+		const formData = values( dataPerLocation )
+			.concat( jQuery( '.metabox-base-form' ).serialize() )
+			.concat( additionalData )
+			.join( '&' );
 		const fetchOptions = {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

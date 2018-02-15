@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import { Toolbar, withState } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -153,13 +153,15 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, onReplace, className } ) {
+	edit: withState( {
+		editable: 'content',
+	} )( ( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className, editable, setState } ) => {
 		const { align, value, citation, style } = attributes;
-		const focusedEditable = focus ? focus.editable || 'value' : null;
 		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
+		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
 						icon: 1 === variation ? 'format-quote' : 'testimonial',
@@ -190,8 +192,6 @@ export const settings = {
 							value: fromRichTextValue( nextValue ),
 						} )
 					}
-					focus={ focusedEditable === 'value' ? focus : null }
-					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					onMerge={ mergeBlocks }
 					onRemove={ ( forward ) => {
 						const hasEmptyCitation = ! citation || citation.length === 0;
@@ -200,8 +200,10 @@ export const settings = {
 						}
 					} }
 					placeholder={ __( 'Write quote…' ) }
+					isSelected={ isSelected && editable === 'content' }
+					onFocus={ onSetActiveEditable( 'content' ) }
 				/>
-				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
+				{ ( ( citation && citation.length > 0 ) || isSelected ) && (
 					<RichText
 						tagName="cite"
 						value={ citation }
@@ -210,19 +212,14 @@ export const settings = {
 								citation: nextCitation,
 							} )
 						}
-						focus={ focusedEditable === 'citation' ? focus : null }
-						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
-						onRemove={ ( forward ) => {
-							if ( ! forward ) {
-								setFocus( { ...focus, editable: 'value' } );
-							}
-						} }
 						placeholder={ __( 'Write citation…' ) }
+						isSelected={ isSelected && editable === 'cite' }
+						onFocus={ onSetActiveEditable( 'cite' ) }
 					/>
 				) }
 			</blockquote>,
 		];
-	},
+	} ),
 
 	save( { attributes } ) {
 		const { align, value, citation, style } = attributes;

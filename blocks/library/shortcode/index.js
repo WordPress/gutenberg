@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -60,6 +61,6 @@ export const settings = {
 	edit: Shortcode,
 
 	save( { attributes } ) {
-		return attributes.text;
+		return <RawHTML>{ attributes.text }</RawHTML>;
 	},
 };

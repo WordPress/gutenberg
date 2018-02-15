@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 import DocumentOutlineItem from './item';
-import { getBlocks, getEditedPostTitle } from '../../store/selectors';
+import { getBlocks, getEditedPostAttribute } from '../../store/selectors';
 import { selectBlock } from '../../store/actions';
 
 /**
@@ -134,7 +134,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 export default connect(
 	( state ) => {
 		return {
-			title: getEditedPostTitle( state ),
+			title: getEditedPostAttribute( state, 'title' ),
 			blocks: getBlocks( state ),
 		};
 	},

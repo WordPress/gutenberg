@@ -27,7 +27,7 @@ import { attr, prop, html, text, query, node, children } from './matchers';
  * @param {*}      value Original value.
  * @param {string} type  Type to coerce.
  *
- * @returns {*} Coerced value.
+ * @return {*} Coerced value.
  */
 export function asType( value, type ) {
 	switch ( type ) {
@@ -63,7 +63,7 @@ export function asType( value, type ) {
  *
  * @param {Object} sourceConfig Attribute Source object.
  *
- * @returns {Function} A hpq Matcher.
+ * @return {Function} A hpq Matcher.
  */
 export function matcherFromSource( sourceConfig ) {
 	switch ( sourceConfig.source ) {
@@ -84,7 +84,7 @@ export function matcherFromSource( sourceConfig ) {
 			return query( sourceConfig.selector, subMatchers );
 		default:
 			// eslint-disable-next-line no-console
-			console.error( `Unkown source type "${ sourceConfig.source }"` );
+			console.error( `Unknown source type "${ sourceConfig.source }"` );
 	}
 }
 
@@ -98,7 +98,7 @@ export function matcherFromSource( sourceConfig ) {
  * @param {string} innerHTML         Block's raw content.
  * @param {Object} commentAttributes Block's comment attributes.
  *
- * @returns {*} Attribute value.
+ * @return {*} Attribute value.
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
@@ -128,7 +128,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
  * @param {string}  innerHTML  Raw block content.
  * @param {?Object} attributes Known block attributes (from delimiters).
  *
- * @returns {Object} All block attributes.
+ * @return {Object} All block attributes.
  */
 export function getBlockAttributes( blockType, innerHTML, attributes ) {
 	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
@@ -146,7 +146,7 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
  * @param {string}  innerHTML  Raw block content.
  * @param {?Object} attributes Known block attributes (from delimiters).
  *
- * @returns {Object} Block attributes.
+ * @return {Object} Block attributes.
  */
 export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attributes ) {
 	if ( ! blockType.deprecated ) {
@@ -178,13 +178,23 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param {?string} name       Block type name.
- * @param {string}  innerHTML  Raw block content.
- * @param {?Object} attributes Attributes obtained from block delimiters.
+ * @param {Object} blockNode Parsed block node.
  *
- * @returns {?Object} An initialized block object (if possible).
+ * @return {?Object} An initialized block object (if possible).
  */
-export function createBlockWithFallback( name, innerHTML, attributes ) {
+export function createBlockWithFallback( blockNode ) {
+	let {
+		blockName: name,
+		attrs: attributes,
+		innerBlocks = [],
+		innerHTML,
+	} = blockNode;
+
+	attributes = attributes || {};
+
+	// Trim content to avoid creation of intermediary freeform segments
+	innerHTML = innerHTML.trim();
+
 	// Use type from block content, otherwise find unknown handler.
 	name = name || getUnknownTypeHandlerName();
 
@@ -217,6 +227,9 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 		blockType = getBlockType( name );
 	}
 
+	// Coerce inner blocks from parse form to canonical form
+	innerBlocks = innerBlocks.map( createBlockWithFallback );
+
 	// Include in set only if type were determined.
 	if ( ! blockType || ( ! innerHTML && name === fallbackBlock ) ) {
 		return;
@@ -224,7 +237,8 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 
 	const block = createBlock(
 		name,
-		getBlockAttributes( blockType, innerHTML, attributes )
+		getBlockAttributes( blockType, innerHTML, attributes ),
+		innerBlocks
 	);
 
 	// Validate that the parsed block is valid, meaning that if we were to
@@ -260,12 +274,11 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
  *
  * @param {string} content The post content.
  *
- * @returns {Array} Block list.
+ * @return {Array} Block list.
  */
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
-		const { blockName, innerHTML, attrs } = blockNode;
-		const block = createBlockWithFallback( blockName, innerHTML.trim(), attrs );
+		const block = createBlockWithFallback( blockNode );
 		if ( block ) {
 			memo.push( block );
 		}
