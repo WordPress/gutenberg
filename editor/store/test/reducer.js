@@ -72,7 +72,7 @@ describe( 'state', () => {
 		it( 'should return history (empty edits, blocksByUid, blockOrder), dirty flag by default', () => {
 			const state = editor( undefined, {} );
 
-			expect( state.past ).toEqual( [ state.present ] );
+			expect( state.past ).toEqual( [] );
 			expect( state.future ).toEqual( [] );
 			expect( state.present.edits ).toEqual( {} );
 			expect( state.present.blocksByUid ).toEqual( {} );
@@ -849,7 +849,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.past ).toHaveLength( 2 );
+				expect( state.past ).toHaveLength( 1 );
 			} );
 
 			it( 'should not overwrite present history if updating same attributes', () => {
@@ -880,7 +880,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.past ).toHaveLength( 3 );
+				expect( state.past ).toHaveLength( 2 );
 			} );
 		} );
 	} );

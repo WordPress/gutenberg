@@ -14,50 +14,36 @@ import { includes, first, last, drop, dropRight } from 'lodash';
  * @return {Function} Enhanced reducer.
  */
 export default function withHistory( reducer, options = {} ) {
-	const initialPresent = reducer( undefined, {} );
-
 	const initialState = {
-		// Past already contains record of present since changes are buffered in present.
-		past: [ initialPresent ],
-		present: initialPresent,
+		past: [],
+		present: reducer( undefined, {} ),
 		future: [],
 	};
 
-	let lastAction;
+	let lastAction = null;
+	let shouldCreateUndoLevel = false;
+
+	const {
+		resetTypes = [],
+		shouldOverwriteState = () => false,
+	} = options;
 
 	return ( state = initialState, action ) => {
 		const { past, present, future } = state;
 		const previousAction = lastAction;
-		const {
-			resetTypes = [],
-			shouldOverwriteState = () => false,
-		} = options;
 
 		lastAction = action;
 
 		switch ( action.type ) {
 			case 'UNDO':
-				// If there are changes in buffer, push buffer to the future.
-				if ( last( past ) !== present ) {
-					return {
-						past,
-						present: last( past ),
-						future: [ present, ...future ],
-					};
-				}
-
 				// Can't undo if no past.
-				// If the present "buffer" is the same as the last record,
-				// There is no further past.
-				if ( past.length < 2 ) {
+				if ( ! past.length ) {
 					return state;
 				}
 
-				const newPast = dropRight( past );
-
 				return {
-					past: newPast,
-					present: last( newPast ),
+					past: dropRight( past ),
+					present: last( past ),
 					future: [ present, ...future ],
 				};
 			case 'REDO':
@@ -67,29 +53,21 @@ export default function withHistory( reducer, options = {} ) {
 				}
 
 				return {
-					past: [ ...past, first( future ) ],
+					past: [ ...past, present ],
 					present: first( future ),
 					future: drop( future ),
 				};
 
 			case 'CREATE_UNDO_LEVEL':
-				// Already has this level.
-				if ( last( past ) === present ) {
-					return state;
-				}
-
-				return {
-					past: [ ...past, present ],
-					present,
-					future: [],
-				};
+				shouldCreateUndoLevel = true;
+				return state;
 		}
 
 		const nextPresent = reducer( present, action );
 
 		if ( includes( resetTypes, action.type ) ) {
 			return {
-				past: [ nextPresent ],
+				past: [],
 				present: nextPresent,
 				future: [],
 			};
@@ -99,16 +77,18 @@ export default function withHistory( reducer, options = {} ) {
 			return state;
 		}
 
-		if ( shouldOverwriteState( action, previousAction ) ) {
-			return {
-				past,
-				present: nextPresent,
-				future,
-			};
+		let nextPast = [ ...past, present ];
+
+		shouldCreateUndoLevel = ! past.length || shouldCreateUndoLevel;
+
+		if ( ! shouldCreateUndoLevel && shouldOverwriteState( action, previousAction ) ) {
+			nextPast = past;
 		}
 
+		shouldCreateUndoLevel = false;
+
 		return {
-			past: [ ...past, present ],
+			past: nextPast,
 			present: nextPresent,
 			future: [],
 		};

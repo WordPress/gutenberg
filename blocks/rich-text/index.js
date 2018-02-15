@@ -146,7 +146,7 @@ export class RichText extends Component {
 			selectedNodeId: 0,
 		};
 
-		this.isEmpty = ! value || ! value.length || ( value.length === 1 && ! value[ 0 ] );
+		this.isEmpty = ! value || ! value.length;
 	}
 
 	/**

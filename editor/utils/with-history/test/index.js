@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import withHistory from '../';
@@ -30,12 +25,10 @@ describe( 'withHistory', () => {
 		const state = reducer( undefined, {} );
 
 		expect( state ).toEqual( {
-			past: [ { count: 0 } ],
+			past: [],
 			present: { count: 0 },
 			future: [],
 		} );
-
-		expect( last( state.past ) ).toBe( state.present );
 	} );
 
 	it( 'should track changes in present', () => {
@@ -50,19 +43,25 @@ describe( 'withHistory', () => {
 		} );
 	} );
 
-	it( 'should create undo level if buffer is available', () => {
+	it( 'should create undo level', () => {
 		let state;
 		state = reducer( undefined, {} );
 		state = reducer( state, { type: 'INCREMENT' } );
 		state = reducer( state, { type: 'CREATE_UNDO_LEVEL' } );
 
 		expect( state ).toEqual( {
-			past: [ { count: 0 }, { count: 1 } ],
+			past: [ { count: 0 } ],
 			present: { count: 1 },
 			future: [],
 		} );
 
-		expect( state ).toBe( reducer( state, { type: 'CREATE_UNDO_LEVEL' } ) );
+		state = reducer( state, { type: 'INCREMENT' } );
+
+		expect( state ).toEqual( {
+			past: [ { count: 0 }, { count: 1 } ],
+			present: { count: 2 },
+			future: [],
+		} );
 	} );
 
 	it( 'should perform undo of buffer', () => {
@@ -72,12 +71,11 @@ describe( 'withHistory', () => {
 		state = reducer( state, { type: 'UNDO' } );
 
 		expect( state ).toEqual( {
-			past: [ { count: 0 } ],
+			past: [],
 			present: { count: 0 },
 			future: [ { count: 1 } ],
 		} );
 
-		expect( last( state.past ) ).toBe( state.present );
 		expect( state ).toBe( reducer( state, { type: 'UNDO' } ) );
 	} );
 
@@ -89,12 +87,11 @@ describe( 'withHistory', () => {
 		state = reducer( state, { type: 'UNDO' } );
 
 		expect( state ).toEqual( {
-			past: [ { count: 0 } ],
+			past: [],
 			present: { count: 0 },
 			future: [ { count: 1 } ],
 		} );
 
-		expect( last( state.past ) ).toBe( state.present );
 		expect( state ).toBe( reducer( state, { type: 'UNDO' } ) );
 	} );
 
@@ -107,12 +104,11 @@ describe( 'withHistory', () => {
 		state = reducer( state, { type: 'REDO' } );
 
 		expect( state ).toEqual( {
-			past: [ { count: 0 }, { count: 1 } ],
+			past: [ { count: 0 } ],
 			present: { count: 1 },
 			future: [],
 		} );
 
-		expect( last( state.past ) ).toBe( state.present );
 		expect( state ).toBe( reducer( state, { type: 'REDO' } ) );
 	} );
 
@@ -124,7 +120,7 @@ describe( 'withHistory', () => {
 		state = reducer( state, { type: 'RESET_HISTORY' } );
 
 		expect( state ).toEqual( {
-			past: [ { count: 1 } ],
+			past: [],
 			present: { count: 1 },
 			future: [],
 		} );
