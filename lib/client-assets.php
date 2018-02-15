@@ -155,7 +155,6 @@ function gutenberg_register_scripts_and_styles() {
 		gutenberg_get_script_polyfill( array(
 			'\'Promise\' in window' => 'promise',
 			'\'fetch\' in window'   => 'fetch',
-			'\'WeakMap\' in window' => 'WeakMap',
 		) ),
 		'before'
 	);
