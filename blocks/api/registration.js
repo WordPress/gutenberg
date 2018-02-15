@@ -93,6 +93,15 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( blocks[ name ] ) {
+		console.error(
+			'Block "' + name + '" is already registered.'
+		);
+		return;
+	}
+
+	settings = applyFilters( 'blocks.registerBlockType', settings, name );
+
 	if ( ! settings || ! isFunction( settings.save ) ) {
 		console.error(
 			'The "save" property must be specified and must be a valid function.'
@@ -102,12 +111,6 @@ export function registerBlockType( name, settings ) {
 	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
 		console.error(
 			'The "edit" property must be a valid function.'
-		);
-		return;
-	}
-	if ( blocks[ name ] ) {
-		console.error(
-			'Block "' + name + '" is already registered.'
 		);
 		return;
 	}
@@ -144,8 +147,6 @@ export function registerBlockType( name, settings ) {
 	if ( ! settings.icon ) {
 		settings.icon = 'block-default';
 	}
-
-	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
 	return blocks[ name ] = settings;
 }
