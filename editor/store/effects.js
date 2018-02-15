@@ -292,9 +292,13 @@ export default {
 
 		dispatch( savePost() );
 	},
-	SETUP_EDITOR( action ) {
+	SETUP_EDITOR( action, store ) {
 		const { post, settings } = action;
 		const effects = [];
+
+		// Dispatch must occur immediately, as subsequent block parse filtering
+		// may rely on post properties.
+		store.dispatch( resetPost( post ) );
 
 		// Parse content as blocks
 		if ( post.content.raw ) {
@@ -310,10 +314,6 @@ export default {
 			} );
 			effects.push( resetBlocks( blocks ) );
 		}
-
-		// Resetting post should occur after blocks have been reset, since it's
-		// the post reset that restarts history (used in dirty detection).
-		effects.push( resetPost( post ) );
 
 		// Include auto draft title in edits while not flagging post as dirty
 		if ( post.status === 'auto-draft' ) {

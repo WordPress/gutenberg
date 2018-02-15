@@ -8,6 +8,7 @@ import { mapValues, omit } from 'lodash';
  * WordPress dependencies
  */
 import { autop } from '@wordpress/autop';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -93,19 +94,19 @@ export function matcherFromSource( sourceConfig ) {
  * commentAttributes returns the attribute value depending on its source
  * definition of the given attribute key.
  *
- * @param {string} attributeKey      Attribute key.
- * @param {Object} attributeSchema   Attribute's schema.
+ * @param {string} key               Attribute key.
+ * @param {Object} schema            Attribute's schema.
  * @param {string} innerHTML         Block's raw content.
  * @param {Object} commentAttributes Block's comment attributes.
  *
  * @return {*} Attribute value.
  */
-export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
+export function getBlockAttribute( key, schema, innerHTML, commentAttributes ) {
 	let value;
-	switch ( attributeSchema.source ) {
+	switch ( schema.source ) {
 		// undefined source means that it's an attribute serialized to the block's "comment"
 		case undefined:
-			value = commentAttributes ? commentAttributes[ attributeKey ] : undefined;
+			value = commentAttributes ? commentAttributes[ key ] : undefined;
 			break;
 		case 'attribute':
 		case 'property':
@@ -114,11 +115,19 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'children':
 		case 'node':
 		case 'query':
-			value = hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+			value = hpqParse( innerHTML, matcherFromSource( schema ) );
 			break;
 	}
 
-	return value === undefined ? attributeSchema.default : asType( value, attributeSchema.type );
+	value = applyFilters( 'blocks.getBlockAttribute.source', value, schema, innerHTML, commentAttributes );
+
+	if ( value === undefined ) {
+		value = schema.default;
+	} else {
+		value = asType( value, schema.type );
+	}
+
+	return applyFilters( 'blocks.getBlockAttribute', value, schema, innerHTML, commentAttributes );
 }
 
 /**

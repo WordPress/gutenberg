@@ -1327,50 +1327,6 @@ describe( 'selectors', () => {
 				} ],
 			} );
 		} );
-
-		it( 'should merge meta attributes for the block', () => {
-			registerBlockType( 'core/meta-block', {
-				save: ( props ) => props.attributes.text,
-				category: 'common',
-				title: 'test block',
-				attributes: {
-					foo: {
-						type: 'string',
-						source: 'meta',
-						meta: 'foo',
-					},
-				},
-			} );
-
-			const state = {
-				currentPost: {
-					meta: {
-						foo: 'bar',
-					},
-				},
-				editor: {
-					present: {
-						blocksByUid: {
-							123: { uid: 123, name: 'core/meta-block', attributes: {} },
-						},
-						blockOrder: {
-							'': [ 123 ],
-							123: [],
-						},
-						edits: {},
-					},
-				},
-			};
-
-			expect( getBlock( state, 123 ) ).toEqual( {
-				uid: 123,
-				name: 'core/meta-block',
-				attributes: {
-					foo: 'bar',
-				},
-				innerBlocks: [],
-			} );
-		} );
 	} );
 
 	describe( 'getBlocks', () => {

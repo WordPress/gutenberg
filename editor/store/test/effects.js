@@ -446,11 +446,10 @@ describe( 'effects', () => {
 				status: 'draft',
 			};
 
-			const result = handler( { post, settings: {} } );
+			const result = handler( { post, settings: {} }, store );
 
-			expect( result ).toEqual( [
-				resetPost( post ),
-			] );
+			expect( dispatch ).toHaveBeenCalledWith( resetPost( post ) );
+			expect( result ).toEqual( [] );
 		} );
 
 		it( 'should return block reset with non-empty content', () => {
@@ -466,10 +465,10 @@ describe( 'effects', () => {
 				status: 'draft',
 			};
 
-			const result = handler( { post, settings: {} } );
+			const result = handler( { post, settings: {} }, store );
 
-			expect( result ).toHaveLength( 2 );
-			expect( result ).toContainEqual( resetPost( post ) );
+			expect( dispatch ).toHaveBeenCalledWith( resetPost( post ) );
+			expect( result ).toHaveLength( 1 );
 			expect( result.some( ( { blocks } ) => {
 				return blocks && blocks[ 0 ].name === 'core/test-block';
 			} ) ).toBe( true );
@@ -487,10 +486,10 @@ describe( 'effects', () => {
 				status: 'auto-draft',
 			};
 
-			const result = handler( { post, settings: {} } );
+			const result = handler( { post, settings: {} }, store );
 
+			expect( dispatch ).toHaveBeenCalledWith( resetPost( post ) );
 			expect( result ).toEqual( [
-				resetPost( post ),
 				setupNewPost( { title: 'A History of Pork' } ),
 			] );
 		} );
