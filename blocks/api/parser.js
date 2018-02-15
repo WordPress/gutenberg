@@ -94,19 +94,19 @@ export function matcherFromSource( sourceConfig ) {
  * commentAttributes returns the attribute value depending on its source
  * definition of the given attribute key.
  *
- * @param {string} key               Attribute key.
- * @param {Object} schema            Attribute's schema.
+ * @param {string} attributeKey      Attribute key.
+ * @param {Object} attributeSchema   Attribute's schema.
  * @param {string} innerHTML         Block's raw content.
  * @param {Object} commentAttributes Block's comment attributes.
  *
  * @return {*} Attribute value.
  */
-export function getBlockAttribute( key, schema, innerHTML, commentAttributes ) {
+export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
-	switch ( schema.source ) {
+	switch ( attributeSchema.source ) {
 		// undefined source means that it's an attribute serialized to the block's "comment"
 		case undefined:
-			value = commentAttributes ? commentAttributes[ key ] : undefined;
+			value = commentAttributes ? commentAttributes[ attributeKey ] : undefined;
 			break;
 		case 'attribute':
 		case 'property':
@@ -115,19 +115,19 @@ export function getBlockAttribute( key, schema, innerHTML, commentAttributes ) {
 		case 'children':
 		case 'node':
 		case 'query':
-			value = hpqParse( innerHTML, matcherFromSource( schema ) );
+			value = hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
 			break;
 	}
 
-	value = applyFilters( 'blocks.getBlockAttribute.source', value, schema, innerHTML, commentAttributes );
+	value = applyFilters( 'blocks.getBlockAttribute.source', value, attributeSchema, innerHTML, commentAttributes );
 
 	if ( value === undefined ) {
-		value = schema.default;
+		value = attributeSchema.default;
 	} else {
-		value = asType( value, schema.type );
+		value = asType( value, attributeSchema.type );
 	}
 
-	return applyFilters( 'blocks.getBlockAttribute', value, schema, innerHTML, commentAttributes );
+	return applyFilters( 'blocks.getBlockAttribute', value, attributeSchema, innerHTML, commentAttributes );
 }
 
 /**
