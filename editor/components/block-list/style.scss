@@ -1,5 +1,9 @@
-.edit-post-visual-editor .editor-block-list__block {
+.editor-block-list__layout .editor-default-block-appender,
+.editor-block-list__layout .editor-block-list__block {
 	margin-bottom: $block-spacing;
+}
+
+.editor-block-list__layout .editor-block-list__block {
 	position: relative;
 	padding: $block-padding;
 

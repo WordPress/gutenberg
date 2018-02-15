@@ -1,8 +1,6 @@
 $empty-paragraph-height: $text-editor-font-size * 4;
 
 .editor-default-block-appender {
-	margin-bottom: $block-spacing;
-
 	.editor-default-block-appender__content {
 		height: $empty-paragraph-height;
 		color: $dark-gray-300;
