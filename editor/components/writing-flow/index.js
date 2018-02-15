@@ -221,15 +221,15 @@ class WritingFlow extends Component {
 		}
 
 		if ( isNav && isShift && hasMultiSelection ) {
-			// Shift key is down and existing block selection
+			// Shift key is down and existing block multi-selection
 			event.preventDefault();
 			this.expandSelection( selectionStart, isReverse );
 		} else if ( isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
-			// Shift key is down, but no existing block selection
+			// Shift key is down, but no existing block multi-selection
 			event.preventDefault();
 			this.expandSelection( selectedBlockUID, isReverse );
 		} else if ( isNav && hasMultiSelection ) {
-			// Moving from multi block selection to single block selection
+			// Moving from block multi-selection to single block selection
 			event.preventDefault();
 			this.moveSelection( isReverse );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
