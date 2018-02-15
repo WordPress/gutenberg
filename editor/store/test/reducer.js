@@ -833,6 +833,8 @@ describe( 'state', () => {
 					} ],
 				} );
 
+				expect( state.past ).toHaveLength( 1 );
+
 				state = editor( state, {
 					type: 'UPDATE_BLOCK_ATTRIBUTES',
 					uid: 'kumquat',
@@ -849,7 +851,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.past ).toHaveLength( 1 );
+				expect( state.past ).toHaveLength( 2 );
 			} );
 
 			it( 'should not overwrite present history if updating same attributes', () => {
@@ -863,6 +865,8 @@ describe( 'state', () => {
 						innerBlocks: [],
 					} ],
 				} );
+
+				expect( state.past ).toHaveLength( 1 );
 
 				state = editor( state, {
 					type: 'UPDATE_BLOCK_ATTRIBUTES',
@@ -880,7 +884,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.past ).toHaveLength( 2 );
+				expect( state.past ).toHaveLength( 3 );
 			} );
 		} );
 	} );
