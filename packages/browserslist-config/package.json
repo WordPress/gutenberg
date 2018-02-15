@@ -22,7 +22,7 @@
 		"node": ">=8"
 	},
 	"devDependencies": {
-		"browserslist": "^3.0.0"
+		"browserslist": "^3.1.0"
 	},
 	"publishConfig": {
 		"access": "public"
