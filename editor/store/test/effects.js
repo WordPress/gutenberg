@@ -33,6 +33,7 @@ import {
 	convertBlockToStatic,
 	convertBlockToReusable,
 	selectBlock,
+	fetchTaxonomies,
 } from '../../store/actions';
 import reducer from '../reducer';
 import effects from '../effects';
@@ -869,6 +870,63 @@ describe( 'effects', () => {
 						[ createBlock( 'core/block', { ref: expect.any( Number ) } ) ]
 					)
 				);
+			} );
+		} );
+
+		describe( '.FETCH_TAXONOMIES', () => {
+			const handler = effects.FETCH_TAXONOMIES;
+
+			it( 'should get the taxonomies', () => {
+				const promise = Promise.resolve( {
+					data: {
+						category: {
+							name: 'Category',
+							slug: 'category',
+							rest_base: 'category',
+						},
+						post_tag: {
+							name: 'Post tag',
+							slug: 'post_tags',
+							rest_base: 'tags',
+						},
+					} } );
+
+				set( global, 'wp.api.collections.Taxonomies', class {
+					fetch() {
+						return promise;
+					}
+				} );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => {}, dispatch };
+
+				handler( fetchTaxonomies(), store );
+
+				return promise.then( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMIES_SUCCESS',
+						taxonomies: {
+							category: {
+								name: 'Category',
+								slug: 'category',
+								rest_base: 'category',
+							},
+							post_tag: {
+								name: 'Post tag',
+								slug: 'post_tags',
+								rest_base: 'tags',
+							},
+						},
+					} );
+					expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMY_TERMS',
+						taxonomy: 'category',
+					} );
+					expect( dispatch.mock.calls[ 2 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMY_TERMS',
+						taxonomy: 'tags',
+					} );
+				} );
 			} );
 		} );
 	} );
