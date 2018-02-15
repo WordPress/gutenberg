@@ -609,7 +609,8 @@ export class RichText extends Component {
 	 * @param {number} keyCode The key code that has been pressed on the keyboard.
 	 */
 	onKeyUp( { keyCode } ) {
-		// See https://bugs.chromium.org/p/chromium/issues/detail?id=725890
+		// The input event does not fire when the whole field is selected and
+		// BACKSPACE is pressed.
 		if ( keyCode === BACKSPACE ) {
 			this.onChange();
 		}
