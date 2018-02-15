@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { deprecated } from '@wordpress/utils';
+
+/**
  * Internal dependencies
  */
 import RichText from './';
@@ -6,8 +11,7 @@ import RichText from './';
 class Editable extends RichText {
 	constructor() {
 		super( ...arguments );
-		// eslint-disable-next-line no-console
-		console.warn( 'Editable is deprecated, use wp.blocks.RichText instead.' );
+		deprecated( 'Editable', '2.5', 'wp.blocks.RichText', 'Gutenberg' );
 	}
 }
 

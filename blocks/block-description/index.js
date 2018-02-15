@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { deprecated } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
@@ -10,8 +11,7 @@ import './style.scss';
 class BlockDescription extends Component {
 	constructor() {
 		super( ...arguments );
-		// eslint-disable-next-line no-console
-		console.warn( 'The wp.blocks.BlockDescription component is deprecated. Use the "description" block property instead.' );
+		deprecated( 'The wp.blocks.BlockDescription component', '2.4', 'the "description" block property', 'Gutenberg' );
 	}
 
 	render() {

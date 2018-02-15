@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { Button, Tooltip } from '@wordpress/components';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -11,8 +12,7 @@ import MediaUpload from './';
 
 class MediaUploadButton extends Component {
 	componentDidMount() {
-		// eslint-disable-next-line no-console
-		console.warn( 'MediaUploadButton is deprecated use wp.blocks.MediaUpload instead' );
+		deprecated( 'MediaUploadButton', '2.4', 'wp.blocks.MediaUpload', 'Gutenberg' );
 	}
 
 	render() {
