@@ -540,33 +540,6 @@ export function blockSelection( state = {
 	return state;
 }
 
-/**
- * Reducer returning hovered block state.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function hoveredBlock( state = null, action ) {
-	switch ( action.type ) {
-		case 'TOGGLE_BLOCK_HOVERED':
-			return action.hovered ? action.uid : null;
-		case 'SELECT_BLOCK':
-		case 'START_TYPING':
-		case 'MULTI_SELECT':
-			return null;
-		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state ) === -1 ) {
-				return state;
-			}
-
-			return action.blocks[ 0 ].uid;
-	}
-
-	return state;
-}
-
 export function blocksMode( state = {}, action ) {
 	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
 		const { uid } = action;
@@ -880,7 +853,6 @@ export default optimist( combineReducers( {
 	currentPost,
 	isTyping,
 	blockSelection,
-	hoveredBlock,
 	blocksMode,
 	isInsertionPointVisible,
 	preferences,

@@ -60,7 +60,6 @@ import {
 	getEditedPostAttribute,
 	getNextBlockUid,
 	getPreviousBlockUid,
-	isBlockHovered,
 	isBlockMultiSelected,
 	isBlockSelected,
 	isFirstMultiSelectedBlock,
@@ -80,6 +79,7 @@ export class BlockListBlock extends Component {
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
+		this.onMouseLeave = this.onMouseLeave.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
@@ -99,6 +99,7 @@ export class BlockListBlock extends Component {
 
 		this.state = {
 			error: null,
+			isHovered: false,
 			isSelectionCollapsed: true,
 		};
 	}
@@ -231,13 +232,25 @@ export class BlockListBlock extends Component {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
 	 */
 	maybeHover() {
-		const { isHovered, isMultiSelected, onHover } = this.props;
+		const { isMultiSelected } = this.props;
+		const { isHovered } = this.state;
 
 		if ( isHovered || isMultiSelected || this.hadTouchStart ) {
 			return;
 		}
 
-		onHover();
+		this.setState( { isHovered: true } );
+	}
+
+	/**
+	 * Sets the block state as unhovered if currently hovering. There are cases
+	 * where mouseleave may occur but the block is not hovered (multi-select),
+	 * so to avoid unnecesary renders, the state is only set if hovered.
+	 */
+	onMouseLeave() {
+		if ( this.state.isHovered ) {
+			this.setState( { isHovered: false } );
+		}
 	}
 
 	maybeStartTyping() {
@@ -435,11 +448,11 @@ export class BlockListBlock extends Component {
 			rootUID,
 			layout,
 			renderBlockMenu,
-			isHovered,
 			isSelected,
 			isMultiSelected,
 			isFirstMultiSelected,
 		} = this.props;
+		const isHovered = this.state.isHovered && ! this.props.isMultiSelecting;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -468,7 +481,7 @@ export class BlockListBlock extends Component {
 			'is-reusable': isReusableBlock( blockType ),
 		} );
 
-		const { onMouseLeave, onReplace } = this.props;
+		const { onReplace } = this.props;
 
 		// Determine whether the block has props to apply to the wrapper.
 		let wrapperProps;
@@ -489,7 +502,7 @@ export class BlockListBlock extends Component {
 			<IgnoreNestedEvents
 				ref={ this.setBlockListRef }
 				onMouseOver={ this.maybeHover }
-				onMouseLeave={ onMouseLeave }
+				onMouseLeave={ this.onMouseLeave }
 				className={ wrapperClassName }
 				data-type={ block.name }
 				onTouchStart={ this.onTouchStart }
@@ -594,7 +607,7 @@ const mapStateToProps = ( state, { uid, rootUID } ) => {
 		block: getBlock( state, uid ),
 		isMultiSelected: isBlockMultiSelected( state, uid ),
 		isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
-		isHovered: isBlockHovered( state, uid ) && ! isMultiSelecting( state ),
+		isMultiSelecting: isMultiSelecting( state ),
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 		isTyping: isSelected && isTyping( state ),
@@ -626,21 +639,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 
 	onStopTyping() {
 		dispatch( stopTyping() );
-	},
-
-	onHover() {
-		dispatch( {
-			type: 'TOGGLE_BLOCK_HOVERED',
-			hovered: true,
-			uid: ownProps.uid,
-		} );
-	},
-	onMouseLeave() {
-		dispatch( {
-			type: 'TOGGLE_BLOCK_HOVERED',
-			hovered: false,
-			uid: ownProps.uid,
-		} );
 	},
 
 	onInsertBlocks( blocks, index ) {
