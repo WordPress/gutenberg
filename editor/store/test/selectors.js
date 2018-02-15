@@ -79,6 +79,8 @@ const {
 	getRecentInserterItems,
 	getFrequentInserterItems,
 	POST_UPDATE_TRANSACTION_ID,
+	getTaxonomyTerms,
+	getTaxonomyTermsFetchStatus,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2792,6 +2794,101 @@ describe( 'selectors', () => {
 			} );
 
 			expect( isPublishing ).toBe( true );
+		} );
+	} );
+
+	describe( 'getTaxonomyTerms', () => {
+		it( 'should return an empty array when the terms are undefined', () => {
+			const taxonomyTerms = getTaxonomyTerms( {}, 'category' );
+
+			expect( taxonomyTerms ).toEqual( [] );
+		} );
+
+		it( 'should return the terms for a taxonomy when multiple taxonomies are available', () => {
+			const taxonomyTerms = getTaxonomyTerms( {
+				taxonomyTerms: {
+					data: {
+						category: [
+							{
+								id: 1,
+								name: 'Uncategorized',
+								slug: 'uncategorized',
+								taxonomy: 'category',
+							},
+							{
+								id: 5,
+								name: 'SEO',
+								slug: 'seo',
+								taxonomy: 'category',
+							},
+						],
+						post_tag: [
+							{
+								id: 2,
+								name: 'You\'re it',
+								slug: 'youre-it',
+								taxonomy: 'post_tag',
+							},
+						],
+					},
+				},
+			}, 'category' );
+
+			expect( taxonomyTerms ).toEqual(
+				[
+					{
+						id: 1,
+						name: 'Uncategorized',
+						slug: 'uncategorized',
+						taxonomy: 'category',
+					},
+					{
+						id: 5,
+						name: 'SEO',
+						slug: 'seo',
+						taxonomy: 'category',
+					},
+				],
+			);
+		} );
+	} );
+
+	describe( 'getTaxonomyTermsFetchStatus', () => {
+		it( 'should return null when the term is undefined', () => {
+			const fetchStatus = getTaxonomyTermsFetchStatus( {
+				taxonomyTerms: {
+					fetchStatus: {},
+				},
+			}, 'category' );
+
+			expect( fetchStatus ).toBeNull();
+		} );
+
+		it( 'should return the terms for a taxonomy when multiple taxonomies are available', () => {
+			const fetchStatus = getTaxonomyTermsFetchStatus( {
+				taxonomyTerms: {
+					fetchStatus: {
+						category: {
+							requesting: false,
+							successful: true,
+							error: null,
+						},
+						post_tag: {
+							requesting: false,
+							successful: true,
+							error: null,
+						},
+					},
+				},
+			}, 'category' );
+
+			expect( fetchStatus ).toEqual(
+				{
+					requesting: false,
+					successful: true,
+					error: null,
+				},
+			);
 		} );
 	} );
 } );

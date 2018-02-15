@@ -1342,3 +1342,27 @@ export function isPublishingPost( state ) {
 	// considered published
 	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
 }
+
+/**
+ * Returns the Taxonomy Terms data if it exists.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} taxonomy Unique identifier of a Taxonomy.
+ *
+ * @return {Array} Taxonomy Terms data.
+ */
+export function getTaxonomyTerms( state, taxonomy ) {
+	return get( state, `taxonomyTerms.data.${ taxonomy }`, [] );
+}
+
+/**
+ * Returns the Taxonomy Terms fetch status.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} taxonomy Unique identifier of a Taxonomy.
+ *
+ * @return {Object} Taxonomy Terms fetch status.
+ */
+export function getTaxonomyTermsFetchStatus( state, taxonomy ) {
+	return state.taxonomyTerms.fetchStatus[ taxonomy ] || null;
+}
