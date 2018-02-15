@@ -4,7 +4,7 @@
 import { withAPIData, Spinner, SandBox } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function ShortcodePreview( { response, setFocus } ) {
+function ShortcodePreview( { response } ) {
 	if ( response.isLoading || ! response.data ) {
 		return (
 			<div key="loading" className="wp-block-embed is-loading">
@@ -21,7 +21,6 @@ function ShortcodePreview( { response, setFocus } ) {
 				html={ html }
 				title="Preview"
 				type={ response.data.type }
-				onFocus={ setFocus }
 			/>
 		</figure>
 	);
