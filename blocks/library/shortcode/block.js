@@ -30,6 +30,7 @@ export class Shortcode extends Component {
 		const { preview } = this.state;
 		const { instanceId, postId, setAttributes, attributes, focus, setFocus } = this.props;
 		const inputId = `blocks-shortcode-input-${ instanceId }`;
+		const shortcodeContent = ( attributes.text || '' ).trim();
 
 		const controls = focus && (
 			<BlockControls key="controls">
@@ -41,49 +42,38 @@ export class Shortcode extends Component {
 					</button>
 					<button
 						className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
-						onClick={ () => this.setState( { preview: true } ) }>
+						onClick={ () => { shortcodeContent.length && this.setState( { preview: true } ) } }>
 						<span>{ __( 'Preview' ) }</span>
 					</button>
 				</div>
 			</BlockControls>
 		);
-
-		if ( ! preview ) {
+		
+		if ( preview ) {
 			return [
 				controls,
-				<div className="wp-block-shortcode" key="placeholder">
-					<label htmlFor={ inputId }>
-						<Dashicon icon="editor-code" />
-						{ __( 'Shortcode' ) }
-					</label>
-					<PlainText
-						id={ inputId }
-						value={ attributes.text }
-						placeholder={ __( 'Write shortcode here…' ) }
-						onChange={ ( text ) => setAttributes( { text } ) }
-					/>
-				</div>,
-			];
-		}
-
-		const shortcodeContent = ( !! attributes.text ) ? attributes.text.trim() : '';
-
-		if ( ! shortcodeContent.length ) {
-			return [
-				controls,
-				<div key="empty" className="wp-block-embed is-loading">
-					{ __( 'Enter something to preview' ) }
-				</div>,
+				<ShortcodePreview key="preview"
+					shortcode={ shortcodeContent }
+					postId={ postId }
+					setFocus={ setFocus }
+				/>,
 			];
 		}
 
 		return [
 			controls,
-			<ShortcodePreview key="preview"
-				shortcode={ shortcodeContent }
-				postId={ postId }
-				setFocus={ setFocus }
-			/>,
+			<div className="wp-block-shortcode" key="placeholder">
+				<label htmlFor={ inputId }>
+					<Dashicon icon="editor-code" />
+					{ __( 'Shortcode' ) }
+				</label>
+				<PlainText
+					id={ inputId }
+					value={ attributes.text }
+					placeholder={ __( 'Write shortcode here…' ) }
+					onChange={ ( text ) => setAttributes( { text } ) }
+				/>
+			</div>,
 		];
 	}
 }
