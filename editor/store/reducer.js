@@ -115,13 +115,11 @@ export const editor = flow( [
 	combineReducers,
 
 	// Track undo history, starting at editor initialization of blocks. Assumes
-	// that block resetting always occurs in initialization, and that it's the
-	// last action before resetting history.
-	partialRight( withHistory, { resetTypes: [ 'RESET_BLOCKS' ] } ),
+	// one of either block resetting, new post setup occurs in initialization.
+	partialRight( withHistory, { resetTypes: [ 'SETUP_NEW_POST', 'RESET_BLOCKS' ] } ),
 
-	// Track whether changes exist, resetting at initialization of blocks and
-	// at each post save.
-	partialRight( withChangeDetection, { resetTypes: [ 'RESET_POST', 'RESET_BLOCKS' ] } ),
+	// Track whether changes exist, resetting at initialization and each save.
+	partialRight( withChangeDetection, { resetTypes: [ 'RESET_POST', 'SETUP_NEW_POST', 'RESET_BLOCKS' ] } ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
