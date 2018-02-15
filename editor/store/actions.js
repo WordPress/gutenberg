@@ -589,7 +589,7 @@ export function fetchTaxonomies( postType ) {
 /**
  * Returns an action object used to fetch a Taxonomy's Terms from the REST API into the store.
  *
- * @param taxonomy {string} The unique identifier of the taxonomy.
+ * @param {string} taxonomy The unique identifier of the taxonomy.
  *
  * @return {Object} Action object.
  */
