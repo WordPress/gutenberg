@@ -106,6 +106,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			doServerSideRender( event ) {
 				if ( event ) {
 					event.preventDefault();
+				} else {
+					this.setState( { fromPaste: true } );
 				}
 				const { url } = this.props.attributes;
 				const { setAttributes } = this.props;
@@ -123,9 +125,14 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 							return;
 						}
 						response.json().then( ( obj ) => {
-							const { html, type, provider_name: providerName } = obj;
+							const { html, type, title: urlTitle, provider_name: providerName } = obj;
 							const providerNameSlug = kebabCase( toLower( providerName ) );
 
+							// invalid url, and this didn't come from submitting the form
+							if ( 'oembed_invalid_url' === code && ! event ) {
+								this.props.onReplace( createBlock( 'core/paragraph', { content: ( <a href={ url }>{ url }</a> ) } ) );
+								return;
+							}
 							if ( html ) {
 								this.setState( { html, type, providerNameSlug } );
 								setAttributes( { type, providerNameSlug } );
@@ -142,7 +149,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			}
 
 			render() {
-				const { html, type, error, fetching } = this.state;
+				const { html, type, error, fetching, fromPaste } = this.state;
 				const { align, url, caption } = this.props.attributes;
 				const { setAttributes, isSelected } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -155,6 +162,12 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 						/>
 					</BlockControls>
 				);
+
+				if ( fetching && fromPaste ) {
+					return [
+						<p>{ url }</p>
+					];
+				}
 
 				if ( fetching ) {
 					return [
