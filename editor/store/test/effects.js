@@ -46,6 +46,15 @@ jest.mock( 'uuid/v4', () => {
 describe( 'effects', () => {
 	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
 
+	let mockState;
+	const dispatch = jest.fn();
+	const store = { getState: () => mockState, dispatch };
+
+	beforeEach( () => {
+		mockState = {};
+		dispatch.mockReset();
+	} );
+
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;
 		const defaultGetBlock = selectors.getBlock;
@@ -71,9 +80,7 @@ describe( 'effects', () => {
 				return blockA.uid === uid ? blockA : blockB;
 			};
 
-			const dispatch = jest.fn();
-			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken' ) );
@@ -103,9 +110,7 @@ describe( 'effects', () => {
 			selectors.getBlock = ( state, uid ) => {
 				return blockA.uid === uid ? blockA : blockB;
 			};
-			const dispatch = jest.fn();
-			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken', -1 ) );
@@ -141,9 +146,7 @@ describe( 'effects', () => {
 			selectors.getBlock = ( state, uid ) => {
 				return blockA.uid === uid ? blockA : blockB;
 			};
-			const dispatch = jest.fn();
-			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), store );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -198,9 +201,7 @@ describe( 'effects', () => {
 			selectors.getBlock = ( state, uid ) => {
 				return blockA.uid === uid ? blockA : blockB;
 			};
-			const dispatch = jest.fn();
-			const getState = () => ( {} );
-			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			// expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
@@ -214,8 +215,6 @@ describe( 'effects', () => {
 
 	describe( '.AUTOSAVE', () => {
 		const handler = effects.AUTOSAVE;
-		const dispatch = jest.fn();
-		const store = { getState: () => {}, dispatch };
 
 		beforeAll( () => {
 			selectors.isEditedPostSaveable = jest.spyOn( selectors, 'isEditedPostSaveable' );
@@ -225,7 +224,6 @@ describe( 'effects', () => {
 		} );
 
 		beforeEach( () => {
-			dispatch.mockReset();
 			selectors.isEditedPostSaveable.mockReset();
 			selectors.isEditedPostDirty.mockReset();
 			selectors.isCurrentPostPublished.mockReset();
@@ -341,10 +339,9 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should dispatch meta box updates on success for dirty meta boxes', () => {
-			const dispatch = jest.fn();
-			const store = { getState: () => ( {
+			mockState = {
 				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
+			};
 
 			const post = getDraftPost();
 
@@ -355,10 +352,9 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
-			const dispatch = jest.fn();
-			const store = { getState: () => ( {
+			mockState = {
 				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
+			};
 
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
@@ -379,10 +375,9 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
-			const dispatch = jest.fn();
-			const store = { getState: () => ( {
+			mockState = {
 				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
+			};
 
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
@@ -407,10 +402,9 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should dispatch notices when just updating a published post again', () => {
-			const dispatch = jest.fn();
-			const store = { getState: () => ( {
+			mockState = {
 				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
+			};
 
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
@@ -545,9 +539,6 @@ describe( 'effects', () => {
 					}
 				} );
 
-				const dispatch = jest.fn();
-				const store = { getState: () => {}, dispatch };
-
 				handler( fetchReusableBlocks(), store );
 
 				return promise.then( () => {
@@ -587,9 +578,6 @@ describe( 'effects', () => {
 					}
 				} );
 
-				const dispatch = jest.fn();
-				const store = { getState: () => {}, dispatch };
-
 				handler( fetchReusableBlocks( id ), store );
 
 				expect( modelAttributes ).toEqual( { id } );
@@ -619,9 +607,6 @@ describe( 'effects', () => {
 						return promise;
 					}
 				} );
-
-				const dispatch = jest.fn();
-				const store = { getState: () => {}, dispatch };
 
 				handler( fetchReusableBlocks(), store );
 
@@ -660,10 +645,7 @@ describe( 'effects', () => {
 
 				const initialState = reducer( undefined, {} );
 				const action = updateReusableBlock( reusableBlock.id, reusableBlock );
-				const state = reducer( initialState, action );
-
-				const dispatch = jest.fn();
-				const store = { getState: () => state, dispatch };
+				mockState = reducer( initialState, action );
 
 				handler( saveReusableBlock( reusableBlock.id ), store );
 
@@ -695,10 +677,7 @@ describe( 'effects', () => {
 
 				const initialState = reducer( undefined, {} );
 				const action = updateReusableBlock( reusableBlock.id, reusableBlock );
-				const state = reducer( initialState, action );
-
-				const dispatch = jest.fn();
-				const store = { getState: () => state, dispatch };
+				mockState = reducer( initialState, action );
 
 				handler( saveReusableBlock( reusableBlock.id ), store );
 
@@ -738,10 +717,7 @@ describe( 'effects', () => {
 					resetBlocks( [ associatedBlock ] ),
 					updateReusableBlock( id, {} ),
 				];
-				const state = actions.reduce( reducer, undefined );
-
-				const dispatch = jest.fn();
-				const store = { getState: () => state, dispatch };
+				mockState = actions.reduce( reducer, undefined );
 
 				handler( deleteReusableBlock( id ), store );
 
@@ -770,10 +746,7 @@ describe( 'effects', () => {
 					}
 				} );
 
-				const state = reducer( undefined, updateReusableBlock( 123, {} ) );
-
-				const dispatch = jest.fn();
-				const store = { getState: () => state, dispatch };
+				mockState = reducer( undefined, updateReusableBlock( 123, {} ) );
 
 				handler( deleteReusableBlock( 123 ), store );
 
@@ -792,10 +765,7 @@ describe( 'effects', () => {
 					isTemporary: true,
 				};
 
-				const state = reducer( undefined, updateReusableBlock( -123, reusableBlock ) );
-
-				const dispatch = jest.fn();
-				const store = { getState: () => state, dispatch };
+				mockState = reducer( undefined, updateReusableBlock( -123, reusableBlock ) );
 
 				handler( deleteReusableBlock( -123 ), store );
 
@@ -819,10 +789,7 @@ describe( 'effects', () => {
 					updateReusableBlock( reusableBlock.id, reusableBlock ),
 				];
 				const initialState = reducer( undefined, {} );
-				const state = reduce( actions, reducer, initialState );
-
-				const dispatch = jest.fn();
-				const store = { getState: () => state, dispatch };
+				mockState = reduce( actions, reducer, initialState );
 
 				handler( convertBlockToStatic( staticBlock.uid ), store );
 
@@ -844,10 +811,7 @@ describe( 'effects', () => {
 				} );
 
 				const initialState = reducer( undefined, {} );
-				const state = reducer( initialState, resetBlocks( [ staticBlock ] ) );
-
-				const dispatch = jest.fn();
-				const store = { getState: () => state, dispatch };
+				mockState = reducer( initialState, resetBlocks( [ staticBlock ] ) );
 
 				handler( convertBlockToReusable( staticBlock.uid ), store );
 
