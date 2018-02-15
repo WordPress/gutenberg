@@ -300,6 +300,13 @@ export default {
 		// may rely on post properties.
 		store.dispatch( resetPost( post ) );
 
+		// Include auto draft title in edits while not flagging post as dirty
+		if ( post.status === 'auto-draft' ) {
+			effects.push( setupNewPost( {
+				title: post.title.raw,
+			} ) );
+		}
+
 		// Parse content as blocks
 		if ( post.content.raw ) {
 			effects.push( resetBlocks( parse( post.content.raw ) ) );
@@ -313,13 +320,6 @@ export default {
 				return block;
 			} );
 			effects.push( resetBlocks( blocks ) );
-		}
-
-		// Include auto draft title in edits while not flagging post as dirty
-		if ( post.status === 'auto-draft' ) {
-			effects.push( setupNewPost( {
-				title: post.title.raw,
-			} ) );
 		}
 
 		return effects;
