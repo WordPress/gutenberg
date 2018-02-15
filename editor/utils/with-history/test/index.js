@@ -5,23 +5,11 @@ import withHistory from '../';
 
 describe( 'withHistory', () => {
 	const counter = ( state = { count: 0 }, { type } ) => {
-		if ( type === 'INCREMENT' ) {
-			return { count: state.count + 1 };
-		}
-
-		if ( type === 'RESET' ) {
-			return { count: 0 };
-		}
-
-		return state;
+		return type === 'INCREMENT' ? { count: state.count + 1 } : state;
 	};
 
-	const reducer = withHistory( counter, {
-		shouldOverwriteState: ( { type } ) => type === 'INCREMENT',
-		resetTypes: [ 'RESET_HISTORY' ],
-	} );
-
 	it( 'should return a new reducer', () => {
+		const reducer = withHistory( counter );
 		const state = reducer( undefined, {} );
 
 		expect( state ).toEqual( {
@@ -32,6 +20,8 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should track changes in present', () => {
+		const reducer = withHistory( counter );
+
 		let state;
 		state = reducer( undefined, {} );
 		state = reducer( state, { type: 'INCREMENT' } );
@@ -44,10 +34,12 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should create undo level', () => {
+		const reducer = withHistory( counter );
+
 		let state;
 		state = reducer( undefined, {} );
 		state = reducer( state, { type: 'INCREMENT' } );
-		state = reducer( state, { type: 'CREATE_UNDO_LEVEL' } );
+		// state = reducer( state, { type: 'CREATE_UNDO_LEVEL' } );
 
 		expect( state ).toEqual( {
 			past: [ { count: 0 } ],
@@ -64,26 +56,12 @@ describe( 'withHistory', () => {
 		} );
 	} );
 
-	it( 'should perform undo of buffer', () => {
+	it( 'should perform undo', () => {
+		const reducer = withHistory( counter );
+
 		let state;
 		state = reducer( undefined, {} );
 		state = reducer( state, { type: 'INCREMENT' } );
-		state = reducer( state, { type: 'UNDO' } );
-
-		expect( state ).toEqual( {
-			past: [],
-			present: { count: 0 },
-			future: [ { count: 1 } ],
-		} );
-
-		expect( state ).toBe( reducer( state, { type: 'UNDO' } ) );
-	} );
-
-	it( 'should perform undo of last level', () => {
-		let state;
-		state = reducer( undefined, {} );
-		state = reducer( state, { type: 'INCREMENT' } );
-		state = reducer( state, { type: 'CREATE_UNDO_LEVEL' } );
 		state = reducer( state, { type: 'UNDO' } );
 
 		expect( state ).toEqual( {
@@ -96,10 +74,11 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should perform redo', () => {
+		const reducer = withHistory( counter );
+
 		let state;
 		state = reducer( undefined, {} );
 		state = reducer( state, { type: 'INCREMENT' } );
-		state = reducer( state, { type: 'CREATE_UNDO_LEVEL' } );
 		state = reducer( state, { type: 'UNDO' } );
 		state = reducer( state, { type: 'REDO' } );
 
@@ -113,10 +92,11 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should reset history by options.resetTypes', () => {
+		const reducer = withHistory( counter, { resetTypes: [ 'RESET_HISTORY' ] } );
+
 		let state;
 		state = reducer( undefined, {} );
 		state = reducer( state, { type: 'INCREMENT' } );
-		state = reducer( state, { type: 'CREATE_UNDO_LEVEL' } );
 		state = reducer( state, { type: 'RESET_HISTORY' } );
 
 		expect( state ).toEqual( {
@@ -126,15 +106,51 @@ describe( 'withHistory', () => {
 		} );
 	} );
 
-	it( 'should create history record for non buffer types', () => {
+	it( 'should overwrite present state with option.shouldOverwriteState', () => {
+		const reducer = withHistory( counter, {
+			shouldOverwriteState: ( { type } ) => type === 'INCREMENT',
+		} );
+
 		let state;
 		state = reducer( undefined, {} );
 		state = reducer( state, { type: 'INCREMENT' } );
-		state = reducer( state, { type: 'RESET' } );
+
+		expect( state ).toEqual( {
+			past: [ { count: 0 } ],
+			present: { count: 1 },
+			future: [],
+		} );
+
+		state = reducer( state, { type: 'INCREMENT' } );
+
+		expect( state ).toEqual( {
+			past: [ { count: 0 } ],
+			present: { count: 2 },
+			future: [],
+		} );
+	} );
+
+	it( 'should create undo level with option.shouldOverwriteState and CREATE_UNDO_LEVEL', () => {
+		const reducer = withHistory( counter, {
+			shouldOverwriteState: ( { type } ) => type === 'INCREMENT',
+		} );
+
+		let state;
+		state = reducer( undefined, {} );
+		state = reducer( state, { type: 'INCREMENT' } );
+		state = reducer( state, { type: 'CREATE_UNDO_LEVEL' } );
+
+		expect( state ).toEqual( {
+			past: [ { count: 0 } ],
+			present: { count: 1 },
+			future: [],
+		} );
+
+		state = reducer( state, { type: 'INCREMENT' } );
 
 		expect( state ).toEqual( {
 			past: [ { count: 0 }, { count: 1 } ],
-			present: { count: 0 },
+			present: { count: 2 },
 			future: [],
 		} );
 	} );

@@ -20,7 +20,7 @@ export default function withHistory( reducer, options = {} ) {
 		future: [],
 	};
 
-	let lastAction = null;
+	let lastAction;
 	let shouldCreateUndoLevel = false;
 
 	const {
