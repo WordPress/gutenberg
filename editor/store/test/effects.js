@@ -23,7 +23,6 @@ import {
 	resetBlocks,
 	mergeBlocks,
 	replaceBlocks,
-	editPost,
 	savePost,
 	requestMetaBoxUpdates,
 	updateReusableBlock,
@@ -265,8 +264,7 @@ describe( 'effects', () => {
 
 			handler( {}, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
@@ -278,19 +276,6 @@ describe( 'effects', () => {
 
 			// TODO: Publish autosave
 			expect( dispatch ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should set auto-draft to draft before save', () => {
-			selectors.isEditedPostSaveable.mockReturnValue( true );
-			selectors.isEditedPostDirty.mockReturnValue( true );
-			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
-
-			handler( {}, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
-			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
 		it( 'should return update action for saveable, dirty draft', () => {
@@ -497,7 +482,10 @@ describe( 'effects', () => {
 
 			expect( result ).toEqual( [
 				resetPost( post ),
-				setupNewPost( { title: 'A History of Pork' } ),
+				setupNewPost( {
+					title: 'A History of Pork',
+					status: 'draft',
+				} ),
 			] );
 		} );
 	} );
