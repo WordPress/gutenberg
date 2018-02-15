@@ -878,18 +878,17 @@ describe( 'effects', () => {
 
 			it( 'should get the taxonomies and dispatch actions to get the terms', () => {
 				const promise = Promise.resolve( {
-					data: {
-						category: {
-							name: 'Category',
-							slug: 'category',
-							rest_base: 'category',
-						},
-						post_tag: {
-							name: 'Post tag',
-							slug: 'post_tags',
-							rest_base: 'tags',
-						},
-					} } );
+					category: {
+						name: 'Categories',
+						slug: 'category',
+						rest_base: 'categories',
+					},
+					post_tag: {
+						name: 'Tags',
+						slug: 'post_tag',
+						rest_base: 'tags',
+					},
+				} );
 
 				set( global, 'wp.api.collections.Taxonomies', class {
 					fetch() {
@@ -907,13 +906,13 @@ describe( 'effects', () => {
 						type: 'FETCH_TAXONOMIES_SUCCESS',
 						taxonomies: {
 							category: {
-								name: 'Category',
+								name: 'Categories',
 								slug: 'category',
-								rest_base: 'category',
+								rest_base: 'categories',
 							},
 							post_tag: {
-								name: 'Post tag',
-								slug: 'post_tags',
+								name: 'Tags',
+								slug: 'post_tag',
 								rest_base: 'tags',
 							},
 						},
@@ -924,7 +923,7 @@ describe( 'effects', () => {
 					} );
 					expect( dispatch.mock.calls[ 2 ][ 0 ] ).toEqual( {
 						type: 'FETCH_TAXONOMY_TERMS',
-						taxonomy: 'tags',
+						taxonomy: 'post_tag',
 					} );
 				} );
 			} );
