@@ -28,11 +28,11 @@ export class Shortcode extends Component {
 
 	render() {
 		const { preview } = this.state;
-		const { instanceId, postId, setAttributes, attributes, focus, setFocus } = this.props;
+		const { instanceId, postId, setAttributes, attributes, isSelected } = this.props;
 		const inputId = `blocks-shortcode-input-${ instanceId }`;
 		const shortcodeContent = ( attributes.text || '' ).trim();
 
-		const controls = focus && (
+		const controls = isSelected && (
 			<BlockControls key="controls">
 				<div className="components-toolbar">
 					<button
@@ -42,20 +42,19 @@ export class Shortcode extends Component {
 					</button>
 					<button
 						className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
-						onClick={ () => { shortcodeContent.length && this.setState( { preview: true } ) } }>
+						onClick={ () => shortcodeContent.length && this.setState( { preview: true } ) } >
 						<span>{ __( 'Preview' ) }</span>
 					</button>
 				</div>
 			</BlockControls>
 		);
-		
+
 		if ( preview ) {
 			return [
 				controls,
 				<ShortcodePreview key="preview"
 					shortcode={ shortcodeContent }
 					postId={ postId }
-					setFocus={ setFocus }
 				/>,
 			];
 		}
