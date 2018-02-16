@@ -290,10 +290,11 @@ export class BlockListBlock extends Component {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
 	 */
 	maybeHover() {
-		const { isMultiSelected } = this.props;
+		const { isMultiSelected, isSelected } = this.props;
 		const { isHovered } = this.state;
 
-		if ( isHovered || isMultiSelected || this.hadTouchStart ) {
+		if ( isHovered || isMultiSelected || isSelected ||
+				this.props.isMultiSelecting || this.hadTouchStart ) {
 			return;
 		}
 
