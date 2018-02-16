@@ -22,7 +22,7 @@ import { Fragment } from '@wordpress/element';
  */
 import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
-import { hasFixedToolbar } from '../../../store/selectors';
+import { hasFixedToolbar } from '../../store/selectors';
 
 function VisualEditor( props ) {
 	return (

@@ -24,9 +24,9 @@ import {
 import './style.scss';
 import Header from '../header';
 import Sidebar from '../sidebar';
-import TextEditor from '../modes/text-editor';
-import VisualEditor from '../modes/visual-editor';
-import EditorModeKeyboardShortcuts from '../modes/keyboard-shortcuts';
+import TextEditor from '../text-editor';
+import VisualEditor from '../visual-editor';
+import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import {
