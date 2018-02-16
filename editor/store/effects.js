@@ -16,6 +16,7 @@ import {
 	createReusableBlock,
 	isReusableBlock,
 	getDefaultBlockName,
+	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -41,6 +42,7 @@ import {
 	insertBlock,
 	setMetaBoxSavedData,
 	selectBlock,
+	removeBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -56,6 +58,7 @@ import {
 	getReusableBlock,
 	getMetaBoxes,
 	hasMetaBoxes,
+	getBlockOrder,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
@@ -66,6 +69,30 @@ import { getMetaBoxContainer } from '../utils/meta-boxes';
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
+
+/**
+ * When inserting a block, remove the previous block if it was an empty default
+ * block.
+ *
+ * @param {Object} action Action object.
+ * @param {Object} store  Store object.
+ *
+ * @return {?Object} Action object, if block to be removed.
+ */
+function removeDefaultEmptyPrecedingBlock( action, store ) {
+	const { index, rootUID } = action;
+	const state = store.getState();
+	const blockOrder = getBlockOrder( state, rootUID );
+	const previousBlockUID = blockOrder[ index - 1 ];
+	if ( ! previousBlockUID ) {
+		return;
+	}
+
+	const previousBlock = getBlock( state, previousBlockUID );
+	if ( previousBlock && isUnmodifiedDefaultBlock( previousBlock ) ) {
+		return removeBlock( previousBlockUID );
+	}
+}
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -530,4 +557,6 @@ export default {
 		window.fetch( window._wpMetaBoxUrl, fetchOptions )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
+
+	INSERT_BLOCKS: removeDefaultEmptyPrecedingBlock,
 };
