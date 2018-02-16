@@ -6,13 +6,13 @@ import BlockRemoveButton from '../block-settings-menu/block-remove-button';
 import BlockSettingsMenu from '../block-settings-menu';
 import VisualEditorInserter from '../inserter';
 
-function BlockMobileToolbar( { uid, renderBlockMenu } ) {
+function BlockMobileToolbar( { rootUID, uid, renderBlockMenu } ) {
 	return (
 		<div className="editor-block-list__block-mobile-toolbar">
 			<VisualEditorInserter />
 			<BlockMover uids={ [ uid ] } />
 			<BlockRemoveButton uids={ [ uid ] } small />
-			<BlockSettingsMenu uids={ [ uid ] } renderBlockMenu={ renderBlockMenu } />
+			<BlockSettingsMenu rootUID={ rootUID } uids={ [ uid ] } renderBlockMenu={ renderBlockMenu } />
 		</div>
 	);
 }
