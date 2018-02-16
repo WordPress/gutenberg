@@ -9,19 +9,18 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, withContext } from '@wordpress/components';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint, getSelectedBlock } from '../../store/selectors';
+import { getBlockInsertionPoint } from '../../store/selectors';
 import {
 	insertBlock,
 	hideInsertionPoint,
 	showInsertionPoint,
-	replaceBlocks,
 } from '../../store/actions';
 
 class Inserter extends Component {
@@ -97,30 +96,20 @@ export default compose( [
 		( state, ownProps ) => {
 			return {
 				insertionPoint: getBlockInsertionPoint( state, ownProps.rootUID ),
-				selectedBlock: getSelectedBlock( state ),
 			};
 		},
-		{
-			showInsertionPoint,
-			hideInsertionPoint,
-			insertBlock,
-			replaceBlocks,
+		( dispatch, ownProps ) => {
+			return {
+				showInsertionPoint,
+				hideInsertionPoint,
+				onInsertBlock( item, insertionPoint ) {
+					const { layout, rootUID } = ownProps;
+					const { name, initialAttributes } = item;
+					const block = createBlock( name, { ...initialAttributes, layout } );
+					dispatch( insertBlock( block, insertionPoint, rootUID ) );
+				},
+			};
 		},
-		( { selectedBlock, ...stateProps }, dispatchProps, { layout, rootUID, ...ownProps } ) => ( {
-			...stateProps,
-			...ownProps,
-			showInsertionPoint: dispatchProps.showInsertionPoint,
-			hideInsertionPoint: dispatchProps.hideInsertionPoint,
-			onInsertBlock( item, index ) {
-				const { name, initialAttributes } = item;
-				const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
-				if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
-					dispatchProps.replaceBlocks( selectedBlock.uid, insertedBlock );
-					return;
-				}
-				dispatchProps.insertBlock( insertedBlock, index, rootUID );
-			},
-		} )
 	),
 	withContext( 'editor' )( ( settings ) => {
 		const { blockTypes, templateLock } = settings;
