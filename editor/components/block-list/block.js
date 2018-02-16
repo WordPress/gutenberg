@@ -451,6 +451,7 @@ export class BlockListBlock extends Component {
 			isSelected,
 			isMultiSelected,
 			isFirstMultiSelected,
+			isLastInSelection,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! this.props.isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -471,6 +472,11 @@ export class BlockListBlock extends Component {
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error } = this.state;
+
+		// Insertion point can only be made visible when the side inserter is
+		// not present, and either the block is at the extent of a selection or
+		// is the last block in the top-level list rendering.
+		const shouldShowInsertionPoint = ! showSideInserter && ( isLastInSelection || ( isLast && ! rootUID ) );
 
 		// Generate the wrapper class names handling the different states of the block.
 		const wrapperClassName = classnames( 'editor-block-list__block', {
@@ -584,11 +590,10 @@ export class BlockListBlock extends Component {
 					{ shouldShowMobileToolbar && <BlockMobileToolbar uid={ block.uid } renderBlockMenu={ renderBlockMenu } /> }
 				</IgnoreNestedEvents>
 				{ !! error && <BlockCrashWarning /> }
-				{ ! showSideInserter && (
+				{ shouldShowInsertionPoint && (
 					<BlockInsertionPoint
 						uid={ block.uid }
 						rootUID={ rootUID }
-						layout={ layout }
 					/>
 				) }
 				{ showSideInserter && (
@@ -611,6 +616,7 @@ const mapStateToProps = ( state, { uid, rootUID } ) => {
 		isMultiSelected: isBlockMultiSelected( state, uid ),
 		isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
 		isMultiSelecting: isMultiSelecting( state ),
+		isLastInSelection: state.blockSelection.end === uid,
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 		isTyping: isSelected && isTyping( state ),

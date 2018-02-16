@@ -2019,21 +2019,22 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockInsertionPoint', () => {
-		it( 'should return the uid of the selected block', () => {
+		it( 'should return an object for the selected block', () => {
 			const state = {
 				currentPost: {},
 				preferences: { mode: 'visual' },
 				blockSelection: {
-					start: 2,
-					end: 2,
+					start: 'uid1',
+					end: 'uid1',
 				},
 				editor: {
 					present: {
 						blocksByUid: {
-							2: { uid: 2 },
+							uid1: { uid: 'uid1' },
 						},
 						blockOrder: {
-							'': [ 1, 2, 3 ],
+							'': [ 'uid1' ],
+							uid1: [],
 						},
 						edits: {},
 					},
@@ -2041,44 +2042,137 @@ describe( 'selectors', () => {
 				isInsertionPointVisible: false,
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootUID: undefined,
+				layout: undefined,
+				index: 1,
+			} );
 		} );
 
-		it( 'should return the last multi selected uid', () => {
+		it( 'should return an object for the nested selected block', () => {
 			const state = {
+				currentPost: {},
 				preferences: { mode: 'visual' },
 				blockSelection: {
-					start: 1,
-					end: 2,
+					start: 'uid2',
+					end: 'uid2',
 				},
 				editor: {
 					present: {
-						blockOrder: {
-							'': [ 1, 2, 3 ],
+						blocksByUid: {
+							uid1: { uid: 'uid1' },
+							uid2: { uid: 'uid2' },
 						},
+						blockOrder: {
+							'': [ 'uid1' ],
+							uid1: [ 'uid2' ],
+							uid2: [],
+						},
+						edits: {},
 					},
 				},
 				isInsertionPointVisible: false,
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootUID: 'uid1',
+				layout: undefined,
+				index: 1,
+			} );
 		} );
 
-		it( 'should return the last block if no selection', () => {
+		it( 'should return an object for the selected block with layout', () => {
 			const state = {
+				currentPost: {},
 				preferences: { mode: 'visual' },
-				blockSelection: { start: null, end: null },
+				blockSelection: {
+					start: 'uid1',
+					end: 'uid1',
+				},
 				editor: {
 					present: {
-						blockOrder: {
-							'': [ 1, 2, 3 ],
+						blocksByUid: {
+							uid1: { uid: 'uid1', attributes: { layout: 'wide' } },
 						},
+						blockOrder: {
+							'': [ 'uid1' ],
+							uid1: [],
+						},
+						edits: {},
 					},
 				},
 				isInsertionPointVisible: false,
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootUID: undefined,
+				layout: 'wide',
+				index: 1,
+			} );
+		} );
+
+		it( 'should return an object for the last multi selected uid', () => {
+			const state = {
+				currentPost: {},
+				preferences: { mode: 'visual' },
+				blockSelection: {
+					start: 'uid1',
+					end: 'uid2',
+				},
+				editor: {
+					present: {
+						blocksByUid: {
+							uid1: { uid: 'uid1' },
+							uid2: { uid: 'uid2' },
+						},
+						blockOrder: {
+							'': [ 'uid1', 'uid2' ],
+							uid1: [],
+							uid2: [],
+						},
+						edits: {},
+					},
+				},
+				isInsertionPointVisible: false,
+			};
+
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootUID: undefined,
+				layout: undefined,
+				index: 2,
+			} );
+		} );
+
+		it( 'should return an object for the last block if no selection', () => {
+			const state = {
+				currentPost: {},
+				preferences: { mode: 'visual' },
+				blockSelection: {
+					start: null,
+					end: null,
+				},
+				editor: {
+					present: {
+						blocksByUid: {
+							uid1: { uid: 'uid1' },
+							uid2: { uid: 'uid2' },
+						},
+						blockOrder: {
+							'': [ 'uid1', 'uid2' ],
+							uid1: [],
+							uid2: [],
+						},
+						edits: {},
+					},
+				},
+				isInsertionPointVisible: false,
+			};
+
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootUID: undefined,
+				layout: undefined,
+				index: 2,
+			} );
 		} );
 	} );
 
