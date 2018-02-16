@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, reduce, size, castArray, noop, first } from 'lodash';
+import { get, reduce, size, castArray, noop, first, last } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
@@ -207,31 +207,39 @@ export class BlockListBlock extends Component {
 	 * When a block becomces selected, transition focus to an inner tabbable.
 	 */
 	focusTabbable() {
+		const { initialPosition } = this.props;
+
 		if ( this.node.contains( document.activeElement ) ) {
 			return;
 		}
 
-		const target = first( focus.tabbable.find( this.node ) );
+		// Find all tabbables within node.
+		const tabbables = focus.tabbable.find( this.node );
+
+		// If reversed (e.g. merge via backspace), use the last in the set of
+		// tabbables.
+		const isReverse = -1 === initialPosition;
+		const target = ( isReverse ? last : first )( tabbables );
+
 		if ( ! target ) {
 			return;
 		}
 
 		target.focus();
 
-		if ( this.props.initialPosition !== -1 ) {
-			return;
-		}
-
-		// Special casing RichText components because the placeCaret utilities
-		// are not working correctly. When merging two sibling paragraph blocks
-		// (backspacing), the focus is not moved to the correct position.
-		const editor = tinymce.get( target.getAttribute( 'id' ) );
-		if ( editor ) {
-			editor.selection.select( editor.getBody(), true );
-			editor.selection.collapse( false );
-		} else {
-			placeCaretAtHorizontalEdge( target, true );
-			placeCaretAtVerticalEdge( target, true );
+		// In reverse case, need to explicitly place caret position.
+		if ( isReverse ) {
+			// Special case RichText component because the placeCaret utilities
+			// aren't working correctly. When merging two paragraph blocks, the
+			// focus is not moved to the correct position.
+			const editor = tinymce.get( target.getAttribute( 'id' ) );
+			if ( editor ) {
+				editor.selection.select( editor.getBody(), true );
+				editor.selection.collapse( false );
+			} else {
+				placeCaretAtHorizontalEdge( target, true );
+				placeCaretAtVerticalEdge( target, true );
+			}
 		}
 	}
 
