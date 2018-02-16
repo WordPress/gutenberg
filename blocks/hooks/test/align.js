@@ -116,7 +116,7 @@ describe( 'align', () => {
 				<EnhancedComponent
 					name="core/foo"
 					attributes={ {} }
-					focus
+					isSelected
 				/>
 			);
 
@@ -140,7 +140,7 @@ describe( 'align', () => {
 				<EnhancedComponent
 					name="core/foo"
 					attributes={ {} }
-					focus
+					isSelected
 				/>
 			);
 

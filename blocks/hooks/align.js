@@ -78,8 +78,8 @@ export function withToolbarControls( BlockEdit ) {
 		const updateAlignment = ( nextAlign ) => props.setAttributes( { align: nextAlign } );
 
 		return [
-			validAlignments.length > 0 && props.focus && (
-				<BlockControls key="controls">
+			validAlignments.length > 0 && props.isSelected && (
+				<BlockControls key="align-controls">
 					<BlockAlignmentToolbar
 						value={ props.attributes.align }
 						onChange={ updateAlignment }
@@ -90,7 +90,7 @@ export function withToolbarControls( BlockEdit ) {
 			<BlockEdit key="edit" { ...props } />,
 		];
 	};
-	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'customClassName' );
+	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'align' );
 
 	return WrappedBlockEdit;
 }
@@ -141,5 +141,5 @@ export function addAssignedAlign( props, blockType, attributes ) {
 addFilter( 'blocks.registerBlockType', 'core/align/addAttribute', addAttribute );
 addFilter( 'editor.BlockListBlock', 'core/align/withAlign', withAlign );
 addFilter( 'blocks.BlockEdit', 'core/align/withToolbarControls', withToolbarControls );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/align/extraProps', addAssignedAlign );
+addFilter( 'blocks.getSaveContent.extraProps', 'core/align/addAssignedAlign', addAssignedAlign );
 
