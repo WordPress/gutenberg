@@ -16,7 +16,7 @@ class DocumentTitle extends Component {
 	}
 
 	setDocumentTitle( title ) {
-		document.title = title + ' | ' + this.originalDocumentTitle;
+		document.title = 'Edit: ' + title + ' | ' + this.originalDocumentTitle;
 	}
 
 	componentDidMount() {
