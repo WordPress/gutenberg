@@ -710,6 +710,18 @@ export class RichText extends Component {
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
 	}
 
+	updateContent() {
+		// Do not trigger a change event coming from the TinyMCE undo manager.
+		// Our global state is already up-to-date.
+		this.editor.undoManager.ignore( () => {
+			const bookmark = this.editor.selection.getBookmark( 2, true );
+
+			this.savedContent = this.props.value;
+			this.setContent( this.savedContent );
+			this.editor.selection.moveToBookmark( bookmark );
+		} );
+	}
+
 	setContent( content = '' ) {
 		this.editor.setContent( renderToString( content ) );
 	}
@@ -730,14 +742,7 @@ export class RichText extends Component {
 			this.props.value !== prevProps.value &&
 			this.props.value !== this.savedContent
 		) {
-			// Do not trigger a `addUndo` event.
-			this.editor.undoManager.ignore( () => {
-				const bookmark = this.editor.selection.getBookmark( 2, true );
-
-				this.savedContent = this.props.value;
-				this.setContent( this.savedContent );
-				this.editor.selection.moveToBookmark( bookmark );
-			} );
+			this.updateContent();
 		}
 	}
 
