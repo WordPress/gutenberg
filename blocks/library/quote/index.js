@@ -158,7 +158,9 @@ export const settings = {
 	} )( ( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className, editable, setState } ) => {
 		const { align, value, citation, style } = attributes;
 		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
-		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
+		const onSetActiveEditable = ( newEditable ) => () => {
+			setState( { editable: newEditable } );
+		};
 
 		return [
 			isSelected && (
