@@ -535,6 +535,8 @@ export class RichText extends Component {
 
 			const forward = event.keyCode === DELETE;
 
+			this.onChange();
+
 			if ( this.props.onMerge ) {
 				this.props.onMerge( forward );
 			}
