@@ -2402,7 +2402,7 @@ describe( 'selectors', () => {
 			registerCoreBlocks();
 		} );
 
-		it( 'should return the 8 most recently used blocks', () => {
+		it( 'should return the 9 most recently used blocks', () => {
 			const state = {
 				preferences: {
 					recentInserts: [
@@ -2441,6 +2441,7 @@ describe( 'selectors', () => {
 				{ name: 'core/heading', initialAttributes: {} },
 				{ name: 'core/list', initialAttributes: {} },
 				{ name: 'core/video', initialAttributes: {} },
+				{ name: 'core/audio', initialAttributes: {} },
 			] );
 		} );
 
@@ -2461,7 +2462,7 @@ describe( 'selectors', () => {
 			// We should get back 8 items with no duplicates
 			const items = getRecentInserterItems( state );
 			const blockNames = items.map( item => item.name );
-			expect( union( blockNames ) ).toHaveLength( 8 );
+			expect( union( blockNames ) ).toHaveLength( 9 );
 		} );
 	} );
 

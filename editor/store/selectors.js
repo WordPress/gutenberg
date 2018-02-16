@@ -28,7 +28,7 @@ import { addQueryArgs } from '@wordpress/url';
 /***
  * Module constants
  */
-const MAX_RECENT_BLOCKS = 8;
+const MAX_RECENT_BLOCKS = 9;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 
 /**

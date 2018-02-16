@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import 'element-closest';
-import { find, last, reverse } from 'lodash';
+import { find, last, reverse, get } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
@@ -192,14 +192,14 @@ class WritingFlow extends Component {
 		const parentBlock = target.hasAttribute( 'data-block' ) ? target : target.closest( '[data-block]' );
 		if (
 			parentBlock &&
-			( ! this.props.selectedBlock || parentBlock.getAttribute( 'data-block' ) !== this.props.selectedBlock.uid )
+			( ! this.props.selectedBlockUID || parentBlock.getAttribute( 'data-block' ) !== this.props.selectedBlockUID )
 		) {
 			this.props.onSelectBlock( parentBlock.getAttribute( 'data-block' ) );
 		}
 	}
 
 	onKeyDown( event ) {
-		const { selectedBlock, selectionStart, hasMultiSelection } = this.props;
+		const { selectedBlockUID, selectionStart, hasMultiSelection } = this.props;
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -221,15 +221,15 @@ class WritingFlow extends Component {
 		}
 
 		if ( isNav && isShift && hasMultiSelection ) {
-			// Shift key is down and existing block selection
+			// Shift key is down and existing block multi-selection
 			event.preventDefault();
 			this.expandSelection( selectionStart, isReverse );
 		} else if ( isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
-			// Shift key is down, but no existing block selection
+			// Shift key is down, but no existing block multi-selection
 			event.preventDefault();
-			this.expandSelection( selectedBlock.uid, isReverse );
+			this.expandSelection( selectedBlockUID, isReverse );
 		} else if ( isNav && hasMultiSelection ) {
-			// Moving from multi block selection to single block selection
+			// Moving from block multi-selection to single block selection
 			event.preventDefault();
 			this.moveSelection( isReverse );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
@@ -255,10 +255,10 @@ class WritingFlow extends Component {
 	componentDidUpdate( prevProps ) {
 		// When selecting a new block, we focus its first editable or the container
 		if (
-			this.props.selectedBlock &&
-			( ! prevProps.selectedBlock || this.props.selectedBlock.uid !== prevProps.selectedBlock.uid )
+			this.props.selectedBlockUID &&
+			( ! prevProps.selectedBlockUID || this.props.selectedBlockUID !== prevProps.selectedBlockUID )
 		) {
-			const blockContainer = this.container.querySelector( `[data-block="${ this.props.selectedBlock.uid }"]` );
+			const blockContainer = this.container.querySelector( `[data-block="${ this.props.selectedBlockUID }"]` );
 			if ( blockContainer && ! blockContainer.contains( document.activeElement ) ) {
 				const target = this.getInnerTabbable( blockContainer, this.props.initialPosition === -1 );
 				target.focus();
@@ -303,7 +303,7 @@ export default connect(
 		nextBlockUid: getNextBlockUid( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
-		selectedBlock: getSelectedBlock( state ),
+		selectedBlockUID: get( getSelectedBlock( state ), [ 'uid' ] ),
 		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
 	} ),
 	{
