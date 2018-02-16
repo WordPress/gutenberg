@@ -4,7 +4,6 @@
 import { connect } from 'react-redux';
 import 'element-closest';
 import { find, last, reverse, get } from 'lodash';
-import tinymce from 'tinymce';
 
 /**
  * WordPress dependencies
@@ -29,7 +28,6 @@ import {
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
-	getSelectedBlocksInitialCaretPosition,
 } from '../../store/selectors';
 import {
 	multiSelect,
@@ -108,19 +106,6 @@ class WritingFlow extends Component {
 
 			return true;
 		} );
-	}
-
-	getInnerTabbable( target, isReverse ) {
-		let focusableNodes = this.getVisibleTabbables();
-		if ( isReverse ) {
-			focusableNodes = reverse( focusableNodes );
-		}
-
-		const innerItem = find( focusableNodes, ( node ) => {
-			return target !== node && target.contains( node );
-		} );
-
-		return innerItem ? innerItem : target;
 	}
 
 	isInLastNonEmptyBlock( target ) {
@@ -252,32 +237,6 @@ class WritingFlow extends Component {
 		}
 	}
 
-	componentDidUpdate( prevProps ) {
-		// When selecting a new block, we focus its first editable or the container
-		if (
-			this.props.selectedBlockUID &&
-			( ! prevProps.selectedBlockUID || this.props.selectedBlockUID !== prevProps.selectedBlockUID )
-		) {
-			const blockContainer = this.container.querySelector( `[data-block="${ this.props.selectedBlockUID }"]` );
-			if ( blockContainer && ! blockContainer.contains( document.activeElement ) ) {
-				const target = this.getInnerTabbable( blockContainer, this.props.initialPosition === -1 );
-				target.focus();
-				if ( this.props.initialPosition === -1 ) {
-					// Special casing RichText components because the two functions at the bottom are not working as expected.
-					// When merging two sibling paragraph blocks (backspacing) the focus is not moved to the right position.
-					const editor = tinymce.get( target.getAttribute( 'id' ) );
-					if ( editor ) {
-						editor.selection.select( editor.getBody(), true );
-						editor.selection.collapse( false );
-					} else {
-						placeCaretAtHorizontalEdge( target, true );
-						placeCaretAtVerticalEdge( target, true );
-					}
-				}
-			}
-		}
-	}
-
 	render() {
 		const { children } = this.props;
 
@@ -304,7 +263,6 @@ export default connect(
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
 		selectedBlockUID: get( getSelectedBlock( state ), [ 'uid' ] ),
-		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
 	} ),
 	{
 		onMultiSelect: multiSelect,
