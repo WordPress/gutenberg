@@ -146,7 +146,7 @@ export class BlockListBlock extends Component {
 			this.previousOffset = this.node.getBoundingClientRect().top;
 		}
 
-		if ( newProps.isTyping ) {
+		if ( newProps.isTyping || newProps.isSelected ) {
 			this.hideHoverEffects();
 		}
 	}
