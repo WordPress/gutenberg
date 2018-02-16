@@ -76,8 +76,8 @@ class HierarchicalTermSelector extends Component {
 
 	onAddTerm( event ) {
 		event.preventDefault();
-		const { onUpdateTerms, restBase, terms, slug } = this.props;
-		const { formName, formParent, adding, availableTerms } = this.state;
+		const { onUpdateTerms, restBase, terms, slug, availableTerms } = this.props;
+		const { formName, formParent, adding } = this.state;
 		if ( formName === '' || adding ) {
 			return;
 		}
@@ -123,8 +123,6 @@ class HierarchicalTermSelector extends Component {
 		} );
 		findOrCreatePromise
 			.then( ( term ) => {
-				const hasTerm = !! find( this.props.availableTerms, ( availableTerm ) => availableTerm.id === term.id );
-				const newAvailableTerms = hasTerm ? this.props.availableTerms : [ term, ...this.props.availableTerms ];
 				const termAddedMessage = sprintf(
 					_x( '%s added', 'term' ),
 					get(

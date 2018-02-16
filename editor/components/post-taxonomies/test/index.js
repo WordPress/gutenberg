@@ -48,6 +48,13 @@ describe( 'PostTaxonomies', () => {
 			label: 'Categories',
 			slug: 'category',
 			restBase: 'categories',
+			taxonomy: {
+				name: 'Categories',
+				slug: 'category',
+				types: [ 'post', 'page' ],
+				hierarchical: true,
+				rest_base: 'categories',
+			},
 		} );
 	} );
 } );

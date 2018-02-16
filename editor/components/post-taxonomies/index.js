@@ -7,7 +7,6 @@ import { filter, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 
 /**
