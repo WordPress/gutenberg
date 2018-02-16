@@ -34,6 +34,7 @@ import {
 	convertBlockToReusable,
 	selectBlock,
 	fetchTaxonomies,
+	fetchTaxonomyTerms,
 } from '../../store/actions';
 import reducer from '../reducer';
 import effects from '../effects';
@@ -899,7 +900,7 @@ describe( 'effects', () => {
 				const dispatch = jest.fn();
 				const store = { getState: () => {}, dispatch };
 
-				handler( fetchTaxonomies(), store );
+				handler( fetchTaxonomies( 'post' ), store );
 
 				return promise.then( () => {
 					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
@@ -924,6 +925,87 @@ describe( 'effects', () => {
 					expect( dispatch.mock.calls[ 2 ][ 0 ] ).toEqual( {
 						type: 'FETCH_TAXONOMY_TERMS',
 						taxonomy: 'post_tag',
+					} );
+				} );
+			} );
+		} );
+
+		describe( '.FETCH_TAXONOMY_TERMS', () => {
+			const handler = effects.FETCH_TAXONOMY_TERMS;
+
+			it( 'should get the terms for the specified taxonomy', () => {
+				const promise = Promise.resolve( [
+					{
+						id: 1,
+						name: 'Uncategorized',
+						slug: 'uncategorized',
+						taxonomy: 'category',
+						parent: 0,
+					},
+					{
+						id: 5,
+						name: 'SEO',
+						slug: 'seo',
+						taxonomy: 'category',
+						parent: 0,
+					},
+					{
+						id: 6,
+						name: 'Google',
+						slug: 'google',
+						taxonomy: 'category',
+						parent: 5,
+					},
+				] );
+
+				set( global, 'wp.api.collections.Categories', class {
+					fetch() {
+						return promise;
+					}
+				} );
+
+				const dispatch = jest.fn();
+				const getState = jest.fn();
+				getState.mockReturnValue( {
+					taxonomies: {
+						data: {
+							category: {
+								rest_base: 'categories',
+							},
+						},
+					},
+				} );
+				const store = { getState, dispatch };
+
+				handler( fetchTaxonomyTerms( 'category' ), store );
+
+				return promise.then( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
+						taxonomy: 'category',
+						taxonomyTerms: [
+							{
+								id: 1,
+								name: 'Uncategorized',
+								slug: 'uncategorized',
+								taxonomy: 'category',
+								parent: 0,
+							},
+							{
+								id: 5,
+								name: 'SEO',
+								slug: 'seo',
+								taxonomy: 'category',
+								parent: 0,
+							},
+							{
+								id: 6,
+								name: 'Google',
+								slug: 'google',
+								taxonomy: 'category',
+								parent: 5,
+							},
+						],
 					} );
 				} );
 			} );
