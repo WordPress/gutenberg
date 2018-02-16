@@ -879,19 +879,6 @@ export function isBlockWithinSelection( state, uid ) {
 }
 
 /**
- * Returns true if the cursor is hovering the block corresponding to the
- * specified unique ID, or false otherwise.
- *
- * @param {Object} state Global application state.
- * @param {string} uid   Block unique ID.
- *
- * @return {boolean} Whether block is hovered.
- */
-export function isBlockHovered( state, uid ) {
-	return state.hoveredBlock === uid;
-}
-
-/**
  * Whether in the process of multi-selecting or not.
  *
  * @param {Object} state Global application state.

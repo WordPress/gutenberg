@@ -55,7 +55,6 @@ const {
 	isBlockWithinSelection,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
-	isBlockHovered,
 	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
@@ -1942,24 +1941,6 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the block is not first in multi selection', () => {
 			expect( isFirstMultiSelectedBlock( state, 3 ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isBlockHovered', () => {
-		it( 'should return true if the block is hovered', () => {
-			const state = {
-				hoveredBlock: 123,
-			};
-
-			expect( isBlockHovered( state, 123 ) ).toBe( true );
-		} );
-
-		it( 'should return false if the block is not hovered', () => {
-			const state = {
-				hoveredBlock: 123,
-			};
-
-			expect( isBlockHovered( state, 23 ) ).toBe( false );
 		} );
 	} );
 
