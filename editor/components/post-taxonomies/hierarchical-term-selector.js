@@ -16,7 +16,7 @@ import { buildTermsTree } from '@wordpress/utils';
  * Internal dependencies
  */
 import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
+import { editPost, addTaxonomyTerm } from '../../store/actions';
 
 const DEFAULT_QUERY = {
 	per_page: 100,
@@ -75,6 +75,17 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	onAddTerm( event ) {
+		event.preventDefault();
+		const { formName, formParent, adding } = this.state;
+		const { taxonomy } = this.props;
+		if ( formName === '' || adding ) {
+			return;
+		}
+
+		const parent = formParent ? parseInt( formParent ) : null;
+		this.props.addTaxonomyTerm( taxonomy.slug, formName, parent );
+
+		/*
 		event.preventDefault();
 		const { onUpdateTerms, restBase, terms, slug, availableTerms } = this.props;
 		const { formName, formParent, adding } = this.state;
@@ -146,6 +157,7 @@ class HierarchicalTermSelector extends Component {
 					adding: false,
 				} );
 			} );
+			*/
 	}
 
 	componentWillUnmount() {
@@ -297,6 +309,7 @@ const applyConnect = connect(
 		onUpdateTerms( terms, restBase ) {
 			return editPost( { [ restBase ]: terms } );
 		},
+		addTaxonomyTerm,
 	}
 );
 

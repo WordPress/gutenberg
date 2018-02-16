@@ -950,6 +950,17 @@ export const taxonomyTerms = combineReducers( {
 					[ taxonomy ]: action.taxonomyTerms,
 				};
 			}
+			case 'ADD_TAXONOMY_TERM_SUCCESS': {
+				const { taxonomyTerm } = action;
+				const taxonomy = taxonomyTerm.taxonomy;
+				return {
+					...state,
+					[ taxonomy ]: [
+						...state[ taxonomy ],
+						taxonomyTerm,
+					],
+				};
+			}
 		}
 
 		return state;

@@ -623,4 +623,62 @@ export default {
 			} );
 		} );
 	},
+	ADD_TAXONOMY_TERM( action, store ) {
+		const { getState, dispatch } = store;
+		const state = getState();
+
+		// Only proceed if the state knows about this taxonomy
+		if ( ! has( state, `taxonomies.data.${ action.taxonomySlug }` ) ) {
+			// TODO: Use more appropriate error
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				error: {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				},
+			} );
+			return;
+		}
+
+		const taxonomy = state.taxonomies.data[ action.taxonomySlug ];
+		if ( ! taxonomy.hierarchical || ! action.termParentId ) {
+			action.termParentId = undefined;
+		}
+
+		const TaxonomyCollection = wp.api.getTaxonomyCollection( taxonomy.slug );
+		// Only proceed if the api collections has this taxonomy class
+		if ( ! TaxonomyCollection ) {
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				error: {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				},
+			} );
+			return;
+		}
+
+		const collection = new TaxonomyCollection();
+		collection.fetch( {
+			type: 'POST',
+			data: {
+				name: action.termName,
+				parent: action.termParentId,
+			},
+		} ).then( ( taxonomyTerm ) => {
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_SUCCESS',
+				taxonomyTerm: taxonomyTerm,
+			} );
+			// TODO: Dispatch action to add new term id to current post.
+		}, ( err ) => {
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				error: get( err, 'responseJSON', {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} ),
+			} );
+		} );
+	},
 };
