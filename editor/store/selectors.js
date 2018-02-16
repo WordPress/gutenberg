@@ -1366,3 +1366,17 @@ export function getTaxonomyTerms( state, taxonomy ) {
 export function getTaxonomyTermsFetchStatus( state, taxonomy ) {
 	return state.taxonomyTerms.fetchStatus[ taxonomy ] || null;
 }
+
+/**
+ *
+ * Returns the Taxonomy Terms fetch status.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} taxonomy Unique identifier of a Taxonomy.
+ * @param {number} termId Unique identifier of a Term.
+ *
+ * @return {Object} Taxonomy Term Data.
+ */
+export function getTaxonomyTerm( state, taxonomy, termId ) {
+	return find( getTaxonomyTerms( state, taxonomy ), term => term.id === termId ) || null;
+}

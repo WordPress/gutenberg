@@ -81,6 +81,7 @@ const {
 	POST_UPDATE_TRANSACTION_ID,
 	getTaxonomyTerms,
 	getTaxonomyTermsFetchStatus,
+	getTaxonomyTerm,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2890,6 +2891,40 @@ describe( 'selectors', () => {
 					error: null,
 				},
 			);
+		} );
+	} );
+
+	describe( 'getTaxonomyTerm', () => {
+		it( 'should return the term data when it is available', () => {
+			const termData = getTaxonomyTerm( {
+				taxonomyTerms: {
+					data: {
+						category: [
+							{
+								id: 1,
+								name: 'Uncategorized',
+								slug: 'uncategorized',
+								taxonomy: 'category',
+							},
+						],
+					},
+				},
+			}, 'category', 1 );
+
+			expect( termData ).toEqual( {
+				id: 1,
+				name: 'Uncategorized',
+				slug: 'uncategorized',
+				taxonomy: 'category',
+			} );
+		} );
+
+		it( 'should return null when the term data is unavailable', () => {
+			const termData = getTaxonomyTerm( {
+				taxonomyTerms: {},
+			}, 'category', 1 );
+
+			expect( termData ).toBeNull();
 		} );
 	} );
 } );
