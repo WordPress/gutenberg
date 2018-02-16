@@ -218,7 +218,8 @@ export class BlockListBlock extends Component {
 		}
 
 		// Find all tabbables within node.
-		const tabbables = focus.tabbable.find( this.node );
+		const tabbables = focus.tabbable.find( this.node )
+			.filter( ( node ) => node !== this.node );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
