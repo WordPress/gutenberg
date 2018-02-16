@@ -1447,6 +1447,11 @@ describe( 'selectors', () => {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
 							123: { uid: 123, name: 'core/paragraph', attributes: {} },
 						},
+						blockOrder: {
+							'': [ 23, 123 ],
+							23: [],
+							123: [],
+						},
 						edits: {},
 					},
 				},
@@ -1458,22 +1463,7 @@ describe( 'selectors', () => {
 
 		it( 'should return null if there is multi selection', () => {
 			const state = {
-				editor: {
-					present: {
-						blocksByUid: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-						},
-					},
-				},
-				blockSelection: { start: 23, end: 123 },
-			};
-
-			expect( getSelectedBlock( state ) ).toBe( null );
-		} );
-
-		it( 'should return the selected block', () => {
-			const state = {
+				currentPost: {},
 				editor: {
 					present: {
 						blocksByUid: {
@@ -1485,6 +1475,30 @@ describe( 'selectors', () => {
 							23: [],
 							123: [],
 						},
+						edits: {},
+					},
+				},
+				blockSelection: { start: 23, end: 123 },
+			};
+
+			expect( getSelectedBlock( state ) ).toBe( null );
+		} );
+
+		it( 'should return the selected block', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							23: { uid: 23, name: 'core/heading', attributes: {} },
+							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': [ 23, 123 ],
+							23: [],
+							123: [],
+						},
+						edits: {},
 					},
 				},
 				blockSelection: { start: 23, end: 23 },
@@ -2164,8 +2178,10 @@ describe( 'selectors', () => {
 					present: {
 						blockOrder: {},
 						blocksByUid: {},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
@@ -2182,8 +2198,10 @@ describe( 'selectors', () => {
 							123: { uid: 123, name: 'core/image', attributes: {} },
 							456: { uid: 456, name: 'core/quote', attributes: {} },
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
@@ -2199,8 +2217,10 @@ describe( 'selectors', () => {
 						blocksByUid: {
 							123: { uid: 123, name: 'core/image', attributes: {} },
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'image' );
@@ -2216,8 +2236,10 @@ describe( 'selectors', () => {
 						blocksByUid: {
 							456: { uid: 456, name: 'core/quote', attributes: {} },
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
@@ -2233,8 +2255,10 @@ describe( 'selectors', () => {
 						blocksByUid: {
 							567: { uid: 567, name: 'core-embed/youtube', attributes: {} },
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'video' );
@@ -2251,8 +2275,10 @@ describe( 'selectors', () => {
 							456: { uid: 456, name: 'core/quote', attributes: {} },
 							789: { uid: 789, name: 'core/paragraph', attributes: {} },
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
@@ -2279,8 +2305,10 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {},
 						blockOrder: {},
+						edits: {},
 					},
 				},
+				currentPost: {},
 				reusableBlocks: {
 					data: {},
 				},
@@ -2296,8 +2324,10 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {},
 						blockOrder: {},
+						edits: {},
 					},
 				},
+				currentPost: {},
 				reusableBlocks: {
 					data: {},
 				},
@@ -2327,8 +2357,10 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 1 ],
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 				reusableBlocks: {
 					data: {},
 				},
@@ -2344,8 +2376,10 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {},
 						blockOrder: {},
+						edits: {},
 					},
 				},
+				currentPost: {},
 				reusableBlocks: {
 					data: {
 						123: {

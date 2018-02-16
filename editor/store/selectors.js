@@ -450,10 +450,10 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, uid ) => [
-		get( state, [ 'editor', 'present', 'blocksByUid', uid ] ),
+		state.editor.present.blocksByUid[ uid ],
 		getBlockDependantsCacheBust( state, uid ),
-		get( state, [ 'editor', 'present', 'edits', 'meta' ] ),
-		get( state, 'currentPost.meta' ),
+		state.editor.present.edits.meta,
+		state.currentPost.meta,
 	]
 );
 
