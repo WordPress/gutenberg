@@ -35,6 +35,7 @@ import {
 	selectBlock,
 	fetchTaxonomies,
 	fetchTaxonomyTerms,
+	addTaxonomyTerm,
 } from '../../store/actions';
 import reducer from '../reducer';
 import effects from '../effects';
@@ -972,7 +973,7 @@ describe( 'effects', () => {
 					taxonomies: {
 						data: {
 							category: {
-								rest_base: 'categories',
+								slug: 'category',
 							},
 						},
 					},
@@ -1008,6 +1009,56 @@ describe( 'effects', () => {
 								parent: 5,
 							},
 						],
+					} );
+				} );
+			} );
+		} );
+
+		describe( '.ADD_TAXONOMY_TERM', () => {
+			const handler = effects.ADD_TAXONOMY_TERM;
+
+			it( 'should post a new taxonomy term', () => {
+				const promise = Promise.resolve( {
+					id: 5,
+					name: 'SEO',
+					slug: 'seo',
+					taxonomy: 'category',
+					parent: 0,
+				} );
+
+				const getTaxonomyCollection = jest.fn();
+				getTaxonomyCollection.mockReturnValue( class {
+					fetch() {
+						return promise;
+					}
+				} );
+				set( global, 'wp.api.getTaxonomyCollection', getTaxonomyCollection );
+
+				const getState = jest.fn();
+				const dispatch = jest.fn();
+				getState.mockReturnValue( {
+					taxonomies: {
+						data: {
+							category: {
+								slug: 'category',
+							},
+						},
+					},
+				} );
+				const store = { getState, dispatch };
+
+				handler( addTaxonomyTerm( 'category', 'categoryName', null ), store );
+				promise.then( () => {
+					expect( dispatch ).toHaveBeenCalledTimes( 1 );
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'ADD_TAXONOMY_TERM_SUCCESS',
+						taxonomyTerm: {
+							id: 1,
+							name: 'Uncategorized',
+							slug: 'uncategorized',
+							taxonomy: 'category',
+							parent: 0,
+						},
 					} );
 				} );
 			} );
