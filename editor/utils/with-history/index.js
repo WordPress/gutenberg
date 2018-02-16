@@ -77,12 +77,12 @@ export default function withHistory( reducer, options = {} ) {
 			return state;
 		}
 
-		let nextPast = [ ...past, present ];
+		let nextPast = past;
 
 		shouldCreateUndoLevel = ! past.length || shouldCreateUndoLevel;
 
-		if ( ! shouldCreateUndoLevel && shouldOverwriteState( action, previousAction ) ) {
-			nextPast = past;
+		if ( shouldCreateUndoLevel || ! shouldOverwriteState( action, previousAction ) ) {
+			nextPast = [ ...past, present ];
 		}
 
 		shouldCreateUndoLevel = false;
