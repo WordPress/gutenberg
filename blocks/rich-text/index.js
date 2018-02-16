@@ -579,7 +579,7 @@ export class RichText extends Component {
 				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
 				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
 
-				this.props.onSplit( beforeElement, afterElement );
+				this.restoreContentAndSplit( beforeElement, afterElement );
 			} else {
 				event.preventDefault();
 				this.onCreateUndoLevel();
@@ -638,9 +638,10 @@ export class RichText extends Component {
 
 			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
 			const afterElement = nodeListToReact( filterEmptyNodes( afterFragment.childNodes ), createTinyMCEElement );
-			this.props.onSplit( beforeElement, afterElement, ...blocks );
+
+			this.restoreContentAndSplit( beforeElement, afterElement, blocks );
 		} else {
-			this.props.onSplit( [], [], ...blocks );
+			this.restoreContentAndSplit( [], [], blocks );
 		}
 	}
 
@@ -686,7 +687,7 @@ export class RichText extends Component {
 		// Splitting into two blocks
 		this.setContent( this.props.value );
 
-		this.props.onSplit(
+		this.restoreContentAndSplit(
 			nodeListToReact( before, createTinyMCEElement ),
 			nodeListToReact( after, createTinyMCEElement )
 		);
@@ -740,7 +741,9 @@ export class RichText extends Component {
 			!! this.editor &&
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent
+			this.props.value !== this.savedContent &&
+			! isEqual( this.props.value, prevProps.value ) &&
+			! isEqual( this.props.value, this.savedContent )
 		) {
 			this.updateContent();
 		}
@@ -794,6 +797,19 @@ export class RichText extends Component {
 		this.setState( ( state ) => ( {
 			formats: merge( {}, state.formats, formats ),
 		} ) );
+	}
+
+	/**
+	 * Calling onSplit means we need to abort the change done by TinyMCE.
+	 * we need to call updateContent to restore the initial content before calling onSplit.
+	 *
+	 * @param {Array}  before content before the split position
+	 * @param {Array}  after  content after the split position
+	 * @param {?Array} blocks blocks to insert at the split position
+	 */
+	restoreContentAndSplit( before, after, blocks ) {
+		this.updateContent();
+		this.props.onSplit( before, after, ...blocks );
 	}
 
 	render() {
