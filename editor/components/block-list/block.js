@@ -85,7 +85,7 @@ export class BlockListBlock extends Component {
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
-		this.onMouseLeave = this.onMouseLeave.bind( this );
+		this.hideHoverEffects = this.hideHoverEffects.bind( this );
 		this.maybeStartTyping = this.maybeStartTyping.bind( this );
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
@@ -144,6 +144,10 @@ export class BlockListBlock extends Component {
 			( newProps.isSelected || newProps.isFirstMultiSelected )
 		) {
 			this.previousOffset = this.node.getBoundingClientRect().top;
+		}
+
+		if ( newProps.isTyping || newProps.isSelected ) {
+			this.hideHoverEffects();
 		}
 	}
 
@@ -286,10 +290,11 @@ export class BlockListBlock extends Component {
 	 * @see https://developer.mozilla.org/en-US/docs/Web/Events/mouseenter
 	 */
 	maybeHover() {
-		const { isMultiSelected } = this.props;
+		const { isMultiSelected, isSelected } = this.props;
 		const { isHovered } = this.state;
 
-		if ( isHovered || isMultiSelected || this.hadTouchStart ) {
+		if ( isHovered || isMultiSelected || isSelected ||
+				this.props.isMultiSelecting || this.hadTouchStart ) {
 			return;
 		}
 
@@ -301,7 +306,7 @@ export class BlockListBlock extends Component {
 	 * where mouseleave may occur but the block is not hovered (multi-select),
 	 * so to avoid unnecesary renders, the state is only set if hovered.
 	 */
-	onMouseLeave() {
+	hideHoverEffects() {
 		if ( this.state.isHovered ) {
 			this.setState( { isHovered: false } );
 		}
@@ -565,7 +570,7 @@ export class BlockListBlock extends Component {
 			<IgnoreNestedEvents
 				ref={ this.setBlockListRef }
 				onMouseOver={ this.maybeHover }
-				onMouseLeave={ this.onMouseLeave }
+				onMouseLeave={ this.hideHoverEffects }
 				className={ wrapperClassName }
 				data-type={ block.name }
 				onTouchStart={ this.onTouchStart }
