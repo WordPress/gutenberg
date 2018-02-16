@@ -29,6 +29,8 @@ import DefaultBlockAppender from '../default-block-appender';
 import {
 	isSelectionEnabled,
 	isMultiSelecting,
+	getMultiSelectedBlocksStartUid,
+	getMultiSelectedBlocksEndUid,
 } from '../../store/selectors';
 import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
 
@@ -236,6 +238,8 @@ export default connect(
 		// Reference block selection value directly, since current selectors
 		// assume either multi-selection (getMultiSelectedBlocksStartUid) or
 		// singular-selection (getSelectedBlock) exclusively.
+		selectionStart: getMultiSelectedBlocksStartUid( state ),
+		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		selectionStartUID: state.blockSelection.start,
 		isSelectionEnabled: isSelectionEnabled( state ),
 		isMultiSelecting: isMultiSelecting( state ),
