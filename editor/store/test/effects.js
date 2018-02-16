@@ -958,11 +958,13 @@ describe( 'effects', () => {
 					},
 				] );
 
-				set( global, 'wp.api.collections.Categories', class {
+				const getTaxonomyCollection = jest.fn();
+				getTaxonomyCollection.mockReturnValue( class {
 					fetch() {
 						return promise;
 					}
 				} );
+				set( global, 'wp.api.getTaxonomyCollection', getTaxonomyCollection );
 
 				const dispatch = jest.fn();
 				const getState = jest.fn();

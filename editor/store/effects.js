@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, has, includes, map, castArray, uniqueId, reduce, values, some, forEach, upperFirst } from 'lodash';
+import { get, has, includes, map, castArray, uniqueId, reduce, values, some, forEach } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -592,10 +592,10 @@ export default {
 		}
 
 		const taxonomy = state.taxonomies.data[ action.taxonomy ];
-		const className = upperFirst( taxonomy.rest_base );
 
+		const TaxonomyCollection = wp.api.getTaxonomyCollection( taxonomy.slug );
 		// Only proceed if the api collections has this taxonomy class
-		if ( ! has( wp, `api.collections.${ className }` ) ) {
+		if ( ! TaxonomyCollection ) {
 			dispatch( {
 				type: 'FETCH_TAXONOMIES_FAILURE',
 				error: {
@@ -606,7 +606,7 @@ export default {
 			return;
 		}
 
-		const collection = new wp.api.collections[ className ]();
+		const collection = new TaxonomyCollection();
 		collection.fetch().then( ( taxonomyTerms ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
