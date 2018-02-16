@@ -228,6 +228,26 @@ export function getBlockTypes() {
 }
 
 /**
+ * Returns the block support value for a feature, if defined.
+ *
+ * @param  {(string|Object)} nameOrType      Block name or type object
+ * @param  {string}          feature         Feature to retrieve
+ * @param  {*}               defaultSupports Default value to return if not
+ *                                           explicitly defined
+ * @return {?*}                              Block support value
+ */
+export function getBlockSupport( nameOrType, feature, defaultSupports ) {
+	const blockType = 'string' === typeof nameOrType ?
+		getBlockType( nameOrType ) :
+		nameOrType;
+
+	return get( blockType, [
+		'supports',
+		feature,
+	], defaultSupports );
+}
+
+/**
  * Returns true if the block defines support for a feature, or false otherwise.
  *
  * @param {(string|Object)} nameOrType      Block name or type object.
@@ -238,14 +258,7 @@ export function getBlockTypes() {
  * @return {boolean} Whether block supports feature.
  */
 export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
-	const blockType = 'string' === typeof nameOrType ?
-		getBlockType( nameOrType ) :
-		nameOrType;
-
-	return !! get( blockType, [
-		'supports',
-		feature,
-	], defaultSupports );
+	return !! getBlockSupport( nameOrType, feature, defaultSupports );
 }
 
 /**
