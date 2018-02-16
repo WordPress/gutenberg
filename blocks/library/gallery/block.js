@@ -26,7 +26,6 @@ import MediaUpload from '../../media-upload';
 import ImagePlaceholder from '../../image-placeholder';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
 
 const MAX_COLUMNS = 8;
@@ -48,7 +47,6 @@ class GalleryBlock extends Component {
 		this.onSelectImages = this.onSelectImages.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
-		this.updateAlignment = this.updateAlignment.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
@@ -97,10 +95,6 @@ class GalleryBlock extends Component {
 
 	setColumnsNumber( value ) {
 		this.props.setAttributes( { columns: value } );
-	}
-
-	updateAlignment( nextAlign ) {
-		this.props.setAttributes( { align: nextAlign } );
 	}
 
 	toggleImageCrop() {
@@ -164,10 +158,6 @@ class GalleryBlock extends Component {
 		const controls = (
 			isSelected && (
 				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ this.updateAlignment }
-					/>
 					{ !! images.length && (
 						<Toolbar>
 							<MediaUpload

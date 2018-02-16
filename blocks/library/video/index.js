@@ -17,7 +17,6 @@ import './editor.scss';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 export const name = 'core/video';
 
@@ -31,9 +30,6 @@ export const settings = {
 	category: 'common',
 
 	attributes: {
-		align: {
-			type: 'string',
-		},
 		id: {
 			type: 'number',
 		},
@@ -50,11 +46,8 @@ export const settings = {
 		},
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
+	supports: {
+		align: true,
 	},
 
 	edit: class extends Component {
@@ -70,10 +63,9 @@ export const settings = {
 		}
 
 		render() {
-			const { align, caption, id } = this.props.attributes;
+			const { caption, id } = this.props.attributes;
 			const { setAttributes, isSelected } = this.props;
 			const { editing, className, src } = this.state;
-			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
 			};
@@ -96,10 +88,6 @@ export const settings = {
 			};
 			const controls = isSelected && (
 				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
 					<Toolbar>
 						<IconButton
 							className="components-icon-button components-toolbar__control"

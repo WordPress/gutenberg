@@ -21,10 +21,7 @@ import AlignmentToolbar from '../../alignment-toolbar';
 import MediaUpload from '../../media-upload';
 import ImagePlaceholder from '../../image-placeholder';
 import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
-
-const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 export const name = 'core/cover-image';
 
@@ -46,9 +43,6 @@ export const settings = {
 		url: {
 			type: 'string',
 		},
-		align: {
-			type: 'string',
-		},
 		contentAlign: {
 			type: 'string',
 			default: 'center',
@@ -64,6 +58,10 @@ export const settings = {
 			type: 'number',
 			default: 50,
 		},
+	},
+
+	supports: {
+		align: true,
 	},
 
 	transforms: {
@@ -87,16 +85,8 @@ export const settings = {
 		],
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( -1 !== validAlignments.indexOf( align ) ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit( { attributes, setAttributes, isSelected, className } ) {
-		const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const { url, title, contentAlign, id, hasParallax, dimRatio } = attributes;
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
@@ -124,11 +114,6 @@ export const settings = {
 		);
 		const controls = isSelected && [
 			<BlockControls key="controls">
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ updateAlignment }
-				/>
-
 				{ alignmentToolbar }
 				<Toolbar>
 					<MediaUpload

@@ -24,14 +24,8 @@ export const settings = {
 	keywords: [ __( 'recent posts' ) ],
 
 	supports: {
+		align: [ 'center', 'wide', 'full' ],
 		html: false,
-	},
-
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
 	},
 
 	edit: LatestPostsBlock,
