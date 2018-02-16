@@ -138,7 +138,6 @@ export class RichText extends Component {
 		this.onPropagateUndo = this.onPropagateUndo.bind( this );
 		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
-		this.onAddUndo = this.onAddUndo.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 
 		this.state = {
@@ -191,7 +190,8 @@ export class RichText extends Component {
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
 		editor.on( 'input', this.onChange );
-		editor.on( 'addundo', this.onAddUndo );
+		// The change event in TinyMCE fires every time an undo level is added.
+		editor.on( 'change', this.onCreateUndoLevel );
 
 		patterns.apply( this, [ editor ] );
 
@@ -400,14 +400,6 @@ export class RichText extends Component {
 		this.isEmpty = this.editor.dom.isEmpty( this.editor.getBody() );
 		this.savedContent = this.isEmpty ? [] : this.getContent();
 		this.props.onChange( this.savedContent );
-	}
-
-	onAddUndo( { lastLevel } ) {
-		if ( ! lastLevel ) {
-			return;
-		}
-
-		this.onCreateUndoLevel();
 	}
 
 	onCreateUndoLevel() {
