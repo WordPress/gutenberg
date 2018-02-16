@@ -6,9 +6,7 @@ import {
 	map,
 	first,
 	get,
-	has,
 	last,
-	reduce,
 	compact,
 	find,
 	some,
@@ -422,46 +420,16 @@ export const getBlock = createSelector(
 			return null;
 		}
 
-		let { attributes } = block;
-
-		// Inject custom source attribute values.
-		//
-		// TODO: Create generic external sourcing pattern, not explicitly
-		// targeting meta attributes.
-		const type = getBlockType( block.name );
-		if ( type ) {
-			attributes = reduce( type.attributes, ( result, value, key ) => {
-				if ( value.source === 'meta' ) {
-					if ( result === attributes ) {
-						result = { ...result };
-					}
-
-					result[ key ] = getPostMeta( state, value.meta );
-				}
-
-				return result;
-			}, attributes );
-		}
-
 		return {
 			...block,
-			attributes,
 			innerBlocks: getBlocks( state, uid ),
 		};
 	},
 	( state, uid ) => [
 		get( state, [ 'editor', 'present', 'blocksByUid', uid ] ),
 		getBlockDependantsCacheBust( state, uid ),
-		get( state, [ 'editor', 'present', 'edits', 'meta' ] ),
-		get( state, 'currentPost.meta' ),
 	]
 );
-
-function getPostMeta( state, key ) {
-	return has( state, [ 'editor', 'present', 'edits', 'meta', key ] ) ?
-		get( state, [ 'editor', 'present', 'edits', 'meta', key ] ) :
-		get( state, [ 'currentPost', 'meta', key ] );
-}
 
 /**
  * Returns all block objects for the current post being edited as an array in

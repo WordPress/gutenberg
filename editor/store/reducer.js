@@ -114,12 +114,12 @@ function getFlattenedBlocks( blocks ) {
 export const editor = flow( [
 	combineReducers,
 
-	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, { resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ] } ),
+	// Track undo history, starting at editor initialization of blocks. Assumes
+	// one of either block resetting, new post setup occurs in initialization.
+	partialRight( withHistory, { resetTypes: [ 'SETUP_NEW_POST', 'RESET_BLOCKS' ] } ),
 
-	// Track whether changes exist, resetting at each post save. Relies on
-	// editor initialization firing post reset as an effect.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_NEW_POST', 'RESET_POST' ] } ),
+	// Track whether changes exist, resetting at initialization and each save.
+	partialRight( withChangeDetection, { resetTypes: [ 'RESET_POST', 'SETUP_NEW_POST', 'RESET_BLOCKS' ] } ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {

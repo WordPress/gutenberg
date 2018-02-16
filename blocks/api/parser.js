@@ -8,6 +8,7 @@ import { mapValues, omit } from 'lodash';
  * WordPress dependencies
  */
 import { autop } from '@wordpress/autop';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -118,7 +119,15 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 			break;
 	}
 
-	return value === undefined ? attributeSchema.default : asType( value, attributeSchema.type );
+	value = applyFilters( 'blocks.getBlockAttribute.source', value, attributeSchema, innerHTML, commentAttributes );
+
+	if ( value === undefined ) {
+		value = attributeSchema.default;
+	} else {
+		value = asType( value, attributeSchema.type );
+	}
+
+	return applyFilters( 'blocks.getBlockAttribute', value, attributeSchema, innerHTML, commentAttributes );
 }
 
 /**
