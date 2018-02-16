@@ -373,6 +373,14 @@ export class BlockListBlock extends Component {
 	 * @return {void}
 	 */
 	onFocus( event ) {
+		// Firefox-specific: Firefox will redirect focus of an already-focused
+		// node to its parent, but assign a property before doing so. If that
+		// property exists, ensure that it is the node, or abort.
+		const { explicitOriginalTarget } = event.nativeEvent;
+		if ( explicitOriginalTarget && explicitOriginalTarget !== this.node ) {
+			return;
+		}
+
 		if ( event.target === this.node && ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
