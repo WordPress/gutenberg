@@ -15,6 +15,8 @@ import {
 	findIndex,
 	reject,
 	omitBy,
+	keys,
+	isEqual,
 } from 'lodash';
 
 /**
@@ -96,6 +98,31 @@ function getFlattenedBlocks( blocks ) {
 }
 
 /**
+ * Option for the history reducer. When the block ID and updated attirbute keys
+ * are the same as previously, the history reducer should overwrite its present
+ * state.
+ *
+ * @param {Object} action         The currently dispatched action.
+ * @param {Object} previousAction The previously dispatched action.
+ *
+ * @return {boolean} Whether or not to overwrite present state.
+ */
+function shouldOverwriteState( action, previousAction ) {
+	if (
+		previousAction &&
+		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+		action.type === previousAction.type
+	) {
+		const attributes = keys( action.attributes );
+		const previousAttributes = keys( previousAction.attributes );
+
+		return action.uid === previousAction.uid && isEqual( attributes, previousAttributes );
+	}
+
+	return false;
+}
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -115,7 +142,10 @@ export const editor = flow( [
 	combineReducers,
 
 	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, { resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ] } ),
+	partialRight( withHistory, {
+		resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ],
+		shouldOverwriteState,
+	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.

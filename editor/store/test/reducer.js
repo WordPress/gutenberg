@@ -819,6 +819,74 @@ describe( 'state', () => {
 				expect( state.present.blocksByUid ).toBe( state.present.blocksByUid );
 			} );
 		} );
+
+		describe( 'withHistory', () => {
+			it( 'should overwrite present history if updating same attributes', () => {
+				let state;
+
+				state = editor( state, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {},
+						innerBlocks: [],
+					} ],
+				} );
+
+				expect( state.past ).toHaveLength( 1 );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 1,
+					},
+				} );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 2,
+					},
+				} );
+
+				expect( state.past ).toHaveLength( 2 );
+			} );
+
+			it( 'should not overwrite present history if updating same attributes', () => {
+				let state;
+
+				state = editor( state, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {},
+						innerBlocks: [],
+					} ],
+				} );
+
+				expect( state.past ).toHaveLength( 1 );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 1,
+					},
+				} );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						other: 1,
+					},
+				} );
+
+				expect( state.past ).toHaveLength( 3 );
+			} );
+		} );
 	} );
 
 	describe( 'currentPost()', () => {

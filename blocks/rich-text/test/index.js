@@ -219,6 +219,7 @@ describe( 'RichText', () => {
 				expect( wrapper.instance().getSettings( settings ) ).toEqual( {
 					setting: 'hi',
 					forced_root_block: false,
+					custom_undo_redo_levels: 1,
 				} );
 			} );
 
