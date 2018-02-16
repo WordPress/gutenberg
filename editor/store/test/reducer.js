@@ -688,11 +688,12 @@ describe( 'state', () => {
 
 			it( 'should save initial post state', () => {
 				const state = editor( undefined, {
-					type: 'SETUP_NEW_POST',
+					type: 'SETUP_EDITOR_STATE',
 					edits: {
 						status: 'draft',
 						title: 'post title',
 					},
+					blocks: [],
 				} );
 
 				expect( state.present.edits ).toEqual( {

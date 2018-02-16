@@ -18,8 +18,7 @@ import {
  * Internal dependencies
  */
 import {
-	resetPost,
-	setupNewPost,
+	setupEditorState,
 	resetBlocks,
 	mergeBlocks,
 	replaceBlocks,
@@ -439,9 +438,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( [
-				resetPost( post ),
-			] );
+			expect( result ).toEqual( setupEditorState( post, [], {} ) );
 		} );
 
 		it( 'should return block reset with non-empty content', () => {
@@ -459,11 +456,8 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toHaveLength( 2 );
-			expect( result ).toContainEqual( resetPost( post ) );
-			expect( result.some( ( { blocks } ) => {
-				return blocks && blocks[ 0 ].name === 'core/test-block';
-			} ) ).toBe( true );
+			expect( result.blocks ).toHaveLength( 1 );
+			expect( result ).toEqual( setupEditorState( post, result.blocks, {} ) );
 		} );
 
 		it( 'should return post setup action only if auto-draft', () => {
@@ -480,13 +474,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( [
-				resetPost( post ),
-				setupNewPost( {
-					title: 'A History of Pork',
-					status: 'draft',
-				} ),
-			] );
+			expect( result ).toEqual( setupEditorState( post, [], { title: 'A History of Pork', status: 'draft' } ) );
 		} );
 	} );
 

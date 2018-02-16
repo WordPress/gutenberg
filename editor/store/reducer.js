@@ -143,18 +143,18 @@ export const editor = flow( [
 
 	// Track undo history, starting at editor initialization.
 	partialRight( withHistory, {
-		resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ],
+		resetTypes: [ 'SETUP_EDITOR_STATE' ],
 		shouldOverwriteState,
 	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_NEW_POST', 'RESET_POST' ] } ),
+	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ] } ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-			case 'SETUP_NEW_POST':
+			case 'SETUP_EDITOR_STATE':
 				return reduce( action.edits, ( result, value, key ) => {
 					// Only assign into result if not already same value
 					if ( value !== state[ key ] ) {
@@ -198,6 +198,7 @@ export const editor = flow( [
 	blocksByUid( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
+			case 'SETUP_EDITOR_STATE':
 				return getFlattenedBlocks( action.blocks );
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
@@ -301,6 +302,7 @@ export const editor = flow( [
 	blockOrder( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
+			case 'SETUP_EDITOR_STATE':
 				return mapBlockOrder( action.blocks );
 
 			case 'INSERT_BLOCKS': {
@@ -436,6 +438,7 @@ export const editor = flow( [
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
+		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
 		case 'UPDATE_POST':
 			let post;
