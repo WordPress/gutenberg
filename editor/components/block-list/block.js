@@ -3,13 +3,14 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, reduce, size, castArray, noop } from 'lodash';
+import { get, reduce, size, castArray, noop, first, last } from 'lodash';
+import tinymce from 'tinymce';
 
 /**
  * WordPress dependencies
  */
 import { Component, findDOMNode, compose } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, focus } from '@wordpress/utils';
 import {
 	BlockEdit,
 	createBlock,
@@ -25,7 +26,11 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getScrollContainer } from '../../utils/dom';
+import {
+	getScrollContainer,
+	placeCaretAtHorizontalEdge,
+	placeCaretAtVerticalEdge,
+} from '../../utils/dom';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
@@ -67,6 +72,7 @@ import {
 	isTyping,
 	getBlockMode,
 	getCurrentPostType,
+	getSelectedBlocksInitialCaretPosition,
 } from '../../store/selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
@@ -126,6 +132,10 @@ export class BlockListBlock extends Component {
 			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
 		}
 		document.addEventListener( 'selectionchange', this.onSelectionChange );
+
+		if ( this.props.isSelected ) {
+			this.focusTabbable();
+		}
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -158,6 +168,10 @@ export class BlockListBlock extends Component {
 				this.removeStopTypingListener();
 			}
 		}
+
+		if ( this.props.isSelected && ! prevProps.isSelected ) {
+			this.focusTabbable();
+		}
 	}
 
 	componentWillUnmount() {
@@ -187,6 +201,46 @@ export class BlockListBlock extends Component {
 		//
 		// eslint-disable-next-line react/no-find-dom-node
 		this.node = findDOMNode( node );
+	}
+
+	/**
+	 * When a block becomces selected, transition focus to an inner tabbable.
+	 */
+	focusTabbable() {
+		const { initialPosition } = this.props;
+
+		if ( this.node.contains( document.activeElement ) ) {
+			return;
+		}
+
+		// Find all tabbables within node.
+		const tabbables = focus.tabbable.find( this.node );
+
+		// If reversed (e.g. merge via backspace), use the last in the set of
+		// tabbables.
+		const isReverse = -1 === initialPosition;
+		const target = ( isReverse ? last : first )( tabbables );
+
+		if ( ! target ) {
+			return;
+		}
+
+		target.focus();
+
+		// In reverse case, need to explicitly place caret position.
+		if ( isReverse ) {
+			// Special case RichText component because the placeCaret utilities
+			// aren't working correctly. When merging two paragraph blocks, the
+			// focus is not moved to the correct position.
+			const editor = tinymce.get( target.getAttribute( 'id' ) );
+			if ( editor ) {
+				editor.selection.select( editor.getBody(), true );
+				editor.selection.collapse( false );
+			} else {
+				placeCaretAtHorizontalEdge( target, true );
+				placeCaretAtVerticalEdge( target, true );
+			}
+		}
 	}
 
 	setAttributes( attributes ) {
@@ -625,6 +679,7 @@ const mapStateToProps = ( state, { uid, rootUID } ) => {
 		mode: getBlockMode( state, uid ),
 		isSelectionEnabled: isSelectionEnabled( state ),
 		postType: getCurrentPostType( state ),
+		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
 		isSelected,
 	};
 };
