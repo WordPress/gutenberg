@@ -392,8 +392,6 @@ export class RichText extends Component {
 
 	/**
 	 * Handles any case where the content of the tinyMCE instance has changed.
-	 *
-	 * @param {boolean} checkIfDirty Check whether the editor is dirty before calling onChange.
 	 */
 
 	onChange() {
@@ -791,8 +789,6 @@ export class RichText extends Component {
 		this.setState( ( state ) => ( {
 			formats: merge( {}, state.formats, formats ),
 		} ) );
-
-		this.editor.setDirty( true );
 	}
 
 	render() {
