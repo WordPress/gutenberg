@@ -253,7 +253,9 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						edits: {},
+						edits: {
+							status: 'draft',
+						},
 					},
 				},
 			};
@@ -268,7 +270,9 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						edits: {},
+						edits: {
+							status: 'draft',
+						},
 					},
 				},
 			};

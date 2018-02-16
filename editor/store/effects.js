@@ -33,7 +33,6 @@ import {
 	createErrorNotice,
 	removeNotice,
 	savePost,
-	editPost,
 	requestMetaBoxUpdates,
 	metaBoxUpdatesSuccess,
 	updateReusableBlock,
@@ -285,11 +284,6 @@ export default {
 			return;
 		}
 
-		// Change status from auto-draft to draft
-		if ( isEditedPostNew( state ) ) {
-			dispatch( editPost( { status: 'draft' } ) );
-		}
-
 		dispatch( savePost() );
 	},
 	SETUP_EDITOR( action ) {
@@ -319,6 +313,7 @@ export default {
 		if ( post.status === 'auto-draft' ) {
 			effects.push( setupNewPost( {
 				title: post.title.raw,
+				status: 'draft',
 			} ) );
 		}
 
