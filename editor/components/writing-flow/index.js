@@ -261,6 +261,14 @@ class WritingFlow extends Component {
 			const blockContainer = this.container.querySelector( `[data-block="${ this.props.selectedBlockUID }"]` );
 			if ( blockContainer && ! blockContainer.contains( document.activeElement ) ) {
 				const target = this.getInnerTabbable( blockContainer, this.props.initialPosition === -1 );
+
+				// Avoid selecting the target if it's:
+				//  - The default block appender (or generally uneditable)
+				//  - Within a nested block
+				if ( target.readOnly || target.closest( '[data-block]' ) !== blockContainer ) {
+					return;
+				}
+
 				target.focus();
 				if ( this.props.initialPosition === -1 ) {
 					// Special casing RichText components because the two functions at the bottom are not working as expected.
