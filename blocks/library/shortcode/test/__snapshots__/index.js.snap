@@ -24,7 +24,7 @@ exports[`core/shortcode block edit matches snapshot 1`] = `
     Shortcode
   </label>
   <textarea
-    autocomplete="off"
+    class="blocks-plain-text"
     id="blocks-shortcode-input-0"
     placeholder="Write shortcode here…"
     rows="1"

@@ -6,24 +6,23 @@ import { combineReducers } from 'redux';
 import {
 	flow,
 	partialRight,
-	difference,
 	reduce,
-	keyBy,
-	keys,
 	first,
 	last,
 	omit,
-	pick,
 	without,
 	mapValues,
 	findIndex,
 	reject,
+	omitBy,
+	keys,
+	isEqual,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, getBlockType } from '@wordpress/blocks';
+import { isReusableBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -32,18 +31,13 @@ import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
 import { PREFERENCES_DEFAULTS } from './defaults';
 
-/***
- * Module constants
- */
-const MAX_RECENT_BLOCKS = 8;
-
 /**
  * Returns a post attribute value, flattening nested rendered content using its
  * raw value in place of its original object form.
  *
  * @param {*} value Original value.
  *
- * @returns {*} Raw value.
+ * @return {*} Raw value.
  */
 export function getPostRawValue( value ) {
 	if ( value && 'object' === typeof value && 'raw' in value ) {
@@ -54,6 +48,81 @@ export function getPostRawValue( value ) {
 }
 
 /**
+ * Given an array of blocks, returns an object where each key is a nesting
+ * context, the value of which is an array of block UIDs existing within that
+ * nesting context.
+ *
+ * @param {Array}   blocks  Blocks to map.
+ * @param {?string} rootUID Assumed root UID.
+ *
+ * @return {Object} Block order map object.
+ */
+function mapBlockOrder( blocks, rootUID = '' ) {
+	const result = { [ rootUID ]: [] };
+
+	blocks.forEach( ( block ) => {
+		const { uid, innerBlocks } = block;
+
+		result[ rootUID ].push( uid );
+
+		Object.assign( result, mapBlockOrder( innerBlocks, uid ) );
+	} );
+
+	return result;
+}
+
+/**
+ * Given an array of blocks, returns an object containing all blocks, recursing
+ * into inner blocks. Keys correspond to the block UID, the value of which is
+ * the block object.
+ *
+ * @param {Array} blocks Blocks to flatten.
+ *
+ * @return {Object} Flattened blocks object.
+ */
+function getFlattenedBlocks( blocks ) {
+	const flattenedBlocks = {};
+
+	const stack = [ ...blocks ];
+	while ( stack.length ) {
+		// `innerBlocks` is redundant data which can fall out of sync, since
+		// this is reflected in `blockOrder`, so exclude from appended block.
+		const { innerBlocks, ...block } = stack.shift();
+
+		stack.push( ...innerBlocks );
+
+		flattenedBlocks[ block.uid ] = block;
+	}
+
+	return flattenedBlocks;
+}
+
+/**
+ * Option for the history reducer. When the block ID and updated attirbute keys
+ * are the same as previously, the history reducer should overwrite its present
+ * state.
+ *
+ * @param {Object} action         The currently dispatched action.
+ * @param {Object} previousAction The previously dispatched action.
+ *
+ * @return {boolean} Whether or not to overwrite present state.
+ */
+function shouldOverwriteState( action, previousAction ) {
+	if (
+		previousAction &&
+		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+		action.type === previousAction.type
+	) {
+		const attributes = keys( action.attributes );
+		const previousAttributes = keys( previousAction.attributes );
+
+		return action.uid === previousAction.uid && isEqual( attributes, previousAttributes );
+	}
+
+	return false;
+}
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -61,7 +130,8 @@ export function getPostRawValue( value ) {
  *  - edits: an object describing changes to be made to the current post, in
  *           the format accepted by the WP REST API
  *  - blocksByUid: post content blocks keyed by UID
- *  - blockOrder: list of block UIDs in order
+ *  - blockOrder: object where each key is a UID, its value an array of uids
+ *                representing the order of its inner blocks
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -72,16 +142,19 @@ export const editor = flow( [
 	combineReducers,
 
 	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, { resetTypes: [ 'SETUP_EDITOR' ] } ),
+	partialRight( withHistory, {
+		resetTypes: [ 'SETUP_EDITOR_STATE' ],
+		shouldOverwriteState,
+	} ),
 
-	// Track whether changes exist, starting at editor initialization and
-	// resetting at each post save.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR', 'RESET_POST' ] } ),
+	// Track whether changes exist, resetting at each post save. Relies on
+	// editor initialization firing post reset as an effect.
+	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ] } ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-			case 'SETUP_NEW_POST':
+			case 'SETUP_EDITOR_STATE':
 				return reduce( action.edits, ( result, value, key ) => {
 					// Only assign into result if not already same value
 					if ( value !== state[ key ] ) {
@@ -125,7 +198,8 @@ export const editor = flow( [
 	blocksByUid( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
-				return keyBy( action.blocks, 'uid' );
+			case 'SETUP_EDITOR_STATE':
+				return getFlattenedBlocks( action.blocks );
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
@@ -179,19 +253,18 @@ export const editor = flow( [
 			case 'INSERT_BLOCKS':
 				return {
 					...state,
-					...keyBy( action.blocks, 'uid' ),
+					...getFlattenedBlocks( action.blocks ),
 				};
 
 			case 'REPLACE_BLOCKS':
 				if ( ! action.blocks ) {
 					return state;
 				}
-				return action.blocks.reduce( ( memo, block ) => {
-					return {
-						...memo,
-						[ block.uid ]: block,
-					};
-				}, omit( state, action.uids ) );
+
+				return {
+					...omit( state, action.uids ),
+					...getFlattenedBlocks( action.blocks ),
+				};
 
 			case 'REMOVE_BLOCKS':
 				return omit( state, action.uids );
@@ -226,80 +299,128 @@ export const editor = flow( [
 		return state;
 	},
 
-	blockOrder( state = [], action ) {
+	blockOrder( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
-				return action.blocks.map( ( { uid } ) => uid );
+			case 'SETUP_EDITOR_STATE':
+				return mapBlockOrder( action.blocks );
 
 			case 'INSERT_BLOCKS': {
-				const position = action.position !== undefined ? action.position : state.length;
-				return [
-					...state.slice( 0, position ),
-					...action.blocks.map( block => block.uid ),
-					...state.slice( position ),
-				];
+				const { rootUID = '', blocks } = action;
+
+				const subState = state[ rootUID ] || [];
+				const mappedBlocks = mapBlockOrder( blocks, rootUID );
+
+				const { index = subState.length } = action;
+
+				return {
+					...state,
+					...mappedBlocks,
+					[ rootUID ]: [
+						...subState.slice( 0, index ),
+						...mappedBlocks[ rootUID ],
+						...subState.slice( index ),
+					],
+				};
 			}
 
 			case 'MOVE_BLOCKS_UP': {
-				const firstUid = first( action.uids );
-				const lastUid = last( action.uids );
+				const { uids, rootUID = '' } = action;
+				const firstUid = first( uids );
+				const lastUid = last( uids );
+				const subState = state[ rootUID ];
 
-				if ( ! state.length || firstUid === first( state ) ) {
+				if ( ! subState.length || firstUid === first( subState ) ) {
 					return state;
 				}
 
-				const firstIndex = state.indexOf( firstUid );
-				const lastIndex = state.indexOf( lastUid );
-				const swappedUid = state[ firstIndex - 1 ];
+				const firstIndex = subState.indexOf( firstUid );
+				const lastIndex = subState.indexOf( lastUid );
+				const swappedUid = subState[ firstIndex - 1 ];
 
-				return [
-					...state.slice( 0, firstIndex - 1 ),
-					...action.uids,
-					swappedUid,
-					...state.slice( lastIndex + 1 ),
-				];
+				return {
+					...state,
+					[ rootUID ]: [
+						...subState.slice( 0, firstIndex - 1 ),
+						...uids,
+						swappedUid,
+						...subState.slice( lastIndex + 1 ),
+					],
+				};
 			}
 
 			case 'MOVE_BLOCKS_DOWN': {
-				const firstUid = first( action.uids );
-				const lastUid = last( action.uids );
+				const { uids, rootUID = '' } = action;
+				const firstUid = first( uids );
+				const lastUid = last( uids );
+				const subState = state[ rootUID ];
 
-				if ( ! state.length || lastUid === last( state ) ) {
+				if ( ! subState.length || lastUid === last( subState ) ) {
 					return state;
 				}
 
-				const firstIndex = state.indexOf( firstUid );
-				const lastIndex = state.indexOf( lastUid );
-				const swappedUid = state[ lastIndex + 1 ];
+				const firstIndex = subState.indexOf( firstUid );
+				const lastIndex = subState.indexOf( lastUid );
+				const swappedUid = subState[ lastIndex + 1 ];
 
-				return [
-					...state.slice( 0, firstIndex ),
-					swappedUid,
-					...action.uids,
-					...state.slice( lastIndex + 2 ),
-				];
+				return {
+					...state,
+					[ rootUID ]: [
+						...subState.slice( 0, firstIndex ),
+						swappedUid,
+						...uids,
+						...subState.slice( lastIndex + 2 ),
+					],
+				};
 			}
 
-			case 'REPLACE_BLOCKS':
-				if ( ! action.blocks ) {
+			case 'REPLACE_BLOCKS': {
+				const { blocks, uids } = action;
+				if ( ! blocks ) {
 					return state;
 				}
 
-				return state.reduce( ( memo, uid ) => {
-					if ( uid === action.uids[ 0 ] ) {
-						return memo.concat( action.blocks.map( ( block ) => block.uid ) );
-					}
-					if ( action.uids.indexOf( uid ) === -1 ) {
-						memo.push( uid );
-					}
-					return memo;
-				}, [] );
+				const mappedBlocks = mapBlockOrder( blocks );
+
+				return flow( [
+					( nextState ) => omit( nextState, uids ),
+					( nextState ) => mapValues( nextState, ( subState ) => (
+						reduce( subState, ( result, uid ) => {
+							if ( uid === uids[ 0 ] ) {
+								return [
+									...result,
+									...mappedBlocks[ '' ],
+								];
+							}
+
+							if ( uids.indexOf( uid ) === -1 ) {
+								result.push( uid );
+							}
+
+							return result;
+						}, [] )
+					) ),
+				] )( {
+					...state,
+					...omit( mappedBlocks, '' ),
+				} );
+			}
 
 			case 'REMOVE_BLOCKS':
-				return without( state, ...action.uids );
+			case 'REMOVE_REUSABLE_BLOCK': {
+				const { type, uids, associatedBlockUids } = action;
+				const uidsToRemove = type === 'REMOVE_BLOCKS' ? uids : associatedBlockUids;
 
-			case 'REMOVE_REUSABLE_BLOCK':
-				return without( state, ...action.associatedBlockUids );
+				return flow( [
+					// Remove inner block ordering for removed blocks
+					( nextState ) => omit( nextState, uidsToRemove ),
+
+					// Remove deleted blocks from other blocks' orderings
+					( nextState ) => mapValues( nextState, ( subState ) => (
+						without( subState, ...uidsToRemove )
+					) ),
+				] )( state );
+			}
 		}
 
 		return state;
@@ -313,10 +434,11 @@ export const editor = flow( [
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
+		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
 		case 'UPDATE_POST':
 			let post;
@@ -343,7 +465,7 @@ export function currentPost( state = {}, action ) {
  * @param {boolean} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @returns {boolean} Updated state.
+ * @return {boolean} Updated state.
  */
 export function isTyping( state = false, action ) {
 	switch ( action.type ) {
@@ -363,19 +485,18 @@ export function isTyping( state = false, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export function blockSelection( state = {
 	start: null,
 	end: null,
-	focus: null,
 	isMultiSelecting: false,
 	isEnabled: true,
+	initialPosition: null,
 }, action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK':
-			if ( state.start === null && state.end === null &&
-					state.focus === null && ! state.isMultiSelecting ) {
+			if ( state.start === null && state.end === null && ! state.isMultiSelecting ) {
 				return state;
 			}
 
@@ -383,8 +504,8 @@ export function blockSelection( state = {
 				...state,
 				start: null,
 				end: null,
-				focus: null,
 				isMultiSelecting: false,
+				initialPosition: null,
 			};
 		case 'START_MULTI_SELECT':
 			if ( state.isMultiSelecting ) {
@@ -394,24 +515,24 @@ export function blockSelection( state = {
 			return {
 				...state,
 				isMultiSelecting: true,
+				initialPosition: null,
 			};
 		case 'STOP_MULTI_SELECT':
-			const nextFocus = state.start === state.end ? state.focus : null;
-			if ( ! state.isMultiSelecting && nextFocus === state.focus ) {
+			if ( ! state.isMultiSelecting ) {
 				return state;
 			}
 
 			return {
 				...state,
 				isMultiSelecting: false,
-				focus: nextFocus,
+				initialPosition: null,
 			};
 		case 'MULTI_SELECT':
 			return {
 				...state,
 				start: action.start,
 				end: action.end,
-				focus: state.isMultiSelecting ? state.focus : null,
+				initialPosition: null,
 			};
 		case 'SELECT_BLOCK':
 			if ( action.uid === state.start && action.uid === state.end ) {
@@ -421,21 +542,14 @@ export function blockSelection( state = {
 				...state,
 				start: action.uid,
 				end: action.uid,
-				focus: action.focus || {},
-			};
-		case 'UPDATE_FOCUS':
-			return {
-				...state,
-				start: action.uid,
-				end: action.uid,
-				focus: action.config || {},
+				initialPosition: action.initialPosition,
 			};
 		case 'INSERT_BLOCKS':
 			return {
 				...state,
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
-				focus: {},
+				initialPosition: null,
 				isMultiSelecting: false,
 			};
 		case 'REPLACE_BLOCKS':
@@ -446,7 +560,7 @@ export function blockSelection( state = {
 				...state,
 				start: action.blocks[ 0 ].uid,
 				end: action.blocks[ 0 ].uid,
-				focus: {},
+				initialPosition: null,
 				isMultiSelecting: false,
 			};
 		case 'TOGGLE_SELECTION':
@@ -454,33 +568,6 @@ export function blockSelection( state = {
 				...state,
 				isEnabled: action.isSelectionEnabled,
 			};
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning hovered block state.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @returns {Object} Updated state.
- */
-export function hoveredBlock( state = null, action ) {
-	switch ( action.type ) {
-		case 'TOGGLE_BLOCK_HOVERED':
-			return action.hovered ? action.uid : null;
-		case 'SELECT_BLOCK':
-		case 'START_TYPING':
-		case 'MULTI_SELECT':
-			return null;
-		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state ) === -1 ) {
-				return state;
-			}
-
-			return action.blocks[ 0 ].uid;
 	}
 
 	return state;
@@ -499,20 +586,21 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point.
+ * Reducer returning the block insertion point visibility, a boolean value
+ * reflecting whether the insertion point should be shown.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
-export function blockInsertionPoint( state = {}, action ) {
+export function isInsertionPointVisible( state = false, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
-			return { ...state, visible: true, position: action.index };
+			return true;
 
 		case 'HIDE_INSERTION_POINT':
-			return { ...state, visible: false, position: null };
+			return false;
 	}
 
 	return state;
@@ -527,40 +615,42 @@ export function blockInsertionPoint( state = {}, action ) {
  * @param {Object}  state.panels          The state of the different sidebar panels.
  * @param {Object}  action                Dispatched action.
  *
- * @returns {string} Updated state.
+ * @return {string} Updated state.
  */
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
-			// record the block usage and put the block in the recently used blocks
-			let blockUsage = state.blockUsage;
-			let recentlyUsedBlocks = [ ...state.recentlyUsedBlocks ];
-			action.blocks.forEach( ( block ) => {
-				const uses = ( blockUsage[ block.name ] || 0 ) + 1;
-				blockUsage = omit( blockUsage, block.name );
-				blockUsage[ block.name ] = uses;
-				recentlyUsedBlocks = [ block.name, ...without( recentlyUsedBlocks, block.name ) ].slice( 0, MAX_RECENT_BLOCKS );
-			} );
-			return {
-				...state,
-				blockUsage,
-				recentlyUsedBlocks,
-			};
-		case 'SETUP_EDITOR':
-			const isBlockDefined = name => getBlockType( name ) !== undefined;
-			const filterInvalidBlocksFromList = list => list.filter( isBlockDefined );
-			const filterInvalidBlocksFromObject = obj => pick( obj, keys( obj ).filter( isBlockDefined ) );
-			const commonBlocks = getBlockTypes()
-				.filter( ( blockType ) => 'common' === blockType.category )
-				.map( ( blockType ) => blockType.name );
+			return action.blocks.reduce( ( prevState, block ) => {
+				let id = block.name;
+				const insert = { name: block.name };
+				if ( isReusableBlock( block ) ) {
+					insert.ref = block.attributes.ref;
+					id += '/' + block.attributes.ref;
+				}
 
+				const isSameAsInsert = ( { name, ref } ) => name === insert.name && ref === insert.ref;
+
+				return {
+					...prevState,
+					recentInserts: [
+						insert,
+						...reject( prevState.recentInserts, isSameAsInsert ),
+					],
+					insertUsage: {
+						...prevState.insertUsage,
+						[ id ]: {
+							count: prevState.insertUsage[ id ] ? prevState.insertUsage[ id ].count + 1 : 1,
+							insert,
+						},
+					},
+				};
+			}, state );
+
+		case 'REMOVE_REUSABLE_BLOCK':
 			return {
 				...state,
-				// recently used gets filled up to `MAX_RECENT_BLOCKS` with blocks from the common category
-				recentlyUsedBlocks: filterInvalidBlocksFromList( [ ...state.recentlyUsedBlocks ] )
-					.concat( difference( commonBlocks, state.recentlyUsedBlocks ) )
-					.slice( 0, MAX_RECENT_BLOCKS ),
-				blockUsage: filterInvalidBlocksFromObject( state.blockUsage ),
+				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
+				recentInserts: reject( state.recentInserts, insert => insert.ref === action.id ),
 			};
 	}
 
@@ -574,7 +664,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Updated state.
+ * @return {Object} Updated state.
  */
 export function saving( state = {}, action ) {
 	switch ( action.type ) {
@@ -648,7 +738,7 @@ const defaultMetaBoxState = locations.reduce( ( result, key ) => {
  *
  * @param {boolean}  state   Previous state.
  * @param {Object}   action  Action Object.
- * @returns {Object}         Updated state.
+ * @return {Object}         Updated state.
  */
 export function isSavingMetaBoxes( state = false, action ) {
 	switch ( action.type ) {
@@ -671,7 +761,7 @@ export function isSavingMetaBoxes( state = false, action ) {
  *
  * @param {boolean}  state   Previous state.
  * @param {Object}   action  Action Object.
- * @returns {Object}         Updated state.
+ * @return {Object}         Updated state.
  */
 export function metaBoxes( state = defaultMetaBoxState, action ) {
 	switch ( action.type ) {
@@ -796,9 +886,8 @@ export default optimist( combineReducers( {
 	currentPost,
 	isTyping,
 	blockSelection,
-	hoveredBlock,
 	blocksMode,
-	blockInsertionPoint,
+	isInsertionPointVisible,
 	preferences,
 	saving,
 	notices,

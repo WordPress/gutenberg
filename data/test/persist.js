@@ -17,7 +17,7 @@ describe( 'loadAndPersist', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
 		loadAndPersist(
 			store,
 			reducer,
@@ -27,10 +27,28 @@ describe( 'loadAndPersist', () => {
 		expect( store.getState().preferences ).toEqual( { chicken: true, ribs: true } );
 	} );
 
+	it( 'should not load the initial value from the local storage if the storage key is different.', () => {
+		const storageKey = 'dumbStorageKey';
+		window.localStorage.setItem( storageKey, JSON.stringify( { chicken: true } ) );
+		const reducer = () => {
+			return {
+				preferences: { ribs: true },
+			};
+		};
+		const store = createStore( withRehydratation( reducer, 'preferences', storageKey + 'change' ) );
+		loadAndPersist(
+			store,
+			reducer,
+			'preferences',
+			storageKey,
+		);
+		expect( store.getState().preferences ).toEqual( { ribs: true } );
+	} );
+
 	it( 'should persist to local storage once the state value changes', () => {
 		const storageKey = 'dumbStorageKey2';
 		const reducer = ( state, action ) => {
-			if ( action.type === 'REDUX_SERIALIZE' ) {
+			if ( action.type === 'SERIALIZE' ) {
 				return state;
 			}
 
@@ -44,7 +62,7 @@ describe( 'loadAndPersist', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
 		loadAndPersist(
 			store,
 			reducer,
@@ -72,7 +90,7 @@ describe( 'loadAndPersist', () => {
 		// store preferences without the `counter` default
 		window.localStorage.setItem( storageKey, JSON.stringify( {} ) );
 
-		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
 		loadAndPersist(
 			store,
 			reducer,
@@ -102,7 +120,7 @@ describe( 'loadAndPersist', () => {
 
 		window.localStorage.setItem( storageKey, JSON.stringify( { counter: 1 } ) );
 
-		const store = createStore( withRehydratation( reducer, 'preferences' ) );
+		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
 
 		loadAndPersist(
 			store,

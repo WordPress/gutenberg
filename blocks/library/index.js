@@ -10,6 +10,7 @@ import * as audio from './audio';
 import * as button from './button';
 import * as categories from './categories';
 import * as code from './code';
+import * as columns from './columns';
 import * as coverImage from './cover-image';
 import * as embed from './embed';
 import * as freeform from './freeform';
@@ -35,10 +36,31 @@ import * as video from './video';
 
 export const registerCoreBlocks = () => {
 	[
+		// FIXME: Temporary fix.
+		//
+		// The Shortcode block declares a catch-all shortcode transform,
+		// meaning it will attempt to intercept pastes and block conversions of
+		// any valid shortcode-like content. Other blocks (e.g. Gallery) may
+		// declare specific shortcode transforms (e.g. `[gallery]`), with which
+		// this block would conflict. Thus, the Shortcode block needs to be
+		// registered as early as possible, so that any other block types'
+		// shortcode transforms can be honoured.
+		//
+		// This isn't a proper solution, as it is at odds with the
+		// specification of shortcode conversion, in the sense that conversion
+		// is explicitly independent of block order. Thus, concurrent parse
+		// rules (i.e. a same text input can yield two different transforms,
+		// like `[gallery] -> { Gallery, Shortcode }`) are unsupported,
+		// yielding non-deterministic results. A proper solution could be to
+		// let the editor (or site owners) determine a default block handler of
+		// unknown shortcodes — see `setUnknownTypeHandlerName`.
+		shortcode,
+
 		audio,
 		button,
 		categories,
 		code,
+		columns,
 		coverImage,
 		embed,
 		...embed.common,
@@ -57,7 +79,6 @@ export const registerCoreBlocks = () => {
 		quote,
 		reusableBlock,
 		separator,
-		shortcode,
 		subhead,
 		table,
 		textColumns,

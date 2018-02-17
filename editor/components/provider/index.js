@@ -9,7 +9,7 @@ import { flow, pick, noop } from 'lodash';
  * WordPress Dependencies
  */
 import { createElement, Component } from '@wordpress/element';
-import { EditableProvider } from '@wordpress/blocks';
+import { RichTextProvider } from '@wordpress/blocks';
 import {
 	APIProvider,
 	DropZoneProvider,
@@ -19,7 +19,7 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo, initializeMetaBoxState } from '../../store/actions';
+import { setupEditor, undo, redo, createUndoLevel, initializeMetaBoxState } from '../../store/actions';
 import store from '../../store';
 
 /**
@@ -32,10 +32,26 @@ import store from '../../store';
  */
 const DEFAULT_SETTINGS = {
 	alignWide: false,
+	colors: [
+		'#f78da7',
+		'#cf2e2e',
+		'#ff6900',
+		'#fcb900',
+		'#7bdcb5',
+		'#00d084',
+		'#8ed1fc',
+		'#0693e3',
+		'#eee',
+		'#abb8c3',
+		'#313131',
+	],
 
 	// This is current max width of the block inner area
 	// It's used to constraint image resizing and this value could be overriden later by themes
 	maxWidth: 608,
+
+	// Allowed block types for the editor, defaulting to true (all supported).
+	blockTypes: true,
 };
 
 class EditorProvider extends Component {
@@ -43,6 +59,7 @@ class EditorProvider extends Component {
 		super( ...arguments );
 
 		this.store = store;
+		this.initializeMetaBoxes = this.initializeMetaBoxes.bind( this );
 
 		this.settings = {
 			...DEFAULT_SETTINGS,
@@ -85,13 +102,17 @@ class EditorProvider extends Component {
 				{ store: this.store },
 			],
 
-			// Editable provider:
+			// RichText provider:
 			//
 			//  - context.onUndo
+			//  - context.onRedo
+			//  - context.onCreateUndoLevel
 			[
-				EditableProvider,
+				RichTextProvider,
 				bindActionCreators( {
 					onUndo: undo,
+					onRedo: redo,
+					onCreateUndoLevel: createUndoLevel,
 				}, this.store.dispatch ),
 			],
 

@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 
 export const name = 'core/verse';
 
@@ -50,11 +50,11 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, className, isSelected } ) {
 		const { content } = attributes;
 
 		return (
-			<Editable
+			<RichText
 				tagName="pre"
 				value={ content }
 				onChange={ ( nextContent ) => {
@@ -62,11 +62,10 @@ export const settings = {
 						content: nextContent,
 					} );
 				} }
-				focus={ focus }
-				onFocus={ setFocus }
 				placeholder={ __( 'Write…' ) }
 				wrapperClassName={ className }
 				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+				isSelected={ isSelected }
 			/>
 		);
 	},

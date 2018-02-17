@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
+import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withInstanceId, Dashicon } from '@wordpress/components';
 
@@ -13,6 +9,7 @@ import { withInstanceId, Dashicon } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
+import PlainText from '../../plain-text';
 
 export const name = 'core/shortcode';
 
@@ -72,14 +69,11 @@ export const settings = {
 						<Dashicon icon="editor-code" />
 						{ __( 'Shortcode' ) }
 					</label>
-					<TextareaAutosize
+					<PlainText
 						id={ inputId }
-						autoComplete="off"
 						value={ attributes.text }
 						placeholder={ __( 'Write shortcode here…' ) }
-						onChange={ ( event ) => setAttributes( {
-							text: event.target.value,
-						} ) }
+						onChange={ ( text ) => setAttributes( { text } ) }
 					/>
 				</div>
 			);
@@ -87,6 +81,6 @@ export const settings = {
 	),
 
 	save( { attributes } ) {
-		return attributes.text;
+		return <RawHTML>{ attributes.text }</RawHTML>;
 	},
 };

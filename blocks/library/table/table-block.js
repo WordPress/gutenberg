@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 
 function isTableSelected( editor ) {
@@ -81,10 +81,10 @@ export default class TableBlock extends Component {
 		};
 	}
 
-	handleSetup( editor, focus ) {
+	handleSetup( editor, isSelected ) {
 		// select the end of the first table cell
 		editor.on( 'init', () => {
-			if ( focus ) {
+			if ( isSelected ) {
 				selectFirstCell( editor );
 			}
 		} );
@@ -92,10 +92,10 @@ export default class TableBlock extends Component {
 	}
 
 	render() {
-		const { content, focus, onFocus, onChange, className } = this.props;
+		const { content, onChange, className, isSelected } = this.props;
 
 		return [
-			<Editable
+			<RichText
 				key="editor"
 				tagName="table"
 				wrapperClassName={ className }
@@ -104,13 +104,12 @@ export default class TableBlock extends Component {
 					plugins: ( settings.plugins || [] ).concat( 'table' ),
 					table_tab_navigation: false,
 				} ) }
-				onSetup={ ( editor ) => this.handleSetup( editor, focus ) }
+				onSetup={ ( editor ) => this.handleSetup( editor, isSelected ) }
 				onChange={ onChange }
 				value={ content }
-				focus={ focus }
-				onFocus={ onFocus }
+				isSelected={ isSelected }
 			/>,
-			focus && (
+			isSelected && (
 				<BlockControls key="menu">
 					<Toolbar>
 						<DropdownMenu

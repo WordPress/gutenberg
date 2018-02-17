@@ -48,19 +48,6 @@
 	}
 }
 
-.edit-post-visual-editor .editor-inserter-with-shortcuts {
-	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
-	margin: 0 auto;
-	clear: both;
-
-	padding: $block-padding;
-	padding-left: $block-padding - 8px; // Offset by left button's own padding
-	@include break-small {
-		padding: $block-padding ( $block-padding + $block-mover-padding-visible );
-		padding-left: $block-padding + $block-mover-padding-visible - 8px;
-	}
-}
-
 .edit-post-visual-editor .editor-post-title {
 	margin-left: auto;
 	margin-right: auto;
@@ -72,7 +59,7 @@
 	}
 
 	@include break-small() {
-		padding: 5px ( $block-mover-padding-visible );
+		padding: 5px #{ $block-mover-padding-visible - 1px };	// subtract 1px border, because this is an outline
 
 		.editor-post-permalink {
 			left: $block-mover-padding-visible;
@@ -89,7 +76,12 @@
 	position: relative;
 
 	@include break-small() {
-		padding: 0 $block-mover-padding-visible;
+		padding: 0 $block-mover-padding-visible;	// don't subtract 1px border because it's a border not an outline
+
+		.components-drop-zone {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
 
 		.editor-default-block-appender__content {
 			padding: 0 $block-padding;

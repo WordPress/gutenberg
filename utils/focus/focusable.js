@@ -42,7 +42,7 @@ const SELECTOR = [
  *
  * @param {Element} element DOM element to test.
  *
- * @returns {boolean} Whether element is visible.
+ * @return {boolean} Whether element is visible.
  */
 function isVisible( element ) {
 	return (
@@ -59,7 +59,7 @@ function isVisible( element ) {
  *
  * @param {Element} element DOM area element to test.
  *
- * @returns {boolean} Whether area element is valid for focus.
+ * @return {boolean} Whether area element is valid for focus.
  */
 function isValidFocusableArea( element ) {
 	const map = element.closest( 'map[name]' );
@@ -76,7 +76,7 @@ function isValidFocusableArea( element ) {
  *
  * @param {Element} context Element in which to search.
  *
- * @returns {Element[]} Focusable elements.
+ * @return {Element[]} Focusable elements.
  */
 export function find( context ) {
 	const elements = context.querySelectorAll( SELECTOR );

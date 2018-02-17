@@ -9,6 +9,7 @@
                 "Embedded content from youtube"
             ]
         },
+        "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-youtube\">\n    https://youtube.com/\n    <figcaption>Embedded content from youtube</figcaption>\n</figure>"
     }
 ]

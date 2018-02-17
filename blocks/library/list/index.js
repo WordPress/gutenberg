@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 
 export const name = 'core/list';
@@ -229,8 +229,7 @@ export const settings = {
 		render() {
 			const {
 				attributes,
-				focus,
-				setFocus,
+				isSelected,
 				insertBlocksAfter,
 				setAttributes,
 				mergeBlocks,
@@ -239,7 +238,7 @@ export const settings = {
 			const { nodeName, values } = attributes;
 
 			return [
-				focus && (
+				isSelected && (
 					<BlockControls
 						key="controls"
 						controls={ [
@@ -268,7 +267,7 @@ export const settings = {
 						] }
 					/>
 				),
-				<Editable
+				<RichText
 					multiline="li"
 					key="editable"
 					tagName={ nodeName.toLowerCase() }
@@ -276,8 +275,6 @@ export const settings = {
 					onSetup={ this.setupEditor }
 					onChange={ this.setNextValues }
 					value={ values }
-					focus={ focus }
-					onFocus={ setFocus }
 					wrapperClassName="blocks-list"
 					placeholder={ __( 'Write list…' ) }
 					onMerge={ mergeBlocks }
@@ -301,6 +298,7 @@ export const settings = {
 							undefined
 					}
 					onRemove={ () => onReplace( [] ) }
+					isSelected={ isSelected }
 				/>,
 			];
 		}

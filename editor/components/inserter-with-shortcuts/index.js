@@ -1,115 +1,76 @@
 /**
  * External dependencies
  */
-import { some } from 'lodash';
 import { connect } from 'react-redux';
-import classnames from 'classnames';
+import { filter, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { BlockIcon, createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { compose } from '@wordpress/element';
 import { IconButton, withContext } from '@wordpress/components';
-import { Component, compose } from '@wordpress/element';
-import { createBlock, BlockIcon } from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import Inserter from '../inserter';
-import { clearSelectedBlock, insertBlock } from '../../store/actions';
-import { getMostFrequentlyUsedBlocks, getBlockCount, getBlocks } from '../../store/selectors';
+import { getFrequentInserterItems } from '../../store/selectors';
+import { replaceBlocks } from '../../store/actions';
 
-export class InserterWithShortcuts extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.showControls = this.toggleControls.bind( this, true );
-		this.hideControls = this.toggleControls.bind( this, false );
-
-		this.state = {
-			isShowingControls: false,
-		};
+function InserterWithShortcuts( { items, isLocked, onToggle, onInsert } ) {
+	if ( isLocked ) {
+		return null;
 	}
 
-	toggleControls( isShowingControls ) {
-		this.setState( { isShowingControls } );
+	const itemsWithoutDefaultBlock = filter( items, ( item ) =>
+		item.name !== getDefaultBlockName() || ! isEmpty( item.initialAttributes )
+	).slice( 0, 2 );
 
-		if ( isShowingControls && this.props.clearSelectedBlock ) {
-			this.props.clearSelectedBlock();
-		}
-	}
+	return (
+		<div className="editor-inserter-with-shortcuts">
+			<Inserter
+				position="top left"
+				onToggle={ onToggle }
+			/>
 
-	insertBlock( name ) {
-		this.props.insertBlock( createBlock( name ) );
-	}
-
-	isDisabledBlock( block ) {
-		return block.useOnce && some( this.props.blocks, ( { name } ) => block.name === name );
-	}
-
-	render() {
-		const { blockCount, isLocked } = this.props;
-		const { isShowingControls } = this.state;
-		const { mostFrequentlyUsedBlocks } = this.props;
-		const classes = classnames( 'editor-inserter-with-shortcuts', {
-			'is-showing-controls': isShowingControls,
-		} );
-
-		if ( isLocked ) {
-			return null;
-		}
-
-		return (
-			<div
-				className={ classes }
-				onFocus={ this.showControls }
-				onBlur={ this.hideControls }
-			>
-				<Inserter
-					insertIndex={ blockCount }
-					position="top right" />
-				{ mostFrequentlyUsedBlocks && mostFrequentlyUsedBlocks.map( ( block ) => (
-					<IconButton
-						key={ 'frequently_used_' + block.name }
-						className="editor-inserter__block"
-						onClick={ () => this.insertBlock( block.name ) }
-						label={ sprintf( __( 'Add %s' ), block.title ) }
-						disabled={ this.isDisabledBlock( block ) }
-						icon={ (
-							<span className="editor-inserter-with-shortcuts__block-icon">
-								<BlockIcon icon={ block.icon } />
-							</span>
-						) }
-					>
-						{ block.title }
-					</IconButton>
-				) ) }
-			</div>
-		);
-	}
+			{ itemsWithoutDefaultBlock.map( ( item ) => (
+				<IconButton
+					key={ item.id }
+					className="editor-inserter-with-shortcuts__block"
+					onClick={ () => onInsert( item ) }
+					label={ sprintf( __( 'Add %s' ), item.title ) }
+					icon={ (
+						<span className="editor-inserter-with-shortcuts__block-icon">
+							<BlockIcon icon={ item.icon } />
+						</span>
+					) }
+				/>
+			) ) }
+		</div>
+	);
 }
 
 export default compose(
-	connect(
-		( state ) => {
-			return {
-				mostFrequentlyUsedBlocks: getMostFrequentlyUsedBlocks( state ),
-				blockCount: getBlockCount( state ),
-				blocks: getBlocks( state ),
-			};
-		},
-		{
-			insertBlock,
-			clearSelectedBlock,
-		}
-	),
 	withContext( 'editor' )( ( settings ) => {
-		const { templateLock } = settings;
+		const { templateLock, blockTypes } = settings;
 
 		return {
 			isLocked: !! templateLock,
+			enabledBlockTypes: blockTypes,
 		};
 	} ),
+	connect(
+		( state, { enabledBlockTypes } ) => ( {
+			items: getFrequentInserterItems( state, enabledBlockTypes, 3 ),
+		} ),
+		( dispatch, { uid, layout } ) => ( {
+			onInsert( { name, initialAttributes } ) {
+				const block = createBlock( name, { ...initialAttributes, layout } );
+				return dispatch( replaceBlocks( uid, block ) );
+			},
+		} )
+	),
 )( InserterWithShortcuts );

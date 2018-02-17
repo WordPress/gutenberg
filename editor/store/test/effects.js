@@ -6,19 +6,22 @@ import { noop, reduce, set } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } from '@wordpress/blocks';
+import {
+	getBlockTypes,
+	unregisterBlockType,
+	registerBlockType,
+	createBlock,
+	createReusableBlock,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import {
-	resetPost,
-	setupNewPost,
+	setupEditorState,
 	resetBlocks,
 	mergeBlocks,
-	focusBlock,
 	replaceBlocks,
-	editPost,
 	savePost,
 	requestMetaBoxUpdates,
 	updateReusableBlock,
@@ -27,6 +30,7 @@ import {
 	fetchReusableBlocks,
 	convertBlockToStatic,
 	convertBlockToReusable,
+	selectBlock,
 } from '../../store/actions';
 import reducer from '../reducer';
 import effects from '../effects';
@@ -42,11 +46,13 @@ describe( 'effects', () => {
 
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;
+		const defaultGetBlock = selectors.getBlock;
 
 		afterEach( () => {
 			getBlockTypes().forEach( ( block ) => {
 				unregisterBlockType( block.name );
 			} );
+			selectors.getBlock = defaultGetBlock;
 		} );
 
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
@@ -59,11 +65,16 @@ describe( 'effects', () => {
 				uid: 'ribs',
 				name: 'core/test-block',
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
+
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken' ) );
+			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken' ) );
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
@@ -87,11 +98,15 @@ describe( 'effects', () => {
 				name: 'core/test-block',
 				attributes: { content: 'ribs' },
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
+			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken', -1 ) );
 			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -121,8 +136,12 @@ describe( 'effects', () => {
 				name: 'core/test-block2',
 				attributes: { content: 'ribs' },
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -174,11 +193,15 @@ describe( 'effects', () => {
 				name: 'core/test-block-2',
 				attributes: { content2: 'ribs' },
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
+			// expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -240,8 +263,7 @@ describe( 'effects', () => {
 
 			handler( {}, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
@@ -253,19 +275,6 @@ describe( 'effects', () => {
 
 			// TODO: Publish autosave
 			expect( dispatch ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should set auto-draft to draft before save', () => {
-			selectors.isEditedPostSaveable.mockReturnValue( true );
-			selectors.isEditedPostDirty.mockReturnValue( true );
-			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
-
-			handler( {}, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
-			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
 		it( 'should return update action for saveable, dirty draft', () => {
@@ -317,19 +326,23 @@ describe( 'effects', () => {
 
 		it( 'should dispatch meta box updates on success for dirty meta boxes', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const post = getDraftPost();
 
 			handler( { post: post, previousPost: post }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates() );
+			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( post ) );
 		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
@@ -351,7 +364,9 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
@@ -377,7 +392,9 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when just updating a published post again', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { getState: () => ( {
+				metaBoxes: { side: { isActive: true } },
+			} ), dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
@@ -421,9 +438,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( [
-				resetPost( post ),
-			] );
+			expect( result ).toEqual( setupEditorState( post, [], {} ) );
 		} );
 
 		it( 'should return block reset with non-empty content', () => {
@@ -441,11 +456,8 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toHaveLength( 2 );
-			expect( result ).toContainEqual( resetPost( post ) );
-			expect( result.some( ( { blocks } ) => {
-				return blocks && blocks[ 0 ].name === 'core/test-block';
-			} ) ).toBe( true );
+			expect( result.blocks ).toHaveLength( 1 );
+			expect( result ).toEqual( setupEditorState( post, result.blocks, {} ) );
 		} );
 
 		it( 'should return post setup action only if auto-draft', () => {
@@ -462,10 +474,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( [
-				resetPost( post ),
-				setupNewPost( { title: 'A History of Pork' } ),
-			] );
+			expect( result ).toEqual( setupEditorState( post, [], { title: 'A History of Pork', status: 'draft' } ) );
 		} );
 	} );
 
@@ -621,14 +630,9 @@ describe( 'effects', () => {
 					}
 				} );
 
-				const reusableBlock = {
-					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
-					title: 'My cool block',
-					type: 'core/test-block',
-					attributes: {
-						name: 'Big Bird',
-					},
-				};
+				const reusableBlock = createReusableBlock( 'core/test-block', {
+					name: 'Big Bird',
+				} );
 
 				const initialState = reducer( undefined, {} );
 				const action = updateReusableBlock( reusableBlock.id, reusableBlock );
@@ -640,8 +644,7 @@ describe( 'effects', () => {
 				handler( saveReusableBlock( reusableBlock.id ), store );
 
 				expect( modelAttributes ).toEqual( {
-					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
-					title: 'My cool block',
+					title: 'Untitled block',
 					content: '<!-- wp:test-block {\"name\":\"Big Bird\"} /-->',
 				} );
 				return promise.then( () => {
@@ -662,14 +665,9 @@ describe( 'effects', () => {
 					}
 				} );
 
-				const reusableBlock = {
-					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
-					name: 'My cool block',
-					type: 'core/test-block',
-					attributes: {
-						name: 'Big Bird',
-					},
-				};
+				const reusableBlock = createReusableBlock( 'core/test-block', {
+					name: 'Big Bird',
+				} );
 
 				const initialState = reducer( undefined, {} );
 				const action = updateReusableBlock( reusableBlock.id, reusableBlock );
@@ -708,13 +706,9 @@ describe( 'effects', () => {
 
 				const id = 123;
 
-				const associatedBlock = {
-					uid: 'd6b55aa9-16b5-4123-9675-749d75a7f14d',
-					name: 'core/block',
-					attributes: {
-						ref: id,
-					},
-				};
+				const associatedBlock = createBlock( 'core/block', {
+					ref: id,
+				} );
 
 				const actions = [
 					resetBlocks( [ associatedBlock ] ),
@@ -789,21 +783,12 @@ describe( 'effects', () => {
 			const handler = effects.CONVERT_BLOCK_TO_STATIC;
 
 			it( 'should convert a reusable block into a static block', () => {
-				const reusableBlock = {
-					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
-					name: 'My cool block',
-					type: 'core/test-block',
-					attributes: {
-						name: 'Big Bird',
-					},
-				};
-				const staticBlock = {
-					uid: 'd6b55aa9-16b5-4123-9675-749d75a7f14d',
-					name: 'core/block',
-					attributes: {
-						ref: reusableBlock.id,
-					},
-				};
+				const reusableBlock = createReusableBlock( 'core/test-block', {
+					name: 'Big Bird',
+				} );
+				const staticBlock = createBlock( 'core/block', {
+					ref: reusableBlock.id,
+				} );
 
 				const actions = [
 					resetBlocks( [ staticBlock ] ),
@@ -830,13 +815,9 @@ describe( 'effects', () => {
 			const handler = effects.CONVERT_BLOCK_TO_REUSABLE;
 
 			it( 'should convert a static block into a reusable block', () => {
-				const staticBlock = {
-					uid: 'd6b55aa9-16b5-4123-9675-749d75a7f14d',
-					name: 'core/test-block',
-					attributes: {
-						name: 'Big Bird',
-					},
-				};
+				const staticBlock = createBlock( 'core/test-block', {
+					name: 'Big Bird',
+				} );
 
 				const initialState = reducer( undefined, {} );
 				const state = reducer( initialState, resetBlocks( [ staticBlock ] ) );

@@ -18,7 +18,7 @@ import { PREFERENCES_DEFAULTS } from './defaults';
  * @param {Object}  state.panels          The state of the different sidebar panels.
  * @param {Object}  action                Dispatched action.
  *
- * @returns {string} Updated state.
+ * @return {string} Updated state.
  */
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
@@ -51,7 +51,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					[ action.feature ]: ! state.features[ action.feature ],
 				},
 			};
-		case 'REDUX_SERIALIZE':
+		case 'SERIALIZE':
 			return omit( state, [ 'sidebars.mobile', 'sidebars.publish' ] );
 	}
 

@@ -9,14 +9,14 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import './style.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
+import RichText from '../../rich-text';
 
 export const name = 'core/subhead';
 
 export const settings = {
 	title: __( 'Subhead' ),
+
+	description: __( 'Explanatory text under the main heading of an article.' ),
 
 	icon: 'text',
 
@@ -57,18 +57,11 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { content, placeholder } = attributes;
 
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Explanatory text under the main heading of an article.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
-			<Editable
+		return (
+			<RichText
 				tagName="p"
 				key="editable"
 				value={ content }
@@ -77,12 +70,11 @@ export const settings = {
 						content: nextContent,
 					} );
 				} }
-				focus={ focus }
-				onFocus={ setFocus }
 				className={ className }
 				placeholder={ placeholder || __( 'Write subhead…' ) }
-			/>,
-		];
+				isSelected={ isSelected }
+			/>
+		);
 	},
 
 	save( { attributes, className } ) {

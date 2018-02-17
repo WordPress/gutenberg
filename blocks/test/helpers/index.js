@@ -23,7 +23,7 @@ export const blockEditRender = ( name, settings ) => {
 	return render(
 		<BlockEdit
 			name={ name }
-			focus={ false }
+			isSelected={ false }
 			attributes={ block.attributes }
 			setAttributes={ noop }
 		/>

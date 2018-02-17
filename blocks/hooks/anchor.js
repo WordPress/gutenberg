@@ -8,6 +8,7 @@ import { assign } from 'lodash';
  */
 import { getWrapperDisplayName } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -29,7 +30,7 @@ const ANCHOR_REGEX = /[\s#]/g;
  *
  * @param {Object} settings Original block settings.
  *
- * @returns {Object} Filtered block settings.
+ * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
@@ -53,16 +54,15 @@ export function addAttribute( settings ) {
  *
  * @param {function|Component} BlockEdit Original component.
  *
- * @returns {string} Wrapped component.
+ * @return {string} Wrapped component.
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
-		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.focus;
-
+		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.isSelected;
 		return [
 			<BlockEdit key="block-edit-anchor" { ...props } />,
 			hasAnchor && <InspectorControls key="inspector-anchor">
-				<InspectorControls.TextControl
+				<TextControl
 					label={ __( 'HTML Anchor' ) }
 					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
 					value={ props.attributes.anchor || '' }
@@ -89,7 +89,7 @@ export function withInspectorControl( BlockEdit ) {
  * @param {Object} blockType  Block type.
  * @param {Object} attributes Current block attributes.
  *
- * @returns {Object} Filtered props applied to save element.
+ * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
 	if ( hasBlockSupport( blockType, 'anchor' ) ) {

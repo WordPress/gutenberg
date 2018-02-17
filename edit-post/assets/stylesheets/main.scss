@@ -1,3 +1,49 @@
+// Output overrides for each scheme
+@include admin-scheme-color-overrides( 'blue', $scheme-blue__spot-color );
+@include admin-scheme-color-overrides( 'coffee', $scheme-coffee__spot-color );
+@include admin-scheme-color-overrides( 'ectoplasm', $scheme-ectoplasm__spot-color );
+@include admin-scheme-color-overrides( 'midnight', $scheme-midnight__spot-color );
+@include admin-scheme-color-overrides( 'ocean', $scheme-ocean__spot-color );
+@include admin-scheme-color-overrides( 'sunrise', $scheme-sunrise__spot-color );
+
+@keyframes animate_fade {
+	from {
+		opacity: 0;
+		transform: translateY( 4px );
+	}
+	to {
+		opacity: 1;
+		transform: translateY( 0px );
+	}
+}
+
+@keyframes move_background {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 28px 0;
+	}
+}
+
+@keyframes loading_fade {
+	0% {
+		opacity: .5;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: .5;
+	}
+}
+
+@keyframes slide_in_right {
+	100% {
+		transform: translateX( 0% );
+	}
+}
+
 body.gutenberg-editor-page {
 	background: $white;
 
@@ -77,6 +123,7 @@ body.gutenberg-editor-page {
 
 	img {
 		max-width: 100%;
+		height: auto;
 	}
 
 	iframe {

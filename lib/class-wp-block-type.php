@@ -98,27 +98,32 @@ class WP_Block_Type {
 	}
 
 	/**
-	 * Renders the block type output for given attributes and content.
+	 * Renders the block type output for given attributes.
 	 *
 	 * @since 0.6.0
 	 * @access public
 	 *
-	 * @param array       $attributes Optional. Block attributes. Default empty array.
-	 * @param string|null $content    Optional. Raw block content, or null if none set. Default null.
+	 * @param array $attributes Optional. Block attributes. Default empty array.
 	 * @return string Rendered block type output.
 	 */
-	public function render( $attributes = array(), $content = null ) {
-		if ( ! is_callable( $this->render_callback ) ) {
-			if ( ! $content ) {
-				return '';
-			}
-
-			return $content;
+	public function render( $attributes = array() ) {
+		if ( ! $this->is_dynamic() ) {
+			return '';
 		}
 
 		$attributes = $this->prepare_attributes_for_render( $attributes );
 
-		return call_user_func( $this->render_callback, $attributes, $content );
+		return (string) call_user_func( $this->render_callback, $attributes );
+	}
+
+	/**
+	 * Returns true if the block type is dynamic, or false otherwise. A dynamic
+	 * block is one which defers its rendering to occur on-demand at runtime.
+	 *
+	 * @returns boolean Whether block type is dynamic.
+	 */
+	public function is_dynamic() {
+		return is_callable( $this->render_callback );
 	}
 
 	/**

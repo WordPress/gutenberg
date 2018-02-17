@@ -5,15 +5,16 @@ exports[`core/pullquote block edit matches snapshot 1`] = `
   class="wp-block-pullquote"
 >
   <div
-    class="blocks-pullquote__content blocks-editable"
+    class="blocks-pullquote__content blocks-rich-text"
   >
     <div
       aria-label="Write quote…"
-      class="blocks-editable__tinymce"
+      class="blocks-rich-text__tinymce"
       contenteditable="true"
+      data-is-placeholder-visible="true"
     />
     <div
-      class="blocks-editable__tinymce"
+      class="blocks-rich-text__tinymce"
     >
       <p>
         Write quote…

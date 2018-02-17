@@ -1,6 +1,6 @@
 # Introducing Attributes and Editable Fields
 
-Our example block is still not very interesting because it lacks options to customize the appearance of the message. In this section, we will implement an editable field allowing the user to specify their own message. Before doing so, it's important to understand how the state of a block (its "attributes") is maintained and changed over time.
+Our example block is still not very interesting because it lacks options to customize the appearance of the message. In this section, we will implement a RichText field allowing the user to specify their own message. Before doing so, it's important to understand how the state of a block (its "attributes") is maintained and changed over time.
 
 ## Attributes
 
@@ -13,7 +13,7 @@ One challenge of maintaining the representation of a block as a JavaScript objec
 ```js
 var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
-	Editable = wp.blocks.Editable;
+	RichText = wp.blocks.RichText;
 
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -31,22 +31,20 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	},
 
 	edit: function( props ) {
-		var content = props.attributes.content,
-			focus = props.focus;
+		var content = props.attributes.content;
 
 		function onChangeContent( newContent ) {
 			props.setAttributes( { content: newContent } );
 		}
 
 		return el(
-			Editable,
+			RichText,
 			{
 				tagName: 'p',
 				className: props.className,
 				onChange: onChangeContent,
 				value: content,
-				focus: focus,
-				onFocus: props.setFocus
+				isSelected: props.isSelected,
 			}
 		);
 	},
@@ -60,7 +58,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType, Editable, source } = wp.blocks;
+const { registerBlockType, RichText, source } = wp.blocks;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -77,21 +75,20 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 		},
 	},
 
-	edit( { attributes, className, focus, setAttributes, setFocus } ) {
-		const { content } = attributes;
+	edit( { attributes, className, setAttributes } ) {
+		const { content, isSelected } = attributes;
 
 		function onChangeContent( newContent ) {
 			setAttributes( { content: newContent } );
 		}
 
 		return (
-			<Editable
+			<RichText
 				tagName="p"
 				className={ className }
 				onChange={ onChangeContent }
 				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
+				isSelected={ isSelected }
 			/>
 		);
 	},
@@ -109,12 +106,12 @@ When registering a new block type, the `attributes` property describes the shape
 
 In the code snippet above, when loading the editor, we will extract the `content` value as the children of the paragraph element in the saved post's markup.
 
-## Components and the `Editable` Component
+## Components and the `RichText` Component
 
-Earlier examples used the `createElement` function to create DOM nodes, but it's also possible to encapsulate this behavior into ["components"](). This abstraction helps as a pattern to share common behaviors and to hide complexity into self-contained units. There are a number of components available to use in implementing your blocks. You can see one such component in the snippet above: the [`Editable` component]().
+Earlier examples used the `createElement` function to create DOM nodes, but it's also possible to encapsulate this behavior into ["components"](). This abstraction helps as a pattern to share common behaviors and to hide complexity into self-contained units. There are a number of components available to use in implementing your blocks. You can see one such component in the snippet above: the [`RichText` component]().
 
-The `Editable` component can be considered as a super-powered `textarea` element, enabling rich content editing including bold, italics, hyperlinks, etc. It is not too much unlike the single editor region of the legacy post editor, and is in fact powered by the same TinyMCE library.
+The `RichText` component can be considered as a super-powered `textarea` element, enabling rich content editing including bold, italics, hyperlinks, etc. It is not too much unlike the single editor region of the legacy post editor, and is in fact powered by the same TinyMCE library.
 
-Implementing this behavior as a component enables you as the block implementer to be much more granular about editable fields. Your block may not need `Editable` at all, or it may need many independent `Editable` elements, each operating on a subset of the overall block state.
+Implementing this behavior as a component enables you as the block implementer to be much more granular about editable fields. Your block may not need `RichText` at all, or it may need many independent `RichText` elements, each operating on a subset of the overall block state.
 
-Because `Editable` allows for nested nodes, you'll most often use it in conjunction with the `children` attribute source when extracting the value from saved content.
+Because `RichText` allows for nested nodes, you'll most often use it in conjunction with the `children` attribute source when extracting the value from saved content.

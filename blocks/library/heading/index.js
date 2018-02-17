@@ -10,7 +10,7 @@ import { Toolbar } from '@wordpress/components';
  */
 import './editor.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
@@ -101,11 +101,11 @@ export const settings = {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter, onReplace } ) {
+	edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls
 					key="controls"
 					controls={
@@ -119,7 +119,7 @@ export const settings = {
 					}
 				/>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<h3>{ __( 'Heading Settings' ) }</h3>
 					<p>{ __( 'Level' ) }</p>
@@ -143,13 +143,11 @@ export const settings = {
 					/>
 				</InspectorControls>
 			),
-			<Editable
+			<RichText
 				key="editable"
 				wrapperClassName="wp-block-heading"
 				tagName={ nodeName.toLowerCase() }
 				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
 				onSplit={
@@ -166,6 +164,7 @@ export const settings = {
 				onRemove={ () => onReplace( [] ) }
 				style={ { textAlign: align } }
 				placeholder={ placeholder || __( 'Write heading…' ) }
+				isSelected={ isSelected }
 			/>,
 		];
 	},

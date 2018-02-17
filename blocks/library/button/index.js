@@ -3,17 +3,16 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Dashicon, IconButton, PanelColor, withFallbackStyles } from '@wordpress/components';
+import { Dashicon, IconButton, PanelColor, ToggleControl, withFallbackStyles } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import './style.scss';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
@@ -60,8 +59,7 @@ class ButtonBlock extends Component {
 		const {
 			attributes,
 			setAttributes,
-			focus,
-			setFocus,
+			isSelected,
 			className,
 		} = this.props;
 
@@ -76,18 +74,16 @@ class ButtonBlock extends Component {
 		} = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
 			),
 			<span key="button" className={ className } title={ title } ref={ this.bindRef }>
-				<Editable
+				<RichText
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
 					value={ text }
-					focus={ focus }
-					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 					className="wp-block-button__link"
@@ -95,9 +91,10 @@ class ButtonBlock extends Component {
 						backgroundColor: color,
 						color: textColor,
 					} }
+					isSelected={ isSelected }
 					keepPlaceholderOnFocus
 				/>
-				{ focus &&
+				{ isSelected &&
 					<InspectorControls key="inspector">
 						<ToggleControl
 							label={ __( 'Wrap text' ) }
@@ -125,7 +122,7 @@ class ButtonBlock extends Component {
 					</InspectorControls>
 				}
 			</span>,
-			focus && (
+			isSelected && (
 				<form
 					key="form-link"
 					className="blocks-button__inline-link"

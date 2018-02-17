@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import { createBlock } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 
 export const name = 'core/preformatted';
 
@@ -58,11 +58,11 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, className, isSelected } ) {
 		const { content } = attributes;
 
 		return [
-			<Editable
+			<RichText
 				key="block"
 				tagName="pre"
 				value={ content }
@@ -71,10 +71,9 @@ export const settings = {
 						content: nextContent,
 					} );
 				} }
-				focus={ focus }
-				onFocus={ setFocus }
 				placeholder={ __( 'Write preformatted text…' ) }
 				wrapperClassName={ className }
+				isSelected={ isSelected }
 			/>,
 		];
 	},
