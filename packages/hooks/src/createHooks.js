@@ -12,8 +12,8 @@ import createDidHook from './createDidHook';
  * @return {Object} Object that contains all hooks.
  */
 function createHooks() {
-	const actions = {};
-	const filters = {};
+	const actions = Object.create( null );
+	const filters = Object.create( null );
 
 	return {
 		addAction:        createAddHook( actions ),

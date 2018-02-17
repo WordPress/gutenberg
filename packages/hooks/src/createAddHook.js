@@ -41,7 +41,7 @@ function createAddHook( hooks ) {
 
 		const handler = { callback, priority, namespace };
 
-		if ( hooks.hasOwnProperty( hookName ) ) {
+		if ( hooks[ hookName ] ) {
 			// Find the correct insert index of the new hook.
 			const handlers = hooks[ hookName ].handlers;
 			let i = 0;

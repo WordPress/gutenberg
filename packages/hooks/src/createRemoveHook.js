@@ -32,7 +32,7 @@ function createRemoveHook( hooks, removeAll ) {
 		}
 
 		// Bail if no hooks exist by this name
-		if ( ! hooks.hasOwnProperty( hookName ) ) {
+		if ( ! hooks[ hookName ] ) {
 			return 0;
 		}
 

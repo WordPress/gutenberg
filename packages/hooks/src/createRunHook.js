@@ -21,7 +21,7 @@ function createRunHook( hooks, returnFirstArg ) {
 	 * @return {*}               Return value of runner, if applicable.
 	 */
 	return function runHooks( hookName, ...args ) {
-		if ( ! hooks.hasOwnProperty( hookName ) ) {
+		if ( ! hooks[ hookName ] ) {
 			hooks[ hookName ] = {
 				runs: 0,
 				handlers: [],
