@@ -21,16 +21,12 @@ function createRunHook( hooks, returnFirstArg ) {
 	 * @return {*}               Return value of runner, if applicable.
 	 */
 	return function runHooks( hookName, ...args ) {
-		if ( ! hooks[ hookName ] ) {
-			hooks[ hookName ] = {
-				runs: 0,
-				handlers: [],
-			};
+		let handlers;
+		if ( hooks[ hookName ] ) {
+			handlers = hooks[ hookName ].handlers;
 		}
 
-		const handlers = hooks[ hookName ].handlers;
-
-		if ( ! handlers.length ) {
+		if ( ! handlers || ! handlers.length ) {
 			return returnFirstArg
 				? args[ 0 ]
 				: undefined;
@@ -42,6 +38,13 @@ function createRunHook( hooks, returnFirstArg ) {
 		};
 
 		hooks.__current.push( hookInfo );
+
+		if ( ! hooks[ hookName ] ) {
+			hooks[ hookName ] = {
+				runs: 0,
+				handlers: [],
+			};
+		}
 		hooks[ hookName ].runs++;
 
 		while ( hookInfo.currentIndex < handlers.length ) {
