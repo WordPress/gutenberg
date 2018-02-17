@@ -21,11 +21,6 @@ function createRunHook( hooks, returnFirstArg ) {
 	 * @return {*}               Return value of runner, if applicable.
 	 */
 	return function runHooks( hookName, ...args ) {
-
-		if ( ! validateHookName( hookName ) ) {
-			return;
-		}
-
 		if ( ! hooks.hasOwnProperty( hookName ) ) {
 			hooks[ hookName ] = {
 				runs: 0,

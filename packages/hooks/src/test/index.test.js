@@ -214,20 +214,6 @@ test( 'cannot add filters with non-numeric priorities', () => {
 	);
 } );
 
-test( 'cannot run filters with non-string names', () => {
-	expect( applyFilters( () => {}, 42 ) ).toBe( undefined );
-	expect( console ).toHaveErroredWith(
-		'The hook name must be a non-empty string.'
-	);
-} );
-
-test( 'cannot run filters named with __ prefix', () => {
-	expect( applyFilters( '__test', 42 ) ).toBe( undefined );
-	expect( console ).toHaveErroredWith(
-		'The hook name cannot begin with `__`.'
-	);
-} );
-
 test( 'add 3 filters with different priorities and run them', () => {
 	addFilter( 'test.filter', 'my_callback_filter_a',  filter_a );
 	addFilter( 'test.filter', 'my_callback_filter_b',  filter_b, 2 );
