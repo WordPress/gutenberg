@@ -77,20 +77,19 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 	public function get_shortcode_output( $request ) {
 		global $post;
 		global $wp_embed;
-		$style         = '';
-		$js            = '';
-		$type          = 'html';
-		$output        = '';
-		$yt_pattern    = '#https?://(?:www\.)?(?:youtube\.com/watch|youtu\.be/)#';
-		$vimeo_pattern = '#https?://(.+\.)?vimeo\.com/.*#';
-		$args          = $request->get_params();
-		$post          = isset( $args['postId'] ) ? get_post( $args['postId'] ) : null;
-		$shortcode     = isset( $args['shortcode'] ) ? trim( $args['shortcode'] ) : '';
-		$cache_key     = 'shortcode_' . md5( serialize( $args ) );
-		$data          = get_transient( $cache_key );
+		$style     = '';
+		$js        = '';
+		$type      = 'html';
+		$output    = '';
+		$args      = $request->get_params();
+		$post      = isset( $args['postId'] ) ? get_post( $args['postId'] ) : null;
+		$shortcode = isset( $args['shortcode'] ) ? trim( $args['shortcode'] ) : '';
+		$cache_key = 'shortcode_' . md5( serialize( $args ) );
+		$data      = get_transient( $cache_key );
 		if ( ! empty( $data ) ) {
 			return rest_ensure_response( $data );
 		}
+
 		// Initialize $data.
 		$data = array(
 			'html'  => $output,
@@ -108,9 +107,25 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			setup_postdata( $post );
 		}
 
-		// Since the [embed] shortcode needs to be run earlier than other shortcodes.
+		// Since the [embed] shortcode needs to be run earlier than other shortcodes,
+		// do_shortcode() will not work with [embed] if there are other shortcodes registered.
 		if ( has_shortcode( $shortcode, 'embed' ) ) {
-			$output = $wp_embed->run_shortcode( $shortcode );
+			$embed_request = new WP_REST_Request( 'GET', '/oembed/1.0/proxy' );
+			$pattern       = get_shortcode_regex();
+			if ( preg_match_all( '/' . $pattern . '/s', $shortcode, $matches ) ) {
+				$embed_request['url'] = $matches[5][0];
+				$embed_response       = rest_do_request( $embed_request );
+				if ( $embed_response->is_error() ) {
+					// Convert to a WP_Error object.
+					$error      = $embed_response->as_error();
+					$message    = $embed_response->get_error_message();
+					$error_data = $embed_response->get_error_data();
+					$status     = isset( $error_data['status'] ) ? $error_data['status'] : 500;
+					wp_die( printf( '<p>An error occurred: %s (%d)</p>', $message, $error_data ) );
+				}
+				$embed_data = $embed_response->get_data();
+				$output     = $embed_data->html;
+			}
 		} else {
 			$output = do_shortcode( $shortcode );
 		}
@@ -121,13 +136,10 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		}
 
 		// Check if shortcode is returning a video. The video type will be used by the frontend to maintain 16:9 aspect ratio.
-		// TODO: Extend embed video compare to other services too, such as videopress.
 		if ( has_shortcode( $shortcode, 'video' ) ) {
 			$type = 'video';
-		} elseif ( has_shortcode( $shortcode, 'embed' ) && preg_match( $yt_pattern, $shortcode ) ) {
-			$type = 'video';
-		} elseif ( has_shortcode( $shortcode, 'embed' ) && preg_match( $vimeo_pattern, $shortcode ) ) {
-			$type = 'video';
+		} elseif ( has_shortcode( $shortcode, 'embed' ) ) {
+			$type = $embed_data->type;
 		} else {
 			$type = 'html';
 			// Gallery and caption shortcodes need the theme style to be embedded in the shortcode preview iframe.

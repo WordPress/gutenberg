@@ -146,11 +146,11 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			// Youtube embed.
 			array(
 				array(
-					'shortcode' => 'Check this video [embed]https://www.youtube.com/watch?v=8OBfr46Y0cQ[/embed]',
+					'shortcode' => '[embed]https://www.youtube.com/watch?v=8OBfr46Y0cQ[/embed]',
 					'postId'    => self::$post_id,
 				),
 				array(
-					'html'  => 'Check this video <iframe width="500" height="281" src="https://www.youtube.com/embed/8OBfr46Y0cQ?feature=oembed" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>',
+					'html'  => '<iframe width="600" height="338" src="https://www.youtube.com/embed/8OBfr46Y0cQ?feature=oembed" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>',
 					'type'  => 'video',
 					'style' => '',
 					'js'    => '',
@@ -159,11 +159,11 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			// Vimeo embed.
 			array(
 				array(
-					'shortcode' => 'Check this video [embed]https://vimeo.com/81625407[/embed]',
+					'shortcode' => '[embed]https://vimeo.com/81625407[/embed]',
 					'postId'    => self::$post_id,
 				),
 				array(
-					'html'  => 'Check this video <iframe src="https://player.vimeo.com/video/81625407" width="500" height="281" frameborder="0" title="What is WordPress?" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>',
+					'html'  => '<iframe src="https://player.vimeo.com/video/81625407" width="600" height="338" frameborder="0" title="What is WordPress?" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>',
 					'type'  => 'video',
 					'style' => '',
 					'js'    => '',
