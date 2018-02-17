@@ -22,11 +22,11 @@ Gutenberg looks at the editor as more than a content field, revisiting a layout 
 
 Here's why we're looking at the whole editing screen, as opposed to just the content field:
 
-1. The block unifies multiple interfaces. If we add that on top of the existing interface, it would _add_ complexity, as opposed to remove it.
+1. The block unifies multiple interfaces. If we add that on top of the existing interface, it would _add_ complexity, as opposed to removing it.
 2. By revisiting the interface, we can modernize the writing, editing, and publishing experience, with usability and simplicity in mind, benefitting both new and casual users.
 3. When singular block interface takes center stage, it demonstrates a clear path forward for developers to create premium blocks, superior to both shortcodes and widgets.
 4. Considering the whole interface lays a solid foundation for the next focus, full site customization.
-5. Looking at the full editor screen also gives us the opportunity to drastically modernize the foundation, and take steps towards a more fluid and JavaScript powered future that fully leverages the WordPress REST API.
+5. Looking at the full editor screen also gives us the opportunity to drastically modernize the foundation, and take steps towards a more fluid and JavaScript-powered future that fully leverages the WordPress REST API.
 
 ![Writing in Gutenberg 1.6](https://make.wordpress.org/core/files/2017/10/gutenberg-typing-1_6.gif)
 
@@ -40,7 +40,7 @@ Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/f
 
 ## Compatibility
 
-Posts are backwards compatible, and shortcodes will still work. We are continuously exploring how highly-tailored meta boxes can be accommodated, and are looking at solutions ranging from a plugin to disable Gutenberg to automatically detecting whether to load Gutenberg or not. While we want to make sure the new editing experience from writing to publishing is user-friendly, we’re committed to finding  a good solution for highly-tailored existing sites.
+Posts are backwards compatible, and shortcodes will still work. We are continuously exploring how highly-tailored meta boxes can be accommodated, and are looking at solutions ranging from a plugin to disable Gutenberg to automatically detecting whether to load Gutenberg or not. While we want to make sure the new editing experience from writing to publishing is user-friendly, we’re committed to finding a good solution for highly-tailored existing sites.
 
 ## The stages of Gutenberg
 
@@ -70,3 +70,5 @@ Please see <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUT
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post Grammar Parser</a>
 - <a href="https://make.wordpress.org/core/tag/gutenberg/">Development updates on make.wordpress.org</a>
 - <a href="https://wordpress.org/gutenberg/handbook/">Documentation: Creating Blocks, Reference, and Guidelines</a>
+
+<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)

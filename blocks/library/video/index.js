@@ -14,13 +14,14 @@ import { Component } from '@wordpress/element';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType } from '../../api';
 import MediaUpload from '../../media-upload';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-registerBlockType( 'core/video', {
+export const name = 'core/video';
+
+export const settings = {
 	title: __( 'Video' ),
 
 	description: __( 'The Video block allows you to embed video files and play them back using a simple player.' ),
@@ -70,7 +71,7 @@ registerBlockType( 'core/video', {
 
 		render() {
 			const { align, caption, id } = this.props.attributes;
-			const { setAttributes, focus, setFocus } = this.props;
+			const { setAttributes, isSelected } = this.props;
 			const { editing, className, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
@@ -78,7 +79,7 @@ registerBlockType( 'core/video', {
 			};
 			const onSelectVideo = ( media ) => {
 				if ( media && media.url ) {
-					// sets the block's attribure and updates the edit component from the
+					// sets the block's attribute and updates the edit component from the
 					// selected media, then switches off the editing UI
 					setAttributes( { src: media.url, id: media.id } );
 					this.setState( { src: media.url, editing: false } );
@@ -93,7 +94,7 @@ registerBlockType( 'core/video', {
 				}
 				return false;
 			};
-			const controls = focus && (
+			const controls = isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -109,8 +110,6 @@ registerBlockType( 'core/video', {
 					</Toolbar>
 				</BlockControls>
 			);
-
-			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
 			if ( editing ) {
 				return [
@@ -153,14 +152,13 @@ registerBlockType( 'core/video', {
 				controls,
 				<figure key="video" className={ className }>
 					<video controls src={ src } />
-					{ ( ( caption && caption.length ) || !! focus ) && (
-						<Editable
+					{ ( ( caption && caption.length ) || isSelected ) && (
+						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							focus={ focus && focus.editable === 'caption' ? focus : undefined }
-							onFocus={ focusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							isSelected={ isSelected }
 							inlineToolbar
 						/>
 					) }
@@ -180,4 +178,4 @@ registerBlockType( 'core/video', {
 			</figure>
 		);
 	},
-} );
+};

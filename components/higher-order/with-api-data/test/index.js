@@ -10,9 +10,17 @@ import { identity, fromPairs } from 'lodash';
 import withAPIData from '../';
 
 jest.mock( '../request', () => {
-	const request = jest.fn( () => Promise.resolve( {
-		body: {},
-	} ) );
+	const request = jest.fn( ( { path } ) => {
+		if ( /\/users$/.test( path ) ) {
+			return Promise.reject( {
+				code: 'rest_forbidden_context',
+				message: 'Sorry, you are not allowed to list users.',
+				data: { status: 403 },
+			} );
+		}
+
+		return Promise.resolve( { body: {} } );
+	} );
 
 	request.getCachedResponse = ( { method, path } ) => {
 		return method === 'GET' && '/wp/v2/pages/10' === path ?
@@ -27,6 +35,9 @@ describe( 'withAPIData()', () => {
 	const schema = {
 		routes: {
 			'/wp/v2/pages/(?P<parent>[\\d]+)/revisions': {
+				methods: [ 'GET' ],
+			},
+			'/wp/v2/users': {
 				methods: [ 'GET' ],
 			},
 			'/wp/v2/pages/(?P<id>[\\d]+)': {
@@ -75,6 +86,20 @@ describe( 'withAPIData()', () => {
 		process.nextTick( () => {
 			expect( wrapper.state( 'dataProps' ).revisions.isLoading ).toBe( false );
 			expect( wrapper.state( 'dataProps' ).revisions.data ).toEqual( {} );
+
+			done();
+		} );
+	} );
+
+	it( 'should handle error response', ( done ) => {
+		const wrapper = getWrapper( () => ( {
+			users: '/wp/v2/users',
+		} ) );
+
+		process.nextTick( () => {
+			expect( wrapper.state( 'dataProps' ).users.isLoading ).toBe( false );
+			expect( wrapper.state( 'dataProps' ).users ).not.toHaveProperty( 'data' );
+			expect( wrapper.state( 'dataProps' ).users.error.code ).toBe( 'rest_forbidden_context' );
 
 			done();
 		} );

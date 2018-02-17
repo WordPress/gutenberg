@@ -80,7 +80,7 @@ export const node = ( selector ) => () => {
  *
  * @param {Object} settings Original block settings.
  *
- * @returns {Object} Filtered block settings.
+ * @return {Object} Filtered block settings.
  */
 export function resolveAttributes( settings ) {
 	// Resolve deprecated attributes

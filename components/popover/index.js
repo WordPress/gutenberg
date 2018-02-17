@@ -52,11 +52,10 @@ class Popover extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.isOpen ) {
-			this.setOffset();
-			this.setForcedPositions();
-			this.toggleWindowEvents( true );
-		}
+		this.setOffset();
+		this.setForcedPositions();
+		this.toggleWindowEvents( true );
+		this.focus();
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -69,21 +68,10 @@ class Popover extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const { isOpen, position } = this.props;
-		const { isOpen: prevIsOpen, position: prevPosition } = prevProps;
-		if ( isOpen !== prevIsOpen ) {
-			this.toggleWindowEvents( isOpen );
+		const { position } = this.props;
+		const { position: prevPosition } = prevProps;
 
-			if ( isOpen ) {
-				this.focus();
-			}
-		}
-
-		if ( ! isOpen ) {
-			return;
-		}
-
-		if ( isOpen !== prevIsOpen || position !== prevPosition ) {
+		if ( position !== prevPosition ) {
 			this.setOffset();
 			this.setForcedPositions();
 		} else if ( ! isEqual( this.state, prevState ) ) {
@@ -105,8 +93,8 @@ class Popover extends Component {
 	}
 
 	focus() {
-		const { focusOnOpen = true } = this.props;
-		if ( ! focusOnOpen ) {
+		const { focusOnMount = true } = this.props;
+		if ( ! focusOnMount ) {
 			return;
 		}
 
@@ -129,7 +117,7 @@ class Popover extends Component {
 		this.rafHandle = window.requestAnimationFrame( this.setOffset );
 	}
 
-	getAnchorRect( ) {
+	getAnchorRect() {
 		const { anchor } = this.nodes;
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
@@ -251,7 +239,6 @@ class Popover extends Component {
 
 	render() {
 		const {
-			isOpen,
 			onClose,
 			children,
 			className,
@@ -261,17 +248,13 @@ class Popover extends Component {
 			/* eslint-disable no-unused-vars */
 			position,
 			range,
-			focusOnOpen,
+			focusOnMount,
 			getAnchorRect,
 			expandOnMobile,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
 		const [ yAxis, xAxis ] = this.getPositions();
-
-		if ( ! isOpen ) {
-			return null;
-		}
 
 		const classes = classnames(
 			'components-popover',
@@ -314,7 +297,7 @@ class Popover extends Component {
 
 		// Apply focus return behavior except when default focus on open
 		// behavior is disabled.
-		if ( false !== focusOnOpen ) {
+		if ( false !== focusOnMount ) {
 			content = <FocusManaged>{ content }</FocusManaged>;
 		}
 

@@ -1,19 +1,19 @@
 /**
  * WordPress Dependencies
  */
-import { registerReducer, registerSelectors } from '@wordpress/data';
+import { registerReducer, registerSelectors, withRehydratation, loadAndPersist } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import reducer from './reducer';
-import { withRehydratation, loadAndPersist } from './persist';
-import enhanceWithBrowserSize from './mobile';
 import applyMiddlewares from './middlewares';
-import { BREAK_MEDIUM } from './constants';
 import {
-	getEditedPostContent,
-	getEditedPostTitle,
+	getBlockCount,
+	getBlocks,
+	getEditedPostAttribute,
+	getLastMultiSelectedBlockUid,
+	getSelectedBlockCount,
 } from './selectors';
 
 /**
@@ -23,14 +23,16 @@ const STORAGE_KEY = `GUTENBERG_PREFERENCES_${ window.userSettings.uid }`;
 const MODULE_KEY = 'core/editor';
 
 const store = applyMiddlewares(
-	registerReducer( 'core/editor', withRehydratation( reducer, 'preferences' ) )
+	registerReducer( MODULE_KEY, withRehydratation( reducer, 'preferences', STORAGE_KEY ) )
 );
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
-enhanceWithBrowserSize( store, BREAK_MEDIUM );
 
 registerSelectors( MODULE_KEY, {
-	getEditedPostContent,
-	getEditedPostTitle,
+	getBlockCount,
+	getBlocks,
+	getEditedPostAttribute,
+	getLastMultiSelectedBlockUid,
+	getSelectedBlockCount,
 } );
 
 export default store;

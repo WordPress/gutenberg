@@ -2,15 +2,16 @@
 
 exports[`core/list block edit matches snapshot 1`] = `
 <div
-  class="blocks-list blocks-editable"
+  class="blocks-list blocks-rich-text"
 >
   <ul
     aria-label="Write list…"
-    class="blocks-editable__tinymce"
+    class="blocks-rich-text__tinymce"
     contenteditable="true"
+    data-is-placeholder-visible="true"
   />
   <ul
-    class="blocks-editable__tinymce"
+    class="blocks-rich-text__tinymce"
   >
     <li>
       Write list…

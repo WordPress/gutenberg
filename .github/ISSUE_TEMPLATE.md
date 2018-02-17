@@ -7,6 +7,7 @@ BEFORE POSTING YOUR ISSUE:
 - Search this repository for issues and pull requests and whether it has been fixed or reported already.
 - Ensure you are using the latest code before logging bugs.
 - Disable all plugins to ensure it's not a plugin conflict issue.
+- To report a security issue, please visit the WordPress HackerOne program: https://hackerone.com/wordpress.
 -->
 
 ## Issue Overview

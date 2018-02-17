@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
+import { get, has, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,22 +25,20 @@ import { speak } from '@wordpress/a11y';
  */
 import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
+	setupEditorState,
 	resetPost,
-	setupNewPost,
-	resetBlocks,
-	focusBlock,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
 	removeNotice,
 	savePost,
-	editPost,
 	requestMetaBoxUpdates,
 	metaBoxUpdatesSuccess,
 	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
 	setMetaBoxSavedData,
+	selectBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -55,9 +53,10 @@ import {
 	getBlocks,
 	getReusableBlock,
 	getMetaBoxes,
+	hasMetaBoxes,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
-import { getMetaBoxContainer } from '../edit-post/meta-boxes';
+import { getMetaBoxContainer } from '../utils/meta-boxes';
 
 /**
  * Module Constants
@@ -86,10 +85,7 @@ export default {
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 		new Model( toSend ).save().done( ( newPost ) => {
-			dispatch( {
-				type: 'RESET_POST',
-				post: newPost,
-			} );
+			dispatch( resetPost( newPost ) );
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				previousPost: post,
@@ -151,7 +147,9 @@ export default {
 		}
 
 		// Update dirty meta boxes.
-		dispatch( requestMetaBoxUpdates() );
+		if ( hasMetaBoxes( store.getState() ) ) {
+			dispatch( requestMetaBoxUpdates() );
+		}
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
@@ -206,13 +204,10 @@ export default {
 	TRASH_POST_SUCCESS( action ) {
 		const { postId, postType } = action;
 
-		// Delay redirect to ensure store has been updated with the successful trash.
-		setTimeout( () => {
-			window.location.href = getWPAdminURL( 'edit.php', {
-				trashed: 1,
-				post_type: postType,
-				ids: postId,
-			} );
+		window.location.href = getWPAdminURL( 'edit.php', {
+			trashed: 1,
+			post_type: postType,
+			ids: postId,
 		} );
 	},
 	TRASH_POST_FAILURE( action, store ) {
@@ -221,12 +216,15 @@ export default {
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
-		const [ blockA, blockB ] = action.blocks;
+		const state = store.getState();
+		const [ blockAUid, blockBUid ] = action.blocks;
+		const blockA = getBlock( state, blockAUid );
+		const blockB = getBlock( state, blockBUid );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
 		if ( ! blockType.merge ) {
-			dispatch( focusBlock( blockA.uid ) );
+			dispatch( selectBlock( blockA.uid ) );
 			return;
 		}
 
@@ -247,7 +245,7 @@ export default {
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		dispatch( focusBlock( blockA.uid, { offset: -1 } ) );
+		dispatch( selectBlock( blockA.uid, -1 ) );
 		dispatch( replaceBlocks(
 			[ blockA.uid, blockB.uid ],
 			[
@@ -282,22 +280,17 @@ export default {
 			return;
 		}
 
-		// Change status from auto-draft to draft
-		if ( isEditedPostNew( state ) ) {
-			dispatch( editPost( { status: 'draft' } ) );
-		}
-
 		dispatch( savePost() );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;
-		const effects = [];
 
 		// Parse content as blocks
+		let blocks;
 		if ( post.content.raw ) {
-			effects.push( resetBlocks( parse( post.content.raw ) ) );
+			blocks = parse( post.content.raw );
 		} else if ( settings.template ) {
-			const blocks = map( settings.template, ( [ name, attributes ] ) => {
+			blocks = map( settings.template, ( [ name, attributes ] ) => {
 				const block = createBlock( name );
 				block.attributes = {
 					...block.attributes,
@@ -305,23 +298,25 @@ export default {
 				};
 				return block;
 			} );
-			effects.push( resetBlocks( blocks ) );
+		} else {
+			blocks = [];
 		}
-
-		// Resetting post should occur after blocks have been reset, since it's
-		// the post reset that restarts history (used in dirty detection).
-		effects.push( resetPost( post ) );
 
 		// Include auto draft title in edits while not flagging post as dirty
+		const edits = {};
 		if ( post.status === 'auto-draft' ) {
-			effects.push( setupNewPost( {
-				title: post.title.raw,
-			} ) );
+			edits.title = post.title.raw;
+			edits.status = 'draft';
 		}
 
-		return effects;
+		return setupEditorState( post, blocks, edits );
 	},
 	FETCH_REUSABLE_BLOCKS( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		if ( ! has( wp, 'api.models.Blocks' ) && ! has( wp, 'api.collections.Blocks' ) ) {
+			return;
+		}
 		const { id } = action;
 		const { dispatch } = store;
 
@@ -356,12 +351,19 @@ export default {
 		);
 	},
 	SAVE_REUSABLE_BLOCK( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		if ( ! has( wp, 'api.models.Blocks' ) ) {
+			return;
+		}
+
 		const { id } = action;
 		const { getState, dispatch } = store;
 
 		const { title, type, attributes, isTemporary } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
 		const requestData = isTemporary ? { title, content } : { id, title, content };
+
 		new wp.api.models.Blocks( requestData ).save().then(
 			( updatedReusableBlock ) => {
 				dispatch( {
@@ -383,6 +385,12 @@ export default {
 		);
 	},
 	DELETE_REUSABLE_BLOCK( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		if ( ! has( wp, 'api.models.Blocks' ) ) {
+			return;
+		}
+
 		const { id } = action;
 		const { getState, dispatch } = store;
 
@@ -443,13 +451,19 @@ export default {
 
 		const oldBlock = getBlock( getState(), action.uid );
 		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
-		const newBlock = createBlock( 'core/block', { ref: reusableBlock.id } );
+		const newBlock = createBlock( 'core/block', {
+			ref: reusableBlock.id,
+			layout: oldBlock.attributes.layout,
+		} );
 		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
-	APPEND_DEFAULT_BLOCK() {
-		return insertBlock( createBlock( getDefaultBlockName() ) );
+	APPEND_DEFAULT_BLOCK( action ) {
+		const { attributes, rootUID } = action;
+		const block = createBlock( getDefaultBlockName(), attributes );
+
+		return insertBlock( block, undefined, rootUID );
 	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;
@@ -469,7 +483,8 @@ export default {
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
-		const dataPerLocation = reduce( getMetaBoxes( store.getState() ), ( memo, metabox, location ) => {
+		const state = store.getState();
+		const dataPerLocation = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
 			if ( metabox.isActive ) {
 				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
 			}
@@ -477,11 +492,20 @@ export default {
 		}, {} );
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
+		// Additional data needed for backwards compatibility.
+		// If we do not provide this data the post will be overriden with the default values.
+		const post = getCurrentPost( state );
+		const additionalData = [
+			post.comment_status && `comment_status=${ post.comment_status }`,
+			post.ping_status && `ping_status=${ post.ping_status }`,
+		].filter( Boolean );
+
 		// To save the metaboxes, we serialize each one of the location forms and combine them
 		// We also add the "common" hidden fields from the base .metabox-base-form
-		const formData = values( dataPerLocation ).concat(
-			jQuery( '.metabox-base-form' ).serialize()
-		).join( '&' );
+		const formData = values( dataPerLocation )
+			.concat( jQuery( '.metabox-base-form' ).serialize() )
+			.concat( additionalData )
+			.join( '&' );
 		const fetchOptions = {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

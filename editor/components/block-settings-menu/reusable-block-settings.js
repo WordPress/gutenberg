@@ -15,10 +15,20 @@ import { isReusableBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { getBlock, getReusableBlock } from '../../store/selectors';
+import {
+	getBlock,
+	getBlockOrder,
+	getReusableBlock,
+} from '../../store/selectors';
 import { convertBlockToStatic, convertBlockToReusable, deleteReusableBlock } from '../../store/actions';
 
-export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onConvertToReusable, onDelete } ) {
+export function ReusableBlockSettings( {
+	reusableBlock,
+	isValidForConvert,
+	onConvertToStatic,
+	onConvertToReusable,
+	onDelete,
+} ) {
 	return (
 		<Fragment>
 			{ ! reusableBlock && (
@@ -26,6 +36,7 @@ export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onCon
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
 					onClick={ onConvertToReusable }
+					disabled={ ! isValidForConvert }
 				>
 					{ __( 'Convert to Reusable Block' ) }
 				</IconButton>
@@ -56,7 +67,9 @@ export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onCon
 export default connect(
 	( state, { uid } ) => {
 		const block = getBlock( state, uid );
+
 		return {
+			isValidForConvert: ! getBlockOrder( state, block.uid ).length,
 			reusableBlock: isReusableBlock( block ) ? getReusableBlock( state, block.attributes.ref ) : null,
 		};
 	},

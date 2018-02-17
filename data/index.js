@@ -2,21 +2,42 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { createStore, combineReducers } from 'redux';
-import { flowRight } from 'lodash';
+import { createStore } from 'redux';
+import { flowRight, without, mapValues } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+export { loadAndPersist, withRehydratation } from './persist';
 
 /**
  * Module constants
  */
-const reducers = {};
+const stores = {};
 const selectors = {};
-const enhancers = [];
-if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
-	enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__() );
+let listeners = [];
+
+/**
+ * Global listener called for each store's update.
+ */
+export function globalListener() {
+	listeners.forEach( listener => listener() );
 }
 
-const initialReducer = () => ( {} );
-const store = createStore( initialReducer, {}, flowRight( enhancers ) );
+/**
+ * Subscribe to changes to any data.
+ *
+ * @param {Function}   listener Listener function.
+ *
+ * @return {Function}           Unsubscribe function.
+ */
+export const subscribe = ( listener ) => {
+	listeners.push( listener );
+
+	return () => {
+		listeners = without( listeners, listener );
+	};
+};
 
 /**
  * Registers a new sub-reducer to the global state and returns a Redux-like store object.
@@ -24,29 +45,18 @@ const store = createStore( initialReducer, {}, flowRight( enhancers ) );
  * @param {string} reducerKey Reducer key.
  * @param {Object} reducer    Reducer function.
  *
- * @returns {Object} Store Object.
+ * @return {Object} Store Object.
  */
 export function registerReducer( reducerKey, reducer ) {
-	reducers[ reducerKey ] = reducer;
-	store.replaceReducer( combineReducers( reducers ) );
-	const getState = () => store.getState()[ reducerKey ];
+	const enhancers = [];
+	if ( window.__REDUX_DEVTOOLS_EXTENSION__ ) {
+		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: reducerKey, instanceId: reducerKey } ) );
+	}
+	const store = createStore( reducer, flowRight( enhancers ) );
+	stores[ reducerKey ] = store;
+	store.subscribe( globalListener );
 
-	return {
-		dispatch: store.dispatch,
-		subscribe( listener ) {
-			let previousState = getState();
-			const unsubscribe = store.subscribe( () => {
-				const newState = getState();
-				if ( newState !== previousState ) {
-					listener();
-					previousState = newState;
-				}
-			} );
-
-			return unsubscribe;
-		},
-		getState,
-	};
+	return store;
 }
 
 /**
@@ -59,7 +69,32 @@ export function registerReducer( reducerKey, reducer ) {
  *                              state as first argument.
  */
 export function registerSelectors( reducerKey, newSelectors ) {
-	selectors[ reducerKey ] = newSelectors;
+	const store = stores[ reducerKey ];
+	const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
+	selectors[ reducerKey ] = mapValues( newSelectors, createStateSelector );
+}
+
+/**
+ * Calls a selector given the current state and extra arguments.
+ *
+ * @param {string} reducerKey Part of the state shape to register the
+ *                            selectors for.
+ *
+ * @return {*} The selector's returned value.
+ */
+export function select( reducerKey ) {
+	if ( arguments.length > 1 ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'Deprecated: `select` now accepts only a single argument: the reducer key. ' +
+			'The return value is an object of selector functions.'
+		);
+
+		const [ , selectorKey, ...args ] = arguments;
+		return select( reducerKey )[ selectorKey ]( ...args );
+	}
+
+	return selectors[ reducerKey ];
 }
 
 /**
@@ -69,9 +104,19 @@ export function registerSelectors( reducerKey, newSelectors ) {
  *                                       to determine the data for the
  *                                       component.
  *
- * @returns {Function} Renders the wrapped component and passes it data.
+ * @return {Function} Renders the wrapped component and passes it data.
  */
 export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
+	const store = {
+		getState() {
+			return mapValues( stores, subStore => subStore.getState() );
+		},
+		subscribe,
+		dispatch() {
+			// eslint-disable-next-line no-console
+			console.warn( 'Dispatch is not supported.' );
+		},
+	};
 	const connectWithStore = ( ...args ) => {
 		const ConnectedWrappedComponent = connect( ...args )( WrappedComponent );
 		return ( props ) => {
@@ -80,24 +125,6 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
 	};
 
 	return connectWithStore( ( state, ownProps ) => {
-		const select = ( key, selectorName, ...args ) => {
-			return selectors[ key ][ selectorName ]( state[ key ], ...args );
-		};
-
 		return mapSelectorsToProps( select, ownProps );
 	} );
-};
-
-/**
- * Calls a selector given the current state and extra arguments.
- *
- * @param {string} reducerKey   Part of the state shape to register the
- *                              selectors for.
- * @param {string} selectorName Selector name.
- * @param {*}      args         Selectors arguments.
- *
- * @returns {*} The selector's returned value.
- */
-export const select = ( reducerKey, selectorName, ...args ) => {
-	return selectors[ reducerKey ][ selectorName ]( store.getState()[ reducerKey ], ...args );
 };

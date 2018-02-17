@@ -19,7 +19,7 @@ const getGalleryDetailsMediaFrame = () => {
 		/**
 		 * Create the default states.
 		 *
-		 * @returns {void}
+		 * @return {void}
 		 */
 		createStates: function createStates() {
 			this.states.add( [
@@ -53,7 +53,7 @@ const getGalleryDetailsMediaFrame = () => {
 // the media library image object contains numerous attributes
 // we only need this set to display the image in the library
 const slimImageObject = ( img ) => {
-	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt', 'link' ];
+	const attrSet = [ 'sizes', 'mime', 'type', 'subtype', 'id', 'url', 'alt', 'link', 'caption' ];
 	return pick( img, attrSet );
 };
 

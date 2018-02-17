@@ -9,6 +9,7 @@
                 "Embedded content from flickr"
             ]
         },
+        "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-flickr\">\n    https://flickr.com/\n    <figcaption>Embedded content from flickr</figcaption>\n</figure>"
     }
 ]
