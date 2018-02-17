@@ -41,7 +41,6 @@ function createRunHook( hooks, returnFirstArg ) {
 			currentIndex: 0,
 		};
 
-		hooks.__current = hooks.__current || [];
 		hooks.__current.push( hookInfo );
 		hooks[ hookName ].runs++;
 

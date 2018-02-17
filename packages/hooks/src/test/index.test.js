@@ -71,6 +71,10 @@ beforeEach( () => {
 	// because the internal functions have references to the original objects.
 	[ actions, filters ].forEach( hooks => {
 		for ( const k in hooks ) {
+			if ( '__current' === k ) {
+				continue;
+			}
+
 			delete hooks[ k ];
 		}
 	} );

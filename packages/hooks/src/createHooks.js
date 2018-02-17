@@ -14,6 +14,8 @@ import createDidHook from './createDidHook';
 function createHooks() {
 	const actions = Object.create( null );
 	const filters = Object.create( null );
+	actions.__current = [];
+	filters.__current = [];
 
 	return {
 		addAction:        createAddHook( actions ),
