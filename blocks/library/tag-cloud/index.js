@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import TagCloudBlock from './block';
 
 export const name = 'core/tag-cloud';
@@ -24,7 +25,10 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
-		taxonomy: {
+		taxonomySlug: {
+			type: 'string',
+		},
+		taxonomyRestBase: {
 			type: 'string',
 		},
 		align: {

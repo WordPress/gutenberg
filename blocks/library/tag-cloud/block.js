@@ -2,17 +2,24 @@
  * External dependencies
  */
 import { map } from 'lodash';
+import { stringify } from 'querystringify';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, ToggleControl, SelectControl, withAPIData } from '@wordpress/components';
+import {
+	Placeholder,
+	ToggleControl,
+	SelectControl,
+	withAPIData,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import TermList from './term-list';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -40,10 +47,12 @@ class TagCloudBlock extends Component {
 		} );
 	}
 
-	setTaxonomy( taxonomy ) {
+	setTaxonomy( taxonomySlug ) {
 		const { setAttributes } = this.props;
+		const taxonomies = this.props.taxonomies.data;
+		const taxonomy = taxonomies[ taxonomySlug ];
 
-		setAttributes( { taxonomy } );
+		setAttributes( { taxonomySlug, taxonomyRestBase: taxonomy.rest_base } );
 	}
 
 	toggleShowTagCounts() {
@@ -54,8 +63,14 @@ class TagCloudBlock extends Component {
 	}
 
 	render() {
-		const { attributes, focus, setAttributes } = this.props;
-		const { taxonomy, showTagCounts, align } = attributes;
+		const {
+			attributes,
+			focus,
+			setAttributes,
+			termList,
+			className,
+		} = this.props;
+		const { taxonomySlug, showTagCounts, align } = attributes;
 		const taxonomies = this.getTaxonomies();
 		const options = [
 			{
@@ -64,6 +79,15 @@ class TagCloudBlock extends Component {
 			},
 			...taxonomies,
 		];
+		const terms = termList.data ? (
+			<TermList
+				terms={ termList.data }
+				showTagCounts={ showTagCounts }
+				className={ className }
+			/>
+		) : (
+			[]
+		);
 
 		const inspectorControls = focus && (
 			<InspectorControls key="inspector">
@@ -71,7 +95,7 @@ class TagCloudBlock extends Component {
 				<SelectControl
 					label={ __( 'Taxonomy' ) }
 					options={ options }
-					value={ taxonomy }
+					value={ taxonomySlug }
 					onChange={ this.setTaxonomy }
 				/>
 				<ToggleControl
@@ -82,7 +106,7 @@ class TagCloudBlock extends Component {
 			</InspectorControls>
 		);
 
-		if ( ! taxonomy ) {
+		if ( ! taxonomySlug ) {
 			return [
 				inspectorControls,
 				<Placeholder
@@ -105,20 +129,27 @@ class TagCloudBlock extends Component {
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
-						onChange={ ( nextAlign ) => {
+						onChange={ nextAlign => {
 							setAttributes( { align: nextAlign } );
 						} }
 						controls={ [ 'left', 'center', 'right', 'full' ] }
 					/>
 				</BlockControls>
 			),
-			taxonomy,
+			terms,
 		];
 	}
 }
 
-export default withAPIData( () => {
+export default withAPIData( props => {
+	const { taxonomyRestBase } = props.attributes;
+	const queryString = stringify( {
+		hide_empty: true,
+		per_page: 100,
+	} );
+
 	return {
 		taxonomies: '/wp/v2/taxonomies',
+		termList: `/wp/v2/${ taxonomyRestBase }?${ queryString }`,
 	};
 } )( TagCloudBlock );
