@@ -45,21 +45,16 @@ function createRunHook( hooks, returnFirstArg ) {
 		hooks.__current.push( hookInfo );
 		hooks[ hookName ].runs++;
 
-		let maybeReturnValue = args[ 0 ];
-
 		while ( hookInfo.currentIndex < handlers.length ) {
 			const handler = handlers[ hookInfo.currentIndex ];
-			maybeReturnValue = handler.callback.apply( null, args );
-			if ( returnFirstArg ) {
-				args[ 0 ] = maybeReturnValue;
-			}
+			args[ 0 ] = handler.callback.apply( null, args );
 			hookInfo.currentIndex++;
 		}
 
 		hooks.__current.pop();
 
 		if ( returnFirstArg ) {
-			return maybeReturnValue;
+			return args[ 0 ];
 		}
 	};
 }
