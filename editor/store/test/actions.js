@@ -16,7 +16,6 @@ import {
 	toggleSelection,
 	setupEditor,
 	resetPost,
-	setupNewPost,
 	resetBlocks,
 	updateBlockAttributes,
 	updateBlock,
@@ -72,18 +71,6 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
-
-	describe( 'setupNewPost', () => {
-		it( 'should return the SETUP_NEW_POST action', () => {
-			const edits = {};
-			const result = setupNewPost( edits );
-			expect( result ).toEqual( {
-				type: 'SETUP_NEW_POST',
-				edits,
-			} );
-		} );
-	} );
-
 	describe( 'resetBlocks', () => {
 		it( 'should return the RESET_BLOCKS actions', () => {
 			const blocks = [];
@@ -272,15 +259,11 @@ describe( 'actions', () => {
 
 	describe( 'mergeBlocks', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
-			const blockA = {
-				uid: 'blockA',
-			};
-			const blockB = {
-				uid: 'blockB',
-			};
-			expect( mergeBlocks( blockA, blockB ) ).toEqual( {
+			const blockAUid = 'blockA';
+			const blockBUid = 'blockB';
+			expect( mergeBlocks( blockAUid, blockBUid ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
-				blocks: [ blockA, blockB ],
+				blocks: [ blockAUid, blockBUid ],
 			} );
 		} );
 	} );

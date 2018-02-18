@@ -14,6 +14,7 @@ exports[`core/text-columns block edit matches snapshot 1`] = `
         aria-label="New Column"
         class="blocks-rich-text__tinymce"
         contenteditable="true"
+        data-is-placeholder-visible="true"
       />
       <p
         class="blocks-rich-text__tinymce"
@@ -32,6 +33,7 @@ exports[`core/text-columns block edit matches snapshot 1`] = `
         aria-label="New Column"
         class="blocks-rich-text__tinymce"
         contenteditable="true"
+        data-is-placeholder-visible="true"
       />
       <p
         class="blocks-rich-text__tinymce"

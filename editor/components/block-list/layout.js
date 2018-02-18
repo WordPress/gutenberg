@@ -6,21 +6,18 @@ import {
 	findLast,
 	map,
 	invert,
-	isEqual,
 	mapValues,
 	sortBy,
 	throttle,
-	get,
 	last,
 } from 'lodash';
-import scrollIntoView from 'dom-scroll-into-view';
+import classnames from 'classnames';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { serialize, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -30,16 +27,12 @@ import BlockListBlock from './block';
 import BlockSelectionClearer from '../block-selection-clearer';
 import DefaultBlockAppender from '../default-block-appender';
 import {
-	getMultiSelectedBlocksStartUid,
-	getMultiSelectedBlocksEndUid,
-	getMultiSelectedBlocks,
-	getMultiSelectedBlockUids,
-	getSelectedBlock,
 	isSelectionEnabled,
 	isMultiSelecting,
+	getMultiSelectedBlocksStartUid,
+	getMultiSelectedBlocksEndUid,
 } from '../../store/selectors';
 import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
-import { documentHasSelection } from '../../utils/dom';
 
 class BlockListLayout extends Component {
 	constructor( props ) {
@@ -48,8 +41,6 @@ class BlockListLayout extends Component {
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
 		this.onShiftSelection = this.onShiftSelection.bind( this );
-		this.onCopy = this.onCopy.bind( this );
-		this.onCut = this.onCut.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
@@ -62,30 +53,11 @@ class BlockListLayout extends Component {
 	}
 
 	componentDidMount() {
-		document.addEventListener( 'copy', this.onCopy );
-		document.addEventListener( 'cut', this.onCut );
 		window.addEventListener( 'mousemove', this.setLastClientY );
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener( 'copy', this.onCopy );
-		document.removeEventListener( 'cut', this.onCut );
 		window.removeEventListener( 'mousemove', this.setLastClientY );
-	}
-
-	componentWillReceiveProps( nextProps ) {
-		if ( isEqual( this.props.multiSelectedBlockUids, nextProps.multiSelectedBlockUids ) ) {
-			return;
-		}
-
-		if ( nextProps.multiSelectedBlockUids && nextProps.multiSelectedBlockUids.length > 0 ) {
-			const extent = this.nodes[ nextProps.selectionEnd ];
-			if ( extent ) {
-				scrollIntoView( extent, extent.closest( '.edit-post-layout__content' ), {
-					onlyScrollIfNeeded: true,
-				} );
-			}
-		}
 	}
 
 	setLastClientY( { clientY } ) {
@@ -125,36 +97,6 @@ class BlockListLayout extends Component {
 		this.onSelectionChange( this.coordMap[ key ] );
 	}
 
-	onCopy( event ) {
-		const { multiSelectedBlocks, selectedBlock } = this.props;
-
-		if ( ! multiSelectedBlocks.length && ! selectedBlock ) {
-			return;
-		}
-
-		// Let native copy behaviour take over in input fields.
-		if ( selectedBlock && documentHasSelection() ) {
-			return;
-		}
-
-		const serialized = serialize( selectedBlock || multiSelectedBlocks );
-
-		event.clipboardData.setData( 'text/plain', serialized );
-		event.clipboardData.setData( 'text/html', serialized );
-
-		event.preventDefault();
-	}
-
-	onCut( event ) {
-		const { multiSelectedBlockUids } = this.props;
-
-		this.onCopy( event );
-
-		if ( multiSelectedBlockUids.length ) {
-			this.props.onRemove( multiSelectedBlockUids );
-		}
-	}
-
 	/**
 	 * Binds event handlers to the document for tracking a pending multi-select
 	 * in response to a mousedown event occurring in a rendered block.
@@ -188,6 +130,11 @@ class BlockListLayout extends Component {
 		window.addEventListener( 'mouseup', this.onSelectionEnd );
 	}
 
+	/**
+	 * Handles multi-selection changes in response to pointer move.
+	 *
+	 * @param {string} uid Block under cursor in multi-select drag.
+	 */
 	onSelectionChange( uid ) {
 		const { onMultiSelect, selectionStart, selectionEnd } = this.props;
 		const { selectionAtStart } = this;
@@ -197,10 +144,13 @@ class BlockListLayout extends Component {
 			return;
 		}
 
+		// If multi-selecting and cursor extent returns to the start of
+		// selection, cancel multi-select.
 		if ( isAtStart && selectionStart ) {
 			onMultiSelect( null, null );
 		}
 
+		// Expand multi-selection to block under cursor.
 		if ( ! isAtStart && selectionEnd !== uid ) {
 			onMultiSelect( selectionAtStart, uid );
 		}
@@ -235,12 +185,10 @@ class BlockListLayout extends Component {
 			return;
 		}
 
-		const { selectedBlock, selectionStart, onMultiSelect, onSelect } = this.props;
+		const { selectionStartUID, onMultiSelect, onSelect } = this.props;
 
-		if ( selectedBlock ) {
-			onMultiSelect( selectedBlock.uid, uid );
-		} else if ( selectionStart ) {
-			onMultiSelect( selectionStart, uid );
+		if ( selectionStartUID ) {
+			onMultiSelect( selectionStartUID, uid );
 		} else {
 			onSelect( uid );
 		}
@@ -248,7 +196,7 @@ class BlockListLayout extends Component {
 
 	render() {
 		const {
-			blocks,
+			blockUIDs,
 			showContextualToolbar,
 			layout,
 			isGroupedByLayout,
@@ -261,15 +209,17 @@ class BlockListLayout extends Component {
 			defaultLayout = layout;
 		}
 
-		const isLastBlockDefault = get( last( blocks ), 'name' ) === getDefaultBlockName();
+		const classes = classnames( {
+			[ `layout-${ layout }` ]: layout,
+		} );
 
 		return (
-			<BlockSelectionClearer className={ 'layout-' + layout }>
-				{ map( blocks, ( block, blockIndex ) => (
+			<BlockSelectionClearer className={ classes }>
+				{ map( blockUIDs, ( uid, blockIndex ) => (
 					<BlockListBlock
-						key={ 'block-' + block.uid }
+						key={ 'block-' + uid }
 						index={ blockIndex }
-						uid={ block.uid }
+						uid={ uid }
 						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
@@ -277,17 +227,15 @@ class BlockListLayout extends Component {
 						rootUID={ rootUID }
 						layout={ defaultLayout }
 						isFirst={ blockIndex === 0 }
-						isLast={ blockIndex === blocks.length - 1 }
+						isLast={ blockIndex === blockUIDs.length - 1 }
 						renderBlockMenu={ renderBlockMenu }
 					/>
 				) ) }
-				{ ( ! blocks.length || ! isLastBlockDefault ) && (
-					<DefaultBlockAppender
-						rootUID={ rootUID }
-						layout={ defaultLayout }
-						showPrompt={ ! blocks.length }
-					/>
-				) }
+				<DefaultBlockAppender
+					rootUID={ rootUID }
+					lastBlockUID={ last( blockUIDs ) }
+					layout={ defaultLayout }
+				/>
 			</BlockSelectionClearer>
 		);
 	}
@@ -295,11 +243,12 @@ class BlockListLayout extends Component {
 
 export default connect(
 	( state ) => ( {
+		// Reference block selection value directly, since current selectors
+		// assume either multi-selection (getMultiSelectedBlocksStartUid) or
+		// singular-selection (getSelectedBlock) exclusively.
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		selectionEnd: getMultiSelectedBlocksEndUid( state ),
-		multiSelectedBlocks: getMultiSelectedBlocks( state ),
-		multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
-		selectedBlock: getSelectedBlock( state ),
+		selectionStartUID: state.blockSelection.start,
 		isSelectionEnabled: isSelectionEnabled( state ),
 		isMultiSelecting: isMultiSelecting( state ),
 	} ),
@@ -315,9 +264,6 @@ export default connect(
 		},
 		onSelect( uid ) {
 			dispatch( selectBlock( uid ) );
-		},
-		onRemove( uids ) {
-			dispatch( { type: 'REMOVE_BLOCKS', uids } );
 		},
 	} )
 )( BlockListLayout );

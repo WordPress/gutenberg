@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import tinymce from 'tinymce';
 import classnames from 'classnames';
 import {
 	last,
@@ -13,7 +12,7 @@ import {
 	find,
 	defer,
 	noop,
-	throttle,
+	reject,
 } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 import 'element-closest';
@@ -54,10 +53,48 @@ export function createTinyMCEElement( type, props, ...children ) {
 	);
 }
 
-export function isLinkBoundary( fragment ) {
-	return fragment.childNodes && fragment.childNodes.length === 1 &&
-		fragment.childNodes[ 0 ].nodeName === 'A' && fragment.childNodes[ 0 ].text.length === 1 &&
-		fragment.childNodes[ 0 ].text[ 0 ] === '\uFEFF';
+/**
+ * Returns true if the node is the inline node boundary. This is used in node
+ * filtering prevent the inline boundary from being included in the split which
+ * occurs while within but at the end of an inline node, since TinyMCE includes
+ * a placeholder caret character at the end.
+ *
+ * @see https://github.com/tinymce/tinymce/blob/master/src/plugins/link/main/ts/core/Utils.ts
+ *
+ * @param {Node} node Node to test.
+ *
+ * @return {boolean} Whether node is inline boundary.
+ */
+export function isEmptyInlineBoundary( node ) {
+	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
+	return text === '\uFEFF';
+}
+
+/**
+ * Returns true if the node is empty, meaning it contains only the placeholder
+ * caret character or is an empty text node.
+ *
+ * @param {Node} node Node to test.
+ *
+ * @return {boolean} Whether node is empty.
+ */
+export function isEmptyNode( node ) {
+	return (
+		'' === node.nodeValue ||
+		isEmptyInlineBoundary( node )
+	);
+}
+
+/**
+ * Given a set of Nodes, filters to set to exclude any empty nodes: those with
+ * either empty text nodes or only including the inline boundary caret.
+ *
+ * @param {Node[]} childNodes Nodes to filter.
+ *
+ * @return {Node[]} Non-empty nodes.
+ */
+export function filterEmptyNodes( childNodes ) {
+	return reject( childNodes, isEmptyNode );
 }
 
 export function getFormatProperties( formatName, parents ) {
@@ -93,22 +130,22 @@ export class RichText extends Component {
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.throttledOnChange = throttle( this.onChange.bind( this ), 500 );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
-		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.maybePropagateUndo = this.maybePropagateUndo.bind( this );
+		this.onPropagateUndo = this.onPropagateUndo.bind( this );
 		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
+		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 
 		this.state = {
 			formats: {},
-			empty: ! value || ! value.length,
 			selectedNodeId: 0,
 		};
+
+		this.isEmpty = ! value || ! value.length;
 	}
 
 	/**
@@ -123,6 +160,9 @@ export class RichText extends Component {
 		return ( this.props.getSettings || identity )( {
 			...settings,
 			forced_root_block: this.props.multiline || false,
+			// Allow TinyMCE to keep one undo level for comparing changes.
+			// Prevent it otherwise from accumulating any history.
+			custom_undo_redo_levels: 1,
 		} );
 	}
 
@@ -142,16 +182,16 @@ export class RichText extends Component {
 		} );
 
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusout', this.onChange );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
 		editor.on( 'keyup', this.onKeyUp );
-		editor.on( 'selectionChange', this.onSelectionChange );
-		editor.on( 'BeforeExecCommand', this.maybePropagateUndo );
+		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
-		editor.on( 'input', this.throttledOnChange );
+		editor.on( 'input', this.onChange );
+		// The change event in TinyMCE fires every time an undo level is added.
+		editor.on( 'change', this.onCreateUndoLevel );
 
 		patterns.apply( this, [ editor ] );
 
@@ -205,41 +245,22 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles the global selection change event.
-	 */
-	onSelectionChange() {
-		const isActive = document.activeElement === this.editor.getBody();
-		// We must check this because selectionChange is a global event.
-		if ( ! isActive ) {
-			return;
-		}
-
-		const isEmpty = tinymce.DOM.isEmpty( this.editor.getBody() );
-		if ( this.state.empty !== isEmpty ) {
-			this.setState( { empty: isEmpty } );
-		}
-	}
-
-	/**
 	 * Handles an undo event from tinyMCE.
 	 *
-	 * When user attempts Undo when empty Undo stack, propagate undo
-	 * action to context handler. The compromise here is that: TinyMCE
-	 * handles Undo until change, at which point `editor.save` resets
-	 * history. If no history exists, let context handler have a turn.
-	 * Defer in case an immediate undo causes TinyMCE to be destroyed,
-	 * if other undo behaviors test presence of an input field.
-	 *
-	 * @param {UndoEvent} event The undo event as triggered by tinyMCE.
+	 * @param {UndoEvent} event The undo event as triggered by TinyMCE.
 	 */
-	maybePropagateUndo( event ) {
-		const { onUndo } = this.context;
-		if ( onUndo && event.command === 'Undo' && ! this.editor.undoManager.hasUndo() ) {
-			defer( onUndo );
+	onPropagateUndo( event ) {
+		const { onUndo, onRedo } = this.context;
+		const { command } = event;
 
-			// We could return false here to stop other TinyMCE event handlers
-			// from running, but we assume TinyMCE won't do anything on an
-			// empty undo stack anyways.
+		if ( command === 'Undo' && onUndo ) {
+			defer( onUndo );
+			event.preventDefault();
+		}
+
+		if ( command === 'Redo' && onRedo ) {
+			defer( onRedo );
+			event.preventDefault();
 		}
 	}
 
@@ -372,13 +393,17 @@ export class RichText extends Component {
 	/**
 	 * Handles any case where the content of the tinyMCE instance has changed.
 	 */
+
 	onChange() {
-		if ( ! this.editor.isDirty() ) {
-			return;
-		}
-		this.savedContent = this.state.empty ? [] : this.getContent();
+		this.isEmpty = this.editor.dom.isEmpty( this.editor.getBody() );
+		this.savedContent = this.isEmpty ? [] : this.getContent();
 		this.props.onChange( this.savedContent );
-		this.editor.save();
+	}
+
+	onCreateUndoLevel() {
+		// Always ensure the content is up-to-date.
+		this.onChange();
+		this.context.onCreateUndoLevel();
 	}
 
 	/**
@@ -506,6 +531,8 @@ export class RichText extends Component {
 				return;
 			}
 
+			this.onCreateUndoLevel();
+
 			const forward = event.keyCode === DELETE;
 
 			if ( this.props.onMerge ) {
@@ -543,6 +570,7 @@ export class RichText extends Component {
 				}
 
 				event.preventDefault();
+				this.onCreateUndoLevel();
 
 				const childNodes = Array.from( rootNode.childNodes );
 				const index = dom.nodeIndex( selectedNode );
@@ -551,10 +579,10 @@ export class RichText extends Component {
 				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
 				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
 
-				this.setContent( beforeElement );
-				this.props.onSplit( beforeElement, afterElement );
+				this.restoreContentAndSplit( beforeElement, afterElement );
 			} else {
 				event.preventDefault();
+				this.onCreateUndoLevel();
 
 				if ( event.shiftKey || ! this.props.onSplit ) {
 					this.editor.execCommand( 'InsertLineBreak', false, event );
@@ -571,8 +599,10 @@ export class RichText extends Component {
 	 * @param {number} keyCode The key code that has been pressed on the keyboard.
 	 */
 	onKeyUp( { keyCode } ) {
+		// The input event does not fire when the whole field is selected and
+		// BACKSPACE is pressed.
 		if ( keyCode === BACKSPACE ) {
-			this.onSelectionChange();
+			this.onChange();
 		}
 	}
 
@@ -607,13 +637,11 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = isLinkBoundary( afterFragment ) ? [] : nodeListToReact( afterFragment.childNodes, createTinyMCEElement );
+			const afterElement = nodeListToReact( filterEmptyNodes( afterFragment.childNodes ), createTinyMCEElement );
 
-			this.setContent( beforeElement );
-			this.props.onSplit( beforeElement, afterElement, ...blocks );
+			this.restoreContentAndSplit( beforeElement, afterElement, blocks );
 		} else {
-			this.setContent( [] );
-			this.props.onSplit( [], [], ...blocks );
+			this.restoreContentAndSplit( [], [], blocks );
 		}
 	}
 
@@ -659,7 +687,7 @@ export class RichText extends Component {
 		// Splitting into two blocks
 		this.setContent( this.props.value );
 
-		this.props.onSplit(
+		this.restoreContentAndSplit(
 			nodeListToReact( before, createTinyMCEElement ),
 			nodeListToReact( after, createTinyMCEElement )
 		);
@@ -684,14 +712,15 @@ export class RichText extends Component {
 	}
 
 	updateContent() {
-		const bookmark = this.editor.selection.getBookmark( 2, true );
-		this.savedContent = this.props.value;
-		this.setContent( this.savedContent );
-		this.editor.selection.moveToBookmark( bookmark );
+		// Do not trigger a change event coming from the TinyMCE undo manager.
+		// Our global state is already up-to-date.
+		this.editor.undoManager.ignore( () => {
+			const bookmark = this.editor.selection.getBookmark( 2, true );
 
-		// Saving the editor on updates avoid unecessary onChanges calls
-		// These calls can make the focus jump
-		this.editor.save();
+			this.savedContent = this.props.value;
+			this.setContent( this.savedContent );
+			this.editor.selection.moveToBookmark( bookmark );
+		} );
 	}
 
 	setContent( content = '' ) {
@@ -704,7 +733,6 @@ export class RichText extends Component {
 
 	componentWillUnmount() {
 		this.onChange();
-		this.throttledOnChange.cancel();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -713,11 +741,14 @@ export class RichText extends Component {
 			!! this.editor &&
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent
+			this.props.value !== this.savedContent &&
+			! isEqual( this.props.value, prevProps.value ) &&
+			! isEqual( this.props.value, this.savedContent )
 		) {
 			this.updateContent();
 		}
 	}
+
 	componentWillReceiveProps( nextProps ) {
 		if ( 'development' === process.env.NODE_ENV ) {
 			if ( ! isEqual( this.props.formatters, nextProps.formatters ) ) {
@@ -766,8 +797,19 @@ export class RichText extends Component {
 		this.setState( ( state ) => ( {
 			formats: merge( {}, state.formats, formats ),
 		} ) );
+	}
 
-		this.editor.setDirty( true );
+	/**
+	 * Calling onSplit means we need to abort the change done by TinyMCE.
+	 * we need to call updateContent to restore the initial content before calling onSplit.
+	 *
+	 * @param {Array}  before content before the split position
+	 * @param {Array}  after  content after the split position
+	 * @param {?Array} blocks blocks to insert at the split position
+	 */
+	restoreContentAndSplit( before, after, blocks ) {
+		this.updateContent();
+		this.props.onSplit( before, after, ...blocks );
 	}
 
 	render() {
@@ -785,7 +827,6 @@ export class RichText extends Component {
 			isSelected = false,
 			formatters,
 		} = this.props;
-		const { empty } = this.state;
 
 		const ariaProps = pickAriaProps( this.props );
 
@@ -793,7 +834,7 @@ export class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && empty;
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty;
 		const classes = classnames( wrapperClassName, 'blocks-rich-text' );
 
 		const formatToolbar = (
@@ -847,7 +888,9 @@ export class RichText extends Component {
 
 RichText.contextTypes = {
 	onUndo: noop,
+	onRedo: noop,
 	canUserUseUnfilteredHTML: noop,
+	onCreateUndoLevel: noop,
 };
 
 RichText.defaultProps = {

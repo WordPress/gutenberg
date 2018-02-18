@@ -21,7 +21,6 @@ import {
 	getPostRawValue,
 	editor,
 	currentPost,
-	hoveredBlock,
 	isTyping,
 	blockSelection,
 	preferences,
@@ -689,11 +688,12 @@ describe( 'state', () => {
 
 			it( 'should save initial post state', () => {
 				const state = editor( undefined, {
-					type: 'SETUP_NEW_POST',
+					type: 'SETUP_EDITOR_STATE',
 					edits: {
 						status: 'draft',
 						title: 'post title',
 					},
+					blocks: [],
 				} );
 
 				expect( state.present.edits ).toEqual( {
@@ -819,6 +819,74 @@ describe( 'state', () => {
 				expect( state.present.blocksByUid ).toBe( state.present.blocksByUid );
 			} );
 		} );
+
+		describe( 'withHistory', () => {
+			it( 'should overwrite present history if updating same attributes', () => {
+				let state;
+
+				state = editor( state, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {},
+						innerBlocks: [],
+					} ],
+				} );
+
+				expect( state.past ).toHaveLength( 1 );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 1,
+					},
+				} );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 2,
+					},
+				} );
+
+				expect( state.past ).toHaveLength( 2 );
+			} );
+
+			it( 'should not overwrite present history if updating same attributes', () => {
+				let state;
+
+				state = editor( state, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {},
+						innerBlocks: [],
+					} ],
+				} );
+
+				expect( state.past ).toHaveLength( 1 );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 1,
+					},
+				} );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						other: 1,
+					},
+				} );
+
+				expect( state.past ).toHaveLength( 3 );
+			} );
+		} );
 	} );
 
 	describe( 'currentPost()', () => {
@@ -851,55 +919,6 @@ describe( 'state', () => {
 				title: 'updated post object from server',
 				status: 'publish',
 			} );
-		} );
-	} );
-
-	describe( 'hoveredBlock()', () => {
-		it( 'should return with block uid as hovered', () => {
-			const state = hoveredBlock( null, {
-				type: 'TOGGLE_BLOCK_HOVERED',
-				uid: 'kumquat',
-				hovered: true,
-			} );
-
-			expect( state ).toBe( 'kumquat' );
-		} );
-
-		it( 'should return null when a block is selected', () => {
-			const state = hoveredBlock( 'kumquat', {
-				type: 'SELECT_BLOCK',
-				uid: 'kumquat',
-			} );
-
-			expect( state ).toBeNull();
-		} );
-
-		it( 'should replace the hovered block', () => {
-			const state = hoveredBlock( 'chicken', {
-				type: 'REPLACE_BLOCKS',
-				uids: [ 'chicken' ],
-				blocks: [ {
-					uid: 'wings',
-					name: 'core/freeform',
-					innerBlocks: [],
-				} ],
-			} );
-
-			expect( state ).toBe( 'wings' );
-		} );
-
-		it( 'should keep the hovered block', () => {
-			const state = hoveredBlock( 'chicken', {
-				type: 'REPLACE_BLOCKS',
-				uids: [ 'ribs' ],
-				blocks: [ {
-					uid: 'wings',
-					name: 'core/freeform',
-					innerBlocks: [],
-				} ],
-			} );
-
-			expect( state ).toBe( 'chicken' );
 		} );
 	} );
 
@@ -1163,11 +1182,12 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				recentInserts: [],
+				insertUsage: {},
 			} );
 		} );
 
 		it( 'should record recently used blocks', () => {
-			const state = preferences( deepFreeze( { recentInserts: [] } ), {
+			const state = preferences( deepFreeze( { recentInserts: [], insertUsage: {} } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'bacon',
@@ -1179,9 +1199,23 @@ describe( 'state', () => {
 				recentInserts: [
 					{ name: 'core-embed/twitter' },
 				],
+				insertUsage: {
+					'core-embed/twitter': {
+						count: 1,
+						insert: { name: 'core-embed/twitter' },
+					},
+				},
 			} );
 
-			const twoRecentBlocks = preferences( deepFreeze( { recentInserts: [] } ), {
+			const twoRecentBlocks = preferences( deepFreeze( {
+				recentInserts: [],
+				insertUsage: {
+					'core-embed/twitter': {
+						count: 1,
+						insert: { name: 'core-embed/twitter' },
+					},
+				},
+			} ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'eggs',
@@ -1198,6 +1232,16 @@ describe( 'state', () => {
 					{ name: 'core/block', ref: 123 },
 					{ name: 'core-embed/twitter' },
 				],
+				insertUsage: {
+					'core-embed/twitter': {
+						count: 2,
+						insert: { name: 'core-embed/twitter' },
+					},
+					'core/block/123': {
+						count: 1,
+						insert: { name: 'core/block', ref: 123 },
+					},
+				},
 			} );
 		} );
 
@@ -1208,6 +1252,12 @@ describe( 'state', () => {
 					{ name: 'core/block', ref: 123 },
 					{ name: 'core/block', ref: 456 },
 				],
+				insertUsage: {
+					'core/block/123': {
+						count: 1,
+						insert: { name: 'core/block', ref: 123 },
+					},
+				},
 			};
 
 			const state = preferences( deepFreeze( initialState ), {
@@ -1220,6 +1270,7 @@ describe( 'state', () => {
 					{ name: 'core-embed/twitter' },
 					{ name: 'core/block', ref: 456 },
 				],
+				insertUsage: {},
 			} );
 		} );
 	} );

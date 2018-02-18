@@ -8,10 +8,12 @@ import { connect } from 'react-redux';
  */
 import {
 	BlockList,
+	CopyHandler,
 	PostTitle,
 	WritingFlow,
 	EditorGlobalKeyboardShortcuts,
 	BlockSelectionClearer,
+	MultiSelectScrollIntoView,
 } from '@wordpress/editor';
 import { Fragment } from '@wordpress/element';
 
@@ -26,6 +28,8 @@ function VisualEditor( props ) {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor">
 			<EditorGlobalKeyboardShortcuts />
+			<CopyHandler />
+			<MultiSelectScrollIntoView />
 			<WritingFlow>
 				<PostTitle />
 				<BlockList
