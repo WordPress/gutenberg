@@ -99,7 +99,7 @@ class HierarchicalTermSelector extends Component {
 		// TODO: Check if term exists on server, retrieve it and add it if so.
 
 		const parent = formParent ? parseInt( formParent ) : null;
-		this.props.addTaxonomyTerm( taxonomy.slug, formName, parent );
+		this.props.addTaxonomyTerm( taxonomy.slug, taxonomy.rest_base, formName, parent );
 
 		// TODO: Speak() when term has been added in correct lifecycle-method.
 		// ComponentWillReceiveProps?

@@ -625,16 +625,20 @@ export function fetchTaxonomyTerms( taxonomy ) {
 /**
  * Returns an action object used to post a new taxonomy term to the REST API and into the store.
  *
+ * First checks if the term already exists.
+ *
  * @param {string} taxonomySlug The taxonomy's slug.
+ * @param {string} taxonomyRestBase Text taxonomy's rest base.
  * @param {string} termName The new term's name.
  * @param {number} termParentId The new term's parent id.
  *
  * @return {Object} Action object.
  */
-export function addTaxonomyTerm( taxonomySlug, termName, termParentId ) {
+export function addTaxonomyTerm( taxonomySlug, taxonomyRestBase, termName, termParentId ) {
 	return {
 		type: 'ADD_TAXONOMY_TERM',
 		taxonomySlug,
+		taxonomyRestBase,
 		termName,
 		termParentId,
 	};

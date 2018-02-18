@@ -32,6 +32,7 @@ import {
 	createErrorNotice,
 	removeNotice,
 	savePost,
+	editPost,
 	requestMetaBoxUpdates,
 	metaBoxUpdatesSuccess,
 	updateReusableBlock,
@@ -44,6 +45,7 @@ import {
 	getCurrentPost,
 	getCurrentPostType,
 	getEditedPostContent,
+	getEditedPostAttribute,
 	getPostEdits,
 	isCurrentPostPublished,
 	isEditedPostDirty,
@@ -613,9 +615,10 @@ export default {
 	ADD_TAXONOMY_TERM( action, store ) {
 		const { getState, dispatch } = store;
 		const state = getState();
+		const { taxonomySlug, taxonomyRestBase } = action;
 
 		// Only proceed if the state knows about this taxonomy
-		if ( ! has( state, `taxonomies.data.${ action.taxonomySlug }` ) ) {
+		if ( ! has( state, `taxonomies.data.${ taxonomySlug }` ) ) {
 			// TODO: Use more appropriate error
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_FAILURE',
@@ -627,7 +630,7 @@ export default {
 			return;
 		}
 
-		const taxonomy = state.taxonomies.data[ action.taxonomySlug ];
+		const taxonomy = state.taxonomies.data[ taxonomySlug ];
 		if ( ! taxonomy.hierarchical || ! action.termParentId ) {
 			action.termParentId = undefined;
 		}
@@ -657,14 +660,25 @@ export default {
 				type: 'ADD_TAXONOMY_TERM_SUCCESS',
 				taxonomyTerm: taxonomyTerm,
 			} );
-			// TODO: Dispatch action to add new term id to current post.
+			dispatch(
+				editPost( {
+					[ taxonomyRestBase ]: [
+						...getEditedPostAttribute( state, taxonomyRestBase ),
+						taxonomyTerm.id,
+					],
+				} )
+			);
 		}, ( err ) => {
+			const error = get( err, 'responseJSON', {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
+			} );
+			if ( error.code === 'term_exists' ) {
+				console.log( 'term_exists' );
+			}
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
+				error: error,
 			} );
 		} );
 	},
