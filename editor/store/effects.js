@@ -653,7 +653,14 @@ export default {
 			return;
 		}
 
-		const onResolve = ( taxonomyTerm ) => {
+		const collection = new TaxonomyCollection();
+		collection.fetch( {
+			type: 'POST',
+			data: {
+				name: termName,
+				parent: termParentId,
+			},
+		} ).then( ( taxonomyTerm ) => {
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_SUCCESS',
 				taxonomyTerm: taxonomyTerm,
@@ -666,13 +673,27 @@ export default {
 					],
 				} )
 			);
-			return Promise.reject( 'Intentional rejection' );
-		};
-
-		const onReject = ( err ) => {
-			if ( err === 'Intentional rejection' ) {
+		}, ( err ) => {
+			const error = get( err, 'responseJSON', {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
+			} );
+			if ( error.code === 'term_exists' ) {
+				dispatch( {
+					type: 'FETCH_AND_ADD_TAXONOMY_TERM',
+					termName: action.termName,
+					termParentId: action.termParentId,
+					taxonomy: taxonomy,
+					taxonomyCollection: collection,
+					taxonomyRestBase: action.taxonomyRestBase,
+				} );
 				return;
 			}
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				error: error,
+			} );
+		}, ( err ) => {
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_FAILURE',
 				error: get( err, 'responseJSON', {
@@ -680,45 +701,75 @@ export default {
 					message: __( 'An unknown error occurred.' ),
 				} ),
 			} );
-		};
+		} );
+	},
+	FETCH_AND_ADD_TAXONOMY_TERM( action, store ) {
+		const { dispatch, getState } = store;
+		const state = getState();
 
-		const collection = new TaxonomyCollection();
+		debugger;
+
+		const {
+			termName,
+			taxonomy,
+			taxonomyCollection: collection,
+			taxonomyRestBase,
+		} = action;
+		let termParentId = action.termParentId;
+
+		if ( ! taxonomy.hierarchical || ! termParentId ) {
+			termParentId = undefined;
+		}
+
+		const DEFAULT_QUERY = {
+			per_page: 100,
+			orderby: 'count',
+			order: 'desc',
+			_fields: [ 'id', 'name', 'parent' ],
+		};
 		collection.fetch( {
-			type: 'POST',
 			data: {
-				name: termName,
-				parent: termParentId,
+				...DEFAULT_QUERY,
+				parent: termParentId || 0,
+				search: termName,
 			},
-		} ).then( onResolve, ( err ) => {
-			const error = get( err, 'responseJSON', {
-				code: 'unknown_error',
-				message: __( 'An unknown error occurred.' ),
+		} ).then( searchResult => {
+			return new Promise( ( resolve, reject ) => {
+				const taxonomyTerm = find( searchResult, { name: termName } );
+				if ( taxonomyTerm ) {
+					resolve( taxonomyTerm );
+				}
+				reject();
 			} );
-			if ( error.code === 'term_exists' ) {
-				const DEFAULT_QUERY = {
-					per_page: 100,
-					orderby: 'count',
-					order: 'desc',
-					_fields: [ 'id', 'name', 'parent' ],
-				};
-				return collection.fetch( {
-					data: {
-						...DEFAULT_QUERY,
-						parent: termParentId || 0,
-						search: termName,
-					},
-				} );
-			}
+		}, err => {
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_FAILURE',
-				error: error,
+				error: get( err, 'responseJSON', {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} ),
 			} );
-		}, onReject ).then( searchResult => {
-			const taxonomyTerm = find( searchResult, { name: termName } );
-			if ( taxonomyTerm ) {
-				return Promise.resolve( taxonomyTerm );
-			}
-			return Promise.reject();
-		}, onReject ).then( onResolve, onReject ).catch( onReject );
+		} ).then( taxonomyTerm => {
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_SUCCESS',
+				taxonomyTerm: taxonomyTerm,
+			} );
+			dispatch(
+				editPost( {
+					[ taxonomyRestBase ]: [
+						...getEditedPostAttribute( state, taxonomyRestBase ),
+						taxonomyTerm.id,
+					],
+				} )
+			);
+		}, err => {
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				error: get( err, 'responseJSON', {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} ),
+			} );
+		} );
 	},
 };
