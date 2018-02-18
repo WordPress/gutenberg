@@ -707,8 +707,6 @@ export default {
 		const { dispatch, getState } = store;
 		const state = getState();
 
-		debugger;
-
 		const {
 			termName,
 			taxonomy,
@@ -725,7 +723,7 @@ export default {
 			per_page: 100,
 			orderby: 'count',
 			order: 'desc',
-			_fields: [ 'id', 'name', 'parent' ],
+			_fields: [ 'id', 'name', 'parent', 'taxonomy' ],
 		};
 		collection.fetch( {
 			data: {
@@ -733,23 +731,11 @@ export default {
 				parent: termParentId || 0,
 				search: termName,
 			},
-		} ).then( searchResult => {
-			return new Promise( ( resolve, reject ) => {
-				const taxonomyTerm = find( searchResult, { name: termName } );
-				if ( taxonomyTerm ) {
-					resolve( taxonomyTerm );
-				}
-				reject();
-			} );
-		}, err => {
-			dispatch( {
-				type: 'ADD_TAXONOMY_TERM_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
-			} );
-		} ).then( taxonomyTerm => {
+		} ).then( results => {
+			const taxonomyTerm = find( results, { name: termName } );
+			if ( ! taxonomyTerm ) {
+				throw 'How in the world?';
+			}
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_SUCCESS',
 				taxonomyTerm: taxonomyTerm,
