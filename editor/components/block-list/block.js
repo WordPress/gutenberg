@@ -23,6 +23,7 @@ import {
 	cloneBlock,
 	getBlockType,
 	getSaveElement,
+	hasBlockSupport,
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
@@ -521,6 +522,7 @@ export class BlockListBlock extends Component {
 			isMultiSelected,
 			isFirstMultiSelected,
 			isLastInSelection,
+			rootHasManageNesting,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! this.props.isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -533,10 +535,11 @@ export class BlockListBlock extends Component {
 		// If the block is selected and we're typing the block should not appear as selected unless the selection is not collapsed.
 		// Empty paragraph blocks should always show up as unselected.
 		const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( block );
-		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
+		const showSideInserter = ! rootHasManageNesting && ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const isSelectedNotTyping = isSelected && ( ! this.props.isTyping || ! this.state.isSelectionCollapsed );
 		const shouldAppearSelected = ! showSideInserter && isSelectedNotTyping;
-		const shouldShowMovers = shouldAppearSelected || isHovered || ( isEmptyDefaultBlock && isSelectedNotTyping );
+		const shouldShowMovers = ! rootHasManageNesting &&
+			( shouldAppearSelected || isHovered || ( isEmptyDefaultBlock && isSelectedNotTyping ) );
 		const shouldShowSettingsMenu = shouldShowMovers;
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
 		const shouldShowMobileToolbar = shouldAppearSelected;
@@ -678,6 +681,7 @@ export class BlockListBlock extends Component {
 
 const mapStateToProps = ( state, { uid, rootUID } ) => {
 	const isSelected = isBlockSelected( state, uid );
+	const rootBlock = rootUID ? getBlock( state, rootUID ) : undefined;
 	return {
 		previousBlockUid: getPreviousBlockUid( state, uid ),
 		nextBlockUid: getNextBlockUid( state, uid ),
@@ -696,6 +700,8 @@ const mapStateToProps = ( state, { uid, rootUID } ) => {
 		postType: getCurrentPostType( state ),
 		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
 		isSelected,
+		rootHasManageNesting: !! rootBlock &&
+			hasBlockSupport( rootBlock.name, 'managedNesting' ),
 	};
 };
 
