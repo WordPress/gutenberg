@@ -77,13 +77,32 @@ class HierarchicalTermSelector extends Component {
 	onAddTerm( event ) {
 		event.preventDefault();
 		const { formName, formParent, adding } = this.state;
-		const { taxonomy } = this.props;
+		const { taxonomy, terms, availableTerms, restBase, onUpdateTerms } = this.props;
 		if ( formName === '' || adding ) {
 			return;
 		}
 
+		// check if the term we are adding already exists
+		const existingTerm = this.findTerm( availableTerms, formParent, formName );
+		if ( existingTerm ) {
+			// if the term we are adding exists but is not selected select it
+			if ( ! some( terms, term => term === existingTerm.id ) ) {
+				onUpdateTerms( [ ...terms, existingTerm.id ], restBase );
+			}
+			this.setState( {
+				formName: '',
+				formParent: '',
+			} );
+			return;
+		}
+
+		// TODO: Check if term exists on server, retrieve it and add it if so.
+
 		const parent = formParent ? parseInt( formParent ) : null;
 		this.props.addTaxonomyTerm( taxonomy.slug, formName, parent );
+
+		// TODO: Speak() when term has been added in correct lifecycle-method.
+		// ComponentWillReceiveProps?
 
 		/*
 		event.preventDefault();
