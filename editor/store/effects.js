@@ -25,15 +25,13 @@ import { speak } from '@wordpress/a11y';
  */
 import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
+	setupEditorState,
 	resetPost,
-	setupNewPost,
-	resetBlocks,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
 	removeNotice,
 	savePost,
-	editPost,
 	requestMetaBoxUpdates,
 	metaBoxUpdatesSuccess,
 	updateReusableBlock,
@@ -87,10 +85,7 @@ export default {
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
 		new Model( toSend ).save().done( ( newPost ) => {
-			dispatch( {
-				type: 'RESET_POST',
-				post: newPost,
-			} );
+			dispatch( resetPost( newPost ) );
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				previousPost: post,
@@ -285,22 +280,17 @@ export default {
 			return;
 		}
 
-		// Change status from auto-draft to draft
-		if ( isEditedPostNew( state ) ) {
-			dispatch( editPost( { status: 'draft' } ) );
-		}
-
 		dispatch( savePost() );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;
-		const effects = [];
 
 		// Parse content as blocks
+		let blocks;
 		if ( post.content.raw ) {
-			effects.push( resetBlocks( parse( post.content.raw ) ) );
+			blocks = parse( post.content.raw );
 		} else if ( settings.template ) {
-			const blocks = map( settings.template, ( [ name, attributes ] ) => {
+			blocks = map( settings.template, ( [ name, attributes ] ) => {
 				const block = createBlock( name );
 				block.attributes = {
 					...block.attributes,
@@ -308,21 +298,18 @@ export default {
 				};
 				return block;
 			} );
-			effects.push( resetBlocks( blocks ) );
+		} else {
+			blocks = [];
 		}
-
-		// Resetting post should occur after blocks have been reset, since it's
-		// the post reset that restarts history (used in dirty detection).
-		effects.push( resetPost( post ) );
 
 		// Include auto draft title in edits while not flagging post as dirty
+		const edits = {};
 		if ( post.status === 'auto-draft' ) {
-			effects.push( setupNewPost( {
-				title: post.title.raw,
-			} ) );
+			edits.title = post.title.raw;
+			edits.status = 'draft';
 		}
 
-		return effects;
+		return setupEditorState( post, blocks, edits );
 	},
 	FETCH_REUSABLE_BLOCKS( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place

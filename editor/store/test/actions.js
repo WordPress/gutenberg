@@ -16,7 +16,6 @@ import {
 	toggleSelection,
 	setupEditor,
 	resetPost,
-	setupNewPost,
 	resetBlocks,
 	updateBlockAttributes,
 	updateBlock,
@@ -72,18 +71,6 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
-
-	describe( 'setupNewPost', () => {
-		it( 'should return the SETUP_NEW_POST action', () => {
-			const edits = {};
-			const result = setupNewPost( edits );
-			expect( result ).toEqual( {
-				type: 'SETUP_NEW_POST',
-				edits,
-			} );
-		} );
-	} );
-
 	describe( 'resetBlocks', () => {
 		it( 'should return the RESET_BLOCKS actions', () => {
 			const blocks = [];

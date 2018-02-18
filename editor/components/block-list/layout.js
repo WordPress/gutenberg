@@ -29,6 +29,8 @@ import DefaultBlockAppender from '../default-block-appender';
 import {
 	isSelectionEnabled,
 	isMultiSelecting,
+	getMultiSelectedBlocksStartUid,
+	getMultiSelectedBlocksEndUid,
 } from '../../store/selectors';
 import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
 
@@ -128,6 +130,11 @@ class BlockListLayout extends Component {
 		window.addEventListener( 'mouseup', this.onSelectionEnd );
 	}
 
+	/**
+	 * Handles multi-selection changes in response to pointer move.
+	 *
+	 * @param {string} uid Block under cursor in multi-select drag.
+	 */
 	onSelectionChange( uid ) {
 		const { onMultiSelect, selectionStart, selectionEnd } = this.props;
 		const { selectionAtStart } = this;
@@ -137,10 +144,13 @@ class BlockListLayout extends Component {
 			return;
 		}
 
+		// If multi-selecting and cursor extent returns to the start of
+		// selection, cancel multi-select.
 		if ( isAtStart && selectionStart ) {
 			onMultiSelect( null, null );
 		}
 
+		// Expand multi-selection to block under cursor.
 		if ( ! isAtStart && selectionEnd !== uid ) {
 			onMultiSelect( selectionAtStart, uid );
 		}
@@ -236,6 +246,8 @@ export default connect(
 		// Reference block selection value directly, since current selectors
 		// assume either multi-selection (getMultiSelectedBlocksStartUid) or
 		// singular-selection (getSelectedBlock) exclusively.
+		selectionStart: getMultiSelectedBlocksStartUid( state ),
+		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		selectionStartUID: state.blockSelection.start,
 		isSelectionEnabled: isSelectionEnabled( state ),
 		isMultiSelecting: isMultiSelecting( state ),
