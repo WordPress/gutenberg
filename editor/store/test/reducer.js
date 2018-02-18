@@ -1891,6 +1891,100 @@ describe( 'state', () => {
 	} );
 
 	describe( 'taxonomyTerms()', () => {
+		it( 'should indicate that terms are being fetched for a taxonomy', () => {
+			const initialState = {
+				data: {},
+				fetchStatus: {
+					tags: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+				},
+			};
 
+			const state = taxonomyTerms( initialState, {
+				type: 'FETCH_TAXONOMY_TERMS',
+				taxonomy: 'categories',
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				fetchStatus: {
+					tags: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+					categories: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+				},
+			} );
+		} );
+
+		it( 'should indicate that fetching the terms was successful', () => {
+			const initialState = {
+				data: {},
+				fetchStatus: {
+					tags: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+				},
+			};
+
+			const state = taxonomyTerms( initialState, {
+				type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
+				taxonomy: 'tags',
+				taxonomyTerms: [],
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					tags: [],
+				},
+				fetchStatus: {
+					tags: {
+						requesting: false,
+						successful: true,
+						error: null,
+					},
+				},
+			} );
+		} );
+
+		it( 'should stop indicating that the terms are being fetched when an error occurred', () => {
+			const initialState = {
+				data: {},
+				fetchStatus: {
+					tags: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+				},
+			};
+
+			const state = taxonomyTerms( initialState, {
+				type: 'FETCH_TAXONOMY_TERMS_FAILURE',
+				taxonomy: 'tags',
+				error: 'Some arbitrary error',
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				fetchStatus: {
+					tags: {
+						requesting: false,
+						successful: false,
+						error: 'Some arbitrary error',
+					},
+				},
+			} );
+		} );
 	} );
 } );
