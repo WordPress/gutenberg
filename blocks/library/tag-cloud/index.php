@@ -18,8 +18,8 @@ function gutenberg_render_block_core_tag_cloud( $attributes ) {
 		$align = $attributes['align'];
 	}
 
+	$class          = "wp-block-tag-cloud align{$align}";
 	$wrapper_markup = '<p class="%1$s">%2$s</p>';
-	$class = "wp-block-tag-cloud align{$align}";
 
 	$args = array(
 		'echo'       => false,
