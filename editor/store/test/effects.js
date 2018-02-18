@@ -1025,7 +1025,7 @@ describe( 'effects', () => {
 
 				handler( addTaxonomyTerm( 'category', 'categoryName', null ), store );
 				promise.then( () => {
-					expect( dispatch ).toHaveBeenCalledTimes( 1 );
+					expect( dispatch ).toHaveBeenCalledTimes( 2 );
 					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
 						type: 'ADD_TAXONOMY_TERM_SUCCESS',
 						taxonomyTerm: {
@@ -1035,6 +1035,10 @@ describe( 'effects', () => {
 							taxonomy: 'category',
 							parent: 0,
 						},
+					} );
+					expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( {
+						type: 'EDIT_POST',
+						categories: [ 1 ],
 					} );
 				} );
 			} );
