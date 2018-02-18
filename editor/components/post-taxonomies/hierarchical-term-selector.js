@@ -18,13 +18,6 @@ import { buildTermsTree } from '@wordpress/utils';
 import { getEditedPostAttribute } from '../../store/selectors';
 import { editPost, addTaxonomyTerm } from '../../store/actions';
 
-const DEFAULT_QUERY = {
-	per_page: 100,
-	orderby: 'count',
-	order: 'desc',
-	_fields: [ 'id', 'name', 'parent' ],
-};
-
 class HierarchicalTermSelector extends Component {
 	constructor() {
 		super( ...arguments );

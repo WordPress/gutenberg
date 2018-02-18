@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, has, includes, map, castArray, uniqueId, reduce, values, some, forEach } from 'lodash';
+import { get, has, includes, map, castArray, uniqueId, reduce, values, some, forEach, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -615,7 +615,12 @@ export default {
 	ADD_TAXONOMY_TERM( action, store ) {
 		const { getState, dispatch } = store;
 		const state = getState();
-		const { taxonomySlug, taxonomyRestBase } = action;
+		const {
+			taxonomySlug,
+			taxonomyRestBase,
+			termName,
+		} = action;
+		let termParentId = action.termParentId;
 
 		// Only proceed if the state knows about this taxonomy
 		if ( ! has( state, `taxonomies.data.${ taxonomySlug }` ) ) {
@@ -631,8 +636,8 @@ export default {
 		}
 
 		const taxonomy = state.taxonomies.data[ taxonomySlug ];
-		if ( ! taxonomy.hierarchical || ! action.termParentId ) {
-			action.termParentId = undefined;
+		if ( ! taxonomy.hierarchical || ! termParentId ) {
+			termParentId = undefined;
 		}
 
 		const TaxonomyCollection = wp.api.getTaxonomyCollection( taxonomy.slug );
@@ -648,14 +653,7 @@ export default {
 			return;
 		}
 
-		const collection = new TaxonomyCollection();
-		collection.fetch( {
-			type: 'POST',
-			data: {
-				name: action.termName,
-				parent: action.termParentId,
-			},
-		} ).then( ( taxonomyTerm ) => {
+		const onResolve = ( taxonomyTerm ) => {
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_SUCCESS',
 				taxonomyTerm: taxonomyTerm,
@@ -668,18 +666,59 @@ export default {
 					],
 				} )
 			);
-		}, ( err ) => {
+			return Promise.reject( 'Intentional rejection' );
+		};
+
+		const onReject = ( err ) => {
+			if ( err === 'Intentional rejection' ) {
+				return;
+			}
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				error: get( err, 'responseJSON', {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} ),
+			} );
+		};
+
+		const collection = new TaxonomyCollection();
+		collection.fetch( {
+			type: 'POST',
+			data: {
+				name: termName,
+				parent: termParentId,
+			},
+		} ).then( onResolve, ( err ) => {
 			const error = get( err, 'responseJSON', {
 				code: 'unknown_error',
 				message: __( 'An unknown error occurred.' ),
 			} );
 			if ( error.code === 'term_exists' ) {
-				console.log( 'term_exists' );
+				const DEFAULT_QUERY = {
+					per_page: 100,
+					orderby: 'count',
+					order: 'desc',
+					_fields: [ 'id', 'name', 'parent' ],
+				};
+				return collection.fetch( {
+					data: {
+						...DEFAULT_QUERY,
+						parent: termParentId || 0,
+						search: termName,
+					},
+				} );
 			}
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_FAILURE',
 				error: error,
 			} );
-		} );
+		}, onReject ).then( searchResult => {
+			const taxonomyTerm = find( searchResult, { name: termName } );
+			if ( taxonomyTerm ) {
+				return Promise.resolve( taxonomyTerm );
+			}
+			return Promise.reject();
+		}, onReject ).then( onResolve, onReject ).catch( onReject );
 	},
 };
