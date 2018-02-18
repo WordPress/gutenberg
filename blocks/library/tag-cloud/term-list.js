@@ -1,37 +1,31 @@
-function termCountScale( count ) {
-	return Math.round( Math.log10( count + 1 ) * 100 );
-}
-
+/**
+ * Calculate font size for terms based on their post count.
+ *
+ * @param {Array} terms The list of terms.
+ *
+ * @return {Array} Array of terms with font scale.
+ */
 function calculateFontSizes( terms ) {
 	const MIN = 8;
 	const MAX = 22;
 	const UNIT = 'pt';
-	const scaledCounts = [];
 
+	// Sort terms by post count ascending
+	const sortedTerms = terms.slice();
+	sortedTerms.sort( ( a, b ) => a.count - b.count );
+
+	// Get first and last items in array to know
+	// the lowest and highest post count in list
+	const lowestCount = sortedTerms[ 0 ].count;
+	const highestCount = sortedTerms.pop().count;
+
+	const range = Math.max( highestCount - lowestCount, 1 );
+	const fontStep = ( MAX - MIN ) / range;
+
+	// Calculate font size for each term
 	terms.forEach( ( term, i ) => {
-		const countScale = termCountScale( term.count );
-
-		terms[ i ].fontScale = countScale;
-		scaledCounts.push( countScale );
-	} );
-
-	const minCount = Math.min( ...scaledCounts );
-	let spread = Math.max( ...scaledCounts ) - minCount;
-
-	if ( spread <= 0 ) {
-		spread = 1;
-	}
-
-	let fontSpread = MAX - MIN;
-
-	if ( fontSpread < 0 ) {
-		fontSpread = 1;
-	}
-
-	const fontStep = fontSpread / spread;
-
-	terms.forEach( ( term, i ) => {
-		const fontSize = MIN + ( ( terms[ i ].fontScale - minCount ) * fontStep );
+		const countWeight = term.count - lowestCount;
+		const fontSize = MIN + ( countWeight * fontStep );
 		terms[ i ].fontScale = `${ fontSize }${ UNIT }`;
 	} );
 
