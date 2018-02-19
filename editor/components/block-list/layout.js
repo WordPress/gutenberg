@@ -209,7 +209,7 @@ class BlockListLayout extends Component {
 			defaultLayout = layout;
 		}
 
-		const classes = classnames( {
+		const classes = classnames( 'editor-block-list__layout', {
 			[ `layout-${ layout }` ]: layout,
 		} );
 
