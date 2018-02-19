@@ -230,7 +230,7 @@ export class InserterMenu extends Component {
 		if ( 'saved' === tab && itemsForTab.length === 0 ) {
 			return (
 				<p className="editor-inserter__no-tab-content-message">
-					{ __( 'No saved blocks.' ) }
+					{ __( 'No blocks found.' ) }
 				</p>
 			);
 		}
