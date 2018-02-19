@@ -1,8 +1,19 @@
 /**
+ * External dependencies
+ */
+import { connect } from 'react-redux';
+
+/**
  * WordPress dependencies
  */
 import { withAPIData, Spinner, SandBox } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { getCurrentPostId } from '../../../editor/store/selectors';
 
 function ShortcodePreview( { response } ) {
 	if ( response.isLoading || ! response.data ) {
@@ -26,6 +37,14 @@ function ShortcodePreview( { response } ) {
 	);
 }
 
+const applyConnect = connect(
+	( state ) => {
+		return {
+			postId: getCurrentPostId( state ),
+		};
+	},
+);
+
 const applyWithAPIData = withAPIData( ( props ) => {
 	const { shortcode, postId } = props;
 	return {
@@ -33,4 +52,7 @@ const applyWithAPIData = withAPIData( ( props ) => {
 	};
 } );
 
-export default applyWithAPIData( ShortcodePreview );
+export default compose( [
+	applyConnect,
+	applyWithAPIData,
+] )( ShortcodePreview );

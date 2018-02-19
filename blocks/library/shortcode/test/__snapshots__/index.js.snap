@@ -5,7 +5,7 @@ exports[`core/shortcode block edit matches snapshot 1`] = `
   class="wp-block-shortcode"
 >
   <label
-    for="blocks-shortcode-input-undefined"
+    for="blocks-shortcode-input-0"
   >
     <svg
       aria-hidden="true"
@@ -25,7 +25,7 @@ exports[`core/shortcode block edit matches snapshot 1`] = `
   </label>
   <textarea
     class="blocks-plain-text"
-    id="blocks-shortcode-input-undefined"
+    id="blocks-shortcode-input-0"
     placeholder="Write shortcode here…"
     rows="1"
   />

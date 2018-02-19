@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { withInstanceId, Dashicon } from '@wordpress/components';
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,7 +10,6 @@ import { __ } from '@wordpress/i18n';
  */
 import ShortcodePreview from './preview';
 import BlockControls from '../../block-controls';
-import { getCurrentPostId } from '../../../editor/store/selectors';
 import PlainText from '../../plain-text';
 
 export class Shortcode extends Component {
@@ -77,15 +71,4 @@ export class Shortcode extends Component {
 	}
 }
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			postId: getCurrentPostId( state ),
-		};
-	},
-);
-
-export default compose( [
-	applyConnect,
-	withInstanceId,
-] )( Shortcode );
+export default withInstanceId( Shortcode );
