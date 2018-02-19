@@ -43,6 +43,7 @@
 	// Cropped
 	&.is-cropped .blocks-gallery-image,
 	&.is-cropped .blocks-gallery-item {
+      a,
       img {
 			flex: 1;
 			width: 100%;
