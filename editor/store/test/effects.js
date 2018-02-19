@@ -1020,25 +1020,74 @@ describe( 'effects', () => {
 							},
 						},
 					},
+					currentPost: {
+						categories: [],
+					},
 				} );
 				const store = { getState, dispatch };
 
-				handler( addTaxonomyTerm( 'category', 'categoryName', null ), store );
-				promise.then( () => {
+				handler( addTaxonomyTerm( 'category', 'categories', 'categoryName', null ), store );
+				return promise.then( () => {
 					expect( dispatch ).toHaveBeenCalledTimes( 2 );
 					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
 						type: 'ADD_TAXONOMY_TERM_SUCCESS',
 						taxonomyTerm: {
-							id: 1,
-							name: 'Uncategorized',
-							slug: 'uncategorized',
+							id: 5,
+							name: 'SEO',
+							slug: 'seo',
 							taxonomy: 'category',
 							parent: 0,
 						},
 					} );
 					expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( {
 						type: 'EDIT_POST',
-						categories: [ 1 ],
+						edits: {
+							categories: [ 5 ],
+						},
+					} );
+				} );
+			} );
+
+			it( 'should get an existing term when the term it\'s trying to post already exists', () => {
+				const promise = Promise.reject( {
+					responseJSON: {
+						code: 'term_exists',
+					},
+				} );
+
+				const getTaxonomyCollection = jest.fn();
+				getTaxonomyCollection.mockReturnValue( class {
+					fetch() {
+						return promise;
+					}
+				} );
+				set( global, 'wp.api.getTaxonomyCollection', getTaxonomyCollection );
+
+				const getState = jest.fn();
+				const dispatch = jest.fn();
+				getState.mockReturnValue( {
+					taxonomies: {
+						data: {
+							category: {
+								slug: 'category',
+							},
+						},
+					},
+				} );
+				const store = { getState, dispatch };
+
+				handler( addTaxonomyTerm( 'category', 'categories', 'Term name', null ), store );
+
+				return promise.catch( () => {
+					expect( dispatch ).toHaveBeenCalledTimes( 1 );
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_AND_ADD_TAXONOMY_TERM',
+						termName: 'Term name',
+						termParentId: null,
+						taxonomyRestBase: 'categories',
+						taxonomy: {
+							slug: 'category',
+						},
 					} );
 				} );
 			} );

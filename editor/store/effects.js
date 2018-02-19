@@ -684,7 +684,6 @@ export default {
 					termName: action.termName,
 					termParentId: action.termParentId,
 					taxonomy: taxonomy,
-					taxonomyCollection: collection,
 					taxonomyRestBase: action.taxonomyRestBase,
 				} );
 				return;
@@ -710,7 +709,6 @@ export default {
 		const {
 			termName,
 			taxonomy,
-			taxonomyCollection: collection,
 			taxonomyRestBase,
 		} = action;
 		let termParentId = action.termParentId;
@@ -718,6 +716,21 @@ export default {
 		if ( ! taxonomy.hierarchical || ! termParentId ) {
 			termParentId = undefined;
 		}
+
+		const TaxonomyCollection = wp.api.getTaxonomyCollection( taxonomy.slug );
+		// Only proceed if the api collections has this taxonomy class
+		if ( ! TaxonomyCollection ) {
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				error: {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				},
+			} );
+			return;
+		}
+
+		const collection = new TaxonomyCollection();
 
 		const DEFAULT_QUERY = {
 			per_page: 100,
