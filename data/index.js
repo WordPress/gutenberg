@@ -89,7 +89,10 @@ export function registerSelectors( reducerKey, newSelectors ) {
  */
 export function select( reducerKey ) {
 	if ( arguments.length > 1 ) {
-		deprecated( 'Calling select with multiple arguments', '2.4', undefined, 'Gutenberg' );
+		deprecated( 'Calling select with multiple arguments', {
+			version: '2.4',
+			plugin: 'Gutenberg',
+		} );
 
 		const [ , selectorKey, ...args ] = arguments;
 		return select( reducerKey )[ selectorKey ]( ...args );

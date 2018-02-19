@@ -10,7 +10,12 @@ import { deprecated } from '@wordpress/utils';
 import { addFilter } from '@wordpress/hooks';
 
 function warnAboutDeprecatedMatcher() {
-	deprecated( 'Attributes matching using functions', '2.3', 'the declarative attributes', 'Gutenberg', 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' );
+	deprecated( 'Attributes matching using functions', {
+		version: '2.4',
+		alternative: 'the declarative attributes',
+		plugin: 'Gutenberg',
+		link: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
+	} );
 }
 
 export const attr = ( selector, attribute ) => () => {

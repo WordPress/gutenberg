@@ -20,7 +20,12 @@ export class RawHTMLWithWarning extends Component {
 
 		// Disable reason: We're intentionally logging a console warning
 		// advising the developer to upgrade usage.
-		deprecated( 'Returning raw HTML from block `save`', '2.5', '`wp.element.RawHTML` component', 'Gutenberg', 'https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/#save' );
+		deprecated( 'Returning raw HTML from block `save`', {
+			version: '2.5',
+			alternative: '`wp.element.RawHTML` component',
+			plugin: 'Gutenberg',
+			link: 'https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/#save',
+		} );
 	}
 
 	render() {

@@ -13,7 +13,7 @@ describe( 'deprecated', () => {
 	} );
 
 	it( 'should show a deprecation warning with a version', () => {
-		deprecated( 'Eating meat', 'the future' );
+		deprecated( 'Eating meat', { version: 'the future' } );
 
 		expect( console ).toHaveWarnedWith(
 			'Eating meat is deprecated and will be removed in the future.'
@@ -21,7 +21,7 @@ describe( 'deprecated', () => {
 	} );
 
 	it( 'should show a deprecation warning with an alternative', () => {
-		deprecated( 'Eating meat', 'the future', 'vegetables' );
+		deprecated( 'Eating meat', { version: 'the future', alternative: 'vegetables' } );
 
 		expect( console ).toHaveWarnedWith(
 			'Eating meat is deprecated and will be removed in the future. Please use vegetables instead.'
@@ -29,7 +29,11 @@ describe( 'deprecated', () => {
 	} );
 
 	it( 'should show a deprecation warning with an alternative specific to a plugin', () => {
-		deprecated( 'Eating meat', 'the future', 'vegetables', 'the earth' );
+		deprecated( 'Eating meat', {
+			version: 'the future',
+			alternative: 'vegetables',
+			plugin: 'the earth',
+		} );
 
 		expect( console ).toHaveWarnedWith(
 			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead.'
@@ -37,7 +41,12 @@ describe( 'deprecated', () => {
 	} );
 
 	it( 'should show a deprecation warning with a link', () => {
-		deprecated( 'Eating meat', 'the future', 'vegetables', 'the earth', 'https://en.wikipedia.org/wiki/Vegetarianism' );
+		deprecated( 'Eating meat', {
+			version: 'the future',
+			alternative: 'vegetables',
+			plugin: 'the earth',
+			link: 'https://en.wikipedia.org/wiki/Vegetarianism',
+		} );
 
 		expect( console ).toHaveWarnedWith(
 			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead. See: https://en.wikipedia.org/wiki/Vegetarianism'

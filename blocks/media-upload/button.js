@@ -12,7 +12,11 @@ import MediaUpload from './';
 
 class MediaUploadButton extends Component {
 	componentDidMount() {
-		deprecated( 'MediaUploadButton', '2.4', 'wp.blocks.MediaUpload', 'Gutenberg' );
+		deprecated( 'MediaUploadButton', {
+			version: '2.4',
+			alternative: 'wp.blocks.MediaUpload',
+			plugin: 'Gutenberg',
+		} );
 	}
 
 	render() {

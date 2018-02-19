@@ -31,7 +31,11 @@ export default function InspectorControls( { children } ) {
 const withDeprecation = ( componentName ) => ( OriginalComponent ) => {
 	class WrappedComponent extends Component {
 		componentDidMount() {
-			deprecated( `wp.blocks.InspectorControls.${ componentName }`, '2.4', `wp.components.${ componentName }`, 'Gutenberg' );
+			deprecated( `wp.blocks.InspectorControls.${ componentName }`, {
+				version: '2.4',
+				alternative: `wp.components.${ componentName }`,
+				plugin: 'Gutenberg',
+			} );
 		}
 
 		render() {
