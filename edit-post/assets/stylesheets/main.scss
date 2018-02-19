@@ -9,15 +9,10 @@ body.gutenberg-editor-page {
 		padding-bottom: 0;
 	}
 
-	// Show all notice above
+	/* We hide legacy notices in Gutenberg, because they were not designed in a way that scaled well.
+	   Plugins can use Gutenberg notices if they need to pass on information to the user when they are editing. */
 	#wpbody-content > div:not( .gutenberg ):not( #screen-meta ) {
-		position: relative;
-		z-index: z-index( '.components-notice-list' );
-		box-shadow: $shadow-popover;
-		display: inline-block;
-		margin: 10px;
-		float: left;
-		clear: both;
+		display: none;
 	}
 
 	#wpfooter {
