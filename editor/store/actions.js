@@ -8,10 +8,10 @@ import { partial, castArray } from 'lodash';
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param  {Object} post     Post object
- * @param  {Object} settings Editor settings object
+ * @param {Object} post     Post object.
+ * @param {Object} settings Editor settings object.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function setupEditor( post, settings ) {
 	return {
@@ -25,9 +25,9 @@ export function setupEditor( post, settings ) {
  * Returns an action object used in signalling that the latest version of the
  * post has been received, either by initialization or save.
  *
- * @param  {Object} post Post object
+ * @param {Object} post Post object.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function resetPost( post ) {
 	return {
@@ -37,16 +37,19 @@ export function resetPost( post ) {
 }
 
 /**
- * Returns an action object used in signalling that editor has initialized as a
- * new post with specified edits which should be considered non-dirtying.
+ * Returns an action object used to setup the editor state when first opening an editor.
  *
- * @param  {Object} edits Edited attributes object
+ * @param {Object} post   Post object.
+ * @param {Array}  blocks Array of blocks.
+ * @param {Object} edits  Initial edited attributes object.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
-export function setupNewPost( edits ) {
+export function setupEditorState( post, blocks, edits ) {
 	return {
-		type: 'SETUP_NEW_POST',
+		type: 'SETUP_EDITOR_STATE',
+		post,
+		blocks,
 		edits,
 	};
 }
@@ -56,9 +59,9 @@ export function setupNewPost( edits ) {
  * reset to the specified array of blocks, taking precedence over any other
  * content reflected as an edit in state.
  *
- * @param  {Array}  blocks Array of blocks
+ * @param {Array} blocks Array of blocks.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function resetBlocks( blocks ) {
 	return {
@@ -68,13 +71,13 @@ export function resetBlocks( blocks ) {
 }
 
 /**
- * Returns an action object used in signalling that the block attributes with the
- * specified UID has been updated.
+ * Returns an action object used in signalling that the block attributes with
+ * the specified UID has been updated.
  *
- * @param  {String} uid        Block UID
- * @param  {Object} attributes Block attributes to be merged
+ * @param {string} uid        Block UID.
+ * @param {Object} attributes Block attributes to be merged.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function updateBlockAttributes( uid, attributes ) {
 	return {
@@ -88,10 +91,10 @@ export function updateBlockAttributes( uid, attributes ) {
  * Returns an action object used in signalling that the block with the
  * specified UID has been updated.
  *
- * @param  {String} uid        Block UID
- * @param  {Object} updates    Block attributes to be merged
+ * @param {string} uid     Block UID.
+ * @param {Object} updates Block attributes to be merged.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function updateBlock( uid, updates ) {
 	return {
@@ -101,17 +104,10 @@ export function updateBlock( uid, updates ) {
 	};
 }
 
-export function focusBlock( uid, config ) {
-	return {
-		type: 'UPDATE_FOCUS',
-		uid,
-		config,
-	};
-}
-
-export function selectBlock( uid ) {
+export function selectBlock( uid, initialPosition = null ) {
 	return {
 		type: 'SELECT_BLOCK',
+		initialPosition,
 		uid,
 	};
 }
@@ -143,11 +139,12 @@ export function clearSelectedBlock() {
 }
 
 /**
- * Returns an action object that enables or disables block selection
+ * Returns an action object that enables or disables block selection.
  *
- * @param {boolean} [isSelectionEnabled=true] Whether block selection should be enabled
+ * @param {boolean} [isSelectionEnabled=true] Whether block selection should
+ *                                            be enabled.
 
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function toggleSelection( isSelectionEnabled = true ) {
 	return {
@@ -160,10 +157,10 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param  {(String|String[])} uids   Block UID(s) to replace
- * @param  {(Object|Object[])} blocks Replacement block(s)
+ * @param {(string|string[])} uids   Block UID(s) to replace.
+ * @param {(Object|Object[])} blocks Replacement block(s).
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function replaceBlocks( uids, blocks ) {
 	return {
@@ -177,45 +174,64 @@ export function replaceBlocks( uids, blocks ) {
  * Returns an action object signalling that a single block should be replaced
  * with one or more replacement blocks.
  *
- * @param  {(String|String[])} uid   Block UID(s) to replace
- * @param  {(Object|Object[])} block Replacement block(s)
+ * @param {(string|string[])} uid   Block UID(s) to replace.
+ * @param {(Object|Object[])} block Replacement block(s).
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function replaceBlock( uid, block ) {
 	return replaceBlocks( uid, block );
 }
 
-export function insertBlock( block, position ) {
-	return insertBlocks( [ block ], position );
+/**
+ * Returns an action object used in signalling that a single block should be
+ * inserted, optionally at a specific index respective a root block list.
+ *
+ * @param {Object}  block   Block object to insert.
+ * @param {?number} index   Index at which block should be inserted.
+ * @param {?string} rootUID Optional root UID of block list to insert.
+ *
+ * @return {Object} Action object.
+ */
+export function insertBlock( block, index, rootUID ) {
+	return insertBlocks( [ block ], index, rootUID );
 }
 
-export function insertBlocks( blocks, position ) {
+/**
+ * Returns an action object used in signalling that an array of blocks should
+ * be inserted, optionally at a specific index respective a root block list.
+ *
+ * @param {Object[]} blocks  Block objects to insert.
+ * @param {?number}  index   Index at which block should be inserted.
+ * @param {?string}  rootUID Optional root UID of block list to insert.
+ *
+ * @return {Object} Action object.
+ */
+export function insertBlocks( blocks, index, rootUID ) {
 	return {
 		type: 'INSERT_BLOCKS',
 		blocks: castArray( blocks ),
-		position,
+		index,
+		rootUID,
 	};
 }
 
 /**
- * Returns an action object showing the insertion point at a given index
+ * Returns an action object used in signalling that the insertion point should
+ * be shown.
  *
- * @param  {Number?} index  Index of the insertion point
- *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
-export function showInsertionPoint( index ) {
+export function showInsertionPoint() {
 	return {
 		type: 'SHOW_INSERTION_POINT',
-		index,
 	};
 }
 
 /**
- * Returns an action object hiding the insertion point
+ * Returns an action object hiding the insertion point.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function hideInsertionPoint() {
 	return {
@@ -244,17 +260,25 @@ export function trashPost( postId, postType ) {
 	};
 }
 
-export function mergeBlocks( blockA, blockB ) {
+/**
+ * Returns an action object used in signalling that two blocks should be merged
+ *
+ * @param {string} blockAUid UID of the first block to merge.
+ * @param {string} blockBUid UID of the second block to merge.
+ *
+ * @return {Object} Action object.
+ */
+export function mergeBlocks( blockAUid, blockBUid ) {
 	return {
 		type: 'MERGE_BLOCKS',
-		blocks: [ blockA, blockB ],
+		blocks: [ blockAUid, blockBUid ],
 	};
 }
 
 /**
  * Returns an action object used in signalling that the post should autosave.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function autosave() {
 	return {
@@ -266,7 +290,7 @@ export function autosave() {
  * Returns an action object used in signalling that undo history should
  * restore last popped state.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function redo() {
 	return { type: 'REDO' };
@@ -275,19 +299,29 @@ export function redo() {
 /**
  * Returns an action object used in signalling that undo history should pop.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function undo() {
 	return { type: 'UNDO' };
 }
 
 /**
+ * Returns an action object used in signalling that undo history record should
+ * be created.
+ *
+ * @return {Object} Action object.
+ */
+export function createUndoLevel() {
+	return { type: 'CREATE_UNDO_LEVEL' };
+}
+
+/**
  * Returns an action object used in signalling that the blocks
  * corresponding to the specified UID set are to be removed.
  *
- * @param  {String[]} uids Block UIDs
+ * @param {string[]} uids Block UIDs.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function removeBlocks( uids ) {
 	return {
@@ -300,20 +334,20 @@ export function removeBlocks( uids ) {
  * Returns an action object used in signalling that the block with the
  * specified UID is to be removed.
  *
- * @param  {String} uid Block UID
+ * @param {string} uid Block UID.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function removeBlock( uid ) {
 	return removeBlocks( [ uid ] );
 }
 
 /**
- * Returns an action object used to toggle the block editing mode (visual/html)
+ * Returns an action object used to toggle the block editing mode (visual/html).
  *
- * @param  {String} uid Block UID
+ * @param {string} uid Block UID.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function toggleBlockMode( uid ) {
 	return {
@@ -325,7 +359,7 @@ export function toggleBlockMode( uid ) {
 /**
  * Returns an action object used in signalling that the user has begun to type.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function startTyping() {
 	return {
@@ -336,7 +370,7 @@ export function startTyping() {
 /**
  * Returns an action object used in signalling that the user has stopped typing.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function stopTyping() {
 	return {
@@ -345,59 +379,15 @@ export function stopTyping() {
 }
 
 /**
- * Returns an action object used in signalling that the user toggled the sidebar
+ * Returns an action object used to create a notice.
  *
- * @param  {String}   sidebar      Name of the sidebar to toggle (desktop, mobile or publish)
- * @param  {Boolean?} forcedValue  Force a sidebar state
- *
- * @returns {Object} Action object.
- */
-export function toggleSidebar( sidebar, forcedValue ) {
-	return {
-		type: 'TOGGLE_SIDEBAR',
-		sidebar,
-		forcedValue,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the user switched the active sidebar tab panel
- *
- * @param  {String} panel   The panel name
- *
- * @returns {Object} Action object.
- */
-export function setActivePanel( panel ) {
-	return {
-		type: 'SET_ACTIVE_PANEL',
-		panel,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the user toggled a sidebar panel
- *
- * @param  {String} panel   The panel name
- *
- * @returns {Object} Action object.
- */
-export function toggleSidebarPanel( panel ) {
-	return {
-		type: 'TOGGLE_SIDEBAR_PANEL',
-		panel,
-	};
-}
-
-/**
- * Returns an action object used to create a notice
- *
- * @param {String}     status   The notice status
- * @param {WPElement}  content  The notice content
- * @param {?Object}    options  The notice options.  Available options:
+ * @param {string}    status  The notice status.
+ * @param {WPElement} content The notice content.
+ * @param {?Object}   options The notice options.  Available options:
  *                              `id` (string; default auto-generated)
- *                              `isDismissible` (boolean; default `true`)
+ *                              `isDismissible` (boolean; default `true`).
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function createNotice( status, content, options = {} ) {
 	const {
@@ -418,11 +408,11 @@ export function createNotice( status, content, options = {} ) {
 }
 
 /**
- * Returns an action object used to remove a notice
+ * Returns an action object used to remove a notice.
  *
- * @param {String}  id  The notice id
+ * @param {string} id The notice id.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function removeNotice( id ) {
 	return {
@@ -438,12 +428,13 @@ export function removeNotice( id ) {
  * area is empty, this will set the store state to indicate that React should
  * not render the meta box area.
  *
- * Example: metaBoxes = { side: true, normal: false }
+ * Example: metaBoxes = { side: true, normal: false }.
+ *
  * This indicates that the sidebar has a meta box but the normal area does not.
  *
  * @param {Object} metaBoxes Whether meta box locations are active.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function initializeMetaBoxState( metaBoxes ) {
 	return {
@@ -453,74 +444,38 @@ export function initializeMetaBoxState( metaBoxes ) {
 }
 
 /**
- * Returns an action object used to signify that a meta box finished reloading.
- *
- * @param {String} location Location of meta box: 'normal', 'side' or 'advanced'.
- *
- * @returns {Object} Action object.
- */
-export function handleMetaBoxReload( location ) {
-	return {
-		type: 'HANDLE_META_BOX_RELOAD',
-		location,
-	};
-}
-
-/**
- * Returns an action object used to signify that a meta box finished loading.
- *
- * @param {String} location Location of meta box: 'normal', 'side' or 'advanced'.
- *
- * @returns {Object} Action object.
- */
-export function metaBoxLoaded( location ) {
-	return {
-		type: 'META_BOX_LOADED',
-		location,
-	};
-}
-
-/**
  * Returns an action object used to request meta box update.
  *
- * @param {Array} locations Locations of meta boxes: ['normal', 'side', 'advanced' ].
- *
- * @returns {Object} Action object.
+ * @return {Object}      Action object.
  */
-export function requestMetaBoxUpdates( locations ) {
+export function requestMetaBoxUpdates() {
 	return {
 		type: 'REQUEST_META_BOX_UPDATES',
-		locations,
 	};
 }
 
 /**
- * Returns an action object used to set meta box state changed.
+ * Returns an action object used signal a successfull meta nox update.
  *
- * @param {String}  location   Location of meta box: 'normal', 'side' or 'advanced'.
- * @param {Boolean} hasChanged Whether the meta box has changed.
- *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
-export function metaBoxStateChanged( location, hasChanged ) {
+export function metaBoxUpdatesSuccess() {
 	return {
-		type: 'META_BOX_STATE_CHANGED',
-		location,
-		hasChanged,
+		type: 'META_BOX_UPDATES_SUCCESS',
 	};
 }
 
 /**
- * Returns an action object used to toggle a feature flag
+ * Returns an action object used set the saved meta boxes data.
+ * This is used to check if the meta boxes have been touched when leaving the editor.
  *
- * @param {String}  feature   Featurre name.
- *
- * @returns {Object} Action object.
+ * @param   {Object} dataPerLocation Meta Boxes Data per location.
+ * @return {Object}                 Action object.
  */
-export function toggleFeature( feature ) {
+export function setMetaBoxSavedData( dataPerLocation ) {
 	return {
-		type: 'TOGGLE_FEATURE',
-		feature,
+		type: 'META_BOX_SET_SAVED_DATA',
+		dataPerLocation,
 	};
 }
 
@@ -533,9 +488,10 @@ export const createWarningNotice = partial( createNotice, 'warning' );
  * Returns an action object used to fetch a single reusable block or all
  * reusable blocks from the REST API into the store.
  *
- * @param {?string} id If given, only a single reusable block with this ID will be fetched
+ * @param {?string} id If given, only a single reusable block with this ID will
+ *                     be fetched.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function fetchReusableBlocks( id ) {
 	return {
@@ -545,12 +501,14 @@ export function fetchReusableBlocks( id ) {
 }
 
 /**
- * Returns an action object used to insert or update a reusable block into the store.
+ * Returns an action object used to insert or update a reusable block into
+ * the store.
  *
- * @param {Object} id            The ID of the reusable block to update
- * @param {Object} reusableBlock The new reusable block object. Any omitted keys are not changed
+ * @param {Object} id            The ID of the reusable block to update.
+ * @param {Object} reusableBlock The new reusable block object. Any omitted keys
+ *                               are not changed.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function updateReusableBlock( id, reusableBlock ) {
 	return {
@@ -564,9 +522,9 @@ export function updateReusableBlock( id, reusableBlock ) {
  * Returns an action object used to save a reusable block that's in the store
  * to the REST API.
  *
- * @param {Object} id The ID of the reusable block to save
+ * @param {Object} id The ID of the reusable block to save.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function saveReusableBlock( id ) {
 	return {
@@ -578,9 +536,9 @@ export function saveReusableBlock( id ) {
 /**
  * Returns an action object used to delete a reusable block via the REST API.
  *
- * @param {number} id  The ID of the reusable block to delete.
+ * @param {number} id The ID of the reusable block to delete.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function deleteReusableBlock( id ) {
 	return {
@@ -593,9 +551,9 @@ export function deleteReusableBlock( id ) {
  * Returns an action object used to convert a reusable block into a static
  * block.
  *
- * @param {Object} uid The ID of the block to attach
+ * @param {Object} uid The ID of the block to attach.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function convertBlockToStatic( uid ) {
 	return {
@@ -608,9 +566,9 @@ export function convertBlockToStatic( uid ) {
  * Returns an action object used to convert a static block into a reusable
  * block.
  *
- * @param {Object} uid The ID of the block to detach
+ * @param {Object} uid The ID of the block to detach.
  *
- * @returns {Object} Action object.
+ * @return {Object} Action object.
  */
 export function convertBlockToReusable( uid ) {
 	return {
@@ -618,16 +576,19 @@ export function convertBlockToReusable( uid ) {
 		uid,
 	};
 }
-
-export function appendDefaultBlock() {
+/**
+ * Returns an action object used in signalling that a new block of the default
+ * type should be appended to the block list.
+ *
+ * @param {?Object} attributes Optional attributes of the block to assign.
+ * @param {?string} rootUID    Optional root UID of block list to append.
+ *
+ * @return {Object} Action object
+ */
+export function appendDefaultBlock( attributes, rootUID ) {
 	return {
 		type: 'APPEND_DEFAULT_BLOCK',
-	};
-}
-
-export function switchEditorMode( mode ) {
-	return {
-		type: 'SWITCH_MODE',
-		mode,
+		attributes,
+		rootUID,
 	};
 }

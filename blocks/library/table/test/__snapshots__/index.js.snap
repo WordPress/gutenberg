@@ -2,10 +2,10 @@
 
 exports[`core/embed block edit matches snapshot 1`] = `
 <div
-  class="wp-block-table blocks-editable"
+  class="wp-block-table blocks-rich-text"
 >
   <table
-    class="blocks-editable__tinymce"
+    class="blocks-rich-text__tinymce"
     contenteditable="true"
   >
     <tbody>

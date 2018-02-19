@@ -15,7 +15,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockEdit from '../../block-edit';
-import { registerBlockType } from '../../api';
 import ReusableBlockEditPanel from './edit-panel';
 
 class ReusableBlockEdit extends Component {
@@ -87,7 +86,7 @@ class ReusableBlockEdit extends Component {
 	}
 
 	render() {
-		const { focus, reusableBlock, isFetching, isSaving } = this.props;
+		const { isSelected, reusableBlock, isFetching, isSaving } = this.props;
 		const { isEditing, title, attributes } = this.state;
 
 		if ( ! reusableBlock && isFetching ) {
@@ -106,12 +105,12 @@ class ReusableBlockEdit extends Component {
 				<BlockEdit
 					{ ...this.props }
 					name={ reusableBlock.type }
-					focus={ isEditing ? focus : null }
+					isSelected={ isEditing && isSelected }
 					attributes={ reusableBlockAttributes }
 					setAttributes={ isEditing ? this.setAttributes : noop }
 				/>
 			</div>,
-			focus && (
+			isSelected && (
 				<ReusableBlockEditPanel
 					key="panel"
 					isEditing={ isEditing }
@@ -156,7 +155,9 @@ const ConnectedReusableBlockEdit = connect(
 	} )
 )( ReusableBlockEdit );
 
-registerBlockType( 'core/block', {
+export const name = 'core/block';
+
+export const settings = {
 	title: __( 'Reusable Block' ),
 	category: 'reusable-blocks',
 	isPrivate: true,
@@ -174,4 +175,4 @@ registerBlockType( 'core/block', {
 
 	edit: ConnectedReusableBlockEdit,
 	save: () => null,
-} );
+};

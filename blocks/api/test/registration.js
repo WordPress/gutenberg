@@ -17,6 +17,7 @@ import {
 	getDefaultBlockName,
 	getBlockType,
 	getBlockTypes,
+	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
 } from '../registration';
@@ -93,6 +94,9 @@ describe( 'blocks', () => {
 				title: 'block title',
 				attributes: {
 					className: {
+						type: 'string',
+					},
+					layout: {
 						type: 'string',
 					},
 				},
@@ -183,6 +187,9 @@ describe( 'blocks', () => {
 					className: {
 						type: 'string',
 					},
+					layout: {
+						type: 'string',
+					},
 				},
 			} );
 		} );
@@ -200,6 +207,9 @@ describe( 'blocks', () => {
 				icon: 'block-default',
 				attributes: {
 					className: {
+						type: 'string',
+					},
+					layout: {
 						type: 'string',
 					},
 				},
@@ -227,6 +237,9 @@ describe( 'blocks', () => {
 						className: {
 							type: 'string',
 						},
+						layout: {
+							type: 'string',
+						},
 					},
 				},
 			] );
@@ -240,6 +253,9 @@ describe( 'blocks', () => {
 				icon: 'block-default',
 				attributes: {
 					className: {
+						type: 'string',
+					},
+					layout: {
 						type: 'string',
 					},
 				},
@@ -289,6 +305,9 @@ describe( 'blocks', () => {
 					className: {
 						type: 'string',
 					},
+					layout: {
+						type: 'string',
+					},
 				},
 			} );
 		} );
@@ -305,6 +324,9 @@ describe( 'blocks', () => {
 				icon: 'block-default',
 				attributes: {
 					className: {
+						type: 'string',
+					},
+					layout: {
 						type: 'string',
 					},
 				},
@@ -332,6 +354,9 @@ describe( 'blocks', () => {
 						className: {
 							type: 'string',
 						},
+						layout: {
+							type: 'string',
+						},
 					},
 				},
 				{
@@ -345,9 +370,47 @@ describe( 'blocks', () => {
 						className: {
 							type: 'string',
 						},
+						layout: {
+							type: 'string',
+						},
 					},
 				},
 			] );
+		} );
+	} );
+
+	describe( 'getBlockSupport', () => {
+		it( 'should return undefined if block has no supports', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					bar: true,
+				},
+			} );
+
+			expect( getBlockSupport( 'core/test-block', 'foo' ) ).toBe( undefined );
+		} );
+
+		it( 'should return block supports value', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					bar: true,
+				},
+			} );
+
+			expect( getBlockSupport( 'core/test-block', 'bar' ) ).toBe( true );
+		} );
+
+		it( 'should return custom default supports if block does not define support by name', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				supports: {
+					bar: true,
+				},
+			} );
+
+			expect( getBlockSupport( 'core/test-block', 'foo', true ) ).toBe( true );
 		} );
 	} );
 

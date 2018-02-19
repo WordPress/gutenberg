@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { IconButton, Toolbar } from '@wordpress/components';
+import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 
@@ -15,19 +15,20 @@ import classnames from 'classnames';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, createBlock } from '../../api';
-import Editable from '../../editable';
+import { createBlock } from '../../api';
+import RichText from '../../rich-text';
+import AlignmentToolbar from '../../alignment-toolbar';
 import MediaUpload from '../../media-upload';
 import ImagePlaceHolder from '../../image-placeholder';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import RangeControl from '../../inspector-controls/range-control';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
-registerBlockType( 'core/cover-image', {
+export const name = 'core/cover-image';
+
+export const settings = {
 	title: __( 'Cover Image' ),
 
 	description: __( 'Cover Image is a bold image block with an optional title.' ),
@@ -47,6 +48,10 @@ registerBlockType( 'core/cover-image', {
 		},
 		align: {
 			type: 'string',
+		},
+		contentAlign: {
+			type: 'string',
+			default: 'center',
 		},
 		id: {
 			type: 'number',
@@ -89,8 +94,8 @@ registerBlockType( 'core/cover-image', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
-		const { url, title, align, id, hasParallax, dimRatio } = attributes;
+	edit( { attributes, setAttributes, isSelected, className } ) {
+		const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
@@ -101,6 +106,7 @@ registerBlockType( 'core/cover-image', {
 			undefined;
 		const classes = classnames(
 			className,
+			contentAlign !== 'center' && `has-${ contentAlign }-content`,
 			dimRatioToClass( dimRatio ),
 			{
 				'has-background-dim': dimRatio !== 0,
@@ -108,13 +114,22 @@ registerBlockType( 'core/cover-image', {
 			}
 		);
 
-		const controls = focus && [
+		const alignmentToolbar	= (
+			<AlignmentToolbar
+				value={ contentAlign }
+				onChange={ ( nextAlign ) => {
+					setAttributes( { contentAlign: nextAlign } );
+				} }
+			/>
+		);
+		const controls = isSelected && [
 			<BlockControls key="controls">
 				<BlockAlignmentToolbar
 					value={ align }
 					onChange={ updateAlignment }
 				/>
 
+				{ alignmentToolbar }
 				<Toolbar>
 					<MediaUpload
 						onSelect={ onSelectImage }
@@ -146,6 +161,9 @@ registerBlockType( 'core/cover-image', {
 					max={ 100 }
 					step={ 10 }
 				/>
+				<PanelBody title={ __( 'Text Alignment' ) }>
+					{ alignmentToolbar }
+				</PanelBody>
 			</InspectorControls>,
 		];
 
@@ -153,12 +171,11 @@ registerBlockType( 'core/cover-image', {
 			const hasTitle = ! isEmpty( title );
 			const icon = hasTitle ? undefined : 'format-image';
 			const label = hasTitle ? (
-				<Editable
+				<RichText
 					tagName="h2"
 					value={ title }
-					focus={ focus }
-					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { title: value } ) }
+					isSelected={ isSelected }
 					inlineToolbar
 				/>
 			) : __( 'Cover Image' );
@@ -179,14 +196,13 @@ registerBlockType( 'core/cover-image', {
 				style={ style }
 				className={ classes }
 			>
-				{ title || !! focus ? (
-					<Editable
+				{ title || isSelected ? (
+					<RichText
 						tagName="h2"
 						placeholder={ __( 'Write title…' ) }
 						value={ title }
-						focus={ focus }
-						onFocus={ setFocus }
 						onChange={ ( value ) => setAttributes( { title: value } ) }
+						isSelected={ isSelected }
 						inlineToolbar
 					/>
 				) : null }
@@ -195,7 +211,7 @@ registerBlockType( 'core/cover-image', {
 	},
 
 	save( { attributes, className } ) {
-		const { url, title, hasParallax, dimRatio, align } = attributes;
+		const { url, title, hasParallax, dimRatio, align, contentAlign } = attributes;
 		const style = url ?
 			{ backgroundImage: `url(${ url })` } :
 			undefined;
@@ -205,6 +221,7 @@ registerBlockType( 'core/cover-image', {
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
+				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
 			},
 			align ? `align${ align }` : null,
 		);
@@ -215,7 +232,7 @@ registerBlockType( 'core/cover-image', {
 			</section>
 		);
 	},
-} );
+};
 
 function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?

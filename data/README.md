@@ -39,17 +39,17 @@ Let's say the state of our plugin (registered with the key `myPlugin`) has the f
 wp.data.registerSelectors( 'myPlugin', { getTitle: ( state ) => state.title } );
 ```
 
-### `wp.data.select( key: string, selectorName: string, ...args )`
+### `wp.data.select( key: string )`
 
-This function allows calling any registered selector. Given a module's key, a selector's name and extra arguments passed to the selector, this function calls the selector passing it the current state and the extra arguments provided.
+This function allows calling any registered selector. Given a module's key, this function returns an object of all selector functions registered for the module.
 
 #### Example:
 
 ```js
-wp.data.select( 'myPlugin', 'getTitle' ); // Returns "My post title"
+wp.data.select( 'myPlugin' ).getTitle(); // Returns "My post title"
 ```
 
-### `wp.data.query( mapSelectorsToProps: func )( WrappedComponent: Component )`
+### `wp.data.query( mapSelectorsToProps: function )( WrappedComponent: Component )`
 
 If you use a React or WordPress Element, a Higher Order Component is made available to inject data into your components like so:
 
@@ -58,7 +58,25 @@ const Component = ( { title } ) => <div>{ title }</div>;
 
 wp.data.query( select => {
 	return {
-		title: select( 'myPlugin', 'getTitle' ),
+		title: select( 'myPlugin' ).getTitle(),
 	};
 } )( Component );
+```
+
+### `wp.data.subscribe( listener: function )`
+
+Function used to subscribe to data changes. The listener function is called each time a change is made to any of the registered reducers. This function returns a `unsubscribe` function used to abort the subscription.
+
+```js
+// Subscribe.
+const unsubscribe = wp.data.subscribe( () => {
+	const data = {
+		slug: wp.data.select( 'core/editor' ).getEditedPostSlug(),
+	};
+
+	console.log( 'data changed', data );
+} );
+
+// Unsubcribe.
+unsubscribe();
 ```

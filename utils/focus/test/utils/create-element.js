@@ -2,9 +2,9 @@
  * Given an element type, returns an HTMLElement with an emulated layout,
  * since JSDOM does have its own internal layout engine.
  *
- * @param  {String}      type Element type
+ * @param {string} type Element type.
  *
- * @returns {HTMLElement} Layout-emulated element.
+ * @return {HTMLElement} Layout-emulated element.
  */
 export default function createElement( type ) {
 	const element = document.createElement( type );

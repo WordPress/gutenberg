@@ -23,6 +23,7 @@ class DropZone extends Component {
 		this.setZoneNode = this.setZoneNode.bind( this );
 		this.onDrop = this.onDrop.bind( this );
 		this.onFilesDrop = this.onFilesDrop.bind( this );
+		this.onHTMLDrop = this.onHTMLDrop.bind( this );
 
 		this.state = {
 			isDraggingOverDocument: false,
@@ -37,6 +38,7 @@ class DropZone extends Component {
 			updateState: this.setState.bind( this ),
 			onDrop: this.onDrop,
 			onFilesDrop: this.onFilesDrop,
+			onHTMLDrop: this.onHTMLDrop,
 		} );
 	}
 
@@ -53,6 +55,12 @@ class DropZone extends Component {
 	onFilesDrop() {
 		if ( this.props.onFilesDrop ) {
 			this.props.onFilesDrop( ...arguments );
+		}
+	}
+
+	onHTMLDrop() {
+		if ( this.props.onHTMLDrop ) {
+			this.props.onHTMLDrop( ...arguments );
 		}
 	}
 

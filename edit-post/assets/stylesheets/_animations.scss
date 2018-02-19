@@ -1,0 +1,20 @@
+@mixin animate_fade {
+	animation: animate_fade 0.1s ease-out;
+	animation-fill-mode: forwards;
+}
+
+@mixin move_background {
+	background-size: 28px 28px;
+	animation: move_background .5s linear infinite;
+}
+
+@mixin loading_fade {
+	animation: loading_fade 1.6s ease-in-out infinite;
+}
+
+@mixin slide_in_right {
+	transform: translateX(+100%);
+	animation: slide_in_right 0.1s forwards;
+}
+
+

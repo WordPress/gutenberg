@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { ChromePicker } from 'react-color';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,16 +16,14 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import './style.scss';
 
-export function ColorPalette( { defaultColors, colors, value, onChange } ) {
-	const usedColors = colors || defaultColors;
-
+export function ColorPalette( { colors, disableCustomColors = false, value, onChange } ) {
 	function applyOrUnset( color ) {
 		return () => onChange( value === color ? undefined : color );
 	}
 
 	return (
 		<div className="blocks-color-palette">
-			{ usedColors.map( ( color ) => {
+			{ map( colors, ( color ) => {
 				const style = { color: color };
 				const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
 
@@ -42,29 +41,31 @@ export function ColorPalette( { defaultColors, colors, value, onChange } ) {
 				);
 			} ) }
 
-			<Dropdown
-				className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color"
-				contentClassName="blocks-color-palette__picker "
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<button
-						type="button"
-						aria-expanded={ isOpen }
-						className="blocks-color-palette__item"
-						onClick={ onToggle }
-						aria-label={ __( 'Custom color picker' ) }
-					>
-						<span className="blocks-color-palette__custom-color-gradient" />
-					</button>
-				) }
-				renderContent={ () => (
-					<ChromePicker
-						color={ value }
-						onChangeComplete={ ( color ) => onChange( color.hex ) }
-						style={ { width: '100%' } }
-						disableAlpha
-					/>
-				) }
-			/>
+			{ ! disableCustomColors &&
+				<Dropdown
+					className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color"
+					contentClassName="blocks-color-palette__picker "
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<button
+							type="button"
+							aria-expanded={ isOpen }
+							className="blocks-color-palette__item"
+							onClick={ onToggle }
+							aria-label={ __( 'Custom color picker' ) }
+						>
+							<span className="blocks-color-palette__custom-color-gradient" />
+						</button>
+					) }
+					renderContent={ () => (
+						<ChromePicker
+							color={ value }
+							onChangeComplete={ ( color ) => onChange( color.hex ) }
+							style={ { width: '100%' } }
+							disableAlpha
+						/>
+					) }
+				/>
+			}
 
 			<button
 				className="button-link blocks-color-palette__clear"
@@ -78,7 +79,10 @@ export function ColorPalette( { defaultColors, colors, value, onChange } ) {
 }
 
 export default withContext( 'editor' )(
-	( settings ) => ( {
-		defaultColors: settings.colors,
+	( settings, props ) => ( {
+		colors: props.colors || settings.colors,
+		disableCustomColors: props.disableCustomColors !== undefined ?
+			props.disableCustomColors :
+			settings.disableCustomColors,
 	} )
 )( ColorPalette );

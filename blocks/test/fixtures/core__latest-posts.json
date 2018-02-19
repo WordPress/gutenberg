@@ -6,12 +6,13 @@
         "attributes": {
             "postsToShow": 5,
             "displayPostDate": false,
-            "layout": "list",
+            "postLayout": "list",
             "columns": 3,
             "align": "center",
             "order": "desc",
             "orderBy": "date"
         },
+        "innerBlocks": [],
         "originalContent": ""
     }
 ]

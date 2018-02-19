@@ -4,13 +4,13 @@
 import { compact } from 'lodash';
 
 /**
- *	Media Upload is used by image and gallery blocks to handle uploading an image
+ *	Media Upload is used by image and gallery blocks to handle uploading an image.
  *	when a file upload button is activated.
  *
- *	TODO: future enhancement to add an upload indicator
+ *	TODO: future enhancement to add an upload indicator.
  *
- * @param  {Array}    filesList       List of files.
- * @param  {Function} onImagesChange  Function to be called each time a file or a temporary representation of the file is available.
+ * @param {Array}    filesList      List of files.
+ * @param {Function} onImagesChange Function to be called each time a file or a temporary representation of the file is available.
  */
 export function mediaUpload( filesList, onImagesChange ) {
 	// Cast filesList to array
@@ -34,7 +34,7 @@ export function mediaUpload( filesList, onImagesChange ) {
 
 		return createMediaFromFile( mediaFile ).then(
 			( savedMedia ) => {
-				setAndUpdateImages( idx, { id: savedMedia.id, url: savedMedia.source_url } );
+				setAndUpdateImages( idx, { id: savedMedia.id, url: savedMedia.source_url, link: savedMedia.link } );
 			},
 			() => {
 				// Reset to empty on failure.
@@ -46,9 +46,9 @@ export function mediaUpload( filesList, onImagesChange ) {
 }
 
 /**
- * @param  {File}    file Media File to Save
+ * @param {File} file Media File to Save.
  *
- * @returns {Promise} Media Object Promise.
+ * @return {Promise} Media Object Promise.
  */
 export function createMediaFromFile( file ) {
 	// Create upload payload
@@ -58,5 +58,21 @@ export function createMediaFromFile( file ) {
 	return new wp.api.models.Media().save( null, {
 		data: data,
 		contentType: false,
+	} );
+}
+
+/**
+ * Utility used to preload an image before displaying it.
+ *
+ * @param   {string}  url Image Url.
+ * @return {Promise}     Pormise resolved once the image is preloaded.
+ */
+export function preloadImage( url ) {
+	return new Promise( resolve => {
+		const newImg = new window.Image();
+		newImg.onload = function() {
+			resolve( url );
+		};
+		newImg.src = url;
 	} );
 }

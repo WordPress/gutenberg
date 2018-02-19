@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -52,33 +47,28 @@ export default class OldEditor extends Component {
 
 	componentWillUnmount() {
 		window.addEventListener( 'DOMContentLoaded', this.initialize );
-		wp.oldEditor.remove( this.props.id );
+		wp.oldEditor.remove( `editor-${ this.props.id }` );
 	}
 
 	componentDidUpdate( prevProps ) {
 		const { id, attributes: { content } } = this.props;
 
-		const editor = window.tinymce.get( id );
+		const editor = window.tinymce.get( `editor-${ id }` );
 
 		if ( prevProps.attributes.content !== content ) {
 			editor.setContent( content || '' );
-		}
-
-		if ( ! prevProps.focus && !! this.props.focus && document.activeElement !== editor.getBody() ) {
-			editor.getBody().focus();
 		}
 	}
 
 	initialize() {
 		const { id } = this.props;
 		const { settings } = window.wpEditorL10n.tinymce;
-
-		wp.oldEditor.initialize( id, {
+		wp.oldEditor.initialize( `editor-${ id }`, {
 			tinymce: {
 				...settings,
 				inline: true,
 				content_css: false,
-				fixed_toolbar_container: '#' + id + '-toolbar',
+				fixed_toolbar_container: `#toolbar-${ id }`,
 				setup: this.onSetup,
 			},
 		} );
@@ -119,77 +109,23 @@ export default class OldEditor extends Component {
 				editor.dom.toggleClass( ref, 'has-advanced-toolbar', active );
 			},
 		} );
-
-		/* eslint-disable */
-
-		// Re-register WP_More as it doesn't work with inline mode.
-		// This should be fixed in core.
-		// See wp-includes/js/tinymce/plugins/wordpress/plugin.js
-		// Swaps node.nodeName === 'BODY' to node === editor.getBody()
-		editor.on( 'init', () => {
-			if ( this.props.focus && document.activeElement !== editor.getBody() ) {
-				editor.getBody().focus();
-			}
-
-			editor.addCommand( 'WP_More', function( tag ) {
-				var parent, html, title,
-					classname = 'wp-more-tag',
-					dom = editor.dom,
-					node = editor.selection.getNode(),
-					rootNode = editor.getBody();
-
-				tag = tag || 'more';
-				classname += ' mce-wp-' + tag;
-				title = tag === 'more' ? 'Read more...' : 'Next page';
-				title = editor.editorManager.i18n.translate( title );
-				html = '<img src="' + tinymce.Env.transparentSrc + '" alt="" title="' + title + '" class="' + classname + '" ' +
-					'data-wp-more="' + tag + '" data-mce-resize="false" data-mce-placeholder="1" />';
-
-				// Most common case
-				if ( node === rootNode || ( node.nodeName === 'P' && node.parentNode == rootNode ) ) {
-					editor.insertContent( html );
-					return;
-				}
-
-				// Get the top level parent node
-				parent = dom.getParent( node, function( found ) {
-					if ( found.parentNode && found.parentNode === rootNode ) {
-						return true;
-					}
-
-					return false;
-				}, editor.getBody() );
-
-				if ( parent ) {
-					if ( parent.nodeName === 'P' ) {
-						parent.appendChild( dom.create( 'p', null, html ).firstChild );
-					} else {
-						dom.insertAfter( dom.create( 'p', null, html ), parent );
-					}
-
-					editor.nodeChanged();
-				}
-			} );
-		} );
-
-		/* eslint-enable */
 	}
 
 	render() {
-		const { focus, id, className } = this.props;
+		const { isSelected, id } = this.props;
 
 		return [
 			<div
 				key="toolbar"
-				id={ id + '-toolbar' }
+				id={ `toolbar-${ id }` }
 				ref={ ref => this.ref = ref }
 				className="freeform-toolbar"
-				style={ ! focus ? { display: 'none' } : {} }
+				style={ ! isSelected ? { display: 'none' } : {} }
 			/>,
 			<div
 				key="editor"
-				id={ id }
-				className={ classnames( className, 'blocks-editable__tinymce' ) }
+				id={ `editor-${ id }` }
+				className="wp-block-freeform blocks-rich-text__tinymce"
 			/>,
 		];
 	}

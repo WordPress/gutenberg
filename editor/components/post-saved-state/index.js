@@ -15,7 +15,7 @@ import { Dashicon, Button } from '@wordpress/components';
  */
 import './style.scss';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
-import { editPost, savePost } from '../../store/actions';
+import { savePost } from '../../store/actions';
 import {
 	isEditedPostNew,
 	isCurrentPostPublished,
@@ -23,10 +23,16 @@ import {
 	isSavingPost,
 	isEditedPostSaveable,
 	getCurrentPost,
-	getEditedPostAttribute,
+	hasMetaBoxes,
 } from '../../store/selectors';
 
-export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
+/**
+ * Component showing whether the post is saved or not and displaying save links.
+ *
+ * @param   {Object}    Props Component Props.
+ * @return {WPElement}       WordPress Element.
+ */
+export function PostSavedState( { hasActiveMetaboxes, isNew, isPublished, isDirty, isSaving, isSaveable, onSave } ) {
 	const className = 'editor-post-saved-state';
 
 	if ( isSaving ) {
@@ -45,7 +51,7 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 		return null;
 	}
 
-	if ( ! isNew && ! isDirty ) {
+	if ( ! isNew && ! isDirty && ! hasActiveMetaboxes ) {
 		return (
 			<span className={ className }>
 				<Dashicon icon="saved" />
@@ -54,16 +60,8 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 		);
 	}
 
-	const onClick = () => {
-		if ( 'auto-draft' === status ) {
-			onStatusChange( 'draft' );
-		}
-
-		onSave();
-	};
-
 	return (
-		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
+		<Button className={ classnames( className, 'button-link' ) } onClick={ onSave }>
 			<span className="editor-post-saved-state__mobile">{ __( 'Save' ) }</span>
 			<span className="editor-post-saved-state__desktop">{ __( 'Save Draft' ) }</span>
 		</Button>
@@ -78,10 +76,9 @@ export default connect(
 		isDirty: isEditedPostDirty( state ),
 		isSaving: isSavingPost( state ),
 		isSaveable: isEditedPostSaveable( state ),
-		status: getEditedPostAttribute( state, 'status' ),
+		hasActiveMetaboxes: hasMetaBoxes( state ),
 	} ),
 	{
-		onStatusChange: ( status ) => editPost( { status } ),
 		onSave: savePost,
 	}
 )( PostSavedState );

@@ -1,4 +1,5 @@
 $blocks-button__height: 46px;
+$blocks-button__line-height: $big-font-size + 6px;
 
 .wp-block-button {
 	margin-bottom: 1.5em;
@@ -12,12 +13,13 @@ $blocks-button__height: 46px;
 		cursor: pointer;
 		display: inline-block;
 		font-size: $big-font-size;
-		height: $blocks-button__height;
-		line-height: $blocks-button__height;
+		line-height: $blocks-button__line-height;
 		margin: 0;
-		padding: 0 24px;
+		padding: ( $blocks-button__height - $blocks-button__line-height ) / 2 24px;
+		text-align: center;
 		text-decoration: none !important;
 		white-space: nowrap;
+		word-break: break-word;
 
 		&:hover,
 		&:focus,

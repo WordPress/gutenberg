@@ -76,11 +76,11 @@ export const node = ( selector ) => () => {
 };
 
 /**
- * Resolve the matchers attributes for backwards compatibilty
+ * Resolve the matchers attributes for backwards compatibilty.
  *
- * @param  {Object} settings Original block settings
+ * @param {Object} settings Original block settings.
  *
- * @returns {Object} Filtered block settings.
+ * @return {Object} Filtered block settings.
  */
 export function resolveAttributes( settings ) {
 	// Resolve deprecated attributes

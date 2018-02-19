@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
+import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withState } from '@wordpress/components';
 
@@ -13,10 +9,12 @@ import { withState } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
+import PlainText from '../../plain-text';
 
-registerBlockType( 'core/html', {
+export const name = 'core/html';
+
+export const settings = {
 	title: __( 'Custom HTML' ),
 
 	description: __( 'Add custom HTML code and preview it right here in the editor.' ),
@@ -40,10 +38,19 @@ registerBlockType( 'core/html', {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'IFRAME',
+			},
+		],
+	},
+
 	edit: withState( {
 		preview: false,
-	} )( ( { attributes, setAttributes, setState, focus, preview } ) => [
-		focus && (
+	} )( ( { attributes, setAttributes, setState, isSelected, preview } ) => [
+		isSelected && (
 			<BlockControls key="controls">
 				<div className="components-toolbar">
 					<button
@@ -63,16 +70,16 @@ registerBlockType( 'core/html', {
 			<div
 				key="preview"
 				dangerouslySetInnerHTML={ { __html: attributes.content } } /> :
-			<TextareaAutosize
+			<PlainText
 				className="wp-block-html"
 				key="editor"
 				value={ attributes.content }
-				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
+				onChange={ ( content ) => setAttributes( { content } ) }
 				aria-label={ __( 'HTML' ) }
 			/>,
 	] ),
 
 	save( { attributes } ) {
-		return attributes.content;
+		return <RawHTML>{ attributes.content }</RawHTML>;
 	},
-} );
+};

@@ -1,0 +1,90 @@
+.edit-post-visual-editor {
+	position: relative;
+	height: 100%;
+	margin: 0 auto;
+	padding: 50px 0;
+
+	&,
+	& p {
+		font-family: $editor-font;
+		font-size: $editor-font-size;
+		line-height: $editor-line-height;
+	}
+}
+
+.edit-post-visual-editor .editor-block-list__block {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+
+	&[data-align="wide"] {
+		max-width: 1100px;
+	}
+
+	&[data-align="full"] {
+		max-width: 100%;
+	}
+
+	&[data-align="full"],
+	&[data-align="wide"] {
+		.editor-block-contextual-toolbar {
+			@include break-small() {
+				width: $visual-editor-max-width + 2;	// 1px border left and right
+			}
+			margin-left: auto;
+			margin-right: auto;
+		}
+	}
+}
+
+// This is a focus style shown for blocks that need an indicator even when in an isEditing state
+// like for example an image block that receives arrowkey focus.
+.edit-post-visual-editor .editor-block-list__block:not( .is-selected ) .editor-block-list__block-edit  {
+	box-shadow: 0 0 0 0 $white, 0 0 0 0 $dark-gray-900;
+	transition: .1s box-shadow .05s;
+
+	&:focus {
+		box-shadow: 0 0 0 1px $white, 0 0 0 3px $dark-gray-900;
+	}
+}
+
+.edit-post-visual-editor .editor-post-title {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+
+	.editor-post-permalink {
+		left: $block-padding;
+		right: $block-padding;
+	}
+
+	@include break-small() {
+		padding: 5px #{ $block-mover-padding-visible - 1px };	// subtract 1px border, because this is an outline
+
+		.editor-post-permalink {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
+	}
+}
+
+.edit-post-visual-editor .editor-default-block-appender {
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	clear: left;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+
+	@include break-small() {
+		padding: 0 $block-mover-padding-visible;	// don't subtract 1px border because it's a border not an outline
+
+		.components-drop-zone {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
+
+		.editor-default-block-appender__content {
+			padding: 0 $block-padding;
+		}
+	}
+}

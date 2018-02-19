@@ -12,13 +12,14 @@ import { addAction, applyFilters, removeAction } from '@wordpress/hooks';
 const ANIMATION_FRAME_PERIOD = 16;
 
 /**
- * Creates a higher-order component which adds filtering capability to the wrapped component.
- * Filters get applied when the original component is about to be mounted.
- * When a filter is added or removed that matches the hook name, the wrapped component re-renders.
+ * Creates a higher-order component which adds filtering capability to the
+ * wrapped component. Filters get applied when the original component is about
+ * to be mounted. When a filter is added or removed that matches the hook name,
+ * the wrapped component re-renders.
  *
  * @param {string} hookName Hook name exposed to be used by filters.
  *
- * @returns {Function} Higher-order component factory.
+ * @return {Function} Higher-order component factory.
  */
 export default function withFilters( hookName ) {
 	return ( OriginalComponent ) => {

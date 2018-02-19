@@ -1,12 +1,19 @@
 /**
  * External dependencies
  */
+import deepFreeze from 'deep-freeze';
 import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import { createBlock, getPossibleBlockTransformations, switchToBlockType, createReusableBlock } from '../factory';
+import {
+	createBlock,
+	cloneBlock,
+	getPossibleBlockTransformations,
+	switchToBlockType,
+	createReusableBlock,
+} from '../factory';
 import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
@@ -34,7 +41,7 @@ describe( 'block factory', () => {
 	} );
 
 	describe( 'createBlock()', () => {
-		it( 'should create a block given its blockType and attributes', () => {
+		it( 'should create a block given its blockType, attributes, inner blocks', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
 					align: {
@@ -53,9 +60,11 @@ describe( 'block factory', () => {
 				category: 'common',
 				title: 'test block',
 			} );
-			const block = createBlock( 'core/test-block', {
-				align: 'left',
-			} );
+			const block = createBlock(
+				'core/test-block',
+				{ align: 'left' },
+				[ createBlock( 'core/test-block' ) ],
+			);
 
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {
@@ -64,6 +73,8 @@ describe( 'block factory', () => {
 				align: 'left',
 			} );
 			expect( block.isValid ).toBe( true );
+			expect( block.innerBlocks ).toHaveLength( 1 );
+			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block' );
 			expect( typeof block.uid ).toBe( 'string' );
 		} );
 
@@ -100,6 +111,79 @@ describe( 'block factory', () => {
 
 			expect( block.attributes ).toEqual( {} );
 			expect( block.isValid ).toBe( true );
+		} );
+	} );
+
+	describe( 'cloneBlock()', () => {
+		it( 'should merge attributes into the existing block', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					isDifferent: {
+						type: 'boolean',
+						default: false,
+					},
+				},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+			const block = deepFreeze(
+				createBlock(
+					'core/test-block',
+					{ align: 'left' },
+					[ createBlock( 'core/test-block' ) ],
+				)
+			);
+
+			const clonedBlock = cloneBlock( block, {
+				isDifferent: true,
+			} );
+
+			expect( clonedBlock.name ).toEqual( block.name );
+			expect( clonedBlock.attributes ).toEqual( {
+				align: 'left',
+				isDifferent: true,
+			} );
+			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
+			expect( typeof clonedBlock.uid ).toBe( 'string' );
+			expect( clonedBlock.uid ).not.toBe( block.uid );
+		} );
+
+		it( 'should replace inner blocks of the existing block', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					isDifferent: {
+						type: 'boolean',
+						default: false,
+					},
+				},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+			const block = deepFreeze(
+				createBlock(
+					'core/test-block',
+					{ align: 'left' },
+					[
+						createBlock( 'core/test-block', { align: 'right' } ),
+						createBlock( 'core/test-block', { align: 'left' } ),
+					],
+				)
+			);
+
+			const clonedBlock = cloneBlock( block, undefined, [
+				createBlock( 'core/test-block' ),
+			] );
+
+			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
+			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toHaveProperty( 'align' );
 		} );
 	} );
 

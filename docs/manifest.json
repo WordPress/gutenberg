@@ -30,6 +30,18 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "RichText API",
+		"slug": "rich-text-api",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/blocks\/rich-text\/README.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Deprecated Blocks",
+		"slug": "deprecated-blocks",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/deprecated-blocks.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Templates",
 		"slug": "templates",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/templates.md",
@@ -90,6 +102,12 @@
 		"parent": "blocks"
 	},
 	{
+		"title": "Generate Blocks with WP-CLI",
+		"slug": "generate-blocks-with-wp-cli",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks-scaffolding.md",
+		"parent": "blocks"
+	},
+	{
 		"title": "Reference",
 		"slug": "reference",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference.md",
@@ -135,6 +153,12 @@
 		"title": "Release Process",
 		"slug": "release",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/release.md",
+		"parent": "reference"
+	},
+	{
+		"title": "Repository Management",
+		"slug": "repository-management",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/repository-management.md",
 		"parent": "reference"
 	},
 	{

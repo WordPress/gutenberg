@@ -7,17 +7,18 @@ exports[`core/paragraph block edit matches snapshot 1`] = `
       class="components-autocomplete"
     >
       <div
-        class="blocks-editable"
+        class="blocks-rich-text"
       >
         <p
           aria-autocomplete="list"
           aria-expanded="false"
           aria-label="Add text or type / to add content"
-          class="wp-block-paragraph blocks-editable__tinymce"
+          class="wp-block-paragraph blocks-rich-text__tinymce"
           contenteditable="true"
+          data-is-placeholder-visible="true"
         />
         <p
-          class="blocks-editable__tinymce wp-block-paragraph"
+          class="blocks-rich-text__tinymce wp-block-paragraph"
         >
           Add text or type / to add content
         </p>

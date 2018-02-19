@@ -7,13 +7,12 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { RangeControl, SelectControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import CategorySelect from './category-select';
-import RangeControl from '../inspector-controls/range-control';
-import SelectControl from '../inspector-controls/select-control';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;

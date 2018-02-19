@@ -7,9 +7,9 @@ import { Component, getWrapperDisplayName } from '@wordpress/element';
  * A Higher Order Component used to provide and manage internal component state
  * via props.
  *
- * @param  {?Object}   initialState Optional initial state of the component
+ * @param {?Object} initialState Optional initial state of the component.
  *
- * @returns {Component} Wrapped component.
+ * @return {Component} Wrapped component.
  */
 function withState( initialState = {} ) {
 	return ( OriginalComponent ) => {
