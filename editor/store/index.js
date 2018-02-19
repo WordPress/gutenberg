@@ -1,7 +1,13 @@
 /**
  * WordPress Dependencies
  */
-import { registerReducer, registerSelectors, withRehydratation, loadAndPersist } from '@wordpress/data';
+import {
+	registerReducer,
+	registerSelectors,
+	registerActions,
+	withRehydratation,
+	loadAndPersist,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,6 +21,9 @@ import {
 	getLastMultiSelectedBlockUid,
 	getSelectedBlockCount,
 } from './selectors';
+import {
+	insertBlocks,
+} from './actions';
 
 /**
  * Module Constants
@@ -34,5 +43,7 @@ registerSelectors( MODULE_KEY, {
 	getLastMultiSelectedBlockUid,
 	getSelectedBlockCount,
 } );
+
+registerActions( MODULE_KEY, { insertBlocks } );
 
 export default store;

@@ -1,12 +1,20 @@
 /**
  * External dependencies
  */
-import { render } from 'enzyme';
+import { render, mount } from 'enzyme';
 
 /**
  * Internal dependencies
  */
-import { registerReducer, registerSelectors, select, query, subscribe } from '../';
+import {
+	registerReducer,
+	registerSelectors,
+	registerActions,
+	dispatch,
+	select,
+	query,
+	subscribe,
+} from '../';
 
 describe( 'store', () => {
 	it( 'Should append reducers to the state', () => {
@@ -69,6 +77,32 @@ describe( 'query', () => {
 
 		expect( tree ).toMatchSnapshot();
 	} );
+
+	it( 'passes the relevant actions to the component', () => {
+		const store = registerReducer( 'reactCounter', ( state = 0, action ) => {
+			if ( action.type === 'increment' ) {
+				return state + 1;
+			}
+			return state;
+		} );
+		const increment = () => ( { type: 'increment' } );
+		registerActions( 'reactCounter', {
+			increment,
+		} );
+		const Component = query( undefined, ( dispatchAction ) => ( {
+			onClick: () => dispatchAction( 'reactCounter' ).increment(),
+		} ) )( ( props ) => {
+			return <button onClick={ props.onClick }>Increment</button>;
+		} );
+
+		const tree = mount( <Component keyName="reactKey" /> );
+		const button = tree.find( 'button' );
+
+		button.simulate( 'click' ); // state = 1
+		button.simulate( 'click' ); // state = 2
+
+		expect( store.getState() ).toBe( 2 );
+	} );
 } );
 
 describe( 'subscribe', () => {
@@ -95,5 +129,24 @@ describe( 'subscribe', () => {
 		store.dispatch( action );
 
 		expect( incrementedValue ).toBe( 3 );
+	} );
+} );
+
+describe( 'dispatch', () => {
+	it( 'registers actions to the public API', () => {
+		const store = registerReducer( 'counter', ( state = 0, action ) => {
+			if ( action.type === 'increment' ) {
+				return state + action.count;
+			}
+			return state;
+		} );
+		const increment = ( count = 1 ) => ( { type: 'increment', count } );
+		registerActions( 'counter', {
+			increment,
+		} );
+
+		dispatch( 'counter' ).increment(); // state = 1
+		dispatch( 'counter' ).increment( 4 ); // state = 5
+		expect( store.getState() ).toBe( 5 );
 	} );
 } );

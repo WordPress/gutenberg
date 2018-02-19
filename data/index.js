@@ -20,6 +20,7 @@ export { loadAndPersist, withRehydratation } from './persist';
  */
 const stores = {};
 const selectors = {};
+const actions = {};
 let listeners = [];
 
 /**
@@ -28,21 +29,6 @@ let listeners = [];
 export function globalListener() {
 	listeners.forEach( listener => listener() );
 }
-
-/**
- * Subscribe to changes to any data.
- *
- * @param {Function}   listener Listener function.
- *
- * @return {Function}           Unsubscribe function.
- */
-export const subscribe = ( listener ) => {
-	listeners.push( listener );
-
-	return () => {
-		listeners = without( listeners, listener );
-	};
-};
 
 /**
  * Registers a new sub-reducer to the global state and returns a Redux-like store object.
@@ -80,6 +66,34 @@ export function registerSelectors( reducerKey, newSelectors ) {
 }
 
 /**
+ * Registers actions for external usage.
+ *
+ * @param {string} reducerKey   Part of the state shape to register the
+ *                              selectors for.
+ * @param {Object} newActions   Actions to register.
+ */
+export function registerActions( reducerKey, newActions ) {
+	const store = stores[ reducerKey ];
+	const createBoundAction = ( action ) => ( ...args ) => store.dispatch( action( ...args ) );
+	actions[ reducerKey ] = mapValues( newActions, createBoundAction );
+}
+
+/**
+ * Subscribe to changes to any data.
+ *
+ * @param {Function}   listener Listener function.
+ *
+ * @return {Function}           Unsubscribe function.
+ */
+export const subscribe = ( listener ) => {
+	listeners.push( listener );
+
+	return () => {
+		listeners = without( listeners, listener );
+	};
+};
+
+/**
  * Calls a selector given the current state and extra arguments.
  *
  * @param {string} reducerKey Part of the state shape to register the
@@ -102,15 +116,30 @@ export function select( reducerKey ) {
 }
 
 /**
+ * Returns the available actions for a part of the state.
+ *
+ * @param {string} reducerKey Part of the state shape to dispatch the
+ *                            action for.
+ *
+ * @return {*} The action's returned value.
+ */
+export function dispatch( reducerKey ) {
+	return actions[ reducerKey ];
+}
+
+/**
  * Higher Order Component used to inject data using the registered selectors.
  *
  * @param {Function} mapSelectorsToProps Gets called with the selectors object
  *                                       to determine the data for the
  *                                       component.
+ * @param {Function} mapDispatchToProps  Gets called with the wp.data.dispatch function
+ *                                       to create action handlers.
+ *
  *
  * @return {Function} Renders the wrapped component and passes it data.
  */
-export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
+export const query = ( mapSelectorsToProps, mapDispatchToProps ) => ( WrappedComponent ) => {
 	const store = {
 		getState() {
 			return mapValues( stores, subStore => subStore.getState() );
@@ -128,7 +157,14 @@ export const query = ( mapSelectorsToProps ) => ( WrappedComponent ) => {
 		};
 	};
 
-	return connectWithStore( ( state, ownProps ) => {
-		return mapSelectorsToProps( select, ownProps );
-	} );
+	return connectWithStore(
+		mapSelectorsToProps ?
+			( state, ownProps ) => {
+				return mapSelectorsToProps( select, ownProps );
+			} : undefined,
+		mapDispatchToProps ?
+			( unusedDispatch, ownProps ) => {
+				return mapDispatchToProps( dispatch, ownProps );
+			} : undefined
+	);
 };

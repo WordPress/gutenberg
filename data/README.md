@@ -39,6 +39,25 @@ Let's say the state of our plugin (registered with the key `myPlugin`) has the f
 wp.data.registerSelectors( 'myPlugin', { getTitle: ( state ) => state.title } );
 ```
 
+### `wp.data.registerActions( reducerKey: string, newActions: object )`
+
+If your module or plugin needs to expose its actions to other modules and plugins, you'll have to register action creators.
+
+An action creator is a function that takes arguments and returns an action object dispatch to the registered reducer to update the state.
+
+#### Example:
+
+```js
+wp.data.registerActions( 'myPlugin', {
+	setTitle( newTitle ) {
+		return {
+			type: 'SET_TITLE',
+			title: newTitle,
+		};
+	},
+} );
+```
+
 ### `wp.data.select( key: string )`
 
 This function allows calling any registered selector. Given a module's key, this function returns an object of all selector functions registered for the module.
@@ -49,7 +68,17 @@ This function allows calling any registered selector. Given a module's key, this
 wp.data.select( 'myPlugin' ).getTitle(); // Returns "My post title"
 ```
 
-### `wp.data.query( mapSelectorsToProps: function )( WrappedComponent: Component )`
+### `wp.data.dispatch( key: string )`
+
+This function allows calling any registered action. Given a module's key, this function returns an object of all action creators functions registered for the module.
+
+#### Example:
+
+```js
+wp.data.dispatch( 'myPlugin' ).setTitle( 'new Title' ); // Dispatches the setTitle action to the reducer
+```
+
+### `wp.data.query( mapSelectorsToProps: function, mapDispatchToProps: function )( WrappedComponent: Component )`
 
 If you use a React or WordPress Element, a Higher Order Component is made available to inject data into your components like so:
 
@@ -61,6 +90,25 @@ wp.data.query( select => {
 		title: select( 'myPlugin' ).getTitle(),
 	};
 } )( Component );
+```
+
+You can also use this Higher Order Component to provide action handlers to your components
+
+```js
+const Component = ( { title, updateTitle } ) => <input value={ title } onChange={ updateTitle } />;
+
+wp.data.query(
+	select => {
+		return {
+			title: select( 'myPlugin' ).getTitle(),
+		};
+	} ,
+	dispatch => ( {
+		updateTitle( event ) {
+			dispatch( 'myPlugin' ).setTitle( event.target.value )
+		}
+	} )
+)( Component );
 ```
 
 ### `wp.data.subscribe( listener: function )`
