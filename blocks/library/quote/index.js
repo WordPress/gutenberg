@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString, get } from 'lodash';
+import { castArray, get, isString } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -122,32 +122,41 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					const textElement = value[ 0 ];
-					if ( ! textElement ) {
+					// if no text content exist just transform the quote into an heading block
+					// using citation as the content, it may be empty creating an empty heading block.
+					if ( ( ! value || ! value.length ) ) {
 						return createBlock( 'core/heading', {
 							content: citation,
 						} );
 					}
-					const textContent = isString( textElement.children ) ?
-						textElement.children :
-						textElement.children.props.children;
-					if ( Array.isArray( value ) || citation ) {
-						const text = createBlock( 'core/heading', {
-							content: textContent,
-						} );
-						const quote = createBlock( 'core/quote', {
-							...attrs,
-							citation,
-							value: Array.isArray( value ) ?
-								value.slice( 1 ) :
-								[],
-						} );
 
-						return [ text, quote ];
+					const firstValue = get( value, [ 0, 'children' ] );
+					const headingContent = castArray( isString( firstValue ) ?
+						firstValue :
+						get( firstValue, [ 'props', 'children' ], '' )
+					);
+
+					// if the quote content just contains a paragraph and no citation exist
+					// convert the quote content into and heading block.
+					if ( ! citation && value.length === 1 ) {
+						return createBlock( 'core/heading', {
+							content: headingContent,
+						} );
 					}
-					return createBlock( 'core/heading', {
-						content: textContent,
+
+					// In the normal case convert the first paragraph of quote into an heading
+					// and create a new quote block equal tl what we had excluding the first paragraph
+					const heading = createBlock( 'core/heading', {
+						content: headingContent,
 					} );
+
+					const quote = createBlock( 'core/quote', {
+						...attrs,
+						citation,
+						value: value.slice( 1 ),
+					} );
+
+					return [ heading, quote ];
 				},
 			},
 		],
@@ -158,7 +167,9 @@ export const settings = {
 	} )( ( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className, editable, setState } ) => {
 		const { align, value, citation, style } = attributes;
 		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
-		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
+		const onSetActiveEditable = ( newEditable ) => () => {
+			setState( { editable: newEditable } );
+		};
 
 		return [
 			isSelected && (

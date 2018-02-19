@@ -51,7 +51,6 @@ class Inserter extends Component {
 			position,
 			children,
 			onInsertBlock,
-			insertionPoint,
 			hasSupportedBlocks,
 			isLocked,
 		} = this.props;
@@ -80,7 +79,7 @@ class Inserter extends Component {
 				) }
 				renderContent={ ( { onClose } ) => {
 					const onSelect = ( item ) => {
-						onInsertBlock( item, insertionPoint );
+						onInsertBlock( item );
 
 						onClose();
 					};
@@ -94,9 +93,9 @@ class Inserter extends Component {
 
 export default compose( [
 	connect(
-		( state, ownProps ) => {
+		( state ) => {
 			return {
-				insertionPoint: getBlockInsertionPoint( state, ownProps.rootUID ),
+				insertionPoint: getBlockInsertionPoint( state ),
 				selectedBlock: getSelectedBlock( state ),
 			};
 		},
@@ -106,12 +105,13 @@ export default compose( [
 			insertBlock,
 			replaceBlocks,
 		},
-		( { selectedBlock, ...stateProps }, dispatchProps, { layout, rootUID, ...ownProps } ) => ( {
+		( { selectedBlock, insertionPoint, ...stateProps }, dispatchProps, { ...ownProps } ) => ( {
 			...stateProps,
 			...ownProps,
 			showInsertionPoint: dispatchProps.showInsertionPoint,
 			hideInsertionPoint: dispatchProps.hideInsertionPoint,
-			onInsertBlock( item, index ) {
+			onInsertBlock( item ) {
+				const { index, rootUID, layout } = insertionPoint;
 				const { name, initialAttributes } = item;
 				const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
 				if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {

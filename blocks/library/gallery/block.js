@@ -72,6 +72,7 @@ class GalleryBlock extends Component {
 		return () => {
 			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
 			const { columns } = this.props.attributes;
+			this.setState( { selectedImage: null } );
 			this.props.setAttributes( {
 				images,
 				columns: columns ? Math.min( images.length, columns ) : columns,
@@ -106,7 +107,9 @@ class GalleryBlock extends Component {
 
 	setImageAttributes( index, attributes ) {
 		const { attributes: { images }, setAttributes } = this.props;
-
+		if ( ! images[ index ] ) {
+			return;
+		}
 		setAttributes( {
 			images: [
 				...images.slice( 0, index ),

@@ -35,6 +35,7 @@ const blockAttributes = {
 			},
 			link: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'data-link',
 			},
 			alt: {

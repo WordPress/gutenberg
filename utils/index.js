@@ -10,5 +10,6 @@ export { decodeEntities };
 export * from './blob-cache';
 export * from './mediaupload';
 export * from './terms';
+export * from './deprecation';
 
 export { viewPort };

@@ -3,8 +3,7 @@
  */
 import { connect } from 'react-redux';
 import 'element-closest';
-import { find, last, reverse } from 'lodash';
-import tinymce from 'tinymce';
+import { find, last, reverse, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,12 +23,11 @@ import {
 	placeCaretAtVerticalEdge,
 } from '../../utils/dom';
 import {
-	getPreviousBlock,
-	getNextBlock,
+	getPreviousBlockUid,
+	getNextBlockUid,
 	getMultiSelectedBlocksStartUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
-	getSelectedBlocksInitialCaretPosition,
 } from '../../store/selectors';
 import {
 	multiSelect,
@@ -110,19 +108,6 @@ class WritingFlow extends Component {
 		} );
 	}
 
-	getInnerTabbable( target, isReverse ) {
-		let focusableNodes = this.getVisibleTabbables();
-		if ( isReverse ) {
-			focusableNodes = reverse( focusableNodes );
-		}
-
-		const innerItem = find( focusableNodes, ( node ) => {
-			return target !== node && target.contains( node );
-		} );
-
-		return innerItem ? innerItem : target;
-	}
-
 	isInLastNonEmptyBlock( target ) {
 		const tabbables = this.getVisibleTabbables();
 
@@ -155,20 +140,20 @@ class WritingFlow extends Component {
 	}
 
 	expandSelection( currentStartUid, isReverse ) {
-		const { previousBlock, nextBlock } = this.props;
+		const { previousBlockUid, nextBlockUid } = this.props;
 
-		const expandedBlock = isReverse ? previousBlock : nextBlock;
-		if ( expandedBlock ) {
-			this.props.onMultiSelect( currentStartUid, expandedBlock.uid );
+		const expandedBlockUid = isReverse ? previousBlockUid : nextBlockUid;
+		if ( expandedBlockUid ) {
+			this.props.onMultiSelect( currentStartUid, expandedBlockUid );
 		}
 	}
 
 	moveSelection( isReverse ) {
-		const { previousBlock, nextBlock } = this.props;
+		const { previousBlockUid, nextBlockUid } = this.props;
 
-		const focusedBlock = isReverse ? previousBlock : nextBlock;
-		if ( focusedBlock ) {
-			this.props.onSelectBlock( focusedBlock.uid );
+		const focusedBlockUid = isReverse ? previousBlockUid : nextBlockUid;
+		if ( focusedBlockUid ) {
+			this.props.onSelectBlock( focusedBlockUid );
 		}
 	}
 
@@ -192,14 +177,14 @@ class WritingFlow extends Component {
 		const parentBlock = target.hasAttribute( 'data-block' ) ? target : target.closest( '[data-block]' );
 		if (
 			parentBlock &&
-			( ! this.props.selectedBlock || parentBlock.getAttribute( 'data-block' ) !== this.props.selectedBlock.uid )
+			( ! this.props.selectedBlockUID || parentBlock.getAttribute( 'data-block' ) !== this.props.selectedBlockUID )
 		) {
 			this.props.onSelectBlock( parentBlock.getAttribute( 'data-block' ) );
 		}
 	}
 
 	onKeyDown( event ) {
-		const { selectedBlock, selectionStart, hasMultiSelection } = this.props;
+		const { selectedBlockUID, selectionStart, hasMultiSelection } = this.props;
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -221,15 +206,15 @@ class WritingFlow extends Component {
 		}
 
 		if ( isNav && isShift && hasMultiSelection ) {
-			// Shift key is down and existing block selection
+			// Shift key is down and existing block multi-selection
 			event.preventDefault();
 			this.expandSelection( selectionStart, isReverse );
 		} else if ( isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
-			// Shift key is down, but no existing block selection
+			// Shift key is down, but no existing block multi-selection
 			event.preventDefault();
-			this.expandSelection( selectedBlock.uid, isReverse );
+			this.expandSelection( selectedBlockUID, isReverse );
 		} else if ( isNav && hasMultiSelection ) {
-			// Moving from multi block selection to single block selection
+			// Moving from block multi-selection to single block selection
 			event.preventDefault();
 			this.moveSelection( isReverse );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
@@ -249,32 +234,6 @@ class WritingFlow extends Component {
 				isVerticalEdge( target, false, false )
 		) {
 			this.props.onBottomReached();
-		}
-	}
-
-	componentDidUpdate( prevProps ) {
-		// When selecting a new block, we focus its first editable or the container
-		if (
-			this.props.selectedBlock &&
-			( ! prevProps.selectedBlock || this.props.selectedBlock.uid !== prevProps.selectedBlock.uid )
-		) {
-			const blockContainer = this.container.querySelector( `[data-block="${ this.props.selectedBlock.uid }"]` );
-			if ( blockContainer && ! blockContainer.contains( document.activeElement ) ) {
-				const target = this.getInnerTabbable( blockContainer, this.props.initialPosition === -1 );
-				target.focus();
-				if ( this.props.initialPosition === -1 ) {
-					// Special casing RichText components because the two functions at the bottom are not working as expected.
-					// When merging two sibling paragraph blocks (backspacing) the focus is not moved to the right position.
-					const editor = tinymce.get( target.getAttribute( 'id' ) );
-					if ( editor ) {
-						editor.selection.select( editor.getBody(), true );
-						editor.selection.collapse( false );
-					} else {
-						placeCaretAtHorizontalEdge( target, true );
-						placeCaretAtVerticalEdge( target, true );
-					}
-				}
-			}
 		}
 	}
 
@@ -299,12 +258,11 @@ class WritingFlow extends Component {
 
 export default connect(
 	( state ) => ( {
-		previousBlock: getPreviousBlock( state ),
-		nextBlock: getNextBlock( state ),
+		previousBlockUid: getPreviousBlockUid( state ),
+		nextBlockUid: getNextBlockUid( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
-		selectedBlock: getSelectedBlock( state ),
-		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
+		selectedBlockUID: get( getSelectedBlock( state ), [ 'uid' ] ),
 	} ),
 	{
 		onMultiSelect: multiSelect,

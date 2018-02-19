@@ -15,6 +15,8 @@ import {
 	findIndex,
 	reject,
 	omitBy,
+	keys,
+	isEqual,
 } from 'lodash';
 
 /**
@@ -96,6 +98,31 @@ function getFlattenedBlocks( blocks ) {
 }
 
 /**
+ * Option for the history reducer. When the block ID and updated attirbute keys
+ * are the same as previously, the history reducer should overwrite its present
+ * state.
+ *
+ * @param {Object} action         The currently dispatched action.
+ * @param {Object} previousAction The previously dispatched action.
+ *
+ * @return {boolean} Whether or not to overwrite present state.
+ */
+function shouldOverwriteState( action, previousAction ) {
+	if (
+		previousAction &&
+		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+		action.type === previousAction.type
+	) {
+		const attributes = keys( action.attributes );
+		const previousAttributes = keys( previousAction.attributes );
+
+		return action.uid === previousAction.uid && isEqual( attributes, previousAttributes );
+	}
+
+	return false;
+}
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -115,16 +142,19 @@ export const editor = flow( [
 	combineReducers,
 
 	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, { resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ] } ),
+	partialRight( withHistory, {
+		resetTypes: [ 'SETUP_EDITOR_STATE' ],
+		shouldOverwriteState,
+	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_NEW_POST', 'RESET_POST' ] } ),
+	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ] } ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-			case 'SETUP_NEW_POST':
+			case 'SETUP_EDITOR_STATE':
 				return reduce( action.edits, ( result, value, key ) => {
 					// Only assign into result if not already same value
 					if ( value !== state[ key ] ) {
@@ -168,6 +198,7 @@ export const editor = flow( [
 	blocksByUid( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
+			case 'SETUP_EDITOR_STATE':
 				return getFlattenedBlocks( action.blocks );
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
@@ -271,6 +302,7 @@ export const editor = flow( [
 	blockOrder( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
+			case 'SETUP_EDITOR_STATE':
 				return mapBlockOrder( action.blocks );
 
 			case 'INSERT_BLOCKS': {
@@ -406,6 +438,7 @@ export const editor = flow( [
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
+		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
 		case 'UPDATE_POST':
 			let post;
@@ -535,33 +568,6 @@ export function blockSelection( state = {
 				...state,
 				isEnabled: action.isSelectionEnabled,
 			};
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning hovered block state.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function hoveredBlock( state = null, action ) {
-	switch ( action.type ) {
-		case 'TOGGLE_BLOCK_HOVERED':
-			return action.hovered ? action.uid : null;
-		case 'SELECT_BLOCK':
-		case 'START_TYPING':
-		case 'MULTI_SELECT':
-			return null;
-		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state ) === -1 ) {
-				return state;
-			}
-
-			return action.blocks[ 0 ].uid;
 	}
 
 	return state;
@@ -880,7 +886,6 @@ export default optimist( combineReducers( {
 	currentPost,
 	isTyping,
 	blockSelection,
-	hoveredBlock,
 	blocksMode,
 	isInsertionPointVisible,
 	preferences,

@@ -24,7 +24,7 @@ function CopyContentButton( { editedPostContent, hasCopied, setState } ) {
 
 const Enhanced = compose(
 	query( ( select ) => ( {
-		editedPostContent: select( 'core/editor', 'getEditedPostContent' ),
+		editedPostContent: select( 'core/editor' ).getEditedPostAttribute( 'content' ),
 	} ) ),
 	withState( { hasCopied: false } )
 )( CopyContentButton );

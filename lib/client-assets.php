@@ -79,7 +79,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'data/build/index.js' ),
-		array( 'wp-element' ),
+		array( 'wp-element', 'wp-utils' ),
 		filemtime( gutenberg_dir_path() . 'data/build/index.js' )
 	);
 	wp_register_script(
@@ -874,10 +874,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$allowed_block_types = apply_filters( 'allowed_block_types', true );
 
 	$editor_settings = array(
-		'alignWide'          => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
-		'availableTemplates' => wp_get_theme()->get_page_templates( get_post( $post_to_edit['id'] ) ),
-		'blockTypes'         => $allowed_block_types,
-		'titlePlaceholder'   => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
+		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
+		'availableTemplates'  => wp_get_theme()->get_page_templates( get_post( $post_to_edit['id'] ) ),
+		'blockTypes'          => $allowed_block_types,
+		'disableCustomColors' => get_theme_support( 'disable-custom-colors' ),
+		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 	);
 
 	if ( ! empty( $color_palette ) ) {

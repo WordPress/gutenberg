@@ -6,7 +6,14 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { RichText, createTinyMCEElement, isLinkBoundary, getFormatProperties } from '../';
+import {
+	RichText,
+	createTinyMCEElement,
+	isEmptyInlineBoundary,
+	isEmptyNode,
+	filterEmptyNodes,
+	getFormatProperties,
+} from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
 
 describe( 'createTinyMCEElement', () => {
@@ -40,24 +47,95 @@ describe( 'createTinyMCEElement', () => {
 	} );
 } );
 
-describe( 'isLinkBoundary', () => {
-	const fragment = {
-		childNodes: [
-			{
-				nodeName: 'A',
-				text: '\uFEFF',
+describe( 'isEmptyInlineBoundary', () => {
+	describe( 'link', () => {
+		const node = document.createElement( 'a' );
+		node.innerText = '\uFEFF';
 
-			},
-		],
-	};
+		test( 'should return true for a valid link boundary', () => {
+			expect( isEmptyInlineBoundary( node ) ).toBe( true );
+		} );
 
-	test( 'should return true for a valid link boundary', () => {
-		expect( isLinkBoundary( fragment ) ).toBe( true );
+		test( 'should return false for an invalid link boundary', () => {
+			const invalid = { ...node, childNodes: [] };
+			expect( isEmptyInlineBoundary( invalid ) ).toBe( false );
+		} );
 	} );
 
-	test( 'should return false for an invalid link boundary', () => {
-		const invalid = { ...fragment, childNodes: [] };
-		expect( isLinkBoundary( invalid ) ).toBe( false );
+	describe( 'code', () => {
+		const node = document.createElement( 'code' );
+		node.textContent = '\uFEFF';
+
+		test( 'should return true for a valid link boundary', () => {
+			expect( isEmptyInlineBoundary( node ) ).toBe( true );
+		} );
+
+		test( 'should return false for an invalid link boundary', () => {
+			const invalid = { ...node, childNodes: [] };
+			expect( isEmptyInlineBoundary( invalid ) ).toBe( false );
+		} );
+	} );
+} );
+
+describe( 'isEmptyNode', () => {
+	it( 'returns true for empty text node', () => {
+		const node = document.createTextNode( '' );
+
+		expect( isEmptyNode( node ) ).toBe( true );
+	} );
+
+	it( 'returns false for non-empty text node', () => {
+		const node = document.createTextNode( 'rabbit' );
+
+		expect( isEmptyNode( node ) ).toBe( false );
+	} );
+
+	it( 'returns false for element node', () => {
+		const node = document.createElement( 'br' );
+
+		expect( isEmptyNode( node ) ).toBe( false );
+	} );
+} );
+
+describe( 'filterEmptyNodes', () => {
+	it( 'preserves newlines', () => {
+		const node = document.createElement( 'div' );
+		node.innerHTML = 'a<br>foo';
+
+		expect( filterEmptyNodes( node.childNodes ) ).toEqual( [
+			document.createTextNode( 'a' ),
+			document.createElement( 'br' ),
+			document.createTextNode( 'foo' ),
+		] );
+	} );
+
+	it( 'omits text node', () => {
+		const node = document.createElement( 'div' );
+		node.appendChild( document.createTextNode( '' ) );
+
+		expect( filterEmptyNodes( node.childNodes ) ).toHaveLength( 0 );
+	} );
+
+	it( 'omits prefixing text node', () => {
+		const node = document.createElement( 'div' );
+		node.innerHTML = '<br>foo';
+		node.insertBefore( document.createTextNode( '' ), node.firstChild );
+
+		expect( filterEmptyNodes( node.childNodes ) ).toEqual( [
+			document.createElement( 'br' ),
+			document.createTextNode( 'foo' ),
+		] );
+	} );
+
+	it( 'omits trailing text node', () => {
+		const node = document.createElement( 'div' );
+		node.innerHTML = '<br>foo';
+		node.appendChild( document.createTextNode( '' ) );
+
+		expect( filterEmptyNodes( node.childNodes ) ).toEqual( [
+			document.createElement( 'br' ),
+			document.createTextNode( 'foo' ),
+		] );
 	} );
 } );
 
@@ -141,6 +219,7 @@ describe( 'RichText', () => {
 				expect( wrapper.instance().getSettings( settings ) ).toEqual( {
 					setting: 'hi',
 					forced_root_block: false,
+					custom_undo_redo_levels: 1,
 				} );
 			} );
 

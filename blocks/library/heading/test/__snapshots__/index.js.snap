@@ -8,6 +8,7 @@ exports[`core/heading block edit matches snapshot 1`] = `
     aria-label="Write heading…"
     class="blocks-rich-text__tinymce"
     contenteditable="true"
+    data-is-placeholder-visible="true"
   />
   <h2
     class="blocks-rich-text__tinymce"
