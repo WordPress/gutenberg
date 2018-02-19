@@ -15,6 +15,11 @@ const plugins = {};
  * @param {Object?}  settings Plugin settings.
  */
 export function registerPlugin( id, activate, settings ) {
+	if ( plugins[ id ] ) {
+		console.error(
+			`Plugin "${ id }" has already been registered`
+		);
+	}
 	if ( ! validatePluginId( id ) ) {
 		return;
 	}
