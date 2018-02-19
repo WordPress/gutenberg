@@ -22,6 +22,7 @@ export { default as BlockEdit } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as ColorPalette } from './color-palette';
 export { default as Editable } from './rich-text/editable';
+export { default as ImagePlaceholder } from './image-placeholder';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorControls } from './inspector-controls';
 export { default as PlainText } from './plain-text';
