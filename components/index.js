@@ -17,6 +17,7 @@ export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as IconButton } from './icon-button';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
+export { default as MenuItemsChoice } from './menu-items/menu-items-choice';
 export { default as MenuItemsGroup } from './menu-items/menu-items-group';
 export { default as MenuItemsToggle } from './menu-items/menu-items-toggle';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
