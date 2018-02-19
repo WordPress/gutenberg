@@ -125,7 +125,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 							return;
 						}
 						response.json().then( ( obj ) => {
-							const { html, type, title: urlTitle, provider_name: providerName } = obj;
+							const { html, type, provider_name: providerName, code } = obj;
 							const providerNameSlug = kebabCase( toLower( providerName ) );
 
 							// invalid url, and this didn't come from submitting the form
@@ -165,7 +165,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 
 				if ( fetching && fromPaste ) {
 					return [
-						<p>{ url }</p>
+						controls,
+						<p key="loading">{ url }</p>,
 					];
 				}
 

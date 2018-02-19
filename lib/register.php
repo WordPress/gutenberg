@@ -518,6 +518,12 @@ function gutenberg_revisions_restore( $revisions_data ) {
 }
 add_filter( 'wp_prepare_revision_for_js', 'gutenberg_revisions_restore' );
 
+/**
+ * Generates and caches HTML for a URL that contains OpenGraph metadata.
+ *
+ * @param string $url The URL to generate HTML for.
+ * @return mixed OpenGraph HTML, or false if there was no OpenGraph data.
+ */
 function gutenberg_oembed_opengraph( $url ) {
 	$cache_key = 'gutenberg_opengraph_' . md5( $url );
 	$html = get_transient( $cache_key );
