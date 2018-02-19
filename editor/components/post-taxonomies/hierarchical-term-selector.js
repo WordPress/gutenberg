@@ -321,9 +321,9 @@ const applyWithAPIData = withAPIData( ( props ) => {
 } );
 
 const applyConnect = connect(
-	( state, onwProps ) => {
+	( state, ownProps ) => {
 		return {
-			terms: getEditedPostAttribute( state, onwProps.restBase ),
+			terms: getEditedPostAttribute( state, ownProps.restBase ),
 		};
 	},
 	{
