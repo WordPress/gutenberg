@@ -20,16 +20,6 @@ export const settings = {
 
 	category: 'widgets',
 
-	attributes: {
-		showTagCounts: {
-			type: 'boolean',
-			default: false,
-		},
-		taxonomy: {
-			type: 'string',
-		},
-	},
-
 	supports: {
 		html: false,
 		align: true,

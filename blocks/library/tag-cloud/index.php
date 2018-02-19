@@ -13,12 +13,7 @@
  * @return string Returns the tag cloud for selected taxonomy.
  */
 function gutenberg_render_block_core_tag_cloud( $attributes ) {
-	$align = 'center';
-	if ( isset( $attributes['align'] ) && in_array( $attributes['align'], array( 'left', 'right', 'full' ), true ) ) {
-		$align = $attributes['align'];
-	}
-
-	$class          = "wp-block-tag-cloud align{$align}";
+	$class          = "wp-block-tag-cloud align{$attributes['align']}";
 	$wrapper_markup = '<p class="%1$s">%2$s</p>';
 
 	$args = array(
@@ -39,5 +34,18 @@ function gutenberg_render_block_core_tag_cloud( $attributes ) {
 }
 
 register_block_type( 'core/tag-cloud', array(
+	'attributes'      => array(
+		'taxonomy'      => array(
+			'type' => 'string',
+		),
+		'showTagCounts' => array(
+			'type'    => 'boolean',
+			'default' => false,
+		),
+		'align'         => array(
+			'type'    => 'string',
+			'default' => 'center',
+		),
+	),
 	'render_callback' => 'gutenberg_render_block_core_tag_cloud',
 ) );
