@@ -3,10 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 
-function NoBlocks() {
+function NoBlocks( props ) {
+	const { children } = props;
 	return (
 		<span className="editor-inserter__no-blocks">
-			{ __( 'No blocks found' ) }
+			{ !! children ? children : __( 'No blocks found' ) }
 		</span>
 	);
 }

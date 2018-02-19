@@ -228,7 +228,9 @@ export class InserterMenu extends Component {
 		// If the Saved tab is selected and we have no results, display a friendly message
 		if ( 'saved' === tab && itemsForTab.length === 0 ) {
 			return (
-				<NoBlocks />
+				<NoBlocks>
+					No saved blocks
+				</NoBlocks>
 			);
 		}
 
