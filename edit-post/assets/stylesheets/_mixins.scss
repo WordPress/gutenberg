@@ -174,15 +174,17 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 
 // Menu items
 @mixin menu-style__neutral() {
+	color: $black;
 	border: none;
 	box-shadow: none;
 }
 
 @mixin menu-style__focus() {
 	border: none;
-	outline-offset: -1px;
+	box-shadow: none;
+	outline-offset: -2px;
 	color: $dark-gray-900;
-	outline: 1px dotted $dark-gray-300;
+	outline: 1px dotted $dark-gray-500;
 }
 
 // Old
