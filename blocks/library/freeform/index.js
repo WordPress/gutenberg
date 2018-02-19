@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -27,10 +28,16 @@ export const settings = {
 		},
 	},
 
+	supports: {
+		className: false,
+		customClassName: false,
+	},
+
 	edit: OldEditor,
 
 	save( { attributes } ) {
 		const { content } = attributes;
-		return content;
+
+		return <RawHTML>{ content }</RawHTML>;
 	},
 };

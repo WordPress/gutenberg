@@ -43,7 +43,7 @@ Our goal with Gutenberg is not just to create a seamless post- and page-building
 
 ## Is Gutenberg built on top of TinyMCE?
 
-No. TinyMCE is one of the best tools for enabling rich text on the web. In Gutenberg, TinyMCE does exactly that. Nearly every text field you'll find is augmented with TinyMCE for rich text. Whether it be text, lists, or even just a single caption, TinyMCE can be invoked on blocks for rich text enhancements.
+No. [TinyMCE](https://www.tinymce.com/) is one of the best tools for enabling rich text on the web. In Gutenberg, TinyMCE does exactly that. Nearly every text field you'll find is augmented with TinyMCE for rich text. Whether it be text, lists, or even just a single caption, TinyMCE can be invoked on blocks for rich text enhancements.
 
 ## What browsers will Gutenberg support?
 

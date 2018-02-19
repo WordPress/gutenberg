@@ -43,3 +43,13 @@ add_theme_support( 'editor-color-palette',
 ```
 
 The colors will be shown in order on the palette, and there's no limit to how many can be specified.
+
+### Disabling custom colors in block Color Palettes
+
+By default, the color palette offered to blocks, allows the user to select a custom color different from the editor or theme default colors.
+Themes can disable this feature using:
+```php
+add_theme_support( 'disable-custom-colors' );
+```
+
+This flag will make sure users are only able to choose colors from the `editor-color-palette` the theme provided or from the editor default colors if the theme did not provide one.

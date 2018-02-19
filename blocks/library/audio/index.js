@@ -17,7 +17,6 @@ import './editor.scss';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 export const name = 'core/audio';
 
@@ -37,9 +36,6 @@ export const settings = {
 			selector: 'audio',
 			attribute: 'src',
 		},
-		align: {
-			type: 'string',
-		},
 		caption: {
 			type: 'array',
 			source: 'children',
@@ -50,11 +46,8 @@ export const settings = {
 		},
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
+	supports: {
+		align: true,
 	},
 
 	edit: class extends Component {
@@ -69,10 +62,9 @@ export const settings = {
 			};
 		}
 		render() {
-			const { align, caption, id } = this.props.attributes;
-			const { setAttributes, focus, setFocus } = this.props;
+			const { caption, id } = this.props.attributes;
+			const { setAttributes, isSelected } = this.props;
 			const { editing, className, src } = this.state;
-			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
 			};
@@ -93,12 +85,8 @@ export const settings = {
 				}
 				return false;
 			};
-			const controls = focus && (
+			const controls = isSelected && (
 				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
 					<Toolbar>
 						<IconButton
 							className="components-icon-button components-toolbar__control"
@@ -109,8 +97,6 @@ export const settings = {
 					</Toolbar>
 				</BlockControls>
 			);
-
-			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
 
 			if ( editing ) {
 				return [
@@ -153,14 +139,13 @@ export const settings = {
 				controls,
 				<figure key="audio" className={ className }>
 					<audio controls="controls" src={ src } />
-					{ ( ( caption && caption.length ) || !! focus ) && (
+					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							focus={ focus && focus.editable === 'caption' ? focus : undefined }
-							onFocus={ focusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							isSelected={ isSelected }
 							inlineToolbar
 						/>
 					) }
@@ -171,9 +156,9 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { align, src, caption } = attributes;
+		const { src, caption } = attributes;
 		return (
-			<figure className={ align ? `align${ align }` : null }>
+			<figure>
 				<audio controls="controls" src={ src } />
 				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>

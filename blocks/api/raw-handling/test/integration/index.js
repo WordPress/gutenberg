@@ -19,6 +19,9 @@ const types = [
 	'ms-word',
 	'ms-word-online',
 	'evernote',
+	'iframe-embed',
+	'one-image',
+	'two-images',
 ];
 
 describe( 'raw handling: integration', () => {
@@ -32,7 +35,7 @@ describe( 'raw handling: integration', () => {
 		it( type, () => {
 			const input = fs.readFileSync( path.join( __dirname, `${ type }-in.html` ), 'utf8' ).trim();
 			const output = fs.readFileSync( path.join( __dirname, `${ type }-out.html` ), 'utf8' ).trim();
-			const converted = rawHandler( { HTML: input } );
+			const converted = rawHandler( { HTML: input, canUserUseUnfilteredHTML: true } );
 			const serialized = typeof converted === 'string' ? converted : serialize( converted );
 
 			equal( output, serialized );

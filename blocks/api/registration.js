@@ -16,9 +16,34 @@ import { applyFilters } from '@wordpress/hooks';
 import { getCategories } from './categories';
 
 /**
- * Block settings keyed by block name.
+ * Defined behavior of a block type.
  *
- * @type {Object}
+ * @typedef {WPBlockType}
+ *
+ * @property {string}             name       Block's namespaced name.
+ * @property {string}             title      Human-readable label for a block.
+ *                                           Shown in the block inserter.
+ * @property {string}             category   Category classification of block,
+ *                                           impacting where block is shown in
+ *                                           inserter results.
+ * @property {(string|WPElement)} icon       Slug of the Dashicon to be shown
+ *                                           as the icon for the block in the
+ *                                           inserter, or element.
+ * @property {?string[]}          keywords   Additional keywords to produce
+ *                                           block as inserter search result.
+ * @property {?Object}            attributes Block attributes.
+ * @property {Function}           save       Serialize behavior of a block,
+ *                                           returning an element describing
+ *                                           structure of the block's post
+ *                                           content markup.
+ * @property {WPComponent}        edit       Component rendering element to be
+ *                                           interacted with in an editor.
+ */
+
+/**
+ * Block type definitions keyed by block name.
+ *
+ * @type {Object.<string,WPBlockType>}
  */
 const blocks = {};
 
@@ -203,6 +228,26 @@ export function getBlockTypes() {
 }
 
 /**
+ * Returns the block support value for a feature, if defined.
+ *
+ * @param  {(string|Object)} nameOrType      Block name or type object
+ * @param  {string}          feature         Feature to retrieve
+ * @param  {*}               defaultSupports Default value to return if not
+ *                                           explicitly defined
+ * @return {?*}                              Block support value
+ */
+export function getBlockSupport( nameOrType, feature, defaultSupports ) {
+	const blockType = 'string' === typeof nameOrType ?
+		getBlockType( nameOrType ) :
+		nameOrType;
+
+	return get( blockType, [
+		'supports',
+		feature,
+	], defaultSupports );
+}
+
+/**
  * Returns true if the block defines support for a feature, or false otherwise.
  *
  * @param {(string|Object)} nameOrType      Block name or type object.
@@ -213,14 +258,7 @@ export function getBlockTypes() {
  * @return {boolean} Whether block supports feature.
  */
 export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
-	const blockType = 'string' === typeof nameOrType ?
-		getBlockType( nameOrType ) :
-		nameOrType;
-
-	return !! get( blockType, [
-		'supports',
-		feature,
-	], defaultSupports );
+	return !! getBlockSupport( nameOrType, feature, defaultSupports );
 }
 
 /**

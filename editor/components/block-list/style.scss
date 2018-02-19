@@ -275,41 +275,6 @@
 		}
 	}
 
-	// Left side inserter
-	> .editor-inserter {
-		position: absolute;
-		left: 2px;
-		top: 16px;
-
-		// Mobile
-		display: none;
-		@include break-small {
-			display: block;
-		}
-
-		.editor-inserter__toggle {
-			width: $icon-button-size-small;
-			padding: 2px;
-
-			// Adjust inserter design
-			box-shadow: inset 0 0 0 1px $light-gray-500;
-			border-radius: 50%;
-
-			// Hide the outer ring on the inserter, to visually lighten it
-			&:before {
-				content: '';
-				position: absolute;
-				top: 2px;
-				right: 2px;
-				bottom: 2px;
-				left: 2px;
-				display: block;
-				border: 4px solid $white;
-				border-radius: 50%;
-			}
-		}
-	}
-
 	// Left and right side UI
 	> .editor-block-settings-menu,
 	> .editor-block-mover {
@@ -508,4 +473,14 @@ $sticky-bottom-offset: 20px;
 	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset		 +		display: flex;
 	margin-top: - $sticky-bottom-offset - 1px;
 	padding-top: 2px;
+}
+
+.editor-block-list__side-inserter {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+
+	@include break-small {
+		right: $block-mover-padding-visible + 10px;
+	}
 }

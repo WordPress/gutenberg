@@ -3,7 +3,8 @@
  */
 import { connect } from 'react-redux';
 import 'element-closest';
-import { find, last, reverse, clamp } from 'lodash';
+import { find, last, reverse, get } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -22,13 +23,17 @@ import {
 	placeCaretAtVerticalEdge,
 } from '../../utils/dom';
 import {
-	getBlockUids,
+	getPreviousBlockUid,
+	getNextBlockUid,
 	getMultiSelectedBlocksStartUid,
-	getMultiSelectedBlocksEndUid,
 	getMultiSelectedBlocks,
 	getSelectedBlock,
 } from '../../store/selectors';
-import { multiSelect, appendDefaultBlock, focusBlock } from '../../store/actions';
+import {
+	multiSelect,
+	appendDefaultBlock,
+	selectBlock,
+} from '../../store/actions';
 
 /**
  * Module Constants
@@ -134,16 +139,22 @@ class WritingFlow extends Component {
 				blockEl.contains( el ) && isElementNonEmpty( el ) );
 	}
 
-	expandSelection( blocks, currentStartUid, currentEndUid, delta ) {
-		const lastIndex = blocks.indexOf( currentEndUid );
-		const nextIndex = clamp( lastIndex + delta, 0, blocks.length - 1 );
-		this.props.onMultiSelect( currentStartUid, blocks[ nextIndex ] );
+	expandSelection( currentStartUid, isReverse ) {
+		const { previousBlockUid, nextBlockUid } = this.props;
+
+		const expandedBlockUid = isReverse ? previousBlockUid : nextBlockUid;
+		if ( expandedBlockUid ) {
+			this.props.onMultiSelect( currentStartUid, expandedBlockUid );
+		}
 	}
 
-	moveSelection( blocks, currentUid, delta ) {
-		const currentIndex = blocks.indexOf( currentUid );
-		const nextIndex = clamp( currentIndex + delta, 0, blocks.length - 1 );
-		this.props.onFocusBlock( blocks[ nextIndex ] );
+	moveSelection( isReverse ) {
+		const { previousBlockUid, nextBlockUid } = this.props;
+
+		const focusedBlockUid = isReverse ? previousBlockUid : nextBlockUid;
+		if ( focusedBlockUid ) {
+			this.props.onSelectBlock( focusedBlockUid );
+		}
 	}
 
 	isEditableEdge( moveUp, target ) {
@@ -153,8 +164,27 @@ class WritingFlow extends Component {
 		return editables.length > 0 && index === edgeIndex;
 	}
 
+	/**
+	 * Function called to ensure the block parent of the target node is selected.
+	 *
+	 * @param {DOMElement} target
+	 */
+	selectParentBlock( target ) {
+		if ( ! target ) {
+			return;
+		}
+
+		const parentBlock = target.hasAttribute( 'data-block' ) ? target : target.closest( '[data-block]' );
+		if (
+			parentBlock &&
+			( ! this.props.selectedBlockUID || parentBlock.getAttribute( 'data-block' ) !== this.props.selectedBlockUID )
+		) {
+			this.props.onSelectBlock( parentBlock.getAttribute( 'data-block' ) );
+		}
+	}
+
 	onKeyDown( event ) {
-		const { selectedBlock, selectionStart, selectionEnd, blocks, hasMultiSelection } = this.props;
+		const { selectedBlockUID, selectionStart, hasMultiSelection } = this.props;
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -176,24 +206,26 @@ class WritingFlow extends Component {
 		}
 
 		if ( isNav && isShift && hasMultiSelection ) {
-			// Shift key is down and existing block selection
+			// Shift key is down and existing block multi-selection
 			event.preventDefault();
-			this.expandSelection( blocks, selectionStart, selectionEnd, isReverse ? -1 : +1 );
+			this.expandSelection( selectionStart, isReverse );
 		} else if ( isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
-			// Shift key is down, but no existing block selection
+			// Shift key is down, but no existing block multi-selection
 			event.preventDefault();
-			this.expandSelection( blocks, selectedBlock.uid, selectedBlock.uid, isReverse ? -1 : +1 );
+			this.expandSelection( selectedBlockUID, isReverse );
 		} else if ( isNav && hasMultiSelection ) {
-			// Moving from multi block selection to single block selection
+			// Moving from block multi-selection to single block selection
 			event.preventDefault();
-			this.moveSelection( blocks, selectionEnd, isReverse ? -1 : +1 );
+			this.moveSelection( isReverse );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
+			this.selectParentBlock( closestTabbable );
 			event.preventDefault();
 		} else if ( isHorizontal && isHorizontalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+			this.selectParentBlock( closestTabbable );
 			event.preventDefault();
 		}
 
@@ -226,15 +258,15 @@ class WritingFlow extends Component {
 
 export default connect(
 	( state ) => ( {
-		blocks: getBlockUids( state ),
+		previousBlockUid: getPreviousBlockUid( state ),
+		nextBlockUid: getNextBlockUid( state ),
 		selectionStart: getMultiSelectedBlocksStartUid( state ),
-		selectionEnd: getMultiSelectedBlocksEndUid( state ),
 		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
-		selectedBlock: getSelectedBlock( state ),
+		selectedBlockUID: get( getSelectedBlock( state ), [ 'uid' ] ),
 	} ),
 	{
 		onMultiSelect: multiSelect,
 		onBottomReached: appendDefaultBlock,
-		onFocusBlock: focusBlock,
+		onSelectBlock: selectBlock,
 	}
 )( WritingFlow );

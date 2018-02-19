@@ -6,8 +6,189 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import RichText from '../';
+import {
+	RichText,
+	createTinyMCEElement,
+	isEmptyInlineBoundary,
+	isEmptyNode,
+	filterEmptyNodes,
+	getFormatProperties,
+} from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
+
+describe( 'createTinyMCEElement', () => {
+	const type = 'p';
+	const children = <p>Child</p>;
+
+	test( 'should return null', () => {
+		const props = {
+			'data-mce-bogus': 'all',
+		};
+
+		expect( createTinyMCEElement( type, props, children ) ).toBeNull();
+	} );
+
+	test( 'should return children', () => {
+		const props = {
+			'data-mce-bogus': '',
+		};
+
+		const wrapper = createTinyMCEElement( type, props, children );
+		expect( wrapper ).toEqual( [ children ] );
+	} );
+
+	test( 'should render a TinyMCE element', () => {
+		const props = {
+			'a-prop': 'hi',
+		};
+
+		const wrapper = shallow( createTinyMCEElement( type, props, children ) );
+		expect( wrapper ).toMatchSnapshot();
+	} );
+} );
+
+describe( 'isEmptyInlineBoundary', () => {
+	describe( 'link', () => {
+		const node = document.createElement( 'a' );
+		node.innerText = '\uFEFF';
+
+		test( 'should return true for a valid link boundary', () => {
+			expect( isEmptyInlineBoundary( node ) ).toBe( true );
+		} );
+
+		test( 'should return false for an invalid link boundary', () => {
+			const invalid = { ...node, childNodes: [] };
+			expect( isEmptyInlineBoundary( invalid ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'code', () => {
+		const node = document.createElement( 'code' );
+		node.textContent = '\uFEFF';
+
+		test( 'should return true for a valid link boundary', () => {
+			expect( isEmptyInlineBoundary( node ) ).toBe( true );
+		} );
+
+		test( 'should return false for an invalid link boundary', () => {
+			const invalid = { ...node, childNodes: [] };
+			expect( isEmptyInlineBoundary( invalid ) ).toBe( false );
+		} );
+	} );
+} );
+
+describe( 'isEmptyNode', () => {
+	it( 'returns true for empty text node', () => {
+		const node = document.createTextNode( '' );
+
+		expect( isEmptyNode( node ) ).toBe( true );
+	} );
+
+	it( 'returns false for non-empty text node', () => {
+		const node = document.createTextNode( 'rabbit' );
+
+		expect( isEmptyNode( node ) ).toBe( false );
+	} );
+
+	it( 'returns false for element node', () => {
+		const node = document.createElement( 'br' );
+
+		expect( isEmptyNode( node ) ).toBe( false );
+	} );
+} );
+
+describe( 'filterEmptyNodes', () => {
+	it( 'preserves newlines', () => {
+		const node = document.createElement( 'div' );
+		node.innerHTML = 'a<br>foo';
+
+		expect( filterEmptyNodes( node.childNodes ) ).toEqual( [
+			document.createTextNode( 'a' ),
+			document.createElement( 'br' ),
+			document.createTextNode( 'foo' ),
+		] );
+	} );
+
+	it( 'omits text node', () => {
+		const node = document.createElement( 'div' );
+		node.appendChild( document.createTextNode( '' ) );
+
+		expect( filterEmptyNodes( node.childNodes ) ).toHaveLength( 0 );
+	} );
+
+	it( 'omits prefixing text node', () => {
+		const node = document.createElement( 'div' );
+		node.innerHTML = '<br>foo';
+		node.insertBefore( document.createTextNode( '' ), node.firstChild );
+
+		expect( filterEmptyNodes( node.childNodes ) ).toEqual( [
+			document.createElement( 'br' ),
+			document.createTextNode( 'foo' ),
+		] );
+	} );
+
+	it( 'omits trailing text node', () => {
+		const node = document.createElement( 'div' );
+		node.innerHTML = '<br>foo';
+		node.appendChild( document.createTextNode( '' ) );
+
+		expect( filterEmptyNodes( node.childNodes ) ).toEqual( [
+			document.createElement( 'br' ),
+			document.createTextNode( 'foo' ),
+		] );
+	} );
+} );
+
+describe( 'getFormatProperties', () => {
+	const formatName = 'link';
+	const node = {
+		nodeName: 'A',
+		attributes: {
+			href: 'https://www.testing.com',
+		},
+	};
+
+	test( 'should return an empty object', () => {
+		expect( getFormatProperties( 'ofSomething' ) ).toEqual( {} );
+	} );
+
+	test( 'should return an empty object if no anchor element is found', () => {
+		expect( getFormatProperties( formatName, [ { ...node, nodeName: 'P' } ] ) ).toEqual( {} );
+	} );
+
+	test( 'should return an object of value and node for a link', () => {
+		const mockNode = {
+			...node,
+			getAttribute: jest.fn().mockImplementation( ( attr ) => mockNode.attributes[ attr ] ),
+		};
+
+		const parents = [
+			mockNode,
+		];
+
+		expect( getFormatProperties( formatName, parents ) ).toEqual( {
+			value: 'https://www.testing.com',
+			node: mockNode,
+		} );
+	} );
+
+	test( 'should return an object of value and node of empty values when no values are found.', () => {
+		const mockNode = {
+			...node,
+			attributes: {},
+			getAttribute: jest.fn().mockImplementation( ( attr ) => mockNode.attributes[ attr ] ),
+		};
+
+		const parents = [
+			mockNode,
+		];
+
+		expect( getFormatProperties( formatName, parents ) ).toEqual( {
+			value: '',
+			node: mockNode,
+		} );
+	} );
+} );
 
 describe( 'RichText', () => {
 	describe( 'Component', () => {
@@ -38,6 +219,7 @@ describe( 'RichText', () => {
 				expect( wrapper.instance().getSettings( settings ) ).toEqual( {
 					setting: 'hi',
 					forced_root_block: false,
+					custom_undo_redo_levels: 1,
 				} );
 			} );
 
@@ -48,6 +230,7 @@ describe( 'RichText', () => {
 			} );
 		} );
 	} );
+
 	describe( '.propTypes', () => {
 		/* eslint-disable no-console */
 		let consoleError;

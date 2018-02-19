@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	focusBlock,
 	replaceBlocks,
 	startTyping,
 	stopTyping,
@@ -17,7 +16,6 @@ import {
 	toggleSelection,
 	setupEditor,
 	resetPost,
-	setupNewPost,
 	resetBlocks,
 	updateBlockAttributes,
 	updateBlock,
@@ -73,18 +71,6 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
-
-	describe( 'setupNewPost', () => {
-		it( 'should return the SETUP_NEW_POST action', () => {
-			const edits = {};
-			const result = setupNewPost( edits );
-			expect( result ).toEqual( {
-				type: 'SETUP_NEW_POST',
-				edits,
-			} );
-		} );
-	} );
-
 	describe( 'resetBlocks', () => {
 		it( 'should return the RESET_BLOCKS actions', () => {
 			const blocks = [];
@@ -122,26 +108,13 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'focusBlock', () => {
-		it( 'should return the UPDATE_FOCUS action', () => {
-			const focusConfig = {
-				editable: 'cite',
-			};
-
-			expect( focusBlock( 'chicken', focusConfig ) ).toEqual( {
-				type: 'UPDATE_FOCUS',
-				uid: 'chicken',
-				config: focusConfig,
-			} );
-		} );
-	} );
-
 	describe( 'selectBlock', () => {
 		it( 'should return the SELECT_BLOCK action', () => {
 			const uid = 'my-uid';
-			const result = selectBlock( uid );
+			const result = selectBlock( uid, -1 );
 			expect( result ).toEqual( {
 				type: 'SELECT_BLOCK',
+				initialPosition: -1,
 				uid,
 			} );
 		} );
@@ -215,11 +188,11 @@ describe( 'actions', () => {
 			const block = {
 				uid: 'ribs',
 			};
-			const position = 5;
-			expect( insertBlock( block, position ) ).toEqual( {
+			const index = 5;
+			expect( insertBlock( block, index ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks: [ block ],
-				position,
+				index,
 			} );
 		} );
 	} );
@@ -229,11 +202,11 @@ describe( 'actions', () => {
 			const blocks = [ {
 				uid: 'ribs',
 			} ];
-			const position = 3;
-			expect( insertBlocks( blocks, position ) ).toEqual( {
+			const index = 3;
+			expect( insertBlocks( blocks, index ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks,
-				position,
+				index,
 			} );
 		} );
 	} );
@@ -286,15 +259,11 @@ describe( 'actions', () => {
 
 	describe( 'mergeBlocks', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
-			const blockA = {
-				uid: 'blockA',
-			};
-			const blockB = {
-				uid: 'blockB',
-			};
-			expect( mergeBlocks( blockA, blockB ) ).toEqual( {
+			const blockAUid = 'blockA';
+			const blockBUid = 'blockB';
+			expect( mergeBlocks( blockAUid, blockBUid ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
-				blocks: [ blockA, blockB ],
+				blocks: [ blockAUid, blockBUid ],
 			} );
 		} );
 	} );

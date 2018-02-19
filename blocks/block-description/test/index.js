@@ -16,7 +16,7 @@ describe( 'BlockDescription', () => {
 			expect( blockDescription.type() ).toBe( 'div' );
 			expect( blockDescription.text() ).toBe( 'Hello World' );
 			expect( console ).toHaveWarnedWith(
-				'The wp.blocks.BlockDescription component is deprecated. Use the "description" block property instead.'
+				'The wp.blocks.BlockDescription component is deprecated and will be removed from Gutenberg in 2.4. Please use the \"description\" block property instead.'
 			);
 		} );
 	} );

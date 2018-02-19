@@ -7,9 +7,10 @@ import { connect } from 'react-redux';
  * Internal dependencies
  */
 import {
-	getBlockUids,
+	getBlockIndex,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
+	getBlockCount,
 } from '../../store/selectors';
 
 function BlockInsertionPoint( { showInsertionPoint } ) {
@@ -21,14 +22,16 @@ function BlockInsertionPoint( { showInsertionPoint } ) {
 }
 
 export default connect(
-	( state, { uid } ) => {
-		const blockIndex = uid ? getBlockUids( state ).indexOf( uid ) : -1;
-		const insertIndex = blockIndex > -1 ? blockIndex + 1 : 0;
+	( state, { uid, rootUID } ) => {
+		const blockIndex = uid ? getBlockIndex( state, uid, rootUID ) : -1;
+		const insertIndex = blockIndex > -1 ? blockIndex + 1 : getBlockCount( state );
+		const insertionPoint = getBlockInsertionPoint( state );
 
 		return {
 			showInsertionPoint: (
 				isBlockInsertionPointVisible( state ) &&
-				getBlockInsertionPoint( state ) === insertIndex
+				insertionPoint.index === insertIndex &&
+				insertionPoint.rootUID === rootUID
 			),
 		};
 	},
