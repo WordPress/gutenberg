@@ -32,7 +32,7 @@ const Enhanced = compose(
 const buttonElement = <Enhanced key="copy-content-button" />;
 
 addFilter(
-	'editor.EditorActions.tools',
+	'editPost.EditorActions.tools',
 	'core/copy-content/button',
 	( children ) => [ ...children, buttonElement ]
 );
