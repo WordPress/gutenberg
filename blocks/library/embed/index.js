@@ -155,7 +155,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 					const label = sprintf( __( '%s URL' ), title );
 
 					return (
-						<Placeholder key="placeholder" icon={ icon } label={ label } className="wp-block-embed">
+						<Placeholder icon={ icon } label={ label } className="wp-block-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"

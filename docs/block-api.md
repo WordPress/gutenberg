@@ -267,7 +267,7 @@ useOnce: true,
 
 * **Type:** `Object`
 
-Optional block extended support features. The following options are supported, and should be specified as a boolean `true` or `false` value in most of the cases:
+Optional block extended support features. The following options are supported:
 
 - `align` (default `false`): This property adds block controls which allow to change block's alignment.
 
@@ -307,11 +307,12 @@ className: false,
 html: false,
 ```
 
-- `wideAlign` (default `true`): Gutenberg allows to enable [wide alignment](themes.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+- `wideAlign` (default `true`): Gutenberg allows to enable [wide alignment](https://wordpress.org/gutenberg/handbook/extensibility/theme-support/#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
 ```js
 // Remove the support for wide alignment.
 wideAlign: false,
+```
 
 ## Edit and Save
 

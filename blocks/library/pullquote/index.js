@@ -67,7 +67,7 @@ export const settings = {
 		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
 		return (
-			<blockquote key="quote" className={ className }>
+			<blockquote className={ className }>
 				<RichText
 					multiline="p"
 					value={ toRichTextValue( value ) }

@@ -65,8 +65,8 @@ export const settings = {
 		const classes = classnames( className, `has-${ columns }-columns` );
 
 		return [
-			isSelected ? [
-				<InspectorControls key="inspector">
+			isSelected && (
+				<InspectorControls>
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }
@@ -78,8 +78,8 @@ export const settings = {
 						min={ 2 }
 						max={ 6 }
 					/>
-				</InspectorControls>,
-			] : [],
+				</InspectorControls>
+			),
 			<div className={ classes } key="container">
 				<InnerBlocks layouts={ getColumnLayouts( columns ) } />
 			</div>,
