@@ -30,7 +30,6 @@ export { default as MediaUpload } from './media-upload';
 export { default as MediaUploadButton } from './media-upload/button';
 export { default as RichText } from './rich-text';
 export { default as RichTextProvider } from './rich-text/provider';
-export { default as TermTreeSelect } from './term-tree-select';
 export { default as UrlInput } from './url-input';
 export { default as UrlInputButton } from './url-input/button';
 
