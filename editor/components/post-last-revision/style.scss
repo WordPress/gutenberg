@@ -12,10 +12,10 @@
 
 	&:hover,
 	&:active {
-		@include menu-style__neutral();
+		@include menu-style__neutral;
 	}
 
 	&:focus {
-		@include menu-style__focus();
+		@include menu-style__focus;
 	}
 }

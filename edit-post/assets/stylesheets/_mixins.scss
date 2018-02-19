@@ -174,12 +174,12 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 
 // Menu items
 @mixin menu-style__neutral() {
-	color: $black;
 	border: none;
 	box-shadow: none;
 }
 
 @mixin menu-style__focus() {
+	color: $black;
 	border: none;
 	box-shadow: none;
 	outline-offset: -2px;
