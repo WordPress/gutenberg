@@ -23,7 +23,7 @@ function gutenberg_render_block_core_tag_cloud( $attributes ) {
 
 	$args = array(
 		'echo'       => false,
-		'taxonomy'   => $attributes['taxonomySlug'],
+		'taxonomy'   => $attributes['taxonomy'],
 		'show_count' => ! empty( $attributes['showTagCounts'] ),
 	);
 

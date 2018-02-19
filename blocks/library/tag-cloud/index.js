@@ -25,10 +25,7 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
-		taxonomySlug: {
-			type: 'string',
-		},
-		taxonomyRestBase: {
+		taxonomy: {
 			type: 'string',
 		},
 		align: {

@@ -47,12 +47,10 @@ class TagCloudBlock extends Component {
 		} );
 	}
 
-	setTaxonomy( taxonomySlug ) {
+	setTaxonomy( taxonomy ) {
 		const { setAttributes } = this.props;
-		const taxonomies = this.props.taxonomies.data;
-		const taxonomy = taxonomies[ taxonomySlug ];
 
-		setAttributes( { taxonomySlug, taxonomyRestBase: taxonomy.rest_base } );
+		setAttributes( { taxonomy } );
 	}
 
 	toggleShowTagCounts() {
@@ -70,7 +68,7 @@ class TagCloudBlock extends Component {
 			termList,
 			className,
 		} = this.props;
-		const { taxonomySlug, showTagCounts, align } = attributes;
+		const { taxonomy, showTagCounts, align } = attributes;
 		const taxonomies = this.getTaxonomies();
 		const options = [
 			{
@@ -95,7 +93,7 @@ class TagCloudBlock extends Component {
 				<SelectControl
 					label={ __( 'Taxonomy' ) }
 					options={ options }
-					value={ taxonomySlug }
+					value={ taxonomy }
 					onChange={ this.setTaxonomy }
 				/>
 				<ToggleControl
@@ -106,7 +104,7 @@ class TagCloudBlock extends Component {
 			</InspectorControls>
 		);
 
-		if ( ! taxonomySlug ) {
+		if ( ! taxonomy ) {
 			return [
 				inspectorControls,
 				<Placeholder
@@ -141,8 +139,8 @@ class TagCloudBlock extends Component {
 	}
 }
 
-export default withAPIData( props => {
-	const { taxonomyRestBase } = props.attributes;
+export default withAPIData( ( props, { taxonomy } ) => {
+	const taxonomyRestBase = taxonomy( props.attributes.taxonomy );
 	const queryString = stringify( {
 		hide_empty: true,
 		per_page: 100,
