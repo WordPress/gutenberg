@@ -144,8 +144,7 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 // Formatting Buttons
 @mixin formatting-button-style__hover {
 	color: $dark-gray-500;
-	border: 1px solid $dark-gray-500;
-	box-shadow: inset 0 0 0 1px $white;
+	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
 }
 
 @mixin formatting-button-style__active() {
@@ -156,9 +155,11 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 }
 
 @mixin formatting-button-style__focus() {
-	outline: none;
-	border: 1px solid $dark-gray-500;
-	box-shadow: inset 0 0 0 1px $white;
+	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow
+	outline: 2px solid transparent;
+	outline-offset: -2px;
 }
 
 // Tabs, Inputs, Square buttons
