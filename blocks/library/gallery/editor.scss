@@ -18,10 +18,7 @@
 		width: 100%;
 	}
 
-	// last-of-type is used because RichText creates to figcations when placeholders are visible,
-	// and in that case only the second one should be targeted.
-	// Using data-is-placeholder-visible caused blinks because the attributes are not immediately added to the dom.
-	.blocks-rich-text figcaption:last-of-type {
+	.blocks-rich-text figcaption:not( [data-is-placeholder-visible="true"] ) {
 		position: relative;
 	}
 
