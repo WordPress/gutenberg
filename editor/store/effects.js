@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, has, includes, map, castArray, uniqueId, reduce, values, some, forEach, find } from 'lodash';
+import { get, has, includes, map, castArray, uniqueId, reduce, values, some, forEach, find, defaults } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -520,17 +520,19 @@ export default {
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 	FETCH_TAXONOMIES( action, store ) {
-		// Only proceed if the api collections has the Taxonomies class
-		if ( ! has( wp, 'api.collections.Taxonomies' ) ) {
-			// TODO: Use more appropriate error
+		const dispatchFailure = ( error ) => {
+			error = defaults( error, {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
+			} );
 			dispatch( {
 				type: 'FETCH_TAXONOMIES_FAILURE',
-				error: {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				},
+				error,
 			} );
-			return;
+		};
+
+		if ( ! has( wp, 'api.collections.Taxonomies' ) ) {
+			return dispatchFailure();
 		}
 
 		const { dispatch } = store;
@@ -554,62 +556,45 @@ export default {
 				} );
 			} );
 		}, ( err ) => {
-			dispatch( {
-				type: 'FETCH_TAXONOMIES_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
-			} );
+			dispatchFailure( err.responseJSON );
 		} );
 	},
 	FETCH_TAXONOMY_TERMS( action, store ) {
 		const { getState, dispatch } = store;
 		const state = getState();
+		const { taxonomySlug } = action;
 
-		// Only proceed if the state knows about this taxonomy
-		if ( ! has( state, `taxonomies.data.${ action.taxonomy }` ) ) {
-			// TODO: Use more appropriate error
-			dispatch( {
-				type: 'FETCH_TAXONOMIES_FAILURE',
-				error: {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				},
+		const dispatchFailure = ( error ) => {
+			error = defaults( error, {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
 			} );
-			return;
+			dispatch( {
+				type: 'FETCH_TAXONOMY_TERMS_FAILURE',
+				error,
+			} );
+		};
+
+		if ( ! has( state, `taxonomies.data.${ taxonomySlug }` ) ) {
+			return dispatchFailure();
 		}
 
-		const taxonomy = state.taxonomies.data[ action.taxonomy ];
-
+		const taxonomy = state.taxonomies.data[ taxonomySlug ];
 		const TaxonomyCollection = wp.api.getTaxonomyCollection( taxonomy.slug );
-		// Only proceed if the api collections has this taxonomy class
+
 		if ( ! TaxonomyCollection ) {
-			dispatch( {
-				type: 'FETCH_TAXONOMIES_FAILURE',
-				error: {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				},
-			} );
-			return;
+			return dispatchFailure();
 		}
 
 		const collection = new TaxonomyCollection();
 		collection.fetch().then( ( taxonomyTerms ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
-				taxonomy: action.taxonomy,
+				taxonomy: taxonomySlug,
 				taxonomyTerms,
 			} );
 		}, ( err ) => {
-			dispatch( {
-				type: 'FETCH_TAXONOMY_TERMS_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
-			} );
+			dispatchFailure( err.responseJSON );
 		} );
 	},
 	ADD_TAXONOMY_TERM( action, store ) {
@@ -622,17 +607,19 @@ export default {
 		} = action;
 		let termParentId = action.termParentId;
 
-		// Only proceed if the state knows about this taxonomy
-		if ( ! has( state, `taxonomies.data.${ taxonomySlug }` ) ) {
-			// TODO: Use more appropriate error
+		const dispatchFailure = ( error ) => {
+			error = defaults( error, {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
+			} );
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_FAILURE',
-				error: {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				},
+				error,
 			} );
-			return;
+		};
+
+		if ( ! has( state, `taxonomies.data.${ taxonomySlug }` ) ) {
+			return dispatchFailure();
 		}
 
 		const taxonomy = state.taxonomies.data[ taxonomySlug ];
@@ -641,16 +628,8 @@ export default {
 		}
 
 		const TaxonomyCollection = wp.api.getTaxonomyCollection( taxonomy.slug );
-		// Only proceed if the api collections has this taxonomy class
 		if ( ! TaxonomyCollection ) {
-			dispatch( {
-				type: 'ADD_TAXONOMY_TERM_FAILURE',
-				error: {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				},
-			} );
-			return;
+			return dispatchFailure();
 		}
 
 		const collection = new TaxonomyCollection();
@@ -674,11 +653,7 @@ export default {
 				} )
 			);
 		}, ( err ) => {
-			const error = get( err, 'responseJSON', {
-				code: 'unknown_error',
-				message: __( 'An unknown error occurred.' ),
-			} );
-			if ( error.code === 'term_exists' ) {
+			if ( err.responseJSON && err.responseJSON.code === 'term_exists' ) {
 				dispatch( {
 					type: 'FETCH_AND_ADD_TAXONOMY_TERM',
 					termName: action.termName,
@@ -686,26 +661,16 @@ export default {
 					taxonomy: taxonomy,
 					taxonomyRestBase: action.taxonomyRestBase,
 				} );
-				return;
+			} else {
+				dispatchFailure( err.responseJSON );
 			}
-			dispatch( {
-				type: 'ADD_TAXONOMY_TERM_FAILURE',
-				error: error,
-			} );
 		}, ( err ) => {
-			dispatch( {
-				type: 'ADD_TAXONOMY_TERM_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
-			} );
+			dispatchFailure( err.responseJSON );
 		} );
 	},
 	FETCH_AND_ADD_TAXONOMY_TERM( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
-
 		const {
 			termName,
 			taxonomy,
@@ -713,25 +678,27 @@ export default {
 		} = action;
 		let termParentId = action.termParentId;
 
+		const dispatchFailure = ( error ) => {
+			error = defaults( error, {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
+			} );
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				error,
+			} );
+		};
+
 		if ( ! taxonomy.hierarchical || ! termParentId ) {
 			termParentId = undefined;
 		}
 
 		const TaxonomyCollection = wp.api.getTaxonomyCollection( taxonomy.slug );
-		// Only proceed if the api collections has this taxonomy class
 		if ( ! TaxonomyCollection ) {
-			dispatch( {
-				type: 'ADD_TAXONOMY_TERM_FAILURE',
-				error: {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				},
-			} );
-			return;
+			return dispatchFailure();
 		}
 
 		const collection = new TaxonomyCollection();
-
 		const DEFAULT_QUERY = {
 			per_page: 100,
 			orderby: 'count',
@@ -746,9 +713,11 @@ export default {
 			},
 		} ).then( results => {
 			const taxonomyTerm = find( results, { name: termName } );
+			// This should never be an possible
 			if ( ! taxonomyTerm ) {
-				throw 'How in the world?';
+				return dispatchFailure();
 			}
+
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_SUCCESS',
 				taxonomyTerm: taxonomyTerm,
@@ -762,13 +731,7 @@ export default {
 				} )
 			);
 		}, err => {
-			dispatch( {
-				type: 'ADD_TAXONOMY_TERM_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
-			} );
+			dispatchFailure( err.responseJSON );
 		} );
 	},
 };

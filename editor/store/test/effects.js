@@ -905,6 +905,63 @@ describe( 'effects', () => {
 					} );
 				} );
 			} );
+
+			it( 'should dispatch a failure action when something goes wrong', () => {
+				const promise = Promise.reject( {
+					responseJSON: {
+						code: 'unauthorized',
+						message: 'Not allowed',
+					},
+				} );
+
+				set( global, 'wp.api.collections.Taxonomies', class {
+					fetch() {
+						return promise;
+					}
+				} );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => {}, dispatch };
+
+				handler( fetchTaxonomies( 'post' ), store );
+
+				expect.assertions( 1 );
+				return promise.catch( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMIES_FAILURE',
+						error: {
+							code: 'unauthorized',
+							message: 'Not allowed',
+						},
+					} );
+				} );
+			} );
+
+			it( 'should dispatch a failure action with a default error when something goes wrong', () => {
+				const promise = Promise.reject( {} );
+
+				set( global, 'wp.api.collections.Taxonomies', class {
+					fetch() {
+						return promise;
+					}
+				} );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => {}, dispatch };
+
+				handler( fetchTaxonomies( 'post' ), store );
+
+				expect.assertions( 1 );
+				return promise.catch( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMIES_FAILURE',
+						error: {
+							code: 'unknown_error',
+							message: 'An unknown error occurred.',
+						},
+					} );
+				} );
+			} );
 		} );
 
 		describe( '.FETCH_TAXONOMY_TERMS', () => {
@@ -985,6 +1042,44 @@ describe( 'effects', () => {
 								parent: 5,
 							},
 						],
+					} );
+				} );
+			} );
+
+			it( 'should dispatch a failure action when something goes wrong', () => {
+				const promise = Promise.reject( {} );
+
+				const getTaxonomyCollection = jest.fn();
+				getTaxonomyCollection.mockReturnValue( class {
+					fetch() {
+						return promise;
+					}
+				} );
+				set( global, 'wp.api.getTaxonomyCollection', getTaxonomyCollection );
+
+				const dispatch = jest.fn();
+				const getState = jest.fn();
+				getState.mockReturnValue( {
+					taxonomies: {
+						data: {
+							category: {
+								slug: 'category',
+							},
+						},
+					},
+				} );
+				const store = { getState, dispatch };
+
+				handler( fetchTaxonomyTerms( 'category' ), store );
+
+				expect.assertions( 1 );
+				return promise.catch( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMY_TERMS_FAILURE',
+						error: {
+							code: 'unknown_error',
+							message: 'An unknown error occurred.',
+						},
 					} );
 				} );
 			} );
@@ -1087,6 +1182,46 @@ describe( 'effects', () => {
 						taxonomyRestBase: 'categories',
 						taxonomy: {
 							slug: 'category',
+						},
+					} );
+				} );
+			} );
+
+			it( 'should dispatch a failure action when something goes wrong', () => {
+				const promise = Promise.reject( {} );
+
+				const getTaxonomyCollection = jest.fn();
+				getTaxonomyCollection.mockReturnValue( class {
+					fetch() {
+						return promise;
+					}
+				} );
+				set( global, 'wp.api.getTaxonomyCollection', getTaxonomyCollection );
+
+				const getState = jest.fn();
+				const dispatch = jest.fn();
+				getState.mockReturnValue( {
+					taxonomies: {
+						data: {
+							category: {
+								slug: 'category',
+							},
+						},
+					},
+					currentPost: {
+						categories: [],
+					},
+				} );
+				const store = { getState, dispatch };
+
+				handler( addTaxonomyTerm( 'category', 'categories', 'categoryName', null ), store );
+				expect.assertions( 1 );
+				return promise.catch( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'ADD_TAXONOMY_TERM_FAILURE',
+						error: {
+							code: 'unknown_error',
+							message: 'An unknown error occurred.',
 						},
 					} );
 				} );
