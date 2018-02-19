@@ -22,7 +22,7 @@ import {
  * Internal dependencies
  */
 import MediaUpload from '../../media-upload';
-import ImagePlaceHolder from '../../image-placeholder';
+import ImagePlaceholder from '../../image-placeholder';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -188,7 +188,7 @@ class GalleryBlock extends Component {
 		if ( images.length === 0 ) {
 			return [
 				controls,
-				<ImagePlaceHolder key="gallery-placeholder"
+				<ImagePlaceholder key="gallery-placeholder"
 					className={ className }
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
