@@ -176,7 +176,7 @@ export const settings = {
 
 	supports: {
 		align: true,
-		wideAlign: false,
+		alignWide: false,
 	},
 
 	getEditWrapperProps( attributes ) {

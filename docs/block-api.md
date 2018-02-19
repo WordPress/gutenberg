@@ -278,6 +278,12 @@ align: true,
 align: [ 'left', 'right', 'full' ],
 ```
 
+- `alignWide` (default `true`): Gutenberg allows to enable [wide alignment](https://wordpress.org/gutenberg/handbook/extensibility/theme-support/#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+
+```js
+// Remove the support for wide alignment.
+alignWide: false,
+```
 
 - `anchor` (default `false`): Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
@@ -305,13 +311,6 @@ className: false,
 ```js
 // Remove the support for the HTML mode.
 html: false,
-```
-
-- `wideAlign` (default `true`): Gutenberg allows to enable [wide alignment](https://wordpress.org/gutenberg/handbook/extensibility/theme-support/#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
-
-```js
-// Remove the support for wide alignment.
-wideAlign: false,
 ```
 
 ## Edit and Save
