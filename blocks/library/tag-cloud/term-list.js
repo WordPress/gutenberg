@@ -3,7 +3,7 @@
  *
  * @param {Array} terms The list of terms.
  *
- * @return {Array} Array of terms with font scale.
+ * @return {Array} Array of scaled font sizes.
  */
 function calculateFontSizes( terms ) {
 	const MIN = 8;
@@ -11,8 +11,7 @@ function calculateFontSizes( terms ) {
 	const UNIT = 'pt';
 
 	// Sort terms by post count ascending
-	const sortedTerms = terms.slice();
-	sortedTerms.sort( ( a, b ) => a.count - b.count );
+	const sortedTerms = terms.slice().sort( ( a, b ) => a.count - b.count );
 
 	// Get first and last items in array to know
 	// the lowest and highest post count in list
@@ -23,13 +22,11 @@ function calculateFontSizes( terms ) {
 	const fontStep = ( MAX - MIN ) / range;
 
 	// Calculate font size for each term
-	terms.forEach( ( term, i ) => {
+	return terms.map( term => {
 		const countWeight = term.count - lowestCount;
-		const fontSize = MIN + ( countWeight * fontStep );
-		terms[ i ].fontScale = `${ fontSize }${ UNIT }`;
+		const fontSize = MIN + ( countWeight * fontStep ) + UNIT;
+		return fontSize;
 	} );
-
-	return terms;
 }
 
 function TermList( { terms, showTagCounts, ...rest } ) {
@@ -41,7 +38,7 @@ function TermList( { terms, showTagCounts, ...rest } ) {
 				<a
 					key={ i }
 					href={ term.link }
-					style={ { fontSize: termFontSizes[ i ].fontScale } }
+					style={ { fontSize: termFontSizes[ i ] } }
 					target="_blank"
 				>
 					{ term.name }
