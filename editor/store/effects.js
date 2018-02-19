@@ -549,10 +549,10 @@ export default {
 				type: 'FETCH_TAXONOMIES_SUCCESS',
 				taxonomies,
 			} );
-			forEach( taxonomies, function( taxonomy, key ) {
+			forEach( taxonomies, function( taxonomy, taxonomySlug ) {
 				dispatch( {
 					type: 'FETCH_TAXONOMY_TERMS',
-					taxonomy: key,
+					taxonomySlug,
 				} );
 			} );
 		}, ( err ) => {
@@ -590,7 +590,7 @@ export default {
 		collection.fetch().then( ( taxonomyTerms ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
-				taxonomy: taxonomySlug,
+				taxonomySlug,
 				taxonomyTerms,
 			} );
 		}, ( err ) => {

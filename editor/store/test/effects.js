@@ -897,11 +897,11 @@ describe( 'effects', () => {
 					} );
 					expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( {
 						type: 'FETCH_TAXONOMY_TERMS',
-						taxonomy: 'category',
+						taxonomySlug: 'category',
 					} );
 					expect( dispatch.mock.calls[ 2 ][ 0 ] ).toEqual( {
 						type: 'FETCH_TAXONOMY_TERMS',
-						taxonomy: 'post_tag',
+						taxonomySlug: 'post_tag',
 					} );
 				} );
 			} );
@@ -1018,7 +1018,7 @@ describe( 'effects', () => {
 				return promise.then( () => {
 					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
 						type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
-						taxonomy: 'category',
+						taxonomySlug: 'category',
 						taxonomyTerms: [
 							{
 								id: 1,

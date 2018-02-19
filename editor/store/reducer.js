@@ -950,19 +950,19 @@ export const taxonomyTerms = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
 			case 'FETCH_TAXONOMY_TERMS_SUCCESS': {
-				const { taxonomy } = action;
+				const { taxonomySlug } = action;
 				return {
 					...state,
-					[ taxonomy ]: action.taxonomyTerms,
+					[ taxonomySlug ]: action.taxonomyTerms,
 				};
 			}
 			case 'ADD_TAXONOMY_TERM_SUCCESS': {
 				const { taxonomyTerm } = action;
-				const taxonomy = taxonomyTerm.taxonomy;
+				const taxonomySlug = taxonomyTerm.taxonomy;
 				return {
 					...state,
-					[ taxonomy ]: [
-						...state[ taxonomy ],
+					[ taxonomySlug ]: [
+						...state[ taxonomySlug ],
 						taxonomyTerm,
 					],
 				};
@@ -975,10 +975,10 @@ export const taxonomyTerms = combineReducers( {
 	fetchStatus( state = {}, action ) {
 		switch ( action.type ) {
 			case 'FETCH_TAXONOMY_TERMS': {
-				const { taxonomy } = action;
+				const { taxonomySlug } = action;
 				return {
 					...state,
-					[ taxonomy ]: {
+					[ taxonomySlug ]: {
 						requesting: true,
 						successful: false,
 						error: null,
@@ -986,10 +986,10 @@ export const taxonomyTerms = combineReducers( {
 				};
 			}
 			case 'FETCH_TAXONOMY_TERMS_SUCCESS': {
-				const { taxonomy } = action;
+				const { taxonomySlug } = action;
 				return {
 					...state,
-					[ taxonomy ]: {
+					[ taxonomySlug ]: {
 						requesting: false,
 						successful: true,
 						error: null,
@@ -997,10 +997,10 @@ export const taxonomyTerms = combineReducers( {
 				};
 			}
 			case 'FETCH_TAXONOMY_TERMS_FAILURE': {
-				const { error, taxonomy } = action;
+				const { error, taxonomySlug } = action;
 				return {
 					...state,
-					[ taxonomy ]: {
+					[ taxonomySlug ]: {
 						requesting: false,
 						successful: false,
 						error,

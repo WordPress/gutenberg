@@ -1914,7 +1914,7 @@ describe( 'state', () => {
 			const initialState = {
 				data: {},
 				fetchStatus: {
-					tags: {
+					post_tag: {
 						requesting: true,
 						successful: false,
 						error: null,
@@ -1924,18 +1924,18 @@ describe( 'state', () => {
 
 			const state = taxonomyTerms( initialState, {
 				type: 'FETCH_TAXONOMY_TERMS',
-				taxonomy: 'categories',
+				taxonomySlug: 'category',
 			} );
 
 			expect( state ).toEqual( {
 				data: {},
 				fetchStatus: {
-					tags: {
+					post_tag: {
 						requesting: true,
 						successful: false,
 						error: null,
 					},
-					categories: {
+					category: {
 						requesting: true,
 						successful: false,
 						error: null,
@@ -1948,7 +1948,7 @@ describe( 'state', () => {
 			const initialState = {
 				data: {},
 				fetchStatus: {
-					tags: {
+					post_tag: {
 						requesting: true,
 						successful: false,
 						error: null,
@@ -1958,16 +1958,16 @@ describe( 'state', () => {
 
 			const state = taxonomyTerms( initialState, {
 				type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
-				taxonomy: 'tags',
+				taxonomySlug: 'post_tag',
 				taxonomyTerms: [],
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					tags: [],
+					post_tag: [],
 				},
 				fetchStatus: {
-					tags: {
+					post_tag: {
 						requesting: false,
 						successful: true,
 						error: null,
@@ -1980,7 +1980,7 @@ describe( 'state', () => {
 			const initialState = {
 				data: {},
 				fetchStatus: {
-					tags: {
+					post_tag: {
 						requesting: true,
 						successful: false,
 						error: null,
@@ -1990,14 +1990,14 @@ describe( 'state', () => {
 
 			const state = taxonomyTerms( initialState, {
 				type: 'FETCH_TAXONOMY_TERMS_FAILURE',
-				taxonomy: 'tags',
+				taxonomySlug: 'post_tag',
 				error: 'Some arbitrary error',
 			} );
 
 			expect( state ).toEqual( {
 				data: {},
 				fetchStatus: {
-					tags: {
+					post_tag: {
 						requesting: false,
 						successful: false,
 						error: 'Some arbitrary error',
