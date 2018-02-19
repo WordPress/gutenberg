@@ -28,20 +28,11 @@ export const settings = {
 		taxonomy: {
 			type: 'string',
 		},
-		align: {
-			type: 'string',
-		},
 	},
 
 	supports: {
 		html: false,
-	},
-
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
+		align: true,
 	},
 
 	edit: TagCloudBlock,
