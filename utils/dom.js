@@ -366,3 +366,18 @@ export function getScrollContainer( node ) {
 	// Continue traversing
 	return getScrollContainer( node.parentNode );
 }
+
+/**
+ * Given a DOM node, returns whether the node is editable or not.
+ *
+ * @param {Element} node Node to check
+ *
+ * @return {boolean}     Whether the node is editable or not
+ */
+export function isEditableNode( node ) {
+	return (
+		node.nodeName === 'INPUT' ||
+		node.nodeName === 'TEXTAREA' ||
+		node.contentEditable === 'true'
+	);
+}
