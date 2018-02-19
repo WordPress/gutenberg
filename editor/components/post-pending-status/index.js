@@ -26,7 +26,6 @@ export function PostPendingStatus( { status, onUpdateStatus } ) {
 	return (
 		<PostPendingStatusCheck>
 			<ToggleControl
-				key="toggle"
 				label={ __( 'Pending Review' ) }
 				checked={ status === 'pending' }
 				onChange={ togglePendingStatus }

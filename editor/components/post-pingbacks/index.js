@@ -18,15 +18,14 @@ import { editPost } from '../../store/actions';
 function PostPingbacks( { pingStatus = 'open', ...props } ) {
 	const onTogglePingback = () => props.editPost( { ping_status: pingStatus === 'open' ? 'closed' : 'open' } );
 
-	return [
+	return (
 		<ToggleControl
-			key="toggle"
 			label={ __( 'Allow Pingbacks & Trackbacks' ) }
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }
 			showHint={ false }
-		/>,
-	];
+		/>
+	);
 }
 
 export default connect(

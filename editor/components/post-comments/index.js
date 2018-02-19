@@ -20,7 +20,6 @@ function PostComments( { commentStatus = 'open', ...props } ) {
 
 	return (
 		<ToggleControl
-			key="toggle"
 			label={ __( 'Allow Comments' ) }
 			checked={ commentStatus === 'open' }
 			onChange={ onToggleComments }
