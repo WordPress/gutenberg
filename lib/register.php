@@ -526,9 +526,9 @@ add_filter( 'wp_prepare_revision_for_js', 'gutenberg_revisions_restore' );
  */
 function gutenberg_oembed_opengraph( $url ) {
 	$cache_key = 'gutenberg_opengraph_' . md5( $url );
-	$html = get_transient( $cache_key );
+	$html      = get_transient( $cache_key );
 
-	// empty string means we tried to get OpenGraph information for this url, but it had none
+	// Empty string means we tried to get OpenGraph information for this url, but it had none.
 	if ( '' === $html ) {
 		return false;
 	}
@@ -541,8 +541,7 @@ function gutenberg_oembed_opengraph( $url ) {
 		$url,
 		array(
 			'limit_response_size' => 250000,
-			// set a user agent, or else some sites block the request
-			'user-agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:20.0) Gecko/20100101 Firefox/20.0'
+			'user-agent'          => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:20.0) Gecko/20100101 Firefox/20.0',
 		)
 	);
 
@@ -601,17 +600,17 @@ function gutenberg_oembed_fallback( $response, $handler, $request ) {
 		}
 
 		return  array(
-			'url'   => $url,
-			'html'  => $html,
-			'type'  => 'opengraph',
+			'url'  => $url,
+			'html' => $html,
+			'type' => 'opengraph',
 		);
 	}
 
 	return $response;
 }
 
-// potentially return an OpenGraph response if the embed proxy API cannot embed
+// Potentially return an OpenGraph response if the embed proxy API cannot embed.
 add_filter( 'rest_request_after_callbacks', 'gutenberg_oembed_fallback', 10, 3 );
 
-// fires if there are no providers for a URL, so do the OpenGraph stuff here
+// Fires if there are no providers for a URL, so do the OpenGraph stuff here.
 add_filter( 'embed_maybe_make_link', 'gutenberg_oembed_opengraph' );
