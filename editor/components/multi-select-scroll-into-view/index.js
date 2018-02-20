@@ -8,11 +8,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { Component } from '@wordpress/element';
 import { query } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { getScrollContainer } from '../../utils/dom';
+import { getScrollContainer } from '@wordpress/utils';
 
 class MultiSelectScrollIntoView extends Component {
 	componentDidUpdate() {
