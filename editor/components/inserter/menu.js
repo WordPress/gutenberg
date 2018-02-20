@@ -229,7 +229,7 @@ export class InserterMenu extends Component {
 		if ( 'saved' === tab && itemsForTab.length === 0 ) {
 			return (
 				<NoBlocks>
-					No saved blocks
+					{ __( 'No saved blocks.' ) }
 				</NoBlocks>
 			);
 		}
