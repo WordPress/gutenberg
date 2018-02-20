@@ -38,4 +38,4 @@ Launches the test runner. It uses [Jest](https://facebook.github.io/jest/) behin
 
 This is inspired by [react-scripts](https://www.npmjs.com/package/react-scripts) and [kcd-scripts](https://www.npmjs.com/package/kcd-scripts).
 
-<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

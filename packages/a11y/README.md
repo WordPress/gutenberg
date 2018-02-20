@@ -50,4 +50,4 @@ For context I'll quote [this article on WordPress.org](https://make.wordpress.or
 
 See https://make.wordpress.org/design/handbook/design-guide/browser-support/
 
-<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

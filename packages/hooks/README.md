@@ -50,4 +50,4 @@ Whenever an action or filter is added or removed, a matching `hookAdded` or `hoo
 * `hookAdded` action is triggered when `addFilter()` or `addAction()` method is called, passing values for `hookName`, `functionName`, `callback` and `priority`.
 * `hookRemoved` action is triggered when `removeFilter()` or `removeAction()` method is called, passing values for `hookName` and `functionName`.
 
-<br/><br/>![Code is Poetry.](https://cldup.com/ZdtsUVg_V3.png)
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
