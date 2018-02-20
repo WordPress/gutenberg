@@ -12,9 +12,9 @@ import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
 import EditorActions from '../editor-actions';
 
-const element = (
+const MoreMenu = () => (
 	<Dropdown
-		className="edit-post-ellipsis-menu"
+		className="edit-post-more-menu"
 		position="bottom left"
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
@@ -27,17 +27,13 @@ const element = (
 		renderContent={ ( { onClose } ) => (
 			<div>
 				<ModeSwitcher onSelect={ onClose } />
-				<div className="edit-post-ellipsis-menu__separator" />
+				<div className="edit-post-more-menu__separator" />
 				<FixedToolbarToggle onToggle={ onClose } />
-				<div className="edit-post-ellipsis-menu__separator" />
+				<div className="edit-post-more-menu__separator" />
 				<EditorActions />
 			</div>
 		) }
 	/>
 );
 
-function EllipsisMenu() {
-	return element;
-}
-
-export default EllipsisMenu;
+export default MoreMenu;

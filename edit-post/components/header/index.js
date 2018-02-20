@@ -18,7 +18,7 @@ import {
  * Internal dependencies
  */
 import './style.scss';
-import EllipsisMenu from './ellipsis-menu';
+import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
 import { isSidebarOpened } from '../../store/selectors';
 import { toggleSidebar } from '../../store/actions';
@@ -52,7 +52,7 @@ function Header( {
 						label={ __( 'Settings' ) }
 						aria-expanded={ isDefaultSidebarOpened }
 					/>
-					<EllipsisMenu key="ellipsis-menu" />
+					<MoreMenu key="more-menu" />
 				</div>
 			) }
 		</div>
