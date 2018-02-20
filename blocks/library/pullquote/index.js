@@ -36,10 +36,6 @@ const blockAttributes = {
 		source: 'children',
 		selector: 'cite',
 	},
-	align: {
-		type: 'string',
-		default: 'none',
-	},
 };
 
 export const name = 'core/pullquote';
@@ -100,10 +96,10 @@ export const settings = {
 	} ),
 
 	save( { attributes } ) {
-		const { value, citation, align } = attributes;
+		const { value, citation } = attributes;
 
 		return (
-			<blockquote className={ `align${ align }` }>
+			<blockquote>
 				{ value && value.map( ( paragraph, i ) =>
 					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
 				) }
@@ -117,6 +113,10 @@ export const settings = {
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
+			align: {
+				type: 'string',
+				default: 'none',
+			},
 			citation: {
 				type: 'array',
 				source: 'children',

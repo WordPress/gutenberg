@@ -149,10 +149,6 @@ const blockAttributes = {
 		source: 'children',
 		selector: 'a',
 	},
-	align: {
-		type: 'string',
-		default: 'none',
-	},
 	color: {
 		type: 'string',
 	},
@@ -193,7 +189,7 @@ export const settings = {
 	edit: ButtonBlock,
 
 	save( { attributes } ) {
-		const { url, text, title, align, color, textColor } = attributes;
+		const { url, text, title, color, textColor } = attributes;
 
 		const buttonStyle = {
 			backgroundColor: color,
@@ -203,7 +199,7 @@ export const settings = {
 		const linkClass = 'wp-block-button__link';
 
 		return (
-			<div className={ `align${ align }` }>
+			<div>
 				<a className={ linkClass } href={ url } title={ title } style={ buttonStyle }>
 					{ text }
 				</a>
@@ -212,7 +208,13 @@ export const settings = {
 	},
 
 	deprecated: [ {
-		attributes: blockAttributes,
+		attributes: {
+			...blockAttributes,
+			align: {
+				type: 'string',
+				default: 'none',
+			},
+		},
 
 		save( { attributes } ) {
 			const { url, text, title, align, color, textColor } = attributes;

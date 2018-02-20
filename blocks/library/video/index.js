@@ -157,10 +157,10 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { src, caption, align } = attributes;
+		const { src, caption } = attributes;
 		return (
 
-			<figure className={ align ? `align${ align }` : null }>
+			<figure>
 				{ src && <video controls src={ src } /> }
 				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>

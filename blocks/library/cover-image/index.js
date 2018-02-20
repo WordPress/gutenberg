@@ -196,7 +196,7 @@ export const settings = {
 	},
 
 	save( { attributes, className } ) {
-		const { url, title, hasParallax, dimRatio, align, contentAlign } = attributes;
+		const { url, title, hasParallax, dimRatio, contentAlign } = attributes;
 		const style = url ?
 			{ backgroundImage: `url(${ url })` } :
 			undefined;
@@ -208,7 +208,6 @@ export const settings = {
 				'has-parallax': hasParallax,
 				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
 			},
-			align ? `align${ align }` : null,
 		);
 
 		return (

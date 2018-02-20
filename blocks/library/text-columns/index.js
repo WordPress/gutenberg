@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { times } from 'lodash';
 
 /**
@@ -60,6 +61,10 @@ export const settings = {
 
 	edit( { attributes, setAttributes, className, isSelected } ) {
 		const { width, content, columns } = attributes;
+		const blockClassName = classnames( className, {
+			[ `columns-${ columns }` ]: true,
+			[ `align${ width }` ]: width,
+		} );
 
 		return [
 			isSelected && (
@@ -82,7 +87,7 @@ export const settings = {
 					/>
 				</InspectorControls>
 			),
-			<div className={ `${ className } align${ width } columns-${ columns }` } key="block">
+			<div className={ blockClassName } key="block">
 				{ times( columns, ( index ) =>
 					<div className="wp-block-column" key={ `column-${ index }` }>
 						<RichText

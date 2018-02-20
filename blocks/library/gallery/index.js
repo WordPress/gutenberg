@@ -18,10 +18,6 @@ import { createBlock } from '../../api';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
 const blockAttributes = {
-	align: {
-		type: 'string',
-		default: 'none',
-	},
 	images: {
 		type: 'array',
 		default: [],
@@ -173,9 +169,9 @@ export const settings = {
 	edit: GalleryBlock,
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
 		return (
-			<ul className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+			<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
 				{ images.map( ( image ) => {
 					let href;
 
@@ -207,6 +203,10 @@ export const settings = {
 		{
 			attributes: {
 				...blockAttributes,
+				align: {
+					type: 'string',
+					default: 'none',
+				},
 				images: {
 					...blockAttributes.images,
 					selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
