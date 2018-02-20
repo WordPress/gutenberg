@@ -6,7 +6,7 @@ import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 export default function EditorActions() {
-	const tools = applyFilters( 'editPost.EditorActions.tools', [] );
+	const tools = applyFilters( 'editPost.MoreMenu.tools', [] );
 	return tools.length ? (
 		<MenuItemsGroup key="tools"
 			className="edit-post-actions"
