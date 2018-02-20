@@ -157,6 +157,17 @@
 		}
 	}
 
+	// Apply max-width to floated items that have no intrinsic width, like Cover Image or Gallery
+	&[data-align="left"],
+	&[data-align="right"] {
+		&[data-type="core/cover-image"] .editor-block-list__block-edit,
+		&[data-type="core/gallery"] .editor-block-list__block-edit,
+		&[data-resized="false"] .editor-block-list__block-edit {
+			max-width: 360px;
+			width: 100%;
+		}
+	}
+
 	// Left
 	&[data-align="left"] {
 		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
