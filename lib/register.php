@@ -565,15 +565,48 @@ function gutenberg_oembed_opengraph( $url ) {
 	if ( ! $image && ! $desc ) {
 		$html = '';
 	} else {
-		$html = '<blockquote style="margin: 0; border: 1px solid #e1e3e6; border-radius: 4px; padding: 8px; overflow: hidden; height: 96px">';
+		$html = '<blockquote>';
 		if ( $image ) {
-			$html .= "<img src=\"$image\" style=\"width: 96px; height: 96px; object-fit: cover; float: left; margin-right: 1em\" />";
+			$html .= "<img src=\"$image\" />";
 		}
-		$html .= "<h1 style=\"font-size: 13px; margin: 0\"><a href=\"$url\" style=\"color: #007daa;\">$title</a></h1>";
+		$html .= "<h1><a href=\"$url\">$title</a></h1>";
 		if ( $desc ) {
-			$html .= "<p style=\"margin: 0\">$desc</p>";
+			$html .= "<p>$desc</p>";
 		}
 		$html .= '</blockquote>';
+		$html .= '<style type="text/css">
+		body.opengraph blockquote,
+		.is-type-opengraph blockquote {
+			margin: 0;
+			border: 1px solid #e1e3e6;
+			border-radius: 4px;
+			padding: 8px;
+			overflow: hidden;
+			height: 96px;
+			box-sizing: content-box;
+			-moz-box-sizing: content-box;
+			-webkit-box-sizing: content-box;
+		}
+		body.opengraph img,
+		.is-type-opengraph img {
+			width: 96px;
+			height: 96px;
+			object-fit: cover;
+			float: left;
+			margin-right: 1em;
+		}
+		body.opengraph p,
+		body.opengraph h1,
+		.is-type-opengraph p,
+		.is-type-opengraph h1 {
+			font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+			font-size: 13px;
+			margin: 0;
+		}
+		body.opengraph a {
+			color: #007daa;
+		}
+		</style>';
 	}
 
 	$ttl = apply_filters( 'gutenberg_opengraph_ttl', DAY_IN_SECONDS, $url );
