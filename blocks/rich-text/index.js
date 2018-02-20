@@ -225,6 +225,9 @@ export class RichText extends Component {
 
 	onInit() {
 		this.registerCustomFormatters();
+
+		const focusPosition = this.getFocusPosition();
+		this.setState( { focusPosition } );
 	}
 
 	adaptFormatter( options ) {
@@ -437,27 +440,13 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Calculates the relative position where the link toolbar should be.
+	 * Calculates relative position for a link modal in the formatting toolbar.
 	 *
-	 * Based on the selection of the text inside this element a position is
-	 * calculated where the toolbar should be. This can be used downstream to
-	 * absolutely position the toolbar. It does this by finding the closest
-	 * relative element.
-	 *
-	 * @return {{top: number, left: number}} The desired position of the toolbar.
+	 * @return {{top: number, left: number}} Link modal position.
 	 */
 	getFocusPosition() {
 		const position = this.getEditorSelectionRect();
-
-		// Find the parent "relative" or "absolute" positioned container
-		const findRelativeParent = ( node ) => {
-			const style = window.getComputedStyle( node );
-			if ( style.position === 'relative' || style.position === 'absolute' ) {
-				return node;
-			}
-			return findRelativeParent( node.parentNode );
-		};
-		const container = findRelativeParent( this.editor.getBody() );
+		const container = this.editor.getBody().closest( '.edit-post-visual-editor' );
 		const containerPosition = container.getBoundingClientRect();
 		const toolbarOffset = { top: 10, left: 0 };
 		const linkModalWidth = 298;

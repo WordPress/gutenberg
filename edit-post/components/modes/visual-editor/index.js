@@ -16,6 +16,7 @@ import {
 	MultiSelectScrollIntoView,
 } from '@wordpress/editor';
 import { Fragment } from '@wordpress/element';
+import { Slot } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -42,6 +43,7 @@ function VisualEditor( props ) {
 					) }
 				/>
 			</WritingFlow>
+			<Slot name="VisualEditor.LastChild" />
 		</BlockSelectionClearer>
 	);
 }

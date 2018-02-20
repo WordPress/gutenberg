@@ -64,7 +64,7 @@ class FormatToolbar extends Component {
 
 	onKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
-			if ( this.state.isEditingLink ) {
+			if ( this.state.isAddingLink || this.state.isEditingLink ) {
 				event.stopPropagation();
 				this.dropLink();
 			}
@@ -145,9 +145,9 @@ class FormatToolbar extends Component {
 				<Toolbar controls={ toolbarControls } />
 
 				{ ( isAddingLink || isEditingLink ) &&
-					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+					// Disable reason: KeyPress should be suppressed so parents are unaffected.
 					/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-					<Fill name="RichText.Siblings">
+					<Fill name="VisualEditor.LastChild">
 						<form
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
@@ -165,9 +165,9 @@ class FormatToolbar extends Component {
 				}
 
 				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
-					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+					// Disable reason: KeyPress should be suppressed so parents are unaffected.
 					/* eslint-disable jsx-a11y/no-static-element-interactions */
-					<Fill name="RichText.Siblings">
+					<Fill name="VisualEditor.LastChild">
 						<div
 							className="blocks-format-toolbar__link-modal"
 							style={ linkStyle }
