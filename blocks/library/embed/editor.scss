@@ -1,7 +1,15 @@
 .editor-block-list__block[data-type="core/embed"] {
 	&[data-align="left"],
 	&[data-align="right"] {
-		max-width: 100%;
+		float: none;
+	}
+
+	&[data-align="left"] .wp-block-embed {
+		float: left;
+	}
+
+	&[data-align="right"] .wp-block-embed {
+		float: right;
 	}
 }
 
@@ -14,7 +22,7 @@
 		width: 300px;
 		max-width: 100%;
 	}
-		
+
 	&.is-loading {
 		display: flex;
 		flex-direction: column;
