@@ -565,13 +565,13 @@ function gutenberg_oembed_opengraph( $url ) {
 	if ( ! $image && ! $desc ) {
 		$html = '';
 	} else {
-		$html = '<blockquote>';
+		$html = '<blockquote style="margin: 0; border: 1px solid #e1e3e6; border-radius: 4px; padding: 8px; overflow: hidden; height: 96px">';
 		if ( $image ) {
-			$html .= "<img src=\"$image\" />";
+			$html .= "<img src=\"$image\" style=\"width: 96px; height: 96px; object-fit: cover; float: left; margin-right: 1em\" />";
 		}
-		$html .= "<h1><a href=\"$url\">$title</a></h1>";
+		$html .= "<h1 style=\"font-size: 13px; margin: 0\"><a href=\"$url\" style=\"color: #007daa;\">$title</a></h1>";
 		if ( $desc ) {
-			$html .= "<p>$desc</p>";
+			$html .= "<p style=\"margin: 0\">$desc</p>";
 		}
 		$html .= '</blockquote>';
 	}

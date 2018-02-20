@@ -140,7 +140,6 @@ export default class Sandbox extends Component {
 		const style = `
 			body {
 				margin: 0;
-				font: 13px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
 			}
 			body.video,
 			body.video > div,
@@ -151,32 +150,6 @@ export default class Sandbox extends Component {
 			body > div > * {
 				margin-top: 0 !important;	/* has to have !important to override inline styles */
 				margin-bottom: 0 !important;
-			}
-			/* OpenGraph styles */
-			.opengraph blockquote {
-				margin: 0;
-				border: 1px solid #e1e3e6;
-				border-radius: 4px;
-				padding: 8px;
-				overflow: hidden;
-				height: 96px;
-			}
-			.opengraph img {
-				width: 96px;
-				height: 96px;
-				object-fit: cover;
-				float: left;
-				margin-right: 1em;
-			}
-			.opengraph h1 {
-				font-size: 13px;
-				margin: 0;
-			}
-			.opengraph p {
-				margin: 0;
-			}
-			.opengraph a {
-				color: #007daa;
 			}
 		`;
 
