@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, mount } from 'enzyme';
+import { render } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -12,7 +12,7 @@ import {
 	registerActions,
 	dispatch,
 	select,
-	query,
+	onSubscribe,
 	subscribe,
 } from '../';
 
@@ -59,15 +59,15 @@ describe( 'select', () => {
 	} );
 } );
 
-describe( 'query', () => {
+describe( 'onSubscribe', () => {
 	it( 'passes the relevant data to the component', () => {
 		registerReducer( 'reactReducer', () => ( { reactKey: 'reactState' } ) );
 		registerSelectors( 'reactReducer', {
 			reactSelector: ( state, key ) => state[ key ],
 		} );
-		const Component = query( ( selectFunc, ownProps ) => {
+		const Component = onSubscribe( ( ownProps ) => {
 			return {
-				data: selectFunc( 'reactReducer' ).reactSelector( ownProps.keyName ),
+				data: select( 'reactReducer' ).reactSelector( ownProps.keyName ),
 			};
 		} )( ( props ) => {
 			return <div>{ props.data }</div>;
@@ -76,32 +76,6 @@ describe( 'query', () => {
 		const tree = render( <Component keyName="reactKey" /> );
 
 		expect( tree ).toMatchSnapshot();
-	} );
-
-	it( 'passes the relevant actions to the component', () => {
-		const store = registerReducer( 'reactCounter', ( state = 0, action ) => {
-			if ( action.type === 'increment' ) {
-				return state + 1;
-			}
-			return state;
-		} );
-		const increment = () => ( { type: 'increment' } );
-		registerActions( 'reactCounter', {
-			increment,
-		} );
-		const Component = query( undefined, ( dispatchAction ) => ( {
-			onClick: () => dispatchAction( 'reactCounter' ).increment(),
-		} ) )( ( props ) => {
-			return <button onClick={ props.onClick }>Increment</button>;
-		} );
-
-		const tree = mount( <Component keyName="reactKey" /> );
-		const button = tree.find( 'button' );
-
-		button.simulate( 'click' ); // state = 1
-		button.simulate( 'click' ); // state = 2
-
-		expect( store.getState() ).toBe( 2 );
 	} );
 } );
 

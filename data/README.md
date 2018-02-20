@@ -78,39 +78,6 @@ This function allows calling any registered action. Given a module's key, this f
 wp.data.dispatch( 'myPlugin' ).setTitle( 'new Title' ); // Dispatches the setTitle action to the reducer
 ```
 
-### `wp.data.query( mapSelectorsToProps: function, mapDispatchToProps: function )( WrappedComponent: Component )`
-
-If you use a React or WordPress Element, a Higher Order Component is made available to inject data into your components like so:
-
-```js
-const Component = ( { title } ) => <div>{ title }</div>;
-
-wp.data.query( select => {
-	return {
-		title: select( 'myPlugin' ).getTitle(),
-	};
-} )( Component );
-```
-
-You can also use this Higher Order Component to provide action handlers to your components
-
-```js
-const Component = ( { title, updateTitle } ) => <input value={ title } onChange={ updateTitle } />;
-
-wp.data.query(
-	select => {
-		return {
-			title: select( 'myPlugin' ).getTitle(),
-		};
-	} ,
-	dispatch => ( {
-		updateTitle( event ) {
-			dispatch( 'myPlugin' ).setTitle( event.target.value )
-		}
-	} )
-)( Component );
-```
-
 ### `wp.data.subscribe( listener: function )`
 
 Function used to subscribe to data changes. The listener function is called each time a change is made to any of the registered reducers. This function returns a `unsubscribe` function used to abort the subscription.
@@ -127,4 +94,31 @@ const unsubscribe = wp.data.subscribe( () => {
 
 // Unsubcribe.
 unsubscribe();
+```
+
+### `wp.data.onSubscribe( mapDataToProps: function )( WrappedComponent: Component )`
+
+If you use a React or WordPress Element, a Higher Order Component is made available to inject data into your components like so:
+
+```js
+const Component = ( { title } ) => <div>{ title }</div>;
+
+wp.data.onSubscribe( () => {
+	return {
+		title: wp.data.select( 'myPlugin' ).getTitle(),
+	};
+} )( Component );
+```
+
+You can also use this Higher Order Component to provide action handlers to your components
+
+```js
+const Component = ( { title, updateTitle } ) => <input value={ title } onChange={ updateTitle } />;
+
+wp.data.onSubscribe( () => {
+	return {
+		title: select( 'myPlugin' ).getTitle(),
+		updateTitle: dispatch( 'myPlugin' ).setTitle,
+	};
+} )( Component );
 ```

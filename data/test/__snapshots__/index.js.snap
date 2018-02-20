@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`query passes the relevant data to the component 1`] = `
+exports[`onSubscribe passes the relevant data to the component 1`] = `
 <div>
   reactState
 </div>

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
+import isEqualShallow from 'is-equal-shallow';
 import { createStore } from 'redux';
 import { flowRight, without, mapValues } from 'lodash';
 
@@ -9,6 +9,7 @@ import { flowRight, without, mapValues } from 'lodash';
  * WordPress dependencies
  */
 import { deprecated } from '@wordpress/utils';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -128,43 +129,71 @@ export function dispatch( reducerKey ) {
 }
 
 /**
- * Higher Order Component used to inject data using the registered selectors.
+ * Higher Order Component used to inject data and actions using the registered selectors/actions.
  *
- * @param {Function} mapSelectorsToProps Gets called with the selectors object
- *                                       to determine the data for the
- *                                       component.
- * @param {Function} mapDispatchToProps  Gets called with the wp.data.dispatch function
- *                                       to create action handlers.
- *
+ * @param {Function} mapDataToProps Gets called with the props object
+ *                                  to determine the data for the
+ *                                  component.
  *
  * @return {Function} Renders the wrapped component and passes it data.
  */
-export const query = ( mapSelectorsToProps, mapDispatchToProps ) => ( WrappedComponent ) => {
-	const store = {
-		getState() {
-			return mapValues( stores, subStore => subStore.getState() );
-		},
-		subscribe,
-		dispatch() {
-			// eslint-disable-next-line no-console
-			console.warn( 'Dispatch is not supported.' );
-		},
-	};
-	const connectWithStore = ( ...args ) => {
-		const ConnectedWrappedComponent = connect( ...args )( WrappedComponent );
-		return ( props ) => {
-			return <ConnectedWrappedComponent { ...props } store={ store } />;
-		};
-	};
+export const onSubscribe = ( mapDataToProps ) => ( WrappedComponent ) => {
+	const usePropsArgument = mapDataToProps.length !== 0;
 
-	return connectWithStore(
-		mapSelectorsToProps ?
-			( state, ownProps ) => {
-				return mapSelectorsToProps( select, ownProps );
-			} : undefined,
-		mapDispatchToProps ?
-			( unusedDispatch, ownProps ) => {
-				return mapDispatchToProps( dispatch, ownProps );
-			} : undefined
-	);
+	class ComponentWithData extends Component {
+		constructor() {
+			super( ...arguments );
+			this.state = {};
+		}
+
+		componentWillMount() {
+			this.subscribe();
+			this.runSelection( this.props );
+		}
+
+		componentWillUnmount() {
+			this.unsubscribe();
+		}
+
+		componentWillReceiveProps( newProps ) {
+			if ( usePropsArgument ) {
+				this.runSelection( newProps );
+			}
+		}
+
+		subscribe() {
+			this.unsubscribe = subscribe( () => this.runSelection( this.props ) );
+		}
+
+		runSelection( props ) {
+			const newState = mapDataToProps( props );
+			if ( ! isEqualShallow( newState, this.state ) ) {
+				this.setState( newState );
+			}
+		}
+
+		shouldComponentUpdate( nextProps, nextState ) {
+			return nextState !== this.state || ! isEqualShallow( nextProps, this.props );
+		}
+
+		render() {
+			return (
+				<WrappedComponent { ...this.props } { ...this.state } />
+			);
+		}
+	}
+
+	return ComponentWithData;
+};
+
+export const query = ( mapSelectToProps ) => {
+	deprecated( 'wp.data.query', {
+		version: '2.5',
+		alternative: 'wp.data.onSubscribe',
+		plugin: 'Gutenberg',
+	} );
+
+	return onSubscribe( ( props ) => {
+		return mapSelectToProps( select, props );
+	} );
 };
