@@ -17,10 +17,9 @@
 	padding-top: .05px;
 	padding-bottom: .05px;
 
-	// Space blocks using margin instead of block padding
-	// @todo, this should be on a per-block basis, including placeholders
-	.editor-block-list__block-edit p {
-		margin-top: $block-padding;		// @todo needs new variable
+	// Space every block using margin instead of padding
+	.editor-block-list__block-edit {
+		margin-top: $block-padding;
 		margin-bottom: $block-padding;
 	}
 
@@ -153,12 +152,6 @@
 		// When images are floated, the block itself should collapse to zero height
 		margin-bottom: 0;
 
-		// Because margins don't collapse, we add a little top margin to offset that
-		// In the theme itself, this shouldn't be necessary
-		img {
-			margin-top: $block-padding;
-		}
-
 		// Hide block outline when an image is floated
 		&:before {
 			content: none;
@@ -167,7 +160,7 @@
 
 	// Left
 	&[data-align="left"] {
-		figure {	// This is in the editor only, on the frontend, the img should be floated
+		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
 			float: left;
 			margin-right: 2em;
 		}
@@ -175,7 +168,7 @@
 
 	// Right
 	&[data-align="right"] {
-		figure {	// This is in the editor only, on the frontend, the img should be floated
+		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
 			float: right;
 			margin-left: 2em;
 		}
@@ -403,16 +396,24 @@
  * Block Toolbar
  */
 
-
 .editor-block-contextual-toolbar {
 	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
-	margin-top: - $block-toolbar-height - 1px;
-	margin-bottom: $block-padding + 1px;
 	white-space: nowrap;
 	text-align: left;
 	pointer-events: none;
 	height: $block-toolbar-height;
+
+	// Position the contextual toolbar above the block
+	margin-top: -$block-toolbar-height;
+	margin-bottom: $block-padding;
+
+	// Floated items have special needs for the contextual toolbar position
+	.edit-post-visual-editor .editor-block-list__block[data-align="left"] &,
+	.edit-post-visual-editor .editor-block-list__block[data-align="right"] & {
+		margin-bottom: 1px;
+		margin-top: -$block-toolbar-height - 1px;
+	}
 
 	// put toolbar snugly to side edges on mobile
 	margin-left: -$block-padding - 1px;	// stack borders
@@ -454,12 +455,6 @@
 	@include break-small() {
 		margin-left: - $block-padding - 1px;
 		margin-right: - $block-padding - 1px;
-	}
-
-	// Custom toolbars for floats
-	.edit-post-visual-editor .editor-block-list__block[data-align="left"] &,
-	.edit-post-visual-editor .editor-block-list__block[data-align="right"] & {
-		margin-bottom: 1px;
 	}
 }
 
