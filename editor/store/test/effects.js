@@ -520,7 +520,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( setupEditorState( post, [], {} ) );
+			expect( result ).toEqual( setupEditorState( post, [], {}, true ) );
 		} );
 
 		it( 'should return block reset with non-empty content', () => {
@@ -539,7 +539,7 @@ describe( 'effects', () => {
 			const result = handler( { post, settings: {} } );
 
 			expect( result.blocks ).toHaveLength( 1 );
-			expect( result ).toEqual( setupEditorState( post, result.blocks, {} ) );
+			expect( result ).toEqual( setupEditorState( post, result.blocks, {}, true ) );
 		} );
 
 		it( 'should return post setup action only if auto-draft', () => {
@@ -556,7 +556,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( setupEditorState( post, [], { title: 'A History of Pork', status: 'draft' } ) );
+			expect( result ).toEqual( setupEditorState( post, [], { title: 'A History of Pork', status: 'draft' }, true ) );
 		} );
 	} );
 

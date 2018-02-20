@@ -34,6 +34,7 @@ import {
 	blocksMode,
 	isInsertionPointVisible,
 	reusableBlocks,
+	template,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -2020,6 +2021,44 @@ describe( 'state', () => {
 				isFetching: {},
 				isSaving: {},
 			} );
+		} );
+	} );
+
+	describe( 'template', () => {
+		it( 'should default to visible', () => {
+			const state = template( undefined, {} );
+
+			expect( state ).toEqual( { isValid: true } );
+		} );
+
+		it( 'should set the template', () => {
+			const blockTemplate = [ [ 'core/paragraph' ] ];
+			const state = template( undefined, {
+				type: 'SETUP_EDITOR',
+				settings: { template: blockTemplate, templateLock: 'all' },
+			} );
+
+			expect( state ).toEqual( { isValid: true, template: blockTemplate, lock: 'all' } );
+		} );
+
+		it( 'should set the validity flag', () => {
+			const original = deepFreeze( { isValid: true, template: [] } );
+			const state = template( original, {
+				type: 'SETUP_EDITOR_STATE',
+				isValidTemplate: false,
+			} );
+
+			expect( state ).toEqual( { isValid: false, template: [] } );
+		} );
+
+		it( 'should reset the validity flag', () => {
+			const original = deepFreeze( { isValid: false, template: [] } );
+			const state = template( original, {
+				type: 'SET_TEMPLATE_VALIDITY',
+				isValid: true,
+			} );
+
+			expect( state ).toEqual( { isValid: true, template: [] } );
 		} );
 	} );
 } );

@@ -15,7 +15,7 @@ import { parse } from '@wordpress/blocks';
  */
 import './style.scss';
 import { getEditedPostContent } from '../../store/selectors';
-import { editPost, resetBlocks } from '../../store/actions';
+import { editPost, resetBlocks, checkTemplateValidity } from '../../store/actions';
 
 class PostTextEditor extends Component {
 	constructor( props ) {
@@ -63,12 +63,13 @@ export default connect(
 	( state ) => ( {
 		value: getEditedPostContent( state ),
 	} ),
-	{
+	( dispatch ) => ( {
 		onChange( content ) {
-			return editPost( { content } );
+			dispatch( editPost( { content } ) );
 		},
 		onPersist( content ) {
-			return resetBlocks( parse( content ) );
+			dispatch( resetBlocks( parse( content ) ) );
+			dispatch( checkTemplateValidity() );
 		},
-	}
+	} )
 )( PostTextEditor );

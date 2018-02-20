@@ -15,6 +15,8 @@ import {
 	serialize,
 	isReusableBlock,
 	getDefaultBlockForPostFormat,
+	doesBlocksMatchTemplate,
+	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -39,6 +41,8 @@ import {
 	removeBlocks,
 	selectBlock,
 	removeBlock,
+	resetBlocks,
+	setTemplateValidity,
 } from './actions';
 import {
 	getCurrentPost,
@@ -58,7 +62,9 @@ import {
 	getProvisionalBlockUID,
 	getSelectedBlock,
 	isBlockSelected,
+	getTemplate,
 	POST_UPDATE_TRANSACTION_ID,
+	getTemplateLock,
 } from './selectors';
 
 /**
@@ -305,19 +311,16 @@ export default {
 
 		// Parse content as blocks
 		let blocks;
+		let isValidTemplate = true;
 		if ( post.content.raw ) {
 			blocks = parse( post.content.raw );
+			isValidTemplate = (
+				! settings.template ||
+				settings.templateLock !== 'all' ||
+				doesBlocksMatchTemplate( blocks, settings.template )
+			);
 		} else if ( settings.template ) {
-			const createBlocksFromTemplate = ( template ) => {
-				return map( template, ( [ name, attributes, innerBlocksTemplate ] ) => {
-					return createBlock(
-						name,
-						attributes,
-						createBlocksFromTemplate( innerBlocksTemplate )
-					);
-				} );
-			};
-			blocks = createBlocksFromTemplate( settings.template );
+			blocks = synchronizeBlocksWithTemplate( [], settings.template );
 		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
 			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
 		} else {
@@ -331,7 +334,31 @@ export default {
 			edits.status = 'draft';
 		}
 
-		return setupEditorState( post, blocks, edits );
+		return setupEditorState( post, blocks, edits, isValidTemplate );
+	},
+	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
+		const state = getState();
+		const blocks = getBlocks( state );
+		const template = getTemplate( state );
+		const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
+
+		return [
+			resetBlocks( updatedBlockList ),
+			setTemplateValidity( true ),
+		];
+	},
+	CHECK_TEMPLATE_VALIDITY( action, { getState } ) {
+		const state = getState();
+		const blocks = getBlocks( state );
+		const template = getTemplate( state );
+		const templateLock = getTemplateLock( state );
+		const isValid = (
+			! template ||
+			templateLock !== 'all' ||
+			doesBlocksMatchTemplate( blocks, template )
+		);
+
+		return setTemplateValidity( isValid );
 	},
 	FETCH_REUSABLE_BLOCKS( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
