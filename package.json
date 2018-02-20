@@ -12,7 +12,10 @@
 		"glob": "^7.1.2",
 		"lerna": "^2.9.0",
 		"mkdirp": "^0.5.1",
-		"rimraf": "^2.6.1"
+		"npm-run-all": "^4.1.2",
+		"path-type": "^3.0.0",
+		"rimraf": "^2.6.1",
+		"symlink-or-copy": "^1.2.0"
 	},
 	"babel": {
 		"presets": "@wordpress/default"
@@ -25,14 +28,17 @@
 	},
 	"scripts": {
 		"build-clean": "rimraf ./packages/*/build ./packages/*/build-module",
-		"prebuild": "check-node-version --package",
+		"prebuild": "npm-run-all check-engines build-clean",
 		"build": "node ./scripts/build.js",
-		"postinstall": "lerna bootstrap --hoist && ./scripts/create-symlinks.sh && npm run build",
+		"check-engines": "check-node-version --package",
+		"create-symlinks": "node ./scripts/create-symlinks.js",
+		"lerna-bootstrap": "lerna bootstrap --hoist",
+		"postinstall": "npm-run-all lerna-bootstrap create-symlinks build",
 		"test": "wp-scripts test",
 		"test:coverage": "npm run test -- --coverage",
 		"test:coverage-ci": "npm run test -- --coverage && codecov",
 		"test:watch": "npm run test -- --watch",
-		"publish:dev": "npm run build-clean && npm run build && lerna publish --npm-tag next",
-		"publish:prod": "npm run build-clean && npm run build && lerna publish"
+		"publish:dev": "npm run build && lerna publish --npm-tag next",
+		"publish:prod": "npm run build && lerna publish"
 	}
 }
