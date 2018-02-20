@@ -12,7 +12,7 @@
 /**
  * External dependencies
  */
-import { get, mapValues } from 'lodash';
+import { get, mapValues, includes } from 'lodash';
 
 export const BACKSPACE = 8;
 export const TAB = 9;
@@ -88,5 +88,21 @@ export const displayShortcut = mapValues( modifiers, ( modifier ) => {
 		// the key join character ("+") between it and the final character if that
 		// final character is alphanumeric. ⌘S looks nicer than ⌘+S.
 		return shortcut.replace( /⌘\+([A-Z0-9])$/g, '⌘$1' );
+	};
+} );
+
+export const is = mapValues( modifiers, ( getModifiers ) => {
+	return ( event, character, _isMac = isMacOS ) => {
+		const mods = getModifiers( _isMac );
+
+		if ( ! mods.every( ( key ) => event[ `${ key }Key` ] ) ) {
+			return false;
+		}
+
+		if ( ! character ) {
+			return includes( mods, event.key.toLowerCase() );
+		}
+
+		return event.key === character;
 	};
 } );

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { first, last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component, Fragment, compose } from '@wordpress/element';
@@ -17,17 +12,10 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.selectAll = this.selectAll.bind( this );
 		this.undoOrRedo = this.undoOrRedo.bind( this );
 		this.save = this.save.bind( this );
 		this.deleteSelectedBlocks = this.deleteSelectedBlocks.bind( this );
 		this.clearMultiSelection = this.clearMultiSelection.bind( this );
-	}
-
-	selectAll( event ) {
-		const { uids, onMultiSelect } = this.props;
-		event.preventDefault();
-		onMultiSelect( first( uids ), last( uids ) );
 	}
 
 	undoOrRedo( event ) {
@@ -72,7 +60,6 @@ class EditorGlobalKeyboardShortcuts extends Component {
 			<Fragment>
 				<KeyboardShortcuts
 					shortcuts={ {
-						[ rawShortcut.primary( 'a' ) ]: this.selectAll,
 						[ rawShortcut.primary( 'z' ) ]: this.undoOrRedo,
 						[ rawShortcut.primaryShift( 'z' ) ]: this.undoOrRedo,
 						backspace: this.deleteSelectedBlocks,
@@ -111,7 +98,6 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const {
 			clearSelectedBlock,
-			multiSelect,
 			redo,
 			undo,
 			removeBlocks,
@@ -120,7 +106,6 @@ export default compose( [
 
 		return {
 			clearSelectedBlock,
-			onMultiSelect: multiSelect,
 			onRedo: redo,
 			onUndo: undo,
 			onRemove: removeBlocks,

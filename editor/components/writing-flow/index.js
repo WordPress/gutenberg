@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { overEvery, find, findLast, reverse } from 'lodash';
+import { overEvery, find, findLast, reverse, first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import {
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
+	isFullySelected,
 } from '@wordpress/dom';
 import { keycodes } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -32,7 +33,7 @@ import {
  * Module Constants
  */
 
-const { UP, DOWN, LEFT, RIGHT } = keycodes;
+const { UP, DOWN, LEFT, RIGHT, is } = keycodes;
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -179,7 +180,7 @@ class WritingFlow extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { hasMultiSelection } = this.props;
+		const { hasMultiSelection, onMultiSelect, blocks } = this.props;
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -201,6 +202,25 @@ class WritingFlow extends Component {
 		}
 
 		if ( ! isNav ) {
+			const activeElement = document.activeElement;
+
+			// Set right before the meta+a combination can be pressed.
+			if ( is.primary( event ) ) {
+				this.isFullySelected = isFullySelected( activeElement );
+			}
+
+			if ( is.primary( event, 'a' ) ) {
+				// In the case of contentEditable, we want to know the earlier value
+				// because the selection will have already been set by TinyMCE.
+				if ( activeElement.isContentEditable ? this.isFullySelected : isFullySelected( activeElement ) ) {
+					onMultiSelect( first( blocks ), last( blocks ) );
+					event.preventDefault();
+				}
+
+				// Set in case the meta key doesn't get released.
+				this.isFullySelected = isFullySelected( activeElement );
+			}
+
 			return;
 		}
 
@@ -278,6 +298,7 @@ export default compose( [
 			getFirstMultiSelectedBlockUid,
 			getLastMultiSelectedBlockUid,
 			hasMultiSelection,
+			getBlockOrder,
 		} = select( 'core/editor' );
 
 		const selectedBlockUID = getSelectedBlockUID();
@@ -292,6 +313,7 @@ export default compose( [
 			selectedFirstUid: getFirstMultiSelectedBlockUid(),
 			selectedLastUid: getLastMultiSelectedBlockUid(),
 			hasMultiSelection: hasMultiSelection(),
+			blocks: getBlockOrder(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
