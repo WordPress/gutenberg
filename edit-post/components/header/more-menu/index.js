@@ -25,11 +25,9 @@ const MoreMenu = () => (
 			/>
 		) }
 		renderContent={ ( { onClose } ) => (
-			<div>
+			<div className="edit-post-more-menu__content">
 				<ModeSwitcher onSelect={ onClose } />
-				<div className="edit-post-more-menu__separator" />
 				<FixedToolbarToggle onToggle={ onClose } />
-				<div className="edit-post-more-menu__separator" />
 				<EditorActions />
 			</div>
 		) }
