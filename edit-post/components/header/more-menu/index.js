@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Dropdown } from '@wordpress/components';
+import { IconButton, Dropdown, MenuItemsGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -10,7 +10,6 @@ import { IconButton, Dropdown } from '@wordpress/components';
 import './style.scss';
 import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
-import EditorActions from '../editor-actions';
 
 const MoreMenu = () => (
 	<Dropdown
@@ -28,7 +27,10 @@ const MoreMenu = () => (
 			<div className="edit-post-more-menu__content">
 				<ModeSwitcher onSelect={ onClose } />
 				<FixedToolbarToggle onToggle={ onClose } />
-				<EditorActions />
+				<MenuItemsGroup
+					label={ __( 'Tools' ) }
+					filterName="editPost.MoreMenu.tools"
+				/>
 			</div>
 		) }
 	/>

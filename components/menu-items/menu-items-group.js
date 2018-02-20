@@ -4,6 +4,12 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { Children } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -15,9 +21,11 @@ function MenuItemsGroup( {
 	children,
 	instanceId,
 	className = '',
+	filterName,
 } ) {
 	const labelId = `components-menu-items-group-label-${ instanceId }`;
 	const classNames = classnames( className, 'components-menu-items-group' );
+	const menuItems = filterName ? applyFilters( filterName, Children.toArray( children ) ) : children;
 
 	return (
 		<div className={ classNames }>
@@ -25,7 +33,7 @@ function MenuItemsGroup( {
 				<div className="components-menu-items-group__label" id={ labelId }>{ label }</div>
 			}
 			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
-				{ children }
+				{ menuItems }
 			</NavigableMenu>
 		</div>
 	);
