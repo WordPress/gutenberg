@@ -6,6 +6,11 @@ import { createStore } from 'redux';
 import { flowRight, without, mapValues } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { deprecated } from '@wordpress/utils';
+
+/**
  * Internal dependencies
  */
 export { loadAndPersist, withRehydratation } from './persist';
@@ -84,11 +89,10 @@ export function registerSelectors( reducerKey, newSelectors ) {
  */
 export function select( reducerKey ) {
 	if ( arguments.length > 1 ) {
-		// eslint-disable-next-line no-console
-		console.warn(
-			'Deprecated: `select` now accepts only a single argument: the reducer key. ' +
-			'The return value is an object of selector functions.'
-		);
+		deprecated( 'Calling select with multiple arguments', {
+			version: '2.4',
+			plugin: 'Gutenberg',
+		} );
 
 		const [ , selectorKey, ...args ] = arguments;
 		return select( reducerKey )[ selectorKey ]( ...args );

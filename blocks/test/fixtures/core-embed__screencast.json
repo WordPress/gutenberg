@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-screencast\">\n    https://screencast.com/\n    <figcaption>Embedded content from screencast</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-screencast wp-block-embed\">\n    https://screencast.com/\n    <figcaption>Embedded content from screencast</figcaption>\n</figure>"
     }
 ]
