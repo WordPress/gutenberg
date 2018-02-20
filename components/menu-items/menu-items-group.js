@@ -16,16 +16,24 @@ import './style.scss';
 import { NavigableMenu } from '../navigable-container';
 import withInstanceId from '../higher-order/with-instance-id';
 
-function MenuItemsGroup( {
-	label,
+export function MenuItemsGroup( {
 	children,
-	instanceId,
 	className = '',
 	filterName,
+	instanceId,
+	label,
 } ) {
+	const childrenArray = Children.toArray( children );
+	const menuItems = filterName ?
+		applyFilters( filterName, childrenArray ) :
+		childrenArray;
+
+	if ( ! Array.isArray( menuItems ) || ! menuItems.length ) {
+		return null;
+	}
+
 	const labelId = `components-menu-items-group-label-${ instanceId }`;
 	const classNames = classnames( className, 'components-menu-items-group' );
-	const menuItems = filterName ? applyFilters( filterName, Children.toArray( children ) ) : children;
 
 	return (
 		<div className={ classNames }>
