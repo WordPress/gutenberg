@@ -45,11 +45,16 @@ describe( 'Managing links', () => {
 		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
 
 		cy.get( lastBlockSelector ).click();
+		cy.focused().type( 'test' );
+
+		// we need to trigger isTyping = false
+		cy.get( lastBlockSelector ).trigger( 'mousemove', { clientX: 200, clientY: 300 } );
+		cy.get( lastBlockSelector ).trigger( 'mousemove', { clientX: 250, clientY: 350 } );
 
 		cy.get( 'button[aria-label="Link"]' ).click();
 
 		// Typing "left" should not close the dialog
-		cy.focused().type( '{leftarrow}' );
+		cy.get( '.blocks-url-input input' ).type( '{leftarrow}' );
 		cy.get( '.blocks-format-toolbar__link-modal' ).should( 'be.visible' );
 
 		// Escape should close the dialog still.

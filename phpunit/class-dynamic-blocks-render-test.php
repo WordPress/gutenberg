@@ -105,6 +105,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 
 		$rendered = $block_type->render();
 
-		$this->assertEquals( '10', $rendered );
+		$this->assertSame( '10', $rendered );
+		$this->assertInternalType( 'string', $rendered );
 	}
 }

@@ -132,7 +132,7 @@ input[type="search"].editor-inserter__search {
 	}
 }
 
-.editor-inserter__no-results {
+.editor-inserter__no-blocks {
 	display: block;
 	text-align: center;
 	font-style: italic;
@@ -164,12 +164,6 @@ input[type="search"].editor-inserter__search {
 		border-bottom: 1px solid $light-gray-500;
 		flex-shrink: 0;
 		margin-top: 1px;
-	}
-
-	.editor-inserter__no-tab-content-message {
-		font-style: italic;
-		margin-top: 3em;
-		text-align: center;
 	}
 }
 

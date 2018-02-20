@@ -14,16 +14,22 @@ describe( 'DefaultBlockAppender', () => {
 		expect( onAppend ).toHaveBeenCalledWith();
 	};
 
+	it( 'should render nothing if not visible', () => {
+		const wrapper = shallow( <DefaultBlockAppender /> );
+
+		expect( wrapper.type() ).toBe( null );
+	} );
+
 	it( 'should match snapshot', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender onAppend={ onAppend } /> );
+		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	it( 'should append a default block when input clicked', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender onAppend={ onAppend } /> );
+		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
 		const input = wrapper.find( 'input.editor-default-block-appender__content' );
 
 		expect( input.prop( 'value' ) ).toEqual( 'Write your story' );
@@ -34,7 +40,7 @@ describe( 'DefaultBlockAppender', () => {
 
 	it( 'should append a default block when input focused', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender onAppend={ onAppend } /> );
+		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
 
 		wrapper.find( 'input.editor-default-block-appender__content' ).simulate( 'focus' );
 
@@ -45,7 +51,7 @@ describe( 'DefaultBlockAppender', () => {
 
 	it( 'should optionally show without prompt', () => {
 		const onAppend = jest.fn();
-		const wrapper = shallow( <DefaultBlockAppender onAppend={ onAppend } showPrompt={ false } /> );
+		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt={ false } /> );
 		const input = wrapper.find( 'input.editor-default-block-appender__content' );
 
 		expect( input.prop( 'value' ) ).toEqual( '' );

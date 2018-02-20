@@ -9,17 +9,21 @@ import { filter } from 'lodash';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mediaUpload } from '@wordpress/utils';
-import { IconButton, DropZone, Toolbar } from '@wordpress/components';
+import {
+	IconButton,
+	DropZone,
+	RangeControl,
+	SelectControl,
+	ToggleControl,
+	Toolbar,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import MediaUpload from '../../media-upload';
-import ImagePlaceHolder from '../../image-placeholder';
+import ImagePlaceholder from '../../image-placeholder';
 import InspectorControls from '../../inspector-controls';
-import RangeControl from '../../inspector-controls/range-control';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import SelectControl from '../../inspector-controls/select-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
@@ -39,7 +43,7 @@ class GalleryBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onUnselectImage = this.onUnselectImage.bind( this );
+		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectImages = this.onSelectImages.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
@@ -55,35 +59,20 @@ class GalleryBlock extends Component {
 	}
 
 	onSelectImage( index ) {
-		return ( event ) => {
-			// ignore clicks in the editable caption.
-			// Without this logic, text operations like selection, select / unselects the images.
-			if ( event.target.tagName === 'FIGCAPTION' ) {
-				return;
+		return () => {
+			if ( this.state.selectedImage !== index ) {
+				this.setState( {
+					selectedImage: index,
+				} );
 			}
-
-			this.setState( {
-				selectedImage: index,
-			} );
 		};
-	}
-
-	onUnselectImage( event ) {
-		// ignore clicks in the editable caption.
-		// Without this logic, text operations like selection, select / unselects the images.
-		if ( event.target.tagName === 'FIGCAPTION' ) {
-			return;
-		}
-
-		this.setState( {
-			selectedImage: null,
-		} );
 	}
 
 	onRemoveImage( index ) {
 		return () => {
 			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
 			const { columns } = this.props.attributes;
+			this.setState( { selectedImage: null } );
 			this.props.setAttributes( {
 				images,
 				columns: columns ? Math.min( images.length, columns ) : columns,
@@ -118,7 +107,9 @@ class GalleryBlock extends Component {
 
 	setImageAttributes( index, attributes ) {
 		const { attributes: { images }, setAttributes } = this.props;
-
+		if ( ! images[ index ] ) {
+			return;
+		}
 		setAttributes( {
 			images: [
 				...images.slice( 0, index ),
@@ -149,6 +140,7 @@ class GalleryBlock extends Component {
 		if ( ! nextProps.isSelected && this.props.isSelected ) {
 			this.setState( {
 				selectedImage: null,
+				captionSelected: false,
 			} );
 		}
 	}
@@ -196,7 +188,7 @@ class GalleryBlock extends Component {
 		if ( images.length === 0 ) {
 			return [
 				controls,
-				<ImagePlaceHolder key="gallery-placeholder"
+				<ImagePlaceholder key="gallery-placeholder"
 					className={ className }
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
@@ -242,7 +234,6 @@ class GalleryBlock extends Component {
 							isSelected={ isSelected && this.state.selectedImage === index }
 							onRemove={ this.onRemoveImage( index ) }
 							onSelect={ this.onSelectImage( index ) }
-							onUnselect={ this.onUnselectImage }
 							setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 							caption={ img.caption }
 						/>

@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-meetup-com\">\n    https://meetup.com/\n    <figcaption>Embedded content from meetup-com</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-meetup-com wp-block-embed\">\n    https://meetup.com/\n    <figcaption>Embedded content from meetup-com</figcaption>\n</figure>"
     }
 ]

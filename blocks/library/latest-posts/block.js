@@ -10,7 +10,14 @@ import { stringify } from 'querystringify';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Toolbar, Spinner, withAPIData } from '@wordpress/components';
+import {
+	Placeholder,
+	RangeControl,
+	Spinner,
+	ToggleControl,
+	Toolbar,
+	withAPIData,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
 
@@ -21,8 +28,6 @@ import './editor.scss';
 import './style.scss';
 import QueryPanel from '../../query-panel';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import RangeControl from '../../inspector-controls/range-control';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
