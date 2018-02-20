@@ -23,6 +23,7 @@ $z-layers: (
 	'.editor-block-mover': 1,
 	'.blocks-gallery-item__inline-menu': 20,
 	'.editor-block-settings-menu__popover': 20, // Below the header
+	'.blocks-url-input__suggestions': 30,
 	'.edit-post-header': 30,
 	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
 
@@ -35,6 +36,10 @@ $z-layers: (
 	'.edit-post-sidebar': 100000,
 	'.edit-post-layout .edit-post-post-publish-panel': 100001,
 
+	// Show sidebar in greater than small viewports above editor related elements
+	// but bellow #adminmenuback { z-index: 100 }
+	'.edit-post-sidebar {greater than small}': 50,
+
 	// Show notices below expanded wp-admin submenus:
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-notice-list': 9989,
@@ -43,7 +48,6 @@ $z-layers: (
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-popover': 1000000,
 	'.components-autocomplete__results': 1000000,
-	'.blocks-url-input__suggestions': 9999,
 );
 
 @function z-index( $key ) {
