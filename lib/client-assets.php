@@ -545,47 +545,54 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 }
 
 /**
- * Extend wp-api Backbone client with methods to look up the REST API endpoints for all post types.
+ * Extend wp-api Backbone client with methods to look up Backbone Model and Collection by type
  *
- * This is temporary while waiting for #41111 in core.
+ * This is temporary while waiting for #42737 in core.
  *
- * @link https://core.trac.wordpress.org/ticket/41111
+ * @link https://core.trac.wordpress.org/ticket/42737
  */
 function gutenberg_extend_wp_api_backbone_client() {
-	// Post Types Mapping.
-	$post_type_rest_base_mapping = array();
-	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
-		$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
-		$post_type_rest_base_mapping[ $post_type_object->name ] = $rest_base;
-	}
 
-	// Taxonomies Mapping.
-	$taxonomy_rest_base_mapping = array();
-	foreach ( get_taxonomies( array(), 'objects' ) as $taxonomy_object ) {
-		$rest_base = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
-		$taxonomy_rest_base_mapping[ $taxonomy_object->name ] = $rest_base;
-	}
+	// Type to Model Mapping, only need to map types that name differs from model.
+	// For example, no need to map post => post, or page => page.
+	$type_model_mapping = array(
+		'attachment' => 'media',
+		'post_tag'   => 'tag',
+	);
+	// You can use the filter to extend or map a custom type to another.
+	$type_model_mapping = apply_filters( 'type_model_mapping', $type_model_mapping );
 
-	$script  = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
-	$script .= sprintf( 'wp.api.taxonomyRestBaseMapping = %s;', wp_json_encode( $taxonomy_rest_base_mapping ) );
+	// Type to Collection Mapping, only need to map types that name differs from collection.
+	$type_collection_mapping = array(
+		'category' => 'categories',
+		'page'     => 'pages',
+		'post'     => 'posts',
+		'post_tag' => 'tags',
+	);
+	// You can use the filter to extend or map a custom type to another.
+	$type_collection_mapping = apply_filters( 'type_collection_mapping', $type_collection_mapping );
+
+	$script  = sprintf( 'wp.api.typeModelMapping = %s;', wp_json_encode( $type_model_mapping ) );
+	$script .= sprintf( 'wp.api.typeCollectionMapping = %s;', wp_json_encode( $type_collection_mapping ) );
 	$script .= <<<JS
-		wp.api.getPostTypeModel = function( postType ) {
-			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<id>[\\\\d]+)';
-			return _.find( wp.api.models, function( model ) {
-				return model.prototype.route && route === model.prototype.route.index;
-			} );
+		wp.api.getModelByType = function( type ) {
+			if ( this.typeModelMapping[ type ] ) {
+				type = this.typeModelMapping[ type ];
+			}
+			var modelName = wp.api.utils.capitalizeAndCamelCaseDashes( type );
+			// console.log is temporary to raise any errors that may go unnoticed.
+			if ( ! wp.api.models[ modelName ] ) { console.log( 'Model Not Found: ', modelName ); }
+			return wp.api.models[ modelName ];
 		};
-		wp.api.getTaxonomyModel = function( taxonomy ) {
-			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ] + '/(?P<id>[\\\\d]+)';
-			return _.find( wp.api.models, function( model ) {
-				return model.prototype.route && route === model.prototype.route.index;
-			} );
-		};
-		wp.api.getTaxonomyCollection = function( taxonomy ) {
-			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ];
-			return _.find( wp.api.collections, function( model ) {
-				return model.prototype.route && route === model.prototype.route.index;
-			} );
+
+		wp.api.getCollectionByType = function( type ) {
+			if ( this.typeCollectionMapping[ type ] ) {
+				type = this.typeCollectionMapping[ type ];
+			}
+			var collectionName = wp.api.utils.capitalizeAndCamelCaseDashes( type );
+			// console.log is temporary to raise any errors that may go unnoticed.
+			if ( ! wp.api.collections[ collectionName ] ) { console.log( 'Collection Not Found: ', collectionName ); }
+			return wp.api.collections[ collectionName ];
 		};
 JS;
 	wp_add_inline_script( 'wp-api', $script );

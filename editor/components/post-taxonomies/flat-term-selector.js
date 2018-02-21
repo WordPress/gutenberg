@@ -74,7 +74,7 @@ class FlatTermSelector extends Component {
 
 	fetchTerms( params = {} ) {
 		const query = { ...DEFAULT_QUERY, ...params };
-		const Collection = wp.api.getTaxonomyCollection( this.props.slug );
+		const Collection = wp.api.getCollectionByType( this.props.slug );
 		const request = new Collection().fetch( { data: query } );
 		request.then( ( terms ) => {
 			this.setState( ( state ) => ( {
@@ -101,7 +101,7 @@ class FlatTermSelector extends Component {
 	findOrCreateTerm( termName ) {
 		return new Promise( ( resolve, reject ) => {
 			// Tries to create a term or fetch it if it already exists
-			const Model = wp.api.getTaxonomyModel( this.props.slug );
+			const Model = wp.api.getModelByType( this.props.slug );
 			new Model( { name: termName } ).save()
 				.then( resolve, ( xhr ) => {
 					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
