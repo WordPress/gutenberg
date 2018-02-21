@@ -163,6 +163,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 					</BlockControls>
 				);
 
+				// If the user just pasted a URL into a paragraph, we display a paragraph with the
+				// URL in it while we do the fetch. This is so the user doesn't see the big grey
+				// "Embedding..." UI unexpectedly, and makes the experience a bit smoother.
 				if ( fetching && fromPaste ) {
 					return [
 						controls,

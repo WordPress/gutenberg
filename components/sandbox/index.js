@@ -134,6 +134,7 @@ export default class Sandbox extends Component {
 				document.body.style.position = 'absolute';
 				document.body.style.width = '100%';
 				document.body.setAttribute( 'data-resizable-iframe-connected', '' );
+
 				sendResize();
 		} )();`;
 

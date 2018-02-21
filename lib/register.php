@@ -519,6 +519,28 @@ function gutenberg_revisions_restore( $revisions_data ) {
 add_filter( 'wp_prepare_revision_for_js', 'gutenberg_revisions_restore' );
 
 /**
+ * Extracts OpenGraph metadata from a HTML document.
+ *
+ * @param string $html The HTML.
+ * @return array OpenGraph data indexed by property name.
+ */
+function gutenberg_get_opengraph_metadata( $html ) {
+	$matches = array();
+	$data = array();
+	preg_match_all( '/<meta[^>]+property="og:([^"]+)"[^>]+content="([^"]+)"[^>]+>/i', $html, $matches );
+	foreach( $matches[1] as $key => $value ) {
+		$data[ $value ] = $matches[2][ $key ];
+	}
+	if ( ! isset( $data['title'] ) ) {
+		preg_match( '/<title>([^<]+)<\/title>/i', $html, $matches );
+		if ( isset( $matches[1] ) ) {
+			$data['title'] = $matches[1];
+		}
+	}
+	return $data;
+}
+
+/**
  * Generates and caches HTML for a URL that contains OpenGraph metadata.
  *
  * @param string $url The URL to generate HTML for.
@@ -541,7 +563,8 @@ function gutenberg_oembed_opengraph( $url ) {
 		$url,
 		array(
 			'limit_response_size' => 250000,
-			'user-agent'          => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:20.0) Gecko/20100101 Firefox/20.0',
+			// Some sites block fetching if we don't have a user agent.
+			'user-agent'          => $_SERVER['HTTP_USER_AGENT'],
 		)
 	);
 
@@ -549,18 +572,11 @@ function gutenberg_oembed_opengraph( $url ) {
 		return false;
 	}
 
-	$body = wp_remote_retrieve_body( $get );
-
-	preg_match( '/<title>([^<]+)<\/title>/i', $body, $title_match );
-	$title = empty( $title_match ) ? $url : $title_match[1];
-	preg_match( '/<meta[^>]+property="og:image"[^>]*>/i', $body, $image_match );
-	$image = empty( $image_match ) ? '' : $image_match[0];
-	preg_match( '/content="([^"]+)"/i', $image, $image_match );
-	$image = empty( $image_match ) ? '' : $image_match[1];
-	preg_match( '/<meta[^>]+property="og:description"[^>]*>/i', $body, $desc_match );
-	$desc = empty( $desc_match ) ? '' : $desc_match[0];
-	preg_match( '/content="([^"]+)"/i', $desc, $desc_match );
-	$desc = empty( $desc_match ) ? '' : $desc_match[1];
+	$body  = wp_remote_retrieve_body( $get );
+	$data  = gutenberg_get_opengraph_metadata( $body );
+	$image = isset( $data['image'] ) ? $data['image'] : false;
+	$title = isset( $data['title'] ) ? $data['title'] : $url;
+	$desc  = isset( $data['description'] ) ? $data['description'] : false;
 
 	if ( ! $image && ! $desc ) {
 		$html = '';
@@ -645,5 +661,5 @@ function gutenberg_oembed_fallback( $response, $handler, $request ) {
 // Potentially return an OpenGraph response if the embed proxy API cannot embed.
 add_filter( 'rest_request_after_callbacks', 'gutenberg_oembed_fallback', 10, 3 );
 
-// Fires if there are no providers for a URL, so do the OpenGraph stuff here.
+// Fires if there are no providers for a URL, so do the OpenGraph stuff here, as it's really a fancy link.
 add_filter( 'embed_maybe_make_link', 'gutenberg_oembed_opengraph' );
