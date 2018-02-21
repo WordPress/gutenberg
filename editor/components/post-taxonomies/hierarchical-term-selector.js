@@ -17,7 +17,7 @@ import { buildTermsTree } from '@wordpress/utils';
  */
 import {
 	getEditedPostAttribute,
-	isRequestingTaxonomyTerm,
+	getTaxonomyTermFetchStatus,
 	getTaxonomyTerms,
 } from '../../store/selectors';
 import { editPost, addTaxonomyTerm } from '../../store/actions';
@@ -247,7 +247,7 @@ const applyConnect = connect(
 		const availableTerms = getTaxonomyTerms( state, ownProps.slug );
 		return {
 			terms: getEditedPostAttribute( state, ownProps.restBase ),
-			loading: isRequestingTaxonomyTerm( state, ownProps.slug ),
+			loading: get( getTaxonomyTermFetchStatus( state, ownProps.slug ), 'requesting', true ),
 			availableTerms: availableTerms,
 			availableTermsTree: buildTermsTree( availableTerms ),
 		};
