@@ -23,7 +23,6 @@ import {
 	isSavingPost,
 	isEditedPostSaveable,
 	getCurrentPost,
-	hasMetaBoxes,
 } from '../../store/selectors';
 
 /**
@@ -32,7 +31,7 @@ import {
  * @param   {Object}    Props Component Props.
  * @return {WPElement}       WordPress Element.
  */
-export function PostSavedState( { hasActiveMetaboxes, isNew, isPublished, isDirty, isSaving, isSaveable, onSave } ) {
+export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, onSave } ) {
 	const className = 'editor-post-saved-state';
 
 	if ( isSaving ) {
@@ -51,7 +50,7 @@ export function PostSavedState( { hasActiveMetaboxes, isNew, isPublished, isDirt
 		return null;
 	}
 
-	if ( ! isNew && ! isDirty && ! hasActiveMetaboxes ) {
+	if ( ! isNew && ! isDirty ) {
 		return (
 			<span className={ className }>
 				<Dashicon icon="saved" />
@@ -69,14 +68,13 @@ export function PostSavedState( { hasActiveMetaboxes, isNew, isPublished, isDirt
 }
 
 export default connect(
-	( state ) => ( {
+	( state, { forceIsDirty, forceIsSaving } ) => ( {
 		post: getCurrentPost( state ),
 		isNew: isEditedPostNew( state ),
 		isPublished: isCurrentPostPublished( state ),
-		isDirty: isEditedPostDirty( state ),
-		isSaving: isSavingPost( state ),
+		isDirty: isEditedPostDirty( state ) || forceIsDirty,
+		isSaving: isSavingPost( state ) || forceIsSaving,
 		isSaveable: isEditedPostSaveable( state ),
-		hasActiveMetaboxes: hasMetaBoxes( state ),
 	} ),
 	{
 		onSave: savePost,

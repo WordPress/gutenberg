@@ -5,8 +5,6 @@ import {
 	replaceBlocks,
 	startTyping,
 	stopTyping,
-	requestMetaBoxUpdates,
-	initializeMetaBoxState,
 	fetchReusableBlocks,
 	updateReusableBlock,
 	saveReusableBlock,
@@ -444,29 +442,6 @@ describe( 'actions', () => {
 			expect( removeNotice( noticeId ) ).toEqual( {
 				type: 'REMOVE_NOTICE',
 				noticeId,
-			} );
-		} );
-	} );
-
-	describe( 'requestMetaBoxUpdates', () => {
-		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
-			expect( requestMetaBoxUpdates() ).toEqual( {
-				type: 'REQUEST_META_BOX_UPDATES',
-			} );
-		} );
-	} );
-
-	describe( 'initializeMetaBoxState', () => {
-		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
-			const metaBoxes = {
-				side: true,
-				normal: true,
-				advanced: false,
-			};
-
-			expect( initializeMetaBoxState( metaBoxes ) ).toEqual( {
-				type: 'INITIALIZE_META_BOX_STATE',
-				metaBoxes,
 			} );
 		} );
 	} );

@@ -10,7 +10,6 @@ import classnames from 'classnames';
 import { Popover, navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	MetaBoxes,
 	AutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
@@ -27,6 +26,8 @@ import Sidebar from '../sidebar';
 import TextEditor from '../modes/text-editor';
 import VisualEditor from '../modes/visual-editor';
 import EditorModeKeyboardShortcuts from '../modes/keyboard-shortcuts';
+import MetaBoxes from '../meta-boxes';
+import MetaBoxesUnsavedWarning from '../meta-boxes/unsaved-warning';
 import {
 	getEditorMode,
 	hasOpenSidebar,
@@ -70,6 +71,7 @@ function Layout( {
 		<div className={ className }>
 			<DocumentTitle />
 			<UnsavedChangesWarning />
+			<MetaBoxesUnsavedWarning />
 			<AutosaveMonitor />
 			<Header />
 			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">

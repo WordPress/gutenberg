@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { some } from 'lodash';
+import jQuery from 'jquery';
 
 /**
  * WordPress dependencies
@@ -12,9 +14,10 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { isEditedPostDirty } from '../../store/selectors';
+import { getMetaBoxes } from '../../store/selectors';
+import { getMetaBoxContainer } from '../../utils/meta-boxes';
 
-class UnsavedChangesWarning extends Component {
+class MetaBoxesUnsavedWarning extends Component {
 	/**
 	 * @inheritdoc
 	 */
@@ -44,7 +47,11 @@ class UnsavedChangesWarning extends Component {
 	 * @return {string?}       Warning message.
 	 */
 	warnIfUnsavedChanges( event ) {
-		if ( this.props.isDirty ) {
+		const areMetaBoxesDirty = some( this.props.metaBoxes, ( metaBox, location ) => {
+			return metaBox.isActive &&
+				jQuery( getMetaBoxContainer( location ) ).serialize() !== metaBox.data;
+		} );
+		if ( areMetaBoxesDirty ) {
 			event.returnValue = __( 'You have unsaved changes. If you proceed, they will be lost.' );
 			return event.returnValue;
 		}
@@ -60,6 +67,9 @@ class UnsavedChangesWarning extends Component {
 
 export default connect(
 	( state ) => ( {
-		isDirty: isEditedPostDirty( state ),
-	} )
-)( UnsavedChangesWarning );
+		metaBoxes: getMetaBoxes( state ),
+	} ),
+	undefined,
+	undefined,
+	{ storeKey: 'edit-post' }
+)( MetaBoxesUnsavedWarning );
