@@ -23,14 +23,19 @@
 	},
 	"files": [
 		"bin",
-		"scripts"
+		"config",
+		"scripts",
+		"utils"
 	],
 	"bin": {
 		"wp-scripts": "./bin/wp-scripts.js"
 	},
 	"dependencies": {
+		"@wordpress/babel-preset-default": "^1.0.2",
+		"@wordpress/jest-preset-default": "^1.0.0",
 		"cross-spawn": "^5.1.0",
-		"jest": "^22.0.4"
+		"jest": "^22.0.4",
+		"read-pkg-up": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
