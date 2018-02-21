@@ -1332,6 +1332,29 @@ export function isPublishingPost( state ) {
 }
 
 /**
+ * Returns the taxonomy data if it exists.
+ *
+ * @param {Object} state        Global application state.
+ * @param {string} taxonomySlug Taxonomy slug.
+ *
+ * @return {Array} Taxonomy terms data.
+ */
+export function getTaxonomy( state, taxonomySlug ) {
+	return get( state, `taxonomies.data.${ taxonomySlug }`, null );
+}
+
+/**
+ * Returns the taxonomies data if it exists.
+ *
+ * @param {Object} state        Global application state.
+ *
+ * @return {Array} Taxonomy terms data.
+ */
+export function getTaxonomies( state ) {
+	return get( state, 'taxonomies.data', null );
+}
+
+/**
  * Returns the taxonomy terms data if it exists.
  *
  * @param {Object} state        Global application state.
@@ -1353,18 +1376,6 @@ export function getTaxonomyTerms( state, taxonomySlug ) {
  */
 export function getTaxonomyTermFetchStatus( state, taxonomySlug ) {
 	return state.taxonomyTerms.fetchStatus[ taxonomySlug ] || null;
-}
-
-/**
- * Returns true if the taxonomy is currently requesting or if it does not exist.
- *
- * @param {Object} state        Global application state.
- * @param {string} taxonomySlug Unique identifier of a Taxonomy.
- *
- * @return {boolean} Taxonomy Term fetch status.
- */
-export function isRequestingTaxonomyTerm( state, taxonomySlug ) {
-	return get( state, `taxonomyTerms.fetchStatus.${ taxonomySlug }.requesting`, true );
 }
 
 /**

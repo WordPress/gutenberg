@@ -16,7 +16,7 @@ import { FormTokenField } from '@wordpress/components';
  */
 import {
 	getEditedPostAttribute,
-	isRequestingTaxonomyTerm,
+	getTaxonomyTermFetchStatus,
 	getTaxonomyTerms,
 } from '../../store/selectors';
 import { editPost, addTaxonomyTerm } from '../../store/actions';
@@ -119,7 +119,7 @@ const applyConnect = connect(
 	( state, ownProps ) => {
 		return {
 			terms: getEditedPostAttribute( state, ownProps.restBase ),
-			loading: isRequestingTaxonomyTerm( state, ownProps.slug ),
+			loading: get( getTaxonomyTermFetchStatus( state, ownProps.slug ), 'requesting', true ),
 			availableTerms: getTaxonomyTerms( state, ownProps.slug ),
 		};
 	},
