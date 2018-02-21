@@ -160,7 +160,7 @@ class FlatTermSelector extends Component {
 	}
 
 	render() {
-		const { label, slug, taxonomy } = this.props;
+		const { slug, taxonomy } = this.props;
 		const { loading, availableTerms, selectedTerms } = this.state;
 		const termNames = availableTerms.map( ( term ) => term.name );
 		const newTermPlaceholderLabel = get(
@@ -178,24 +178,21 @@ class FlatTermSelector extends Component {
 		const removeTermLabel = sprintf( _x( 'Remove %s: %%s', 'term' ), singularName );
 
 		return (
-			<div className="editor-post-taxonomies__flat-terms-selector">
-				<h3 className="editor-post-taxonomies__flat-terms-selector-title">{ label }</h3>
-				<FormTokenField
-					value={ selectedTerms }
-					displayTransform={ unescapeString }
-					suggestions={ termNames }
-					onChange={ this.onChange }
-					onInputChange={ this.searchTerms }
-					maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-					disabled={ loading }
-					placeholder={ newTermPlaceholderLabel }
-					messages={ {
-						added: termAddedLabel,
-						removed: termRemovedLabel,
-						remove: removeTermLabel,
-					} }
-				/>
-			</div>
+			<FormTokenField
+				value={ selectedTerms }
+				displayTransform={ unescapeString }
+				suggestions={ termNames }
+				onChange={ this.onChange }
+				onInputChange={ this.searchTerms }
+				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+				disabled={ loading }
+				placeholder={ newTermPlaceholderLabel }
+				messages={ {
+					added: termAddedLabel,
+					removed: termRemovedLabel,
+					remove: removeTermLabel,
+				} }
+			/>
 		);
 	}
 }
