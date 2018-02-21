@@ -123,9 +123,13 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 							return;
 						}
 						response.json().then( ( obj ) => {
-							const { html, type, provider_name: providerName } = obj;
+							const { html, provider_name: providerName } = obj;
 							const providerNameSlug = kebabCase( toLower( providerName ) );
+							let { type } = obj;
 
+							if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
+								type = 'wp-embed';
+							}
 							if ( html ) {
 								this.setState( { html, type, providerNameSlug } );
 								setAttributes( { type, providerNameSlug } );
@@ -194,6 +198,20 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 				const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
+				const embedWrapper = 'wp-embed' === type ? (
+					<div
+						className="wp-block-embed__wrapper"
+						dangerouslySetInnerHTML={ { __html: html } }
+					/>
+				) : (
+					<div className="wp-block-embed__wrapper">
+						<SandBox
+							html={ html }
+							title={ iframeTitle }
+							type={ type }
+						/>
+					</div>
+				);
 				let typeClassName = 'wp-block-embed';
 				if ( 'video' === type ) {
 					typeClassName += ' is-video';
@@ -207,15 +225,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
 								<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
 							</Placeholder>
-						) : (
-							<div className="wp-block-embed__wrapper">
-								<SandBox
-									html={ html }
-									title={ iframeTitle }
-									type={ type }
-								/>
-							</div>
-						) }
+						) : embedWrapper }
 						{ ( caption && caption.length > 0 ) || isSelected ? (
 							<RichText
 								tagName="figcaption"
