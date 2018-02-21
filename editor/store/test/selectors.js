@@ -79,7 +79,7 @@ const {
 	getFrequentInserterItems,
 	POST_UPDATE_TRANSACTION_ID,
 	getTaxonomyTerms,
-	getTaxonomyTermsFetchStatus,
+	getTaxonomyTermFetchStatus,
 	getTaxonomyTerm,
 	getTaxonomies,
 	getTaxonomy,
@@ -2970,9 +2970,9 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getTaxonomyTermsFetchStatus', () => {
+	describe( 'getTaxonomyTermFetchStatus', () => {
 		it( 'should return null when the term is undefined', () => {
-			const fetchStatus = getTaxonomyTermsFetchStatus( {
+			const fetchStatus = getTaxonomyTermFetchStatus( {
 				taxonomyTerms: {
 					fetchStatus: {},
 				},
@@ -2982,7 +2982,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return the terms for a taxonomy when multiple taxonomies are available', () => {
-			const fetchStatus = getTaxonomyTermsFetchStatus( {
+			const fetchStatus = getTaxonomyTermFetchStatus( {
 				taxonomyTerms: {
 					fetchStatus: {
 						category: {
