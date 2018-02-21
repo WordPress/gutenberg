@@ -75,7 +75,7 @@ describe( 'utils', () => {
 	} );
 
 	describe( 'spawnScript', () => {
-		const scriptName = 'test-unit';
+		const scriptName = 'test-unit-js';
 
 		beforeAll( () => {
 			exitMock.mockImplementation( ( code ) => {

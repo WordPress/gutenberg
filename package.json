@@ -34,7 +34,7 @@
 		"create-symlinks": "node ./scripts/create-symlinks.js",
 		"lerna-bootstrap": "lerna bootstrap --hoist",
 		"postinstall": "npm-run-all lerna-bootstrap create-symlinks build",
-		"test": "wp-scripts test-unit",
+		"test": "wp-scripts test-unit-js",
 		"test:coverage": "npm run test -- --coverage",
 		"test:coverage-ci": "npm run test -- --coverage && codecov",
 		"test:watch": "npm run test -- --watch",

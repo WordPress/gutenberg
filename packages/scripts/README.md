@@ -16,9 +16,9 @@ This is a CLI and exposes a binary called `wp-scripts` so you can call it direct
 ```json
 {
 	"scripts": {
-		"test": "wp-scripts test-unit",
-		"test:help": "wp-scripts test-unit --help",
-		"test:watch": "wp-scripts test-unit --watch"
+		"test": "wp-scripts test-unit-js",
+		"test:help": "wp-scripts test-unit-js --help",
+		"test:watch": "wp-scripts test-unit-js --watch"
 	}
 }
 ```
@@ -30,11 +30,11 @@ This is how you execute those scripts using the presented setup:
 
 ## Available Scripts
 
-### `wp-scripts test-unit`
+### `wp-scripts test-unit-js`
 
 _Alias_: `wp-scripts test-unit-jest` 
 
-Launches the test runner. It uses [Jest](https://facebook.github.io/jest/) behind the scenes and you are able to utilize all of its [CLI options](https://facebook.github.io/jest/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit --help` or `npm run test:help` (if you use `package.json` setup shared above) to view all of the available options.
+Launches the test runner. It uses [Jest](https://facebook.github.io/jest/) behind the scenes and you are able to utilize all of its [CLI options](https://facebook.github.io/jest/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit-js --help` or `npm run test:help` (if you use `package.json` setup shared above) to view all of the available options.
 
 ## Inspiration
 
