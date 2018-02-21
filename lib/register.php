@@ -503,3 +503,155 @@ function gutenberg_revisions_restore( $revisions_data ) {
 	return $revisions_data;
 }
 add_filter( 'wp_prepare_revision_for_js', 'gutenberg_revisions_restore' );
+
+/**
+ * Extracts OpenGraph metadata from a HTML document.
+ *
+ * @param string $html The HTML.
+ * @return array OpenGraph data indexed by property name.
+ */
+function gutenberg_get_opengraph_metadata( $html ) {
+	$matches = array();
+	$data    = array();
+	preg_match_all( '/<meta[^>]+property="og:([^"]+)"[^>]+content="([^"]+)"[^>]+>/i', $html, $matches );
+
+	foreach ( $matches[1] as $key => $value ) {
+		$data[ $value ] = $matches[2][ $key ];
+	}
+
+	if ( ! isset( $data['title'] ) ) {
+		preg_match( '/<title>([^<]+)<\/title>/i', $html, $matches );
+		if ( isset( $matches[1] ) ) {
+			$data['title'] = $matches[1];
+		}
+	}
+
+	return $data;
+}
+
+/**
+ * Generates and caches HTML for a URL that contains OpenGraph metadata.
+ *
+ * @param string $url The URL to generate HTML for.
+ * @return mixed OpenGraph HTML, or false if there was no OpenGraph data.
+ */
+function gutenberg_oembed_opengraph( $url ) {
+	$cache_key = 'gutenberg_opengraph_' . md5( $url );
+	$html      = get_transient( $cache_key );
+
+	// Empty string means we tried to get OpenGraph information for this url, but it had none.
+	if ( '' === $html ) {
+		return false;
+	}
+
+	if ( ! empty( $html ) ) {
+		return $html;
+	}
+
+	$get = wp_safe_remote_get(
+		$url,
+		array(
+			'limit_response_size' => 250000,
+			// Some sites block fetching if we don't have a user agent.
+			'user-agent'          => $_SERVER['HTTP_USER_AGENT'],
+		)
+	);
+
+	if ( is_wp_error( $get ) ) {
+		return false;
+	}
+
+	$body  = wp_remote_retrieve_body( $get );
+	$data  = gutenberg_get_opengraph_metadata( $body );
+	$image = isset( $data['image'] ) ? $data['image'] : false;
+	$title = isset( $data['title'] ) ? $data['title'] : $url;
+	$desc  = isset( $data['description'] ) ? $data['description'] : false;
+
+	if ( ! $image && ! $desc ) {
+		$html = '';
+	} else {
+		$html = '<blockquote>';
+		if ( $image ) {
+			$html .= "<img src=\"$image\" />";
+		}
+		$html .= "<h1><a href=\"$url\">$title</a></h1>";
+		if ( $desc ) {
+			$html .= "<p>$desc</p>";
+		}
+		$html .= '</blockquote>';
+		$html .= '<style type="text/css">
+		body.opengraph blockquote,
+		.is-type-opengraph blockquote {
+			margin: 0;
+			border: 1px solid #e1e3e6;
+			border-radius: 4px;
+			padding: 8px;
+			overflow: hidden;
+			height: 96px;
+			box-sizing: content-box;
+			-moz-box-sizing: content-box;
+			-webkit-box-sizing: content-box;
+		}
+		body.opengraph img,
+		.is-type-opengraph img {
+			width: 96px;
+			height: 96px;
+			object-fit: cover;
+			float: left;
+			margin-right: 1em;
+		}
+		body.opengraph p,
+		body.opengraph h1,
+		.is-type-opengraph p,
+		.is-type-opengraph h1 {
+			clear: none;
+			line-height: inherit;
+			padding: 0;
+			font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
+			font-size: 13px;
+			margin: 0;
+		}
+		body.opengraph a {
+			color: #007daa;
+		}
+		</style>';
+	}
+
+	$ttl = apply_filters( 'gutenberg_opengraph_ttl', DAY_IN_SECONDS, $url );
+	set_transient( $cache_key, $html, $ttl );
+
+	return $html;
+}
+
+/**
+ * Adds the Gutenberg embed fallback response, if oEmbed cannot embed the URL.
+ *
+ * @param  array           $response  oEmbed response.
+ * @param  array           $handler   The embed handler.
+ * @param  WP_REST_Request $request   The REST request.
+ * @return array                      Modifed embed response.
+ */
+function gutenberg_oembed_fallback( $response, $handler, $request ) {
+	if ( is_wp_error( $response ) && $response->get_error_code() === 'oembed_invalid_url' ) {
+		$url  = $request->get_param( 'url' );
+		$html = gutenberg_oembed_opengraph( $url );
+
+		if ( ! $html ) {
+			return $response;
+		}
+
+		return  array(
+			'url'  => $url,
+			'html' => $html,
+			'type' => 'opengraph',
+		);
+	}
+
+	return $response;
+}
+
+// Potentially return an OpenGraph response if the embed proxy API cannot embed.
+add_filter( 'rest_request_after_callbacks', 'gutenberg_oembed_fallback', 10, 3 );
+
+// Fires if there are no providers for a URL, so do the OpenGraph stuff here, as it's really a fancy link.
+add_filter( 'embed_maybe_make_link', 'gutenberg_oembed_opengraph' );
