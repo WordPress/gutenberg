@@ -103,7 +103,7 @@ function gutenberg_register_scripts_and_styles() {
 	global $wp_locale;
 	wp_add_inline_script( 'wp-date', 'window._wpDateSettings = ' . wp_json_encode( array(
 		'l10n'     => array(
-			'locale'        => get_locale(),
+			'locale'        => get_user_locale(),
 			'months'        => array_values( $wp_locale->month ),
 			'monthsShort'   => array_values( $wp_locale->month_abbrev ),
 			'weekdays'      => array_values( $wp_locale->weekday ),
