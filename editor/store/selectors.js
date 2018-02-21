@@ -1379,18 +1379,6 @@ export function getTaxonomyTermFetchStatus( state, taxonomySlug ) {
 }
 
 /**
- * Returns true if the taxonomy is currently requesting or if it does not exist.
- *
- * @param {Object} state        Global application state.
- * @param {string} taxonomySlug Unique identifier of a Taxonomy.
- *
- * @return {boolean} Taxonomy Term fetch status.
- */
-export function isRequestingTaxonomyTerm( state, taxonomySlug ) {
-	return get( state, `taxonomyTerms.fetchStatus.${ taxonomySlug }.requesting`, true );
-}
-
-/**
  *
  * Returns the Taxonomy Terms fetch status.
  *
