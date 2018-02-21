@@ -15,7 +15,7 @@ import { buildTermsTree } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import { getEditedPostAttribute } from '../../store/selectors';
+import { getEditedPostAttribute, isRequestingTaxonomyTerm } from '../../store/selectors';
 import { editPost, addTaxonomyTerm } from '../../store/actions';
 
 class HierarchicalTermSelector extends Component {
@@ -243,7 +243,7 @@ const applyConnect = connect(
 		const availableTerms = get( state, `taxonomyTerms.data.${ ownProps.slug }`, [] );
 		return {
 			terms: getEditedPostAttribute( state, ownProps.restBase ),
-			loading: get( state, `taxonomyTerms.fetchStatus.${ ownProps.slug }.requesting`, true ),
+			loading: isRequestingTaxonomyTerm( state, ownProps.slug ),
 			availableTerms: availableTerms,
 			availableTermsTree: buildTermsTree( availableTerms ),
 		};

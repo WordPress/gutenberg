@@ -1332,39 +1332,51 @@ export function isPublishingPost( state ) {
 }
 
 /**
- * Returns the Taxonomy Terms data if it exists.
+ * Returns the taxonomy terms data if it exists.
  *
- * @param {Object} state Global application state.
- * @param {string} taxonomy Unique identifier of a Taxonomy.
+ * @param {Object} state        Global application state.
+ * @param {string} taxonomySlug Taxonomy slug.
  *
- * @return {Array} Taxonomy Terms data.
+ * @return {Array} Taxonomy terms data.
  */
-export function getTaxonomyTerms( state, taxonomy ) {
-	return get( state, `taxonomyTerms.data.${ taxonomy }`, [] );
+export function getTaxonomyTerms( state, taxonomySlug ) {
+	return get( state, `taxonomyTerms.data.${ taxonomySlug }`, [] );
 }
 
 /**
- * Returns the Taxonomy Terms fetch status.
+ * Returns the taxonomy term fetch status.
  *
- * @param {Object} state Global application state.
- * @param {string} taxonomy Unique identifier of a Taxonomy.
+ * @param {Object} state        Global application state.
+ * @param {string} taxonomySlug Taxonomy slug.
  *
- * @return {Object} Taxonomy Terms fetch status.
+ * @return {Object} Taxonomy term fetch status.
  */
-export function getTaxonomyTermsFetchStatus( state, taxonomy ) {
-	return state.taxonomyTerms.fetchStatus[ taxonomy ] || null;
+export function getTaxonomyTermFetchStatus( state, taxonomySlug ) {
+	return state.taxonomyTerms.fetchStatus[ taxonomySlug ] || null;
+}
+
+/**
+ * Returns true if the taxonomy is currently requesting or if it does not exist.
+ *
+ * @param {Object} state        Global application state.
+ * @param {string} taxonomySlug Unique identifier of a Taxonomy.
+ *
+ * @return {boolean} Taxonomy Term fetch status.
+ */
+export function isRequestingTaxonomyTerm( state, taxonomySlug ) {
+	return get( state, `taxonomyTerms.fetchStatus.${ taxonomySlug }.requesting`, true );
 }
 
 /**
  *
  * Returns the Taxonomy Terms fetch status.
  *
- * @param {Object} state Global application state.
- * @param {string} taxonomy Unique identifier of a Taxonomy.
- * @param {number} termId Unique identifier of a Term.
+ * @param {Object} state        Global application state.
+ * @param {string} taxonomySlug Taxonomy slug.
+ * @param {number} termId       Unique identifier of a Term.
  *
  * @return {Object} Taxonomy Term Data.
  */
-export function getTaxonomyTerm( state, taxonomy, termId ) {
-	return find( getTaxonomyTerms( state, taxonomy ), term => term.id === termId ) || null;
+export function getTaxonomyTerm( state, taxonomySlug, termId ) {
+	return find( getTaxonomyTerms( state, taxonomySlug ), term => term.id === termId ) || null;
 }
