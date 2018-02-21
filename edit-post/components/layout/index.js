@@ -59,7 +59,6 @@ function Layout( {
 	onClosePublishSidebar,
 	plugin,
 } ) {
-
 	const isSidebarOpened = layoutHasOpenSidebar &&
 		( openedGeneralSidebar !== 'plugin' || getSidebarSettings( plugin ) );
 	const className = classnames( 'edit-post-layout', {
