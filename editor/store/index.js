@@ -14,16 +14,8 @@ import {
  */
 import reducer from './reducer';
 import applyMiddlewares from './middlewares';
-import {
-	getBlockCount,
-	getBlocks,
-	getEditedPostAttribute,
-	getLastMultiSelectedBlockUid,
-	getSelectedBlockCount,
-} from './selectors';
-import {
-	insertBlocks,
-} from './actions';
+import * as selectors from './selectors';
+import * as actions from './actions';
 
 /**
  * Module Constants
@@ -36,14 +28,7 @@ const store = applyMiddlewares(
 );
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 
-registerSelectors( MODULE_KEY, {
-	getBlockCount,
-	getBlocks,
-	getEditedPostAttribute,
-	getLastMultiSelectedBlockUid,
-	getSelectedBlockCount,
-} );
-
-registerActions( MODULE_KEY, { insertBlocks } );
+registerSelectors( MODULE_KEY, selectors );
+registerActions( MODULE_KEY, actions );
 
 export default store;
