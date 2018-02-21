@@ -330,11 +330,14 @@ export function isEditedPostEmpty( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = getEditedPostAttribute( state, 'date' );
-	// Adding 1 minute as an error threshold between the server and the client dates.
-	const now = moment().add( 1, 'minute' );
+	// The post date is returned without timezone info. It is set with the same
+	// WP timezone, since that timezone is created using blog option gmt_offset
+	const date = moment.tz( 'WP' ).set( getEditedPostAttribute( state, 'date' ) );
 
-	return moment( date ).isAfter( now );
+	// Adding 1 minute as an error threshold between the server and the client dates.
+	const now = moment.tz( 'WP' ).add( 1, 'minute' );
+
+	return date.isAfter( now );
 }
 
 /**
