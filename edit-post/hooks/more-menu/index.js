@@ -6,7 +6,7 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import CopyContentMenuItem from '../../components/header/copy-content-menu-item';
+import CopyContentMenuItem from './copy-content-menu-item';
 
 const withCopyContentMenuItem = ( menuItems ) => [
 	...menuItems,
