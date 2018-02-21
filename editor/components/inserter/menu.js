@@ -33,6 +33,7 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
+import NoBlocks from './no-blocks';
 
 import { getInserterItems, getRecentInserterItems } from '../../store/selectors';
 import { fetchReusableBlocks } from '../../store/actions';
@@ -201,9 +202,7 @@ export class InserterMenu extends Component {
 	renderCategories( visibleItemsByCategory ) {
 		if ( isEmpty( visibleItemsByCategory ) ) {
 			return (
-				<span className="editor-inserter__no-results">
-					{ __( 'No blocks found' ) }
-				</span>
+				<NoBlocks />
 			);
 		}
 
@@ -229,9 +228,9 @@ export class InserterMenu extends Component {
 		// If the Saved tab is selected and we have no results, display a friendly message
 		if ( 'saved' === tab && itemsForTab.length === 0 ) {
 			return (
-				<p className="editor-inserter__no-tab-content-message">
+				<NoBlocks>
 					{ __( 'No saved blocks.' ) }
-				</p>
+				</NoBlocks>
 			);
 		}
 

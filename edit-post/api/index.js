@@ -5,3 +5,7 @@ export {
 export {
 	registerPlugin,
 } from './plugins-core';
+export {
+	registerSidebar,
+	activateSidebar,
+} from './sidebar';

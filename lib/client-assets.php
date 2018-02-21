@@ -103,7 +103,7 @@ function gutenberg_register_scripts_and_styles() {
 	global $wp_locale;
 	wp_add_inline_script( 'wp-date', 'window._wpDateSettings = ' . wp_json_encode( array(
 		'l10n'     => array(
-			'locale'        => get_locale(),
+			'locale'        => get_user_locale(),
 			'months'        => array_values( $wp_locale->month ),
 			'monthsShort'   => array_values( $wp_locale->month_abbrev ),
 			'weekdays'      => array_values( $wp_locale->weekday ),
@@ -390,15 +390,6 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'promise',
 		'https://unpkg.com/promise-polyfill@7.0.0/dist/promise' . $suffix . '.js'
-	);
-
-	// TODO: This is only necessary so long as WordPress 4.9 is not yet stable,
-	// since we depend on the newly-introduced wp-api-request script handle.
-	//
-	// See: gutenberg_ensure_wp_api_request (compat.php).
-	gutenberg_register_vendor_script(
-		'wp-api-request-shim',
-		'https://rawgit.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
 	);
 }
 

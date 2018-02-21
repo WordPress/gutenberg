@@ -20,6 +20,8 @@ import Layout from './components/layout';
 import store from './store';
 export * from './api';
 
+export * from './api';
+
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );
 if ( dateSettings.timezone.string ) {

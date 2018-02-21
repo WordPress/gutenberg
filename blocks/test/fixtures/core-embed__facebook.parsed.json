@@ -5,7 +5,7 @@
             "url": "https://facebook.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-facebook\">\n    https://facebook.com/\n    <figcaption>Embedded content from facebook</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-facebook wp-block-embed\">\n    https://facebook.com/\n    <figcaption>Embedded content from facebook</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

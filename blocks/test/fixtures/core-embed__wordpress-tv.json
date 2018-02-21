@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-wordpress-tv\">\n    https://wordpress.tv/\n    <figcaption>Embedded content from wordpress-tv</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-wordpress-tv wp-block-embed\">\n    https://wordpress.tv/\n    <figcaption>Embedded content from wordpress-tv</figcaption>\n</figure>"
     }
 ]

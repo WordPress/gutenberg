@@ -9,11 +9,17 @@ import classnames from 'classnames';
 import { Component } from '@wordpress/element';
 import { IconButton, withAPIData, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import RichText from '../../rich-text';
+
+/**
+ * Module constants
+ */
+const { BACKSPACE, DELETE } = keycodes;
 
 class GalleryImage extends Component {
 	constructor() {
@@ -21,10 +27,16 @@ class GalleryImage extends Component {
 
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectCaption = this.onSelectCaption.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
+		this.bindContainer = this.bindContainer.bind( this );
 
 		this.state = {
 			captionSelected: false,
 		};
+	}
+
+	bindContainer( ref ) {
+		this.container = ref;
 	}
 
 	onSelectCaption() {
@@ -48,6 +60,17 @@ class GalleryImage extends Component {
 			this.setState( {
 				captionSelected: false,
 			} );
+		}
+	}
+
+	onKeyDown( event ) {
+		if (
+			this.container === document.activeElement &&
+			this.props.isSelected && [ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
+		) {
+			event.stopPropagation();
+			event.preventDefault();
+			this.props.onRemove();
 		}
 	}
 
@@ -95,7 +118,7 @@ class GalleryImage extends Component {
 		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<figure className={ className }>
+			<figure className={ className } tabIndex="-1" onKeyDown={ this.onKeyDown } ref={ this.bindContainer }>
 				{ isSelected &&
 					<div className="blocks-gallery-item__inline-menu">
 						<IconButton
