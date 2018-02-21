@@ -14,7 +14,11 @@ import { FormTokenField } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getEditedPostAttribute } from '../../store/selectors';
+import {
+	getEditedPostAttribute,
+	isRequestingTaxonomyTerm,
+	getTaxonomyTerms,
+} from '../../store/selectors';
 import { editPost, addTaxonomyTerm } from '../../store/actions';
 
 const MAX_TERMS_SUGGESTIONS = 20;
@@ -115,8 +119,8 @@ const applyConnect = connect(
 	( state, ownProps ) => {
 		return {
 			terms: getEditedPostAttribute( state, ownProps.restBase ),
-			loading: get( state, `taxonomyTerms.fetchStatus.${ ownProps.slug }.requesting`, true ),
-			availableTerms: get( state, `taxonomyTerms.data.${ ownProps.slug }`, [] ),
+			loading: isRequestingTaxonomyTerm( state, ownProps.slug ),
+			availableTerms: getTaxonomyTerms( state, ownProps.slug ),
 		};
 	},
 	{
