@@ -16,6 +16,7 @@ import {
 	TextControl,
 	TextareaControl,
 	ToggleControl,
+	ImageControl,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { deprecated } from '@wordpress/utils';
@@ -57,6 +58,7 @@ forEach(
 		TextControl,
 		TextareaControl,
 		ToggleControl,
+		ImageControl,
 	},
 	( component, componentName ) => {
 		InspectorControls[ componentName ] = withDeprecation( componentName )( component );

@@ -39,6 +39,7 @@ export { default as TabPanel } from './tab-panel';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as ToggleControl } from './toggle-control';
+export { default as ImageControl } from './image-control';
 export { default as Toolbar } from './toolbar';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
