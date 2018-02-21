@@ -2,6 +2,7 @@
  * External dependencies
  */
 import moment from 'moment';
+import 'moment-timezone/moment-timezone-utils';
 import {
 	map,
 	first,
@@ -275,7 +276,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+		( post.status === 'future' && moment.tz( post.date, 'WP' ).isBefore( moment.tz( 'WP' ) ) );
 }
 
 /**
@@ -332,7 +333,8 @@ export function isEditedPostEmpty( state ) {
 export function isEditedPostBeingScheduled( state ) {
 	// The post date is returned without timezone info. It is set with the same
 	// WP timezone, since that timezone is created using blog option gmt_offset
-	const date = moment.tz( 'WP' ).set( getEditedPostAttribute( state, 'date' ) );
+	const postdate = getEditedPostAttribute( state, 'date' );
+	const date = moment.tz( postdate, 'WP' );
 
 	// Adding 1 minute as an error threshold between the server and the client dates.
 	const now = moment.tz( 'WP' ).add( 1, 'minute' );
