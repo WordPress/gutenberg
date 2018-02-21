@@ -96,29 +96,31 @@ const unsubscribe = wp.data.subscribe( () => {
 unsubscribe();
 ```
 
-### `wp.data.onSubscribe( mapDataToProps: function )( WrappedComponent: Component )`
+### `wp.data.withData( mapStateToProps: Object|Function )( WrappedComponent: Component )`
 
-If you use a React or WordPress Element, a Higher Order Component is made available to inject data into your components like so:
+To inject state-derived props into a WordPress Element Component, use the `withData` higher-order component:
 
-```js
+```jsx
 const Component = ( { title } ) => <div>{ title }</div>;
 
-wp.data.onSubscribe( () => {
-	return {
-		title: wp.data.select( 'myPlugin' ).getTitle(),
-	};
+const EnhancedComponent = wp.data.withData( {
+	title: wp.data.select( 'myPlugin' ).getTitle,
 } )( Component );
 ```
 
-You can also use this Higher Order Component to provide action handlers to your components
+### `wp.data.withDispatch( propsToDispatchers: Object )( WrappedComponent: Component )`
 
-```js
+To manipulate store data, you can pass dispatching actions into your component as props using the `withDispatch` higher-order component:
+
+```jsx
 const Component = ( { title, updateTitle } ) => <input value={ title } onChange={ updateTitle } />;
 
-wp.data.onSubscribe( () => {
-	return {
-		title: select( 'myPlugin' ).getTitle(),
+const EnhancedComponent = wp.element.compose( [
+	wp.data.withData( {
+		title: select( 'myPlugin' ).getTitle,
+	} ),
+	wp.data.withDispatch( {
 		updateTitle: dispatch( 'myPlugin' ).setTitle,
-	};
-} )( Component );
+	} ),
+] )( Component );
 ```
