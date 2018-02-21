@@ -57,7 +57,7 @@ description: 'Block showing a Book card.'
 Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embed`.
 
 ```js
-// Assigning to the 'layout' category
+// Assigning to the 'widgets' category
 category: 'widgets',
 ```
 

@@ -1,0 +1,161 @@
+// Output overrides for each scheme
+@include admin-scheme-color-overrides( 'blue', $scheme-blue__spot-color );
+@include admin-scheme-color-overrides( 'coffee', $scheme-coffee__spot-color );
+@include admin-scheme-color-overrides( 'ectoplasm', $scheme-ectoplasm__spot-color );
+@include admin-scheme-color-overrides( 'midnight', $scheme-midnight__spot-color );
+@include admin-scheme-color-overrides( 'ocean', $scheme-ocean__spot-color );
+@include admin-scheme-color-overrides( 'sunrise', $scheme-sunrise__spot-color );
+
+@keyframes animate_fade {
+	from {
+		opacity: 0;
+		transform: translateY( 4px );
+	}
+	to {
+		opacity: 1;
+		transform: translateY( 0px );
+	}
+}
+
+@keyframes move_background {
+	from {
+		background-position: 0 0;
+	}
+	to {
+		background-position: 28px 0;
+	}
+}
+
+@keyframes loading_fade {
+	0% {
+		opacity: .5;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: .5;
+	}
+}
+
+@keyframes slide_in_right {
+	100% {
+		transform: translateX( 0% );
+	}
+}
+
+body.gutenberg-editor-page {
+	background: $white;
+
+	#update-nag, .update-nag {
+		display: none;
+	}
+
+	#wpcontent {
+		padding-left: 0;
+	}
+
+	#wpbody-content {
+		padding-bottom: 0;
+	}
+
+	#wpfooter {
+		display: none;
+	}
+
+	.a11y-speak-region {
+		left: -1px;
+		top: -1px;
+	}
+
+	svg {
+		fill: currentColor;
+		outline: none;
+	}
+
+	ul#adminmenu a.wp-has-current-submenu:after,
+	ul#adminmenu>li.current>a.current:after {
+		border-right-color: $white;
+	}
+}
+
+.gutenberg {
+	* {
+		box-sizing: border-box;
+	}
+
+	ul:not(.wp-block-gallery) {
+		list-style-type: disc;
+	}
+
+	ol:not(.wp-block-gallery) {
+		list-style-type: decimal;
+	}
+
+	ul,
+	ol {
+		margin: 0;
+		padding: 0;
+	}
+
+	select {
+		font-size: $default-font-size;
+		color: $dark-gray-500;
+	}
+}
+
+.gutenberg__editor {
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	@include break-small {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		min-height: calc( 100vh - #{ $admin-bar-height-big } );
+	}
+
+	// The WP header height changes at this breakpoint
+	@include break-medium {
+		min-height: calc( 100vh - #{ $admin-bar-height } );
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	iframe {
+		width: 100%;
+	}
+
+	.components-navigate-regions {
+		height: 100%;
+	}
+}
+
+.editor-post-title,
+.editor-block-list__block {
+	input,
+	textarea {
+		border-radius: 4px;
+		border-color: $light-gray-500;
+		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 10px;
+
+		&::-webkit-input-placeholder {
+			color: $dark-gray-300;
+		}
+		&::-moz-placeholder {
+			color: $dark-gray-300;
+		}
+		&:-ms-input-placeholder {
+			color: $dark-gray-300;
+		}
+		&:-moz-placeholder {
+			color: $dark-gray-300;
+		}
+	}
+}

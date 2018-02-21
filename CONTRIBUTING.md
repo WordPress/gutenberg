@@ -14,7 +14,7 @@ To test the plugin, or to contribute to it, you can clone this repository and bu
 
 ### Local Environment
 
-First, you need a WordPress Environment to run the plugin on. The quickest way to get up and running is to use the provided docker setup. Just install [docker](https://www.docker.com/) on your machine and run `./bin/setup-local-env.sh`.
+First, you need a WordPress Environment to run the plugin on. The quickest way to get up and running is to use the provided docker setup. Just install [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) on your machine and run `./bin/setup-local-env.sh`.
 
 The WordPress installation should be available at `http://localhost:8888` (username: `admin`, password: `password`).
 Inside the "docker" directory, you can use any docker command to interact with your containers. If this port is in use, you can override it in your `docker-compose.override.yml` file. If you're running [e2e tests](https://wordpress.org/gutenberg/handbook/reference/testing-overview/#end-to-end-testing), this change will be used correctly.
@@ -50,6 +50,8 @@ For example, `add/gallery-block` means you're working on adding a new gallery bl
 
 You can pick among all the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue">Good First Issue</a>.
 
+The workflow is documented in greater detail in the [repository management](./docs/repository-management.md) document.
+
 ## Testing
 
 Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Cypress](https://www.cypress.io/). You can find out more details in [Testing Overview document](./docs/testing-overview.md).
@@ -63,3 +65,7 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
 
 To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [manifest file](https://github.com/WordPress/gutenberg/blob/master/docs/manifest.json).
+
+## Reporting Security Issues
+
+Please see [SECURITY.md](./SECURITY.md).

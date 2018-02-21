@@ -9,6 +9,7 @@
                 "Embedded content from instagram"
             ]
         },
-        "originalContent": "<figure class=\"wp-block-embed-instagram\">\n    https://instagram.com/\n    <figcaption>Embedded content from instagram</figcaption>\n</figure>"
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-embed-instagram wp-block-embed\">\n    https://instagram.com/\n    <figcaption>Embedded content from instagram</figcaption>\n</figure>"
     }
 ]

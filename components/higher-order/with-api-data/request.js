@@ -47,7 +47,7 @@ export const cache = mapKeys(
  *
  * @param {XMLHttpRequest} xhr XMLHttpRequest object.
  *
- * @returns {Array[]} Array of header tuples.
+ * @return {Array[]} Array of header tuples.
  */
 export function getResponseHeaders( xhr ) {
 	// 'date: Tue, 22 Aug 2017 18:45:28 GMT↵server: nginx'
@@ -66,7 +66,7 @@ export function getResponseHeaders( xhr ) {
  *
  * @param {Object} request Request object (path, method).
  *
- * @returns {?Object} Response object (body, headers).
+ * @return {?Object} Response object (body, headers).
  */
 export function getCachedResponse( request ) {
 	if ( isRequestMethod( request, 'GET' ) ) {

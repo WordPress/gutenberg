@@ -4,7 +4,13 @@
 import { createElement, Component, cloneElement, Children, Fragment } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { camelCase, flowRight, isString, upperFirst } from 'lodash';
+import {
+	camelCase,
+	flowRight,
+	isString,
+	upperFirst,
+	isEmpty,
+} from 'lodash';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -16,7 +22,7 @@ import { camelCase, flowRight, isString, upperFirst } from 'lodash';
  *                                       pass through to element creator
  * @param {...WPElement}       children Descendant elements
  *
- * @returns {WPElement} Element.
+ * @return {WPElement} Element.
  */
 export { createElement };
 
@@ -46,7 +52,7 @@ export { Component };
  * @param {WPElement} element Element
  * @param {?Object}   props   Props to apply to cloned element
  *
- * @returns {WPElement} Cloned element.
+ * @return {WPElement} Cloned element.
  */
 export { cloneElement };
 
@@ -80,16 +86,23 @@ export { createPortal };
  *
  * @param {WPElement} element Element to render
  *
- * @returns {String} HTML.
+ * @return {string} HTML.
  */
-export { renderToStaticMarkup as renderToString };
+export function renderToString( element ) {
+	let rendered = renderToStaticMarkup( element );
+
+	// Drop raw HTML wrappers (support dangerous inner HTML without wrapper)
+	rendered = rendered.replace( /<\/?wp-raw-html>/g, '' );
+
+	return rendered;
+}
 
 /**
  * Concatenate two or more React children objects.
  *
  * @param {...?Object} childrenArguments Array of children arguments (array of arrays/strings/objects) to concatenate.
  *
- * @returns {Array} The concatenated value.
+ * @return {Array} The concatenated value.
  */
 export function concatChildren( ...childrenArguments ) {
 	return childrenArguments.reduce( ( memo, children, i ) => {
@@ -113,7 +126,7 @@ export function concatChildren( ...childrenArguments ) {
  * @param {?Object} children Children object.
  * @param {string}  nodeName Node name.
  *
- * @returns {?Object} The updated children object.
+ * @return {?Object} The updated children object.
  */
 export function switchChildrenNodeName( children, nodeName ) {
 	return children && Children.map( children, ( elt, index ) => {
@@ -131,7 +144,7 @@ export function switchChildrenNodeName( children, nodeName ) {
  *
  * @param {...Function} hocs The HOC functions to invoke.
  *
- * @returns {Function} Returns the new composite function.
+ * @return {Function} Returns the new composite function.
  */
 export { flowRight as compose };
 
@@ -142,10 +155,33 @@ export { flowRight as compose };
  * @param {Function|Component} BaseComponent Used to detect the existing display name.
  * @param {string} wrapperName Wrapper name to prepend to the display name.
  *
- * @returns {string} Wrapped display name.
+ * @return {string} Wrapped display name.
  */
 export function getWrapperDisplayName( BaseComponent, wrapperName ) {
 	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;
 
 	return `${ upperFirst( camelCase( wrapperName ) ) }(${ displayName })`;
+}
+
+/**
+ * Component used as equivalent of Fragment with unescaped HTML, in cases where
+ * it is desirable to render dangerous HTML without needing a wrapper element.
+ * To preserve additional props, a `div` wrapper _will_ be created if any props
+ * aside from `children` are passed.
+ *
+ * @param {string} props.children HTML to render.
+ *
+ * @return {WPElement} Dangerously-rendering element.
+ */
+export function RawHTML( { children, ...props } ) {
+	// Render wrapper only if props are non-empty.
+	const tagName = isEmpty( props ) ? 'wp-raw-html' : 'div';
+
+	// Merge HTML into assigned props.
+	props = {
+		dangerouslySetInnerHTML: { __html: children },
+		...props,
+	};
+
+	return createElement( tagName, props );
 }

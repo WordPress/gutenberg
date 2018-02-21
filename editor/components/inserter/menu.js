@@ -26,17 +26,19 @@ import {
 	withSpokenMessages,
 	withContext,
 } from '@wordpress/components';
-import { getCategories } from '@wordpress/blocks';
+import { getCategories, isReusableBlock } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import NoBlocks from './no-blocks';
 
 import { getInserterItems, getRecentInserterItems } from '../../store/selectors';
 import { fetchReusableBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
+import BlockPreview from '../block-preview';
 
 export const searchItems = ( items, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
@@ -59,6 +61,7 @@ export class InserterMenu extends Component {
 		this.state = {
 			filterValue: '',
 			tab: 'recent',
+			selectedItem: null,
 		};
 		this.filter = this.filter.bind( this );
 		this.searchItems = this.searchItems.bind( this );
@@ -68,6 +71,7 @@ export class InserterMenu extends Component {
 
 		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
+		this.previewItem = this.previewItem.bind( this );
 	}
 
 	componentDidMount() {
@@ -96,6 +100,10 @@ export class InserterMenu extends Component {
 		this.setState( {
 			filterValue: event.target.value,
 		} );
+	}
+
+	previewItem( item ) {
+		this.setState( { selectedItem: item } );
 	}
 
 	selectItem( item ) {
@@ -170,6 +178,7 @@ export class InserterMenu extends Component {
 				items={ items }
 				labelledBy={ labelledBy }
 				onSelectItem={ this.selectItem }
+				onHover={ this.previewItem }
 			/>
 		);
 	}
@@ -193,9 +202,7 @@ export class InserterMenu extends Component {
 	renderCategories( visibleItemsByCategory ) {
 		if ( isEmpty( visibleItemsByCategory ) ) {
 			return (
-				<span className="editor-inserter__no-results">
-					{ __( 'No blocks found' ) }
-				</span>
+				<NoBlocks />
 			);
 		}
 
@@ -221,9 +228,9 @@ export class InserterMenu extends Component {
 		// If the Saved tab is selected and we have no results, display a friendly message
 		if ( 'saved' === tab && itemsForTab.length === 0 ) {
 			return (
-				<p className="editor-inserter__no-tab-content-message">
+				<NoBlocks>
 					{ __( 'No saved blocks.' ) }
-				</p>
+				</NoBlocks>
 			);
 		}
 
@@ -250,9 +257,7 @@ export class InserterMenu extends Component {
 			return 1; // Move focus forward
 		}
 
-		// Prevent cases of focus being unexpectedly stolen up in the tree,
-		// notably when using VisualEditorSiblingInserter, where focus is
-		// moved to sibling blocks.
+		// Prevent cases of focus being unexpectedly stolen up in the tree.
 		if ( includes( ARROWS, event.keyCode ) ) {
 			return 0; // Don't move focus, but prevent event propagation
 		}
@@ -262,10 +267,13 @@ export class InserterMenu extends Component {
 
 	render() {
 		const { instanceId, items } = this.props;
+		const { selectedItem } = this.state;
 		const isSearching = this.state.filterValue;
 
 		return (
-			<TabbableContainer className="editor-inserter__menu" deep
+			<TabbableContainer
+				className="editor-inserter__menu"
+				deep
 				eventToOffset={ this.eventToOffset }
 			>
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
@@ -315,6 +323,9 @@ export class InserterMenu extends Component {
 					<div role="menu" className="editor-inserter__search-results">
 						{ this.renderCategories( this.getVisibleItemsByCategory( items ) ) }
 					</div>
+				}
+				{ selectedItem && isReusableBlock( selectedItem ) &&
+					<BlockPreview name={ selectedItem.name } attributes={ selectedItem.initialAttributes } />
 				}
 			</TabbableContainer>
 		);

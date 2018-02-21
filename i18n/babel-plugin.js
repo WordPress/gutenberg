@@ -88,7 +88,7 @@ const REGEXP_TRANSLATOR_COMMENT = /^\s*translators:\s*([\s\S]+)/im;
  *
  * @param {Object} node AST node.
  *
- * @returns {string} String value.
+ * @return {string} String value.
  */
 function getNodeAsString( node ) {
 	switch ( node.type ) {
@@ -113,7 +113,7 @@ function getNodeAsString( node ) {
  * @param {number} _originalNodeLine Private: In recursion, line number of
  *                                     the original node passed.
  *
- * @returns {?string} Translator comment.
+ * @return {?string} Translator comment.
  */
 function getTranslatorComment( path, _originalNodeLine ) {
 	const { node, parent, parentPath } = path;
@@ -162,7 +162,7 @@ function getTranslatorComment( path, _originalNodeLine ) {
  *
  * @param {string} key Key to test.
  *
- * @returns {boolean} Whether key is valid for assignment.
+ * @return {boolean} Whether key is valid for assignment.
  */
 function isValidTranslationKey( key ) {
 	return -1 !== VALID_TRANSLATION_KEYS.indexOf( key );
@@ -175,7 +175,7 @@ function isValidTranslationKey( key ) {
  * @param {Object} a First translation object.
  * @param {Object} b Second translation object.
  *
- * @returns {boolean} Whether valid translation keys match.
+ * @return {boolean} Whether valid translation keys match.
  */
 function isSameTranslation( a, b ) {
 	return isEqual(

@@ -70,60 +70,6 @@ function _gutenberg_utf8_split( $str ) {
 }
 
 /**
- * Fixes a conflict with the Jetpack plugin trying to read an undefined global
- * variable `grunionEditorView` during the initialization of the
- * `core/freeform` block.
- *
- * @since 0.7.1
- */
-function gutenberg_fix_jetpack_freeform_block_conflict() {
-	if (
-		defined( 'JETPACK__VERSION' ) &&
-		version_compare( JETPACK__VERSION, '5.2.2', '<' )
-	) {
-		remove_filter(
-			'mce_external_plugins',
-			array( 'Grunion_Editor_View', 'mce_external_plugins' )
-		);
-	}
-}
-
-/**
- * Shims wp-api-request for WordPress installations not running 4.9-alpha or
- * newer.
- *
- * @see https://core.trac.wordpress.org/ticket/40919
- *
- * @since 0.10.0
- */
-function gutenberg_ensure_wp_api_request() {
-	if ( wp_script_is( 'wp-api-request', 'registered' ) ||
-			! wp_script_is( 'wp-api-request-shim', 'registered' ) ) {
-		return;
-	}
-
-	global $wp_scripts;
-
-	// Define script using existing shim. We do this because we must define the
-	// vendor script in client-assets.php, but want to use consistent handle.
-	$shim = $wp_scripts->registered['wp-api-request-shim'];
-	wp_register_script(
-		'wp-api-request',
-		$shim->src,
-		$shim->deps,
-		$shim->ver
-	);
-
-	// Localize wp-api-request using wp-api handle data (swapped in 4.9-alpha).
-	$wp_api_localized_data = $wp_scripts->get_data( 'wp-api', 'data' );
-	if ( false !== $wp_api_localized_data ) {
-		wp_add_inline_script( 'wp-api-request', $wp_api_localized_data, 'before' );
-	}
-}
-add_action( 'wp_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
-add_action( 'admin_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
-
-/**
  * Disables wpautop behavior in classic editor when post contains blocks, to
  * prevent removep from invalidating paragraph blocks.
  *

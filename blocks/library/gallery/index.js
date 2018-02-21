@@ -14,7 +14,7 @@ import { createMediaFromFile, preloadImage } from '@wordpress/utils';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType, createBlock } from '../../api';
+import { createBlock } from '../../api';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
 const blockAttributes = {
@@ -26,20 +26,33 @@ const blockAttributes = {
 		type: 'array',
 		default: [],
 		source: 'query',
-		selector: 'ul.wp-block-gallery .blocks-gallery-item img',
+		selector: 'ul.wp-block-gallery .blocks-gallery-item',
 		query: {
 			url: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'src',
+			},
+			link: {
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'data-link',
 			},
 			alt: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'alt',
 				default: '',
 			},
 			id: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'data-id',
+			},
+			caption: {
+				type: 'array',
+				source: 'children',
+				selector: 'figcaption',
 			},
 		},
 	},
@@ -56,7 +69,9 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/gallery', {
+export const name = 'core/gallery';
+
+export const settings = {
 	title: __( 'Gallery' ),
 	description: __( 'Image galleries are a great way to share groups of pictures on your site.' ),
 	icon: 'format-gallery',
@@ -74,7 +89,7 @@ registerBlockType( 'core/gallery', {
 					const validImages = filter( attributes, ( { id, url } ) => id && url );
 					if ( validImages.length > 0 ) {
 						return createBlock( 'core/gallery', {
-							images: validImages.map( ( { id, url, alt } ) => ( { id, url, alt } ) ),
+							images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
 						} );
 					}
 					return createBlock( 'core/gallery' );
@@ -129,6 +144,7 @@ registerBlockType( 'core/gallery', {
 						images: medias.map( media => ( {
 							id: media.id,
 							url: media.source_url,
+							link: media.link,
 						} ) ),
 					} ) );
 
@@ -142,7 +158,7 @@ registerBlockType( 'core/gallery', {
 				blocks: [ 'core/image' ],
 				transform: ( { images } ) => {
 					if ( images.length > 0 ) {
-						return images.map( ( { id, url, alt } ) => createBlock( 'core/image', { id, url, alt } ) );
+						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption } ) );
 					}
 					return createBlock( 'core/image' );
 				},
@@ -175,12 +191,13 @@ registerBlockType( 'core/gallery', {
 							break;
 					}
 
-					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } />;
+					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } />;
 
 					return (
 						<li key={ image.id || image.url } className="blocks-gallery-item">
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
+								{ image.caption && image.caption.length > 0 && <figcaption>{ image.caption }</figcaption> }
 							</figure>
 						</li>
 					);
@@ -228,5 +245,4 @@ registerBlockType( 'core/gallery', {
 			},
 		},
 	],
-
-} );
+};
