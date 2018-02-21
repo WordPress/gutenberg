@@ -34,7 +34,7 @@
 		"@wordpress/babel-preset-default": "^1.0.2",
 		"@wordpress/jest-preset-default": "^1.0.0",
 		"cross-spawn": "^5.1.0",
-		"jest": "^22.0.4",
+		"jest": "^22.4.0",
 		"read-pkg-up": "^3.0.0"
 	},
 	"publishConfig": {
