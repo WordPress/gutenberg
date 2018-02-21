@@ -2,6 +2,16 @@
  * External dependencies
  */
 import moment from 'moment';
+import 'moment-timezone/moment-timezone-utils';
+const momentTimezone = {
+	name: 'WP',
+	abbrs: [ 'WP' ],
+	untils: [ null ],
+	offsets: [ 0 ],
+};
+const unpackedTimezone = moment.tz.pack( momentTimezone );
+moment.tz.add( unpackedTimezone );
+
 import { filter, property, union } from 'lodash';
 
 /**
