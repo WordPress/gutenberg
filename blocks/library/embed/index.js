@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse } from 'url';
-import { includes } from 'lodash';
+import { includes, kebabCase, toLower } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,6 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -50,6 +51,12 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			align: {
 				type: 'string',
 			},
+			type: {
+				type: 'string',
+			},
+			providerNameSlug: {
+				type: 'string',
+			},
 		},
 
 		transforms,
@@ -70,6 +77,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 					type: '',
 					error: false,
 					fetching: false,
+					providerName: '',
 				};
 			}
 
@@ -100,6 +108,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 					event.preventDefault();
 				}
 				const { url } = this.props.attributes;
+				const { setAttributes } = this.props;
 				const apiURL = addQueryArgs( wpApiSettings.root + 'oembed/1.0/proxy', {
 					url: url,
 					_wpnonce: wpApiSettings.nonce,
@@ -114,11 +123,15 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 							return;
 						}
 						response.json().then( ( obj ) => {
-							const { html, type } = obj;
+							const { html, type, provider_name: providerName } = obj;
+							const providerNameSlug = kebabCase( toLower( providerName ) );
+
 							if ( html ) {
-								this.setState( { html, type } );
+								this.setState( { html, type, providerNameSlug } );
+								setAttributes( { type, providerNameSlug } );
 							} else if ( 'photo' === type ) {
-								this.setState( { html: this.getPhotoHtml( obj ), type } );
+								this.setState( { html: this.getPhotoHtml( obj ), type, providerNameSlug } );
+								setAttributes( { type, providerNameSlug } );
 							} else {
 								this.setState( { error: true } );
 							}
@@ -219,14 +232,20 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 		},
 
 		save( { attributes } ) {
-			const { url, caption, align } = attributes;
+			const { url, caption, align, type, providerNameSlug } = attributes;
 
 			if ( ! url ) {
 				return;
 			}
 
+			const embedClassName = classnames( 'wp-block-embed', {
+				[ `is-align${ align }` ]: align,
+				[ `is-type-${ type }` ]: type,
+				[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
+			} );
+
 			return (
-				<figure className={ align ? `align${ align }` : null }>
+				<figure className={ embedClassName }>
 					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
 					{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 				</figure>

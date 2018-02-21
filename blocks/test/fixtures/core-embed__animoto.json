@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-animoto\">\n    https://animoto.com/\n    <figcaption>Embedded content from animoto</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-animoto wp-block-embed\">\n    https://animoto.com/\n    <figcaption>Embedded content from animoto</figcaption>\n</figure>"
     }
 ]

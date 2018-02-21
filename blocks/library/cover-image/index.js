@@ -19,7 +19,7 @@ import { createBlock } from '../../api';
 import RichText from '../../rich-text';
 import AlignmentToolbar from '../../alignment-toolbar';
 import MediaUpload from '../../media-upload';
-import ImagePlaceHolder from '../../image-placeholder';
+import ImagePlaceholder from '../../image-placeholder';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
@@ -182,7 +182,7 @@ export const settings = {
 
 			return [
 				controls,
-				<ImagePlaceHolder key="cover-image-placeholder"
+				<ImagePlaceholder key="cover-image-placeholder"
 					{ ...{ className, icon, label, onSelectImage } }
 				/>,
 			];
