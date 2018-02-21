@@ -79,37 +79,37 @@ class HierarchicalTermSelector extends Component {
 		speak( termAddedMessage, 'assertive' );
 	}
 
+	clearForm() {
+		this.setState( {
+			formName: '',
+			formParent: '',
+		} );
+	}
+
 	onAddTerm( event ) {
 		event.preventDefault();
-		const { formName, formParent, adding } = this.state;
-		const { taxonomy, terms, availableTerms, restBase, onUpdateTerms } = this.props;
-		if ( formName === '' || adding ) {
+		const { formName, formParent } = this.state;
+		const { taxonomy, terms, availableTerms, restBase, onUpdateTerms, loading } = this.props;
+		if ( formName === '' || loading ) {
 			return;
 		}
 
-		// check if the term we are adding already exists
+		// Check if the term we are adding already exists.
 		const existingTerm = this.findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
-			// if the term we are adding exists but is not selected select it
+			// If the term we are adding exists but is not selected select it.
 			if ( ! some( terms, term => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ], restBase );
 				this.speakTermAdded();
 			}
-			this.setState( {
-				formName: '',
-				formParent: '',
-			} );
+			this.clearForm();
 			return;
 		}
 
 		const parent = formParent ? parseInt( formParent ) : null;
 		this.props.addTaxonomyTerm( taxonomy.slug, taxonomy.rest_base, formName, parent );
 		this.speakTermAdded();
-
-		this.setState( {
-			formName: '',
-			formParent: '',
-		} );
+		this.clearForm();
 	}
 
 	renderTerms( renderedTerms ) {
@@ -226,6 +226,7 @@ class HierarchicalTermSelector extends Component {
 						<button
 							type="submit"
 							className="button editor-post-taxonomies__hierarchical-terms-submit"
+							disabled={ loading }
 						>
 							{ newTermSubmitLabel }
 						</button>

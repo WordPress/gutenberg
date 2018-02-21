@@ -906,7 +906,7 @@ describe( 'effects', () => {
 				} );
 			} );
 
-			it( 'should dispatch a failure action when something goes wrong', () => {
+			it( 'should dispatch a failure action when the API returns an error', () => {
 				const promise = Promise.reject( {
 					responseJSON: {
 						code: 'unauthorized',
@@ -937,7 +937,7 @@ describe( 'effects', () => {
 				} );
 			} );
 
-			it( 'should dispatch a failure action with a default error when something goes wrong', () => {
+			it( 'should dispatch a failure action with a default error when an unknown API error occurs', () => {
 				const promise = Promise.reject( {} );
 
 				set( global, 'wp.api.collections.Taxonomies', class {
@@ -1046,7 +1046,7 @@ describe( 'effects', () => {
 				} );
 			} );
 
-			it( 'should dispatch a failure action when something goes wrong', () => {
+			it( 'should dispatch a failure action when the API returns an error', () => {
 				const promise = Promise.reject( {} );
 
 				const getTaxonomyCollection = jest.fn();
@@ -1112,6 +1112,7 @@ describe( 'effects', () => {
 						data: {
 							category: {
 								slug: 'category',
+								rest_base: 'categories',
 							},
 						},
 					},
@@ -1126,6 +1127,7 @@ describe( 'effects', () => {
 					expect( dispatch ).toHaveBeenCalledTimes( 2 );
 					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
 						type: 'ADD_TAXONOMY_TERM_SUCCESS',
+						taxonomySlug: 'category',
 						taxonomyTerm: {
 							id: 5,
 							name: 'SEO',
@@ -1165,6 +1167,7 @@ describe( 'effects', () => {
 						data: {
 							category: {
 								slug: 'category',
+								rest_base: 'categories',
 							},
 						},
 					},
@@ -1179,15 +1182,15 @@ describe( 'effects', () => {
 						type: 'FETCH_AND_ADD_TAXONOMY_TERM',
 						termName: 'Term name',
 						termParentId: null,
-						taxonomyRestBase: 'categories',
 						taxonomy: {
 							slug: 'category',
+							rest_base: 'categories',
 						},
 					} );
 				} );
 			} );
 
-			it( 'should dispatch a failure action when something goes wrong', () => {
+			it( 'should dispatch a failure action when the API returns an error', () => {
 				const promise = Promise.reject( {} );
 
 				const getTaxonomyCollection = jest.fn();
@@ -1205,6 +1208,7 @@ describe( 'effects', () => {
 						data: {
 							category: {
 								slug: 'category',
+								rest_base: 'categories',
 							},
 						},
 					},

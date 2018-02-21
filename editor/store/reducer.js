@@ -974,6 +974,7 @@ export const taxonomyTerms = combineReducers( {
 
 	fetchStatus( state = {}, action ) {
 		switch ( action.type ) {
+			case 'ADD_TAXONOMY_TERM':
 			case 'FETCH_TAXONOMY_TERMS': {
 				const { taxonomySlug } = action;
 				return {
@@ -985,6 +986,7 @@ export const taxonomyTerms = combineReducers( {
 					},
 				};
 			}
+			case 'ADD_TAXONOMY_TERM_SUCCESS':
 			case 'FETCH_TAXONOMY_TERMS_SUCCESS': {
 				const { taxonomySlug } = action;
 				return {
@@ -996,6 +998,7 @@ export const taxonomyTerms = combineReducers( {
 					},
 				};
 			}
+			case 'ADD_TAXONOMY_TERM_FAILURE':
 			case 'FETCH_TAXONOMY_TERMS_FAILURE': {
 				const { error, taxonomySlug } = action;
 				return {

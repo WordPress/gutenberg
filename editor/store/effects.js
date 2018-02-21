@@ -66,6 +66,11 @@ import { getMetaBoxContainer } from '../utils/meta-boxes';
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
+const DEFAULT_TAXONOMY_QUERY = {
+	per_page: 100,
+	orderby: 'count',
+	order: 'desc',
+};
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -537,14 +542,14 @@ export default {
 
 		const { dispatch } = store;
 		const collection = new wp.api.collections.Taxonomies();
-		const fetchData = {};
+		const fetchData = {
+			...DEFAULT_TAXONOMY_QUERY,
+		};
 		if ( has( action, 'postType' ) ) {
-			fetchData.data = {
-				type: action.postType,
-			};
+			fetchData.type = action.postType;
 		}
 
-		collection.fetch( fetchData ).then( ( taxonomies ) => {
+		collection.fetch( { data: fetchData } ).then( ( taxonomies ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMIES_SUCCESS',
 				taxonomies,
@@ -587,7 +592,11 @@ export default {
 		}
 
 		const collection = new TaxonomyCollection();
-		collection.fetch().then( ( taxonomyTerms ) => {
+		collection.fetch( {
+			data: {
+				...DEFAULT_TAXONOMY_QUERY,
+			},
+		} ).then( ( taxonomyTerms ) => {
 			dispatch( {
 				type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
 				taxonomySlug,
@@ -636,13 +645,15 @@ export default {
 		collection.fetch( {
 			type: 'POST',
 			data: {
+				...DEFAULT_TAXONOMY_QUERY,
 				name: termName,
 				parent: termParentId,
 			},
 		} ).then( ( taxonomyTerm ) => {
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_SUCCESS',
-				taxonomyTerm: taxonomyTerm,
+				taxonomySlug,
+				taxonomyTerm,
 			} );
 			dispatch(
 				editPost( {
@@ -658,8 +669,7 @@ export default {
 					type: 'FETCH_AND_ADD_TAXONOMY_TERM',
 					termName: action.termName,
 					termParentId: action.termParentId,
-					taxonomy: taxonomy,
-					taxonomyRestBase: action.taxonomyRestBase,
+					taxonomy,
 				} );
 			} else {
 				dispatchFailure( err.responseJSON );
@@ -674,7 +684,6 @@ export default {
 		const {
 			termName,
 			taxonomy,
-			taxonomyRestBase,
 		} = action;
 		let termParentId = action.termParentId;
 
@@ -685,6 +694,7 @@ export default {
 			} );
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				taxonomySlug: taxonomy.slug,
 				error,
 			} );
 		};
@@ -699,33 +709,29 @@ export default {
 		}
 
 		const collection = new TaxonomyCollection();
-		const DEFAULT_QUERY = {
-			per_page: 100,
-			orderby: 'count',
-			order: 'desc',
-			_fields: [ 'id', 'name', 'parent', 'taxonomy' ],
-		};
 		collection.fetch( {
 			data: {
-				...DEFAULT_QUERY,
+				...DEFAULT_TAXONOMY_QUERY,
+				_fields: [ 'id', 'name', 'parent', 'taxonomy' ],
 				parent: termParentId || 0,
 				search: termName,
 			},
 		} ).then( results => {
 			const taxonomyTerm = find( results, { name: termName } );
-			// This should never be an possible
+			// This should be extremely unlikely, but let's do a sanity check.
 			if ( ! taxonomyTerm ) {
 				return dispatchFailure();
 			}
 
 			dispatch( {
 				type: 'ADD_TAXONOMY_TERM_SUCCESS',
-				taxonomyTerm: taxonomyTerm,
+				taxonomySlug: taxonomy.slug,
+				taxonomyTerm,
 			} );
 			dispatch(
 				editPost( {
-					[ taxonomyRestBase ]: [
-						...getEditedPostAttribute( state, taxonomyRestBase ),
+					[ taxonomy.rest_base ]: [
+						...getEditedPostAttribute( state, taxonomy.rest_base ),
 						taxonomyTerm.id,
 					],
 				} )
