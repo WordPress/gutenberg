@@ -526,17 +526,20 @@ add_filter( 'wp_prepare_revision_for_js', 'gutenberg_revisions_restore' );
  */
 function gutenberg_get_opengraph_metadata( $html ) {
 	$matches = array();
-	$data = array();
+	$data    = array();
 	preg_match_all( '/<meta[^>]+property="og:([^"]+)"[^>]+content="([^"]+)"[^>]+>/i', $html, $matches );
-	foreach( $matches[1] as $key => $value ) {
+
+	foreach ( $matches[1] as $key => $value ) {
 		$data[ $value ] = $matches[2][ $key ];
 	}
+
 	if ( ! isset( $data['title'] ) ) {
 		preg_match( '/<title>([^<]+)<\/title>/i', $html, $matches );
 		if ( isset( $matches[1] ) ) {
 			$data['title'] = $matches[1];
 		}
 	}
+
 	return $data;
 }
 
