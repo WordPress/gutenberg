@@ -489,6 +489,10 @@
 	pointer-events: none;
 	height: $block-toolbar-height;
 
+	// Table shares same characteristics of inline-block (collapsing width to
+	// minimum of child content) while supporting negative margins.
+	display: table;
+
 	// Position the contextual toolbar above the block, add 1px to each to stack borders
 	margin-top: -$block-toolbar-height - 1px;
 	margin-bottom: $block-padding + 1px;
