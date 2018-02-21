@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render } from 'enzyme';
+import { mount } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -12,7 +12,8 @@ import {
 	registerActions,
 	dispatch,
 	select,
-	onSubscribe,
+	withSelect,
+	withDispatch,
 	subscribe,
 } from '../';
 
@@ -59,23 +60,75 @@ describe( 'select', () => {
 	} );
 } );
 
-describe( 'onSubscribe', () => {
+describe( 'withSelect', () => {
 	it( 'passes the relevant data to the component', () => {
 		registerReducer( 'reactReducer', () => ( { reactKey: 'reactState' } ) );
 		registerSelectors( 'reactReducer', {
 			reactSelector: ( state, key ) => state[ key ],
 		} );
-		const Component = onSubscribe( ( ownProps ) => {
-			return {
-				data: select( 'reactReducer' ).reactSelector( ownProps.keyName ),
-			};
-		} )( ( props ) => {
-			return <div>{ props.data }</div>;
+
+		// In normal circumstances, the fact that we have to add an arbitrary
+		// prefix to the variable name would be concerning, and perhaps an
+		// argument that we ought to expect developer to use select from the
+		// wp.data export. But in-fact, this serves as a good deterrent for
+		// including both `withSelect` and `select` in the same scope, which
+		// shouldn't occur for a typical component, and if it did might wrongly
+		// encourage the developer to use `select` within the component itself.
+		const Component = withSelect( ( _select, ownProps ) => ( {
+			data: _select( 'reactReducer' ).reactSelector( ownProps.keyName ),
+		} ) )( ( props ) => <div>{ props.data }</div> );
+
+		const wrapper = mount( <Component keyName="reactKey" /> );
+
+		// Wrapper is the enhanced component. Find props on the rendered child.
+		const child = wrapper.childAt( 0 );
+		expect( child.props() ).toEqual( {
+			keyName: 'reactKey',
+			data: 'reactState',
+		} );
+		expect( wrapper.text() ).toBe( 'reactState' );
+	} );
+} );
+
+describe( 'withDispatch', () => {
+	it( 'passes the relevant data to the component', () => {
+		const store = registerReducer( 'counter', ( state = 0, action ) => {
+			if ( action.type === 'increment' ) {
+				return state + action.count;
+			}
+			return state;
 		} );
 
-		const tree = render( <Component keyName="reactKey" /> );
+		const increment = ( count = 1 ) => ( { type: 'increment', count } );
+		registerActions( 'counter', {
+			increment,
+		} );
 
-		expect( tree ).toMatchSnapshot();
+		const Component = withDispatch( ( _dispatch, ownProps ) => {
+			const { count } = ownProps;
+
+			return {
+				increment: () => _dispatch( 'counter' ).increment( count ),
+			};
+		} )( ( props ) => <button onClick={ props.increment } /> );
+
+		const wrapper = mount( <Component count={ 0 } /> );
+
+		// Wrapper is the enhanced component. Find props on the rendered child.
+		const child = wrapper.childAt( 0 );
+
+		const incrementBeforeSetProps = child.prop( 'increment' );
+
+		// Verify that dispatch respects props at the time of being invoked by
+		// changing props after the initial mount.
+		wrapper.setProps( { count: 2 } );
+
+		// Function value reference should not have changed in props update.
+		expect( child.prop( 'increment' ) ).toBe( incrementBeforeSetProps );
+
+		wrapper.find( 'button' ).simulate( 'click' );
+
+		expect( store.getState() ).toBe( 2 );
 	} );
 } );
 

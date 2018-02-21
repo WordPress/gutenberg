@@ -96,15 +96,17 @@ const unsubscribe = wp.data.subscribe( () => {
 unsubscribe();
 ```
 
-### `wp.data.withData( mapStateToProps: Object|Function )( WrappedComponent: Component )`
+### `wp.data.withSelect( mapStateToProps: Object|Function )( WrappedComponent: Component )`
 
-To inject state-derived props into a WordPress Element Component, use the `withData` higher-order component:
+To inject state-derived props into a WordPress Element Component, use the `withSelect` higher-order component:
 
 ```jsx
 const Component = ( { title } ) => <div>{ title }</div>;
 
-const EnhancedComponent = wp.data.withData( {
-	title: wp.data.select( 'myPlugin' ).getTitle,
+const EnhancedComponent = wp.data.withSelect( ( select ) => {
+	return {
+		title: select( 'myPlugin' ).getTitle,		
+	};
 } )( Component );
 ```
 
@@ -116,11 +118,15 @@ To manipulate store data, you can pass dispatching actions into your component a
 const Component = ( { title, updateTitle } ) => <input value={ title } onChange={ updateTitle } />;
 
 const EnhancedComponent = wp.element.compose( [
-	wp.data.withData( {
-		title: select( 'myPlugin' ).getTitle,
+	wp.data.withSelect( ( select ) => {
+		return {
+			title: select( 'myPlugin' ).getTitle(),
+		};
 	} ),
-	wp.data.withDispatch( {
-		updateTitle: dispatch( 'myPlugin' ).setTitle,
+	wp.data.withDispatch( ( dispatch ) => {
+		return {
+			updateTitle: dispatch( 'myPlugin' ).setTitle,			
+		};
 	} ),
 ] )( Component );
 ```

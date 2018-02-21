@@ -3,7 +3,7 @@
  */
 import isEqualShallow from 'is-equal-shallow';
 import { createStore } from 'redux';
-import { flowRight, without, mapValues, isPlainObject } from 'lodash';
+import { flowRight, without, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -132,25 +132,18 @@ export function dispatch( reducerKey ) {
  * Higher-order component used to inject state-derived props using registered
  * selectors.
  *
- * @param {Object|Function} mapStateToProps Object of prop names where value is
- *                                          a state selector to populate every
- *                                          state change. Passed as function,
- *                                          it is called with the component's
- *                                          own original props.
+ * @param {Function} mapStateToProps Function called on every state change,
+ *                                   expected to return object of props to
+ *                                   merge with the component's own props.
  *
  * @return {Component} Enhanced component with merged state data props.
  */
-export const withData = ( mapStateToProps ) => ( WrappedComponent ) => {
-	// Normalize object form to function.
-	if ( isPlainObject( mapStateToProps ) ) {
-		// Object form is pairs of prop names to selectors.
-		const propsToSelectors = mapStateToProps;
-		mapStateToProps = () => mapValues( propsToSelectors, ( selector ) => selector() );
-	}
-
-	class ComponentWithData extends Component {
+export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
+	class ComponentWithSelect extends Component {
 		constructor() {
 			super( ...arguments );
+
+			this.runSelection = this.runSelection.bind( this );
 
 			this.state = {};
 		}
@@ -159,7 +152,7 @@ export const withData = ( mapStateToProps ) => ( WrappedComponent ) => {
 			this.subscribe();
 
 			// Populate initial state.
-			this.runSelection( this.props );
+			this.runSelection();
 		}
 
 		componentWillUnmount() {
@@ -167,11 +160,11 @@ export const withData = ( mapStateToProps ) => ( WrappedComponent ) => {
 		}
 
 		subscribe() {
-			this.unsubscribe = subscribe( () => this.runSelection( this.props ) );
+			this.unsubscribe = subscribe( this.runSelection );
 		}
 
-		runSelection( props ) {
-			const newState = mapStateToProps( props );
+		runSelection() {
+			const newState = mapStateToProps( select, this.props );
 			if ( ! isEqualShallow( newState, this.state ) ) {
 				this.setState( newState );
 			}
@@ -182,16 +175,16 @@ export const withData = ( mapStateToProps ) => ( WrappedComponent ) => {
 		}
 	}
 
-	ComponentWithData.displayName = getWrapperDisplayName( ComponentWithData, 'data' );
+	ComponentWithSelect.displayName = getWrapperDisplayName( WrappedComponent, 'select' );
 
-	return ComponentWithData;
+	return ComponentWithSelect;
 };
 
 /**
  * Higher-order component used to add dispatch props using registered action
  * creators.
  *
- * @param {Object} propsToDispatchers Object of prop names where value is a
+ * @param {Object} mapDispatchToProps Object of prop names where value is a
  *                                    dispatch-bound action creator, or a
  *                                    function to be called with with the
  *                                    component's props and returning an
@@ -199,30 +192,41 @@ export const withData = ( mapStateToProps ) => ( WrappedComponent ) => {
  *
  * @return {Component} Enhanced component with merged dispatcher props.
  */
-export const withDispatch = ( propsToDispatchers ) => ( WrappedComponent ) => {
+export const withDispatch = ( mapDispatchToProps ) => ( WrappedComponent ) => {
 	class ComponentWithDispatch extends Component {
 		constructor() {
 			super( ...arguments );
 
-			// Assign as instance property so that in reconciling subsequent
-			// renders, the assigned prop values are referentially equal.
-			this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
-				// Prebind with prop name so we have reference to the original
-				// dispatcher to invoke.
-				return this.proxyDispatch.bind( this, propName );
-			} );
+			this.proxyProps = {};
+		}
+
+		componentWillMount() {
+			this.setProxyProps( this.props );
+		}
+
+		componentWillUpdate( nextProps ) {
+			this.setProxyProps( nextProps );
 		}
 
 		proxyDispatch( propName, ...args ) {
 			// Original dispatcher is a pre-bound (dispatching) action creator.
-			const result = propsToDispatchers[ propName ]( ...args );
+			mapDispatchToProps( dispatch, this.props )[ propName ]( ...args );
+		}
 
-			// ...or, in more complex cases, it can leverage component props to
-			// generate dispatch arguments. We assume that if the result is not
-			// an object (return value of dispatch), not yet dispatched.
-			if ( typeof result === 'function' ) {
-				result( this.props );
-			}
+		setProxyProps( props ) {
+			// Assign as instance property so that in reconciling subsequent
+			// renders, the assigned prop values are referentially equal.
+			const propsToDispatchers = mapDispatchToProps( dispatch, props );
+			this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
+				// Prebind with prop name so we have reference to the original
+				// dispatcher to invoke. Track between re-renders to avoid
+				// creating new function references every render.
+				if ( this.proxyProps.hasOwnProperty( propName ) ) {
+					return this.proxyProps[ propName ];
+				}
+
+				return this.proxyDispatch.bind( this, propName );
+			} );
 		}
 
 		render() {
@@ -230,7 +234,7 @@ export const withDispatch = ( propsToDispatchers ) => ( WrappedComponent ) => {
 		}
 	}
 
-	ComponentWithDispatch.displayName = getWrapperDisplayName( ComponentWithDispatch, 'dispatch' );
+	ComponentWithDispatch.displayName = getWrapperDisplayName( WrappedComponent, 'dispatch' );
 
 	return ComponentWithDispatch;
 };
@@ -238,11 +242,11 @@ export const withDispatch = ( propsToDispatchers ) => ( WrappedComponent ) => {
 export const query = ( mapSelectToProps ) => {
 	deprecated( 'wp.data.query', {
 		version: '2.5',
-		alternative: 'wp.data.withData',
+		alternative: 'wp.data.withSelect',
 		plugin: 'Gutenberg',
 	} );
 
-	return withData( ( props ) => {
+	return withSelect( ( props ) => {
 		return mapSelectToProps( select, props );
 	} );
 };

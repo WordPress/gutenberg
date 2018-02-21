@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, withContext } from '@wordpress/components';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
-import { withData, withDispatch, dispatch, select } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -85,15 +85,15 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withData( {
+	withSelect( ( select ) => ( {
 		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint,
 		selectedBlock: select( 'core/editor' ).getSelectedBlock,
-	} ),
-	withDispatch( {
+	} ) ),
+	withDispatch( ( dispatch, ownProps ) => ( {
 		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
 		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
-		onInsertBlock: ( item ) => ( props ) => {
-			const { insertionPoint, selectedBlock } = props;
+		onInsertBlock: ( item ) => {
+			const { insertionPoint, selectedBlock } = ownProps;
 			const { index, rootUID, layout } = insertionPoint;
 			const { name, initialAttributes } = item;
 			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
@@ -102,7 +102,7 @@ export default compose( [
 			}
 			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
 		},
-	} ),
+	} ) ),
 	withContext( 'editor' )( ( settings ) => {
 		const { blockTypes, templateLock } = settings;
 
