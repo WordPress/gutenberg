@@ -716,7 +716,6 @@ function gutenberg_common_scripts_and_styles() {
 	do_action( 'enqueue_block_assets' );
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
-add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 
 /**
  * Enqueues registered block scripts and styles, depending on current rendered
