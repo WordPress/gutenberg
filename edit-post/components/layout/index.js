@@ -29,23 +29,41 @@ import VisualEditor from '../modes/visual-editor';
 import EditorModeKeyboardShortcuts from '../modes/keyboard-shortcuts';
 import {
 	getEditorMode,
-	hasFixedToolbar,
 	hasOpenSidebar,
-	isSidebarOpened,
+	isFeatureActive,
+	getOpenedGeneralSidebar,
+	isPublishSidebarOpened,
+	getActivePlugin,
 } from '../../store/selectors';
-import { toggleSidebar } from '../../store/actions';
+import { closePublishSidebar } from '../../store/actions';
+import PluginsPanel from '../../components/plugins-panel/index.js';
+import { getSidebarSettings } from '../../api/sidebar';
+
+function GeneralSidebar( { openedGeneralSidebar } ) {
+	switch ( openedGeneralSidebar ) {
+		case 'editor':
+			return <Sidebar />;
+		case 'plugin':
+			return <PluginsPanel />;
+		default:
+	}
+	return null;
+}
 
 function Layout( {
 	mode,
 	layoutHasOpenSidebar,
-	isDefaultSidebarOpened,
-	isPublishSidebarOpened,
-	fixedToolbarActive,
-	onClosePublishPanel,
+	publishSidebarOpen,
+	openedGeneralSidebar,
+	hasFixedToolbar,
+	onClosePublishSidebar,
+	plugin,
 } ) {
+	const isSidebarOpened = layoutHasOpenSidebar &&
+		( openedGeneralSidebar !== 'plugin' || getSidebarSettings( plugin ) );
 	const className = classnames( 'edit-post-layout', {
-		'is-sidebar-opened': layoutHasOpenSidebar,
-		'has-fixed-toolbar': fixedToolbarActive,
+		'is-sidebar-opened': isSidebarOpened,
+		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
 	return (
@@ -68,8 +86,11 @@ function Layout( {
 					<MetaBoxes location="advanced" />
 				</div>
 			</div>
-			{ isDefaultSidebarOpened && <Sidebar /> }
-			{ isPublishSidebarOpened && <PostPublishPanel onClose={ onClosePublishPanel } /> }
+			{ publishSidebarOpen && <PostPublishPanel onClose={ onClosePublishSidebar } /> }
+			{
+				openedGeneralSidebar !== null && <GeneralSidebar
+					openedGeneralSidebar={ openedGeneralSidebar } />
+			}
 			<Popover.Slot />
 		</div>
 	);
@@ -79,12 +100,13 @@ export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
 		layoutHasOpenSidebar: hasOpenSidebar( state ),
-		isDefaultSidebarOpened: isSidebarOpened( state ),
-		isPublishSidebarOpened: isSidebarOpened( state, 'publish' ),
-		fixedToolbarActive: hasFixedToolbar( state ),
+		openedGeneralSidebar: getOpenedGeneralSidebar( state ),
+		publishSidebarOpen: isPublishSidebarOpened( state ),
+		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
+		plugin: getActivePlugin( state ),
 	} ),
 	{
-		onClosePublishPanel: () => toggleSidebar( 'publish', false ),
+		onClosePublishSidebar: closePublishSidebar,
 	},
 	undefined,
 	{ storeKey: 'edit-post' }
