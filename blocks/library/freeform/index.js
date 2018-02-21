@@ -15,7 +15,7 @@ export const name = 'core/freeform';
 export const settings = {
 	title: __( 'Classic' ),
 
-	desription: __( 'The classic editor, in block form.' ),
+	description: __( 'The classic editor, in block form.' ),
 
 	icon: 'editor-kitchensink',
 
