@@ -618,6 +618,9 @@ function gutenberg_oembed_opengraph( $url ) {
 		body.opengraph h1,
 		.is-type-opengraph p,
 		.is-type-opengraph h1 {
+			clear: none;
+			line-height: inherit;
+			padding: 0;
 			font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
 			font-size: 13px;
 			margin: 0;
