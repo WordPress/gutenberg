@@ -15,6 +15,7 @@ import {
 	getLastMultiSelectedBlockUid,
 	getSelectedBlockCount,
 	getTaxonomyTerm,
+	getTaxonomyTerms,
 } from './selectors';
 import {
 	fetchTaxonomies,
@@ -40,6 +41,7 @@ registerSelectors( MODULE_KEY, {
 	getLastMultiSelectedBlockUid,
 	getSelectedBlockCount,
 	getTaxonomyTerm,
+	getTaxonomyTerms,
 } );
 
 export default store;
