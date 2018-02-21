@@ -21,7 +21,6 @@ import { editPost, addTaxonomyTerm } from '../../store/actions';
 class HierarchicalTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
-		this.findTerm = this.findTerm.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onChangeFormName = this.onChangeFormName.bind( this );
 		this.onChangeFormParent = this.onChangeFormParent.bind( this );
@@ -67,6 +66,19 @@ class HierarchicalTermSelector extends Component {
 		} );
 	}
 
+	speakTermAdded() {
+		const { taxonomy, slug, speak } = this.props;
+		const termAddedMessage = sprintf(
+			_x( '%s added', 'term' ),
+			get(
+				taxonomy,
+				[ 'data', 'labels', 'singular_name' ],
+				slug === 'category' ? __( 'Category' ) : __( 'Term' )
+			)
+		);
+		speak( termAddedMessage, 'assertive' );
+	}
+
 	onAddTerm( event ) {
 		event.preventDefault();
 		const { formName, formParent, adding } = this.state;
@@ -81,6 +93,7 @@ class HierarchicalTermSelector extends Component {
 			// if the term we are adding exists but is not selected select it
 			if ( ! some( terms, term => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ], restBase );
+				this.speakTermAdded();
 			}
 			this.setState( {
 				formName: '',
@@ -88,98 +101,15 @@ class HierarchicalTermSelector extends Component {
 			} );
 			return;
 		}
-
-		// TODO: Check if term exists on server, retrieve it and add it if so.
 
 		const parent = formParent ? parseInt( formParent ) : null;
 		this.props.addTaxonomyTerm( taxonomy.slug, taxonomy.rest_base, formName, parent );
+		this.speakTermAdded();
 
-		// TODO: Speak() when term has been added in correct lifecycle-method.
-		// ComponentWillReceiveProps?
-
-		/*
-		event.preventDefault();
-		const { onUpdateTerms, restBase, terms, slug, availableTerms } = this.props;
-		const { formName, formParent, adding } = this.state;
-		if ( formName === '' || adding ) {
-			return;
-		}
-
-		// check if the term we are adding already exists
-		const existingTerm = this.findTerm( availableTerms, formParent, formName );
-		if ( existingTerm ) {
-			// if the term we are adding exists but is not selected select it
-			if ( ! some( terms, term => term === existingTerm.id ) ) {
-				onUpdateTerms( [ ...terms, existingTerm.id ], restBase );
-			}
-			this.setState( {
-				formName: '',
-				formParent: '',
-			} );
-			return;
-		}
-
-		const findOrCreatePromise = new Promise( ( resolve, reject ) => {
-			this.setState( {
-				adding: true,
-			} );
-			// Tries to create a term or fetch it if it already exists
-			const Model = wp.api.getTaxonomyModel( this.props.slug );
-			this.addRequest = new Model( {
-				name: formName,
-				parent: formParent ? formParent : undefined,
-			} ).save();
-			this.addRequest
-				.then( resolve, ( xhr ) => {
-					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
-					if ( errorCode === 'term_exists' ) {
-						// search the new category created since last fetch
-						this.addRequest = new Model().fetch(
-							{ data: { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } }
-						);
-						return this.addRequest.then( searchResult => {
-							resolve( this.findTerm( searchResult, formParent, formName ) );
-						}, reject );
-					}
-					reject( xhr );
-				} );
+		this.setState( {
+			formName: '',
+			formParent: '',
 		} );
-		findOrCreatePromise
-			.then( ( term ) => {
-				const termAddedMessage = sprintf(
-					_x( '%s added', 'term' ),
-					get(
-						this.props.taxonomy,
-						[ 'data', 'labels', 'singular_name' ],
-						slug === 'category' ? __( 'Category' ) : __( 'Term' )
-					)
-				);
-				this.props.speak( termAddedMessage, 'assertive' );
-				this.setState( {
-					adding: false,
-					formName: '',
-					formParent: '',
-				} );
-				onUpdateTerms( [ ...terms, term.id ], restBase );
-			}, ( xhr ) => {
-				if ( xhr.statusText === 'abort' ) {
-					return;
-				}
-				this.setState( {
-					adding: false,
-				} );
-			} );
-			*/
-	}
-
-	componentWillUnmount() {
-		if ( this.fetchRequest ) {
-			this.fetchRequest.abort();
-		}
-
-		if ( this.addRequest ) {
-			this.addRequest.abort();
-		}
 	}
 
 	renderTerms( renderedTerms ) {
@@ -217,8 +147,8 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	render() {
-		const { label, slug, taxonomy, instanceId, availableTermsTree, availableTerms } = this.props;
-		const { formName, formParent, loading, showForm } = this.state;
+		const { label, slug, taxonomy, instanceId, availableTermsTree, availableTerms, loading } = this.props;
+		const { formName, formParent, showForm } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
 			[ 'data', 'labels', labelProperty ],
