@@ -1,27 +1,6 @@
-.editor-block-list__block[data-type="core/embed"] {
-	&[data-align="left"],
-	&[data-align="right"] {
-		float: none;
-	}
-
-	&[data-align="left"] .wp-block-embed {
-		float: left;
-	}
-
-	&[data-align="right"] .wp-block-embed {
-		float: right;
-	}
-}
-
 .wp-block-embed {
 	margin: 0;
 	clear: both; // necessary because we use responsive trickery to set width/height, and therefore the video doesn't intrinsically clear floats like an img does
-
-	[data-align="left"] &,
-	[data-align="right"] & {
-		width: 300px;
-		max-width: 100%;
-	}
 
 	&.is-loading {
 		display: flex;
