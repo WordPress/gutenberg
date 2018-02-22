@@ -375,7 +375,7 @@
 
 .editor-block-list__insertion-point-indicator {
 	position: absolute;
-	top: 9px;
+	top: 16px;
 	height: 2px;
 	left: 0;
 	right: 0;
@@ -392,10 +392,10 @@
 
 	&:before {
 		position: absolute;
-		top: 9px;
+		top: 16px;
 		height: 2px;
-		left: 0;
-		right: 0;
+		left: $block-padding;
+		right: $block-padding;
 		background: $dark-gray-100;
 		content: '';
 		opacity: 0;
@@ -410,8 +410,8 @@
 
 .editor-block-list__block > .editor-block-list__insertion-point {
 	position: absolute;
-	bottom: -10px;
-	height: 20px;
+	bottom: -19px;
+	height: 34px; // Matches the whole empty space between two blocks
 	top: auto;
 	left: 0;
 	right: 0;
