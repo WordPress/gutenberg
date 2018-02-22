@@ -557,6 +557,29 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should cascade remove to include inner blocks', () => {
+			const block = createBlock( 'core/test-block', {}, [
+				createBlock( 'core/test-block', {}, [
+					createBlock( 'core/test-block' ),
+				] ),
+			] );
+
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ block ],
+			} );
+
+			const state = editor( original, {
+				type: 'REMOVE_BLOCKS',
+				uids: [ block.uid ],
+			} );
+
+			expect( state.present.blocksByUid ).toEqual( {} );
+			expect( state.present.blockOrder ).toEqual( {
+				'': [],
+			} );
+		} );
+
 		it( 'should insert at the specified index', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',

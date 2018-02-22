@@ -17,7 +17,7 @@ import { query } from '@wordpress/data';
  * Internal dependencies
  */
 import { isEditorSidebarPanelOpened } from '../../../store/selectors';
-import { toggleSidebarPanel } from '../../../store/actions';
+import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
 
 /**
  * Module Constants
@@ -54,7 +54,7 @@ const applyConnect = connect(
 	},
 	{
 		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
+			return toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
 	},
 	undefined,

@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MenuItemsGroup should match snapshot 1`] = `
+<div
+  className="components-menu-items-group"
+>
+  <div
+    className="components-menu-items-group__label"
+    id="components-menu-items-group-label-1"
+  >
+    My group
+  </div>
+  <NavigableMenu
+    aria-labelledby="components-menu-items-group-label-1"
+    orientation="vertical"
+  >
+    <p
+      key=".0"
+    >
+      My item
+    </p>
+  </NavigableMenu>
+</div>
+`;

@@ -197,3 +197,49 @@ function gutenberg_register_rest_api_post_type_capabilities() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities' );
+
+/**
+ * Make sure oEmbed REST Requests apply the WP Embed security mechanism for WordPress embeds.
+ *
+ * @see  https://core.trac.wordpress.org/ticket/32522
+ *
+ * TODO: This is a temporary solution. Next step would be to edit the WP_oEmbed_Controller,
+ * once merged into Core.
+ *
+ * @since 2.3.0
+ *
+ * @param  WP_HTTP_Response|WP_Error $response The REST Request response.
+ * @param  WP_REST_Server            $handler  ResponseHandler instance (usually WP_REST_Server).
+ * @param  WP_REST_Request           $request  Request used to generate the response.
+ * @return WP_HTTP_Response|object|WP_Error    The REST Request response.
+ */
+function gutenberg_filter_oembed_result( $response, $handler, $request ) {
+	if ( 'GET' !== $request->get_method() ) {
+		return $response;
+	}
+
+	if ( is_wp_error( $response ) && 'oembed_invalid_url' !== $response->get_error_code() ) {
+		return $response;
+	}
+
+	// External embeds.
+	if ( '/oembed/1.0/proxy' === $request->get_route() ) {
+		if ( is_wp_error( $response ) ) {
+			// It's possibly a local post, so lets try and retrieve it that way.
+			$post_id = url_to_postid( $_GET['url'] );
+			$data    = get_oembed_response_data( $post_id, apply_filters( 'oembed_default_width', 600 ) );
+
+			if ( ! $data ) {
+				// Not a local post, return the original error.
+				return $response;
+			}
+			$response = (object) $data;
+		}
+
+		// Make sure the HTML is run through the oembed sanitisation routines.
+		$response->html = wp_oembed_get( $_GET['url'], $_GET );
+	}
+
+	return $response;
+}
+add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );

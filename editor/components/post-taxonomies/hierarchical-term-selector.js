@@ -2,14 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { get, unescape as unescapeString, without, map, repeat, find, some } from 'lodash';
+import { get, unescape as unescapeString, without, find, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { withAPIData, withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { TreeSelect, withAPIData, withInstanceId, withSpokenMessages } from '@wordpress/components';
 import { buildTermsTree } from '@wordpress/utils';
 
 /**
@@ -60,8 +60,8 @@ class HierarchicalTermSelector extends Component {
 		this.setState( { formName: newValue } );
 	}
 
-	onChangeFormParent( event ) {
-		this.setState( { formParent: event.target.value } );
+	onChangeFormParent( newParent ) {
+		this.setState( { formParent: newParent } );
 	}
 
 	onToggleForm() {
@@ -213,15 +213,6 @@ class HierarchicalTermSelector extends Component {
 		} );
 	}
 
-	renderParentSelectorOptions( terms, level = 0 ) {
-		return map( terms, ( term ) => ( [
-			<option key={ term.id } value={ term.id }>
-				{ repeat( '\u00A0', level * 3 ) + unescapeString( term.name ) }
-			</option>,
-			...this.renderParentSelectorOptions( term.children, level + 1 ),
-		] ) );
-	}
-
 	render() {
 		const { label, slug, taxonomy, instanceId } = this.props;
 		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
@@ -248,7 +239,6 @@ class HierarchicalTermSelector extends Component {
 		const noParentOption = `— ${ parentSelectLabel } —`;
 		const newTermSubmitLabel = newTermButtonLabel;
 		const inputId = `editor-post-taxonomies__hierarchical-terms-input-${ instanceId }`;
-		const selectId = `editor-post-taxonomies__hierarchical-terms-select-${ instanceId }`;
 
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
@@ -281,23 +271,13 @@ class HierarchicalTermSelector extends Component {
 							required
 						/>
 						{ !! availableTerms.length &&
-							<div>
-								<label
-									htmlFor={ selectId }
-									className="editor-post-taxonomies__hierarchical-terms-label"
-								>
-									{ parentSelectLabel }
-								</label>
-								<select
-									id={ selectId }
-									className="editor-post-taxonomies__hierarchical-terms-input"
-									value={ formParent }
-									onChange={ this.onChangeFormParent }
-								>
-									<option value="">{ noParentOption }</option>
-									{ this.renderParentSelectorOptions( availableTermsTree ) }
-								</select>
-							</div>
+							<TreeSelect
+								label={ parentSelectLabel }
+								noOptionLabel={ noParentOption }
+								onChange={ this.onChangeFormParent }
+								selectedId={ formParent }
+								tree={ availableTermsTree }
+							/>
 						}
 						<button
 							type="submit"

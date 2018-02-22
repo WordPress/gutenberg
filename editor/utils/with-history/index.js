@@ -4,16 +4,15 @@
 import { includes, first, last, drop, dropRight } from 'lodash';
 
 /**
- * Reducer enhancer which transforms the result of the original reducer into an
- * object tracking its own history (past, present, future).
+ * Higher-order reducer creator which transforms the result of the original
+ * reducer into an object tracking its own history (past, present, future).
  *
- * @param {Function} reducer            Original reducer.
- * @param {?Object}  options            Optional options.
- * @param {?Array}   options.resetTypes Action types upon which to clear past.
+ * @param {?Object} options            Optional options.
+ * @param {?Array}  options.resetTypes Action types upon which to clear past.
  *
- * @return {Function} Enhanced reducer.
+ * @return {Function} Higher-order reducer.
  */
-export default function withHistory( reducer, options = {} ) {
+const withHistory = ( options = {} ) => ( reducer ) => {
 	const initialState = {
 		past: [],
 		present: reducer( undefined, {} ),
@@ -93,4 +92,6 @@ export default function withHistory( reducer, options = {} ) {
 			future: [],
 		};
 	};
-}
+};
+
+export default withHistory;

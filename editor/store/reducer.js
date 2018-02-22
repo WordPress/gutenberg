@@ -5,7 +5,6 @@ import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
 import {
 	flow,
-	partialRight,
 	reduce,
 	first,
 	last,
@@ -123,6 +122,30 @@ function shouldOverwriteState( action, previousAction ) {
 }
 
 /**
+ * Higher-order reducer targeting the combined editor reducer, augmenting
+ * block UIDs in remove action to include cascade of inner blocks.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
+	if ( state && action.type === 'REMOVE_BLOCKS' ) {
+		const uids = [ ...action.uids ];
+
+		// For each removed UID, include its inner blocks in UIDs to remove,
+		// recursing into those so long as inner blocks exist.
+		for ( let i = 0; i < uids.length; i++ ) {
+			uids.push( ...state.blockOrder[ uids[ i ] ] );
+		}
+
+		action = { ...action, uids };
+	}
+
+	return reducer( state, action );
+};
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -141,15 +164,19 @@ function shouldOverwriteState( action, previousAction ) {
 export const editor = flow( [
 	combineReducers,
 
+	withInnerBlocksRemoveCascade,
+
 	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, {
+	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
 		shouldOverwriteState,
 	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ] } ),
+	withChangeDetection( {
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ],
+	} ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
