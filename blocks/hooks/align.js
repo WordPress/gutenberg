@@ -131,7 +131,7 @@ export function withAlign( BlockListBlock ) {
 export function addAssignedAlign( props, blockType, attributes ) {
 	const { align } = attributes;
 
-	if ( align && includes( getBlockValidAlignments( blockType ), align ) ) {
+	if ( includes( getBlockValidAlignments( blockType ), align ) ) {
 		props.className = classnames( `align${ align }`, props.className );
 	}
 

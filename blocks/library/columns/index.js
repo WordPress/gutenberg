@@ -66,7 +66,7 @@ export const settings = {
 
 		return [
 			isSelected && (
-				<InspectorControls>
+				<InspectorControls key="inspector">
 					<RangeControl
 						label={ __( 'Columns' ) }
 						value={ columns }

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { filter, every } from 'lodash';
 
 /**
@@ -170,8 +171,12 @@ export const settings = {
 
 	save( { attributes } ) {
 		const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
+		const className = classnames( `columns-${ columns }`, {
+			'is-cropped': imageCrop,
+		} );
+
 		return (
-			<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+			<ul className={ className }>
 				{ images.map( ( image ) => {
 					let href;
 

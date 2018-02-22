@@ -175,8 +175,7 @@ export const settings = {
 		alignWide: false,
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { clear } = attributes;
+	getEditWrapperProps( { clear } ) {
 		const props = { 'data-resized': true };
 
 		if ( clear ) {
