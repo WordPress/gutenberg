@@ -910,6 +910,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'availableTemplates'  => wp_get_theme()->get_page_templates( get_post( $post_to_edit['id'] ) ),
 		'blockTypes'          => $allowed_block_types,
 		'disableCustomColors' => get_theme_support( 'disable-custom-colors' ),
+		'disablePostFormats'  => ! current_theme_supports( 'post-formats' ),
 		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 	);
 
