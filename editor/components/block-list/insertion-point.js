@@ -36,7 +36,6 @@ function BlockInsertionPoint( { showInsertionPoint, showInserter, index, layout,
 			{ showInsertionPoint && <div className="editor-block-list__insertion-point-indicator" /> }
 			{ showInserter && (
 				<button
-					tabIndex="-1"
 					className="editor-block-list__insertion-point-inserter"
 					onClick={ onClick }
 					aria-label={ __( 'Insert block' ) }

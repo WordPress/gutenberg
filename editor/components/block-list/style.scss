@@ -406,6 +406,11 @@
 		opacity: 1;
 		transition: opacity 0.2s linear 0.5s;
 	}
+
+	&:focus:before {
+		opacity: 1;
+		transition: opacity 0.2s linear;
+	}
 }
 
 .editor-block-list__block > .editor-block-list__insertion-point {
