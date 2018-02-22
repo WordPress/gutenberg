@@ -91,7 +91,8 @@ function register_block_core_latest_posts() {
 				'default' => 3,
 			),
 			'align'           => array(
-				'type' => 'string',
+				'type'    => 'string',
+				'default' => 'center',
 			),
 			'order'           => array(
 				'type'    => 'string',

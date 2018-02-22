@@ -29,6 +29,7 @@ import './style.scss';
 import QueryPanel from '../../query-panel';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
+import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const MAX_POSTS_COLUMNS = 6;
 
@@ -49,7 +50,7 @@ class LatestPostsBlock extends Component {
 	render() {
 		const latestPosts = this.props.latestPosts.data;
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { displayPostDate, layout, columns, order, orderBy, categories, postsToShow } = attributes;
+		const { displayPostDate, align, layout, columns, order, orderBy, categories, postsToShow } = attributes;
 
 		const inspectorControls = isSelected && (
 			<InspectorControls key="inspector">
@@ -120,6 +121,13 @@ class LatestPostsBlock extends Component {
 			inspectorControls,
 			isSelected && (
 				<BlockControls key="controls">
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+						controls={ [ 'center', 'wide', 'full' ] }
+					/>
 					<Toolbar controls={ layoutControls } />
 				</BlockControls>
 			),

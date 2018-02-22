@@ -8,6 +8,7 @@
             "displayPostDate": false,
             "postLayout": "list",
             "columns": 3,
+            "align": "center",
             "order": "desc",
             "orderBy": "date"
         },
