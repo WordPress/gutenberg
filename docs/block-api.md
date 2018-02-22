@@ -115,6 +115,24 @@ Transforms provide rules for what a block can be transformed from and what it ca
 
 For example, a paragraph block can be transformed into a heading block.
 
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: function ( content ) {
+                return createBlock( 'core/heading', {
+                    content,
+                } );
+            },
+        },
+    ]
+},
+```
+{% ESNext %}
 ```js
 transforms: {
     from: [
@@ -127,8 +145,47 @@ transforms: {
                 } );
             },
         },
+    ]
+},
+```
+{% end %}
+
 An existing shortcode can be transformed into its block counterpart.
 
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            // Shortcode tag can also be an array of shortcode aliases
+            tag: 'caption',
+            attributes: {
+                // An attribute can be source from a tag attribute in the shortcode content
+                url: {
+                    type: 'string',
+                    source: 'attribute',
+                    attribute: 'src',
+                    selector: 'img',
+                },
+                // An attribute can be source from the shortcode attributes
+                align: {
+                    type: 'string',
+                    shortcode: function( named ) {
+                        var align = named.align ? named.align : 'alignnone';
+                        return align.replace( 'align', '' );
+                    },
+                },
+            },
+        },
+    ]
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    from: [
         {
             type: 'shortcode',
             // Shortcode tag can also be an array of shortcode aliases
@@ -152,10 +209,30 @@ An existing shortcode can be transformed into its block counterpart.
         },
     ]
 },
+
 ```
+{% end %}
 
 A block can also be transformed into another block type. For example, a heading block can be transformed into a paragraph block.
 
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: function( content ) {
+                return createBlock( 'core/paragraph', {
+                    content,
+                } );
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
 ```js
 transforms: {
     to: [
@@ -171,6 +248,8 @@ transforms: {
     ],
 },
 ```
+{% end %}
+
 
 #### useOnce (optional)
 
