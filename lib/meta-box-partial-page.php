@@ -176,11 +176,17 @@ add_filter( 'filter_gutenberg_meta_boxes', 'gutenberg_filter_meta_boxes' );
  */
 function gutenberg_intercept_meta_box_render() {
 	global $wp_meta_boxes;
+	/** This filter is documented in lib/meta-box-partial-page.php */
+	$filtered_meta_boxes = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
 
 	foreach ( $wp_meta_boxes as $post_type => $contexts ) {
 		foreach ( $contexts as $context => $priorities ) {
 			foreach ( $priorities as $priority => $boxes ) {
 				foreach ( $boxes as $id => $box ) {
+					// Don't override meta boxes that Gutenberg handles itself.
+					if ( ! isset( $filtered_meta_boxes[ $post_type ][ $context ][ $priority ][ $id ] ) ) {
+						continue;
+					}
 					if ( ! is_array( $box ) ) {
 						continue;
 					}
