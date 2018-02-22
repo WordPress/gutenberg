@@ -22,6 +22,7 @@ function FeatureToggle( { onToggle, active, onMobile } ) {
 	return (
 		<MenuItemsGroup
 			label={ __( 'Settings' ) }
+			filterName="editPost.MoreMenu.settings"
 		>
 			<MenuItemsToggle
 				label={ __( 'Fix Toolbar to Top' ) }

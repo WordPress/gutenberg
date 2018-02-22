@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Dropdown, MenuItemsSeparator } from '@wordpress/components';
+import { IconButton, Dropdown, MenuItemsGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -10,12 +10,11 @@ import { IconButton, Dropdown, MenuItemsSeparator } from '@wordpress/components'
 import './style.scss';
 import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
-import EditorActions from '../editor-actions';
 import Plugins from '../plugins';
 
-const element = (
+const MoreMenu = () => (
 	<Dropdown
-		className="edit-post-ellipsis-menu"
+		className="edit-post-more-menu"
 		position="bottom left"
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
@@ -26,26 +25,19 @@ const element = (
 			/>
 		) }
 		renderContent={ ( { onClose } ) => (
-			<div>
+			<div className="edit-post-more-menu__content">
 				<ModeSwitcher onSelect={ onClose } />
-				<MenuItemsSeparator />
 				<FixedToolbarToggle onToggle={ onClose } />
 				{ /* Plugins component renders its own divider, because it may not show. */ }
 				<Plugins onSelect={ onClose } />
-				<MenuItemsSeparator />
-				<EditorActions />
+				<MenuItemsGroup
+					label={ __( 'Tools' ) }
+					filterName="editPost.MoreMenu.tools"
+				/>
 			</div>
 		) }
 	/>
 );
 
-/**
- * Returns the EllipsisMenu component.
- *
- * @return {ReactElement} The EllipsisMenu component.
- */
-function EllipsisMenu() {
-	return element;
-}
+export default MoreMenu;
 
-export default EllipsisMenu;

@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { NavigableMenu, withInstanceId, IconButton, MenuItemsSeparator } from '@wordpress/components';
+import { NavigableMenu, withInstanceId, IconButton, MenuItemsGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -29,8 +29,6 @@ function Plugins( props ) {
 		return null;
 	}
 
-	const { instanceId } = props;
-
 	/**
 	 * Handles the user clicking on one of the plugins in the menu
 	 *
@@ -44,44 +42,38 @@ function Plugins( props ) {
 		ellipsisMenuItems[ pluginId ].callback();
 	}
 
-	const labelId = `components-choice-menu-plugins-label-${ instanceId }`;
+	return (
+		<MenuItemsGroup
+			label={ __( 'Plugins' ) }
+			filterName="editPost.MoreMenu.plugins" >
+			{
+				map( ellipsisMenuItems, menuItem => {
+					if ( isString( menuItem.icon ) ) {
+						menuItem.icon = null;
+					}
+					const buttonClassName = classnames(
+						'components-menu-item-plugins__button',
+						menuItem.icon ? 'has-icon' : null
+					);
 
-	return [
-		<MenuItemsSeparator key="plugins-separator" />,
-		<div
-			key="plugins-menu-items"
-			className="components-choice-menu-plugins" >
-			<div className="components-choice-menu-plugins__label">{ __( 'Plugins' ) }</div>
-			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
-				{
-					map( ellipsisMenuItems, menuItem => {
-						if ( isString( menuItem.icon ) ) {
-							menuItem.icon = null;
-						}
-						const buttonClassName = classnames(
-							'components-menu-item-plugins__button',
-							menuItem.icon ? 'has-icon' : null
-						);
-
-						return (
-							<IconButton
-								key={ menuItem.menuItemId }
-								className={ buttonClassName }
-								icon={
-									menuItem.icon ?
-										<div className="components-menu-item-plugins__icon-container" >
-											{ menuItem.icon }
-										</div> : null
-								}
-								onClick={ () => onSelect( menuItem.menuItemId ) }>
-								{ menuItem.title }
-							</IconButton>
-						);
-					} )
-				}
-			</NavigableMenu>
-		</div>,
-	];
+					return (
+						<IconButton
+							key={ menuItem.menuItemId }
+							className={ buttonClassName }
+							icon={
+								menuItem.icon ?
+									<div className="components-menu-item-plugins__icon-container" >
+										{ menuItem.icon }
+									</div> : null
+							}
+							onClick={ () => onSelect( menuItem.menuItemId ) }>
+							{ menuItem.title }
+						</IconButton>
+					);
+				} )
+			}
+		</MenuItemsGroup>
+	);
 }
 
 export default withInstanceId( Plugins );

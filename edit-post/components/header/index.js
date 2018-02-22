@@ -18,7 +18,7 @@ import {
  * Internal dependencies
  */
 import './style.scss';
-import EllipsisMenu from './ellipsis-menu';
+import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
 import {
 	getOpenedGeneralSidebar,
@@ -62,7 +62,7 @@ function Header( {
 						label={ __( 'Settings' ) }
 						aria-expanded={ isGeneralSidebarEditorOpen }
 					/>
-					<EllipsisMenu key="ellipsis-menu" />
+					<MoreMenu key="more-menu" />
 				</div>
 			) }
 		</div>
