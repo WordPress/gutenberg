@@ -123,7 +123,7 @@
 				"message": "Use @wordpress/utils as import path instead."
 			},
 			{
-				"selector": "ImportDeclaration[source.value=/^edit-poost$/]",
+				"selector": "ImportDeclaration[source.value=/^edit-post$/]",
 				"message": "Use @wordpress/edit-post as import path instead."
 			},
 			{
