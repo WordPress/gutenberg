@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { flow, noop, last } from 'lodash';
+import { flow, noop, last, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,7 +10,7 @@ import { flow, noop, last } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
 import { compose } from '@wordpress/element';
-import { cloneBlock } from '@wordpress/blocks';
+import { cloneBlock, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -18,8 +18,12 @@ import { cloneBlock } from '@wordpress/blocks';
 import { getBlocksByUid, getBlockIndex } from '../../store/selectors';
 import { insertBlocks } from '../../store/actions';
 
-export function BlockDuplicateButton( { onDuplicate, onClick = noop, isLocked, small = false } ) {
-	if ( isLocked ) {
+export function BlockDuplicateButton( { blockNames, onDuplicate, onClick = noop, isLocked, small = false } ) {
+	const canDuplicate = every( blockNames.map( name => {
+		const type = getBlockType( name );
+		return ! type.useOnce;
+	} ) );
+	if ( isLocked || ! canDuplicate ) {
 		return null;
 	}
 
@@ -45,6 +49,7 @@ export default compose(
 		} ),
 		{ insertBlocks },
 		( { blocks, index }, dispatchProps, { rootUID } ) => ( {
+			blockNames: blocks.map( block => block.name ),
 			onDuplicate() {
 				dispatchProps.insertBlocks(
 					blocks.map( block => cloneBlock( block ) ),
