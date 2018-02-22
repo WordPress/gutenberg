@@ -197,6 +197,9 @@
 	&[data-align="full"],
 	&[data-align="wide"] {
 		clear: both;
+
+		// Without z-index, the block toolbar will be below an adjecent float
+		z-index: z-index( '.editor-block-list__block {core/image aligned wide or fullwide}' );
 	}
 
 	// Full-wide
