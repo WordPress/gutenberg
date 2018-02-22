@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -16,15 +11,15 @@ import {
 	MultiSelectScrollIntoView,
 } from '@wordpress/editor';
 import { Fragment } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
-import { hasFixedToolbar } from '../../../store/selectors';
 
-function VisualEditor( props ) {
+function VisualEditor( { hasFixedToolbar } ) {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor">
 			<EditorGlobalKeyboardShortcuts />
@@ -33,7 +28,7 @@ function VisualEditor( props ) {
 			<WritingFlow>
 				<PostTitle />
 				<BlockList
-					showContextualToolbar={ ! props.hasFixedToolbar }
+					showContextualToolbar={ ! hasFixedToolbar }
 					renderBlockMenu={ ( { children, onClose } ) => (
 						<Fragment>
 							<BlockInspectorButton onClick={ onClose } />
@@ -46,13 +41,6 @@ function VisualEditor( props ) {
 	);
 }
 
-export default connect(
-	( state ) => {
-		return {
-			hasFixedToolbar: hasFixedToolbar( state ),
-		};
-	},
-	undefined,
-	undefined,
-	{ storeKey: 'edit-post' }
-)( VisualEditor );
+export default withSelect( ( select ) => ( {
+	hasFixedToolbar: select( 'core/edit-post' ).hasFixedToolbar(),
+} ) )( VisualEditor );

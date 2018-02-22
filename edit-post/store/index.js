@@ -1,7 +1,12 @@
 /**
  * WordPress Dependencies
  */
-import { registerReducer, withRehydratation, loadAndPersist } from '@wordpress/data';
+import {
+	registerReducer,
+	registerSelectors,
+	withRehydratation,
+	loadAndPersist,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,6 +15,7 @@ import reducer from './reducer';
 import enhanceWithBrowserSize from './mobile';
 import { BREAK_MEDIUM } from './constants';
 import applyMiddlewares from './middlewares';
+import { hasFixedToolbar } from './selectors';
 
 /**
  * Module Constants
@@ -23,5 +29,9 @@ const store = applyMiddlewares(
 
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 enhanceWithBrowserSize( store, BREAK_MEDIUM );
+
+registerSelectors( MODULE_KEY, {
+	hasFixedToolbar,
+} );
 
 export default store;
