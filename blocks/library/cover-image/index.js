@@ -216,7 +216,6 @@ export const settings = {
 		const style = backgroundImageStyles( url );
 		const classes = classnames(
 			className,
-			align ? `align${ align }` : null,
 			dimRatioToClass( dimRatio ),
 			{
 				'has-background-dim': dimRatio !== 0,
