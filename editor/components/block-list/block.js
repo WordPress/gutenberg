@@ -545,7 +545,11 @@ export class BlockListBlock extends Component {
 		// Insertion point can only be made visible when the side inserter is
 		// not present, and either the block is at the extent of a selection or
 		// is the last block in the top-level list rendering.
-		const shouldShowInsertionPoint = ! showSideInserter && ( isLastInSelection || ( isLast && ! rootUID ) );
+		const shouldShowInsertionPoint = (
+			( ! isMultiSelected && ! isLast ) ||
+			( isMultiSelected && isLastInSelection ) ||
+			( isLast && ! rootUID )
+		);
 
 		// Generate the wrapper class names handling the different states of the block.
 		const wrapperClassName = classnames( 'editor-block-list__block', {

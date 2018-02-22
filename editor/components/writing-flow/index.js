@@ -32,7 +32,7 @@ import {
 } from '../../store/selectors';
 import {
 	multiSelect,
-	appendDefaultBlock,
+	insertDefaultBlock,
 	selectBlock,
 } from '../../store/actions';
 
@@ -267,7 +267,7 @@ export default connect(
 	} ),
 	{
 		onMultiSelect: multiSelect,
-		onBottomReached: appendDefaultBlock,
+		onBottomReached: insertDefaultBlock,
 		onSelectBlock: selectBlock,
 	}
 )( WritingFlow );

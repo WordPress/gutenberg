@@ -371,24 +371,51 @@
 
 .editor-block-list__insertion-point {
 	position: relative;
+}
+
+.editor-block-list__insertion-point-indicator {
+	position: absolute;
+	top: 9px;
+	height: 2px;
+	left: 0;
+	right: 0;
+	background: $blue-medium-500;
+}
+
+.editor-block-list__insertion-point-inserter {
+	background: none;
+	border: none;
+	display: block;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
 
 	&:before {
 		position: absolute;
-		top: -1px;
+		top: 9px;
 		height: 2px;
 		left: 0;
 		right: 0;
-		background: $blue-medium-500;
+		background: $dark-gray-100;
 		content: '';
+		opacity: 0;
+		transition: opacity 0.1s linear 0.1s;
+	}
+
+	&:hover:before {
+		opacity: 1;
+		transition: opacity 0.8s linear 0.5s;
 	}
 }
 
 .editor-block-list__block > .editor-block-list__insertion-point {
 	position: absolute;
 	bottom: -10px;
+	height: 20px;
 	top: auto;
 	left: 0;
 	right: 0;
+	z-index: z-index( '.editor-block-list__block > .editor-block-list__insertion-point' );
 
 	@include break-small {
 		left: $block-mover-padding-visible;
