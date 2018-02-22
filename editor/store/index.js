@@ -14,7 +14,15 @@ import {
 	getEditedPostAttribute,
 	getLastMultiSelectedBlockUid,
 	getSelectedBlockCount,
+	getTaxonomy,
+	getTaxonomies,
+	getTaxonomyTerm,
+	getTaxonomyTerms,
+	getTaxonomyTermFetchStatus,
 } from './selectors';
+import {
+	fetchTaxonomies,
+} from './actions';
 
 /**
  * Module Constants
@@ -27,12 +35,19 @@ const store = applyMiddlewares(
 );
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 
+store.dispatch( fetchTaxonomies() );
+
 registerSelectors( MODULE_KEY, {
 	getBlockCount,
 	getBlocks,
 	getEditedPostAttribute,
 	getLastMultiSelectedBlockUid,
 	getSelectedBlockCount,
+	getTaxonomy,
+	getTaxonomies,
+	getTaxonomyTerm,
+	getTaxonomyTerms,
+	getTaxonomyTermFetchStatus,
 } );
 
 export default store;

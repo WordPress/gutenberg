@@ -78,6 +78,11 @@ const {
 	getRecentInserterItems,
 	getFrequentInserterItems,
 	POST_UPDATE_TRANSACTION_ID,
+	getTaxonomyTerms,
+	getTaxonomyTermFetchStatus,
+	getTaxonomyTerm,
+	getTaxonomies,
+	getTaxonomy,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2906,6 +2911,208 @@ describe( 'selectors', () => {
 			} );
 
 			expect( isPublishing ).toBe( true );
+		} );
+	} );
+
+	describe( 'getTaxonomyTerms', () => {
+		it( 'should return an empty array when the terms are undefined', () => {
+			const taxonomyTerms = getTaxonomyTerms( {}, 'category' );
+
+			expect( taxonomyTerms ).toEqual( [] );
+		} );
+
+		it( 'should return the terms for a taxonomy when multiple taxonomies are available', () => {
+			const taxonomyTerms = getTaxonomyTerms( {
+				taxonomyTerms: {
+					data: {
+						category: [
+							{
+								id: 1,
+								name: 'Uncategorized',
+								slug: 'uncategorized',
+								taxonomy: 'category',
+							},
+							{
+								id: 5,
+								name: 'SEO',
+								slug: 'seo',
+								taxonomy: 'category',
+							},
+						],
+						post_tag: [
+							{
+								id: 2,
+								name: 'You\'re it',
+								slug: 'youre-it',
+								taxonomy: 'post_tag',
+							},
+						],
+					},
+				},
+			}, 'category' );
+
+			expect( taxonomyTerms ).toEqual(
+				[
+					{
+						id: 1,
+						name: 'Uncategorized',
+						slug: 'uncategorized',
+						taxonomy: 'category',
+					},
+					{
+						id: 5,
+						name: 'SEO',
+						slug: 'seo',
+						taxonomy: 'category',
+					},
+				],
+			);
+		} );
+	} );
+
+	describe( 'getTaxonomyTermFetchStatus', () => {
+		it( 'should return null when the term is undefined', () => {
+			const fetchStatus = getTaxonomyTermFetchStatus( {
+				taxonomyTerms: {
+					fetchStatus: {},
+				},
+			}, 'category' );
+
+			expect( fetchStatus ).toBeNull();
+		} );
+
+		it( 'should return the terms for a taxonomy when multiple taxonomies are available', () => {
+			const fetchStatus = getTaxonomyTermFetchStatus( {
+				taxonomyTerms: {
+					fetchStatus: {
+						category: {
+							requesting: false,
+							successful: true,
+							error: null,
+						},
+						post_tag: {
+							requesting: false,
+							successful: true,
+							error: null,
+						},
+					},
+				},
+			}, 'category' );
+
+			expect( fetchStatus ).toEqual(
+				{
+					requesting: false,
+					successful: true,
+					error: null,
+				},
+			);
+		} );
+	} );
+
+	describe( 'getTaxonomyTerm', () => {
+		it( 'should return the term data when it is available', () => {
+			const termData = getTaxonomyTerm( {
+				taxonomyTerms: {
+					data: {
+						category: [
+							{
+								id: 1,
+								name: 'Uncategorized',
+								slug: 'uncategorized',
+								taxonomy: 'category',
+							},
+						],
+					},
+				},
+			}, 'category', 1 );
+
+			expect( termData ).toEqual( {
+				id: 1,
+				name: 'Uncategorized',
+				slug: 'uncategorized',
+				taxonomy: 'category',
+			} );
+		} );
+
+		it( 'should return null when the term data is unavailable', () => {
+			const termData = getTaxonomyTerm( {
+				taxonomyTerms: {},
+			}, 'category', 1 );
+
+			expect( termData ).toBeNull();
+		} );
+	} );
+
+	describe( 'getTaxonomies', () => {
+		it( 'should return the taxonomies if there are any', () => {
+			const taxonomies = getTaxonomies( {
+				taxonomies: {
+					data: {
+						category: {
+							name: 'Categories',
+							slug: 'category',
+							hierarchical: true,
+							rest_base: 'categories',
+						},
+					},
+				},
+			} );
+
+			expect( taxonomies ).toEqual( {
+				category: {
+					name: 'Categories',
+					slug: 'category',
+					hierarchical: true,
+					rest_base: 'categories',
+				},
+			} );
+		} );
+	} );
+
+	describe( 'getTaxonomy', () => {
+		it( 'should return the data for a single taxonomy', () => {
+			const taxonomy = getTaxonomy( {
+				taxonomies: {
+					data: {
+						category: {
+							name: 'Categories',
+							slug: 'category',
+							hierarchical: true,
+							rest_base: 'categories',
+						},
+						post_tag: {
+							name: 'Tags',
+							slug: 'post_tag',
+							hierarchical: false,
+							rest_base: 'tags',
+						},
+					},
+				},
+			}, 'category' );
+
+			expect( taxonomy ).toEqual( {
+				name: 'Categories',
+				slug: 'category',
+				hierarchical: true,
+				rest_base: 'categories',
+			} );
+		} );
+
+		it( 'should return null if the data isn\'t available', () => {
+			const taxonomy = getTaxonomy( {
+				taxonomies: {
+					data: {
+						category: {
+							name: 'Categories',
+							slug: 'category',
+							hierarchical: true,
+							rest_base: 'categories',
+						},
+					},
+				},
+			}, 'post_tag' );
+
+			expect( taxonomy ).toBeNull();
 		} );
 	} );
 } );

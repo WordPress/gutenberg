@@ -31,6 +31,9 @@ import {
 	convertBlockToStatic,
 	convertBlockToReusable,
 	selectBlock,
+	fetchTaxonomies,
+	fetchTaxonomyTerms,
+	addTaxonomyTerm,
 } from '../../store/actions';
 import reducer from '../reducer';
 import effects from '../effects';
@@ -845,6 +848,387 @@ describe( 'effects', () => {
 						[ createBlock( 'core/block', { ref: expect.any( Number ) } ) ]
 					)
 				);
+			} );
+		} );
+
+		describe( '.FETCH_TAXONOMIES', () => {
+			const handler = effects.FETCH_TAXONOMIES;
+
+			it( 'should get the taxonomies and dispatch actions to get the terms', () => {
+				const promise = Promise.resolve( {
+					category: {
+						name: 'Categories',
+						slug: 'category',
+						rest_base: 'categories',
+					},
+					post_tag: {
+						name: 'Tags',
+						slug: 'post_tag',
+						rest_base: 'tags',
+					},
+				} );
+
+				set( global, 'wp.api.collections.Taxonomies', class {
+					fetch() {
+						return promise;
+					}
+				} );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => {}, dispatch };
+
+				handler( fetchTaxonomies( 'post' ), store );
+
+				return promise.then( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMIES_SUCCESS',
+						taxonomies: {
+							category: {
+								name: 'Categories',
+								slug: 'category',
+								rest_base: 'categories',
+							},
+							post_tag: {
+								name: 'Tags',
+								slug: 'post_tag',
+								rest_base: 'tags',
+							},
+						},
+					} );
+					expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMY_TERMS',
+						taxonomySlug: 'category',
+					} );
+					expect( dispatch.mock.calls[ 2 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMY_TERMS',
+						taxonomySlug: 'post_tag',
+					} );
+				} );
+			} );
+
+			it( 'should dispatch a failure action when the API returns an error', () => {
+				const promise = Promise.reject( {
+					responseJSON: {
+						code: 'unauthorized',
+						message: 'Not allowed',
+					},
+				} );
+
+				set( global, 'wp.api.collections.Taxonomies', class {
+					fetch() {
+						return promise;
+					}
+				} );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => {}, dispatch };
+
+				handler( fetchTaxonomies( 'post' ), store );
+
+				expect.assertions( 1 );
+				return promise.catch( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMIES_FAILURE',
+						error: {
+							code: 'unauthorized',
+							message: 'Not allowed',
+						},
+					} );
+				} );
+			} );
+
+			it( 'should dispatch a failure action with a default error when an unknown API error occurs', () => {
+				const promise = Promise.reject( {} );
+
+				set( global, 'wp.api.collections.Taxonomies', class {
+					fetch() {
+						return promise;
+					}
+				} );
+
+				const dispatch = jest.fn();
+				const store = { getState: () => {}, dispatch };
+
+				handler( fetchTaxonomies( 'post' ), store );
+
+				expect.assertions( 1 );
+				return promise.catch( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMIES_FAILURE',
+						error: {
+							code: 'unknown_error',
+							message: 'An unknown error occurred.',
+						},
+					} );
+				} );
+			} );
+		} );
+
+		describe( '.FETCH_TAXONOMY_TERMS', () => {
+			const handler = effects.FETCH_TAXONOMY_TERMS;
+
+			it( 'should get the terms for the specified taxonomy', () => {
+				const promise = Promise.resolve( [
+					{
+						id: 1,
+						name: 'Uncategorized',
+						slug: 'uncategorized',
+						taxonomy: 'category',
+						parent: 0,
+					},
+					{
+						id: 5,
+						name: 'SEO',
+						slug: 'seo',
+						taxonomy: 'category',
+						parent: 0,
+					},
+					{
+						id: 6,
+						name: 'Google',
+						slug: 'google',
+						taxonomy: 'category',
+						parent: 5,
+					},
+				] );
+
+				const getTaxonomyCollection = jest.fn();
+				getTaxonomyCollection.mockReturnValue( class {
+					fetch() {
+						return promise;
+					}
+				} );
+				set( global, 'wp.api.getTaxonomyCollection', getTaxonomyCollection );
+
+				const dispatch = jest.fn();
+				const getState = jest.fn();
+				getState.mockReturnValue( {
+					taxonomies: {
+						data: {
+							category: {
+								slug: 'category',
+							},
+						},
+					},
+				} );
+				const store = { getState, dispatch };
+
+				handler( fetchTaxonomyTerms( 'category' ), store );
+
+				return promise.then( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
+						taxonomySlug: 'category',
+						taxonomyTerms: [
+							{
+								id: 1,
+								name: 'Uncategorized',
+								slug: 'uncategorized',
+								taxonomy: 'category',
+								parent: 0,
+							},
+							{
+								id: 5,
+								name: 'SEO',
+								slug: 'seo',
+								taxonomy: 'category',
+								parent: 0,
+							},
+							{
+								id: 6,
+								name: 'Google',
+								slug: 'google',
+								taxonomy: 'category',
+								parent: 5,
+							},
+						],
+					} );
+				} );
+			} );
+
+			it( 'should dispatch a failure action when the API returns an error', () => {
+				const promise = Promise.reject( {} );
+
+				const getTaxonomyCollection = jest.fn();
+				getTaxonomyCollection.mockReturnValue( class {
+					fetch() {
+						return promise;
+					}
+				} );
+				set( global, 'wp.api.getTaxonomyCollection', getTaxonomyCollection );
+
+				const dispatch = jest.fn();
+				const getState = jest.fn();
+				getState.mockReturnValue( {
+					taxonomies: {
+						data: {
+							category: {
+								slug: 'category',
+							},
+						},
+					},
+				} );
+				const store = { getState, dispatch };
+
+				handler( fetchTaxonomyTerms( 'category' ), store );
+
+				expect.assertions( 1 );
+				return promise.catch( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_TAXONOMY_TERMS_FAILURE',
+						error: {
+							code: 'unknown_error',
+							message: 'An unknown error occurred.',
+						},
+					} );
+				} );
+			} );
+		} );
+
+		describe( '.ADD_TAXONOMY_TERM', () => {
+			const handler = effects.ADD_TAXONOMY_TERM;
+
+			it( 'should post a new taxonomy term', () => {
+				const promise = Promise.resolve( {
+					id: 5,
+					name: 'SEO',
+					slug: 'seo',
+					taxonomy: 'category',
+					parent: 0,
+				} );
+
+				const getTaxonomyCollection = jest.fn();
+				getTaxonomyCollection.mockReturnValue( class {
+					fetch() {
+						return promise;
+					}
+				} );
+				set( global, 'wp.api.getTaxonomyCollection', getTaxonomyCollection );
+
+				const getState = jest.fn();
+				const dispatch = jest.fn();
+				getState.mockReturnValue( {
+					taxonomies: {
+						data: {
+							category: {
+								slug: 'category',
+								rest_base: 'categories',
+							},
+						},
+					},
+					currentPost: {
+						categories: [],
+					},
+				} );
+				const store = { getState, dispatch };
+
+				handler( addTaxonomyTerm( 'category', 'categories', 'categoryName', null ), store );
+				return promise.then( () => {
+					expect( dispatch ).toHaveBeenCalledTimes( 2 );
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'ADD_TAXONOMY_TERM_SUCCESS',
+						taxonomySlug: 'category',
+						taxonomyTerm: {
+							id: 5,
+							name: 'SEO',
+							slug: 'seo',
+							taxonomy: 'category',
+							parent: 0,
+						},
+					} );
+					expect( dispatch.mock.calls[ 1 ][ 0 ] ).toEqual( {
+						type: 'EDIT_POST',
+						edits: {
+							categories: [ 5 ],
+						},
+					} );
+				} );
+			} );
+
+			it( 'should get an existing term when the term it\'s trying to post already exists', () => {
+				const promise = Promise.reject( {
+					responseJSON: {
+						code: 'term_exists',
+					},
+				} );
+
+				const getTaxonomyCollection = jest.fn();
+				getTaxonomyCollection.mockReturnValue( class {
+					fetch() {
+						return promise;
+					}
+				} );
+				set( global, 'wp.api.getTaxonomyCollection', getTaxonomyCollection );
+
+				const getState = jest.fn();
+				const dispatch = jest.fn();
+				getState.mockReturnValue( {
+					taxonomies: {
+						data: {
+							category: {
+								slug: 'category',
+								rest_base: 'categories',
+							},
+						},
+					},
+				} );
+				const store = { getState, dispatch };
+
+				handler( addTaxonomyTerm( 'category', 'categories', 'Term name', null ), store );
+
+				return promise.catch( () => {
+					expect( dispatch ).toHaveBeenCalledTimes( 1 );
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'FETCH_AND_ADD_TAXONOMY_TERM',
+						termName: 'Term name',
+						termParentId: null,
+						taxonomy: {
+							slug: 'category',
+							rest_base: 'categories',
+						},
+					} );
+				} );
+			} );
+
+			it( 'should dispatch a failure action when the API returns an error', () => {
+				const promise = Promise.reject( {} );
+
+				const getTaxonomyCollection = jest.fn();
+				getTaxonomyCollection.mockReturnValue( class {
+					fetch() {
+						return promise;
+					}
+				} );
+				set( global, 'wp.api.getTaxonomyCollection', getTaxonomyCollection );
+
+				const getState = jest.fn();
+				const dispatch = jest.fn();
+				getState.mockReturnValue( {
+					taxonomies: {
+						data: {
+							category: {
+								slug: 'category',
+								rest_base: 'categories',
+							},
+						},
+					},
+					currentPost: {
+						categories: [],
+					},
+				} );
+				const store = { getState, dispatch };
+
+				handler( addTaxonomyTerm( 'category', 'categories', 'categoryName', null ), store );
+				expect.assertions( 1 );
+				return promise.catch( () => {
+					expect( dispatch.mock.calls[ 0 ][ 0 ] ).toEqual( {
+						type: 'ADD_TAXONOMY_TERM_FAILURE',
+						error: {
+							code: 'unknown_error',
+							message: 'An unknown error occurred.',
+						},
+					} );
+				} );
 			} );
 		} );
 	} );

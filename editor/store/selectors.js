@@ -1330,3 +1330,64 @@ export function isPublishingPost( state ) {
 	// considered published
 	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
 }
+
+/**
+ * Returns the taxonomy data if it exists.
+ *
+ * @param {Object} state        Global application state.
+ * @param {string} taxonomySlug Taxonomy slug.
+ *
+ * @return {Array} Taxonomy terms data.
+ */
+export function getTaxonomy( state, taxonomySlug ) {
+	return get( state, `taxonomies.data.${ taxonomySlug }`, null );
+}
+
+/**
+ * Returns the taxonomies data if it exists.
+ *
+ * @param {Object} state        Global application state.
+ *
+ * @return {Array} Taxonomy terms data.
+ */
+export function getTaxonomies( state ) {
+	return get( state, 'taxonomies.data', null );
+}
+
+/**
+ * Returns the taxonomy terms data if it exists.
+ *
+ * @param {Object} state        Global application state.
+ * @param {string} taxonomySlug Taxonomy slug.
+ *
+ * @return {Array} Taxonomy terms data.
+ */
+export function getTaxonomyTerms( state, taxonomySlug ) {
+	return get( state, `taxonomyTerms.data.${ taxonomySlug }`, [] );
+}
+
+/**
+ * Returns the taxonomy term fetch status.
+ *
+ * @param {Object} state        Global application state.
+ * @param {string} taxonomySlug Taxonomy slug.
+ *
+ * @return {Object} Taxonomy term fetch status.
+ */
+export function getTaxonomyTermFetchStatus( state, taxonomySlug ) {
+	return state.taxonomyTerms.fetchStatus[ taxonomySlug ] || null;
+}
+
+/**
+ *
+ * Returns the Taxonomy Terms fetch status.
+ *
+ * @param {Object} state        Global application state.
+ * @param {string} taxonomySlug Taxonomy slug.
+ * @param {number} termId       Unique identifier of a Term.
+ *
+ * @return {Object} Taxonomy Term Data.
+ */
+export function getTaxonomyTerm( state, taxonomySlug, termId ) {
+	return find( getTaxonomyTerms( state, taxonomySlug ), term => term.id === termId ) || null;
+}

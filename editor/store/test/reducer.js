@@ -31,6 +31,8 @@ import {
 	isSavingMetaBoxes,
 	metaBoxes,
 	reusableBlocks,
+	taxonomies,
+	taxonomyTerms,
 } from '../reducer';
 
 jest.mock( '../../utils/meta-boxes', () => {
@@ -1827,6 +1829,180 @@ describe( 'state', () => {
 				data: {},
 				isFetching: {},
 				isSaving: {},
+			} );
+		} );
+	} );
+
+	describe( 'taxonomies()', () => {
+		it( 'should indicate that the taxonomies are being fetched', () => {
+			const initialState = {
+				data: {},
+				fetchStatus: {},
+			};
+
+			const state = taxonomies( initialState, {
+				type: 'FETCH_TAXONOMIES',
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				fetchStatus: {
+					requesting: true,
+					successful: false,
+					error: null,
+				},
+			} );
+		} );
+
+		it( 'should stop indicating that the taxonomies are being fetched when an error occurred', () => {
+			const initialState = {
+				data: {},
+				fetchStatus: {
+					requesting: true,
+					successful: false,
+					error: null,
+				},
+			};
+
+			const state = taxonomies( initialState, {
+				type: 'FETCH_TAXONOMIES_FAILURE',
+				error: 'Some arbitrary error',
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				fetchStatus: {
+					requesting: false,
+					successful: false,
+					error: 'Some arbitrary error',
+				},
+			} );
+		} );
+
+		it( 'should indicate that fetching the taxonomies was successful', () => {
+			const initialState = {
+				data: {},
+				fetchStatus: {
+					requesting: true,
+					successful: false,
+					error: null,
+				},
+			};
+
+			const state = taxonomies( initialState, {
+				type: 'FETCH_TAXONOMIES_SUCCESS',
+				taxonomies: {
+					category: [],
+				},
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					category: [],
+				},
+				fetchStatus: {
+					requesting: false,
+					successful: true,
+					error: null,
+				},
+			} );
+		} );
+	} );
+
+	describe( 'taxonomyTerms()', () => {
+		it( 'should indicate that terms are being fetched for a taxonomy', () => {
+			const initialState = {
+				data: {},
+				fetchStatus: {
+					post_tag: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+				},
+			};
+
+			const state = taxonomyTerms( initialState, {
+				type: 'FETCH_TAXONOMY_TERMS',
+				taxonomySlug: 'category',
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				fetchStatus: {
+					post_tag: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+					category: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+				},
+			} );
+		} );
+
+		it( 'should indicate that fetching the terms was successful', () => {
+			const initialState = {
+				data: {},
+				fetchStatus: {
+					post_tag: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+				},
+			};
+
+			const state = taxonomyTerms( initialState, {
+				type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
+				taxonomySlug: 'post_tag',
+				taxonomyTerms: [],
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					post_tag: [],
+				},
+				fetchStatus: {
+					post_tag: {
+						requesting: false,
+						successful: true,
+						error: null,
+					},
+				},
+			} );
+		} );
+
+		it( 'should stop indicating that the terms are being fetched when an error occurred', () => {
+			const initialState = {
+				data: {},
+				fetchStatus: {
+					post_tag: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+				},
+			};
+
+			const state = taxonomyTerms( initialState, {
+				type: 'FETCH_TAXONOMY_TERMS_FAILURE',
+				taxonomySlug: 'post_tag',
+				error: 'Some arbitrary error',
+			} );
+
+			expect( state ).toEqual( {
+				data: {},
+				fetchStatus: {
+					post_tag: {
+						requesting: false,
+						successful: false,
+						error: 'Some arbitrary error',
+					},
+				},
 			} );
 		} );
 	} );

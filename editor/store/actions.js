@@ -592,3 +592,56 @@ export function appendDefaultBlock( attributes, rootUID ) {
 		rootUID,
 	};
 }
+
+/**
+ * Returns an action object used to fetch all taxonomies from the REST API into the store.
+ *
+ * Continues with fetching the terms for each taxonomy.
+ *
+ * @param {string} postType Optional post type of taxonomies to fetch.
+ *
+ * @return {Object} Action object.
+ */
+export function fetchTaxonomies( postType ) {
+	return {
+		type: 'FETCH_TAXONOMIES',
+		postType,
+	};
+}
+
+/**
+ * Returns an action object used to fetch a taxonomy's terms from the REST API into the store.
+ *
+ * @param {string} taxonomySlug The taxonomy's slug.
+ *
+ * @return {Object} Action object.
+ */
+
+export function fetchTaxonomyTerms( taxonomySlug ) {
+	return {
+		type: 'FETCH_TAXONOMY_TERMS',
+		taxonomySlug,
+	};
+}
+
+/**
+ * Returns an action object used to post a new Taxonomy term to the REST API and into the store.
+ *
+ * First checks if the term already exists.
+ *
+ * @param {string} taxonomySlug     The taxonomy's slug.
+ * @param {string} taxonomyRestBase The taxonomy's rest base.
+ * @param {string} termName         The new term's name.
+ * @param {number} termParentId     The new term's parent id.
+ *
+ * @return {Object} Action object.
+ */
+export function addTaxonomyTerm( taxonomySlug, taxonomyRestBase, termName, termParentId ) {
+	return {
+		type: 'ADD_TAXONOMY_TERM',
+		taxonomySlug,
+		taxonomyRestBase,
+		termName,
+		termParentId,
+	};
+}

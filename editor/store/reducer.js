@@ -881,6 +881,141 @@ export const reusableBlocks = combineReducers( {
 	},
 } );
 
+/**
+ * Reducer to save the WP REST API Taxonomy Terms to the state.
+ *
+ * State:
+ * - data:         The data that is returned by the WP REST API.
+ * - fetchStatus:
+ *   - requesting: Boolean indicating if the Taxonomies are currently being fetched.
+ *   - successful: Boolean indicating if the Taxonomies where successfully fetched.
+ *   - error:      Object when not null contains the error that occurred during fetching.
+ *
+ * @return {Object} Updated state.
+ */
+export const taxonomies = combineReducers( {
+	data( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_TAXONOMIES_SUCCESS': {
+				return action.taxonomies;
+			}
+		}
+
+		return state;
+	},
+
+	fetchStatus( state = false, action ) {
+		switch ( action.type ) {
+			case 'FETCH_TAXONOMIES': {
+				return {
+					requesting: true,
+					successful: false,
+					error: null,
+				};
+			}
+			case 'FETCH_TAXONOMIES_SUCCESS': {
+				return {
+					requesting: false,
+					successful: true,
+					error: null,
+				};
+			}
+			case 'FETCH_TAXONOMIES_FAILURE': {
+				const { error } = action;
+				return {
+					requesting: false,
+					successful: false,
+					error,
+				};
+			}
+		}
+
+		return state;
+	},
+} );
+
+/**
+ * Reducer to save the WP REST API Taxonomy Terms to the state.
+ *
+ * State:
+ * - data:        The data that is returned by the WP REST API.
+ * - fetchStatus; Object with per Taxonomy:
+ *   - requesting: Boolean indicating if the Taxonomies are currently being fetched.
+ *   - successful: Boolean indicating if the Taxonomies where successfully fetched.
+ *   - error:      Object when not null contains the error that occurred during fetching.
+ *
+ * @return {Object} Updated state.
+ */
+export const taxonomyTerms = combineReducers( {
+	data( state = {}, action ) {
+		switch ( action.type ) {
+			case 'FETCH_TAXONOMY_TERMS_SUCCESS': {
+				const { taxonomySlug } = action;
+				return {
+					...state,
+					[ taxonomySlug ]: action.taxonomyTerms,
+				};
+			}
+			case 'ADD_TAXONOMY_TERM_SUCCESS': {
+				const { taxonomyTerm } = action;
+				const taxonomySlug = taxonomyTerm.taxonomy;
+				return {
+					...state,
+					[ taxonomySlug ]: [
+						...state[ taxonomySlug ],
+						taxonomyTerm,
+					],
+				};
+			}
+		}
+
+		return state;
+	},
+
+	fetchStatus( state = {}, action ) {
+		switch ( action.type ) {
+			case 'ADD_TAXONOMY_TERM':
+			case 'FETCH_TAXONOMY_TERMS': {
+				const { taxonomySlug } = action;
+				return {
+					...state,
+					[ taxonomySlug ]: {
+						requesting: true,
+						successful: false,
+						error: null,
+					},
+				};
+			}
+			case 'ADD_TAXONOMY_TERM_SUCCESS':
+			case 'FETCH_TAXONOMY_TERMS_SUCCESS': {
+				const { taxonomySlug } = action;
+				return {
+					...state,
+					[ taxonomySlug ]: {
+						requesting: false,
+						successful: true,
+						error: null,
+					},
+				};
+			}
+			case 'ADD_TAXONOMY_TERM_FAILURE':
+			case 'FETCH_TAXONOMY_TERMS_FAILURE': {
+				const { error, taxonomySlug } = action;
+				return {
+					...state,
+					[ taxonomySlug ]: {
+						requesting: false,
+						successful: false,
+						error,
+					},
+				};
+			}
+		}
+
+		return state;
+	},
+} );
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -894,4 +1029,6 @@ export default optimist( combineReducers( {
 	metaBoxes,
 	isSavingMetaBoxes,
 	reusableBlocks,
+	taxonomies,
+	taxonomyTerms,
 } ) );

@@ -7,7 +7,6 @@ import { filter, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 
 /**
@@ -27,6 +26,7 @@ export function PostTaxonomies( { postType, taxonomies } ) {
 				const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
 				return (
 					<TaxonomyComponent
+						taxonomy={ taxonomy }
 						key={ taxonomy.slug }
 						label={ taxonomy.name }
 						restBase={ taxonomy.rest_base }
@@ -41,17 +41,13 @@ export function PostTaxonomies( { postType, taxonomies } ) {
 const applyConnect = connect(
 	( state ) => {
 		return {
+			taxonomies: state.taxonomies,
 			postType: getCurrentPostType( state ),
 		};
 	},
 );
 
-const applyWithAPIData = withAPIData( () => ( {
-	taxonomies: '/wp/v2/taxonomies?context=edit',
-} ) );
-
 export default compose( [
 	applyConnect,
-	applyWithAPIData,
 ] )( PostTaxonomies );
 

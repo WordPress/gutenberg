@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, has, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
+import { get, has, includes, map, castArray, uniqueId, reduce, values, some, forEach, find, defaults } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -32,6 +32,7 @@ import {
 	createErrorNotice,
 	removeNotice,
 	savePost,
+	editPost,
 	requestMetaBoxUpdates,
 	metaBoxUpdatesSuccess,
 	updateReusableBlock,
@@ -44,6 +45,7 @@ import {
 	getCurrentPost,
 	getCurrentPostType,
 	getEditedPostContent,
+	getEditedPostAttribute,
 	getPostEdits,
 	isCurrentPostPublished,
 	isEditedPostDirty,
@@ -64,6 +66,11 @@ import { getMetaBoxContainer } from '../utils/meta-boxes';
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
+const DEFAULT_TAXONOMY_QUERY = {
+	per_page: 100,
+	orderby: 'count',
+	order: 'desc',
+};
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -518,5 +525,221 @@ export default {
 		// Save the metaboxes
 		window.fetch( window._wpMetaBoxUrl, fetchOptions )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
+	},
+	FETCH_TAXONOMIES( action, store ) {
+		const dispatchFailure = ( error ) => {
+			error = defaults( error, {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
+			} );
+			dispatch( {
+				type: 'FETCH_TAXONOMIES_FAILURE',
+				error,
+			} );
+		};
+
+		if ( ! has( wp, 'api.collections.Taxonomies' ) ) {
+			return dispatchFailure();
+		}
+
+		const { dispatch } = store;
+		const collection = new wp.api.collections.Taxonomies();
+		const fetchData = {
+			...DEFAULT_TAXONOMY_QUERY,
+		};
+		if ( has( action, 'postType' ) ) {
+			fetchData.type = action.postType;
+		}
+
+		collection.fetch( { data: fetchData } ).then( ( taxonomies ) => {
+			dispatch( {
+				type: 'FETCH_TAXONOMIES_SUCCESS',
+				taxonomies,
+			} );
+			forEach( taxonomies, function( taxonomy, taxonomySlug ) {
+				dispatch( {
+					type: 'FETCH_TAXONOMY_TERMS',
+					taxonomySlug,
+				} );
+			} );
+		}, ( err ) => {
+			dispatchFailure( err.responseJSON );
+		} );
+	},
+	FETCH_TAXONOMY_TERMS( action, store ) {
+		const { getState, dispatch } = store;
+		const state = getState();
+		const { taxonomySlug } = action;
+
+		const dispatchFailure = ( error ) => {
+			error = defaults( error, {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
+			} );
+			dispatch( {
+				type: 'FETCH_TAXONOMY_TERMS_FAILURE',
+				error,
+			} );
+		};
+
+		if ( ! has( state, `taxonomies.data.${ taxonomySlug }` ) ) {
+			return dispatchFailure();
+		}
+
+		const taxonomy = state.taxonomies.data[ taxonomySlug ];
+		const TaxonomyCollection = wp.api.getTaxonomyCollection( taxonomy.slug );
+
+		if ( ! TaxonomyCollection ) {
+			return dispatchFailure();
+		}
+
+		const collection = new TaxonomyCollection();
+		collection.fetch( {
+			data: {
+				...DEFAULT_TAXONOMY_QUERY,
+			},
+		} ).then( ( taxonomyTerms ) => {
+			dispatch( {
+				type: 'FETCH_TAXONOMY_TERMS_SUCCESS',
+				taxonomySlug,
+				taxonomyTerms,
+			} );
+		}, ( err ) => {
+			dispatchFailure( err.responseJSON );
+		} );
+	},
+	ADD_TAXONOMY_TERM( action, store ) {
+		const { getState, dispatch } = store;
+		const state = getState();
+		const {
+			taxonomySlug,
+			taxonomyRestBase,
+			termName,
+		} = action;
+		let termParentId = action.termParentId;
+
+		const dispatchFailure = ( error ) => {
+			error = defaults( error, {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
+			} );
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				error,
+			} );
+		};
+
+		if ( ! has( state, `taxonomies.data.${ taxonomySlug }` ) ) {
+			return dispatchFailure();
+		}
+
+		const taxonomy = state.taxonomies.data[ taxonomySlug ];
+		if ( ! taxonomy.hierarchical || ! termParentId ) {
+			termParentId = undefined;
+		}
+
+		const TaxonomyCollection = wp.api.getTaxonomyCollection( taxonomy.slug );
+		if ( ! TaxonomyCollection ) {
+			return dispatchFailure();
+		}
+
+		const collection = new TaxonomyCollection();
+		collection.fetch( {
+			type: 'POST',
+			data: {
+				...DEFAULT_TAXONOMY_QUERY,
+				name: termName,
+				parent: termParentId,
+			},
+		} ).then( ( taxonomyTerm ) => {
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_SUCCESS',
+				taxonomySlug,
+				taxonomyTerm,
+			} );
+			dispatch(
+				editPost( {
+					[ taxonomyRestBase ]: [
+						...getEditedPostAttribute( state, taxonomyRestBase ),
+						taxonomyTerm.id,
+					],
+				} )
+			);
+		}, ( err ) => {
+			if ( err.responseJSON && err.responseJSON.code === 'term_exists' ) {
+				dispatch( {
+					type: 'FETCH_AND_ADD_TAXONOMY_TERM',
+					termName: action.termName,
+					termParentId: action.termParentId,
+					taxonomy,
+				} );
+			} else {
+				dispatchFailure( err.responseJSON );
+			}
+		}, ( err ) => {
+			dispatchFailure( err.responseJSON );
+		} );
+	},
+	FETCH_AND_ADD_TAXONOMY_TERM( action, store ) {
+		const { dispatch, getState } = store;
+		const state = getState();
+		const {
+			termName,
+			taxonomy,
+		} = action;
+		let termParentId = action.termParentId;
+
+		const dispatchFailure = ( error ) => {
+			error = defaults( error, {
+				code: 'unknown_error',
+				message: __( 'An unknown error occurred.' ),
+			} );
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_FAILURE',
+				taxonomySlug: taxonomy.slug,
+				error,
+			} );
+		};
+
+		if ( ! taxonomy.hierarchical || ! termParentId ) {
+			termParentId = undefined;
+		}
+
+		const TaxonomyCollection = wp.api.getTaxonomyCollection( taxonomy.slug );
+		if ( ! TaxonomyCollection ) {
+			return dispatchFailure();
+		}
+
+		const collection = new TaxonomyCollection();
+		collection.fetch( {
+			data: {
+				...DEFAULT_TAXONOMY_QUERY,
+				_fields: [ 'id', 'name', 'parent', 'taxonomy' ],
+				parent: termParentId || 0,
+				search: termName,
+			},
+		} ).then( results => {
+			const taxonomyTerm = find( results, { name: termName } );
+			// This should be extremely unlikely, but let's do a sanity check.
+			if ( ! taxonomyTerm ) {
+				return dispatchFailure();
+			}
+
+			dispatch( {
+				type: 'ADD_TAXONOMY_TERM_SUCCESS',
+				taxonomySlug: taxonomy.slug,
+				taxonomyTerm,
+			} );
+			dispatch(
+				editPost( {
+					[ taxonomy.rest_base ]: [
+						...getEditedPostAttribute( state, taxonomy.rest_base ),
+						taxonomyTerm.id,
+					],
+				} )
+			);
+		}, err => {
+			dispatchFailure( err.responseJSON );
+		} );
 	},
 };
