@@ -7,8 +7,9 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/element';
 import { PanelBody } from '@wordpress/components';
-import { PostExcerpt as PostExcerptForm, PostExcerptCheck } from '@wordpress/editor';
+import { PostExcerpt as PostExcerptForm, ifPostTypeSupports } from '@wordpress/editor';
 
 /**
  * Internal Dependencies
@@ -23,15 +24,13 @@ const PANEL_NAME = 'post-excerpt';
 
 function PostExcerpt( { isOpened, onTogglePanel } ) {
 	return (
-		<PostExcerptCheck>
-			<PanelBody title={ __( 'Excerpt' ) } opened={ isOpened } onToggle={ onTogglePanel }>
-				<PostExcerptForm />
-			</PanelBody>
-		</PostExcerptCheck>
+		<PanelBody title={ __( 'Excerpt' ) } opened={ isOpened } onToggle={ onTogglePanel }>
+			<PostExcerptForm />
+		</PanelBody>
 	);
 }
 
-export default connect(
+const applyConnect = connect(
 	( state ) => {
 		return {
 			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
@@ -44,5 +43,9 @@ export default connect(
 	},
 	undefined,
 	{ storeKey: 'edit-post' }
-)( PostExcerpt );
+);
 
+export default compose( [
+	ifPostTypeSupports( 'excerpt' ),
+	applyConnect,
+] )( PostExcerpt );

@@ -15,7 +15,7 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import PostFormatCheck from './check';
+import ifPostTypeSupports from '../higher-order/if-post-type-supports';
 import { getEditedPostAttribute, getSuggestedPostFormat } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
@@ -40,36 +40,35 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFor
 
 	/* eslint-disable jsx-a11y/no-onchange */
 	return (
-		<PostFormatCheck>
-			<div className="editor-post-format">
-				<div className="editor-post-format__content">
-					<label htmlFor={ postFormatSelectorId }>{ __( 'Post Format' ) }</label>
-					<select
-						value={ postFormat }
-						onChange={ ( event ) => onUpdatePostFormat( event.target.value ) }
-						id={ postFormatSelectorId }
-					>
-						{ POST_FORMATS.map( format => (
-							<option key={ format.id } value={ format.id }>{ format.caption }</option>
-						) ) }
-					</select>
-				</div>
-
-				{ suggestion && suggestion.id !== postFormat && (
-					<div className="editor-post-format__suggestion">
-						{ __( 'Suggestion:' ) }{ ' ' }
-						<button className="button-link" onClick={ () => onUpdatePostFormat( suggestion.id ) }>
-							{ suggestion.caption }
-						</button>
-					</div>
-				) }
+		<div className="editor-post-format">
+			<div className="editor-post-format__content">
+				<label htmlFor={ postFormatSelectorId }>{ __( 'Post Format' ) }</label>
+				<select
+					value={ postFormat }
+					onChange={ ( event ) => onUpdatePostFormat( event.target.value ) }
+					id={ postFormatSelectorId }
+				>
+					{ POST_FORMATS.map( format => (
+						<option key={ format.id } value={ format.id }>{ format.caption }</option>
+					) ) }
+				</select>
 			</div>
-		</PostFormatCheck>
+
+			{ suggestion && suggestion.id !== postFormat && (
+				<div className="editor-post-format__suggestion">
+					{ __( 'Suggestion:' ) }{ ' ' }
+					<button className="button-link" onClick={ () => onUpdatePostFormat( suggestion.id ) }>
+						{ suggestion.caption }
+					</button>
+				</div>
+			) }
+		</div>
 	);
 	/* eslint-enable jsx-a11y/no-onchange */
 }
 
 export default compose( [
+	ifPostTypeSupports( 'post-formats' ),
 	connect(
 		( state ) => {
 			return {

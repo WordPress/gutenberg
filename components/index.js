@@ -47,6 +47,7 @@ export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
+export { default as ifPropsVerify } from './higher-order/if-props-verify';
 export { default as withAPIData } from './higher-order/with-api-data';
 export { default as withContext } from './higher-order/with-context';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';

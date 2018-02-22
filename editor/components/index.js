@@ -16,11 +16,8 @@ export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
 export { default as PostComments } from './post-comments';
 export { default as PostExcerpt } from './post-excerpt';
-export { default as PostExcerptCheck } from './post-excerpt/check';
 export { default as PostFeaturedImage } from './post-featured-image';
-export { default as PostFeaturedImageCheck } from './post-featured-image/check';
 export { default as PostFormat } from './post-format';
-export { default as PostFormatCheck } from './post-format/check';
 export { default as PostLastRevision } from './post-last-revision';
 export { default as PostLastRevisionCheck } from './post-last-revision/check';
 export { default as PostPendingStatus } from './post-pending-status';
@@ -44,7 +41,6 @@ export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
 export { default as PostTrash } from './post-trash';
 export { default as PostTrashCheck } from './post-trash/check';
-export { default as PostTypeSupportCheck } from './post-type-support-check';
 export { default as PostVisibility } from './post-visibility';
 export { default as PostVisibilityLabel } from './post-visibility/label';
 export { default as PostVisibilityCheck } from './post-visibility/check';
@@ -71,3 +67,6 @@ export { default as WritingFlow } from './writing-flow';
 
 // State Related Components
 export { default as EditorProvider } from './provider';
+
+// Higher-Order Components
+export { default as ifPostTypeSupports } from './higher-order/if-post-type-supports';
