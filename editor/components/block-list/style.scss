@@ -193,6 +193,12 @@
 		}
 	}
 
+	// Wide and full-wide
+	&[data-align="full"],
+	&[data-align="wide"] {
+		clear: both;
+	}
+
 	// Full-wide
 	&[data-align="full"] {
 		padding-left: 0;
