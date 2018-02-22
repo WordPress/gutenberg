@@ -55,6 +55,7 @@ const entryPointNames = [
 	'i18n',
 	'utils',
 	'data',
+	'viewport',
 	[ 'editPost', 'edit-post' ],
 ];
 
