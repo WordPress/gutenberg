@@ -127,6 +127,8 @@ transforms: {
                 } );
             },
         },
+An existing shortcode can be transformed into its block counterpart.
+
         {
             type: 'shortcode',
             // Shortcode tag can also be an array of shortcode aliases
