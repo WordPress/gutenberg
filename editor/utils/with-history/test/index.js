@@ -9,7 +9,7 @@ describe( 'withHistory', () => {
 	);
 
 	it( 'should return a new reducer', () => {
-		const reducer = withHistory( counter );
+		const reducer = withHistory()( counter );
 
 		expect( typeof reducer ).toBe( 'function' );
 		expect( reducer( undefined, {} ) ).toEqual( {
@@ -20,7 +20,7 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should track history', () => {
-		const reducer = withHistory( counter );
+		const reducer = withHistory()( counter );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -42,7 +42,7 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should perform undo', () => {
-		const reducer = withHistory( counter );
+		const reducer = withHistory()( counter );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -57,14 +57,14 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should not perform undo on empty past', () => {
-		const reducer = withHistory( counter );
+		const reducer = withHistory()( counter );
 		const state = reducer( undefined, {} );
 
 		expect( state ).toBe( reducer( state, { type: 'UNDO' } ) );
 	} );
 
 	it( 'should perform redo', () => {
-		const reducer = withHistory( counter );
+		const reducer = withHistory()( counter );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -80,14 +80,14 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should not perform redo on empty future', () => {
-		const reducer = withHistory( counter );
+		const reducer = withHistory()( counter );
 		const state = reducer( undefined, {} );
 
 		expect( state ).toBe( reducer( state, { type: 'REDO' } ) );
 	} );
 
 	it( 'should reset history by options.resetTypes', () => {
-		const reducer = withHistory( counter, { resetTypes: [ 'RESET_HISTORY' ] } );
+		const reducer = withHistory( { resetTypes: [ 'RESET_HISTORY' ] } )( counter );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -102,7 +102,7 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should return same reference if state has not changed', () => {
-		const reducer = withHistory( counter );
+		const reducer = withHistory()( counter );
 		const original = reducer( undefined, {} );
 		const state = reducer( original, {} );
 
@@ -110,9 +110,9 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should overwrite present state with option.shouldOverwriteState', () => {
-		const reducer = withHistory( counter, {
+		const reducer = withHistory( {
 			shouldOverwriteState: ( { type } ) => type === 'INCREMENT',
-		} );
+		} )( counter );
 
 		let state;
 		state = reducer( undefined, {} );
@@ -134,9 +134,9 @@ describe( 'withHistory', () => {
 	} );
 
 	it( 'should create undo level with option.shouldOverwriteState and CREATE_UNDO_LEVEL', () => {
-		const reducer = withHistory( counter, {
+		const reducer = withHistory( {
 			shouldOverwriteState: ( { type } ) => type === 'INCREMENT',
-		} );
+		} )( counter );
 
 		let state;
 		state = reducer( undefined, {} );

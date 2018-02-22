@@ -5,7 +5,6 @@ import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
 import {
 	flow,
-	partialRight,
 	reduce,
 	first,
 	last,
@@ -142,14 +141,16 @@ export const editor = flow( [
 	combineReducers,
 
 	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, {
+	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
 		shouldOverwriteState,
 	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ] } ),
+	withChangeDetection( {
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ],
+	} ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
