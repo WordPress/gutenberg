@@ -1,17 +1,29 @@
 .editor-block-list__layout .editor-default-block-appender,
 .editor-block-list__layout .editor-block-list__block {
-	margin-bottom: $block-spacing;
-}
-
-.editor-block-list__layout .editor-block-list__block {
 	position: relative;
-	padding: $block-padding;
+	margin-bottom: $block-spacing;
+	padding-left: $block-padding;
+	padding-right: $block-padding;
 
 	@include break-small {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
-		padding: $block-padding $block-padding + $block-mover-padding-visible;
+		padding-left: $block-padding + $block-mover-padding-visible;
+		padding-right: $block-padding + $block-mover-padding-visible;
 	}
 
+	// Prevent collapsing margins
+	// This allows us control over block boundaries and how blocks fit together visually
+	// It makes things a lot simpler, however it also means block margins and paddings have to be tuned (halved) for the editor.
+	padding-top: .05px;
+	padding-bottom: .05px;
+
+	// Space every block using margin instead of padding
+	.editor-block-list__block-edit {
+		margin-top: $block-padding;
+		margin-bottom: $block-padding;
+	}
+
+	// Block outline container
 	&:before {
 		z-index: z-index( '.editor-block-list__block:before' );
 		content: '';
@@ -28,6 +40,7 @@
 		}
 	}
 
+	// Block warnings
 	&.has-warning .editor-block-list__block-edit {
 		position: relative;
 		min-height: 250px;
@@ -125,85 +138,71 @@
 		display: none;
 	}
 
-	// Alignments
+
+	/**
+	 * Alignments
+	 */
+
 	&[data-align="left"],
 	&[data-align="right"] {
 		// Without z-index, won't be clickable as "above" adjacent content
 		z-index: z-index( '.editor-block-list__block {core/image aligned left or right}' );
 		width: 100%;
-		max-width: 370px;	// Needed for blocks with no intrinsic width, like Cover Image or Gallery
-	}
 
-	&[data-align="left"] {
-		float: left;
+		// When images are floated, the block itself should collapse to zero height
+		margin-bottom: 0;
 
-		// mobile, and no sidebars
-		margin-right: $block-padding;
-
-		// sidebar (folded)
-		.auto-fold .edit-post-layout:not( .is-sidebar-opened ) & {
-			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
-				margin-left: $float-margin;
-			}
-		}
-
-		// sidebar (sticky)
-		.sticky-menu .edit-post-layout:not( .is-sidebar-opened ) & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width - $block-padding ) {
-				margin-left: $float-margin;
-			}
-		}
-
-		// sidebar (sticky) and post settings
-		.sticky-menu .edit-post-layout & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
-				margin-left: $float-margin;
-			}
-		}
-
-		// sidebar and post settings
-		.auto-fold .is-sidebar-opened & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width ) {
-				margin-left: $float-margin;
-			}
+		// Hide block outline when an image is floated
+		&:before {
+			content: none;
 		}
 	}
 
+	// Apply max-width to floated items that have no intrinsic width, like Cover Image or Gallery
+	&[data-align="left"],
 	&[data-align="right"] {
-		float: right;
-
-		// mobile, and no sidebars
-		margin-right: $block-padding;
-
-		// sidebar (folded)
-		.auto-fold .edit-post-layout:not( .is-sidebar-opened ) & {
-			@include editor-width( $admin-sidebar-width-collapsed + $visual-editor-max-width - $block-padding ) {
-				margin-right: $float-margin;
-			}
+		> .editor-block-list__block-edit {
+			max-width: 360px;
+			width: 100%;
 		}
 
-		// sidebar (sticky)
-		.sticky-menu .edit-post-layout:not( .is-sidebar-opened ) & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width - $block-padding ) {
-				margin-right: $float-margin;
-			}
-		}
-
-		// sidebar (sticky) and post settings
-		.sticky-menu .edit-post-layout & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width - $block-padding ) {
-				margin-right: $float-margin;
-			}
-		}
-
-		// sidebar and post settings
-		.auto-fold .is-sidebar-opened & {
-			@include editor-width( $admin-sidebar-width + $visual-editor-max-width + $sidebar-width ) {
-				margin-right: $float-margin;
-			}
+		// reset when data-resized
+		&[data-resized="true"] > .editor-block-list__block-edit {
+			max-width: none;
+			width: auto;
 		}
 	}
 
+	// Left
+	&[data-align="left"] {
+		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+			float: left;
+			margin-right: 2em;
+		}
+	}
+
+	// Right
+	&[data-align="right"] {
+		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+			float: right;
+			margin-left: 2em;
+		}
+
+		.editor-block-toolbar {
+			float: right;
+		}
+	}
+
+	// Wide and full-wide
+	&[data-align="full"],
+	&[data-align="wide"] {
+		clear: both;
+
+		// Without z-index, the block toolbar will be below an adjecent float
+		z-index: z-index( '.editor-block-list__block {core/image aligned wide or fullwide}' );
+	}
+
+	// Full-wide
 	&[data-align="full"] {
 		padding-left: 0;
 		padding-right: 0;
@@ -253,10 +252,12 @@
 		}
 	}
 
+	// Clear floats
 	&[data-clear="true"] {
 		float: none;
 	}
 
+	// Dropzones
 	& > .components-drop-zone {
 		border: none;
 		top: -4px;
@@ -418,19 +419,31 @@
 	}
 }
 
-$sticky-bottom-offset: 20px;
+
+/**
+ * Block Toolbar
+ */
 
 .editor-block-contextual-toolbar {
 	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
-	margin-top: - $block-toolbar-height - $block-padding - 1px;
-	margin-bottom: $block-padding + $sticky-bottom-offset;
 	white-space: nowrap;
 	text-align: left;
 	pointer-events: none;
 	height: $block-toolbar-height;
 
-	// put toolbar snugly to edge on mobile
+	// Position the contextual toolbar above the block, add 1px to each to stack borders
+	margin-top: -$block-toolbar-height - 1px;
+	margin-bottom: $block-padding + 1px;
+
+	// Floated items have special needs for the contextual toolbar position
+	.edit-post-visual-editor .editor-block-list__block[data-align="left"] &,
+	.edit-post-visual-editor .editor-block-list__block[data-align="right"] & {
+		margin-bottom: 1px;
+		margin-top: -$block-toolbar-height - 1px;
+	}
+
+	// put toolbar snugly to side edges on mobile
 	margin-left: -$block-padding - 1px;	// stack borders
 	margin-right: -$block-padding - 1px;
 	@include break-small() {
@@ -471,12 +484,6 @@ $sticky-bottom-offset: 20px;
 		margin-left: - $block-padding - 1px;
 		margin-right: - $block-padding - 1px;
 	}
-}
-
-.editor-block-contextual-toolbar + div {
-	// prevent collapsing margins between block and toolbar, matches the 20px bottom offset		 +		display: flex;
-	margin-top: - $sticky-bottom-offset - 1px;
-	padding-top: 2px;
 }
 
 .editor-block-list__side-inserter {
