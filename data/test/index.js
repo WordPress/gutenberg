@@ -4,6 +4,11 @@
 import { mount } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { compose } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import {
@@ -87,6 +92,75 @@ describe( 'withSelect', () => {
 			data: 'reactState',
 		} );
 		expect( wrapper.text() ).toBe( 'reactState' );
+
+		wrapper.unmount();
+	} );
+
+	it( 'should rerun selection on state changes', () => {
+		registerReducer( 'counter', ( state = 0, action ) => {
+			if ( action.type === 'increment' ) {
+				return state + 1;
+			}
+
+			return state;
+		} );
+
+		registerSelectors( 'counter', {
+			getCount: ( state ) => state,
+		} );
+
+		registerActions( 'counter', {
+			increment: () => ( { type: 'increment' } ),
+		} );
+
+		const Component = compose( [
+			withSelect( ( _select ) => ( {
+				count: _select( 'counter' ).getCount(),
+			} ) ),
+			withDispatch( ( _dispatch ) => ( {
+				increment: _dispatch( 'counter' ).increment,
+			} ) ),
+		] )( ( props ) => (
+			<button onClick={ props.increment }>
+				{ props.count }
+			</button>
+		) );
+
+		const wrapper = mount( <Component /> );
+
+		const button = wrapper.find( 'button' );
+
+		button.simulate( 'click' );
+
+		expect( button.text() ).toBe( '1' );
+
+		wrapper.unmount();
+	} );
+
+	it( 'should rerun selection on props changes', () => {
+		registerReducer( 'counter', ( state = 0, action ) => {
+			if ( action.type === 'increment' ) {
+				return state + 1;
+			}
+
+			return state;
+		} );
+
+		registerSelectors( 'counter', {
+			getCount: ( state, offset ) => state + offset,
+		} );
+
+		const Component = withSelect( ( _select, ownProps ) => ( {
+			count: _select( 'counter' ).getCount( ownProps.offset ),
+		} ) )( ( props ) => <div>{ props.count }</div> );
+
+		const wrapper = mount( <Component offset={ 0 } /> );
+
+		wrapper.setProps( { offset: 10 } );
+
+		expect( wrapper.childAt( 0 ).text() ).toBe( '10' );
+
+		wrapper.unmount();
 	} );
 } );
 
@@ -129,6 +203,8 @@ describe( 'withDispatch', () => {
 		wrapper.find( 'button' ).simulate( 'click' );
 
 		expect( store.getState() ).toBe( 2 );
+
+		wrapper.unmount();
 	} );
 } );
 

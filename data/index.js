@@ -155,6 +155,12 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 			this.runSelection();
 		}
 
+		componentWillReceiveProps( nextProps ) {
+			if ( ! isEqualShallow( nextProps, this.props ) ) {
+				this.runSelection( nextProps );
+			}
+		}
+
 		componentWillUnmount() {
 			this.unsubscribe();
 		}
@@ -163,8 +169,8 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 			this.unsubscribe = subscribe( this.runSelection );
 		}
 
-		runSelection() {
-			const newState = mapStateToProps( select, this.props );
+		runSelection( props = this.props ) {
+			const newState = mapStateToProps( select, props );
 			if ( ! isEqualShallow( newState, this.state ) ) {
 				this.setState( newState );
 			}
