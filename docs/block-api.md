@@ -109,7 +109,66 @@ attributes: {
 
 #### Transforms (optional)
 
-Work in progress...
+* **Type:** `Array`
+
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression or a raw DOM node.
+
+For example, a paragraph block can be transformed into a heading block.
+
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: ( { content } ) => {
+                return createBlock( 'core/heading', {
+                    content,
+                } );
+            },
+        },
+        {
+            type: 'shortcode',
+            // Shortcode tag can also be an array of shortcode aliases
+            tag: 'caption',
+            attributes: {
+                // An attribute can be source from a tag attribute in the shortcode content
+                url: {
+                    type: 'string',
+                    source: 'attribute',
+                    attribute: 'src',
+                    selector: 'img',
+                },
+                // An attribute can be source from the shortcode attributes
+                align: {
+                    type: 'string',
+                    shortcode: ( { named: { align = 'alignnone' } } ) => {
+                        return align.replace( 'align', '' );
+                    },
+                },
+            },
+        },
+    ]
+},
+```
+
+A block can also be transformed into another block type. For example, a heading block can be transformed into a paragraph block.
+
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: ( { content } ) => {
+                return createBlock( 'core/paragraph', {
+                    content,
+                } );
+            },
+        },
+    ],
+},
+```
 
 #### useOnce (optional)
 
