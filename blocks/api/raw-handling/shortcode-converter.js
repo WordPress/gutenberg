@@ -7,7 +7,7 @@ import { castArray, find, get, dropRight, last, mapValues, pickBy } from 'lodash
  * Internal dependencies
  */
 import { createBlock } from '../factory';
-import { getBlockTypes } from '../registration';
+import { getBlockType, getBlockTypes } from '../registration';
 import { getBlockAttributes } from '../parser';
 
 /**
@@ -16,8 +16,12 @@ import { getBlockAttributes } from '../parser';
 const { shortcode } = window.wp;
 
 export default function( HTML ) {
+	// Move Shortcode block to beginning of block types array to ensure it processes first.
+	let blockTypes = getBlockTypes().filter( ( block ) => block.name !== 'core/shortcode' );
+	blockTypes = [ getBlockType( 'core/shortcode' ), ...blockTypes ];
+
 	// Get all matches. These are *not* ordered.
-	const matches = getBlockTypes().reduce( ( acc, blockType ) => {
+	const matches = blockTypes.reduce( ( acc, blockType ) => {
 		const transformsFrom = get( blockType, 'transforms.from', [] );
 		const transform = find( transformsFrom, ( { type } ) => type === 'shortcode' );
 
