@@ -548,7 +548,7 @@ export class BlockListBlock extends Component {
 		const shouldShowInsertionPoint = (
 			( ! isMultiSelected && ! isLast ) ||
 			( isMultiSelected && isLastInSelection ) ||
-			( isLast && ! rootUID )
+			( isLast && ! rootUID && ! isEmptyDefaultBlock )
 		);
 
 		// Generate the wrapper class names handling the different states of the block.

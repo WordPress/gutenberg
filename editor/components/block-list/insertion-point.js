@@ -17,7 +17,6 @@ import {
 	getBlockIndex,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
-	getBlockCount,
 	getBlock,
 	isTyping,
 } from '../../store/selectors';
@@ -58,7 +57,7 @@ class BlockInsertionPoint extends Component {
 export default connect(
 	( state, { uid, rootUID } ) => {
 		const blockIndex = uid ? getBlockIndex( state, uid, rootUID ) : -1;
-		const insertIndex = blockIndex > -1 ? blockIndex + 1 : getBlockCount( state );
+		const insertIndex = blockIndex + 1;
 		const insertionPoint = getBlockInsertionPoint( state );
 		const block = uid ? getBlock( state, uid ) : null;
 
