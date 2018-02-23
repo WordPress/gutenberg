@@ -1,46 +1,42 @@
-.editor-block-list__layout .editor-default-block-appender,
+.editor-block-list__layout {
+	// make room in the main content column for the side UI
+	// the side UI uses negative margins to position itself so as to not affect the block width
+	@include break-small() {
+		padding-left: $block-side-ui-padding;
+		padding-right: $block-side-ui-padding;
+	}
+}
+
 .editor-block-list__layout .editor-block-list__block {
 	position: relative;
-	margin-bottom: $block-spacing;
 	padding-left: $block-padding;
 	padding-right: $block-padding;
 
-	@include break-small {
+	@include break-small() {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
-		padding-left: $block-padding + $block-mover-padding-visible;
-		padding-right: $block-padding + $block-mover-padding-visible;
+		padding-left: $block-padding + $block-side-ui-padding;
+		padding-right: $block-padding + $block-side-ui-padding;
 	}
 
-	// Prevent collapsing margins
-	// This allows us control over block boundaries and how blocks fit together visually
-	// It makes things a lot simpler, however it also means block margins and paddings have to be tuned (halved) for the editor.
-	padding-top: .05px;
-	padding-bottom: .05px;
+	// Prevent collapsing margins @todo try and revisit this, it's conducive to theming to allow these to collapse
+	padding-top: .1px;
+	padding-bottom: .1px;
 
-	// Space every block using margin instead of padding
+
+	// Space every block using margins instead of padding
+	// This allows margins to collapse, which gives a better representation of how it looks on the frontend
 	.editor-block-list__block-edit {
 		margin-top: $block-padding;
 		margin-bottom: $block-padding;
 	}
 
-	// Block outline container
-	&:before {
-		z-index: z-index( '.editor-block-list__block:before' );
-		content: '';
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		outline: 1px solid transparent;
+	margin-bottom: $block-spacing;
 
-		@include break-small {
-			left: $block-mover-padding-visible;
-			right: $block-mover-padding-visible;
-		}
-	}
 
-	// Block warnings
+	/**
+	 * Warnings
+	 */
+
 	&.has-warning .editor-block-list__block-edit {
 		position: relative;
 		min-height: 250px;
@@ -64,7 +60,11 @@
 		background-image: linear-gradient( to bottom, transparent, #fff );
 	}
 
-	// simpler style for a block that has cursor focus (but hasn't been selected)
+
+	/**
+	 * Hovered Block style
+	 */
+
 	&.is-selected > .editor-block-mover:before,
 	&.is-hovered > .editor-block-mover:before,
 	&.is-selected > .editor-block-settings-menu:before,
@@ -106,17 +106,42 @@
 		border-left: none;
 	}
 
+
+	/**
+	 * Selected Block style
+	 */
+
+	.editor-block-list__block-edit {
+		position: relative;
+
+		&:before {
+			z-index: z-index( '.editor-block-list__block-edit:before' );
+			content: '';
+			position: absolute;
+			top: -$block-padding;
+			right: -$block-padding;
+			bottom: -$block-padding;
+			left: -$block-padding;
+			outline: 1px solid transparent;
+		}
+
+	}
+
 	// focused block-style
-	&.is-selected:before {
+	&.is-selected > .editor-block-list__block-edit:before {
 		outline: 1px solid $light-gray-500;
 	}
 
 	// give reusable blocks a dashed outline
-	&.is-reusable.is-selected:before {
+	&.is-reusable.is-selected > .editor-block-list__block-edit:before {
 		outline: 1px dashed $light-gray-500;
 	}
 
-	// selection style for textarea
+
+	/**
+	 * Selection Style
+	 */
+
 	::-moz-selection {
 		background: $blue-medium-highlight;
 	}
@@ -130,10 +155,12 @@
 		background: transparent;
 	}
 
-	&.is-multi-selected:before {
+	&.is-multi-selected .editor-block-list__block-edit:before {
 		background: $blue-medium-highlight;
 	}
 
+
+	// @todo, this appears to be unused
 	.iframe-overlay {
 		position: relative;
 	}
@@ -218,10 +245,24 @@
 
 	// Full-wide
 	&[data-align="full"] {
-		padding-left: 0;
-		padding-right: 0;
 
-		&:before {
+		// compensate for main container padding
+		@include break-small() {
+			margin-left: -$block-side-ui-padding;
+			margin-right: -$block-side-ui-padding;
+		}
+
+		.editor-block-list__block-edit {
+			margin-left: -$block-padding;
+			margin-right: -$block-padding;
+
+			@include break-small() {
+				margin-left: -$block-side-ui-padding - $block-padding;
+				margin-right: -$block-side-ui-padding - $block-padding;
+			}
+		}
+
+		.editor-block-list__block-edit:before {
 			left: 0;
 			right: 0;
 			border-left-width: 0;
@@ -272,11 +313,11 @@
 	}
 
 	// Dropzones
-	& > .components-drop-zone {
+	& .components-drop-zone {
 		border: none;
 		top: -4px;
 		bottom: -3px;
-		margin: 0 $block-mover-padding-visible;
+		margin: 0 $block-side-ui-padding;
 		border-radius: 0;
 
 		.components-drop-zone__content {
@@ -294,7 +335,11 @@
 		}
 	}
 
-	// Left and right side UI
+
+	/**
+	 * Left and right side UI
+	 */
+
 	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		position: absolute;
@@ -304,12 +349,12 @@
 
 	// Right side UI
 	> .editor-block-settings-menu {
-		right: $block-mover-margin;
+		right: #{ -1 * $block-mover-margin - $block-padding + 2px };
 		padding-top: 2px;
 
 		// Mobile
 		display: none;
-		@include break-small {
+		@include break-small() {
 			display: flex;
 			flex-direction: column;
 		}
@@ -317,13 +362,13 @@
 
 	// Left side UI
 	> .editor-block-mover {
-		left: $block-mover-margin + 2px;
+		left: -$block-mover-margin - $block-padding + 4px;
 		padding-top: 6px;
 		z-index: z-index( '.editor-block-mover' );
 
 		// Mobile
 		display: none;
-		@include break-small {
+		@include break-small() {
 			display: block;
 		}
 	}
@@ -333,6 +378,10 @@
 		display: flex;
 		flex-direction: row;
 		margin-top: $item-spacing;
+
+		@include break-small() {
+			display: none;
+		}
 
 		// Movers, inserter, trash & ellipsis
 		.editor-inserter {
@@ -360,6 +409,7 @@
 
 		// Movers
 		.editor-block-mover {
+			display: flex;
 			margin-right: auto;
 
 			.editor-inserter,
@@ -386,7 +436,7 @@
 
 .editor-block-list__insertion-point-indicator {
 	position: absolute;
-	top: 16px;
+	top: $block-padding - 1px; // Half the empty space between two blocks, minus the 2px height
 	height: 2px;
 	left: 0;
 	right: 0;
@@ -399,13 +449,14 @@
 	border: none;
 	display: block;
 	top: 0;
-	height: 34px; // Matches the whole empty space between two blocks
+	height: $block-padding * 2; // Matches the whole empty space between two blocks
 	width: 100%;
 	cursor: pointer;
+	padding: 0;	// Unstyle inherited padding from core button
 
 	&:before {
 		position: absolute;
-		top: 16px;
+		top: $block-padding - 1px; // Half the empty space between two blocks, minus the 2px height
 		height: 2px;
 		left: $block-padding;
 		right: $block-padding;
@@ -438,34 +489,24 @@
 	}
 }
 
+// In between blocks
 .editor-block-list__block > .editor-block-list__insertion-point {
 	position: absolute;
-	bottom: -19px;
-	height: 34px; // Matches the whole empty space between two blocks
+	bottom: -$block-padding;
+	height: $block-padding * 2; // Matches the whole empty space between two blocks
 	top: auto;
 	left: 0;
 	right: 0;
-
-	@include break-small {
-		left: $block-mover-padding-visible;
-		right: $block-mover-padding-visible;
-	}
 }
 
+// Before the first block
 .editor-block-list__layout > .editor-block-list__insertion-point {
 	position: relative;
+	top: -$block-padding;
 	margin-left: auto;
 	margin-right: auto;
-	top: -19px;
 	left: 0;
 	right: 0;
-
-	.editor-block-list__insertion-point-inserter:before {
-		@include break-small {
-			left: $block-mover-padding-visible;
-			right: $block-mover-padding-visible;
-		}
-	}
 }
 
 .editor-block-list__block .editor-block-list__block-html-textarea {
@@ -514,9 +555,10 @@
 	// put toolbar snugly to side edges on mobile
 	margin-left: -$block-padding - 1px;	// stack borders
 	margin-right: -$block-padding - 1px;
+
 	@include break-small() {
-		margin-left: auto;
-		margin-right: auto;
+		margin-left: -$block-padding - $block-side-ui-padding - 1px;	// stack borders
+		margin-right: -$block-padding - $block-side-ui-padding - 1px;
 	}
 
 	// on mobile, toolbars fix differently
@@ -556,17 +598,13 @@
 	& > * {
 		pointer-events: auto;
 	}
-
-	@include break-small() {
-		margin-left: - $block-padding - 1px;
-		margin-right: - $block-padding - 1px;
-	}
 }
 
+// @todo: verify
 .editor-block-list__side-inserter {
 	position: absolute;
-	top: 10px;
-	right: 10px;
+	top: $item-spacing;
+	right: $item-spacing;
 	display: none;
 
 	@include break-small {
@@ -588,4 +626,6 @@
 		left: 10px;
 		right: auto;
 	}
+	top: $item-spacing;
+	right: $item-spacing;
 }
