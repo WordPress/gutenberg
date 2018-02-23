@@ -1,4 +1,4 @@
- .editor-meta-boxes-panel {
+ .edit-post-meta-boxes-panel {
 	border: 0;
 
 	// don't show unless sidebar is also opened
@@ -8,14 +8,14 @@
 	}
 }
 
-.editor-meta-boxes-panel__body {
+.edit-post-meta-boxes-panel__body {
 	display: none;
 	&.is-opened {
 		display: block;
 	}
 }
 
-.editor-meta-boxes-panel__toggle {
+.edit-post-meta-boxes-panel__toggle {
 	display: block;
 	padding: 0;
 	width: 100%;

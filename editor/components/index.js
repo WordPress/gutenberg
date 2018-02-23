@@ -7,7 +7,6 @@ export { default as EditorGlobalKeyboardShortcuts } from './editor-global-keyboa
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
-export { default as MetaBoxes } from './meta-boxes';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesParent } from './page-attributes/parent';

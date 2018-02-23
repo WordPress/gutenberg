@@ -23,6 +23,8 @@ import HeaderToolbar from './header-toolbar';
 import {
 	getOpenedGeneralSidebar,
 	isPublishSidebarOpened,
+	hasMetaBoxes,
+	isSavingMetaBoxes,
 } from '../../store/selectors';
 import {
 	openGeneralSidebar,
@@ -36,6 +38,8 @@ function Header( {
 	onCloseGeneralSidebar,
 	isPublishSidebarOpen,
 	onTogglePublishSidebar,
+	hasActiveMetaboxes,
+	isSaving,
 } ) {
 	const toggleGeneralSidebar = isGeneralSidebarEditorOpen ? onCloseGeneralSidebar : onOpenGeneralSidebar;
 
@@ -49,7 +53,10 @@ function Header( {
 			<HeaderToolbar />
 			{ ! isPublishSidebarOpen && (
 				<div className="edit-post-header__settings">
-					<PostSavedState />
+					<PostSavedState
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+					/>
 					<PostPreviewButton />
 					<PostPublishPanelToggle
 						isOpen={ isPublishSidebarOpen }
@@ -73,6 +80,8 @@ export default connect(
 	( state ) => ( {
 		isGeneralSidebarEditorOpen: getOpenedGeneralSidebar( state ) === 'editor',
 		isPublishSidebarOpen: isPublishSidebarOpened( state ),
+		hasActiveMetaboxes: hasMetaBoxes( state ),
+		isSaving: isSavingMetaBoxes( state ),
 	} ),
 	{
 		onOpenGeneralSidebar: () => openGeneralSidebar( 'editor' ),
