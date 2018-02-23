@@ -33,7 +33,7 @@ const SELECTOR = [
 	'object',
 	'embed',
 	'area[href]',
-	'[contenteditable]',
+	'[contenteditable]:not([contenteditable=false])',
 ].join( ',' );
 
 /**

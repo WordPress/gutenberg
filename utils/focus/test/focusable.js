@@ -85,6 +85,27 @@ describe( 'focusable', () => {
 			expect( find( map ) ).toEqual( [] );
 		} );
 
+		it( 'finds contenteditable', () => {
+			const node = createElement( 'div' );
+			const div = createElement( 'div' );
+			node.appendChild( div );
+
+			div.setAttribute( 'contenteditable', '' );
+			expect( find( node ) ).toEqual( [ div ] );
+
+			div.setAttribute( 'contenteditable', 'true' );
+			expect( find( node ) ).toEqual( [ div ] );
+		} );
+
+		it( 'ignores contenteditable=false', () => {
+			const node = createElement( 'div' );
+			const div = createElement( 'div' );
+			node.appendChild( div );
+
+			div.setAttribute( 'contenteditable', 'false' );
+			expect( find( node ) ).toEqual( [] );
+		} );
+
 		it( 'ignores invisible inputs', () => {
 			const node = createElement( 'div' );
 			const input = createElement( 'input' );
