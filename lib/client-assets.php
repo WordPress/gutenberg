@@ -79,7 +79,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'data/build/index.js' ),
-		array( 'wp-element' ),
+		array( 'wp-element', 'wp-utils' ),
 		filemtime( gutenberg_dir_path() . 'data/build/index.js' )
 	);
 	wp_register_script(
@@ -103,7 +103,7 @@ function gutenberg_register_scripts_and_styles() {
 	global $wp_locale;
 	wp_add_inline_script( 'wp-date', 'window._wpDateSettings = ' . wp_json_encode( array(
 		'l10n'     => array(
-			'locale'        => get_locale(),
+			'locale'        => get_user_locale(),
 			'months'        => array_values( $wp_locale->month ),
 			'monthsShort'   => array_values( $wp_locale->month_abbrev ),
 			'weekdays'      => array_values( $wp_locale->weekday ),
@@ -238,7 +238,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-edit-post',
 		gutenberg_url( 'edit-post/build/index.js' ),
-		array( 'jquery', 'heartbeat', 'wp-element', 'wp-components', 'wp-editor', 'wp-i18n', 'wp-date', 'wp-utils', 'wp-data' ),
+		array( 'jquery', 'heartbeat', 'wp-element', 'wp-components', 'wp-editor', 'wp-i18n', 'wp-date', 'wp-utils', 'wp-data', 'wp-embed' ),
 		filemtime( gutenberg_dir_path() . 'edit-post/build/index.js' ),
 		true
 	);
@@ -391,15 +391,6 @@ function gutenberg_register_vendor_scripts() {
 		'promise',
 		'https://unpkg.com/promise-polyfill@7.0.0/dist/promise' . $suffix . '.js'
 	);
-
-	// TODO: This is only necessary so long as WordPress 4.9 is not yet stable,
-	// since we depend on the newly-introduced wp-api-request script handle.
-	//
-	// See: gutenberg_ensure_wp_api_request (compat.php).
-	gutenberg_register_vendor_script(
-		'wp-api-request-shim',
-		'https://rawgit.com/WordPress/wordpress-develop/master/src/wp-includes/js/api-request.js'
-	);
 }
 
 /**
@@ -528,23 +519,25 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 		fclose( $f );
 		$response = wp_remote_get( $src );
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			// The request failed; just enqueue the script directly from the
-			// URL.  This will probably fail too, but surfacing the error to
-			// the browser is probably the best we can do.
-			wp_register_script( $handle, $src, $deps, null );
-			// If our file was newly created above, it will have a size of
-			// zero, and we need to delete it so that we don't think it's
-			// already cached on the next request.
+			// The request failed. If the file is already cached we should
+			// continue to use this file. 
+			// If not, then we need to unlink the 
+			// 0 byte file that's been created, 
+			// and enqueue the script directly from the URL.
+			// The browser may also fail to load the file...
+			// leading to a very poor user experience. 
+			// That's development mode for you!
 			if ( ! filesize( $full_path ) ) {
+				wp_register_script( $handle, $src, $deps, null );
 				unlink( $full_path );
+				return;
 			}
-			return;
+		} else {
+			$f = fopen( $full_path, 'w' );
+			fwrite( $f, wp_remote_retrieve_body( $response ) );
+			fclose( $f );
 		}
-		$f = fopen( $full_path, 'w' );
-		fwrite( $f, wp_remote_retrieve_body( $response ) );
-		fclose( $f );
 	}
-
 	wp_register_script(
 		$handle,
 		gutenberg_url( 'vendor/' . $filename ),

@@ -76,18 +76,6 @@
 	}
 }
 
-.editor-block-list__block[data-type="core/image"][data-align="right"],
-.editor-block-list__block[data-type="core/image"][data-align="left"] {
-	max-width: none;
-	&[data-resized="false"] {
-		max-width: 370px;
-	}
-	&[data-resized="true"] {
-		width: auto;
-		max-width: none;
-	}
-}
-
 .editor-block-list__block[data-type="core/image"][data-align="center"] {
 	.wp-block-image {
 		margin-left: auto;

@@ -10,7 +10,13 @@ import tinymce from 'tinymce';
  * WordPress dependencies
  */
 import { Component, findDOMNode, compose } from '@wordpress/element';
-import { keycodes, focus } from '@wordpress/utils';
+import {
+	keycodes,
+	focus,
+	getScrollContainer,
+	placeCaretAtHorizontalEdge,
+	placeCaretAtVerticalEdge,
+} from '@wordpress/utils';
 import {
 	BlockEdit,
 	createBlock,
@@ -26,11 +32,6 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	getScrollContainer,
-	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge,
-} from '../../utils/dom';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';

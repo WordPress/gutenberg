@@ -9,18 +9,17 @@ import { connect } from 'react-redux';
 import { compose } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
-import { query } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
-import { getActivePanel } from '../../store/selectors';
-import { toggleSidebar, setActivePanel } from '../../store/actions';
+import { getActiveEditorPanel } from '../../store/selectors';
+import { closeGeneralSidebar, setGeneralSidebarActivePanel } from '../../store/actions';
 
-const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
+const SidebarHeader = ( { panel, onSetPanel, onCloseSidebar, count } ) => {
 	// Do not display "0 Blocks".
 	count = count === 0 ? 1 : count;
-	const closeSidebar = () => onToggleSidebar( undefined, false );
 
 	return (
 		<div className="components-panel__header edit-post-sidebar__panel-tabs">
@@ -39,7 +38,7 @@ const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
 				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }
 			</button>
 			<IconButton
-				onClick={ closeSidebar }
+				onClick={ onCloseSidebar }
 				icon="no-alt"
 				label={ __( 'Close settings' ) }
 			/>
@@ -48,16 +47,16 @@ const SidebarHeader = ( { panel, onSetPanel, onToggleSidebar, count } ) => {
 };
 
 export default compose(
-	query( ( select ) => ( {
+	withSelect( ( select ) => ( {
 		count: select( 'core/editor' ).getSelectedBlockCount(),
 	} ) ),
 	connect(
 		( state ) => ( {
-			panel: getActivePanel( state ),
+			panel: getActiveEditorPanel( state ),
 		} ),
 		{
-			onSetPanel: setActivePanel,
-			onToggleSidebar: toggleSidebar,
+			onSetPanel: setGeneralSidebarActivePanel.bind( null, 'editor' ),
+			onCloseSidebar: closeGeneralSidebar,
 		},
 		undefined,
 		{ storeKey: 'edit-post' }

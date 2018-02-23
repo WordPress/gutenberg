@@ -8,8 +8,8 @@ import { registerReducer, withRehydratation, loadAndPersist } from '@wordpress/d
  */
 import reducer from './reducer';
 import enhanceWithBrowserSize from './mobile';
-import applyMiddlewares from './middlewares';
 import { BREAK_MEDIUM } from './constants';
+import applyMiddlewares from './middlewares';
 
 /**
  * Module Constants
@@ -20,6 +20,7 @@ const MODULE_KEY = 'core/edit-post';
 const store = applyMiddlewares(
 	registerReducer( MODULE_KEY, withRehydratation( reducer, 'preferences', STORAGE_KEY ) )
 );
+
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 enhanceWithBrowserSize( store, BREAK_MEDIUM );
 

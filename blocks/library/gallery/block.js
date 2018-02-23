@@ -22,7 +22,7 @@ import {
  * Internal dependencies
  */
 import MediaUpload from '../../media-upload';
-import ImagePlaceHolder from '../../image-placeholder';
+import ImagePlaceholder from '../../image-placeholder';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -72,6 +72,7 @@ class GalleryBlock extends Component {
 		return () => {
 			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
 			const { columns } = this.props.attributes;
+			this.setState( { selectedImage: null } );
 			this.props.setAttributes( {
 				images,
 				columns: columns ? Math.min( images.length, columns ) : columns,
@@ -106,7 +107,9 @@ class GalleryBlock extends Component {
 
 	setImageAttributes( index, attributes ) {
 		const { attributes: { images }, setAttributes } = this.props;
-
+		if ( ! images[ index ] ) {
+			return;
+		}
 		setAttributes( {
 			images: [
 				...images.slice( 0, index ),
@@ -185,7 +188,7 @@ class GalleryBlock extends Component {
 		if ( images.length === 0 ) {
 			return [
 				controls,
-				<ImagePlaceHolder key="gallery-placeholder"
+				<ImagePlaceholder key="gallery-placeholder"
 					className={ className }
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }

@@ -1,0 +1,21 @@
+.edit-post-more-menu {
+	// the padding and margin of the more menu is intentionally non-standard
+	@include break-small() {
+		margin-left: 4px;
+	}
+
+	.components-icon-button {
+		padding: 8px 4px;
+		width: auto;
+	}
+
+	.components-button svg {
+		transform: rotate(90deg);
+	}
+}
+
+.edit-post-more-menu__content {
+	.components-menu-items-group:not(:last-child) {
+  		border-bottom: 1px solid $light-gray-500;
+	}
+}

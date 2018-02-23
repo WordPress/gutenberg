@@ -14,7 +14,7 @@ import { PostTaxonomies as PostTaxonomiesForm, PostTaxonomiesCheck } from '@word
  * Internal dependencies
  */
 import { isEditorSidebarPanelOpened } from '../../../store/selectors';
-import { toggleSidebarPanel } from '../../../store/actions';
+import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
 
 /**
  * Module Constants
@@ -43,7 +43,7 @@ export default connect(
 	},
 	{
 		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
+			return toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
 	},
 	undefined,

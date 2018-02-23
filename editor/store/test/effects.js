@@ -23,7 +23,6 @@ import {
 	mergeBlocks,
 	replaceBlocks,
 	savePost,
-	requestMetaBoxUpdates,
 	updateReusableBlock,
 	saveReusableBlock,
 	deleteReusableBlock,
@@ -324,32 +323,16 @@ describe( 'effects', () => {
 			replaceStateSpy.mockRestore();
 		} );
 
-		it( 'should dispatch meta box updates on success for dirty meta boxes', () => {
-			const dispatch = jest.fn();
-			const store = { getState: () => ( {
-				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
-
-			const post = getDraftPost();
-
-			handler( { post: post, previousPost: post }, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( post ) );
-		} );
-
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => ( {
-				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
+			const store = { dispatch };
 
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
 
 			handler( { post, previousPost }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p><span>Post published!</span> <a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
@@ -364,16 +347,14 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => ( {
-				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
+			const store = { dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
 
 			handler( { post, previousPost }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p>
@@ -392,16 +373,14 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when just updating a published post again', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => ( {
-				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
+			const store = { dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
 
 			handler( { post, previousPost }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p><span>Post updated!</span>{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid

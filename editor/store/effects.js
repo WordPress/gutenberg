@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, has, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
+import { get, has, includes, map, castArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import {
 	createReusableBlock,
 	isReusableBlock,
 	getDefaultBlockName,
+	getDefaultBlockForPostFormat,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -32,12 +33,9 @@ import {
 	createErrorNotice,
 	removeNotice,
 	savePost,
-	requestMetaBoxUpdates,
-	metaBoxUpdatesSuccess,
 	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
-	setMetaBoxSavedData,
 	selectBlock,
 } from './actions';
 import {
@@ -50,13 +48,11 @@ import {
 	isEditedPostNew,
 	isEditedPostSaveable,
 	getBlock,
+	getBlockCount,
 	getBlocks,
 	getReusableBlock,
-	getMetaBoxes,
-	hasMetaBoxes,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
-import { getMetaBoxContainer } from '../utils/meta-boxes';
 
 /**
  * Module Constants
@@ -144,11 +140,6 @@ export default {
 				</p>,
 				{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 			) );
-		}
-
-		// Update dirty meta boxes.
-		if ( hasMetaBoxes( store.getState() ) ) {
-			dispatch( requestMetaBoxUpdates() );
 		}
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
@@ -290,14 +281,18 @@ export default {
 		if ( post.content.raw ) {
 			blocks = parse( post.content.raw );
 		} else if ( settings.template ) {
-			blocks = map( settings.template, ( [ name, attributes ] ) => {
-				const block = createBlock( name );
-				block.attributes = {
-					...block.attributes,
-					...attributes,
-				};
-				return block;
-			} );
+			const createBlocksFromTemplate = ( template ) => {
+				return map( template, ( [ name, attributes, innerBlocksTemplate ] ) => {
+					return createBlock(
+						name,
+						attributes,
+						createBlocksFromTemplate( innerBlocksTemplate )
+					);
+				} );
+			};
+			blocks = createBlocksFromTemplate( settings.template );
+		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
+			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
 		} else {
 			blocks = [];
 		}
@@ -469,52 +464,15 @@ export default {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
 	},
-	INITIALIZE_META_BOX_STATE( action, store ) {
-		// Allow toggling metaboxes panels
-		if ( some( action.metaBoxes ) ) {
-			window.postboxes.add_postbox_toggles( 'post' );
+
+	EDIT_POST( action, { getState } ) {
+		const format = get( action, 'edits.format' );
+		if ( ! format ) {
+			return;
 		}
-		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
-			if ( isActive ) {
-				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
-			}
-			return memo;
-		}, {} );
-		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
-	},
-	REQUEST_META_BOX_UPDATES( action, store ) {
-		const state = store.getState();
-		const dataPerLocation = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
-			if ( metabox.isActive ) {
-				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
-			}
-			return memo;
-		}, {} );
-		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
-
-		// Additional data needed for backwards compatibility.
-		// If we do not provide this data the post will be overriden with the default values.
-		const post = getCurrentPost( state );
-		const additionalData = [
-			post.comment_status && `comment_status=${ post.comment_status }`,
-			post.ping_status && `ping_status=${ post.ping_status }`,
-		].filter( Boolean );
-
-		// To save the metaboxes, we serialize each one of the location forms and combine them
-		// We also add the "common" hidden fields from the base .metabox-base-form
-		const formData = values( dataPerLocation )
-			.concat( jQuery( '.metabox-base-form' ).serialize() )
-			.concat( additionalData )
-			.join( '&' );
-		const fetchOptions = {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: formData,
-			credentials: 'include',
-		};
-
-		// Save the metaboxes
-		window.fetch( window._wpMetaBoxUrl, fetchOptions )
-			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
+		const blockName = getDefaultBlockForPostFormat( format );
+		if ( blockName && getBlockCount( getState() ) === 0 ) {
+			return insertBlock( createBlock( blockName ) );
+		}
 	},
 };

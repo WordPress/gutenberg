@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-scribd\">\n    https://scribd.com/\n    <figcaption>Embedded content from scribd</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-scribd wp-block-embed\">\n    https://scribd.com/\n    <figcaption>Embedded content from scribd</figcaption>\n</figure>"
     }
 ]

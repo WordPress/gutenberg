@@ -1,4 +1,4 @@
 /**
  * Internal dependencies
  */
-import './copy-content';
+import './more-menu';

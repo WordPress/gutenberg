@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Dropdown } from '@wordpress/components';
+import { IconButton, Dropdown, MenuItemsGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -10,11 +10,10 @@ import { IconButton, Dropdown } from '@wordpress/components';
 import './style.scss';
 import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
-import EditorActions from '../editor-actions';
 
-const element = (
+const MoreMenu = () => (
 	<Dropdown
-		className="edit-post-ellipsis-menu"
+		className="edit-post-more-menu"
 		position="bottom left"
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
@@ -25,19 +24,16 @@ const element = (
 			/>
 		) }
 		renderContent={ ( { onClose } ) => (
-			<div>
+			<div className="edit-post-more-menu__content">
 				<ModeSwitcher onSelect={ onClose } />
-				<div className="edit-post-ellipsis-menu__separator" />
 				<FixedToolbarToggle onToggle={ onClose } />
-				<div className="edit-post-ellipsis-menu__separator" />
-				<EditorActions />
+				<MenuItemsGroup
+					label={ __( 'Tools' ) }
+					filterName="editPost.MoreMenu.tools"
+				/>
 			</div>
 		) }
 	/>
 );
 
-function EllipsisMenu() {
-	return element;
-}
-
-export default EllipsisMenu;
+export default MoreMenu;

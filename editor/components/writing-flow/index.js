@@ -9,19 +9,20 @@ import { find, last, reverse, get } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { keycodes, focus } from '@wordpress/utils';
-
-/**
- * Internal dependencies
- */
-import { BlockListBlock } from '../block-list/block';
 import {
+	keycodes,
+	focus,
 	computeCaretRect,
 	isHorizontalEdge,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
-} from '../../utils/dom';
+} from '@wordpress/utils';
+
+/**
+ * Internal dependencies
+ */
+import { BlockListBlock } from '../block-list/block';
 import {
 	getPreviousBlockUid,
 	getNextBlockUid,

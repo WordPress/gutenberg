@@ -15,7 +15,7 @@ Planned additions:
 
 ## API
 
-Tempates can be declared in JS or in PHP as an array of blockTypes (block name and optional attributes).
+Templates can be declared in JS or in PHP as an array of blockTypes (block name and optional attributes).
 
 ```js
 const template = [

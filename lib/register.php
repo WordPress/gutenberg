@@ -38,16 +38,7 @@ add_action(
  * @since 1.5.0
  */
 function gutenberg_collect_meta_box_data() {
-	global $_gutenberg_restore_globals_after_meta_boxes, $current_screen, $wp_meta_boxes, $post, $typenow;
-
-	// Depending on whether we are creating a post or editing one this may need to be different.
-	$potential_hookname = 'post';
-
-	// Set original screen to return to.
-	$GLOBALS['_gutenberg_restore_globals_after_meta_boxes']['current_screen'] = $current_screen;
-
-	// Override screen as though we are on post.php We have access to WP_Screen etc. by this point.
-	WP_Screen::get( $potential_hookname )->set_current_screen();
+	global $current_screen, $wp_meta_boxes, $post, $typenow;
 
 	$screen = $current_screen;
 
@@ -270,11 +261,6 @@ function gutenberg_collect_meta_box_data() {
 		'wp-edit-post',
 		'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
 	);
-
-	// Restore any global variables that we temporarily modified above.
-	foreach ( $_gutenberg_restore_globals_after_meta_boxes as $name => $value ) {
-		$GLOBALS[ $name ] = $value;
-	}
 }
 
 /**

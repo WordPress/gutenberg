@@ -11,7 +11,6 @@ import {
 	reduce,
 	compact,
 	find,
-	some,
 	unionWith,
 	includes,
 	values,
@@ -41,53 +40,6 @@ export const POST_UPDATE_TRANSACTION_ID = 'post-update';
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
-
-/**
- * Returns the state of legacy meta boxes.
- *
- * @param   {Object} state Global application state.
- * @return {Object}       State of meta boxes.
- */
-export function getMetaBoxes( state ) {
-	return state.metaBoxes;
-}
-
-/**
- * Returns the state of legacy meta boxes.
- *
- * @param {Object} state    Global application state.
- * @param {string} location Location of the meta box.
- *
- * @return {Object} State of meta box at specified location.
- */
-export function getMetaBox( state, location ) {
-	return getMetaBoxes( state )[ location ];
-}
-
-/**
- * Returns true if the post is using Meta Boxes
- *
- * @param  {Object} state Global application state
- * @return {boolean}      Whether there are metaboxes or not.
- */
-export const hasMetaBoxes = createSelector(
-	( state ) => {
-		return some( getMetaBoxes( state ), ( metaBox ) => {
-			return metaBox.isActive;
-		} );
-	},
-	( state ) => state.metaBoxes,
-);
-
-/**
- * Returns true if the the Meta Boxes are being saved.
- *
- * @param   {Object}  state Global application state.
- * @return {boolean}       Whether the metaboxes are being saved.
- */
-export function isSavingMetaBoxes( state ) {
-	return state.isSavingMetaBoxes;
-}
 
 /**
  * Returns true if any past editor history snapshots exist, or false otherwise.
@@ -287,7 +239,8 @@ export function isCurrentPostPublished( state ) {
  */
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
-	return isEditedPostDirty( state ) || hasMetaBoxes( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
+
+	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
 }
 
 /**
@@ -966,7 +919,7 @@ export function isBlockInsertionPointVisible( state ) {
  * @return {boolean} Whether post is being saved.
  */
 export function isSavingPost( state ) {
-	return state.saving.requesting || isSavingMetaBoxes( state );
+	return state.saving.requesting;
 }
 
 /**

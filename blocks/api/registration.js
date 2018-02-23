@@ -64,6 +64,19 @@ let unknownTypeHandlerName;
 let defaultBlockName;
 
 /**
+ * Constant mapping post formats to the expected default block.
+ *
+ * @type {Object}
+ */
+const POST_FORMAT_BLOCK_MAP = {
+	audio: 'core/audio',
+	gallery: 'core/gallery',
+	image: 'core/image',
+	quote: 'core/quote',
+	video: 'core/video',
+};
+
+/**
  * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
@@ -93,6 +106,15 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( blocks[ name ] ) {
+		console.error(
+			'Block "' + name + '" is already registered.'
+		);
+		return;
+	}
+
+	settings = applyFilters( 'blocks.registerBlockType', settings, name );
+
 	if ( ! settings || ! isFunction( settings.save ) ) {
 		console.error(
 			'The "save" property must be specified and must be a valid function.'
@@ -102,12 +124,6 @@ export function registerBlockType( name, settings ) {
 	if ( 'edit' in settings && ! isFunction( settings.edit ) ) {
 		console.error(
 			'The "edit" property must be a valid function.'
-		);
-		return;
-	}
-	if ( blocks[ name ] ) {
-		console.error(
-			'Block "' + name + '" is already registered.'
 		);
 		return;
 	}
@@ -144,8 +160,6 @@ export function registerBlockType( name, settings ) {
 	if ( ! settings.icon ) {
 		settings.icon = 'block-default';
 	}
-
-	settings = applyFilters( 'blocks.registerBlockType', settings, name );
 
 	return blocks[ name ] = settings;
 }
@@ -201,10 +215,24 @@ export function setDefaultBlockName( name ) {
 /**
  * Retrieves the default block name.
  *
- * @return {?string} Blog name.
+ * @return {?string} Block name.
  */
 export function getDefaultBlockName() {
 	return defaultBlockName;
+}
+
+/**
+ * Retrieves the expected default block for the post format.
+ *
+ * @param	{string} postFormat Post format
+ * @return {string}            Block name.
+ */
+export function getDefaultBlockForPostFormat( postFormat ) {
+	const blockName = POST_FORMAT_BLOCK_MAP[ postFormat ];
+	if ( blockName && getBlockType( blockName ) ) {
+		return blockName;
+	}
+	return null;
 }
 
 /**

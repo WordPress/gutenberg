@@ -5,7 +5,7 @@
             "url": "https://kickstarter.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-kickstarter\">\n    https://kickstarter.com/\n    <figcaption>Embedded content from kickstarter</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-kickstarter wp-block-embed\">\n    https://kickstarter.com/\n    <figcaption>Embedded content from kickstarter</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

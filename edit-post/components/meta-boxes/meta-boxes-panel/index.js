@@ -41,14 +41,14 @@ class MetaBoxesPanel extends Component {
 		const { children, opened } = this.props;
 		const isOpened = opened === undefined ? this.state.opened : opened;
 		const icon = `arrow-${ isOpened ? 'down' : 'right' }`;
-		const className = classnames( 'editor-meta-boxes-panel__body', { 'is-opened': isOpened } );
+		const className = classnames( 'edit-post-meta-boxes-panel__body', { 'is-opened': isOpened } );
 
 		return (
-			<Panel className="editor-meta-boxes-panel">
+			<Panel className="edit-post-meta-boxes-panel">
 				<Button
 					onClick={ this.toggle }
 					aria-expanded={ isOpened }
-					className="editor-meta-boxes-panel__toggle"
+					className="edit-post-meta-boxes-panel__toggle"
 				>
 					<PanelHeader>
 						{ __( 'Extended Settings' ) }

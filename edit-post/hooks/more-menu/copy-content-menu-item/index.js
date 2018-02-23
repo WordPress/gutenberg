@@ -3,11 +3,10 @@
  */
 import { ClipboardButton, withState } from '@wordpress/components';
 import { compose } from '@wordpress/element';
-import { query } from '@wordpress/data';
-import { addFilter } from '@wordpress/hooks';
+import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-function CopyContentButton( { editedPostContent, hasCopied, setState } ) {
+function CopyContentMenuItem( { editedPostContent, hasCopied, setState } ) {
 	return (
 		<ClipboardButton
 			text={ editedPostContent }
@@ -22,17 +21,9 @@ function CopyContentButton( { editedPostContent, hasCopied, setState } ) {
 	);
 }
 
-const Enhanced = compose(
-	query( ( select ) => ( {
+export default compose(
+	withSelect( ( select ) => ( {
 		editedPostContent: select( 'core/editor' ).getEditedPostAttribute( 'content' ),
 	} ) ),
 	withState( { hasCopied: false } )
-)( CopyContentButton );
-
-const buttonElement = <Enhanced key="copy-content-button" />;
-
-addFilter(
-	'editor.EditorActions.tools',
-	'core/copy-content/button',
-	( children ) => [ ...children, buttonElement ]
-);
+)( CopyContentMenuItem );
