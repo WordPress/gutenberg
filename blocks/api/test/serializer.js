@@ -24,7 +24,6 @@ import {
 } from '../registration';
 import { createBlock } from '../';
 import InnerBlocks from '../../inner-blocks';
-import { settings as moreSettings } from '../../library/more';
 
 describe( 'block serializer', () => {
 	beforeAll( () => {
@@ -284,43 +283,6 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'serializeBlock()', () => {
-		describe( '"more" block', () => {
-			beforeEach( () => {
-				registerBlockType( 'core/more', moreSettings );
-			} );
-
-			// FIXME: These tests aren't relevant anymore, but I kept them in
-			// the diff to better illustrate the changes.
-
-			it( 'serializes without text', () => {
-				const block = createBlock( 'core/more', {} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!-- wp:more -->\n<!--more-->\n<!-- /wp:more -->' );
-			} );
-
-			it( 'serializes with text', () => {
-				const block = createBlock( 'core/more', {
-					customText: 'Read more!',
-				} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!-- wp:more {"customText":"Read more!"} -->\n<!--more Read more!-->\n<!-- /wp:more -->' );
-			} );
-
-			it( 'serializes with no teaser', () => {
-				const block = createBlock( 'core/more', {
-					noTeaser: true,
-				} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!-- wp:more {"noTeaser":true} -->\n<!--more-->\n<!--noteaser-->\n<!-- /wp:more -->' );
-			} );
-		} );
-
 		it( 'serializes the fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unknown-block', {
 				category: 'common',
