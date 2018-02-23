@@ -56,6 +56,7 @@ const entryPointNames = [
 	'utils',
 	'data',
 	'viewport',
+	[ 'coreData', 'core-data' ],
 	[ 'editPost', 'edit-post' ],
 	'plugins',
 ];

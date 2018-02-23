@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Spinner, ToggleControl, withAPIData } from '@wordpress/components';
+import { Placeholder, Spinner, ToggleControl } from '@wordpress/components';
+import { withData } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { times, unescape } from 'lodash';
 
@@ -46,7 +47,7 @@ class CategoriesBlock extends Component {
 	}
 
 	getCategories( parentId = null ) {
-		const categories = this.props.categories.data;
+		const categories = this.props.categories;
 		if ( ! categories || ! categories.length ) {
 			return [];
 		}
@@ -204,8 +205,8 @@ class CategoriesBlock extends Component {
 	}
 }
 
-export default withAPIData( () => {
+export default withData( ( resolve ) => {
 	return {
-		categories: '/wp/v2/categories',
+		categories: resolve( 'core' ).getCategories(),
 	};
 } )( CategoriesBlock );
