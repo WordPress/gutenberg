@@ -29,13 +29,11 @@ function TemplateNotice( { isValid, ...props } ) {
 	};
 
 	return (
-		<Notice isDismissible={ false } status="warning">
-			<div className="editor-template-notice">
-				<p>{ __( 'The content of your post doesn\'t match the template assigned to your post type.' ) }</p>
-				<div>
-					<Button className="button" onClick={ props.resetTemplateValidity }>{ __( 'Keep it as is' ) }</Button>
-					<Button onClick={ confirmSynchronization } isPrimary>{ __( 'Reset the template' ) }</Button>
-				</div>
+		<Notice className="editor-template-notice" isDismissible={ false } status="warning">
+			<p>{ __( 'The content of your post doesn\'t match the template assigned to your post type.' ) }</p>
+			<div>
+				<Button className="button" onClick={ props.resetTemplateValidity }>{ __( 'Keep it as is' ) }</Button>
+				<Button onClick={ confirmSynchronization } isPrimary>{ __( 'Reset the template' ) }</Button>
 			</div>
 		</Notice>
 	);
