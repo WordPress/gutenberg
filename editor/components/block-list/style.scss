@@ -463,6 +463,12 @@
 
 		// this prevents floats from messing up the position
 		position: absolute;
+		left: 0;
+
+		.editor-block-list__block[data-align="right"] & {
+			left: auto;
+			right: 0;
+		}
 
 		// remove stacked borders in inline toolbar
 		> div:first-child {
