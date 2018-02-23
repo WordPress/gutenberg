@@ -9,7 +9,6 @@ import {
 	openPublishSidebar,
 	closePublishSidebar,
 	togglePublishSidebar,
-	setViewportType,
 	toggleFeature,
 	requestMetaBoxUpdates,
 	initializeMetaBoxState,
@@ -76,16 +75,6 @@ describe( 'actions', () => {
 			expect( toggleGeneralSidebarEditorPanel( panel ) ).toEqual( {
 				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
 				panel,
-			} );
-		} );
-	} );
-
-	describe( 'setViewportType', () => {
-		it( 'should return SET_VIEWPORT_TYPE action', () => {
-			const viewportType = 'mobile';
-			expect( setViewportType( viewportType ) ).toEqual( {
-				type: 'SET_VIEWPORT_TYPE',
-				viewportType,
 			} );
 		} );
 	} );
