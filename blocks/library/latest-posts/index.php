@@ -13,17 +13,22 @@
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
+	$args     = array(
+		'numberposts' => $attributes['postsToShow'],
+		'post_status' => 'publish',
+		'order'       => $attributes['order'],
+		'orderby'     => $attributes['orderBy'],
+		'category'    => $attributes['categories'],
+	);
+	$instance = array(
+		'title'     => '',
+		'number'    => $attributes['postsToShow'],
+		'show_date' => $attributes['displayPostDate'],
+	);
+
 	$recent_posts = wp_get_recent_posts(
-		apply_filters(
-			'widget_posts_args',
-			array(
-				'numberposts' => $attributes['postsToShow'],
-				'post_status' => 'publish',
-				'order'       => $attributes['order'],
-				'orderby'     => $attributes['orderBy'],
-				'category'    => $attributes['categories'],
-			)
-		)
+		/** This filter is documented in wp-includes/widgets/class-wp-widget-recent-posts.php of WordPress core codebase */
+		apply_filters( 'widget_posts_args', $args, $instance )
 	);
 
 	$list_items_markup = '';
