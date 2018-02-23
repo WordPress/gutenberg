@@ -21,7 +21,7 @@ class Disabled extends Component {
 		this.bindNode = this.bindNode.bind( this );
 		this.disable = this.disable.bind( this );
 
-		// Disable re-disable since disabling process itself will incur
+		// Debounce re-disable since disabling process itself will incur
 		// additional mutations which should be ignored.
 		this.debouncedDisable = debounce( this.disable, { leading: true } );
 	}
