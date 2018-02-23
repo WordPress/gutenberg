@@ -118,7 +118,6 @@ class ReusableBlockEdit extends Component {
 				{ element }
 				{ isSelected && (
 					<ReusableBlockEditPanel
-						key="panel"
 						isEditing={ isEditing }
 						title={ title !== null ? title : reusableBlock.title }
 						isSaving={ isSaving && ! reusableBlock.isTemporary }
