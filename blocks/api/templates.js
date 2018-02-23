@@ -17,10 +17,16 @@ import { createBlock } from './factory';
  * @return {boolean}        Whether the list of blocks matches a templates
  */
 export function doesBlocksMatchTemplate( blocks = [], template = [] ) {
-	return blocks.length === template.length && every( template, ( [ name,, innerBlocksTemplate ], index ) => {
-		const block = blocks[ index ];
-		return name === block.name && doesBlocksMatchTemplate( block.innerBlocks, innerBlocksTemplate );
-	} );
+	return (
+		blocks.length === template.length &&
+		every( template, ( [ name, , innerBlocksTemplate ], index ) => {
+			const block = blocks[ index ];
+			return (
+				name === block.name &&
+				doesBlocksMatchTemplate( block.innerBlocks, innerBlocksTemplate )
+			);
+		} )
+	);
 }
 
 /**
