@@ -30,10 +30,8 @@
 
 .editor-block-settings-menu__section {
 	margin-top: $item-spacing;
-	margin-left: -$item-spacing;
-	margin-right: -$item-spacing;
 	margin-bottom: -$item-spacing;
-	padding: $item-spacing;
+	padding: $item-spacing 0;
 	border-top: 1px solid $light-gray-500;
 }
 
