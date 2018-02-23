@@ -7,8 +7,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { Placeholder, Spinner } from '@wordpress/components';
+import { Component, Fragment } from '@wordpress/element';
+import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -99,30 +99,37 @@ class ReusableBlockEdit extends Component {
 
 		const reusableBlockAttributes = { ...reusableBlock.attributes, ...attributes };
 
-		return [
-			// We fake the block being read-only by wrapping it with an element that has pointer-events: none
-			<div key="edit" style={ { pointerEvents: isEditing ? 'auto' : 'none' } }>
-				<BlockEdit
-					{ ...this.props }
-					name={ reusableBlock.type }
-					isSelected={ isEditing && isSelected }
-					attributes={ reusableBlockAttributes }
-					setAttributes={ isEditing ? this.setAttributes : noop }
-				/>
-			</div>,
-			isSelected && (
-				<ReusableBlockEditPanel
-					key="panel"
-					isEditing={ isEditing }
-					title={ title !== null ? title : reusableBlock.title }
-					isSaving={ isSaving && ! reusableBlock.isTemporary }
-					onEdit={ this.startEditing }
-					onChangeTitle={ this.setTitle }
-					onSave={ this.updateReusableBlock }
-					onCancel={ this.stopEditing }
-				/>
-			),
-		];
+		let element = (
+			<BlockEdit
+				{ ...this.props }
+				name={ reusableBlock.type }
+				isSelected={ isEditing && isSelected }
+				attributes={ reusableBlockAttributes }
+				setAttributes={ isEditing ? this.setAttributes : noop }
+			/>
+		);
+
+		if ( ! isEditing ) {
+			element = <Disabled>{ element }</Disabled>;
+		}
+
+		return (
+			<Fragment>
+				{ element }
+				{ isSelected && (
+					<ReusableBlockEditPanel
+						key="panel"
+						isEditing={ isEditing }
+						title={ title !== null ? title : reusableBlock.title }
+						isSaving={ isSaving && ! reusableBlock.isTemporary }
+						onEdit={ this.startEditing }
+						onChangeTitle={ this.setTitle }
+						onSave={ this.updateReusableBlock }
+						onCancel={ this.stopEditing }
+					/>
+				) }
+			</Fragment>
+		);
 	}
 }
 
