@@ -19,7 +19,7 @@ cache:
 
 before_install:
   - nvm install && nvm use
-  - npm install npm@latest -g
+  - npm install npm@5.7.1 -g
 
 branches:
   only:
