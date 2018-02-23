@@ -3,6 +3,7 @@
  */
 import ReactDatePicker from 'react-datepicker';
 import moment from 'moment';
+import { wpmoment } from '@wordpress/date';
 
 /**
  * Module Constants
@@ -10,7 +11,7 @@ import moment from 'moment';
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
 function DatePicker( { currentDate, onChange, ...args } ) {
-	const momentDate = currentDate ? moment( currentDate ) : moment();
+	const momentDate = currentDate ? moment( currentDate ) : wpmoment;
 	const onChangeMoment = ( newDate ) => onChange( newDate.format( TIMEZONELESS_FORMAT ) );
 
 	return <ReactDatePicker

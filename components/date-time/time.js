@@ -9,6 +9,7 @@ import moment from 'moment';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { wpmoment } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -50,11 +51,11 @@ class TimePicker extends Component {
 	}
 
 	syncState( { currentTime, is12Hour } ) {
-		const selected = currentTime ? moment( currentTime ) : moment();
+		const selected = currentTime ? moment( currentTime ) : wpmoment;
 		const minutes = selected.format( 'mm' );
 		const am = selected.format( 'A' );
 		const hours = selected.format( is12Hour ? 'hh' : 'HH' );
-		const date = currentTime ? moment( currentTime ) : moment();
+		const date = currentTime ? moment( currentTime ) : wpmoment;
 		this.setState( { minutes, hours, am, date } );
 	}
 
