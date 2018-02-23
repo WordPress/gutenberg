@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { flow, noop, last, every } from 'lodash';
 
 /**
@@ -10,19 +9,14 @@ import { flow, noop, last, every } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
 import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { cloneBlock, getBlockType } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { getBlocksByUid, getBlockIndex } from '../../store/selectors';
-import { insertBlocks } from '../../store/actions';
-
-export function BlockDuplicateButton( { blockNames, onDuplicate, onClick = noop, isLocked, small = false } ) {
-	const canDuplicate = every( blockNames.map( name => {
-		const type = getBlockType( name );
+export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false } ) {
+	const canDuplicate = every( blocks, block => {
+		const type = getBlockType( block.name );
 		return ! type.useOnce;
-	} ) );
+	} );
 	if ( isLocked || ! canDuplicate ) {
 		return null;
 	}
@@ -42,23 +36,19 @@ export function BlockDuplicateButton( { blockNames, onDuplicate, onClick = noop,
 }
 
 export default compose(
-	connect(
-		( state, ownProps ) => ( {
-			blocks: getBlocksByUid( state, ownProps.uids ),
-			index: getBlockIndex( state, last( ownProps.uids ), ownProps.rootUID ),
-		} ),
-		{ insertBlocks },
-		( { blocks, index }, dispatchProps, { rootUID } ) => ( {
-			blockNames: blocks.map( block => block.name ),
-			onDuplicate() {
-				dispatchProps.insertBlocks(
-					blocks.map( block => cloneBlock( block ) ),
-					index + 1,
-					rootUID
-				);
-			},
-		} )
-	),
+	withSelect( ( select, { uids, rootUID } ) => ( {
+		blocks: select( 'core/editor' ).getBlocksByUid( uids ),
+		index: select( 'core/editor' ).getBlockIndex( last( uids ), rootUID ),
+	} ) ),
+	withDispatch( ( dispatch, { blocks, index, rootUID } ) => ( {
+		onDuplicate() {
+			dispatch( 'core/editor' ).insertBlocks(
+				blocks.map( block => cloneBlock( block ) ),
+				index + 1,
+				rootUID
+			);
+		},
+	} ) ),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
 
