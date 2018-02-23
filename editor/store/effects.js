@@ -334,7 +334,10 @@ export default {
 			edits.status = 'draft';
 		}
 
-		return setupEditorState( post, blocks, edits, isValidTemplate );
+		return [
+			setTemplateValidity( isValidTemplate ),
+			setupEditorState( post, blocks, edits ),
+		];
 	},
 	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
 		const state = getState();

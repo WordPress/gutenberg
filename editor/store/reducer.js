@@ -744,11 +744,6 @@ export function template( state = { isValid: true }, action ) {
 				template: action.settings.template,
 				lock: action.settings.templateLock,
 			};
-		case 'SETUP_EDITOR_STATE':
-			return {
-				...state,
-				isValid: action.isValidTemplate,
-			};
 		case 'SET_TEMPLATE_VALIDITY':
 			return {
 				...state,

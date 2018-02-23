@@ -2041,16 +2041,6 @@ describe( 'state', () => {
 			expect( state ).toEqual( { isValid: true, template: blockTemplate, lock: 'all' } );
 		} );
 
-		it( 'should set the validity flag', () => {
-			const original = deepFreeze( { isValid: true, template: [] } );
-			const state = template( original, {
-				type: 'SETUP_EDITOR_STATE',
-				isValidTemplate: false,
-			} );
-
-			expect( state ).toEqual( { isValid: false, template: [] } );
-		} );
-
 		it( 'should reset the validity flag', () => {
 			const original = deepFreeze( { isValid: false, template: [] } );
 			const state = template( original, {

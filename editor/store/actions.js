@@ -50,17 +50,15 @@ export function resetPost( post ) {
  * @param {Object}  post            Post object.
  * @param {Array}   blocks          Array of blocks.
  * @param {Object}  edits           Initial edited attributes object.
- * @param {boolean} isValidTemplate Whether the template is valid or not.
  *
  * @return {Object} Action object.
  */
-export function setupEditorState( post, blocks, edits, isValidTemplate ) {
+export function setupEditorState( post, blocks, edits ) {
 	return {
 		type: 'SETUP_EDITOR_STATE',
 		post,
 		blocks,
 		edits,
-		isValidTemplate,
 	};
 }
 
