@@ -63,13 +63,15 @@ export default connect(
 	( state ) => ( {
 		value: getEditedPostContent( state ),
 	} ),
-	( dispatch ) => ( {
+	{
 		onChange( content ) {
-			dispatch( editPost( { content } ) );
+			return editPost( { content } );
 		},
 		onPersist( content ) {
-			dispatch( resetBlocks( parse( content ) ) );
-			dispatch( checkTemplateValidity() );
+			return [
+				resetBlocks( parse( content ) ),
+				checkTemplateValidity(),
+			];
 		},
-	} )
+	}
 )( PostTextEditor );
