@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow, withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { PageAttributesCheck, PageAttributesOrder, PageAttributesParent, PageTemplate } from '@wordpress/editor';
-import { query } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -45,7 +45,7 @@ export function PageAttributes( { isOpened, onTogglePanel, postType } ) {
 	);
 }
 
-const applyQuery = query( ( select ) => ( {
+const applyWithSelect = withSelect( ( select ) => ( {
 	postTypeSlug: select( 'core/editor' ).getEditedPostAttribute( 'type' ),
 } ) );
 
@@ -72,7 +72,7 @@ const applyWithAPIData = withAPIData( ( props ) => {
 } );
 
 export default compose(
-	applyQuery,
+	applyWithSelect,
 	applyConnect,
 	applyWithAPIData,
 )( PageAttributes );
