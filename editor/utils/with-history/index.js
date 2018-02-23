@@ -1,18 +1,48 @@
 /**
  * External dependencies
  */
-import { includes, first, last, drop, dropRight } from 'lodash';
+import { overSome, includes, first, last, drop, dropRight } from 'lodash';
+
+/**
+ * Default options for withHistory reducer enhancer. Refer to withHistory
+ * documentation for options explanation.
+ *
+ * @see withHistory
+ *
+ * @type {Object}
+ */
+const DEFAULT_OPTIONS = {
+	resetTypes: [],
+	ignoreTypes: [],
+	shouldOverwriteState: () => false,
+};
 
 /**
  * Higher-order reducer creator which transforms the result of the original
  * reducer into an object tracking its own history (past, present, future).
  *
- * @param {?Object} options            Optional options.
- * @param {?Array}  options.resetTypes Action types upon which to clear past.
+ * @param {?Object}   options                      Optional options.
+ * @param {?Array}    options.resetTypes           Action types upon which to
+ *                                                 clear past.
+ * @param {?Array}    options.ignoreTypes          Action types upon which to
+ *                                                 avoid history tracking.
+ * @param {?Function} options.shouldOverwriteState Function receiving last and
+ *                                                 current actions, returning
+ *                                                 boolean indicating whether
+ *                                                 present should be merged,
+ *                                                 rather than add undo level.
  *
  * @return {Function} Higher-order reducer.
  */
 const withHistory = ( options = {} ) => ( reducer ) => {
+	options = { ...DEFAULT_OPTIONS, ...options };
+
+	// `ignoreTypes` is simply a convenience for `shouldOverwriteState`
+	options.shouldOverwriteState = overSome( [
+		options.shouldOverwriteState,
+		( action ) => includes( options.ignoreTypes, action.type ),
+	] );
+
 	const initialState = {
 		past: [],
 		present: reducer( undefined, {} ),
