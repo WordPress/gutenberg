@@ -1,15 +1,12 @@
 /**
  * External dependencies
  */
-import moment from 'moment-timezone';
-import 'moment-timezone/moment-timezone-utils';
 import { createProvider } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { settings as dateSettings } from '@wordpress/date';
 import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
 
 /**
@@ -20,20 +17,6 @@ import Layout from './components/layout';
 import store from './store';
 
 export * from './api';
-
-// Configure moment globally
-moment.locale( dateSettings.l10n.locale );
-
-// create WP timezone based off dateSettings
-const offsets = ( dateSettings.timezone.string ) ?  moment.tz.zone( dateSettings.timezone.string ).offsets : [ -dateSettings.timezone.offset * 60 ];
-const momentTimezone = {
-	name: 'WP',
-	abbrs: [ 'WP' ],
-	untils: [ null ],
-	offsets: [ offsets ],
-};
-const unpackedTimezone = moment.tz.pack( momentTimezone );
-moment.tz.add( unpackedTimezone );
 
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
