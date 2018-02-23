@@ -1,4 +1,22 @@
 import moment from 'moment';
+import 'moment-timezone';
+import 'moment-timezone/moment-timezone-utils';
+
+export const settings = window._wpDateSettings;
+
+// Create WP timezone based off dateSettings.
+const offsets = ( settings.timezone.string ) ? moment.tz.zone( settings.timezone.string ).offsets : [ -settings.timezone.offset * 60 ];
+const momentTimezone = {
+	name: 'WP',
+	abbrs: [ 'WP' ],
+	untils: [ null ],
+	offsets: [ offsets ],
+};
+moment.tz.add( moment.tz.pack( momentTimezone ) );
+
+// Create a new wpmoment object attaching the timezone and cloning
+// so it does not change the global moment timezone.
+export const wpmoment = moment.tz( 'WP' ).clone();
 
 // Date constants.
 /**
@@ -313,8 +331,6 @@ export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 	// Format and return.
 	return format( dateFormat, dateMoment );
 }
-
-export const settings = window._wpDateSettings;
 
 // Initialize.
 setupLocale( window._wpDateSettings );
