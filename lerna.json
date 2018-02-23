@@ -1,10 +1,5 @@
 {
 	"lerna": "2.9.0",
-	"command": {
-		"bootstrap": {
-			"npmClientArgs": ["--no-package-lock"]
-		}
-	},
 	"commands": {
 		"publish": {
 			"ignore": [
