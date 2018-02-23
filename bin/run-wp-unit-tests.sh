@@ -39,6 +39,9 @@ fi
 # Check parser syntax
 php lib/parser.php || exit 1
 
+# Check PHPCS
+phpcs
+
 # Run PHPUnit tests
 if [ ${DOCKER} = "true" ]; then
 	npm run test-php || exit 1
