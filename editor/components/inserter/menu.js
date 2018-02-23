@@ -131,7 +131,7 @@ export class InserterMenu extends Component {
 				return frecentItems;
 
 			case 'blocks':
-				predicate = ( item ) => item.category !== 'embed' && item.category !== 'reusable-blocks';
+				predicate = ( item ) => item.category !== 'embed' && item.category !== 'shared';
 				break;
 
 			case 'embeds':
@@ -139,7 +139,7 @@ export class InserterMenu extends Component {
 				break;
 
 			case 'shared':
-				predicate = ( item ) => item.category === 'reusable-blocks';
+				predicate = ( item ) => item.category === 'shared';
 				break;
 		}
 
