@@ -25,7 +25,10 @@ import BlockContentProvider from '../block-content-provider';
  * @return {string} The block's default class.
  */
 export function getBlockDefaultClassname( blockName ) {
-	// Drop common prefixes: 'core/' or 'core-' (in 'core-embed/')
+	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+
+	// @todo This should be filterable.
 	return 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 }
 
@@ -122,23 +125,23 @@ export function getCommentAttributes( allAttributes, blockType ) {
 	const attributes = reduce( blockType.attributes, ( result, attributeSchema, key ) => {
 		const value = allAttributes[ key ];
 
-		// Ignore undefined values
+		// Ignore undefined values.
 		if ( undefined === value ) {
 			return result;
 		}
 
 		// Ignore all attributes but the ones with an "undefined" source
-		// "undefined" source refers to attributes saved in the block comment
+		// "undefined" source refers to attributes saved in the block comment.
 		if ( attributeSchema.source !== undefined ) {
 			return result;
 		}
 
-		// Ignore default value
+		// Ignore default value.
 		if ( 'default' in attributeSchema && attributeSchema.default === value ) {
 			return result;
 		}
 
-		// Otherwise, include in comment set
+		// Otherwise, include in comment set.
 		result[ key ] = value;
 		return result;
 	}, {} );
@@ -177,6 +180,7 @@ export function getBeautifulContent( content ) {
  * @return {string} HTML.
  */
 export function getBlockContent( block ) {
+	// @todo why not getBlockInnerHtml?
 	const blockType = getBlockType( block.name );
 
 	// If block was parsed as invalid or encounters an error while generating
@@ -208,10 +212,12 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
 		serializeAttributes( attributes ) + ' ' :
 		'';
 
-	// strip core blocks of their namespace prefix
+	// Strip core blocks of their namespace prefix.
 	const blockName = startsWith( rawBlockName, 'core/' ) ?
 		rawBlockName.slice( 5 ) :
 		rawBlockName;
+
+	// @todo make the `wp:` prefix potentially configurable.
 
 	if ( ! content ) {
 		return `<!-- wp:${ blockName } ${ serializedAttributes }/-->`;
