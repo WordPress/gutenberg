@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, noop, last, every } from 'lodash';
+import { flow, noop, last, every, first } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,11 +42,15 @@ export default compose(
 	} ) ),
 	withDispatch( ( dispatch, { blocks, index, rootUID } ) => ( {
 		onDuplicate() {
+			const clonedBlocks = blocks.map( block => cloneBlock( block ) );
 			dispatch( 'core/editor' ).insertBlocks(
-				blocks.map( block => cloneBlock( block ) ),
+				clonedBlocks,
 				index + 1,
 				rootUID
 			);
+			if ( clonedBlocks.length > 1 ) {
+				dispatch( 'core/editor' ).multiSelect( first( clonedBlocks ).uid, last( clonedBlocks ).uid );
+			}
 		},
 	} ) ),
 	withContext( 'editor' )( ( settings ) => {
