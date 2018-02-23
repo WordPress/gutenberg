@@ -519,23 +519,25 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 		fclose( $f );
 		$response = wp_remote_get( $src );
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			// The request failed; just enqueue the script directly from the
-			// URL.  This will probably fail too, but surfacing the error to
-			// the browser is probably the best we can do.
-			wp_register_script( $handle, $src, $deps, null );
-			// If our file was newly created above, it will have a size of
-			// zero, and we need to delete it so that we don't think it's
-			// already cached on the next request.
+			// The request failed. If the file is already cached we should
+			// continue to use this file. 
+			// If not, then we need to unlink the 
+			// 0 byte file that's been created, 
+			// and enqueue the script directly from the URL.
+			// The browser may also fail to load the file...
+			// leading to a very poor user experience. 
+			// That's development mode for you!
 			if ( ! filesize( $full_path ) ) {
+				wp_register_script( $handle, $src, $deps, null );
 				unlink( $full_path );
+				return;
 			}
-			return;
+		} else {
+			$f = fopen( $full_path, 'w' );
+			fwrite( $f, wp_remote_retrieve_body( $response ) );
+			fclose( $f );
 		}
-		$f = fopen( $full_path, 'w' );
-		fwrite( $f, wp_remote_retrieve_body( $response ) );
-		fclose( $f );
 	}
-
 	wp_register_script(
 		$handle,
 		gutenberg_url( 'vendor/' . $filename ),
