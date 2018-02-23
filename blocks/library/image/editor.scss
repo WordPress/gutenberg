@@ -87,3 +87,9 @@
 		margin-right: auto;
 	}
 }
+
+.editor-block-list__block[data-type="core/image"][data-align="right"] {
+	.wp-block-image {
+		float: right;
+	}
+}
