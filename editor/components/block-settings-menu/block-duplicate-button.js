@@ -37,7 +37,7 @@ export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isL
 
 export default compose(
 	withSelect( ( select, { uids, rootUID } ) => ( {
-		blocks: select( 'core/editor' ).getBlocksByUid( uids ),
+		blocks: select( 'core/editor' ).getBlocksByUID( uids ),
 		index: select( 'core/editor' ).getBlockIndex( last( uids ), rootUID ),
 	} ) ),
 	withDispatch( ( dispatch, { blocks, index, rootUID } ) => ( {
