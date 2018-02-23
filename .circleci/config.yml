@@ -1,0 +1,38 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:9-stretch
+
+    filters:
+      branches:
+        only:
+          # Whitelist branches to build for.
+          - master
+      tags:
+        only: /^v.*/
+
+    steps:
+      # Checkout repo & subs:
+      - checkout
+      - run: git submodule sync
+      - run: git submodule update --init
+
+      # Get npm cache:
+      - restore_cache:
+          key: npm
+
+      # Build steps:
+      - run: npm install
+      - run: npm run build
+
+      # Make fast:
+      - save_cache:
+          key: npm
+          paths:
+            - ~/.npm
+            - ~/.node-gyp
+
+      # Run the deploy:
+      - deploy:
+          command: .circleci/deploy.sh
