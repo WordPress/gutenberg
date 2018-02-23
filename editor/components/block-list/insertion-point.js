@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
  */
 import { __ } from '@wordpress/i18n';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,24 +26,33 @@ import {
 	startTyping,
 } from '../../store/actions';
 
-function BlockInsertionPoint( { showInsertionPoint, showInserter, index, layout, rootUID, ...props } ) {
-	const onClick = () => {
+class BlockInsertionPoint extends Component {
+	constructor() {
+		super( ...arguments );
+		this.onClick = this.onClick.bind( this );
+	}
+	onClick() {
+		const { layout, rootUID, index, ...props } = this.props;
 		props.insertDefaultBlock( { layout }, rootUID, index );
 		props.startTyping();
-	};
+	}
 
-	return (
-		<div className="editor-block-list__insertion-point">
-			{ showInsertionPoint && <div className="editor-block-list__insertion-point-indicator" /> }
-			{ showInserter && (
-				<button
-					className="editor-block-list__insertion-point-inserter"
-					onClick={ onClick }
-					aria-label={ __( 'Insert block' ) }
-				/>
-			) }
-		</div>
-	);
+	render() {
+		const { showInsertionPoint, showInserter } = this.props;
+
+		return (
+			<div className="editor-block-list__insertion-point">
+				{ showInsertionPoint && <div className="editor-block-list__insertion-point-indicator" /> }
+				{ showInserter && (
+					<button
+						className="editor-block-list__insertion-point-inserter"
+						onClick={ this.onClick }
+						aria-label={ __( 'Insert block' ) }
+					/>
+				) }
+			</div>
+		);
+	}
 }
 
 export default connect(
