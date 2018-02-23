@@ -367,10 +367,6 @@
 		color: $dark-gray-300;
 		margin: 4px 0 0 -4px;	// align better with text blocks
 	}
-
-	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
-		@include button-style__hover;
-	}
 }
 
 .editor-block-list__insertion-point {
