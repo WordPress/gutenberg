@@ -72,6 +72,10 @@ input[type=text].editor-default-block-appender__content {
 	&:focus {
 		outline: 1px solid $light-gray-500;
 	}
+
+	&:disabled {
+		display: none;
+	}
 }
 
 .editor-default-block-appender .components-drop-zone__content-icon {
