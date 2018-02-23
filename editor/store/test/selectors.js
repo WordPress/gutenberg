@@ -1,17 +1,6 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
-import 'moment-timezone/moment-timezone-utils';
-const momentTimezone = {
-	name: 'WP',
-	abbrs: [ 'WP' ],
-	untils: [ null ],
-	offsets: [ 0 ],
-};
-const unpackedTimezone = moment.tz.pack( momentTimezone );
-moment.tz.add( unpackedTimezone );
-
 import { filter, property, union } from 'lodash';
 
 /**
@@ -19,6 +8,7 @@ import { filter, property, union } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { registerBlockType, unregisterBlockType, registerCoreBlocks, getBlockTypes } from '@wordpress/blocks';
+import { wpmoment } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -1000,7 +990,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						edits: { date: moment().add( 7, 'days' ).format( '' ) },
+						edits: { date: wpmoment.add( 7, 'days' ).format( '' ) },
 					},
 				},
 			};

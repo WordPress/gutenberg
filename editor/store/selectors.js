@@ -2,7 +2,6 @@
  * External dependencies
  */
 import moment from 'moment';
-import 'moment-timezone/moment-timezone-utils';
 import {
 	map,
 	first,
@@ -25,6 +24,7 @@ import createSelector from 'rememo';
 import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+import { wpmoment } from '@wordpress/date';
 
 /***
  * Module constants
@@ -276,7 +276,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && moment.tz( post.date, 'WP' ).isBefore( moment.tz( 'WP' ) ) );
+		( post.status === 'future' && moment( post.date ).isBefore( wpmoment ) );
 }
 
 /**
@@ -331,13 +331,9 @@ export function isEditedPostEmpty( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	// The post date is returned without timezone info. It is set with the same
-	// WP timezone, since that timezone is created using blog option gmt_offset
-	const postdate = getEditedPostAttribute( state, 'date' );
-	const date = moment.tz( postdate, 'WP' );
-
+	const date = moment( getEditedPostAttribute( state, 'date' ) );
 	// Adding 1 minute as an error threshold between the server and the client dates.
-	const now = moment.tz( 'WP' ).add( 1, 'minute' );
+	const now = wpmoment.add( 1, 'minute' );
 
 	return date.isAfter( now );
 }
