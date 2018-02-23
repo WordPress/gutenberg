@@ -44,7 +44,8 @@ class UnsavedChangesWarning extends Component {
 	 * @return {string?}       Warning message.
 	 */
 	warnIfUnsavedChanges( event ) {
-		if ( this.props.isDirty ) {
+		const { isDirty, forceIsDirty = () => false } = this.props;
+		if ( isDirty || forceIsDirty() ) {
 			event.returnValue = __( 'You have unsaved changes. If you proceed, they will be lost.' );
 			return event.returnValue;
 		}

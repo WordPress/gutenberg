@@ -240,7 +240,6 @@ export function isCurrentPostPublished( state ) {
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
 
-	// TODO: filter
 	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
 }
 
@@ -920,7 +919,6 @@ export function isBlockInsertionPointVisible( state ) {
  * @return {boolean} Whether post is being saved.
  */
 export function isSavingPost( state ) {
-	// TODO: filter
 	return state.saving.requesting;
 }
 

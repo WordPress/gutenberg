@@ -72,8 +72,8 @@ export default connect(
 		post: getCurrentPost( state ),
 		isNew: isEditedPostNew( state ),
 		isPublished: isCurrentPostPublished( state ),
-		isDirty: isEditedPostDirty( state ) || forceIsDirty,
-		isSaving: isSavingPost( state ) || forceIsSaving,
+		isDirty: forceIsDirty || isEditedPostDirty( state ),
+		isSaving: forceIsSaving || isSavingPost( state ),
 		isSaveable: isEditedPostSaveable( state ),
 	} ),
 	{
