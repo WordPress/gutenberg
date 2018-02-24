@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, compact, startsWith } from 'lodash';
+import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import isEqualShallow from 'is-equal-shallow';
 
@@ -239,19 +239,6 @@ export function serializeBlock( block ) {
 	const saveAttributes = getCommentAttributes( block.attributes, blockType );
 
 	switch ( blockName ) {
-		case 'core/more':
-			const { customText, noTeaser } = saveAttributes;
-
-			const moreTag = customText ?
-				`<!--more ${ customText }-->` :
-				'<!--more-->';
-
-			const noTeaserTag = noTeaser ?
-				'<!--noteaser-->' :
-				'';
-
-			return compact( [ moreTag, noTeaserTag ] ).join( '\n' );
-
 		case getUnknownTypeHandlerName():
 			return saveContent;
 

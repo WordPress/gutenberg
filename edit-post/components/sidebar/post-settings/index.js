@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { Panel } from '@wordpress/components';
-import { MetaBoxes } from '@wordpress/editor';
 
 /**
  * Internal Dependencies
@@ -16,6 +15,7 @@ import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
 import DocumentOutlinePanel from '../document-outline-panel';
+import MetaBoxes from '../../meta-boxes';
 
 const panel = (
 	<Panel>

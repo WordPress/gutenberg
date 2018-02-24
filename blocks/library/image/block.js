@@ -29,7 +29,7 @@ import {
  * Internal dependencies
  */
 import RichText from '../../rich-text';
-import ImagePlaceHolder from '../../image-placeholder';
+import ImagePlaceholder from '../../image-placeholder';
 import MediaUpload from '../../media-upload';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
@@ -177,7 +177,7 @@ class ImageBlock extends Component {
 		if ( ! url ) {
 			return [
 				controls,
-				<ImagePlaceHolder
+				<ImagePlaceholder
 					className={ className }
 					key="image-placeholder"
 					icon="format-image"

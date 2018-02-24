@@ -18,14 +18,11 @@ import {
  * Internal dependencies
  */
 import {
-	resetPost,
-	setupNewPost,
+	setupEditorState,
 	resetBlocks,
 	mergeBlocks,
 	replaceBlocks,
-	editPost,
 	savePost,
-	requestMetaBoxUpdates,
 	updateReusableBlock,
 	saveReusableBlock,
 	deleteReusableBlock,
@@ -265,8 +262,7 @@ describe( 'effects', () => {
 
 			handler( {}, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
@@ -278,19 +274,6 @@ describe( 'effects', () => {
 
 			// TODO: Publish autosave
 			expect( dispatch ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should set auto-draft to draft before save', () => {
-			selectors.isEditedPostSaveable.mockReturnValue( true );
-			selectors.isEditedPostDirty.mockReturnValue( true );
-			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
-
-			handler( {}, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
-			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
 		it( 'should return update action for saveable, dirty draft', () => {
@@ -340,32 +323,16 @@ describe( 'effects', () => {
 			replaceStateSpy.mockRestore();
 		} );
 
-		it( 'should dispatch meta box updates on success for dirty meta boxes', () => {
-			const dispatch = jest.fn();
-			const store = { getState: () => ( {
-				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
-
-			const post = getDraftPost();
-
-			handler( { post: post, previousPost: post }, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( post ) );
-		} );
-
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => ( {
-				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
+			const store = { dispatch };
 
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
 
 			handler( { post, previousPost }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p><span>Post published!</span> <a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
@@ -380,16 +347,14 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => ( {
-				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
+			const store = { dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
 
 			handler( { post, previousPost }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p>
@@ -408,16 +373,14 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when just updating a published post again', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => ( {
-				metaBoxes: { side: { isActive: true } },
-			} ), dispatch };
+			const store = { dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
 
 			handler( { post, previousPost }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p><span>Post updated!</span>{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
@@ -454,9 +417,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( [
-				resetPost( post ),
-			] );
+			expect( result ).toEqual( setupEditorState( post, [], {} ) );
 		} );
 
 		it( 'should return block reset with non-empty content', () => {
@@ -474,11 +435,8 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toHaveLength( 2 );
-			expect( result ).toContainEqual( resetPost( post ) );
-			expect( result.some( ( { blocks } ) => {
-				return blocks && blocks[ 0 ].name === 'core/test-block';
-			} ) ).toBe( true );
+			expect( result.blocks ).toHaveLength( 1 );
+			expect( result ).toEqual( setupEditorState( post, result.blocks, {} ) );
 		} );
 
 		it( 'should return post setup action only if auto-draft', () => {
@@ -495,10 +453,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( [
-				resetPost( post ),
-				setupNewPost( { title: 'A History of Pork' } ),
-			] );
+			expect( result ).toEqual( setupEditorState( post, [], { title: 'A History of Pork', status: 'draft' } ) );
 		} );
 	} );
 

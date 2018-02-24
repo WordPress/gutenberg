@@ -37,16 +37,19 @@ export function resetPost( post ) {
 }
 
 /**
- * Returns an action object used in signalling that editor has initialized as a
- * new post with specified edits which should be considered non-dirtying.
+ * Returns an action object used to setup the editor state when first opening an editor.
  *
- * @param {Object} edits Edited attributes object.
+ * @param {Object} post   Post object.
+ * @param {Array}  blocks Array of blocks.
+ * @param {Object} edits  Initial edited attributes object.
  *
  * @return {Object} Action object.
  */
-export function setupNewPost( edits ) {
+export function setupEditorState( post, blocks, edits ) {
 	return {
-		type: 'SETUP_NEW_POST',
+		type: 'SETUP_EDITOR_STATE',
+		post,
+		blocks,
 		edits,
 	};
 }
@@ -303,6 +306,16 @@ export function undo() {
 }
 
 /**
+ * Returns an action object used in signalling that undo history record should
+ * be created.
+ *
+ * @return {Object} Action object.
+ */
+export function createUndoLevel() {
+	return { type: 'CREATE_UNDO_LEVEL' };
+}
+
+/**
  * Returns an action object used in signalling that the blocks
  * corresponding to the specified UID set are to be removed.
  *
@@ -405,64 +418,6 @@ export function removeNotice( id ) {
 	return {
 		type: 'REMOVE_NOTICE',
 		noticeId: id,
-	};
-}
-
-/**
- * Returns an action object used to check the state of meta boxes at a location.
- *
- * This should only be fired once to initialize meta box state. If a meta box
- * area is empty, this will set the store state to indicate that React should
- * not render the meta box area.
- *
- * Example: metaBoxes = { side: true, normal: false }.
- *
- * This indicates that the sidebar has a meta box but the normal area does not.
- *
- * @param {Object} metaBoxes Whether meta box locations are active.
- *
- * @return {Object} Action object.
- */
-export function initializeMetaBoxState( metaBoxes ) {
-	return {
-		type: 'INITIALIZE_META_BOX_STATE',
-		metaBoxes,
-	};
-}
-
-/**
- * Returns an action object used to request meta box update.
- *
- * @return {Object}      Action object.
- */
-export function requestMetaBoxUpdates() {
-	return {
-		type: 'REQUEST_META_BOX_UPDATES',
-	};
-}
-
-/**
- * Returns an action object used signal a successfull meta nox update.
- *
- * @return {Object} Action object.
- */
-export function metaBoxUpdatesSuccess() {
-	return {
-		type: 'META_BOX_UPDATES_SUCCESS',
-	};
-}
-
-/**
- * Returns an action object used set the saved meta boxes data.
- * This is used to check if the meta boxes have been touched when leaving the editor.
- *
- * @param   {Object} dataPerLocation Meta Boxes Data per location.
- * @return {Object}                 Action object.
- */
-export function setMetaBoxSavedData( dataPerLocation ) {
-	return {
-		type: 'META_BOX_SET_SAVED_DATA',
-		dataPerLocation,
 	};
 }
 

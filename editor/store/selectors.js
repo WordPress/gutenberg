@@ -11,7 +11,6 @@ import {
 	reduce,
 	compact,
 	find,
-	some,
 	unionWith,
 	includes,
 	values,
@@ -41,53 +40,6 @@ export const POST_UPDATE_TRANSACTION_ID = 'post-update';
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
-
-/**
- * Returns the state of legacy meta boxes.
- *
- * @param   {Object} state Global application state.
- * @return {Object}       State of meta boxes.
- */
-export function getMetaBoxes( state ) {
-	return state.metaBoxes;
-}
-
-/**
- * Returns the state of legacy meta boxes.
- *
- * @param {Object} state    Global application state.
- * @param {string} location Location of the meta box.
- *
- * @return {Object} State of meta box at specified location.
- */
-export function getMetaBox( state, location ) {
-	return getMetaBoxes( state )[ location ];
-}
-
-/**
- * Returns true if the post is using Meta Boxes
- *
- * @param  {Object} state Global application state
- * @return {boolean}      Whether there are metaboxes or not.
- */
-export const hasMetaBoxes = createSelector(
-	( state ) => {
-		return some( getMetaBoxes( state ), ( metaBox ) => {
-			return metaBox.isActive;
-		} );
-	},
-	( state ) => state.metaBoxes,
-);
-
-/**
- * Returns true if the the Meta Boxes are being saved.
- *
- * @param   {Object}  state Global application state.
- * @return {boolean}       Whether the metaboxes are being saved.
- */
-export function isSavingMetaBoxes( state ) {
-	return state.isSavingMetaBoxes;
-}
 
 /**
  * Returns true if any past editor history snapshots exist, or false otherwise.
@@ -287,7 +239,8 @@ export function isCurrentPostPublished( state ) {
  */
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
-	return isEditedPostDirty( state ) || hasMetaBoxes( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
+
+	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
 }
 
 /**
@@ -450,10 +403,10 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, uid ) => [
-		get( state, [ 'editor', 'present', 'blocksByUid', uid ] ),
+		state.editor.present.blocksByUid[ uid ],
 		getBlockDependantsCacheBust( state, uid ),
-		get( state, [ 'editor', 'present', 'edits', 'meta' ] ),
-		get( state, 'currentPost.meta' ),
+		state.editor.present.edits.meta,
+		state.currentPost.meta,
 	]
 );
 
@@ -879,19 +832,6 @@ export function isBlockWithinSelection( state, uid ) {
 }
 
 /**
- * Returns true if the cursor is hovering the block corresponding to the
- * specified unique ID, or false otherwise.
- *
- * @param {Object} state Global application state.
- * @param {string} uid   Block unique ID.
- *
- * @return {boolean} Whether block is hovered.
- */
-export function isBlockHovered( state, uid ) {
-	return state.hoveredBlock === uid;
-}
-
-/**
  * Whether in the process of multi-selecting or not.
  *
  * @param {Object} state Global application state.
@@ -940,23 +880,24 @@ export function isTyping( state ) {
  * Returns the insertion point, the index at which the new inserted block would
  * be placed. Defaults to the last index.
  *
- * @param {Object}  state   Global application state.
- * @param {?string} rootUID Optional root UID of block list.
+ * @param {Object} state Global application state.
  *
- * @return {?string} Unique ID after which insertion will occur.
+ * @return {Object} Insertion point object with `rootUID`, `layout`, `index`
  */
-export function getBlockInsertionPoint( state, rootUID ) {
-	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
-	if ( lastMultiSelectedBlock ) {
-		return getBlockIndex( state, lastMultiSelectedBlock, rootUID ) + 1;
+export function getBlockInsertionPoint( state ) {
+	let rootUID, layout, index;
+
+	const { end } = state.blockSelection;
+	if ( end ) {
+		rootUID = getBlockRootUID( state, end ) || undefined;
+
+		layout = get( getBlock( state, end ), [ 'attributes', 'layout' ] );
+		index = getBlockIndex( state, end, rootUID ) + 1;
+	} else {
+		index = getBlockOrder( state ).length;
 	}
 
-	const selectedBlock = getSelectedBlock( state );
-	if ( selectedBlock ) {
-		return getBlockIndex( state, selectedBlock.uid, rootUID ) + 1;
-	}
-
-	return getBlockOrder( state, rootUID ).length;
+	return { rootUID, layout, index };
 }
 
 /**
@@ -978,7 +919,7 @@ export function isBlockInsertionPointVisible( state ) {
  * @return {boolean} Whether post is being saved.
  */
 export function isSavingPost( state ) {
-	return state.saving.requesting || isSavingMetaBoxes( state );
+	return state.saving.requesting;
 }
 
 /**

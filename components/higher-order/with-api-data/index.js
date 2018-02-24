@@ -22,7 +22,7 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 			this.state = {
 				dataProps: {},
 			};
-
+			// console.log(" in constructore " + JSON.stringify(context.getAPIPostTypeRestBaseMapping()));
 			this.schema = context.getAPISchema();
 			this.routeHelpers = mapValues( {
 				type: context.getAPIPostTypeRestBaseMapping(),
@@ -36,6 +36,7 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 		}
 
 		componentDidMount() {
+			// console.log("starting componentDidMount")
 			this.initializeFetchable( {} );
 		}
 
@@ -135,6 +136,7 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 		}
 
 		request( propName, method, path ) {
+			// console.log("starting request")
 			this.setIntoDataProp( propName, {
 				[ this.getPendingKey( method ) ]: true,
 			} );
@@ -156,13 +158,21 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 						[ this.getPendingKey( method ) ]: false,
 						...nextDataProp,
 					} );
+					// console.log("response is ")
+					// console.log(nextDataProp)
 				} );
 		}
 
 		applyMapping( props ) {
 			const { dataProps } = this.state;
-
+			// console.log(mapPropsToData)
+			// console.log(props)
+			// console.log(this.routeHelpers)
 			const mapping = mapPropsToData( props, this.routeHelpers );
+			// console.log("mapping is ")
+			// console.log(mapping)
+			// console.log("schema is " )
+			// console.log(this.schema)
 			const nextDataProps = reduce( mapping, ( result, path, propName ) => {
 				// Skip if mapping already assigned into state data props
 				// Exmaple: Component updates with one new prop and other
@@ -208,11 +218,13 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 
 				return result;
 			}, {} );
-
+			// console.log("nextDataProps is ")
+			// console.log(nextDataProps)
 			this.setState( () => ( { dataProps: nextDataProps } ) );
 		}
 
 		render() {
+			// console.log(" post constructore " + JSON.stringify(this.routeHelpers));
 			return (
 				<WrappedComponent
 					{ ...this.props }

@@ -1,9 +1,10 @@
 export const PREFERENCES_DEFAULTS = {
-	mode: 'visual',
-	sidebars: {
-		desktop: true,
-		mobile: false,
-		publish: false,
+	editorMode: 'visual',
+	viewportType: 'desktop', // 'desktop' | 'mobile'
+	activeGeneralSidebar: 'editor', // null | 'editor' | 'plugin'
+	activeSidebarPanel: { // The keys in this object should match activeSidebarPanel values
+		editor: null, // 'document' | 'block'
+		plugin: null, // pluginId
 	},
 	panels: { 'post-status': true },
 	features: {

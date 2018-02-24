@@ -29,6 +29,8 @@ class RichTextProvider extends Component {
 
 RichTextProvider.childContextTypes = {
 	onUndo: noop,
+	onRedo: noop,
+	onCreateUndoLevel: noop,
 };
 
 export default RichTextProvider;

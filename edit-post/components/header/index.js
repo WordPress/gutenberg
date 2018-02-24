@@ -18,17 +18,31 @@ import {
  * Internal dependencies
  */
 import './style.scss';
-import EllipsisMenu from './ellipsis-menu';
+import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
-import { isSidebarOpened } from '../../store/selectors';
-import { toggleSidebar } from '../../store/actions';
+import {
+	getOpenedGeneralSidebar,
+	isPublishSidebarOpened,
+	hasMetaBoxes,
+	isSavingMetaBoxes,
+} from '../../store/selectors';
+import {
+	openGeneralSidebar,
+	closeGeneralSidebar,
+	togglePublishSidebar,
+} from '../../store/actions';
 
 function Header( {
-	onToggleDefaultSidebar,
+	isGeneralSidebarEditorOpen,
+	onOpenGeneralSidebar,
+	onCloseGeneralSidebar,
+	isPublishSidebarOpen,
 	onTogglePublishSidebar,
-	isDefaultSidebarOpened,
-	isPublishSidebarOpened,
+	hasActiveMetaboxes,
+	isSaving,
 } ) {
+	const toggleGeneralSidebar = isGeneralSidebarEditorOpen ? onCloseGeneralSidebar : onOpenGeneralSidebar;
+
 	return (
 		<div
 			role="region"
@@ -37,22 +51,25 @@ function Header( {
 			tabIndex="-1"
 		>
 			<HeaderToolbar />
-			{ ! isPublishSidebarOpened && (
+			{ ! isPublishSidebarOpen && (
 				<div className="edit-post-header__settings">
-					<PostSavedState />
+					<PostSavedState
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+					/>
 					<PostPreviewButton />
 					<PostPublishPanelToggle
-						isOpen={ isPublishSidebarOpened }
+						isOpen={ isPublishSidebarOpen }
 						onToggle={ onTogglePublishSidebar }
 					/>
 					<IconButton
 						icon="admin-generic"
-						onClick={ onToggleDefaultSidebar }
-						isToggled={ isDefaultSidebarOpened }
+						onClick={ toggleGeneralSidebar }
+						isToggled={ isGeneralSidebarEditorOpen }
 						label={ __( 'Settings' ) }
-						aria-expanded={ isDefaultSidebarOpened }
+						aria-expanded={ isGeneralSidebarEditorOpen }
 					/>
-					<EllipsisMenu key="ellipsis-menu" />
+					<MoreMenu key="more-menu" />
 				</div>
 			) }
 		</div>
@@ -61,12 +78,15 @@ function Header( {
 
 export default connect(
 	( state ) => ( {
-		isDefaultSidebarOpened: isSidebarOpened( state ),
-		isPublishSidebarOpened: isSidebarOpened( state, 'publish' ),
+		isGeneralSidebarEditorOpen: getOpenedGeneralSidebar( state ) === 'editor',
+		isPublishSidebarOpen: isPublishSidebarOpened( state ),
+		hasActiveMetaboxes: hasMetaBoxes( state ),
+		isSaving: isSavingMetaBoxes( state ),
 	} ),
 	{
-		onToggleDefaultSidebar: () => toggleSidebar(),
-		onTogglePublishSidebar: () => toggleSidebar( 'publish' ),
+		onOpenGeneralSidebar: () => openGeneralSidebar( 'editor' ),
+		onCloseGeneralSidebar: closeGeneralSidebar,
+		onTogglePublishSidebar: togglePublishSidebar,
 	},
 	undefined,
 	{ storeKey: 'edit-post' }

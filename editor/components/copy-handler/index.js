@@ -8,11 +8,11 @@ import { connect } from 'react-redux';
  */
 import { Component } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
+import { documentHasSelection } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
-import { documentHasSelection } from '../../utils/dom';
 import { removeBlocks } from '../../store/actions';
 import {
 	getMultiSelectedBlocks,

@@ -12,6 +12,7 @@ import { mediaUpload } from '@wordpress/utils';
 import {
 	IconButton,
 	DropZone,
+	FormFileUpload,
 	RangeControl,
 	SelectControl,
 	ToggleControl,
@@ -22,7 +23,7 @@ import {
  * Internal dependencies
  */
 import MediaUpload from '../../media-upload';
-import ImagePlaceHolder from '../../image-placeholder';
+import ImagePlaceholder from '../../image-placeholder';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -51,7 +52,8 @@ class GalleryBlock extends Component {
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
-		this.dropFiles = this.dropFiles.bind( this );
+		this.addFiles = this.addFiles.bind( this );
+		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -72,6 +74,7 @@ class GalleryBlock extends Component {
 		return () => {
 			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
 			const { columns } = this.props.attributes;
+			this.setState( { selectedImage: null } );
 			this.props.setAttributes( {
 				images,
 				columns: columns ? Math.min( images.length, columns ) : columns,
@@ -106,7 +109,9 @@ class GalleryBlock extends Component {
 
 	setImageAttributes( index, attributes ) {
 		const { attributes: { images }, setAttributes } = this.props;
-
+		if ( ! images[ index ] ) {
+			return;
+		}
 		setAttributes( {
 			images: [
 				...images.slice( 0, index ),
@@ -119,7 +124,11 @@ class GalleryBlock extends Component {
 		} );
 	}
 
-	dropFiles( files ) {
+	uploadFromFiles( event ) {
+		this.addFiles( event.target.files );
+	}
+
+	addFiles( files ) {
 		const currentImages = this.props.attributes.images || [];
 		const { setAttributes } = this.props;
 		mediaUpload(
@@ -148,7 +157,7 @@ class GalleryBlock extends Component {
 
 		const dropZone = (
 			<DropZone
-				onFilesDrop={ this.dropFiles }
+				onFilesDrop={ this.addFiles }
 			/>
 		);
 
@@ -185,7 +194,7 @@ class GalleryBlock extends Component {
 		if ( images.length === 0 ) {
 			return [
 				controls,
-				<ImagePlaceHolder key="gallery-placeholder"
+				<ImagePlaceholder key="gallery-placeholder"
 					className={ className }
 					icon="format-gallery"
 					label={ __( 'Gallery' ) }
@@ -236,6 +245,18 @@ class GalleryBlock extends Component {
 						/>
 					</li>
 				) ) }
+				{ isSelected &&
+					<li className="blocks-gallery-item">
+						<FormFileUpload
+							multiple
+							isLarge
+							className="blocks-gallery-add-item-button"
+							onChange={ this.uploadFromFiles }
+							accept="image/*"
+							icon="insert"
+						/>
+					</li>
+				}
 			</ul>,
 		];
 	}

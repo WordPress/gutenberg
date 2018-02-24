@@ -168,7 +168,6 @@ class ParagraphBlock extends Component {
 						<RichText
 							tagName="p"
 							className={ classnames( 'wp-block-paragraph', className, {
-								[ `align${ width }` ]: width,
 								'has-background': backgroundColor,
 							} ) }
 							style={ {

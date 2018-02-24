@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItemsGroup } from '@wordpress/components';
+import { MenuItemsChoice, MenuItemsGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -43,10 +43,14 @@ function ModeSwitcher( { onSwitch, mode } ) {
 	return (
 		<MenuItemsGroup
 			label={ __( 'Editor' ) }
-			choices={ choices }
-			value={ mode }
-			onSelect={ onSwitch }
-		/>
+			filterName="editPost.MoreMenu.editor"
+		>
+			<MenuItemsChoice
+				choices={ choices }
+				value={ mode }
+				onSelect={ onSwitch }
+			/>
+		</MenuItemsGroup>
 	);
 }
 

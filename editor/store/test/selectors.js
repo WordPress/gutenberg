@@ -55,7 +55,6 @@ const {
 	isBlockWithinSelection,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
-	isBlockHovered,
 	getBlockMode,
 	isTyping,
 	getBlockInsertionPoint,
@@ -65,10 +64,6 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
-	getMetaBoxes,
-	hasMetaBoxes,
-	isSavingMetaBoxes,
-	getMetaBox,
 	getReusableBlock,
 	isSavingReusableBlock,
 	isSelectionEnabled,
@@ -103,99 +98,6 @@ describe( 'selectors', () => {
 
 	afterAll( () => {
 		unregisterBlockType( 'core/test-block' );
-	} );
-
-	describe( 'hasMetaBoxes', () => {
-		it( 'should return true if there are active meta boxes', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-					},
-					side: {
-						isActive: true,
-					},
-				},
-			};
-
-			expect( hasMetaBoxes( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if there are no active meta boxes', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-					},
-					side: {
-						isActive: false,
-					},
-				},
-			};
-
-			expect( hasMetaBoxes( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isSavingMetaBoxes', () => {
-		it( 'should return true if some meta boxes are saving', () => {
-			const state = {
-				isSavingMetaBoxes: true,
-			};
-
-			expect( isSavingMetaBoxes( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if no meta boxes are saving', () => {
-			const state = {
-				isSavingMetaBoxes: false,
-			};
-
-			expect( isSavingMetaBoxes( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'getMetaBoxes', () => {
-		it( 'should return the state of all meta boxes', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: true,
-					},
-					side: {
-						isActive: true,
-					},
-				},
-			};
-
-			expect( getMetaBoxes( state ) ).toEqual( {
-				normal: {
-					isActive: true,
-				},
-				side: {
-					isActive: true,
-				},
-			} );
-		} );
-	} );
-
-	describe( 'getMetaBox', () => {
-		it( 'should return the state of selected meta box', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-					},
-					side: {
-						isActive: true,
-					},
-				},
-			};
-
-			expect( getMetaBox( state, 'side' ) ).toEqual( {
-				isActive: true,
-			} );
-		} );
 	} );
 
 	describe( 'hasEditorUndo', () => {
@@ -254,7 +156,9 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						edits: {},
+						edits: {
+							status: 'draft',
+						},
 					},
 				},
 			};
@@ -269,7 +173,9 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						edits: {},
+						edits: {
+							status: 'draft',
+						},
 					},
 				},
 			};
@@ -301,8 +207,6 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isCleanNewPost', () => {
-		const metaBoxes = {};
-
 		it( 'should return true when the post is not dirty and has not been saved before', () => {
 			const state = {
 				editor: {
@@ -312,7 +216,6 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'auto-draft',
 				},
-				metaBoxes,
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( true );
@@ -327,7 +230,6 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'draft',
 				},
-				metaBoxes,
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
@@ -342,7 +244,6 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'auto-draft',
 				},
-				metaBoxes,
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
@@ -503,7 +404,6 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getDocumentTitle', () => {
-		const metaBoxes = {};
 		it( 'should return current title unedited existing post', () => {
 			const state = {
 				currentPost: {
@@ -518,7 +418,6 @@ describe( 'selectors', () => {
 					},
 					isDirty: false,
 				},
-				metaBoxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
@@ -537,7 +436,6 @@ describe( 'selectors', () => {
 						},
 					},
 				},
-				metaBoxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( 'Modified Title' );
@@ -558,7 +456,6 @@ describe( 'selectors', () => {
 					},
 					isDirty: false,
 				},
-				metaBoxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
@@ -579,7 +476,6 @@ describe( 'selectors', () => {
 					},
 					isDirty: true,
 				},
-				metaBoxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
@@ -729,8 +625,6 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostPublishable', () => {
-		const metaBoxes = {};
-
 		it( 'should return true for pending posts', () => {
 			const state = {
 				editor: {
@@ -739,7 +633,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'pending',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -753,7 +646,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'draft',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -767,7 +659,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'publish',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -781,7 +672,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'publish',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -795,7 +685,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'private',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -809,7 +698,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'future',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -823,7 +711,6 @@ describe( 'selectors', () => {
 				editor: {
 					isDirty: true,
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -1448,6 +1335,11 @@ describe( 'selectors', () => {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
 							123: { uid: 123, name: 'core/paragraph', attributes: {} },
 						},
+						blockOrder: {
+							'': [ 23, 123 ],
+							23: [],
+							123: [],
+						},
 						edits: {},
 					},
 				},
@@ -1459,22 +1351,7 @@ describe( 'selectors', () => {
 
 		it( 'should return null if there is multi selection', () => {
 			const state = {
-				editor: {
-					present: {
-						blocksByUid: {
-							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-						},
-					},
-				},
-				blockSelection: { start: 23, end: 123 },
-			};
-
-			expect( getSelectedBlock( state ) ).toBe( null );
-		} );
-
-		it( 'should return the selected block', () => {
-			const state = {
+				currentPost: {},
 				editor: {
 					present: {
 						blocksByUid: {
@@ -1486,6 +1363,30 @@ describe( 'selectors', () => {
 							23: [],
 							123: [],
 						},
+						edits: {},
+					},
+				},
+				blockSelection: { start: 23, end: 123 },
+			};
+
+			expect( getSelectedBlock( state ) ).toBe( null );
+		} );
+
+		it( 'should return the selected block', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							23: { uid: 23, name: 'core/heading', attributes: {} },
+							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						},
+						blockOrder: {
+							'': [ 23, 123 ],
+							23: [],
+							123: [],
+						},
+						edits: {},
 					},
 				},
 				blockSelection: { start: 23, end: 23 },
@@ -1945,24 +1846,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isBlockHovered', () => {
-		it( 'should return true if the block is hovered', () => {
-			const state = {
-				hoveredBlock: 123,
-			};
-
-			expect( isBlockHovered( state, 123 ) ).toBe( true );
-		} );
-
-		it( 'should return false if the block is not hovered', () => {
-			const state = {
-				hoveredBlock: 123,
-			};
-
-			expect( isBlockHovered( state, 23 ) ).toBe( false );
-		} );
-	} );
-
 	describe( 'geteBlockMode', () => {
 		it( 'should return "visual" if unset', () => {
 			const state = {
@@ -2024,21 +1907,22 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockInsertionPoint', () => {
-		it( 'should return the uid of the selected block', () => {
+		it( 'should return an object for the selected block', () => {
 			const state = {
 				currentPost: {},
 				preferences: { mode: 'visual' },
 				blockSelection: {
-					start: 2,
-					end: 2,
+					start: 'uid1',
+					end: 'uid1',
 				},
 				editor: {
 					present: {
 						blocksByUid: {
-							2: { uid: 2 },
+							uid1: { uid: 'uid1' },
 						},
 						blockOrder: {
-							'': [ 1, 2, 3 ],
+							'': [ 'uid1' ],
+							uid1: [],
 						},
 						edits: {},
 					},
@@ -2046,44 +1930,137 @@ describe( 'selectors', () => {
 				isInsertionPointVisible: false,
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootUID: undefined,
+				layout: undefined,
+				index: 1,
+			} );
 		} );
 
-		it( 'should return the last multi selected uid', () => {
+		it( 'should return an object for the nested selected block', () => {
 			const state = {
+				currentPost: {},
 				preferences: { mode: 'visual' },
 				blockSelection: {
-					start: 1,
-					end: 2,
+					start: 'uid2',
+					end: 'uid2',
 				},
 				editor: {
 					present: {
-						blockOrder: {
-							'': [ 1, 2, 3 ],
+						blocksByUid: {
+							uid1: { uid: 'uid1' },
+							uid2: { uid: 'uid2' },
 						},
+						blockOrder: {
+							'': [ 'uid1' ],
+							uid1: [ 'uid2' ],
+							uid2: [],
+						},
+						edits: {},
 					},
 				},
 				isInsertionPointVisible: false,
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toBe( 2 );
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootUID: 'uid1',
+				layout: undefined,
+				index: 1,
+			} );
 		} );
 
-		it( 'should return the last block if no selection', () => {
+		it( 'should return an object for the selected block with layout', () => {
 			const state = {
+				currentPost: {},
 				preferences: { mode: 'visual' },
-				blockSelection: { start: null, end: null },
+				blockSelection: {
+					start: 'uid1',
+					end: 'uid1',
+				},
 				editor: {
 					present: {
-						blockOrder: {
-							'': [ 1, 2, 3 ],
+						blocksByUid: {
+							uid1: { uid: 'uid1', attributes: { layout: 'wide' } },
 						},
+						blockOrder: {
+							'': [ 'uid1' ],
+							uid1: [],
+						},
+						edits: {},
 					},
 				},
 				isInsertionPointVisible: false,
 			};
 
-			expect( getBlockInsertionPoint( state ) ).toBe( 3 );
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootUID: undefined,
+				layout: 'wide',
+				index: 1,
+			} );
+		} );
+
+		it( 'should return an object for the last multi selected uid', () => {
+			const state = {
+				currentPost: {},
+				preferences: { mode: 'visual' },
+				blockSelection: {
+					start: 'uid1',
+					end: 'uid2',
+				},
+				editor: {
+					present: {
+						blocksByUid: {
+							uid1: { uid: 'uid1' },
+							uid2: { uid: 'uid2' },
+						},
+						blockOrder: {
+							'': [ 'uid1', 'uid2' ],
+							uid1: [],
+							uid2: [],
+						},
+						edits: {},
+					},
+				},
+				isInsertionPointVisible: false,
+			};
+
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootUID: undefined,
+				layout: undefined,
+				index: 2,
+			} );
+		} );
+
+		it( 'should return an object for the last block if no selection', () => {
+			const state = {
+				currentPost: {},
+				preferences: { mode: 'visual' },
+				blockSelection: {
+					start: null,
+					end: null,
+				},
+				editor: {
+					present: {
+						blocksByUid: {
+							uid1: { uid: 'uid1' },
+							uid2: { uid: 'uid2' },
+						},
+						blockOrder: {
+							'': [ 'uid1', 'uid2' ],
+							uid1: [],
+							uid2: [],
+						},
+						edits: {},
+					},
+				},
+				isInsertionPointVisible: false,
+			};
+
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootUID: undefined,
+				layout: undefined,
+				index: 2,
+			} );
 		} );
 	} );
 
@@ -2103,7 +2080,6 @@ describe( 'selectors', () => {
 				saving: {
 					requesting: true,
 				},
-				isSavingMetaBoxes: false,
 			};
 
 			expect( isSavingPost( state ) ).toBe( true );
@@ -2114,21 +2090,9 @@ describe( 'selectors', () => {
 				saving: {
 					requesting: false,
 				},
-				isSavingMetaBoxes: false,
 			};
 
 			expect( isSavingPost( state ) ).toBe( false );
-		} );
-
-		it( 'should return true if the post is not currently being saved but meta boxes are saving', () => {
-			const state = {
-				saving: {
-					requesting: false,
-				},
-				isSavingMetaBoxes: true,
-			};
-
-			expect( isSavingPost( state ) ).toBe( true );
 		} );
 	} );
 
@@ -2183,8 +2147,10 @@ describe( 'selectors', () => {
 					present: {
 						blockOrder: {},
 						blocksByUid: {},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
@@ -2201,8 +2167,10 @@ describe( 'selectors', () => {
 							123: { uid: 123, name: 'core/image', attributes: {} },
 							456: { uid: 456, name: 'core/quote', attributes: {} },
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBeNull();
@@ -2218,8 +2186,10 @@ describe( 'selectors', () => {
 						blocksByUid: {
 							123: { uid: 123, name: 'core/image', attributes: {} },
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'image' );
@@ -2235,8 +2205,10 @@ describe( 'selectors', () => {
 						blocksByUid: {
 							456: { uid: 456, name: 'core/quote', attributes: {} },
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
@@ -2252,8 +2224,10 @@ describe( 'selectors', () => {
 						blocksByUid: {
 							567: { uid: 567, name: 'core-embed/youtube', attributes: {} },
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'video' );
@@ -2270,8 +2244,10 @@ describe( 'selectors', () => {
 							456: { uid: 456, name: 'core/quote', attributes: {} },
 							789: { uid: 789, name: 'core/paragraph', attributes: {} },
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getSuggestedPostFormat( state ) ).toBe( 'quote' );
@@ -2298,8 +2274,10 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {},
 						blockOrder: {},
+						edits: {},
 					},
 				},
+				currentPost: {},
 				reusableBlocks: {
 					data: {},
 				},
@@ -2315,8 +2293,10 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {},
 						blockOrder: {},
+						edits: {},
 					},
 				},
+				currentPost: {},
 				reusableBlocks: {
 					data: {},
 				},
@@ -2346,8 +2326,10 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 1 ],
 						},
+						edits: {},
 					},
 				},
+				currentPost: {},
 				reusableBlocks: {
 					data: {},
 				},
@@ -2363,8 +2345,10 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {},
 						blockOrder: {},
+						edits: {},
 					},
 				},
+				currentPost: {},
 				reusableBlocks: {
 					data: {
 						123: {
