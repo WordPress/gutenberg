@@ -9,52 +9,30 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ShortcodePreview from './preview';
-import BlockControls from '../../block-controls';
 import PlainText from '../../plain-text';
 
 export class Shortcode extends Component {
 	constructor() {
-		super();
-		this.state = {
-			preview: false,
-		};
+		super( ...arguments );
+		this.state = {};
 	}
 
 	render() {
-		const { preview } = this.state;
-		const { instanceId, postId, setAttributes, attributes, isSelected } = this.props;
+		const { instanceId, setAttributes, attributes, isSelected } = this.props;
 		const inputId = `blocks-shortcode-input-${ instanceId }`;
 		const shortcodeContent = ( attributes.text || '' ).trim();
 
-		const controls = isSelected && (
-			<BlockControls key="controls">
-				<div className="components-toolbar">
-					<button
-						className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` }
-						onClick={ () => this.setState( { preview: false } ) }>
-						<span>{ __( 'Shortcode' ) }</span>
-					</button>
-					<button
-						className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
-						onClick={ () => shortcodeContent.length && this.setState( { preview: true } ) } >
-						<span>{ __( 'Preview' ) }</span>
-					</button>
-				</div>
-			</BlockControls>
-		);
-
-		if ( preview ) {
+		if ( ! isSelected ) {
 			return [
-				controls,
-				<ShortcodePreview key="preview"
-					shortcode={ shortcodeContent }
-					postId={ postId }
-				/>,
+				<div className="wp-block" key="preview">
+					<ShortcodePreview
+						shortcode={ shortcodeContent }
+					/>
+				</div>,
 			];
 		}
 
 		return [
-			controls,
 			<div className="wp-block-shortcode" key="placeholder">
 				<label htmlFor={ inputId }>
 					<Dashicon icon="editor-code" />

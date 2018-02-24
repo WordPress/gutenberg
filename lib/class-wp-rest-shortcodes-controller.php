@@ -77,6 +77,7 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 	public function get_shortcode_output( $request ) {
 		global $post;
 		global $wp_embed;
+
 		$style     = '';
 		$js        = '';
 		$type      = 'html';
@@ -102,19 +103,22 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			setup_postdata( $post );
 		}
 
-		$output = apply_filters('the_content', $shortcode);
+		if ( has_shortcode( $shortcode, 'embed' ) ) {
+			$output = $wp_embed->run_shortcode( $shortcode );
+		} else {
+			$output = $shortcode;
+		}
 
-		if ( empty( $output ) ) {
+		$output = do_shortcode( $output );
+
+		if ( empty( $output ) || ( $output === $shortcode ) ) {
 			$data['html'] = __( 'Sorry, couldn\'t render a preview', 'gutenberg' );
 			return rest_ensure_response( $data );
 		}
 
-		$type = 'html';
-
 		ob_start();
 		wp_head();
 		$style = ob_get_clean();
-
 
 		ob_start();
 		wp_footer();

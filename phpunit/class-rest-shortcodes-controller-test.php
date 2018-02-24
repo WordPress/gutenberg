@@ -99,10 +99,8 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'shortcode' => 'Any Random Text',
 				),
 				array(
-					'html'  => 'Any Random Text',
-					'type'  => 'html',
-					'style' => '',
-					'js'    => '',
+					'html' => 'Sorry, couldn\'t render a preview',
+					'type' => 'html',
 				),
 			),
 			// [caption] default shortcode will also return the default theme style sheet.
@@ -111,10 +109,8 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'shortcode' => '[caption]My Caption[/caption]',
 				),
 				array(
-					'html'  => 'My Caption',
-					'type'  => 'html',
-					'style' => '<link rel="stylesheet" type="text/css" href="/tmp/wordpress-tests-lib/includes/../data/themedir1/default/style.css" />',
-					'js'    => '',
+					'html' => 'My Caption',
+					'type' => 'html',
 				),
 			),
 			// Sending an empty string.
@@ -124,10 +120,8 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'postId'    => self::$post_id,
 				),
 				array(
-					'html'  => 'Enter something to preview',
-					'type'  => 'html',
-					'style' => '',
-					'js'    => '',
+					'html' => 'Enter something to preview',
+					'type' => 'html',
 				),
 			),
 			// Sending invalid shortcode attribute.
@@ -137,46 +131,38 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'postId'    => self::$post_id,
 				),
 				array(
-					'html'  => 'Sorry, couldn\'t render a preview',
-					'type'  => 'html',
-					'style' => '',
-					'js'    => '',
+					'html' => 'Sorry, couldn\'t render a preview',
+					'type' => 'html',
 				),
 			),
 			// Youtube embed.
 			array(
 				array(
-					'shortcode' => '[embed]https://www.youtube.com/watch?v=8OBfr46Y0cQ[/embed]',
+					'shortcode' => '[embed width="500" height="281"]https://www.youtube.com/watch?v=8OBfr46Y0cQ[/embed]',
 					'postId'    => self::$post_id,
 				),
 				array(
-					'html'  => '<iframe width="600" height="338" src="https://www.youtube.com/embed/8OBfr46Y0cQ?feature=oembed" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>',
-					'type'  => 'video',
-					'style' => '',
-					'js'    => '',
+					'html' => '<iframe width="500" height="281" src="https://www.youtube.com/embed/8OBfr46Y0cQ?feature=oembed" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>',
+					'type' => 'html',
 				),
 			),
 			// Vimeo embed.
 			array(
 				array(
-					'shortcode' => '[embed]https://vimeo.com/81625407[/embed]',
+					'shortcode' => '[embed width="500" height="281"]https://vimeo.com/81625407[/embed]',
 					'postId'    => self::$post_id,
 				),
 				array(
-					'html'  => '<iframe src="https://player.vimeo.com/video/81625407" width="600" height="338" frameborder="0" title="What is WordPress?" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>',
-					'type'  => 'video',
-					'style' => '',
-					'js'    => '',
+					'html' => '<iframe src="https://player.vimeo.com/video/81625407" width="500" height="281" frameborder="0" title="What is WordPress?" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>',
+					'type' => 'html',
 				),
 			),
 			// Not sending shortcode attribute.
 			array(
 				array(),
 				array(
-					'html'  => 'Enter something to preview',
-					'type'  => 'html',
-					'style' => '',
-					'js'    => '',
+					'html' => 'Enter something to preview',
+					'type' => 'html',
 				),
 			),
 			// Sending valid UTF-8.
@@ -186,10 +172,8 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'postId'    => self::$post_id,
 				),
 				array(
-					'html'  => '\xe2\x82\xa1',
-					'type'  => 'html',
-					'style' => '',
-					'js'    => '',
+					'html' => 'Sorry, couldn\'t render a preview',
+					'type' => 'html',
 				),
 			),
 		);
@@ -209,8 +193,6 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals( $expected_message['html'], $data['html'] );
 		$this->assertEquals( $expected_message['type'], $data['type'] );
-		$this->assertEquals( $expected_message['style'], $data['style'] );
-		$this->assertEquals( $expected_message['js'], $data['js'] );
 	}
 	public function test_context_param() {
 		$this->markTestSkipped( 'Controller doesn\'t implement get_context_param().' );
@@ -233,6 +215,7 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_update_item() {
 		$this->markTestSkipped( 'Controller doesn\'t implement prepare_item().' );
 	}
+
 	public function test_get_item_schema() {
 		$request    = new WP_REST_Request( 'OPTIONS', '/gutenberg/v1/shortcodes' );
 		$response   = $this->server->dispatch( $request );

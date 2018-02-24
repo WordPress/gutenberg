@@ -120,8 +120,13 @@ export default class Sandbox extends Component {
 				// determining the unconstrained page bounds.
 				function removeViewportStyles( ruleOrNode ) {
 					[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
-						if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
-							ruleOrNode.style[ style ] = '';
+						if(!ruleOrNode.style) return;
+						try {
+							if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
+								ruleOrNode.style[ style ] = '';
+							}
+						} catch(err) {
+							
 						}
 					} );
 				}
@@ -147,7 +152,7 @@ export default class Sandbox extends Component {
 			body.html > div,
 			body.html > div > iframe {
 				width: 100%;
-				height: 100%;
+				min-height: 100%;
 			}
 
 			body > div > * {
