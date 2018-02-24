@@ -10,11 +10,6 @@ import { withAPIData, Spinner, SandBox } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import { getCurrentPostId } from '../../../editor/store/selectors';
-
 function ShortcodePreview( { response } ) {
 	if ( response.isLoading || ! response.data ) {
 		return (
@@ -40,7 +35,7 @@ function ShortcodePreview( { response } ) {
 const applyConnect = connect(
 	( state ) => {
 		return {
-			postId: getCurrentPostId( state ),
+			postId: state.currentPost.id,
 		};
 	},
 );
