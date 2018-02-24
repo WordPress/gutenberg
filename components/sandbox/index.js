@@ -142,14 +142,10 @@ export default class Sandbox extends Component {
 			body {
 				margin: 0;
 			}
-			
-			body.html {
-				width: 100%;
-			}
 
-			body.video,
-			body.video > div,
-			body.video > div > iframe {
+			body.html,
+			body.html > div,
+			body.html > div > iframe {
 				width: 100%;
 				height: 100%;
 			}

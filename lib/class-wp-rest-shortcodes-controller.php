@@ -84,11 +84,6 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 		$args      = $request->get_params();
 		$post      = isset( $args['postId'] ) ? get_post( $args['postId'] ) : null;
 		$shortcode = isset( $args['shortcode'] ) ? trim( $args['shortcode'] ) : '';
-		$cache_key = 'shortcode_' . md5( serialize( $args ) );
-		$data      = get_transient( $cache_key );
-		if ( ! empty( $data ) ) {
-			return rest_ensure_response( $data );
-		}
 
 		// Initialize $data.
 		$data = array(
@@ -107,53 +102,23 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			setup_postdata( $post );
 		}
 
-		// Since the [embed] shortcode needs to be run earlier than other shortcodes,
-		// do_shortcode() will not work with [embed] if there are other shortcodes registered.
-		if ( has_shortcode( $shortcode, 'embed' ) ) {
-			$embed_request = new WP_REST_Request( 'GET', '/oembed/1.0/proxy' );
-			$pattern       = get_shortcode_regex();
-			if ( preg_match_all( '/' . $pattern . '/s', $shortcode, $matches ) ) {
-				$embed_request['url'] = $matches[5][0];
-				$embed_response       = rest_do_request( $embed_request );
-				if ( $embed_response->is_error() ) {
-					// Convert to a WP_Error object.
-					$error      = $embed_response->as_error();
-					$message    = $embed_response->get_error_message();
-					$error_data = $embed_response->get_error_data();
-					$status     = isset( $error_data['status'] ) ? $error_data['status'] : 500;
-					wp_die( printf( '<p>An error occurred: %s (%d)</p>', $message, $error_data ) );
-				}
-				$embed_data = $embed_response->get_data();
-				$output     = $embed_data->html;
-			}
-		} else {
-			$output = do_shortcode( $shortcode );
-		}
+		$output = apply_filters('the_content', $shortcode);
 
 		if ( empty( $output ) ) {
 			$data['html'] = __( 'Sorry, couldn\'t render a preview', 'gutenberg' );
 			return rest_ensure_response( $data );
 		}
 
-		// Check if shortcode is returning a video. The video type will be used by the frontend to maintain 16:9 aspect ratio.
-		if ( has_shortcode( $shortcode, 'video' ) ) {
-			$type = 'video';
-		} elseif ( has_shortcode( $shortcode, 'embed' ) ) {
-			$type = $embed_data->type;
-		} else {
-			$type = 'html';
-			// Gallery and caption shortcodes need the theme style to be embedded in the shortcode preview iframe.
-			if ( has_shortcode( $shortcode, 'gallery' ) || has_shortcode( $shortcode, 'caption' ) || has_shortcode( $shortcode, 'wp_caption' ) ) {
-				$style = '<link rel="stylesheet" type="text/css" href="' . get_stylesheet_uri() . '" />';
-			}
+		$type = 'html';
 
-			// Playlist shortcodes need the playlist JS to be embedded in the shortcode preview iframe.
-			if ( has_shortcode( $shortcode, 'playlist' ) ) {
-				ob_start();
-				wp_footer();
-				$js = ob_get_clean();
-			}
-		}
+		ob_start();
+		wp_head();
+		$style = ob_get_clean();
+
+
+		ob_start();
+		wp_footer();
+		$js = ob_get_clean();
 
 		$data = array(
 			'html'  => $output,
@@ -161,9 +126,6 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			'style' => $style,
 			'js'    => $js,
 		);
-
-		// Caches the result for 12 hours.
-		set_transient( $cache_key, $data, 12 * HOUR_IN_SECONDS );
 
 		return rest_ensure_response( $data );
 	}
