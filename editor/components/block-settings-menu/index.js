@@ -28,8 +28,8 @@ function BlockSettingsMenu( {
 	renderBlockMenu = ( { children } ) => children,
 	draggable,
 	onDragStart,
-	onDragEnd }
-) {
+	onDragEnd,
+} ) {
 	const count = uids.length;
 
 	return (

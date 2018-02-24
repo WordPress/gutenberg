@@ -59,9 +59,9 @@ const withDragging = ( OriginalComponent ) => {
 			const cloneWrapper = document.getElementById( this.cloneNodeId );
 
 			cloneWrapper.style.top =
-				`${ parseInt( cloneWrapper.style.top, 10 ) + parseInt( event.clientY, 10 ) - parseInt( this.cursorTop, 10 ) }px`;
+				`${ parseInt( cloneWrapper.style.top, 10 ) + event.clientY - this.cursorTop }px`;
 			cloneWrapper.style.left =
-				`${ parseInt( cloneWrapper.style.left, 10 ) + parseInt( event.clientX, 10 ) - parseInt( this.cursorLeft, 10 ) }px`;
+				`${ parseInt( cloneWrapper.style.left, 10 ) + event.clientX - this.cursorLeft }px`;
 
 			// Update cursor coordinates.
 			this.cursorLeft = event.clientX;
@@ -123,8 +123,8 @@ const withDragging = ( OriginalComponent ) => {
 				cloneWrapper.style.transform = 'scale(0.5)';
 				cloneWrapper.style.transformOrigin = 'top left';
 				// Position clone near the cursor.
-				cloneWrapper.style.top = `${ parseInt( event.clientY, 10 ) - 100 }px`;
-				cloneWrapper.style.left = `${ parseInt( event.clientX, 10 ) }px`;
+				cloneWrapper.style.top = `${ event.clientY - 100 }px`;
+				cloneWrapper.style.left = `${ event.clientX }px`;
 			} else {
 				// Position clone right over the original element (20px padding).
 				cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
