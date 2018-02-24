@@ -33,10 +33,8 @@
 		z-index: z-index( '.editor-block-list__block-drag-inset.is-visible > .inner' );
 	}
 
-	&:hover {
-		cursor: move;/* Fallback for IE/Edge < 14 */
-		cursor: grab;
-	}
+	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: grab;
 }
 
 .editor-block-list__block {
@@ -329,14 +327,16 @@
 		position: absolute;
 		top: 0;
 		padding: 0;
+
+		/* Necessary for drag indicator */
+		cursor: move;/* Fallback for IE/Edge < 14 */
+		cursor: grab;
 	}
 
 	// Right side UI
 	> .editor-block-settings-menu {
 		right: $block-mover-margin;
 		padding-top: 2px;
-		cursor: move;/* Fallback for IE/Edge < 14 */
-		cursor: grab;
 
 		// Mobile
 		display: none;

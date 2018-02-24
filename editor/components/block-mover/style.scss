@@ -1,11 +1,3 @@
-.editor-block-mover {
-	/* Necessary for dragging block from the mover */
-	&:hover {
-		cursor: move;/* Fallback for IE/Edge < 14 */
-		cursor: grab;
-	}
-}
-
 // Mover icon buttons$
 .editor-block-mover__control {
 	display: block;
