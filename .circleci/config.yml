@@ -4,13 +4,10 @@ jobs:
     docker:
       - image: circleci/node:9-stretch
 
-    filters:
-      branches:
-        only:
-          # Whitelist branches to build for.
-          - master
-      tags:
-        only: /^v.*/
+    branches:
+      only:
+        # Whitelist branches to build for.
+        - master
 
     steps:
       # Checkout repo & subs:
