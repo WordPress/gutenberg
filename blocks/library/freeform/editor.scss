@@ -104,6 +104,16 @@
 		margin-left: auto;
 		margin-right: auto;
 	}
+
+	.wp-more-tag {
+		width: 96%;
+		height: 0;
+		display: block;
+		margin: 15px auto;
+		outline: 0;
+		cursor: default;
+		border: 2px dashed rgb( 186, 186, 186 );
+	}
 }
 
 // freeform toolbar
