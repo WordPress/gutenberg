@@ -14,6 +14,7 @@ import {
 	PanelColor,
 	RangeControl,
 	ToggleControl,
+	Button,
 	withFallbackStyles,
 } from '@wordpress/components';
 
@@ -45,6 +46,8 @@ const ContrastCheckerWithFallbackStyles = withFallbackStyles( ( node, ownProps )
 		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
 	};
 } )( ContrastChecker );
+
+const fontSizeValues = [ 14, 16, 36, 48 ];
 
 class ParagraphBlock extends Component {
 	constructor() {
@@ -79,6 +82,39 @@ class ParagraphBlock extends Component {
 			return;
 		}
 		this.nodeRef = node;
+	}
+
+	setFontSize( value ) {
+		const { setAttributes } = this.props;
+		if ( fontSizeValues.includes( value ) ) {
+			if ( fontSizeValues[ 0 ] === value ) {
+				setAttributes( { fontSize: fontSizeValues[ 0 ], textClass: 'is-small-text' } );
+			} else if ( fontSizeValues[ 1 ] === value ) {
+				setAttributes( { fontSize: fontSizeValues[ 1 ], textClass: 'is-regular-text' } );
+			} else if ( fontSizeValues[ 2 ] === value ) {
+				setAttributes( { fontSize: fontSizeValues[ 2 ], textClass: 'is-large-text' } );
+			} else if ( fontSizeValues[ 3 ] === value ) {
+				setAttributes( { fontSize: fontSizeValues[ 3 ], textClass: 'is-larger-text' } );
+			}
+		} else {
+			setAttributes( { fontSize: value, textClass: '' } );
+		}
+	}
+
+	getFontSize() {
+		const { fontSize, textClass } = this.props.attributes;
+		switch ( textClass ) {
+			case 'is-small-text':
+				return fontSizeValues[ 0 ];
+			case 'is-regular-text':
+				return fontSizeValues[ 1 ];
+			case 'is-large-text':
+				return fontSizeValues[ 2 ];
+			case 'is-larger-text':
+				return fontSizeValues[ 3 ];
+			default:
+				return fontSize;
+		}
 	}
 
 	render() {
@@ -117,19 +153,48 @@ class ParagraphBlock extends Component {
 			isSelected && (
 				<InspectorControls key="inspector">
 					<PanelBody title={ __( 'Text Settings' ) }>
-						<ToggleControl
-							label={ __( 'Drop Cap' ) }
-							checked={ !! dropCap }
-							onChange={ this.toggleDropCap }
-						/>
+						<Button
+							isSmall
+							isPrimary={ attributes.textClass === 'is-small-text' }
+							onClick={ () => this.setFontSize( fontSizeValues[ 0 ] ) }
+						>
+							Small
+						</Button>
+						<Button
+							isSmall
+							isPrimary={ attributes.textClass === 'is-regular-text' }
+							onClick={ () => this.setFontSize( fontSizeValues[ 1 ] ) }
+						>
+							Regular
+						</Button>
+						<Button
+							isSmall
+							isPrimary={ attributes.textClass === 'is-large-text' }
+							onClick={ () => this.setFontSize( fontSizeValues[ 2 ] ) }
+						>
+							Large
+						</Button>
+						<Button
+							isSmall
+							isPrimary={ attributes.textClass === 'is-larger-text' }
+							onClick={ () => this.setFontSize( fontSizeValues[ 3 ] ) }
+						>
+							Larger
+						</Button>
 						<RangeControl
 							label={ __( 'Font Size' ) }
-							value={ fontSize || '' }
-							onChange={ ( value ) => setAttributes( { fontSize: value } ) }
+							value={ this.getFontSize() || '' }
+							onChange={ ( value ) => this.setFontSize( value ) }
 							min={ 10 }
 							max={ 200 }
 							beforeIcon="editor-textcolor"
 							allowReset
+						/>
+						<span>{ attributes.textClass }</span>
+						<ToggleControl
+							label={ __( 'Drop Cap' ) }
+							checked={ !! dropCap }
+							onChange={ this.toggleDropCap }
 						/>
 					</PanelBody>
 					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
@@ -323,7 +388,7 @@ export const settings = {
 		const styles = {
 			backgroundColor: backgroundColor,
 			color: textColor,
-			fontSize: fontSize,
+			fontSize: fontSizeValues.includes( fontSize ) ? null : fontSize,
 			textAlign: align,
 		};
 
