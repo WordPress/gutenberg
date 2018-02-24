@@ -31,6 +31,11 @@ const inlineWhitelist = {
 	br: {},
 };
 
+const embeddedWhiteList = {
+	img: { attributes: [ 'src', 'alt' ], classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone' ] },
+	iframe: { attributes: [ 'src', 'allowfullscreen', 'height', 'width' ] },
+};
+
 const inlineWrapperWhiteList = {
 	figcaption: {},
 	h1: {},
@@ -39,7 +44,7 @@ const inlineWrapperWhiteList = {
 	h4: {},
 	h5: {},
 	h6: {},
-	p: { children: [ 'img' ] },
+	p: {},
 	li: { children: [ 'ul', 'ol', 'li' ] },
 	pre: {},
 	td: {},
@@ -49,7 +54,7 @@ const inlineWrapperWhiteList = {
 const whitelist = {
 	...inlineWhitelist,
 	...inlineWrapperWhiteList,
-	img: { attributes: [ 'src', 'alt' ], classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone' ] },
+	...embeddedWhiteList,
 	figure: {},
 	blockquote: {},
 	hr: {},
@@ -63,7 +68,7 @@ const whitelist = {
 };
 
 export function isWhitelisted( element ) {
-	return !! whitelist[ element.nodeName.toLowerCase() ];
+	return whitelist.hasOwnProperty( element.nodeName.toLowerCase() );
 }
 
 export function isNotWhitelisted( element ) {
@@ -82,9 +87,11 @@ export function isAttributeWhitelisted( tag, attribute ) {
  * Checks if nodeName should be treated as inline when being added to tagName.
  * This happens if nodeName and tagName are in the same group defined in inlineWhitelistTagGroups.
  *
- * @param  {String}  nodeName Node name.
- * @param  {String}  tagName  Tag name.
- * @return {Boolean}          True if nodeName is inline in the context of tagName and false otherwise.
+ * @param {string} nodeName Node name.
+ * @param {string} tagName  Tag name.
+ *
+ * @return {boolean} True if nodeName is inline in the context of tagName and
+ *                    false otherwise.
  */
 function isInlineForTag( nodeName, tagName ) {
 	if ( ! tagName || ! nodeName ) {
@@ -97,7 +104,7 @@ function isInlineForTag( nodeName, tagName ) {
 
 export function isInline( node, tagName ) {
 	const nodeName = node.nodeName.toLowerCase();
-	return !! inlineWhitelist[ nodeName ] || isInlineForTag( nodeName, tagName );
+	return inlineWhitelist.hasOwnProperty( nodeName ) || isInlineForTag( nodeName, tagName );
 }
 
 export function isClassWhitelisted( tag, name ) {
@@ -108,8 +115,21 @@ export function isClassWhitelisted( tag, name ) {
 	);
 }
 
+/**
+ * Whether or not the given node is embedded content.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Embedded_content
+ *
+ * @param {Node} node The node to check.
+ *
+ * @return {boolean} True if embedded content, false if not.
+ */
+export function isEmbedded( node ) {
+	return embeddedWhiteList.hasOwnProperty( node.nodeName.toLowerCase() );
+}
+
 export function isInlineWrapper( node ) {
-	return !! inlineWrapperWhiteList[ node.nodeName.toLowerCase() ];
+	return inlineWrapperWhiteList.hasOwnProperty( node.nodeName.toLowerCase() );
 }
 
 export function isAllowedBlock( parentNode, node ) {
@@ -195,9 +215,9 @@ export function isPlain( HTML ) {
 /**
  * Given node filters, deeply filters and mutates a NodeList.
  *
- * @param  {NodeList} nodeList The nodeList to filter.
- * @param  {Array}    filters  An array of functions that can mutate with the provided node.
- * @param  {Document} doc      The document of the nodeList.
+ * @param {NodeList} nodeList The nodeList to filter.
+ * @param {Array}    filters  An array of functions that can mutate with the provided node.
+ * @param {Document} doc      The document of the nodeList.
  */
 export function deepFilterNodeList( nodeList, filters, doc ) {
 	Array.from( nodeList ).forEach( ( node ) => {
@@ -217,9 +237,10 @@ export function deepFilterNodeList( nodeList, filters, doc ) {
 /**
  * Given node filters, deeply filters HTML tags.
  *
- * @param  {String} HTML    The HTML to filter.
- * @param  {Array}  filters An array of functions that can mutate with the provided node.
- * @return {String}         The filtered HTML.
+ * @param {string} HTML    The HTML to filter.
+ * @param {Array}  filters An array of functions that can mutate with the provided node.
+ *
+ * @return {string} The filtered HTML.
  */
 export function deepFilterHTML( HTML, filters = [] ) {
 	const doc = document.implementation.createHTMLDocument( '' );

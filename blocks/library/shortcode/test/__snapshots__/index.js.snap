@@ -1,0 +1,33 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/shortcode block edit matches snapshot 1`] = `
+<div
+  class="wp-block-shortcode"
+>
+  <label
+    for="blocks-shortcode-input-0"
+  >
+    <svg
+      aria-hidden="true"
+      class="dashicon dashicons-editor-code"
+      focusable="false"
+      height="20"
+      role="img"
+      viewBox="0 0 20 20"
+      width="20"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M9 6l-4 4 4 4-1 2-6-6 6-6zm2 8l4-4-4-4 1-2 6 6-6 6z"
+      />
+    </svg>
+    Shortcode
+  </label>
+  <textarea
+    class="blocks-plain-text"
+    id="blocks-shortcode-input-0"
+    placeholder="Write shortcode here…"
+    rows="1"
+  />
+</div>
+`;

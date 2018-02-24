@@ -3,7 +3,6 @@
 	"parser": "babel-eslint",
 	"extends": [
 		"wordpress",
-		"plugin:wordpress/jsdoc",
 		"plugin:react/recommended",
 		"plugin:jsx-a11y/recommended",
 		"plugin:jest/recommended"
@@ -12,7 +11,6 @@
 		"browser": false,
 		"es6": true,
 		"node": true,
-		"mocha": true,
 		"jest/globals": true
 	},
 	"parserOptions": {
@@ -125,6 +123,10 @@
 				"message": "Use @wordpress/utils as import path instead."
 			},
 			{
+				"selector": "ImportDeclaration[source.value=/^edit-poost$/]",
+				"message": "Use @wordpress/edit-post as import path instead."
+			},
+			{
 				"selector": "CallExpression[callee.name=/^__|_n|_x$/]:not([arguments.0.type=/^Literal|BinaryExpression$/])",
 				"message": "Translate function arguments must be string literals."
 			},
@@ -178,16 +180,31 @@
 			}
 		} ],
 		"template-curly-spacing": [ "error", "always" ],
-		"valid-jsdoc": [ "error", { "requireReturn": false } ],
+		"valid-jsdoc": [ "error", {
+			"prefer": {
+				"arg": "param",
+				"argument": "param",
+				"extends": "augments",
+				"returns": "return"
+			},
+			"preferType": {
+				"array": "Array",
+				"bool": "boolean",
+				"Boolean": "boolean",
+				"float": "number",
+				"Float": "number",
+				"int": "number",
+				"integer": "number",
+				"Integer": "number",
+				"Number": "number",
+				"object": "Object",
+				"String": "string",
+				"Void": "void"
+			},
+			"requireParamDescription": false,
+			"requireReturn": false
+		} ],
 		"valid-typeof": "error",
 		"yoda": "off"
-	},
-	"overrides": [
-		{
-			"files": [ "{blocks,components,date,editor,element,i18n,data,utils}/**/test/*.js" ],
-			"rules": {
-				"require-jsdoc": "off"
-			}
-		}
-	]
+	}
 }

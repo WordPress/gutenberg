@@ -1,17 +1,25 @@
 /**
+ * External dependencies
+ */
+import { compact } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { ToggleControl } from '@wordpress/components';
+import { RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType } from '../../api';
+import { createBlock } from '../../api';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
 
-registerBlockType( 'core/more', {
+export const name = 'core/more';
+
+export const settings = {
 	title: __( 'More' ),
 
 	description: __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ),
@@ -38,7 +46,29 @@ registerBlockType( 'core/more', {
 		},
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.dataset && node.dataset.block === 'core/more',
+				transform( node ) {
+					const { customText, noTeaser } = node.dataset;
+					const attrs = {};
+					// Don't copy unless defined and not an empty string
+					if ( customText ) {
+						attrs.customText = customText;
+					}
+					// Special handling for boolean
+					if ( noTeaser === '' ) {
+						attrs.noTeaser = true;
+					}
+					return createBlock( 'core/more', attrs );
+				},
+			},
+		],
+	},
+
+	edit( { attributes, setAttributes, isSelected } ) {
 		const { customText, noTeaser } = attributes;
 
 		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
@@ -47,7 +77,7 @@ registerBlockType( 'core/more', {
 		const inputLength = value.length ? value.length + 1 : 1;
 
 		return [
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<ToggleControl
 						label={ __( 'Hide the teaser before the "More" tag' ) }
@@ -62,13 +92,26 @@ registerBlockType( 'core/more', {
 					value={ value }
 					size={ inputLength }
 					onChange={ ( event ) => setAttributes( { customText: event.target.value } ) }
-					onFocus={ setFocus }
 				/>
 			</div>,
 		];
 	},
 
-	save() {
-		return null;
+	save( { attributes } ) {
+		const { customText, noTeaser } = attributes;
+
+		const moreTag = customText ?
+			`<!--more ${ customText }-->` :
+			'<!--more-->';
+
+		const noTeaserTag = noTeaser ?
+			'<!--noteaser-->' :
+			'';
+
+		return (
+			<RawHTML>
+				{ compact( [ moreTag, noTeaserTag ] ).join( '\n' ) }
+			</RawHTML>
+		);
 	},
-} );
+};

@@ -2,17 +2,58 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createMediaFromFile } from '@wordpress/utils';
+import { createMediaFromFile, preloadImage } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, createBlock, getBlockAttributes, getBlockType } from '../../api';
+import { createBlock, getBlockAttributes, getBlockType } from '../../api';
 import ImageBlock from './block';
 
-registerBlockType( 'core/image', {
+export const name = 'core/image';
+
+const blockAttributes = {
+	url: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
+	},
+	alt: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'alt',
+		default: '',
+	},
+	caption: {
+		type: 'array',
+		source: 'children',
+		selector: 'figcaption',
+	},
+	href: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'href',
+	},
+	id: {
+		type: 'number',
+	},
+	align: {
+		type: 'string',
+	},
+	width: {
+		type: 'number',
+	},
+	height: {
+		type: 'number',
+	},
+};
+
+export const settings = {
 	title: __( 'Image' ),
 
 	description: __( 'Worth a thousand words.' ),
@@ -23,43 +64,7 @@ registerBlockType( 'core/image', {
 
 	keywords: [ __( 'photo' ) ],
 
-	attributes: {
-		url: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'img',
-			attribute: 'src',
-		},
-		alt: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'img',
-			attribute: 'alt',
-		},
-		caption: {
-			type: 'array',
-			source: 'children',
-			selector: 'figcaption',
-		},
-		href: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'a',
-			attribute: 'href',
-		},
-		id: {
-			type: 'number',
-		},
-		align: {
-			type: 'string',
-		},
-		width: {
-			type: 'number',
-		},
-		height: {
-			type: 'number',
-		},
-	},
+	attributes: blockAttributes,
 
 	transforms: {
 		from: [
@@ -67,18 +72,15 @@ registerBlockType( 'core/image', {
 				type: 'raw',
 				isMatch( node ) {
 					const tag = node.nodeName.toLowerCase();
-					const hasText = !! node.textContent.trim();
 					const hasImage = node.querySelector( 'img' );
 
-					return tag === 'img' || ( hasImage && ! hasText ) || ( hasImage && tag === 'figure' );
+					return tag === 'img' || ( hasImage && tag === 'figure' );
 				},
 				transform( node ) {
-					const targetNode = node.parentNode.querySelector( 'figure,img' );
-					const matches = /align(left|center|right)/.exec( targetNode.className );
+					const matches = /align(left|center|right)/.exec( node.className );
 					const align = matches ? matches[ 1 ] : undefined;
 					const blockType = getBlockType( 'core/image' );
-					const attributes = getBlockAttributes( blockType, targetNode.outerHTML, { align } );
-
+					const attributes = getBlockAttributes( blockType, node.outerHTML, { align } );
 					return createBlock( 'core/image', attributes );
 				},
 			},
@@ -87,12 +89,18 @@ registerBlockType( 'core/image', {
 				isMatch( files ) {
 					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
 				},
-				transform( files ) {
-					return createMediaFromFile( files[ 0 ] )
-						.then( ( media ) => createBlock( 'core/image', {
-							id: media.id,
-							url: media.source_url,
-						} ) );
+				transform( files, onChange ) {
+					const file = files[ 0 ];
+					const block = createBlock( 'core/image', {
+						url: window.URL.createObjectURL( file ),
+					} );
+
+					createMediaFromFile( file )
+						.then( ( media ) => preloadImage( media.source_url ).then(
+							() => onChange( block.uid, { id: media.id, url: media.source_url } )
+						) );
+
+					return block;
 				},
 			},
 			{
@@ -145,7 +153,7 @@ registerBlockType( 'core/image', {
 
 	getEditWrapperProps( attributes ) {
 		const { align, width } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+		if ( 'left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align ) {
 			return { 'data-align': align, 'data-resized': !! width };
 		}
 	},
@@ -153,9 +161,17 @@ registerBlockType( 'core/image', {
 	edit: ImageBlock,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height } = attributes;
-		const extraImageProps = width || height ? { width, height } : {};
-		const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+		const { url, alt, caption, align, href, width, height, id } = attributes;
+
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ id ? `wp-image-${ id }` : null }
+				width={ width }
+				height={ height }
+			/>
+		);
 
 		let figureStyle = {};
 
@@ -172,4 +188,30 @@ registerBlockType( 'core/image', {
 			</figure>
 		);
 	},
-} );
+
+	deprecated: [
+		{
+			attributes: blockAttributes,
+			save( { attributes } ) {
+				const { url, alt, caption, align, href, width, height } = attributes;
+				const extraImageProps = width || height ? { width, height } : {};
+				const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+
+				let figureStyle = {};
+
+				if ( width ) {
+					figureStyle = { width };
+				} else if ( align === 'left' || align === 'right' ) {
+					figureStyle = { maxWidth: '50%' };
+				}
+
+				return (
+					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+					</figure>
+				);
+			},
+		},
+	],
+};

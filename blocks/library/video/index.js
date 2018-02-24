@@ -14,16 +14,17 @@ import { Component } from '@wordpress/element';
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType } from '../../api';
-import MediaUploadButton from '../../media-upload-button';
-import Editable from '../../editable';
+import MediaUpload from '../../media-upload';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-registerBlockType( 'core/video', {
+export const name = 'core/video';
+
+export const settings = {
 	title: __( 'Video' ),
 
-	description: __( 'Video, locally hosted, locally sourced.' ),
+	description: __( 'The Video block allows you to embed video files and play them back using a simple player.' ),
 
 	icon: 'format-video',
 
@@ -70,7 +71,7 @@ registerBlockType( 'core/video', {
 
 		render() {
 			const { align, caption, id } = this.props.attributes;
-			const { setAttributes, focus, setFocus } = this.props;
+			const { setAttributes, isSelected } = this.props;
 			const { editing, className, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
@@ -78,7 +79,7 @@ registerBlockType( 'core/video', {
 			};
 			const onSelectVideo = ( media ) => {
 				if ( media && media.url ) {
-					// sets the block's attribure and updates the edit component from the
+					// sets the block's attribute and updates the edit component from the
 					// selected media, then switches off the editing UI
 					setAttributes( { src: media.url, id: media.id } );
 					this.setState( { src: media.url, editing: false } );
@@ -93,7 +94,7 @@ registerBlockType( 'core/video', {
 				}
 				return false;
 			};
-			const controls = focus && (
+			const controls = isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -110,8 +111,6 @@ registerBlockType( 'core/video', {
 				</BlockControls>
 			);
 
-			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
-
 			if ( editing ) {
 				return [
 					controls,
@@ -119,7 +118,7 @@ registerBlockType( 'core/video', {
 						key="placeholder"
 						icon="media-video"
 						label={ __( 'Video' ) }
-						instructions={ __( 'Select a video file from your library, or upload a new one:' ) }
+						instructions={ __( 'Select a video file from your library, or upload a new one' ) }
 						className={ className }>
 						<form onSubmit={ onSelectUrl }>
 							<input
@@ -134,14 +133,16 @@ registerBlockType( 'core/video', {
 								{ __( 'Use URL' ) }
 							</Button>
 						</form>
-						<MediaUploadButton
-							buttonProps={ { isLarge: true } }
+						<MediaUpload
 							onSelect={ onSelectVideo }
 							type="video"
 							id={ id }
-						>
-							{ __( 'Add from Media Library' ) }
-						</MediaUploadButton>
+							render={ ( { open } ) => (
+								<Button isLarge onClick={ open } >
+									{ __( 'Add from Media Library' ) }
+								</Button>
+							) }
+						/>
 					</Placeholder>,
 				];
 			}
@@ -151,14 +152,13 @@ registerBlockType( 'core/video', {
 				controls,
 				<figure key="video" className={ className }>
 					<video controls src={ src } />
-					{ ( ( caption && caption.length ) || !! focus ) && (
-						<Editable
+					{ ( ( caption && caption.length ) || isSelected ) && (
+						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							focus={ focus && focus.editable === 'caption' ? focus : undefined }
-							onFocus={ focusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							isSelected={ isSelected }
 							inlineToolbar
 						/>
 					) }
@@ -178,4 +178,4 @@ registerBlockType( 'core/video', {
 			</figure>
 		);
 	},
-} );
+};

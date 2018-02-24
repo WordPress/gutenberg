@@ -8,6 +8,7 @@ import { assign } from 'lodash';
  */
 import { getWrapperDisplayName } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -25,10 +26,11 @@ const ANCHOR_REGEX = /[\s#]/g;
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
- * of the first node
+ * of the first node.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
@@ -50,17 +52,17 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include a new block inspector control for
  * assigning the anchor ID, if block supports anchor.
  *
- * @param  {function|Component} BlockEdit Original component
- * @return {function}                     Wrapped component
+ * @param {function|Component} BlockEdit Original component.
+ *
+ * @return {string} Wrapped component.
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
-		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.focus;
-
+		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.isSelected;
 		return [
 			<BlockEdit key="block-edit-anchor" { ...props } />,
 			hasAnchor && <InspectorControls key="inspector-anchor">
-				<InspectorControls.TextControl
+				<TextControl
 					label={ __( 'HTML Anchor' ) }
 					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
 					value={ props.attributes.anchor || '' }
@@ -83,10 +85,11 @@ export function withInspectorControl( BlockEdit ) {
  * supports anchor. This is only applied if the block's save result is an
  * element and not a markup string.
  *
- * @param  {Object} extraProps Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Current block attributes
- * @return {Object}            Filtered props applied to save element
+ * @param {Object} extraProps Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Current block attributes.
+ *
+ * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
 	if ( hasBlockSupport( blockType, 'anchor' ) ) {

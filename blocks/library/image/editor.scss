@@ -76,10 +76,14 @@
 	}
 }
 
-.editor-block-list__block[data-type="core/image"][data-align="right"],
-.editor-block-list__block[data-type="core/image"][data-align="left"] {
-	max-width: none !important;
-	&[data-resized="false"] {
-		max-width: 370px !important;
+.editor-block-list__block[data-type="core/image"][data-align="center"] {
+	.wp-block-image {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	&[data-resized="false"] .wp-block-image div {
+		margin-left: auto;
+		margin-right: auto;
 	}
 }

@@ -6,14 +6,16 @@ import { isFunction, mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { deprecated } from '@wordpress/utils';
 import { addFilter } from '@wordpress/hooks';
 
 function warnAboutDeprecatedMatcher() {
-	// eslint-disable-next-line no-console
-	console.warn(
-		'Attributes matchers are deprecated and they will be removed in a future version of Gutenberg. ' +
-		'Please update your attributes definition https://wordpress.org/gutenberg/handbook/block-api/attributes/'
-	);
+	deprecated( 'Attributes matching using functions', {
+		version: '2.4',
+		alternative: 'the declarative attributes',
+		plugin: 'Gutenberg',
+		link: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
+	} );
 }
 
 export const attr = ( selector, attribute ) => () => {
@@ -76,10 +78,11 @@ export const node = ( selector ) => () => {
 };
 
 /**
- * Resolve the matchers attributes for backwards compatibilty
+ * Resolve the matchers attributes for backwards compatibilty.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 export function resolveAttributes( settings ) {
 	// Resolve deprecated attributes

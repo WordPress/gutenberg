@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
+import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withInstanceId, Dashicon } from '@wordpress/components';
 
@@ -13,9 +9,11 @@ import { withInstanceId, Dashicon } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType } from '../../api';
+import PlainText from '../../plain-text';
 
-registerBlockType( 'core/shortcode', {
+export const name = 'core/shortcode';
+
+export const settings = {
 	title: __( 'Shortcode' ),
 
 	description: __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ),
@@ -71,14 +69,11 @@ registerBlockType( 'core/shortcode', {
 						<Dashicon icon="editor-code" />
 						{ __( 'Shortcode' ) }
 					</label>
-					<TextareaAutosize
+					<PlainText
 						id={ inputId }
-						autoComplete="off"
 						value={ attributes.text }
 						placeholder={ __( 'Write shortcode here…' ) }
-						onChange={ ( event ) => setAttributes( {
-							text: event.target.value,
-						} ) }
+						onChange={ ( text ) => setAttributes( { text } ) }
 					/>
 				</div>
 			);
@@ -86,6 +81,6 @@ registerBlockType( 'core/shortcode', {
 	),
 
 	save( { attributes } ) {
-		return attributes.text;
+		return <RawHTML>{ attributes.text }</RawHTML>;
 	},
-} );
+};

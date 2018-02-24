@@ -1,0 +1,16 @@
+.editor-inserter-with-shortcuts {
+	display: flex;
+	align-items: center;
+	flex-direction: row-reverse;
+
+	.components-icon-button {
+		border-radius: $button-style__radius-roundrect;
+	}
+}
+
+.editor-inserter-with-shortcuts__block {
+	margin-right: 5px;
+	width: 36px;
+	height: 36px;
+	padding-top: 8px;
+}

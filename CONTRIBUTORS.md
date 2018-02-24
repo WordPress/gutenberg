@@ -90,4 +90,6 @@ This list is manually curated to include valuable contributions by volunteers th
 | | @betsela
 | | @fuyuko
 | | @msdesign21
+| @thrijith |
+| @Cloud887 |
 | @abdullah1908 | @abdullahramzan |

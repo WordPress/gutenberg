@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get } from 'lodash';
+import { find, get, compact } from 'lodash';
 import showdown from 'showdown';
 
 /**
@@ -12,32 +12,37 @@ import { getBlockTypes, getUnknownTypeHandlerName } from '../registration';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import stripAttributes from './strip-attributes';
+import specialCommentConverter from './special-comment-converter';
 import commentRemover from './comment-remover';
 import createUnwrapper from './create-unwrapper';
 import isInlineContent from './is-inline-content';
 import formattingTransformer from './formatting-transformer';
 import msListConverter from './ms-list-converter';
-import listMerger from './list-merger';
+import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
 import tableNormaliser from './table-normaliser';
 import inlineContentConverter from './inline-content-converter';
+import embeddedContentReducer from './embedded-content-reducer';
 import { deepFilterHTML, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
 import shortcodeConverter from './shortcode-converter';
+import slackMarkdownVariantCorrector from './slack-markdown-variant-corrector';
 
 /**
  * Converts an HTML string to known blocks. Strips everything else.
  *
- * @param  {String}       options.HTML        The HTML to convert.
- * @param  {String}       [options.plainText] Plain text version.
- * @param  {String}       [options.mode]      Handle content as blocks or inline content.
- *                                            * 'AUTO': Decide based on the content passed.
- *                                            * 'INLINE': Always handle as inline content, and return string.
- *                                            * 'BLOCKS': Always handle as blocks, and return array of blocks.
- * @param  {Array}         [options.tagName]  The tag into which content will be inserted.
- * @return {Array|String}                     A list of blocks or a string, depending on `handlerMode`.
+ * @param {string}  [options.HTML]                     The HTML to convert.
+ * @param {string}  [options.plainText]                Plain text version.
+ * @param {string}  [options.mode]                     Handle content as blocks or inline content.
+ *                                                     * 'AUTO': Decide based on the content passed.
+ *                                                     * 'INLINE': Always handle as inline content, and return string.
+ *                                                     * 'BLOCKS': Always handle as blocks, and return array of blocks.
+ * @param {Array}   [options.tagName]                  The tag into which content will be inserted.
+ * @param {boolean} [options.canUserUseUnfilteredHTML] Whether or not to user can use unfiltered HTML.
+ *
+ * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName } ) {
+export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
@@ -54,6 +59,10 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 
 		converter.setOption( 'noHeaderId', true );
 		converter.setOption( 'tables', true );
+		converter.setOption( 'omitExtraWLInCodeBlocks', true );
+		converter.setOption( 'simpleLineBreaks', true );
+
+		plainText = slackMarkdownVariantCorrector( plainText );
 
 		HTML = converter.makeHtml( plainText );
 
@@ -88,6 +97,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 			// Add semantic formatting before attributes are stripped.
 			formattingTransformer,
 			stripAttributes,
+			specialCommentConverter,
 			commentRemover,
 			createUnwrapper( ( node ) => ! isInline( node, tagName ) ),
 		] );
@@ -110,18 +120,21 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 			msListConverter,
 		] );
 
-		piece = deepFilterHTML( piece, [
-			listMerger,
+		piece = deepFilterHTML( piece, compact( [
+			listReducer,
 			imageCorrector,
 			// Add semantic formatting before attributes are stripped.
 			formattingTransformer,
 			stripAttributes,
+			specialCommentConverter,
 			commentRemover,
+			! canUserUseUnfilteredHTML && createUnwrapper( ( element ) => element.nodeName === 'IFRAME' ),
+			embeddedContentReducer,
 			createUnwrapper( isNotWhitelisted ),
 			blockquoteNormaliser,
 			tableNormaliser,
 			inlineContentConverter,
-		] );
+		] ) );
 
 		piece = deepFilterHTML( piece, [
 			createUnwrapper( isInvalidInline ),

@@ -34,8 +34,7 @@ class Admin_Test extends WP_UnitTestCase {
 	/**
 	 * Set up before class.
 	 */
-	public static function setUpBeforeClass() {
-
+	public static function wpSetUpBeforeClass() {
 		self::$editor_user_id      = self::factory()->user->create( array(
 			'role' => 'editor',
 		) );
@@ -47,13 +46,12 @@ class Admin_Test extends WP_UnitTestCase {
 			'post_title'   => 'Example',
 			'post_content' => 'Tester',
 		) );
-		return parent::setUpBeforeClass();
 	}
 
 	/**
 	 * Tests gutenberg_can_edit_post().
 	 *
-	 * @covers gutenberg_can_edit_post
+	 * @covers ::gutenberg_can_edit_post
 	 */
 	function test_gutenberg_can_edit_post() {
 		$this->assertFalse( gutenberg_can_edit_post( -1 ) );
@@ -82,7 +80,7 @@ class Admin_Test extends WP_UnitTestCase {
 	/**
 	 * Tests gutenberg_post_has_blocks().
 	 *
-	 * @covers gutenberg_post_has_blocks
+	 * @covers ::gutenberg_post_has_blocks
 	 */
 	function test_gutenberg_post_has_blocks() {
 		$this->assertTrue( gutenberg_post_has_blocks( self::$post_with_blocks ) );
@@ -92,7 +90,7 @@ class Admin_Test extends WP_UnitTestCase {
 	/**
 	 * Tests gutenberg_content_has_blocks().
 	 *
-	 * @covers gutenberg_content_has_blocks
+	 * @covers ::gutenberg_content_has_blocks
 	 */
 	function test_gutenberg_content_has_blocks() {
 		$content_with_blocks    = get_post_field( 'post_content', self::$post_with_blocks );
@@ -105,7 +103,7 @@ class Admin_Test extends WP_UnitTestCase {
 	/**
 	 * Tests gutenberg_add_gutenberg_post_state().
 	 *
-	 * @covers gutenberg_add_gutenberg_post_state
+	 * @covers ::gutenberg_add_gutenberg_post_state
 	 */
 	function test_add_gutenberg_post_state() {
 		// With blocks.
@@ -120,7 +118,7 @@ class Admin_Test extends WP_UnitTestCase {
 	/**
 	 * Test that the revisions 'return to editor' links are set correctly for Classic & Gutenberg editors.
 	 *
-	 * @covers gutenberg_revisions_link_to_editor
+	 * @covers ::gutenberg_revisions_link_to_editor
 	 */
 	function test_gutenberg_revisions_link_to_editor() {
 		global $pagenow;

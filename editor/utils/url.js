@@ -4,34 +4,34 @@
 import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Returns the Post's Edit URL
+ * Returns the Post's Edit URL.
  *
- * @param  {Number} postId  Post ID
+ * @param {number} postId Post ID.
  *
- * @return {String}         URL
+ * @return {string} Post edit URL.
  */
 export function getPostEditUrl( postId ) {
 	return getWPAdminURL( 'post.php', { post: postId, action: 'edit' } );
 }
 
 /**
- * Returns the url of a WPAdmin Page
+ * Returns the URL of a WPAdmin Page.
  *
- * @param  {String} page   page to navigate to
- * @param  {Object} query  Query Args
+ * @param {string} page  Page to navigate to.
+ * @param {Object} query Query Args.
  *
- * @return {String}        URL
+ * @return {string} WPAdmin URL.
  */
 export function getWPAdminURL( page, query ) {
 	return addQueryArgs( page, query );
 }
 
 /**
- * Returns a url for display
+ * Returns a URL for display.
  *
- * @param  {String} url    Original url
+ * @param {string} url Original URL.
  *
- * @return {String}        Displayed URL
+ * @return {string} Displayed URL.
  */
 export function filterURLForDisplay( url ) {
 	// remove protocol and www prefixes

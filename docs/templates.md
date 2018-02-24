@@ -15,7 +15,7 @@ Planned additions:
 
 ## API
 
-Tempates can be declared in JS or in PHP as an array of blockTypes (block name and optional attributes).
+Templates can be declared in JS or in PHP as an array of blockTypes (block name and optional attributes).
 
 ```js
 const template = [
@@ -68,3 +68,20 @@ Sometimes the intention might be to lock the template on the UI so that the bloc
 
 - `all` — prevents all operations.
 - `insert` — prevents inserting new blocks, but allows moving existing ones.
+
+## Existing Post Types
+
+It is also possible to assign a template to an existing post type like "posts" and "pages":
+
+```php
+function my_add_template_to_posts() {
+	$post_type_object = get_post_type_object( 'post' );
+	$post_type_object->template = array(
+		array( 'core/paragraph', array(
+			'placeholder' => 'Add Description...',
+		) ),
+	);
+	$post_type_object->template_lock = 'all';
+}
+add_action( 'init', 'my_add_template_to_posts' );
+```

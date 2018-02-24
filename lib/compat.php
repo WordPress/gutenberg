@@ -70,60 +70,6 @@ function _gutenberg_utf8_split( $str ) {
 }
 
 /**
- * Fixes a conflict with the Jetpack plugin trying to read an undefined global
- * variable `grunionEditorView` during the initialization of the
- * `core/freeform` block.
- *
- * @since 0.7.1
- */
-function gutenberg_fix_jetpack_freeform_block_conflict() {
-	if (
-		defined( 'JETPACK__VERSION' ) &&
-		version_compare( JETPACK__VERSION, '5.2.2', '<' )
-	) {
-		remove_filter(
-			'mce_external_plugins',
-			array( 'Grunion_Editor_View', 'mce_external_plugins' )
-		);
-	}
-}
-
-/**
- * Shims wp-api-request for WordPress installations not running 4.9-alpha or
- * newer.
- *
- * @see https://core.trac.wordpress.org/ticket/40919
- *
- * @since 0.10.0
- */
-function gutenberg_ensure_wp_api_request() {
-	if ( wp_script_is( 'wp-api-request', 'registered' ) ||
-			! wp_script_is( 'wp-api-request-shim', 'registered' ) ) {
-		return;
-	}
-
-	global $wp_scripts;
-
-	// Define script using existing shim. We do this because we must define the
-	// vendor script in client-assets.php, but want to use consistent handle.
-	$shim = $wp_scripts->registered['wp-api-request-shim'];
-	wp_register_script(
-		'wp-api-request',
-		$shim->src,
-		$shim->deps,
-		$shim->ver
-	);
-
-	// Localize wp-api-request using wp-api handle data (swapped in 4.9-alpha).
-	$wp_api_localized_data = $wp_scripts->get_data( 'wp-api', 'data' );
-	if ( false !== $wp_api_localized_data ) {
-		wp_add_inline_script( 'wp-api-request', $wp_api_localized_data, 'before' );
-	}
-}
-add_action( 'wp_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
-add_action( 'admin_enqueue_scripts', 'gutenberg_ensure_wp_api_request', 20 );
-
-/**
  * Disables wpautop behavior in classic editor when post contains blocks, to
  * prevent removep from invalidating paragraph blocks.
  *
@@ -251,3 +197,49 @@ function gutenberg_register_rest_api_post_type_capabilities() {
 	);
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities' );
+
+/**
+ * Make sure oEmbed REST Requests apply the WP Embed security mechanism for WordPress embeds.
+ *
+ * @see  https://core.trac.wordpress.org/ticket/32522
+ *
+ * TODO: This is a temporary solution. Next step would be to edit the WP_oEmbed_Controller,
+ * once merged into Core.
+ *
+ * @since 2.3.0
+ *
+ * @param  WP_HTTP_Response|WP_Error $response The REST Request response.
+ * @param  WP_REST_Server            $handler  ResponseHandler instance (usually WP_REST_Server).
+ * @param  WP_REST_Request           $request  Request used to generate the response.
+ * @return WP_HTTP_Response|object|WP_Error    The REST Request response.
+ */
+function gutenberg_filter_oembed_result( $response, $handler, $request ) {
+	if ( 'GET' !== $request->get_method() ) {
+		return $response;
+	}
+
+	if ( is_wp_error( $response ) && 'oembed_invalid_url' !== $response->get_error_code() ) {
+		return $response;
+	}
+
+	// External embeds.
+	if ( '/oembed/1.0/proxy' === $request->get_route() ) {
+		if ( is_wp_error( $response ) ) {
+			// It's possibly a local post, so lets try and retrieve it that way.
+			$post_id = url_to_postid( $_GET['url'] );
+			$data    = get_oembed_response_data( $post_id, apply_filters( 'oembed_default_width', 600 ) );
+
+			if ( ! $data ) {
+				// Not a local post, return the original error.
+				return $response;
+			}
+			$response = (object) $data;
+		}
+
+		// Make sure the HTML is run through the oembed sanitisation routines.
+		$response->html = wp_oembed_get( $_GET['url'], $_GET );
+	}
+
+	return $response;
+}
+add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );

@@ -9,6 +9,7 @@
                 "Embedded content from reddit"
             ]
         },
-        "originalContent": "<figure class=\"wp-block-embed-reddit\">\n    https://reddit.com/\n    <figcaption>Embedded content from reddit</figcaption>\n</figure>"
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-embed-reddit wp-block-embed\">\n    https://reddit.com/\n    <figcaption>Embedded content from reddit</figcaption>\n</figure>"
     }
 ]

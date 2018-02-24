@@ -2,14 +2,9 @@
  * Internal dependencies
  */
 import {
-	focusBlock,
 	replaceBlocks,
 	startTyping,
 	stopTyping,
-	requestMetaBoxUpdates,
-	handleMetaBoxReload,
-	metaBoxStateChanged,
-	initializeMetaBoxState,
 	fetchReusableBlocks,
 	updateReusableBlock,
 	saveReusableBlock,
@@ -19,7 +14,6 @@ import {
 	toggleSelection,
 	setupEditor,
 	resetPost,
-	setupNewPost,
 	resetBlocks,
 	updateBlockAttributes,
 	updateBlock,
@@ -43,17 +37,12 @@ import {
 	removeBlocks,
 	removeBlock,
 	toggleBlockMode,
-	toggleSidebar,
-	setActivePanel,
-	toggleSidebarPanel,
 	createNotice,
 	createSuccessNotice,
 	createInfoNotice,
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
-	metaBoxLoaded,
-	toggleFeature,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -80,18 +69,6 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
-
-	describe( 'setupNewPost', () => {
-		it( 'should return the SETUP_NEW_POST action', () => {
-			const edits = {};
-			const result = setupNewPost( edits );
-			expect( result ).toEqual( {
-				type: 'SETUP_NEW_POST',
-				edits,
-			} );
-		} );
-	} );
-
 	describe( 'resetBlocks', () => {
 		it( 'should return the RESET_BLOCKS actions', () => {
 			const blocks = [];
@@ -129,26 +106,13 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'focusBlock', () => {
-		it( 'should return the UPDATE_FOCUS action', () => {
-			const focusConfig = {
-				editable: 'cite',
-			};
-
-			expect( focusBlock( 'chicken', focusConfig ) ).toEqual( {
-				type: 'UPDATE_FOCUS',
-				uid: 'chicken',
-				config: focusConfig,
-			} );
-		} );
-	} );
-
 	describe( 'selectBlock', () => {
 		it( 'should return the SELECT_BLOCK action', () => {
 			const uid = 'my-uid';
-			const result = selectBlock( uid );
+			const result = selectBlock( uid, -1 );
 			expect( result ).toEqual( {
 				type: 'SELECT_BLOCK',
+				initialPosition: -1,
 				uid,
 			} );
 		} );
@@ -222,11 +186,11 @@ describe( 'actions', () => {
 			const block = {
 				uid: 'ribs',
 			};
-			const position = 5;
-			expect( insertBlock( block, position ) ).toEqual( {
+			const index = 5;
+			expect( insertBlock( block, index ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks: [ block ],
-				position,
+				index,
 			} );
 		} );
 	} );
@@ -236,20 +200,19 @@ describe( 'actions', () => {
 			const blocks = [ {
 				uid: 'ribs',
 			} ];
-			const position = 3;
-			expect( insertBlocks( blocks, position ) ).toEqual( {
+			const index = 3;
+			expect( insertBlocks( blocks, index ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks,
-				position,
+				index,
 			} );
 		} );
 	} );
 
 	describe( 'showInsertionPoint', () => {
 		it( 'should return the SHOW_INSERTION_POINT action', () => {
-			expect( showInsertionPoint( 1 ) ).toEqual( {
+			expect( showInsertionPoint() ).toEqual( {
 				type: 'SHOW_INSERTION_POINT',
-				index: 1,
 			} );
 		} );
 	} );
@@ -294,15 +257,11 @@ describe( 'actions', () => {
 
 	describe( 'mergeBlocks', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
-			const blockA = {
-				uid: 'blockA',
-			};
-			const blockB = {
-				uid: 'blockB',
-			};
-			expect( mergeBlocks( blockA, blockB ) ).toEqual( {
+			const blockAUid = 'blockA';
+			const blockBUid = 'blockB';
+			expect( mergeBlocks( blockAUid, blockBUid ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
-				blocks: [ blockA, blockB ],
+				blocks: [ blockAUid, blockBUid ],
 			} );
 		} );
 	} );
@@ -375,34 +334,6 @@ describe( 'actions', () => {
 		it( 'should return the STOP_TYPING action', () => {
 			expect( stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
-			} );
-		} );
-	} );
-
-	describe( 'toggleSidebar', () => {
-		it( 'should return TOGGLE_SIDEBAR action', () => {
-			expect( toggleSidebar( 'publish', true ) ).toEqual( {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'publish',
-				forcedValue: true,
-			} );
-		} );
-	} );
-
-	describe( 'setActivePanel', () => {
-		const panel = 'panelName';
-		expect( setActivePanel( panel ) ).toEqual( {
-			type: 'SET_ACTIVE_PANEL',
-			panel,
-		} );
-	} );
-
-	describe( 'toggleSidebarPanel', () => {
-		it( 'should return TOGGLE_SIDEBAR_PANEL action', () => {
-			const panel = 'panelName';
-			expect( toggleSidebarPanel( panel ) ).toEqual( {
-				type: 'TOGGLE_SIDEBAR_PANEL',
-				panel,
 			} );
 		} );
 	} );
@@ -511,69 +442,6 @@ describe( 'actions', () => {
 			expect( removeNotice( noticeId ) ).toEqual( {
 				type: 'REMOVE_NOTICE',
 				noticeId,
-			} );
-		} );
-	} );
-
-	describe( 'metaBoxLoaded', () => {
-		it( 'should return META_BOX_LOADED action', () => {
-			const location = 'normal';
-			expect( metaBoxLoaded( location ) ).toEqual( {
-				type: 'META_BOX_LOADED',
-				location,
-			} );
-		} );
-	} );
-
-	describe( 'toggleFeature', () => {
-		it( 'should return TOGGLE_FEATURE action', () => {
-			const feature = 'name';
-			expect( toggleFeature( feature ) ).toEqual( {
-				type: 'TOGGLE_FEATURE',
-				feature,
-			} );
-		} );
-	} );
-
-	describe( 'requestMetaBoxUpdates', () => {
-		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
-			expect( requestMetaBoxUpdates( [ 'normal' ] ) ).toEqual( {
-				type: 'REQUEST_META_BOX_UPDATES',
-				locations: [ 'normal' ],
-			} );
-		} );
-	} );
-
-	describe( 'handleMetaBoxReload', () => {
-		it( 'should return the HANDLE_META_BOX_RELOAD action with a location and node', () => {
-			expect( handleMetaBoxReload( 'normal' ) ).toEqual( {
-				type: 'HANDLE_META_BOX_RELOAD',
-				location: 'normal',
-			} );
-		} );
-	} );
-
-	describe( 'metaBoxStateChanged', () => {
-		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
-			expect( metaBoxStateChanged( 'normal', true ) ).toEqual( {
-				type: 'META_BOX_STATE_CHANGED',
-				location: 'normal',
-				hasChanged: true,
-			} );
-		} );
-	} );
-
-	describe( 'initializeMetaBoxState', () => {
-		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
-			const metaBoxes = {
-				side: true,
-				normal: true,
-				advanced: false,
-			};
-
-			expect( initializeMetaBoxState( metaBoxes ) ).toEqual( {
-				type: 'INITIALIZE_META_BOX_STATE',
-				metaBoxes,
 			} );
 		} );
 	} );

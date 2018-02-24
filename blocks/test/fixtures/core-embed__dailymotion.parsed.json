@@ -5,7 +5,7 @@
             "url": "https://dailymotion.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-dailymotion\">\n    https://dailymotion.com/\n    <figcaption>Embedded content from dailymotion</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-dailymotion wp-block-embed\">\n    https://dailymotion.com/\n    <figcaption>Embedded content from dailymotion</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},
