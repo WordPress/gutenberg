@@ -19,7 +19,7 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { withFilters, withContext, withAPIData } from '@wordpress/components';
+import { withFilters, withContext, withAPIData, withSafeTimeout, withDragging, } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -122,6 +122,7 @@ export class BlockListBlock extends Component {
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
+		this.setDraggingState = this.setDraggingState.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -434,6 +435,10 @@ export class BlockListBlock extends Component {
 		this.setState( { error } );
 	}
 
+	setDraggingState( dragging ) {
+		this.setState( { dragging } );
+	}
+
 	onDragStart( event ) {
 		this.props.onDragStart(
 			event,
@@ -442,18 +447,12 @@ export class BlockListBlock extends Component {
 			this.props.order,
 			BLOCK_REORDER
 		);
-		// Following fires after the events in props.onDragStart.
-		setTimeout( () => {
-			this.setState( { dragging: true } );
-		}, 0 );
+		this.props.setTimeout( () => this.setDraggingState( true ), 0 );
 	}
 
 	onDragEnd( event ) {
 		this.props.onDragEnd( event );
-		// Following fires after the events in props.onDragStart.
-		setTimeout( () => {
-			this.setState( { dragging: false } );
-		}, 0 );
+		this.setDraggingState( false );
 	}
 
 	/*
@@ -465,10 +464,7 @@ export class BlockListBlock extends Component {
 	 */
 	reorderBlock( event, uid, toIndex ) {
 		this.onDragEnd( event );
-		// Following fires after the events in props.onDragEnd.
-		setTimeout( () => {
-			this.props.moveBlockToIndex( uid, toIndex );
-		}, 300 );
+		this.props.moveBlockToIndex( uid, toIndex );
 	}
 
 	selectOnOpen( open ) {
@@ -779,4 +775,6 @@ export default compose(
 	withAPIData( ( { postType } ) => ( {
 		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	} ) ),
+	withSafeTimeout,
+	withDragging,
 )( BlockListBlock );

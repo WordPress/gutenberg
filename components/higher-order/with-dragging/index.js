@@ -2,11 +2,17 @@
  * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
+import { withSafeTimeout } from '@wordpress/components';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
+
+const dragImageClass = 'components-with-dragging__invisible-drag-image';
+const cloneWrapperClass = 'components-with-dragging__clone';
+const cloneHeightTransformationBreakpoint = 700;
+const clonePadding = 20;
 
 const withDragging = ( OriginalComponent ) => {
 	class Draggable extends Component {
@@ -18,16 +24,8 @@ const withDragging = ( OriginalComponent ) => {
 			this.onDragEnd = this.onDragEnd.bind( this );
 			this.cursorTop = null;
 			this.cursorLeft = null;
-			this.config = {
-				dragImageClass: 'components-with-dragging__invisible-drag-image',
-				cloneWrapperClass: 'components-with-dragging__clone',
-				cloneHeightTransformationBreakpoint: 700,
-				clonePadding: 20,
-			};
-			this.state = {
-				cloneNodeId: null,
-				elementId: null,
-			};
+			this.cloneNodeId = null;
+			this.elementId = null;
 		}
 
 		/**
@@ -35,9 +33,8 @@ const withDragging = ( OriginalComponent ) => {
 		 * @param  {Object} event     The non-custom DragEvent.
 		 */
 		onDragEnd( event ) {
-			const { elementId, cloneNodeId } = this.state;
-			const element = document.getElementById( elementId );
-			const cloneWrapper = document.getElementById( cloneNodeId );
+			const element = document.getElementById( this.elementId );
+			const cloneWrapper = document.getElementById( this.cloneNodeId );
 
 			if ( element && cloneWrapper ) {
 				// Remove clone.
@@ -47,7 +44,8 @@ const withDragging = ( OriginalComponent ) => {
 			// Reset cursor.
 			document.body.classList.remove( 'dragging' );
 
-			this.setState( { elementId: null, cloneNodeId: null } );
+			this.elementId = null;
+			this.cloneNodeId = null;
 
 			document.removeEventListener( 'dragover', this.onDragOver );
 			event.stopPropagation();
@@ -58,8 +56,7 @@ const withDragging = ( OriginalComponent ) => {
 		 * @param  {Object} event     The non-custom DragEvent.
 		 */
 		onDragOver( event ) {
-			const { cloneNodeId } = this.state;
-			const cloneWrapper = document.getElementById( cloneNodeId );
+			const cloneWrapper = document.getElementById( this.cloneNodeId );
 
 			cloneWrapper.style.top =
 				`${ parseInt( cloneWrapper.style.top, 10 ) + parseInt( event.clientY, 10 ) - parseInt( this.cursorTop, 10 ) }px`;
@@ -90,15 +87,15 @@ const withDragging = ( OriginalComponent ) => {
 			const elementLeftOffset = parseInt( elementRect.left, 10 );
 			const clone = element.cloneNode( true );
 			const cloneWrapper = document.createElement( 'div' );
-			const cloneNodeId = `clone-wrapper-${ element.id }`;
 			const dragImage = document.createElement( 'div' );
 
-			this.setState( { cloneNodeId, elementId } );
+			this.elementId = elementId;
+			this.cloneNodeId = `clone-wrapper-${ this.elementId }`;
 
 			// Set a fake drag image to avoid browser defaults. Remove from DOM right after.
 			if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-				dragImage.id = `drag-image-${ element.id }`;
-				dragImage.classList.add( this.config.dragImageClass );
+				dragImage.id = `drag-image-${ this.elementId }`;
+				dragImage.classList.add( dragImageClass );
 				document.body.appendChild( dragImage );
 				event.dataTransfer.setDragImage( dragImage, 0, 0 );
 				setTimeout( ( ( _dragImage ) => () => {
@@ -111,17 +108,17 @@ const withDragging = ( OriginalComponent ) => {
 				JSON.stringify( {
 					uid: uid,
 					fromIndex: order,
-					type: type
+					type: type,
 				} )
 			);
 
 			// Prepare element clone and append to element wrapper.
-			clone.id = `clone-${ element.id }`;
-			cloneWrapper.id = cloneNodeId;
-			cloneWrapper.classList.add( this.config.cloneWrapperClass );
-			cloneWrapper.style.width = `${ elementRect.width + ( this.config.clonePadding * 2 ) }px`;
+			clone.id = `clone-${ this.elementId }`;
+			cloneWrapper.id = this.cloneNodeId;
+			cloneWrapper.classList.add( cloneWrapperClass );
+			cloneWrapper.style.width = `${ elementRect.width + ( clonePadding * 2 ) }px`;
 
-			if ( elementRect.height > this.config.cloneHeightTransformationBreakpoint ) {
+			if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
 				// Scale down clone if original element is larger than 700px.
 				cloneWrapper.style.transform = 'scale(0.5)';
 				cloneWrapper.style.transformOrigin = 'top left';
@@ -130,8 +127,8 @@ const withDragging = ( OriginalComponent ) => {
 				cloneWrapper.style.left = `${ parseInt( event.clientX, 10 ) }px`;
 			} else {
 				// Position clone right over the original element (20px padding).
-				cloneWrapper.style.top = `${ elementTopOffset - this.config.clonePadding }px`;
-				cloneWrapper.style.left = `${ elementLeftOffset - this.config.clonePadding }px`;
+				cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
+				cloneWrapper.style.left = `${ elementLeftOffset - clonePadding }px`;
 			}
 
 			cloneWrapper.appendChild( clone );
@@ -158,6 +155,6 @@ const withDragging = ( OriginalComponent ) => {
 	}
 
 	return Draggable;
-};
+};	
 
 export default withDragging;

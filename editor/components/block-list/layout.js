@@ -21,7 +21,6 @@ import 'element-closest';
  */
 import { Component } from '@wordpress/element';
 import { serialize, getDefaultBlockName } from '@wordpress/blocks';
-import { withDragging } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -255,8 +254,6 @@ class BlockListLayout extends Component {
 			isGroupedByLayout,
 			rootUID,
 			renderBlockMenu,
-			onDragStart,
-			onDragEnd,
 		} = this.props;
 
 		let defaultLayout;
@@ -282,8 +279,6 @@ class BlockListLayout extends Component {
 						isFirst={ blockIndex === 0 }
 						isLast={ blockIndex === blocks.length - 1 }
 						renderBlockMenu={ renderBlockMenu }
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
 					/>
 				) ) }
 				{ ( ! blocks.length || ! isLastBlockDefault ) && (
@@ -325,4 +320,4 @@ export default connect(
 			dispatch( { type: 'REMOVE_BLOCKS', uids } );
 		},
 	} )
-)( withDragging( BlockListLayout ) );
+)( BlockListLayout );
