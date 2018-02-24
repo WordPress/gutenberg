@@ -159,7 +159,7 @@ export const name = 'core/block';
 
 export const settings = {
 	title: __( 'Reusable Block' ),
-	category: 'reusable-blocks',
+	category: 'saved',
 	isPrivate: true,
 
 	attributes: {

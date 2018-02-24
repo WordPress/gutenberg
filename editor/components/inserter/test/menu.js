@@ -69,7 +69,7 @@ const reusableItem = {
 	name: 'core/block',
 	initialAttributes: { ref: 123 },
 	title: 'My reusable block',
-	category: 'reusable-blocks',
+	category: 'saved',
 	isDisabled: false,
 };
 
