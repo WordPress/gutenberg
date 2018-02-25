@@ -20,7 +20,7 @@ function ShortcodePreview( { response } ) {
 		);
 	}
 
-	const html = response.data.html + ' ' + response.data.js + ' ' + response.data.style;
+	const html = response.data.head_scripts_styles + ' ' + response.data.html + ' ' + response.data.footer_scripts_styles;
 	return (
 		<figure className="wp-block-embed" key="embed">
 			<SandBox
