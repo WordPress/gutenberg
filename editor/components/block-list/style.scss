@@ -42,6 +42,10 @@
 	&.is-hidden > * {
 		visibility: hidden;
 	}
+
+	.editor-block-list__block-edit .reusable-block-edit-panel * {
+		z-index: z-index( '.editor-block-list__block-edit .reusable-block-edit-panel *' );
+	}
 }
 
 .edit-post-visual-editor .editor-block-list__block {
