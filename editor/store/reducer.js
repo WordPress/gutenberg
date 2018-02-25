@@ -312,13 +312,13 @@ export const editor = flow( [
 					action.index = subState.length - 1;
 				}
 
-				const _state = [ ...subState ];
+				const nextSubState = [ ...subState ];
 
-				_state.splice( action.index, 0, _state.splice( blockIndex, 1 )[ 0 ] );
+				nextSubState.splice( action.index, 0, nextSubState.splice( blockIndex, 1 )[ 0 ] );
 
 				return {
 					...state,
-					[ rootUID ]: _state,
+					[ rootUID ]: nextSubState,
 				};
 			}
 
