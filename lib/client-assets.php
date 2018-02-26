@@ -568,23 +568,11 @@ function gutenberg_extend_wp_api_backbone_client() {
 	$script  = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
 	$script .= sprintf( 'wp.api.taxonomyRestBaseMapping = %s;', wp_json_encode( $taxonomy_rest_base_mapping ) );
 	$script .= <<<JS
-		wp.api.getPostTypeModel = function( postType ) {
-			var route = '/' + wpApiSettings.versionString + this.postTypeRestBaseMapping[ postType ] + '/(?P<id>[\\\\d]+)';
-			return _.find( wp.api.models, function( model ) {
-				return model.prototype.route && route === model.prototype.route.index;
-			} );
+		wp.api.getPostTypeRoute = function( postType ) {
+			return wp.api.postTypeRestBaseMapping[ postType ];
 		};
-		wp.api.getTaxonomyModel = function( taxonomy ) {
-			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ] + '/(?P<id>[\\\\d]+)';
-			return _.find( wp.api.models, function( model ) {
-				return model.prototype.route && route === model.prototype.route.index;
-			} );
-		};
-		wp.api.getTaxonomyCollection = function( taxonomy ) {
-			var route = '/' + wpApiSettings.versionString + this.taxonomyRestBaseMapping[ taxonomy ];
-			return _.find( wp.api.collections, function( model ) {
-				return model.prototype.route && route === model.prototype.route.index;
-			} );
+		wp.api.getTaxonomyRoute = function( taxonomy ) {
+			return wp.api.taxonomyRestBaseMapping[ taxonomy ];
 		};
 JS;
 	wp_add_inline_script( 'wp-api', $script );

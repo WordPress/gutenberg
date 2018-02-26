@@ -494,10 +494,9 @@ describe( 'effects', () => {
 					},
 				] );
 
-				set( global, 'wp.api.collections.Blocks', class {
-					fetch() {
-						return promise;
-					}
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => {
+					return promise;
 				} );
 
 				const dispatch = jest.fn();
@@ -525,29 +524,19 @@ describe( 'effects', () => {
 			it( 'should fetch a single reusable block', () => {
 				const id = 123;
 
-				let modelAttributes;
 				const promise = Promise.resolve( {
 					id,
 					title: 'My cool block',
 					content: '<!-- wp:core/test-block {"name":"Big Bird"} /-->',
 				} );
-
-				set( global, 'wp.api.models.Blocks', class {
-					constructor( attributes ) {
-						modelAttributes = attributes;
-					}
-
-					fetch() {
-						return promise;
-					}
-				} );
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => promise );
 
 				const dispatch = jest.fn();
 				const store = { getState: () => {}, dispatch };
 
 				handler( fetchReusableBlocks( id ), store );
 
-				expect( modelAttributes ).toEqual( { id } );
 				return promise.then( () => {
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
@@ -568,12 +557,8 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-
-				set( global, 'wp.api.collections.Blocks', class {
-					fetch() {
-						return promise;
-					}
-				} );
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => promise );
 
 				const dispatch = jest.fn();
 				const store = { getState: () => {}, dispatch };
@@ -598,15 +583,10 @@ describe( 'effects', () => {
 			it( 'should save a reusable block and swaps its id', () => {
 				let modelAttributes;
 				const promise = Promise.resolve( { id: 3 } );
-
-				set( global, 'wp.api.models.Blocks', class {
-					constructor( attributes ) {
-						modelAttributes = attributes;
-					}
-
-					save() {
-						return promise;
-					}
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', ( request ) => {
+					modelAttributes = request.data;
+					return promise;
 				} );
 
 				const reusableBlock = createReusableBlock( 'core/test-block', {
@@ -637,12 +617,8 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-
-				set( global, 'wp.api.models.Blocks', class {
-					save() {
-						return promise;
-					}
-				} );
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => promise );
 
 				const reusableBlock = createReusableBlock( 'core/test-block', {
 					name: 'Big Bird',
@@ -670,18 +646,9 @@ describe( 'effects', () => {
 			const handler = effects.DELETE_REUSABLE_BLOCK;
 
 			it( 'should delete a reusable block', () => {
-				let modelAttributes;
 				const promise = Promise.resolve( {} );
-
-				set( global, 'wp.api.models.Blocks', class {
-					constructor( attributes ) {
-						modelAttributes = attributes;
-					}
-
-					destroy() {
-						return promise;
-					}
-				} );
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => promise );
 
 				const id = 123;
 
@@ -706,7 +673,6 @@ describe( 'effects', () => {
 					associatedBlockUids: [ associatedBlock.uid ],
 					optimist: expect.any( Object ),
 				} );
-				expect( modelAttributes ).toEqual( { id } );
 				return promise.then( () => {
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
@@ -718,12 +684,8 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-
-				set( global, 'wp.api.models.Blocks', class {
-					destroy() {
-						return promise;
-					}
-				} );
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => promise );
 
 				const state = reducer( undefined, updateReusableBlock( 123, {} ) );
 

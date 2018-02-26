@@ -3,6 +3,7 @@
  */
 import { parse } from 'url';
 import { includes, kebabCase, toLower } from 'lodash';
+import { stringify } from 'querystring';
 
 /**
  * WordPress dependencies
@@ -10,7 +11,6 @@ import { includes, kebabCase, toLower } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
-import { addQueryArgs } from '@wordpress/url';
 import classnames from 'classnames';
 
 /**
@@ -109,38 +109,31 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				}
 				const { url } = this.props.attributes;
 				const { setAttributes } = this.props;
-				const apiURL = addQueryArgs( wpApiSettings.root + 'oembed/1.0/proxy', {
-					url: url,
-					_wpnonce: wpApiSettings.nonce,
-				} );
 
 				this.setState( { error: false, fetching: true } );
-				window.fetch( apiURL, {
-					credentials: 'include',
-				} ).then(
-					( response ) => {
+				wp.apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ).then(
+					( obj ) => {
 						if ( this.unmounting ) {
 							return;
 						}
-						response.json().then( ( obj ) => {
-							const { html, provider_name: providerName } = obj;
-							const providerNameSlug = kebabCase( toLower( providerName ) );
-							let { type } = obj;
 
-							if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
-								type = 'wp-embed';
-							}
-							if ( html ) {
-								this.setState( { html, type, providerNameSlug } );
-								setAttributes( { type, providerNameSlug } );
-							} else if ( 'photo' === type ) {
-								this.setState( { html: this.getPhotoHtml( obj ), type, providerNameSlug } );
-								setAttributes( { type, providerNameSlug } );
-							} else {
-								this.setState( { error: true } );
-							}
-							this.setState( { fetching: false } );
-						} );
+						const { html, provider_name: providerName } = obj;
+						const providerNameSlug = kebabCase( toLower( providerName ) );
+						let { type } = obj;
+
+						if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
+							type = 'wp-embed';
+						}
+						if ( html ) {
+							this.setState( { html, type, providerNameSlug } );
+							setAttributes( { type, providerNameSlug } );
+						} else if ( 'photo' === type ) {
+							this.setState( { html: this.getPhotoHtml( obj ), type, providerNameSlug } );
+							setAttributes( { type, providerNameSlug } );
+						} else {
+							this.setState( { error: true } );
+						}
+						this.setState( { fetching: false } );
 					}
 				);
 			}

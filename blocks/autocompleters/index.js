@@ -108,7 +108,7 @@ export function blockAutocompleter( { onReplace } ) {
  */
 export function userAutocompleter() {
 	const getOptions = () => {
-		return ( new wp.api.collections.Users() ).fetch().then( ( users ) => {
+		return wp.apiRequest( { path: '/wp/v2/users' } ).then( ( users ) => {
 			return users.map( ( user ) => {
 				return {
 					value: user,

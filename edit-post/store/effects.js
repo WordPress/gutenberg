@@ -72,15 +72,14 @@ const effects = {
 			.concat( jQuery( '.metabox-base-form' ).serialize() )
 			.concat( additionalData )
 			.join( '&' );
-		const fetchOptions = {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: formData,
-			credentials: 'include',
-		};
 
 		// Save the metaboxes
-		window.fetch( window._wpMetaBoxUrl, fetchOptions )
+		wp.apiRequest( {
+			url: window._wpMetaBoxUrl,
+			method: 'POST',
+			contentType: 'application/x-www-form-urlencoded',
+			data: formData,
+		} )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 };
