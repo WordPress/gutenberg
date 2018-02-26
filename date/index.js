@@ -14,8 +14,9 @@ const momentTimezone = {
 };
 moment.tz.add( moment.tz.pack( momentTimezone ) );
 
-// Create a new wpmoment object attaching the timezone and cloning
-// so it does not change the global moment timezone.
+// Create a new wpmoment object which mirrors moment but includes
+// the attached timezone, instead of setting a default timezone on
+// the global moment object.
 export const wpmoment = ( ...args ) => {
 	return moment.tz( ...args, 'WP' );
 };
