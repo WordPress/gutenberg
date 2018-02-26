@@ -379,12 +379,23 @@ export const settings = {
 	edit: ParagraphBlock,
 
 	save( { attributes } ) {
-		const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+		const {
+			width,
+			align,
+			content,
+			dropCap,
+			backgroundColor,
+			textColor,
+			textClass,
+			fontSize,
+		} = attributes;
+
 		const className = classnames( {
 			[ `align${ width }` ]: width,
 			'has-background': backgroundColor,
 			'has-drop-cap': dropCap,
-		} );
+		}, textClass );
+
 		const styles = {
 			backgroundColor: backgroundColor,
 			color: textColor,
