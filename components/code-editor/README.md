@@ -2,7 +2,7 @@ CodeEditor
 =======
 
 CodeEditor is a React component that provides the user with a code editor
-that has syntax highliting and linting.
+that has syntax highlighting and linting.
 
 The components acts as a drop-in replacement for a <textarea>, and uses the
 CodeMirror library that is provided as part of WordPress Core.
@@ -16,7 +16,7 @@ function editCode() {
 	return (
 		<CodeEditor
 			value={ '<p>This is some <b>HTML</b> code that will have syntax highlighting!</p>' }
-		    onChange={ value => console.log( value ) }
+			onChange={ value => console.log( value ) }
 		/>
 	);
 }
