@@ -454,11 +454,11 @@ export default {
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
-	APPEND_DEFAULT_BLOCK( action ) {
-		const { attributes, rootUID } = action;
+	INSERT_DEFAULT_BLOCK( action ) {
+		const { attributes, rootUID, index } = action;
 		const block = createBlock( getDefaultBlockName(), attributes );
 
-		return insertBlock( block, undefined, rootUID );
+		return insertBlock( block, index, rootUID );
 	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;

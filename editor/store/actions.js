@@ -520,17 +520,19 @@ export function convertBlockToReusable( uid ) {
 }
 /**
  * Returns an action object used in signalling that a new block of the default
- * type should be appended to the block list.
+ * type should be added to the block list.
  *
  * @param {?Object} attributes Optional attributes of the block to assign.
  * @param {?string} rootUID    Optional root UID of block list to append.
+ * @param {?number} index      Optional index where to insert the default block
  *
  * @return {Object} Action object
  */
-export function appendDefaultBlock( attributes, rootUID ) {
+export function insertDefaultBlock( attributes, rootUID, index ) {
 	return {
-		type: 'APPEND_DEFAULT_BLOCK',
+		type: 'INSERT_DEFAULT_BLOCK',
 		attributes,
 		rootUID,
+		index,
 	};
 }
