@@ -72,6 +72,7 @@ export const settings = {
 				} }
 				content={ content }
 				className={ className }
+				isSelected={ isSelected }
 			/>,
 		];
 	},
