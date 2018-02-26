@@ -990,7 +990,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						edits: { date: wpmoment.add( 7, 'days' ).format( '' ) },
+						edits: { date: wpmoment().add( 7, 'days' ).format( '' ) },
 					},
 				},
 			};

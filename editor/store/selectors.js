@@ -276,7 +276,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && moment( post.date ).isBefore( wpmoment ) );
+		( post.status === 'future' && wpmoment( post.date ).isBefore( wpmoment() ) );
 }
 
 /**
@@ -331,9 +331,9 @@ export function isEditedPostEmpty( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = moment( getEditedPostAttribute( state, 'date' ) );
+	const date = wpmoment( getEditedPostAttribute( state, 'date' ) );
 	// Adding 1 minute as an error threshold between the server and the client dates.
-	const now = wpmoment.add( 1, 'minute' );
+	const now = wpmoment().add( 1, 'minute' );
 
 	return date.isAfter( now );
 }
