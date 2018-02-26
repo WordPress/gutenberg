@@ -14,6 +14,7 @@ import './hooks';
 // and then stored as objects in state, from which it is then rendered for editing.
 export * from './api';
 export * from './autocompleters';
+export * from './colors';
 
 export { default as editorMediaUpload } from './editor-media-upload';
 export { default as AlignmentToolbar } from './alignment-toolbar';

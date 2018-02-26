@@ -9,10 +9,22 @@ To opt-in for one of these features, call `add_theme_support` in the `functions.
 ```php
 function mytheme_setup_theme_supported_features() {
 	add_theme_support( 'editor-color-palette',
-		'#a156b4',
-		'#d0a5db',
-		'#eee',
-		'#444'
+		array(
+			'name' => 'strong magenta',
+			'color' => '#a156b4',
+		),
+		array(
+			'name' => 'light grayish magenta',
+			'color' => '#d0a5db',
+		),
+		array(
+			'name' => 'very light gray',
+			'color' => '#eee',
+		),
+		array(
+			'name' => 'very dark gray',
+			'color' => '#444',
+		)
 	);
 }
 
@@ -35,14 +47,40 @@ Different blocks have the possibility of customizing colors. Gutenberg provides 
 
 ```php
 add_theme_support( 'editor-color-palette',
-	'#a156b4',
-	'#d0a5db',
-	'#eee',
-	'#444'
+	array(
+		'name' => 'strong magenta',
+		'color' => '#a156b4',
+	),
+	array(
+		'name' => 'light grayish magenta',
+		'color' => '#d0a5db',
+	),
+	array(
+		'name' => 'very light gray',
+		'color' => '#eee',
+	),
+	array(
+		'name' => 'very dark gray',
+		'color' => '#444',
+	)
 );
 ```
 
 The colors will be shown in order on the palette, and there's no limit to how many can be specified.
+
+Themes are responsible for creating the classes that apply the colors in different contexts. Core blocks use "color" and "background-color" contexts. So to correctly apply "strong magenta" to all contexts of core blocks a theme should implement the following classes:
+
+```css
+.has-strong-magenta-background-color {
+	background-color: #313131;
+}
+
+.has-strong-magenta-color {
+	color: #f78da7;
+}
+```
+
+The class name is built appending 'has-', followed by the class name *using* kebab case and ending with the context name.
 
 ### Disabling custom colors in block Color Palettes
 

@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	concatChildren,
 	Component,
+	compose,
 	Fragment,
 	RawHTML,
 } from '@wordpress/element';
@@ -26,6 +27,8 @@ import {
 import {
 	createBlock,
 	blockAutocompleter,
+	getColorClass,
+	withColors,
 	userAutocompleter,
 	AlignmentToolbar,
 	BlockAlignmentToolbar,
@@ -128,6 +131,7 @@ class ParagraphBlock extends Component {
 			mergeBlocks,
 			onReplace,
 			className,
+			initializeColor,
 			fallbackBackgroundColor,
 			fallbackTextColor,
 			fallbackFontSize,
@@ -138,12 +142,20 @@ class ParagraphBlock extends Component {
 			content,
 			dropCap,
 			placeholder,
-			backgroundColor,
-			textColor,
 			width,
 		} = attributes;
 
 		const fontSize = this.getFontSize();
+		const textColor = initializeColor( {
+			colorContext: 'color',
+			colorAttribute: 'textColor',
+			customColorAttribute: 'customTextColor',
+		} );
+		const backgroundColor = initializeColor( {
+			colorContext: 'background-color',
+			colorAttribute: 'backgroundColor',
+			customColorAttribute: 'customBackgroundColor',
+		} );
 
 		return (
 			<Fragment>
@@ -200,22 +212,22 @@ class ParagraphBlock extends Component {
 							onChange={ this.toggleDropCap }
 						/>
 					</PanelBody>
-					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
+					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor.value } initialOpen={ false }>
 						<ColorPalette
-							value={ backgroundColor }
-							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
+							value={ backgroundColor.value }
+							onChange={ backgroundColor.set }
 						/>
 					</PanelColor>
-					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
+					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor.value } initialOpen={ false }>
 						<ColorPalette
-							value={ textColor }
-							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+							value={ textColor.value }
+							onChange={ textColor.set }
 						/>
 					</PanelColor>
 					<ContrastChecker
+						textColor={ textColor.value }
+						backgroundColor={ backgroundColor.value }
 						{ ...{
-							textColor,
-							backgroundColor,
 							fallbackBackgroundColor,
 							fallbackTextColor,
 						} }
@@ -232,12 +244,14 @@ class ParagraphBlock extends Component {
 					<RichText
 						tagName="p"
 						className={ classnames( 'wp-block-paragraph', className, {
-							'has-background': backgroundColor,
+							'has-background': backgroundColor.value,
 							'has-drop-cap': dropCap,
+							[ backgroundColor.class ]: backgroundColor.class,
+							[ textColor.class ]: textColor.class,
 						} ) }
 						style={ {
-							backgroundColor: backgroundColor,
-							color: textColor,
+							backgroundColor: backgroundColor.class ? undefined : backgroundColor.value,
+							color: textColor.class ? undefined : textColor.value,
 							fontSize: fontSize ? fontSize + 'px' : undefined,
 							textAlign: align,
 						} }
@@ -295,7 +309,13 @@ const schema = {
 	textColor: {
 		type: 'string',
 	},
+	customTextColor: {
+		type: 'string',
+	},
 	backgroundColor: {
+		type: 'string',
+	},
+	customBackgroundColor: {
 		type: 'string',
 	},
 	fontSize: {
@@ -345,7 +365,7 @@ export const settings = {
 				fontSize: {
 					type: 'number',
 				},
-			}, 'customFontSize' ),
+			}, 'customFontSize', 'customTextColor', 'customBackgroundColor' ),
 			save( { attributes } ) {
 				const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
 				const className = classnames( {
@@ -363,13 +383,12 @@ export const settings = {
 				return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
 			},
 			migrate( attributes ) {
-				if ( isFinite( attributes.fontSize ) ) {
-					return omit( {
-						...attributes,
-						customFontSize: attributes.fontSize,
-					}, 'fontSize' );
-				}
-				return attributes;
+				return omit( {
+					...attributes,
+					customFontSize: isFinite( attributes.fontSize ) ? attributes.fontSize : undefined,
+					customTextColor: attributes.textColor && '#' === attributes.textColor[ 0 ] ? attributes.textColor : undefined,
+					customBackgroundColor: attributes.backgroundColor && '#' === attributes.backgroundColor[ 0 ] ? attributes.backgroundColor : undefined,
+				}, [ 'fontSize', 'textColor', 'backgroundColor' ] );
 			},
 		},
 		{
@@ -408,7 +427,10 @@ export const settings = {
 		}
 	},
 
-	edit: FallbackStyles( ParagraphBlock ),
+	edit: compose(
+		withColors,
+		FallbackStyles,
+	)( ParagraphBlock ),
 
 	save( { attributes } ) {
 		const {
@@ -418,21 +440,29 @@ export const settings = {
 			dropCap,
 			backgroundColor,
 			textColor,
+			customBackgroundColor,
+			customTextColor,
 			fontSize,
 			customFontSize,
 		} = attributes;
 
+		const textClass = getColorClass( 'color', textColor );
+		const backgroundClass = getColorClass( 'background-color', backgroundColor );
+		const fontSizeClass = fontSize && FONT_SIZES[ fontSize ] && `is-${ fontSize }-text`;
+
 		const className = classnames( {
 			[ `align${ width }` ]: width,
-			'has-background': backgroundColor,
+			'has-background': backgroundColor || customBackgroundColor,
 			'has-drop-cap': dropCap,
-			[ `is-${ fontSize }-text` ]: fontSize && FONT_SIZES[ fontSize ],
+			[ fontSizeClass ]: fontSizeClass,
+			[ textClass ]: textClass,
+			[ backgroundClass ]: backgroundClass,
 		} );
 
 		const styles = {
-			backgroundColor: backgroundColor,
-			color: textColor,
-			fontSize: ! fontSize && customFontSize ? customFontSize : undefined,
+			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+			color: textClass ? undefined : customTextColor,
+			fontSize: fontSizeClass ? undefined : customFontSize,
 			textAlign: align,
 		};
 
