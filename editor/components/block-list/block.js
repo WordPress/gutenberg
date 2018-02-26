@@ -101,6 +101,7 @@ export class BlockListBlock extends Component {
 		this.onClick = this.onClick.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
+		this.updateHasEditableContent = this.updateHasEditableContent.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -140,6 +141,9 @@ export class BlockListBlock extends Component {
 			this.focusTabbable();
 		}
 
+		this.contentObserver = new window.MutationObserver( this.updateHasEditableContent );
+		this.contentObserver.observe( this.node, { childList: true, subtree: true } );
+
 		this.updateHasEditableContent();
 	}
 
@@ -169,8 +173,6 @@ export class BlockListBlock extends Component {
 			this.previousOffset = null;
 		}
 
-		this.updateHasEditableContent();
-
 		// Bind or unbind mousemove from page when user starts or stops typing
 		if ( this.props.isTyping !== prevProps.isTyping ) {
 			if ( this.props.isTyping ) {
@@ -188,6 +190,7 @@ export class BlockListBlock extends Component {
 	componentWillUnmount() {
 		this.removeStopTypingListener();
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		this.contentObserver.disconnect();
 	}
 
 	removeStopTypingListener() {
