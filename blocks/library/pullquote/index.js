@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -18,20 +13,11 @@ import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const toRichTextValue = value => map( value, ( subValue => subValue.children ) );
-const fromRichTextValue = value => map( value, ( subValue ) => ( {
-	children: subValue,
-} ) );
 const blockAttributes = {
 	value: {
 		type: 'array',
 		source: 'query',
 		selector: 'blockquote > p',
-		query: {
-			children: {
-				source: 'node',
-			},
-		},
 	},
 	citation: {
 		type: 'array',
@@ -84,10 +70,10 @@ export const settings = {
 			<blockquote key="quote" className={ className }>
 				<RichText
 					multiline="p"
-					value={ toRichTextValue( value ) }
+					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: fromRichTextValue( nextValue ),
+							value: nextValue,
 						} )
 					}
 					placeholder={ __( 'Write quote…' ) }
@@ -118,9 +104,7 @@ export const settings = {
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				{ value && value.map( ( paragraph, i ) =>
-					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-				) }
+				{ [ value ] /* Prevent keys warning... */ }
 				{ citation && citation.length > 0 && (
 					<cite>{ citation }</cite>
 				) }

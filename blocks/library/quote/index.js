@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, get, isString } from 'lodash';
+import { castArray, get, isString, first } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -20,21 +20,11 @@ import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import RichText from '../../rich-text';
 
-const toRichTextValue = value => value.map( ( subValue => subValue.children ) );
-const fromRichTextValue = value => value.map( ( subValue ) => ( {
-	children: subValue,
-} ) );
-
 const blockAttributes = {
 	value: {
 		type: 'array',
 		source: 'query',
 		selector: 'blockquote > p',
-		query: {
-			children: {
-				source: 'node',
-			},
-		},
 		default: [],
 	},
 	citation: {
@@ -69,7 +59,7 @@ export const settings = {
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: [
-							{ children: <p key="1">{ content }</p> },
+							<p key="1">{ content }</p>,
 						],
 					} );
 				},
@@ -80,7 +70,7 @@ export const settings = {
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: [
-							{ children: <p key="1">{ content }</p> },
+							<p key="1">{ content }</p>,
 						],
 					} );
 				},
@@ -91,7 +81,7 @@ export const settings = {
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: [
-							{ children: <p key="1">{ content }</p> },
+							<p key="1">{ content }</p>,
 						],
 					} );
 				},
@@ -112,7 +102,7 @@ export const settings = {
 					}
 					// transforming a quote with content
 					return ( value || [] ).map( item => createBlock( 'core/paragraph', {
-						content: [ get( item, 'children.props.children', '' ) ],
+						content: [ get( item, 'props.children', '' ) ],
 					} ) ).concat( citation ? createBlock( 'core/paragraph', {
 						content: citation,
 					} ) : [] );
@@ -130,7 +120,7 @@ export const settings = {
 						} );
 					}
 
-					const firstValue = get( value, [ 0, 'children' ] );
+					const firstValue = first( value );
 					const headingContent = castArray( isString( firstValue ) ?
 						firstValue :
 						get( firstValue, [ 'props', 'children' ], '' )
@@ -197,10 +187,10 @@ export const settings = {
 			>
 				<RichText
 					multiline="p"
-					value={ toRichTextValue( value ) }
+					value={ value }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: fromRichTextValue( nextValue ),
+							value: nextValue,
 						} )
 					}
 					onMerge={ mergeBlocks }
@@ -240,9 +230,7 @@ export const settings = {
 				className={ style === 2 ? 'is-large' : '' }
 				style={ { textAlign: align ? align : null } }
 			>
-				{ value.map( ( paragraph, i ) => (
-					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-				) ) }
+				{ [ value ] /* Prevent keys warning... */ }
 				{ citation && citation.length > 0 && (
 					<cite>{ citation }</cite>
 				) }

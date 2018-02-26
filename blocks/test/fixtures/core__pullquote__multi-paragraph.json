@@ -6,40 +6,18 @@
         "attributes": {
             "value": [
                 {
-                    "children": {
-                        "type": "p",
-                        "key": null,
-                        "ref": null,
-                        "props": {
-                            "children": [
-                                "Paragraph ",
-                                {
-                                    "type": "strong",
-                                    "key": "_domReact71",
-                                    "ref": null,
-                                    "props": {
-                                        "children": "one"
-                                    },
-                                    "_owner": null,
-                                    "_store": {}
-                                }
-                            ]
-                        },
-                        "_owner": null,
-                        "_store": {}
-                    }
+                    "type": "p",
+                    "children": [
+                        "Paragraph ",
+                        {
+                            "type": "strong",
+                            "children": "one"
+                        }
+                    ]
                 },
                 {
-                    "children": {
-                        "type": "p",
-                        "key": null,
-                        "ref": null,
-                        "props": {
-                            "children": "Paragraph two"
-                        },
-                        "_owner": null,
-                        "_store": {}
-                    }
+                    "type": "p",
+                    "children": "Paragraph two"
                 }
             ],
             "citation": [
