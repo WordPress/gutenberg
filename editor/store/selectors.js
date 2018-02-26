@@ -439,6 +439,19 @@ export const getBlocks = createSelector(
 	]
 );
 
+export const getBlocksByUID = createSelector(
+	( state, uids ) => {
+		return map( uids, ( uid ) => getBlock( state, uid ) );
+	},
+	( state ) => [
+		state.editor.present.blocksByUid,
+		state.editor.present.blockOrder,
+		state.editor.present.edits.meta,
+		state.currentPost.meta,
+		state.editor.present.blocksByUid,
+	]
+);
+
 /**
  * Returns the number of blocks currently present in the post.
  *
