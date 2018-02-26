@@ -360,6 +360,12 @@
 	}
 }
 
+// This is a focus style shown for blocks that need an indicator even when in an isEditing state
+// like for example an image block that receives arrowkey focus.
+.editor-block-list__block:not(.has-editable-content):not( .is-selected ) > .editor-block-list__block-edit:focus {
+	box-shadow: 0 0 0 1px $white, 0 0 0 3px $dark-gray-900;
+}
+
 .editor-block-list .editor-inserter {
 	margin: $item-spacing;
 
