@@ -209,6 +209,20 @@ describe( 'withDispatch', () => {
 } );
 
 describe( 'subscribe', () => {
+	const unsubscribes = [];
+	afterEach( () => {
+		let unsubscribe;
+		while ( ( unsubscribe = unsubscribes.shift() ) ) {
+			unsubscribe();
+		}
+	} );
+
+	function subscribeWithUnsubscribe( ...args ) {
+		const unsubscribe = subscribe( ...args );
+		unsubscribes.push( unsubscribe );
+		return unsubscribe;
+	}
+
 	it( 'registers multiple selectors to the public API', () => {
 		let incrementedValue = null;
 		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
@@ -232,6 +246,21 @@ describe( 'subscribe', () => {
 		store.dispatch( action );
 
 		expect( incrementedValue ).toBe( 3 );
+	} );
+
+	it( 'avoids calling a later listener if unsubscribed during earlier callback', () => {
+		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
+		const firstListener = jest.fn( () => {
+			secondUnsubscribe();
+		} );
+		const secondListener = jest.fn();
+
+		subscribeWithUnsubscribe( firstListener );
+		const secondUnsubscribe = subscribeWithUnsubscribe( secondListener );
+
+		store.dispatch( { type: 'dummy' } );
+
+		expect( secondListener ).not.toHaveBeenCalled();
 	} );
 } );
 
