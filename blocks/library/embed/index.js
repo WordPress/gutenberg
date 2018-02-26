@@ -111,31 +111,33 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				const { setAttributes } = this.props;
 
 				this.setState( { error: false, fetching: true } );
-				wp.apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ).then(
-					( obj ) => {
-						if ( this.unmounting ) {
-							return;
-						}
+				wp.apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } )
+					.then(
+						( obj ) => {
+							if ( this.unmounting ) {
+								return;
+							}
 
-						const { html, provider_name: providerName } = obj;
-						const providerNameSlug = kebabCase( toLower( providerName ) );
-						let { type } = obj;
+							const { html, provider_name: providerName } = obj;
+							const providerNameSlug = kebabCase( toLower( providerName ) );
+							let { type } = obj;
 
-						if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
-							type = 'wp-embed';
+							if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
+								type = 'wp-embed';
+							}
+							if ( html ) {
+								this.setState( { html, type, providerNameSlug } );
+								setAttributes( { type, providerNameSlug } );
+							} else if ( 'photo' === type ) {
+								this.setState( { html: this.getPhotoHtml( obj ), type, providerNameSlug } );
+								setAttributes( { type, providerNameSlug } );
+							}
+							this.setState( { fetching: false } );
+						},
+						() => {
+							this.setState( { fetching: false, error: true } );
 						}
-						if ( html ) {
-							this.setState( { html, type, providerNameSlug } );
-							setAttributes( { type, providerNameSlug } );
-						} else if ( 'photo' === type ) {
-							this.setState( { html: this.getPhotoHtml( obj ), type, providerNameSlug } );
-							setAttributes( { type, providerNameSlug } );
-						} else {
-							this.setState( { error: true } );
-						}
-						this.setState( { fetching: false } );
-					}
-				);
+					);
 			}
 
 			render() {
