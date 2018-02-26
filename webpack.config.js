@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const { reduce, escapeRegExp, castArray, get } = require( 'lodash' );
@@ -127,6 +126,8 @@ class CustomTemplatedPathPlugin {
 }
 
 const config = {
+	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+
 	entry: Object.assign(
 		entryPointNames.reduce( ( memo, entryPoint ) => {
 			// Normalized entry point as an array of [ name, path ]. If a path
@@ -144,7 +145,7 @@ const config = {
 		}, {} )
 	),
 	output: {
-		filename: '[basename]/build/index.js',
+		filename: '[name]/build/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
@@ -191,9 +192,6 @@ const config = {
 		],
 	},
 	plugins: [
-		new webpack.DefinePlugin( {
-			'process.env.NODE_ENV': JSON.stringify( process.env.NODE_ENV || 'development' ),
-		} ),
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
@@ -201,10 +199,6 @@ const config = {
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',
 			minify: process.env.NODE_ENV === 'production' ? { safe: true } : false,
-		} ),
-		new webpack.LoaderOptionsPlugin( {
-			minimize: process.env.NODE_ENV === 'production',
-			debug: process.env.NODE_ENV !== 'production',
 		} ),
 		new CustomTemplatedPathPlugin( {
 			basename( path, data ) {
@@ -221,14 +215,5 @@ const config = {
 		children: false,
 	},
 };
-
-switch ( process.env.NODE_ENV ) {
-	case 'production':
-		config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
-		break;
-
-	default:
-		config.devtool = 'source-map';
-}
 
 module.exports = config;
