@@ -696,6 +696,10 @@ export class RichText extends Component {
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
 			this.props.value !== this.savedContent &&
+
+			// Comparing using isEqual is necessary especially to avoid unnecessary updateContent calls
+			// This fixes issues in multi richText blocks like quotes when moving the focus between
+			// the different editables.
 			! isEqual( this.props.value, prevProps.value ) &&
 			! isEqual( this.props.value, this.savedContent )
 		) {
