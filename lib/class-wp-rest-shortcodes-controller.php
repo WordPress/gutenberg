@@ -160,23 +160,23 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			'title'      => 'shortcode-block',
 			'type'       => 'object',
 			'properties' => array(
-				'html'  => array(
+				'html'                  => array(
 					'description' => __( 'The block\'s content with shortcodes filtered through hooks.', 'gutenberg' ),
 					'type'        => 'string',
 					'required'    => true,
 				),
-				'type'  => array(
+				'type'                  => array(
 					'description' => __( 'The filtered content type - video or otherwise', 'gutenberg' ),
 					'type'        => 'string',
 					'required'    => true,
 				),
-				'style' => array(
-					'description' => __( 'Links to external style sheets needed to render the shortcode', 'gutenberg' ),
+				'head_scripts_styles'   => array(
+					'description' => __( 'Links to  style sheets and scripts to render the shortcode', 'gutenberg' ),
 					'type'        => 'string',
 					'required'    => true,
 				),
-				'js'    => array(
-					'description' => __( 'Links to external javascript and inline scripts needed to render the shortcode', 'gutenberg' ),
+				'footer_scripts_styles' => array(
+					'description' => __( 'Links to  style sheets and scripts to render the shortcode', 'gutenberg' ),
 					'type'        => 'string',
 					'required'    => true,
 				),
