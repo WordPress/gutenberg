@@ -36,14 +36,4 @@ describe( 'ifViewportMatches()', () => {
 
 		wrapper.unmount();
 	} );
-
-	it( 'should render with result of query match as prop', () => {
-		dispatch( 'core/viewport' ).setIsMatching( { '> wide': true } );
-		const EnhancedComponent = ifViewportMatches( '> wide', 'isMatch' )( Component );
-		const wrapper = mount( <EnhancedComponent /> );
-
-		expect( wrapper.find( Component ).prop( 'isMatch' ) ).toBe( true );
-
-		wrapper.unmount();
-	} );
 } );

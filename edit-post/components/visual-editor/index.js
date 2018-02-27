@@ -12,7 +12,7 @@ import {
 } from '@wordpress/editor';
 import { Fragment, compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { ifViewportMatches } from '@wordpress/viewport';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -46,5 +46,5 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 	} ) ),
-	ifViewportMatches( 'medium', 'isLargeViewport' ),
+	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( VisualEditor );

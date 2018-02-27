@@ -2,31 +2,32 @@
  * WordPress dependencies
  */
 import { compose, getWrapperDisplayName } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
 import { ifCondition } from '@wordpress/components';
 
 /**
+ * Internal dependencies
+ */
+import withViewportMatch from './with-viewport-match';
+
+/**
  * Higher-order component creator, creating a new component which renders if
- * the viewport query is satisfied or with the given optional prop name.
+ * the viewport query is satisfied.
  *
- * @param {string}  query    Viewport query.
- * @param {?string} propName Optional prop name passed to component with result
- *                           of query match. If provided, component will always
- *                           render even if viewport does not match.
+ * @param {string} query Viewport query.
  *
- * @see isViewportMatch
+ * @see withViewportMatches
  *
  * @return {Function} Higher-order component.
  */
-const ifViewportMatches = ( query, propName ) => ( WrappedComponent ) => {
+const ifViewportMatches = ( query ) => ( WrappedComponent ) => {
 	const EnhancedComponent = compose( [
-		withSelect( ( select ) => ( {
-			isViewportSize: select( 'core/viewport' ).isViewportMatch( query ),
-		} ) ),
-		ifCondition( ( props ) => props.isViewportSize, propName ),
+		withViewportMatch( {
+			isViewportMatch: query,
+		} ),
+		ifCondition( ( props ) => props.isViewportMatch ),
 	] )( WrappedComponent );
 
-	EnhancedComponent.displayName = getWrapperDisplayName( WrappedComponent, 'viewportSize' );
+	EnhancedComponent.displayName = getWrapperDisplayName( WrappedComponent, 'ifViewportMatches' );
 
 	return EnhancedComponent;
 };

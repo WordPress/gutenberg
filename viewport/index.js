@@ -14,6 +14,7 @@ import { dispatch } from '@wordpress/data';
 import './store';
 
 export { default as ifViewportMatches } from './if-viewport-matches';
+export { default as withViewportMatch } from './with-viewport-match';
 
 /**
  * Hash of breakpoint names with pixel width at which it becomes effective.

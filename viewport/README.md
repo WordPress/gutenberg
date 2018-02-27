@@ -1,7 +1,7 @@
 Viewport
 ========
 
-Viewport is a module for responding to changes in the browser viewport size. It registers its own [data module](https://github.com/WordPress/gutenberg/tree/master/data), updated in response to browser media queries on a standard set of supported breakpoints. This data and the included `ifViewportMatches` higher-order component can be used in your own modules and components to implement viewport-dependent behaviors.
+Viewport is a module for responding to changes in the browser viewport size. It registers its own [data module](https://github.com/WordPress/gutenberg/tree/master/data), updated in response to browser media queries on a standard set of supported breakpoints. This data and the included higher-order components can be used in your own modules and components to implement viewport-dependent behaviors.
 
 ## Breakpoints
 
@@ -36,7 +36,7 @@ const isWideOrHuge = isViewportMatch( '>= wide' );
 
 ## `ifViewportMatches` Higher-Order Component
 
-If you are authoring a component which should only be shown under a specific viewport condition, or should vary its rendering behavior depending upon the matching viewport, you can leverage the `ifViewportMatches` higher-order component to achieve this requirement.
+If you are authoring a component which should only be shown under a specific viewport condition, you can leverage the `ifViewportMatches` higher-order component to achieve this requirement.
 
 Pass a viewport query to render the component only when the query is matched:
 
@@ -48,7 +48,11 @@ function MyMobileComponent() {
 MyMobileComponent = ifViewportMatches( '< small' )( MyMobileComponent );
 ```
 
-Pass a viewport query and a prop name to render the component with the result of the query match:
+## `withViewportMatch` Higher-Order Component
+
+If you are authoring a component which should vary its rendering behavior depending upon the matching viewport, you can leverage the `withViewportMatch` higher-order component to achieve this requirement.
+
+Pass an object, where each key is a prop name and its value a viewport query. The component will be rendered with your prop(s) assigned with the result(s) of the query match:
 
 ```jsx
 function MyComponent( { isMobile } ) {
@@ -57,5 +61,5 @@ function MyComponent( { isMobile } ) {
 	);
 }
 
-MyComponent = ifViewportMatches( '< small', 'isMobile' )( MyComponent );
+MyComponent = withViewportMatch( { isMobile: '< small' } )( MyComponent );
 ```
