@@ -33,4 +33,4 @@ function gutenberg_remove_wpcom_markdown_support( $post_data ) {
 	}
 	return $post_data;
 }
-add_filter( 'wp_insert_post_data', 'gutenberg_remove_wpcom_markdown_support', 1, 1 );
+add_filter( 'wp_insert_post_data', 'gutenberg_remove_wpcom_markdown_support', 9 );
