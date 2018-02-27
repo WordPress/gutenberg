@@ -10,16 +10,12 @@ import { noop } from 'lodash';
 import { Fragment } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { isReusableBlock } from '@wordpress/blocks';
+import { isReusableBlock, getBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import {
-	getBlock,
-	getBlockOrder,
-	getReusableBlock,
-} from '../../store/selectors';
+import { getBlock, getReusableBlock } from '../../store/selectors';
 import { convertBlockToStatic, convertBlockToReusable, deleteReusableBlock } from '../../store/actions';
 
 export function ReusableBlockSettings( {
@@ -69,7 +65,7 @@ export default connect(
 		const block = getBlock( state, uid );
 
 		return {
-			isValidForConvert: ! getBlockOrder( state, block.uid ).length,
+			isValidForConvert: getBlockSupport( block.name, 'reusable', true ),
 			reusableBlock: isReusableBlock( block ) ? getReusableBlock( state, block.attributes.ref ) : null,
 		};
 	},

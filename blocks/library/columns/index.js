@@ -49,6 +49,10 @@ export const settings = {
 
 	category: 'layout',
 
+	supports: {
+		reusable: false,
+	},
+
 	attributes: {
 		columns: {
 			type: 'number',
