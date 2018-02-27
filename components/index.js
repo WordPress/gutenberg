@@ -5,6 +5,7 @@ export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
+export { default as CodeEditor } from './code-editor';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as DropZone } from './drop-zone';

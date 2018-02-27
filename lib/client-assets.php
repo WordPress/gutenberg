@@ -740,6 +740,32 @@ add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 
 /**
+ * The code editor settings that were last captured by
+ * gutenberg_capture_code_editor_settings().
+ *
+ * @var array|false
+ */
+$gutenberg_captured_code_editor_settings = false;
+
+/**
+ * When passed to the wp_code_editor_settings filter, this function captures
+ * the code editor settings given to it and then prevents
+ * wp_enqueue_code_editor() from enqueuing any assets.
+ *
+ * This is a workaround until e.g. code_editor_settings() is added to Core.
+ *
+ * @since 2.1.0
+ *
+ * @param array $settings Code editor settings.
+ * @return false
+ */
+function gutenberg_capture_code_editor_settings( $settings ) {
+	global $gutenberg_captured_code_editor_settings;
+	$gutenberg_captured_code_editor_settings = $settings;
+	return false;
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -835,6 +861,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	), $meta_box_url );
 	wp_localize_script( 'wp-editor', '_wpMetaBoxUrl', $meta_box_url );
 
+	// Populate default code editor settings by short-circuiting wp_enqueue_code_editor.
+	global $gutenberg_captured_code_editor_settings;
+	add_filter( 'wp_code_editor_settings', 'gutenberg_capture_code_editor_settings' );
+	wp_enqueue_code_editor( array( 'type' => 'text/html' ) );
+	remove_filter( 'wp_code_editor_settings', 'gutenberg_capture_code_editor_settings' );
+	wp_add_inline_script( 'wp-editor', sprintf(
+		'window._wpGutenbergCodeEditorSettings = %s;',
+		wp_json_encode( $gutenberg_captured_code_editor_settings )
+	) );
+
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$align_wide              = get_theme_support( 'align-wide' );
@@ -903,7 +939,6 @@ JS;
 	/**
 	 * Styles
 	 */
-
 	wp_enqueue_style( 'wp-edit-post' );
 
 	/**
