@@ -1,5 +1,5 @@
 
-.editor-meta-boxes-area {
+.edit-post-meta-boxes-area {
 	position: relative;
 
 		/* Match width and positioning of the meta boxes. Override default styles. */
@@ -80,17 +80,17 @@
 		bottom: 0;
 		content: '';
 		background: transparent;
-		z-index: z-index( '.editor-meta-boxes-area.is-loading:before');
+		z-index: z-index( '.edit-post-meta-boxes-area.is-loading:before');
 	}
 
 	.spinner {
 		position: absolute;
 		top: 10px;
 		right: 20px;
-		z-index: z-index( '.editor-meta-boxes-area .spinner');
+		z-index: z-index( '.edit-post-meta-boxes-area .spinner');
 	}
 }
 
-.editor-meta-boxes-area__clear {
+.edit-post-meta-boxes-area__clear {
 	clear: both;
 }

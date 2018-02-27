@@ -12,9 +12,9 @@ import { KeyboardShortcuts } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import shortcuts from '../../../keyboard-shortcuts';
-import { getEditorMode } from '../../../store/selectors';
-import { switchEditorMode } from '../../../store/actions';
+import shortcuts from '../../keyboard-shortcuts';
+import { getEditorMode } from '../../store/selectors';
+import { switchEditorMode } from '../../store/actions';
 
 class EditorModeKeyboardShortcuts extends Component {
 	constructor() {

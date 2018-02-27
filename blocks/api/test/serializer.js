@@ -283,54 +283,6 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'serializeBlock()', () => {
-		describe( '"more" block', () => {
-			beforeEach( () => {
-				registerBlockType( 'core/more', {
-					category: 'layout',
-					title: 'more',
-					attributes: {
-						customText: {
-							type: 'string',
-						},
-						noTeaser: {
-							type: 'boolean',
-							default: false,
-						},
-					},
-
-					save: () => null,
-				} );
-			} );
-
-			it( 'serializes without text', () => {
-				const block = createBlock( 'core/more', {} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!--more-->' );
-			} );
-
-			it( 'serializes with text', () => {
-				const block = createBlock( 'core/more', {
-					customText: 'Read more!',
-				} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!--more Read more!-->' );
-			} );
-
-			it( 'serializes with no teaser', () => {
-				const block = createBlock( 'core/more', {
-					noTeaser: true,
-				} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!--more-->\n<!--noteaser-->' );
-			} );
-		} );
-
 		it( 'serializes the fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unknown-block', {
 				category: 'common',

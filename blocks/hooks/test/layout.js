@@ -53,4 +53,14 @@ describe( 'layout', () => {
 			expect( transformedBlock.attributes.layout ).toBe( 'wide' );
 		} );
 	} );
+
+	describe( 'excludeLayoutFromUnmodifiedBlockCheck', () => {
+		const excludeLayoutAttribute = applyFilters.bind( null, 'blocks.isUnmodifiedDefaultBlock.attributes' );
+
+		it( 'should exclude the layout attribute', () => {
+			const attributeKeys = excludeLayoutAttribute( [ 'align', 'content', 'layout' ] );
+
+			expect( attributeKeys ).toEqual( [ 'align', 'content' ] );
+		} );
+	} );
 } );

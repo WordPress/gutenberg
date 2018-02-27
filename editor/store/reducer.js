@@ -5,7 +5,6 @@ import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
 import {
 	flow,
-	partialRight,
 	reduce,
 	first,
 	last,
@@ -123,6 +122,30 @@ function shouldOverwriteState( action, previousAction ) {
 }
 
 /**
+ * Higher-order reducer targeting the combined editor reducer, augmenting
+ * block UIDs in remove action to include cascade of inner blocks.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
+	if ( state && action.type === 'REMOVE_BLOCKS' ) {
+		const uids = [ ...action.uids ];
+
+		// For each removed UID, include its inner blocks in UIDs to remove,
+		// recursing into those so long as inner blocks exist.
+		for ( let i = 0; i < uids.length; i++ ) {
+			uids.push( ...state.blockOrder[ uids[ i ] ] );
+		}
+
+		action = { ...action, uids };
+	}
+
+	return reducer( state, action );
+};
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -141,15 +164,19 @@ function shouldOverwriteState( action, previousAction ) {
 export const editor = flow( [
 	combineReducers,
 
+	withInnerBlocksRemoveCascade,
+
 	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, {
+	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
 		shouldOverwriteState,
 	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ] } ),
+	withChangeDetection( {
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ],
+	} ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
@@ -717,75 +744,6 @@ export function notices( state = [], action ) {
 	return state;
 }
 
-const locations = [
-	'normal',
-	'side',
-	'advanced',
-];
-
-const defaultMetaBoxState = locations.reduce( ( result, key ) => {
-	result[ key ] = {
-		isActive: false,
-	};
-
-	return result;
-}, {} );
-
-/**
- * Reducer keeping track of the meta boxes isSaving state.
- * A "true" value means the meta boxes saving request is in-flight.
- *
- *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
- * @return {Object}         Updated state.
- */
-export function isSavingMetaBoxes( state = false, action ) {
-	switch ( action.type ) {
-		case 'REQUEST_META_BOX_UPDATES':
-			return true;
-		case 'META_BOX_UPDATES_SUCCESS':
-			return false;
-		default:
-			return state;
-	}
-}
-
-/**
- * Reducer keeping track of the state of each meta box location.
- * This includes:
- *  - isActive: Whether the location is active or not.
- *  - data: The last saved form data for this location.
- *    This is used to check whether the form is dirty
- *    before leaving the page.
- *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
- * @return {Object}         Updated state.
- */
-export function metaBoxes( state = defaultMetaBoxState, action ) {
-	switch ( action.type ) {
-		case 'INITIALIZE_META_BOX_STATE':
-			return locations.reduce( ( newState, location ) => {
-				newState[ location ] = {
-					...state[ location ],
-					isActive: action.metaBoxes[ location ],
-				};
-				return newState;
-			}, { ...state } );
-		case 'META_BOX_SET_SAVED_DATA':
-			return locations.reduce( ( newState, location ) => {
-				newState[ location ] = {
-					...state[ location ],
-					data: action.dataPerLocation[ location ],
-				};
-				return newState;
-			}, { ...state } );
-		default:
-			return state;
-	}
-}
-
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
@@ -891,7 +849,5 @@ export default optimist( combineReducers( {
 	preferences,
 	saving,
 	notices,
-	metaBoxes,
-	isSavingMetaBoxes,
 	reusableBlocks,
 } ) );

@@ -9,6 +9,7 @@ import { registerReducer, withRehydratation, loadAndPersist } from '@wordpress/d
 import reducer from './reducer';
 import enhanceWithBrowserSize from './mobile';
 import { BREAK_MEDIUM } from './constants';
+import applyMiddlewares from './middlewares';
 
 /**
  * Module Constants
@@ -16,7 +17,9 @@ import { BREAK_MEDIUM } from './constants';
 const STORAGE_KEY = `WP_EDIT_POST_PREFERENCES_${ window.userSettings.uid }`;
 const MODULE_KEY = 'core/edit-post';
 
-const store = registerReducer( MODULE_KEY, withRehydratation( reducer, 'preferences', STORAGE_KEY ) );
+const store = applyMiddlewares(
+	registerReducer( MODULE_KEY, withRehydratation( reducer, 'preferences', STORAGE_KEY ) )
+);
 
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 enhanceWithBrowserSize( store, BREAK_MEDIUM );

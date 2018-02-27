@@ -33,12 +33,12 @@ export function MenuItemsGroup( {
 	}
 
 	const labelId = `components-menu-items-group-label-${ instanceId }`;
-	const classNames = classnames( className, 'components-menu-items-group' );
+	const classNames = classnames( className, 'components-menu-items__group' );
 
 	return (
 		<div className={ classNames }>
 			{ label &&
-				<div className="components-menu-items-group__label" id={ labelId }>{ label }</div>
+				<div className="components-menu-items__group-label" id={ labelId }>{ label }</div>
 			}
 			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
 				{ menuItems }

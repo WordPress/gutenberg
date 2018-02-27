@@ -88,3 +88,7 @@
 		}
 	}
 }
+
+.edit-post-visual-editor .editor-block-list__layout > .editor-block-list__insertion-point {
+	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+}
