@@ -16,7 +16,7 @@ import './style.scss';
 import { isValidTemplate } from '../../store/selectors';
 import { setTemplateValidity, synchronizeTemplate } from '../../store/actions';
 
-function TemplateNotice( { isValid, ...props } ) {
+function TemplateValidationNotice( { isValid, ...props } ) {
 	if ( isValid ) {
 		return null;
 	}
@@ -29,7 +29,7 @@ function TemplateNotice( { isValid, ...props } ) {
 	};
 
 	return (
-		<Notice className="editor-template-notice" isDismissible={ false } status="warning">
+		<Notice className="editor-template-validation-notice" isDismissible={ false } status="warning">
 			<p>{ __( 'The content of your post doesn\'t match the template assigned to your post type.' ) }</p>
 			<div>
 				<Button className="button" onClick={ props.resetTemplateValidity }>{ __( 'Keep it as is' ) }</Button>
@@ -47,4 +47,4 @@ export default connect(
 		resetTemplateValidity: () => setTemplateValidity( true ),
 		synchronizeTemplate,
 	}
-)( TemplateNotice );
+)( TemplateValidationNotice );

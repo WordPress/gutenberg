@@ -34,6 +34,6 @@ export {
 	isUnmodifiedDefaultBlock,
 } from './utils';
 export {
-	doesBlocksMatchTemplate,
+	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from './templates';

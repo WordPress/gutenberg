@@ -13,12 +13,12 @@ import { NoticeList } from '@wordpress/components';
  */
 import { removeNotice } from '../../store/actions';
 import { getNotices } from '../../store/selectors';
-import TemplateNotice from '../template-notice';
+import TemplateValidationNotice from '../template-validation-notice';
 
 function EditorNotices( props ) {
 	return (
 		<NoticeList { ...props }>
-			<TemplateNotice />
+			<TemplateValidationNotice />
 		</NoticeList>
 	);
 }
