@@ -158,6 +158,12 @@ function gutenberg_register_scripts_and_styles() {
 		) ),
 		'before'
 	);
+	wp_register_script(
+		'wp-viewport',
+		gutenberg_url( 'viewport/build/index.js' ),
+		array( 'wp-element', 'wp-data', 'wp-components' ),
+		filemtime( gutenberg_dir_path() . 'viewport/build/index.js' )
+	);
 	// Loading the old editor and its config to ensure the classic block works as expected.
 	wp_add_inline_script(
 		'wp-blocks', 'window.wp.oldEditor = window.wp.editor;', 'before'
@@ -237,7 +243,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-edit-post',
 		gutenberg_url( 'edit-post/build/index.js' ),
-		array( 'jquery', 'heartbeat', 'wp-element', 'wp-components', 'wp-editor', 'wp-i18n', 'wp-date', 'wp-utils', 'wp-data', 'wp-embed' ),
+		array( 'jquery', 'heartbeat', 'wp-element', 'wp-components', 'wp-editor', 'wp-i18n', 'wp-date', 'wp-utils', 'wp-data', 'wp-embed', 'wp-viewport' ),
 		filemtime( gutenberg_dir_path() . 'edit-post/build/index.js' ),
 		true
 	);

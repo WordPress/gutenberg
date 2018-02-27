@@ -32,6 +32,32 @@ export function globalListener() {
 }
 
 /**
+ * Convenience for registering reducer with actions and selectors.
+ *
+ * @param {string} reducerKey Reducer key.
+ * @param {Object} options    Store description (reducer, actions, selectors).
+ *
+ * @return {Object} Registered store object.
+ */
+export function registerStore( reducerKey, options ) {
+	if ( ! options.reducer ) {
+		throw new TypeError( 'Must specify store reducer' );
+	}
+
+	const store = registerReducer( reducerKey, options.reducer );
+
+	if ( options.actions ) {
+		registerActions( reducerKey, options.actions );
+	}
+
+	if ( options.selectors ) {
+		registerSelectors( reducerKey, options.selectors );
+	}
+
+	return store;
+}
+
+/**
  * Registers a new sub-reducer to the global state and returns a Redux-like store object.
  *
  * @param {string} reducerKey Reducer key.

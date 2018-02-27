@@ -26,7 +26,6 @@ describe( 'state', () => {
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
-				viewportType: 'desktop',
 			} );
 		} );
 

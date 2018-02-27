@@ -12,6 +12,7 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import {
+	registerStore,
 	registerReducer,
 	registerSelectors,
 	registerActions,
@@ -22,7 +23,40 @@ import {
 	subscribe,
 } from '../';
 
-describe( 'store', () => {
+describe( 'registerStore', () => {
+	it( 'should be shorthand for reducer, actions, selectors registration', () => {
+		const store = registerStore( 'butcher', {
+			reducer( state = { ribs: 6, chicken: 4 }, action ) {
+				switch ( action.type ) {
+					case 'sale':
+						return {
+							...state,
+							[ action.meat ]: state[ action.meat ] / 2,
+						};
+				}
+
+				return state;
+			},
+			selectors: {
+				getPrice: ( state, meat ) => state[ meat ],
+			},
+			actions: {
+				startSale: ( meat ) => ( { type: 'sale', meat } ),
+			},
+		} );
+
+		expect( store.getState() ).toEqual( { ribs: 6, chicken: 4 } );
+		expect( dispatch( 'butcher' ) ).toHaveProperty( 'startSale' );
+		expect( select( 'butcher' ) ).toHaveProperty( 'getPrice' );
+		expect( select( 'butcher' ).getPrice( 'chicken' ) ).toBe( 4 );
+		expect( select( 'butcher' ).getPrice( 'ribs' ) ).toBe( 6 );
+		dispatch( 'butcher' ).startSale( 'chicken' );
+		expect( select( 'butcher' ).getPrice( 'chicken' ) ).toBe( 2 );
+		expect( select( 'butcher' ).getPrice( 'ribs' ) ).toBe( 6 );
+	} );
+} );
+
+describe( 'registerReducer', () => {
 	it( 'Should append reducers to the state', () => {
 		const reducer1 = () => 'chicken';
 		const reducer2 = () => 'ribs';
