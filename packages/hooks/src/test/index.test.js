@@ -71,6 +71,10 @@ beforeEach( () => {
 	// because the internal functions have references to the original objects.
 	[ actions, filters ].forEach( hooks => {
 		for ( const k in hooks ) {
+			if ( '__current' === k ) {
+				continue;
+			}
+
 			delete hooks[ k ];
 		}
 	} );
@@ -211,20 +215,6 @@ test( 'cannot add filters with non-numeric priorities', () => {
 	addFilter( 'test', 'my_callback', () => null, '42' );
 	expect( console ).toHaveErroredWith(
 		'If specified, the hook priority must be a number.'
-	);
-} );
-
-test( 'cannot run filters with non-string names', () => {
-	expect( applyFilters( () => {}, 42 ) ).toBe( undefined );
-	expect( console ).toHaveErroredWith(
-		'The hook name must be a non-empty string.'
-	);
-} );
-
-test( 'cannot run filters named with __ prefix', () => {
-	expect( applyFilters( '__test', 42 ) ).toBe( undefined );
-	expect( console ).toHaveErroredWith(
-		'The hook name cannot begin with `__`.'
 	);
 } );
 

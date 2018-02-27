@@ -22,7 +22,7 @@ function createDidHook( hooks ) {
 			return;
 		}
 
-		return hooks.hasOwnProperty( hookName ) && hooks[ hookName ].runs
+		return hooks[ hookName ] && hooks[ hookName ].runs
 			? hooks[ hookName ].runs
 			: 0;
 	};

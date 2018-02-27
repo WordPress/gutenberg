@@ -21,21 +21,12 @@ function createRunHook( hooks, returnFirstArg ) {
 	 * @return {*}               Return value of runner, if applicable.
 	 */
 	return function runHooks( hookName, ...args ) {
-
-		if ( ! validateHookName( hookName ) ) {
-			return;
+		let handlers;
+		if ( hooks[ hookName ] ) {
+			handlers = hooks[ hookName ].handlers;
 		}
 
-		if ( ! hooks.hasOwnProperty( hookName ) ) {
-			hooks[ hookName ] = {
-				runs: 0,
-				handlers: [],
-			};
-		}
-
-		const handlers = hooks[ hookName ].handlers;
-
-		if ( ! handlers.length ) {
+		if ( ! handlers || ! handlers.length ) {
 			return returnFirstArg
 				? args[ 0 ]
 				: undefined;
@@ -46,25 +37,26 @@ function createRunHook( hooks, returnFirstArg ) {
 			currentIndex: 0,
 		};
 
-		hooks.__current = hooks.__current || [];
 		hooks.__current.push( hookInfo );
-		hooks[ hookName ].runs++;
 
-		let maybeReturnValue = args[ 0 ];
+		if ( ! hooks[ hookName ] ) {
+			hooks[ hookName ] = {
+				runs: 0,
+				handlers: [],
+			};
+		}
+		hooks[ hookName ].runs++;
 
 		while ( hookInfo.currentIndex < handlers.length ) {
 			const handler = handlers[ hookInfo.currentIndex ];
-			maybeReturnValue = handler.callback.apply( null, args );
-			if ( returnFirstArg ) {
-				args[ 0 ] = maybeReturnValue;
-			}
+			args[ 0 ] = handler.callback.apply( null, args );
 			hookInfo.currentIndex++;
 		}
 
 		hooks.__current.pop();
 
 		if ( returnFirstArg ) {
-			return maybeReturnValue;
+			return args[ 0 ];
 		}
 	};
 }
