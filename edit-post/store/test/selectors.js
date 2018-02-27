@@ -64,7 +64,6 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					activeGeneralSidebar: 'editor',
-					viewportType: 'desktop',
 					activeSidebarPanel: 'document',
 				},
 			};
@@ -78,7 +77,6 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					activeGeneralSidebar: 'editor',
-					viewportType: 'desktop',
 					activeSidebarPanel: 'blocks',
 				},
 			};
@@ -92,7 +90,6 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					activeGeneralSidebar: null,
-					viewportType: 'desktop',
 					activeSidebarPanel: null,
 				},
 			};
