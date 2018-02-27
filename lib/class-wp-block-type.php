@@ -42,7 +42,6 @@ class WP_Block_Type {
 	 * Block type editor script handle.
 	 *
 	 * @since 2.0.0
-	 * @access public
 	 * @var string
 	 */
 	public $editor_script;
@@ -51,7 +50,6 @@ class WP_Block_Type {
 	 * Block type front end script handle.
 	 *
 	 * @since 2.0.0
-	 * @access public
 	 * @var string
 	 */
 	public $script;
@@ -95,7 +93,6 @@ class WP_Block_Type {
 	 * Renders the block type output for given attributes.
 	 *
 	 * @since 0.6.0
-	 * @access public
 	 *
 	 * @param array $attributes Optional. Block attributes. Default empty array.
 	 * @return string Rendered block type output.
