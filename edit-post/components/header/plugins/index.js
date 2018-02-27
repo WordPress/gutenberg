@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { NavigableMenu, withInstanceId, IconButton, MenuItemsGroup } from '@wordpress/components';
+import { withInstanceId, IconButton, MenuItemsGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies

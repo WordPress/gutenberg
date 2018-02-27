@@ -7,7 +7,6 @@ import { isFunction } from 'lodash';
 import store from '../store';
 import { setGeneralSidebarActivePanel, openGeneralSidebar } from '../store/actions';
 import { applyFilters } from '@wordpress/hooks';
-import { registerPlugin } from './plugins-core';
 
 const sidebars = {};
 
@@ -69,8 +68,6 @@ export function registerSidebar( name, settings ) {
 	}
 
 	settings = applyFilters( 'editor.registerSidebar', settings, name );
-
-	registerPlugin( name, activateSidebar.bind( null, name ), settings );
 
 	return sidebars[ name ] = settings;
 }

@@ -9,7 +9,8 @@
  */
 import { applyFilters } from '@wordpress/hooks';
 import { isString } from 'util';
-import { activatePlugin, validatePluginId } from './plugins-core';
+import { validatePluginId } from './utils';
+import { activateSidebar } from './sidebar';
 
 const menuItems = {};
 
@@ -76,7 +77,7 @@ export function registerEditorMenuItem( menuItemId, settings ) {
 		return null;
 	}
 
-	settings.callback = activatePlugin.bind( null, settings.target );
+	settings.callback = activateSidebar.bind( null, settings.target );
 
 	settings = applyFilters( 'editor.registerEllipsisMenuItem', settings, menuItemId );
 
