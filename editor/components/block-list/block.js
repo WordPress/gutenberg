@@ -383,7 +383,7 @@ export class BlockListBlock extends Component {
 			return;
 		}
 
-		if ( event.target === this.node && ! this.props.isSelected ) {
+		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
 	}
