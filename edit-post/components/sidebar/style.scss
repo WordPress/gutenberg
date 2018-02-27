@@ -13,7 +13,7 @@
 
 	@include break-small() {
 		top: $admin-bar-height-big + $header-height;
-		z-index: auto;
+		z-index: z-index( '.edit-post-sidebar {greater than small}' );
 		height: auto;
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
