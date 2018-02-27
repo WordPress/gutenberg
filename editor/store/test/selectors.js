@@ -64,10 +64,6 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
-	getMetaBoxes,
-	hasMetaBoxes,
-	isSavingMetaBoxes,
-	getMetaBox,
 	getReusableBlock,
 	isSavingReusableBlock,
 	isSelectionEnabled,
@@ -102,99 +98,6 @@ describe( 'selectors', () => {
 
 	afterAll( () => {
 		unregisterBlockType( 'core/test-block' );
-	} );
-
-	describe( 'hasMetaBoxes', () => {
-		it( 'should return true if there are active meta boxes', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-					},
-					side: {
-						isActive: true,
-					},
-				},
-			};
-
-			expect( hasMetaBoxes( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if there are no active meta boxes', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-					},
-					side: {
-						isActive: false,
-					},
-				},
-			};
-
-			expect( hasMetaBoxes( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isSavingMetaBoxes', () => {
-		it( 'should return true if some meta boxes are saving', () => {
-			const state = {
-				isSavingMetaBoxes: true,
-			};
-
-			expect( isSavingMetaBoxes( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if no meta boxes are saving', () => {
-			const state = {
-				isSavingMetaBoxes: false,
-			};
-
-			expect( isSavingMetaBoxes( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'getMetaBoxes', () => {
-		it( 'should return the state of all meta boxes', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: true,
-					},
-					side: {
-						isActive: true,
-					},
-				},
-			};
-
-			expect( getMetaBoxes( state ) ).toEqual( {
-				normal: {
-					isActive: true,
-				},
-				side: {
-					isActive: true,
-				},
-			} );
-		} );
-	} );
-
-	describe( 'getMetaBox', () => {
-		it( 'should return the state of selected meta box', () => {
-			const state = {
-				metaBoxes: {
-					normal: {
-						isActive: false,
-					},
-					side: {
-						isActive: true,
-					},
-				},
-			};
-
-			expect( getMetaBox( state, 'side' ) ).toEqual( {
-				isActive: true,
-			} );
-		} );
 	} );
 
 	describe( 'hasEditorUndo', () => {
@@ -304,8 +207,6 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isCleanNewPost', () => {
-		const metaBoxes = {};
-
 		it( 'should return true when the post is not dirty and has not been saved before', () => {
 			const state = {
 				editor: {
@@ -315,7 +216,6 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'auto-draft',
 				},
-				metaBoxes,
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( true );
@@ -330,7 +230,6 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'draft',
 				},
-				metaBoxes,
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
@@ -345,7 +244,6 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'auto-draft',
 				},
-				metaBoxes,
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
@@ -506,7 +404,6 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getDocumentTitle', () => {
-		const metaBoxes = {};
 		it( 'should return current title unedited existing post', () => {
 			const state = {
 				currentPost: {
@@ -521,7 +418,6 @@ describe( 'selectors', () => {
 					},
 					isDirty: false,
 				},
-				metaBoxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
@@ -540,7 +436,6 @@ describe( 'selectors', () => {
 						},
 					},
 				},
-				metaBoxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( 'Modified Title' );
@@ -561,7 +456,6 @@ describe( 'selectors', () => {
 					},
 					isDirty: false,
 				},
-				metaBoxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
@@ -582,7 +476,6 @@ describe( 'selectors', () => {
 					},
 					isDirty: true,
 				},
-				metaBoxes,
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( '(Untitled)' ) );
@@ -732,8 +625,6 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostPublishable', () => {
-		const metaBoxes = {};
-
 		it( 'should return true for pending posts', () => {
 			const state = {
 				editor: {
@@ -742,7 +633,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'pending',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -756,7 +646,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'draft',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -770,7 +659,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'publish',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -784,7 +672,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'publish',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -798,7 +685,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'private',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -812,7 +698,6 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'future',
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -826,7 +711,6 @@ describe( 'selectors', () => {
 				editor: {
 					isDirty: true,
 				},
-				metaBoxes,
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -2196,7 +2080,6 @@ describe( 'selectors', () => {
 				saving: {
 					requesting: true,
 				},
-				isSavingMetaBoxes: false,
 			};
 
 			expect( isSavingPost( state ) ).toBe( true );
@@ -2207,21 +2090,9 @@ describe( 'selectors', () => {
 				saving: {
 					requesting: false,
 				},
-				isSavingMetaBoxes: false,
 			};
 
 			expect( isSavingPost( state ) ).toBe( false );
-		} );
-
-		it( 'should return true if the post is not currently being saved but meta boxes are saving', () => {
-			const state = {
-				saving: {
-					requesting: false,
-				},
-				isSavingMetaBoxes: true,
-			};
-
-			expect( isSavingPost( state ) ).toBe( true );
 		} );
 	} );
 

@@ -60,7 +60,7 @@ class MetaBoxesArea extends Component {
 		const { location, isSaving } = this.props;
 
 		const classes = classnames(
-			'editor-meta-boxes-area',
+			'edit-post-meta-boxes-area',
 			`is-${ location }`,
 			{
 				'is-loading': isSaving,
@@ -70,8 +70,8 @@ class MetaBoxesArea extends Component {
 		return (
 			<div className={ classes }>
 				{ isSaving && <Spinner /> }
-				<div className="editor-meta-boxes-area__container" ref={ this.bindContainerNode } />
-				<div className="editor-meta-boxes-area__clear" />
+				<div className="edit-post-meta-boxes-area__container" ref={ this.bindContainerNode } />
+				<div className="edit-post-meta-boxes-area__clear" />
 			</div>
 		);
 	}
@@ -86,4 +86,9 @@ function mapStateToProps( state ) {
 	};
 }
 
-export default connect( mapStateToProps )( MetaBoxesArea );
+export default connect(
+	mapStateToProps,
+	undefined,
+	undefined,
+	{ storeKey: 'edit-post' }
+)( MetaBoxesArea );

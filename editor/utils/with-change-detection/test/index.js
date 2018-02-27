@@ -24,7 +24,7 @@ describe( 'withChangeDetection()', () => {
 	}
 
 	it( 'should respect original reducer behavior', () => {
-		const reducer = withChangeDetection( originalReducer );
+		const reducer = withChangeDetection()( originalReducer );
 
 		const state = reducer( undefined, {} );
 		expect( state ).toEqual( { count: 0, isDirty: false } );
@@ -35,7 +35,7 @@ describe( 'withChangeDetection()', () => {
 	} );
 
 	it( 'should allow reset types as option', () => {
-		const reducer = withChangeDetection( originalReducer, { resetTypes: [ 'RESET' ] } );
+		const reducer = withChangeDetection( { resetTypes: [ 'RESET' ] } )( originalReducer );
 
 		let state;
 
@@ -50,7 +50,7 @@ describe( 'withChangeDetection()', () => {
 	} );
 
 	it( 'should preserve isDirty into non-resetting non-reference-changing types', () => {
-		const reducer = withChangeDetection( originalReducer, { resetTypes: [ 'RESET' ] } );
+		const reducer = withChangeDetection( { resetTypes: [ 'RESET' ] } )( originalReducer );
 
 		let state;
 
@@ -65,7 +65,7 @@ describe( 'withChangeDetection()', () => {
 	} );
 
 	it( 'should maintain separate states', () => {
-		const reducer = withChangeDetection( originalReducer );
+		const reducer = withChangeDetection()( originalReducer );
 
 		let firstState;
 
@@ -80,7 +80,7 @@ describe( 'withChangeDetection()', () => {
 	} );
 
 	it( 'should flag as not dirty even if reset type causes reference change', () => {
-		const reducer = withChangeDetection( originalReducer, { resetTypes: [ 'RESET_AND_CHANGE_REFERENCE' ] } );
+		const reducer = withChangeDetection( { resetTypes: [ 'RESET_AND_CHANGE_REFERENCE' ] } )( originalReducer );
 
 		let state;
 

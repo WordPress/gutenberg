@@ -10,6 +10,10 @@ import {
 	isMobile,
 	hasFixedToolbar,
 	isFeatureActive,
+	getMetaBoxes,
+	hasMetaBoxes,
+	isSavingMetaBoxes,
+	getMetaBox,
 } from '../selectors';
 
 jest.mock( '../constants', () => ( {
@@ -260,6 +264,98 @@ describe( 'selectors', () => {
 			};
 
 			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
+		} );
+	} );
+	describe( 'hasMetaBoxes', () => {
+		it( 'should return true if there are active meta boxes', () => {
+			const state = {
+				metaBoxes: {
+					normal: {
+						isActive: false,
+					},
+					side: {
+						isActive: true,
+					},
+				},
+			};
+
+			expect( hasMetaBoxes( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if there are no active meta boxes', () => {
+			const state = {
+				metaBoxes: {
+					normal: {
+						isActive: false,
+					},
+					side: {
+						isActive: false,
+					},
+				},
+			};
+
+			expect( hasMetaBoxes( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isSavingMetaBoxes', () => {
+		it( 'should return true if some meta boxes are saving', () => {
+			const state = {
+				isSavingMetaBoxes: true,
+			};
+
+			expect( isSavingMetaBoxes( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if no meta boxes are saving', () => {
+			const state = {
+				isSavingMetaBoxes: false,
+			};
+
+			expect( isSavingMetaBoxes( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getMetaBoxes', () => {
+		it( 'should return the state of all meta boxes', () => {
+			const state = {
+				metaBoxes: {
+					normal: {
+						isActive: true,
+					},
+					side: {
+						isActive: true,
+					},
+				},
+			};
+
+			expect( getMetaBoxes( state ) ).toEqual( {
+				normal: {
+					isActive: true,
+				},
+				side: {
+					isActive: true,
+				},
+			} );
+		} );
+	} );
+
+	describe( 'getMetaBox', () => {
+		it( 'should return the state of selected meta box', () => {
+			const state = {
+				metaBoxes: {
+					normal: {
+						isActive: false,
+					},
+					side: {
+						isActive: true,
+					},
+				},
+			};
+
+			expect( getMetaBox( state, 'side' ) ).toEqual( {
+				isActive: true,
+			} );
 		} );
 	} );
 } );

@@ -15,7 +15,7 @@
 }
 
 .edit-post-more-menu__content {
-	.components-menu-items-group:not(:last-child) {
+	.components-menu-items__group:not(:last-child) {
   		border-bottom: 1px solid $light-gray-500;
 	}
 }

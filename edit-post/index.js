@@ -19,8 +19,7 @@ import './assets/stylesheets/main.scss';
 import './hooks';
 import Layout from './components/layout';
 import store from './store';
-export * from './api';
-
+import { initializeMetaBoxState } from './store/actions';
 export * from './api';
 
 // Configure moment globally
@@ -92,7 +91,7 @@ export function initializeEditor( id, post, settings ) {
 	const reboot = reinitializeEditor.bind( null, target, settings );
 	const ReduxProvider = createProvider( 'edit-post' );
 
-	const provider = render(
+	render(
 		<EditorProvider settings={ settings } post={ post }>
 			<ErrorBoundary onError={ reboot }>
 				<ReduxProvider store={ store }>
@@ -104,6 +103,8 @@ export function initializeEditor( id, post, settings ) {
 	);
 
 	return {
-		initializeMetaBoxes: provider.initializeMetaBoxes,
+		initializeMetaBoxes( metaBoxes ) {
+			store.dispatch( initializeMetaBoxState( metaBoxes ) );
+		},
 	};
 }
