@@ -3,6 +3,7 @@
  */
 import { map, isEmpty, isString } from 'lodash';
 import classnames from 'classnames';
+import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -15,6 +16,7 @@ import { withInstanceId, IconButton, MenuItemsGroup } from '@wordpress/component
  */
 import './style.scss';
 import { getMoreMenuItems } from '../../../api';
+import { getActivePlugin } from '../../../store/selectors';
 
 /**
  * Renders a list of plugins that will activate different UI elements.
@@ -53,7 +55,8 @@ function Plugins( props ) {
 					}
 					const buttonClassName = classnames(
 						'components-menu-item-plugins__button',
-						menuItem.icon ? 'has-icon' : null
+						menuItem.icon ? 'has-icon' : null,
+						menuItem.target === props.activePlugin ? 'active' : null,
 					);
 
 					return (
@@ -76,4 +79,8 @@ function Plugins( props ) {
 	);
 }
 
-export default withInstanceId( Plugins );
+export default connect( state => {
+	return {
+		activePlugin: getActivePlugin( state ),
+	};
+}, null, null, { storeKey: 'edit-post' } )( withInstanceId( Plugins ) );

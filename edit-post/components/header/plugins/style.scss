@@ -23,6 +23,10 @@
 		padding-left: 0;
 	}
 
+	&.active {
+		background-color: #0eb5d6;
+	}
+
 	&:hover {
 		color: $black;
 	}
