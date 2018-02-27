@@ -25,12 +25,10 @@
  * @param  array $post      Post object which contains content to check for block.
  * @return array $post      Post object.
  */
-function gutenberg_remove_wpcom_markdown_support( $post_data ) {
-	if ( gutenberg_content_has_blocks( implode( "\n", $post_data ) ) ) {
-		if ( class_exists ( 'WPCom_Markdown' ) ) {
-			WPCom_Markdown::get_instance()->unload_markdown_for_posts();
-		}
+function gutenberg_remove_wpcom_markdown_support( $post ) {
+	if ( class_exists( 'WPCom_Markdown' ) && gutenberg_content_has_blocks( $post['post_content'] ) ) {
+		WPCom_Markdown::get_instance()->unload_markdown_for_posts();
 	}
-	return $post_data;
+	return $post;
 }
 add_filter( 'wp_insert_post_data', 'gutenberg_remove_wpcom_markdown_support', 9 );
