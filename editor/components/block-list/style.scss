@@ -439,9 +439,11 @@
 	left: 0;
 	right: 0;
 
-	@include break-small {
-		left: $block-mover-padding-visible;
-		right: $block-mover-padding-visible;
+	.editor-block-list__insertion-point-inserter:before {
+		@include break-small {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
 	}
 }
 
