@@ -34,7 +34,7 @@ const template = [
 A custom post type can register its own template during registration:
 
 ```php
-function my_register_post_type() {
+function myplugin_register_book_post_type() {
 	$args = array(
 		'public' => true,
 		'label'  => 'Books',
@@ -53,7 +53,7 @@ function my_register_post_type() {
 	);
 	register_post_type( 'book', $args );
 }
-add_action( 'init', 'my_register_post_type' );
+add_action( 'init', 'myplugin_register_book_post_type' );
 ```
 
 ### Locking
