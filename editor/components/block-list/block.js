@@ -13,7 +13,6 @@ import { Component, findDOMNode, compose } from '@wordpress/element';
 import {
 	keycodes,
 	focus,
-	getScrollContainer,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 } from '@wordpress/utils';
@@ -100,8 +99,6 @@ export class BlockListBlock extends Component {
 		this.onClick = this.onClick.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-
-		this.previousOffset = null;
 		this.hadTouchStart = false;
 
 		this.state = {
@@ -140,31 +137,12 @@ export class BlockListBlock extends Component {
 	}
 
 	componentWillReceiveProps( newProps ) {
-		if (
-			this.props.order !== newProps.order &&
-			( newProps.isSelected || newProps.isFirstMultiSelected )
-		) {
-			this.previousOffset = this.node.getBoundingClientRect().top;
-		}
-
 		if ( newProps.isTyping || newProps.isSelected ) {
 			this.hideHoverEffects();
 		}
 	}
 
 	componentDidUpdate( prevProps ) {
-		// Preserve scroll prosition when block rearranged
-		if ( this.previousOffset ) {
-			const scrollContainer = getScrollContainer( this.node );
-			if ( scrollContainer ) {
-				scrollContainer.scrollTop = scrollContainer.scrollTop +
-					this.node.getBoundingClientRect().top -
-					this.previousOffset;
-			}
-
-			this.previousOffset = null;
-		}
-
 		// Bind or unbind mousemove from page when user starts or stops typing
 		if ( this.props.isTyping !== prevProps.isTyping ) {
 			if ( this.props.isTyping ) {
@@ -201,8 +179,7 @@ export class BlockListBlock extends Component {
 
 	bindBlockNode( node ) {
 		// Disable reason: The block element uses a component to manage event
-		// nesting, but we rely on a raw DOM node for focusing and preserving
-		// scroll offset on move.
+		// nesting, but we rely on a raw DOM node for focusing.
 		//
 		// eslint-disable-next-line react/no-find-dom-node
 		this.node = findDOMNode( node );
