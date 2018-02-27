@@ -1,13 +1,13 @@
 /**
- * Browser dependencies
- */
-const { ELEMENT_NODE } = window.Node;
-
-/**
  * Internal dependencies
  */
 import { isInlineWrapper, isInline, isAllowedBlock, deepFilterNodeList } from './utils';
 import createUnwrapper from './create-unwrapper';
+
+/**
+ * Browser dependencies
+ */
+const { ELEMENT_NODE } = window.Node;
 
 export default function( node, doc ) {
 	if ( node.nodeType !== ELEMENT_NODE ) {

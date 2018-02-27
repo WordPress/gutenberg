@@ -1,12 +1,12 @@
 /**
- * Browser dependencies
- */
-const { ELEMENT_NODE } = window.Node;
-
-/**
  * Internal dependencies
  */
 import { isAttributeWhitelisted, isClassWhitelisted } from './utils';
+
+/**
+ * Browser dependencies
+ */
+const { ELEMENT_NODE } = window.Node;
 
 export default function( node ) {
 	if ( node.nodeType !== ELEMENT_NODE ) {

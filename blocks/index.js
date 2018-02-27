@@ -3,6 +3,9 @@
  */
 import './hooks';
 
+// Deprecated matchers
+import { attr, prop, text, html, query, node, children } from './hooks/matchers';
+
 // A "block" is the abstract term used to describe units of markup that,
 // when composed together, form the content or layout of a page.
 // The API for blocks is exposed via `wp.blocks`.
@@ -34,5 +37,4 @@ export { default as UrlInput } from './url-input';
 export { default as UrlInputButton } from './url-input/button';
 
 // Deprecated matchers
-import { attr, prop, text, html, query, node, children } from './hooks/matchers';
 export const source = { attr, prop, text, html, query, node, children };
