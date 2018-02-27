@@ -216,7 +216,7 @@ class BlockListLayout extends Component {
 
 		return (
 			<BlockSelectionClearer className={ classes }>
-				{ !! blockUIDs.length && <BlockInsertionPoint /> }
+				{ !! blockUIDs.length && <BlockInsertionPoint rootUID={ rootUID } layout={ defaultLayout } /> }
 				{ map( blockUIDs, ( uid, blockIndex ) => (
 					<BlockListBlock
 						key={ 'block-' + uid }
