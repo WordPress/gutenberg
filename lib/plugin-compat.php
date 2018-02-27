@@ -27,9 +27,9 @@
  */
 function gutenberg_remove_wpcom_markdown_support( $post_data ) {
 	if ( gutenberg_content_has_blocks( implode( "\n", $post_data ) ) ) {
-        if ( class_exists ( 'WPCom_Markdown' ) ) {
-            WPCom_Markdown::get_instance()->unload_markdown_for_posts();
-        }
+		if ( class_exists ( 'WPCom_Markdown' ) ) {
+			WPCom_Markdown::get_instance()->unload_markdown_for_posts();
+		}
 	}
 	return $post_data;
 }
