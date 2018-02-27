@@ -16,7 +16,7 @@ import { withInstanceId, IconButton, MenuItemsGroup } from '@wordpress/component
  */
 import './style.scss';
 import { getMoreMenuItems } from '../../../api';
-import { getActivePlugin } from '../../../store/selectors';
+import { getActivePlugin, getOpenedGeneralSidebar } from '../../../store/selectors';
 
 /**
  * Renders a list of plugins that will activate different UI elements.
@@ -81,6 +81,7 @@ function Plugins( props ) {
 
 export default connect( state => {
 	return {
-		activePlugin: getActivePlugin( state ),
+		activePlugin: getOpenedGeneralSidebar( state ) === 'plugin' ?
+			getActivePlugin( state ) : null,
 	};
 }, null, null, { storeKey: 'edit-post' } )( withInstanceId( Plugins ) );
