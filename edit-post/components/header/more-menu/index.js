@@ -28,7 +28,6 @@ const MoreMenu = () => (
 			<div className="edit-post-more-menu__content">
 				<ModeSwitcher onSelect={ onClose } />
 				<FixedToolbarToggle onToggle={ onClose } />
-				{ /* Plugins component renders its own divider, because it may not show. */ }
 				<Plugins onSelect={ onClose } />
 				<MenuItemsGroup
 					label={ __( 'Tools' ) }
