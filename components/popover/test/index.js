@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { shallow, mount } from 'enzyme';
+import { noop } from 'lodash';
 
 /**
  * Internal dependencies
@@ -10,61 +11,52 @@ import Popover from '../';
 
 describe( 'Popover', () => {
 	describe( '#componentDidUpdate()', () => {
-		let wrapper, mocks;
+		let wrapper;
 		beforeEach( () => {
+			jest.spyOn( Popover.prototype, 'toggleWindowEvents' ).mockImplementation( noop );
+			jest.spyOn( Popover.prototype, 'setOffset' ).mockImplementation( noop );
+			jest.spyOn( Popover.prototype, 'setForcedPositions' ).mockImplementation( noop );
+
 			wrapper = shallow(
 				<Popover />,
 				{ lifecycleExperimental: true }
 			);
+		} );
 
-			mocks = {
-				toggleWindowEvents: jest.fn(),
-				setOffset: jest.fn(),
-				setForcedPositions: jest.fn(),
-			};
-
-			Object.assign( wrapper.instance(), mocks );
+		afterEach( () => {
+			jest.restoreAllMocks();
 		} );
 
 		it( 'should add window events', () => {
-			wrapper.setProps( { isOpen: true } );
-
-			expect( mocks.toggleWindowEvents ).toHaveBeenCalledWith( true );
-			expect( mocks.setOffset ).toHaveBeenCalled();
-			expect( mocks.setForcedPositions ).toHaveBeenCalled();
+			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( true );
+			expect( Popover.prototype.setOffset ).toHaveBeenCalled();
+			expect( Popover.prototype.setForcedPositions ).toHaveBeenCalled();
 		} );
 
 		it( 'should remove window events', () => {
-			wrapper.setProps( { isOpen: true } );
-			jest.clearAllMocks();
+			wrapper.unmount();
 
-			wrapper.setProps( { isOpen: false } );
-
-			expect( mocks.toggleWindowEvents ).toHaveBeenCalledWith( false );
-			expect( mocks.setOffset ).not.toHaveBeenCalled();
-			expect( mocks.setForcedPositions ).not.toHaveBeenCalled();
+			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( false );
 		} );
 
 		it( 'should set offset and forced positions on changed position', () => {
-			wrapper.setProps( { isOpen: true } );
 			jest.clearAllMocks();
 
 			wrapper.setProps( { position: 'bottom right' } );
 
-			expect( mocks.toggleWindowEvents ).not.toHaveBeenCalled();
-			expect( mocks.setOffset ).toHaveBeenCalled();
-			expect( mocks.setForcedPositions ).toHaveBeenCalled();
+			expect( Popover.prototype.toggleWindowEvents ).not.toHaveBeenCalled();
+			expect( Popover.prototype.setOffset ).toHaveBeenCalled();
+			expect( Popover.prototype.setForcedPositions ).toHaveBeenCalled();
 		} );
 
 		it( 'should set offset on changed forced positions', () => {
-			wrapper.setProps( { isOpen: true } );
 			jest.clearAllMocks();
 
 			wrapper.setState( { forcedXAxis: 'left' } );
 
-			expect( mocks.toggleWindowEvents ).not.toHaveBeenCalled();
-			expect( mocks.setOffset ).toHaveBeenCalled();
-			expect( mocks.setForcedPositions ).not.toHaveBeenCalled();
+			expect( Popover.prototype.toggleWindowEvents ).not.toHaveBeenCalled();
+			expect( Popover.prototype.setOffset ).toHaveBeenCalled();
+			expect( Popover.prototype.setForcedPositions ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should focus when opening', () => {
@@ -72,7 +64,6 @@ describe( 'Popover', () => {
 			// child, but in context of JSDOM the inputs are not visible and
 			// are therefore skipped as tabbable, defaulting to popover.
 			wrapper = mount( <Popover /> );
-			wrapper.setProps( { isOpen: true } );
 
 			const content = wrapper.find( '.components-popover__content' ).getDOMNode();
 
@@ -82,8 +73,7 @@ describe( 'Popover', () => {
 		it( 'should allow focus-on-open behavior to be disabled', () => {
 			const activeElement = document.activeElement;
 
-			wrapper = mount( <Popover focusOnOpen={ false } /> );
-			wrapper.setProps( { isOpen: true } );
+			wrapper = mount( <Popover focusOnMount={ false } /> );
 
 			expect( document.activeElement ).toBe( activeElement );
 		} );
@@ -282,20 +272,15 @@ describe( 'Popover', () => {
 	} );
 
 	describe( '#render()', () => {
-		it( 'should render nothing if popover is not open', () => {
-			const wrapper = shallow( <Popover /> );
+		it( 'should render content', () => {
+			const wrapper = shallow( <Popover>Hello</Popover>, { disableLifecycleMethods: true } );
 
-			expect( wrapper.type() ).toBeNull();
-		} );
-
-		it( 'should render content if popover is open', () => {
-			const wrapper = shallow( <Popover isOpen>Hello</Popover>, { disableLifecycleMethods: true } );
-
-			expect( wrapper.type() ).not.toBeNull();
+			expect( wrapper.type() ).toBe( 'span' );
+			expect( wrapper.find( '.components-popover__content' ).prop( 'children' ) ).toBe( 'Hello' );
 		} );
 
 		it( 'should pass additional to portaled element', () => {
-			const wrapper = shallow( <Popover isOpen role="tooltip">Hello</Popover>, { disableLifecycleMethods: true } );
+			const wrapper = shallow( <Popover role="tooltip">Hello</Popover>, { disableLifecycleMethods: true } );
 
 			expect( wrapper.find( '.components-popover' ).prop( 'role' ) ).toBe( 'tooltip' );
 		} );

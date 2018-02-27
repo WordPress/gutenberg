@@ -4,17 +4,16 @@
 import { includes } from 'lodash';
 
 /**
- * Reducer enhancer for tracking changes to reducer state over time. The
- * returned reducer will include a new `isDirty` property on the object
- * reflecting whether the original reference of the reducer has changed.
+ * Higher-order reducer creator for tracking changes to state over time. The
+ * returned reducer will include a `isDirty` property on the object reflecting
+ * whether the original reference of the reducer has changed.
  *
- * @param {Function} reducer            Original reducer.
- * @param {?Object}  options            Optional .
- * @param {?Array}   options.resetTypes Action types upon which to reset dirty.
+ * @param {?Object} options            Optional options.
+ * @param {?Array}  options.resetTypes Action types upon which to reset dirty.
  *
- * @return {Function} Enhanced reducer.
+ * @return {Function} Higher-order reducer.
  */
-export default function withChangeDetection( reducer, options = {} ) {
+const withChangeDetection = ( options = {} ) => ( reducer ) => {
 	return ( state, action ) => {
 		const nextState = reducer( state, action );
 
@@ -41,4 +40,6 @@ export default function withChangeDetection( reducer, options = {} ) {
 
 		return nextState;
 	};
-}
+};
+
+export default withChangeDetection;

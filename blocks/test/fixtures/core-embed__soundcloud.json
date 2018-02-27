@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-soundcloud\">\n    https://soundcloud.com/\n    <figcaption>Embedded content from soundcloud</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-soundcloud wp-block-embed\">\n    https://soundcloud.com/\n    <figcaption>Embedded content from soundcloud</figcaption>\n</figure>"
     }
 ]

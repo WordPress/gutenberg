@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { assign, compact, get } from 'lodash';
+import { assign, compact, get, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,6 +70,19 @@ function preserveLayoutAttribute( transformedBlock, blocks ) {
 	return transformedBlock;
 }
 
+/**
+ * Excludes the layout from the list of attributes to check
+ * when determining if a block is unmodified or not.
+ *
+ * @param  {Object} attributeKeys  Attribute keys to check
+ *
+ * @return {Object}                Modified list of attribute keys
+ */
+function excludeLayoutFromUnmodifiedBlockCheck( attributeKeys ) {
+	return without( attributeKeys, 'layout' );
+}
+
 addFilter( 'blocks.registerBlockType', 'core/layout/attribute', addAttribute );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/layout/save-props', addSaveProps );
 addFilter( 'blocks.switchToBlockType.transformedBlock', 'core/layout/preserve-layout', preserveLayoutAttribute );
+addFilter( 'blocks.isUnmodifiedDefaultBlock.attributes', 'core/layout/exclude-layout-attribute-check', excludeLayoutFromUnmodifiedBlockCheck );

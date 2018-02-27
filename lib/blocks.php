@@ -199,6 +199,9 @@ function do_blocks( $content ) {
 	// Append remaining unmatched content.
 	$rendered_content .= $content;
 
+	// Strip remaining block comment demarcations.
+	$rendered_content = preg_replace( '/<!--\s+\/?wp:.*?-->\r?\n?/m', '', $rendered_content );
+
 	return $rendered_content;
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().

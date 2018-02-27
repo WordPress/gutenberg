@@ -26,7 +26,7 @@ describe( 'Adding blocks', () => {
 		cy.get( '[placeholder="Write code…"]' ).type( 'Code block' );
 
 		// Switch to Text Mode to check HTML Output
-		cy.get( '.edit-post-ellipsis-menu [aria-label="More"]' ).click();
+		cy.get( '.edit-post-more-menu [aria-label="More"]' ).click();
 		cy.get( 'button' ).contains( 'Code Editor' ).click();
 
 		// Assertions

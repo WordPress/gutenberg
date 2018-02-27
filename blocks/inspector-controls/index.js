@@ -18,6 +18,7 @@ import {
 	ToggleControl,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
+import { deprecated } from '@wordpress/utils';
 
 export default function InspectorControls( { children } ) {
 	return (
@@ -30,8 +31,11 @@ export default function InspectorControls( { children } ) {
 const withDeprecation = ( componentName ) => ( OriginalComponent ) => {
 	class WrappedComponent extends Component {
 		componentDidMount() {
-			// eslint-disable-next-line no-console
-			console.warn( `wp.blocks.InspectorControls.${ componentName } is deprecated, use wp.components.${ componentName }.` );
+			deprecated( `wp.blocks.InspectorControls.${ componentName }`, {
+				version: '2.4',
+				alternative: `wp.components.${ componentName }`,
+				plugin: 'Gutenberg',
+			} );
 		}
 
 		render() {

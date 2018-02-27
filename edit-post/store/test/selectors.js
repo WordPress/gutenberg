@@ -4,12 +4,16 @@
 import {
 	getEditorMode,
 	getPreference,
-	isSidebarOpened,
+	isGeneralSidebarPanelOpened,
 	hasOpenSidebar,
 	isEditorSidebarPanelOpened,
 	isMobile,
 	hasFixedToolbar,
 	isFeatureActive,
+	getMetaBoxes,
+	hasMetaBoxes,
+	isSavingMetaBoxes,
+	getMetaBox,
 } from '../selectors';
 
 jest.mock( '../constants', () => ( {
@@ -20,7 +24,7 @@ describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
 		it( 'should return the selected editor mode', () => {
 			const state = {
-				preferences: { mode: 'text' },
+				preferences: { editorMode: 'text' },
 			};
 
 			expect( getEditorMode( state ) ).toEqual( 'text' );
@@ -61,143 +65,66 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isSidebarOpened', () => {
-		it( 'should return true when is not mobile and the normal sidebar is opened', () => {
+	describe( 'isGeneralSidebarPanelOpened', () => {
+		it( 'should return true when specified the sidebar panel is opened', () => {
 			const state = {
-				mobile: false,
 				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-					},
+					activeGeneralSidebar: 'editor',
+					viewportType: 'desktop',
+					activeSidebarPanel: 'document',
 				},
 			};
+			const panel = 'document';
+			const sidebar = 'editor';
 
-			expect( isSidebarOpened( state ) ).toBe( true );
+			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( true );
 		} );
 
-		it( 'should return false when is not mobile and the normal sidebar is closed', () => {
+		it( 'should return false when another panel than the specified sidebar panel is opened', () => {
 			const state = {
-				mobile: false,
 				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-					},
+					activeGeneralSidebar: 'editor',
+					viewportType: 'desktop',
+					activeSidebarPanel: 'blocks',
 				},
 			};
+			const panel = 'document';
+			const sidebar = 'editor';
 
-			expect( isSidebarOpened( state ) ).toBe( false );
+			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( false );
 		} );
 
-		it( 'should return true when is mobile and the mobile sidebar is opened', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when is mobile and the mobile sidebar is closed', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state ) ).toBe( false );
-		} );
-
-		it( 'should return true when the given is opened', () => {
+		it( 'should return false when no sidebar panel is opened', () => {
 			const state = {
 				preferences: {
-					sidebars: {
-						publish: true,
-					},
+					activeGeneralSidebar: null,
+					viewportType: 'desktop',
+					activeSidebarPanel: null,
 				},
 			};
+			const panel = 'blocks';
+			const sidebar = 'editor';
 
-			expect( isSidebarOpened( state, 'publish' ) ).toBe( true );
-		} );
-
-		it( 'should return false when the given is not opened', () => {
-			const state = {
-				preferences: {
-					sidebars: {
-						publish: false,
-					},
-				},
-			};
-
-			expect( isSidebarOpened( state, 'publish' ) ).toBe( false );
+			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( false );
 		} );
 	} );
 
 	describe( 'hasOpenSidebar', () => {
-		it( 'should return true if at least one sidebar is open (using the desktop sidebar as default)', () => {
+		it( 'should return true if at least one sidebar is open', () => {
 			const state = {
-				mobile: false,
 				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-						publish: false,
-					},
+					activeSidebarPanel: null,
 				},
 			};
 
 			expect( hasOpenSidebar( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if at no sidebar is open (using the desktop sidebar as default)', () => {
+		it( 'should return false if no sidebar is open', () => {
 			const state = {
-				mobile: false,
+				publishSidebarActive: false,
 				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-						publish: false,
-					},
-				},
-			};
-
-			expect( hasOpenSidebar( state ) ).toBe( false );
-		} );
-
-		it( 'should return true if at least one sidebar is open (using the mobile sidebar as default)', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: false,
-						mobile: true,
-						publish: false,
-					},
-				},
-			};
-
-			expect( hasOpenSidebar( state ) ).toBe( true );
-		} );
-
-		it( 'should return true if at no sidebar is open (using the mobile sidebar as default)', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					sidebars: {
-						desktop: true,
-						mobile: false,
-						publish: false,
-					},
+					activeGeneralSidebar: null,
 				},
 			};
 
@@ -337,6 +264,98 @@ describe( 'selectors', () => {
 			};
 
 			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
+		} );
+	} );
+	describe( 'hasMetaBoxes', () => {
+		it( 'should return true if there are active meta boxes', () => {
+			const state = {
+				metaBoxes: {
+					normal: {
+						isActive: false,
+					},
+					side: {
+						isActive: true,
+					},
+				},
+			};
+
+			expect( hasMetaBoxes( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if there are no active meta boxes', () => {
+			const state = {
+				metaBoxes: {
+					normal: {
+						isActive: false,
+					},
+					side: {
+						isActive: false,
+					},
+				},
+			};
+
+			expect( hasMetaBoxes( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isSavingMetaBoxes', () => {
+		it( 'should return true if some meta boxes are saving', () => {
+			const state = {
+				isSavingMetaBoxes: true,
+			};
+
+			expect( isSavingMetaBoxes( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if no meta boxes are saving', () => {
+			const state = {
+				isSavingMetaBoxes: false,
+			};
+
+			expect( isSavingMetaBoxes( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getMetaBoxes', () => {
+		it( 'should return the state of all meta boxes', () => {
+			const state = {
+				metaBoxes: {
+					normal: {
+						isActive: true,
+					},
+					side: {
+						isActive: true,
+					},
+				},
+			};
+
+			expect( getMetaBoxes( state ) ).toEqual( {
+				normal: {
+					isActive: true,
+				},
+				side: {
+					isActive: true,
+				},
+			} );
+		} );
+	} );
+
+	describe( 'getMetaBox', () => {
+		it( 'should return the state of selected meta box', () => {
+			const state = {
+				metaBoxes: {
+					normal: {
+						isActive: false,
+					},
+					side: {
+						isActive: true,
+					},
+				},
+			};
+
+			expect( getMetaBox( state, 'side' ) ).toEqual( {
+				isActive: true,
+			} );
 		} );
 	} );
 } );

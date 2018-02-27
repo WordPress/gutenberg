@@ -5,7 +5,6 @@ import optimist from 'redux-optimist';
 import { combineReducers } from 'redux';
 import {
 	flow,
-	partialRight,
 	reduce,
 	first,
 	last,
@@ -14,6 +13,9 @@ import {
 	mapValues,
 	findIndex,
 	reject,
+	omitBy,
+	keys,
+	isEqual,
 } from 'lodash';
 
 /**
@@ -95,6 +97,55 @@ function getFlattenedBlocks( blocks ) {
 }
 
 /**
+ * Option for the history reducer. When the block ID and updated attirbute keys
+ * are the same as previously, the history reducer should overwrite its present
+ * state.
+ *
+ * @param {Object} action         The currently dispatched action.
+ * @param {Object} previousAction The previously dispatched action.
+ *
+ * @return {boolean} Whether or not to overwrite present state.
+ */
+function shouldOverwriteState( action, previousAction ) {
+	if (
+		previousAction &&
+		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+		action.type === previousAction.type
+	) {
+		const attributes = keys( action.attributes );
+		const previousAttributes = keys( previousAction.attributes );
+
+		return action.uid === previousAction.uid && isEqual( attributes, previousAttributes );
+	}
+
+	return false;
+}
+
+/**
+ * Higher-order reducer targeting the combined editor reducer, augmenting
+ * block UIDs in remove action to include cascade of inner blocks.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
+	if ( state && action.type === 'REMOVE_BLOCKS' ) {
+		const uids = [ ...action.uids ];
+
+		// For each removed UID, include its inner blocks in UIDs to remove,
+		// recursing into those so long as inner blocks exist.
+		for ( let i = 0; i < uids.length; i++ ) {
+			uids.push( ...state.blockOrder[ uids[ i ] ] );
+		}
+
+		action = { ...action, uids };
+	}
+
+	return reducer( state, action );
+};
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -113,17 +164,24 @@ function getFlattenedBlocks( blocks ) {
 export const editor = flow( [
 	combineReducers,
 
+	withInnerBlocksRemoveCascade,
+
 	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, { resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ] } ),
+	withHistory( {
+		resetTypes: [ 'SETUP_EDITOR_STATE' ],
+		shouldOverwriteState,
+	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_NEW_POST', 'RESET_POST' ] } ),
+	withChangeDetection( {
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ],
+	} ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-			case 'SETUP_NEW_POST':
+			case 'SETUP_EDITOR_STATE':
 				return reduce( action.edits, ( result, value, key ) => {
 					// Only assign into result if not already same value
 					if ( value !== state[ key ] ) {
@@ -167,6 +225,7 @@ export const editor = flow( [
 	blocksByUid( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
+			case 'SETUP_EDITOR_STATE':
 				return getFlattenedBlocks( action.blocks );
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
@@ -270,6 +329,7 @@ export const editor = flow( [
 	blockOrder( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
+			case 'SETUP_EDITOR_STATE':
 				return mapBlockOrder( action.blocks );
 
 			case 'INSERT_BLOCKS': {
@@ -405,6 +465,7 @@ export const editor = flow( [
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
+		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
 		case 'UPDATE_POST':
 			let post;
@@ -539,33 +600,6 @@ export function blockSelection( state = {
 	return state;
 }
 
-/**
- * Reducer returning hovered block state.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function hoveredBlock( state = null, action ) {
-	switch ( action.type ) {
-		case 'TOGGLE_BLOCK_HOVERED':
-			return action.hovered ? action.uid : null;
-		case 'SELECT_BLOCK':
-		case 'START_TYPING':
-		case 'MULTI_SELECT':
-			return null;
-		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state ) === -1 ) {
-				return state;
-			}
-
-			return action.blocks[ 0 ].uid;
-	}
-
-	return state;
-}
-
 export function blocksMode( state = {}, action ) {
 	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
 		const { uid } = action;
@@ -613,10 +647,13 @@ export function isInsertionPointVisible( state = false, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
+		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
+				let id = block.name;
 				const insert = { name: block.name };
 				if ( isReusableBlock( block ) ) {
 					insert.ref = block.attributes.ref;
+					id += '/' + block.attributes.ref;
 				}
 
 				const isSameAsInsert = ( { name, ref } ) => name === insert.name && ref === insert.ref;
@@ -627,12 +664,20 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 						insert,
 						...reject( prevState.recentInserts, isSameAsInsert ),
 					],
+					insertUsage: {
+						...prevState.insertUsage,
+						[ id ]: {
+							count: prevState.insertUsage[ id ] ? prevState.insertUsage[ id ].count + 1 : 1,
+							insert,
+						},
+					},
 				};
 			}, state );
 
 		case 'REMOVE_REUSABLE_BLOCK':
 			return {
 				...state,
+				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
 				recentInserts: reject( state.recentInserts, insert => insert.ref === action.id ),
 			};
 	}
@@ -698,75 +743,6 @@ export function notices( state = [], action ) {
 	}
 
 	return state;
-}
-
-const locations = [
-	'normal',
-	'side',
-	'advanced',
-];
-
-const defaultMetaBoxState = locations.reduce( ( result, key ) => {
-	result[ key ] = {
-		isActive: false,
-	};
-
-	return result;
-}, {} );
-
-/**
- * Reducer keeping track of the meta boxes isSaving state.
- * A "true" value means the meta boxes saving request is in-flight.
- *
- *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
- * @return {Object}         Updated state.
- */
-export function isSavingMetaBoxes( state = false, action ) {
-	switch ( action.type ) {
-		case 'REQUEST_META_BOX_UPDATES':
-			return true;
-		case 'META_BOX_UPDATES_SUCCESS':
-			return false;
-		default:
-			return state;
-	}
-}
-
-/**
- * Reducer keeping track of the state of each meta box location.
- * This includes:
- *  - isActive: Whether the location is active or not.
- *  - data: The last saved form data for this location.
- *    This is used to check whether the form is dirty
- *    before leaving the page.
- *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
- * @return {Object}         Updated state.
- */
-export function metaBoxes( state = defaultMetaBoxState, action ) {
-	switch ( action.type ) {
-		case 'INITIALIZE_META_BOX_STATE':
-			return locations.reduce( ( newState, location ) => {
-				newState[ location ] = {
-					...state[ location ],
-					isActive: action.metaBoxes[ location ],
-				};
-				return newState;
-			}, { ...state } );
-		case 'META_BOX_SET_SAVED_DATA':
-			return locations.reduce( ( newState, location ) => {
-				newState[ location ] = {
-					...state[ location ],
-					data: action.dataPerLocation[ location ],
-				};
-				return newState;
-			}, { ...state } );
-		default:
-			return state;
-	}
 }
 
 export const reusableBlocks = combineReducers( {
@@ -869,13 +845,10 @@ export default optimist( combineReducers( {
 	currentPost,
 	isTyping,
 	blockSelection,
-	hoveredBlock,
 	blocksMode,
 	isInsertionPointVisible,
 	preferences,
 	saving,
 	notices,
-	metaBoxes,
-	isSavingMetaBoxes,
 	reusableBlocks,
 } ) );

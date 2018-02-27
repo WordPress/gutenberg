@@ -15,7 +15,7 @@ Planned additions:
 
 ## API
 
-Tempates can be declared in JS or in PHP as an array of blockTypes (block name and optional attributes).
+Templates can be declared in JS or in PHP as an array of blockTypes (block name and optional attributes).
 
 ```js
 const template = [
@@ -84,4 +84,23 @@ function my_add_template_to_posts() {
 	$post_type_object->template_lock = 'all';
 }
 add_action( 'init', 'my_add_template_to_posts' );
+```
+
+## Nested Templates
+
+Container blocks like the columns blocks also support templates. This is achieved by assigned a nested template to the block.
+
+```php
+$template = array(
+	array( 'core/paragraph', array(
+		'placeholder' => 'Add a root-level paragraph',
+	) ),
+	array( 'core/columns', array(), array(
+		array( 'core/image', array( 'layout' => 'column-1' ) ),
+		array( 'core/paragraph', array(
+			'placeholder' => 'Add a inner paragraph',
+			'layout' => 'column-2'
+		) ),
+	) )
+);
 ```

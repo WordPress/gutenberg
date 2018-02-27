@@ -21,7 +21,6 @@ import {
 	getPostRawValue,
 	editor,
 	currentPost,
-	hoveredBlock,
 	isTyping,
 	blockSelection,
 	preferences,
@@ -29,16 +28,8 @@ import {
 	notices,
 	blocksMode,
 	isInsertionPointVisible,
-	isSavingMetaBoxes,
-	metaBoxes,
 	reusableBlocks,
 } from '../reducer';
-
-jest.mock( '../../utils/meta-boxes', () => {
-	return {
-		getMetaBoxContainer: () => ( { innerHTML: 'meta boxes content' } ),
-	};
-} );
 
 describe( 'state', () => {
 	describe( 'getPostRawValue', () => {
@@ -558,6 +549,29 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should cascade remove to include inner blocks', () => {
+			const block = createBlock( 'core/test-block', {}, [
+				createBlock( 'core/test-block', {}, [
+					createBlock( 'core/test-block' ),
+				] ),
+			] );
+
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ block ],
+			} );
+
+			const state = editor( original, {
+				type: 'REMOVE_BLOCKS',
+				uids: [ block.uid ],
+			} );
+
+			expect( state.present.blocksByUid ).toEqual( {} );
+			expect( state.present.blockOrder ).toEqual( {
+				'': [],
+			} );
+		} );
+
 		it( 'should insert at the specified index', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
@@ -689,11 +703,12 @@ describe( 'state', () => {
 
 			it( 'should save initial post state', () => {
 				const state = editor( undefined, {
-					type: 'SETUP_NEW_POST',
+					type: 'SETUP_EDITOR_STATE',
 					edits: {
 						status: 'draft',
 						title: 'post title',
 					},
+					blocks: [],
 				} );
 
 				expect( state.present.edits ).toEqual( {
@@ -819,6 +834,74 @@ describe( 'state', () => {
 				expect( state.present.blocksByUid ).toBe( state.present.blocksByUid );
 			} );
 		} );
+
+		describe( 'withHistory', () => {
+			it( 'should overwrite present history if updating same attributes', () => {
+				let state;
+
+				state = editor( state, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {},
+						innerBlocks: [],
+					} ],
+				} );
+
+				expect( state.past ).toHaveLength( 1 );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 1,
+					},
+				} );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 2,
+					},
+				} );
+
+				expect( state.past ).toHaveLength( 2 );
+			} );
+
+			it( 'should not overwrite present history if updating same attributes', () => {
+				let state;
+
+				state = editor( state, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {},
+						innerBlocks: [],
+					} ],
+				} );
+
+				expect( state.past ).toHaveLength( 1 );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						test: 1,
+					},
+				} );
+
+				state = editor( state, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						other: 1,
+					},
+				} );
+
+				expect( state.past ).toHaveLength( 3 );
+			} );
+		} );
 	} );
 
 	describe( 'currentPost()', () => {
@@ -851,55 +934,6 @@ describe( 'state', () => {
 				title: 'updated post object from server',
 				status: 'publish',
 			} );
-		} );
-	} );
-
-	describe( 'hoveredBlock()', () => {
-		it( 'should return with block uid as hovered', () => {
-			const state = hoveredBlock( null, {
-				type: 'TOGGLE_BLOCK_HOVERED',
-				uid: 'kumquat',
-				hovered: true,
-			} );
-
-			expect( state ).toBe( 'kumquat' );
-		} );
-
-		it( 'should return null when a block is selected', () => {
-			const state = hoveredBlock( 'kumquat', {
-				type: 'SELECT_BLOCK',
-				uid: 'kumquat',
-			} );
-
-			expect( state ).toBeNull();
-		} );
-
-		it( 'should replace the hovered block', () => {
-			const state = hoveredBlock( 'chicken', {
-				type: 'REPLACE_BLOCKS',
-				uids: [ 'chicken' ],
-				blocks: [ {
-					uid: 'wings',
-					name: 'core/freeform',
-					innerBlocks: [],
-				} ],
-			} );
-
-			expect( state ).toBe( 'wings' );
-		} );
-
-		it( 'should keep the hovered block', () => {
-			const state = hoveredBlock( 'chicken', {
-				type: 'REPLACE_BLOCKS',
-				uids: [ 'ribs' ],
-				blocks: [ {
-					uid: 'wings',
-					name: 'core/freeform',
-					innerBlocks: [],
-				} ],
-			} );
-
-			expect( state ).toBe( 'chicken' );
 		} );
 	} );
 
@@ -1163,11 +1197,12 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				recentInserts: [],
+				insertUsage: {},
 			} );
 		} );
 
 		it( 'should record recently used blocks', () => {
-			const state = preferences( deepFreeze( { recentInserts: [] } ), {
+			const state = preferences( deepFreeze( { recentInserts: [], insertUsage: {} } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'bacon',
@@ -1179,9 +1214,23 @@ describe( 'state', () => {
 				recentInserts: [
 					{ name: 'core-embed/twitter' },
 				],
+				insertUsage: {
+					'core-embed/twitter': {
+						count: 1,
+						insert: { name: 'core-embed/twitter' },
+					},
+				},
 			} );
 
-			const twoRecentBlocks = preferences( deepFreeze( { recentInserts: [] } ), {
+			const twoRecentBlocks = preferences( deepFreeze( {
+				recentInserts: [],
+				insertUsage: {
+					'core-embed/twitter': {
+						count: 1,
+						insert: { name: 'core-embed/twitter' },
+					},
+				},
+			} ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'eggs',
@@ -1198,6 +1247,16 @@ describe( 'state', () => {
 					{ name: 'core/block', ref: 123 },
 					{ name: 'core-embed/twitter' },
 				],
+				insertUsage: {
+					'core-embed/twitter': {
+						count: 2,
+						insert: { name: 'core-embed/twitter' },
+					},
+					'core/block/123': {
+						count: 1,
+						insert: { name: 'core/block', ref: 123 },
+					},
+				},
 			} );
 		} );
 
@@ -1208,6 +1267,12 @@ describe( 'state', () => {
 					{ name: 'core/block', ref: 123 },
 					{ name: 'core/block', ref: 456 },
 				],
+				insertUsage: {
+					'core/block/123': {
+						count: 1,
+						insert: { name: 'core/block', ref: 123 },
+					},
+				},
 			};
 
 			const state = preferences( deepFreeze( initialState ), {
@@ -1220,6 +1285,7 @@ describe( 'state', () => {
 					{ name: 'core-embed/twitter' },
 					{ name: 'core/block', ref: 456 },
 				],
+				insertUsage: {},
 			} );
 		} );
 	} );
@@ -1370,94 +1436,6 @@ describe( 'state', () => {
 			const value = blocksMode( deepFreeze( { chicken: 'html' } ), action );
 
 			expect( value ).toEqual( { chicken: 'visual' } );
-		} );
-	} );
-
-	describe( 'isSavingMetaBoxes', () => {
-		it( 'should return default state', () => {
-			const actual = isSavingMetaBoxes( undefined, {} );
-			expect( actual ).toBe( false );
-		} );
-
-		it( 'should set saving flag to true', () => {
-			const action = {
-				type: 'REQUEST_META_BOX_UPDATES',
-			};
-			const actual = isSavingMetaBoxes( false, action );
-
-			expect( actual ).toBe( true );
-		} );
-
-		it( 'should set saving flag to false', () => {
-			const action = {
-				type: 'META_BOX_UPDATES_SUCCESS',
-			};
-			const actual = isSavingMetaBoxes( true, action );
-
-			expect( actual ).toBe( false );
-		} );
-	} );
-
-	describe( 'metaBoxes()', () => {
-		it( 'should return default state', () => {
-			const actual = metaBoxes( undefined, {} );
-			const expected = {
-				normal: {
-					isActive: false,
-				},
-				side: {
-					isActive: false,
-				},
-				advanced: {
-					isActive: false,
-				},
-			};
-
-			expect( actual ).toEqual( expected );
-		} );
-
-		it( 'should set the sidebar to active', () => {
-			const theMetaBoxes = {
-				normal: false,
-				advanced: false,
-				side: true,
-			};
-
-			const action = {
-				type: 'INITIALIZE_META_BOX_STATE',
-				metaBoxes: theMetaBoxes,
-			};
-
-			const actual = metaBoxes( undefined, action );
-			const expected = {
-				normal: {
-					isActive: false,
-				},
-				side: {
-					isActive: true,
-				},
-				advanced: {
-					isActive: false,
-				},
-			};
-
-			expect( actual ).toEqual( expected );
-		} );
-
-		it( 'should set the meta boxes saved data', () => {
-			const action = {
-				type: 'META_BOX_SET_SAVED_DATA',
-				dataPerLocation: {
-					side: 'a=b',
-				},
-			};
-
-			const theMetaBoxes = metaBoxes( { normal: { isActive: true }, side: { isActive: false } }, action );
-			expect( theMetaBoxes ).toEqual( {
-				advanced: { data: undefined },
-				normal: { isActive: true, data: undefined },
-				side: { isActive: false, data: 'a=b' },
-			} );
 		} );
 	} );
 

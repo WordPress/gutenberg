@@ -5,6 +5,7 @@ export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
+export { default as CodeEditor } from './code-editor';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as DropZone } from './drop-zone';
@@ -17,6 +18,7 @@ export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as IconButton } from './icon-button';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';
+export { default as MenuItemsChoice } from './menu-items/menu-items-choice';
 export { default as MenuItemsGroup } from './menu-items/menu-items-group';
 export { default as MenuItemsToggle } from './menu-items/menu-items-toggle';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
@@ -41,6 +43,7 @@ export { default as TextareaControl } from './textarea-control';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as Tooltip } from './tooltip';
+export { default as TreeSelect } from './tree-select';
 export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components

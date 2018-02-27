@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 2.1.0
+ * Version: 2.2.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -496,14 +496,18 @@ function gutenberg_replace_default_add_new_button() {
 			button.remove();
 
 			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
+			var dropdown = expander.parentNode.querySelector( '.dropdown' );
+			function toggleDropdown() {
+				dropdown.classList.toggle( 'visible' );
+			}
 			expander.addEventListener( 'click', function( e ) {
 				e.preventDefault();
-				e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
+				toggleDropdown();
 			} );
 			expander.addEventListener( 'keydown', function( e ) {
 				if ( 13 === e.which || 32 === e.which ) {
 					e.preventDefault();
-					e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
+					toggleDropdown();
 				}
 			} );
 		} );

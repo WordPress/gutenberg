@@ -11,9 +11,9 @@ import {
 	reduce,
 	compact,
 	find,
-	some,
 	unionWith,
 	includes,
+	values,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -27,64 +27,19 @@ import { addQueryArgs } from '@wordpress/url';
 /***
  * Module constants
  */
-const MAX_RECENT_BLOCKS = 8;
+const MAX_RECENT_BLOCKS = 9;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 
 /**
- * Shared reference to an empty array used as the default block order return
- * value when the state value is not explicitly assigned, since we want to
- * avoid returning a new array reference on every invocation.
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
  *
  * @type {Array}
  */
-const DEFAULT_BLOCK_ORDER = [];
-
-/**
- * Returns the state of legacy meta boxes.
- *
- * @param   {Object} state Global application state.
- * @return {Object}       State of meta boxes.
- */
-export function getMetaBoxes( state ) {
-	return state.metaBoxes;
-}
-
-/**
- * Returns the state of legacy meta boxes.
- *
- * @param {Object} state    Global application state.
- * @param {string} location Location of the meta box.
- *
- * @return {Object} State of meta box at specified location.
- */
-export function getMetaBox( state, location ) {
-	return getMetaBoxes( state )[ location ];
-}
-
-/**
- * Returns true if the post is using Meta Boxes
- *
- * @param  {Object} state Global application state
- * @return {boolean}      Whether there are metaboxes or not.
- */
-export const hasMetaBoxes = createSelector(
-	( state ) => {
-		return some( getMetaBoxes( state ), ( metaBox ) => {
-			return metaBox.isActive;
-		} );
-	},
-	( state ) => state.metaBoxes,
-);
-
-/**
- * Returns true if the the Meta Boxes are being saved.
- *
- * @param   {Object}  state Global application state.
- * @return {boolean}       Whether the metaboxes are being saved.
- */
-export function isSavingMetaBoxes( state ) {
-	return state.isSavingMetaBoxes;
-}
+const EMPTY_ARRAY = [];
 
 /**
  * Returns true if any past editor history snapshots exist, or false otherwise.
@@ -170,17 +125,6 @@ export function getCurrentPostType( state ) {
 }
 
 /**
- * Returns the slug of the post currently being edited.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Slug.
- */
-export function getCurrentPostSlug( state ) {
-	return getEditedPostAttribute( state, 'slug' );
-}
-
-/**
  * Returns the ID of the post currently being edited, or null if the post has
  * not yet been saved.
  *
@@ -239,6 +183,13 @@ export function getPostEdits( state ) {
  */
 export function getEditedPostAttribute( state, attributeName ) {
 	const edits = getPostEdits( state );
+
+	// Special cases
+	switch ( attributeName ) {
+		case 'content':
+			return getEditedPostContent( state );
+	}
+
 	return edits[ attributeName ] === undefined ?
 		state.currentPost[ attributeName ] :
 		edits[ attributeName ];
@@ -288,7 +239,8 @@ export function isCurrentPostPublished( state ) {
  */
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
-	return isEditedPostDirty( state ) || hasMetaBoxes( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
+
+	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
 }
 
 /**
@@ -301,9 +253,24 @@ export function isEditedPostPublishable( state ) {
  */
 export function isEditedPostSaveable( state ) {
 	return (
-		!! getEditedPostTitle( state ) ||
+		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostExcerpt( state ) ||
-		!! getEditedPostContent( state )
+		! isEditedPostEmpty( state )
+	);
+}
+
+/**
+ * Returns true if the edited post has content. A post has content if it has at
+ * least one block or otherwise has a non-empty content property assigned.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether post has content.
+ */
+export function isEditedPostEmpty( state ) {
+	return (
+		! getBlockCount( state ) &&
+		! getEditedPostAttribute( state, 'content' )
 	);
 }
 
@@ -324,26 +291,6 @@ export function isEditedPostBeingScheduled( state ) {
 }
 
 /**
- * Returns the raw title of the post being edited, preferring the unsaved value
- * if different than the saved post.
- *
- * @param {Object} state Global application state.
- *
- * @return {string} Raw post title.
- */
-export function getEditedPostTitle( state ) {
-	const editedTitle = getPostEdits( state ).title;
-	if ( editedTitle !== undefined ) {
-		return editedTitle;
-	}
-	const currentPost = getCurrentPost( state );
-	if ( currentPost.title && currentPost.title ) {
-		return currentPost.title;
-	}
-	return '';
-}
-
-/**
  * Gets the document title to be used.
  *
  * @param {Object} state Global application state.
@@ -351,7 +298,7 @@ export function getEditedPostTitle( state ) {
  * @return {string} Document title.
  */
 export function getDocumentTitle( state ) {
-	let title = getEditedPostTitle( state );
+	let title = getEditedPostAttribute( state, 'title' );
 
 	if ( ! title.trim() ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
@@ -388,6 +335,27 @@ export function getEditedPostPreviewLink( state ) {
 
 	return addQueryArgs( link, { preview: 'true' } );
 }
+
+/**
+ * Returns a new reference when the inner blocks of a given block UID change.
+ * This is used exclusively as a memoized selector dependant, relying on this
+ * selector's shared return value and recursively those of its inner blocks
+ * defined as dependencies. This abuses mechanics of the selector memoization
+ * to return from the original selector function only when dependants change.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {*} A value whose reference will change only when inner blocks of
+ *             the given block UID change.
+ */
+export const getBlockDependantsCacheBust = createSelector(
+	() => [],
+	( state, uid ) => map(
+		getBlockOrder( state, uid ),
+		( innerBlockUID ) => getBlock( state, innerBlockUID ),
+	),
+);
 
 /**
  * Returns a block given its unique ID. This is a parsed copy of the block,
@@ -434,10 +402,11 @@ export const getBlock = createSelector(
 			innerBlocks: getBlocks( state, uid ),
 		};
 	},
-	( state ) => [
-		get( state, [ 'editor', 'present', 'blocksByUid' ] ),
-		get( state, [ 'editor', 'present', 'edits', 'meta' ] ),
-		get( state, 'currentPost.meta' ),
+	( state, uid ) => [
+		state.editor.present.blocksByUid[ uid ],
+		getBlockDependantsCacheBust( state, uid ),
+		state.editor.present.edits.meta,
+		state.currentPost.meta,
 	]
 );
 
@@ -466,6 +435,19 @@ export const getBlocks = createSelector(
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
+		state.editor.present.blocksByUid,
+	]
+);
+
+export const getBlocksByUID = createSelector(
+	( state, uids ) => {
+		return map( uids, ( uid ) => getBlock( state, uid ) );
+	},
+	( state ) => [
+		state.editor.present.blocksByUid,
+		state.editor.present.blockOrder,
+		state.editor.present.edits.meta,
+		state.currentPost.meta,
 		state.editor.present.blocksByUid,
 	]
 );
@@ -537,7 +519,7 @@ export function getBlockRootUID( state, uid ) {
 }
 
 /**
- * Returns the block adjacent one at the given reference startUID and modifier
+ * Returns the UID of the block adjacent one at the given reference startUID and modifier
  * directionality. Defaults start UID to the selected block, and direction as
  * next block. Returns null if there is no adjacent block.
  *
@@ -545,9 +527,9 @@ export function getBlockRootUID( state, uid ) {
  * @param {?string} startUID Optional UID of block from which to search.
  * @param {?number} modifier Directionality multiplier (1 next, -1 previous).
  *
- * @return {?Object} Adjacent block object, or null if none exists.
+ * @return {?string} Return the UID of the block, or null if none exists.
  */
-export function getAdjacentBlock( state, startUID, modifier = 1 ) {
+export function getAdjacentBlockUid( state, startUID, modifier = 1 ) {
 	// Default to selected block.
 	if ( startUID === undefined ) {
 		startUID = get( getSelectedBlock( state ), 'uid' );
@@ -590,33 +572,33 @@ export function getAdjacentBlock( state, startUID, modifier = 1 ) {
 	}
 
 	// Assume incremented index is within the set.
-	return getBlock( state, orderSet[ nextIndex ] );
+	return orderSet[ nextIndex ];
 }
 
 /**
- * Returns the previous block from the given reference startUID. Defaults start
+ * Returns the previous block's UID from the given reference startUID. Defaults start
  * UID to the selected block. Returns null if there is no previous block.
  *
  * @param {Object}  state    Global application state.
  * @param {?string} startUID Optional UID of block from which to search.
  *
- * @return {?Object} Adjacent block object, or null if none exists.
+ * @return {?string} Adjacent block's UID, or null if none exists.
  */
-export function getPreviousBlock( state, startUID ) {
-	return getAdjacentBlock( state, startUID, -1 );
+export function getPreviousBlockUid( state, startUID ) {
+	return getAdjacentBlockUid( state, startUID, -1 );
 }
 
 /**
- * Returns the next block from the given reference startUID. Defaults start UID
+ * Returns the next block's UID from the given reference startUID. Defaults start UID
  * to the selected block. Returns null if there is no next block.
  *
  * @param {Object}  state    Global application state.
  * @param {?string} startUID Optional UID of block from which to search.
  *
- * @return {?Object} Adjacent block object, or null if none exists.
+ * @return {?string} Adjacent block's UID, or null if none exists.
  */
-export function getNextBlock( state, startUID ) {
-	return getAdjacentBlock( state, startUID, 1 );
+export function getNextBlockUid( state, startUID ) {
+	return getAdjacentBlockUid( state, startUID, 1 );
 }
 
 /**
@@ -685,7 +667,14 @@ export const getMultiSelectedBlockUids = createSelector(
  * @return {Array} Multi-selected block objects.
  */
 export const getMultiSelectedBlocks = createSelector(
-	( state ) => getMultiSelectedBlockUids( state ).map( ( uid ) => getBlock( state, uid ) ),
+	( state ) => {
+		const multiSelectedBlockUids = getMultiSelectedBlockUids( state );
+		if ( ! multiSelectedBlockUids.length ) {
+			return EMPTY_ARRAY;
+		}
+
+		return multiSelectedBlockUids.map( ( uid ) => getBlock( state, uid ) );
+	},
 	( state ) => [
 		state.editor.present.blockOrder,
 		state.blockSelection.start,
@@ -797,7 +786,7 @@ export function getMultiSelectedBlocksEndUid( state ) {
  * @return {Array} Ordered unique IDs of post blocks.
  */
 export function getBlockOrder( state, rootUID ) {
-	return state.editor.present.blockOrder[ rootUID || '' ] || DEFAULT_BLOCK_ORDER;
+	return state.editor.present.blockOrder[ rootUID || '' ] || EMPTY_ARRAY;
 }
 
 /**
@@ -856,19 +845,6 @@ export function isBlockWithinSelection( state, uid ) {
 }
 
 /**
- * Returns true if the cursor is hovering the block corresponding to the
- * specified unique ID, or false otherwise.
- *
- * @param {Object} state Global application state.
- * @param {string} uid   Block unique ID.
- *
- * @return {boolean} Whether block is hovered.
- */
-export function isBlockHovered( state, uid ) {
-	return state.hoveredBlock === uid;
-}
-
-/**
  * Whether in the process of multi-selecting or not.
  *
  * @param {Object} state Global application state.
@@ -917,23 +893,24 @@ export function isTyping( state ) {
  * Returns the insertion point, the index at which the new inserted block would
  * be placed. Defaults to the last index.
  *
- * @param {Object}  state   Global application state.
- * @param {?string} rootUID Optional root UID of block list.
+ * @param {Object} state Global application state.
  *
- * @return {?string} Unique ID after which insertion will occur.
+ * @return {Object} Insertion point object with `rootUID`, `layout`, `index`
  */
-export function getBlockInsertionPoint( state, rootUID ) {
-	const lastMultiSelectedBlock = getLastMultiSelectedBlockUid( state );
-	if ( lastMultiSelectedBlock ) {
-		return getBlockIndex( state, lastMultiSelectedBlock, rootUID ) + 1;
+export function getBlockInsertionPoint( state ) {
+	let rootUID, layout, index;
+
+	const { end } = state.blockSelection;
+	if ( end ) {
+		rootUID = getBlockRootUID( state, end ) || undefined;
+
+		layout = get( getBlock( state, end ), [ 'attributes', 'layout' ] );
+		index = getBlockIndex( state, end, rootUID ) + 1;
+	} else {
+		index = getBlockOrder( state ).length;
 	}
 
-	const selectedBlock = getSelectedBlock( state );
-	if ( selectedBlock ) {
-		return getBlockIndex( state, selectedBlock.uid, rootUID ) + 1;
-	}
-
-	return getBlockOrder( state, rootUID ).length;
+	return { rootUID, layout, index };
 }
 
 /**
@@ -955,7 +932,7 @@ export function isBlockInsertionPointVisible( state ) {
  * @return {boolean} Whether post is being saved.
  */
 export function isSavingPost( state ) {
-	return state.saving.requesting || isSavingMetaBoxes( state );
+	return state.saving.requesting;
 }
 
 /**
@@ -1177,36 +1154,25 @@ export function getInserterItems( state, enabledBlockTypes = true ) {
 	return compact( items );
 }
 
-const getRecentInserts = createSelector(
-	state => {
-		// Filter out any inserts that are associated with a block type that isn't registered
-		const inserts = state.preferences.recentInserts.filter( insert => getBlockType( insert.name ) );
+function fillWithCommonBlocks( inserts ) {
+	// Filter out any inserts that are associated with a block type that isn't registered
+	const items = inserts.filter( insert => getBlockType( insert.name ) );
 
-		// Common blocks that we'll use to pad out our list
-		const commonInserts = getBlockTypes()
-			.filter( blockType => blockType.category === 'common' )
-			.map( blockType => ( { name: blockType.name } ) );
+	// Common blocks that we'll use to pad out our list
+	const commonInserts = getBlockTypes()
+		.filter( blockType => blockType.category === 'common' )
+		.map( blockType => ( { name: blockType.name } ) );
 
-		const areInsertsEqual = ( a, b ) => a.name === b.name && a.ref === b.ref;
-		return unionWith( inserts, commonInserts, areInsertsEqual );
-	},
-	state => state.preferences.recentInserts
-);
+	const areInsertsEqual = ( a, b ) => a.name === b.name && a.ref === b.ref;
+	return unionWith( items, commonInserts, areInsertsEqual );
+}
 
-/**
- * Determines the items that appear in the 'Recent' tab of the inserter.
- *
- * @param {Object}           state             Global application state.
- * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
- *
- * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
- */
-export function getRecentInserterItems( state, enabledBlockTypes = true ) {
+function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
 	if ( ! enabledBlockTypes ) {
 		return [];
 	}
 
-	const items = getRecentInserts( state ).map( insert => {
+	const items = fillWithCommonBlocks( inserts ).map( insert => {
 		if ( insert.ref ) {
 			const reusableBlock = getReusableBlock( state, insert.ref );
 			return buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock );
@@ -1216,7 +1182,36 @@ export function getRecentInserterItems( state, enabledBlockTypes = true ) {
 		return buildInserterItemFromBlockType( state, enabledBlockTypes, blockType );
 	} );
 
-	return compact( items ).slice( 0, MAX_RECENT_BLOCKS );
+	return compact( items ).slice( 0, maximum );
+}
+
+/**
+ * Determines the items that appear in the 'Recent' tab of the inserter.
+ *
+ * @param {Object}           state             Global application state.
+ * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {number}           maximum           Number of items to return.
+ *
+ * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
+ */
+export function getRecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
+	return getItemsFromInserts( state, state.preferences.recentInserts, enabledBlockTypes, maximum );
+}
+
+/**
+ * Determines the items that appear in the inserter with shortcuts based on the block usage
+ *
+ * @param {Object}           state             Global application state.
+ * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {number}           maximum           Number of items to return.
+ *
+ * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
+ */
+export function getFrequentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
+	const sortedInserts = values( state.preferences.insertUsage )
+		.sort( ( a, b ) => b.count - a.count )
+		.map( ( { insert } ) => insert );
+	return getItemsFromInserts( state, sortedInserts, enabledBlockTypes, maximum );
 }
 
 /**

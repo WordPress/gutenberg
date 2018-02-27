@@ -11,6 +11,7 @@ exports[`core/quote block edit matches snapshot 1`] = `
       aria-label="Write quote…"
       class="blocks-rich-text__tinymce"
       contenteditable="true"
+      data-is-placeholder-visible="true"
     />
     <div
       class="blocks-rich-text__tinymce"

@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { flowRight } from 'lodash';
+import refx from 'refx';
 
 /**
  * Internal dependencies
  */
-import { mobileMiddleware } from '../utils/mobile';
+import effects from './effects';
 
 /**
  * Applies the custom middlewares used specifically in the editor module.
@@ -17,7 +18,7 @@ import { mobileMiddleware } from '../utils/mobile';
  */
 function applyMiddlewares( store ) {
 	const middlewares = [
-		mobileMiddleware,
+		refx( effects ),
 	];
 
 	let enhancedDispatch = () => {

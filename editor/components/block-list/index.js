@@ -3,60 +3,66 @@
  */
 import { connect } from 'react-redux';
 import {
-	filter,
+	reduce,
 	get,
 	map,
 } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { createElement } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockListLayout from './layout';
-import { getBlocks } from '../../store/selectors';
+import { getBlocks, getBlockOrder } from '../../store/selectors';
 
-function BlockList( {
-	blocks,
-	renderBlockMenu,
-	layouts = {},
-	rootUID,
-	showContextualToolbar,
-} ) {
-	// BlockList can be provided with a layouts configuration, either grouped
-	// (blocks adjacent in markup) or ungrouped. This is inferred by the shape
-	// of the layouts configuration passed (grouped layout as array).
-	const isGroupedByLayout = Array.isArray( layouts );
+const UngroupedLayoutBlockList = connect(
+	( state, ownProps ) => ( {
+		blockUIDs: getBlockOrder( state, ownProps.rootUID ),
+	} )
+)( BlockListLayout );
 
-	// In case of ungrouped layout, we still emulate a layout merely for the
-	// purposes of normalizing layout rendering, even though there will only
-	// be a single layout, and no filtering applied.
-	if ( ! isGroupedByLayout ) {
-		layouts = [ { name: 'default' } ];
-	}
-
-	return map( layouts, ( layout ) => {
-		// When rendering grouped layouts, filter to blocks assigned to layout.
-		const layoutBlocks = isGroupedByLayout ?
-			filter( blocks, ( block ) => (
-				get( block, [ 'attributes', 'layout' ] ) === layout.name
-			) ) :
-			blocks;
-
-		return (
-			<BlockListLayout
-				key={ layout.name }
-				layout={ layout.name }
-				isGroupedByLayout={ isGroupedByLayout }
-				blocks={ layoutBlocks }
-				renderBlockMenu={ renderBlockMenu }
-				rootUID={ rootUID }
-				showContextualToolbar={ showContextualToolbar }
-			/>
-		);
-	} );
-}
-
-export default connect(
+const GroupedLayoutBlockList = connect(
 	( state, ownProps ) => ( {
 		blocks: getBlocks( state, ownProps.rootUID ),
 	} ),
-)( BlockList );
+)( ( {
+	blocks,
+	layouts,
+	...props
+} ) => map( layouts, ( layout ) => {
+	// Filter blocks assigned to layout when rendering grouped layouts.
+	const layoutBlockUIDs = reduce( blocks, ( result, block ) => {
+		if ( get( block, [ 'attributes', 'layout' ] ) === layout.name ) {
+			result.push( block.uid );
+		}
+
+		return result;
+	}, [] );
+
+	return (
+		<BlockListLayout
+			key={ layout.name }
+			layout={ layout.name }
+			isGroupedByLayout
+			blockUIDs={ layoutBlockUIDs }
+			{ ...props }
+		/>
+	);
+} ) );
+
+const BlockList = ( props ) => createElement(
+	// BlockList can be provided with a layouts configuration, either grouped
+	// (blocks adjacent in markup) or ungrouped. This is inferred by the shape
+	// of the layouts configuration passed (grouped layout as array).
+	Array.isArray( props.layouts ) ?
+		GroupedLayoutBlockList :
+		UngroupedLayoutBlockList,
+	props
+);
+
+export default BlockList;

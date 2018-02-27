@@ -29,14 +29,12 @@
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
 		height: 100%;
-		padding-top: $panel-header-height;
 		margin-top: -1px;
 		margin-bottom: -1px;
 
 		@include break-small() {
 			overflow: inherit;
 			height: auto;
-			padding-top: 0;
 		}
 	}
 
@@ -90,13 +88,16 @@
 	}
 }
 
-.edit-post-layout.is-sidebar-opened .edit-post-sidebar {
-	/* Sidebar covers screen on mobile */
-	width: 100%;
+.edit-post-layout.is-sidebar-opened {
+	.edit-post-sidebar,
+	.edit-post-plugins-panel {
+		/* Sidebar covers screen on mobile */
+		width: 100%;
 
-	/* Sidebar sits on the side on larger breakpoints */
-	@include break-medium() {
-		width: $sidebar-width;
+		/* Sidebar sits on the side on larger breakpoints */
+		@include break-medium() {
+			width: $sidebar-width;
+		}
 	}
 }
 
@@ -123,6 +124,7 @@
 	padding: 0 20px;
 	margin-left: 0;
 	font-weight: 400;
+	@include square-style__neutral;
 
 	&.is-active {
 		border-bottom-color: $blue-medium-500;
@@ -130,6 +132,6 @@
 	}
 
 	&:focus {
-		@include button-style__focus-active;
+		@include square-style__focus-active;
 	}
 }
