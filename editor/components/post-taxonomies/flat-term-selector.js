@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { get, unescape as unescapeString, find, throttle } from 'lodash';
+import { get, unescape as unescapeString, find, throttle, uniqBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,9 @@ import { FormTokenField, withAPIData } from '@wordpress/components';
 import { getEditedPostAttribute } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
+/**
+ * Module constants
+ */
 const DEFAULT_QUERY = {
 	per_page: 100,
 	orderby: 'count',
@@ -24,6 +27,7 @@ const DEFAULT_QUERY = {
 	_fields: [ 'id', 'name' ],
 };
 const MAX_TERMS_SUGGESTIONS = 20;
+const isSameTermName = ( termA, termB ) => termA.toLowerCase() === termB.toLowerCase();
 
 class FlatTermSelector extends Component {
 	constructor() {
@@ -111,7 +115,7 @@ class FlatTermSelector extends Component {
 							{ data: { ...DEFAULT_QUERY, search: termName } }
 						);
 						return this.addRequest.then( searchResult => {
-							resolve( find( searchResult, result => result.name === termName ) );
+							resolve( find( searchResult, result => isSameTermName( result.name, termName ) ) );
 						}, reject );
 					}
 					reject( xhr );
@@ -120,26 +124,27 @@ class FlatTermSelector extends Component {
 	}
 
 	onChange( termNames ) {
-		this.setState( { selectedTerms: termNames } );
-		const newTermNames = termNames.filter( ( termName ) =>
-			! find( this.state.availableTerms, ( term ) => term.name === termName )
+		const uniqueTerms = uniqBy( termNames, ( term ) => term.toLowerCase() );
+		this.setState( { selectedTerms: uniqueTerms } );
+		const newTermNames = uniqueTerms.filter( ( termName ) =>
+			! find( this.state.availableTerms, ( term ) => isSameTermName( term.name, termName ) )
 		);
 		const termNamesToIds = ( names, availableTerms ) => {
 			return names
 				.map( ( termName ) =>
-					find( availableTerms, ( term ) => term.name === termName ).id
+					find( availableTerms, ( term ) => isSameTermName( term.name, termName ) ).id
 				);
 		};
 
 		if ( newTermNames.length === 0 ) {
-			return this.props.onUpdateTerms( termNamesToIds( termNames, this.state.availableTerms ), this.props.restBase );
+			return this.props.onUpdateTerms( termNamesToIds( uniqueTerms, this.state.availableTerms ), this.props.restBase );
 		}
 		Promise
 			.all( newTermNames.map( this.findOrCreateTerm ) )
 			.then( ( newTerms ) => {
 				const newAvailableTerms = this.state.availableTerms.concat( newTerms );
 				this.setState( { availableTerms: newAvailableTerms } );
-				return this.props.onUpdateTerms( termNamesToIds( termNames, newAvailableTerms ), this.props.restBase );
+				return this.props.onUpdateTerms( termNamesToIds( uniqueTerms, newAvailableTerms ), this.props.restBase );
 			} );
 	}
 

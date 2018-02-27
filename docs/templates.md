@@ -85,3 +85,22 @@ function my_add_template_to_posts() {
 }
 add_action( 'init', 'my_add_template_to_posts' );
 ```
+
+## Nested Templates
+
+Container blocks like the columns blocks also support templates. This is achieved by assigned a nested template to the block.
+
+```php
+$template = array(
+	array( 'core/paragraph', array(
+		'placeholder' => 'Add a root-level paragraph',
+	) ),
+	array( 'core/columns', array(), array(
+		array( 'core/image', array( 'layout' => 'column-1' ) ),
+		array( 'core/paragraph', array(
+			'placeholder' => 'Add a inner paragraph',
+			'layout' => 'column-2'
+		) ),
+	) )
+);
+```

@@ -18,6 +18,9 @@ import { buildTermsTree } from '@wordpress/utils';
 import { getEditedPostAttribute } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
+/**
+ * Module Constants
+ */
 const DEFAULT_QUERY = {
 	per_page: 100,
 	orderby: 'count',
@@ -73,7 +76,7 @@ class HierarchicalTermSelector extends Component {
 	findTerm( terms, parent, name ) {
 		return find( terms, term => {
 			return ( ( ! term.parent && ! parent ) || parseInt( term.parent ) === parseInt( parent ) ) &&
-				term.name === name;
+				term.name.toLowerCase() === name.toLowerCase();
 		} );
 	}
 

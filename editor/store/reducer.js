@@ -647,6 +647,7 @@ export function isInsertionPointVisible( state = false, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
+		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
 				let id = block.name;
 				const insert = { name: block.name };
