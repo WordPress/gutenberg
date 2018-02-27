@@ -1,7 +1,7 @@
 export {
-	registerEditorMenuItem,
-	getEditorMenuItems,
-} from './editor-menu-item';
+	registerMoreMenuItem,
+	getMoreMenuItems,
+} from './more-menu-item';
 export {
 	registerSidebar,
 	activateSidebar,

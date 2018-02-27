@@ -14,7 +14,7 @@ import { withInstanceId, IconButton, MenuItemsGroup } from '@wordpress/component
  * Internal dependencies
  */
 import './style.scss';
-import { getEditorMenuItems } from '../../../api';
+import { getMoreMenuItems } from '../../../api';
 
 /**
  * Renders a list of plugins that will activate different UI elements.
@@ -23,7 +23,7 @@ import { getEditorMenuItems } from '../../../api';
  * @return {Object} The rendered list of menu items.
  */
 function Plugins( props ) {
-	const ellipsisMenuItems = getEditorMenuItems();
+	const ellipsisMenuItems = getMoreMenuItems();
 
 	if ( isEmpty( ellipsisMenuItems ) ) {
 		return null;

@@ -15,7 +15,7 @@ import { activateSidebar } from './sidebar';
 const menuItems = {};
 
 /**
- * Registers a plugin under the ellipsis menu.
+ * Registers a plugin under the more menu.
  *
  * @param {string}   menuItemId        The unique identifier of the plugin. Should be in
  *                                     `[namespace]/[name]` format.
@@ -26,7 +26,7 @@ const menuItems = {};
  *
  * @return {Object} The final sidebar settings object.
  */
-export function registerEditorMenuItem( menuItemId, settings ) {
+export function registerMoreMenuItem( menuItemId, settings ) {
 	settings = {
 		menuItemId,
 		...settings,
@@ -79,7 +79,7 @@ export function registerEditorMenuItem( menuItemId, settings ) {
 
 	settings.callback = activateSidebar.bind( null, settings.target );
 
-	settings = applyFilters( 'editor.registerEllipsisMenuItem', settings, menuItemId );
+	settings = applyFilters( 'editor.registerMoreMenuItem', settings, menuItemId );
 
 	return menuItems[ menuItemId ] = settings;
 }
@@ -89,6 +89,6 @@ export function registerEditorMenuItem( menuItemId, settings ) {
  *
  * @return {Object} Registered menu items.
  */
-export function getEditorMenuItems() {
+export function getMoreMenuItems() {
 	return menuItems;
 }
