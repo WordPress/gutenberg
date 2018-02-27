@@ -15,7 +15,7 @@ import {
 	serialize,
 	isReusableBlock,
 	getDefaultBlockForPostFormat,
-	doesBlocksMatchTemplate,
+	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -317,7 +317,7 @@ export default {
 			isValidTemplate = (
 				! settings.template ||
 				settings.templateLock !== 'all' ||
-				doesBlocksMatchTemplate( blocks, settings.template )
+				doBlocksMatchTemplate( blocks, settings.template )
 			);
 		} else if ( settings.template ) {
 			blocks = synchronizeBlocksWithTemplate( [], settings.template );
@@ -358,7 +358,7 @@ export default {
 		const isValid = (
 			! template ||
 			templateLock !== 'all' ||
-			doesBlocksMatchTemplate( blocks, template )
+			doBlocksMatchTemplate( blocks, template )
 		);
 
 		return setTemplateValidity( isValid );

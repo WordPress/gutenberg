@@ -8,7 +8,7 @@ import { noop } from 'lodash';
  */
 import { createBlock } from '../factory';
 import { getBlockTypes, unregisterBlockType, registerBlockType } from '../registration';
-import { doesBlocksMatchTemplate, synchronizeBlocksWithTemplate } from '../templates';
+import { doBlocksMatchTemplate, synchronizeBlocksWithTemplate } from '../templates';
 
 describe( 'templates', () => {
 	afterEach( () => {
@@ -33,9 +33,9 @@ describe( 'templates', () => {
 		} );
 	} );
 
-	describe( 'doesBlocksMatchTemplate', () => {
+	describe( 'doBlocksMatchTemplate', () => {
 		it( 'return true if for empty templates and blocks', () => {
-			expect( doesBlocksMatchTemplate() ).toBe( true );
+			expect( doBlocksMatchTemplate() ).toBe( true );
 		} );
 
 		it( 'return true if the template matches the blocks', () => {
@@ -49,7 +49,7 @@ describe( 'templates', () => {
 				createBlock( 'core/test-block-2' ),
 				createBlock( 'core/test-block-2' ),
 			];
-			expect( doesBlocksMatchTemplate( blockList, template ) ).toBe( true );
+			expect( doBlocksMatchTemplate( blockList, template ) ).toBe( true );
 		} );
 
 		it( 'return true if the template matches the blocks with nested blocks', () => {
@@ -65,7 +65,7 @@ describe( 'templates', () => {
 				createBlock( 'core/test-block-2', {}, [ createBlock( 'core/test-block' ) ] ),
 				createBlock( 'core/test-block-2' ),
 			];
-			expect( doesBlocksMatchTemplate( blockList, template ) ).toBe( true );
+			expect( doBlocksMatchTemplate( blockList, template ) ).toBe( true );
 		} );
 
 		it( 'return false if the template length doesn\'t match the blocks length', () => {
@@ -78,7 +78,7 @@ describe( 'templates', () => {
 				createBlock( 'core/test-block-2' ),
 				createBlock( 'core/test-block-2' ),
 			];
-			expect( doesBlocksMatchTemplate( blockList, template ) ).toBe( false );
+			expect( doBlocksMatchTemplate( blockList, template ) ).toBe( false );
 		} );
 
 		it( 'return false if the nested template doesn\'t match the blocks', () => {
@@ -94,7 +94,7 @@ describe( 'templates', () => {
 				createBlock( 'core/test-block-2', {}, [ createBlock( 'core/test-block-2' ) ] ),
 				createBlock( 'core/test-block-2' ),
 			];
-			expect( doesBlocksMatchTemplate( blockList, template ) ).toBe( false );
+			expect( doBlocksMatchTemplate( blockList, template ) ).toBe( false );
 		} );
 	} );
 
