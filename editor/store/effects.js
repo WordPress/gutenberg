@@ -314,6 +314,8 @@ export default {
 		let isValidTemplate = true;
 		if ( post.content.raw ) {
 			blocks = parse( post.content.raw );
+
+			// Unlocked templates are considered always valid because they act as default values only.
 			isValidTemplate = (
 				! settings.template ||
 				settings.templateLock !== 'all' ||
