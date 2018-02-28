@@ -305,9 +305,16 @@ Popover.contextTypes = {
 	getSlot: noop,
 };
 
+const _Popover = Popover;
+
 Popover = withViewportMatch( {
 	isMobile: '< small',
 } )( Popover );
+
+// TODO: This is a useful pattern for retrieving the unmodified component from
+// within unit tests, and might be something to consider building into a common
+// `createHigherOrderComponent` helper function (along with `displayName`).
+Popover.WrappedComponent = _Popover;
 
 Popover.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
 

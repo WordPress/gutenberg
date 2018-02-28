@@ -7,7 +7,9 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import Popover from '../';
+import EnhancedPopover from '../';
+
+const Popover = EnhancedPopover.WrappedComponent;
 
 describe( 'Popover', () => {
 	describe( '#componentDidUpdate()', () => {
