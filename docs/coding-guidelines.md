@@ -86,6 +86,18 @@ Example:
 import VisualEditor from '../visual-editor';
 ```
 
+### Experimental APIs
+
+Exposed APIs that are still being tested, discussed and are subject to change should be prefixed with `experimental__`, until they are finalized. This is meant to discourage developers from relying on the API, because it might be removed or changed in the (near) future.
+
+Example:
+
+```js
+export {
+	exposedApi as experimental__exposedApi
+} from './exposedApi.js';
+```
+
 ## PHP
 
 We use
