@@ -15,7 +15,7 @@ import { withInstanceId, IconButton, MenuItemsGroup } from '@wordpress/component
  * Internal dependencies
  */
 import './style.scss';
-import { getMoreMenuItems } from '../../../api';
+import { getMoreMenuItems } from '../../../api/more-menu-item';
 import { getActivePlugin, getOpenedGeneralSidebar } from '../../../store/selectors';
 
 /**

@@ -1,5 +1,5 @@
 export {
-	registerMoreMenuItem,
+	registerMoreMenuItem as __experimentalRegisterMoreMenuItem,
 } from './more-menu-item';
 export {
 	registerSidebar,
