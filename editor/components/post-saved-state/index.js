@@ -2,13 +2,12 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, Button } from '@wordpress/components';
+import { Dashicon, IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -43,7 +42,7 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 	}
 
 	if ( isPublished ) {
-		return <PostSwitchToDraftButton className={ classnames( className, 'button-link' ) } />;
+		return <PostSwitchToDraftButton />;
 	}
 
 	if ( ! isSaveable ) {
@@ -60,10 +59,15 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 	}
 
 	return (
-		<Button className={ classnames( className, 'button-link' ) } onClick={ onSave }>
+		<IconButton
+			className="editor-post-save-draft"
+			onClick={ onSave }
+			icon="cloud-upload"
+			label={ __( 'Save Draft' ) }
+		>
 			<span className="editor-post-saved-state__mobile">{ __( 'Save' ) }</span>
 			<span className="editor-post-saved-state__desktop">{ __( 'Save Draft' ) }</span>
-		</Button>
+		</IconButton>
 	);
 }
 
