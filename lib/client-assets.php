@@ -160,7 +160,6 @@ function gutenberg_register_scripts_and_styles() {
 			array(
 				'\'Promise\' in window' => 'promise',
 				'\'fetch\' in window'   => 'fetch',
-				'\'WeakMap\' in window' => 'WeakMap',
 			)
 		),
 		'before'
