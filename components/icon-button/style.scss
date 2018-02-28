@@ -8,15 +8,11 @@
 	color: $dark-gray-500;
 	position: relative;
 	overflow: hidden;
-	text-indent: 8px;
+	text-indent: 4px;
 
 	.dashicon {
 		display: inline-block;
 		flex: 0 0 auto;
-	}
-
-	@include break-medium() {
-		text-indent: 4px;
 	}
 
 	&:not( :disabled ):hover {
