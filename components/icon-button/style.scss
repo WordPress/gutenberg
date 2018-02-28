@@ -7,7 +7,6 @@
 	background: none;
 	color: $dark-gray-500;
 	position: relative;
-	width: $icon-button-size;	// show only icon on small breakpoints
 	overflow: hidden;
 	text-indent: 8px;
 
@@ -17,7 +16,6 @@
 	}
 
 	@include break-medium() {
-		width: auto;
 		text-indent: 4px;
 	}
 

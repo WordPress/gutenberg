@@ -112,7 +112,6 @@ export class PostPreviewButton extends Component {
 				onClick={ this.saveForPreview }
 				target={ this.getWindowTarget() }
 				disabled={ ! isSaveable }
-				label={ _x( 'Preview', 'imperative verb' ) }
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
 			</Button>
