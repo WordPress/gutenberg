@@ -32,6 +32,8 @@ export function registerMoreMenuItem( menuItemId, settings ) {
 		...settings,
 	};
 
+	settings = applyFilters( 'editor.registerMoreMenuItem', settings, menuItemId );
+
 	if ( ! validatePluginId( menuItemId ) ) {
 		console.error(
 			'Ellipsis menu item names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-sidebar'
@@ -78,8 +80,6 @@ export function registerMoreMenuItem( menuItemId, settings ) {
 	}
 
 	settings.callback = activateSidebar.bind( null, settings.target );
-
-	settings = applyFilters( 'editor.registerMoreMenuItem', settings, menuItemId );
 
 	return menuItems[ menuItemId ] = settings;
 }
