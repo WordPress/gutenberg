@@ -432,16 +432,17 @@
 
 .editor-block-list__layout > .editor-block-list__insertion-point {
 	position: relative;
-	margin-top: -15px;
 	margin-left: auto;
 	margin-right: auto;
 	top: -19px;
 	left: 0;
 	right: 0;
 
-	@include break-small {
-		left: $block-mover-padding-visible;
-		right: $block-mover-padding-visible;
+	.editor-block-list__insertion-point-inserter:before {
+		@include break-small {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
 	}
 }
 

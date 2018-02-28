@@ -122,29 +122,6 @@ export function isEditorSidebarPanelOpened( state, panel ) {
 }
 
 /**
- * Returns true if the current window size corresponds to mobile resolutions (<= medium breakpoint).
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether current window size corresponds to
- *                    mobile resolutions.
- */
-export function isMobile( state ) {
-	return state.mobile;
-}
-
-/**
- * Returns whether the toolbar should be fixed or not.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} True if toolbar is fixed.
- */
-export function hasFixedToolbar( state ) {
-	return ! isMobile( state ) && isFeatureActive( state, 'fixedToolbar' );
-}
-
-/**
  * Returns whether the given feature is enabled or not.
  *
  * @param {Object} state   Global application state.

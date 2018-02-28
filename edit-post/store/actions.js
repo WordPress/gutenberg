@@ -90,19 +90,6 @@ export function toggleGeneralSidebarEditorPanel( panel ) {
 }
 
 /**
- * Returns an action object used in signalling that the viewport type preference should be set.
- *
- * @param {string} viewportType The viewport type (desktop or mobile).
- * @return {Object} Action object.
- */
-export function setViewportType( viewportType ) {
-	return {
-		type: 'SET_VIEWPORT_TYPE',
-		viewportType,
-	};
-}
-
-/**
  * Returns an action object used to toggle a feature flag.
  *
  * @param {string} feature Featurre name.

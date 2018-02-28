@@ -12,6 +12,7 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import {
+	registerStore,
 	registerReducer,
 	registerSelectors,
 	registerActions,
@@ -22,7 +23,40 @@ import {
 	subscribe,
 } from '../';
 
-describe( 'store', () => {
+describe( 'registerStore', () => {
+	it( 'should be shorthand for reducer, actions, selectors registration', () => {
+		const store = registerStore( 'butcher', {
+			reducer( state = { ribs: 6, chicken: 4 }, action ) {
+				switch ( action.type ) {
+					case 'sale':
+						return {
+							...state,
+							[ action.meat ]: state[ action.meat ] / 2,
+						};
+				}
+
+				return state;
+			},
+			selectors: {
+				getPrice: ( state, meat ) => state[ meat ],
+			},
+			actions: {
+				startSale: ( meat ) => ( { type: 'sale', meat } ),
+			},
+		} );
+
+		expect( store.getState() ).toEqual( { ribs: 6, chicken: 4 } );
+		expect( dispatch( 'butcher' ) ).toHaveProperty( 'startSale' );
+		expect( select( 'butcher' ) ).toHaveProperty( 'getPrice' );
+		expect( select( 'butcher' ).getPrice( 'chicken' ) ).toBe( 4 );
+		expect( select( 'butcher' ).getPrice( 'ribs' ) ).toBe( 6 );
+		dispatch( 'butcher' ).startSale( 'chicken' );
+		expect( select( 'butcher' ).getPrice( 'chicken' ) ).toBe( 2 );
+		expect( select( 'butcher' ).getPrice( 'ribs' ) ).toBe( 6 );
+	} );
+} );
+
+describe( 'registerReducer', () => {
 	it( 'Should append reducers to the state', () => {
 		const reducer1 = () => 'chicken';
 		const reducer2 = () => 'ribs';
@@ -66,6 +100,20 @@ describe( 'select', () => {
 } );
 
 describe( 'withSelect', () => {
+	const unsubscribes = [];
+	afterEach( () => {
+		let unsubscribe;
+		while ( ( unsubscribe = unsubscribes.shift() ) ) {
+			unsubscribe();
+		}
+	} );
+
+	function subscribeWithUnsubscribe( ...args ) {
+		const unsubscribe = subscribe( ...args );
+		unsubscribes.push( unsubscribe );
+		return unsubscribe;
+	}
+
 	it( 'passes the relevant data to the component', () => {
 		registerReducer( 'reactReducer', () => ( { reactKey: 'reactState' } ) );
 		registerSelectors( 'reactReducer', {
@@ -162,6 +210,36 @@ describe( 'withSelect', () => {
 
 		wrapper.unmount();
 	} );
+
+	it( 'ensures component is still mounted before setting state', () => {
+		// This test verifies that even though unsubscribe doesn't take effect
+		// until after the current listener stack is called, we don't attempt
+		// to setState on an unmounting `withSelect` component. It will fail if
+		// an attempt is made to `setState` on an unmounted component.
+		const store = registerReducer( 'counter', ( state = 0, action ) => {
+			if ( action.type === 'increment' ) {
+				return state + 1;
+			}
+
+			return state;
+		} );
+
+		registerSelectors( 'counter', {
+			getCount: ( state, offset ) => state + offset,
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			wrapper.unmount();
+		} );
+
+		const Component = withSelect( ( _select, ownProps ) => ( {
+			count: _select( 'counter' ).getCount( ownProps.offset ),
+		} ) )( ( props ) => <div>{ props.count }</div> );
+
+		const wrapper = mount( <Component offset={ 0 } /> );
+
+		store.dispatch( { type: 'increment' } );
+	} );
 } );
 
 describe( 'withDispatch', () => {
@@ -209,6 +287,20 @@ describe( 'withDispatch', () => {
 } );
 
 describe( 'subscribe', () => {
+	const unsubscribes = [];
+	afterEach( () => {
+		let unsubscribe;
+		while ( ( unsubscribe = unsubscribes.shift() ) ) {
+			unsubscribe();
+		}
+	} );
+
+	function subscribeWithUnsubscribe( ...args ) {
+		const unsubscribe = subscribe( ...args );
+		unsubscribes.push( unsubscribe );
+		return unsubscribe;
+	}
+
 	it( 'registers multiple selectors to the public API', () => {
 		let incrementedValue = null;
 		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
@@ -232,6 +324,35 @@ describe( 'subscribe', () => {
 		store.dispatch( action );
 
 		expect( incrementedValue ).toBe( 3 );
+	} );
+
+	it( 'snapshots listeners on change, avoiding a later listener if subscribed during earlier callback', () => {
+		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
+		const secondListener = jest.fn();
+		const firstListener = jest.fn( () => {
+			subscribeWithUnsubscribe( secondListener );
+		} );
+
+		subscribeWithUnsubscribe( firstListener );
+
+		store.dispatch( { type: 'dummy' } );
+
+		expect( secondListener ).not.toHaveBeenCalled();
+	} );
+
+	it( 'snapshots listeners on change, calling a later listener even if unsubscribed during earlier callback', () => {
+		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
+		const firstListener = jest.fn( () => {
+			secondUnsubscribe();
+		} );
+		const secondListener = jest.fn();
+
+		subscribeWithUnsubscribe( firstListener );
+		const secondUnsubscribe = subscribeWithUnsubscribe( secondListener );
+
+		store.dispatch( { type: 'dummy' } );
+
+		expect( secondListener ).toHaveBeenCalled();
 	} );
 } );
 

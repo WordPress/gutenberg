@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, has, includes, map, castArray, uniqueId } from 'lodash';
+import { get, includes, map, castArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -79,8 +79,8 @@ export default {
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
-		new Model( toSend ).save().done( ( newPost ) => {
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).done( ( newPost ) => {
 			dispatch( resetPost( newPost ) );
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
@@ -171,9 +171,9 @@ export default {
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
 		const { postId } = action;
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( getState() ) );
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( getState() ) );
 		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
-		new Model( { id: postId } ).destroy().then(
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					...action,
@@ -309,17 +309,17 @@ export default {
 	FETCH_REUSABLE_BLOCKS( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
-		if ( ! has( wp, 'api.models.Blocks' ) && ! has( wp, 'api.collections.Blocks' ) ) {
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
 			return;
 		}
 		const { id } = action;
 		const { dispatch } = store;
-
 		let result;
 		if ( id ) {
-			result = new wp.api.models.Blocks( { id } ).fetch();
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
 		} else {
-			result = new wp.api.collections.Blocks().fetch();
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }` } );
 		}
 
 		result.then(
@@ -348,7 +348,8 @@ export default {
 	SAVE_REUSABLE_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
-		if ( ! has( wp, 'api.models.Blocks' ) ) {
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
 			return;
 		}
 
@@ -357,9 +358,12 @@ export default {
 
 		const { title, type, attributes, isTemporary } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
-		const requestData = isTemporary ? { title, content } : { id, title, content };
 
-		new wp.api.models.Blocks( requestData ).save().then(
+		const data = isTemporary ? { title, content } : { id, title, content };
+		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
+		const method = isTemporary ? 'POST' : 'PUT';
+
+		wp.apiRequest( { path, data, method } ).then(
 			( updatedReusableBlock ) => {
 				dispatch( {
 					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
@@ -382,7 +386,8 @@ export default {
 	DELETE_REUSABLE_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
-		if ( ! has( wp, 'api.models.Blocks' ) ) {
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
 			return;
 		}
 
@@ -409,7 +414,7 @@ export default {
 			optimist: { type: BEGIN, id: transactionId },
 		} );
 
-		new wp.api.models.Blocks( { id } ).destroy().then(
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					type: 'DELETE_REUSABLE_BLOCK_SUCCESS',

@@ -7,18 +7,12 @@ import {
 	isGeneralSidebarPanelOpened,
 	hasOpenSidebar,
 	isEditorSidebarPanelOpened,
-	isMobile,
-	hasFixedToolbar,
 	isFeatureActive,
 	getMetaBoxes,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
 	getMetaBox,
 } from '../selectors';
-
-jest.mock( '../constants', () => ( {
-	BREAK_MEDIUM: 500,
-} ) );
 
 describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
@@ -70,7 +64,6 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					activeGeneralSidebar: 'editor',
-					viewportType: 'desktop',
 					activeSidebarPanel: 'document',
 				},
 			};
@@ -84,7 +77,6 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					activeGeneralSidebar: 'editor',
-					viewportType: 'desktop',
 					activeSidebarPanel: 'blocks',
 				},
 			};
@@ -98,7 +90,6 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					activeGeneralSidebar: null,
-					viewportType: 'desktop',
 					activeSidebarPanel: null,
 				},
 			};
@@ -155,78 +146,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'isMobile', () => {
-		it( 'should return true if resolution is equal or less than medium breakpoint', () => {
-			const state = {
-				mobile: true,
-			};
-
-			expect( isMobile( state ) ).toBe( true );
-		} );
-
-		it( 'should return true if resolution is greater than medium breakpoint', () => {
-			const state = {
-				mobile: false,
-			};
-
-			expect( isMobile( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'hasFixedToolbar', () => {
-		it( 'should return true if fixedToolbar is active and is not mobile screen size', () => {
-			const state = {
-				mobile: false,
-				preferences: {
-					features: {
-						fixedToolbar: true,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if fixedToolbar is active and is mobile screen size', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					features: {
-						fixedToolbar: true,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( false );
-		} );
-
-		it( 'should return false if fixedToolbar is disable and is not mobile screen size', () => {
-			const state = {
-				mobile: false,
-				preferences: {
-					features: {
-						fixedToolbar: false,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( false );
-		} );
-
-		it( 'should return false if fixedToolbar is disable and is mobile screen size', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					features: {
-						fixedToolbar: false,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( false );
 		} );
 	} );
 
