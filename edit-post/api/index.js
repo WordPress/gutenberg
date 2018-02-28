@@ -1,6 +1,5 @@
 export {
 	registerMoreMenuItem,
-	getMoreMenuItems,
 } from './more-menu-item';
 export {
 	registerSidebar,
