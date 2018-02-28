@@ -51,31 +51,31 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks without a namespace', () => {
 			const block = registerBlockType( 'doing-it-wrong' );
-			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-plugin' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with too many namespaces', () => {
 			const block = registerBlockType( 'doing/it/wrong' );
-			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-plugin' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with invalid characters', () => {
 			const block = registerBlockType( 'still/_doing_it_wrong' );
-			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-plugin' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with uppercase characters', () => {
 			const block = registerBlockType( 'Core/Paragraph' );
-			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-plugin' );
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks not starting with a letter', () => {
 			const block = registerBlockType( 'my-plugin/4-fancy-block', defaultBlockSettings );
-			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-plugin' );
 			expect( block ).toBeUndefined();
 		} );
 

@@ -1,4 +1,4 @@
-import { validatePluginId } from '../utils';
+import { validatePluginId } from '../plugins';
 
 describe( 'validatePluginId', () => {
 	it( 'accepts a valid plugin id', () => {

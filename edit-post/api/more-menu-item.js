@@ -9,7 +9,7 @@
  */
 import { applyFilters } from '@wordpress/hooks';
 import { isString } from 'util';
-import { validatePluginId } from './utils';
+import { validatePluginId } from '../../utils/plugins';
 import { activateSidebar } from './sidebar';
 
 const menuItems = {};
@@ -35,9 +35,6 @@ export function registerMoreMenuItem( menuItemId, settings ) {
 	settings = applyFilters( 'editor.registerMoreMenuItem', settings, menuItemId );
 
 	if ( ! validatePluginId( menuItemId ) ) {
-		console.error(
-			'Ellipsis menu item names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-sidebar'
-		);
 		return null;
 	}
 	if ( menuItems[ menuItemId ] ) {

@@ -7,6 +7,7 @@ import { isFunction } from 'lodash';
 import store from '../store';
 import { setGeneralSidebarActivePanel, openGeneralSidebar } from '../store/actions';
 import { applyFilters } from '@wordpress/hooks';
+import { validatePluginId } from '../../utils/plugins';
 
 const sidebars = {};
 
@@ -30,16 +31,7 @@ export function registerSidebar( name, settings ) {
 		...settings,
 	};
 
-	if ( typeof name !== 'string' ) {
-		console.error(
-			'Sidebar names must be strings.'
-		);
-		return null;
-	}
-	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
-		console.error(
-			'Sidebar names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-sidebar.'
-		);
+	if ( ! validatePluginId( name ) ) {
 		return null;
 	}
 	if ( ! settings || ! isFunction( settings.render ) ) {

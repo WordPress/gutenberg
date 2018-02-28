@@ -4,18 +4,19 @@
  * Validates the plugin id.
  *
  * @param {string} id Plugin identifier.
+ * @param {string} [pluginName] Plugin name.
  * @return {boolean} Whether the pluginId is valid.
  */
-export function validatePluginId( id ) {
+export function validatePluginId( id, pluginName = 'Plugin identifiers' ) {
 	if ( typeof id !== 'string' ) {
 		console.error(
-			'Plugin identifier must be a string.'
+			wp.i18n.sprintf( '%s must be strings.', pluginName )
 		);
 		return false;
 	}
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( id ) ) {
 		console.error(
-			'Plugin identifier must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-sidebar'
+			wp.i18n.sprintf( '%s must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-plugin', pluginName )
 		);
 		return false;
 	}
