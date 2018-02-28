@@ -48,40 +48,38 @@ function Plugins( props ) {
 		<MenuItemsGroup
 			label={ __( 'Plugins' ) }
 			filterName="editPost.MoreMenu.plugins" >
-			{
-				map( ellipsisMenuItems, menuItem => {
-					if ( isString( menuItem.icon ) ) {
-						menuItem.icon = null;
-					}
-					const pluginActive = menuItem.target === props.activePlugin;
+			{ map( ellipsisMenuItems, menuItem => {
+				if ( isString( menuItem.icon ) ) {
+					menuItem.icon = null;
+				}
+				const pluginActive = menuItem.target === props.activePlugin;
 
-					let Icon = menuItem.icon ? (
-						<span className="components-menu-item-plugins__icon-container" >
-							{ menuItem.icon }
-						</span>
-					) : null;
+				let Icon = menuItem.icon ? (
+					<span className="components-menu-item-plugins__icon-container" >
+						{ menuItem.icon }
+					</span>
+				) : null;
 
-					if ( pluginActive ) {
-						Icon = 'yes';
-					}
+				if ( pluginActive ) {
+					Icon = 'yes';
+				}
 
-					const buttonClassName = classnames(
-						'components-menu-item-plugins__button',
-						Icon ? 'has-icon' : null,
-						pluginActive ? 'active' : null,
-					);
+				const buttonClassName = classnames(
+					'components-menu-item-plugins__button',
+					Icon ? 'has-icon' : null,
+					pluginActive ? 'active' : null,
+				);
 
-					return (
-						<IconButton
-							key={ menuItem.menuItemId }
-							className={ buttonClassName }
-							icon={ Icon }
-							onClick={ () => onSelect( menuItem.menuItemId ) }>
-							{ menuItem.title }
-						</IconButton>
-					);
-				} )
-			}
+				return (
+					<IconButton
+						key={ menuItem.menuItemId }
+						className={ buttonClassName }
+						icon={ Icon }
+						onClick={ () => onSelect( menuItem.menuItemId ) }>
+						{ menuItem.title }
+					</IconButton>
+				);
+			} ) }
 		</MenuItemsGroup>
 	);
 }
