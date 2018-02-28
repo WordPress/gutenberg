@@ -4,10 +4,12 @@
 	font-size: $default-font-size;
 	background: $white;
 	padding: ( $panel-padding * 2 ) $panel-padding;
-	border-bottom: 1px solid $light-gray-500;
 	text-align: center;
 }
 
+.editor-block-inspector__multi-blocks {
+	border-bottom: 1px solid $light-gray-500;
+}
 
 .editor-block-inspector__card {
 	display: flex;
