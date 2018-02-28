@@ -320,10 +320,6 @@
 		flex-direction: row;
 		margin-top: $item-spacing;
 
-		@include break-small() {
-			display: none;
-		}
-
 		// Movers, inserter, trash & ellipsis
 		.editor-inserter {
 			position: relative;
