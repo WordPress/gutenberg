@@ -104,6 +104,7 @@ zip -r gutenberg.zip \
 	{blocks,components,date,editor,element,hooks,i18n,data,utils,edit-post,viewport}/build/*.{js,map} \
 	{blocks,components,editor,edit-post}/build/*.css \
 	languages/gutenberg.pot \
+	languages/gutenberg-translations.php \
 	README.md
 
 # Reset `gutenberg.php`
