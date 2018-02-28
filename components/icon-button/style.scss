@@ -9,7 +9,7 @@
 	position: relative;
 	width: $icon-button-size;	// show only icon on small breakpoints
 	overflow: hidden;
-	text-indent: 4px;
+	text-indent: 8px;
 
 	.dashicon {
 		display: inline-block;
@@ -18,6 +18,7 @@
 
 	@include break-medium() {
 		width: auto;
+		text-indent: 4px;
 	}
 
 	&:not( :disabled ):hover {

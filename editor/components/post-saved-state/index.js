@@ -60,6 +60,7 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 
 	return (
 		<IconButton
+			className="editor-post-save-draft"
 			onClick={ onSave }
 			icon="cloud-upload"
 			label={ __( 'Save Draft' ) }
