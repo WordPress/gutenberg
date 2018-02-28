@@ -7,7 +7,7 @@ import { isFunction } from 'lodash';
 import store from '../store';
 import { setGeneralSidebarActivePanel, openGeneralSidebar } from '../store/actions';
 import { applyFilters } from '@wordpress/hooks';
-import { validatePluginId } from '../../utils/plugins';
+import { validateNamespacedId } from '../../utils/plugins';
 
 const sidebars = {};
 
@@ -31,7 +31,7 @@ export function registerSidebar( name, settings ) {
 		...settings,
 	};
 
-	if ( ! validatePluginId( name ) ) {
+	if ( ! validateNamespacedId( name ) ) {
 		return null;
 	}
 	if ( ! settings || ! isFunction( settings.render ) ) {

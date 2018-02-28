@@ -9,7 +9,7 @@
  */
 import { applyFilters } from '@wordpress/hooks';
 import { isString } from 'util';
-import { validatePluginId } from '../../utils/plugins';
+import { validateNamespacedId } from '../../utils/plugins';
 import { activateSidebar } from './sidebar';
 
 const menuItems = {};
@@ -34,7 +34,7 @@ export function registerMoreMenuItem( menuItemId, settings ) {
 
 	settings = applyFilters( 'editor.registerMoreMenuItem', settings, menuItemId );
 
-	if ( ! validatePluginId( menuItemId ) ) {
+	if ( ! validateNamespacedId( menuItemId ) ) {
 		return null;
 	}
 	if ( menuItems[ menuItemId ] ) {

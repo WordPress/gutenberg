@@ -14,7 +14,7 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getCategories } from './categories';
-import { validatePluginId } from '../../utils/plugins';
+import { validateNamespacedId } from '../../utils/plugins';
 
 /**
  * Defined behavior of a block type.
@@ -95,7 +95,7 @@ export function registerBlockType( name, settings ) {
 		...settings,
 	};
 
-	if ( ! validatePluginId( name, 'Block names' ) ) {
+	if ( ! validateNamespacedId( name, 'Block names' ) ) {
 		return;
 	}
 	if ( blocks[ name ] ) {
