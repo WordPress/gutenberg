@@ -7,6 +7,7 @@ import { shallow, mount } from 'enzyme';
  * Internal dependencies
  */
 import Tooltip from '../';
+import Popover from '../../popover';
 
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
@@ -42,11 +43,11 @@ describe( 'Tooltip', () => {
 			wrapper.setState( { isOver: true } );
 
 			const button = wrapper.find( 'button' );
-			const popover = wrapper.find( 'Popover' );
+			const popover = wrapper.find( Popover );
 			expect( wrapper.type() ).toBe( 'button' );
 			expect( button.children() ).toHaveLength( 2 );
 			expect( button.childAt( 0 ).text() ).toBe( 'Hover Me!' );
-			expect( button.childAt( 1 ).name() ).toBe( 'Popover' );
+			expect( button.childAt( 1 ).type() ).toBe( Popover );
 			expect( popover.prop( 'focusOnMount' ) ).toBe( false );
 			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
 			expect( popover.children().text() ).toBe( 'Help text' );
@@ -69,14 +70,14 @@ describe( 'Tooltip', () => {
 			const button = wrapper.find( 'button' );
 			button.simulate( 'focus', event );
 
-			const popover = wrapper.find( 'Popover' );
+			const popover = wrapper.find( Popover );
 			expect( originalFocus ).toHaveBeenCalledWith( event );
 			expect( wrapper.state( 'isOver' ) ).toBe( true );
 			expect( popover ).toHaveLength( 1 );
 		} );
 
 		it( 'should show popover on delayed mouseenter', () => {
-			const expectPopoverVisible = ( wrapper, visible ) => expect( wrapper.find( 'Popover' ) ).toHaveLength( visible ? 1 : 0 );
+			const expectPopoverVisible = ( wrapper, visible ) => expect( wrapper.find( Popover ) ).toHaveLength( visible ? 1 : 0 );
 
 			// Mount: Issues with using `setState` asynchronously with shallow-
 			// rendered components: https://github.com/airbnb/enzyme/issues/450
@@ -135,7 +136,7 @@ describe( 'Tooltip', () => {
 
 			expect( originalMouseEnter ).toHaveBeenCalled();
 
-			const popover = wrapper.find( 'Popover' );
+			const popover = wrapper.find( Popover );
 			wrapper.instance().delayedSetIsOver.flush();
 			expect( wrapper.state( 'isOver' ) ).toBe( false );
 			expect( popover ).toHaveLength( 0 );
@@ -162,7 +163,7 @@ describe( 'Tooltip', () => {
 
 			wrapper.instance().delayedSetIsOver.flush();
 
-			const popover = wrapper.find( 'Popover' );
+			const popover = wrapper.find( Popover );
 			expect( wrapper.state( 'isOver' ) ).toBe( false );
 			expect( popover ).toHaveLength( 0 );
 		} );
