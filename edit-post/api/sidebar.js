@@ -1,13 +1,21 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
-/* External dependencies */
+/**
+ * External dependencies
+ */
 import { isFunction } from 'lodash';
 
-/* Internal dependencies */
-import store from '../store';
-import { setGeneralSidebarActivePanel, openGeneralSidebar } from '../store/actions';
+/**
+ * Wordpress dependencies
+ */
 import { applyFilters } from '@wordpress/hooks';
 import { validateNamespacedId } from '@wordpress/utils';
+
+/**
+ * Internal dependencies
+ */
+import store from '../store';
+import { setGeneralSidebarActivePanel, openGeneralSidebar } from '../store/actions';
 
 const sidebars = {};
 

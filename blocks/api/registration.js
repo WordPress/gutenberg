@@ -9,12 +9,12 @@ import { get, isFunction, some } from 'lodash';
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
+import { validateNamespacedId } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import { getCategories } from './categories';
-import { validateNamespacedId } from '@wordpress/utils';
 
 /**
  * Defined behavior of a block type.

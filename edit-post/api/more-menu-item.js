@@ -1,15 +1,15 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /**
- * External dependencies
+ * Wordpress dependencies
  */
+import { applyFilters } from '@wordpress/hooks';
+import { validateNamespacedId } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
 import { isString } from 'lodash';
-import { validateNamespacedId } from '@wordpress/utils';
 import { activateSidebar } from './sidebar';
 
 const menuItems = {};
