@@ -48,7 +48,7 @@ export const settings = {
 
 	edit: withState( {
 		preview: false,
-	} )( ( { attributes, setAttributes, setState, isSelected, toggleSelection, preview } ) => (
+	} )( ( { attributes, setAttributes, setState, isSelected, toggleSelection, preview, isReadOnly } ) => (
 		<div className="wp-block-html">
 			{ isSelected && (
 				<BlockControls>
@@ -68,7 +68,7 @@ export const settings = {
 					</div>
 				</BlockControls>
 			) }
-			{ preview ? (
+			{ ( preview || isReadOnly ) ? (
 				<SandBox html={ attributes.content } />
 			) : (
 				<CodeEditor
