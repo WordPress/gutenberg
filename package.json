@@ -152,6 +152,7 @@
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"package-plugin": "./bin/build-plugin-zip.sh",
+		"pot-to-php": "./bin/pot-to-php.js",
 		"precommit": "lint-staged",
 		"test-unit": "wp-scripts test-unit-js",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
