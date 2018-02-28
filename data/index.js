@@ -28,13 +28,7 @@ let listeners = [];
  * Global listener called for each store's update.
  */
 export function globalListener() {
-	// Use for loop instead of Array#forEach, as it's possible a listener's
-	// behavior causes one further in the stack to be unsubscribed. The
-	// latter's callback should not be called, which requires monitoring
-	// changes to the array as they occur in iteration.
-	for ( let i = 0; i < listeners.length; i++ ) {
-		listeners[ i ]();
-	}
+	listeners.forEach( ( listener ) => listener() );
 }
 
 /**

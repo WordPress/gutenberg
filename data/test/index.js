@@ -248,7 +248,21 @@ describe( 'subscribe', () => {
 		expect( incrementedValue ).toBe( 3 );
 	} );
 
-	it( 'avoids calling a later listener if unsubscribed during earlier callback', () => {
+	it( 'snapshots listeners on change, avoiding a later listener if subscribed during earlier callback', () => {
+		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
+		const secondListener = jest.fn();
+		const firstListener = jest.fn( () => {
+			subscribeWithUnsubscribe( secondListener );
+		} );
+
+		subscribeWithUnsubscribe( firstListener );
+
+		store.dispatch( { type: 'dummy' } );
+
+		expect( secondListener ).not.toHaveBeenCalled();
+	} );
+
+	it( 'snapshots listeners on change, calling a later listener even if unsubscribed during earlier callback', () => {
 		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
 		const firstListener = jest.fn( () => {
 			secondUnsubscribe();
@@ -260,7 +274,7 @@ describe( 'subscribe', () => {
 
 		store.dispatch( { type: 'dummy' } );
 
-		expect( secondListener ).not.toHaveBeenCalled();
+		expect( secondListener ).toHaveBeenCalled();
 	} );
 } );
 
