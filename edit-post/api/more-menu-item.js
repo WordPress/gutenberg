@@ -9,7 +9,7 @@
  */
 import { applyFilters } from '@wordpress/hooks';
 import { isString } from 'util';
-import { validateNamespacedId } from '../../utils/plugins';
+import { validateNamespacedId } from '@wordpress/utils';
 import { activateSidebar } from './sidebar';
 
 const menuItems = {};

@@ -7,7 +7,7 @@ import { isFunction } from 'lodash';
 import store from '../store';
 import { setGeneralSidebarActivePanel, openGeneralSidebar } from '../store/actions';
 import { applyFilters } from '@wordpress/hooks';
-import { validateNamespacedId } from '../../utils/plugins';
+import { validateNamespacedId } from '@wordpress/utils';
 
 const sidebars = {};
 

@@ -14,7 +14,7 @@ import { applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getCategories } from './categories';
-import { validateNamespacedId } from '../../utils/plugins';
+import { validateNamespacedId } from '@wordpress/utils';
 
 /**
  * Defined behavior of a block type.
