@@ -1,5 +1,3 @@
-import '@wordpress/jest-console';
-
 let registerMoreMenuItem, getMoreMenuItems, registerSidebar;
 function requireAll() {
 	jest.resetModules();
