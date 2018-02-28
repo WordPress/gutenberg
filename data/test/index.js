@@ -66,6 +66,20 @@ describe( 'select', () => {
 } );
 
 describe( 'withSelect', () => {
+	const unsubscribes = [];
+	afterEach( () => {
+		let unsubscribe;
+		while ( ( unsubscribe = unsubscribes.shift() ) ) {
+			unsubscribe();
+		}
+	} );
+
+	function subscribeWithUnsubscribe( ...args ) {
+		const unsubscribe = subscribe( ...args );
+		unsubscribes.push( unsubscribe );
+		return unsubscribe;
+	}
+
 	it( 'passes the relevant data to the component', () => {
 		registerReducer( 'reactReducer', () => ( { reactKey: 'reactState' } ) );
 		registerSelectors( 'reactReducer', {
@@ -161,6 +175,36 @@ describe( 'withSelect', () => {
 		expect( wrapper.childAt( 0 ).text() ).toBe( '10' );
 
 		wrapper.unmount();
+	} );
+
+	it( 'ensures component is still mounted before setting state', () => {
+		// This test verifies that even though unsubscribe doesn't take effect
+		// until after the current listener stack is called, we don't attempt
+		// to setState on an unmounting `withSelect` component. It will fail if
+		// an attempt is made to `setState` on an unmounted component.
+		const store = registerReducer( 'counter', ( state = 0, action ) => {
+			if ( action.type === 'increment' ) {
+				return state + 1;
+			}
+
+			return state;
+		} );
+
+		registerSelectors( 'counter', {
+			getCount: ( state, offset ) => state + offset,
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			wrapper.unmount();
+		} );
+
+		const Component = withSelect( ( _select, ownProps ) => ( {
+			count: _select( 'counter' ).getCount( ownProps.offset ),
+		} ) )( ( props ) => <div>{ props.count }</div> );
+
+		const wrapper = mount( <Component offset={ 0 } /> );
+
+		store.dispatch( { type: 'increment' } );
 	} );
 } );
 
