@@ -54,26 +54,28 @@ function Plugins( props ) {
 						menuItem.icon = null;
 					}
 					const pluginActive = menuItem.target === props.activePlugin;
+
+					let Icon = menuItem.icon ? (
+						<div className="components-menu-item-plugins__icon-container" >
+							{ menuItem.icon }
+						</div>
+					) : null;
+
+					if ( pluginActive ) {
+						Icon = 'yes';
+					}
+
 					const buttonClassName = classnames(
 						'components-menu-item-plugins__button',
-						menuItem.icon ? 'has-icon' : null,
+						Icon ? 'has-icon' : null,
 						pluginActive ? 'active' : null,
 					);
-
-					const Icon = pluginActive ? 'yes' :
-						(
-							<div className="components-menu-item-plugins__icon-container" >
-								{ menuItem.icon }
-							</div>
-						);
 
 					return (
 						<IconButton
 							key={ menuItem.menuItemId }
 							className={ buttonClassName }
-							icon={
-								menuItem.icon ? Icon : null
-							}
+							icon={ Icon }
 							onClick={ () => onSelect( menuItem.menuItemId ) }>
 							{ menuItem.title }
 						</IconButton>
