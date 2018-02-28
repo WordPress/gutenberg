@@ -94,8 +94,8 @@ Example:
 
 ```js
 export {
-	exposedApi as experimental__exposedApi
-} from './exposedApi.js';
+	internalApi as experimental__exposedApi
+} from './internalApi.js';
 ```
 
 ## PHP
