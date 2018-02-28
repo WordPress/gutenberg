@@ -22,7 +22,7 @@ export function validateNamespacedId( id, name = 'Namespaced identifiers' ) {
 	}
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( id ) ) {
 		console.error(
-			wp.i18n.sprintf( '%s must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-plugin', name )
+			wp.i18n.sprintf( '%s must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-id', name )
 		);
 		return false;
 	}

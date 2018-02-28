@@ -39,4 +39,3 @@ const MoreMenu = () => (
 );
 
 export default MoreMenu;
-
