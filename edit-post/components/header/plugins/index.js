@@ -21,7 +21,8 @@ import { getActivePlugin, getOpenedGeneralSidebar } from '../../../store/selecto
 /**
  * Renders a list of plugins that will activate different UI elements.
  *
- * @param   {Object} props The component props.
+ * @param {Object} props The component props.
+ *
  * @return {Object} The rendered list of menu items.
  */
 function Plugins( props ) {
@@ -34,9 +35,8 @@ function Plugins( props ) {
 	/**
 	 * Handles the user clicking on one of the plugins in the menu
 	 *
-	 * Does nothing currently, but should be used to trigger the plugins sidebar
-	 *
 	 * @param {string} pluginId The plugin id.
+	 *
 	 * @return {void}
 	 */
 	function onSelect( pluginId ) {

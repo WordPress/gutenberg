@@ -17,12 +17,12 @@ const menuItems = {};
 /**
  * Registers a plugin under the more menu.
  *
- * @param {string}   menuItemId        The unique identifier of the plugin. Should be in
- *                                     `[namespace]/[name]` format.
- * @param {Object}   settings          The settings for this menu item.
- * @param {string}   settings.title    The name to show in the settings menu.
- * @param {func}     settings.target   The registered plugin that should be activated.
- * @param {string}   [settings.icon]   SVG Icon url.
+ * @param {string}       menuItemId      The unique identifier of the plugin. Should be in
+ *                                       `[namespace]/[name]` format.
+ * @param {Object}       settings        The settings for this menu item.
+ * @param {string}       settings.title  The name to show in the settings menu.
+ * @param {func}         settings.target The registered plugin that should be activated.
+ * @param {ReactElement} [settings.icon] SVG React Component.
  *
  * @return {Object} The final sidebar settings object.
  */
