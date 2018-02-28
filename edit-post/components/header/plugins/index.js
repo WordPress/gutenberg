@@ -3,20 +3,20 @@
  */
 import { map, isEmpty, isString } from 'lodash';
 import classnames from 'classnames';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withInstanceId, IconButton, MenuItemsGroup } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { getMoreMenuItems } from '../../../api/more-menu-item';
-import { getActivePlugin, getOpenedGeneralSidebar } from '../../../store/selectors';
 
 /**
  * Renders a list of plugins that will activate different UI elements.
@@ -84,9 +84,17 @@ function Plugins( props ) {
 	);
 }
 
-export default connect( state => {
-	return {
-		activePlugin: getOpenedGeneralSidebar( state ) === 'plugin' ?
-			getActivePlugin( state ) : null,
-	};
-}, null, null, { storeKey: 'edit-post' } )( withInstanceId( Plugins ) );
+export default compose( [
+	withSelect( select => {
+		const editPost = select( 'core/edit-post' );
+		const openedSidebar = editPost.getOpenedGeneralSidebar();
+		if ( openedSidebar !== 'plugin' ) {
+			return {};
+		}
+
+		return {
+			activePlugin: editPost.getActivePlugin(),
+		};
+	} ),
+	withInstanceId,
+] )( Plugins );
