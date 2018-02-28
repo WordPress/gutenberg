@@ -24,4 +24,20 @@ describe( 'registerMoreMenuItem', () => {
 		} );
 		expect( getMoreMenuItems()[ 'gutenberg/plugin' ] ).toBeDefined();
 	} );
+
+	it( 'throws an error when a more menu item with the same id already exists', () => {
+		registerSidebar( 'plugins/sidebar', {
+			title: 'Plugin Title',
+			render: () => 'Component',
+		} );
+		registerMoreMenuItem( 'gutenberg/plugin', {
+			title: 'Plugin',
+			target: 'gutenberg/plugin',
+		} );
+		registerMoreMenuItem( 'gutenberg/plugin', {
+			title: 'Plugin',
+			target: 'gutenberg/plugin',
+		} );
+		expect( console ).toHaveErrored();
+	} );
 } );
