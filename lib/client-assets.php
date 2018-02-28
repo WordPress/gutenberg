@@ -156,12 +156,10 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_add_inline_script(
 		'wp-blocks',
-		gutenberg_get_script_polyfill(
-			array(
-				'\'Promise\' in window' => 'promise',
-				'\'fetch\' in window'   => 'fetch',
-			)
-		),
+		gutenberg_get_script_polyfill( array(
+			'\'Promise\' in window' => 'promise',
+			'\'fetch\' in window'   => 'fetch',
+		) ),
 		'before'
 	);
 	// Loading the old editor and its config to ensure the classic block works as expected.
