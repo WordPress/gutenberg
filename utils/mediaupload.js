@@ -54,10 +54,12 @@ export function createMediaFromFile( file ) {
 	// Create upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
-
-	return new wp.api.models.Media().save( null, {
-		data: data,
+	return wp.apiRequest( {
+		path: '/wp/v2/media',
+		data,
 		contentType: false,
+		processData: false,
+		method: 'POST',
 	} );
 }
 

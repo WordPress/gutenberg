@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { get, unescape as unescapeString, find, throttle, uniqBy } from 'lodash';
+import { stringify } from 'querystring';
 
 /**
  * WordPress dependencies
@@ -24,7 +25,7 @@ const DEFAULT_QUERY = {
 	per_page: 100,
 	orderby: 'count',
 	order: 'desc',
-	_fields: [ 'id', 'name' ],
+	_fields: 'id,name',
 };
 const MAX_TERMS_SUGGESTIONS = 20;
 const isSameTermName = ( termA, termB ) => termA.toLowerCase() === termB.toLowerCase();
@@ -78,8 +79,8 @@ class FlatTermSelector extends Component {
 
 	fetchTerms( params = {} ) {
 		const query = { ...DEFAULT_QUERY, ...params };
-		const Collection = wp.api.getTaxonomyCollection( this.props.slug );
-		const request = new Collection().fetch( { data: query } );
+		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+		const request = wp.apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( query ) }` } );
 		request.then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(
@@ -105,21 +106,24 @@ class FlatTermSelector extends Component {
 	findOrCreateTerm( termName ) {
 		return new Promise( ( resolve, reject ) => {
 			// Tries to create a term or fetch it if it already exists
-			const Model = wp.api.getTaxonomyModel( this.props.slug );
-			new Model( { name: termName } ).save()
-				.then( resolve, ( xhr ) => {
-					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
-					if ( errorCode === 'term_exists' ) {
-						// search the new category created since last fetch
-						this.addRequest = new Model().fetch(
-							{ data: { ...DEFAULT_QUERY, search: termName } }
-						);
-						return this.addRequest.then( searchResult => {
-							resolve( find( searchResult, result => isSameTermName( result.name, termName ) ) );
-						}, reject );
-					}
-					reject( xhr );
-				} );
+			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+			wp.apiRequest( {
+				path: `/wp/v2/${ basePath }`,
+				method: 'POST',
+				data: { name: termName },
+			} ).then( resolve, ( xhr ) => {
+				const errorCode = xhr.responseJSON && xhr.responseJSON.code;
+				if ( errorCode === 'term_exists' ) {
+					// search the new category created since last fetch
+					this.addRequest = wp.apiRequest( {
+						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
+					} );
+					return this.addRequest.then( searchResult => {
+						resolve( find( searchResult, result => isSameTermName( result.name, termName ) ) );
+					}, reject );
+				}
+				reject( xhr );
+			} );
 		} );
 	}
 
@@ -159,7 +163,6 @@ class FlatTermSelector extends Component {
 		const { label, slug, taxonomy } = this.props;
 		const { loading, availableTerms, selectedTerms } = this.state;
 		const termNames = availableTerms.map( ( term ) => term.name );
-
 		const newTermPlaceholderLabel = get(
 			taxonomy,
 			[ 'data', 'labels', 'add_new_item' ],

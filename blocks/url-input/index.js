@@ -4,6 +4,7 @@
 import { throttle } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
+import { stringify } from 'querystringify';
 
 /**
  * WordPress dependencies
@@ -66,11 +67,13 @@ class UrlInput extends Component {
 			selectedSuggestion: null,
 			loading: true,
 		} );
-		this.suggestionsRequest = new wp.api.collections.Posts().fetch( { data: {
-			search: value,
-			per_page: 20,
-			orderby: 'relevance',
-		} } );
+		this.suggestionsRequest = wp.apiRequest( {
+			path: `/wp/v2/posts?${ stringify( {
+				search: value,
+				per_page: 20,
+				orderby: 'relevance',
+			} ) }`,
+		} );
 
 		this.suggestionsRequest
 			.then(
