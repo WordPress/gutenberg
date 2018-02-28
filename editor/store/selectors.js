@@ -1273,20 +1273,47 @@ export function getFrecentInserterItems( state, enabledBlockTypes = true, maximu
  *
  * @return {Object} The reusable block, or null if none exists.
  */
-export function getReusableBlock( state, ref ) {
-	return state.reusableBlocks.data[ ref ] || null;
-}
+export const getReusableBlock = createSelector(
+	( state, ref ) => {
+		const block = state.reusableBlocks.data[ ref ];
+		if ( ! block ) {
+			return null;
+		}
+
+		return {
+			...block,
+			id: ref,
+			isTemporary: ! Number.isInteger( ref ),
+		};
+	},
+	( state, ref ) => [
+		state.reusableBlocks.data[ ref ],
+	],
+);
 
 /**
  * Returns whether or not the reusable block with the given ID is being saved.
  *
- * @param {*} state Global application state.
- * @param {*} ref   The reusable block's ID.
+ * @param {Object} state Global application state.
+ * @param {string} ref   The reusable block's ID.
  *
  * @return {boolean} Whether or not the reusable block is being saved.
  */
 export function isSavingReusableBlock( state, ref ) {
 	return state.reusableBlocks.isSaving[ ref ] || false;
+}
+
+/**
+ * Returns true if the reusable block with the given ID is being fetched, or
+ * false otherwise.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} ref   The reusable block's ID.
+ *
+ * @return {boolean} Whether the reusable block is being fetched.
+ */
+export function isFetchingReusableBlock( state, ref ) {
+	return !! state.reusableBlocks.isFetching[ ref ];
 }
 
 /**
