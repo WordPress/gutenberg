@@ -1,4 +1,3 @@
-import '@wordpress/jest-console';
 import { validatePluginId } from '../utils';
 
 describe( 'validatePluginId', () => {
