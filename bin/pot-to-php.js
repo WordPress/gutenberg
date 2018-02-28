@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const gettextParser = require( 'gettext-parser' );
-const _isEmpty = require( 'lodash/isEmpty' );
+const { isEmpty } = require( 'lodash' );
 const path = require( 'path' );
 const fs = require( 'fs' );
 
@@ -43,8 +43,8 @@ function convertTranslationToPHP( translation, textdomain ) {
 	let original = translation.msgid;
 	const comments = translation.comments;
 
-	if ( ! _isEmpty( comments ) ) {
-		if ( ! _isEmpty( comments.reference ) ) {
+	if ( ! isEmpty( comments ) ) {
+		if ( ! isEmpty( comments.reference ) ) {
 			// All references are split by newlines, add a // Reference prefix to make them tidy.
 			php += TAB + '// Reference: ' +
 				comments.reference
@@ -53,7 +53,7 @@ function convertTranslationToPHP( translation, textdomain ) {
 				NEWLINE;
 		}
 
-		if ( ! _isEmpty( comments.extracted ) ) {
+		if ( ! isEmpty( comments.extracted ) ) {
 			// All extracted comments are split by newlines, add a tab to line them up nicely.
 			const extracted = comments.extracted
 				.split( NEWLINE )
@@ -61,12 +61,16 @@ function convertTranslationToPHP( translation, textdomain ) {
 
 			php += TAB + `/* ${ extracted } */${ NEWLINE }`;
 		}
+
+		if ( ! isEmpty( comments.translator ) ) {
+			php += TAB + `/* translators: ${ comments.translator } */${ NEWLINE }`;
+		}
 	}
 
 	if ( '' !== original ) {
 		original = escapeSingleQuotes( original );
 
-		if ( _isEmpty( translation.msgid_plural ) ) {
+		if ( isEmpty( translation.msgid_plural ) ) {
 			php += TAB + `__( '${ original }', '${ textdomain }' )`;
 		} else {
 			const plural = escapeSingleQuotes( translation.msgid_plural );
@@ -78,7 +82,7 @@ function convertTranslationToPHP( translation, textdomain ) {
 	return php;
 }
 
-function convertPotToPHP( potFile, phpFile, options ) {
+function convertPOTToPHP( potFile, phpFile, options ) {
 	const poContents = fs.readFileSync( potFile );
 	const parsedPO = gettextParser.po.parse( poContents );
 
@@ -93,7 +97,7 @@ function convertPotToPHP( potFile, phpFile, options ) {
 	fs.writeFileSync( phpFile, fileOutput );
 }
 
-convertPotToPHP(
+convertPOTToPHP(
 	path.join( __dirname, '../languages/gutenberg.pot' ),
 	path.join( __dirname, '../languages/gutenberg-translations.php' ),
 	{
