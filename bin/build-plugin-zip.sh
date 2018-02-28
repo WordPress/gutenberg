@@ -79,8 +79,6 @@ status "Installing dependencies..."
 npm install
 status "Generating build..."
 npm run build
-status "Generating translation messages..."
-npm run gettext-strings
 status "Generating PHP file for wordpress.org to parse translations..."
 npm run pot-to-php
 
