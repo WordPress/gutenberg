@@ -9,6 +9,7 @@ import { isEqual, noop } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { focus, keycodes } from '@wordpress/utils';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -29,7 +30,6 @@ const { ESCAPE } = keycodes;
  * @type {String}
  */
 const SLOT_NAME = 'Popover';
-const isMobile = () => window.innerWidth < 782;
 
 class Popover extends Component {
 	constructor() {
@@ -47,7 +47,6 @@ class Popover extends Component {
 		this.state = {
 			forcedYAxis: null,
 			forcedXAxis: null,
-			isMobile: false,
 		};
 	}
 
@@ -140,26 +139,15 @@ class Popover extends Component {
 	}
 
 	setOffset() {
-		const { getAnchorRect = this.getAnchorRect, expandOnMobile = false } = this.props;
+		const { getAnchorRect = this.getAnchorRect, isMobile, expandOnMobile = false } = this.props;
 		const { popover } = this.nodes;
 
-		if ( isMobile() && expandOnMobile ) {
+		if ( isMobile && expandOnMobile ) {
 			popover.style.left = 0;
 			popover.style.top = 0;
 			popover.style.right = 0;
 			popover.style.bottom = 0;
-			if ( ! this.state.isMobile ) {
-				this.setState( {
-					isMobile: true,
-				} );
-			}
 			return;
-		}
-
-		if ( this.state.isMobile ) {
-			this.setState( {
-				isMobile: false,
-			} );
 		}
 
 		const [ yAxis, xAxis ] = this.getPositions();
@@ -250,6 +238,7 @@ class Popover extends Component {
 			range,
 			focusOnMount,
 			getAnchorRect,
+			isMobile,
 			expandOnMobile,
 			/* eslint-enable no-unused-vars */
 			...contentProps
@@ -262,7 +251,7 @@ class Popover extends Component {
 			'is-' + yAxis,
 			'is-' + xAxis,
 			{
-				'is-mobile': this.state.isMobile,
+				'is-mobile': isMobile,
 			}
 		);
 
@@ -278,7 +267,7 @@ class Popover extends Component {
 					{ ...contentProps }
 					onKeyDown={ this.maybeClose }
 				>
-					{ this.state.isMobile && (
+					{ isMobile && (
 						<div className="components-popover__header">
 							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
 						</div>
@@ -315,6 +304,10 @@ class Popover extends Component {
 Popover.contextTypes = {
 	getSlot: noop,
 };
+
+Popover = withViewportMatch( {
+	isMobile: '< small',
+} )( Popover );
 
 Popover.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
 

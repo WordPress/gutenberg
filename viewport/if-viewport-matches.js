@@ -2,7 +2,25 @@
  * WordPress dependencies
  */
 import { compose, getWrapperDisplayName } from '@wordpress/element';
-import { ifCondition } from '@wordpress/components';
+
+// TEMPORARY: A circular dependency exists between `@wordpress/components`
+// and `@wordpress/viewport` (Popover -> withViewportMatch, ifViewportMatches
+// -> ifCondition).
+
+// import { ifCondition } from '@wordpress/components';
+const ifCondition = ( predicate ) => ( WrappedComponent ) => {
+	const EnhancedComponent = ( props ) => {
+		if ( ! predicate( props ) ) {
+			return null;
+		}
+
+		return <WrappedComponent { ...props } />;
+	};
+
+	EnhancedComponent.displayName = getWrapperDisplayName( WrappedComponent, 'ifCondition' );
+
+	return EnhancedComponent;
+};
 
 /**
  * Internal dependencies

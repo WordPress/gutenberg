@@ -141,7 +141,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'components/build/index.js' ),
-		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-hooks', 'wp-api-request', 'moment' ),
+		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-hooks', 'wp-api-request', 'wp-viewport', 'moment' ),
 		filemtime( gutenberg_dir_path() . 'components/build/index.js' )
 	);
 	wp_register_script(
@@ -161,7 +161,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-viewport',
 		gutenberg_url( 'viewport/build/index.js' ),
-		array( 'wp-element', 'wp-data', 'wp-components' ),
+		array( 'wp-element', 'wp-data' ),
 		filemtime( gutenberg_dir_path() . 'viewport/build/index.js' )
 	);
 	// Loading the old editor and its config to ensure the classic block works as expected.
