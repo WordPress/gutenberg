@@ -1,4 +1,4 @@
-const reducer = ( state = {}, action ) => {
+const reducer = ( state, action ) => {
 	switch ( action.type ) {
 		case 'FETCH_CATEGORIES_SUCCESS':
 			return action.categories.reduce( ( memo, category ) => ( {

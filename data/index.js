@@ -3,7 +3,8 @@
  */
 import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
-import { flowRight, without, mapValues, isFunction, omitBy, forEach } from 'lodash';
+import { flowRight, without, mapValues } from 'lodash';
+import memize from 'memize';
 
 /**
  * WordPress dependencies
@@ -21,6 +22,7 @@ export { loadAndPersist, withRehydratation } from './persist';
  */
 const stores = {};
 const selectors = {};
+const resolvers = {};
 const actions = {};
 let listeners = [];
 
@@ -113,12 +115,21 @@ export { combineReducers };
 export function registerSelectors( reducerKey, newSelectors ) {
 	const store = stores[ reducerKey ];
 	const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
-	selectors[ reducerKey ] = mapValues( newSelectors, ( selector ) => {
-		return {
-			...( isFunction( selector ) ? {} : selector ),
-			select: createStateSelector( isFunction( selector ) ? selector : selector.select ),
-		};
-	} );
+	selectors[ reducerKey ] = mapValues( newSelectors, createStateSelector );
+}
+
+/**
+ * Registers resolvers.
+ *
+ * @param {string} reducerKey   Part of the state shape to register the
+ *                              resolvers for.
+ * @param {Object} newResolvers Resolvers to register.
+ */
+export function registerResolvers( reducerKey, newResolvers ) {
+	resolvers[ reducerKey ] = mapValues(
+		newResolvers,
+		( resolver ) => ( { ...resolver, fulfill: memize( resolver.fulfill ) } )
+	);
 }
 
 /**
@@ -158,7 +169,23 @@ export const subscribe = ( listener ) => {
  * @return {*} The selector's returned value.
  */
 export function select( reducerKey ) {
-	return mapValues( selectors[ reducerKey ], ( selector ) => selector.select );
+	const createResolver = ( selector, key ) => ( ...args ) => {
+		const result = selector( ...args );
+		const resolver = resolvers[ reducerKey ] && resolvers[ reducerKey ][ key ];
+		if ( ! resolver ) {
+			return result;
+		}
+		const isFulfilled = resolver.isFulfilled( stores[ reducerKey ].getState(), ...args );
+		if ( isFulfilled ) {
+			// TODO: clear memize cache for these sepecific args
+		} else {
+			resolver.fulfill( ...args );
+		}
+
+		return result;
+	};
+
+	return mapValues( selectors[ reducerKey ], createResolver );
 }
 
 /**
@@ -302,105 +329,6 @@ export const withDispatch = ( mapDispatchToProps ) => ( WrappedComponent ) => {
 	ComponentWithDispatch.displayName = getWrapperDisplayName( WrappedComponent, 'dispatch' );
 
 	return ComponentWithDispatch;
-};
-
-/**
- * Higher-order component used to inject state-derived props using registered
- * selectors and trigger the necessary actions to fetch the selected data.
- *
- * @param {Function} mapStateToProps Function called on every state change,
- *                                   expected to return object of resolvers to
- *                                   run and provide prop for resolver.
- *
- * @return {Component} Enhanced component with merged state data props.
- */
-export const withData = ( mapStateToProps ) => ( WrappedComponent ) => {
-	class ComponentWithData extends Component {
-		constructor() {
-			super( ...arguments );
-
-			this.runSelection = this.runSelection.bind( this );
-
-			this.state = {};
-			this.resolvers = {};
-		}
-
-		componentWillMount() {
-			this.subscribe();
-
-			// Populate initial state.
-			this.runResolvers();
-		}
-
-		componentWillReceiveProps( nextProps ) {
-			if ( ! isShallowEqual( nextProps, this.props ) ) {
-				this.runResolvers( nextProps );
-			}
-		}
-
-		componentWillUnmount() {
-			this.unsubscribe();
-		}
-
-		subscribe() {
-			this.unsubscribe = subscribe( this.runSelection );
-		}
-
-		resolve( props ) {
-			const resolve = ( reducerKey ) => {
-				return mapValues( selectors[ reducerKey ], ( selector, key ) => {
-					return ( ...args ) => ( {
-						args,
-						key,
-						reducerKey,
-					} );
-				} );
-			};
-			return mapStateToProps( resolve, props );
-		}
-
-		runResolvers( props = this.props ) {
-			const resolvers = this.resolve( props );
-			const newResolvers = omitBy( resolvers, ( resolver, key ) => {
-				const previousResolver = this.resolvers[ key ];
-				return (
-					!! previousResolver &&
-					previousResolver.key === resolver.key &&
-					isShallowEqual( previousResolver.args, resolver.args )
-				);
-			} );
-			this.resolvers = resolvers;
-			this.runSideEffects( newResolvers );
-			this.runSelection();
-		}
-
-		runSideEffects( resolvers ) {
-			forEach( resolvers, ( { key, reducerKey, args } ) => {
-				const selector = selectors[ reducerKey ][ key ];
-				if ( selector.effect ) {
-					selector.effect( ...args );
-				}
-			} );
-		}
-
-		runSelection() {
-			const newState = mapValues( this.resolvers, ( { key, reducerKey, args } ) => {
-				const selector = selectors[ reducerKey ][ key ];
-				return selector.select( ...args );
-			} );
-			if ( ! isShallowEqual( newState, this.state ) ) {
-				this.setState( newState );
-			}
-		}
-
-		render() {
-			return <WrappedComponent { ...this.props } { ...this.state } />;
-		}
-	}
-
-	ComponentWithData.displayName = getWrapperDisplayName( WrappedComponent, 'data' );
-
-	return ComponentWithData;
 };
 
 export const query = ( mapSelectToProps ) => {

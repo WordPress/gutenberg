@@ -4,6 +4,7 @@
 import {
 	registerReducer,
 	registerSelectors,
+	registerResolvers,
 } from '@wordpress/data';
 
 /**
@@ -18,10 +19,12 @@ import { getCategories } from './selectors';
 const MODULE_KEY = 'core';
 
 const store = registerReducer( MODULE_KEY, reducer );
-registerSelectors( MODULE_KEY, {
+
+registerSelectors( MODULE_KEY, { getCategories } );
+registerResolvers( MODULE_KEY, {
 	getCategories: {
-		select: getCategories,
-		effect: () => {
+		isFulfilled: ( state ) => state !== undefined,
+		fulfill: () => {
 			wp.apiRequest( { path: '/wp/v2/categories' } ).then( categories => {
 				store.dispatch( {
 					type: 'FETCH_CATEGORIES_SUCCESS',

@@ -3,7 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { Placeholder, Spinner, ToggleControl } from '@wordpress/components';
-import { withData } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { times, unescape } from 'lodash';
 
@@ -205,8 +205,8 @@ class CategoriesBlock extends Component {
 	}
 }
 
-export default withData( ( resolve ) => {
+export default withSelect( ( select ) => {
 	return {
-		categories: resolve( 'core' ).getCategories(),
+		categories: select( 'core' ).getCategories(),
 	};
 } )( CategoriesBlock );
