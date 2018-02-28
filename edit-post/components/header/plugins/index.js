@@ -56,9 +56,9 @@ function Plugins( props ) {
 					const pluginActive = menuItem.target === props.activePlugin;
 
 					let Icon = menuItem.icon ? (
-						<div className="components-menu-item-plugins__icon-container" >
+						<span className="components-menu-item-plugins__icon-container" >
 							{ menuItem.icon }
-						</div>
+						</span>
 					) : null;
 
 					if ( pluginActive ) {
