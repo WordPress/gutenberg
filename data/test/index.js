@@ -100,6 +100,20 @@ describe( 'select', () => {
 } );
 
 describe( 'withSelect', () => {
+	const unsubscribes = [];
+	afterEach( () => {
+		let unsubscribe;
+		while ( ( unsubscribe = unsubscribes.shift() ) ) {
+			unsubscribe();
+		}
+	} );
+
+	function subscribeWithUnsubscribe( ...args ) {
+		const unsubscribe = subscribe( ...args );
+		unsubscribes.push( unsubscribe );
+		return unsubscribe;
+	}
+
 	it( 'passes the relevant data to the component', () => {
 		registerReducer( 'reactReducer', () => ( { reactKey: 'reactState' } ) );
 		registerSelectors( 'reactReducer', {
@@ -196,6 +210,36 @@ describe( 'withSelect', () => {
 
 		wrapper.unmount();
 	} );
+
+	it( 'ensures component is still mounted before setting state', () => {
+		// This test verifies that even though unsubscribe doesn't take effect
+		// until after the current listener stack is called, we don't attempt
+		// to setState on an unmounting `withSelect` component. It will fail if
+		// an attempt is made to `setState` on an unmounted component.
+		const store = registerReducer( 'counter', ( state = 0, action ) => {
+			if ( action.type === 'increment' ) {
+				return state + 1;
+			}
+
+			return state;
+		} );
+
+		registerSelectors( 'counter', {
+			getCount: ( state, offset ) => state + offset,
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			wrapper.unmount();
+		} );
+
+		const Component = withSelect( ( _select, ownProps ) => ( {
+			count: _select( 'counter' ).getCount( ownProps.offset ),
+		} ) )( ( props ) => <div>{ props.count }</div> );
+
+		const wrapper = mount( <Component offset={ 0 } /> );
+
+		store.dispatch( { type: 'increment' } );
+	} );
 } );
 
 describe( 'withDispatch', () => {
@@ -243,6 +287,20 @@ describe( 'withDispatch', () => {
 } );
 
 describe( 'subscribe', () => {
+	const unsubscribes = [];
+	afterEach( () => {
+		let unsubscribe;
+		while ( ( unsubscribe = unsubscribes.shift() ) ) {
+			unsubscribe();
+		}
+	} );
+
+	function subscribeWithUnsubscribe( ...args ) {
+		const unsubscribe = subscribe( ...args );
+		unsubscribes.push( unsubscribe );
+		return unsubscribe;
+	}
+
 	it( 'registers multiple selectors to the public API', () => {
 		let incrementedValue = null;
 		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
@@ -266,6 +324,35 @@ describe( 'subscribe', () => {
 		store.dispatch( action );
 
 		expect( incrementedValue ).toBe( 3 );
+	} );
+
+	it( 'snapshots listeners on change, avoiding a later listener if subscribed during earlier callback', () => {
+		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
+		const secondListener = jest.fn();
+		const firstListener = jest.fn( () => {
+			subscribeWithUnsubscribe( secondListener );
+		} );
+
+		subscribeWithUnsubscribe( firstListener );
+
+		store.dispatch( { type: 'dummy' } );
+
+		expect( secondListener ).not.toHaveBeenCalled();
+	} );
+
+	it( 'snapshots listeners on change, calling a later listener even if unsubscribed during earlier callback', () => {
+		const store = registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
+		const firstListener = jest.fn( () => {
+			secondUnsubscribe();
+		} );
+		const secondListener = jest.fn();
+
+		subscribeWithUnsubscribe( firstListener );
+		const secondUnsubscribe = subscribeWithUnsubscribe( secondListener );
+
+		store.dispatch( { type: 'dummy' } );
+
+		expect( secondListener ).toHaveBeenCalled();
 	} );
 } );
 

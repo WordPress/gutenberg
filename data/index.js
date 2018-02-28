@@ -28,7 +28,7 @@ let listeners = [];
  * Global listener called for each store's update.
  */
 export function globalListener() {
-	listeners.forEach( listener => listener() );
+	listeners.forEach( ( listener ) => listener() );
 }
 
 /**
@@ -189,6 +189,12 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 
 		componentWillUnmount() {
 			this.unsubscribe();
+
+			// While above unsubscribe avoids future listener calls, callbacks
+			// are snapshotted before being invoked, so if unmounting occurs
+			// during a previous callback, we need to explicitly track and
+			// avoid the `runSelection` that is scheduled to occur.
+			this.isUnmounting = true;
 		}
 
 		subscribe() {
@@ -196,6 +202,10 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 		}
 
 		runSelection( props = this.props ) {
+			if ( this.isUnmounting ) {
+				return;
+			}
+
 			const newState = mapStateToProps( select, props );
 			if ( ! isEqualShallow( newState, this.state ) ) {
 				this.setState( newState );
