@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, isEmpty, isString } from 'lodash';
+import { map, isEmpty } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -49,9 +49,6 @@ function Plugins( props ) {
 			label={ __( 'Plugins' ) }
 			filterName="editPost.MoreMenu.plugins" >
 			{ map( ellipsisMenuItems, menuItem => {
-				if ( isString( menuItem.icon ) ) {
-					menuItem.icon = null;
-				}
 				const pluginActive = menuItem.target === props.activePlugin;
 
 				let Icon = menuItem.icon ? (
