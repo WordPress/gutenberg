@@ -178,6 +178,19 @@ export const settings = {
 			figureStyle = { maxWidth: '50%' };
 		}
 
+		// Output an extra element for floats
+		if ( align === 'left' || align === 'right' ) {
+			return (
+				<div className={ align ? `align${ align }` : null }>
+					<figure style={ figureStyle }>
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+					</figure>
+				</div>
+			);
+		}
+
+		// Just output figure when non floated
 		return (
 			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
 				{ href ? <a href={ href }>{ image }</a> : image }
@@ -202,6 +215,19 @@ export const settings = {
 					figureStyle = { maxWidth: '50%' };
 				}
 
+				// Output an extra element for floats
+				if ( align === 'left' || align === 'right' ) {
+					return (
+						<div className={ align ? `align${ align }` : null }>
+							<figure style={ figureStyle }>
+								{ href ? <a href={ href }>{ image }</a> : image }
+								{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+							</figure>
+						</div>
+					);
+				}
+
+				// Just output figure when non floated
 				return (
 					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
 						{ href ? <a href={ href }>{ image }</a> : image }
