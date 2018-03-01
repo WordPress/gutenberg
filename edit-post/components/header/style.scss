@@ -26,6 +26,14 @@
 	@include break-medium() {
 		top: $admin-bar-height;
 	}
+
+	.editor-post-switch-to-draft + .editor-post-preview {
+		display: none;
+
+		@include break-small {
+			display: inline-block;
+		}
+	}
 }
 
 @include editor-left('.edit-post-header');

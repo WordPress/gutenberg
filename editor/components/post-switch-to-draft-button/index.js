@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -31,14 +31,14 @@ function PostSwitchToDraftButton( { isSaving, isPublished, onClick } ) {
 	};
 
 	return (
-		<IconButton
+		<Button
 			className="editor-post-switch-to-draft"
 			isLarge
 			onClick={ onSwitch }
 			disabled={ isSaving }
 		>
 			{ __( 'Switch to Draft' ) }
-		</IconButton>
+		</Button>
 	);
 }
 
