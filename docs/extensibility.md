@@ -130,7 +130,7 @@ This method takes a sidebar `name` and a `settings` object, containing a title a
 **Example**
 
 ```js
-wp.data.registerSidebar( 'my-plugin/my-custom-sidebar', {
+wp.editPost.registerSidebar( 'my-plugin/my-custom-sidebar', {
 	render: function mySidebar() {
 		return <p>This is an example</p>;
 	},
@@ -146,7 +146,7 @@ This method takes the `name` of the sidebar you'd like to open. That sidebar sho
 **Example**
 
 ```js
-wp.data.activateSidebar( 'my-plugin/my-custom-sidebar' );
+wp.editPost.activateSidebar( 'my-plugin/my-custom-sidebar' );
 ```
 
 ## Extending the editor's UI (Slot and Fill)

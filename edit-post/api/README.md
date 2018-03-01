@@ -14,7 +14,7 @@ This method only registers a sidebar. To open the sidebar, use the `activateSide
 #### Example:
 
 ```js
-wp.data.registerSidebar( 'my-plugin/my-custom-sidebar', {
+wp.editPost.registerSidebar( 'my-plugin/my-custom-sidebar', {
 	render: function mySidebar() {
 		return <p>This is an example</p>;
 	},
@@ -29,5 +29,5 @@ This method takes one argument:
 #### Example:
 
 ```js
-wp.data.activateSidebar( 'my-plugin/my-custom-sidebar' );
+wp.editPost.activateSidebar( 'my-plugin/my-custom-sidebar' );
 ```
