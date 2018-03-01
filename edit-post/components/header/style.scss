@@ -27,7 +27,8 @@
 		top: $admin-bar-height;
 	}
 
-	.editor-post-switch-to-draft + .editor-post-preview {
+	.editor-post-switch-to-draft + .editor-post-preview,
+	.editor-post-switch-to-draft + .editor-post-preview + .editor-post-publish-button {
 		display: none;
 
 		@include break-small {
@@ -79,7 +80,7 @@
 		margin: 2px;
 		height: 33px;
 		line-height: 32px;
-		padding: 0 6px 2px;
+		padding: 0 5px 2px;
 		font-size: $default-font-size;
 
 		@include break-small() {
