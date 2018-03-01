@@ -55,7 +55,7 @@ function Plugins( props ) {
 				const pluginActive = menuItem.target === props.activePlugin;
 
 				let Icon = menuItem.icon ? (
-					<span className="components-menu-item-plugins__icon-container" >
+					<span className="edit-post-plugins__icon-container" >
 						{ menuItem.icon }
 					</span>
 				) : null;
@@ -65,9 +65,11 @@ function Plugins( props ) {
 				}
 
 				const buttonClassName = classnames(
-					'components-menu-item-plugins__button',
-					Icon ? 'has-icon' : null,
-					pluginActive ? 'active' : null,
+					'edit-post-plugins__button',
+					{
+						'has-icon': Icon,
+						'is-active': pluginActive,
+					}
 				);
 
 				return (
