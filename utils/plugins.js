@@ -14,7 +14,7 @@ import { sprintf } from '@wordpress/i18n';
  * If a namespace id is invalid, it will print a console error, optionally using
  * the name of the thing it identifies.
  *
- * @param {string} id Namespaced identifier.
+ * @param {string} id     Namespaced identifier.
  * @param {string} [name] Plural name of what the id is for, defaults to "Namespaced identifiers".
  * @return {boolean} Whether the id is valid.
  */
