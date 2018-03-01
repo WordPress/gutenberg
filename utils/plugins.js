@@ -1,6 +1,11 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /**
+ * WordPress Dependencies
+ */
+import { sprintf } from '@wordpress/i18n';
+
+/**
  * Validates the namespaced id.
  *
  * A namespaced id should be formatted like this: "namespace/identifier".
@@ -16,13 +21,13 @@
 export function validateNamespacedId( id, name = 'Namespaced identifiers' ) {
 	if ( typeof id !== 'string' ) {
 		console.error(
-			wp.i18n.sprintf( '%s must be strings.', name )
+			sprintf( '%s must be strings.', name )
 		);
 		return false;
 	}
 	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( id ) ) {
 		console.error(
-			wp.i18n.sprintf( '%s must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-id', name )
+			sprintf( '%s must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-id', name )
 		);
 		return false;
 	}
