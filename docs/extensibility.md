@@ -120,6 +120,35 @@ wp.hooks.addFilter(
 
 _Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
 
+## Adding a sidebar
+
+### Registering a sidebar
+`wp.editPost.registerSidebar( name: string, settings: { title: string, render: function } )`
+
+This method takes a sidebar `name` and a `settings` object, containing a title and a render function. The name should contain a namespace prefix (Example: my-plugin/my-custom-sidebar).
+
+**Example**
+
+```js
+wp.data.registerSidebar( 'my-plugin/my-custom-sidebar', {
+	render: function mySidebar() {
+		return <p>This is an example</p>;
+	},
+} );
+```
+
+### Activating a sidebar
+
+`wp.editPost.activateSidebar( name: string )`
+
+This method takes the `name` of the sidebar you'd like to open. That sidebar should have been registered beforehand using the `registerSidebar` method.
+
+**Example**
+
+```js
+wp.data.activateSidebar( 'my-plugin/my-custom-sidebar' );
+```
+
 ## Extending the editor's UI (Slot and Fill)
 
 Coming soon.
