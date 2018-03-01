@@ -34,9 +34,10 @@ function escapeSingleQuotes( input ) {
  *
  * @param {Object} translation The translation to convert.
  * @param {string} textdomain The text domain to use in the WordPress translation function call.
+ * @param {string} context The context for the translation.
  * @return {string} Lines of PHP that match the translation.
  */
-function convertTranslationToPHP( translation, textdomain ) {
+function convertTranslationToPHP( translation, textdomain, context = '' ) {
 	let php = '';
 
 	// The format of gettext-js matches the terminology in gettext itself.
@@ -71,11 +72,19 @@ function convertTranslationToPHP( translation, textdomain ) {
 		original = escapeSingleQuotes( original );
 
 		if ( isEmpty( translation.msgid_plural ) ) {
-			php += TAB + `__( '${ original }', '${ textdomain }' )`;
+			if ( isEmpty( context ) ) {
+				php += TAB + `__( '${ original }', '${ textdomain }' )`;
+			} else {
+				php += TAB + `_x( '${ original }', '${ translation.msgctxt }', '${ textdomain }' )`;
+			}
 		} else {
 			const plural = escapeSingleQuotes( translation.msgid_plural );
 
-			php += TAB + `_n_noop( '${ original }', '${ plural }', '${ textdomain }' )`;
+			if ( isEmpty( context ) ) {
+				php += TAB + `_n_noop( '${ original }', '${ plural }', '${ textdomain }' )`;
+			} else {
+				php += TAB + `_nx_noop( '${ original }',  '${ plural }', '${ translation.msgctxt }', '${ textdomain }' )`;
+			}
 		}
 	}
 
@@ -86,11 +95,17 @@ function convertPOTToPHP( potFile, phpFile, options ) {
 	const poContents = fs.readFileSync( potFile );
 	const parsedPO = gettextParser.po.parse( poContents );
 
-	const translations = parsedPO.translations[ '' ];
+	let output = [];
 
-	const output = Object.values( translations )
-		.map( ( translation ) => convertTranslationToPHP( translation, options.textdomain ) )
-		.filter( php => php !== '' );
+	for ( const context of Object.keys( parsedPO.translations ) ) {
+		const translations = parsedPO.translations[ context ];
+
+		const newOutput = Object.values( translations )
+			.map( ( translation ) => convertTranslationToPHP( translation, options.textdomain, context ) )
+			.filter( php => php !== '' );
+
+		output = [ output, ...newOutput ];
+	}
 
 	const fileOutput = fileHeader + output.join( ',' + NEWLINE + NEWLINE ) + fileFooter;
 
