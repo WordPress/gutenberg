@@ -1,7 +1,5 @@
-/* eslint camelcase: 0 */
-
 export {
-	registerMoreMenuItem as experimental__registerMoreMenuItem,
+	registerMoreMenuItem as __experimentalRegisterMoreMenuItem,
 } from './more-menu-item';
 export {
 	registerSidebar,
