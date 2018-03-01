@@ -22,7 +22,7 @@ const menuItems = {};
  * @param {Object}       settings        The settings for this menu item.
  * @param {string}       settings.title  The name to show in the settings menu.
  * @param {func}         settings.target The registered plugin that should be activated.
- * @param {ReactElement} [settings.icon] SVG React Component.
+ * @param {ReactElement} [settings.icon] SVG React Element.
  *
  * @return {Object} The final sidebar settings object.
  */
