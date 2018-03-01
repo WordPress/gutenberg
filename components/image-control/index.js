@@ -6,7 +6,6 @@ import BaseControl from '../base-control';
 import MediaUpload from '../../blocks/media-upload';
 import Button from '../button';
 import withInstanceId from '../higher-order/with-instance-id';
-import './style.scss';
 
 function ImageControl( { label, value, help, instanceId, onSelect, buttonRender = null, ...props } ) {
 	const id = `inspector-media-upload-control-${ instanceId }`;
