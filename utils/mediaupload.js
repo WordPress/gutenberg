@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, startsWith } from 'lodash';
+import { compact, get, startsWith } from 'lodash';
 
 /**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
@@ -35,7 +35,16 @@ export function mediaUpload( filesList, onFileChange, allowedType ) {
 
 		return createMediaFromFile( mediaFile ).then(
 			( savedMedia ) => {
-				setAndUpdateFiles( idx, { id: savedMedia.id, url: savedMedia.source_url, link: savedMedia.link } );
+				const mediaObject = {
+					id: savedMedia.id,
+					url: savedMedia.source_url,
+					link: savedMedia.link,
+				};
+				const caption = get( savedMedia, [ 'caption', 'raw' ] );
+				if ( caption ) {
+					mediaObject.caption = [ caption ];
+				}
+				setAndUpdateFiles( idx, mediaObject );
 			},
 			() => {
 				// Reset to empty on failure.
@@ -51,7 +60,7 @@ export function mediaUpload( filesList, onFileChange, allowedType ) {
  *
  * @return {Promise} Media Object Promise.
  */
-export function createMediaFromFile( file ) {
+function createMediaFromFile( file ) {
 	// Create upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
