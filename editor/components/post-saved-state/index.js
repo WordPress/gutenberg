@@ -31,11 +31,10 @@ import {
  * @return {WPElement}       WordPress Element.
  */
 export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, onSave } ) {
-	const className = 'editor-post-saved-state';
-
 	if ( isSaving ) {
 		return (
-			<span className={ className }>
+			<span className="editor-post-saved-state editor-post-saved-state__saving">
+				<Dashicon icon="cloud" />
 				{ __( 'Saving' ) }
 			</span>
 		);
@@ -51,7 +50,7 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 
 	if ( ! isNew && ! isDirty ) {
 		return (
-			<span className={ className }>
+			<span className="editor-post-saved-state">
 				<Dashicon icon="saved" />
 				{ __( 'Saved' ) }
 			</span>
@@ -63,10 +62,8 @@ export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSavea
 			className="editor-post-save-draft"
 			onClick={ onSave }
 			icon="cloud-upload"
-			label={ __( 'Save Draft' ) }
 		>
-			<span className="editor-post-saved-state__mobile">{ __( 'Save' ) }</span>
-			<span className="editor-post-saved-state__desktop">{ __( 'Save Draft' ) }</span>
+			{ __( 'Save Draft' ) }
 		</IconButton>
 	);
 }
