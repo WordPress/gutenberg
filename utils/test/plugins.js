@@ -14,12 +14,12 @@ describe( 'validatePluginId', () => {
 		expect( valid ).toBe( false );
 	} );
 
-	it( 'rejects a pluginId that\'s a number', () => {
+	it( 'rejects a pluginId that\'s not a string but a number', () => {
 		expect( validateNamespacedId( 1 ) ).toBe( false );
 		expect( console ).toHaveErrored();
 	} );
 
-	it( 'rejects a pluginId that\'s an object', () => {
+	it( 'rejects a pluginId that\'s not a string but an object', () => {
 		expect( validateNamespacedId( {} ) ).toBe( false );
 		expect( console ).toHaveErrored();
 	} );
