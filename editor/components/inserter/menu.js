@@ -138,7 +138,7 @@ export class InserterMenu extends Component {
 				predicate = ( item ) => item.category === 'embed';
 				break;
 
-			case 'saved':
+			case 'shared':
 				predicate = ( item ) => item.category === 'reusable-blocks';
 				break;
 		}
@@ -225,11 +225,11 @@ export class InserterMenu extends Component {
 			return this.renderItems( itemsForTab );
 		}
 
-		// If the Saved tab is selected and we have no results, display a friendly message
-		if ( 'saved' === tab && itemsForTab.length === 0 ) {
+		// If the Shared tab is selected and we have no results, display a friendly message
+		if ( 'shared' === tab && itemsForTab.length === 0 ) {
 			return (
 				<NoBlocks>
-					{ __( 'No saved blocks.' ) }
+					{ __( 'No shared blocks.' ) }
 				</NoBlocks>
 			);
 		}
@@ -306,8 +306,8 @@ export class InserterMenu extends Component {
 								className: 'editor-inserter__tab',
 							},
 							{
-								name: 'saved',
-								title: __( 'Saved' ),
+								name: 'shared',
+								title: __( 'Shared' ),
 								className: 'editor-inserter__tab',
 							},
 						] }
