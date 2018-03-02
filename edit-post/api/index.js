@@ -1,4 +1,4 @@
 export {
-	registerSidebar,
-	activateSidebar,
+	registerSidebar as __experimentalRegisterSidebar,
+	activateSidebar as __experimentalActivateSidebar,
 } from './sidebar';
