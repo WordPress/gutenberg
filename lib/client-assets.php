@@ -85,7 +85,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'utils/build/index.js' ),
-		array(),
+		array( 'tinymce-latest' ),
 		filemtime( gutenberg_dir_path() . 'utils/build/index.js' )
 	);
 	wp_register_script(

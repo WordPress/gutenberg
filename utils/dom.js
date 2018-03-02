@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { includes } from 'lodash';
+import tinymce from 'tinymce';
 
 /**
  * Browser dependencies
@@ -57,8 +58,14 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 	}
 
 	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
+	const editor = tinymce.get( node.id );
 
-	if ( ! isReverse && offset !== maxOffset ) {
+	if (
+		! isReverse &&
+		offset !== maxOffset &&
+		// content editables with only a BR element are considered empty
+		( ! editor || ! editor.dom.isEmpty( node ) )
+	) {
 		return false;
 	}
 
