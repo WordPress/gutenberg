@@ -21,7 +21,7 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
-import { keycodes, createBlobURL } from '@wordpress/utils';
+import { keycodes, createBlobURL, isHorizontalEdge } from '@wordpress/utils';
 import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
 /**
@@ -469,52 +469,6 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Determines if the current selection within the editor is at the start.
-	 *
-	 * @return {boolean} Whether or not the selection is at the start of the editor.
-	 */
-	isStartOfEditor() {
-		const range = this.editor.selection.getRng();
-		if ( range.startOffset !== 0 || ! range.collapsed ) {
-			return false;
-		}
-		const start = range.startContainer;
-		const body = this.editor.getBody();
-		let element = start;
-		while ( element !== body ) {
-			const child = element;
-			element = element.parentNode;
-			if ( element.firstChild !== child ) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Determines if the current selection within the editor is at the end.
-	 *
-	 * @return {boolean} Whether or not the selection is at the end of the editor.
-	 */
-	isEndOfEditor() {
-		const range = this.editor.selection.getRng();
-		if ( range.endOffset !== range.endContainer.textContent.length || ! range.collapsed ) {
-			return false;
-		}
-		const start = range.endContainer;
-		const body = this.editor.getBody();
-		let element = start;
-		while ( element !== body ) {
-			const child = element;
-			element = element.parentNode;
-			if ( element.lastChild !== child ) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
 	 * Handles a keydown event from tinyMCE.
 	 *
 	 * @param {KeydownEvent} event The keydow event as triggered by tinyMCE.
@@ -524,8 +478,8 @@ export class RichText extends Component {
 		const rootNode = this.editor.getBody();
 
 		if (
-			( event.keyCode === BACKSPACE && this.isStartOfEditor() ) ||
-			( event.keyCode === DELETE && this.isEndOfEditor() )
+			( event.keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
+			( event.keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
 		) {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
