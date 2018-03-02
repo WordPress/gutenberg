@@ -31,6 +31,7 @@ function Toolbar( { controls = [], children, className } ) {
 					<div
 						key={ [ setIndex, controlIndex ].join() }
 						className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
+						tabIndex={ -1 }
 					>
 						<IconButton
 							icon={ control.icon }

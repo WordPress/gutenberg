@@ -370,19 +370,9 @@ export class BlockListBlock extends Component {
 	 * specifically handles the case where block does not set focus on its own
 	 * (via `setFocus`), typically if there is no focusable input in the block.
 	 *
-	 * @param {FocusEvent} event A focus event
-	 *
 	 * @return {void}
 	 */
-	onFocus( event ) {
-		// Firefox-specific: Firefox will redirect focus of an already-focused
-		// node to its parent, but assign a property before doing so. If that
-		// property exists, ensure that it is the node, or abort.
-		const { explicitOriginalTarget } = event.nativeEvent;
-		if ( explicitOriginalTarget && explicitOriginalTarget !== this.node ) {
-			return;
-		}
-
+	onFocus() {
 		if ( ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
