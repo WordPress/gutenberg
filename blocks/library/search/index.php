@@ -26,7 +26,7 @@ function gutenberg_render_block_core_search( $attributes ) {
 
 		$defaults = array(
 			'label'       => _x( 'Search for:', 'label' ),
-			'placeholder' => esc_attr_x( 'Search &hellip;', 'placeholder' ),
+			'placeholder' => esc_attr_x( 'Search &hellip;', 'gutenberg' ),
 			'submitValue' => esc_attr_x( 'Search', 'submit button' ),
 		);
 

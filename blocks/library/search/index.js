@@ -81,7 +81,7 @@ const searchAttributes = {
 	},
 	placeholder: {
 		type: 'string',
-		default: _x( 'Search &hellip;', 'placeholder' ),
+		default: _x( 'Search &hellip;', 'gutenberg' ),
 	},
 	submitValue: {
 		type: 'string',
