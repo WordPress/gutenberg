@@ -9,6 +9,7 @@ import { format } from 'util';
 /**
  * Internal dependencies
  */
+import { registerCoreBlocks } from '../library';
 import parse from '../api/parser';
 import { parse as grammarParse } from '../api/post.pegjs';
 import serialize from '../api/serializer';
@@ -76,13 +77,19 @@ function normalizeParsedBlocks( blocks ) {
 		// Clone and remove React-instance-specific stuff; also, attribute
 		// values that equal `undefined` will be removed
 		block = JSON.parse( JSON.stringify( block ) );
+
 		// Change unique UIDs to a predictable value
 		block.uid = '_uid_' + index;
+
 		// Walk each attribute and get a more concise representation of any
 		// React elements
 		for ( const k in block.attributes ) {
 			block.attributes[ k ] = normalizeReactTree( block.attributes[ k ] );
 		}
+
+		// Recurse to normalize inner blocks
+		block.innerBlocks = normalizeParsedBlocks( block.innerBlocks );
+
 		return block;
 	} );
 }
@@ -91,8 +98,9 @@ describe( 'full post content fixture', () => {
 	beforeAll( () => {
 		window._wpBlocks = require( './server-registered.json' );
 
-		// Register all blocks.
-		require( 'blocks' );
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+		registerCoreBlocks();
 	} );
 
 	fileBasenames.forEach( f => {
@@ -136,6 +144,16 @@ describe( 'full post content fixture', () => {
 			}
 
 			const blocksActual = parse( content );
+
+			// Block validation logs during deprecation migration. Since this
+			// is expected for deprecated blocks, match on filename and allow.
+			const isDeprecated = /__deprecated([-_]|$)/.test( f );
+			if ( isDeprecated ) {
+				// eslint-disable-next-line no-console
+				console.warn.mockReset();
+				expect( console ).toHaveErrored();
+			}
+
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
 			let blocksExpectedString = readFixtureFile( f + '.json' );
 

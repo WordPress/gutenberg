@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`core/embed block edit matches snapshot 1`] = `
+<div
+  class="wp-block-table blocks-rich-text"
+>
+  <table
+    class="blocks-rich-text__tinymce"
+    contenteditable="true"
+  >
+    <tbody>
+      <tr>
+        <td>
+          <br />
+        </td>
+        <td>
+          <br />
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <br />
+        </td>
+        <td>
+          <br />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;

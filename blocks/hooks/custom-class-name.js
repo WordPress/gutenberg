@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { getWrapperDisplayName } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -19,11 +20,11 @@ import InspectorControls from '../inspector-controls';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
- * of the first node
+ * of the first node.
  *
- * @param  {Object} settings Original block settings
+ * @param {Object} settings Original block settings.
  *
- * @returns {Object} Filtered block settings.
+ * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
@@ -42,18 +43,18 @@ export function addAttribute( settings ) {
  * Override the default edit UI to include a new block inspector control for
  * assigning the custom class name, if block supports custom class name.
  *
- * @param  {function|Component} BlockEdit Original component
+ * @param {function|Component} BlockEdit Original component.
  *
- * @returns {function} Wrapped component.
+ * @return {string} Wrapped component.
  */
 export function withInspectorControl( BlockEdit ) {
 	const WrappedBlockEdit = ( props ) => {
-		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true ) && props.focus;
+		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true ) && props.isSelected;
 
 		return [
 			<BlockEdit key="block-edit-custom-class-name" { ...props } />,
 			hasCustomClassName && <InspectorControls key="inspector-custom-class-name">
-				<InspectorControls.TextControl
+				<TextControl
 					label={ __( 'Additional CSS Class' ) }
 					value={ props.attributes.className || '' }
 					onChange={ ( nextValue ) => {
@@ -75,11 +76,11 @@ export function withInspectorControl( BlockEdit ) {
  * supports anchor. This is only applied if the block's save result is an
  * element and not a markup string.
  *
- * @param  {Object} extraProps Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Current block attributes
+ * @param {Object} extraProps Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Current block attributes.
  *
- * @returns {Object} Filtered props applied to save element.
+ * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
 	if ( hasBlockSupport( blockType, 'customClassName', true ) && attributes.className ) {

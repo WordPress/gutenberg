@@ -9,7 +9,7 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Button, Spinner, ResponsiveWrapper, withAPIData } from '@wordpress/components';
-import { MediaUploadButton } from '@wordpress/blocks';
+import { MediaUpload } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 
 /**
@@ -31,23 +31,25 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 		<PostFeaturedImageCheck>
 			<div className="editor-post-featured-image">
 				{ !! featuredImageId &&
-					<MediaUploadButton
+					<MediaUpload
 						title={ postLabel.set_featured_image }
-						buttonProps={ { className: 'button-link editor-post-featured-image__preview' } }
 						onSelect={ onUpdateImage }
 						type="image"
 						modalClass="editor-post-featured-image__media-modal"
-					>
-						{ media && !! media.data &&
-							<ResponsiveWrapper
-								naturalWidth={ media.data.media_details.width }
-								naturalHeight={ media.data.media_details.height }
-							>
-								<img src={ media.data.source_url } alt={ __( 'Featured image' ) } />
-							</ResponsiveWrapper>
-						}
-						{ media && media.isLoading && <Spinner /> }
-					</MediaUploadButton>
+						render={ ( { open } ) => (
+							<Button className="button-link editor-post-featured-image__preview" onClick={ open } >
+								{ media && !! media.data &&
+									<ResponsiveWrapper
+										naturalWidth={ media.data.media_details.width }
+										naturalHeight={ media.data.media_details.height }
+									>
+										<img src={ media.data.source_url } alt={ __( 'Featured image' ) } />
+									</ResponsiveWrapper>
+								}
+								{ media && media.isLoading && <Spinner /> }
+							</Button>
+						) }
+					/>
 				}
 				{ !! featuredImageId && media && ! media.isLoading &&
 					<p className="editor-post-featured-image__howto">
@@ -55,15 +57,17 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 					</p>
 				}
 				{ ! featuredImageId &&
-					<MediaUploadButton
+					<MediaUpload
 						title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-						buttonProps={ { className: 'editor-post-featured-image__toggle button-link' } }
 						onSelect={ onUpdateImage }
 						type="image"
 						modalClass="editor-post-featured-image__media-modal"
-					>
-						{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-					</MediaUploadButton>
+						render={ ( { open } )=>(
+							<Button className="editor-post-featured-image__toggle button-link" onClick={ open }>
+								{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+							</Button>
+						) }
+					/>
 				}
 				{ !! featuredImageId &&
 					<Button className="editor-post-featured-image__toggle button-link" onClick={ onRemoveImage }>

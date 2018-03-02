@@ -1,16 +1,11 @@
-.gutenberg .wp-block-code {
-	textarea {
-		box-shadow: none;
-		font-family: $editor-html-font;
-		font-size: $text-editor-font-size;
-		color: $dark-gray-800;
-		border: 1px solid $light-gray-500;
-		border-radius: 4px;
-		padding: .8em 1.6em;
-		margin: 0;
-		overflow-x: auto;
-		width: 100%;
-	}
+.wp-block-code .blocks-plain-text {
+	font-family: $editor-html-font;
+	font-size: $text-editor-font-size;
+	color: $dark-gray-800;
+	padding: .8em 1.6em;
+	overflow-x: auto !important;
+	border: 1px solid $light-gray-500;
+	border-radius: 4px;
 }
 
 // We should extract this to a separate components-toolbar

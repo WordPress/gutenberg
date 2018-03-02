@@ -5,6 +5,7 @@ cypress
 /hooks
 node_modules
 gutenberg.zip
+languages/gutenberg.pot
 
 # Directories/files that may appear in your environment
 .DS_Store

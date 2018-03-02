@@ -2,14 +2,15 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { unescape as unescapeString, without, map, repeat, find, some } from 'lodash';
+import { get, unescape as unescapeString, without, find, some } from 'lodash';
+import { stringify } from 'querystring';
 
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { TreeSelect, withAPIData, withInstanceId, withSpokenMessages } from '@wordpress/components';
 import { buildTermsTree } from '@wordpress/utils';
 
 /**
@@ -18,11 +19,14 @@ import { buildTermsTree } from '@wordpress/utils';
 import { getEditedPostAttribute } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
+/**
+ * Module Constants
+ */
 const DEFAULT_QUERY = {
 	per_page: 100,
 	orderby: 'count',
 	order: 'desc',
-	_fields: [ 'id', 'name', 'parent' ],
+	_fields: 'id,name,parent',
 };
 
 class HierarchicalTermSelector extends Component {
@@ -60,8 +64,8 @@ class HierarchicalTermSelector extends Component {
 		this.setState( { formName: newValue } );
 	}
 
-	onChangeFormParent( event ) {
-		this.setState( { formParent: event.target.value } );
+	onChangeFormParent( newParent ) {
+		this.setState( { formParent: newParent } );
 	}
 
 	onToggleForm() {
@@ -73,7 +77,7 @@ class HierarchicalTermSelector extends Component {
 	findTerm( terms, parent, name ) {
 		return find( terms, term => {
 			return ( ( ! term.parent && ! parent ) || parseInt( term.parent ) === parseInt( parent ) ) &&
-				term.name === name;
+				term.name.toLowerCase() === name.toLowerCase();
 		} );
 	}
 
@@ -104,19 +108,23 @@ class HierarchicalTermSelector extends Component {
 				adding: true,
 			} );
 			// Tries to create a term or fetch it if it already exists
-			const Model = wp.api.getTaxonomyModel( this.props.slug );
-			this.addRequest = new Model( {
-				name: formName,
-				parent: formParent ? formParent : undefined,
-			} ).save();
+			const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+			this.addRequest = wp.apiRequest( {
+				path: `/wp/v2/${ basePath }`,
+				method: 'POST',
+				data: {
+					name: formName,
+					parent: formParent ? formParent : undefined,
+				},
+			} );
 			this.addRequest
 				.then( resolve, ( xhr ) => {
 					const errorCode = xhr.responseJSON && xhr.responseJSON.code;
 					if ( errorCode === 'term_exists' ) {
 						// search the new category created since last fetch
-						this.addRequest = new Model().fetch(
-							{ data: { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } }
-						);
+						this.addRequest = wp.apiRequest( {
+							path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
+						} );
 						return this.addRequest.then( searchResult => {
 							resolve( this.findTerm( searchResult, formParent, formName ) );
 						}, reject );
@@ -128,7 +136,14 @@ class HierarchicalTermSelector extends Component {
 			.then( ( term ) => {
 				const hasTerm = !! find( this.state.availableTerms, ( availableTerm ) => availableTerm.id === term.id );
 				const newAvailableTerms = hasTerm ? this.state.availableTerms : [ term, ...this.state.availableTerms ];
-				const termAddedMessage = slug === 'category' ? __( 'Category added' ) : __( 'Term added' );
+				const termAddedMessage = sprintf(
+					_x( '%s added', 'term' ),
+					get(
+						this.props.taxonomy,
+						[ 'data', 'labels', 'singular_name' ],
+						slug === 'category' ? __( 'Category' ) : __( 'Term' )
+					)
+				);
 				this.props.speak( termAddedMessage, 'assertive' );
 				this.setState( {
 					adding: false,
@@ -149,9 +164,8 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	componentDidMount() {
-		const Collection = wp.api.getTaxonomyCollection( this.props.slug );
-		this.fetchRequest = new Collection()
-			.fetch( { data: DEFAULT_QUERY } )
+		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
+		this.fetchRequest = wp.apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( DEFAULT_QUERY ) }` } )
 			.done( ( terms ) => {
 				const availableTermsTree = buildTermsTree( terms );
 
@@ -206,26 +220,32 @@ class HierarchicalTermSelector extends Component {
 		} );
 	}
 
-	renderParentSelectorOptions( terms, level = 0 ) {
-		return map( terms, ( term ) => ( [
-			<option key={ term.id } value={ term.id }>
-				{ repeat( '\u00A0', level * 3 ) + unescapeString( term.name ) }
-			</option>,
-			...this.renderParentSelectorOptions( term.children, level + 1 ),
-		] ) );
-	}
-
 	render() {
+		const { label, slug, taxonomy, instanceId } = this.props;
 		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
-		const { label, slug, instanceId } = this.props;
-
-		const newTermButtonLabel = slug === 'category' ? __( 'Add new category' ) : __( 'Add new term' );
-		const newTermLabel = slug === 'category' ? __( 'Category Name' ) : __( 'Term Name' );
-		const parentSelectLabel = slug === 'category' ? __( 'Parent Category' ) : __( 'Parent Term' );
-		const noParentOption = slug === 'category' ? _x( 'None', 'category' ) : _x( 'None', 'term' );
-		const newTermSubmitLabel = slug === 'category' ? __( 'Add Category' ) : __( 'Add Term' );
+		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
+			taxonomy,
+			[ 'data', 'labels', labelProperty ],
+			slug === 'category' ? fallbackIsCategory : fallbackIsNotCategory
+		);
+		const newTermButtonLabel = labelWithFallback(
+			'add_new_item',
+			__( 'Add new category' ),
+			__( 'Add new term' )
+		);
+		const newTermLabel = labelWithFallback(
+			'new_item_name',
+			__( 'Add new category' ),
+			__( 'Add new term' )
+		);
+		const parentSelectLabel = labelWithFallback(
+			'parent_item',
+			__( 'Parent Category' ),
+			__( 'Parent Term' )
+		);
+		const noParentOption = `— ${ parentSelectLabel } —`;
+		const newTermSubmitLabel = newTermButtonLabel;
 		const inputId = `editor-post-taxonomies__hierarchical-terms-input-${ instanceId }`;
-		const selectId = `editor-post-taxonomies__hierarchical-terms-select-${ instanceId }`;
 
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
@@ -258,23 +278,13 @@ class HierarchicalTermSelector extends Component {
 							required
 						/>
 						{ !! availableTerms.length &&
-							<div>
-								<label
-									htmlFor={ selectId }
-									className="editor-post-taxonomies__hierarchical-terms-label"
-								>
-									{ parentSelectLabel }
-								</label>
-								<select
-									id={ selectId }
-									className="editor-post-taxonomies__hierarchical-terms-input"
-									value={ formParent }
-									onChange={ this.onChangeFormParent }
-								>
-									<option value="">{ noParentOption }</option>
-									{ this.renderParentSelectorOptions( availableTermsTree ) }
-								</select>
-							</div>
+							<TreeSelect
+								label={ parentSelectLabel }
+								noOptionLabel={ noParentOption }
+								onChange={ this.onChangeFormParent }
+								selectedId={ formParent }
+								tree={ availableTermsTree }
+							/>
 						}
 						<button
 							type="submit"
@@ -290,10 +300,17 @@ class HierarchicalTermSelector extends Component {
 	}
 }
 
+const applyWithAPIData = withAPIData( ( props ) => {
+	const { slug } = props;
+	return {
+		taxonomy: `/wp/v2/taxonomies/${ slug }?context=edit`,
+	};
+} );
+
 const applyConnect = connect(
-	( state, onwProps ) => {
+	( state, ownProps ) => {
 		return {
-			terms: getEditedPostAttribute( state, onwProps.restBase ),
+			terms: getEditedPostAttribute( state, ownProps.restBase ),
 		};
 	},
 	{
@@ -304,6 +321,7 @@ const applyConnect = connect(
 );
 
 export default compose(
+	applyWithAPIData,
 	applyConnect,
 	withSpokenMessages,
 	withInstanceId

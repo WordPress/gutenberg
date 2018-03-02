@@ -51,7 +51,7 @@ final class WP_Block_Type_Registry {
 	 */
 	public function register( $name, $args = array() ) {
 		$block_type = null;
-		if ( is_a( $name, 'WP_Block_Type' ) ) {
+		if ( $name instanceof WP_Block_Type ) {
 			$block_type = $name;
 			$name       = $block_type->name;
 		}
@@ -102,7 +102,7 @@ final class WP_Block_Type_Registry {
 	 * @return WP_Block_Type|false The unregistered block type on success, or false on failure.
 	 */
 	public function unregister( $name ) {
-		if ( is_a( $name, 'WP_Block_Type' ) ) {
+		if ( $name instanceof WP_Block_Type ) {
 			$name = $name->name;
 		}
 
@@ -154,7 +154,7 @@ final class WP_Block_Type_Registry {
 	 * @since 0.6.0
 	 * @access public
 	 *
-	 * @param tring $name Block type name including namespace.
+	 * @param string $name Block type name including namespace.
 	 * @return bool True if the block type is registered, false otherwise.
 	 */
 	public function is_registered( $name ) {

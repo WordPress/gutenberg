@@ -1,0 +1,21 @@
+.edit-post-layout {
+  .edit-post-plugins-panel__header {
+    padding: 0 8px 0 16px;
+    height: $panel-header-height;
+    border-bottom: 1px solid $light-gray-500;
+    display: flex;
+    align-items: center;
+
+    .components-icon-button {
+      margin-left: auto;
+    }
+
+    h3 {
+      margin: 0;
+      font-weight: 400;
+      color: inherit;
+    }
+  }
+}
+
+

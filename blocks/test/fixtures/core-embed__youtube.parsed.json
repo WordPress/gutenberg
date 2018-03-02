@@ -5,7 +5,7 @@
             "url": "https://youtube.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-youtube\">\n    https://youtube.com/\n    <figcaption>Embedded content from youtube</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-youtube wp-block-embed\">\n    https://youtube.com/\n    <figcaption>Embedded content from youtube</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

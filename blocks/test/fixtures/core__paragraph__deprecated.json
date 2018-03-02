@@ -1,0 +1,15 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/paragraph",
+        "isValid": true,
+        "attributes": {
+            "content": [
+                "Unwrapped is still valid."
+            ],
+            "dropCap": false
+        },
+        "innerBlocks": [],
+        "originalContent": "Unwrapped is still valid."
+    }
+]

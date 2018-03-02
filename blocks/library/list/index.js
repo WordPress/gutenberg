@@ -13,11 +13,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
-import Editable from '../../editable';
+import { createBlock } from '../../api';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 
-registerBlockType( 'core/list', {
+export const name = 'core/list';
+
+export const settings = {
 	title: __( 'List' ),
 	description: __( 'List. Numbered or bulleted.' ),
 	icon: 'editor-ul',
@@ -212,10 +214,10 @@ registerBlockType( 'core/list', {
 			};
 		}
 
-		getEditorSettings( settings ) {
+		getEditorSettings( editorSettings ) {
 			return {
-				...settings,
-				plugins: ( settings.plugins || [] ).concat( 'lists' ),
+				...editorSettings,
+				plugins: ( editorSettings.plugins || [] ).concat( 'lists' ),
 				lists_indent_on_tab: false,
 			};
 		}
@@ -227,8 +229,7 @@ registerBlockType( 'core/list', {
 		render() {
 			const {
 				attributes,
-				focus,
-				setFocus,
+				isSelected,
 				insertBlocksAfter,
 				setAttributes,
 				mergeBlocks,
@@ -237,7 +238,7 @@ registerBlockType( 'core/list', {
 			const { nodeName, values } = attributes;
 
 			return [
-				focus && (
+				isSelected && (
 					<BlockControls
 						key="controls"
 						controls={ [
@@ -266,7 +267,7 @@ registerBlockType( 'core/list', {
 						] }
 					/>
 				),
-				<Editable
+				<RichText
 					multiline="li"
 					key="editable"
 					tagName={ nodeName.toLowerCase() }
@@ -274,8 +275,6 @@ registerBlockType( 'core/list', {
 					onSetup={ this.setupEditor }
 					onChange={ this.setNextValues }
 					value={ values }
-					focus={ focus }
-					onFocus={ setFocus }
 					wrapperClassName="blocks-list"
 					placeholder={ __( 'Write list…' ) }
 					onMerge={ mergeBlocks }
@@ -299,6 +298,7 @@ registerBlockType( 'core/list', {
 							undefined
 					}
 					onRemove={ () => onReplace( [] ) }
+					isSelected={ isSelected }
 				/>,
 			];
 		}
@@ -313,4 +313,4 @@ registerBlockType( 'core/list', {
 			values
 		);
 	},
-} );
+};

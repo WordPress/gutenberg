@@ -15,13 +15,27 @@
 	width: 100%;
 }
 
+// The ellipsis icon button
 .editor-block-settings-menu__toggle {
 	border-radius: 50%;
-	padding: 3px;
-	transform: rotate( 90deg );
 	width: auto;
+	padding: 2px;
+	margin: 14px 4px 14px 8px;
+	width: $icon-button-size-small;
+
+	.dashicon {
+		transform: rotate( 90deg );
+	}
 }
 
+.editor-block-settings-menu__section {
+	margin-top: $item-spacing;
+	margin-bottom: -$item-spacing;
+	padding: $item-spacing 0;
+	border-top: 1px solid $light-gray-500;
+}
+
+// Popout menu
 .editor-block-settings-menu__control {
 	width: 100%;
 	justify-content: flex-start;
@@ -31,14 +45,12 @@
 	border-radius: 0;
 	color: $dark-gray-500;
 	cursor: pointer;
-	border: 1px solid transparent;
+	@include menu-style__neutral;
 
 	&:hover,
 	&:focus,
 	&:not(:disabled):hover {
-		box-shadow: none;
-		color: $dark-gray-500;
-		border: 1px solid $dark-gray-500;
+		@include menu-style__focus;
 	}
 
 	.dashicon {

@@ -8,17 +8,20 @@
             "images": [
                 {
                     "url": "https://cldup.com/uuUqE_dXzy.jpg",
-                    "alt": "title"
+                    "alt": "title",
+                    "caption": []
                 },
                 {
                     "url": "http://google.com/hi.png",
-                    "alt": "title"
+                    "alt": "title",
+                    "caption": []
                 }
             ],
             "columns": 1,
             "imageCrop": true,
             "linkTo": "none"
         },
-        "originalContent": "<div class=\"wp-block-gallery alignnone columns-1 is-cropped\">\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"title\" />\n\t</figure>\n\t<figure class=\"blocks-gallery-image\">\n\t\t<img src=\"http://google.com/hi.png\" alt=\"title\" />\n\t</figure>\n</div>"
+        "innerBlocks": [],
+        "originalContent": "<ul class=\"wp-block-gallery alignnone columns-1 is-cropped\">\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"title\" />\n\t\t</figure>\n\t</li>\n\t<li class=\"blocks-gallery-item\">\n\t\t<figure>\n\t\t\t<img src=\"http://google.com/hi.png\" alt=\"title\" />\n\t\t</figure>\n\t</li>\n</ul>"
     }
 ]
