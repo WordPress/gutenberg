@@ -9,6 +9,7 @@ import { get, isFunction, some } from 'lodash';
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
+import { validateNamespacedId } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -94,16 +95,7 @@ export function registerBlockType( name, settings ) {
 		...settings,
 	};
 
-	if ( typeof name !== 'string' ) {
-		console.error(
-			'Block names must be strings.'
-		);
-		return;
-	}
-	if ( ! /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/.test( name ) ) {
-		console.error(
-			'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
-		);
+	if ( ! validateNamespacedId( name, 'Block names' ) ) {
 		return;
 	}
 	if ( blocks[ name ] ) {
