@@ -19,6 +19,7 @@ import isInlineContent from './is-inline-content';
 import formattingTransformer from './formatting-transformer';
 import msListConverter from './ms-list-converter';
 import listReducer from './list-reducer';
+import singleItemListConverter from './single-item-list-converter';
 import imageCorrector from './image-corrector';
 import blockquoteNormaliser from './blockquote-normaliser';
 import tableNormaliser from './table-normaliser';
@@ -81,14 +82,17 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 		}
 	}
 
-	// An array of HTML strings and block objects. The blocks replace matched shortcodes.
+	// An array of HTML strings and block objects. The blocks replace matched
+	// shortcodes.
 	const pieces = shortcodeConverter( HTML );
 
-	// The call to shortcodeConverter will always return more than one element if shortcodes are matched.
-	// The reason is when shortcodes are matched empty HTML strings are included.
+	// The call to shortcodeConverter will always return more than one element
+	// if shortcodes are matched. The reason is when shortcodes are matched
+	// empty HTML strings are included.
 	const hasShortcodes = pieces.length > 1;
 
-	// True if mode is auto, no shortcode is included and HTML verifies the isInlineContent condition
+	// True if mode is auto, no shortcode is included and HTML verifies the
+	// isInlineContent condition
 	const isAutoModeInline = mode === 'AUTO' && isInlineContent( HTML, tagName ) && ! hasShortcodes;
 
 	// Return filtered HTML if condition is true
@@ -137,6 +141,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 		] ) );
 
 		piece = deepFilterHTML( piece, [
+			singleItemListConverter,
 			createUnwrapper( isInvalidInline ),
 		] );
 
