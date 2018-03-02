@@ -16,6 +16,7 @@ import './style.scss';
 import { getSidebarSettings } from '../../api/sidebar';
 import { getActivePlugin } from '../../store/selectors';
 import { closeGeneralSidebar } from '../../store/actions';
+import PluginSidebar from '../plugin-sidebar';
 
 function PluginsPanel( { onClose, plugin } ) {
 	const pluginSidebar = getSidebarSettings( plugin );
@@ -44,7 +45,7 @@ function PluginsPanel( { onClose, plugin } ) {
 				/>
 			</div>
 			<div className="edit-post-plugins-panel__content">
-				{ render() }
+				<PluginSidebar.Slot />
 			</div>
 		</div>
 	);

@@ -41,6 +41,7 @@ import {
 import { closePublishSidebar } from '../../store/actions';
 import PluginsPanel from '../../components/plugins-panel/index.js';
 import { getSidebarSettings } from '../../api/sidebar';
+import { Plugins } from '../../api/plugin';
 
 function GeneralSidebar( { openedGeneralSidebar } ) {
 	switch ( openedGeneralSidebar ) {
@@ -101,6 +102,7 @@ function Layout( {
 					openedGeneralSidebar={ openedGeneralSidebar } />
 			}
 			<Popover.Slot />
+			<Plugins />
 		</div>
 	);
 }
