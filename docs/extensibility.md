@@ -149,7 +149,7 @@ This method takes the `name` of the sidebar you'd like to open. That sidebar sho
 **Example**
 
 ```js
-wp.editPost.experimentalActivateSidebar( 'my-plugin/my-custom-sidebar' );
+wp.editPost.__experimentalActivateSidebar( 'my-plugin/my-custom-sidebar' );
 ```
 
 ## Extending the editor's UI (Slot and Fill)
