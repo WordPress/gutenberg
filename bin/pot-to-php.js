@@ -104,7 +104,7 @@ function convertPOTToPHP( potFile, phpFile, options ) {
 			.map( ( translation ) => convertTranslationToPHP( translation, options.textdomain, context ) )
 			.filter( php => php !== '' );
 
-		output = [ output, ...newOutput ];
+		output = [ ...output, ...newOutput ];
 	}
 
 	const fileOutput = fileHeader + output.join( ',' + NEWLINE + NEWLINE ) + fileFooter;
