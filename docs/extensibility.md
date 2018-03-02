@@ -122,7 +122,7 @@ _Note:_ This filter must always be run on every page load, and not in your brows
 
 ## Adding a sidebar
 
-**Warning:** This is an experimental API, and can be subject to change or event removal.
+**Warning:** This is an experimental API, and is subject to change or even removal.
 
 ### Registering a sidebar
 
