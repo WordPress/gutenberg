@@ -579,6 +579,7 @@ export class BlockListBlock extends Component {
 				data-type={ block.name }
 				onTouchStart={ this.onTouchStart }
 				onClick={ this.onClick }
+				tabIndex="0"
 				childHandledEvents={ [
 					'onKeyPress',
 					'onDragStart',
@@ -619,7 +620,6 @@ export class BlockListBlock extends Component {
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
 					className={ BlockListBlock.className }
-					tabIndex="0"
 					aria-label={ blockLabel }
 					data-block={ block.uid }
 				>
