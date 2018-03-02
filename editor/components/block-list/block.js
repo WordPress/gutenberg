@@ -619,7 +619,7 @@ export class BlockListBlock extends Component {
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
 					onFocus={ this.onFocus }
-					className={ BlockListBlock.className }
+					className="editor-block-list__block-edit"
 					aria-label={ blockLabel }
 					data-block={ block.uid }
 				>
@@ -756,8 +756,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 		dispatch( toggleSelection( selectionEnabled ) );
 	},
 } );
-
-BlockListBlock.className = 'editor-block-list__block-edit';
 
 BlockListBlock.childContextTypes = {
 	BlockList: noop,
