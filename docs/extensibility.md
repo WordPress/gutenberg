@@ -122,15 +122,18 @@ _Note:_ This filter must always be run on every page load, and not in your brows
 
 ## Adding a sidebar
 
+**Warning:** This is an experimental API, and can be subject to change or event removal.
+
 ### Registering a sidebar
-`wp.editPost.registerSidebar( name: string, settings: { title: string, render: function } )`
+
+`wp.editPost.__experimentalRegisterSidebar( name: string, settings: { title: string, render: function } )`
 
 This method takes a sidebar `name` and a `settings` object, containing a title and a render function. The name should contain a namespace prefix (Example: my-plugin/my-custom-sidebar).
 
 **Example**
 
 ```js
-wp.editPost.registerSidebar( 'my-plugin/my-custom-sidebar', {
+wp.editPost.__experimentalRegisterSidebar( 'my-plugin/my-custom-sidebar', {
 	render: function mySidebar() {
 		return <p>This is an example</p>;
 	},
@@ -139,14 +142,14 @@ wp.editPost.registerSidebar( 'my-plugin/my-custom-sidebar', {
 
 ### Activating a sidebar
 
-`wp.editPost.activateSidebar( name: string )`
+`wp.editPost.__experimentalActivateSidebar( name: string )`
 
 This method takes the `name` of the sidebar you'd like to open. That sidebar should have been registered beforehand using the `registerSidebar` method.
 
 **Example**
 
 ```js
-wp.editPost.activateSidebar( 'my-plugin/my-custom-sidebar' );
+wp.editPost.experimentalActivateSidebar( 'my-plugin/my-custom-sidebar' );
 ```
 
 ## Extending the editor's UI (Slot and Fill)
