@@ -25,9 +25,9 @@ function gutenberg_render_block_core_search( $attributes ) {
 	} else {
 
 		$defaults = array(
-			'label'       => _x( 'Search for:', 'label' ),
-			'placeholder' => esc_attr_x( 'Search &hellip;', 'gutenberg' ),
-			'submitValue' => esc_attr_x( 'Search', 'submit button' ),
+			'label'       => _x( 'Search for:', 'label', 'gutenberg' ),
+			'placeholder' => esc_attr_x( 'Search &hellip;', 'placeholder', 'gutenberg' ),
+			'submitValue' => esc_attr_x( 'Search', 'submit button', 'gutenberg' ),
 		);
 
 		$args = wp_parse_args( $attributes, $defaults );
