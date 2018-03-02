@@ -72,7 +72,19 @@ export function registerReducer( reducerKey, reducer ) {
 	}
 	const store = createStore( reducer, flowRight( enhancers ) );
 	stores[ reducerKey ] = store;
-	store.subscribe( globalListener );
+
+	// Customize subscribe behavior to call listeners only on effective change,
+	// not on every dispatch.
+	let lastState = store.getState();
+	store.subscribe( () => {
+		const state = store.getState();
+		const hasChanged = state !== lastState;
+		lastState = state;
+
+		if ( hasChanged ) {
+			globalListener();
+		}
+	} );
 
 	return store;
 }
