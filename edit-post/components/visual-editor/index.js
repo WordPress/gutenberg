@@ -29,7 +29,7 @@ function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
 			<WritingFlow>
 				<PostTitle />
 				<BlockList
-					showContextualToolbar={ isLargeViewport && ! hasFixedToolbar }
+					showContextualToolbar={ ! isLargeViewport || ! hasFixedToolbar }
 					renderBlockMenu={ ( { children, onClose } ) => (
 						<Fragment>
 							<BlockInspectorButton onClick={ onClose } />
