@@ -50,13 +50,7 @@ function gutenberg_render_block_core_search( $attributes ) {
 		</form>';
 	}
 
-	/**
-	 * Filters the HTML output of the search form.
-	 *
-	 * @since 2.7.0
-	 *
-	 * @param string $form The search form HTML output.
-	 */
+	/** This filter is documented in wp-includes/general-template.php */
 	$result = apply_filters( 'get_search_form', $form );
 
 	if ( null === $result ) {
