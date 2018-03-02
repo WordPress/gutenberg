@@ -70,11 +70,6 @@ body.gutenberg-editor-page {
 		top: -1px;
 	}
 
-	svg {
-		fill: currentColor;
-		outline: none;
-	}
-
 	ul#adminmenu a.wp-has-current-submenu:after,
 	ul#adminmenu>li.current>a.current:after {
 		border-right-color: $white;
@@ -103,6 +98,11 @@ body.gutenberg-editor-page {
 	select {
 		font-size: $default-font-size;
 		color: $dark-gray-500;
+	}
+
+	svg.dashicon {
+		fill: currentColor;
+		outline: none;
 	}
 }
 
