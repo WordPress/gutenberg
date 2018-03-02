@@ -24,6 +24,7 @@ import { Component } from '@wordpress/element';
  */
 import './style.scss';
 import BlockListBlock from './block';
+import BlockInsertionPoint from './insertion-point';
 import BlockSelectionClearer from '../block-selection-clearer';
 import DefaultBlockAppender from '../default-block-appender';
 import {
@@ -215,6 +216,7 @@ class BlockListLayout extends Component {
 
 		return (
 			<BlockSelectionClearer className={ classes }>
+				{ !! blockUIDs.length && <BlockInsertionPoint rootUID={ rootUID } layout={ defaultLayout } /> }
 				{ map( blockUIDs, ( uid, blockIndex ) => (
 					<BlockListBlock
 						key={ 'block-' + uid }

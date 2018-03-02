@@ -3,25 +3,25 @@
  */
 import { connect } from 'react-redux';
 import 'element-closest';
-import { find, last, reverse, get } from 'lodash';
+import { find, reverse, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { keycodes, focus } from '@wordpress/utils';
-
-/**
- * Internal dependencies
- */
-import { BlockListBlock } from '../block-list/block';
 import {
+	keycodes,
+	focus,
 	computeCaretRect,
 	isHorizontalEdge,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
-} from '../../utils/dom';
+} from '@wordpress/utils';
+
+/**
+ * Internal dependencies
+ */
 import {
 	getPreviousBlockUid,
 	getNextBlockUid,
@@ -31,7 +31,6 @@ import {
 } from '../../store/selectors';
 import {
 	multiSelect,
-	appendDefaultBlock,
 	selectBlock,
 } from '../../store/actions';
 
@@ -39,10 +38,6 @@ import {
  * Module Constants
  */
 const { UP, DOWN, LEFT, RIGHT } = keycodes;
-
-function isElementNonEmpty( el ) {
-	return !! el.innerText.trim();
-}
 
 class WritingFlow extends Component {
 	constructor() {
@@ -106,37 +101,6 @@ class WritingFlow extends Component {
 
 			return true;
 		} );
-	}
-
-	isInLastNonEmptyBlock( target ) {
-		const tabbables = this.getVisibleTabbables();
-
-		// Find last tabbable, compare with target
-		const lastTabbable = last( tabbables );
-		if ( ! lastTabbable || ! lastTabbable.contains( target ) ) {
-			return false;
-		}
-
-		// Find block-level ancestor of said last tabbable
-		const blockEl = lastTabbable.closest( '.' + BlockListBlock.className );
-		const blockIndex = tabbables.indexOf( blockEl );
-
-		// Unexpected, so we'll leave quietly.
-		if ( blockIndex === -1 ) {
-			return false;
-		}
-
-		// Maybe there are no descendants, and the target is the block itself?
-		if ( lastTabbable === blockEl ) {
-			return isElementNonEmpty( blockEl );
-		}
-
-		// Otherwise, find the descendants of the ancestor, i.e. the target and
-		// its siblings, and check them instead.
-		return tabbables
-			.slice( blockIndex + 1 )
-			.some( ( el ) =>
-				blockEl.contains( el ) && isElementNonEmpty( el ) );
 	}
 
 	expandSelection( currentStartUid, isReverse ) {
@@ -228,13 +192,6 @@ class WritingFlow extends Component {
 			this.selectParentBlock( closestTabbable );
 			event.preventDefault();
 		}
-
-		if ( isDown && ! isShift && ! hasMultiSelection &&
-				this.isInLastNonEmptyBlock( target ) &&
-				isVerticalEdge( target, false, false )
-		) {
-			this.props.onBottomReached();
-		}
 	}
 
 	render() {
@@ -266,7 +223,6 @@ export default connect(
 	} ),
 	{
 		onMultiSelect: multiSelect,
-		onBottomReached: appendDefaultBlock,
 		onSelectBlock: selectBlock,
 	}
 )( WritingFlow );

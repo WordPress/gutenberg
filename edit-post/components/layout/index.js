@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,7 +11,6 @@ import classnames from 'classnames';
 import { Popover, navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	MetaBoxes,
 	AutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
@@ -24,9 +24,11 @@ import {
 import './style.scss';
 import Header from '../header';
 import Sidebar from '../sidebar';
-import TextEditor from '../modes/text-editor';
-import VisualEditor from '../modes/visual-editor';
-import EditorModeKeyboardShortcuts from '../modes/keyboard-shortcuts';
+import TextEditor from '../text-editor';
+import VisualEditor from '../visual-editor';
+import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
+import MetaBoxes from '../meta-boxes';
+import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import {
 	getEditorMode,
 	hasOpenSidebar,
@@ -34,6 +36,7 @@ import {
 	getOpenedGeneralSidebar,
 	isPublishSidebarOpened,
 	getActivePlugin,
+	getMetaBoxes,
 } from '../../store/selectors';
 import { closePublishSidebar } from '../../store/actions';
 import PluginsPanel from '../../components/plugins-panel/index.js';
@@ -58,6 +61,7 @@ function Layout( {
 	hasFixedToolbar,
 	onClosePublishSidebar,
 	plugin,
+	metaBoxes,
 } ) {
 	const isSidebarOpened = layoutHasOpenSidebar &&
 		( openedGeneralSidebar !== 'plugin' || getSidebarSettings( plugin ) );
@@ -69,7 +73,12 @@ function Layout( {
 	return (
 		<div className={ className }>
 			<DocumentTitle />
-			<UnsavedChangesWarning />
+			<UnsavedChangesWarning forceIsDirty={ () => {
+				return some( metaBoxes, ( metaBox, location ) => {
+					return metaBox.isActive &&
+						jQuery( getMetaBoxContainer( location ) ).serialize() !== metaBox.data;
+				} );
+			} } />
 			<AutosaveMonitor />
 			<Header />
 			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
@@ -104,6 +113,7 @@ export default connect(
 		publishSidebarOpen: isPublishSidebarOpened( state ),
 		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 		plugin: getActivePlugin( state ),
+		metaBoxes: getMetaBoxes( state ),
 	} ),
 	{
 		onClosePublishSidebar: closePublishSidebar,

@@ -1,9 +1,9 @@
-.components-menu-items-group {
+.components-menu-items__group {
 	width: 100%;
 	padding: 10px;
 }
 
-.components-menu-items-group__label {
+.components-menu-items__group-label {
 	margin-bottom: 10px;
 	color: $dark-gray-300;
 }
@@ -25,6 +25,10 @@
 	}
 
 	&:hover {
-		color: $black;
+		@include menu-style__neutral;
+	}
+
+	&:focus {
+		@include menu-style__focus;
 	}
 }

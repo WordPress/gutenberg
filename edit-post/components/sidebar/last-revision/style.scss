@@ -1,5 +1,8 @@
-.edit-post-last-revision__panel .edit-post-post-last-revision__title {
-	box-sizing: content-box;
-	margin: #{ -1 * $panel-padding };
-	padding: $panel-padding;
+// Needs specificity, because this panel is just a button
+.components-panel__body.is-opened.edit-post-last-revision__panel {
+	padding: 0;
+}
+
+.editor-post-last-revision__title {
+	padding: #{ $panel-padding - 3px } $panel-padding;	// subtract extra height of dashicon
 }

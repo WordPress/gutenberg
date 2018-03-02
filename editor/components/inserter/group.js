@@ -72,6 +72,8 @@ export default class InserterGroup extends Component {
 				disabled={ item.isDisabled }
 				onMouseEnter={ this.createToggleBlockHover( item ) }
 				onMouseLeave={ this.createToggleBlockHover( null ) }
+				onFocus={ this.createToggleBlockHover( item ) }
+				onBlur={ this.createToggleBlockHover( null ) }
 			>
 				<BlockIcon icon={ item.icon } />
 				{ item.title }

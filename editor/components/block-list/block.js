@@ -10,7 +10,13 @@ import tinymce from 'tinymce';
  * WordPress dependencies
  */
 import { Component, findDOMNode, compose } from '@wordpress/element';
-import { keycodes, focus } from '@wordpress/utils';
+import {
+	keycodes,
+	focus,
+	getScrollContainer,
+	placeCaretAtHorizontalEdge,
+	placeCaretAtVerticalEdge,
+} from '@wordpress/utils';
 import {
 	BlockEdit,
 	createBlock,
@@ -26,11 +32,6 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	getScrollContainer,
-	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge,
-} from '../../utils/dom';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
@@ -544,7 +545,11 @@ export class BlockListBlock extends Component {
 		// Insertion point can only be made visible when the side inserter is
 		// not present, and either the block is at the extent of a selection or
 		// is the last block in the top-level list rendering.
-		const shouldShowInsertionPoint = ! showSideInserter && ( isLastInSelection || ( isLast && ! rootUID ) );
+		const shouldShowInsertionPoint = (
+			( ! isMultiSelected && ! isLast ) ||
+			( isMultiSelected && isLastInSelection ) ||
+			( isLast && ! rootUID && ! isEmptyDefaultBlock )
+		);
 
 		// Generate the wrapper class names handling the different states of the block.
 		const wrapperClassName = classnames( 'editor-block-list__block', {
@@ -610,6 +615,7 @@ export class BlockListBlock extends Component {
 				{ shouldShowSettingsMenu && (
 					<BlockSettingsMenu
 						uids={ [ block.uid ] }
+						rootUID={ rootUID }
 						renderBlockMenu={ renderBlockMenu }
 					/>
 				) }
@@ -655,13 +661,20 @@ export class BlockListBlock extends Component {
 							/>,
 						] }
 					</BlockCrashBoundary>
-					{ shouldShowMobileToolbar && <BlockMobileToolbar uid={ block.uid } renderBlockMenu={ renderBlockMenu } /> }
+					{ shouldShowMobileToolbar && (
+						<BlockMobileToolbar
+							rootUID={ rootUID }
+							uid={ block.uid }
+							renderBlockMenu={ renderBlockMenu }
+						/>
+					) }
 				</IgnoreNestedEvents>
 				{ !! error && <BlockCrashWarning /> }
 				{ shouldShowInsertionPoint && (
 					<BlockInsertionPoint
 						uid={ block.uid }
 						rootUID={ rootUID }
+						layout={ layout }
 					/>
 				) }
 				{ showSideInserter && (

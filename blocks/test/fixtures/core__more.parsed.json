@@ -1,10 +1,9 @@
 [
     {
         "blockName": "core/more",
-        "attrs": {
-            "noTeaser": false
-        },
-        "innerHTML": ""
+        "attrs": null,
+        "innerBlocks": [],
+        "innerHTML": "\n<!--more-->\n"
     },
     {
         "attrs": {},

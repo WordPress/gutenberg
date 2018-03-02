@@ -1,12 +1,18 @@
 .edit-post-more-menu {
+	margin-left: -4px;
+
 	// the padding and margin of the more menu is intentionally non-standard
-	@include break-small() {
-		margin-left: 4px;
+	.components-icon-button {
+		width: auto;
+		padding: 8px 2px;
 	}
 
-	.components-icon-button {
-		padding: 8px 4px;
-		width: auto;
+	@include break-small() {
+		margin-left: 4px;
+
+		.components-icon-button {
+			padding: 8px 4px;
+		}
 	}
 
 	.components-button svg {
@@ -15,7 +21,7 @@
 }
 
 .edit-post-more-menu__content {
-	.components-menu-items-group:not(:last-child) {
+	.components-menu-items__group:not(:last-child) {
   		border-bottom: 1px solid $light-gray-500;
 	}
 }

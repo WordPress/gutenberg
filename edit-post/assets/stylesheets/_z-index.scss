@@ -15,15 +15,17 @@ $z-layers: (
 	'.editor-inserter__tabs': 1,
 	'.editor-inserter__tab.is-active': 1,
 	'.components-panel__header': 1,
-	'.editor-meta-boxes-area.is-loading:before': 1,
-	'.editor-meta-boxes-area .spinner': 2,
-	'.blocks-format-toolbar__link-modal': 2,
-	'.editor-block-contextual-toolbar': 2,
-	'.editor-block-switcher__menu': 2,
-	'.components-popover__close': 2,
+	'.edit-post-meta-boxes-area.is-loading:before': 1,
+	'.edit-post-meta-boxes-area .spinner': 5,
+	'.editor-block-contextual-toolbar': 21,
+	'.editor-block-switcher__menu': 5,
+	'.components-popover__close': 5,
+	'.editor-block-list__insertion-point': 5,
+	'.blocks-format-toolbar__link-modal': 6,
 	'.editor-block-mover': 1,
 	'.blocks-gallery-item__inline-menu': 20,
 	'.editor-block-settings-menu__popover': 20, // Below the header
+	'.blocks-url-input__suggestions': 30,
 	'.edit-post-header': 30,
 	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
 
@@ -36,6 +38,10 @@ $z-layers: (
 	'.edit-post-sidebar': 100000,
 	'.edit-post-layout .edit-post-post-publish-panel': 100001,
 
+	// Show sidebar in greater than small viewports above editor related elements
+	// but bellow #adminmenuback { z-index: 100 }
+	'.edit-post-sidebar {greater than small}': 50,
+
 	// Show notices below expanded wp-admin submenus:
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-notice-list': 9989,
@@ -44,7 +50,6 @@ $z-layers: (
 	// #adminmenuwrap { z-index: 9990 }
 	'.components-popover': 1000000,
 	'.components-autocomplete__results': 1000000,
-	'.blocks-url-input__suggestions': 9999,
 );
 
 @function z-index( $key ) {

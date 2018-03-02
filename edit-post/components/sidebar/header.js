@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import { compose } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
-import { query } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
@@ -47,7 +47,7 @@ const SidebarHeader = ( { panel, onSetPanel, onCloseSidebar, count } ) => {
 };
 
 export default compose(
-	query( ( select ) => ( {
+	withSelect( ( select ) => ( {
 		count: select( 'core/editor' ).getSelectedBlockCount(),
 	} ) ),
 	connect(

@@ -1,6 +1,6 @@
 .edit-post-header {
 	height: $header-height;
-	padding: $item-spacing;
+	padding: $item-spacing 2px;
 	border-bottom: 1px solid $light-gray-500;
 	background: $white;
 	display: flex;
@@ -19,11 +19,21 @@
 	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
 	@include break-small {
 		position: fixed;
+		padding: $item-spacing;
 		top: $admin-bar-height-big;
 	}
 
 	@include break-medium() {
 		top: $admin-bar-height;
+	}
+
+	.editor-post-switch-to-draft + .editor-post-preview,
+	.editor-post-switch-to-draft + .editor-post-preview + .editor-post-publish-button {
+		display: none;
+
+		@include break-small {
+			display: inline-block;
+		}
 	}
 }
 
@@ -63,16 +73,29 @@
 		background: $dark-gray-500;
 	}
 
-	&.editor-post-publish-button, &.editor-post-publish-panel__toggle {
+	&.editor-post-switch-to-draft,
+	&.editor-post-preview,
+	&.editor-post-publish-button,
+	&.editor-post-publish-panel__toggle {
 		margin: 2px;
 		height: 33px;
 		line-height: 32px;
-		padding: 0 12px 2px;
+		padding: 0 5px 2px;
+		font-size: $default-font-size;
+
+		@include break-small() {
+			padding: 0 12px 2px;
+		}
 	}
 
 	@include break-medium() {
-		&.editor-post-publish-button, &.editor-post-publish-panel__toggle {
-			margin: 0 10px;
+		&.editor-post-preview {
+			margin: 0 3px 0 12px;
+		}
+
+		&.editor-post-publish-button,
+		&.editor-post-publish-panel__toggle {
+			margin: 0 12px 0 3px;
 		}
 	}
 }

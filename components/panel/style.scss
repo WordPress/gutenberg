@@ -63,7 +63,7 @@
 }
 .components-panel__body.is-opened > .components-panel__body-title {
 	margin: -1 * $panel-padding;
-	margin-bottom: 0;
+	margin-bottom: 5px;
 }
 
 .components-panel__body-toggle.components-button {
@@ -73,6 +73,11 @@
 	width: 100%;
 	font-weight: 600;
 	text-align: left;
+	@include menu-style__neutral;
+
+	&:focus {
+		@include menu-style__focus;
+	}
 
 	.dashicon {
 		position: absolute;
@@ -126,7 +131,8 @@
 		max-width: 75%;
 	}
 
-	&:empty {
+	&:empty,
+	&:first-of-type {
 		margin-top: 0;
 	}
 }

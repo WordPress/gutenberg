@@ -90,19 +90,6 @@ export function toggleGeneralSidebarEditorPanel( panel ) {
 }
 
 /**
- * Returns an action object used in signalling that the viewport type preference should be set.
- *
- * @param {string} viewportType The viewport type (desktop or mobile).
- * @return {Object} Action object.
- */
-export function setViewportType( viewportType ) {
-	return {
-		type: 'SET_VIEWPORT_TYPE',
-		viewportType,
-	};
-}
-
-/**
  * Returns an action object used to toggle a feature flag.
  *
  * @param {string} feature Featurre name.
@@ -120,5 +107,63 @@ export function switchEditorMode( mode ) {
 	return {
 		type: 'SWITCH_MODE',
 		mode,
+	};
+}
+
+/**
+ * Returns an action object used to check the state of meta boxes at a location.
+ *
+ * This should only be fired once to initialize meta box state. If a meta box
+ * area is empty, this will set the store state to indicate that React should
+ * not render the meta box area.
+ *
+ * Example: metaBoxes = { side: true, normal: false }.
+ *
+ * This indicates that the sidebar has a meta box but the normal area does not.
+ *
+ * @param {Object} metaBoxes Whether meta box locations are active.
+ *
+ * @return {Object} Action object.
+ */
+export function initializeMetaBoxState( metaBoxes ) {
+	return {
+		type: 'INITIALIZE_META_BOX_STATE',
+		metaBoxes,
+	};
+}
+
+/**
+ * Returns an action object used to request meta box update.
+ *
+ * @return {Object}      Action object.
+ */
+export function requestMetaBoxUpdates() {
+	return {
+		type: 'REQUEST_META_BOX_UPDATES',
+	};
+}
+
+/**
+ * Returns an action object used signal a successfull meta nox update.
+ *
+ * @return {Object} Action object.
+ */
+export function metaBoxUpdatesSuccess() {
+	return {
+		type: 'META_BOX_UPDATES_SUCCESS',
+	};
+}
+
+/**
+ * Returns an action object used set the saved meta boxes data.
+ * This is used to check if the meta boxes have been touched when leaving the editor.
+ *
+ * @param   {Object} dataPerLocation Meta Boxes Data per location.
+ * @return {Object}                 Action object.
+ */
+export function setMetaBoxSavedData( dataPerLocation ) {
+	return {
+		type: 'META_BOX_SET_SAVED_DATA',
+		dataPerLocation,
 	};
 }

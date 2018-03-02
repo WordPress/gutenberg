@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createMediaFromFile, preloadImage } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -89,16 +88,14 @@ export const settings = {
 				isMatch( files ) {
 					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
 				},
-				transform( files, onChange ) {
+				transform( files ) {
 					const file = files[ 0 ];
+					// We don't need to upload the media directly here
+					// It's already done as part of the `componentDidMount`
+					// int the image block
 					const block = createBlock( 'core/image', {
 						url: window.URL.createObjectURL( file ),
 					} );
-
-					createMediaFromFile( file )
-						.then( ( media ) => preloadImage( media.source_url ).then(
-							() => onChange( block.uid, { id: media.id, url: media.source_url } )
-						) );
 
 					return block;
 				},

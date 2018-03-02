@@ -421,64 +421,6 @@ export function removeNotice( id ) {
 	};
 }
 
-/**
- * Returns an action object used to check the state of meta boxes at a location.
- *
- * This should only be fired once to initialize meta box state. If a meta box
- * area is empty, this will set the store state to indicate that React should
- * not render the meta box area.
- *
- * Example: metaBoxes = { side: true, normal: false }.
- *
- * This indicates that the sidebar has a meta box but the normal area does not.
- *
- * @param {Object} metaBoxes Whether meta box locations are active.
- *
- * @return {Object} Action object.
- */
-export function initializeMetaBoxState( metaBoxes ) {
-	return {
-		type: 'INITIALIZE_META_BOX_STATE',
-		metaBoxes,
-	};
-}
-
-/**
- * Returns an action object used to request meta box update.
- *
- * @return {Object}      Action object.
- */
-export function requestMetaBoxUpdates() {
-	return {
-		type: 'REQUEST_META_BOX_UPDATES',
-	};
-}
-
-/**
- * Returns an action object used signal a successfull meta nox update.
- *
- * @return {Object} Action object.
- */
-export function metaBoxUpdatesSuccess() {
-	return {
-		type: 'META_BOX_UPDATES_SUCCESS',
-	};
-}
-
-/**
- * Returns an action object used set the saved meta boxes data.
- * This is used to check if the meta boxes have been touched when leaving the editor.
- *
- * @param   {Object} dataPerLocation Meta Boxes Data per location.
- * @return {Object}                 Action object.
- */
-export function setMetaBoxSavedData( dataPerLocation ) {
-	return {
-		type: 'META_BOX_SET_SAVED_DATA',
-		dataPerLocation,
-	};
-}
-
 export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );
@@ -578,17 +520,19 @@ export function convertBlockToReusable( uid ) {
 }
 /**
  * Returns an action object used in signalling that a new block of the default
- * type should be appended to the block list.
+ * type should be added to the block list.
  *
  * @param {?Object} attributes Optional attributes of the block to assign.
  * @param {?string} rootUID    Optional root UID of block list to append.
+ * @param {?number} index      Optional index where to insert the default block
  *
  * @return {Object} Action object
  */
-export function appendDefaultBlock( attributes, rootUID ) {
+export function insertDefaultBlock( attributes, rootUID, index ) {
 	return {
-		type: 'APPEND_DEFAULT_BLOCK',
+		type: 'INSERT_DEFAULT_BLOCK',
 		attributes,
 		rootUID,
+		index,
 	};
 }

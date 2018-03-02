@@ -90,11 +90,24 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 	$core_side_meta_boxes = array(
 		'submitdiv',
 		'formatdiv',
-		'categorydiv',
-		'tagsdiv-post_tag',
 		'pageparentdiv',
 		'postimagediv',
 	);
+
+	$custom_taxonomies = get_taxonomies(
+		array(
+			'show_ui' => true,
+		),
+		'objects'
+	);
+
+	// Following the same logic as meta box generation in:
+	// https://github.com/WordPress/wordpress-develop/blob/c896326/src/wp-admin/edit-form-advanced.php#L288-L292.
+	foreach ( $custom_taxonomies as $custom_taxonomy ) {
+		$core_side_meta_boxes [] = $custom_taxonomy->hierarchical ?
+			$custom_taxonomy->name . 'div' :
+			'tagsdiv-' . $custom_taxonomy->name;
+	}
 
 	$core_normal_meta_boxes = array(
 		'revisionsdiv',

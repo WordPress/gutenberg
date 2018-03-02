@@ -18,7 +18,7 @@ import {
 	isCurrentPostPublished,
 } from '../../store/selectors';
 
-function PostSwitchToDraftButton( { className, isSaving, isPublished, onClick } ) {
+function PostSwitchToDraftButton( { isSaving, isPublished, onClick } ) {
 	if ( ! isPublished ) {
 		return null;
 	}
@@ -32,7 +32,7 @@ function PostSwitchToDraftButton( { className, isSaving, isPublished, onClick } 
 
 	return (
 		<Button
-			className={ className }
+			className="editor-post-switch-to-draft"
 			isLarge
 			onClick={ onSwitch }
 			disabled={ isSaving }

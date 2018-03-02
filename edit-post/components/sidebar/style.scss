@@ -13,7 +13,7 @@
 
 	@include break-small() {
 		top: $admin-bar-height-big + $header-height;
-		z-index: auto;
+		z-index: z-index( '.edit-post-sidebar {greater than small}' );
 		height: auto;
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
@@ -121,9 +121,10 @@
 	cursor: pointer;
 	height: 50px;
 	line-height: 50px;
-	padding: 0 20px;
+	padding: 0 15px;
 	margin-left: 0;
 	font-weight: 400;
+	@include square-style__neutral;
 
 	&.is-active {
 		border-bottom-color: $blue-medium-500;
@@ -131,6 +132,6 @@
 	}
 
 	&:focus {
-		@include button-style__focus-active;
+		@include square-style__focus-active;
 	}
 }

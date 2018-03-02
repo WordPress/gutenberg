@@ -2,10 +2,10 @@
 
 exports[`MenuItemsGroup should match snapshot 1`] = `
 <div
-  className="components-menu-items-group"
+  className="components-menu-items__group"
 >
   <div
-    className="components-menu-items-group__label"
+    className="components-menu-items__group-label"
     id="components-menu-items-group-label-1"
   >
     My group

@@ -8,7 +8,7 @@ import { countBy } from 'lodash';
  */
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { query } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -58,7 +58,7 @@ function TableOfContentsPanel( { blocks } ) {
 	);
 }
 
-export default query( ( select ) => {
+export default withSelect( ( select ) => {
 	return {
 		blocks: select( 'core/editor' ).getBlocks(),
 	};

@@ -43,9 +43,7 @@ function InserterWithShortcuts( { items, isLocked, onToggle, onInsert } ) {
 					onClick={ () => onInsert( item ) }
 					label={ sprintf( __( 'Add %s' ), item.title ) }
 					icon={ (
-						<span className="editor-inserter-with-shortcuts__block-icon">
-							<BlockIcon icon={ item.icon } />
-						</span>
+						<BlockIcon icon={ item.icon } />
 					) }
 				/>
 			) ) }

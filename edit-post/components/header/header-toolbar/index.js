@@ -1,7 +1,9 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { connect } from 'react-redux';
+import { compose } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * WordPress dependencies
@@ -21,9 +23,8 @@ import {
  * Internal dependencies
  */
 import './style.scss';
-import { hasFixedToolbar } from '../../../store/selectors';
 
-function HeaderToolbar( { fixedToolbarActive } ) {
+function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 	return (
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
@@ -34,7 +35,7 @@ function HeaderToolbar( { fixedToolbarActive } ) {
 			<EditorHistoryRedo />
 			<TableOfContents />
 			<MultiBlocksSwitcher />
-			{ fixedToolbarActive && (
+			{ hasFixedToolbar && isLargeViewport && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />
 				</div>
@@ -43,11 +44,9 @@ function HeaderToolbar( { fixedToolbarActive } ) {
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		fixedToolbarActive: hasFixedToolbar( state ),
-	} ),
-	undefined,
-	undefined,
-	{ storeKey: 'edit-post' }
-)( HeaderToolbar );
+export default compose( [
+	withSelect( ( select ) => ( {
+		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+	} ) ),
+	withViewportMatch( { isLargeViewport: 'medium' } ),
+] )( HeaderToolbar );

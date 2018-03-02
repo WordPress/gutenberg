@@ -5,6 +5,7 @@ export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
+export { default as CodeEditor } from './code-editor';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as DropZone } from './drop-zone';
@@ -46,6 +47,7 @@ export { default as TreeSelect } from './tree-select';
 export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
+export { default as ifCondition } from './higher-order/if-condition';
 export { default as navigateRegions } from './higher-order/navigate-regions';
 export { default as withAPIData } from './higher-order/with-api-data';
 export { default as withContext } from './higher-order/with-context';

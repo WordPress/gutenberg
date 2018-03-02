@@ -35,6 +35,7 @@ input[type="search"].editor-inserter__search {
 	z-index: 1;
 	border: none;
 	box-shadow: 0 1px 0 0 $light-gray-500;
+	@include square-style__neutral;
 
 	// fonts smaller than 16px causes mobile safari to zoom
 	font-size: $mobile-text-min-font-size;
@@ -43,7 +44,7 @@ input[type="search"].editor-inserter__search {
 	}
 
 	&:focus {
-		@include input-style__focus-active;
+		@include square-style__focus-active;
 	}
 }
 
@@ -164,6 +165,7 @@ input[type="search"].editor-inserter__search {
 		border-bottom: 1px solid $light-gray-500;
 		flex-shrink: 0;
 		margin-top: 1px;
+		@include square-style__neutral;
 	}
 }
 

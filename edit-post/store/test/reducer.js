@@ -8,6 +8,8 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	preferences,
+	isSavingMetaBoxes,
+	metaBoxes,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -24,7 +26,6 @@ describe( 'state', () => {
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
-				viewportType: 'desktop',
 			} );
 		} );
 
@@ -82,6 +83,94 @@ describe( 'state', () => {
 				feature: 'chicken',
 			} );
 			expect( state ).toEqual( { features: { chicken: false } } );
+		} );
+	} );
+
+	describe( 'isSavingMetaBoxes', () => {
+		it( 'should return default state', () => {
+			const actual = isSavingMetaBoxes( undefined, {} );
+			expect( actual ).toBe( false );
+		} );
+
+		it( 'should set saving flag to true', () => {
+			const action = {
+				type: 'REQUEST_META_BOX_UPDATES',
+			};
+			const actual = isSavingMetaBoxes( false, action );
+
+			expect( actual ).toBe( true );
+		} );
+
+		it( 'should set saving flag to false', () => {
+			const action = {
+				type: 'META_BOX_UPDATES_SUCCESS',
+			};
+			const actual = isSavingMetaBoxes( true, action );
+
+			expect( actual ).toBe( false );
+		} );
+	} );
+
+	describe( 'metaBoxes()', () => {
+		it( 'should return default state', () => {
+			const actual = metaBoxes( undefined, {} );
+			const expected = {
+				normal: {
+					isActive: false,
+				},
+				side: {
+					isActive: false,
+				},
+				advanced: {
+					isActive: false,
+				},
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+
+		it( 'should set the sidebar to active', () => {
+			const theMetaBoxes = {
+				normal: false,
+				advanced: false,
+				side: true,
+			};
+
+			const action = {
+				type: 'INITIALIZE_META_BOX_STATE',
+				metaBoxes: theMetaBoxes,
+			};
+
+			const actual = metaBoxes( undefined, action );
+			const expected = {
+				normal: {
+					isActive: false,
+				},
+				side: {
+					isActive: true,
+				},
+				advanced: {
+					isActive: false,
+				},
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+
+		it( 'should set the meta boxes saved data', () => {
+			const action = {
+				type: 'META_BOX_SET_SAVED_DATA',
+				dataPerLocation: {
+					side: 'a=b',
+				},
+			};
+
+			const theMetaBoxes = metaBoxes( { normal: { isActive: true }, side: { isActive: false } }, action );
+			expect( theMetaBoxes ).toEqual( {
+				advanced: { data: undefined },
+				normal: { isActive: true, data: undefined },
+				side: { isActive: false, data: 'a=b' },
+			} );
 		} );
 	} );
 } );

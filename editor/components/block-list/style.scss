@@ -367,29 +367,59 @@
 		color: $dark-gray-300;
 		margin: 4px 0 0 -4px;	// align better with text blocks
 	}
-
-	.editor-inserter__toggle.components-icon-button:not(:disabled):hover {
-		@include button-style__hover;
-	}
 }
 
 .editor-block-list__insertion-point {
 	position: relative;
+	z-index: z-index( '.editor-block-list__insertion-point' );
+}
+
+.editor-block-list__insertion-point-indicator {
+	position: absolute;
+	top: 16px;
+	height: 2px;
+	left: 0;
+	right: 0;
+	background: $blue-medium-500;
+}
+
+.editor-block-list__insertion-point-inserter {
+	position: absolute;
+	background: none;
+	border: none;
+	display: block;
+	top: 0;
+	height: 34px; // Matches the whole empty space between two blocks
+	width: 100%;
+	cursor: pointer;
 
 	&:before {
 		position: absolute;
-		top: -1px;
+		top: 16px;
 		height: 2px;
-		left: 0;
-		right: 0;
-		background: $blue-medium-500;
+		left: $block-padding;
+		right: $block-padding;
+		background: $dark-gray-100;
 		content: '';
+		opacity: 0;
+		transition: opacity 0.1s linear 0.1s;
+	}
+
+	&:hover:before {
+		opacity: 1;
+		transition: opacity 0.2s linear 0.5s;
+	}
+
+	&:focus:before {
+		opacity: 1;
+		transition: opacity 0.2s linear;
 	}
 }
 
 .editor-block-list__block > .editor-block-list__insertion-point {
 	position: absolute;
-	bottom: -10px;
+	bottom: -19px;
+	height: 34px; // Matches the whole empty space between two blocks
 	top: auto;
 	left: 0;
 	right: 0;
@@ -397,6 +427,22 @@
 	@include break-small {
 		left: $block-mover-padding-visible;
 		right: $block-mover-padding-visible;
+	}
+}
+
+.editor-block-list__layout > .editor-block-list__insertion-point {
+	position: relative;
+	margin-left: auto;
+	margin-right: auto;
+	top: -19px;
+	left: 0;
+	right: 0;
+
+	.editor-block-list__insertion-point-inserter:before {
+		@include break-small {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
 	}
 }
 
@@ -460,6 +506,15 @@
 	.editor-block-toolbar {
 		border: 1px solid $light-gray-500;
 		width: 100%;
+
+		// this prevents floats from messing up the position
+		position: absolute;
+		left: 0;
+
+		.editor-block-list__block[data-align="right"] & {
+			left: auto;
+			right: 0;
+		}
 
 		// remove stacked borders in inline toolbar
 		> div:first-child {

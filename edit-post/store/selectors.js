@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import createSelector from 'rememo';
+import { some } from 'lodash';
+
+/**
  * Returns the current editing mode.
  *
  * @param {Object} state Global application state.
@@ -116,29 +122,6 @@ export function isEditorSidebarPanelOpened( state, panel ) {
 }
 
 /**
- * Returns true if the current window size corresponds to mobile resolutions (<= medium breakpoint).
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether current window size corresponds to
- *                    mobile resolutions.
- */
-export function isMobile( state ) {
-	return state.mobile;
-}
-
-/**
- * Returns whether the toolbar should be fixed or not.
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} True if toolbar is fixed.
- */
-export function hasFixedToolbar( state ) {
-	return ! isMobile( state ) && isFeatureActive( state, 'fixedToolbar' );
-}
-
-/**
  * Returns whether the given feature is enabled or not.
  *
  * @param {Object} state   Global application state.
@@ -148,4 +131,51 @@ export function hasFixedToolbar( state ) {
  */
 export function isFeatureActive( state, feature ) {
 	return !! state.preferences.features[ feature ];
+}
+
+/**
+ * Returns the state of legacy meta boxes.
+ *
+ * @param   {Object} state Global application state.
+ * @return {Object}       State of meta boxes.
+ */
+export function getMetaBoxes( state ) {
+	return state.metaBoxes;
+}
+
+/**
+ * Returns the state of legacy meta boxes.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} location Location of the meta box.
+ *
+ * @return {Object} State of meta box at specified location.
+ */
+export function getMetaBox( state, location ) {
+	return getMetaBoxes( state )[ location ];
+}
+
+/**
+ * Returns true if the post is using Meta Boxes
+ *
+ * @param  {Object} state Global application state
+ * @return {boolean}      Whether there are metaboxes or not.
+ */
+export const hasMetaBoxes = createSelector(
+	( state ) => {
+		return some( getMetaBoxes( state ), ( metaBox ) => {
+			return metaBox.isActive;
+		} );
+	},
+	( state ) => state.metaBoxes,
+);
+
+/**
+ * Returns true if the the Meta Boxes are being saved.
+ *
+ * @param   {Object}  state Global application state.
+ * @return {boolean}       Whether the metaboxes are being saved.
+ */
+export function isSavingMetaBoxes( state ) {
+	return state.isSavingMetaBoxes;
 }

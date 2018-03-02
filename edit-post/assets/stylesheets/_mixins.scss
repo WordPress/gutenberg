@@ -115,6 +115,7 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
  * Button states and focus styles
  */
 
+// Buttons with rounded corners
 @mixin button-style__disabled {
 	opacity: 0.6;
 	cursor: default;
@@ -132,11 +133,61 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 }
 
 @mixin button-style__focus-active() {
-	outline: none;
 	color: $dark-gray-900;
 	box-shadow: inset 0 0 0 1px $dark-gray-300, inset 0 0 0 2px $white;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow
+	outline: 2px solid transparent;
+	outline-offset: -2px;
 }
 
+// Formatting Buttons
+@mixin formatting-button-style__hover {
+	color: $dark-gray-500;
+	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
+}
+
+@mixin formatting-button-style__active() {
+	outline: none;
+	color: $white;
+	box-shadow: none;
+	background: $dark-gray-500;
+}
+
+@mixin formatting-button-style__focus() {
+	box-shadow: inset 0 0 0 1px $dark-gray-500, inset 0 0 0 2px $white;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+}
+
+// Tabs, Inputs, Square buttons
+@mixin square-style__neutral() {
+	outline-offset: -1px;
+}
+
+@mixin square-style__focus-active() {
+	color: $dark-gray-900;
+	outline: 1px solid $dark-gray-300;
+}
+
+// Menu items
+@mixin menu-style__neutral() {
+	border: none;
+	box-shadow: none;
+}
+
+@mixin menu-style__focus() {
+	color: $black;
+	border: none;
+	box-shadow: none;
+	outline-offset: -2px;
+	color: $dark-gray-900;
+	outline: 1px dotted $dark-gray-500;
+}
+
+// Old
 @mixin tab-style__focus-active() {
 	outline: none;
 	color: $dark-gray-900;

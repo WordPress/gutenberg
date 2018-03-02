@@ -9,8 +9,9 @@ import {
 	openPublishSidebar,
 	closePublishSidebar,
 	togglePublishSidebar,
-	setViewportType,
 	toggleFeature,
+	requestMetaBoxUpdates,
+	initializeMetaBoxState,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -78,22 +79,35 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'setViewportType', () => {
-		it( 'should return SET_VIEWPORT_TYPE action', () => {
-			const viewportType = 'mobile';
-			expect( setViewportType( viewportType ) ).toEqual( {
-				type: 'SET_VIEWPORT_TYPE',
-				viewportType,
-			} );
-		} );
-	} );
-
 	describe( 'toggleFeature', () => {
 		it( 'should return TOGGLE_FEATURE action', () => {
 			const feature = 'name';
 			expect( toggleFeature( feature ) ).toEqual( {
 				type: 'TOGGLE_FEATURE',
 				feature,
+			} );
+		} );
+	} );
+
+	describe( 'requestMetaBoxUpdates', () => {
+		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
+			expect( requestMetaBoxUpdates() ).toEqual( {
+				type: 'REQUEST_META_BOX_UPDATES',
+			} );
+		} );
+	} );
+
+	describe( 'initializeMetaBoxState', () => {
+		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
+			const metaBoxes = {
+				side: true,
+				normal: true,
+				advanced: false,
+			};
+
+			expect( initializeMetaBoxState( metaBoxes ) ).toEqual( {
+				type: 'INITIALIZE_META_BOX_STATE',
+				metaBoxes,
 			} );
 		} );
 	} );

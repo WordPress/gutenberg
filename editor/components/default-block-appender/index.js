@@ -2,14 +2,13 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { getDefaultBlockName } from '@wordpress/blocks';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { withContext } from '@wordpress/components';
 
 /**
@@ -17,7 +16,7 @@ import { withContext } from '@wordpress/components';
  */
 import './style.scss';
 import BlockDropZone from '../block-drop-zone';
-import { appendDefaultBlock, startTyping } from '../../store/actions';
+import { insertDefaultBlock, startTyping } from '../../store/actions';
 import { getBlock, getBlockCount } from '../../store/selectors';
 
 export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPrompt } ) {
@@ -45,10 +44,10 @@ export default compose(
 		( state, ownProps ) => {
 			const isEmpty = ! getBlockCount( state, ownProps.rootUID );
 			const lastBlock = getBlock( state, ownProps.lastBlockUID );
-			const isLastBlockDefault = get( lastBlock, 'name' ) === getDefaultBlockName();
+			const isLastBlockEmptyDefault = lastBlock && isUnmodifiedDefaultBlock( lastBlock );
 
 			return {
-				isVisible: isEmpty || ! isLastBlockDefault,
+				isVisible: isEmpty || ! isLastBlockEmptyDefault,
 				showPrompt: isEmpty,
 			};
 		},
@@ -61,7 +60,7 @@ export default compose(
 					attributes = { layout };
 				}
 
-				dispatch( appendDefaultBlock( attributes, rootUID ) );
+				dispatch( insertDefaultBlock( attributes, rootUID ) );
 				dispatch( startTyping() );
 			},
 		} )

@@ -3,7 +3,7 @@
  */
 import { ClipboardButton, withState } from '@wordpress/components';
 import { compose } from '@wordpress/element';
-import { query } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 function CopyContentMenuItem( { editedPostContent, hasCopied, setState } ) {
@@ -22,7 +22,7 @@ function CopyContentMenuItem( { editedPostContent, hasCopied, setState } ) {
 }
 
 export default compose(
-	query( ( select ) => ( {
+	withSelect( ( select ) => ( {
 		editedPostContent: select( 'core/editor' ).getEditedPostAttribute( 'content' ),
 	} ) ),
 	withState( { hasCopied: false } )
