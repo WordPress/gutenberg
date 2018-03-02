@@ -11,6 +11,7 @@ import { compose } from '@wordpress/element';
  */
 import './style.scss';
 import { getSidebarSettings } from '../../api/sidebar';
+import PluginSidebar from '../plugin-sidebar';
 
 function PluginsPanel( { onClose, pluginSidebar } ) {
 	if ( ! pluginSidebar ) {
@@ -19,7 +20,6 @@ function PluginsPanel( { onClose, pluginSidebar } ) {
 
 	const {
 		title,
-		render,
 	} = pluginSidebar;
 
 	return (
@@ -37,7 +37,7 @@ function PluginsPanel( { onClose, pluginSidebar } ) {
 				/>
 			</div>
 			<div className="edit-post-plugins-panel__content">
-				{ render() }
+				<PluginSidebar.Slot />
 			</div>
 		</div>
 	);

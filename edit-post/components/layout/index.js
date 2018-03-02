@@ -32,6 +32,7 @@ import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import PluginsPanel from '../../components/plugins-panel/index.js';
+import { Plugins } from '../../api/plugin';
 
 function Layout( {
 	mode,
@@ -83,6 +84,7 @@ function Layout( {
 			{ editorSidebarOpened && <Sidebar /> }
 			{ pluginSidebarOpened && <PluginsPanel /> }
 			<Popover.Slot />
+			<Plugins />
 		</div>
 	);
 }
