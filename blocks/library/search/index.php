@@ -44,9 +44,9 @@ function gutenberg_render_block_core_search( $attributes ) {
 		$form = '<form role="search" method="get" class="search-form" action="' . esc_url( home_url( '/' ) ) . '">
 			<label>
 				<span class="screen-reader-text">' . $args['label'] . '</span>
-				<input type="search" class="search-field" placeholder="' . $args['placeholder'] . '" value="' . get_search_query() . '" name="s" />
+				<input type="search" class="search-field" placeholder="' . esc_attr( $args['placeholder'] ) . '" value="' . get_search_query() . '" name="s" />
 			</label>
-			<input type="submit" class="search-submit" value="' . $args['submitValue'] . '" />
+			<input type="submit" class="search-submit" value="' . esc_attr( $args['submitValue'] ) . '" />
 		</form>';
 	}
 
