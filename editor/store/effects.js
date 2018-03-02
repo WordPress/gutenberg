@@ -16,6 +16,7 @@ import {
 	createReusableBlock,
 	isReusableBlock,
 	getDefaultBlockName,
+	getDefaultBlockForPostFormat,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -25,25 +26,21 @@ import { speak } from '@wordpress/a11y';
  */
 import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
+	setupEditorState,
 	resetPost,
-	setupNewPost,
-	resetBlocks,
-	focusBlock,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
 	removeNotice,
 	savePost,
-	editPost,
-	requestMetaBoxUpdates,
 	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
+	selectBlock,
 } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
-	getDirtyMetaBoxes,
 	getEditedPostContent,
 	getPostEdits,
 	isCurrentPostPublished,
@@ -51,6 +48,7 @@ import {
 	isEditedPostNew,
 	isEditedPostSaveable,
 	getBlock,
+	getBlockCount,
 	getBlocks,
 	getReusableBlock,
 	POST_UPDATE_TRANSACTION_ID,
@@ -81,12 +79,9 @@ export default {
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
-		new Model( toSend ).save().done( ( newPost ) => {
-			dispatch( {
-				type: 'RESET_POST',
-				post: newPost,
-			} );
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).done( ( newPost ) => {
+			dispatch( resetPost( newPost ) );
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				previousPost: post,
@@ -108,7 +103,7 @@ export default {
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
-		const { dispatch, getState } = store;
+		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = includes( publishStatus, previousPost.status );
@@ -147,9 +142,6 @@ export default {
 			) );
 		}
 
-		// Update dirty meta boxes.
-		dispatch( requestMetaBoxUpdates( getDirtyMetaBoxes( getState() ) ) );
-
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
 				{ id: post.id },
@@ -179,9 +171,9 @@ export default {
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
 		const { postId } = action;
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( getState() ) );
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( getState() ) );
 		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
-		new Model( { id: postId } ).destroy().then(
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					...action,
@@ -203,13 +195,10 @@ export default {
 	TRASH_POST_SUCCESS( action ) {
 		const { postId, postType } = action;
 
-		// Delay redirect to ensure store has been updated with the successful trash.
-		setTimeout( () => {
-			window.location.href = getWPAdminURL( 'edit.php', {
-				trashed: 1,
-				post_type: postType,
-				ids: postId,
-			} );
+		window.location.href = getWPAdminURL( 'edit.php', {
+			trashed: 1,
+			post_type: postType,
+			ids: postId,
 		} );
 	},
 	TRASH_POST_FAILURE( action, store ) {
@@ -218,12 +207,15 @@ export default {
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
-		const [ blockA, blockB ] = action.blocks;
+		const state = store.getState();
+		const [ blockAUid, blockBUid ] = action.blocks;
+		const blockA = getBlock( state, blockAUid );
+		const blockB = getBlock( state, blockBUid );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
 		if ( ! blockType.merge ) {
-			dispatch( focusBlock( blockA.uid ) );
+			dispatch( selectBlock( blockA.uid ) );
 			return;
 		}
 
@@ -244,7 +236,7 @@ export default {
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		dispatch( focusBlock( blockA.uid, { offset: -1 } ) );
+		dispatch( selectBlock( blockA.uid, -1 ) );
 		dispatch( replaceBlocks(
 			[ blockA.uid, blockB.uid ],
 			[
@@ -279,54 +271,55 @@ export default {
 			return;
 		}
 
-		// Change status from auto-draft to draft
-		if ( isEditedPostNew( state ) ) {
-			dispatch( editPost( { status: 'draft' } ) );
-		}
-
 		dispatch( savePost() );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;
-		const effects = [];
 
 		// Parse content as blocks
+		let blocks;
 		if ( post.content.raw ) {
-			effects.push( resetBlocks( parse( post.content.raw ) ) );
+			blocks = parse( post.content.raw );
 		} else if ( settings.template ) {
-			const blocks = map( settings.template, ( [ name, attributes ] ) => {
-				const block = createBlock( name );
-				block.attributes = {
-					...block.attributes,
-					...attributes,
-				};
-				return block;
-			} );
-			effects.push( resetBlocks( blocks ) );
+			const createBlocksFromTemplate = ( template ) => {
+				return map( template, ( [ name, attributes, innerBlocksTemplate ] ) => {
+					return createBlock(
+						name,
+						attributes,
+						createBlocksFromTemplate( innerBlocksTemplate )
+					);
+				} );
+			};
+			blocks = createBlocksFromTemplate( settings.template );
+		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
+			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
+		} else {
+			blocks = [];
 		}
-
-		// Resetting post should occur after blocks have been reset, since it's
-		// the post reset that restarts history (used in dirty detection).
-		effects.push( resetPost( post ) );
 
 		// Include auto draft title in edits while not flagging post as dirty
+		const edits = {};
 		if ( post.status === 'auto-draft' ) {
-			effects.push( setupNewPost( {
-				title: post.title.raw,
-			} ) );
+			edits.title = post.title.raw;
+			edits.status = 'draft';
 		}
 
-		return effects;
+		return setupEditorState( post, blocks, edits );
 	},
 	FETCH_REUSABLE_BLOCKS( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
+			return;
+		}
 		const { id } = action;
 		const { dispatch } = store;
-
 		let result;
 		if ( id ) {
-			result = new wp.api.models.Blocks( { id } ).fetch();
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
 		} else {
-			result = new wp.api.collections.Blocks().fetch();
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }` } );
 		}
 
 		result.then(
@@ -353,13 +346,24 @@ export default {
 		);
 	},
 	SAVE_REUSABLE_BLOCK( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
+			return;
+		}
+
 		const { id } = action;
 		const { getState, dispatch } = store;
 
 		const { title, type, attributes, isTemporary } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
-		const requestData = isTemporary ? { title, content } : { id, title, content };
-		new wp.api.models.Blocks( requestData ).save().then(
+
+		const data = isTemporary ? { title, content } : { id, title, content };
+		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
+		const method = isTemporary ? 'POST' : 'PUT';
+
+		wp.apiRequest( { path, data, method } ).then(
 			( updatedReusableBlock ) => {
 				dispatch( {
 					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
@@ -380,6 +384,13 @@ export default {
 		);
 	},
 	DELETE_REUSABLE_BLOCK( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
+			return;
+		}
+
 		const { id } = action;
 		const { getState, dispatch } = store;
 
@@ -403,7 +414,7 @@ export default {
 			optimist: { type: BEGIN, id: transactionId },
 		} );
 
-		new wp.api.models.Blocks( { id } ).destroy().then(
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
@@ -440,16 +451,33 @@ export default {
 
 		const oldBlock = getBlock( getState(), action.uid );
 		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
-		const newBlock = createBlock( 'core/block', { ref: reusableBlock.id } );
+		const newBlock = createBlock( 'core/block', {
+			ref: reusableBlock.id,
+			layout: oldBlock.attributes.layout,
+		} );
 		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
-	APPEND_DEFAULT_BLOCK() {
-		return insertBlock( createBlock( getDefaultBlockName() ) );
+	INSERT_DEFAULT_BLOCK( action ) {
+		const { attributes, rootUID, index } = action;
+		const block = createBlock( getDefaultBlockName(), attributes );
+
+		return insertBlock( block, index, rootUID );
 	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
+	},
+
+	EDIT_POST( action, { getState } ) {
+		const format = get( action, 'edits.format' );
+		if ( ! format ) {
+			return;
+		}
+		const blockName = getDefaultBlockForPostFormat( format );
+		if ( blockName && getBlockCount( getState() ) === 0 ) {
+			return insertBlock( createBlock( blockName ) );
+		}
 	},
 };

@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -80,6 +80,9 @@ export class PostPreviewButton extends Component {
 				<p>Generating preview.</p>
 			</div>
 			<style>
+				body {
+					margin: 0;
+				}
 				div {
 					display: flex;
 					flex-direction: column;
@@ -102,14 +105,16 @@ export class PostPreviewButton extends Component {
 		const { link, isSaveable } = this.props;
 
 		return (
-			<IconButton
+			<Button
+				className="editor-post-preview"
+				isLarge
 				href={ link }
 				onClick={ this.saveForPreview }
 				target={ this.getWindowTarget() }
-				icon="visibility"
 				disabled={ ! isSaveable }
-				label={ _x( 'Preview', 'imperative verb' ) }
-			/>
+			>
+				{ _x( 'Preview', 'imperative verb' ) }
+			</Button>
 		);
 	}
 }

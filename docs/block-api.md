@@ -57,7 +57,7 @@ description: 'Block showing a Book card.'
 Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embed`.
 
 ```js
-// Assigning to the 'layout' category
+// Assigning to the 'widgets' category
 category: 'widgets',
 ```
 
@@ -109,14 +109,154 @@ attributes: {
 
 #### Transforms (optional)
 
-Work in progress...
+* **Type:** `Array`
+
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression or a raw DOM node.
+
+For example, a paragraph block can be transformed into a heading block.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: function ( content ) {
+                return createBlock( 'core/heading', {
+                    content,
+                } );
+            },
+        },
+    ]
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: ( { content } ) => {
+                return createBlock( 'core/heading', {
+                    content,
+                } );
+            },
+        },
+    ]
+},
+```
+{% end %}
+
+An existing shortcode can be transformed into its block counterpart.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            // Shortcode tag can also be an array of shortcode aliases
+            tag: 'caption',
+            attributes: {
+                // An attribute can be source from a tag attribute in the shortcode content
+                url: {
+                    type: 'string',
+                    source: 'attribute',
+                    attribute: 'src',
+                    selector: 'img',
+                },
+                // An attribute can be source from the shortcode attributes
+                align: {
+                    type: 'string',
+                    shortcode: function( named ) {
+                        var align = named.align ? named.align : 'alignnone';
+                        return align.replace( 'align', '' );
+                    },
+                },
+            },
+        },
+    ]
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            // Shortcode tag can also be an array of shortcode aliases
+            tag: 'caption',
+            attributes: {
+                // An attribute can be source from a tag attribute in the shortcode content
+                url: {
+                    type: 'string',
+                    source: 'attribute',
+                    attribute: 'src',
+                    selector: 'img',
+                },
+                // An attribute can be source from the shortcode attributes
+                align: {
+                    type: 'string',
+                    shortcode: ( { named: { align = 'alignnone' } } ) => {
+                        return align.replace( 'align', '' );
+                    },
+                },
+            },
+        },
+    ]
+},
+
+```
+{% end %}
+
+A block can also be transformed into another block type. For example, a heading block can be transformed into a paragraph block.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: function( content ) {
+                return createBlock( 'core/paragraph', {
+                    content,
+                } );
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: ( { content } ) => {
+                return createBlock( 'core/paragraph', {
+                    content,
+                } );
+            },
+        },
+    ],
+},
+```
+{% end %}
+
 
 #### useOnce (optional)
 
 * **Type:** `Bool`
 * **Default:** `false`
 
-Whether a block can only be used once per post.
+A once-only block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A once-only block's icon is automatically dimmed (unclickable) to prevent multiple instances.
 
 ```js
 // Use the block just once per post

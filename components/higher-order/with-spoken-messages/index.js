@@ -10,11 +10,12 @@ import { Component } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
 /**
- * A Higher Order Component used to be provide a unique instance ID by component
+ * A Higher Order Component used to be provide a unique instance ID by
+ * component.
  *
- * @param {WPElement}  WrappedComponent  The wrapped component
+ * @param {WPElement} WrappedComponent  The wrapped component.
  *
- * @returns {Component} Component with an instanceId prop.
+ * @return {Component} Component with an instanceId prop.
  */
 function withSpokenMessages( WrappedComponent ) {
 	return class extends Component {

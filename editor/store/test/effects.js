@@ -6,27 +6,30 @@ import { noop, reduce, set } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getBlockTypes, unregisterBlockType, registerBlockType, createBlock } from '@wordpress/blocks';
+import {
+	getBlockTypes,
+	unregisterBlockType,
+	registerBlockType,
+	createBlock,
+	createReusableBlock,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import {
-	resetPost,
-	setupNewPost,
+	setupEditorState,
 	resetBlocks,
 	mergeBlocks,
-	focusBlock,
 	replaceBlocks,
-	editPost,
 	savePost,
-	requestMetaBoxUpdates,
 	updateReusableBlock,
 	saveReusableBlock,
 	deleteReusableBlock,
 	fetchReusableBlocks,
 	convertBlockToStatic,
 	convertBlockToReusable,
+	selectBlock,
 } from '../../store/actions';
 import reducer from '../reducer';
 import effects from '../effects';
@@ -42,11 +45,13 @@ describe( 'effects', () => {
 
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;
+		const defaultGetBlock = selectors.getBlock;
 
 		afterEach( () => {
 			getBlockTypes().forEach( ( block ) => {
 				unregisterBlockType( block.name );
 			} );
+			selectors.getBlock = defaultGetBlock;
 		} );
 
 		it( 'should only focus the blockA if the blockA has no merge function', () => {
@@ -59,11 +64,16 @@ describe( 'effects', () => {
 				uid: 'ribs',
 				name: 'core/test-block',
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
+
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken' ) );
+			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken' ) );
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
@@ -87,11 +97,15 @@ describe( 'effects', () => {
 				name: 'core/test-block',
 				attributes: { content: 'ribs' },
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
+			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken', -1 ) );
 			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -121,8 +135,12 @@ describe( 'effects', () => {
 				name: 'core/test-block2',
 				attributes: { content: 'ribs' },
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -174,11 +192,15 @@ describe( 'effects', () => {
 				name: 'core/test-block-2',
 				attributes: { content2: 'ribs' },
 			};
+			selectors.getBlock = ( state, uid ) => {
+				return blockA.uid === uid ? blockA : blockB;
+			};
 			const dispatch = jest.fn();
-			handler( mergeBlocks( blockA, blockB ), { dispatch } );
+			const getState = () => ( {} );
+			handler( mergeBlocks( blockA.uid, blockB.uid ), { dispatch, getState } );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
+			// expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
 			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
 				uid: 'chicken',
 				name: 'core/test-block',
@@ -240,8 +262,7 @@ describe( 'effects', () => {
 
 			handler( {}, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
@@ -253,19 +274,6 @@ describe( 'effects', () => {
 
 			// TODO: Publish autosave
 			expect( dispatch ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should set auto-draft to draft before save', () => {
-			selectors.isEditedPostSaveable.mockReturnValue( true );
-			selectors.isEditedPostDirty.mockReturnValue( true );
-			selectors.isCurrentPostPublished.mockReturnValue( false );
-			selectors.isEditedPostNew.mockReturnValue( true );
-
-			handler( {}, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
-			expect( dispatch ).toHaveBeenCalledWith( editPost( { status: 'draft' } ) );
-			expect( dispatch ).toHaveBeenCalledWith( savePost() );
 		} );
 
 		it( 'should return update action for saveable, dirty draft', () => {
@@ -283,7 +291,7 @@ describe( 'effects', () => {
 
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
 		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
-		let getDirtyMetaBoxesSpy, replaceStateSpy;
+		let replaceStateSpy;
 
 		const defaultPost = {
 			id: 1,
@@ -304,43 +312,27 @@ describe( 'effects', () => {
 		} );
 
 		beforeAll( () => {
-			getDirtyMetaBoxesSpy = jest.spyOn( selectors, 'getDirtyMetaBoxes' );
 			replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
 		} );
 
 		beforeEach( () => {
-			getDirtyMetaBoxesSpy.mockReset();
-			getDirtyMetaBoxesSpy.mockReturnValue( [ 'normal', 'side' ] );
 			replaceStateSpy.mockReset();
 		} );
 
 		afterAll( () => {
-			getDirtyMetaBoxesSpy.mockRestore();
 			replaceStateSpy.mockRestore();
-		} );
-
-		it( 'should dispatch meta box updates on success for dirty meta boxes', () => {
-			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
-
-			const post = getDraftPost();
-
-			handler( { post: post, previousPost: post }, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( requestMetaBoxUpdates( [ 'normal', 'side' ] ) );
 		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { dispatch };
 
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
 
 			handler( { post, previousPost }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p><span>Post published!</span> <a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
@@ -355,14 +347,14 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
 
 			handler( { post, previousPost }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p>
@@ -381,14 +373,14 @@ describe( 'effects', () => {
 
 		it( 'should dispatch notices when just updating a published post again', () => {
 			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
+			const store = { dispatch };
 
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
 
 			handler( { post, previousPost }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
 					content: <p><span>Post updated!</span>{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
@@ -425,9 +417,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( [
-				resetPost( post ),
-			] );
+			expect( result ).toEqual( setupEditorState( post, [], {} ) );
 		} );
 
 		it( 'should return block reset with non-empty content', () => {
@@ -445,11 +435,8 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toHaveLength( 2 );
-			expect( result ).toContainEqual( resetPost( post ) );
-			expect( result.some( ( { blocks } ) => {
-				return blocks && blocks[ 0 ].name === 'core/test-block';
-			} ) ).toBe( true );
+			expect( result.blocks ).toHaveLength( 1 );
+			expect( result ).toEqual( setupEditorState( post, result.blocks, {} ) );
 		} );
 
 		it( 'should return post setup action only if auto-draft', () => {
@@ -466,10 +453,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post, settings: {} } );
 
-			expect( result ).toEqual( [
-				resetPost( post ),
-				setupNewPost( { title: 'A History of Pork' } ),
-			] );
+			expect( result ).toEqual( setupEditorState( post, [], { title: 'A History of Pork', status: 'draft' } ) );
 		} );
 	} );
 
@@ -510,10 +494,9 @@ describe( 'effects', () => {
 					},
 				] );
 
-				set( global, 'wp.api.collections.Blocks', class {
-					fetch() {
-						return promise;
-					}
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => {
+					return promise;
 				} );
 
 				const dispatch = jest.fn();
@@ -541,29 +524,19 @@ describe( 'effects', () => {
 			it( 'should fetch a single reusable block', () => {
 				const id = 123;
 
-				let modelAttributes;
 				const promise = Promise.resolve( {
 					id,
 					title: 'My cool block',
 					content: '<!-- wp:core/test-block {"name":"Big Bird"} /-->',
 				} );
-
-				set( global, 'wp.api.models.Blocks', class {
-					constructor( attributes ) {
-						modelAttributes = attributes;
-					}
-
-					fetch() {
-						return promise;
-					}
-				} );
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => promise );
 
 				const dispatch = jest.fn();
 				const store = { getState: () => {}, dispatch };
 
 				handler( fetchReusableBlocks( id ), store );
 
-				expect( modelAttributes ).toEqual( { id } );
 				return promise.then( () => {
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
@@ -584,12 +557,8 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-
-				set( global, 'wp.api.collections.Blocks', class {
-					fetch() {
-						return promise;
-					}
-				} );
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => promise );
 
 				const dispatch = jest.fn();
 				const store = { getState: () => {}, dispatch };
@@ -614,25 +583,15 @@ describe( 'effects', () => {
 			it( 'should save a reusable block and swaps its id', () => {
 				let modelAttributes;
 				const promise = Promise.resolve( { id: 3 } );
-
-				set( global, 'wp.api.models.Blocks', class {
-					constructor( attributes ) {
-						modelAttributes = attributes;
-					}
-
-					save() {
-						return promise;
-					}
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', ( request ) => {
+					modelAttributes = request.data;
+					return promise;
 				} );
 
-				const reusableBlock = {
-					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
-					title: 'My cool block',
-					type: 'core/test-block',
-					attributes: {
-						name: 'Big Bird',
-					},
-				};
+				const reusableBlock = createReusableBlock( 'core/test-block', {
+					name: 'Big Bird',
+				} );
 
 				const initialState = reducer( undefined, {} );
 				const action = updateReusableBlock( reusableBlock.id, reusableBlock );
@@ -644,8 +603,7 @@ describe( 'effects', () => {
 				handler( saveReusableBlock( reusableBlock.id ), store );
 
 				expect( modelAttributes ).toEqual( {
-					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
-					title: 'My cool block',
+					title: 'Untitled block',
 					content: '<!-- wp:test-block {\"name\":\"Big Bird\"} /-->',
 				} );
 				return promise.then( () => {
@@ -659,21 +617,12 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => promise );
 
-				set( global, 'wp.api.models.Blocks', class {
-					save() {
-						return promise;
-					}
+				const reusableBlock = createReusableBlock( 'core/test-block', {
+					name: 'Big Bird',
 				} );
-
-				const reusableBlock = {
-					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
-					name: 'My cool block',
-					type: 'core/test-block',
-					attributes: {
-						name: 'Big Bird',
-					},
-				};
 
 				const initialState = reducer( undefined, {} );
 				const action = updateReusableBlock( reusableBlock.id, reusableBlock );
@@ -697,28 +646,15 @@ describe( 'effects', () => {
 			const handler = effects.DELETE_REUSABLE_BLOCK;
 
 			it( 'should delete a reusable block', () => {
-				let modelAttributes;
 				const promise = Promise.resolve( {} );
-
-				set( global, 'wp.api.models.Blocks', class {
-					constructor( attributes ) {
-						modelAttributes = attributes;
-					}
-
-					destroy() {
-						return promise;
-					}
-				} );
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => promise );
 
 				const id = 123;
 
-				const associatedBlock = {
-					uid: 'd6b55aa9-16b5-4123-9675-749d75a7f14d',
-					name: 'core/block',
-					attributes: {
-						ref: id,
-					},
-				};
+				const associatedBlock = createBlock( 'core/block', {
+					ref: id,
+				} );
 
 				const actions = [
 					resetBlocks( [ associatedBlock ] ),
@@ -737,7 +673,6 @@ describe( 'effects', () => {
 					associatedBlockUids: [ associatedBlock.uid ],
 					optimist: expect.any( Object ),
 				} );
-				expect( modelAttributes ).toEqual( { id } );
 				return promise.then( () => {
 					expect( dispatch ).toHaveBeenCalledWith( {
 						type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
@@ -749,12 +684,8 @@ describe( 'effects', () => {
 
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
-
-				set( global, 'wp.api.models.Blocks', class {
-					destroy() {
-						return promise;
-					}
-				} );
+				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
+				set( global, 'wp.apiRequest', () => promise );
 
 				const state = reducer( undefined, updateReusableBlock( 123, {} ) );
 
@@ -793,21 +724,12 @@ describe( 'effects', () => {
 			const handler = effects.CONVERT_BLOCK_TO_STATIC;
 
 			it( 'should convert a reusable block into a static block', () => {
-				const reusableBlock = {
-					id: '69f00b2b-ea09-4d5c-a98f-0b1112d7d400',
-					name: 'My cool block',
-					type: 'core/test-block',
-					attributes: {
-						name: 'Big Bird',
-					},
-				};
-				const staticBlock = {
-					uid: 'd6b55aa9-16b5-4123-9675-749d75a7f14d',
-					name: 'core/block',
-					attributes: {
-						ref: reusableBlock.id,
-					},
-				};
+				const reusableBlock = createReusableBlock( 'core/test-block', {
+					name: 'Big Bird',
+				} );
+				const staticBlock = createBlock( 'core/block', {
+					ref: reusableBlock.id,
+				} );
 
 				const actions = [
 					resetBlocks( [ staticBlock ] ),
@@ -834,13 +756,9 @@ describe( 'effects', () => {
 			const handler = effects.CONVERT_BLOCK_TO_REUSABLE;
 
 			it( 'should convert a static block into a reusable block', () => {
-				const staticBlock = {
-					uid: 'd6b55aa9-16b5-4123-9675-749d75a7f14d',
-					name: 'core/test-block',
-					attributes: {
-						name: 'Big Bird',
-					},
-				};
+				const staticBlock = createBlock( 'core/test-block', {
+					name: 'Big Bird',
+				} );
 
 				const initialState = reducer( undefined, {} );
 				const state = reducer( initialState, resetBlocks( [ staticBlock ] ) );

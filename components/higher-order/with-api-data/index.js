@@ -139,16 +139,24 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 				[ this.getPendingKey( method ) ]: true,
 			} );
 
-			request( { path, method } ).then( ( response ) => {
-				this.setIntoDataProp( propName, {
-					[ this.getPendingKey( method ) ]: false,
+			request( { path, method } )
+				// [Success] Set the data prop:
+				.then( ( response ) => ( {
 					[ this.getResponseDataKey( method ) ]: response.body,
-				} );
-			} ).catch( ( error ) => {
-				this.setIntoDataProp( propName, {
+				} ) )
+
+				// [Failure] Set the error prop:
+				.catch( ( error ) => ( {
 					[ this.getErrorResponseKey( method ) ]: error,
+				} ) )
+
+				// Always reset loading prop:
+				.then( ( nextDataProp ) => {
+					this.setIntoDataProp( propName, {
+						[ this.getPendingKey( method ) ]: false,
+						...nextDataProp,
+					} );
 				} );
-			} );
 		}
 
 		applyMapping( props ) {

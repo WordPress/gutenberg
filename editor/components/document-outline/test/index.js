@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, registerCoreBlocks } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,6 +14,8 @@ import { createBlock } from '@wordpress/blocks';
 import { DocumentOutline } from '../';
 
 describe( 'DocumentOutline', () => {
+	registerCoreBlocks();
+
 	const paragraph = createBlock( 'core/paragraph' );
 	const headingH1 = createBlock( 'core/heading', {
 		content: 'Heading 1',

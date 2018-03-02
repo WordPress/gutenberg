@@ -53,7 +53,7 @@ function gutenberg_load_plugin_textdomain() {
 	load_plugin_textdomain(
 		'gutenberg',
 		false,
-		dirname( plugin_basename( __FILE__ ) ) . '/languages/'
+		plugin_basename( gutenberg_dir_path() ) . '/languages/'
 	);
 }
 add_action( 'plugins_loaded', 'gutenberg_load_plugin_textdomain' );

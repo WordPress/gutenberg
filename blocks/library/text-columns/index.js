@@ -7,20 +7,21 @@ import { times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { RangeControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import RangeControl from '../../inspector-controls/range-control';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 
-registerBlockType( 'core/text-columns', {
+export const name = 'core/text-columns';
+
+export const settings = {
 	title: __( 'Text Columns' ),
 
 	description: __( 'Add text across columns. This block is experimental' ),
@@ -57,11 +58,11 @@ registerBlockType( 'core/text-columns', {
 		}
 	},
 
-	edit( { attributes, setAttributes, className, focus, setFocus } ) {
+	edit( { attributes, setAttributes, className, isSelected } ) {
 		const { width, content, columns } = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ width }
@@ -70,7 +71,7 @@ registerBlockType( 'core/text-columns', {
 					/>
 				</BlockControls>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
 					<RangeControl
 						label={ __( 'Columns' ) }
@@ -84,7 +85,7 @@ registerBlockType( 'core/text-columns', {
 			<div className={ `${ className } align${ width } columns-${ columns }` } key="block">
 				{ times( columns, ( index ) =>
 					<div className="wp-block-column" key={ `column-${ index }` }>
-						<Editable
+						<RichText
 							tagName="p"
 							value={ content && content[ index ] && content[ index ].children }
 							onChange={ ( nextContent ) => {
@@ -96,9 +97,8 @@ registerBlockType( 'core/text-columns', {
 									],
 								} );
 							} }
-							focus={ focus && focus.column === index }
-							onFocus={ () => setFocus( { column: index } ) }
 							placeholder={ __( 'New Column' ) }
+							isSelected={ isSelected }
 						/>
 					</div>
 				) }
@@ -118,4 +118,4 @@ registerBlockType( 'core/text-columns', {
 			</div>
 		);
 	},
-} );
+};

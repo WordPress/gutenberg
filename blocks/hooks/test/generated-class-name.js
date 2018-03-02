@@ -42,5 +42,12 @@ describe( 'generated className', () => {
 
 			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
 		} );
+
+		it( 'should not inject duplicates into className', () => {
+			const attributes = { className: 'bar' };
+			const extraProps = addSaveProps( { className: 'foo wp-block-chicken-ribs' }, blockSettings, attributes );
+
+			expect( extraProps.className ).toBe( 'wp-block-chicken-ribs foo' );
+		} );
 	} );
 } );

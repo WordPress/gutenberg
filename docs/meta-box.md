@@ -46,7 +46,7 @@ A copy of the global `$wp_meta_boxes` is made then filtered through `apply_filte
 
 Then each location for this particular type of meta box is checked for whether it is active. If it is not empty a value of true is stored, if it is empty a value of false is stored. This meta box location data is then dispatched by the editor Redux store in `INITIALIZE_META_BOX_STATE`.
 
-Ideally, this could be done at instantiation of the editor and help simplify this flow. However, it is not possible to know the meta box state before `admin_enqueue_scripts`, where we are calling `createEditorInstance()`. This will have to do, unless we want to move `createEditorInstance()` to fire in the footer or at some point after `admin_head`. With recent changes to editor bootstrapping this might now be possible. Test with ACF to make sure.
+Ideally, this could be done at instantiation of the editor and help simplify this flow. However, it is not possible to know the meta box state before `admin_enqueue_scripts`, where we are calling `initializeEditor()`. This will have to do, unless we want to move `initializeEditor()` to fire in the footer or at some point after `admin_head`. With recent changes to editor bootstrapping this might now be possible. Test with ACF to make sure.
 
 ### Redux and React Meta Box Management
 
@@ -57,11 +57,9 @@ When rendering the Gutenberg Page, the metaboxes are rendered to a hidden div `#
 
 #### MetaBoxArea Component
 
-When the component renders it will store a ref to the metaboxes container, retrieve the metaboxes HTML from the prefetch location and watches input and changes.
+When the component renders it will store a ref to the metaboxes container, retrieve the metaboxes HTML from the prefetch location.
 
-The change detection will store the current form's `FormData`, then whenever a change is detected the current form data will be checked vs, the original form data. This serves as a way to see if the meta box state is dirty. When the meta box state has been detected to have changed, a Redux action `META_BOX_STATE_CHANGED` is dispatched, updating the store setting the isDirty flag to `true`. If the state ever returns back to the original form data, `META_BOX_STATE_CHANGED` is dispatched again to set the isDirty flag to `false`. A selector `isMetaBoxStateDirty()` is used to help check whether the post can be updated. It checks each meta box for whether it is dirty, and if there is at least one dirty meta box, it will return true. This dirty detection does not impact creating new posts, as the content will have to change before meta boxes can trigger the overall dirty state.
-
-When the post is updated, only meta boxes areas that are active and dirty, will be submitted. This removes any unnecessary requests being made. No extra revisions, are created either by the meta box submissions. A Redux action will trigger on `REQUEST_POST_UPDATE` for any dirty meta box. See `editor/effects.js`. The `REQUEST_META_BOX_UPDATES` action will set that meta boxes' state to `isUpdating`, the `isUpdating` prop will be sent into the `MetaBoxArea` and cause a form submission.
+When the post is updated, only meta boxes areas that are active will be submitted. This removes any unnecessary requests being made. No extra revisions, are created either by the meta box submissions. A Redux action will trigger on `REQUEST_POST_UPDATE` for any active meta box. See `editor/effects.js`. The `REQUEST_META_BOX_UPDATES` action will set that meta boxes' state to `isUpdating`, the `isUpdating` prop will be sent into the `MetaBoxArea` and cause a form submission.
 
 If the metabox area is saving, we display an updating overlay, to prevent users from changing the form values while the meta box is submitting.
 
@@ -75,7 +73,7 @@ So an example url would look like:
 
 This url is automatically passed into React via a `_wpMetaBoxUrl` global variable.
 
-Thus page page mimics the `post.php` post form, so when it is submitted it will normally fire all of the necessary hooks and actions, and have the proper global state to correctly fire any PHP meta box mumbo jumbo without needing to modify any existing code. On successful submission, React will signal a `handleMetaBoxReload` to set up the new form state for dirty checking, remove the updating overlay, and set the store to no longer be updating the meta box area.
+Thus page page mimics the `post.php` post form, so when it is submitted it will normally fire all of the necessary hooks and actions, and have the proper global state to correctly fire any PHP meta box mumbo jumbo without needing to modify any existing code. On successful submission, React will signal a `handleMetaBoxReload` to remove the updating overlay, and set the store to no longer be updating the meta box area.
 
 
 ### Common Compatibility Issues

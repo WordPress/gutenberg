@@ -2,7 +2,7 @@
 
 exports[`BlockControls Should render a dynamic toolbar of controls 1`] = `
 <Fill
-  name="Formatting.Toolbar"
+  name="Block.Toolbar"
 >
   <Toolbar
     controls={

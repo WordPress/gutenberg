@@ -8,19 +8,15 @@ import { stringify } from 'querystringify';
  * WordPress dependencies
  */
 import { buildTermsTree } from '@wordpress/utils';
-import { withAPIData } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import TermTreeSelect from '../term-tree-select';
+import { TreeSelect, withAPIData } from '@wordpress/components';
 
 function CategorySelect( { label, noOptionLabel, categories, selectedCategory, onChange } ) {
 	const termsTree = buildTermsTree( get( categories, 'data', {} ) );
 	return (
-		<TermTreeSelect
-			{ ...{ label, noOptionLabel, onChange, termsTree } }
-			selectedTerm={ selectedCategory }
+		<TreeSelect
+			{ ...{ label, noOptionLabel, onChange } }
+			tree={ termsTree }
+			selectedId={ selectedCategory }
 		/>
 	);
 }

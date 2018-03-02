@@ -18,7 +18,12 @@ import './style.scss';
 import PostPublishButton from '../post-publish-button';
 import PostPublishPanelPrepublish from './prepublish';
 import PostPublishPanelPostpublish from './postpublish';
-import { getCurrentPostType, isCurrentPostPublished, isSavingPost } from '../../store/selectors';
+import {
+	getCurrentPostType,
+	isCurrentPostPublished,
+	isSavingPost,
+	isEditedPostDirty,
+} from '../../store/selectors';
 
 class PostPublishPanel extends Component {
 	constructor() {
@@ -40,6 +45,14 @@ class PostPublishPanel extends Component {
 				published: true,
 				loading: false,
 			} );
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		// Automatically collapse the publish sidebar when a post
+		// is published and the user makes an edit.
+		if ( prevProps.isPublished && this.props.isDirty ) {
+			this.props.onClose();
 		}
 	}
 
@@ -85,6 +98,7 @@ const applyConnect = connect(
 			postType: getCurrentPostType( state ),
 			isPublished: isCurrentPostPublished( state ),
 			isSaving: isSavingPost( state ),
+			isDirty: isEditedPostDirty( state ),
 		};
 	},
 );
