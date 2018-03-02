@@ -94,7 +94,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ [] }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 				blockTypes
@@ -114,7 +114,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ [] }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -130,7 +130,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [ advancedTextItem, textItem, someOtherItem ] }
+				frecentItems={ [ advancedTextItem, textItem, someOtherItem ] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -149,7 +149,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -173,7 +173,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -196,7 +196,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -222,7 +222,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ items }
+				frecentItems={ items }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -239,7 +239,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -262,7 +262,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>

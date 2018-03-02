@@ -35,7 +35,7 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import NoBlocks from './no-blocks';
 
-import { getInserterItems, getRecentInserterItems } from '../../store/selectors';
+import { getInserterItems, getFrecentInserterItems } from '../../store/selectors';
 import { fetchReusableBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
 import BlockPreview from '../block-preview';
@@ -118,7 +118,7 @@ export class InserterMenu extends Component {
 	}
 
 	getItemsForTab( tab ) {
-		const { items, recentItems } = this.props;
+		const { items, frecentItems } = this.props;
 
 		// If we're searching, use everything, otherwise just get the items visible in this tab
 		if ( this.state.filterValue ) {
@@ -128,7 +128,7 @@ export class InserterMenu extends Component {
 		let predicate;
 		switch ( tab ) {
 			case 'recent':
-				return recentItems;
+				return frecentItems;
 
 			case 'blocks':
 				predicate = ( item ) => item.category !== 'embed' && item.category !== 'reusable-blocks';
@@ -344,7 +344,7 @@ export default compose(
 		( state, ownProps ) => {
 			return {
 				items: getInserterItems( state, ownProps.enabledBlockTypes ),
-				recentItems: getRecentInserterItems( state, ownProps.enabledBlockTypes ),
+				frecentItems: getFrecentInserterItems( state, ownProps.enabledBlockTypes ),
 			};
 		},
 		{ fetchReusableBlocks }
