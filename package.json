@@ -101,7 +101,7 @@
 			"@wordpress/default"
 		],
 		"env": {
-			"gettext": {
+			"production": {
 				"plugins": [
 					[
 						"./i18n/babel-plugin",
@@ -137,13 +137,12 @@
 	},
 	"scripts": {
 		"prebuild": "check-node-version --package",
-		"build": "cross-env BABEL_ENV=default NODE_ENV=production webpack",
-		"gettext-strings": "cross-env BABEL_ENV=gettext webpack",
+		"build": "cross-env NODE_ENV=production webpack",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
 		"predev": "check-node-version --package",
-		"dev": "cross-env BABEL_ENV=default webpack --watch",
+		"dev": "cross-env webpack --watch",
 		"test": "npm run lint && npm run test-unit",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
