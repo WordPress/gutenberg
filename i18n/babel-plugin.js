@@ -58,7 +58,7 @@ const DEFAULT_FUNCTIONS = {
 	__: [ 'msgid' ],
 	_n: [ 'msgid', 'msgid_plural' ],
 	_x: [ 'msgid', 'msgctxt' ],
-	_nx: [ 'msgid', 'msgctxt', 'msgid_plural' ],
+	_nx: [ 'msgid', 'msgid_plural', null, 'msgctxt' ],
 };
 
 /**
