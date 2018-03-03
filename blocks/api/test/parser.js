@@ -172,29 +172,31 @@ describe( 'block parser', () => {
 
 	describe( 'getAttributesFromDeprecatedVersion', () => {
 		it( 'should return undefined if the block has no deprecated versions', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const attributes = getAttributesFromDeprecatedVersion(
-				defaultBlockSettings,
-				'<span class="wp-block-test-block">Bananas</span>',
+				'core/test-block',
 				{},
+				'<span class="wp-block-test-block">Bananas</span>'
 			);
 			expect( attributes ).toBeUndefined();
 		} );
 
 		it( 'should return undefined if no valid deprecated version found', () => {
-			const attributes = getAttributesFromDeprecatedVersion(
-				{
-					name: 'core/test-block',
-					...defaultBlockSettings,
-					deprecated: [
-						{
-							save() {
-								return 'nothing';
-							},
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				deprecated: [
+					{
+						save() {
+							return 'nothing';
 						},
-					],
-				},
-				'<span class="wp-block-test-block">Bananas</span>',
+					},
+				],
+			} );
+
+			const attributes = getAttributesFromDeprecatedVersion(
+				'core/test-block',
 				{},
+				'<span class="wp-block-test-block">Bananas</span>'
 			);
 			expect( attributes ).toBeUndefined();
 			expect( console ).toHaveErrored();
@@ -202,26 +204,27 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should return the attributes parsed by the deprecated version', () => {
-			const attributes = getAttributesFromDeprecatedVersion(
-				{
-					name: 'core/test-block',
-					...defaultBlockSettings,
-					save: ( props ) => <div>{ props.attributes.fruit }</div>,
-					deprecated: [
-						{
-							attributes: {
-								fruit: {
-									type: 'string',
-									source: 'text',
-									selector: 'span',
-								},
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				save: ( props ) => <div>{ props.attributes.fruit }</div>,
+				deprecated: [
+					{
+						attributes: {
+							fruit: {
+								type: 'string',
+								source: 'text',
+								selector: 'span',
 							},
-							save: ( props ) => <span>{ props.attributes.fruit }</span>,
 						},
-					],
-				},
-				'<span class="wp-block-test-block">Bananas</span>',
+						save: ( props ) => <span>{ props.attributes.fruit }</span>,
+					},
+				],
+			} );
+
+			const attributes = getAttributesFromDeprecatedVersion(
+				'core/test-block',
 				{},
+				'<span class="wp-block-test-block">Bananas</span>'
 			);
 			expect( attributes ).toEqual( { fruit: 'Bananas' } );
 		} );

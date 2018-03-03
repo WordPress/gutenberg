@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://flickr.com/",
-            "caption": [
-                "Embedded content from flickr"
-            ]
+            "caption": "Embedded content from flickr"
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-flickr wp-block-embed\">\n    https://flickr.com/\n    <figcaption>Embedded content from flickr</figcaption>\n</figure>"

@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { castArray, get, isString } from 'lodash';
+import { map } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
+import { Fragment } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Toolbar, withState } from '@wordpress/components';
 
@@ -20,10 +21,11 @@ import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import RichText from '../../rich-text';
 
-const toRichTextValue = value => value.map( ( subValue => subValue.children ) );
-const fromRichTextValue = value => value.map( ( subValue ) => ( {
-	children: subValue,
-} ) );
+const toRichTextValue = ( value ) => map( value, 'children' ).join( '' );
+const fromRichTextValue = ( value ) => map(
+	new window.DOMParser().parseFromString( value, 'text/html' ).body.children,
+	( node ) => ( { children: node.outerHTML } )
+);
 
 const blockAttributes = {
 	value: {
@@ -112,7 +114,7 @@ export const settings = {
 					}
 					// transforming a quote with content
 					return ( value || [] ).map( item => createBlock( 'core/paragraph', {
-						content: [ get( item, 'children.props.children', '' ) ],
+						content: [ item.children ],
 					} ) ).concat( citation ? createBlock( 'core/paragraph', {
 						content: citation,
 					} ) : [] );
@@ -130,24 +132,18 @@ export const settings = {
 						} );
 					}
 
-					const firstValue = get( value, [ 0, 'children' ] );
-					const headingContent = castArray( isString( firstValue ) ?
-						firstValue :
-						get( firstValue, [ 'props', 'children' ], '' )
-					);
-
 					// if the quote content just contains a paragraph and no citation exist
 					// convert the quote content into and heading block.
 					if ( ! citation && value.length === 1 ) {
 						return createBlock( 'core/heading', {
-							content: headingContent,
+							content: value[ 0 ].children,
 						} );
 					}
 
 					// In the normal case convert the first paragraph of quote into an heading
 					// and create a new quote block equal tl what we had excluding the first paragraph
 					const heading = createBlock( 'core/heading', {
-						content: headingContent,
+						content: value[ 0 ].children,
 					} );
 
 					const quote = createBlock( 'core/quote', {
@@ -241,7 +237,7 @@ export const settings = {
 				style={ { textAlign: align ? align : null } }
 			>
 				{ value.map( ( paragraph, i ) => (
-					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
+					<Fragment key={ i }>{ paragraph.children }</Fragment>
 				) ) }
 				{ citation && citation.length > 0 && (
 					<cite>{ citation }</cite>
@@ -270,7 +266,7 @@ export const settings = {
 						style={ { textAlign: align ? align : null } }
 					>
 						{ value.map( ( paragraph, i ) => (
-							<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
+							<Fragment key={ i }>{ paragraph.children }</Fragment>
 						) ) }
 						{ citation && citation.length > 0 && (
 							<footer>{ citation }</footer>

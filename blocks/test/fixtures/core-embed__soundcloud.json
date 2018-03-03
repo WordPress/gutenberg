@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://soundcloud.com/",
-            "caption": [
-                "Embedded content from soundcloud"
-            ]
+            "caption": "Embedded content from soundcloud"
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-soundcloud wp-block-embed\">\n    https://soundcloud.com/\n    <figcaption>Embedded content from soundcloud</figcaption>\n</figure>"

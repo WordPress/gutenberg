@@ -61,12 +61,15 @@ describe( 'element', () => {
 	} );
 
 	describe( 'concatChildren', () => {
-		it( 'should return an empty array for undefined children', () => {
-			expect( concatChildren() ).toEqual( [] );
+		it( 'should return concatenated primitives', () => {
+			expect( concatChildren( 'a', 'b', 2 ) ).toBe( 'ab2' );
+			expect( concatChildren( [ 'a' ], 'b2' ) ).toEqual( 'ab2' );
+			expect( concatChildren( [ 'a' ], [ 'b', 2 ] ) ).toEqual( 'ab2' );
+			expect( concatChildren( [ 'a' ], [ 'b', null, false, 0 ] ) ).toEqual( 'ab0' );
 		} );
 
-		it( 'should concat the string arrays', () => {
-			expect( concatChildren( [ 'a' ], 'b' ) ).toEqual( [ 'a', 'b' ] );
+		it( 'should return null for undefined children', () => {
+			expect( concatChildren() ).toBe( null );
 		} );
 
 		it( 'should concat the object arrays and rewrite keys', () => {

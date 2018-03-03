@@ -43,7 +43,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	const attributes = reduce( blockType.attributes, ( result, source, key ) => {
+	let attributes = reduce( blockType.attributes, ( result, source, key ) => {
 		const value = blockAttributes[ key ];
 		if ( undefined !== value ) {
 			result[ key ] = value;
@@ -53,6 +53,8 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 
 		return result;
 	}, {} );
+
+	attributes = applyFilters( 'blocks.createBlock.attributes', attributes, name, blockAttributes, innerBlocks );
 
 	// Blocks are stored with a unique ID, the assigned type name,
 	// and the block attributes.
@@ -207,12 +209,14 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
-	let transformationResults;
-	if ( transformation.isMultiBlock ) {
-		transformationResults = transformation.transform( blocksArray.map( ( currentBlock ) => currentBlock.attributes ) );
-	} else {
-		transformationResults = transformation.transform( firstBlock.attributes );
+	const transformationArray = transformation.isMultiBlock ? blocksArray : [ firstBlock ];
+	let sourceBlocksAttributes = transformationArray.map( ( block ) => {
+		return applyFilters( 'blocks.switchToBlockType.sourceAttributes', block.attributes, sourceName );
+	} );
+	if ( ! transformation.isMultiBlock ) {
+		sourceBlocksAttributes = first( sourceBlocksAttributes );
 	}
+	let transformationResults = transformation.transform( sourceBlocksAttributes );
 
 	// Ensure that the transformation function returned an object or an array
 	// of objects.

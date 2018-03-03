@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
+import { isEmpty, reduce, isPlainObject, castArray, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
 import isEqualShallow from 'is-equal-shallow';
 
@@ -50,9 +50,19 @@ export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 		save = instance.render.bind( instance );
 	}
 
+	/**
+	 * Filters the attributes of a block before generating serialized result.
+	 * Avoid mutating the attribute value, as it should only be effective for
+	 * the duration of the serialization.
+	 *
+	 * @param {Object}      attributes Block attributes.
+	 * @param {WPBlockType} blockType  Block type definition.
+	 */
+	attributes = applyFilters( 'blocks.getSaveElement.attributes', attributes, blockType.name, innerBlocks );
+
 	let element = save( { attributes, innerBlocks } );
 
-	if ( isObject( element ) && hasFilter( 'blocks.getSaveContent.extraProps' ) ) {
+	if ( isPlainObject( element ) && hasFilter( 'blocks.getSaveContent.extraProps' ) ) {
 		/**
 		 * Filters the props applied to the block save result element.
 		 *

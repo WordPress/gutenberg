@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://spotify.com/",
-            "caption": [
-                "Embedded content from spotify"
-            ]
+            "caption": "Embedded content from spotify"
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-spotify wp-block-embed\">\n    https://spotify.com/\n    <figcaption>Embedded content from spotify</figcaption>\n</figure>"

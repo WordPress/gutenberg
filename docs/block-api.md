@@ -96,7 +96,7 @@ attributes: {
 	},
 	author: {
 		type: 'string',
-		source: 'children',
+		source: 'html',
 		selector: '.book-author',
 	},
 	pages: {

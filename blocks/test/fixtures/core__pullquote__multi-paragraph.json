@@ -6,45 +6,13 @@
         "attributes": {
             "value": [
                 {
-                    "children": {
-                        "type": "p",
-                        "key": null,
-                        "ref": null,
-                        "props": {
-                            "children": [
-                                "Paragraph ",
-                                {
-                                    "type": "strong",
-                                    "key": "_domReact71",
-                                    "ref": null,
-                                    "props": {
-                                        "children": "one"
-                                    },
-                                    "_owner": null,
-                                    "_store": {}
-                                }
-                            ]
-                        },
-                        "_owner": null,
-                        "_store": {}
-                    }
+                    "children": "<p>Paragraph <strong>one</strong></p>"
                 },
                 {
-                    "children": {
-                        "type": "p",
-                        "key": null,
-                        "ref": null,
-                        "props": {
-                            "children": "Paragraph two"
-                        },
-                        "_owner": null,
-                        "_store": {}
-                    }
+                    "children": "<p>Paragraph two</p>"
                 }
             ],
-            "citation": [
-                "by whomever"
-            ],
+            "citation": "by whomever",
             "align": "none"
         },
         "innerBlocks": [],

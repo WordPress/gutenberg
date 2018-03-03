@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://polldaddy.com/",
-            "caption": [
-                "Embedded content from polldaddy"
-            ]
+            "caption": "Embedded content from polldaddy"
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-polldaddy wp-block-embed\">\n    https://polldaddy.com/\n    <figcaption>Embedded content from polldaddy</figcaption>\n</figure>"
