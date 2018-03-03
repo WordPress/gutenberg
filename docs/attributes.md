@@ -53,28 +53,6 @@ Use `html` to extract the inner HTML from markup.
 // { "content": "The inner text of the <strong>figcaption</strong> element" }
 ```
 
-### `children`
-
-Use `children` to extract child nodes of the matched element, returned as an array of virtual elements. This is most commonly used in combination with the `RichText` component.
-
-_Example_: Extract child nodes from a paragraph of rich text.
-
-```js
-{
-	content: {
-		source: 'children',
-		selector: 'p'
-	}
-}
-// {
-//   "content": [
-//     "Vestibulum eu ",
-//     { "type": "strong", "children": "tortor" },
-//     " vel urna."
-//   ]
-// }
-```
-
 ### `query`
 
 Use `query` to extract an array of values from markup. Entries of the array are determined by the selector argument, where each matched element within the block will have an entry structured corresponding to the second argument, an object of attribute sources.

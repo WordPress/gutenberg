@@ -6,21 +6,10 @@
         "attributes": {
             "value": [
                 {
-                    "children": {
-                        "type": "p",
-                        "key": null,
-                        "ref": null,
-                        "props": {
-                            "children": "Testing pullquote block..."
-                        },
-                        "_owner": null,
-                        "_store": {}
-                    }
+                    "children": "<p>Testing pullquote block...</p>"
                 }
             ],
-            "citation": [
-                "...with a caption"
-            ],
+            "citation": "...with a caption",
             "align": "none"
         },
         "innerBlocks": [],

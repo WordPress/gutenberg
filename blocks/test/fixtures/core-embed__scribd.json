@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://scribd.com/",
-            "caption": [
-                "Embedded content from scribd"
-            ]
+            "caption": "Embedded content from scribd"
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-scribd wp-block-embed\">\n    https://scribd.com/\n    <figcaption>Embedded content from scribd</figcaption>\n</figure>"

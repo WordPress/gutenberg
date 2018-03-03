@@ -100,17 +100,31 @@ export function renderToString( element ) {
 /**
  * Concatenate two or more React children objects.
  *
- * @param {...?Object} childrenArguments Array of children arguments (array of arrays/strings/objects) to concatenate.
+ * @param {...*} childrenArguments Array of children arguments, where each is a
+ *                                 string or array of arrays, strings, objects.
  *
- * @return {Array} The concatenated value.
+ * @return {Element} The concatenated value.
  */
 export function concatChildren( ...childrenArguments ) {
-	return childrenArguments.reduce( ( memo, children, i ) => {
+	// Empty children argument set is rendered as empty.
+	if ( ! childrenArguments.length ) {
+		return null;
+	}
+
+	let isPrimitive = true;
+
+	const result = childrenArguments.reduce( ( memo, children, i ) => {
 		Children.forEach( children, ( child, j ) => {
-			if ( child && 'string' !== typeof child ) {
+			if ( typeof child === 'number' ) {
+				child = String( child );
+			}
+
+			if ( child && typeof child !== 'string' ) {
 				child = cloneElement( child, {
 					key: [ i, j ].join(),
 				} );
+
+				isPrimitive = false;
 			}
 
 			memo.push( child );
@@ -118,6 +132,13 @@ export function concatChildren( ...childrenArguments ) {
 
 		return memo;
 	}, [] );
+
+	// If every children argument is a primitive value, simply concatenate.
+	if ( isPrimitive ) {
+		return result.join( '' );
+	}
+
+	return result;
 }
 
 /**

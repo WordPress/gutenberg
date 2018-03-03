@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import {
 	last,
 	isEqual,
-	omitBy,
+	once,
 	forEach,
 	merge,
 	identity,
@@ -14,13 +14,12 @@ import {
 	noop,
 	reject,
 } from 'lodash';
-import { nodeListToReact } from 'dom-react';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString } from '@wordpress/element';
+import { Component, RawHTML } from '@wordpress/element';
 import { keycodes, createBlobURL, isHorizontalEdge } from '@wordpress/utils';
 import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
@@ -37,21 +36,32 @@ import { EVENTS } from './constants';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
-export function createTinyMCEElement( type, props, ...children ) {
-	if ( props[ 'data-mce-bogus' ] === 'all' ) {
-		return null;
-	}
+/**
+ * Given a NodeList or array of Node, returns the aggregated HTML of the nodes.
+ *
+ * @param {NodeList|Node[]} nodes NodeList or array of Node.
+ *
+ * @return {string} Node HTML.
+ */
+export const getNodesHTML = ( () => {
+	const getElement = once( () => {
+		let doc;
+		if ( document.implementation && document.implementation.createHTMLDocument ) {
+			doc = document.implementation.createHTMLDocument( '' );
+		} else {
+			doc = document;
+		}
 
-	if ( props.hasOwnProperty( 'data-mce-bogus' ) ) {
-		return children;
-	}
+		return doc.createElement( 'div' );
+	} );
 
-	return createElement(
-		type,
-		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
-		...children
-	);
-}
+	return ( nodes ) => {
+		const element = getElement();
+		element.innerHTML = '';
+		nodes.forEach( ( node ) => element.appendChild( node ) );
+		return element.innerHTML;
+	};
+} )();
 
 /**
  * Returns true if the node is the inline node boundary. This is used in node
@@ -114,18 +124,6 @@ export class RichText extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		const { value } = props;
-		if ( 'production' !== process.env.NODE_ENV && undefined !== value &&
-					! Array.isArray( value ) ) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Invalid value of type ${ typeof value } passed to RichText ` +
-				'(expected array). Attribute values should be sourced using ' +
-				'the `children` source when used with RichText.\n\n' +
-				'See: https://wordpress.org/gutenberg/handbook/block-api/attributes/#children'
-			);
-		}
-
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
@@ -145,6 +143,7 @@ export class RichText extends Component {
 			selectedNodeId: 0,
 		};
 
+		const { value } = props;
 		this.isEmpty = ! value || ! value.length;
 	}
 
@@ -530,8 +529,8 @@ export class RichText extends Component {
 				const index = dom.nodeIndex( selectedNode );
 				const beforeNodes = childNodes.slice( 0, index );
 				const afterNodes = childNodes.slice( index + 1 );
-				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
-				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
+				const beforeElement = getNodesHTML( beforeNodes );
+				const afterElement = getNodesHTML( afterNodes );
 
 				this.restoreContentAndSplit( beforeElement, afterElement );
 			} else {
@@ -590,8 +589,8 @@ export class RichText extends Component {
 			const beforeFragment = beforeRange.extractContents();
 			const afterFragment = afterRange.extractContents();
 
-			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = nodeListToReact( filterEmptyNodes( afterFragment.childNodes ), createTinyMCEElement );
+			const beforeElement = getNodesHTML( beforeFragment.childNodes );
+			const afterElement = getNodesHTML( filterEmptyNodes( afterFragment.childNodes ) );
 
 			this.restoreContentAndSplit( beforeElement, afterElement, blocks );
 		} else {
@@ -642,8 +641,8 @@ export class RichText extends Component {
 		this.setContent( this.props.value );
 
 		this.restoreContentAndSplit(
-			nodeListToReact( before, createTinyMCEElement ),
-			nodeListToReact( after, createTinyMCEElement )
+			getNodesHTML( before ),
+			getNodesHTML( after )
 		);
 	}
 
@@ -678,11 +677,11 @@ export class RichText extends Component {
 	}
 
 	setContent( content = '' ) {
-		this.editor.setContent( renderToString( content ) );
+		this.editor.setContent( content );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
+		return this.editor.getContent();
 	}
 
 	componentWillUnmount() {
@@ -695,13 +694,7 @@ export class RichText extends Component {
 			!! this.editor &&
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
-			this.props.value !== this.savedContent &&
-
-			// Comparing using isEqual is necessary especially to avoid unnecessary updateContent calls
-			// This fixes issues in multi richText blocks like quotes when moving the focus between
-			// the different editables.
-			! isEqual( this.props.value, prevProps.value ) &&
-			! isEqual( this.props.value, this.savedContent )
+			this.props.value !== this.savedContent
 		) {
 			this.updateContent();
 		}
@@ -856,4 +849,8 @@ RichText.defaultProps = {
 	formatters: [],
 };
 
-export default withSafeTimeout( RichText );
+const EnahncedRichText = withSafeTimeout( RichText );
+
+EnahncedRichText.Content = ( { value } ) => <RawHTML>{ value }</RawHTML>;
+
+export default EnahncedRichText;

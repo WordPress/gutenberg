@@ -6,6 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withState } from '@wordpress/components';
 
@@ -18,10 +19,12 @@ import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const toRichTextValue = value => map( value, ( subValue => subValue.children ) );
-const fromRichTextValue = value => map( value, ( subValue ) => ( {
-	children: subValue,
-} ) );
+const toRichTextValue = ( value ) => map( value, 'children' ).join( '' );
+const fromRichTextValue = ( value ) => map(
+	new window.DOMParser().parseFromString( value, 'text/html' ).body.children,
+	( node ) => ( { children: node.outerHTML } )
+);
+
 const blockAttributes = {
 	value: {
 		type: 'array',
@@ -118,9 +121,9 @@ export const settings = {
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				{ value && value.map( ( paragraph, i ) =>
-					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-				) }
+				{ value.map( ( paragraph, i ) => (
+					<Fragment key={ i }>{ paragraph.children }</Fragment>
+				) ) }
 				{ citation && citation.length > 0 && (
 					<cite>{ citation }</cite>
 				) }
@@ -143,9 +146,9 @@ export const settings = {
 
 			return (
 				<blockquote className={ `align${ align }` }>
-					{ value && value.map( ( paragraph, i ) =>
-						<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-					) }
+					{ value && value.map( ( paragraph, i ) => (
+						<Fragment key={ i }>{ paragraph.children }</Fragment>
+					) ) }
 					{ citation && citation.length > 0 && (
 						<footer>{ citation }</footer>
 					) }

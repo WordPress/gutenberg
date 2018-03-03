@@ -4,14 +4,7 @@
         "name": "core/heading",
         "isValid": true,
         "attributes": {
-            "content": [
-                "The ",
-                {
-                    "type": "em",
-                    "children": "Inserter"
-                },
-                " Tool"
-            ],
+            "content": "The <em>Inserter</em> Tool",
             "nodeName": "H2"
         },
         "innerBlocks": [],

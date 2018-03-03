@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://screencast.com/",
-            "caption": [
-                "Embedded content from screencast"
-            ]
+            "caption": "Embedded content from screencast"
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-screencast wp-block-embed\">\n    https://screencast.com/\n    <figcaption>Embedded content from screencast</figcaption>\n</figure>"

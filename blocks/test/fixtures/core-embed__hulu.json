@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://hulu.com/",
-            "caption": [
-                "Embedded content from hulu"
-            ]
+            "caption": "Embedded content from hulu"
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-embed-hulu wp-block-embed\">\n    https://hulu.com/\n    <figcaption>Embedded content from hulu</figcaption>\n</figure>"
