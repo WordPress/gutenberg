@@ -7,7 +7,7 @@ import './style.scss';
 
 function CheckboxControl( { label, heading, checked, help, instanceId, onChange, ...props } ) {
 	const id = `inspector-checkbox-control-${ instanceId }`;
-	const onChangeValue = ( event ) => onChange( event.target.value );
+	const onChangeValue = ( event ) => onChange( event.target.checked );
 
 	return (
 		<BaseControl label={ heading } id={ id } help={ help }>
