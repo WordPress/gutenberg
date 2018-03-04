@@ -2,7 +2,6 @@
  * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
-import { withSafeTimeout } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -151,6 +150,6 @@ const withDragging = ( OriginalComponent ) => {
 	}
 
 	return Draggable;
-};	
+};
 
 export default withDragging;

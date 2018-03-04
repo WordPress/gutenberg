@@ -19,7 +19,7 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { withFilters, withContext, withAPIData, withSafeTimeout, withDragging, } from '@wordpress/components';
+import { withFilters, withContext, withAPIData, withSafeTimeout, withDragging } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -453,7 +453,7 @@ export class BlockListBlock extends Component {
 			type: BLOCK_REORDER,
 			layout: this.props.layout,
 		};
-		
+
 		this.props.onDragStart( event, `block-${ this.props.uid }`, transferData );
 		this.props.setTimeout( () => this.setState( { dragging: true } ), 0 );
 	}
@@ -528,9 +528,9 @@ export class BlockListBlock extends Component {
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
-		const reorderWithDraggingProps = { 
-			draggable: true, 
-			onDragStart: this.onDragStart, 
+		const reorderWithDraggingProps = {
+			draggable: true,
+			onDragStart: this.onDragStart,
 			onDragEnd: this.onDragEnd,
 		};
 
