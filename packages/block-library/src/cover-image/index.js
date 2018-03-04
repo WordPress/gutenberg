@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -14,10 +15,10 @@ import { compose } from '@wordpress/compose';
 import {
 	BlockControls,
 	InspectorControls,
+	InnerBlocks,
 	BlockAlignmentToolbar,
 	MediaPlaceholder,
 	MediaUpload,
-	AlignmentToolbar,
 	PanelColorSettings,
 	RichText,
 	withColors,
@@ -62,6 +63,14 @@ const blockAttributes = {
 
 export const name = 'core/cover-image';
 
+const INNER_BLOCKS_TEMPLATE = [
+	[ 'core/paragraph', {
+		align: 'center',
+		fontSize: 'large',
+		placeholder: __( 'Write title…' ),
+	} ],
+];
+const INNER_BLOCKS_ALLOWED_BLOCKS = [ 'core/button', 'core/heading', 'core/paragraph' ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const settings = {
@@ -79,13 +88,6 @@ export const settings = {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/heading' ],
-				transform: ( { content } ) => (
-					createBlock( 'core/cover-image', { title: content } )
-				),
-			},
-			{
-				type: 'block',
 				blocks: [ 'core/image' ],
 				transform: ( { caption, url, align, id } ) => (
 					createBlock( 'core/cover-image', {
@@ -98,13 +100,6 @@ export const settings = {
 			},
 		],
 		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/heading' ],
-				transform: ( { title } ) => (
-					createBlock( 'core/heading', { content: title } )
-				),
-			},
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
@@ -131,8 +126,8 @@ export const settings = {
 		withColors( { overlayColor: 'background-color' } ),
 		withNotices,
 	] )(
-		( { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
-			const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
+		( { attributes, setAttributes, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
+			const { url, align, id, hasParallax, dimRatio } = attributes;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const onSelectImage = ( media ) => {
 				if ( ! media || ! media.url ) {
@@ -143,7 +138,6 @@ export const settings = {
 			};
 			const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 			const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
-			const setTitle = ( newTitle ) => setAttributes( { title: newTitle } );
 
 			const style = {
 				...backgroundImageStyles( url ),
@@ -152,7 +146,6 @@ export const settings = {
 
 			const classes = classnames(
 				className,
-				contentAlign !== 'center' && `has-${ contentAlign }-content`,
 				dimRatioToClass( dimRatio ),
 				{
 					'has-background-dim': dimRatio !== 0,
@@ -162,37 +155,29 @@ export const settings = {
 
 			const controls = (
 				<Fragment>
-					<BlockControls>
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ updateAlignment }
-						/>
-						{ !! url && (
-							<Fragment>
-								<AlignmentToolbar
-									value={ contentAlign }
-									onChange={ ( nextAlign ) => {
-										setAttributes( { contentAlign: nextAlign } );
-									} }
+					{ !! url && (
+						<BlockControls>
+							<BlockAlignmentToolbar
+								value={ align }
+								onChange={ updateAlignment }
+							/>
+							<Toolbar>
+								<MediaUpload
+									onSelect={ onSelectImage }
+									allowedTypes={ ALLOWED_MEDIA_TYPES }
+									value={ id }
+									render={ ( { open } ) => (
+										<IconButton
+											className="components-toolbar__control"
+											label={ __( 'Edit image' ) }
+											icon="edit"
+											onClick={ open }
+										/>
+									) }
 								/>
-								<Toolbar>
-									<MediaUpload
-										onSelect={ onSelectImage }
-										allowedTypes={ ALLOWED_MEDIA_TYPES }
-										value={ id }
-										render={ ( { open } ) => (
-											<IconButton
-												className="components-toolbar__control"
-												label={ __( 'Edit image' ) }
-												icon="edit"
-												onClick={ open }
-											/>
-										) }
-									/>
-								</Toolbar>
-							</Fragment>
-						) }
-					</BlockControls>
+							</Toolbar>
+						</BlockControls>
+					) }
 					{ !! url && (
 						<InspectorControls>
 							<PanelBody title={ __( 'Cover Image Settings' ) }>
@@ -226,16 +211,8 @@ export const settings = {
 			);
 
 			if ( ! url ) {
-				const hasTitle = ! RichText.isEmpty( title );
-				const icon = hasTitle ? undefined : 'format-image';
-				const label = hasTitle ? (
-					<RichText
-						tagName="h2"
-						value={ title }
-						onChange={ setTitle }
-						inlineToolbar
-					/>
-				) : __( 'Cover Image' );
+				const icon = 'format-image';
+				const label = ( 'Cover Image' );
 
 				return (
 					<Fragment>
@@ -265,16 +242,12 @@ export const settings = {
 						style={ style }
 						className={ classes }
 					>
-						{ ( ! RichText.isEmpty( title ) || isSelected ) && (
-							<RichText
-								tagName="p"
-								className="wp-block-cover-image-text"
-								placeholder={ __( 'Write title…' ) }
-								value={ title }
-								onChange={ setTitle }
-								inlineToolbar
+						<div className="wp-block-cover-image__inner-container">
+							<InnerBlocks
+								template={ INNER_BLOCKS_TEMPLATE }
+								allowedBlocks={ INNER_BLOCKS_ALLOWED_BLOCKS }
 							/>
-						) }
+						</div>
 					</div>
 				</Fragment>
 			);
@@ -282,7 +255,7 @@ export const settings = {
 	),
 
 	save( { attributes, className } ) {
-		const { url, title, hasParallax, dimRatio, align, contentAlign, overlayColor, customOverlayColor } = attributes;
+		const { url, hasParallax, dimRatio, align, overlayColor, customOverlayColor } = attributes;
 		const overlayColorClass = getColorClassName( 'background-color', overlayColor );
 		const style = backgroundImageStyles( url );
 		if ( ! overlayColorClass ) {
@@ -296,16 +269,15 @@ export const settings = {
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
-				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
 			},
 			align ? `align${ align }` : null,
 		);
 
 		return (
 			<div className={ classes } style={ style }>
-				{ ! RichText.isEmpty( title ) && (
-					<RichText.Content tagName="p" className="wp-block-cover-image-text" value={ title } />
-				) }
+				<div className="wp-block-cover-image__inner-container">
+					<InnerBlocks.Content />
+				</div>
 			</div>
 		);
 	},
@@ -314,7 +286,56 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			title: {
-				source: 'html',
+				type: 'array',
+				source: 'children',
+				selector: 'p',
+			},
+			contentAlign: {
+				type: 'string',
+				default: 'center',
+			},
+		},
+
+		save( { attributes, className } ) {
+			const { url, title, hasParallax, dimRatio, align, contentAlign } = attributes;
+			const style = backgroundImageStyles( url );
+			const classes = classnames(
+				className,
+				dimRatioToClass( dimRatio ),
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+					[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
+				},
+				align ? `align${ align }` : null,
+			);
+
+			return (
+				<div className={ classes } style={ style }>
+					{ title && title.length > 0 && (
+						<RichText.Content tagName="p" className="wp-block-cover-image-text" value={ title } />
+					) }
+				</div>
+			);
+		},
+
+		migrate( attributes ) {
+			return [
+				omit( attributes, [ 'title', 'contentAlign' ] ),
+				[ createBlock( 'core/paragraph', {
+					content: attributes.title,
+					align: attributes.contentAlign,
+					fontSize: 'large',
+					placeholder: __( 'Write title…' ),
+				} ) ],
+			];
+		},
+	}, {
+		attributes: {
+			...blockAttributes,
+			title: {
+				type: 'array',
+				source: 'children',
 				selector: 'h2',
 			},
 		},

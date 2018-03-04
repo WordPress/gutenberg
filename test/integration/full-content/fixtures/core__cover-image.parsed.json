@@ -3,10 +3,22 @@
         "blockName": "core/cover-image",
         "attrs": {
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
+            "id": 8398,
             "dimRatio": 40
         },
-        "innerBlocks": [],
-        "innerHTML": "\n<div class=\"wp-block-cover-image has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <p class=\"wp-block-cover-image-text\">Guten Berg!</p>\n</div>\n"
+        "innerBlocks": [
+            {
+                "blockName": "core/paragraph",
+                "attrs": {
+                    "align": "center",
+                    "placeholder": "Write title…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "innerHTML": "\n\t\t<p style=\"text-align:center\" class=\"has-large-font-size\">Paragraph 1</p>\n\t\t"
+            }
+        ],
+        "innerHTML": "\n<div class=\"wp-block-cover-image has-background-dim has-background-dim-40\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <div class=\"wp-block-cover-image__inner-container\">\n\t\t\n    </div>\n</div>\n"
     },
     {
         "blockName": null,

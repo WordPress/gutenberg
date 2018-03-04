@@ -1,3 +1,12 @@
+.wp-block-cover-image,
+.wp-block-cover-image.alignleft,
+.wp-block-cover-image.aligncenter,
+.wp-block-cover-image.alignright,
+.wp-block-cover-image.alignwide,
+.wp-block-cover-image.alignfull {
+	display: flex;
+}
+
 .wp-block-cover-image {
 	position: relative;
 	background-color: $black;
@@ -6,7 +15,7 @@
 	min-height: 430px;
 	width: 100%;
 	margin: 0 0 1.5em 0;
-	display: flex;
+
 	justify-content: center;
 	align-items: center;
 
@@ -81,5 +90,22 @@
 	&.alignright {
 		max-width: $content-width / 2;
 		width: 100%;
+	}
+
+	.wp-block-cover-image__inner-container {
+		width: calc(100% - 70px);
+		z-index: z-index(".wp-block-cover-image__inner-container");
+		color: $light-gray-100;
+	}
+
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	.wp-block-subhead {
+		color: inherit;
 	}
 }
