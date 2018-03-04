@@ -57,21 +57,20 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 	const reorderBlock = ( event, position ) => {
 		if ( index !== undefined && event.dataTransfer ) {
 			try {
-				const { uid, fromIndex, type } = JSON.parse( event.dataTransfer.getData( 'text' ) );
+				const { rootUID, uid, fromIndex, type, layout } = JSON.parse( event.dataTransfer.getData( 'text' ) );
 
-				if ( type !== BLOCK_REORDER ) {
+				if ( type !== BLOCK_REORDER || layout !== props.layout ) {
+					props.onDrop( event, null, null, null );
 					return;
 				}
 
 				if ( position.y === 'top' && index > fromIndex ) {
-					props.onDrop( event, uid, index - 1 );
-					return;
+					props.onDrop( event, rootUID, uid, index - 1 );
 				} else if ( position.y === 'bottom' && index < fromIndex ) {
-					props.onDrop( event, uid, index + 1 );
-					return;
+					props.onDrop( event, rootUID, uid, index + 1 );
+				} else {
+					props.onDrop( event, rootUID, uid, index );
 				}
-
-				props.onDrop( event, uid, index );
 			} catch ( err ) {
 				// console.log( err );
 			}

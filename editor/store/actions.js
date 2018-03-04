@@ -182,13 +182,16 @@ export function replaceBlock( uid, block ) {
 
 /**
  * @todo :clk:doc
- * @param  {[type]} uid   [description]
- * @param  {[type]} index [description]
- * @return {[type]}       [description]
+ * @param  {[type]} rootUID	[description]
+ * @param  {[type]} uid		[description]
+ * @param  {[type]} index	[description]
+ *
+ * @return {Object} Action object.
  */
-export function moveBlockToIndex( uid, index ) {
+export function moveBlockToIndex( rootUID, uid, index ) {
 	return {
 		type: 'MOVE_BLOCK_TO_INDEX',
+		rootUID,
 		uid,
 		index,
 	};

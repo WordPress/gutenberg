@@ -13,19 +13,20 @@ const dragImageClass = 'components-with-dragging__invisible-drag-image';
 const cloneWrapperClass = 'components-with-dragging__clone';
 const cloneHeightTransformationBreakpoint = 700;
 const clonePadding = 20;
+const context = {
+	cloneNodeId: null,
+	elementId: null,
+	cursorTop: null,
+	cursorLeft: null,
+};
 
 const withDragging = ( OriginalComponent ) => {
 	class Draggable extends Component {
 		constructor() {
 			super( ...arguments );
-
 			this.onDragStart = this.onDragStart.bind( this );
 			this.onDragOver = this.onDragOver.bind( this );
 			this.onDragEnd = this.onDragEnd.bind( this );
-			this.cursorTop = null;
-			this.cursorLeft = null;
-			this.cloneNodeId = null;
-			this.elementId = null;
 		}
 
 		/**
@@ -33,22 +34,21 @@ const withDragging = ( OriginalComponent ) => {
 		 * @param  {Object} event     The non-custom DragEvent.
 		 */
 		onDragEnd( event ) {
-			const element = document.getElementById( this.elementId );
-			const cloneWrapper = document.getElementById( this.cloneNodeId );
+			const element = document.getElementById( context.elementId );
+			const cloneWrapper = document.getElementById( context.cloneNodeId );
 
 			if ( element && cloneWrapper ) {
 				// Remove clone.
 				element.parentNode.removeChild( cloneWrapper );
+				context.elementId = null;
+				context.cloneNodeId = null;
 			}
 
 			// Reset cursor.
 			document.body.classList.remove( 'dragging' );
-
-			this.elementId = null;
-			this.cloneNodeId = null;
-
 			document.removeEventListener( 'dragover', this.onDragOver );
 			event.stopPropagation();
+			event.preventDefault();
 		}
 
 		/*
@@ -56,16 +56,16 @@ const withDragging = ( OriginalComponent ) => {
 		 * @param  {Object} event     The non-custom DragEvent.
 		 */
 		onDragOver( event ) {
-			const cloneWrapper = document.getElementById( this.cloneNodeId );
+			const cloneWrapper = document.getElementById( context.cloneNodeId );
 
 			cloneWrapper.style.top =
-				`${ parseInt( cloneWrapper.style.top, 10 ) + event.clientY - this.cursorTop }px`;
+				`${ parseInt( cloneWrapper.style.top, 10 ) + event.clientY - context.cursorTop }px`;
 			cloneWrapper.style.left =
-				`${ parseInt( cloneWrapper.style.left, 10 ) + event.clientX - this.cursorLeft }px`;
+				`${ parseInt( cloneWrapper.style.left, 10 ) + event.clientX - context.cursorLeft }px`;
 
 			// Update cursor coordinates.
-			this.cursorLeft = event.clientX;
-			this.cursorTop = event.clientY;
+			context.cursorLeft = event.clientX;
+			context.cursorTop = event.clientY;
 		}
 
 		/**
@@ -73,13 +73,16 @@ const withDragging = ( OriginalComponent ) => {
 		 *  - Adds a fake temporary drag image to avoid browser defaults.
 		 *  - Sets transfer data.
 		 *  - Adds dragover listener.
-		 * @param  {Object} event     The non-custom DragEvent.
-		 * @param  {string} uid       The unique identifier of the element to be dragged.
-		 * @param  {string} elementId The HTML id of the element to be dragged.
-		 * @param  {number} order     The current index of the element to be dragged.
-		 * @param  {string} type      A unique constant identifying the type of dragging operation.
+		 * @param  {Object} event					The non-custom DragEvent.
+		 * @param  {string} elementId				The HTML id of the element to be dragged.
+		 * @param  {Object} transferData			The data to be set to event's dataTransfer and will be made accessible in any later drop logic.
+		 * @param  {string} transferData.rootUID	A unique identifier of the element's root.
+		 * @param  {string} transferData.uid		A unique identifier of the element to be dragged.
+		 * @param  {number} transferData.order		The current index of the element to be dragged.
+		 * @param  {string} transferData.type		A unique constant identifying the type of dragging operation.
+		 * @param  {string} transferData.layout		A layout identifier used to distinguish nested elements.
 		 */
-		onDragStart( event, uid, elementId, order, type ) {
+		onDragStart( event, elementId, transferData ) {
 			const element = document.getElementById( elementId );
 			const elementWrapper = element.parentNode;
 			const elementRect = element.getBoundingClientRect();
@@ -89,12 +92,12 @@ const withDragging = ( OriginalComponent ) => {
 			const cloneWrapper = document.createElement( 'div' );
 			const dragImage = document.createElement( 'div' );
 
-			this.elementId = elementId;
-			this.cloneNodeId = `clone-wrapper-${ this.elementId }`;
+			context.elementId = elementId;
+			context.cloneNodeId = `clone-wrapper-${ elementId }`;
 
 			// Set a fake drag image to avoid browser defaults. Remove from DOM right after.
 			if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-				dragImage.id = `drag-image-${ this.elementId }`;
+				dragImage.id = `drag-image-${ context.elementId }`;
 				dragImage.classList.add( dragImageClass );
 				document.body.appendChild( dragImage );
 				event.dataTransfer.setDragImage( dragImage, 0, 0 );
@@ -103,18 +106,11 @@ const withDragging = ( OriginalComponent ) => {
 				} )( dragImage ), 0 );
 			}
 
-			event.dataTransfer.setData(
-				'text',
-				JSON.stringify( {
-					uid: uid,
-					fromIndex: order,
-					type: type,
-				} )
-			);
+			event.dataTransfer.setData( 'text', JSON.stringify( transferData ) );
 
 			// Prepare element clone and append to element wrapper.
-			clone.id = `clone-${ this.elementId }`;
-			cloneWrapper.id = this.cloneNodeId;
+			clone.id = `clone-${ context.elementId }`;
+			cloneWrapper.id = context.cloneNodeId;
 			cloneWrapper.classList.add( cloneWrapperClass );
 			cloneWrapper.style.width = `${ elementRect.width + ( clonePadding * 2 ) }px`;
 
@@ -135,8 +131,8 @@ const withDragging = ( OriginalComponent ) => {
 			elementWrapper.appendChild( cloneWrapper );
 
 			// Mark the current cursor coordinates.
-			this.cursorLeft = event.clientX;
-			this.cursorTop = event.clientY;
+			context.cursorLeft = event.clientX;
+			context.cursorTop = event.clientY;
 			// Update cursor to 'grabbing', document wide.
 			document.body.classList.add( 'dragging' );
 			document.addEventListener( 'dragover', this.onDragOver );

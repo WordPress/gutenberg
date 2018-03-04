@@ -167,6 +167,12 @@ export class BlockListBlock extends Component {
 		}
 	}
 
+	// shouldComponentUpdate(nextProps, nextState) {
+	// 	console.log(`next: ${nextState.dragging}` );
+	// 	console.log(`previous: ${this.state.dragging}`);
+	// 	return true;
+	// }
+
 	componentDidUpdate( prevProps ) {
 		// Preserve scroll prosition when block rearranged
 		if ( this.previousOffset ) {
@@ -440,19 +446,21 @@ export class BlockListBlock extends Component {
 	}
 
 	onDragStart( event ) {
-		this.props.onDragStart(
-			event,
-			this.props.uid,
-			`block-${ this.props.uid }`,
-			this.props.order,
-			BLOCK_REORDER
-		);
-		this.props.setTimeout( () => this.setDraggingState( true ), 0 );
+		const transferData = {
+			rootUID: this.props.rootUID,
+			uid: this.props.uid,
+			fromIndex: this.props.order,
+			type: BLOCK_REORDER,
+			layout: this.props.layout,
+		};
+		
+		this.props.onDragStart( event, `block-${ this.props.uid }`, transferData );
+		this.props.setTimeout( () => this.setState( { dragging: true } ), 0 );
 	}
 
 	onDragEnd( event ) {
 		this.props.onDragEnd( event );
-		this.setDraggingState( false );
+		this.setState( { dragging: false } );
 	}
 
 	/*
@@ -462,9 +470,9 @@ export class BlockListBlock extends Component {
 	 *    - We call the dragEnd handler here to ensure the dropzone does not prevent this call.
 	 *  - Initiate reordering.
 	 */
-	reorderBlock( event, uid, toIndex ) {
+	reorderBlock( event, rootUID, uid, toIndex ) {
 		this.onDragEnd( event );
-		this.props.moveBlockToIndex( uid, toIndex );
+		this.props.moveBlockToIndex( rootUID, uid, toIndex );
 	}
 
 	selectOnOpen( open ) {
@@ -520,6 +528,11 @@ export class BlockListBlock extends Component {
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
+		const reorderWithDraggingProps = { 
+			draggable: true, 
+			onDragStart: this.onDragStart, 
+			onDragEnd: this.onDragEnd,
+		};
 
 		// Generate the wrapper class names handling the different states of the block.
 		const wrapperClassName = classnames( 'editor-block-list__block', {
@@ -571,9 +584,8 @@ export class BlockListBlock extends Component {
 				{ ...wrapperProps }
 			>
 				<div
-					draggable={ true }
-					onDragStart={ this.onDragStart }
-					onDragEnd={ this.onDragEnd }
+					blockName={ blockName }
+					{ ...reorderWithDraggingProps }
 					className={ blockDragInsetClassName }
 				>
 					<div className="inner" ></div>
@@ -592,18 +604,14 @@ export class BlockListBlock extends Component {
 						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
-						draggable={ true }
-						onDragStart={ this.onDragStart }
-						onDragEnd={ this.onDragEnd }
+						{ ...reorderWithDraggingProps }
 					/>
 				) }
 				{ shouldShowSettingsMenu && (
 					<BlockSettingsMenu
 						uids={ [ block.uid ] }
 						renderBlockMenu={ renderBlockMenu }
-						draggable={ true }
-						onDragStart={ this.onDragStart }
-						onDragEnd={ this.onDragEnd }
+						{ ...reorderWithDraggingProps }
 					/>
 				) }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
@@ -750,8 +758,8 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
 	},
-	moveBlockToIndex( uid, index ) {
-		dispatch( moveBlockToIndex( uid, index ) );
+	moveBlockToIndex( rootUID, uid, index ) {
+		dispatch( moveBlockToIndex( rootUID, uid, index ) );
 	},
 } );
 
