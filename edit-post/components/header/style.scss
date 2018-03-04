@@ -25,6 +25,7 @@
 
 	@include break-medium() {
 		top: $admin-bar-height;
+		left: $admin-sidebar-width;
 	}
 
 	.editor-post-switch-to-draft + .editor-post-preview,
