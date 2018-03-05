@@ -218,14 +218,18 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 				return;
 			}
 
-			const newState = mapStateToProps( select, props );
-			if ( ! isEqualShallow( newState, this.state ) ) {
-				this.setState( newState );
+			const { mergeProps } = this.state;
+			const nextMergeProps = mapStateToProps( select, props );
+
+			if ( ! isEqualShallow( nextMergeProps, mergeProps ) ) {
+				this.setState( {
+					mergeProps: nextMergeProps,
+				} );
 			}
 		}
 
 		render() {
-			return <WrappedComponent { ...this.props } { ...this.state } />;
+			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
 		}
 	}
 

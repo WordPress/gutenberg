@@ -273,6 +273,27 @@ describe( 'withSelect', () => {
 
 			expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		} );
+
+		itWithExtraAssertions( 'omits props which are not returned on subsequent mappings', () => {
+			registerReducer( 'demo', ( state = 'OK' ) => state );
+			registerSelectors( 'demo', {
+				getValue: ( state ) => state,
+			} );
+
+			const Component = withSelectImplementation( ( _select, ownProps ) => {
+				return {
+					[ ownProps.propName ]: _select( 'demo' ).getValue(),
+				};
+			} )( () => <div /> );
+
+			wrapper = mount( <Component propName="foo" /> );
+
+			expect( wrapper.childAt( 0 ).props() ).toEqual( { foo: 'OK', propName: 'foo' } );
+
+			wrapper.setProps( { propName: 'bar' } );
+
+			expect( wrapper.childAt( 0 ).props() ).toEqual( { bar: 'OK', propName: 'bar' } );
+		} );
 	}
 
 	cases( withSelect );
