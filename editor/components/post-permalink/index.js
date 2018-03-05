@@ -230,7 +230,6 @@ class PostPermalink extends Component {
 							className="editor-post-permalink__save"
 							onClick={ this.onSavePermalink }
 							isPrimary
-							isLarge
 						>
 							{ __( 'Ok' ) }
 						</Button>
@@ -243,7 +242,6 @@ class PostPermalink extends Component {
 						onCopy={ this.onCopy }
 						ref={ this.bindCopyButton }
 						isPrimary
-						isLarge
 					>
 						{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
 					</ClipboardButton>
