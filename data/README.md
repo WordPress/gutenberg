@@ -136,8 +136,6 @@ unsubscribe();
 
 A higher-order component is a function which accepts a [component](https://github.com/WordPress/gutenberg/tree/master/element) and returns a new, enhanced component. A stateful user interface should respond to changes in the underlying state and updates its displayed element accordingly. WordPress uses higher-order components both as a means to separate the purely visual aspects of an interface from its data backing, and to ensure that the data is kept in-sync with the stores.
 
-In the React/Redux ecosystem, this distinction is often labelled [_Presentational and Container Components_](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0). [React Redux](https://github.com/reactjs/react-redux) is the official bindings between React and Redux for providing this behavior. The higher-order components offered in the data module are very much like React Redux's `connect` function, but offered as independent functions for retrieving and manipulating data: `withSelect` and `withDispatch`.
-
 #### `withSelect( mapSelectToProps: Function ): Function`
 
 Use `withSelect` to inject state-derived props into a component. Passed a function which returns an object mapping prop names to the subscribed data source, a higher-order component function is returned. The higher-order component can be used to enhance a presentational component, updating it automatically when state changes. The mapping function is passed the [`select` function](#select) and the props passed to the original component.
