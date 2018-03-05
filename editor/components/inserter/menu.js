@@ -60,7 +60,7 @@ export class InserterMenu extends Component {
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			tab: 'recent',
+			tab: 'frequent',
 			selectedItem: null,
 		};
 		this.filter = this.filter.bind( this );
@@ -69,7 +69,7 @@ export class InserterMenu extends Component {
 		this.sortItems = this.sortItems.bind( this );
 		this.selectItem = this.selectItem.bind( this );
 
-		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
+		this.tabScrollTop = { frequent: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
 		this.previewItem = this.previewItem.bind( this );
 	}
@@ -127,7 +127,7 @@ export class InserterMenu extends Component {
 
 		let predicate;
 		switch ( tab ) {
-			case 'recent':
+			case 'frequent':
 				return frecentItems;
 
 			case 'blocks':
@@ -147,7 +147,7 @@ export class InserterMenu extends Component {
 	}
 
 	sortItems( items ) {
-		if ( 'recent' === this.state.tab && ! this.state.filterValue ) {
+		if ( 'frequent' === this.state.tab && ! this.state.filterValue ) {
 			return items;
 		}
 
@@ -220,8 +220,8 @@ export class InserterMenu extends Component {
 	renderTabView( tab ) {
 		const itemsForTab = this.getItemsForTab( tab );
 
-		// If the Recent tab is selected, don't render category headers
-		if ( 'recent' === tab ) {
+		// If the Frequent tab is selected, don't render category headers
+		if ( 'frequent' === tab ) {
 			return this.renderItems( itemsForTab );
 		}
 
@@ -248,7 +248,7 @@ export class InserterMenu extends Component {
 
 	// Passed to TabbableContainer, extending its event-handling logic
 	eventToOffset( event ) {
-		// If a tab (Recent, Blocks, …) is focused, pressing the down arrow
+		// If a tab (Frequent, Blocks, …) is focused, pressing the down arrow
 		// moves focus to the selected panel below.
 		if (
 			event.keyCode === keycodes.DOWN &&
@@ -291,8 +291,8 @@ export class InserterMenu extends Component {
 						onSelect={ this.switchTab }
 						tabs={ [
 							{
-								name: 'recent',
-								title: __( 'Recent' ),
+								name: 'frequent',
+								title: __( 'Frequent' ),
 								className: 'editor-inserter__tab',
 							},
 							{
