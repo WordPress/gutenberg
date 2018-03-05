@@ -243,7 +243,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-edit-post',
 		gutenberg_url( 'edit-post/build/index.js' ),
-		array( 'jquery', 'heartbeat', 'wp-element', 'wp-components', 'wp-editor', 'wp-i18n', 'wp-date', 'wp-utils', 'wp-data', 'wp-embed', 'wp-viewport' ),
+		array( 'jquery', 'wp-element', 'wp-components', 'wp-editor', 'wp-i18n', 'wp-date', 'wp-utils', 'wp-data', 'wp-embed', 'wp-viewport' ),
 		filemtime( gutenberg_dir_path() . 'edit-post/build/index.js' ),
 		true
 	);
@@ -774,6 +774,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	gutenberg_extend_wp_api_backbone_client();
 
+	wp_enqueue_script( 'heartbeat' );
 	wp_enqueue_script( 'wp-edit-post' );
 
 	// Register `wp-utils` as a dependency of `word-count` to ensure that
