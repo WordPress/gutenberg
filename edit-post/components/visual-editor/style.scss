@@ -10,6 +10,20 @@
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
 	}
+
+	& ul,
+	& ol {
+		margin: 0;
+		padding: 0;
+	}
+
+	& ul:not(.wp-block-gallery) {
+		list-style-type: disc;
+	}
+
+	& ol {
+		list-style-type: decimal;
+	}
 }
 
 .edit-post-visual-editor .editor-block-list__block {
