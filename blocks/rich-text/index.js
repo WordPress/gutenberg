@@ -765,7 +765,7 @@ export class RichText extends Component {
 	 * @param {Array}  after  content after the split position
 	 * @param {?Array} blocks blocks to insert at the split position
 	 */
-	restoreContentAndSplit( before, after, blocks ) {
+	restoreContentAndSplit( before, after, blocks = [] ) {
 		this.updateContent();
 		this.props.onSplit( before, after, ...blocks );
 	}
