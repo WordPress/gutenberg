@@ -170,11 +170,11 @@ In the above example, when `HammerPriceDisplay` is rendered into an application,
 
 #### `withDispatch( mapDispatchToProps: Function ): Function`
 
-Use `withDispatch` to inject dispatching action props into your component. Passed a function which returns an object mapping prop names to action dispatchers, a higher-order component function is returned. The higher-order component can be used to enhance a presentational component, often providing callback behaviors for user interactions. The mapping function is passed the [`dispatch` function](#dispatch) and the props passed to the original component.
+Use `withDispatch` to inject dispatching action props into your component. Passed a function which returns an object mapping prop names to action dispatchers, a higher-order component function is returned. The higher-order component can be used to enhance a component. For example, you can define callback behaviors as props for responding to user interactions. The mapping function is passed the [`dispatch` function](#dispatch) and the props passed to the original component.
 
 ```jsx
 function Button( { onClick, children } ) {
-	return <button type="buttton" onClick={ onClick }>{ children }</button>;
+	return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
 const SaleButton = withDispatch( ( dispatch ) => {
