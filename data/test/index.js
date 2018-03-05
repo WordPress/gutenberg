@@ -253,6 +253,26 @@ describe( 'withSelect', () => {
 
 			store.dispatch( { type: 'increment' } );
 		} );
+
+		itWithExtraAssertions( 'should not rerun selection on unchanging state', () => {
+			const store = registerReducer( 'unchanging', ( state = {} ) => state );
+
+			registerSelectors( 'unchanging', {
+				getState: ( state ) => state,
+			} );
+
+			const mapSelectToProps = jest.fn();
+
+			const Component = compose( [
+				withSelectImplementation( mapSelectToProps ),
+			] )( () => <div /> );
+
+			wrapper = mount( <Component /> );
+
+			store.dispatch( { type: 'dummy' } );
+
+			expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		} );
 	}
 
 	cases( withSelect );
@@ -379,6 +399,16 @@ describe( 'subscribe', () => {
 		store.dispatch( { type: 'dummy' } );
 
 		expect( secondListener ).toHaveBeenCalled();
+	} );
+
+	it( 'does not call listeners if state has not changed', () => {
+		const store = registerReducer( 'unchanging', ( state = {} ) => state );
+		const listener = jest.fn();
+		subscribeWithUnsubscribe( listener );
+
+		store.dispatch( { type: 'dummy' } );
+
+		expect( listener ).not.toHaveBeenCalled();
 	} );
 } );
 
