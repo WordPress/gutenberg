@@ -13,7 +13,7 @@ const { registerStore } = wp.data;
 
 const DEFAULT_STATE = {
 	prices: {},
-	sale: false,
+	discountPercent: 0,
 };
 
 registerStore( 'my-shop', {
@@ -31,7 +31,7 @@ registerStore( 'my-shop', {
 			case 'START_SALE':
 				return {
 					...state,
-					sale: true,
+					discountPercent: action.discountPercent,
 				};
 		}
 
@@ -46,22 +46,20 @@ registerStore( 'my-shop', {
 				price,
 			};
 		},
-		startSale() {
+		startSale( discountPercent ) {
 			return {
 				type: 'START_SALE',
+				discountPercent,
 			};
 		},
 	},
 
 	selectors: {
 		getPrice( item ) {
-			const price = state.prices[ item ];
+			const { prices, discountPercent } = state;
+			const price = prices[ item ];
 
-			if ( state.sale ) {
-				return price * 0.8;
-			}
-
-			return price;
+			return price * ( 1 - ( 0.01 * discountPercent ) );
 		},
 	},
 } );
@@ -177,11 +175,14 @@ function Button( { onClick, children } ) {
 	return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
-const SaleButton = withDispatch( ( dispatch ) => {
+const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 	const { startSale } = dispatch( 'my-shop' );
+	const { discountPercent = 20 } = ownProps;
 
 	return {
-		onClick: startSale,
+		onClick() {
+			startSale( discountPercent );
+		},
 	};
 } );
 
