@@ -175,12 +175,7 @@ export function select( reducerKey ) {
 		if ( ! resolver ) {
 			return result;
 		}
-		const isFulfilled = resolver.isFulfilled( stores[ reducerKey ].getState(), ...args );
-		if ( isFulfilled ) {
-			// TODO: clear memize cache for these sepecific args
-		} else {
-			resolver.fulfill( ...args );
-		}
+		resolver.fulfill( ...args );
 
 		return result;
 	};
