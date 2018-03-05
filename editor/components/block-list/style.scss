@@ -410,9 +410,21 @@
 		transition: opacity 0.2s linear 0.5s;
 	}
 
+	&:focus {
+		outline: none;
+	}
+
+	// Show focus style when tabbing
 	&:focus:before {
 		opacity: 1;
 		transition: opacity 0.2s linear;
+		outline: 1px solid $dark-gray-300;
+		outline-offset: 2px;
+	}
+
+	// Don't show focus style when clicking
+	&:focus:active:before {
+		outline: none;
 	}
 }
 
