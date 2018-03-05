@@ -141,16 +141,6 @@ export const subscribe = ( listener ) => {
  * @return {*} The selector's returned value.
  */
 export function select( reducerKey ) {
-	if ( arguments.length > 1 ) {
-		deprecated( 'Calling select with multiple arguments', {
-			version: '2.4',
-			plugin: 'Gutenberg',
-		} );
-
-		const [ , selectorKey, ...args ] = arguments;
-		return select( reducerKey )[ selectorKey ]( ...args );
-	}
-
 	return selectors[ reducerKey ];
 }
 
