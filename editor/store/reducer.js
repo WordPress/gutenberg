@@ -411,6 +411,10 @@ export const editor = flow( [
 
 				return flow( [
 					( nextState ) => omit( nextState, uids ),
+					( nextState ) => ( {
+						...nextState,
+						...omit( mappedBlocks, '' ),
+					} ),
 					( nextState ) => mapValues( nextState, ( subState ) => (
 						reduce( subState, ( result, uid ) => {
 							if ( uid === uids[ 0 ] ) {
@@ -427,10 +431,7 @@ export const editor = flow( [
 							return result;
 						}, [] )
 					) ),
-				] )( {
-					...state,
-					...omit( mappedBlocks, '' ),
-				} );
+				] )( state );
 			}
 
 			case 'REMOVE_BLOCKS':
