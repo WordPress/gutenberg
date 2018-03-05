@@ -19,6 +19,7 @@ import {
 	isEditedPostNew,
 	isCurrentPostPublished,
 	getEditedPostAttribute,
+	getCurrentPost,
 } from '../../store/selectors';
 import { editPost } from '../../store/actions';
 
@@ -32,11 +33,18 @@ class PostPermalink extends Component {
 		super( ...arguments );
 		this.state = {
 			editingSlug: false,
-			permalink: '',
+			isEditable: false,
+			showCopyConfirmation: false,
+			slug: '',
 		};
 		this.bindCopyButton = this.bindNode.bind( this, 'copyButton' );
 		this.setFocus = this.setFocus.bind( this );
 		this.getSlug = this.getSlug.bind( this );
+		this.getStoredSlug = this.getStoredSlug.bind( this );
+		this.getSlugPrefix = this.getSlugPrefix.bind( this );
+		this.getSlugSuffix = this.getSlugSuffix.bind( this );
+		this.replaceTags = this.replaceTags.bind( this );
+		this.isModified = this.isModified.bind( this );
 		this.onChangePermalink = this.onChangePermalink.bind( this );
 		this.onEditPermalink = this.onEditPermalink.bind( this );
 		this.onSavePermalink = this.onSavePermalink.bind( this );
@@ -69,6 +77,24 @@ class PostPermalink extends Component {
 	}
 
 	/**
+	 * Do preliminary, client-side sanitization of the slug so that it represents
+	 * a valid URL segment.
+	 *
+	 * Note: The final sanitization is done at the server-side and can produce
+	 * a different result.
+	 *
+	 * @param {string} slug The slug to sanitize.
+	 * @return {string} Sanitized slug.
+	 */
+	sanitizeSlug( slug ) {
+		// TODO: Do complete client-side sanitization of the slug.
+		// The final version could be extracted into the '@wordpress/url' package.
+		slug = slug.replace( REGEXP_NEWLINES, ' ' );
+		slug = slug.split( ' ' ).join( '-' );
+		return slug + '-sanitized';
+	}
+
+	/**
 	 * Returns a permalink for a given post slug.
 	 *
 	 * @param {string} slug The post slug to insert in into the permalink.
@@ -76,32 +102,100 @@ class PostPermalink extends Component {
 	 * @returns {string} The full permalink.
 	 */
 	getPermalink( slug ) {
-		let permalink = this.props.link;
-		const samplePermalink = this.props.samplePermalink;
-		if ( samplePermalink ) {
-			permalink = samplePermalink[ 0 ].replace( '%postname%', slug || samplePermalink[ 1 ] );
+		const permalink = this.props.url + this.props.permalinkStructure;
+		return this.replaceTags( permalink, slug );
+	}
+
+	/**
+	 * Returns the currently modified slug for the current post.
+	 *
+	 * @return {string} The slug.
+	 */
+	getSlug() {
+		let slug = this.getStoredSlug();
+
+		if ( this.state.slug ) {
+			slug = this.state.slug;
 		}
+
+		return slug;
+	}
+
+	/**
+	 * Get the prefix for the modifiable permalink.
+	 *
+	 * This returns everything before a "%postname%" tag.
+	 *
+	 * @return {string} Prefix up to the "%postname%" tag.
+	 */
+	getSlugPrefix() {
+		return this.props.url + this.props.permalinkStructure.split( '%postname%' )[ 0 ];
+	}
+
+	/**
+	 * Get the suffix for the modifiable permalink.
+	 *
+	 * This returns everything after a "%postname%" tag.
+	 *
+	 * @return {string} Suffix after the "%postname%" tag.
+	 */
+	getSlugSuffix() {
+		return this.props.permalinkStructure.split( '%postname%' )[ 1 ];
+	}
+
+	/**
+	 * Replace tags in a permalink structure with actual values.
+	 *
+	 * @param {string} permalink Permalink structure to replace the tags in.
+	 * @param {string} slug Slug to use in replacements
+	 *
+	 * @return {string} Prepared permalink.
+	 */
+	replaceTags( permalink, slug ) {
+		// TODO: All tag implementations are missing except for "%postname%".
+		permalink = permalink.replace( '%year%', '2004' );
+		permalink = permalink.replace( '%monthnum%', '05' );
+		permalink = permalink.replace( '%day%', '28' );
+		permalink = permalink.replace( '%hour%', '15' );
+		permalink = permalink.replace( '%minute%', '43' );
+		permalink = permalink.replace( '%second%', '33' );
+		permalink = permalink.replace( '%post_id%', '423' );
+		permalink = permalink.replace( '%postname%', slug );
+		permalink = permalink.replace( '%category%', 'category-slug' );
+		permalink = permalink.replace( '%author%', 'author-name' );
 
 		return permalink;
 	}
 
 	/**
-	 * Returns the slug for the current post.
+	 * Returns the stored slug for the current post.
 	 *
 	 * @returns {string} The slug.
 	 */
-	getSlug() {
-		const { actualSlug, isPublished, samplePermalink } = this.props;
+	getStoredSlug() {
+		const { actualSlug, samplePermalink } = this.props;
+		let storedSlug = '';
 
-		if ( isPublished ) {
-			return actualSlug;
+		if ( actualSlug ) {
+			storedSlug = actualSlug;
 		}
 
-		if ( samplePermalink ) {
-			return samplePermalink[ 1 ];
+		if ( samplePermalink && samplePermalink[ 1 ] ) {
+			storedSlug = samplePermalink[ 1 ];
 		}
 
-		return '';
+		return storedSlug;
+	}
+
+	/**
+	 * Check whether the current slug has been modified.
+	 *
+	 * @return {boolean} Whether the slug was modified.
+	 */
+	isModified() {
+		const storedSlug = this.getStoredSlug();
+		return this.getSlug() !== storedSlug ||
+			'' === storedSlug;
 	}
 
 	/**
@@ -119,8 +213,8 @@ class PostPermalink extends Component {
 	 */
 	componentDidMount() {
 		this.setState( {
-			permalink: this.getPermalink(),
 			slug: this.getSlug(),
+			isEditable: this.props.permalinkStructure.includes( '%postname%' ),
 		} );
 	}
 
@@ -137,7 +231,6 @@ class PostPermalink extends Component {
 	componentWillReceiveProps() {
 		const slug = this.getSlug();
 		this.setState( {
-			permalink: this.getPermalink( slug ),
 			slug: slug,
 		} );
 	}
@@ -166,15 +259,17 @@ class PostPermalink extends Component {
 	 * Adapt state & props and focus the copy button when the permalink is saved.
 	 */
 	onSavePermalink() {
+		const slug = this.sanitizeSlug( this.state.slug );
 		this.setState(
 			{
 				editingSlug: false,
-				permalink: this.getPermalink( this.state.slug ),
+				slug: slug,
 			},
-			this.focusCopyButton
+			function savePermalink() {
+				this.props.onUpdate( slug );
+				this.focusCopyButton();
+			}
 		);
-		const newSlug = this.state.slug.replace( REGEXP_NEWLINES, ' ' );
-		this.props.onUpdate( newSlug );
 	}
 
 	/**
@@ -195,11 +290,13 @@ class PostPermalink extends Component {
 
 	render() {
 		const { isNew, link } = this.props;
-		const { editingSlug, permalink, slug } = this.state;
+		const { editingSlug, isEditable, showCopyConfirmation } = this.state;
+		const slug = this.getSlug();
+		const permalink = this.getPermalink( slug );
+
 		if ( isNew || ! link ) {
 			return null;
 		}
-		const prefix = permalink.replace( /[^/]+\/?$/, '' );
 
 		return (
 			<div className="editor-post-permalink">
@@ -207,16 +304,21 @@ class PostPermalink extends Component {
 				{ ! editingSlug &&
 					<Button
 						className="editor-post-permalink__link"
-						href={ addQueryArgs( this.props.link, { preview: true } ) }
+						href={ addQueryArgs( link, { preview: true } ) }
 						target="_blank"
 					>
-						{ permalink }
+						<span
+							className={ 'editor-post-permalink__permalink' + ( this.isModified() ? ' editor-post-permalink__permalink_modified' : '' ) }>
+							{ permalink }
+						</span>
 					</Button>
 				}
 				{ editingSlug &&
-					<form className="editor-post-permalink__slug-form" onSubmit={ this.onSavePermalink }>
+					<form
+						className="editor-post-permalink__slug-form"
+						onSubmit={ this.onSavePermalink }>
 						<span className="editor-post-permalink__prefix">
-							{ prefix }
+							{ this.replaceTags( this.getSlugPrefix() ) }
 						</span>
 						<input
 							type="text"
@@ -225,7 +327,9 @@ class PostPermalink extends Component {
 							onChange={ this.onChangePermalink }
 							required
 						/>
-						/
+						<span className="editor-post-permalink__suffix">
+							{ this.replaceTags( this.getSlugSuffix() ) }
+						</span>
 						<Button
 							className="editor-post-permalink__save"
 							onClick={ this.onSavePermalink }
@@ -243,10 +347,10 @@ class PostPermalink extends Component {
 						ref={ this.bindCopyButton }
 						isPrimary
 					>
-						{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
+						{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
 					</ClipboardButton>
 				}
-				{ ! editingSlug &&
+				{ ! editingSlug && isEditable &&
 					<Button
 						className="editor-post-permalink__edit button"
 						onClick={ this.onEditPermalink }
@@ -266,7 +370,11 @@ export default connect(
 			isPublished: isCurrentPostPublished( state ),
 			link: getEditedPostAttribute( state, 'link' ),
 			samplePermalink: getEditedPostAttribute( state, 'sample_permalink' ),
-			actualSlug: getEditedPostAttribute( state, 'slug' ),
+			actualSlug: getCurrentPost( state ).slug,
+
+			// TODO: How should these be fetched?
+			url: window.wpApiSettings.schema.url,
+			permalinkStructure: window.wpApiSettings.schema.permalink_structure,
 		};
 	},
 	{
