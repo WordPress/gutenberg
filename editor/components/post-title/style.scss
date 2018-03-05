@@ -1,29 +1,25 @@
 .editor-post-title {
 	position: relative;
 	padding: 5px 0;
-}
 
-.editor-post-title textarea.editor-post-title__input {
-	display: block;
-	width: 100%;
-	padding: #{ $block-padding + 5px } $block-padding;
-	margin: 0;
-	outline: none;
-	box-shadow: none;
-	border: 1px solid transparent;
-	border-radius: 0;
-	transition: 0.2s outline;
-	font-size: 2em;
-	font-family: $editor-font;
-	line-height: $default-line-height;
+	.editor-post-title__input {
+		display: block;
+		width: 100%;
+		padding: #{ $block-padding + 5px } $block-padding;
+		margin: 0;
+		box-shadow: none;
+		border: 1px solid transparent;
+		font-size: 2em;
+		font-family: $editor-font;
+		line-height: $default-line-height;
 
-	// inherited from h1
-	font-weight: 600;
+		// inherited from h1
+		font-weight: 600;
+	}
 
-	&:hover,
-	&:focus {
+	&.is-selected .editor-post-title__input,
+	.editor-post-title__input:focus {
 		border: 1px solid $light-gray-500;
-		transition: 0.2s outline;
 	}
 }
 
