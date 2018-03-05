@@ -20,14 +20,11 @@
 }
 
 .editor-block-inspector__card-icon {
-	display: flex;
-	justify-content: center;
-	align-items: center;
 	border: 1px solid $light-gray-700;
+	padding: 7px;
 	margin-right: 10px;
 	height: 36px;
 	width: 36px;
-	min-width: 36px;
 }
 
 .editor-block-inspector__card-content {
