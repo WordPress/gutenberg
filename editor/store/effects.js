@@ -375,7 +375,7 @@ export default {
 			},
 			( error ) => {
 				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
-				const message = __( 'An unknown error occured.' );
+				const message = __( 'An unknown error occurred.' );
 				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
 					id: REUSABLE_BLOCK_NOTICE_ID,
 					spokenMessage: message,
@@ -430,7 +430,7 @@ export default {
 					id,
 					optimist: { type: REVERT, id: transactionId },
 				} );
-				const message = __( 'An unknown error occured.' );
+				const message = __( 'An unknown error occurred.' );
 				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
 					id: REUSABLE_BLOCK_NOTICE_ID,
 					spokenMessage: message,
