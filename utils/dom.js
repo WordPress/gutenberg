@@ -36,6 +36,11 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 		return true;
 	}
 
+	// If the container is empty, the caret is always at the edge.
+	if ( tinymce.DOM.isEmpty( container ) ) {
+		return true;
+	}
+
 	const selection = window.getSelection();
 	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 	if ( collapseRanges ) {
@@ -58,14 +63,8 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 	}
 
 	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
-	const editor = tinymce.get( node.id );
 
-	if (
-		! isReverse &&
-		offset !== maxOffset &&
-		// content editables with only a BR element are considered empty
-		( ! editor || ! editor.dom.isEmpty( node ) )
-	) {
+	if ( ! isReverse && offset !== maxOffset ) {
 		return false;
 	}
 
