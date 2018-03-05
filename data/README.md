@@ -79,8 +79,6 @@ The return value of `registerStore` is a [Redux-like store object](https://redux
    - _Redux parallel:_ [`getState`](https://redux.js.org/api-reference/store#getState)
 - `store.subscribe( listener: Function )`: Registers a function called any time the value of state changes.
    - _Redux parallel:_ [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
-   - Differences from Redux:
-      - In Redux, a subscriber is called on every dispatch, regardless of whether a change has occurred. In `@wordpress/data`, a subscriber is only called when state has changed.
 - `store.dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
    - _Redux parallel:_ [`dispatch`](https://redux.js.org/api-reference/store#dispatch(action))
 
@@ -199,3 +197,12 @@ const SaleButton = withDispatch( ( dispatch ) => {
 The data module shares many of the same [core principles](https://redux.js.org/introduction/three-principles) and [API method naming](https://redux.js.org/api-reference) of [Redux](https://redux.js.org/). In fact, it is implemented atop Redux. Where it differs is in establishing a modularization pattern for creating separate but interdependent stores, and in codifying conventions such as selector functions as the primary entry point for data access.
 
 The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](https://github.com/WordPress/gutenberg/tree/master/element#compose)).
+
+Specific implementation differences from Redux and React Redux:
+
+- In Redux, a `subscribe` listener is called on every dispatch, regardless of whether the value of state has changed.
+   - In `@wordpress/data`, a subscriber is only called when state has changed.
+- In React Redux, a `mapStateToProps` function must return an object.
+   - In `@wordpress/data`, a `withSelect` mapping function can return `undefined` if it has no props to inject.
+- In React Redux, the `mapDispatchToProps` argument can be defined as an object or a function.
+   - In `@wordpress/data`, the `withDispatch` higher-order component creator must be passed a function.
