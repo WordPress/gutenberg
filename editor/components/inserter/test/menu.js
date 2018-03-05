@@ -88,13 +88,13 @@ describe( 'InserterMenu', () => {
 	// wrapper.find have had to be strengthened (and the filterWhere strengthened also), otherwise two
 	// results would be returned even though only one was in the DOM.
 
-	it( 'should show the recent tab by default', () => {
+	it( 'should show the frequent tab by default', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ [] }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 				blockTypes
@@ -102,7 +102,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Recent' );
+		expect( activeCategory.text() ).toBe( 'Frequent' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks ).toHaveLength( 0 );
@@ -114,7 +114,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ [] }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -124,13 +124,13 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks ).toHaveLength( 0 );
 	} );
 
-	it( 'should show the recently used items in the recent tab', () => {
+	it( 'should show the frequently used items in the frequent tab', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [ advancedTextItem, textItem, someOtherItem ] }
+				frecentItems={ [ advancedTextItem, textItem, someOtherItem ] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -149,7 +149,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -173,7 +173,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -196,7 +196,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -222,7 +222,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ items }
+				frecentItems={ items }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -239,7 +239,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>
@@ -262,7 +262,7 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchReusableBlocks={ noop }
 			/>

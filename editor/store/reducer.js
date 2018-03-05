@@ -656,17 +656,12 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					id += '/' + block.attributes.ref;
 				}
 
-				const isSameAsInsert = ( { name, ref } ) => name === insert.name && ref === insert.ref;
-
 				return {
 					...prevState,
-					recentInserts: [
-						insert,
-						...reject( prevState.recentInserts, isSameAsInsert ),
-					],
 					insertUsage: {
 						...prevState.insertUsage,
 						[ id ]: {
+							time: Date.now(),
 							count: prevState.insertUsage[ id ] ? prevState.insertUsage[ id ].count + 1 : 1,
 							insert,
 						},
@@ -678,7 +673,6 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 			return {
 				...state,
 				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
-				recentInserts: reject( state.recentInserts, insert => insert.ref === action.id ),
 			};
 	}
 
