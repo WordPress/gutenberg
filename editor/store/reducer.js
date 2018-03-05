@@ -16,6 +16,7 @@ import {
 	omitBy,
 	keys,
 	isEqual,
+	includes,
 } from 'lodash';
 
 /**
@@ -600,6 +601,48 @@ export function blockSelection( state = {
 	return state;
 }
 
+/**
+ * Reducer returning the UID of the provisional block. A provisional block is
+ * one which is to be removed if it does not receive updates in the time until
+ * the next selection or block reset.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function provisionalBlockUID( state = null, action ) {
+	switch ( action.type ) {
+		case 'INSERT_BLOCKS':
+			if ( action.isProvisional ) {
+				return first( action.blocks ).uid;
+			}
+			break;
+
+		case 'RESET_BLOCKS':
+			return null;
+
+		case 'UPDATE_BLOCK_ATTRIBUTES':
+		case 'UPDATE_BLOCK':
+		case 'CONVERT_BLOCK_TO_REUSABLE':
+			const { uid } = action;
+			if ( uid === state ) {
+				return null;
+			}
+			break;
+
+		case 'REPLACE_BLOCKS':
+		case 'REMOVE_BLOCKS':
+			const { uids } = action;
+			if ( includes( uids, state ) ) {
+				return null;
+			}
+			break;
+	}
+
+	return state;
+}
+
 export function blocksMode( state = {}, action ) {
 	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
 		const { uid } = action;
@@ -839,6 +882,7 @@ export default optimist( combineReducers( {
 	currentPost,
 	isTyping,
 	blockSelection,
+	provisionalBlockUID,
 	blocksMode,
 	isInsertionPointVisible,
 	preferences,

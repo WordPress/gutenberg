@@ -72,6 +72,7 @@ const {
 	isPublishingPost,
 	getInserterItems,
 	getFrecentInserterItems,
+	getProvisionalBlockUID,
 	POST_UPDATE_TRANSACTION_ID,
 } = selectors;
 
@@ -2707,6 +2708,24 @@ describe( 'selectors', () => {
 			} );
 
 			expect( isPublishing ).toBe( true );
+		} );
+	} );
+
+	describe( 'getProvisionalBlockUID()', () => {
+		it( 'should return null if not set', () => {
+			const provisionalBlockUID = getProvisionalBlockUID( {
+				provisionalBlockUID: null,
+			} );
+
+			expect( provisionalBlockUID ).toBe( null );
+		} );
+
+		it( 'should return UID of provisional block', () => {
+			const provisionalBlockUID = getProvisionalBlockUID( {
+				provisionalBlockUID: 'chicken',
+			} );
+
+			expect( provisionalBlockUID ).toBe( 'chicken' );
 		} );
 	} );
 } );

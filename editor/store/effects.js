@@ -52,6 +52,7 @@ import {
 	getBlocks,
 	getReusableBlock,
 	getProvisionalBlockUID,
+	isBlockSelected,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
@@ -72,8 +73,9 @@ const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
  * @return {?Object} Remove action, if provisional block is set.
  */
 export function removeProvisionalBlock( action, store ) {
-	const provisionalBlockUID = getProvisionalBlockUID( store.getState() );
-	if ( provisionalBlockUID ) {
+	const state = store.getState();
+	const provisionalBlockUID = getProvisionalBlockUID( state );
+	if ( provisionalBlockUID && ! isBlockSelected( state, provisionalBlockUID ) ) {
 		return removeBlock( provisionalBlockUID );
 	}
 }
