@@ -219,7 +219,7 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 			}
 
 			const { mergeProps } = this.state;
-			const nextMergeProps = mapStateToProps( select, props );
+			const nextMergeProps = mapStateToProps( select, props ) || {};
 
 			if ( ! isEqualShallow( nextMergeProps, mergeProps ) ) {
 				this.setState( {

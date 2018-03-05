@@ -294,6 +294,33 @@ describe( 'withSelect', () => {
 
 			expect( wrapper.childAt( 0 ).props() ).toEqual( { bar: 'OK', propName: 'bar' } );
 		} );
+
+		itWithExtraAssertions( 'allows undefined return from mapSelectToProps', () => {
+			registerReducer( 'demo', ( state = 'OK' ) => state );
+			registerSelectors( 'demo', {
+				getValue: ( state ) => state,
+			} );
+
+			const Component = withSelectImplementation( ( _select, ownProps ) => {
+				if ( ownProps.pass ) {
+					return {
+						count: _select( 'demo' ).getValue(),
+					};
+				}
+			} )( ( props ) => <div>{ props.count || 'Unknown' }</div> );
+
+			wrapper = mount( <Component pass={ false } /> );
+
+			expect( wrapper.childAt( 0 ).text() ).toBe( 'Unknown' );
+
+			wrapper.setProps( { pass: true } );
+
+			expect( wrapper.childAt( 0 ).text() ).toBe( 'OK' );
+
+			wrapper.setProps( { pass: false } );
+
+			expect( wrapper.childAt( 0 ).text() ).toBe( 'Unknown' );
+		} );
 	}
 
 	cases( withSelect );
