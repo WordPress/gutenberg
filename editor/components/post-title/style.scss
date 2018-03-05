@@ -6,6 +6,14 @@
 		position: absolute;
 		top: 35px;
 		left: 0px;
+		&:focus {
+			outline: none;
+			box-shadow: none;
+		}
+	}
+
+	.editor-post-title__permalink-popover {
+		margin-bottom: 50px;
 	}
 
 	.editor-post-permalink {

@@ -7,6 +7,7 @@
 	font-family: $default-font;
 	font-size: $default-font-size;
 	height: 40px;
+	width: 742px;
 
 	// put toolbar snugly to edge on mobile
 	margin-left: -$block-padding - 1px;	// stack borders
@@ -19,6 +20,7 @@
 
 .editor-post-permalink__label {
 	margin: 0 10px;
+	font-weight: bold;
 }
 
 .editor-post-permalink__link {
