@@ -379,7 +379,7 @@ export class BlockListBlock extends Component {
 	 * @return {void}
 	 */
 	onFocus() {
-		if ( ! this.props.isSelected ) {
+		if ( ! this.props.isSelected && ! this.props.isMultiSelected ) {
 			this.props.onSelect();
 		}
 	}
