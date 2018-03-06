@@ -1,20 +1,3 @@
-
-/**
- * Returns an action object used in signalling that the user switched the active
- * sidebar tab panel.
- *
- * @param  {string} sidebar Sidebar name
- * @param  {string} panel   Panel name
- * @return {Object}         Action object
- */
-export function setGeneralSidebarActivePanel( sidebar, panel ) {
-	return {
-		type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
-		sidebar,
-		panel,
-	};
-}
-
 /**
  * Returns an action object used in signalling that the user opened a sidebar.
  *

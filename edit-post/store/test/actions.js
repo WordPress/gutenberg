@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	setGeneralSidebarActivePanel,
 	toggleGeneralSidebarEditorPanel,
 	openGeneralSidebar,
 	closeGeneralSidebar,
@@ -15,16 +14,6 @@ import {
 } from '../actions';
 
 describe( 'actions', () => {
-	describe( 'setGeneralSidebarActivePanel', () => {
-		it( 'should return SET_GENERAL_SIDEBAR_ACTIVE_PANEL action', () => {
-			expect( setGeneralSidebarActivePanel( 'editor', 'document' ) ).toEqual( {
-				type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
-				sidebar: 'editor',
-				panel: 'document',
-			} );
-		} );
-	} );
-
 	describe( 'openGeneralSidebar', () => {
 		it( 'should return OPEN_GENERAL_SIDEBAR action', () => {
 			const sidebar = 'sidebarName';

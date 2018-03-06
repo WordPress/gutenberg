@@ -32,14 +32,6 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					[ action.sidebar ]: activeSidebarPanel,
 				},
 			};
-		case 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL':
-			return {
-				...state,
-				activeSidebarPanel: {
-					...state.activeSidebarPanel,
-					[ action.sidebar ]: action.panel,
-				},
-			};
 		case 'CLOSE_GENERAL_SIDEBAR':
 			return {
 				...state,

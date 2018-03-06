@@ -15,7 +15,7 @@ import { withSelect } from '@wordpress/data';
  * Internal Dependencies
  */
 import { getActiveEditorPanel } from '../../store/selectors';
-import { closeGeneralSidebar, setGeneralSidebarActivePanel } from '../../store/actions';
+import { closeGeneralSidebar, openGeneralSidebar } from '../../store/actions';
 
 const SidebarHeader = ( { panel, onSetPanel, onCloseSidebar, count } ) => {
 	// Do not display "0 Blocks".
@@ -55,7 +55,7 @@ export default compose(
 			panel: getActiveEditorPanel( state ),
 		} ),
 		{
-			onSetPanel: setGeneralSidebarActivePanel.bind( null, 'editor' ),
+			onSetPanel: openGeneralSidebar.bind( null, 'editor' ),
 			onCloseSidebar: closeGeneralSidebar,
 		},
 		undefined,
