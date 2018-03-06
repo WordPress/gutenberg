@@ -86,20 +86,6 @@ body.gutenberg-editor-page {
 		box-sizing: border-box;
 	}
 
-	ul:not(.wp-block-gallery) {
-		list-style-type: disc;
-	}
-
-	ol:not(.wp-block-gallery) {
-		list-style-type: decimal;
-	}
-
-	ul,
-	ol {
-		margin: 0;
-		padding: 0;
-	}
-
 	select {
 		font-size: $default-font-size;
 		color: $dark-gray-500;
