@@ -80,26 +80,29 @@ export default {
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).done( ( newPost ) => {
-			dispatch( resetPost( newPost ) );
-			dispatch( {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				previousPost: post,
-				post: newPost,
-				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
-		} ).fail( ( err ) => {
-			dispatch( {
-				type: 'REQUEST_POST_UPDATE_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
-				post,
-				edits,
-				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
-		} );
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
+			( newPost ) => {
+				dispatch( resetPost( newPost ) );
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_SUCCESS',
+					previousPost: post,
+					post: newPost,
+					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+				} );
+			},
+			( err ) => {
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_FAILURE',
+					error: get( err, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+					post,
+					edits,
+					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+				} );
+			}
+		);
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
