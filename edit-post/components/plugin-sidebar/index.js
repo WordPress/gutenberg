@@ -17,6 +17,8 @@ import { Slot, Fill } from '@wordpress/components';
  */
 const SLOT_NAME = 'PluginSidebar';
 
+//TODO Error boundaries
+
 class PluginSidebar extends Component {
 	constructor( props ) {
 		super( props );
@@ -30,13 +32,13 @@ class PluginSidebar extends Component {
 	}
 
 	render() {
-		const { title, name, children, activePlugin } = this.props;
+		const { children } = this.props;
 		return <Fill name={ SLOT_NAME }>{ children }</Fill>;
 	}
 }
 
 PluginSidebar.contextTypes = {
-	getSlot: noop,
+	plugin: noop,
 };
 
 PluginSidebar.Slot = () => <Slot name={ SLOT_NAME } />;

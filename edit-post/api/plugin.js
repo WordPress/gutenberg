@@ -4,10 +4,10 @@
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
-import { Fragment } from '@wordpress/element';
+import { createContext, Component } from '@wordpress/element';
 
 /* External dependencies */
-import { isFunction, map, isEmpty } from 'lodash';
+import { isFunction, map, noop } from 'lodash';
 
 /* Internal dependencies */
 // import store from '../store';
@@ -51,18 +51,47 @@ export function registerPlugin( settings ) {
 		return null;
 	}
 
+	plugins.context = createContext();
+
 	return plugins[ settings.name ] = settings;
 }
 
-export function Plugins() {
-	return (
-		<div id="plugin-fills" style={ { display: 'none' } }>
-			<Fragment>
-				{ map( plugins, plugin => {
-					console.log( plugin.render() );
-					return plugin.render();
-				} ) }
-			</Fragment>
-		</div>
-	);
+class ContextProvider extends Component {
+	getChildContext() {
+		return {
+			plugin: this.props.plugin,
+		};
+	}
+
+	render() {
+		return this.props.children;
+	}
 }
+
+ContextProvider.childContextTypes = {
+	plugin: noop,
+};
+
+class Plugins extends Component {
+	render() {
+		return (
+			<div id="plugin-fills" style={ { display: 'none' } }>
+				{ map( plugins, plugin => {
+					const Context = plugin.context;
+					return (
+						<Context.Provider key={ plugin.name } value={ plugin.name }>
+							{ plugin.render() }
+						</Context.Provider>
+					);
+					// return (
+					// 	<ContextProvider key={ plugin.name } plugin={ plugin }>
+					// 		{ plugin.render() }
+					// 	</ContextProvider>
+					// );
+				} ) }
+			</div>
+		);
+	}
+}
+
+export { Plugins };
