@@ -1,7 +1,7 @@
 export {
 	registerSidebar as __experimentalRegisterSidebar,
-	activateSidebar as __experimentalActivateSidebar,
 } from './sidebar';
 export {
 	registerPlugin,
+	activateSidebar,
 } from './plugin';

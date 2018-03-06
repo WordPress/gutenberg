@@ -35,12 +35,10 @@ import {
 	isFeatureActive,
 	getOpenedGeneralSidebar,
 	isPublishSidebarOpened,
-	getActivePlugin,
 	getMetaBoxes,
 } from '../../store/selectors';
 import { closePublishSidebar } from '../../store/actions';
-import PluginsPanel from '../../components/plugins-panel/index.js';
-import { getSidebarSettings } from '../../api/sidebar';
+import { PluginSidebarSlot } from '../../components/plugin-sidebar/index.js';
 import { Plugins } from '../../api/plugin';
 
 function GeneralSidebar( { openedGeneralSidebar } ) {
@@ -48,7 +46,7 @@ function GeneralSidebar( { openedGeneralSidebar } ) {
 		case 'editor':
 			return <Sidebar />;
 		case 'plugin':
-			return <PluginsPanel />;
+			return <PluginSidebarSlot />;
 		default:
 	}
 	return null;
@@ -61,13 +59,10 @@ function Layout( {
 	openedGeneralSidebar,
 	hasFixedToolbar,
 	onClosePublishSidebar,
-	plugin,
 	metaBoxes,
 } ) {
-	const isSidebarOpened = layoutHasOpenSidebar &&
-		( openedGeneralSidebar !== 'plugin' || getSidebarSettings( plugin ) );
 	const className = classnames( 'edit-post-layout', {
-		'is-sidebar-opened': isSidebarOpened,
+		'is-sidebar-opened': layoutHasOpenSidebar,
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
@@ -114,7 +109,6 @@ export default connect(
 		openedGeneralSidebar: getOpenedGeneralSidebar( state ),
 		publishSidebarOpen: isPublishSidebarOpened( state ),
 		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
-		plugin: getActivePlugin( state ),
 		metaBoxes: getMetaBoxes( state ),
 	} ),
 	{

@@ -7,14 +7,16 @@ import PropTypes from 'prop-types';
 /**
  * WordPress dependencies
  */
-import { Component, Children, cloneElement } from '@wordpress/element';
-import { Slot, Fill } from '@wordpress/components';
+import { Component, Children, cloneElement, compose } from '@wordpress/element';
+import { Slot, Fill, IconButton, withFocusReturn } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { getActivePlugin } from '../../store/selectors';
+import './style.scss';
+import { getActivePlugin, getOpenedGeneralSidebar } from '../../store/selectors';
+import { closeGeneralSidebar } from '../../store/actions';
 
 /**
  * Name of slot in which popover should fill.
@@ -56,15 +58,38 @@ class PluginSidebar extends Component {
 	}
 
 	render() {
+		if ( ! this.namespacedName ) {
+			this.namespacedName = `${ this.context.namespace }/${ this.props.name }`;
+		}
+		if ( this.props.activePlugin !== this.namespacedName ) {
+			return null;
+		}
+
 		const { children, ...props } = this.props;
 		const newProps = {
 			...props,
-			namespacedName: `${ this.context.namespace }/${ this.props.name }`,
+			namespacedName: this.namespacedName,
 		};
 
 		return (
 			<Fill name={ SLOT_NAME }>
-				{ cloneElement( Children.only( children ), newProps ) }
+				<div
+					className="edit-post-sidebar edit-post-plugins-panel"
+					role="region"
+					aria-label={ __( 'Editor plugins' ) }
+					tabIndex="-1">
+					<div className="edit-post-plugins-panel__header">
+						<h3>{ this.props.title }</h3>
+						<IconButton
+							onClick={ this.props.onClose }
+							icon="no-alt"
+							label={ __( 'Close settings' ) }
+						/>
+					</div>
+					<div className="edit-post-plugins-panel__content">
+						{ cloneElement( Children.only( children ), newProps ) }
+					</div>
+				</div>
 			</Fill>
 		);
 	}
@@ -74,8 +99,19 @@ PluginSidebar.contextTypes = {
 	namespace: PropTypes.string.isRequired,
 };
 
-PluginSidebar.Slot = () => ( <SidebarErrorBoundary><Slot name={ SLOT_NAME } /></SidebarErrorBoundary> );
+const PluginSidebarSlot = () => ( <SidebarErrorBoundary><Slot name={ SLOT_NAME } /></SidebarErrorBoundary> );
 
-export default connect( ( state ) => ( {
-	activePlugins: getActivePlugin( state ),
-} ) )( PluginSidebar );
+const PluginSidebarFill = compose( [
+	connect(
+		( state ) => ( {
+			activePlugin: getActivePlugin( state ),
+			openedGeneralSidebar: getOpenedGeneralSidebar( state ),
+		} ), {
+			onClose: closeGeneralSidebar,
+		},
+		null,
+		{ storeKey: 'edit-post' } ),
+	withFocusReturn,
+] )( PluginSidebar );
+
+export { PluginSidebarFill, PluginSidebarSlot };

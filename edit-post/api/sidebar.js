@@ -4,8 +4,6 @@
 import { isFunction } from 'lodash';
 
 /* Internal dependencies */
-import store from '../store';
-import { setGeneralSidebarActivePanel, openGeneralSidebar } from '../store/actions';
 import { applyFilters } from '@wordpress/hooks';
 
 const sidebars = {};
@@ -70,29 +68,4 @@ export function registerSidebar( name, settings ) {
 	settings = applyFilters( 'editor.registerSidebar', settings, name );
 
 	return sidebars[ name ] = settings;
-}
-
-/**
- * Retrieves the sidebar settings object.
- *
- * @param {string} name The name of the sidebar to retrieve the settings for.
- *
- * @return {Object} The settings object of the sidebar. Or null if the
- *                         sidebar doesn't exist.
- */
-export function getSidebarSettings( name ) {
-	if ( ! sidebars.hasOwnProperty( name ) ) {
-		return null;
-	}
-	return sidebars[ name ];
-}
-/**
- * Activates the given sidebar.
- *
- * @param  {string} name The name of the sidebar to activate.
- * @return {void}
- */
-export function activateSidebar( name ) {
-	store.dispatch( openGeneralSidebar( 'plugin' ) );
-	store.dispatch( setGeneralSidebarActivePanel( 'plugin', name ) );
 }
