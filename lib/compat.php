@@ -362,35 +362,78 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
 add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );
 
 /**
- * Add additional 'public' rest api field to taxonomies.
+ * Add additional 'visibility' rest api field to taxonomies.
  *
  * Used so private taxonomies are not displayed in the UI.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42707
  */
-function gutenberg_add_taxonomy_public_field() {
+function gutenberg_add_taxonomy_visibility_field() {
 	register_rest_field(
 		'taxonomy',
-		'public',
+		'visibility',
 		array(
-			'get_callback'    => 'get_post_meta_for_api',
-			'schema'          => array(
-				'description' => __( 'Whether taxonomy is public.', 'gutenberg' ),
-				'type'        => 'boolean',
+			'get_callback' => 'gutenberg_get_taxonomy_visibility_data',
+			'schema'       => array(
+				'description' => __( 'The visibility settings for the taxonomy.' ),
+				'type'        => 'object',
 				'context'     => array( 'edit' ),
 				'readonly'    => true,
+				'properties'  => array(
+					'public'             => array(
+						'description' => __( 'Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.' ),
+						'type'        => 'boolean',
+					),
+					'publicly_queryable' => array(
+						'description' => __( 'Whether the taxonomy is publicly queryable.' ),
+						'type'        => 'boolean',
+					),
+					'show_ui'            => array(
+						'description' => __( 'Whether to generate a default UI for managing this taxonomy.' ),
+						'type'        => 'boolean',
+					),
+					'show_admin_column'  => array(
+						'description' => __( 'Whether to allow automatic creation of taxonomy columns on associated post-types table.' ),
+						'type'        => 'boolean',
+					),
+					'show_in_nav_menus'  => array(
+						'description' => __( 'Whether to make the taxonomy available for selection in navigation menus.' ),
+						'type'        => 'boolean',
+					),
+					'show_in_quick_edit' => array(
+						'description' => __( 'Whether to show the taxonomy in the quick/bulk edit panel.' ),
+						'type'        => 'boolean',
+					),
+				),
 			),
 		)
 	);
 }
 
 /**
- * Gets taxonomy public property.
+ * Gets taxonomy visibility property data.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42707
  *
  * @param array $object Taxonomy data from REST API.
- * @return boolean Whether the taxonomy is public.
+ * @return array Array of taxonomy visibility data.
  */
-function get_post_meta_for_api( $object ) {
+function gutenberg_get_taxonomy_visibility_data( $object ) {
+	// Just return existing data for up-to-date Core.
+	if ( isset( $object['visibility'] ) ) {
+		return $object['visibility'];
+	}
+
 	$taxonomy = get_taxonomy( $object['slug'] );
-	return $taxonomy->public;
+
+	return array(
+		'public'             => $taxonomy->public,
+		'publicly_queryable' => $taxonomy->publicly_queryable,
+		'show_ui'            => $taxonomy->show_ui,
+		'show_admin_column'  => $taxonomy->show_admin_column,
+		'show_in_nav_menus'  => $taxonomy->show_in_nav_menus,
+		'show_in_quick_edit' => $taxonomy->show_ui,
+	);
 }
 
-add_action( 'rest_api_init', 'gutenberg_add_taxonomy_public_field' );
+add_action( 'rest_api_init', 'gutenberg_add_taxonomy_visibility_field' );
