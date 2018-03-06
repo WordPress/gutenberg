@@ -3,11 +3,6 @@
 /* External dependencies */
 import { isFunction } from 'lodash';
 
-/**
- * WordPress dependencies
- */
-import { dispatch } from '@wordpress/data';
-
 /* Internal dependencies */
 import { applyFilters } from '@wordpress/hooks';
 
@@ -73,28 +68,4 @@ export function registerSidebar( name, settings ) {
 	settings = applyFilters( 'editor.registerSidebar', settings, name );
 
 	return sidebars[ name ] = settings;
-}
-
-/**
- * Retrieves the sidebar settings object.
- *
- * @param {string} name The name of the sidebar to retrieve the settings for.
- *
- * @return {Object} The settings object of the sidebar. Or null if the
- *                         sidebar doesn't exist.
- */
-export function getSidebarSettings( name ) {
-	if ( ! sidebars.hasOwnProperty( name ) ) {
-		return null;
-	}
-	return sidebars[ name ];
-}
-/**
- * Activates the given sidebar.
- *
- * @param  {string} name The name of the sidebar to activate.
- * @return {void}
- */
-export function activateSidebar( name ) {
-	dispatch( 'core/edit-post' ).openGeneralSidebar( name );
 }

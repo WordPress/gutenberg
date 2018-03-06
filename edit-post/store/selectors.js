@@ -5,11 +5,6 @@ import createSelector from 'rememo';
 import { includes, some } from 'lodash';
 
 /**
- * Internal dependencies
- */
-import { getSidebarSettings } from '../api/sidebar';
-
-/**
  * Returns the current editing mode.
  *
  * @param {Object} state Global application state.
@@ -41,7 +36,7 @@ export function isEditorSidebarOpened( state ) {
 export function isPluginSidebarOpened( state ) {
 	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
 
-	return Boolean( getSidebarSettings( activeGeneralSidebar ) );
+	return activeGeneralSidebar ? activeGeneralSidebar.startsWith( 'plugin/' ) : false;
 }
 
 /**

@@ -11,8 +11,10 @@ import { isFunction, map } from 'lodash';
 import PropTypes from 'prop-types';
 
 /* Internal dependencies */
-// import store from '../store';
-// import { setGeneralSidebarActivePanel, openGeneralSidebar } from '../store/actions';
+import store from '../store';
+import {
+	openGeneralSidebar,
+} from '../store/actions';
 
 const plugins = {};
 
@@ -85,6 +87,16 @@ class Plugins extends Component {
 			</div>
 		);
 	}
+}
+
+/**
+ * Activates the given sidebar.
+ *
+ * @param  {string} name The name of the sidebar to activate.
+ * @return {void}
+ */
+export function activateSidebar( name ) {
+	store.dispatch( openGeneralSidebar( 'plugin', name ) );
 }
 
 export { Plugins };
