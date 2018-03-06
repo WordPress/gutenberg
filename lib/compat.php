@@ -375,33 +375,33 @@ function gutenberg_add_taxonomy_visibility_field() {
 		array(
 			'get_callback' => 'gutenberg_get_taxonomy_visibility_data',
 			'schema'       => array(
-				'description' => __( 'The visibility settings for the taxonomy.' ),
+				'description' => __( 'The visibility settings for the taxonomy.', 'gutenberg' ),
 				'type'        => 'object',
 				'context'     => array( 'edit' ),
 				'readonly'    => true,
 				'properties'  => array(
 					'public'             => array(
-						'description' => __( 'Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.' ),
+						'description' => __( 'Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.', 'gutenberg' ),
 						'type'        => 'boolean',
 					),
 					'publicly_queryable' => array(
-						'description' => __( 'Whether the taxonomy is publicly queryable.' ),
+						'description' => __( 'Whether the taxonomy is publicly queryable.', 'gutenberg' ),
 						'type'        => 'boolean',
 					),
 					'show_ui'            => array(
-						'description' => __( 'Whether to generate a default UI for managing this taxonomy.' ),
+						'description' => __( 'Whether to generate a default UI for managing this taxonomy.', 'gutenberg' ),
 						'type'        => 'boolean',
 					),
 					'show_admin_column'  => array(
-						'description' => __( 'Whether to allow automatic creation of taxonomy columns on associated post-types table.' ),
+						'description' => __( 'Whether to allow automatic creation of taxonomy columns on associated post-types table.', 'gutenberg' ),
 						'type'        => 'boolean',
 					),
 					'show_in_nav_menus'  => array(
-						'description' => __( 'Whether to make the taxonomy available for selection in navigation menus.' ),
+						'description' => __( 'Whether to make the taxonomy available for selection in navigation menus.', 'gutenberg' ),
 						'type'        => 'boolean',
 					),
 					'show_in_quick_edit' => array(
-						'description' => __( 'Whether to show the taxonomy in the quick/bulk edit panel.' ),
+						'description' => __( 'Whether to show the taxonomy in the quick/bulk edit panel.', 'gutenberg' ),
 						'type'        => 'boolean',
 					),
 				),
