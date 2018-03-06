@@ -18,7 +18,7 @@ describe( 'PostSavedState', () => {
 				isSaveable={ false } />
 		);
 
-		expect( wrapper.text() ).toBe( 'Saving' );
+		expect( wrapper.text() ).toContain( 'Saving' );
 	} );
 
 	it( 'returns null if the post is not saveable', () => {

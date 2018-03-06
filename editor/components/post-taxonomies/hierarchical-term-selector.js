@@ -221,7 +221,7 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	render() {
-		const { label, slug, taxonomy, instanceId } = this.props;
+		const { slug, taxonomy, instanceId } = this.props;
 		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
@@ -248,54 +248,52 @@ class HierarchicalTermSelector extends Component {
 		const inputId = `editor-post-taxonomies__hierarchical-terms-input-${ instanceId }`;
 
 		/* eslint-disable jsx-a11y/no-onchange */
-		return (
-			<div className="editor-post-taxonomies__hierarchical-terms-selector">
-				<h3 className="editor-post-taxonomies__hierarchical-terms-selector-title">{ label }</h3>
-				{ this.renderTerms( availableTermsTree ) }
-				{ ! loading &&
-					<button
-						onClick={ this.onToggleForm }
-						className="button-link editor-post-taxonomies__hierarchical-terms-add"
-						aria-expanded={ showForm }
+		return [
+			...this.renderTerms( availableTermsTree ),
+			! loading && (
+				<button
+					key="term-add-button"
+					onClick={ this.onToggleForm }
+					className="button-link editor-post-taxonomies__hierarchical-terms-add"
+					aria-expanded={ showForm }
+				>
+					{ newTermButtonLabel }
+				</button>
+			),
+			showForm && (
+				<form onSubmit={ this.onAddTerm } key="hierarchical-terms-form">
+					<label
+						htmlFor={ inputId }
+						className="editor-post-taxonomies__hierarchical-terms-label"
 					>
-						{ newTermButtonLabel }
-					</button>
-				}
-				{ showForm &&
-					<form onSubmit={ this.onAddTerm }>
-						<label
-							htmlFor={ inputId }
-							className="editor-post-taxonomies__hierarchical-terms-label"
-						>
-							{ newTermLabel }
-						</label>
-						<input
-							type="text"
-							id={ inputId }
-							className="editor-post-taxonomies__hierarchical-terms-input"
-							value={ formName }
-							onChange={ this.onChangeFormName }
-							required
+						{ newTermLabel }
+					</label>
+					<input
+						type="text"
+						id={ inputId }
+						className="editor-post-taxonomies__hierarchical-terms-input"
+						value={ formName }
+						onChange={ this.onChangeFormName }
+						required
+					/>
+					{ !! availableTerms.length &&
+						<TreeSelect
+							label={ parentSelectLabel }
+							noOptionLabel={ noParentOption }
+							onChange={ this.onChangeFormParent }
+							selectedId={ formParent }
+							tree={ availableTermsTree }
 						/>
-						{ !! availableTerms.length &&
-							<TreeSelect
-								label={ parentSelectLabel }
-								noOptionLabel={ noParentOption }
-								onChange={ this.onChangeFormParent }
-								selectedId={ formParent }
-								tree={ availableTermsTree }
-							/>
-						}
-						<button
-							type="submit"
-							className="button editor-post-taxonomies__hierarchical-terms-submit"
-						>
-							{ newTermSubmitLabel }
-						</button>
-					</form>
-				}
-			</div>
-		);
+					}
+					<button
+						type="submit"
+						className="button editor-post-taxonomies__hierarchical-terms-submit"
+					>
+						{ newTermSubmitLabel }
+					</button>
+				</form>
+			),
+		];
 		/* eslint-enable jsx-a11y/no-onchange */
 	}
 }

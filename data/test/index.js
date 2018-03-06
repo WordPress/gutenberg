@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
+import { noop, flowRight } from 'lodash';
 import { mount } from 'enzyme';
 
 /**
  * WordPress dependencies
  */
+import { deprecated } from '@wordpress/utils';
 import { compose } from '@wordpress/element';
 
 /**
@@ -21,7 +23,12 @@ import {
 	withSelect,
 	withDispatch,
 	subscribe,
+	query,
 } from '../';
+
+jest.mock( '@wordpress/utils', () => ( {
+	deprecated: jest.fn(),
+} ) );
 
 describe( 'registerStore', () => {
 	it( 'should be shorthand for reducer, actions, selectors registration', () => {
@@ -95,16 +102,23 @@ describe( 'select', () => {
 
 		expect( select( 'reducer', 'selector', 'arg' ) ).toEqual( 'result' );
 		expect( selector ).toBeCalledWith( store.getState(), 'arg' );
-		expect( console ).toHaveWarned();
+		expect( deprecated ).toHaveBeenCalled();
 	} );
 } );
 
 describe( 'withSelect', () => {
+	let wrapper;
+
 	const unsubscribes = [];
 	afterEach( () => {
 		let unsubscribe;
 		while ( ( unsubscribe = unsubscribes.shift() ) ) {
 			unsubscribe();
+		}
+
+		if ( wrapper ) {
+			wrapper.unmount();
+			wrapper = null;
 		}
 	} );
 
@@ -114,135 +128,169 @@ describe( 'withSelect', () => {
 		return unsubscribe;
 	}
 
-	it( 'passes the relevant data to the component', () => {
-		registerReducer( 'reactReducer', () => ( { reactKey: 'reactState' } ) );
-		registerSelectors( 'reactReducer', {
-			reactSelector: ( state, key ) => state[ key ],
+	function cases( withSelectImplementation, extraAssertions = noop ) {
+		function itWithExtraAssertions( description, test ) {
+			return it( description, flowRight( test, extraAssertions ) );
+		}
+
+		itWithExtraAssertions( 'passes the relevant data to the component', () => {
+			registerReducer( 'reactReducer', () => ( { reactKey: 'reactState' } ) );
+			registerSelectors( 'reactReducer', {
+				reactSelector: ( state, key ) => state[ key ],
+			} );
+
+			// In normal circumstances, the fact that we have to add an arbitrary
+			// prefix to the variable name would be concerning, and perhaps an
+			// argument that we ought to expect developer to use select from the
+			// wp.data export. But in-fact, this serves as a good deterrent for
+			// including both `withSelect` and `select` in the same scope, which
+			// shouldn't occur for a typical component, and if it did might wrongly
+			// encourage the developer to use `select` within the component itself.
+			const Component = withSelectImplementation( ( _select, ownProps ) => ( {
+				data: _select( 'reactReducer' ).reactSelector( ownProps.keyName ),
+			} ) )( ( props ) => <div>{ props.data }</div> );
+
+			wrapper = mount( <Component keyName="reactKey" /> );
+
+			// Wrapper is the enhanced component. Find props on the rendered child.
+			const child = wrapper.childAt( 0 );
+			expect( child.props() ).toEqual( {
+				keyName: 'reactKey',
+				data: 'reactState',
+			} );
+			expect( wrapper.text() ).toBe( 'reactState' );
 		} );
 
-		// In normal circumstances, the fact that we have to add an arbitrary
-		// prefix to the variable name would be concerning, and perhaps an
-		// argument that we ought to expect developer to use select from the
-		// wp.data export. But in-fact, this serves as a good deterrent for
-		// including both `withSelect` and `select` in the same scope, which
-		// shouldn't occur for a typical component, and if it did might wrongly
-		// encourage the developer to use `select` within the component itself.
-		const Component = withSelect( ( _select, ownProps ) => ( {
-			data: _select( 'reactReducer' ).reactSelector( ownProps.keyName ),
-		} ) )( ( props ) => <div>{ props.data }</div> );
+		itWithExtraAssertions( 'should rerun selection on state changes', () => {
+			registerReducer( 'counter', ( state = 0, action ) => {
+				if ( action.type === 'increment' ) {
+					return state + 1;
+				}
 
-		const wrapper = mount( <Component keyName="reactKey" /> );
+				return state;
+			} );
 
-		// Wrapper is the enhanced component. Find props on the rendered child.
-		const child = wrapper.childAt( 0 );
-		expect( child.props() ).toEqual( {
-			keyName: 'reactKey',
-			data: 'reactState',
-		} );
-		expect( wrapper.text() ).toBe( 'reactState' );
+			registerSelectors( 'counter', {
+				getCount: ( state ) => state,
+			} );
 
-		wrapper.unmount();
-	} );
+			registerActions( 'counter', {
+				increment: () => ( { type: 'increment' } ),
+			} );
 
-	it( 'should rerun selection on state changes', () => {
-		registerReducer( 'counter', ( state = 0, action ) => {
-			if ( action.type === 'increment' ) {
-				return state + 1;
-			}
+			const Component = compose( [
+				withSelectImplementation( ( _select ) => ( {
+					count: _select( 'counter' ).getCount(),
+				} ) ),
+				withDispatch( ( _dispatch ) => ( {
+					increment: _dispatch( 'counter' ).increment,
+				} ) ),
+			] )( ( props ) => (
+				<button onClick={ props.increment }>
+					{ props.count }
+				</button>
+			) );
 
-			return state;
-		} );
+			wrapper = mount( <Component /> );
 
-		registerSelectors( 'counter', {
-			getCount: ( state ) => state,
-		} );
+			const button = wrapper.find( 'button' );
 
-		registerActions( 'counter', {
-			increment: () => ( { type: 'increment' } ),
+			button.simulate( 'click' );
+
+			expect( button.text() ).toBe( '1' );
 		} );
 
-		const Component = compose( [
-			withSelect( ( _select ) => ( {
-				count: _select( 'counter' ).getCount(),
-			} ) ),
-			withDispatch( ( _dispatch ) => ( {
-				increment: _dispatch( 'counter' ).increment,
-			} ) ),
-		] )( ( props ) => (
-			<button onClick={ props.increment }>
-				{ props.count }
-			</button>
-		) );
+		itWithExtraAssertions( 'should rerun selection on props changes', () => {
+			registerReducer( 'counter', ( state = 0, action ) => {
+				if ( action.type === 'increment' ) {
+					return state + 1;
+				}
 
-		const wrapper = mount( <Component /> );
+				return state;
+			} );
 
-		const button = wrapper.find( 'button' );
+			registerSelectors( 'counter', {
+				getCount: ( state, offset ) => state + offset,
+			} );
 
-		button.simulate( 'click' );
+			const Component = withSelectImplementation( ( _select, ownProps ) => ( {
+				count: _select( 'counter' ).getCount( ownProps.offset ),
+			} ) )( ( props ) => <div>{ props.count }</div> );
 
-		expect( button.text() ).toBe( '1' );
+			wrapper = mount( <Component offset={ 0 } /> );
 
-		wrapper.unmount();
-	} );
+			wrapper.setProps( { offset: 10 } );
 
-	it( 'should rerun selection on props changes', () => {
-		registerReducer( 'counter', ( state = 0, action ) => {
-			if ( action.type === 'increment' ) {
-				return state + 1;
-			}
-
-			return state;
+			expect( wrapper.childAt( 0 ).text() ).toBe( '10' );
 		} );
 
-		registerSelectors( 'counter', {
-			getCount: ( state, offset ) => state + offset,
+		itWithExtraAssertions( 'ensures component is still mounted before setting state', () => {
+			// This test verifies that even though unsubscribe doesn't take effect
+			// until after the current listener stack is called, we don't attempt
+			// to setState on an unmounting `withSelect` component. It will fail if
+			// an attempt is made to `setState` on an unmounted component.
+			const store = registerReducer( 'counter', ( state = 0, action ) => {
+				if ( action.type === 'increment' ) {
+					return state + 1;
+				}
+
+				return state;
+			} );
+
+			registerSelectors( 'counter', {
+				getCount: ( state, offset ) => state + offset,
+			} );
+
+			subscribeWithUnsubscribe( () => {
+				wrapper.unmount();
+			} );
+
+			const Component = withSelectImplementation( ( _select, ownProps ) => ( {
+				count: _select( 'counter' ).getCount( ownProps.offset ),
+			} ) )( ( props ) => <div>{ props.count }</div> );
+
+			wrapper = mount( <Component offset={ 0 } /> );
+
+			store.dispatch( { type: 'increment' } );
 		} );
 
-		const Component = withSelect( ( _select, ownProps ) => ( {
-			count: _select( 'counter' ).getCount( ownProps.offset ),
-		} ) )( ( props ) => <div>{ props.count }</div> );
+		itWithExtraAssertions( 'should not rerun selection on unchanging state', () => {
+			const store = registerReducer( 'unchanging', ( state = {} ) => state );
 
-		const wrapper = mount( <Component offset={ 0 } /> );
+			registerSelectors( 'unchanging', {
+				getState: ( state ) => state,
+			} );
 
-		wrapper.setProps( { offset: 10 } );
+			const mapSelectToProps = jest.fn();
 
-		expect( wrapper.childAt( 0 ).text() ).toBe( '10' );
+			const Component = compose( [
+				withSelectImplementation( mapSelectToProps ),
+			] )( () => <div /> );
 
-		wrapper.unmount();
-	} );
+			wrapper = mount( <Component /> );
 
-	it( 'ensures component is still mounted before setting state', () => {
-		// This test verifies that even though unsubscribe doesn't take effect
-		// until after the current listener stack is called, we don't attempt
-		// to setState on an unmounting `withSelect` component. It will fail if
-		// an attempt is made to `setState` on an unmounted component.
-		const store = registerReducer( 'counter', ( state = 0, action ) => {
-			if ( action.type === 'increment' ) {
-				return state + 1;
-			}
+			store.dispatch( { type: 'dummy' } );
 
-			return state;
+			expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
 		} );
+	}
 
-		registerSelectors( 'counter', {
-			getCount: ( state, offset ) => state + offset,
-		} );
+	cases( withSelect );
 
-		subscribeWithUnsubscribe( () => {
-			wrapper.unmount();
-		} );
-
-		const Component = withSelect( ( _select, ownProps ) => ( {
-			count: _select( 'counter' ).getCount( ownProps.offset ),
-		} ) )( ( props ) => <div>{ props.count }</div> );
-
-		const wrapper = mount( <Component offset={ 0 } /> );
-
-		store.dispatch( { type: 'increment' } );
+	describe( 'query backwards-compatibility', () => {
+		cases( query, () => expect( deprecated ).toHaveBeenCalled() );
 	} );
 } );
 
 describe( 'withDispatch', () => {
+	let wrapper;
+	afterEach( () => {
+		if ( wrapper ) {
+			wrapper.unmount();
+			wrapper = null;
+		}
+	} );
+
 	it( 'passes the relevant data to the component', () => {
 		const store = registerReducer( 'counter', ( state = 0, action ) => {
 			if ( action.type === 'increment' ) {
@@ -264,7 +312,7 @@ describe( 'withDispatch', () => {
 			};
 		} )( ( props ) => <button onClick={ props.increment } /> );
 
-		const wrapper = mount( <Component count={ 0 } /> );
+		wrapper = mount( <Component count={ 0 } /> );
 
 		// Wrapper is the enhanced component. Find props on the rendered child.
 		const child = wrapper.childAt( 0 );
@@ -281,8 +329,6 @@ describe( 'withDispatch', () => {
 		wrapper.find( 'button' ).simulate( 'click' );
 
 		expect( store.getState() ).toBe( 2 );
-
-		wrapper.unmount();
 	} );
 } );
 
@@ -353,6 +399,16 @@ describe( 'subscribe', () => {
 		store.dispatch( { type: 'dummy' } );
 
 		expect( secondListener ).toHaveBeenCalled();
+	} );
+
+	it( 'does not call listeners if state has not changed', () => {
+		const store = registerReducer( 'unchanging', ( state = {} ) => state );
+		const listener = jest.fn();
+		subscribeWithUnsubscribe( listener );
+
+		store.dispatch( { type: 'dummy' } );
+
+		expect( listener ).not.toHaveBeenCalled();
 	} );
 } );
 
