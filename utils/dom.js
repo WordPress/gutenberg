@@ -114,7 +114,7 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 		return false;
 	}
 
-	const rangeRect = getClientRect( range );
+	const rangeRect = getClientRectFromRange( range );
 
 	if ( ! rangeRect ) {
 		return false;
@@ -143,7 +143,7 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
  *
  * @return {DOMRect} The rectangle.
  */
-export function getClientRect( range ) {
+export function getClientRectFromRange( range ) {
 	// Adjust for empty containers.
 	return range.startContainer.nodeType === ELEMENT_NODE ?
 		range.startContainer.getBoundingClientRect() :
@@ -169,7 +169,7 @@ export function computeCaretRect( container ) {
 		return;
 	}
 
-	return getClientRect( range );
+	return getClientRectFromRange( range );
 }
 
 /**
