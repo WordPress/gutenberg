@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress Dependencies
  */
-import { cloneElement, Children } from 'element';
+import { cloneElement, Children } from '@wordpress/element';
 
 /**
  * Internal dependencies

@@ -1,0 +1,39 @@
+.editor-post-featured-image {
+	padding: 10px 0 0;
+
+	.spinner {
+		margin: 0;
+	}
+}
+
+.editor-post-featured-image__toggle {
+	text-decoration: underline;
+	color: $blue-wordpress;
+
+	&:focus {
+		box-shadow: none;
+		outline: none;
+	}
+
+	&:hover {
+		color: $blue-medium-500;
+	}
+}
+
+.editor-post-featured-image__preview {
+	display: block;
+	width: 100%;
+}
+
+.editor-post-featured-image__howto {
+	color: $dark-gray-300;
+	font-style: italic;
+	margin: 10px 0;
+}
+
+// Should be replaced with a config in media modal.
+.editor-post-featured-image__media-modal {
+	.setting[data-setting="caption"], .setting[data-setting="description"] {
+		display: none;
+	}
+}

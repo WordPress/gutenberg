@@ -7,6 +7,13 @@ set -e
 cd "$(dirname "$0")"
 cd ..
 
+# Enable nicer messaging for build status
+YELLOW_BOLD='\033[1;33m';
+COLOR_RESET='\033[0m';
+status () {
+	echo -e "\n${YELLOW_BOLD}$1${COLOR_RESET}\n"
+}
+
 # Make sure there are no changes in the working tree.  Release builds should be
 # traceable to a particular commit and reliably reproducible.  (This is not
 # totally true at the moment because we download nightly vendor scripts).
@@ -31,7 +38,13 @@ if [ "$branch" != 'master' ]; then
 	sleep 2
 fi
 
+# Remove ignored files to reset repository to pristine condition. Previous test
+# ensures that changed files abort the plugin build.
+status "Cleaning working directory..."
+git clean -xdf
+
 # Download all vendor scripts
+status "Downloading remote vendor scripts..."
 vendor_scripts=""
 # Using `command | while read...` is more typical, but the inside of the while
 # loop will run under a separate process this way, meaning that it cannot
@@ -45,15 +58,29 @@ exec 3< <(
 while IFS='|' read -u 3 url filename; do
 	echo "$url"
 	echo -n " > vendor/$filename ... "
-	curl --location --silent "$url" --output "vendor/_download.tmp.js"
+	http_status=$( curl \
+		--location \
+		--silent \
+		"$url" \
+		--output "vendor/_download.tmp.js" \
+		--write-out "%{http_code}"
+	)
+	if [ "$http_status" != 200 ]; then
+		echo "error - HTTP $http_status"
+		exit 1
+	fi
 	mv -f "vendor/_download.tmp.js" "vendor/$filename"
 	echo "done!"
 	vendor_scripts="$vendor_scripts vendor/$filename"
 done
 
 # Run the build
+status "Installing dependencies..."
 npm install
+status "Generating build..."
 npm run build
+status "Generating PHP file for wordpress.org to parse translations..."
+npm run pot-to-php
 
 # Remove any existing zip file
 rm -f gutenberg.zip
@@ -65,24 +92,20 @@ php bin/generate-gutenberg-php.php > gutenberg.tmp.php
 mv gutenberg.tmp.php gutenberg.php
 
 # Generate the plugin zip file
+status "Creating archive..."
 zip -r gutenberg.zip \
 	gutenberg.php \
-	index.php \
 	lib/*.php \
-	lib/blocks/*.php \
+	blocks/library/*/*.php \
 	post-content.js \
 	$vendor_scripts \
-	blocks/build/*.{js,map} \
-	components/build/*.{js,map} \
-	date/build/*.{js,map} \
-	editor/build/*.{js,map} \
-	element/build/*.{js,map} \
-	i18n/build/*.{js,map} \
-	utils/build/*.{js,map} \
-	blocks/build/*.css \
-	components/build/*.css \
-	editor/build/*.css \
+	{blocks,components,date,editor,element,hooks,i18n,data,utils,edit-post,viewport}/build/*.{js,map} \
+	{blocks,components,editor,edit-post}/build/*.css \
+	languages/gutenberg.pot \
+	languages/gutenberg-translations.php \
 	README.md
 
 # Reset `gutenberg.php`
 git checkout gutenberg.php
+
+status "Done."

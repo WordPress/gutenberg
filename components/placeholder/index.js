@@ -13,7 +13,7 @@ function Placeholder( { icon, children, label, instructions, className, ...addit
 	const classes = classnames( 'components-placeholder', className );
 
 	return (
-		<div { ...additionalProps } aria-label={ label } className={ classes }>
+		<div { ...additionalProps } className={ classes }>
 			<div className="components-placeholder__label">
 				{ !! icon && <Dashicon icon={ icon } /> }
 				{ label }

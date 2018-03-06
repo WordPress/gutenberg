@@ -1,67 +1,169 @@
 /**
+ * External dependencies
+ */
+import { filter, every } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Toolbar, Placeholder } from 'components';
+import { __ } from '@wordpress/i18n';
+import { createMediaFromFile, preloadImage } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import './style.scss';
-import { registerBlockType, query as hpq } from '../../api';
-import MediaUploadButton from '../../media-upload-button';
-import InspectorControls from '../../inspector-controls';
-import RangeControl from '../../inspector-controls/range-control';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import GalleryImage from './gallery-image';
+import { createBlock } from '../../api';
+import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
-const { query, attr } = hpq;
-
-const MAX_COLUMNS = 8;
-
-const editMediaLibrary = ( attributes, setAttributes ) => {
-	const frameConfig = {
-		frame: 'post',
-		title: __( 'Update Gallery media' ),
-		button: {
-			text: __( 'Select' ),
+const blockAttributes = {
+	align: {
+		type: 'string',
+		default: 'none',
+	},
+	images: {
+		type: 'array',
+		default: [],
+		source: 'query',
+		selector: 'ul.wp-block-gallery .blocks-gallery-item',
+		query: {
+			url: {
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'src',
+			},
+			link: {
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'data-link',
+			},
+			alt: {
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'alt',
+				default: '',
+			},
+			id: {
+				source: 'attribute',
+				selector: 'img',
+				attribute: 'data-id',
+			},
+			caption: {
+				type: 'array',
+				source: 'children',
+				selector: 'figcaption',
+			},
 		},
-		multiple: true,
-		state: 'gallery-edit',
-		selection: new wp.media.model.Selection( attributes.images, { multiple: true } ),
-	};
-
-	const editFrame = wp.media( frameConfig );
-	function updateFn() {
-		setAttributes( {
-			images: this.frame.state().attributes.library.models.map( ( a ) => {
-				return a.attributes;
-			} ),
-		} );
-	}
-
-	editFrame.on( 'insert', updateFn );
-	editFrame.state( 'gallery-edit' ).on( 'update', updateFn );
-	editFrame.open( 'gutenberg-gallery' );
+	},
+	columns: {
+		type: 'number',
+	},
+	imageCrop: {
+		type: 'boolean',
+		default: true,
+	},
+	linkTo: {
+		type: 'string',
+		default: 'none',
+	},
 };
 
-function defaultColumnsNumber( attributes ) {
-	attributes.images = attributes.images || [];
-	return Math.min( 3, attributes.images.length );
-}
+export const name = 'core/gallery';
 
-registerBlockType( 'core/gallery', {
+export const settings = {
 	title: __( 'Gallery' ),
+	description: __( 'Image galleries are a great way to share groups of pictures on your site.' ),
 	icon: 'format-gallery',
 	category: 'common',
+	keywords: [ __( 'images' ), __( 'photos' ) ],
+	attributes: blockAttributes,
 
-	attributes: {
-		images:
-			query( 'div.blocks-gallery figure.blocks-gallery-image img', {
-				url: attr( 'src' ),
-				alt: attr( 'alt' ),
-			} ) || [],
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				isMultiBlock: true,
+				blocks: [ 'core/image' ],
+				transform: ( attributes ) => {
+					const validImages = filter( attributes, ( { id, url } ) => id && url );
+					if ( validImages.length > 0 ) {
+						return createBlock( 'core/gallery', {
+							images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
+						} );
+					}
+					return createBlock( 'core/gallery' );
+				},
+			},
+			{
+				type: 'shortcode',
+				tag: 'gallery',
+				attributes: {
+					images: {
+						type: 'array',
+						shortcode: ( { named: { ids } } ) => {
+							if ( ! ids ) {
+								return [];
+							}
+
+							return ids.split( ',' ).map( ( id ) => ( {
+								id: parseInt( id, 10 ),
+							} ) );
+						},
+					},
+					columns: {
+						type: 'number',
+						shortcode: ( { named: { columns = '3' } } ) => {
+							return parseInt( columns, 10 );
+						},
+					},
+					linkTo: {
+						type: 'string',
+						shortcode: ( { named: { link = 'attachment' } } ) => {
+							return link === 'file' ? 'media' : link;
+						},
+					},
+				},
+			},
+			{
+				type: 'files',
+				isMatch( files ) {
+					return files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 );
+				},
+				transform( files, onChange ) {
+					const block = createBlock( 'core/gallery', {
+						images: files.map( ( file ) => ( {
+							url: window.URL.createObjectURL( file ),
+						} ) ),
+					} );
+
+					Promise.all( files.map( ( file ) =>
+						createMediaFromFile( file )
+							.then( ( media ) => preloadImage( media.source_url ).then( () => media ) )
+					) ).then( ( medias ) => onChange( block.uid, {
+						images: medias.map( media => ( {
+							id: media.id,
+							url: media.source_url,
+							link: media.link,
+						} ) ),
+					} ) );
+
+					return block;
+				},
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				transform: ( { images } ) => {
+					if ( images.length > 0 ) {
+						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption } ) );
+					}
+					return createBlock( 'core/image' );
+				},
+			},
+		],
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -71,82 +173,76 @@ registerBlockType( 'core/gallery', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus } ) {
-		const { images = [], columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
-		const setColumnsNumber = ( event ) => setAttributes( { columns: event.target.value } );
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-
-		const controls = (
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
-					/>
-					{ !! images.length && (
-						<Toolbar controls={ [ {
-							icon: 'edit',
-							title: __( 'Edit Gallery' ),
-							onClick: () => editMediaLibrary( attributes, setAttributes ),
-						} ] } />
-					) }
-				</BlockControls>
-			)
-		);
-
-		if ( images.length === 0 ) {
-			const setMediaUrl = ( imgs ) => setAttributes( { images: imgs } );
-			return [
-				controls,
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag images here or insert from media library' ) }
-					icon="format-gallery"
-					label={ __( 'Gallery' ) }
-					className="blocks-gallery">
-					<MediaUploadButton
-						onSelect={ setMediaUrl }
-						type="image"
-						autoOpen
-						multiple="true"
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
-			];
-		}
-
-		return [
-			controls,
-			focus && images.length > 1 && (
-				<InspectorControls key="inspector">
-					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ setColumnsNumber }
-						min="1"
-						max={ Math.min( MAX_COLUMNS, images.length ) }
-					/>
-				</InspectorControls>
-			),
-			<div key="gallery" className={ `blocks-gallery align${ align } columns-${ columns }` }>
-				{ images.map( ( img ) => (
-					<GalleryImage key={ img.url } img={ img } />
-				) ) }
-			</div>,
-		];
-	},
+	edit: GalleryBlock,
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align = 'none' } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 		return (
-			<div className={ `blocks-gallery align${ align } columns-${ columns }` } >
-				{ images.map( ( img ) => (
-					<GalleryImage key={ img.url } img={ img } />
-				) ) }
-			</div>
+			<ul className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+				{ images.map( ( image ) => {
+					let href;
+
+					switch ( linkTo ) {
+						case 'media':
+							href = image.url;
+							break;
+						case 'attachment':
+							href = image.link;
+							break;
+					}
+
+					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } />;
+
+					return (
+						<li key={ image.id || image.url } className="blocks-gallery-item">
+							<figure>
+								{ href ? <a href={ href }>{ img }</a> : img }
+								{ image.caption && image.caption.length > 0 && <figcaption>{ image.caption }</figcaption> }
+							</figure>
+						</li>
+					);
+				} ) }
+			</ul>
 		);
 	},
 
-} );
+	deprecated: [
+		{
+			attributes: {
+				...blockAttributes,
+				images: {
+					...blockAttributes.images,
+					selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
+				},
+			},
+
+			save( { attributes } ) {
+				const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+				return (
+					<div className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+						{ images.map( ( image ) => {
+							let href;
+
+							switch ( linkTo ) {
+								case 'media':
+									href = image.url;
+									break;
+								case 'attachment':
+									href = image.link;
+									break;
+							}
+
+							const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } />;
+
+							return (
+								<figure key={ image.id || image.url } className="blocks-gallery-image">
+									{ href ? <a href={ href }>{ img }</a> : img }
+								</figure>
+							);
+						} ) }
+					</div>
+				);
+			},
+		},
+	],
+};

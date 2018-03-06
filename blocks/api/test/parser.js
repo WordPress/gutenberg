@@ -1,154 +1,342 @@
 /**
- * External dependencies
- */
-import { expect } from 'chai';
-
-/**
  * Internal dependencies
  */
-import { text } from '../query';
 import {
+	getBlockAttribute,
 	getBlockAttributes,
-	parseBlockAttributes,
+	asType,
 	createBlockWithFallback,
+	getAttributesFromDeprecatedVersion,
 	default as parse,
 } from '../parser';
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
-	setUnknownTypeHandler,
+	setUnknownTypeHandlerName,
 } from '../registration';
 
 describe( 'block parser', () => {
+	const defaultBlockSettings = {
+		attributes: {
+			fruit: {
+				type: 'string',
+			},
+		},
+		save: ( { attributes } ) => attributes.fruit || null,
+		category: 'common',
+		title: 'block title',
+	};
+
+	const unknownBlockSettings = {
+		category: 'common',
+		title: 'unknown block',
+		attributes: {
+			content: {
+				type: 'string',
+				source: 'html',
+			},
+		},
+		save: ( { attributes } ) => attributes.content || null,
+	};
+
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'blocks/hooks' );
+	} );
+
 	afterEach( () => {
-		setUnknownTypeHandler( undefined );
+		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 	} );
 
-	describe( 'parseBlockAttributes()', () => {
-		it( 'should use the function implementation', () => {
-			const blockType = {
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent + ' & Chicken',
-					};
-				},
-			};
-
-			expect( parseBlockAttributes( 'Ribs', blockType ) ).to.eql( {
-				content: 'Ribs & Chicken',
-			} );
+	describe( 'asType()', () => {
+		it( 'gracefully handles undefined type', () => {
+			expect( asType( 5 ) ).toBe( 5 );
 		} );
 
-		it( 'should use the query object implementation', () => {
-			const blockType = {
-				attributes: {
-					emphasis: text( 'strong' ),
-					ignoredDomMatcher: ( node ) => node.innerHTML,
-				},
-			};
-
-			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
-
-			expect( parseBlockAttributes( rawContent, blockType ) ).to.eql( {
-				emphasis: '& Chicken',
-			} );
+		it( 'gracefully handles unhandled type', () => {
+			expect( asType( 5, '__UNHANDLED__' ) ).toBe( 5 );
 		} );
 
-		it( 'should return an empty object if no attributes defined', () => {
-			const blockType = {};
-			const rawContent = '<span>Ribs <strong>& Chicken</strong></span>';
+		it( 'returns expected coerced values', () => {
+			const arr = [];
+			const obj = {};
 
-			expect( parseBlockAttributes( rawContent, blockType ) ).to.eql( {} );
+			expect( asType( '5', 'string' ) ).toBe( '5' );
+			expect( asType( 5, 'string' ) ).toBe( '5' );
+
+			expect( asType( 5, 'integer' ) ).toBe( 5 );
+			expect( asType( '5', 'integer' ) ).toBe( 5 );
+
+			expect( asType( 5, 'number' ) ).toBe( 5 );
+			expect( asType( '5', 'number' ) ).toBe( 5 );
+
+			expect( asType( true, 'boolean' ) ).toBe( true );
+			expect( asType( false, 'boolean' ) ).toBe( false );
+			expect( asType( '5', 'boolean' ) ).toBe( true );
+			expect( asType( 0, 'boolean' ) ).toBe( false );
+
+			expect( asType( null, 'null' ) ).toBe( null );
+			expect( asType( 0, 'null' ) ).toBe( null );
+
+			expect( asType( arr, 'array' ) ).toBe( arr );
+			expect( asType( new Set( [ 1, 2, 3 ] ), 'array' ) ).toEqual( [ 1, 2, 3 ] );
+
+			expect( asType( obj, 'object' ) ).toBe( obj );
+			expect( asType( {}, 'object' ) ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'getBlockAttribute', () => {
+		it( 'should return the comment attribute value', () => {
+			const value = getBlockAttribute(
+				'number',
+				{
+					type: 'number',
+				},
+				'',
+				{ number: 10 }
+			);
+
+			expect( value ).toBe( 10 );
+		} );
+
+		it( 'should return the matcher\'s attribute value', () => {
+			const value = getBlockAttribute(
+				'content',
+				{
+					type: 'string',
+					source: 'text',
+					selector: 'div',
+				},
+				'<div>chicken</div>',
+				{}
+			);
+			expect( value ).toBe( 'chicken' );
+		} );
+
+		it( 'should return undefined for meta attributes', () => {
+			const value = getBlockAttribute(
+				'content',
+				{
+					type: 'string',
+					source: 'meta',
+					meta: 'content',
+				},
+				'<div>chicken</div>',
+				{}
+			);
+			expect( value ).toBeUndefined();
 		} );
 	} );
 
 	describe( 'getBlockAttributes()', () => {
 		it( 'should merge attributes with the parsed and default attributes', () => {
 			const blockType = {
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent + ' & Chicken',
-					};
-				},
-				defaultAttributes: {
-					content: '',
-					topic: 'none',
+				attributes: {
+					content: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+					number: {
+						type: 'number',
+						source: 'attribute',
+						attribute: 'data-number',
+						selector: 'div',
+					},
+					align: {
+						type: 'string',
+					},
+					topic: {
+						type: 'string',
+						default: 'none',
+					},
 				},
 			};
 
-			const rawContent = 'Ribs';
-			const attrs = { align: 'left' };
+			const innerHTML = '<div data-number="10">Ribs</div>';
+			const attrs = { align: 'left', invalid: true };
 
-			expect( getBlockAttributes( blockType, rawContent, attrs ) ).to.eql( {
+			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
+				content: 'Ribs',
+				number: 10,
 				align: 'left',
 				topic: 'none',
-				content: 'Ribs & Chicken',
 			} );
+		} );
+	} );
+
+	describe( 'getAttributesFromDeprecatedVersion', () => {
+		it( 'should return undefined if the block has no deprecated versions', () => {
+			const attributes = getAttributesFromDeprecatedVersion(
+				defaultBlockSettings,
+				'<span class="wp-block-test-block">Bananas</span>',
+				{},
+			);
+			expect( attributes ).toBeUndefined();
+		} );
+
+		it( 'should return undefined if no valid deprecated version found', () => {
+			const attributes = getAttributesFromDeprecatedVersion(
+				{
+					name: 'core/test-block',
+					...defaultBlockSettings,
+					deprecated: [
+						{
+							save() {
+								return 'nothing';
+							},
+						},
+					],
+				},
+				'<span class="wp-block-test-block">Bananas</span>',
+				{},
+			);
+			expect( attributes ).toBeUndefined();
+			expect( console ).toHaveErrored();
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should return the attributes parsed by the deprecated version', () => {
+			const attributes = getAttributesFromDeprecatedVersion(
+				{
+					name: 'core/test-block',
+					...defaultBlockSettings,
+					save: ( props ) => <div>{ props.attributes.fruit }</div>,
+					deprecated: [
+						{
+							attributes: {
+								fruit: {
+									type: 'string',
+									source: 'text',
+									selector: 'span',
+								},
+							},
+							save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						},
+					],
+				},
+				'<span class="wp-block-test-block">Bananas</span>',
+				{},
+			);
+			expect( attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 	} );
 
 	describe( 'createBlockWithFallback', () => {
 		it( 'should create the requested block if it exists', () => {
-			registerBlockType( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = createBlockWithFallback(
-				'core/test-block',
-				'content',
-				{ attr: 'value' }
-			);
-			expect( block.name ).to.eql( 'core/test-block' );
-			expect( block.attributes ).to.eql( { attr: 'value' } );
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: 'Bananas',
+				attrs: { fruit: 'Bananas' },
+			} );
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should create the requested block with no attributes if it exists', () => {
-			registerBlockType( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = createBlockWithFallback( 'core/test-block', 'content' );
-			expect( block.name ).to.eql( 'core/test-block' );
-			expect( block.attributes ).to.eql( {} );
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: '',
+			} );
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( {} );
 		} );
 
 		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
-			registerBlockType( 'core/unknown-block', {} );
-			setUnknownTypeHandler( 'core/unknown-block' );
+			registerBlockType( 'core/unknown-block', unknownBlockSettings );
+			setUnknownTypeHandlerName( 'core/unknown-block' );
 
-			const block = createBlockWithFallback(
-				'core/test-block',
-				'content',
-				{ attr: 'value' }
-			);
-			expect( block.name ).to.eql( 'core/unknown-block' );
-			expect( block.attributes ).to.eql( { attr: 'value' } );
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: 'Bananas',
+				attrs: { fruit: 'Bananas' },
+			} );
+			expect( block.name ).toBe( 'core/unknown-block' );
+			expect( block.attributes.content ).toContain( 'wp:test-block' );
 		} );
 
 		it( 'should fall back to the unknown type handler if block type not specified', () => {
-			registerBlockType( 'core/unknown-block', {} );
-			setUnknownTypeHandler( 'core/unknown-block' );
+			registerBlockType( 'core/unknown-block', unknownBlockSettings );
+			setUnknownTypeHandlerName( 'core/unknown-block' );
 
-			const block = createBlockWithFallback( null, 'content' );
-			expect( block.name ).to.eql( 'core/unknown-block' );
-			expect( block.attributes ).to.eql( {} );
+			const block = createBlockWithFallback( {
+				innerHTML: 'content',
+			} );
+			expect( block.name ).toEqual( 'core/unknown-block' );
+			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
 
 		it( 'should not create a block if no unknown type handler', () => {
-			const block = createBlockWithFallback( 'core/test-block', 'content' );
-			expect( block ).to.be.undefined();
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: '',
+			} );
+			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should fallback to an older version of the block if the current one is invalid', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				save: ( { attributes } ) => <div>{ attributes.fruit }</div>,
+				deprecated: [
+					{
+						attributes: {
+							fruit: {
+								type: 'string',
+								source: 'text',
+								selector: 'span',
+							},
+						},
+						save: ( { attributes } ) => <span>{ attributes.fruit }</span>,
+						migrate: ( attributes ) => ( { fruit: 'Big ' + attributes.fruit } ),
+					},
+				],
+			} );
+
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: '<span class="wp-block-test-block">Bananas</span>',
+				attrs: { fruit: 'Bananas' },
+			} );
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
+			expect( block.isValid ).toBe( true );
+			expect( console ).toHaveErrored();
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
 	describe( 'parse()', () => {
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
-				// Currently this is the only way to test block content parsing?
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent,
-					};
+				attributes: {
+					content: {
+						type: 'string',
+						source: 'text',
+					},
+					smoked: { type: 'string' },
+					url: { type: 'string' },
+					chicken: { type: 'string' },
 				},
+				save: ( { attributes } ) => attributes.content,
+				category: 'common',
+				title: 'test block',
 			} );
 
 			const parsed = parse(
@@ -157,30 +345,34 @@ describe( 'block parser', () => {
 				'<!-- /wp:core/test-block -->'
 			);
 
-			expect( parsed ).to.have.lengthOf( 1 );
-			expect( parsed[ 0 ].name ).to.equal( 'core/test-block' );
-			expect( parsed[ 0 ].attributes ).to.eql( {
+			expect( parsed ).toHaveLength( 1 );
+			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
+			expect( parsed[ 0 ].attributes ).toEqual( {
 				content: 'Brisket',
 				smoked: 'yes',
 				url: 'http://google.com',
 				chicken: 'ribs & \'wings\'',
 			} );
-			expect( parsed[ 0 ].uid ).to.be.a( 'string' );
+			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
 		} );
 
 		it( 'should parse empty post content', () => {
 			const parsed = parse( '' );
 
-			expect( parsed ).to.eql( [] );
+			expect( parsed ).toEqual( [] );
 		} );
 
 		it( 'should parse the post content, ignoring unknown blocks', () => {
 			registerBlockType( 'core/test-block', {
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent + ' & Chicken',
-					};
+				attributes: {
+					content: {
+						type: 'string',
+						source: 'text',
+					},
 				},
+				save: ( { attributes } ) => attributes.content,
+				category: 'common',
+				title: 'test block',
 			} );
 
 			const parsed = parse(
@@ -189,28 +381,53 @@ describe( 'block parser', () => {
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 			);
 
-			expect( parsed ).to.have.lengthOf( 1 );
-			expect( parsed[ 0 ].name ).to.equal( 'core/test-block' );
-			expect( parsed[ 0 ].attributes ).to.eql( {
-				content: 'Ribs & Chicken',
+			expect( parsed ).toHaveLength( 1 );
+			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
+			expect( parsed[ 0 ].attributes ).toEqual( {
+				content: 'Ribs',
 			} );
-			expect( parsed[ 0 ].uid ).to.be.a( 'string' );
+			expect( typeof parsed[ 0 ].uid ).toBe( 'string' );
+		} );
+
+		it( 'should add the core namespace to un-namespaced blocks', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const parsed = parse(
+				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->'
+			);
+
+			expect( parsed ).toHaveLength( 1 );
+			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
+		} );
+
+		it( 'should ignore blocks with a bad namespace', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			setUnknownTypeHandlerName( 'core/unknown-block' );
+
+			const parsed = parse(
+				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
+				'<p>Broccoli</p>' +
+				'<!-- wp:core/unknown/block -->Ribs<!-- /wp:core/unknown/block -->'
+			);
+			expect( parsed ).toHaveLength( 1 );
+			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
 		} );
 
 		it( 'should parse the post content, using unknown block handler', () => {
-			registerBlockType( 'core/test-block', {} );
-			registerBlockType( 'core/unknown-block', {} );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
-			setUnknownTypeHandler( 'core/unknown-block' );
+			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
-				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
 				'<p>Broccoli</p>' +
 				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 			);
 
-			expect( parsed ).to.have.lengthOf( 3 );
-			expect( parsed.map( ( { name } ) => name ) ).to.eql( [
+			expect( parsed ).toHaveLength( 3 );
+			expect( parsed.map( ( { name } ) => name ) ).toEqual( [
 				'core/test-block',
 				'core/unknown-block',
 				'core/unknown-block',
@@ -218,61 +435,54 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should parse the post content, including raw HTML at each end', () => {
-			registerBlockType( 'core/test-block', {} );
-			registerBlockType( 'core/unknown-block', {
-				// Currently this is the only way to test block content parsing?
-				attributes: function( rawContent ) {
-					return {
-						content: rawContent,
-					};
-				},
-			} );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
-			setUnknownTypeHandler( 'core/unknown-block' );
+			setUnknownTypeHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<p>Cauliflower</p>' +
-				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
 				'\n<p>Broccoli</p>\n' +
-				'<!-- wp:core/test-block -->Ribs<!-- /wp:core/test-block -->' +
+				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
 				'<p>Romanesco</p>'
 			);
 
-			expect( parsed ).to.have.lengthOf( 5 );
-			expect( parsed.map( ( { name } ) => name ) ).to.eql( [
+			expect( parsed ).toHaveLength( 5 );
+			expect( parsed.map( ( { name } ) => name ) ).toEqual( [
 				'core/unknown-block',
 				'core/test-block',
 				'core/unknown-block',
 				'core/test-block',
 				'core/unknown-block',
 			] );
-			expect( parsed[ 0 ].attributes.content ).to.eql( '<p>Cauliflower</p>' );
-			expect( parsed[ 2 ].attributes.content ).to.eql( '<p>Broccoli</p>' );
-			expect( parsed[ 4 ].attributes.content ).to.eql( '<p>Romanesco</p>' );
+			expect( parsed[ 0 ].attributes.content ).toEqual( '<p>Cauliflower</p>' );
+			expect( parsed[ 2 ].attributes.content ).toEqual( '<p>Broccoli</p>' );
+			expect( parsed[ 4 ].attributes.content ).toEqual( '<p>Romanesco</p>' );
 		} );
 
 		it( 'should parse blocks with empty content', () => {
-			registerBlockType( 'core/test-block', {} );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
 			const parsed = parse(
 				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->'
 			);
 
-			expect( parsed ).to.have.lengthOf( 1 );
-			expect( parsed.map( ( { name } ) => name ) ).to.eql( [
+			expect( parsed ).toHaveLength( 1 );
+			expect( parsed.map( ( { name } ) => name ) ).toEqual( [
 				'core/test-block',
 			] );
 		} );
 
 		it( 'should parse void blocks', () => {
-			registerBlockType( 'core/test-block', {} );
-			registerBlockType( 'core/void-block', {} );
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+			registerBlockType( 'core/void-block', defaultBlockSettings );
 			const parsed = parse(
 				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->' +
 				'<!-- wp:core/void-block /-->'
 			);
 
-			expect( parsed ).to.have.lengthOf( 2 );
-			expect( parsed.map( ( { name } ) => name ) ).to.eql( [
+			expect( parsed ).toHaveLength( 2 );
+			expect( parsed.map( ( { name } ) => name ) ).toEqual( [
 				'core/test-block', 'core/void-block',
 			] );
 		} );

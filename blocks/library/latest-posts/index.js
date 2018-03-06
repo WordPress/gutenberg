@@ -1,75 +1,42 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
-import { Placeholder } from 'components';
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { registerBlockType } from '../../api';
-import { getLatestPosts } from './data.js';
+import './editor.scss';
+import './style.scss';
+import LatestPostsBlock from './block';
 
-registerBlockType( 'core/latestposts', {
+export const name = 'core/latest-posts';
+
+export const settings = {
 	title: __( 'Latest Posts' ),
+
+	description: __( 'Shows a list of your site\'s most recent posts.' ),
 
 	icon: 'list-view',
 
 	category: 'widgets',
 
-	defaultAttributes: {
-		poststoshow: 5,
+	keywords: [ __( 'recent posts' ) ],
+
+	supports: {
+		html: false,
 	},
 
-	edit: class extends Component {
-		constructor() {
-			super( ...arguments );
-
-			const { poststoshow } = this.props.attributes;
-
-			this.state = {
-				latestPosts: [],
-			};
-
-			this.latestPostsRequest = getLatestPosts( poststoshow );
-
-			this.latestPostsRequest
-				.then( latestPosts => this.setState( { latestPosts } ) );
-		}
-
-		render() {
-			const { latestPosts } = this.state;
-
-			if ( ! latestPosts.length ) {
-				return (
-					<Placeholder
-						icon="update"
-						label={ __( 'Loading latest posts, please wait' ) }
-					>
-					</Placeholder>
-				);
-			}
-
-			return (
-				<div className="blocks-latest-posts">
-					<ul>
-						{ latestPosts.map( ( post, i ) =>
-							<li key={ i }><a href={ post.link }>{ post.title.rendered }</a></li>
-						) }
-					</ul>
-				</div>
-			);
-		}
-
-		componentWillUnmount() {
-			if ( this.latestPostsRequest.state() === 'pending' ) {
-				this.latestPostsRequest.abort();
-			}
+	getEditWrapperProps( attributes ) {
+		const { align } = attributes;
+		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align };
 		}
 	},
+
+	edit: LatestPostsBlock,
 
 	save() {
 		return null;
 	},
-} );
+};

@@ -1,0 +1,30 @@
+.wp-block-shortcode {
+	display: flex;
+	flex-direction: row;
+	padding: 1em;
+	background-color: $light-gray-100;
+
+	label {
+		flex-basis: 0;
+		display: flex;
+		align-items: center;
+		margin-right: $item-spacing;
+		white-space: nowrap;
+	}
+
+	.blocks-plain-text {
+		flex: 1 0 0%;
+		padding: 4px 8px;
+		border: 1px solid $light-gray-500;
+		font-family: $default-font;
+		font-size: 13px;
+
+		&:focus {
+			border: 1px solid $dark-gray-500;
+		}
+	}
+
+	.dashicon {
+		margin-right: $item-spacing;
+	}
+}

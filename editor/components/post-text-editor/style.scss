@@ -1,0 +1,62 @@
+.editor-post-text-editor {
+	display: block;
+	margin: 0;
+	width: 100%;
+	border: none;
+	outline: none;
+	box-shadow: none;
+	resize: none;
+	overflow: hidden;
+	font-family: $editor-html-font;
+	font-size: $text-editor-font-size;
+	line-height: 150%;
+
+	&:focus {
+		box-shadow: none;
+	}
+}
+
+.editor-post-text-editor__toolbar {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+
+	button {
+		height: 30px;
+		background: none;
+		padding: 0 8px;
+		margin: 3px 4px;
+		text-align: center;
+		cursor: pointer;
+		font-family: $editor-html-font;
+		color: $dark-gray-500;
+		border: 1px solid transparent;
+
+		&:first-child {
+			margin-left: 0;
+		}
+
+		&:hover,
+		&:focus {
+			outline: none;
+			border: 1px solid $dark-gray-500;
+		}
+	}
+}
+
+.editor-post-text-editor__bold {
+	font-weight: bold;
+}
+
+.editor-post-text-editor__italic {
+	font-style: italic;
+}
+
+.editor-post-text-editor__link {
+	text-decoration: underline;
+	color: $blue-medium-500;
+}
+
+.editor-post-text-editor__del {
+	text-decoration:line-through;
+}

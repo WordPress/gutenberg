@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Block categories.
@@ -17,12 +17,13 @@ const categories = [
 	{ slug: 'layout', title: __( 'Layout Blocks' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
 	{ slug: 'embed', title: __( 'Embed' ) },
+	{ slug: 'reusable-blocks', title: __( 'Saved Blocks' ) },
 ];
 
 /**
- * Returns all the block categories
+ * Returns all the block categories.
  *
- * @return {Array} Block categories
+ * @return {Array} Block categories.
  */
 export function getCategories() {
 	return categories;

@@ -1,142 +1,214 @@
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
-import { Placeholder, Dashicon, Toolbar } from 'components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { registerBlockType, query } from '../../api';
-import Editable from '../../editable';
-import MediaUploadButton from '../../media-upload-button';
-import InspectorControls from '../../inspector-controls';
-import TextControl from '../../inspector-controls/text-control';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import './editor.scss';
+import { createBlock, getBlockAttributes, getBlockType } from '../../api';
+import ImageBlock from './block';
 
-const { attr, children } = query;
+export const name = 'core/image';
 
-registerBlockType( 'core/image', {
+const blockAttributes = {
+	url: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
+	},
+	alt: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'alt',
+		default: '',
+	},
+	caption: {
+		type: 'array',
+		source: 'children',
+		selector: 'figcaption',
+	},
+	href: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'href',
+	},
+	id: {
+		type: 'number',
+	},
+	align: {
+		type: 'string',
+	},
+	width: {
+		type: 'number',
+	},
+	height: {
+		type: 'number',
+	},
+};
+
+export const settings = {
 	title: __( 'Image' ),
+
+	description: __( 'Worth a thousand words.' ),
 
 	icon: 'format-image',
 
 	category: 'common',
 
-	attributes: {
-		url: attr( 'img', 'src' ),
-		alt: attr( 'img', 'alt' ),
-		caption: children( 'figcaption' ),
+	keywords: [ __( 'photo' ) ],
+
+	attributes: blockAttributes,
+
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch( node ) {
+					const tag = node.nodeName.toLowerCase();
+					const hasImage = node.querySelector( 'img' );
+
+					return tag === 'img' || ( hasImage && tag === 'figure' );
+				},
+				transform( node ) {
+					const matches = /align(left|center|right)/.exec( node.className );
+					const align = matches ? matches[ 1 ] : undefined;
+					const blockType = getBlockType( 'core/image' );
+					const attributes = getBlockAttributes( blockType, node.outerHTML, { align } );
+					return createBlock( 'core/image', attributes );
+				},
+			},
+			{
+				type: 'files',
+				isMatch( files ) {
+					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
+				},
+				transform( files ) {
+					const file = files[ 0 ];
+					// We don't need to upload the media directly here
+					// It's already done as part of the `componentDidMount`
+					// int the image block
+					const block = createBlock( 'core/image', {
+						url: window.URL.createObjectURL( file ),
+					} );
+
+					return block;
+				},
+			},
+			{
+				type: 'shortcode',
+				tag: 'caption',
+				attributes: {
+					url: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'src',
+						selector: 'img',
+					},
+					alt: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'alt',
+						selector: 'img',
+					},
+					caption: {
+						type: 'array',
+						// To do: needs to support HTML.
+						source: 'text',
+					},
+					href: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'href',
+						selector: 'a',
+					},
+					id: {
+						type: 'number',
+						shortcode: ( { named: { id } } ) => {
+							if ( ! id ) {
+								return;
+							}
+
+							return parseInt( id.replace( 'attachment_', '' ), 10 );
+						},
+					},
+					align: {
+						type: 'string',
+						shortcode: ( { named: { align = 'alignnone' } } ) => {
+							return align.replace( 'align', '' );
+						},
+					},
+				},
+			},
+		],
 	},
 
 	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
+		const { align, width } = attributes;
+		if ( 'left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align, 'data-resized': !! width };
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
-		const { url, alt, caption, align, id } = attributes;
-		const updateAlt = ( newAlt ) => setAttributes( { alt: newAlt } );
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		const onSelectImage = ( media ) => {
-			setAttributes( { url: media.url, alt: media.alt, caption: media.caption, id: media.id } );
-		};
-		const uploadButtonProps = { isLarge: true };
-
-		const controls = (
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-						controls={ [ 'left', 'center', 'right', 'wide', 'full' ] }
-					/>
-
-					<Toolbar>
-						<li>
-							<MediaUploadButton
-								buttonProps={ { className: 'components-icon-button components-toolbar__control' } }
-								onSelect={ onSelectImage }
-								type="image"
-								value={ id }
-							>
-								<Dashicon icon="edit" />
-							</MediaUploadButton>
-						</li>
-					</Toolbar>
-				</BlockControls>
-			)
-		);
-
-		if ( ! url ) {
-			return [
-				controls,
-				<Placeholder
-					key="placeholder"
-					instructions={ __( 'Drag image here or insert from media library' ) }
-					icon="format-image"
-					label={ __( 'Image' ) }
-					className="blocks-image">
-					<MediaUploadButton
-						buttonProps={ uploadButtonProps }
-						onSelect={ onSelectImage }
-						type="format-image"
-						autoOpen
-					>
-						{ __( 'Insert from Media Library' ) }
-					</MediaUploadButton>
-				</Placeholder>,
-			];
-		}
-
-		const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
-
-		// Disable reason: Each block can be selected by clicking on it
-
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return [
-			controls,
-			focus && (
-				<InspectorControls key="inspector">
-					<TextControl label={ __( 'Alternate Text' ) } value={ alt } onChange={ updateAlt } />
-				</InspectorControls>
-			),
-			<figure key="image" className="blocks-image">
-				<img src={ url } alt={ alt } onClick={ setFocus } />
-				{ ( caption && caption.length > 0 ) || !! focus ? (
-					<Editable
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						focus={ focus && focus.editable === 'caption' ? focus : undefined }
-						onFocus={ focusCaption }
-						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						inline
-						inlineToolbar
-					/>
-				) : null }
-			</figure>,
-		];
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-	},
+	edit: ImageBlock,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align = 'none' } = attributes;
+		const { url, alt, caption, align, href, width, height, id } = attributes;
 
-		// If there's no caption set only save the image element.
-		if ( ! caption || ! caption.length ) {
-			return <img src={ url } alt={ alt } className={ `align${ align }` } />;
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ id ? `wp-image-${ id }` : null }
+				width={ width }
+				height={ height }
+			/>
+		);
+
+		let figureStyle = {};
+
+		if ( width ) {
+			figureStyle = { width };
+		} else if ( align === 'left' || align === 'right' ) {
+			figureStyle = { maxWidth: '50%' };
 		}
 
 		return (
-			<figure className={ `align${ align }` }>
-				<img src={ url } alt={ alt } />
-				<figcaption>{ caption }</figcaption>
+			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+				{ href ? <a href={ href }>{ image }</a> : image }
+				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);
 	},
-} );
+
+	deprecated: [
+		{
+			attributes: blockAttributes,
+			save( { attributes } ) {
+				const { url, alt, caption, align, href, width, height } = attributes;
+				const extraImageProps = width || height ? { width, height } : {};
+				const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
+
+				let figureStyle = {};
+
+				if ( width ) {
+					figureStyle = { width };
+				} else if ( align === 'left' || align === 'right' ) {
+					figureStyle = { maxWidth: '50%' };
+				}
+
+				return (
+					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+					</figure>
+				);
+			},
+		},
+	],
+};

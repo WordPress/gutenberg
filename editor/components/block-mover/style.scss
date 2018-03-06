@@ -1,0 +1,50 @@
+// Mover icon buttons$
+.editor-block-mover__control {
+	display: block;
+	padding: 2px;
+	margin: 0 6px 0 4px;
+	border: none;
+	outline: none;
+	background: none;
+	color: $dark-gray-300;
+	cursor: pointer;
+	border-radius: 50%;
+	width: $icon-button-size-small;
+
+	&[aria-disabled="true"] {
+		cursor: default;
+		color: $light-gray-300;
+		pointer-events: none;
+	}
+
+	// apply styles to SVG for movers on the desktop breakpoint
+	@include break-small {
+		// unstyle inherited icon button styles
+		&:not(:disabled):hover,
+		&:not(:disabled):active,
+		&:not(:disabled):focus {
+			box-shadow: none;
+			color: inherit;
+		}
+
+		svg {
+			display: block;
+			position: relative; // Fixing the Safari bug for `<button>`s overflow
+			border-radius: 50%;
+			margin: auto;
+
+		}
+
+		&:not(:disabled):hover svg {
+			box-shadow: inset 0 0 0 1px $light-gray-500;
+		}
+
+		&:not(:disabled):active svg {
+			@include button-style__active;
+		}
+
+		&:not(:disabled):focus svg {
+			@include button-style__focus-active;
+		}
+	}
+}

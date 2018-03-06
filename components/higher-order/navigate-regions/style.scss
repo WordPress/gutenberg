@@ -1,0 +1,12 @@
+.components-navigate-regions.is-focusing-regions [role="region"] {
+	&:focus:after {
+		content: '';
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		pointer-events: none;
+		border: 4px solid $blue-medium-400;
+	}
+}

@@ -1,21 +1,17 @@
 .components-toolbar {
 	margin: 0;
 	border: 1px solid $light-gray-500;
-	box-shadow: $shadow-popover;
 	background-color: $white;
 	display: inline-flex;
 }
 
-ul.components-toolbar {
-	list-style-type: none;
-
-	&> li {
+div.components-toolbar {
+	&> div {
 		display: inline-flex;
-		position: relative;
 		margin: 0;
 	}
 
-	&> li + li {
+	&> div + div {
 		margin-left: -3px;
 
 		&.has-left-divider {
@@ -43,57 +39,34 @@ ul.components-toolbar {
 	align-items: flex-end;
 	margin: 0;
 	padding: 3px;
-	background: none;
 	outline: none;
-	color: $dark-gray-500;
 	cursor: pointer;
 	position: relative;
 	width: $icon-button-size;
 	height: $icon-button-size;
 
+	// unset icon button styles
+	&:active,
 	&:hover,
-	/* the ":not(:disabled)" is needed to make it specific enough */
-	&:hover:not(:disabled),
 	&:focus {
-		color: $dark-gray-500;
 		outline: none;
 		box-shadow: none;
+		background: none;
+		border: none;
 	}
 
-	&.is-active,
-	&.is-active:hover {
-		color: $white;
-	}
-
+	// disabled
 	&:disabled {
 		cursor: default;
 	}
 
-	&> svg {
-		border: 1px solid transparent;
-		padding: 4px;
+	& > svg {
+		padding: 5px;
 		box-sizing: content-box;
+		border-radius: $button-style__radius-roundrect;
 	}
 
-	&:hover > svg,
-	&:focus > svg {
-		color: $dark-gray-500;
-	}
-
-	&:not(:disabled) {
-		&.is-active > svg,
-		&:hover > svg,
-		&:focus > svg {
-			border: 1px solid $dark-gray-500;
-		}
-	}
-
-	&.is-active > svg,
-	&.is-active:hover > svg {
-		background-color: $dark-gray-500;
-		color: $white;
-	}
-
+	// subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
 		padding: 4px 8px 4px 0px;
 	}
@@ -103,9 +76,25 @@ ul.components-toolbar {
 		font-family: $default-font;
 		font-size: $default-font-size;
 		font-weight: bold;
-		position: relative;
-		top: -5px;
-		left: -11px;
+		position: absolute;
+		right: 8px;
+		bottom: 8px;
+	}
+
+	// hover style
+	&:not( :disabled ).is-active > svg,
+	&:not( :disabled ):hover > svg {
+		@include formatting-button-style__hover;
+	}
+
+	// active & toggled style
+	&:not(:disabled).is-active > svg {
+		@include formatting-button-style__active;
+	}
+
+	// focus style
+	&:not(:disabled):focus > svg {
+		@include formatting-button-style__focus;
 	}
 }
 

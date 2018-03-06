@@ -1,0 +1,33 @@
+.wp-block-cover-image {
+	.blocks-rich-text__tinymce[data-is-empty="true"]:before {
+		position: inherit;
+	}
+
+	.blocks-rich-text__tinymce a {
+		color: white;
+	}
+
+	.blocks-rich-text__tinymce:focus a[data-mce-selected] {
+		padding: 0 2px;
+		margin: 0 -2px;
+		border-radius: 2px;
+		box-shadow: none;
+		background: rgba( 255, 255, 255, 0.3 );
+	}
+
+	.blocks-rich-text strong {
+		font-weight: 300;
+	}
+
+	&.components-placeholder h2 {
+		color: inherit;
+	}
+
+	&.has-left-content .block-rich-text__inline-toolbar {
+		justify-content: flex-start;
+	}
+
+	&.has-right-content .block-rich-text__inline-toolbar{
+		justify-content: flex-end;
+	}
+}

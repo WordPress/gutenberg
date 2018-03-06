@@ -1,0 +1,36 @@
+$empty-paragraph-height: $text-editor-font-size * 4;
+
+.editor-default-block-appender {
+	.editor-default-block-appender__content {
+		height: $empty-paragraph-height;
+		color: $dark-gray-300;
+		outline: 1px solid transparent;
+		transition: 0.2s outline;
+
+		&:hover {
+			outline: 1px solid $light-gray-500;
+		}
+	}
+}
+
+.editor-default-block-appender__content,
+input[type=text].editor-default-block-appender__content {
+	border: none;
+	background: none;
+	box-shadow: none;
+	display: block;
+	width: 100%;
+	height: $empty-paragraph-height;
+	font-size: $editor-font-size;
+	cursor: text;
+	margin: 0;
+	max-width: none;	// fixes a bleed issue from the admin
+
+	&:focus {
+		outline: 1px solid $light-gray-500;
+	}
+}
+
+.editor-default-block-appender .components-drop-zone__content-icon {
+	display: none;
+}

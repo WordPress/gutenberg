@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import classnames from 'classnames';
+import { flatMap } from 'lodash';
 
 /**
  * Internal dependencies
@@ -9,7 +10,7 @@ import classNames from 'classnames';
 import './style.scss';
 import IconButton from '../icon-button';
 
-function Toolbar( { controls = [], children } ) {
+function Toolbar( { controls = [], children, className } ) {
 	if (
 		( ! controls || ! controls.length ) &&
 		! children
@@ -24,11 +25,10 @@ function Toolbar( { controls = [], children } ) {
 	}
 
 	return (
-		<ul className="components-toolbar">
-			{ controlSets.reduce( ( result, controlSet, setIndex ) => [
-				...result,
-				...controlSet.map( ( control, controlIndex ) => (
-					<li
+		<div className={ classnames( 'components-toolbar', className ) }>
+			{ flatMap( controlSets, ( controlSet, setIndex ) => (
+				controlSet.map( ( control, controlIndex ) => (
+					<div
 						key={ [ setIndex, controlIndex ].join() }
 						className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
 					>
@@ -40,18 +40,18 @@ function Toolbar( { controls = [], children } ) {
 								event.stopPropagation();
 								control.onClick();
 							} }
-							className={ classNames( 'components-toolbar__control', {
+							className={ classnames( 'components-toolbar__control', {
 								'is-active': control.isActive,
 							} ) }
 							aria-pressed={ control.isActive }
 							disabled={ control.isDisabled }
 						/>
 						{ control.children }
-					</li>
-				) ),
-			], [] ) }
+					</div>
+				) )
+			) ) }
 			{ children }
-		</ul>
+		</div>
 	);
 }
 

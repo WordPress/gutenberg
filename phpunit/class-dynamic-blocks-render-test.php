@@ -6,7 +6,7 @@
  */
 
 /**
- * Test do_blocks
+ * Test do_blocks, WP_Block_Type::render
  */
 class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 
@@ -30,21 +30,34 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Dummy block rendering function, returning numeric value.
+	 *
+	 * @return number Block output.
+	 */
+	function render_dummy_block_numeric() {
+		return 10;
+	}
+
+	/**
 	 * Tear down.
 	 */
 	function tearDown() {
+		parent::tearDown();
+
 		$this->dummy_block_instance_number = 0;
-		$GLOBALS['wp_registered_blocks'] = array();
+
+		$registry = WP_Block_Type_Registry::get_instance();
+		$registry->unregister( 'core/dummy' );
 	}
 
 	/**
 	 * Test dynamic blocks that lack content, including void blocks.
 	 *
-	 * @covers do_blocks
+	 * @covers ::do_blocks
 	 */
 	function test_dynamic_block_rendering() {
 		$settings = array(
-			'render' => array(
+			'render_callback' => array(
 				$this,
 				'render_dummy_block',
 			),
@@ -74,32 +87,25 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test dynamic blocks that contain content.
+	 * Test dynamic blocks return string value from render, even if render
+	 * callback does not.
 	 *
-	 * @covers do_blocks
+	 * @covers WP_Block_Type::render
 	 */
-	function test_dynamic_block_rendering_with_content() {
+	function test_dynamic_block_renders_string() {
 		$settings = array(
-			'render' => array(
+			'render_callback' => array(
 				$this,
-				'render_dummy_block',
+				'render_dummy_block_numeric',
 			),
 		);
-		register_block_type( 'core/dummy', $settings );
-		$post_content =
-			'before' .
-			'<!-- wp:core/dummy {"value":"b1"} -->this\nshould\n\nbe\nignored<!-- /wp:core/dummy -->' .
-			'between' .
-			'<!-- wp:core/dummy {"value":"b2"} -->this should also be ignored<!-- /wp:core/dummy -->' .
-			'after';
 
-		$updated_post_content = do_blocks( $post_content );
-		$this->assertEquals( $updated_post_content,
-			'before' .
-			'1:b1' .
-			'between' .
-			'2:b2' .
-			'after'
-		);
+		register_block_type( 'core/dummy', $settings );
+		$block_type = new WP_Block_Type( 'core/dummy', $settings );
+
+		$rendered = $block_type->render();
+
+		$this->assertSame( '10', $rendered );
+		$this->assertInternalType( 'string', $rendered );
 	}
 }

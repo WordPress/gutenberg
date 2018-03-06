@@ -1,0 +1,33 @@
+.editor-warning {
+	z-index: z-index( '.editor-warning' );
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate( -50%, -50% );
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+	width: 96%;
+	max-width: 780px;
+	padding: 20px 20px 0px 20px;
+	background-color: $white;
+	border: 1px solid $light-gray-500;
+	text-align: center;
+	line-height: $default-line-height;
+	box-shadow: $shadow-popover;
+
+	p:first-child {
+		margin-top: 0;
+	}
+
+	.edit-post-visual-editor & p {
+		width: 100%;
+		font-family: $default-font;
+		font-size: $default-font-size;
+	}
+
+	.components-button {
+		margin: 0 #{ $item-spacing / 2 } 5px;
+	}
+}

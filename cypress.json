@@ -1,0 +1,12 @@
+{
+	"baseUrl": "http://localhost:8888",
+	"env": {
+		"username": "admin",
+		"password": "password"
+	},
+	"integrationFolder": "test/e2e/integration",
+	"supportFile": "test/e2e/support",
+	"videoRecording": false,
+	"chromeWebSecurity": false,
+	"pluginsFile": "test/e2e/plugins"
+}

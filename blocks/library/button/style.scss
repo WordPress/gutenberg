@@ -1,40 +1,39 @@
 $blocks-button__height: 46px;
+$blocks-button__line-height: $big-font-size + 6px;
 
-.blocks-button {
-	font-family: $default-font;
-	display: inline-block;
-	text-decoration: none;
-	font-size: $big-font-size;
-	margin: 0;
-	padding: 0 24px;
-	height: $blocks-button__height;
-	line-height: $blocks-button__height;
-	cursor: default;
-	border-radius: $blocks-button__height / 2;
-	white-space: nowrap;
-	background: $blue-medium-400;
-	color: $white;
-	vertical-align: top;
-	position: relative;
+.wp-block-button {
+	margin-bottom: 1.5em;
 
-	&:hover {
+	& .wp-block-button__link {
+		background-color: $dark-gray-700;
+		border: none;
+		border-radius: $blocks-button__height / 2;
+		box-shadow: none !important;
 		color: $white;
+		cursor: pointer;
+		display: inline-block;
+		font-size: $big-font-size;
+		line-height: $blocks-button__line-height;
+		margin: 0;
+		padding: ( $blocks-button__height - $blocks-button__line-height ) / 2 24px;
+		text-align: center;
+		text-decoration: none !important;
+		white-space: nowrap;
+		word-break: break-word;
+
+		&:hover,
+		&:focus,
+		&:active {
+			background-color: $dark-gray-700;
+			color: $white;
+		}
 	}
 
-	.editable-format-toolbar__link-modal {
-		z-index: 2;
-		top: $blocks-button__height + 2px;
-		left: 50%;
-		transform: translateX( -50% );
-	}
-}
-
-.editor-visual-editor__block[data-type="core/button"] {
-	&[data-align="center"] {
+	&.aligncenter {
 		text-align: center;
 	}
 
-	&[data-align="right"] {
+	&.alignright {
 		text-align: right;
 	}
 }

@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
 import { shallow } from 'enzyme';
 
 /**
  * Internal dependencies
  */
-import { Placeholder } from 'components';
+import Placeholder from '../';
 
 describe( 'Placeholder', () => {
 	describe( 'basic rendering', () => {
@@ -17,32 +16,31 @@ describe( 'Placeholder', () => {
 			const placeholderInstructions = placeholder.find( '.components-placeholder__instructions' );
 			const placeholderFieldset = placeholder.find( '.components-placeholder__fieldset' );
 
-			expect( placeholder.hasClass( 'components-placeholder' ) ).to.be.true();
+			expect( placeholder.hasClass( 'components-placeholder' ) ).toBe( true );
 			// Test for empty label.
-			expect( placeholderLabel.exists() ).to.be.true();
-			expect( placeholderLabel.find( 'Dashicon' ).exists() ).to.be.false();
+			expect( placeholderLabel.exists() ).toBe( true );
+			expect( placeholderLabel.find( 'Dashicon' ).exists() ).toBe( false );
 			// Test for non existant instructions.
-			expect( placeholderInstructions.exists() ).to.be.false();
+			expect( placeholderInstructions.exists() ).toBe( false );
 			// Test for empty fieldset.
-			expect( placeholderFieldset.exists() ).to.be.true();
+			expect( placeholderFieldset.exists() ).toBe( true );
 		} );
 
 		it( 'should render a Dashicon in the label section', () => {
 			const placeholder = shallow( <Placeholder icon="wordpress" /> );
 			const placeholderLabel = placeholder.find( '.components-placeholder__label' );
 
-			expect( placeholderLabel.exists() ).to.be.true();
-			expect( placeholderLabel.find( 'Dashicon' ).exists() ).to.be.true();
+			expect( placeholderLabel.exists() ).toBe( true );
+			expect( placeholderLabel.find( 'Dashicon' ).exists() ).toBe( true );
 		} );
 
-		it( 'should render a label section and add aria label', () => {
+		it( 'should render a label section', () => {
 			const label = 'WordPress';
 			const placeholder = shallow( <Placeholder label={ label } /> );
 			const placeholderLabel = placeholder.find( '.components-placeholder__label' );
 			const child = placeholderLabel.childAt( 0 );
 
-			expect( placeholder.prop( 'aria-label' ) ).to.equal( label );
-			expect( child.text() ).to.equal( label );
+			expect( child.text() ).toBe( label );
 		} );
 
 		it( 'should display an instructions element', () => {
@@ -51,8 +49,8 @@ describe( 'Placeholder', () => {
 			const placeholderInstructions = placeholder.find( '.components-placeholder__instructions' );
 			const child = placeholderInstructions.childAt( 0 );
 
-			expect( placeholderInstructions.exists() ).to.be.true();
-			expect( child.matchesElement( element ) ).to.be.true();
+			expect( placeholderInstructions.exists() ).toBe( true );
+			expect( child.matchesElement( element ) ).toBe( true );
 		} );
 
 		it( 'should display a fieldset from the children property', () => {
@@ -61,18 +59,18 @@ describe( 'Placeholder', () => {
 			const placeholderFieldset = placeholder.find( '.components-placeholder__fieldset' );
 			const child = placeholderFieldset.childAt( 0 );
 
-			expect( placeholderFieldset.exists() ).to.be.true();
-			expect( child.matchesElement( element ) ).to.be.true();
+			expect( placeholderFieldset.exists() ).toBe( true );
+			expect( child.matchesElement( element ) ).toBe( true );
 		} );
 
 		it( 'should add an additional className to the top container', () => {
 			const placeholder = shallow( <Placeholder className="wp-placeholder" /> );
-			expect( placeholder.hasClass( 'wp-placeholder' ) ).to.be.true();
+			expect( placeholder.hasClass( 'wp-placeholder' ) ).toBe( true );
 		} );
 
 		it( 'should add additional props to the top level container', () => {
 			const placeholder = shallow( <Placeholder test="test" /> );
-			expect( placeholder.prop( 'test' ) ).to.equal( 'test' );
+			expect( placeholder.prop( 'test' ) ).toBe( 'test' );
 		} );
 	} );
 } );

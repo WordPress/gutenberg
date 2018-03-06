@@ -22,7 +22,7 @@ function gutenberg_get_jed_locale_data( $domain ) {
 	$translations = get_translations_for_domain( $domain );
 
 	$locale = array(
-		'domain' => $domain,
+		'domain'      => $domain,
 		'locale_data' => array(
 			$domain => array(
 				'' => array(
@@ -53,7 +53,7 @@ function gutenberg_load_plugin_textdomain() {
 	load_plugin_textdomain(
 		'gutenberg',
 		false,
-		dirname( plugin_basename( __FILE__ ) ) . '/languages/'
+		plugin_basename( gutenberg_dir_path() ) . '/languages/'
 	);
 }
 add_action( 'plugins_loaded', 'gutenberg_load_plugin_textdomain' );

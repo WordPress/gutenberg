@@ -1,0 +1,52 @@
+.editor-post-title {
+	position: relative;
+	padding: 5px 0;
+
+	div {
+		border: 1px solid transparent;
+		font-size: $editor-font-size;
+		transition: 0.2s outline;
+		margin-top: 0;
+		margin-bottom: 0;
+		padding: $block-padding;
+	}
+
+	&:hover div {
+		border: 1px solid $light-gray-500;
+		transition: 0.2s outline;
+	}
+
+	&.is-selected div {
+		border: 1px solid $light-gray-500;
+		transition: 0.2s outline;
+	}
+}
+
+.editor-post-title textarea.editor-post-title__input {
+	display: block;
+	font-size: 2em;
+	font-family: $editor-font;
+	line-height: $default-line-height;
+	outline: none;
+	border: none;
+	box-shadow: none;
+	width: 100%;
+	padding: 5px 0;
+	margin: 0;
+
+	// inherited from h1
+	font-weight: 600;
+
+	&:focus {
+		outline: none;
+		box-shadow: none;
+	}
+}
+
+.editor-post-title .editor-post-permalink {
+	font-size: $default-font-size;
+	position: absolute;
+	top: -34px;
+	left: 0;
+	right: 0;
+}

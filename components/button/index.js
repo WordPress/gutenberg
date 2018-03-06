@@ -1,13 +1,17 @@
 /**
  * External dependencies
  */
-import './style.scss';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { Component, createElement } from 'element';
+import { Component, createElement } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import './style.scss';
 
 class Button extends Component {
 	constructor( props ) {
@@ -26,12 +30,25 @@ class Button extends Component {
 	}
 
 	render() {
-		const { href, target, isPrimary, isLarge, isToggled, className, disabled, ...additionalProps } = this.props;
+		const {
+			href,
+			target,
+			isPrimary,
+			isLarge,
+			isSmall,
+			isToggled,
+			isBusy,
+			className,
+			disabled,
+			...additionalProps
+		} = this.props;
 		const classes = classnames( 'components-button', className, {
 			button: ( isPrimary || isLarge ),
 			'button-primary': isPrimary,
 			'button-large': isLarge,
+			'button-small': isSmall,
 			'is-toggled': isToggled,
+			'is-busy': isBusy,
 		} );
 
 		const tag = href !== undefined && ! disabled ? 'a' : 'button';

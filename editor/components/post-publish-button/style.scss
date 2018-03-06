@@ -1,0 +1,30 @@
+.editor-post-publish-button.is-saving,
+.editor-post-publish-button.is-saving:disabled {
+	position: relative;
+
+	// These styles overrides the disabled state with the button primary styles
+	opacity: 1;
+	background: none !important;
+	text-decoration: none !important;
+	color: $white !important;
+	border-color: $blue-wordpress $blue-wordpress-700 $blue-wordpress-700 !important;
+	box-shadow: 0 1px 0 $blue-wordpress-700 !important;
+	text-shadow: 0 -1px 1px $blue-wordpress-700, 1px 0 1px $blue-wordpress-700, 0 1px 1px $blue-wordpress-700, -1px 0 1px $blue-wordpress-700 !important;
+	// End of the overriding
+
+	&:hover {
+		background: none;
+	}
+
+	&:before {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		content: '';
+		background-image: repeating-linear-gradient( -45deg, $blue-wordpress-700, $blue-wordpress-700 11px, $blue-wordpress 10px, $blue-wordpress 20px );
+		z-index: -1;
+		@include move_background;
+	}
+}

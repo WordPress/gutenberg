@@ -1,0 +1,21 @@
+.editor-block-toolbar {
+	display: inline-flex;
+	overflow: auto; // allow horizontal scrolling on mobile
+	flex-grow: 1;
+	width: 100%;
+
+	.components-toolbar {
+		border: none;
+		border-left: 1px solid $light-gray-500;
+	}
+
+	// this should probably have its own class
+	> div {
+		display: flex;
+	}
+}
+
+.editor-block-toolbar .editor-block-switcher {
+	display: inline-flex;
+	border-left: 1px solid $light-gray-500;
+}

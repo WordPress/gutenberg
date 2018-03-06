@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { last, take, clone, uniq, map, difference, each, identity, some, throttle } from 'lodash';
+import { last, take, clone, uniq, map, difference, each, identity, some } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from 'i18n';
-import { Component } from 'element';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,11 +18,13 @@ import Token from './token';
 import TokenInput from './token-input';
 import SuggestionsList from './suggestions-list';
 import withInstanceId from '../higher-order/with-instance-id';
+import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 const initialState = {
 	incompleteTokenValue: '',
 	inputOffsetFromEnd: 0,
 	isActive: false,
+	isExpanded: false,
 	selectedSuggestionIndex: -1,
 	selectedSuggestionScroll: false,
 };
@@ -46,12 +48,12 @@ class FormTokenField extends Component {
 		this.onInputChange = this.onInputChange.bind( this );
 		this.bindInput = this.bindInput.bind( this );
 		this.bindTokensAndInput = this.bindTokensAndInput.bind( this );
-		this.throlltedSpeak = throttle( this.speak.bind( this ), 1000 );
 	}
 
 	componentDidUpdate() {
+		// Make sure to focus the input when the isActive state is true.
 		if ( this.state.isActive && ! this.input.hasFocus() ) {
-			this.input.focus(); // make sure focus is on input
+			this.input.focus();
 		}
 	}
 
@@ -73,7 +75,18 @@ class FormTokenField extends Component {
 	}
 
 	onFocus( event ) {
-		this.setState( { isActive: true } );
+		// If focus is on the input or on the container, set the isActive state to true.
+		if ( this.input.hasFocus() || event.target === this.tokensAndInput ) {
+			this.setState( { isActive: true } );
+		} else {
+			/*
+			 * Otherwise, focus is on one of the token "remove" buttons and we
+			 * set the isActive state to false to prevent the input to be
+			 * re-focused, see componentDidUpdate().
+			 */
+			this.setState( { isActive: false } );
+		}
+
 		if ( 'function' === typeof this.props.onFocus ) {
 			this.props.onFocus( event );
 		}
@@ -154,6 +167,7 @@ class FormTokenField extends Component {
 
 	onTokenClickRemove( event ) {
 		this.deleteToken( event.value );
+		this.input.focus();
 	}
 
 	onSuggestionHovered( suggestion ) {
@@ -185,19 +199,25 @@ class FormTokenField extends Component {
 			incompleteTokenValue: tokenValue,
 			selectedSuggestionIndex: -1,
 			selectedSuggestionScroll: false,
+			isExpanded: false,
 		} );
 
-		const showMessage = tokenValue.trim().length > 1;
-		if ( showMessage ) {
+		this.props.onInputChange( tokenValue );
+
+		const inputHasMinimumChars = tokenValue.trim().length > 1;
+		if ( inputHasMinimumChars ) {
 			const matchingSuggestions = this.getMatchingSuggestions( tokenValue );
+
+			this.setState( { isExpanded: !! matchingSuggestions.length } );
+
 			if ( !! matchingSuggestions.length ) {
-				this.throlltedSpeak( sprintf( _n(
+				this.props.debouncedSpeak( sprintf( _n(
 					'%d result found, use up and down arrow keys to navigate.',
 					'%d results found, use up and down arrow keys to navigate.',
 					matchingSuggestions.length
-				), matchingSuggestions.length ) );
+				), matchingSuggestions.length ), 'assertive' );
 			} else {
-				this.throlltedSpeak( __( 'No results.' ) );
+				this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 			}
 		}
 	}
@@ -338,7 +358,7 @@ class FormTokenField extends Component {
 
 	addNewToken( token ) {
 		this.addNewTokens( [ token ] );
-		this.speak( this.props.messages.added );
+		this.props.speak( this.props.messages.added, 'assertive' );
 
 		this.setState( {
 			incompleteTokenValue: '',
@@ -356,7 +376,7 @@ class FormTokenField extends Component {
 			return this.getTokenValue( item ) !== this.getTokenValue( token );
 		} );
 		this.props.onChange( newTokens );
-		this.speak( this.props.messages.removed );
+		this.props.speak( this.props.messages.removed, 'assertive' );
 	}
 
 	getTokenValue( token ) {
@@ -398,10 +418,6 @@ class FormTokenField extends Component {
 		}
 
 		return take( suggestions, maxSuggestions );
-	}
-
-	speak( message ) {
-		wp.a11y.speak( message, 'assertive' );
 	}
 
 	getSelectedSuggestion() {
@@ -468,7 +484,7 @@ class FormTokenField extends Component {
 			disabled: this.props.disabled,
 			value: this.state.incompleteTokenValue,
 			onBlur: this.onBlur,
-			isExpanded: this.state.isActive,
+			isExpanded: this.state.isExpanded,
 			selectedSuggestionIndex: this.state.selectedSuggestionIndex,
 		};
 
@@ -502,7 +518,8 @@ class FormTokenField extends Component {
 			tabIndex: '-1',
 		};
 		const matchingSuggestions = this.getMatchingSuggestions();
-		const showSuggestions = this.state.incompleteTokenValue.trim().length > 1;
+		const inputHasMinimumChars = this.state.incompleteTokenValue.trim().length > 1;
+		const showSuggestions = inputHasMinimumChars && !! matchingSuggestions.length;
 
 		if ( ! disabled ) {
 			tokenFieldProps = Object.assign( {}, tokenFieldProps, {
@@ -512,6 +529,10 @@ class FormTokenField extends Component {
 			} );
 		}
 
+		// Disable reason: There is no appropriate role which describes the
+		// input container intended accessible usability.
+		// TODO: Refactor click detection to use blur to stop propagation.
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div { ...tokenFieldProps } >
 				<label htmlFor={ `components-form-token-input-${ instanceId }` } className="screen-reader-text">
@@ -534,7 +555,6 @@ class FormTokenField extends Component {
 						suggestions={ matchingSuggestions }
 						selectedIndex={ this.state.selectedSuggestionIndex }
 						scrollIntoView={ this.state.selectedSuggestionScroll }
-						isExpanded={ this.state.isActive }
 						onHover={ this.onSuggestionHovered }
 						onSelect={ this.onSuggestionSelected }
 					/>
@@ -544,6 +564,7 @@ class FormTokenField extends Component {
 				</div>
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
@@ -555,6 +576,7 @@ FormTokenField.defaultProps = {
 	displayTransform: identity,
 	saveTransform: ( token ) => token.trim(),
 	onChange: () => {},
+	onInputChange: () => {},
 	isBorderless: false,
 	disabled: false,
 	tokenizeOnSpace: false,
@@ -565,4 +587,4 @@ FormTokenField.defaultProps = {
 	},
 };
 
-export default withInstanceId( FormTokenField );
+export default withSpokenMessages( withInstanceId( FormTokenField ) );

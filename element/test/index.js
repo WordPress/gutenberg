@@ -1,24 +1,40 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
+import { shallow } from 'enzyme';
 
 /**
  * Internal dependencies
  */
-import { createElement, renderToString, concatChildren, switchChildrenNodeName } from '../';
+import {
+	Component,
+	createElement,
+	concatChildren,
+	renderToString,
+	switchChildrenNodeName,
+	getWrapperDisplayName,
+	RawHTML,
+} from '../';
 
 describe( 'element', () => {
 	describe( 'renderToString', () => {
-		it( 'should return an empty string for a falsey value', () => {
-			expect( renderToString() ).to.equal( '' );
-			expect( renderToString( false ) ).to.equal( '' );
-			expect( renderToString( null ) ).to.equal( '' );
-			expect( renderToString( 0 ) ).to.equal( '' );
+		it( 'should return an empty string for booleans/null/undefined values', () => {
+			expect( renderToString() ).toBe( '' );
+			expect( renderToString( false ) ).toBe( '' );
+			expect( renderToString( true ) ).toBe( '' );
+			expect( renderToString( null ) ).toBe( '' );
+		} );
+
+		it( 'should return a string 0', () => {
+			expect( renderToString( 0 ) ).toBe( '0' );
+		} );
+
+		it( 'should return a string 12345', () => {
+			expect( renderToString( 12345 ) ).toBe( '12345' );
 		} );
 
 		it( 'should return a string verbatim', () => {
-			expect( renderToString( 'Zucchini' ) ).to.equal( 'Zucchini' );
+			expect( renderToString( 'Zucchini' ) ).toBe( 'Zucchini' );
 		} );
 
 		it( 'should return a string from an array', () => {
@@ -26,23 +42,31 @@ describe( 'element', () => {
 				'Zucchini ',
 				createElement( 'em', null, 'is a' ),
 				' summer squash',
-			] ) ).to.equal( 'Zucchini <em>is a</em> summer squash' );
+			] ) ).toBe( 'Zucchini <em>is a</em> summer squash' );
 		} );
 
 		it( 'should return a string from an element', () => {
 			expect( renderToString(
 				createElement( 'strong', null, 'Courgette' )
-			) ).to.equal( '<strong>Courgette</strong>' );
+			) ).toBe( '<strong>Courgette</strong>' );
+		} );
+
+		it( 'strips raw html wrapper', () => {
+			const html = '<p>So scary!</p>';
+
+			expect( renderToString(
+				<RawHTML>{ html }</RawHTML>,
+			) ).toBe( html );
 		} );
 	} );
 
 	describe( 'concatChildren', () => {
 		it( 'should return an empty array for undefined children', () => {
-			expect( concatChildren() ).to.eql( [] );
+			expect( concatChildren() ).toEqual( [] );
 		} );
 
 		it( 'should concat the string arrays', () => {
-			expect( concatChildren( [ 'a' ], 'b' ) ).to.eql( [ 'a', 'b' ] );
+			expect( concatChildren( [ 'a' ], 'b' ) ).toEqual( [ 'a', 'b' ] );
 		} );
 
 		it( 'should concat the object arrays and rewrite keys', () => {
@@ -50,24 +74,24 @@ describe( 'element', () => {
 				[ createElement( 'strong', {}, 'Courgette' ) ],
 				createElement( 'strong', {}, 'Concombre' )
 			);
-			expect( concat.length ).to.equal( 2 );
-			expect( concat[ 0 ].key ).to.equal( '0,0' );
-			expect( concat[ 1 ].key ).to.equal( '1,0' );
+			expect( concat ).toHaveLength( 2 );
+			expect( concat[ 0 ].key ).toBe( '0,0' );
+			expect( concat[ 1 ].key ).toBe( '1,0' );
 		} );
 	} );
 
 	describe( 'switchChildrenNodeName', () => {
 		it( 'should return undefined for undefined children', () => {
-			expect( switchChildrenNodeName() ).to.be.undefined();
+			expect( switchChildrenNodeName() ).toBeUndefined();
 		} );
 
 		it( 'should switch strings', () => {
 			const children = switchChildrenNodeName( [ 'a', 'b' ], 'strong' );
-			expect( children.length ).to.equal( 2 );
-			expect( children[ 0 ].type ).to.equal( 'strong' );
-			expect( children[ 0 ].props.children ).to.equal( 'a' );
-			expect( children[ 1 ].type ).to.equal( 'strong' );
-			expect( children[ 1 ].props.children ).to.equal( 'b' );
+			expect( children ).toHaveLength( 2 );
+			expect( children[ 0 ].type ).toBe( 'strong' );
+			expect( children[ 0 ].props.children ).toBe( 'a' );
+			expect( children[ 1 ].type ).toBe( 'strong' );
+			expect( children[ 1 ].props.children ).toBe( 'b' );
 		} );
 
 		it( 'should switch elements', () => {
@@ -75,12 +99,80 @@ describe( 'element', () => {
 				createElement( 'strong', { align: 'left' }, 'Courgette' ),
 				createElement( 'strong', {}, 'Concombre' ),
 			], 'em' );
-			expect( children.length ).to.equal( 2 );
-			expect( children[ 0 ].type ).to.equal( 'em' );
-			expect( children[ 0 ].props.children ).to.equal( 'Courgette' );
-			expect( children[ 0 ].props.align ).to.equal( 'left' );
-			expect( children[ 1 ].type ).to.equal( 'em' );
-			expect( children[ 1 ].props.children ).to.equal( 'Concombre' );
+			expect( children ).toHaveLength( 2 );
+			expect( children[ 0 ].type ).toBe( 'em' );
+			expect( children[ 0 ].props.children ).toBe( 'Courgette' );
+			expect( children[ 0 ].props.align ).toBe( 'left' );
+			expect( children[ 1 ].type ).toBe( 'em' );
+			expect( children[ 1 ].props.children ).toBe( 'Concombre' );
+		} );
+	} );
+
+	describe( 'getWrapperDisplayName()', () => {
+		it( 'should use default name for anonymous function', () => {
+			expect( getWrapperDisplayName( () => <div />, 'test' ) ).toBe( 'Test(Component)' );
+		} );
+
+		it( 'should use camel case starting with upper for wrapper prefix ', () => {
+			expect( getWrapperDisplayName( () => <div />, 'one-two_threeFOUR' ) ).toBe( 'OneTwoThreeFour(Component)' );
+		} );
+
+		it( 'should use function name', () => {
+			function SomeComponent() {
+				return <div />;
+			}
+
+			expect( getWrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(SomeComponent)' );
+		} );
+
+		it( 'should use component class name', () => {
+			class SomeComponent extends Component {
+				render() {
+					return <div />;
+				}
+			}
+
+			expect( getWrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(SomeComponent)' );
+		} );
+
+		it( 'should use displayName property', () => {
+			class SomeComponent extends Component {
+				render() {
+					return <div />;
+				}
+			}
+			SomeComponent.displayName = 'CustomDisplayName';
+
+			expect( getWrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(CustomDisplayName)' );
+		} );
+	} );
+
+	describe( 'RawHTML', () => {
+		it( 'is dangerous', () => {
+			const html = '<p>So scary!</p>';
+			const element = shallow(
+				<RawHTML>
+					{ html }
+				</RawHTML>
+			);
+
+			expect( element.type() ).toBe( 'wp-raw-html' );
+			expect( element.prop( 'dangerouslySetInnerHTML' ).__html ).toBe( html );
+			expect( element.prop( 'children' ) ).toBe( undefined );
+		} );
+
+		it( 'creates wrapper if assigned other props', () => {
+			const html = '<p>So scary!</p>';
+			const element = shallow(
+				<RawHTML className="foo">
+					{ html }
+				</RawHTML>
+			);
+
+			expect( element.type() ).toBe( 'div' );
+			expect( element.prop( 'className' ) ).toBe( 'foo' );
+			expect( element.prop( 'dangerouslySetInnerHTML' ).__html ).toBe( html );
+			expect( element.prop( 'children' ) ).toBe( undefined );
 		} );
 	} );
 } );

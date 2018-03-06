@@ -1,0 +1,15 @@
+[
+    {
+        "blockName": "core/cover-image",
+        "attrs": {
+            "url": "https://cldup.com/uuUqE_dXzy.jpg",
+            "dimRatio": 40
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<section class=\"wp-block-cover-image has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <h2>Guten Berg!</h2>\n</section>\n"
+    },
+    {
+        "attrs": {},
+        "innerHTML": "\n"
+    }
+]

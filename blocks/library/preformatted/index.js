@@ -1,52 +1,69 @@
 /**
  * WordPress
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
-import { registerBlockType, createBlock, query } from '../../api';
-import Editable from '../../editable';
+import './editor.scss';
+import { createBlock } from '../../api';
+import RichText from '../../rich-text';
 
-const { children } = query;
+export const name = 'core/preformatted';
 
-registerBlockType( 'core/preformatted', {
+export const settings = {
 	title: __( 'Preformatted' ),
+
+	description: __( 'Preformatted text keeps your spaces, tabs and linebreaks as they are.' ),
 
 	icon: 'text',
 
 	category: 'formatting',
 
 	attributes: {
-		content: children( 'pre' ),
+		content: {
+			type: 'array',
+			source: 'children',
+			selector: 'pre',
+		},
 	},
 
 	transforms: {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) =>
 					createBlock( 'core/preformatted', attributes ),
+			},
+			{
+				type: 'raw',
+				isMatch: ( node ) => (
+					node.nodeName === 'PRE' &&
+					! (
+						node.children.length === 1 &&
+						node.firstChild.nodeName === 'CODE'
+					)
+				),
 			},
 		],
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/text' ],
+				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) =>
-					createBlock( 'core/text', attributes ),
+					createBlock( 'core/paragraph', attributes ),
 			},
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus } ) {
+	edit( { attributes, setAttributes, className, isSelected } ) {
 		const { content } = attributes;
 
-		return (
-			<Editable
+		return [
+			<RichText
+				key="block"
 				tagName="pre"
 				value={ content }
 				onChange={ ( nextContent ) => {
@@ -54,10 +71,11 @@ registerBlockType( 'core/preformatted', {
 						content: nextContent,
 					} );
 				} }
-				focus={ focus }
-				onFocus={ setFocus }
-			/>
-		);
+				placeholder={ __( 'Write preformatted text…' ) }
+				wrapperClassName={ className }
+				isSelected={ isSelected }
+			/>,
+		];
 	},
 
 	save( { attributes } ) {
@@ -65,4 +83,4 @@ registerBlockType( 'core/preformatted', {
 
 		return <pre>{ content }</pre>;
 	},
-} );
+};

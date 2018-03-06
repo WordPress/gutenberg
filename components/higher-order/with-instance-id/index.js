@@ -1,14 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { Component } from 'element';
+import { Component } from '@wordpress/element';
 
 /**
- * A Higher Order Component used to be provide a unique instance ID by component
+ * A Higher Order Component used to be provide a unique instance ID by
+ * component.
  *
- * @param {WPElement}  WrappedComponent  The wrapped component
+ * @param {WPElement} WrappedComponent The wrapped component.
  *
- * @return {Component}                   Component with an instanceId prop.
+ * @return {Component} Component with an instanceId prop.
  */
 function withInstanceId( WrappedComponent ) {
 	let instances = 0;

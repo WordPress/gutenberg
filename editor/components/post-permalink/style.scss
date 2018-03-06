@@ -1,0 +1,36 @@
+.editor-post-permalink {
+	display: inline-flex;
+	align-items: center;
+	border: 1px solid $light-gray-500;
+	background: $white;
+	padding: 5px;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	height: 40px;
+
+	// put toolbar snugly to edge on mobile
+	margin-left: -$block-padding - 1px;	// stack borders
+	margin-right: -$block-padding - 1px;
+	@include break-small() {
+		margin-left: -1px;
+		margin-right: -1px;
+	}
+}
+
+.editor-post-permalink__label {
+	margin: 0 10px;
+}
+
+.editor-post-permalink__link {
+	color: $dark-gray-200;
+	text-decoration: underline;
+	margin-right: 10px;
+	width: 100%;
+	overflow: hidden;
+	position: relative;
+	white-space: nowrap;
+
+	&:after {
+		@include long-content-fade( $size: 20% );
+	}
+}

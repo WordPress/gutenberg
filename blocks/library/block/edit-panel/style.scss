@@ -1,0 +1,32 @@
+.reusable-block-edit-panel {
+	align-items: center;
+	background: $light-gray-100;
+	color: $dark-gray-500;
+	display: flex;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	justify-content: flex-end;
+	margin: $block-padding (-$block-padding) (-$block-padding);
+	padding: 10px $block-padding;
+
+	.reusable-block-edit-panel__spinner {
+		margin: 0 5px;
+	}
+
+	.reusable-block-edit-panel__info {
+		margin-right: auto;
+	}
+
+	.reusable-block-edit-panel__title {
+		flex-grow: 1;
+		font-size: 14px;
+		height: 30px;
+		margin: 0 auto 0 0;
+		max-width: 230px;
+	}
+
+	// Needs specificity to override the margin-bottom set by .button
+	.wp-core-ui & .reusable-block-edit-panel__button {
+		margin: 0 0 0 5px;
+	}
+}

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { expect } from 'chai';
 import { shallow, mount } from 'enzyme';
 import { Component } from '../../../../element';
 
@@ -36,42 +35,42 @@ describe( 'withFocusReturn()', () => {
 			const renderedComposite = shallow( <Composite /> );
 			const wrappedElement = renderedComposite.find( 'Test' );
 			const wrappedElementShallow = wrappedElement.shallow();
-			expect( wrappedElementShallow.hasClass( 'test' ) ).to.be.true();
-			expect( wrappedElementShallow.type() ).to.equal( 'div' );
-			expect( wrappedElementShallow.text() ).to.equal( 'Testing' );
+			expect( wrappedElementShallow.hasClass( 'test' ) ).toBe( true );
+			expect( wrappedElementShallow.type() ).toBe( 'div' );
+			expect( wrappedElementShallow.text() ).toBe( 'Testing' );
 		} );
 
 		it( 'should pass additional props through to the wrapped element', () => {
 			const renderedComposite = shallow( <Composite test="test" /> );
 			const wrappedElement = renderedComposite.find( 'Test' );
 			// Ensure that the wrapped Test element has the appropriate props.
-			expect( wrappedElement.props().test ).to.equal( 'test' );
+			expect( wrappedElement.props().test ).toBe( 'test' );
 		} );
 
 		it( 'should not switch focus back to the bound focus element', () => {
 			const mountedComposite = mount( <Composite /> );
-			expect( mountedComposite.instance().activeElement ).to.equal( activeElement );
+			expect( mountedComposite.instance().activeElementOnMount ).toBe( activeElement );
 
 			// Change activeElement.
 			switchFocusTo.focus();
-			expect( document.activeElement ).to.equal( switchFocusTo );
+			expect( document.activeElement ).toBe( switchFocusTo );
 
 			// Should keep focus on switchFocusTo, because it is not within HOC.
 			mountedComposite.unmount();
-			expect( document.activeElement ).to.equal( switchFocusTo );
+			expect( document.activeElement ).toBe( switchFocusTo );
 		} );
 
 		it( 'should return focus to element associated with HOC', () => {
 			const mountedComposite = mount( <Composite /> );
-			expect( mountedComposite.instance().activeElement ).to.equal( activeElement );
+			expect( mountedComposite.instance().activeElementOnMount ).toBe( activeElement );
 
 			// Change activeElement.
 			document.activeElement.blur();
-			expect( document.activeElement ).to.equal( document.body );
+			expect( document.activeElement ).toBe( document.body );
 
 			// Should return to the activeElement saved with this component.
 			mountedComposite.unmount();
-			expect( document.activeElement ).to.equal( activeElement );
+			expect( document.activeElement ).toBe( activeElement );
 		} );
 	} );
 } );

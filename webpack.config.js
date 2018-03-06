@@ -1,19 +1,66 @@
 /**
  * External dependencies
  */
-
-const glob = require( 'glob' );
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
+const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+const { reduce, escapeRegExp, castArray, get } = require( 'lodash' );
+const { basename } = require( 'path' );
+
+// Main CSS loader for everything but blocks..
+const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
+	filename: './[basename]/build/style.css',
+} );
+
+// CSS loader for styles specific to block editing.
+const editBlocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './blocks/build/edit-blocks.css',
+} );
+
+// CSS loader for styles specific to blocks in general.
+const blocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './blocks/build/style.css',
+} );
+
+// Configuration for the ExtractTextPlugin.
+const extractConfig = {
+	use: [
+		{ loader: 'raw-loader' },
+		{
+			loader: 'postcss-loader',
+			options: {
+				plugins: [
+					require( 'autoprefixer' ),
+				],
+			},
+		},
+		{
+			loader: 'sass-loader',
+			query: {
+				includePaths: [ 'edit-post/assets/stylesheets' ],
+				data: '@import "colors"; @import "admin-schemes"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
+				outputStyle: 'production' === process.env.NODE_ENV ?
+					'compressed' : 'nested',
+			},
+		},
+	],
+};
 
 const entryPointNames = [
-	'element',
-	'i18n',
-	'components',
-	'utils',
 	'blocks',
+	'components',
 	'date',
 	'editor',
+	'element',
+	'i18n',
+	'utils',
+	'data',
+	'viewport',
+	[ 'editPost', 'edit-post' ],
+];
+
+const packageNames = [
+	'hooks',
 ];
 
 const externals = {
@@ -22,21 +69,82 @@ const externals = {
 	'react-dom/server': 'ReactDOMServer',
 	tinymce: 'tinymce',
 	moment: 'moment',
+	jquery: 'jQuery',
 };
 
-entryPointNames.forEach( entryPointName => {
-	externals[ entryPointName ] = {
-		'this': [ 'wp', entryPointName ],
+[ ...entryPointNames, ...packageNames ].forEach( name => {
+	externals[ `@wordpress/${ name }` ] = {
+		this: [ 'wp', name ],
 	};
 } );
 
+/**
+ * Webpack plugin for handling specific template tags in Webpack configuration
+ * values like those supported in the base Webpack functionality (e.g. `name`).
+ *
+ * @see webpack.TemplatedPathPlugin
+ */
+class CustomTemplatedPathPlugin {
+	/**
+	 * CustomTemplatedPathPlugin constructor. Initializes handlers as a tuple
+	 * set of RegExp, handler, where the regular expression is used in matching
+	 * a Webpack asset path.
+	 *
+	 * @param {Object.<string,Function>} handlers Object keyed by tag to match,
+	 *                                            with function value returning
+	 *                                            replacement string.
+	 *
+	 * @return {void}
+	 */
+	constructor( handlers ) {
+		this.handlers = reduce( handlers, ( result, handler, key ) => {
+			const regexp = new RegExp( `\\[${ escapeRegExp( key ) }\\]`, 'gi' );
+			return [ ...result, [ regexp, handler ] ];
+		}, [] );
+	}
+
+	/**
+	 * Webpack plugin application logic.
+	 *
+	 * @param {Object} compiler Webpack compiler
+	 *
+	 * @return {void}
+	 */
+	apply( compiler ) {
+		compiler.plugin( 'compilation', ( compilation ) => {
+			compilation.mainTemplate.plugin( 'asset-path', ( path, data ) => {
+				for ( let i = 0; i < this.handlers.length; i++ ) {
+					const [ regexp, handler ] = this.handlers[ i ];
+					if ( regexp.test( path ) ) {
+						return path.replace( regexp, handler( path, data ) );
+					}
+				}
+
+				return path;
+			} );
+		} );
+	}
+}
+
 const config = {
-	entry: entryPointNames.reduce( ( memo, entryPointName ) => {
-		memo[ entryPointName ] = './' + entryPointName + '/index.js';
-		return memo;
-	}, {} ),
+	entry: Object.assign(
+		entryPointNames.reduce( ( memo, entryPoint ) => {
+			// Normalized entry point as an array of [ name, path ]. If a path
+			// is not explicitly defined, use the name.
+			entryPoint = castArray( entryPoint );
+			const [ name, path = name ] = entryPoint;
+
+			memo[ name ] = `./${ path }`;
+
+			return memo;
+		}, {} ),
+		packageNames.reduce( ( memo, packageName ) => {
+			memo[ packageName ] = `./node_modules/@wordpress/${ packageName }`;
+			return memo;
+		}, {} )
+	),
 	output: {
-		filename: '[name]/build/index.js',
+		filename: '[basename]/build/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
@@ -47,11 +155,6 @@ const config = {
 			__dirname,
 			'node_modules',
 		],
-		alias: {
-			// There are currently resolution errors on RSF's "mitt" dependency
-			// when imported as native ES module
-			'react-slot-fill': 'react-slot-fill/lib/rsf.js',
-		},
 	},
 	module: {
 		rules: [
@@ -65,22 +168,25 @@ const config = {
 				use: 'babel-loader',
 			},
 			{
+				test: /style\.s?css$/,
+				include: [
+					/blocks/,
+				],
+				use: blocksCSSPlugin.extract( extractConfig ),
+			},
+			{
+				test: /editor\.s?css$/,
+				include: [
+					/blocks/,
+				],
+				use: editBlocksCSSPlugin.extract( extractConfig ),
+			},
+			{
 				test: /\.s?css$/,
-				use: ExtractTextPlugin.extract( {
-					use: [
-						{ loader: 'raw-loader' },
-						{ loader: 'postcss-loader' },
-						{
-							loader: 'sass-loader',
-							query: {
-								includePaths: [ 'editor/assets/stylesheets' ],
-								data: '@import "variables"; @import "mixins"; @import "animations";@import "z-index";',
-								outputStyle: 'production' === process.env.NODE_ENV ?
-									'compressed' : 'nested',
-							},
-						},
-					],
-				} ),
+				exclude: [
+					/blocks/,
+				],
+				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
 		],
 	},
@@ -88,16 +194,26 @@ const config = {
 		new webpack.DefinePlugin( {
 			'process.env.NODE_ENV': JSON.stringify( process.env.NODE_ENV || 'development' ),
 		} ),
-		new ExtractTextPlugin( {
-			filename: './[name]/build/style.css',
+		blocksCSSPlugin,
+		editBlocksCSSPlugin,
+		mainCSSExtractTextPlugin,
+		// Create RTL files with a -rtl suffix
+		new WebpackRTLPlugin( {
+			suffix: '-rtl',
+			minify: process.env.NODE_ENV === 'production' ? { safe: true } : false,
 		} ),
 		new webpack.LoaderOptionsPlugin( {
 			minimize: process.env.NODE_ENV === 'production',
 			debug: process.env.NODE_ENV !== 'production',
-			options: {
-				postcss: [
-					require( 'autoprefixer' ),
-				],
+		} ),
+		new CustomTemplatedPathPlugin( {
+			basename( path, data ) {
+				const rawRequest = get( data, [ 'chunk', 'entryModule', 'rawRequest' ] );
+				if ( rawRequest ) {
+					return basename( rawRequest );
+				}
+
+				return path;
 			},
 		} ),
 	],
@@ -109,35 +225,6 @@ const config = {
 switch ( process.env.NODE_ENV ) {
 	case 'production':
 		config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
-		break;
-
-	case 'test':
-		config.target = 'node';
-		config.node = {
-			__dirname: true,
-		};
-		config.module.rules = [
-			...entryPointNames.map( ( entry ) => ( {
-				test: require.resolve( './' + entry + '/index.js' ),
-				use: 'expose-loader?wp.' + entry,
-			} ) ),
-			...config.module.rules,
-		];
-		const testFiles = glob.sync(
-			'./{' + Object.keys( config.entry ).sort() + '}/**/test/*.js'
-		);
-		config.entry = [
-			...entryPointNames.map(
-				entryPointName => './' + entryPointName + '/index.js'
-			),
-			...testFiles.filter( f => /full-content\.js$/.test( f ) ),
-			...testFiles.filter( f => ! /full-content\.js$/.test( f ) ),
-		];
-		config.externals = [ require( 'webpack-node-externals' )() ];
-		config.output = {
-			filename: 'build/test.js',
-			path: __dirname,
-		};
 		break;
 
 	default:

@@ -1,21 +1,21 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import classnames from 'classnames';
 import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from 'i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 
-function FormToggle( { className, checked, id, onChange = noop, showHint = true } ) {
-	const wrapperClasses = classNames(
+function FormToggle( { className, checked, id, onChange = noop, showHint = true, ...props } ) {
+	const wrapperClasses = classnames(
 		'components-form-toggle',
 		className,
 		{ 'is-checked': checked }
@@ -27,9 +27,12 @@ function FormToggle( { className, checked, id, onChange = noop, showHint = true 
 				className="components-form-toggle__input"
 				id={ id }
 				type="checkbox"
-				value={ checked }
+				checked={ checked }
 				onChange={ onChange }
+				{ ...props }
 			/>
+			<span className="components-form-toggle__track"></span>
+			<span className="components-form-toggle__thumb"></span>
 			{ showHint &&
 				<span className="components-form-toggle__hint" aria-hidden>
 					{ checked ? __( 'On' ) : __( 'Off' ) }
