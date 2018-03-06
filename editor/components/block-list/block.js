@@ -417,6 +417,15 @@ export class BlockListBlock extends Component {
 			}
 		} else {
 			this.props.onSelectionStart( this.props.uid );
+
+			// Allow user to escape out of a multi-selection to a singular
+			// selection of a block via click. This is handled here since
+			// onFocus excludes blocks involved in a multiselection, as
+			// focus can be incurred by starting a multiselection (focus
+			// moved to first block's multi-controls).
+			if ( this.props.isMultiSelected ) {
+				this.props.onSelect();
+			}
 		}
 	}
 
