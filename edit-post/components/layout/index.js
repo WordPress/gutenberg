@@ -89,11 +89,9 @@ function Layout( {
 			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<EditorNotices />
 				<PreserveScrollInReorder />
-				<div className="edit-post-layout__editor">
-					<EditorModeKeyboardShortcuts />
-					{ mode === 'text' && <TextEditor /> }
-					{ mode === 'visual' && <VisualEditor /> }
-				</div>
+				<EditorModeKeyboardShortcuts />
+				{ mode === 'text' && <TextEditor /> }
+				{ mode === 'visual' && <VisualEditor /> }
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
 				</div>
