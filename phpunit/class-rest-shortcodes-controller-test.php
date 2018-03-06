@@ -99,7 +99,7 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'shortcode' => 'Any Random Text',
 				),
 				array(
-					'html' => '<p>Any Random Text</p>',
+					'html' => 'Any Random Text',
 					'type' => 'html',
 				),
 			),
@@ -150,7 +150,7 @@ class REST_Shortcodes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'postId'    => self::$post_id,
 				),
 				array(
-					'html' => '<p>\xe2\x82\xa1</p>',
+					'html' => '\xe2\x82\xa1',
 					'type' => 'html',
 				),
 			),

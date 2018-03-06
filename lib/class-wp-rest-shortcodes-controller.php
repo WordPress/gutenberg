@@ -87,8 +87,10 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 
 		// Initialize $data.
 		$data = array(
-			'html' => $output,
-			'type' => $type,
+			'html'                  => $output,
+			'type'                  => $type,
+			'head_scripts_styles'   => $head_scripts_styles,
+			'footer_scripts_styles' => $footer_scripts_styles,
 		);
 
 		if ( empty( $shortcode ) ) {
@@ -100,7 +102,12 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 			setup_postdata( $post );
 		}
 
-		$output = trim( apply_filters( 'the_content', $shortcode ) );
+		// Since the [embed] shortcode needs to be run earlier than other shortcodes.
+		if ( has_shortcode( $shortcode, 'embed' ) ) {
+			$output = $wp_embed->run_shortcode( $shortcode );
+		} else {
+			$output = do_shortcode( $shortcode );
+		}
 
 		if ( empty( $output ) ) {
 			$data['html'] = __( 'Sorry, couldn\'t render a preview', 'gutenberg' );
@@ -125,12 +132,8 @@ class WP_REST_Shortcodes_Controller extends WP_REST_Controller {
 				$embed_request['url'] = $matches[5][0];
 				$embed_response       = rest_do_request( $embed_request );
 				if ( $embed_response->is_error() ) {
-					// Convert to a WP_Error object.
-					$error      = $embed_response->as_error();
-					$message    = $embed_response->get_error_message();
-					$error_data = $embed_response->get_error_data();
-					$status     = isset( $error_data['status'] ) ? $error_data['status'] : 500;
-					wp_die( printf( '<p>An error occurred: %s (%d)</p>', $message, $error_data ) );
+					$data['html'] = __( 'Sorry, couldn\'t render a preview', 'gutenberg' );
+					return rest_ensure_response( $data );
 				}
 				$embed_data = $embed_response->get_data();
 			}
