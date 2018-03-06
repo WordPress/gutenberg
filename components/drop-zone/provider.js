@@ -169,14 +169,14 @@ class DropZoneProvider extends Component {
 
 		const { position, hoveredDropZone } = this.state;
 		const dropzone = hoveredDropZone !== -1 ? this.dropzones[ hoveredDropZone ] : null;
+		const isValidDropzone = !! dropzone && dropzone.element.contains( event.target );
 
 		this.resetDragState();
-
-		if ( !! dropzone && !! dropzone.onDrop ) {
+		if ( isValidDropzone && !! dropzone.onDrop ) {
 			dropzone.onDrop( event, position );
 		}
 
-		if ( event.dataTransfer && !! dropzone ) {
+		if ( event.dataTransfer && isValidDropzone ) {
 			const files = event.dataTransfer.files;
 			const HTML = event.dataTransfer.getData( 'text/html' );
 
