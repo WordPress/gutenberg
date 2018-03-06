@@ -4,10 +4,11 @@
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
-import { createContext, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 /* External dependencies */
-import { isFunction, map, noop } from 'lodash';
+import { isFunction, map } from 'lodash';
+import PropTypes from 'prop-types';
 
 /* Internal dependencies */
 // import store from '../store';
@@ -51,15 +52,13 @@ export function registerPlugin( settings ) {
 		return null;
 	}
 
-	settings.context = createContext();
-
 	return plugins[ settings.name ] = settings;
 }
 
 class ContextProvider extends Component {
 	getChildContext() {
 		return {
-			plugin: this.props.plugin,
+			namespace: this.props.namespace,
 		};
 	}
 
@@ -69,7 +68,7 @@ class ContextProvider extends Component {
 }
 
 ContextProvider.childContextTypes = {
-	plugin: noop,
+	namespace: PropTypes.string.isRequired,
 };
 
 class Plugins extends Component {
@@ -77,17 +76,11 @@ class Plugins extends Component {
 		return (
 			<div id="plugin-fills" style={ { display: 'none' } }>
 				{ map( plugins, plugin => {
-					const Context = plugin.context;
 					return (
-						<Context.Provider key={ plugin.name } value={ plugin.name }>
+						<ContextProvider key={ plugin.name } namespace={ plugin.name }>
 							{ plugin.render() }
-						</Context.Provider>
+						</ContextProvider>
 					);
-					// return (
-					// 	<ContextProvider key={ plugin.name } plugin={ plugin }>
-					// 		{ plugin.render() }
-					// 	</ContextProvider>
-					// );
 				} ) }
 			</div>
 		);

@@ -1,14 +1,15 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Children, cloneElement } from '@wordpress/element';
 import { Slot, Fill } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Name of slot in which popover should fill.
@@ -17,7 +18,25 @@ import { Slot, Fill } from '@wordpress/components';
  */
 const SLOT_NAME = 'PluginSidebar';
 
-//TODO Error boundaries
+class SidebarErrorBoundary extends Component {
+	constructor( props ) {
+		super( props );
+		this.state = { hasError: false };
+	}
+
+	componentDidCatch() {
+		this.setState( { hasError: true } );
+	}
+
+	render() {
+		if ( this.state.hasError ) {
+			return <p className="plugin-sidebar-error">
+				{ __( 'An error occurred rendering the plugin sidebar.' ) }
+			</p>;
+		}
+		return this.props.children;
+	}
+}
 
 class PluginSidebar extends Component {
 	constructor( props ) {
@@ -32,15 +51,24 @@ class PluginSidebar extends Component {
 	}
 
 	render() {
-		const { children } = this.props;
-		return <Fill name={ SLOT_NAME }>{ children }</Fill>;
+		const { children, ...props } = this.props;
+		const newProps = {
+			...props,
+			namespacedName: `${ this.context.namespace }/${ this.props.name }`,
+		};
+
+		return (
+			<Fill name={ SLOT_NAME }>
+				{ cloneElement( Children.only( children ), newProps ) }
+			</Fill>
+		);
 	}
 }
 
 PluginSidebar.contextTypes = {
-	plugin: noop,
+	namespace: PropTypes.string.isRequired,
 };
 
-PluginSidebar.Slot = () => <Slot name={ SLOT_NAME } />;
+PluginSidebar.Slot = () => ( <SidebarErrorBoundary><Slot name={ SLOT_NAME } /></SidebarErrorBoundary> );
 
 export default PluginSidebar;
