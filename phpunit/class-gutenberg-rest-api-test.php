@@ -15,10 +15,10 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$this->administrator = $this->factory->user->create( array(
 			'role' => 'administrator',
 		) );
-		$this->author = $this->factory->user->create( array(
+		$this->author        = $this->factory->user->create( array(
 			'role' => 'author',
 		) );
-		$this->editor = $this->factory->user->create( array(
+		$this->editor        = $this->factory->user->create( array(
 			'role' => 'editor',
 		) );
 	}
@@ -89,7 +89,7 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 	 * Should not return an extra visibility field without context set.
 	 */
 	function test_visibility_field_without_context() {
-		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/category' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/category' );
 		$response = rest_do_request( $request );
 
 		$result = $response->get_data();
