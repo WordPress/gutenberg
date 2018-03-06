@@ -34,20 +34,11 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
-		align: {
-			type: 'string',
-		},
 	},
 
 	supports: {
+		align: [ 'left', 'center', 'right', 'full' ],
 		html: false,
-	},
-
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
 	},
 
 	edit: CategoriesBlock,

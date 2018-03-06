@@ -15,8 +15,6 @@ import { withState } from '@wordpress/components';
 import './editor.scss';
 import './style.scss';
 import RichText from '../../rich-text';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const toRichTextValue = value => map( value, ( subValue => subValue.children ) );
 const fromRichTextValue = value => map( value, ( subValue ) => ( {
@@ -38,10 +36,6 @@ const blockAttributes = {
 		source: 'children',
 		selector: 'cite',
 	},
-	align: {
-		type: 'string',
-		default: 'none',
-	},
 };
 
 export const name = 'core/pullquote';
@@ -58,30 +52,18 @@ export const settings = {
 
 	attributes: blockAttributes,
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
+	supports: {
+		align: true,
 	},
 
 	edit: withState( {
 		editable: 'content',
 	} )( ( { attributes, setAttributes, isSelected, className, editable, setState } ) => {
-		const { value, citation, align } = attributes;
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const { value, citation } = attributes;
 		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
-		return [
-			isSelected && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-				</BlockControls>
-			),
-			<blockquote key="quote" className={ className }>
+		return (
+			<blockquote className={ className }>
 				<RichText
 					multiline="p"
 					value={ toRichTextValue( value ) }
@@ -109,15 +91,15 @@ export const settings = {
 						onFocus={ onSetActiveEditable( 'cite' ) }
 					/>
 				) }
-			</blockquote>,
-		];
+			</blockquote>
+		);
 	} ),
 
 	save( { attributes } ) {
-		const { value, citation, align } = attributes;
+		const { value, citation } = attributes;
 
 		return (
-			<blockquote className={ `align${ align }` }>
+			<blockquote>
 				{ value && value.map( ( paragraph, i ) =>
 					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
 				) }
@@ -131,6 +113,10 @@ export const settings = {
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
+			align: {
+				type: 'string',
+				default: 'none',
+			},
 			citation: {
 				type: 'array',
 				source: 'children',

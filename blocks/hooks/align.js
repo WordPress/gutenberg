@@ -56,7 +56,7 @@ export function getBlockValidAlignments( blockName ) {
 		validAlignments.push( 'left', 'center', 'right' );
 
 		// ...including wide alignments unless explicitly `false`.
-		if ( hasBlockSupport( blockName, 'wideAlign', true ) ) {
+		if ( hasBlockSupport( blockName, 'alignWide', true ) ) {
 			validAlignments.push( 'wide', 'full' );
 		}
 	}

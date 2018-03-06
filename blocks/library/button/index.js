@@ -12,8 +12,6 @@ import './editor.scss';
 import './style.scss';
 import RichText from '../../rich-text';
 import UrlInput from '../../url-input';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
 import InspectorControls from '../../inspector-controls';
@@ -67,18 +65,12 @@ class ButtonBlock extends Component {
 			text,
 			url,
 			title,
-			align,
 			color,
 			textColor,
 			clear,
 		} = attributes;
 
 		return [
-			isSelected && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
-				</BlockControls>
-			),
 			<span key="button" className={ className } title={ title } ref={ this.bindRef }>
 				<RichText
 					tagName="span"
@@ -157,10 +149,6 @@ const blockAttributes = {
 		source: 'children',
 		selector: 'a',
 	},
-	align: {
-		type: 'string',
-		default: 'none',
-	},
 	color: {
 		type: 'string',
 	},
@@ -182,13 +170,13 @@ export const settings = {
 
 	attributes: blockAttributes,
 
-	getEditWrapperProps( attributes ) {
-		const { align, clear } = attributes;
-		const props = { 'data-resized': true };
+	supports: {
+		align: true,
+		alignWide: false,
+	},
 
-		if ( 'left' === align || 'right' === align || 'center' === align ) {
-			props[ 'data-align' ] = align;
-		}
+	getEditWrapperProps( { clear } ) {
+		const props = { 'data-resized': true };
 
 		if ( clear ) {
 			props[ 'data-clear' ] = 'true';
@@ -200,7 +188,7 @@ export const settings = {
 	edit: ButtonBlock,
 
 	save( { attributes } ) {
-		const { url, text, title, align, color, textColor } = attributes;
+		const { url, text, title, color, textColor } = attributes;
 
 		const buttonStyle = {
 			backgroundColor: color,
@@ -210,7 +198,7 @@ export const settings = {
 		const linkClass = 'wp-block-button__link';
 
 		return (
-			<div className={ `align${ align }` }>
+			<div>
 				<a className={ linkClass } href={ url } title={ title } style={ buttonStyle }>
 					{ text }
 				</a>
@@ -219,7 +207,13 @@ export const settings = {
 	},
 
 	deprecated: [ {
-		attributes: blockAttributes,
+		attributes: {
+			...blockAttributes,
+			align: {
+				type: 'string',
+				default: 'none',
+			},
+		},
 
 		save( { attributes } ) {
 			const { url, text, title, align, color, textColor } = attributes;

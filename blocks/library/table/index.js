@@ -9,8 +9,6 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import './style.scss';
 import TableBlock from './table-block';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 export const name = 'core/table';
 
@@ -32,9 +30,10 @@ export const settings = {
 				</tbody>,
 			],
 		},
-		align: {
-			type: 'string',
-		},
+	},
+
+	supports: {
+		align: true,
 	},
 
 	transforms: {
@@ -46,41 +45,25 @@ export const settings = {
 		],
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { content } = attributes;
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		return [
-			isSelected && (
-				<BlockControls key="toolbar">
-					<BlockAlignmentToolbar
-						value={ attributes.align }
-						onChange={ updateAlignment }
-					/>
-				</BlockControls>
-			),
+
+		return (
 			<TableBlock
-				key="editor"
 				onChange={ ( nextContent ) => {
 					setAttributes( { content: nextContent } );
 				} }
 				content={ content }
 				className={ className }
 				isSelected={ isSelected }
-			/>,
-		];
+			/>
+		);
 	},
 
 	save( { attributes } ) {
-		const { content, align } = attributes;
+		const { content } = attributes;
 		return (
-			<table className={ align ? `align${ align }` : null }>
+			<table>
 				{ content }
 			</table>
 		);

@@ -12,8 +12,6 @@ import { times, unescape } from 'lodash';
 import './editor.scss';
 import './style.scss';
 import InspectorControls from '../../inspector-controls';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 class CategoriesBlock extends Component {
 	constructor() {
@@ -142,11 +140,11 @@ class CategoriesBlock extends Component {
 	}
 
 	render() {
-		const { attributes, focus, setAttributes } = this.props;
-		const { align, displayAsDropdown, showHierarchy, showPostCounts } = attributes;
+		const { attributes, isSelected } = this.props;
+		const { displayAsDropdown, showHierarchy, showPostCounts } = attributes;
 		const categories = this.getCategories();
 
-		const inspectorControls = focus && (
+		const inspectorControls = isSelected && (
 			<InspectorControls key="inspector">
 				<h3>{ __( 'Categories Settings' ) }</h3>
 				<ToggleControl
@@ -182,17 +180,6 @@ class CategoriesBlock extends Component {
 
 		return [
 			inspectorControls,
-			focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-						controls={ [ 'left', 'center', 'right', 'full' ] }
-					/>
-				</BlockControls>
-			),
 			<div key="categories" className={ this.props.className }>
 				{
 					displayAsDropdown ?

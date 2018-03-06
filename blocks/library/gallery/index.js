@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { filter, every } from 'lodash';
 
 /**
@@ -18,10 +19,6 @@ import { createBlock } from '../../api';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
 const blockAttributes = {
-	align: {
-		type: 'string',
-		default: 'none',
-	},
 	images: {
 		type: 'array',
 		default: [],
@@ -78,6 +75,10 @@ export const settings = {
 	category: 'common',
 	keywords: [ __( 'images' ), __( 'photos' ) ],
 	attributes: blockAttributes,
+
+	supports: {
+		align: true,
+	},
 
 	transforms: {
 		from: [
@@ -166,19 +167,16 @@ export const settings = {
 		],
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit: GalleryBlock,
 
 	save( { attributes } ) {
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
+		const className = classnames( `columns-${ columns }`, {
+			'is-cropped': imageCrop,
+		} );
+
 		return (
-			<ul className={ `align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+			<ul className={ className }>
 				{ images.map( ( image ) => {
 					let href;
 
@@ -210,6 +208,10 @@ export const settings = {
 		{
 			attributes: {
 				...blockAttributes,
+				align: {
+					type: 'string',
+					default: 'none',
+				},
 				images: {
 					...blockAttributes.images,
 					selector: 'div.wp-block-gallery figure.blocks-gallery-image img',

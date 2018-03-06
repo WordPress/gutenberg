@@ -2,7 +2,7 @@
 
 exports[`core/text-columns block edit matches snapshot 1`] = `
 <div
-  class="wp-block-text-columns alignundefined columns-2"
+  class="wp-block-text-columns columns-2"
 >
   <div
     class="wp-block-column"
