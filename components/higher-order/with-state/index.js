@@ -14,10 +14,16 @@ import { Component, getWrapperDisplayName } from '@wordpress/element';
 function withState( initialState = {} ) {
 	return ( OriginalComponent ) => {
 		class WrappedComponent extends Component {
-			constructor() {
+			constructor( props ) {
 				super( ...arguments );
 
 				this.setState = this.setState.bind( this );
+
+				// If passed a function, call it with component props to
+				// compute initial state object.
+				if ( 'function' === typeof initialState ) {
+					initialState = initialState( props );
+				}
 
 				this.state = initialState;
 			}
