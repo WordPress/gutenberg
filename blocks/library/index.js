@@ -57,6 +57,7 @@ export const registerCoreBlocks = () => {
 		// unknown shortcodes — see `setUnknownTypeHandlerName`.
 		shortcode,
 
+		archives,
 		audio,
 		button,
 		categories,
