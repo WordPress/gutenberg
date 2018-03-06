@@ -51,7 +51,7 @@ export function registerPlugin( settings ) {
 		return null;
 	}
 
-	plugins.context = createContext();
+	settings.context = createContext();
 
 	return plugins[ settings.name ] = settings;
 }
