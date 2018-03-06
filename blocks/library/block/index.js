@@ -27,8 +27,10 @@ class ReusableBlockEdit extends Component {
 		this.setTitle = this.setTitle.bind( this );
 		this.updateReusableBlock = this.updateReusableBlock.bind( this );
 
+		const { reusableBlock } = this.props;
+
 		this.state = {
-			isEditing: false,
+			isEditing: !! ( reusableBlock && reusableBlock.isTemporary ),
 			title: null,
 			attributes: null,
 		};
@@ -40,9 +42,6 @@ class ReusableBlockEdit extends Component {
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	componentWillReceiveProps( nextProps ) {
 		if ( this.props.focus && ! nextProps.focus ) {
 			this.stopEditing();
