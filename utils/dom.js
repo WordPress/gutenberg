@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { includes, first } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
@@ -144,10 +144,22 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
  * @return {DOMRect} The rectangle.
  */
 export function getClientRectFromRange( range ) {
-	// Adjust for empty containers.
-	return range.startContainer.nodeType === ELEMENT_NODE ?
-		range.startContainer.getBoundingClientRect() :
-		range.getClientRects()[ 0 ];
+	// For uncollapsed ranges `getBoundingClientRect` works as expected. It is
+	// the sum of `getClientRects`.
+	if ( ! range.collapsed ) {
+		return range.getBoundingClientRect();
+	}
+
+	// If the collapsed ranged starts (and therefore ends) at an element node,
+	// use `getBoundingClientRect` on that element node. `getClientRects` will
+	// return empty.
+	if ( range.startContainer.nodeType === ELEMENT_NODE ) {
+		return range.startContainer.getBoundingClientRect();
+	}
+
+	// For normal collapsed ranges, the trick is to use the first (and only)
+	// untouched client rect from `getClientRects`.
+	return first( range.getClientRects() );
 }
 
 /**
