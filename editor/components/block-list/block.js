@@ -417,10 +417,6 @@ export class BlockListBlock extends Component {
 			}
 		} else {
 			this.props.onSelectionStart( this.props.uid );
-
-			if ( ! this.props.isSelected ) {
-				this.props.onSelect();
-			}
 		}
 	}
 
