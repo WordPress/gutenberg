@@ -28,9 +28,9 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should return an extra public field on response when in edit context.
+	 * Should return an extra visibility field on response when in edit context.
 	 */
-	function test_public_field() {
+	function test_visibility_field() {
 		wp_set_current_user( $this->administrator );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/category' );
@@ -39,14 +39,20 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 
 		$result = $response->get_data();
 
-		$this->assertTrue( isset( $result['public'] ) );
-		$this->assertTrue( $result['public'] );
+		$this->assertTrue( isset( $result['visibility'] ) );
+		$this->assertInternalType( 'array', $result['visibility'] );
+		$this->assertArrayHasKey( 'public', $result['visibility'] );
+		$this->assertArrayHasKey( 'publicly_queryable', $result['visibility'] );
+		$this->assertArrayHasKey( 'show_ui', $result['visibility'] );
+		$this->assertArrayHasKey( 'show_admin_column', $result['visibility'] );
+		$this->assertArrayHasKey( 'show_in_nav_menus', $result['visibility'] );
+		$this->assertArrayHasKey( 'show_in_quick_edit', $result['visibility'] );
 	}
 
 	/**
-	 * Should return an extra public field on response.
+	 * Should return an extra visibility field on response.
 	 */
-	function test_public_field_for_non_admin_roles() {
+	function test_visibility_field_for_non_admin_roles() {
 		wp_set_current_user( $this->editor );
 
 		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/category' );
@@ -55,8 +61,14 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 
 		$result = $response->get_data();
 
-		$this->assertTrue( isset( $result['public'] ) );
-		$this->assertTrue( $result['public'] );
+		$this->assertTrue( isset( $result['visibility'] ) );
+		$this->assertInternalType( 'array', $result['visibility'] );
+		$this->assertArrayHasKey( 'public', $result['visibility'] );
+		$this->assertArrayHasKey( 'publicly_queryable', $result['visibility'] );
+		$this->assertArrayHasKey( 'show_ui', $result['visibility'] );
+		$this->assertArrayHasKey( 'show_admin_column', $result['visibility'] );
+		$this->assertArrayHasKey( 'show_in_nav_menus', $result['visibility'] );
+		$this->assertArrayHasKey( 'show_in_quick_edit', $result['visibility'] );
 
 		/**
 		 * See https://github.com/WordPress/gutenberg/issues/2545
@@ -70,18 +82,18 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 
 		$result = $response->get_data();
 
-		$this->assertTrue( ! isset( $result['public'] ) );
+		$this->assertFalse( isset( $result['visibility'] ) );
 	}
 
 	/**
-	 * Should not return an extra public field without context set.
+	 * Should not return an extra visibility field without context set.
 	 */
-	function test_public_field_without_context() {
+	function test_visibility_field_without_context() {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies/category' );
 		$response = rest_do_request( $request );
 
 		$result = $response->get_data();
 
-		$this->assertTrue( ! isset( $result['public'] ) );
+		$this->assertFalse( isset( $result['visibility'] ) );
 	}
 }
