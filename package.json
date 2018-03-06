@@ -33,7 +33,7 @@
 		"js-beautify": "1.6.14",
 		"lodash": "4.17.4",
 		"memize": "1.0.5",
-		"moment": "2.18.1",
+		"moment": "2.21.0",
 		"moment-timezone": "0.5.13",
 		"mousetrap": "1.6.1",
 		"prop-types": "15.5.10",
