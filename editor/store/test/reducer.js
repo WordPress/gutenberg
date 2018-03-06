@@ -869,7 +869,7 @@ describe( 'state', () => {
 				expect( state.past ).toHaveLength( 2 );
 			} );
 
-			it( 'should not overwrite present history if updating same attributes', () => {
+			it( 'should not overwrite present history if updating different attributes', () => {
 				let state;
 
 				state = editor( state, {
