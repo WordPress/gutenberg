@@ -22,7 +22,6 @@ export { loadAndPersist, withRehydratation } from './persist';
  */
 const stores = {};
 const selectors = {};
-const resolvers = {};
 const actions = {};
 let listeners = [];
 
@@ -130,10 +129,21 @@ export function registerSelectors( reducerKey, newSelectors ) {
  * @param {Object} newResolvers Resolvers to register.
  */
 export function registerResolvers( reducerKey, newResolvers ) {
-	resolvers[ reducerKey ] = mapValues(
-		newResolvers,
-		( resolver ) => ( { fulfill: memize( resolver.fulfill ) } )
-	);
+	const createResolver = ( selector, key ) => {
+		let resolver = get( newResolvers, [ key, 'fulfill' ] );
+		if ( resolver ) {
+			resolver = memize( resolver );
+		}
+		return ( ...args ) => {
+			if ( resolver ) {
+				resolver( ...args );
+			}
+
+			return selector( ...args );
+		};
+	};
+
+	selectors[ reducerKey ] = mapValues( selectors[ reducerKey ], createResolver );
 }
 
 /**
@@ -173,16 +183,7 @@ export const subscribe = ( listener ) => {
  * @return {*} The selector's returned value.
  */
 export function select( reducerKey ) {
-	const createResolver = ( selector, key ) => ( ...args ) => {
-		const resolver = get( resolvers, [ reducerKey, key ] );
-		if ( resolver ) {
-			resolver.fulfill( ...args );
-		}
-
-		return selector( ...args );
-	};
-
-	return mapValues( selectors[ reducerKey ], createResolver );
+	return selectors[ reducerKey ];
 }
 
 /**
