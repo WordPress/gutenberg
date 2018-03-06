@@ -19,7 +19,7 @@ const store = registerStore( MODULE_KEY, {
 	selectors: { getCategories },
 	resolvers: {
 		getCategories: {
-			fulfill: () => {
+			fulfill() {
 				wp.apiRequest( { path: '/wp/v2/categories' } ).then( categories => {
 					store.dispatch( {
 						type: 'FETCH_CATEGORIES_SUCCESS',
