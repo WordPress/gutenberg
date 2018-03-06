@@ -26,6 +26,9 @@ describe( 'PostTaxonomies', () => {
 			types: [ 'book' ],
 			hierarchical: true,
 			rest_base: 'genres',
+			visibility: {
+				show_ui: true,
+			},
 		};
 
 		const categoriesTaxonomy = {
@@ -34,6 +37,9 @@ describe( 'PostTaxonomies', () => {
 			types: [ 'post', 'page' ],
 			hierarchical: true,
 			rest_base: 'categories',
+			visibility: {
+				show_ui: true,
+			},
 		};
 
 		const wrapperOne = shallow(
