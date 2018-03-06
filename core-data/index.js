@@ -1,11 +1,7 @@
 /**
  * WordPress Dependencies
  */
-import {
-	registerReducer,
-	registerSelectors,
-	registerResolvers,
-} from '@wordpress/data';
+import { registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,18 +14,19 @@ import { getCategories } from './selectors';
  */
 const MODULE_KEY = 'core';
 
-const store = registerReducer( MODULE_KEY, reducer );
-
-registerSelectors( MODULE_KEY, { getCategories } );
-registerResolvers( MODULE_KEY, {
-	getCategories: {
-		fulfill: () => {
-			wp.apiRequest( { path: '/wp/v2/categories' } ).then( categories => {
-				store.dispatch( {
-					type: 'FETCH_CATEGORIES_SUCCESS',
-					categories,
+const store = registerStore( MODULE_KEY, {
+	reducer,
+	selectors: { getCategories },
+	resolvers: {
+		getCategories: {
+			fulfill: () => {
+				wp.apiRequest( { path: '/wp/v2/categories' } ).then( categories => {
+					store.dispatch( {
+						type: 'FETCH_CATEGORIES_SUCCESS',
+						categories,
+					} );
 				} );
-			} );
+			},
 		},
 	},
 } );

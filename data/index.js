@@ -37,7 +37,7 @@ export function globalListener() {
  * Convenience for registering reducer with actions and selectors.
  *
  * @param {string} reducerKey Reducer key.
- * @param {Object} options    Store description (reducer, actions, selectors).
+ * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
  *
  * @return {Object} Registered store object.
  */
@@ -54,6 +54,10 @@ export function registerStore( reducerKey, options ) {
 
 	if ( options.selectors ) {
 		registerSelectors( reducerKey, options.selectors );
+	}
+
+	if ( options.resolvers ) {
+		registerResolvers( reducerKey, options.resolvers );
 	}
 
 	return store;
