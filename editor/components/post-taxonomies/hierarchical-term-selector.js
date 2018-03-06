@@ -165,8 +165,8 @@ class HierarchicalTermSelector extends Component {
 
 	componentDidMount() {
 		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		this.fetchRequest = wp.apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( DEFAULT_QUERY ) }` } )
-			.done( ( terms ) => {
+		this.fetchRequest = wp.apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( DEFAULT_QUERY ) }` } ).then(
+			( terms ) => { // resolve
 				const availableTermsTree = buildTermsTree( terms );
 
 				this.setState( {
@@ -174,15 +174,16 @@ class HierarchicalTermSelector extends Component {
 					availableTermsTree,
 					availableTerms: terms,
 				} );
-			} )
-			.fail( ( xhr ) => {
+			},
+			( xhr ) => { // reject
 				if ( xhr.statusText === 'abort' ) {
 					return;
 				}
 				this.setState( {
 					loading: false,
 				} );
-			} );
+			}
+		);
 	}
 
 	componentWillUnmount() {
