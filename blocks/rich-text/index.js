@@ -35,6 +35,11 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 
+/**
+ * Browser dependencies
+ */
+const { console } = window;
+
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
 export function createTinyMCEElement( type, props, ...children ) {
@@ -699,6 +704,13 @@ export class RichText extends Component {
 			this.props.value !== this.savedContent
 		) {
 			this.updateContent();
+
+			if (
+				'development' === process.env.NODE_ENV &&
+				isEqual( this.props.value, prevProps.value )
+			) {
+				console.warn( 'The current and previous value props are not strictly equal but the contents are the same. Please ensure the value prop reference does not change.' );
+			}
 		}
 	}
 
