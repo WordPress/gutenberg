@@ -89,7 +89,7 @@ class TabPanel extends Component {
 						id={ selectedId + '-view' }
 						className="components-tab-panel__tab-content"
 					>
-						{ this.props.children( selectedTab.name ) }
+						{ this.props.children( selectedTab.name, selectedTab.title ) }
 					</div>
 				) }
 			</div>
