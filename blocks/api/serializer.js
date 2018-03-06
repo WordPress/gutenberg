@@ -27,8 +27,6 @@ import BlockContentProvider from '../block-content-provider';
 export function getBlockDefaultClassname( blockName ) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
 	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
-
-	// @todo This should be filterable.
 	return 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 }
 
