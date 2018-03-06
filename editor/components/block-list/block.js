@@ -196,6 +196,8 @@ export class BlockListBlock extends Component {
 		// eslint-disable-next-line react/no-find-dom-node
 		node = findDOMNode( node );
 
+		this.wrapperNode = node;
+
 		this.props.blockRef( node, this.props.uid );
 	}
 
@@ -214,7 +216,11 @@ export class BlockListBlock extends Component {
 	focusTabbable() {
 		const { initialPosition } = this.props;
 
-		if ( this.node.contains( document.activeElement ) ) {
+		// Focus is captured by the wrapper node, so while focus transition
+		// should only consider tabbables within editable display, since it
+		// may be the wrapper itself or a side control which triggered the
+		// focus event, don't unnecessary transition to an inner tabbable.
+		if ( this.wrapperNode.contains( document.activeElement ) ) {
 			return;
 		}
 
@@ -578,6 +584,7 @@ export class BlockListBlock extends Component {
 				className={ wrapperClassName }
 				data-type={ block.name }
 				onTouchStart={ this.onTouchStart }
+				onFocus={ this.onFocus }
 				onClick={ this.onClick }
 				tabIndex="0"
 				childHandledEvents={ [
@@ -585,7 +592,6 @@ export class BlockListBlock extends Component {
 					'onDragStart',
 					'onMouseDown',
 					'onKeyDown',
-					'onFocus',
 				] }
 				{ ...wrapperProps }
 			>
@@ -618,7 +624,6 @@ export class BlockListBlock extends Component {
 					onDragStart={ this.preventDrag }
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
-					onFocus={ this.onFocus }
 					className="editor-block-list__block-edit"
 					aria-label={ blockLabel }
 					data-block={ block.uid }
