@@ -11,6 +11,7 @@ import {
 	upperFirst,
 	isEmpty,
 } from 'lodash';
+import createContext from 'create-react-context';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -25,6 +26,8 @@ import {
  * @return {WPElement} Element.
  */
 export { createElement };
+
+export { createContext };
 
 /**
  * Renders a given element into the target DOM node.
