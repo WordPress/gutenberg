@@ -14,31 +14,31 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal Dependencies
  */
-import { getActiveEditorPanel } from '../../store/selectors';
+import { getActiveGeneralSidebarName } from '../../store/selectors';
 import { closeGeneralSidebar, openGeneralSidebar } from '../../store/actions';
 
-const SidebarHeader = ( { panel, onSetPanel, onCloseSidebar, count } ) => {
+const SidebarHeader = ( { activeSidebarName, openSidebar, closeSidebar, count } ) => {
 	// Do not display "0 Blocks".
 	count = count === 0 ? 1 : count;
 
 	return (
 		<div className="components-panel__header edit-post-sidebar__panel-tabs">
 			<button
-				onClick={ () => onSetPanel( 'document' ) }
-				className={ `edit-post-sidebar__panel-tab ${ panel === 'document' ? 'is-active' : '' }` }
+				onClick={ () => openSidebar( 'edit-post/document' ) }
+				className={ `edit-post-sidebar__panel-tab ${ activeSidebarName === 'edit-post/document' ? 'is-active' : '' }` }
 				aria-label={ __( 'Document settings' ) }
 			>
 				{ __( 'Document' ) }
 			</button>
 			<button
-				onClick={ () => onSetPanel( 'block' ) }
-				className={ `edit-post-sidebar__panel-tab ${ panel === 'block' ? 'is-active' : '' }` }
+				onClick={ () => openSidebar( 'edit-post/block' ) }
+				className={ `edit-post-sidebar__panel-tab ${ activeSidebarName === 'edit-post/block' ? 'is-active' : '' }` }
 				aria-label={ __( 'Block settings' ) }
 			>
 				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }
 			</button>
 			<IconButton
-				onClick={ onCloseSidebar }
+				onClick={ closeSidebar }
 				icon="no-alt"
 				label={ __( 'Close settings' ) }
 			/>
@@ -52,11 +52,11 @@ export default compose(
 	} ) ),
 	connect(
 		( state ) => ( {
-			panel: getActiveEditorPanel( state ),
+			activeSidebarName: getActiveGeneralSidebarName( state ),
 		} ),
 		{
-			onSetPanel: openGeneralSidebar.bind( null, 'editor' ),
-			onCloseSidebar: closeGeneralSidebar,
+			openSidebar: openGeneralSidebar,
+			closeSidebar: closeGeneralSidebar,
 		},
 		undefined,
 		{ storeKey: 'edit-post' }

@@ -5,6 +5,11 @@ import createSelector from 'rememo';
 import { some } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import { getSidebarSettings } from '../api/sidebar';
+
+/**
  * Returns the current editing mode.
  *
  * @param {Object} state Global application state.
@@ -16,24 +21,42 @@ export function getEditorMode( state ) {
 }
 
 /**
- * Returns the current active panel for the sidebar.
+ * Returns true if the editor sidebar is opened.
  *
- * @param {Object} state Global application state.
- *
- * @return {string} Active sidebar panel.
+ * @param {Object} state Global application state
+ * @return {boolean}     Whether the editor sidebar is opened.
  */
-export function getActiveEditorPanel( state ) {
-	return getPreference( state, 'activeSidebarPanel', {} ).editor;
+export function isEditorSidebarOpened( state ) {
+	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
+
+	return [ 'edit-post/document', 'edit-post/block' ].includes( activeGeneralSidebar );
 }
 
 /**
- * Returns the current active plugin for the plugin sidebar.
+ * Returns true if the plugin sidebar is opened.
  *
- * @param  {Object}  state Global application state
- * @return {string}        Active plugin sidebar plugin
+ * @param {Object} state Global application state
+ * @return {boolean}     Whether the plugin sidebar is opened.
  */
-export function getActivePlugin( state ) {
-	return getPreference( state, 'activeSidebarPanel', {} ).plugin;
+export function isPluginSidebarOpened( state ) {
+	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
+
+	return Boolean( getSidebarSettings( activeGeneralSidebar ) );
+}
+
+/**
+ * Returns the current active general sidebar name.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} Active general sidebar name.
+ */
+export function getActiveGeneralSidebarName( state ) {
+	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
+
+	return activeGeneralSidebar && ( isEditorSidebarOpened( state ) || isPluginSidebarOpened( state ) ) ?
+		activeGeneralSidebar :
+		null;
 }
 
 /**
@@ -62,30 +85,6 @@ export function getPreference( state, preferenceKey, defaultValue ) {
 }
 
 /**
- * Returns the opened general sidebar and null if the sidebar is closed.
- *
- * @param {Object} state Global application state.
- * @return {string}     The opened general sidebar panel.
- */
-export function getOpenedGeneralSidebar( state ) {
-	return getPreference( state, 'activeGeneralSidebar' );
-}
-
-/**
- * Returns true if the panel is open in the currently opened sidebar.
- *
- * @param  {Object}  state   Global application state
- * @param  {string}  sidebar Sidebar name (leave undefined for the default sidebar)
- * @param  {string}  panel   Sidebar panel name (leave undefined for the default panel)
- * @return {boolean}        Whether the given general sidebar panel is open
- */
-export function isGeneralSidebarPanelOpened( state, sidebar, panel ) {
-	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar' );
-	const activeSidebarPanel = getPreference( state, 'activeSidebarPanel' );
-	return activeGeneralSidebar === sidebar && activeSidebarPanel === panel;
-}
-
-/**
  * Returns true if the publish sidebar is opened.
  *
  * @param {Object} state Global application state
@@ -93,20 +92,6 @@ export function isGeneralSidebarPanelOpened( state, sidebar, panel ) {
  */
 export function isPublishSidebarOpened( state ) {
 	return state.publishSidebarActive;
-}
-
-/**
- * Returns true if there's any open sidebar (mobile, desktop or publish).
- *
- * @param {Object} state Global application state.
- *
- * @return {boolean} Whether sidebar is open.
- */
-export function hasOpenSidebar( state ) {
-	const generalSidebarOpen = getPreference( state, 'activeGeneralSidebar' ) !== null;
-	const publishSidebarOpen = state.publishSidebarActive;
-
-	return generalSidebarOpen || publishSidebarOpen;
 }
 
 /**

@@ -1,15 +1,13 @@
 /**
- * Returns an action object used in signalling that the user opened a sidebar.
+ * Returns an action object used in signalling that the user opened an editor sidebar.
  *
- * @param {string} sidebar        Sidebar to open.
- * @param {string} [panel = null] Panel to open in the sidebar. Null if unchanged.
- * @return {Object}              Action object.
+ * @param {string} name        Sidebar name to be opened.
+ * @return {Object}            Action object.
  */
-export function openGeneralSidebar( sidebar, panel = null ) {
+export function openGeneralSidebar( name ) {
 	return {
 		type: 'OPEN_GENERAL_SIDEBAR',
-		sidebar,
-		panel,
+		name,
 	};
 }
 

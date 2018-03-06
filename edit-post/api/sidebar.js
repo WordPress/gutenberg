@@ -96,5 +96,5 @@ export function getSidebarSettings( name ) {
  * @return {void}
  */
 export function activateSidebar( name ) {
-	dispatch( 'edit-post' ).openGeneralSidebar( 'plugin', name );
+	dispatch( 'edit-post' ).openGeneralSidebar( name );
 }

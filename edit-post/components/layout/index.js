@@ -31,46 +31,30 @@ import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import {
 	getEditorMode,
-	hasOpenSidebar,
+	isEditorSidebarOpened,
 	isFeatureActive,
-	getOpenedGeneralSidebar,
+	isPluginSidebarOpened,
 	isPublishSidebarOpened,
-	getActivePlugin,
 	getMetaBoxes,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
 } from '../../store/selectors';
 import { closePublishSidebar } from '../../store/actions';
 import PluginsPanel from '../../components/plugins-panel/index.js';
-import { getSidebarSettings } from '../../api/sidebar';
-
-function GeneralSidebar( { openedGeneralSidebar } ) {
-	switch ( openedGeneralSidebar ) {
-		case 'editor':
-			return <Sidebar />;
-		case 'plugin':
-			return <PluginsPanel />;
-		default:
-	}
-	return null;
-}
 
 function Layout( {
 	mode,
-	layoutHasOpenSidebar,
+	editorSidebarOpen,
+	pluginSidebarOpen,
 	publishSidebarOpen,
-	openedGeneralSidebar,
 	hasFixedToolbar,
 	onClosePublishSidebar,
-	plugin,
 	metaBoxes,
 	hasActiveMetaboxes,
 	isSaving,
 } ) {
-	const isSidebarOpened = layoutHasOpenSidebar &&
-		( openedGeneralSidebar !== 'plugin' || getSidebarSettings( plugin ) );
 	const className = classnames( 'edit-post-layout', {
-		'is-sidebar-opened': isSidebarOpened,
+		'is-sidebar-opened': editorSidebarOpen || pluginSidebarOpen || publishSidebarOpen,
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
@@ -106,10 +90,8 @@ function Layout( {
 					forceIsSaving={ isSaving }
 				/>
 			) }
-			{
-				openedGeneralSidebar !== null && <GeneralSidebar
-					openedGeneralSidebar={ openedGeneralSidebar } />
-			}
+			{ editorSidebarOpen && <Sidebar /> }
+			{ pluginSidebarOpen && <PluginsPanel /> }
 			<Popover.Slot />
 		</div>
 	);
@@ -118,11 +100,10 @@ function Layout( {
 export default connect(
 	( state ) => ( {
 		mode: getEditorMode( state ),
-		layoutHasOpenSidebar: hasOpenSidebar( state ),
-		openedGeneralSidebar: getOpenedGeneralSidebar( state ),
+		editorSidebarOpen: isEditorSidebarOpened( state ),
+		pluginSidebarOpen: isPluginSidebarOpened( state ),
 		publishSidebarOpen: isPublishSidebarOpened( state ),
 		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
-		plugin: getActivePlugin( state ),
 		metaBoxes: getMetaBoxes( state ),
 		hasActiveMetaboxes: hasMetaBoxes( state ),
 		isSaving: isSavingMetaBoxes( state ),

@@ -16,12 +16,10 @@ import {
 describe( 'actions', () => {
 	describe( 'openGeneralSidebar', () => {
 		it( 'should return OPEN_GENERAL_SIDEBAR action', () => {
-			const sidebar = 'sidebarName';
-			const panel = 'panelName';
-			expect( openGeneralSidebar( sidebar, panel ) ).toEqual( {
+			const name = 'plugin/my-name';
+			expect( openGeneralSidebar( name ) ).toEqual( {
 				type: 'OPEN_GENERAL_SIDEBAR',
-				sidebar,
-				panel,
+				name,
 			} );
 		} );
 	} );

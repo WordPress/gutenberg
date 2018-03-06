@@ -21,7 +21,7 @@ import './style.scss';
 import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
 import {
-	getOpenedGeneralSidebar,
+	isEditorSidebarOpened,
 	isPublishSidebarOpened,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
@@ -33,7 +33,7 @@ import {
 } from '../../store/actions';
 
 function Header( {
-	isGeneralSidebarEditorOpen,
+	isEditorSidebarOpen,
 	onOpenGeneralSidebar,
 	onCloseGeneralSidebar,
 	isPublishSidebarOpen,
@@ -41,7 +41,7 @@ function Header( {
 	hasActiveMetaboxes,
 	isSaving,
 } ) {
-	const toggleGeneralSidebar = isGeneralSidebarEditorOpen ? onCloseGeneralSidebar : onOpenGeneralSidebar;
+	const toggleGeneralSidebar = isEditorSidebarOpen ? onCloseGeneralSidebar : onOpenGeneralSidebar;
 
 	return (
 		<div
@@ -67,9 +67,9 @@ function Header( {
 					<IconButton
 						icon="admin-generic"
 						onClick={ toggleGeneralSidebar }
-						isToggled={ isGeneralSidebarEditorOpen }
+						isToggled={ isEditorSidebarOpen }
 						label={ __( 'Settings' ) }
-						aria-expanded={ isGeneralSidebarEditorOpen }
+						aria-expanded={ isEditorSidebarOpen }
 					/>
 					<MoreMenu key="more-menu" />
 				</div>
@@ -80,13 +80,13 @@ function Header( {
 
 export default connect(
 	( state ) => ( {
-		isGeneralSidebarEditorOpen: getOpenedGeneralSidebar( state ) === 'editor',
+		isEditorSidebarOpen: isEditorSidebarOpened( state ),
 		isPublishSidebarOpen: isPublishSidebarOpened( state ),
 		hasActiveMetaboxes: hasMetaBoxes( state ),
 		isSaving: isSavingMetaBoxes( state ),
 	} ),
 	{
-		onOpenGeneralSidebar: () => openGeneralSidebar( 'editor' ),
+		onOpenGeneralSidebar: () => openGeneralSidebar( 'edit-post/document' ),
 		onCloseGeneralSidebar: closeGeneralSidebar,
 		onTogglePublishSidebar: togglePublishSidebar,
 	},

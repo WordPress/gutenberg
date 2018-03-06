@@ -14,12 +14,10 @@ import { IconButton, withFocusReturn } from '@wordpress/components';
  */
 import './style.scss';
 import { getSidebarSettings } from '../../api/sidebar';
-import { getActivePlugin } from '../../store/selectors';
+import { getActiveGeneralSidebarName } from '../../store/selectors';
 import { closeGeneralSidebar } from '../../store/actions';
 
-function PluginsPanel( { onClose, plugin } ) {
-	const pluginSidebar = getSidebarSettings( plugin );
-
+function PluginsPanel( { onClose, pluginSidebar } ) {
 	if ( ! pluginSidebar ) {
 		return null;
 	}
@@ -53,7 +51,7 @@ function PluginsPanel( { onClose, plugin } ) {
 export default connect(
 	( state ) => {
 		return {
-			plugin: getActivePlugin( state ),
+			pluginSidebar: getSidebarSettings( getActiveGeneralSidebarName( state ) ),
 		};
 	}, {
 		onClose: closeGeneralSidebar,

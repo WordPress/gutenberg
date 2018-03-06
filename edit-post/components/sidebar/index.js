@@ -16,25 +16,7 @@ import './style.scss';
 import PostSettings from './post-settings';
 import BlockInspectorPanel from './block-inspector-panel';
 import Header from './header';
-import { getActiveEditorPanel } from '../../store/selectors';
-
-/**
- * Returns the panel that should be rendered in the sidebar.
- *
- * @param {string} panel The currently active panel.
- *
- * @return {Object} The React element to render as a panel.
- */
-function getPanel( panel ) {
-	switch ( panel ) {
-		case 'document':
-			return PostSettings;
-		case 'block':
-			return BlockInspectorPanel;
-		default:
-			return PostSettings;
-	}
-}
+import { getActiveGeneralSidebarName } from '../../store/selectors';
 
 /**
  * Renders a sidebar with the relevant panel.
@@ -43,13 +25,7 @@ function getPanel( panel ) {
  *
  * @return {Object} The rendered sidebar.
  */
-const Sidebar = ( { panel } ) => {
-	const ActivePanel = getPanel( panel );
-
-	const props = {
-		panel,
-	};
-
+const Sidebar = ( { activeSidebarName } ) => {
 	return (
 		<div
 			className="edit-post-sidebar"
@@ -58,7 +34,10 @@ const Sidebar = ( { panel } ) => {
 			tabIndex="-1"
 		>
 			<Header />
-			<ActivePanel { ...props } />
+			{ activeSidebarName === 'edit-post/block' ?
+				<BlockInspectorPanel /> :
+				<PostSettings />
+			}
 		</div>
 	);
 };
@@ -66,7 +45,7 @@ const Sidebar = ( { panel } ) => {
 export default connect(
 	( state ) => {
 		return {
-			panel: getActiveEditorPanel( state ),
+			activeSidebarName: getActiveGeneralSidebarName( state ),
 		};
 	},
 	undefined,

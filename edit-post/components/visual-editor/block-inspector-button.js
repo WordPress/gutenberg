@@ -13,26 +13,26 @@ import { IconButton, withSpokenMessages } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { getActiveEditorPanel, isGeneralSidebarPanelOpened } from '../../store/selectors';
+import { getActiveGeneralSidebarName, isEditorSidebarOpened } from '../../store/selectors';
 import { openGeneralSidebar } from '../../store/actions';
 
 export function BlockInspectorButton( {
-	isGeneralSidebarEditorOpened,
+	isEditorSidebarOpen,
 	onOpenGeneralSidebarEditor,
-	panel,
+	activeSidebarName,
 	onClick = noop,
 	small = false,
 	speak,
 } ) {
 	const speakMessage = () => {
-		if ( ! isGeneralSidebarEditorOpened || ( isGeneralSidebarEditorOpened && panel !== 'block' ) ) {
+		if ( ! isEditorSidebarOpen || ( isEditorSidebarOpen && activeSidebarName !== 'edit-post/block' ) ) {
 			speak( __( 'Additional settings are now available in the Editor advanced settings sidebar' ) );
 		} else {
 			speak( __( 'Advanced settings closed' ) );
 		}
 	};
 
-	const label = ( isGeneralSidebarEditorOpened && panel === 'block' ) ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
+	const label = ( isEditorSidebarOpen && activeSidebarName === 'edit-post/block' ) ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
 
 	return (
 		<IconButton
@@ -48,12 +48,12 @@ export function BlockInspectorButton( {
 
 export default connect(
 	( state ) => ( {
-		isGeneralSidebarEditorOpened: isGeneralSidebarPanelOpened( state, 'editor' ),
-		panel: getActiveEditorPanel( state ),
+		isEditorSidebarOpen: isEditorSidebarOpened( state ),
+		activeSidebarName: getActiveGeneralSidebarName( state ),
 	} ),
 	( dispatch ) => ( {
 		onOpenGeneralSidebarEditor() {
-			dispatch( openGeneralSidebar( 'editor', 'block' ) );
+			dispatch( openGeneralSidebar( 'edit-post/block' ) );
 		},
 	} ),
 	undefined,
