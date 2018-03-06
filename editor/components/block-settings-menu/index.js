@@ -66,7 +66,6 @@ function BlockSettingsMenu( {
 						<BlockRemoveButton key="remove" uids={ uids } />,
 						<BlockDuplicateButton key="duplicate" uids={ uids } rootUID={ rootUID } />,
 						count === 1 && <ReusableBlockSettings key="reusable-block" uid={ uids[ 0 ] } onToggle={ onClose } />,
-						<div key="separator" className="editor-block-settings-menu__separator" />,
 						<BlockTransformations key="transformations" uids={ uids } onClick={ onClose } />,
 					] } ) }
 				</NavigableMenu>
