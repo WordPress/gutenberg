@@ -18,7 +18,6 @@ import { compose } from '@wordpress/element';
 import './style.scss';
 import { getBlockMoverLabel } from './mover-label';
 import { getBlockIndex, getBlock } from '../../store/selectors';
-import { selectBlock } from '../../store/actions';
 
 /**
  * Module constants
@@ -94,10 +93,6 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 function createOnMove( type, dispatch, ownProps ) {
 	return () => {
 		const { uids, rootUID } = ownProps;
-		if ( uids.length === 1 ) {
-			dispatch( selectBlock( first( uids ) ) );
-		}
-
 		dispatch( { type, uids, rootUID } );
 	};
 }

@@ -174,6 +174,8 @@ export class BlockListBlock extends Component {
 		// eslint-disable-next-line react/no-find-dom-node
 		node = findDOMNode( node );
 
+		this.wrapperNode = node;
+
 		this.props.blockRef( node, this.props.uid );
 	}
 
@@ -191,7 +193,11 @@ export class BlockListBlock extends Component {
 	focusTabbable() {
 		const { initialPosition } = this.props;
 
-		if ( this.node.contains( document.activeElement ) ) {
+		// Focus is captured by the wrapper node, so while focus transition
+		// should only consider tabbables within editable display, since it
+		// may be the wrapper itself or a side control which triggered the
+		// focus event, don't unnecessary transition to an inner tabbable.
+		if ( this.wrapperNode.contains( document.activeElement ) ) {
 			return;
 		}
 
@@ -347,20 +353,10 @@ export class BlockListBlock extends Component {
 	 * specifically handles the case where block does not set focus on its own
 	 * (via `setFocus`), typically if there is no focusable input in the block.
 	 *
-	 * @param {FocusEvent} event A focus event
-	 *
 	 * @return {void}
 	 */
-	onFocus( event ) {
-		// Firefox-specific: Firefox will redirect focus of an already-focused
-		// node to its parent, but assign a property before doing so. If that
-		// property exists, ensure that it is the node, or abort.
-		const { explicitOriginalTarget } = event.nativeEvent;
-		if ( explicitOriginalTarget && explicitOriginalTarget !== this.node ) {
-			return;
-		}
-
-		if ( event.target === this.node && ! this.props.isSelected ) {
+	onFocus() {
+		if ( ! this.props.isSelected && ! this.props.isMultiSelected ) {
 			this.props.onSelect();
 		}
 	}
@@ -399,7 +395,12 @@ export class BlockListBlock extends Component {
 		} else {
 			this.props.onSelectionStart( this.props.uid );
 
-			if ( ! this.props.isSelected ) {
+			// Allow user to escape out of a multi-selection to a singular
+			// selection of a block via click. This is handled here since
+			// onFocus excludes blocks involved in a multiselection, as
+			// focus can be incurred by starting a multiselection (focus
+			// moved to first block's multi-controls).
+			if ( this.props.isMultiSelected ) {
 				this.props.onSelect();
 			}
 		}
@@ -565,13 +566,14 @@ export class BlockListBlock extends Component {
 				className={ wrapperClassName }
 				data-type={ block.name }
 				onTouchStart={ this.onTouchStart }
+				onFocus={ this.onFocus }
 				onClick={ this.onClick }
+				tabIndex="0"
 				childHandledEvents={ [
 					'onKeyPress',
 					'onDragStart',
 					'onMouseDown',
 					'onKeyDown',
-					'onFocus',
 				] }
 				{ ...wrapperProps }
 			>
@@ -604,9 +606,7 @@ export class BlockListBlock extends Component {
 					onDragStart={ this.preventDrag }
 					onMouseDown={ this.onPointerDown }
 					onKeyDown={ this.onKeyDown }
-					onFocus={ this.onFocus }
-					className={ BlockListBlock.className }
-					tabIndex="0"
+					className="editor-block-list__block-edit"
 					aria-label={ blockLabel }
 					data-block={ block.uid }
 				>
@@ -743,8 +743,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 		dispatch( toggleSelection( selectionEnabled ) );
 	},
 } );
-
-BlockListBlock.className = 'editor-block-list__block-edit';
 
 BlockListBlock.childContextTypes = {
 	BlockList: noop,
