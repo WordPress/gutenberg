@@ -85,7 +85,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'utils/build/index.js' ),
-		array(),
+		array( 'tinymce-latest' ),
 		filemtime( gutenberg_dir_path() . 'utils/build/index.js' )
 	);
 	wp_register_script(
@@ -365,8 +365,8 @@ function gutenberg_register_vendor_scripts() {
 	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
 	gutenberg_register_vendor_script(
 		'moment',
-		'https://unpkg.com/moment@2.18.1/' . $moment_script,
-		array( 'react' )
+		'https://unpkg.com/moment@2.21.0/' . $moment_script,
+		array()
 	);
 	$tinymce_version = '4.7.2';
 	gutenberg_register_vendor_script(

@@ -55,7 +55,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 	}, {} );
 
 	// Blocks are stored with a unique ID, the assigned type name,
-	// and the block attributes.
+	// the block attributes, and their inner blocks.
 	return {
 		uid: uuid(),
 		name,
@@ -140,7 +140,7 @@ export function getPossibleBlockTransformations( blocks ) {
 		return [];
 	}
 
-	//compute the block that have a from transformation able to transfer blocks passed as argument.
+	// Compute the block that have a from transformation able to transfer blocks passed as argument.
 	const blocksToBeTransformedFrom = filter(
 		getBlockTypes(),
 		createIsTypeTransformableFrom( sourceBlockName, isMultiBlock ),
@@ -149,13 +149,13 @@ export function getPossibleBlockTransformations( blocks ) {
 	const blockType = getBlockType( sourceBlockName );
 	const transformsTo = get( blockType, 'transforms.to', [] );
 
-	//computes a list of blocks that source block can be transformed into using the "to transformations" implemented in it.
+	// Generate list of block transformations using the supplied "transforms to".
 	const blocksToBeTransformedTo = flatMap(
 		isMultiBlock ? filter( transformsTo, 'isMultiBlock' ) : transformsTo,
 		transformation => transformation.blocks
 	);
 
-	//returns a unique list of blocks that blocks passed as argument can transform into
+	// Returns a unique list of available block transformations.
 	return reduce( [
 		...blocksToBeTransformedFrom,
 		...blocksToBeTransformedTo,
@@ -270,7 +270,7 @@ export function switchToBlockType( blocks, name ) {
  */
 export function createReusableBlock( type, attributes ) {
 	return {
-		id: -uniqueId(), // Temorary id replaced when the block is saved server side
+		id: -uniqueId(), // Temporary id replaced when the block is saved server side
 		isTemporary: true,
 		title: __( 'Untitled block' ),
 		type,

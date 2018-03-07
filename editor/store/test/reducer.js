@@ -869,7 +869,7 @@ describe( 'state', () => {
 				expect( state.past ).toHaveLength( 2 );
 			} );
 
-			it( 'should not overwrite present history if updating same attributes', () => {
+			it( 'should not overwrite present history if updating different attributes', () => {
 				let state;
 
 				state = editor( state, {
@@ -1196,13 +1196,12 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				recentInserts: [],
 				insertUsage: {},
 			} );
 		} );
 
 		it( 'should record recently used blocks', () => {
-			const state = preferences( deepFreeze( { recentInserts: [], insertUsage: {} } ), {
+			const state = preferences( deepFreeze( { insertUsage: {} } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'bacon',
@@ -1211,11 +1210,9 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				recentInserts: [
-					{ name: 'core-embed/twitter' },
-				],
 				insertUsage: {
 					'core-embed/twitter': {
+						time: expect.any( Number ),
 						count: 1,
 						insert: { name: 'core-embed/twitter' },
 					},
@@ -1223,9 +1220,9 @@ describe( 'state', () => {
 			} );
 
 			const twoRecentBlocks = preferences( deepFreeze( {
-				recentInserts: [],
 				insertUsage: {
 					'core-embed/twitter': {
+						time: expect.any( Number ),
 						count: 1,
 						insert: { name: 'core-embed/twitter' },
 					},
@@ -1243,16 +1240,14 @@ describe( 'state', () => {
 			} );
 
 			expect( twoRecentBlocks ).toEqual( {
-				recentInserts: [
-					{ name: 'core/block', ref: 123 },
-					{ name: 'core-embed/twitter' },
-				],
 				insertUsage: {
 					'core-embed/twitter': {
+						time: expect.any( Number ),
 						count: 2,
 						insert: { name: 'core-embed/twitter' },
 					},
 					'core/block/123': {
+						time: expect.any( Number ),
 						count: 1,
 						insert: { name: 'core/block', ref: 123 },
 					},
@@ -1262,13 +1257,9 @@ describe( 'state', () => {
 
 		it( 'should remove recorded reusable blocks that are deleted', () => {
 			const initialState = {
-				recentInserts: [
-					{ name: 'core-embed/twitter' },
-					{ name: 'core/block', ref: 123 },
-					{ name: 'core/block', ref: 456 },
-				],
 				insertUsage: {
 					'core/block/123': {
+						time: 1000,
 						count: 1,
 						insert: { name: 'core/block', ref: 123 },
 					},
@@ -1281,10 +1272,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				recentInserts: [
-					{ name: 'core-embed/twitter' },
-					{ name: 'core/block', ref: 456 },
-				],
 				insertUsage: {},
 			} );
 		} );

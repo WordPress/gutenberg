@@ -35,7 +35,7 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import NoBlocks from './no-blocks';
 
-import { getInserterItems, getRecentInserterItems } from '../../store/selectors';
+import { getInserterItems, getFrecentInserterItems } from '../../store/selectors';
 import { fetchReusableBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
 import BlockPreview from '../block-preview';
@@ -60,7 +60,7 @@ export class InserterMenu extends Component {
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			tab: 'recent',
+			tab: 'frequent',
 			selectedItem: null,
 		};
 		this.filter = this.filter.bind( this );
@@ -69,7 +69,7 @@ export class InserterMenu extends Component {
 		this.sortItems = this.sortItems.bind( this );
 		this.selectItem = this.selectItem.bind( this );
 
-		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
+		this.tabScrollTop = { frequent: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
 		this.previewItem = this.previewItem.bind( this );
 	}
@@ -118,7 +118,7 @@ export class InserterMenu extends Component {
 	}
 
 	getItemsForTab( tab ) {
-		const { items, recentItems } = this.props;
+		const { items, frecentItems } = this.props;
 
 		// If we're searching, use everything, otherwise just get the items visible in this tab
 		if ( this.state.filterValue ) {
@@ -127,19 +127,19 @@ export class InserterMenu extends Component {
 
 		let predicate;
 		switch ( tab ) {
-			case 'recent':
-				return recentItems;
+			case 'frequent':
+				return frecentItems;
 
 			case 'blocks':
-				predicate = ( item ) => item.category !== 'embed' && item.category !== 'reusable-blocks';
+				predicate = ( item ) => item.category !== 'embed' && item.category !== 'shared';
 				break;
 
 			case 'embeds':
 				predicate = ( item ) => item.category === 'embed';
 				break;
 
-			case 'saved':
-				predicate = ( item ) => item.category === 'reusable-blocks';
+			case 'shared':
+				predicate = ( item ) => item.category === 'shared';
 				break;
 		}
 
@@ -147,7 +147,7 @@ export class InserterMenu extends Component {
 	}
 
 	sortItems( items ) {
-		if ( 'recent' === this.state.tab && ! this.state.filterValue ) {
+		if ( 'frequent' === this.state.tab && ! this.state.filterValue ) {
 			return items;
 		}
 
@@ -220,16 +220,16 @@ export class InserterMenu extends Component {
 	renderTabView( tab ) {
 		const itemsForTab = this.getItemsForTab( tab );
 
-		// If the Recent tab is selected, don't render category headers
-		if ( 'recent' === tab ) {
+		// If the Frequent tab is selected, don't render category headers
+		if ( 'frequent' === tab ) {
 			return this.renderItems( itemsForTab );
 		}
 
-		// If the Saved tab is selected and we have no results, display a friendly message
-		if ( 'saved' === tab && itemsForTab.length === 0 ) {
+		// If the Shared tab is selected and we have no results, display a friendly message
+		if ( 'shared' === tab && itemsForTab.length === 0 ) {
 			return (
 				<NoBlocks>
-					{ __( 'No saved blocks.' ) }
+					{ __( 'No shared blocks.' ) }
 				</NoBlocks>
 			);
 		}
@@ -248,7 +248,7 @@ export class InserterMenu extends Component {
 
 	// Passed to TabbableContainer, extending its event-handling logic
 	eventToOffset( event ) {
-		// If a tab (Recent, Blocks, …) is focused, pressing the down arrow
+		// If a tab (Frequent, Blocks, …) is focused, pressing the down arrow
 		// moves focus to the selected panel below.
 		if (
 			event.keyCode === keycodes.DOWN &&
@@ -291,8 +291,8 @@ export class InserterMenu extends Component {
 						onSelect={ this.switchTab }
 						tabs={ [
 							{
-								name: 'recent',
-								title: __( 'Recent' ),
+								name: 'frequent',
+								title: __( 'Frequent' ),
 								className: 'editor-inserter__tab',
 							},
 							{
@@ -306,8 +306,8 @@ export class InserterMenu extends Component {
 								className: 'editor-inserter__tab',
 							},
 							{
-								name: 'saved',
-								title: __( 'Saved' ),
+								name: 'shared',
+								title: __( 'Shared' ),
 								className: 'editor-inserter__tab',
 							},
 						] }
@@ -344,7 +344,7 @@ export default compose(
 		( state, ownProps ) => {
 			return {
 				items: getInserterItems( state, ownProps.enabledBlockTypes ),
-				recentItems: getRecentInserterItems( state, ownProps.enabledBlockTypes ),
+				frecentItems: getFrecentInserterItems( state, ownProps.enabledBlockTypes ),
 			};
 		},
 		{ fetchReusableBlocks }

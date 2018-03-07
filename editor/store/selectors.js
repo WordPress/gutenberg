@@ -1122,7 +1122,7 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 		initialAttributes: { ref: reusableBlock.id },
 		title: reusableBlock.title,
 		icon: referencedBlockType.icon,
-		category: 'reusable-blocks',
+		category: 'shared',
 		keywords: [],
 		isDisabled: false,
 	};
@@ -1186,7 +1186,11 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
 }
 
 /**
- * Determines the items that appear in the 'Recent' tab of the inserter.
+ * Returns a list of items which the user is likely to want to insert. These
+ * are ordered by 'frecency', which is a heuristic that combines block usage
+ * frequency and recency.
+ *
+ * https://en.wikipedia.org/wiki/Frecency
  *
  * @param {Object}           state             Global application state.
  * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
@@ -1194,22 +1198,23 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
  *
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
-export function getRecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
-	return getItemsFromInserts( state, state.preferences.recentInserts, enabledBlockTypes, maximum );
-}
+export function getFrecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
+	const calculateFrecency = ( time, count ) => {
+		const duration = Date.now() - time;
+		switch ( true ) {
+			case duration < 3600:
+				return count * 4;
+			case duration < ( 24 * 3600 ):
+				return count * 2;
+			case duration < ( 7 * 24 * 3600 ):
+				return count / 2;
+			default:
+				return count / 4;
+		}
+	};
 
-/**
- * Determines the items that appear in the inserter with shortcuts based on the block usage
- *
- * @param {Object}           state             Global application state.
- * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
- * @param {number}           maximum           Number of items to return.
- *
- * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
- */
-export function getFrequentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
 	const sortedInserts = values( state.preferences.insertUsage )
-		.sort( ( a, b ) => b.count - a.count )
+		.sort( ( a, b ) => calculateFrecency( b.time, b.count ) - calculateFrecency( a.time, a.count ) )
 		.map( ( { insert } ) => insert );
 	return getItemsFromInserts( state, sortedInserts, enabledBlockTypes, maximum );
 }

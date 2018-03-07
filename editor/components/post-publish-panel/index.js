@@ -61,7 +61,7 @@ class PostPublishPanel extends Component {
 	}
 
 	render() {
-		const { onClose, user } = this.props;
+		const { onClose, user, forceIsDirty, forceIsSaving } = this.props;
 		const { loading, published } = this.state;
 		const canPublish = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
@@ -70,7 +70,7 @@ class PostPublishPanel extends Component {
 				<div className="editor-post-publish-panel__header">
 					{ ! published && (
 						<div className="editor-post-publish-panel__header-publish-button">
-							<PostPublishButton onSubmit={ this.onPublish } />
+							<PostPublishButton onSubmit={ this.onPublish } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
 						</div>
 					) }
 					{ published && (

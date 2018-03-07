@@ -36,6 +36,8 @@ import {
 	getOpenedGeneralSidebar,
 	isPublishSidebarOpened,
 	getMetaBoxes,
+	hasMetaBoxes,
+	isSavingMetaBoxes,
 } from '../../store/selectors';
 import { closePublishSidebar } from '../../store/actions';
 import { PluginSidebarSlot } from '../../components/plugin-sidebar/index.js';
@@ -60,6 +62,8 @@ function Layout( {
 	hasFixedToolbar,
 	onClosePublishSidebar,
 	metaBoxes,
+	hasActiveMetaboxes,
+	isSaving,
 } ) {
 	const className = classnames( 'edit-post-layout', {
 		'is-sidebar-opened': layoutHasOpenSidebar,
@@ -91,7 +95,13 @@ function Layout( {
 					<MetaBoxes location="advanced" />
 				</div>
 			</div>
-			{ publishSidebarOpen && <PostPublishPanel onClose={ onClosePublishSidebar } /> }
+			{ publishSidebarOpen && (
+				<PostPublishPanel
+					onClose={ onClosePublishSidebar }
+					forceIsDirty={ hasActiveMetaboxes }
+					forceIsSaving={ isSaving }
+				/>
+			) }
 			{
 				openedGeneralSidebar !== null && <GeneralSidebar
 					openedGeneralSidebar={ openedGeneralSidebar } />
@@ -110,6 +120,8 @@ export default connect(
 		publishSidebarOpen: isPublishSidebarOpened( state ),
 		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 		metaBoxes: getMetaBoxes( state ),
+		hasActiveMetaboxes: hasMetaBoxes( state ),
+		isSaving: isSavingMetaBoxes( state ),
 	} ),
 	{
 		onClosePublishSidebar: closePublishSidebar,

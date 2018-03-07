@@ -61,6 +61,8 @@ function Header( {
 					<PostPublishPanelToggle
 						isOpen={ isPublishSidebarOpen }
 						onToggle={ onTogglePublishSidebar }
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
 					/>
 					<IconButton
 						icon="admin-generic"
