@@ -465,6 +465,32 @@ export function getBlockCount( state, rootUID ) {
 }
 
 /**
+ * Returns the current block selection start. This value may be null, and it
+ * may represent either a singular block selection or multi-selection start.
+ * A selection is singular if its start and end match.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} UID of block selection start.
+ */
+export function getBlockSelectionStart( state ) {
+	return state.blockSelection.start;
+}
+
+/**
+ * Returns the current block selection end. This value may be null, and it
+ * may represent either a singular block selection or multi-selection end.
+ * A selection is singular if its start and end match.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} UID of block selection end.
+ */
+export function getBlockSelectionEnd( state ) {
+	return state.blockSelection.end;
+}
+
+/**
  * Returns the number of blocks currently selected in the post.
  *
  * @param {Object} state Global application state.

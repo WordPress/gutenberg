@@ -16,6 +16,7 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 	DocumentTitle,
+	PreserveScrollInReorder,
 } from '@wordpress/editor';
 
 /**
@@ -87,6 +88,7 @@ function Layout( {
 			<Header />
 			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<EditorNotices />
+				<PreserveScrollInReorder />
 				<div className="edit-post-layout__editor">
 					<EditorModeKeyboardShortcuts />
 					{ mode === 'text' && <TextEditor /> }
