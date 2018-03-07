@@ -1327,3 +1327,14 @@ export function isPublishingPost( state ) {
 	// considered published
 	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
 }
+
+/**
+ * Returns the provisional block UID, or null if there is no provisional block.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?string} Provisional block UID, if set.
+ */
+export function getProvisionalBlockUID( state ) {
+	return state.provisionalBlockUID;
+}
