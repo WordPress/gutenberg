@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import ReactTestRenderer from 'react-test-renderer';
+import { mount } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -17,7 +17,7 @@ describe( 'plugin/context', () => {
 
 			const WrappedComponent = withPluginContext( Component );
 
-			const renderer = ReactTestRenderer.create(
+			const MountedComponent = mount(
 				<PluginContextProvider value="plugin-namespace">
 					<div>
 						<WrappedComponent />
@@ -25,9 +25,7 @@ describe( 'plugin/context', () => {
 				</PluginContextProvider>
 			);
 
-			const tree = renderer.toJSON();
-
-			expect( tree.children[ 0 ] ).toEqual( 'plugin-namespace' );
+			expect( MountedComponent.find( Component ).props().pluginContext ).toEqual( 'plugin-namespace' );
 		} );
 	} );
 } );
