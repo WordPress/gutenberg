@@ -14,12 +14,15 @@ import SidebarLayout from './sidebar-layout';
 import ErrorBoundary from './error-boundary';
 
 /**
- * Name of slot in which popover should fill.
+ * Name of slot in which the sidebar should fill.
  *
  * @type {String}
  */
 const SLOT_NAME = 'PluginSidebar';
 
+/**
+ * The plugin sidebar fill.
+ */
 class PluginSidebar extends Component {
 	constructor( props ) {
 		super( props );
@@ -60,6 +63,11 @@ class PluginSidebar extends Component {
 	}
 }
 
+/**
+ * The plugin sidebar slot.
+ *
+ * @return {ReactElement} The plugin sidebar slot.
+ */
 const PluginSidebarSlot = () => (
 	<Slot name={ SLOT_NAME } />
 );
