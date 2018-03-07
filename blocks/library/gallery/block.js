@@ -137,7 +137,8 @@ class GalleryBlock extends Component {
 				setAttributes( {
 					images: currentImages.concat( images ),
 				} );
-			}
+			},
+			'image',
 		);
 	}
 
