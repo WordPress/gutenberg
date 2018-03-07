@@ -9,12 +9,11 @@ import { noop, get } from 'lodash';
  */
 import { withSelect } from '@wordpress/data';
 import { Component, compose } from '@wordpress/element';
-import { withFilters, withAPIData } from '@wordpress/components';
+import { withContext, withFilters, withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { createInnerBlockList } from './utils';
 import {
 	getBlockType,
 	getBlockDefaultClassname,
@@ -25,17 +24,12 @@ export class BlockEdit extends Component {
 	getChildContext() {
 		const {
 			id: uid,
-			renderBlockMenu,
-			showContextualToolbar,
 			user,
+			createInnerBlockList,
 		} = this.props;
 
 		return {
-			BlockList: createInnerBlockList(
-				uid,
-				renderBlockMenu,
-				showContextualToolbar
-			),
+			BlockList: createInnerBlockList( uid ),
 			canUserUseUnfilteredHTML: get( user.data, [
 				'capabilities',
 				'unfiltered_html',
@@ -88,4 +82,5 @@ export default compose( [
 	withAPIData( ( { postType } ) => ( {
 		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	} ) ),
+	withContext( 'createInnerBlockList' )(),
 ] )( BlockEdit );

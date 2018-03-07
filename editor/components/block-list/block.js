@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, reduce, size, castArray, first, last } from 'lodash';
+import { get, reduce, size, castArray, first, last, noop } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
@@ -46,6 +46,7 @@ import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
+import { createInnerBlockList } from './utils';
 import {
 	editPost,
 	insertBlocks,
@@ -98,6 +99,24 @@ export class BlockListBlock extends Component {
 		this.state = {
 			error: null,
 			isHovered: false,
+		};
+	}
+
+	/**
+	 * Provides context for descendent components for use in block rendering.
+	 *
+	 * @return {Object} Child context.
+	 */
+	getChildContext() {
+		// Blocks may render their own BlockEdit, in which case we must provide
+		// a mechanism for them to create their own InnerBlockList. BlockEdit
+		// is defined in `@wordpress/blocks`, so to avoid a circular dependency
+		// we inject this function via context.
+		return {
+			createInnerBlockList: ( uid ) => {
+				const { renderBlockMenu, showContextualToolbar } = this.props;
+				return createInnerBlockList( uid, renderBlockMenu, showContextualToolbar );
+			},
 		};
 	}
 
@@ -633,6 +652,10 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 		dispatch( toggleSelection( selectionEnabled ) );
 	},
 } );
+
+BlockListBlock.childContextTypes = {
+	createInnerBlockList: noop,
+};
 
 export default compose(
 	connect( mapStateToProps, mapDispatchToProps ),
