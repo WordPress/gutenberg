@@ -51,7 +51,9 @@ class PluginSidebar extends Component {
 				<SidebarLayout
 					title={ props.title }
 					onClose={ props.onClose } >
-					{ cloneElement( Children.only( children ), newProps ) }
+					<ErrorBoundary pluginName={ this.namespacedName }>
+						{ cloneElement( Children.only( children ), newProps ) }
+					</ErrorBoundary>
 				</SidebarLayout>
 			</Fill>
 		);
@@ -59,9 +61,7 @@ class PluginSidebar extends Component {
 }
 
 const PluginSidebarSlot = () => (
-	<ErrorBoundary>
-		<Slot name={ SLOT_NAME } />
-	</ErrorBoundary>
+	<Slot name={ SLOT_NAME } />
 );
 
 const PluginSidebarFill = compose( [
