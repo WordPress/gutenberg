@@ -101,7 +101,9 @@ function withFocusOutside( WrappedComponent ) {
 		normalizeButtonFocus( event ) {
 			const { type, target } = event;
 
-			if ( type === 'mouseup' ) {
+			const isInteractionEnd = includes( [ 'mouseup', 'touchend' ], type );
+
+			if ( isInteractionEnd ) {
 				this.preventBlurCheck = false;
 			} else if ( isFocusNormalizedButton( target ) ) {
 				this.preventBlurCheck = true;
@@ -118,6 +120,8 @@ function withFocusOutside( WrappedComponent ) {
 					onFocus={ this.cancelBlurCheck }
 					onMouseDown={ this.normalizeButtonFocus }
 					onMouseUp={ this.normalizeButtonFocus }
+					onTouchStart={ this.normalizeButtonFocus }
+					onTouchEnd={ this.normalizeButtonFocus }
 					onBlur={ this.queueBlurCheck }
 				>
 					<WrappedComponent
