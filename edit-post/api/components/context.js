@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import PropTypes from 'prop-types';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,7 @@ class PluginContextProvider extends Component {
 }
 
 PluginContextProvider.childContextTypes = {
-	pluginContext: PropTypes.any.isRequired,
+	pluginContext: noop,
 };
 
 function withPluginContext( WrappedComponent ) {
@@ -35,7 +35,7 @@ function withPluginContext( WrappedComponent ) {
 	}
 
 	PluginContextConsumer.contextTypes = {
-		pluginContext: PropTypes.any.isRequired,
+		pluginContext: noop,
 	};
 
 	return PluginContextConsumer;
