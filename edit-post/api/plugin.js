@@ -8,13 +8,11 @@ import { Component } from '@wordpress/element';
 
 /* External dependencies */
 import { isFunction, map } from 'lodash';
-import PropTypes from 'prop-types';
 
-/* Internal dependencies */
-import store from '../store';
-import {
-	openGeneralSidebar,
-} from '../store/actions';
+/**
+ * Internal dependencies
+ */
+import { PluginContextProvider, withPluginContext } from './components/context';
 
 const plugins = {};
 
@@ -27,7 +25,7 @@ const plugins = {};
  *
  * @return {Object} The final plugin settings object.
  */
-export function registerPlugin( settings ) {
+function registerPlugin( settings ) {
 	settings = applyFilters( 'editPost.registerPlugin', settings, settings.name );
 
 	if ( typeof settings.name !== 'string' ) {
@@ -57,31 +55,15 @@ export function registerPlugin( settings ) {
 	return plugins[ settings.name ] = settings;
 }
 
-class ContextProvider extends Component {
-	getChildContext() {
-		return {
-			namespace: this.props.namespace,
-		};
-	}
-
-	render() {
-		return this.props.children;
-	}
-}
-
-ContextProvider.childContextTypes = {
-	namespace: PropTypes.string.isRequired,
-};
-
 class Plugins extends Component {
 	render() {
 		return (
 			<div id="plugin-fills" style={ { display: 'none' } }>
 				{ map( plugins, plugin => {
 					return (
-						<ContextProvider key={ plugin.name } namespace={ plugin.name }>
+						<PluginContextProvider key={ plugin.name } namespace={ plugin.name }>
 							{ plugin.render() }
-						</ContextProvider>
+						</PluginContextProvider>
 					);
 				} ) }
 			</div>
@@ -89,14 +71,8 @@ class Plugins extends Component {
 	}
 }
 
-/**
- * Activates the given sidebar.
- *
- * @param  {string} name The name of the sidebar to activate.
- * @return {void}
- */
-export function activateSidebar( name ) {
-	store.dispatch( openGeneralSidebar( 'plugin', name ) );
-}
-
-export { Plugins };
+export {
+	Plugins,
+	withPluginContext,
+	registerPlugin,
+};

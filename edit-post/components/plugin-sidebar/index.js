@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 import './style.scss';
 import { getActivePlugin, getOpenedGeneralSidebar } from '../../store/selectors';
 import { closeGeneralSidebar } from '../../store/actions';
+import { withPluginContext } from '../../api/plugin';
 
 /**
  * Name of slot in which popover should fill.
@@ -59,7 +60,7 @@ class PluginSidebar extends Component {
 
 	render() {
 		if ( ! this.namespacedName ) {
-			this.namespacedName = `${ this.context.namespace }/${ this.props.name }`;
+			this.namespacedName = `${ this.props.namespace }/${ this.props.name }`;
 		}
 		if ( this.props.activePlugin !== this.namespacedName ) {
 			return null;
@@ -95,10 +96,6 @@ class PluginSidebar extends Component {
 	}
 }
 
-PluginSidebar.contextTypes = {
-	namespace: PropTypes.string.isRequired,
-};
-
 const PluginSidebarSlot = () => ( <SidebarErrorBoundary><Slot name={ SLOT_NAME } /></SidebarErrorBoundary> );
 
 const PluginSidebarFill = compose( [
@@ -112,6 +109,7 @@ const PluginSidebarFill = compose( [
 		null,
 		{ storeKey: 'edit-post' } ),
 	withFocusReturn,
+	withPluginContext,
 ] )( PluginSidebar );
 
 export { PluginSidebarFill, PluginSidebarSlot };
