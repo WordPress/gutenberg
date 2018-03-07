@@ -90,6 +90,6 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
-addFilter( 'blocks.registerBlockType', 'core/custom-class-name/attribute', addAttribute );
-addFilter( 'blocks.BlockEdit', 'core/custom-class-name/inspector-control', withInspectorControl );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
+addFilter( 'blocks.registerBlockType', 'core/blocks/custom-class-name/add-attribute', addAttribute );
+addFilter( 'blocks.BlockEdit', 'core/blocks/custom-class-name/with-inspector-control', withInspectorControl );
+addFilter( 'blocks.getSaveContent.extraProps', 'core/blocks/custom-class-name/add-save-props', addSaveProps );

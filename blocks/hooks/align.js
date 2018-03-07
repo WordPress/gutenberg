@@ -138,8 +138,8 @@ export function addAssignedAlign( props, blockType, attributes ) {
 	return props;
 }
 
-addFilter( 'blocks.registerBlockType', 'core/align/addAttribute', addAttribute );
-addFilter( 'editor.BlockListBlock', 'core/align/withAlign', withAlign );
-addFilter( 'blocks.BlockEdit', 'core/align/withToolbarControls', withToolbarControls );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/align/addAssignedAlign', addAssignedAlign );
+addFilter( 'blocks.registerBlockType', 'core/blocks/align/add-attribute', addAttribute );
+addFilter( 'editor.BlockListBlock', 'core/blocks/align/with-align', withAlign );
+addFilter( 'blocks.BlockEdit', 'core/blocks/align/with-toolbar-controls', withToolbarControls );
+addFilter( 'blocks.getSaveContent.extraProps', 'core/blocks/align/add-assigned-align', addAssignedAlign );
 

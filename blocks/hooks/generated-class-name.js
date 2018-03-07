@@ -43,4 +43,4 @@ export function addGeneratedClassName( extraProps, blockType ) {
 	return extraProps;
 }
 
-addFilter( 'blocks.getSaveContent.extraProps', 'core/generated-class-name/save-props', addGeneratedClassName );
+addFilter( 'blocks.getSaveContent.extraProps', 'core/blocks/generated-class-name/add-generated-class-name', addGeneratedClassName );

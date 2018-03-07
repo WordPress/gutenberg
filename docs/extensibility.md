@@ -113,7 +113,7 @@ function addBackgroundProp( props ) {
 // Adding the filter
 wp.hooks.addFilter(
 	'blocks.getSaveContent.extraProps',
-	'myplugin/add-background',
+	'myplugin/add-background-prop',
 	addBackgroundProp
 );
 ```

@@ -15,6 +15,6 @@ const withCopyContentMenuItem = ( menuItems ) => [
 
 addFilter(
 	'editPost.MoreMenu.tools',
-	'core/edit-post/more-menu/withCopyContentMenuItem',
+	'core/edit-post/more-menu/with-copy-content-menu-item',
 	withCopyContentMenuItem
 );

@@ -57,6 +57,6 @@ export function shimRawHTML( element ) {
 
 addFilter(
 	'blocks.getSaveElement',
-	'core/deprecated/shim-dangerous-html',
+	'core/blocks/deprecated/shim-raw-html',
 	shimRawHTML
 );
