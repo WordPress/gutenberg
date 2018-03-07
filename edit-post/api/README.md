@@ -33,7 +33,7 @@ wp.editPost.registerPlugin( {
 } );
 ```
 
-You can activate the sidebars using the following line:
+You can activate the sidebars using the following lines:
 
 `wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/first-sidebar-name' );`
 `wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/second-sidebar-name' );`

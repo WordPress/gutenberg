@@ -120,38 +120,65 @@ wp.hooks.addFilter(
 
 _Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
 
-## Adding a sidebar
+## Extending the editor's UI (Slot and Fill)
 
-**Warning:** This is an experimental API, and is subject to change or even removal.
+Extending the editor's UI is done with in `registerPlugin` API, and allows you to define all your plugin's UI elements in one place.
 
-### Registering a sidebar
+`wp.editPost.registerPlugin( { name: string, render: function } )`
 
-`wp.editPost.__experimentalRegisterSidebar( name: string, settings: { title: string, render: function } )`
-
-This method takes a sidebar `name` and a `settings` object, containing a title and a render function. The name should contain a namespace prefix (Example: my-plugin/my-custom-sidebar).
-
+This method takes one argument: 
+- An object containing the following data:
+  - `name`: A string identifying the plugin. Must be unique across all registered plugins.
+  - `render`: A component containing the UI elements to be rendered. See the list below for all available UI elements.
+  
 **Example**
 
 ```js
-wp.editPost.__experimentalRegisterSidebar( 'my-plugin/my-custom-sidebar', {
-	render: function mySidebar() {
-		return <p>This is an example</p>;
-	},
+const Fragment = wp.element.Fragment;
+const PluginSidebar = wp.editPost.PluginSidebar;
+
+const Component = () => (
+	<Fragment>
+        <PluginSidebar name="first-sidebar-name" title="My Sidebar">
+            <h1>Content of the first sidebar</h1>
+        </PluginSidebar>
+        <PluginSidebar name="second-sidebar-name" title="My Second Sidebar">
+            <h1>Content of the second sidebar</h1>
+        </PluginSidebar>
+	</Fragment>
+);
+
+wp.editPost.registerPlugin( {
+    name: 'plugin-name',
+    render: Component,
 } );
 ```
 
-### Activating a sidebar
+You can activate the sidebars using the following lines:
 
-`wp.editPost.__experimentalActivateSidebar( name: string )`
+`wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/first-sidebar-name' );`
+`wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/second-sidebar-name' );`
 
-This method takes the `name` of the sidebar you'd like to open. That sidebar should have been registered beforehand using the `registerSidebar` method.
+  
+### Available UI components
 
-**Example**
+The available UI components are available under `wp.editPost`, and are React components.
 
-```js
-wp.editPost.__experimentalActivateSidebar( 'my-plugin/my-custom-sidebar' );
-```
+#### PluginSidebar
 
-## Extending the editor's UI (Slot and Fill)
+Renders a sidebar when activated.
 
-Coming soon.
+`<PluginSidebar name="sidebar-name" title="Sidebar title">{ contents }</PluginSidebar>`
+
+- Props
+  - `name`: A string identifying the sidebar. Must be unique for every sidebar registered iwthin the scope of your plugin.
+  - `title`: Title displayed at the top of the sidebar. Must be a string.
+  
+The contents you render within the `PluginSidebar` will show up as content within the sidebar.
+
+The sidebar can be activated using the data api:
+
+`wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );`
+
+Notice that you need to use both the plugin name and sidebar name separated by a `/` to show the correct sidebar.
+
