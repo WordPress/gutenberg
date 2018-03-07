@@ -55,7 +55,7 @@ function registerPlugin( settings ) {
 	return plugins[ settings.name ] = settings;
 }
 
-class Plugins extends Component {
+class PluginFills extends Component {
 	render() {
 		return (
 			<div id="plugin-fills" style={ { display: 'none' } }>
@@ -72,7 +72,7 @@ class Plugins extends Component {
 }
 
 export {
-	Plugins,
+	PluginFills,
 	withPluginContext,
 	registerPlugin,
 };
