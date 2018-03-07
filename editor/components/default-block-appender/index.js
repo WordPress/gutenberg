@@ -18,8 +18,10 @@ import './style.scss';
 import BlockDropZone from '../block-drop-zone';
 import { insertDefaultBlock, startTyping } from '../../store/actions';
 import { getBlock, getBlockCount } from '../../store/selectors';
+import InserterWithShortcuts from '../inserter-with-shortcuts';
+import Inserter from '../inserter';
 
-export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPrompt, placeholder } ) {
+export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPrompt, placeholder, layout, rootUID } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
@@ -38,6 +40,8 @@ export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPromp
 				onKeyDown={ onAppend }
 				value={ showPrompt ? value : '' }
 			/>
+			<InserterWithShortcuts uid={ rootUID } layout={ layout } />
+			<Inserter position="top right" />
 		</div>
 	);
 }
