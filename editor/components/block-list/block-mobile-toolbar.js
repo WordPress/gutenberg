@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { ifViewportMatches } from '@wordpress/viewport';
+
+/**
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
@@ -17,4 +22,4 @@ function BlockMobileToolbar( { rootUID, uid, renderBlockMenu } ) {
 	);
 }
 
-export default BlockMobileToolbar;
+export default ifViewportMatches( '< small' )( BlockMobileToolbar );
