@@ -70,6 +70,8 @@
 
 .edit-post-layout__content {
 	position: relative;
+	// Pad the scroll box so content on the bottom can be scrolled up.
+	padding-bottom: 100vh;
 
 	// on mobile the main content area has to scroll
 	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
