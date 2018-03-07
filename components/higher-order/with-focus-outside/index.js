@@ -31,6 +31,7 @@ const INPUT_BUTTON_TYPES = [
  */
 function isFocusNormalizedButton( element ) {
 	switch ( element.nodeName ) {
+		case 'A':
 		case 'BUTTON':
 			return true;
 
