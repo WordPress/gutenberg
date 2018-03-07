@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 class SidebarErrorBoundary extends Component {
 	constructor( props ) {
@@ -17,7 +17,7 @@ class SidebarErrorBoundary extends Component {
 	render() {
 		if ( this.state.hasError ) {
 			return <p className="plugin-sidebar-error">
-				{ __( 'An error occurred rendering the plugin sidebar.' ) }
+				{ sprintf( __( 'An error occurred rendering the plugin sidebar with id "%s".' ), this.props.pluginName ) }
 			</p>;
 		}
 		return this.props.children;
