@@ -26,8 +26,12 @@ const plugins = {};
  * @return {Object} The final plugin settings object.
  */
 function registerPlugin( settings ) {
-	settings = applyFilters( 'editPost.registerPlugin', settings, settings.name );
-
+	if ( typeof settings !== 'object' ) {
+		console.error(
+			'No settings object provided!'
+		);
+		return null;
+	}
 	if ( typeof settings.name !== 'string' ) {
 		console.error(
 			'Plugin names must be strings.'
@@ -45,12 +49,14 @@ function registerPlugin( settings ) {
 			`Plugin "${ settings.name }" is already registered.`
 		);
 	}
-	if ( ! settings || ! isFunction( settings.render ) ) {
+	if ( ! isFunction( settings.render ) ) {
 		console.error(
 			'The "render" property must be specified and must be a valid function.'
 		);
 		return null;
 	}
+
+	settings = applyFilters( 'editPost.registerPlugin', settings, settings.name );
 
 	return plugins[ settings.name ] = settings;
 }
