@@ -209,6 +209,12 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 			left: $admin-sidebar-width;
 		}
 	}
+	
+	.edit-post-layout #{$selector} { /* Without auto-fold or folded */
+		@include break-medium() {
+			left: $admin-sidebar-width;
+		}
+	}	
 
 	.auto-fold #{$selector} {		/* Auto fold is when on smaller breakpoints, nav menu auto colllapses */
 		@include break-medium() {
