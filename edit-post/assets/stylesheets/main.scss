@@ -82,8 +82,10 @@ body.gutenberg-editor-page {
 }
 
 .gutenberg {
-	* {
-		box-sizing: border-box;
+	box-sizing: border-box;
+
+	*, *:after, *:before {
+		box-sizing: inherit;
 	}
 
 	ul:not(.wp-block-gallery) {
