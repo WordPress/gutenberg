@@ -89,6 +89,7 @@ class ParagraphBlock extends Component {
 			isSelected,
 			mergeBlocks,
 			onReplace,
+			className,
 		} = this.props;
 
 		const {
@@ -101,8 +102,6 @@ class ParagraphBlock extends Component {
 			textColor,
 			width,
 		} = attributes;
-
-		const className = dropCap ? 'has-drop-cap' : null;
 
 		return [
 			isSelected && (
@@ -169,6 +168,7 @@ class ParagraphBlock extends Component {
 							tagName="p"
 							className={ classnames( 'wp-block-paragraph', className, {
 								'has-background': backgroundColor,
+								'has-drop-cap': dropCap,
 							} ) }
 							style={ {
 								backgroundColor: backgroundColor,
