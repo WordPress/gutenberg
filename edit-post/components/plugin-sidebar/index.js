@@ -95,4 +95,4 @@ const PluginSidebarFill = compose( [
 	withPluginContext,
 ] )( PluginSidebar );
 
-export { PluginSidebarFill, PluginSidebarSlot };
+export { PluginSidebarFill, PluginSidebarSlot as PluginSidebar };

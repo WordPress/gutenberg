@@ -31,8 +31,8 @@ import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import { PluginFills } from '../../api/plugin';
-import { PluginSidebarSlot } from '../plugin-sidebar';
+import { PluginArea } from '../../api/plugin';
+import { PluginSidebar } from '../plugin-sidebar';
 
 function Layout( {
 	mode,
@@ -82,9 +82,9 @@ function Layout( {
 				/>
 			) }
 			{ editorSidebarOpened && <Sidebar /> }
-			{ pluginSidebarOpened && <PluginSidebarSlot /> }
+			{ pluginSidebarOpened && <PluginSidebar /> }
 			<Popover.Slot />
-			<PluginFills />
+			<PluginArea />
 		</div>
 	);
 }
