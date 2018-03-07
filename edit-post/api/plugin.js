@@ -61,7 +61,10 @@ function registerPlugin( settings ) {
 	return plugins[ settings.name ] = settings;
 }
 
-class PluginFills extends Component {
+/**
+ * A component that renders all plugin fills in a hidden div.
+ */
+class PluginArea extends Component {
 	render() {
 		return (
 			<div id="plugin-fills" style={ { display: 'none' } }>
@@ -78,7 +81,7 @@ class PluginFills extends Component {
 }
 
 export {
-	PluginFills,
+	PluginArea,
 	withPluginContext,
 	registerPlugin,
 };

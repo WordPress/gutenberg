@@ -40,15 +40,15 @@ import {
 	isSavingMetaBoxes,
 } from '../../store/selectors';
 import { closePublishSidebar } from '../../store/actions';
-import { PluginSidebarSlot } from '../../components/plugin-sidebar/index.js';
-import { PluginFills } from '../../api/plugin';
+import { PluginSidebar } from '../../components/plugin-sidebar/index.js';
+import { PluginArea } from '../../api/plugin';
 
 function GeneralSidebar( { openedGeneralSidebar } ) {
 	switch ( openedGeneralSidebar ) {
 		case 'editor':
 			return <Sidebar />;
 		case 'plugin':
-			return <PluginSidebarSlot />;
+			return <PluginSidebar />;
 		default:
 	}
 	return null;
@@ -107,7 +107,7 @@ function Layout( {
 					openedGeneralSidebar={ openedGeneralSidebar } />
 			}
 			<Popover.Slot />
-			<PluginFills />
+			<PluginArea />
 		</div>
 	);
 }
