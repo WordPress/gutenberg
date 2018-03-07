@@ -11,7 +11,7 @@ import { Component } from '@wordpress/element';
 class PluginContextProvider extends Component {
 	getChildContext() {
 		return {
-			namespace: this.props.namespace,
+			pluginContext: this.props.value,
 		};
 	}
 
@@ -21,7 +21,7 @@ class PluginContextProvider extends Component {
 }
 
 PluginContextProvider.childContextTypes = {
-	namespace: PropTypes.string.isRequired,
+	pluginContext: PropTypes.any.isRequired,
 };
 
 function withPluginContext( WrappedComponent ) {
@@ -35,7 +35,7 @@ function withPluginContext( WrappedComponent ) {
 	}
 
 	PluginContextConsumer.contextTypes = {
-		namespace: PropTypes.string.isRequired,
+		pluginContext: PropTypes.any.isRequired,
 	};
 
 	return PluginContextConsumer;

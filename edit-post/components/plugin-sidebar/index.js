@@ -60,7 +60,7 @@ class PluginSidebar extends Component {
 
 	render() {
 		if ( ! this.namespacedName ) {
-			this.namespacedName = `${ this.props.namespace }/${ this.props.name }`;
+			this.namespacedName = `${ this.props.pluginContext.namespace }/${ this.props.name }`;
 		}
 		if ( this.props.openedGeneralSidebar !== this.namespacedName ) {
 			return null;
