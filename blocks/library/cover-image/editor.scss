@@ -1,4 +1,8 @@
 .wp-block-cover-image {
+	.blocks-rich-text, .wp-block-button{
+		width: 100%;
+	}
+
 	.blocks-rich-text__tinymce[data-is-empty="true"]:before {
 		position: inherit;
 	}
@@ -30,4 +34,24 @@
 	&.has-right-content .block-rich-text__inline-toolbar{
 		justify-content: flex-end;
 	}
+
+	.editor-block-list__layout {
+		margin-top: 20px;
+		width: 100%;
+	}
+
+	.editor-block-list__block[data-type="core/button"] {
+		&[data-align="center"] .editor-block-toolbar {
+			left: calc(50% - 100px);
+		}
+
+		&:not([data-align]) .blocks-button__inline-link {
+			margin-left: 0px;
+		}
+	}
+
+	.editor-block-list__block-edit .wp-block-button {
+		width: auto;
+	}
+
 }

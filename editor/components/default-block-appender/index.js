@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { hasBlockSupport, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { withContext } from '@wordpress/components';
 
 /**
@@ -19,8 +19,8 @@ import BlockDropZone from '../block-drop-zone';
 import { insertDefaultBlock, startTyping } from '../../store/actions';
 import { getBlock, getBlockCount } from '../../store/selectors';
 
-export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPrompt } ) {
-	if ( isLocked || ! isVisible ) {
+export function DefaultBlockAppender( { isLocked, isVisible, onAppend, rootHasManageNesting, showPrompt } ) {
+	if ( isLocked || ! isVisible || rootHasManageNesting ) {
 		return null;
 	}
 
@@ -45,10 +45,14 @@ export default compose(
 			const isEmpty = ! getBlockCount( state, ownProps.rootUID );
 			const lastBlock = getBlock( state, ownProps.lastBlockUID );
 			const isLastBlockEmptyDefault = lastBlock && isUnmodifiedDefaultBlock( lastBlock );
+			const rootBlock = ownProps.rootUID ? getBlock( state, ownProps.rootUID ) : undefined;
 
 			return {
 				isVisible: isEmpty || ! isLastBlockEmptyDefault,
 				showPrompt: isEmpty,
+				rootHasManageNesting: !! rootBlock &&
+					hasBlockSupport( rootBlock.name, 'managedNesting' ),
+
 			};
 		},
 		( dispatch, ownProps ) => ( {
