@@ -4,7 +4,6 @@
 import { Component, Children, cloneElement, compose } from '@wordpress/element';
 import { Slot, Fill, withFocusReturn } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -12,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import './style.scss';
 import { withPluginContext } from '../../api/plugin';
 import SidebarLayout from './sidebar-layout';
+import ErrorBoundary from './error-boundary';
 
 /**
  * Name of slot in which popover should fill.
@@ -19,26 +19,6 @@ import SidebarLayout from './sidebar-layout';
  * @type {String}
  */
 const SLOT_NAME = 'PluginSidebar';
-
-class SidebarErrorBoundary extends Component {
-	constructor( props ) {
-		super( props );
-		this.state = { hasError: false };
-	}
-
-	componentDidCatch() {
-		this.setState( { hasError: true } );
-	}
-
-	render() {
-		if ( this.state.hasError ) {
-			return <p className="plugin-sidebar-error">
-				{ __( 'An error occurred rendering the plugin sidebar.' ) }
-			</p>;
-		}
-		return this.props.children;
-	}
-}
 
 class PluginSidebar extends Component {
 	constructor( props ) {
@@ -78,7 +58,11 @@ class PluginSidebar extends Component {
 	}
 }
 
-const PluginSidebarSlot = () => ( <SidebarErrorBoundary><Slot name={ SLOT_NAME } /></SidebarErrorBoundary> );
+const PluginSidebarSlot = () => (
+	<ErrorBoundary>
+		<Slot name={ SLOT_NAME } />
+	</ErrorBoundary>
+);
 
 const PluginSidebarFill = compose( [
 	withSelect( select => {
