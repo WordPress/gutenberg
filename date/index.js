@@ -192,37 +192,37 @@ const formatMap = {
 /**
  * Adds a locale to moment, using the format supplied by `wp_localize_script()`.
  *
- * @param {Object} s Settings, including locale data.
+ * @param {Object} localSettings Settings, including locale data.
  */
-function setupLocale( s ) {
+function setupLocale( localSettings ) {
 	// Backup and restore current locale.
 	const currentLocale = moment.locale();
-	moment.updateLocale( s.l10n.locale, {
+	moment.updateLocale( localSettings.l10n.locale, {
 		// Inherit anything missing from the default locale.
 		parentLocale: currentLocale,
-		months: s.l10n.months,
-		monthsShort: s.l10n.monthsShort,
-		weekdays: s.l10n.weekdays,
-		weekdaysShort: s.l10n.weekdaysShort,
+		months: localSettings.l10n.months,
+		monthsShort: localSettings.l10n.monthsShort,
+		weekdays: localSettings.l10n.weekdays,
+		weekdaysShort: localSettings.l10n.weekdaysShort,
 		meridiem( hour, minute, isLowercase ) {
 			if ( hour < 12 ) {
-				return isLowercase ? s.l10n.meridiem.am : s.l10n.meridiem.AM;
+				return isLowercase ? localSettings.l10n.meridiem.am : localSettings.l10n.meridiem.AM;
 			}
-			return isLowercase ? s.l10n.meridiem.pm : s.l10n.meridiem.PM;
+			return isLowercase ? localSettings.l10n.meridiem.pm : localSettings.l10n.meridiem.PM;
 		},
 		longDateFormat: {
-			LT: s.formats.time,
+			LT: localSettings.formats.time,
 			LTS: null,
 			L: null,
-			LL: s.formats.date,
-			LLL: s.formats.datetime,
+			LL: localSettings.formats.date,
+			LLL: localSettings.formats.datetime,
 			LLLL: null,
 		},
 		// From human_time_diff?
 		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
 		relativeTime: {
-			future: s.l10n.relative.future,
-			past: s.l10n.relative.past,
+			future: localSettings.l10n.relative.future,
+			past: localSettings.l10n.relative.past,
 			s: 'seconds',
 			m: 'a minute',
 			mm: '%d minutes',
