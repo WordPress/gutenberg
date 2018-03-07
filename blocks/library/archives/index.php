@@ -15,13 +15,15 @@
  * @return string Returns the post content with archives added.
  */
 function render_block_core_archives( $attributes ) {
+	static $block_id = 0;
+	$block_id++;
+
 	$show_post_count = ! empty( $attributes['showPostCounts'] ) ? true : false;
 	$class            = "wp-block-archives align{$attributes['align']}";
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
 
-		// Todo: 123 should be a unique number, see WP_Widget_Archives class.
-		$dropdown_id = esc_attr( 'archives-dropdown-123' );
+		$dropdown_id = esc_attr( 'wp-block-archives-' . $block_id );
 		$title       = __( 'Archives' );
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-archives.php */
