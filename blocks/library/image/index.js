@@ -72,8 +72,20 @@ export const settings = {
 				isMatch( node ) {
 					const tag = node.nodeName.toLowerCase();
 					const hasImage = node.querySelector( 'img' );
+					const isAnchorWithOneImage = ( nodeToCheck ) =>
+						'A' === nodeToCheck.nodeName &&
+						1 === nodeToCheck.childNodes.length &&
+						'IMG' === nodeToCheck.firstChild.nodeName;
 
-					return tag === 'img' || ( hasImage && tag === 'figure' );
+					const isParagraphWithAnchorImage =
+						'P' ===	node.nodeName &&
+						1 === node.childNodes.length &&
+						isAnchorWithOneImage( node.firstChild );
+
+					return tag === 'img' ||
+						( hasImage && tag === 'figure' ) ||
+						isParagraphWithAnchorImage ||
+						isAnchorWithOneImage( node );
 				},
 				transform( node ) {
 					const matches = /align(left|center|right)/.exec( node.className );

@@ -152,6 +152,15 @@ export function isInvalidInline( element ) {
 		return false;
 	}
 
+	// an image inside an anchor is not invalid inline
+	if (
+		element.nodeName === 'A' &&
+		element.childNodes.length === 1 &&
+		element.firstChild.nodeName === 'IMG'
+	) {
+		return false;
+	}
+
 	return Array.from( element.childNodes ).some( ( node ) => {
 		if ( node.nodeType === ELEMENT_NODE ) {
 			if ( ! isInline( node ) ) {
