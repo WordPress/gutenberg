@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { isInteger } from 'lodash';
-import moment from 'moment';
 
 /**
  * WordPress dependencies
@@ -51,11 +50,11 @@ class TimePicker extends Component {
 	}
 
 	syncState( { currentTime, is12Hour } ) {
-		const selected = currentTime ? moment( currentTime ) : wpmoment;
+		const selected = currentTime ? wpmoment( currentTime ) : wpmoment();
 		const minutes = selected.format( 'mm' );
 		const am = selected.format( 'A' );
 		const hours = selected.format( is12Hour ? 'hh' : 'HH' );
-		const date = currentTime ? moment( currentTime ) : wpmoment;
+		const date = currentTime ? wpmoment( currentTime ) : wpmoment();
 		this.setState( { minutes, hours, am, date } );
 	}
 
