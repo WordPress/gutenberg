@@ -491,8 +491,8 @@
 	margin-bottom: $block-padding + 1px;
 
 	// Floated items have special needs for the contextual toolbar position
-	.edit-post-visual-editor .editor-block-list__block[data-align="left"] &,
-	.edit-post-visual-editor .editor-block-list__block[data-align="right"] & {
+	.editor-block-list__block[data-align="left"] &,
+	.editor-block-list__block[data-align="right"] & {
 		margin-bottom: 1px;
 		margin-top: -$block-toolbar-height - 1px;
 	}
