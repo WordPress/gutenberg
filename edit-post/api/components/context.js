@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 /**
  * WordPress dependencies
  */
-import { Component, cloneElement, Children } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 class PluginContextProvider extends Component {
 	getChildContext() {
@@ -24,22 +24,21 @@ PluginContextProvider.childContextTypes = {
 	namespace: PropTypes.string.isRequired,
 };
 
-class PluginContextConsumer extends Component {
-	render() {
-		return cloneElement( Children.only( this.props.children ), this.context );
-	}
-}
-
-PluginContextConsumer.contextTypes = {
-	namespace: PropTypes.string.isRequired,
-};
-
 function withPluginContext( WrappedComponent ) {
-	return ( props ) => (
-		<PluginContextConsumer>
-			<WrappedComponent { ...props } />
-		</PluginContextConsumer>
-	);
+	class PluginContextConsumer extends Component {
+		render() {
+			return <WrappedComponent
+				{ ...this.props }
+				{ ...this.context }
+			/>;
+		}
+	}
+
+	PluginContextConsumer.contextTypes = {
+		namespace: PropTypes.string.isRequired,
+	};
+
+	return PluginContextConsumer;
 }
 
 export {
