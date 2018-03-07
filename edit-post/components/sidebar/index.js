@@ -1,13 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress Dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withFocusReturn } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal Dependencies
@@ -16,7 +13,6 @@ import './style.scss';
 import PostSettings from './post-settings';
 import BlockInspectorPanel from './block-inspector-panel';
 import Header from './header';
-import { getActiveGeneralSidebarName } from '../../store/selectors';
 
 /**
  * Renders a sidebar with the relevant panel.
@@ -42,13 +38,9 @@ const Sidebar = ( { activeSidebarName } ) => {
 	);
 };
 
-export default connect(
-	( state ) => {
-		return {
-			activeSidebarName: getActiveGeneralSidebarName( state ),
-		};
-	},
-	undefined,
-	undefined,
-	{ storeKey: 'edit-post' }
-)( withFocusReturn( Sidebar ) );
+export default compose(
+	withSelect( ( select ) => ( {
+		activeSidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
+	} ) ),
+	withFocusReturn,
+)( Sidebar );

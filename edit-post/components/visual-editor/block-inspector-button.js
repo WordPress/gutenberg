@@ -11,12 +11,6 @@ import { IconButton, withSpokenMessages } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import { getActiveGeneralSidebarName, isEditorSidebarOpened } from '../../store/selectors';
-import { openGeneralSidebar } from '../../store/actions';
-
 export function BlockInspectorButton( {
 	areAdvancedSettingsOpened,
 	closeSidebar,

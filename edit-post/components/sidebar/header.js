@@ -1,21 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
-
-/**
- * Internal Dependencies
- */
-import { getActiveGeneralSidebarName } from '../../store/selectors';
-import { closeGeneralSidebar, openGeneralSidebar } from '../../store/actions';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 const SidebarHeader = ( { activeSidebarName, openSidebar, closeSidebar, count } ) => {
 	// Do not display "0 Blocks".
@@ -49,16 +38,10 @@ const SidebarHeader = ( { activeSidebarName, openSidebar, closeSidebar, count } 
 export default compose(
 	withSelect( ( select ) => ( {
 		count: select( 'core/editor' ).getSelectedBlockCount(),
+		activeSidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
 	} ) ),
-	connect(
-		( state ) => ( {
-			activeSidebarName: getActiveGeneralSidebarName( state ),
-		} ),
-		{
-			openSidebar: openGeneralSidebar,
-			closeSidebar: closeGeneralSidebar,
-		},
-		undefined,
-		{ storeKey: 'edit-post' }
-	)
+	withDispatch( ( dispatch ) => ( {
+		openSidebar: dispatch( 'core/edit-post' ).openGeneralSidebar,
+		closeSidebar: dispatch( 'core/edit-post' ).closeGeneralSidebar,
+	} ) ),
 )( SidebarHeader );
