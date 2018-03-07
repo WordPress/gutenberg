@@ -561,3 +561,9 @@
 		right: $block-mover-padding-visible + 10px;
 	}
 }
+
+.editor-block-list__empty-block-inserter {
+	position: absolute;
+		top: 10px;
+		left: 10px;
+}
