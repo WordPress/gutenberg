@@ -67,7 +67,7 @@ class PluginFills extends Component {
 			<div id="plugin-fills" style={ { display: 'none' } }>
 				{ map( plugins, plugin => {
 					return (
-						<PluginContextProvider key={ plugin.name } namespace={ plugin.name }>
+						<PluginContextProvider key={ plugin.name } value={ { namespace: plugin.name } }>
 							{ plugin.render() }
 						</PluginContextProvider>
 					);
