@@ -270,6 +270,11 @@ export class InserterMenu extends Component {
 		const { selectedItem } = this.state;
 		const isSearching = this.state.filterValue;
 
+		// Disable reason: The inserter menu is a modal display, not one which
+		// is always visible, and one which already incurs this behavior of
+		// autoFocus via Popover's focusOnMount.
+
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<TabbableContainer
 				className="editor-inserter__menu"
@@ -285,6 +290,7 @@ export class InserterMenu extends Component {
 					placeholder={ __( 'Search for a block' ) }
 					className="editor-inserter__search"
 					onChange={ this.filter }
+					autoFocus
 				/>
 				{ ! isSearching &&
 					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
@@ -329,6 +335,7 @@ export class InserterMenu extends Component {
 				}
 			</TabbableContainer>
 		);
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
