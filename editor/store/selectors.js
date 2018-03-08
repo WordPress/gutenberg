@@ -465,6 +465,32 @@ export function getBlockCount( state, rootUID ) {
 }
 
 /**
+ * Returns the current block selection start. This value may be null, and it
+ * may represent either a singular block selection or multi-selection start.
+ * A selection is singular if its start and end match.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} UID of block selection start.
+ */
+export function getBlockSelectionStart( state ) {
+	return state.blockSelection.start;
+}
+
+/**
+ * Returns the current block selection end. This value may be null, and it
+ * may represent either a singular block selection or multi-selection end.
+ * A selection is singular if its start and end match.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} UID of block selection end.
+ */
+export function getBlockSelectionEnd( state ) {
+	return state.blockSelection.end;
+}
+
+/**
  * Returns the number of blocks currently selected in the post.
  *
  * @param {Object} state Global application state.
@@ -1122,7 +1148,7 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 		initialAttributes: { ref: reusableBlock.id },
 		title: reusableBlock.title,
 		icon: referencedBlockType.icon,
-		category: 'reusable-blocks',
+		category: 'shared',
 		keywords: [],
 		isDisabled: false,
 	};
@@ -1300,4 +1326,15 @@ export function isPublishingPost( state ) {
 	// Consider as publishing when current post prior to request was not
 	// considered published
 	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
+}
+
+/**
+ * Returns the provisional block UID, or null if there is no provisional block.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?string} Provisional block UID, if set.
+ */
+export function getProvisionalBlockUID( state ) {
+	return state.provisionalBlockUID;
 }

@@ -24,7 +24,7 @@ import { getBlock } from '../../store/selectors';
  */
 const { DOWN } = keycodes;
 
-function BlockSwitcher( { blocks, onTransform, isLocked } ) {
+export function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 	const allowedBlocks = getPossibleBlockTransformations( blocks );
 
 	if ( isLocked || ! allowedBlocks.length ) {

@@ -24,13 +24,24 @@ export default function( node ) {
 		return;
 	}
 
-	let wrapper = node;
+	let nodeToInsert = node;
+	// if the embedded is an image and its parent is an anchor with just the image
+	// take the anchor out instead of just the image
+	if (
+		'IMG' === node.nodeName &&
+		1 === node.parentNode.childNodes.length &&
+		'A' === node.parentNode.nodeName
+	) {
+		nodeToInsert = node.parentNode;
+	}
+
+	let wrapper = nodeToInsert;
 
 	while ( wrapper && wrapper.nodeName !== 'P' ) {
 		wrapper = wrapper.parentElement;
 	}
 
 	if ( wrapper ) {
-		wrapper.parentNode.insertBefore( node, wrapper );
+		wrapper.parentNode.insertBefore( nodeToInsert, wrapper );
 	}
 }

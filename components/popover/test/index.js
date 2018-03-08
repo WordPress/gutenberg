@@ -25,6 +25,14 @@ describe( 'Popover', () => {
 
 		afterEach( () => {
 			jest.restoreAllMocks();
+
+			// Resetting keyboard state is deferred, so ensure that timers are
+			// consumed to avoid leaking into other tests.
+			jest.runAllTimers();
+
+			if ( document.activeElement ) {
+				document.activeElement.blur();
+			}
 		} );
 
 		it( 'should add window events', () => {
@@ -59,7 +67,12 @@ describe( 'Popover', () => {
 			expect( Popover.prototype.setForcedPositions ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should focus when opening', () => {
+		it( 'should focus when opening in response to keyboard event', () => {
+			// As in the real world, these occur in sequence before the popover
+			// has been mounted. Keyup's resetting is deferred.
+			document.dispatchEvent( new window.KeyboardEvent( 'keydown' ) );
+			document.dispatchEvent( new window.KeyboardEvent( 'keyup' ) );
+
 			// An ideal test here would mount with an input child and focus the
 			// child, but in context of JSDOM the inputs are not visible and
 			// are therefore skipped as tabbable, defaulting to popover.
@@ -68,6 +81,12 @@ describe( 'Popover', () => {
 			const content = wrapper.find( '.components-popover__content' ).getDOMNode();
 
 			expect( document.activeElement ).toBe( content );
+		} );
+
+		it( 'should not focus when opening in response to pointer event', () => {
+			wrapper = mount( <Popover /> );
+
+			expect( document.activeElement ).toBe( document.body );
 		} );
 
 		it( 'should allow focus-on-open behavior to be disabled', () => {

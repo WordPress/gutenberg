@@ -16,6 +16,7 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 	DocumentTitle,
+	PreserveScrollInReorder,
 } from '@wordpress/editor';
 
 /**
@@ -37,6 +38,8 @@ import {
 	isPublishSidebarOpened,
 	getActivePlugin,
 	getMetaBoxes,
+	hasMetaBoxes,
+	isSavingMetaBoxes,
 } from '../../store/selectors';
 import { closePublishSidebar } from '../../store/actions';
 import PluginsPanel from '../../components/plugins-panel/index.js';
@@ -62,6 +65,8 @@ function Layout( {
 	onClosePublishSidebar,
 	plugin,
 	metaBoxes,
+	hasActiveMetaboxes,
+	isSaving,
 } ) {
 	const isSidebarOpened = layoutHasOpenSidebar &&
 		( openedGeneralSidebar !== 'plugin' || getSidebarSettings( plugin ) );
@@ -83,11 +88,10 @@ function Layout( {
 			<Header />
 			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<EditorNotices />
-				<div className="edit-post-layout__editor">
-					<EditorModeKeyboardShortcuts />
-					{ mode === 'text' && <TextEditor /> }
-					{ mode === 'visual' && <VisualEditor /> }
-				</div>
+				<PreserveScrollInReorder />
+				<EditorModeKeyboardShortcuts />
+				{ mode === 'text' && <TextEditor /> }
+				{ mode === 'visual' && <VisualEditor /> }
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
 				</div>
@@ -95,7 +99,13 @@ function Layout( {
 					<MetaBoxes location="advanced" />
 				</div>
 			</div>
-			{ publishSidebarOpen && <PostPublishPanel onClose={ onClosePublishSidebar } /> }
+			{ publishSidebarOpen && (
+				<PostPublishPanel
+					onClose={ onClosePublishSidebar }
+					forceIsDirty={ hasActiveMetaboxes }
+					forceIsSaving={ isSaving }
+				/>
+			) }
 			{
 				openedGeneralSidebar !== null && <GeneralSidebar
 					openedGeneralSidebar={ openedGeneralSidebar } />
@@ -114,6 +124,8 @@ export default connect(
 		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
 		plugin: getActivePlugin( state ),
 		metaBoxes: getMetaBoxes( state ),
+		hasActiveMetaboxes: hasMetaBoxes( state ),
+		isSaving: isSavingMetaBoxes( state ),
 	} ),
 	{
 		onClosePublishSidebar: closePublishSidebar,

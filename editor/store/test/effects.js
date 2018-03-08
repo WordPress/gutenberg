@@ -30,10 +30,14 @@ import {
 	convertBlockToStatic,
 	convertBlockToReusable,
 	selectBlock,
-} from '../../store/actions';
+	removeBlock,
+	createErrorNotice,
+} from '../actions';
 import reducer from '../reducer';
-import effects from '../effects';
-import * as selectors from '../../store/selectors';
+import effects, {
+	removeProvisionalBlock,
+} from '../effects';
+import * as selectors from '../selectors';
 
 // Make all generated UUIDs the same for testing
 jest.mock( 'uuid/v4', () => {
@@ -42,6 +46,47 @@ jest.mock( 'uuid/v4', () => {
 
 describe( 'effects', () => {
 	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
+
+	describe( 'removeProvisionalBlock()', () => {
+		const store = { getState: () => {} };
+
+		beforeAll( () => {
+			selectors.getProvisionalBlockUID = jest.spyOn( selectors, 'getProvisionalBlockUID' );
+			selectors.isBlockSelected = jest.spyOn( selectors, 'isBlockSelected' );
+		} );
+
+		beforeEach( () => {
+			selectors.getProvisionalBlockUID.mockReset();
+			selectors.isBlockSelected.mockReset();
+		} );
+
+		afterAll( () => {
+			selectors.getProvisionalBlockUID.mockRestore();
+			selectors.isBlockSelected.mockRestore();
+		} );
+
+		it( 'should return nothing if there is no provisional block', () => {
+			const action = removeProvisionalBlock( {}, store );
+
+			expect( action ).toBeUndefined();
+		} );
+
+		it( 'should return nothing if there is a provisional block and it is selected', () => {
+			selectors.getProvisionalBlockUID.mockReturnValue( 'chicken' );
+			selectors.isBlockSelected.mockImplementation( ( state, uid ) => uid === 'chicken' );
+			const action = removeProvisionalBlock( {}, store );
+
+			expect( action ).toBeUndefined();
+		} );
+
+		it( 'should return remove action for provisional block', () => {
+			selectors.getProvisionalBlockUID.mockReturnValue( 'chicken' );
+			selectors.isBlockSelected.mockImplementation( ( state, uid ) => uid === 'ribs' );
+			const action = removeProvisionalBlock( {}, store );
+
+			expect( action ).toEqual( removeBlock( 'chicken' ) );
+		} );
+	} );
 
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;
@@ -106,11 +151,14 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken', -1 ) );
-			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
-				uid: 'chicken',
-				name: 'core/test-block',
-				attributes: { content: 'chicken ribs' },
-			} ] ) );
+			expect( dispatch ).toHaveBeenCalledWith( {
+				...replaceBlocks( [ 'chicken', 'ribs' ], [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: { content: 'chicken ribs' },
+				} ] ),
+				time: expect.any( Number ),
+			} );
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
@@ -391,6 +439,62 @@ describe( 'effects', () => {
 				},
 				type: 'CREATE_NOTICE',
 			} ) );
+		} );
+	} );
+
+	describe( '.REQUEST_POST_UPDATE_FAILURE', () => {
+		it( 'should dispatch a notice on failure when publishing a draft fails.', () => {
+			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			const action = {
+				post: {
+					id: 1,
+					title: {
+						raw: 'A History of Pork',
+					},
+					content: {
+						raw: '',
+					},
+					status: 'draft',
+				},
+				edits: {
+					status: 'publish',
+				},
+			};
+
+			handler( action, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Publishing failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
+		} );
+
+		it( 'should dispatch a notice on failure when trying to update a draft.', () => {
+			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			const action = {
+				post: {
+					id: 1,
+					title: {
+						raw: 'A History of Pork',
+					},
+					content: {
+						raw: '',
+					},
+					status: 'draft',
+				},
+				edits: {
+					status: 'draft',
+				},
+			};
+
+			handler( action, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Updating failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
 		} );
 	} );
 
@@ -780,12 +884,13 @@ describe( 'effects', () => {
 				expect( dispatch ).toHaveBeenCalledWith(
 					saveReusableBlock( expect.any( Number ) )
 				);
-				expect( dispatch ).toHaveBeenCalledWith(
-					replaceBlocks(
+				expect( dispatch ).toHaveBeenCalledWith( {
+					...replaceBlocks(
 						[ staticBlock.uid ],
 						[ createBlock( 'core/block', { ref: expect.any( Number ) } ) ]
-					)
-				);
+					),
+					time: expect.any( Number ),
+				} );
 			} );
 		} );
 	} );

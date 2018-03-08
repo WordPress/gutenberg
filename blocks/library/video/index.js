@@ -6,8 +6,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Placeholder, Toolbar, IconButton, Button } from '@wordpress/components';
+import {
+	Button,
+	FormFileUpload,
+	IconButton,
+	Placeholder,
+	Toolbar,
+} from '@wordpress/components';
 import { Component } from '@wordpress/element';
+import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -94,20 +101,24 @@ export const settings = {
 				}
 				return false;
 			};
+			const setVideo = ( [ audio ] ) => onSelectVideo( audio );
+			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setVideo, 'video' );
 			const controls = isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
 					/>
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit video' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</Toolbar>
+					{ ! editing && (
+						<Toolbar>
+							<IconButton
+								className="components-icon-button components-toolbar__control"
+								label={ __( 'Edit video' ) }
+								onClick={ switchToEditing }
+								icon="edit"
+							/>
+						</Toolbar>
+					) }
 				</BlockControls>
 			);
 
@@ -133,6 +144,14 @@ export const settings = {
 								{ __( 'Use URL' ) }
 							</Button>
 						</form>
+						<FormFileUpload
+							isLarge
+							className="wp-block-video__upload-button"
+							onChange={ uploadFromFiles }
+							accept="video/*"
+						>
+							{ __( 'Upload' ) }
+						</FormFileUpload>
 						<MediaUpload
 							onSelect={ onSelectVideo }
 							type="video"

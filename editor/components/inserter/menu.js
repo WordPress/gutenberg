@@ -131,15 +131,15 @@ export class InserterMenu extends Component {
 				return frecentItems;
 
 			case 'blocks':
-				predicate = ( item ) => item.category !== 'embed' && item.category !== 'reusable-blocks';
+				predicate = ( item ) => item.category !== 'embed' && item.category !== 'shared';
 				break;
 
 			case 'embeds':
 				predicate = ( item ) => item.category === 'embed';
 				break;
 
-			case 'saved':
-				predicate = ( item ) => item.category === 'reusable-blocks';
+			case 'shared':
+				predicate = ( item ) => item.category === 'shared';
 				break;
 		}
 
@@ -225,11 +225,11 @@ export class InserterMenu extends Component {
 			return this.renderItems( itemsForTab );
 		}
 
-		// If the Saved tab is selected and we have no results, display a friendly message
-		if ( 'saved' === tab && itemsForTab.length === 0 ) {
+		// If the Shared tab is selected and we have no results, display a friendly message
+		if ( 'shared' === tab && itemsForTab.length === 0 ) {
 			return (
 				<NoBlocks>
-					{ __( 'No saved blocks.' ) }
+					{ __( 'No shared blocks.' ) }
 				</NoBlocks>
 			);
 		}
@@ -270,6 +270,11 @@ export class InserterMenu extends Component {
 		const { selectedItem } = this.state;
 		const isSearching = this.state.filterValue;
 
+		// Disable reason: The inserter menu is a modal display, not one which
+		// is always visible, and one which already incurs this behavior of
+		// autoFocus via Popover's focusOnMount.
+
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<TabbableContainer
 				className="editor-inserter__menu"
@@ -285,6 +290,7 @@ export class InserterMenu extends Component {
 					placeholder={ __( 'Search for a block' ) }
 					className="editor-inserter__search"
 					onChange={ this.filter }
+					autoFocus
 				/>
 				{ ! isSearching &&
 					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
@@ -306,8 +312,8 @@ export class InserterMenu extends Component {
 								className: 'editor-inserter__tab',
 							},
 							{
-								name: 'saved',
-								title: __( 'Saved' ),
+								name: 'shared',
+								title: __( 'Shared' ),
 								className: 'editor-inserter__tab',
 							},
 						] }
@@ -329,6 +335,7 @@ export class InserterMenu extends Component {
 				}
 			</TabbableContainer>
 		);
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 

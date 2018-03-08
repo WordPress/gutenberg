@@ -1,7 +1,5 @@
 .edit-post-visual-editor {
 	position: relative;
-	height: 100%;
-	margin: 0 auto;
 	padding: 50px 0;
 
 	&,
@@ -9,6 +7,20 @@
 		font-family: $editor-font;
 		font-size: $editor-font-size;
 		line-height: $editor-line-height;
+	}
+
+	& ul,
+	& ol {
+		margin: 0;
+		padding: 0;
+	}
+
+	& ul:not(.wp-block-gallery) {
+		list-style-type: disc;
+	}
+
+	& ol {
+		list-style-type: decimal;
 	}
 }
 
@@ -39,11 +51,13 @@
 
 // This is a focus style shown for blocks that need an indicator even when in an isEditing state
 // like for example an image block that receives arrowkey focus.
-.edit-post-visual-editor .editor-block-list__block:not( .is-selected ) .editor-block-list__block-edit  {
-	box-shadow: 0 0 0 0 $white, 0 0 0 0 $dark-gray-900;
-	transition: .1s box-shadow .05s;
+.edit-post-visual-editor .editor-block-list__block:not( .is-selected )   {
+	.editor-block-list__block-edit {
+		box-shadow: 0 0 0 0 $white, 0 0 0 0 $dark-gray-900;
+		transition: .1s box-shadow .05s;
+	}
 
-	&:focus {
+	&:focus .editor-block-list__block-edit {
 		box-shadow: 0 0 0 1px $white, 0 0 0 3px $dark-gray-900;
 	}
 }

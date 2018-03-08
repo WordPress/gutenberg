@@ -26,6 +26,7 @@ import {
 	preferences,
 	saving,
 	notices,
+	provisionalBlockUID,
 	blocksMode,
 	isInsertionPointVisible,
 	reusableBlocks,
@@ -181,6 +182,70 @@ describe( 'state', () => {
 				[ wrapperBlock.uid ]: [ replacementBlock.uid ],
 				[ replacementBlock.uid ]: [],
 			} );
+		} );
+
+		it( 'should replace the block even if the new block uid is the same', () => {
+			const originalState = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [],
+				} ],
+			} );
+			const replacedState = editor( originalState, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'chicken' ],
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/freeform',
+					innerBlocks: [],
+				} ],
+			} );
+
+			expect( Object.keys( replacedState.present.blocksByUid ) ).toHaveLength( 1 );
+			expect( values( originalState.present.blocksByUid )[ 0 ].name ).toBe( 'core/test-block' );
+			expect( values( replacedState.present.blocksByUid )[ 0 ].name ).toBe( 'core/freeform' );
+			expect( values( replacedState.present.blocksByUid )[ 0 ].uid ).toBe( 'chicken' );
+			expect( replacedState.present.blockOrder ).toEqual( {
+				'': [ 'chicken' ],
+				chicken: [],
+			} );
+
+			const nestedBlock = {
+				uid: 'chicken',
+				name: 'core/test-block',
+				attributes: {},
+				innerBlocks: [],
+			};
+			const wrapperBlock = createBlock( 'core/test-block', {}, [ nestedBlock ] );
+			const replacementNestedBlock = {
+				uid: 'chicken',
+				name: 'core/freeform',
+				attributes: {},
+				innerBlocks: [],
+			};
+
+			const originalNestedState = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ wrapperBlock ],
+			} );
+
+			const replacedNestedState = editor( originalNestedState, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ nestedBlock.uid ],
+				blocks: [ replacementNestedBlock ],
+			} );
+
+			expect( replacedNestedState.present.blockOrder ).toEqual( {
+				'': [ wrapperBlock.uid ],
+				[ wrapperBlock.uid ]: [ replacementNestedBlock.uid ],
+				[ replacementNestedBlock.uid ]: [],
+			} );
+
+			expect( originalNestedState.present.blocksByUid.chicken.name ).toBe( 'core/test-block' );
+			expect( replacedNestedState.present.blocksByUid.chicken.name ).toBe( 'core/freeform' );
 		} );
 
 		it( 'should update the block', () => {
@@ -869,7 +934,7 @@ describe( 'state', () => {
 				expect( state.past ).toHaveLength( 2 );
 			} );
 
-			it( 'should not overwrite present history if updating same attributes', () => {
+			it( 'should not overwrite present history if updating different attributes', () => {
 				let state;
 
 				state = editor( state, {
@@ -1207,12 +1272,13 @@ describe( 'state', () => {
 					uid: 'bacon',
 					name: 'core-embed/twitter',
 				} ],
+				time: 123456,
 			} );
 
 			expect( state ).toEqual( {
 				insertUsage: {
 					'core-embed/twitter': {
-						time: expect.any( Number ),
+						time: 123456,
 						count: 1,
 						insert: { name: 'core-embed/twitter' },
 					},
@@ -1222,7 +1288,7 @@ describe( 'state', () => {
 			const twoRecentBlocks = preferences( deepFreeze( {
 				insertUsage: {
 					'core-embed/twitter': {
-						time: expect.any( Number ),
+						time: 123456,
 						count: 1,
 						insert: { name: 'core-embed/twitter' },
 					},
@@ -1237,17 +1303,18 @@ describe( 'state', () => {
 					name: 'core/block',
 					attributes: { ref: 123 },
 				} ],
+				time: 123457,
 			} );
 
 			expect( twoRecentBlocks ).toEqual( {
 				insertUsage: {
 					'core-embed/twitter': {
-						time: expect.any( Number ),
+						time: 123457,
 						count: 2,
 						insert: { name: 'core-embed/twitter' },
 					},
 					'core/block/123': {
-						time: expect.any( Number ),
+						time: 123457,
 						count: 1,
 						insert: { name: 'core/block', ref: 123 },
 					},
@@ -1401,6 +1468,100 @@ describe( 'state', () => {
 					status: 'success',
 				},
 			] );
+		} );
+	} );
+
+	describe( 'provisionalBlockUID()', () => {
+		const PROVISIONAL_UPDATE_ACTION_TYPES = [
+			'UPDATE_BLOCK_ATTRIBUTES',
+			'UPDATE_BLOCK',
+			'CONVERT_BLOCK_TO_REUSABLE',
+		];
+
+		const PROVISIONAL_REPLACE_ACTION_TYPES = [
+			'REPLACE_BLOCKS',
+			'REMOVE_BLOCKS',
+		];
+
+		it( 'returns null by default', () => {
+			const state = provisionalBlockUID( undefined, {} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns the uid of the first inserted provisional block', () => {
+			const state = provisionalBlockUID( null, {
+				type: 'INSERT_BLOCKS',
+				isProvisional: true,
+				blocks: [
+					{ uid: 'chicken' },
+				],
+			} );
+
+			expect( state ).toBe( 'chicken' );
+		} );
+
+		it( 'does not return uid of block if not provisional', () => {
+			const state = provisionalBlockUID( null, {
+				type: 'INSERT_BLOCKS',
+				blocks: [
+					{ uid: 'chicken' },
+				],
+			} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns null on block reset', () => {
+			const state = provisionalBlockUID( 'chicken', {
+				type: 'RESET_BLOCKS',
+			} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns null on block update', () => {
+			PROVISIONAL_UPDATE_ACTION_TYPES.forEach( ( type ) => {
+				const state = provisionalBlockUID( 'chicken', {
+					type,
+					uid: 'chicken',
+				} );
+
+				expect( state ).toBe( null );
+			} );
+		} );
+
+		it( 'does not return null if update occurs to non-provisional block', () => {
+			PROVISIONAL_UPDATE_ACTION_TYPES.forEach( ( type ) => {
+				const state = provisionalBlockUID( 'chicken', {
+					type,
+					uid: 'ribs',
+				} );
+
+				expect( state ).toBe( 'chicken' );
+			} );
+		} );
+
+		it( 'returns null if replacement of provisional block', () => {
+			PROVISIONAL_REPLACE_ACTION_TYPES.forEach( ( type ) => {
+				const state = provisionalBlockUID( 'chicken', {
+					type,
+					uids: [ 'chicken' ],
+				} );
+
+				expect( state ).toBe( null );
+			} );
+		} );
+
+		it( 'does not return null if replacement of non-provisional block', () => {
+			PROVISIONAL_REPLACE_ACTION_TYPES.forEach( ( type ) => {
+				const state = provisionalBlockUID( 'chicken', {
+					type,
+					uids: [ 'ribs' ],
+				} );
+
+				expect( state ).toBe( 'chicken' );
+			} );
 		} );
 	} );
 
