@@ -15,6 +15,7 @@ import {
 	RangeControl,
 	ToggleControl,
 	Button,
+	ButtonGroup,
 	withFallbackStyles,
 } from '@wordpress/components';
 
@@ -153,34 +154,36 @@ class ParagraphBlock extends Component {
 			isSelected && (
 				<InspectorControls key="inspector">
 					<PanelBody title={ __( 'Text Settings' ) }>
-						<Button
-							isSmall
-							isPrimary={ attributes.textClass === 'is-small-text' }
-							onClick={ () => this.setFontSize( fontSizeValues[ 0 ] ) }
-						>
-							Small
-						</Button>
-						<Button
-							isSmall
-							isPrimary={ attributes.textClass === 'is-regular-text' }
-							onClick={ () => this.setFontSize( fontSizeValues[ 1 ] ) }
-						>
-							Regular
-						</Button>
-						<Button
-							isSmall
-							isPrimary={ attributes.textClass === 'is-large-text' }
-							onClick={ () => this.setFontSize( fontSizeValues[ 2 ] ) }
-						>
-							Large
-						</Button>
-						<Button
-							isSmall
-							isPrimary={ attributes.textClass === 'is-larger-text' }
-							onClick={ () => this.setFontSize( fontSizeValues[ 3 ] ) }
-						>
-							Larger
-						</Button>
+						<ButtonGroup aria-label={ __( 'Select font size' ) }>
+							<Button
+								isLarge
+								isPrimary={ attributes.textClass === 'is-small-text' }
+								onClick={ () => this.setFontSize( fontSizeValues[ 0 ] ) }
+							>
+								S
+							</Button>
+							<Button
+								isLarge
+								isPrimary={ attributes.textClass === 'is-regular-text' }
+								onClick={ () => this.setFontSize( fontSizeValues[ 1 ] ) }
+							>
+								M
+							</Button>
+							<Button
+								isLarge
+								isPrimary={ attributes.textClass === 'is-large-text' }
+								onClick={ () => this.setFontSize( fontSizeValues[ 2 ] ) }
+							>
+								L
+							</Button>
+							<Button
+								isLarge
+								isPrimary={ attributes.textClass === 'is-larger-text' }
+								onClick={ () => this.setFontSize( fontSizeValues[ 3 ] ) }
+							>
+								XL
+							</Button>
+						</ButtonGroup>
 						<RangeControl
 							label={ __( 'Font Size' ) }
 							value={ this.getFontSize() || '' }
