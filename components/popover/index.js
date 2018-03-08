@@ -252,6 +252,7 @@ class Popover extends Component {
 
 	render() {
 		const {
+			headerTitle,
 			onClose,
 			children,
 			className,
@@ -293,6 +294,9 @@ class Popover extends Component {
 				>
 					{ this.state.isMobile && (
 						<div className="components-popover__header">
+							<span className="components-popover__header-title">
+								{ headerTitle }
+							</span>
 							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
 						</div>
 					) }
