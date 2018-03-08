@@ -107,8 +107,14 @@ class PostPermalink extends Component {
 	 * @return {string} The full permalink.
 	 */
 	getPermalink( slug ) {
-		const permalink = this.props.url + this.props.permalinkStructure;
-		return this.replaceTags( permalink, slug );
+		let template = this.props.permalinkStructure;
+
+		// Provide fallback in case pretty permalinks are disabled.
+		if ( ! template ) {
+			template = '/?p=%post_id%';
+		}
+
+		return this.replaceTags( this.props.url + template, slug );
 	}
 
 	/**
