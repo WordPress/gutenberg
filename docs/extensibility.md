@@ -162,7 +162,7 @@ You can activate the sidebars using the following lines:
   
 ### Available UI components
 
-The available UI components are available under `wp.editPost`, and are React components.
+The available UI components are found in the global variable `wp.editPost`, and are React components.
 
 #### PluginSidebar
 
@@ -171,7 +171,7 @@ Renders a sidebar when activated.
 `<PluginSidebar name="sidebar-name" title="Sidebar title">{ contents }</PluginSidebar>`
 
 - Props
-  - `name`: A string identifying the sidebar. Must be unique for every sidebar registered iwthin the scope of your plugin.
+  - `name`: A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
   - `title`: Title displayed at the top of the sidebar. Must be a string.
   
 The contents you render within the `PluginSidebar` will show up as content within the sidebar.
@@ -181,4 +181,3 @@ The sidebar can be activated using the data api:
 `wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );`
 
 Notice that you need to use both the plugin name and sidebar name separated by a `/` to show the correct sidebar.
-
