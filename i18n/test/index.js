@@ -11,6 +11,12 @@ describe( 'i18n', () => {
 			expect( console ).toHaveErrored();
 			expect( result ).toBe( 'Hello' );
 		} );
+
+		it( 'decodes entities', () => {
+			const result = dcnpgettext( undefined, undefined, 'Ribs &amp; Chicken' );
+
+			expect( result ).toBe( 'Ribs & Chicken' );
+		} );
 	} );
 
 	describe( 'sprintf()', () => {

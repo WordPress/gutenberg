@@ -129,7 +129,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-i18n',
 		gutenberg_url( 'i18n/build/index.js' ),
-		array(),
+		array( 'wp-utils' ),
 		filemtime( gutenberg_dir_path() . 'i18n/build/index.js' )
 	);
 	wp_register_script(

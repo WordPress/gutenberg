@@ -3,6 +3,11 @@
  */
 import Jed from 'jed';
 
+/**
+ * WordPress dependencies
+ */
+import { decodeEntities } from '@wordpress/utils';
+
 let i18n;
 
 /**
@@ -46,7 +51,8 @@ export function getI18n() {
  */
 export function dcnpgettext( domain, context, single, plural, number ) {
 	try {
-		return getI18n().dcnpgettext( domain, context, single, plural, number );
+		const text = getI18n().dcnpgettext( domain, context, single, plural, number );
+		return decodeEntities( text );
 	} catch ( error ) {
 		// Disable reason: Jed throws errors. To avoid crashing the application
 		// we log these to the console instead, and return a default value.
