@@ -66,14 +66,20 @@ class PostPermalink extends Component {
 	 * Focus the test input that constains the editable permalink slug.
 	 */
 	focusPermalinkInput() {
-		document.querySelector( '.editor-post-permalink__slug-input' ).focus();
+		const input = document.querySelector( '.editor-post-permalink__slug-input' );
+		if ( input ) {
+			input.focus();
+		}
 	}
 
 	/**
 	 * Focus the copy button that copies the permalink to the clipboard.
 	 */
 	focusCopyButton() {
-		document.querySelector( '.editor-post-permalink__copy' ).focus();
+		const copyButton = document.querySelector( '.editor-post-permalink__copy' );
+		if ( copyButton ) {
+			copyButton.focus();
+		}
 	}
 
 	/**
@@ -293,15 +299,17 @@ class PostPermalink extends Component {
 		const { editingSlug, isEditable, showCopyConfirmation } = this.state;
 		const slug = this.getSlug();
 		const permalink = this.getPermalink( slug );
-
-		if ( isNew || ! link ) {
-			return null;
-		}
+		const unavailable = isNew || ! link;
 
 		return (
 			<div className="editor-post-permalink">
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
-				{ ! editingSlug &&
+				{ unavailable &&
+					<span className="editor-post-permalink__unavailable">
+						{ __( 'The permalink is currently not available. Please save a draft of your post first.', 'gutenberg' ) }
+					</span>
+				}
+				{ ! unavailable && ! editingSlug &&
 					<Button
 						className="editor-post-permalink__link"
 						href={ addQueryArgs( link, { preview: true } ) }
@@ -313,7 +321,7 @@ class PostPermalink extends Component {
 						</span>
 					</Button>
 				}
-				{ editingSlug &&
+				{ ! unavailable && editingSlug &&
 					<form
 						className="editor-post-permalink__slug-form"
 						onSubmit={ this.onSavePermalink }>
@@ -339,7 +347,7 @@ class PostPermalink extends Component {
 						</Button>
 					</form>
 				}
-				{ ! editingSlug &&
+				{ ! unavailable && ! editingSlug &&
 					<ClipboardButton
 						className="editor-post-permalink__copy button"
 						text={ link }
@@ -350,7 +358,7 @@ class PostPermalink extends Component {
 						{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
 					</ClipboardButton>
 				}
-				{ ! editingSlug && isEditable &&
+				{ ! unavailable && ! editingSlug && isEditable &&
 					<Button
 						className="editor-post-permalink__edit button"
 						onClick={ this.onEditPermalink }
