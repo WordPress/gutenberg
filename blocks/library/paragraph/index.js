@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { findKey } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,7 +49,12 @@ const ContrastCheckerWithFallbackStyles = withFallbackStyles( ( node, ownProps )
 	};
 } )( ContrastChecker );
 
-const fontSizeValues = [ 14, 16, 36, 48 ];
+const FONT_SIZES = {
+	small: 14,
+	regular: 16,
+	large: 36,
+	larger: 48,
+};
 
 class ParagraphBlock extends Component {
 	constructor() {
@@ -85,37 +91,21 @@ class ParagraphBlock extends Component {
 		this.nodeRef = node;
 	}
 
-	setFontSize( value ) {
+	setFontSize( fontSize ) {
 		const { setAttributes } = this.props;
-		if ( fontSizeValues.includes( value ) ) {
-			if ( fontSizeValues[ 0 ] === value ) {
-				setAttributes( { fontSize: fontSizeValues[ 0 ], textClass: 'is-small-text' } );
-			} else if ( fontSizeValues[ 1 ] === value ) {
-				setAttributes( { fontSize: fontSizeValues[ 1 ], textClass: 'is-regular-text' } );
-			} else if ( fontSizeValues[ 2 ] === value ) {
-				setAttributes( { fontSize: fontSizeValues[ 2 ], textClass: 'is-large-text' } );
-			} else if ( fontSizeValues[ 3 ] === value ) {
-				setAttributes( { fontSize: fontSizeValues[ 3 ], textClass: 'is-larger-text' } );
-			}
-		} else {
-			setAttributes( { fontSize: value, textClass: '' } );
+		const size = findKey( FONT_SIZES, ( value ) => value === fontSize );
+
+		let textClass;
+		if ( size ) {
+			textClass = `is-${ size }-text`;
 		}
+
+		setAttributes( { fontSize, textClass } );
 	}
 
 	getFontSize() {
 		const { fontSize, textClass } = this.props.attributes;
-		switch ( textClass ) {
-			case 'is-small-text':
-				return fontSizeValues[ 0 ];
-			case 'is-regular-text':
-				return fontSizeValues[ 1 ];
-			case 'is-large-text':
-				return fontSizeValues[ 2 ];
-			case 'is-larger-text':
-				return fontSizeValues[ 3 ];
-			default:
-				return fontSize;
-		}
+		return FONT_SIZES[ textClass ] || fontSize;
 	}
 
 	render() {
@@ -159,28 +149,28 @@ class ParagraphBlock extends Component {
 								<Button
 									isLarge
 									isPrimary={ attributes.textClass === 'is-small-text' }
-									onClick={ () => this.setFontSize( fontSizeValues[ 0 ] ) }
+									onClick={ () => this.setFontSize( FONT_SIZES.small ) }
 								>
 									S
 								</Button>
 								<Button
 									isLarge
 									isPrimary={ attributes.textClass === 'is-regular-text' }
-									onClick={ () => this.setFontSize( fontSizeValues[ 1 ] ) }
+									onClick={ () => this.setFontSize( FONT_SIZES.regular ) }
 								>
 									M
 								</Button>
 								<Button
 									isLarge
 									isPrimary={ attributes.textClass === 'is-large-text' }
-									onClick={ () => this.setFontSize( fontSizeValues[ 2 ] ) }
+									onClick={ () => this.setFontSize( FONT_SIZES.large ) }
 								>
 									L
 								</Button>
 								<Button
 									isLarge
 									isPrimary={ attributes.textClass === 'is-larger-text' }
-									onClick={ () => this.setFontSize( fontSizeValues[ 3 ] ) }
+									onClick={ () => this.setFontSize( FONT_SIZES.larger ) }
 								>
 									XL
 								</Button>
@@ -196,7 +186,7 @@ class ParagraphBlock extends Component {
 							label={ __( 'Custom Size' ) }
 							value={ this.getFontSize() || '' }
 							onChange={ ( value ) => this.setFontSize( value ) }
-							min={ 10 }
+							min={ 12 }
 							max={ 100 }
 							beforeIcon="editor-textcolor"
 						/>
@@ -317,6 +307,9 @@ const schema = {
 	fontSize: {
 		type: 'number',
 	},
+	textClass: {
+		type: 'string',
+	},
 };
 
 export const name = 'core/paragraph';
@@ -409,7 +402,7 @@ export const settings = {
 		const styles = {
 			backgroundColor: backgroundColor,
 			color: textColor,
-			fontSize: fontSizeValues.includes( fontSize ) ? null : fontSize,
+			fontSize: textClass ? null : fontSize,
 			textAlign: align,
 		};
 
