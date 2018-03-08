@@ -16,7 +16,6 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import './style.scss';
 import {
-	isEditedPostNew,
 	isCurrentPostPublished,
 	getEditedPostAttribute,
 	getCurrentPost,
