@@ -438,13 +438,13 @@ export class BlockListBlock extends Component {
 			case DELETE:
 				// Remove block on backspace.
 				if ( target === this.node ) {
-					const { uid, onRemove, isLocked, previousBlock, onSelect } = this.props;
+					const { uid, onRemove, isLocked, previousBlockUid, onSelect } = this.props;
 					event.preventDefault();
 					if ( ! isLocked ) {
 						onRemove( uid );
 
-						if ( previousBlock ) {
-							onSelect( previousBlock.uid, -1 );
+						if ( previousBlockUid ) {
+							onSelect( previousBlockUid, -1 );
 						}
 					}
 				}
