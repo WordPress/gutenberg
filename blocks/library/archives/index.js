@@ -15,6 +15,8 @@ export const name = 'core/archives';
 export const settings = {
 	title: __( 'Archives' ),
 
+	description: __( 'This block displays a monthly archive of your site’s Posts.' ),
+
 	icon: 'calendar-alt',
 
 	category: 'widgets',
@@ -27,7 +29,7 @@ export const settings = {
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+		if ( 'left' === align || 'right' === align || 'center' === align || 'full' === align ) {
 			return { 'data-align': align };
 		}
 	},

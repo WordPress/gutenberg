@@ -6,8 +6,6 @@ import {
 	Placeholder,
 	Spinner,
 	ToggleControl,
-	Toolbar,
-	withAPIData,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -60,22 +58,22 @@ class ArchivesBlock extends Component {
 		const archives = this.getArchives();
 
 		const inspectorControls = isSelected && (
-				<InspectorControls key="inspector">
-					<h3>{ __( 'Archives Settings' ) }</h3>
-					<ToggleControl
-						label={ __( 'Show post counts' ) }
-						checked={ showPostCounts }
-						onChange={ this.toggleShowPostCounts }
-					/>
-					<ToggleControl
-						label={ __( 'Display as dropdown' ) }
-						checked={ displayAsDropdown }
-						onChange={ this.toggleDisplayAsDropdown }
-					/>
-				</InspectorControls>
-			);
+			<InspectorControls key="inspector">
+				<h3>{ __( 'Archives Settings' ) }</h3>
+				<ToggleControl
+					label={ __( 'Show post counts' ) }
+					checked={ showPostCounts }
+					onChange={ this.toggleShowPostCounts }
+				/>
+				<ToggleControl
+					label={ __( 'Display as dropdown' ) }
+					checked={ displayAsDropdown }
+					onChange={ this.toggleDisplayAsDropdown }
+				/>
+			</InspectorControls>
+		);
 
-		/* if ( ! archives.length ) {
+		if ( ! archives.length ) {
 			return [
 				inspectorControls,
 				<Placeholder
@@ -86,7 +84,7 @@ class ArchivesBlock extends Component {
 					<Spinner />
 				</Placeholder>,
 			];
-		} */
+		}
 
 		return [
 			inspectorControls,

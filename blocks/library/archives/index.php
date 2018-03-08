@@ -19,12 +19,12 @@ function render_block_core_archives( $attributes ) {
 	$block_id++;
 
 	$show_post_count = ! empty( $attributes['showPostCounts'] ) ? true : false;
-	$class            = "wp-block-archives align{$attributes['align']}";
+	$class           = "wp-block-archives align{$attributes['align']}";
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
 
 		$dropdown_id = esc_attr( 'wp-block-archives-' . $block_id );
-		$title       = __( 'Archives' );
+		$title       = __( 'Archives', 'gutenberg' );
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-archives.php */
 		$dropdown_args = apply_filters( 'widget_archives_dropdown_args', array(
@@ -39,19 +39,19 @@ function render_block_core_archives( $attributes ) {
 
 		switch ( $dropdown_args['type'] ) {
 			case 'yearly':
-				$label = __( 'Select Year' );
+				$label = __( 'Select Year', 'gutenberg' );
 				break;
 			case 'monthly':
-				$label = __( 'Select Month' );
+				$label = __( 'Select Month', 'gutenberg' );
 				break;
 			case 'daily':
-				$label = __( 'Select Day' );
+				$label = __( 'Select Day', 'gutenberg' );
 				break;
 			case 'weekly':
-				$label = __( 'Select Week' );
+				$label = __( 'Select Week', 'gutenberg' );
 				break;
 			default:
-				$label = __( 'Select Post' );
+				$label = __( 'Select Post', 'gutenberg' );
 				break;
 		}
 
@@ -88,7 +88,7 @@ function render_block_core_archives( $attributes ) {
 function register_block_core_archives() {
 	register_block_type( 'core/archives', array(
 		'attributes'      => array(
-			'showPostCounts' => array(
+			'showPostCounts'    => array(
 				'type'    => 'boolean',
 				'default' => false,
 			),
