@@ -10,7 +10,7 @@ import './style.scss';
 import BlockSwitcher from './';
 import { getMultiSelectedBlockUids } from '../../store/selectors';
 
-function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockUids } ) {
+export function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockUids } ) {
 	if ( ! isMultiBlockSelection ) {
 		return null;
 	}
