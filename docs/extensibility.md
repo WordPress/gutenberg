@@ -124,7 +124,7 @@ _Note:_ This filter must always be run on every page load, and not in your brows
 
 Extending the editor's UI is done with in `registerPlugin` API, and allows you to define all your plugin's UI elements in one place.
 
-`wp.editPost.registerPlugin( { name: string, render: function } )`
+`wp.editPost.__experimental.registerPlugin( { name: string, render: function } )`
 
 This method takes one argument: 
 - An object containing the following data:
@@ -135,7 +135,7 @@ This method takes one argument:
 
 ```js
 const Fragment = wp.element.Fragment;
-const PluginSidebar = wp.editPost.PluginSidebar;
+const PluginSidebar = wp.editPost.__experimental.PluginSidebar;
 
 const Component = () => (
 	<Fragment>
@@ -148,7 +148,7 @@ const Component = () => (
 	</Fragment>
 );
 
-wp.editPost.registerPlugin( {
+wp.editPost.__experimental.registerPlugin( {
     name: 'plugin-name',
     render: Component,
 } );
@@ -162,7 +162,7 @@ You can activate the sidebars using the following lines:
   
 ### Available UI components
 
-The available UI components are found in the global variable `wp.editPost`, and are React components.
+The available UI components are found in the global variable `wp.editPost.__experimental`, and are React components.
 
 #### PluginSidebar
 
