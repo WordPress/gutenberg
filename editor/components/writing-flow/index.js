@@ -2,8 +2,9 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import classnames from 'classnames';
+import { find, reverse, get, findLast } from 'lodash';
 import 'element-closest';
-import { find, reverse, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,6 +23,7 @@ import {
 /**
  * Internal dependencies
  */
+import './style.scss';
 import {
 	getPreviousBlockUid,
 	getNextBlockUid,
@@ -35,6 +37,12 @@ import {
 } from '../../store/actions';
 
 /**
+ * Browser dependencies
+ */
+
+const { DOMRect } = window;
+
+/**
  * Module Constants
  */
 const { UP, DOWN, LEFT, RIGHT } = keycodes;
@@ -46,6 +54,8 @@ class WritingFlow extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 		this.clearVerticalRect = this.clearVerticalRect.bind( this );
+		this.focusClosestBlock = this.focusClosestBlock.bind( this );
+
 		this.verticalRect = null;
 	}
 
@@ -173,8 +183,36 @@ class WritingFlow extends Component {
 		}
 	}
 
+	focusClosestBlock( event ) {
+		const { clientX, clientY } = event;
+
+		const tabbables = this.getVisibleTabbables();
+
+		let rect;
+		let target = findLast( tabbables, ( tabbable ) => {
+			rect = tabbable.getBoundingClientRect();
+			return clientY > rect.top;
+		} );
+
+		if ( ! target ) {
+			target = tabbables[ 0 ];
+			rect = target.getBoundingClientRect();
+		}
+
+		if ( target.contains( document.activeElement ) ) {
+			return;
+		}
+
+		const x = Math.min( clientX, rect.right - 1 );
+		const targetRect = new DOMRect( x, rect.top, 0, rect.height );
+
+		placeCaretAtVerticalEdge( target, false, targetRect );
+	}
+
 	render() {
-		const { children } = this.props;
+		const { className, children } = this.props;
+
+		const classes = classnames( 'editor-writing-flow', className );
 
 		// Disable reason: Wrapper itself is non-interactive, but must capture
 		// bubbling events from children to determine focus transition intents.
@@ -184,6 +222,8 @@ class WritingFlow extends Component {
 				ref={ this.bindContainer }
 				onKeyDown={ this.onKeyDown }
 				onMouseDown={ this.clearVerticalRect }
+				onClick={ this.focusClosestBlock }
+				className={ classes }
 			>
 				{ children }
 			</div>
