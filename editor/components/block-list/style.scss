@@ -569,6 +569,10 @@
 		top: 10px;
 		right: 10px;
 
+	.editor-inserter__toggle {
+		border-radius: 50%;
+	}
+
 	@include break-small {
 		left: 10px;
 		right: auto;
