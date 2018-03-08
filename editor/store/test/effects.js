@@ -106,11 +106,14 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken', -1 ) );
-			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
-				uid: 'chicken',
-				name: 'core/test-block',
-				attributes: { content: 'chicken ribs' },
-			} ] ) );
+			expect( dispatch ).toHaveBeenCalledWith( {
+				...replaceBlocks( [ 'chicken', 'ribs' ], [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: { content: 'chicken ribs' },
+				} ] ),
+				time: expect.any( Number ),
+			} );
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
@@ -780,12 +783,13 @@ describe( 'effects', () => {
 				expect( dispatch ).toHaveBeenCalledWith(
 					saveReusableBlock( expect.any( Number ) )
 				);
-				expect( dispatch ).toHaveBeenCalledWith(
-					replaceBlocks(
+				expect( dispatch ).toHaveBeenCalledWith( {
+					...replaceBlocks(
 						[ staticBlock.uid ],
 						[ createBlock( 'core/block', { ref: expect.any( Number ) } ) ]
-					)
-				);
+					),
+					time: expect.any( Number ),
+				} );
 			} );
 		} );
 	} );
