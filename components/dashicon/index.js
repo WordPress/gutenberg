@@ -6,6 +6,11 @@ OR if you're looking to change now SVGs get output, you'll need to edit strings 
 !!! */
 
 /**
+ * Internal dependencies
+ */
+import './style.scss';
+
+/**
  * External dependencies
  */
 export default class Dashicon extends wp.element.Component {
