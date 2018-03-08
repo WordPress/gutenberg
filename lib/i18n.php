@@ -22,23 +22,18 @@ function gutenberg_get_jed_locale_data( $domain ) {
 	$translations = get_translations_for_domain( $domain );
 
 	$locale = array(
-		'domain'      => $domain,
-		'locale_data' => array(
-			$domain => array(
-				'' => array(
-					'domain' => $domain,
-					'lang'   => is_admin() ? get_user_locale() : get_locale(),
-				),
-			),
+		'' => array(
+			'domain' => $domain,
+			'lang'   => is_admin() ? get_user_locale() : get_locale(),
 		),
 	);
 
 	if ( ! empty( $translations->headers['Plural-Forms'] ) ) {
-		$locale['locale_data'][ $domain ]['']['plural_forms'] = $translations->headers['Plural-Forms'];
+		$locale['']['plural_forms'] = $translations->headers['Plural-Forms'];
 	}
 
 	foreach ( $translations->entries as $msgid => $entry ) {
-		$locale['locale_data'][ $domain ][ $msgid ] = $entry->translations;
+		$locale[ $msgid ] = $entry->translations;
 	}
 
 	return $locale;

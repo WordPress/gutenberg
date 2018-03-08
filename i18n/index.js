@@ -6,14 +6,25 @@ import Jed from 'jed';
 let i18n;
 
 /**
- * Creates a new Jed instance with specified locale data configuration.
+ * Merges locale data into the Jed instance by domain. Creates a new Jed
+ * instance if one has not yet been assigned.
  *
  * @see http://messageformat.github.io/Jed/
  *
- * @param {Object} data Locale data configuration.
+ * @param {?Object} localeData Locale data configuration.
+ * @param {?string} domain     Domain for which configuration applies.
  */
-export function setLocaleData( data ) {
-	i18n = new Jed( data );
+export function setLocaleData( localeData = { '': {} }, domain = 'default' ) {
+	if ( ! i18n ) {
+		i18n = new Jed( {
+			domain: 'default',
+			locale_data: {
+				default: {},
+			},
+		} );
+	}
+
+	i18n.options.locale_data[ domain ] = localeData;
 }
 
 /**
@@ -24,7 +35,7 @@ export function setLocaleData( data ) {
  */
 export function getI18n() {
 	if ( ! i18n ) {
-		setLocaleData( { '': {} } );
+		setLocaleData();
 	}
 
 	return i18n;
@@ -44,7 +55,7 @@ export function getI18n() {
  *
  * @return {string} The translated string.
  */
-export function dcnpgettext( domain, context, single, plural, number ) {
+export function dcnpgettext( domain = 'default', context, single, plural, number ) {
 	try {
 		return getI18n().dcnpgettext( domain, context, single, plural, number );
 	} catch ( error ) {
