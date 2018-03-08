@@ -42,6 +42,12 @@
 .edit-post-header__settings {
 	display: inline-flex;
 	align-items: center;
+
+	// Ensure that even SVG icons that don't include the .dashicon class are colored
+	.components-icon-button svg {
+		fill: currentColor;
+		outline: none;
+	}
 }
 
 .edit-post-header .components-button {
