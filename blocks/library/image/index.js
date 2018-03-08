@@ -70,22 +70,10 @@ export const settings = {
 			{
 				type: 'raw',
 				isMatch( node ) {
-					const tag = node.nodeName.toLowerCase();
-					const hasImage = node.querySelector( 'img' );
-					const isAnchorWithOneImage = ( nodeToCheck ) =>
-						'A' === nodeToCheck.nodeName &&
-						1 === nodeToCheck.childNodes.length &&
-						'IMG' === nodeToCheck.firstChild.nodeName;
+					const isImage = node.nodeName === 'IMG';
+					const hasImage = !! node.querySelector( 'img' );
 
-					const isParagraphWithAnchorImage =
-						'P' ===	node.nodeName &&
-						1 === node.childNodes.length &&
-						isAnchorWithOneImage( node.firstChild );
-
-					return tag === 'img' ||
-						( hasImage && tag === 'figure' ) ||
-						isParagraphWithAnchorImage ||
-						isAnchorWithOneImage( node );
+					return isImage || hasImage;
 				},
 				transform( node ) {
 					const matches = /align(left|center|right)/.exec( node.className );

@@ -144,20 +144,12 @@ export function isAllowedBlock( parentNode, node ) {
 }
 
 export function isInvalidInline( element ) {
-	if ( ! isInline( element ) ) {
+	// Allow anchor tag to wrap non-inline elements.
+	if ( ! isInline( element ) || element.nodeName === 'A' ) {
 		return false;
 	}
 
 	if ( ! element.hasChildNodes() ) {
-		return false;
-	}
-
-	// an image inside an anchor is not invalid inline
-	if (
-		element.nodeName === 'A' &&
-		element.childNodes.length === 1 &&
-		element.firstChild.nodeName === 'IMG'
-	) {
 		return false;
 	}
 
