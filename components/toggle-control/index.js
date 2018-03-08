@@ -25,8 +25,14 @@ class ToggleControl extends Component {
 	}
 
 	render() {
-		const { label, checked, help, instanceId } = this.props;
+		const { label, checked, help, checkedHelp, instanceId } = this.props;
 		const id = `inspector-toggle-control-${ instanceId }`;
+
+		// allow customizing the help text based on checked state
+		let helpLabel = help;
+		if ( checkedHelp ) {
+			helpLabel = checked ? checkedHelp : help;
+		}
 
 		let describedBy;
 		if ( help ) {
@@ -37,7 +43,7 @@ class ToggleControl extends Component {
 			<BaseControl
 				label={ label }
 				id={ id }
-				help={ help }
+				help={ helpLabel }
 				className="components-toggle-control"
 			>
 				<FormToggle

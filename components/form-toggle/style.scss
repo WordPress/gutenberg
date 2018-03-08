@@ -5,26 +5,38 @@ $toggle-border-width: 2px;
 .components-form-toggle {
 	position: relative;
 
+	// On/Off icon indicators
+	.components-form-toggle__on,
+	.components-form-toggle__off {
+		position: absolute;
+		top: $toggle-border-width * 3;
+	}
+
+	.components-form-toggle__off {
+		color: $dark-gray-300;
+		fill: currentColor;
+		right: $toggle-border-width * 3;
+	}
+
+	.components-form-toggle__on {
+		left: $toggle-border-width * 3 + 2px; // indent 2px extra because icon is thinner
+		filter: invert( 100% ) contrast( 500% ); // this makes the icon white, and it makes it dark blue in Windows High Contrast Mode
+		outline: 1px solid transparent; // this makes the dark blue all black in Windows High Contrast Mode
+		outline-offset: -1px;
+	}
+
+	// unchecked state
 	.components-form-toggle__track {
 		content: '';
 		display: inline-block;
 		vertical-align: top;
 		box-sizing: border-box;
 		background-color: $white;
-		border: $toggle-border-width solid $dark-gray-500;
+		border: $toggle-border-width solid $dark-gray-300;
 		width: $toggle-width;
 		height: $toggle-height;
 		border-radius: $toggle-height / 2;
 		transition: 0.2s background ease;
-	}
-
-	&:hover .components-form-toggle__track {
-		background-color: $light-gray-500;
-	}
-
-	&.is-checked .components-form-toggle__track {
-		background-color: $blue-medium-400;
-		border: $toggle-border-width solid $blue-medium-400;
 	}
 
 	.components-form-toggle__thumb {
@@ -36,25 +48,40 @@ $toggle-border-width: 2px;
 		height: $toggle-height - ( $toggle-border-width * 4 );
 		border-radius: 50%;
 		transition: 0.1s transform ease;
-		background-color: $dark-gray-500;
-		border: 2px solid $dark-gray-500; // has to have an explicit border for Windows High Contrast Mode
+		background-color: $dark-gray-300;
+		border: 5px solid $dark-gray-300; // has explicit border to act as a fill in Windows High Contrast Mode
 	}
 
-	&__input:focus {
-		& + .components-form-toggle__track {
-			@include switch-style__focus-active();
-
-			 & + .components-form-toggle__thumb {
-				 border-width: 5px;
-			 }
+	&:hover {
+		.components-form-toggle__track {
+			border: $toggle-border-width solid $dark-gray-500;
 		}
+
+		.components-form-toggle__thumb {
+			background-color: $dark-gray-500;
+			border: 5px solid $dark-gray-300; // has explicit border to act as a fill in Windows High Contrast Mode
+		}
+
+		.components-form-toggle__off {
+			color: $dark-gray-500;
+		}
+	}
+
+	// checked state
+	&.is-checked .components-form-toggle__track {
+		background-color: $blue-medium-400;
+		border: $toggle-border-width solid $blue-medium-400;
+		border: #{ $toggle-height / 2 } solid transparent; // expand the border to fake a solid in Windows High Contrast Mode
+	}
+
+	&__input:focus + .components-form-toggle__track {
+		@include switch-style__focus-active();
 	}
 
 	&.is-checked {
 		.components-form-toggle__thumb {
 			background-color: $white;
-			border-color: $white; // has to have an explicit border for Windows High Contrast Mode
-			border-width: 5px; // expand the border to fake a solid in Windows High Contrast Mode
+			border-width: 0; // zero out the border color to make the thumb invisible in Windows High Contrast Mode
 			transform: translateX( $toggle-width - ( $toggle-border-width * 4 ) - ( $toggle-height - ( $toggle-border-width * 4 ) ) );
 		}
 
@@ -62,22 +89,6 @@ $toggle-border-width: 2px;
 			background-color: $blue-medium-500;
 			border: $toggle-border-width solid $blue-medium-500;
 		}
-	}
-
-	// On/Off icon indicators
-	.components-form-toggle__on,
-	.components-form-toggle__off {
-		position: absolute;
-		top: $toggle-border-width * 3;
-	}
-
-	.components-form-toggle__off {
-		right: $toggle-border-width * 3;
-	}
-
-	.components-form-toggle__on {
-		left: $toggle-border-width * 3;
-		fill: $white;
 	}
 }
 

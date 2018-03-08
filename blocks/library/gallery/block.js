@@ -219,6 +219,8 @@ class GalleryBlock extends Component {
 							label={ __( 'Crop Images' ) }
 							checked={ !! imageCrop }
 							onChange={ this.toggleImageCrop }
+							help={ __( 'Thumbnails are not cropped.' ) }
+							checkedHelp={ __( 'Thumbnails are cropped to align.' ) }
 						/>
 						<SelectControl
 							label={ __( 'Link to' ) }
