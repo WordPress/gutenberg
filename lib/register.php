@@ -440,11 +440,7 @@ function gutenberg_register_post_types() {
 			'create_blocks',
 		),
 		'contributor'   => array(
-			'edit_blocks',
 			'read_blocks',
-			'delete_blocks',
-			'delete_published_blocks',
-			'edit_published_blocks',
 		),
 	);
 

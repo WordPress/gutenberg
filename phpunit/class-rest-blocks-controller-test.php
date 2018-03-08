@@ -214,7 +214,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 			array( 'update_delete_own', 'editor', 200 ),
 			array( 'update_delete_own', 'author', 200 ),
-			array( 'update_delete_own', 'contributor', 200 ),
+			array( 'update_delete_own', 'contributor', 403 ),
 
 			array( 'update_delete_others', 'editor', 200 ),
 			array( 'update_delete_others', 'author', 403 ),
