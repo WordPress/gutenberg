@@ -1,3 +1,21 @@
+/**
+ * External dependencies
+ */
+const { escapeRegExp } = require( 'lodash' );
+
+/**
+ * Internal dependencies
+ */
+const { version } = require( './package' );
+
+/**
+ * Regular expression string matching a SemVer string with equal major/minor to
+ * the current package version. Used in identifying deprecations.
+ *
+ * @type {string}
+ */
+const majorMinorRegExp = escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
+
 module.exports = {
 	root: true,
 	parser: 'babel-eslint',
@@ -141,6 +159,10 @@ module.exports = {
 			{
 				selector: 'CallExpression[callee.name=_nx]:not([arguments.2.type=/^Literal|BinaryExpression$/])',
 				message: 'Translate function arguments must be string literals.',
+			},
+			{
+				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
+				message: 'Deprecated functions must be removed before releasing this version.',
 			},
 		],
 		'no-shadow': 'error',
