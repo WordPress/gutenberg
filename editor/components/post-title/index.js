@@ -39,7 +39,6 @@ class PostTitle extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.blurIfOutside = this.blurIfOutside.bind( this );
 		this.togglePermalink = this.togglePermalink.bind( this );
 
 		this.nodes = {};
@@ -48,6 +47,16 @@ class PostTitle extends Component {
 			isSelected: false,
 			permalinkOpen: false,
 		};
+	}
+
+	/**
+	 * Bind a node to the nodes container.
+	 *
+	 * @param {string} name Name of the node to bind.
+	 * @param {Object} node Reference to the node.
+	 */
+	bindNode( name, node ) {
+		this.nodes[ name ] = node;
 	}
 
 	handleFocusOutside() {
