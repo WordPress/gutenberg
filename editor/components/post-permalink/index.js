@@ -151,23 +151,39 @@ class PostPermalink extends Component {
 	/**
 	 * Replace tags in a permalink structure with actual values.
 	 *
-	 * @param {string} permalink Permalink structure to replace the tags in.
+	 * @param {string} template Permalink structure to replace the tags in.
 	 * @param {string} slug Slug to use in replacements
 	 *
 	 * @return {string} Prepared permalink.
 	 */
-	replaceTags( permalink, slug ) {
-		// TODO: All tag implementations are missing except for "%postname%".
-		permalink = permalink.replace( '%year%', '2004' );
-		permalink = permalink.replace( '%monthnum%', '05' );
-		permalink = permalink.replace( '%day%', '28' );
-		permalink = permalink.replace( '%hour%', '15' );
-		permalink = permalink.replace( '%minute%', '43' );
-		permalink = permalink.replace( '%second%', '33' );
-		permalink = permalink.replace( '%post_id%', '423' );
+	replaceTags( template, slug ) {
+		let permalink = template;
+
+		if ( this.props.date ) {
+			const date = new Date( this.props.date );
+			permalink = permalink.replace( '%year%', date.getFullYear() );
+			permalink = permalink.replace( '%monthnum%', date.getMonth() );
+			permalink = permalink.replace( '%day%', date.getDay() );
+			permalink = permalink.replace( '%hour%', date.getHours() );
+			permalink = permalink.replace( '%minute%', date.getMinutes() );
+			permalink = permalink.replace( '%second%', date.getSeconds() );
+		}
+
+		if ( this.props.id ) {
+			permalink = permalink.replace( '%post_id%', this.props.id );
+		}
+
+		if ( this.props.author ) {
+			// TODO: This still needs to convert the user ID in props.author to an
+			// actual user slug.
+			permalink = permalink.replace( '%author%', this.props.author );
+		}
+
+		// TODO: Not implemented yet. This will probably need to be fetched
+		// asynchronously.
+		permalink = permalink.replace( '%category%', '%category%' );
+
 		permalink = permalink.replace( '%postname%', slug );
-		permalink = permalink.replace( '%category%', 'category-slug' );
-		permalink = permalink.replace( '%author%', 'author-name' );
 
 		return permalink;
 	}
@@ -370,6 +386,9 @@ export default connect(
 			isPublished: isCurrentPostPublished( state ),
 			link: getEditedPostAttribute( state, 'link' ),
 			samplePermalink: getEditedPostAttribute( state, 'sample_permalink' ),
+			id: getEditedPostAttribute( state, 'id' ),
+			date: getEditedPostAttribute( state, 'date' ),
+			author: getEditedPostAttribute( state, 'author' ),
 			actualSlug: getCurrentPost( state ).slug,
 
 			// TODO: How should these be fetched?
