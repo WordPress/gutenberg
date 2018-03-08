@@ -89,7 +89,7 @@ export class BlockListBlock extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+		this.deleteOrInsertAfterWrapper = this.deleteOrInsertAfterWrapper.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
@@ -349,36 +349,41 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	onKeyDown( event ) {
+	/**
+	 * Interprets keydown event intent to remove or insert after block if key
+	 * event occurs on wrapper node. This can occur when the block has no text
+	 * fields of its own, particularly after initial insertion, to allow for
+	 * easy deletion and continuous writing flow to add additional content.
+	 *
+	 * @param {KeyboardEvent} event Keydown event.
+	 */
+	deleteOrInsertAfterWrapper( event ) {
 		const { keyCode, target } = event;
+
+		if ( target !== this.wrapperNode || this.props.isLocked ) {
+			return;
+		}
 
 		switch ( keyCode ) {
 			case ENTER:
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
-				if ( target === this.node && ! this.props.isLocked ) {
-					event.preventDefault();
-
-					this.props.onInsertBlocks( [
-						createBlock( 'core/paragraph' ),
-					], this.props.order + 1 );
-				}
+				this.props.onInsertBlocks( [
+					createBlock( 'core/paragraph' ),
+				], this.props.order + 1 );
+				event.preventDefault();
 				break;
 
 			case BACKSPACE:
 			case DELETE:
 				// Remove block on backspace.
-				if ( target === this.node ) {
-					const { uid, onRemove, isLocked, previousBlockUid, onSelect } = this.props;
-					event.preventDefault();
-					if ( ! isLocked ) {
-						onRemove( uid );
+				const { uid, onRemove, previousBlockUid, onSelect } = this.props;
+				onRemove( uid );
 
-						if ( previousBlockUid ) {
-							onSelect( previousBlockUid, -1 );
-						}
-					}
+				if ( previousBlockUid ) {
+					onSelect( previousBlockUid, -1 );
 				}
+				event.preventDefault();
 				break;
 		}
 	}
@@ -479,11 +484,11 @@ export class BlockListBlock extends Component {
 				onTouchStart={ this.onTouchStart }
 				onFocus={ this.onFocus }
 				onClick={ this.onClick }
+				onKeyDown={ this.deleteOrInsertAfterWrapper }
 				tabIndex="0"
 				childHandledEvents={ [
 					'onDragStart',
 					'onMouseDown',
-					'onKeyDown',
 				] }
 				{ ...wrapperProps }
 			>
@@ -514,7 +519,6 @@ export class BlockListBlock extends Component {
 					ref={ this.bindBlockNode }
 					onDragStart={ this.preventDrag }
 					onMouseDown={ this.onPointerDown }
-					onKeyDown={ this.onKeyDown }
 					className="editor-block-list__block-edit"
 					aria-label={ blockLabel }
 					data-block={ block.uid }
