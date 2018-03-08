@@ -8,7 +8,7 @@ $blocks-button__line-height: $big-font-size + 6px;
 		background-color: $dark-gray-700;
 		border: none;
 		border-radius: $blocks-button__height / 2;
-		box-shadow: none !important;
+		box-shadow: none;
 		color: $white;
 		cursor: pointer;
 		display: inline-block;
@@ -17,7 +17,7 @@ $blocks-button__line-height: $big-font-size + 6px;
 		margin: 0;
 		padding: ( $blocks-button__height - $blocks-button__line-height ) / 2 24px;
 		text-align: center;
-		text-decoration: none !important;
+		text-decoration: none;
 		white-space: nowrap;
 		word-break: break-word;
 

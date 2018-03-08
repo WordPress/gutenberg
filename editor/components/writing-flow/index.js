@@ -58,7 +58,7 @@ class WritingFlow extends Component {
 	}
 
 	getEditables( target ) {
-		const outer = target.closest( '.editor-block-list__block-edit' );
+		const outer = target.closest( '.editor-block-list__block' );
 		if ( ! outer || target === outer ) {
 			return [ target ];
 		}
@@ -74,7 +74,7 @@ class WritingFlow extends Component {
 				node.nodeName === 'INPUT' ||
 				node.nodeName === 'TEXTAREA' ||
 				node.contentEditable === 'true' ||
-				node.classList.contains( 'editor-block-list__block-edit' )
+				node.classList.contains( 'editor-block-list__block' )
 			) );
 	}
 
@@ -128,25 +128,6 @@ class WritingFlow extends Component {
 		return editables.length > 0 && index === edgeIndex;
 	}
 
-	/**
-	 * Function called to ensure the block parent of the target node is selected.
-	 *
-	 * @param {DOMElement} target
-	 */
-	selectParentBlock( target ) {
-		if ( ! target ) {
-			return;
-		}
-
-		const parentBlock = target.hasAttribute( 'data-block' ) ? target : target.closest( '[data-block]' );
-		if (
-			parentBlock &&
-			( ! this.props.selectedBlockUID || parentBlock.getAttribute( 'data-block' ) !== this.props.selectedBlockUID )
-		) {
-			this.props.onSelectBlock( parentBlock.getAttribute( 'data-block' ) );
-		}
-	}
-
 	onKeyDown( event ) {
 		const { selectedBlockUID, selectionStart, hasMultiSelection } = this.props;
 
@@ -184,12 +165,10 @@ class WritingFlow extends Component {
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
-			this.selectParentBlock( closestTabbable );
 			event.preventDefault();
 		} else if ( isHorizontal && isHorizontalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
-			this.selectParentBlock( closestTabbable );
 			event.preventDefault();
 		}
 	}

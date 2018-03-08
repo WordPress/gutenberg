@@ -69,7 +69,7 @@ const reusableItem = {
 	name: 'core/block',
 	initialAttributes: { ref: 123 },
 	title: 'My reusable block',
-	category: 'reusable-blocks',
+	category: 'shared',
 	isDisabled: false,
 };
 
@@ -167,7 +167,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
 	} );
 
-	it( 'should show reusable items in the saved tab', () => {
+	it( 'should show reusable items in the shared tab', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
@@ -179,11 +179,11 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 		const embedTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Saved' && node.name() === 'button' );
+			.filterWhere( ( node ) => node.text() === 'Shared' && node.name() === 'button' );
 		embedTab.simulate( 'click' );
 
 		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Saved' );
+		expect( activeCategory.text() ).toBe( 'Shared' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks ).toHaveLength( 1 );

@@ -1,24 +1,20 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RangeControl, SelectControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import { RangeControl, SelectControl } from '../';
 import CategorySelect from './category-select';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
 
-export default function QueryPanel( {
-	category,
+export default function QueryControls( {
+	categoriesList,
+	selectedCategoryId,
 	numberOfItems,
 	order,
 	orderBy,
@@ -26,13 +22,13 @@ export default function QueryPanel( {
 	minItems = DEFAULT_MIN_ITEMS,
 	onCategoryChange,
 	onNumberOfItemsChange,
-	onOrderChange = noop,
-	onOrderByChange = noop,
+	onOrderChange,
+	onOrderByChange,
 } ) {
 	return [
-		( onOrderChange || onOrderByChange ) && (
+		( onOrderChange && onOrderByChange ) && (
 			<SelectControl
-				key="query-panel-select"
+				key="query-controls-order-select"
 				label={ __( 'Order by' ) }
 				value={ `${ orderBy }/${ order }` }
 				options={ [
@@ -68,15 +64,16 @@ export default function QueryPanel( {
 		),
 		onCategoryChange && (
 			<CategorySelect
-				key="query-panel-category-select"
+				key="query-controls-category-select"
+				categoriesList={ categoriesList }
 				label={ __( 'Category' ) }
 				noOptionLabel={ __( 'All' ) }
-				selectedCategory={ category }
+				selectedCategoryId={ selectedCategoryId }
 				onChange={ onCategoryChange }
 			/> ),
 		onNumberOfItemsChange && (
 			<RangeControl
-				key="query-panel-range-control"
+				key="query-controls-range-control"
 				label={ __( 'Number of items' ) }
 				value={ numberOfItems }
 				onChange={ onNumberOfItemsChange }

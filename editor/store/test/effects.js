@@ -30,9 +30,12 @@ import {
 	convertBlockToStatic,
 	convertBlockToReusable,
 	selectBlock,
+	removeBlock,
 } from '../../store/actions';
 import reducer from '../reducer';
-import effects from '../effects';
+import effects, {
+	removeProvisionalBlock,
+} from '../effects';
 import * as selectors from '../../store/selectors';
 
 // Make all generated UUIDs the same for testing
@@ -42,6 +45,47 @@ jest.mock( 'uuid/v4', () => {
 
 describe( 'effects', () => {
 	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
+
+	describe( 'removeProvisionalBlock()', () => {
+		const store = { getState: () => {} };
+
+		beforeAll( () => {
+			selectors.getProvisionalBlockUID = jest.spyOn( selectors, 'getProvisionalBlockUID' );
+			selectors.isBlockSelected = jest.spyOn( selectors, 'isBlockSelected' );
+		} );
+
+		beforeEach( () => {
+			selectors.getProvisionalBlockUID.mockReset();
+			selectors.isBlockSelected.mockReset();
+		} );
+
+		afterAll( () => {
+			selectors.getProvisionalBlockUID.mockRestore();
+			selectors.isBlockSelected.mockRestore();
+		} );
+
+		it( 'should return nothing if there is no provisional block', () => {
+			const action = removeProvisionalBlock( {}, store );
+
+			expect( action ).toBeUndefined();
+		} );
+
+		it( 'should return nothing if there is a provisional block and it is selected', () => {
+			selectors.getProvisionalBlockUID.mockReturnValue( 'chicken' );
+			selectors.isBlockSelected.mockImplementation( ( state, uid ) => uid === 'chicken' );
+			const action = removeProvisionalBlock( {}, store );
+
+			expect( action ).toBeUndefined();
+		} );
+
+		it( 'should return remove action for provisional block', () => {
+			selectors.getProvisionalBlockUID.mockReturnValue( 'chicken' );
+			selectors.isBlockSelected.mockImplementation( ( state, uid ) => uid === 'ribs' );
+			const action = removeProvisionalBlock( {}, store );
+
+			expect( action ).toEqual( removeBlock( 'chicken' ) );
+		} );
+	} );
 
 	describe( '.MERGE_BLOCKS', () => {
 		const handler = effects.MERGE_BLOCKS;

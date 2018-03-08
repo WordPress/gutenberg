@@ -26,7 +26,7 @@ describe( 'withFocusOutside', () => {
 				return (
 					<div>
 						<input />
-						<input />
+						<input type="button" />
 					</div>
 				);
 			}
@@ -40,6 +40,23 @@ describe( 'withFocusOutside', () => {
 		wrapper.find( 'input' ).at( 0 ).simulate( 'focus' );
 		wrapper.find( 'input' ).at( 0 ).simulate( 'blur' );
 		wrapper.find( 'input' ).at( 1 ).simulate( 'focus' );
+
+		jest.runAllTimers();
+
+		expect( callback ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should not call handler if focus transitions via click to button', () => {
+		const callback = jest.fn();
+		const wrapper = mount( <EnhancedComponent onFocusOutside={ callback } /> );
+
+		wrapper.find( 'input' ).at( 0 ).simulate( 'focus' );
+		wrapper.find( 'input' ).at( 1 ).simulate( 'mousedown' );
+		wrapper.find( 'input' ).at( 0 ).simulate( 'blur' );
+		// In most browsers, the input at index 1 would receive a focus event
+		// at this point, but this is not guaranteed, which is the intention of
+		// the normalization behavior tested here.
+		wrapper.find( 'input' ).at( 1 ).simulate( 'mouseup' );
 
 		jest.runAllTimers();
 
