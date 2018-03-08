@@ -189,7 +189,7 @@ class ParagraphBlock extends Component {
 							value={ this.getFontSize() || '' }
 							onChange={ ( value ) => this.setFontSize( value ) }
 							min={ 10 }
-							max={ 200 }
+							max={ 100 }
 							beforeIcon="editor-textcolor"
 							allowReset
 						/>
