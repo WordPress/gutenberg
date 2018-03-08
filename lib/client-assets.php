@@ -543,12 +543,12 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 		$response = wp_remote_get( $src );
 		if ( wp_remote_retrieve_response_code( $response ) !== 200 ) {
 			// The request failed. If the file is already cached we should
-			// continue to use this file
+			// continue to use this file.
 			// If not, then we need to unlink the
 			// 0 byte file that's been created,
-			// and enqueue the script directly from the URL
+			// and enqueue the script directly from the URL.
 			// The browser may also fail to load the file
-			// leading to a very poor user experience
+			// leading to a very poor user experience.
 			// That's development mode for you!
 			if ( ! filesize( $full_path ) ) {
 				wp_register_script( $handle, $src, $deps, null );
