@@ -19,7 +19,10 @@ import { Button, Dashicon, withContext, Popover } from '@wordpress/components';
  */
 import './style.scss';
 import PostPermalink from '../post-permalink';
-import { getEditedPostAttribute } from '../../store/selectors';
+import {
+	getEditedPostAttribute, isCurrentPostPublished,
+	isEditedPostNew
+} from '../../store/selectors';
 import { insertBlock, editPost, clearSelectedBlock } from '../../store/actions';
 
 /**
@@ -97,7 +100,7 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title, placeholder } = this.props;
+		const { title, placeholder, isNew, link } = this.props;
 		const { isSelected, permalinkOpen } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 
@@ -111,6 +114,7 @@ class PostTitle extends Component {
 			>
 				<Button
 					className="editor-post-title__permalink-button"
+					disabled={ isNew || ! link }
 					onClick={ this.togglePermalink }>
 					<Dashicon icon="admin-links" />
 					{ permalinkOpen && (
@@ -145,6 +149,8 @@ class PostTitle extends Component {
 const applyConnect = connect(
 	( state ) => ( {
 		title: getEditedPostAttribute( state, 'title' ),
+		isNew: isEditedPostNew( state ),
+		link: getEditedPostAttribute( state, 'link' ),
 	} ),
 	{
 		onEnterPress() {

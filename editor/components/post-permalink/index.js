@@ -295,21 +295,15 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, link } = this.props;
+		const { link } = this.props;
 		const { editingSlug, isEditable, showCopyConfirmation } = this.state;
 		const slug = this.getSlug();
 		const permalink = this.getPermalink( slug );
-		const unavailable = isNew || ! link;
 
 		return (
 			<div className="editor-post-permalink">
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
-				{ unavailable &&
-					<span className="editor-post-permalink__unavailable">
-						{ __( 'The permalink is currently not available. Please save a draft of your post first.', 'gutenberg' ) }
-					</span>
-				}
-				{ ! unavailable && ! editingSlug &&
+				{ ! editingSlug &&
 					<Button
 						className="editor-post-permalink__link"
 						href={ addQueryArgs( link, { preview: true } ) }
@@ -321,7 +315,7 @@ class PostPermalink extends Component {
 						</span>
 					</Button>
 				}
-				{ ! unavailable && editingSlug &&
+				{ editingSlug &&
 					<form
 						className="editor-post-permalink__slug-form"
 						onSubmit={ this.onSavePermalink }>
@@ -347,7 +341,7 @@ class PostPermalink extends Component {
 						</Button>
 					</form>
 				}
-				{ ! unavailable && ! editingSlug &&
+				{ ! editingSlug &&
 					<ClipboardButton
 						className="editor-post-permalink__copy button"
 						text={ link }
@@ -358,7 +352,7 @@ class PostPermalink extends Component {
 						{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
 					</ClipboardButton>
 				}
-				{ ! unavailable && ! editingSlug && isEditable &&
+				{ ! editingSlug && isEditable &&
 					<Button
 						className="editor-post-permalink__edit button"
 						onClick={ this.onEditPermalink }
@@ -374,7 +368,6 @@ class PostPermalink extends Component {
 export default connect(
 	( state ) => {
 		return {
-			isNew: isEditedPostNew( state ),
 			isPublished: isCurrentPostPublished( state ),
 			link: getEditedPostAttribute( state, 'link' ),
 			samplePermalink: getEditedPostAttribute( state, 'sample_permalink' ),
