@@ -19,10 +19,7 @@ import { Button, Dashicon, withContext, Popover } from '@wordpress/components';
  */
 import './style.scss';
 import PostPermalink from '../post-permalink';
-import {
-	getEditedPostAttribute, isCurrentPostPublished,
-	isEditedPostNew
-} from '../../store/selectors';
+import { getEditedPostAttribute, isEditedPostNew, } from '../../store/selectors';
 import { insertBlock, editPost, clearSelectedBlock } from '../../store/actions';
 
 /**
