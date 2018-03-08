@@ -10,6 +10,7 @@
 	z-index: z-index( '.edit-post-header' );
 	left: 0;
 	right: 0;
+	box-sizing: border-box;
 
 	// mobile edgecase for toolbar
 	top: 0;
