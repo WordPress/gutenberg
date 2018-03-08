@@ -316,10 +316,14 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { link } = this.props;
+		const { link, samplePermalink } = this.props;
 		const { editingSlug, isEditable, showCopyConfirmation } = this.state;
 		const slug = this.getSlug();
 		const permalink = this.getPermalink( slug );
+		let viewLink = link;
+		if ( samplePermalink ) {
+			viewLink = addQueryArgs( viewLink, { preview: true } );
+		}
 
 		return (
 			<div className="editor-post-permalink">
@@ -327,7 +331,7 @@ class PostPermalink extends Component {
 				{ ! editingSlug &&
 					<Button
 						className="editor-post-permalink__link"
-						href={ addQueryArgs( link, { preview: true } ) }
+						href={ viewLink }
 						target="_blank"
 					>
 						<span
@@ -365,7 +369,7 @@ class PostPermalink extends Component {
 				{ ! editingSlug &&
 					<ClipboardButton
 						className="editor-post-permalink__copy button"
-						text={ link }
+						text={ viewLink }
 						onCopy={ this.onCopy }
 						ref={ this.bindCopyButton }
 						isPrimary
