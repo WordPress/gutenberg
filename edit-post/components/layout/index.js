@@ -40,7 +40,7 @@ import {
 	isSavingMetaBoxes,
 } from '../../store/selectors';
 import { closePublishSidebar } from '../../store/actions';
-import { PluginSidebar } from '../../components/plugin-sidebar/index.js';
+import { PluginSidebar } from '../../api/components/plugin-sidebar';
 import { PluginArea } from '../../api/plugin';
 
 function GeneralSidebar( { openedGeneralSidebar } ) {
