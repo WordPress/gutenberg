@@ -74,7 +74,7 @@ import {
 	getSelectedBlocksInitialCaretPosition,
 } from '../../store/selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, ENTER } = keycodes;
+const { BACKSPACE, DELETE, ENTER } = keycodes;
 
 export class BlockListBlock extends Component {
 	constructor() {
@@ -379,11 +379,6 @@ export class BlockListBlock extends Component {
 						}
 					}
 				}
-				break;
-
-			case ESCAPE:
-				// Deselect on escape.
-				this.props.onDeselect();
 				break;
 		}
 	}
