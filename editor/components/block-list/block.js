@@ -13,6 +13,7 @@ import { Component, findDOMNode, compose } from '@wordpress/element';
 import {
 	keycodes,
 	focus,
+	isTextField,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 } from '@wordpress/utils';
@@ -202,15 +203,15 @@ export class BlockListBlock extends Component {
 		}
 
 		// Find all tabbables within node.
-		const tabbables = focus.tabbable.find( this.node )
-			.filter( ( node ) => node !== this.node );
+		const textInputs = focus.tabbable.find( this.node ).filter( isTextField );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
 		const isReverse = -1 === initialPosition;
-		const target = ( isReverse ? last : first )( tabbables );
+		const target = ( isReverse ? last : first )( textInputs );
 
 		if ( ! target ) {
+			this.wrapperNode.focus();
 			return;
 		}
 
