@@ -146,6 +146,15 @@ $float-margin: calc( 50% - #{ $content-width-padding / 2 } );
 	outline-offset: -2px;
 }
 
+// Switch
+@mixin switch-style__focus-active() {
+	box-shadow: 0 0 0 2px $white, 0 0 0 3px $dark-gray-300;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+}
+
 // Formatting Buttons
 @mixin formatting-button-style__hover {
 	color: $dark-gray-500;

@@ -1,4 +1,4 @@
-$toggle-width: 32px;
+$toggle-width: 36px;
 $toggle-height: 18px;
 $toggle-border-width: 2px;
 
@@ -35,14 +35,14 @@ $toggle-border-width: 2px;
 		width: $toggle-height - ( $toggle-border-width * 4 );
 		height: $toggle-height - ( $toggle-border-width * 4 );
 		border-radius: 50%;
-		border: 2px solid $dark-gray-500;
-		background: $white;
 		transition: 0.1s transform ease;
+		background-color: $dark-gray-500;
+		border: 2px solid $dark-gray-500; // has to have an explicit border for Windows High Contrast Mode
 	}
 
 	&__input:focus {
 		& + .components-form-toggle__track {
-			box-shadow: 0 0 0 1px $white, 0 0 0 2px $blue-medium-400, 0 0 2px 2px $blue-medium-400;
+			@include switch-style__focus-active();
 
 			 & + .components-form-toggle__thumb {
 				 border-width: 5px;
@@ -52,8 +52,9 @@ $toggle-border-width: 2px;
 
 	&.is-checked {
 		.components-form-toggle__thumb {
-			border: 2px solid $white;
-			background-color: $blue-medium-500;
+			background-color: $white;
+			border-color: $white; // has to have an explicit border for Windows High Contrast Mode
+			border-width: 5px; // expand the border to fake a solid in Windows High Contrast Mode
 			transform: translateX( $toggle-width - ( $toggle-border-width * 4 ) - ( $toggle-height - ( $toggle-border-width * 4 ) ) );
 		}
 
@@ -61,6 +62,22 @@ $toggle-border-width: 2px;
 			background-color: $blue-medium-500;
 			border: $toggle-border-width solid $blue-medium-500;
 		}
+	}
+
+	// On/Off icon indicators
+	.components-form-toggle__on,
+	.components-form-toggle__off {
+		position: absolute;
+		top: $toggle-border-width * 3;
+	}
+
+	.components-form-toggle__off {
+		right: $toggle-border-width * 3;
+	}
+
+	.components-form-toggle__on {
+		left: $toggle-border-width * 3;
+		fill: $white;
 	}
 }
 
@@ -74,11 +91,4 @@ $toggle-border-width: 2px;
 	margin: 0;
 	padding: 0;
 	z-index: z-index( '.components-form-toggle__input' );
-}
-
-.components-form-toggle__hint {
-	display: inline-block;
-	min-width: 24px;	// This prevents a position jog when the control is right aligned, and the width of the label changes
-	margin-left: 10px;
-	font-weight: 500;
 }
