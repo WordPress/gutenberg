@@ -1242,6 +1242,10 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
  */
 export function getFrecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
 	const calculateFrecency = ( time, count ) => {
+		if ( ! time ) {
+			return count;
+		}
+
 		const duration = Date.now() - time;
 		switch ( true ) {
 			case duration < 3600:

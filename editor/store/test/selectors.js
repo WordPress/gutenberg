@@ -2450,6 +2450,54 @@ describe( 'selectors', () => {
 			] );
 		} );
 
+		it( 'should weight by time', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/image': { time: Date.now() - 1000, count: 2, insert: { name: 'core/image' } },
+						'core/paragraph': { time: Date.now() - 4000, count: 3, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			expect( getFrecentInserterItems( state, true, 2 ) ).toMatchObject( [
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/paragraph', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should be backwards-compatible with old preferences values', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/image': { time: Date.now(), count: 1, insert: { name: 'core/image' } },
+						'core/paragraph': { time: undefined, count: 5, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			expect( getFrecentInserterItems( state, true, 2 ) ).toMatchObject( [
+				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/image', initialAttributes: {} },
+			] );
+		} );
+
 		it( 'should pad list out with blocks from the common category', () => {
 			const state = {
 				preferences: {
