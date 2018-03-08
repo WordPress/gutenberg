@@ -143,12 +143,13 @@ class ParagraphBlock extends Component {
 			),
 			isSelected && (
 				<InspectorControls key="inspector">
-					<PanelBody title={ __( 'Text Settings' ) }>
+					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
 						<div className="blocks-font-size__main">
 							<ButtonGroup aria-label={ __( 'Font Size' ) }>
 								<Button
 									isLarge
 									isPrimary={ attributes.textClass === 'is-small-text' }
+									aria-pressed={ attributes.textClass === 'is-small-text' }
 									onClick={ () => this.setFontSize( FONT_SIZES.small ) }
 								>
 									S
@@ -156,6 +157,7 @@ class ParagraphBlock extends Component {
 								<Button
 									isLarge
 									isPrimary={ attributes.textClass === 'is-regular-text' }
+									aria-pressed={ attributes.textClass === 'is-regular-text' }
 									onClick={ () => this.setFontSize( FONT_SIZES.regular ) }
 								>
 									M
@@ -163,6 +165,7 @@ class ParagraphBlock extends Component {
 								<Button
 									isLarge
 									isPrimary={ attributes.textClass === 'is-large-text' }
+									aria-pressed={ attributes.textClass === 'is-large-text' }
 									onClick={ () => this.setFontSize( FONT_SIZES.large ) }
 								>
 									L
@@ -170,6 +173,7 @@ class ParagraphBlock extends Component {
 								<Button
 									isLarge
 									isPrimary={ attributes.textClass === 'is-larger-text' }
+									aria-pressed={ attributes.textClass === 'is-larger-text' }
 									onClick={ () => this.setFontSize( FONT_SIZES.larger ) }
 								>
 									XL
@@ -189,6 +193,7 @@ class ParagraphBlock extends Component {
 							min={ 12 }
 							max={ 100 }
 							beforeIcon="editor-textcolor"
+							afterIcon="editor-textcolor"
 						/>
 						<span>{ attributes.textClass }</span>
 						<ToggleControl
