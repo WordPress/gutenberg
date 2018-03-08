@@ -3,7 +3,7 @@ Edit post API
 
 The edit post API contains the following methods:
 
-## `wp.editPost.__experimental.registerPlugin( { name: string, render: function } )`
+### `wp.editPost.__experimental.registerPlugin( { name: string, render: function } )`
 
 This method takes one argument: 
 - An object containing the following data:
@@ -19,10 +19,10 @@ const PluginSidebar = wp.editPost.__experimental.PluginSidebar;
 const Component = () => (
 	<Fragment>
         <PluginSidebar name="first-sidebar-name" title="My Sidebar">
-            <h1>Content of the first sidebar</h1>
+            <p>Content of the first sidebar</p>
         </PluginSidebar>
         <PluginSidebar name="second-sidebar-name" title="My Second Sidebar">
-            <h1>Content of the second sidebar</h1>
+            <p>Content of the second sidebar</p>
         </PluginSidebar>
 	</Fragment>
 );
@@ -35,9 +35,10 @@ wp.editPost.__experimental.registerPlugin( {
 
 You can activate the sidebars using the following lines:
 
-`wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/first-sidebar-name' );`
-`wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/second-sidebar-name' );`
-
+```js
+wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/first-sidebar-name' );
+wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/second-sidebar-name' );
+```
   
 ### Available UI components
 
@@ -46,17 +47,13 @@ The available UI components are found in the global variable `wp.editPost.__expe
 #### PluginSidebar
 
 Renders a sidebar when activated.
-
-`<PluginSidebar name="sidebar-name" title="Sidebar title">{ contents }</PluginSidebar>`
-
+```js
+<PluginSidebar name="sidebar-name" title="Sidebar title">
+    <MySidebar />
+</PluginSidebar>
+```
 - Props
   - `name`: A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
   - `title`: Title displayed at the top of the sidebar. Must be a string.
   
 The contents you render within the `PluginSidebar` will show up as content within the sidebar.
-
-The sidebar can be activated using the data api:
-
-`wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );`
-
-Notice that you need to use both the plugin name and sidebar name separated by a `/` to show the correct sidebar.
