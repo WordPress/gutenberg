@@ -1,20 +1,20 @@
 .editor-post-permalink {
 	display: inline-flex;
 	align-items: center;
-	border: 1px solid $light-gray-500;
 	background: $white;
 	padding: 5px;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	height: 40px;
-	width: 742px;
-
-	// put toolbar snugly to edge on mobile
-	margin-left: -$block-padding - 1px;	// stack borders
-	margin-right: -$block-padding - 1px;
+	width: 390px;
+	@include break-mobile() {
+		width: 470px;
+	}
 	@include break-small() {
-		margin-left: -1px;
-		margin-right: -1px;
+		width: 605px;
+	}
+	@include break-large() {
+		width: 742px;
 	}
 }
 
