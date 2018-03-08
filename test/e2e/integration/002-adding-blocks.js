@@ -13,7 +13,7 @@ describe( 'Adding blocks', () => {
 		// Default block appender is provisional
 		cy.get( lastBlockSelector ).then( ( firstBlock ) => {
 			cy.get( '.editor-default-block-appender' ).click();
-			cy.get( '.edit-post-visual-editor' ).click();
+			cy.focused().type( '{esc}' );
 			cy.get( lastBlockSelector ).should( 'have.text', firstBlock.text() );
 		} );
 
