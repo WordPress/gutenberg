@@ -1,8 +1,8 @@
 {
-	"baseUrl": "http://localhost:8888",
+	"baseUrl": "http://localhost/gutenberg",
 	"env": {
-		"username": "admin",
-		"password": "password"
+		"username": "timplatts",
+		"password": "Twebfoxx17!"
 	},
 	"integrationFolder": "test/e2e/integration",
 	"supportFile": "test/e2e/support",

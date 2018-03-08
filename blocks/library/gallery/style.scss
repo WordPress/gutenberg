@@ -15,12 +15,15 @@
 		justify-content: center;
 		position: relative;
 
-
 		figure {
 			margin: 0;
 			height: 100%;
 			display: flex;
 			align-items: flex-end;
+
+			.spinner {
+				margin: auto;
+			}
 		}
 
 		img {
@@ -38,6 +41,8 @@
 			position: absolute;
 			width: 100%;
 		}
+
+
 	}
 
 	// Cropped
