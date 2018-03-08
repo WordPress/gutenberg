@@ -10,7 +10,7 @@ describe( 'Adding nested blocks', () => {
         cy.get( '.editor-default-block-appender' ).click();
 		cy.get( lastBlockSelector ).type( '{enter}' );
 
-        // Assertion
+        // Assertion to check for two paragraph blocks
         cy.get( '.mce-content-body' ).should( ($p) => {
             expect( $p ).to.have.length(2);
         } );
@@ -18,7 +18,7 @@ describe( 'Adding nested blocks', () => {
         // Merge second paragraph block back into first using Backspace
         cy.get( lastBlockSelector ).type( '{backspace}' );
 
-        // Assertion
+        // Assertion to check for one paragraph block
         cy.get( '.mce-content-body' ).should( ($p) => {
             expect( $p ).to.have.length(1);
         } );
