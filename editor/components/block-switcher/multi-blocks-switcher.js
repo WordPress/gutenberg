@@ -19,14 +19,12 @@ export function MultiBlocksSwitcher( { isMultiBlockSelection, selectedBlockUids 
 	);
 }
 
-export const mapStateToProps = ( state ) => {
-	const selectedBlockUids = getMultiSelectedBlockUids( state );
-	return {
-		isMultiBlockSelection: selectedBlockUids.length > 1,
-		selectedBlockUids,
-	};
-};
-
 export default connect(
-	mapStateToProps
+	( state ) => {
+		const selectedBlockUids = getMultiSelectedBlockUids( state );
+		return {
+			isMultiBlockSelection: selectedBlockUids.length > 1,
+			selectedBlockUids,
+		};
+	}
 )( MultiBlocksSwitcher );
