@@ -154,44 +154,51 @@ class ParagraphBlock extends Component {
 			isSelected && (
 				<InspectorControls key="inspector">
 					<PanelBody title={ __( 'Text Settings' ) }>
-						<ButtonGroup aria-label={ __( 'Select font size' ) }>
+						<div className="blocks-font-size__main">
+							<ButtonGroup aria-label={ __( 'Font Size' ) }>
+								<Button
+									isLarge
+									isPrimary={ attributes.textClass === 'is-small-text' }
+									onClick={ () => this.setFontSize( fontSizeValues[ 0 ] ) }
+								>
+									S
+								</Button>
+								<Button
+									isLarge
+									isPrimary={ attributes.textClass === 'is-regular-text' }
+									onClick={ () => this.setFontSize( fontSizeValues[ 1 ] ) }
+								>
+									M
+								</Button>
+								<Button
+									isLarge
+									isPrimary={ attributes.textClass === 'is-large-text' }
+									onClick={ () => this.setFontSize( fontSizeValues[ 2 ] ) }
+								>
+									L
+								</Button>
+								<Button
+									isLarge
+									isPrimary={ attributes.textClass === 'is-larger-text' }
+									onClick={ () => this.setFontSize( fontSizeValues[ 3 ] ) }
+								>
+									XL
+								</Button>
+							</ButtonGroup>
 							<Button
 								isLarge
-								isPrimary={ attributes.textClass === 'is-small-text' }
-								onClick={ () => this.setFontSize( fontSizeValues[ 0 ] ) }
+								onClick={ () => this.setFontSize( null ) }
 							>
-								S
+								{ __( 'Reset' ) }
 							</Button>
-							<Button
-								isLarge
-								isPrimary={ attributes.textClass === 'is-regular-text' }
-								onClick={ () => this.setFontSize( fontSizeValues[ 1 ] ) }
-							>
-								M
-							</Button>
-							<Button
-								isLarge
-								isPrimary={ attributes.textClass === 'is-large-text' }
-								onClick={ () => this.setFontSize( fontSizeValues[ 2 ] ) }
-							>
-								L
-							</Button>
-							<Button
-								isLarge
-								isPrimary={ attributes.textClass === 'is-larger-text' }
-								onClick={ () => this.setFontSize( fontSizeValues[ 3 ] ) }
-							>
-								XL
-							</Button>
-						</ButtonGroup>
+						</div>
 						<RangeControl
-							label={ __( 'Font Size' ) }
+							label={ __( 'Custom Size' ) }
 							value={ this.getFontSize() || '' }
 							onChange={ ( value ) => this.setFontSize( value ) }
 							min={ 10 }
 							max={ 100 }
 							beforeIcon="editor-textcolor"
-							allowReset
 						/>
 						<span>{ attributes.textClass }</span>
 						<ToggleControl
