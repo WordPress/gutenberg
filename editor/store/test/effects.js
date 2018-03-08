@@ -31,12 +31,13 @@ import {
 	convertBlockToReusable,
 	selectBlock,
 	removeBlock,
-} from '../../store/actions';
+	createErrorNotice,
+} from '../actions';
 import reducer from '../reducer';
 import effects, {
 	removeProvisionalBlock,
 } from '../effects';
-import * as selectors from '../../store/selectors';
+import * as selectors from '../selectors';
 
 // Make all generated UUIDs the same for testing
 jest.mock( 'uuid/v4', () => {
@@ -435,6 +436,62 @@ describe( 'effects', () => {
 				},
 				type: 'CREATE_NOTICE',
 			} ) );
+		} );
+	} );
+
+	describe( '.REQUEST_POST_UPDATE_FAILURE', () => {
+		it( 'should dispatch a notice on failure when publishing a draft fails.', () => {
+			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			const action = {
+				post: {
+					id: 1,
+					title: {
+						raw: 'A History of Pork',
+					},
+					content: {
+						raw: '',
+					},
+					status: 'draft',
+				},
+				edits: {
+					status: 'publish',
+				},
+			};
+
+			handler( action, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Publishing failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
+		} );
+
+		it( 'should dispatch a notice on failure when trying to update a draft.', () => {
+			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
+			const dispatch = jest.fn();
+			const store = { getState: () => {}, dispatch };
+
+			const action = {
+				post: {
+					id: 1,
+					title: {
+						raw: 'A History of Pork',
+					},
+					content: {
+						raw: '',
+					},
+					status: 'draft',
+				},
+				edits: {
+					status: 'draft',
+				},
+			};
+
+			handler( action, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Updating failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
 		} );
 	} );
 
