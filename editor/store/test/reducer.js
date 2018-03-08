@@ -184,6 +184,70 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should replace the block even if the new block uid is the same', () => {
+			const originalState = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [],
+				} ],
+			} );
+			const replacedState = editor( originalState, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'chicken' ],
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/freeform',
+					innerBlocks: [],
+				} ],
+			} );
+
+			expect( Object.keys( replacedState.present.blocksByUid ) ).toHaveLength( 1 );
+			expect( values( originalState.present.blocksByUid )[ 0 ].name ).toBe( 'core/test-block' );
+			expect( values( replacedState.present.blocksByUid )[ 0 ].name ).toBe( 'core/freeform' );
+			expect( values( replacedState.present.blocksByUid )[ 0 ].uid ).toBe( 'chicken' );
+			expect( replacedState.present.blockOrder ).toEqual( {
+				'': [ 'chicken' ],
+				chicken: [],
+			} );
+
+			const nestedBlock = {
+				uid: 'chicken',
+				name: 'core/test-block',
+				attributes: {},
+				innerBlocks: [],
+			};
+			const wrapperBlock = createBlock( 'core/test-block', {}, [ nestedBlock ] );
+			const replacementNestedBlock = {
+				uid: 'chicken',
+				name: 'core/freeform',
+				attributes: {},
+				innerBlocks: [],
+			};
+
+			const originalNestedState = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ wrapperBlock ],
+			} );
+
+			const replacedNestedState = editor( originalNestedState, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ nestedBlock.uid ],
+				blocks: [ replacementNestedBlock ],
+			} );
+
+			expect( replacedNestedState.present.blockOrder ).toEqual( {
+				'': [ wrapperBlock.uid ],
+				[ wrapperBlock.uid ]: [ replacementNestedBlock.uid ],
+				[ replacementNestedBlock.uid ]: [],
+			} );
+
+			expect( originalNestedState.present.blocksByUid.chicken.name ).toBe( 'core/test-block' );
+			expect( replacedNestedState.present.blocksByUid.chicken.name ).toBe( 'core/freeform' );
+		} );
+
 		it( 'should update the block', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
