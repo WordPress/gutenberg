@@ -1,3 +1,11 @@
-export {
+import { registerPlugin } from './plugin';
+import { PluginSidebarFill as PluginSidebar } from './components/plugin-sidebar';
+
+const __experimental = {
 	registerPlugin,
-} from './plugin';
+	PluginSidebar,
+};
+
+export {
+	__experimental,
+};
