@@ -105,7 +105,7 @@ class PostPermalink extends Component {
 	 *
 	 * @param {string} slug The post slug to insert in into the permalink.
 	 *
-	 * @returns {string} The full permalink.
+	 * @return {string} The full permalink.
 	 */
 	getPermalink( slug ) {
 		const permalink = this.props.url + this.props.permalinkStructure;
@@ -176,7 +176,7 @@ class PostPermalink extends Component {
 	/**
 	 * Returns the stored slug for the current post.
 	 *
-	 * @returns {string} The slug.
+	 * @return {string} The slug.
 	 */
 	getStoredSlug() {
 		const { actualSlug, samplePermalink } = this.props;
