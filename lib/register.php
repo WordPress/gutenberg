@@ -412,37 +412,50 @@ function gutenberg_register_post_types() {
 		'map_meta_cap'          => true,
 	) );
 
-	foreach ( array( 'administrator', 'editor' ) as $role_name ) {
-		$editor = get_role( $role_name );
-		$editor->add_cap( 'edit_blocks' );
-		$editor->add_cap( 'edit_others_blocks' );
-		$editor->add_cap( 'publish_blocks' );
-		$editor->add_cap( 'read_private_blocks' );
-		$editor->add_cap( 'read_blocks' );
-		$editor->add_cap( 'delete_blocks' );
-		$editor->add_cap( 'delete_private_blocks' );
-		$editor->add_cap( 'delete_published_blocks' );
-		$editor->add_cap( 'delete_others_blocks' );
-		$editor->add_cap( 'edit_private_blocks' );
-		$editor->add_cap( 'edit_published_blocks' );
-		$editor->add_cap( 'create_blocks' );
+	$editor_caps = array(
+		'edit_blocks',
+		'edit_others_blocks',
+		'publish_blocks',
+		'read_private_blocks',
+		'read_blocks',
+		'delete_blocks',
+		'delete_private_blocks',
+		'delete_published_blocks',
+		'delete_others_blocks',
+		'edit_private_blocks',
+		'edit_published_blocks',
+		'create_blocks',
+	);
+
+	$caps_map = array(
+		'administrator' => $editor_caps,
+		'editor'        => $editor_caps,
+		'author'        => array(
+			'edit_blocks',
+			'publish_blocks',
+			'read_blocks',
+			'delete_blocks',
+			'delete_published_blocks',
+			'edit_published_blocks',
+			'create_blocks',
+		),
+		'contributor'   => array(
+			'edit_blocks',
+			'read_blocks',
+			'delete_blocks',
+			'delete_published_blocks',
+			'edit_published_blocks',
+		),
+	);
+
+	foreach ( $caps_map as $role_name => $caps ) {
+		$role = get_role( $role_name );
+		foreach ( $caps as $cap ) {
+			if ( ! $role->has_cap( $cap ) ) {
+				$role->add_cap( $cap );
+			}
+		}
 	}
-
-	$author = get_role( 'author' );
-	$author->add_cap( 'edit_blocks' );
-	$author->add_cap( 'publish_blocks' );
-	$author->add_cap( 'read_blocks' );
-	$author->add_cap( 'delete_blocks' );
-	$author->add_cap( 'delete_published_blocks' );
-	$author->add_cap( 'edit_published_blocks' );
-	$author->add_cap( 'create_blocks' );
-
-	$contributor = get_role( 'contributor' );
-	$contributor->add_cap( 'edit_blocks' );
-	$contributor->add_cap( 'read_blocks' );
-	$contributor->add_cap( 'delete_blocks' );
-	$contributor->add_cap( 'delete_published_blocks' );
-	$contributor->add_cap( 'edit_published_blocks' );
 }
 add_action( 'init', 'gutenberg_register_post_types' );
 
