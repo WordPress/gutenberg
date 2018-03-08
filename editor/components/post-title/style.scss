@@ -30,6 +30,12 @@
 		font-family: $editor-font;
 		line-height: $default-line-height;
 
+		// Leave enough room for the permalink button on small screens.
+		margin-left: 20px;
+		@include break-small() {
+			margin-left: 0;
+		}
+
 		// inherited from h1
 		font-weight: 600;
 	}
