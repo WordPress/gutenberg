@@ -97,7 +97,7 @@ class PostPermalink extends Component {
 		// The final version could be extracted into the '@wordpress/url' package.
 		slug = slug.replace( REGEXP_NEWLINES, ' ' );
 		slug = slug.split( ' ' ).join( '-' );
-		return slug + '-sanitized';
+		return slug;
 	}
 
 	/**
