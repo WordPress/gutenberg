@@ -71,8 +71,8 @@ const {
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
 	getInserterItems,
-	getRecentInserterItems,
-	getFrequentInserterItems,
+	getFrecentInserterItems,
+	getProvisionalBlockUID,
 	POST_UPDATE_TRANSACTION_ID,
 } = selectors;
 
@@ -2367,7 +2367,7 @@ describe( 'selectors', () => {
 					initialAttributes: { ref: 123 },
 					title: 'My reusable block',
 					icon: 'test',
-					category: 'reusable-blocks',
+					category: 'shared',
 					keywords: [],
 					isDisabled: false,
 				},
@@ -2379,89 +2379,20 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getRecentInserterItems', () => {
+	describe( 'getFrecentInserterItems', () => {
 		beforeAll( () => {
 			registerCoreBlocks();
 		} );
 
-		it( 'should return the 9 most recently used blocks', () => {
-			const state = {
-				preferences: {
-					recentInserts: [
-						{ name: 'core/deleted-block' }, // Deleted blocks should be filtered out
-						{ name: 'core/block', ref: 456 }, // Deleted reusable blocks should be filtered out
-						{ name: 'core/paragraph' },
-						{ name: 'core/block', ref: 123 },
-						{ name: 'core/image' },
-						{ name: 'core/quote' },
-						{ name: 'core/gallery' },
-						{ name: 'core/heading' },
-						{ name: 'core/list' },
-						{ name: 'core/video' },
-						{ name: 'core/audio' },
-						{ name: 'core/code' },
-					],
-				},
-				editor: {
-					present: {
-						blockOrder: [],
-					},
-				},
-				reusableBlocks: {
-					data: {
-						123: { id: 123, type: 'core/test-block' },
-					},
-				},
-			};
-
-			expect( getRecentInserterItems( state ) ).toMatchObject( [
-				{ name: 'core/paragraph', initialAttributes: {} },
-				{ name: 'core/block', initialAttributes: { ref: 123 } },
-				{ name: 'core/image', initialAttributes: {} },
-				{ name: 'core/quote', initialAttributes: {} },
-				{ name: 'core/gallery', initialAttributes: {} },
-				{ name: 'core/heading', initialAttributes: {} },
-				{ name: 'core/list', initialAttributes: {} },
-				{ name: 'core/video', initialAttributes: {} },
-				{ name: 'core/audio', initialAttributes: {} },
-			] );
-		} );
-
-		it( 'should pad list out with blocks from the common category', () => {
-			const state = {
-				preferences: {
-					recentInserts: [
-						{ name: 'core/paragraph' },
-					],
-				},
-				editor: {
-					present: {
-						blockOrder: [],
-					},
-				},
-			};
-
-			// We should get back 8 items with no duplicates
-			const items = getRecentInserterItems( state );
-			const blockNames = items.map( item => item.name );
-			expect( union( blockNames ) ).toHaveLength( 9 );
-		} );
-	} );
-
-	describe( 'getFrequentInserterItems', () => {
-		beforeAll( () => {
-			registerCoreBlocks();
-		} );
-
-		it( 'should return the 8 most recently used blocks', () => {
+		it( 'should return the most frecently used blocks', () => {
 			const state = {
 				preferences: {
 					insertUsage: {
-						'core/deleted-block': { count: 10, insert: { name: 'core/deleted-block' } }, // Deleted blocks should be filtered out
-						'core/block/456': { count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted reusable blocks should be filtered out
-						'core/image': { count: 3, insert: { name: 'core/image' } },
-						'core/block/123': { count: 5, insert: { name: 'core/block', ref: 123 } },
-						'core/paragraph': { count: 2, insert: { name: 'core/paragraph' } },
+						'core/deleted-block': { time: 1000, count: 10, insert: { name: 'core/deleted-block' } }, // Deleted blocks should be filtered out
+						'core/block/456': { time: 1000, count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted reusable blocks should be filtered out
+						'core/image': { time: 1000, count: 3, insert: { name: 'core/image' } },
+						'core/block/123': { time: 1000, count: 5, insert: { name: 'core/block', ref: 123 } },
+						'core/paragraph': { time: 1000, count: 2, insert: { name: 'core/paragraph' } },
 					},
 				},
 				editor: {
@@ -2476,7 +2407,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getFrequentInserterItems( state, true, 3 ) ).toMatchObject( [
+			expect( getFrecentInserterItems( state, true, 3 ) ).toMatchObject( [
 				{ name: 'core/block', initialAttributes: { ref: 123 } },
 				{ name: 'core/image', initialAttributes: {} },
 				{ name: 'core/paragraph', initialAttributes: {} },
@@ -2487,7 +2418,7 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					insertUsage: {
-						'core/image': { count: 2, insert: { name: 'core/paragraph' } },
+						'core/image': { time: 1000, count: 2, insert: { name: 'core/paragraph' } },
 					},
 				},
 				editor: {
@@ -2498,7 +2429,7 @@ describe( 'selectors', () => {
 			};
 
 			// We should get back 4 items with no duplicates
-			const items = getFrequentInserterItems( state, true, 4 );
+			const items = getFrecentInserterItems( state, true, 4 );
 			const blockNames = items.map( item => item.name );
 			expect( union( blockNames ) ).toHaveLength( 4 );
 		} );
@@ -2777,6 +2708,24 @@ describe( 'selectors', () => {
 			} );
 
 			expect( isPublishing ).toBe( true );
+		} );
+	} );
+
+	describe( 'getProvisionalBlockUID()', () => {
+		it( 'should return null if not set', () => {
+			const provisionalBlockUID = getProvisionalBlockUID( {
+				provisionalBlockUID: null,
+			} );
+
+			expect( provisionalBlockUID ).toBe( null );
+		} );
+
+		it( 'should return UID of provisional block', () => {
+			const provisionalBlockUID = getProvisionalBlockUID( {
+				provisionalBlockUID: 'chicken',
+			} );
+
+			expect( provisionalBlockUID ).toBe( 'chicken' );
 		} );
 	} );
 } );

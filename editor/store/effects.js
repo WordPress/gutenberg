@@ -15,7 +15,6 @@ import {
 	serialize,
 	createReusableBlock,
 	isReusableBlock,
-	getDefaultBlockName,
 	getDefaultBlockForPostFormat,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -37,6 +36,7 @@ import {
 	saveReusableBlock,
 	insertBlock,
 	selectBlock,
+	removeBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -51,6 +51,8 @@ import {
 	getBlockCount,
 	getBlocks,
 	getReusableBlock,
+	getProvisionalBlockUID,
+	isBlockSelected,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
@@ -60,6 +62,23 @@ import {
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
+
+/**
+ * Effect handler returning an action to remove the provisional block, if one
+ * is set.
+ *
+ * @param {Object} action Action object.
+ * @param {Object} store  Data store instance.
+ *
+ * @return {?Object} Remove action, if provisional block is set.
+ */
+export function removeProvisionalBlock( action, store ) {
+	const state = store.getState();
+	const provisionalBlockUID = getProvisionalBlockUID( state );
+	if ( provisionalBlockUID && ! isBlockSelected( state, provisionalBlockUID ) ) {
+		return removeBlock( provisionalBlockUID );
+	}
+}
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -459,12 +478,6 @@ export default {
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
-	INSERT_DEFAULT_BLOCK( action ) {
-		const { attributes, rootUID, index } = action;
-		const block = createBlock( getDefaultBlockName(), attributes );
-
-		return insertBlock( block, index, rootUID );
-	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
@@ -480,4 +493,10 @@ export default {
 			return insertBlock( createBlock( blockName ) );
 		}
 	},
+
+	CLEAR_SELECTED_BLOCK: removeProvisionalBlock,
+
+	SELECT_BLOCK: removeProvisionalBlock,
+
+	MULTI_SELECT: removeProvisionalBlock,
 };

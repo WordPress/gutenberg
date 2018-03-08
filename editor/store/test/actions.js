@@ -163,6 +163,7 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks: [ block ],
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -177,6 +178,7 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks,
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -187,10 +189,12 @@ describe( 'actions', () => {
 				uid: 'ribs',
 			};
 			const index = 5;
-			expect( insertBlock( block, index ) ).toEqual( {
+			expect( insertBlock( block, index, 'test_uid' ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks: [ block ],
 				index,
+				rootUID: 'test_uid',
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -201,10 +205,12 @@ describe( 'actions', () => {
 				uid: 'ribs',
 			} ];
 			const index = 3;
-			expect( insertBlocks( blocks, index ) ).toEqual( {
+			expect( insertBlocks( blocks, index, 'test_uid' ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks,
 				index,
+				rootUID: 'test_uid',
+				time: expect.any( Number ),
 			} );
 		} );
 	} );

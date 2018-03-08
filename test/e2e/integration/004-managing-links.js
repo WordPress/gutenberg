@@ -1,5 +1,5 @@
 describe( 'Managing links', () => {
-	before( () => {
+	beforeEach( () => {
 		cy.newPost();
 	} );
 
@@ -28,6 +28,8 @@ describe( 'Managing links', () => {
 
 		cy.get( '.editor-default-block-appender' ).click();
 
+		cy.focused().type( 'Text' );
+
 		cy.get( 'button[aria-label="Link"]' ).click();
 
 		// Typing "left" should not close the dialog
@@ -42,12 +44,12 @@ describe( 'Managing links', () => {
 	it( 'Pressing Left and Esc in Link Dialog in "Docked Toolbar" mode', () => {
 		setFixedToolbar( false );
 
-		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
+		cy.get( '.editor-default-block-appender' ).click();
 
-		cy.get( lastBlockSelector ).click();
-		cy.focused().type( 'test' );
+		cy.focused().type( 'Text' );
 
 		// we need to trigger isTyping = false
+		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
 		cy.get( lastBlockSelector ).trigger( 'mousemove', { clientX: 200, clientY: 300 } );
 		cy.get( lastBlockSelector ).trigger( 'mousemove', { clientX: 250, clientY: 350 } );
 
