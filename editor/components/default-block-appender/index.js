@@ -40,7 +40,7 @@ export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPromp
 				onKeyDown={ onAppend }
 				value={ showPrompt ? value : '' }
 			/>
-			<InserterWithShortcuts uid={ rootUID } layout={ layout } />
+			<InserterWithShortcuts rootUID={ rootUID } layout={ layout } />
 			<Inserter position="top right" />
 		</div>
 	);

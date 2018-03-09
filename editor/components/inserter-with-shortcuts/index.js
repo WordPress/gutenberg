@@ -11,13 +11,13 @@ import { BlockIcon, createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 import { IconButton, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { getFrecentInserterItems } from '../../store/selectors';
-import { replaceBlocks } from '../../store/actions';
 
 function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 	if ( isLocked ) {
@@ -57,12 +57,20 @@ export default compose(
 	connect(
 		( state, { enabledBlockTypes } ) => ( {
 			items: getFrecentInserterItems( state, enabledBlockTypes, 4 ),
-		} ),
-		( dispatch, { uid, layout } ) => ( {
-			onInsert( { name, initialAttributes } ) {
-				const block = createBlock( name, { ...initialAttributes, layout } );
-				return dispatch( replaceBlocks( uid, block ) );
-			},
 		} )
 	),
+	withDispatch( ( dispatch, ownProps ) => {
+		const { uid, rootUID, layout } = ownProps;
+
+		return {
+			onInsert( { name, initialAttributes } ) {
+				const block = createBlock( name, { ...initialAttributes, layout } );
+				if ( uid ) {
+					dispatch( 'core/editor' ).replaceBlocks( uid, block );
+				} else {
+					dispatch( 'core/editor' ).insertBlock( block, undefined, rootUID );
+				}
+			},
+		};
+	} ),
 )( InserterWithShortcuts );
