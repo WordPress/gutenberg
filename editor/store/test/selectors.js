@@ -2602,7 +2602,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isFetchingReusableBlock', () => {
-		it( 'should return false when the block is not being saved', () => {
+		it( 'should return false when the block is not being fetched', () => {
 			const state = {
 				reusableBlocks: {
 					isFetching: {},
@@ -2613,7 +2613,7 @@ describe( 'selectors', () => {
 			expect( isFetching ).toBe( false );
 		} );
 
-		it( 'should return true when the block is being saved', () => {
+		it( 'should return true when the block is being fetched', () => {
 			const state = {
 				reusableBlocks: {
 					isFetching: {
