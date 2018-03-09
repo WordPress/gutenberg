@@ -151,6 +151,15 @@ input[type="search"].editor-inserter__search {
 	.components-tab-panel__tab-content {
 		overflow: auto;
 
+		&:focus {
+			outline: 1px solid $blue-medium-500;
+			outline-offset: -1px;
+
+			&:active {
+				outline: none;
+			}
+		}
+
 		@include break-medium {
 			height: $block-inserter-content-height;
 		}
