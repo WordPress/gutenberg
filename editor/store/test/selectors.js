@@ -2380,7 +2380,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUid: {
+							carrot: { name: 'core/test-block' },
+						},
 						blockOrder: {},
 						edits: {},
 					},
@@ -2388,11 +2390,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				reusableBlocks: {
 					data: {
-						123: {
-							id: 123,
-							title: 'My reusable block',
-							type: 'core/test-block',
-						},
+						123: { uid: 'carrot', title: 'My reusable block' },
 					},
 				},
 			};
@@ -2434,14 +2432,19 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
+						blocksByUid: {
+							carrot: { name: 'core/test-block' },
+						},
 						blockOrder: [],
+						edits: {},
 					},
 				},
 				reusableBlocks: {
 					data: {
-						123: { id: 123, type: 'core/test-block' },
+						123: { uid: 'carrot' },
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getFrecentInserterItems( state, true, 3 ) ).toMatchObject( [
@@ -2629,33 +2632,20 @@ describe( 'selectors', () => {
 
 	describe( 'getReusableBlocks', () => {
 		it( 'should return an array of reusable blocks', () => {
-			const reusableBlock1 = {
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-			const reusableBlock2 = {
-				id: '687e1a87-cca1-41f2-a782-197ddaea9abf',
-				name: 'My neat block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Goodbye!',
-				},
-			};
 			const state = {
 				reusableBlocks: {
 					data: {
-						[ reusableBlock1.id ]: reusableBlock1,
-						[ reusableBlock2.id ]: reusableBlock2,
+						123: { uid: 'carrot' },
+						reusable1: { uid: 'broccoli' },
 					},
 				},
 			};
 
 			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [ reusableBlock1, reusableBlock2 ] );
+			expect( reusableBlocks ).toEqual( [
+				{ id: 123, isTemporary: false, uid: 'carrot' },
+				{ id: 'reusable1', isTemporary: true, uid: 'broccoli' },
+			] );
 		} );
 
 		it( 'should return an empty array when no reusable blocks exist', () => {
