@@ -47,7 +47,6 @@ import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import { createInnerBlockList } from './utils';
 import {
-	clearSelectedBlock,
 	editPost,
 	insertBlocks,
 	mergeBlocks,
@@ -608,10 +607,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 
 	onSelect( uid = ownProps.uid, initialPosition ) {
 		dispatch( selectBlock( uid, initialPosition ) );
-	},
-
-	onDeselect() {
-		dispatch( clearSelectedBlock() );
 	},
 
 	onInsertBlocks( blocks, index ) {
