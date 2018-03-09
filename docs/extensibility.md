@@ -137,44 +137,42 @@ This method takes one argument:
 const Fragment = wp.element.Fragment;
 const PluginSidebar = wp.editPost.__experimental.PluginSidebar;
 
-const Component = () => (
+const MyPluginComponent = () => (
 	<Fragment>
-        <PluginSidebar name="first-sidebar-name" title="My Sidebar">
-            <p>Content of the first sidebar</p>
-        </PluginSidebar>
-        <PluginSidebar name="second-sidebar-name" title="My Second Sidebar">
-            <p>Content of the second sidebar</p>
-        </PluginSidebar>
+		<PluginSidebar name="first-sidebar-name" title="My Sidebar">
+			<p>Content of the first sidebar</p>
+		</PluginSidebar>
+		<PluginSidebar name="second-sidebar-name" title="My Second Sidebar">
+			<p>Content of the second sidebar</p>
+		</PluginSidebar>
 	</Fragment>
 );
 
 wp.editPost.__experimental.registerPlugin( {
-    name: 'plugin-name',
-    render: Component,
+	name: 'my-plugin-name',
+	render: MyPluginComponent,
 } );
-```
-
-You can activate the sidebars using the following lines:
-
-```js
-wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/first-sidebar-name' );
-wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/second-sidebar-name' );
 ```
   
 ### Available UI components
 
-The available UI components are found in the global variable `wp.editPost.__experimental`, and are React components.
+The available UI components are found in the global variable `wp.editPost.__experimental`, and are WrordPress components.
 
 #### PluginSidebar
 
 Renders a sidebar when activated.
 ```js
-<PluginSidebar name="sidebar-name" title="Sidebar title">
-    <MySidebar />
+<PluginSidebar name="first-sidebar-name" title="My Sidebar">
+	<p>Content of the first sidebar</p>
 </PluginSidebar>
 ```
 - Props
   - `name`: A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
   - `title`: Title displayed at the top of the sidebar. Must be a string.
   
+You can activate the sidebar using the following statement:
+```js
+wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'my-plugin-name/first-sidebar-name' );
+```
 The contents you render within the `PluginSidebar` will show up as content within the sidebar.
+
