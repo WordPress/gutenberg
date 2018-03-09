@@ -705,7 +705,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 					insertUsage: {
 						...prevState.insertUsage,
 						[ id ]: {
-							time: action.time,
+							time: Date.now(),
 							count: prevState.insertUsage[ id ] ? prevState.insertUsage[ id ].count + 1 : 1,
 							insert,
 						},
