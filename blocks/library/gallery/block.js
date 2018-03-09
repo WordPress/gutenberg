@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { filter } from 'lodash';
+import { filter, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -84,10 +84,7 @@ class GalleryBlock extends Component {
 
 	onSelectImages( images ) {
 		this.props.setAttributes( {
-			images: images.map( ( attributes ) => ( {
-				...attributes,
-				caption: attributes.caption ? [ attributes.caption ] : [],
-			} ) ),
+			images: images.map( ( image ) => pick( image, [ 'alt', 'caption', 'id', 'url' ] ) ),
 		} );
 	}
 

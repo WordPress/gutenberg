@@ -8,6 +8,7 @@ import {
 	isEmpty,
 	map,
 	get,
+	pick,
 } from 'lodash';
 
 /**
@@ -92,11 +93,7 @@ class ImageBlock extends Component {
 	}
 
 	onSelectImage( media ) {
-		const attributes = { url: media.url, alt: media.alt, id: media.id };
-		if ( media.caption ) {
-			attributes.caption = [ media.caption ];
-		}
-		this.props.setAttributes( attributes );
+		this.props.setAttributes( pick( media, [ 'alt', 'id', 'caption', 'url' ] ) );
 	}
 
 	onSetHref( value ) {
