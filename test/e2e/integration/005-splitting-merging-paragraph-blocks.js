@@ -20,7 +20,7 @@ describe( 'Adding nested blocks', () => {
 
 		// Assertion to check for one paragraph block
 		cy.get( '.mce-content-body' ).should( ( $p ) => {
-		expect( $p ).to.have.length( 1 );
+			expect( $p ).to.have.length( 1 );
 		} );
 	} );
 } );
