@@ -2,6 +2,23 @@
 	position: relative;
 	padding: 5px 0;
 
+	.editor-post-title__permalink-button {
+		position: absolute;
+		top: 35px;
+		left: 0px;
+		&:focus {
+			outline: none;
+			box-shadow: none;
+		}
+	}
+
+	.editor-post-permalink {
+		position: absolute;
+		top: -34px;
+		left: 0;
+		right: 0;
+	}
+
 	.editor-post-title__input {
 		display: block;
 		width: 100%;
@@ -12,6 +29,12 @@
 		font-size: 2em;
 		font-family: $editor-font;
 		line-height: $default-line-height;
+
+		// Leave enough room for the permalink button on small screens.
+		margin-left: 20px;
+		@include break-small() {
+			margin-left: 0;
+		}
 
 		// inherited from h1
 		font-weight: 600;
