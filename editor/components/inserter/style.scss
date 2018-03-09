@@ -172,8 +172,6 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__tab {
 	border: none;
 	background: none;
-	//border-bottom: 3px solid transparent;
-	//border-top: 3px solid transparent;
 	font-size: $default-font;
 	padding: #{ 8px + 3px } 8px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	width: 100%;
@@ -186,7 +184,7 @@ input[type="search"].editor-inserter__search {
 	&.is-active {
 		padding-bottom: 8px;
 		font-weight: 600;
-		border-bottom-color: $blue-medium-500;
+		border-bottom: 3px solid $blue-medium-500;
 		position: relative;
 		z-index: z-index( '.editor-inserter__tab.is-active' );
 	}
