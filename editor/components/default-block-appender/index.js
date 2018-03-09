@@ -22,7 +22,15 @@ import { getBlock, getBlockCount } from '../../store/selectors';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 
-export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPrompt, placeholder, layout, rootUID } ) {
+export function DefaultBlockAppender( {
+	isLocked,
+	isVisible,
+	onAppend,
+	showPrompt,
+	placeholder,
+	layout,
+	rootUID,
+} ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
@@ -30,7 +38,9 @@ export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPromp
 	const value = placeholder || __( 'Write your story' );
 
 	return (
-		<div className="editor-default-block-appender">
+		<div
+			data-root-uid={ rootUID || '' }
+			className="editor-default-block-appender">
 			<BlockDropZone />
 			<input
 				className="editor-default-block-appender__content"

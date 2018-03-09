@@ -4,18 +4,14 @@ describe( 'Adding blocks', () => {
 	} );
 
 	it( 'Should insert content using the placeholder and the regular inserter', () => {
-		const lastBlockSelector = '.editor-block-list__block-edit:last';
+		// Default block appender is provisional
+		cy.get( '.editor-default-block-appender' ).click();
+		cy.get( '.editor-post-title__input' ).click();
+		cy.get( '[data-type="core/paragraph"]' ).should( 'have.length', 0 );
 
 		// Using the placeholder
 		cy.get( '.editor-default-block-appender' ).click();
 		cy.focused().type( 'Paragraph block' );
-
-		// Default block appender is provisional
-		cy.get( lastBlockSelector ).then( ( firstBlock ) => {
-			cy.get( '.editor-default-block-appender' ).click();
-			cy.get( '.editor-post-title__input' ).click();
-			cy.get( lastBlockSelector ).should( 'have.text', firstBlock.text() );
-		} );
 
 		// Using the slash command
 		// TODO: Test omitted because Cypress doesn't update the selection
