@@ -2,13 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { getDefaultBlockName } from '@wordpress/blocks';
 import { withContext } from '@wordpress/components';
 
 /**
@@ -50,10 +51,10 @@ export default compose(
 		( state, ownProps ) => {
 			const isEmpty = ! getBlockCount( state, ownProps.rootUID );
 			const lastBlock = getBlock( state, ownProps.lastBlockUID );
-			const isLastBlockEmptyDefault = lastBlock && isUnmodifiedDefaultBlock( lastBlock );
+			const isLastBlockDefault = get( lastBlock, 'name' ) === getDefaultBlockName();
 
 			return {
-				isVisible: isEmpty || ! isLastBlockEmptyDefault,
+				isVisible: isEmpty || ! isLastBlockDefault,
 				showPrompt: isEmpty,
 			};
 		},
