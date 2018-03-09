@@ -1,25 +1,18 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton, withFocusReturn } from '@wordpress/components';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
 import { getSidebarSettings } from '../../api/sidebar';
-import { getActivePlugin } from '../../store/selectors';
-import { closeGeneralSidebar } from '../../store/actions';
 
-function PluginsPanel( { onClose, plugin } ) {
-	const pluginSidebar = getSidebarSettings( plugin );
-
+function PluginsPanel( { onClose, pluginSidebar } ) {
 	if ( ! pluginSidebar ) {
 		return null;
 	}
@@ -50,14 +43,12 @@ function PluginsPanel( { onClose, plugin } ) {
 	);
 }
 
-export default connect(
-	( state ) => {
-		return {
-			plugin: getActivePlugin( state ),
-		};
-	}, {
-		onClose: closeGeneralSidebar,
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
-)( withFocusReturn( PluginsPanel ) );
+export default compose(
+	withSelect( ( select ) => ( {
+		pluginSidebar: getSidebarSettings( select( 'core/edit-post' ).getActiveGeneralSidebarName() ),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		onClose: dispatch( 'core/edit-post' ).closeGeneralSidebar,
+	} ) ),
+	withFocusReturn,
+)( PluginsPanel );
