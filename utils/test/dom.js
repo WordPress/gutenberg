@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isHorizontalEdge, placeCaretAtHorizontalEdge, isInputField } from '../dom';
+import { isHorizontalEdge, placeCaretAtHorizontalEdge, isTextField } from '../dom';
 
 describe( 'DOM', () => {
 	let parent;
@@ -92,13 +92,53 @@ describe( 'DOM', () => {
 		} );
 	} );
 
-	describe( 'isInputfield', () => {
-		it( 'should return true for an input element', () => {
-			expect( isInputField( document.createElement( 'input' ) ) ).toBe( true );
+	describe( 'isTextField', () => {
+		/**
+		 * A sampling of input types expected not to be text eligible.
+		 *
+		 * @type {string[]}
+		 */
+		const NON_TEXT_INPUT_TYPES = [
+			'button',
+			'checkbox',
+			'image',
+			'hidden',
+			'radio',
+			'submit',
+		];
+
+		/**
+		 * A sampling of input types expected to be text eligible.
+		 *
+		 * @type {string[]}
+		 */
+		const TEXT_INPUT_TYPES = [
+			'text',
+			'password',
+			'search',
+			'url',
+		];
+
+		it( 'should return false for non-text input elements', () => {
+			NON_TEXT_INPUT_TYPES.forEach( ( type ) => {
+				const input = document.createElement( 'input' );
+				input.type = type;
+
+				expect( isTextField( input ) ).toBe( false );
+			} );
+		} );
+
+		it( 'should return true for text input elements', () => {
+			TEXT_INPUT_TYPES.forEach( ( type ) => {
+				const input = document.createElement( 'input' );
+				input.type = type;
+
+				expect( isTextField( input ) ).toBe( true );
+			} );
 		} );
 
 		it( 'should return true for an textarea element', () => {
-			expect( isInputField( document.createElement( 'textarea' ) ) ).toBe( true );
+			expect( isTextField( document.createElement( 'textarea' ) ) ).toBe( true );
 		} );
 
 		it( 'should return true for a contenteditable element', () => {
@@ -106,11 +146,11 @@ describe( 'DOM', () => {
 
 			div.contentEditable = 'true';
 
-			expect( isInputField( div ) ).toBe( true );
+			expect( isTextField( div ) ).toBe( true );
 		} );
 
 		it( 'should return true for a normal div element', () => {
-			expect( isInputField( document.createElement( 'div' ) ) ).toBe( false );
+			expect( isTextField( document.createElement( 'div' ) ) ).toBe( false );
 		} );
 	} );
 } );
