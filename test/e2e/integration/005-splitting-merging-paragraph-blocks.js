@@ -1,4 +1,4 @@
-describe( 'Adding nested blocks', () => {
+describe( 'Splitting and merging paragraph blocks', () => {
 	before( () => {
 		cy.newPost();
 	} );
