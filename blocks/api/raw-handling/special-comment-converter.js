@@ -55,8 +55,7 @@ export default function( node ) {
 	while ( parent.nodeName !== 'BODY' ) {
 		parent = parent.parentNode;
 	}
-	parent.appendChild( more );
-	node.parentNode.removeChild( node );
+	replace( node, more );
 }
 
 function createMore( customText, noTeaser ) {
@@ -70,4 +69,17 @@ function createMore( customText, noTeaser ) {
 		node.dataset.noTeaser = '';
 	}
 	return node;
+}
+
+function replace( processedNode, newNode ) {
+	insertAfter( newNode, processedNode.parentNode );
+	remove( processedNode );
+}
+
+function remove( node ) {
+	node.parentNode.removeChild( node );
+}
+
+function insertAfter( newNode, referenceNode ) {
+	referenceNode.parentNode.insertBefore( newNode, referenceNode.nextSibling );
 }
