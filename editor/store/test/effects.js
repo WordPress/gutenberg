@@ -249,11 +249,14 @@ describe( 'effects', () => {
 
 			expect( dispatch ).toHaveBeenCalledTimes( 2 );
 			// expect( dispatch ).toHaveBeenCalledWith( focusBlock( 'chicken', { offset: -1 } ) );
-			expect( dispatch ).toHaveBeenCalledWith( replaceBlocks( [ 'chicken', 'ribs' ], [ {
-				uid: 'chicken',
-				name: 'core/test-block',
-				attributes: { content: 'chicken ribs' },
-			} ] ) );
+			expect( dispatch ).toHaveBeenCalledWith( {
+				...replaceBlocks( [ 'chicken', 'ribs' ], [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: { content: 'chicken ribs' },
+				} ] ),
+				time: expect.any( Number ),
+			} );
 		} );
 	} );
 
@@ -847,12 +850,13 @@ describe( 'effects', () => {
 
 				handler( convertBlockToStatic( staticBlock.uid ), store );
 
-				expect( dispatch ).toHaveBeenCalledWith(
-					replaceBlocks(
+				expect( dispatch ).toHaveBeenCalledWith( {
+					...replaceBlocks(
 						[ staticBlock.uid ],
 						createBlock( reusableBlock.type, reusableBlock.attributes )
-					)
-				);
+					),
+					time: expect.any( Number ),
+				} );
 			} );
 		} );
 
