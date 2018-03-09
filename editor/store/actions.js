@@ -175,7 +175,6 @@ export function replaceBlocks( uids, blocks ) {
 		type: 'REPLACE_BLOCKS',
 		uids: castArray( uids ),
 		blocks: castArray( blocks ),
-		time: Date.now(),
 	};
 }
 
@@ -222,7 +221,6 @@ export function insertBlocks( blocks, index, rootUID ) {
 		blocks: castArray( blocks ),
 		index,
 		rootUID,
-		time: Date.now(),
 	};
 }
 
