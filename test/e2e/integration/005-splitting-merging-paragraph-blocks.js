@@ -4,11 +4,9 @@ describe( 'Splitting and merging paragraph blocks', () => {
 	} );
 
 	it( 'Should split and merge paragraph blocks using Enter and Backspace', () => {
-		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
-
 		// Insert paragraph block and split using Enter
 		cy.get( '.editor-default-block-appender' ).click();
-		cy.get( lastBlockSelector ).type( '{enter}' );
+		cy.get( '.mce-content-body' ).type( '{enter}' );
 
 		// Assertion to check for two paragraph blocks
 		cy.get( '.mce-content-body' ).should( ( $p ) => {
@@ -16,7 +14,7 @@ describe( 'Splitting and merging paragraph blocks', () => {
 		} );
 
 		// Merge second paragraph block back into first using Backspace
-		cy.get( lastBlockSelector ).type( '{backspace}' );
+		cy.get( '.mce-content-body:first' ).type( '{backspace}' );
 
 		// Assertion to check for one paragraph block
 		cy.get( '.mce-content-body' ).should( ( $p ) => {
