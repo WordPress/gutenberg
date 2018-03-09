@@ -10,7 +10,6 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withContext, withFocusOutside } from '@wordpress/components';
 
@@ -97,11 +96,11 @@ const applyWithSelect = withSelect( ( select ) => {
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { insertBlock, editPost, clearSelectedBlock } = dispatch( 'core/editor' );
+	const { insertDefaultBlock, editPost, clearSelectedBlock } = dispatch( 'core/editor' );
 
 	return {
 		onEnterPress() {
-			insertBlock( createBlock( getDefaultBlockName() ), 0 );
+			insertDefaultBlock( undefined, undefined, 0 );
 		},
 		onUpdate( title ) {
 			editPost( { title } );
