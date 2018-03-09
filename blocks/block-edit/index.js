@@ -53,7 +53,7 @@ export class BlockEdit extends Component {
 
 		// `edit` and `save` are functions or components describing the markup
 		// with which a block is displayed. If `blockType` is valid, assign
-		// them preferencially as the render value for the block.
+		// them preferentially as the render value for the block.
 		const Edit = blockType.edit || blockType.save;
 
 		// For backwards compatibility concerns adds a focus and setFocus prop
