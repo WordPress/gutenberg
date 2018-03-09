@@ -507,6 +507,7 @@ export default {
 			} )
 		) );
 
+		// Re-add the original block to the store, since replaceBlock() will have removed it
 		dispatch( receiveBlocks( [ parsedBlock ] ) );
 	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
