@@ -384,8 +384,8 @@ export default {
 		}
 
 		const { id } = action;
-		const { getState, dispatch } = store;
-		const state = getState();
+		const { dispatch } = store;
+		const state = store.getState();
 
 		const { uid, title, isTemporary } = getReusableBlock( state, id );
 		const { name, attributes, innerBlocks } = getBlock( state, uid );
