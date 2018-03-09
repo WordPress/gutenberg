@@ -479,7 +479,8 @@ export default {
 		const state = store.getState();
 		const oldBlock = getBlock( state, action.uid );
 		const reusableBlock = getReusableBlock( state, oldBlock.attributes.ref );
-		const newBlock = getBlock( state, reusableBlock.uid );
+		const referencedBlock = getBlock( state, reusableBlock.uid );
+		const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
 		store.dispatch( replaceBlock( oldBlock.uid, newBlock ) );
 	},
 	CONVERT_BLOCK_TO_REUSABLE( action, store ) {
