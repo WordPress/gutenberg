@@ -20,6 +20,10 @@
 		padding-right: calc( 50% - #{ $text-editor-max-width / 2 } );
 	}
 
+	* {
+		box-sizing: border-box;
+	}
+
 	.edit-post-post-text-editor__toolbar {
 		width: 100%;
 		max-width: $text-editor-max-width;

@@ -56,10 +56,6 @@
 @include editor-left('.components-notice-list');
 @include editor-right('.components-notice-list');
 
-.edit-post-layout__editor * {
-	box-sizing: border-box;
-}
-
 .edit-post-layout__metaboxes:not(:empty) {
 	border-top: 1px solid $light-gray-500;
 	margin-top: 10px;
