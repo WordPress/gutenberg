@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { some } from 'lodash';
+import { includes, some } from 'lodash';
 
 /**
  * Internal dependencies
@@ -29,7 +29,7 @@ export function getEditorMode( state ) {
 export function isEditorSidebarOpened( state ) {
 	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
 
-	return [ 'edit-post/document', 'edit-post/block' ].includes( activeGeneralSidebar );
+	return includes( [ 'edit-post/document', 'edit-post/block' ], activeGeneralSidebar );
 }
 
 /**
