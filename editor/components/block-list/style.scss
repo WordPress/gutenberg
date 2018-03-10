@@ -95,33 +95,33 @@
 	}
 
 	// simpler style for a block that has cursor focus (but hasn't been selected)
-	&.is-selected > .editor-block-mover:before,
-	&.is-hovered > .editor-block-mover:before,
-	&.is-selected > .editor-block-settings-menu:before,
-	&.is-hovered > .editor-block-settings-menu:before {
+	&.is-selected > .editor-block-list__drag-handle > .editor-block-mover:before,
+	&.is-hovered > .editor-block-list__drag-handle > .editor-block-mover:before,
+	&.is-selected > .editor-block-list__drag-handle > .editor-block-settings-menu:before,
+	&.is-hovered > .editor-block-list__drag-handle > .editor-block-settings-menu:before {
 		content: '';
 		position: absolute;
 		height: 36px;
 		top: 10px;
 	}
 
-	&.is-selected > .editor-block-mover:before,
-	&.is-hovered > .editor-block-mover:before {
+	&.is-selected > .editor-block-list__drag-handle > .editor-block-mover:before,
+	&.is-hovered > .editor-block-list__drag-handle > .editor-block-mover:before {
 		border-right: 1px solid $light-gray-500;
 		right: 6px;
 	}
 
-	&.is-reusable.is-selected > .editor-block-mover:before {
+	&.is-reusable.is-selected > .editor-block-list__drag-handle > .editor-block-mover:before {
 		border-right: none;
 	}
 
-	&.is-selected > .editor-block-settings-menu:before,
-	&.is-hovered > .editor-block-settings-menu:before {
+	&.is-selected > .editor-block-list__drag-handle > .editor-block-settings-menu:before,
+	&.is-hovered > .editor-block-list__drag-handle > .editor-block-settings-menu:before {
 		border-left: 1px solid $light-gray-500;
 		left: 6px;
 	}
 
-	&.is-reusable.is-selected > .editor-block-settings-menu:before {
+	&.is-reusable.is-selected > .editor-block-list__drag-handle > .editor-block-settings-menu:before {
 		border-left: none;
 	}
 
@@ -326,8 +326,8 @@
 	}
 
 	// Left and right side UI
-	> .editor-block-settings-menu,
-	> .editor-block-mover {
+	> .editor-block-list__drag-handle > .editor-block-settings-menu,
+	> .editor-block-list__drag-handle > .editor-block-mover {
 		position: absolute;
 		top: 0;
 		padding: 0;
@@ -338,7 +338,7 @@
 	}
 
 	// Right side UI
-	> .editor-block-settings-menu {
+	> .editor-block-list__drag-handle > .editor-block-settings-menu {
 		right: $block-mover-margin;
 		padding-top: 2px;
 
@@ -351,7 +351,7 @@
 	}
 
 	// Left side UI
-	> .editor-block-mover {
+	> .editor-block-list__drag-handle > .editor-block-mover {
 		left: $block-mover-margin + 2px;
 		padding-top: 6px;
 		z-index: z-index( '.editor-block-mover' );

@@ -26,9 +26,6 @@ function BlockSettingsMenu( {
 	onSelect,
 	focus,
 	renderBlockMenu = ( { children } ) => children,
-	draggable,
-	onDragStart,
-	onDragEnd,
 } ) {
 	const count = uids.length;
 
@@ -37,9 +34,6 @@ function BlockSettingsMenu( {
 			className="editor-block-settings-menu"
 			contentClassName="editor-block-settings-menu__popover"
 			position="bottom left"
-			draggable={ draggable }
-			onDragStart={ onDragStart }
-			onDragEnd={ onDragEnd }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
 					'is-opened': isOpen,
@@ -47,9 +41,6 @@ function BlockSettingsMenu( {
 
 				return (
 					<IconButton
-						draggable={ draggable }
-						onDragStart={ onDragStart }
-						onDragEnd={ onDragEnd }
 						className={ toggleClassname }
 						onClick={ () => {
 							if ( uids.length === 1 ) {

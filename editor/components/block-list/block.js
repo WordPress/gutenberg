@@ -546,6 +546,7 @@ export class BlockListBlock extends Component {
 		const blockDragInsetClassName = classnames( 'editor-block-list__block-drag-inset', {
 			'is-visible': dragging,
 		} );
+		const blockDragHandleClassName = 'editor-block-list__drag-handle';
 
 		const { onMouseLeave, onReplace } = this.props;
 
@@ -598,21 +599,29 @@ export class BlockListBlock extends Component {
 					onDrop={ this.reorderBlock }
 				/>
 				{ shouldShowMovers && (
-					<BlockMover
-						uids={ [ block.uid ] }
-						rootUID={ rootUID }
-						layout={ layout }
-						isFirst={ isFirst }
-						isLast={ isLast }
+					<div
 						{ ...reorderWithDraggingProps }
-					/>
+						className={ blockDragHandleClassName }
+					>
+						<BlockMover
+							uids={ [ block.uid ] }
+							rootUID={ rootUID }
+							layout={ layout }
+							isFirst={ isFirst }
+							isLast={ isLast }
+						/>
+					</div>
 				) }
 				{ shouldShowSettingsMenu && (
-					<BlockSettingsMenu
-						uids={ [ block.uid ] }
-						renderBlockMenu={ renderBlockMenu }
+					<div
 						{ ...reorderWithDraggingProps }
-					/>
+						className={ blockDragHandleClassName }
+					>
+						<BlockSettingsMenu
+							uids={ [ block.uid ] }
+							renderBlockMenu={ renderBlockMenu }
+						/>
+					</div>
 				) }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }

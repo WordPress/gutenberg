@@ -65,9 +65,6 @@ class Dropdown extends Component {
 			className,
 			contentClassName,
 			expandOnMobile,
-			draggable,
-			onDragStart,
-			onDragEnd,
 		} = this.props;
 
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
@@ -76,9 +73,6 @@ class Dropdown extends Component {
 			<div
 				className={ className }
 				ref={ this.bindContainer }
-				draggable={ draggable }
-				onDragStart={ onDragStart }
-				onDragEnd={ onDragEnd }
 			>
 				{ /**
 				   * This seemingly redundant wrapper node avoids root return
