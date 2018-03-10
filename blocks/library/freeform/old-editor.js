@@ -109,6 +109,24 @@ export default class OldEditor extends Component {
 				editor.dom.toggleClass( ref, 'has-advanced-toolbar', active );
 			},
 		} );
+
+		// To do: get TinyMCE to add a setting to the inline theme to always
+		// display toolbars. In the meantime, force display with CSS and force
+		// the creation of toolbars by manually focussing the editor on
+		// initialisation.
+		editor.on( 'init', () => {
+			const { activeElement } = document;
+
+			// Force fire focus, even if the editor already has focus.
+			editor.fire( 'focus' );
+
+			// Set focus back to where it was, unless it was this editor.
+			// This should only be true during page load, where the active
+			// element will be the document.
+			if ( activeElement !== editor.getBody() ) {
+				activeElement.focus();
+			}
+		} );
 	}
 
 	render() {

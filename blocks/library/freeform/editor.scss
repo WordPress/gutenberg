@@ -129,12 +129,15 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
     padding-top: 0;
 }
 
-// freeform toolbar
 .freeform-toolbar {
 	width: auto;
 	margin: - $block-padding;
 	margin-bottom: $block-padding;
-	// TinyMCE hides on blur with inline styles.
+}
+
+// TinyMCE hides on blur with inline styles.
+.freeform-toolbar,
+.freeform-toolbar .mce-tinymce-inline {
 	display: block !important;
 }
 
