@@ -15,7 +15,6 @@ import { KeyboardShortcuts, withContext } from '@wordpress/components';
  */
 import { getBlockOrder, getMultiSelectedBlockUids } from '../../store/selectors';
 import {
-	clearSelectedBlock,
 	multiSelect,
 	redo,
 	undo,
@@ -74,7 +73,6 @@ class EditorGlobalKeyboardShortcuts extends Component {
 						'mod+shift+z': this.undoOrRedo,
 						backspace: this.deleteSelectedBlocks,
 						del: this.deleteSelectedBlocks,
-						escape: this.props.clearSelectedBlock,
 					} }
 				/>
 				<KeyboardShortcuts
@@ -97,7 +95,6 @@ export default compose(
 			};
 		},
 		{
-			clearSelectedBlock,
 			onMultiSelect: multiSelect,
 			onRedo: redo,
 			onUndo: undo,
