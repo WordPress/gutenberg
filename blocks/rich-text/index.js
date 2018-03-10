@@ -21,7 +21,7 @@ import 'element-closest';
  * WordPress dependencies
  */
 import { createElement, Component, renderToString } from '@wordpress/element';
-import { keycodes, createBlobURL, isHorizontalEdge, getClientRectFromRange } from '@wordpress/utils';
+import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange } from '@wordpress/utils';
 import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
 
 /**
@@ -417,7 +417,7 @@ export class RichText extends Component {
 	 * @return {{top: number, left: number}} The desired position of the toolbar.
 	 */
 	getFocusPosition() {
-		const position = getClientRectFromRange( this.editor.selection.getRng() );
+		const position = getRectangleFromRange( this.editor.selection.getRng() );
 
 		// Find the parent "relative" or "absolute" positioned container
 		const findRelativeParent = ( node ) => {

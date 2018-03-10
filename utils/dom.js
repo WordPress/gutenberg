@@ -7,7 +7,7 @@ import tinymce from 'tinymce';
 /**
  * Browser dependencies
  */
-const { getComputedStyle } = window;
+const { getComputedStyle, DOMRect } = window;
 const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
@@ -114,7 +114,7 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 		return false;
 	}
 
-	const rangeRect = getClientRectFromRange( range );
+	const rangeRect = getRectangleFromRange( range );
 
 	if ( ! rangeRect ) {
 		return false;
@@ -143,22 +143,28 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
  *
  * @return {DOMRect} The rectangle.
  */
-export function getClientRectFromRange( range ) {
-	// For uncollapsed ranges `getBoundingClientRect` works as expected. It is
-	// the sum of `getClientRects`.
+export function getRectangleFromRange( range ) {
+	// For uncollapsed ranges, get the rectangle that bounds the contents of the
+	// range; this a rectangle enclosing the union of the bounding rectangles
+	// for all the elements in the range.
 	if ( ! range.collapsed ) {
 		return range.getBoundingClientRect();
 	}
 
-	// If the collapsed ranged starts (and therefore ends) at an element node,
-	// use `getBoundingClientRect` on that element node. `getClientRects` will
-	// return empty.
+	// If the collapsed range starts (and therefore ends) at an element node,
+	// `getClientRects` will return undefined. To fix this we can get the
+	// bounding rectangle of the element node to create a DOMRect based on that.
 	if ( range.startContainer.nodeType === ELEMENT_NODE ) {
-		return range.startContainer.getBoundingClientRect();
+		const { x, y, height } = range.startContainer.getBoundingClientRect();
+
+		// Create a new DOMRect with zero width.
+		return new DOMRect( x, y, 0, height );
 	}
 
-	// For normal collapsed ranges, the trick is to use the first (and only)
-	// untouched client rect from `getClientRects`.
+	// For normal collapsed ranges (exception above), the bounding rectangle of
+	// the range may be inaccurate in some browsers. There will only be one
+	// rectangle since it is a collapsed range, so it is safe to pass this as
+	// the union of them. This works consistently in all browsers.
 	return first( range.getClientRects() );
 }
 
@@ -181,7 +187,7 @@ export function computeCaretRect( container ) {
 		return;
 	}
 
-	return getClientRectFromRange( range );
+	return getRectangleFromRange( range );
 }
 
 /**

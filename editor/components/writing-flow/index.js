@@ -74,7 +74,7 @@ class WritingFlow extends Component {
 		/**
 		 * Here a rectangle is stored while moving the caret vertically so
 		 * vertical position of the start position can be restored.
-		 * This is to recreate browser behaviour.
+		 * This is to recreate browser behaviour across blocks.
 		 *
 		 * @type {?DOMRect}
 		 */
