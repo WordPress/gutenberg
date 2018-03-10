@@ -74,12 +74,7 @@ const withDragging = ( OriginalComponent ) => {
 		 *  - Adds dragover listener.
 		 * @param  {Object} event					The non-custom DragEvent.
 		 * @param  {string} elementId				The HTML id of the element to be dragged.
-		 * @param  {Object} transferData			The data to be set to event's dataTransfer and will be made accessible in any later drop logic.
-		 * @param  {string} transferData.rootUID	A unique identifier of the element's root.
-		 * @param  {string} transferData.uid		A unique identifier of the element to be dragged.
-		 * @param  {number} transferData.order		The current index of the element to be dragged.
-		 * @param  {string} transferData.type		A unique constant identifying the type of dragging operation.
-		 * @param  {string} transferData.layout		A layout identifier used to distinguish nested elements.
+		 * @param  {Object} transferData			The data to be set to the event's dataTransfer - to be accessible in any later drop logic.
 		 */
 		onDragStart( event, elementId, transferData ) {
 			const element = document.getElementById( elementId );

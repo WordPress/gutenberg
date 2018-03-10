@@ -121,7 +121,6 @@ export class BlockListBlock extends Component {
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.setDraggingState = this.setDraggingState.bind( this );
 
 		this.previousOffset = null;
 		this.hadTouchStart = false;
@@ -438,10 +437,6 @@ export class BlockListBlock extends Component {
 
 	onBlockError( error ) {
 		this.setState( { error } );
-	}
-
-	setDraggingState( dragging ) {
-		this.setState( { dragging } );
 	}
 
 	onDragStart( event ) {

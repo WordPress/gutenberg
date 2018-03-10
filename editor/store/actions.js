@@ -181,10 +181,12 @@ export function replaceBlock( uid, block ) {
 }
 
 /**
- * @todo :clk:doc
- * @param  {[type]} rootUID	[description]
- * @param  {[type]} uid		[description]
- * @param  {[type]} index	[description]
+ * Returns an aciton object signalling that an indexed block should be moved
+ * to a new index.
+ *
+ * @param  {?string} rootUID	Optional root UID (parent's UID) associated with a block.
+ * @param  {?string} uid		The UID of the block.
+ * @param  {number} index	The index to move the block to.
  *
  * @return {Object} Action object.
  */

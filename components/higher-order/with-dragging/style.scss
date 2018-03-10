@@ -1,3 +1,8 @@
+body.dragging {
+	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: grabbing !important;
+}
+
 .components-with-dragging__invisible-drag-image {
 	position: fixed;
 	left: -1000px;

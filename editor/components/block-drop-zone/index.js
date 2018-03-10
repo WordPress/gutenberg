@@ -54,25 +54,29 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 	};
 
 	const reorderBlock = ( event, position ) => {
-		if ( index !== undefined && event.dataTransfer ) {
-			try {
-				const { rootUID, uid, fromIndex, type, layout } = JSON.parse( event.dataTransfer.getData( 'text' ) );
+		if ( index === undefined || ! event.dataTransfer ) {
+			return;
+		}
 
-				if ( type !== 'block' || layout !== props.layout ) {
-					props.onDrop( event, null, null, null );
-					return;
-				}
+		let rootUID, uid, fromIndex, type, layout;
 
-				if ( position.y === 'top' && index > fromIndex ) {
-					props.onDrop( event, rootUID, uid, index - 1 );
-				} else if ( position.y === 'bottom' && index < fromIndex ) {
-					props.onDrop( event, rootUID, uid, index + 1 );
-				} else {
-					props.onDrop( event, rootUID, uid, index );
-				}
-			} catch ( err ) {
-				// console.log( err );
-			}
+		try {
+			( { rootUID, uid, fromIndex, type, layout } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
+		} catch ( err ) {
+			return;
+		}
+
+		if ( type !== 'block' || layout !== props.layout ) {
+			props.onDrop( event, null, null, null );
+			return;
+		}
+
+		if ( position.y === 'top' && index > fromIndex ) {
+			props.onDrop( event, rootUID, uid, index - 1 );
+		} else if ( position.y === 'bottom' && index < fromIndex ) {
+			props.onDrop( event, rootUID, uid, index + 1 );
+		} else {
+			props.onDrop( event, rootUID, uid, index );
 		}
 	};
 
