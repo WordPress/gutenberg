@@ -165,12 +165,6 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	// shouldComponentUpdate(nextProps, nextState) {
-	// 	console.log(`next: ${nextState.dragging}` );
-	// 	console.log(`previous: ${this.state.dragging}`);
-	// 	return true;
-	// }
-
 	componentDidUpdate( prevProps ) {
 		// Preserve scroll prosition when block rearranged
 		if ( this.previousOffset ) {
