@@ -30,7 +30,6 @@ import { addQueryArgs } from '@wordpress/url';
  */
 const MAX_RECENT_BLOCKS = 8;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
-export const BLOCK_REORDER = 'BLOCK_REORDER';
 
 /**
  * Shared reference to an empty array used as the default block order return

@@ -68,7 +68,6 @@ import {
 	isTyping,
 	getBlockMode,
 	getCurrentPostType,
-	BLOCK_REORDER,
 } from '../../store/selectors';
 
 const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
@@ -450,7 +449,7 @@ export class BlockListBlock extends Component {
 			rootUID: this.props.rootUID,
 			uid: this.props.uid,
 			fromIndex: this.props.order,
-			type: BLOCK_REORDER,
+			type: 'block',
 			layout: this.props.layout,
 		};
 

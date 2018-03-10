@@ -15,7 +15,6 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import { insertBlocks, updateBlockAttributes } from '../../store/actions';
-import { BLOCK_REORDER } from '../../store/selectors';
 
 function BlockDropZone( { index, isLocked, ...props } ) {
 	if ( isLocked ) {
@@ -59,7 +58,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 			try {
 				const { rootUID, uid, fromIndex, type, layout } = JSON.parse( event.dataTransfer.getData( 'text' ) );
 
-				if ( type !== BLOCK_REORDER || layout !== props.layout ) {
+				if ( type !== 'block' || layout !== props.layout ) {
 					props.onDrop( event, null, null, null );
 					return;
 				}
