@@ -130,15 +130,17 @@ export function registerSelectors( reducerKey, newSelectors ) {
  */
 export function registerResolvers( reducerKey, newResolvers ) {
 	const createResolver = ( selector, key ) => {
-		let resolver = get( newResolvers, [ key, 'fulfill' ] );
-		if ( resolver ) {
-			resolver = memize( resolver );
+		// Don't modify selector behavior if no resolver exists.
+		let fulfill = get( newResolvers, [ key, 'fulfill' ] );
+		if ( typeof fulfill !== 'function' ) {
+			return selector;
 		}
-		return ( ...args ) => {
-			if ( resolver ) {
-				resolver( ...args );
-			}
 
+		// Ensure single invocation per argument set via memoization.
+		fulfill = memize( fulfill );
+
+		return ( ...args ) => {
+			fulfill( ...args );
 			return selector( ...args );
 		};
 	};

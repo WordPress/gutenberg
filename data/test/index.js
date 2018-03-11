@@ -15,6 +15,7 @@ import {
 	registerStore,
 	registerReducer,
 	registerSelectors,
+	registerResolvers,
 	registerActions,
 	dispatch,
 	select,
@@ -70,6 +71,48 @@ describe( 'registerReducer', () => {
 
 		const store2 = registerReducer( 'red2', reducer2 );
 		expect( store2.getState() ).toEqual( 'ribs' );
+	} );
+} );
+
+describe( 'registerResolvers', () => {
+	it( 'should not do anything for selectors which do not have resolvers', () => {
+		registerReducer( 'demo', ( state = 'OK' ) => state );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {} );
+
+		expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+	} );
+
+	it( 'should not do anything if registered without fulfill', () => {
+		registerReducer( 'demo', ( state = 'OK' ) => state );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: {},
+		} );
+
+		expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+	} );
+
+	it( 'should behave as a side effect for the given selector, with arguments', () => {
+		const resolver = jest.fn();
+
+		registerReducer( 'demo', ( state = 'OK' ) => state );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: {
+				fulfill: resolver,
+			},
+		} );
+
+		const value = select( 'demo' ).getValue( 'arg1', 'arg2' );
+		expect( resolver ).toHaveBeenCalledWith( 'arg1', 'arg2' );
+		expect( value ).toBe( 'OK' );
 	} );
 } );
 
