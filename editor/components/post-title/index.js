@@ -9,7 +9,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withContext, withFocusOutside } from '@wordpress/components';
 
@@ -76,8 +76,8 @@ class PostTitle extends Component {
 					className="editor-post-title__input"
 					value={ title }
 					onChange={ this.onChange }
-					placeholder={ placeholder || __( 'Add title' ) }
-					aria-label={ placeholder || __( 'Add title' ) }
+					placeholder={ decodeEntities( placeholder ) || __( 'Add title' ) }
+					aria-label={ decodeEntities( placeholder ) || __( 'Add title' ) }
 					onFocus={ this.onSelect }
 					onKeyDown={ this.onKeyDown }
 					onKeyPress={ this.onUnselect }
