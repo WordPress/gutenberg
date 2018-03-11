@@ -55,7 +55,7 @@ registerStore( 'my-shop', {
 	},
 
 	selectors: {
-		getPrice( item ) {
+		getPrice( state, item ) {
 			const { prices, discountPercent } = state;
 			const price = prices[ item ];
 
