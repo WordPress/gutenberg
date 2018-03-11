@@ -373,3 +373,37 @@ export function getScrollContainer( node ) {
 	// Continue traversing
 	return getScrollContainer( node.parentNode );
 }
+
+/**
+ * Given two DOM nodes, replaces the former with the latter in the DOM.
+ *
+ * @param {Element} processedNode Node to be removed.
+ * @param {Element} newNode       Node to be inserted in its place.
+ * @return {void}
+ */
+export function replace( processedNode, newNode ) {
+	insertAfter( newNode, processedNode.parentNode );
+	remove( processedNode );
+}
+
+/**
+ * Given a DOM node, removes it from the DOM.
+ *
+ * @param {Element} node Node to be removed.
+ * @return {void}
+ */
+export function remove( node ) {
+	node.parentNode.removeChild( node );
+}
+
+/**
+ * Given two DOM nodes, inserts the former in the DOM as the next sibling of
+ * the latter.
+ *
+ * @param {Element} newNode       Node to be inserted.
+ * @param {Element} referenceNode Node after which to perform the insertion.
+ * @return {void}
+ */
+export function insertAfter( newNode, referenceNode ) {
+	referenceNode.parentNode.insertBefore( newNode, referenceNode.nextSibling );
+}
