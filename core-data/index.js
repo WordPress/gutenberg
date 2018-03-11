@@ -16,17 +16,17 @@ const MODULE_KEY = 'core';
 
 const store = registerStore( MODULE_KEY, {
 	reducer,
-	selectors: { getCategories },
+	selectors: {
+		getCategories,
+	},
 	resolvers: {
-		getCategories: {
-			fulfill() {
-				wp.apiRequest( { path: '/wp/v2/categories' } ).then( categories => {
-					store.dispatch( {
-						type: 'RECEIVE_CATEGORIES',
-						categories,
-					} );
+		getCategories() {
+			wp.apiRequest( { path: '/wp/v2/categories' } ).then( ( categories ) => {
+				store.dispatch( {
+					type: 'RECEIVE_CATEGORIES',
+					categories,
 				} );
-			},
+			} );
 		},
 	},
 } );

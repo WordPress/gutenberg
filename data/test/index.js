@@ -85,18 +85,6 @@ describe( 'registerResolvers', () => {
 		expect( select( 'demo' ).getValue() ).toBe( 'OK' );
 	} );
 
-	it( 'should not do anything if registered without fulfill', () => {
-		registerReducer( 'demo', ( state = 'OK' ) => state );
-		registerSelectors( 'demo', {
-			getValue: ( state ) => state,
-		} );
-		registerResolvers( 'demo', {
-			getValue: {},
-		} );
-
-		expect( select( 'demo' ).getValue() ).toBe( 'OK' );
-	} );
-
 	it( 'should behave as a side effect for the given selector, with arguments', () => {
 		const resolver = jest.fn();
 
@@ -105,9 +93,7 @@ describe( 'registerResolvers', () => {
 			getValue: ( state ) => state,
 		} );
 		registerResolvers( 'demo', {
-			getValue: {
-				fulfill: resolver,
-			},
+			getValue: resolver,
 		} );
 
 		const value = select( 'demo' ).getValue( 'arg1', 'arg2' );
