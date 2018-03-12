@@ -39,7 +39,7 @@ class PluginSidebar extends Component {
 		if ( ! this.namespacedName ) {
 			this.namespacedName = `${ this.props.pluginContext.namespace }/${ this.props.name }`;
 		}
-		if ( this.props.openedGeneralSidebar !== this.namespacedName ) {
+		if ( this.props.activePlugin !== this.namespacedName ) {
 			return null;
 		}
 
