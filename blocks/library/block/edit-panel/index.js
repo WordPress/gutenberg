@@ -26,14 +26,14 @@ class ReusableBlockEditPanel extends Component {
 		this.handleTitleKeyDown = this.handleTitleKeyDown.bind( this );
 	}
 
-	bindTitleRef( ref ) {
-		this.titleRef = ref;
-	}
-
 	componentDidMount() {
 		if ( this.props.isEditing ) {
 			this.titleRef.select();
 		}
+	}
+
+	bindTitleRef( ref ) {
+		this.titleRef = ref;
 	}
 
 	handleFormSubmit( event ) {
