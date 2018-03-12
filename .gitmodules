@@ -1,0 +1,3 @@
+[submodule "gutenberg"]
+	path = gutenberg
+	url = https://github.com/wordpress/gutenberg

@@ -1,10 +1,24 @@
 This is the mobile version of Gutenberg, targetting Android and iOS. It's a React Native library bootstrapped by CRNA.
 
-## Full Documentation
-
 The most recent and complete version of this guide is available [here](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/README.md).
 
-## Available Scripts
+## Getting Started
+
+### Clone the project
+
+* Clone the project and submodules:
+```
+$ git clone --recurse-submodules https://github.com/automattic/gutenberg-mobile
+```
+
+* Or if you already have the project cloned, init the `gutenberg` submodule: 
+```
+$ cd gutenberg
+$ git submodule init
+$ git submodule update
+```
+
+## Run
 
 If Yarn was installed when the project was initialized, then dependencies will have been installed via Yarn, and you should probably use it to run these commands as well. Unlike dependency installation, command running syntax is identical for Yarn and NPM at the time of this writing.
 
