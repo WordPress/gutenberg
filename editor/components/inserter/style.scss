@@ -150,14 +150,14 @@ input[type="search"].editor-inserter__search {
 
 	.components-tab-panel__tab-content {
 		overflow: auto;
+		@include square-style__neutral();
 
 		&:focus {
-			outline: 1px solid $blue-medium-500;
-			outline-offset: -1px;
+			@include square-style__focus-active()
+		}
 
-			&:active {
-				outline: none;
-			}
+		&:focus:active {
+			outline: none;
 		}
 
 		@include break-medium {
