@@ -2,19 +2,14 @@
 .edit-post-meta-boxes-area {
 	position: relative;
 
-		/* Match width and positioning of the meta boxes. Override default styles. */
+	/* Match width and positioning of the meta boxes. Override default styles. */
 	#poststuff {
 		margin: 0 auto;
 		padding-top: 0;
 		min-width: auto;
 	}
 
-	#post {
-		margin: 0;
-	}
-
 	/* Override Default meta box stylings */
-
 	#poststuff h3.hndle,
 	#poststuff .stuffbox > h3,
 	#poststuff h2.hndle { /* WordPress selectors yolo */
@@ -41,28 +36,6 @@
 		margin: 0;
 	}
 
-	input,
-	select,
-	textarea {
-		background: inherit;
-		border: 1px solid $light-gray-500;
-		border-radius: 4px;
-		box-shadow: none;
-		color: $dark-gray-800;
-		display: inline-block;
-		font-family: inherit;
-		font-size: $default-font-size;
-		line-height: 24px;
-		outline: none;
-		padding: 4px;
-	}
-
-	input:hover,
-	select:hover,
-	textarea:hover {
-		border: 1px solid $light-gray-700;
-	}
-
 	.postbox .handlediv {
 		height: 44px;
 		width: 44px;
@@ -85,8 +58,8 @@
 		right: 20px;
 		z-index: z-index( '.edit-post-meta-boxes-area .spinner');
 	}
-}
 
-.edit-post-meta-boxes-area__clear {
-	clear: both;
+	&__clear {
+		clear: both;
+	}
 }
