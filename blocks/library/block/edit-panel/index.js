@@ -59,9 +59,9 @@ class ReusableBlockEditPanel extends Component {
 			<Fragment>
 				{ ( ! isEditing && ! isSaving ) && (
 					<div className="reusable-block-edit-panel">
-						<span className="reusable-block-edit-panel__info">
-							<b>{ title }</b>
-						</span>
+						<b className="reusable-block-edit-panel__info">
+							{ title }
+						</b>
 						<Button isLarge className="reusable-block-edit-panel__button" onClick={ onEdit }>
 							{ __( 'Edit' ) }
 						</Button>
