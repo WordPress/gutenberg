@@ -17,7 +17,6 @@ import {
 } from '@wordpress/element';
 import {
 	PanelBody,
-	PanelColor,
 	RangeControl,
 	ToggleControl,
 	Button,
@@ -31,9 +30,9 @@ import {
 	AlignmentToolbar,
 	BlockAlignmentToolbar,
 	BlockControls,
-	ColorPalette,
 	ContrastChecker,
 	InspectorControls,
+	PanelColor,
 	RichText,
 } from '@wordpress/blocks';
 
@@ -206,18 +205,21 @@ class ParagraphBlock extends Component {
 							help={ this.getDropCapHelp }
 						/>
 					</PanelBody>
-					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor.value } colorName={ backgroundColor.name } initialOpen={ false }>
-						<ColorPalette
-							value={ backgroundColor.value }
-							onChange={ setBackgroundColor }
-						/>
-					</PanelColor>
-					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor.value } colorName={ textColor.name } initialOpen={ false }>
-						<ColorPalette
-							value={ textColor.value }
-							onChange={ setTextColor }
-						/>
-					</PanelColor>
+					<PanelColor
+						colorName={ backgroundColor.name }
+						colorValue={ backgroundColor.value }
+						initialOpen={ false }
+						title={ __( 'Background Color' ) }
+						onChange={ setBackgroundColor }
+					/>
+					<PanelColor
+						colorName={ textColor.name }
+						colorValue={ textColor.value }
+						initialOpen={ false }
+						title={ __( 'Text Color' ) }
+						onChange={ setTextColor }
+						value={ textColor.value }
+					/>
 					<ContrastChecker
 						textColor={ textColor.value }
 						backgroundColor={ backgroundColor.value }

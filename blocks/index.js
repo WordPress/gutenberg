@@ -37,3 +37,5 @@ export { default as RichTextProvider } from './rich-text/provider';
 export { default as UrlInput } from './url-input';
 export { default as UrlInputButton } from './url-input/button';
 export { default as EditorSettings, withEditorSettings } from './editor-settings';
+export { default as PanelColor } from './panel-color';
+export { default as withColorContext } from './with-color-context';
