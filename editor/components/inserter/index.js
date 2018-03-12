@@ -86,8 +86,8 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint,
-		selectedBlock: select( 'core/editor' ).getSelectedBlock,
+		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint(),
+		selectedBlock: select( 'core/editor' ).getSelectedBlock(),
 	} ) ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,

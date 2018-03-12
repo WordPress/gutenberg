@@ -8,6 +8,7 @@ export { default as ClipboardButton } from './clipboard-button';
 export { default as CodeEditor } from './code-editor';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
+export { default as Disabled } from './disabled';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
@@ -31,6 +32,7 @@ export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
 export { default as Popover } from './popover';
+export { default as QueryControls } from './query-controls';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
@@ -47,6 +49,7 @@ export { default as TreeSelect } from './tree-select';
 export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
+export { default as ifCondition } from './higher-order/if-condition';
 export { default as navigateRegions } from './higher-order/navigate-regions';
 export { default as withAPIData } from './higher-order/with-api-data';
 export { default as withContext } from './higher-order/with-context';

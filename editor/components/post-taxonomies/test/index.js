@@ -16,38 +16,50 @@ describe( 'PostTaxonomies', () => {
 			<PostTaxonomies postType="page" taxonomies={ taxonomies } />
 		);
 
-		expect( wrapper.children() ).toHaveLength( 0 );
+		expect( wrapper.at( 0 ) ).toHaveLength( 0 );
 	} );
 
 	it( 'should render taxonomy components for taxonomies assigned to post type', () => {
-		const taxonomies = {
-			data: [
-				{
-					name: 'Categories',
-					slug: 'category',
-					types: [ 'post', 'page' ],
-					hierarchical: true,
-					rest_base: 'categories',
-				},
-				{
-					name: 'Genres',
-					slug: 'genre',
-					types: [ 'book' ],
-					hierarchical: true,
-					rest_base: 'genres',
-				},
-			],
+		const genresTaxonomy = {
+			name: 'Genres',
+			slug: 'genre',
+			types: [ 'book' ],
+			hierarchical: true,
+			rest_base: 'genres',
 		};
 
-		const wrapper = shallow(
-			<PostTaxonomies postType="page" taxonomies={ taxonomies } />
+		const categoriesTaxonomy = {
+			name: 'Categories',
+			slug: 'category',
+			types: [ 'post', 'page' ],
+			hierarchical: true,
+			rest_base: 'categories',
+		};
+
+		const wrapperOne = shallow(
+			<PostTaxonomies postType="book"
+				taxonomies={ {
+					data: [ genresTaxonomy, categoriesTaxonomy ],
+				} }
+			/>
 		);
 
-		expect( wrapper.children() ).toHaveLength( 1 );
-		expect( wrapper.childAt( 0 ).props() ).toEqual( {
-			label: 'Categories',
-			slug: 'category',
-			restBase: 'categories',
-		} );
+		expect( wrapperOne.at( 0 ) ).toHaveLength( 1 );
+
+		const wrapperTwo = shallow(
+			<PostTaxonomies postType="book"
+				taxonomies={ {
+					data: [
+						genresTaxonomy,
+						{
+							...categoriesTaxonomy,
+							types: [ 'post', 'page', 'book' ],
+						},
+					],
+				} }
+			/>
+		);
+
+		expect( wrapperTwo.at( 0 ) ).toHaveLength( 2 );
 	} );
 } );

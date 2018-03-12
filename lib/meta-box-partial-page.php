@@ -90,11 +90,24 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 	$core_side_meta_boxes = array(
 		'submitdiv',
 		'formatdiv',
-		'categorydiv',
-		'tagsdiv-post_tag',
 		'pageparentdiv',
 		'postimagediv',
 	);
+
+	$custom_taxonomies = get_taxonomies(
+		array(
+			'show_ui' => true,
+		),
+		'objects'
+	);
+
+	// Following the same logic as meta box generation in:
+	// https://github.com/WordPress/wordpress-develop/blob/c896326/src/wp-admin/edit-form-advanced.php#L288-L292.
+	foreach ( $custom_taxonomies as $custom_taxonomy ) {
+		$core_side_meta_boxes [] = $custom_taxonomy->hierarchical ?
+			$custom_taxonomy->name . 'div' :
+			'tagsdiv-' . $custom_taxonomy->name;
+	}
 
 	$core_normal_meta_boxes = array(
 		'revisionsdiv',
@@ -354,7 +367,6 @@ function gutenberg_meta_box_post_form_hidden_fields( $post ) {
 	<input type="hidden" id="user-id" name="user_ID" value="<?php echo (int) $user_id; ?>" />
 	<input type="hidden" id="hiddenaction" name="action" value="<?php echo esc_attr( $form_action ); ?>" />
 	<input type="hidden" id="originalaction" name="originalaction" value="<?php echo esc_attr( $form_action ); ?>" />
-	<input type="hidden" id="post_author" name="post_author" value="<?php echo esc_attr( $post->post_author ); ?>" />
 	<input type="hidden" id="post_type" name="post_type" value="<?php echo esc_attr( $post->post_type ); ?>" />
 	<input type="hidden" id="original_post_status" name="original_post_status" value="<?php echo esc_attr( $post->post_status ); ?>" />
 	<input type="hidden" id="referredby" name="referredby" value="<?php echo $referer ? esc_url( $referer ) : ''; ?>" />

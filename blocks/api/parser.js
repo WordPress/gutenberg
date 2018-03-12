@@ -149,10 +149,16 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
  * @return {Object} Block attributes.
  */
 export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attributes ) {
-	if ( ! blockType.deprecated ) {
+	// Not all blocks need a deprecated definition so avoid unnecessary computational cycles
+	// as early as possible when `deprecated` property is not supplied.
+	if ( ! blockType.deprecated || ! blockType.deprecated.length ) {
 		return;
 	}
 
+	// There is no notion of version numbers for blocks. Instead, deprecated versions
+	// are defined implicitly as successive array entries containing the relevant definitions
+	// for handling each block variation. In order to validate a provided source, it has
+	// to attempt to parse each array entry at a time.
 	for ( let i = 0; i < blockType.deprecated.length; i++ ) {
 		const deprecatedBlockType = {
 			...omit( blockType, [ 'attributes', 'save', 'supports' ] ), // Parsing/Serialization properties
@@ -160,17 +166,17 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 		};
 
 		try {
-			// Parse using the deprecated block version .
-			// Try to validate the parsed block using this same deprecated version.
-			// Ignore this version if the the validation fails.
+			// Handle migration of older attributes into current version if necessary.
 			const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
 			const migratedBlockAttributes = deprecatedBlockType.migrate ? deprecatedBlockType.migrate( deprecatedBlockAttributes ) : deprecatedBlockAttributes;
+
+			// Attempt to validate the parsed block. Ignore if the the validation step fails.
 			const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
 			if ( isValid ) {
 				return migratedBlockAttributes;
 			}
 		} catch ( error ) {
-			// ignore error, it means this deprecated version is invalid
+			// Ignore error, it means this deprecated version is invalid.
 		}
 	}
 }
@@ -192,19 +198,18 @@ export function createBlockWithFallback( blockNode ) {
 
 	attributes = attributes || {};
 
-	// Trim content to avoid creation of intermediary freeform segments
+	// Trim content to avoid creation of intermediary freeform segments.
 	innerHTML = innerHTML.trim();
 
 	// Use type from block content, otherwise find unknown handler.
 	name = name || getUnknownTypeHandlerName();
 
-	// Convert 'core/text' blocks in existing content to the new
-	// 'core/paragraph'.
+	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';
 	}
 
-	// Try finding type for known block name, else fall back again.
+	// Try finding the type for known block name, else fall back again.
 	let blockType = getBlockType( name );
 
 	const fallbackBlock = getUnknownTypeHandlerName();
@@ -227,7 +232,7 @@ export function createBlockWithFallback( blockNode ) {
 		blockType = getBlockType( name );
 	}
 
-	// Coerce inner blocks from parse form to canonical form
+	// Coerce inner blocks from parsed form to canonical form.
 	innerBlocks = innerBlocks.map( createBlockWithFallback );
 
 	// Include in set only if type were determined.
@@ -241,9 +246,10 @@ export function createBlockWithFallback( blockNode ) {
 		innerBlocks
 	);
 
-	// Validate that the parsed block is valid, meaning that if we were to
-	// reserialize it given the assumed attributes, the markup matches the
-	// original value.
+	// Block validation assumes an idempotent operation from source block to serialized block
+	// provided there are no changes in attributes. The validation procedure thus compares the
+	// provided source value with the serialized output before there are any modifications to
+	// the block. When both match, the block is marked as valid.
 	if ( name !== fallbackBlock ) {
 		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
 	}
@@ -252,8 +258,8 @@ export function createBlockWithFallback( blockNode ) {
 	// invalid, or future serialization attempt results in an error.
 	block.originalContent = innerHTML;
 
-	// When block is invalid, attempt to parse it using deprecated definition.
-	// This enables blocks to modify attribute and markup structure without
+	// When the block is invalid, attempt to parse it using a deprecated definition.
+	// This enables blocks to modify its attributes and markup structure without
 	// invalidating content written in previous formats.
 	if ( ! block.isValid ) {
 		const attributesParsedWithDeprecatedVersion = getAttributesFromDeprecatedVersion(

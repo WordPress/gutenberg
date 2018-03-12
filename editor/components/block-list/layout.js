@@ -25,6 +25,7 @@ import { Component } from '@wordpress/element';
 import './style.scss';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
+import IgnoreNestedEvents from './ignore-nested-events';
 import BlockSelectionClearer from '../block-selection-clearer';
 import DefaultBlockAppender from '../default-block-appender';
 import {
@@ -216,7 +217,7 @@ class BlockListLayout extends Component {
 
 		return (
 			<BlockSelectionClearer className={ classes }>
-				{ !! blockUIDs.length && <BlockInsertionPoint /> }
+				{ !! blockUIDs.length && <BlockInsertionPoint rootUID={ rootUID } layout={ defaultLayout } /> }
 				{ map( blockUIDs, ( uid, blockIndex ) => (
 					<BlockListBlock
 						key={ 'block-' + uid }
@@ -233,11 +234,13 @@ class BlockListLayout extends Component {
 						renderBlockMenu={ renderBlockMenu }
 					/>
 				) ) }
-				<DefaultBlockAppender
-					rootUID={ rootUID }
-					lastBlockUID={ last( blockUIDs ) }
-					layout={ defaultLayout }
-				/>
+				<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
+					<DefaultBlockAppender
+						rootUID={ rootUID }
+						lastBlockUID={ last( blockUIDs ) }
+						layout={ defaultLayout }
+					/>
+				</IgnoreNestedEvents>
 			</BlockSelectionClearer>
 		);
 	}

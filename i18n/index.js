@@ -36,11 +36,12 @@ export function getI18n() {
  * @see https://developer.wordpress.org/reference/functions/__/
  *
  * @param {string} text Text to translate.
+ * @param {string} domain Domain to retrieve the translated text.
  *
  * @return {string} Translated text.
  */
-export function __( text ) {
-	return getI18n().gettext( text );
+export function __( text, domain ) {
+	return getI18n().dgettext( domain, text );
 }
 
 /**
@@ -50,11 +51,12 @@ export function __( text ) {
  *
  * @param {string} text    Text to translate.
  * @param {string} context Context information for the translators.
+ * @param {string} domain Domain to retrieve the translated text.
  *
  * @return {string} Translated context string without pipe.
  */
-export function _x( text, context ) {
-	return getI18n().pgettext( context, text );
+export function _x( text, context, domain ) {
+	return getI18n().dpgettext( domain, context, text );
 }
 
 /**
@@ -67,11 +69,12 @@ export function _x( text, context ) {
  * @param {string} plural The text to be used if the number is plural.
  * @param {number} number The number to compare against to use either the
  *                         singular or plural form.
+ * @param {string} domain Domain to retrieve the translated text.
  *
  * @return {string} The translated singular or plural form.
  */
-export function _n( single, plural, number ) {
-	return getI18n().ngettext( single, plural, number );
+export function _n( single, plural, number, domain ) {
+	return getI18n().dngettext( domain, single, plural, number );
 }
 
 /**
@@ -85,11 +88,12 @@ export function _n( single, plural, number ) {
  * @param {number} number  The number to compare against to use either the
  *                          singular or plural form.
  * @param {string} context Context information for the translators.
+ * @param {string} domain Domain to retrieve the translated text.
  *
  * @return {string} The translated singular or plural form.
  */
-export function _nx( single, plural, number, context ) {
-	return getI18n().npgettext( context, single, plural, number );
+export function _nx( single, plural, number, context, domain ) {
+	return getI18n().dnpgettext( domain, context, single, plural, number );
 }
 
 /**

@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { concatChildren, Component } from '@wordpress/element';
+import { concatChildren, Component, RawHTML } from '@wordpress/element';
 import {
 	Autocomplete,
 	PanelBody,
@@ -290,7 +290,9 @@ export const settings = {
 			migrate( attributes ) {
 				return {
 					...attributes,
-					content: [ attributes.content ],
+					content: [
+						<RawHTML key="html">{ attributes.content }</RawHTML>,
+					],
 				};
 			},
 		},

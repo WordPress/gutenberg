@@ -7,16 +7,12 @@
 	background: none;
 	color: $dark-gray-500;
 	position: relative;
-	width: $icon-button-size;	// show only icon on small breakpoints
 	overflow: hidden;
+	text-indent: 4px;
 
 	.dashicon {
 		display: inline-block;
 		flex: 0 0 auto;
-	}
-
-	@include break-medium() {
-		width: auto;
 	}
 
 	&:not( :disabled ):hover {

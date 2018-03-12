@@ -13,7 +13,7 @@
 
 	@include break-small() {
 		top: $admin-bar-height-big + $header-height;
-		z-index: auto;
+		z-index: z-index( '.edit-post-sidebar {greater than small}' );
 		height: auto;
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
@@ -116,18 +116,17 @@
 .edit-post-sidebar__panel-tab {
 	background: transparent;
 	border: none;
-	border-bottom: 3px solid transparent;
 	border-radius: 0;
 	cursor: pointer;
 	height: 50px;
-	line-height: 50px;
-	padding: 0 20px;
+	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: 400;
 	@include square-style__neutral;
 
 	&.is-active {
-		border-bottom-color: $blue-medium-500;
+		padding-bottom: 0;
+		border-bottom: 3px solid $blue-medium-500;
 		font-weight: 600;
 	}
 

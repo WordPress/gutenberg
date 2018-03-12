@@ -465,6 +465,32 @@ export function getBlockCount( state, rootUID ) {
 }
 
 /**
+ * Returns the current block selection start. This value may be null, and it
+ * may represent either a singular block selection or multi-selection start.
+ * A selection is singular if its start and end match.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} UID of block selection start.
+ */
+export function getBlockSelectionStart( state ) {
+	return state.blockSelection.start;
+}
+
+/**
+ * Returns the current block selection end. This value may be null, and it
+ * may represent either a singular block selection or multi-selection end.
+ * A selection is singular if its start and end match.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} UID of block selection end.
+ */
+export function getBlockSelectionEnd( state ) {
+	return state.blockSelection.end;
+}
+
+/**
  * Returns the number of blocks currently selected in the post.
  *
  * @param {Object} state Global application state.
@@ -1072,7 +1098,7 @@ function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
 		return null;
 	}
 
-	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! enabledBlockTypes.includes( blockType.name );
+	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! includes( enabledBlockTypes, blockType.name );
 	if ( blockTypeIsDisabled ) {
 		return null;
 	}
@@ -1106,7 +1132,7 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 		return null;
 	}
 
-	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! enabledBlockTypes.includes( 'core/block' );
+	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! includes( enabledBlockTypes, 'core/block' );
 	if ( blockTypeIsDisabled ) {
 		return null;
 	}
@@ -1122,7 +1148,7 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 		initialAttributes: { ref: reusableBlock.id },
 		title: reusableBlock.title,
 		icon: referencedBlockType.icon,
-		category: 'reusable-blocks',
+		category: 'shared',
 		keywords: [],
 		isDisabled: false,
 	};
@@ -1186,7 +1212,11 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
 }
 
 /**
- * Determines the items that appear in the 'Recent' tab of the inserter.
+ * Returns a list of items which the user is likely to want to insert. These
+ * are ordered by 'frecency', which is a heuristic that combines block usage
+ * frequency and recency.
+ *
+ * https://en.wikipedia.org/wiki/Frecency
  *
  * @param {Object}           state             Global application state.
  * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
@@ -1194,22 +1224,23 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
  *
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
-export function getRecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
-	return getItemsFromInserts( state, state.preferences.recentInserts, enabledBlockTypes, maximum );
-}
+export function getFrecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
+	const calculateFrecency = ( time, count ) => {
+		const duration = Date.now() - time;
+		switch ( true ) {
+			case duration < 3600:
+				return count * 4;
+			case duration < ( 24 * 3600 ):
+				return count * 2;
+			case duration < ( 7 * 24 * 3600 ):
+				return count / 2;
+			default:
+				return count / 4;
+		}
+	};
 
-/**
- * Determines the items that appear in the inserter with shortcuts based on the block usage
- *
- * @param {Object}           state             Global application state.
- * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
- * @param {number}           maximum           Number of items to return.
- *
- * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
- */
-export function getFrequentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
 	const sortedInserts = values( state.preferences.insertUsage )
-		.sort( ( a, b ) => b.count - a.count )
+		.sort( ( a, b ) => calculateFrecency( b.time, b.count ) - calculateFrecency( a.time, a.count ) )
 		.map( ( { insert } ) => insert );
 	return getItemsFromInserts( state, sortedInserts, enabledBlockTypes, maximum );
 }
@@ -1295,4 +1326,15 @@ export function isPublishingPost( state ) {
 	// Consider as publishing when current post prior to request was not
 	// considered published
 	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
+}
+
+/**
+ * Returns the provisional block UID, or null if there is no provisional block.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {?string} Provisional block UID, if set.
+ */
+export function getProvisionalBlockUID( state ) {
+	return state.provisionalBlockUID;
 }

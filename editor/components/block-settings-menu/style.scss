@@ -28,10 +28,9 @@
 	}
 }
 
-.editor-block-settings-menu__section {
+.editor-block-settings-menu__separator {
 	margin-top: $item-spacing;
-	margin-bottom: -$item-spacing;
-	padding: $item-spacing 0;
+	margin-bottom: $item-spacing;
 	border-top: 1px solid $light-gray-500;
 }
 
@@ -56,10 +55,4 @@
 	.dashicon {
 		margin-right: 5px;
 	}
-}
-
-.editor-block-settings-menu__section {
-	margin-top: $item-spacing;
-	padding-top: $item-spacing;
-	border-top: 1px solid $light-gray-500;
 }

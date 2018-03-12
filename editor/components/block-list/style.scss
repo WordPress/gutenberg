@@ -44,6 +44,8 @@
 	&.has-warning .editor-block-list__block-edit {
 		position: relative;
 		min-height: 250px;
+		max-height: 500px;
+		overflow: hidden;
 
 		> :not( .editor-warning ) {
 			pointer-events: none;
@@ -59,6 +61,7 @@
 		bottom: 0;
 		left: 0;
 		background-color: rgba( $white, 0.6 );
+		background-image: linear-gradient( to bottom, transparent, #fff );
 	}
 
 	// simpler style for a block that has cursor focus (but hasn't been selected)
@@ -76,6 +79,17 @@
 	&.is-hovered > .editor-block-mover:before {
 		border-right: 1px solid $light-gray-500;
 		right: 6px;
+	}
+
+	&.is-typing .editor-block-list__empty-block-inserter,
+	&.is-typing .editor-block-list__side-inserter {
+		opacity: 0;
+	}
+
+	.editor-block-list__empty-block-inserter,
+	.editor-block-list__side-inserter {
+		opacity: 1;
+		transition: opacity 0.2s;
 	}
 
 	&.is-reusable.is-selected > .editor-block-mover:before {
@@ -320,10 +334,6 @@
 		flex-direction: row;
 		margin-top: $item-spacing;
 
-		@include break-small() {
-			display: none;
-		}
-
 		// Movers, inserter, trash & ellipsis
 		.editor-inserter {
 			position: relative;
@@ -410,9 +420,21 @@
 		transition: opacity 0.2s linear 0.5s;
 	}
 
+	&:focus {
+		outline: none;
+	}
+
+	// Show focus style when tabbing
 	&:focus:before {
 		opacity: 1;
 		transition: opacity 0.2s linear;
+		outline: 1px solid $dark-gray-300;
+		outline-offset: 2px;
+	}
+
+	// Don't show focus style when clicking
+	&:focus:active:before {
+		outline: none;
 	}
 }
 
@@ -432,16 +454,17 @@
 
 .editor-block-list__layout > .editor-block-list__insertion-point {
 	position: relative;
-	margin-top: -15px;
 	margin-left: auto;
 	margin-right: auto;
 	top: -19px;
 	left: 0;
 	right: 0;
 
-	@include break-small {
-		left: $block-mover-padding-visible;
-		right: $block-mover-padding-visible;
+	.editor-block-list__insertion-point-inserter:before {
+		@include break-small {
+			left: $block-mover-padding-visible;
+			right: $block-mover-padding-visible;
+		}
 	}
 }
 
@@ -544,8 +567,25 @@
 	position: absolute;
 	top: 10px;
 	right: 10px;
+	display: none;
 
 	@include break-small {
 		right: $block-mover-padding-visible + 10px;
+		display: block;
+	}
+}
+
+.editor-block-list__empty-block-inserter {
+	position: absolute;
+		top: 10px;
+		right: 10px;
+
+	.editor-inserter__toggle {
+		border-radius: 50%;
+	}
+
+	@include break-small {
+		left: 10px;
+		right: auto;
 	}
 }

@@ -28,7 +28,33 @@ let listeners = [];
  * Global listener called for each store's update.
  */
 export function globalListener() {
-	listeners.forEach( listener => listener() );
+	listeners.forEach( ( listener ) => listener() );
+}
+
+/**
+ * Convenience for registering reducer with actions and selectors.
+ *
+ * @param {string} reducerKey Reducer key.
+ * @param {Object} options    Store description (reducer, actions, selectors).
+ *
+ * @return {Object} Registered store object.
+ */
+export function registerStore( reducerKey, options ) {
+	if ( ! options.reducer ) {
+		throw new TypeError( 'Must specify store reducer' );
+	}
+
+	const store = registerReducer( reducerKey, options.reducer );
+
+	if ( options.actions ) {
+		registerActions( reducerKey, options.actions );
+	}
+
+	if ( options.selectors ) {
+		registerSelectors( reducerKey, options.selectors );
+	}
+
+	return store;
 }
 
 /**
@@ -46,7 +72,19 @@ export function registerReducer( reducerKey, reducer ) {
 	}
 	const store = createStore( reducer, flowRight( enhancers ) );
 	stores[ reducerKey ] = store;
-	store.subscribe( globalListener );
+
+	// Customize subscribe behavior to call listeners only on effective change,
+	// not on every dispatch.
+	let lastState = store.getState();
+	store.subscribe( () => {
+		const state = store.getState();
+		const hasChanged = state !== lastState;
+		lastState = state;
+
+		if ( hasChanged ) {
+			globalListener();
+		}
+	} );
 
 	return store;
 }
@@ -163,6 +201,12 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 
 		componentWillUnmount() {
 			this.unsubscribe();
+
+			// While above unsubscribe avoids future listener calls, callbacks
+			// are snapshotted before being invoked, so if unmounting occurs
+			// during a previous callback, we need to explicitly track and
+			// avoid the `runSelection` that is scheduled to occur.
+			this.isUnmounting = true;
 		}
 
 		subscribe() {
@@ -170,14 +214,22 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 		}
 
 		runSelection( props = this.props ) {
-			const newState = mapStateToProps( select, props );
-			if ( ! isEqualShallow( newState, this.state ) ) {
-				this.setState( newState );
+			if ( this.isUnmounting ) {
+				return;
+			}
+
+			const { mergeProps } = this.state;
+			const nextMergeProps = mapStateToProps( select, props ) || {};
+
+			if ( ! isEqualShallow( nextMergeProps, mergeProps ) ) {
+				this.setState( {
+					mergeProps: nextMergeProps,
+				} );
 			}
 		}
 
 		render() {
-			return <WrappedComponent { ...this.props } { ...this.state } />;
+			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
 		}
 	}
 
@@ -252,7 +304,5 @@ export const query = ( mapSelectToProps ) => {
 		plugin: 'Gutenberg',
 	} );
 
-	return withSelect( ( props ) => {
-		return mapSelectToProps( select, props );
-	} );
+	return withSelect( mapSelectToProps );
 };

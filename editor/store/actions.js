@@ -5,6 +5,14 @@ import uuid from 'uuid/v4';
 import { partial, castArray } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import {
+	getDefaultBlockName,
+	createBlock,
+} from '@wordpress/blocks';
+
+/**
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
@@ -167,6 +175,7 @@ export function replaceBlocks( uids, blocks ) {
 		type: 'REPLACE_BLOCKS',
 		uids: castArray( uids ),
 		blocks: castArray( blocks ),
+		time: Date.now(),
 	};
 }
 
@@ -213,6 +222,7 @@ export function insertBlocks( blocks, index, rootUID ) {
 		blocks: castArray( blocks ),
 		index,
 		rootUID,
+		time: Date.now(),
 	};
 }
 
@@ -529,10 +539,10 @@ export function convertBlockToReusable( uid ) {
  * @return {Object} Action object
  */
 export function insertDefaultBlock( attributes, rootUID, index ) {
+	const block = createBlock( getDefaultBlockName(), attributes );
+
 	return {
-		type: 'INSERT_DEFAULT_BLOCK',
-		attributes,
-		rootUID,
-		index,
+		...insertBlock( block, index, rootUID ),
+		isProvisional: true,
 	};
 }

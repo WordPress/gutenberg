@@ -1,32 +1,13 @@
-
 /**
- * Returns an action object used in signalling that the user switched the active
- * sidebar tab panel.
+ * Returns an action object used in signalling that the user opened an editor sidebar.
  *
- * @param  {string} sidebar Sidebar name
- * @param  {string} panel   Panel name
- * @return {Object}         Action object
+ * @param {string} name        Sidebar name to be opened.
+ * @return {Object}            Action object.
  */
-export function setGeneralSidebarActivePanel( sidebar, panel ) {
-	return {
-		type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
-		sidebar,
-		panel,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the user opened a sidebar.
- *
- * @param {string} sidebar        Sidebar to open.
- * @param {string} [panel = null] Panel to open in the sidebar. Null if unchanged.
- * @return {Object}              Action object.
- */
-export function openGeneralSidebar( sidebar, panel = null ) {
+export function openGeneralSidebar( name ) {
 	return {
 		type: 'OPEN_GENERAL_SIDEBAR',
-		sidebar,
-		panel,
+		name,
 	};
 }
 
@@ -86,19 +67,6 @@ export function toggleGeneralSidebarEditorPanel( panel ) {
 	return {
 		type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
 		panel,
-	};
-}
-
-/**
- * Returns an action object used in signalling that the viewport type preference should be set.
- *
- * @param {string} viewportType The viewport type (desktop or mobile).
- * @return {Object} Action object.
- */
-export function setViewportType( viewportType ) {
-	return {
-		type: 'SET_VIEWPORT_TYPE',
-		viewportType,
 	};
 }
 
