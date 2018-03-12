@@ -150,6 +150,15 @@ input[type="search"].editor-inserter__search {
 
 	.components-tab-panel__tab-content {
 		overflow: auto;
+		@include square-style__neutral();
+
+		&:focus {
+			@include square-style__focus-active()
+		}
+
+		&:focus:active {
+			outline: none;
+		}
 
 		@include break-medium {
 			height: $block-inserter-content-height;
