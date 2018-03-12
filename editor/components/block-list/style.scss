@@ -556,8 +556,25 @@
 	position: absolute;
 	top: 10px;
 	right: 10px;
+	display: none;
 
 	@include break-small {
 		right: $block-mover-padding-visible + 10px;
+		display: block;
+	}
+}
+
+.editor-block-list__empty-block-inserter {
+	position: absolute;
+		top: 10px;
+		right: 10px;
+
+	.editor-inserter__toggle {
+		border-radius: 50%;
+	}
+
+	@include break-small {
+		left: 10px;
+		right: auto;
 	}
 }
