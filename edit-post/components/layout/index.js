@@ -32,7 +32,7 @@ import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import { PluginArea } from '../../api/plugin';
-import { PluginSidebar } from '../plugin-sidebar';
+import { PluginSidebar } from '../../api/components/plugin-sidebar';
 
 function Layout( {
 	mode,
