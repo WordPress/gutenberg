@@ -10,6 +10,7 @@
 	color: $dark-gray-500;
 	height: 100vh;
 	overflow: hidden;
+	box-sizing: border-box;
 
 	@include break-small() {
 		top: $admin-bar-height-big + $header-height;

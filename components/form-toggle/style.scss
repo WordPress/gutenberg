@@ -38,6 +38,7 @@ $toggle-border-width: 2px;
 		border: 2px solid $dark-gray-500;
 		background: $white;
 		transition: 0.1s transform ease;
+		box-sizing: border-box;
 	}
 
 	&__input:focus {

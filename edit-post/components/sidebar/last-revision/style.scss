@@ -5,4 +5,5 @@
 
 .editor-post-last-revision__title {
 	padding: #{ $panel-padding - 3px } $panel-padding;	// subtract extra height of dashicon
+	box-sizing: border-box;
 }

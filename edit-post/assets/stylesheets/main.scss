@@ -82,10 +82,6 @@ body.gutenberg-editor-page {
 }
 
 .gutenberg {
-	* {
-		box-sizing: border-box;
-	}
-
 	select {
 		font-size: $default-font-size;
 		color: $dark-gray-500;
