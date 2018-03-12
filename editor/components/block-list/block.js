@@ -452,6 +452,7 @@ export class BlockListBlock extends Component {
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
 			'is-reusable': isReusableBlock( blockType ),
+			'is-typing': isTypingWithinBlock,
 		} );
 
 		const { onReplace } = this.props;
