@@ -88,8 +88,15 @@ div.components-toolbar {
 	}
 
 	// active & toggled style
-	&:not(:disabled).is-active > svg {
-		@include formatting-button-style__active;
+	&:not(:disabled).is-active {
+		& > svg,
+		&[data-subscript]:after {
+			@include formatting-button-color__active;
+		}
+
+		& > svg {
+			@include formatting-button-style__active;
+		}
 	}
 
 	&:not(:disabled).is-active[data-subscript]:after {
