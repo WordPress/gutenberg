@@ -16,7 +16,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
+import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	IconButton,
 	SelectControl,
@@ -37,6 +37,7 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
+import { mediaUpload } from '../../../utils/mediaupload';
 
 /**
  * Module constants
@@ -65,13 +66,16 @@ class ImageBlock extends Component {
 
 		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
 			getBlobByURL( url )
-				.then( createMediaFromFile )
-				.then( ( media ) => {
-					setAttributes( {
-						id: media.id,
-						url: media.source_url,
-					} );
-				} );
+				.then(
+					( file ) =>
+						mediaUpload(
+							[ file ],
+							( [ image ] ) => {
+								setAttributes( { ...image } );
+							},
+							'image'
+						)
+				);
 		}
 	}
 
