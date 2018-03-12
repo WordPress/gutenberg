@@ -81,6 +81,17 @@
 		right: 6px;
 	}
 
+	&.is-typing .editor-block-list__empty-block-inserter,
+	&.is-typing .editor-block-list__side-inserter {
+		opacity: 0;
+	}
+
+	.editor-block-list__empty-block-inserter,
+	.editor-block-list__side-inserter {
+		opacity: 1;
+		transition: opacity 0.2s;
+	}
+
 	&.is-reusable.is-selected > .editor-block-mover:before {
 		border-right: none;
 	}
