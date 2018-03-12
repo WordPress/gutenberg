@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { combineReducers } from 'redux';
-import { get, omit } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * Internal dependencies
@@ -23,22 +23,9 @@ import { PREFERENCES_DEFAULTS } from './defaults';
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'OPEN_GENERAL_SIDEBAR':
-			const activeSidebarPanel = action.panel ? action.panel : state.activeSidebarPanel[ action.sidebar ];
 			return {
 				...state,
-				activeGeneralSidebar: action.sidebar,
-				activeSidebarPanel: {
-					...state.activeSidebarPanel,
-					[ action.sidebar ]: activeSidebarPanel,
-				},
-			};
-		case 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL':
-			return {
-				...state,
-				activeSidebarPanel: {
-					...state.activeSidebarPanel,
-					[ action.sidebar ]: action.panel,
-				},
+				activeGeneralSidebar: action.name,
 			};
 		case 'CLOSE_GENERAL_SIDEBAR':
 			return {
@@ -67,7 +54,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				},
 			};
 		case 'SERIALIZE':
-			return omit( state, [ 'sidebars.mobile', 'sidebars.publish' ] );
+			return state;
 	}
 
 	return state;

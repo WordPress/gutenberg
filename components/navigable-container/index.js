@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { omit, noop } from 'lodash';
+import { omit, noop, includes } from 'lodash';
 
 /**
  * WordPress Dependencies
@@ -138,9 +138,9 @@ export class NavigableMenu extends Component {
 				previous = [ LEFT, UP ];
 			}
 
-			if ( next.includes( keyCode ) ) {
+			if ( includes( next, keyCode ) ) {
 				return 1;
-			} else if ( previous.includes( keyCode ) ) {
+			} else if ( includes( previous, keyCode ) ) {
 				return -1;
 			}
 		};

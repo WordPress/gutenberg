@@ -22,11 +22,12 @@ import { getMetaBoxContainer } from '../utils/meta-boxes';
 const effects = {
 	INITIALIZE_META_BOX_STATE( action, store ) {
 		const hasActiveMetaBoxes = some( action.metaBoxes );
+		if ( ! hasActiveMetaBoxes ) {
+			return;
+		}
 
 		// Allow toggling metaboxes panels
-		if ( hasActiveMetaBoxes ) {
-			window.postboxes.add_postbox_toggles( 'post' );
-		}
+		window.postboxes.add_postbox_toggles( 'post' );
 
 		// Initialize metaboxes state
 		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
@@ -64,6 +65,7 @@ const effects = {
 		const additionalData = [
 			post.comment_status && `comment_status=${ post.comment_status }`,
 			post.ping_status && `ping_status=${ post.ping_status }`,
+			`post_author=${ post.author }`,
 		].filter( Boolean );
 
 		// To save the metaboxes, we serialize each one of the location forms and combine them

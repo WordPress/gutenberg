@@ -32,7 +32,7 @@ $scheme-sunrise__spot-color: #de823f;
 		// Tab indicators
 		.edit-post-sidebar__panel-tab.is-active,
 		.editor-inserter__tab.is-active {
-			border-bottom-color: $spot-color;
+			border-bottom: 3px solid $spot-color;
 		}
 
 		// Switch
@@ -64,7 +64,7 @@ $scheme-sunrise__spot-color: #de823f;
 				background-image: repeating-linear-gradient( -45deg, darken( $spot-color, 20 ), darken( $spot-color, 20 ) 11px, darken( $spot-color, 10 ) 10px, darken( $spot-color, 10 ) 20px );
 			}
 		}
-		
+
 		// Datepicker
 		.react-datepicker__day--selected {
 			background-color: $spot-color;

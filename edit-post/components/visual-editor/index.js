@@ -6,6 +6,7 @@ import {
 	CopyHandler,
 	PostTitle,
 	WritingFlow,
+	ObserveTyping,
 	EditorGlobalKeyboardShortcuts,
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
@@ -26,18 +27,20 @@ function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
 			<EditorGlobalKeyboardShortcuts />
 			<CopyHandler />
 			<MultiSelectScrollIntoView />
-			<WritingFlow>
-				<PostTitle />
-				<BlockList
-					showContextualToolbar={ ! isLargeViewport || ! hasFixedToolbar }
-					renderBlockMenu={ ( { children, onClose } ) => (
-						<Fragment>
-							<BlockInspectorButton onClick={ onClose } />
-							{ children }
-						</Fragment>
-					) }
-				/>
-			</WritingFlow>
+			<ObserveTyping>
+				<WritingFlow>
+					<PostTitle />
+					<BlockList
+						showContextualToolbar={ ! isLargeViewport || ! hasFixedToolbar }
+						renderBlockMenu={ ( { children, onClose } ) => (
+							<Fragment>
+								<BlockInspectorButton onClick={ onClose } />
+								{ children }
+							</Fragment>
+						) }
+					/>
+				</WritingFlow>
+			</ObserveTyping>
 		</BlockSelectionClearer>
 	);
 }

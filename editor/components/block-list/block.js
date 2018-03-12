@@ -13,6 +13,7 @@ import { Component, findDOMNode, compose } from '@wordpress/element';
 import {
 	keycodes,
 	focus,
+	isTextField,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 } from '@wordpress/utils';
@@ -46,15 +47,12 @@ import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import { createInnerBlockList } from './utils';
 import {
-	clearSelectedBlock,
 	editPost,
 	insertBlocks,
 	mergeBlocks,
 	removeBlock,
 	replaceBlocks,
 	selectBlock,
-	startTyping,
-	stopTyping,
 	updateBlockAttributes,
 	toggleSelection,
 } from '../../store/actions';
@@ -75,7 +73,7 @@ import {
 	getSelectedBlocksInitialCaretPosition,
 } from '../../store/selectors';
 
-const { BACKSPACE, ESCAPE, DELETE, ENTER, UP, RIGHT, DOWN, LEFT } = keycodes;
+const { BACKSPACE, DELETE, ENTER } = keycodes;
 
 export class BlockListBlock extends Component {
 	constructor() {
@@ -86,25 +84,21 @@ export class BlockListBlock extends Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
-		this.maybeStartTyping = this.maybeStartTyping.bind( this );
-		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+		this.deleteOrInsertAfterWrapper = this.deleteOrInsertAfterWrapper.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
-		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.hadTouchStart = false;
 
 		this.state = {
 			error: null,
 			isHovered: false,
-			isSelectionCollapsed: true,
 		};
 	}
 
@@ -126,44 +120,21 @@ export class BlockListBlock extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.isTyping ) {
-			document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
-		}
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
-
 		if ( this.props.isSelected ) {
 			this.focusTabbable();
 		}
 	}
 
 	componentWillReceiveProps( newProps ) {
-		if ( newProps.isTyping || newProps.isSelected ) {
+		if ( newProps.isTypingWithinBlock || newProps.isSelected ) {
 			this.hideHoverEffects();
 		}
 	}
 
 	componentDidUpdate( prevProps ) {
-		// Bind or unbind mousemove from page when user starts or stops typing
-		if ( this.props.isTyping !== prevProps.isTyping ) {
-			if ( this.props.isTyping ) {
-				document.addEventListener( 'mousemove', this.stopTypingOnMouseMove );
-			} else {
-				this.removeStopTypingListener();
-			}
-		}
-
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this.focusTabbable();
 		}
-	}
-
-	componentWillUnmount() {
-		this.removeStopTypingListener();
-		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
-	removeStopTypingListener() {
-		document.removeEventListener( 'mousemove', this.stopTypingOnMouseMove );
 	}
 
 	setBlockListRef( node ) {
@@ -202,15 +173,15 @@ export class BlockListBlock extends Component {
 		}
 
 		// Find all tabbables within node.
-		const tabbables = focus.tabbable.find( this.node )
-			.filter( ( node ) => node !== this.node );
+		const textInputs = focus.tabbable.find( this.node ).filter( isTextField );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
 		const isReverse = -1 === initialPosition;
-		const target = ( isReverse ? last : first )( tabbables );
+		const target = ( isReverse ? last : first )( textInputs );
 
 		if ( ! target ) {
+			this.wrapperNode.focus();
 			return;
 		}
 
@@ -297,31 +268,6 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	maybeStartTyping() {
-		// We do not want to dispatch start typing if state value already reflects
-		// that we're typing (dispatch noise)
-		if ( ! this.props.isTyping ) {
-			this.props.onStartTyping();
-		}
-	}
-
-	stopTypingOnMouseMove( { clientX, clientY } ) {
-		const { lastClientX, lastClientY } = this;
-
-		// We need to check that the mouse really moved
-		// Because Safari trigger mousemove event when we press shift, ctrl...
-		if (
-			lastClientX &&
-			lastClientY &&
-			( lastClientX !== clientX || lastClientY !== clientY )
-		) {
-			this.props.onStopTyping();
-		}
-
-		this.lastClientX = clientX;
-		this.lastClientY = clientY;
-	}
-
 	mergeBlocks( forward = false ) {
 		const { block, previousBlockUid, nextBlockUid, onMerge } = this.props;
 
@@ -338,10 +284,6 @@ export class BlockListBlock extends Component {
 		} else {
 			onMerge( previousBlockUid, block.uid );
 		}
-
-		// Manually trigger typing mode, since merging will remove this block and
-		// cause onKeyDown to not fire
-		this.maybeStartTyping();
 	}
 
 	insertBlocksAfter( blocks ) {
@@ -406,56 +348,41 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	onKeyDown( event ) {
+	/**
+	 * Interprets keydown event intent to remove or insert after block if key
+	 * event occurs on wrapper node. This can occur when the block has no text
+	 * fields of its own, particularly after initial insertion, to allow for
+	 * easy deletion and continuous writing flow to add additional content.
+	 *
+	 * @param {KeyboardEvent} event Keydown event.
+	 */
+	deleteOrInsertAfterWrapper( event ) {
 		const { keyCode, target } = event;
+
+		if ( target !== this.wrapperNode || this.props.isLocked ) {
+			return;
+		}
 
 		switch ( keyCode ) {
 			case ENTER:
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
-				if ( target === this.node && ! this.props.isLocked ) {
-					event.preventDefault();
-
-					this.props.onInsertBlocks( [
-						createBlock( 'core/paragraph' ),
-					], this.props.order + 1 );
-				}
-
-				// Pressing enter should trigger typing mode after the content has split
-				this.maybeStartTyping();
-				break;
-
-			case UP:
-			case RIGHT:
-			case DOWN:
-			case LEFT:
-				// Arrow keys do not fire keypress event, but should still
-				// trigger typing mode.
-				this.maybeStartTyping();
+				this.props.onInsertBlocks( [
+					createBlock( 'core/paragraph' ),
+				], this.props.order + 1 );
+				event.preventDefault();
 				break;
 
 			case BACKSPACE:
 			case DELETE:
 				// Remove block on backspace.
-				if ( target === this.node ) {
-					const { uid, onRemove, isLocked, previousBlock, onSelect } = this.props;
-					event.preventDefault();
-					if ( ! isLocked ) {
-						onRemove( uid );
+				const { uid, onRemove, previousBlockUid, onSelect } = this.props;
+				onRemove( uid );
 
-						if ( previousBlock ) {
-							onSelect( previousBlock.uid, -1 );
-						}
-					}
+				if ( previousBlockUid ) {
+					onSelect( previousBlockUid, -1 );
 				}
-
-				// Pressing backspace should trigger typing mode
-				this.maybeStartTyping();
-				break;
-
-			case ESCAPE:
-				// Deselect on escape.
-				this.props.onDeselect();
+				event.preventDefault();
 				break;
 		}
 	}
@@ -467,19 +394,6 @@ export class BlockListBlock extends Component {
 	selectOnOpen( open ) {
 		if ( open && ! this.props.isSelected ) {
 			this.props.onSelect();
-		}
-	}
-
-	onSelectionChange() {
-		if ( ! this.props.isSelected ) {
-			return;
-		}
-
-		const selection = window.getSelection();
-		const isCollapsed = selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
-		// We only keep track of the collapsed selection for selected blocks.
-		if ( isCollapsed !== this.state.isSelectionCollapsed && this.props.isSelected ) {
-			this.setState( { isSelectionCollapsed: isCollapsed } );
 		}
 	}
 
@@ -499,6 +413,7 @@ export class BlockListBlock extends Component {
 			isMultiSelected,
 			isFirstMultiSelected,
 			isLastInSelection,
+			isTypingWithinBlock,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! this.props.isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -508,11 +423,11 @@ export class BlockListBlock extends Component {
 		// The block as rendered in the editor is composed of general block UI
 		// (mover, toolbar, wrapper) and the display of the block content.
 
-		// If the block is selected and we're typing the block should not appear as selected unless the selection is not collapsed.
+		// If the block is selected and we're typing the block should not appear.
 		// Empty paragraph blocks should always show up as unselected.
 		const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( block );
+		const isSelectedNotTyping = isSelected && ! isTypingWithinBlock;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
-		const isSelectedNotTyping = isSelected && ( ! this.props.isTyping || ! this.state.isSelectionCollapsed );
 		const shouldAppearSelected = ! showSideInserter && isSelectedNotTyping;
 		const shouldShowMovers = shouldAppearSelected || isHovered || ( isEmptyDefaultBlock && isSelectedNotTyping );
 		const shouldShowSettingsMenu = shouldShowMovers;
@@ -568,12 +483,11 @@ export class BlockListBlock extends Component {
 				onTouchStart={ this.onTouchStart }
 				onFocus={ this.onFocus }
 				onClick={ this.onClick }
+				onKeyDown={ this.deleteOrInsertAfterWrapper }
 				tabIndex="0"
 				childHandledEvents={ [
-					'onKeyPress',
 					'onDragStart',
 					'onMouseDown',
-					'onKeyDown',
 				] }
 				{ ...wrapperProps }
 			>
@@ -602,10 +516,8 @@ export class BlockListBlock extends Component {
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
 				<IgnoreNestedEvents
 					ref={ this.bindBlockNode }
-					onKeyPress={ this.maybeStartTyping }
 					onDragStart={ this.preventDrag }
 					onMouseDown={ this.onPointerDown }
-					onKeyDown={ this.onKeyDown }
 					className="editor-block-list__block-edit"
 					aria-label={ blockLabel }
 					data-block={ block.uid }
@@ -677,7 +589,7 @@ const mapStateToProps = ( state, { uid, rootUID } ) => {
 		isLastInSelection: state.blockSelection.end === uid,
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
-		isTyping: isSelected && isTyping( state ),
+		isTypingWithinBlock: isSelected && isTyping( state ),
 		order: getBlockIndex( state, uid, rootUID ),
 		meta: getEditedPostAttribute( state, 'meta' ),
 		mode: getBlockMode( state, uid ),
@@ -695,18 +607,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 
 	onSelect( uid = ownProps.uid, initialPosition ) {
 		dispatch( selectBlock( uid, initialPosition ) );
-	},
-
-	onDeselect() {
-		dispatch( clearSelectedBlock() );
-	},
-
-	onStartTyping() {
-		dispatch( startTyping() );
-	},
-
-	onStopTyping() {
-		dispatch( stopTyping() );
 	},
 
 	onInsertBlocks( blocks, index ) {

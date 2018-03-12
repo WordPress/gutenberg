@@ -3,9 +3,12 @@
 /* External dependencies */
 import { isFunction } from 'lodash';
 
+/**
+ * WordPress dependencies
+ */
+import { dispatch } from '@wordpress/data';
+
 /* Internal dependencies */
-import store from '../store';
-import { setGeneralSidebarActivePanel, openGeneralSidebar } from '../store/actions';
 import { applyFilters } from '@wordpress/hooks';
 
 const sidebars = {};
@@ -93,6 +96,5 @@ export function getSidebarSettings( name ) {
  * @return {void}
  */
 export function activateSidebar( name ) {
-	store.dispatch( openGeneralSidebar( 'plugin' ) );
-	store.dispatch( setGeneralSidebarActivePanel( 'plugin', name ) );
+	dispatch( 'core/edit-post' ).openGeneralSidebar( name );
 }
