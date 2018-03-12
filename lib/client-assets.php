@@ -774,7 +774,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	gutenberg_extend_wp_api_backbone_client();
 
+	// Enqueue heartbeat separately as an "optional" dependency of the editor.
+	// Heartbeat is used for automatic nonce refreshing, but some hosts choose
+	// to disable it outright.
 	wp_enqueue_script( 'heartbeat' );
+
 	wp_enqueue_script( 'wp-edit-post' );
 
 	// Register `wp-utils` as a dependency of `word-count` to ensure that
