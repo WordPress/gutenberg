@@ -18,7 +18,7 @@ import BlockEdit from '../../block-edit';
 import ReusableBlockEditPanel from './edit-panel';
 
 class ReusableBlockEdit extends Component {
-	constructor() {
+	constructor( { reusableBlock } ) {
 		super( ...arguments );
 
 		this.startEditing = this.startEditing.bind( this );
@@ -26,8 +26,6 @@ class ReusableBlockEdit extends Component {
 		this.setAttributes = this.setAttributes.bind( this );
 		this.setTitle = this.setTitle.bind( this );
 		this.updateReusableBlock = this.updateReusableBlock.bind( this );
-
-		const { reusableBlock } = this.props;
 
 		this.state = {
 			isEditing: !! ( reusableBlock && reusableBlock.isTemporary ),
