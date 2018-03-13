@@ -64,10 +64,6 @@ describe( 'withFocusReturn()', () => {
 			const mountedComposite = mount( <Composite /> );
 			expect( mountedComposite.instance().activeElementOnMount ).toBe( activeElement );
 
-			// Change activeElement.
-			document.activeElement.blur();
-			expect( document.activeElement ).toBe( document.body );
-
 			// Should return to the activeElement saved with this component.
 			mountedComposite.unmount();
 			expect( document.activeElement ).toBe( activeElement );
