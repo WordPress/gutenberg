@@ -16,7 +16,7 @@ export class ServerSideRender extends Component {
 		super( props );
 		this.state = {
 			response: {},
-			attributes: props.attributes,
+			attributes: props,
 		};
 	}
 
@@ -25,18 +25,21 @@ export class ServerSideRender extends Component {
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		if ( JSON.stringify( nextProps.attributes ) !== JSON.stringify( this.props.attributes ) ) {
-			this.setState( { attributes: nextProps.attributes }, this.getOutput );
+		if ( JSON.stringify( nextProps ) !== JSON.stringify( this.props ) ) {
+			debugger;
+			this.setState( { attributes: nextProps }, this.getOutput );
 		}
 	}
 
 	getOutput() {
 		const { block } = this.props;
 		const attributes = this.state.attributes;
-		const apiURL = addQueryArgs( wpApiSettings.root + 'gutenberg/v1/blocks-renderer/' + block, { ...attributes } );
+		const apiURL = addQueryArgs( wpApiSettings.root + 'gutenberg/v1/blocks-renderer/' + block, {
+			...attributes,
+			_wpnonce: wpApiSettings.nonce,
+		} );
 		return window.fetch( apiURL, {
 			credentials: 'include',
-			_wpnonce: wpApiSettings.nonce,
 		} ).then( response => {
 			response.json().then( data => ( {
 				data: data,

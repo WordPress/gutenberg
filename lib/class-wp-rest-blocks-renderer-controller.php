@@ -62,7 +62,6 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function get_item_output_permissions_check() {
-		return true;
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error( 'gutenberg_block_cannot_read', __( 'Sorry, you are not allowed to read Gutenberg blocks as this user.', 'gutenberg' ), array(
 				'status' => rest_authorization_required_code(),
@@ -130,14 +129,14 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 	public function get_item_schema() {
 		return array(
 			'$schema'    => 'http://json-schema.org/schema#',
-			'title'      => 'shortcode-block',
+			'title'      => 'blocks-renderer',
 			'type'       => 'object',
 			'properties' => array(
-				'html'  => array(
+				'output'  => array(
 					'description' => __( 'The block\'s output.', 'gutenberg' ),
 					'type'        => 'string',
 					'required'    => true,
-				),'required'    => true,
+				),
 			),
 		);
 	}
