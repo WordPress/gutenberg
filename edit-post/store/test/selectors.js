@@ -13,10 +13,15 @@ import {
 	isSavingMetaBoxes,
 	getMetaBox,
 } from '../selectors';
-import { getSidebarSettings as getSidebarSettingsMock } from '../../api/sidebar';
+import { getRegisteredUIComponent as getRegisteredUIComponentMock } from '../../api/plugin';
 
-jest.mock( '../../api/sidebar', () => ( {
-	getSidebarSettings: jest.fn().mockReturnValue( null ),
+jest.mock( '@wordpress/element', () => ( {
+	compose: jest.fn().mockReturnValue( jest.fn() ),
+	Component: jest.fn(),
+	createElement: jest.fn(),
+} ) );
+jest.mock( '../../api/plugin', () => ( {
+	getRegisteredUIComponent: jest.fn().mockReturnValue( null ),
 } ) );
 
 describe( 'selectors', () => {
@@ -118,9 +123,9 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return true when the plugin sidebar is opened', () => {
-			getSidebarSettingsMock.mockReturnValueOnce( {
-				title: 'My Sidebar',
-				render: () => 'My Sidebar',
+			getRegisteredUIComponentMock.mockReturnValueOnce( {
+				pluginName: 'my-plugin',
+				uiType: 'sidebar',
 			} );
 			const name = 'my-plugin/my-sidebar';
 			const state = {
@@ -130,7 +135,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( isPluginSidebarOpened( state ) ).toBe( true );
-			expect( getSidebarSettingsMock ).toHaveBeenCalledWith( name );
+			expect( getRegisteredUIComponentMock ).toHaveBeenCalledWith( name, 'sidebar' );
 		} );
 	} );
 
