@@ -173,7 +173,6 @@ class Tooltip extends Component {
 				child.props.children,
 				isOver && (
 					<Popover
-						focusOnMount={ false }
 						position={ position }
 						className="components-tooltip"
 						aria-hidden="true"

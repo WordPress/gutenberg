@@ -47,7 +47,6 @@ describe( 'Tooltip', () => {
 			expect( button.children() ).toHaveLength( 2 );
 			expect( button.childAt( 0 ).text() ).toBe( 'Hover Me!' );
 			expect( button.childAt( 1 ).name() ).toBe( 'Popover' );
-			expect( popover.prop( 'focusOnMount' ) ).toBe( false );
 			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
 			expect( popover.children().text() ).toBe( 'Help text' );
 		} );
