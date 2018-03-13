@@ -27,7 +27,7 @@ const effects = {
 		}
 
 		// Allow toggling metaboxes panels
-		window.postboxes.add_postbox_toggles( 'post' );
+		window.postboxes.add_postbox_toggles( select( 'core/editor' ).getCurrentPostType() );
 
 		// Initialize metaboxes state
 		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
