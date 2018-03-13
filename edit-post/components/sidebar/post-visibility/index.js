@@ -25,7 +25,7 @@ export function PostVisibility() {
 								type="button"
 								aria-expanded={ isOpen }
 								className="edit-post-post-visibility__toggle button-link"
-								onClick={ onToggle }
+								onClick={ () => onToggle() }
 							>
 								<PostVisibilityLabel />
 							</button>

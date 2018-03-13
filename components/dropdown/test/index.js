@@ -4,9 +4,26 @@
 import { mount } from 'enzyme';
 
 /**
+ * WordPress dependencies
+ */
+import { keycodes, focus } from '@wordpress/utils';
+
+/**
  * Internal dependencies
  */
 import Dropdown from '../';
+
+jest.mock( '@wordpress/utils', () => {
+	const utils = require.requireActual( '@wordpress/utils' );
+	return {
+		...utils,
+		focus: {
+			tabbable: {
+				find: jest.fn().mockReturnValue( [] ),
+			},
+		},
+	};
+} );
 
 describe( 'Dropdown', () => {
 	const expectPopoverVisible = ( wrapper, visible ) => expect( wrapper.find( 'Popover' ) ).toHaveLength( visible ? 1 : 0 );
@@ -20,7 +37,7 @@ describe( 'Dropdown', () => {
 			className="container"
 			contentClassName="content"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<button aria-expanded={ isOpen } onClick={ onToggle }>Toggleee</button>
+				<button aria-expanded={ isOpen } onClick={ () => onToggle() }>Toggle</button>
 			) }
 			renderContent={ () => null }
 		/> );
@@ -40,7 +57,7 @@ describe( 'Dropdown', () => {
 			className="container"
 			contentClassName="content"
 			renderToggle={ ( { isOpen, onToggle, onClose } ) => [
-				<button key="open" className="open" aria-expanded={ isOpen } onClick={ onToggle }>Toggleee</button>,
+				<button key="open" className="open" aria-expanded={ isOpen } onClick={ () => onToggle() }>Toggle</button>,
 				<button key="close" className="close" onClick={ onClose } >closee</button>,
 			] }
 			renderContent={ () => null }
@@ -57,5 +74,25 @@ describe( 'Dropdown', () => {
 		wrapper.update();
 
 		expectPopoverVisible( wrapper, false );
+	} );
+
+	it( 'should open to first tabbable on keydown', () => {
+		focus.tabbable.find.mockImplementation( ( content ) => {
+			return [ content.querySelector( 'input' ) ];
+		} );
+
+		const wrapper = mount(
+			<Dropdown
+				renderToggle={ () => <button /> }
+				renderContent={ () => <input type="button" /> }
+			/>
+		);
+
+		wrapper.find( 'button' ).simulate( 'keydown', {
+			keyCode: keycodes.DOWN,
+		} );
+
+		expectPopoverVisible( wrapper, true );
+		expect( document.activeElement.nodeName ).toBe( 'INPUT' );
 	} );
 } );

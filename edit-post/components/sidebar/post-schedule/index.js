@@ -22,7 +22,7 @@ export function PostSchedule() {
 						<button
 							type="button"
 							className="edit-post-post-schedule__toggle button-link"
-							onClick={ onToggle }
+							onClick={ () => onToggle() }
 							aria-expanded={ isOpen }
 						>
 							<PostScheduleLabel />

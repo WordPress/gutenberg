@@ -19,7 +19,7 @@ function TableOfContents( { hasBlocks } ) {
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<IconButton
-					onClick={ onToggle }
+					onClick={ () => onToggle() }
 					icon="info-outline"
 					aria-expanded={ isOpen }
 					label={ __( 'Content Structure' ) }
