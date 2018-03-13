@@ -64,7 +64,7 @@ class FormatToolbar extends Component {
 
 	onKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
-			if ( this.state.isEditingLink ) {
+			if ( this.state.isEditingLink || this.state.isAddingLink ) {
 				event.stopPropagation();
 				this.dropLink();
 			}

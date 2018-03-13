@@ -1,10 +1,6 @@
 export const PREFERENCES_DEFAULTS = {
 	editorMode: 'visual',
-	activeGeneralSidebar: 'editor', // null | 'editor' | 'plugin'
-	activeSidebarPanel: { // The keys in this object should match activeSidebarPanel values
-		editor: null, // 'document' | 'block'
-		plugin: null, // pluginId
-	},
+	activeGeneralSidebar: 'edit-post/document', // null | 'edit-post/block' | 'edit-post/document' | 'plugin/*'
 	panels: { 'post-status': true },
 	features: {
 		fixedToolbar: false,

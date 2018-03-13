@@ -80,6 +80,7 @@ class PostTitle extends Component {
 					value={ title }
 					onChange={ this.onChange }
 					placeholder={ placeholder || __( 'Add title' ) }
+					aria-label={ placeholder || __( 'Add title' ) }
 					onFocus={ this.onSelect }
 					onKeyDown={ this.onKeyDown }
 					onKeyPress={ this.onUnselect }

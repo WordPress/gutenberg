@@ -1098,7 +1098,7 @@ function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
 		return null;
 	}
 
-	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! enabledBlockTypes.includes( blockType.name );
+	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! includes( enabledBlockTypes, blockType.name );
 	if ( blockTypeIsDisabled ) {
 		return null;
 	}
@@ -1132,7 +1132,7 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 		return null;
 	}
 
-	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! enabledBlockTypes.includes( 'core/block' );
+	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! includes( enabledBlockTypes, 'core/block' );
 	if ( blockTypeIsDisabled ) {
 		return null;
 	}
