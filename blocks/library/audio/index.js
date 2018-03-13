@@ -65,13 +65,13 @@ export const settings = {
 			this.state = {
 				editing: ! this.props.attributes.src,
 				src: this.props.attributes.src,
-				className,
 			};
 		}
+		
 		render() {
 			const { caption, id } = this.props.attributes;
-			const { setAttributes, isSelected } = this.props;
-			const { editing, className, src } = this.state;
+			const { setAttributes, isSelected, className } = this.props;
+			const { editing, src } = this.state;
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
 			};

@@ -158,7 +158,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				if ( fetching ) {
 					return [
 						controls,
-						<div key="loading" className="wp-block-embed is-loading">
+						<div key="loading" className={ classnames( className, 'is-loading' ) }>
 							<Spinner />
 							<p>{ __( 'Embedding…' ) }</p>
 						</div>,
@@ -170,7 +170,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 
 					return [
 						controls,
-						<Placeholder key="placeholder" icon={ icon } label={ label } className="wp-block-embed">
+						<Placeholder key="placeholder" icon={ icon } label={ label } className={ className }>
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
@@ -207,14 +207,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 						/>
 					</div>
 				);
-				let typeClassName = classnames( className, 'wp-block-embed' );
-				if ( 'video' === type ) {
-					typeClassName += ' is-video';
-				}
 
 				return [
 					controls,
-					<figure key="embed" className={ typeClassName }>
+					<figure key="embed" className={ classnames( className, { 'is-video': 'video' === type } ) }>
 						{ ( cannotPreview ) ? (
 							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
@@ -243,7 +239,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				return;
 			}
 
-			const embedClassName = classnames( 'wp-block-embed', {
+			const embedClassName = classnames( {
 				[ `align${ align }` ]: align,
 				[ `is-type-${ type }` ]: type,
 				[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
