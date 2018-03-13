@@ -57,7 +57,7 @@ body.gutenberg-editor-page {
 
 	/* We hide legacy notices in Gutenberg, because they were not designed in a way that scaled well.
 	   Plugins can use Gutenberg notices if they need to pass on information to the user when they are editing. */
-	#wpbody-content > div:not( .gutenberg ):not( #screen-meta ) {
+	#admin-notice-list {
 		display: none;
 	}
 

@@ -25,6 +25,7 @@ import { PluginArea } from '@wordpress/plugins';
  * Internal dependencies
  */
 import './style.scss';
+import AdminNotices from '../admin-notices';
 import Header from '../header';
 import Sidebar from '../sidebar';
 import TextEditor from '../text-editor';
@@ -63,6 +64,7 @@ function Layout( {
 			<AutosaveMonitor />
 			<Header />
 			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
+				<AdminNotices />
 				<EditorNotices />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />

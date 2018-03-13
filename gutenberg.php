@@ -158,6 +158,8 @@ function gutenberg_init( $return, $post ) {
 		return false;
 	}
 
+	add_action( 'admin_notices', 'gutenberg_before_notices', 0 );
+	add_action( 'admin_notices', 'gutenberg_after_notices', PHP_INT_MAX );
 	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
@@ -527,3 +529,23 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
 function gutenberg_add_admin_body_class( $classes ) {
 	return "$classes gutenberg-editor-page";
 }
+
+/**
+ * Adds an opening div tag before all notices in order to corral and hide them.
+ *
+ * @since 2.3.0
+ */
+function gutenberg_before_notices() {
+	echo '<div id="admin-notice-list">';
+}
+
+
+/**
+ * Adds a closing div tag after all notices in order to corral and hide them.
+ *
+ * @since 2.3.0
+ */
+function gutenberg_after_notices() {
+	echo '</div>';
+}
+
