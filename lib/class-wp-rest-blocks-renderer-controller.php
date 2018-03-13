@@ -93,16 +93,30 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_block_invalid_name', __( 'Invalid block name.' ), array( 'status' => 404 ) );
 		}
 
-		if ( isset( $request['attributes'] ) && is_array( $request['attributes'] ) ) {
-			$atts = $request['attributes'];
-		} else {
-			$atts = array();
-		}
+		$atts = $this->prepare_attributes( $request->get_params() );
 
 		$data = array(
 			'output' => $block->render( $atts ),
 		);
 		return rest_ensure_response( $data );
+	}
+
+	/**
+	 * Fix potential boolean value issues. The values come as strings and "false" and "true" might generate issues if left like this.
+	 *
+	 * @param array $attributes Attributes.
+	 * @return mixed Attributes.
+	 */
+	public function prepare_attributes( $attributes ) {
+		foreach ( $attributes as $key => $value ) {
+			if ( "false" === $value ) {
+				$attributes[ $key ] = false;
+			} elseif ( "true" === $value ) {
+				$attributes[ $key ] = true;
+			}
+		}
+
+		return $attributes;
 	}
 
 	/**
