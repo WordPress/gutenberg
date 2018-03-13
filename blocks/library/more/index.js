@@ -8,7 +8,7 @@ import { compact } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { ToggleControl } from '@wordpress/components';
-import { RawHTML } from '@wordpress/element';
+import { Component, RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -68,33 +68,48 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, isSelected } ) {
-		const { customText, noTeaser } = attributes;
+	edit: class extends Component {
+		
+		constructor() {
+			super( ...arguments );
+			this.onChangeInput = this.onChangeInput.bind( this );
+		}
 
-		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
-		const defaultText = __( 'Read more' );
-		const value = customText !== undefined ? customText : defaultText;
-		const inputLength = value.length ? value.length + 1 : 1;
+		onChangeInput( event ) {
+			const value = event.target.textLength === 0 ? undefined : event.target.value;
+			this.props.setAttributes( { customText: value } );
+		}
 
-		return [
-			isSelected && (
-				<InspectorControls key="inspector">
-					<ToggleControl
-						label={ __( 'Hide the teaser before the "More" tag' ) }
-						checked={ !! noTeaser }
-						onChange={ toggleNoTeaser }
+		render() {
+			const { customText, noTeaser } = this.props.attributes;
+			const { setAttributes, isSelected } = this.props;
+			
+			const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
+			const defaultText = __( 'Read more' );
+			const value = customText !== undefined ? customText : defaultText;
+			const inputLength = value.length ? value.length + 1 : 1;
+
+			return [
+				isSelected && (
+					<InspectorControls key="inspector">
+						<ToggleControl
+							label={ __( 'Hide the teaser before the "More" tag' ) }
+							checked={ !! noTeaser }
+							onChange={ toggleNoTeaser }
+						/>
+					</InspectorControls>
+				),
+				<div key="more-tag" className="wp-block-more">
+					<input
+						type="text"
+						value={ value }
+						size={ inputLength }
+						onChange={ this.onChangeInput }
 					/>
-				</InspectorControls>
-			),
-			<div key="more-tag" className="wp-block-more">
-				<input
-					type="text"
-					value={ value }
-					size={ inputLength }
-					onChange={ ( event ) => setAttributes( { customText: event.target.value } ) }
-				/>
-			</div>,
-		];
+				</div>,
+			];
+		}
+
 	},
 
 	save( { attributes } ) {
