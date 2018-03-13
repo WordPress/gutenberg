@@ -72,7 +72,7 @@ export const settings = {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/heading' ],
+				blocks: [ 'core/heading', 'core/paragraph' ],
 				transform: ( { content } ) => (
 					createBlock( 'core/cover-image', { title: content } )
 				),
@@ -86,6 +86,14 @@ export const settings = {
 					createBlock( 'core/heading', { content: title } )
 				),
 			},
+			{
+				type: 'block',
+				blocks: [ 'core/paragraph' ],
+				transform: ( { title } ) => (
+					createBlock( 'core/paragraph', { content: title } )
+				),
+			},
+
 		],
 	},
 
