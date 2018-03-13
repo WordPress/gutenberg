@@ -50,8 +50,7 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 
 // Left side inserter icon
 .editor-block-list__empty-block-inserter,
-.editor-inserter {
-	opacity: 0;
+.editor-default-block-appender .editor-inserter {
 	position: absolute;
 		top: $item-spacing;
 		right: $item-spacing;
@@ -68,11 +67,10 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 }
 
 // Quick block insertion icons on the right
-.editor-inserter-with-shortcuts,
-.editor-block-list__side-inserter {
+.editor-inserter-with-shortcuts {
 	position: absolute;
 	top: $item-spacing;
-	right: $item-spacing;
+	right: $block-padding;
 	display: none;
 
 	@include break-small {
