@@ -600,7 +600,6 @@
 	}
 }
 
-// @todo: verify
 .editor-block-list__side-inserter {
 	position: absolute;
 	top: $item-spacing;
@@ -608,7 +607,7 @@
 	display: none;
 
 	@include break-small {
-		right: $block-mover-padding-visible + 10px;
+		right: $block-side-ui-padding + 10px;
 		display: block;
 	}
 }
