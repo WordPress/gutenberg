@@ -1,10 +1,12 @@
-import { registerPlugin, getRegisteredUIComponent } from './plugin';
+import { PluginRegistry } from './plugin';
 import { PluginSidebarFill as PluginSidebar } from './components/plugin-sidebar';
 
+const registry = PluginRegistry.getInstance();
+
 const __experimental = {
-	registerPlugin,
+	registerPlugin: registry.registerPlugin,
+	getRegisteredUIComponent: registry.getRegisteredUIComponent,
 	PluginSidebar,
-	getRegisteredUIComponent,
 };
 
 export {

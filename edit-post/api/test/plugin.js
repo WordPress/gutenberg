@@ -1,4 +1,11 @@
-import { registerPlugin } from '../plugin';
+import { PluginRegistry } from '../plugin';
+
+let registerPlugin;
+
+beforeEach( () => {
+	const registry = PluginRegistry.resetInstance();
+	registerPlugin = registry.registerPlugin;
+} );
 
 describe( 'registerPlugin', () => {
 	it( 'successfully registers a plugin', () => {
@@ -41,6 +48,11 @@ describe( 'registerPlugin', () => {
 			name: 'plugin',
 			render: () => 'plugin content',
 		} );
+		registerPlugin( {
+			name: 'plugin',
+			render: () => 'plugin content',
+		} );
+		console.log( console ); // eslint-disable-line
 		expect( console ).toHaveErroredWith( 'Plugin "plugin" is already registered.' );
 	} );
 } );
