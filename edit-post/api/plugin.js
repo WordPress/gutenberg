@@ -14,6 +14,9 @@ import { isFunction, map } from 'lodash';
  */
 import { PluginContextProvider, withPluginContext } from './components/context';
 
+/**
+ * Singleton class for registering plugins.
+ */
 class PluginRegistry {
 	constructor() {
 		this.plugins = {};
@@ -103,6 +106,11 @@ class PluginRegistry {
 		return uiComponent;
 	}
 
+	/**
+	 * Get singleton instance.
+	 *
+	 * @return {PluginRegistry} PluginRegistry instance.
+	 */
 	static getInstance() {
 		if ( ! this.instance ) {
 			this.instance = new PluginRegistry();

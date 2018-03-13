@@ -35,6 +35,11 @@ class PluginSidebar extends Component {
 		}
 	}
 
+	/**
+	 * Generates the UI plugin identifier by combining the plugin name and the sidebar name.
+	 *
+	 * Also registers the plugin in the plugin registry.
+	 */
 	componentWillMount() {
 		if ( ! this.namespacedName ) {
 			this.namespacedName = `${ this.props.pluginContext.namespace }/${ this.props.name }`;
@@ -42,6 +47,11 @@ class PluginSidebar extends Component {
 		this.props.pluginContext.registerUIComponent( this.namespacedName, 'sidebar' );
 	}
 
+	/**
+	 * Renders the PluginSidebar component.
+	 *
+	 * @returns {ReactElement} The rendered component.
+	 */
 	render() {
 		if ( this.props.activePlugin !== this.namespacedName ) {
 			return null;
