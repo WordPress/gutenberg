@@ -18,16 +18,12 @@ export class ServerSideRender extends Component {
 			response: {},
 			attributes: props.attributes,
 		};
+
+		this.getOutput = this.getOutput.bind( this );
 	}
 
 	componentDidMount() {
 		this.getOutput();
-	}
-
-	componentWillReceiveProps( nextProps ) {
-		if ( JSON.stringify( nextProps.attributes ) !== JSON.stringify( this.props.attributes ) ) {
-			this.setState( { attributes: nextProps.attributes }, this.getOutput );
-		}
 	}
 
 	getOutput() {
