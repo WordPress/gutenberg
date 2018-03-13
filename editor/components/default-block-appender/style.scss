@@ -23,20 +23,9 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		border-radius: 50%;
 	}
 
-	.editor-inserter-with-shortcuts {
-		position: absolute;
-			top: 10px;
-			right: 58px;
-		display: none;
-
-		.components-icon-button {
-			color: $light-gray-700;
-			transition: color 0.2s;
-		}
-
-		@include break-small {
-			display: flex;
-		}
+	.editor-inserter-with-shortcuts .components-icon-button {
+		color: $light-gray-700;
+		transition: color 0.2s;
 	}
 
 	&:hover {
@@ -53,25 +42,41 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		}
 	}
 
-	.editor-inserter {
-		opacity: 0;
-		position: absolute;
-			top: 10px;
-			right: 10px;
-		transition: opacity 0.2s;
-
-		@include break-small {
-			left: 10px;
-			right: auto;
-		}
-
-		&:hover,
-		&:focus {
-			outline: 1px solid $light-gray-500;
-		}
-	}
-
+	// Dropzone
 	.components-drop-zone__content-icon {
 		display: none;
+	}
+}
+
+// Left side inserter icon
+.editor-block-list__empty-block-inserter,
+.editor-inserter {
+	opacity: 0;
+	position: absolute;
+		top: $item-spacing;
+		right: $item-spacing;
+	transition: opacity 0.2s;
+
+	@include break-small {
+		left: -$block-side-ui-padding;
+		right: auto;
+	}
+
+	.editor-inserter__toggle {
+		border-radius: 50%;
+	}
+}
+
+// Quick block insertion icons on the right
+.editor-inserter-with-shortcuts,
+.editor-block-list__side-inserter {
+	position: absolute;
+	top: $item-spacing;
+	right: $item-spacing;
+	display: none;
+
+	@include break-small {
+		right: -$block-padding;
+		display: flex;
 	}
 }

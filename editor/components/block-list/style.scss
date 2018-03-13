@@ -599,32 +599,3 @@
 		pointer-events: auto;
 	}
 }
-
-.editor-block-list__side-inserter {
-	position: absolute;
-	top: $item-spacing;
-	right: $item-spacing;
-	display: none;
-
-	@include break-small {
-		right: $block-side-ui-padding + 10px;
-		display: block;
-	}
-}
-
-.editor-block-list__empty-block-inserter {
-	position: absolute;
-		top: 10px;
-		right: 10px;
-
-	.editor-inserter__toggle {
-		border-radius: 50%;
-	}
-
-	@include break-small {
-		left: 10px;
-		right: auto;
-	}
-	top: $item-spacing;
-	right: $item-spacing;
-}
