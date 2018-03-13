@@ -99,4 +99,4 @@ export function resolveAttributes( settings ) {
 	return settings;
 }
 
-addFilter( 'blocks.registerBlockType', 'core/matchers', resolveAttributes );
+addFilter( 'blocks.registerBlockType', 'core/blocks/matchers/resolve-attributes', resolveAttributes );

@@ -82,7 +82,7 @@ function excludeLayoutFromUnmodifiedBlockCheck( attributeKeys ) {
 	return without( attributeKeys, 'layout' );
 }
 
-addFilter( 'blocks.registerBlockType', 'core/layout/attribute', addAttribute );
-addFilter( 'blocks.getSaveContent.extraProps', 'core/layout/save-props', addSaveProps );
-addFilter( 'blocks.switchToBlockType.transformedBlock', 'core/layout/preserve-layout', preserveLayoutAttribute );
-addFilter( 'blocks.isUnmodifiedDefaultBlock.attributes', 'core/layout/exclude-layout-attribute-check', excludeLayoutFromUnmodifiedBlockCheck );
+addFilter( 'blocks.registerBlockType', 'core/blocks/layout/add-attribute', addAttribute );
+addFilter( 'blocks.getSaveContent.extraProps', 'core/blocks/layout/add-save-props', addSaveProps );
+addFilter( 'blocks.switchToBlockType.transformedBlock', 'core/blcoks/layout/preserve-layout-attribute', preserveLayoutAttribute );
+addFilter( 'blocks.isUnmodifiedDefaultBlock.attributes', 'core/blocks/layout/exclude-layout-from-unmodified-block-check', excludeLayoutFromUnmodifiedBlockCheck );

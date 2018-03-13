@@ -118,6 +118,6 @@ function getOutboundType( blockType ) {
 
 addFilter(
 	'blocks.BlockEdit',
-	'core/validation/useOnce',
+	'core/edit-post/validate-use-once/with-use-once-validation',
 	withUseOnceValidation
 );
