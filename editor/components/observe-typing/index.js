@@ -9,6 +9,7 @@ import { includes } from 'lodash';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { isTextField, keycodes } from '@wordpress/utils';
+import { withSafeTimeout } from '@wordpress/components';
 
 const { UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE } = keycodes;
 
@@ -139,12 +140,18 @@ class ObserveTyping extends Component {
 	 * @param {FocusEvent} event Focus event.
 	 */
 	stopTypingOnNonTextField( event ) {
-		const { isTyping, onStopTyping } = this.props;
-		const { target } = event;
+		event.persist();
 
-		if ( isTyping && ! isTextField( target ) ) {
-			onStopTyping();
-		}
+		// Since focus to a non-text field via arrow key will trigger before
+		// the keydown event, wait until after current stack before evaluating
+		// whether typing is to be stopped. Otherwise, typing will re-start.
+		this.props.setTimeout( () => {
+			const { isTyping, onStopTyping } = this.props;
+			const { target } = event;
+			if ( isTyping && ! isTextField( target ) ) {
+				onStopTyping();
+			}
+		} );
 	}
 
 	render() {
@@ -183,4 +190,5 @@ export default compose( [
 			onStopTyping: stopTyping,
 		};
 	} ),
+	withSafeTimeout,
 ] )( ObserveTyping );
