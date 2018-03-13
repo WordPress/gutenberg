@@ -10,9 +10,25 @@ import BaseControl from '../base-control';
 import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
-function SelectControl( { label, help, instanceId, onChange, options = [], ...props } ) {
+function SelectControl( {
+	help,
+	instanceId,
+	label,
+	multiple = false,
+	onChange,
+	options = [],
+	...props
+} ) {
 	const id = `inspector-select-control-${ instanceId }`;
-	const onChangeValue = ( event ) => onChange( event.target.value );
+	const onChangeValue = ( event ) => {
+		if ( multiple ) {
+			const selectedOptions = [ ...event.target.options ].filter( ( { selected } ) => selected );
+			const newValues = selectedOptions.map( ( { value } ) => value );
+			onChange( newValues );
+			return;
+		}
+		onChange( event.target.value );
+	};
 
 	// Disable reason: A select with an onchange throws a warning
 
@@ -24,6 +40,7 @@ function SelectControl( { label, help, instanceId, onChange, options = [], ...pr
 				className="blocks-select-control__input"
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
+				multiple={ multiple }
 				{ ...props }
 			>
 				{ options.map( ( option ) =>
