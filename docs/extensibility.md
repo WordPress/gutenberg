@@ -133,19 +133,19 @@ This method takes two arguments:
   
 **Example**
 
-```js
+```jsx
 const { Fragment } = wp.element;
 const { PluginSidebar } = wp.editPost.__experimental;
 
 const Component = () => (
-	<Fragment>
+    <Fragment>
         <PluginSidebar name="first-sidebar-name" title="My Sidebar">
             <p>Content of the first sidebar</p>
         </PluginSidebar>
         <PluginSidebar name="second-sidebar-name" title="My Second Sidebar">
             <p>Content of the second sidebar</p>
         </PluginSidebar>
-	</Fragment>
+    </Fragment>
 );
 
 wp.editPost.__experimental.registerPlugin( 'plugin-names', {
@@ -167,7 +167,7 @@ The available UI components are found in the global variable `wp.editPost.__expe
 #### PluginSidebar
 
 Renders a sidebar when activated.
-```js
+```jsx
 <PluginSidebar name="sidebar-name" title="Sidebar title">
     <MySidebar />
 </PluginSidebar>
