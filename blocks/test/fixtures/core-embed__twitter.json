@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-twitter\">\n    https://twitter.com/automattic\n    <figcaption>We are Automattic</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-twitter wp-block-embed\">\n    https://twitter.com/automattic\n    <figcaption>We are Automattic</figcaption>\n</figure>"
     }
 ]

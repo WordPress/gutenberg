@@ -38,16 +38,7 @@ add_action(
  * @since 1.5.0
  */
 function gutenberg_collect_meta_box_data() {
-	global $_gutenberg_restore_globals_after_meta_boxes, $current_screen, $wp_meta_boxes, $post, $typenow;
-
-	// Depending on whether we are creating a post or editing one this may need to be different.
-	$potential_hookname = 'post';
-
-	// Set original screen to return to.
-	$GLOBALS['_gutenberg_restore_globals_after_meta_boxes']['current_screen'] = $current_screen;
-
-	// Override screen as though we are on post.php We have access to WP_Screen etc. by this point.
-	WP_Screen::get( $potential_hookname )->set_current_screen();
+	global $current_screen, $wp_meta_boxes, $post, $typenow;
 
 	$screen = $current_screen;
 
@@ -270,11 +261,6 @@ function gutenberg_collect_meta_box_data() {
 		'wp-edit-post',
 		'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
 	);
-
-	// Restore any global variables that we temporarily modified above.
-	foreach ( $_gutenberg_restore_globals_after_meta_boxes as $name => $value ) {
-		$GLOBALS[ $name ] = $value;
-	}
 }
 
 /**
@@ -401,11 +387,57 @@ function gutenberg_register_post_types() {
 			'singular_name' => 'Block',
 		),
 		'public'                => false,
-		'capability_type'       => 'post',
 		'show_in_rest'          => true,
 		'rest_base'             => 'blocks',
 		'rest_controller_class' => 'WP_REST_Blocks_Controller',
+		'capability_type'       => 'block',
+		'capabilities'          => array(
+			'read'         => 'read_blocks',
+			'create_posts' => 'create_blocks',
+		),
+		'map_meta_cap'          => true,
 	) );
+
+	$editor_caps = array(
+		'edit_blocks',
+		'edit_others_blocks',
+		'publish_blocks',
+		'read_private_blocks',
+		'read_blocks',
+		'delete_blocks',
+		'delete_private_blocks',
+		'delete_published_blocks',
+		'delete_others_blocks',
+		'edit_private_blocks',
+		'edit_published_blocks',
+		'create_blocks',
+	);
+
+	$caps_map = array(
+		'administrator' => $editor_caps,
+		'editor'        => $editor_caps,
+		'author'        => array(
+			'edit_blocks',
+			'publish_blocks',
+			'read_blocks',
+			'delete_blocks',
+			'delete_published_blocks',
+			'edit_published_blocks',
+			'create_blocks',
+		),
+		'contributor'   => array(
+			'read_blocks',
+		),
+	);
+
+	foreach ( $caps_map as $role_name => $caps ) {
+		$role = get_role( $role_name );
+		foreach ( $caps as $cap ) {
+			if ( ! $role->has_cap( $cap ) ) {
+				$role->add_cap( $cap );
+			}
+		}
+	}
 }
 add_action( 'init', 'gutenberg_register_post_types' );
 

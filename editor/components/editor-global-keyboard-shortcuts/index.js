@@ -7,20 +7,28 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
+import { Component, Fragment, compose } from '@wordpress/element';
 import { KeyboardShortcuts, withContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { getBlockOrder, getMultiSelectedBlockUids } from '../../store/selectors';
-import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../store/actions';
+import {
+	clearSelectedBlock,
+	multiSelect,
+	redo,
+	undo,
+	autosave,
+	removeBlocks,
+} from '../../store/actions';
 
 class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
 		super( ...arguments );
 		this.selectAll = this.selectAll.bind( this );
 		this.undoOrRedo = this.undoOrRedo.bind( this );
+		this.save = this.save.bind( this );
 		this.deleteSelectedBlocks = this.deleteSelectedBlocks.bind( this );
 	}
 
@@ -41,6 +49,11 @@ class EditorGlobalKeyboardShortcuts extends Component {
 		event.preventDefault();
 	}
 
+	save( event ) {
+		event.preventDefault();
+		this.props.onSave();
+	}
+
 	deleteSelectedBlocks( event ) {
 		const { multiSelectedBlockUids, onRemove, isLocked } = this.props;
 		if ( multiSelectedBlockUids.length ) {
@@ -53,14 +66,24 @@ class EditorGlobalKeyboardShortcuts extends Component {
 
 	render() {
 		return (
-			<KeyboardShortcuts shortcuts={ {
-				'mod+a': this.selectAll,
-				'mod+z': this.undoOrRedo,
-				'mod+shift+z': this.undoOrRedo,
-				backspace: this.deleteSelectedBlocks,
-				del: this.deleteSelectedBlocks,
-				escape: this.props.clearSelectedBlock,
-			} } />
+			<Fragment>
+				<KeyboardShortcuts
+					shortcuts={ {
+						'mod+a': this.selectAll,
+						'mod+z': this.undoOrRedo,
+						'mod+shift+z': this.undoOrRedo,
+						backspace: this.deleteSelectedBlocks,
+						del: this.deleteSelectedBlocks,
+						escape: this.props.clearSelectedBlock,
+					} }
+				/>
+				<KeyboardShortcuts
+					bindGlobal
+					shortcuts={ {
+						'mod+s': this.save,
+					} }
+				/>
+			</Fragment>
 		);
 	}
 }
@@ -79,6 +102,7 @@ export default compose(
 			onRedo: redo,
 			onUndo: undo,
 			onRemove: removeBlocks,
+			onSave: autosave,
 		}
 	),
 	withContext( 'editor' )( ( settings ) => {

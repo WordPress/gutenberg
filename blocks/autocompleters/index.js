@@ -112,7 +112,7 @@ export function userAutocompleter() {
 		if ( search ) {
 			payload = { data: { search } };
 		}
-		return ( new wp.api.collections.Users() ).fetch( payload ).then( ( users ) => {
+		return wp.apiRequest( { path: '/wp/v2/users' } ).then( ( users ) => {
 			return users.map( ( user ) => {
 				return {
 					value: user,

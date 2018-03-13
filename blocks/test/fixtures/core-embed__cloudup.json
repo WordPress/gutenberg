@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-cloudup\">\n    https://cloudup.com/\n    <figcaption>Embedded content from cloudup</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-cloudup wp-block-embed\">\n    https://cloudup.com/\n    <figcaption>Embedded content from cloudup</figcaption>\n</figure>"
     }
 ]

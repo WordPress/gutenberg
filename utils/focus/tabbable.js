@@ -27,7 +27,7 @@ function getTabIndex( element ) {
  *
  * @return {boolean} Whether element is tabbable.
  */
-function isTabbableIndex( element ) {
+export function isTabbableIndex( element ) {
 	return getTabIndex( element ) !== -1;
 }
 

@@ -9,24 +9,90 @@ import classnames from 'classnames';
 import { Component } from '@wordpress/element';
 import { IconButton, withAPIData, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import RichText from '../../rich-text';
 
+/**
+ * Module constants
+ */
+const { BACKSPACE, DELETE } = keycodes;
+
 class GalleryImage extends Component {
-	componentWillReceiveProps( { image } ) {
+	constructor() {
+		super( ...arguments );
+
+		this.onImageClick = this.onImageClick.bind( this );
+		this.onSelectCaption = this.onSelectCaption.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
+		this.bindContainer = this.bindContainer.bind( this );
+
+		this.state = {
+			captionSelected: false,
+		};
+	}
+
+	bindContainer( ref ) {
+		this.container = ref;
+	}
+
+	onSelectCaption() {
+		if ( ! this.state.captionSelected ) {
+			this.setState( {
+				captionSelected: true,
+			} );
+		}
+
+		if ( ! this.props.isSelected ) {
+			this.props.onSelect();
+		}
+	}
+
+	onImageClick() {
+		if ( ! this.props.isSelected ) {
+			this.props.onSelect();
+		}
+
+		if ( this.state.captionSelected ) {
+			this.setState( {
+				captionSelected: false,
+			} );
+		}
+	}
+
+	onKeyDown( event ) {
+		if (
+			this.container === document.activeElement &&
+			this.props.isSelected && [ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
+		) {
+			event.stopPropagation();
+			event.preventDefault();
+			this.props.onRemove();
+		}
+	}
+
+	componentWillReceiveProps( { isSelected, image } ) {
 		if ( image && image.data && ! this.props.url ) {
 			this.props.setAttributes( {
 				url: image.data.source_url,
 				alt: image.data.alt_text,
 			} );
 		}
+
+		// unselect the caption so when the user selects other image and comeback
+		// the caption is not immediately selected
+		if ( this.state.captionSelected && ! isSelected && this.props.isSelected ) {
+			this.setState( {
+				captionSelected: false,
+			} );
+		}
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, caption, onSelect, onUnselect, onRemove, setAttributes } = this.props;
+		const { url, alt, id, linkTo, link, isSelected, caption, onRemove, setAttributes } = this.props;
 
 		let href;
 
@@ -39,7 +105,10 @@ class GalleryImage extends Component {
 				break;
 		}
 
-		const img = url ? <img src={ url } alt={ alt } data-id={ id } /> : <Spinner />;
+		// Disable reason: Image itself is not meant to be
+		// interactive, but should direct image selection and unfocus caption fields
+		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
+		const img = url ? <img src={ url } alt={ alt } data-id={ id } onClick={ this.onImageClick } /> : <Spinner />;
 
 		const className = classnames( {
 			'is-selected': isSelected,
@@ -49,7 +118,7 @@ class GalleryImage extends Component {
 		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<figure className={ className } onClick={ isSelected ? onUnselect : onSelect }>
+			<figure className={ className } tabIndex="-1" onKeyDown={ this.onKeyDown } ref={ this.bindContainer }>
 				{ isSelected &&
 					<div className="blocks-gallery-item__inline-menu">
 						<IconButton
@@ -66,9 +135,9 @@ class GalleryImage extends Component {
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
-						isSelected={ isSelected }
+						isSelected={ this.state.captionSelected }
 						onChange={ newCaption => setAttributes( { caption: newCaption } ) }
-						onFocus={ ! isSelected ? onSelect : undefined }
+						onFocus={ this.onSelectCaption }
 						inlineToolbar
 					/>
 				) : null }

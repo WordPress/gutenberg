@@ -1,9 +1,9 @@
 .editor-warning {
 	z-index: z-index( '.editor-warning' );
 	position: absolute;
-	top: 50%;
+	top: 15px;
 	left: 50%;
-	transform: translate( -50%, -50% );
+	transform: translateX( -50% );
 	display: flex;
 	flex-direction: column;
 	justify-content: space-around;

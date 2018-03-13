@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-hulu\">\n    https://hulu.com/\n    <figcaption>Embedded content from hulu</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-hulu wp-block-embed\">\n    https://hulu.com/\n    <figcaption>Embedded content from hulu</figcaption>\n</figure>"
     }
 ]

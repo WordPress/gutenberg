@@ -1,5 +1,5 @@
 describe( 'Managing links', () => {
-	before( () => {
+	beforeEach( () => {
 		cy.newPost();
 	} );
 
@@ -7,7 +7,7 @@ describe( 'Managing links', () => {
 	const fixedIsOff = 'button:contains("Fix Toolbar to Top"):not(".is-selected")';
 
 	const setFixedToolbar = ( b ) => {
-		cy.get( '.edit-post-ellipsis-menu button' ).click();
+		cy.get( '.edit-post-more-menu button' ).click();
 
 		cy.get( 'body' ).then( ( $body ) => {
 			const candidate = b ? fixedIsOff : fixedIsOn;
@@ -16,7 +16,7 @@ describe( 'Managing links', () => {
 				return 'button:contains("Fix Toolbar to Top")';
 			}
 
-			return '.edit-post-ellipsis-menu button';
+			return '.edit-post-more-menu button';
 		} ).then( ( selector ) => {
 			cy.log( ' selector " + selector ', selector );
 			cy.get( selector ).click();
@@ -27,6 +27,8 @@ describe( 'Managing links', () => {
 		setFixedToolbar( true );
 
 		cy.get( '.editor-default-block-appender' ).click();
+
+		cy.focused().type( 'Text' );
 
 		cy.get( 'button[aria-label="Link"]' ).click();
 
@@ -42,14 +44,19 @@ describe( 'Managing links', () => {
 	it( 'Pressing Left and Esc in Link Dialog in "Docked Toolbar" mode', () => {
 		setFixedToolbar( false );
 
-		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
+		cy.get( '.editor-default-block-appender' ).click();
 
-		cy.get( lastBlockSelector ).click();
+		cy.focused().type( 'Text' );
+
+		// we need to trigger isTyping = false
+		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
+		cy.get( lastBlockSelector ).trigger( 'mousemove', { clientX: 200, clientY: 300 } );
+		cy.get( lastBlockSelector ).trigger( 'mousemove', { clientX: 250, clientY: 350 } );
 
 		cy.get( 'button[aria-label="Link"]' ).click();
 
 		// Typing "left" should not close the dialog
-		cy.focused().type( '{leftarrow}' );
+		cy.get( '.blocks-url-input input' ).type( '{leftarrow}' );
 		cy.get( '.blocks-format-toolbar__link-modal' ).should( 'be.visible' );
 
 		// Escape should close the dialog still.

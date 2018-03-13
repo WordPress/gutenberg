@@ -18,16 +18,23 @@ import {
 	isCurrentPostPublished,
 } from '../../store/selectors';
 
-function PostSwitchToDraftButton( { className, isSaving, isPublished, onClick } ) {
+function PostSwitchToDraftButton( { isSaving, isPublished, onClick } ) {
 	if ( ! isPublished ) {
 		return null;
 	}
 
+	const onSwitch = () => {
+		// eslint-disable-next-line no-alert
+		if ( window.confirm( __( 'Are you sure you want to unpublish this post?' ) ) ) {
+			onClick();
+		}
+	};
+
 	return (
 		<Button
-			className={ className }
+			className="editor-post-switch-to-draft"
 			isLarge
-			onClick={ onClick }
+			onClick={ onSwitch }
 			disabled={ isSaving }
 		>
 			{ __( 'Switch to Draft' ) }

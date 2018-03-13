@@ -9,7 +9,6 @@ import { shallow } from 'enzyme';
 import { ColorPalette } from '../';
 
 describe( 'ColorPalette', () => {
-	const defaultColors = [ 'green' ];
 	const colors = [ 'red', 'white', 'blue' ];
 	const currentColor = 'red';
 	const onChange = jest.fn();
@@ -23,10 +22,6 @@ describe( 'ColorPalette', () => {
 
 	test( 'should render a dynamic toolbar of colors', () => {
 		expect( wrapper ).toMatchSnapshot();
-	} );
-
-	test( 'should render a dynamic toolbar with default colors, when colors are not present', () => {
-		expect( shallow( <ColorPalette defaultColors={ defaultColors } value={ currentColor } onChange={ onChange } /> ) ).toMatchSnapshot();
 	} );
 
 	test( 'should render three color button options', () => {
@@ -57,6 +52,10 @@ describe( 'ColorPalette', () => {
 
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( undefined );
+	} );
+
+	test( 'should allow disabling custom color picker', () => {
+		expect( shallow( <ColorPalette colors={ colors } disableCustomColors={ true } value={ currentColor } onChange={ onChange } /> ) ).toMatchSnapshot();
 	} );
 
 	describe( 'Dropdown', () => {

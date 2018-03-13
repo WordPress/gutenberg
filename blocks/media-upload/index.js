@@ -1,6 +1,12 @@
 /**
+ * External Dependencies
+ */
+import { parse as hpqParse } from 'hpq';
+
+/**
  * WordPress dependencies
  */
+import { children } from '../api/matchers';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { pick } from 'lodash';
@@ -64,6 +70,7 @@ class MediaUpload extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onOpen = this.onOpen.bind( this );
+		this.processMediaCaption = this.processMediaCaption.bind( this );
 		const frameConfig = {
 			title,
 			button: {
@@ -110,10 +117,11 @@ class MediaUpload extends Component {
 		if ( ! selectedImages || ! selectedImages.models.length ) {
 			return;
 		}
+
 		if ( multiple ) {
-			onSelect( selectedImages.models.map( ( model ) => slimImageObject( model.toJSON() ) ) );
+			onSelect( selectedImages.models.map( ( model ) => this.processMediaCaption( slimImageObject( model.toJSON() ) ) ) );
 		} else {
-			onSelect( slimImageObject( selectedImages.models[ 0 ].toJSON() ) );
+			onSelect( this.processMediaCaption( slimImageObject( ( selectedImages.models[ 0 ].toJSON() ) ) ) );
 		}
 	}
 
@@ -121,7 +129,11 @@ class MediaUpload extends Component {
 		const { onSelect, multiple = false } = this.props;
 		// Get media attachment details from the frame state
 		const attachment = this.frame.state().get( 'selection' ).toJSON();
-		onSelect( multiple ? attachment : attachment[ 0 ] );
+		onSelect(
+			multiple ?
+				attachment.map( this.processMediaCaption ) :
+				this.processMediaCaption( attachment[ 0 ] )
+		);
 	}
 
 	onOpen() {
@@ -145,6 +157,12 @@ class MediaUpload extends Component {
 
 	openModal() {
 		this.frame.open();
+	}
+
+	processMediaCaption( mediaObject ) {
+		return ! mediaObject.caption ?
+			mediaObject :
+			{ ...mediaObject, caption: hpqParse( mediaObject.caption, children() ) };
 	}
 
 	render() {

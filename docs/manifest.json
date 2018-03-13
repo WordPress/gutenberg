@@ -156,6 +156,12 @@
 		"parent": "reference"
 	},
 	{
+		"title": "Repository Management",
+		"slug": "repository-management",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/repository-management.md",
+		"parent": "reference"
+	},
+	{
 		"title": "Outreach",
 		"slug": "outreach",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/outreach.md",

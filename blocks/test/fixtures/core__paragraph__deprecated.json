@@ -5,11 +5,19 @@
         "isValid": true,
         "attributes": {
             "content": [
-                "Unwrapped is still valid."
+                {
+                    "_owner": null,
+                    "_store": {},
+                    "key": "html",
+                    "props": {
+                        "children": "Unwrapped is <em>still</em> valid."
+                    },
+                    "ref": null
+                }
             ],
             "dropCap": false
         },
         "innerBlocks": [],
-        "originalContent": "Unwrapped is still valid."
+        "originalContent": "Unwrapped is <em>still</em> valid."
     }
 ]

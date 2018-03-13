@@ -6,8 +6,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, IconButton, Placeholder, Toolbar } from '@wordpress/components';
+import {
+	Button,
+	FormFileUpload,
+	IconButton,
+	Placeholder,
+	Toolbar,
+} from '@wordpress/components';
 import { Component } from '@wordpress/element';
+import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -17,7 +24,6 @@ import './editor.scss';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 export const name = 'core/audio';
 
@@ -37,9 +43,6 @@ export const settings = {
 			selector: 'audio',
 			attribute: 'src',
 		},
-		align: {
-			type: 'string',
-		},
 		caption: {
 			type: 'array',
 			source: 'children',
@@ -50,11 +53,8 @@ export const settings = {
 		},
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
+	supports: {
+		align: true,
 	},
 
 	edit: class extends Component {
@@ -69,10 +69,9 @@ export const settings = {
 			};
 		}
 		render() {
-			const { align, caption, id } = this.props.attributes;
+			const { caption, id } = this.props.attributes;
 			const { setAttributes, isSelected } = this.props;
 			const { editing, className, src } = this.state;
-			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
 			};
@@ -93,28 +92,12 @@ export const settings = {
 				}
 				return false;
 			};
-			const controls = isSelected && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit audio' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</Toolbar>
-				</BlockControls>
-			);
+			const setAudio = ( [ audio ] ) => onSelectAudio( audio );
+			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAudio, 'audio' );
 
 			if ( editing ) {
-				return [
-					controls,
+				return (
 					<Placeholder
-						key="placeholder"
 						icon="media-audio"
 						label={ __( 'Audio' ) }
 						instructions={ __( 'Select an audio file from your library, or upload a new one' ) }
@@ -132,6 +115,14 @@ export const settings = {
 								{ __( 'Use URL' ) }
 							</Button>
 						</form>
+						<FormFileUpload
+							isLarge
+							className="wp-block-audio__upload-button"
+							onChange={ uploadFromFiles }
+							accept="audio/*"
+						>
+							{ __( 'Upload' ) }
+						</FormFileUpload>
 						<MediaUpload
 							onSelect={ onSelectAudio }
 							type="audio"
@@ -142,13 +133,24 @@ export const settings = {
 								</Button>
 							) }
 						/>
-					</Placeholder>,
-				];
+					</Placeholder>
+				);
 			}
 
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 			return [
-				controls,
+				isSelected && (
+					<BlockControls key="controls">
+						<Toolbar>
+							<IconButton
+								className="components-icon-button components-toolbar__control"
+								label={ __( 'Edit audio' ) }
+								onClick={ switchToEditing }
+								icon="edit"
+							/>
+						</Toolbar>
+					</BlockControls>
+				),
 				<figure key="audio" className={ className }>
 					<audio controls="controls" src={ src } />
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
@@ -168,9 +170,9 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { align, src, caption } = attributes;
+		const { src, caption } = attributes;
 		return (
-			<figure className={ align ? `align${ align }` : null }>
+			<figure>
 				<audio controls="controls" src={ src } />
 				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>

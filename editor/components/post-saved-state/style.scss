@@ -1,33 +1,36 @@
 .editor-post-saved-state {
 	display: flex;
 	align-items: center;
-	margin-right: $item-spacing;
 	color: $dark-gray-500;
+	overflow: hidden;
 
 	.dashicon {
-		margin-right: 4px;
-		margin-left: -4px;
+		display: inline-block;
+	    flex: 0 0 auto;
+	}
+}
+
+.editor-post-saved-state,
+.editor-post-save-draft {
+	white-space: nowrap;
+	padding: 8px 4px;
+	width: $icon-button-size - 8px;
+
+	.dashicon {
+		margin-right: 8px;
 	}
 
-	.wp-core-ui &.button-link {
-		margin-right: $item-spacing;
-		padding: 0;
+	@include break-small() {
+		padding: 8px;
+		width: auto;
+		text-indent: inherit;
 
-		&:hover {
-			background: none;
+		.dashicon {
+			margin-right: 4px;
 		}
 	}
 }
 
-.editor-post-saved-state__mobile {
-	@include break-small {
-		display: none;
-	}
-}
-
-.editor-post-saved-state__desktop {
-	display: none;
-	@include break-small {
-		display: inline;
-	}
+.editor-post-saved-state__saving {
+	animation: loading_fade .5s infinite;
 }

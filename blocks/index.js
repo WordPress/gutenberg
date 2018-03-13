@@ -22,6 +22,7 @@ export { default as BlockEdit } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as ColorPalette } from './color-palette';
 export { default as Editable } from './rich-text/editable';
+export { default as ImagePlaceholder } from './image-placeholder';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorControls } from './inspector-controls';
 export { default as PlainText } from './plain-text';
@@ -29,7 +30,6 @@ export { default as MediaUpload } from './media-upload';
 export { default as MediaUploadButton } from './media-upload/button';
 export { default as RichText } from './rich-text';
 export { default as RichTextProvider } from './rich-text/provider';
-export { default as TermTreeSelect } from './term-tree-select';
 export { default as UrlInput } from './url-input';
 export { default as UrlInputButton } from './url-input/button';
 

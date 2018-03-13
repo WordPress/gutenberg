@@ -6,31 +6,32 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
 import { PostTaxonomies as PostTaxonomiesForm, PostTaxonomiesCheck } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { isEditorSidebarPanelOpened } from '../../../store/selectors';
-import { toggleSidebarPanel } from '../../../store/actions';
+import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
+import TaxonomyPanel from './taxonomy-panel';
 
 /**
  * Module Constants
  */
 const PANEL_NAME = 'post-taxonomies';
 
-function PostTaxonomies( { isOpened, onTogglePanel } ) {
+function PostTaxonomies() {
 	return (
 		<PostTaxonomiesCheck>
-			<PanelBody
-				title={ __( 'Categories & Tags' ) }
-				opened={ isOpened }
-				onToggle={ onTogglePanel }
-			>
-				<PostTaxonomiesForm />
-			</PanelBody>
+			<PostTaxonomiesForm
+				taxonomyWrapper={ ( content, taxonomy ) => {
+					return (
+						<TaxonomyPanel taxonomy={ taxonomy }>
+							{ content }
+						</TaxonomyPanel>
+					);
+				} }
+			/>
 		</PostTaxonomiesCheck>
 	);
 }
@@ -43,7 +44,7 @@ export default connect(
 	},
 	{
 		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
+			return toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
 	},
 	undefined,

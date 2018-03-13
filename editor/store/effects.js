@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, has, includes, map, castArray, uniqueId, reduce, values, some } from 'lodash';
+import { get, includes, map, castArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import {
 	serialize,
 	createReusableBlock,
 	isReusableBlock,
-	getDefaultBlockName,
+	getDefaultBlockForPostFormat,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -25,22 +25,18 @@ import { speak } from '@wordpress/a11y';
  */
 import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
+	setupEditorState,
 	resetPost,
-	setupNewPost,
-	resetBlocks,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
 	removeNotice,
 	savePost,
-	editPost,
-	requestMetaBoxUpdates,
-	metaBoxUpdatesSuccess,
 	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
-	setMetaBoxSavedData,
 	selectBlock,
+	removeBlock,
 } from './actions';
 import {
 	getCurrentPost,
@@ -52,12 +48,13 @@ import {
 	isEditedPostNew,
 	isEditedPostSaveable,
 	getBlock,
+	getBlockCount,
 	getBlocks,
 	getReusableBlock,
-	getMetaBoxes,
+	getProvisionalBlockUID,
+	isBlockSelected,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
-import { getMetaBoxContainer } from '../utils/meta-boxes';
 
 /**
  * Module Constants
@@ -65,6 +62,23 @@ import { getMetaBoxContainer } from '../utils/meta-boxes';
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
+
+/**
+ * Effect handler returning an action to remove the provisional block, if one
+ * is set.
+ *
+ * @param {Object} action Action object.
+ * @param {Object} store  Data store instance.
+ *
+ * @return {?Object} Remove action, if provisional block is set.
+ */
+export function removeProvisionalBlock( action, store ) {
+	const state = store.getState();
+	const provisionalBlockUID = getProvisionalBlockUID( state );
+	if ( provisionalBlockUID && ! isBlockSelected( state, provisionalBlockUID ) ) {
+		return removeBlock( provisionalBlockUID );
+	}
+}
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -84,12 +98,9 @@ export default {
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
-		new Model( toSend ).save().done( ( newPost ) => {
-			dispatch( {
-				type: 'RESET_POST',
-				post: newPost,
-			} );
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).done( ( newPost ) => {
+			dispatch( resetPost( newPost ) );
 			dispatch( {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				previousPost: post,
@@ -150,9 +161,6 @@ export default {
 			) );
 		}
 
-		// Update dirty meta boxes.
-		dispatch( requestMetaBoxUpdates() );
-
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
 				{ id: post.id },
@@ -182,9 +190,9 @@ export default {
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
 		const { postId } = action;
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( getState() ) );
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( getState() ) );
 		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
-		new Model( { id: postId } ).destroy().then(
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					...action,
@@ -218,7 +226,10 @@ export default {
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
-		const [ blockA, blockB ] = action.blocks;
+		const state = store.getState();
+		const [ blockAUid, blockBUid ] = action.blocks;
+		const blockA = getBlock( state, blockAUid );
+		const blockB = getBlock( state, blockBUid );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
@@ -279,59 +290,55 @@ export default {
 			return;
 		}
 
-		// Change status from auto-draft to draft
-		if ( isEditedPostNew( state ) ) {
-			dispatch( editPost( { status: 'draft' } ) );
-		}
-
 		dispatch( savePost() );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;
-		const effects = [];
 
 		// Parse content as blocks
+		let blocks;
 		if ( post.content.raw ) {
-			effects.push( resetBlocks( parse( post.content.raw ) ) );
+			blocks = parse( post.content.raw );
 		} else if ( settings.template ) {
-			const blocks = map( settings.template, ( [ name, attributes ] ) => {
-				const block = createBlock( name );
-				block.attributes = {
-					...block.attributes,
-					...attributes,
-				};
-				return block;
-			} );
-			effects.push( resetBlocks( blocks ) );
+			const createBlocksFromTemplate = ( template ) => {
+				return map( template, ( [ name, attributes, innerBlocksTemplate ] ) => {
+					return createBlock(
+						name,
+						attributes,
+						createBlocksFromTemplate( innerBlocksTemplate )
+					);
+				} );
+			};
+			blocks = createBlocksFromTemplate( settings.template );
+		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
+			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
+		} else {
+			blocks = [];
 		}
-
-		// Resetting post should occur after blocks have been reset, since it's
-		// the post reset that restarts history (used in dirty detection).
-		effects.push( resetPost( post ) );
 
 		// Include auto draft title in edits while not flagging post as dirty
+		const edits = {};
 		if ( post.status === 'auto-draft' ) {
-			effects.push( setupNewPost( {
-				title: post.title.raw,
-			} ) );
+			edits.title = post.title.raw;
+			edits.status = 'draft';
 		}
 
-		return effects;
+		return setupEditorState( post, blocks, edits );
 	},
 	FETCH_REUSABLE_BLOCKS( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
-		if ( ! has( wp, 'api.models.Blocks' ) && ! has( wp, 'api.collections.Blocks' ) ) {
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
 			return;
 		}
 		const { id } = action;
 		const { dispatch } = store;
-
 		let result;
 		if ( id ) {
-			result = new wp.api.models.Blocks( { id } ).fetch();
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
 		} else {
-			result = new wp.api.collections.Blocks().fetch();
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }` } );
 		}
 
 		result.then(
@@ -360,7 +367,8 @@ export default {
 	SAVE_REUSABLE_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
-		if ( ! has( wp, 'api.models.Blocks' ) ) {
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
 			return;
 		}
 
@@ -369,9 +377,12 @@ export default {
 
 		const { title, type, attributes, isTemporary } = getReusableBlock( getState(), id );
 		const content = serialize( createBlock( type, attributes ) );
-		const requestData = isTemporary ? { title, content } : { id, title, content };
 
-		new wp.api.models.Blocks( requestData ).save().then(
+		const data = isTemporary ? { title, content } : { id, title, content };
+		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
+		const method = isTemporary ? 'POST' : 'PUT';
+
+		wp.apiRequest( { path, data, method } ).then(
 			( updatedReusableBlock ) => {
 				dispatch( {
 					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
@@ -383,7 +394,7 @@ export default {
 			},
 			( error ) => {
 				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
-				const message = __( 'An unknown error occured.' );
+				const message = __( 'An unknown error occurred.' );
 				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
 					id: REUSABLE_BLOCK_NOTICE_ID,
 					spokenMessage: message,
@@ -394,7 +405,8 @@ export default {
 	DELETE_REUSABLE_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
-		if ( ! has( wp, 'api.models.Blocks' ) ) {
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
 			return;
 		}
 
@@ -421,7 +433,7 @@ export default {
 			optimist: { type: BEGIN, id: transactionId },
 		} );
 
-		new wp.api.models.Blocks( { id } ).destroy().then(
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
@@ -437,7 +449,7 @@ export default {
 					id,
 					optimist: { type: REVERT, id: transactionId },
 				} );
-				const message = __( 'An unknown error occured.' );
+				const message = __( 'An unknown error occurred.' );
 				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
 					id: REUSABLE_BLOCK_NOTICE_ID,
 					spokenMessage: message,
@@ -466,52 +478,25 @@ export default {
 		dispatch( saveReusableBlock( reusableBlock.id ) );
 		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
 	},
-	APPEND_DEFAULT_BLOCK( action ) {
-		const { attributes, rootUID } = action;
-		const block = createBlock( getDefaultBlockName(), attributes );
-
-		return insertBlock( block, undefined, rootUID );
-	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;
 		speak( message, 'assertive' );
 	},
-	INITIALIZE_META_BOX_STATE( action, store ) {
-		// Allow toggling metaboxes panels
-		if ( some( action.metaBoxes ) ) {
-			window.postboxes.add_postbox_toggles( 'post' );
+
+	EDIT_POST( action, { getState } ) {
+		const format = get( action, 'edits.format' );
+		if ( ! format ) {
+			return;
 		}
-		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
-			if ( isActive ) {
-				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
-			}
-			return memo;
-		}, {} );
-		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
+		const blockName = getDefaultBlockForPostFormat( format );
+		if ( blockName && getBlockCount( getState() ) === 0 ) {
+			return insertBlock( createBlock( blockName ) );
+		}
 	},
-	REQUEST_META_BOX_UPDATES( action, store ) {
-		const dataPerLocation = reduce( getMetaBoxes( store.getState() ), ( memo, metabox, location ) => {
-			if ( metabox.isActive ) {
-				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
-			}
-			return memo;
-		}, {} );
-		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
-		// To save the metaboxes, we serialize each one of the location forms and combine them
-		// We also add the "common" hidden fields from the base .metabox-base-form
-		const formData = values( dataPerLocation ).concat(
-			jQuery( '.metabox-base-form' ).serialize()
-		).join( '&' );
-		const fetchOptions = {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: formData,
-			credentials: 'include',
-		};
+	CLEAR_SELECTED_BLOCK: removeProvisionalBlock,
 
-		// Save the metaboxes
-		window.fetch( window._wpMetaBoxUrl, fetchOptions )
-			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
-	},
+	SELECT_BLOCK: removeProvisionalBlock,
+
+	MULTI_SELECT: removeProvisionalBlock,
 };

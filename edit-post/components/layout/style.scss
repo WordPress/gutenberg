@@ -62,7 +62,7 @@
 	padding: 10px 0 10px;
 	clear: both;
 
-	.editor-meta-boxes-area {
+	.edit-post-meta-boxes-area {
 		max-width: $visual-editor-max-width;
 		margin: auto;
 	}
@@ -70,12 +70,23 @@
 
 .edit-post-layout__content {
 	position: relative;
+	display: flex;
+	min-height: 100%;
+	flex-direction: column;
 
 	// on mobile the main content area has to scroll
 	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
 	@include break-small {
 		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
+	}
+
+	.edit-post-visual-editor {
+		flex-basis: 100%;
+	}
+
+	.edit-post-layout__metaboxes {
+		flex-shrink: 0;
 	}
 }
 

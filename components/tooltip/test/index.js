@@ -19,7 +19,7 @@ describe( 'Tooltip', () => {
 			expect( wrapper.children() ).toHaveLength( 2 );
 		} );
 
-		it( 'should render children with additional popover', () => {
+		it( 'should render children', () => {
 			const wrapper = shallow(
 				<Tooltip position="bottom right" text="Help Text">
 					<button>Hover Me!</button>
@@ -27,13 +27,27 @@ describe( 'Tooltip', () => {
 			);
 
 			const button = wrapper.find( 'button' );
+			expect( wrapper.type() ).toBe( 'button' );
+			expect( button.children() ).toHaveLength( 1 );
+			expect( button.childAt( 0 ).text() ).toBe( 'Hover Me!' );
+		} );
+
+		it( 'should render children with additional popover when over', () => {
+			const wrapper = shallow(
+				<Tooltip position="bottom right" text="Help Text">
+					<button>Hover Me!</button>
+				</Tooltip>
+			);
+
+			wrapper.setState( { isOver: true } );
+
+			const button = wrapper.find( 'button' );
 			const popover = wrapper.find( 'Popover' );
 			expect( wrapper.type() ).toBe( 'button' );
 			expect( button.children() ).toHaveLength( 2 );
 			expect( button.childAt( 0 ).text() ).toBe( 'Hover Me!' );
 			expect( button.childAt( 1 ).name() ).toBe( 'Popover' );
-			expect( popover.prop( 'isOpen' ) ).toBe( false );
-			expect( popover.prop( 'focusOnOpen' ) ).toBe( false );
+			expect( popover.prop( 'focusOnMount' ) ).toBe( false );
 			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
 			expect( popover.children().text() ).toBe( 'Help text' );
 		} );
@@ -58,11 +72,11 @@ describe( 'Tooltip', () => {
 			const popover = wrapper.find( 'Popover' );
 			expect( originalFocus ).toHaveBeenCalledWith( event );
 			expect( wrapper.state( 'isOver' ) ).toBe( true );
-			expect( popover.prop( 'isOpen' ) ).toBe( true );
+			expect( popover ).toHaveLength( 1 );
 		} );
 
 		it( 'should show popover on delayed mouseenter', () => {
-			const expectPopoverOpened = ( wrapper, opened ) => expect( wrapper.find( 'Popover' ) ).toHaveProp( 'isOpen', opened );
+			const expectPopoverVisible = ( wrapper, visible ) => expect( wrapper.find( 'Popover' ) ).toHaveLength( visible ? 1 : 0 );
 
 			// Mount: Issues with using `setState` asynchronously with shallow-
 			// rendered components: https://github.com/airbnb/enzyme/issues/450
@@ -88,12 +102,12 @@ describe( 'Tooltip', () => {
 			expect( originalMouseEnter ).toHaveBeenCalled();
 
 			expect( wrapper.state( 'isOver' ) ).toBe( false );
-			expectPopoverOpened( wrapper, false );
+			expectPopoverVisible( wrapper, false );
 			wrapper.instance().delayedSetIsOver.flush();
 			wrapper.update();
 
 			expect( wrapper.state( 'isOver' ) ).toBe( true );
-			expectPopoverOpened( wrapper, true );
+			expectPopoverVisible( wrapper, true );
 		} );
 
 		it( 'should ignore mouseenter on disabled elements', () => {
@@ -124,7 +138,7 @@ describe( 'Tooltip', () => {
 			const popover = wrapper.find( 'Popover' );
 			wrapper.instance().delayedSetIsOver.flush();
 			expect( wrapper.state( 'isOver' ) ).toBe( false );
-			expect( popover.prop( 'isOpen' ) ).toBe( false );
+			expect( popover ).toHaveLength( 0 );
 		} );
 
 		it( 'should cancel pending setIsOver on mouseleave', () => {
@@ -150,7 +164,7 @@ describe( 'Tooltip', () => {
 
 			const popover = wrapper.find( 'Popover' );
 			expect( wrapper.state( 'isOver' ) ).toBe( false );
-			expect( popover.prop( 'isOpen' ) ).toBe( false );
+			expect( popover ).toHaveLength( 0 );
 		} );
 	} );
 } );
