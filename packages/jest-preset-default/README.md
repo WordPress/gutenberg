@@ -12,7 +12,7 @@ npm install @wordpress/jest-preset-default --save-dev
 
 ## Setup
 
-### Via jest.config.json or `jest` field in `package.json`
+### Via `jest.config.json` or `jest` field in `package.json`
 
 ```json
 {
