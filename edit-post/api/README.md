@@ -3,18 +3,18 @@ Edit post API
 
 The edit post API contains the following methods:
 
-### `wp.editPost.__experimental.registerPlugin( { name: string, render: function } )`
+### `wp.editPost.__experimental.registerPlugin( name: string, { render: function } )`
 
-This method takes one argument: 
-- An object containing the following data:
-  - `name`: A string identifying the plugin. Must be unique across all registered plugins.
-  - `render`: A component containing the UI elements to be rendered. See the list below for all available UI elements.
+This method takes two arguments:
+1. `name`: A string identifying the plugin. Must be unique across all registered plugins.
+2. `settings`: An object containing the following data:
+   - `render`: A component containing the UI elements to be rendered. See the list below for all available UI elements.
   
 **Example**
 
 ```js
-const Fragment = wp.element.Fragment;
-const PluginSidebar = wp.editPost.__experimental.PluginSidebar;
+const { Fragment } = wp.element;
+const { PluginSidebar } = wp.editPost.__experimental;
 
 const Component = () => (
 	<Fragment>
@@ -27,8 +27,7 @@ const Component = () => (
 	</Fragment>
 );
 
-wp.editPost.__experimental.registerPlugin( {
-    name: 'plugin-name',
+wp.editPost.__experimental.registerPlugin( 'plugin-names', {
     render: Component,
 } );
 ```

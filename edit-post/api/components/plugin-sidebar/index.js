@@ -50,7 +50,7 @@ class PluginSidebar extends Component {
 	/**
 	 * Renders the PluginSidebar component.
 	 *
-	 * @returns {ReactElement} The rendered component.
+	 * @return {ReactElement} The rendered component.
 	 */
 	render() {
 		if ( this.props.activePlugin !== this.namespacedName ) {

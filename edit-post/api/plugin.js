@@ -29,34 +29,34 @@ class PluginRegistry {
 	/**
 	 * Registers a plugin to the editor.
 	 *
+	 * @param {string}   name   The name of the plugin.
 	 * @param {Object}   settings        The settings for this plugin.
-	 * @param {string}   settings.name   The name of the plugin.
 	 * @param {Function} settings.render The function that renders the plugin.
 	 *
 	 * @return {Object} The final plugin settings object.
 	 */
-	registerPlugin( settings ) {
+	registerPlugin( name, settings ) {
 		if ( typeof settings !== 'object' ) {
 			console.error(
 				'No settings object provided!'
 			);
 			return null;
 		}
-		if ( typeof settings.name !== 'string' ) {
+		if ( typeof name !== 'string' ) {
 			console.error(
 				'Plugin names must be strings.'
 			);
 			return null;
 		}
-		if ( ! /^[a-z][a-z0-9-]*$/.test( settings.name ) ) {
+		if ( ! /^[a-z][a-z0-9-]*$/.test( name ) ) {
 			console.error(
 				'Plugin names must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-plugin".'
 			);
 			return null;
 		}
-		if ( this.plugins[ settings.name ] ) {
+		if ( this.plugins[ name ] ) {
 			console.error(
-				`Plugin "${ settings.name }" is already registered.`
+				`Plugin "${ name }" is already registered.`
 			);
 		}
 		if ( ! isFunction( settings.render ) ) {
@@ -66,9 +66,10 @@ class PluginRegistry {
 			return null;
 		}
 
+		settings.name = name;
 		settings.sidebar = {};
 
-		settings = applyFilters( 'editPost.registerPlugin', settings, settings.name );
+		settings = applyFilters( 'editPost.registerPlugin', settings, name );
 
 		return this.plugins[ settings.name ] = settings;
 	}
