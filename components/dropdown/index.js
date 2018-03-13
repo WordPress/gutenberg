@@ -121,6 +121,8 @@ class Dropdown extends Component {
 		} else {
 			this.toggle( true, true );
 		}
+
+		event.stopPropagation();
 	}
 
 	render() {
