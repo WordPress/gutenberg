@@ -2,6 +2,10 @@
 .edit-post-meta-boxes-area {
 	position: relative;
 
+	* {
+		box-sizing: content-box;
+	}
+
 		/* Match width and positioning of the meta boxes. Override default styles. */
 	#poststuff {
 		margin: 0 auto;
