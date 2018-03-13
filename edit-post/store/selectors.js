@@ -3,6 +3,7 @@
  */
 import createSelector from 'rememo';
 import { includes, some } from 'lodash';
+import { __experimental } from '../api';
 
 /**
  * Returns the current editing mode.
@@ -36,7 +37,9 @@ export function isEditorSidebarOpened( state ) {
 export function isPluginSidebarOpened( state ) {
 	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
 
-	return activeGeneralSidebar ? activeGeneralSidebar.startsWith( 'plugin/' ) : false;
+	const uiComponent = __experimental.getRegisteredUIComponent( activeGeneralSidebar, 'sidebar' );
+
+	return !! uiComponent;
 }
 
 /**

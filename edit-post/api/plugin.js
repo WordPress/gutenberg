@@ -15,6 +15,7 @@ import { isFunction, map } from 'lodash';
 import { PluginContextProvider, withPluginContext } from './components/context';
 
 const plugins = {};
+const pluginUIComponents = {};
 
 /**
  * Registers a plugin to the editor.
@@ -56,9 +57,44 @@ function registerPlugin( settings ) {
 		return null;
 	}
 
+	settings.sidebar = {};
+
 	settings = applyFilters( 'editPost.registerPlugin', settings, settings.name );
 
 	return plugins[ settings.name ] = settings;
+}
+
+/**
+ * A callback called by the UI components via context to register the UI component.
+ *
+ * @param {string} pluginName       The plugin name.
+ * @param {string} uiNamespacedName The unique ui plugin identifier.
+ * @param {string} uiType           The UI type.
+ */
+function registerUIComponent( pluginName, uiNamespacedName, uiType ) {
+	pluginUIComponents[ uiNamespacedName ] = {
+		pluginName,
+		uiType,
+	};
+}
+
+/**
+ * Get the registered plugin information, null if it doesn't exist.
+ *
+ * @param {string}  uiNamespacedName The unique ui plugin identifier.
+ * @param {string?} uiType           Optional UI type, will only return if ui type matches.
+ *
+ * @return {Object|null} Object containing plugin information null if the plugin doesn't exist.
+ */
+function getRegisteredUIComponent( uiNamespacedName, uiType = null ) {
+	const uiComponent = pluginUIComponents[ uiNamespacedName ] || null;
+	if ( uiType ) {
+		if ( uiComponent && uiComponent.uiType === uiType ) {
+			return uiComponent;
+		}
+		return null;
+	}
+	return uiComponent;
 }
 
 /**
@@ -69,8 +105,12 @@ class PluginArea extends Component {
 		return (
 			<div id="plugin-fills" style={ { display: 'none' } }>
 				{ map( plugins, plugin => {
+					const boundRegisterUIComponent = registerUIComponent.bind( null, plugin.name );
 					return (
-						<PluginContextProvider key={ plugin.name } value={ { namespace: plugin.name } }>
+						<PluginContextProvider key={ plugin.name } value={ {
+							registerUIComponent: boundRegisterUIComponent,
+							namespace: plugin.name,
+						} }>
 							{ plugin.render() }
 						</PluginContextProvider>
 					);
@@ -84,4 +124,5 @@ export {
 	PluginArea,
 	withPluginContext,
 	registerPlugin,
+	getRegisteredUIComponent,
 };

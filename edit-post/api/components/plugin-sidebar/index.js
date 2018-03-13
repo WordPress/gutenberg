@@ -35,10 +35,14 @@ class PluginSidebar extends Component {
 		}
 	}
 
-	render() {
+	componentWillMount() {
 		if ( ! this.namespacedName ) {
 			this.namespacedName = `${ this.props.pluginContext.namespace }/${ this.props.name }`;
 		}
+		this.props.pluginContext.registerUIComponent( this.namespacedName, 'sidebar' );
+	}
+
+	render() {
 		if ( this.props.activePlugin !== this.namespacedName ) {
 			return null;
 		}
