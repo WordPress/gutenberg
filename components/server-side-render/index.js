@@ -3,15 +3,12 @@
  */
 import {
 	Component,
-	compose,
-	RawHTML
+	RawHTML,
 } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
 export class ServerSideRender extends Component {
-
 	constructor( props ) {
 		super( props );
 		this.state = {
