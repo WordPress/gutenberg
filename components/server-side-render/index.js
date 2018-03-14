@@ -31,27 +31,21 @@ export class ServerSideRender extends Component {
 		this.setState( { response: {} } );
 		const { block } = this.props;
 		const attributes = this.state.attributes;
-		const apiURL = addQueryArgs( wpApiSettings.root + 'gutenberg/v1/blocks-renderer/' + block, {
+		const apiURL = addQueryArgs( '/gutenberg/v1/blocks-renderer/' + block, {
 			...attributes,
 			_wpnonce: wpApiSettings.nonce,
 		} );
-		return window.fetch( apiURL, {
-			credentials: 'include',
-		} ).then( response => {
-			response.json().then( data => ( {
-				data: data,
-				status: response.status,
-			} ) ).then( res => {
-				if ( res.status === 200 ) {
-					this.setState( { response: res } );
-				}
-			} );
+
+		return wp.apiRequest( { path: apiURL } ).then( response => {
+			if ( response && response.output ) {
+				this.setState( { response: response.output } );
+			}
 		} );
 	}
 
 	render() {
 		const response = this.state.response;
-		if ( response.isLoading || ! response.data ) {
+		if ( ! response.length ) {
 			return (
 				<div key="loading" className="wp-block-embed is-loading">
 
@@ -60,9 +54,8 @@ export class ServerSideRender extends Component {
 			);
 		}
 
-		const html = response.data.output;
 		return (
-			<RawHTML key="html">{ html }</RawHTML>
+			<RawHTML key="html">{ response }</RawHTML>
 		);
 	}
 }
