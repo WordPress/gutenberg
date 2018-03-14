@@ -87,6 +87,7 @@
 		"phpegjs": "1.0.0-beta7",
 		"postcss-loader": "2.0.6",
 		"prismjs": "1.6.0",
+		"puppeteer": "1.1.1",
 		"raw-loader": "0.5.1",
 		"react-test-renderer": "16.0.0",
 		"sass-loader": "6.0.6",
