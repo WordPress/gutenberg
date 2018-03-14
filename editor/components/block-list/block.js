@@ -46,7 +46,7 @@ import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
-import { createInnerBlockList } from './utils';
+import { createInnerBlockList } from '../../utils/block-list';
 import {
 	editPost,
 	insertBlocks,

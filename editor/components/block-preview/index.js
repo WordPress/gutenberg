@@ -12,7 +12,7 @@ import { createBlock, BlockEdit } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { createInnerBlockList } from '../block-list/utils';
+import { createInnerBlockList } from '../../utils/block-list';
 import './style.scss';
 
 /**
