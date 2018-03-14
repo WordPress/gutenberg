@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { withContext } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -35,7 +36,7 @@ export function DefaultBlockAppender( {
 		return null;
 	}
 
-	const value = placeholder || __( 'Write your story' );
+	const value = decodeEntities( placeholder ) || __( 'Write your story' );
 
 	return (
 		<div
