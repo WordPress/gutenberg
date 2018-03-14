@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
 
@@ -11,7 +10,7 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { withContext, withFocusOutside } from '@wordpress/components';
 
 /**
@@ -19,8 +18,6 @@ import { withContext, withFocusOutside } from '@wordpress/components';
  */
 import './style.scss';
 import PostPermalink from '../post-permalink';
-import { getEditedPostAttribute } from '../../store/selectors';
-import { insertBlock, editPost, clearSelectedBlock } from '../../store/actions';
 
 /**
  * Constants
@@ -90,20 +87,27 @@ class PostTitle extends Component {
 	}
 }
 
-const applyConnect = connect(
-	( state ) => ( {
-		title: getEditedPostAttribute( state, 'title' ),
-	} ),
-	{
+const applyWithSelect = withSelect( ( select ) => {
+	const { getEditedPostAttribute } = select( 'core/editor' );
+
+	return {
+		title: getEditedPostAttribute( 'title' ),
+	};
+} );
+
+const applyWithDispatch = withDispatch( ( dispatch ) => {
+	const { insertDefaultBlock, editPost, clearSelectedBlock } = dispatch( 'core/editor' );
+
+	return {
 		onEnterPress() {
-			return insertBlock( createBlock( getDefaultBlockName() ), 0 );
+			insertDefaultBlock( undefined, undefined, 0 );
 		},
 		onUpdate( title ) {
-			return editPost( { title } );
+			editPost( { title } );
 		},
 		clearSelectedBlock,
-	}
-);
+	};
+} );
 
 const applyEditorSettings = withContext( 'editor' )(
 	( settings ) => ( {
@@ -112,7 +116,8 @@ const applyEditorSettings = withContext( 'editor' )(
 );
 
 export default compose(
-	applyConnect,
+	applyWithSelect,
+	applyWithDispatch,
 	applyEditorSettings,
 	withFocusOutside
 )( PostTitle );
