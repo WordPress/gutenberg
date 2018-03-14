@@ -65,7 +65,7 @@ export const settings = {
 	},
 
 	edit: class extends Component {
-		constructor( { className } ) {
+		constructor() {
 			super( ...arguments );
 			// edit component has its own src in the state so it can be edited
 			// without setting the actual value outside of the edit UI
