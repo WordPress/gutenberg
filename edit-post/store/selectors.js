@@ -3,7 +3,11 @@
  */
 import createSelector from 'rememo';
 import { includes, some } from 'lodash';
-import { __experimental } from '../api';
+
+/**
+ * WordPress dependencies
+ */
+import { __experimental } from '@wordpress/plugins';
 
 /**
  * Returns the current editing mode.

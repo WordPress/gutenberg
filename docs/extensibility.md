@@ -124,7 +124,7 @@ _Note:_ This filter must always be run on every page load, and not in your brows
 
 Extending the editor's UI is done with in `registerPlugin` API, and allows you to define all your plugin's UI elements in one place.
 
-### `wp.editPost.__experimental.registerPlugin( name: string, { render: function } )`
+### `wp.plugins.__experimental.registerPlugin( name: string, { render: function } )`
 
 This method takes two arguments:
 1. `name`: A string identifying the plugin. Must be unique across all registered plugins.

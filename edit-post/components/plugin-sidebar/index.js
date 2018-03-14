@@ -4,12 +4,12 @@
 import { Component, Children, cloneElement, compose } from '@wordpress/element';
 import { Slot, Fill, withFocusReturn } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { withPluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import withPluginContext from '../higher-order/with-plugin-context';
 import SidebarLayout from './sidebar-layout';
 import ErrorBoundary from './sidebar-error-boundary';
 

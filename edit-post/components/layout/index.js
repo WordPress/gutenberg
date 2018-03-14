@@ -19,6 +19,7 @@ import {
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/element';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -31,7 +32,6 @@ import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import PluginArea from '../plugin-area';
 import { PluginSidebar } from '../plugin-sidebar';
 
 function Layout( {

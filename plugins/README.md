@@ -3,7 +3,7 @@ Edit post API
 
 The edit post API contains the following methods:
 
-### `wp.editPost.__experimental.registerPlugin( name: string, { render: function } )`
+### `wp.plugins.__experimental.registerPlugin( name: string, { render: function } )`
 
 This method takes two arguments:
 1. `name`: A string identifying the plugin. Must be unique across all registered plugins.

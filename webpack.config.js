@@ -57,6 +57,7 @@ const entryPointNames = [
 	'data',
 	'viewport',
 	[ 'editPost', 'edit-post' ],
+	'plugins',
 ];
 
 const packageNames = [

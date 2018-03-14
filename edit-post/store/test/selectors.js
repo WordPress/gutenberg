@@ -13,7 +13,7 @@ import {
 	isSavingMetaBoxes,
 	getMetaBox,
 } from '../selectors';
-import { __experimental } from '../../api';
+import { __experimental } from '@wordpress/plugins';
 const getRegisteredUIComponentMock = __experimental.getRegisteredUIComponent;
 
 jest.mock( '@wordpress/element', () => ( {
@@ -21,7 +21,7 @@ jest.mock( '@wordpress/element', () => ( {
 	Component: jest.fn(),
 	createElement: jest.fn(),
 } ) );
-jest.mock( '../../api', () => ( {
+jest.mock( '@wordpress/plugins', () => ( {
 	__experimental: {
 		getRegisteredUIComponent: jest.fn().mockReturnValue( null ),
 	},
