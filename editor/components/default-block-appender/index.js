@@ -2,13 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { getDefaultBlockName } from '@wordpress/blocks';
 import { withContext } from '@wordpress/components';
 
 /**
@@ -21,7 +22,15 @@ import { getBlock, getBlockCount } from '../../store/selectors';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 
-export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPrompt, placeholder, layout, rootUID } ) {
+export function DefaultBlockAppender( {
+	isLocked,
+	isVisible,
+	onAppend,
+	showPrompt,
+	placeholder,
+	layout,
+	rootUID,
+} ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
@@ -29,7 +38,9 @@ export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPromp
 	const value = placeholder || __( 'Write your story' );
 
 	return (
-		<div className="editor-default-block-appender">
+		<div
+			data-root-uid={ rootUID || '' }
+			className="editor-default-block-appender">
 			<BlockDropZone />
 			<input
 				className="editor-default-block-appender__content"
@@ -50,10 +61,10 @@ export default compose(
 		( state, ownProps ) => {
 			const isEmpty = ! getBlockCount( state, ownProps.rootUID );
 			const lastBlock = getBlock( state, ownProps.lastBlockUID );
-			const isLastBlockEmptyDefault = lastBlock && isUnmodifiedDefaultBlock( lastBlock );
+			const isLastBlockDefault = get( lastBlock, 'name' ) === getDefaultBlockName();
 
 			return {
-				isVisible: isEmpty || ! isLastBlockEmptyDefault,
+				isVisible: isEmpty || ! isLastBlockDefault,
 				showPrompt: isEmpty,
 			};
 		},
