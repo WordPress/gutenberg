@@ -4,6 +4,11 @@
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
 class SidebarErrorBoundary extends Component {
 	constructor( props ) {
 		super( props );

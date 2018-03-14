@@ -1,10 +1,13 @@
-import './style.scss';
-
 /**
  * WordPress dependencies
  */
 import { IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import './style.scss';
 
 const SidebarLayout = ( { onClose, title, children } ) => {
 	return (
