@@ -12,7 +12,7 @@ import { isFunction, map } from 'lodash';
 /**
  * Internal dependencies
  */
-import { PluginContextProvider, withPluginContext } from './components/context';
+import PluginContextProvider from '../components/plugin-context-provider';
 
 /**
  * Singleton class for registering plugins.
@@ -152,6 +152,5 @@ class PluginArea extends Component {
 
 export {
 	PluginArea,
-	withPluginContext,
 	PluginRegistry,
 };

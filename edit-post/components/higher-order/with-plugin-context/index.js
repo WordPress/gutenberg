@@ -8,22 +8,15 @@ import { noop } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 
-class PluginContextProvider extends Component {
-	getChildContext() {
-		return {
-			pluginContext: this.props.value,
-		};
-	}
-
-	render() {
-		return this.props.children;
-	}
-}
-
-PluginContextProvider.childContextTypes = {
-	pluginContext: noop,
-};
-
+/**
+ * Higher-order component creator that creates a new component and provides
+ * the plugin context provided by the PluginContextProvider component as
+ * props to that component under props.pluginContext.
+ *
+ * @param {ReactElement} WrappedComponent The component to be decorated.
+ *
+ * @return {PluginContextConsumer} The higher order component.
+ */
 function withPluginContext( WrappedComponent ) {
 	class PluginContextConsumer extends Component {
 		render() {
@@ -41,7 +34,4 @@ function withPluginContext( WrappedComponent ) {
 	return PluginContextConsumer;
 }
 
-export {
-	PluginContextProvider,
-	withPluginContext,
-};
+export default withPluginContext;

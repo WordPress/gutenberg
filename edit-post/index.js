@@ -21,7 +21,7 @@ import Layout from './components/layout';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 
-export { PluginSidebarFill as PluginSidebar } from './api/components/plugin-sidebar';
+export { PluginSidebarFill as PluginSidebar } from './components/plugin-sidebar';
 export * from './api';
 
 // Configure moment globally

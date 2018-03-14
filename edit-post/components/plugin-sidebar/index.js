@@ -9,7 +9,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import './style.scss';
-import { withPluginContext } from '../../plugin';
+import withPluginContext from '../higher-order/with-plugin-context';
 import SidebarLayout from './sidebar-layout';
 import ErrorBoundary from './error-boundary';
 
