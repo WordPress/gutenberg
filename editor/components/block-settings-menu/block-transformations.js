@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
 import { getPossibleBlockTransformations, switchToBlockType } from '@wordpress/blocks';
 import { compose, Fragment } from '@wordpress/element';
@@ -27,9 +27,12 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 	return (
 		<Fragment>
 			<div className="editor-block-settings-menu__separator" />
+			<span
+				className="editor-block-switcher__menu-title"
+			>
+				{ __( 'Transform into:' ) }
+			</span>
 			{ possibleBlockTransformations.map( ( { name, title, icon } ) => {
-			/* translators: label indicating the transformation of a block into another block */
-				const shownText = sprintf( __( 'Turn into %s' ), title );
 				return (
 					<IconButton
 						key={ name }
@@ -39,9 +42,9 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 							onClick( event );
 						} }
 						icon={ icon }
-						label={ small ? shownText : undefined }
+						label={ small ? title : undefined }
 					>
-						{ ! small && shownText }
+						{ ! small && title }
 					</IconButton>
 				);
 			} ) }
