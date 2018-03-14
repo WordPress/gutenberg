@@ -18,7 +18,7 @@
 	}
 
 	&.is-selected .editor-post-title__input,
-	.editor-post-title__input:focus {
+	.editor-post-title__input:hover {
 		border: 1px solid $light-gray-500;
 	}
 }

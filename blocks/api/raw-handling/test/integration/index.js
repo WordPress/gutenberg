@@ -14,6 +14,7 @@ import serialize from '../../../serializer';
 
 const types = [
 	'plain',
+	'classic',
 	'apple',
 	'google-docs',
 	'ms-word',
