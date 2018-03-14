@@ -34,10 +34,11 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 	 */
 	public function register_routes() {
 
+		// @codingStandardsIgnoreLine - PHPCS mistakes $this->namespace for the namespace keyword.
 		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<name>[\w-]+\/[\w-]+)', array(
-			'args' => array(
+			'args'   => array(
 				'name' => array(
-					'description' => __( 'Unique registered name for the block.' ),
+					'description' => __( 'Unique registered name for the block.', 'gutenberg' ),
 					'type'        => 'string',
 				),
 			),
@@ -82,14 +83,14 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 	 */
 	public function get_item_output( $request ) {
 		if ( ! isset( $request['name'] ) ) {
-			return new WP_Error( 'rest_block_invalid_name', __( 'Invalid block name.' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_block_invalid_name', __( 'Invalid block name.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		$registry = WP_Block_Type_Registry::get_instance();
 		$block    = $registry->get_registered( $request['name'] );
 
-		if ( ! $block || ! $block instanceof WP_Block_Type) {
-			return new WP_Error( 'rest_block_invalid_name', __( 'Invalid block name.' ), array( 'status' => 404 ) );
+		if ( ! $block || ! $block instanceof WP_Block_Type ) {
+			return new WP_Error( 'rest_block_invalid_name', __( 'Invalid block name.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		$atts = $this->prepare_attributes( $request->get_params() );
@@ -108,9 +109,9 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 	 */
 	public function prepare_attributes( $attributes ) {
 		foreach ( $attributes as $key => $value ) {
-			if ( "false" === $value ) {
+			if ( 'false' === $value ) {
 				$attributes[ $key ] = false;
-			} elseif ( "true" === $value ) {
+			} elseif ( 'true' === $value ) {
 				$attributes[ $key ] = true;
 			}
 		}
@@ -132,7 +133,7 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 			'title'      => 'blocks-renderer',
 			'type'       => 'object',
 			'properties' => array(
-				'output'  => array(
+				'output' => array(
 					'description' => __( 'The block\'s output.', 'gutenberg' ),
 					'type'        => 'string',
 					'required'    => true,

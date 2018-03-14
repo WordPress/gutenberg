@@ -43,7 +43,7 @@ class REST_Blocks_Renderer_Controller_Test extends WP_Test_REST_Controller_Testc
 	 */
 	public function register_test_block() {
 		register_block_type( self::$block_name, array(
-			'attributes' => array(
+			'attributes'      => array(
 				'foo' => array(
 					'type' => 'string',
 				),
