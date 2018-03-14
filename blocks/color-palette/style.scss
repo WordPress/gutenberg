@@ -35,7 +35,7 @@ $color-palette-circle-spacing: 14px;
 	vertical-align: top;
 	height: 100%;
 	width: 100%;
-	border: none;
+	border: 1px solid rgba(0, 0, 0, 0.2);
 	border-radius: 50%;
 	background: transparent;
 	box-shadow: inset 0 0 0 ( $color-palette-circle-size / 2 );
@@ -44,10 +44,6 @@ $color-palette-circle-spacing: 14px;
 
 	&.is-active {
 		box-shadow: inset 0 0 0 4px;
-	}
-
-	&.has-border {
-		border: 1px solid #DADADA;
 	}
 
 	&:focus {
