@@ -1332,7 +1332,7 @@ export function isFetchingReusableBlock( state, ref ) {
  * @return {Array} An array of all reusable blocks.
  */
 export function getReusableBlocks( state ) {
-	return Object.keys( state.reusableBlocks.data ).map( ( ref ) => getReusableBlock( state, ref ) );
+	return map( state.reusableBlocks.data, ( value, ref ) => getReusableBlock( state, ref ) );
 }
 
 /**
