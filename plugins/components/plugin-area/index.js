@@ -22,7 +22,7 @@ class PluginArea extends Component {
 		const pluginRegistry = PluginRegistry.getInstance();
 
 		return (
-			<div id="plugin-fills" style={ { display: 'none' } }>
+			<div style={ { display: 'none' } }>
 				{ map( pluginRegistry.plugins, plugin => {
 					const boundRegisterUIComponent = pluginRegistry.registerUIComponent.bind( pluginRegistry, plugin.name );
 					return (
