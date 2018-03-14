@@ -9,12 +9,12 @@ import { __ } from '@wordpress/i18n';
 const SidebarLayout = ( { onClose, title, children } ) => {
 	return (
 		<div
-			className="edit-post-sidebar edit-post-plugin-sidebar"
+			className="edit-post-plugin-sidebar"
 			role="region"
 			aria-label={ __( 'Editor plugins' ) }
 			tabIndex="-1">
 			<div className="edit-post-plugin-sidebar__header">
-				<h3>{ title }</h3>
+				<h3 className="edit-post-plugin-sidebar__title">{ title }</h3>
 				<IconButton
 					onClick={ onClose }
 					icon="no-alt"
