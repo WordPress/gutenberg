@@ -62,7 +62,7 @@ export const settings = {
 
 	description: __( 'Cover Image is a bold image block with an optional title.' ),
 
-	icon: 'format-image',
+	icon: 'cover-image',
 
 	category: 'common',
 
