@@ -31,7 +31,7 @@ export class ServerSideRender extends Component {
 		this.setState( { response: {} } );
 		const { block } = this.props;
 		const attributes = this.state.attributes;
-		const apiURL = addQueryArgs( '/gutenberg/v1/blocks-renderer/' + block, {
+		const apiURL = addQueryArgs( '/gutenberg/v1/block-renderer/' + block, {
 			...attributes,
 			_wpnonce: wpApiSettings.nonce,
 		} );

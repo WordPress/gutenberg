@@ -1,14 +1,14 @@
 <?php
 /**
- * WP_REST_Blocks_Renderer_Controller tests.
+ * WP_REST_Block_Renderer_Controller tests.
  *
  * @package gutenberg
  */
 
 /**
- * Tests for WP_REST_Blocks_Renderer_Controller.
+ * Tests for WP_REST_Block_Renderer_Controller.
  */
-class REST_Blocks_Renderer_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * Test block's name.
@@ -79,15 +79,15 @@ class REST_Blocks_Renderer_Controller_Test extends WP_Test_REST_Controller_Testc
 	public function test_register_routes() {
 		$routes = $this->server->get_routes();
 
-		$this->assertArrayHasKey( '/gutenberg/v1/blocks-renderer/(?P<name>[\w-]+\/[\w-]+)', $routes );
+		$this->assertArrayHasKey( '/gutenberg/v1/block-renderer/(?P<name>[\w-]+\/[\w-]+)', $routes );
 	}
 
 	/**
 	 * Test getting item without permissions.
 	 */
-	public function test_get_item_output_without_permissions() {
+	public function test_get_item_without_permissions() {
 		wp_set_current_user( 0 );
-		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/blocks-renderer/' . self::$block_name );
+		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertErrorResponse( 'gutenberg_block_cannot_read', $response, rest_authorization_required_code() );
@@ -96,9 +96,9 @@ class REST_Blocks_Renderer_Controller_Test extends WP_Test_REST_Controller_Testc
 	/**
 	 * Test getting item with invalid block name.
 	 */
-	public function test_get_item_output_invalid_block_name() {
+	public function test_get_item_invalid_block_name() {
 		wp_set_current_user( self::$user_id );
-		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/blocks-renderer/core/123' );
+		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/core/123' );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_block_invalid_name', $response, 404 );
@@ -106,22 +106,22 @@ class REST_Blocks_Renderer_Controller_Test extends WP_Test_REST_Controller_Testc
 
 	/**
 	 * Check getting the correct block output.
-	 * Test get_item_output().
+	 * Test get_item().
 	 *
 	 * @covers test_get_item().
 	 */
-	public function test_get_item_output() {
+	public function test_get_item() {
 		$this->register_test_block();
 		wp_set_current_user( self::$user_id );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/blocks-renderer/' . self::$block_name );
+		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
 		$request->set_param( 'foo', 'bar' );
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 
 		$data = $response->get_data();
-		$this->assertEquals( 'Expected test result', $data['output'] );
+		$this->assertEquals( 'Expected test result', $data['rendered'] );
 
 	}
 
@@ -143,13 +143,6 @@ class REST_Blocks_Renderer_Controller_Test extends WP_Test_REST_Controller_Testc
 	 * NA.
 	 */
 	public function test_delete_item() {
-		$this->markTestSkipped();
-	}
-
-	/**
-	 * NA.
-	 */
-	public function test_get_item() {
 		$this->markTestSkipped();
 	}
 

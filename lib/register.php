@@ -447,7 +447,7 @@ add_action( 'init', 'gutenberg_register_post_types' );
  * @since ?
  */
 function gutenberg_register_rest_routes() {
-	$controller = new WP_REST_Blocks_Renderer_Controller();
+	$controller = new WP_REST_Block_Renderer_Controller();
 	$controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );

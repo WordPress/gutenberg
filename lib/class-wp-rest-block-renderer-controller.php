@@ -1,19 +1,19 @@
 <?php
 /**
- * Blocks Renderer REST API: WP_REST_Blocks_Renderer_Controller class
+ * Block Renderer REST API: WP_REST_Block_Renderer_Controller class
  *
  * @package gutenberg
  * @since ?
  */
 
 /**
- * Controller which provides REST endpoint for rendering blocks.
+ * Controller which provides REST endpoint for rendering a block.
  *
  * @since ?
  *
  * @see WP_REST_Controller
  */
-class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
+class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 
 	/**
 	 * Constructs the controller.
@@ -24,7 +24,7 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 
 		// @codingStandardsIgnoreLine - PHPCS mistakes $this->namespace for the namespace keyword.
 		$this->namespace = 'gutenberg/v1';
-		$this->rest_base = 'blocks-renderer';
+		$this->rest_base = 'block-renderer';
 	}
 
 	/**
@@ -44,8 +44,8 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 			),
 			array(
 				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'get_item_output' ),
-				'permission_callback' => array( $this, 'get_item_output_permissions_check' ),
+				'callback'            => array( $this, 'get_item' ),
+				'permission_callback' => array( $this, 'get_item_permissions_check' ),
 				'args'                => array(
 					'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 				),
@@ -62,7 +62,7 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 	 *
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_item_output_permissions_check() {
+	public function get_item_permissions_check() {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error( 'gutenberg_block_cannot_read', __( 'Sorry, you are not allowed to read Gutenberg blocks as this user.', 'gutenberg' ), array(
 				'status' => rest_authorization_required_code(),
@@ -81,7 +81,7 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
-	public function get_item_output( $request ) {
+	public function get_item( $request ) {
 		if ( ! isset( $request['name'] ) ) {
 			return new WP_Error( 'rest_block_invalid_name', __( 'Invalid block name.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
@@ -96,7 +96,7 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 		$atts = $this->prepare_attributes( $request->get_params() );
 
 		$data = array(
-			'output' => $block->render( $atts ),
+			'rendered' => $block->render( $atts ),
 		);
 		return rest_ensure_response( $data );
 	}
@@ -130,10 +130,10 @@ class WP_REST_Blocks_Renderer_Controller extends WP_REST_Controller {
 	public function get_item_schema() {
 		return array(
 			'$schema'    => 'http://json-schema.org/schema#',
-			'title'      => 'blocks-renderer',
+			'title'      => 'block-renderer',
 			'type'       => 'object',
 			'properties' => array(
-				'output' => array(
+				'rendered' => array(
 					'description' => __( 'The block\'s output.', 'gutenberg' ),
 					'type'        => 'string',
 					'required'    => true,
