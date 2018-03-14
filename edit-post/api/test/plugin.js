@@ -1,4 +1,4 @@
-import { PluginRegistry } from '../plugin';
+import PluginRegistry from '../plugin';
 
 let registerPlugin;
 
