@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { withContext, withFocusOutside } from '@wordpress/components';
+import { KeyboardShortcuts, withContext, withFocusOutside } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -33,6 +33,7 @@ class PostTitle extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.redirectHistory = this.redirectHistory.bind( this );
 
 		this.state = {
 			isSelected: false,
@@ -64,6 +65,26 @@ class PostTitle extends Component {
 		}
 	}
 
+	/**
+	 * Emulates behavior of an undo or redo on its corresponding key press
+	 * combination. This is a workaround to React's treatment of undo in a
+	 * controlled textarea where characters are updated one at a time.
+	 * Instead, leverage the store's undo handling of title changes.
+	 *
+	 * @see https://github.com/facebook/react/issues/8514
+	 *
+	 * @param {KeyboardEvent} event Key event.
+	 */
+	redirectHistory( event ) {
+		if ( event.shiftKey ) {
+			this.props.onRedo();
+		} else {
+			this.props.onUndo();
+		}
+
+		event.preventDefault();
+	}
+
 	render() {
 		const { title, placeholder } = this.props;
 		const { isSelected } = this.state;
@@ -72,16 +93,23 @@ class PostTitle extends Component {
 		return (
 			<div className={ className }>
 				{ isSelected && <PostPermalink /> }
-				<Textarea
-					className="editor-post-title__input"
-					value={ title }
-					onChange={ this.onChange }
-					placeholder={ decodeEntities( placeholder ) || __( 'Add title' ) }
-					aria-label={ decodeEntities( placeholder ) || __( 'Add title' ) }
-					onFocus={ this.onSelect }
-					onKeyDown={ this.onKeyDown }
-					onKeyPress={ this.onUnselect }
-				/>
+				<KeyboardShortcuts
+					shortcuts={ {
+						'mod+z': this.redirectHistory,
+						'mod+shift+z': this.redirectHistory,
+					} }
+				>
+					<Textarea
+						className="editor-post-title__input"
+						value={ title }
+						onChange={ this.onChange }
+						placeholder={ decodeEntities( placeholder ) || __( 'Add title' ) }
+						aria-label={ decodeEntities( placeholder ) || __( 'Add title' ) }
+						onFocus={ this.onSelect }
+						onKeyDown={ this.onKeyDown }
+						onKeyPress={ this.onUnselect }
+					/>
+				</KeyboardShortcuts>
 			</div>
 		);
 	}
@@ -96,7 +124,13 @@ const applyWithSelect = withSelect( ( select ) => {
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { insertDefaultBlock, editPost, clearSelectedBlock } = dispatch( 'core/editor' );
+	const {
+		insertDefaultBlock,
+		editPost,
+		clearSelectedBlock,
+		undo,
+		redo,
+	} = dispatch( 'core/editor' );
 
 	return {
 		onEnterPress() {
@@ -105,6 +139,8 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 		onUpdate( title ) {
 			editPost( { title } );
 		},
+		onUndo: undo,
+		onRedo: redo,
 		clearSelectedBlock,
 	};
 } );

@@ -18,6 +18,10 @@ import {
  * Internal dependencies
  */
 import {
+	hasSameKeys,
+	isUpdatingSameBlockAttribute,
+	isUpdatingSamePostProperty,
+	shouldOverwriteState,
 	getPostRawValue,
 	editor,
 	currentPost,
@@ -33,6 +37,216 @@ import {
 } from '../reducer';
 
 describe( 'state', () => {
+	describe( 'hasSameKeys()', () => {
+		it( 'returns false if two objects do not have the same keys', () => {
+			const a = { foo: 10 };
+			const b = { bar: 10 };
+
+			expect( hasSameKeys( a, b ) ).toBe( false );
+		} );
+
+		it( 'returns false if two objects have the same keys', () => {
+			const a = { foo: 10 };
+			const b = { foo: 20 };
+
+			expect( hasSameKeys( a, b ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isUpdatingSameBlockAttribute()', () => {
+		it( 'should return false if not updating block attributes', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not updating the same block', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not updating the same block attributes', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					bar: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating the same block attributes', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isUpdatingSamePostProperty()', () => {
+		it( 'should return false if not editing post', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 10,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not editing the same post properties', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					bar: 20,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating the same post properties', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'shouldOverwriteState()', () => {
+		it( 'should return false if no previous action', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = undefined;
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if the action types are different', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_DIFFERENT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating same block attribute', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
+		} );
+
+		it( 'should return true if updating same post property', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'getPostRawValue', () => {
 		it( 'returns original value for non-rendered content', () => {
 			const value = getPostRawValue( '' );
