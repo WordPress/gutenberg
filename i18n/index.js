@@ -6,14 +6,25 @@ import Jed from 'jed';
 let i18n;
 
 /**
- * Creates a new Jed instance with specified locale data configuration.
+ * Merges locale data into the Jed instance by domain. Creates a new Jed
+ * instance if one has not yet been assigned.
  *
  * @see http://messageformat.github.io/Jed/
  *
- * @param {Object} data Locale data configuration.
+ * @param {?Object} localeData Locale data configuration.
+ * @param {?string} domain     Domain for which configuration applies.
  */
-export function setLocaleData( data ) {
-	i18n = new Jed( data );
+export function setLocaleData( localeData = { '': {} }, domain = 'default' ) {
+	if ( ! i18n ) {
+		i18n = new Jed( {
+			domain: 'default',
+			locale_data: {
+				default: {},
+			},
+		} );
+	}
+
+	i18n.options.locale_data[ domain ] = localeData;
 }
 
 /**
@@ -24,10 +35,38 @@ export function setLocaleData( data ) {
  */
 export function getI18n() {
 	if ( ! i18n ) {
-		setLocaleData( { '': {} } );
+		setLocaleData();
 	}
 
 	return i18n;
+}
+
+/**
+ * Wrapper for Jed's `dcnpgettext`, its most qualified function. Absorbs errors
+ * which are thrown as the result of invalid translation.
+ *
+ * @param {?string} domain  Domain to retrieve the translated text.
+ * @param {?string} context Context information for the translators.
+ * @param {string}  single  Text to translate if non-plural. Used as fallback
+ *                          return value on a caught error.
+ * @param {?string} plural  The text to be used if the number is plural.
+ * @param {?number} number  The number to compare against to use either the
+ *                          singular or plural form.
+ *
+ * @return {string} The translated string.
+ */
+export function dcnpgettext( domain = 'default', context, single, plural, number ) {
+	try {
+		return getI18n().dcnpgettext( domain, context, single, plural, number );
+	} catch ( error ) {
+		// Disable reason: Jed throws errors. To avoid crashing the application
+		// we log these to the console instead, and return a default value.
+
+		// eslint-disable-next-line no-console
+		console.error( 'Jed localization error: \n\n' + error.toString() );
+
+		return single;
+	}
 }
 
 /**
@@ -35,13 +74,13 @@ export function getI18n() {
  *
  * @see https://developer.wordpress.org/reference/functions/__/
  *
- * @param {string} text Text to translate.
- * @param {string} domain Domain to retrieve the translated text.
+ * @param {string}  text   Text to translate.
+ * @param {?string} domain Domain to retrieve the translated text.
  *
  * @return {string} Translated text.
  */
 export function __( text, domain ) {
-	return getI18n().dgettext( domain, text );
+	return dcnpgettext( domain, undefined, text );
 }
 
 /**
@@ -49,14 +88,14 @@ export function __( text, domain ) {
  *
  * @see https://developer.wordpress.org/reference/functions/_x/
  *
- * @param {string} text    Text to translate.
- * @param {string} context Context information for the translators.
- * @param {string} domain Domain to retrieve the translated text.
+ * @param {string}  text    Text to translate.
+ * @param {string}  context Context information for the translators.
+ * @param {?string} domain  Domain to retrieve the translated text.
  *
  * @return {string} Translated context string without pipe.
  */
 export function _x( text, context, domain ) {
-	return getI18n().dpgettext( domain, context, text );
+	return dcnpgettext( domain, context, text );
 }
 
 /**
@@ -65,16 +104,16 @@ export function _x( text, context, domain ) {
  *
  * @see https://developer.wordpress.org/reference/functions/_n/
  *
- * @param {string} single The text to be used if the number is singular.
- * @param {string} plural The text to be used if the number is plural.
- * @param {number} number The number to compare against to use either the
+ * @param {string}  single The text to be used if the number is singular.
+ * @param {string}  plural The text to be used if the number is plural.
+ * @param {number}  number The number to compare against to use either the
  *                         singular or plural form.
- * @param {string} domain Domain to retrieve the translated text.
+ * @param {?string} domain Domain to retrieve the translated text.
  *
  * @return {string} The translated singular or plural form.
  */
 export function _n( single, plural, number, domain ) {
-	return getI18n().dngettext( domain, single, plural, number );
+	return dcnpgettext( domain, undefined, single, plural, number );
 }
 
 /**
@@ -83,24 +122,40 @@ export function _n( single, plural, number, domain ) {
  *
  * @see https://developer.wordpress.org/reference/functions/_nx/
  *
- * @param {string} single  The text to be used if the number is singular.
- * @param {string} plural  The text to be used if the number is plural.
- * @param {number} number  The number to compare against to use either the
+ * @param {string}  single  The text to be used if the number is singular.
+ * @param {string}  plural  The text to be used if the number is plural.
+ * @param {number}  number  The number to compare against to use either the
  *                          singular or plural form.
- * @param {string} context Context information for the translators.
- * @param {string} domain Domain to retrieve the translated text.
+ * @param {string}  context Context information for the translators.
+ * @param {?string} domain  Domain to retrieve the translated text.
  *
  * @return {string} The translated singular or plural form.
  */
 export function _nx( single, plural, number, context, domain ) {
-	return getI18n().dnpgettext( domain, context, single, plural, number );
+	return dcnpgettext( domain, context, single, plural, number );
 }
 
 /**
- * Returns a formatted string.
+ * Returns a formatted string. If an error occurs in applying the format, the
+ * original format string is returned.
+ *
+ * @param {string}   format  The format of the string to generate.
+ * @param {string[]} ...args Arguments to apply to the format.
  *
  * @see http://www.diveintojavascript.com/projects/javascript-sprintf
  *
- * @type {string}
+ * @return {string} The formatted string.
  */
-export const sprintf = Jed.sprintf;
+export function sprintf( format, ...args ) {
+	try {
+		return Jed.sprintf( format, ...args );
+	} catch ( error ) {
+		// Disable reason: Jed throws errors. To avoid crashing the application
+		// we log these to the console instead, and return a default value.
+
+		// eslint-disable-next-line no-console
+		console.error( 'Jed sprintf error: \n\n' + error.stack );
+
+		return format;
+	}
+}
