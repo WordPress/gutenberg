@@ -177,13 +177,27 @@ $float-margin: calc( 50% - #{ $content-width-padding / 2 } );
 }
 
 // Tabs, Inputs, Square buttons
+@mixin input-style__neutral() {
+	outline-offset: -1px;
+	box-shadow: 0 0 0 transparent;
+	transition: box-shadow .05s linear;
+}
+
+@mixin input-style__focus() {
+	color: $dark-gray-900;
+	outline: 1px solid $dark-gray-300;
+	box-shadow: 0 0 0 2px $blue-medium-200;
+}
+
+// Square buttons
 @mixin square-style__neutral() {
 	outline-offset: -1px;
 }
 
-@mixin square-style__focus-active() {
+@mixin square-style__focus() {
 	color: $dark-gray-900;
 	outline: 1px solid $dark-gray-300;
+	box-shadow: none;
 }
 
 // Menu items
