@@ -1,4 +1,4 @@
-.edit-post-plugin-sidebar {
+.edit-post-plugin-sidebar__sidebar-layout {
 	position: fixed;
 	z-index: z-index( '.edit-post-sidebar' );
 	top: 0;
@@ -35,16 +35,18 @@
 		}
 	}
 
-	&__error {
-		padding: 16px;
-		margin: 0;
-		color: red;
-	}
-
 	&__title {
 		font-size: 13px;
 		font-weight: 600;
 		color: inherit;
 		margin: 0;
+	}
+}
+
+.edit-post-plugin-sidebar__sidebar-error-boundary {
+	&__message {
+		padding: 16px;
+		margin: 0;
+		color: red;
 	}
 }
