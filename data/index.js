@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import isEqualShallow from 'is-equal-shallow';
+import isShallowEqual from 'shallowequal';
 import { createStore } from 'redux';
 import { flowRight, without, mapValues } from 'lodash';
 
@@ -141,16 +141,6 @@ export const subscribe = ( listener ) => {
  * @return {*} The selector's returned value.
  */
 export function select( reducerKey ) {
-	if ( arguments.length > 1 ) {
-		deprecated( 'Calling select with multiple arguments', {
-			version: '2.4',
-			plugin: 'Gutenberg',
-		} );
-
-		const [ , selectorKey, ...args ] = arguments;
-		return select( reducerKey )[ selectorKey ]( ...args );
-	}
-
 	return selectors[ reducerKey ];
 }
 
@@ -194,7 +184,7 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 		}
 
 		componentWillReceiveProps( nextProps ) {
-			if ( ! isEqualShallow( nextProps, this.props ) ) {
+			if ( ! isShallowEqual( nextProps, this.props ) ) {
 				this.runSelection( nextProps );
 			}
 		}
@@ -221,7 +211,7 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 			const { mergeProps } = this.state;
 			const nextMergeProps = mapStateToProps( select, props ) || {};
 
-			if ( ! isEqualShallow( nextMergeProps, mergeProps ) ) {
+			if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
 				this.setState( {
 					mergeProps: nextMergeProps,
 				} );

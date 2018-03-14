@@ -2,6 +2,10 @@
 .edit-post-meta-boxes-area {
 	position: relative;
 
+	* {
+		box-sizing: content-box;
+	}
+
 	/* Match width and positioning of the meta boxes. Override default styles. */
 	#poststuff {
 		margin: 0 auto;
@@ -58,8 +62,8 @@
 		right: 20px;
 		z-index: z-index( '.edit-post-meta-boxes-area .spinner');
 	}
+}
 
-	&__clear {
-		clear: both;
-	}
+.edit-post-meta-boxes-area__clear {
+	clear: both;
 }

@@ -26,7 +26,6 @@ import './style.scss';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from './ignore-nested-events';
-import BlockSelectionClearer from '../block-selection-clearer';
 import DefaultBlockAppender from '../default-block-appender';
 import {
 	isSelectionEnabled,
@@ -216,7 +215,7 @@ class BlockListLayout extends Component {
 		} );
 
 		return (
-			<BlockSelectionClearer className={ classes }>
+			<div className={ classes }>
 				{ !! blockUIDs.length && <BlockInsertionPoint rootUID={ rootUID } layout={ defaultLayout } /> }
 				{ map( blockUIDs, ( uid, blockIndex ) => (
 					<BlockListBlock
@@ -241,7 +240,7 @@ class BlockListLayout extends Component {
 						layout={ defaultLayout }
 					/>
 				</IgnoreNestedEvents>
-			</BlockSelectionClearer>
+			</div>
 		);
 	}
 }

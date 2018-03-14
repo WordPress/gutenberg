@@ -3,7 +3,7 @@
  */
 import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
-import isEqualShallow from 'is-equal-shallow';
+import isShallowEqual from 'shallowequal';
 
 /**
  * WordPress dependencies
@@ -68,7 +68,7 @@ export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 			attributes
 		);
 
-		if ( ! isEqualShallow( props, element.props ) ) {
+		if ( ! isShallowEqual( props, element.props ) ) {
 			element = cloneElement( element, props );
 		}
 	}

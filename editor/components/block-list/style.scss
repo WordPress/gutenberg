@@ -81,6 +81,17 @@
 		right: 6px;
 	}
 
+	&.is-typing .editor-block-list__empty-block-inserter,
+	&.is-typing .editor-block-list__side-inserter {
+		opacity: 0;
+	}
+
+	.editor-block-list__empty-block-inserter,
+	.editor-block-list__side-inserter {
+		opacity: 1;
+		transition: opacity 0.2s;
+	}
+
 	&.is-reusable.is-selected > .editor-block-mover:before {
 		border-right: none;
 	}
@@ -556,8 +567,25 @@
 	position: absolute;
 	top: 10px;
 	right: 10px;
+	display: none;
 
 	@include break-small {
 		right: $block-mover-padding-visible + 10px;
+		display: block;
+	}
+}
+
+.editor-block-list__empty-block-inserter {
+	position: absolute;
+		top: 10px;
+		right: 10px;
+
+	.editor-inserter__toggle {
+		border-radius: 50%;
+	}
+
+	@include break-small {
+		left: 10px;
+		right: auto;
 	}
 }
