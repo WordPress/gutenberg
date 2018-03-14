@@ -31,7 +31,7 @@ import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import { PluginArea } from '../../api/plugin';
+import PluginArea from '../plugin-area';
 import { PluginSidebar } from '../plugin-sidebar';
 
 function Layout( {

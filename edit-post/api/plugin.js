@@ -4,15 +4,9 @@
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
-import { Component } from '@wordpress/element';
 
 /* External dependencies */
-import { isFunction, map } from 'lodash';
-
-/**
- * Internal dependencies
- */
-import PluginContextProvider from '../components/plugin-context-provider';
+import { isFunction } from 'lodash';
 
 /**
  * Singleton class for registering plugins.
@@ -125,32 +119,4 @@ class PluginRegistry {
 	}
 }
 
-/**
- * A component that renders all plugin fills in a hidden div.
- */
-class PluginArea extends Component {
-	render() {
-		const pluginRegistry = PluginRegistry.getInstance();
-
-		return (
-			<div id="plugin-fills" style={ { display: 'none' } }>
-				{ map( pluginRegistry.plugins, plugin => {
-					const boundRegisterUIComponent = pluginRegistry.registerUIComponent.bind( pluginRegistry, plugin.name );
-					return (
-						<PluginContextProvider key={ plugin.name } value={ {
-							registerUIComponent: boundRegisterUIComponent,
-							namespace: plugin.name,
-						} }>
-							{ plugin.render() }
-						</PluginContextProvider>
-					);
-				} ) }
-			</div>
-		);
-	}
-}
-
-export {
-	PluginArea,
-	PluginRegistry,
-};
+export default PluginRegistry;
