@@ -5,7 +5,9 @@
  */
 import { applyFilters } from '@wordpress/hooks';
 
-/* External dependencies */
+/**
+ * External dependencies
+ */
 import { isFunction } from 'lodash';
 
 /**

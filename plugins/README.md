@@ -1,7 +1,7 @@
-Edit post API
+Plugins API
 ====
 
-The edit post API contains the following methods:
+The plugins API contains the following methods:
 
 ### `wp.plugins.__experimental.registerPlugin( name: string, { render: function } )`
 
@@ -27,7 +27,7 @@ const Component = () => (
     </Fragment>
 );
 
-wp.editPost.__experimental.registerPlugin( 'plugin-names', {
+wp.plugins.__experimental.registerPlugin( 'plugin-names', {
     render: Component,
 } );
 ```

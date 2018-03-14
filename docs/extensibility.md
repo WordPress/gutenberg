@@ -148,7 +148,7 @@ const Component = () => (
     </Fragment>
 );
 
-wp.editPost.__experimental.registerPlugin( 'plugin-names', {
+wp.plugins.__experimental.registerPlugin( 'plugin-names', {
     render: Component,
 } );
 ```
