@@ -1,10 +1,14 @@
-.wp-block-video figcaption {
-	margin-top: 0.5em;
-	color: $dark-gray-300;
-	text-align: center;
-	font-size: $default-font-size;
-}
+.wp-block-video {
+	margin: 0;
 
-.wp-block-video.aligncenter {
-	text-align: center;
+	figcaption {
+		margin-top: 0.5em;
+		color: $dark-gray-300;
+		text-align: center;
+		font-size: $default-font-size;
+	}
+
+	&.aligncenter {
+		text-align: center;
+	}
 }
