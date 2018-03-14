@@ -871,7 +871,23 @@ export function isBlockWithinSelection( state, uid ) {
 }
 
 /**
- * Whether in the process of multi-selecting or not.
+ * Returns true if a multi-selection has been made, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether multi-selection has been made.
+ */
+export function hasMultiSelection( state ) {
+	const { start, end } = state.blockSelection;
+	return start !== end;
+}
+
+/**
+ * Whether in the process of multi-selecting or not. This flag is only true
+ * while the multi-selection is being selected (by mouse move), and is false
+ * once the multi-selection has been settled.
+ *
+ * @see hasMultiSelection
  *
  * @param {Object} state Global application state.
  *

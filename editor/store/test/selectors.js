@@ -53,6 +53,7 @@ const {
 	getNextBlockUid,
 	isBlockSelected,
 	isBlockWithinSelection,
+	hasMultiSelection,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	getBlockMode,
@@ -1801,6 +1802,41 @@ describe( 'selectors', () => {
 			};
 
 			expect( isBlockWithinSelection( state, 4 ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'hasMultiSelection', () => {
+		it( 'should return false if no selection', () => {
+			const state = {
+				blockSelection: {
+					start: null,
+					end: null,
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if singular selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if multi-selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( true );
 		} );
 	} );
 
