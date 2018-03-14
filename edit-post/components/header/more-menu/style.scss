@@ -24,10 +24,4 @@
 	.components-menu-items__group:not(:last-child) {
   		border-bottom: 1px solid $light-gray-500;
 	}
-
-	// Ensure that even SVG icons that don't include the .dashicon class are colored
-	.components-icon-button svg {
-		fill: currentColor;
-		outline: none;
-	}
 }
