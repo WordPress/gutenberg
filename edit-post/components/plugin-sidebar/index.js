@@ -11,7 +11,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import './style.scss';
 import withPluginContext from '../higher-order/with-plugin-context';
 import SidebarLayout from './sidebar-layout';
-import ErrorBoundary from './error-boundary';
+import ErrorBoundary from './sidebar-error-boundary';
 
 /**
  * Name of slot in which the sidebar should fill.

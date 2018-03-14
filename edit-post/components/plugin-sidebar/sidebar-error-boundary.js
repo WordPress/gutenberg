@@ -16,9 +16,11 @@ class SidebarErrorBoundary extends Component {
 
 	render() {
 		if ( this.state.hasError ) {
-			return <p className="plugin-sidebar-error">
-				{ sprintf( __( 'An error occurred rendering the plugin sidebar with id "%s".' ), this.props.pluginName ) }
-			</p>;
+			return (
+				<p className="edit-post-plugin-sidebar__error">
+					{ sprintf( __( 'An error occurred rendering the plugin sidebar with id "%s".' ), this.props.pluginName ) }
+				</p>
+			);
 		}
 		return this.props.children;
 	}

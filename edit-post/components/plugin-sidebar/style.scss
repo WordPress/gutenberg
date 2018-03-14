@@ -1,5 +1,5 @@
-.edit-post-layout {
-  .edit-post-plugins-panel__header {
+.edit-post-plugin-sidebar {
+  &__header {
     padding: 0 8px 0 16px;
     height: $panel-header-height;
     border-bottom: 1px solid $light-gray-500;
@@ -16,10 +16,9 @@
       color: inherit;
     }
   }
-}
 
-.plugin-sidebar-error {
-  padding: 16px;
-  color: red;
+  &__error {
+    padding: 16px;
+    color: red;
+  }
 }
-

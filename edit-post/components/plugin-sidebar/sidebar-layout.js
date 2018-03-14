@@ -9,11 +9,11 @@ import { __ } from '@wordpress/i18n';
 const SidebarLayout = ( { onClose, title, children } ) => {
 	return (
 		<div
-			className="edit-post-sidebar edit-post-plugins-panel"
+			className="edit-post-sidebar edit-post-plugin-sidebar"
 			role="region"
 			aria-label={ __( 'Editor plugins' ) }
 			tabIndex="-1">
-			<div className="edit-post-plugins-panel__header">
+			<div className="edit-post-plugin-sidebar__header">
 				<h3>{ title }</h3>
 				<IconButton
 					onClick={ onClose }
@@ -21,7 +21,7 @@ const SidebarLayout = ( { onClose, title, children } ) => {
 					label={ __( 'Close settings' ) }
 				/>
 			</div>
-			<div className="edit-post-plugins-panel__content">
+			<div className="edit-post-plugin-sidebar__content">
 				{ children }
 			</div>
 		</div>
