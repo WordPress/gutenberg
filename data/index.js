@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import isEqualShallow from 'is-equal-shallow';
+import isShallowEqual from 'shallowequal';
 import { createStore } from 'redux';
 import { flowRight, without, mapValues } from 'lodash';
 
@@ -184,7 +184,7 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 		}
 
 		componentWillReceiveProps( nextProps ) {
-			if ( ! isEqualShallow( nextProps, this.props ) ) {
+			if ( ! isShallowEqual( nextProps, this.props ) ) {
 				this.runSelection( nextProps );
 			}
 		}
@@ -211,7 +211,7 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 			const { mergeProps } = this.state;
 			const nextMergeProps = mapStateToProps( select, props ) || {};
 
-			if ( ! isEqualShallow( nextMergeProps, mergeProps ) ) {
+			if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
 				this.setState( {
 					mergeProps: nextMergeProps,
 				} );
