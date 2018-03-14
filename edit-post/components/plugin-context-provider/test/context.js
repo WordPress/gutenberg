@@ -6,7 +6,8 @@ import { mount } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { PluginContextProvider, withPluginContext } from '../index';
+import PluginContextProvider from '../index';
+import withPluginContext from '../../higher-order/with-plugin-context';
 
 describe( 'plugin/context', () => {
 	describe( 'withPluginContext', () => {
