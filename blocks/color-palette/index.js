@@ -25,7 +25,13 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 		<div className="blocks-color-palette">
 			{ map( colors, ( color ) => {
 				const style = { color: color };
-				const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
+				const className = classnames( 
+					'blocks-color-palette__item', 
+					{
+						'is-active': value === color ,
+				 		'has-border': '#fff' === color 
+					} 
+				);
 
 				return (
 					<div key={ color } className="blocks-color-palette__item-wrapper">
