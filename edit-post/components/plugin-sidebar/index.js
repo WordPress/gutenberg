@@ -77,16 +77,7 @@ class PluginSidebar extends Component {
 	}
 }
 
-/**
- * The plugin sidebar slot.
- *
- * @return {ReactElement} The plugin sidebar slot.
- */
-const PluginSidebarSlot = () => (
-	<Slot name={ SLOT_NAME } />
-);
-
-const PluginSidebarFill = compose( [
+const WrappedPluginSidebar = compose( [
 	withSelect( select => {
 		return {
 			activePlugin: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
@@ -101,4 +92,13 @@ const PluginSidebarFill = compose( [
 	withPluginContext,
 ] )( PluginSidebar );
 
-export { PluginSidebarFill, PluginSidebarSlot as PluginSidebar };
+/**
+ * The plugin sidebar slot.
+ *
+ * @return {ReactElement} The plugin sidebar slot.
+ */
+WrappedPluginSidebar.Slot = () => (
+	<Slot name={ SLOT_NAME } />
+);
+
+export default WrappedPluginSidebar;
