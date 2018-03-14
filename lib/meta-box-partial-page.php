@@ -150,32 +150,6 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 	return $meta_boxes;
 }
 
-/**
- * Check whether a meta box is empty.
- *
- * @since 1.5.0
- *
- * @param array  $meta_boxes Meta box data.
- * @param string $context    Location of meta box, one of side, advanced, normal.
- * @param string $post_type  Post type to investigate.
- * @return boolean Whether the meta box is empty.
- */
-function gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type ) {
-	$page = $post_type;
-
-	if ( ! isset( $meta_boxes[ $page ][ $context ] ) ) {
-		return true;
-	}
-
-	foreach ( $meta_boxes[ $page ][ $context ] as $priority => $boxes ) {
-		if ( ! empty( $boxes ) ) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
 add_filter( 'filter_gutenberg_meta_boxes', 'gutenberg_filter_meta_boxes' );
 
 /**
@@ -317,7 +291,7 @@ function the_gutenberg_metaboxes() {
 	 */
 	$wp_meta_boxes = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
 	$locations     = array( 'side', 'normal', 'advanced' );
-
+	$meta_box_data = array();
 	// Render meta boxes.
 	?>
 	<form class="metabox-base-form">
@@ -328,17 +302,32 @@ function the_gutenberg_metaboxes() {
 			<div id="poststuff" class="sidebar-open">
 				<div id="postbox-container-2" class="postbox-container">
 					<?php
-					do_meta_boxes(
+					$number_metaboxes = do_meta_boxes(
 						$current_screen,
 						$location,
 						$post
 					);
+
+					$meta_box_data[ $location ] = $number_metaboxes > 0;
 					?>
 				</div>
 			</div>
 		</form>
 	<?php endforeach; ?>
 	<?php
+
+	/**
+	 * Sadly we probably can not add this data directly into editor settings.
+	 *
+	 * ACF and other meta boxes need admin_head to fire for meta box registry.
+	 * admin_head fires after admin_enqueue_scripts which is where we create our
+	 * editor instance. If a cleaner solution can be imagined, please change
+	 * this, and try to get this data to load directly into the editor settings.
+	 */
+	wp_add_inline_script(
+		'wp-edit-post',
+		'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
+	);
 
 	// Reset meta box data.
 	$wp_meta_boxes = $_original_meta_boxes;
