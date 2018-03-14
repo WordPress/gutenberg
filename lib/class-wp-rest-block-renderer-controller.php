@@ -28,30 +28,44 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Registers the necessary REST API routes.
+	 * Registers the necessary REST API routes, one for each dynamic block.
 	 *
 	 * @access public
 	 */
 	public function register_routes() {
 
-		// @codingStandardsIgnoreLine - PHPCS mistakes $this->namespace for the namespace keyword.
-		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<name>[\w-]+\/[\w-]+)', array(
-			'args'   => array(
-				'name' => array(
-					'description' => __( 'Unique registered name for the block.', 'gutenberg' ),
-					'type'        => 'string',
+		$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+		foreach ( $block_types as $block_type ) {
+			if ( ! $block_type->is_dynamic() ) {
+				continue;
+			}
+
+			// @codingStandardsIgnoreLine - PHPCS mistakes $this->namespace for the namespace keyword.
+			register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<name>' . $block_type->name . ')', array(
+				'args'   => array(
+					'name' => array(
+						'description' => __( 'Unique registered name for the block.', 'gutenberg' ),
+						'type'        => 'string',
+					),
 				),
-			),
-			array(
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'get_item' ),
-				'permission_callback' => array( $this, 'get_item_permissions_check' ),
-				'args'                => array(
-					'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => array(
+						'context'    => $this->get_context_param( array( 'default' => 'view' ) ),
+						'attributes' => array(
+							/* translators: %s is the name of the block */
+							'description'          => sprintf( __( 'Attributes for %s block', 'gutenberg' ), $block_type->name ),
+							'type'                 => 'object',
+							'additionalProperties' => false,
+							'properties'           => $block_type->attributes,
+						),
+					),
 				),
-			),
-			'schema' => array( $this, 'get_public_item_schema' ),
-		) );
+				'schema' => array( $this, 'get_public_item_schema' ),
+			) );
+		}
 	}
 
 	/**
@@ -60,9 +74,10 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	 * @since ?
 	 * @access public
 	 *
+	 * @param WP_REST_Request $request Request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_item_permissions_check() {
+	public function get_item_permissions_check( $request ) {
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			return new WP_Error( 'gutenberg_block_cannot_read', __( 'Sorry, you are not allowed to read Gutenberg blocks as this user.', 'gutenberg' ), array(
 				'status' => rest_authorization_required_code(),
@@ -82,41 +97,12 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		if ( ! isset( $request['name'] ) ) {
-			return new WP_Error( 'rest_block_invalid_name', __( 'Invalid block name.', 'gutenberg' ), array( 'status' => 404 ) );
-		}
-
 		$registry = WP_Block_Type_Registry::get_instance();
 		$block    = $registry->get_registered( $request['name'] );
-
-		if ( ! $block || ! $block instanceof WP_Block_Type ) {
-			return new WP_Error( 'rest_block_invalid_name', __( 'Invalid block name.', 'gutenberg' ), array( 'status' => 404 ) );
-		}
-
-		$atts = $this->prepare_attributes( $request->get_params() );
-
-		$data = array(
-			'rendered' => $block->render( $atts ),
+		$data     = array(
+			'rendered' => $block->render( $request->get_param( 'attributes' ) ),
 		);
 		return rest_ensure_response( $data );
-	}
-
-	/**
-	 * Fix potential boolean value issues. The values come as strings and "false" and "true" might generate issues if left like this.
-	 *
-	 * @param array $attributes Attributes.
-	 * @return mixed Attributes.
-	 */
-	public function prepare_attributes( $attributes ) {
-		foreach ( $attributes as $key => $value ) {
-			if ( 'false' === $value ) {
-				$attributes[ $key ] = false;
-			} elseif ( 'true' === $value ) {
-				$attributes[ $key ] = true;
-			}
-		}
-
-		return $attributes;
 	}
 
 	/**
@@ -130,11 +116,11 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	public function get_item_schema() {
 		return array(
 			'$schema'    => 'http://json-schema.org/schema#',
-			'title'      => 'block-renderer',
+			'title'      => 'rendered-block',
 			'type'       => 'object',
 			'properties' => array(
 				'rendered' => array(
-					'description' => __( 'The block\'s output.', 'gutenberg' ),
+					'description' => __( 'The rendered block.', 'gutenberg' ),
 					'type'        => 'string',
 					'required'    => true,
 				),
