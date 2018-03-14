@@ -28,6 +28,7 @@ export class ServerSideRender extends Component {
 	}
 
 	getOutput() {
+		this.setState( { response: {} } );
 		const { block } = this.props;
 		const attributes = this.state.attributes;
 		const apiURL = addQueryArgs( wpApiSettings.root + 'gutenberg/v1/blocks-renderer/' + block, {
