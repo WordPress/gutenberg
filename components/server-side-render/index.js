@@ -26,7 +26,6 @@ export class ServerSideRender extends Component {
 
 	componentWillReceiveProps( nextProps ) {
 		if ( JSON.stringify( nextProps ) !== JSON.stringify( this.props ) ) {
-			debugger;
 			this.setState( { attributes: nextProps }, this.getOutput );
 		}
 	}
