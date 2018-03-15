@@ -16,7 +16,7 @@ import SidebarLayout from './sidebar-layout';
  *
  * @type {String}
  */
-const SLOT_NAME = 'plugin-sidebar';
+const SLOT_NAME = 'PluginSidebar';
 
 /**
  * Renders the plugin sidebar fill.
