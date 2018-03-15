@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Button, Placeholder, Spinner } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { Placeholder, Spinner } from '@wordpress/components';
 
 class MenuPlaceholder extends Component {
 	render() {
@@ -12,14 +12,23 @@ class MenuPlaceholder extends Component {
 
 		if ( ! hasMenus ) {
 			return (
-				<Placeholder key="placeholder"
+				<Placeholder
+					key="placeholder"
 					icon="menu"
-					label={ __( 'Navigation Menu' ) }
-				>
-					{ ! Array.isArray( menus ) ?
-						<Spinner /> :
-						__( 'No menus found.' )
-					}
+					label={ __( 'Navigation Menu' ) }>
+					{ ! Array.isArray( menus ) ? (
+						<Spinner />
+					) : (
+						<div>
+							<span>{ __( 'No menus found.' ) }</span>
+							{ ' ' }
+							<Button
+								href="customize.php?autofocus[panel]=nav_menus"
+								target="_blank">
+								{ __( 'Create a menu.' ) }
+							</Button>
+						</div>
+					) }
 				</Placeholder>
 			);
 		}
@@ -28,7 +37,7 @@ class MenuPlaceholder extends Component {
 			<Placeholder
 				key="block-placeholder"
 				icon={ 'menu' }
-				label={ __( 'Navigation Menu' ) } >
+				label={ __( 'Navigation Menu' ) }>
 				{ children }
 			</Placeholder>
 		);

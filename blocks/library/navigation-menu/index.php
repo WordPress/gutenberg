@@ -40,15 +40,15 @@ function gutenberg_render_block_core_navigation_menu( $attributes ) {
 }
 
 register_block_type( 'core/navigation-menu', array(
-	'attributes'      => array(
-		'selected'        => array(
-			'type' => 'string',
+	'attributes' => array(
+		'selected' => array(
+			'type' => 'int',
 		),
-		'layout'          => array(
+		'layout'   => array(
 			'type'    => 'string',
 			'default' => 'vertical',
 		),
-		'align'           => array(
+		'align'    => array(
 			'type'    => 'string',
 			'default' => 'center',
 		),

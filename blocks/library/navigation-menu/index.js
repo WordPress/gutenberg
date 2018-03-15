@@ -15,7 +15,7 @@ export const name = 'core/navigation-menu';
 export const settings = {
 	title: __( 'Navigation Menu' ),
 
-	description: __( 'Display your site pages.' ),
+	description: __( 'Show a list of menu items.' ),
 
 	icon: 'menu',
 

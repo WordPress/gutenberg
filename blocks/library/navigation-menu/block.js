@@ -112,7 +112,6 @@ class NavigationMenuBlock extends Component {
 
 	renderMenu() {
 		const { data, isLoading } = this.props.items;
-		const customizerUrl = '';
 
 		if ( isUndefined( data ) || isEmpty( data ) || isLoading ) {
 			return (
@@ -123,7 +122,7 @@ class NavigationMenuBlock extends Component {
 				>
 					{ ! Array.isArray( data ) ?
 						<Spinner /> :
-						<Button href={ `${ customizerUrl }?autofocus%5Bpanel%5D=nav_menus` }>
+						<Button href="customize.php?autofocus[panel]=nav_menus" target="_blank">
 							{ __( 'No items found in this menu.' ) }
 						</Button>
 					}
