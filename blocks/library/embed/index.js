@@ -158,7 +158,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				if ( fetching ) {
 					return [
 						controls,
-						<div key="loading" className={ classnames( className, 'is-loading' ) }>
+						<div key="loading" className="wp-block-embed is-loading">
 							<Spinner />
 							<p>{ __( 'Embedding…' ) }</p>
 						</div>,
@@ -170,7 +170,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 
 					return [
 						controls,
-						<Placeholder key="placeholder" icon={ icon } label={ label } className={ className }>
+						<Placeholder key="placeholder" icon={ icon } label={ label } className="wp-block-embed">
 							<form onSubmit={ this.doServerSideRender }>
 								<input
 									type="url"
@@ -239,7 +239,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				return;
 			}
 
-			const embedClassName = classnames( {
+			const embedClassName = classnames( 'wp-block-embed', {
 				[ `align${ align }` ]: align,
 				[ `is-type-${ type }` ]: type,
 				[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
