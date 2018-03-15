@@ -41,7 +41,7 @@ wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/second-sid
   
 ### Available UI components
 
-The available UI components are found in the global variable `wp.editPost.__experimental`, and are React components.
+The available UI components are found in the global variable `wp.plugins.__experimental`, and are React components.
 
 #### PluginSidebar
 

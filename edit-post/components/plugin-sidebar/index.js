@@ -1,110 +1,57 @@
 /**
  * WordPress dependencies
  */
-import { Component, Children, cloneElement, compose } from '@wordpress/element';
-import { Slot, Fill, withFocusReturn } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { withPluginContext } from '@wordpress/plugins';
+import { compose } from '@wordpress/element';
+import { Slot, Fill, withFocusReturn, withContext } from '@wordpress/components';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import SidebarLayout from './sidebar-layout';
-import ErrorBoundary from './sidebar-error-boundary';
 
 /**
  * Name of slot in which the sidebar should fill.
  *
  * @type {String}
  */
-const SLOT_NAME = 'PluginSidebar';
+const SLOT_NAME = 'plugin-sidebar';
 
 /**
- * The plugin sidebar fill.
+ * Renders the plugin sidebar fill.
+ *
+ * @return {WPElement} Plugin sidebar fill.
  */
-class PluginSidebar extends Component {
-	constructor( props ) {
-		super( props );
-
-		this.state = { invalid: false };
-
-		if ( typeof props.name !== 'string' ) {
-			// eslint-disable-next-line no-console
-			console.error( 'PluginSidebar name should be of type string' );
-			this.state.invalid = true;
-		}
-		if ( ! /^[a-z][a-z0-9-]*$/.test( props.name ) ) {
-			// eslint-disable-next-line no-console
-			console.error( 'Sidebar names must include only lowercase alphanumeric characters or dashes,' +
-				' and start with a letter. Example: "my-sidebar".' );
-			this.state.invalid = true;
-		}
-	}
-
-	/**
-	 * Generates the UI plugin identifier by combining the plugin name and the sidebar name.
-	 *
-	 * Also registers the plugin in the plugin registry.
-	 */
-	componentWillMount() {
-		if ( ! this.namespacedName ) {
-			this.namespacedName = `plugin-sidebar/${ this.props.pluginContext.namespace }/${ this.props.name }`;
-		}
-	}
-
-	/**
-	 * Renders the PluginSidebar component.
-	 *
-	 * @return {ReactElement} The rendered component.
-	 */
-	render() {
-		if ( this.props.activePlugin !== this.namespacedName || this.state.invalid ) {
-			return null;
-		}
-
-		const { children, ...props } = this.props;
-		const newProps = {
-			...props,
-			namespacedName: this.namespacedName,
-		};
-
-		return (
-			<Fill name={ SLOT_NAME }>
-				<SidebarLayout
-					title={ props.title }
-					onClose={ props.onClose } >
-					<ErrorBoundary pluginName={ this.namespacedName }>
-						{ typeof children === 'string' ? children : cloneElement( Children.only( children ), newProps ) }
-					</ErrorBoundary>
-				</SidebarLayout>
-			</Fill>
-		);
-	}
+function PluginSidebar( { pluginName, name, title, onClose, children } ) {
+	return (
+		<Fill name={ [ SLOT_NAME, pluginName, name ].join( '/' ) }>
+			<SidebarLayout
+				title={ title }
+				onClose={ onClose } >
+				{ children }
+			</SidebarLayout>
+		</Fill>
+	);
 }
 
-const WrappedPluginSidebar = compose( [
-	withSelect( select => {
-		return {
-			activePlugin: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
-		};
-	} ),
+PluginSidebar = compose( [
 	withDispatch( dispatch => {
 		return {
 			onClose: dispatch( 'core/edit-post' ).closeGeneralSidebar,
 		};
 	} ),
 	withFocusReturn,
-	withPluginContext,
+	withContext( 'pluginName' )(),
 ] )( PluginSidebar );
 
 /**
  * The plugin sidebar slot.
  *
- * @return {ReactElement} The plugin sidebar slot.
+ * @return {WPElement} The plugin sidebar slot.
  */
-WrappedPluginSidebar.Slot = () => (
-	<Slot name={ SLOT_NAME } />
+PluginSidebar.Slot = ( { name } ) => (
+	<Slot name={ [ SLOT_NAME, name ].join( '/' ) } />
 );
 
-export default WrappedPluginSidebar;
+export default PluginSidebar;

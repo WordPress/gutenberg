@@ -34,13 +34,8 @@ export function isEditorSidebarOpened( state ) {
  * @return {boolean}     Whether the plugin sidebar is opened.
  */
 export function isPluginSidebarOpened( state ) {
-	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
-
-	if ( ! activeGeneralSidebar || typeof activeGeneralSidebar !== 'string' ) {
-		return false;
-	}
-
-	return activeGeneralSidebar.startsWith( 'plugin-sidebar/' );
+	const activeGeneralSidebar = getActiveGeneralSidebarName( state );
+	return !! activeGeneralSidebar && ! isEditorSidebarOpened( state );
 }
 
 /**
@@ -51,11 +46,7 @@ export function isPluginSidebarOpened( state ) {
  * @return {?string} Active general sidebar name.
  */
 export function getActiveGeneralSidebarName( state ) {
-	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
-
-	return activeGeneralSidebar && ( isEditorSidebarOpened( state ) || isPluginSidebarOpened( state ) ) ?
-		activeGeneralSidebar :
-		null;
+	return getPreference( state, 'activeGeneralSidebar', null );
 }
 
 /**

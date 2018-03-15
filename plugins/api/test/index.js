@@ -1,13 +1,19 @@
-import PluginRegistry from '../plugin';
-
-let registerPlugin;
-
-beforeEach( () => {
-	const registry = PluginRegistry.resetInstance();
-	registerPlugin = registry.registerPlugin;
-} );
+/**
+ * Internal dependencies
+ */
+import {
+	registerPlugin,
+	unregisterPlugin,
+	getPlugins,
+} from '../';
 
 describe( 'registerPlugin', () => {
+	afterEach( () => {
+		getPlugins().forEach( ( plugin ) => {
+			unregisterPlugin( plugin.name );
+		} );
+	} );
+
 	it( 'successfully registers a plugin', () => {
 		registerPlugin( 'plugin', {
 			render: () => 'plugin content',

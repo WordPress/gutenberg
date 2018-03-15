@@ -9,13 +9,12 @@ import { noop } from 'lodash';
 import { Component } from '@wordpress/element';
 
 /**
- * Provives context to plugins, in combination with the withPluginContext
- * higher order component.
+ * Provides context to plugins, injecting name for slot name assignnment.
  */
 class PluginContextProvider extends Component {
 	getChildContext() {
 		return {
-			pluginContext: this.props.value,
+			pluginName: this.props.pluginName,
 		};
 	}
 
@@ -25,7 +24,7 @@ class PluginContextProvider extends Component {
 }
 
 PluginContextProvider.childContextTypes = {
-	pluginContext: noop,
+	pluginName: noop,
 };
 
 export default PluginContextProvider;
