@@ -98,6 +98,11 @@
 		"presets": [
 			"@wordpress/default"
 		],
+		"plugins": [
+			["transform-react-jsx", {
+				"pragma": "React.createElement"
+			}]
+		],
 		"env": {
 			"production": {
 				"plugins": [
