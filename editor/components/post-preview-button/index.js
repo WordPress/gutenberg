@@ -74,6 +74,10 @@ export class PostPreviewButton extends Component {
 			this.getWindowTarget()
 		);
 
+		// When popup is closed, delete reference to avoid later assignment of
+		// location in a post update.
+		this.previewWindow.onbeforeunload = () => delete this.previewWindow;
+
 		const markup = `
 			<div>
 				<p>Please wait&hellip;</p>
