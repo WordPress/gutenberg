@@ -37,3 +37,9 @@ $blocks-button__line-height: $big-font-size + 6px;
 		text-align: right;
 	}
 }
+
+.wp-block-button .wp-block-button__link{
+    white-space: normal;
+    word-break: break-all;
+    height: auto; 
+}
