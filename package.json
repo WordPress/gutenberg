@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "@wordpress/babel-preset-default": "^1.1.2",
     "cross-env": "^5.1.4",
     "flow-bin": "0.56.0",
     "jest-expo": "25.0.0",
