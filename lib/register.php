@@ -482,6 +482,23 @@ function gutenberg_register_rest_api_post_revisions() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
 
 /**
+ * Adds embed preview API endpoint.
+ *
+ * This is a replacement for the 'embed-parse' admin ajax action that the classic
+ * editor uses to preview embedded content.
+ *
+ * @since 2.6.0
+ */
+function gutenberg_register_rest_api_embed_preview() {
+	register_rest_route( 'gutenberg/v1', '/embed-preview/', array(
+		'methods'             => 'GET',
+		'callback'            => 'gutenberg_embed_preview',
+		'permission_callback' => 'gutenberg_embed_preview_permission_check',
+	) );
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_api_embed_preview' );
+
+/**
  * Injects a hidden input in the edit form to propagate the information that classic editor is selected.
  *
  * @since 1.5.2

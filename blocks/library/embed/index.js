@@ -3,13 +3,12 @@
  */
 import { parse } from 'url';
 import { includes, kebabCase, toLower } from 'lodash';
-import { stringify } from 'querystring';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Component, renderToString } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
 import classnames from 'classnames';
 
@@ -51,12 +50,6 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			align: {
 				type: 'string',
 			},
-			type: {
-				type: 'string',
-			},
-			providerNameSlug: {
-				type: 'string',
-			},
 		},
 
 		transforms,
@@ -74,10 +67,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				this.doServerSideRender = this.doServerSideRender.bind( this );
 				this.state = {
 					html: '',
-					type: '',
 					error: false,
 					fetching: false,
-					providerName: '',
 				};
 			}
 
@@ -96,43 +87,26 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				this.unmounting = true;
 			}
 
-			getPhotoHtml( photo ) {
-				// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
-				// acually the full size photo.
-				const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
-				return renderToString( photoPreview );
-			}
-
 			doServerSideRender( event ) {
 				if ( event ) {
 					event.preventDefault();
 				}
 				const { url } = this.props.attributes;
-				const { setAttributes } = this.props;
 
 				this.setState( { error: false, fetching: true } );
-				wp.apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } )
+				wp.apiRequest( { path: '/gutenberg/v1/embed-preview/', data: { url } } )
 					.then(
 						( obj ) => {
 							if ( this.unmounting ) {
 								return;
 							}
 
-							const { html, provider_name: providerName } = obj;
-							const providerNameSlug = kebabCase( toLower( providerName ) );
-							let { type } = obj;
-
-							if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
-								type = 'wp-embed';
-							}
+							const { html } = obj;
 							if ( html ) {
-								this.setState( { html, type, providerNameSlug } );
-								setAttributes( { type, providerNameSlug } );
-							} else if ( 'photo' === type ) {
-								this.setState( { html: this.getPhotoHtml( obj ), type, providerNameSlug } );
-								setAttributes( { type, providerNameSlug } );
+								this.setState( { html, fetching: false } );
+							} else {
+								this.setState( { fetching: false, error: true } );
 							}
-							this.setState( { fetching: false } );
 						},
 						() => {
 							this.setState( { fetching: false, error: true } );
@@ -141,7 +115,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			}
 
 			render() {
-				const { html, type, error, fetching } = this.state;
+				const { html, error, fetching } = this.state;
 				const { align, url, caption } = this.props.attributes;
 				const { setAttributes, isSelected } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
@@ -193,7 +167,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				const parsedUrl = parse( url );
 				const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
 				const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
-				const embedWrapper = 'wp-embed' === type ? (
+				const embedWrapper = includes( html, 'class="wp-embedded-content" data-secret' ) ? (
 					<div
 						className="wp-block-embed__wrapper"
 						dangerouslySetInnerHTML={ { __html: html } }
@@ -203,18 +177,13 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 						<SandBox
 							html={ html }
 							title={ iframeTitle }
-							type={ type }
 						/>
 					</div>
 				);
-				let typeClassName = 'wp-block-embed';
-				if ( 'video' === type ) {
-					typeClassName += ' is-video';
-				}
 
 				return [
 					controls,
-					<figure key="embed" className={ typeClassName }>
+					<figure key="embed" className="wp-block-embed">
 						{ ( cannotPreview ) ? (
 							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
@@ -237,16 +206,19 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 		},
 
 		save( { attributes } ) {
-			const { url, caption, align, type, providerNameSlug } = attributes;
+			const { url, caption, align } = attributes;
 
 			if ( ! url ) {
 				return;
 			}
-
+			// TODO: make blocks switch to the correct block based on the URL used.
+			// Until embed blocks can switch based on the URL (e.g. entering a Twitter URL
+			// into a YouTube block switches to a Twitter block) there's a possibility
+			// these provider based classes will be wrong.
+			const providerNameSlug = kebabCase( toLower( title ) );
 			const embedClassName = classnames( 'wp-block-embed', {
 				[ `align${ align }` ]: align,
-				[ `is-type-${ type }` ]: type,
-				[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
+				[ `wp-block-embed-${ providerNameSlug }` ]: providerNameSlug,
 			} );
 
 			return (
