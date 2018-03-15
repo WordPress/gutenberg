@@ -1,0 +1,15 @@
+{
+    "preset": "react-native",
+    "haste": {
+        "defaultPlatform": "android",
+        "platforms": [
+            "android",
+            "ios",
+            "native"
+        ],
+        "providesModuleNodeModules": [
+            "react-native"
+        ]
+    }
+}
+    
