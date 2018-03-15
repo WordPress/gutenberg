@@ -27,7 +27,9 @@ import BlockContentProvider from '../block-content-provider';
 export function getBlockDefaultClassname( blockName ) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
 	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
-	return 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+	const className = 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+
+	return applyFilters( 'blocks.getBlockDefaultClassname', className, blockName );
 }
 
 /**
