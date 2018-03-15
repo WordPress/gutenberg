@@ -5,6 +5,12 @@
 		padding-left: $block-side-ui-padding;
 		padding-right: $block-side-ui-padding;
 	}
+
+	// Don't add side padding for nested blocks, @todo see if this can be scoped better
+	.editor-block-list__block & {
+		padding-left: 0;
+		padding-right: 0;
+	}
 }
 
 .editor-block-list__layout .editor-block-list__block {
@@ -78,7 +84,13 @@
 	&.is-selected > .editor-block-mover:before,
 	&.is-hovered > .editor-block-mover:before {
 		border-right: 1px solid $light-gray-500;
-		right: 6px;
+		right: 0;
+	}
+
+	&.is-selected > .editor-block-settings-menu:before,
+	&.is-hovered > .editor-block-settings-menu:before {
+		border-left: 1px solid $light-gray-500;
+		left: 0;
 	}
 
 	&.is-typing .editor-block-list__empty-block-inserter,
@@ -90,12 +102,6 @@
 	.editor-block-list__side-inserter {
 		opacity: 1;
 		transition: opacity 0.2s;
-	}
-
-	&.is-selected > .editor-block-settings-menu:before,
-	&.is-hovered > .editor-block-settings-menu:before {
-		border-left: 1px solid $light-gray-500;
-		left: 6px;
 	}
 
 	/**
@@ -159,26 +165,6 @@
 	&.is-reusable > .editor-block-list__block-edit:before {
 		outline: 1px dashed $light-gray-500;
 	}
-
-	// @todo, this appears to be unused
-	.iframe-overlay {
-		position: relative;
-	}
-
-	.iframe-overlay:before {
-		content: '';
-		display: block;
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-	}
-
-	&.is-selected .iframe-overlay:before {
-		display: none;
-	}
-
 
 	/**
 	 * Alignments
@@ -334,23 +320,37 @@
 			border-bottom: 3px solid $blue-medium-500;
 		}
 	}
+}
 
 
-	/**
-	 * Left and right side UI
-	 */
+/**
+ * Left and right side UI
+ */
 
+.editor-block-list__block {
+
+	// Left and right
 	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		position: absolute;
-		top: 0;
+		top: -.9px; // .9px because of the collapsing margins hack, see line 27, @todo revisit when we allow margins to collapse
+		bottom: -.9px; // utilize full vertical space to increase hoverable area
 		padding: 0;
+		width: $block-side-ui-width;
+	}
+
+	// Elevate when selected or hovered
+	&.is-selected,
+	&.is-hovered {
+		.editor-block-settings-menu,
+		.editor-block-mover {
+			z-index: 9999;	// @todo
+		}
 	}
 
 	// Right side UI
 	> .editor-block-settings-menu {
-		right: #{ -1 * $block-mover-margin - $block-padding + 2px };
-		padding-top: 2px;
+		right: -$block-side-ui-width;
 
 		// Mobile
 		display: none;
@@ -362,8 +362,7 @@
 
 	// Left side UI
 	> .editor-block-mover {
-		left: -$block-mover-margin - $block-padding + 4px;
-		padding-top: 6px;
+		left: -$block-side-ui-width;
 		z-index: z-index( '.editor-block-mover' );
 
 		// Mobile
@@ -373,7 +372,7 @@
 		}
 	}
 
-	// Mobile tools
+	// Show side UI inline below the block on mobile
 	.editor-block-list__block-mobile-toolbar {
 		display: flex;
 		flex-direction: row;
@@ -419,6 +418,11 @@
 		}
 	}
 }
+
+
+/**
+ * In-Canvas Inserter
+ */
 
 .editor-block-list .editor-inserter {
 	margin: $item-spacing;

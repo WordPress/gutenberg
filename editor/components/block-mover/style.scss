@@ -1,20 +1,35 @@
 // Mover icon buttons
 .editor-block-mover__control {
 	display: block;
-	padding: 2px;
-	margin: 0 6px 0 4px;
 	border: none;
 	outline: none;
 	background: none;
 	color: $dark-gray-300;
 	cursor: pointer;
-	border-radius: 50%;
-	width: $icon-button-size-small;
+	padding: 0;
+	width: $block-side-ui-width;
+	height: $block-side-ui-width;	// the side UI can be no taller than 2 * $block-side-ui-width, which matches the height of a line of text
 
 	&[aria-disabled="true"] {
 		cursor: default;
 		color: $light-gray-300;
 		pointer-events: none;
+	}
+
+	// Try a background, only for nested situations @todo
+	@include break-small() {
+		.editor-block-list__layout .editor-block-list__layout & {
+			background: $white;
+			border-color: $light-gray-500;
+			border-style: solid;
+
+			&:first-child {
+				border-width: 1px 1px 0 1px;
+			}
+			&:last-child {
+				border-width: 0 1px 1px 1px;
+			}
+		}
 	}
 
 	// apply styles to SVG for movers on the desktop breakpoint

@@ -1,0 +1,21 @@
+// These margins make sure that nested blocks stack/overlay with the parent block chrome
+// This is sort of an experiment at making sure the editor looks as much like the end result as possible
+// Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
+.wp-block-columns .editor-block-list__layout {
+	&:first-child {
+		margin-left: -$block-padding;
+	}
+	&:last-child {
+		margin-right: -$block-padding;
+	}
+}
+
+// Prevent the parent block from being hovered, allow only nested blocks
+// Selecting the parent block can be an explicit choice using a separate control
+.editor-block-list__block[data-type="core/columns"] {
+	pointer-events: none;
+
+	> .editor-block-list__block-edit .editor-block-list__block {
+		pointer-events: all;
+	}
+}
