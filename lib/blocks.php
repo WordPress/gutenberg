@@ -31,7 +31,7 @@ function register_block_type( $name, $args = array() ) {
 }
 
 /**
- * Registers a block type from the JSON settings file.
+ * Registers a block type(s) from the JSON settings file.
  *
  * @since 2.5.0
  *
@@ -52,8 +52,21 @@ function register_block_type_from_settings( $file_name ) {
 	$name = $settings['name'];
 	unset( $settings['name'] );
 
-	return register_block_type( $name, $settings );
+	// Find if there are different variations of the given block type, e.g. embed
+	$variations = array();
+	if ( ! empty( $settings['variations'] ) ) {
+		$variations = $settings['variations'];
+		unset( $settings['variations'] );
+	}
+
+	$result = register_block_type( $name, $settings );
+	foreach ( $variations as $variation_name ) {
+		register_block_type( $variation_name, $settings );
+	}
+
+	return $result;
 }
+
 /**
  * Unregisters a block type.
  *

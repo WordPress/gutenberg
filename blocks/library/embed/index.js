@@ -26,7 +26,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
+function getEmbedBlockSettings( { title, icon, transforms, keywords = [] } ) {
 	return {
 		title,
 
@@ -34,30 +34,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 
 		icon,
 
-		category,
-
 		keywords,
-
-		attributes: {
-			url: {
-				type: 'string',
-			},
-			caption: {
-				type: 'array',
-				source: 'children',
-				selector: 'figcaption',
-				default: [],
-			},
-			align: {
-				type: 'string',
-			},
-			type: {
-				type: 'string',
-			},
-			providerNameSlug: {
-				type: 'string',
-			},
-		},
 
 		transforms,
 
@@ -255,7 +232,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 	};
 }
 
-export const name = 'core/embed';
+export { name } from './settings.json';
 
 export const settings = getEmbedBlockSettings( {
 	title: __( 'Embed' ),
