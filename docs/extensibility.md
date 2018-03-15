@@ -109,8 +109,8 @@ _Example:_
 ```js
 // Our filter function
 function setBlockCustomClassName( className, blockName ) {
-	return blockName === 'core/paragraph' ?
-		'my-plugin-paragraph' :
+	return blockName === 'core/code' ?
+		'my-plugin-code' :
 		className;
 }
 
