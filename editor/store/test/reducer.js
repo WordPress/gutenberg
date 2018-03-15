@@ -1464,6 +1464,41 @@ describe( 'state', () => {
 
 			expect( state ).toBe( original );
 		} );
+
+		it( 'should remove the selection if we are removing the selected block', () => {
+			const original = deepFreeze( {
+				start: 'chicken',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+			const state = blockSelection( original, {
+				type: 'REMOVE_BLOCKS',
+				uids: [ 'chicken' ],
+			} );
+
+			expect( state ).toEqual( {
+				start: null,
+				end: null,
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+		} );
+
+		it( 'should keep the selection if we are not removing the selected block', () => {
+			const original = deepFreeze( {
+				start: 'chicken',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+			const state = blockSelection( original, {
+				type: 'REMOVE_BLOCKS',
+				uids: [ 'ribs' ],
+			} );
+
+			expect( state ).toBe( original );
+		} );
 	} );
 
 	describe( 'preferences()', () => {
