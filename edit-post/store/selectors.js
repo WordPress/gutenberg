@@ -5,11 +5,6 @@ import createSelector from 'rememo';
 import { includes, some } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { __experimental } from '@wordpress/plugins';
-
-/**
  * Returns the current editing mode.
  *
  * @param {Object} state Global application state.
@@ -41,9 +36,11 @@ export function isEditorSidebarOpened( state ) {
 export function isPluginSidebarOpened( state ) {
 	const activeGeneralSidebar = getPreference( state, 'activeGeneralSidebar', null );
 
-	const uiComponent = __experimental.getRegisteredUIComponent( activeGeneralSidebar, 'sidebar' );
+	if ( ! activeGeneralSidebar || typeof activeGeneralSidebar !== 'string' ) {
+		return false;
+	}
 
-	return !! uiComponent;
+	return activeGeneralSidebar.startsWith( 'plugin-sidebar/' );
 }
 
 /**

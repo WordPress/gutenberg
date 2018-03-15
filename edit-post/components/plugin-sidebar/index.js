@@ -42,9 +42,8 @@ class PluginSidebar extends Component {
 	 */
 	componentWillMount() {
 		if ( ! this.namespacedName ) {
-			this.namespacedName = `${ this.props.pluginContext.namespace }/${ this.props.name }`;
+			this.namespacedName = `plugin-sidebar/${ this.props.pluginContext.namespace }/${ this.props.name }`;
 		}
-		this.props.pluginContext.registerUIComponent( this.namespacedName, 'sidebar' );
 	}
 
 	/**
@@ -69,7 +68,7 @@ class PluginSidebar extends Component {
 					title={ props.title }
 					onClose={ props.onClose } >
 					<ErrorBoundary pluginName={ this.namespacedName }>
-						{ cloneElement( Children.only( children ), newProps ) }
+						{ typeof children === 'string' ? children : cloneElement( Children.only( children ), newProps ) }
 					</ErrorBoundary>
 				</SidebarLayout>
 			</Fill>

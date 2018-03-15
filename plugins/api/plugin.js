@@ -16,10 +16,8 @@ import { isFunction } from 'lodash';
 class PluginRegistry {
 	constructor() {
 		this.plugins = {};
-		this.pluginUIComponents = {};
 
 		this.registerPlugin = this.registerPlugin.bind( this );
-		this.getRegisteredUIComponent = this.getRegisteredUIComponent.bind( this );
 	}
 
 	/**
@@ -82,25 +80,6 @@ class PluginRegistry {
 			pluginName,
 			uiType,
 		};
-	}
-
-	/**
-	 * Get the registered plugin information, null if it doesn't exist.
-	 *
-	 * @param {string}  uiNamespacedName The unique ui plugin identifier.
-	 * @param {string?} uiType           Optional UI type, will only return if ui type matches.
-	 *
-	 * @return {Object|null} Object containing plugin information null if the plugin doesn't exist.
-	 */
-	getRegisteredUIComponent( uiNamespacedName, uiType = null ) {
-		const uiComponent = this.pluginUIComponents[ uiNamespacedName ] || null;
-		if ( uiType ) {
-			if ( uiComponent && uiComponent.uiType === uiType ) {
-				return uiComponent;
-			}
-			return null;
-		}
-		return uiComponent;
 	}
 
 	/**

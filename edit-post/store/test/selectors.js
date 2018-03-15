@@ -13,18 +13,11 @@ import {
 	isSavingMetaBoxes,
 	getMetaBox,
 } from '../selectors';
-import { __experimental } from '@wordpress/plugins';
-const getRegisteredUIComponentMock = __experimental.getRegisteredUIComponent;
 
 jest.mock( '@wordpress/element', () => ( {
 	compose: jest.fn().mockReturnValue( jest.fn() ),
 	Component: jest.fn(),
 	createElement: jest.fn(),
-} ) );
-jest.mock( '@wordpress/plugins', () => ( {
-	__experimental: {
-		getRegisteredUIComponent: jest.fn().mockReturnValue( null ),
-	},
 } ) );
 
 describe( 'selectors', () => {
@@ -126,11 +119,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return true when the plugin sidebar is opened', () => {
-			getRegisteredUIComponentMock.mockReturnValueOnce( {
-				pluginName: 'my-plugin',
-				uiType: 'sidebar',
-			} );
-			const name = 'my-plugin/my-sidebar';
+			const name = 'plugin-sidebar/my-plugin/my-sidebar';
 			const state = {
 				preferences: {
 					activeGeneralSidebar: name,
@@ -138,7 +127,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isPluginSidebarOpened( state ) ).toBe( true );
-			expect( getRegisteredUIComponentMock ).toHaveBeenCalledWith( name, 'sidebar' );
 		} );
 	} );
 
