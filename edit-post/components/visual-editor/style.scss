@@ -27,7 +27,7 @@
 .edit-post-visual-editor .editor-writing-flow__click-redirect {
 	// Collapse to minimum height of 50px, to fully occupy editor bottom pad.
 	height: 50px;
-	width: $visual-editor-max-width;
+	width: $content-width;
 	// Offset for: Visual editor padding, block (default appender) margin.
 	margin: #{ -1 * $block-spacing } auto -50px;
 }
@@ -95,6 +95,7 @@
 
 .edit-post-visual-editor .editor-default-block-appender {
 	// Default to centered and content-width, like blocks
+	max-width: $content-width;
 	margin-left: auto;
 	margin-right: auto;
 	position: relative;
@@ -106,11 +107,11 @@
 	}
 
 	@include break-small() {
-		padding: 0 $block-mover-padding-visible;	// don't subtract 1px border because it's a border not an outline
+		padding: 0 $block-side-ui-padding;	// don't subtract 1px border because it's a border not an outline
 
 		.components-drop-zone {
-			left: $block-mover-padding-visible;
-			right: $block-mover-padding-visible;
+			left: $block-side-ui-padding;
+			right: $block-side-ui-padding;
 		}
 
 		.editor-default-block-appender__content {
