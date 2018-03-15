@@ -14,12 +14,6 @@ import {
 	getMetaBox,
 } from '../selectors';
 
-jest.mock( '@wordpress/element', () => ( {
-	compose: jest.fn().mockReturnValue( jest.fn() ),
-	Component: jest.fn(),
-	createElement: jest.fn(),
-} ) );
-
 describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
 		it( 'should return the selected editor mode', () => {
