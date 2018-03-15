@@ -107,13 +107,6 @@
 	}
 
 	@include break-small() {
-		padding: 0 $block-side-ui-padding;	// don't subtract 1px border because it's a border not an outline
-
-		.components-drop-zone {
-			left: $block-side-ui-padding;
-			right: $block-side-ui-padding;
-		}
-
 		.editor-default-block-appender__content {
 			padding: 0 $block-padding;
 		}
