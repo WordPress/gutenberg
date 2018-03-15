@@ -65,21 +65,20 @@ export const settings = {
 	},
 
 	edit: class extends Component {
-		constructor( { className } ) {
+		constructor() {
 			super( ...arguments );
 			// edit component has its own src in the state so it can be edited
 			// without setting the actual value outside of the edit UI
 			this.state = {
 				editing: ! this.props.attributes.src,
 				src: this.props.attributes.src,
-				className,
 			};
 		}
 
 		render() {
 			const { align, caption, id } = this.props.attributes;
-			const { setAttributes, isSelected } = this.props;
-			const { editing, className, src } = this.state;
+			const { setAttributes, isSelected, className } = this.props;
+			const { editing, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
