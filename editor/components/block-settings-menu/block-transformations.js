@@ -28,7 +28,7 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 		<Fragment>
 			<div className="editor-block-settings-menu__separator" />
 			<span
-				className="editor-block-switcher__menu-title"
+				className="editor-block-settings-menu__title"
 			>
 				{ __( 'Transform into:' ) }
 			</span>
