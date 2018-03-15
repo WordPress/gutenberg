@@ -18,12 +18,14 @@ function PluginArea() {
 	return (
 		<div style={ { display: 'none' } }>
 			{ map( getPlugins(), ( plugin ) => {
+				const { render: Plugin } = plugin;
+
 				return (
 					<PluginContextProvider
 						key={ plugin.name }
 						pluginName={ plugin.name }
 					>
-						{ plugin.render() }
+						<Plugin />
 					</PluginContextProvider>
 				);
 			} ) }
