@@ -4,8 +4,6 @@ describe( 'Splitting and merging paragraph blocks', () => {
 	} );
 
 	it( 'Should split and merge paragraph blocks using Enter and Backspace', () => {
-		const lastBlockSelector = '.editor-block-list__block-edit:last [contenteditable="true"]:first';
-
 		// TODO: Test splitting blocks by using Enter.  Due to a current bug
 		// with Cypress, the text caret does not move from the start of the
 		// text while typing, which is necessary to navigate to the middle
@@ -50,7 +48,3 @@ describe( 'Splitting and merging paragraph blocks', () => {
 		].join( '\n' ) );
 	} );
 } );
-
-Cypress.on('uncaught:exception', (err, runnable) => {
-	return false
-})
