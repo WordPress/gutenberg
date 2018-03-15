@@ -1,0 +1,41 @@
+{
+  "name": "core/latest-posts",
+  "category": "widgets",
+  "supports": {
+	"html": false
+  },
+  "attributes": {
+	"categories": {
+	  "type": "string"
+	},
+	"postsToShow": {
+	  "type": "number",
+	  "default": 5
+	},
+	"displayPostDate": {
+	  "type": "boolean",
+	  "default": false
+	},
+	"postLayout": {
+	  "type": "string",
+	  "default": "list"
+	},
+	"columns": {
+	  "type": "number",
+	  "default": 3
+	},
+	"align": {
+	  "type": "string",
+	  "default": "center"
+	},
+	"order": {
+	  "type": "string",
+	  "default": "desc"
+	},
+	"orderBy": {
+	  "type": "string",
+	  "default": "date"
+	}
+  },
+  "render_callback": "render_block_core_latest_posts"
+}

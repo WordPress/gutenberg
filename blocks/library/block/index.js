@@ -158,24 +158,12 @@ const ConnectedReusableBlockEdit = connect(
 	} )
 )( ReusableBlockEdit );
 
-export const name = 'core/block';
+export { name } from './settings.json';
 
 export const settings = {
 	title: __( 'Shared Block' ),
-	category: 'shared',
-	isPrivate: true,
-
-	attributes: {
-		ref: {
-			type: 'number',
-		},
-	},
-
-	supports: {
-		customClassName: false,
-		html: false,
-	},
 
 	edit: ConnectedReusableBlockEdit,
+
 	save: () => null,
 };

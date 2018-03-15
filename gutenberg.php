@@ -158,6 +158,10 @@ function gutenberg_init( $return, $post ) {
 		return false;
 	}
 
+	foreach ( glob( dirname( __FILE__ ) . '/blocks/library/*/settings.json' ) as $block_settings_file ) {
+		register_block_type_from_settings( $block_settings_file );
+	}
+
 	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );

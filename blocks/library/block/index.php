@@ -31,13 +31,3 @@ function gutenberg_render_block_core_reusable_block( $attributes ) {
 
 	return gutenberg_render_block( $block );
 }
-
-register_block_type( 'core/block', array(
-	'attributes'      => array(
-		'ref' => array(
-			'type' => 'number',
-		),
-	),
-
-	'render_callback' => 'gutenberg_render_block_core_reusable_block',
-) );

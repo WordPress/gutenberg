@@ -1,0 +1,25 @@
+{
+  "name": "core/categories",
+  "category": "widgets",
+  "supports": {
+	"html": false
+  },
+  "attributes": {
+	"showPostCounts": {
+	  "type": "boolean",
+	  "default": false
+	},
+	"displayAsDropdown": {
+	  "type": "boolean",
+	  "default": false
+	},
+	"showHierarchy": {
+	  "type": "boolean",
+	  "default": false
+	},
+	"align": {
+	  "type": "string"
+	}
+  },
+  "render_callback": "render_block_core_categories"
+}

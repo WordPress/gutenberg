@@ -10,7 +10,7 @@ import './editor.scss';
 import './style.scss';
 import LatestPostsBlock from './block';
 
-export const name = 'core/latest-posts';
+export { name } from './settings.json';
 
 export const settings = {
 	title: __( 'Latest Posts' ),
@@ -19,13 +19,7 @@ export const settings = {
 
 	icon: 'list-view',
 
-	category: 'widgets',
-
 	keywords: [ __( 'recent posts' ) ],
-
-	supports: {
-		html: false,
-	},
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;

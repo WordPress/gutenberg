@@ -10,7 +10,7 @@ import './editor.scss';
 import './style.scss';
 import CategoriesBlock from './block';
 
-export const name = 'core/categories';
+export { name } from './settings.json';
 
 export const settings = {
 	title: __( 'Categories' ),
@@ -18,30 +18,6 @@ export const settings = {
 	description: __( 'Shows a list of your site\'s categories.' ),
 
 	icon: 'list-view',
-
-	category: 'widgets',
-
-	attributes: {
-		showPostCounts: {
-			type: 'boolean',
-			default: false,
-		},
-		displayAsDropdown: {
-			type: 'boolean',
-			default: false,
-		},
-		showHierarchy: {
-			type: 'boolean',
-			default: false,
-		},
-		align: {
-			type: 'string',
-		},
-	},
-
-	supports: {
-		html: false,
-	},
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
