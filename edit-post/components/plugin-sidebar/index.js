@@ -27,11 +27,18 @@ class PluginSidebar extends Component {
 	constructor( props ) {
 		super( props );
 
+		this.state = { invalid: false };
+
 		if ( typeof props.name !== 'string' ) {
-			throw 'Sidebar names must be strings.';
+			// eslint-disable-next-line no-console
+			console.error( 'PluginSidebar name should be of type string' );
+			this.state.invalid = true;
 		}
 		if ( ! /^[a-z][a-z0-9-]*$/.test( props.name ) ) {
-			throw 'Sidebar names must include only lowercase alphanumeric characters or dashes, and start with a letter. Example: "my-sidebar".';
+			// eslint-disable-next-line no-console
+			console.error( 'Sidebar names must include only lowercase alphanumeric characters or dashes,' +
+				' and start with a letter. Example: "my-sidebar".' );
+			this.state.invalid = true;
 		}
 	}
 
@@ -52,7 +59,7 @@ class PluginSidebar extends Component {
 	 * @return {ReactElement} The rendered component.
 	 */
 	render() {
-		if ( this.props.activePlugin !== this.namespacedName ) {
+		if ( this.props.activePlugin !== this.namespacedName || this.state.invalid ) {
 			return null;
 		}
 
