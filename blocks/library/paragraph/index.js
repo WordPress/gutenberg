@@ -209,42 +209,7 @@ class ParagraphBlock extends Component {
 	}
 }
 
-const supports = {
-	className: false,
-};
-
-const schema = {
-	content: {
-		type: 'array',
-		source: 'children',
-		selector: 'p',
-		default: [],
-	},
-	align: {
-		type: 'string',
-	},
-	dropCap: {
-		type: 'boolean',
-		default: false,
-	},
-	placeholder: {
-		type: 'string',
-	},
-	width: {
-		type: 'string',
-	},
-	textColor: {
-		type: 'string',
-	},
-	backgroundColor: {
-		type: 'string',
-	},
-	fontSize: {
-		type: 'number',
-	},
-};
-
-export const name = 'core/paragraph';
+export { name } from './settings.json';
 
 export const settings = {
 	title: __( 'Paragraph' ),
@@ -253,13 +218,7 @@ export const settings = {
 
 	icon: 'editor-paragraph',
 
-	category: 'common',
-
 	keywords: [ __( 'text' ) ],
-
-	supports,
-
-	attributes: schema,
 
 	transforms: {
 		from: [
@@ -276,12 +235,35 @@ export const settings = {
 
 	deprecated: [
 		{
-			supports,
+			supports: {
+				className: false,
+			},
 			attributes: {
-				...schema,
 				content: {
 					type: 'string',
 					source: 'html',
+				},
+				align: {
+					type: 'string',
+				},
+				dropCap: {
+					type: 'boolean',
+					default: false,
+				},
+				placeholder: {
+					type: 'string',
+				},
+				width: {
+					type: 'string',
+				},
+				textColor: {
+					type: 'string',
+				},
+				backgroundColor: {
+					type: 'string',
+				},
+				fontSize: {
+					type: 'number',
 				},
 			},
 			save( { attributes } ) {

@@ -1,0 +1,37 @@
+{
+  "name": "core/paragraph",
+  "category": "common",
+  "supports": {
+	"className": false
+  },
+  "attributes": {
+	"content": {
+	  "type": "array",
+	  "source": "children",
+	  "selector": "p",
+	  "default": []
+	},
+	"align": {
+	  "type": "string"
+	},
+	"dropCap": {
+	  "type": "boolean",
+	  "default": false
+	},
+	"placeholder": {
+	  "type": "string"
+	},
+	"width": {
+	  "type": "string"
+	},
+	"textColor": {
+	  "type": "string"
+	},
+	"backgroundColor": {
+	  "type": "string"
+	},
+	"fontSize": {
+	  "type": "number"
+	}
+  }
+}
