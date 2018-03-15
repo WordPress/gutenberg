@@ -104,6 +104,15 @@ export const settings = {
 	edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
+		const alignmentToolbar = (
+			<AlignmentToolbar
+				value={ align }
+				onChange={ ( nextAlign ) => {
+					setAttributes( { align: nextAlign } );
+				} }
+			/>
+		);
+
 		return [
 			isSelected && (
 				<BlockControls
@@ -117,7 +126,9 @@ export const settings = {
 							subscript: level,
 						} ) )
 					}
-				/>
+				>
+				{ alignmentToolbar }
+				</BlockControls>
 			),
 			isSelected && (
 				<InspectorControls key="inspector">
@@ -135,12 +146,7 @@ export const settings = {
 						}
 					/>
 					<p>{ __( 'Text Alignment' ) }</p>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
+					{ alignmentToolbar }
 				</InspectorControls>
 			),
 			<RichText
