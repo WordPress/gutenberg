@@ -97,8 +97,12 @@ describe( 'registerResolvers', () => {
 		} );
 
 		const value = select( 'demo' ).getValue( 'arg1', 'arg2' );
-		expect( resolver ).toHaveBeenCalledWith( 'arg1', 'arg2' );
 		expect( value ).toBe( 'OK' );
+		expect( resolver ).toHaveBeenCalledWith( 'OK', 'arg1', 'arg2' );
+		select( 'demo' ).getValue( 'arg1', 'arg2' );
+		expect( resolver ).toHaveBeenCalledTimes( 1 );
+		select( 'demo' ).getValue( 'arg3', 'arg4' );
+		expect( resolver ).toHaveBeenCalledTimes( 2 );
 	} );
 } );
 

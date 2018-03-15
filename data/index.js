@@ -4,7 +4,7 @@
 import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues } from 'lodash';
-import memize from 'memize';
+import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
@@ -122,7 +122,9 @@ export function registerSelectors( reducerKey, newSelectors ) {
 }
 
 /**
- * Registers resolvers.
+ * Registers resolvers for a given reducer key. Resolvers are side effects
+ * invoked once per argument set of a given selector call, used in ensuring
+ * that the data needs for the selector are satisfied.
  *
  * @param {string} reducerKey   Part of the state shape to register the
  *                              resolvers for.
@@ -135,11 +137,17 @@ export function registerResolvers( reducerKey, newResolvers ) {
 			return selector;
 		}
 
-		// Ensure single invocation per argument set via memoization.
-		const fulfill = memize( newResolvers[ key ] );
+		// Ensure single invocation per argument set via memoization. Uses
+		// createSelector to take advantage of its ignoring first argument in
+		// cache key (state), since otherwise may leak memory unnecessarily.
+		const fulfill = createSelector( newResolvers[ key ] );
 
 		return ( ...args ) => {
-			fulfill( ...args );
+			// At this point, selectors have already been pre-bound to inject
+			// state, it would not be otherwise provided to fulfill.
+			const state = stores[ reducerKey ].getState();
+			fulfill( state, ...args );
+
 			return selector( ...args );
 		};
 	};
