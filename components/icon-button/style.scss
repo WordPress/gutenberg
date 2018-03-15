@@ -16,7 +16,6 @@
 	}
 
 	// Ensure that even SVG icons that don't include the .dashicon class are colored
-	.dashicon,
 	svg {
 		fill: currentColor;
 		outline: none;
