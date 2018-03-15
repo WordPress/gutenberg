@@ -2,7 +2,6 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
-import { combineReducers } from 'redux';
 import {
 	flow,
 	reduce,
@@ -24,6 +23,7 @@ import {
  * WordPress dependencies
  */
 import { isReusableBlock } from '@wordpress/blocks';
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies

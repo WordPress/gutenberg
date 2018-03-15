@@ -2,7 +2,7 @@
  * External dependencies
  */
 import isShallowEqual from 'shallowequal';
-import { createStore } from 'redux';
+import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues } from 'lodash';
 
 /**
@@ -88,6 +88,18 @@ export function registerReducer( reducerKey, reducer ) {
 
 	return store;
 }
+
+/**
+ * The combineReducers helper function turns an object whose values are different
+ * reducing functions into a single reducing function you can pass to registerReducer.
+ *
+ * @param {Object} reducers An object whose values correspond to different reducing
+ *                          functions that need to be combined into one.
+ *
+ * @return {Function}       A reducer that invokes every reducer inside the reducers
+ *                          object, and constructs a state object with the same shape.
+ */
+export { combineReducers };
 
 /**
  * Registers selectors for external usage.

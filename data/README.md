@@ -130,6 +130,40 @@ const unsubscribe = subscribe( () => {
 unsubscribe();
 ```
 
+### Helpers
+
+#### `combineReducers( reducers: Object ): Function`
+
+As your app grows more complex, you'll want to split your reducing function into separate functions, each managing independent parts of the state. The `combineReducers` helper function turns an object whose values are different reducing functions into a single reducing function you can pass to `registerStore`.
+
+_Example:_
+
+```js
+const { combineReducers, registerStore } = wp.data;
+
+const prices = ( state = {}, action ) => {
+	return action.type === 'SET_PRICE' ?
+		{
+			...state,
+			[ action.item ]: action.price,
+		} :
+		state;
+};
+
+const discountPercent = ( state = 0, action ) => {
+	return action.type === 'START_SALE' ?
+		action.discountPercent :
+		state;
+};
+
+registerStore( 'my-shop', {
+	reducer: combineReducers( {
+		prices,
+		discountPercent,
+	} ),
+} );
+```
+
 ### Higher-Order Components
 
 A higher-order component is a function which accepts a [component](https://github.com/WordPress/gutenberg/tree/master/element) and returns a new, enhanced component. A stateful user interface should respond to changes in the underlying state and updates its displayed element accordingly. WordPress uses higher-order components both as a means to separate the purely visual aspects of an interface from its data backing, and to ensure that the data is kept in-sync with the stores.
