@@ -218,7 +218,7 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 			startSale( discountPercent );
 		},
 	};
-} );
+} )( Button );
 
 // Rendered in the application:
 //
