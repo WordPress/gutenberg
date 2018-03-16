@@ -1,4 +1,9 @@
 /**
+ * External dependencies.
+ */
+import { isEqual } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -12,33 +17,31 @@ export class ServerSideRender extends Component {
 	constructor( props ) {
 		super( props );
 		this.state = {
-			response: {},
-			attributes: props,
+			response: null,
 		};
 	}
 
 	componentDidMount() {
-		this.getOutput();
+		this.fetch();
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		if ( JSON.stringify( nextProps ) !== JSON.stringify( this.props ) ) {
-			this.setState( { attributes: nextProps }, this.getOutput );
+		if ( ! isEqual( nextProps, this.props ) ) {
+			this.fetch();
 		}
 	}
 
-	getOutput() {
-		this.setState( { response: {} } );
+	fetch() {
+		this.setState( { response: null } );
 		const { block } = this.props;
-		const attributes = this.state.attributes;
 		const apiURL = addQueryArgs( '/gutenberg/v1/block-renderer/' + block, {
-			...attributes,
+			...this.props,
 			_wpnonce: wpApiSettings.nonce,
 		} );
 
 		return wp.apiRequest( { path: apiURL } ).then( response => {
-			if ( response && response.output ) {
-				this.setState( { response: response.output } );
+			if ( response && response.rendered ) {
+				this.setState( { response: response.rendered } );
 			}
 		} );
 	}

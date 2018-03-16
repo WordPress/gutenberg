@@ -21,7 +21,6 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function __construct() {
-
 		// @codingStandardsIgnoreLine - PHPCS mistakes $this->namespace for the namespace keyword.
 		$this->namespace = 'gutenberg/v1';
 		$this->rest_base = 'block-renderer';
@@ -33,7 +32,6 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function register_routes() {
-
 		$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
 		foreach ( $block_types as $block_type ) {
 			if ( ! $block_type->is_dynamic() ) {

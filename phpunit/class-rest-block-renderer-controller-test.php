@@ -253,45 +253,27 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		$this->arrayHasKey( 'string', $data['schema']['properties']['rendered']['type'] );
 	}
 
-	/**
-	 * NA.
-	 */
 	public function test_update_item() {
-		$this->markTestSkipped();
+		$this->markTestSkipped( 'Controller doesn\'t implement update_item().' );
 	}
 
-	/**
-	 * NA.
-	 */
 	public function test_create_item() {
-		$this->markTestSkipped();
+		$this->markTestSkipped( 'Controller doesn\'t implement create_item().' );
 	}
 
-	/**
-	 * NA.
-	 */
 	public function test_delete_item() {
-		$this->markTestSkipped();
+		$this->markTestSkipped( 'Controller doesn\'t implement delete_item().' );
 	}
 
-	/**
-	 * NA.
-	 */
 	public function test_get_items() {
-		$this->markTestSkipped();
+		$this->markTestSkipped( 'Controller doesn\'t implement get_items().' );
 	}
 
-	/**
-	 * NA.
-	 */
 	public function test_context_param() {
-		$this->markTestIncomplete();
+		$this->markTestIncomplete( 'Controller doesn\'t implement context_param().' );
 	}
 
-	/**
-	 * NA.
-	 */
 	public function test_prepare_item() {
-		$this->markTestSkipped();
+		$this->markTestSkipped( 'Controller doesn\'t implement prepare_item().' );
 	}
 }
