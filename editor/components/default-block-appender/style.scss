@@ -68,6 +68,10 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 	.editor-inserter__toggle {
 		border-radius: 50%;
 	}
+
+	&:disabled {
+		display: none;
+	}
 }
 
 // Quick block insertion icons on the right

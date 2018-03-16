@@ -67,6 +67,7 @@ const {
 	getNotices,
 	getReusableBlock,
 	isSavingReusableBlock,
+	isFetchingReusableBlock,
 	isSelectionEnabled,
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
@@ -2379,7 +2380,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUid: {
+							carrot: { name: 'core/test-block' },
+						},
 						blockOrder: {},
 						edits: {},
 					},
@@ -2387,11 +2390,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				reusableBlocks: {
 					data: {
-						123: {
-							id: 123,
-							title: 'My reusable block',
-							type: 'core/test-block',
-						},
+						123: { uid: 'carrot', title: 'My reusable block' },
 					},
 				},
 			};
@@ -2433,14 +2432,19 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
+						blocksByUid: {
+							carrot: { name: 'core/test-block' },
+						},
 						blockOrder: [],
+						edits: {},
 					},
 				},
 				reusableBlocks: {
 					data: {
-						123: { id: 123, type: 'core/test-block' },
+						123: { uid: 'carrot' },
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getFrecentInserterItems( state, true, 3 ) ).toMatchObject( [
@@ -2521,25 +2525,45 @@ describe( 'selectors', () => {
 
 	describe( 'getReusableBlock', () => {
 		it( 'should return a reusable block', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			const expectedReusableBlock = {
-				id,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
 			const state = {
 				reusableBlocks: {
 					data: {
-						[ id ]: expectedReusableBlock,
+						8109: {
+							uid: 'foo',
+							title: 'My cool block',
+						},
 					},
 				},
 			};
 
-			const actualReusableBlock = getReusableBlock( state, id );
-			expect( actualReusableBlock ).toEqual( expectedReusableBlock );
+			const actualReusableBlock = getReusableBlock( state, 8109 );
+			expect( actualReusableBlock ).toEqual( {
+				id: 8109,
+				isTemporary: false,
+				uid: 'foo',
+				title: 'My cool block',
+			} );
+		} );
+
+		it( 'should return a temporary reusable block', () => {
+			const state = {
+				reusableBlocks: {
+					data: {
+						reusable1: {
+							uid: 'foo',
+							title: 'My cool block',
+						},
+					},
+				},
+			};
+
+			const actualReusableBlock = getReusableBlock( state, 'reusable1' );
+			expect( actualReusableBlock ).toEqual( {
+				id: 'reusable1',
+				isTemporary: true,
+				uid: 'foo',
+				title: 'My cool block',
+			} );
 		} );
 
 		it( 'should return null when no reusable block exists', () => {
@@ -2562,54 +2586,66 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const isSaving = isSavingReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
+			const isSaving = isSavingReusableBlock( state, 5187 );
 			expect( isSaving ).toBe( false );
 		} );
 
 		it( 'should return true when the block is being saved', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const state = {
 				reusableBlocks: {
 					isSaving: {
-						[ id ]: true,
+						5187: true,
 					},
 				},
 			};
 
-			const isSaving = isSavingReusableBlock( state, id );
+			const isSaving = isSavingReusableBlock( state, 5187 );
 			expect( isSaving ).toBe( true );
+		} );
+	} );
+
+	describe( 'isFetchingReusableBlock', () => {
+		it( 'should return false when the block is not being fetched', () => {
+			const state = {
+				reusableBlocks: {
+					isFetching: {},
+				},
+			};
+
+			const isFetching = isFetchingReusableBlock( state, 5187 );
+			expect( isFetching ).toBe( false );
+		} );
+
+		it( 'should return true when the block is being fetched', () => {
+			const state = {
+				reusableBlocks: {
+					isFetching: {
+						5187: true,
+					},
+				},
+			};
+
+			const isFetching = isFetchingReusableBlock( state, 5187 );
+			expect( isFetching ).toBe( true );
 		} );
 	} );
 
 	describe( 'getReusableBlocks', () => {
 		it( 'should return an array of reusable blocks', () => {
-			const reusableBlock1 = {
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-			const reusableBlock2 = {
-				id: '687e1a87-cca1-41f2-a782-197ddaea9abf',
-				name: 'My neat block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Goodbye!',
-				},
-			};
 			const state = {
 				reusableBlocks: {
 					data: {
-						[ reusableBlock1.id ]: reusableBlock1,
-						[ reusableBlock2.id ]: reusableBlock2,
+						123: { uid: 'carrot' },
+						reusable1: { uid: 'broccoli' },
 					},
 				},
 			};
 
 			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [ reusableBlock1, reusableBlock2 ] );
+			expect( reusableBlocks ).toEqual( [
+				{ id: 123, isTemporary: false, uid: 'carrot' },
+				{ id: 'reusable1', isTemporary: true, uid: 'broccoli' },
+			] );
 		} );
 
 		it( 'should return an empty array when no reusable blocks exist', () => {

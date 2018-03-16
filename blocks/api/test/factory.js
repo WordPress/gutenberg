@@ -12,7 +12,6 @@ import {
 	cloneBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
-	createReusableBlock,
 } from '../factory';
 import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
 
@@ -697,20 +696,6 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].isValid ).toBe( true );
 			expect( transformedBlocks[ 1 ].attributes ).toEqual( {
 				value: 'smoked ribs',
-			} );
-		} );
-	} );
-
-	describe( 'createReusableBlock', () => {
-		it( 'should create a reusable block', () => {
-			const type = 'core/test-block';
-			const attributes = { name: 'Big Bird' };
-
-			expect( createReusableBlock( type, attributes ) ).toMatchObject( {
-				id: expect.any( Number ),
-				title: 'Untitled block',
-				type,
-				attributes,
 			} );
 		} );
 	} );
