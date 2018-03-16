@@ -19,7 +19,7 @@
 	#poststuff h2.hndle { /* WordPress selectors yolo */
 		border-bottom: 1px solid $light-gray-500;
 		box-sizing: border-box;
-		color: $dark-gray-500;
+		color: inherit;
 		font-weight: 600;
 		outline: none;
 		padding: 15px;
@@ -29,13 +29,13 @@
 
 	.postbox {
 		border: 0;
-		color: $dark-gray-500;
+		color: inherit;
 		margin-bottom: 0;
 	}
 
 	.postbox > .inside {
 		border-bottom: 1px solid $light-gray-500;
-		color: $dark-gray-500;
+		color: inherit;
 		padding: 0 $block-padding $block-padding;
 		margin: 0;
 	}
