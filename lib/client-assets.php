@@ -549,7 +549,7 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 			$f = fopen( $full_path, 'w' );
 			fwrite( $f, wp_remote_retrieve_body( $response ) );
 			fclose( $f );
-		} else if ( ! filesize( $full_path ) ) {
+		} elseif ( ! filesize( $full_path ) ) {
 			// The request failed. If the file is already cached, continue to
 			// use this file. If not, then unlink the 0 byte file, and enqueue
 			// the script directly from the URL.

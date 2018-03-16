@@ -13,7 +13,6 @@ import {
 	switchToBlockType,
 	createBlock,
 	serialize,
-	createReusableBlock,
 	isReusableBlock,
 	getDefaultBlockForPostFormat,
 } from '@wordpress/blocks';
@@ -27,14 +26,17 @@ import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
 	setupEditorState,
 	resetPost,
+	receiveBlocks,
+	receiveReusableBlocks,
+	replaceBlock,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
 	removeNotice,
 	savePost,
-	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
+	removeBlocks,
 	selectBlock,
 	removeBlock,
 } from './actions';
@@ -338,8 +340,10 @@ export default {
 		if ( ! basePath ) {
 			return;
 		}
+
 		const { id } = action;
 		const { dispatch } = store;
+
 		let result;
 		if ( id ) {
 			result = wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
@@ -349,13 +353,17 @@ export default {
 
 		result.then(
 			( reusableBlockOrBlocks ) => {
+				dispatch( receiveReusableBlocks( map(
+					castArray( reusableBlockOrBlocks ),
+					( reusableBlock ) => ( {
+						reusableBlock,
+						parsedBlock: parse( reusableBlock.content )[ 0 ],
+					} )
+				) ) );
+
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
 					id,
-					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, title, content } ) => {
-						const [ { name: type, attributes } ] = parse( content );
-						return { id: itemId, title, type, attributes };
-					} ),
 				} );
 			},
 			( error ) => {
@@ -370,6 +378,9 @@ export default {
 			}
 		);
 	},
+	RECEIVE_REUSABLE_BLOCKS( action ) {
+		return receiveBlocks( map( action.results, 'parsedBlock' ) );
+	},
 	SAVE_REUSABLE_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
 		// until there is a filter to not use reusable blocks if undefined
@@ -379,10 +390,12 @@ export default {
 		}
 
 		const { id } = action;
-		const { getState, dispatch } = store;
+		const { dispatch } = store;
+		const state = store.getState();
 
-		const { title, type, attributes, isTemporary } = getReusableBlock( getState(), id );
-		const content = serialize( createBlock( type, attributes ) );
+		const { uid, title, isTemporary } = getReusableBlock( state, id );
+		const { name, attributes, innerBlocks } = getBlock( state, uid );
+		const content = serialize( createBlock( name, attributes, innerBlocks ) );
 
 		const data = isTemporary ? { title, content } : { id, title, content };
 		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
@@ -435,9 +448,14 @@ export default {
 		dispatch( {
 			type: 'REMOVE_REUSABLE_BLOCK',
 			id,
-			associatedBlockUids,
 			optimist: { type: BEGIN, id: transactionId },
 		} );
+
+		// Remove the parsed block.
+		dispatch( removeBlocks( [
+			...associatedBlockUids,
+			reusableBlock.uid,
+		] ) );
 
 		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
 			() => {
@@ -464,25 +482,40 @@ export default {
 		);
 	},
 	CONVERT_BLOCK_TO_STATIC( action, store ) {
-		const { getState, dispatch } = store;
-
-		const oldBlock = getBlock( getState(), action.uid );
-		const reusableBlock = getReusableBlock( getState(), oldBlock.attributes.ref );
-		const newBlock = createBlock( reusableBlock.type, reusableBlock.attributes );
-		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
+		const state = store.getState();
+		const oldBlock = getBlock( state, action.uid );
+		const reusableBlock = getReusableBlock( state, oldBlock.attributes.ref );
+		const referencedBlock = getBlock( state, reusableBlock.uid );
+		const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
+		store.dispatch( replaceBlock( oldBlock.uid, newBlock ) );
 	},
 	CONVERT_BLOCK_TO_REUSABLE( action, store ) {
 		const { getState, dispatch } = store;
 
-		const oldBlock = getBlock( getState(), action.uid );
-		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
-		const newBlock = createBlock( 'core/block', {
-			ref: reusableBlock.id,
-			layout: oldBlock.attributes.layout,
-		} );
-		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
+		const parsedBlock = getBlock( getState(), action.uid );
+		const reusableBlock = {
+			id: uniqueId( 'reusable' ),
+			uid: parsedBlock.uid,
+			title: __( 'Untitled block' ),
+		};
+
+		dispatch( receiveReusableBlocks( [ {
+			reusableBlock,
+			parsedBlock,
+		} ] ) );
+
 		dispatch( saveReusableBlock( reusableBlock.id ) );
-		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
+
+		dispatch( replaceBlock(
+			parsedBlock.uid,
+			createBlock( 'core/block', {
+				ref: reusableBlock.id,
+				layout: parsedBlock.attributes.layout,
+			} )
+		) );
+
+		// Re-add the original block to the store, since replaceBlock() will have removed it
+		dispatch( receiveBlocks( [ parsedBlock ] ) );
 	},
 	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
 		const message = spokenMessage || content;
