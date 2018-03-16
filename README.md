@@ -40,6 +40,15 @@ yarn start -- --reset-cache
 
 Runs the [jest](https://github.com/facebook/jest) test runner on your tests.
 
+To run `jest` with debugger support, start it with the following CLI command:
+```
+NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand
+```
+
+Append `--config <jest config json file>` to specify a config file other than the default.
+
+Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to springle `debugger` statements anywhere in the code that you'd like the debugger to break.
+
 #### `npm run ios`
 
 Like `npm start`, but also attempts to open your app in the iOS Simulator if you're on a Mac and have it installed.
