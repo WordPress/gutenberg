@@ -9,10 +9,15 @@ describe( 'Splitting and merging paragraph blocks', () => {
 		// text while typing, which is necessary to navigate to the middle
 		// of some text and type Enter to split it.
 
-		// Insert two separate paragraph blocks to be merged
-		cy.get( '.editor-default-block-appender' ).click();
+		//Add two paragraph blocks to merge
+		cy.get( '.edit-post-header [aria-label="Add block"]' ).click();
+		cy.get( '[placeholder="Search for a block"]' ).type( 'paragraph' );
+		cy.get( '.editor-inserter__block' ).contains( 'Paragraph' ).click();
 		cy.focused().type( 'First' );
-		cy.get( '.editor-default-block-appender' ).click();
+
+		cy.get( '.edit-post-header [aria-label="Add block"]' ).click();
+		cy.get( '[placeholder="Search for a block"]' ).type( 'paragraph' );
+		cy.get( '.editor-inserter__block' ).contains( 'Paragraph' ).click();
 		cy.focused().type( 'Second' );
 
 		// Switch to Code Editor to check HTML Output
