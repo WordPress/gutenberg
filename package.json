@@ -5,6 +5,7 @@
   "devDependencies": {
     "flow-bin": "0.56.0",
     "jest-expo": "25.0.0",
+    "prettier": "git+https://github.com/Automattic/calypso-prettier.git#calypso-1.9",
     "react-native-scripts": "1.11.1",
     "react-test-renderer": "16.2.0"
   },
@@ -15,7 +16,8 @@
     "android": "react-native-scripts android",
     "ios": "react-native-scripts ios",
     "test": "node node_modules/jest/bin/jest.js",
-    "flow": "flow"
+    "flow": "flow",
+    "prettier": "prettier --write *js"
   },
   "jest": {
     "preset": "jest-expo"
