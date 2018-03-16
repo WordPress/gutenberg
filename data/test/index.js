@@ -22,6 +22,7 @@ import {
 	withSelect,
 	withDispatch,
 	subscribe,
+	isActionLike,
 } from '../';
 
 jest.mock( '@wordpress/utils', () => ( {
@@ -75,6 +76,20 @@ describe( 'registerReducer', () => {
 } );
 
 describe( 'registerResolvers', () => {
+	const unsubscribes = [];
+	afterEach( () => {
+		let unsubscribe;
+		while ( ( unsubscribe = unsubscribes.shift() ) ) {
+			unsubscribe();
+		}
+	} );
+
+	function subscribeWithUnsubscribe( ...args ) {
+		const unsubscribe = subscribe( ...args );
+		unsubscribes.push( unsubscribe );
+		return unsubscribe;
+	}
+
 	it( 'should not do anything for selectors which do not have resolvers', () => {
 		registerReducer( 'demo', ( state = 'OK' ) => state );
 		registerSelectors( 'demo', {
@@ -103,6 +118,77 @@ describe( 'registerResolvers', () => {
 		expect( resolver ).toHaveBeenCalledTimes( 1 );
 		select( 'demo' ).getValue( 'arg3', 'arg4' );
 		expect( resolver ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should resolve promise action to dispatch', ( done ) => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+			return action.type === 'SET_OK' ? 'OK' : state;
+		} );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: () => Promise.resolve( { type: 'SET_OK' } ),
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			try {
+				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+				done();
+			} catch ( error ) {
+				done( error );
+			}
+		} );
+
+		select( 'demo' ).getValue();
+	} );
+
+	it( 'should resolve promise non-action to dispatch', ( done ) => {
+		let shouldThrow = false;
+		registerReducer( 'demo', ( state = 'OK' ) => {
+			if ( shouldThrow ) {
+				throw 'Should not have dispatched';
+			}
+
+			return state;
+		} );
+		shouldThrow = true;
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: () => Promise.resolve(),
+		} );
+
+		select( 'demo' ).getValue();
+
+		process.nextTick( () => {
+			done();
+		} );
+	} );
+
+	it( 'should not dispatch resolved promise action on subsequent selector calls', ( done ) => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+			return action.type === 'SET_OK' && state === 'NOTOK' ? 'OK' : 'NOTOK';
+		} );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: () => Promise.resolve( { type: 'SET_OK' } ),
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			try {
+				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+				done();
+			} catch ( error ) {
+				done( error );
+			}
+		} );
+
+		select( 'demo' ).getValue();
+		select( 'demo' ).getValue();
 	} );
 } );
 
@@ -483,5 +569,22 @@ describe( 'dispatch', () => {
 		dispatch( 'counter' ).increment(); // state = 1
 		dispatch( 'counter' ).increment( 4 ); // state = 5
 		expect( store.getState() ).toBe( 5 );
+	} );
+} );
+
+describe( 'isActionLike', () => {
+	it( 'returns false if non-action-like', () => {
+		expect( isActionLike( undefined ) ).toBe( false );
+		expect( isActionLike( null ) ).toBe( false );
+		expect( isActionLike( [] ) ).toBe( false );
+		expect( isActionLike( {} ) ).toBe( false );
+		expect( isActionLike( 1 ) ).toBe( false );
+		expect( isActionLike( 0 ) ).toBe( false );
+		expect( isActionLike( Infinity ) ).toBe( false );
+		expect( isActionLike( { type: null } ) ).toBe( false );
+	} );
+
+	it( 'returns true if action-like', () => {
+		expect( isActionLike( { type: 'POW' } ) ).toBe( true );
 	} );
 } );

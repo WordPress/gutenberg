@@ -7,28 +7,15 @@ import { registerStore } from '@wordpress/data';
  * Internal dependencies
  */
 import reducer from './reducer';
-import { getCategories } from './selectors';
+import * as selectors from './selectors';
+import * as actions from './actions';
+import * as resolvers from './resolvers';
 
-/**
- * Module Constants
- */
-const MODULE_KEY = 'core';
-
-const store = registerStore( MODULE_KEY, {
+const store = registerStore( 'core', {
 	reducer,
-	selectors: {
-		getCategories,
-	},
-	resolvers: {
-		getCategories() {
-			wp.apiRequest( { path: '/wp/v2/categories' } ).then( ( categories ) => {
-				store.dispatch( {
-					type: 'RECEIVE_CATEGORIES',
-					categories,
-				} );
-			} );
-		},
-	},
+	actions,
+	selectors,
+	resolvers,
 } );
 
 export default store;

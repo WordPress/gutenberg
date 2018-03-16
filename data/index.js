@@ -4,7 +4,7 @@
 import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues } from 'lodash';
-import createSelector from 'rememo';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -137,17 +137,28 @@ export function registerResolvers( reducerKey, newResolvers ) {
 			return selector;
 		}
 
-		// Ensure single invocation per argument set via memoization. Uses
-		// createSelector to take advantage of its ignoring first argument in
-		// cache key (state), since otherwise may leak memory unnecessarily.
-		const fulfill = createSelector( newResolvers[ key ] );
+		// Ensure single invocation per argument set via memoization.
+		const fulfill = memoize( ( ...args ) => {
+			const store = stores[ reducerKey ];
 
-		return ( ...args ) => {
 			// At this point, selectors have already been pre-bound to inject
 			// state, it would not be otherwise provided to fulfill.
-			const state = stores[ reducerKey ].getState();
-			fulfill( state, ...args );
+			const state = store.getState();
 
+			const fulfillment = newResolvers[ key ]( state, ...args );
+
+			// Returning a promise from resolver dispatches upon resolution.
+			if ( fulfillment instanceof Promise ) {
+				fulfillment.then( ( action ) => {
+					if ( isActionLike( action ) ) {
+						store.dispatch( action );
+					}
+				} );
+			}
+		} );
+
+		return ( ...args ) => {
+			fulfill( ...args );
 			return selector( ...args );
 		};
 	};
@@ -337,6 +348,20 @@ export const withDispatch = ( mapDispatchToProps ) => ( WrappedComponent ) => {
 
 	return ComponentWithDispatch;
 };
+
+/**
+ * Returns true if the given argument appears to be a dispatchable action.
+ *
+ * @param {*} action Object to test.
+ *
+ * @return {boolean} Whether object is action-like.
+ */
+export function isActionLike( action ) {
+	return (
+		!! action &&
+		typeof action.type === 'string'
+	);
+}
 
 export const query = ( mapSelectToProps ) => {
 	deprecated( 'wp.data.query', {
