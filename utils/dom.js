@@ -318,16 +318,21 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 }
 
 /**
- * Check whether the given node in an input field.
+ * Check whether the given element is a text field, where text field is defined
+ * by the ability to select within the input, or that it is contenteditable.
+ *
+ * See: https://html.spec.whatwg.org/#textFieldSelection
  *
  * @param {HTMLElement} element The HTML element.
  *
- * @return {boolean} True if the element is an input field, false if not.
+ * @return {boolean} True if the element is an text field, false if not.
  */
-export function isInputField( { nodeName, contentEditable } ) {
+export function isTextField( element ) {
+	const { nodeName, selectionStart, contentEditable } = element;
+
 	return (
-		nodeName === 'INPUT' ||
-		nodeName === 'TEXTAREA' ||
+		( nodeName === 'INPUT' && selectionStart !== null ) ||
+		( nodeName === 'TEXTAREA' ) ||
 		contentEditable === 'true'
 	);
 }
@@ -339,7 +344,7 @@ export function isInputField( { nodeName, contentEditable } ) {
  * @return {boolean} True if there is selection, false if not.
  */
 export function documentHasSelection() {
-	if ( isInputField( document.activeElement ) ) {
+	if ( isTextField( document.activeElement ) ) {
 		return true;
 	}
 

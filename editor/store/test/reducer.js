@@ -1272,12 +1272,13 @@ describe( 'state', () => {
 					uid: 'bacon',
 					name: 'core-embed/twitter',
 				} ],
+				time: 123456,
 			} );
 
 			expect( state ).toEqual( {
 				insertUsage: {
 					'core-embed/twitter': {
-						time: expect.any( Number ),
+						time: 123456,
 						count: 1,
 						insert: { name: 'core-embed/twitter' },
 					},
@@ -1287,7 +1288,7 @@ describe( 'state', () => {
 			const twoRecentBlocks = preferences( deepFreeze( {
 				insertUsage: {
 					'core-embed/twitter': {
-						time: expect.any( Number ),
+						time: 123456,
 						count: 1,
 						insert: { name: 'core-embed/twitter' },
 					},
@@ -1302,17 +1303,18 @@ describe( 'state', () => {
 					name: 'core/block',
 					attributes: { ref: 123 },
 				} ],
+				time: 123457,
 			} );
 
 			expect( twoRecentBlocks ).toEqual( {
 				insertUsage: {
 					'core-embed/twitter': {
-						time: expect.any( Number ),
+						time: 123457,
 						count: 2,
 						insert: { name: 'core-embed/twitter' },
 					},
 					'core/block/123': {
-						time: expect.any( Number ),
+						time: 123457,
 						count: 1,
 						insert: { name: 'core/block', ref: 123 },
 					},

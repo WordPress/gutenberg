@@ -18,11 +18,15 @@ import './style.scss';
 import BlockDropZone from '../block-drop-zone';
 import { insertDefaultBlock, startTyping } from '../../store/actions';
 import { getBlock, getBlockCount } from '../../store/selectors';
+import InserterWithShortcuts from '../inserter-with-shortcuts';
+import Inserter from '../inserter';
 
-export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPrompt } ) {
+export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPrompt, placeholder, layout, rootUID } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
+
+	const value = placeholder || __( 'Write your story' );
 
 	return (
 		<div className="editor-default-block-appender">
@@ -34,8 +38,10 @@ export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPromp
 				onFocus={ onAppend }
 				onClick={ onAppend }
 				onKeyDown={ onAppend }
-				value={ showPrompt ? __( 'Write your story' ) : '' }
+				value={ showPrompt ? value : '' }
 			/>
+			<InserterWithShortcuts rootUID={ rootUID } layout={ layout } />
+			<Inserter position="top right" />
 		</div>
 	);
 }
@@ -66,10 +72,11 @@ export default compose(
 		} )
 	),
 	withContext( 'editor' )( ( settings ) => {
-		const { templateLock } = settings;
+		const { templateLock, bodyPlaceholder } = settings;
 
 		return {
 			isLocked: !! templateLock,
+			placeholder: bodyPlaceholder,
 		};
 	} ),
 )( DefaultBlockAppender );
