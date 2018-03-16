@@ -2,7 +2,6 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
-import { combineReducers } from 'redux';
 import {
 	flow,
 	reduce,
@@ -17,12 +16,14 @@ import {
 	keys,
 	isEqual,
 	includes,
+	overSome,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { isReusableBlock } from '@wordpress/blocks';
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -98,28 +99,72 @@ function getFlattenedBlocks( blocks ) {
 }
 
 /**
- * Option for the history reducer. When the block ID and updated attirbute keys
- * are the same as previously, the history reducer should overwrite its present
- * state.
+ * Returns true if the two object arguments have the same keys, or false
+ * otherwise.
  *
- * @param {Object} action         The currently dispatched action.
- * @param {Object} previousAction The previously dispatched action.
+ * @param {Object} a First object.
+ * @param {Object} b Second object.
  *
- * @return {boolean} Whether or not to overwrite present state.
+ * @return {boolean} Whether the two objects have the same keys.
  */
-function shouldOverwriteState( action, previousAction ) {
-	if (
-		previousAction &&
-		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
-		action.type === previousAction.type
-	) {
-		const attributes = keys( action.attributes );
-		const previousAttributes = keys( previousAction.attributes );
+export function hasSameKeys( a, b ) {
+	return isEqual( keys( a ), keys( b ) );
+}
 
-		return action.uid === previousAction.uid && isEqual( attributes, previousAttributes );
+/**
+ * Returns true if, given the currently dispatching action and the previously
+ * dispatched action, the two actions are updating the same block attribute, or
+ * false otherwise.
+ *
+ * @param {Object} action         Currently dispatching action.
+ * @param {Object} previousAction Previously dispatched action.
+ *
+ * @return {boolean} Whether actions are updating the same block attribute.
+ */
+export function isUpdatingSameBlockAttribute( action, previousAction ) {
+	return (
+		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+		action.uid === previousAction.uid &&
+		hasSameKeys( action.attributes, previousAction.attributes )
+	);
+}
+
+/**
+ * Returns true if, given the currently dispatching action and the previously
+ * dispatched action, the two actions are editing the same post property, or
+ * false otherwise.
+ *
+ * @param {Object} action         Currently dispatching action.
+ * @param {Object} previousAction Previously dispatched action.
+ *
+ * @return {boolean} Whether actions are updating the same post property.
+ */
+export function isUpdatingSamePostProperty( action, previousAction ) {
+	return (
+		action.type === 'EDIT_POST' &&
+		hasSameKeys( action.edits, previousAction.edits )
+	);
+}
+
+/**
+ * Returns true if, given the currently dispatching action and the previously
+ * dispatched action, the two actions are modifying the same property such that
+ * undo history should be batched.
+ *
+ * @param {Object} action         Currently dispatching action.
+ * @param {Object} previousAction Previously dispatched action.
+ *
+ * @return {boolean} Whether to overwrite present state.
+ */
+export function shouldOverwriteState( action, previousAction ) {
+	if ( ! previousAction || action.type !== previousAction.type ) {
+		return false;
 	}
 
-	return false;
+	return overSome( [
+		isUpdatingSameBlockAttribute,
+		isUpdatingSamePostProperty,
+	] )( action, previousAction );
 }
 
 /**

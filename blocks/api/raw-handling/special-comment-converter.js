@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { remove, replace } from '@wordpress/utils';
+
+/**
  * Browser dependencies
  */
 const { COMMENT_NODE } = window.Node;
@@ -42,7 +47,7 @@ export default function( node ) {
 			sibling.nodeValue === 'noteaser'
 		) {
 			noTeaser = true;
-			sibling.parentNode.removeChild( sibling );
+			remove( sibling );
 			break;
 		}
 	}
@@ -55,8 +60,7 @@ export default function( node ) {
 	while ( parent.nodeName !== 'BODY' ) {
 		parent = parent.parentNode;
 	}
-	parent.appendChild( more );
-	node.parentNode.removeChild( node );
+	replace( node, more );
 }
 
 function createMore( customText, noTeaser ) {

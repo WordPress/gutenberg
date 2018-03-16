@@ -53,6 +53,7 @@ const {
 	getNextBlockUid,
 	isBlockSelected,
 	isBlockWithinSelection,
+	hasMultiSelection,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	getBlockMode,
@@ -1804,6 +1805,41 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'hasMultiSelection', () => {
+		it( 'should return false if no selection', () => {
+			const state = {
+				blockSelection: {
+					start: null,
+					end: null,
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if singular selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if multi-selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'isBlockMultiSelected', () => {
 		const state = {
 			editor: {
@@ -2411,6 +2447,54 @@ describe( 'selectors', () => {
 				{ name: 'core/block', initialAttributes: { ref: 123 } },
 				{ name: 'core/image', initialAttributes: {} },
 				{ name: 'core/paragraph', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should weight by time', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/image': { time: Date.now() - 1000, count: 2, insert: { name: 'core/image' } },
+						'core/paragraph': { time: Date.now() - 4000, count: 3, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			expect( getFrecentInserterItems( state, true, 2 ) ).toMatchObject( [
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/paragraph', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should be backwards-compatible with old preferences values', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/image': { time: Date.now(), count: 1, insert: { name: 'core/image' } },
+						'core/paragraph': { time: undefined, count: 5, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			expect( getFrecentInserterItems( state, true, 2 ) ).toMatchObject( [
+				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/image', initialAttributes: {} },
 			] );
 		} );
 

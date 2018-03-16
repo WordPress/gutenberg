@@ -24,28 +24,39 @@
 	}
 }
 
+.edit-post-visual-editor .editor-writing-flow__click-redirect {
+	// Collapse to minimum height of 50px, to fully occupy editor bottom pad.
+	height: 50px;
+	width: $content-width;
+	// Offset for: Visual editor padding, block (default appender) margin.
+	margin: #{ -1 * $block-spacing } auto -50px;
+}
+
 .edit-post-visual-editor .editor-block-list__block {
 	margin-left: auto;
 	margin-right: auto;
-	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	max-width: $content-width;
+
+	@include break-small() {
+		.editor-block-list__block-edit {
+			margin-left: -$block-side-ui-padding;
+			margin-right: -$block-side-ui-padding;
+		}
+
+		&[data-align="full"] .editor-block-contextual-toolbar,
+		&[data-align="wide"] .editor-block-contextual-toolbar {
+			max-width: $content-width + 2;	// 1px border left and right
+			margin-left: auto;
+			margin-right: auto;
+		}
+	}
 
 	&[data-align="wide"] {
 		max-width: 1100px;
 	}
 
 	&[data-align="full"] {
-		max-width: 100%;
-	}
-
-	&[data-align="full"],
-	&[data-align="wide"] {
-		.editor-block-contextual-toolbar {
-			@include break-small() {
-				width: $visual-editor-max-width + 2;	// 1px border left and right
-			}
-			margin-left: auto;
-			margin-right: auto;
-		}
+		max-width: none;
 	}
 }
 
@@ -65,7 +76,7 @@
 .edit-post-visual-editor .editor-post-title {
 	margin-left: auto;
 	margin-right: auto;
-	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	max-width: $content-width + ( 2 * $block-side-ui-padding );
 
 	.editor-post-permalink {
 		left: $block-padding;
@@ -73,30 +84,29 @@
 	}
 
 	@include break-small() {
-		padding: 5px #{ $block-mover-padding-visible - 1px };	// subtract 1px border, because this is an outline
+		padding: 5px #{ $block-side-ui-padding - 1px };	// subtract 1px border, because this is an outline
 
 		.editor-post-permalink {
-			left: $block-mover-padding-visible;
-			right: $block-mover-padding-visible;
+			left: $block-side-ui-padding;
+			right: $block-side-ui-padding;
 		}
 	}
 }
 
 .edit-post-visual-editor .editor-default-block-appender {
-	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
-	clear: left;
+	// Default to centered and content-width, like blocks
+	max-width: $content-width;
 	margin-left: auto;
 	margin-right: auto;
 	position: relative;
 
+	&[data-root-uid=""] .editor-default-block-appender__content:hover {
+		// Outline on root-level default block appender is redundant with the
+		// WritingFlow click redirector.
+		outline: 1px solid transparent;
+	}
+
 	@include break-small() {
-		padding: 0 $block-mover-padding-visible;	// don't subtract 1px border because it's a border not an outline
-
-		.components-drop-zone {
-			left: $block-mover-padding-visible;
-			right: $block-mover-padding-visible;
-		}
-
 		.editor-default-block-appender__content {
 			padding: 0 $block-padding;
 		}
@@ -104,5 +114,6 @@
 }
 
 .edit-post-visual-editor .editor-block-list__layout > .editor-block-list__insertion-point {
-	max-width: $visual-editor-max-width + ( 2 * $block-mover-padding-visible );
+	max-width: $content-width;
+	position: relative;
 }

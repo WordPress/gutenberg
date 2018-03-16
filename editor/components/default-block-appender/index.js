@@ -2,14 +2,16 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { getDefaultBlockName } from '@wordpress/blocks';
 import { withContext } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -18,16 +20,28 @@ import './style.scss';
 import BlockDropZone from '../block-drop-zone';
 import { insertDefaultBlock, startTyping } from '../../store/actions';
 import { getBlock, getBlockCount } from '../../store/selectors';
+import InserterWithShortcuts from '../inserter-with-shortcuts';
+import Inserter from '../inserter';
 
-export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPrompt, placeholder } ) {
+export function DefaultBlockAppender( {
+	isLocked,
+	isVisible,
+	onAppend,
+	showPrompt,
+	placeholder,
+	layout,
+	rootUID,
+} ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
 
-	const value = placeholder || __( 'Write your story' );
+	const value = decodeEntities( placeholder ) || __( 'Write your story' );
 
 	return (
-		<div className="editor-default-block-appender">
+		<div
+			data-root-uid={ rootUID || '' }
+			className="editor-default-block-appender">
 			<BlockDropZone />
 			<input
 				className="editor-default-block-appender__content"
@@ -38,6 +52,8 @@ export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPromp
 				onKeyDown={ onAppend }
 				value={ showPrompt ? value : '' }
 			/>
+			<InserterWithShortcuts rootUID={ rootUID } layout={ layout } />
+			<Inserter position="top right" />
 		</div>
 	);
 }
@@ -46,10 +62,10 @@ export default compose(
 		( state, ownProps ) => {
 			const isEmpty = ! getBlockCount( state, ownProps.rootUID );
 			const lastBlock = getBlock( state, ownProps.lastBlockUID );
-			const isLastBlockEmptyDefault = lastBlock && isUnmodifiedDefaultBlock( lastBlock );
+			const isLastBlockDefault = get( lastBlock, 'name' ) === getDefaultBlockName();
 
 			return {
-				isVisible: isEmpty || ! isLastBlockEmptyDefault,
+				isVisible: isEmpty || ! isLastBlockDefault,
 				showPrompt: isEmpty,
 			};
 		},

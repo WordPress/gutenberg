@@ -101,7 +101,7 @@ export const settings = {
 		};
 	},
 
-	edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace } ) {
+	edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
@@ -163,6 +163,7 @@ export const settings = {
 				}
 				onRemove={ () => onReplace( [] ) }
 				style={ { textAlign: align } }
+				className={ className }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 				isSelected={ isSelected }
 			/>,

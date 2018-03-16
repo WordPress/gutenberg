@@ -302,6 +302,7 @@ describe( 'actions', () => {
 			expect( removeBlocks( uids ) ).toEqual( {
 				type: 'REMOVE_BLOCKS',
 				uids,
+				isProvisionalBlock: false,
 			} );
 		} );
 	} );
@@ -314,6 +315,14 @@ describe( 'actions', () => {
 				uids: [
 					uid,
 				],
+				isProvisionalBlock: false,
+			} );
+			expect( removeBlock( uid, true ) ).toEqual( {
+				type: 'REMOVE_BLOCKS',
+				uids: [
+					uid,
+				],
+				isProvisionalBlock: true,
 			} );
 		} );
 	} );

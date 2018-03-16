@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import isEqualShallow from 'is-equal-shallow';
-import { createStore } from 'redux';
+import isShallowEqual from 'shallowequal';
+import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues } from 'lodash';
 
 /**
@@ -90,6 +90,18 @@ export function registerReducer( reducerKey, reducer ) {
 }
 
 /**
+ * The combineReducers helper function turns an object whose values are different
+ * reducing functions into a single reducing function you can pass to registerReducer.
+ *
+ * @param {Object} reducers An object whose values correspond to different reducing
+ *                          functions that need to be combined into one.
+ *
+ * @return {Function}       A reducer that invokes every reducer inside the reducers
+ *                          object, and constructs a state object with the same shape.
+ */
+export { combineReducers };
+
+/**
  * Registers selectors for external usage.
  *
  * @param {string} reducerKey   Part of the state shape to register the
@@ -141,16 +153,6 @@ export const subscribe = ( listener ) => {
  * @return {*} The selector's returned value.
  */
 export function select( reducerKey ) {
-	if ( arguments.length > 1 ) {
-		deprecated( 'Calling select with multiple arguments', {
-			version: '2.4',
-			plugin: 'Gutenberg',
-		} );
-
-		const [ , selectorKey, ...args ] = arguments;
-		return select( reducerKey )[ selectorKey ]( ...args );
-	}
-
 	return selectors[ reducerKey ];
 }
 
@@ -194,7 +196,7 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 		}
 
 		componentWillReceiveProps( nextProps ) {
-			if ( ! isEqualShallow( nextProps, this.props ) ) {
+			if ( ! isShallowEqual( nextProps, this.props ) ) {
 				this.runSelection( nextProps );
 			}
 		}
@@ -221,7 +223,7 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 			const { mergeProps } = this.state;
 			const nextMergeProps = mapStateToProps( select, props ) || {};
 
-			if ( ! isEqualShallow( nextMergeProps, mergeProps ) ) {
+			if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
 				this.setState( {
 					mergeProps: nextMergeProps,
 				} );
