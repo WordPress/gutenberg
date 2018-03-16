@@ -209,6 +209,8 @@ function Button( { onClick, children } ) {
 	return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
+const { withDispatch } = wp.data;
+
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 	const { startSale } = dispatch( 'my-shop' );
 	const { discountPercent = 20 } = ownProps;
@@ -218,7 +220,7 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 			startSale( discountPercent );
 		},
 	};
-} );
+} )( Button );
 
 // Rendered in the application:
 //
