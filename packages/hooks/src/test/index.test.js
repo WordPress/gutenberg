@@ -572,6 +572,32 @@ test( 'adding and removing filters with recursion', () => {
 	expect( applyFilters( 'remove_and_add', '' ) ).toBe( '1-134-234' );
 } );
 
+test( 'actions preserve arguments across handlers without return value', () => {
+	const arg1 = { a: 10 };
+	const arg2 = { b: 20 };
+
+	addAction( 'test.action', 'my_callback1', ( a, b ) => {
+		expect( a ).toBe( arg1 );
+		expect( b ).toBe( arg2 );
+	} );
+
+	addAction( 'test.action', 'my_callback2', ( a, b ) => {
+		expect( a ).toBe( arg1 );
+		expect( b ).toBe( arg2 );
+	} );
+
+	doAction( 'test.action', arg1, arg2 );
+} );
+
+test( 'filters pass first argument across handlers', () => {
+	addFilter( 'test.filter', 'my_callback1', ( count ) => count + 1 );
+	addFilter( 'test.filter', 'my_callback2', ( count ) => count + 1 );
+
+	const result = applyFilters( 'test.filter', 0 );
+
+	expect( result ).toBe( 2 );
+} );
+
 // Test adding via composition.
 test( 'adding hooks via composition', () => {
 	const testObject = {};
