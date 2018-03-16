@@ -4,11 +4,6 @@
 import classnames from 'classnames';
 
 /**
- * WordPress dependencies
- */
-import { keycodes } from '@wordpress/utils';
-
-/**
  * Internal dependencies
  */
 import './style.scss';
@@ -16,8 +11,6 @@ import IconButton from '../icon-button';
 import Dashicon from '../dashicon';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
-
-const { DOWN } = keycodes;
 
 function DropdownMenu( {
 	icon = 'menu',
@@ -34,13 +27,6 @@ function DropdownMenu( {
 			className="components-dropdown-menu"
 			contentClassName="components-dropdown-menu__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => {
-				const openOnArrowDown = ( event ) => {
-					if ( ! isOpen && event.keyCode === DOWN ) {
-						event.preventDefault();
-						event.stopPropagation();
-						onToggle();
-					}
-				};
 				return (
 					<IconButton
 						className={
@@ -50,7 +36,6 @@ function DropdownMenu( {
 						}
 						icon={ icon }
 						onClick={ onToggle }
-						onKeyDown={ openOnArrowDown }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
