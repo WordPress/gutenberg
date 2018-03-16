@@ -96,8 +96,6 @@ function normalizeParsedBlocks( blocks ) {
 
 describe( 'full post content fixture', () => {
 	beforeAll( () => {
-		window._wpBlocks = require( './server-registered.json' );
-
 		// Load all hooks that modify blocks
 		require( 'blocks/hooks' );
 		registerCoreBlocks();

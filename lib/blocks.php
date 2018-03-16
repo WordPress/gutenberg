@@ -31,6 +31,43 @@ function register_block_type( $name, $args = array() ) {
 }
 
 /**
+ * Registers a block type(s) from the JSON settings file.
+ *
+ * @since 2.5.0
+ *
+ * @param string $file_name The file name with block settings.
+ * @return WP_Block_Type|false The registered block type on success, or false on failure.
+ */
+function register_block_type_from_settings( $file_name ) {
+	if ( ! file_exists( $file_name ) ) {
+		return false;
+	}
+
+	$file_content = file_get_contents( $file_name );
+	$settings = json_decode( $file_content, true );
+	// TODO: validate JSON file schema instead
+	if ( empty( $settings['name'] ) ) {
+		return false;
+	}
+	$name = $settings['name'];
+	unset( $settings['name'] );
+
+	// Find if there are different variations of the given block type, e.g. embed
+	$variations = array();
+	if ( ! empty( $settings['variations'] ) ) {
+		$variations = $settings['variations'];
+		unset( $settings['variations'] );
+	}
+
+	$result = register_block_type( $name, $settings );
+	foreach ( $variations as $variation_name ) {
+		register_block_type( $variation_name, $settings );
+	}
+
+	return $result;
+}
+
+/**
  * Unregisters a block type.
  *
  * @since 0.1.0

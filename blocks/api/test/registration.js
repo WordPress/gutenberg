@@ -108,7 +108,7 @@ describe( 'blocks', () => {
 
 		it( 'should reject blocks without a save function', () => {
 			const block = registerBlockType( 'my-plugin/fancy-block-5' );
-			expect( console ).toHaveErroredWith( 'The "save" property must be specified and must be a valid function.' );
+			expect( console ).toHaveErroredWith( 'Block settings must be objects.' );
 			expect( block ).toBeUndefined();
 		} );
 
@@ -161,7 +161,7 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
-		it( 'should default to browser-initialized global attributes', () => {
+		it( 'should not update server-initialized attributes', () => {
 			const attributes = { ok: { type: 'boolean' } };
 			window._wpBlocks = {
 				'core/test-block-with-attributes': { attributes },
@@ -176,17 +176,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes: {
-					ok: {
-						type: 'boolean',
-					},
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
+				attributes,
 			} );
 		} );
 

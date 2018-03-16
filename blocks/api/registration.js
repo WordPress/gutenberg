@@ -88,12 +88,6 @@ const POST_FORMAT_BLOCK_MAP = {
  *                     otherwise `undefined`.
  */
 export function registerBlockType( name, settings ) {
-	settings = {
-		name,
-		...get( window._wpBlocks, name ),
-		...settings,
-	};
-
 	if ( typeof name !== 'string' ) {
 		console.error(
 			'Block names must be strings.'
@@ -112,10 +106,21 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
+	if ( typeof settings !== 'object' ) {
+		console.error(
+			'Block settings must be objects.'
+		);
+		return;
+	}
 
-	settings = applyFilters( 'blocks.registerBlockType', settings, name );
+	settings = {
+		name,
+		...applyFilters( 'blocks.registerBlockType', settings, name ),
+		// the values set server-side can't be updated on the client
+		...get( window._wpBlocks, name, {} ),
+	};
 
-	if ( ! settings || ! isFunction( settings.save ) ) {
+	if ( ! isFunction( settings.save ) ) {
 		console.error(
 			'The "save" property must be specified and must be a valid function.'
 		);

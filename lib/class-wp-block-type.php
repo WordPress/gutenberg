@@ -23,12 +23,36 @@ class WP_Block_Type {
 	public $name;
 
 	/**
+	 * Block type category name.
+	 *
+	 * @since 2.5.0
+	 * @var string
+	 */
+	public $category;
+
+	/**
+	 * Block type icon name.
+	 *
+	 * @since 2.5.0
+	 * @var string
+	 */
+	public $icon;
+
+	/**
 	 * Block type render callback.
 	 *
 	 * @since 0.6.0
 	 * @var callable
 	 */
 	public $render_callback;
+
+	/**
+	 * Block type supports property schemas.
+	 *
+	 * @since 2.5.0
+	 * @var array
+	 */
+	public $supports;
 
 	/**
 	 * Block type attributes property schemas.

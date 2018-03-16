@@ -1,0 +1,15 @@
+{
+  "name": "core/block",
+  "category": "shared",
+  "isPrivate": true,
+  "supports": {
+	"customClassName": false,
+	"html": false
+  },
+  "attributes": {
+	"ref": {
+	  "type": "number"
+	}
+  },
+  "render_callback": "gutenberg_render_block_core_reusable_block"
+}
