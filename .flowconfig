@@ -36,6 +36,14 @@
 <PROJECT_ROOT>/node_modules/xdl/.*
 <PROJECT_ROOT>/node_modules/reqwest/.*
 <PROJECT_ROOT>/node_modules/metro-bundler/.*
+<PROJECT_ROOT>/node_modules/fbjs/.*
+<PROJECT_ROOT>/node_modules/graphql/.*
+<PROJECT_ROOT>/node_modules/prettier/.*
+
+; Gutenberg tools
+<PROJECT_ROOT>/gutenberg/node_modules/findup/.*
+<PROJECT_ROOT>/gutenberg/node_modules/cypress/.*
+<PROJECT_ROOT>/gutenberg/node_modules/config-chain/.*
 
 ; Hack to make Flow works on OS X with a RN project
 <PROJECT_ROOT>/node_modules/metro/.*
