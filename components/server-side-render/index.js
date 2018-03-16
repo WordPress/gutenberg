@@ -48,7 +48,7 @@ export class ServerSideRender extends Component {
 
 	render() {
 		const response = this.state.response;
-		if ( ! response.length ) {
+		if ( ! response || ! response.length ) {
 			return (
 				<div key="loading" className="wp-block-embed is-loading">
 
