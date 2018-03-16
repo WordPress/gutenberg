@@ -36,7 +36,7 @@ export class ServerSideRender extends Component {
 		const attributes = Object.assign( {}, this.props );
 
 		// Delete 'block' from attributes, only registered block attributes are allowed.
-		delete attributes[ 'block' ];
+		delete attributes.block;
 
 		let apiURL = this.getQueryUrlFromObject( {
 			attributes: attributes,
@@ -52,16 +52,16 @@ export class ServerSideRender extends Component {
 	}
 
 	getQueryUrlFromObject( obj, prefix ) {
-		let str = [],
-			param;
+		const str = [];
+		let param;
 		for ( param in obj ) {
 			if ( obj.hasOwnProperty( param ) ) {
-				let key = prefix ? prefix + '[' + param + ']' : param,
+				const key = prefix ? prefix + '[' + param + ']' : param,
 					value = obj[ param ];
 				str.push(
 					( value !== null && 'object' === typeof value ) ?
-					this.getQueryUrlFromObject( value, key ) :
-					encodeURIComponent( key ) + '=' + encodeURIComponent( value )
+						this.getQueryUrlFromObject( value, key ) :
+						encodeURIComponent( key ) + '=' + encodeURIComponent( value )
 				);
 			}
 		}
