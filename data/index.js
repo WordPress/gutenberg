@@ -147,14 +147,14 @@ export function registerResolvers( reducerKey, newResolvers ) {
 
 			let fulfillment = newResolvers[ key ]( state, ...args );
 
-			// Returning a promise from resolver dispatches upon resolution.
-			if ( fulfillment instanceof Promise ) {
-				fulfillment = [ fulfillment ];
-			} else if ( ! isAsyncIterable( fulfillment ) ) {
+			// Attempt to normalize fulfillment as async iterable.
+			fulfillment = toAsyncIterable( fulfillment );
+			if ( ! isAsyncIterable( fulfillment ) ) {
 				return;
 			}
 
 			for await ( const maybeAction of fulfillment ) {
+				// Dispatch if it quacks like an action.
 				if ( isActionLike( maybeAction ) ) {
 					store.dispatch( maybeAction );
 				}
@@ -379,6 +379,50 @@ export function isAsyncIterable( object ) {
 		!! object &&
 		typeof object[ Symbol.asyncIterator ] === 'function'
 	);
+}
+
+/**
+ * Returns true if the given object is iterable, or false otherwise.
+ *
+ * @param {*} object Object to test.
+ *
+ * @return {boolean} Whether object is iterable.
+ */
+export function isIterable( object ) {
+	return (
+		!! object &&
+		typeof object[ Symbol.iterator ] === 'function'
+	);
+}
+
+/**
+ * Normalizes the given object argument to an async iterable, asynchronously
+ * yielding on a singular or array of generator yields or promise resolution.
+ *
+ * @param {*} object Object to normalize.
+ *
+ * @return {AsyncGenerator} Async iterable actions.
+ */
+export function toAsyncIterable( object ) {
+	if ( isAsyncIterable( object ) ) {
+		return object;
+	}
+
+	return ( async function* () {
+		// Normalize as iterable...
+		if ( ! isIterable( object ) ) {
+			object = [ object ];
+		}
+
+		for ( let maybeAction of object ) {
+			// ...of Promises.
+			if ( ! ( maybeAction instanceof Promise ) ) {
+				maybeAction = Promise.resolve( maybeAction );
+			}
+
+			yield await maybeAction;
+		}
+	}() );
 }
 
 export const query = ( mapSelectToProps ) => {

@@ -24,6 +24,8 @@ import {
 	subscribe,
 	isActionLike,
 	isAsyncIterable,
+	isIterable,
+	toAsyncIterable,
 } from '../';
 
 jest.mock( '@wordpress/utils', () => ( {
@@ -119,6 +121,77 @@ describe( 'registerResolvers', () => {
 		expect( resolver ).toHaveBeenCalledTimes( 1 );
 		select( 'demo' ).getValue( 'arg3', 'arg4' );
 		expect( resolver ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should resolve action to dispatch', ( done ) => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+			return action.type === 'SET_OK' ? 'OK' : state;
+		} );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: () => ( { type: 'SET_OK' } ),
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			try {
+				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+				done();
+			} catch ( error ) {
+				done( error );
+			}
+		} );
+
+		select( 'demo' ).getValue();
+	} );
+
+	it( 'should resolve mixed type action array to dispatch', ( done ) => {
+		registerReducer( 'counter', ( state = 0, action ) => {
+			return action.type === 'INCREMENT' ? state + 1 : state;
+		} );
+		registerSelectors( 'counter', {
+			getCount: ( state ) => state,
+		} );
+		registerResolvers( 'counter', {
+			getCount: () => [
+				{ type: 'INCREMENT' },
+				Promise.resolve( { type: 'INCREMENT' } ),
+			],
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			if ( select( 'counter' ).getCount() === 2 ) {
+				done();
+			}
+		} );
+
+		select( 'counter' ).getCount();
+	} );
+
+	it( 'should resolve generator action to dispatch', ( done ) => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+			return action.type === 'SET_OK' ? 'OK' : state;
+		} );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			* getValue() {
+				yield { type: 'SET_OK' };
+			},
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			try {
+				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+				done();
+			} catch ( error ) {
+				done( error );
+			}
+		} );
+
+		select( 'demo' ).getValue();
 	} );
 
 	it( 'should resolve promise action to dispatch', ( done ) => {
@@ -631,5 +704,78 @@ describe( 'isAsyncIterable', () => {
 		expect( isAsyncIterable( result ) ).toBe( true );
 
 		await result;
+	} );
+} );
+
+describe( 'isIterable', () => {
+	it( 'returns false if not iterable', () => {
+		expect( isIterable( undefined ) ).toBe( false );
+		expect( isIterable( null ) ).toBe( false );
+		expect( isIterable( {} ) ).toBe( false );
+		expect( isIterable( Promise.resolve( {} ) ) ).toBe( false );
+	} );
+
+	it( 'returns true if iterable', () => {
+		function* getIterable() {
+			yield 'foo';
+		}
+
+		const result = getIterable();
+
+		expect( isIterable( result ) ).toBe( true );
+		expect( isIterable( [] ) ).toBe( true );
+	} );
+} );
+
+describe( 'toAsyncIterable', () => {
+	it( 'normalizes async iterable', async () => {
+		async function* getAsyncIterable() {
+			yield await Promise.resolve( { ok: true } );
+		}
+
+		const object = getAsyncIterable();
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
+	} );
+
+	it( 'normalizes promise', async () => {
+		const object = Promise.resolve( { ok: true } );
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
+	} );
+
+	it( 'normalizes object', async () => {
+		const object = { ok: true };
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
+	} );
+
+	it( 'normalizes array of promise', async () => {
+		const object = [ Promise.resolve( { ok: true } ) ];
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
+	} );
+
+	it( 'normalizes mixed array', async () => {
+		const object = [ { foo: 'bar' }, Promise.resolve( { ok: true } ) ];
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { foo: 'bar' } );
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
+	} );
+
+	it( 'normalizes generator', async () => {
+		function* getIterable() {
+			yield Promise.resolve( { ok: true } );
+		}
+
+		const object = getIterable();
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
 	} );
 } );
