@@ -51,3 +51,6 @@ xcuserdata
 DerivedData
 *.xcuserstatee
 
+# VSCode local config dir
+.vscode/
+
