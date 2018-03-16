@@ -723,6 +723,9 @@ export default class Dashicon extends wp.element.Component {
 			case 'slides':
 				path = 'M5 14V6h10v8H5zm-3-1V7h2v6H2zm4-6v6h8V7H6zm10 0h2v6h-2V7zm-3 2V8H7v1h6zm0 3v-2H7v2h6z';
 				break;
+			case 'slideshow':
+				path = 'M5,5 L15,5 L15,15 L5,15 L5,5 Z M2,6 L4,6 L4,14 L2,14 L2,6 Z M16,6 L18,6 L18,14 L16,14 L16,6 Z';
+				break;
 			case 'smartphone':
 				path = 'M6 2h8c.55 0 1 .45 1 1v14c0 .55-.45 1-1 1H6c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1zm7 12V4H7v10h6zM8 5h4l-4 5V5z';
 				break;

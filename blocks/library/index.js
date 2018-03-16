@@ -27,6 +27,7 @@ import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
 import * as separator from './separator';
+import * as slideshow from './slideshow';
 import * as shortcode from './shortcode';
 import * as subhead from './subhead';
 import * as table from './table';
@@ -83,6 +84,7 @@ export const registerCoreBlocks = () => {
 		pullquote,
 		reusableBlock,
 		separator,
+		slideshow,
 		subhead,
 		table,
 		textColumns,
