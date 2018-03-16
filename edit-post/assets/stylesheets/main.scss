@@ -85,6 +85,11 @@ body.gutenberg-editor-page {
 		font-size: $default-font-size;
 		color: $dark-gray-500;
 	}
+
+	svg.dashicon {
+		fill: currentColor;
+		outline: none;
+	}
 }
 
 .gutenberg__editor {
