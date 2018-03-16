@@ -23,6 +23,7 @@ import {
 	withDispatch,
 	subscribe,
 	isActionLike,
+	isAsyncIterable,
 } from '../';
 
 jest.mock( '@wordpress/utils', () => ( {
@@ -165,6 +166,29 @@ describe( 'registerResolvers', () => {
 		process.nextTick( () => {
 			done();
 		} );
+	} );
+
+	it( 'should resolve async iterator action to dispatch', ( done ) => {
+		registerReducer( 'counter', ( state = 0, action ) => {
+			return action.type === 'INCREMENT' ? state + 1 : state;
+		} );
+		registerSelectors( 'counter', {
+			getCount: ( state ) => state,
+		} );
+		registerResolvers( 'counter', {
+			getCount: async function* () {
+				yield { type: 'INCREMENT' };
+				yield await Promise.resolve( { type: 'INCREMENT' } );
+			},
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			if ( select( 'counter' ).getCount() === 2 ) {
+				done();
+			}
+		} );
+
+		select( 'counter' ).getCount();
 	} );
 
 	it( 'should not dispatch resolved promise action on subsequent selector calls', ( done ) => {
@@ -586,5 +610,26 @@ describe( 'isActionLike', () => {
 
 	it( 'returns true if action-like', () => {
 		expect( isActionLike( { type: 'POW' } ) ).toBe( true );
+	} );
+} );
+
+describe( 'isAsyncIterable', () => {
+	it( 'returns false if not async iterable', () => {
+		expect( isAsyncIterable( undefined ) ).toBe( false );
+		expect( isAsyncIterable( null ) ).toBe( false );
+		expect( isAsyncIterable( [] ) ).toBe( false );
+		expect( isAsyncIterable( {} ) ).toBe( false );
+	} );
+
+	it( 'returns true if async iterable', async () => {
+		async function* getAsyncIterable() {
+			yield new Promise( ( resolve ) => process.nextTick( resolve ) );
+		}
+
+		const result = getAsyncIterable();
+
+		expect( isAsyncIterable( result ) ).toBe( true );
+
+		await result;
 	} );
 } );

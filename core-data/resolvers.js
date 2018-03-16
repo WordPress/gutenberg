@@ -1,15 +1,14 @@
 /**
  * Internal dependencies
  */
-import { receiveCategories } from './actions';
+import { setRequested, receiveCategories } from './actions';
 
 /**
- * Requests categories from the REST API, returning a promise resolving to an
- * action object for receiving categories.
- *
- * @return {Promise<Object>} Categories request promise.
+ * Requests categories from the REST API, yielding action objects on request
+ * progress.
  */
-export async function getCategories() {
+export async function* getCategories() {
+	yield setRequested( 'categories' );
 	const categories = await wp.apiRequest( { path: '/wp/v2/categories' } );
-	return receiveCategories( categories );
+	yield receiveCategories( categories );
 }

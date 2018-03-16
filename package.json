@@ -64,6 +64,7 @@
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
 		"babel-loader": "7.1.2",
+		"babel-plugin-transform-async-generator-functions": "6.24.1",
 		"babel-traverse": "6.26.0",
 		"check-node-version": "3.1.1",
 		"codecov": "3.0.0",
@@ -98,6 +99,9 @@
 		"presets": [
 			"@wordpress/default"
 		],
+		"plugins": [
+			"transform-async-generator-functions"
+		],
 		"env": {
 			"production": {
 				"plugins": [
@@ -106,7 +110,8 @@
 						{
 							"output": "languages/gutenberg.pot"
 						}
-					]
+					],
+					"transform-async-generator-functions"
 				]
 			}
 		}
@@ -121,7 +126,8 @@
 		"preset": "@wordpress/jest-preset-default",
 		"setupFiles": [
 			"<rootDir>/test/unit/setup-blocks.js",
-			"<rootDir>/test/unit/setup-wp-aliases.js"
+			"<rootDir>/test/unit/setup-wp-aliases.js",
+			"<rootDir>/test/unit/shim-async-iterator-symbol.js"
 		],
 		"transform": {
 			"\\.pegjs$": "<rootDir>/test/unit/pegjs-transform.js"

@@ -143,9 +143,8 @@ class CategoriesBlock extends Component {
 	}
 
 	render() {
-		const { attributes, focus, setAttributes } = this.props;
+		const { attributes, focus, setAttributes, isRequesting } = this.props;
 		const { align, displayAsDropdown, showHierarchy, showPostCounts } = attributes;
-		const categories = this.getCategories();
 
 		const inspectorControls = focus && (
 			<InspectorControls key="inspector">
@@ -168,7 +167,7 @@ class CategoriesBlock extends Component {
 			</InspectorControls>
 		);
 
-		if ( ! categories.length ) {
+		if ( isRequesting ) {
 			return [
 				inspectorControls,
 				<Placeholder
@@ -206,7 +205,10 @@ class CategoriesBlock extends Component {
 }
 
 export default withSelect( ( select ) => {
+	const { getCategories, isRequestingCategories } = select( 'core' );
+
 	return {
-		categories: select( 'core' ).getCategories(),
+		categories: getCategories(),
+		isRequesting: isRequestingCategories(),
 	};
 } )( CategoriesBlock );

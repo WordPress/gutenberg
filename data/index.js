@@ -25,6 +25,13 @@ const selectors = {};
 const actions = {};
 let listeners = [];
 
+// Babel transform doesn't provide its own `asyncIterator` symbol, but it does
+// test for its presence at runtime, so define a shim value if not otherwise
+// defined by the browser.
+if ( typeof Symbol.asyncIterator !== 'symbol' ) {
+	Symbol.asyncIterator = Symbol( 'Symbol.asyncIterator' );
+}
+
 /**
  * Global listener called for each store's update.
  */
@@ -138,22 +145,26 @@ export function registerResolvers( reducerKey, newResolvers ) {
 		}
 
 		// Ensure single invocation per argument set via memoization.
-		const fulfill = memoize( ( ...args ) => {
+		const fulfill = memoize( async ( ...args ) => {
 			const store = stores[ reducerKey ];
 
 			// At this point, selectors have already been pre-bound to inject
 			// state, it would not be otherwise provided to fulfill.
 			const state = store.getState();
 
-			const fulfillment = newResolvers[ key ]( state, ...args );
+			let fulfillment = newResolvers[ key ]( state, ...args );
 
 			// Returning a promise from resolver dispatches upon resolution.
 			if ( fulfillment instanceof Promise ) {
-				fulfillment.then( ( action ) => {
-					if ( isActionLike( action ) ) {
-						store.dispatch( action );
-					}
-				} );
+				fulfillment = [ fulfillment ];
+			} else if ( ! isAsyncIterable( fulfillment ) ) {
+				return;
+			}
+
+			for await ( const maybeAction of fulfillment ) {
+				if ( isActionLike( maybeAction ) ) {
+					store.dispatch( maybeAction );
+				}
 			}
 		} );
 
@@ -360,6 +371,20 @@ export function isActionLike( action ) {
 	return (
 		!! action &&
 		typeof action.type === 'string'
+	);
+}
+
+/**
+ * Returns true if the given object is an async iterable, or false otherwise.
+ *
+ * @param {*} object Object to test.
+ *
+ * @return {boolean} Whether object is an async iterable.
+ */
+export function isAsyncIterable( object ) {
+	return (
+		!! object &&
+		typeof object[ Symbol.asyncIterator ] === 'function'
 	);
 }
 
