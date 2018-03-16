@@ -125,9 +125,9 @@ CAP;
 		$this->assertEquals( 1, preg_match_all( "/{$this->caption}/", $result, $_r ) );
 
 		if ( current_theme_supports( 'html5', 'caption' ) ) {
-			$this->assertEquals( 1, preg_match_all( "/max-width: 20/", $result, $_r ) );
+			$this->assertEquals( 1, preg_match_all( '/width: 20/', $result, $_r ) );
 		} else {
-			$this->assertEquals( 1, preg_match_all( "/max-width: 30/", $result, $_r ) );
+			$this->assertEquals( 1, preg_match_all( '/width: 30/', $result, $_r ) );
 		}
 	}
 
