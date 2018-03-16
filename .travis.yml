@@ -1,3 +1,6 @@
+before_script:
+  - yarn install
+
 matrix:
   include:
     - language: node_js
@@ -6,5 +9,4 @@ matrix:
       cache:
         yarn: true
       script:
-        - yarn install
-        - npm run flow
+        - ./.travis/travis-checks-js.sh
