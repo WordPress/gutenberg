@@ -6,6 +6,10 @@
 		box-sizing: content-box;
 	}
 
+	input, textarea {
+		box-sizing: border-box;
+	}
+
 	/* Match width and positioning of the meta boxes. Override default styles. */
 	#poststuff {
 		margin: 0 auto;
