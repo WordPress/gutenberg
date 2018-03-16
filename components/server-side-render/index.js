@@ -21,19 +21,19 @@ export class ServerSideRender extends Component {
 	}
 
 	componentDidMount() {
-		this.fetch();
+		this.fetch( this.props );
 	}
 
 	componentWillReceiveProps( nextProps ) {
 		if ( ! isEqual( nextProps, this.props ) ) {
-			this.fetch();
+			this.fetch( nextProps );
 		}
 	}
 
-	fetch() {
+	fetch( props ) {
 		this.setState( { response: null } );
-		const { block } = this.props;
-		const attributes = Object.assign( {}, this.props );
+		const { block } = props;
+		const attributes = Object.assign( {}, props );
 
 		// Delete 'block' from attributes, only registered block attributes are allowed.
 		delete attributes.block;
