@@ -122,7 +122,14 @@ class Dropdown extends Component {
 			this.toggle( true, true );
 		}
 
+		// Consider this key handled, since otherwise the behavior of other
+		// handlers may conflict with intended focus.
 		event.stopPropagation();
+
+		// Prevent scroll on arrow press.
+		if ( event.keyCode === DOWN ) {
+			event.preventDefault();
+		}
 	}
 
 	render() {
