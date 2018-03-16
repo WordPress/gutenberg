@@ -1,4 +1,4 @@
-.blocks-range-control {
+.components-range-control {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
@@ -9,11 +9,11 @@
 		margin-right: 10px;
 	}
 
-	.blocks-base-control__label {
+	.components-base-control__label {
 		width: 100%;
 	}
 
-	.blocks-range-control__slider {
+	.components-range-control__slider {
 		margin-left: 0;
 		flex: 1;
 	}
@@ -38,7 +38,7 @@
 	border-radius: 1.5px;
 }
 
-.blocks-range-control__slider {
+.components-range-control__slider {
 	width: 100%;
 	margin-left: $item-spacing;
 	padding: 0;
@@ -114,7 +114,7 @@
 	}
 }
 
-.blocks-range-control__number {
+.components-range-control__number {
 	display: inline-block;
 	margin-left: $item-spacing;
 	font-weight: 500;

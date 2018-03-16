@@ -21,7 +21,7 @@ function SelectControl( { label, help, instanceId, onChange, options = [], ...pr
 		<BaseControl label={ label } id={ id } help={ help }>
 			<select
 				id={ id }
-				className="blocks-select-control__input"
+				className="components-select-control__input"
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
 				{ ...props }
