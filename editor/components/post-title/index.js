@@ -99,12 +99,15 @@ class PostTitle extends Component {
 						'mod+shift+z': this.redirectHistory,
 					} }
 				>
+					<label htmlFor="post-title" className="screen-reader-text">
+						{ placeholder || __( 'Add title' ) }
+					</label>
 					<Textarea
+						id="post-title"
 						className="editor-post-title__input"
 						value={ title }
 						onChange={ this.onChange }
 						placeholder={ decodeEntities( placeholder ) || __( 'Add title' ) }
-						aria-label={ decodeEntities( placeholder ) || __( 'Add title' ) }
 						onFocus={ this.onSelect }
 						onKeyDown={ this.onKeyDown }
 						onKeyPress={ this.onUnselect }
