@@ -91,6 +91,8 @@ rm -f gutenberg.zip
 php bin/generate-gutenberg-php.php > gutenberg.tmp.php
 mv gutenberg.tmp.php gutenberg.php
 
+build_files=$(ls **/build/*.{js,css})
+
 # Generate the plugin zip file
 status "Creating archive..."
 zip -r gutenberg.zip \
@@ -99,8 +101,7 @@ zip -r gutenberg.zip \
 	blocks/library/*/*.php \
 	post-content.js \
 	$vendor_scripts \
-	{blocks,components,date,editor,element,hooks,i18n,data,utils,edit-post,viewport,plugins,core-data}/build/*.{js,map} \
-	{blocks,components,editor,edit-post}/build/*.css \
+	$build_files \
 	languages/gutenberg.pot \
 	languages/gutenberg-translations.php \
 	README.md
