@@ -6,10 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './editor.scss';
-import './style.scss';
 import ArchivesBlock from './block';
-
 export const name = 'core/archives';
 
 export const settings = {
