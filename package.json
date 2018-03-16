@@ -69,6 +69,7 @@
 		"check-node-version": "3.1.1",
 		"codecov": "3.0.0",
 		"concurrently": "3.5.0",
+		"core-js": "2.5.3",
 		"cross-env": "3.2.4",
 		"cypress": "1.4.1",
 		"deep-freeze": "0.0.1",
@@ -125,9 +126,9 @@
 		},
 		"preset": "@wordpress/jest-preset-default",
 		"setupFiles": [
+			"core-js/fn/symbol/async-iterator",
 			"<rootDir>/test/unit/setup-blocks.js",
-			"<rootDir>/test/unit/setup-wp-aliases.js",
-			"<rootDir>/test/unit/shim-async-iterator-symbol.js"
+			"<rootDir>/test/unit/setup-wp-aliases.js"
 		],
 		"transform": {
 			"\\.pegjs$": "<rootDir>/test/unit/pegjs-transform.js"

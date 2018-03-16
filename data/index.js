@@ -25,13 +25,6 @@ const selectors = {};
 const actions = {};
 let listeners = [];
 
-// Babel transform doesn't provide its own `asyncIterator` symbol, but it does
-// test for its presence at runtime, so define a shim value if not otherwise
-// defined by the browser.
-if ( typeof Symbol.asyncIterator !== 'symbol' ) {
-	Symbol.asyncIterator = Symbol( 'Symbol.asyncIterator' );
-}
-
 /**
  * Global listener called for each store's update.
  */
