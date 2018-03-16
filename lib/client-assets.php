@@ -257,7 +257,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-edit-post',
 		gutenberg_url( 'edit-post/build/index.js' ),
-		array( 'jquery', 'heartbeat', 'wp-element', 'wp-components', 'wp-editor', 'wp-i18n', 'wp-date', 'wp-utils', 'wp-data', 'wp-embed', 'wp-viewport' ),
+		array( 'jquery', 'wp-element', 'wp-components', 'wp-editor', 'wp-i18n', 'wp-date', 'wp-utils', 'wp-data', 'wp-embed', 'wp-viewport' ),
 		filemtime( gutenberg_dir_path() . 'edit-post/build/index.js' ),
 		true
 	);
@@ -782,6 +782,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$is_demo = isset( $_GET['gutenberg-demo'] );
 
 	gutenberg_extend_wp_api_backbone_client();
+
+	// Enqueue heartbeat separately as an "optional" dependency of the editor.
+	// Heartbeat is used for automatic nonce refreshing, but some hosts choose
+	// to disable it outright.
+	wp_enqueue_script( 'heartbeat' );
 
 	wp_enqueue_script( 'wp-edit-post' );
 
