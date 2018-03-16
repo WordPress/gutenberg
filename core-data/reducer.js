@@ -4,37 +4,33 @@
 import { combineReducers } from 'redux';
 
 /**
- * Reducer returning the categories list.
+ * Reducer managing terms state. Keyed by taxonomy slug, the value is either
+ * undefined (if no request has been made for given taxonomy), null (if a
+ * request is in-flight for given taxonomy), or the array of terms for the
+ * taxonomy.
  *
- * @param {Object}  state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {string} Updated state.
  */
-function categories( state = null, action ) {
+export function terms( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_CATEGORIES':
-			return [ ...action.categories ];
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning requested state, tracking whether requests have been
- * issued for a given data type.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Action object.
- *
- * @return {Object} Next state.
- */
-function requested( state = {}, action ) {
-	switch ( action.type ) {
-		case 'SET_REQUESTED':
+		case 'RECEIVE_TERMS':
 			return {
 				...state,
-				[ action.dataType ]: true,
+				[ action.taxonomy ]: action.terms,
+			};
+
+		case 'SET_REQUESTED':
+			const { dataType, subType: taxonomy } = action;
+			if ( dataType !== 'terms' || state.hasOwnProperty( taxonomy ) ) {
+				return state;
+			}
+
+			return {
+				...state,
+				[ taxonomy ]: null,
 			};
 	}
 
@@ -42,6 +38,5 @@ function requested( state = {}, action ) {
 }
 
 export default combineReducers( {
-	categories,
-	requested,
+	terms,
 } );

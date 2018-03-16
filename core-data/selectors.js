@@ -1,4 +1,16 @@
 /**
+ * Returns all the available terms for the given taxonomy.
+ *
+ * @param {Object} state    Data state.
+ * @param {string} taxonomy Taxonomy name.
+ *
+ * @return {Array} Categories list.
+ */
+export function getTerms( state, taxonomy ) {
+	return state.terms[ taxonomy ];
+}
+
+/**
  * Returns all the available categories.
  *
  * @param {Object} state Data state.
@@ -6,33 +18,30 @@
  * @return {Array} Categories list.
  */
 export function getCategories( state ) {
-	return state.categories;
+	return getTerms( state, 'categories' );
 }
 
 /**
- * Returns true if a request has been issued for the given data type, or false
- * otherwise.
+ * Returns true if a request is in progress for terms data of a given taxonomy,
+ * or false otherwise.
  *
  * @param {Object} state    Data state.
- * @param {string} dataType Data type to test.
+ * @param {string} taxonomy Taxonomy name.
  *
- * @return {boolean} Whether data type has been requested.
+ * @return {boolean} Whether a request is in progress for taxonomy's terms.
  */
-export function hasRequested( state, dataType ) {
-	return !! state.requested[ dataType ];
+export function isRequestingTerms( state, taxonomy ) {
+	return state.terms[ taxonomy ] === null;
 }
 
 /**
  * Returns true if a request is in progress for categories data, or false
  * otherwise.
  *
- * @param {Object} state    Data state.
+ * @param {Object} state Data state.
  *
  * @return {boolean} Whether a request is in progress for categories.
  */
 export function isRequestingCategories( state ) {
-	return (
-		hasRequested( state, 'categories' ) &&
-		getCategories( state ) === null
-	);
+	return isRequestingTerms( state, 'categories' );
 }
