@@ -24,18 +24,19 @@ function InvalidBlockWarning( { convertToHTML, convertToBlocks } ) {
 	const hasHTMLBlock = !! getBlockType( 'core/html' );
 
 	return (
-		<Warning>
-			<p>{ __( 'This block appears to have been modified externally.' ) }</p>
-			<p>
-				<Button onClick={ convertToBlocks } isLarge isPrimary={ ! hasHTMLBlock }>
+		<Warning
+			actions={ [
+				<Button key="convert" onClick={ convertToBlocks } isLarge isPrimary={ ! hasHTMLBlock }>
 					{ __( 'Convert to Blocks' ) }
-				</Button>
-				{ hasHTMLBlock && (
-					<Button onClick={ convertToHTML } isLarge isPrimary>
+				</Button>,
+				hasHTMLBlock && (
+					<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
 						{ __( 'Edit as HTML' ) }
 					</Button>
-				) }
-			</p>
+				),
+			] }
+		>
+			{ __( 'This block appears to have been modified externally.' ) }
 		</Warning>
 	);
 }

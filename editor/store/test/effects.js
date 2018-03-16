@@ -84,7 +84,7 @@ describe( 'effects', () => {
 			selectors.isBlockSelected.mockImplementation( ( state, uid ) => uid === 'ribs' );
 			const action = removeProvisionalBlock( {}, store );
 
-			expect( action ).toEqual( removeBlock( 'chicken' ) );
+			expect( action ).toEqual( removeBlock( 'chicken', true ) );
 		} );
 	} );
 

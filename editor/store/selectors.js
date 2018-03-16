@@ -871,7 +871,23 @@ export function isBlockWithinSelection( state, uid ) {
 }
 
 /**
- * Whether in the process of multi-selecting or not.
+ * Returns true if a multi-selection has been made, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether multi-selection has been made.
+ */
+export function hasMultiSelection( state ) {
+	const { start, end } = state.blockSelection;
+	return start !== end;
+}
+
+/**
+ * Whether in the process of multi-selecting or not. This flag is only true
+ * while the multi-selection is being selected (by mouse move), and is false
+ * once the multi-selection has been settled.
+ *
+ * @see hasMultiSelection
  *
  * @param {Object} state Global application state.
  *
@@ -1226,6 +1242,10 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
  */
 export function getFrecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
 	const calculateFrecency = ( time, count ) => {
+		if ( ! time ) {
+			return count;
+		}
+
 		const duration = Date.now() - time;
 		switch ( true ) {
 			case duration < 3600:

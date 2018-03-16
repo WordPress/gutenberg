@@ -9,6 +9,7 @@ import { includes } from 'lodash';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { isTextField, keycodes } from '@wordpress/utils';
+import { withSafeTimeout } from '@wordpress/components';
 
 const { UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE } = keycodes;
 
@@ -40,6 +41,7 @@ class ObserveTyping extends Component {
 		this.stopTypingOnSelectionUncollapse = this.stopTypingOnSelectionUncollapse.bind( this );
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.startTypingInTextField = this.startTypingInTextField.bind( this );
+		this.stopTypingOnNonTextField = this.stopTypingOnNonTextField.bind( this );
 
 		this.lastMouseMove = null;
 	}
@@ -132,6 +134,26 @@ class ObserveTyping extends Component {
 		onStartTyping();
 	}
 
+	/**
+	 * Stops typing when focus transitions to a non-text field element.
+	 *
+	 * @param {FocusEvent} event Focus event.
+	 */
+	stopTypingOnNonTextField( event ) {
+		event.persist();
+
+		// Since focus to a non-text field via arrow key will trigger before
+		// the keydown event, wait until after current stack before evaluating
+		// whether typing is to be stopped. Otherwise, typing will re-start.
+		this.props.setTimeout( () => {
+			const { isTyping, onStopTyping } = this.props;
+			const { target } = event;
+			if ( isTyping && ! isTextField( target ) ) {
+				onStopTyping();
+			}
+		} );
+	}
+
 	render() {
 		const { children } = this.props;
 
@@ -141,6 +163,7 @@ class ObserveTyping extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div
+				onFocus={ this.stopTypingOnNonTextField }
 				onKeyPress={ this.startTypingInTextField }
 				onKeyDown={ this.startTypingInTextField }
 			>
@@ -153,14 +176,19 @@ class ObserveTyping extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
+		const { isTyping } = select( 'core/editor' );
+
 		return {
-			isTyping: select( 'core/editor' ).isTyping(),
+			isTyping: isTyping(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
+		const { startTyping, stopTyping } = dispatch( 'core/editor' );
+
 		return {
-			onStartTyping: dispatch( 'core/editor' ).startTyping,
-			onStopTyping: dispatch( 'core/editor' ).stopTyping,
+			onStartTyping: startTyping,
+			onStopTyping: stopTyping,
 		};
 	} ),
+	withSafeTimeout,
 ] )( ObserveTyping );

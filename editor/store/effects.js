@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray, uniqueId } from 'lodash';
+import { get, includes, last, map, castArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -49,9 +49,12 @@ import {
 	isEditedPostSaveable,
 	getBlock,
 	getBlockCount,
+	getBlockRootUID,
 	getBlocks,
 	getReusableBlock,
+	getPreviousBlockUid,
 	getProvisionalBlockUID,
+	getSelectedBlock,
 	isBlockSelected,
 	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
@@ -76,7 +79,7 @@ export function removeProvisionalBlock( action, store ) {
 	const state = store.getState();
 	const provisionalBlockUID = getProvisionalBlockUID( state );
 	if ( provisionalBlockUID && ! isBlockSelected( state, provisionalBlockUID ) ) {
-		return removeBlock( provisionalBlockUID );
+		return removeBlock( provisionalBlockUID, true );
 	}
 }
 
@@ -99,26 +102,29 @@ export default {
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).done( ( newPost ) => {
-			dispatch( resetPost( newPost ) );
-			dispatch( {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				previousPost: post,
-				post: newPost,
-				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
-		} ).fail( ( err ) => {
-			dispatch( {
-				type: 'REQUEST_POST_UPDATE_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
-				post,
-				edits,
-				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
-		} );
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
+			( newPost ) => {
+				dispatch( resetPost( newPost ) );
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_SUCCESS',
+					previousPost: post,
+					post: newPost,
+					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+				} );
+			},
+			( err ) => {
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_FAILURE',
+					error: get( err, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+					post,
+					edits,
+					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+				} );
+			}
+		);
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
@@ -499,4 +505,31 @@ export default {
 	SELECT_BLOCK: removeProvisionalBlock,
 
 	MULTI_SELECT: removeProvisionalBlock,
+
+	REMOVE_BLOCKS( action, { getState, dispatch } ) {
+		// if we are removing the provisional block don't do anything.
+		if ( action.isProvisionalBlock ) {
+			return;
+		}
+
+		const firstRemovedBlockUID = action.uids[ 0 ];
+		const state = getState();
+		const currentSelectedBlock = getSelectedBlock( state );
+
+		// recreate the state before the block was removed.
+		const previousState = { ...state, editor: { present: last( state.editor.past ) } };
+
+		// rootUID of the removed block.
+		const rootUID = getBlockRootUID( previousState, firstRemovedBlockUID );
+
+		// UID of the block that was before the removed block
+		// or the rootUID if the removed block was the first amongst his siblings.
+		const blockUIDToSelect = getPreviousBlockUid( previousState, firstRemovedBlockUID ) || rootUID;
+
+		// Dispatch select block action if the currently selected block
+		// is not already the block we want to be selected.
+		if ( blockUIDToSelect !== currentSelectedBlock ) {
+			dispatch( selectBlock( blockUIDToSelect ) );
+		}
+	},
 };

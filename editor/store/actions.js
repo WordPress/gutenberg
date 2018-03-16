@@ -329,14 +329,16 @@ export function createUndoLevel() {
  * Returns an action object used in signalling that the blocks
  * corresponding to the specified UID set are to be removed.
  *
- * @param {string[]} uids Block UIDs.
+ * @param {string[]} uids               Block UIDs.
+ * @param {boolean}  isProvisionalBlock True if the action is being used to remove a provisional block.
  *
  * @return {Object} Action object.
  */
-export function removeBlocks( uids ) {
+export function removeBlocks( uids, isProvisionalBlock = false ) {
 	return {
 		type: 'REMOVE_BLOCKS',
 		uids,
+		isProvisionalBlock,
 	};
 }
 
@@ -344,12 +346,13 @@ export function removeBlocks( uids ) {
  * Returns an action object used in signalling that the block with the
  * specified UID is to be removed.
  *
- * @param {string} uid Block UID.
+ * @param {string}  uid                Block UID.
+ * @param {boolean} isProvisionalBlock True if the action is being used to remove a provisional block.
  *
  * @return {Object} Action object.
  */
-export function removeBlock( uid ) {
-	return removeBlocks( [ uid ] );
+export function removeBlock( uid, isProvisionalBlock = false ) {
+	return removeBlocks( [ uid ], isProvisionalBlock );
 }
 
 /**
