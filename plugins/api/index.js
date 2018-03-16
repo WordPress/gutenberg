@@ -58,7 +58,6 @@ export function registerPlugin( name, settings ) {
 	}
 
 	settings.name = name;
-	settings.sidebar = {};
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
 
