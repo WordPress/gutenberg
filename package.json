@@ -17,7 +17,8 @@
     "ios": "react-native-scripts ios",
     "test": "node node_modules/jest/bin/jest.js",
     "flow": "flow",
-    "prettier": "prettier --write *js"
+    "prettier": "prettier --write *js",
+    "prettier-check": "prettier -l *js"
   },
   "jest": {
     "preset": "jest-expo"
