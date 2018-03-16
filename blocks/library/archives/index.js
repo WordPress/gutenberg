@@ -34,7 +34,6 @@ export const settings = {
 	edit: ArchivesBlock,
 
 	save() {
-
 		// Handled by PHP.
 		return null;
 	},
