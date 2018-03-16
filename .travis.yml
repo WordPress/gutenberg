@@ -1,0 +1,10 @@
+matrix:
+  include:
+    - language: node_js
+      node_js: 8
+      env: LANE='node'
+      cache:
+        yarn: true
+      script:
+        - yarn install
+        - npm run flow
