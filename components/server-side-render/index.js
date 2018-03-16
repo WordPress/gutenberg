@@ -11,7 +11,6 @@ import {
 	RawHTML,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
 
 export class ServerSideRender extends Component {
 	constructor( props ) {
@@ -34,16 +33,39 @@ export class ServerSideRender extends Component {
 	fetch() {
 		this.setState( { response: null } );
 		const { block } = this.props;
-		const apiURL = addQueryArgs( '/gutenberg/v1/block-renderer/' + block, {
-			...this.props,
-			_wpnonce: wpApiSettings.nonce,
+		const attributes = Object.assign( {}, this.props );
+
+		// Delete 'block' from attributes, only registered block attributes are allowed.
+		delete attributes[ 'block' ];
+
+		let apiURL = this.getQueryUrlFromObject( {
+			attributes: attributes,
 		} );
+
+		apiURL = '/gutenberg/v1/block-renderer/' + block + '?' + apiURL;
 
 		return wp.apiRequest( { path: apiURL } ).then( response => {
 			if ( response && response.rendered ) {
 				this.setState( { response: response.rendered } );
 			}
 		} );
+	}
+
+	getQueryUrlFromObject( obj, prefix ) {
+		let str = [],
+			param;
+		for ( param in obj ) {
+			if ( obj.hasOwnProperty( param ) ) {
+				let key = prefix ? prefix + '[' + param + ']' : param,
+					value = obj[ param ];
+				str.push(
+					( value !== null && 'object' === typeof value ) ?
+					this.getQueryUrlFromObject( value, key ) :
+					encodeURIComponent( key ) + '=' + encodeURIComponent( value )
+				);
+			}
+		}
+		return str.join( '&' );
 	}
 
 	render() {
