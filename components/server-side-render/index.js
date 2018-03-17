@@ -34,13 +34,9 @@ export class ServerSideRender extends Component {
 		this.setState( { response: null } );
 		const { block, attributes } = props;
 
-		let apiURL = this.getQueryUrlFromObject( {
-			attributes: attributes,
-		} );
+		const path = '/gutenberg/v1/block-renderer/' + block + '?' + this.getQueryUrlFromObject( { attributes } );
 
-		apiURL = '/gutenberg/v1/block-renderer/' + block + '?' + apiURL;
-
-		return wp.apiRequest( { path: apiURL } ).then( response => {
+		return wp.apiRequest( { path: path } ).then( response => {
 			if ( response && response.rendered ) {
 				this.setState( { response: response.rendered } );
 			}
@@ -52,7 +48,7 @@ export class ServerSideRender extends Component {
 			const key = prefix ? prefix + '[' + paramName + ']' : paramName,
 				value = obj[ paramName ];
 			return isObject( paramValue ) ? this.getQueryUrlFromObject( value, key ) :
-				encodeURIComponent( key ) + '=' + encodeURIComponent( value )
+				encodeURIComponent( key ) + '=' + encodeURIComponent( value );
 		} ).join( '&' );
 	}
 
