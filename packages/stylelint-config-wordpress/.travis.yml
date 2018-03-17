@@ -16,7 +16,7 @@ cache:
 
 node_js:
   - '8'
-  - '6'
+  - '9'
 
 before_install:
   - npm install -g npm@latest
