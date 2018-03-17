@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { isEqual } from 'lodash';
+import { isEqual, isObject, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -32,11 +32,7 @@ export class ServerSideRender extends Component {
 
 	fetch( props ) {
 		this.setState( { response: null } );
-		const { block } = props;
-		const attributes = Object.assign( {}, props );
-
-		// Delete 'block' from attributes, only registered block attributes are allowed.
-		delete attributes.block;
+		const { block, attributes } = props;
 
 		let apiURL = this.getQueryUrlFromObject( {
 			attributes: attributes,
@@ -52,20 +48,12 @@ export class ServerSideRender extends Component {
 	}
 
 	getQueryUrlFromObject( obj, prefix ) {
-		const str = [];
-		let param;
-		for ( param in obj ) {
-			if ( obj.hasOwnProperty( param ) ) {
-				const key = prefix ? prefix + '[' + param + ']' : param,
-					value = obj[ param ];
-				str.push(
-					( value !== null && 'object' === typeof value ) ?
-						this.getQueryUrlFromObject( value, key ) :
-						encodeURIComponent( key ) + '=' + encodeURIComponent( value )
-				);
-			}
-		}
-		return str.join( '&' );
+		return map( obj, ( paramValue, paramName ) => {
+			const key = prefix ? prefix + '[' + paramName + ']' : paramName,
+				value = obj[ paramName ];
+			return isObject( paramValue ) ? this.getQueryUrlFromObject( value, key ) :
+				encodeURIComponent( key ) + '=' + encodeURIComponent( value )
+		} ).join( '&' );
 	}
 
 	render() {
