@@ -70,7 +70,7 @@ class ArchivesBlock extends Component {
 					/>
 				</BlockControls>
 			),
-			<ServerSideRender key="archives" block="core/archives" { ...attributes } />,
+			<ServerSideRender key="archives" block="core/archives" attributes={ this.props.attributes } />,
 		];
 	}
 }
