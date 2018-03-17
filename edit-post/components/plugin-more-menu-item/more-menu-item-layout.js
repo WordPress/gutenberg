@@ -10,9 +10,9 @@ import './style.scss';
  */
 function MoreMenuItemLayout( { title, icon, isActive, onClick } ) {
 	return (
-		<div className="edit-post-plugin-more-menu-item__more-menu-item-layout">
+		<button onClick={ onClick } className="edit-post-plugin-more-menu-item__more-menu-item-layout">
 			{ title }
-		</div>
+		</button>
 	);
 }
 

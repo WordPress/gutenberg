@@ -1,9 +1,15 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { compose, MenuItemsGroup } from '@wordpress/element';
-import { Slot, Fill, withContext } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { Slot, Fill, withContext, MenuItemsGroup } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -18,7 +24,7 @@ import MoreMenuItemLayout from './more-menu-item-layout';
  */
 const SLOT_NAME = 'PluginMoreMenuItem';
 
-function PluginMoreMenuItem( { title, onClick, icon, type, target } ) {
+function PluginMoreMenuItem( { title, onClick, icon } ) {
 	return (
 		<Fill name={ SLOT_NAME }>
 			<MoreMenuItemLayout
@@ -29,16 +35,31 @@ function PluginMoreMenuItem( { title, onClick, icon, type, target } ) {
 	);
 }
 
+PluginMoreMenuItem = compose( [
+	withContext( 'pluginName' )(),
+	withDispatch( ( dispatch, { type, pluginName, target } ) => {
+		let onClick = noop;
+		const pluginTarget = `${ pluginName }/${ target }`;
+		switch ( type ) {
+			case 'sidebar':
+				onClick = () => dispatch( 'core/edit-post' ).openGeneralSidebar( pluginTarget );
+		}
+		return {
+			onClick,
+		};
+	} ),
+] )( PluginMoreMenuItem );
+
 PluginMoreMenuItem.Slot = ( { getFills } ) => {
 	// We don't want the plugins menu items group to be rendered if there are no fills.
 	if ( ! getFills( SLOT_NAME ).length ) {
 		return null;
 	}
 	return (
-		<div className="edit-post-plugin-more-menu-item__slot">
-			<h2>Title</h2>
+		<MenuItemsGroup
+			label={ __( 'Plugins' ) } >
 			<Slot name={ SLOT_NAME } />
-		</div>
+		</MenuItemsGroup>
 	);
 };
 
