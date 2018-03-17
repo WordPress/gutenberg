@@ -22,6 +22,7 @@ import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 
 import PluginSidebar from './components/plugin-sidebar';
+import PluginMoreMenuItem from './components/plugin-more-menu-item';
 
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );
@@ -112,4 +113,5 @@ export function initializeEditor( id, post, settings ) {
 
 export const __experimental = {
 	PluginSidebar,
+	PluginMoreMenuItem,
 };
