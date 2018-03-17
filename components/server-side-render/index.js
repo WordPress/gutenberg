@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { isEqual } from 'lodash';
+import { isEqual, isObject, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -32,19 +32,11 @@ export class ServerSideRender extends Component {
 
 	fetch( props ) {
 		this.setState( { response: null } );
-		const { block } = props;
-		const attributes = Object.assign( {}, props );
+		const { block, attributes } = props;
 
-		// Delete 'block' from attributes, only registered block attributes are allowed.
-		delete attributes.block;
+		const path = '/gutenberg/v1/block-renderer/' + block + '?' + this.getQueryUrlFromObject( { attributes } );
 
-		let apiURL = this.getQueryUrlFromObject( {
-			attributes: attributes,
-		} );
-
-		apiURL = '/gutenberg/v1/block-renderer/' + block + '?' + apiURL;
-
-		return wp.apiRequest( { path: apiURL } ).then( response => {
+		return wp.apiRequest( { path: path } ).then( response => {
 			if ( response && response.rendered ) {
 				this.setState( { response: response.rendered } );
 			}
@@ -52,20 +44,12 @@ export class ServerSideRender extends Component {
 	}
 
 	getQueryUrlFromObject( obj, prefix ) {
-		const str = [];
-		let param;
-		for ( param in obj ) {
-			if ( obj.hasOwnProperty( param ) ) {
-				const key = prefix ? prefix + '[' + param + ']' : param,
-					value = obj[ param ];
-				str.push(
-					( value !== null && 'object' === typeof value ) ?
-						this.getQueryUrlFromObject( value, key ) :
-						encodeURIComponent( key ) + '=' + encodeURIComponent( value )
-				);
-			}
-		}
-		return str.join( '&' );
+		return map( obj, ( paramValue, paramName ) => {
+			const key = prefix ? prefix + '[' + paramName + ']' : paramName,
+				value = obj[ paramName ];
+			return isObject( paramValue ) ? this.getQueryUrlFromObject( value, key ) :
+				encodeURIComponent( key ) + '=' + encodeURIComponent( value );
+		} ).join( '&' );
 	}
 
 	render() {

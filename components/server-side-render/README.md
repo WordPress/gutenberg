@@ -11,7 +11,7 @@ Render core/archives preview.
 ```jsx
 	<ServerSideRender
 		block="core/archives"
-		{ this.props.attributes }
+		attributes={ this.props.attributes }
 	/>
 ```
 
