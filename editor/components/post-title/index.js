@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { KeyboardShortcuts, withContext, withFocusOutside } from '@wordpress/components';
+import { KeyboardShortcuts, withContext, withInstanceId, withFocusOutside } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -86,7 +86,7 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title, placeholder } = this.props;
+		const { title, placeholder, instanceId } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 
@@ -99,11 +99,11 @@ class PostTitle extends Component {
 						'mod+shift+z': this.redirectHistory,
 					} }
 				>
-					<label htmlFor="post-title" className="screen-reader-text">
-						{ placeholder || __( 'Add title' ) }
+					<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
+						{ decodeEntities( placeholder ) || __( 'Add title' ) }
 					</label>
 					<Textarea
-						id="post-title"
+						id={ `post-title-${ instanceId }` }
 						className="editor-post-title__input"
 						value={ title }
 						onChange={ this.onChange }
@@ -158,5 +158,6 @@ export default compose(
 	applyWithSelect,
 	applyWithDispatch,
 	applyEditorSettings,
+	withInstanceId,
 	withFocusOutside
 )( PostTitle );
