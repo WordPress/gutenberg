@@ -58,6 +58,7 @@
 	},
 	"devDependencies": {
 		"@wordpress/babel-preset-default": "1.1.1",
+		"@wordpress/custom-templated-path-webpack-plugin": "1.0.0",
 		"@wordpress/jest-preset-default": "1.0.3",
 		"@wordpress/scripts": "1.1.0",
 		"autoprefixer": "6.7.7",
