@@ -1,5 +1,8 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 2.6.0
+- `wp.blocks.getBlockDefaultClassname` function removed. Please use `wp.blocks.getBlockDefaultClassName` instead.
+
 ## 2.5.0
 
  - Returning raw HTML from block `save` is unsupported. Please use the `wp.element.RawHTML` component instead.
