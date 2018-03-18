@@ -34,6 +34,7 @@ import * as table from './table';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as visitorcounter from './visitor-counter';
 
 export const registerCoreBlocks = () => {
 	[
@@ -90,6 +91,7 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
+		visitorcounter,
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );
