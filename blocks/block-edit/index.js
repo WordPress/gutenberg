@@ -16,7 +16,7 @@ import { withContext, withFilters, withAPIData } from '@wordpress/components';
  */
 import {
 	getBlockType,
-	getBlockDefaultClassname,
+	getBlockDefaultClassName,
 	hasBlockSupport,
 } from '../api';
 
@@ -47,7 +47,7 @@ export class BlockEdit extends Component {
 
 		// Generate a class name for the block's editable form
 		const generatedClassName = hasBlockSupport( blockType, 'className', true ) ?
-			getBlockDefaultClassname( name ) :
+			getBlockDefaultClassName( name ) :
 			null;
 		const className = classnames( generatedClassName, attributes.className );
 
