@@ -8,24 +8,32 @@ import { StyleSheet, View, Text } from 'react-native';
 import Toolbar from './toolbar';
 
 export default class BlockHolder extends React.Component<
-	{ index: number, blockType: string, content: string },
+	{
+		index: number,
+		blockType: string,
+		content: string,
+		onToolbarButtonPressed: ( button: string, index: number ) => void,
+	},
 	{ selected: boolean, focused: boolean }
 > {
 	state = {
 		selected: false,
 		focused: true,
 	};
-	constructor( props: { index: number, blockType: string, content: string } ) {
+	constructor( props: {
+		index: number,
+		blockType: string,
+		content: string,
+		onToolbarButtonPressed: ( button: string, index: number ) => void,
+	} ) {
 		super( props );
-	}
-
-	onToolbarButtonPressed( button: string, index: number ) {
-		console.log( 'Button: ' + button + ' - index: ' + index );
 	}
 
 	renderToolbarIfBlockFocused() {
 		if ( this.state.focused ) {
-			return <Toolbar index={ this.props.index } onButtonPressed={ this.onToolbarButtonPressed } />;
+			return (
+				<Toolbar index={ this.props.index } onButtonPressed={ this.props.onToolbarButtonPressed } />
+			);
 		} else {
 			// Return empty view, toolbar won't be rendered
 			return <View />;

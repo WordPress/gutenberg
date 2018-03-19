@@ -9,13 +9,14 @@ import BlockHolder from './block-holder';
 
 export default class BlockManager extends React.Component<
 	{},
-	{ blocks: Array<{ key: string, blockType: string, content: string }> }
+	{ refresh: boolean, blocks: Array<{ key: string, blockType: string, content: string }> }
 > {
 	constructor( props: {} ) {
 		super( props );
 		// TODO: block state should be externalized (shared with Gutenberg at some point?).
 		// If not it should be created from a string parsing (commented HTML to json).
 		this.state = {
+			refresh: false,
 			blocks: [
 				{
 					key: '0',
@@ -43,10 +44,36 @@ export default class BlockManager extends React.Component<
 					key: '4',
 					blockType: 'paragraph',
 					content:
-						'משפטים יוצרים חפש גם, בה אנא שתפו ספרדית אנגלשמות אם אחר. סרבול ספרות הבאים בדף גם, מה אתה ויקיפדיה האטמוספירה. אל בקר נפלו יכול. כלים ביולי וכמקובל רבה בה, בה התפת',
+						'Лорем ипсум долор сит амет, адиписци трацтатос еа еум. Меа аудиам малуиссет те, хас меис либрис елеифенд ин. Нец ех тота деленит сусципит. Яуас порро инструцтиор но нец.',
 				},
 			],
 		};
+	}
+
+	onToolbarButtonPressed( button: string, index: number ) {
+		console.log( 'Button: ' + button + ' - index: ' + index );
+		var blocks = this.state.blocks;
+		switch ( button ) {
+			case 'up':
+				if ( index == 0 ) return;
+				var tmp = blocks[ index ];
+				blocks[ index ] = blocks[ index - 1 ];
+				blocks[ index - 1 ] = tmp;
+				break;
+			case 'down':
+				if ( index == blocks.length - 1 ) return;
+				var tmp = blocks[ index ];
+				blocks[ index ] = blocks[ index + 1 ];
+				blocks[ index + 1 ] = tmp;
+				break;
+			case 'delete':
+				blocks.splice( index, 1 );
+				break;
+			case 'settings':
+				// TODO: implement settings
+				break;
+		}
+		this.setState( { blocks: blocks, refresh: ! this.state.refresh } );
 	}
 
 	render() {
@@ -56,6 +83,7 @@ export default class BlockManager extends React.Component<
 				<FlatList
 					style={ styles.list }
 					data={ this.state.blocks }
+					extraData={ this.state.refresh }
 					renderItem={ this.renderItem.bind( this ) }
 				/>
 			</View>
@@ -66,7 +94,13 @@ export default class BlockManager extends React.Component<
 		item: { key: string, blockType: string, content: string },
 		index: number,
 	} ) {
-		return <BlockHolder index={ value.index } { ...value.item } />;
+		return (
+			<BlockHolder
+				onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
+				index={ value.index }
+				{ ...value.item }
+			/>
+		);
 	}
 }
 
