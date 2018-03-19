@@ -8,7 +8,7 @@ import { noop } from 'lodash';
  */
 import { compose } from '@wordpress/element';
 import { Slot, Fill, withContext, MenuItemsGroup } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -24,10 +24,11 @@ import MoreMenuItemLayout from './more-menu-item-layout';
  */
 const SLOT_NAME = 'PluginMoreMenuItem';
 
-function PluginMoreMenuItem( { title, onClick, icon } ) {
+function PluginMoreMenuItem( { title, onClick, icon, isActive } ) {
 	return (
 		<Fill name={ SLOT_NAME }>
 			<MoreMenuItemLayout
+				isActive={ isActive }
 				title={ title }
 				onClick={ onClick }
 				icon={ icon } />
@@ -36,13 +37,23 @@ function PluginMoreMenuItem( { title, onClick, icon } ) {
 }
 
 PluginMoreMenuItem = compose( [
-	withContext( 'pluginName' )(),
-	withDispatch( ( dispatch, { type, pluginName, target } ) => {
+	withContext( 'pluginName' )( ( pluginName, { target } ) => {
+		return {
+			target: `${ pluginName }/${ target }`,
+		};
+	} ),
+	withSelect( ( select, { target } ) => ( {
+		isActive: select( 'core/edit-post' ).getActiveGeneralSidebarName() === target,
+	} ) ),
+	withDispatch( ( dispatch, { type, target, isActive } ) => {
 		let onClick = noop;
-		const pluginTarget = `${ pluginName }/${ target }`;
-		switch ( type ) {
-			case 'sidebar':
-				onClick = () => dispatch( 'core/edit-post' ).openGeneralSidebar( pluginTarget );
+		if ( isActive ) {
+			onClick = dispatch( 'core/edit-post' ).closeGeneralSidebar;
+		} else {
+			switch ( type ) {
+				case 'sidebar':
+					onClick = () => dispatch( 'core/edit-post' ).openGeneralSidebar( target );
+			}
 		}
 		return {
 			onClick,
