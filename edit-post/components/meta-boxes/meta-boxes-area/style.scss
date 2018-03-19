@@ -6,25 +6,20 @@
 		box-sizing: content-box;
 	}
 
-		/* Match width and positioning of the meta boxes. Override default styles. */
+	/* Match width and positioning of the meta boxes. Override default styles. */
 	#poststuff {
 		margin: 0 auto;
 		padding-top: 0;
 		min-width: auto;
 	}
 
-	#post {
-		margin: 0;
-	}
-
 	/* Override Default meta box stylings */
-
 	#poststuff h3.hndle,
 	#poststuff .stuffbox > h3,
 	#poststuff h2.hndle { /* WordPress selectors yolo */
 		border-bottom: 1px solid $light-gray-500;
 		box-sizing: border-box;
-		color: $dark-gray-500;
+		color: inherit;
 		font-weight: 600;
 		outline: none;
 		padding: 15px;
@@ -34,37 +29,15 @@
 
 	.postbox {
 		border: 0;
-		color: $dark-gray-500;
+		color: inherit;
 		margin-bottom: 0;
 	}
 
 	.postbox > .inside {
 		border-bottom: 1px solid $light-gray-500;
-		color: $dark-gray-500;
+		color: inherit;
 		padding: 0 $block-padding $block-padding;
 		margin: 0;
-	}
-
-	input,
-	select,
-	textarea {
-		background: inherit;
-		border: 1px solid $light-gray-500;
-		border-radius: 4px;
-		box-shadow: none;
-		color: $dark-gray-800;
-		display: inline-block;
-		font-family: inherit;
-		font-size: $default-font-size;
-		line-height: 24px;
-		outline: none;
-		padding: 4px;
-	}
-
-	input:hover,
-	select:hover,
-	textarea:hover {
-		border: 1px solid $light-gray-700;
 	}
 
 	.postbox .handlediv {

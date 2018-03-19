@@ -881,37 +881,6 @@ describe( 'state', () => {
 			expect( state.present.blockOrder[ '' ] ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
 		} );
 
-		it( 'should remove associated blocks when deleting a reusable block', () => {
-			const original = editor( undefined, {
-				type: 'RESET_BLOCKS',
-				blocks: [ {
-					uid: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					uid: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
-			} );
-			const state = editor( original, {
-				type: 'REMOVE_REUSABLE_BLOCK',
-				id: 123,
-				associatedBlockUids: [ 'chicken', 'veggies' ],
-			} );
-
-			expect( state.present.blockOrder[ '' ] ).toEqual( [ 'ribs' ] );
-			expect( state.present.blocksByUid ).toEqual( {
-				ribs: {
-					uid: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-				},
-			} );
-		} );
-
 		describe( 'edits()', () => {
 			it( 'should save newly edited properties', () => {
 				const original = editor( undefined, {
@@ -1811,49 +1780,23 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should add fetched reusable blocks', () => {
-			const reusableBlock = {
-				id: 123,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-
+		it( 'should add received reusable blocks', () => {
 			const state = reusableBlocks( {}, {
-				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
-				reusableBlocks: [ reusableBlock ],
+				type: 'RECEIVE_REUSABLE_BLOCKS',
+				results: [ {
+					reusableBlock: {
+						id: 123,
+						title: 'My cool block',
+					},
+					parsedBlock: {
+						uid: 'foo',
+					},
+				} ],
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					[ reusableBlock.id ]: reusableBlock,
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should add a reusable block', () => {
-			const reusableBlock = {
-				id: 123,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-
-			const state = reusableBlocks( {}, {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id: reusableBlock.id,
-				reusableBlock,
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					[ reusableBlock.id ]: reusableBlock,
+					123: { uid: 'foo', title: 'My cool block' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -1861,45 +1804,23 @@ describe( 'state', () => {
 		} );
 
 		it( 'should update a reusable block', () => {
-			const id = 123;
 			const initialState = {
 				data: {
-					[ id ]: {
-						id,
-						name: 'My cool block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Hello!',
-							dropCap: true,
-						},
-					},
+					123: { uid: '', title: '' },
 				},
 				isFetching: {},
 				isSaving: {},
 			};
 
 			const state = reusableBlocks( initialState, {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id,
-				reusableBlock: {
-					name: 'My better block',
-					attributes: {
-						content: 'Yo!',
-					},
-				},
+				type: 'UPDATE_REUSABLE_BLOCK_TITLE',
+				id: 123,
+				title: 'My block',
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					[ id ]: {
-						id,
-						name: 'My better block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Yo!',
-							dropCap: true,
-						},
-					},
+					123: { uid: '', title: 'My block' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -1907,40 +1828,22 @@ describe( 'state', () => {
 		} );
 
 		it( 'should update the reusable block\'s id if it was temporary', () => {
-			const id = 123;
 			const initialState = {
 				data: {
-					[ id ]: {
-						id,
-						isTemporary: true,
-						name: 'My cool block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Hello!',
-							dropCap: true,
-						},
-					},
+					reusable1: { uid: '', title: '' },
 				},
 				isSaving: {},
 			};
 
 			const state = reusableBlocks( initialState, {
 				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-				id,
-				updatedId: 3,
+				id: 'reusable1',
+				updatedId: 123,
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					3: {
-						id: 3,
-						name: 'My cool block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Hello!',
-							dropCap: true,
-						},
-					},
+					123: { uid: '', title: '' },
 				},
 				isFetching: {},
 				isSaving: {},

@@ -1138,12 +1138,13 @@ function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
 /**
  * Given a reusable block, constructs an item that appears in the inserter.
  *
+ * @param {Object}           state             Global application state.
  * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
  * @param {Object}           reusableBlock     Reusable block, likely from getReusableBlock().
  *
  * @return {Editor.InserterItem} Item that appears in inserter.
  */
-function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) {
+function buildInserterItemFromReusableBlock( state, enabledBlockTypes, reusableBlock ) {
 	if ( ! enabledBlockTypes || ! reusableBlock ) {
 		return null;
 	}
@@ -1153,7 +1154,12 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 		return null;
 	}
 
-	const referencedBlockType = getBlockType( reusableBlock.type );
+	const referencedBlock = getBlock( state, reusableBlock.uid );
+	if ( ! referencedBlock ) {
+		return null;
+	}
+
+	const referencedBlockType = getBlockType( referencedBlock.name );
 	if ( ! referencedBlockType ) {
 		return null;
 	}
@@ -1189,7 +1195,7 @@ export function getInserterItems( state, enabledBlockTypes = true ) {
 	);
 
 	const dynamicItems = getReusableBlocks( state ).map( reusableBlock =>
-		buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock )
+		buildInserterItemFromReusableBlock( state, enabledBlockTypes, reusableBlock )
 	);
 
 	const items = [ ...staticItems, ...dynamicItems ];
@@ -1217,7 +1223,7 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
 	const items = fillWithCommonBlocks( inserts ).map( insert => {
 		if ( insert.ref ) {
 			const reusableBlock = getReusableBlock( state, insert.ref );
-			return buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock );
+			return buildInserterItemFromReusableBlock( state, enabledBlockTypes, reusableBlock );
 		}
 
 		const blockType = getBlockType( insert.name );
@@ -1242,6 +1248,10 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
  */
 export function getFrecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
 	const calculateFrecency = ( time, count ) => {
+		if ( ! time ) {
+			return count;
+		}
+
 		const duration = Date.now() - time;
 		switch ( true ) {
 			case duration < 3600:
@@ -1264,25 +1274,54 @@ export function getFrecentInserterItems( state, enabledBlockTypes = true, maximu
 /**
  * Returns the reusable block with the given ID.
  *
- * @param {Object} state Global application state.
- * @param {string} ref   The reusable block's ID.
+ * @param {Object}        state Global application state.
+ * @param {number|string} ref   The reusable block's ID.
  *
  * @return {Object} The reusable block, or null if none exists.
  */
-export function getReusableBlock( state, ref ) {
-	return state.reusableBlocks.data[ ref ] || null;
-}
+export const getReusableBlock = createSelector(
+	( state, ref ) => {
+		const block = state.reusableBlocks.data[ ref ];
+		if ( ! block ) {
+			return null;
+		}
+
+		const isTemporary = isNaN( parseInt( ref ) );
+
+		return {
+			...block,
+			id: isTemporary ? ref : +ref,
+			isTemporary,
+		};
+	},
+	( state, ref ) => [
+		state.reusableBlocks.data[ ref ],
+	],
+);
 
 /**
  * Returns whether or not the reusable block with the given ID is being saved.
  *
- * @param {*} state Global application state.
- * @param {*} ref   The reusable block's ID.
+ * @param {Object} state Global application state.
+ * @param {string} ref   The reusable block's ID.
  *
  * @return {boolean} Whether or not the reusable block is being saved.
  */
 export function isSavingReusableBlock( state, ref ) {
 	return state.reusableBlocks.isSaving[ ref ] || false;
+}
+
+/**
+ * Returns true if the reusable block with the given ID is being fetched, or
+ * false otherwise.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} ref   The reusable block's ID.
+ *
+ * @return {boolean} Whether the reusable block is being fetched.
+ */
+export function isFetchingReusableBlock( state, ref ) {
+	return !! state.reusableBlocks.isFetching[ ref ];
 }
 
 /**
@@ -1293,7 +1332,7 @@ export function isSavingReusableBlock( state, ref ) {
  * @return {Array} An array of all reusable blocks.
  */
 export function getReusableBlocks( state ) {
-	return Object.values( state.reusableBlocks.data );
+	return map( state.reusableBlocks.data, ( value, ref ) => getReusableBlock( state, ref ) );
 }
 
 /**

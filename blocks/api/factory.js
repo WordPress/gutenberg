@@ -14,13 +14,11 @@ import {
 	find,
 	first,
 	flatMap,
-	uniqueId,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -256,24 +254,4 @@ export function switchToBlockType( blocks, name ) {
 		 */
 		return applyFilters( 'blocks.switchToBlockType.transformedBlock', transformedBlock, blocks );
 	} );
-}
-
-/**
- * Creates a new reusable block.
- *
- * @param {string} type       The type of the block referenced by the reusable
- *                            block.
- * @param {Object} attributes The attributes of the block referenced by the
- *                            reusable block.
- *
- * @return {Object} A reusable block object.
- */
-export function createReusableBlock( type, attributes ) {
-	return {
-		id: -uniqueId(), // Temporary id replaced when the block is saved server side
-		isTemporary: true,
-		title: __( 'Untitled block' ),
-		type,
-		attributes,
-	};
 }

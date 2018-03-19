@@ -2,7 +2,6 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
-import { combineReducers } from 'redux';
 import {
 	flow,
 	reduce,
@@ -24,6 +23,7 @@ import {
  * WordPress dependencies
  */
 import { isReusableBlock } from '@wordpress/blocks';
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -215,6 +215,7 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
 		shouldOverwriteState,
 	} ),
 
@@ -222,6 +223,7 @@ export const editor = flow( [
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
 		resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
 	} ),
 ] )( {
 	edits( state = {}, action ) {
@@ -273,6 +275,12 @@ export const editor = flow( [
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
 				return getFlattenedBlocks( action.blocks );
+
+			case 'RECEIVE_BLOCKS':
+				return {
+					...state,
+					...getFlattenedBlocks( action.blocks ),
+				};
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
@@ -364,9 +372,6 @@ export const editor = flow( [
 					return block;
 				} );
 			}
-
-			case 'REMOVE_REUSABLE_BLOCK':
-				return omit( state, action.associatedBlockUids );
 		}
 
 		return state;
@@ -377,6 +382,12 @@ export const editor = flow( [
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
 				return mapBlockOrder( action.blocks );
+
+			case 'RECEIVE_BLOCKS':
+				return {
+					...state,
+					...omit( mapBlockOrder( action.blocks ), '' ),
+				};
 
 			case 'INSERT_BLOCKS': {
 				const { rootUID = '', blocks } = action;
@@ -481,20 +492,15 @@ export const editor = flow( [
 			}
 
 			case 'REMOVE_BLOCKS':
-			case 'REMOVE_REUSABLE_BLOCK': {
-				const { type, uids, associatedBlockUids } = action;
-				const uidsToRemove = type === 'REMOVE_BLOCKS' ? uids : associatedBlockUids;
-
 				return flow( [
 					// Remove inner block ordering for removed blocks
-					( nextState ) => omit( nextState, uidsToRemove ),
+					( nextState ) => omit( nextState, action.uids ),
 
 					// Remove deleted blocks from other blocks' orderings
 					( nextState ) => mapValues( nextState, ( subState ) => (
-						without( subState, ...uidsToRemove )
+						without( subState, ...action.uids )
 					) ),
 				] )( state );
-			}
 		}
 
 		return state;
@@ -831,26 +837,37 @@ export function notices( state = [], action ) {
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
-			case 'FETCH_REUSABLE_BLOCKS_SUCCESS': {
-				return reduce( action.reusableBlocks, ( newState, reusableBlock ) => ( {
-					...newState,
-					[ reusableBlock.id ]: reusableBlock,
-				} ), state );
+			case 'RECEIVE_REUSABLE_BLOCKS': {
+				return reduce( action.results, ( nextState, result ) => {
+					const { id, title } = result.reusableBlock;
+					const { uid } = result.parsedBlock;
+
+					const value = { uid, title };
+
+					if ( ! isEqual( nextState[ id ], value ) ) {
+						if ( nextState === state ) {
+							nextState = { ...nextState };
+						}
+
+						nextState[ id ] = value;
+					}
+
+					return nextState;
+				}, state );
 			}
 
-			case 'UPDATE_REUSABLE_BLOCK': {
-				const { id, reusableBlock } = action;
-				const existingReusableBlock = state[ id ];
+			case 'UPDATE_REUSABLE_BLOCK_TITLE': {
+				const { id, title } = action;
+
+				if ( ! state[ id ] || state[ id ].title === title ) {
+					return state;
+				}
 
 				return {
 					...state,
 					[ id ]: {
-						...existingReusableBlock,
-						...reusableBlock,
-						attributes: {
-							...( existingReusableBlock && existingReusableBlock.attributes ),
-							...reusableBlock.attributes,
-						},
+						...state[ id ],
+						title,
 					},
 				};
 			}
@@ -862,12 +879,11 @@ export const reusableBlocks = combineReducers( {
 				if ( id === updatedId ) {
 					return state;
 				}
+
+				const value = state[ id ];
 				return {
 					...omit( state, id ),
-					[ updatedId ]: {
-						...omit( state[ id ], [ 'id', 'isTemporary' ] ),
-						id: updatedId,
-					},
+					[ updatedId ]: value,
 				};
 			}
 
