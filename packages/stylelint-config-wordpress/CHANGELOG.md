@@ -1,9 +1,11 @@
 # HEAD
 
--   Changed: Updated `stylelint` peer dependency version to `^8.0.0`.
+-   Added: stylelint `9.1.3` support.
+-   Changed: Updated `stylelint` peer dependency version to `^9.1.3`.
 -   Changed: Improved `no-duplicate-selectors` tests.
--   Updated: Bump minimum Node.js required version to `8.9.3`.
 -   Removed: Jest snapshots.
+-   Removed: `stylelint < 9.1.3` compatibility.
+-   Updated: Bump minimum Node.js required version to `8.9.3`.
 
 # 12.0.0
 
