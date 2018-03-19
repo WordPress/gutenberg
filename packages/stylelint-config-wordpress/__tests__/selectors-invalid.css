@@ -25,3 +25,7 @@ input[type='text'] { /* Should be [type="text"] */
 .selectorA {
 	color: #000;
 }
+
+.selector:after {
+	color: #000;
+}

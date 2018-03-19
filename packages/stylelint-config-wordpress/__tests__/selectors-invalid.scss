@@ -25,3 +25,10 @@ p {
 		margin: 0;
 	}
 }
+
+span {
+
+	& .class:after {
+		margin: 0;
+	}
+}

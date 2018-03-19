@@ -27,3 +27,11 @@ p {
 		margin: 0;
 	}
 }
+
+span {
+
+	&,
+	.foo::after {
+		color: #000;
+	}
+}

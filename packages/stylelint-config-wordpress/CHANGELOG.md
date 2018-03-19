@@ -5,6 +5,7 @@
 -   Changed: Improved `no-duplicate-selectors` tests.
 -   Removed: Jest snapshots.
 -   Removed: `stylelint < 9.1.3` compatibility.
+-   Updated: `selector-pseudo-element-colon-notation` to use `double`
 -   Updated: `stylelint-config-recommended` to `2.1.0`.
 -   Updated: `stylelint-scss` to `2.1.0`.
 -   Updated: Bump minimum Node.js required version to `8.9.3`.

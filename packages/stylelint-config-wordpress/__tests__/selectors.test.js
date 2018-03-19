@@ -47,7 +47,7 @@ describe( 'flags warnings with invalid selectors css', () => {
 
 	it( 'flags warnings', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings ).toHaveLength( 3 )
+			expect( data.results[0].warnings ).toHaveLength( 4 )
 		) );
 	});
 
@@ -113,13 +113,13 @@ describe( 'flags warnings with invalid selectors css', () => {
 
 	it( 'correct third warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].text ).toBe( 'Expected double quotes (string-quotes)' )
+			expect( data.results[0].warnings[2].text ).toBe( 'Expected double colon pseudo-element notation (selector-pseudo-element-colon-notation)' )
 		) );
 	});
 
 	it( 'correct third warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].rule ).toBe( 'string-quotes' )
+			expect( data.results[0].warnings[2].rule ).toBe( 'selector-pseudo-element-colon-notation' )
 		) );
 	});
 
@@ -131,13 +131,43 @@ describe( 'flags warnings with invalid selectors css', () => {
 
 	it( 'correct third warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].line ).toBe( 17 )
+			expect( data.results[0].warnings[2].line ).toBe( 29 )
 		) );
 	});
 
 	it( 'correct third warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[2].column ).toBe( 12 )
+			expect( data.results[0].warnings[2].column ).toBe( 10 )
+		) );
+	});
+
+	it( 'correct fourth warning text', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[3].text ).toBe( 'Expected double quotes (string-quotes)' )
+		) );
+	});
+
+	it( 'correct fourth warning rule flagged', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[3].rule ).toBe( 'string-quotes' )
+		) );
+	});
+
+	it( 'correct fourth warning severity flagged', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[3].severity ).toBe( 'error' )
+		) );
+	});
+
+	it( 'correct fourth warning line number', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[3].line ).toBe( 17 )
+		) );
+	});
+
+	it( 'correct fourth warning column number', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[3].column ).toBe( 12 )
 		) );
 	});
 });

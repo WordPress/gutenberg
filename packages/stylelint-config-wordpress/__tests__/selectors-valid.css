@@ -5,3 +5,7 @@
 input[type="text"] {
 	line-height: 1.1;
 }
+
+.selector::after {
+	color: #000;
+}
