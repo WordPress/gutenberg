@@ -113,10 +113,10 @@
 	},
 	"jest": {
 		"collectCoverageFrom": [
-			"(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport)/**/*.js"
+			"(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport|plugins)/**/*.js"
 		],
 		"moduleNameMapper": {
-			"@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport)": "$1"
+			"@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport|plugins)": "$1"
 		},
 		"preset": "@wordpress/jest-preset-default",
 		"setupFiles": [
