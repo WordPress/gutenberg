@@ -34,6 +34,17 @@ export default class BlockManager extends React.Component<
 					content:
 						'書籍やウェブページや広告などのデザインのプロトタイプを制作したり顧客にプレゼンテーションしたりする際に、まだ正式な文章の出来上がっていないテキスト部分の書体（フォント）、タイポグラフィ、レイアウトなどといった視覚的なデザインを調整したりわかりやすく見せるために用いられる。',
 				},
+				{
+					key: '3',
+					blockType: 'code',
+					content: 'if name == "World":\n    return "Hello World"\nelse:\n    return "Hello Pony"',
+				},
+				{
+					key: '4',
+					blockType: 'paragraph',
+					content:
+						'משפטים יוצרים חפש גם, בה אנא שתפו ספרדית אנגלשמות אם אחר. סרבול ספרות הבאים בדף גם, מה אתה ויקיפדיה האטמוספירה. אל בקר נפלו יכול. כלים ביולי וכמקובל רבה בה, בה התפת',
+				},
 			],
 		};
 	}

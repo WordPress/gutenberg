@@ -3,25 +3,31 @@
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 
-export default class Toolbar extends React.Component<{ index: number }> {
-	constructor( props: { index: number } ) {
+export default class Toolbar extends React.Component<{
+	index: number,
+	onButtonPressed: ( button: string, index: number ) => void,
+}> {
+	constructor( props: {
+		index: number,
+		onButtonPressed: ( button: string, index: number ) => void,
+	} ) {
 		super( props );
 	}
 
 	onPressUp() {
-		console.log( 'Pressed Up, index: ' + this.props.index );
+		this.props.onButtonPressed( 'up', this.props.index );
 	}
 
 	onPressDown() {
-		console.log( 'Pressed Down, index: ' + this.props.index );
+		this.props.onButtonPressed( 'down', this.props.index );
 	}
 
 	onPressSettings() {
-		console.log( 'Pressed Settings, index: ' + this.props.index );
+		this.props.onButtonPressed( 'setting', this.props.index );
 	}
 
 	onPressDelete() {
-		console.log( 'Pressed Delete, index: ' + this.props.index );
+		this.props.onButtonPressed( 'delete', this.props.index );
 	}
 
 	render() {

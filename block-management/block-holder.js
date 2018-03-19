@@ -19,9 +19,13 @@ export default class BlockHolder extends React.Component<
 		super( props );
 	}
 
+	onToolbarButtonPressed( button: string, index: number ) {
+		console.log( 'Button: ' + button + ' - index: ' + index );
+	}
+
 	renderToolbarIfBlockFocused() {
 		if ( this.state.focused ) {
-			return <Toolbar index={ this.props.index } />;
+			return <Toolbar index={ this.props.index } onButtonPressed={ this.onToolbarButtonPressed } />;
 		} else {
 			// Return empty view, toolbar won't be rendered
 			return <View />;
