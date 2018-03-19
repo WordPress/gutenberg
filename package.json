@@ -39,6 +39,7 @@
 		"test:coverage": "npm run test -- --coverage",
 		"test:coverage-ci": "npm run test -- --coverage && codecov",
 		"test:watch": "npm run test -- --watch",
+		"publish:check": "npm run build && lerna updated",
 		"publish:dev": "npm run build && lerna publish --npm-tag next",
 		"publish:prod": "npm run build && lerna publish"
 	}
