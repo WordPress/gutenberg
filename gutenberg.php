@@ -134,6 +134,7 @@ function gutenberg_pre_init() {
 	}
 
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
+	add_action( 'wp_enqueue_scripts', 'gutenberg_view_post_scripts_and_styles' );
 }
 
 /**

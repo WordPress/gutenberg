@@ -57,6 +57,7 @@ const entryPointNames = [
 	'data',
 	'viewport',
 	[ 'editPost', 'edit-post' ],
+	[ 'viewPost', 'view-post' ],
 ];
 
 const packageNames = [

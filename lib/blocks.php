@@ -199,9 +199,20 @@ function do_blocks( $content ) {
 	// Append remaining unmatched content.
 	$rendered_content .= $content;
 
-	// Strip remaining block comment demarcations.
-	$rendered_content = preg_replace( '/<!--\s+\/?wp:.*?-->\r?\n?/m', '', $rendered_content );
-
 	return $rendered_content;
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
+
+/**
+ * Strips remaining block comment demarcations.
+ *
+ * @since 2.5.0
+ *
+ * @param  string $content Post content.
+ * @return string          Updated post content.
+ */
+function do_blocks_strip_comment_demarcations( $content ) {
+	return preg_replace( '/<!--\s+\/?wp:.*?-->\r?\n?/m', '', $content );
+}
+// TODO: It should be possible to leave comments for the processing on the frontend
+//add_filter( 'the_content', 'do_blocks_strip_comment_demarcations', 9 ); // AFTER do_blocks
