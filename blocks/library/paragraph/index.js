@@ -372,7 +372,8 @@ export const settings = {
 			[ `align${ width }` ]: width,
 			'has-background': backgroundColor,
 			'has-drop-cap': dropCap,
-		}, thresholdFontSize ? `is-${ thresholdFontSize }-text` : undefined );
+			[ `is-${ thresholdFontSize }-text` ]: thresholdFontSize,
+		} );
 
 		const styles = {
 			backgroundColor: backgroundColor,
