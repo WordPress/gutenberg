@@ -35,7 +35,6 @@
 		"moment": "2.21.0",
 		"moment-timezone": "0.5.13",
 		"mousetrap": "1.6.1",
-		"npm": "5.7.1",
 		"prop-types": "15.5.10",
 		"querystringify": "1.0.0",
 		"re-resizable": "4.0.3",
