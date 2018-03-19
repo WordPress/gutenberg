@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { findKey } from 'lodash';
+import { findKey, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -146,38 +146,22 @@ class ParagraphBlock extends Component {
 					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
 						<div className="blocks-font-size__main">
 							<ButtonGroup aria-label={ __( 'Font Size' ) }>
-								<Button
-									isLarge
-									isPrimary={ attributes.textClass === 'is-small-text' }
-									aria-pressed={ attributes.textClass === 'is-small-text' }
-									onClick={ () => this.setFontSize( FONT_SIZES.small ) }
-								>
-									S
-								</Button>
-								<Button
-									isLarge
-									isPrimary={ attributes.textClass === 'is-regular-text' }
-									aria-pressed={ attributes.textClass === 'is-regular-text' }
-									onClick={ () => this.setFontSize( FONT_SIZES.regular ) }
-								>
-									M
-								</Button>
-								<Button
-									isLarge
-									isPrimary={ attributes.textClass === 'is-large-text' }
-									aria-pressed={ attributes.textClass === 'is-large-text' }
-									onClick={ () => this.setFontSize( FONT_SIZES.large ) }
-								>
-									L
-								</Button>
-								<Button
-									isLarge
-									isPrimary={ attributes.textClass === 'is-larger-text' }
-									aria-pressed={ attributes.textClass === 'is-larger-text' }
-									onClick={ () => this.setFontSize( FONT_SIZES.larger ) }
-								>
-									XL
-								</Button>
+								{ map( {
+									S: 'small',
+									M: 'regular',
+									L: 'large',
+									XL: 'larger',
+								}, ( size, label ) => (
+									<Button
+										key={ label }
+										isLarge
+										isPrimary={ attributes.textClass === `is-${ size }-text` }
+										aria-pressed={ attributes.textClass === `is-${ size }-text` }
+										onClick={ () => this.setFontSize( FONT_SIZES[ size ] ) }
+									>
+										{ label }
+									</Button>
+								) ) }
 							</ButtonGroup>
 							<Button
 								isLarge
