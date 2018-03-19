@@ -47,9 +47,9 @@ export function resetPost( post ) {
 /**
  * Returns an action object used to setup the editor state when first opening an editor.
  *
- * @param {Object} post   Post object.
- * @param {Array}  blocks Array of blocks.
- * @param {Object} edits  Initial edited attributes object.
+ * @param {Object}  post            Post object.
+ * @param {Array}   blocks          Array of blocks.
+ * @param {Object}  edits           Initial edited attributes object.
  *
  * @return {Object} Action object.
  */
@@ -262,6 +262,42 @@ export function showInsertionPoint() {
 export function hideInsertionPoint() {
 	return {
 		type: 'HIDE_INSERTION_POINT',
+	};
+}
+
+/**
+ * Returns an action object resetting the template validity.
+ *
+ * @param {boolean}  isValid  template validity flag.
+ *
+ * @return {Object} Action object.
+ */
+export function setTemplateValidity( isValid ) {
+	return {
+		type: 'SET_TEMPLATE_VALIDITY',
+		isValid,
+	};
+}
+
+/**
+ * Returns an action object tocheck the template validity.
+ *
+ * @return {Object} Action object.
+ */
+export function checkTemplateValidity() {
+	return {
+		type: 'CHECK_TEMPLATE_VALIDITY',
+	};
+}
+
+/**
+ * Returns an action object synchronize the template with the list of blocks
+ *
+ * @return {Object} Action object.
+ */
+export function synchronizeTemplate() {
+	return {
+		type: 'SYNCHRONIZE_TEMPLATE',
 	};
 }
 

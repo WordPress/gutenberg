@@ -729,6 +729,32 @@ export function isInsertionPointVisible( state = false, action ) {
 }
 
 /**
+ * Reducer returning whether the post blocks match the defined template or not.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function template( state = { isValid: true }, action ) {
+	switch ( action.type ) {
+		case 'SETUP_EDITOR':
+			return {
+				...state,
+				template: action.settings.template,
+				lock: action.settings.templateLock,
+			};
+		case 'SET_TEMPLATE_VALIDITY':
+			return {
+				...state,
+				isValid: action.isValid,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the user preferences.
  *
  * @param {Object}  state                 Current state.
@@ -951,4 +977,5 @@ export default optimist( combineReducers( {
 	saving,
 	notices,
 	reusableBlocks,
+	template,
 } ) );

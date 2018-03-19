@@ -75,6 +75,9 @@ const {
 	getInserterItems,
 	getFrecentInserterItems,
 	getProvisionalBlockUID,
+	isValidTemplate,
+	getTemplate,
+	getTemplateLock,
 	POST_UPDATE_TRANSACTION_ID,
 } = selectors;
 
@@ -2846,6 +2849,45 @@ describe( 'selectors', () => {
 			} );
 
 			expect( provisionalBlockUID ).toBe( 'chicken' );
+		} );
+	} );
+
+	describe( 'isValidTemplate', () => {
+		it( 'should return true if template is valid', () => {
+			const state = {
+				template: { isValid: true },
+			};
+
+			expect( isValidTemplate( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if template is not valid', () => {
+			const state = {
+				template: { isValid: false },
+			};
+
+			expect( isValidTemplate( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getTemplate', () => {
+		it( 'should return the template object', () => {
+			const template = [];
+			const state = {
+				template: { isValid: true, template },
+			};
+
+			expect( getTemplate( state ) ).toBe( template );
+		} );
+	} );
+
+	describe( 'getTemplateLock', () => {
+		it( 'should return the template object', () => {
+			const state = {
+				template: { isValid: true, lock: 'all' },
+			};
+
+			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 	} );
 } );

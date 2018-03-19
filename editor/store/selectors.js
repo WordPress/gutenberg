@@ -967,6 +967,36 @@ export function isBlockInsertionPointVisible( state ) {
 }
 
 /**
+ * Returns whether the blocks matches the template or not.
+ *
+ * @param {boolean} state
+ * @return {?boolean} Whether the template is valid or not.
+ */
+export function isValidTemplate( state ) {
+	return state.template.isValid;
+}
+
+/**
+ * Returns the defined block template
+ *
+ * @param {boolean} state
+ * @return {?Arary}        Block Template
+ */
+export function getTemplate( state ) {
+	return state.template.template;
+}
+
+/**
+ * Returns the defined block template lock
+ *
+ * @param {boolean} state
+ * @return {?string}        Block Template Lock
+ */
+export function getTemplateLock( state ) {
+	return state.template.lock;
+}
+
+/**
  * Returns true if the post is currently being saved, or false otherwise.
  *
  * @param {Object} state Global application state.
