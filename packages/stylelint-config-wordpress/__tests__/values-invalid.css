@@ -1,13 +1,17 @@
-.class { /* Avoid missing space and semicolon */
+.selector { /* Avoid missing space and semicolon */
 	background:#fff
 }
 
-.class { /* Avoid adding a unit on a zero value */
+.another-selector { /* Avoid adding a unit on a zero value */
 	margin: 0px 0px 20px 0px;
 }
 
-.class {
+.one-more-selector {
 	font-family: Times New Roman, serif; /* Quote font names when required */
 	font-weight: bold; /* Avoid named font weights */
 	line-height: 1.4em;
+}
+
+.selector { /* Avoid duplicate selectors */
+	background: #fff;
 }

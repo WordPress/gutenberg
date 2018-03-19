@@ -293,13 +293,13 @@ describe( 'flags warnings with invalid values css', () => {
 
 	it( 'correct ninth warning text', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[8].text ).toBe( "Unexpected longhand value '0px 0px 20px 0px' instead of '0px 0px 20px' (shorthand-property-no-redundant-values)" )
+			expect( data.results[0].warnings[8].text ).toBe( 'Unexpected duplicate selector ".selector", first used at line 1 (no-duplicate-selectors)' )
 		) );
 	});
 
 	it( 'correct ninth warning rule flagged', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[8].rule ).toBe( 'shorthand-property-no-redundant-values' )
+			expect( data.results[0].warnings[8].rule ).toBe( 'no-duplicate-selectors' )
 		) );
 	});
 
@@ -311,13 +311,13 @@ describe( 'flags warnings with invalid values css', () => {
 
 	it( 'correct ninth warning line number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[8].line ).toBe( 6 )
+			expect( data.results[0].warnings[8].line ).toBe( 15 )
 		) );
 	});
 
 	it( 'correct ninth warning column number', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[8].column ).toBe( 2 )
+			expect( data.results[0].warnings[8].column ).toBe( 1 )
 		) );
 	});
 });

@@ -5,14 +5,14 @@
 	}
 }
 
-p {
+a {
 
 	&.foo {
 		margin: 0;
 	}
 }
 
-p {
+div {
 
 	.foo > & {
 		margin: 0;
@@ -23,7 +23,7 @@ p {
 
 	&,
 	.foo,
-	.bar {
+	.baz {
 		margin: 0;
 	}
 }
