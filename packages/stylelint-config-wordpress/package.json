@@ -90,6 +90,6 @@
 	},
 	"dependencies": {
 		"stylelint-config-recommended": "^2.1.0",
-		"stylelint-scss": "^2.0.0"
+		"stylelint-scss": "^2.1.0"
 	}
 }
