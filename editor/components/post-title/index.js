@@ -89,6 +89,7 @@ class PostTitle extends Component {
 		const { title, placeholder, instanceId } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
+		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
 			<div className={ className }>
@@ -100,14 +101,14 @@ class PostTitle extends Component {
 					} }
 				>
 					<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
-						{ decodeEntities( placeholder ) || __( 'Add title' ) }
+						{ decodedPlaceholder || __( 'Add title' ) }
 					</label>
 					<Textarea
 						id={ `post-title-${ instanceId }` }
 						className="editor-post-title__input"
 						value={ title }
 						onChange={ this.onChange }
-						placeholder={ decodeEntities( placeholder ) || __( 'Add title' ) }
+						placeholder={ decodedPlaceholder || __( 'Add title' ) }
 						onFocus={ this.onSelect }
 						onKeyDown={ this.onKeyDown }
 						onKeyPress={ this.onUnselect }
