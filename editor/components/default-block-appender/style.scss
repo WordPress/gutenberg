@@ -13,7 +13,6 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		font-size: $editor-font-size;
 		cursor: text;
 		width: 100%;
-		height: $empty-paragraph-height;
 		color: $dark-gray-300;
 		outline: 1px solid transparent;
 		transition: 0.2s outline;
