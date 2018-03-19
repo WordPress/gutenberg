@@ -103,7 +103,8 @@ function register_block_core_latest_posts() {
 				'default' => 'date',
 			),
 		),
-		'render_callback' => 'render_block_core_latest_posts',
+		// TODO: render client side instead?
+		//'render_callback' => 'render_block_core_latest_posts',
 	) );
 }
 
