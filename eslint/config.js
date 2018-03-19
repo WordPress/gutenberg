@@ -2,7 +2,7 @@ module.exports = {
 	parser: 'babel-eslint',
 	extends: [
 		'wordpress',
-		'wordpress/es6',
+		'plugin:wordpress/esnext',
 		'plugin:react/recommended',
 		'plugin:jsx-a11y/recommended',
 	],
