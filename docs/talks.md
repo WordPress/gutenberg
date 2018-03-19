@@ -7,6 +7,7 @@ Talks given about Gutenberg, including slides and videos as they are available.
 - [Gutenberg Notes](http://haiku2.com/2017/09/bend-wordpress-meetup-gutenberg-notes/) at Bend WordPress Meetup (5. September 2017)
 - [Gutenberg and the Future of Content in WordPress](https://www.slideshare.net/andrewmduthie/gutenberg-and-the-future-of-content-in-wordpress) (20. September 2017)
 - [Head first into Gutenberg](https://speakerdeck.com/prtksxna/head-first-into-gutenberg) at the [WordPress Goa Meet-up](https://www.meetup.com/WordPressGoa/events/245275573/) (1. December 2017)
+- [Gutenberg : vers une approche plus fine du contenu](https://imathi.eu/2018/02/16/gutenberg-vers-une-approche-plus-fine-du-contenu/) at [WP Paris](https://wpparis.fr/) (8. February 2018)
 
 ## Videos
 - [All `Gutenberg` tagged Talks at WordPress.tv](https://wordpress.tv/tag/gutenberg/)

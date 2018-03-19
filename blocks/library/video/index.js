@@ -6,8 +6,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Placeholder, Toolbar, IconButton, Button } from '@wordpress/components';
+import {
+	Button,
+	FormFileUpload,
+	IconButton,
+	Placeholder,
+	Toolbar,
+} from '@wordpress/components';
 import { Component } from '@wordpress/element';
+import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -58,21 +65,20 @@ export const settings = {
 	},
 
 	edit: class extends Component {
-		constructor( { className } ) {
+		constructor() {
 			super( ...arguments );
 			// edit component has its own src in the state so it can be edited
 			// without setting the actual value outside of the edit UI
 			this.state = {
 				editing: ! this.props.attributes.src,
 				src: this.props.attributes.src,
-				className,
 			};
 		}
 
 		render() {
 			const { align, caption, id } = this.props.attributes;
-			const { setAttributes, isSelected } = this.props;
-			const { editing, className, src } = this.state;
+			const { setAttributes, isSelected, className } = this.props;
+			const { editing, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
@@ -94,20 +100,24 @@ export const settings = {
 				}
 				return false;
 			};
+			const setVideo = ( [ audio ] ) => onSelectVideo( audio );
+			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setVideo, 'video' );
 			const controls = isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
 					/>
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit video' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</Toolbar>
+					{ ! editing && (
+						<Toolbar>
+							<IconButton
+								className="components-icon-button components-toolbar__control"
+								label={ __( 'Edit video' ) }
+								onClick={ switchToEditing }
+								icon="edit"
+							/>
+						</Toolbar>
+					) }
 				</BlockControls>
 			);
 
@@ -133,6 +143,14 @@ export const settings = {
 								{ __( 'Use URL' ) }
 							</Button>
 						</form>
+						<FormFileUpload
+							isLarge
+							className="wp-block-video__upload-button"
+							onChange={ uploadFromFiles }
+							accept="video/*"
+						>
+							{ __( 'Upload' ) }
+						</FormFileUpload>
 						<MediaUpload
 							onSelect={ onSelectVideo }
 							type="video"

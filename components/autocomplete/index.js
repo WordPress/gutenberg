@@ -472,35 +472,36 @@ export class Autocomplete extends Component {
 				className="components-autocomplete"
 			>
 				{ children( { isExpanded, listBoxId, activeId } ) }
-				<Popover
-					isOpen={ isExpanded }
-					focusOnOpen={ false }
-					onClose={ this.reset }
-					position="top right"
-					className="components-autocomplete__popover"
-					getAnchorRect={ this.getWordRect }
-				>
-					<div
-						id={ listBoxId }
-						role="listbox"
-						className="components-autocomplete__results"
+				{ isExpanded && (
+					<Popover
+						focusOnMount={ false }
+						onClose={ this.reset }
+						position="top right"
+						className="components-autocomplete__popover"
+						getAnchorRect={ this.getWordRect }
 					>
-						{ isExpanded && map( filteredOptions, ( option, index ) => (
-							<Button
-								key={ option.key }
-								id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
-								role="option"
-								aria-selected={ index === selectedIndex }
-								className={ classnames( 'components-autocomplete__result', className, {
-									'is-selected': index === selectedIndex,
-								} ) }
-								onClick={ () => this.select( option ) }
-							>
-								{ option.label }
-							</Button>
-						) ) }
-					</div>
-				</Popover>
+						<div
+							id={ listBoxId }
+							role="listbox"
+							className="components-autocomplete__results"
+						>
+							{ isExpanded && map( filteredOptions, ( option, index ) => (
+								<Button
+									key={ option.key }
+									id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+									role="option"
+									aria-selected={ index === selectedIndex }
+									className={ classnames( 'components-autocomplete__result', className, {
+										'is-selected': index === selectedIndex,
+									} ) }
+									onClick={ () => this.select( option ) }
+								>
+									{ option.label }
+								</Button>
+							) ) }
+						</div>
+					</Popover>
+				) }
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */

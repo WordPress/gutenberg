@@ -53,7 +53,7 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `isSelected: Boolean`
 
-*Optional.* Whether to show the input is selected or not in order to show the formatting contros.
+*Optional.* Whether to show the input is selected or not in order to show the formatting controls.
 
 ### `keepPlaceholderOnFocus: Boolean`
 

@@ -16,6 +16,7 @@ import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
 import './style.scss';
 import BlockModeToggle from './block-mode-toggle';
 import BlockRemoveButton from './block-remove-button';
+import BlockDuplicateButton from './block-duplicate-button';
 import BlockTransformations from './block-transformations';
 import ReusableBlockSettings from './reusable-block-settings';
 import UnknownConverter from './unknown-converter';
@@ -25,6 +26,7 @@ function BlockSettingsMenu( {
 	uids,
 	onSelect,
 	focus,
+	rootUID,
 	renderBlockMenu = ( { children } ) => children }
 ) {
 	const count = uids.length;
@@ -62,6 +64,7 @@ function BlockSettingsMenu( {
 						count === 1 && <BlockModeToggle key="mode-toggle" uid={ uids[ 0 ] } onToggle={ onClose } />,
 						count === 1 && <UnknownConverter key="unknown-converter" uid={ uids[ 0 ] } />,
 						<BlockRemoveButton key="remove" uids={ uids } />,
+						<BlockDuplicateButton key="duplicate" uids={ uids } rootUID={ rootUID } />,
 						count === 1 && <ReusableBlockSettings key="reusable-block" uid={ uids[ 0 ] } onToggle={ onClose } />,
 						<BlockTransformations key="transformations" uids={ uids } onClick={ onClose } />,
 					] } ) }

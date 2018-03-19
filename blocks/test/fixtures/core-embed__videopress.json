@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-videopress\">\n    https://videopress.com/\n    <figcaption>Embedded content from videopress</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-videopress wp-block-embed\">\n    https://videopress.com/\n    <figcaption>Embedded content from videopress</figcaption>\n</figure>"
     }
 ]

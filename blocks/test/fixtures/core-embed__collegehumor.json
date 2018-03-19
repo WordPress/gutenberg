@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-collegehumor\">\n    https://collegehumor.com/\n    <figcaption>Embedded content from collegehumor</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-collegehumor wp-block-embed\">\n    https://collegehumor.com/\n    <figcaption>Embedded content from collegehumor</figcaption>\n</figure>"
     }
 ]

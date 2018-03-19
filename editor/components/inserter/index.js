@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { isEmpty } from 'lodash';
 
 /**
@@ -10,19 +8,14 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, withContext } from '@wordpress/components';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint } from '../../store/selectors';
-import {
-	insertBlock,
-	hideInsertionPoint,
-	showInsertionPoint,
-} from '../../store/actions';
 
 class Inserter extends Component {
 	constructor() {
@@ -51,7 +44,6 @@ class Inserter extends Component {
 			position,
 			children,
 			onInsertBlock,
-			insertionPoint,
 			hasSupportedBlocks,
 			isLocked,
 		} = this.props;
@@ -80,7 +72,7 @@ class Inserter extends Component {
 				) }
 				renderContent={ ( { onClose } ) => {
 					const onSelect = ( item ) => {
-						onInsertBlock( item, insertionPoint );
+						onInsertBlock( item );
 
 						onClose();
 					};
@@ -93,28 +85,24 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	connect(
-		( state, ownProps ) => {
-			return {
-				insertionPoint: getBlockInsertionPoint( state, ownProps.rootUID ),
-			};
+	withSelect( ( select ) => ( {
+		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint(),
+		selectedBlock: select( 'core/editor' ).getSelectedBlock(),
+	} ) ),
+	withDispatch( ( dispatch, ownProps ) => ( {
+		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
+		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
+		onInsertBlock: ( item ) => {
+			const { insertionPoint, selectedBlock } = ownProps;
+			const { index, rootUID, layout } = insertionPoint;
+			const { name, initialAttributes } = item;
+			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
+			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+				return dispatch( 'core/editor' ).replaceBlocks( selectedBlock.uid, insertedBlock );
+			}
+			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
 		},
-		( dispatch, ownProps ) => ( {
-			onInsertBlock( item, index ) {
-				const { rootUID, layout } = ownProps;
-				const { name, initialAttributes } = item;
-				dispatch( insertBlock(
-					createBlock( name, { ...initialAttributes, layout } ),
-					index,
-					rootUID,
-				) );
-			},
-			...bindActionCreators( {
-				showInsertionPoint,
-				hideInsertionPoint,
-			}, dispatch ),
-		} )
-	),
+	} ) ),
 	withContext( 'editor' )( ( settings ) => {
 		const { blockTypes, templateLock } = settings;
 

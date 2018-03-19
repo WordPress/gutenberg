@@ -11,6 +11,7 @@ export {
 	default as serialize,
 	getBlockContent,
 	getBlockDefaultClassname,
+	getBlockDefaultClassName,
 	getSaveElement,
 } from './serializer';
 export { isValidBlock } from './validation';
@@ -22,9 +23,17 @@ export {
 	getUnknownTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	getDefaultBlockForPostFormat,
 	getBlockType,
 	getBlockTypes,
+	getBlockSupport,
 	hasBlockSupport,
 	isReusableBlock,
 } from './registration';
-
+export {
+	isUnmodifiedDefaultBlock,
+} from './utils';
+export {
+	doBlocksMatchTemplate,
+	synchronizeBlocksWithTemplate,
+} from './templates';

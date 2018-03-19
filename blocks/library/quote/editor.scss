@@ -1,5 +1,9 @@
 .wp-block-quote {
 	margin: 0;
+
+	cite {
+		display: block;
+	}
 }
 
 .wp-block-quote:not(.is-large) {

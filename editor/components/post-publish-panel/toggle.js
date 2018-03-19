@@ -24,9 +24,20 @@ import {
 	getCurrentPostType,
 } from '../../store/selectors';
 
-function PostPublishPanelToggle( { user, isSaving, isPublishable, isSaveable, isPublished, isBeingScheduled, onToggle, isOpen } ) {
+function PostPublishPanelToggle( {
+	user,
+	isSaving,
+	isPublishable,
+	isSaveable,
+	isPublished,
+	isBeingScheduled,
+	onToggle,
+	isOpen,
+	forceIsDirty,
+	forceIsSaving,
+} ) {
 	const isButtonEnabled = (
-		! isSaving && isPublishable && isSaveable
+		! isSaving && ! forceIsSaving && isPublishable && isSaveable
 	) || isPublished;
 
 	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
@@ -34,7 +45,7 @@ function PostPublishPanelToggle( { user, isSaving, isPublishable, isSaveable, is
 	const showToggle = ! isContributor && ! isPublished && ! isBeingScheduled;
 
 	if ( ! showToggle ) {
-		return <PostPublishButton />;
+		return <PostPublishButton forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />;
 	}
 
 	return (

@@ -1,4 +1,4 @@
-This component is used to embed embeds!
+This component provides an isolated environment for arbitrary HTML via iframes. 
 
 #### To test
 
