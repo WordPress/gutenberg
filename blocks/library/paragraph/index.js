@@ -93,19 +93,8 @@ class ParagraphBlock extends Component {
 
 	setFontSize( fontSize ) {
 		const { setAttributes } = this.props;
-		const size = findKey( FONT_SIZES, ( value ) => value === fontSize );
 
-		let textClass;
-		if ( size ) {
-			textClass = `is-${ size }-text`;
-		}
-
-		setAttributes( { fontSize, textClass } );
-	}
-
-	getFontSize() {
-		const { fontSize, textClass } = this.props.attributes;
-		return FONT_SIZES[ textClass ] || fontSize;
+		setAttributes( { fontSize } );
 	}
 
 	render() {
@@ -155,8 +144,8 @@ class ParagraphBlock extends Component {
 									<Button
 										key={ label }
 										isLarge
-										isPrimary={ attributes.textClass === `is-${ size }-text` }
-										aria-pressed={ attributes.textClass === `is-${ size }-text` }
+										isPrimary={ fontSize === FONT_SIZES[ size ] }
+										aria-pressed={ fontSize === FONT_SIZES[ size ] }
 										onClick={ () => this.setFontSize( FONT_SIZES[ size ] ) }
 									>
 										{ label }
@@ -172,7 +161,7 @@ class ParagraphBlock extends Component {
 						</div>
 						<RangeControl
 							label={ __( 'Custom Size' ) }
-							value={ this.getFontSize() || '' }
+							value={ fontSize || '' }
 							onChange={ ( value ) => this.setFontSize( value ) }
 							min={ 12 }
 							max={ 100 }
@@ -295,9 +284,6 @@ const schema = {
 	fontSize: {
 		type: 'number',
 	},
-	textClass: {
-		type: 'string',
-	},
 };
 
 export const name = 'core/paragraph';
@@ -377,20 +363,21 @@ export const settings = {
 			dropCap,
 			backgroundColor,
 			textColor,
-			textClass,
 			fontSize,
 		} = attributes;
+
+		const thresholdFontSize = findKey( FONT_SIZES, ( size ) => size === fontSize );
 
 		const className = classnames( {
 			[ `align${ width }` ]: width,
 			'has-background': backgroundColor,
 			'has-drop-cap': dropCap,
-		}, textClass );
+		}, thresholdFontSize ? `is-${ thresholdFontSize }-text` : undefined );
 
 		const styles = {
 			backgroundColor: backgroundColor,
 			color: textColor,
-			fontSize: textClass ? null : fontSize,
+			fontSize: thresholdFontSize ? null : fontSize,
 			textAlign: align,
 		};
 
