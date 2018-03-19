@@ -23,7 +23,7 @@ import createSelector from 'rememo';
 import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-import { wpmoment } from '@wordpress/date';
+import { moment } from '@wordpress/date';
 
 /***
  * Module constants
@@ -275,7 +275,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && wpmoment( post.date ).isBefore( wpmoment() ) );
+		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
 }
 
 /**
@@ -330,9 +330,9 @@ export function isEditedPostEmpty( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = wpmoment( getEditedPostAttribute( state, 'date' ) );
+	const date = moment( getEditedPostAttribute( state, 'date' ) );
 	// Adding 1 minute as an error threshold between the server and the client dates.
-	const now = wpmoment().add( 1, 'minute' );
+	const now = moment().add( 1, 'minute' );
 
 	return date.isAfter( now );
 }

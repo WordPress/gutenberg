@@ -1,24 +1,24 @@
-import moment from 'moment';
+import momentLib from 'moment';
 import 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
 export const settings = window._wpDateSettings;
 
 // Create WP timezone based off dateSettings.
-const offsets = ( settings.timezone.string ) ? moment.tz.zone( settings.timezone.string ).offsets : [ -settings.timezone.offset * 60 ];
+const offsets = ( settings.timezone.string ) ? momentLib.tz.zone( settings.timezone.string ).offsets : [ -settings.timezone.offset * 60 ];
 const momentTimezone = {
 	name: 'WP',
 	abbrs: [ 'WP' ],
 	untils: [ null ],
 	offsets: [ offsets ],
 };
-moment.tz.add( moment.tz.pack( momentTimezone ) );
+momentLib.tz.add( momentLib.tz.pack( momentTimezone ) );
 
-// Create a new wpmoment object which mirrors moment but includes
+// Create a new moment object which mirrors moment but includes
 // the attached timezone, instead of setting a default timezone on
 // the global moment object.
-export const wpmoment = ( ...args ) => {
-	return moment.tz( ...args, 'WP' );
+export const moment = ( ...args ) => {
+	return momentLib.tz( ...args, 'WP' );
 };
 
 // Date constants.
@@ -133,7 +133,7 @@ const formatMap = {
 	 * @return {string} Formatted date.
 	 */
 	B( momentDate ) {
-		const timezoned = moment( momentDate ).utcOffset( 60 );
+		const timezoned = momentLib( momentDate ).utcOffset( 60 );
 		const seconds = parseInt( timezoned.format( 's' ), 10 ),
 			minutes = parseInt( timezoned.format( 'm' ), 10 ),
 			hours = parseInt( timezoned.format( 'H' ), 10 );
@@ -196,8 +196,8 @@ const formatMap = {
  */
 function setupLocale( localSettings ) {
 	// Backup and restore current locale.
-	const currentLocale = moment.locale();
-	moment.updateLocale( localSettings.l10n.locale, {
+	const currentLocale = momentLib.locale();
+	momentLib.updateLocale( localSettings.l10n.locale, {
 		// Inherit anything missing from the default locale.
 		parentLocale: currentLocale,
 		months: localSettings.l10n.months,
@@ -236,7 +236,7 @@ function setupLocale( localSettings ) {
 			yy: '%d years',
 		},
 	} );
-	moment.locale( currentLocale );
+	momentLib.locale( currentLocale );
 }
 
 /**
@@ -252,7 +252,7 @@ function setupLocale( localSettings ) {
 export function format( dateFormat, dateValue = new Date() ) {
 	let i, char;
 	let newFormat = [];
-	const momentDate = moment( dateValue );
+	const momentDate = momentLib( dateValue );
 	for ( i = 0; i < dateFormat.length; i++ ) {
 		char = dateFormat[ i ];
 		// Is this an escape?
@@ -292,7 +292,7 @@ export function format( dateFormat, dateValue = new Date() ) {
  */
 export function date( dateFormat, dateValue = new Date() ) {
 	const offset = window._wpDateSettings.timezone.offset * HOUR_IN_MINUTES;
-	const dateMoment = moment( dateValue ).utcOffset( offset, true );
+	const dateMoment = momentLib( dateValue ).utcOffset( offset, true );
 	return format( dateFormat, dateMoment );
 }
 
@@ -307,7 +307,7 @@ export function date( dateFormat, dateValue = new Date() ) {
  * @return {string} Formatted date.
  */
 export function gmdate( dateFormat, dateValue = new Date() ) {
-	const dateMoment = moment( dateValue ).utc();
+	const dateMoment = momentLib( dateValue ).utc();
 	return format( dateFormat, dateMoment );
 }
 
@@ -327,7 +327,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 	// Defaults.
 	const offset = gmt ? 0 : window._wpDateSettings.timezone.offset * HOUR_IN_MINUTES;
 	// Convert to moment object.
-	const dateMoment = moment( dateValue ).utcOffset( offset, true );
+	const dateMoment = momentLib( dateValue ).utcOffset( offset, true );
 
 	// Set the locale.
 	dateMoment.locale( window._wpDateSettings.l10n.locale );

@@ -8,7 +8,7 @@ import { filter, property, union } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { registerBlockType, unregisterBlockType, registerCoreBlocks, getBlockTypes } from '@wordpress/blocks';
-import { wpmoment } from '@wordpress/date';
+import { moment } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -990,7 +990,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						edits: { date: wpmoment().add( 7, 'days' ).format( '' ) },
+						edits: { date: moment().add( 7, 'days' ).format( '' ) },
 					},
 				},
 			};
