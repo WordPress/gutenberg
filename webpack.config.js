@@ -4,6 +4,7 @@
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const { reduce, escapeRegExp, castArray, get } = require( 'lodash' );
 const { basename } = require( 'path' );
 
@@ -198,6 +199,10 @@ const config = {
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
+		new CopyWebpackPlugin( [ {
+			from: 'blocks/library/visitor-counter/digital-7.ttf',
+			to: 'blocks/build/digital-7.ttf',
+		} ] ),
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',

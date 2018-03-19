@@ -1,0 +1,66 @@
+$visitor-counter-border-width: 5px;
+
+@font-face {
+	font-family: 'Digital-7';
+	src: url( 'digital-7.ttf' );
+}
+
+.wp-block-visitor-counter {
+	background-color: #000000;
+	position: relative;
+	border: 1px solid #000000;
+	padding: calc( 1px + #{$visitor-counter-border-width} );
+	display: inline-block;
+
+	.visitor-counter-border {
+		position: absolute;
+	}
+	
+	.visitor-counter-top-border {
+		width: 100%;
+		height: $visitor-counter-border-width;
+		top: 0;
+		left: 0;
+		background-image: linear-gradient(to top, #273703, #577aa6 53%, #b3c6eb);
+		clip-path: polygon( 0 0, 100% 0, calc( 100% - #{$visitor-counter-border-width} ) 100%, $visitor-counter-border-width 100% );
+	}
+
+	.visitor-counter-right-border {
+		width: $visitor-counter-border-width;
+		height: 100%;
+		top: 0;
+		right: 0;
+		background-image: linear-gradient(to right, #273703, #577aa6 53%, #b3c6eb);
+		clip-path: polygon( 0 $visitor-counter-border-width, 100% 0, 100% 100%, 0 calc( 100% - #{$visitor-counter-border-width} ) );
+	}
+
+	.visitor-counter-bottom-border {
+		width: 100%;
+		height: $visitor-counter-border-width;
+		bottom: 0;
+		left: 0;
+		background-image: linear-gradient(to bottom, #273703, #577aa6 53%, #b3c6eb);
+		clip-path: polygon( $visitor-counter-border-width 0, calc( 100% - #{$visitor-counter-border-width} ) 0, 100% 100%, 0 100% );
+	}
+
+	.visitor-counter-left-border {
+		width: $visitor-counter-border-width;
+		height: 100%;
+		top: 0;
+		left: 0;
+		background-image: linear-gradient(to left, #273703, #577aa6 53%, #b3c6eb);
+		clip-path: polygon( 0 0, 100% $visitor-counter-border-width, 100% calc( 100% - #{$visitor-counter-border-width} ), 0 100% );
+	}
+
+	.visitor-counter-digits {
+		font-family: Digital-7;
+		font-size: 25px;
+		font-weight: normal;
+		font-style: normal;
+		font-stretch: normal;
+		line-height: normal;
+		letter-spacing: normal;
+		color: #00ff00;
+		text-align: right;
+	}
+}

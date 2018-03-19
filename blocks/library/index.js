@@ -22,17 +22,20 @@ import * as freeform from './freeform';
 import * as html from './html';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as map from './map';
 import * as more from './more';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
 import * as separator from './separator';
+import * as slideshow from './slideshow';
 import * as shortcode from './shortcode';
 import * as subhead from './subhead';
 import * as table from './table';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as visitorcounter from './visitor-counter';
 
 export const registerCoreBlocks = () => {
 	[
@@ -78,16 +81,19 @@ export const registerCoreBlocks = () => {
 		freeform,
 		html,
 		latestPosts,
+		map,
 		more,
 		preformatted,
 		pullquote,
 		reusableBlock,
 		separator,
+		slideshow,
 		subhead,
 		table,
 		textColumns,
 		verse,
 		video,
+		visitorcounter,
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );
