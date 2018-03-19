@@ -1,4 +1,4 @@
-# HEAD
+# 13.0.0
 
 -   Added: stylelint `9.1.3` support.
 -   Changed: Updated `stylelint` peer dependency version to `^9.1.3`.

@@ -1,6 +1,6 @@
 {
 	"name": "stylelint-config-wordpress",
-	"version": "12.0.0",
+	"version": "13.0.0",
 	"description": "WordPress shareable config for stylelint",
 	"keywords": [
 		"code",
