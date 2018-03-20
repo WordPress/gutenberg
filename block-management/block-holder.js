@@ -35,7 +35,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	render() {
 		// TODO: This is a place holder, this should call the edit() method of the block depending on this.props.blockType
 		if ( this.props.blockType === 'code' ) {
-			Code = codeBlock.edit;
+			const Code = codeBlock.edit;
 			return (
 				<TouchableWithoutFeedback
 					onPress={ this.props.onBlockHolderPressed.bind( this, this.props.index ) }
