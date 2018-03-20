@@ -87,7 +87,7 @@ export function removeProvisionalBlock( action, store ) {
 	const state = store.getState();
 	const provisionalBlockUID = getProvisionalBlockUID( state );
 	if ( provisionalBlockUID && ! isBlockSelected( state, provisionalBlockUID ) ) {
-		return removeBlock( provisionalBlockUID, true );
+		return removeBlock( provisionalBlockUID, false );
 	}
 }
 
@@ -572,8 +572,8 @@ export default {
 	MULTI_SELECT: removeProvisionalBlock,
 
 	REMOVE_BLOCKS( action, { getState, dispatch } ) {
-		// if we are removing the provisional block don't do anything.
-		if ( action.isProvisionalBlock ) {
+		// if the action says previous block should not be selected don't do anything.
+		if ( ! action.selectPrevious ) {
 			return;
 		}
 
