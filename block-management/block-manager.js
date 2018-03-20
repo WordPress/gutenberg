@@ -6,6 +6,7 @@
 import React from 'react';
 import { StyleSheet, Text, View, FlatList, TextInput } from 'react-native';
 import BlockHolder from './block-holder';
+import { ToolbarButton } from './constants';
 
 export default class BlockManager extends React.Component<
 	{},
@@ -54,22 +55,22 @@ export default class BlockManager extends React.Component<
 		console.log( 'Button: ' + button + ' - index: ' + index );
 		var blocks = this.state.blocks;
 		switch ( button ) {
-			case 'up':
+			case ToolbarButton.UP:
 				if ( index == 0 ) return;
 				var tmp = blocks[ index ];
 				blocks[ index ] = blocks[ index - 1 ];
 				blocks[ index - 1 ] = tmp;
 				break;
-			case 'down':
+			case ToolbarButton.DOWN:
 				if ( index == blocks.length - 1 ) return;
 				var tmp = blocks[ index ];
 				blocks[ index ] = blocks[ index + 1 ];
 				blocks[ index + 1 ] = tmp;
 				break;
-			case 'delete':
+			case ToolbarButton.DELETE:
 				blocks.splice( index, 1 );
 				break;
-			case 'settings':
+			case ToolbarButton.SETTINGS:
 				// TODO: implement settings
 				break;
 		}

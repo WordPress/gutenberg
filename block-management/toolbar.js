@@ -2,51 +2,48 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
+import { ToolbarButton } from './constants';
 
 export default class Toolbar extends React.Component<{
 	index: number,
-	onButtonPressed: ( button: string, index: number ) => void,
+	onButtonPressed: ( button: number, index: number ) => void,
 }> {
 	constructor( props: {
 		index: number,
-		onButtonPressed: ( button: string, index: number ) => void,
+		onButtonPressed: ( button: number, index: number ) => void,
 	} ) {
 		super( props );
-	}
-
-	onPressUp() {
-		this.props.onButtonPressed( 'up', this.props.index );
-	}
-
-	onPressDown() {
-		this.props.onButtonPressed( 'down', this.props.index );
-	}
-
-	onPressSettings() {
-		this.props.onButtonPressed( 'setting', this.props.index );
-	}
-
-	onPressDelete() {
-		this.props.onButtonPressed( 'delete', this.props.index );
 	}
 
 	render() {
 		return (
 			<View style={ styles.toolbar }>
-				<Button style={ styles.toolbarButton } onPress={ this.onPressUp.bind( this ) } title="Up" />
 				<Button
 					style={ styles.toolbarButton }
-					onPress={ this.onPressDown.bind( this ) }
+					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.UP, this.props.index ) }
+					title="Up"
+				/>
+				<Button
+					style={ styles.toolbarButton }
+					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DOWN, this.props.index ) }
 					title="Down"
 				/>
 				<Button
 					style={ styles.toolbarButton }
-					onPress={ this.onPressSettings.bind( this ) }
+					onPress={ this.props.onButtonPressed.bind(
+						this,
+						ToolbarButton.SETTINGS,
+						this.props.index
+					) }
 					title="Settings"
 				/>
 				<Button
 					style={ styles.toolbarButton }
-					onPress={ this.onPressDelete.bind( this ) }
+					onPress={ this.props.onButtonPressed.bind(
+						this,
+						ToolbarButton.DELETE,
+						this.props.index
+					) }
 					title="Delete"
 				/>
 			</View>
