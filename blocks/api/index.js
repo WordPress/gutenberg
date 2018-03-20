@@ -33,3 +33,7 @@ export {
 export {
 	isUnmodifiedDefaultBlock,
 } from './utils';
+export {
+	doBlocksMatchTemplate,
+	synchronizeBlocksWithTemplate,
+} from './templates';

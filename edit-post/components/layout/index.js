@@ -19,6 +19,7 @@ import {
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/element';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -31,12 +32,13 @@ import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import PluginsPanel from '../../components/plugins-panel/index.js';
+import PluginSidebar from '../plugin-sidebar';
 
 function Layout( {
 	mode,
 	editorSidebarOpened,
 	pluginSidebarOpened,
+	sidebarName,
 	publishSidebarOpened,
 	hasFixedToolbar,
 	closePublishSidebar,
@@ -81,8 +83,9 @@ function Layout( {
 				/>
 			) }
 			{ editorSidebarOpened && <Sidebar /> }
-			{ pluginSidebarOpened && <PluginsPanel /> }
+			{ pluginSidebarOpened && <PluginSidebar.Slot name={ sidebarName } /> }
 			<Popover.Slot />
+			<PluginArea />
 		</div>
 	);
 }
@@ -92,6 +95,7 @@ export default compose(
 		mode: select( 'core/edit-post' ).getEditorMode(),
 		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
+		sidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
 		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),

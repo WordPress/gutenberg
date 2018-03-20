@@ -21,7 +21,7 @@ import Layout from './components/layout';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 
-export * from './api';
+import PluginSidebar from './components/plugin-sidebar';
 
 // Configure moment globally
 moment.locale( dateSettings.l10n.locale );
@@ -109,3 +109,7 @@ export function initializeEditor( id, post, settings ) {
 		},
 	};
 }
+
+export const __experimental = {
+	PluginSidebar,
+};
