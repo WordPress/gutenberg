@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { findKey, map } from 'lodash';
+import { findKey, isFinite, map, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -344,6 +344,40 @@ export const settings = {
 	},
 
 	deprecated: [
+		{
+			supports,
+			attributes: omit( {
+				...schema,
+				fontSize: {
+					type: 'number',
+				},
+			}, 'customFontSize' ),
+			save( { attributes } ) {
+				const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+				const className = classnames( {
+					[ `align${ width }` ]: width,
+					'has-background': backgroundColor,
+					'has-drop-cap': dropCap,
+				} );
+				const styles = {
+					backgroundColor: backgroundColor,
+					color: textColor,
+					fontSize: fontSize,
+					textAlign: align,
+				};
+
+				return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+			},
+			migrate( attributes ) {
+				if ( isFinite( attributes.fontSize ) ) {
+					return omit( {
+						...attributes,
+						customFontSize: attributes.fontSize,
+					}, 'fontSize' );
+				}
+				return attributes;
+			},
+		},
 		{
 			supports,
 			attributes: {
