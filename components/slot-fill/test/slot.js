@@ -82,6 +82,27 @@ describe( 'Slot', () => {
 		expect( element.find( 'Slot > div' ).html() ).toBe( '<div><span></span><div></div>text</div>' );
 	} );
 
+	it( 'calls the functions passed as the Slot\'s fillProps in the Fill', () => {
+		const onClose = jest.fn();
+		const onOpen = jest.fn();
+
+		mount(
+			<Provider>
+				<Slot name="chicken" bubblesVirtually fillProps={ { onClose: onClose, onOpen: onOpen } } />
+				<Fill name="chicken">
+					{ ( props ) => {
+						props.onClose();
+						props.onOpen();
+						return null;
+					} };
+				</Fill>
+			</Provider>
+		);
+
+		expect( onClose ).toHaveBeenCalled();
+		expect( onOpen ).toHaveBeenCalled();
+	} );
+
 	it( 'should re-render Slot when not bubbling virtually', () => {
 		const element = mount(
 			<Provider>
