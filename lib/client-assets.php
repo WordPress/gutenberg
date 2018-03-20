@@ -802,6 +802,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// to disable it outright.
 	wp_enqueue_script( 'heartbeat' );
 
+	// Ignore Classic Editor's `rich_editing` user option, aka "Disable visual
+	// editor". Forcing this to be true guarantees that TinyMCE and its plugins
+	// are available in Gutenberg. Fixes
+	// https://github.com/WordPress/gutenberg/issues/5667.
+	add_filter( 'user_can_richedit', '__return_true' );
+
 	wp_enqueue_script( 'wp-edit-post' );
 
 	// Register `wp-utils` as a dependency of `word-count` to ensure that
