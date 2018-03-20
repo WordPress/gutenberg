@@ -19,7 +19,6 @@ import {
 } from '@wordpress/utils';
 import {
 	BlockEdit,
-	createBlock,
 	cloneBlock,
 	getBlockType,
 	getSaveElement,
@@ -73,7 +72,7 @@ import {
 	getSelectedBlocksInitialCaretPosition,
 } from '../../store/selectors';
 
-const { BACKSPACE, DELETE, ENTER } = keycodes;
+const { BACKSPACE, DELETE, ENTER, ESCAPE } = keycodes;
 
 export class BlockListBlock extends Component {
 	constructor() {
@@ -88,7 +87,7 @@ export class BlockListBlock extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
-		this.deleteOrInsertAfterWrapper = this.deleteOrInsertAfterWrapper.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
@@ -160,10 +159,10 @@ export class BlockListBlock extends Component {
 	}
 
 	/**
-	 * When a block becomces selected, transition focus to an inner tabbable.
+	 * When a block becomes selected, transition focus to an inner tabbable.
 	 */
 	focusTabbable() {
-		const { initialPosition } = this.props;
+		const { initialPosition, keyboardMode } = this.props;
 
 		// Focus is captured by the wrapper node, so while focus transition
 		// should only consider tabbables within editable display, since it
@@ -173,12 +172,28 @@ export class BlockListBlock extends Component {
 			return;
 		}
 
+		// In navigation mode, we should select the parent node only
+		// This could be triggered when we remove a block from navigation mode (backspace)
+		if ( keyboardMode === 'navigation' ) {
+			this.wrapperNode.focus();
+			return;
+		}
+
+		this.focusFirstTextFieldOrContainer( -1 === initialPosition );
+	}
+
+	/**
+	 * Function focusing the first text field of the current block when called.
+	 * Fallback to the block container if no text field
+	 *
+	 * @param {boolean} isReverse select begining or end of the current block
+	 */
+	focusFirstTextFieldOrContainer( isReverse ) {
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable.find( this.node ).filter( isTextField );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
-		const isReverse = -1 === initialPosition;
 		const target = ( isReverse ? last : first )( textInputs );
 
 		if ( ! target ) {
@@ -350,32 +365,37 @@ export class BlockListBlock extends Component {
 	}
 
 	/**
-	 * Interprets keydown event intent to remove or insert after block if key
+	 * Interprets keydown event intent to switch keyboard mode and remove or insert after block if key
 	 * event occurs on wrapper node. This can occur when the block has no text
 	 * fields of its own, particularly after initial insertion, to allow for
 	 * easy deletion and continuous writing flow to add additional content.
 	 *
 	 * @param {KeyboardEvent} event Keydown event.
 	 */
-	deleteOrInsertAfterWrapper( event ) {
+	onKeyDown( event ) {
 		const { keyCode, target } = event;
+		const { keyboardMode, onChangeKeyboardMode } = this.props;
 
-		if ( target !== this.wrapperNode || this.props.isLocked ) {
-			return;
-		}
+		const isWrapperFocused = target === this.wrapperNode;
 
+		// Keyboard navigation events
 		switch ( keyCode ) {
 			case ENTER:
-				// Insert default block after current block if enter and event
-				// not already handled by descendant.
-				this.props.onInsertBlocks( [
-					createBlock( 'core/paragraph' ),
-				], this.props.order + 1 );
-				event.preventDefault();
+				if ( isWrapperFocused && keyboardMode === 'navigation' ) {
+					event.preventDefault();
+					onChangeKeyboardMode( 'edit' );
+					this.focusFirstTextFieldOrContainer();
+				}
 				break;
-
+			case ESCAPE:
+				onChangeKeyboardMode( 'navigation' );
+				this.wrapperNode.focus();
+				break;
 			case BACKSPACE:
 			case DELETE:
+				if ( ! isWrapperFocused ) {
+					return;
+				}
 				// Remove block on backspace.
 				const { uid, onRemove, previousBlockUid, onSelect } = this.props;
 				onRemove( uid );
@@ -485,7 +505,7 @@ export class BlockListBlock extends Component {
 				onTouchStart={ this.onTouchStart }
 				onFocus={ this.onFocus }
 				onClick={ this.onClick }
-				onKeyDown={ this.deleteOrInsertAfterWrapper }
+				onKeyDown={ this.onKeyDown }
 				tabIndex="0"
 				childHandledEvents={ [
 					'onDragStart',

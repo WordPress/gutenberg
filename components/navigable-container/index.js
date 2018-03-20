@@ -65,10 +65,14 @@ class NavigableContainer extends Component {
 			this.props.onKeyDown( event );
 		}
 
+		if ( this.props.disabled ) {
+			return;
+		}
+
 		const { getFocusableContext } = this;
 		const { cycle = true, eventToOffset, onNavigate = noop, stopNavigationEvents } = this.props;
 
-		const offset = eventToOffset( event );
+		const offset = eventToOffset( event, this.container );
 
 		// eventToOffset returns undefined if the event is not handled by the component
 		if ( offset !== undefined && stopNavigationEvents ) {
@@ -111,7 +115,7 @@ class NavigableContainer extends Component {
 					'onlyBrowserTabstops',
 				] ) }
 				onKeyDown={ this.onKeyDown }
-				onFocus={ this.onFocus }>
+			>
 				{ children }
 			</div>
 		);
@@ -160,9 +164,9 @@ export class NavigableMenu extends Component {
 
 export class TabbableContainer extends Component {
 	render() {
-		const eventToOffset = ( evt ) => {
-			const { keyCode, shiftKey } = evt;
-			if ( TAB === keyCode ) {
+		const eventToOffset = ( evt, container ) => {
+			const { keyCode, shiftKey, target } = evt;
+			if ( TAB === keyCode && target.parentElement === container ) {
 				return shiftKey ? -1 : 1;
 			}
 
