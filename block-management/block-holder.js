@@ -12,7 +12,7 @@ export default class BlockHolder extends React.Component<
 		index: number,
 		blockType: string,
 		content: string,
-		onToolbarButtonPressed: ( button: string, index: number ) => void,
+		onToolbarButtonPressed: ( button: number, index: number ) => void,
 	},
 	{ selected: boolean, focused: boolean }
 > {
@@ -24,7 +24,7 @@ export default class BlockHolder extends React.Component<
 		index: number,
 		blockType: string,
 		content: string,
-		onToolbarButtonPressed: ( button: string, index: number ) => void,
+		onToolbarButtonPressed: ( button: number, index: number ) => void,
 	} ) {
 		super( props );
 	}

@@ -51,7 +51,7 @@ export default class BlockManager extends React.Component<
 		};
 	}
 
-	onToolbarButtonPressed( button: string, index: number ) {
+	onToolbarButtonPressed( button: number, index: number ) {
 		console.log( 'Button: ' + button + ' - index: ' + index );
 		var blocks = this.state.blocks;
 		switch ( button ) {
