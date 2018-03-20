@@ -7,6 +7,9 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Toolbar from './toolbar';
 
+// Gutenberg imports
+import { settings as codeBlock } from '../gutenberg/blocks/library/code';
+
 type PropsType = {
 	index: number,
 	blockType: string,
@@ -31,6 +34,26 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 
 	render() {
 		// TODO: This is a place holder, this should call the edit() method of the block depending on this.props.blockType
+		if ( this.props.blockType === 'code' ) {
+			Code = codeBlock.edit;
+			return (
+				<TouchableWithoutFeedback
+					onPress={ this.props.onBlockHolderPressed.bind( this, this.props.index ) }
+				>
+					<View style={ styles.blockHolder }>
+						<View style={ styles.blockTitle }>
+							<Text>BlockType: { this.props.blockType }</Text>
+						</View>
+						<Code
+							attributes={ { content: this.props.content } }
+							setAttributes={ attrs => console.log( { attrs } ) }
+						/>
+						{ this.renderToolbarIfBlockFocused.bind( this )() }
+					</View>
+				</TouchableWithoutFeedback>
+			);
+		}
+
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.index ) }

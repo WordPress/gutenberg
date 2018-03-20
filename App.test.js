@@ -2,6 +2,7 @@
 
 import React from 'react';
 import App from './App';
+import BlockHolder from './block-management/block-holder';
 
 import renderer from 'react-test-renderer';
 
@@ -10,8 +11,17 @@ it( 'renders without crashing', () => {
 	expect( rendered ).toBeTruthy();
 } );
 
-it( "returns RN's View container and ", () => {
-	const rendered = renderer.create( <App /> ).toJSON();
-	expect( rendered.type ).toBe( 'View' ); // parent container
-	expect( rendered.children[ 0 ].type ).toBe( 'View' ); // "Code" block
+it( 'Code block is a TextInput', () => {
+	renderer
+		.create( <App /> )
+		.root.findAllByType( BlockHolder )
+		.forEach( blockHolder => {
+			if ( blockHolder.props.blockType === 'code' ) {
+				const blockHolderContainer = blockHolder.children[ 0 ].children[ 0 ].children[ 0 ];
+				const contentComponent = blockHolderContainer.children[ 1 ];
+				const inputComponent =
+					contentComponent.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ];
+				expect( inputComponent.type ).toBe( 'TextInput' );
+			}
+		} );
 } );
