@@ -4,6 +4,7 @@
 import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues } from 'lodash';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -35,7 +36,7 @@ export function globalListener() {
  * Convenience for registering reducer with actions and selectors.
  *
  * @param {string} reducerKey Reducer key.
- * @param {Object} options    Store description (reducer, actions, selectors).
+ * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
  *
  * @return {Object} Registered store object.
  */
@@ -52,6 +53,10 @@ export function registerStore( reducerKey, options ) {
 
 	if ( options.selectors ) {
 		registerSelectors( reducerKey, options.selectors );
+	}
+
+	if ( options.resolvers ) {
+		registerResolvers( reducerKey, options.resolvers );
 	}
 
 	return store;
@@ -114,6 +119,55 @@ export function registerSelectors( reducerKey, newSelectors ) {
 	const store = stores[ reducerKey ];
 	const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
 	selectors[ reducerKey ] = mapValues( newSelectors, createStateSelector );
+}
+
+/**
+ * Registers resolvers for a given reducer key. Resolvers are side effects
+ * invoked once per argument set of a given selector call, used in ensuring
+ * that the data needs for the selector are satisfied.
+ *
+ * @param {string} reducerKey   Part of the state shape to register the
+ *                              resolvers for.
+ * @param {Object} newResolvers Resolvers to register.
+ */
+export function registerResolvers( reducerKey, newResolvers ) {
+	const createResolver = ( selector, key ) => {
+		// Don't modify selector behavior if no resolver exists.
+		if ( ! newResolvers.hasOwnProperty( key ) ) {
+			return selector;
+		}
+
+		// Ensure single invocation per argument set via memoization.
+		const fulfill = memoize( async ( ...args ) => {
+			const store = stores[ reducerKey ];
+
+			// At this point, selectors have already been pre-bound to inject
+			// state, it would not be otherwise provided to fulfill.
+			const state = store.getState();
+
+			let fulfillment = newResolvers[ key ]( state, ...args );
+
+			// Attempt to normalize fulfillment as async iterable.
+			fulfillment = toAsyncIterable( fulfillment );
+			if ( ! isAsyncIterable( fulfillment ) ) {
+				return;
+			}
+
+			for await ( const maybeAction of fulfillment ) {
+				// Dispatch if it quacks like an action.
+				if ( isActionLike( maybeAction ) ) {
+					store.dispatch( maybeAction );
+				}
+			}
+		} );
+
+		return ( ...args ) => {
+			fulfill( ...args );
+			return selector( ...args );
+		};
+	};
+
+	selectors[ reducerKey ] = mapValues( selectors[ reducerKey ], createResolver );
 }
 
 /**
@@ -298,6 +352,78 @@ export const withDispatch = ( mapDispatchToProps ) => ( WrappedComponent ) => {
 
 	return ComponentWithDispatch;
 };
+
+/**
+ * Returns true if the given argument appears to be a dispatchable action.
+ *
+ * @param {*} action Object to test.
+ *
+ * @return {boolean} Whether object is action-like.
+ */
+export function isActionLike( action ) {
+	return (
+		!! action &&
+		typeof action.type === 'string'
+	);
+}
+
+/**
+ * Returns true if the given object is an async iterable, or false otherwise.
+ *
+ * @param {*} object Object to test.
+ *
+ * @return {boolean} Whether object is an async iterable.
+ */
+export function isAsyncIterable( object ) {
+	return (
+		!! object &&
+		typeof object[ Symbol.asyncIterator ] === 'function'
+	);
+}
+
+/**
+ * Returns true if the given object is iterable, or false otherwise.
+ *
+ * @param {*} object Object to test.
+ *
+ * @return {boolean} Whether object is iterable.
+ */
+export function isIterable( object ) {
+	return (
+		!! object &&
+		typeof object[ Symbol.iterator ] === 'function'
+	);
+}
+
+/**
+ * Normalizes the given object argument to an async iterable, asynchronously
+ * yielding on a singular or array of generator yields or promise resolution.
+ *
+ * @param {*} object Object to normalize.
+ *
+ * @return {AsyncGenerator} Async iterable actions.
+ */
+export function toAsyncIterable( object ) {
+	if ( isAsyncIterable( object ) ) {
+		return object;
+	}
+
+	return ( async function* () {
+		// Normalize as iterable...
+		if ( ! isIterable( object ) ) {
+			object = [ object ];
+		}
+
+		for ( let maybeAction of object ) {
+			// ...of Promises.
+			if ( ! ( maybeAction instanceof Promise ) ) {
+				maybeAction = Promise.resolve( maybeAction );
+			}
+
+			yield await maybeAction;
+		}
+	}() );
+}
 
 export const query = ( mapSelectToProps ) => {
 	deprecated( 'wp.data.query', {

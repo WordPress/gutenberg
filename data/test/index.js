@@ -15,12 +15,17 @@ import {
 	registerStore,
 	registerReducer,
 	registerSelectors,
+	registerResolvers,
 	registerActions,
 	dispatch,
 	select,
 	withSelect,
 	withDispatch,
 	subscribe,
+	isActionLike,
+	isAsyncIterable,
+	isIterable,
+	toAsyncIterable,
 } from '../';
 
 jest.mock( '@wordpress/utils', () => ( {
@@ -70,6 +75,217 @@ describe( 'registerReducer', () => {
 
 		const store2 = registerReducer( 'red2', reducer2 );
 		expect( store2.getState() ).toEqual( 'ribs' );
+	} );
+} );
+
+describe( 'registerResolvers', () => {
+	const unsubscribes = [];
+	afterEach( () => {
+		let unsubscribe;
+		while ( ( unsubscribe = unsubscribes.shift() ) ) {
+			unsubscribe();
+		}
+	} );
+
+	function subscribeWithUnsubscribe( ...args ) {
+		const unsubscribe = subscribe( ...args );
+		unsubscribes.push( unsubscribe );
+		return unsubscribe;
+	}
+
+	it( 'should not do anything for selectors which do not have resolvers', () => {
+		registerReducer( 'demo', ( state = 'OK' ) => state );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {} );
+
+		expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+	} );
+
+	it( 'should behave as a side effect for the given selector, with arguments', () => {
+		const resolver = jest.fn();
+
+		registerReducer( 'demo', ( state = 'OK' ) => state );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: resolver,
+		} );
+
+		const value = select( 'demo' ).getValue( 'arg1', 'arg2' );
+		expect( value ).toBe( 'OK' );
+		expect( resolver ).toHaveBeenCalledWith( 'OK', 'arg1', 'arg2' );
+		select( 'demo' ).getValue( 'arg1', 'arg2' );
+		expect( resolver ).toHaveBeenCalledTimes( 1 );
+		select( 'demo' ).getValue( 'arg3', 'arg4' );
+		expect( resolver ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should resolve action to dispatch', ( done ) => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+			return action.type === 'SET_OK' ? 'OK' : state;
+		} );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: () => ( { type: 'SET_OK' } ),
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			try {
+				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+				done();
+			} catch ( error ) {
+				done( error );
+			}
+		} );
+
+		select( 'demo' ).getValue();
+	} );
+
+	it( 'should resolve mixed type action array to dispatch', ( done ) => {
+		registerReducer( 'counter', ( state = 0, action ) => {
+			return action.type === 'INCREMENT' ? state + 1 : state;
+		} );
+		registerSelectors( 'counter', {
+			getCount: ( state ) => state,
+		} );
+		registerResolvers( 'counter', {
+			getCount: () => [
+				{ type: 'INCREMENT' },
+				Promise.resolve( { type: 'INCREMENT' } ),
+			],
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			if ( select( 'counter' ).getCount() === 2 ) {
+				done();
+			}
+		} );
+
+		select( 'counter' ).getCount();
+	} );
+
+	it( 'should resolve generator action to dispatch', ( done ) => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+			return action.type === 'SET_OK' ? 'OK' : state;
+		} );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			* getValue() {
+				yield { type: 'SET_OK' };
+			},
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			try {
+				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+				done();
+			} catch ( error ) {
+				done( error );
+			}
+		} );
+
+		select( 'demo' ).getValue();
+	} );
+
+	it( 'should resolve promise action to dispatch', ( done ) => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+			return action.type === 'SET_OK' ? 'OK' : state;
+		} );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: () => Promise.resolve( { type: 'SET_OK' } ),
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			try {
+				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+				done();
+			} catch ( error ) {
+				done( error );
+			}
+		} );
+
+		select( 'demo' ).getValue();
+	} );
+
+	it( 'should resolve promise non-action to dispatch', ( done ) => {
+		let shouldThrow = false;
+		registerReducer( 'demo', ( state = 'OK' ) => {
+			if ( shouldThrow ) {
+				throw 'Should not have dispatched';
+			}
+
+			return state;
+		} );
+		shouldThrow = true;
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: () => Promise.resolve(),
+		} );
+
+		select( 'demo' ).getValue();
+
+		process.nextTick( () => {
+			done();
+		} );
+	} );
+
+	it( 'should resolve async iterator action to dispatch', ( done ) => {
+		registerReducer( 'counter', ( state = 0, action ) => {
+			return action.type === 'INCREMENT' ? state + 1 : state;
+		} );
+		registerSelectors( 'counter', {
+			getCount: ( state ) => state,
+		} );
+		registerResolvers( 'counter', {
+			getCount: async function* () {
+				yield { type: 'INCREMENT' };
+				yield await Promise.resolve( { type: 'INCREMENT' } );
+			},
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			if ( select( 'counter' ).getCount() === 2 ) {
+				done();
+			}
+		} );
+
+		select( 'counter' ).getCount();
+	} );
+
+	it( 'should not dispatch resolved promise action on subsequent selector calls', ( done ) => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+			return action.type === 'SET_OK' && state === 'NOTOK' ? 'OK' : 'NOTOK';
+		} );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: () => Promise.resolve( { type: 'SET_OK' } ),
+		} );
+
+		subscribeWithUnsubscribe( () => {
+			try {
+				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
+				done();
+			} catch ( error ) {
+				done( error );
+			}
+		} );
+
+		select( 'demo' ).getValue();
+		select( 'demo' ).getValue();
 	} );
 } );
 
@@ -450,5 +666,116 @@ describe( 'dispatch', () => {
 		dispatch( 'counter' ).increment(); // state = 1
 		dispatch( 'counter' ).increment( 4 ); // state = 5
 		expect( store.getState() ).toBe( 5 );
+	} );
+} );
+
+describe( 'isActionLike', () => {
+	it( 'returns false if non-action-like', () => {
+		expect( isActionLike( undefined ) ).toBe( false );
+		expect( isActionLike( null ) ).toBe( false );
+		expect( isActionLike( [] ) ).toBe( false );
+		expect( isActionLike( {} ) ).toBe( false );
+		expect( isActionLike( 1 ) ).toBe( false );
+		expect( isActionLike( 0 ) ).toBe( false );
+		expect( isActionLike( Infinity ) ).toBe( false );
+		expect( isActionLike( { type: null } ) ).toBe( false );
+	} );
+
+	it( 'returns true if action-like', () => {
+		expect( isActionLike( { type: 'POW' } ) ).toBe( true );
+	} );
+} );
+
+describe( 'isAsyncIterable', () => {
+	it( 'returns false if not async iterable', () => {
+		expect( isAsyncIterable( undefined ) ).toBe( false );
+		expect( isAsyncIterable( null ) ).toBe( false );
+		expect( isAsyncIterable( [] ) ).toBe( false );
+		expect( isAsyncIterable( {} ) ).toBe( false );
+	} );
+
+	it( 'returns true if async iterable', async () => {
+		async function* getAsyncIterable() {
+			yield new Promise( ( resolve ) => process.nextTick( resolve ) );
+		}
+
+		const result = getAsyncIterable();
+
+		expect( isAsyncIterable( result ) ).toBe( true );
+
+		await result;
+	} );
+} );
+
+describe( 'isIterable', () => {
+	it( 'returns false if not iterable', () => {
+		expect( isIterable( undefined ) ).toBe( false );
+		expect( isIterable( null ) ).toBe( false );
+		expect( isIterable( {} ) ).toBe( false );
+		expect( isIterable( Promise.resolve( {} ) ) ).toBe( false );
+	} );
+
+	it( 'returns true if iterable', () => {
+		function* getIterable() {
+			yield 'foo';
+		}
+
+		const result = getIterable();
+
+		expect( isIterable( result ) ).toBe( true );
+		expect( isIterable( [] ) ).toBe( true );
+	} );
+} );
+
+describe( 'toAsyncIterable', () => {
+	it( 'normalizes async iterable', async () => {
+		async function* getAsyncIterable() {
+			yield await Promise.resolve( { ok: true } );
+		}
+
+		const object = getAsyncIterable();
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
+	} );
+
+	it( 'normalizes promise', async () => {
+		const object = Promise.resolve( { ok: true } );
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
+	} );
+
+	it( 'normalizes object', async () => {
+		const object = { ok: true };
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
+	} );
+
+	it( 'normalizes array of promise', async () => {
+		const object = [ Promise.resolve( { ok: true } ) ];
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
+	} );
+
+	it( 'normalizes mixed array', async () => {
+		const object = [ { foo: 'bar' }, Promise.resolve( { ok: true } ) ];
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { foo: 'bar' } );
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
+	} );
+
+	it( 'normalizes generator', async () => {
+		function* getIterable() {
+			yield Promise.resolve( { ok: true } );
+		}
+
+		const object = getIterable();
+		const normalized = toAsyncIterable( object );
+
+		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
 	} );
 } );

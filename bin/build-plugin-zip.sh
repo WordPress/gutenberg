@@ -99,7 +99,7 @@ zip -r gutenberg.zip \
 	blocks/library/*/*.php \
 	post-content.js \
 	$vendor_scripts \
-	{blocks,components,date,editor,element,hooks,i18n,data,utils,edit-post,viewport,plugins}/build/*.{js,map} \
+	{blocks,components,date,editor,element,hooks,i18n,data,utils,edit-post,viewport,plugins,core-data}/build/*.{js,map} \
 	{blocks,components,editor,edit-post}/build/*.css \
 	languages/gutenberg.pot \
 	languages/gutenberg-translations.php \

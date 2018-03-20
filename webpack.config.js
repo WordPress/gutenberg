@@ -4,7 +4,7 @@
 const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
-const { reduce, escapeRegExp, castArray, get } = require( 'lodash' );
+const { reduce, escapeRegExp, get } = require( 'lodash' );
 const { basename } = require( 'path' );
 
 // Main CSS loader for everything but blocks..
@@ -46,6 +46,23 @@ const extractConfig = {
 	],
 };
 
+/**
+ * Given a string, returns a new string with dash separators converedd to
+ * camel-case equivalent. This is not as aggressive as `_.camelCase` in
+ * converting to uppercase, where Lodash will convert letters following
+ * numbers.
+ *
+ * @param {string} string Input dash-delimited string.
+ *
+ * @return {string} Camel-cased string.
+ */
+function camelCaseDash( string ) {
+	return string.replace(
+		/-([a-z])/,
+		( match, letter ) => letter.toUpperCase()
+	);
+}
+
 const entryPointNames = [
 	'blocks',
 	'components',
@@ -56,12 +73,17 @@ const entryPointNames = [
 	'utils',
 	'data',
 	'viewport',
-	[ 'editPost', 'edit-post' ],
+	'core-data',
 	'plugins',
+	'edit-post',
 ];
 
 const packageNames = [
 	'hooks',
+];
+
+const coreGlobals = [
+	'api-request',
 ];
 
 const externals = {
@@ -73,9 +95,13 @@ const externals = {
 	jquery: 'jQuery',
 };
 
-[ ...entryPointNames, ...packageNames ].forEach( name => {
+[
+	...entryPointNames,
+	...packageNames,
+	...coreGlobals,
+].forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
-		this: [ 'wp', name ],
+		this: [ 'wp', camelCaseDash( name ) ],
 	};
 } );
 
@@ -129,14 +155,9 @@ class CustomTemplatedPathPlugin {
 
 const config = {
 	entry: Object.assign(
-		entryPointNames.reduce( ( memo, entryPoint ) => {
-			// Normalized entry point as an array of [ name, path ]. If a path
-			// is not explicitly defined, use the name.
-			entryPoint = castArray( entryPoint );
-			const [ name, path = name ] = entryPoint;
-
+		entryPointNames.reduce( ( memo, path ) => {
+			const name = camelCaseDash( path );
 			memo[ name ] = `./${ path }`;
-
 			return memo;
 		}, {} ),
 		packageNames.reduce( ( memo, packageName ) => {

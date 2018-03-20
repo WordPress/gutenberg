@@ -126,12 +126,17 @@ module.exports = {
 		semi: 'error',
 		'semi-spacing': 'error',
 		'space-before-blocks': [ 'error', 'always' ],
-		'space-before-function-paren': [ 'error', 'never' ],
+		'space-before-function-paren': [ 'error', {
+			anonymous: 'never',
+			named: 'never',
+			asyncArrow: 'always',
+		} ],
 		'space-in-parens': [ 'error', 'always' ],
 		'space-infix-ops': [ 'error', { int32Hint: false } ],
 		'space-unary-ops': [ 'error', {
 			overrides: {
 				'!': true,
+				yield: true,
 			},
 		} ],
 		'template-curly-spacing': [ 'error', 'always' ],

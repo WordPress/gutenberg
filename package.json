@@ -64,10 +64,12 @@
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
 		"babel-loader": "7.1.2",
+		"babel-plugin-transform-async-generator-functions": "6.24.1",
 		"babel-traverse": "6.26.0",
 		"check-node-version": "3.1.1",
 		"codecov": "3.0.0",
 		"concurrently": "3.5.0",
+		"core-js": "2.5.3",
 		"cross-env": "3.2.4",
 		"cypress": "1.4.1",
 		"deep-freeze": "0.0.1",
@@ -98,6 +100,9 @@
 		"presets": [
 			"@wordpress/default"
 		],
+		"plugins": [
+			"transform-async-generator-functions"
+		],
 		"env": {
 			"production": {
 				"plugins": [
@@ -106,20 +111,22 @@
 						{
 							"output": "languages/gutenberg.pot"
 						}
-					]
+					],
+					"transform-async-generator-functions"
 				]
 			}
 		}
 	},
 	"jest": {
 		"collectCoverageFrom": [
-			"(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport|plugins)/**/*.js"
+			"(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport|plugins|core-data)/**/*.js"
 		],
 		"moduleNameMapper": {
-			"@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport|plugins)": "$1"
+			"@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport|plugins|core-data)": "$1"
 		},
 		"preset": "@wordpress/jest-preset-default",
 		"setupFiles": [
+			"core-js/fn/symbol/async-iterator",
 			"<rootDir>/test/unit/setup-blocks.js",
 			"<rootDir>/test/unit/setup-wp-aliases.js"
 		],
