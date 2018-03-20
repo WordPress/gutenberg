@@ -8,14 +8,14 @@ import { StyleSheet, Text, View, FlatList, TextInput } from 'react-native';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
-export default class BlockManager extends React.Component<
-	{},
-	{
-		refresh: boolean,
-		blocks: Array<{ key: string, blockType: string, content: string, focused: boolean }>,
-	}
-> {
-	constructor( props: {} ) {
+type PropsType = {};
+type StateType = {
+	refresh: boolean,
+	blocks: Array<{ key: string, blockType: string, content: string, focused: boolean }>,
+};
+
+export default class BlockManager extends React.Component<PropsType, StateType> {
+	constructor( props: PropsType ) {
 		super( props );
 		// TODO: block state should be externalized (shared with Gutenberg at some point?).
 		// If not it should be created from a string parsing (commented HTML to json).

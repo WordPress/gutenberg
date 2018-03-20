@@ -7,28 +7,17 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Toolbar from './toolbar';
 
-export default class BlockHolder extends React.Component<
-	{
-		index: number,
-		blockType: string,
-		content: string,
-		focused: boolean,
-		onToolbarButtonPressed: ( button: number, index: number ) => void,
-		onBlockHolderPressed: ( rowId: number ) => void,
-	},
-	{ selected: boolean, focused: boolean }
-> {
-	constructor( props: {
-		index: number,
-		blockType: string,
-		content: string,
-		focused: boolean,
-		onToolbarButtonPressed: ( button: number, index: number ) => void,
-		onBlockHolderPressed: ( rowId: number ) => void,
-	} ) {
-		super( props );
-	}
+type PropsType = {
+	index: number,
+	blockType: string,
+	content: string,
+	focused: boolean,
+	onToolbarButtonPressed: ( button: number, index: number ) => void,
+	onBlockHolderPressed: ( rowId: number ) => void,
+};
+type StateType = { selected: boolean, focused: boolean };
 
+export default class BlockHolder extends React.Component<PropsType, StateType> {
 	renderToolbarIfBlockFocused() {
 		if ( this.props.focused ) {
 			return (
