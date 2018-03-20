@@ -127,7 +127,7 @@ export const settings = {
 						} ) )
 					}
 				>
-				{ alignmentToolbar }
+					{ alignmentToolbar }
 				</BlockControls>
 			),
 			isSelected && (
