@@ -13,6 +13,7 @@ function MenuItemsToggle( { label, isSelected, onClick, shortcut } ) {
 				className="components-menu-items__button is-toggle is-selected"
 				icon="yes"
 				onClick={ onClick }
+				aria-pressed="true"
 			>
 				{ label }
 				<Shortcut shortcut={ shortcut } />
@@ -24,6 +25,7 @@ function MenuItemsToggle( { label, isSelected, onClick, shortcut } ) {
 		<Button
 			className="components-menu-items__button is-toggle"
 			onClick={ onClick }
+			aria-pressed="false"
 		>
 			{ label }
 			<Shortcut shortcut={ shortcut } />
