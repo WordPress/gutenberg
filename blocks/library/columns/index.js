@@ -16,8 +16,6 @@ import { RangeControl } from '@wordpress/components';
  */
 import './style.scss';
 import InspectorControls from '../../inspector-controls';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InnerBlocks from '../../inner-blocks';
 
 /**
@@ -54,34 +52,20 @@ export const settings = {
 			type: 'number',
 			default: 2,
 		},
-		align: {
-			type: 'string',
-		},
+	},
+
+	supports: {
+		align: [ 'wide', 'full' ],
 	},
 
 	description: __( 'A multi-column layout of content.' ),
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-
-		return { 'data-align': align };
-	},
-
 	edit( { attributes, setAttributes, className, focus } ) {
-		const { align, columns } = attributes;
+		const { columns } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
 
 		return [
 			...focus ? [
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						controls={ [ 'wide', 'full' ] }
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</BlockControls>,
 				<InspectorControls key="inspector">
 					<RangeControl
 						label={ __( 'Columns' ) }
