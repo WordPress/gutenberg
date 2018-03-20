@@ -708,4 +708,14 @@ EOF;
 
 		$this->assertEquals( "<{$element} title=\"foo\">", wp_kses_attr( $element, $attribute, array( 'foo' => array( 'title' => true ) ), array() ) );
 	}
+
+	/**
+	 * @ticket 43312
+	 */
+	function test_wp_kses_attr_no_attributes_allowed_with_false() {
+		$element   = 'foo';
+		$attribute = 'title="foo" class="bar"';
+
+		$this->assertEquals( "<{$element}>", wp_kses_attr( $element, $attribute, array( 'foo' => false ), array() ) );
+	}
 }
