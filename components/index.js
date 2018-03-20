@@ -3,6 +3,7 @@ export { default as APIProvider } from './higher-order/with-api-data/provider';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
+export { default as ButtonGroup } from './button-group';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as CodeEditor } from './code-editor';
