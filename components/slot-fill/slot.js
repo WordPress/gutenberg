@@ -45,7 +45,7 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { name, bubblesVirtually = false } = this.props;
+		const { name, bubblesVirtually = false, fillProps } = this.props;
 		const { getFills = noop } = this.context;
 
 		if ( bubblesVirtually ) {
@@ -60,6 +60,10 @@ class Slot extends Component {
 						if ( ! child || isString( child ) ) {
 							return child;
 						}
+						if ( typeof child === 'function' ) {
+							return child( fillProps );
+						}
+
 						const childKey = `${ fillKey }---${ child.key || childIndex }`;
 						return cloneElement( child, { key: childKey } );
 					} );
