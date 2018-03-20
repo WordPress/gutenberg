@@ -166,7 +166,7 @@ export class TabbableContainer extends Component {
 	render() {
 		const eventToOffset = ( evt, container ) => {
 			const { keyCode, shiftKey, target } = evt;
-			if ( TAB === keyCode && target.parentElement === container ) {
+			if ( TAB === keyCode && ( this.props.deep || target.parentElement === container ) ) {
 				return shiftKey ? -1 : 1;
 			}
 
