@@ -17,6 +17,7 @@ it( 'Code block is a TextInput', () => {
 		.root.findAllByType( BlockHolder )
 		.forEach( blockHolder => {
 			if ( blockHolder.props.blockType === 'code' ) {
+				// TODO: hardcoded indices are ugly and error prone. Can we do better here?
 				const blockHolderContainer = blockHolder.children[ 0 ].children[ 0 ].children[ 0 ];
 				const contentComponent = blockHolderContainer.children[ 1 ];
 				const inputComponent =
