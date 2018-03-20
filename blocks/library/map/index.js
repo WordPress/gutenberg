@@ -96,7 +96,7 @@ class MapView extends Component {
 				this.map.addLayer( new L.TileLayer( 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 					minZoom: 3,
 					maxZoom: 12,
-					attribution: 'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+					attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
 				} ) );
 
 				const coordinates = new L.LatLng( latitude, longitude );
