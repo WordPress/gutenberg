@@ -46,6 +46,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 						</View>
 						<Code
 							attributes={ { content: this.props.content } }
+							// TODO: input text needs to be kept by updating the attributes
 							setAttributes={ attrs => console.log( { attrs } ) }
 						/>
 						{ this.renderToolbarIfBlockFocused.bind( this )() }
