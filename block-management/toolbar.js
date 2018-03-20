@@ -8,13 +8,6 @@ export default class Toolbar extends React.Component<{
 	index: number,
 	onButtonPressed: ( button: number, index: number ) => void,
 }> {
-	constructor( props: {
-		index: number,
-		onButtonPressed: ( button: number, index: number ) => void,
-	} ) {
-		super( props );
-	}
-
 	render() {
 		return (
 			<View style={ styles.toolbar }>

@@ -20,14 +20,6 @@ export default class BlockHolder extends React.Component<
 		selected: false,
 		focused: true,
 	};
-	constructor( props: {
-		index: number,
-		blockType: string,
-		content: string,
-		onToolbarButtonPressed: ( button: number, index: number ) => void,
-	} ) {
-		super( props );
-	}
 
 	renderToolbarIfBlockFocused() {
 		if ( this.state.focused ) {
