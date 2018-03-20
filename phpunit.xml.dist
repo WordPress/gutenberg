@@ -5,10 +5,21 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
-	>
+>
 	<testsuites>
 		<testsuite>
 			<directory suffix="-test.php">./phpunit/</directory>
 		</testsuite>
 	</testsuites>
+
+	<filter>
+		<whitelist
+			addUncoveredFilesFromWhitelist="true"
+			processUncoveredFilesFromWhitelist="false"
+		>
+			<file>./gutenberg.php</file>
+			<directory suffix=".php">./lib</directory>
+			<directory suffix=".php">./blocks/library/*</directory>
+		</whitelist>
+	</filter>
 </phpunit>

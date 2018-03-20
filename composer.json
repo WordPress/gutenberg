@@ -20,6 +20,35 @@
 		"composer/installers": "~1.0"
 	},
 	"scripts": {
-		"lint": "phpcs"
+		"test": [
+			"@lint",
+			"@test-unit"
+		],
+		"test:coverage": [
+			"@lint",
+			"@test-unit:coverage"
+		],
+		"test:coverage-ci": [
+			"@lint",
+			"@test-unit:coverage-ci"
+		],
+
+		"phpcs": "phpcs",
+		"lint": "docker-compose run --rm composer run-script phpcs",
+
+		"test-unit": "docker-compose run --rm wordpress_phpunit phpunit",
+		"test-unit:coverage": "docker-compose run --rm wordpress_phpunit phpunit --coverage-text",
+		"test-unit:coverage-html": "docker-compose run --rm wordpress_phpunit phpunit --coverage-html=./coverage/phpunit",
+		"test-unit:coverage-ci": [
+			"docker-compose run --rm wordpress_phpunit phpunit --coverage-clover=./coverage/phpunit/coverage.xml",
+			"curl -s https://codecov.io/bash | bash"
+		],
+		"test-unit-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit",
+		"test-unit-multisite:coverage": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit --coverage-text",
+		"test-unit-multisite:coverage-html": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit --coverage-html=./coverage/phpunit/multisite",
+		"test-unit-multisite:coverage-ci": [
+			"docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit --coverage-clover=./coverage/phpunit/multisite/coverage.xml",
+			"curl -s https://codecov.io/bash | bash"
+		]
 	}
 }
