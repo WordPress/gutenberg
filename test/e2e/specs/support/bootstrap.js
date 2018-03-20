@@ -3,7 +3,7 @@
 import puppeteer from 'puppeteer';
 
 beforeAll( async () => {
-	global.browser = await puppeteer.launch( { headless: false } );
+	global.browser = await puppeteer.launch();
 	global.page = await browser.newPage();
 } );
 
