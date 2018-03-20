@@ -11,7 +11,7 @@ The most recent and complete version of this guide is available [here](https://g
 $ git clone --recurse-submodules https://github.com/automattic/gutenberg-mobile
 ```
 
-* Or if you already have the project cloned, init the `gutenberg` submodule: 
+* Or if you already have the project cloned, init the `gutenberg` submodule:
 ```
 $ cd gutenberg
 $ git submodule init
@@ -40,6 +40,15 @@ yarn start -- --reset-cache
 
 Runs the [jest](https://github.com/facebook/jest) test runner on your tests.
 
+To run `jest` with debugger support, start it with the following CLI command:
+```
+NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand
+```
+
+Append `--config <jest config json file>` to specify a config file other than the default.
+
+Then, open `chrome://inspect` in Chrome to attach the debugger (look into the "Remote Target" section). While testing/developing, feel free to springle `debugger` statements anywhere in the code that you'd like the debugger to break.
+
 #### `npm run ios`
 
 Like `npm start`, but also attempts to open your app in the iOS Simulator if you're on a Mac and have it installed.
@@ -57,6 +66,19 @@ Flow is a static type checker for JavaScript code. Flow checks JavaScript code f
 This project is set up to use [jest](https://facebook.github.io/jest/) for tests. You can configure whatever testing strategy you like, but jest works out of the box. Create test files in directories called `__tests__` or with the `.test` extension to have the files loaded by jest. See the [the template project](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/App.test.js) for an example test. The [jest documentation](https://facebook.github.io/jest/docs/en/getting-started.html) is also a wonderful resource, as is the [React Native testing tutorial](https://facebook.github.io/jest/docs/en/tutorial-react-native.html).
 
 
+## Code style
+
+Run the style checker with this command that lists the files having at least one style violation:
+```
+$ npm run prettier-check
+```
+
+Fix style violations:
+```
+$ npm run prettier
+```
+
 ## License
 
-TBD
+Gutenberg Mobile is an Open Source project covered by the [GNU General Public License version 2](LICENSE).
+

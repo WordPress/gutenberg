@@ -1,3 +1,5 @@
-declare module 'react-native' { 
-    declare var exports: any; 
+/** @format */
+
+declare module 'react-native' {
+	declare var exports: any;
 }
