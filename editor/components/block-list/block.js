@@ -121,7 +121,7 @@ export class BlockListBlock extends Component {
 
 	componentDidMount() {
 		if ( this.props.isSelected ) {
-			this.focusTabbable();
+			this.focusTabbable( true );
 		}
 	}
 
@@ -160,8 +160,10 @@ export class BlockListBlock extends Component {
 
 	/**
 	 * When a block becomes selected, transition focus to an inner tabbable.
+	 *
+	 * @param {boolean} forceInnerFocus Whether or not to force focus to inner content
 	 */
-	focusTabbable() {
+	focusTabbable( forceInnerFocus = false ) {
 		const { initialPosition, keyboardMode } = this.props;
 
 		// Focus is captured by the wrapper node, so while focus transition
@@ -174,7 +176,7 @@ export class BlockListBlock extends Component {
 
 		// In navigation mode, we should select the parent node only
 		// This could be triggered when we remove a block from navigation mode (backspace)
-		if ( keyboardMode === 'navigation' ) {
+		if ( ! forceInnerFocus && keyboardMode === 'navigation' ) {
 			this.wrapperNode.focus();
 			return;
 		}
