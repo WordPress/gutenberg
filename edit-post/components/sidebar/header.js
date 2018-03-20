@@ -14,7 +14,7 @@ const SidebarHeader = ( { count, title, activeSidebarName, openSidebar, closeSid
 		<Fragment>
 			<div className="components-panel__header edit-post-sidebar__header">
 				<span className="edit-post-sidebar__title">
-					{ title }
+					{ title || __( '(no title)' ) }
 				</span>
 				<IconButton
 					onClick={ closeSidebar }
