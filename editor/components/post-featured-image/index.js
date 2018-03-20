@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Button, Spinner, ResponsiveWrapper, withAPIData } from '@wordpress/components';
 import { MediaUpload } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -38,15 +39,15 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
 							<Button className="button-link editor-post-featured-image__preview" onClick={ open } >
-								{ media && !! media.data &&
+								{ media &&
 									<ResponsiveWrapper
-										naturalWidth={ media.data.media_details.width }
-										naturalHeight={ media.data.media_details.height }
+										naturalWidth={ media.media_details.width }
+										naturalHeight={ media.media_details.height }
 									>
-										<img src={ media.data.source_url } alt={ __( 'Featured image' ) } />
+										<img src={ media.source_url } alt={ __( 'Featured image' ) } />
 									</ResponsiveWrapper>
 								}
-								{ media && media.isLoading && <Spinner /> }
+								{ ! media && <Spinner /> }
 							</Button>
 						) }
 					/>
@@ -96,14 +97,18 @@ const applyConnect = connect(
 	}
 );
 
-const applyWithAPIData = withAPIData( ( { featuredImageId, postTypeName } ) => {
+const applyWithAPIData = withAPIData( ( { postTypeName } ) => {
 	return {
-		media: featuredImageId ? `/wp/v2/media/${ featuredImageId }` : undefined,
 		postType: postTypeName ? `/wp/v2/types/${ postTypeName }?context=edit` : undefined,
 	};
 } );
 
+const applyWithSelect = withSelect( ( select, { featuredImageId } ) => ( {
+	media: featuredImageId ? select( 'core' ).getMedia( featuredImageId ) : undefined,
+} ) );
+
 export default compose(
 	applyConnect,
 	applyWithAPIData,
+	applyWithSelect,
 )( PostFeaturedImage );

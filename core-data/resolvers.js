@@ -6,7 +6,7 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { setRequested, receiveTerms } from './actions';
+import { setRequested, receiveTerms, receiveMedia } from './actions';
 
 /**
  * Requests categories from the REST API, yielding action objects on request
@@ -16,4 +16,15 @@ export async function* getCategories() {
 	yield setRequested( 'terms', 'categories' );
 	const categories = await apiRequest( { path: '/wp/v2/categories' } );
 	yield receiveTerms( 'categories', categories );
+}
+
+/**
+ * Requests a media element from the REST API.
+ *
+ * @param {Object} state State tree
+ * @param {number} id    Media id
+ */
+export async function* getMedia( state, id ) {
+	const media = await apiRequest( { path: `/wp/v2/media/${ id }` } );
+	yield receiveMedia( media );
 }

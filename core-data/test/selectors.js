@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getTerms, isRequestingTerms } from '../selectors';
+import { getTerms, isRequestingTerms, getMedia } from '../selectors';
 
 describe( 'getTerms()', () => {
 	it( 'returns value of terms by taxonomy', () => {
@@ -54,5 +54,21 @@ describe( 'isRequestingTerms()', () => {
 
 		const result = isRequestingTerms( state, 'categories' );
 		expect( result ).toBe( true );
+	} );
+} );
+
+describe( 'getMedia', () => {
+	it( 'returns a media element by id', () => {
+		let state = deepFreeze( {
+			media: {},
+		} );
+		expect( getMedia( state, 1 ) ).toBe( undefined );
+
+		state = deepFreeze( {
+			media: {
+				1: { id: 1 },
+			},
+		} );
+		expect( getMedia( state, 1 ) ).toEqual( { id: 1 } );
 	} );
 } );

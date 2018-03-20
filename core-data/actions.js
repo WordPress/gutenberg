@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { castArray } from 'lodash';
+
+/**
  * Returns an action object used in signalling that the request for a given
  * data type has been made.
  *
@@ -29,5 +34,19 @@ export function receiveTerms( taxonomy, terms ) {
 		type: 'RECEIVE_TERMS',
 		taxonomy,
 		terms,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that media have been received.
+ *
+ * @param {Array|Object} media Media received.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveMedia( media ) {
+	return {
+		type: 'RECEIVE_MEDIA',
+		media: castArray( media ),
 	};
 }

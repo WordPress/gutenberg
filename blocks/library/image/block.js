@@ -22,9 +22,9 @@ import {
 	SelectControl,
 	TextControl,
 	Toolbar,
-	withAPIData,
 	withContext,
 } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -136,7 +136,7 @@ class ImageBlock extends Component {
 	}
 
 	getAvailableSizes() {
-		return get( this.props.image, [ 'data', 'media_details', 'sizes' ], {} );
+		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
 	}
 
 	render() {
@@ -297,14 +297,14 @@ export default compose( [
 	withContext( 'editor' )( ( settings ) => {
 		return { settings };
 	} ),
-	withAPIData( ( props ) => {
+	withSelect( ( select, props ) => {
 		const { id } = props.attributes;
 		if ( ! id ) {
 			return {};
 		}
 
 		return {
-			image: `/wp/v2/media/${ id }`,
+			image: select( 'core' ).getMedia( id ),
 		};
 	} ),
 ] )( ImageBlock );

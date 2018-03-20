@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { combineReducers } from 'redux';
+import { keyBy } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -37,6 +42,19 @@ export function terms( state = {}, action ) {
 	return state;
 }
 
+export function media( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_MEDIA':
+			return {
+				...state,
+				...keyBy( action.media, 'id' ),
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
+	media,
 } );
