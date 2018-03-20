@@ -4,10 +4,12 @@ import React from 'react';
 import { StyleSheet, Text, View, Button } from 'react-native';
 import { ToolbarButton } from './constants';
 
-export default class Toolbar extends React.Component<{
+type PropsType = {
 	index: number,
 	onButtonPressed: ( button: number, index: number ) => void,
-}> {
+};
+
+export default class Toolbar extends React.Component<PropsType> {
 	render() {
 		return (
 			<View style={ styles.toolbar }>
