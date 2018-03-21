@@ -632,6 +632,17 @@ export function blockSelection( state = {
 				initialPosition: null,
 				isMultiSelecting: false,
 			};
+		case 'REMOVE_BLOCKS':
+			if ( ! action.uids || ! action.uids.length || action.uids.indexOf( state.start ) === -1 ) {
+				return state;
+			}
+			return {
+				...state,
+				start: null,
+				end: null,
+				initialPosition: null,
+				isMultiSelecting: false,
+			};
 		case 'REPLACE_BLOCKS':
 			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
 				return state;
