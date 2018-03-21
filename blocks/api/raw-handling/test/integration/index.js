@@ -39,7 +39,7 @@ describe( 'raw handling: integration', () => {
 			const converted = rawHandler( { HTML: input, canUserUseUnfilteredHTML: true } );
 			const serialized = typeof converted === 'string' ? converted : serialize( converted );
 
-			equal( output, serialized );
+			equal( serialized, output );
 		} );
 	} );
 } );
