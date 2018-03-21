@@ -88,7 +88,7 @@ describe( 'Slot', () => {
 
 		mount(
 			<Provider>
-				<Slot name="chicken" bubblesVirtually fillProps={ { onClose: onClose, onOpen: onOpen } } />
+				<Slot name="chicken" fillProps={ { onClose: onClose, onOpen: onOpen } } />
 				<Fill name="chicken">
 					{ ( props ) => {
 						props.onClose();
