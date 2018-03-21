@@ -34,7 +34,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 
 	getBlockForType() {
 		if ( this.props.blockType === 'code' ) {
-			const blockType = getBlockType('core/code');
+			const blockType = getBlockType( 'core/code' );
 			const Code = blockType.edit;
 			// TODO: input text needs to be kept by updating the attributes
 			return (
