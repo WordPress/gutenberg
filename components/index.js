@@ -60,6 +60,7 @@ export { default as withFallbackStyles } from './higher-order/with-fallback-styl
 export { default as withFilters } from './higher-order/with-filters';
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
+export { default as withGlobalEvents } from './higher-order/with-global-events';
 export { default as withInstanceId } from './higher-order/with-instance-id';
 export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
