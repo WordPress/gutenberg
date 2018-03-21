@@ -1,6 +1,8 @@
-This is the mobile version of Gutenberg, targetting Android and iOS. It's a React Native library bootstrapped by CRNA.
+# Mobile Gutenberg
 
-The most recent and complete version of this guide is available [here](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/README.md).
+Note: The project is at an early stage project, it's not yet ready for integration.
+
+This is the mobile version of Gutenberg, targetting Android and iOS. It's a React Native library bootstrapped by CRNA.
 
 ## Getting Started
 
@@ -18,9 +20,17 @@ $ git submodule init
 $ git submodule update
 ```
 
+### Set up
+
+Before running the demo app, you need to download and install the project dependencies. This is done via the following command:
+
+```
+npm install
+```
+
 ## Run
 
-If Yarn was installed when the project was initialized, then dependencies will have been installed via Yarn, and you should probably use it to run these commands as well. Unlike dependency installation, command running syntax is identical for Yarn and NPM at the time of this writing.
+Note: the most recent and complete version of this guide is available [here](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/README.md).
 
 ### `npm start`
 
@@ -32,8 +42,6 @@ Sometimes you may need to reset or clear the React Native packager's cache. To d
 
 ```
 npm start -- --reset-cache
-# or
-yarn start -- --reset-cache
 ```
 
 #### `npm test`
