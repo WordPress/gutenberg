@@ -8,7 +8,7 @@ import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Toolbar from './toolbar';
 
 // Gutenberg imports
-import { settings as codeBlock } from '../gutenberg/blocks/library/code';
+import { getBlockType } from '@gutenberg/blocks/api';
 
 type PropsType = {
 	index: number,
@@ -34,7 +34,8 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 
 	getBlockForType() {
 		if ( this.props.blockType === 'code' ) {
-			const Code = codeBlock.edit;
+			const blockType = getBlockType('core/code');
+			const Code = blockType.edit;
 			// TODO: input text needs to be kept by updating the attributes
 			return (
 				<Code
