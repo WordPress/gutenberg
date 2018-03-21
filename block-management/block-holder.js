@@ -7,6 +7,9 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Toolbar from './toolbar';
 
+// Gutenberg imports
+import { settings as codeBlock } from '../gutenberg/blocks/library/code';
+
 type PropsType = {
 	index: number,
 	blockType: string,
@@ -29,8 +32,23 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		}
 	}
 
+	getBlockForType() {
+		if ( this.props.blockType === 'code' ) {
+			const Code = codeBlock.edit;
+			// TODO: input text needs to be kept by updating the attributes
+			return (
+				<Code
+					attributes={ { content: this.props.content } }
+					setAttributes={ attrs => console.log( { attrs } ) }
+				/>
+			);
+		} else {
+			// Default block placeholder
+			return <Text>{ this.props.content }</Text>;
+		}
+	}
+
 	render() {
-		// TODO: This is a place holder, this should call the edit() method of the block depending on this.props.blockType
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.index ) }
@@ -39,9 +57,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 					<View style={ styles.blockTitle }>
 						<Text>BlockType: { this.props.blockType }</Text>
 					</View>
-					<View style={ styles.blockContent }>
-						<Text>{ this.props.content }</Text>
-					</View>
+					<View style={ styles.blockContainer }>{ this.getBlockForType.bind( this )() }</View>
 					{ this.renderToolbarIfBlockFocused.bind( this )() }
 				</View>
 			</TouchableWithoutFeedback>
@@ -53,8 +69,10 @@ const styles = StyleSheet.create( {
 	blockHolder: {
 		flex: 1,
 	},
-	blockContent: {
+	blockContainer: {
 		backgroundColor: 'white',
+	},
+	blockContent: {
 		padding: 10,
 	},
 	blockTitle: {

@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
+    "@wordpress/babel-preset-default": "^1.1.2",
+    "cross-env": "^5.1.4",
     "flow-bin": "0.56.0",
     "jest-expo": "25.0.0",
     "prettier": "git+https://github.com/Automattic/calypso-prettier.git#calypso-1.9",
@@ -16,6 +18,7 @@
     "android": "react-native-scripts android",
     "ios": "react-native-scripts ios",
     "test": "node node_modules/jest/bin/jest.js",
+    "test-android": "cross-env NODE_ENV=test jest --config jest.android.json",
     "flow": "flow",
     "prettier": "prettier --write *.js *block-management/*.js",
     "prettier-check": "prettier -l *.js *block-management/*.js"
@@ -24,7 +27,9 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "classnames": "^2.2.5",
     "expo": "^25.0.0",
+    "jed": "^1.1.1",
     "react": "16.2.0",
     "react-native": "0.52.0"
   }
