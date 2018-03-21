@@ -61,7 +61,7 @@ When the component renders it will store a reference to the meta boxes container
 
 When the post is updated, only meta box areas that are active will be submitted. This prevents unnecessary requests. No extra revisions are created by the meta box submissions. A Redux action will trigger on `REQUEST_POST_UPDATE` for any active meta box. See `editor/effects.js`. The `REQUEST_META_BOX_UPDATES` action will set that meta box's state to `isUpdating`. The `isUpdating` prop will be sent into the `MetaBoxArea` and cause a form submission.
 
-When the meta box area is saving, we display an updating overlay, to prevent users from changing the form values in mid-save.
+When the meta box area is saving, we display an updating overlay, to prevent users from changing the form values while a save is in progress.
 
 After the new block editor is made into the default editor, it will be necessary to provide the classic-editor flag to access the meta box partial page.
 
