@@ -50,20 +50,20 @@ Ideally, this could be done at instantiation of the editor and help simplify thi
 
 ### Redux and React Meta Box Management
 
-When rendering the Gutenberg Page, the metaboxes are rendered to a hidden div `#metaboxes`.
+When rendering the Gutenberg Page, the meta boxes are rendered to a hidden div `#metaboxes`.
 
 *The Redux store will hold all meta boxes as inactive by default*. When
 `INITIALIZE_META_BOX_STATE` comes in, the store will update any active meta box areas by setting the `isActive` flag to `true`. Once this happens React will check for the new props sent in by Redux on the `MetaBox` component. If that `MetaBox` is now active, instead of rendering null, a `MetaBoxArea` component will be rendered. The `MetaBox` component is the container component that mediates between the `MetaBoxArea` and the Redux Store. *If no meta boxes are active, nothing happens. This will be the default behavior, as all core meta boxes have been stripped.*
 
 #### MetaBoxArea Component
 
-When the component renders it will store a reference to the metaboxes container and retrieve the metaboxes HTML from the prefetch location.
+When the component renders it will store a reference to the meta boxes container and retrieve the meta boxes HTML from the prefetch location.
 
-When the post is updated, only metabox areas that are active will be submitted. This prevents unnecessary requests. No extra revisions are created by the meta box submissions. A Redux action will trigger on `REQUEST_POST_UPDATE` for any active meta box. See `editor/effects.js`. The `REQUEST_META_BOX_UPDATES` action will set that meta box's state to `isUpdating`. The `isUpdating` prop will be sent into the `MetaBoxArea` and cause a form submission.
+When the post is updated, only meta box areas that are active will be submitted. This prevents unnecessary requests. No extra revisions are created by the meta box submissions. A Redux action will trigger on `REQUEST_POST_UPDATE` for any active meta box. See `editor/effects.js`. The `REQUEST_META_BOX_UPDATES` action will set that meta box's state to `isUpdating`. The `isUpdating` prop will be sent into the `MetaBoxArea` and cause a form submission.
 
-When the metabox area is saving, we display an updating overlay, to prevent users from changing the form values in mid-save.
+When the meta box area is saving, we display an updating overlay, to prevent users from changing the form values in mid-save.
 
-After the new block editor is made into the default editor, it will be necessary to provide the classic-editor flag to access the metabox partial page.
+After the new block editor is made into the default editor, it will be necessary to provide the classic-editor flag to access the meta box partial page.
 
 `gutenberg_meta_box_save()` saves meta box changes. A `meta_box` request parameter should be present and should match one of `'advanced'`, `'normal'`, or `'side'`. This value will determine which meta box area is served.
 
