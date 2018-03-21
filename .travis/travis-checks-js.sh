@@ -9,3 +9,4 @@ function pFail() {
 
 npm run flow || pFail
 npm run prettier-check || pFail
+npm test || pFail
