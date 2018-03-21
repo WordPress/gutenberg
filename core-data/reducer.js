@@ -42,6 +42,14 @@ export function terms( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing media state. Keyed by id.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
 export function media( state = {}, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_MEDIA':
