@@ -30,6 +30,7 @@ class ReusableBlockEdit extends Component {
 		this.state = {
 			isEditing: !! ( reusableBlock && reusableBlock.isTemporary ),
 			title: null,
+			attributes: null,
 		};
 	}
 
@@ -40,11 +41,12 @@ class ReusableBlockEdit extends Component {
 	}
 
 	startEditing() {
-		const { reusableBlock } = this.props;
+		const { reusableBlock, block } = this.props;
 
 		this.setState( {
 			isEditing: true,
 			title: reusableBlock.title,
+			attributes: block.attributes,
 		} );
 	}
 
@@ -52,12 +54,17 @@ class ReusableBlockEdit extends Component {
 		this.setState( {
 			isEditing: false,
 			title: null,
+			attributes: null,
 		} );
 	}
 
 	setAttributes( attributes ) {
-		const { updateAttributes, block } = this.props;
-		updateAttributes( block.uid, attributes );
+		this.setState( ( prevState ) => {
+			if ( prevState.attributes !== null ) {
+				return { attributes: { ...prevState.attributes, ...attributes } };
+			}
+			return null;
+		} );
 	}
 
 	setTitle( title ) {
@@ -65,13 +72,14 @@ class ReusableBlockEdit extends Component {
 	}
 
 	save() {
-		const { reusableBlock, onUpdateTitle, onSave } = this.props;
+		const { reusableBlock, onUpdateTitle, updateAttributes, block, onSave } = this.props;
+		const { title, attributes } = this.state;
 
-		const { title } = this.state;
 		if ( title !== reusableBlock.title ) {
 			onUpdateTitle( title );
 		}
 
+		updateAttributes( block.uid, attributes );
 		onSave();
 
 		this.stopEditing();
@@ -79,7 +87,7 @@ class ReusableBlockEdit extends Component {
 
 	render() {
 		const { isSelected, reusableBlock, block, isFetching, isSaving } = this.props;
-		const { isEditing, title } = this.state;
+		const { isEditing, title, attributes } = this.state;
 
 		if ( ! reusableBlock && isFetching ) {
 			return <Placeholder><Spinner /></Placeholder>;
@@ -95,7 +103,7 @@ class ReusableBlockEdit extends Component {
 				isSelected={ isEditing && isSelected }
 				id={ block.uid }
 				name={ block.name }
-				attributes={ block.attributes }
+				attributes={ attributes !== null ? attributes : block.attributes }
 				setAttributes={ isEditing ? this.setAttributes : noop }
 			/>
 		);
