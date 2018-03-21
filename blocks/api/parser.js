@@ -89,6 +89,19 @@ export function matcherFromSource( sourceConfig ) {
 }
 
 /**
+ * Given a block's raw content and an attribute's schema returns the attribute's
+ * value depending on its source.
+ *
+ * @param {string} innerHTML         Block's raw content.
+ * @param {Object} attributeSchema   Attribute's schema.
+ *
+ * @return {*} Attribute value.
+ */
+export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
+	return hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+}
+
+/**
  * Given an attribute key, an attribute's schema, a block's raw content and the
  * commentAttributes returns the attribute value depending on its source
  * definition of the given attribute key.
@@ -114,7 +127,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'children':
 		case 'node':
 		case 'query':
-			value = hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 			break;
 	}
 

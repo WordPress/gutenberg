@@ -87,7 +87,6 @@ exports[`core/cover-image block edit matches snapshot 1`] = `
         type="file"
       />
     </div>
-    *** Mock(Media upload button) ***
   </div>
 </div>
 `;
