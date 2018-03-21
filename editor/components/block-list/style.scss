@@ -526,7 +526,8 @@
  * Block Toolbar
  */
 
-.editor-block-contextual-toolbar {
+.editor-block-contextual-toolbar,
+.editor-block-breadcrumb {
 	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
 	white-space: nowrap;
@@ -560,35 +561,53 @@
 		top: -1px;	// stack borders
 	}
 
-	.editor-block-toolbar {
-		border: 1px solid $light-gray-500;
-		width: 100%;
-
-		// this prevents floats from messing up the position
-		position: absolute;
-		left: 0;
-
-		.editor-block-list__block[data-align="right"] & {
-			left: auto;
-			right: 0;
-		}
-
-		// remove stacked borders in inline toolbar
-		> div:first-child {
-			margin-left: -1px;
-		}
-
-		> .editor-block-switcher:first-child {
-			margin-left: -2px;
-		}
-
-		@include break-small() {
-			width: auto;
-		}
-	}
-
 	// Reset pointer-events on children.
 	& > * {
 		pointer-events: auto;
+	}
+}
+
+.editor-block-contextual-toolbar .editor-block-toolbar,
+.editor-block-breadcrumb .components-toolbar {
+	border: 1px solid $light-gray-500;
+	width: 100%;
+
+	// this prevents floats from messing up the position
+	position: absolute;
+	left: 0;
+
+	.editor-block-list__block[data-align="right"] & {
+		left: auto;
+		right: 0;
+	}
+
+	// remove stacked borders in inline toolbar
+	> div:first-child {
+		margin-left: -1px;
+	}
+
+	> .editor-block-switcher:first-child {
+		margin-left: -2px;
+	}
+
+	@include break-small() {
+		width: auto;
+	}
+}
+
+.editor-block-breadcrumb .components-toolbar {
+	padding: 0px 12px;
+	line-height: $block-toolbar-height - 1px;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	color: $dark-gray-500;
+	cursor: default;
+
+	.components-button {
+		margin-left: -12px;
+		margin-right: 12px;
+		border-right: 1px solid $light-gray-500;
+		color: $dark-gray-500;
+		padding-top: 6px;
 	}
 }
