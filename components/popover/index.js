@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { defer, isEqual, noop } from 'lodash';
+import { isEqual, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -18,19 +18,6 @@ import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import { Slot, Fill } from '../slot-fill';
-
-/**
- * Value representing whether a key is currently pressed. Bound to the document
- * for use in determining whether the Popover component has mounted in response
- * to a keyboard event. Popover's focusOnMount behavior is specific to keyboard
- * interaction. Must be bound at the top-level and its unsetting deferred since
- * the component will have already mounted by the time keyup occurs.
- *
- * @type {boolean}
- */
-let isKeyDown = false;
-document.addEventListener( 'keydown', () => isKeyDown = true );
-document.addEventListener( 'keyup', defer.bind( null, () => isKeyDown = false ) );
 
 const FocusManaged = withFocusReturn( ( { children } ) => children );
 
@@ -107,7 +94,7 @@ class Popover extends Component {
 
 	focus() {
 		const { focusOnMount = true } = this.props;
-		if ( ! focusOnMount || ! isKeyDown ) {
+		if ( ! focusOnMount ) {
 			return;
 		}
 
