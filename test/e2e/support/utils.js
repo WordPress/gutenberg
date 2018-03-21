@@ -35,3 +35,9 @@ export async function visitAdmin( adminPath ) {
 export async function newPost() {
 	await visitAdmin( 'post-new.php' );
 }
+
+export async function newDesktopBrowserPage() {
+	global.page = await browser.newPage();
+	await page.setViewport( { width: 1000, height: 700 } );
+	await page.setDefaultNavigationTimeout( 60000 );
+}

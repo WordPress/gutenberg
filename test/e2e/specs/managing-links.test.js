@@ -2,14 +2,12 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost } from '../support/utils';
+import { newPost, newDesktopBrowserPage } from '../support/utils';
 
 describe( 'Managing links', () => {
 	beforeEach( async () => {
+		await newDesktopBrowserPage();
 		await newPost();
-		await page.on( 'dialog', async dialog => {
-			await dialog.accept();
-		} );
 	} );
 
 	const setFixedToolbar = async ( b ) => {

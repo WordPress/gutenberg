@@ -2,10 +2,11 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, visitAdmin } from '../support/utils';
+import { newPost, visitAdmin, newDesktopBrowserPage } from '../support/utils';
 
 describe( 'hello', () => {
 	beforeAll( async () => {
+		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
