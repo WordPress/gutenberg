@@ -58,13 +58,15 @@ describe( 'isRequestingTerms()', () => {
 } );
 
 describe( 'getMedia', () => {
-	it( 'returns a media element by id', () => {
-		let state = deepFreeze( {
+	it( 'should return undefined for unknown media', () => {
+		const state = deepFreeze( {
 			media: {},
 		} );
 		expect( getMedia( state, 1 ) ).toBe( undefined );
+	} );
 
-		state = deepFreeze( {
+	it( 'should return a media element by id', () => {
+		const state = deepFreeze( {
 			media: {
 				1: { id: 1 },
 			},
