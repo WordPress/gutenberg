@@ -4,7 +4,6 @@
 import '../support/bootstrap';
 import { newPost } from '../support/utils';
 
-// Tests
 describe( 'a11y', () => {
 	beforeAll( async () => {
 		await newPost();

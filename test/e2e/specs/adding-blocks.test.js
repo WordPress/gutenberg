@@ -4,7 +4,6 @@
 import '../support/bootstrap';
 import { newPost } from '../support/utils';
 
-// Tests
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
 		await newPost();

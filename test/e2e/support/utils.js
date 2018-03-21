@@ -1,7 +1,6 @@
 import path from 'path';
 import url from 'url';
 
-// Config
 const BASE_URL = 'http://localhost:8888';
 const USERNAME = 'admin';
 const PASSWORD = 'password';
