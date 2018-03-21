@@ -7,8 +7,6 @@
 import './support/bootstrap';
 import { newPost } from './support';
 
-jest.setTimeout( 50000 );
-
 // Tests
 describe( 'Multi-block selection', () => {
 	beforeAll( async () => {
