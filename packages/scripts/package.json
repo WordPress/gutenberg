@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"description": "Collection of JS scripts for WordPress development",
 	"author": "WordPress",
 	"license": "GPL-2.0-or-later",
@@ -32,7 +32,7 @@
 	},
 	"dependencies": {
 		"@wordpress/babel-preset-default": "^1.1.2",
-		"@wordpress/jest-preset-default": "^1.0.4",
+		"@wordpress/jest-preset-default": "^1.0.5",
 		"cross-spawn": "^5.1.0",
 		"jest": "^22.4.0",
 		"read-pkg-up": "^3.0.0"
