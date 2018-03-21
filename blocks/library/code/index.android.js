@@ -61,6 +61,7 @@ export const settings = {
 			<View className={ className }>
 				<PlainText
 					value={ attributes.content }
+					multiline={ true }
 					onChange={ ( content ) => setAttributes( { content } ) }
 					placeholder={ __( 'Write code…' ) }
 					aria-label={ __( 'Code' ) }
