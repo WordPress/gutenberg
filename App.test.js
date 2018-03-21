@@ -21,7 +21,8 @@ it( 'Code block is a TextInput', () => {
 				const blockHolderContainer = blockHolder.children[ 0 ].children[ 0 ].children[ 0 ];
 				const contentComponent = blockHolderContainer.children[ 1 ];
 				const inputComponent =
-					contentComponent.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ];
+					contentComponent.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ]
+						.children[ 0 ].children[ 0 ];
 				expect( inputComponent.type ).toBe( 'TextInput' );
 			}
 		} );
