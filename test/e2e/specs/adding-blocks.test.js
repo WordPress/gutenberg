@@ -49,24 +49,6 @@ describe( 'adding blocks', () => {
 		// Assertions
 		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
 
-		expect( textEditorContent ).toEqual( [
-			'<!-- wp:paragraph -->',
-			'<p>Paragraph block</p>',
-			'<!-- /wp:paragraph -->',
-			'',
-			'<!-- wp:paragraph -->',
-			'<p>Second paragraph</p>',
-			'<!-- /wp:paragraph -->',
-			'',
-			'<!-- wp:quote -->',
-			'<blockquote class=\"wp-block-quote\">',
-			'    <p>Quote block</p>',
-			'</blockquote>',
-			'<!-- /wp:quote -->',
-			'',
-			'<!-- wp:code -->',
-			'<pre class="wp-block-code"><code>Code block</code></pre>',
-			'<!-- /wp:code -->',
-		].join( '\n' ) );
+		expect( textEditorContent ).toMatchSnapshot();
 	} );
 } );
