@@ -1,11 +1,8 @@
-/* eslint-env jest */
-/* global page */
-
 /**
  * Internal dependencies
  */
-import './support/bootstrap';
-import { newPost } from './support';
+import '../support/bootstrap';
+import { newPost } from '../support/utils';
 
 // Tests
 describe( 'Managing links', () => {

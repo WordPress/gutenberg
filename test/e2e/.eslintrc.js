@@ -4,11 +4,10 @@ module.exports = {
 		'../../eslint/config.js',
 	],
 	env: {
-		mocha: true,
+		jest: true
 	},
 	globals: {
-		cy: true,
-		Cypress: true,
-		expect: true,
+		page: true,
+		browser: true,
 	},
 };
