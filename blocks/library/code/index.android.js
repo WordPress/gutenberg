@@ -1,3 +1,5 @@
+/** @format */
+
 import React from 'react';
 import { View } from 'react-native';
 
@@ -47,11 +49,10 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => (
+				isMatch: node =>
 					node.nodeName === 'PRE' &&
 					node.children.length === 1 &&
-					node.firstChild.nodeName === 'CODE'
-				),
+					node.firstChild.nodeName === 'CODE',
 			},
 		],
 	},
@@ -62,7 +63,8 @@ export const settings = {
 				<PlainText
 					value={ attributes.content }
 					multiline={ true }
-					onChange={ ( content ) => setAttributes( { content } ) }
+					underlineColorAndroid="transparent"
+					onChange={ content => setAttributes( { content } ) }
 					placeholder={ __( 'Write code…' ) }
 					aria-label={ __( 'Code' ) }
 				/>
@@ -71,6 +73,10 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		return <pre><code>{ attributes.content }</code></pre>;
+		return (
+			<pre>
+				<code>{ attributes.content }</code>
+			</pre>
+		);
 	},
 };
