@@ -298,13 +298,11 @@ export default compose( [
 		return { settings };
 	} ),
 	withSelect( ( select, props ) => {
+		const { getMedia } = select( 'core' );
 		const { id } = props.attributes;
-		if ( ! id ) {
-			return {};
-		}
 
 		return {
-			image: select( 'core' ).getMedia( id ),
+			image: id ? getMedia( id ) : null,
 		};
 	} ),
 ] )( ImageBlock );

@@ -148,6 +148,11 @@ class GalleryImage extends Component {
 	}
 }
 
-export default withSelect( ( select, { id } ) => ( {
-	image: id ? select( 'core' ).getMedia( id ) : {},
-} ) )( GalleryImage );
+export default withSelect( ( select, ownProps ) => {
+	const { getMedia } = select( 'core' );
+	const { id } = ownProps;
+
+	return {
+		image: id ? getMedia( id ) : null,
+	};
+} )( GalleryImage );

@@ -103,9 +103,13 @@ const applyWithAPIData = withAPIData( ( { postTypeName } ) => {
 	};
 } );
 
-const applyWithSelect = withSelect( ( select, { featuredImageId } ) => ( {
-	media: featuredImageId ? select( 'core' ).getMedia( featuredImageId ) : undefined,
-} ) );
+const applyWithSelect = withSelect( ( select, { featuredImageId } ) => {
+	const { getMedia } = select( 'core' );
+
+	return {
+		image: featuredImageId ? getMedia( featuredImageId ) : null,
+	};
+} );
 
 export default compose(
 	applyConnect,
