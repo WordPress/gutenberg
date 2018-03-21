@@ -59,7 +59,6 @@ class Fill extends Component {
 		const { getSlot = noop } = this.context;
 		const { name, children } = this.props;
 		const slot = getSlot( name );
-
 		if ( ! slot || ! slot.props.bubblesVirtually ) {
 			return null;
 		}
