@@ -250,6 +250,7 @@ transforms: {
 ```
 {% end %}
 
+To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 #### useOnce (optional)
 

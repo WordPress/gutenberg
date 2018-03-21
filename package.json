@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "2.3.0",
+	"version": "2.4.0",
 	"description": "A new WordPress editor experience",
 	"main": "build/app.js",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -25,9 +25,8 @@
 		"dom-scroll-into-view": "1.2.1",
 		"element-closest": "2.0.2",
 		"escape-string-regexp": "1.0.5",
-		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#327b6bdec434177a6e841bd3210e87627ccfcecb",
+		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
 		"hpq": "1.2.0",
-		"is-equal-shallow": "0.1.3",
 		"jed": "1.1.1",
 		"jquery": "3.2.1",
 		"js-beautify": "1.6.14",
@@ -51,6 +50,7 @@
 		"redux-optimist": "1.0.0",
 		"refx": "3.0.0",
 		"rememo": "2.4.0",
+		"shallowequal": "1.0.2",
 		"showdown": "1.7.4",
 		"simple-html-tokenizer": "0.4.1",
 		"tinycolor2": "1.4.1",
@@ -64,10 +64,12 @@
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
 		"babel-loader": "7.1.2",
+		"babel-plugin-transform-async-generator-functions": "6.24.1",
 		"babel-traverse": "6.26.0",
 		"check-node-version": "3.1.1",
 		"codecov": "3.0.0",
 		"concurrently": "3.5.0",
+		"core-js": "2.5.3",
 		"cross-env": "3.2.4",
 		"cypress": "1.4.1",
 		"deep-freeze": "0.0.1",
@@ -98,6 +100,9 @@
 		"presets": [
 			"@wordpress/default"
 		],
+		"plugins": [
+			"transform-async-generator-functions"
+		],
 		"env": {
 			"production": {
 				"plugins": [
@@ -106,20 +111,22 @@
 						{
 							"output": "languages/gutenberg.pot"
 						}
-					]
+					],
+					"transform-async-generator-functions"
 				]
 			}
 		}
 	},
 	"jest": {
 		"collectCoverageFrom": [
-			"(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport)/**/*.js"
+			"(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport|plugins|core-data)/**/*.js"
 		],
 		"moduleNameMapper": {
-			"@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport)": "$1"
+			"@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport|plugins|core-data)": "$1"
 		},
 		"preset": "@wordpress/jest-preset-default",
 		"setupFiles": [
+			"core-js/fn/symbol/async-iterator",
 			"<rootDir>/test/unit/setup-blocks.js",
 			"<rootDir>/test/unit/setup-wp-aliases.js"
 		],

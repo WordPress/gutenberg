@@ -210,6 +210,7 @@ export const settings = {
 							onReplace( [] );
 						}
 					} }
+					/* translators: the text of the quotation */
 					placeholder={ __( 'Write quote…' ) }
 					isSelected={ isSelected && editable === 'content' }
 					onFocus={ onSetActiveEditable( 'content' ) }
@@ -223,6 +224,7 @@ export const settings = {
 								citation: nextCitation,
 							} )
 						}
+						/* translators: the individual or entity quoted */
 						placeholder={ __( 'Write citation…' ) }
 						isSelected={ isSelected && editable === 'cite' }
 						onFocus={ onSetActiveEditable( 'cite' ) }

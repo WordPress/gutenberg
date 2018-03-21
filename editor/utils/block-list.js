@@ -6,7 +6,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BlockList from './';
+import BlockList from '../components/block-list';
 
 /**
  * An object of cached BlockList components

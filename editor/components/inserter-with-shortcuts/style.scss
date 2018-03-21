@@ -9,8 +9,8 @@
 }
 
 .editor-inserter-with-shortcuts__block {
-	margin-right: 5px;
-	width: 36px;
-	height: 36px;
+	margin-right: $block-spacing;
+	width: $icon-button-size;
+	height: $icon-button-size;
 	padding-top: 8px;
 }

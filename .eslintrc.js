@@ -79,6 +79,14 @@ module.exports = {
 				message: 'Use @wordpress/viewport as import path instead.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^plugins$/]',
+				message: 'Use @wordpress/plugins as import path instead.',
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^core-data$/]",
+				"message": "Use @wordpress/core-data as import path instead."
+			},
+			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},
