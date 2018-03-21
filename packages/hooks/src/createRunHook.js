@@ -49,7 +49,12 @@ function createRunHook( hooks, returnFirstArg ) {
 
 		while ( hookInfo.currentIndex < handlers.length ) {
 			const handler = handlers[ hookInfo.currentIndex ];
-			args[ 0 ] = handler.callback.apply( null, args );
+
+			const result = handler.callback.apply( null, args );
+			if ( returnFirstArg ) {
+				args[ 0 ] = result;
+			}
+
 			hookInfo.currentIndex++;
 		}
 
