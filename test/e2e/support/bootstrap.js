@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 
 // The Jest timeout is increased because these tests are a bit slow
-jest.setTimeout( 20000 );
+jest.setTimeout( 50000 );
 
 beforeAll( async () => {
 	global.browser = await puppeteer.launch();
