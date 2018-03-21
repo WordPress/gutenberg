@@ -48,6 +48,7 @@
 		&.is-bottom {
 			top: 100%;
 			margin-top: 8px;
+			z-index: z-index( ".components-popover.is-bottom" );
 
 			&:before {
 				top: -8px;
