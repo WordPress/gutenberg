@@ -170,6 +170,27 @@ export function getWrapperDisplayName( BaseComponent, wrapperName ) {
 }
 
 /**
+ * Given a function mapping a component to an enhanced component and modifier
+ * name, returns the enhanced component augmented with a generated displayName.
+ *
+ * @param {Function} mapComponentToEnhancedComponent Function mapping component
+ *                                                   to enhanced component.
+ * @param {string}   modifierName                    Seed name from which to
+ *                                                   generated display name.
+ *
+ * @return {WPComponent} Component class with generated display name assigned.
+ */
+export function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
+	return ( OriginalComponent ) => {
+		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
+		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
+		EnhancedComponent.displayName = `${ modifierName }(${ displayName })`;
+
+		return EnhancedComponent;
+	};
+}
+
+/**
  * Component used as equivalent of Fragment with unescaped HTML, in cases where
  * it is desirable to render dangerous HTML without needing a wrapper element.
  * To preserve additional props, a `div` wrapper _will_ be created if any props
