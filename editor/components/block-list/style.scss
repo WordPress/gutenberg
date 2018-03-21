@@ -493,22 +493,11 @@
 	}
 }
 
-// In between blocks
 .editor-block-list__block > .editor-block-list__insertion-point {
 	position: absolute;
-	bottom: -$block-padding;
-	height: $block-padding * 2; // Matches the whole empty space between two blocks
-	top: auto;
-	left: 0;
-	right: 0;
-}
-
-// Before the first block
-.editor-block-list__layout > .editor-block-list__insertion-point {
-	position: relative;
 	top: -$block-padding;
-	margin-left: auto;
-	margin-right: auto;
+	height: $block-padding * 2; // Matches the whole empty space between two blocks
+	bottom: auto;
 	left: 0;
 	right: 0;
 }

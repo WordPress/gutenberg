@@ -39,7 +39,7 @@ describe( 'adding blocks', () => {
 		// Using the between inserter
 		await page.mouse.move( 200, 300 );
 		await page.mouse.move( 250, 350 );
-		await page.click( '[data-type="core/paragraph"] .editor-block-list__insertion-point-inserter' );
+		await page.click( '[data-type="core/quote"] .editor-block-list__insertion-point-inserter' );
 		await page.keyboard.type( 'Second paragraph' );
 
 		// Switch to Text Mode to check HTML Output
