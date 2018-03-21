@@ -23,6 +23,7 @@ export { default as KeyboardShortcuts } from './keyboard-shortcuts';
 export { default as MenuItemsChoice } from './menu-items/menu-items-choice';
 export { default as MenuItemsGroup } from './menu-items/menu-items-group';
 export { default as MenuItemsToggle } from './menu-items/menu-items-toggle';
+export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';

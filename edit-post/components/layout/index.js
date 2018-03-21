@@ -7,7 +7,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Popover, navigateRegions } from '@wordpress/components';
+import { Popover, ScrollLock, navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	AutosaveMonitor,
@@ -20,6 +20,7 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/element';
 import { PluginArea } from '@wordpress/plugins';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -45,9 +46,12 @@ function Layout( {
 	metaBoxes,
 	hasActiveMetaboxes,
 	isSaving,
+	isMobileViewport,
 } ) {
+	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
+
 	const className = classnames( 'edit-post-layout', {
-		'is-sidebar-opened': editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened,
+		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
@@ -84,6 +88,9 @@ function Layout( {
 			) }
 			{ editorSidebarOpened && <Sidebar /> }
 			{ pluginSidebarOpened && <PluginSidebar.Slot name={ sidebarName } /> }
+			{
+				isMobileViewport && sidebarIsOpened && <ScrollLock />
+			}
 			<Popover.Slot />
 			<PluginArea />
 		</div>
@@ -105,5 +112,6 @@ export default compose(
 	withDispatch( ( dispatch ) => ( {
 		closePublishSidebar: dispatch( 'core/edit-post' ).closePublishSidebar,
 	} ) ),
-	navigateRegions
+	navigateRegions,
+	withViewportMatch( { isMobileViewport: '< small' } ),
 )( Layout );
