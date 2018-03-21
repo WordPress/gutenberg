@@ -32,29 +32,23 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		}
 	}
 
-	render() {
-		// TODO: This is a place holder, this should call the edit() method of the block depending on this.props.blockType
+	getBlockForType() {
 		if ( this.props.blockType === 'code' ) {
 			const Code = codeBlock.edit;
+			// TODO: input text needs to be kept by updating the attributes
 			return (
-				<TouchableWithoutFeedback
-					onPress={ this.props.onBlockHolderPressed.bind( this, this.props.index ) }
-				>
-					<View style={ styles.blockHolder }>
-						<View style={ styles.blockTitle }>
-							<Text>BlockType: { this.props.blockType }</Text>
-						</View>
-						<Code
-							attributes={ { content: this.props.content } }
-							// TODO: input text needs to be kept by updating the attributes
-							setAttributes={ attrs => console.log( { attrs } ) }
-						/>
-						{ this.renderToolbarIfBlockFocused.bind( this )() }
-					</View>
-				</TouchableWithoutFeedback>
+				<Code
+					attributes={ { content: this.props.content } }
+					setAttributes={ attrs => console.log( { attrs } ) }
+				/>
 			);
+		} else {
+			// Default block placeholder
+			return <Text>{ this.props.content }</Text>;
 		}
+	}
 
+	render() {
 		return (
 			<TouchableWithoutFeedback
 				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.index ) }
@@ -63,9 +57,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 					<View style={ styles.blockTitle }>
 						<Text>BlockType: { this.props.blockType }</Text>
 					</View>
-					<View style={ styles.blockContent }>
-						<Text>{ this.props.content }</Text>
-					</View>
+					<View style={ styles.blockContainer }>{ this.getBlockForType.bind( this )() }</View>
 					{ this.renderToolbarIfBlockFocused.bind( this )() }
 				</View>
 			</TouchableWithoutFeedback>
@@ -77,8 +69,10 @@ const styles = StyleSheet.create( {
 	blockHolder: {
 		flex: 1,
 	},
-	blockContent: {
+	blockContainer: {
 		backgroundColor: 'white',
+	},
+	blockContent: {
 		padding: 10,
 	},
 	blockTitle: {
