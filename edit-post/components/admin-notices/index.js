@@ -8,13 +8,15 @@ import { isEmpty, intersection } from 'lodash';
  */
 import { _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Notice } from '@wordpress/components';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
 // TODO: This may not be right to import from, figure out what is.
 import { getWPAdminURL } from '../../../editor/utils/url';
+
+const ADMIN_MESSAGES_NOTICE_ID = 'ADMIN_MESSAGES_NOTICES_ID';
 
 const noticeClassNames = [
 	'notice',
@@ -40,27 +42,10 @@ function countNotices( noticeList ) {
 }
 
 class AdminNotices extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.state = { noticeCount: 0 };
-	}
-
 	componentWillMount() {
 		const noticeList = document.getElementById( 'admin-notice-list' );
 		const noticeCount = countNotices( noticeList );
-
-		this.setState( () => {
-			return { noticeCount };
-		} );
-	}
-
-	render() {
-		const { noticeCount } = this.state;
-
-		if ( noticeCount === 0 ) {
-			return null;
-		}
+		const { createNotice } = this.props;
 
 		const msg = sprintf( _n(
 			'There is a WordPress notice which needs your attention.',
@@ -69,13 +54,18 @@ class AdminNotices extends Component {
 
 		const content = <p><a href={ getWPAdminURL( 'index.php' ) }>{ msg }</a></p>;
 
-		return (
-			<div className="admin-notices-summary">
-				<Notice status="info" content={ content } isDismissible={ false } />
-			</div>
+		createNotice(
+			content,
+			{ id: ADMIN_MESSAGES_NOTICE_ID, spokenMessage: msg }
 		);
+	}
+
+	render() {
+		return null;
 	}
 }
 
-export default AdminNotices;
+export default withDispatch( ( dispatch ) => ( {
+	createNotice: dispatch( 'core/editor' ).createInfoNotice,
+} ) )( AdminNotices );
 
