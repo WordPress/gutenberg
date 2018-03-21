@@ -18,36 +18,22 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				activeGeneralSidebar: 'editor',
-				activeSidebarPanel: {
-					editor: null,
-					plugin: null,
-				},
+				activeGeneralSidebar: 'edit-post/document',
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
-				viewportType: 'desktop',
 			} );
 		} );
 
 		it( 'should set the general sidebar active panel', () => {
 			const state = preferences( deepFreeze( {
 				activeGeneralSidebar: 'editor',
-				activeSidebarPanel: {
-					editor: null,
-					plugin: null,
-				},
 			} ), {
 				type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
-				sidebar: 'editor',
-				panel: 'document',
+				name: 'edit-post/document',
 			} );
 			expect( state ).toEqual( {
 				activeGeneralSidebar: 'editor',
-				activeSidebarPanel: {
-					editor: 'document',
-					plugin: null,
-				},
 			} );
 		} );
 

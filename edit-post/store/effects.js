@@ -7,6 +7,8 @@ import { reduce, values, some } from 'lodash';
  * WordPress dependencies
  */
 import { select, subscribe } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,11 +24,12 @@ import { getMetaBoxContainer } from '../utils/meta-boxes';
 const effects = {
 	INITIALIZE_META_BOX_STATE( action, store ) {
 		const hasActiveMetaBoxes = some( action.metaBoxes );
+		if ( ! hasActiveMetaBoxes ) {
+			return;
+		}
 
 		// Allow toggling metaboxes panels
-		if ( hasActiveMetaBoxes ) {
-			window.postboxes.add_postbox_toggles( 'post' );
-		}
+		window.postboxes.add_postbox_toggles( select( 'core/editor' ).getCurrentPostType() );
 
 		// Initialize metaboxes state
 		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
@@ -64,6 +67,7 @@ const effects = {
 		const additionalData = [
 			post.comment_status && `comment_status=${ post.comment_status }`,
 			post.ping_status && `ping_status=${ post.ping_status }`,
+			`post_author=${ post.author }`,
 		].filter( Boolean );
 
 		// To save the metaboxes, we serialize each one of the location forms and combine them
@@ -72,16 +76,19 @@ const effects = {
 			.concat( jQuery( '.metabox-base-form' ).serialize() )
 			.concat( additionalData )
 			.join( '&' );
-		const fetchOptions = {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-			body: formData,
-			credentials: 'include',
-		};
 
 		// Save the metaboxes
-		window.fetch( window._wpMetaBoxUrl, fetchOptions )
+		wp.apiRequest( {
+			url: window._wpMetaBoxUrl,
+			method: 'POST',
+			contentType: 'application/x-www-form-urlencoded',
+			data: formData,
+		} )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
+	},
+	SWITCH_MODE( action ) {
+		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
+		speak( message, 'assertive' );
 	},
 };
 

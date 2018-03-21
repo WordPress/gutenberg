@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { some } from 'lodash';
 
@@ -16,7 +15,11 @@ import {
 	EditorNotices,
 	PostPublishPanel,
 	DocumentTitle,
+	PreserveScrollInReorder,
 } from '@wordpress/editor';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/element';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -24,49 +27,27 @@ import {
 import './style.scss';
 import Header from '../header';
 import Sidebar from '../sidebar';
-import TextEditor from '../modes/text-editor';
-import VisualEditor from '../modes/visual-editor';
-import EditorModeKeyboardShortcuts from '../modes/keyboard-shortcuts';
+import TextEditor from '../text-editor';
+import VisualEditor from '../visual-editor';
+import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import {
-	getEditorMode,
-	hasOpenSidebar,
-	isFeatureActive,
-	getOpenedGeneralSidebar,
-	isPublishSidebarOpened,
-	getActivePlugin,
-	getMetaBoxes,
-} from '../../store/selectors';
-import { closePublishSidebar } from '../../store/actions';
-import PluginsPanel from '../../components/plugins-panel/index.js';
-import { getSidebarSettings } from '../../api/sidebar';
-
-function GeneralSidebar( { openedGeneralSidebar } ) {
-	switch ( openedGeneralSidebar ) {
-		case 'editor':
-			return <Sidebar />;
-		case 'plugin':
-			return <PluginsPanel />;
-		default:
-	}
-	return null;
-}
+import PluginSidebar from '../plugin-sidebar';
 
 function Layout( {
 	mode,
-	layoutHasOpenSidebar,
-	publishSidebarOpen,
-	openedGeneralSidebar,
+	editorSidebarOpened,
+	pluginSidebarOpened,
+	sidebarName,
+	publishSidebarOpened,
 	hasFixedToolbar,
-	onClosePublishSidebar,
-	plugin,
+	closePublishSidebar,
 	metaBoxes,
+	hasActiveMetaboxes,
+	isSaving,
 } ) {
-	const isSidebarOpened = layoutHasOpenSidebar &&
-		( openedGeneralSidebar !== 'plugin' || getSidebarSettings( plugin ) );
 	const className = classnames( 'edit-post-layout', {
-		'is-sidebar-opened': isSidebarOpened,
+		'is-sidebar-opened': editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
@@ -83,11 +64,10 @@ function Layout( {
 			<Header />
 			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
 				<EditorNotices />
-				<div className="edit-post-layout__editor">
-					<EditorModeKeyboardShortcuts />
-					{ mode === 'text' && <TextEditor /> }
-					{ mode === 'visual' && <VisualEditor /> }
-				</div>
+				<PreserveScrollInReorder />
+				<EditorModeKeyboardShortcuts />
+				{ mode === 'text' && <TextEditor /> }
+				{ mode === 'visual' && <VisualEditor /> }
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
 				</div>
@@ -95,29 +75,35 @@ function Layout( {
 					<MetaBoxes location="advanced" />
 				</div>
 			</div>
-			{ publishSidebarOpen && <PostPublishPanel onClose={ onClosePublishSidebar } /> }
-			{
-				openedGeneralSidebar !== null && <GeneralSidebar
-					openedGeneralSidebar={ openedGeneralSidebar } />
-			}
+			{ publishSidebarOpened && (
+				<PostPublishPanel
+					onClose={ closePublishSidebar }
+					forceIsDirty={ hasActiveMetaboxes }
+					forceIsSaving={ isSaving }
+				/>
+			) }
+			{ editorSidebarOpened && <Sidebar /> }
+			{ pluginSidebarOpened && <PluginSidebar.Slot name={ sidebarName } /> }
 			<Popover.Slot />
+			<PluginArea />
 		</div>
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		mode: getEditorMode( state ),
-		layoutHasOpenSidebar: hasOpenSidebar( state ),
-		openedGeneralSidebar: getOpenedGeneralSidebar( state ),
-		publishSidebarOpen: isPublishSidebarOpened( state ),
-		hasFixedToolbar: isFeatureActive( state, 'fixedToolbar' ),
-		plugin: getActivePlugin( state ),
-		metaBoxes: getMetaBoxes( state ),
-	} ),
-	{
-		onClosePublishSidebar: closePublishSidebar,
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
-)( navigateRegions( Layout ) );
+export default compose(
+	withSelect( ( select ) => ( {
+		mode: select( 'core/edit-post' ).getEditorMode(),
+		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
+		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
+		sidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
+		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),
+		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		closePublishSidebar: dispatch( 'core/edit-post' ).closePublishSidebar,
+	} ) ),
+	navigateRegions
+)( Layout );

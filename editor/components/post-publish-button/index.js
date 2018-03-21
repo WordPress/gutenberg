@@ -36,6 +36,7 @@ export function PostPublishButton( {
 	isSaveable,
 	user,
 	onSubmit = noop,
+	forceIsSaving,
 } ) {
 	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
 	const isContributor = ! get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
@@ -69,18 +70,18 @@ export function PostPublishButton( {
 			disabled={ ! isButtonEnabled }
 			className={ className }
 		>
-			<PublishButtonLabel />
+			<PublishButtonLabel forceIsSaving={ forceIsSaving } />
 		</Button>
 	);
 }
 
 const applyConnect = connect(
-	( state ) => ( {
-		isSaving: isSavingPost( state ),
+	( state, { forceIsSaving, forceIsDirty } ) => ( {
+		isSaving: forceIsSaving || isSavingPost( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
 		visibility: getEditedPostVisibility( state ),
 		isSaveable: isEditedPostSaveable( state ),
-		isPublishable: isEditedPostPublishable( state ),
+		isPublishable: forceIsDirty || isEditedPostPublishable( state ),
 		postType: getCurrentPostType( state ),
 	} ),
 	{

@@ -8,7 +8,7 @@ window._wpGutenbergPost.title = {
 window._wpGutenbergPost.content = {
 	raw: [
 		'<!-- wp:cover-image {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->',
-		'<section class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><h2>Of Mountains &amp; Printing Presses</h2></section>',
+		'<div class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><p class="wp-block-cover-image-text">Of Mountains &amp; Printing Presses</p></div>',
 		'<!-- /wp:cover-image -->',
 
 		'<!-- wp:paragraph -->',
@@ -126,8 +126,8 @@ window._wpGutenbergPost.content = {
 		'<p>Any block can opt into these alignments. The embed block has them also, and is responsive out of the box:</p>',
 		'<!-- /wp:paragraph -->',
 
-		'<!-- wp:embed {"url":"https://vimeo.com/22439234","align":"wide"} -->',
-		'<figure class="wp-block-embed alignwide">https://vimeo.com/22439234</figure>',
+		'<!-- wp:embed {"url":"https://vimeo.com/22439234","align":"wide","type":"video","providerNameSlug":"vimeo"} -->',
+		'<figure class="wp-block-embed alignwide is-type-video is-provider-vimeo">https://vimeo.com/22439234</figure>',
 		'<!-- /wp:embed -->',
 
 		'<!-- wp:paragraph -->',

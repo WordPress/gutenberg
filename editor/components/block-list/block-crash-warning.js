@@ -10,9 +10,7 @@ import Warning from '../warning';
 
 const warning = (
 	<Warning>
-		<p>{ __(
-			'This block has encountered an error and cannot be previewed.'
-		) }</p>
+		{ __( 'This block has encountered an error and cannot be previewed.' ) }
 	</Warning>
 );
 

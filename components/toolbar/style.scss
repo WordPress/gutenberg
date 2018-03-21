@@ -92,6 +92,10 @@ div.components-toolbar {
 		@include formatting-button-style__active;
 	}
 
+	&:not(:disabled).is-active[data-subscript]:after {
+		color: $white;
+	}
+
 	// focus style
 	&:not(:disabled):focus > svg {
 		@include formatting-button-style__focus;

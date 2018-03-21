@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -74,6 +74,10 @@ export class PostPreviewButton extends Component {
 			this.getWindowTarget()
 		);
 
+		// When popup is closed, delete reference to avoid later assignment of
+		// location in a post update.
+		this.previewWindow.onbeforeunload = () => delete this.previewWindow;
+
 		const markup = `
 			<div>
 				<p>Please wait&hellip;</p>
@@ -105,14 +109,16 @@ export class PostPreviewButton extends Component {
 		const { link, isSaveable } = this.props;
 
 		return (
-			<IconButton
+			<Button
+				className="editor-post-preview"
+				isLarge
 				href={ link }
 				onClick={ this.saveForPreview }
 				target={ this.getWindowTarget() }
-				icon="visibility"
 				disabled={ ! isSaveable }
-				label={ _x( 'Preview', 'imperative verb' ) }
-			/>
+			>
+				{ _x( 'Preview', 'imperative verb' ) }
+			</Button>
 		);
 	}
 }

@@ -62,7 +62,7 @@ import TinyMCE from 'tinymce';
 
 #### WordPress Dependencies
 
-To encourage reusability between features, our JavaScript is split into domain-specific modules which [`export`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export) one or more functions or objects. In the Gutenberg project, we've distinguished these modules under top-level directories `blocks`, `components`, `editor`, `edit-post`, `element`, `data` and `i18n`. These each serve an independent purpose, and often code is shared between them. For example, in order to localize its text, editor code will need to include functions from the `i18n` module.
+To encourage reusability between features, our JavaScript is split into domain-specific modules which [`export`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/export) one or more functions or objects. In the Gutenberg project, we've distinguished these modules under top-level directories. Each module serve an independent purpose, and often code is shared between them. For example, in order to localize its text, editor code will need to include functions from the `i18n` module.
 
 Example:
 
@@ -84,6 +84,18 @@ Example:
  * Internal dependencies
  */
 import VisualEditor from '../visual-editor';
+```
+
+### Experimental APIs
+
+Exposed APIs that are still being tested, discussed and are subject to change should be prefixed with `__experimental`, until they are finalized. This is meant to discourage developers from relying on the API, because it might be removed or changed in the (near) future.
+
+Example:
+
+```js
+export {
+	internalApi as __experimentalExposedApi
+} from './internalApi.js';
 ```
 
 ## PHP

@@ -53,6 +53,7 @@ const {
 	getNextBlockUid,
 	isBlockSelected,
 	isBlockWithinSelection,
+	hasMultiSelection,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	getBlockMode,
@@ -66,13 +67,17 @@ const {
 	getNotices,
 	getReusableBlock,
 	isSavingReusableBlock,
+	isFetchingReusableBlock,
 	isSelectionEnabled,
 	getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
 	getInserterItems,
-	getRecentInserterItems,
-	getFrequentInserterItems,
+	getFrecentInserterItems,
+	getProvisionalBlockUID,
+	isValidTemplate,
+	getTemplate,
+	getTemplateLock,
 	POST_UPDATE_TRANSACTION_ID,
 } = selectors;
 
@@ -1804,6 +1809,41 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'hasMultiSelection', () => {
+		it( 'should return false if no selection', () => {
+			const state = {
+				blockSelection: {
+					start: null,
+					end: null,
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if singular selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if multi-selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'isBlockMultiSelected', () => {
 		const state = {
 			editor: {
@@ -2343,7 +2383,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUid: {
+							carrot: { name: 'core/test-block' },
+						},
 						blockOrder: {},
 						edits: {},
 					},
@@ -2351,11 +2393,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				reusableBlocks: {
 					data: {
-						123: {
-							id: 123,
-							title: 'My reusable block',
-							type: 'core/test-block',
-						},
+						123: { uid: 'carrot', title: 'My reusable block' },
 					},
 				},
 			};
@@ -2367,7 +2405,7 @@ describe( 'selectors', () => {
 					initialAttributes: { ref: 123 },
 					title: 'My reusable block',
 					icon: 'test',
-					category: 'reusable-blocks',
+					category: 'shared',
 					keywords: [],
 					isDisabled: false,
 				},
@@ -2379,89 +2417,52 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getRecentInserterItems', () => {
+	describe( 'getFrecentInserterItems', () => {
 		beforeAll( () => {
 			registerCoreBlocks();
 		} );
 
-		it( 'should return the 9 most recently used blocks', () => {
+		it( 'should return the most frecently used blocks', () => {
 			const state = {
 				preferences: {
-					recentInserts: [
-						{ name: 'core/deleted-block' }, // Deleted blocks should be filtered out
-						{ name: 'core/block', ref: 456 }, // Deleted reusable blocks should be filtered out
-						{ name: 'core/paragraph' },
-						{ name: 'core/block', ref: 123 },
-						{ name: 'core/image' },
-						{ name: 'core/quote' },
-						{ name: 'core/gallery' },
-						{ name: 'core/heading' },
-						{ name: 'core/list' },
-						{ name: 'core/video' },
-						{ name: 'core/audio' },
-						{ name: 'core/code' },
-					],
+					insertUsage: {
+						'core/deleted-block': { time: 1000, count: 10, insert: { name: 'core/deleted-block' } }, // Deleted blocks should be filtered out
+						'core/block/456': { time: 1000, count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted reusable blocks should be filtered out
+						'core/image': { time: 1000, count: 3, insert: { name: 'core/image' } },
+						'core/block/123': { time: 1000, count: 5, insert: { name: 'core/block', ref: 123 } },
+						'core/paragraph': { time: 1000, count: 2, insert: { name: 'core/paragraph' } },
+					},
 				},
 				editor: {
 					present: {
+						blocksByUid: {
+							carrot: { name: 'core/test-block' },
+						},
 						blockOrder: [],
+						edits: {},
 					},
 				},
 				reusableBlocks: {
 					data: {
-						123: { id: 123, type: 'core/test-block' },
+						123: { uid: 'carrot' },
 					},
 				},
+				currentPost: {},
 			};
 
-			expect( getRecentInserterItems( state ) ).toMatchObject( [
-				{ name: 'core/paragraph', initialAttributes: {} },
+			expect( getFrecentInserterItems( state, true, 3 ) ).toMatchObject( [
 				{ name: 'core/block', initialAttributes: { ref: 123 } },
 				{ name: 'core/image', initialAttributes: {} },
-				{ name: 'core/quote', initialAttributes: {} },
-				{ name: 'core/gallery', initialAttributes: {} },
-				{ name: 'core/heading', initialAttributes: {} },
-				{ name: 'core/list', initialAttributes: {} },
-				{ name: 'core/video', initialAttributes: {} },
-				{ name: 'core/audio', initialAttributes: {} },
+				{ name: 'core/paragraph', initialAttributes: {} },
 			] );
 		} );
 
-		it( 'should pad list out with blocks from the common category', () => {
-			const state = {
-				preferences: {
-					recentInserts: [
-						{ name: 'core/paragraph' },
-					],
-				},
-				editor: {
-					present: {
-						blockOrder: [],
-					},
-				},
-			};
-
-			// We should get back 8 items with no duplicates
-			const items = getRecentInserterItems( state );
-			const blockNames = items.map( item => item.name );
-			expect( union( blockNames ) ).toHaveLength( 9 );
-		} );
-	} );
-
-	describe( 'getFrequentInserterItems', () => {
-		beforeAll( () => {
-			registerCoreBlocks();
-		} );
-
-		it( 'should return the 8 most recently used blocks', () => {
+		it( 'should weight by time', () => {
 			const state = {
 				preferences: {
 					insertUsage: {
-						'core/deleted-block': { count: 10, insert: { name: 'core/deleted-block' } }, // Deleted blocks should be filtered out
-						'core/block/456': { count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted reusable blocks should be filtered out
-						'core/image': { count: 3, insert: { name: 'core/image' } },
-						'core/block/123': { count: 5, insert: { name: 'core/block', ref: 123 } },
-						'core/paragraph': { count: 2, insert: { name: 'core/paragraph' } },
+						'core/image': { time: Date.now() - 1000, count: 2, insert: { name: 'core/image' } },
+						'core/paragraph': { time: Date.now() - 4000, count: 3, insert: { name: 'core/paragraph' } },
 					},
 				},
 				editor: {
@@ -2470,16 +2471,37 @@ describe( 'selectors', () => {
 					},
 				},
 				reusableBlocks: {
-					data: {
-						123: { id: 123, type: 'core/test-block' },
-					},
+					data: {},
 				},
 			};
 
-			expect( getFrequentInserterItems( state, true, 3 ) ).toMatchObject( [
-				{ name: 'core/block', initialAttributes: { ref: 123 } },
+			expect( getFrecentInserterItems( state, true, 2 ) ).toMatchObject( [
 				{ name: 'core/image', initialAttributes: {} },
 				{ name: 'core/paragraph', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should be backwards-compatible with old preferences values', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/image': { time: Date.now(), count: 1, insert: { name: 'core/image' } },
+						'core/paragraph': { time: undefined, count: 5, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				reusableBlocks: {
+					data: {},
+				},
+			};
+
+			expect( getFrecentInserterItems( state, true, 2 ) ).toMatchObject( [
+				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/image', initialAttributes: {} },
 			] );
 		} );
 
@@ -2487,7 +2509,7 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					insertUsage: {
-						'core/image': { count: 2, insert: { name: 'core/paragraph' } },
+						'core/image': { time: 1000, count: 2, insert: { name: 'core/paragraph' } },
 					},
 				},
 				editor: {
@@ -2498,7 +2520,7 @@ describe( 'selectors', () => {
 			};
 
 			// We should get back 4 items with no duplicates
-			const items = getFrequentInserterItems( state, true, 4 );
+			const items = getFrecentInserterItems( state, true, 4 );
 			const blockNames = items.map( item => item.name );
 			expect( union( blockNames ) ).toHaveLength( 4 );
 		} );
@@ -2506,25 +2528,45 @@ describe( 'selectors', () => {
 
 	describe( 'getReusableBlock', () => {
 		it( 'should return a reusable block', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			const expectedReusableBlock = {
-				id,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
 			const state = {
 				reusableBlocks: {
 					data: {
-						[ id ]: expectedReusableBlock,
+						8109: {
+							uid: 'foo',
+							title: 'My cool block',
+						},
 					},
 				},
 			};
 
-			const actualReusableBlock = getReusableBlock( state, id );
-			expect( actualReusableBlock ).toEqual( expectedReusableBlock );
+			const actualReusableBlock = getReusableBlock( state, 8109 );
+			expect( actualReusableBlock ).toEqual( {
+				id: 8109,
+				isTemporary: false,
+				uid: 'foo',
+				title: 'My cool block',
+			} );
+		} );
+
+		it( 'should return a temporary reusable block', () => {
+			const state = {
+				reusableBlocks: {
+					data: {
+						reusable1: {
+							uid: 'foo',
+							title: 'My cool block',
+						},
+					},
+				},
+			};
+
+			const actualReusableBlock = getReusableBlock( state, 'reusable1' );
+			expect( actualReusableBlock ).toEqual( {
+				id: 'reusable1',
+				isTemporary: true,
+				uid: 'foo',
+				title: 'My cool block',
+			} );
 		} );
 
 		it( 'should return null when no reusable block exists', () => {
@@ -2547,54 +2589,66 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const isSaving = isSavingReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
+			const isSaving = isSavingReusableBlock( state, 5187 );
 			expect( isSaving ).toBe( false );
 		} );
 
 		it( 'should return true when the block is being saved', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const state = {
 				reusableBlocks: {
 					isSaving: {
-						[ id ]: true,
+						5187: true,
 					},
 				},
 			};
 
-			const isSaving = isSavingReusableBlock( state, id );
+			const isSaving = isSavingReusableBlock( state, 5187 );
 			expect( isSaving ).toBe( true );
+		} );
+	} );
+
+	describe( 'isFetchingReusableBlock', () => {
+		it( 'should return false when the block is not being fetched', () => {
+			const state = {
+				reusableBlocks: {
+					isFetching: {},
+				},
+			};
+
+			const isFetching = isFetchingReusableBlock( state, 5187 );
+			expect( isFetching ).toBe( false );
+		} );
+
+		it( 'should return true when the block is being fetched', () => {
+			const state = {
+				reusableBlocks: {
+					isFetching: {
+						5187: true,
+					},
+				},
+			};
+
+			const isFetching = isFetchingReusableBlock( state, 5187 );
+			expect( isFetching ).toBe( true );
 		} );
 	} );
 
 	describe( 'getReusableBlocks', () => {
 		it( 'should return an array of reusable blocks', () => {
-			const reusableBlock1 = {
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-			const reusableBlock2 = {
-				id: '687e1a87-cca1-41f2-a782-197ddaea9abf',
-				name: 'My neat block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Goodbye!',
-				},
-			};
 			const state = {
 				reusableBlocks: {
 					data: {
-						[ reusableBlock1.id ]: reusableBlock1,
-						[ reusableBlock2.id ]: reusableBlock2,
+						123: { uid: 'carrot' },
+						reusable1: { uid: 'broccoli' },
 					},
 				},
 			};
 
 			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [ reusableBlock1, reusableBlock2 ] );
+			expect( reusableBlocks ).toEqual( [
+				{ id: 123, isTemporary: false, uid: 'carrot' },
+				{ id: 'reusable1', isTemporary: true, uid: 'broccoli' },
+			] );
 		} );
 
 		it( 'should return an empty array when no reusable blocks exist', () => {
@@ -2777,6 +2831,63 @@ describe( 'selectors', () => {
 			} );
 
 			expect( isPublishing ).toBe( true );
+		} );
+	} );
+
+	describe( 'getProvisionalBlockUID()', () => {
+		it( 'should return null if not set', () => {
+			const provisionalBlockUID = getProvisionalBlockUID( {
+				provisionalBlockUID: null,
+			} );
+
+			expect( provisionalBlockUID ).toBe( null );
+		} );
+
+		it( 'should return UID of provisional block', () => {
+			const provisionalBlockUID = getProvisionalBlockUID( {
+				provisionalBlockUID: 'chicken',
+			} );
+
+			expect( provisionalBlockUID ).toBe( 'chicken' );
+		} );
+	} );
+
+	describe( 'isValidTemplate', () => {
+		it( 'should return true if template is valid', () => {
+			const state = {
+				template: { isValid: true },
+			};
+
+			expect( isValidTemplate( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if template is not valid', () => {
+			const state = {
+				template: { isValid: false },
+			};
+
+			expect( isValidTemplate( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getTemplate', () => {
+		it( 'should return the template object', () => {
+			const template = [];
+			const state = {
+				template: { isValid: true, template },
+			};
+
+			expect( getTemplate( state ) ).toBe( template );
+		} );
+	} );
+
+	describe( 'getTemplateLock', () => {
+		it( 'should return the template object', () => {
+			const state = {
+				template: { isValid: true, lock: 'all' },
+			};
+
+			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 	} );
 } );

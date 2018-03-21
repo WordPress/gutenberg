@@ -66,26 +66,31 @@ function withUseOnceValidation( BlockEdit ) {
 			<div key="invalid-preview" style={ { minHeight: '100px' } }>
 				<BlockEdit key="block-edit" { ...props } />
 			</div>,
-			<Warning key="use-once-warning">
-				<p>
-					<strong>{ blockType.title }: </strong>
-					{ __( 'This block may not be used more than once.' ) }</p>
-				<p>
-					<Button isLarge onClick={
-						selectFirst
-					}>{ __( 'Find original' ) }</Button>
-					<Button isLarge onClick={
-						() => props.onReplace( [] )
-					}>{ __( 'Remove' ) }</Button>
-					{ outboundType &&
-						<Button isLarge onClick={ () => props.onReplace(
-							createBlock( outboundType.name, props.attributes )
-						) }>
+			<Warning
+				key="use-once-warning"
+				actions={ [
+					<Button key="find-original" isLarge onClick={ selectFirst }>
+						{ __( 'Find original' ) }
+					</Button>,
+					<Button key="remove" isLarge onClick={ () => props.onReplace( [] ) }>
+						{ __( 'Remove' ) }
+					</Button>,
+					outboundType && (
+						<Button
+							key="transform"
+							isLarge
+							onClick={ () => props.onReplace(
+								createBlock( outboundType.name, props.attributes )
+							) }
+						>
 							{ __( 'Transform into:' ) }{ ' ' }
 							{ outboundType.title }
 						</Button>
-					}
-				</p>
+					),
+				] }
+			>
+				<strong>{ blockType.title }: </strong>
+				{ __( 'This block may not be used more than once.' ) }
 			</Warning>,
 		];
 	};

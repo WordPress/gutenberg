@@ -70,11 +70,6 @@ body.gutenberg-editor-page {
 		top: -1px;
 	}
 
-	svg {
-		fill: currentColor;
-		outline: none;
-	}
-
 	ul#adminmenu a.wp-has-current-submenu:after,
 	ul#adminmenu>li.current>a.current:after {
 		border-right-color: $white;
@@ -84,20 +79,6 @@ body.gutenberg-editor-page {
 .gutenberg {
 	* {
 		box-sizing: border-box;
-	}
-
-	ul:not(.wp-block-gallery) {
-		list-style-type: disc;
-	}
-
-	ol:not(.wp-block-gallery) {
-		list-style-type: decimal;
-	}
-
-	ul,
-	ol {
-		margin: 0;
-		padding: 0;
 	}
 
 	select {
@@ -141,12 +122,6 @@ body.gutenberg-editor-page {
 .editor-block-list__block {
 	input,
 	textarea {
-		border-radius: 4px;
-		border-color: $light-gray-500;
-		font-family: $default-font;
-		font-size: $default-font-size;
-		padding: 6px 10px;
-
 		&::-webkit-input-placeholder {
 			color: $dark-gray-300;
 		}
@@ -159,5 +134,16 @@ body.gutenberg-editor-page {
 		&:-moz-placeholder {
 			color: $dark-gray-300;
 		}
+	}
+}
+
+.editor-block-list__block {
+	input,
+	textarea {
+		border-radius: 4px;
+		border-color: $light-gray-500;
+		font-family: $default-font;
+		font-size: $default-font-size;
+		padding: 6px 10px;
 	}
 }

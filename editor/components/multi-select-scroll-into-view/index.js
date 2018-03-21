@@ -10,6 +10,11 @@ import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getScrollContainer } from '@wordpress/utils';
 
+/**
+ * Internal dependencies
+ */
+import { getBlockDOMNode } from '../../utils/dom';
+
 class MultiSelectScrollIntoView extends Component {
 	componentDidUpdate() {
 		// Relies on expectation that `componentDidUpdate` will only be called
@@ -29,7 +34,7 @@ class MultiSelectScrollIntoView extends Component {
 			return;
 		}
 
-		const extentNode = document.querySelector( '[data-block="' + extentUID + '"]' );
+		const extentNode = getBlockDOMNode( extentUID );
 		if ( ! extentNode ) {
 			return;
 		}

@@ -26,6 +26,7 @@ function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting 
 		/>,
 		<BlockSettingsMenu
 			key="menu"
+			rootUID={ rootUID }
 			uids={ multiSelectedBlockUids }
 			focus
 		/>,

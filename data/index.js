@@ -1,9 +1,10 @@
 /**
  * External dependencies
  */
-import isEqualShallow from 'is-equal-shallow';
-import { createStore } from 'redux';
+import isShallowEqual from 'shallowequal';
+import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues } from 'lodash';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -28,7 +29,37 @@ let listeners = [];
  * Global listener called for each store's update.
  */
 export function globalListener() {
-	listeners.forEach( listener => listener() );
+	listeners.forEach( ( listener ) => listener() );
+}
+
+/**
+ * Convenience for registering reducer with actions and selectors.
+ *
+ * @param {string} reducerKey Reducer key.
+ * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
+ *
+ * @return {Object} Registered store object.
+ */
+export function registerStore( reducerKey, options ) {
+	if ( ! options.reducer ) {
+		throw new TypeError( 'Must specify store reducer' );
+	}
+
+	const store = registerReducer( reducerKey, options.reducer );
+
+	if ( options.actions ) {
+		registerActions( reducerKey, options.actions );
+	}
+
+	if ( options.selectors ) {
+		registerSelectors( reducerKey, options.selectors );
+	}
+
+	if ( options.resolvers ) {
+		registerResolvers( reducerKey, options.resolvers );
+	}
+
+	return store;
 }
 
 /**
@@ -46,10 +77,34 @@ export function registerReducer( reducerKey, reducer ) {
 	}
 	const store = createStore( reducer, flowRight( enhancers ) );
 	stores[ reducerKey ] = store;
-	store.subscribe( globalListener );
+
+	// Customize subscribe behavior to call listeners only on effective change,
+	// not on every dispatch.
+	let lastState = store.getState();
+	store.subscribe( () => {
+		const state = store.getState();
+		const hasChanged = state !== lastState;
+		lastState = state;
+
+		if ( hasChanged ) {
+			globalListener();
+		}
+	} );
 
 	return store;
 }
+
+/**
+ * The combineReducers helper function turns an object whose values are different
+ * reducing functions into a single reducing function you can pass to registerReducer.
+ *
+ * @param {Object} reducers An object whose values correspond to different reducing
+ *                          functions that need to be combined into one.
+ *
+ * @return {Function}       A reducer that invokes every reducer inside the reducers
+ *                          object, and constructs a state object with the same shape.
+ */
+export { combineReducers };
 
 /**
  * Registers selectors for external usage.
@@ -64,6 +119,55 @@ export function registerSelectors( reducerKey, newSelectors ) {
 	const store = stores[ reducerKey ];
 	const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
 	selectors[ reducerKey ] = mapValues( newSelectors, createStateSelector );
+}
+
+/**
+ * Registers resolvers for a given reducer key. Resolvers are side effects
+ * invoked once per argument set of a given selector call, used in ensuring
+ * that the data needs for the selector are satisfied.
+ *
+ * @param {string} reducerKey   Part of the state shape to register the
+ *                              resolvers for.
+ * @param {Object} newResolvers Resolvers to register.
+ */
+export function registerResolvers( reducerKey, newResolvers ) {
+	const createResolver = ( selector, key ) => {
+		// Don't modify selector behavior if no resolver exists.
+		if ( ! newResolvers.hasOwnProperty( key ) ) {
+			return selector;
+		}
+
+		// Ensure single invocation per argument set via memoization.
+		const fulfill = memoize( async ( ...args ) => {
+			const store = stores[ reducerKey ];
+
+			// At this point, selectors have already been pre-bound to inject
+			// state, it would not be otherwise provided to fulfill.
+			const state = store.getState();
+
+			let fulfillment = newResolvers[ key ]( state, ...args );
+
+			// Attempt to normalize fulfillment as async iterable.
+			fulfillment = toAsyncIterable( fulfillment );
+			if ( ! isAsyncIterable( fulfillment ) ) {
+				return;
+			}
+
+			for await ( const maybeAction of fulfillment ) {
+				// Dispatch if it quacks like an action.
+				if ( isActionLike( maybeAction ) ) {
+					store.dispatch( maybeAction );
+				}
+			}
+		} );
+
+		return ( ...args ) => {
+			fulfill( ...args );
+			return selector( ...args );
+		};
+	};
+
+	selectors[ reducerKey ] = mapValues( selectors[ reducerKey ], createResolver );
 }
 
 /**
@@ -103,16 +207,6 @@ export const subscribe = ( listener ) => {
  * @return {*} The selector's returned value.
  */
 export function select( reducerKey ) {
-	if ( arguments.length > 1 ) {
-		deprecated( 'Calling select with multiple arguments', {
-			version: '2.4',
-			plugin: 'Gutenberg',
-		} );
-
-		const [ , selectorKey, ...args ] = arguments;
-		return select( reducerKey )[ selectorKey ]( ...args );
-	}
-
 	return selectors[ reducerKey ];
 }
 
@@ -156,13 +250,19 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 		}
 
 		componentWillReceiveProps( nextProps ) {
-			if ( ! isEqualShallow( nextProps, this.props ) ) {
+			if ( ! isShallowEqual( nextProps, this.props ) ) {
 				this.runSelection( nextProps );
 			}
 		}
 
 		componentWillUnmount() {
 			this.unsubscribe();
+
+			// While above unsubscribe avoids future listener calls, callbacks
+			// are snapshotted before being invoked, so if unmounting occurs
+			// during a previous callback, we need to explicitly track and
+			// avoid the `runSelection` that is scheduled to occur.
+			this.isUnmounting = true;
 		}
 
 		subscribe() {
@@ -170,14 +270,22 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 		}
 
 		runSelection( props = this.props ) {
-			const newState = mapStateToProps( select, props );
-			if ( ! isEqualShallow( newState, this.state ) ) {
-				this.setState( newState );
+			if ( this.isUnmounting ) {
+				return;
+			}
+
+			const { mergeProps } = this.state;
+			const nextMergeProps = mapStateToProps( select, props ) || {};
+
+			if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
+				this.setState( {
+					mergeProps: nextMergeProps,
+				} );
 			}
 		}
 
 		render() {
-			return <WrappedComponent { ...this.props } { ...this.state } />;
+			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
 		}
 	}
 
@@ -245,6 +353,78 @@ export const withDispatch = ( mapDispatchToProps ) => ( WrappedComponent ) => {
 	return ComponentWithDispatch;
 };
 
+/**
+ * Returns true if the given argument appears to be a dispatchable action.
+ *
+ * @param {*} action Object to test.
+ *
+ * @return {boolean} Whether object is action-like.
+ */
+export function isActionLike( action ) {
+	return (
+		!! action &&
+		typeof action.type === 'string'
+	);
+}
+
+/**
+ * Returns true if the given object is an async iterable, or false otherwise.
+ *
+ * @param {*} object Object to test.
+ *
+ * @return {boolean} Whether object is an async iterable.
+ */
+export function isAsyncIterable( object ) {
+	return (
+		!! object &&
+		typeof object[ Symbol.asyncIterator ] === 'function'
+	);
+}
+
+/**
+ * Returns true if the given object is iterable, or false otherwise.
+ *
+ * @param {*} object Object to test.
+ *
+ * @return {boolean} Whether object is iterable.
+ */
+export function isIterable( object ) {
+	return (
+		!! object &&
+		typeof object[ Symbol.iterator ] === 'function'
+	);
+}
+
+/**
+ * Normalizes the given object argument to an async iterable, asynchronously
+ * yielding on a singular or array of generator yields or promise resolution.
+ *
+ * @param {*} object Object to normalize.
+ *
+ * @return {AsyncGenerator} Async iterable actions.
+ */
+export function toAsyncIterable( object ) {
+	if ( isAsyncIterable( object ) ) {
+		return object;
+	}
+
+	return ( async function* () {
+		// Normalize as iterable...
+		if ( ! isIterable( object ) ) {
+			object = [ object ];
+		}
+
+		for ( let maybeAction of object ) {
+			// ...of Promises.
+			if ( ! ( maybeAction instanceof Promise ) ) {
+				maybeAction = Promise.resolve( maybeAction );
+			}
+
+			yield await maybeAction;
+		}
+	}() );
+}
+
 export const query = ( mapSelectToProps ) => {
 	deprecated( 'wp.data.query', {
 		version: '2.5',
@@ -252,7 +432,5 @@ export const query = ( mapSelectToProps ) => {
 		plugin: 'Gutenberg',
 	} );
 
-	return withSelect( ( props ) => {
-		return mapSelectToProps( select, props );
-	} );
+	return withSelect( mapSelectToProps );
 };

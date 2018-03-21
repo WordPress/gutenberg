@@ -18,7 +18,6 @@ class WP_Block_Type {
 	 * Block type key.
 	 *
 	 * @since 0.6.0
-	 * @access public
 	 * @var string
 	 */
 	public $name;
@@ -27,7 +26,6 @@ class WP_Block_Type {
 	 * Block type render callback.
 	 *
 	 * @since 0.6.0
-	 * @access public
 	 * @var callable
 	 */
 	public $render_callback;
@@ -36,7 +34,6 @@ class WP_Block_Type {
 	 * Block type attributes property schemas.
 	 *
 	 * @since 0.10.0
-	 * @access public
 	 * @var array
 	 */
 	public $attributes;
@@ -45,7 +42,6 @@ class WP_Block_Type {
 	 * Block type editor script handle.
 	 *
 	 * @since 2.0.0
-	 * @access public
 	 * @var string
 	 */
 	public $editor_script;
@@ -54,7 +50,6 @@ class WP_Block_Type {
 	 * Block type front end script handle.
 	 *
 	 * @since 2.0.0
-	 * @access public
 	 * @var string
 	 */
 	public $script;
@@ -63,7 +58,6 @@ class WP_Block_Type {
 	 * Block type editor style handle.
 	 *
 	 * @since 2.0.0
-	 * @access public
 	 * @var string
 	 */
 	public $editor_style;
@@ -72,7 +66,6 @@ class WP_Block_Type {
 	 * Block type front end style handle.
 	 *
 	 * @since 2.0.0
-	 * @access public
 	 * @var string
 	 */
 	public $style;
@@ -83,7 +76,6 @@ class WP_Block_Type {
 	 * Will populate object properties from the provided arguments.
 	 *
 	 * @since 0.6.0
-	 * @access public
 	 *
 	 * @see register_block_type()
 	 *
@@ -101,7 +93,6 @@ class WP_Block_Type {
 	 * Renders the block type output for given attributes.
 	 *
 	 * @since 0.6.0
-	 * @access public
 	 *
 	 * @param array $attributes Optional. Block attributes. Default empty array.
 	 * @return string Rendered block type output.
@@ -120,7 +111,7 @@ class WP_Block_Type {
 	 * Returns true if the block type is dynamic, or false otherwise. A dynamic
 	 * block is one which defers its rendering to occur on-demand at runtime.
 	 *
-	 * @returns boolean Whether block type is dynamic.
+	 * @return boolean Whether block type is dynamic.
 	 */
 	public function is_dynamic() {
 		return is_callable( $this->render_callback );
@@ -164,7 +155,6 @@ class WP_Block_Type {
 	 * Sets block type properties.
 	 *
 	 * @since 0.6.0
-	 * @access public
 	 *
 	 * @param array|string $args Array or string of arguments for registering a block type.
 	 */

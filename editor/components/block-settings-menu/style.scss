@@ -28,11 +28,16 @@
 	}
 }
 
-.editor-block-settings-menu__section {
+.editor-block-settings-menu__separator {
 	margin-top: $item-spacing;
-	margin-bottom: -$item-spacing;
-	padding: $item-spacing 0;
+	margin-bottom: $item-spacing;
 	border-top: 1px solid $light-gray-500;
+}
+
+.editor-block-settings-menu__title {
+	display: block;
+	padding: 6px;
+	color: $dark-gray-300;
 }
 
 // Popout menu
@@ -56,10 +61,4 @@
 	.dashicon {
 		margin-right: 5px;
 	}
-}
-
-.editor-block-settings-menu__section {
-	margin-top: $item-spacing;
-	padding-top: $item-spacing;
-	border-top: 1px solid $light-gray-500;
 }

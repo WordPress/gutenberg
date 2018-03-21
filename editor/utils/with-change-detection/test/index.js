@@ -49,6 +49,18 @@ describe( 'withChangeDetection()', () => {
 		expect( state ).toEqual( { count: 1, isDirty: false } );
 	} );
 
+	it( 'should allow ignore types as option', () => {
+		const reducer = withChangeDetection( { ignoreTypes: [ 'INCREMENT' ] } )( originalReducer );
+
+		let state;
+
+		state = reducer( undefined, {} );
+		expect( state ).toEqual( { count: 0, isDirty: false } );
+
+		state = reducer( deepFreeze( state ), { type: 'INCREMENT' } );
+		expect( state ).toEqual( { count: 1, isDirty: false } );
+	} );
+
 	it( 'should preserve isDirty into non-resetting non-reference-changing types', () => {
 		const reducer = withChangeDetection( { resetTypes: [ 'RESET' ] } )( originalReducer );
 

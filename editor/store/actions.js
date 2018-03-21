@@ -5,6 +5,14 @@ import uuid from 'uuid/v4';
 import { partial, castArray } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import {
+	getDefaultBlockName,
+	createBlock,
+} from '@wordpress/blocks';
+
+/**
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
@@ -39,9 +47,9 @@ export function resetPost( post ) {
 /**
  * Returns an action object used to setup the editor state when first opening an editor.
  *
- * @param {Object} post   Post object.
- * @param {Array}  blocks Array of blocks.
- * @param {Object} edits  Initial edited attributes object.
+ * @param {Object}  post            Post object.
+ * @param {Array}   blocks          Array of blocks.
+ * @param {Object}  edits           Initial edited attributes object.
  *
  * @return {Object} Action object.
  */
@@ -66,6 +74,22 @@ export function setupEditorState( post, blocks, edits ) {
 export function resetBlocks( blocks ) {
 	return {
 		type: 'RESET_BLOCKS',
+		blocks,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that blocks have been received.
+ * Unlike resetBlocks, these should be appended to the existing known set, not
+ * replacing.
+ *
+ * @param {Object[]} blocks Array of block objects.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveBlocks( blocks ) {
+	return {
+		type: 'RECEIVE_BLOCKS',
 		blocks,
 	};
 }
@@ -167,6 +191,7 @@ export function replaceBlocks( uids, blocks ) {
 		type: 'REPLACE_BLOCKS',
 		uids: castArray( uids ),
 		blocks: castArray( blocks ),
+		time: Date.now(),
 	};
 }
 
@@ -213,6 +238,7 @@ export function insertBlocks( blocks, index, rootUID ) {
 		blocks: castArray( blocks ),
 		index,
 		rootUID,
+		time: Date.now(),
 	};
 }
 
@@ -236,6 +262,42 @@ export function showInsertionPoint() {
 export function hideInsertionPoint() {
 	return {
 		type: 'HIDE_INSERTION_POINT',
+	};
+}
+
+/**
+ * Returns an action object resetting the template validity.
+ *
+ * @param {boolean}  isValid  template validity flag.
+ *
+ * @return {Object} Action object.
+ */
+export function setTemplateValidity( isValid ) {
+	return {
+		type: 'SET_TEMPLATE_VALIDITY',
+		isValid,
+	};
+}
+
+/**
+ * Returns an action object tocheck the template validity.
+ *
+ * @return {Object} Action object.
+ */
+export function checkTemplateValidity() {
+	return {
+		type: 'CHECK_TEMPLATE_VALIDITY',
+	};
+}
+
+/**
+ * Returns an action object synchronize the template with the list of blocks
+ *
+ * @return {Object} Action object.
+ */
+export function synchronizeTemplate() {
+	return {
+		type: 'SYNCHRONIZE_TEMPLATE',
 	};
 }
 
@@ -319,14 +381,16 @@ export function createUndoLevel() {
  * Returns an action object used in signalling that the blocks
  * corresponding to the specified UID set are to be removed.
  *
- * @param {string[]} uids Block UIDs.
+ * @param {string[]} uids           Block UIDs.
+ * @param {boolean}  selectPrevious True if the previous block should be selected when a block is removed.
  *
  * @return {Object} Action object.
  */
-export function removeBlocks( uids ) {
+export function removeBlocks( uids, selectPrevious = true ) {
 	return {
 		type: 'REMOVE_BLOCKS',
 		uids,
+		selectPrevious,
 	};
 }
 
@@ -334,12 +398,13 @@ export function removeBlocks( uids ) {
  * Returns an action object used in signalling that the block with the
  * specified UID is to be removed.
  *
- * @param {string} uid Block UID.
+ * @param {string}  uid            Block UID.
+ * @param {boolean} selectPrevious True if the previous block should be selected when a block is removed.
  *
  * @return {Object} Action object.
  */
-export function removeBlock( uid ) {
-	return removeBlocks( [ uid ] );
+export function removeBlock( uid, selectPrevious = true ) {
+	return removeBlocks( [ uid ], selectPrevious );
 }
 
 /**
@@ -443,20 +508,18 @@ export function fetchReusableBlocks( id ) {
 }
 
 /**
- * Returns an action object used to insert or update a reusable block into
- * the store.
+ * Returns an action object used in signalling that reusable blocks have been
+ * received. Results is an array of objects containing reusableBlock (details
+ * about reusable persistence) and parsedBlock (the original block).
  *
- * @param {Object} id            The ID of the reusable block to update.
- * @param {Object} reusableBlock The new reusable block object. Any omitted keys
- *                               are not changed.
+ * @param {Object[]} results Reusable blocks received.
  *
  * @return {Object} Action object.
  */
-export function updateReusableBlock( id, reusableBlock ) {
+export function receiveReusableBlocks( results ) {
 	return {
-		type: 'UPDATE_REUSABLE_BLOCK',
-		id,
-		reusableBlock,
+		type: 'RECEIVE_REUSABLE_BLOCKS',
+		results,
 	};
 }
 
@@ -486,6 +549,23 @@ export function deleteReusableBlock( id ) {
 	return {
 		type: 'DELETE_REUSABLE_BLOCK',
 		id,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that a reusable block's title is
+ * to be updated.
+ *
+ * @param {number} id    The ID of the reusable block to update.
+ * @param {string} title The new title.
+ *
+ * @return {Object} Action object.
+ */
+export function updateReusableBlockTitle( id, title ) {
+	return {
+		type: 'UPDATE_REUSABLE_BLOCK_TITLE',
+		id,
+		title,
 	};
 }
 
@@ -520,17 +600,19 @@ export function convertBlockToReusable( uid ) {
 }
 /**
  * Returns an action object used in signalling that a new block of the default
- * type should be appended to the block list.
+ * type should be added to the block list.
  *
  * @param {?Object} attributes Optional attributes of the block to assign.
  * @param {?string} rootUID    Optional root UID of block list to append.
+ * @param {?number} index      Optional index where to insert the default block
  *
  * @return {Object} Action object
  */
-export function appendDefaultBlock( attributes, rootUID ) {
+export function insertDefaultBlock( attributes, rootUID, index ) {
+	const block = createBlock( getDefaultBlockName(), attributes );
+
 	return {
-		type: 'APPEND_DEFAULT_BLOCK',
-		attributes,
-		rootUID,
+		...insertBlock( block, index, rootUID ),
+		isProvisional: true,
 	};
 }

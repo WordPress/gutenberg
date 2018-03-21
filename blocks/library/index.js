@@ -6,6 +6,11 @@ import {
 	setDefaultBlockName,
 	setUnknownTypeHandlerName,
 } from '../api';
+import * as paragraph from './paragraph';
+import * as image from './image';
+import * as heading from './heading';
+import * as quote from './quote';
+import * as gallery from './gallery';
 import * as audio from './audio';
 import * as button from './button';
 import * as categories from './categories';
@@ -14,17 +19,12 @@ import * as columns from './columns';
 import * as coverImage from './cover-image';
 import * as embed from './embed';
 import * as freeform from './freeform';
-import * as gallery from './gallery';
-import * as heading from './heading';
 import * as html from './html';
-import * as image from './image';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
 import * as more from './more';
-import * as paragraph from './paragraph';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
-import * as quote from './quote';
 import * as reusableBlock from './block';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
@@ -56,6 +56,16 @@ export const registerCoreBlocks = () => {
 		// unknown shortcodes — see `setUnknownTypeHandlerName`.
 		shortcode,
 
+		// Common blocks are grouped at the top to prioritize their display
+		// in various contexts — like the inserter and auto-complete components.
+		paragraph,
+		image,
+		heading,
+		gallery,
+		list,
+		quote,
+
+		// Register all remaining core blocks.
 		audio,
 		button,
 		categories,
@@ -66,17 +76,11 @@ export const registerCoreBlocks = () => {
 		...embed.common,
 		...embed.others,
 		freeform,
-		gallery,
-		heading,
 		html,
-		image,
-		list,
 		latestPosts,
 		more,
-		paragraph,
 		preformatted,
 		pullquote,
-		quote,
 		reusableBlock,
 		separator,
 		subhead,
