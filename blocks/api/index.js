@@ -3,6 +3,8 @@ export {
 	cloneBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
+	getBlockTransforms,
+	findTransform,
 } from './factory';
 export {
 	default as parse,
