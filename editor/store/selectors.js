@@ -508,6 +508,18 @@ export function getSelectedBlockCount( state ) {
 }
 
 /**
+ * Returns true if there is a single selected block, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether a single block is selected.
+ */
+export function hasSelectedBlock( state ) {
+	const { start, end } = state.blockSelection;
+	return !! start && start === end;
+}
+
+/**
  * Returns the currently selected block, or null if there is no selected block.
  *
  * @param {Object} state Global application state.

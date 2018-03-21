@@ -40,6 +40,7 @@ const {
 	getBlock,
 	getBlocks,
 	getBlockCount,
+	hasSelectedBlock,
 	getSelectedBlock,
 	getBlockRootUID,
 	getEditedPostAttribute,
@@ -1327,6 +1328,41 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockCount( state, '123' ) ).toBe( 2 );
+		} );
+	} );
+
+	describe( 'hasSelectedBlock', () => {
+		it( 'should return false if no selection', () => {
+			const state = {
+				blockSelection: {
+					start: null,
+					end: null,
+				},
+			};
+
+			expect( hasSelectedBlock( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if multi-selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				},
+			};
+
+			expect( hasSelectedBlock( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if singular selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				},
+			};
+
+			expect( hasSelectedBlock( state ) ).toBe( true );
 		} );
 	} );
 

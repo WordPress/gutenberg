@@ -6,8 +6,8 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { withDispatch } from '@wordpress/data';
+import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 class BlockSelectionClearer extends Component {
 	constructor() {
@@ -29,8 +29,9 @@ class BlockSelectionClearer extends Component {
 	 * @param {FocusEvent} event Focus event.
 	 */
 	clearSelectionIfFocusTarget( event ) {
-		if ( event.target === this.container ) {
-			this.props.clearSelectedBlock();
+		const { hasSelectedBlock, clearSelectedBlock } = this.props;
+		if ( event.target === this.container && hasSelectedBlock ) {
+			clearSelectedBlock();
 		}
 	}
 
@@ -42,13 +43,22 @@ class BlockSelectionClearer extends Component {
 				tabIndex={ -1 }
 				onFocus={ this.clearSelectionIfFocusTarget }
 				ref={ this.bindContainer }
-				{ ...omit( props, 'clearSelectedBlock' ) }
+				{ ...omit( props, [ 'clearSelectedBlock', 'hasSelectedBlock' ] ) }
 			/>
 		);
 	}
 }
 
-export default withDispatch( ( dispatch ) => {
-	const { clearSelectedBlock } = dispatch( 'core/editor' );
-	return { clearSelectedBlock };
-} )( BlockSelectionClearer );
+export default compose( [
+	withSelect( ( select ) => {
+		const { hasSelectedBlock } = select( 'core/editor' );
+
+		return {
+			hasSelectedBlock: hasSelectedBlock(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { clearSelectedBlock } = dispatch( 'core/editor' );
+		return { clearSelectedBlock };
+	} ),
+] )( BlockSelectionClearer );
