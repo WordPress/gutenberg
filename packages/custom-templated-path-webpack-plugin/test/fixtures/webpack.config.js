@@ -21,8 +21,6 @@ module.exports = {
 	plugins: [
 		new CustomTemplatedPathPlugin( {
 			basename( path, data ) {
-				console.log(data)
-
 				let rawRequest;
 				if ( data && data.chunk && data.chunk.entryModule ) {
 					rawRequest = data.chunk.entryModule.rawRequest;
