@@ -14,12 +14,12 @@ import { Component, createRef } from '@wordpress/element';
 import withGlobalEvents from '../higher-order/with-global-events';
 
 class FocusableIframe extends Component {
-	constructor() {
+	constructor( props ) {
 		super( ...arguments );
 
 		this.checkFocus = this.checkFocus.bind( this );
 
-		this.node = createRef();
+		this.node = props.iframeRef || createRef();
 	}
 
 	/**
@@ -42,7 +42,7 @@ class FocusableIframe extends Component {
 		return (
 			<iframe
 				ref={ this.node }
-				{ ...omit( this.props, [ 'onFocus' ] ) }
+				{ ...omit( this.props, [ 'iframeRef', 'onFocus' ] ) }
 			/>
 		);
 		/* eslint-enable jsx-a11y/iframe-has-title */
