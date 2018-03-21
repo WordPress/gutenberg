@@ -146,7 +146,7 @@ export const settings = {
 					/>
 				</Toolbar>
 			</BlockControls>,
-			<InspectorControls key="inspector">
+			!!url && <InspectorControls key="inspector">
 				<h2>{ __( 'Cover Image Settings' ) }</h2>
 				<ToggleControl
 					label={ __( 'Fixed Background' ) }
