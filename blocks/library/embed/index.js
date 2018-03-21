@@ -71,7 +71,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 		edit: class extends Component {
 			constructor() {
 				super( ...arguments );
+
 				this.doServerSideRender = this.doServerSideRender.bind( this );
+				this.setIsSelected = this.setIsSelected.bind( this );
+
 				this.state = {
 					html: '',
 					type: '',
@@ -94,6 +97,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			componentWillUnmount() {
 				// can't abort the fetch promise, so let it know we will unmount
 				this.unmounting = true;
+			}
+
+			setIsSelected() {
+				this.props.setIsSelected( true );
 			}
 
 			getPhotoHtml( photo ) {
@@ -204,6 +211,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 							html={ html }
 							title={ iframeTitle }
 							type={ type }
+							onFocus={ this.setIsSelected }
 						/>
 					</div>
 				);
