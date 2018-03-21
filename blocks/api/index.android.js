@@ -15,20 +15,20 @@ export {
 // } from './serializer';
 // export { isValidBlock } from './validation';
 // export { getCategories } from './categories';
-// export {
-// 	registerBlockType,
+export {
+	registerBlockType,
 // 	unregisterBlockType,
 // 	setUnknownTypeHandlerName,
 // 	getUnknownTypeHandlerName,
 // 	setDefaultBlockName,
 // 	getDefaultBlockName,
 // 	getDefaultBlockForPostFormat,
-// 	getBlockType,
+	getBlockType,
 // 	getBlockTypes,
 // 	getBlockSupport,
 // 	hasBlockSupport,
 // 	isReusableBlock,
-// } from './registration';
+} from './registration';
 // export {
 // 	isUnmodifiedDefaultBlock,
 // } from './utils';
