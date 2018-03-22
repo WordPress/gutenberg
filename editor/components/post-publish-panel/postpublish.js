@@ -2,20 +2,19 @@
  * External Dependencies
  */
 import { get } from 'lodash';
-import { connect } from 'react-redux';
 
 /**
  * WordPress Dependencies
  */
-import { PanelBody, Button, ClipboardButton, withAPIData } from '@wordpress/components';
+import { PanelBody, Button, ClipboardButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Component, compose, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import PostScheduleLabel from '../post-schedule/label';
-import { getCurrentPost, getCurrentPostType, isCurrentPostScheduled } from '../../store/selectors';
 
 class PostPublishPanelPostpublish extends Component {
 	constructor() {
@@ -50,7 +49,7 @@ class PostPublishPanelPostpublish extends Component {
 
 	render() {
 		const { isScheduled, post, postType } = this.props;
-		const viewPostLabel = get( postType, [ 'data', 'labels', 'view_item' ] );
+		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
 
 		const postPublishNonLinkHeader = isScheduled ?
 			<Fragment>{ __( 'is now scheduled. It will go live on' ) } <PostScheduleLabel />.</Fragment> :
@@ -89,25 +88,13 @@ class PostPublishPanelPostpublish extends Component {
 	}
 }
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			post: getCurrentPost( state ),
-			postTypeSlug: getCurrentPostType( state ),
-			isScheduled: isCurrentPostScheduled( state ),
-		};
-	}
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postTypeSlug } = props;
+export default withSelect( ( select ) => {
+	const { getEditedPostAttribute, getCurrentPost, isCurrentPostScheduled } = select( 'core/editor' );
+	const { getPostType } = select( 'core' );
 
 	return {
-		postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
+		post: getCurrentPost(),
+		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		isScheduled: isCurrentPostScheduled(),
 	};
-} );
-
-export default compose( [
-	applyConnect,
-	applyWithAPIData,
-] )( PostPublishPanelPostpublish );
+} )( PostPublishPanelPostpublish );
