@@ -83,11 +83,11 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__block {
 	display: flex;
 	flex-direction: column;
-	width: calc( 33% - 6px );
-	margin: 3px;
+	width: calc( 33% - 8px );
+	margin: 4px;
 	font-size: $default-font-size;
 	color: $dark-gray-500;
-	padding: 4px 12px;
+	padding: 8px 4px;
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
@@ -96,6 +96,8 @@ input[type="search"].editor-inserter__search {
 	background: transparent;
 	outline: 1px solid $light-gray-200;
 	min-height: 5em;
+	overflow: hidden;
+	word-break: break-word;
 
 	.dashicon {
 		margin-bottom: 3px;
