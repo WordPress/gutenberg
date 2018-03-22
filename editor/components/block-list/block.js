@@ -480,6 +480,7 @@ export class BlockListBlock extends Component {
 			<IgnoreNestedEvents
 				ref={ this.setBlockListRef }
 				onMouseOver={ this.maybeHover }
+				onMouseOverHandled={ this.hideHoverEffects }
 				onMouseLeave={ this.hideHoverEffects }
 				className={ wrapperClassName }
 				data-type={ block.name }
