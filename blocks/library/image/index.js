@@ -174,8 +174,6 @@ export const settings = {
 
 		if ( width ) {
 			figureStyle = { width };
-		} else if ( align === 'left' || align === 'right' ) {
-			figureStyle = { maxWidth: '50%' };
 		}
 
 		return (
