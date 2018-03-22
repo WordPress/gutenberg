@@ -17,30 +17,11 @@ export type BlockArray = Array<{
 type PropsType = {
 	blocks: BlockArray,
 };
-type StateType = {
-	refresh: boolean,
-};
+type StateType = {};
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
-	constructor( props: PropsType ) {
-		super( props );
-
-		this.state = {
-			refresh: false,
-			blocks: [ ...this.props.blocks ],
-		};
-	}
-
 	onBlockHolderPressed( rowId: number ) {
-		var blocks = this.state.blocks;
-		const currentBlockState = blocks[ rowId ].focused;
-		// Deselect all blocks
-		for ( let block of blocks ) {
-			block.focused = false;
-		}
-		// Select or deselect pressed block
-		blocks[ rowId ].focused = ! currentBlockState;
-		this.setState( { blocks: blocks, refresh: ! this.state.refresh } );
+		this.props.focusBlockAction( rowId );
 	}
 
 	onToolbarButtonPressed( button: number, index: number ) {
@@ -74,8 +55,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				<View style={ { height: 30 } } />
 				<FlatList
 					style={ styles.list }
-					data={ this.state.blocks }
-					extraData={ this.state.refresh }
+					data={ this.props.blocks }
+					extraData={ this.props.refresh }
 					renderItem={ this.renderItem.bind( this ) }
 				/>
 			</View>

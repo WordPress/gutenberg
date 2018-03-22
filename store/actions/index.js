@@ -1,5 +1,6 @@
 /** @format */
 
-export const testAction = () => ( {
-	type: 'TEST_ACTION',
+export const focusBlockAction = index => ( {
+	type: 'BLOCK_FOCUS_ACTION',
+	rowId: index,
 } );

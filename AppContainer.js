@@ -1,15 +1,17 @@
 /** @format */
 import { connect } from 'react-redux';
+import { focusBlockAction } from './store/actions';
 import MainApp from './MainApp';
 
 const mapStateToProps = state => ( {
-	content: state.content || 'Please Wait...',
+	...state,
 } );
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = ( dispatch, ownProps ) => {
 	return {
-		testAction: () => {
-			dispatch( testAction() );
+		...ownProps,
+		focusBlockAction: index => {
+			dispatch( focusBlockAction( index ) );
 		},
 	};
 };
