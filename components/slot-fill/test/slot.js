@@ -84,6 +84,19 @@ describe( 'Slot', () => {
 				expect( element.find( 'Slot > div' ).html() ).toBe( '<div><span></span><div></div>text</div>' );
 			} );
 
+			it( 'should render a Fill registered after slot mounted', () => {
+				const element = mount(
+					<Provider>
+						<Slot bubblesVirtually={ bubblesVirtually } name="chicken" />
+						<Fill name="chicken">
+							<span />
+						</Fill>
+					</Provider>
+				);
+
+				expect( element.find( 'Slot > div' ).html() ).toBe( '<div><span></span></div>' );
+			} );
+
 			it( 'calls the functions passed as the Slot\'s fillProps in the Fill', () => {
 				const onClose = jest.fn();
 

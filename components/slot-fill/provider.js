@@ -49,6 +49,13 @@ class SlotFillProvider extends Component {
 			instance,
 		];
 		this.forceUpdateSlot( name );
+
+		// If fill is registered after slot is rendered, and slot leverages
+		// portals, must signal that all fills should update.
+		const slot = this.getSlot( name );
+		if ( slot && slot.props.bubblesVirtually ) {
+			this.forceUpdateFills( name );
+		}
 	}
 
 	unregisterSlot( name ) {
