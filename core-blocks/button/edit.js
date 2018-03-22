@@ -88,6 +88,8 @@ class ButtonEdit extends Component {
 			clear,
 		} = attributes;
 
+		/* The disabling of autofocus, the input is being focused when you tab to the button block. */
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<Fragment>
 				<BlockControls>
@@ -148,12 +150,14 @@ class ButtonEdit extends Component {
 						<UrlInput
 							value={ url }
 							onChange={ ( value ) => setAttributes( { url: value } ) }
+							autoFocus={ false }
 						/>
 						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 					</form>
 				) }
 			</Fragment>
 		);
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 

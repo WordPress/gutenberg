@@ -47,9 +47,27 @@ class NavigableContainer extends Component {
 			.find( this.container )
 			.filter( ( node ) => deep || node.parentElement === this.container );
 
+		let previous = null;
+		let next = null;
+		let didReachContainer = false;
+		finder
+			.find( document.body )
+			.forEach( ( node ) => {
+				const isInsideContainer = this.container.contains( node );
+				if ( ! didReachContainer && ! isInsideContainer ) {
+					previous = node;
+				}
+				if ( isInsideContainer && ! didReachContainer ) {
+					didReachContainer = true;
+				}
+				if ( didReachContainer && ! isInsideContainer && ! next ) {
+					next = node;
+				}
+			} );
+
 		const index = this.getFocusableIndex( focusables, target );
 		if ( index > -1 && target ) {
-			return { index, target, focusables };
+			return { index, target, focusables, next, previous };
 		}
 		return null;
 	}
@@ -71,7 +89,7 @@ class NavigableContainer extends Component {
 		}
 
 		const { getFocusableContext } = this;
-		const { cycle = true, eventToOffset, onNavigate = noop, stopNavigationEvents } = this.props;
+		const { cycle = true, eventToOffset, onNavigate = noop, stopNavigationEvents, restrictInsideContainer = true } = this.props;
 
 		const offset = eventToOffset( event, this.container );
 
@@ -98,11 +116,27 @@ class NavigableContainer extends Component {
 			return;
 		}
 
-		const { index, focusables } = context;
+		const preventDefaultKeyBehaviour = () => {
+			if ( ! stopNavigationEvents ) {
+				return;
+			}
+
+			// Prevents arrow key handlers bound to the document directly interfering
+			event.nativeEvent.stopImmediatePropagation();
+			event.preventDefault();
+			event.stopPropagation();
+		};
+
+		const { index, focusables, next, previous } = context;
 		const nextIndex = cycle ? cycleValue( index, focusables.length, offset ) : index + offset;
+		preventDefaultKeyBehaviour();
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 			focusables[ nextIndex ].focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );
+		} else if ( ! restrictInsideContainer ) {
+			const nextTarget = offset > 0 ? next || previous : previous || next;
+			nextTarget.focus();
+			onNavigate( -1 ); // this indicates that we're leaving the container
 		}
 	}
 
@@ -197,6 +231,7 @@ export class TabbableContainer extends Component {
 			<NavigableContainer
 				stopNavigationEvents
 				onlyBrowserTabstops
+				restrictInsideContainer={ false }
 				eventToOffset={ eventToOffset }
 				{ ...this.props }
 			/>
