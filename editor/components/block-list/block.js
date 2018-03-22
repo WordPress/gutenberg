@@ -435,6 +435,7 @@ export class BlockListBlock extends Component {
 			isLargeViewport,
 			isEmptyDefaultBlock,
 			isPreviousBlockADefaultEmptyBlock,
+			keyboardMode,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -446,15 +447,16 @@ export class BlockListBlock extends Component {
 
 		// If the block is selected and we're typing the block should not appear.
 		// Empty paragraph blocks should always show up as unselected.
+		const isKeyboardEditMode = keyboardMode === 'edit';
 		const isSelectedNotTyping = isSelected && ! isTypingWithinBlock;
 		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! showEmptyBlockSideInserter && isSelectedNotTyping;
 		// We render block movers and block settings to keep them tabbale even if hidden
-		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
-		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
+		const shouldRenderMovers = isKeyboardEditMode && ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
+		const shouldRenderBlockSettings = isKeyboardEditMode && ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
 		const shouldShowBreadcrumb = isHovered;
-		const shouldShowContextualToolbar = shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
-		const shouldShowMobileToolbar = shouldAppearSelected;
+		const shouldShowContextualToolbar = isKeyboardEditMode && shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
+		const shouldShowMobileToolbar = isKeyboardEditMode && shouldAppearSelected;
 		const { error, dragging } = this.state;
 
 		// Insertion point can only be made visible when the side inserter is
