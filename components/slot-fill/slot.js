@@ -57,6 +57,7 @@ class Slot extends Component {
 				{ map( getFills( name ), ( fill ) => {
 					const fillKey = fill.occurrence;
 
+					// If a function is passed as a child, render it with the fillProps.
 					if ( isFunction( fill.props.children ) ) {
 						return cloneElement( fill.props.children( fillProps ), { key: fillKey } );
 					}

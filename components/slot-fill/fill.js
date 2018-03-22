@@ -65,6 +65,7 @@ class Fill extends Component {
 			return null;
 		}
 
+		// If a function is passed as a child, provide it with the fillProps.
 		if ( isFunction( children ) ) {
 			children = children( slot.props.fillProps );
 		}
