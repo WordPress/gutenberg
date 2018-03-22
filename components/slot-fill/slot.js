@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { noop, map, isString, isFunction } from 'lodash';
+import { noop, map, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, Children, cloneElement } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 
 class Slot extends Component {
 	constructor() {
@@ -56,20 +56,18 @@ class Slot extends Component {
 			<div ref={ this.bindNode }>
 				{ map( getFills( name ), ( fill ) => {
 					const fillKey = fill.occurrence;
+					let { children } = fill.props;
 
 					// If a function is passed as a child, render it with the fillProps.
-					if ( isFunction( fill.props.children ) ) {
-						return cloneElement( fill.props.children( fillProps ), { key: fillKey } );
+					if ( isFunction( children ) ) {
+						children = children( fillProps );
 					}
 
-					return Children.map( fill.props.children, ( child, childIndex ) => {
-						if ( ! child || isString( child ) ) {
-							return child;
-						}
-
-						const childKey = `${ fillKey }---${ child.key || childIndex }`;
-						return cloneElement( child, { key: childKey } );
-					} );
+					return (
+						<Fragment key={ fillKey }>
+							{ children }
+						</Fragment>
+					);
 				} ) }
 			</div>
 		);
