@@ -38,7 +38,6 @@ function fireKeyDown( container, keyCode, shiftKey ) {
 		},
 		keyCode,
 		shiftKey,
-		target: document.activeElement,
 	} );
 
 	return interaction;

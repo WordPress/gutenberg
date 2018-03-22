@@ -94,20 +94,8 @@ class NavigableContainer extends Component {
 			return;
 		}
 
-		const preventDefaultKeyBehaviour = () => {
-			if ( ! stopNavigationEvents ) {
-				return;
-			}
-
-			// Prevents arrow key handlers bound to the document directly interfering
-			event.nativeEvent.stopImmediatePropagation();
-			event.preventDefault();
-			event.stopPropagation();
-		};
-
 		const { index, focusables } = context;
 		const nextIndex = cycle ? cycleValue( index, focusables.length, offset ) : index + offset;
-		preventDefaultKeyBehaviour();
 		if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 			focusables[ nextIndex ].focus();
 			onNavigate( nextIndex, focusables[ nextIndex ] );
