@@ -34,6 +34,10 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 
+import * as article from './_article';
+import * as row6_6 from './_row6_6';
+import * as row4_4_4 from './_row4_4_4';
+
 export const registerCoreBlocks = () => {
 	[
 		// FIXME: Temporary fix.
@@ -88,6 +92,9 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
+		article,
+		row6_6,
+		row4_4_4
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );
