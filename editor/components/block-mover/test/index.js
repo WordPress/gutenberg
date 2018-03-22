@@ -7,6 +7,7 @@ import { shallow } from 'enzyme';
  * Internal dependencies
  */
 import { BlockMover } from '../';
+import { upArrow, downArrow } from '../arrows';
 
 describe( 'BlockMover', () => {
 	describe( 'basic rendering', () => {
@@ -35,6 +36,7 @@ describe( 'BlockMover', () => {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
 				label: 'Move up',
+				icon: upArrow,
 				'aria-disabled': undefined,
 				'aria-describedby': 'editor-block-mover__up-description',
 			} );
@@ -42,6 +44,7 @@ describe( 'BlockMover', () => {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
 				label: 'Move down',
+				icon: downArrow,
 				'aria-disabled': undefined,
 				'aria-describedby': 'editor-block-mover__down-description',
 			} );

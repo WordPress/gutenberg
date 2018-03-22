@@ -18,21 +18,7 @@ import { compose } from '@wordpress/element';
 import './style.scss';
 import { getBlockMoverDescription } from './mover-description';
 import { getBlockIndex, getBlock } from '../../store/selectors';
-
-/**
- * Module constants
- */
-const upArrow = (
-	<svg tabIndex="-1" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden role="img" focusable="false">
-		<path d="M12.293 12.207L9 8.914l-3.293 3.293-1.414-1.414L9 6.086l4.707 4.707z" />
-	</svg>
-);
-
-const downArrow = (
-	<svg tabIndex="-1" width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden role="img" focusable="false">
-		<path d="M12.293 6.086L9 9.379 5.707 6.086 4.293 7.5 9 12.207 13.707 7.5z" />
-	</svg>
-);
+import { upArrow, downArrow } from './arrows';
 
 export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked } ) {
 	if ( isLocked ) {
@@ -49,8 +35,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
 				icon={ upArrow }
-				tooltip={ __( 'Move Up' ) }
-				label={ __( 'Move Up' ) }
+				label={ __( 'Move up' ) }
 				aria-describedby="editor-block-mover__up-description"
 				aria-disabled={ isFirst }
 			/>
@@ -58,8 +43,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				className="editor-block-mover__control"
 				onClick={ isLast ? null : onMoveDown }
 				icon={ downArrow }
-				tooltip={ __( 'Move Down' ) }
-				label={ __( 'Move Down' ) }
+				label={ __( 'Move down' ) }
 				aria-describedby="editor-block-mover__down-description"
 				aria-disabled={ isLast }
 			/>
