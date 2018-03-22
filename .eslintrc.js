@@ -11,7 +11,7 @@ const { version } = require( './package' );
 /**
  * Regular expression string matching a SemVer string with equal major/minor to
  * the current package version. Used in identifying deprecations.
- *
+ *n
  * @type {string}
  */
 const majorMinorRegExp = escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.\\d+)?';
@@ -92,4 +92,13 @@ module.exports = {
 			},
 		],
 	},
+	overrides: [
+		{
+			files: [ 'test/e2e/**/*.js' ],
+			globals: {
+				page: true,
+				browser: true,
+			},
+		},
+	],
 };
