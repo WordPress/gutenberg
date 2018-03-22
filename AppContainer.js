@@ -1,6 +1,11 @@
 /** @format */
 import { connect } from 'react-redux';
-import { focusBlockAction } from './store/actions';
+import {
+	focusBlockAction,
+	moveBlockUpAction,
+	moveBlockDownAction,
+	deleteBlockAction,
+} from './store/actions';
 import MainApp from './MainApp';
 
 const mapStateToProps = state => ( {
@@ -12,6 +17,15 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 		...ownProps,
 		focusBlockAction: index => {
 			dispatch( focusBlockAction( index ) );
+		},
+		moveBlockUpAction: index => {
+			dispatch( moveBlockUpAction( index ) );
+		},
+		moveBlockDownAction: index => {
+			dispatch( moveBlockDownAction( index ) );
+		},
+		deleteBlockAction: index => {
+			dispatch( deleteBlockAction( index ) );
 		},
 	};
 };

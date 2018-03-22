@@ -16,6 +16,9 @@ export type BlockArray = Array<{
 }>;
 export type BlockListType = {
 	focusBlockAction: number => mixed,
+	moveBlockUpAction: number => mixed,
+	moveBlockDownAction: number => mixed,
+	deleteBlockAction: number => mixed,
 	blocks: BlockArray,
 	refresh: boolean,
 };
@@ -29,28 +32,24 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	onToolbarButtonPressed( button: number, index: number ) {
-		// var blocks = this.state.blocks;
-		// switch ( button ) {
-		// 	case ToolbarButton.UP:
-		// 		if ( index == 0 ) return;
-		// 		var tmp = blocks[ index ];
-		// 		blocks[ index ] = blocks[ index - 1 ];
-		// 		blocks[ index - 1 ] = tmp;
-		// 		break;
-		// 	case ToolbarButton.DOWN:
-		// 		if ( index == blocks.length - 1 ) return;
-		// 		var tmp = blocks[ index ];
-		// 		blocks[ index ] = blocks[ index + 1 ];
-		// 		blocks[ index + 1 ] = tmp;
-		// 		break;
-		// 	case ToolbarButton.DELETE:
-		// 		blocks.splice( index, 1 );
-		// 		break;
-		// 	case ToolbarButton.SETTINGS:
-		// 		// TODO: implement settings
-		// 		break;
-		// }
-		// this.setState( { blocks: blocks, refresh: ! this.state.refresh } );
+		var blocks = this.props.blocks;
+		switch ( button ) {
+			case ToolbarButton.UP:
+				if ( index == 0 ) return;
+				this.props.moveBlockUpAction( index );
+				break;
+			case ToolbarButton.DOWN:
+				if ( index == blocks.length - 1 ) return;
+				this.props.moveBlockDownAction( index );
+				break;
+			case ToolbarButton.DELETE:
+				this.props.deleteBlockAction( index );
+				blocks.splice( index, 1 );
+				break;
+			case ToolbarButton.SETTINGS:
+				// TODO: implement settings
+				break;
+		}
 	}
 
 	render() {
