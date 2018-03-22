@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
  * @var {Array} categories
  */
 const categories = [
+	{ slug: 'rows', title: __( 'Rows Blocks' ) },
 	{ slug: 'common', title: __( 'Common Blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
 	{ slug: 'layout', title: __( 'Layout Elements' ) },

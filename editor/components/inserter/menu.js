@@ -60,7 +60,7 @@ export class InserterMenu extends Component {
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			tab: 'frequent',
+			tab: 'rows',
 			selectedItem: null,
 		};
 		this.filter = this.filter.bind( this );
@@ -69,7 +69,7 @@ export class InserterMenu extends Component {
 		this.sortItems = this.sortItems.bind( this );
 		this.selectItem = this.selectItem.bind( this );
 
-		this.tabScrollTop = { frequent: 0, blocks: 0, embeds: 0 };
+		this.tabScrollTop = { rows: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
 		this.previewItem = this.previewItem.bind( this );
 	}
@@ -127,29 +127,32 @@ export class InserterMenu extends Component {
 
 		let predicate;
 		switch ( tab ) {
-			case 'frequent':
-				return frecentItems;
+			// case 'frequent':
+			// 	return frecentItems;
 
+			case 'rows':
+				predicate = ( item ) => item.category === 'rows';
+				break;			
 			case 'blocks':
-				predicate = ( item ) => item.category !== 'embed' && item.category !== 'shared';
+				predicate = ( item ) => item.category !== 'embed' && item.category !== 'shared' && item.category !== 'rows';
 				break;
 
-			case 'embeds':
-				predicate = ( item ) => item.category === 'embed';
-				break;
+			// case 'embeds':
+			// 	predicate = ( item ) => item.category === 'embed';
+			// 	break;
 
-			case 'shared':
-				predicate = ( item ) => item.category === 'shared';
-				break;
+			// case 'shared':
+			// 	predicate = ( item ) => item.category === 'shared';
+			// 	break;
 		}
 
 		return filter( items, predicate );
 	}
 
 	sortItems( items ) {
-		if ( 'frequent' === this.state.tab && ! this.state.filterValue ) {
-			return items;
-		}
+		// if ( 'frequent' === this.state.tab && ! this.state.filterValue ) {
+		// 	return items;
+		// }
 
 		const getCategoryIndex = ( item ) => {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
@@ -221,7 +224,7 @@ export class InserterMenu extends Component {
 		const itemsForTab = this.getItemsForTab( tab );
 
 		// If the Frequent tab is selected, don't render category headers
-		if ( 'frequent' === tab ) {
+		if ( 'rows' === tab ) {
 			return this.renderItems( itemsForTab );
 		}
 
@@ -296,9 +299,14 @@ export class InserterMenu extends Component {
 					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
 						onSelect={ this.switchTab }
 						tabs={ [
+							// {
+							// 	name: 'frequent',
+							// 	title: __( 'Frequent' ),
+							// 	className: 'editor-inserter__tab',
+							// },
 							{
-								name: 'frequent',
-								title: __( 'Frequent' ),
+								name: 'rows',
+								title: __( 'Rows' ),
 								className: 'editor-inserter__tab',
 							},
 							{
@@ -306,16 +314,16 @@ export class InserterMenu extends Component {
 								title: __( 'Blocks' ),
 								className: 'editor-inserter__tab',
 							},
-							{
-								name: 'embeds',
-								title: __( 'Embeds' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'shared',
-								title: __( 'Shared' ),
-								className: 'editor-inserter__tab',
-							},
+							// {
+							// 	name: 'embeds',
+							// 	title: __( 'Embeds' ),
+							// 	className: 'editor-inserter__tab',
+							// },
+							// {
+							// 	name: 'shared',
+							// 	title: __( 'Shared' ),
+							// 	className: 'editor-inserter__tab',
+							// },
 						] }
 					>
 						{ ( tabKey ) => (
