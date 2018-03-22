@@ -8,18 +8,17 @@ import { StyleSheet, Text, View, FlatList, TextInput } from 'react-native';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
-export type BlockArray = Array<{
-	key: string,
-	blockType: string,
-	content: string,
-	focused: boolean,
-}>;
 export type BlockListType = {
 	focusBlockAction: number => mixed,
 	moveBlockUpAction: number => mixed,
 	moveBlockDownAction: number => mixed,
 	deleteBlockAction: number => mixed,
-	blocks: BlockArray,
+	blocks: Array<{
+		key: string,
+		blockType: string,
+		content: string,
+		focused: boolean,
+	}>,
 	refresh: boolean,
 };
 
