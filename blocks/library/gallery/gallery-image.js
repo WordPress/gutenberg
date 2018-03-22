@@ -7,9 +7,10 @@ import classnames from 'classnames';
  * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
-import { IconButton, withAPIData, Spinner } from '@wordpress/components';
+import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -74,11 +75,11 @@ class GalleryImage extends Component {
 		}
 	}
 
-	componentWillReceiveProps( { isSelected, image } ) {
-		if ( image && image.data && ! this.props.url ) {
+	componentWillReceiveProps( { isSelected, image, url } ) {
+		if ( image && ! url ) {
 			this.props.setAttributes( {
-				url: image.data.source_url,
-				alt: image.data.alt_text,
+				url: image.source_url,
+				alt: image.alt_text,
 			} );
 		}
 
@@ -147,6 +148,11 @@ class GalleryImage extends Component {
 	}
 }
 
-export default withAPIData( ( { id } ) => ( {
-	image: id ? `/wp/v2/media/${ id }` : {},
-} ) )( GalleryImage );
+export default withSelect( ( select, ownProps ) => {
+	const { getMedia } = select( 'core' );
+	const { id } = ownProps;
+
+	return {
+		image: id ? getMedia( id ) : null,
+	};
+} )( GalleryImage );
