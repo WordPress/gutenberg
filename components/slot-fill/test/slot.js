@@ -98,8 +98,6 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		console.log( element.html() );
-
 		element.find( 'button' ).simulate( 'click' );
 
 		expect( onClose ).toHaveBeenCalled();
