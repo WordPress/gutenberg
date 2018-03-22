@@ -35,11 +35,11 @@ describe( 'TabPanel', () => {
 					}
 				>
 					{
-						( tabName, tabTitle ) => {
+						( tab ) => {
 							return (
-								<div tabIndex="0" className={ tabName + '-view' }>
-									<h3 tabIndex="0" className={ tabName + '-title' }>{ tabTitle }</h3>
-									<p tabIndex="0" className={ tabName + '-text' }>{ tabName }</p>
+								<div tabIndex="0" className={ tab.name + '-view' }>
+									<h3 tabIndex="0" className={ tab.name + '-title' }>{ tab.title }</h3>
+									<p tabIndex="0" className={ tab.name + '-text' }>{ tab.name }</p>
 								</div>
 							);
 						}
