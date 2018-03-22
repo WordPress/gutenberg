@@ -108,7 +108,6 @@ input[type="search"].editor-inserter__search {
 	&:not(:disabled) {
 		&:hover {
 			@include button-style__hover;
-			//outline: 1px solid $light-gray-500;
 		}
 
 		&:focus,
