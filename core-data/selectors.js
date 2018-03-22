@@ -45,3 +45,15 @@ export function isRequestingTerms( state, taxonomy ) {
 export function isRequestingCategories( state ) {
 	return isRequestingTerms( state, 'categories' );
 }
+
+/**
+ * Returns the media object by id.
+ *
+ * @param {Object} state Data state.
+ * @param {number} id    Media id.
+ *
+ * @return {Object?}     Media object.
+ */
+export function getMedia( state, id ) {
+	return state.media[ id ];
+}

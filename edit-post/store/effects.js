@@ -7,6 +7,8 @@ import { reduce, values, some } from 'lodash';
  * WordPress dependencies
  */
 import { select, subscribe } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -83,6 +85,10 @@ const effects = {
 			data: formData,
 		} )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
+	},
+	SWITCH_MODE( action ) {
+		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
+		speak( message, 'assertive' );
 	},
 };
 
