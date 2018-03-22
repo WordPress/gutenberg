@@ -55,6 +55,7 @@ import {
 	selectBlock,
 	updateBlockAttributes,
 	toggleSelection,
+	setKeyboardMode,
 } from '../../store/actions';
 import {
 	getBlock,
@@ -70,6 +71,7 @@ import {
 	isTyping,
 	getBlockMode,
 	getSelectedBlocksInitialCaretPosition,
+	getKeyboardMode,
 } from '../../store/selectors';
 
 const { BACKSPACE, DELETE, ENTER, ESCAPE } = keycodes;
@@ -627,6 +629,7 @@ const mapStateToProps = ( state, { uid, rootUID } ) => {
 		mode: getBlockMode( state, uid ),
 		isSelectionEnabled: isSelectionEnabled( state ),
 		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
+		keyboardMode: getKeyboardMode( state ),
 		isSelected,
 	};
 };
@@ -672,6 +675,10 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
+	},
+
+	onChangeKeyboardMode( mode ) {
+		dispatch( setKeyboardMode( mode ) );
 	},
 } );
 
