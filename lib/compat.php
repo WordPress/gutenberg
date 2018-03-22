@@ -105,6 +105,8 @@ add_action( 'wp_default_scripts', 'gutenberg_shim_fix_api_request_plain_permalin
 /**
  * Shims support for emulating HTTP/1.0 requests in wp.apiRequest
  *
+ * @see https://core.trac.wordpress.org/ticket/43605
+ *
  * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
  */
 function gutenberg_shim_api_request_emulate_http( $scripts ) {
