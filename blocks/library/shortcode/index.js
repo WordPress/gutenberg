@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
+import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withInstanceId, Dashicon } from '@wordpress/components';
 
@@ -13,14 +9,16 @@ import { withInstanceId, Dashicon } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType } from '../../api';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
+import PlainText from '../../plain-text';
 
-registerBlockType( 'core/shortcode', {
+export const name = 'core/shortcode';
+
+export const settings = {
 	title: __( 'Shortcode' ),
 
-	icon: 'marker',
+	description: __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ),
+
+	icon: 'shortcode',
 
 	category: 'widgets',
 
@@ -51,6 +49,7 @@ registerBlockType( 'core/shortcode', {
 						},
 					},
 				},
+				priority: 20,
 			},
 		],
 	},
@@ -62,7 +61,7 @@ registerBlockType( 'core/shortcode', {
 	},
 
 	edit: withInstanceId(
-		( { attributes, setAttributes, instanceId, focus } ) => {
+		( { attributes, setAttributes, instanceId } ) => {
 			const inputId = `blocks-shortcode-input-${ instanceId }`;
 
 			return (
@@ -71,29 +70,18 @@ registerBlockType( 'core/shortcode', {
 						<Dashicon icon="editor-code" />
 						{ __( 'Shortcode' ) }
 					</label>
-					<TextareaAutosize
+					<PlainText
 						id={ inputId }
-						autoComplete="off"
 						value={ attributes.text }
 						placeholder={ __( 'Write shortcode here…' ) }
-						onChange={ ( event ) => setAttributes( {
-							text: event.target.value,
-						} ) }
+						onChange={ ( text ) => setAttributes( { text } ) }
 					/>
-					{ focus &&
-						<InspectorControls>
-							<BlockDescription>
-								<p>{ __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ) }</p>
-							</BlockDescription>
-							<p>{ __( 'No advanced options.' ) }</p>
-						</InspectorControls>
-					}
 				</div>
 			);
 		}
 	),
 
 	save( { attributes } ) {
-		return attributes.text;
+		return <RawHTML>{ attributes.text }</RawHTML>;
 	},
-} );
+};

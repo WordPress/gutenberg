@@ -23,6 +23,7 @@ class PostPermalink extends Component {
 			showCopyConfirmation: false,
 		};
 		this.onCopy = this.onCopy.bind( this );
+		this.onFinishCopy = this.onFinishCopy.bind( this );
 	}
 
 	componentWillUnmount() {
@@ -33,13 +34,12 @@ class PostPermalink extends Component {
 		this.setState( {
 			showCopyConfirmation: true,
 		} );
+	}
 
-		clearTimeout( this.dismissCopyConfirmation );
-		this.dismissCopyConfirmation = setTimeout( () => {
-			this.setState( {
-				showCopyConfirmation: false,
-			} );
-		}, 4000 );
+	onFinishCopy() {
+		this.setState( {
+			showCopyConfirmation: false,
+		} );
 	}
 
 	render() {
@@ -53,9 +53,14 @@ class PostPermalink extends Component {
 				<Dashicon icon="admin-links" />
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 				<Button className="editor-post-permalink__link" href={ link } target="_blank">
-					{ link }
+					{ decodeURI( link ) }
 				</Button>
-				<ClipboardButton className="button" text={ link } onCopy={ this.onCopy }>
+				<ClipboardButton
+					className="button"
+					text={ link }
+					onCopy={ this.onCopy }
+					onFinishCopy={ this.onFinishCopy }
+				>
 					{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
 				</ClipboardButton>
 			</div>

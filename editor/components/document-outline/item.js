@@ -17,7 +17,7 @@ const TableOfContentsItem = ( {
 	<li
 		className={ classnames(
 			'document-outline__item',
-			`is-h${ level }`,
+			`is-${ level.toLowerCase() }`,
 			{
 				'is-invalid': ! isValid,
 			}
@@ -29,7 +29,7 @@ const TableOfContentsItem = ( {
 		>
 			<span className="document-outline__emdash" aria-hidden="true"></span>
 			<strong className="document-outline__level">
-				H{ level }
+				{ level }
 			</strong>
 			<span className="document-outline__item-content">
 				{ children }

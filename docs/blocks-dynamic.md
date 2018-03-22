@@ -49,7 +49,6 @@ registerBlockType( 'my-plugin/latest-post', {
 ```js
 // myblock.js
 
-const { el } = wp.element;
 const { registerBlockType } = wp.blocks;
 const { withAPIData } = wp.components;
 

@@ -8,11 +8,14 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
 import CategoriesBlock from './block';
 
-registerBlockType( 'core/categories', {
+export const name = 'core/categories';
+
+export const settings = {
 	title: __( 'Categories' ),
+
+	description: __( 'Shows a list of your site\'s categories.' ),
 
 	icon: 'list-view',
 
@@ -52,4 +55,4 @@ registerBlockType( 'core/categories', {
 	save() {
 		return null;
 	},
-} );
+};

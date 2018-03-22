@@ -2,19 +2,19 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, Button } from '@wordpress/components';
+import { Dashicon, IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { editPost, savePost } from '../../store/actions';
+import PostSwitchToDraftButton from '../post-switch-to-draft-button';
+import { savePost } from '../../store/actions';
 import {
 	isEditedPostNew,
 	isCurrentPostPublished,
@@ -22,61 +22,62 @@ import {
 	isSavingPost,
 	isEditedPostSaveable,
 	getCurrentPost,
-	getEditedPostAttribute,
 } from '../../store/selectors';
 
-export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, status, onStatusChange, onSave } ) {
-	const className = 'editor-post-saved-state';
-
+/**
+ * Component showing whether the post is saved or not and displaying save links.
+ *
+ * @param   {Object}    Props Component Props.
+ * @return {WPElement}       WordPress Element.
+ */
+export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, onSave } ) {
 	if ( isSaving ) {
 		return (
-			<span className={ className }>
+			<span className="editor-post-saved-state editor-post-saved-state__saving">
+				<Dashicon icon="cloud" />
 				{ __( 'Saving' ) }
 			</span>
 		);
 	}
 
-	if ( ! isSaveable || isPublished ) {
+	if ( isPublished ) {
+		return <PostSwitchToDraftButton />;
+	}
+
+	if ( ! isSaveable ) {
 		return null;
 	}
 
 	if ( ! isNew && ! isDirty ) {
 		return (
-			<span className={ className }>
+			<span className="editor-post-saved-state">
 				<Dashicon icon="saved" />
 				{ __( 'Saved' ) }
 			</span>
 		);
 	}
 
-	const onClick = () => {
-		if ( 'auto-draft' === status ) {
-			onStatusChange( 'draft' );
-		}
-
-		onSave();
-	};
-
 	return (
-		<Button className={ classnames( className, 'button-link' ) } onClick={ onClick }>
-			<span className="editor-post-saved-state__mobile">{ __( 'Save' ) }</span>
-			<span className="editor-post-saved-state__desktop">{ __( 'Save Draft' ) }</span>
-		</Button>
+		<IconButton
+			className="editor-post-save-draft"
+			onClick={ onSave }
+			icon="cloud-upload"
+		>
+			{ __( 'Save Draft' ) }
+		</IconButton>
 	);
 }
 
 export default connect(
-	( state ) => ( {
+	( state, { forceIsDirty, forceIsSaving } ) => ( {
 		post: getCurrentPost( state ),
 		isNew: isEditedPostNew( state ),
 		isPublished: isCurrentPostPublished( state ),
-		isDirty: isEditedPostDirty( state ),
-		isSaving: isSavingPost( state ),
+		isDirty: forceIsDirty || isEditedPostDirty( state ),
+		isSaving: forceIsSaving || isSavingPost( state ),
 		isSaveable: isEditedPostSaveable( state ),
-		status: getEditedPostAttribute( state, 'status' ),
 	} ),
 	{
-		onStatusChange: ( status ) => editPost( { status } ),
 		onSave: savePost,
 	}
 )( PostSavedState );

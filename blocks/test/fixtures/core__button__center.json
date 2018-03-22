@@ -10,6 +10,7 @@
             ],
             "align": "center"
         },
-        "originalContent": "<div class=\"wp-block-button aligncenter\"><a href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>"
+        "innerBlocks": [],
+        "originalContent": "<div class=\"wp-block-button aligncenter\"><a class=\"wp-block-button__link\" href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>"
     }
 ]

@@ -6,15 +6,16 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Return a label for the block movement controls depending on block position.
  *
- * @param  {number}  selectedCount Number of blocks selected.
- * @param  {string}  type          Block type - in the case of a single block, should
+ * @param {number}  selectedCount Number of blocks selected.
+ * @param {string}  type          Block type - in the case of a single block, should
  *                                 define its 'type'. I.e. 'Text', 'Heading', 'Image' etc.
- * @param  {number}  firstIndex    The index (position - 1) of the first block selected.
- * @param  {boolean} isFirst       This is the first block.
- * @param  {boolean} isLast        This is the last block.
- * @param  {number}  dir           Direction of movement (> 0 is considered to be going
+ * @param {number}  firstIndex    The index (position - 1) of the first block selected.
+ * @param {boolean} isFirst       This is the first block.
+ * @param {boolean} isLast        This is the last block.
+ * @param {number}  dir           Direction of movement (> 0 is considered to be going
  *                                 down, < 0 is up).
- * @return {string}                Label for the block movement controls.
+ *
+ * @return {string} Label for the block movement controls.
  */
 export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, isLast, dir ) {
 	const position = ( firstIndex + 1 );
@@ -68,13 +69,14 @@ export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, is
 /**
  * Return a label for the block movement controls depending on block position.
  *
- * @param  {number}  selectedCount Number of blocks selected.
- * @param  {number}  firstIndex    The index (position - 1) of the first block selected.
- * @param  {boolean} isFirst       This is the first block.
- * @param  {boolean} isLast        This is the last block.
- * @param  {number}  dir           Direction of movement (> 0 is considered to be going
+ * @param {number}  selectedCount Number of blocks selected.
+ * @param {number}  firstIndex    The index (position - 1) of the first block selected.
+ * @param {boolean} isFirst       This is the first block.
+ * @param {boolean} isLast        This is the last block.
+ * @param {number}  dir           Direction of movement (> 0 is considered to be going
  *                                 down, < 0 is up).
- * @return {string}                Label for the block movement controls.
+ *
+ * @return {string} Label for the block movement controls.
  */
 export function getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isLast, dir ) {
 	const position = ( firstIndex + 1 );

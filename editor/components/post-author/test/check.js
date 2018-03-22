@@ -37,7 +37,7 @@ describe( 'PostAuthorCheck', () => {
 
 	const user = {
 		data: {
-			capabilities: {
+			post_type_capabilities: {
 				publish_posts: true,
 			},
 		},
@@ -48,7 +48,7 @@ describe( 'PostAuthorCheck', () => {
 		expect( wrapper.type() ).toBe( null );
 		wrapper = shallow(
 			<PostAuthorCheck users={ users } user={
-				{ data: { capabilities: { publish_posts: false } } }
+				{ data: { post_type_capabilities: { publish_posts: false } } }
 			}>
 				authors
 			</PostAuthorCheck>

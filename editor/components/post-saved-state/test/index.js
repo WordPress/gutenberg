@@ -18,7 +18,7 @@ describe( 'PostSavedState', () => {
 				isSaveable={ false } />
 		);
 
-		expect( wrapper.text() ).toBe( 'Saving' );
+		expect( wrapper.text() ).toContain( 'Saving' );
 	} );
 
 	it( 'returns null if the post is not saveable', () => {
@@ -33,10 +33,10 @@ describe( 'PostSavedState', () => {
 		expect( wrapper.type() ).toBeNull();
 	} );
 
-	it( 'returns null if the post is published', () => {
+	it( 'returns a switch to draft link if the post is published', () => {
 		const wrapper = shallow( <PostSavedState isPublished /> );
 
-		expect( wrapper.type() ).toBeNull();
+		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	it( 'should return Saved text if not new and not dirty', () => {
@@ -52,29 +52,7 @@ describe( 'PostSavedState', () => {
 		expect( wrapper.childAt( 1 ).text() ).toBe( 'Saved' );
 	} );
 
-	it( 'should edit auto-draft post to draft before save', () => {
-		const statusSpy = jest.fn();
-		const saveSpy = jest.fn();
-		const wrapper = shallow(
-			<PostSavedState
-				isNew={ false }
-				isDirty={ true }
-				isSaving={ false }
-				isSaveable={ true }
-				onStatusChange={ statusSpy }
-				onSave={ saveSpy }
-				status="auto-draft" />
-		);
-
-		expect( wrapper.name() ).toBe( 'Button' );
-		expect( wrapper.childAt( 0 ).text() ).toBe( 'Save' );
-		wrapper.simulate( 'click' );
-		expect( statusSpy ).toHaveBeenCalledWith( 'draft' );
-		expect( saveSpy ).toHaveBeenCalled();
-	} );
-
 	it( 'should return Save button if edits to be saved', () => {
-		const statusSpy = jest.fn();
 		const saveSpy = jest.fn();
 		const wrapper = shallow(
 			<PostSavedState
@@ -82,14 +60,11 @@ describe( 'PostSavedState', () => {
 				isDirty={ true }
 				isSaving={ false }
 				isSaveable={ true }
-				onStatusChange={ statusSpy }
 				onSave={ saveSpy } />
 		);
 
-		expect( wrapper.name() ).toBe( 'Button' );
-		expect( wrapper.childAt( 0 ).text() ).toBe( 'Save' );
+		expect( wrapper.name() ).toBe( 'IconButton' );
 		wrapper.simulate( 'click' );
-		expect( statusSpy ).not.toHaveBeenCalled();
 		expect( saveSpy ).toHaveBeenCalled();
 	} );
 } );

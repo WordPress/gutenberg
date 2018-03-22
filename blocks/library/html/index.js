@@ -1,25 +1,22 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
+import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withState } from '@wordpress/components';
+import { withState, SandBox, CodeEditor } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType } from '../../api';
 import BlockControls from '../../block-controls';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
-registerBlockType( 'core/html', {
+export const name = 'core/html';
+
+export const settings = {
 	title: __( 'Custom HTML' ),
+
+	description: __( 'Add custom HTML code and preview it right here in the editor.' ),
 
 	icon: 'html',
 
@@ -40,44 +37,51 @@ registerBlockType( 'core/html', {
 		},
 	},
 
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'IFRAME',
+			},
+		],
+	},
+
 	edit: withState( {
 		preview: false,
-	} )( ( { attributes, setAttributes, setState, focus, preview } ) => [
-		focus && (
-			<BlockControls key="controls">
-				<div className="components-toolbar">
-					<button
-						className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` }
-						onClick={ () => setState( { preview: false } ) }>
-						<span>HTML</span>
-					</button>
-					<button
-						className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
-						onClick={ () => setState( { preview: true } ) }>
-						<span>{ __( 'Preview' ) }</span>
-					</button>
-				</div>
-			</BlockControls>
-		),
-		preview ?
-			<div
-				key="preview"
-				dangerouslySetInnerHTML={ { __html: attributes.content } } /> :
-			<TextareaAutosize
-				key="editor"
-				value={ attributes.content }
-				onChange={ ( event ) => setAttributes( { content: event.target.value } ) }
-			/>,
-		focus && (
-			<InspectorControls key="inspector">
-				<BlockDescription>
-					<p>{ __( 'Add custom HTML code and preview it right here in the editor.' ) }</p>
-				</BlockDescription>
-			</InspectorControls>
-		),
-	] ),
+	} )( ( { attributes, setAttributes, setState, isSelected, toggleSelection, preview } ) => (
+		<div className="wp-block-html">
+			{ isSelected && (
+				<BlockControls>
+					<div className="components-toolbar">
+						<button
+							className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` }
+							onClick={ () => setState( { preview: false } ) }
+						>
+							<span>HTML</span>
+						</button>
+						<button
+							className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
+							onClick={ () => setState( { preview: true } ) }
+						>
+							<span>{ __( 'Preview' ) }</span>
+						</button>
+					</div>
+				</BlockControls>
+			) }
+			{ preview ? (
+				<SandBox html={ attributes.content } />
+			) : (
+				<CodeEditor
+					value={ attributes.content }
+					focus={ isSelected }
+					onFocus={ toggleSelection }
+					onChange={ content => setAttributes( { content } ) }
+				/>
+			) }
+		</div>
+	) ),
 
 	save( { attributes } ) {
-		return attributes.content;
+		return <RawHTML>{ attributes.content }</RawHTML>;
 	},
-} );
+};

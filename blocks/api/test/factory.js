@@ -1,12 +1,20 @@
 /**
  * External dependencies
  */
+import deepFreeze from 'deep-freeze';
 import { noop } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import { createBlock, getPossibleBlockTransformations, switchToBlockType, createReusableBlock } from '../factory';
+import {
+	createBlock,
+	cloneBlock,
+	getPossibleBlockTransformations,
+	switchToBlockType,
+	getBlockTransforms,
+	findTransform,
+} from '../factory';
 import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
 
 describe( 'block factory', () => {
@@ -34,7 +42,7 @@ describe( 'block factory', () => {
 	} );
 
 	describe( 'createBlock()', () => {
-		it( 'should create a block given its blockType and attributes', () => {
+		it( 'should create a block given its blockType, attributes, inner blocks', () => {
 			registerBlockType( 'core/test-block', {
 				attributes: {
 					align: {
@@ -53,9 +61,11 @@ describe( 'block factory', () => {
 				category: 'common',
 				title: 'test block',
 			} );
-			const block = createBlock( 'core/test-block', {
-				align: 'left',
-			} );
+			const block = createBlock(
+				'core/test-block',
+				{ align: 'left' },
+				[ createBlock( 'core/test-block' ) ],
+			);
 
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {
@@ -64,6 +74,8 @@ describe( 'block factory', () => {
 				align: 'left',
 			} );
 			expect( block.isValid ).toBe( true );
+			expect( block.innerBlocks ).toHaveLength( 1 );
+			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block' );
 			expect( typeof block.uid ).toBe( 'string' );
 		} );
 
@@ -100,6 +112,79 @@ describe( 'block factory', () => {
 
 			expect( block.attributes ).toEqual( {} );
 			expect( block.isValid ).toBe( true );
+		} );
+	} );
+
+	describe( 'cloneBlock()', () => {
+		it( 'should merge attributes into the existing block', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					isDifferent: {
+						type: 'boolean',
+						default: false,
+					},
+				},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+			const block = deepFreeze(
+				createBlock(
+					'core/test-block',
+					{ align: 'left' },
+					[ createBlock( 'core/test-block' ) ],
+				)
+			);
+
+			const clonedBlock = cloneBlock( block, {
+				isDifferent: true,
+			} );
+
+			expect( clonedBlock.name ).toEqual( block.name );
+			expect( clonedBlock.attributes ).toEqual( {
+				align: 'left',
+				isDifferent: true,
+			} );
+			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
+			expect( typeof clonedBlock.uid ).toBe( 'string' );
+			expect( clonedBlock.uid ).not.toBe( block.uid );
+		} );
+
+		it( 'should replace inner blocks of the existing block', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					isDifferent: {
+						type: 'boolean',
+						default: false,
+					},
+				},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+			const block = deepFreeze(
+				createBlock(
+					'core/test-block',
+					{ align: 'left' },
+					[
+						createBlock( 'core/test-block', { align: 'right' } ),
+						createBlock( 'core/test-block', { align: 'left' } ),
+					],
+				)
+			);
+
+			const clonedBlock = cloneBlock( block, undefined, [
+				createBlock( 'core/test-block' ),
+			] );
+
+			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
+			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toHaveProperty( 'align' );
 		} );
 	} );
 
@@ -617,17 +702,102 @@ describe( 'block factory', () => {
 		} );
 	} );
 
-	describe( 'createReusableBlock', () => {
-		it( 'should create a reusable block', () => {
-			const type = 'core/test-block';
-			const attributes = { name: 'Big Bird' };
-
-			expect( createReusableBlock( type, attributes ) ).toMatchObject( {
-				id: expect.any( Number ),
-				name: 'Untitled block',
-				type,
-				attributes,
+	describe( 'getBlockTransforms', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/transform-from-text-block-1', {
+				transforms: {
+					from: [ {
+						blocks: [ 'core/text-block' ],
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
 			} );
+			registerBlockType( 'core/transform-from-text-block-2', {
+				transforms: {
+					from: [ {
+						blocks: [ 'core/text-block' ],
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+		} );
+
+		it( 'should return all block types of direction', () => {
+			const transforms = getBlockTransforms( 'from' );
+
+			expect( transforms ).toEqual( [
+				{
+					blocks: [ 'core/text-block' ],
+					blockName: 'core/transform-from-text-block-1',
+				},
+				{
+					blocks: [ 'core/text-block' ],
+					blockName: 'core/transform-from-text-block-2',
+				},
+			] );
+		} );
+
+		it( 'should return empty array if no block type by name', () => {
+			const transforms = getBlockTransforms( 'from', 'core/not-exists' );
+
+			expect( transforms ).toEqual( [] );
+		} );
+
+		it( 'should return empty array if no defined transforms', () => {
+			const transforms = getBlockTransforms( 'to', 'core/transform-from-text-block-1' );
+
+			expect( transforms ).toEqual( [] );
+		} );
+
+		it( 'should return single block type transforms of direction', () => {
+			const transforms = getBlockTransforms( 'from', 'core/transform-from-text-block-1' );
+
+			expect( transforms ).toEqual( [
+				{
+					blocks: [ 'core/text-block' ],
+					blockName: 'core/transform-from-text-block-1',
+				},
+			] );
+		} );
+	} );
+
+	describe( 'findTransform', () => {
+		const transforms = [
+			{
+				blocks: [ 'core/text-block' ],
+				priority: 20,
+				blockName: 'core/transform-from-text-block-1',
+			},
+			{
+				blocks: [ 'core/text-block' ],
+				blockName: 'core/transform-from-text-block-3',
+				priority: 5,
+			},
+			{
+				blocks: [ 'core/text-block' ],
+				blockName: 'core/transform-from-text-block-2',
+			},
+		];
+
+		it( 'should return highest priority (lowest numeric value) transform', () => {
+			const transform = findTransform( transforms, () => true );
+
+			expect( transform ).toEqual( {
+				blocks: [ 'core/text-block' ],
+				blockName: 'core/transform-from-text-block-3',
+				priority: 5,
+			} );
+		} );
+
+		it( 'should return null if no matching transform', () => {
+			const transform = findTransform( transforms, () => false );
+
+			expect( transform ).toBe( null );
 		} );
 	} );
 } );

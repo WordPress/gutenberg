@@ -4,26 +4,23 @@
 import { __ } from '@wordpress/i18n';
 
 /**
- * Block categories.
- *
- * Group blocks together based on common traits
- * The block "inserter" relies on these to present the list blocks
+ * Block categories are defined groups for organizing blocks.
  *
  * @var {Array} categories
  */
 const categories = [
 	{ slug: 'common', title: __( 'Common Blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
-	{ slug: 'layout', title: __( 'Layout Blocks' ) },
+	{ slug: 'layout', title: __( 'Layout Elements' ) },
 	{ slug: 'widgets', title: __( 'Widgets' ) },
-	{ slug: 'embed', title: __( 'Embed' ) },
-	{ slug: 'reusable-blocks', title: __( 'Saved Blocks' ) },
+	{ slug: 'embed', title: __( 'Embeds' ) },
+	{ slug: 'shared', title: __( 'Shared Blocks' ) },
 ];
 
 /**
- * Returns all the block categories
+ * Returns all the block categories.
  *
- * @return {Array} Block categories
+ * @return {Array} Block categories.
  */
 export function getCategories() {
 	return categories;

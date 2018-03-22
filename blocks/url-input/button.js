@@ -38,12 +38,13 @@ class UrlInputButton extends Component {
 	render() {
 		const { url, onChange } = this.props;
 		const { expanded } = this.state;
+		const buttonLabel = url ? __( 'Edit Link' ) : __( 'Insert Link' );
 
 		return (
 			<div className="blocks-url-input__button">
 				<IconButton
 					icon="admin-links"
-					label={ __( 'Edit Link' ) }
+					label={ buttonLabel }
 					onClick={ this.toggle }
 					className={ classnames( 'components-toolbar__control', {
 						'is-active': url,
@@ -53,18 +54,20 @@ class UrlInputButton extends Component {
 					<form
 						className="blocks-format-toolbar__link-modal"
 						onSubmit={ this.submitLink }>
-						<IconButton
-							className="blocks-url-input__back"
-							icon="arrow-left-alt"
-							label={ __( 'Close' ) }
-							onClick={ this.toggle }
-						/>
-						<UrlInput value={ url || '' } onChange={ onChange } data-test="UrlInput" />
-						<IconButton
-							icon="editor-break"
-							label={ __( 'Submit' ) }
-							type="submit"
-						/>
+						<div className="blocks-format-toolbar__link-modal-line">
+							<IconButton
+								className="blocks-url-input__back"
+								icon="arrow-left-alt"
+								label={ __( 'Close' ) }
+								onClick={ this.toggle }
+							/>
+							<UrlInput value={ url || '' } onChange={ onChange } data-test="UrlInput" />
+							<IconButton
+								icon="editor-break"
+								label={ __( 'Submit' ) }
+								type="submit"
+							/>
+						</div>
 					</form>
 				}
 			</div>

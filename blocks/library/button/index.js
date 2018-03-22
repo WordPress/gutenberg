@@ -3,23 +3,20 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Dashicon, IconButton, PanelColor, withFallbackStyles } from '@wordpress/components';
+import { Dashicon, IconButton, PanelColor, ToggleControl, withFallbackStyles } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
 import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
 const { getComputedStyle } = window;
 
@@ -62,8 +59,7 @@ class ButtonBlock extends Component {
 		const {
 			attributes,
 			setAttributes,
-			focus,
-			setFocus,
+			isSelected,
 			className,
 		} = this.props;
 
@@ -78,33 +74,30 @@ class ButtonBlock extends Component {
 		} = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
 			),
-			<span key="button" className={ className } title={ title } style={ { backgroundColor: color } } ref={ this.bindRef }>
-				<Editable
+			<span key="button" className={ className } title={ title } ref={ this.bindRef }>
+				<RichText
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
 					value={ text }
-					focus={ focus }
-					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+					className="wp-block-button__link"
 					style={ {
+						backgroundColor: color,
 						color: textColor,
 					} }
+					isSelected={ isSelected }
 					keepPlaceholderOnFocus
 				/>
-				{ focus &&
+				{ isSelected &&
 					<InspectorControls key="inspector">
-						<BlockDescription>
-							<p>{ __( 'A nice little button. Call something out with it.' ) }</p>
-						</BlockDescription>
-
 						<ToggleControl
-							label={ __( 'Stand on a line' ) }
+							label={ __( 'Wrap text' ) }
 							checked={ !! clear }
 							onChange={ this.toggleClear }
 						/>
@@ -129,7 +122,7 @@ class ButtonBlock extends Component {
 					</InspectorControls>
 				}
 			</span>,
-			focus && (
+			isSelected && (
 				<form
 					key="form-link"
 					className="blocks-button__inline-link"
@@ -146,46 +139,52 @@ class ButtonBlock extends Component {
 	}
 }
 
-registerBlockType( 'core/button', {
+const blockAttributes = {
+	url: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'href',
+	},
+	title: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'title',
+	},
+	text: {
+		type: 'array',
+		source: 'children',
+		selector: 'a',
+	},
+	align: {
+		type: 'string',
+		default: 'none',
+	},
+	color: {
+		type: 'string',
+	},
+	textColor: {
+		type: 'string',
+	},
+};
+
+export const name = 'core/button';
+
+export const settings = {
 	title: __( 'Button' ),
+
+	description: __( 'A nice little button. Call something out with it.' ),
 
 	icon: 'button',
 
 	category: 'layout',
 
-	attributes: {
-		url: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'a',
-			attribute: 'href',
-		},
-		title: {
-			type: 'string',
-			source: 'attribute',
-			selector: 'a',
-			attribute: 'title',
-		},
-		text: {
-			type: 'array',
-			source: 'children',
-			selector: 'a',
-		},
-		align: {
-			type: 'string',
-			default: 'none',
-		},
-		color: {
-			type: 'string',
-		},
-		textColor: {
-			type: 'string',
-		},
-	},
+	attributes: blockAttributes,
 
 	getEditWrapperProps( attributes ) {
 		const { align, clear } = attributes;
-		const props = {};
+		const props = { 'data-resized': true };
 
 		if ( 'left' === align || 'right' === align || 'center' === align ) {
 			props[ 'data-align' ] = align;
@@ -203,12 +202,35 @@ registerBlockType( 'core/button', {
 	save( { attributes } ) {
 		const { url, text, title, align, color, textColor } = attributes;
 
+		const buttonStyle = {
+			backgroundColor: color,
+			color: textColor,
+		};
+
+		const linkClass = 'wp-block-button__link';
+
 		return (
-			<div className={ `align${ align }` } style={ { backgroundColor: color } }>
-				<a href={ url } title={ title } style={ { color: textColor } }>
+			<div className={ `align${ align }` }>
+				<a className={ linkClass } href={ url } title={ title } style={ buttonStyle }>
 					{ text }
 				</a>
 			</div>
 		);
 	},
-} );
+
+	deprecated: [ {
+		attributes: blockAttributes,
+
+		save( { attributes } ) {
+			const { url, text, title, align, color, textColor } = attributes;
+
+			return (
+				<div className={ `align${ align }` } style={ { backgroundColor: color } }>
+					<a href={ url } title={ title } style={ { color: textColor } }>
+						{ text }
+					</a>
+				</div>
+			);
+		},
+	} ],
+};

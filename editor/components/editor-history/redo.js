@@ -21,6 +21,7 @@ function EditorHistoryRedo( { hasRedo, redo } ) {
 			label={ __( 'Redo' ) }
 			disabled={ ! hasRedo }
 			onClick={ redo }
+			className="editor-history__undo"
 		/>
 	);
 }

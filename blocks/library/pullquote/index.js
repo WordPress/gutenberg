@@ -7,21 +7,19 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { withState } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
-import Editable from '../../editable';
+import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
-const toEditableValue = value => map( value, ( subValue => subValue.children ) );
-const fromEditableValue = value => map( value, ( subValue ) => ( {
+const toRichTextValue = value => map( value, ( subValue => subValue.children ) );
+const fromRichTextValue = value => map( value, ( subValue ) => ( {
 	children: subValue,
 } ) );
 const blockAttributes = {
@@ -46,9 +44,13 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/pullquote', {
+export const name = 'core/pullquote';
+
+export const settings = {
 
 	title: __( 'Pullquote' ),
+
+	description: __( 'A pullquote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ),
 
 	icon: 'format-quote',
 
@@ -63,19 +65,15 @@ registerBlockType( 'core/pullquote', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit: withState( {
+		editable: 'content',
+	} )( ( { attributes, setAttributes, isSelected, className, editable, setState } ) => {
 		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
 		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'A pullquote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -84,36 +82,38 @@ registerBlockType( 'core/pullquote', {
 				</BlockControls>
 			),
 			<blockquote key="quote" className={ className }>
-				<Editable
+				<RichText
 					multiline="p"
-					value={ toEditableValue( value ) }
+					value={ toRichTextValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: fromEditableValue( nextValue ),
+							value: fromRichTextValue( nextValue ),
 						} )
 					}
+					/* translators: the text of the quotation */
 					placeholder={ __( 'Write quote…' ) }
-					focus={ focus && focus.editable === 'value' ? focus : null }
-					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					wrapperClassName="blocks-pullquote__content"
+					isSelected={ isSelected && editable === 'content' }
+					onFocus={ onSetActiveEditable( 'content' ) }
 				/>
-				{ ( citation || !! focus ) && (
-					<Editable
+				{ ( citation || isSelected ) && (
+					<RichText
 						tagName="cite"
 						value={ citation }
-						placeholder={ __( 'Write caption…' ) }
+						/* translators: the individual or entity quoted */
+						placeholder={ __( 'Write citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
 							} )
 						}
-						focus={ focus && focus.editable === 'citation' ? focus : null }
-						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
+						isSelected={ isSelected && editable === 'cite' }
+						onFocus={ onSetActiveEditable( 'cite' ) }
 					/>
 				) }
 			</blockquote>,
 		];
-	},
+	} ),
 
 	save( { attributes } ) {
 		const { value, citation, align } = attributes;
@@ -155,4 +155,4 @@ registerBlockType( 'core/pullquote', {
 			);
 		},
 	} ],
-} );
+};

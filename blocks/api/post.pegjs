@@ -169,32 +169,8 @@ Block_List
   }
 
 Token
-  = Tag_More
-  / Block_Void
+  = Block_Void
   / Block_Balanced
-
-Tag_More
-  = "<!--" WS* "more" customText:(WS+ text:$((!(WS* "-->") .)+) { /** <?php return $text; ?> **/ return text })? WS* "-->" noTeaser:(WS* "<!--noteaser-->")?
-  { /** <?php
-    $attrs = array( 'noTeaser' => (bool) $noTeaser );
-    if ( ! empty( $customText ) ) {
-      $attrs['customText'] = $customText;
-    }
-    return array(
-       'blockName' => 'core/more',
-       'attrs' => $attrs,
-       'innerHTML' => ''
-    );
-    ?> **/
-    return {
-      blockName: 'core/more',
-      attrs: {
-        customText: customText || undefined,
-        noTeaser: !! noTeaser
-      },
-      innerHTML: ''
-    }
-  }
 
 Block_Void
   = "<!--" WS+ "wp:" blockName:Block_Name WS+ attrs:(a:Block_Attributes WS+ {

@@ -1,34 +1,50 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { Children } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
 import { NavigableMenu } from '../navigable-container';
-import MenuItemsToggle from './menu-items-toggle';
+import withInstanceId from '../higher-order/with-instance-id';
 
-function MenuItemsGroup( { label, value, choices = [], onSelect, children } ) {
+export function MenuItemsGroup( {
+	children,
+	className = '',
+	filterName,
+	instanceId,
+	label,
+} ) {
+	const childrenArray = Children.toArray( children );
+	const menuItems = filterName ?
+		applyFilters( filterName, childrenArray ) :
+		childrenArray;
+
+	if ( ! Array.isArray( menuItems ) || ! menuItems.length ) {
+		return null;
+	}
+
+	const labelId = `components-menu-items-group-label-${ instanceId }`;
+	const classNames = classnames( className, 'components-menu-items__group' );
+
 	return (
-		<div className="components-choice-menu">
-			<div className="components-choice-menu__label">{ label }</div>
-			<NavigableMenu orientation="vertical">
-				{ choices.map( ( item ) => {
-					const isSelected = value === item.value;
-					return (
-						<MenuItemsToggle
-							key={ item.value }
-							label={ item.label }
-							isSelected={ isSelected }
-							onClick={ () => {
-								if ( ! isSelected ) {
-									onSelect( item.value );
-								}
-							} }
-						/>
-					);
-				} ) }
+		<div className={ classNames }>
+			{ label &&
+				<div className="components-menu-items__group-label" id={ labelId }>{ label }</div>
+			}
+			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
+				{ menuItems }
 			</NavigableMenu>
-			{ children }
 		</div>
 	);
 }
 
-export default MenuItemsGroup;
+export default withInstanceId( MenuItemsGroup );

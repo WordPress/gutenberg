@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { get, includes, map, castArray } from 'lodash';
+import { get, includes, last, map, castArray, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,35 +13,40 @@ import {
 	switchToBlockType,
 	createBlock,
 	serialize,
-	createReusableBlock,
-	getDefaultBlockName,
+	isReusableBlock,
+	getDefaultBlockForPostFormat,
+	doBlocksMatchTemplate,
+	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
+	setupEditorState,
 	resetPost,
-	setupNewPost,
-	resetBlocks,
-	focusBlock,
+	receiveBlocks,
+	receiveReusableBlocks,
+	replaceBlock,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
 	removeNotice,
 	savePost,
-	editPost,
-	requestMetaBoxUpdates,
-	updateReusableBlock,
 	saveReusableBlock,
 	insertBlock,
+	removeBlocks,
+	selectBlock,
+	removeBlock,
+	resetBlocks,
+	setTemplateValidity,
 } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
-	getDirtyMetaBoxes,
 	getEditedPostContent,
 	getPostEdits,
 	isCurrentPostPublished,
@@ -49,8 +54,17 @@ import {
 	isEditedPostNew,
 	isEditedPostSaveable,
 	getBlock,
+	getBlockCount,
+	getBlockRootUID,
+	getBlocks,
 	getReusableBlock,
+	getPreviousBlockUid,
+	getProvisionalBlockUID,
+	getSelectedBlock,
+	isBlockSelected,
+	getTemplate,
 	POST_UPDATE_TRANSACTION_ID,
+	getTemplateLock,
 } from './selectors';
 
 /**
@@ -58,7 +72,24 @@ import {
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
-const SAVE_REUSABLE_BLOCK_NOTICE_ID = 'SAVE_REUSABLE_BLOCK_NOTICE_ID';
+const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
+
+/**
+ * Effect handler returning an action to remove the provisional block, if one
+ * is set.
+ *
+ * @param {Object} action Action object.
+ * @param {Object} store  Data store instance.
+ *
+ * @return {?Object} Remove action, if provisional block is set.
+ */
+export function removeProvisionalBlock( action, store ) {
+	const state = store.getState();
+	const provisionalBlockUID = getProvisionalBlockUID( state );
+	if ( provisionalBlockUID && ! isBlockSelected( state, provisionalBlockUID ) ) {
+		return removeBlock( provisionalBlockUID, false );
+	}
+}
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
@@ -78,34 +109,34 @@ export default {
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( state ) );
-		new Model( toSend ).save().done( ( newPost ) => {
-			dispatch( {
-				type: 'RESET_POST',
-				post: newPost,
-			} );
-			dispatch( {
-				type: 'REQUEST_POST_UPDATE_SUCCESS',
-				previousPost: post,
-				post: newPost,
-				optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
-		} ).fail( ( err ) => {
-			dispatch( {
-				type: 'REQUEST_POST_UPDATE_FAILURE',
-				error: get( err, 'responseJSON', {
-					code: 'unknown_error',
-					message: __( 'An unknown error occurred.' ),
-				} ),
-				post,
-				edits,
-				optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-			} );
-		} );
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
+			( newPost ) => {
+				dispatch( resetPost( newPost ) );
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_SUCCESS',
+					previousPost: post,
+					post: newPost,
+					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+				} );
+			},
+			( err ) => {
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_FAILURE',
+					error: get( err, 'responseJSON', {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					} ),
+					post,
+					edits,
+					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+				} );
+			}
+		);
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
-		const { dispatch, getState } = store;
+		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = includes( publishStatus, previousPost.status );
@@ -140,12 +171,9 @@ export default {
 					{ ' ' }
 					{ shouldShowLink && <a href={ post.link }>{ __( 'View post' ) }</a> }
 				</p>,
-				{ id: SAVE_POST_NOTICE_ID }
+				{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 			) );
 		}
-
-		// Update dirty meta boxes.
-		dispatch( requestMetaBoxUpdates( getDirtyMetaBoxes( getState() ) ) );
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
 			window.history.replaceState(
@@ -176,9 +204,9 @@ export default {
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
 		const { postId } = action;
-		const Model = wp.api.getPostTypeModel( getCurrentPostType( getState() ) );
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( getState() ) );
 		dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
-		new Model( { id: postId } ).destroy().then(
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ postId }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
 					...action,
@@ -200,13 +228,10 @@ export default {
 	TRASH_POST_SUCCESS( action ) {
 		const { postId, postType } = action;
 
-		// Delay redirect to ensure store has been updated with the successful trash.
-		setTimeout( () => {
-			window.location.href = getWPAdminURL( 'edit.php', {
-				trashed: 1,
-				post_type: postType,
-				ids: postId,
-			} );
+		window.location.href = getWPAdminURL( 'edit.php', {
+			trashed: 1,
+			post_type: postType,
+			ids: postId,
 		} );
 	},
 	TRASH_POST_FAILURE( action, store ) {
@@ -215,12 +240,15 @@ export default {
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
-		const [ blockA, blockB ] = action.blocks;
+		const state = store.getState();
+		const [ blockAUid, blockBUid ] = action.blocks;
+		const blockA = getBlock( state, blockAUid );
+		const blockB = getBlock( state, blockBUid );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
 		if ( ! blockType.merge ) {
-			dispatch( focusBlock( blockA.uid ) );
+			dispatch( selectBlock( blockA.uid ) );
 			return;
 		}
 
@@ -241,7 +269,7 @@ export default {
 			blocksWithTheSameType[ 0 ].attributes
 		);
 
-		dispatch( focusBlock( blockA.uid, { offset: -1 } ) );
+		dispatch( selectBlock( blockA.uid, -1 ) );
 		dispatch( replaceBlocks(
 			[ blockA.uid, blockB.uid ],
 			[
@@ -276,69 +304,104 @@ export default {
 			return;
 		}
 
-		// Change status from auto-draft to draft
-		if ( isEditedPostNew( state ) ) {
-			dispatch( editPost( { status: 'draft' } ) );
-		}
-
 		dispatch( savePost() );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;
-		const effects = [];
 
 		// Parse content as blocks
+		let blocks;
+		let isValidTemplate = true;
 		if ( post.content.raw ) {
-			effects.push( resetBlocks( parse( post.content.raw ) ) );
-		} else if ( settings.template ) {
-			const blocks = map( settings.template, ( [ name, attributes ] ) => {
-				const block = createBlock( name );
-				block.attributes = {
-					...block.attributes,
-					...attributes,
-				};
-				return block;
-			} );
-			effects.push( resetBlocks( blocks ) );
-		}
+			blocks = parse( post.content.raw );
 
-		// Resetting post should occur after blocks have been reset, since it's
-		// the post reset that restarts history (used in dirty detection).
-		effects.push( resetPost( post ) );
+			// Unlocked templates are considered always valid because they act as default values only.
+			isValidTemplate = (
+				! settings.template ||
+				settings.templateLock !== 'all' ||
+				doBlocksMatchTemplate( blocks, settings.template )
+			);
+		} else if ( settings.template ) {
+			blocks = synchronizeBlocksWithTemplate( [], settings.template );
+		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
+			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
+		} else {
+			blocks = [];
+		}
 
 		// Include auto draft title in edits while not flagging post as dirty
+		const edits = {};
 		if ( post.status === 'auto-draft' ) {
-			effects.push( setupNewPost( {
-				title: post.title.raw,
-			} ) );
+			edits.title = post.title.raw;
+			edits.status = 'draft';
 		}
 
-		return effects;
+		return [
+			setTemplateValidity( isValidTemplate ),
+			setupEditorState( post, blocks, edits ),
+		];
+	},
+	SYNCHRONIZE_TEMPLATE( action, { getState } ) {
+		const state = getState();
+		const blocks = getBlocks( state );
+		const template = getTemplate( state );
+		const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
+
+		return [
+			resetBlocks( updatedBlockList ),
+			setTemplateValidity( true ),
+		];
+	},
+	CHECK_TEMPLATE_VALIDITY( action, { getState } ) {
+		const state = getState();
+		const blocks = getBlocks( state );
+		const template = getTemplate( state );
+		const templateLock = getTemplateLock( state );
+		const isValid = (
+			! template ||
+			templateLock !== 'all' ||
+			doBlocksMatchTemplate( blocks, template )
+		);
+
+		return setTemplateValidity( isValid );
 	},
 	FETCH_REUSABLE_BLOCKS( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
+			return;
+		}
+
 		const { id } = action;
 		const { dispatch } = store;
 
 		let result;
 		if ( id ) {
-			result = new wp.api.models.ReusableBlocks( { id } ).fetch();
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
 		} else {
-			result = new wp.api.collections.ReusableBlocks().fetch();
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }` } );
 		}
 
 		result.then(
 			( reusableBlockOrBlocks ) => {
+				dispatch( receiveReusableBlocks( map(
+					castArray( reusableBlockOrBlocks ),
+					( reusableBlock ) => ( {
+						reusableBlock,
+						parsedBlock: parse( reusableBlock.content )[ 0 ],
+					} )
+				) ) );
+
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
-					reusableBlocks: castArray( reusableBlockOrBlocks ).map( ( { id: itemId, name, content } ) => {
-						const [ { name: type, attributes } ] = parse( content );
-						return { id: itemId, name, type, attributes };
-					} ),
+					id,
 				} );
 			},
 			( error ) => {
 				dispatch( {
 					type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+					id,
 					error: error.responseJSON || {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
@@ -347,53 +410,191 @@ export default {
 			}
 		);
 	},
+	RECEIVE_REUSABLE_BLOCKS( action ) {
+		return receiveBlocks( map( action.results, 'parsedBlock' ) );
+	},
 	SAVE_REUSABLE_BLOCK( action, store ) {
-		const { id } = action;
-		const { getState, dispatch } = store;
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
+			return;
+		}
 
-		const { name, type, attributes, isTemporary } = getReusableBlock( getState(), id );
-		const content = serialize( createBlock( type, attributes ) );
-		const requestData = isTemporary ? { name, content } : { id, name, content };
-		new wp.api.models.ReusableBlocks( requestData ).save().then(
+		const { id } = action;
+		const { dispatch } = store;
+		const state = store.getState();
+
+		const { uid, title, isTemporary } = getReusableBlock( state, id );
+		const { name, attributes, innerBlocks } = getBlock( state, uid );
+		const content = serialize( createBlock( name, attributes, innerBlocks ) );
+
+		const data = isTemporary ? { title, content } : { id, title, content };
+		const path = isTemporary ? `/wp/v2/${ basePath }` : `/wp/v2/${ basePath }/${ id }`;
+		const method = isTemporary ? 'POST' : 'PUT';
+
+		wp.apiRequest( { path, data, method } ).then(
 			( updatedReusableBlock ) => {
 				dispatch( {
 					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
 					updatedId: updatedReusableBlock.id,
 					id,
 				} );
-				dispatch( createSuccessNotice(
-					__( 'Block updated.' ),
-					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
-				) );
+				const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
+				dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
 			},
 			( error ) => {
 				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
-				dispatch( createErrorNotice(
-					get( error.responseJSON, 'message', __( 'An unknown error occured.' ) ),
-					{ id: SAVE_REUSABLE_BLOCK_NOTICE_ID }
-				) );
+				const message = __( 'An unknown error occurred.' );
+				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+					id: REUSABLE_BLOCK_NOTICE_ID,
+					spokenMessage: message,
+				} ) );
+			}
+		);
+	},
+	DELETE_REUSABLE_BLOCK( action, store ) {
+		// TODO: these are potentially undefined, this fix is in place
+		// until there is a filter to not use reusable blocks if undefined
+		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
+		if ( ! basePath ) {
+			return;
+		}
+
+		const { id } = action;
+		const { getState, dispatch } = store;
+
+		// Don't allow a reusable block with a temporary ID to be deleted
+		const reusableBlock = getReusableBlock( getState(), id );
+		if ( ! reusableBlock || reusableBlock.isTemporary ) {
+			return;
+		}
+
+		// Remove any other blocks that reference this reusable block
+		const allBlocks = getBlocks( getState() );
+		const associatedBlocks = allBlocks.filter( block => isReusableBlock( block ) && block.attributes.ref === id );
+		const associatedBlockUids = associatedBlocks.map( block => block.uid );
+
+		const transactionId = uniqueId();
+
+		dispatch( {
+			type: 'REMOVE_REUSABLE_BLOCK',
+			id,
+			optimist: { type: BEGIN, id: transactionId },
+		} );
+
+		// Remove the parsed block.
+		dispatch( removeBlocks( [
+			...associatedBlockUids,
+			reusableBlock.uid,
+		] ) );
+
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
+			() => {
+				dispatch( {
+					type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
+					id,
+					optimist: { type: COMMIT, id: transactionId },
+				} );
+				const message = __( 'Block deleted.' );
+				dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+			},
+			( error ) => {
+				dispatch( {
+					type: 'DELETE_REUSABLE_BLOCK_FAILURE',
+					id,
+					optimist: { type: REVERT, id: transactionId },
+				} );
+				const message = __( 'An unknown error occurred.' );
+				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+					id: REUSABLE_BLOCK_NOTICE_ID,
+					spokenMessage: message,
+				} ) );
 			}
 		);
 	},
 	CONVERT_BLOCK_TO_STATIC( action, store ) {
-		const { getState, dispatch } = store;
-
-		const oldBlock = getBlock( getState(), action.uid );
-		const reusableBlock = getReusableBlock( getState(), oldBlock.attributes.ref );
-		const newBlock = createBlock( reusableBlock.type, reusableBlock.attributes );
-		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
+		const state = store.getState();
+		const oldBlock = getBlock( state, action.uid );
+		const reusableBlock = getReusableBlock( state, oldBlock.attributes.ref );
+		const referencedBlock = getBlock( state, reusableBlock.uid );
+		const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
+		store.dispatch( replaceBlock( oldBlock.uid, newBlock ) );
 	},
 	CONVERT_BLOCK_TO_REUSABLE( action, store ) {
 		const { getState, dispatch } = store;
 
-		const oldBlock = getBlock( getState(), action.uid );
-		const reusableBlock = createReusableBlock( oldBlock.name, oldBlock.attributes );
-		const newBlock = createBlock( 'core/block', { ref: reusableBlock.id } );
-		dispatch( updateReusableBlock( reusableBlock.id, reusableBlock ) );
+		const parsedBlock = getBlock( getState(), action.uid );
+		const reusableBlock = {
+			id: uniqueId( 'reusable' ),
+			uid: parsedBlock.uid,
+			title: __( 'Untitled block' ),
+		};
+
+		dispatch( receiveReusableBlocks( [ {
+			reusableBlock,
+			parsedBlock,
+		} ] ) );
+
 		dispatch( saveReusableBlock( reusableBlock.id ) );
-		dispatch( replaceBlocks( [ oldBlock.uid ], [ newBlock ] ) );
+
+		dispatch( replaceBlock(
+			parsedBlock.uid,
+			createBlock( 'core/block', {
+				ref: reusableBlock.id,
+				layout: parsedBlock.attributes.layout,
+			} )
+		) );
+
+		// Re-add the original block to the store, since replaceBlock() will have removed it
+		dispatch( receiveBlocks( [ parsedBlock ] ) );
 	},
-	APPEND_DEFAULT_BLOCK() {
-		return insertBlock( createBlock( getDefaultBlockName() ) );
+	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
+		const message = spokenMessage || content;
+		speak( message, 'assertive' );
+	},
+
+	EDIT_POST( action, { getState } ) {
+		const format = get( action, 'edits.format' );
+		if ( ! format ) {
+			return;
+		}
+		const blockName = getDefaultBlockForPostFormat( format );
+		if ( blockName && getBlockCount( getState() ) === 0 ) {
+			return insertBlock( createBlock( blockName ) );
+		}
+	},
+
+	CLEAR_SELECTED_BLOCK: removeProvisionalBlock,
+
+	SELECT_BLOCK: removeProvisionalBlock,
+
+	MULTI_SELECT: removeProvisionalBlock,
+
+	REMOVE_BLOCKS( action, { getState, dispatch } ) {
+		// if the action says previous block should not be selected don't do anything.
+		if ( ! action.selectPrevious ) {
+			return;
+		}
+
+		const firstRemovedBlockUID = action.uids[ 0 ];
+		const state = getState();
+		const currentSelectedBlock = getSelectedBlock( state );
+
+		// recreate the state before the block was removed.
+		const previousState = { ...state, editor: { present: last( state.editor.past ) } };
+
+		// rootUID of the removed block.
+		const rootUID = getBlockRootUID( previousState, firstRemovedBlockUID );
+
+		// UID of the block that was before the removed block
+		// or the rootUID if the removed block was the first amongst his siblings.
+		const blockUIDToSelect = getPreviousBlockUid( previousState, firstRemovedBlockUID ) || rootUID;
+
+		// Dispatch select block action if the currently selected block
+		// is not already the block we want to be selected.
+		if ( blockUIDToSelect !== currentSelectedBlock ) {
+			dispatch( selectBlock( blockUIDToSelect ) );
+		}
 	},
 };

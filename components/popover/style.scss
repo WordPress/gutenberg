@@ -4,6 +4,8 @@
 	left: 50%;
 
 	&:not(.is-mobile) {
+		margin-left: 2px;
+
 		&:before {
 			border: 8px solid $light-gray-500;
 		}
@@ -46,6 +48,7 @@
 		&.is-bottom {
 			top: 100%;
 			margin-top: 8px;
+			z-index: z-index( ".components-popover.is-bottom" );
 
 			&:before {
 				top: -8px;
@@ -109,16 +112,22 @@
 }
 
 .components-popover__header {
-	height: $panel-header-height;
-	background: $light-gray-300;
-	padding: 0 $panel-padding;
+	align-items: center;
+	background: $white;
 	border: 1px solid $light-gray-500;
-	position: relative;
+	display: flex;
+	height: $panel-header-height;
+	justify-content: space-between;
+	padding: 0 8px 0 $panel-padding;
+}
+
+.components-popover__header-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
 }
 
 .components-popover__close.components-icon-button {
-	position: absolute;
-	top: 6px;
-	right: 6px;
 	z-index: z-index( '.components-popover__close' );
 }

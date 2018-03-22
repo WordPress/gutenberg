@@ -43,7 +43,7 @@ Our goal with Gutenberg is not just to create a seamless post- and page-building
 
 ## Is Gutenberg built on top of TinyMCE?
 
-No. TinyMCE is one of the best tools for enabling rich text on the web. In Gutenberg, TinyMCE does exactly that. Nearly every text field you'll find is augmented with TinyMCE for rich text. Whether it be text, lists, or even just a single caption, TinyMCE can be invoked on blocks for rich text enhancements.
+No. [TinyMCE](https://www.tinymce.com/) is one of the best tools for enabling rich text on the web. In Gutenberg, TinyMCE does exactly that. Nearly every text field you'll find is augmented with TinyMCE for rich text. Whether it be text, lists, or even just a single caption, TinyMCE can be invoked on blocks for rich text enhancements.
 
 ## What browsers will Gutenberg support?
 
@@ -97,7 +97,7 @@ Blocks will be able to provide base structural CSS styles, and themes can add st
 
 Other features, like the new _wide_ and _full-wide_ alignment options, will simply be CSS classes applied to blocks that offer this alignment. We are looking at how a theme can opt in to this feature, for example using `add_theme_support`.
 
-*See:* [Theme Support](https://wordpress.org/gutenberg/handbook/reference/theme-support/)
+*See:* [Theme Support](https://wordpress.org/gutenberg/handbook/extensibility/theme-support/)
 
 ## How will editor styles work?
 

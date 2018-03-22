@@ -8,15 +8,15 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
 
-registerBlockType( 'core/table', {
+export const name = 'core/table';
+
+export const settings = {
 	title: __( 'Table' ),
+	description: __( 'Tables. Best used for tabular data.' ),
 	icon: 'editor-table',
 	category: 'formatting',
 
@@ -53,18 +53,11 @@ registerBlockType( 'core/table', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { content } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Tables. Best used for tabular data.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
-			focus && (
+			isSelected && (
 				<BlockControls key="toolbar">
 					<BlockAlignmentToolbar
 						value={ attributes.align }
@@ -78,9 +71,8 @@ registerBlockType( 'core/table', {
 					setAttributes( { content: nextContent } );
 				} }
 				content={ content }
-				focus={ focus }
-				onFocus={ setFocus }
 				className={ className }
+				isSelected={ isSelected }
 			/>,
 		];
 	},
@@ -93,4 +85,4 @@ registerBlockType( 'core/table', {
 			</table>
 		);
 	},
-} );
+};

@@ -38,6 +38,7 @@ class ClipboardButton extends Component {
 	componentWillUnmount() {
 		this.clipboard.destroy();
 		delete this.clipboard;
+		clearTimeout( this.onCopyTimeout );
 	}
 
 	bindContainer( container ) {
@@ -50,9 +51,17 @@ class ClipboardButton extends Component {
 		// kept within the rendered node.
 		args.clearSelection();
 
-		const { onCopy } = this.props;
+		const { onCopy, onFinishCopy } = this.props;
 		if ( onCopy ) {
 			onCopy();
+			// For convenience and consistency, ClipboardButton offers to call
+			// a secondary callback with delay. This is useful to reset
+			// consumers' state, e.g. to revert a label from "Copied" to
+			// "Copy".
+			if ( onFinishCopy ) {
+				clearTimeout( this.onCopyTimeout );
+				this.onCopyTimeout = setTimeout( onFinishCopy, 4000 );
+			}
 		}
 	}
 
@@ -68,7 +77,7 @@ class ClipboardButton extends Component {
 	render() {
 		// Disable reason: Exclude from spread props passed to Button
 		// eslint-disable-next-line no-unused-vars
-		const { className, children, onCopy, text, ...buttonProps } = this.props;
+		const { className, children, onCopy, onFinishCopy, text, ...buttonProps } = this.props;
 		const classes = classnames( 'components-clipboard-button', className );
 
 		return (

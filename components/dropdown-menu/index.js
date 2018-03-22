@@ -54,6 +54,7 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
+						tooltip={ label }
 					>
 						<Dashicon icon="arrow-down" />
 					</IconButton>

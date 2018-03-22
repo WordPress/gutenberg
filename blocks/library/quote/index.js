@@ -1,29 +1,27 @@
 /**
  * External dependencies
  */
-import { isString, get } from 'lodash';
+import { castArray, get, isString } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import { Toolbar, withState } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
+import { createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
-import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
+import RichText from '../../rich-text';
 
-const toEditableValue = value => value.map( ( subValue => subValue.children ) );
-const fromEditableValue = value => value.map( ( subValue ) => ( {
+const toRichTextValue = value => value.map( ( subValue => subValue.children ) );
+const fromRichTextValue = value => value.map( ( subValue ) => ( {
 	children: subValue,
 } ) );
 
@@ -53,8 +51,11 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/quote', {
+export const name = 'core/quote';
+
+export const settings = {
 	title: __( 'Quote' ),
+	description: __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ),
 	icon: 'format-quote',
 	category: 'common',
 
@@ -121,44 +122,57 @@ registerBlockType( 'core/quote', {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { value, citation, ...attrs } ) => {
-					const textElement = value[ 0 ];
-					if ( ! textElement ) {
+					// if no text content exist just transform the quote into an heading block
+					// using citation as the content, it may be empty creating an empty heading block.
+					if ( ( ! value || ! value.length ) ) {
 						return createBlock( 'core/heading', {
 							content: citation,
 						} );
 					}
-					const textContent = isString( textElement.children ) ?
-						textElement.children :
-						textElement.children.props.children;
-					if ( Array.isArray( value ) || citation ) {
-						const text = createBlock( 'core/heading', {
-							content: textContent,
-						} );
-						const quote = createBlock( 'core/quote', {
-							...attrs,
-							citation,
-							value: Array.isArray( value ) ?
-								value.slice( 1 ) :
-								[],
-						} );
 
-						return [ text, quote ];
+					const firstValue = get( value, [ 0, 'children' ] );
+					const headingContent = castArray( isString( firstValue ) ?
+						firstValue :
+						get( firstValue, [ 'props', 'children' ], '' )
+					);
+
+					// if the quote content just contains a paragraph and no citation exist
+					// convert the quote content into and heading block.
+					if ( ! citation && value.length === 1 ) {
+						return createBlock( 'core/heading', {
+							content: headingContent,
+						} );
 					}
-					return createBlock( 'core/heading', {
-						content: textContent,
+
+					// In the normal case convert the first paragraph of quote into an heading
+					// and create a new quote block equal tl what we had excluding the first paragraph
+					const heading = createBlock( 'core/heading', {
+						content: headingContent,
 					} );
+
+					const quote = createBlock( 'core/quote', {
+						...attrs,
+						citation,
+						value: value.slice( 1 ),
+					} );
+
+					return [ heading, quote ];
 				},
 			},
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, onReplace, className } ) {
+	edit: withState( {
+		editable: 'content',
+	} )( ( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className, editable, setState } ) => {
 		const { align, value, citation, style } = attributes;
-		const focusedEditable = focus ? focus.editable || 'value' : null;
 		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
+		const onSetActiveEditable = ( newEditable ) => () => {
+			setState( { editable: newEditable } );
+		};
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
 						icon: 1 === variation ? 'format-quote' : 'testimonial',
@@ -176,27 +190,19 @@ registerBlockType( 'core/quote', {
 					/>
 				</BlockControls>
 			),
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
 			<blockquote
 				key="quote"
 				className={ containerClassname }
+				style={ { textAlign: align } }
 			>
-				<Editable
+				<RichText
 					multiline="p"
-					value={ toEditableValue( value ) }
+					value={ toRichTextValue( value ) }
 					onChange={
 						( nextValue ) => setAttributes( {
-							value: fromEditableValue( nextValue ),
+							value: fromRichTextValue( nextValue ),
 						} )
 					}
-					focus={ focusedEditable === 'value' ? focus : null }
-					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					onMerge={ mergeBlocks }
 					onRemove={ ( forward ) => {
 						const hasEmptyCitation = ! citation || citation.length === 0;
@@ -204,31 +210,29 @@ registerBlockType( 'core/quote', {
 							onReplace( [] );
 						}
 					} }
-					style={ { textAlign: align } }
+					/* translators: the text of the quotation */
 					placeholder={ __( 'Write quote…' ) }
+					isSelected={ isSelected && editable === 'content' }
+					onFocus={ onSetActiveEditable( 'content' ) }
 				/>
-				{ ( ( citation && citation.length > 0 ) || !! focus ) && (
-					<Editable
+				{ ( ( citation && citation.length > 0 ) || isSelected ) && (
+					<RichText
 						tagName="cite"
 						value={ citation }
-						placeholder={ __( 'Write citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
 							} )
 						}
-						focus={ focusedEditable === 'citation' ? focus : null }
-						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
-						onRemove={ ( forward ) => {
-							if ( ! forward ) {
-								setFocus( { ...focus, editable: 'value' } );
-							}
-						} }
+						/* translators: the individual or entity quoted */
+						placeholder={ __( 'Write citation…' ) }
+						isSelected={ isSelected && editable === 'cite' }
+						onFocus={ onSetActiveEditable( 'cite' ) }
 					/>
 				) }
 			</blockquote>,
 		];
-	},
+	} ),
 
 	save( { attributes } ) {
 		const { align, value, citation, style } = attributes;
@@ -278,4 +282,4 @@ registerBlockType( 'core/quote', {
 			},
 		},
 	],
-} );
+};

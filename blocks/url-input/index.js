@@ -4,13 +4,14 @@
 import { throttle } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
+import { stringify } from 'querystringify';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, decodeEntities } from '@wordpress/utils';
 import { Spinner, withInstanceId, withSpokenMessages } from '@wordpress/components';
 
 const { UP, DOWN, ENTER } = keycodes;
@@ -66,11 +67,13 @@ class UrlInput extends Component {
 			selectedSuggestion: null,
 			loading: true,
 		} );
-		this.suggestionsRequest = new wp.api.collections.Posts().fetch( { data: {
-			search: value,
-			per_page: 20,
-			orderby: 'relevance',
-		} } );
+		this.suggestionsRequest = wp.apiRequest( {
+			path: `/wp/v2/posts?${ stringify( {
+				search: value,
+				per_page: 20,
+				orderby: 'relevance',
+			} ) }`,
+		} );
 
 		this.suggestionsRequest
 			.then(
@@ -175,7 +178,7 @@ class UrlInput extends Component {
 	}
 
 	render() {
-		const { value, instanceId } = this.props;
+		const { value = '', instanceId } = this.props;
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
@@ -220,7 +223,7 @@ class UrlInput extends Component {
 								onClick={ () => this.selectLink( post.link ) }
 								aria-selected={ index === selectedSuggestion }
 							>
-								{ post.title.rendered || __( '(no title)' ) }
+								{ decodeEntities( post.title.rendered ) || __( '(no title)' ) }
 							</button>
 						) ) }
 					</div>

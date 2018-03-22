@@ -22,6 +22,12 @@ $color-palette-circle-spacing: 14px;
 	&:hover {
 		transform: scale( 1.2 );
 	}
+
+	// Ensure that the <div> that <Dropdown> wraps our toggle button with is full height
+	& > div {
+		height: 100%;
+		width: 100%;
+	}
 }
 
 .blocks-color-palette__item {
@@ -38,6 +44,17 @@ $color-palette-circle-spacing: 14px;
 
 	&.is-active {
 		box-shadow: inset 0 0 0 4px;
+	}
+
+	&::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		border-radius: 50%;
+		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .2);
 	}
 
 	&:focus {

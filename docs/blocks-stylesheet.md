@@ -61,47 +61,54 @@ The class name is generated using the block's name prefixed with `wp-block-`, re
 
 ## Enqueueing Editor-only Block Assets
 
-Like scripts, your block's editor-specific styles should be enqueued during the `enqueue_block_editor_assets` action.
+Like scripts, your block's editor-specific styles should be enqueued by assigning the `editor_styles` setting of the registered block type:
 
 ```php
 <?php
 
-function gutenberg_boilerplate_enqueue_block_editor_assets() {
-	wp_enqueue_script(
-		'gutenberg-boilerplate-es5-step02',
+function gutenberg_boilerplate_block() {
+	wp_register_script(
+		'gutenberg-boilerplate-es5-step02-editor',
 		plugins_url( 'step-02/block.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element' )
 	);
-	wp_enqueue_style(
+	wp_register_style(
 		'gutenberg-boilerplate-es5-step02-editor',
 		plugins_url( 'step-02/editor.css', __FILE__ ),
 		array( 'wp-edit-blocks' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'step-02/editor.css' )
 	);
+
+	register_block_type( 'gutenberg-boilerplate-esnext/hello-world-step-02', array(
+		'editor_script' => 'gutenberg-boilerplate-es5-step02-editor',
+		'editor_style'  => 'gutenberg-boilerplate-es5-step02-editor',
+	) );
 }
-add_action( 'enqueue_block_editor_assets', 'gutenberg_boilerplate_enqueue_block_editor_assets' );
+add_action( 'init', 'gutenberg_boilerplate_block' );
 ```
 
 ## Enqueueing Editor and Front end Assets
 
-While a block's scripts are only necessary to load in the editor, you'll want to load styles both on the front of your site and in the editor. You may even want distinct styles in each context.
+While a block's scripts are usually only necessary to load in the editor, you'll want to load styles both on the front of your site and in the editor. You may even want distinct styles in each context.
 
-The `enqueue_block_editor_assets` action will only be triggered when the editor is loading. To enqueue styles for your block when viewing the front of your site, you should do so during the `enqueue_block_assets` action.
+When registering a block, you can assign one or both of `style` and `editor_style` to respectively assign styles always loaded for a block or styles only loaded in the editor.
 
 ```php
 <?php
 
-function gutenberg_boilerplate_es5_enqueue_common_assets() {
-	wp_enqueue_style(
+function gutenberg_boilerplate_block() {
+	wp_register_style(
 		'gutenberg-boilerplate-es5-step02',
 		plugins_url( 'step-02/style.css', __FILE__ ),
 		array( 'wp-blocks' ),
 		filemtime( plugin_dir_path( __FILE__ ) . 'step-02/style.css' )
 	);
+
+	register_block_type( 'gutenberg-boilerplate-esnext/hello-world-step-02', array(
+		'style' => 'gutenberg-boilerplate-es5-step02',
+	) );
 }
-add_action( 'enqueue_block_assets', 'gutenberg_boilerplate_es5_enqueue_common_assets' );
+add_action( 'init', 'gutenberg_boilerplate_block' );
 ```
 
-The `enqueue_block_assets` action is triggered both in the editor and on the front of the site. Since your block is likely to share some styles in both contexts, you can consider `style.css` as the base stylesheet, placing editor-specific styles in `editor.css`.
-
-If you'd like the scripts to be limited to your site's front end only, you can use `enqueue_block_assets` and enqueue your scripts only if [`! is_admin()`](https://developer.wordpress.org/reference/functions/is_admin/) applies.
+Since your block is likely to share some styles in both contexts, you can consider `style.css` as the base stylesheet, placing editor-specific styles in `editor.css`.

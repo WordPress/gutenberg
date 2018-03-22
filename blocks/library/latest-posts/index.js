@@ -8,11 +8,14 @@ import { __ } from '@wordpress/i18n';
  */
 import './editor.scss';
 import './style.scss';
-import { registerBlockType } from '../../api';
 import LatestPostsBlock from './block';
 
-registerBlockType( 'core/latest-posts', {
+export const name = 'core/latest-posts';
+
+export const settings = {
 	title: __( 'Latest Posts' ),
+
+	description: __( 'Shows a list of your site\'s most recent posts.' ),
 
 	icon: 'list-view',
 
@@ -36,4 +39,4 @@ registerBlockType( 'core/latest-posts', {
 	save() {
 		return null;
 	},
-} );
+};

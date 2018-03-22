@@ -2,67 +2,106 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
+import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 
-function ReusableBlockEditPanel( props ) {
-	const { isEditing, name, isSaving, onEdit, onDetach, onChangeName, onSave, onCancel } = props;
+/**
+ * Module constants
+ */
+const { ESCAPE } = keycodes;
 
-	return (
-		<div className="reusable-block-edit-panel">
-			{ ! isEditing && ! isSaving && [
-				<span key="info" className="reusable-block-edit-panel__info">
-					<b>{ name }</b>
-				</span>,
-				<Button
-					key="edit"
-					isLarge
-					className="reusable-block-edit-panel__button"
-					onClick={ onEdit }>
-					{ __( 'Edit' ) }
-				</Button>,
-				<Button
-					key="detach"
-					isLarge
-					className="reusable-block-edit-panel__button"
-					onClick={ onDetach }>
-					{ __( 'Detach' ) }
-				</Button>,
-			] }
-			{ ( isEditing || isSaving ) && [
-				<input
-					key="name"
-					type="text"
-					disabled={ isSaving }
-					className="reusable-block-edit-panel__name"
-					value={ name }
-					onChange={ ( event ) => onChangeName( event.target.value ) } />,
-				<Button
-					key="save"
-					isPrimary
-					isLarge
-					isBusy={ isSaving }
-					disabled={ ! name || isSaving }
-					className="reusable-block-edit-panel__button"
-					onClick={ onSave }>
-					{ __( 'Save' ) }
-				</Button>,
-				<Button
-					key="cancel"
-					isLarge
-					disabled={ isSaving }
-					className="reusable-block-edit-panel__button"
-					onClick={ onCancel }>
-					{ __( 'Cancel' ) }
-				</Button>,
-			] }
-		</div>
-	);
+class ReusableBlockEditPanel extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.bindTitleRef = this.bindTitleRef.bind( this );
+		this.handleFormSubmit = this.handleFormSubmit.bind( this );
+		this.handleTitleChange = this.handleTitleChange.bind( this );
+		this.handleTitleKeyDown = this.handleTitleKeyDown.bind( this );
+	}
+
+	componentDidMount() {
+		if ( this.props.isEditing ) {
+			this.titleRef.select();
+		}
+	}
+
+	bindTitleRef( ref ) {
+		this.titleRef = ref;
+	}
+
+	handleFormSubmit( event ) {
+		event.preventDefault();
+		this.props.onSave();
+	}
+
+	handleTitleChange( event ) {
+		this.props.onChangeTitle( event.target.value );
+	}
+
+	handleTitleKeyDown( event ) {
+		if ( event.keyCode === ESCAPE ) {
+			event.stopPropagation();
+			this.props.onCancel();
+		}
+	}
+
+	render() {
+		const { isEditing, title, isSaving, onEdit, onSave, onCancel } = this.props;
+
+		return (
+			<Fragment>
+				{ ( ! isEditing && ! isSaving ) && (
+					<div className="reusable-block-edit-panel">
+						<b className="reusable-block-edit-panel__info">
+							{ title }
+						</b>
+						<Button isLarge className="reusable-block-edit-panel__button" onClick={ onEdit }>
+							{ __( 'Edit' ) }
+						</Button>
+					</div>
+				) }
+				{ ( isEditing || isSaving ) && (
+					<form className="reusable-block-edit-panel" onSubmit={ this.handleFormSubmit }>
+						<input
+							ref={ this.bindTitleRef }
+							type="text"
+							disabled={ isSaving }
+							className="reusable-block-edit-panel__title"
+							value={ title }
+							onChange={ this.handleTitleChange }
+							onKeyDown={ this.handleTitleKeyDown }
+						/>
+						<Button
+							type="submit"
+							isPrimary
+							isLarge
+							isBusy={ isSaving }
+							disabled={ ! title || isSaving }
+							className="reusable-block-edit-panel__button"
+							onClick={ onSave }
+						>
+							{ __( 'Save' ) }
+						</Button>
+						<Button
+							isLarge
+							disabled={ isSaving }
+							className="reusable-block-edit-panel__button"
+							onClick={ onCancel }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+					</form>
+				) }
+			</Fragment>
+		);
+	}
 }
 
 export default ReusableBlockEditPanel;
-

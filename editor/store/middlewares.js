@@ -8,19 +8,17 @@ import { flowRight } from 'lodash';
 /**
  * Internal dependencies
  */
-import { mobileMiddleware } from '../utils/mobile';
 import effects from './effects';
 
 /**
- * Applies the custom middlewares used specifically in the editor module
+ * Applies the custom middlewares used specifically in the editor module.
  *
- * @param  {Object}  store Store Object
+ * @param {Object} store Store Object.
  *
- * @return {Object}        Update Store Object
+ * @return {Object} Update Store Object.
  */
 function applyMiddlewares( store ) {
 	const middlewares = [
-		mobileMiddleware,
 		refx( effects ),
 		multi,
 	];
@@ -40,10 +38,8 @@ function applyMiddlewares( store ) {
 	chain = middlewares.map( middleware => middleware( middlewareAPI ) );
 	enhancedDispatch = flowRight( ...chain )( store.dispatch );
 
-	return {
-		...store,
-		dispatch: enhancedDispatch,
-	};
+	store.dispatch = enhancedDispatch;
+	return store;
 }
 
 export default applyMiddlewares;

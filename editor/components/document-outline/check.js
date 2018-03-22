@@ -12,7 +12,7 @@ import { getBlocks } from '../../store/selectors';
 function DocumentOutlineCheck( { blocks, children } ) {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
-	if ( headings.length <= 1 ) {
+	if ( headings.length < 1 ) {
 		return null;
 	}
 

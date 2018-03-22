@@ -9,6 +9,7 @@
                 "Embedded content from smugmug"
             ]
         },
-        "originalContent": "<figure class=\"wp-block-embed-smugmug\">\n    https://smugmug.com/\n    <figcaption>Embedded content from smugmug</figcaption>\n</figure>"
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-embed-smugmug wp-block-embed\">\n    https://smugmug.com/\n    <figcaption>Embedded content from smugmug</figcaption>\n</figure>"
     }
 ]

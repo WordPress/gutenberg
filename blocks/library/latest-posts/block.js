@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isUndefined, pickBy } from 'lodash';
+import { get, isUndefined, pickBy } from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
 import { stringify } from 'querystringify';
@@ -10,7 +10,15 @@ import { stringify } from 'querystringify';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Toolbar, Spinner, withAPIData } from '@wordpress/components';
+import {
+	Placeholder,
+	QueryControls,
+	RangeControl,
+	Spinner,
+	ToggleControl,
+	Toolbar,
+	withAPIData,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
 
@@ -19,11 +27,7 @@ import { decodeEntities } from '@wordpress/utils';
  */
 import './editor.scss';
 import './style.scss';
-import QueryPanel from '../../query-panel';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import RangeControl from '../../inspector-controls/range-control';
-import BlockDescription from '../../block-description';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
@@ -45,19 +49,17 @@ class LatestPostsBlock extends Component {
 
 	render() {
 		const latestPosts = this.props.latestPosts.data;
-		const { attributes, focus, setAttributes } = this.props;
+		const { attributes, categoriesList, isSelected, setAttributes } = this.props;
 		const { displayPostDate, align, layout, columns, order, orderBy, categories, postsToShow } = attributes;
 
-		const inspectorControls = focus && (
+		const inspectorControls = isSelected && (
 			<InspectorControls key="inspector">
-				<BlockDescription>
-					<p>{ __( 'Shows a list of your site\'s most recent posts.' ) }</p>
-				</BlockDescription>
 				<h3>{ __( 'Latest Posts Settings' ) }</h3>
-				<QueryPanel
+				<QueryControls
 					{ ...{ order, orderBy } }
 					numberOfItems={ postsToShow }
-					category={ categories }
+					categoriesList={ get( categoriesList, 'data', {} ) }
+					selectedCategoryId={ categories }
 					onOrderChange={ ( value ) => setAttributes( { order: value } ) }
 					onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
 					onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
@@ -74,7 +76,7 @@ class LatestPostsBlock extends Component {
 						value={ columns }
 						onChange={ ( value ) => setAttributes( { columns: value } ) }
 						min={ 2 }
-						max={ Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+						max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
 					/>
 				}
 			</InspectorControls>
@@ -97,10 +99,9 @@ class LatestPostsBlock extends Component {
 		}
 
 		// Removing posts from display should be instant.
-		const postsDifference = latestPosts.length - postsToShow;
-		if ( postsDifference > 0 ) {
-			latestPosts.splice( postsToShow, postsDifference );
-		}
+		const displayPosts = latestPosts.length > postsToShow ?
+			latestPosts.slice( 0, postsToShow ) :
+			latestPosts;
 
 		const layoutControls = [
 			{
@@ -119,7 +120,7 @@ class LatestPostsBlock extends Component {
 
 		return [
 			inspectorControls,
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -132,12 +133,13 @@ class LatestPostsBlock extends Component {
 				</BlockControls>
 			),
 			<ul
-				className={ classnames( this.props.className, 'columns-' + columns, {
+				className={ classnames( this.props.className, {
 					'is-grid': layout === 'grid',
+					[ `columns-${ columns }` ]: layout === 'grid',
 				} ) }
 				key="latest-posts"
 			>
-				{ latestPosts.map( ( post, i ) =>
+				{ displayPosts.map( ( post, i ) =>
 					<li key={ i }>
 						<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 						{ displayPostDate && post.date_gmt &&
@@ -154,13 +156,19 @@ class LatestPostsBlock extends Component {
 
 export default withAPIData( ( props ) => {
 	const { postsToShow, order, orderBy, categories } = props.attributes;
-	const queryString = stringify( pickBy( {
+	const latestPostsQuery = stringify( pickBy( {
 		categories,
 		order,
 		orderBy,
 		per_page: postsToShow,
+		_fields: [ 'date_gmt', 'link', 'title' ],
 	}, value => ! isUndefined( value ) ) );
+	const categoriesListQuery = stringify( {
+		per_page: 100,
+		_fields: [ 'id', 'name', 'parent' ],
+	} );
 	return {
-		latestPosts: `/wp/v2/posts?${ queryString }`,
+		latestPosts: `/wp/v2/posts?${ latestPostsQuery }`,
+		categoriesList: `/wp/v2/categories?${ categoriesListQuery }`,
 	};
 } )( LatestPostsBlock );

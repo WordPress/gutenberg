@@ -4,9 +4,6 @@ exports[`Warning should match snapshot 1`] = `
 <div
   className="editor-warning"
 >
-  <Dashicon
-    icon="warning"
-  />
   error
 </div>
 `;

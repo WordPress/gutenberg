@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEqual, noop } from 'lodash';
+import { defer, isEqual, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,18 +17,25 @@ import './style.scss';
 import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
+import ScrollLock from '../scroll-lock';
 import { Slot, Fill } from '../slot-fill';
+
+/**
+ * Value representing whether a key is currently pressed. Bound to the document
+ * for use in determining whether the Popover component has mounted in response
+ * to a keyboard event. Popover's focusOnMount behavior is specific to keyboard
+ * interaction. Must be bound at the top-level and its unsetting deferred since
+ * the component will have already mounted by the time keyup occurs.
+ *
+ * @type {boolean}
+ */
+let isKeyDown = false;
+document.addEventListener( 'keydown', () => isKeyDown = true );
+document.addEventListener( 'keyup', defer.bind( null, () => isKeyDown = false ) );
 
 const FocusManaged = withFocusReturn( ( { children } ) => children );
 
 const { ESCAPE } = keycodes;
-
-/**
- * Offset by which popover should adjust horizontally to account for tail.
- *
- * @type {Number}
- */
-const ARROW_OFFSET = 20;
 
 /**
  * Name of slot in which popover should fill.
@@ -59,11 +66,10 @@ class Popover extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.isOpen ) {
-			this.setOffset();
-			this.setForcedPositions();
-			this.toggleWindowEvents( true );
-		}
+		this.setOffset();
+		this.setForcedPositions();
+		this.toggleWindowEvents( true );
+		this.focus();
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -76,21 +82,10 @@ class Popover extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const { isOpen, position } = this.props;
-		const { isOpen: prevIsOpen, position: prevPosition } = prevProps;
-		if ( isOpen !== prevIsOpen ) {
-			this.toggleWindowEvents( isOpen );
+		const { position } = this.props;
+		const { position: prevPosition } = prevProps;
 
-			if ( isOpen ) {
-				this.focus();
-			}
-		}
-
-		if ( ! isOpen ) {
-			return;
-		}
-
-		if ( isOpen !== prevIsOpen || position !== prevPosition ) {
+		if ( position !== prevPosition ) {
 			this.setOffset();
 			this.setForcedPositions();
 		} else if ( ! isEqual( this.state, prevState ) ) {
@@ -112,8 +107,8 @@ class Popover extends Component {
 	}
 
 	focus() {
-		const { focusOnOpen = true } = this.props;
-		if ( ! focusOnOpen ) {
+		const { focusOnMount = true } = this.props;
+		if ( ! focusOnMount || ! isKeyDown ) {
 			return;
 		}
 
@@ -136,7 +131,7 @@ class Popover extends Component {
 		this.rafHandle = window.requestAnimationFrame( this.setOffset );
 	}
 
-	getAnchorRect( ) {
+	getAnchorRect() {
 		const { anchor } = this.nodes;
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
@@ -194,14 +189,8 @@ class Popover extends Component {
 		popover.style.bottom = 'auto';
 		popover.style.right = 'auto';
 
-		if ( isRight ) {
-			popover.style.left = rect.left + ARROW_OFFSET + 'px';
-		} else if ( isLeft ) {
-			popover.style.left = ( rect.right - ARROW_OFFSET ) + 'px';
-		} else {
-			// Set popover at parent node center
-			popover.style.left = Math.round( rect.left + ( rect.width / 2 ) ) + 'px';
-		}
+		// Set popover at parent node center
+		popover.style.left = Math.round( rect.left + ( rect.width / 2 ) ) + 'px';
 
 		// Set at top or bottom of parent node based on popover position
 		popover.style.top = rect[ yAxis ] + 'px';
@@ -264,7 +253,7 @@ class Popover extends Component {
 
 	render() {
 		const {
-			isOpen,
+			headerTitle,
 			onClose,
 			children,
 			className,
@@ -274,17 +263,13 @@ class Popover extends Component {
 			/* eslint-disable no-unused-vars */
 			position,
 			range,
-			focusOnOpen,
+			focusOnMount,
 			getAnchorRect,
 			expandOnMobile,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
 		const [ yAxis, xAxis ] = this.getPositions();
-
-		if ( ! isOpen ) {
-			return null;
-		}
 
 		const classes = classnames(
 			'components-popover',
@@ -310,6 +295,9 @@ class Popover extends Component {
 				>
 					{ this.state.isMobile && (
 						<div className="components-popover__header">
+							<span className="components-popover__header-title">
+								{ headerTitle }
+							</span>
 							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
 						</div>
 					) }
@@ -327,7 +315,7 @@ class Popover extends Component {
 
 		// Apply focus return behavior except when default focus on open
 		// behavior is disabled.
-		if ( false !== focusOnOpen ) {
+		if ( false !== focusOnMount ) {
 			content = <FocusManaged>{ content }</FocusManaged>;
 		}
 
@@ -338,7 +326,10 @@ class Popover extends Component {
 			content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
 		}
 
-		return <span ref={ this.bindNode( 'anchor' ) }>{ content }</span>;
+		return <span ref={ this.bindNode( 'anchor' ) }>
+			{ content }
+			{ this.state.isMobile && expandOnMobile && <ScrollLock /> }
+		</span>;
 	}
 }
 

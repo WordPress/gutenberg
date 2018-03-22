@@ -44,6 +44,7 @@ const formatMap = {
 	 * Gets the ordinal suffix.
 	 *
 	 * @param {moment} momentDate Moment instance.
+	 *
 	 * @return {string} Formatted date.
 	 */
 	S( momentDate ) {
@@ -58,6 +59,7 @@ const formatMap = {
 	 * Gets the day of the year (zero-indexed).
 	 *
 	 * @param {moment} momentDate Moment instance.
+	 *
 	 * @return {string} Formatted date.
 	 */
 	z( momentDate ) {
@@ -77,6 +79,7 @@ const formatMap = {
 	 * Gets the days in the month.
 	 *
 	 * @param {moment} momentDate Moment instance.
+	 *
 	 * @return {string} Formatted date.
 	 */
 	t( momentDate ) {
@@ -88,6 +91,7 @@ const formatMap = {
 	 * Gets whether the current year is a leap year.
 	 *
 	 * @param {moment} momentDate Moment instance.
+	 *
 	 * @return {string} Formatted date.
 	 */
 	L( momentDate ) {
@@ -104,6 +108,7 @@ const formatMap = {
 	 * Gets the current time in Swatch Internet Time (.beats).
 	 *
 	 * @param {moment} momentDate Moment instance.
+	 *
 	 * @return {string} Formatted date.
 	 */
 	B( momentDate ) {
@@ -134,6 +139,7 @@ const formatMap = {
 	 * Gets whether the timezone is in DST currently.
 	 *
 	 * @param {moment} momentDate Moment instance.
+	 *
 	 * @return {string} Formatted date.
 	 */
 	I( momentDate ) {
@@ -146,6 +152,7 @@ const formatMap = {
 	 * Gets the timezone offset in seconds.
 	 *
 	 * @param {moment} momentDate Moment instance.
+	 *
 	 * @return {string} Formatted date.
 	 */
 	Z( momentDate ) {
@@ -214,10 +221,11 @@ function setupLocale( settings ) {
 /**
  * Formats a date. Does not alter the date's timezone.
  *
- * @param {string}                    dateFormat  PHP-style formatting string.
- *                                                See php.net/date
- * @param {(Date|string|moment|null)} dateValue   Date object or string,
- *                                                parsable by moment.js.
+ * @param {string}                    dateFormat PHP-style formatting string.
+ *                                               See php.net/date.
+ * @param {(Date|string|moment|null)} dateValue  Date object or string,
+ *                                               parsable by moment.js.
+ *
  * @return {string} Formatted date.
  */
 export function format( dateFormat, dateValue = new Date() ) {
@@ -254,10 +262,10 @@ export function format( dateFormat, dateValue = new Date() ) {
 /**
  * Formats a date (like `date()` in PHP), in the site's timezone.
  *
- * @param {string}                    dateFormat  PHP-style formatting string.
- *                                                See php.net/date
- * @param {(Date|string|moment|null)} dateValue   Date object or string,
- *                                                parsable by moment.js.
+ * @param {string}                    dateFormat PHP-style formatting string.
+ *                                               See php.net/date.
+ * @param {(Date|string|moment|null)} dateValue  Date object or string,
+ *                                               parsable by moment.js.
  *
  * @return {string} Formatted date.
  */
@@ -270,10 +278,10 @@ export function date( dateFormat, dateValue = new Date() ) {
 /**
  * Formats a date (like `date()` in PHP), in the UTC timezone.
  *
- * @param {string}                    dateFormat  PHP-style formatting string.
- *                                                See php.net/date
- * @param {(Date|string|moment|null)} dateValue   Date object or string,
- *                                                parsable by moment.js.
+ * @param {string}                    dateFormat PHP-style formatting string.
+ *                                               See php.net/date.
+ * @param {(Date|string|moment|null)} dateValue  Date object or string,
+ *                                               parsable by moment.js.
  *
  * @return {string} Formatted date.
  */
@@ -285,12 +293,12 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
 /**
  * Formats a date (like `dateI18n()` in PHP).
  *
- * @param {string}                    dateFormat  PHP-style formatting string.
- *                                                See php.net/date
- * @param {(Date|string|moment|null)} dateValue   Date object or string,
- *                                                parsable by moment.js.
- * @param {boolean}                   gmt         True for GMT/UTC, false for
- *                                                site's timezone.
+ * @param {string}                    dateFormat PHP-style formatting string.
+ *                                               See php.net/date.
+ * @param {(Date|string|moment|null)} dateValue  Date object or string,
+ *                                               parsable by moment.js.
+ * @param {boolean}                   gmt        True for GMT/UTC, false for
+ *                                               site's timezone.
  *
  * @return {string} Formatted date.
  */

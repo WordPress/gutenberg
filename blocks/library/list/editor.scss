@@ -1,7 +1,6 @@
-.blocks-list .blocks-editable__tinymce,
-.blocks-list .blocks-editable__tinymce ul,
-.blocks-list .blocks-editable__tinymce ol {
+.blocks-list .blocks-rich-text__tinymce,
+.blocks-list .blocks-rich-text__tinymce ul,
+.blocks-list .blocks-rich-text__tinymce ol {
 	padding-left: 1.3em;
-	list-style-position: inside;
-	margin-left: 0;
+	margin-left: 1.3em;
 }

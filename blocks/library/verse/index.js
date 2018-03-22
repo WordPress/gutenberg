@@ -7,13 +7,15 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import { registerBlockType, createBlock } from '../../api';
-import Editable from '../../editable';
-import InspectorControls from '../../inspector-controls';
-import BlockDescription from '../../block-description';
+import { createBlock } from '../../api';
+import RichText from '../../rich-text';
 
-registerBlockType( 'core/verse', {
+export const name = 'core/verse';
+
+export const settings = {
 	title: __( 'Verse' ),
+
+	description: __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ),
 
 	icon: 'edit',
 
@@ -48,36 +50,27 @@ registerBlockType( 'core/verse', {
 		],
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, className, isSelected } ) {
 		const { content } = attributes;
 
-		return [
-			focus && (
-				<InspectorControls key="inspector">
-					<BlockDescription>
-						<p>{ __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ) }</p>
-					</BlockDescription>
-				</InspectorControls>
-			),
-			<Editable
+		return (
+			<RichText
 				tagName="pre"
-				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
 						content: nextContent,
 					} );
 				} }
-				focus={ focus }
-				onFocus={ setFocus }
 				placeholder={ __( 'Write…' ) }
 				wrapperClassName={ className }
 				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-			/>,
-		];
+				isSelected={ isSelected }
+			/>
+		);
 	},
 
 	save( { attributes, className } ) {
 		return <pre className={ className }>{ attributes.content }</pre>;
 	},
-} );
+};

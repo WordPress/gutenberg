@@ -23,9 +23,11 @@ function MyDropdownMenu() {
 				</button>
 			) }
 			renderContent={ () => (
-				This is the content of the popover.
+				<div>
+					This is the content of the popover.
+				</div>
 			) }
-		>
+		/>
 	);
 }
 ```
@@ -83,3 +85,11 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Type: `Boolean`
  - Required: No
  - Default: `false`
+
+ ## headerTitle
+
+ Set this to customize the text that is shown in the dropdown's header when
+ it is fullscreen on mobile.
+
+ - Type: `String`
+ - Required: No

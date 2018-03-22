@@ -92,31 +92,64 @@ add_filter( 'allowed_block_types', function() {
 
 To modify the behaviour of existing blocks, Gutenberg exposes a list of filters:
 
-- `blocks.registerBlockType`: Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
+#### `blocks.registerBlockType`
 
-- `blocks.getSaveContent.extraProps`: A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block Type and the block attributes as arguments.
+Used to filter the block settings. It receives the block settings and the name of the block the registered block as arguments.
 
-- `blocks.BlockEdit`: Used to modify the block's `edit` component. It receives the original block `edit` component and returns a new wrapped component.
+#### `blocks.BlockEdit`
 
-**Example**
+Used to modify the block's `edit` component. It receives the original block `edit` component and returns a new wrapped component.
 
-Adding a background by default to all blocks.
+#### `blocks.getBlockDefaultClassName`
+
+Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature. This filter allows to provide an alternative class name.
+
+_Example:_
 
 ```js
 // Our filter function
-function addBackgroundProp( props ) {
-	return Object.assign( props, { backgroundColor: 'red' } );
+function setBlockCustomClassName( className, blockName ) {
+	return blockName === 'core/code' ?
+		'my-plugin-code' :
+		className;
 }
 
 // Adding the filter
 wp.hooks.addFilter(
-	'blocks.getSaveContent.extraProps',
-	'myplugin/add-background',
-	addBackgroundProp
+	'blocks.getBlockDefaultClassName',
+	'my-plugin/set-block-custom-class-name',
+	setBlockCustomClassName
 );
 ```
 
+#### `blocks.getSaveElement`
 
-## Extending the editor's UI (Slot and Fill)
+A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
-Coming soon.
+#### `blocks.getSaveContent.extraProps`
+ 
+A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block type and the block attributes as arguments.
+
+_Example:_
+
+Adding a background by default to all blocks.
+
+```js
+function addBackgroundColorStyle( props ) {
+	return Object.assign( props, { style: { backgroundColor: 'red' } } );
+}
+
+wp.hooks.addFilter(
+	'blocks.getSaveContent.extraProps',
+	'my-plugin/add-background-color-style',
+	addBackgroundColorStyle
+);
+```
+
+_Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
+
+## Extending the Editor UI
+
+Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
+
+Refer to [the plugins module documentation](../plugins/) for more information.

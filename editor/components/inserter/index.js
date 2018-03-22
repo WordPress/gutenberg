@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
 import { isEmpty } from 'lodash';
 
 /**
@@ -10,20 +8,14 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton, withContext } from '@wordpress/components';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import { getBlockInsertionPoint, getEditorMode } from '../../store/selectors';
-import {
-	insertBlock,
-	setBlockInsertionPoint,
-	clearBlockInsertionPoint,
-	hideInsertionPoint,
-} from '../../store/actions';
 
 class Inserter extends Component {
 	constructor() {
@@ -33,21 +25,12 @@ class Inserter extends Component {
 	}
 
 	onToggle( isOpen ) {
-		const {
-			insertIndex,
-			setInsertionPoint,
-			clearInsertionPoint,
-			onToggle,
-		} = this.props;
+		const { onToggle } = this.props;
 
-		// When inserting at specific index, assign as insertion point when
-		// the inserter is opened, clearing on close.
-		if ( insertIndex !== undefined ) {
-			if ( isOpen ) {
-				setInsertionPoint( insertIndex );
-			} else {
-				clearInsertionPoint();
-			}
+		if ( isOpen ) {
+			this.props.showInsertionPoint();
+		} else {
+			this.props.hideInsertionPoint();
 		}
 
 		// Surface toggle callback to parent component
@@ -59,9 +42,9 @@ class Inserter extends Component {
 	render() {
 		const {
 			position,
+			title,
 			children,
 			onInsertBlock,
-			insertionPoint,
 			hasSupportedBlocks,
 			isLocked,
 		} = this.props;
@@ -76,10 +59,11 @@ class Inserter extends Component {
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
+				headerTitle={ title }
 				renderToggle={ ( { onToggle, isOpen } ) => (
 					<IconButton
 						icon="insert"
-						label={ __( 'Insert block' ) }
+						label={ __( 'Add block' ) }
 						onClick={ onToggle }
 						className="editor-inserter__toggle"
 						aria-haspopup="true"
@@ -89,17 +73,13 @@ class Inserter extends Component {
 					</IconButton>
 				) }
 				renderContent={ ( { onClose } ) => {
-					const onInsert = ( name, initialAttributes ) => {
-						onInsertBlock(
-							name,
-							initialAttributes,
-							insertionPoint
-						);
+					const onSelect = ( item ) => {
+						onInsertBlock( item );
 
 						onClose();
 					};
 
-					return <InserterMenu onSelect={ onInsert } />;
+					return <InserterMenu onSelect={ onSelect } />;
 				} }
 			/>
 		);
@@ -107,27 +87,25 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	connect(
-		( state ) => {
-			return {
-				insertionPoint: getBlockInsertionPoint( state ),
-				mode: getEditorMode( state ),
-			};
+	withSelect( ( select ) => ( {
+		title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
+		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint(),
+		selectedBlock: select( 'core/editor' ).getSelectedBlock(),
+	} ) ),
+	withDispatch( ( dispatch, ownProps ) => ( {
+		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
+		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
+		onInsertBlock: ( item ) => {
+			const { insertionPoint, selectedBlock } = ownProps;
+			const { index, rootUID, layout } = insertionPoint;
+			const { name, initialAttributes } = item;
+			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
+			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+				return dispatch( 'core/editor' ).replaceBlocks( selectedBlock.uid, insertedBlock );
+			}
+			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
 		},
-		( dispatch ) => ( {
-			onInsertBlock( name, initialAttributes, position ) {
-				dispatch( hideInsertionPoint() );
-				dispatch( insertBlock(
-					createBlock( name, initialAttributes ),
-					position
-				) );
-			},
-			...bindActionCreators( {
-				setInsertionPoint: setBlockInsertionPoint,
-				clearInsertionPoint: clearBlockInsertionPoint,
-			}, dispatch ),
-		} )
-	),
+	} ) ),
 	withContext( 'editor' )( ( settings ) => {
 		const { blockTypes, templateLock } = settings;
 
