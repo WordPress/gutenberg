@@ -45,7 +45,7 @@ export function DefaultBlockAppender( {
 			<BlockDropZone />
 			<input
 				role="button"
-				aria-label={ __( 'Add block (appender)' ) }
+				aria-label={ __( 'Add block' ) }
 				className="editor-default-block-appender__content"
 				type="text"
 				readOnly
