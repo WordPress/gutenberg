@@ -117,7 +117,7 @@ function gutenberg_shim_api_request_emulate_http( $scripts ) {
 				if ( ! options.headers ) {
 					options.headers = [];
 				}
-				options.headers.push( 'X-HTTP-Method-Override: ' + options.method );
+				options.headers['X-HTTP-Method-Override'] = options.method;
 				options.method = 'POST';
 			}
 		}
