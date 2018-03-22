@@ -58,6 +58,9 @@ class WritingFlow extends Component {
 		this.focusLastTextField = this.focusLastTextField.bind( this );
 		this.swithToEditMode = this.swithToEditMode.bind( this );
 
+		this.lastClientY = null;
+		this.lastClientX = null;
+
 		/**
 		 * Here a rectangle is stored while moving the caret vertically so
 		 * vertical position of the start position can be restored.
@@ -76,10 +79,18 @@ class WritingFlow extends Component {
 		window.removeEventListener( 'mousemove', this.swithToEditMode );
 	}
 
-	swithToEditMode() {
-		if ( this.props.keyboardMode !== 'edit' ) {
+	swithToEditMode( { clientY, clientX } ) {
+		// Safari triggers mousemove even if we didn't really move the mouse
+		// On shift press for instance.
+		// To ensure we really moved the mouse, we compare the mouse position
+		if ( this.props.keyboardMode !== 'edit' &&
+			( this.lastClientX !== null && this.lastClientY !== null ) &&
+			( clientY !== this.lastClientY || clientX !== this.lastClientX )
+		) {
 			this.props.setKeyboardMode( 'edit' );
 		}
+		this.lastClientY = clientY;
+		this.lastClientX = clientX;
 	}
 
 	bindContainer( ref ) {
