@@ -410,6 +410,11 @@ function gutenberg_register_post_types() {
 
 	foreach ( $caps_map as $role_name => $caps ) {
 		$role = get_role( $role_name );
+
+		if ( empty( $role ) ) {
+			continue;
+		}
+
 		foreach ( $caps as $cap ) {
 			if ( ! $role->has_cap( $cap ) ) {
 				$role->add_cap( $cap );
