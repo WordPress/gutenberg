@@ -71,6 +71,10 @@ class Disabled extends Component {
 				focusable.setAttribute( 'disabled', '' );
 			}
 
+			if ( focusable.hasAttribute( 'tabindex' ) ) {
+				focusable.removeAttribute( 'tabindex' );
+			}
+
 			if ( focusable.hasAttribute( 'contenteditable' ) ) {
 				focusable.setAttribute( 'contenteditable', 'false' );
 			}
