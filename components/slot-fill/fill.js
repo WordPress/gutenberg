@@ -59,18 +59,12 @@ class Fill extends Component {
 		const { getSlot = noop } = this.context;
 		const { name, children } = this.props;
 		const slot = getSlot( name );
-		// Todo: also make it work without bubblesVirtually?
+
 		if ( ! slot || ! slot.props.bubblesVirtually ) {
 			return null;
 		}
 
-		if ( slot.props.fillProps ) {
-			// If the child is a function, pass the arguments of the slot to that function.
-			if ( typeof this.props.children === 'function' ) {
-				return this.props.children( slot.props.fillProps );
-			}
-		}
-
+		// Todo: also make it work with bubblesVirtually?
 		return createPortal( children, slot.node );
 	}
 }

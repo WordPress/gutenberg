@@ -45,7 +45,7 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { name, bubblesVirtually = false } = this.props;
+		const { name, bubblesVirtually = false, fillProps } = this.props;
 		const { getFills = noop } = this.context;
 
 		if ( bubblesVirtually ) {
@@ -56,6 +56,9 @@ class Slot extends Component {
 			<div ref={ this.bindNode }>
 				{ map( getFills( name ), ( fill ) => {
 					const fillKey = fill.occurrence;
+					if ( typeof fill.props.children === 'function' ) {
+						return cloneElement( fill.props.children( fillProps ), { key: fillKey } );
+					}
 					return Children.map( fill.props.children, ( child, childIndex ) => {
 						if ( ! child || isString( child ) ) {
 							return child;
