@@ -1,6 +1,6 @@
-# Gutenberg by front
+# Gutenberg by Front
 
-Gutenberg by front could be used as a package of your project. 
+Gutenberg by Front could be used as a package of your project. 
 
 Add `"gutenberg": "git://github.com/front/gutenberg.git"` to your `package.json` dependences.
 
