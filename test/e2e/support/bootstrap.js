@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 import puppeteer from 'puppeteer';
 
 // The Jest timeout is increased because these tests are a bit slow
