@@ -9,13 +9,3 @@
 		margin-right: -$block-padding;
 	}
 }
-
-// Prevent the parent block from being hovered, allow only nested blocks
-// Selecting the parent block can be an explicit choice using a separate control
-.editor-block-list__block[data-type="core/columns"] {
-	pointer-events: none;
-
-	> .editor-block-list__block-edit .editor-block-list__block {
-		pointer-events: all;
-	}
-}
