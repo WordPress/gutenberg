@@ -42,7 +42,7 @@ export const settings = {
 
 	icon: 'columns',
 
-	category: 'layout',
+	category: 'rows',
 
 	attributes: {
 		columns: {
