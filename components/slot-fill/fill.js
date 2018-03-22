@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -57,14 +57,18 @@ class Fill extends Component {
 
 	render() {
 		const { getSlot = noop } = this.context;
-		const { name, children } = this.props;
+		const { name } = this.props;
+		let { children } = this.props;
 		const slot = getSlot( name );
 
 		if ( ! slot || ! slot.props.bubblesVirtually ) {
 			return null;
 		}
 
-		// Todo: also make it work with bubblesVirtually?
+		if ( isFunction( children ) ) {
+			children = children( slot.props.fillProps );
+		}
+
 		return createPortal( children, slot.node );
 	}
 }

@@ -7,7 +7,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Popover, navigateRegions } from '@wordpress/components';
+import { Popover, navigateRegions, Slot, Fill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	AutosaveMonitor,
@@ -86,6 +86,14 @@ function Layout( {
 			{ pluginSidebarOpened && <PluginSidebar.Slot name={ sidebarName } /> }
 			<Popover.Slot />
 			<PluginArea />
+			<Slot bubblesVirtually name="testSlot" fillProps={ { onClose: () => {
+				console.log( "hoi" ); //eslint-disable-line
+			} } } />
+			<Fill name="testSlot">
+				{ ( props ) => {
+					return <button onClick={ props.onClose }>CLICK ME!</button>;
+				} }
+			</Fill>
 		</div>
 	);
 }
