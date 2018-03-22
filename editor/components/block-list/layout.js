@@ -18,7 +18,6 @@ import 'element-closest';
  */
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { TabbableContainer } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -37,8 +36,6 @@ class BlockListLayout extends Component {
 		this.onShiftSelection = this.onShiftSelection.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
-		this.onChangeKeyboardMode = this.onChangeKeyboardMode.bind( this );
-		this.unselectBlockIfLeaving = this.unselectBlockIfLeaving.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
 		// Browser does not fire `*move` event when the pointer position changes
 		// relative to the document, so fire it with the last known position.
@@ -46,9 +43,6 @@ class BlockListLayout extends Component {
 
 		this.lastClientY = 0;
 		this.nodes = {};
-		this.state = {
-			keyboardMode: 'navigation',
-		};
 	}
 
 	componentDidMount() {
@@ -193,16 +187,6 @@ class BlockListLayout extends Component {
 		}
 	}
 
-	onChangeKeyboardMode( mode ) {
-		this.setState( { keyboardMode: mode } );
-	}
-
-	unselectBlockIfLeaving( index ) {
-		if ( index === -1 ) {
-			this.props.clearSelectedBlock();
-		}
-	}
-
 	render() {
 		const {
 			blockUIDs,
@@ -223,28 +207,21 @@ class BlockListLayout extends Component {
 
 		return (
 			<div className={ classes }>
-				<TabbableContainer
-					cycle={ false }
-					disabled={ this.state.keyboardMode !== 'navigation' }
-					onNavigate={ this.unselectBlockIfLeaving }
-				>
-					{ map( blockUIDs, ( uid, blockIndex ) => (
-						<BlockListBlock
-							key={ 'block-' + uid }
-							index={ blockIndex }
-							uid={ uid }
-							blockRef={ this.setBlockRef }
-							onSelectionStart={ this.onSelectionStart }
-							onShiftSelection={ this.onShiftSelection }
-							rootUID={ rootUID }
-							layout={ defaultLayout }
-							isFirst={ blockIndex === 0 }
-							isLast={ blockIndex === blockUIDs.length - 1 }
-							renderBlockMenu={ renderBlockMenu }
-							onChangeKeyboardMode={ this.onChangeKeyboardMode }
-						/>
-					) ) }
-				</TabbableContainer>
+				{ map( blockUIDs, ( uid, blockIndex ) => (
+					<BlockListBlock
+						key={ 'block-' + uid }
+						index={ blockIndex }
+						uid={ uid }
+						blockRef={ this.setBlockRef }
+						onSelectionStart={ this.onSelectionStart }
+						onShiftSelection={ this.onShiftSelection }
+						rootUID={ rootUID }
+						layout={ defaultLayout }
+						isFirst={ blockIndex === 0 }
+						isLast={ blockIndex === blockUIDs.length - 1 }
+						renderBlockMenu={ renderBlockMenu }
+					/>
+				) ) }
 				<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
 					<DefaultBlockAppender
 						rootUID={ rootUID }

@@ -748,6 +748,14 @@ export function blocksMode( state = {}, action ) {
 	return state;
 }
 
+export function keyboardMode( state = 'navigation', action ) {
+	if ( action.type === 'SET_KEYBOARD_MODE' ) {
+		return action.mode;
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning the block insertion point visibility, a boolean value
  * reflecting whether the insertion point should be shown.
@@ -1071,4 +1079,5 @@ export default optimist( combineReducers( {
 	sharedBlocks,
 	template,
 	settings,
+	keyboardMode,
 } ) );

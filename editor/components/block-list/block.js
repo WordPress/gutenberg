@@ -642,6 +642,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled,
 		getSelectedBlocksInitialCaretPosition,
 		getEditorSettings,
+		getKeyboardMode,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( uid );
 	const { templateLock, hasFixedToolbar } = getEditorSettings();
@@ -665,6 +666,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isEmptyDefaultBlock: block && isUnmodifiedDefaultBlock( block ),
 		isPreviousBlockADefaultEmptyBlock: previousBlock && isUnmodifiedDefaultBlock( previousBlock ),
 		isLocked: !! templateLock,
+		keyboardMode: getKeyboardMode(),
 		previousBlockUid,
 		block,
 		isSelected,
@@ -682,6 +684,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		replaceBlocks,
 		editPost,
 		toggleSelection,
+		setKeyboardMode,
 	} = dispatch( 'core/editor' );
 
 	return {
@@ -714,6 +717,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
+		},
+		onChangeKeyboardMode( mode ) {
+			setKeyboardMode( mode );
 		},
 	};
 } );
