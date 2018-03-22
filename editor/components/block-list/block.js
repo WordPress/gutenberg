@@ -151,18 +151,19 @@ export class BlockListBlock extends Component {
 	focusTabbable( forceInnerFocus = false ) {
 		const { initialPosition, keyboardMode } = this.props;
 
+		// In navigation mode, we should select the parent node only
+		// This could be triggered when we remove a block from navigation mode (backspace)
+		// or when we shift tab from the sidebar
+		if ( ! forceInnerFocus && keyboardMode === 'navigation' ) {
+			this.wrapperNode.focus();
+			return;
+		}
+
 		// Focus is captured by the wrapper node, so while focus transition
 		// should only consider tabbables within editable display, since it
 		// may be the wrapper itself or a side control which triggered the
 		// focus event, don't unnecessary transition to an inner tabbable.
 		if ( this.wrapperNode.contains( document.activeElement ) ) {
-			return;
-		}
-
-		// In navigation mode, we should select the parent node only
-		// This could be triggered when we remove a block from navigation mode (backspace)
-		if ( ! forceInnerFocus && keyboardMode === 'navigation' ) {
-			this.wrapperNode.focus();
 			return;
 		}
 
