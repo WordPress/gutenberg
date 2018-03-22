@@ -56,8 +56,12 @@ describe( 'Disabled', () => {
 	it( 'will disable all fields', () => {
 		const wrapper = mount( <Disabled><Form /></Disabled> );
 
-		expect( wrapper.find( 'input' ).getDOMNode().hasAttribute( 'disabled' ) ).toBe( true );
-		expect( wrapper.find( '[contentEditable]' ).getDOMNode().getAttribute( 'contenteditable' ) ).toBe( 'false' );
+		const input = wrapper.find( 'input' ).getDOMNode();
+		const div = wrapper.find( '[contentEditable]' ).getDOMNode();
+
+		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
+		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
+		expect( div.hasAttribute( 'disabled' ) ).toBe( false );
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
