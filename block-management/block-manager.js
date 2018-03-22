@@ -8,6 +8,8 @@ import { StyleSheet, Text, View, FlatList, TextInput } from 'react-native';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
+import { registerCoreBlocks } from '@gutenberg/blocks/library';
+
 type PropsType = {};
 type StateType = {
 	refresh: boolean,
@@ -17,6 +19,9 @@ type StateType = {
 export default class BlockManager extends React.Component<PropsType, StateType> {
 	constructor( props: PropsType ) {
 		super( props );
+
+		registerCoreBlocks();
+
 		// TODO: block state should be externalized (shared with Gutenberg at some point?).
 		// If not it should be created from a string parsing (commented HTML to json).
 		this.state = {
@@ -44,7 +49,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				},
 				{
 					key: '3',
-					blockType: 'code',
+					blockType: 'core/code',
 					content: 'if name == "World":\n    return "Hello World"\nelse:\n    return "Hello Pony"',
 					focused: false,
 				},

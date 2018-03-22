@@ -1,5 +1,18 @@
 {
   "presets": ["babel-preset-expo"],
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "@wordpress/hooks": "./wordpress/hooks",
+          "@wordpress/i18n": "./gutenberg/i18n",
+          "@gutenberg": "./gutenberg"
+        },
+        "extensions": [".js", ".ios.js", ".android.js"]
+      }
+    ]
+  ],
   "env": {
     "development": {
       "plugins": ["transform-react-jsx-source"]
