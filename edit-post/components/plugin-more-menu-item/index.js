@@ -27,11 +27,18 @@ const SLOT_NAME = 'PluginMoreMenuItem';
 function PluginMoreMenuItem( { title, onClick, icon, isActive } ) {
 	return (
 		<Fill name={ SLOT_NAME }>
-			<MoreMenuItemLayout
-				isActive={ isActive }
-				title={ title }
-				onClick={ onClick }
-				icon={ icon } />
+			{ ( props ) => {
+				return (
+					<MoreMenuItemLayout
+						isActive={ isActive }
+						title={ title }
+						onClick={ () => {
+							onClick();
+							props.onClose();
+						} }
+						icon={ icon } />
+				);
+			} }
 		</Fill>
 	);
 }
@@ -61,7 +68,7 @@ PluginMoreMenuItem = compose( [
 	} ),
 ] )( PluginMoreMenuItem );
 
-PluginMoreMenuItem.Slot = ( { getFills } ) => {
+PluginMoreMenuItem.Slot = ( { getFills, fillProps } ) => {
 	// We don't want the plugins menu items group to be rendered if there are no fills.
 	if ( ! getFills( SLOT_NAME ).length ) {
 		return null;
@@ -69,7 +76,7 @@ PluginMoreMenuItem.Slot = ( { getFills } ) => {
 	return (
 		<MenuItemsGroup
 			label={ __( 'Plugins' ) } >
-			<Slot name={ SLOT_NAME } />
+			<Slot name={ SLOT_NAME } fillProps={ fillProps } />
 		</MenuItemsGroup>
 	);
 };

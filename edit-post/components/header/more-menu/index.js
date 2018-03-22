@@ -28,7 +28,7 @@ const MoreMenu = () => (
 			<div className="edit-post-more-menu__content">
 				<ModeSwitcher onSelect={ onClose } />
 				<FixedToolbarToggle onToggle={ onClose } />
-				<PluginMoreMenuItem.Slot />
+				<PluginMoreMenuItem.Slot fillProps={ { onClose } } />
 				<MenuItemsGroup
 					label={ __( 'Tools' ) }
 					filterName="editPost.MoreMenu.tools"
