@@ -49,7 +49,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				},
 				{
 					key: '3',
-					blockType: 'code',
+					blockType: 'core/code',
 					content: 'if name == "World":\n    return "Hello World"\nelse:\n    return "Hello Pony"',
 					focused: false,
 				},
