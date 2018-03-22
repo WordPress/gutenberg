@@ -16,7 +16,7 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import { getBlockMoverLabel } from './mover-label';
+import { getBlockMoverDescription } from './mover-description';
 import { getBlockIndex, getBlock } from '../../store/selectors';
 
 /**
@@ -50,14 +50,8 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				onClick={ isFirst ? null : onMoveUp }
 				icon={ upArrow }
 				tooltip={ __( 'Move Up' ) }
-				label={ getBlockMoverLabel(
-					uids.length,
-					blockType && blockType.title,
-					firstIndex,
-					isFirst,
-					isLast,
-					-1,
-				) }
+				label={ __( 'Move Up' ) }
+				aria-describedby="editor-block-mover__up-description"
 				aria-disabled={ isFirst }
 			/>
 			<IconButton
@@ -65,16 +59,34 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				onClick={ isLast ? null : onMoveDown }
 				icon={ downArrow }
 				tooltip={ __( 'Move Down' ) }
-				label={ getBlockMoverLabel(
-					uids.length,
-					blockType && blockType.title,
-					firstIndex,
-					isFirst,
-					isLast,
-					1,
-				) }
+				label={ __( 'Move Down' ) }
+				aria-describedby="editor-block-mover__down-description"
 				aria-disabled={ isLast }
 			/>
+			<span id="editor-block-mover__up-description" className="editor-block-mover__description">
+				{
+					getBlockMoverDescription(
+						uids.length,
+						blockType && blockType.title,
+						firstIndex,
+						isFirst,
+						isLast,
+						-1,
+					)
+				}
+			</span>
+			<span id="editor-block-mover__down-description" className="editor-block-mover__description">
+				{
+					getBlockMoverDescription(
+						uids.length,
+						blockType && blockType.title,
+						firstIndex,
+						isFirst,
+						isLast,
+						1,
+					)
+				}
+			</span>
 		</div>
 	);
 }

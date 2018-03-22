@@ -17,11 +17,11 @@ import { __, sprintf } from '@wordpress/i18n';
  *
  * @return {string} Label for the block movement controls.
  */
-export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, isLast, dir ) {
+export function getBlockMoverDescription( selectedCount, type, firstIndex, isFirst, isLast, dir ) {
 	const position = ( firstIndex + 1 );
 
 	if ( selectedCount > 1 ) {
-		return getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isLast, dir );
+		return getMultiBlockMoverDescription( selectedCount, firstIndex, isFirst, isLast, dir );
 	}
 
 	if ( isFirst && isLast ) {
@@ -78,7 +78,7 @@ export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, is
  *
  * @return {string} Label for the block movement controls.
  */
-export function getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isLast, dir ) {
+export function getMultiBlockMoverDescription( selectedCount, firstIndex, isFirst, isLast, dir ) {
 	const position = ( firstIndex + 1 );
 
 	if ( dir < 0 && isFirst ) {

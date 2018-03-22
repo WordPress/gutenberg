@@ -27,20 +27,26 @@ describe( 'BlockMover', () => {
 
 			const moveUp = blockMover.childAt( 0 );
 			const moveDown = blockMover.childAt( 1 );
+			const moveUpDesc = blockMover.childAt( 2 );
+			const moveDownDesc = blockMover.childAt( 3 );
 			expect( moveUp.type().name ).toBe( 'IconButton' );
 			expect( moveDown.type().name ).toBe( 'IconButton' );
 			expect( moveUp.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
-				label: 'Move 2 blocks from position 1 up by one place',
+				label: 'Move up',
 				'aria-disabled': undefined,
+				'aria-describedby': 'editor-block-mover__up-description',
 			} );
 			expect( moveDown.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
 				onClick: undefined,
-				label: 'Move 2 blocks from position 1 down by one place',
+				label: 'Move down',
 				'aria-disabled': undefined,
+				'aria-describedby': 'editor-block-mover__down-description',
 			} );
+			expect( moveUpDesc.text() ).toBe( 'Move 2 blocks from position 1 up by one place' );
+			expect( moveDownDesc.text() ).toBe( 'Move 2 blocks from position 1 down by one place' );
 		} );
 
 		it( 'should render the up arrow with a onMoveUp callback', () => {
@@ -67,7 +73,7 @@ describe( 'BlockMover', () => {
 			expect( moveDown.prop( 'onClick' ) ).toBe( onMoveDown );
 		} );
 
-		it( 'should render with a disabled up arrown when the block isFirst', () => {
+		it( 'should render with a disabled up arrow when the block isFirst', () => {
 			const onMoveUp = ( event ) => event;
 			const blockMover = shallow(
 				<BlockMover uids={ selectedUids }

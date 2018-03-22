@@ -1,17 +1,17 @@
 /**
  * Internal dependencies
  */
-import { getBlockMoverLabel, getMultiBlockMoverLabel } from '../mover-label';
+import { getBlockMoverDescription, getMultiBlockMoverDescription } from '../mover-description';
 
 describe( 'block mover', () => {
 	const dirUp = -1,
 		dirDown = 1;
 
-	describe( 'getBlockMoverLabel', () => {
+	describe( 'getBlockMoverDescription', () => {
 		const type = 'TestType';
 
 		it( 'Should generate a title for the first item moving up', () => {
-			expect( getBlockMoverLabel(
+			expect( getBlockMoverDescription(
 				1,
 				type,
 				0,
@@ -24,7 +24,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for the last item moving down', () => {
-			expect( getBlockMoverLabel(
+			expect( getBlockMoverDescription(
 				1,
 				type,
 				3,
@@ -35,7 +35,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for the second item moving up', () => {
-			expect( getBlockMoverLabel(
+			expect( getBlockMoverDescription(
 				1,
 				type,
 				1,
@@ -46,7 +46,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for the second item moving down', () => {
-			expect( getBlockMoverLabel(
+			expect( getBlockMoverDescription(
 				1,
 				type,
 				1,
@@ -57,7 +57,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for the only item in the list', () => {
-			expect( getBlockMoverLabel(
+			expect( getBlockMoverDescription(
 				1,
 				type,
 				0,
@@ -68,9 +68,9 @@ describe( 'block mover', () => {
 		} );
 	} );
 
-	describe( 'getMultiBlockMoverLabel', () => {
+	describe( 'getMultiBlockMoverDescription', () => {
 		it( 'Should generate a title moving multiple blocks up', () => {
-			expect( getMultiBlockMoverLabel(
+			expect( getMultiBlockMoverDescription(
 				4,
 				1,
 				false,
@@ -80,7 +80,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title moving multiple blocks down', () => {
-			expect( getMultiBlockMoverLabel(
+			expect( getMultiBlockMoverDescription(
 				4,
 				0,
 				true,
@@ -90,7 +90,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for a selection of blocks at the top', () => {
-			expect( getMultiBlockMoverLabel(
+			expect( getMultiBlockMoverDescription(
 				4,
 				1,
 				true,
@@ -100,7 +100,7 @@ describe( 'block mover', () => {
 		} );
 
 		it( 'Should generate a title for a selection of blocks at the bottom', () => {
-			expect( getMultiBlockMoverLabel(
+			expect( getMultiBlockMoverDescription(
 				4,
 				2,
 				false,
