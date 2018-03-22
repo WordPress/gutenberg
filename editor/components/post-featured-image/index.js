@@ -107,7 +107,7 @@ const applyWithSelect = withSelect( ( select, { featuredImageId } ) => {
 	const { getMedia } = select( 'core' );
 
 	return {
-		image: featuredImageId ? getMedia( featuredImageId ) : null,
+		media: featuredImageId ? getMedia( featuredImageId ) : null,
 	};
 } );
 

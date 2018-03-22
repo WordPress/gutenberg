@@ -75,8 +75,8 @@ class GalleryImage extends Component {
 		}
 	}
 
-	componentWillReceiveProps( { isSelected, image } ) {
-		if ( image && ! this.props.url ) {
+	componentWillReceiveProps( { isSelected, image, url } ) {
+		if ( image && ! url ) {
 			this.props.setAttributes( {
 				url: image.source_url,
 				alt: image.alt_text,
