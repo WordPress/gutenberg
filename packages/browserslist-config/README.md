@@ -1,6 +1,6 @@
 # @wordpress/browserslist-config
 
-[WordPress Browserslist](https://make.wordpress.org/design/handbook/design-guide/browser-support/) shareable config for [Browserslist](https://www.npmjs.com/package/browserslist).
+[WordPress Browserslist](https://make.wordpress.org/core/handbook/best-practices/browser-support/) shareable config for [Browserslist](https://www.npmjs.com/package/browserslist).
 
 ## Installation
 
