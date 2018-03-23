@@ -5,7 +5,18 @@ matrix:
   include:
     - language: node_js
       node_js: 8
-      env: LANE='node'
+      env:
+        LANE='node'
+        TEST_RN_PLATFORM='android'
+      cache:
+        yarn: true
+      script:
+        - ./.travis/travis-checks-js.sh
+    - language: node_js
+      node_js: 8
+      env:
+        LANE='node'
+        TEST_RN_PLATFORM='ios'
       cache:
         yarn: true
       script:

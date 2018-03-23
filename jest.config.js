@@ -1,9 +1,9 @@
 /** @format */
 
 const defaultPlatform = 'android';
-const rnPlatform = process.env.RN_TEST_PLATFORM || defaultPlatform;
-if ( process.env.RN_TEST_PLATFORM ) {
-	console.log( 'Setting RN platform to: ' + process.env.RN_TEST_PLATFORM );
+const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
+if ( process.env.TEST_RN_PLATFORM ) {
+	console.log( 'Setting RN platform to: ' + process.env.TEST_RN_PLATFORM );
 } else {
 	console.log( 'Setting RN platform to: default (' + defaultPlatform + ')' );
 }
