@@ -22,10 +22,7 @@ class PostPermalink extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
-			showCopyConfirmation: false,
 		};
-		this.onCopy = this.onCopy.bind( this );
-		this.onFinishCopy = this.onFinishCopy.bind( this );
 	}
 
 	componentWillMount() {
@@ -34,10 +31,6 @@ class PostPermalink extends Component {
 				samplePermalink: this.generatePermalink( this.props.samplePermalinkData[0], this.props.samplePermalinkData[1] ),
 			} );
 		}
-	}
-
-	componentWillUnmount() {
-		clearTimeout( this.dismissCopyConfirmation );
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -61,15 +54,7 @@ class PostPermalink extends Component {
 		return template.replace( /%(postname|pagename)%/, post_name );
 	}
 
-	onCopy() {
 		this.setState( {
-			showCopyConfirmation: true,
-		} );
-	}
-
-	onFinishCopy() {
-		this.setState( {
-			showCopyConfirmation: false,
 		} );
 	}
 
