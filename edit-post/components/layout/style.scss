@@ -73,12 +73,14 @@
 	min-height: 100%;
 	flex-direction: column;
 
-	// on mobile the main content area has to scroll
-	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
-	@include break-small {
-		overflow-y: auto;
-		-webkit-overflow-scrolling: touch;
-	}
+	// Pad the scroll box so content on the bottom can be scrolled up.
+	padding-bottom: 50vh;
+
+	// On mobile the main content area has to scroll otherwise you can invoke
+	// the overscroll bounce on the non-scrolling container, causing
+	// (ノಠ益ಠ)ノ彡┻━┻
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
 
 	.edit-post-visual-editor {
 		flex-basis: 100%;

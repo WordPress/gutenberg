@@ -140,6 +140,7 @@ export class RichText extends Component {
 		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
+		this.scrollToCaret = this.scrollToCaret.bind( this );
 
 		this.state = {
 			formats: {},
@@ -183,6 +184,7 @@ export class RichText extends Component {
 		} );
 
 		editor.on( 'init', this.onInit );
+		editor.on( 'focusin', this.scrollToCaret );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
@@ -529,6 +531,21 @@ export class RichText extends Component {
 		if ( keyCode === BACKSPACE ) {
 			this.onChange();
 		}
+
+		this.scrollToCaret();
+	}
+
+	scrollToCaret() {
+		const caretRect = this.getEditorSelectionRect();
+		const caretHeight = caretRect.y;
+		if ( caretHeight !== this.caretHeight ) {
+			const toolbarOffset = 100;
+			window.scrollTo(
+				window.pageXOffset,
+				window.pageYOffset + caretHeight - toolbarOffset
+			);
+		}
+		this.caretHeight = caretHeight;
 	}
 
 	/**
