@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MenuItemsToggle should match snapshot when all props provided 1`] = `
+<MenuItemsItem
+  className="is-toggle"
+  icon="yes"
+  isSelected={true}
+  label="My item"
+  onClick={[Function]}
+  shortcut="mod+shift+alt+w"
+/>
+`;
+
+exports[`MenuItemsToggle should match snapshot when only label provided 1`] = `
+<MenuItemsItem
+  className="is-toggle"
+  label="My item"
+/>
+`;

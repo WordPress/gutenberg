@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import './style.scss';
-import MenuItemsToggle from './menu-items-toggle';
+import MenuItemsToggle from './toggle';
 
 export default function MenuItemsChoice( {
 	choices = [],

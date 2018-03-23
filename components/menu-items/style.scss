@@ -32,3 +32,8 @@
 		@include menu-style__focus;
 	}
 }
+
+.components-menu-items__shortcut {
+	float: right;
+	opacity: .5;
+}
