@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Dashicon, Button } from '@wordpress/components';
+import { Dashicon, ClipboardButton, Button } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -92,7 +92,13 @@ class PostPermalink extends Component {
 
 		return (
 			<div className="editor-post-permalink">
-				<Dashicon icon="admin-links" />
+				<ClipboardButton
+					text={ samplePermalink }
+					title={ __( 'Copy the permalink to your clipboard.' ) }
+				>
+					<Dashicon icon="admin-links" />
+				</ClipboardButton>
+
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
 				{ // Show the sample permalink when it isn't being editing.
