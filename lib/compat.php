@@ -456,7 +456,7 @@ function gutenberg_add_sample_permalink_to_draft_posts( $response, $post, $reque
 	if ( ! function_exists( 'get_sample_permalink' ) ) {
 		require_once ABSPATH . '/wp-admin/includes/post.php';
 	}
-	$response->data['sample_permalink'] = get_sample_permalink( $post );
+	$response->data['sample_permalink'] = get_sample_permalink( $post->ID );
 	return $response;
 }
 /**
