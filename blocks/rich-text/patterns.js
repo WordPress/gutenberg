@@ -52,7 +52,7 @@ export default function( editor ) {
 		}
 
 		if ( keyCode === ENTER ) {
-			enter();
+			enter( event );
 		// Wait for the browser to insert the character.
 		} else if ( keyCode === SPACE ) {
 			setTimeout( () => searchFirstText( spacePatterns ) );
@@ -204,7 +204,7 @@ export default function( editor ) {
 		onReplace( [ block ] );
 	}
 
-	function enter() {
+	function enter( event ) {
 		if ( ! onReplace ) {
 			return;
 		}
@@ -225,7 +225,11 @@ export default function( editor ) {
 		}
 
 		const block = pattern.transform( { content } );
+		onReplace( [ block ] );
 
-		editor.once( 'keyup', () => onReplace( [ block ] ) );
+		// We call preventDefault to prevent additional newlines.
+		event.preventDefault();
+		// stopImmediatePropagation is called to prevent TinyMCE's own processing of keydown which conflicts with the block replacement.
+		event.stopImmediatePropagation();
 	}
 }
