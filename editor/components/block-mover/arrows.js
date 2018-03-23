@@ -1,6 +1,3 @@
-/**
- * Module constants
- */
 export const upArrow = (
 	<svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" aria-hidden role="img" focusable="false">
 		<path d="M12.293 12.207L9 8.914l-3.293 3.293-1.414-1.414L9 6.086l4.707 4.707z" />
