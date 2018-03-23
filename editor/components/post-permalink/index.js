@@ -8,13 +8,14 @@ import { connect } from 'react-redux';
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Dashicon, ClipboardButton, Button } from '@wordpress/components';
+import { Dashicon, Button } from '@wordpress/components';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
 import { isEditedPostNew, getEditedPostAttribute } from '../../store/selectors';
+import { getWPAdminURL } from '../../utils/url';
 
 class PostPermalink extends Component {
 	constructor() {
@@ -43,7 +44,7 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, link } = this.props;
+		const { isNew, link, permalinkStructure } = this.props;
 		if ( isNew || ! link ) {
 			return null;
 		}
@@ -55,14 +56,15 @@ class PostPermalink extends Component {
 				<Button className="editor-post-permalink__link" href={ link } target="_blank">
 					{ decodeURI( link ) }
 				</Button>
-				<ClipboardButton
-					className="button"
-					text={ link }
-					onCopy={ this.onCopy }
-					onFinishCopy={ this.onFinishCopy }
-				>
-					{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy' ) }
-				</ClipboardButton>
+				{ ! permalinkStructure &&
+					<Button
+						className="editor-post-permalink__change button"
+						href={ getWPAdminURL( 'options-permalink.php' ) }
+						target="_blank"
+					>
+						{ __( 'Change Permalinks' ) }
+					</Button>
+				}
 			</div>
 		);
 	}
@@ -73,6 +75,8 @@ export default connect(
 		return {
 			isNew: isEditedPostNew( state ),
 			link: getEditedPostAttribute( state, 'link' ),
+
+			permalinkStructure: window.wpApiSettings.schema.permalink_structure,
 		};
 	}
 )( PostPermalink );
