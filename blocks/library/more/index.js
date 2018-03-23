@@ -69,7 +69,6 @@ export const settings = {
 	},
 
 	edit: class extends Component {
-		
 		constructor() {
 			super( ...arguments );
 			this.onChangeInput = this.onChangeInput.bind( this );
@@ -83,7 +82,7 @@ export const settings = {
 		render() {
 			const { customText, noTeaser } = this.props.attributes;
 			const { setAttributes, isSelected } = this.props;
-			
+
 			const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
 			const defaultText = __( 'Read more' );
 			const value = customText !== undefined ? customText : defaultText;
@@ -109,7 +108,6 @@ export const settings = {
 				</div>,
 			];
 		}
-
 	},
 
 	save( { attributes } ) {
