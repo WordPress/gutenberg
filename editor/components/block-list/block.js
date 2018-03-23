@@ -26,7 +26,7 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { withFilters, withContext, withSafeTimeout, withDragging } from '@wordpress/components';
+import { withFilters, withContext, Draggable } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -397,21 +397,11 @@ export class BlockListBlock extends Component {
 		this.setState( { error } );
 	}
 
-	onDragStart( event ) {
-		const transferData = {
-			rootUID: this.props.rootUID,
-			uid: this.props.uid,
-			fromIndex: this.props.order,
-			type: 'block',
-			layout: this.props.layout,
-		};
-
-		this.props.onDragStart( event, `block-${ this.props.uid }`, transferData );
-		this.props.setTimeout( () => this.setState( { dragging: true } ), 0 );
+	onDragStart() {
+		this.setState( { dragging: true } );
 	}
 
-	onDragEnd( event ) {
-		this.props.onDragEnd( event );
+	onDragEnd() {
 		this.setState( { dragging: false } );
 	}
 
@@ -470,11 +460,6 @@ export class BlockListBlock extends Component {
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
-		const reorderWithDraggingProps = {
-			draggable: true,
-			onDragStart: this.onDragStart,
-			onDragEnd: this.onDragEnd,
-		};
 
 		// Insertion point can only be made visible when the side inserter is
 		// not present, and either the block is at the extent of a selection or
@@ -495,10 +480,6 @@ export class BlockListBlock extends Component {
 			'is-hidden': dragging,
 			'is-typing': isTypingWithinBlock,
 		} );
-		const blockDragInsetClassName = classnames( 'editor-block-list__block-drag-inset', {
-			'is-visible': dragging,
-		} );
-		const blockDragHandleClassName = 'editor-block-list__drag-handle';
 
 		const { onReplace } = this.props;
 
@@ -511,6 +492,26 @@ export class BlockListBlock extends Component {
 			};
 		}
 
+		const blockDragInsetClassName = classnames( 'editor-block-list__block-drag-inset', {
+			'is-visible': dragging,
+		} );
+
+		// Draggable props
+		const transferData = {
+			type: 'block',
+			rootUID: rootUID,
+			fromIndex: order,
+			uid: block.uid,
+			layout,
+		};
+		const blockElementId = `block-${ this.props.uid }`;
+		const draggableProps = {
+			onDragStart: this.onDragStart,
+			onDragEnd: this.onDragEnd,
+			elementId: blockElementId,
+			transferData,
+		};
+
 		// Disable reasons:
 		//
 		//  jsx-a11y/mouse-events-have-key-events:
@@ -522,7 +523,7 @@ export class BlockListBlock extends Component {
 		/* eslint-disable jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<IgnoreNestedEvents
-				id={ `block-${ this.props.uid }` }
+				id={ blockElementId }
 				ref={ this.setBlockListRef }
 				onMouseOver={ this.maybeHover }
 				onMouseLeave={ this.hideHoverEffects }
@@ -539,11 +540,7 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				<div
-					blockName={ blockName }
-					{ ...reorderWithDraggingProps }
-					className={ blockDragInsetClassName }
-				>
+				<div className={ blockDragInsetClassName }>
 					<div className="inner" ></div>
 				</div>
 
@@ -554,10 +551,7 @@ export class BlockListBlock extends Component {
 					onDrop={ this.reorderBlock }
 				/>
 				{ shouldShowMovers && (
-					<div
-						{ ...reorderWithDraggingProps }
-						className={ blockDragHandleClassName }
-					>
+					<Draggable { ...draggableProps }>
 						<BlockMover
 							uids={ [ block.uid ] }
 							rootUID={ rootUID }
@@ -565,19 +559,16 @@ export class BlockListBlock extends Component {
 							isFirst={ isFirst }
 							isLast={ isLast }
 						/>
-					</div>
+					</Draggable>
 				) }
 				{ shouldShowSettingsMenu && ! showSideInserter && (
-					<div
-						{ ...reorderWithDraggingProps }
-						className={ blockDragHandleClassName }
-					>
+					<Draggable { ...draggableProps }>
 						<BlockSettingsMenu
 							uids={ [ block.uid ] }
 							rootUID={ rootUID }
 							renderBlockMenu={ renderBlockMenu }
 						/>
-					</div>
+					</Draggable>
 				) }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
@@ -729,6 +720,4 @@ export default compose(
 		};
 	} ),
 	withFilters( 'editor.BlockListBlock' ),
-	withSafeTimeout,
-	withDragging,
 )( BlockListBlock );

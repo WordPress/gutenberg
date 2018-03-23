@@ -1,4 +1,4 @@
-.components-with-dragging__clone {
+.components-draggable__clone {
 	.editor-block-list__block-drag-inset .inner {
 		visibility: visible;
 		background: white !important;
@@ -114,18 +114,18 @@
 	 * Hovered Block style
 	 */
 
-	&.is-selected > .editor-block-list__drag-handle > .editor-block-mover:before,
-	&.is-hovered > .editor-block-list__drag-handle > .editor-block-mover:before,
-	&.is-selected > .editor-block-list__drag-handle > .editor-block-settings-menu:before,
-	&.is-hovered > .editor-block-list__drag-handle > .editor-block-settings-menu:before {
+	&.is-selected > .components-draggable > .editor-block-mover:before,
+	&.is-hovered > .components-draggable > .editor-block-mover:before,
+	&.is-selected > .components-draggable > .editor-block-settings-menu:before,
+	&.is-hovered > .components-draggable > .editor-block-settings-menu:before {
 		content: '';
 		position: absolute;
 		height: 36px;
 		top: 10px;
 	}
 
-	&.is-selected > .editor-block-list__drag-handle > .editor-block-mover:before,
-	&.is-hovered > .editor-block-list__drag-handle > .editor-block-mover:before {
+	&.is-selected > .components-draggable > .editor-block-mover:before,
+	&.is-hovered > .components-draggable > .editor-block-mover:before {
 		border-right: 1px solid $light-gray-500;
 		right: 6px;
 	}
@@ -141,8 +141,8 @@
 		transition: opacity 0.2s;
 	}
 
-	&.is-selected > .editor-block-list__drag-handle > .editor-block-settings-menu:before,
-	&.is-hovered > .editor-block-list__drag-handle > .editor-block-settings-menu:before {
+	&.is-selected > .components-draggable > .editor-block-settings-menu:before,
+	&.is-hovered > .components-draggable > .editor-block-settings-menu:before {
 		border-left: 1px solid $light-gray-500;
 		left: 6px;
 	}
@@ -389,8 +389,8 @@
 	 * Left and right side UI
 	 */
 
-	> .editor-block-list__drag-handle > .editor-block-settings-menu,
-	> .editor-block-list__drag-handle > .editor-block-mover {
+	> .components-draggable > .editor-block-settings-menu,
+	> .components-draggable > .editor-block-mover {
 		position: absolute;
 		top: 0;
 		padding: 0;
@@ -401,7 +401,7 @@
 	}
 
 	// Right side UI
-	> .editor-block-list__drag-handle > .editor-block-settings-menu {
+	> .components-draggable > .editor-block-settings-menu {
 		right: #{ -1 * $block-mover-margin - $block-padding + 2px };
 		padding-top: 2px;
 
@@ -414,7 +414,7 @@
 	}
 
 	// Left side UI
-	> .editor-block-list__drag-handle > .editor-block-mover {
+	> .components-draggable > .editor-block-mover {
 		left: -$block-mover-margin - $block-padding + 4px;
 		padding-top: 6px;
 		z-index: z-index( '.editor-block-mover' );

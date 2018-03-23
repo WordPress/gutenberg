@@ -71,10 +71,7 @@ class Dropdown extends Component {
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 
 		return (
-			<div
-				className={ className }
-				ref={ this.bindContainer }
-			>
+			<div className={ className } ref={ this.bindContainer }>
 				{ /**
 				   * This seemingly redundant wrapper node avoids root return
 				   * element styling impacting popover positioning.
