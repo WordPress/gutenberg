@@ -54,14 +54,14 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 	};
 
 	const onDrop = ( event, position ) => {
-		if ( index === undefined || ! event.dataTransfer ) {
+		if ( ! event.dataTransfer ) {
 			return;
 		}
 
-		let uid, type, rootUID;
+		let uid, type, rootUID, fromIndex;
 
 		try {
-			( { uid, type, rootUID } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
+			( { uid, type, rootUID, fromIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
 		} catch ( err ) {
 			return;
 		}
@@ -69,8 +69,8 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		if ( type !== 'block' ) {
 			return;
 		}
-
-		const insertIndex = getInsertIndex( position );
+		const positionIndex = getInsertIndex( position );
+		const insertIndex = index && fromIndex < index && rootUID === props.rootUID ? positionIndex - 1 : positionIndex;
 		props.moveBlockToPosition( uid, rootUID, insertIndex );
 	};
 

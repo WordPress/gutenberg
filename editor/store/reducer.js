@@ -416,7 +416,8 @@ export const editor = flow( [
 			}
 
 			case 'MOVE_BLOCK_TO_POSITION': {
-				const { fromRootUID = '', toRootUID = '', uid, index } = action;
+				const { fromRootUID = '', toRootUID = '', uid } = action;
+				const { index = state[ toRootUID ].length } = action;
 
 				// Moving inside the same parent block
 				if ( fromRootUID === toRootUID ) {

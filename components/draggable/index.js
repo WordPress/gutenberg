@@ -37,7 +37,6 @@ class Draggable extends Component {
 		this.removeDragClone();
 		// Reset cursor.
 		document.body.classList.remove( 'dragging' );
-		event.stopPropagation();
 		event.preventDefault();
 
 		this.props.setTimeout( onDragEnd );
@@ -118,7 +117,6 @@ class Draggable extends Component {
 		// Update cursor to 'grabbing', document wide.
 		document.body.classList.add( 'dragging' );
 		document.addEventListener( 'dragover', this.onDragOver );
-		event.stopPropagation();
 
 		this.props.setTimeout( onDragStart );
 	}

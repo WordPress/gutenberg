@@ -42,7 +42,7 @@ export function DefaultBlockAppender( {
 		<div
 			data-root-uid={ rootUID || '' }
 			className="editor-default-block-appender">
-			<BlockDropZone />
+			<BlockDropZone rootUID={ rootUID } layout={ layout } />
 			<input
 				role="button"
 				aria-label={ __( 'Add block' ) }
