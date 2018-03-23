@@ -6,8 +6,10 @@
 	font-family: $default-font;
 	font-size: $default-font-size;
 	justify-content: flex-end;
-	margin: $block-padding (-$block-padding) (-$block-padding);
+	margin: 0 (-$block-padding);
 	padding: 10px $block-padding;
+	position: relative;
+	top: $block-padding;
 
 	.reusable-block-edit-panel__spinner {
 		margin: 0 5px;

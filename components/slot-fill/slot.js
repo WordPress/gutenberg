@@ -45,7 +45,7 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { name, bubblesVirtually = false, fillProps } = this.props;
+		const { name, bubblesVirtually = false, fillProps = {} } = this.props;
 		const { getFills = noop } = this.context;
 
 		if ( bubblesVirtually ) {

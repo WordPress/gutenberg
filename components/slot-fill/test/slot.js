@@ -87,7 +87,7 @@ describe( 'Slot', () => {
 
 		const element = mount(
 			<Provider>
-				<Slot name="chicken" fillProps={ { onClose: onClose } } />
+				<Slot name="chicken" fillProps={ { onClose } } />
 				<Fill name="chicken">
 					{ ( props ) => {
 						return (
@@ -100,7 +100,7 @@ describe( 'Slot', () => {
 
 		element.find( 'button' ).simulate( 'click' );
 
-		expect( onClose ).toHaveBeenCalled();
+		expect( onClose ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should re-render Slot when not bubbling virtually', () => {

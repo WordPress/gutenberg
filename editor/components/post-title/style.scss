@@ -9,11 +9,11 @@
 		margin: 0;
 		box-shadow: none;
 		border: 1px solid transparent;
-		font-size: 2em;
 		font-family: $editor-font;
 		line-height: $default-line-height;
 
-		// inherited from h1
+		// Match h1 heading
+		font-size: 2.441em;
 		font-weight: 600;
 	}
 
