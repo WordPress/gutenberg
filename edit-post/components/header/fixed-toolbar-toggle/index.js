@@ -8,7 +8,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { MenuItemsGroup, MenuItemsToggle, withInstanceId } from '@wordpress/components';
+import { MenuItemsGroup, MenuItemsItem, withInstanceId } from '@wordpress/components';
 import { ifViewportMatches } from '@wordpress/viewport';
 
 function FeatureToggle( { onToggle, isActive } ) {
@@ -17,7 +17,8 @@ function FeatureToggle( { onToggle, isActive } ) {
 			label={ __( 'Settings' ) }
 			filterName="editPost.MoreMenu.settings"
 		>
-			<MenuItemsToggle
+			<MenuItemsItem
+				icon={ isActive && 'yes' }
 				label={ __( 'Fix Toolbar to Top' ) }
 				isSelected={ isActive }
 				onClick={ onToggle }

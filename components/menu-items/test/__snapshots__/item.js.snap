@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MenuItemsItem should match snapshot when all props provided 1`] = `
+<IconButton
+  aria-pressed={true}
+  className="components-menu-items__button my-class is-selected"
+  icon="wordpress"
+  onClick={[Function]}
+>
+  My item
+  <MenuItemsShortcut
+    shortcut="mod+shift+alt+w"
+  />
+</IconButton>
+`;
+
+exports[`MenuItemsItem should match snapshot when only label provided 1`] = `
+<Button
+  aria-pressed={false}
+  className="components-menu-items__button"
+>
+  My item
+  <MenuItemsShortcut />
+</Button>
+`;
