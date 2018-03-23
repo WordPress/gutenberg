@@ -75,7 +75,7 @@ export const settings = {
 		}
 
 		onChangeInput( event ) {
-			const value = event.target.textLength === 0 ? undefined : event.target.value;
+			const value = event.target.value.length === 0 ? undefined : event.target.value;
 			this.props.setAttributes( { customText: value } );
 		}
 
