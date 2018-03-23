@@ -26,7 +26,7 @@ import {
 	withSpokenMessages,
 	withContext,
 } from '@wordpress/components';
-import { getCategories, isReusableBlock } from '@wordpress/blocks';
+import { getCategories, isReusableBlock, getTabs } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -57,10 +57,11 @@ const ARROWS = pick( keycodes, [ 'UP', 'DOWN', 'LEFT', 'RIGHT' ] );
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
+		this.tabs = getTabs();
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			tab: 'rows',
+			tab: this.tabs[0].options.name,
 			selectedItem: null,
 		};
 		this.filter = this.filter.bind( this );
@@ -69,7 +70,13 @@ export class InserterMenu extends Component {
 		this.sortItems = this.sortItems.bind( this );
 		this.selectItem = this.selectItem.bind( this );
 
-		this.tabScrollTop = { rows: 0, blocks: 0, embeds: 0 };
+		this.tabScrollTop = this.tabs.reduce((tabs, tab) => {
+			if (tab.tabScrollTop != undefined) {
+				tabs[tab.options.name] = tab.tabScrollTop;
+			}
+
+			return tabs;
+		}; // { rows: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
 		this.previewItem = this.previewItem.bind( this );
 	}
@@ -298,7 +305,7 @@ export class InserterMenu extends Component {
 				{ ! isSearching &&
 					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
 						onSelect={ this.switchTab }
-						tabs={ [
+						tabs={ tabs /* [
 							// {
 							// 	name: 'frequent',
 							// 	title: __( 'Frequent' ),
@@ -324,7 +331,7 @@ export class InserterMenu extends Component {
 							// 	title: __( 'Shared' ),
 							// 	className: 'editor-inserter__tab',
 							// },
-						] }
+						] */ }
 					>
 						{ ( tabKey ) => (
 							<div ref={ ( ref ) => this.tabContainer = ref }>

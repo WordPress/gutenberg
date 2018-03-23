@@ -15,6 +15,7 @@ export {
 } from './serializer';
 export { isValidBlock } from './validation';
 export { getCategories } from './categories';
+export { getTabs } from './tabs';
 export {
 	registerBlockType,
 	unregisterBlockType,
