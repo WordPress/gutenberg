@@ -9,7 +9,6 @@ import { __ } from '@wordpress/i18n';
  * @var {Array} categories
  */
 const categories = [
-	{ slug: 'rows', title: __( 'Rows Blocks' ) },
 	{ slug: 'common', title: __( 'Common Blocks' ) },
 	{ slug: 'formatting', title: __( 'Formatting' ) },
 	{ slug: 'layout', title: __( 'Layout Elements' ) },
@@ -24,5 +23,9 @@ const categories = [
  * @return {Array} Block categories.
  */
 export function getCategories() {
+	if (typeof customGutenberg === 'object' && customGutenberg.categories) {
+		return customGutenberg.categories;
+	}
+
 	return categories;
 }

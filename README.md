@@ -154,6 +154,16 @@ plugins: [
 ...
 ```
 
+## Custom Gutenberg
+
+How all changes come from our needs, we decided to add a new object with a range of settings that make Gutenberg more customizable.  
+
+```
+cons customGutenberg = {
+	categories: [ ... ] // array of available blocks categories
+};
+```
+
 # Blocks
 ## Article
 Article contains a cover image and a title
