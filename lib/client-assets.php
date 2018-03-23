@@ -928,12 +928,15 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	 */
 	$allowed_block_types = apply_filters( 'allowed_block_types', true );
 
+	$post_type_object = get_post_type_object( $post_to_edit['type'] );
+
 	$editor_settings = array(
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'availableTemplates'  => wp_get_theme()->get_page_templates( get_post( $post_to_edit['id'] ) ),
 		'blockTypes'          => $allowed_block_types,
 		'disableCustomColors' => get_theme_support( 'disable-custom-colors' ),
 		'disablePostFormats'  => ! current_theme_supports( 'post-formats' ),
+		'disablePreview'      => ! is_post_type_viewable( $post_type_object ),
 		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
 	);
@@ -942,7 +945,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$editor_settings['colors'] = $color_palette;
 	}
 
-	$post_type_object = get_post_type_object( $post_to_edit['type'] );
 	if ( ! empty( $post_type_object->template ) ) {
 		$editor_settings['template']     = $post_type_object->template;
 		$editor_settings['templateLock'] = ! empty( $post_type_object->template_lock ) ? $post_type_object->template_lock : false;
