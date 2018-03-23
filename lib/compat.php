@@ -115,7 +115,7 @@ function gutenberg_shim_api_request_emulate_http( $scripts ) {
 	var oldApiRequest = wp.apiRequest;
 	wp.apiRequest = function ( options ) {
 		if ( options.method ) {
-			if( [ 'GET', 'PUT', 'DELETE' ].indexOf( options.method.toUpperCase() ) >= 0 ) {
+			if ( [ 'GET', 'PUT', 'DELETE' ].indexOf( options.method.toUpperCase() ) >= 0 ) {
 				if ( ! options.headers ) {
 					options.headers = [];
 				}
