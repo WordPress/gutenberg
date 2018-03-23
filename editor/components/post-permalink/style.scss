@@ -34,3 +34,20 @@
 		@include long-content-fade( $size: 20% );
 	}
 }
+
+.editor-post-permalink__edit-form {
+	width: 100%;
+}
+
+.editor-post-permalink__prefix,
+.editor-post-permalink__suffix {
+	color: $dark-gray-300;
+}
+
+.editor-post-permalink__edit {
+	margin: 0 5px;
+}
+
+.editor-post-permalink__save {
+	float: right;
+}

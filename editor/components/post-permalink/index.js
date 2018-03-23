@@ -9,79 +9,138 @@ import { connect } from 'react-redux';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Dashicon, Button } from '@wordpress/components';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import { isEditedPostNew, getEditedPostAttribute } from '../../store/selectors';
+import { isEditedPostNew, getEditedPostAttribute, getEditedPostPreviewLink } from '../../store/selectors';
+import { editPost } from '../../store/actions';
 import { getWPAdminURL } from '../../utils/url';
 
 class PostPermalink extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.state = {
+			samplePermalink: '',
+			samplePermalinkPrefix: '',
+			samplePermalinkSuffix: '',
+			postName: '',
+			editedPostName: '',
+			editingPermalink: false,
 		};
+
+		this.onSavePermalink = this.onSavePermalink.bind( this );
 	}
 
 	componentWillMount() {
 		if ( this.props.samplePermalinkData ) {
-			this.setState( {
-				samplePermalink: this.generatePermalink( this.props.samplePermalinkData[0], this.props.samplePermalinkData[1] ),
-			} );
+			this.updateSamplePermalink( this.props.samplePermalinkData[ 0 ], this.props.samplePermalinkData[ 1 ] );
 		}
 	}
 
 	componentWillReceiveProps( nextProps ) {
-		console.log( nextProps );
 		if ( this.props.samplePermalinkData !== nextProps.samplePermalinkData ) {
-			this.setState( {
-				samplePermalink: this.generatePermalink( nextProps.samplePermalinkData[0], nextProps.samplePermalinkData[1] ),
-			} );
+			this.updateSamplePermalink( nextProps.samplePermalinkData[ 0 ], nextProps.samplePermalinkData[ 1 ] );
 		}
 	}
 
 	/**
-	 * Replace the %postname% and %pagename% tags in a sample permalink URL with actual values.
+	 * Updates the samplePermalink data in the state.
 	 *
-	 * @param {string} template  Permalink structure to replace the tags in.
-	 * @param {string} post_name The post slug to use in replacements.
-	 *
-	 * @return {string} Prepared permalink.
+	 * @param {string} template Permalink structure to replace the tags in.
+	 * @param {string} postName The post slug to use in replacements.
 	 */
-	generatePermalink( template, post_name ) {
-		return template.replace( /%(postname|pagename)%/, post_name );
+	updateSamplePermalink( template, postName ) {
+		const regex = /%(?:postname|pagename)%/;
+		this.setState( {
+			samplePermalink: template.replace( regex, postName ),
+			samplePermalinkPrefix: template.split( regex )[ 0 ],
+			samplePermalinkSuffix: template.split( regex )[ 1 ],
+			postName: postName,
+		} );
 	}
 
+	onSavePermalink() {
+		const postName = this.state.editedPostName.replace( /\s+/g, '-' );
+
+		this.props.editPost( {
+			slug: postName,
+			sample_permalink: [ this.props.samplePermalinkData[ 0 ], postName ],
+		} );
+
 		this.setState( {
+			editingPermalink: false,
+			editedPostName: postName,
 		} );
 	}
 
 	render() {
-		const { isNew, link, permalinkStructure } = this.props;
-		const { samplePermalink } = this.state;
+		const { isNew, previewLink, permalinkStructure } = this.props;
+		const {
+			samplePermalink,
+			samplePermalinkPrefix,
+			samplePermalinkSuffix,
+			postName,
+			editingPermalink,
+		} = this.state;
 
-		if ( isNew || ! link ) {
+		if ( isNew || ! previewLink ) {
 			return null;
-		}
-
-		var hrefLink = link;
-		var displayLink = decodeURI( link );
-		if ( samplePermalink ) {
-			hrefLink = addQueryArgs( hrefLink, { preview: true } );
-			displayLink = samplePermalink;
 		}
 
 		return (
 			<div className="editor-post-permalink">
 				<Dashicon icon="admin-links" />
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
-				<Button className="editor-post-permalink__link" href={ hrefLink } target="_blank">
-					{ samplePermalink }
-				</Button>
 
-				{ ! permalinkStructure &&
+				{ // Show the sample permalink when it isn't being editing.
+					! editingPermalink &&
+					<Button className="editor-post-permalink__link" href={ previewLink } target="_blank">
+						{ decodeURI( samplePermalink ) }
+					</Button>
+				}
+
+				{ // When we're editing the permalink, show the edit form.
+					editingPermalink &&
+					<form
+						className="editor-post-permalink__edit-form"
+						onSubmit={ this.onSavePermalink }>
+						<span className="editor-post-permalink__prefix">
+							{ samplePermalinkPrefix }
+						</span>
+						<input
+							type="text"
+							className="editor-post-permalink__edit"
+							defaultValue={ postName }
+							onChange={ ( e ) => this.setState( { editedPostName: e.target.value } ) }
+							required
+						/>
+						<span className="editor-post-permalink__suffix">
+							{ samplePermalinkSuffix }
+						</span>
+						<Button
+							className="editor-post-permalink__save button"
+							onClick={ this.onSavePermalink }
+						>
+							{ __( 'Ok' ) }
+						</Button>
+					</form>
+				}
+
+				{ // When the site has pretty permalinks, and we're not currently editing, show the Edit button.
+					permalinkStructure && ! editingPermalink &&
+					<Button
+						className="editor-post-permalink__edit button"
+						onClick={ () => this.setState( { editingPermalink: true } ) }
+					>
+						{ __( 'Edit' ) }
+					</Button>
+				}
+
+				{ // When the site doesn't have pretty permalinks, show a button to enable them.
+					! permalinkStructure &&
 					<Button
 						className="editor-post-permalink__change button"
 						href={ getWPAdminURL( 'options-permalink.php' ) }
@@ -99,11 +158,14 @@ export default connect(
 	( state ) => {
 		return {
 			isNew: isEditedPostNew( state ),
-			link: getEditedPostAttribute( state, 'link' ),
+			previewLink: getEditedPostPreviewLink( state ),
 			samplePermalinkData: getEditedPostAttribute( state, 'sample_permalink' ),
 
 			permalinkStructure: window.wpApiSettings.schema.permalink_structure,
 		};
+	},
+	{
+		editPost,
 	}
 )( PostPermalink );
 
