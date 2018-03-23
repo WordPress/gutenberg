@@ -73,5 +73,23 @@ describe( 'Store', () => {
 			// the block below it should be the title now
 			expect( newState.blocks[ 1 ].blockType ).toEqual( 'title' );
 		} );
+
+		it( 'should not be able to move bottom block down', () => {
+			const newState = reducer( initialState, actions.moveBlockDownAction( 1 ) );
+
+			// blocks should still be in the same places
+			expect( newState.blocks[ 0 ].blockType ).toEqual( 'title' );
+			expect( newState.blocks[ 1 ].blockType ).toEqual( 'paragraph' );
+		} );
+
+		it( 'should move a block down', () => {
+			let newState = reducer( initialState, actions.moveBlockDownAction( 0 ) );
+
+			// the paragraph block should be at the top now
+			expect( newState.blocks[ 0 ].blockType ).toEqual( 'paragraph' );
+
+			// the title block should have moved down
+			expect( newState.blocks[ 1 ].blockType ).toEqual( 'title' );
+		} );
 	} );
 } );
