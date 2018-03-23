@@ -55,5 +55,13 @@ describe( 'Store', () => {
 			// the other block should have its variable set to false
 			expect( newState.blocks[ 0 ].focused ).toEqual( false );
 		} );
+
+		it( 'should not be able to move top block up', () => {
+			const newState = reducer( initialState, actions.moveBlockUpAction( 0 ) );
+
+			// blocks should still be in the same places
+			expect( newState.blocks[ 0 ].blockType ).toEqual( 'title' );
+			expect( newState.blocks[ 1 ].blockType ).toEqual( 'paragraph' );
+		} );
 	} );
 } );
