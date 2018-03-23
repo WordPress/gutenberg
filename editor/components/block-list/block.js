@@ -26,7 +26,7 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { withFilters, withContext, Draggable } from '@wordpress/components';
+import { withFilters, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -43,6 +43,7 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
+import BlockDraggable from './block-draggable';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
@@ -477,26 +478,7 @@ export class BlockListBlock extends Component {
 				...blockType.getEditWrapperProps( block.attributes ),
 			};
 		}
-
-		const blockDragInsetClassName = classnames( 'editor-block-list__block-drag-inset', {
-			'is-visible': dragging,
-		} );
-
-		// Draggable props
-		const transferData = {
-			type: 'block',
-			rootUID: rootUID,
-			fromIndex: order,
-			uid: block.uid,
-			layout,
-		};
 		const blockElementId = `block-${ this.props.uid }`;
-		const draggableProps = {
-			onDragStart: this.onDragStart,
-			onDragEnd: this.onDragEnd,
-			elementId: blockElementId,
-			transferData,
-		};
 
 		// Disable reasons:
 		//
@@ -526,9 +508,18 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				<Draggable className={ blockDragInsetClassName } { ...draggableProps }>
-					<div className="inner" ></div>
-				</Draggable>
+				{ ! isMultiSelected && (
+					<BlockDraggable
+						rootUID={ rootUID }
+						index={ order }
+						uid={ block.uid }
+						layout={ layout }
+						onDragStart={ this.onDragStart }
+						onDragEnd={ this.onDragEnd }
+						isDragging={ dragging }
+						elementId={ blockElementId }
+					/>
+				) }
 
 				<BlockDropZone
 					index={ order }
@@ -536,24 +527,20 @@ export class BlockListBlock extends Component {
 					layout={ layout }
 				/>
 				{ shouldShowMovers && (
-					<Draggable { ...draggableProps }>
-						<BlockMover
-							uids={ [ block.uid ] }
-							rootUID={ rootUID }
-							layout={ layout }
-							isFirst={ isFirst }
-							isLast={ isLast }
-						/>
-					</Draggable>
+					<BlockMover
+						uids={ [ block.uid ] }
+						rootUID={ rootUID }
+						layout={ layout }
+						isFirst={ isFirst }
+						isLast={ isLast }
+					/>
 				) }
 				{ shouldShowSettingsMenu && ! showSideInserter && (
-					<Draggable { ...draggableProps }>
-						<BlockSettingsMenu
-							uids={ [ block.uid ] }
-							rootUID={ rootUID }
-							renderBlockMenu={ renderBlockMenu }
-						/>
-					</Draggable>
+					<BlockSettingsMenu
+						uids={ [ block.uid ] }
+						rootUID={ rootUID }
+						renderBlockMenu={ renderBlockMenu }
+					/>
 				) }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
