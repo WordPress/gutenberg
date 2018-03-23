@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { noop } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress Dependencies
@@ -18,12 +19,6 @@ const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
 const cloneHeightTransformationBreakpoint = 700;
 const clonePadding = 20;
-const context = {
-	cloneNodeId: null,
-	elementId: null,
-	cursorTop: null,
-	cursorLeft: null,
-};
 
 class Draggable extends Component {
 	constructor() {
@@ -42,7 +37,6 @@ class Draggable extends Component {
 		this.removeDragClone();
 		// Reset cursor.
 		document.body.classList.remove( 'dragging' );
-		document.removeEventListener( 'dragover', this.onDragOver );
 		event.stopPropagation();
 		event.preventDefault();
 
@@ -54,16 +48,14 @@ class Draggable extends Component {
 	 * @param  {Object} event     The non-custom DragEvent.
 	 */
 	onDragOver( event ) {
-		const cloneWrapper = document.getElementById( context.cloneNodeId );
-
-		cloneWrapper.style.top =
-			`${ parseInt( cloneWrapper.style.top, 10 ) + event.clientY - context.cursorTop }px`;
-		cloneWrapper.style.left =
-			`${ parseInt( cloneWrapper.style.left, 10 ) + event.clientX - context.cursorLeft }px`;
+		this.cloneWrapper.style.top =
+			`${ parseInt( this.cloneWrapper.style.top, 10 ) + event.clientY - this.cursorTop }px`;
+		this.cloneWrapper.style.left =
+			`${ parseInt( this.cloneWrapper.style.left, 10 ) + event.clientX - this.cursorLeft }px`;
 
 		// Update cursor coordinates.
-		context.cursorLeft = event.clientX;
-		context.cursorTop = event.clientY;
+		this.cursorLeft = event.clientX;
+		this.cursorTop = event.clientY;
 	}
 
 	/**
@@ -83,15 +75,11 @@ class Draggable extends Component {
 		const elementTopOffset = parseInt( elementRect.top, 10 );
 		const elementLeftOffset = parseInt( elementRect.left, 10 );
 		const clone = element.cloneNode( true );
-		const cloneWrapper = document.createElement( 'div' );
 		const dragImage = document.createElement( 'div' );
-
-		context.elementId = elementId;
-		context.cloneNodeId = `clone-wrapper-${ elementId }`;
 
 		// Set a fake drag image to avoid browser defaults. Remove from DOM right after.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
-			dragImage.id = `drag-image-${ context.elementId }`;
+			dragImage.id = `drag-image-${ elementId }`;
 			dragImage.classList.add( dragImageClass );
 			document.body.appendChild( dragImage );
 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
@@ -103,30 +91,30 @@ class Draggable extends Component {
 		event.dataTransfer.setData( 'text', JSON.stringify( transferData ) );
 
 		// Prepare element clone and append to element wrapper.
-		clone.id = `clone-${ context.elementId }`;
-		cloneWrapper.id = context.cloneNodeId;
-		cloneWrapper.classList.add( cloneWrapperClass );
-		cloneWrapper.style.width = `${ elementRect.width + ( clonePadding * 2 ) }px`;
+		clone.id = `clone-${ elementId }`;
+		this.cloneWrapper = document.createElement( 'div' );
+		this.cloneWrapper.classList.add( cloneWrapperClass );
+		this.cloneWrapper.style.width = `${ elementRect.width + ( clonePadding * 2 ) }px`;
 
 		if ( elementRect.height > cloneHeightTransformationBreakpoint ) {
 			// Scale down clone if original element is larger than 700px.
-			cloneWrapper.style.transform = 'scale(0.5)';
-			cloneWrapper.style.transformOrigin = 'top left';
+			this.cloneWrapper.style.transform = 'scale(0.5)';
+			this.cloneWrapper.style.transformOrigin = 'top left';
 			// Position clone near the cursor.
-			cloneWrapper.style.top = `${ event.clientY - 100 }px`;
-			cloneWrapper.style.left = `${ event.clientX }px`;
+			this.cloneWrapper.style.top = `${ event.clientY - 100 }px`;
+			this.cloneWrapper.style.left = `${ event.clientX }px`;
 		} else {
 			// Position clone right over the original element (20px padding).
-			cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
-			cloneWrapper.style.left = `${ elementLeftOffset - clonePadding }px`;
+			this.cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
+			this.cloneWrapper.style.left = `${ elementLeftOffset - clonePadding }px`;
 		}
 
-		cloneWrapper.appendChild( clone );
-		elementWrapper.appendChild( cloneWrapper );
+		this.cloneWrapper.appendChild( clone );
+		elementWrapper.appendChild( this.cloneWrapper );
 
 		// Mark the current cursor coordinates.
-		context.cursorLeft = event.clientX;
-		context.cursorTop = event.clientY;
+		this.cursorLeft = event.clientX;
+		this.cursorTop = event.clientY;
 		// Update cursor to 'grabbing', document wide.
 		document.body.classList.add( 'dragging' );
 		document.addEventListener( 'dragover', this.onDragOver );
@@ -140,21 +128,19 @@ class Draggable extends Component {
 	}
 
 	removeDragClone() {
-		const cloneWrapper = document.getElementById( context.cloneNodeId );
-
-		if ( cloneWrapper ) {
+		document.removeEventListener( 'dragover', this.onDragOver );
+		if ( this.cloneWrapper && this.cloneWrapper.parentElement ) {
 			// Remove clone.
-			cloneWrapper.parentElement.removeChild( cloneWrapper );
-			context.elementId = null;
-			context.cloneNodeId = null;
+			this.cloneWrapper.remove();
+			this.cloneWrapper = null;
 		}
 	}
 
 	render() {
-		const { children } = this.props;
+		const { children, className } = this.props;
 		return (
 			<div
-				className="components-draggable"
+				className={ classnames( 'components-draggable', className ) }
 				onDragStart={ this.onDragStart }
 				onDragEnd={ this.onDragEnd }
 				draggable

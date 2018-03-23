@@ -1,9 +1,6 @@
-.components-draggable__clone {
-	.editor-block-list__block-drag-inset .inner {
-		visibility: visible;
-		background: white !important;
-		box-shadow: $shadow-popover;
-	}
+.components-draggable__clone .editor-block-list__block-drag-inset {
+	background: white;
+	box-shadow: $shadow-popover;
 }
 
 .editor-block-list__block-drag-inset {

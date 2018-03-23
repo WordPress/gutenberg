@@ -526,9 +526,9 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
-				<div className={ blockDragInsetClassName }>
+				<Draggable className={ blockDragInsetClassName } { ...draggableProps }>
 					<div className="inner" ></div>
-				</div>
+				</Draggable>
 
 				<BlockDropZone
 					index={ order }
