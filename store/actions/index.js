@@ -1,21 +1,22 @@
 /** @format */
+import ActionTypes from './ActionTypes';
 
 export const focusBlockAction = index => ( {
-	type: 'BLOCK_FOCUS_ACTION',
+	type: ActionTypes.BLOCK.FOCUS,
 	rowId: index,
 } );
 
 export const moveBlockUpAction = index => ( {
-	type: 'BLOCK_MOVE_UP_ACTION',
+	type: ActionTypes.BLOCK.MOVE_UP,
 	rowId: index,
 } );
 
 export const moveBlockDownAction = index => ( {
-	type: 'BLOCK_MOVE_DOWN_ACTION',
+	type: ActionTypes.BLOCK.MOVE_DOWN,
 	rowId: index,
 } );
 
 export const deleteBlockAction = index => ( {
-	type: 'BLOCK_DELETE_ACTION',
+	type: ActionTypes.BLOCK.DELETE,
 	rowId: index,
 } );

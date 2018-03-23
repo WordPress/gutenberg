@@ -1,0 +1,10 @@
+/** @format */
+
+export default {
+	BLOCK: {
+		FOCUS: 'BLOCK_FOCUS_ACTION',
+		MOVE_UP: 'BLOCK_MOVE_UP_ACTION',
+		MOVE_DOWN: 'BLOCK_MOVE_DOWN_ACTION',
+		DELETE_ACTION: 'BLOCK_DELETE_ACTION',
+	},
+};
