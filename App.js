@@ -5,7 +5,6 @@ import { Provider } from 'react-redux';
 import { setupStore } from './store';
 import AppContainer from './AppContainer';
 
-debugger;
 const store = setupStore();
 
 export default () => (
