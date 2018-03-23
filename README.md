@@ -160,7 +160,24 @@ How all changes come from our needs, we decided to add a new object with a range
 
 ```
 cons customGutenberg = {
-	categories: [ ... ] // array of available blocks categories
+	categories: [ 
+		{ slug: 'common', title: 'Common blocks' }
+	],
+	tabs: [
+		{
+			options: { name: 'blocks', title: 'Blocks', className: 'editor-inserter__tab' },
+			tabScrollTop: 0, //
+			getItemsForTab() { // if not set, frecentItems will be called
+				return ( item ) => item.category !== 'embed' && item.category !== 'shared';
+			},
+			sortItems(items, state) { // if not set, items will be sort by category
+				return items; // to render 
+			},
+			renderTabView(items) { // if not set, tabs will show items by category
+				return items; // to render items without category headers
+			}
+		}
+	]
 };
 ```
 

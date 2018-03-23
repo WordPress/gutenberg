@@ -15,21 +15,26 @@ const tabs = [
 			title: __( 'Frequent' ),
 			className: 'editor-inserter__tab',
 		},
-		tabScrollTop: 0
-		
+		tabScrollTop: 0,
+		sortItems(items, state) {
+			if (!state.filterValue) {
+				return items;
+			}
+		},
+		renderTabView(items) {
+			return items;
+		}
 	},
-	// {
-	// 	name: 'rows',
-	// 	title: __( 'Rows' ),
-	// 	className: 'editor-inserter__tab',
-	// },
 	{
 		options: {
 			name: 'blocks',
 			title: __( 'Blocks' ),
 			className: 'editor-inserter__tab',
 		},
-		tabScrollTop: 0
+		tabScrollTop: 0,
+		getItemsForTab() {
+			return ( item ) => item.category !== 'embed' && item.category !== 'shared';
+		}
 		
 	},
 	{
@@ -38,14 +43,19 @@ const tabs = [
 			title: __( 'Embeds' ),
 			className: 'editor-inserter__tab',
 		},
-		tabScrollTop: 0
-		
+		tabScrollTop: 0,
+		getItemsForTab() {
+			return ( item ) => item.category === 'embed';
+		}
 	},
 	{
 		options: {
 			name: 'shared',
 			title: __( 'Shared' ),
 			className: 'editor-inserter__tab',
+		},
+		getItemsForTab() {
+			return ( item ) => item.category === 'shared'; 
 		}
 	},
 ];
@@ -61,4 +71,31 @@ export function getTabs() {
 	}
 
 	return tabs;
+}
+
+/**
+ * Returns the default tab which should be display first.
+ *
+ * @return {Object} tab.
+ */
+export function getDefaultTab() {
+	const tabs = getTabs();
+	const tab = tabs.filter(tab => tab.default );
+
+	return tab.length ? tab[0] : tabs[0];
+}
+
+/**
+ * Returns tab by its name.
+ *
+ * @return {Object} tab.
+ */
+export function getTabByName(name) {
+	return getTabs().reduce((res, tab) => {
+		if (tab.options.name == name){
+			res = tab;
+		}
+
+		return res;
+	}, { });
 }

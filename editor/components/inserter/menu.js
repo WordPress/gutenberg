@@ -26,7 +26,7 @@ import {
 	withSpokenMessages,
 	withContext,
 } from '@wordpress/components';
-import { getCategories, isReusableBlock, getTabs } from '@wordpress/blocks';
+import { getCategories, isReusableBlock, getTabs, getTabByName, getDefaultTab } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -61,7 +61,7 @@ export class InserterMenu extends Component {
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			tab: this.tabs[0].options.name,
+			tab: getDefaultTab().options.name,
 			selectedItem: null,
 		};
 		this.filter = this.filter.bind( this );
@@ -70,13 +70,13 @@ export class InserterMenu extends Component {
 		this.sortItems = this.sortItems.bind( this );
 		this.selectItem = this.selectItem.bind( this );
 
-		this.tabScrollTop = this.tabs.reduce((tabs, tab) => {
+		this.tabScrollTop = this.tabs.reduce( (res, tab) => {
 			if (tab.tabScrollTop != undefined) {
-				tabs[tab.options.name] = tab.tabScrollTop;
+				res[tab.options.name] = tab.tabScrollTop;
 			}
 
-			return tabs;
-		}; // { rows: 0, blocks: 0, embeds: 0 };
+			return res;
+		}, { });
 		this.switchTab = this.switchTab.bind( this );
 		this.previewItem = this.previewItem.bind( this );
 	}
@@ -133,33 +133,21 @@ export class InserterMenu extends Component {
 		}
 
 		let predicate;
-		switch ( tab ) {
-			// case 'frequent':
-			// 	return frecentItems;
-
-			case 'rows':
-				predicate = ( item ) => item.category === 'rows';
-				break;			
-			case 'blocks':
-				predicate = ( item ) => item.category !== 'embed' && item.category !== 'shared' && item.category !== 'rows';
-				break;
-
-			// case 'embeds':
-			// 	predicate = ( item ) => item.category === 'embed';
-			// 	break;
-
-			// case 'shared':
-			// 	predicate = ( item ) => item.category === 'shared';
-			// 	break;
+		const tabObj = getTabByName(tab);
+		if (typeof tabObj.getItemsForTab === 'function') {
+			predicate = tabObj.getItemsForTab();
+		} else {
+			return frecentItems;
 		}
 
 		return filter( items, predicate );
 	}
 
 	sortItems( items ) {
-		// if ( 'frequent' === this.state.tab && ! this.state.filterValue ) {
-		// 	return items;
-		// }
+		const tabObj = getTabByName(this.state.tab);
+		if (typeof tabObj.sortItems === 'function') {
+			return tabObj.sortItems(items, this.state);
+		}
 
 		const getCategoryIndex = ( item ) => {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
@@ -230,18 +218,17 @@ export class InserterMenu extends Component {
 	renderTabView( tab ) {
 		const itemsForTab = this.getItemsForTab( tab );
 
-		// If the Frequent tab is selected, don't render category headers
-		if ( 'rows' === tab ) {
-			return this.renderItems( itemsForTab );
-		}
-
-		// If the Shared tab is selected and we have no results, display a friendly message
-		if ( 'shared' === tab && itemsForTab.length === 0 ) {
+		if (itemsForTab.length === 0) {
 			return (
 				<NoBlocks>
-					{ __( 'No shared blocks.' ) }
+					{ __( `No ${tab} blocks.` ) }
 				</NoBlocks>
 			);
+		}
+
+		const tabObj = getTabByName(tab);
+		if (typeof tabObj.renderTabView === 'function') {
+			return this.renderItems(tabObj.renderTabView(itemsForTab));
 		}
 
 		const visibleItemsByCategory = this.getVisibleItemsByCategory( itemsForTab );
@@ -305,33 +292,7 @@ export class InserterMenu extends Component {
 				{ ! isSearching &&
 					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
 						onSelect={ this.switchTab }
-						tabs={ tabs /* [
-							// {
-							// 	name: 'frequent',
-							// 	title: __( 'Frequent' ),
-							// 	className: 'editor-inserter__tab',
-							// },
-							{
-								name: 'rows',
-								title: __( 'Rows' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'blocks',
-								title: __( 'Blocks' ),
-								className: 'editor-inserter__tab',
-							},
-							// {
-							// 	name: 'embeds',
-							// 	title: __( 'Embeds' ),
-							// 	className: 'editor-inserter__tab',
-							// },
-							// {
-							// 	name: 'shared',
-							// 	title: __( 'Shared' ),
-							// 	className: 'editor-inserter__tab',
-							// },
-						] */ }
+						tabs={ this.tabs.map(tab => tab.options) }
 					>
 						{ ( tabKey ) => (
 							<div ref={ ( ref ) => this.tabContainer = ref }>
