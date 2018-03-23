@@ -3,7 +3,7 @@
 exports[`MenuItemsItem should match snapshot when all props provided 1`] = `
 <IconButton
   aria-pressed={true}
-  className="components-menu-items__button my-class is-selected"
+  className="components-menu-items__button my-class has-icon"
   icon="wordpress"
   onClick={[Function]}
 >

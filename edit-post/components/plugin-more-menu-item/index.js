@@ -7,15 +7,9 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
-import { Slot, Fill, withContext, MenuItemsGroup } from '@wordpress/components';
+import { Slot, Fill, withContext, MenuItemsGroup, MenuItemsItem } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import './style.scss';
-import MoreMenuItemLayout from './more-menu-item-layout';
 
 /**
  * Name of slot in which the sidebar should fill.
@@ -24,19 +18,20 @@ import MoreMenuItemLayout from './more-menu-item-layout';
  */
 const SLOT_NAME = 'PluginMoreMenuItem';
 
-function PluginMoreMenuItem( { title, onClick, icon, isActive } ) {
+function PluginMoreMenuItem( { label, onClick, icon, isSelected } ) {
 	return (
 		<Fill name={ SLOT_NAME }>
 			{ ( props ) => {
 				return (
-					<MoreMenuItemLayout
-						isActive={ isActive }
-						title={ title }
+					<MenuItemsItem
+						icon={ isSelected ? 'yes' : icon }
+						isSelected={ isSelected }
+						label={ label }
 						onClick={ () => {
 							onClick();
 							props.onClose();
 						} }
-						icon={ icon } />
+					/>
 				);
 			} }
 		</Fill>
@@ -50,11 +45,11 @@ PluginMoreMenuItem = compose( [
 		};
 	} ),
 	withSelect( ( select, { target } ) => ( {
-		isActive: select( 'core/edit-post' ).getActiveGeneralSidebarName() === target,
+		isSelected: select( 'core/edit-post' ).getActiveGeneralSidebarName() === target,
 	} ) ),
-	withDispatch( ( dispatch, { type, target, isActive } ) => {
+	withDispatch( ( dispatch, { type, target, isSelected } ) => {
 		let onClick = noop;
-		if ( isActive ) {
+		if ( isSelected ) {
 			onClick = dispatch( 'core/edit-post' ).closeGeneralSidebar;
 		} else {
 			switch ( type ) {

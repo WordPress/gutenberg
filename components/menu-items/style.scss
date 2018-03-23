@@ -16,11 +16,17 @@
 	padding-left: 25px;
 	color: $dark-gray-500;
 
-	.dashicon {
+	.dashicon,
+	.components-menu-items__item-icon {
 		margin-right: 5px;
 	}
 
-	&.is-selected {
+	.components-menu-items__item-icon {
+		display: inline-block;
+		flex: 0 0 auto;
+	}
+
+	&.has-icon {
 		padding-left: 0;
 	}
 

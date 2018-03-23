@@ -2,6 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isString } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { cloneElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,10 +25,18 @@ import './style.scss';
 function MenuItemsItem( { className, icon, label, onClick, shortcut, isSelected = false } ) {
 	className = classnames( 'components-menu-items__button', {
 		[ className ]: Boolean( className ),
-		'is-selected': isSelected,
+		'has-icon': Boolean( icon ),
 	} );
 
 	if ( icon ) {
+		if ( ! isString( icon ) ) {
+			icon = cloneElement( icon, {
+				className: 'components-menu-items__item-icon',
+				height: 20,
+				width: 20,
+			} );
+		}
+
 		return (
 			<IconButton
 				className={ className }
