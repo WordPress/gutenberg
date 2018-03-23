@@ -23,6 +23,7 @@ class PostPermalink extends Component {
 		super( ...arguments );
 
 		this.state = {
+			iconClass: '',
 			samplePermalink: '',
 			samplePermalinkPrefix: '',
 			samplePermalinkSuffix: '',
@@ -79,6 +80,7 @@ class PostPermalink extends Component {
 	render() {
 		const { isNew, previewLink, permalinkStructure } = this.props;
 		const {
+			iconClass,
 			samplePermalink,
 			samplePermalinkPrefix,
 			samplePermalinkSuffix,
@@ -93,10 +95,12 @@ class PostPermalink extends Component {
 		return (
 			<div className="editor-post-permalink">
 				<ClipboardButton
+					className="editor-post-permalink__copy"
 					text={ samplePermalink }
 					title={ __( 'Copy the permalink to your clipboard.' ) }
+					onCopy={ () => this.setState( { iconClass: 'copied' } ) }
 				>
-					<Dashicon icon="admin-links" />
+					<Dashicon icon="admin-links" className={ iconClass } />
 				</ClipboardButton>
 
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
