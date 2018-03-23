@@ -87,7 +87,7 @@ export class BlockListBlock extends Component {
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
-		this.reorderBlock = this.reorderBlock.bind( this );
+		this.onDropBlock = this.onDropBlock.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
@@ -412,8 +412,7 @@ export class BlockListBlock extends Component {
 	 *    - We call the dragEnd handler here to ensure the dropzone does not prevent this call.
 	 *  - Initiate reordering.
 	 */
-	reorderBlock( event, rootUID, uid, toIndex ) {
-		this.onDragEnd( event );
+	onDropBlock( rootUID, uid, toIndex ) {
 		this.props.moveBlockToIndex( rootUID, uid, toIndex );
 	}
 
@@ -548,7 +547,7 @@ export class BlockListBlock extends Component {
 					index={ order }
 					rootUID={ rootUID }
 					layout={ layout }
-					onDrop={ this.reorderBlock }
+					onDropBlock={ this.onDropBlock }
 				/>
 				{ shouldShowMovers && (
 					<Draggable { ...draggableProps }>

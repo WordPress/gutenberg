@@ -53,7 +53,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		}
 	};
 
-	const reorderBlock = ( event, position ) => {
+	const onDrop = ( event, position ) => {
 		if ( index === undefined || ! event.dataTransfer ) {
 			return;
 		}
@@ -67,16 +67,16 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		}
 
 		if ( type !== 'block' || layout !== props.layout ) {
-			props.onDrop( event, null, null, null );
+			props.onDropBlock( null, null, null );
 			return;
 		}
 
 		if ( position.y === 'top' && index > fromIndex ) {
-			props.onDrop( event, rootUID, uid, index - 1 );
+			props.onDropBlock( rootUID, uid, index - 1 );
 		} else if ( position.y === 'bottom' && index < fromIndex ) {
-			props.onDrop( event, rootUID, uid, index + 1 );
+			props.onDropBlock( rootUID, uid, index + 1 );
 		} else {
-			props.onDrop( event, rootUID, uid, index );
+			props.onDropBlock( rootUID, uid, index );
 		}
 	};
 
@@ -84,7 +84,7 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		<DropZone
 			onFilesDrop={ onDropFiles }
 			onHTMLDrop={ onHTMLDrop }
-			onDrop={ reorderBlock }
+			onDrop={ onDrop }
 		/>
 	);
 }

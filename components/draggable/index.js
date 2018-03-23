@@ -55,7 +55,7 @@ class Draggable extends Component {
 		event.stopPropagation();
 		event.preventDefault();
 
-		onDragEnd();
+		this.props.setTimeout( onDragEnd );
 	}
 
 	/*
