@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import './style.scss';
-import MenuItemsToggle from './toggle';
+import MenuItemsItem from './item';
 
 export default function MenuItemsChoice( {
 	choices = [],
@@ -12,8 +12,9 @@ export default function MenuItemsChoice( {
 	return choices.map( ( item ) => {
 		const isSelected = value === item.value;
 		return (
-			<MenuItemsToggle
+			<MenuItemsItem
 				key={ item.value }
+				icon={ isSelected && 'yes' }
 				label={ item.label }
 				isSelected={ isSelected }
 				shortcut={ item.shortcut }

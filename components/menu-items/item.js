@@ -12,11 +12,11 @@ import IconButton from '../icon-button';
 import './style.scss';
 
 /**
- * Renders the more menu item.
+ * Renders a generic menu item for use inside the more menu.
  *
  * @return {WPElement} More menu item.
  */
-function MenuItemsItem( { className, icon, isSelected = false, label, onClick, shortcut } ) {
+function MenuItemsItem( { className, icon, label, onClick, shortcut, isSelected = false } ) {
 	className = classnames( 'components-menu-items__button', {
 		[ className ]: Boolean( className ),
 		'is-selected': isSelected,
