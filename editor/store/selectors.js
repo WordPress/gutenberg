@@ -217,6 +217,17 @@ export function getEditedPostVisibility( state ) {
 }
 
 /**
+ * Returns true if post is pending review.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether current post is pending review.
+ */
+export function isCurrentPostPending( state ) {
+	return getCurrentPost( state ).status === 'pending';
+}
+
+/**
  * Return true if the current post has already been published.
  *
  * @param {Object} state Global application state.
@@ -228,6 +239,17 @@ export function isCurrentPostPublished( state ) {
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
 		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+}
+
+/**
+ * Returns true if post is already scheduled.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether current post is scheduled to be posted.
+ */
+export function isCurrentPostScheduled( state ) {
+	return getCurrentPost( state ).status === 'future' && ! isCurrentPostPublished( state );
 }
 
 /**

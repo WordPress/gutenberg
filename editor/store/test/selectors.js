@@ -30,7 +30,9 @@ const {
 	getDocumentTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
+	isCurrentPostPending,
 	isCurrentPostPublished,
+	isCurrentPostScheduled,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
 	isEditedPostEmpty,
@@ -587,6 +589,36 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isCurrentPostPending', () => {
+		it( 'should return true for posts in pending state', () => {
+			const state = {
+				currentPost: {
+					status: 'pending',
+				},
+			};
+
+			expect( isCurrentPostPending( state ) ).toBe( true );
+		} );
+
+		it( 'should return false for draft posts', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+			};
+
+			expect( isCurrentPostPending( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if status is unknown', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( isCurrentPostPending( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isCurrentPostPublished', () => {
 		it( 'should return true for public posts', () => {
 			const state = {
@@ -627,6 +659,58 @@ describe( 'selectors', () => {
 			};
 
 			expect( isCurrentPostPublished( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isCurrentPostScheduled', () => {
+		it( 'should return true for posts with status future', () => {
+			const state = {
+				currentPost: {
+					status: 'future',
+				},
+			};
+
+			expect( isCurrentPostScheduled( state ) ).toBe( true );
+		} );
+
+		it( 'should return true for future scheduled posts', () => {
+			const state = {
+				currentPost: {
+					status: 'future',
+					date: '2100-05-30T17:21:39',
+				},
+			};
+
+			expect( isCurrentPostScheduled( state ) ).toBe( true );
+		} );
+
+		it( 'should return false for old scheduled posts that were already published', () => {
+			const state = {
+				currentPost: {
+					status: 'future',
+					date: '2016-05-30T17:21:39',
+				},
+			};
+
+			expect( isCurrentPostScheduled( state ) ).toBe( false );
+		} );
+
+		it( 'should return false for auto draft posts', () => {
+			const state = {
+				currentPost: {
+					status: 'auto-draft',
+				},
+			};
+
+			expect( isCurrentPostScheduled( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if status is unknown', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( isCurrentPostScheduled( state ) ).toBe( false );
 		} );
 	} );
 
