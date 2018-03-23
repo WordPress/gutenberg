@@ -34,11 +34,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		var blocks = this.props.blocks;
 		switch ( button ) {
 			case ToolbarButton.UP:
-				if ( index == 0 ) return;
 				this.props.moveBlockUpAction( index );
 				break;
 			case ToolbarButton.DOWN:
-				if ( index == blocks.length - 1 ) return;
 				this.props.moveBlockDownAction( index );
 				break;
 			case ToolbarButton.DELETE:
