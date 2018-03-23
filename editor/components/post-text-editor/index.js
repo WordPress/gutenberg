@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
+import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -18,41 +18,45 @@ import { getEditedPostContent } from '../../store/selectors';
 import { editPost, resetBlocks, checkTemplateValidity } from '../../store/actions';
 
 class PostTextEditor extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 
-		this.onChange = this.onChange.bind( this );
-		this.onPersist = this.onPersist.bind( this );
+		this.handleFocus = this.handleFocus.bind( this );
+		this.handleChange = this.handleChange.bind( this );
+		this.handleBlur = this.handleBlur.bind( this );
 
 		this.state = {
-			initialValue: props.value,
+			value: null,
+			isDirty: false,
 		};
 	}
 
-	onChange( event ) {
-		this.props.onChange( event.target.value );
+	handleFocus() {
+		this.setState( { value: this.props.value } );
 	}
 
-	onPersist( event ) {
-		const { value } = event.target;
-		if ( value !== this.state.initialValue ) {
-			this.props.onPersist( value );
+	handleChange( event ) {
+		const value = event.target.value;
+		this.props.onChange( value );
+		this.setState( { value, isDirty: true } );
+	}
 
-			this.setState( {
-				initialValue: value,
-			} );
+	handleBlur() {
+		if ( this.state.isDirty ) {
+			this.props.onPersist( this.state.value );
 		}
+
+		this.setState( { value: null, isDirty: false } );
 	}
 
 	render() {
-		const { value } = this.props;
-
 		return (
 			<Textarea
 				autoComplete="off"
-				value={ value }
-				onChange={ this.onChange }
-				onBlur={ this.onPersist }
+				value={ this.state.value || this.props.value }
+				onFocus={ this.handleFocus }
+				onChange={ this.handleChange }
+				onBlur={ this.handleBlur }
 				className="editor-post-text-editor"
 			/>
 		);
