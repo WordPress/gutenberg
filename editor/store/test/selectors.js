@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
 import { filter, property, union } from 'lodash';
 
 /**
@@ -9,6 +8,7 @@ import { filter, property, union } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { registerBlockType, unregisterBlockType, registerCoreBlocks, getBlockTypes } from '@wordpress/blocks';
+import { moment } from '@wordpress/date';
 
 /**
  * Internal dependencies
