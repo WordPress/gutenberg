@@ -31,6 +31,7 @@ import { combineReducers } from '@wordpress/data';
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
 import { PREFERENCES_DEFAULTS } from './defaults';
+import { insertAt, moveTo } from './array';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -317,6 +318,18 @@ export const editor = flow( [
 					},
 				};
 
+			case 'MOVE_BLOCK_TO_POSITION':
+				return {
+					...state,
+					[ action.uid ]: {
+						...state[ action.uid ],
+						attributes: {
+							...state[ action.uid ].attributes,
+							layout: action.layout,
+						},
+					},
+				};
+
 			case 'UPDATE_BLOCK':
 				// Ignore updates if block isn't known
 				if ( ! state[ action.uid ] ) {
@@ -391,57 +404,41 @@ export const editor = flow( [
 
 			case 'INSERT_BLOCKS': {
 				const { rootUID = '', blocks } = action;
-
 				const subState = state[ rootUID ] || [];
 				const mappedBlocks = mapBlockOrder( blocks, rootUID );
-
 				const { index = subState.length } = action;
 
 				return {
 					...state,
 					...mappedBlocks,
-					[ rootUID ]: [
-						...subState.slice( 0, index ),
-						...mappedBlocks[ rootUID ],
-						...subState.slice( index ),
-					],
+					[ rootUID ]: insertAt( subState, mappedBlocks[ rootUID ], index ),
 				};
 			}
 
-			case 'MOVE_BLOCK_TO_INDEX': {
-				const { rootUID = '' } = action;
-				const subState = state[ rootUID ];
+			case 'MOVE_BLOCK_TO_POSITION': {
+				const { fromRootUID = '', toRootUID = '', uid, index } = action;
 
-				if ( ! Number.isInteger( action.index ) || ! subState.length ) {
-					return state;
+				// Moving inside the same parent block
+				if ( fromRootUID === toRootUID ) {
+					const subState = state[ toRootUID ];
+					const fromIndex = subState.indexOf( uid );
+					return {
+						...state,
+						[ toRootUID ]: moveTo( state[ toRootUID ], fromIndex, index ),
+					};
 				}
 
-				const blockIndex = subState.indexOf( action.uid );
-
-				if ( blockIndex === -1 || blockIndex === action.index ) {
-					return state;
-				}
-
-				if ( action.index < 0 ) {
-					action.index = 0;
-				} else if ( action.index >= subState.length ) {
-					action.index = subState.length - 1;
-				}
-
-				const nextSubState = [ ...subState ];
-
-				nextSubState.splice( action.index, 0, nextSubState.splice( blockIndex, 1 )[ 0 ] );
-
+				// Moving from a parent block to another
 				return {
 					...state,
-					[ rootUID ]: nextSubState,
+					[ fromRootUID ]: without( state[ fromRootUID ], uid ),
+					[ toRootUID ]: insertAt( state[ toRootUID ], uid, index ),
 				};
 			}
 
 			case 'MOVE_BLOCKS_UP': {
 				const { uids, rootUID = '' } = action;
 				const firstUid = first( uids );
-				const lastUid = last( uids );
 				const subState = state[ rootUID ];
 
 				if ( ! subState.length || firstUid === first( subState ) ) {
@@ -449,17 +446,10 @@ export const editor = flow( [
 				}
 
 				const firstIndex = subState.indexOf( firstUid );
-				const lastIndex = subState.indexOf( lastUid );
-				const swappedUid = subState[ firstIndex - 1 ];
 
 				return {
 					...state,
-					[ rootUID ]: [
-						...subState.slice( 0, firstIndex - 1 ),
-						...uids,
-						swappedUid,
-						...subState.slice( lastIndex + 1 ),
-					],
+					[ rootUID ]: moveTo( subState, firstIndex, firstIndex - 1, uids.length ),
 				};
 			}
 
@@ -474,17 +464,10 @@ export const editor = flow( [
 				}
 
 				const firstIndex = subState.indexOf( firstUid );
-				const lastIndex = subState.indexOf( lastUid );
-				const swappedUid = subState[ lastIndex + 1 ];
 
 				return {
 					...state,
-					[ rootUID ]: [
-						...subState.slice( 0, firstIndex ),
-						swappedUid,
-						...uids,
-						...subState.slice( lastIndex + 2 ),
-					],
+					[ rootUID ]: moveTo( subState, firstIndex, firstIndex + 1, uids.length ),
 				};
 			}
 

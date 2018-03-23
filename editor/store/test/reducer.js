@@ -903,7 +903,7 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_TO_INDEX',
+				type: 'MOVE_BLOCK_TO_POSITION',
 				uid: 'ribs',
 				index: 0,
 			} );
@@ -932,7 +932,7 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_TO_INDEX',
+				type: 'MOVE_BLOCK_TO_POSITION',
 				uid: 'ribs',
 				index: 2,
 			} );
@@ -961,7 +961,7 @@ describe( 'state', () => {
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'MOVE_BLOCK_TO_INDEX',
+				type: 'MOVE_BLOCK_TO_POSITION',
 				uid: 'ribs',
 				index: 1,
 			} );

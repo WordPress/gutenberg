@@ -19,7 +19,7 @@ import { compose } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { insertBlocks, updateBlockAttributes } from '../../store/actions';
+import { insertBlocks, updateBlockAttributes, moveBlockToPosition } from '../../store/actions';
 
 function BlockDropZone( { index, isLocked, ...props } ) {
 	if ( isLocked ) {
@@ -58,26 +58,20 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 			return;
 		}
 
-		let rootUID, uid, fromIndex, type, layout;
+		let uid, type, rootUID;
 
 		try {
-			( { rootUID, uid, fromIndex, type, layout } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
+			( { uid, type, rootUID } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
 		} catch ( err ) {
 			return;
 		}
 
-		if ( type !== 'block' || layout !== props.layout ) {
-			props.onDropBlock( null, null, null );
+		if ( type !== 'block' ) {
 			return;
 		}
 
-		if ( position.y === 'top' && index > fromIndex ) {
-			props.onDropBlock( rootUID, uid, index - 1 );
-		} else if ( position.y === 'bottom' && index < fromIndex ) {
-			props.onDropBlock( rootUID, uid, index + 1 );
-		} else {
-			props.onDropBlock( rootUID, uid, index );
-		}
+		const insertIndex = getInsertIndex( position );
+		props.moveBlockToPosition( uid, rootUID, insertIndex );
 	};
 
 	return (
@@ -112,8 +106,12 @@ export default compose(
 				updateBlockAttributes( ...args ) {
 					dispatch( updateBlockAttributes( ...args ) );
 				},
+				moveBlockToPosition( uid, fromRootUID, index ) {
+					const { rootUID, layout } = ownProps;
+					dispatch( moveBlockToPosition( uid, fromRootUID, rootUID, layout, index ) );
+				},
 			};
-		}
+		},
 	),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;

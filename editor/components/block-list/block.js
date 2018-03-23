@@ -56,7 +56,6 @@ import {
 	selectBlock,
 	updateBlockAttributes,
 	toggleSelection,
-	moveBlockToIndex,
 } from '../../store/actions';
 import {
 	getBlock,
@@ -87,7 +86,6 @@ export class BlockListBlock extends Component {
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
-		this.onDropBlock = this.onDropBlock.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
@@ -405,17 +403,6 @@ export class BlockListBlock extends Component {
 		this.setState( { dragging: false } );
 	}
 
-	/*
-	 * Reorder via Drag & Drop. Final step.
-	 * Strategy:
-	 *  - Call dragEnd handler.
-	 *    - We call the dragEnd handler here to ensure the dropzone does not prevent this call.
-	 *  - Initiate reordering.
-	 */
-	onDropBlock( rootUID, uid, toIndex ) {
-		this.props.moveBlockToIndex( rootUID, uid, toIndex );
-	}
-
 	selectOnOpen( open ) {
 		if ( open && ! this.props.isSelected ) {
 			this.props.onSelect();
@@ -547,7 +534,6 @@ export class BlockListBlock extends Component {
 					index={ order }
 					rootUID={ rootUID }
 					layout={ layout }
-					onDropBlock={ this.onDropBlock }
 				/>
 				{ shouldShowMovers && (
 					<Draggable { ...draggableProps }>
@@ -699,9 +685,6 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	},
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
-	},
-	moveBlockToIndex( rootUID, uid, index ) {
-		dispatch( moveBlockToIndex( rootUID, uid, index ) );
 	},
 } );
 

@@ -39,16 +39,7 @@ class Draggable extends Component {
 	 */
 	onDragEnd( event ) {
 		const { onDragEnd = noop } = this.props;
-		const element = document.getElementById( context.elementId );
-		const cloneWrapper = document.getElementById( context.cloneNodeId );
-
-		if ( element && cloneWrapper ) {
-			// Remove clone.
-			element.parentNode.removeChild( cloneWrapper );
-			context.elementId = null;
-			context.cloneNodeId = null;
-		}
-
+		this.removeDragClone();
 		// Reset cursor.
 		document.body.classList.remove( 'dragging' );
 		document.removeEventListener( 'dragover', this.onDragOver );
@@ -142,6 +133,21 @@ class Draggable extends Component {
 		event.stopPropagation();
 
 		this.props.setTimeout( onDragStart );
+	}
+
+	componentWillUnmount() {
+		this.removeDragClone();
+	}
+
+	removeDragClone() {
+		const cloneWrapper = document.getElementById( context.cloneNodeId );
+
+		if ( cloneWrapper ) {
+			// Remove clone.
+			cloneWrapper.parentElement.removeChild( cloneWrapper );
+			context.elementId = null;
+			context.cloneNodeId = null;
+		}
 	}
 
 	render() {
