@@ -18,7 +18,7 @@ export const settings = {
 
 	description: __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ),
 
-	icon: 'marker',
+	icon: 'shortcode',
 
 	category: 'widgets',
 
@@ -49,6 +49,7 @@ export const settings = {
 						},
 					},
 				},
+				priority: 20,
 			},
 		],
 	},

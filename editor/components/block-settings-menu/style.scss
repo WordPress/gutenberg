@@ -28,10 +28,16 @@
 	}
 }
 
-.editor-block-settings-menu__section {
+.editor-block-settings-menu__separator {
 	margin-top: $item-spacing;
-	padding-top: $item-spacing;
+	margin-bottom: $item-spacing;
 	border-top: 1px solid $light-gray-500;
+}
+
+.editor-block-settings-menu__title {
+	display: block;
+	padding: 6px;
+	color: $dark-gray-300;
 }
 
 // Popout menu
@@ -44,23 +50,15 @@
 	border-radius: 0;
 	color: $dark-gray-500;
 	cursor: pointer;
-	border: 1px solid transparent;
+	@include menu-style__neutral;
 
 	&:hover,
 	&:focus,
 	&:not(:disabled):hover {
-		box-shadow: none;
-		color: $dark-gray-500;
-		border: 1px solid $dark-gray-500;
+		@include menu-style__focus;
 	}
 
 	.dashicon {
 		margin-right: 5px;
 	}
-}
-
-.editor-block-settings-menu__section {
-	margin-top: $item-spacing;
-	padding-top: $item-spacing;
-	border-top: 1px solid $light-gray-500;
 }

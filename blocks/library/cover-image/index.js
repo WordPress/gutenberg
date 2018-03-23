@@ -19,12 +19,41 @@ import { createBlock } from '../../api';
 import RichText from '../../rich-text';
 import AlignmentToolbar from '../../alignment-toolbar';
 import MediaUpload from '../../media-upload';
-import ImagePlaceHolder from '../../image-placeholder';
+import ImagePlaceholder from '../../image-placeholder';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InspectorControls from '../../inspector-controls';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
+
+const blockAttributes = {
+	title: {
+		type: 'array',
+		source: 'children',
+		selector: 'p',
+	},
+	url: {
+		type: 'string',
+	},
+	align: {
+		type: 'string',
+	},
+	contentAlign: {
+		type: 'string',
+		default: 'center',
+	},
+	id: {
+		type: 'number',
+	},
+	hasParallax: {
+		type: 'boolean',
+		default: false,
+	},
+	dimRatio: {
+		type: 'number',
+		default: 50,
+	},
+};
 
 export const name = 'core/cover-image';
 
@@ -33,38 +62,11 @@ export const settings = {
 
 	description: __( 'Cover Image is a bold image block with an optional title.' ),
 
-	icon: 'format-image',
+	icon: 'cover-image',
 
 	category: 'common',
 
-	attributes: {
-		title: {
-			type: 'array',
-			source: 'children',
-			selector: 'h2',
-		},
-		url: {
-			type: 'string',
-		},
-		align: {
-			type: 'string',
-		},
-		contentAlign: {
-			type: 'string',
-			default: 'center',
-		},
-		id: {
-			type: 'number',
-		},
-		hasParallax: {
-			type: 'boolean',
-			default: false,
-		},
-		dimRatio: {
-			type: 'number',
-			default: 50,
-		},
-	},
+	attributes: blockAttributes,
 
 	transforms: {
 		from: [
@@ -101,9 +103,7 @@ export const settings = {
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 
-		const style = url ?
-			{ backgroundImage: `url(${ url })` } :
-			undefined;
+		const style = backgroundImageStyles( url );
 		const classes = classnames(
 			className,
 			contentAlign !== 'center' && `has-${ contentAlign }-content`,
@@ -182,7 +182,7 @@ export const settings = {
 
 			return [
 				controls,
-				<ImagePlaceHolder key="cover-image-placeholder"
+				<ImagePlaceholder key="cover-image-placeholder"
 					{ ...{ className, icon, label, onSelectImage } }
 				/>,
 			];
@@ -190,7 +190,7 @@ export const settings = {
 
 		return [
 			controls,
-			<section
+			<div
 				key="preview"
 				data-url={ url }
 				style={ style }
@@ -198,7 +198,8 @@ export const settings = {
 			>
 				{ title || isSelected ? (
 					<RichText
-						tagName="h2"
+						tagName="p"
+						className="wp-block-cover-image-text"
 						placeholder={ __( 'Write title…' ) }
 						value={ title }
 						onChange={ ( value ) => setAttributes( { title: value } ) }
@@ -206,15 +207,13 @@ export const settings = {
 						inlineToolbar
 					/>
 				) : null }
-			</section>,
+			</div>,
 		];
 	},
 
 	save( { attributes, className } ) {
 		const { url, title, hasParallax, dimRatio, align, contentAlign } = attributes;
-		const style = url ?
-			{ backgroundImage: `url(${ url })` } :
-			undefined;
+		const style = backgroundImageStyles( url );
 		const classes = classnames(
 			className,
 			dimRatioToClass( dimRatio ),
@@ -227,15 +226,54 @@ export const settings = {
 		);
 
 		return (
-			<section className={ classes } style={ style }>
-				<h2>{ title }</h2>
-			</section>
+			<div className={ classes } style={ style }>
+				{ title && title.length > 0 && (
+					<p className="wp-block-cover-image-text">{ title }</p>
+				) }
+			</div>
 		);
 	},
+
+	deprecated: [ {
+		attributes: {
+			...blockAttributes,
+			title: {
+				type: 'array',
+				source: 'children',
+				selector: 'h2',
+			},
+		},
+
+		save( { attributes, className } ) {
+			const { url, title, hasParallax, dimRatio, align } = attributes;
+			const style = backgroundImageStyles( url );
+			const classes = classnames(
+				className,
+				dimRatioToClass( dimRatio ),
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+				},
+				align ? `align${ align }` : null,
+			);
+
+			return (
+				<section className={ classes } style={ style }>
+					<h2>{ title }</h2>
+				</section>
+			);
+		},
+	} ],
 };
 
 function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?
 		null :
 		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
+}
+
+function backgroundImageStyles( url ) {
+	return url ?
+		{ backgroundImage: `url(${ url })` } :
+		undefined;
 }

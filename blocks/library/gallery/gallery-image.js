@@ -7,13 +7,20 @@ import classnames from 'classnames';
  * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
-import { IconButton, withAPIData, Spinner } from '@wordpress/components';
+import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { keycodes } from '@wordpress/utils';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import RichText from '../../rich-text';
+
+/**
+ * Module constants
+ */
+const { BACKSPACE, DELETE } = keycodes;
 
 class GalleryImage extends Component {
 	constructor() {
@@ -21,10 +28,16 @@ class GalleryImage extends Component {
 
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectCaption = this.onSelectCaption.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
+		this.bindContainer = this.bindContainer.bind( this );
 
 		this.state = {
 			captionSelected: false,
 		};
+	}
+
+	bindContainer( ref ) {
+		this.container = ref;
 	}
 
 	onSelectCaption() {
@@ -51,11 +64,22 @@ class GalleryImage extends Component {
 		}
 	}
 
-	componentWillReceiveProps( { isSelected, image } ) {
-		if ( image && image.data && ! this.props.url ) {
+	onKeyDown( event ) {
+		if (
+			this.container === document.activeElement &&
+			this.props.isSelected && [ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
+		) {
+			event.stopPropagation();
+			event.preventDefault();
+			this.props.onRemove();
+		}
+	}
+
+	componentWillReceiveProps( { isSelected, image, url } ) {
+		if ( image && ! url ) {
 			this.props.setAttributes( {
-				url: image.data.source_url,
-				alt: image.data.alt_text,
+				url: image.source_url,
+				alt: image.alt_text,
 			} );
 		}
 
@@ -95,7 +119,7 @@ class GalleryImage extends Component {
 		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<figure className={ className }>
+			<figure className={ className } tabIndex="-1" onKeyDown={ this.onKeyDown } ref={ this.bindContainer }>
 				{ isSelected &&
 					<div className="blocks-gallery-item__inline-menu">
 						<IconButton
@@ -124,6 +148,11 @@ class GalleryImage extends Component {
 	}
 }
 
-export default withAPIData( ( { id } ) => ( {
-	image: id ? `/wp/v2/media/${ id }` : {},
-} ) )( GalleryImage );
+export default withSelect( ( select, ownProps ) => {
+	const { getMedia } = select( 'core' );
+	const { id } = ownProps;
+
+	return {
+		image: id ? getMedia( id ) : null,
+	};
+} )( GalleryImage );

@@ -18,7 +18,12 @@ import './style.scss';
 import PostPublishButton from '../post-publish-button';
 import PostPublishPanelPrepublish from './prepublish';
 import PostPublishPanelPostpublish from './postpublish';
-import { getCurrentPostType, isCurrentPostPublished, isSavingPost } from '../../store/selectors';
+import {
+	getCurrentPostType,
+	isCurrentPostPublished,
+	isSavingPost,
+	isEditedPostDirty,
+} from '../../store/selectors';
 
 class PostPublishPanel extends Component {
 	constructor() {
@@ -43,12 +48,20 @@ class PostPublishPanel extends Component {
 		}
 	}
 
+	componentDidUpdate( prevProps ) {
+		// Automatically collapse the publish sidebar when a post
+		// is published and the user makes an edit.
+		if ( prevProps.isPublished && this.props.isDirty ) {
+			this.props.onClose();
+		}
+	}
+
 	onPublish() {
 		this.setState( { loading: true } );
 	}
 
 	render() {
-		const { onClose, user } = this.props;
+		const { onClose, user, forceIsDirty, forceIsSaving } = this.props;
 		const { loading, published } = this.state;
 		const canPublish = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
@@ -57,7 +70,7 @@ class PostPublishPanel extends Component {
 				<div className="editor-post-publish-panel__header">
 					{ ! published && (
 						<div className="editor-post-publish-panel__header-publish-button">
-							<PostPublishButton onSubmit={ this.onPublish } />
+							<PostPublishButton onSubmit={ this.onPublish } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
 						</div>
 					) }
 					{ published && (
@@ -85,6 +98,7 @@ const applyConnect = connect(
 			postType: getCurrentPostType( state ),
 			isPublished: isCurrentPostPublished( state ),
 			isSaving: isSavingPost( state ),
+			isDirty: isEditedPostDirty( state ),
 		};
 	},
 );

@@ -3,6 +3,7 @@
  */
 import { times } from 'lodash';
 import classnames from 'classnames';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -18,6 +19,21 @@ import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import InnerBlocks from '../../inner-blocks';
+
+/**
+ * Returns the layouts configuration for a given number of columns.
+ *
+ * @param {number} columns Number of columns.
+ *
+ * @return {Object[]} Columns layout configuration.
+ */
+const getColumnLayouts = memoize( ( columns ) => {
+	return times( columns, ( n ) => ( {
+		name: `column-${ n + 1 }`,
+		label: sprintf( __( 'Column %d' ), n + 1 ),
+		icon: 'columns',
+	} ) );
+} );
 
 export const name = 'core/columns';
 
@@ -55,16 +71,6 @@ export const settings = {
 		const { align, columns } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
 
-		// Define columns as a set of layouts within the inner block list. This
-		// will enable the user to move blocks between columns, and will apply
-		// a layout-specific class name to the rendered output which can be
-		// styled by the columns wrapper to visually place the columns.
-		const layouts = times( columns, ( n ) => ( {
-			name: `column-${ n + 1 }`,
-			label: sprintf( __( 'Column %d' ), n + 1 ),
-			icon: 'columns',
-		} ) );
-
 		return [
 			...focus ? [
 				<BlockControls key="controls">
@@ -91,7 +97,7 @@ export const settings = {
 				</InspectorControls>,
 			] : [],
 			<div className={ classes } key="container">
-				<InnerBlocks layouts={ layouts } />
+				<InnerBlocks layouts={ getColumnLayouts( columns ) } />
 			</div>,
 		];
 	},

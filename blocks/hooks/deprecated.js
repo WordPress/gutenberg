@@ -8,6 +8,7 @@ import { includes } from 'lodash';
  */
 import { Component, RawHTML } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Wrapper component for RawHTML, logging a warning about unsupported raw
@@ -19,13 +20,12 @@ export class RawHTMLWithWarning extends Component {
 
 		// Disable reason: We're intentionally logging a console warning
 		// advising the developer to upgrade usage.
-
-		// eslint-disable-next-line no-console
-		console.warn(
-			'Deprecated: Returning raw HTML from block `save` is not supported. ' +
-			'Use `wp.element.RawHTML` component instead.\n\n' +
-			'See: https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/#save'
-		);
+		deprecated( 'Returning raw HTML from block `save`', {
+			version: '2.5',
+			alternative: '`wp.element.RawHTML` component',
+			plugin: 'Gutenberg',
+			link: 'https://wordpress.org/gutenberg/handbook/block-api/block-edit-save/#save',
+		} );
 	}
 
 	render() {

@@ -1,13 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress Dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { withFocusReturn } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal Dependencies
@@ -17,9 +14,14 @@ import PostSettings from './post-settings';
 import BlockInspectorPanel from './block-inspector-panel';
 import Header from './header';
 
-import { getActivePanel } from '../../store/selectors';
-
-const Sidebar = ( { panel } ) => {
+/**
+ * Renders a sidebar with the relevant panel.
+ *
+ * @param {string} panel The currently active panel.
+ *
+ * @return {Object} The rendered sidebar.
+ */
+const Sidebar = ( { activeSidebarName } ) => {
 	return (
 		<div
 			className="edit-post-sidebar"
@@ -28,19 +30,17 @@ const Sidebar = ( { panel } ) => {
 			tabIndex="-1"
 		>
 			<Header />
-			{ panel === 'document' && <PostSettings /> }
-			{ panel === 'block' && <BlockInspectorPanel /> }
+			{ activeSidebarName === 'edit-post/block' ?
+				<BlockInspectorPanel /> :
+				<PostSettings />
+			}
 		</div>
 	);
 };
 
-export default connect(
-	( state ) => {
-		return {
-			panel: getActivePanel( state ),
-		};
-	},
-	undefined,
-	undefined,
-	{ storeKey: 'edit-post' }
-)( withFocusReturn( Sidebar ) );
+export default compose(
+	withSelect( ( select ) => ( {
+		activeSidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
+	} ) ),
+	withFocusReturn,
+)( Sidebar );

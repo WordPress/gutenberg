@@ -9,10 +9,9 @@ import { stringify } from 'querystringify';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withInstanceId, withAPIData } from '@wordpress/components';
+import { TreeSelect, withInstanceId, withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { buildTermsTree } from '@wordpress/utils';
-import { TermTreeSelect } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -34,11 +33,11 @@ export function PageAttributesParent( { parent, postType, items, onUpdateParent 
 		name: item.title.raw ? item.title.raw : `#${ item.id } (${ __( 'no title' ) })`,
 	} ) ) );
 	return (
-		<TermTreeSelect
+		<TreeSelect
 			label={ parentPageLabel }
 			noOptionLabel={ `(${ __( 'no parent' ) })` }
-			termsTree={ pagesTree }
-			selectedTerm={ parent }
+			tree={ pagesTree }
+			selectedId={ parent }
 			onChange={ onUpdateParent }
 		/>
 	);

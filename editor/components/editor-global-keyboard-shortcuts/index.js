@@ -1,27 +1,24 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { first, last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
+import { Component, Fragment, compose } from '@wordpress/element';
 import { KeyboardShortcuts, withContext } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { getBlockOrder, getMultiSelectedBlockUids } from '../../store/selectors';
-import { clearSelectedBlock, multiSelect, redo, undo, removeBlocks } from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.selectAll = this.selectAll.bind( this );
 		this.undoOrRedo = this.undoOrRedo.bind( this );
+		this.save = this.save.bind( this );
 		this.deleteSelectedBlocks = this.deleteSelectedBlocks.bind( this );
+		this.clearMultiSelection = this.clearMultiSelection.bind( this );
 	}
 
 	selectAll( event ) {
@@ -41,6 +38,11 @@ class EditorGlobalKeyboardShortcuts extends Component {
 		event.preventDefault();
 	}
 
+	save( event ) {
+		event.preventDefault();
+		this.props.onSave();
+	}
+
 	deleteSelectedBlocks( event ) {
 		const { multiSelectedBlockUids, onRemove, isLocked } = this.props;
 		if ( multiSelectedBlockUids.length ) {
@@ -51,36 +53,73 @@ class EditorGlobalKeyboardShortcuts extends Component {
 		}
 	}
 
+	/**
+	 * Clears current multi-selection, if one exists.
+	 */
+	clearMultiSelection() {
+		const { hasMultiSelection, clearSelectedBlock } = this.props;
+		if ( hasMultiSelection ) {
+			clearSelectedBlock();
+		}
+	}
+
 	render() {
 		return (
-			<KeyboardShortcuts shortcuts={ {
-				'mod+a': this.selectAll,
-				'mod+z': this.undoOrRedo,
-				'mod+shift+z': this.undoOrRedo,
-				backspace: this.deleteSelectedBlocks,
-				del: this.deleteSelectedBlocks,
-				escape: this.props.clearSelectedBlock,
-			} } />
+			<Fragment>
+				<KeyboardShortcuts
+					shortcuts={ {
+						'mod+a': this.selectAll,
+						'mod+z': this.undoOrRedo,
+						'mod+shift+z': this.undoOrRedo,
+						backspace: this.deleteSelectedBlocks,
+						del: this.deleteSelectedBlocks,
+						escape: this.clearMultiSelection,
+					} }
+				/>
+				<KeyboardShortcuts
+					bindGlobal
+					shortcuts={ {
+						'mod+s': this.save,
+					} }
+				/>
+			</Fragment>
 		);
 	}
 }
 
-export default compose(
-	connect(
-		( state ) => {
-			return {
-				uids: getBlockOrder( state ),
-				multiSelectedBlockUids: getMultiSelectedBlockUids( state ),
-			};
-		},
-		{
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getBlockOrder,
+			getMultiSelectedBlockUids,
+			hasMultiSelection,
+		} = select( 'core/editor' );
+
+		return {
+			uids: getBlockOrder(),
+			multiSelectedBlockUids: getMultiSelectedBlockUids(),
+			hasMultiSelection: hasMultiSelection(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const {
+			clearSelectedBlock,
+			multiSelect,
+			redo,
+			undo,
+			removeBlocks,
+			autosave,
+		} = dispatch( 'core/editor' );
+
+		return {
 			clearSelectedBlock,
 			onMultiSelect: multiSelect,
 			onRedo: redo,
 			onUndo: undo,
 			onRemove: removeBlocks,
-		}
-	),
+			onSave: autosave,
+		};
+	} ),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
 
@@ -88,4 +127,4 @@ export default compose(
 			isLocked: !! templateLock,
 		};
 	} ),
-)( EditorGlobalKeyboardShortcuts );
+] )( EditorGlobalKeyboardShortcuts );

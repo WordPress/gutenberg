@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, map, isString } from 'lodash';
+import { noop, map, isString, isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -45,7 +45,7 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { name, bubblesVirtually = false } = this.props;
+		const { name, bubblesVirtually = false, fillProps = {} } = this.props;
 		const { getFills = noop } = this.context;
 
 		if ( bubblesVirtually ) {
@@ -56,10 +56,17 @@ class Slot extends Component {
 			<div ref={ this.bindNode }>
 				{ map( getFills( name ), ( fill ) => {
 					const fillKey = fill.occurrence;
+
+					// If a function is passed as a child, render it with the fillProps.
+					if ( isFunction( fill.props.children ) ) {
+						return cloneElement( fill.props.children( fillProps ), { key: fillKey } );
+					}
+
 					return Children.map( fill.props.children, ( child, childIndex ) => {
 						if ( ! child || isString( child ) ) {
 							return child;
 						}
+
 						const childKey = `${ fillKey }---${ child.key || childIndex }`;
 						return cloneElement( child, { key: childKey } );
 					} );

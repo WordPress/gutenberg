@@ -5,7 +5,7 @@
             "url": "https://tumblr.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-tumblr\">\n    https://tumblr.com/\n    <figcaption>Embedded content from tumblr</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-tumblr wp-block-embed\">\n    https://tumblr.com/\n    <figcaption>Embedded content from tumblr</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

@@ -19,7 +19,7 @@ describe( 'ReusableBlockSettings', () => {
 		);
 
 		const text = wrapper.find( 'IconButton' ).children().text();
-		expect( text ).toEqual( 'Convert to Reusable Block' );
+		expect( text ).toEqual( 'Convert to Shared Block' );
 
 		wrapper.find( 'IconButton' ).simulate( 'click' );
 		expect( onConvert ).toHaveBeenCalled();
@@ -35,7 +35,7 @@ describe( 'ReusableBlockSettings', () => {
 		);
 
 		const text = wrapper.find( 'IconButton' ).first().children().text();
-		expect( text ).toEqual( 'Detach from Reusable Block' );
+		expect( text ).toEqual( 'Convert to Regular Block' );
 
 		wrapper.find( 'IconButton' ).first().simulate( 'click' );
 		expect( onConvert ).toHaveBeenCalled();
@@ -51,7 +51,7 @@ describe( 'ReusableBlockSettings', () => {
 		);
 
 		const text = wrapper.find( 'IconButton' ).last().children().text();
-		expect( text ).toEqual( 'Delete Reusable Block' );
+		expect( text ).toEqual( 'Delete Shared Block' );
 
 		wrapper.find( 'IconButton' ).last().simulate( 'click' );
 		expect( onDelete ).toHaveBeenCalledWith( 123 );

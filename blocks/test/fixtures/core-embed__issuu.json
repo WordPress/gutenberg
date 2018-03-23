@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-issuu\">\n    https://issuu.com/\n    <figcaption>Embedded content from issuu</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-issuu wp-block-embed\">\n    https://issuu.com/\n    <figcaption>Embedded content from issuu</figcaption>\n</figure>"
     }
 ]

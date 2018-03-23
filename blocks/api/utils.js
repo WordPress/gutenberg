@@ -4,6 +4,11 @@
 import { every, keys, isEqual } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
 import { getDefaultBlockName } from './registration';
@@ -25,10 +30,11 @@ export function isUnmodifiedDefaultBlock( block ) {
 	}
 
 	const newDefaultBlock = createBlock( defaultBlockName );
-	const attributeKeys = [
+
+	const attributeKeys = applyFilters( 'blocks.isUnmodifiedDefaultBlock.attributes', [
 		...keys( newDefaultBlock.attributes ),
 		...keys( block.attributes ),
-	];
+	] );
 
 	return every( attributeKeys, key =>
 		isEqual( newDefaultBlock.attributes[ key ], block.attributes[ key ] )

@@ -184,7 +184,7 @@ export const settings = {
 
 	getEditWrapperProps( attributes ) {
 		const { align, clear } = attributes;
-		const props = {};
+		const props = { 'data-resized': true };
 
 		if ( 'left' === align || 'right' === align || 'center' === align ) {
 			props[ 'data-align' ] = align;

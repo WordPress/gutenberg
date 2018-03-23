@@ -8,6 +8,7 @@ import {
 	isEmpty,
 	map,
 	get,
+	pick,
 } from 'lodash';
 
 /**
@@ -15,27 +16,28 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { createMediaFromFile, getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
+import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	IconButton,
 	SelectControl,
 	TextControl,
 	Toolbar,
-	withAPIData,
 	withContext,
 } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import RichText from '../../rich-text';
-import ImagePlaceHolder from '../../image-placeholder';
+import ImagePlaceholder from '../../image-placeholder';
 import MediaUpload from '../../media-upload';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
+import { mediaUpload } from '../../../utils/mediaupload';
 
 /**
  * Module constants
@@ -64,13 +66,16 @@ class ImageBlock extends Component {
 
 		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
 			getBlobByURL( url )
-				.then( createMediaFromFile )
-				.then( ( media ) => {
-					setAttributes( {
-						id: media.id,
-						url: media.source_url,
-					} );
-				} );
+				.then(
+					( file ) =>
+						mediaUpload(
+							[ file ],
+							( [ image ] ) => {
+								setAttributes( { ...image } );
+							},
+							'image'
+						)
+				);
 		}
 	}
 
@@ -92,11 +97,7 @@ class ImageBlock extends Component {
 	}
 
 	onSelectImage( media ) {
-		const attributes = { url: media.url, alt: media.alt, id: media.id };
-		if ( media.caption ) {
-			attributes.caption = [ media.caption ];
-		}
-		this.props.setAttributes( attributes );
+		this.props.setAttributes( pick( media, [ 'alt', 'id', 'caption', 'url' ] ) );
 	}
 
 	onSetHref( value ) {
@@ -135,7 +136,7 @@ class ImageBlock extends Component {
 	}
 
 	getAvailableSizes() {
-		return get( this.props.image, [ 'data', 'media_details', 'sizes' ], {} );
+		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
 	}
 
 	render() {
@@ -177,7 +178,7 @@ class ImageBlock extends Component {
 		if ( ! url ) {
 			return [
 				controls,
-				<ImagePlaceHolder
+				<ImagePlaceholder
 					className={ className }
 					key="image-placeholder"
 					icon="format-image"
@@ -296,14 +297,12 @@ export default compose( [
 	withContext( 'editor' )( ( settings ) => {
 		return { settings };
 	} ),
-	withAPIData( ( props ) => {
+	withSelect( ( select, props ) => {
+		const { getMedia } = select( 'core' );
 		const { id } = props.attributes;
-		if ( ! id ) {
-			return {};
-		}
 
 		return {
-			image: `/wp/v2/media/${ id }`,
+			image: id ? getMedia( id ) : null,
 		};
 	} ),
 ] )( ImageBlock );

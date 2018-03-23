@@ -51,10 +51,10 @@ export function PublishButtonLabel( {
 }
 
 const applyConnect = connect(
-	( state ) => ( {
+	( state, { forceIsSaving } ) => ( {
 		isPublished: isCurrentPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
-		isSaving: isSavingPost( state ),
+		isSaving: forceIsSaving || isSavingPost( state ),
 		isPublishing: isPublishingPost( state ),
 		postType: getCurrentPostType( state ),
 	} )

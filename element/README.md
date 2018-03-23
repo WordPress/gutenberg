@@ -1,7 +1,7 @@
 Element
 =======
 
-Element is, quite simply, an abstraction layer atop [React](https://facebook.github.io/react/).
+Element is, quite simply, an abstraction layer atop [React](https://reactjs.org/).
 
 You may find yourself asking, "Why an abstraction layer?". For a few reasons:
 
@@ -11,8 +11,8 @@ You may find yourself asking, "Why an abstraction layer?". For a few reasons:
 
 On the `wp.element` global object, you will find the following, ordered roughly by the likelihood you'll encounter it in your code:
 
-- [`createElement`](https://facebook.github.io/react/docs/react-api.html#createelement)
-- [`render`](https://facebook.github.io/react/docs/react-dom.html#render)
+- [`createElement`](https://reactjs.org/docs/react-api.html#createelement)
+- [`render`](https://reactjs.org/docs/react-dom.html#render)
 
 ## Example
 
@@ -34,7 +34,7 @@ wp.element.render(
 </script>
 ```
 
-Refer to the [official React Quick Start guide](https://facebook.github.io/react/docs/hello-world.html) for a more thorough walkthrough, in most cases substituting `React` and `ReactDOM` with `wp.element` in code examples.
+Refer to the [official React Quick Start guide](https://reactjs.org/docs/hello-world.html) for a more thorough walkthrough, in most cases substituting `React` and `ReactDOM` with `wp.element` in code examples.
 
 ## Why React?
 
@@ -43,13 +43,13 @@ At the risk of igniting debate surrounding any single "best" front-end framework
 - An understanding of a block in terms of its underlying values (in the [random image example](../blocks/README.md#example), a category)
 - A means to describe the UI of a block given these values
 
-At its most basic, React provides a simple input / output mechanism. __Given a set of inputs ("props"), a developer describes the output to be shown on the page.__ This is most elegantly observed in its [function components](https://facebook.github.io/react/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.
+At its most basic, React provides a simple input / output mechanism. __Given a set of inputs ("props"), a developer describes the output to be shown on the page.__ This is most elegantly observed in its [function components](https://reactjs.org/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.
 
 The offerings of any framework necessarily become more complex as these requirements increase; many front-end frameworks prescribe ideas around page routing, retrieving and updating data, and managing layout. React is not immune to this, but the introduced complexity is rarely caused by React itself, but instead managing an arrangement of supporting tools. By moving these concerns out of sight to the internals of the system (WordPress core code), we can minimize the responsibilities of plugin authors to a small, clear set of touch points.
 
 ## JSX
 
-While not at all a requirement to use React, [JSX](https://facebook.github.io/react/docs/introducing-jsx.html) is a recommended syntax extension to compose elements more expressively. Through a build process, JSX is converted back to the `createElement` syntax you see earlier in this document.
+While not at all a requirement to use React, [JSX](https://reactjs.org/docs/introducing-jsx.html) is a recommended syntax extension to compose elements more expressively. Through a build process, JSX is converted back to the `createElement` syntax you see earlier in this document.
 
 If you've configured [Babel](http://babeljs.io/) for your project, you can opt in to JSX syntax by specifying the `pragma` option of the [`transform-react-jsx` plugin](https://www.npmjs.com/package/babel-plugin-transform-react-jsx) in your [`.babelrc` configuration](http://babeljs.io/docs/usage/babelrc/).
 

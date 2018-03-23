@@ -10,6 +10,6 @@
             ]
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-embed-flickr\">\n    https://flickr.com/\n    <figcaption>Embedded content from flickr</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-embed-flickr wp-block-embed\">\n    https://flickr.com/\n    <figcaption>Embedded content from flickr</figcaption>\n</figure>"
     }
 ]
