@@ -19,7 +19,7 @@ describe( 'block mover', () => {
 				false,
 				dirUp,
 			) ).toBe(
-				`Block "${ type }" is at the beginning of the content and can’t be moved up`
+				`Block ${ type } is at the beginning of the content and can’t be moved up`
 			);
 		} );
 
@@ -31,7 +31,7 @@ describe( 'block mover', () => {
 				false,
 				true,
 				dirDown,
-			) ).toBe( `Block "${ type }" is at the end of the content and can’t be moved down` );
+			) ).toBe( `Block ${ type } is at the end of the content and can’t be moved down` );
 		} );
 
 		it( 'Should generate a title for the second item moving up', () => {
@@ -42,7 +42,7 @@ describe( 'block mover', () => {
 				false,
 				false,
 				dirUp,
-			) ).toBe( `Move "${ type }" block from position 2 up to position 1` );
+			) ).toBe( `Move ${ type } block from position 2 up to position 1` );
 		} );
 
 		it( 'Should generate a title for the second item moving down', () => {
@@ -53,7 +53,7 @@ describe( 'block mover', () => {
 				false,
 				false,
 				dirDown,
-			) ).toBe( `Move "${ type }" block from position 2 down to position 3` );
+			) ).toBe( `Move ${ type } block from position 2 down to position 3` );
 		} );
 
 		it( 'Should generate a title for the only item in the list', () => {
@@ -64,7 +64,7 @@ describe( 'block mover', () => {
 				true,
 				true,
 				dirDown,
-			) ).toBe( `Block "${ type }" is the only block, and cannot be moved` );
+			) ).toBe( `Block ${ type } is the only block, and cannot be moved` );
 		} );
 	} );
 
