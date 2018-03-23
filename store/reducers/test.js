@@ -91,5 +91,51 @@ describe( 'Store', () => {
 			// the title block should have moved down
 			expect( newState.blocks[ 1 ].blockType ).toEqual( 'title' );
 		} );
+
+		it( 'should delete top block', () => {
+			let newState = reducer( initialState, actions.deleteBlockAction( 0 ) );
+
+			// only one block should be left
+			expect( newState.blocks.length ).toEqual( 1 );
+
+			// the paragraph block should be at the top now
+			expect( newState.blocks[ 0 ].blockType ).toEqual( 'paragraph' );
+		} );
+
+		it( 'should delete bottom block', () => {
+			let newState = reducer( initialState, actions.deleteBlockAction( 1 ) );
+
+			// only one block should be left
+			expect( newState.blocks.length ).toEqual( 1 );
+
+			// the title block should still be there at the top
+			expect( newState.blocks[ 0 ].blockType ).toEqual( 'title' );
+		} );
+
+		it( 'should delete middle block', () => {
+			// add a third block so there's a middle one to remove
+			const extraState = {
+				...initialState,
+				blocks: [
+					...initialState.blocks,
+					{
+						key: '2',
+						blockType: 'core/code',
+						content: 'Hello code',
+						focused: false,
+					},
+				],
+			};
+			let newState = reducer( extraState, actions.deleteBlockAction( 1 ) );
+
+			// only two blocks should be left
+			expect( newState.blocks.length ).toEqual( 2 );
+
+			// the title block should still be there at the top
+			expect( newState.blocks[ 0 ].blockType ).toEqual( 'title' );
+
+			// the code block should be at the bottom
+			expect( newState.blocks[ 1 ].blockType ).toEqual( 'core/code' );
+		} );
 	} );
 } );
