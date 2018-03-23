@@ -23,7 +23,7 @@ describe( 'BlockMover', () => {
 		} );
 
 		it( 'should render two IconButton components with the following props', () => {
-			const blockMover = shallow( <BlockMover uids={ selectedUids } blockType={ blockType } firstIndex={ 0 } /> );
+			const blockMover = shallow( <BlockMover uids={ selectedUids } blockType={ blockType } firstIndex={ 0 } instanceId={ 1 } /> );
 			expect( blockMover.hasClass( 'editor-block-mover' ) ).toBe( true );
 
 			const moveUp = blockMover.childAt( 0 );
@@ -38,7 +38,7 @@ describe( 'BlockMover', () => {
 				label: 'Move up',
 				icon: upArrow,
 				'aria-disabled': undefined,
-				'aria-describedby': 'editor-block-mover__up-description',
+				'aria-describedby': 'editor-block-mover__up-description-1',
 			} );
 			expect( moveDown.props() ).toMatchObject( {
 				className: 'editor-block-mover__control',
@@ -46,7 +46,7 @@ describe( 'BlockMover', () => {
 				label: 'Move down',
 				icon: downArrow,
 				'aria-disabled': undefined,
-				'aria-describedby': 'editor-block-mover__down-description',
+				'aria-describedby': 'editor-block-mover__down-description-1',
 			} );
 			expect( moveUpDesc.text() ).toBe( 'Move 2 blocks from position 1 up by one place' );
 			expect( moveDownDesc.text() ).toBe( 'Move 2 blocks from position 1 down by one place' );

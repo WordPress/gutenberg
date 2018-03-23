@@ -8,7 +8,7 @@ import { first } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withContext } from '@wordpress/components';
+import { IconButton, withContext, withInstanceId } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 
@@ -20,7 +20,7 @@ import { getBlockMoverDescription } from './mover-description';
 import { getBlockIndex, getBlock } from '../../store/selectors';
 import { upArrow, downArrow } from './arrows';
 
-export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked } ) {
+export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId } ) {
 	if ( isLocked ) {
 		return null;
 	}
@@ -36,7 +36,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				onClick={ isFirst ? null : onMoveUp }
 				icon={ upArrow }
 				label={ __( 'Move up' ) }
-				aria-describedby="editor-block-mover__up-description"
+				aria-describedby={ `editor-block-mover__up-description-${ instanceId }` }
 				aria-disabled={ isFirst }
 			/>
 			<IconButton
@@ -44,10 +44,10 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 				onClick={ isLast ? null : onMoveDown }
 				icon={ downArrow }
 				label={ __( 'Move down' ) }
-				aria-describedby="editor-block-mover__down-description"
+				aria-describedby={ `editor-block-mover__down-description-${ instanceId }` }
 				aria-disabled={ isLast }
 			/>
-			<span id="editor-block-mover__up-description" className="editor-block-mover__description">
+			<span id={ `editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description">
 				{
 					getBlockMoverDescription(
 						uids.length,
@@ -59,7 +59,7 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 					)
 				}
 			</span>
-			<span id="editor-block-mover__down-description" className="editor-block-mover__description">
+			<span id={ `editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description">
 				{
 					getBlockMoverDescription(
 						uids.length,
@@ -116,4 +116,5 @@ export default compose(
 			isLocked: templateLock === 'all',
 		};
 	} ),
+	withInstanceId,
 )( BlockMover );
