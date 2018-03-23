@@ -63,5 +63,15 @@ describe( 'Store', () => {
 			expect( newState.blocks[ 0 ].blockType ).toEqual( 'title' );
 			expect( newState.blocks[ 1 ].blockType ).toEqual( 'paragraph' );
 		} );
+
+		it( 'should move a block up', () => {
+			let newState = reducer( initialState, actions.moveBlockUpAction( 1 ) );
+
+			// the paragraph block should have moved up
+			expect( newState.blocks[ 0 ].blockType ).toEqual( 'paragraph' );
+
+			// the block below it should be the title now
+			expect( newState.blocks[ 1 ].blockType ).toEqual( 'title' );
+		} );
 	} );
 } );
