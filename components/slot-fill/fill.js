@@ -6,7 +6,7 @@ import { noop, isFunction } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createPortal, Fragment } from '@wordpress/element';
+import { Component, createPortal } from '@wordpress/element';
 
 let occurrences = 0;
 
@@ -65,18 +65,12 @@ class Fill extends Component {
 			return null;
 		}
 
-		const fillKey = this.occurrence;
-
-		// If a function is passed as a child, render it with the fillProps.
-		if ( isFunction( this.props.children ) ) {
+		// If a function is passed as a child, provide it with the fillProps.
+		if ( isFunction( children ) ) {
 			children = children( slot.props.fillProps );
 		}
 
-		return createPortal( (
-			<Fragment key={ fillKey }>
-				{ children }
-			</Fragment>
-		), slot.node );
+		return createPortal( children, slot.node );
 	}
 }
 
