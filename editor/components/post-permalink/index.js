@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Dashicon, ClipboardButton, Button } from '@wordpress/components';
+import { Dashicon, ClipboardButton, Button, Tooltip } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -94,14 +94,15 @@ class PostPermalink extends Component {
 
 		return (
 			<div className="editor-post-permalink">
-				<ClipboardButton
-					className="editor-post-permalink__copy"
-					text={ samplePermalink }
-					title={ __( 'Copy the permalink to your clipboard.' ) }
-					onCopy={ () => this.setState( { iconClass: 'copied' } ) }
-				>
-					<Dashicon icon="admin-links" className={ iconClass } />
-				</ClipboardButton>
+				<Tooltip text={ __( 'Copy the permalink to your clipboard.' ) }>
+					<ClipboardButton
+						className="editor-post-permalink__copy"
+						text={ samplePermalink }
+						onCopy={ () => this.setState( { iconClass: 'copied' } ) }
+					>
+						<Dashicon icon="admin-links" className={ iconClass } />
+					</ClipboardButton>
+				</Tooltip>
 
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
