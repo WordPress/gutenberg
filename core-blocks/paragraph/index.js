@@ -291,6 +291,10 @@ const schema = {
 	customFontSize: {
 		type: 'number',
 	},
+	canInsertTokens: {
+		type: 'boolean',
+		default: true,
+	},
 };
 
 export const name = 'core/paragraph';

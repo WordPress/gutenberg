@@ -16,6 +16,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import InserterTokenMenu from './token-menu';
 
 class Inserter extends Component {
 	constructor() {
@@ -47,6 +48,7 @@ class Inserter extends Component {
 			onInsertBlock,
 			hasSupportedBlocks,
 			isLocked,
+			selectedBlock,
 		} = this.props;
 
 		if ( ! hasSupportedBlocks || isLocked ) {
@@ -78,6 +80,10 @@ class Inserter extends Component {
 
 						onClose();
 					};
+
+					if ( selectedBlock && selectedBlock.attributes.canInsertTokens ) {
+						return <InserterTokenMenu />;
+					}
 
 					return <InserterMenu onSelect={ onSelect } />;
 				} }

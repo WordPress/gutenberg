@@ -15,6 +15,7 @@
                     "_store": {}
                 }
             ],
+            "canInsertTokens": true,
             "dropCap": false
         },
         "innerBlocks": [],

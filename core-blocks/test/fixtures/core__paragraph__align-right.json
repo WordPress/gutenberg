@@ -8,6 +8,7 @@
                 "... like this one, which is separate from the above and right aligned."
             ],
             "align": "right",
+            "canInsertTokens": true,
             "dropCap": false
         },
         "innerBlocks": [],
