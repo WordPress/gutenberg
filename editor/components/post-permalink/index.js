@@ -98,7 +98,7 @@ class PostPermalink extends Component {
 					<ClipboardButton
 						className="editor-post-permalink__copy"
 						text={ samplePermalink }
-						onCopy={ () => this.setState( { iconClass: 'copied' } ) }
+						onCopy={ () => this.setState( { iconClass: 'is-copied' } ) }
 					>
 						<Dashicon icon="admin-links" className={ iconClass } />
 					</ClipboardButton>
