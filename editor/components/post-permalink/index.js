@@ -122,10 +122,10 @@ class PostPermalink extends Component {
 							{ samplePermalinkPrefix }
 						</span>
 						<input
-							type="text"
 							className="editor-post-permalink__edit"
+							aria-label={ __( 'Edit post permalink' ) }
 							defaultValue={ postName }
-							onChange={ ( e ) => this.setState( { editedPostName: e.target.value } ) }
+							onChange={ ( event ) => this.setState( { editedPostName: event.target.value } ) }
 							required
 						/>
 						<span className="editor-post-permalink__suffix">
@@ -135,7 +135,7 @@ class PostPermalink extends Component {
 							className="editor-post-permalink__save button"
 							onClick={ this.onSavePermalink }
 						>
-							{ __( 'Ok' ) }
+							{ __( 'OK' ) }
 						</Button>
 					</form>
 				}
