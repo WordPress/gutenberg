@@ -9,8 +9,12 @@ set -e
 
 # Load NVM
 if [ -n "$NVM_DIR" ]; then
-	# The --no-use option ensures loading NVM doesn't switch the current version.
-	. "$NVM_DIR/nvm.sh" --no-use
+	# if using homebrew, use that to find path to nvm.sh
+	if [ -n "$(command -v brew)" ]; then
+		. "$(brew --prefix nvm)/nvm.sh" --no-use
+	else
+		. "$NVM_DIR/nvm.sh" --no-use
+	fi
 fi
 
 # Change to the expected directory
