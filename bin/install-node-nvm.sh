@@ -23,18 +23,23 @@ cd "$(dirname "$0")/.."
 # Check if nvm is installed
 if [ "$TRAVIS" != "true" ] && ! command_exists "nvm"; then
 	if ask "$(error_message "NVM isn't installed, would you like to download and install it automatically?")" Y; then
-		# The .bash_profile file needs to exist for NVM to install
-		if [ ! -e ~/.bash_profile ]; then
-			touch ~/.bash_profile
+
+		if [ -n "$(command -v brew)" ]; then
+			brew install nvm
+		else
+			# The .bash_profile file needs to exist for NVM to install
+			if [ ! -e ~/.bash_profile ]; then
+				touch ~/.bash_profile
+			fi
+
+			echo -en $(status_message "Installing NVM..." )
+			download "https://raw.githubusercontent.com/creationix/nvm/$NVM_VERSION/install.sh" | bash >/dev/null 2>&1
+			echo ' done!'
+
+			echo -e $(warning_message "NVM was updated, please run this command to reload it:" )
+			echo -e $(warning_message "$(action_format ". \$HOME/.nvm/nvm.sh")" )
+			echo -e $(warning_message "After that, re-run the setup script to continue." )
 		fi
-
-		echo -en $(status_message "Installing NVM..." )
-		download "https://raw.githubusercontent.com/creationix/nvm/$NVM_VERSION/install.sh" | bash >/dev/null 2>&1
-		echo ' done!'
-
-		echo -e $(warning_message "NVM was updated, please run this command to reload it:" )
-		echo -e $(warning_message "$(action_format ". \$HOME/.nvm/nvm.sh")" )
-		echo -e $(warning_message "After that, re-run the setup script to continue." )
 	else
 		echo -e $(error_message "")
 		echo -e $(error_message "Please install NVM manually, then re-run the setup script to continue.")
