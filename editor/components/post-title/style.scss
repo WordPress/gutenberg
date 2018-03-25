@@ -9,16 +9,16 @@
 		margin: 0;
 		box-shadow: none;
 		border: 1px solid transparent;
-		font-size: 2em;
 		font-family: $editor-font;
 		line-height: $default-line-height;
 
-		// inherited from h1
+		// Match h1 heading
+		font-size: 2.441em;
 		font-weight: 600;
 	}
 
 	&.is-selected .editor-post-title__input,
-	.editor-post-title__input:focus {
+	.editor-post-title__input:hover {
 		border: 1px solid $light-gray-500;
 	}
 }

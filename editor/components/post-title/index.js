@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
 
@@ -10,17 +9,15 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { keycodes } from '@wordpress/utils';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { withContext, withFocusOutside } from '@wordpress/components';
+import { keycodes, decodeEntities } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { KeyboardShortcuts, withContext, withInstanceId, withFocusOutside } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostPermalink from '../post-permalink';
-import { getEditedPostAttribute } from '../../store/selectors';
-import { insertBlock, editPost, clearSelectedBlock } from '../../store/actions';
 
 /**
  * Constants
@@ -36,6 +33,7 @@ class PostTitle extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.redirectHistory = this.redirectHistory.bind( this );
 
 		this.state = {
 			isSelected: false,
@@ -67,43 +65,89 @@ class PostTitle extends Component {
 		}
 	}
 
+	/**
+	 * Emulates behavior of an undo or redo on its corresponding key press
+	 * combination. This is a workaround to React's treatment of undo in a
+	 * controlled textarea where characters are updated one at a time.
+	 * Instead, leverage the store's undo handling of title changes.
+	 *
+	 * @see https://github.com/facebook/react/issues/8514
+	 *
+	 * @param {KeyboardEvent} event Key event.
+	 */
+	redirectHistory( event ) {
+		if ( event.shiftKey ) {
+			this.props.onRedo();
+		} else {
+			this.props.onUndo();
+		}
+
+		event.preventDefault();
+	}
+
 	render() {
-		const { title, placeholder } = this.props;
+		const { title, placeholder, instanceId } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
+		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
 			<div className={ className }>
 				{ isSelected && <PostPermalink /> }
-				<Textarea
-					className="editor-post-title__input"
-					value={ title }
-					onChange={ this.onChange }
-					placeholder={ placeholder || __( 'Add title' ) }
-					aria-label={ placeholder || __( 'Add title' ) }
-					onFocus={ this.onSelect }
-					onKeyDown={ this.onKeyDown }
-					onKeyPress={ this.onUnselect }
-				/>
+				<KeyboardShortcuts
+					shortcuts={ {
+						'mod+z': this.redirectHistory,
+						'mod+shift+z': this.redirectHistory,
+					} }
+				>
+					<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
+						{ decodedPlaceholder || __( 'Add title' ) }
+					</label>
+					<Textarea
+						id={ `post-title-${ instanceId }` }
+						className="editor-post-title__input"
+						value={ title }
+						onChange={ this.onChange }
+						placeholder={ decodedPlaceholder || __( 'Add title' ) }
+						onFocus={ this.onSelect }
+						onKeyDown={ this.onKeyDown }
+						onKeyPress={ this.onUnselect }
+					/>
+				</KeyboardShortcuts>
 			</div>
 		);
 	}
 }
 
-const applyConnect = connect(
-	( state ) => ( {
-		title: getEditedPostAttribute( state, 'title' ),
-	} ),
-	{
+const applyWithSelect = withSelect( ( select ) => {
+	const { getEditedPostAttribute } = select( 'core/editor' );
+
+	return {
+		title: getEditedPostAttribute( 'title' ),
+	};
+} );
+
+const applyWithDispatch = withDispatch( ( dispatch ) => {
+	const {
+		insertDefaultBlock,
+		editPost,
+		clearSelectedBlock,
+		undo,
+		redo,
+	} = dispatch( 'core/editor' );
+
+	return {
 		onEnterPress() {
-			return insertBlock( createBlock( getDefaultBlockName() ), 0 );
+			insertDefaultBlock( undefined, undefined, 0 );
 		},
 		onUpdate( title ) {
-			return editPost( { title } );
+			editPost( { title } );
 		},
+		onUndo: undo,
+		onRedo: redo,
 		clearSelectedBlock,
-	}
-);
+	};
+} );
 
 const applyEditorSettings = withContext( 'editor' )(
 	( settings ) => ( {
@@ -112,7 +156,9 @@ const applyEditorSettings = withContext( 'editor' )(
 );
 
 export default compose(
-	applyConnect,
+	applyWithSelect,
+	applyWithDispatch,
 	applyEditorSettings,
+	withInstanceId,
 	withFocusOutside
 )( PostTitle );

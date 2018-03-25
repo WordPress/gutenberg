@@ -3,7 +3,7 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, reduce, size, castArray, noop, first, last } from 'lodash';
+import { get, reduce, size, castArray, first, last, noop } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
@@ -26,7 +26,7 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { withFilters, withContext, withAPIData } from '@wordpress/components';
+import { withFilters, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -46,7 +46,7 @@ import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
-import { createInnerBlockList } from './utils';
+import { createInnerBlockList } from '../../utils/block-list';
 import {
 	editPost,
 	insertBlocks,
@@ -70,7 +70,6 @@ import {
 	isSelectionEnabled,
 	isTyping,
 	getBlockMode,
-	getCurrentPostType,
 	getSelectedBlocksInitialCaretPosition,
 } from '../../store/selectors';
 
@@ -103,20 +102,21 @@ export class BlockListBlock extends Component {
 		};
 	}
 
+	/**
+	 * Provides context for descendent components for use in block rendering.
+	 *
+	 * @return {Object} Child context.
+	 */
 	getChildContext() {
-		const {
-			uid,
-			renderBlockMenu,
-			showContextualToolbar,
-		} = this.props;
-
+		// Blocks may render their own BlockEdit, in which case we must provide
+		// a mechanism for them to create their own InnerBlockList. BlockEdit
+		// is defined in `@wordpress/blocks`, so to avoid a circular dependency
+		// we inject this function via context.
 		return {
-			BlockList: createInnerBlockList(
-				uid,
-				renderBlockMenu,
-				showContextualToolbar
-			),
-			canUserUseUnfilteredHTML: get( this.props.user, [ 'data', 'capabilities', 'unfiltered_html' ], false ),
+			createInnerBlockList: ( uid ) => {
+				const { renderBlockMenu, showContextualToolbar } = this.props;
+				return createInnerBlockList( uid, renderBlockMenu, showContextualToolbar );
+			},
 		};
 	}
 
@@ -604,7 +604,6 @@ const mapStateToProps = ( state, { uid, rootUID } ) => {
 		meta: getEditedPostAttribute( state, 'meta' ),
 		mode: getBlockMode( state, uid ),
 		isSelectionEnabled: isSelectionEnabled( state ),
-		postType: getCurrentPostType( state ),
 		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
 		isSelected,
 	};
@@ -655,8 +654,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 } );
 
 BlockListBlock.childContextTypes = {
-	BlockList: noop,
-	canUserUseUnfilteredHTML: noop,
+	createInnerBlockList: noop,
 };
 
 export default compose(
@@ -669,7 +667,4 @@ export default compose(
 		};
 	} ),
 	withFilters( 'editor.BlockListBlock' ),
-	withAPIData( ( { postType } ) => ( {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	} ) ),
 )( BlockListBlock );

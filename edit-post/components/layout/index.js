@@ -7,7 +7,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Popover, navigateRegions } from '@wordpress/components';
+import { Popover, ScrollLock, navigateRegions } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	AutosaveMonitor,
@@ -19,6 +19,8 @@ import {
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/element';
+import { PluginArea } from '@wordpress/plugins';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -31,21 +33,25 @@ import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import PluginsPanel from '../../components/plugins-panel/index.js';
+import PluginSidebar from '../plugin-sidebar';
 
 function Layout( {
 	mode,
 	editorSidebarOpened,
 	pluginSidebarOpened,
+	sidebarName,
 	publishSidebarOpened,
 	hasFixedToolbar,
 	closePublishSidebar,
 	metaBoxes,
 	hasActiveMetaboxes,
 	isSaving,
+	isMobileViewport,
 } ) {
+	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
+
 	const className = classnames( 'edit-post-layout', {
-		'is-sidebar-opened': editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened,
+		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
@@ -81,8 +87,12 @@ function Layout( {
 				/>
 			) }
 			{ editorSidebarOpened && <Sidebar /> }
-			{ pluginSidebarOpened && <PluginsPanel /> }
+			{ pluginSidebarOpened && <PluginSidebar.Slot name={ sidebarName } /> }
+			{
+				isMobileViewport && sidebarIsOpened && <ScrollLock />
+			}
 			<Popover.Slot />
+			<PluginArea />
 		</div>
 	);
 }
@@ -92,6 +102,7 @@ export default compose(
 		mode: select( 'core/edit-post' ).getEditorMode(),
 		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
+		sidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
 		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),
@@ -101,5 +112,6 @@ export default compose(
 	withDispatch( ( dispatch ) => ( {
 		closePublishSidebar: dispatch( 'core/edit-post' ).closePublishSidebar,
 	} ) ),
-	navigateRegions
+	navigateRegions,
+	withViewportMatch( { isMobileViewport: '< small' } ),
 )( Layout );

@@ -8,14 +8,19 @@ import { includes } from 'lodash';
  * returned reducer will include a `isDirty` property on the object reflecting
  * whether the original reference of the reducer has changed.
  *
- * @param {?Object} options            Optional options.
- * @param {?Array}  options.resetTypes Action types upon which to reset dirty.
+ * @param {?Object} options             Optional options.
+ * @param {?Array}  options.ignoreTypes Action types upon which to skip check.
+ * @param {?Array}  options.resetTypes  Action types upon which to reset dirty.
  *
  * @return {Function} Higher-order reducer.
  */
 const withChangeDetection = ( options = {} ) => ( reducer ) => {
 	return ( state, action ) => {
 		const nextState = reducer( state, action );
+
+		if ( includes( options.ignoreTypes, action.type ) ) {
+			return nextState;
+		}
 
 		// Reset at:
 		//  - Initial state
