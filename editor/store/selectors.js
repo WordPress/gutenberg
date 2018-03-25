@@ -1516,3 +1516,29 @@ export function isPublishingPost( state ) {
 export function getProvisionalBlockUID( state ) {
 	return state.provisionalBlockUID;
 }
+
+/**
+ * Returns whether the permalink is editable or not.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether or not the permalink is editable.
+ */
+export function isPermalinkEditable( state ) {
+	const samplePermalinkData = getEditedPostAttribute( state, 'sample_permalink' );
+
+	return /%(?:postname|pagename)%/.test( samplePermalinkData[ 0 ] );
+}
+
+/**
+ * Returns the sample permalink for the post.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} The sample permalink.
+ */
+export function getSamplePermalink( state ) {
+	const samplePermalinkData = getEditedPostAttribute( state, 'sample_permalink' );
+
+	return samplePermalinkData[ 0 ].replace( /%(?:postname|pagename)%/, samplePermalinkData[ 1 ] );
+}
