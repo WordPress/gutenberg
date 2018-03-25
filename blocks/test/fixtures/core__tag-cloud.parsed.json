@@ -1,0 +1,10 @@
+[
+    {
+        "blockName": "core/tag-cloud",
+        "attrs": {
+            "taxonomy": "category"
+        },
+        "innerBlocks": [],
+        "innerHTML": ""
+    }
+]
