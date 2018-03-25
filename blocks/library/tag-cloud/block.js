@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, filter } from 'lodash';
 import { stringify } from 'querystringify';
 
 /**
@@ -31,7 +31,7 @@ class TagCloudBlock extends Component {
 	}
 
 	getTaxonomies() {
-		const taxonomies = this.props.taxonomies.data;
+		const taxonomies = filter( this.props.taxonomies.data, 'show_cloud' );
 
 		return map( taxonomies, taxonomy => {
 			return {
@@ -127,7 +127,7 @@ export default withAPIData( ( props, { taxonomy } ) => {
 	} );
 
 	return {
-		taxonomies: '/wp/v2/taxonomies',
+		taxonomies: '/wp/v2/taxonomies?context=edit',
 		termList: `/wp/v2/${ taxonomyRestBase }?${ queryString }`,
 	};
 } )( TagCloudBlock );
