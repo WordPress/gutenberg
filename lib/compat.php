@@ -117,7 +117,7 @@ function gutenberg_shim_api_request_emulate_http( $scripts ) {
 		if ( options.method ) {
 			if ( [ 'PATCH', 'PUT', 'DELETE' ].indexOf( options.method.toUpperCase() ) >= 0 ) {
 				if ( ! options.headers ) {
-					options.headers = [];
+					options.headers = {};
 				}
 				options.headers['X-HTTP-Method-Override'] = options.method;
 				options.method = 'POST';
