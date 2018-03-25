@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { withDispatch } from '@wordpress/data';
+import { Component, compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 
@@ -15,7 +16,6 @@ import { Button } from '@wordpress/components';
  */
 import './style.scss';
 import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
 
 class PostPermalinkEditor extends Component {
 	constructor() {
@@ -101,16 +101,15 @@ class PostPermalinkEditor extends Component {
 	}
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	connect( ( state ) => {
 		return {
 			samplePermalinkData: getEditedPostAttribute( state, 'sample_permalink' ),
-
-			permalinkStructure: window.wpApiSettings.schema.permalink_structure,
 		};
-	},
-	{
-		editPost,
-	}
-)( PostPermalinkEditor );
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { editPost } = dispatch( 'core/editor' );
+		return { editPost };
+	} ),
+] )( PostPermalinkEditor );
 
