@@ -39,19 +39,42 @@
 	}
 }
 
-.editor-post-permalink__edit-form {
+.editor-post-permalink-editor {
 	width: 100%;
+	min-width: 20%;
+	display: inline-flex;
+	align-items: center;
+
+	// Higher specificity required to override core margin styles
+	.editor-post-permalink-editor__save {
+		margin-left: auto;
+	}
 }
 
-.editor-post-permalink__prefix,
-.editor-post-permalink__suffix {
+.editor-post-permalink-editor__prefix {
 	color: $dark-gray-300;
+	flex: initial;
+	min-width: 20%;
+	overflow: hidden;
+	position: relative;
+	white-space: nowrap;
+
+	&:after {
+		@include long-content-fade( $size: 20% );
+	}
 }
 
-.editor-post-permalink__edit {
+.editor-post-permalink-editor__edit {
+	flex: initial;
+	min-width: 20%;
 	margin: 0 5px;
 }
 
-.editor-post-permalink__save {
-	float: right;
+.editor-post-permalink-editor__suffix {
+	color: $dark-gray-300;
+	margin-right: 10px;
+}
+
+.editor-post-permalink-editor__save {
+	margin-left: auto;
 }

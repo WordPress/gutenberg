@@ -72,31 +72,29 @@ class PostPermalinkEditor extends Component {
 		} = this.getPermalinkParts();
 
 		return (
-			<div className="editor-post-permalink-editor">
-				<form
-					className="editor-post-permalink__edit-form"
-					onSubmit={ this.onSavePermalink }>
-					<span className="editor-post-permalink__prefix">
-						{ samplePermalinkPrefix }
-					</span>
-					<input
-						className="editor-post-permalink__edit"
-						aria-label={ __( 'Edit post permalink' ) }
-						defaultValue={ postName }
-						onChange={ ( event ) => this.setState( { editedPostName: event.target.value } ) }
-						required
-					/>
-					<span className="editor-post-permalink__suffix">
-						{ samplePermalinkSuffix }
-					</span>
-					<Button
-						className="editor-post-permalink__save button"
-						onClick={ this.onSavePermalink }
-					>
-						{ __( 'OK' ) }
-					</Button>
-				</form>
-			</div>
+			<form
+				className="editor-post-permalink-editor"
+				onSubmit={ this.onSavePermalink }>
+				<span className="editor-post-permalink-editor__prefix">
+					{ samplePermalinkPrefix }
+				</span>
+				<input
+					className="editor-post-permalink-editor__edit"
+					aria-label={ __( 'Edit post permalink' ) }
+					defaultValue={ postName }
+					onChange={ ( event ) => this.setState( { editedPostName: event.target.value } ) }
+					required
+				/>
+				<span className="editor-post-permalink-editor__suffix">
+					{ samplePermalinkSuffix }
+				</span>
+				<Button
+					className="editor-post-permalink-editor__save button"
+					onClick={ this.onSavePermalink }
+				>
+					{ __( 'OK' ) }
+				</Button>
+			</form>
 		);
 	}
 }
