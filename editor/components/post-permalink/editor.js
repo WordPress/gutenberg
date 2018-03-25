@@ -21,6 +21,10 @@ class PostPermalinkEditor extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.state = {
+			editedPostName: '',
+		};
+
 		this.onSavePermalink = this.onSavePermalink.bind( this );
 	}
 
@@ -44,6 +48,8 @@ class PostPermalinkEditor extends Component {
 		const postName = this.state.editedPostName.replace( /\s+/g, '-' );
 		const [ template, oldPostName ] = this.props.samplePermalinkData;
 
+		this.props.onSave();
+
 		if ( ! postName || postName === oldPostName ) {
 			return;
 		}
@@ -56,8 +62,6 @@ class PostPermalinkEditor extends Component {
 		this.setState( {
 			editedPostName: postName,
 		} );
-
-		this.props.onSave();
 	}
 
 	render() {
