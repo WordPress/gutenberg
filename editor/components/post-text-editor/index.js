@@ -21,9 +21,9 @@ class PostTextEditor extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.handleFocus = this.handleFocus.bind( this );
-		this.handleChange = this.handleChange.bind( this );
-		this.handleBlur = this.handleBlur.bind( this );
+		this.startEditing = this.startEditing.bind( this );
+		this.edit = this.edit.bind( this );
+		this.stopEditing = this.stopEditing.bind( this );
 
 		this.state = {
 			value: null,
@@ -31,17 +31,19 @@ class PostTextEditor extends Component {
 		};
 	}
 
-	handleFocus() {
+	startEditing() {
+		// Copying the post content into local state ensures that edits won't be
+		// clobbered by changes to global editor state
 		this.setState( { value: this.props.value } );
 	}
 
-	handleChange( event ) {
+	edit( event ) {
 		const value = event.target.value;
 		this.props.onChange( value );
 		this.setState( { value, isDirty: true } );
 	}
 
-	handleBlur() {
+	stopEditing() {
 		if ( this.state.isDirty ) {
 			this.props.onPersist( this.state.value );
 		}
@@ -54,9 +56,9 @@ class PostTextEditor extends Component {
 			<Textarea
 				autoComplete="off"
 				value={ this.state.value || this.props.value }
-				onFocus={ this.handleFocus }
-				onChange={ this.handleChange }
-				onBlur={ this.handleBlur }
+				onFocus={ this.startEditing }
+				onChange={ this.edit }
+				onBlur={ this.stopEditing }
 				className="editor-post-text-editor"
 			/>
 		);
