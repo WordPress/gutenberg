@@ -16,6 +16,9 @@ import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
 import DocumentOutlinePanel from '../document-outline-panel';
 import MetaBoxes from '../../meta-boxes';
+import PostsList from '../posts-list';
+import SettingsPanel from '../settings-panel';
+
 import { getPanelItems } from '../panel-items.js';
 
 const items = getPanelItems();
@@ -32,6 +35,8 @@ const panel = () => {
 			{ items.includes('page-attributes') ? <PageAttributes /> : '' }
 			{ items.includes('document-outline-panel') ? <DocumentOutlinePanel /> : '' }
 			{ items.includes('meta-boxes') ? <MetaBoxes location="side" usePanel /> : '' }
+			{ items.includes('posts-list') ? <PostsList /> : '' }
+			{ items.includes('settings-panel') ? <SettingsPanel /> : '' }
 		</Panel>
 	);
 }
