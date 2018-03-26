@@ -11,12 +11,13 @@ import Toolbar from './toolbar';
 import { getBlockType } from '@gutenberg/blocks/api';
 
 type PropsType = {
-	index: number,
+	uid: string,
 	blockType: string,
-	attributes: object,
+	attributes: { content: mixed },
 	focused: boolean,
-	onToolbarButtonPressed: ( button: number, index: number ) => void,
-	onBlockHolderPressed: ( rowId: number ) => void,
+	onChange: ( uid: string, attributes: mixed ) => void,
+	onToolbarButtonPressed: ( button: number, uid: string ) => void,
+	onBlockHolderPressed: ( uid: string ) => void,
 };
 type StateType = { selected: boolean, focused: boolean };
 
@@ -24,7 +25,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	renderToolbarIfBlockFocused() {
 		if ( this.props.focused ) {
 			return (
-				<Toolbar index={ this.props.index } onButtonPressed={ this.props.onToolbarButtonPressed } />
+				<Toolbar uid={ this.props.uid } onButtonPressed={ this.props.onToolbarButtonPressed } />
 			);
 		} else {
 			// Return empty view, toolbar won't be rendered
@@ -41,7 +42,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				<Code
 					attributes={ { ...this.props.attributes } }
 					// pass a curried version of onChanged with just one argument
-					setAttributes={ attrs => this.props.onChange( this.props.index, attrs ) }
+					setAttributes={ attrs => this.props.onChange( this.props.uid, attrs ) }
 				/>
 			);
 		} else {
@@ -53,7 +54,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	render() {
 		return (
 			<TouchableWithoutFeedback
-				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.index ) }
+				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.uid ) }
 			>
 				<View style={ styles.blockHolder }>
 					<View style={ styles.blockTitle }>

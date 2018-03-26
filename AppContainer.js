@@ -19,17 +19,17 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 		onChange: ( uid, attributes ) => {
 			dispatch( updateBlockAttributes( uid, attributes ) );
 		},
-		focusBlockAction: index => {
-			dispatch( focusBlockAction( index ) );
+		focusBlockAction: uid => {
+			dispatch( focusBlockAction( uid ) );
 		},
-		moveBlockUpAction: index => {
-			dispatch( moveBlockUpAction( index ) );
+		moveBlockUpAction: uid => {
+			dispatch( moveBlockUpAction( uid ) );
 		},
-		moveBlockDownAction: index => {
-			dispatch( moveBlockDownAction( index ) );
+		moveBlockDownAction: uid => {
+			dispatch( moveBlockDownAction( uid ) );
 		},
-		deleteBlockAction: index => {
-			dispatch( deleteBlockAction( index ) );
+		deleteBlockAction: uid => {
+			dispatch( deleteBlockAction( uid ) );
 		},
 	};
 };

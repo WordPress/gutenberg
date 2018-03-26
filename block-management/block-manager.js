@@ -9,18 +9,18 @@ import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
 type Block = {
-	key: number,
+	uid: string,
 	blockType: string,
-	content: string,
+	attributes: { content: mixed },
 	focused: boolean,
 };
 
 export type BlockListType = {
-	onChange: ( number, object ) => mixed,
-	focusBlockAction: number => mixed,
-	moveBlockUpAction: number => mixed,
-	moveBlockDownAction: number => mixed,
-	deleteBlockAction: number => mixed,
+	onChange: ( uid: string, attributes: mixed ) => void,
+	focusBlockAction: string => mixed,
+	moveBlockUpAction: string => mixed,
+	moveBlockDownAction: string => mixed,
+	deleteBlockAction: string => mixed,
 	blocks: Array<Block>,
 	refresh: boolean,
 };
@@ -29,20 +29,20 @@ type PropsType = BlockListType;
 type StateType = {};
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
-	onBlockHolderPressed( rowId: number ) {
-		this.props.focusBlockAction( rowId );
+	onBlockHolderPressed( uid: string ) {
+		this.props.focusBlockAction( uid );
 	}
 
-	onToolbarButtonPressed( button: number, index: number ) {
+	onToolbarButtonPressed( button: number, uid: string ) {
 		switch ( button ) {
 			case ToolbarButton.UP:
-				this.props.moveBlockUpAction( index );
+				this.props.moveBlockUpAction( uid );
 				break;
 			case ToolbarButton.DOWN:
-				this.props.moveBlockDownAction( index );
+				this.props.moveBlockDownAction( uid );
 				break;
 			case ToolbarButton.DELETE:
-				this.props.deleteBlockAction( index );
+				this.props.deleteBlockAction( uid );
 				break;
 			case ToolbarButton.SETTINGS:
 				// TODO: implement settings
@@ -58,20 +58,21 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					style={ styles.list }
 					data={ this.props.blocks }
 					extraData={ this.props.refresh }
+					keyExtractor={ ( item, index ) => item.uid }
 					renderItem={ this.renderItem.bind( this ) }
 				/>
 			</View>
 		);
 	}
 
-	renderItem( value: { item: Block, index: number } ) {
+	renderItem( value: { item: Block, uid: string } ) {
 		return (
 			<BlockHolder
 				onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
 				onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }
 				onChange={ this.props.onChange.bind( this ) }
 				focused={ value.item.focused }
-				index={ value.index }
+				uid={ value.uid }
 				{ ...value.item }
 			/>
 		);

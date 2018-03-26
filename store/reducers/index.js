@@ -1,19 +1,26 @@
 /** @format */
 
-import { find, reduce } from 'lodash';
+import { find, findIndex, reduce } from 'lodash';
 
 import ActionTypes from '../actions/ActionTypes';
 
-function findBlock( state, uid: integer ) {
-	return find( state.blocks, obj => {
-		return obj.key === uid;
+function findBlock( blocks, uid: string ) {
+	return find( blocks, obj => {
+		return obj.uid === uid;
+	} );
+}
+
+function findBlockIndex( blocks, uid: string ) {
+	return findIndex( blocks, obj => {
+		return obj.uid === uid;
 	} );
 }
 
 export const reducer = ( state = {}, action ) => {
+	const blocks = [ ...state.blocks ];
 	switch ( action.type ) {
 		case ActionTypes.BLOCK.UPDATE_ATTRIBUTES:
-			const block = findBlock( state, action.uid );
+			const block = findBlock( blocks, action.uid );
 
 			// Ignore updates if block isn't known
 			if ( ! block ) {
@@ -26,7 +33,7 @@ export const reducer = ( state = {}, action ) => {
 				( result, value, key ) => {
 					if ( value !== result[ key ] ) {
 						// Avoid mutating original block by creating shallow clone
-						if ( result === findBlock( state, action.uid ).attributes ) {
+						if ( result === findBlock( blocks, action.uid ).attributes ) {
 							result = { ...result };
 						}
 
@@ -35,51 +42,51 @@ export const reducer = ( state = {}, action ) => {
 
 					return result;
 				},
-				state.blocks[ action.uid ].attributes
+				findBlock( blocks, action.uid ).attributes
 			);
 
 			// Skip update if nothing has been changed. The reference will
 			// match the original block if `reduce` had no changed values.
-			if ( nextAttributes === findBlock( state, action.uid ).attributes ) {
+			if ( nextAttributes === findBlock( blocks, action.uid ).attributes ) {
 				return state;
 			}
 
 			// Otherwise merge attributes into state
-			const blocks = [ ...state.blocks ];
-			blocks[ action.uid ] = {
-				...blocks[ action.uid ],
+			var index = findBlockIndex( blocks, action.uid );
+			blocks[ index ] = {
+				...block,
 				attributes: nextAttributes,
 			};
 			return { blocks: blocks, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.FOCUS:
-			var blocks = [ ...state.blocks ];
-			const currentBlockState = blocks[ action.rowId ].focused;
+			const destBlock = findBlock( blocks, action.uid );
+			const destBlockState = destBlock.focused;
 			// Deselect all blocks
 			for ( let block of blocks ) {
 				block.focused = false;
 			}
 			// Select or deselect pressed block
-			blocks[ action.rowId ].focused = ! currentBlockState;
+			destBlock.focused = ! destBlockState;
 			return { blocks: blocks, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.MOVE_UP:
-			if ( action.rowId == 0 ) return state;
+			if ( blocks[ 0 ].uid === action.uid ) return state;
 
-			var blocks = [ ...state.blocks ];
-			var tmp = blocks[ action.rowId ];
-			blocks[ action.rowId ] = blocks[ action.rowId - 1 ];
-			blocks[ action.rowId - 1 ] = tmp;
+			var index = findBlockIndex( blocks, action.uid );
+			var tmp = blocks[ index ];
+			blocks[ index ] = blocks[ index - 1 ];
+			blocks[ index - 1 ] = tmp;
 			return { blocks: blocks, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.MOVE_DOWN:
-			if ( action.rowId == state.blocks.length - 1 ) return state;
+			if ( blocks[ blocks.length - 1 ].uid === action.uid ) return state;
 
-			var blocks = [ ...state.blocks ];
-			var tmp = blocks[ action.rowId ];
-			blocks[ action.rowId ] = blocks[ action.rowId + 1 ];
-			blocks[ action.rowId + 1 ] = tmp;
+			var index = findBlockIndex( blocks, action.uid );
+			var tmp = blocks[ index ];
+			blocks[ index ] = blocks[ index + 1 ];
+			blocks[ index + 1 ] = tmp;
 			return { blocks: blocks, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.DELETE:
-			var blocks = [ ...state.blocks ];
-			blocks.splice( action.rowId, 1 );
+			var index = findBlockIndex( blocks, action.uid );
+			blocks.splice( index, 1 );
 			return { blocks: blocks, refresh: ! state.refresh };
 		default:
 			return state;

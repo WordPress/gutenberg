@@ -7,7 +7,7 @@ const initialState = {
 	// If not it should be created from a string parsing (commented HTML to json).
 	blocks: [
 		{
-			key: 0,
+			uid: '0',
 			blockType: 'title',
 			attributes: {
 				content: 'Hello World',
@@ -15,7 +15,7 @@ const initialState = {
 			focused: false,
 		},
 		{
-			key: 1,
+			uid: '1',
 			blockType: 'paragraph',
 			attributes: {
 				content:
@@ -24,7 +24,7 @@ const initialState = {
 			focused: false,
 		},
 		{
-			key: 2,
+			uid: '2',
 			blockType: 'paragraph',
 			attributes: {
 				content:
@@ -33,7 +33,7 @@ const initialState = {
 			focused: false,
 		},
 		{
-			key: 3,
+			uid: '3',
 			blockType: 'core/code',
 			attributes: {
 				content: 'if name == "World":\n    return "Hello World"\nelse:\n    return "Hello Pony"',
@@ -41,7 +41,7 @@ const initialState = {
 			focused: false,
 		},
 		{
-			key: 4,
+			uid: '4',
 			blockType: 'paragraph',
 			attributes: {
 				content:

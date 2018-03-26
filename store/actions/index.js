@@ -9,22 +9,22 @@ export function updateBlockAttributes( uid, attributes ) {
 	};
 }
 
-export const focusBlockAction = index => ( {
+export const focusBlockAction = uid => ( {
 	type: ActionTypes.BLOCK.FOCUS,
-	rowId: index,
+	uid: uid,
 } );
 
-export const moveBlockUpAction = index => ( {
+export const moveBlockUpAction = uid => ( {
 	type: ActionTypes.BLOCK.MOVE_UP,
-	rowId: index,
+	uid: uid,
 } );
 
-export const moveBlockDownAction = index => ( {
+export const moveBlockDownAction = uid => ( {
 	type: ActionTypes.BLOCK.MOVE_DOWN,
-	rowId: index,
+	uid: uid,
 } );
 
-export const deleteBlockAction = index => ( {
+export const deleteBlockAction = uid => ( {
 	type: ActionTypes.BLOCK.DELETE,
-	rowId: index,
+	uid: uid,
 } );
