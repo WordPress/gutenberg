@@ -174,6 +174,20 @@ export function getPostEdits( state ) {
 }
 
 /**
+ * Returns true if the current post is about to be published.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if post is not published but new state is published.
+ */
+export function isGoingToPublish( state ) {
+	const currentPost = getCurrentPost( state );
+	const edits = getPostEdits( state );
+
+	return ( 'publish' == edits.status ) && ( 'publish' != currentPost.status );
+}
+
+/**
  * Returns a single attribute of the post being edited, preferring the unsaved
  * edit if one exists, but falling back to the attribute for the last known
  * saved state of the post.
