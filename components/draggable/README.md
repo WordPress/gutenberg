@@ -1,6 +1,6 @@
 # Draggable
 
-`Draggable` is a ReactComponent that can wrap any React element to make it draggable. When used, a cross-browser (including IE) customisable drag image is created. The component clones the specified element on drag-start and uses the clone as a drag image during drag-over. Discards the clone on drag-end.
+`Draggable` is a Component that can wrap any element to make it draggable. When used, a cross-browser (including IE) customisable drag image is created. The component clones the specified element on drag-start and uses the clone as a drag image during drag-over. Discards the clone on drag-end.
 
 ## Props
 
@@ -15,7 +15,7 @@ The HTML id of the element to clone on drag
 
 ### transferData
 
-The data object attached to the drag and drop event.
+Arbitrary data object attached to the drag and drop event.
 
 - Type: `Object`
 - Required: Yes

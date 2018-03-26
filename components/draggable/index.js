@@ -69,27 +69,29 @@ class Draggable extends Component {
 	onDragStart( event ) {
 		const { elementId, transferData, onDragStart = noop } = this.props;
 		const element = document.getElementById( elementId );
-		const elementWrapper = element.parentNode;
-		const elementRect = element.getBoundingClientRect();
-		const elementTopOffset = parseInt( elementRect.top, 10 );
-		const elementLeftOffset = parseInt( elementRect.left, 10 );
-		const clone = element.cloneNode( true );
-		const dragImage = document.createElement( 'div' );
 
 		// Set a fake drag image to avoid browser defaults. Remove from DOM right after.
+		// event.dataTransfer.setDragImage is not supported yet in IE,
+		// we need to check for its existance first.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
+			const dragImage = document.createElement( 'div' );
 			dragImage.id = `drag-image-${ elementId }`;
 			dragImage.classList.add( dragImageClass );
 			document.body.appendChild( dragImage );
 			event.dataTransfer.setDragImage( dragImage, 0, 0 );
-			this.props.setTimeout( ( ( _dragImage ) => () => {
-				document.body.removeChild( _dragImage );
-			} )( dragImage ), 0 );
+			this.props.setTimeout( () => {
+				document.body.removeChild( dragImage );
+			} );
 		}
 
 		event.dataTransfer.setData( 'text', JSON.stringify( transferData ) );
 
 		// Prepare element clone and append to element wrapper.
+		const elementRect = element.getBoundingClientRect();
+		const elementWrapper = element.parentNode;
+		const elementTopOffset = parseInt( elementRect.top, 10 );
+		const elementLeftOffset = parseInt( elementRect.left, 10 );
+		const clone = element.cloneNode( true );
 		clone.id = `clone-${ elementId }`;
 		this.cloneWrapper = document.createElement( 'div' );
 		this.cloneWrapper.classList.add( cloneWrapperClass );
@@ -107,7 +109,6 @@ class Draggable extends Component {
 			this.cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
 			this.cloneWrapper.style.left = `${ elementLeftOffset - clonePadding }px`;
 		}
-
 		this.cloneWrapper.appendChild( clone );
 		elementWrapper.appendChild( this.cloneWrapper );
 
