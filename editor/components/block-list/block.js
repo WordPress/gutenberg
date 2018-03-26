@@ -419,6 +419,7 @@ export class BlockListBlock extends Component {
 			isLocked,
 			isFirst,
 			isLast,
+			uid,
 			rootUID,
 			layout,
 			renderBlockMenu,
@@ -478,7 +479,7 @@ export class BlockListBlock extends Component {
 				...blockType.getEditWrapperProps( block.attributes ),
 			};
 		}
-		const blockElementId = `block-${ this.props.uid }`;
+		const blockElementId = `block-${ uid }`;
 
 		// Disable reasons:
 		//
@@ -512,7 +513,7 @@ export class BlockListBlock extends Component {
 					<BlockDraggable
 						rootUID={ rootUID }
 						index={ order }
-						uid={ block.uid }
+						uid={ uid }
 						layout={ layout }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
@@ -528,7 +529,7 @@ export class BlockListBlock extends Component {
 				/>
 				{ shouldShowMovers && (
 					<BlockMover
-						uids={ [ block.uid ] }
+						uids={ [ uid ] }
 						rootUID={ rootUID }
 						layout={ layout }
 						isFirst={ isFirst }
@@ -537,7 +538,7 @@ export class BlockListBlock extends Component {
 				) }
 				{ shouldShowSettingsMenu && ! showSideInserter && (
 					<BlockSettingsMenu
-						uids={ [ block.uid ] }
+						uids={ [ uid ] }
 						rootUID={ rootUID }
 						renderBlockMenu={ renderBlockMenu }
 					/>
@@ -550,7 +551,7 @@ export class BlockListBlock extends Component {
 					onMouseDown={ this.onPointerDown }
 					className="editor-block-list__block-edit"
 					aria-label={ blockLabel }
-					data-block={ block.uid }
+					data-block={ uid }
 				>
 
 					<BlockCrashBoundary onError={ this.onBlockError }>
@@ -563,13 +564,13 @@ export class BlockListBlock extends Component {
 								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 								onReplace={ isLocked ? undefined : onReplace }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-								id={ block.uid }
+								id={ uid }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
 								toggleSelection={ this.props.toggleSelection }
 							/>
 						) }
 						{ isValid && mode === 'html' && (
-							<BlockHtml uid={ block.uid } />
+							<BlockHtml uid={ uid } />
 						) }
 						{ ! isValid && [
 							<div key="invalid-preview">
@@ -584,7 +585,7 @@ export class BlockListBlock extends Component {
 					{ shouldShowMobileToolbar && (
 						<BlockMobileToolbar
 							rootUID={ rootUID }
-							uid={ block.uid }
+							uid={ uid }
 							renderBlockMenu={ renderBlockMenu }
 						/>
 					) }
@@ -592,7 +593,7 @@ export class BlockListBlock extends Component {
 				{ !! error && <BlockCrashWarning /> }
 				{ shouldShowInsertionPoint && (
 					<BlockInsertionPoint
-						uid={ block.uid }
+						uid={ uid }
 						rootUID={ rootUID }
 						layout={ layout }
 					/>
@@ -600,7 +601,7 @@ export class BlockListBlock extends Component {
 				{ showSideInserter && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">
-							<InserterWithShortcuts uid={ block.uid } layout={ layout } onToggle={ this.selectOnOpen } />
+							<InserterWithShortcuts uid={ uid } layout={ layout } onToggle={ this.selectOnOpen } />
 						</div>
 						<div className="editor-block-list__empty-block-inserter">
 							<Inserter
