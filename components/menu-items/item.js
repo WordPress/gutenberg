@@ -24,8 +24,8 @@ import './style.scss';
  */
 function MenuItemsItem( { className, icon, label, onClick, shortcut, isSelected = false } ) {
 	className = classnames( 'components-menu-items__button', {
-		[ className ]: Boolean( className ),
-		'has-icon': Boolean( icon ),
+		[ className ]: className,
+		'has-icon': icon,
 	} );
 
 	if ( icon ) {
