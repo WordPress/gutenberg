@@ -111,13 +111,19 @@ class Popover extends Component {
 
 	/**
 	 * Shifts focus to the non-tabbable content wrapper if there are focusable
-	 * inputs within the content. This enables the user to proceed with tabbing
-	 * or arrowing into the content, to mimic the behavior as if the popover
-	 * were rendered in the markup immediately following the triggering element
-	 * which is not guaranteed with the slot / fill implementation.
+	 * inputs within the content, and if focus is not already within content.
+	 * This enables the user to proceed with tabbing or arrowing into the
+	 * content, to mimic the behavior as if the popover were rendered in the
+	 * markup immediately following the triggering element which is not
+	 * guaranteed with the slot / fill implementation.
 	 */
 	focusContentIfTabbables() {
 		const { content } = this.nodes;
+
+		// Don't shift focus if focus already within (e.g. autoFocus).
+		if ( content.contains( document.activeElement ) ) {
+			return;
+		}
 
 		const hasTabbables = focus.tabbable.find( content ).length > 0;
 		if ( hasTabbables ) {

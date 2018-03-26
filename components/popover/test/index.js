@@ -100,6 +100,19 @@ describe( 'Popover', () => {
 			expect( document.activeElement ).toBe( content );
 		} );
 
+		it( 'should not shift focus when opening if tabbables and focus already within', () => {
+			focus.tabbable.find.mockImplementation( ( content ) => {
+				return [ content.querySelector( 'input' ) ];
+			} );
+
+			// eslint-disable-next-line jsx-a11y/no-autofocus
+			wrapper = mount( <Popover><input autoFocus /></Popover> );
+
+			const input = wrapper.find( 'input' ).getDOMNode();
+
+			expect( document.activeElement ).toBe( input );
+		} );
+
 		it( 'should allow focus-on-open behavior to be disabled', () => {
 			const activeElement = document.activeElement;
 
