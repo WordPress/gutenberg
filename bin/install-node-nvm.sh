@@ -9,11 +9,11 @@ set -e
 
 # Load NVM
 if [ -n "$NVM_DIR" ]; then
-	# if using homebrew, use that to find path to nvm.sh
-	if [ -n "$(command -v brew)" ]; then
-		. "$(brew --prefix nvm)/nvm.sh" --no-use
-	else
+	if [ -f "$NVM_DIR/nvm.sh" ]; then
 		. "$NVM_DIR/nvm.sh" --no-use
+	elif [ -n "$(command -v brew)" ]; then
+		# use homebrew that to find path to nvm.sh
+		. "$(brew --prefix nvm)/nvm.sh" --no-use
 	fi
 fi
 
