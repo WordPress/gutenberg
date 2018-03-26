@@ -3,11 +3,14 @@ package com.example.android.recyclerview.AztecRN;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -15,6 +18,10 @@ import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
+import com.facebook.react.views.textinput.ReactTextChangedEvent;
+import com.facebook.react.views.textinput.ReactTextInputEvent;
+
+import java.util.Map;
 
 public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
 
@@ -34,6 +41,44 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
     @Override
     protected ReactAztecView createViewInstance(ThemedReactContext reactContext) {
         return new ReactAztecView(reactContext, mCallerContext);
+    }
+
+    @Nullable
+    @Override
+    public Map<String, Object> getExportedCustomBubblingEventTypeConstants() {
+        return MapBuilder.<String, Object>builder()
+             /*   .put(
+                        "topSubmitEditing",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of(
+                                        "bubbled", "onSubmitEditing", "captured", "onSubmitEditingCapture")))*/
+                .put(
+                        "topEndEditing",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onEndEditing", "captured", "onEndEditingCapture")))
+                .put(
+                        "topTextInput",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onTextInput", "captured", "onTextInputCapture")))
+                .put(
+                        "topFocus",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onFocus", "captured", "onFocusCapture")))
+                .put(
+                        "topBlur",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onBlur", "captured", "onBlurCapture")))
+              /*  .put(
+                        "topKeyPress",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onKeyPress", "captured", "onKeyPressCapture")))*/
+                .build();
     }
 
     @ReactProp(name = "text")
@@ -74,18 +119,41 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
     protected void addEventEmitters(
             final ThemedReactContext reactContext,
             final ReactAztecView editText) {
-        // addTextChangedListener is needed because it's the place where ReactAztecView add the
-        // TextWatcherDelegator... that in order call onContentSizeChanged when needed and notifies JS
-        editText.addTextChangedListener(new AztecTextInputTextWatcher(reactContext, editText));
+        editText.addTextChangedListener(new AztecTextWatcher(reactContext, editText));
+
+        editText.setOnFocusChangeListener(
+                new View.OnFocusChangeListener() {
+                    public void onFocusChange(View v, boolean hasFocus) {
+                        EventDispatcher eventDispatcher =
+                                reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+                        if (hasFocus) {
+                            eventDispatcher.dispatchEvent(
+                                    new ReactAztecFocusEvent(
+                                            editText.getId()));
+                        } else {
+                            eventDispatcher.dispatchEvent(
+                                    new ReactAztecBlurEvent(
+                                            editText.getId()));
+
+                            eventDispatcher.dispatchEvent(
+                                    new ReactaztecEndEditingEvent(
+                                            editText.getId(),
+                                            editText.getText().toString()));
+                        }
+                    }
+                });
+
+        // Don't think we need to add setOnEditorActionListener here (intercept Enter for example), but
+        // in case check ReactTextInputManager
     }
 
-    private class AztecTextInputTextWatcher implements TextWatcher {
+    private class AztecTextWatcher implements TextWatcher {
 
         private EventDispatcher mEventDispatcher;
         private ReactAztecView mEditText;
         private String mPreviousText;
 
-        public AztecTextInputTextWatcher(
+        public AztecTextWatcher(
                 final ReactContext reactContext,
                 final ReactAztecView editText) {
             mEventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
@@ -115,9 +183,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
                 return;
             }
 
-            //TODO - Danilo: These 2 events below are not yet handled in JS. Not sure we need to include them
-
-        /*    // The event that contains the event counter and updates it must be sent first.
+            // The event that contains the event counter and updates it must be sent first.
             // TODO: t7936714 merge these events
             mEventDispatcher.dispatchEvent(
                     new ReactTextChangedEvent(
@@ -132,7 +198,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
                             oldText,
                             start,
                             start + before));
-                            */
         }
 
         @Override
