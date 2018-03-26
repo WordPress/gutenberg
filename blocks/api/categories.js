@@ -23,8 +23,8 @@ const categories = [
  * @return {Array} Block categories.
  */
 export function getCategories() {
-	if (typeof customGutenberg === 'object' && customGutenberg.categories) {
-		return customGutenberg.categories;
+	if ( typeof window.customGutenberg === 'object' && window.customGutenberg.categories ) {
+		return window.customGutenberg.categories;
 	}
 
 	return categories;

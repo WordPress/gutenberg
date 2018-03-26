@@ -35,7 +35,7 @@ import { registerCoreBlocks } from 'gutenberg';
 registerCoreBlocks();
 ```
 
-Gutenberg by requires `wpApiSettings`, `wp`, `window.wp`, `window._wpDateSettings`, `window.userSettings`, `window.jQuery`, `window.wpEditorL10n`
+Gutenberg by requires `window.wpApiSettings`, `window.wp`, `window._wpDateSettings`, `window.userSettings`, `window.jQuery`, `window.wpEditorL10n`
 
 ### Webpack setup
 
@@ -161,7 +161,7 @@ How all changes come from our needs, we decided to add a new object with a range
 ```
 cons customGutenberg = {
 	categories: [ 
-		{ slug: 'common', title: 'Common blocks' }
+		{ slug: 'common', title: 'Common blocks' } // this category should allways be included
 	],
 	tabs: [
 		{

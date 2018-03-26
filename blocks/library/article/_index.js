@@ -7,7 +7,7 @@ import { findKey, map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { 
+import {
 	Button,
 	ButtonGroup,
 	IconButton,
@@ -15,18 +15,17 @@ import {
 	PanelColor,
 	RangeControl,
 	ToggleControl,
-    Toolbar,
+	Toolbar,
 } from '@wordpress/components';
 
 import { __ } from '@wordpress/i18n';
 
-import { 
+import {
 	AlignmentToolbar,
-    BlockAlignmentToolbar,
 	BlockControls,
 	ColorPalette,
 	ImagePlaceholder,
-    InspectorControls,
+	InspectorControls,
 	MediaUpload,
 	RichText,
 } from '@wordpress/blocks';
@@ -40,11 +39,11 @@ const FONT_SIZES = {
 	larger: 48,
 };
 
-export const name = 'sp/article';
+export const name = 'dynamic/article';
 
 export const settings = {
 	title: 'Article',
-	
+
 	description: __( 'Article has an image and a title.' ),
 
 	icon: 'universal-access-alt',
@@ -52,12 +51,12 @@ export const settings = {
 	category: 'common',
 
 	attributes: {
-        title: {
-            type: 'array',
-            source: 'children',
-            selector: 'p',
-        },
-        url: {
+		title: {
+			type: 'array',
+			source: 'children',
+			selector: 'p',
+		},
+		url: {
 			type: 'string',
 		},
 		textAlign: {
@@ -85,19 +84,18 @@ export const settings = {
 			type: 'string',
 		},
 		customFontSize: {
-			type: 'number'
+			type: 'number',
 		},
-    },
+	},
 
-    edit( { attributes, setAttributes, isSelected, className } ) {
-        const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize } = attributes;
-		
+	edit( { attributes, setAttributes, isSelected, className } ) {
+		const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, customFontSize } = attributes;
+		let { fontSize } = attributes;
+
 		// image events
-		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSelectImage = ( media ) => setAttributes( { url: media.url, id: media.id } );
 		const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
-
 
 		// text events
 		const getFontSize = () => {
@@ -110,10 +108,10 @@ export const settings = {
 			}
 		};
 
+		fontSize = getFontSize();
+
 		const setFontSize = ( fontSizeValue ) => {
-			console.log(fontSizeValue);
 			const thresholdFontSize = findKey( FONT_SIZES, ( size ) => size === fontSizeValue );
-			console.log(thresholdFontSize);
 			if ( thresholdFontSize ) {
 				setAttributes( {
 					fontSize: thresholdFontSize,
@@ -127,15 +125,18 @@ export const settings = {
 			} );
 		};
 
-        const style = url ? { backgroundImage: `url(${ url })` } : undefined;
+		const style = url ? { backgroundImage: `url(${ url })` } : undefined;
 
-        const classes = classnames('wp-block-cover-image', dimRatioToClass( dimRatio ), {
+		const classes = classnames(
+			'wp-block-cover-image',
+			dimRatioToClass( dimRatio ),
+			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
 			}
 		);
 
-  		const alignmentToolbar	= (
+		const alignmentToolbar	= (
 			<AlignmentToolbar
 				value={ textAlign }
 				onChange={ ( nextAlign ) => {
@@ -228,23 +229,25 @@ export const settings = {
 						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 					/>
 				</PanelColor>
-			</InspectorControls>
+			</InspectorControls>,
 		];
 
 		const richText = (
 			<RichText
-			    key="title"
+				key="title"
 				tagName="p"
 				placeholder={ __( 'Write a title…' ) }
 				value={ title }
-				className={ classnames( 'wp-block-paragraph', className, {
-					'has-background': backgroundColor
-				} ) }
-				style={ { 
+				className={ classnames(
+					'wp-block-paragraph',
+					className,
+					{ 'has-background': backgroundColor },
+				) }
+				style={ {
 					backgroundColor: backgroundColor,
 					color: textColor,
 					fontSize: fontSize ? fontSize + 'px' : undefined,
-					textAlign: textAlign 
+					textAlign: textAlign,
 				} }
 				onChange={ ( value ) => setAttributes( { title: value } ) }
 				isSelected={ isSelected }
@@ -252,62 +255,65 @@ export const settings = {
 			/>
 		);
 
-        if (!url) {
-    		const icon = 'format-image';
-    		const label = __( 'Article image' );
-    		
-    		return [
-    			controls,
-    			<ImagePlaceholder
-        			key="cover-image-placeholder"
-        			{ ...{ className, icon, label, onSelectImage } }
-        		/>,
-        		richText
-        	]
-    	} 
-    	
-    	return [
+		if ( ! url ) {
+			const icon = 'format-image';
+			const label = __( 'Article image' );
+
+			return [
+				controls,
+				<ImagePlaceholder
+					key="cover-image-placeholder"
+					{ ...{ className, icon, label, onSelectImage } }
+				/>,
+				richText,
+			];
+		}
+
+		return [
 			controls,
-    		<section
+			<section
 				key="preview"
 				data-url={ url }
 				style={ style }
 				className={ classes }
-			/ >,
-			(title || isSelected ? richText : null ),
-		]
-    },
+			/>,
+			( title || isSelected ? richText : null ),
+		];
+	},
 
-    save( { attributes, className } ) {
-    	const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize } = attributes;
-		
-        const imageStyle = url ? { backgroundImage: `url(${ url })` } : undefined;
-        const imageClasses = classnames('wp-block-cover-image', dimRatioToClass( dimRatio ), {
+	save( { attributes, className } ) {
+		const { url, title, textAlign, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize } = attributes;
+
+		const imageStyle = url ? { backgroundImage: `url(${ url })` } : undefined;
+		const imageClasses = classnames(
+			'wp-block-cover-image',
+			dimRatioToClass( dimRatio ),
+			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
 			},
 		);
 
 		const textStyle = {
-        	backgroundColor: backgroundColor,
+			backgroundColor: backgroundColor,
 			color: textColor,
 			fontSize: ! fontSize && customFontSize ? customFontSize : undefined,
-			textAlign: textAlign 
-        };
+			textAlign: textAlign,
+		};
 
-        const textClasses = classnames( {
+		const textClasses = classnames( {
 			'has-background': backgroundColor,
 			[ `is-${ fontSize }-text` ]: fontSize && FONT_SIZES[ fontSize ],
 		} );
 
-        return (
-        	<div className={ className }>
-        		<section className={ imageClasses ? imageClasses : undefined } style={ imageStyle }></section>
-        		<p className={ textClasses ? textClasses : undefined } style={ textStyle }>{ title }</p>
-        	</div>
-        )
-    },
-}
+		return (
+			<div className={ className }>
+				<section className={ imageClasses ? imageClasses : undefined } style={ imageStyle }></section>
+				<p className={ textClasses ? textClasses : undefined } style={ textStyle }>{ title }</p>
+			</div>
+		);
+	},
+};
 
 function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?

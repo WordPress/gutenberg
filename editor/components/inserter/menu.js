@@ -70,13 +70,13 @@ export class InserterMenu extends Component {
 		this.sortItems = this.sortItems.bind( this );
 		this.selectItem = this.selectItem.bind( this );
 
-		this.tabScrollTop = this.tabs.reduce( (res, tab) => {
-			if (tab.tabScrollTop != undefined) {
-				res[tab.options.name] = tab.tabScrollTop;
+		this.tabScrollTop = this.tabs.reduce( ( res, tab ) => {
+			if ( tab.tabScrollTop !== undefined ) {
+				res[ tab.options.name ] = tab.tabScrollTop;
 			}
 
 			return res;
-		}, { });
+		}, { } );
 		this.switchTab = this.switchTab.bind( this );
 		this.previewItem = this.previewItem.bind( this );
 	}
@@ -133,8 +133,8 @@ export class InserterMenu extends Component {
 		}
 
 		let predicate;
-		const tabObj = getTabByName(tab);
-		if (typeof tabObj.getItemsForTab === 'function') {
+		const tabObj = getTabByName( tab );
+		if ( typeof tabObj.getItemsForTab === 'function' ) {
 			predicate = tabObj.getItemsForTab();
 		} else {
 			return frecentItems;
@@ -144,9 +144,9 @@ export class InserterMenu extends Component {
 	}
 
 	sortItems( items ) {
-		const tabObj = getTabByName(this.state.tab);
-		if (typeof tabObj.sortItems === 'function') {
-			return tabObj.sortItems(items, this.state);
+		const tabObj = getTabByName( this.state.tab );
+		if ( typeof tabObj.sortItems === 'function' ) {
+			return tabObj.sortItems( items, this.state );
 		}
 
 		const getCategoryIndex = ( item ) => {
@@ -218,17 +218,17 @@ export class InserterMenu extends Component {
 	renderTabView( tab ) {
 		const itemsForTab = this.getItemsForTab( tab );
 
-		if (itemsForTab.length === 0) {
+		if ( itemsForTab.length === 0 ) {
 			return (
 				<NoBlocks>
-					{ __( `No ${tab} blocks.` ) }
+					{ __( `No ${ tab } blocks.` ) }
 				</NoBlocks>
 			);
 		}
 
-		const tabObj = getTabByName(tab);
-		if (typeof tabObj.renderTabView === 'function') {
-			return this.renderItems(tabObj.renderTabView(itemsForTab));
+		const tabObj = getTabByName( tab );
+		if ( typeof tabObj.renderTabView === 'function' ) {
+			return this.renderItems( tabObj.renderTabView( itemsForTab ) );
 		}
 
 		const visibleItemsByCategory = this.getVisibleItemsByCategory( itemsForTab );
@@ -292,7 +292,7 @@ export class InserterMenu extends Component {
 				{ ! isSearching &&
 					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
 						onSelect={ this.switchTab }
-						tabs={ this.tabs.map(tab => tab.options) }
+						tabs={ this.tabs.map( tab => tab.options ) }
 					>
 						{ ( tabKey ) => (
 							<div ref={ ( ref ) => this.tabContainer = ref }>

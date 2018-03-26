@@ -9,14 +9,8 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { RangeControl } from '@wordpress/components';
 
-import { 
-    BlockAlignmentToolbar,
-	BlockControls,
-	InnerBlocks,
-	InspectorControls,
-} from '@wordpress/blocks';
+import { BlockAlignmentToolbar, BlockControls, InnerBlocks } from '@wordpress/blocks';
 
 /**
  * Returns the layouts configuration for a given number of columns.
@@ -47,11 +41,11 @@ export const settings = {
 	attributes: {
 		columns: {
 			type: 'number',
-			default: 3
+			default: 3,
 		},
 		align: {
-			type: 'string'
-		}
+			type: 'string',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -82,8 +76,7 @@ export const settings = {
 		];
 	},
 
-
-	save( {attributes} ) {
+	save( { attributes } ) {
 		const { columns } = attributes;
 
 		return (
@@ -91,5 +84,5 @@ export const settings = {
 				<InnerBlocks.Content />
 			</div>
 		);
-	}
-}
+	},
+};

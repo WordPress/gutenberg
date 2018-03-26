@@ -34,9 +34,9 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 
-import * as article from './_article';
-import * as row6_6 from './_row6_6';
-import * as row4_4_4 from './_row4_4_4';
+import * as article from './article';
+import * as row6x6 from './row6x6';
+import * as row4x4x4 from './row4x4x4';
 
 export const registerCoreBlocks = () => {
 	[
@@ -93,8 +93,8 @@ export const registerCoreBlocks = () => {
 		verse,
 		video,
 		article,
-		row6_6,
-		row4_4_4
+		row6x6,
+		row4x4x4,
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );

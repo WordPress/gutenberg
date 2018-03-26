@@ -1,24 +1,24 @@
 /**
  * Appends post id the url
  *
- * @param  {String} url   URL
- * @param  {Object} args  Query Args
+ * @param  {string}	url   URL
+ * @param  {Object}	args  Query Args
  *
- * @return {String}       Updated URL
+ * @return {string}       Updated URL
  */
 export function addQueryArgs( url, args ) {
 	// reset path
 	window.history.replaceState(
 		{ },
 		' ',
-		`${wpApiSettings.root}/pages/`
-	); 
+		`${ wpApiSettings.root }/pages/`
+	);
 
-	if (args.post) {
-		return `${args.post}/${args.action}`;
+	if ( args.post ) {
+		return `${ args.post }/${ args.action }`;
 	}
 
-	if (args.preview) {
+	if ( args.preview ) {
 		return url;
 	}
 
