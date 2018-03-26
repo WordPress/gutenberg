@@ -27,6 +27,20 @@ function SettingsPanel( { isOpened, onTogglePanel } ) {
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
+			<CheckboxControl
+				heading={ __( 'Use theme CSS' ) }
+				checked={ true }
+			/>			
+
+			<CheckboxControl
+				heading={ __( 'Display header' ) }
+				checked={ true }
+			/>			
+
+			<CheckboxControl
+				heading={ __( 'Display footer' ) }
+				checked={ true }
+			/>
 		</PanelBody>
 	);
 }
