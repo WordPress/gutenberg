@@ -19,13 +19,7 @@ export const settings = {
 
 	icon: 'list-view',
 
-	category: 'widgets',
-
 	keywords: [ __( 'recent posts' ) ],
-
-	supports: {
-		html: false,
-	},
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;

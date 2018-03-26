@@ -172,20 +172,10 @@ export const name = 'core/block';
 
 export const settings = {
 	title: __( 'Shared Block' ),
-	category: 'shared',
+
 	isPrivate: true,
 
-	attributes: {
-		ref: {
-			type: 'number',
-		},
-	},
-
-	supports: {
-		customClassName: false,
-		html: false,
-	},
-
 	edit: EnhancedReusableBlockEdit,
+
 	save: () => null,
 };

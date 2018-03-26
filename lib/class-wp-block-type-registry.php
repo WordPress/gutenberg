@@ -86,6 +86,8 @@ final class WP_Block_Type_Registry {
 			$block_type = new WP_Block_Type( $name, $args );
 		}
 
+		$block_type->filter_settings();
+
 		$this->registered_block_types[ $name ] = $block_type;
 
 		return $block_type;

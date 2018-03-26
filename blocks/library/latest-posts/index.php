@@ -70,6 +70,10 @@ function render_block_core_latest_posts( $attributes ) {
  */
 function register_block_core_latest_posts() {
 	register_block_type( 'core/latest-posts', array(
+		'category'        => 'widgets',
+		'supports'        => array(
+			'html' => false,
+		),
 		'attributes'      => array(
 			'categories'      => array(
 				'type' => 'string',

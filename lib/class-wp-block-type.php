@@ -23,12 +23,28 @@ class WP_Block_Type {
 	public $name;
 
 	/**
+	 * Block type category.
+	 *
+	 * @since 2.5.0
+	 * @var string
+	 */
+	public $category;
+
+	/**
 	 * Block type render callback.
 	 *
 	 * @since 0.6.0
 	 * @var callable
 	 */
 	public $render_callback;
+
+	/**
+	 * Block type supports property schemas.
+	 *
+	 * @since 2.5.0
+	 * @var array
+	 */
+	public $supports;
 
 	/**
 	 * Block type attributes property schemas.
@@ -168,5 +184,23 @@ class WP_Block_Type {
 		foreach ( $args as $property_name => $property_value ) {
 			$this->$property_name = $property_value;
 		}
+	}
+
+	/**
+	 * Filters settings for the block just before it gets registered.
+	 *
+	 * @since 2.5.0
+	 */
+	public function filter_settings() {
+		if ( ! has_filter( 'register_block_type' ) ) {
+			return;
+		}
+
+		$this->set_props( apply_filters( 'register_block_type', array(
+			'category'        => $this->category,
+			'supports'        => $this->supports,
+			'attributes'      => $this->attributes,
+			'render_callback' => $this->render_callback,
+		) ), $this->name );
 	}
 }

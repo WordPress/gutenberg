@@ -19,30 +19,6 @@ export const settings = {
 
 	icon: 'list-view',
 
-	category: 'widgets',
-
-	attributes: {
-		showPostCounts: {
-			type: 'boolean',
-			default: false,
-		},
-		displayAsDropdown: {
-			type: 'boolean',
-			default: false,
-		},
-		showHierarchy: {
-			type: 'boolean',
-			default: false,
-		},
-		align: {
-			type: 'string',
-		},
-	},
-
-	supports: {
-		html: false,
-	},
-
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'full' === align ) {

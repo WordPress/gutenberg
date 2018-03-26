@@ -26,6 +26,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	function tearDown() {
 		parent::tearDown();
 
+		remove_filter( 'register_block_type', array( $this, 'register_block_type_my_filter' ) );
 		$this->registry = null;
 	}
 
@@ -81,6 +82,44 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 		$block_type = $this->registry->register( $name, $settings );
 		$this->assertEquals( $name, $block_type->name );
 		$this->assertEquals( $settings['icon'], $block_type->icon );
+		$this->assertEquals( $block_type, $this->registry->get_registered( $name ) );
+	}
+
+	function register_block_type_my_filter( $settings ) {
+		$settings['category']                           = 'my-category';
+		$settings['supports']['html']                   = true;
+		$settings['attributes']['something']['default'] = 'my-value';
+		$settings['render_callback']                    = 'render_block_core_my_paragraph';
+
+		return $settings;
+	}
+
+	/**
+	 * Should update the block settings with the filter.
+	 */
+	function test_register_block_type_with_settings_filter() {
+		$name     = 'core/paragraph';
+		$settings = array(
+			'category'        => 'common',
+			'supports'        => array(
+				'html' => false,
+			),
+			'attributes'      => array(
+				'something' => array(
+					'type' => 'string',
+				),
+			),
+			'render_callback' => 'render_block_core_paragraph',
+		);
+
+		add_filter( 'register_block_type', array( $this, 'register_block_type_my_filter' ) );
+
+		$block_type = $this->registry->register( $name, $settings );
+		$this->assertEquals( $name, $block_type->name );
+		$this->assertEquals( 'my-category', $block_type->category );
+		$this->assertTrue( $block_type->supports['html'] );
+		$this->assertEquals( 'my-value', $block_type->attributes['something']['default'] );
+		$this->assertEquals( 'render_block_core_my_paragraph', $block_type->render_callback );
 		$this->assertEquals( $block_type, $this->registry->get_registered( $name ) );
 	}
 

@@ -89,6 +89,27 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
  */
 function register_block_core_categories() {
 	register_block_type( 'core/categories', array(
+		'category'        => 'widgets',
+		'supports'        => array(
+			'html' => false,
+		),
+		'attributes'      => array(
+			'showPostCounts'    => array(
+				'type'    => 'boolean',
+				'default' => false,
+			),
+			'displayAsDropdown' => array(
+				'type'    => 'boolean',
+				'default' => false,
+			),
+			'showHierarchy'     => array(
+				'type'    => 'boolean',
+				'default' => false,
+			),
+			'align'             => array(
+				'type' => 'string',
+			),
+		),
 		'render_callback' => 'render_block_core_categories',
 	) );
 }
