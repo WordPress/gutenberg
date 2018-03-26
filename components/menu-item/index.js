@@ -23,8 +23,7 @@ import IconButton from '../icon-button';
  * @return {WPElement} More menu item.
  */
 function MenuItem( { className, icon, label, onClick, shortcut, isSelected = false } ) {
-	className = classnames( 'components-menu-item__button', {
-		[ className ]: Boolean( className ),
+	className = classnames( 'components-menu-item__button', className, {
 		'has-icon': icon,
 	} );
 
