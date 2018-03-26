@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { Draggable } from '@wordpress/components';
 
 function BlockDraggable( { rootUID, index, uid, layout, isDragging, ...props } ) {
-	const blockDragInsetClassName = classnames( 'editor-block-list__block-draggable', {
+	const className = classnames( 'editor-block-list__block-draggable', {
 		'is-visible': isDragging,
 	} );
 
@@ -22,8 +22,8 @@ function BlockDraggable( { rootUID, index, uid, layout, isDragging, ...props } )
 	};
 
 	return (
-		<Draggable className={ blockDragInsetClassName } transferData={ transferData } { ...props }>
-			<div className="inner" ></div>
+		<Draggable className={ className } transferData={ transferData } { ...props }>
+			<div className="editor-block-list__block-draggable-inner"></div>
 		</Draggable>
 	);
 }
