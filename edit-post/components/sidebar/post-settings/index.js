@@ -16,19 +16,24 @@ import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
 import DocumentOutlinePanel from '../document-outline-panel';
 import MetaBoxes from '../../meta-boxes';
+import { getPanelItems } from '../panel-items.js';
 
-const panel = (
-	<Panel>
-		<PostStatus />
-		<LastRevision />
-		<PostTaxonomies />
-		<FeaturedImage />
-		<PostExcerpt />
-		<DiscussionPanel />
-		<PageAttributes />
-		<DocumentOutlinePanel />
-		<MetaBoxes location="side" usePanel />
-	</Panel>
-);
+const items = getPanelItems();
 
-export default () => panel;
+const panel = () => {
+	return (
+		<Panel>
+			{ items.includes('post-status') ? <PostStatus /> : '' }
+			{ items.includes('post-excerpt') ? <LastRevision /> : '' }
+			{ items.includes('post-taxonomies') ? <PostTaxonomies /> : '' }
+			{ items.includes('featured-image') ? <FeaturedImage /> : '' }
+			{ items.includes('discussion-panel') ? <PostExcerpt /> : '' }
+			{ items.includes('last-revision') ? <DiscussionPanel /> : '' }
+			{ items.includes('page-attributes') ? <PageAttributes /> : '' }
+			{ items.includes('document-outline-panel') ? <DocumentOutlinePanel /> : '' }
+			{ items.includes('meta-boxes') ? <MetaBoxes location="side" usePanel /> : '' }
+		</Panel>
+	);
+}
+
+export default panel;
