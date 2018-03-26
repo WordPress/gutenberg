@@ -319,6 +319,11 @@ export const editor = flow( [
 				};
 
 			case 'MOVE_BLOCK_TO_POSITION':
+				// Avoid creating a new instance if the layout didn't change.
+				if ( state[ action.uid ].attributes.layout === action.layout ) {
+					return state;
+				}
+
 				return {
 					...state,
 					[ action.uid ]: {

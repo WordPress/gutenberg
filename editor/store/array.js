@@ -1,13 +1,16 @@
+/**
+ * External dependencies
+ */
 import { castArray } from 'lodash';
 
 /**
  * Insert one or multiple elements into a given position of an array.
  *
- * @param {Array}  array Source array.
- * @param {*}   elements Elements to insert.
- * @param {number} index Insert Position.
+ * @param {Array}  array    Source array.
+ * @param {*}      elements Elements to insert.
+ * @param {number} index    Insert Position.
  *
- * @return {Array}       Result.
+ * @return {Array}          Result.
  */
 export function insertAt( array, elements, index ) {
 	return [
