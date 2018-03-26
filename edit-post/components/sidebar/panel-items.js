@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { camelCase } from 'lodash';
-
-/**
  * Panel (sidebar) items.
  *
  * @var {Array} items
@@ -18,8 +13,6 @@ const panelItems = [
 	'page-attributes',
 	'document-outline-panel',
 	'meta-boxes',
-	'posts-list',
-	'settings-panel',
 ];
 
 /**

@@ -26,19 +26,19 @@ const items = getPanelItems();
 const panel = () => {
 	return (
 		<Panel>
-			{ items.includes('post-status') ? <PostStatus /> : '' }
-			{ items.includes('post-excerpt') ? <LastRevision /> : '' }
-			{ items.includes('post-taxonomies') ? <PostTaxonomies /> : '' }
-			{ items.includes('featured-image') ? <FeaturedImage /> : '' }
-			{ items.includes('discussion-panel') ? <PostExcerpt /> : '' }
-			{ items.includes('last-revision') ? <DiscussionPanel /> : '' }
-			{ items.includes('page-attributes') ? <PageAttributes /> : '' }
-			{ items.includes('document-outline-panel') ? <DocumentOutlinePanel /> : '' }
-			{ items.includes('meta-boxes') ? <MetaBoxes location="side" usePanel /> : '' }
-			{ items.includes('posts-list') ? <PostsList /> : '' }
-			{ items.includes('settings-panel') ? <SettingsPanel /> : '' }
+			{ items.includes( 'post-status' ) ? <PostStatus /> : '' }
+			{ items.includes( 'post-excerpt' ) ? <LastRevision /> : '' }
+			{ items.includes( 'post-taxonomies' ) ? <PostTaxonomies /> : '' }
+			{ items.includes( 'featured-image' ) ? <FeaturedImage /> : '' }
+			{ items.includes( 'discussion-panel' ) ? <PostExcerpt /> : '' }
+			{ items.includes( 'last-revision' ) ? <DiscussionPanel /> : '' }
+			{ items.includes( 'page-attributes' ) ? <PageAttributes /> : '' }
+			{ items.includes( 'document-outline-panel' ) ? <DocumentOutlinePanel /> : '' }
+			{ items.includes( 'meta-boxes' ) ? <MetaBoxes location="side" usePanel /> : '' }
+			{ items.includes( 'posts-list' ) ? <PostsList /> : '' }
+			{ items.includes( 'settings-panel' ) ? <SettingsPanel /> : '' }
 		</Panel>
 	);
-}
+};
 
 export default panel;

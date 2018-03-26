@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 
 /**
@@ -23,12 +24,12 @@ function PostsList( { isOpened, onTogglePanel } ) {
 	return (
 		<PanelBody
 			title={ __( 'Stories' ) }
-			opened={ isOpened } 
+			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
 		</PanelBody>
 	);
-} 
+}
 
 export default connect(
 	( state ) => ( {
