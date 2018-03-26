@@ -219,8 +219,8 @@ class WritingFlow extends Component {
 
 		// In navigation mode, tab and arrows navigate from block to blocks
 		if ( keyboardMode === 'navigation' ) {
-			const navigateUp = keyCode === TAB && event.shiftKey;
-			const navigateDown = keyCode === TAB && ! event.shiftKey;
+			const navigateUp = ( keyCode === TAB && event.shiftKey ) || keyCode === UP;
+			const navigateDown = ( keyCode === TAB && ! event.shiftKey ) || keyCode === DOWN;
 
 			if ( ( navigateDown && nextBlockUid ) || ( navigateUp && previousBlockUid ) ) {
 				event.preventDefault();
@@ -228,7 +228,7 @@ class WritingFlow extends Component {
 			}
 
 			// Special case when reaching the end of the blocks (navigate to the next tabbable outside of the writing flow)
-			if ( navigateDown && selectedBlockUID && ! nextBlockUid ) {
+			if ( navigateDown && selectedBlockUID && ! nextBlockUid && [ UP, DOWN ].indexOf( keyCode ) === -1 ) {
 				this.props.clearSelectedBlock();
 				this.appender.focus();
 			}
