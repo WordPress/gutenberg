@@ -7,10 +7,44 @@ import {
 	getPlugins,
 } from '../';
 
+jest.mock( '@wordpress/data', () => {
+	const plugins = {};
+	const dispatch = jest.fn();
+	const select = jest.fn();
+
+	dispatch.mockReturnValue( {
+		registerPlugin: ( name, settings = {} ) => {
+			return plugins[ name ] = settings;
+		},
+		unregisterPlugin: name => {
+			const settings = plugins[ name ];
+			delete plugins[ name ];
+			return settings;
+		},
+	} );
+
+	select.mockReturnValue( {
+		getPlugin: name => {
+			return plugins[ name ];
+		},
+		getPlugins: () => {
+			return plugins;
+		},
+	} );
+
+	return {
+		select,
+		dispatch,
+	};
+} );
+
 describe( 'registerPlugin', () => {
 	afterEach( () => {
-		getPlugins().forEach( ( plugin ) => {
-			unregisterPlugin( plugin.name );
+		const plugins = getPlugins();
+		Object.keys( plugins ).forEach( ( plugin ) => {
+			if ( plugins.hasOwnProperty( plugin.name ) ) {
+				unregisterPlugin( plugin.name );
+			}
 		} );
 	} );
 
@@ -51,7 +85,6 @@ describe( 'registerPlugin', () => {
 		registerPlugin( 'plugin', {
 			render: () => 'plugin content',
 		} );
-		console.log( console ); // eslint-disable-line
 		expect( console ).toHaveErroredWith( 'Plugin "plugin" is already registered.' );
 	} );
 } );

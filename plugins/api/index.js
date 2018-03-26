@@ -43,6 +43,7 @@ export function registerPlugin( name, settings ) {
 		console.error(
 			`Plugin "${ name }" is already registered.`
 		);
+		return null;
 	}
 	if ( ! isFunction( settings.render ) ) {
 		console.error(
