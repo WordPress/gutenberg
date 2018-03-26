@@ -7,16 +7,15 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
-import { Slot, Fill, withContext, MenuItemsGroup, MenuItemsItem } from '@wordpress/components';
+import { Slot, Fill, withContext, MenuItemsItem } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Name of slot in which the more menu items should fill.
  *
  * @type {string}
  */
-const SLOT_NAME = 'PluginMoreMenuItem';
+export const SLOT_NAME = 'PluginMoreMenuItem';
 
 let PluginMoreMenuItem = ( { label, onClick, icon, isSelected } ) => (
 	<Fill name={ SLOT_NAME }>
@@ -76,21 +75,8 @@ PluginMoreMenuItem = compose( [
 	} ),
 ] )( PluginMoreMenuItem );
 
-PluginMoreMenuItem.Slot = ( { getFills, fillProps } ) => {
-	// We don't want the plugins menu items group to be rendered if there are no fills.
-	if ( ! getFills( SLOT_NAME ).length ) {
-		return null;
-	}
-	return (
-		<MenuItemsGroup
-			label={ __( 'Plugins' ) } >
-			<Slot name={ SLOT_NAME } fillProps={ fillProps } />
-		</MenuItemsGroup>
-	);
-};
-
-PluginMoreMenuItem.Slot = compose( [
-	withContext( 'getFills' )(),
-] )( PluginMoreMenuItem.Slot );
+PluginMoreMenuItem.Slot = ( { fillProps } ) => (
+	<Slot name={ SLOT_NAME } fillProps={ fillProps } />
+);
 
 export default PluginMoreMenuItem;
