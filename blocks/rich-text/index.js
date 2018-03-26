@@ -541,14 +541,21 @@ export class RichText extends Component {
 	}
 
 	scrollToCaret() {
+		if ( ! this.props.isViewportSmall ) {
+			return;
+		}
+
 		const { top: caretTop } = this.getEditorSelectionRect();
 
 		const container = getScrollContainer( this.editor.getBody() );
+		if ( ! container ) {
+			return;
+		}
 
 		// When scrolling, avoid positioning the caret at the very top of
 		// the viewport, providing some "air" and some textual context for
 		// the user, and avoiding toolbars.
-		const graceOffset = this.props.isViewportSmall ? 100 : 300;
+		const graceOffset = 100;
 
 		// Avoid pointless scrolling by establishing a threshold under
 		// which scrolling should be skipped;
@@ -876,8 +883,11 @@ RichText.defaultProps = {
 };
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		isViewportSmall: select( 'core/viewport' ).isViewportMatch( '< small' ),
-	} ) ),
+	withSelect( ( select ) => {
+		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
+		return {
+			isViewportSmall: isViewportMatch( '< small' ),
+		};
+	} ),
 	withSafeTimeout,
 ] )( RichText );
