@@ -80,19 +80,7 @@ describe( 'Popover', () => {
 			expect( Popover.prototype.setForcedPositions ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should not focus when opening if no tabbables', () => {
-			const activeElement = document.activeElement;
-
-			wrapper = mount( <Popover /> );
-
-			expect( document.activeElement ).toBe( activeElement );
-		} );
-
-		it( 'should focus when opening if tabbables', () => {
-			focus.tabbable.find.mockImplementation( ( content ) => {
-				return [ content.querySelector( 'input' ) ];
-			} );
-
+		it( 'should focus when opening', () => {
 			wrapper = mount( <Popover><input /></Popover> );
 
 			const content = wrapper.find( '.components-popover__content' ).getDOMNode();
