@@ -300,7 +300,7 @@ export function isEditedPostBeingScheduled( state ) {
 export function getDocumentTitle( state ) {
 	let title = getEditedPostAttribute( state, 'title' );
 
-	if ( ! title.trim() ) {
+	if ( ! title || ! title.trim() ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
 	}
 	return title;
