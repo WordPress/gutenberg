@@ -42,7 +42,8 @@ PluginMoreMenuItem = compose( [
 			target: `${ pluginName }/${ target }`,
 		};
 	} ),
-	withSelect( ( select, { type, target } ) => {
+	withSelect( ( select, ownProps ) => {
+		const { type, target } = ownProps;
 		let isSelected = false;
 		switch ( type ) {
 			case 'sidebar':
@@ -53,7 +54,8 @@ PluginMoreMenuItem = compose( [
 			isSelected,
 		};
 	} ),
-	withDispatch( ( dispatch, { type, target, isSelected } ) => {
+	withDispatch( ( dispatch, ownProps ) => {
+		const { type, target, isSelected } = ownProps;
 		let onClick = noop;
 		const {
 			closeGeneralSidebar,
