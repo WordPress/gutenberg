@@ -40,11 +40,15 @@ public class MyListFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //LinearLayout rootView = (LinearLayout) inflater.inflate(R.layout.list_view_container, container, false);
-        //rootView.setTag(TAG);
+        if (mReactInstanceManager == null) {
+            try {
+                mReactInstanceManager = ((SampleActivityBase) getActivity()).getReactInstanceManager();
+            } catch (ClassCastException e) {
+                throw new ClassCastException(getActivity().toString() + " must extends SampleActivityBase");
+            }
+        }
 
         ReactRootView reactRootView = new ReactRootView(getContext());
-        //reactRootView.setTag(TAG);
         Bundle RNPropos = new Bundle();
         RNPropos.putString("text", EXAMPLE);
         reactRootView.startReactApplication(mReactInstanceManager, "SimpleTextInput", RNPropos);
