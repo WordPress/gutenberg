@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
 import {
 	map,
 	first,
@@ -23,6 +22,7 @@ import createSelector from 'rememo';
 import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+import { moment } from '@wordpress/date';
 
 /***
  * Module constants
@@ -283,11 +283,11 @@ export function isEditedPostEmpty( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = getEditedPostAttribute( state, 'date' );
+	const date = moment( getEditedPostAttribute( state, 'date' ) );
 	// Adding 1 minute as an error threshold between the server and the client dates.
 	const now = moment().add( 1, 'minute' );
 
-	return moment( date ).isAfter( now );
+	return date.isAfter( now );
 }
 
 /**
@@ -300,7 +300,7 @@ export function isEditedPostBeingScheduled( state ) {
 export function getDocumentTitle( state ) {
 	let title = getEditedPostAttribute( state, 'title' );
 
-	if ( ! title.trim() ) {
+	if ( ! title || ! title.trim() ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
 	}
 	return title;

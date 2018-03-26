@@ -71,7 +71,6 @@
 		"concurrently": "3.5.0",
 		"core-js": "2.5.3",
 		"cross-env": "3.2.4",
-		"cypress": "1.4.1",
 		"deep-freeze": "0.0.1",
 		"eslint": "4.16.0",
 		"eslint-config-wordpress": "2.0.0",
@@ -87,6 +86,7 @@
 		"phpegjs": "1.0.0-beta7",
 		"postcss-loader": "2.0.6",
 		"prismjs": "1.6.0",
+		"puppeteer": "1.2.0",
 		"raw-loader": "0.5.1",
 		"react-test-renderer": "16.0.0",
 		"sass-loader": "6.0.6",
@@ -117,23 +117,6 @@
 			}
 		}
 	},
-	"jest": {
-		"collectCoverageFrom": [
-			"(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport|plugins|core-data)/**/*.js"
-		],
-		"moduleNameMapper": {
-			"@wordpress\\/(blocks|components|date|editor|element|i18n|data|utils|edit-post|viewport|plugins|core-data)": "$1"
-		},
-		"preset": "@wordpress/jest-preset-default",
-		"setupFiles": [
-			"core-js/fn/symbol/async-iterator",
-			"<rootDir>/test/unit/setup-blocks.js",
-			"<rootDir>/test/unit/setup-wp-aliases.js"
-		],
-		"transform": {
-			"\\.pegjs$": "<rootDir>/test/unit/pegjs-transform.js"
-		}
-	},
 	"scripts": {
 		"prebuild": "check-node-version --package",
 		"build": "cross-env NODE_ENV=production webpack",
@@ -151,13 +134,13 @@
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"pot-to-php": "./bin/pot-to-php.js",
-		"test-unit": "wp-scripts test-unit-js",
+		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
 		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit",
 		"test-unit:coverage": "npm run test-unit -- --coverage",
 		"test-unit:coverage-ci": "npm run test-unit -- --coverage --maxWorkers 1 && codecov",
 		"test-unit:watch": "npm run test-unit -- --watch",
-		"test-e2e": "cypress run --browser chrome",
-		"test-e2e:watch": "cypress open"
+		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
+		"test-e2e:watch": "npm run test-e2e -- --watch"
 	}
 }

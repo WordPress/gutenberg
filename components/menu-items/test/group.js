@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { MenuItemsGroup } from '../menu-items-group';
+import { MenuItemsGroup } from '../group';
 
 describe( 'MenuItemsGroup', () => {
 	test( 'should render null when no children provided', () => {

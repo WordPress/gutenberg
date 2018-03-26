@@ -17,22 +17,22 @@ import { __, sprintf } from '@wordpress/i18n';
  *
  * @return {string} Label for the block movement controls.
  */
-export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, isLast, dir ) {
+export function getBlockMoverDescription( selectedCount, type, firstIndex, isFirst, isLast, dir ) {
 	const position = ( firstIndex + 1 );
 
 	if ( selectedCount > 1 ) {
-		return getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isLast, dir );
+		return getMultiBlockMoverDescription( selectedCount, firstIndex, isFirst, isLast, dir );
 	}
 
 	if ( isFirst && isLast ) {
 		// translators: %s: Type of block (i.e. Text, Image etc)
-		return sprintf( __( 'Block "%s" is the only block, and cannot be moved' ), type );
+		return sprintf( __( 'Block %s is the only block, and cannot be moved' ), type );
 	}
 
 	if ( dir > 0 && ! isLast ) {
 		// moving down
 		return sprintf(
-			__( 'Move "%(type)s" block from position %(position)d down to position %(newPosition)d' ),
+			__( 'Move %(type)s block from position %(position)d down to position %(newPosition)d' ),
 			{
 				type,
 				position,
@@ -44,13 +44,13 @@ export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, is
 	if ( dir > 0 && isLast ) {
 		// moving down, and is the last item
 		// translators: %s: Type of block (i.e. Text, Image etc)
-		return sprintf( __( 'Block "%s" is at the end of the content and can’t be moved down' ), type );
+		return sprintf( __( 'Block %s is at the end of the content and can’t be moved down' ), type );
 	}
 
 	if ( dir < 0 && ! isFirst ) {
 		// moving up
 		return sprintf(
-			__( 'Move "%(type)s" block from position %(position)d up to position %(newPosition)d' ),
+			__( 'Move %(type)s block from position %(position)d up to position %(newPosition)d' ),
 			{
 				type,
 				position,
@@ -62,7 +62,7 @@ export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, is
 	if ( dir < 0 && isFirst ) {
 		// moving up, and is the first item
 		// translators: %s: Type of block (i.e. Text, Image etc)
-		return sprintf( __( 'Block "%s" is at the beginning of the content and can’t be moved up' ), type );
+		return sprintf( __( 'Block %s is at the beginning of the content and can’t be moved up' ), type );
 	}
 }
 
@@ -78,7 +78,7 @@ export function getBlockMoverLabel( selectedCount, type, firstIndex, isFirst, is
  *
  * @return {string} Label for the block movement controls.
  */
-export function getMultiBlockMoverLabel( selectedCount, firstIndex, isFirst, isLast, dir ) {
+export function getMultiBlockMoverDescription( selectedCount, firstIndex, isFirst, isLast, dir ) {
 	const position = ( firstIndex + 1 );
 
 	if ( dir < 0 && isFirst ) {

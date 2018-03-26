@@ -102,3 +102,10 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Type: `Boolean`
  - Required: No
  - Default: `false`
+
+ ## headerTitle
+
+ Set this to customize the text that is shown in popover's header when it is fullscreen on mobile.
+
+ - Type: `String`
+ - Required: No
