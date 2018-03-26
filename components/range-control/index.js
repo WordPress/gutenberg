@@ -15,10 +15,10 @@ function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIc
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 
 	return (
-		<BaseControl label={ label } id={ id } help={ help } className="blocks-range-control">
+		<BaseControl label={ label } id={ id } help={ help } className="components-range-control">
 			{ beforeIcon && <Dashicon icon={ beforeIcon } size={ 20 } /> }
 			<input
-				className="blocks-range-control__slider"
+				className="components-range-control__slider"
 				id={ id }
 				type="range"
 				value={ value }
@@ -27,7 +27,7 @@ function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIc
 				{ ...props } />
 			{ afterIcon && <Dashicon icon={ afterIcon } /> }
 			<input
-				className="blocks-range-control__number"
+				className="components-range-control__number"
 				type="number"
 				onChange={ onChangeValue }
 				aria-label={ label }

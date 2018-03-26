@@ -1,15 +1,12 @@
 /**
  * External dependencies
  */
-import moment from 'moment-timezone';
-import 'moment-timezone/moment-timezone-utils';
 import { createProvider } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { settings as dateSettings } from '@wordpress/date';
 import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
 
 /**
@@ -21,23 +18,7 @@ import Layout from './components/layout';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 
-export * from './api';
-
-// Configure moment globally
-moment.locale( dateSettings.l10n.locale );
-if ( dateSettings.timezone.string ) {
-	moment.tz.setDefault( dateSettings.timezone.string );
-} else {
-	const momentTimezone = {
-		name: 'WP',
-		abbrs: [ 'WP' ],
-		untils: [ null ],
-		offsets: [ -dateSettings.timezone.offset * 60 ],
-	};
-	const unpackedTimezone = moment.tz.pack( momentTimezone );
-	moment.tz.add( unpackedTimezone );
-	moment.tz.setDefault( 'WP' );
-}
+import PluginSidebar from './components/plugin-sidebar';
 
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
@@ -109,3 +90,7 @@ export function initializeEditor( id, post, settings ) {
 		},
 	};
 }
+
+export const __experimental = {
+	PluginSidebar,
+};

@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Spinner, ToggleControl, withAPIData } from '@wordpress/components';
+import { Placeholder, Spinner, ToggleControl } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { times, unescape } from 'lodash';
 
@@ -46,7 +47,7 @@ class CategoriesBlock extends Component {
 	}
 
 	getCategories( parentId = null ) {
-		const categories = this.props.categories.data;
+		const categories = this.props.categories;
 		if ( ! categories || ! categories.length ) {
 			return [];
 		}
@@ -142,9 +143,8 @@ class CategoriesBlock extends Component {
 	}
 
 	render() {
-		const { attributes, focus, setAttributes } = this.props;
+		const { attributes, focus, setAttributes, isRequesting } = this.props;
 		const { align, displayAsDropdown, showHierarchy, showPostCounts } = attributes;
-		const categories = this.getCategories();
 
 		const inspectorControls = focus && (
 			<InspectorControls key="inspector">
@@ -167,7 +167,7 @@ class CategoriesBlock extends Component {
 			</InspectorControls>
 		);
 
-		if ( ! categories.length ) {
+		if ( isRequesting ) {
 			return [
 				inspectorControls,
 				<Placeholder
@@ -204,8 +204,11 @@ class CategoriesBlock extends Component {
 	}
 }
 
-export default withAPIData( () => {
+export default withSelect( ( select ) => {
+	const { getCategories, isRequestingCategories } = select( 'core' );
+
 	return {
-		categories: '/wp/v2/categories',
+		categories: getCategories(),
+		isRequesting: isRequestingCategories(),
 	};
 } )( CategoriesBlock );

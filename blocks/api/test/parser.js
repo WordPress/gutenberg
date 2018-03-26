@@ -8,6 +8,7 @@ import {
 	createBlockWithFallback,
 	getAttributesFromDeprecatedVersion,
 	default as parse,
+	parseWithAttributeSchema,
 } from '../parser';
 import {
 	registerBlockType,
@@ -87,6 +88,20 @@ describe( 'block parser', () => {
 
 			expect( asType( obj, 'object' ) ).toBe( obj );
 			expect( asType( {}, 'object' ) ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'parseWithAttributeSchema', () => {
+		it( 'should return the matcher\'s attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<div>chicken</div>',
+				{
+					type: 'string',
+					source: 'text',
+					selector: 'div',
+				},
+			);
+			expect( value ).toBe( 'chicken' );
 		} );
 	} );
 
