@@ -38,16 +38,6 @@ class PostPermalink extends Component {
 
 		return (
 			<div className="editor-post-permalink">
-				<Tooltip text={ __( 'Copy the permalink to your clipboard.' ) }>
-					<ClipboardButton
-						className="editor-post-permalink__copy"
-						text={ samplePermalink }
-						onCopy={ () => this.setState( { iconClass: 'is-copied' } ) }
-					>
-						<Dashicon icon="admin-links" className={ iconClass } />
-					</ClipboardButton>
-				</Tooltip>
-
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
 				{ ! editingPermalink &&
@@ -70,6 +60,16 @@ class PostPermalink extends Component {
 						{ __( 'Edit' ) }
 					</Button>
 				}
+
+				<Tooltip text={ __( 'Copy the permalink to your clipboard.' ) }>
+					<ClipboardButton
+						className="editor-post-permalink__copy"
+						text={ samplePermalink }
+						onCopy={ () => this.setState( { iconClass: 'is-copied' } ) }
+					>
+						<Dashicon icon="admin-links" className={ iconClass } />
+					</ClipboardButton>
+				</Tooltip>
 
 				{ ! isEditable &&
 					<Button
