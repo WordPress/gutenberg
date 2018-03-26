@@ -12,31 +12,29 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Name of slot in which the sidebar should fill.
+ * Name of slot in which the more menu items should fill.
  *
- * @type {String}
+ * @type {string}
  */
 const SLOT_NAME = 'PluginMoreMenuItem';
 
-function PluginMoreMenuItem( { label, onClick, icon, isSelected } ) {
-	return (
-		<Fill name={ SLOT_NAME }>
-			{ ( props ) => {
-				return (
-					<MenuItemsItem
-						icon={ isSelected ? 'yes' : icon }
-						isSelected={ isSelected }
-						label={ label }
-						onClick={ () => {
-							onClick();
-							props.onClose();
-						} }
-					/>
-				);
-			} }
-		</Fill>
-	);
-}
+let PluginMoreMenuItem = ( { label, onClick, icon, isSelected } ) => (
+	<Fill name={ SLOT_NAME }>
+		{ ( props ) => {
+			return (
+				<MenuItemsItem
+					icon={ isSelected ? 'yes' : icon }
+					isSelected={ isSelected }
+					label={ label }
+					onClick={ () => {
+						onClick();
+						props.onClose();
+					} }
+				/>
+			);
+		} }
+	</Fill>
+);
 
 PluginMoreMenuItem = compose( [
 	withContext( 'pluginName' )( ( pluginName, { target } ) => {
@@ -44,17 +42,30 @@ PluginMoreMenuItem = compose( [
 			target: `${ pluginName }/${ target }`,
 		};
 	} ),
-	withSelect( ( select, { target } ) => ( {
-		isSelected: select( 'core/edit-post' ).getActiveGeneralSidebarName() === target,
-	} ) ),
+	withSelect( ( select, { type, target } ) => {
+		let isSelected = false;
+		switch ( type ) {
+			case 'sidebar':
+				isSelected = select( 'core/edit-post' ).getActiveGeneralSidebarName() === target;
+				break;
+		}
+		return {
+			isSelected,
+		};
+	} ),
 	withDispatch( ( dispatch, { type, target, isSelected } ) => {
 		let onClick = noop;
-		if ( isSelected ) {
-			onClick = dispatch( 'core/edit-post' ).closeGeneralSidebar;
-		} else {
-			switch ( type ) {
-				case 'sidebar':
-					onClick = () => dispatch( 'core/edit-post' ).openGeneralSidebar( target );
+		const {
+			closeGeneralSidebar,
+			openGeneralSidebar,
+		} = dispatch( 'core/edit-post' );
+		switch ( type ) {
+			case 'sidebar': {
+				if ( isSelected ) {
+					onClick = closeGeneralSidebar;
+				} else {
+					onClick = () => openGeneralSidebar( target );
+				}
 			}
 		}
 		return {
