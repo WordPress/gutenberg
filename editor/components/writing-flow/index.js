@@ -240,11 +240,20 @@ class WritingFlow extends Component {
 			return;
 		}
 
-		// Emulate a rect at which caret should be placed using mouse event.
-		const rect = target.getBoundingClientRect();
-		const targetRect = new DOMRect( event.clientX, rect.top, 0, rect.height );
+		// To generate a caret rect (where its height determines buffer offset
+		// for caret target point), the element must first be focused.
+		target.focus();
+		const rect = computeCaretRect( target );
 
-		placeCaretAtVerticalEdge( target, false, targetRect );
+		// `computeCaretRect` may return undefined if it's unable to find a
+		// collapsed range.
+		if ( ! rect ) {
+			return;
+		}
+
+		// Emulate a rect at which caret should be placed using mouse event.
+		const targetRect = new DOMRect( event.clientX, 0, 0, rect.height );
+		placeCaretAtVerticalEdge( target, true, targetRect );
 	}
 
 	render() {
