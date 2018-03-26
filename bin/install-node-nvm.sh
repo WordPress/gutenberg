@@ -9,6 +9,7 @@ set -e
 
 # Load NVM
 if [ -n "$NVM_DIR" ]; then
+	# The --no-use option ensures loading NVM doesn't switch the current version.
 	if [ -f "$NVM_DIR/nvm.sh" ]; then
 		. "$NVM_DIR/nvm.sh" --no-use
 	elif [ -n "$(command -v brew)" ]; then
