@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
