@@ -447,15 +447,14 @@ add_action( 'rest_api_init', 'gutenberg_add_taxonomy_visibility_field' );
  * @return WP_REST_Response Response containing the sample_permalink, where appropriate.
  */
 function gutenberg_add_sample_permalink_to_draft_posts( $response, $post, $request ) {
-	if ( empty( $response->data['status'] ) || 'draft' !== $response->data['status'] ) {
-		return $response;
-	}
 	if ( 'edit' !== $request['context'] ) {
 		return $response;
 	}
+
 	if ( ! function_exists( 'get_sample_permalink' ) ) {
 		require_once ABSPATH . '/wp-admin/includes/post.php';
 	}
+
 	$response->data['sample_permalink'] = get_sample_permalink( $post->ID );
 	return $response;
 }
