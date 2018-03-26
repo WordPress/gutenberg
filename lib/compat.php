@@ -451,6 +451,10 @@ function gutenberg_add_sample_permalink_to_draft_posts( $response, $post, $reque
 		return $response;
 	}
 
+	if ( ! get_post_type_object( $post->post_type )->public ) {
+		return $response;
+	}
+
 	if ( ! function_exists( 'get_sample_permalink' ) ) {
 		require_once ABSPATH . '/wp-admin/includes/post.php';
 	}
