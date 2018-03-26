@@ -27,6 +27,8 @@ const panel = () => {
 	return (
 		<Panel>
 			{ items.includes( 'post-status' ) ? <PostStatus /> : '' }
+			{ items.includes( 'posts-list' ) ? <PostsList /> : '' }
+			{ items.includes( 'settings-panel' ) ? <SettingsPanel /> : '' }
 			{ items.includes( 'post-excerpt' ) ? <LastRevision /> : '' }
 			{ items.includes( 'post-taxonomies' ) ? <PostTaxonomies /> : '' }
 			{ items.includes( 'featured-image' ) ? <FeaturedImage /> : '' }
@@ -35,8 +37,6 @@ const panel = () => {
 			{ items.includes( 'page-attributes' ) ? <PageAttributes /> : '' }
 			{ items.includes( 'document-outline-panel' ) ? <DocumentOutlinePanel /> : '' }
 			{ items.includes( 'meta-boxes' ) ? <MetaBoxes location="side" usePanel /> : '' }
-			{ items.includes( 'posts-list' ) ? <PostsList /> : '' }
-			{ items.includes( 'settings-panel' ) ? <SettingsPanel /> : '' }
 		</Panel>
 	);
 };
