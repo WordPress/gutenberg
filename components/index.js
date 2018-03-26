@@ -51,7 +51,6 @@ export { default as TreeSelect } from './tree-select';
 export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
-export { default as composeIfCondition } from './higher-order/compose-if-condition';
 export { default as ifCondition } from './higher-order/if-condition';
 export { default as navigateRegions } from './higher-order/navigate-regions';
 export { default as withAPIData } from './higher-order/with-api-data';
