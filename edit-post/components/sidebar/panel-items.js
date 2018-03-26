@@ -16,9 +16,9 @@ const panelItems = [
 ];
 
 /**
- * Returns all the block categories.
+ * Returns all panel items.
  *
- * @return {Array} Block categories.
+ * @return {Array} Panel items.
  */
 export function getPanelItems() {
 	if ( typeof window.customGutenberg === 'object' && window.customGutenberg.panel ) {

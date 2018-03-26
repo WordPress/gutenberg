@@ -29,11 +29,11 @@ const panel = () => {
 			{ items.includes( 'post-status' ) ? <PostStatus /> : '' }
 			{ items.includes( 'posts-list' ) ? <PostsList /> : '' }
 			{ items.includes( 'settings-panel' ) ? <SettingsPanel /> : '' }
-			{ items.includes( 'post-excerpt' ) ? <LastRevision /> : '' }
+			{ items.includes( 'last-revision' ) ? <LastRevision /> : '' }
 			{ items.includes( 'post-taxonomies' ) ? <PostTaxonomies /> : '' }
 			{ items.includes( 'featured-image' ) ? <FeaturedImage /> : '' }
-			{ items.includes( 'discussion-panel' ) ? <PostExcerpt /> : '' }
-			{ items.includes( 'last-revision' ) ? <DiscussionPanel /> : '' }
+			{ items.includes( 'post-excerpt' ) ? <PostExcerpt /> : '' }
+			{ items.includes( 'discussion-panel' ) ? <DiscussionPanel /> : '' }
 			{ items.includes( 'page-attributes' ) ? <PageAttributes /> : '' }
 			{ items.includes( 'document-outline-panel' ) ? <DocumentOutlinePanel /> : '' }
 			{ items.includes( 'meta-boxes' ) ? <MetaBoxes location="side" usePanel /> : '' }
