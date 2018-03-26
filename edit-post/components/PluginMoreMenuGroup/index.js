@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import PluginMoreMenuItem, { SLOT_NAME } from '../plugin-more-menu-item';
 
-const PluginsMenuGroup = ( { getFills, fillProps } ) => {
+const PluginMoreMenuGroup = ( { getFills, fillProps } ) => {
 	// We don't want the plugins menu items group to be rendered if there are no fills.
 	if ( ! getFills( SLOT_NAME ).length ) {
 		return null;
@@ -25,4 +25,4 @@ const PluginsMenuGroup = ( { getFills, fillProps } ) => {
 
 export default compose( [
 	withContext( 'getFills' )(),
-] )( PluginsMenuGroup );
+] )( PluginMoreMenuGroup );

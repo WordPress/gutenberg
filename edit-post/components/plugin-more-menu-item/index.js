@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
-import { Slot, Fill, withContext, MenuItemsItem } from '@wordpress/components';
+import { Slot, Fill, withContext, MenuItemsItem, composeIfCondition } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
@@ -41,38 +41,30 @@ PluginMoreMenuItem = compose( [
 			target: `${ pluginName }/${ target }`,
 		};
 	} ),
-	withSelect( ( select, ownProps ) => {
-		const { type, target } = ownProps;
-		let isSelected = false;
-		switch ( type ) {
-			case 'sidebar':
-				isSelected = select( 'core/edit-post' ).getActiveGeneralSidebarName() === target;
-				break;
-		}
-		return {
-			isSelected,
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const { type, target, isSelected } = ownProps;
-		let onClick = noop;
-		const {
-			closeGeneralSidebar,
-			openGeneralSidebar,
-		} = dispatch( 'core/edit-post' );
-		switch ( type ) {
-			case 'sidebar': {
-				if ( isSelected ) {
-					onClick = closeGeneralSidebar;
-				} else {
-					onClick = () => openGeneralSidebar( target );
-				}
+	composeIfCondition( props => props.type === 'sidebar', [
+		withSelect( ( select, ownProps ) => {
+			const { target } = ownProps;
+			return {
+				isSelected: select( 'core/edit-post' ).getActiveGeneralSidebarName() === target,
+			};
+		} ),
+		withDispatch( ( dispatch, ownProps ) => {
+			const { target, isSelected } = ownProps;
+			let onClick;
+			const {
+				closeGeneralSidebar,
+				openGeneralSidebar,
+			} = dispatch( 'core/edit-post' );
+			if ( isSelected ) {
+				onClick = closeGeneralSidebar;
+			} else {
+				onClick = () => openGeneralSidebar( target );
 			}
-		}
-		return {
-			onClick,
-		};
-	} ),
+			return {
+				onClick,
+			};
+		} ),
+	] ),
 ] )( PluginMoreMenuItem );
 
 PluginMoreMenuItem.Slot = ( { fillProps } ) => (
