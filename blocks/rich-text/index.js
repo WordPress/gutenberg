@@ -537,15 +537,26 @@ export class RichText extends Component {
 
 	scrollToCaret() {
 		const caretRect = this.getEditorSelectionRect();
-		const caretHeight = caretRect.y;
-		if ( caretHeight !== this.caretHeight ) {
-			const toolbarOffset = 100;
-			window.scrollTo(
-				window.pageXOffset,
-				window.pageYOffset + caretHeight - toolbarOffset
-			);
+		const caretTop = caretRect.top;
+		if ( caretTop !== this.caretTop ) {
+			// When scrolling, avoid positioning the caret at the very top of
+			// the viewport, providing some "air" and some textual context for
+			// the user.
+			const graceOffset = 100;
+
+			// Avoid pointless scrolling by establishing a threshold under
+			// which scrolling should be skipped;
+			const epsilon = 10;
+			const delta = caretTop - graceOffset;
+
+			if ( Math.abs( delta ) > epsilon ) {
+				window.scrollTo(
+					window.pageXOffset,
+					window.pageYOffset + caretTop - graceOffset
+				);
+			}
 		}
-		this.caretHeight = caretHeight;
+		this.caretTop = caretTop;
 	}
 
 	/**
