@@ -95,7 +95,6 @@ class PostTitle extends Component {
 		return (
 			<PostTypeSupportCheck supportKeys="title">
 				<div className={ className }>
-					{ isSelected && <PostPermalink /> }
 					<KeyboardShortcuts
 						shortcuts={ {
 							'mod+z': this.redirectHistory,
@@ -116,6 +115,7 @@ class PostTitle extends Component {
 							onKeyPress={ this.onUnselect }
 						/>
 					</KeyboardShortcuts>
+					{ isSelected && <PostPermalink /> }
 				</div>
 			</PostTypeSupportCheck>
 		);
