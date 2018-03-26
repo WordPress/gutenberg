@@ -12,19 +12,19 @@ import { cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import Button from '../button';
 import Shortcut from './shortcut';
 import IconButton from '../icon-button';
-import './style.scss';
 
 /**
  * Renders a generic menu item for use inside the more menu.
  *
  * @return {WPElement} More menu item.
  */
-function MenuItemsItem( { className, icon, label, onClick, shortcut, isSelected = false } ) {
-	className = classnames( 'components-menu-items__button', {
-		[ className ]: className,
+function MenuItem( { className, icon, label, onClick, shortcut, isSelected = false } ) {
+	className = classnames( 'components-menu-item__button', {
+		[ className ]: Boolean( className ),
 		'has-icon': icon,
 	} );
 
@@ -62,4 +62,4 @@ function MenuItemsItem( { className, icon, label, onClick, shortcut, isSelected 
 	);
 }
 
-export default MenuItemsItem;
+export default MenuItem;

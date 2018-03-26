@@ -1,8 +1,7 @@
 /**
  * Internal dependencies
  */
-import './style.scss';
-import MenuItemsItem from './item';
+import MenuItem from '../menu-item';
 
 export default function MenuItemsChoice( {
 	choices = [],
@@ -12,7 +11,7 @@ export default function MenuItemsChoice( {
 	return choices.map( ( item ) => {
 		const isSelected = value === item.value;
 		return (
-			<MenuItemsItem
+			<MenuItem
 				key={ item.value }
 				icon={ isSelected && 'yes' }
 				label={ item.label }

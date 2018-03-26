@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, Dropdown, MenuItemsGroup } from '@wordpress/components';
+import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -29,7 +29,7 @@ const MoreMenu = () => (
 				<ModeSwitcher onSelect={ onClose } />
 				<FixedToolbarToggle onToggle={ onClose } />
 				<PluginMoreMenuGroup fillProps={ { onClose } } />
-				<MenuItemsGroup
+				<MenuGroup
 					label={ __( 'Tools' ) }
 					filterName="editPost.MoreMenu.tools"
 				/>

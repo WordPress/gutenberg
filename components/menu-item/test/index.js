@@ -6,12 +6,12 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import MenuItemsItem from '../item';
+import MenuItem from '../';
 
-describe( 'MenuItemsItem', () => {
+describe( 'MenuItem', () => {
 	test( 'should match snapshot when only label provided', () => {
 		const wrapper = shallow(
-			<MenuItemsItem
+			<MenuItem
 				label="My item"
 			/>
 		);
@@ -21,7 +21,7 @@ describe( 'MenuItemsItem', () => {
 
 	test( 'should match snapshot when all props provided', () => {
 		const wrapper = shallow(
-			<MenuItemsItem
+			<MenuItem
 				className="my-class"
 				icon="wordpress"
 				isSelected={ true }

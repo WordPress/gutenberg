@@ -3,10 +3,10 @@
  */
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { MenuItemsItem } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 
 const PluginSidebarMoreMenuItem = ( { isSelected, icon, label, onClick } ) => (
-	<MenuItemsItem
+	<MenuItem
 		icon={ isSelected ? 'yes' : icon }
 		isSelected={ isSelected }
 		label={ label }

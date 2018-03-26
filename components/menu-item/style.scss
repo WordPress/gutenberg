@@ -1,15 +1,5 @@
-.components-menu-items__group {
-	width: 100%;
-	padding: 10px;
-}
-
-.components-menu-items__group-label {
-	margin-bottom: 10px;
-	color: $dark-gray-300;
-}
-
-.components-menu-items__button,
-.components-menu-items__button.components-icon-button {
+.components-menu-item__button,
+.components-menu-item__button.components-icon-button {
 	width: 100%;
 	padding: 8px;
 	text-align: left;
@@ -39,7 +29,7 @@
 	}
 }
 
-.components-menu-items__shortcut {
+.components-menu-item__shortcut {
 	float: right;
 	opacity: .5;
 }
