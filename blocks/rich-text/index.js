@@ -140,7 +140,6 @@ export class RichText extends Component {
 		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
-		this.scrollToCaret = this.scrollToCaret.bind( this );
 
 		this.state = {
 			formats: {},
@@ -184,7 +183,6 @@ export class RichText extends Component {
 		} );
 
 		editor.on( 'init', this.onInit );
-		editor.on( 'focusin', this.scrollToCaret );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'nodechange', this.onNodeChange );
 		editor.on( 'keydown', this.onKeyDown );
@@ -532,7 +530,13 @@ export class RichText extends Component {
 			this.onChange();
 		}
 
-		this.scrollToCaret();
+		// `scrollToCaret` is called on `nodechange`, whereas calling it on
+		// `keyup` *when* moving to a new RichText element results in incorrect
+		// scrolling. Though the following allows false positives, it results
+		// in much smoother scrolling.
+		if ( keyCode !== BACKSPACE && keyCode !== ENTER ) {
+			this.scrollToCaret();
+		}
 	}
 
 	scrollToCaret() {
@@ -662,6 +666,11 @@ export class RichText extends Component {
 
 		const focusPosition = this.getFocusPosition();
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
+
+		// Originally called on `focusin`, that hook turned out to be
+		// premature. On `nodechange` we can work with the finalized TinyMCE
+		// instance and scroll to proper position.
+		this.scrollToCaret();
 	}
 
 	updateContent() {
