@@ -10,7 +10,7 @@ import { IconButton, Dropdown, MenuItemsGroup } from '@wordpress/components';
 import './style.scss';
 import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
-import PluginMoreMenuGroup from '../../PluginMoreMenuGroup';
+import PluginMoreMenuGroup from '../../plugin-more-menu-group';
 
 const MoreMenu = () => (
 	<Dropdown
