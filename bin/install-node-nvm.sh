@@ -12,8 +12,8 @@ if [ -n "$NVM_DIR" ]; then
 	# The --no-use option ensures loading NVM doesn't switch the current version.
 	if [ -f "$NVM_DIR/nvm.sh" ]; then
 		. "$NVM_DIR/nvm.sh" --no-use
-	elif [ -n "$(command -v brew)" ]; then
-		# use homebrew that to find path to nvm.sh
+	elif [ -n "$(command -v brew)" ] && [ -f "$(brew --prefix nvm)/nvm.sh" ]; then
+		# use homebrew if that's how nvm was installed
 		. "$(brew --prefix nvm)/nvm.sh" --no-use
 	fi
 fi
