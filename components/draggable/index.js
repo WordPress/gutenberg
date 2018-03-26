@@ -109,6 +109,10 @@ class Draggable extends Component {
 			this.cloneWrapper.style.top = `${ elementTopOffset - clonePadding }px`;
 			this.cloneWrapper.style.left = `${ elementLeftOffset - clonePadding }px`;
 		}
+
+		// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
+		[ ...clone.querySelectorAll( 'iframe' ) ].forEach( child => child.remove() );
+
 		this.cloneWrapper.appendChild( clone );
 		elementWrapper.appendChild( this.cloneWrapper );
 
