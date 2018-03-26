@@ -13,7 +13,7 @@ import { getBlockType } from '@gutenberg/blocks/api';
 type PropsType = {
 	index: number,
 	blockType: string,
-	content: string,
+	attributes: object,
 	focused: boolean,
 	onToolbarButtonPressed: ( button: number, index: number ) => void,
 	onBlockHolderPressed: ( rowId: number ) => void,
