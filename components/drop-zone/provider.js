@@ -172,9 +172,6 @@ class DropZoneProvider extends Component {
 		const isValidDropzone = !! dropzone && dropzone.element.contains( event.target );
 
 		this.resetDragState();
-		if ( isValidDropzone && !! dropzone.onDrop ) {
-			dropzone.onDrop( event, position );
-		}
 
 		if ( event.dataTransfer && isValidDropzone ) {
 			const files = event.dataTransfer.files;
@@ -185,6 +182,10 @@ class DropZoneProvider extends Component {
 			} else if ( HTML && dropzone.onHTMLDrop ) {
 				dropzone.onHTMLDrop( HTML, position );
 			}
+		}
+
+		if ( isValidDropzone && !! dropzone.onDrop ) {
+			dropzone.onDrop( event, position );
 		}
 
 		event.stopPropagation();

@@ -14,46 +14,51 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
-import { compose } from '@wordpress/element';
+import { compose, Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { insertBlocks, updateBlockAttributes, moveBlockToPosition } from '../../store/actions';
 
-function BlockDropZone( { index, isLocked, ...props } ) {
-	if ( isLocked ) {
-		return null;
+class BlockDropZone extends Component {
+	constructor() {
+		super();
+
+		this.onDropFiles = this.onDropFiles.bind( this );
+		this.onHTMLDrop = this.onHTMLDrop.bind( this );
+		this.onDrop = this.onDrop.bind( this );
 	}
 
-	const getInsertIndex = ( position ) => {
+	getInsertIndex( position ) {
+		const { index } = this.props;
 		if ( index !== undefined ) {
 			return position.y === 'top' ? index : index + 1;
 		}
-	};
+	}
 
-	const onDropFiles = ( files, position ) => {
+	onDropFiles( files, position ) {
 		const transformation = findTransform(
 			getBlockTransforms( 'from' ),
 			( transform ) => transform.type === 'files' && transform.isMatch( files )
 		);
 
 		if ( transformation ) {
-			const insertIndex = getInsertIndex( position );
-			const blocks = transformation.transform( files, props.updateBlockAttributes );
-			props.insertBlocks( blocks, insertIndex );
+			const insertIndex = this.getInsertIndex( position );
+			const blocks = transformation.transform( files, this.props.updateBlockAttributes );
+			this.props.insertBlocks( blocks, insertIndex );
 		}
-	};
+	}
 
-	const onHTMLDrop = ( HTML, position ) => {
+	onHTMLDrop( HTML, position ) {
 		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
-			props.insertBlocks( blocks, getInsertIndex( position ) );
+			this.props.insertBlocks( blocks, this.getInsertIndex( position ) );
 		}
-	};
+	}
 
-	const onDrop = ( event, position ) => {
+	onDrop( event, position ) {
 		if ( ! event.dataTransfer ) {
 			return;
 		}
@@ -69,18 +74,28 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 		if ( type !== 'block' ) {
 			return;
 		}
-		const positionIndex = getInsertIndex( position );
-		const insertIndex = index && fromIndex < index && rootUID === props.rootUID ? positionIndex - 1 : positionIndex;
-		props.moveBlockToPosition( uid, rootUID, insertIndex );
-	};
+		const { index } = this.props;
+		const positionIndex = this.getInsertIndex( position );
+		// If the block is kept at the same level and moved downwards,
+		// we need to substract "1" from the insert index.
+		const insertIndex = index && fromIndex < index && rootUID === this.props.rootUID ? positionIndex - 1 : positionIndex;
+		this.props.moveBlockToPosition( uid, rootUID, insertIndex );
+	}
 
-	return (
-		<DropZone
-			onFilesDrop={ onDropFiles }
-			onHTMLDrop={ onHTMLDrop }
-			onDrop={ onDrop }
-		/>
-	);
+	render() {
+		const { isLocked } = this.props;
+		if ( isLocked ) {
+			return null;
+		}
+
+		return (
+			<DropZone
+				onFilesDrop={ this.onDropFiles }
+				onHTMLDrop={ this.onHTMLDrop }
+				onDrop={ this.onDrop }
+			/>
+		);
+	}
 }
 
 export default compose(
