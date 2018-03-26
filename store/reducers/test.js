@@ -41,6 +41,16 @@ describe( 'Store', () => {
 			expect( initialState ).toEqual( __iniState );
 		} );
 
+		it( "should mutate block's content", () => {
+			let newState = reducer(
+				initialState,
+				actions.updateBlockAttributes( '1', { content: 'new content' } )
+			);
+
+			// the title block should still be there at the top
+			expect( newState.blocks[ 1 ].attributes.content ).toEqual( 'new content' );
+		} );
+
 		it( 'should focus a block', () => {
 			let newState = reducer( initialState, actions.focusBlockAction( '0' ) );
 
