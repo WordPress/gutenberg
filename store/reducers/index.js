@@ -1,9 +1,56 @@
 /** @format */
 
+import { find, reduce } from 'lodash';
+
 import ActionTypes from '../actions/ActionTypes';
+
+function findBlock( state, uid: integer ) {
+	return find( state.blocks, obj => {
+		return obj.key === uid;
+	} );
+}
 
 export const reducer = ( state = {}, action ) => {
 	switch ( action.type ) {
+		case ActionTypes.BLOCK.UPDATE_ATTRIBUTES:
+			const block = findBlock( state, action.uid );
+
+			// Ignore updates if block isn't known
+			if ( ! block ) {
+				return state;
+			}
+
+			// Consider as updates only changed values
+			const nextAttributes = reduce(
+				action.attributes,
+				( result, value, key ) => {
+					if ( value !== result[ key ] ) {
+						// Avoid mutating original block by creating shallow clone
+						if ( result === findBlock( state, action.uid ).attributes ) {
+							result = { ...result };
+						}
+
+						result[ key ] = value;
+					}
+
+					return result;
+				},
+				state.blocks[ action.uid ].attributes
+			);
+
+			// Skip update if nothing has been changed. The reference will
+			// match the original block if `reduce` had no changed values.
+			if ( nextAttributes === findBlock( state, action.uid ).attributes ) {
+				return state;
+			}
+
+			// Otherwise merge attributes into state
+			const blocks = [ ...state.blocks ];
+			blocks[ action.uid ] = {
+				...blocks[ action.uid ],
+				attributes: nextAttributes,
+			};
+			return { blocks: blocks, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.FOCUS:
 			var blocks = [ ...state.blocks ];
 			const currentBlockState = blocks[ action.rowId ].focused;

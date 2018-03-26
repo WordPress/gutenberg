@@ -39,13 +39,14 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 			// TODO: input text needs to be kept by updating the attributes
 			return (
 				<Code
-					attributes={ { content: this.props.content } }
-					setAttributes={ attrs => console.log( { attrs } ) }
+					attributes={ { ...this.props.attributes } }
+					// pass a curried version of onChanged with just one argument
+					setAttributes={ attrs => this.props.onChange( this.props.index, attrs ) }
 				/>
 			);
 		} else {
 			// Default block placeholder
-			return <Text>{ this.props.content }</Text>;
+			return <Text>{ this.props.attributes.content }</Text>;
 		}
 	}
 

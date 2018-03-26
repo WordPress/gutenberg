@@ -1,6 +1,14 @@
 /** @format */
 import ActionTypes from './ActionTypes';
 
+export function updateBlockAttributes( uid, attributes ) {
+	return {
+		type: ActionTypes.BLOCK.UPDATE_ATTRIBUTES,
+		uid,
+		attributes,
+	};
+}
+
 export const focusBlockAction = index => ( {
 	type: ActionTypes.BLOCK.FOCUS,
 	rowId: index,

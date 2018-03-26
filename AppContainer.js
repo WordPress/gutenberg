@@ -1,6 +1,7 @@
 /** @format */
 import { connect } from 'react-redux';
 import {
+	updateBlockAttributes,
 	focusBlockAction,
 	moveBlockUpAction,
 	moveBlockDownAction,
@@ -15,6 +16,9 @@ const mapStateToProps = state => ( {
 const mapDispatchToProps = ( dispatch, ownProps ) => {
 	return {
 		...ownProps,
+		onChange: ( uid, attributes ) => {
+			dispatch( updateBlockAttributes( uid, attributes ) );
+		},
 		focusBlockAction: index => {
 			dispatch( focusBlockAction( index ) );
 		},

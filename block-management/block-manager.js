@@ -8,17 +8,20 @@ import { StyleSheet, Text, View, FlatList, TextInput } from 'react-native';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
+type Block = {
+	key: number,
+	blockType: string,
+	content: string,
+	focused: boolean,
+};
+
 export type BlockListType = {
+	onChange: ( number, object ) => mixed,
 	focusBlockAction: number => mixed,
 	moveBlockUpAction: number => mixed,
 	moveBlockDownAction: number => mixed,
 	deleteBlockAction: number => mixed,
-	blocks: Array<{
-		key: string,
-		blockType: string,
-		content: string,
-		focused: boolean,
-	}>,
+	blocks: Array<Block>,
 	refresh: boolean,
 };
 
@@ -63,14 +66,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 	}
 
-	renderItem( value: {
-		item: { key: string, blockType: string, content: string, focused: boolean },
-		index: number,
-	} ) {
+	renderItem( value: { item: Block, index: number } ) {
 		return (
 			<BlockHolder
 				onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
 				onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }
+				onChange={ this.props.onChange.bind( this ) }
 				focused={ value.item.focused }
 				index={ value.index }
 				{ ...value.item }
