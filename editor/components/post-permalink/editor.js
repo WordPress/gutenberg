@@ -84,6 +84,7 @@ class PostPermalinkEditor extends Component {
 					defaultValue={ postName }
 					onChange={ ( event ) => this.setState( { editedPostName: event.target.value } ) }
 					required
+					autoFocus
 				/>
 				<span className="editor-post-permalink-editor__suffix">
 					{ samplePermalinkSuffix }
