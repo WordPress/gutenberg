@@ -15,6 +15,7 @@ import { focus, keycodes } from '@wordpress/utils';
  */
 import './style.scss';
 import PopoverDetectOutside from './detect-outside';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill } from '../slot-fill';
@@ -33,12 +34,12 @@ class Popover extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
 		this.bindNode = this.bindNode.bind( this );
 		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.setOffset = this.setOffset.bind( this );
 		this.throttledSetOffset = this.throttledSetOffset.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
+		this.tabInto = this.tabInto.bind( this );
 
 		this.nodes = {};
 
@@ -56,7 +57,7 @@ class Popover extends Component {
 
 		const { focusOnMount = true } = this.props;
 		if ( focusOnMount ) {
-			this.focusFirstTabbable();
+			this.focusContentIfTabbables();
 		}
 	}
 
@@ -105,6 +106,32 @@ class Popover extends Component {
 		const firstTabbable = focus.tabbable.find( content )[ 0 ];
 		if ( firstTabbable ) {
 			firstTabbable.focus();
+		}
+	}
+
+	/**
+	 * Shifts focus to the non-tabbable content wrapper if there are focusable
+	 * inputs within the content. This enables the user to proceed with tabbing
+	 * or arrowing into the content, to mimic the behavior as if the popover
+	 * were rendered in the markup immediately following the triggering element
+	 * which is not guaranteed with the slot / fill implementation.
+	 */
+	focusContentIfTabbables() {
+		const { content } = this.nodes;
+
+		const hasTabbables = focus.tabbable.find( content ).length > 0;
+		if ( hasTabbables ) {
+			content.focus();
+		}
+	}
+
+	/**
+	 * Shifts focus to the first tabbable element if the content wrapper
+	 * currently has focus.
+	 */
+	tabInto() {
+		if ( document.activeElement === this.nodes.content ) {
+			this.focusFirstTabbable();
 		}
 	}
 
@@ -246,7 +273,6 @@ class Popover extends Component {
 			focusOnMount,
 			getAnchorRect,
 			expandOnMobile,
-			focusFirstTabbable,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
@@ -282,13 +308,19 @@ class Popover extends Component {
 							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
 						</div>
 					) }
-					<div
-						ref={ this.bindNode( 'content' ) }
-						className="components-popover__content"
-						tabIndex="-1"
+					<KeyboardShortcuts
+						shortcuts={ {
+							down: this.tabInto,
+						} }
 					>
-						{ children }
-					</div>
+						<div
+							ref={ this.bindNode( 'content' ) }
+							className="components-popover__content"
+							tabIndex="-1"
+						>
+							{ children }
+						</div>
+					</KeyboardShortcuts>
 				</div>
 			</PopoverDetectOutside>
 		);

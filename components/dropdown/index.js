@@ -165,7 +165,6 @@ class Dropdown extends Component {
 							onClose={ this.close }
 							expandOnMobile={ expandOnMobile }
 							headerTitle={ headerTitle }
-							focusOnMount={ false }
 						>
 							{ renderContent( args ) }
 						</Popover>
