@@ -1,0 +1,12 @@
+{
+  "name": "ReciclerViewReactNativeApp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "dependencies": {
+    "react": "^16.2.0",
+    "react-native": "^0.53.3"
+  }
+}
