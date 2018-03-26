@@ -108,11 +108,11 @@ export function blockAutocompleter( { onReplace } ) {
  */
 export function userAutocompleter() {
 	const getOptions = ( search ) => {
-		let payload;
+		let payload = '';
 		if ( search ) {
-			payload = { data: { search } };
+			payload = '?search=' . search;
 		}
-		return wp.apiRequest( { path: '/wp/v2/users' } ).then( ( users ) => {
+		return wp.apiRequest( { path: '/wp/v2/users' + payload } ).then( ( users ) => {
 			return users.map( ( user ) => {
 				return {
 					value: user,
