@@ -20,9 +20,10 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString, Fragment } from '@wordpress/element';
+import { createElement, Component, renderToString, Fragment, compose } from '@wordpress/element';
 import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange, getScrollContainer } from '@wordpress/utils';
 import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -547,7 +548,7 @@ export class RichText extends Component {
 		// When scrolling, avoid positioning the caret at the very top of
 		// the viewport, providing some "air" and some textual context for
 		// the user, and avoiding toolbars.
-		const graceOffset = document.documentElement.clientHeight / 3.0;
+		const graceOffset = this.props.isViewportSmall ? 100 : 300;
 
 		// Avoid pointless scrolling by establishing a threshold under
 		// which scrolling should be skipped;
@@ -874,4 +875,9 @@ RichText.defaultProps = {
 	formatters: [],
 };
 
-export default withSafeTimeout( RichText );
+export default compose( [
+	withSelect( ( select ) => ( {
+		isViewportSmall: select( 'core/viewport' ).isViewportMatch( '< small' ),
+	} ) ),
+	withSafeTimeout,
+] )( RichText );
