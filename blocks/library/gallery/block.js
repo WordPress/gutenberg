@@ -253,7 +253,7 @@ class GalleryBlock extends Component {
 							accept="image/*"
 							icon="insert"
 						>
-							{ __( 'Upload Image' ) }
+							{ __( 'Upload an Image' ) }
 						</FormFileUpload>
 					</li>
 				}
