@@ -253,9 +253,7 @@ class GalleryBlock extends Component {
 							accept="image/*"
 							icon="insert"
 						>
-							<span className="blocks-gallery-add-item-label">
-								{ __( 'Upload Image' ) }
-							</span>
+							{ __( 'Upload Image' ) }
 						</FormFileUpload>
 					</li>
 				}

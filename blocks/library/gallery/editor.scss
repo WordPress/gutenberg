@@ -37,27 +37,23 @@
 	}
 
 	.button.blocks-gallery-add-item-button {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 		box-shadow: none;
 		border: none;
 		border-radius: 0;
 		min-height: 100px;
+		font-family: $default-font;
 
 		& .dashicon {
 			margin-top: 10px;
 		}
 
-
 		&:hover,
 		&:focus {
 			border: 1px solid #999;
 		}
-	}
-
-	.blocks-gallery-add-item-label {
-		display: block;
-		line-height: normal;
-		margin-bottom: -1.22em; // line-height "normal" value
-		font-family: $default-font;
 	}
 }
 
