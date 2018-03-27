@@ -64,7 +64,7 @@ class Inserter extends Component {
 					<IconButton
 						icon="insert"
 						label={ __( 'Add block' ) }
-						onClick={ onToggle }
+						onClick={ () => onToggle() }
 						className="editor-inserter__toggle"
 						aria-haspopup="true"
 						aria-expanded={ isOpen }

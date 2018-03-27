@@ -27,13 +27,20 @@ function withFocusReturn( WrappedComponent ) {
 		}
 
 		componentWillUnmount() {
-			const { activeElementOnMount, isFocused } = this;
-			if ( ! activeElementOnMount ) {
-				return;
-			}
+			this.returnFocus();
+		}
 
-			const { body, activeElement } = document;
-			if ( isFocused || null === activeElement || body === activeElement ) {
+		/**
+		 * Upon component unmount, verify whether focus is within the element
+		 * and, if it is, return focus to the element where focus had existed
+		 * at the point of component mount.
+		 */
+		returnFocus() {
+			const { activeElementOnMount, isFocused } = this;
+
+			// Verify there is an element to which focus should return, and
+			// that focus is within the wrapped element while unmount occurs.
+			if ( activeElementOnMount && isFocused ) {
 				activeElementOnMount.focus();
 			}
 		}

@@ -5,34 +5,47 @@ import { shallow, mount } from 'enzyme';
 import { noop } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { focus } from '@wordpress/utils';
+
+/**
  * Internal dependencies
  */
 import Popover from '../';
 
+jest.mock( '@wordpress/utils', () => {
+	const utils = require.requireActual( '@wordpress/utils' );
+	return {
+		...utils,
+		focus: {
+			tabbable: {
+				find: jest.fn().mockReturnValue( [] ),
+			},
+		},
+	};
+} );
+
 describe( 'Popover', () => {
 	describe( '#componentDidUpdate()', () => {
 		let wrapper;
-		beforeEach( () => {
+
+		beforeAll( () => {
 			jest.spyOn( Popover.prototype, 'toggleWindowEvents' ).mockImplementation( noop );
 			jest.spyOn( Popover.prototype, 'setOffset' ).mockImplementation( noop );
 			jest.spyOn( Popover.prototype, 'setForcedPositions' ).mockImplementation( noop );
-
-			wrapper = shallow(
-				<Popover />,
-				{ lifecycleExperimental: true }
-			);
 		} );
 
-		afterEach( () => {
-			jest.restoreAllMocks();
+		beforeEach( () => {
+			jest.clearAllMocks();
 
-			// Resetting keyboard state is deferred, so ensure that timers are
-			// consumed to avoid leaking into other tests.
-			jest.runAllTimers();
+			wrapper = mount( <Popover /> );
+		} );
 
-			if ( document.activeElement ) {
-				document.activeElement.blur();
-			}
+		afterAll( () => {
+			Popover.prototype.toggleWindowEvents.mockRestore();
+			Popover.prototype.setOffset.mockRestore();
+			Popover.prototype.setForcedPositions.mockRestore();
 		} );
 
 		it( 'should add window events', () => {
@@ -67,32 +80,35 @@ describe( 'Popover', () => {
 			expect( Popover.prototype.setForcedPositions ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should focus when opening in response to keyboard event', () => {
-			// As in the real world, these occur in sequence before the popover
-			// has been mounted. Keyup's resetting is deferred.
-			document.dispatchEvent( new window.KeyboardEvent( 'keydown' ) );
-			document.dispatchEvent( new window.KeyboardEvent( 'keyup' ) );
-
-			// An ideal test here would mount with an input child and focus the
-			// child, but in context of JSDOM the inputs are not visible and
-			// are therefore skipped as tabbable, defaulting to popover.
-			wrapper = mount( <Popover /> );
+		it( 'should focus when opening', () => {
+			wrapper = mount( <Popover><input /></Popover> );
 
 			const content = wrapper.find( '.components-popover__content' ).getDOMNode();
 
 			expect( document.activeElement ).toBe( content );
 		} );
 
-		it( 'should not focus when opening in response to pointer event', () => {
-			wrapper = mount( <Popover /> );
+		it( 'should not shift focus when opening if tabbables and focus already within', () => {
+			focus.tabbable.find.mockImplementation( ( content ) => {
+				return [ content.querySelector( 'input' ) ];
+			} );
 
-			expect( document.activeElement ).toBe( document.body );
+			// eslint-disable-next-line jsx-a11y/no-autofocus
+			wrapper = mount( <Popover><input autoFocus /></Popover> );
+
+			const input = wrapper.find( 'input' ).getDOMNode();
+
+			expect( document.activeElement ).toBe( input );
 		} );
 
 		it( 'should allow focus-on-open behavior to be disabled', () => {
 			const activeElement = document.activeElement;
 
-			wrapper = mount( <Popover focusOnMount={ false } /> );
+			focus.tabbable.find.mockImplementation( ( content ) => {
+				return [ content.querySelector( 'input' ) ];
+			} );
+
+			wrapper = mount( <Popover focusOnMount={ false }><input /></Popover> );
 
 			expect( document.activeElement ).toBe( activeElement );
 		} );

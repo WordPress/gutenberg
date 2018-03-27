@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { defer, isEqual, noop } from 'lodash';
+import { isEqual, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,26 +14,11 @@ import { focus, keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
-import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill } from '../slot-fill';
-
-/**
- * Value representing whether a key is currently pressed. Bound to the document
- * for use in determining whether the Popover component has mounted in response
- * to a keyboard event. Popover's focusOnMount behavior is specific to keyboard
- * interaction. Must be bound at the top-level and its unsetting deferred since
- * the component will have already mounted by the time keyup occurs.
- *
- * @type {boolean}
- */
-let isKeyDown = false;
-document.addEventListener( 'keydown', () => isKeyDown = true );
-document.addEventListener( 'keyup', defer.bind( null, () => isKeyDown = false ) );
-
-const FocusManaged = withFocusReturn( ( { children } ) => children );
 
 const { ESCAPE } = keycodes;
 
@@ -49,12 +34,12 @@ class Popover extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.focus = this.focus.bind( this );
 		this.bindNode = this.bindNode.bind( this );
 		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.setOffset = this.setOffset.bind( this );
 		this.throttledSetOffset = this.throttledSetOffset.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
+		this.tabInto = this.tabInto.bind( this );
 
 		this.nodes = {};
 
@@ -69,7 +54,11 @@ class Popover extends Component {
 		this.setOffset();
 		this.setForcedPositions();
 		this.toggleWindowEvents( true );
-		this.focus();
+
+		const { focusOnMount = true } = this.props;
+		if ( focusOnMount ) {
+			this.focusContent();
+		}
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -106,24 +95,43 @@ class Popover extends Component {
 		window[ handler ]( 'scroll', this.throttledSetOffset, true );
 	}
 
-	focus() {
-		const { focusOnMount = true } = this.props;
-		if ( ! focusOnMount || ! isKeyDown ) {
-			return;
-		}
-
+	/**
+	 * Shifts focus to the first tabbable element within popover content, if
+	 * any exist.
+	 */
+	focusFirstTabbable() {
 		const { content } = this.nodes;
-		if ( ! content ) {
-			return;
-		}
 
-		// Find first tabbable node within content and shift focus, falling
-		// back to the popover panel itself.
+		// Find first tabbable node within content and shift focus.
 		const firstTabbable = focus.tabbable.find( content )[ 0 ];
 		if ( firstTabbable ) {
 			firstTabbable.focus();
-		} else {
+		}
+	}
+
+	/**
+	 * Shifts focus to the non-tabbable content wrapper if focus is not already
+	 * within content. This allows the user to proceed to tab or arrow into the
+	 * content, to mimic the behavior as if the popover were rendered in the
+	 * markup immediately following the triggering element which is not
+	 * guaranteed with the slot / fill implementation.
+	 */
+	focusContent() {
+		const { content } = this.nodes;
+
+		// Don't shift focus if focus already within (e.g. autoFocus).
+		if ( ! content.contains( document.activeElement ) ) {
 			content.focus();
+		}
+	}
+
+	/**
+	 * Shifts focus to the first tabbable element if the content wrapper
+	 * currently has focus.
+	 */
+	tabInto() {
+		if ( document.activeElement === this.nodes.content ) {
+			this.focusFirstTabbable();
 		}
 	}
 
@@ -257,7 +265,6 @@ class Popover extends Component {
 			onClose,
 			children,
 			className,
-			onClickOutside = onClose,
 			// Disable reason: We generate the `...contentProps` rest as remainder
 			// of props which aren't explicitly handled by this component.
 			/* eslint-disable no-unused-vars */
@@ -286,7 +293,7 @@ class Popover extends Component {
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		let content = (
-			<PopoverDetectOutside onClickOutside={ onClickOutside }>
+			<PopoverDetectOutside onFocusOutside={ onClose }>
 				<div
 					ref={ this.bindNode( 'popover' ) }
 					className={ classes }
@@ -301,23 +308,23 @@ class Popover extends Component {
 							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
 						</div>
 					) }
-					<div
-						ref={ this.bindNode( 'content' ) }
-						className="components-popover__content"
-						tabIndex="-1"
+					<KeyboardShortcuts
+						shortcuts={ {
+							down: this.tabInto,
+						} }
 					>
-						{ children }
-					</div>
+						<div
+							ref={ this.bindNode( 'content' ) }
+							className="components-popover__content"
+							tabIndex="-1"
+						>
+							{ children }
+						</div>
+					</KeyboardShortcuts>
 				</div>
 			</PopoverDetectOutside>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
-
-		// Apply focus return behavior except when default focus on open
-		// behavior is disabled.
-		if ( false !== focusOnMount ) {
-			content = <FocusManaged>{ content }</FocusManaged>;
-		}
 
 		// In case there is no slot context in which to render, default to an
 		// in-place rendering.

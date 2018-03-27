@@ -270,9 +270,9 @@ export class InserterMenu extends Component {
 		const { selectedItem } = this.state;
 		const isSearching = this.state.filterValue;
 
-		// Disable reason: The inserter menu is a modal display, not one which
-		// is always visible, and one which already incurs this behavior of
-		// autoFocus via Popover's focusOnMount.
+		// Disable reason: The inserter menu is a modal display, one which is
+		// not always visible. Focusing search enables quick input for intended
+		// action, and because is first tabbable anyways, not unexpected shift.
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (

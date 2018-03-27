@@ -20,7 +20,7 @@ const MoreMenu = () => (
 			<IconButton
 				icon="ellipsis"
 				label={ __( 'More' ) }
-				onClick={ onToggle }
+				onClick={ () => onToggle() }
 				aria-expanded={ isOpen }
 			/>
 		) }

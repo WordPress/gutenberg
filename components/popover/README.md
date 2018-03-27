@@ -88,13 +88,6 @@ A callback invoked when the popover should be closed.
 - Type: `Function`
 - Required: No
 
-### onClickOutside
-
-A callback invoked when the user clicks outside the opened popover, passing the click event. The popover should be closed in response to this interaction. Defaults to `onClose`.
-
-- Type: `Function`
-- Required: No
-
 ### expandOnMobile
 
 Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to avoid this behavior.
