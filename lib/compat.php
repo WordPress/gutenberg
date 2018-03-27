@@ -134,6 +134,17 @@ JS;
 add_action( 'wp_default_scripts', 'gutenberg_shim_api_request_emulate_http' );
 
 /**
+ * Shims assignment of API settings into apiRequest object.
+ *
+ * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
+ */
+function gutenberg_shim_api_request_settings( $scripts ) {
+	$api_settings_shim = 'wp.apiRequest.settings = window.wpApiSettings';
+	$scripts->add_inline_script( 'wp-api-request', $api_settings_shim, 'after' );
+}
+add_action( 'wp_default_scripts', 'gutenberg_shim_api_request_settings' );
+
+/**
  * Disables wpautop behavior in classic editor when post contains blocks, to
  * prevent removep from invalidating paragraph blocks.
  *

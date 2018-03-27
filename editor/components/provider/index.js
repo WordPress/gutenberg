@@ -3,7 +3,7 @@
  */
 import { bindActionCreators } from 'redux';
 import { Provider as ReduxProvider } from 'react-redux';
-import { flow, pick, noop } from 'lodash';
+import { flow, noop } from 'lodash';
 
 /**
  * WordPress Dependencies
@@ -127,13 +127,7 @@ class EditorProvider extends Component {
 			//  - context.getAPITaxonomyRestBaseMapping
 			[
 				APIProvider,
-				{
-					...wpApiSettings,
-					...pick( wp.api, [
-						'postTypeRestBaseMapping',
-						'taxonomyRestBaseMapping',
-					] ),
-				},
+				wpApiSettings,
 			],
 
 			// DropZone provider:
