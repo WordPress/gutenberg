@@ -86,6 +86,10 @@ class PostTitle extends Component {
 	}
 
 	render() {
+		if ( typeof window.customGutenberg === 'object' && ! window.customGutenberg.page.showTitle ) {
+			return <label className="screen-reader-text">{ title }</label>;
+		}
+
 		const { title, placeholder, instanceId } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );

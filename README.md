@@ -178,7 +178,10 @@ cons customGutenberg = {
 			}
 		}
 	],
-	panel: [ 'post-status', 'post-excerpt', 'post-taxonomies', 'featured-image', 'discussion-panel', 'last-revision', 'page-attributes', 'document-outline-panel', 'meta-boxes', 'panel-settings', 'posts-list' ]
+	panel: [ 'post-status', 'post-excerpt', 'post-taxonomies', 'featured-image', 'discussion-panel', 'last-revision', 'page-attributes', 'document-outline-panel', 'meta-boxes', 'panel-settings', 'posts-list' ],
+	page: {
+		showTitle: false, // show/hide title field on editor 
+	}
 };
 ```
 
