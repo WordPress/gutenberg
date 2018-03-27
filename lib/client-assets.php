@@ -588,6 +588,7 @@ function gutenberg_set_wp_api_settings_mappings() {
 
 		foreach ( $objects as $object ) {
 			$rest_base = ! empty( $object->rest_base ) ? $object->rest_base : $object->name;
+
 			$mapping[ $object->name ] = $rest_base;
 		}
 
