@@ -59,7 +59,11 @@ const initialState: StateType = {
 	refresh: false,
 };
 
+const devToolsEnhancer =
+	( process.env.NODE_ENV === 'development' && require( 'remote-redux-devtools' ).default ) ||
+	( () => {} );
+
 export function setupStore( state: StateType = initialState ) {
-	const store = createStore( reducer, state );
+	const store = createStore( reducer, state, devToolsEnhancer() );
 	return store;
 }
