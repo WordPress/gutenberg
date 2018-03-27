@@ -16,7 +16,7 @@ import './style.scss';
 import { NavigableMenu } from '../navigable-container';
 import withInstanceId from '../higher-order/with-instance-id';
 
-export function MenuItemsGroup( {
+export function MenuGroup( {
 	children,
 	className = '',
 	filterName,
@@ -32,13 +32,13 @@ export function MenuItemsGroup( {
 		return null;
 	}
 
-	const labelId = `components-menu-items-group-label-${ instanceId }`;
-	const classNames = classnames( className, 'components-menu-items__group' );
+	const labelId = `components-menu-group-label-${ instanceId }`;
+	const classNames = classnames( className, 'components-menu-group' );
 
 	return (
 		<div className={ classNames }>
 			{ label &&
-				<div className="components-menu-items__group-label" id={ labelId }>{ label }</div>
+				<div className="components-menu-group__label" id={ labelId }>{ label }</div>
 			}
 			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
 				{ menuItems }
@@ -47,4 +47,4 @@ export function MenuItemsGroup( {
 	);
 }
 
-export default withInstanceId( MenuItemsGroup );
+export default withInstanceId( MenuGroup );

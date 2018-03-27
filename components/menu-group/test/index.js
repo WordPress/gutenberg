@@ -6,23 +6,23 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { MenuItemsGroup } from '../group';
+import { MenuGroup } from '../';
 
-describe( 'MenuItemsGroup', () => {
+describe( 'MenuGroup', () => {
 	test( 'should render null when no children provided', () => {
-		const wrapper = shallow( <MenuItemsGroup /> );
+		const wrapper = shallow( <MenuGroup /> );
 
 		expect( wrapper.html() ).toBe( null );
 	} );
 
 	test( 'should match snapshot', () => {
 		const wrapper = shallow(
-			<MenuItemsGroup
+			<MenuGroup
 				label="My group"
 				instanceId="1"
 			>
 				<p>My item</p>
-			</MenuItemsGroup>
+			</MenuGroup>
 		);
 
 		expect( wrapper ).toMatchSnapshot();

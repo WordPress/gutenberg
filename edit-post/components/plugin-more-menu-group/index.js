@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
-import { withContext, MenuItemsGroup } from '@wordpress/components';
+import { withContext, MenuGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -16,10 +16,10 @@ const PluginMoreMenuGroup = ( { getFills, fillProps } ) => {
 		return null;
 	}
 	return (
-		<MenuItemsGroup
+		<MenuGroup
 			label={ __( 'Plugins' ) } >
 			<PluginMoreMenuItem.Slot name={ SLOT_NAME } fillProps={ fillProps } />
-		</MenuItemsGroup>
+		</MenuGroup>
 	);
 };
 
