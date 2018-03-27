@@ -70,7 +70,7 @@ const tabs = [
  * @return {Array} tabs.
  */
 export function getTabs() {
-	const customTabs = get( customGutenberg, 'tabs' );
+	const customTabs = get( window, 'customGutenberg.tabs' );
 	return customTabs || tabs;
 }
 

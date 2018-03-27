@@ -87,7 +87,7 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		if ( ! get( customGutenberg, 'editor.showTitle' ) ) {
+		if ( get( window, 'customGutenberg.editor.hideTitle' ) ) {
 			return <h1 className="screen-reader-text">{ title }</h1>;
 		}
 

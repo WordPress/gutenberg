@@ -104,7 +104,7 @@ export const registerCoreBlocks = () => {
 		registerBlockType( name, settings );
 	} );
 
-	const defaultBlock = get( customGutenberg, 'editor.defaultBlock' ) || paragraph.name;
+	const defaultBlock = get( window, 'customGutenberg.editor.defaultBlock' ) || paragraph.name;
 
 	setDefaultBlockName( defaultBlock );
 	setUnknownTypeHandlerName( freeform.name );

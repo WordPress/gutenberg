@@ -26,6 +26,6 @@ const panelItems = [
  * @return {Array} Panel items.
  */
 export function getPanelItems() {
-	const customItems = get( customGutenberg, 'panel' );
+	const customItems = get( window, 'customGutenberg.panel' );
 	return customItems || panelItems;
 }
