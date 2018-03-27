@@ -19,5 +19,11 @@ if [ "$CHECK_CORRECTNESS" = true ] ; then
 fi
 
 if [ "$CHECK_TESTS" = true ] ; then
-  npm test || pFail
+  # we'll run the tests twich (once for each platform) if the platform env var is not set
+  if [[ -z "${TEST_RN_PLATFORM}" ]] ; then
+    TEST_RN_PLATFORM=android npm test || pFail
+    TEST_RN_PLATFORM=ios npm test || pFail
+  else
+    npm test || pFail
+  fi
 fi
