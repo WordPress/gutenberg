@@ -210,7 +210,7 @@ export class InserterMenu extends Component {
 			( category ) => this.renderCategory( category, visibleItemsByCategory[ category.slug ] )
 		);
 	}
-	
+
 	getVisibleTabs() {
 		const tabs = [
 			{
@@ -234,12 +234,12 @@ export class InserterMenu extends Component {
 				className: 'editor-inserter__tab',
 			},
 		];
-		
+
 		// Remove embeds tab if there are no embeds to display.
 		if ( isEmpty( this.getItemsForTab( 'embeds' ) ) ) {
 			return tabs.filter( tab => 'embeds' !== tab.name );
 		}
-		
+
 		return tabs;
 	}
 
