@@ -58,10 +58,7 @@
 	overflow: hidden;
 	position: relative;
 	white-space: nowrap;
-
-	&:after {
-		@include long-content-fade( $size: 20% );
-	}
+	text-overflow: ellipsis;
 }
 
 .editor-post-permalink-editor__edit {
