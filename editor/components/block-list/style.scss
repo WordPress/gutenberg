@@ -380,7 +380,7 @@
 	}
 
 	// Dropzones
-	& .components-drop-zone {
+	& > .components-drop-zone {
 		border: none;
 		top: -4px;
 		bottom: -3px;

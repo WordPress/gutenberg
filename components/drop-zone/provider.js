@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, without, some, filter, findIndex, noop, throttle } from 'lodash';
+import { isEqual, find, some, filter, noop, throttle } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +17,7 @@ class DropZoneProvider extends Component {
 		this.dragOverListener = this.dragOverListener.bind( this );
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 		this.onDrop = this.onDrop.bind( this );
+		this.bindContainer = this.bindContainer.bind( this );
 
 		this.state = {
 			isDraggingOverDocument: false,
@@ -26,8 +27,12 @@ class DropZoneProvider extends Component {
 		this.dropzones = [];
 	}
 
+	bindContainer( ref ) {
+		this.container = ref;
+	}
+
 	dragOverListener( event ) {
-		this.toggleDraggingOverDocument( event );
+		this.toggleDraggingOverDocument( event, this.getDragEventType( event ) );
 		event.preventDefault();
 	}
 
@@ -80,7 +85,29 @@ class DropZoneProvider extends Component {
 		} );
 	}
 
-	toggleDraggingOverDocument( event ) {
+	getDragEventType( event ) {
+		if ( event.dataTransfer ) {
+			if ( event.dataTransfer.types.indexOf( 'Files' ) !== -1 ) {
+				return 'file';
+			}
+
+			if ( event.dataTransfer.types.indexOf( 'text/html' ) !== -1 ) {
+				return 'html';
+			}
+		}
+
+		return 'default';
+	}
+
+	doesDropzoneSupportType( dropzone, type ) {
+		return (
+			( type === 'file' && dropzone.onFilesDrop ) ||
+			( type === 'html' && dropzone.onHTMLDrop ) ||
+			( type === 'default' && dropzone.onDrop )
+		);
+	}
+
+	toggleDraggingOverDocument( event, dragEventType ) {
 		// In some contexts, it may be necessary to capture and redirect the
 		// drag event (e.g. atop an `iframe`). To accommodate this, you can
 		// create an instance of CustomEvent with the original event specified
@@ -90,14 +117,23 @@ class DropZoneProvider extends Component {
 		const detail = window.CustomEvent && event instanceof window.CustomEvent ? event.detail : event;
 
 		// Index of hovered dropzone.
-		const hoveredDropZone = findIndex( this.dropzones, ( { element } ) =>
-			this.isWithinZoneBounds( element, detail.clientX, detail.clientY )
+
+		const hoveredDropZones = filter( this.dropzones, ( dropzone ) =>
+			this.doesDropzoneSupportType( dropzone, dragEventType ) &&
+			this.isWithinZoneBounds( dropzone.element, detail.clientX, detail.clientY )
 		);
+
+		// Find the leaf dropzone not containing another dropzone
+		const hoveredDropZone = find( hoveredDropZones, zone => (
+			! some( hoveredDropZones, subZone => subZone !== zone && zone.element.parentElement.contains( subZone.element ) )
+		) );
+
+		const hoveredDropZoneIndex = this.dropzones.indexOf( hoveredDropZone );
 
 		let position = null;
 
-		if ( hoveredDropZone !== -1 ) {
-			const rect = this.dropzones[ hoveredDropZone ].element.getBoundingClientRect();
+		if ( hoveredDropZone ) {
+			const rect = hoveredDropZone.element.getBoundingClientRect();
 
 			position = {
 				x: detail.clientX - rect.left < rect.right - detail.clientX ? 'left' : 'right',
@@ -110,38 +146,36 @@ class DropZoneProvider extends Component {
 
 		if ( ! this.state.isDraggingOverDocument ) {
 			dropzonesToUpdate = this.dropzones;
-		} else if ( hoveredDropZone !== this.state.hoveredDropZone ) {
+		} else if ( hoveredDropZoneIndex !== this.state.hoveredDropZone ) {
 			if ( this.state.hoveredDropZone !== -1 ) {
 				dropzonesToUpdate.push( this.dropzones[ this.state.hoveredDropZone ] );
 			}
-			if ( hoveredDropZone !== -1 ) {
-				dropzonesToUpdate.push( this.dropzones[ hoveredDropZone ] );
+			if ( hoveredDropZone ) {
+				dropzonesToUpdate.push( hoveredDropZone );
 			}
 		} else if (
-			hoveredDropZone !== -1 &&
-			hoveredDropZone === this.state.hoveredDropZone &&
+			hoveredDropZone &&
+			hoveredDropZoneIndex === this.state.hoveredDropZone &&
 			! isEqual( position, this.state.position )
 		) {
-			dropzonesToUpdate.push( this.dropzones[ hoveredDropZone ] );
+			dropzonesToUpdate.push( hoveredDropZone );
 		}
 
 		// Notifying the dropzones
 		dropzonesToUpdate.map( ( dropzone ) => {
 			const index = this.dropzones.indexOf( dropzone );
 			dropzone.updateState( {
-				isDraggingOverElement: index === hoveredDropZone,
-				position: index === hoveredDropZone ? position : null,
-				isDraggingOverDocument: true,
+				isDraggingOverElement: index === hoveredDropZoneIndex,
+				position: index === hoveredDropZoneIndex ? position : null,
+				isDraggingOverDocument: this.doesDropzoneSupportType( dropzone, dragEventType ),
 			} );
 		} );
 
 		this.setState( {
 			isDraggingOverDocument: true,
-			hoveredDropZone,
+			hoveredDropZone: hoveredDropZoneIndex,
 			position,
 		} );
-
-		event.preventDefault();
 	}
 
 	isWithinZoneBounds( dropzone, x, y ) {
@@ -158,8 +192,7 @@ class DropZoneProvider extends Component {
 			);
 		};
 
-		const childZones = without( dropzone.parentElement.querySelectorAll( '.components-drop-zone' ), dropzone );
-		return ! some( childZones, isWithinElement ) && isWithinElement( dropzone );
+		return isWithinElement( dropzone );
 	}
 
 	onDrop( event ) {
@@ -168,24 +201,22 @@ class DropZoneProvider extends Component {
 		event.dataTransfer && event.dataTransfer.files.length; // eslint-disable-line no-unused-expressions
 
 		const { position, hoveredDropZone } = this.state;
-		const dropzone = hoveredDropZone !== -1 ? this.dropzones[ hoveredDropZone ] : null;
-		const isValidDropzone = !! dropzone && dropzone.element.contains( event.target );
-
+		const dragEventType = this.getDragEventType( event );
+		const dropzone = this.dropzones[ hoveredDropZone ];
+		const isValidDropzone = !! dropzone && this.container.contains( event.target );
 		this.resetDragState();
 
-		if ( event.dataTransfer && isValidDropzone ) {
-			const files = event.dataTransfer.files;
-			const HTML = event.dataTransfer.getData( 'text/html' );
-
-			if ( files.length && dropzone.onFilesDrop ) {
-				dropzone.onFilesDrop( [ ...event.dataTransfer.files ], position );
-			} else if ( HTML && dropzone.onHTMLDrop ) {
-				dropzone.onHTMLDrop( HTML, position );
+		if ( isValidDropzone ) {
+			switch ( dragEventType ) {
+				case 'file':
+					dropzone.onFilesDrop( [ ...event.dataTransfer.files ], position );
+					break;
+				case 'html':
+					dropzone.onHTMLDrop( event.dataTransfer.getData( 'text/html' ), position );
+					break;
+				case 'default':
+					dropzone.onDrop( event, position );
 			}
-		}
-
-		if ( isValidDropzone && !! dropzone.onDrop ) {
-			dropzone.onDrop( event, position );
 		}
 
 		event.stopPropagation();
@@ -194,7 +225,7 @@ class DropZoneProvider extends Component {
 
 	render() {
 		const { children } = this.props;
-		return children;
+		return <div ref={ this.bindContainer }>{ children }</div>;
 	}
 }
 
