@@ -61,7 +61,7 @@ class PostPermalink extends Component {
 					</Button>
 				}
 
-				<Tooltip text={ __( 'Copy the permalink to your clipboard.' ) }>
+				<Tooltip text={ __( 'Copy the permalink to your clipboard' ) }>
 					<ClipboardButton
 						className="editor-post-permalink__copy"
 						text={ samplePermalink }
