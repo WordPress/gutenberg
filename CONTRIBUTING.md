@@ -70,7 +70,7 @@ To add a new documentation page, you'll have to create a Markdown file in the [d
 
 Please see [SECURITY.md](./SECURITY.md).
 
-## Internationalizing Gutenberg Plugin
+## Localizing Gutenberg Plugin
 
 To translate Gutenburg in your locale or language, [select your locale here](https://translate.wordpress.org/projects/wp-plugins/gutenberg) and translate *Development* (which contains the plugin's string) and/or *Development Readme* (please translate what you see in the Details tab of the [plugin page](https://wordpress.org/plugins/gutenberg/)).
 
