@@ -36,10 +36,10 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	getBlockForType() {
 		const blockType = getBlockType( this.props.blockType );
 		if ( blockType ) {
-			const Code = blockType.edit;
-			// TODO: input text needs to be kept by updating the attributes
+			const Block = blockType.edit;
+			// TODO: setAttributes needs to change the state/attributes
 			return (
-				<Code
+				<Block
 					attributes={ { ...this.props.attributes } }
 					// pass a curried version of onChanged with just one argument
 					setAttributes={ attrs => this.props.onChange( this.props.uid, attrs ) }
