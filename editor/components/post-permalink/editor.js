@@ -71,6 +71,7 @@ class PostPermalinkEditor extends Component {
 			postName,
 		} = this.getPermalinkParts();
 
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<form
 				className="editor-post-permalink-editor"
@@ -97,6 +98,7 @@ class PostPermalinkEditor extends Component {
 				</Button>
 			</form>
 		);
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
