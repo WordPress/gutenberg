@@ -16,7 +16,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import './style.scss';
 
-export function ColorPalette( { colors, disableCustomColors = false, value, onChange } ) {
+export function ColorPalette( { colors, disableCustomColors = false, value, onChange, disableAlpha = true } ) {
 	function applyOrUnset( color ) {
 		return () => onChange( value === color ? undefined : color );
 	}
@@ -61,7 +61,7 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 							color={ value }
 							onChangeComplete={ ( color ) => onChange( color.hex ) }
 							style={ { width: '100%' } }
-							disableAlpha
+							disableAlpha={ disableAlpha }
 						/>
 					) }
 				/>
