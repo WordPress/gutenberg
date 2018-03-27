@@ -7,6 +7,16 @@ matrix:
       node_js: 8
       env:
         LANE='node'
+        CHECK_CORRECTNESS='true'
+      cache:
+        yarn: true
+      script:
+        - ./.travis/travis-checks-js.sh
+    - language: node_js
+      node_js: 8
+      env:
+        LANE='node'
+        CHECK_TESTS='true'
         TEST_RN_PLATFORM='android'
       cache:
         yarn: true
@@ -16,6 +26,7 @@ matrix:
       node_js: 8
       env:
         LANE='node'
+        CHECK_TESTS='true'
         TEST_RN_PLATFORM='ios'
       cache:
         yarn: true
