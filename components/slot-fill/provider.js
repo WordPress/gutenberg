@@ -8,6 +8,11 @@ import { pick, sortBy, forEach, without, noop } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { __interopSetContext } from './context';
+
 class SlotFillProvider extends Component {
 	constructor() {
 		super( ...arguments );
@@ -21,6 +26,10 @@ class SlotFillProvider extends Component {
 
 		this.slots = {};
 		this.fills = {};
+	}
+
+	componentWillMount() {
+		__interopSetContext( this.getChildContext() );
 	}
 
 	getChildContext() {
@@ -41,6 +50,7 @@ class SlotFillProvider extends Component {
 		// Sometimes the fills are registered after the intial render of slot
 		// But before the registerSlot call, we need to rerender the slot
 		this.forceUpdateSlot( name );
+		__interopSetContext( this.getChildContext() );
 	}
 
 	registerFill( name, instance ) {
@@ -49,11 +59,13 @@ class SlotFillProvider extends Component {
 			instance,
 		];
 		this.forceUpdateSlot( name );
+		__interopSetContext( this.getChildContext() );
 	}
 
 	unregisterSlot( name ) {
 		delete this.slots[ name ];
 		this.forceUpdateFills( name );
+		__interopSetContext( this.getChildContext() );
 	}
 
 	unregisterFill( name, instance ) {
@@ -63,6 +75,7 @@ class SlotFillProvider extends Component {
 		);
 		this.resetFillOccurrence( name );
 		this.forceUpdateSlot( name );
+		__interopSetContext( this.getChildContext() );
 	}
 
 	getSlot( name ) {

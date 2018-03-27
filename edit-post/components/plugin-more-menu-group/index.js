@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
-import { withContext, MenuGroup } from '@wordpress/components';
+import { SlotFillContext, MenuGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -10,19 +9,24 @@ import { __ } from '@wordpress/i18n';
  */
 import PluginMoreMenuItem, { SLOT_NAME } from '../plugin-more-menu-item';
 
-const PluginMoreMenuGroup = ( { getFills, fillProps } ) => {
-	// We don't want the plugins menu items group to be rendered if there are no fills.
-	if ( ! getFills( SLOT_NAME ).length ) {
-		return null;
-	}
+function PluginMoreMenuGroup( { fillProps } ) {
 	return (
-		<MenuGroup
-			label={ __( 'Plugins' ) } >
-			<PluginMoreMenuItem.Slot name={ SLOT_NAME } fillProps={ fillProps } />
-		</MenuGroup>
-	);
-};
+		<SlotFillContext.Consumer>
+			{ ( { getFills } ) => {
+				// We don't want the plugins menu items group to be rendered if there are no fills.
+				if ( ! getFills( SLOT_NAME ).length ) {
+					return null;
+				}
 
-export default compose( [
-	withContext( 'getFills' )(),
-] )( PluginMoreMenuGroup );
+				return (
+					<MenuGroup
+						label={ __( 'Plugins' ) } >
+						<PluginMoreMenuItem.Slot name={ SLOT_NAME } fillProps={ fillProps } />
+					</MenuGroup>
+				);
+			} }
+		</SlotFillContext.Consumer>
+	);
+}
+
+export default PluginMoreMenuGroup;
