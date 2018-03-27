@@ -28,6 +28,16 @@ class PostPermalink extends Component {
 		};
 	}
 
+	componentDidUpdate( prevProps, prevState ) {
+		// If we've just stopped editing the permalink, focus on the new permalink.
+		if ( prevState.editingPermalink && ! this.state.editingPermalink ) {
+			const permalinkButton = document.querySelector( '.editor-post-permalink__link' );
+			if ( permalinkButton ) {
+				permalinkButton.focus();
+			}
+		}
+	}
+
 	render() {
 		const { isNew, previewLink, isEditable, samplePermalink } = this.props;
 		const { iconClass, editingPermalink } = this.state;
