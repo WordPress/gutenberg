@@ -252,7 +252,11 @@ class GalleryBlock extends Component {
 							onChange={ this.uploadFromFiles }
 							accept="image/*"
 							icon="insert"
-						/>
+						>
+							<span className="blocks-gallery-add-item-label">
+								{ __( 'Upload Image' ) }
+							</span>
+						</FormFileUpload>
 					</li>
 				}
 			</ul>,

@@ -52,6 +52,13 @@
 			border: 1px solid #999;
 		}
 	}
+
+	.blocks-gallery-add-item-label {
+		display: block;
+		line-height: normal;
+		margin-bottom: -1.22em; // line-height "normal" value
+		font-family: $default-font;
+	}
 }
 
 .blocks-gallery-item__inline-menu {
