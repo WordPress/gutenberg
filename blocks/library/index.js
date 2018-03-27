@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import {
@@ -99,6 +104,8 @@ export const registerCoreBlocks = () => {
 		registerBlockType( name, settings );
 	} );
 
-	setDefaultBlockName( paragraph.name );
+	const defaultBlock = get( customGutenberg, 'editor.defaultBlock' ) || paragraph.name;
+
+	setDefaultBlockName( defaultBlock );
 	setUnknownTypeHandlerName( freeform.name );
 };

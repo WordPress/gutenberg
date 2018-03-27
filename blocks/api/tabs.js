@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -65,11 +70,8 @@ const tabs = [
  * @return {Array} tabs.
  */
 export function getTabs() {
-	if ( typeof window.customGutenberg === 'object' && window.customGutenberg.tabs ) {
-		return window.customGutenberg.tabs;
-	}
-
-	return tabs;
+	const customTabs = get( customGutenberg, 'tabs' );
+	return customTabs || tabs;
 }
 
 /**

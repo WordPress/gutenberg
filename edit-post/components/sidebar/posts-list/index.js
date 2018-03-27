@@ -33,14 +33,14 @@ function PostsList( { isOpened, onTogglePanel } ) {
 		>
 			<TextControl
 				placeholder={ __( 'Search articles' ) }
-				onChange={ event => console.log(event) }
+				onChange={ event => console.log( event ) }
 			/>
 			<SelectControl
 				// Selected value.
 				value=""
 				label={ __( 'Category' ) }
-				options={ options } 
-				onChange={ event => console.log(event) }
+				options={ options }
+				onChange={ event => console.log( event ) }
 			/>
 			<div>
 				<ul>

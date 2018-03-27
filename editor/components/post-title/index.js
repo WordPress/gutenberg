@@ -3,6 +3,7 @@
  */
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -86,8 +87,8 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		if ( typeof window.customGutenberg === 'object' && ! window.customGutenberg.page.showTitle ) {
-			return <label className="screen-reader-text">{ title }</label>;
+		if ( ! get( customGutenberg, 'editor.showTitle' ) ) {
+			return <h1 className="screen-reader-text">{ title }</h1>;
 		}
 
 		const { title, placeholder, instanceId } = this.props;

@@ -179,8 +179,9 @@ cons customGutenberg = {
 		}
 	],
 	panel: [ 'post-status', 'post-excerpt', 'post-taxonomies', 'featured-image', 'discussion-panel', 'last-revision', 'page-attributes', 'document-outline-panel', 'meta-boxes', 'panel-settings', 'posts-list' ],
-	page: {
-		showTitle: false, // show/hide title field on editor 
+	editor: {
+		showTitle: false, // show/hide title field on editor
+		defaultBlock: 'rows/col4-col4-col4' // 
 	}
 };
 ```

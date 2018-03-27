@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * Panel (sidebar) items.
  *
  * @var {Array} items
@@ -21,9 +26,6 @@ const panelItems = [
  * @return {Array} Panel items.
  */
 export function getPanelItems() {
-	if ( typeof window.customGutenberg === 'object' && window.customGutenberg.panel ) {
-		return window.customGutenberg.panel;
-	}
-
-	return panelItems;
+	const customItems = get( customGutenberg, 'panel' );
+	return customItems || panelItems;
 }

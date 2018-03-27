@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -23,9 +28,6 @@ const categories = [
  * @return {Array} Block categories.
  */
 export function getCategories() {
-	if ( typeof window.customGutenberg === 'object' && window.customGutenberg.categories ) {
-		return window.customGutenberg.categories;
-	}
-
-	return categories;
+	const customCategories = get( customGutenberg, 'categories' );
+	return customCategories || categories;
 }
