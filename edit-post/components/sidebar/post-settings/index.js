@@ -16,7 +16,7 @@ import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
 import DocumentOutlinePanel from '../document-outline-panel';
 import MetaBoxes from '../../meta-boxes';
-import PostsList from '../posts-list';
+import ArticlesList from '../articles-list';
 import SettingsPanel from '../settings-panel';
 
 import { getPanelItems } from '../panel-items.js';
@@ -27,7 +27,7 @@ const panel = () => {
 	return (
 		<Panel>
 			{ items.includes( 'post-status' ) ? <PostStatus /> : '' }
-			{ items.includes( 'posts-list' ) ? <PostsList /> : '' }
+			{ items.includes( 'articles-list' ) ? <ArticlesList /> : '' }
 			{ items.includes( 'settings-panel' ) ? <SettingsPanel /> : '' }
 			{ items.includes( 'last-revision' ) ? <LastRevision /> : '' }
 			{ items.includes( 'post-taxonomies' ) ? <PostTaxonomies /> : '' }

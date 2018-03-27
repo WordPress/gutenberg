@@ -18,12 +18,17 @@ import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
 /**
  * Module Constants
  */
-const PANEL_NAME = 'posts-list';
+const PANEL_NAME = 'articles-list';
+
+function getArticles() {
+	return get( window, 'customGutenberg.articles' ) || [];
+}
 
 // TODO: - make panel title customizable
 // 		 - list of categories
-function PostsList( { isOpened, onTogglePanel } ) {
+function ArticlesList( { isOpened, onTogglePanel } ) {
 	const options = [ { value: 0, label: __( 'Uncategorized' ) } ];
+	const articles = getArticles();
 
 	return (
 		<PanelBody
@@ -44,9 +49,9 @@ function PostsList( { isOpened, onTogglePanel } ) {
 			/>
 			<div>
 				<ul>
-					<li>Post 1</li>
-					<li>Post 2</li>
-					<li>Post 3</li>
+					{
+						articles.map( article => <li key={ article.key } >{ article.title }</li> );
+					}
 				</ul>
 			</div>
 		</PanelBody>
@@ -64,4 +69,4 @@ export default connect(
 	},
 	undefined,
 	{ storeKey: 'edit-post' }
-)( PostsList );
+)( ArticlesList );
