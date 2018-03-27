@@ -154,10 +154,30 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
+/**
+ * Reducer returning the articles.
+ *
+ * @param {Object}  state                 Current state.
+ * @param {Object}  action                Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function articles( state, action ) {
+	switch ( action.type ) {
+		case 'GET_LAST_ARTICLES':
+			console.log( 'state', state );
+			console.log( 'action', action );
+			return action;
+		default:
+			return state;
+	}
+}
+
 export default combineReducers( {
 	preferences,
 	panel,
 	publishSidebarActive,
 	metaBoxes,
 	isSavingMetaBoxes,
+	articles,
 } );

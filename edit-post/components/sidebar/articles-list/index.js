@@ -12,7 +12,7 @@ import { PanelBody, TextControl, SelectControl } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { isEditorSidebarPanelOpened } from '../../../store/selectors';
+import { isEditorSidebarPanelOpened, getArtciles } from '../../../store/selectors';
 import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
 
 /**
@@ -20,15 +20,10 @@ import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
  */
 const PANEL_NAME = 'articles-list';
 
-function getArticles() {
-	return get( window, 'customGutenberg.articles' ) || [];
-}
-
 // TODO: - make panel title customizable
 // 		 - list of categories
-function ArticlesList( { isOpened, onTogglePanel } ) {
+function ArticlesList( { isOpened, onTogglePanel, articles } ) {
 	const options = [ { value: 0, label: __( 'Uncategorized' ) } ];
-	const articles = getArticles();
 
 	return (
 		<PanelBody
@@ -50,7 +45,7 @@ function ArticlesList( { isOpened, onTogglePanel } ) {
 			<div>
 				<ul>
 					{
-						articles.map( article => <li key={ article.key } >{ article.title }</li> );
+						articles ? articles.map( article => <li key={ article.key } >{ article.title }</li> ) : <li>No articles!</li>
 					}
 				</ul>
 			</div>
@@ -61,6 +56,7 @@ function ArticlesList( { isOpened, onTogglePanel } ) {
 export default connect(
 	( state ) => ( {
 		isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
+		articles: getArtciles( state ),
 	} ),
 	{
 		onTogglePanel() {

@@ -90,6 +90,10 @@ const effects = {
 		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
 		speak( message, 'assertive' );
 	},
+	GET_LAST_ARTICLES( ) {
+		wp.apiRequest( { path: '/wp/v2/articles' } )
+			.then( articles => this.setState( { articles } ) );
+	},
 };
 
 export default effects;
