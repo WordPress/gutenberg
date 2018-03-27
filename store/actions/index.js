@@ -1,7 +1,16 @@
-/** @format */
+/**
+ * @format
+ * @flow
+ */
+
 import ActionTypes from './ActionTypes';
 
-export function updateBlockAttributes( uid, attributes ) {
+export type BlockActionType = string => {
+	type: $Values<typeof ActionTypes.BLOCK>,
+	uid: string,
+};
+
+export function updateBlockAttributes( uid: string, attributes: mixed ) {
 	return {
 		type: ActionTypes.BLOCK.UPDATE_ATTRIBUTES,
 		uid,
@@ -9,22 +18,22 @@ export function updateBlockAttributes( uid, attributes ) {
 	};
 }
 
-export const focusBlockAction = uid => ( {
+export const focusBlockAction: BlockActionType = uid => ( {
 	type: ActionTypes.BLOCK.FOCUS,
 	uid: uid,
 } );
 
-export const moveBlockUpAction = uid => ( {
+export const moveBlockUpAction: BlockActionType = uid => ( {
 	type: ActionTypes.BLOCK.MOVE_UP,
 	uid: uid,
 } );
 
-export const moveBlockDownAction = uid => ( {
+export const moveBlockDownAction: BlockActionType = uid => ( {
 	type: ActionTypes.BLOCK.MOVE_DOWN,
 	uid: uid,
 } );
 
-export const deleteBlockAction = uid => ( {
+export const deleteBlockAction: BlockActionType = uid => ( {
 	type: ActionTypes.BLOCK.DELETE,
 	uid: uid,
 } );

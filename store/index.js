@@ -1,8 +1,24 @@
-/** @format */
+/**
+ * @format
+ * @flow
+ */
+
 import { createStore } from 'redux';
 import { reducer } from './reducers';
 
-const initialState = {
+export type BlockType = {
+	uid: string,
+	blockType: string,
+	attributes: { content: string },
+	focused: boolean,
+};
+
+export type StateType = {
+	blocks: Array<BlockType>,
+	refresh: boolean,
+};
+
+const initialState: StateType = {
 	// TODO: get blocks list block state should be externalized (shared with Gutenberg at some point?).
 	// If not it should be created from a string parsing (commented HTML to json).
 	blocks: [
@@ -53,7 +69,7 @@ const initialState = {
 	refresh: false,
 };
 
-export function setupStore( state = initialState ) {
+export function setupStore( state: StateType = initialState ) {
 	const store = createStore( reducer, state );
 	return store;
 }

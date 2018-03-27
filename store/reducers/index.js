@@ -1,8 +1,13 @@
-/** @format */
+/**
+ * @format
+ * @flow
+ */
 
 import { find, findIndex, reduce } from 'lodash';
 
 import ActionTypes from '../actions/ActionTypes';
+import type { StateType } from '../';
+import type { BlockActionType } from '../actions';
 
 function findBlock( blocks, uid: string ) {
 	return find( blocks, obj => {
@@ -16,7 +21,10 @@ function findBlockIndex( blocks, uid: string ) {
 	} );
 }
 
-export const reducer = ( state = {}, action ) => {
+export const reducer = (
+	state: StateType = { blocks: [], refresh: false },
+	action: BlockActionType
+) => {
 	const blocks = [ ...state.blocks ];
 	switch ( action.type ) {
 		case ActionTypes.BLOCK.UPDATE_ATTRIBUTES:
