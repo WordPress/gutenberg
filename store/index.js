@@ -4,7 +4,6 @@
  */
 
 import { createStore } from 'redux';
-import devToolsEnhancer from 'remote-redux-devtools';
 import { reducer } from './reducers';
 
 export type BlockType = {
@@ -60,7 +59,11 @@ const initialState: StateType = {
 	refresh: false,
 };
 
+const devToolsEnhancer =
+	( process.env.NODE_ENV === 'development' && require( 'remote-redux-devtools' ).default ) ||
+	( () => {} );
+
 export function setupStore( state: StateType = initialState ) {
-	const store = createStore( reducer, state , devToolsEnhancer());
+	const store = createStore( reducer, state, devToolsEnhancer() );
 	return store;
 }
