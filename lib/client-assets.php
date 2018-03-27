@@ -574,6 +574,32 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
 }
 
 /**
+ * Extends wpApiSettings global to include REST base mappings for post types
+ * and taxonomies
+ */
+function gutenberg_set_wp_api_settings_mappings() {
+	$mapping_prefix_objects = array(
+		'postType' => get_post_types( array(), 'objects' ),
+		'taxonomy' => get_taxonomies( array(), 'objects' ),
+	);
+
+	foreach ( $mapping_prefix_objects as $mapping_prefix => $objects ) {
+		$mapping = array();
+
+		foreach ( $objects as $object ) {
+			$rest_base = ! empty( $object->rest_base ) ? $object->rest_base : $object->name;
+			$mapping[ $object->name ] = $rest_base;
+		}
+
+		wp_add_inline_script( 'wp-api-request', sprintf(
+			'wpApiSettings.%sRestBaseMapping = %s;',
+			$mapping_prefix,
+			wp_json_encode( (object) $mapping )
+		) );
+	}
+}
+
+/**
  * Extend wp-api Backbone client with methods to look up the REST API endpoints for all post types.
  *
  * This is temporary while waiting for #41111 in core.
@@ -581,28 +607,12 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
  * @link https://core.trac.wordpress.org/ticket/41111
  */
 function gutenberg_extend_wp_api_backbone_client() {
-	// Post Types Mapping.
-	$post_type_rest_base_mapping = array();
-	foreach ( get_post_types( array(), 'objects' ) as $post_type_object ) {
-		$rest_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
-		$post_type_rest_base_mapping[ $post_type_object->name ] = $rest_base;
-	}
-
-	// Taxonomies Mapping.
-	$taxonomy_rest_base_mapping = array();
-	foreach ( get_taxonomies( array(), 'objects' ) as $taxonomy_object ) {
-		$rest_base = ! empty( $taxonomy_object->rest_base ) ? $taxonomy_object->rest_base : $taxonomy_object->name;
-		$taxonomy_rest_base_mapping[ $taxonomy_object->name ] = $rest_base;
-	}
-
-	$script  = sprintf( 'wp.api.postTypeRestBaseMapping = %s;', wp_json_encode( $post_type_rest_base_mapping ) );
-	$script .= sprintf( 'wp.api.taxonomyRestBaseMapping = %s;', wp_json_encode( $taxonomy_rest_base_mapping ) );
-	$script .= <<<JS
+	$script = <<<JS
 		wp.api.getPostTypeRoute = function( postType ) {
-			return wp.api.postTypeRestBaseMapping[ postType ];
+			return wpApiSettings.postTypeRestBaseMapping[ postType ];
 		};
 		wp.api.getTaxonomyRoute = function( taxonomy ) {
-			return wp.api.taxonomyRestBaseMapping[ taxonomy ];
+			return wpApiSettings.taxonomyRestBaseMapping[ taxonomy ];
 		};
 JS;
 	wp_add_inline_script( 'wp-api', $script );
@@ -790,6 +800,7 @@ function gutenberg_capture_code_editor_settings( $settings ) {
 function gutenberg_editor_scripts_and_styles( $hook ) {
 	$is_demo = isset( $_GET['gutenberg-demo'] );
 
+	gutenberg_set_wp_api_settings_mappings();
 	gutenberg_extend_wp_api_backbone_client();
 
 	// Enqueue heartbeat separately as an "optional" dependency of the editor.
