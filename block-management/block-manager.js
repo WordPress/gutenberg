@@ -8,12 +8,7 @@ import { StyleSheet, Text, View, FlatList, TextInput } from 'react-native';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
-type Block = {
-	uid: string,
-	blockType: string,
-	attributes: { content: mixed },
-	focused: boolean,
-};
+import type { BlockType } from '../store/';
 
 export type BlockListType = {
 	onChange: ( uid: string, attributes: mixed ) => void,
@@ -21,7 +16,7 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
-	blocks: Array<Block>,
+	blocks: Array<BlockType>,
 	refresh: boolean,
 };
 
@@ -65,7 +60,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 	}
 
-	renderItem( value: { item: Block, uid: string } ) {
+	renderItem( value: { item: BlockType, uid: string } ) {
 		return (
 			<BlockHolder
 				onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }

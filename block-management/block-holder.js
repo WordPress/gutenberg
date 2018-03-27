@@ -7,14 +7,12 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Toolbar from './toolbar';
 
+import type { BlockType } from '../store/';
+
 // Gutenberg imports
 import { getBlockType } from '@gutenberg/blocks/api';
 
-type PropsType = {
-	uid: string,
-	blockType: string,
-	attributes: { content: mixed },
-	focused: boolean,
+type PropsType = BlockType & {
 	onChange: ( uid: string, attributes: mixed ) => void,
 	onToolbarButtonPressed: ( button: number, uid: string ) => void,
 	onBlockHolderPressed: ( uid: string ) => void,
