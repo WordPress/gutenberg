@@ -6,12 +6,12 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getCategories, getMedia } from '../resolvers';
+import { getTerms, getMedia } from '../resolvers';
 import { setRequested, receiveTerms, receiveMedia } from '../actions';
 
 jest.mock( '@wordpress/api-request' );
 
-describe( 'getCategories', () => {
+describe( 'getTerms', () => {
 	const CATEGORIES = [ { id: 1 } ];
 
 	beforeAll( () => {
@@ -23,11 +23,11 @@ describe( 'getCategories', () => {
 	} );
 
 	it( 'yields with requested terms', async () => {
-		const fulfillment = getCategories();
+		const fulfillment = getTerms( 'category' );
 		const requested = ( await fulfillment.next() ).value;
 		expect( requested.type ).toBe( setRequested().type );
 		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveTerms( 'categories', CATEGORIES ) );
+		expect( received ).toEqual( receiveTerms( 'category', CATEGORIES ) );
 	} );
 } );
 
