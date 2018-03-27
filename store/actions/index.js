@@ -5,7 +5,7 @@
 
 import ActionTypes from './ActionTypes';
 
-type BlockActionType = number => {
+export type BlockActionType = number => {
 	type: $Values<typeof ActionTypes.BLOCK>,
 	rowId: number,
 };

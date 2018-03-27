@@ -1,8 +1,16 @@
-/** @format */
+/**
+ * @format
+ * @flow
+ */
 
 import ActionTypes from '../actions/ActionTypes';
+import type { StateType } from '../';
+import type { BlockActionType } from '../actions';
 
-export const reducer = ( state = {}, action ) => {
+export const reducer = (
+	state: StateType = { blocks: [], refresh: false },
+	action: BlockActionType
+) => {
 	switch ( action.type ) {
 		case ActionTypes.BLOCK.FOCUS:
 			var blocks = [ ...state.blocks ];
