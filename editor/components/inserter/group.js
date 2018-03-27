@@ -74,6 +74,7 @@ export default class InserterGroup extends Component {
 				onMouseLeave={ this.createToggleBlockHover( null ) }
 				onFocus={ this.createToggleBlockHover( item ) }
 				onBlur={ this.createToggleBlockHover( null ) }
+				aria-label={ item.title } // Fix for IE11 and JAWS 2018 see GitHub issue 5827.
 			>
 				<BlockIcon icon={ item.icon } />
 				{ item.title }
