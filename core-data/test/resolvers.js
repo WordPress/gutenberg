@@ -23,7 +23,7 @@ describe( 'getTerms', () => {
 	} );
 
 	it( 'yields with requested terms', async () => {
-		const fulfillment = getTerms( 'category' );
+		const fulfillment = getTerms( undefined, 'category' );
 		const requested = ( await fulfillment.next() ).value;
 		expect( requested.type ).toBe( setRequested().type );
 		const received = ( await fulfillment.next() ).value;
