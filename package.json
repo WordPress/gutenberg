@@ -17,8 +17,7 @@
     "eject": "react-native-scripts eject",
     "android": "react-native-scripts android",
     "ios": "react-native-scripts ios",
-    "test": "node node_modules/jest/bin/jest.js",
-    "test-android": "cross-env NODE_ENV=test jest --config jest.android.json",
+    "test": "cross-env NODE_ENV=test node node_modules/jest/bin/jest.js --config jest.config.js",
     "flow": "flow",
     "prettier": "prettier --write *.js *block-management/*.js",
     "prettier-check": "prettier -l *.js *block-management/*.js"
