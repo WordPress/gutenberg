@@ -16,7 +16,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import './style.scss';
 
-export function ColorPalette( { colors, disableCustomColors = false, value, onChange, disableAlpha = true } ) {
+export function ColorPalette( { colors, disableCustomColors = false, value, onChange, colorMode = 'hex', disableAlpha = true } ) {
 	function applyOrUnset( color ) {
 		return () => onChange( value === color ? undefined : color );
 	}
@@ -59,7 +59,26 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 					renderContent={ () => (
 						<ChromePicker
 							color={ value }
-							onChangeComplete={ ( color ) => onChange( color.hex ) }
+							// onChangeComplete={ ( color ) => onChange( color.rgb ) }
+							onChangeComplete={ ( color ) => {
+								if ( typeof color[ colorMode ] !== 'undefined' ) {
+									let colorString;
+									switch ( colorMode ) {
+										case 'rgb':
+											colorString = sprintf( __( 'rgba(%s,%s,%s,%s)' ), color.rgb.r, color.rgb.g, color.rgb.b, color.rgb.a );
+											break;
+										case 'hsl':
+											colorString = sprintf( __( 'hsla(%s,%s,%s,%s)' ), color.rgb.h, color.rgb.s, color.rgb.l, color.rgb.a );
+											break;
+										default:
+											colorString = color.hex;
+											break;
+									}
+									onChange( colorString );
+								} else {
+									onChange( color.hex );
+								}
+							} }
 							style={ { width: '100%' } }
 							disableAlpha={ disableAlpha }
 						/>
