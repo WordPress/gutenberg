@@ -12,7 +12,7 @@ import { PanelBody, TextControl, SelectControl } from '@wordpress/components';
 /**
  * Internal Dependencies
  */
-import { isEditorSidebarPanelOpened, getArtciles } from '../../../store/selectors';
+import { isEditorSidebarPanelOpened, getArticles } from '../../../store/selectors';
 import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
 
 /**
@@ -56,7 +56,7 @@ function ArticlesList( { isOpened, onTogglePanel, articles } ) {
 export default connect(
 	( state ) => ( {
 		isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
-		articles: getArtciles( state ),
+		articles: getArticles( state ),
 	} ),
 	{
 		onTogglePanel() {

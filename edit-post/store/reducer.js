@@ -162,7 +162,7 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
  *
  * @return {string} Updated state.
  */
-export function articles( state, action ) {
+export function articles( state = [], action ) {
 	switch ( action.type ) {
 		case 'GET_LAST_ARTICLES':
 			console.log( 'state', state );
