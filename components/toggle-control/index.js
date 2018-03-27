@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -25,18 +30,13 @@ class ToggleControl extends Component {
 	}
 
 	render() {
-		const { label, checked, help, checkedHelp, instanceId } = this.props;
+		const { label, checked, help, instanceId } = this.props;
 		const id = `inspector-toggle-control-${ instanceId }`;
 
-		// allow customizing the help text based on checked state
-		let helpLabel = help;
-		if ( checkedHelp ) {
-			helpLabel = checked ? checkedHelp : help;
-		}
-
-		let describedBy;
+		let describedBy, helpLabel;
 		if ( help ) {
 			describedBy = id + '__help';
+			helpLabel = isFunction( help ) ? help( checked ) : help;
 		}
 
 		return (
