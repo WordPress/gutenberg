@@ -1,12 +1,14 @@
 /** @format */
 
-// @flow
-
 import React from 'react';
-import BlockManager from './block-management/block-manager';
+import { Provider } from 'react-redux';
+import { setupStore } from './store';
+import AppContainer from './AppContainer';
 
-export default class App extends React.Component<{}> {
-	render() {
-		return <BlockManager />;
-	}
-}
+const store = setupStore();
+
+export default () => (
+	<Provider store={ store }>
+		<AppContainer />
+	</Provider>
+);

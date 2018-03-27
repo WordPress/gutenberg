@@ -17,7 +17,7 @@
     "eject": "react-native-scripts eject",
     "android": "react-native-scripts android",
     "ios": "react-native-scripts ios",
-    "test": "cross-env NODE_ENV=test node node_modules/jest/bin/jest.js --config jest.config.js",
+    "test": "cross-env NODE_ENV=test node node_modules/jest/bin/jest.js --verbose --config jest.config.js",
     "flow": "flow",
     "prettier": "prettier --write *.js *block-management/*.js",
     "prettier-check": "prettier -l *.js *block-management/*.js"
@@ -36,6 +36,8 @@
     "expo": "^25.0.0",
     "jed": "^1.1.1",
     "react": "16.2.0",
-    "react-native": "0.52.0"
+    "react-native": "0.52.0",
+    "react-redux": "^5.0.7",
+    "redux": "^3.7.2"
   }
 }
