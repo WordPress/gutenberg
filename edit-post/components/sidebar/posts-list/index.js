@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, SelectControl } from '@wordpress/components';
+import { PanelBody, TextControl, SelectControl } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -22,11 +22,8 @@ const PANEL_NAME = 'posts-list';
 
 // TODO: - make panel title customizable
 // 		 - list of categories
-
-const postCategories = 
-
 function PostsList( { isOpened, onTogglePanel } ) {
-	let options = [ { value: 0, label: __( 'Uncategorized' ) } ];
+	const options = [ { value: 0, label: __( 'Uncategorized' ) } ];
 
 	return (
 		<PanelBody
@@ -35,13 +32,16 @@ function PostsList( { isOpened, onTogglePanel } ) {
 			onToggle={ onTogglePanel }
 		>
 			<TextControl
-				placeholder={ __( 'Search articles' )  }
+				placeholder={ __( 'Search articles' ) }
+				onChange={ event => console.log(event) }
 			/>
-			<SelectControl 
-		        // Selected value.
-		        value={  } 
-		        label={ __( 'Category' ) } 
-		        options={ options } />
+			<SelectControl
+				// Selected value.
+				value=""
+				label={ __( 'Category' ) }
+				options={ options } 
+				onChange={ event => console.log(event) }
+			/>
 			<div>
 				<ul>
 					<li>Post 1</li>
