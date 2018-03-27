@@ -19,10 +19,11 @@ function FeatureToggle( { onToggle, isActive } ) {
 		>
 			<MenuItem
 				icon={ isActive && 'yes' }
-				label={ __( 'Fix Toolbar to Top' ) }
 				isSelected={ isActive }
 				onClick={ onToggle }
-			/>
+			>
+				{ __( 'Fix Toolbar to Top' ) }
+			</MenuItem>
 		</MenuGroup>
 	);
 }

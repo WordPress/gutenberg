@@ -22,7 +22,7 @@ import IconButton from '../icon-button';
  *
  * @return {WPElement} More menu item.
  */
-function MenuItem( { className, icon, label, onClick, shortcut, isSelected = false } ) {
+function MenuItem( { children, className, icon, onClick, shortcut, isSelected = false } ) {
 	className = classnames( 'components-menu-item__button', className, {
 		'has-icon': icon,
 	} );
@@ -43,7 +43,7 @@ function MenuItem( { className, icon, label, onClick, shortcut, isSelected = fal
 				onClick={ onClick }
 				aria-pressed={ isSelected }
 			>
-				{ label }
+				{ children }
 				<Shortcut shortcut={ shortcut } />
 			</IconButton>
 		);
@@ -55,7 +55,7 @@ function MenuItem( { className, icon, label, onClick, shortcut, isSelected = fal
 			onClick={ onClick }
 			aria-pressed={ isSelected }
 		>
-			{ label }
+			{ children }
 			<Shortcut shortcut={ shortcut } />
 		</Button>
 	);

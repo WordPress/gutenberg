@@ -14,7 +14,6 @@ export default function MenuItemsChoice( {
 			<MenuItem
 				key={ item.value }
 				icon={ isSelected && 'yes' }
-				label={ item.label }
 				isSelected={ isSelected }
 				shortcut={ item.shortcut }
 				onClick={ () => {
@@ -22,7 +21,9 @@ export default function MenuItemsChoice( {
 						onSelect( item.value );
 					}
 				} }
-			/>
+			>
+				{ item.label }
+			</MenuItem>
 		);
 	} );
 }

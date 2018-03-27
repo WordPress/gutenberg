@@ -5,13 +5,14 @@ import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { MenuItem } from '@wordpress/components';
 
-const PluginSidebarMoreMenuItem = ( { isSelected, icon, label, onClick } ) => (
+const PluginSidebarMoreMenuItem = ( { children, isSelected, icon, onClick } ) => (
 	<MenuItem
 		icon={ isSelected ? 'yes' : icon }
 		isSelected={ isSelected }
-		label={ label }
 		onClick={ onClick }
-	/>
+	>
+		{ children }
+	</MenuItem>
 );
 
 export default compose( [
