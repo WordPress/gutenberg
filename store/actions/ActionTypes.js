@@ -1,4 +1,7 @@
-/** @format */
+/**
+ * @format
+ * @flow
+ */
 
 export default {
 	BLOCK: {
