@@ -75,6 +75,9 @@
 
 	// Pad the scroll box so content on the bottom can be scrolled up.
 	padding-bottom: 50vh;
+	@include break-small {
+		padding-bottom: 0;
+	}
 
 	// On mobile the main content area has to scroll otherwise you can invoke
 	// the overscroll bounce on the non-scrolling container, causing
