@@ -92,3 +92,23 @@
 		margin-right: auto;
 	}
 }
+
+.blocks-image-dimensions {
+	.blocks-image-dimensions__row {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.blocks-image-dimensions__width,
+	.blocks-image-dimensions__height {
+		margin-bottom: 0.5em;
+	}
+
+	.blocks-image-dimensions__width {
+		margin-right: 5px;
+	}
+
+	.blocks-image-dimensions__height {
+		margin-left: 5px;
+	}
+}
