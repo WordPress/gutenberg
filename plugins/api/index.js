@@ -8,14 +8,15 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * External dependencies
  */
-import { isFunction } from 'lodash';
+import { isFunction, forEach, without, omit } from 'lodash';
 
 /**
  * Plugin definitions keyed by plugin name.
  *
  * @type {Object.<string,WPPlugin>}
  */
-const plugins = {};
+let plugins = {};
+let observers = [];
 
 /**
  * Registers a plugin to the editor.
@@ -61,7 +62,37 @@ export function registerPlugin( name, settings ) {
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
 
-	return plugins[ settings.name ] = settings;
+	plugins = {
+		...plugins,
+		[ settings.name ]: settings,
+	};
+
+	notifyObservers();
+
+	return settings;
+}
+
+/**
+ * Subscribe to changes to registered plugins.
+ *
+ * @param {function} callback Function to be called when a change occurs.
+ *
+ * @return {function} Unsubscribe function.
+ */
+export function subscribe( callback ) {
+	observers.push( callback );
+	return () => {
+		observers = without( observers, callback );
+	};
+}
+
+/**
+ * Notify all observers.
+ */
+function notifyObservers() {
+	forEach( observers, callback => {
+		callback( plugins );
+	} );
 }
 
 /**
@@ -80,7 +111,8 @@ export function unregisterPlugin( name ) {
 		return;
 	}
 	const oldPlugin = plugins[ name ];
-	delete plugins[ name ];
+	plugins = omit( plugins, name );
+	notifyObservers();
 	return oldPlugin;
 }
 
