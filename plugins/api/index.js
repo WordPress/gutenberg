@@ -4,18 +4,12 @@
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
+import { select, dispatch } from '@wordpress/data';
 
 /**
  * External dependencies
  */
 import { isFunction } from 'lodash';
-
-/**
- * Plugin definitions keyed by plugin name.
- *
- * @type {Object.<string,WPPlugin>}
- */
-const plugins = {};
 
 /**
  * Registers a plugin to the editor.
@@ -45,10 +39,11 @@ export function registerPlugin( name, settings ) {
 		);
 		return null;
 	}
-	if ( plugins[ name ] ) {
+	if ( getPlugin( name ) ) {
 		console.error(
 			`Plugin "${ name }" is already registered.`
 		);
+		return null;
 	}
 	if ( ! isFunction( settings.render ) ) {
 		console.error(
@@ -61,7 +56,9 @@ export function registerPlugin( name, settings ) {
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
 
-	return plugins[ settings.name ] = settings;
+	dispatch( 'core/plugins' ).registerPlugin( name, settings );
+
+	return settings;
 }
 
 /**
@@ -73,14 +70,14 @@ export function registerPlugin( name, settings ) {
  *                     successfully unregistered; otherwise `undefined`.
  */
 export function unregisterPlugin( name ) {
-	if ( ! plugins[ name ] ) {
+	if ( ! getPlugin( name ) ) {
 		console.error(
 			'Plugin "' + name + '" is not registered.'
 		);
 		return;
 	}
-	const oldPlugin = plugins[ name ];
-	delete plugins[ name ];
+	const oldPlugin = getPlugin( name );
+	dispatch( 'core/plugins' ).unregisterPlugin( name );
 	return oldPlugin;
 }
 
@@ -92,7 +89,7 @@ export function unregisterPlugin( name ) {
  * @return {?Object} Plugin setting.
  */
 export function getPlugin( name ) {
-	return plugins[ name ];
+	return select( 'core/plugins' ).getPlugin( name );
 }
 
 /**
@@ -101,5 +98,5 @@ export function getPlugin( name ) {
  * @return {Array} Plugin settings.
  */
 export function getPlugins() {
-	return Object.values( plugins );
+	return select( 'core/plugins' ).getPlugins();
 }
