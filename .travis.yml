@@ -4,11 +4,6 @@ dist: trusty
 
 language: php
 
-env:
-  global:
-    - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-    - E2E_EXECUTABLE_PATH=google-chrome-stable
-
 services:
   - docker
 
@@ -66,6 +61,7 @@ jobs:
         - ./bin/run-wp-unit-tests.sh
 
     - stage: test
+      env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true E2E_EXECUTABLE_PATH=google-chrome-stable
       script:
         - npm install || exit 1
         - npm run build || exit 1
