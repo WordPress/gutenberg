@@ -6,6 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock, BlockEdit } from '@wordpress/blocks';
 
@@ -41,7 +42,7 @@ class BlockPreview extends Component {
 
 		return (
 			<div className="editor-block-preview">
-				<div className="editor-block-preview__title">Preview</div>
+				<div className="editor-block-preview__title">{ __( 'Preview' ) }</div>
 				<div className="editor-block-preview__content">
 					<BlockEdit
 						name={ name }
