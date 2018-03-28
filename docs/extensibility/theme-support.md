@@ -1,4 +1,4 @@
-# Blocks support by themes
+# Theme Support
 
 By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the theme provides.
 

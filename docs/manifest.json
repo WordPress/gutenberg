@@ -54,15 +54,27 @@
 		"parent": null
 	},
 	{
+		"title": "Extending Blocks",
+		"slug": "extending-blocks",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/extending-blocks.md",
+		"parent": "extensibility"
+	},
+	{
+		"title": "Plugins API",
+		"slug": "plugins-api",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/plugins\/README.md",
+		"parent": "extensibility"
+	},
+	{
 		"title": "Meta Boxes",
 		"slug": "meta-box",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/meta-box.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/meta-box.md",
 		"parent": "extensibility"
 	},
 	{
 		"title": "Theme Support",
 		"slug": "theme-support",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/themes.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/theme-support.md",
 		"parent": "extensibility"
 	},
 	{
