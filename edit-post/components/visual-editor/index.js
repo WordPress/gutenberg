@@ -27,8 +27,8 @@ function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
 			<EditorGlobalKeyboardShortcuts />
 			<CopyHandler />
 			<MultiSelectScrollIntoView />
-			<ObserveTyping>
-				<WritingFlow>
+			<WritingFlow>
+				<ObserveTyping>
 					<PostTitle />
 					<BlockList
 						showContextualToolbar={ ! isLargeViewport || ! hasFixedToolbar }
@@ -39,8 +39,8 @@ function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
 							</Fragment>
 						) }
 					/>
-				</WritingFlow>
-			</ObserveTyping>
+				</ObserveTyping>
+			</WritingFlow>
 		</BlockSelectionClearer>
 	);
 }

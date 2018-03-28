@@ -42,6 +42,7 @@ class Inserter extends Component {
 	render() {
 		const {
 			position,
+			title,
 			children,
 			onInsertBlock,
 			hasSupportedBlocks,
@@ -58,6 +59,7 @@ class Inserter extends Component {
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
+				headerTitle={ title }
 				renderToggle={ ( { onToggle, isOpen } ) => (
 					<IconButton
 						icon="insert"
@@ -86,6 +88,7 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select ) => ( {
+		title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
 		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint(),
 		selectedBlock: select( 'core/editor' ).getSelectedBlock(),
 	} ) ),

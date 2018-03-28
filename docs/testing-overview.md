@@ -4,9 +4,9 @@ Gutenberg contains both PHP and JavaScript code, and encourages testing and code
 
 ## Why test?
 
-Aside from the joy testing will bring to your life, tests are important not only because they help to ensure that our application behaves as it should, but also because they provide concise examples of how to use a piece of code. 
+Aside from the joy testing will bring to your life, tests are important not only because they help to ensure that our application behaves as it should, but also because they provide concise examples of how to use a piece of code.
 
-Tests are also part of our code base, which means we apply to them the same standards we apply to all our application code. 
+Tests are also part of our code base, which means we apply to them the same standards we apply to all our application code.
 
 As with all code, tests have to be maintained. Writing tests for the sake of having a test isn't the goal – rather we should try to strike the right balance between covering expected and unexpected behaviours, speedy execution and code maintenance.
 
@@ -44,7 +44,7 @@ Keep your tests in a `test` folder in your working directory. The test file shou
 Only test files (with at least one test case) should live directly under `/test`. If you need to add external mocks or fixtures, place them in a sub folder, for example:
 
 * `test/mocks/[file-name.js`
-* `test/fixtures/[file-name].js` 
+* `test/fixtures/[file-name].js`
 
 ### Importing tests
 
@@ -90,7 +90,7 @@ describe( 'CheckboxWithLabel', () => {
 
 The Jest API includes some nifty [setup and teardown methods](https://facebook.github.io/jest/docs/en/setup-teardown.html) that allow you to perform tasks *before* and *after* each or all of your tests, or tests within a specific `describe` block.
 
-These methods can handle asynchronous code to allow setup that you normally cannot do inline. As with [individual test cases](https://facebook.github.io/jest/docs/en/asynchronous.html#promises), you can return a Promise and Jest will wait for it to resolve: 
+These methods can handle asynchronous code to allow setup that you normally cannot do inline. As with [individual test cases](https://facebook.github.io/jest/docs/en/asynchronous.html#promises), you can return a Promise and Jest will wait for it to resolve:
 
 ```javascript
 // one-time setup for *all* tests
@@ -105,7 +105,7 @@ afterAll( () => {
 ```
 
 `afterEach` and `afterAll` provide a perfect (and preferred) way to 'clean up' after our tests, for example, by resetting state data.
- 
+
 Avoid placing clean up code after assertions since, if any of those tests fail, the clean up won't take place and may cause failures in unrelated tests.
 
 ### Mocking dependencies
@@ -152,9 +152,9 @@ Because we're passing the list as an argument, we can pass mock  `validValuesLis
 
 #### Imported dependencies
 
-Often our code will use methods and properties from imported external and internal libraries in multiple places, which makes passing around arguments messy and impracticable. For these cases `jest.mock` offers a neat way to stub these dependencies. 
+Often our code will use methods and properties from imported external and internal libraries in multiple places, which makes passing around arguments messy and impracticable. For these cases `jest.mock` offers a neat way to stub these dependencies.
 
-For instance, lets assume we have `config` module to control a great deal of functionality via feature flags. 
+For instance, lets assume we have `config` module to control a great deal of functionality via feature flags.
 
 ```javascript
 // bilbo.js
@@ -359,12 +359,6 @@ or interactively
 
 ```bash
 npm run test-e2e:watch
-```
-
-If you're using another local environment setup, you can still run the e2e tests by overriding the base URL and the default WP username/password used in the tests like so:
-
-```bash
-cypress_base_url=http://my-custom-basee-url cypress_username=myusername cypress_password=mypassword npm run test-e2e
 ```
 
 ## PHP Testing

@@ -3,13 +3,13 @@
  */
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { get, reduce, size, castArray, noop, first, last } from 'lodash';
+import { get, reduce, size, castArray, first, last, noop } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode, compose } from '@wordpress/element';
+import { Component, findDOMNode, Fragment, compose } from '@wordpress/element';
 import {
 	keycodes,
 	focus,
@@ -26,7 +26,7 @@ import {
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { withFilters, withContext, withAPIData } from '@wordpress/components';
+import { withFilters, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -45,7 +45,8 @@ import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
-import { createInnerBlockList } from './utils';
+import Inserter from '../inserter';
+import { createInnerBlockList } from '../../utils/block-list';
 import {
 	editPost,
 	insertBlocks,
@@ -69,7 +70,6 @@ import {
 	isSelectionEnabled,
 	isTyping,
 	getBlockMode,
-	getCurrentPostType,
 	getSelectedBlocksInitialCaretPosition,
 } from '../../store/selectors';
 
@@ -102,20 +102,21 @@ export class BlockListBlock extends Component {
 		};
 	}
 
+	/**
+	 * Provides context for descendent components for use in block rendering.
+	 *
+	 * @return {Object} Child context.
+	 */
 	getChildContext() {
-		const {
-			uid,
-			renderBlockMenu,
-			showContextualToolbar,
-		} = this.props;
-
+		// Blocks may render their own BlockEdit, in which case we must provide
+		// a mechanism for them to create their own InnerBlockList. BlockEdit
+		// is defined in `@wordpress/blocks`, so to avoid a circular dependency
+		// we inject this function via context.
 		return {
-			BlockList: createInnerBlockList(
-				uid,
-				renderBlockMenu,
-				showContextualToolbar
-			),
-			canUserUseUnfilteredHTML: get( this.props.user, [ 'data', 'capabilities', 'unfiltered_html' ], false ),
+			createInnerBlockList: ( uid ) => {
+				const { renderBlockMenu, showContextualToolbar } = this.props;
+				return createInnerBlockList( uid, renderBlockMenu, showContextualToolbar );
+			},
 		};
 	}
 
@@ -429,7 +430,7 @@ export class BlockListBlock extends Component {
 		const isSelectedNotTyping = isSelected && ! isTypingWithinBlock;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! showSideInserter && isSelectedNotTyping;
-		const shouldShowMovers = shouldAppearSelected || isHovered || ( isEmptyDefaultBlock && isSelectedNotTyping );
+		const shouldShowMovers = ( shouldAppearSelected || isHovered || ( isEmptyDefaultBlock && isSelectedNotTyping ) ) && ! showSideInserter;
 		const shouldShowSettingsMenu = shouldShowMovers;
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
 		const shouldShowMobileToolbar = shouldAppearSelected;
@@ -451,6 +452,7 @@ export class BlockListBlock extends Component {
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
 			'is-reusable': isReusableBlock( blockType ),
+			'is-typing': isTypingWithinBlock,
 		} );
 
 		const { onReplace } = this.props;
@@ -505,7 +507,7 @@ export class BlockListBlock extends Component {
 						isLast={ isLast }
 					/>
 				) }
-				{ shouldShowSettingsMenu && (
+				{ shouldShowSettingsMenu && ! showSideInserter && (
 					<BlockSettingsMenu
 						uids={ [ block.uid ] }
 						rootUID={ rootUID }
@@ -567,9 +569,17 @@ export class BlockListBlock extends Component {
 					/>
 				) }
 				{ showSideInserter && (
-					<div className="editor-block-list__side-inserter">
-						<InserterWithShortcuts uid={ block.uid } layout={ layout } onToggle={ this.selectOnOpen } />
-					</div>
+					<Fragment>
+						<div className="editor-block-list__side-inserter">
+							<InserterWithShortcuts uid={ block.uid } layout={ layout } onToggle={ this.selectOnOpen } />
+						</div>
+						<div className="editor-block-list__empty-block-inserter">
+							<Inserter
+								position="top right"
+								onToggle={ this.selectOnOpen }
+							/>
+						</div>
+					</Fragment>
 				) }
 			</IgnoreNestedEvents>
 		);
@@ -594,7 +604,6 @@ const mapStateToProps = ( state, { uid, rootUID } ) => {
 		meta: getEditedPostAttribute( state, 'meta' ),
 		mode: getBlockMode( state, uid ),
 		isSelectionEnabled: isSelectionEnabled( state ),
-		postType: getCurrentPostType( state ),
 		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
 		isSelected,
 	};
@@ -645,8 +654,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 } );
 
 BlockListBlock.childContextTypes = {
-	BlockList: noop,
-	canUserUseUnfilteredHTML: noop,
+	createInnerBlockList: noop,
 };
 
 export default compose(
@@ -659,7 +667,4 @@ export default compose(
 		};
 	} ),
 	withFilters( 'editor.BlockListBlock' ),
-	withAPIData( ( { postType } ) => ( {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	} ) ),
 )( BlockListBlock );

@@ -32,8 +32,7 @@ add_action(
 /**
  * Collect information about meta_boxes registered for the current post.
  *
- * This is used to tell React and Redux whether the meta box location has
- * meta boxes.
+ * Redirects to classic editor if a meta box is incompatible.
  *
  * @since 1.5.0
  */
@@ -46,11 +45,19 @@ function gutenberg_collect_meta_box_data() {
 	if ( isset( $_REQUEST['post'] ) ) {
 		$post    = get_post( absint( $_REQUEST['post'] ) );
 		$typenow = $post->post_type;
+
+		if ( ! gutenberg_can_edit_post( $post->ID ) ) {
+			return;
+		}
 	} else {
 		// Eventually add handling for creating new posts of different types in Gutenberg.
 	}
 	$post_type        = $post->post_type;
 	$post_type_object = get_post_type_object( $post_type );
+
+	if ( ! gutenberg_can_edit_post_type( $post_type ) ) {
+		return;
+	}
 
 	$thumbnail_support = current_theme_supports( 'post-thumbnails', $post_type ) && post_type_supports( $post_type, 'thumbnail' );
 	if ( ! $thumbnail_support && 'attachment' === $post_type && $post->post_mime_type ) {
@@ -210,57 +217,36 @@ function gutenberg_collect_meta_box_data() {
 
 	$meta_box_data = array();
 
-	// If the meta box should be empty set to false.
+	// Redirect to classic editor if a meta box is incompatible.
 	foreach ( $locations as $location ) {
-		if ( gutenberg_is_meta_box_empty( $_meta_boxes_copy, $location, $post->post_type ) ) {
-			$meta_box_data[ $location ] = false;
-		} else {
-			$meta_box_data[ $location ] = true;
-			$incompatible_meta_box      = false;
-			// Check if we have a meta box that has declared itself incompatible with the block editor.
-			foreach ( $_meta_boxes_copy[ $post->post_type ][ $location ] as $boxes ) {
-				foreach ( $boxes as $box ) {
-					/*
-					 * If __block_editor_compatible_meta_box is declared as a false-y value,
-					 * the meta box is not compatible with the block editor.
-					 */
-					if ( is_array( $box['args'] )
-						&& isset( $box['args']['__block_editor_compatible_meta_box'] )
-						&& ! $box['args']['__block_editor_compatible_meta_box'] ) {
-							$incompatible_meta_box = true;
-							break 2;
-					}
+		if ( ! isset( $_meta_boxes_copy[ $post->post_type ][ $location ] ) ) {
+			continue;
+		}
+		// Check if we have a meta box that has declared itself incompatible with the block editor.
+		foreach ( $_meta_boxes_copy[ $post->post_type ][ $location ] as $boxes ) {
+			foreach ( $boxes as $box ) {
+				/*
+				 * If __block_editor_compatible_meta_box is declared as a false-y value,
+				 * the meta box is not compatible with the block editor.
+				 */
+				if ( is_array( $box['args'] )
+					&& isset( $box['args']['__block_editor_compatible_meta_box'] )
+					&& ! $box['args']['__block_editor_compatible_meta_box'] ) {
+						$incompatible_meta_box = true;
+						?>
+						<script type="text/javascript">
+							var joiner = '?';
+							if ( window.location.search ) {
+								joiner = '&';
+							}
+							window.location.href += joiner + 'classic-editor';
+						</script>
+						<?php
+						exit;
 				}
-			}
-
-			// Incompatible meta boxes require an immediate redirect to the classic editor.
-			if ( $incompatible_meta_box ) {
-				?>
-				<script type="text/javascript">
-					var joiner = '?';
-					if ( window.location.search ) {
-						joiner = '&';
-					}
-					window.location.href += joiner + 'classic-editor';
-				</script>
-				<?php
-				exit;
 			}
 		}
 	}
-
-	/**
-	 * Sadly we probably can not add this data directly into editor settings.
-	 *
-	 * ACF and other meta boxes need admin_head to fire for meta box registry.
-	 * admin_head fires after admin_enqueue_scripts which is where we create our
-	 * editor instance. If a cleaner solution can be imagined, please change
-	 * this, and try to get this data to load directly into the editor settings.
-	 */
-	wp_add_inline_script(
-		'wp-edit-post',
-		'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
-	);
 }
 
 /**
@@ -432,6 +418,11 @@ function gutenberg_register_post_types() {
 
 	foreach ( $caps_map as $role_name => $caps ) {
 		$role = get_role( $role_name );
+
+		if ( empty( $role ) ) {
+			continue;
+		}
+
 		foreach ( $caps as $cap ) {
 			if ( ! $role->has_cap( $cap ) ) {
 				$role->add_cap( $cap );

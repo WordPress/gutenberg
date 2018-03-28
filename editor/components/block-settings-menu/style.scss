@@ -34,6 +34,12 @@
 	border-top: 1px solid $light-gray-500;
 }
 
+.editor-block-settings-menu__title {
+	display: block;
+	padding: 6px;
+	color: $dark-gray-300;
+}
+
 // Popout menu
 .editor-block-settings-menu__control {
 	width: 100%;

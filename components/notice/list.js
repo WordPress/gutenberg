@@ -1,20 +1,23 @@
 /**
  * External depednencies
  */
-import { noop } from 'lodash';
+import { noop, omit } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import Notice from './';
 
-function NoticeList( { notices, onRemove = noop } ) {
+function NoticeList( { notices, onRemove = noop, children } ) {
 	const removeNotice = ( id ) => () => onRemove( id );
 
 	return (
 		<div className="components-notice-list">
+			{ children }
 			{ [ ...notices ].reverse().map( ( notice ) => (
-				<Notice { ...notice } key={ notice.id } onRemove={ removeNotice( notice.id ) } />
+				<Notice { ...omit( notice, 'content' ) } key={ notice.id } onRemove={ removeNotice( notice.id ) }>
+					{ notice.content }
+				</Notice>
 			) ) }
 		</div>
 	);
