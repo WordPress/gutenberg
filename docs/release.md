@@ -4,7 +4,7 @@ This document is a checklist for building and releasing a new version of Gutenbe
 
 ## Writing the Release Post and Changelog
 
-* Open the [recently updated PRs view](https://github.com/WordPress/gutenberg/pulls?page=2&q=is%3Apr+is%3Aclosed+sort%3Aupdated-desc), and find the PR where the last version bump occurred.
+* Open the [recently updated PRs view](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+is%3Aclosed+sort%3Aupdated-desc), and find the PR where the last version bump occurred.
 * Read through each PR since then, to determine if it needs to be included in the Release Post and/or changelog.
 * Choose a feature or two to highlight in the release post - record an animation of them in action.
 * Save the draft post on [make.wordpress.org/core](https://make.wordpress.org/core/), for publishing after the release.
