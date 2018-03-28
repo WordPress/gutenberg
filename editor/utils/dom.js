@@ -16,6 +16,10 @@ export function getBlockDOMNode( uid ) {
 	return document.querySelector( '[data-block="' + uid + '"]' );
 }
 
+export function getBlockWrapperDOMNode( uid ) {
+	return getBlockDOMNode( uid ).closest( '.editor-block-list__block' );
+}
+
 /**
  * Returns true if the given HTMLElement is a block focus stop. Blocks without
  * their own text fields rely on the focus stop to be keyboard navigable.
