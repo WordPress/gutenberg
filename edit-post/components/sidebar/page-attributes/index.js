@@ -11,12 +11,12 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow, withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { PageAttributesCheck, PageAttributesOrder, PageAttributesParent, PageTemplate } from '@wordpress/editor';
-import { query } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { toggleSidebarPanel } from '../../../store/actions';
+import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
 import { isEditorSidebarPanelOpened } from '../../../store/selectors';
 
 /**
@@ -45,7 +45,7 @@ export function PageAttributes( { isOpened, onTogglePanel, postType } ) {
 	);
 }
 
-const applyQuery = query( ( select ) => ( {
+const applyWithSelect = withSelect( ( select ) => ( {
 	postTypeSlug: select( 'core/editor' ).getEditedPostAttribute( 'type' ),
 } ) );
 
@@ -57,7 +57,7 @@ const applyConnect = connect(
 	},
 	{
 		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
+			return toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
 	},
 	undefined,
@@ -72,7 +72,7 @@ const applyWithAPIData = withAPIData( ( props ) => {
 } );
 
 export default compose(
-	applyQuery,
+	applyWithSelect,
 	applyConnect,
 	applyWithAPIData,
 )( PageAttributes );

@@ -8,7 +8,7 @@ import { countBy } from 'lodash';
  */
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { query } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,7 +21,12 @@ function TableOfContentsPanel( { blocks } ) {
 
 	return (
 		<Fragment>
-			<div className="table-of-contents__counts">
+			<div
+				className="table-of-contents__counts"
+				role="note"
+				aria-label={ __( 'Document Statistics' ) }
+				tabIndex="0"
+			>
 				<div className="table-of-contents__count">
 					{ __( 'Words' ) }
 					<WordCount />
@@ -58,7 +63,7 @@ function TableOfContentsPanel( { blocks } ) {
 	);
 }
 
-export default query( ( select ) => {
+export default withSelect( ( select ) => {
 	return {
 		blocks: select( 'core/editor' ).getBlocks(),
 	};

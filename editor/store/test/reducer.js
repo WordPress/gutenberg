@@ -18,6 +18,10 @@ import {
  * Internal dependencies
  */
 import {
+	hasSameKeys,
+	isUpdatingSameBlockAttribute,
+	isUpdatingSamePostProperty,
+	shouldOverwriteState,
 	getPostRawValue,
 	editor,
 	currentPost,
@@ -26,20 +30,224 @@ import {
 	preferences,
 	saving,
 	notices,
+	provisionalBlockUID,
 	blocksMode,
 	isInsertionPointVisible,
-	isSavingMetaBoxes,
-	metaBoxes,
 	reusableBlocks,
+	template,
 } from '../reducer';
 
-jest.mock( '../../utils/meta-boxes', () => {
-	return {
-		getMetaBoxContainer: () => ( { innerHTML: 'meta boxes content' } ),
-	};
-} );
-
 describe( 'state', () => {
+	describe( 'hasSameKeys()', () => {
+		it( 'returns false if two objects do not have the same keys', () => {
+			const a = { foo: 10 };
+			const b = { bar: 10 };
+
+			expect( hasSameKeys( a, b ) ).toBe( false );
+		} );
+
+		it( 'returns false if two objects have the same keys', () => {
+			const a = { foo: 10 };
+			const b = { foo: 20 };
+
+			expect( hasSameKeys( a, b ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isUpdatingSameBlockAttribute()', () => {
+		it( 'should return false if not updating block attributes', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not updating the same block', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not updating the same block attributes', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					bar: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating the same block attributes', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isUpdatingSamePostProperty()', () => {
+		it( 'should return false if not editing post', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 10,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not editing the same post properties', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					bar: 20,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating the same post properties', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'shouldOverwriteState()', () => {
+		it( 'should return false if no previous action', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = undefined;
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if the action types are different', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_DIFFERENT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating same block attribute', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
+		} );
+
+		it( 'should return true if updating same post property', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'getPostRawValue', () => {
 		it( 'returns original value for non-rendered content', () => {
 			const value = getPostRawValue( '' );
@@ -189,6 +397,70 @@ describe( 'state', () => {
 				[ wrapperBlock.uid ]: [ replacementBlock.uid ],
 				[ replacementBlock.uid ]: [],
 			} );
+		} );
+
+		it( 'should replace the block even if the new block uid is the same', () => {
+			const originalState = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [],
+				} ],
+			} );
+			const replacedState = editor( originalState, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'chicken' ],
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/freeform',
+					innerBlocks: [],
+				} ],
+			} );
+
+			expect( Object.keys( replacedState.present.blocksByUid ) ).toHaveLength( 1 );
+			expect( values( originalState.present.blocksByUid )[ 0 ].name ).toBe( 'core/test-block' );
+			expect( values( replacedState.present.blocksByUid )[ 0 ].name ).toBe( 'core/freeform' );
+			expect( values( replacedState.present.blocksByUid )[ 0 ].uid ).toBe( 'chicken' );
+			expect( replacedState.present.blockOrder ).toEqual( {
+				'': [ 'chicken' ],
+				chicken: [],
+			} );
+
+			const nestedBlock = {
+				uid: 'chicken',
+				name: 'core/test-block',
+				attributes: {},
+				innerBlocks: [],
+			};
+			const wrapperBlock = createBlock( 'core/test-block', {}, [ nestedBlock ] );
+			const replacementNestedBlock = {
+				uid: 'chicken',
+				name: 'core/freeform',
+				attributes: {},
+				innerBlocks: [],
+			};
+
+			const originalNestedState = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ wrapperBlock ],
+			} );
+
+			const replacedNestedState = editor( originalNestedState, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ nestedBlock.uid ],
+				blocks: [ replacementNestedBlock ],
+			} );
+
+			expect( replacedNestedState.present.blockOrder ).toEqual( {
+				'': [ wrapperBlock.uid ],
+				[ wrapperBlock.uid ]: [ replacementNestedBlock.uid ],
+				[ replacementNestedBlock.uid ]: [],
+			} );
+
+			expect( originalNestedState.present.blocksByUid.chicken.name ).toBe( 'core/test-block' );
+			expect( replacedNestedState.present.blocksByUid.chicken.name ).toBe( 'core/freeform' );
 		} );
 
 		it( 'should update the block', () => {
@@ -557,6 +829,29 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should cascade remove to include inner blocks', () => {
+			const block = createBlock( 'core/test-block', {}, [
+				createBlock( 'core/test-block', {}, [
+					createBlock( 'core/test-block' ),
+				] ),
+			] );
+
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ block ],
+			} );
+
+			const state = editor( original, {
+				type: 'REMOVE_BLOCKS',
+				uids: [ block.uid ],
+			} );
+
+			expect( state.present.blocksByUid ).toEqual( {} );
+			expect( state.present.blockOrder ).toEqual( {
+				'': [],
+			} );
+		} );
+
 		it( 'should insert at the specified index', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
@@ -585,37 +880,6 @@ describe( 'state', () => {
 
 			expect( Object.keys( state.present.blocksByUid ) ).toHaveLength( 3 );
 			expect( state.present.blockOrder[ '' ] ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
-		} );
-
-		it( 'should remove associated blocks when deleting a reusable block', () => {
-			const original = editor( undefined, {
-				type: 'RESET_BLOCKS',
-				blocks: [ {
-					uid: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					uid: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
-			} );
-			const state = editor( original, {
-				type: 'REMOVE_REUSABLE_BLOCK',
-				id: 123,
-				associatedBlockUids: [ 'chicken', 'veggies' ],
-			} );
-
-			expect( state.present.blockOrder[ '' ] ).toEqual( [ 'ribs' ] );
-			expect( state.present.blocksByUid ).toEqual( {
-				ribs: {
-					uid: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-				},
-			} );
 		} );
 
 		describe( 'edits()', () => {
@@ -854,7 +1118,7 @@ describe( 'state', () => {
 				expect( state.past ).toHaveLength( 2 );
 			} );
 
-			it( 'should not overwrite present history if updating same attributes', () => {
+			it( 'should not overwrite present history if updating different attributes', () => {
 				let state;
 
 				state = editor( state, {
@@ -1170,6 +1434,41 @@ describe( 'state', () => {
 
 			expect( state ).toBe( original );
 		} );
+
+		it( 'should remove the selection if we are removing the selected block', () => {
+			const original = deepFreeze( {
+				start: 'chicken',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+			const state = blockSelection( original, {
+				type: 'REMOVE_BLOCKS',
+				uids: [ 'chicken' ],
+			} );
+
+			expect( state ).toEqual( {
+				start: null,
+				end: null,
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+		} );
+
+		it( 'should keep the selection if we are not removing the selected block', () => {
+			const original = deepFreeze( {
+				start: 'chicken',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+			const state = blockSelection( original, {
+				type: 'REMOVE_BLOCKS',
+				uids: [ 'ribs' ],
+			} );
+
+			expect( state ).toBe( original );
+		} );
 	} );
 
 	describe( 'preferences()', () => {
@@ -1181,26 +1480,24 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				recentInserts: [],
 				insertUsage: {},
 			} );
 		} );
 
 		it( 'should record recently used blocks', () => {
-			const state = preferences( deepFreeze( { recentInserts: [], insertUsage: {} } ), {
+			const state = preferences( deepFreeze( { insertUsage: {} } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [ {
 					uid: 'bacon',
 					name: 'core-embed/twitter',
 				} ],
+				time: 123456,
 			} );
 
 			expect( state ).toEqual( {
-				recentInserts: [
-					{ name: 'core-embed/twitter' },
-				],
 				insertUsage: {
 					'core-embed/twitter': {
+						time: 123456,
 						count: 1,
 						insert: { name: 'core-embed/twitter' },
 					},
@@ -1208,9 +1505,9 @@ describe( 'state', () => {
 			} );
 
 			const twoRecentBlocks = preferences( deepFreeze( {
-				recentInserts: [],
 				insertUsage: {
 					'core-embed/twitter': {
+						time: 123456,
 						count: 1,
 						insert: { name: 'core-embed/twitter' },
 					},
@@ -1225,19 +1522,18 @@ describe( 'state', () => {
 					name: 'core/block',
 					attributes: { ref: 123 },
 				} ],
+				time: 123457,
 			} );
 
 			expect( twoRecentBlocks ).toEqual( {
-				recentInserts: [
-					{ name: 'core/block', ref: 123 },
-					{ name: 'core-embed/twitter' },
-				],
 				insertUsage: {
 					'core-embed/twitter': {
+						time: 123457,
 						count: 2,
 						insert: { name: 'core-embed/twitter' },
 					},
 					'core/block/123': {
+						time: 123457,
 						count: 1,
 						insert: { name: 'core/block', ref: 123 },
 					},
@@ -1247,13 +1543,9 @@ describe( 'state', () => {
 
 		it( 'should remove recorded reusable blocks that are deleted', () => {
 			const initialState = {
-				recentInserts: [
-					{ name: 'core-embed/twitter' },
-					{ name: 'core/block', ref: 123 },
-					{ name: 'core/block', ref: 456 },
-				],
 				insertUsage: {
 					'core/block/123': {
+						time: 1000,
 						count: 1,
 						insert: { name: 'core/block', ref: 123 },
 					},
@@ -1266,10 +1558,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				recentInserts: [
-					{ name: 'core-embed/twitter' },
-					{ name: 'core/block', ref: 456 },
-				],
 				insertUsage: {},
 			} );
 		} );
@@ -1402,6 +1690,100 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'provisionalBlockUID()', () => {
+		const PROVISIONAL_UPDATE_ACTION_TYPES = [
+			'UPDATE_BLOCK_ATTRIBUTES',
+			'UPDATE_BLOCK',
+			'CONVERT_BLOCK_TO_REUSABLE',
+		];
+
+		const PROVISIONAL_REPLACE_ACTION_TYPES = [
+			'REPLACE_BLOCKS',
+			'REMOVE_BLOCKS',
+		];
+
+		it( 'returns null by default', () => {
+			const state = provisionalBlockUID( undefined, {} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns the uid of the first inserted provisional block', () => {
+			const state = provisionalBlockUID( null, {
+				type: 'INSERT_BLOCKS',
+				isProvisional: true,
+				blocks: [
+					{ uid: 'chicken' },
+				],
+			} );
+
+			expect( state ).toBe( 'chicken' );
+		} );
+
+		it( 'does not return uid of block if not provisional', () => {
+			const state = provisionalBlockUID( null, {
+				type: 'INSERT_BLOCKS',
+				blocks: [
+					{ uid: 'chicken' },
+				],
+			} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns null on block reset', () => {
+			const state = provisionalBlockUID( 'chicken', {
+				type: 'RESET_BLOCKS',
+			} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns null on block update', () => {
+			PROVISIONAL_UPDATE_ACTION_TYPES.forEach( ( type ) => {
+				const state = provisionalBlockUID( 'chicken', {
+					type,
+					uid: 'chicken',
+				} );
+
+				expect( state ).toBe( null );
+			} );
+		} );
+
+		it( 'does not return null if update occurs to non-provisional block', () => {
+			PROVISIONAL_UPDATE_ACTION_TYPES.forEach( ( type ) => {
+				const state = provisionalBlockUID( 'chicken', {
+					type,
+					uid: 'ribs',
+				} );
+
+				expect( state ).toBe( 'chicken' );
+			} );
+		} );
+
+		it( 'returns null if replacement of provisional block', () => {
+			PROVISIONAL_REPLACE_ACTION_TYPES.forEach( ( type ) => {
+				const state = provisionalBlockUID( 'chicken', {
+					type,
+					uids: [ 'chicken' ],
+				} );
+
+				expect( state ).toBe( null );
+			} );
+		} );
+
+		it( 'does not return null if replacement of non-provisional block', () => {
+			PROVISIONAL_REPLACE_ACTION_TYPES.forEach( ( type ) => {
+				const state = provisionalBlockUID( 'chicken', {
+					type,
+					uids: [ 'ribs' ],
+				} );
+
+				expect( state ).toBe( 'chicken' );
+			} );
+		} );
+	} );
+
 	describe( 'blocksMode', () => {
 		it( 'should set mode to html if not set', () => {
 			const action = {
@@ -1424,94 +1806,6 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'isSavingMetaBoxes', () => {
-		it( 'should return default state', () => {
-			const actual = isSavingMetaBoxes( undefined, {} );
-			expect( actual ).toBe( false );
-		} );
-
-		it( 'should set saving flag to true', () => {
-			const action = {
-				type: 'REQUEST_META_BOX_UPDATES',
-			};
-			const actual = isSavingMetaBoxes( false, action );
-
-			expect( actual ).toBe( true );
-		} );
-
-		it( 'should set saving flag to false', () => {
-			const action = {
-				type: 'META_BOX_UPDATES_SUCCESS',
-			};
-			const actual = isSavingMetaBoxes( true, action );
-
-			expect( actual ).toBe( false );
-		} );
-	} );
-
-	describe( 'metaBoxes()', () => {
-		it( 'should return default state', () => {
-			const actual = metaBoxes( undefined, {} );
-			const expected = {
-				normal: {
-					isActive: false,
-				},
-				side: {
-					isActive: false,
-				},
-				advanced: {
-					isActive: false,
-				},
-			};
-
-			expect( actual ).toEqual( expected );
-		} );
-
-		it( 'should set the sidebar to active', () => {
-			const theMetaBoxes = {
-				normal: false,
-				advanced: false,
-				side: true,
-			};
-
-			const action = {
-				type: 'INITIALIZE_META_BOX_STATE',
-				metaBoxes: theMetaBoxes,
-			};
-
-			const actual = metaBoxes( undefined, action );
-			const expected = {
-				normal: {
-					isActive: false,
-				},
-				side: {
-					isActive: true,
-				},
-				advanced: {
-					isActive: false,
-				},
-			};
-
-			expect( actual ).toEqual( expected );
-		} );
-
-		it( 'should set the meta boxes saved data', () => {
-			const action = {
-				type: 'META_BOX_SET_SAVED_DATA',
-				dataPerLocation: {
-					side: 'a=b',
-				},
-			};
-
-			const theMetaBoxes = metaBoxes( { normal: { isActive: true }, side: { isActive: false } }, action );
-			expect( theMetaBoxes ).toEqual( {
-				advanced: { data: undefined },
-				normal: { isActive: true, data: undefined },
-				side: { isActive: false, data: 'a=b' },
-			} );
-		} );
-	} );
-
 	describe( 'reusableBlocks()', () => {
 		it( 'should start out empty', () => {
 			const state = reusableBlocks( undefined, {} );
@@ -1522,49 +1816,23 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should add fetched reusable blocks', () => {
-			const reusableBlock = {
-				id: 123,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-
+		it( 'should add received reusable blocks', () => {
 			const state = reusableBlocks( {}, {
-				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
-				reusableBlocks: [ reusableBlock ],
+				type: 'RECEIVE_REUSABLE_BLOCKS',
+				results: [ {
+					reusableBlock: {
+						id: 123,
+						title: 'My cool block',
+					},
+					parsedBlock: {
+						uid: 'foo',
+					},
+				} ],
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					[ reusableBlock.id ]: reusableBlock,
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should add a reusable block', () => {
-			const reusableBlock = {
-				id: 123,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-
-			const state = reusableBlocks( {}, {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id: reusableBlock.id,
-				reusableBlock,
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					[ reusableBlock.id ]: reusableBlock,
+					123: { uid: 'foo', title: 'My cool block' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -1572,45 +1840,23 @@ describe( 'state', () => {
 		} );
 
 		it( 'should update a reusable block', () => {
-			const id = 123;
 			const initialState = {
 				data: {
-					[ id ]: {
-						id,
-						name: 'My cool block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Hello!',
-							dropCap: true,
-						},
-					},
+					123: { uid: '', title: '' },
 				},
 				isFetching: {},
 				isSaving: {},
 			};
 
 			const state = reusableBlocks( initialState, {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id,
-				reusableBlock: {
-					name: 'My better block',
-					attributes: {
-						content: 'Yo!',
-					},
-				},
+				type: 'UPDATE_REUSABLE_BLOCK_TITLE',
+				id: 123,
+				title: 'My block',
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					[ id ]: {
-						id,
-						name: 'My better block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Yo!',
-							dropCap: true,
-						},
-					},
+					123: { uid: '', title: 'My block' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -1618,40 +1864,22 @@ describe( 'state', () => {
 		} );
 
 		it( 'should update the reusable block\'s id if it was temporary', () => {
-			const id = 123;
 			const initialState = {
 				data: {
-					[ id ]: {
-						id,
-						isTemporary: true,
-						name: 'My cool block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Hello!',
-							dropCap: true,
-						},
-					},
+					reusable1: { uid: '', title: '' },
 				},
 				isSaving: {},
 			};
 
 			const state = reusableBlocks( initialState, {
 				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-				id,
-				updatedId: 3,
+				id: 'reusable1',
+				updatedId: 123,
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					3: {
-						id: 3,
-						name: 'My cool block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Hello!',
-							dropCap: true,
-						},
-					},
+					123: { uid: '', title: '' },
 				},
 				isFetching: {},
 				isSaving: {},
@@ -1828,6 +2056,34 @@ describe( 'state', () => {
 				isFetching: {},
 				isSaving: {},
 			} );
+		} );
+	} );
+
+	describe( 'template', () => {
+		it( 'should default to visible', () => {
+			const state = template( undefined, {} );
+
+			expect( state ).toEqual( { isValid: true } );
+		} );
+
+		it( 'should set the template', () => {
+			const blockTemplate = [ [ 'core/paragraph' ] ];
+			const state = template( undefined, {
+				type: 'SETUP_EDITOR',
+				settings: { template: blockTemplate, templateLock: 'all' },
+			} );
+
+			expect( state ).toEqual( { isValid: true, template: blockTemplate, lock: 'all' } );
+		} );
+
+		it( 'should reset the validity flag', () => {
+			const original = deepFreeze( { isValid: false, template: [] } );
+			const state = template( original, {
+				type: 'SET_TEMPLATE_VALIDITY',
+				isValid: true,
+			} );
+
+			expect( state ).toEqual( { isValid: true, template: [] } );
 		} );
 	} );
 } );

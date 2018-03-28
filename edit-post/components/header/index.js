@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -13,22 +8,27 @@ import {
 	PostSavedState,
 	PostPublishPanelToggle,
 } from '@wordpress/editor';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import EllipsisMenu from './ellipsis-menu';
+import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
-import { isSidebarOpened } from '../../store/selectors';
-import { toggleSidebar } from '../../store/actions';
 
 function Header( {
-	onToggleDefaultSidebar,
-	onTogglePublishSidebar,
-	isDefaultSidebarOpened,
+	isEditorSidebarOpened,
+	openGeneralSidebar,
+	closeGeneralSidebar,
 	isPublishSidebarOpened,
+	togglePublishSidebar,
+	hasActiveMetaboxes,
+	isSaving,
 } ) {
+	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
+
 	return (
 		<div
 			role="region"
@@ -39,35 +39,41 @@ function Header( {
 			<HeaderToolbar />
 			{ ! isPublishSidebarOpened && (
 				<div className="edit-post-header__settings">
-					<PostSavedState />
+					<PostSavedState
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+					/>
 					<PostPreviewButton />
 					<PostPublishPanelToggle
 						isOpen={ isPublishSidebarOpened }
-						onToggle={ onTogglePublishSidebar }
+						onToggle={ togglePublishSidebar }
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
 					/>
 					<IconButton
 						icon="admin-generic"
-						onClick={ onToggleDefaultSidebar }
-						isToggled={ isDefaultSidebarOpened }
+						onClick={ toggleGeneralSidebar }
+						isToggled={ isEditorSidebarOpened }
 						label={ __( 'Settings' ) }
-						aria-expanded={ isDefaultSidebarOpened }
+						aria-expanded={ isEditorSidebarOpened }
 					/>
-					<EllipsisMenu key="ellipsis-menu" />
+					<MoreMenu key="more-menu" />
 				</div>
 			) }
 		</div>
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		isDefaultSidebarOpened: isSidebarOpened( state ),
-		isPublishSidebarOpened: isSidebarOpened( state, 'publish' ),
-	} ),
-	{
-		onToggleDefaultSidebar: () => toggleSidebar(),
-		onTogglePublishSidebar: () => toggleSidebar( 'publish' ),
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
+export default compose(
+	withSelect( ( select ) => ( {
+		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
+		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
+		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		openGeneralSidebar: () => dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/document' ),
+		closeGeneralSidebar: dispatch( 'core/edit-post' ).closeGeneralSidebar,
+		togglePublishSidebar: dispatch( 'core/edit-post' ).togglePublishSidebar,
+	} ) ),
 )( Header );

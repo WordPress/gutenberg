@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEqual, noop } from 'lodash';
+import { defer, isEqual, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,21 @@ import './style.scss';
 import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
+import ScrollLock from '../scroll-lock';
 import { Slot, Fill } from '../slot-fill';
+
+/**
+ * Value representing whether a key is currently pressed. Bound to the document
+ * for use in determining whether the Popover component has mounted in response
+ * to a keyboard event. Popover's focusOnMount behavior is specific to keyboard
+ * interaction. Must be bound at the top-level and its unsetting deferred since
+ * the component will have already mounted by the time keyup occurs.
+ *
+ * @type {boolean}
+ */
+let isKeyDown = false;
+document.addEventListener( 'keydown', () => isKeyDown = true );
+document.addEventListener( 'keyup', defer.bind( null, () => isKeyDown = false ) );
 
 const FocusManaged = withFocusReturn( ( { children } ) => children );
 
@@ -94,7 +108,7 @@ class Popover extends Component {
 
 	focus() {
 		const { focusOnMount = true } = this.props;
-		if ( ! focusOnMount ) {
+		if ( ! focusOnMount || ! isKeyDown ) {
 			return;
 		}
 
@@ -239,6 +253,7 @@ class Popover extends Component {
 
 	render() {
 		const {
+			headerTitle,
 			onClose,
 			children,
 			className,
@@ -280,6 +295,9 @@ class Popover extends Component {
 				>
 					{ this.state.isMobile && (
 						<div className="components-popover__header">
+							<span className="components-popover__header-title">
+								{ headerTitle }
+							</span>
 							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
 						</div>
 					) }
@@ -308,7 +326,10 @@ class Popover extends Component {
 			content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
 		}
 
-		return <span ref={ this.bindNode( 'anchor' ) }>{ content }</span>;
+		return <span ref={ this.bindNode( 'anchor' ) }>
+			{ content }
+			{ this.state.isMobile && expandOnMobile && <ScrollLock /> }
+		</span>;
 	}
 }
 

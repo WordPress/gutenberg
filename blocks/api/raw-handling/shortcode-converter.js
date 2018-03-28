@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { castArray, find, get, dropRight, last, mapValues, pickBy } from 'lodash';
+import { some, castArray, first, mapValues, pickBy } from 'lodash';
 
 /**
  * Internal dependencies
  */
-import { createBlock } from '../factory';
-import { getBlockTypes } from '../registration';
+import { createBlock, getBlockTransforms, findTransform } from '../factory';
+import { getBlockType } from '../registration';
 import { getBlockAttributes } from '../parser';
 
 /**
@@ -15,71 +15,57 @@ import { getBlockAttributes } from '../parser';
  */
 const { shortcode } = window.wp;
 
-export default function( HTML ) {
-	// Get all matches. These are *not* ordered.
-	const matches = getBlockTypes().reduce( ( acc, blockType ) => {
-		const transformsFrom = get( blockType, 'transforms.from', [] );
-		const transform = find( transformsFrom, ( { type } ) => type === 'shortcode' );
+function segmentHTMLToShortcodeBlock( HTML ) {
+	// Get all matches.
+	const transformsFrom = getBlockTransforms( 'from' );
 
-		if ( ! transform ) {
-			return acc;
-		}
+	const transformation = findTransform( transformsFrom, ( transform ) => (
+		transform.type === 'shortcode' &&
+		some( castArray( transform.tag ), ( tag ) => shortcode.regexp( tag ).test( HTML ) )
+	) );
 
-		const transformTags = castArray( transform.tag );
+	if ( ! transformation ) {
+		return [ HTML ];
+	}
 
-		let match;
-		let lastIndex = 0;
+	const transformTags = castArray( transformation.tag );
+	const transformTag = first( transformTags );
 
-		for ( const transformTag of transformTags ) {
-			while ( ( match = shortcode.next( transformTag, HTML, lastIndex ) ) ) {
-				lastIndex = match.index + match.content.length;
+	let match;
+	let lastIndex = 0;
 
-				const attributes = mapValues(
-					pickBy( transform.attributes, ( schema ) => schema.shortcode ),
-					// Passing all of `match` as second argument is intentionally
-					// broad but shouldn't be too relied upon. See
-					// https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
-					( schema ) => schema.shortcode( match.shortcode.attrs, match ),
-				);
+	if ( ( match = shortcode.next( transformTag, HTML, lastIndex ) ) ) {
+		lastIndex = match.index + match.content.length;
 
-				const block = createBlock(
-					blockType.name,
-					getBlockAttributes(
-						{
-							...blockType,
-							attributes: transform.attributes,
-						},
-						match.shortcode.content,
-						attributes,
-					)
-				);
+		const attributes = mapValues(
+			pickBy( transformation.attributes, ( schema ) => schema.shortcode ),
+			// Passing all of `match` as second argument is intentionally broad
+			// but shouldn't be too relied upon.
+			//
+			// See: https://github.com/WordPress/gutenberg/pull/3610#discussion_r152546926
+			( schema ) => schema.shortcode( match.shortcode.attrs, match ),
+		);
 
-				acc[ match.index ] = { block, lastIndex };
-			}
-		}
+		const block = createBlock(
+			transformation.blockName,
+			getBlockAttributes(
+				{
+					...getBlockType( transformation.blockName ),
+					attributes: transformation.attributes,
+				},
+				match.shortcode.content,
+				attributes,
+			)
+		);
 
-		return acc;
-	}, {} );
-
-	let negativeI = 0;
-
-	// Sort the matches and return an array of text pieces and blocks.
-	return Object.keys( matches ).sort( ( a, b ) => a - b ).reduce( ( acc, index ) => {
-		const match = matches[ index ];
-
-		acc = [
-			// Add all pieces except the last text piece.
-			...dropRight( acc ),
-			// Add the start of the last text piece.
-			last( acc ).slice( 0, index - negativeI ),
-			// Add the block.
-			match.block,
-			// Add the rest of the last text piece.
-			last( acc ).slice( match.lastIndex - negativeI ),
+		return [
+			HTML.substr( 0, match.index ),
+			block,
+			...segmentHTMLToShortcodeBlock( HTML.substr( match.index + match.content.length ) ),
 		];
+	}
 
-		negativeI = match.lastIndex;
-
-		return acc;
-	}, [ HTML ] );
+	return [ HTML ];
 }
+
+export default segmentHTMLToShortcodeBlock;

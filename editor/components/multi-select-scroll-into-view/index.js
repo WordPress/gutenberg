@@ -7,12 +7,13 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { query } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
+import { getScrollContainer } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
-import { getScrollContainer } from '../../utils/dom';
+import { getBlockDOMNode } from '../../utils/dom';
 
 class MultiSelectScrollIntoView extends Component {
 	componentDidUpdate() {
@@ -33,7 +34,7 @@ class MultiSelectScrollIntoView extends Component {
 			return;
 		}
 
-		const extentNode = document.querySelector( '[data-block="' + extentUID + '"]' );
+		const extentNode = getBlockDOMNode( extentUID );
 		if ( ! extentNode ) {
 			return;
 		}
@@ -56,7 +57,7 @@ class MultiSelectScrollIntoView extends Component {
 	}
 }
 
-export default query( ( select ) => {
+export default withSelect( ( select ) => {
 	return {
 		extentUID: select( 'core/editor' ).getLastMultiSelectedBlockUid(),
 	};

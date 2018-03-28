@@ -2,13 +2,12 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, Button } from '@wordpress/components';
+import { Dashicon, IconButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -23,7 +22,6 @@ import {
 	isSavingPost,
 	isEditedPostSaveable,
 	getCurrentPost,
-	hasMetaBoxes,
 } from '../../store/selectors';
 
 /**
@@ -32,28 +30,27 @@ import {
  * @param   {Object}    Props Component Props.
  * @return {WPElement}       WordPress Element.
  */
-export function PostSavedState( { hasActiveMetaboxes, isNew, isPublished, isDirty, isSaving, isSaveable, onSave } ) {
-	const className = 'editor-post-saved-state';
-
+export function PostSavedState( { isNew, isPublished, isDirty, isSaving, isSaveable, onSave } ) {
 	if ( isSaving ) {
 		return (
-			<span className={ className }>
+			<span className="editor-post-saved-state editor-post-saved-state__saving">
+				<Dashicon icon="cloud" />
 				{ __( 'Saving' ) }
 			</span>
 		);
 	}
 
 	if ( isPublished ) {
-		return <PostSwitchToDraftButton className={ classnames( className, 'button-link' ) } />;
+		return <PostSwitchToDraftButton />;
 	}
 
 	if ( ! isSaveable ) {
 		return null;
 	}
 
-	if ( ! isNew && ! isDirty && ! hasActiveMetaboxes ) {
+	if ( ! isNew && ! isDirty ) {
 		return (
-			<span className={ className }>
+			<span className="editor-post-saved-state">
 				<Dashicon icon="saved" />
 				{ __( 'Saved' ) }
 			</span>
@@ -61,22 +58,24 @@ export function PostSavedState( { hasActiveMetaboxes, isNew, isPublished, isDirt
 	}
 
 	return (
-		<Button className={ classnames( className, 'button-link' ) } onClick={ onSave }>
-			<span className="editor-post-saved-state__mobile">{ __( 'Save' ) }</span>
-			<span className="editor-post-saved-state__desktop">{ __( 'Save Draft' ) }</span>
-		</Button>
+		<IconButton
+			className="editor-post-save-draft"
+			onClick={ onSave }
+			icon="cloud-upload"
+		>
+			{ __( 'Save Draft' ) }
+		</IconButton>
 	);
 }
 
 export default connect(
-	( state ) => ( {
+	( state, { forceIsDirty, forceIsSaving } ) => ( {
 		post: getCurrentPost( state ),
 		isNew: isEditedPostNew( state ),
 		isPublished: isCurrentPostPublished( state ),
-		isDirty: isEditedPostDirty( state ),
-		isSaving: isSavingPost( state ),
+		isDirty: forceIsDirty || isEditedPostDirty( state ),
+		isSaving: forceIsSaving || isSavingPost( state ),
 		isSaveable: isEditedPostSaveable( state ),
-		hasActiveMetaboxes: hasMetaBoxes( state ),
 	} ),
 	{
 		onSave: savePost,

@@ -1,20 +1,21 @@
 /**
  * WordPress Dependencies
  */
-import { registerReducer, registerSelectors, withRehydratation, loadAndPersist } from '@wordpress/data';
+import {
+	registerReducer,
+	registerSelectors,
+	registerActions,
+	withRehydratation,
+	loadAndPersist,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import reducer from './reducer';
 import applyMiddlewares from './middlewares';
-import {
-	getBlockCount,
-	getBlocks,
-	getEditedPostAttribute,
-	getLastMultiSelectedBlockUid,
-	getSelectedBlockCount,
-} from './selectors';
+import * as selectors from './selectors';
+import * as actions from './actions';
 
 /**
  * Module Constants
@@ -27,12 +28,7 @@ const store = applyMiddlewares(
 );
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
 
-registerSelectors( MODULE_KEY, {
-	getBlockCount,
-	getBlocks,
-	getEditedPostAttribute,
-	getLastMultiSelectedBlockUid,
-	getSelectedBlockCount,
-} );
+registerSelectors( MODULE_KEY, selectors );
+registerActions( MODULE_KEY, actions );
 
 export default store;

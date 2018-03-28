@@ -17,7 +17,7 @@
 		padding: 4px 8px;
 		border: 1px solid $light-gray-500;
 		font-family: $default-font;
-		font-size: 13px;
+		font-size: $default-font-size;
 
 		&:focus {
 			border: 1px solid $dark-gray-500;

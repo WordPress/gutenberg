@@ -6,8 +6,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, IconButton, Placeholder, Toolbar } from '@wordpress/components';
+import {
+	Button,
+	FormFileUpload,
+	IconButton,
+	Placeholder,
+	Toolbar,
+} from '@wordpress/components';
 import { Component } from '@wordpress/element';
+import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -51,20 +58,20 @@ export const settings = {
 	},
 
 	edit: class extends Component {
-		constructor( { className } ) {
+		constructor() {
 			super( ...arguments );
 			// edit component has its own src in the state so it can be edited
 			// without setting the actual value outside of the edit UI
 			this.state = {
 				editing: ! this.props.attributes.src,
 				src: this.props.attributes.src,
-				className,
 			};
 		}
+
 		render() {
 			const { caption, id } = this.props.attributes;
-			const { setAttributes, isSelected } = this.props;
-			const { editing, className, src } = this.state;
+			const { setAttributes, isSelected, className } = this.props;
+			const { editing, src } = this.state;
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
 			};
@@ -85,24 +92,12 @@ export const settings = {
 				}
 				return false;
 			};
-			const controls = isSelected && (
-				<BlockControls key="controls">
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit audio' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</Toolbar>
-				</BlockControls>
-			);
+			const setAudio = ( [ audio ] ) => onSelectAudio( audio );
+			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAudio, 'audio' );
 
 			if ( editing ) {
-				return [
-					controls,
+				return (
 					<Placeholder
-						key="placeholder"
 						icon="media-audio"
 						label={ __( 'Audio' ) }
 						instructions={ __( 'Select an audio file from your library, or upload a new one' ) }
@@ -120,6 +115,14 @@ export const settings = {
 								{ __( 'Use URL' ) }
 							</Button>
 						</form>
+						<FormFileUpload
+							isLarge
+							className="wp-block-audio__upload-button"
+							onChange={ uploadFromFiles }
+							accept="audio/*"
+						>
+							{ __( 'Upload' ) }
+						</FormFileUpload>
 						<MediaUpload
 							onSelect={ onSelectAudio }
 							type="audio"
@@ -130,13 +133,24 @@ export const settings = {
 								</Button>
 							) }
 						/>
-					</Placeholder>,
-				];
+					</Placeholder>
+				);
 			}
 
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 			return [
-				controls,
+				isSelected && (
+					<BlockControls key="controls">
+						<Toolbar>
+							<IconButton
+								className="components-icon-button components-toolbar__control"
+								label={ __( 'Edit audio' ) }
+								onClick={ switchToEditing }
+								icon="edit"
+							/>
+						</Toolbar>
+					</BlockControls>
+				),
 				<figure key="audio" className={ className }>
 					<audio controls="controls" src={ src } />
 					{ ( ( caption && caption.length ) || !! isSelected ) && (

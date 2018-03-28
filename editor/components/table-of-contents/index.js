@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
-import { query } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,7 +31,7 @@ function TableOfContents( { hasBlocks } ) {
 	);
 }
 
-export default query( ( select ) => {
+export default withSelect( ( select ) => {
 	return {
 		hasBlocks: !! select( 'core/editor' ).getBlockCount(),
 	};

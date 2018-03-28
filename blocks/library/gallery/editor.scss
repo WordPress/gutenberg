@@ -1,5 +1,7 @@
-.wp-block-gallery:not( .components-placeholder ) {
-	margin: -8px;
+.wp-block-gallery:not( .components-placeholder ):not( .alignfull ) {
+	// allow gallery items to go edge to edge
+	margin-left: -8px;
+	margin-right: -8px;
 }
 
 .blocks-gallery-item {
@@ -28,6 +30,28 @@
 		margin-top: -4px;
 	}
 
+	.components-form-file-upload,
+	.button.blocks-gallery-add-item-button {
+		width: 100%;
+		height: 100%;
+	}
+
+	.button.blocks-gallery-add-item-button {
+		box-shadow: none;
+		border: none;
+		border-radius: 0;
+		min-height: 100px;
+
+		& .dashicon {
+			margin-top: 10px;
+		}
+
+
+		&:hover,
+		&:focus {
+			border: 1px solid #999;
+		}
+	}
 }
 
 .blocks-gallery-item__inline-menu {

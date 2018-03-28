@@ -1,10 +1,6 @@
 export const PREFERENCES_DEFAULTS = {
-	mode: 'visual',
-	sidebars: {
-		desktop: true,
-		mobile: false,
-		publish: false,
-	},
+	editorMode: 'visual',
+	activeGeneralSidebar: 'edit-post/document', // null | 'edit-post/block' | 'edit-post/document' | 'plugin/*'
 	panels: { 'post-status': true },
 	features: {
 		fixedToolbar: false,

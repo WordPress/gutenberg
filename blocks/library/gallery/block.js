@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { filter } from 'lodash';
+import { filter, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,7 @@ import { mediaUpload } from '@wordpress/utils';
 import {
 	IconButton,
 	DropZone,
+	FormFileUpload,
 	RangeControl,
 	SelectControl,
 	ToggleControl,
@@ -51,7 +52,8 @@ class GalleryBlock extends Component {
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
-		this.dropFiles = this.dropFiles.bind( this );
+		this.addFiles = this.addFiles.bind( this );
+		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 
 		this.state = {
 			selectedImage: null,
@@ -82,10 +84,7 @@ class GalleryBlock extends Component {
 
 	onSelectImages( images ) {
 		this.props.setAttributes( {
-			images: images.map( ( attributes ) => ( {
-				...attributes,
-				caption: attributes.caption ? [ attributes.caption ] : [],
-			} ) ),
+			images: images.map( ( image ) => pick( image, [ 'alt', 'caption', 'id', 'url' ] ) ),
 		} );
 	}
 
@@ -122,7 +121,11 @@ class GalleryBlock extends Component {
 		} );
 	}
 
-	dropFiles( files ) {
+	uploadFromFiles( event ) {
+		this.addFiles( event.target.files );
+	}
+
+	addFiles( files ) {
 		const currentImages = this.props.attributes.images || [];
 		const { setAttributes } = this.props;
 		mediaUpload(
@@ -131,7 +134,8 @@ class GalleryBlock extends Component {
 				setAttributes( {
 					images: currentImages.concat( images ),
 				} );
-			}
+			},
+			'image',
 		);
 	}
 
@@ -151,7 +155,7 @@ class GalleryBlock extends Component {
 
 		const dropZone = (
 			<DropZone
-				onFilesDrop={ this.dropFiles }
+				onFilesDrop={ this.addFiles }
 			/>
 		);
 
@@ -239,6 +243,18 @@ class GalleryBlock extends Component {
 						/>
 					</li>
 				) ) }
+				{ isSelected &&
+					<li className="blocks-gallery-item">
+						<FormFileUpload
+							multiple
+							isLarge
+							className="blocks-gallery-add-item-button"
+							onChange={ this.uploadFromFiles }
+							accept="image/*"
+							icon="insert"
+						/>
+					</li>
+				}
 			</ul>,
 		];
 	}
