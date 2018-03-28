@@ -56,3 +56,15 @@ export function isRequestingCategories( state ) {
 export function getArticles( state ) {
 	return getTerms( state, 'articles' );
 }
+
+/**
+ * Returns true if a request is in progress for articles data, or false
+ * otherwise.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {boolean} Whether a request is in progress for articles.
+ */
+export function isRequestingArticles( state ) {
+	return isRequestingTerms( state, 'articles' );
+}
