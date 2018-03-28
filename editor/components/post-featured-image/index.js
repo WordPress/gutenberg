@@ -84,7 +84,7 @@ const applyWithSelect = withSelect( ( select ) => {
 
 	return {
 		media: featuredImageId ? getMedia( featuredImageId ) : null,
-		postType: getPostType( select( 'core/editor' ).getEditedPostAttribute( 'type' ) ),
+		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		featuredImageId,
 	};
 } );
