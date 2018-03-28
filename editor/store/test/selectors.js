@@ -663,16 +663,6 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isCurrentPostScheduled', () => {
-		it( 'should return true for posts with status future', () => {
-			const state = {
-				currentPost: {
-					status: 'future',
-				},
-			};
-
-			expect( isCurrentPostScheduled( state ) ).toBe( true );
-		} );
-
 		it( 'should return true for future scheduled posts', () => {
 			const state = {
 				currentPost: {
