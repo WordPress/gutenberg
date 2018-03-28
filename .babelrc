@@ -9,7 +9,7 @@
           "@wordpress/i18n": "./gutenberg/i18n",
           "@gutenberg": "./gutenberg"
         },
-        "extensions": [".js", ".ios.js", ".android.js"]
+        "extensions": [".js", ".native.js", ".ios.js", ".android.js"]
       }
     ]
   ],
