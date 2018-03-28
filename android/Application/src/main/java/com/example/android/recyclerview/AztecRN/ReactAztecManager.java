@@ -20,6 +20,10 @@ import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
 import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
+import com.facebook.react.views.textinput.ReactTextInputManager;
+import com.facebook.react.views.scroll.ScrollEvent;
+import com.facebook.react.views.scroll.ScrollEventType;
+import com.facebook.react.views.textinput.ScrollWatcher;
 
 import java.util.Map;
 
@@ -112,6 +116,15 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
             view.setContentSizeWatcher(new AztecContentSizeWatcher(view));
         } else {
             view.setContentSizeWatcher(null);
+        }
+    }
+
+    @ReactProp(name = "onScroll", defaultBoolean = false)
+    public void setOnScroll(final ReactAztecView view, boolean onScroll) {
+        if (onScroll) {
+            view.setScrollWatcher(new AztecScrollWatcher(view));
+        } else {
+            view.setScrollWatcher(null);
         }
     }
 
@@ -239,6 +252,42 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
                                 mEditText.getId(),
                                 PixelUtil.toDIPFromPixel(contentWidth),
                                 PixelUtil.toDIPFromPixel(contentHeight)));
+            }
+        }
+    }
+
+    private class AztecScrollWatcher implements ScrollWatcher {
+
+        private ReactAztecView mReactAztecView;
+        private EventDispatcher mEventDispatcher;
+        private int mPreviousHoriz;
+        private int mPreviousVert;
+
+        public AztecScrollWatcher(ReactAztecView editText) {
+            mReactAztecView = editText;
+            ReactContext reactContext = (ReactContext) editText.getContext();
+            mEventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+        }
+
+        @Override
+        public void onScrollChanged(int horiz, int vert, int oldHoriz, int oldVert) {
+            if (mPreviousHoriz != horiz || mPreviousVert != vert) {
+                ScrollEvent event = ScrollEvent.obtain(
+                        mReactAztecView.getId(),
+                        ScrollEventType.SCROLL,
+                        horiz,
+                        vert,
+                        0f, // can't get x velocity
+                        0f, // can't get y velocity
+                        0, // can't get content width
+                        0, // can't get content height
+                        mReactAztecView.getWidth(),
+                        mReactAztecView.getHeight());
+
+                mEventDispatcher.dispatchEvent(event);
+
+                mPreviousHoriz = horiz;
+                mPreviousVert = vert;
             }
         }
     }

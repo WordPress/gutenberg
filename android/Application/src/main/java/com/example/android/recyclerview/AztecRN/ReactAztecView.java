@@ -10,6 +10,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.views.textinput.ContentSizeWatcher;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
+import com.facebook.react.views.textinput.ScrollWatcher;
 
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.plugins.IAztecPlugin;
@@ -28,10 +29,13 @@ public class ReactAztecView extends AztecText {
     // This flag is set to true when we set the text of the EditText explicitly. In that case, no
     // *TextChanged events should be triggered. This is less expensive than removing the text
     // listeners and adding them back again after the text change is completed.
-    private boolean mIsSettingTextFromJS;
+    private boolean mIsSettingTextFromJS = false;
     private @Nullable ArrayList<TextWatcher> mListeners;
     private @Nullable TextWatcherDelegator mTextWatcherDelegator;
     private @Nullable ContentSizeWatcher mContentSizeWatcher;
+    private @Nullable ScrollWatcher mScrollWatcher;
+
+    private int mNativeEventCount = 0;
 
     public ReactAztecView(ThemedReactContext reactContext, Context context) {
         super(context);
@@ -54,6 +58,19 @@ public class ReactAztecView extends AztecText {
             toolbar.addButton(plugin)
         }
 */
+    }
+
+    public void setScrollWatcher(ScrollWatcher scrollWatcher) {
+        mScrollWatcher = scrollWatcher;
+    }
+
+    @Override
+    protected void onScrollChanged(int horiz, int vert, int oldHoriz, int oldVert) {
+        super.onScrollChanged(horiz, vert, oldHoriz, oldVert);
+
+        if (mScrollWatcher != null) {
+            mScrollWatcher.onScrollChanged(horiz, vert, oldHoriz, oldVert);
+        }
     }
 
     public void setContentSizeWatcher(ContentSizeWatcher contentSizeWatcher) {
@@ -80,14 +97,11 @@ public class ReactAztecView extends AztecText {
         uiManager.setViewLocalData(getId(), localData);
     }
 
-
     //// Text changed events
 
-    // VisibleForTesting from {@link TextInputEventsTestCase}.
     public int incrementAndGetEventCounter() {
         return ++mNativeEventCount;
     }
-    private int mNativeEventCount; // TODO: not yet used
 
     @Override
     public void addTextChangedListener(TextWatcher watcher) {

@@ -29,6 +29,9 @@ class SimpleTextInput extends React.Component {
                    style={[styles.hello, {minHeight: myMinHeight}]}
                    multiline={true}
                    text = {this.props.text}
+                   onScroll = {(event) => {
+                       console.log(event.nativeEvent);
+                   }}
                    onContentSizeChange= {(event) => {
                         this.setState({height: event.nativeEvent.contentSize.height});
                     }}

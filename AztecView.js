@@ -9,6 +9,7 @@ var aztex = {
     maxImagesWidth: PropTypes.number,
     minImagesWidth: PropTypes.number,
     onContentSizeChange: PropTypes.func,
+    onScroll: PropTypes.func,
     ...ViewPropTypes, // include the default view properties
   },
 };
