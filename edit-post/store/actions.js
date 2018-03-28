@@ -148,10 +148,3 @@ export function setMetaBoxSavedData( dataPerLocation ) {
 		dataPerLocation,
 	};
 }
-
-export function getArticles( articles ) {
-	return {
-		type: 'GET_LAST_ARTICLES',
-		articles,
-	};
-}

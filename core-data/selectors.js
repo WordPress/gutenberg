@@ -45,3 +45,14 @@ export function isRequestingTerms( state, taxonomy ) {
 export function isRequestingCategories( state ) {
 	return isRequestingTerms( state, 'categories' );
 }
+
+/**
+ * Returns all the available articles.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Articles list.
+ */
+export function getArticles( state ) {
+	return getTerms( state, 'articles' );
+}
