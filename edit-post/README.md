@@ -11,11 +11,12 @@ They can be found in the global variable `wp.editPost` when defining `wp-edit-po
 
 Experimental components can be found under `wp.editPost.__experimental`. Experimental components are still being evaluated and can change in a future version.
 
-### PluginSidebar (Experimental)
+### PluginSidebar
+**Experimental**
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
 
-If you wish to display the sidebar, you can with use the [`PluginMoreMenuItem`](#pluginmoremenuitem-experimental) component or the `wp.data.dispatch` API.
+If you wish to display the sidebar, you can with use the [`PluginMoreMenuItem`](#pluginmoremenuitem) component or the `wp.data.dispatch` API.
 
 #### Usage
 
@@ -42,7 +43,8 @@ Title displayed at the top of the sidebar.
 - Required: Yes
 
 
-### PluginMoreMenuItem (Experimental)
+### PluginMoreMenuItem
+**Experimental**
 
 Renders a menu item in the more menu drop down, and can be used to activate other plugin UI components.
 The text within the component appears as the menu item label.
