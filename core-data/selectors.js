@@ -18,7 +18,7 @@ export function getTerms( state, taxonomy ) {
  * @return {Array} Categories list.
  */
 export function getCategories( state ) {
-	return getTerms( state, 'categories' );
+	return getTerms( state, 'category' );
 }
 
 /**
@@ -43,7 +43,7 @@ export function isRequestingTerms( state, taxonomy ) {
  * @return {boolean} Whether a request is in progress for categories.
  */
 export function isRequestingCategories( state ) {
-	return isRequestingTerms( state, 'categories' );
+	return isRequestingTerms( state, 'category' );
 }
 
 /**
