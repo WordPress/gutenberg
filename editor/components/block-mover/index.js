@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { first, last } from 'lodash';
+import { first } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,17 +17,14 @@ import { compose } from '@wordpress/element';
  */
 import './style.scss';
 import { getBlockMoverDescription } from './mover-description';
-import { getBlockIndex, getBlock, getBlockCount } from '../../store/selectors';
+import { getBlockIndex, getBlock } from '../../store/selectors';
 import { upArrow, downArrow } from './arrows';
 
-export function BlockMover( { onMoveUp, onMoveDown, uids, blockType, firstIndex, lastIndex, blockCount, isLocked, instanceId } ) {
+export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId } ) {
 	if ( isLocked ) {
 		return null;
 	}
-    
-    const isFirst = ( firstIndex === 0 );
-    const isLast = lastIndex+1 === blockCount;
-    
+
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the button while it has focus causes the screen to change
 	// to an unfocused state (body as active element) without firing blur on,
@@ -104,8 +101,6 @@ export default compose(
 
 			return ( {
 				firstIndex: getBlockIndex( state, first( uids ), rootUID ),
-                lastIndex: getBlockIndex( state, last( uids ), rootUID ),
-                blockCount: getBlockCount( state ),
 				blockType: block ? getBlockType( block.name ) : null,
 			} );
 		},
