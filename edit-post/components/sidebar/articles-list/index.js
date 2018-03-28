@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, TextControl, SelectControl } from '@wordpress/components';
+import { PanelBody, PanelRow, TextControl, SelectControl } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
@@ -25,7 +25,15 @@ const PANEL_NAME = 'articles-list';
 
 // TODO: - make panel title customizable
 // 		 - list of categories
-function ArticlesList( { isOpened, onTogglePanel, categories, isRequestingCategories, articles, isRequestingArticles } ) {
+function ArticlesList(
+	{ 
+		isOpened,
+		onTogglePanel,
+		categories,
+		isRequestingCategories,
+		articles,
+		isRequestingArticles,
+	} ) {
 	// const options = ! isRequestingCategories ? categories.map(cat => ( { value: cat.id, label: cat.name } ) ) : [];
 
 	return (
@@ -34,19 +42,25 @@ function ArticlesList( { isOpened, onTogglePanel, categories, isRequestingCatego
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
-			<TextControl
-				placeholder={ __( 'Search articles' ) }
-				onChange={ event => console.log( event ) }
-			/>
-			{ isRequestingCategories ? ( <p>Loading categories...</p> ) : (
-				<SelectControl
-					// Selected value.
-					value=""
-					label={ __( 'Category' ) }
-					options={ categories }
+			<PanelRow>
+				<TextControl
+					placeholder={ __( 'Search articles' ) }
 					onChange={ event => console.log( event ) }
-				/> 
-			) }
+				/>
+			</PanelRow>
+
+			<PanelRow>
+				{ isRequestingCategories ? ( <p>Loading categories...</p> ) : (
+					<SelectControl
+						// Selected value.
+						value=""
+						label={ __( 'Category' ) }
+						options={ categories }
+						onChange={ event => console.log( event ) }
+					/> 
+				) }
+			</PanelRow>
+			
 			<div>
 				{ isRequestingArticles ? ( <p>Loading articles...</p> ) : (
 

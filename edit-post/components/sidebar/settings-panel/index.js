@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, CheckboxControl } from '@wordpress/components';
+import { PanelBody, PanelRow, CheckboxControl } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -27,23 +27,29 @@ function SettingsPanel( { isOpened, onTogglePanel } ) {
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
-			<CheckboxControl
-				heading={ __( 'Use theme CSS' ) }
-				checked={ true }
-				onChange={ event => console.log( event ) }
-			/>
+			<PanelRow>
+				<CheckboxControl
+					heading={ __( 'Use theme CSS' ) }
+					checked={ true }
+					onChange={ event => console.log( event ) }
+				/>
+			</PanelRow>
 
-			<CheckboxControl
-				heading={ __( 'Display header' ) }
-				checked={ true }
-				onChange={ event => console.log( event ) }
-			/>
+			<PanelRow>
+				<CheckboxControl
+					heading={ __( 'Display header' ) }
+					checked={ true }
+					onChange={ event => console.log( event ) }
+				/>
+			</PanelRow>
 
-			<CheckboxControl
-				heading={ __( 'Display footer' ) }
-				checked={ true }
-				onChange={ event => console.log( event ) }
-			/>
+			<PanelRow>
+				<CheckboxControl
+					heading={ __( 'Display footer' ) }
+					checked={ true }
+					onChange={ event => console.log( event ) }
+				/>
+			</PanelRow>
 		</PanelBody>
 	);
 }
