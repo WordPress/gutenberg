@@ -31,7 +31,7 @@ const Component = () => (
 			name="menu-item-name"
 			title="My Second Sidebar"
 			type="sidebar"
-			target="isebar-name">
+			target="sidebar-name">
 			My Sidebar
 		</PluginMoreMenuItem>
 	</Fragment>
