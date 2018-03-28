@@ -98,6 +98,9 @@ export default class TinyMCE extends Component {
 	render() {
 		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible } = this.props;
 		const ariaProps = pickAriaProps( this.props );
+		if ( [ 'ul', 'ol', 'table' ].indexOf( tagName ) === -1 ) {
+			ariaProps.role = 'textbox';
+		}
 
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
@@ -115,7 +118,6 @@ export default class TinyMCE extends Component {
 			ref: ( node ) => this.editorNode = node,
 			style,
 			suppressContentEditableWarning: true,
-			role: 'textbox',
 		}, children );
 	}
 }
