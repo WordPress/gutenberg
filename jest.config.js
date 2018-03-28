@@ -9,7 +9,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 }
 
 module.exports = {
-	preset: 'jest-expo',
+	preset: 'jest-react-native',
 	moduleNameMapper: {
 		'@wordpress/hooks': '<rootDir>/wordpress/hooks',
 		'@wordpress/i18n': '<rootDir>/gutenberg/i18n',
