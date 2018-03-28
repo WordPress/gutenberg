@@ -16,7 +16,10 @@ Experimental components can be found under `wp.editPost.__experimental`. Experim
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
 
-If you wish to display the sidebar, you can with use the [`PluginMoreMenuItem`](#pluginmoremenuitem) component or the `wp.data.dispatch` API.
+If you wish to display the sidebar, you can with use the [`PluginMoreMenuItem`](#pluginmoremenuitem) component or the `wp.data.dispatch` API:
+```js
+wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );
+```
 
 #### Usage
 
