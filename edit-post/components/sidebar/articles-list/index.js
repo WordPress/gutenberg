@@ -34,8 +34,6 @@ function ArticlesList(
 		articles,
 		isRequestingArticles,
 	} ) {
-	// const options = ! isRequestingCategories ? categories.map(cat => ( { value: cat.id, label: cat.name } ) ) : [];
-
 	return (
 		<PanelBody
 			title={ __( 'Stories' ) }
@@ -54,8 +52,8 @@ function ArticlesList(
 					<SelectControl
 						// Selected value.
 						value=""
-						label={ __( 'Category' ) }
-						options={ categories }
+						label={ __( 'Categories' ) }
+						options={ categories.map( cat => ( { value: cat.id, label: cat.name } ) ) }
 						onChange={ event => console.log( event ) }
 					/>
 				) }
