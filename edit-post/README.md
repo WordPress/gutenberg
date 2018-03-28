@@ -59,7 +59,8 @@ The text within the component appears as the menu item label.
 	name="my-plugin"
 	icon={ <wp.components.DashIcon name="yes" /> }
 	type="sidebar"
-	target="my-sidebar">
+	target="my-sidebar"
+	>
 	My Sidebar
 </PluginMoreMenuItem>
 ```
