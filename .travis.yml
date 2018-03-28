@@ -26,6 +26,7 @@ cache:
 
 before_install:
   - nvm install && nvm use
+  - google-chrome-stable --headless --no-sandbox
 
 branches:
   only:
