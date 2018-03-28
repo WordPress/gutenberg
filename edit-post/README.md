@@ -3,7 +3,9 @@
 The following components can be used with the `registerplugin` ([see documentation](../plugins)) API.
 They can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency.
 
-### PluginSidebar
+Experimental components can be found under `wp.editPost.__experimental`. Experimental components are still being evaluated and can change in a future version.
+
+### PluginSidebar (Experimental)
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
 
@@ -18,7 +20,7 @@ Renders a sidebar when activated. The contents within the `PluginSidebar` will a
 - `name`: A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
 - `title`: Title displayed at the top of the sidebar. Must be a string.
 
-### PluginMoreMenuItem
+### PluginMoreMenuItem (Experimental)
 
 Renders a menu item in the more menu drop down, and can be used to activate other plugin UI components.
 The text within the component appears as the menu item label.
