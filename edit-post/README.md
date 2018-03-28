@@ -4,7 +4,6 @@ Extending the editor UI can be accomplished with the `registerPlugin` API, allow
 
 Refer to [the plugins module documentation](../plugins/) for more information.
 
-
 ### Plugin Components
 
 The following components can be used with the `registerplugin` ([see documentation](../plugins)) API.
