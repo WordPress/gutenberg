@@ -25,11 +25,11 @@ const { registerPlugin } = wp.plugins;
 const Component = () => (
 	<Fragment>
 		<PluginSidebar name="sidebar-name" title="My Sidebar">
-			Content of the first sidebar
+			Content of the sidebar
 		</PluginSidebar>
 		<PluginMoreMenuItem
 			name="menu-item-name"
-			title="My Second Sidebar"
+			title="My Sidebar"
 			type="sidebar"
 			target="sidebar-name">
 			My Sidebar
