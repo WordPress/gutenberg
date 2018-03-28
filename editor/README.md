@@ -12,3 +12,9 @@ Such a crucial step is handled by the grammar parsing which takes the serialized
 The *visual editor* is thus a component that contains and renders the list of block nodes from the internal state into the page. This removes any trace of imperative handling when it comes to finding a block and manipulating a block. As a matter of fact, the visual editor or the text editor are just two different—equally valid—views of the same representation of state. The internal representation of the post content is updated as blocks are updated and it is serialized back to be saved in `post_content`.
 
 Individual blocks are handled by the `VisualBlock` component, which attaches event handlers and renders the `edit` function of a block definition to the document with the corresponding attributes and local state. The `edit` function is the markup shape of a component while in editing mode.
+
+## Extending the editor UI
+
+Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
+
+Refer to [the plugins module documentation](../plugins/) for more information.
