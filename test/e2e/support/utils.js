@@ -7,7 +7,6 @@ import url from 'url';
 const BASE_URL = 'http://localhost:8888';
 const USERNAME = 'admin';
 const PASSWORD = 'password';
-const NAVIGATION_TIMEOUT = 20000;
 
 function getUrl( urlPath ) {
 	return path.join( BASE_URL, urlPath );
@@ -18,18 +17,7 @@ function getCurrentPathName() {
 }
 
 async function gotoUrl( destUrl ) {
-	const promise = page.goto( destUrl, { timeout: 0 } );
-	await new Promise( ( resolve ) => {
-		let resolved = false;
-		const markResolvedAndResolve = () => {
-			if ( ! resolved ) {
-				resolve();
-				resolved = true;
-			}
-		};
-		setTimeout( markResolvedAndResolve, NAVIGATION_TIMEOUT );
-		promise.then( markResolvedAndResolve );
-	} );
+	return page.goto( destUrl );
 }
 
 async function login() {
@@ -39,19 +27,11 @@ async function login() {
 
 	await page.type( '#user_login', USERNAME );
 	await page.type( '#user_pass', PASSWORD );
-	await page.click( '#wp-submit' );
 
-	await new Promise( ( resolve ) => {
-		let resolved = false;
-		const markResolvedAndResolve = () => {
-			if ( ! resolved ) {
-				resolve();
-				resolved = true;
-			}
-		};
-		setTimeout( markResolvedAndResolve, NAVIGATION_TIMEOUT );
-		page.waitForNavigation( { timeout: 0 } ).then( markResolvedAndResolve );
-	} );
+	return Promise.all( [
+		page.waitForNavigation(),
+		page.click( '#wp-submit' ),
+	] );
 }
 
 export async function visitAdmin( adminPath ) {
