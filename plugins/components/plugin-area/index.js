@@ -19,26 +19,7 @@ import { getPlugins, subscribe } from '../../api';
  *
  * @return {WPElement} Plugin area.
  */
-function PluginArea( { plugins } ) {
-	return (
-		<div style={ { display: 'none' } }>
-			{ map( plugins, ( plugin ) => {
-				const { render: Plugin } = plugin;
-
-				return (
-					<PluginContextProvider
-						key={ plugin.name }
-						pluginName={ plugin.name }
-					>
-						<Plugin />
-					</PluginContextProvider>
-				);
-			} ) }
-		</div>
-	);
-}
-
-class PluginsAreaProvider extends Component {
+class PluginArea extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -52,12 +33,31 @@ class PluginsAreaProvider extends Component {
 	}
 
 	componentDidMount() {
-		subscribe( this.updatePlugins.bind( this ) );
+		this.unsubscribe = subscribe( this.updatePlugins.bind( this ) );
+	}
+
+	componentWillUnmount() {
+		this.unsubscribe();
 	}
 
 	render() {
-		return <PluginArea plugins={ this.state.plugins } />;
+		return (
+			<div style={ { display: 'none' } }>
+				{ map( this.state.plugins, ( plugin ) => {
+					const { render: Plugin } = plugin;
+
+					return (
+						<PluginContextProvider
+							key={ plugin.name }
+							pluginName={ plugin.name }
+						>
+							<Plugin />
+						</PluginContextProvider>
+					);
+				} ) }
+			</div>
+		);
 	}
 }
 
-export default PluginsAreaProvider;
+export default PluginArea;
