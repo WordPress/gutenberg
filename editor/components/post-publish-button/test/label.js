@@ -36,6 +36,11 @@ describe( 'PublishButtonLabel', () => {
 		expect( label ).toBe( 'Updating…' );
 	} );
 
+	it( 'should show scheduling if scheduled and saving in progress', () => {
+		const label = PublishButtonLabel( { user, isBeingScheduled: true, isSaving: true } );
+		expect( label ).toBe( 'Scheduling…' );
+	} );
+
 	it( 'should show publish if not published and saving in progress', () => {
 		const label = PublishButtonLabel( { user, isPublished: false, isSaving: true } );
 		expect( label ).toBe( 'Publish' );
