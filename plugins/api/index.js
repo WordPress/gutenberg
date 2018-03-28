@@ -3,7 +3,7 @@
 /**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
+import { applyFilters, doAction } from '@wordpress/hooks';
 
 /**
  * External dependencies
@@ -61,7 +61,11 @@ export function registerPlugin( name, settings ) {
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
 
-	return plugins[ settings.name ] = settings;
+	plugins[ settings.name ] = settings;
+
+	doAction( 'plugins.pluginRegistered', settings, name );
+
+	return settings;
 }
 
 /**
@@ -81,6 +85,9 @@ export function unregisterPlugin( name ) {
 	}
 	const oldPlugin = plugins[ name ];
 	delete plugins[ name ];
+
+	doAction( 'plugins.pluginUnregistered', oldPlugin, name );
+
 	return oldPlugin;
 }
 
