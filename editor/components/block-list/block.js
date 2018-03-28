@@ -503,8 +503,6 @@ export class BlockListBlock extends Component {
 						uids={ [ block.uid ] }
 						rootUID={ rootUID }
 						layout={ layout }
-						isFirst={ isFirst }
-						isLast={ isLast }
 					/>
 				) }
 				{ shouldShowSettingsMenu && ! showSideInserter && (
