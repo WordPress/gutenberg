@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, PanelRow, TextControl, SelectControl } from '@wordpress/components';
+import { PanelBody, PanelRow, FormTokenField, SelectControl } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
@@ -26,7 +26,7 @@ const PANEL_NAME = 'articles-list';
 // TODO: - make panel title customizable
 // 		 - list of categories
 function ArticlesList(
-	{ 
+	{
 		isOpened,
 		onTogglePanel,
 		categories,
@@ -43,7 +43,7 @@ function ArticlesList(
 			onToggle={ onTogglePanel }
 		>
 			<PanelRow>
-				<TextControl
+				<FormTokenField
 					placeholder={ __( 'Search articles' ) }
 					onChange={ event => console.log( event ) }
 				/>
@@ -57,22 +57,22 @@ function ArticlesList(
 						label={ __( 'Category' ) }
 						options={ categories }
 						onChange={ event => console.log( event ) }
-					/> 
+					/>
 				) }
 			</PanelRow>
-			
-			<div>
-				{ isRequestingArticles ? ( <p>Loading articles...</p> ) : (
 
-					<ul>
-						{
-							articles.map( article => (
-								<li key={ article.id }>{ article.title }</li> 
-							) )
-						}
-					</ul>
-				) }
-			</div>
+			{ isRequestingArticles ? ( <PanelRow>Loading articles...</PanelRow> ) : (
+				<div>
+					{
+						articles.map( article => (
+							<PanelRow
+								key={ article.id }>
+								{ article.title }
+							</PanelRow>
+						) )
+					}
+				</div>
+			) }
 		</PanelBody>
 	);
 }
@@ -91,14 +91,18 @@ export default compose(
 		{ storeKey: 'edit-post' }
 	),
 	withSelect( ( select ) => {
-		const { getCategories, isRequestingCategories, 
-				getArticles, isRequestingArticles } = select( 'core' );
+		const {
+			getCategories,
+			isRequestingCategories,
+			getArticles,
+			isRequestingArticles,
+		} = select( 'core' );
 
 		return {
 			categories: getCategories() || [],
 			isRequestingCategories: isRequestingCategories(),
 			articles: getArticles() || [],
 			isRequestingArticles: isRequestingArticles(),
-		}
+		};
 	} )
 )( ArticlesList );
