@@ -8,14 +8,15 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * External dependencies
  */
-import { isFunction } from 'lodash';
+import { isFunction, forEach } from 'lodash';
 
 /**
  * Plugin definitions keyed by plugin name.
  *
  * @type {Object.<string,WPPlugin>}
  */
-const plugins = {};
+let plugins = {};
+const observers = [];
 
 /**
  * Registers a plugin to the editor.
@@ -61,7 +62,24 @@ export function registerPlugin( name, settings ) {
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
 
-	return plugins[ settings.name ] = settings;
+	plugins = {
+		...plugins,
+		[ settings.name ]: settings,
+	};
+
+	notifyObservers();
+
+	return settings;
+}
+
+export function subscribe( callback ) {
+	observers.push( callback );
+}
+
+function notifyObservers() {
+	forEach( observers, callback => {
+		callback( plugins );
+	} );
 }
 
 /**

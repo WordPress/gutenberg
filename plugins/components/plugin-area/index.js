@@ -4,20 +4,25 @@
 import { map } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import PluginContextProvider from '../plugin-context-provider';
-import { getPlugins } from '../../api';
+import { getPlugins, subscribe } from '../../api';
 
 /**
  * A component that renders all plugin fills in a hidden div.
  *
  * @return {WPElement} Plugin area.
  */
-function PluginArea() {
+function PluginArea( { plugins } ) {
 	return (
 		<div style={ { display: 'none' } }>
-			{ map( getPlugins(), ( plugin ) => {
+			{ map( plugins, ( plugin ) => {
 				const { render: Plugin } = plugin;
 
 				return (
@@ -33,4 +38,26 @@ function PluginArea() {
 	);
 }
 
-export default PluginArea;
+class PluginsAreaProvider extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.state = {
+			plugins: getPlugins(),
+		};
+	}
+
+	updatePlugins( plugins ) {
+		this.setState( { plugins } );
+	}
+
+	componentDidMount() {
+		subscribe( this.updatePlugins.bind( this ) );
+	}
+
+	render() {
+		return <PluginArea plugins={ this.state.plugins } />;
+	}
+}
+
+export default PluginsAreaProvider;
