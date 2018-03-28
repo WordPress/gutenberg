@@ -102,11 +102,11 @@
 		],
 		"plugins": [
 			[
-				"transform-async-generator-functions",
-				"transform-react-jsx", {
-					"pragma": "React.createElement"
-				}
-			]
+				"transform-async-generator-functions"
+			],
+			[ "transform-react-jsx", {
+				"pragma": "React.createElement"
+			} ]
 		],
 		"env": {
 			"production": {
