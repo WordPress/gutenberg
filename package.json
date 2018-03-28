@@ -36,6 +36,7 @@
     "classnames": "^2.2.5",
     "expo": "^25.0.0",
     "jed": "^1.1.1",
+    "memize": "^1.0.5",
     "react": "16.2.0",
     "react-native": "0.52.0",
     "react-redux": "^5.0.7",
