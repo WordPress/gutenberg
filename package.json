@@ -117,7 +117,10 @@
 							"output": "languages/gutenberg.pot"
 						}
 					],
-					"transform-async-generator-functions"
+					"transform-async-generator-functions",
+					[ "transform-react-jsx", {
+						"pragma": "React.createElement"
+					} ]
 				]
 			}
 		}
