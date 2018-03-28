@@ -25,14 +25,6 @@
     "prettier": "prettier --write *.js *block-management/*.js",
     "prettier-check": "prettier -l *.js *block-management/*.js"
   },
-  "jest": {
-    "preset": "jest-expo",
-    "moduleNameMapper": {
-      "@wordpress/hooks": "<rootDir>/wordpress/hooks",
-      "@wordpress/i18n": "<rootDir>/gutenberg/i18n",
-      "@gutenberg": "<rootDir>/gutenberg"
-    }
-  },
   "dependencies": {
     "babel-plugin-module-resolver": "^3.1.0",
     "classnames": "^2.2.5",
