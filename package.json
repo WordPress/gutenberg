@@ -7,8 +7,8 @@
     "babel-preset-react-native-stage-0": "^1.0.1",
     "cross-env": "^5.1.4",
     "flow-bin": "0.56.0",
+    "jest": "^22.4.3",
     "jest-react-native": "^18.0.0",
-    "jest": "21.2.1",
     "prettier": "git+https://github.com/Automattic/calypso-prettier.git#calypso-1.9",
     "react-test-renderer": "16.2.0",
     "remote-redux-devtools": "^0.5.12"
