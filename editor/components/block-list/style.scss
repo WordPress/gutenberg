@@ -34,6 +34,10 @@
 	.editor-block-list__block-edit {
 		margin-top: $block-padding;
 		margin-bottom: $block-padding;
+
+		// Prevent collapsing margins @todo try and revisit this, it's conducive to theming to allow these to collapse
+		padding-top: .1px;
+		padding-bottom: .1px;	
 	}
 
 	margin-bottom: $block-spacing;
