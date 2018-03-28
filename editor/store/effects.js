@@ -20,7 +20,6 @@ import {
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { doAction } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -65,8 +64,7 @@ import {
 	isBlockSelected,
 	getTemplate,
 	POST_UPDATE_TRANSACTION_ID,
-	getTemplateLock, isPublishingPost,
-	isGoingToPublish,
+	getTemplateLock,
 } from './selectors';
 
 /**
@@ -111,13 +109,6 @@ export default {
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-
-		// Publishing the post but not currently published
-		if ( isGoingToPublish( state ) ) {
-			// TODO: Make this asynchronous
-			doAction( 'prePublish' );
-		}
-
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
 		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
 			( newPost ) => {
