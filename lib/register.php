@@ -45,11 +45,19 @@ function gutenberg_collect_meta_box_data() {
 	if ( isset( $_REQUEST['post'] ) ) {
 		$post    = get_post( absint( $_REQUEST['post'] ) );
 		$typenow = $post->post_type;
+
+		if ( ! gutenberg_can_edit_post( $post->ID ) ) {
+			return;
+		}
 	} else {
 		// Eventually add handling for creating new posts of different types in Gutenberg.
 	}
 	$post_type        = $post->post_type;
 	$post_type_object = get_post_type_object( $post_type );
+
+	if ( ! gutenberg_can_edit_post_type( $post_type ) ) {
+		return;
+	}
 
 	$thumbnail_support = current_theme_supports( 'post-thumbnails', $post_type ) && post_type_supports( $post_type, 'thumbnail' );
 	if ( ! $thumbnail_support && 'attachment' === $post_type && $post->post_mime_type ) {
