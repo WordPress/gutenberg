@@ -5,8 +5,9 @@ dist: trusty
 language: php
 
 env:
-  - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-  - E2E_EXECUTABLE_PATH=google-chrome-stable
+  global:
+    - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+    - E2E_EXECUTABLE_PATH=google-chrome-stable
 
 services:
   - docker
