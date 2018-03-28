@@ -7,13 +7,13 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { PanelBody, PanelRow } from '@wordpress/components';
+
 import {
-	PanelBody,
-	PanelRow,
 	PostFooter,
 	PostHeader,
 	PostThemeStyle,
-} from '@wordpress/components';
+} from '@wordpress/editor';
 
 /**
  * Internal Dependencies
