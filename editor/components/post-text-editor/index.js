@@ -31,6 +31,14 @@ class PostTextEditor extends Component {
 		};
 	}
 
+	componentWillReceiveProps( nextProps ) {
+		// If we receive a new value while we're editing (but before we've made
+		// changes), go ahead and clobber the local state
+		if ( this.props.value !== nextProps.value && this.state.value && ! this.state.isDirty ) {
+			this.setState( { value: nextProps.value } );
+		}
+	}
+
 	startEditing() {
 		// Copying the post content into local state ensures that edits won't be
 		// clobbered by changes to global editor state
