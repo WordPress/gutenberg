@@ -115,6 +115,8 @@ A pull request can generally be merged once it is:
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
+Please make sure to assign your merged pull request to its release milestone. Doing so creates the historical legacy of what code landed when, and makes it possible for all project contributors (even non-technical ones) to access this information.
+
 ### Closing Pull Requests
 
 Sometimes, a pull request may not be mergeable, no matter how much additional effort is applied to it (e.g. out of scope). In these cases, it’s best to communicate with the contributor graciously while describing why the pull request was closed, this encourages productive future involvement.
