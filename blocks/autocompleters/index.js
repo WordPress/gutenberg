@@ -110,7 +110,7 @@ export function userAutocompleter() {
 	const getOptions = ( search ) => {
 		let payload = '';
 		if ( search ) {
-			payload = '?search=' + search;
+			payload = '?search=' + encodeURIComponent( search );
 		}
 		return wp.apiRequest( { path: '/wp/v2/users' + payload } ).then( ( users ) => {
 			return users.map( ( user ) => {
