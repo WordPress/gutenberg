@@ -64,11 +64,11 @@ wp.hooks.addFilter(
 
 #### `blocks.isUnmodifiedDefaultBlock.attributes`
 
-TBD
+Used internally by the default block (paragraph) to exclude the attributes from the check if the block was modified.
 
 #### `blocks.switchToBlockType.transformedBlock`
 
-TBD
+Used to filters an individual transform result from block transformation. All of the original blocks are passed, since transformations are many-to-many, not one-to-one.
 
 ## Removing Blocks
 
