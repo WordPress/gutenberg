@@ -93,7 +93,7 @@ function Layout( {
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />
 			}
-			<PluginScreenTakeover.Slot name={ screenTakeoverName } />
+			<PluginScreenTakeover.Slot />
 			<Popover.Slot />
 			<PluginArea />
 		</div>
@@ -105,7 +105,6 @@ export default compose(
 		mode: select( 'core/edit-post' ).getEditorMode(),
 		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
-		screenTakeoverName: select( 'core/edit-post' ).getActiveScreenTakeoverName(),
 		sidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
 		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
