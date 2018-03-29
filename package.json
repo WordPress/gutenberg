@@ -10,7 +10,7 @@
     "jest": "^22.4.3",
     "jest-react-native": "^18.0.0",
     "prettier": "git+https://github.com/Automattic/calypso-prettier.git#calypso-1.9",
-    "react-test-renderer": "16.2.0",
+    "react-test-renderer": "^16.3.0-alpha.1",
     "remote-redux-devtools": "^0.5.12"
   },
   "scripts": {
@@ -26,8 +26,8 @@
     "babel-plugin-module-resolver": "^3.1.0",
     "classnames": "^2.2.5",
     "jed": "^1.1.1",
-    "react": "16.2.0",
-    "react-native": "0.52.0",
+    "react": "^16.3.0-alpha.1",
+    "react-native": "0.54.3",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2"
   }
