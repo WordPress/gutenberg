@@ -10,6 +10,10 @@ if ( process.env.TEST_RN_PLATFORM ) {
 
 module.exports = {
 	preset: 'jest-expo',
+	testPathIgnorePatterns: [
+		"/node_modules/",
+		"/gutenberg/"
+	],
 	moduleNameMapper: {
 		'@wordpress/hooks': '<rootDir>/wordpress/hooks',
 		'@wordpress/i18n': '<rootDir>/gutenberg/i18n',
