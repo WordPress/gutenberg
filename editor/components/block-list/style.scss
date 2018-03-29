@@ -37,7 +37,7 @@
 
 		// Prevent collapsing margins @todo try and revisit this, it's conducive to theming to allow these to collapse
 		padding-top: .1px;
-		padding-bottom: .1px;	
+		padding-bottom: .1px;
 	}
 
 	margin-bottom: $block-spacing;
@@ -259,34 +259,32 @@
 			border-right-width: 0;
 		}
 
-		.editor-block-mover {
+		// Adjust how movers behave on the full-wide block, and don't affect children
+		> .editor-block-mover {
 			display: none;
 		}
 
 		@include break-wide() {
-			.editor-block-mover {
+			> .editor-block-mover {
 				display: block;
 				top: -29px;
 				left: 10px;
 				height: auto;
+				width: auto;
+				z-index: inherit;
 
 				&:before {
 					content: none;
 				}
 			}
 
-			.editor-block-mover__control {
+			> .editor-block-mover .editor-block-mover__control {
 				float: left;
-				margin-right: 8px;
 			}
 		}
 
-		.editor-block-settings-menu__control {
-			float: left;
-			margin-right: 8px;
-		}
-
-		.editor-block-settings-menu {
+		// Also adjust block settings menu
+		> .editor-block-settings-menu {
 			top: -41px;
 			right: 10px;
 			height: auto;
@@ -294,6 +292,10 @@
 			&:before {
 				content: none;
 			}
+		}
+
+		> .editor-block-settings-menu .editor-block-settings-menu__control {
+			float: left;
 		}
 	}
 
@@ -555,8 +557,15 @@
 	margin-right: -$block-padding - 1px;
 
 	@include break-small() {
-		margin-left: -$block-padding - $block-side-ui-padding - 1px;	// stack borders
+		// stack borders
+		margin-left: -$block-padding - $block-side-ui-padding - 1px;
 		margin-right: -$block-padding - $block-side-ui-padding - 1px;
+
+		// except for wide elements, this causes a horizontal scrollbar
+		[data-align="full"] & {
+			margin-left: -$block-padding - $block-side-ui-padding;
+			margin-right: -$block-padding - $block-side-ui-padding;
+		}
 	}
 
 	// on mobile, toolbars fix differently
@@ -569,6 +578,7 @@
 	& > * {
 		pointer-events: auto;
 	}
+
 }
 
 .editor-block-contextual-toolbar .editor-block-toolbar,
