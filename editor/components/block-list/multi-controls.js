@@ -16,7 +16,7 @@ import {
 	getBlockCount,
 } from '../../store/selectors';
 
-function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting, firstIndex, lastIndex, blockCount } ) {
+function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting, isFirst, isLast } ) {
 	if ( isSelecting ) {
 		return null;
 	}
@@ -26,8 +26,8 @@ function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting,
 			key="mover"
 			rootUID={ rootUID }
 			uids={ multiSelectedBlockUids }
-			isFirst={ firstIndex === 0 }
-			isLast={ lastIndex + 1 === blockCount }
+			isFirst={ isFirst }
+			isLast={ isLast }
 		/>,
 		<BlockSettingsMenu
 			key="menu"
@@ -41,12 +41,14 @@ function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting,
 export default connect( ( state, ownProps ) => {
 	const { rootUID } = ownProps;
 	const uids = getMultiSelectedBlockUids( state );
-
+    
+    const firstIndex = getBlockIndex( state, first( uids ), rootUID )
+    const lastIndex = getBlockIndex( state, last( uids ), rootUID )
+    
 	return {
 		multiSelectedBlockUids: uids,
 		isSelecting: isMultiSelecting( state ),
-		firstIndex: getBlockIndex( state, first( uids ), rootUID ),
-		lastIndex: getBlockIndex( state, last( uids ), rootUID ),
-		blockCount: getBlockCount( state ),
+        isFirst: firstIndex === 0,
+		isLast: lastIndex + 1 === getBlockCount( state ),
 	};
 } )( BlockListMultiControls );
