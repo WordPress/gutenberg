@@ -1,5 +1,7 @@
 {
-  "presets": ["babel-preset-expo"],
+  "presets": [
+    "babel-preset-react-native-stage-0/decorator-support"
+  ],
   "plugins": [
     [
       "module-resolver",
@@ -9,13 +11,20 @@
           "@wordpress/i18n": "./gutenberg/i18n",
           "@gutenberg": "./gutenberg"
         },
-        "extensions": [".js", ".native.js", ".ios.js", ".android.js"]
+        "extensions": [
+          ".js",
+          ".native.js",
+          ".ios.js",
+          ".android.js"
+        ]
       }
     ]
   ],
   "env": {
     "development": {
-      "plugins": ["transform-react-jsx-source"]
+      "plugins": [
+        "transform-react-jsx-source"
+      ]
     }
   }
 }
