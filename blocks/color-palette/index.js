@@ -59,9 +59,14 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 					renderContent={ () => (
 						<ChromePicker
 							color={ value }
-							// onChangeComplete={ ( color ) => onChange( color.hex ) }
 							onChangeComplete={ ( color ) => {
-								const colorString = color.rgb.a === 1 ? color.hex : sprintf( 'rgba(%s,%s,%s,%s)', color.rgb.r, color.rgb.g, color.rgb.b, color.rgb.a );
+								let colorString;
+								if ( color.rgb.a === 1 ) {
+									colorString = color.hex;
+								} else {
+									const { r, g, b, a } = color.rgb;
+									colorString = 'rgba(' + [ r, g, b, a ].join( ',' ) + ')';
+								}								
 								onChange( colorString );
 							} }
 							style={ { width: '100%' } }
