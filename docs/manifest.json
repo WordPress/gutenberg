@@ -60,12 +60,6 @@
 		"parent": "extensibility"
 	},
 	{
-		"title": "Plugins API",
-		"slug": "plugins-api",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/plugins\/README.md",
-		"parent": "extensibility"
-	},
-	{
 		"title": "Meta Boxes",
 		"slug": "meta-box",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/meta-box.md",

@@ -1,8 +1,10 @@
 # Extending Blocks (Experimental)
 
+[Hooks](https://developer.wordpress.org/plugins/hooks/) are a way for one piece of code to interact/modify another piece of code. They make up the foundation for how plugins and themes interact with Gutenberg, but they’re also used extensively by WordPress Core itself. There are two types of hooks: [Actions](https://developer.wordpress.org/plugins/hooks/actions/) and [Filters](https://developer.wordpress.org/plugins/hooks/filters/). They were initially implemented in PHP, but for the purpose of Gutenberg they were ported to JavaScript and published to npm as [@wordpress/hooks](https://www.npmjs.com/package/@wordpress/hooks) package for general purpose use. You can also learn more about both APIs: [PHP](https://codex.wordpress.org/Plugin_API/) and [JavaScript](https://github.com/WordPress/packages/tree/master/packages/hooks).
+
 ## Modifying Blocks
 
-To modify the behaviour of existing blocks, Gutenberg exposes the following filters:
+To modify the behavior of existing blocks, Gutenberg exposes the following Filters:
 
 #### `blocks.registerBlockType`
 

@@ -29,7 +29,7 @@ If you want to learn more about block creation, The [Blocks Tutorial](./blocks) 
 
 ## Extending Blocks
 
-It is also possible to modify the behaviour of the existing blocks or even remove them completely using filters.
+It is also possible to modify the behavior of the existing blocks or even remove them completely using filters.
 
 Learn more in the [Extending Blocks](./extensibility/extending-blocks) documentation.
 
@@ -41,7 +41,7 @@ Refer to the [Plugins API](./extensibility/plugins-api) documentation for more i
 
 ## Meta Boxes
 
-**It is highly encouraged converting PHP meta boxes to blocks!**
+**Converting PHP meta boxes to blocks is highly encouraged!**
 
 Discover how [Meta Box](./extensibility/meta-box) support works in Gutenberg.
 
