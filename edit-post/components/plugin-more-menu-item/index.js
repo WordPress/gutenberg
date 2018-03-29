@@ -12,6 +12,7 @@ import { Slot, Fill, withContext } from '@wordpress/components';
  * Internal dependencies
  */
 import PluginSidebarMoreMenuItem from './plugin-sidebar-more-menu-item';
+import PluginScreenTakeoverMoreMenuItem from './plugin-screen-takeover-more-menu-item';
 
 /**
  * Name of slot in which the more menu items should fill.
@@ -30,6 +31,8 @@ let PluginMoreMenuItem = ( props ) => (
 			switch ( type ) {
 				case 'sidebar':
 					return <PluginSidebarMoreMenuItem { ...newProps } />;
+				case 'screen-takeover':
+					return <PluginScreenTakeoverMoreMenuItem { ...newProps } />;
 			}
 			return null;
 		} }

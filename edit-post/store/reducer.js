@@ -36,6 +36,16 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				...state,
 				activeGeneralSidebar: null,
 			};
+		case 'OPEN_SCREEN_TAKEOVER':
+			return {
+				...state,
+				activeScreenTakeover: action.name,
+			};
+		case 'CLOSE_SCREEN_TAKEOVER':
+			return {
+				...state,
+				activeScreenTakeover: null,
+			};
 		case 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL':
 			return {
 				...state,

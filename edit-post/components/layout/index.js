@@ -34,6 +34,7 @@ import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import PluginSidebar from '../plugin-sidebar';
+import PluginScreenTakeover from '../plugin-screen-takeover';
 
 function Layout( {
 	mode,
@@ -91,6 +92,7 @@ function Layout( {
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />
 			}
+			<PluginScreenTakeover.Slot />
 			<Popover.Slot />
 			<PluginArea />
 		</div>

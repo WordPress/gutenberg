@@ -20,6 +20,7 @@ import { initializeMetaBoxState } from './store/actions';
 
 import PluginSidebar from './components/plugin-sidebar';
 import PluginMoreMenuItem from './components/plugin-more-menu-item';
+import PluginScreenTakeover from './components/plugin-screen-takeover';
 
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
@@ -95,4 +96,5 @@ export function initializeEditor( id, post, settings ) {
 export const __experimental = {
 	PluginSidebar,
 	PluginMoreMenuItem,
+	PluginScreenTakeover,
 };
