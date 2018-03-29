@@ -1,11 +1,11 @@
 # Extensibility
 
-Extensibility is key for WordPress and like the rest of WordPress components, Gutenberg is highly extensible.
+Extensibility is key for WordPress and, like the rest of WordPress components, Gutenberg is highly extensible.
 
 
 ## Creating Blocks
 
-Gutenberg is about blocks and the main extensibility API of Gutenberg is the Block API. It allows you to create your own static blocks, dynamic blocks rendered on the server and also blocks capable of saving data to Post Meta for more structured content.
+Gutenberg is about blocks, and the main extensibility API of Gutenberg is the Block API. It allows you to create your own static blocks, dynamic blocks rendered on the server and also blocks capable of saving data to Post Meta for more structured content.
 
 Here is a small example of a static custom block type (you can try it in your browser's console):
 
@@ -25,11 +25,11 @@ wp.blocks.registerBlockType( 'mytheme/red-block', {
 } );
 ```
 
-If you want to learn more about block creation, The [Blocks Tutorial](./blocks) is the best place to start.
+If you want to learn more about block creation, the [Blocks Tutorial](./blocks) is the best place to start.
 
 ## Extending Blocks
 
-It is also possible to modify the behavior of the existing blocks or even remove them completely using filters.
+It is also possible to modify the behavior of existing blocks or even remove them completely using filters.
 
 Learn more in the [Extending Blocks](./extensibility/extending-blocks) documentation.
 
