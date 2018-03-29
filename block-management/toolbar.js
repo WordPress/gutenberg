@@ -5,8 +5,8 @@ import { StyleSheet, Text, View, Button } from 'react-native';
 import { ToolbarButton } from './constants';
 
 type PropsType = {
-	index: number,
-	onButtonPressed: ( button: number, index: number ) => void,
+	uid: string,
+	onButtonPressed: ( button: number, uid: string ) => void,
 };
 
 export default class Toolbar extends React.Component<PropsType> {
@@ -15,12 +15,12 @@ export default class Toolbar extends React.Component<PropsType> {
 			<View style={ styles.toolbar }>
 				<Button
 					style={ styles.toolbarButton }
-					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.UP, this.props.index ) }
+					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.UP, this.props.uid ) }
 					title="Up"
 				/>
 				<Button
 					style={ styles.toolbarButton }
-					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DOWN, this.props.index ) }
+					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DOWN, this.props.uid ) }
 					title="Down"
 				/>
 				<Button
@@ -28,17 +28,13 @@ export default class Toolbar extends React.Component<PropsType> {
 					onPress={ this.props.onButtonPressed.bind(
 						this,
 						ToolbarButton.SETTINGS,
-						this.props.index
+						this.props.uid
 					) }
 					title="Settings"
 				/>
 				<Button
 					style={ styles.toolbarButton }
-					onPress={ this.props.onButtonPressed.bind(
-						this,
-						ToolbarButton.DELETE,
-						this.props.index
-					) }
+					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DELETE, this.props.uid ) }
 					title="Delete"
 				/>
 			</View>
