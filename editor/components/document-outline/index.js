@@ -2,19 +2,21 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { filter, countBy } from 'lodash';
+import { countBy, filter, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/element';
+import { withAPIData } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import DocumentOutlineItem from './item';
-import { getBlocks, getEditedPostAttribute } from '../../store/selectors';
+import { getBlocks, getCurrentPostType, getEditedPostAttribute } from '../../store/selectors';
 import { selectBlock } from '../../store/actions';
 
 /**
@@ -59,7 +61,7 @@ const getHeadingLevel = heading => {
 
 const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
+export const DocumentOutline = ( { blocks = [], title, onSelect, postType } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
 	if ( headings.length < 1 ) {
@@ -79,6 +81,8 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 		}
 	};
 
+	const isTitleSupported = get( postType, [ 'data', 'supports', 'title' ], false );
+	const hasTitle = isTitleSupported && title;
 	const items = headings.map( ( heading ) => ( {
 		...heading,
 		level: getHeadingLevel( heading ),
@@ -90,7 +94,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 	return (
 		<div className="document-outline">
 			<ul>
-				{ title && (
+				{ hasTitle && (
 					<DocumentOutlineItem
 						level="Title"
 						isValid
@@ -108,7 +112,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 						! item.isEmpty &&
 						! isIncorrectLevel &&
 						!! item.level &&
-						( item.level !== 1 || ( ! hasMultipleH1 && ! title ) )
+						( item.level !== 1 || ( ! hasMultipleH1 && ! hasTitle ) )
 					);
 					prevHeadingLevel = item.level;
 
@@ -122,7 +126,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 							{ item.isEmpty ? emptyHeadingContent : item.attributes.content }
 							{ isIncorrectLevel && incorrectLevelContent }
 							{ item.level === 1 && hasMultipleH1 && multipleH1Headings }
-							{ title && item.level === 1 && ! hasMultipleH1 && singleH1Headings }
+							{ hasTitle && item.level === 1 && ! hasMultipleH1 && singleH1Headings }
 						</DocumentOutlineItem>
 					);
 				} ) }
@@ -131,16 +135,24 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 	);
 };
 
-export default connect(
-	( state ) => {
-		return {
-			title: getEditedPostAttribute( state, 'title' ),
-			blocks: getBlocks( state ),
-		};
-	},
-	{
-		onSelect( uid ) {
-			return selectBlock( uid );
+export default compose(
+	connect(
+		( state ) => {
+			return {
+				title: getEditedPostAttribute( state, 'title' ),
+				blocks: getBlocks( state ),
+				postTypeName: getCurrentPostType( state ),
+			};
 		},
-	}
+		{
+			onSelect( uid ) {
+				return selectBlock( uid );
+			},
+		},
+	),
+	withAPIData( ( { postTypeName } ) => {
+		return {
+			postType: postTypeName ? `/wp/v2/types/${ postTypeName }?context=edit` : undefined,
+		};
+	} )
 )( DocumentOutline );

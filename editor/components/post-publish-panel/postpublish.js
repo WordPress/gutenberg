@@ -9,12 +9,13 @@ import { connect } from 'react-redux';
  */
 import { PanelBody, Button, ClipboardButton, withAPIData } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Component, compose } from '@wordpress/element';
+import { Component, compose, Fragment } from '@wordpress/element';
 
 /**
  * Internal Dependencies
  */
-import { getCurrentPost, getCurrentPostType } from '../../store/selectors';
+import PostScheduleLabel from '../post-schedule/label';
+import { getCurrentPost, getCurrentPostType, isCurrentPostScheduled } from '../../store/selectors';
 
 class PostPublishPanelPostpublish extends Component {
 	constructor() {
@@ -48,16 +49,23 @@ class PostPublishPanelPostpublish extends Component {
 	}
 
 	render() {
-		const { post, postType } = this.props;
+		const { isScheduled, post, postType } = this.props;
 		const viewPostLabel = get( postType, [ 'data', 'labels', 'view_item' ] );
+
+		const postPublishNonLinkHeader = isScheduled ?
+			<Fragment>{ __( 'is now scheduled. It will go live on' ) } <PostScheduleLabel />.</Fragment> :
+			__( 'is now live.' );
+		const postPublishBodyText = isScheduled ?
+			__( 'The post address will be:' ) :
+			__( 'What\'s next?' );
 
 		return (
 			<div className="post-publish-panel__postpublish">
 				<PanelBody className="post-publish-panel__postpublish-header">
-					<a href={ post.link }>{ post.title || __( '(no title)' ) }</a>{ __( ' is now live.' ) }
+					<a href={ post.link }>{ post.title || __( '(no title)' ) }</a> { postPublishNonLinkHeader }
 				</PanelBody>
 				<PanelBody>
-					<div><strong>{ __( 'What\'s next?' ) }</strong></div>
+					<div><strong>{ postPublishBodyText }</strong></div>
 					<input
 						className="post-publish-panel__postpublish-link-input"
 						readOnly
@@ -65,9 +73,11 @@ class PostPublishPanelPostpublish extends Component {
 						onFocus={ this.onSelectInput }
 					/>
 					<div className="post-publish-panel__postpublish-buttons">
-						<Button className="button" href={ post.link }>
-							{ viewPostLabel }
-						</Button>
+						{ ! isScheduled && (
+							<Button className="button" href={ post.link }>
+								{ viewPostLabel }
+							</Button>
+						) }
 
 						<ClipboardButton className="button" text={ post.link } onCopy={ this.onCopy }>
 							{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy Link' ) }
@@ -84,6 +94,7 @@ const applyConnect = connect(
 		return {
 			post: getCurrentPost( state ),
 			postTypeSlug: getCurrentPostType( state ),
+			isScheduled: isCurrentPostScheduled( state ),
 		};
 	}
 );
