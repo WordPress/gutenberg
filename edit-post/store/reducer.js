@@ -31,6 +31,17 @@ export const preferences = combineReducers( {
 
 		return state;
 	},
+	activeScreenTakeover( state = PREFERENCES_DEFAULTS.activeScreenTakeover, action ) {
+		switch ( action.type ) {
+			case 'OPEN_SCREEN_TAKEOVER':
+				return action.name;
+
+			case 'CLOSE_SCREEN_TAKEOVER':
+				return null;
+		}
+
+		return state;
+	},
 	panels( state = PREFERENCES_DEFAULTS.panels, action ) {
 		if ( action.type === 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL' ) {
 			return {

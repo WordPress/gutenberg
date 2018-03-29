@@ -29,12 +29,13 @@ import './style.scss';
 import BlockSidebar from '../sidebar/block-sidebar';
 import DocumentSidebar from '../sidebar/document-sidebar';
 import Header from '../header';
+import Sidebar from '../sidebar';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import Sidebar from '../sidebar';
+import PluginScreenTakeover from '../plugin-screen-takeover';
 
 function Layout( {
 	mode,
@@ -92,6 +93,7 @@ function Layout( {
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />
 			}
+			<PluginScreenTakeover.Slot />
 			<Popover.Slot />
 			<PluginArea />
 		</div>
