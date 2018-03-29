@@ -6,10 +6,13 @@
         "attributes": {
             "content": [
                 "This is a ",
-                {
-                    "type": "em",
-                    "children": "subhead"
-                },
+                [
+                    "em",
+                    {},
+                    [
+                        "subhead"
+                    ]
+                ],
                 "."
             ]
         },

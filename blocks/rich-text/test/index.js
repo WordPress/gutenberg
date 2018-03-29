@@ -18,7 +18,7 @@ import { diffAriaProps, pickAriaProps } from '../aria';
 
 describe( 'createTinyMCEElement', () => {
 	const type = 'p';
-	const children = <p>Child</p>;
+	const children = createTinyMCEElement( 'p', {}, 'Child' );
 
 	test( 'should return null', () => {
 		const props = {
@@ -42,7 +42,7 @@ describe( 'createTinyMCEElement', () => {
 			'a-prop': 'hi',
 		};
 
-		const wrapper = shallow( createTinyMCEElement( type, props, children ) );
+		const wrapper = createTinyMCEElement( type, props, children );
 		expect( wrapper ).toMatchSnapshot();
 	} );
 } );

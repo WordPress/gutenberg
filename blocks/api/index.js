@@ -42,3 +42,4 @@ export {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from './templates';
+export { nodeListToTree } from './matchers';

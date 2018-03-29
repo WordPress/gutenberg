@@ -242,9 +242,7 @@ export const settings = {
 				className={ style === 2 ? 'is-large' : '' }
 				style={ { textAlign: align ? align : null } }
 			>
-				{ value.map( ( paragraph, i ) => (
-					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-				) ) }
+				{ value.map( ( paragraph ) => paragraph.children ) }
 				{ citation && citation.length > 0 && (
 					<cite>{ citation }</cite>
 				) }
@@ -271,9 +269,7 @@ export const settings = {
 						className={ `blocks-quote-style-${ style }` }
 						style={ { textAlign: align ? align : null } }
 					>
-						{ value.map( ( paragraph, i ) => (
-							<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-						) ) }
+						{ value.map( ( paragraph ) => paragraph.children ) }
 						{ citation && citation.length > 0 && (
 							<footer>{ citation }</footer>
 						) }

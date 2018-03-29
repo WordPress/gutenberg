@@ -14,7 +14,6 @@ import {
 	noop,
 	reject,
 } from 'lodash';
-import { nodeListToReact } from 'dom-react';
 import 'element-closest';
 
 /**
@@ -28,7 +27,7 @@ import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
-import { rawHandler } from '../api';
+import { rawHandler, nodeListToTree } from '../api';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
@@ -36,6 +35,23 @@ import patterns from './patterns';
 import { EVENTS } from './constants';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
+
+function toElement( value ) {
+	if ( ! value ) {
+		return null;
+	}
+
+	if ( ! Array.isArray( value ) ) {
+		return value;
+	}
+
+	const [ type, attributes, children ] = value;
+	if ( ! attributes || attributes.constructor !== Object ) {
+		return value.map( toElement );
+	}
+
+	return createElement( type, attributes, children.map( toElement ) );
+}
 
 export function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -46,11 +62,11 @@ export function createTinyMCEElement( type, props, ...children ) {
 		return children;
 	}
 
-	return createElement(
+	return [
 		type,
 		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
-		...children
-	);
+		children,
+	];
 }
 
 /**
@@ -530,8 +546,8 @@ export class RichText extends Component {
 				const index = dom.nodeIndex( selectedNode );
 				const beforeNodes = childNodes.slice( 0, index );
 				const afterNodes = childNodes.slice( index + 1 );
-				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
-				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
+				const beforeElement = nodeListToTree( beforeNodes, createTinyMCEElement );
+				const afterElement = nodeListToTree( afterNodes, createTinyMCEElement );
 
 				this.restoreContentAndSplit( beforeElement, afterElement );
 			} else {
@@ -590,8 +606,8 @@ export class RichText extends Component {
 			const beforeFragment = beforeRange.extractContents();
 			const afterFragment = afterRange.extractContents();
 
-			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = nodeListToReact( filterEmptyNodes( afterFragment.childNodes ), createTinyMCEElement );
+			const beforeElement = nodeListToTree( beforeFragment.childNodes, createTinyMCEElement );
+			const afterElement = nodeListToTree( filterEmptyNodes( afterFragment.childNodes ), createTinyMCEElement );
 
 			this.restoreContentAndSplit( beforeElement, afterElement, blocks );
 		} else {
@@ -642,8 +658,8 @@ export class RichText extends Component {
 		this.setContent( this.props.value );
 
 		this.restoreContentAndSplit(
-			nodeListToReact( before, createTinyMCEElement ),
-			nodeListToReact( after, createTinyMCEElement )
+			nodeListToTree( before, createTinyMCEElement ),
+			nodeListToTree( after, createTinyMCEElement )
 		);
 	}
 
@@ -682,7 +698,7 @@ export class RichText extends Component {
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
+		return nodeListToTree( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
 	componentWillUnmount() {
@@ -823,7 +839,7 @@ export class RichText extends Component {
 					getSettings={ this.getSettings }
 					onSetup={ this.onSetup }
 					style={ style }
-					defaultValue={ value }
+					defaultValue={ toElement( value ) }
 					isPlaceholderVisible={ isPlaceholderVisible }
 					aria-label={ placeholder }
 					{ ...ariaProps }

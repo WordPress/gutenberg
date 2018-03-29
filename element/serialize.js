@@ -246,6 +246,17 @@ function hasPrefixes( string, prefixes ) {
 }
 
 /**
+ * Returns true if the given argument can be inferred to be a props object.
+ *
+ * @param {*} object Object to test.
+ *
+ * @return {boolean} Whether object is props.
+ */
+function isPropsLike( object ) {
+	return object && object.constructor === Object && ! ( '$$typeof' in object );
+}
+
+/**
  * Returns true if the given prop name should be ignored in attributes
  * serialization, or false otherwise.
  *
@@ -271,6 +282,11 @@ function renderElement( element, context = {} ) {
 	}
 
 	if ( Array.isArray( element ) ) {
+		if ( isPropsLike( element[ 1 ] ) ) {
+			const [ type, props, children ] = element;
+			return renderElement( { type, props: { ...props, children } }, context );
+		}
+
 		return element.map( ( childElement ) => (
 			renderElement( childElement, context )
 		) ).join( '' );
@@ -369,7 +385,11 @@ function renderChildren( children, context = {} ) {
 		if ( typeof child === 'string' ) {
 			result += escapeHTML( child );
 		} else if ( Array.isArray( child ) ) {
-			result += renderChildren( child, context );
+			if ( isPropsLike( child[ 1 ] ) ) {
+				result += renderElement( child, context );
+			} else {
+				result += renderChildren( child, context );
+			}
 		} else if ( typeof child === 'object' && child ) {
 			result += renderElement( child, context );
 		} else if ( typeof child === 'number' ) {

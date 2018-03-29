@@ -6,10 +6,13 @@
         "attributes": {
             "content": [
                 "The ",
-                {
-                    "type": "em",
-                    "children": "Inserter"
-                },
+                [
+                    "em",
+                    {},
+                    [
+                        "Inserter"
+                    ]
+                ],
                 " Tool"
             ],
             "nodeName": "H2"
