@@ -37,6 +37,8 @@ export function PublishButtonLabel( {
 		return __( 'Publishing…' );
 	} else if ( isPublished && isSaving ) {
 		return __( 'Updating…' );
+	} else if ( isBeingScheduled && isSaving ) {
+		return __( 'Scheduling…' );
 	}
 
 	if ( isContributor ) {

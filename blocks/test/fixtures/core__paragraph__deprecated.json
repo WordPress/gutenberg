@@ -6,13 +6,13 @@
         "attributes": {
             "content": [
                 {
-                    "_owner": null,
-                    "_store": {},
                     "key": "html",
+                    "ref": null,
                     "props": {
                         "children": "Unwrapped is <em>still</em> valid."
                     },
-                    "ref": null
+                    "_owner": null,
+                    "_store": {}
                 }
             ],
             "dropCap": false

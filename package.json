@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "2.4.0",
+	"version": "2.5.0",
 	"description": "A new WordPress editor experience",
 	"main": "build/app.js",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -17,7 +17,7 @@
 	"dependencies": {
 		"@wordpress/a11y": "1.0.6",
 		"@wordpress/autop": "1.0.4",
-		"@wordpress/hooks": "1.1.4",
+		"@wordpress/hooks": "1.1.6",
 		"@wordpress/url": "1.0.3",
 		"classnames": "2.2.5",
 		"clipboard": "1.7.1",
@@ -39,7 +39,7 @@
 		"querystringify": "1.0.0",
 		"re-resizable": "4.0.3",
 		"react": "16.2.0",
-		"react-autosize-textarea": "2.0.0",
+		"react-autosize-textarea": "3.0.2",
 		"react-click-outside": "2.3.1",
 		"react-color": "2.13.4",
 		"react-datepicker": "0.61.0",
