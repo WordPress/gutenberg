@@ -41,7 +41,6 @@ function Layout( {
 	mode,
 	editorSidebarOpened,
 	pluginSidebarOpened,
-	screenTakeoverName,
 	publishSidebarOpened,
 	hasFixedToolbar,
 	closePublishSidebar,
@@ -94,7 +93,7 @@ function Layout( {
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />
 			}
-			<PluginScreenTakeover.Slot name={ screenTakeoverName } />
+			<PluginScreenTakeover.Slot />
 			<Popover.Slot />
 			<PluginArea />
 		</div>
