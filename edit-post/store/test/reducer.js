@@ -25,6 +25,19 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should set the active screen takeover', () => {
+			const state = preferences( deepFreeze( {
+				activeScreenTakeover: null,
+			} ), {
+				type: 'OPEN_SCREEN_TAKEOVER',
+				name: 'my-namespace/my-screen-takeover',
+			} );
+
+			expect( state ).toEqual( {
+				activeScreenTakeover: 'my-namespace/my-screen-takeover',
+			} );
+		} );
+
 		it( 'should set the general sidebar active panel', () => {
 			const state = preferences( deepFreeze( {
 				activeGeneralSidebar: 'editor',
