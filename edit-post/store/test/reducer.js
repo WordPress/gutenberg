@@ -19,10 +19,21 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				activeGeneralSidebar: 'edit-post/document',
+				activeScreenTakeover: null,
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
 			} );
+		} );
+
+		it( 'should set the active screen takeover', () => {
+			const original = deepFreeze( preferences( undefined, {} ) );
+			const state = preferences( original, {
+				type: 'OPEN_SCREEN_TAKEOVER',
+				name: 'my-namespace/my-screen-takeover',
+			} );
+
+			expect( state.activeScreenTakeover ).toBe( 'my-namespace/my-screen-takeover' );
 		} );
 
 		it( 'should set the general sidebar', () => {
