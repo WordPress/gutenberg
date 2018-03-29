@@ -17,7 +17,7 @@ import { combineReducers } from '@wordpress/data';
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Object} Updated state.
  */
 export function terms( state = {}, action ) {
 	switch ( action.type ) {
@@ -48,7 +48,7 @@ export function terms( state = {}, action ) {
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {Object} Updated state.
  */
 export function media( state = {}, action ) {
 	switch ( action.type ) {
@@ -62,7 +62,28 @@ export function media( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing post types state. Keyed by slug.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function postTypes( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_POST_TYPES':
+			return {
+				...state,
+				...keyBy( action.postTypes, 'slug' ),
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	media,
+	postTypes,
 } );
