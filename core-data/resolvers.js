@@ -17,9 +17,3 @@ export async function* getCategories() {
 	const categories = await apiRequest( { path: '/wp/v2/categories' } );
 	yield receiveTerms( 'categories', categories );
 }
-
-export async function* getArticles() {
-	yield setRequested( 'terms', 'articles' );
-	const articles = await apiRequest( { path: '/wp/v2/articles' } );
-	yield receiveTerms( 'articles', articles );
-}

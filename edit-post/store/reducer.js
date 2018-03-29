@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -154,10 +154,35 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
+/**
+ * Reducer keeping track of the state of articles
+ * This includes:
+ * 	- selectedCategory
+ * 	- searchTerm
+ * @param  {Object}	state 	Prvious state.
+ * @param  {Object} action 	Action object.
+ * @return {Object}			Updated state.
+ */
+export function search( state = { }, action ) {
+	switch ( action.type ) {
+		case 'SET_ARTICLES':
+		case 'UPDATE_SEARCH_VALUES':
+			return { 
+				...state,
+				...omit( action, [ 'type' ] ) 
+			};
+		case 'SEARCH_ARTICLES':
+			return state;
+		default:
+	 		return state;
+	}
+}
+
 export default combineReducers( {
 	preferences,
 	panel,
 	publishSidebarActive,
 	metaBoxes,
 	isSavingMetaBoxes,
+	search,
 } );

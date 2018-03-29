@@ -17,6 +17,8 @@ import {
 	metaBoxUpdatesSuccess,
 	setMetaBoxSavedData,
 	requestMetaBoxUpdates,
+	searchArticles,
+	setArticles,
 } from './actions';
 import { getMetaBoxes } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
@@ -90,6 +92,22 @@ const effects = {
 		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
 		speak( message, 'assertive' );
 	},
+	UPDATE_SEARCH_VALUES( action, store ) {
+		const { dispatch } = store;
+		dispatch( searchArticles() );
+	},
+	SEARCH_ARTICLES( action, store ) {	
+		const state	= store.getState();
+		const { dispatch } = store;
+
+		// request articles
+		wp.apiRequest( { 
+			path: '/wp/v2/articles',
+			data: { category_id: state.search.selectedCategory, s: state.search.searchTerm }
+		} ).then( articles => {
+			store.dispatch( setArticles( articles) );
+		});
+	}
 };
 
 export default effects;

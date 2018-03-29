@@ -8,15 +8,24 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, PanelRow, FormTokenField, SelectControl } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { PanelBody, PanelRow, TextControl, SelectControl } from '@wordpress/components';
+import { compose, Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
-import { isEditorSidebarPanelOpened } from '../../../store/selectors';
-import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
+import { 
+	isEditorSidebarPanelOpened,
+	getSelectedCategory,
+	getSearchTerm,
+	getArticles,
+} from '../../../store/selectors';
+import { 
+	toggleGeneralSidebarEditorPanel,
+	setCategory,
+	setSearchTerm,
+} from '../../../store/actions';
 import '@wordpress/core-data';
 
 /**
@@ -24,45 +33,46 @@ import '@wordpress/core-data';
  */
 const PANEL_NAME = 'articles-list';
 
-// TODO: - make panel title customizable
-function ArticlesList(
-	{
-		isOpened,
-		onTogglePanel,
-		categories,
-		isRequestingCategories,
-		articles,
-		isRequestingArticles,
-	} ) {
+function ArticlesList ( {
+	isOpened,
+	onTogglePanel,
+	categories,
+	isRequestingCategories,
+	articles,
+	selectedCategory,
+	onCategoryChange,
+	onSearchInputChange,
+	searchTerm,
+} ) {
+
 	return (
 		<PanelBody
 			title={ __( 'Stories' ) }
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
-			<FormTokenField
+			<TextControl
 				placeholder={ __( 'Search articles' ) }
-				onChange={ event => console.log( event ) }
+				value={ searchTerm }
+				onChange={ onSearchInputChange }
 			/>
-			{ isRequestingCategories ? ( <p>Loading categories...</p> ) : (
-				<SelectControl
-					// Selected value.
-					value=""
-					label={ __( 'Categories' ) }
-					options={ _.map( categories, cat => ( { value: cat.id, label: cat.name } ) ) }
-					onChange={ event => console.log( event ) }
-				/>
-			) }
 
-			{ isRequestingArticles ? ( <PanelRow>Loading articles...</PanelRow> ) : (
-				<div>
-					{
-						_.map( articles, article => (
-							<PanelRow key={ article.id }>{ article.title }</PanelRow>
-						) )
-					}
-				</div>
-			) }
+			<SelectControl
+				// Selected value.
+				value={ selectedCategory }
+				label={ __( 'Categories' ) }
+				options={ _.map( categories, cat => ( { value: cat.id, label: cat.name } ) ) }
+				onChange={ onCategoryChange }
+			/>
+
+			<PanelRow>Loading articles...</PanelRow> 
+			<div>
+				{
+					_.map( articles, article => (
+						<PanelRow key={ article.id }>{ article.title }</PanelRow>
+					) )
+				}
+			</div>
 		</PanelBody>
 	);
 }
@@ -71,28 +81,36 @@ export default compose(
 	connect(
 		( state ) => ( {
 			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
+			selectedCategory: getSelectedCategory( state ),
+			searchTerm: getSearchTerm( state ),
+			articles: getArticles( state ),
 		} ),
 		{
 			onTogglePanel() {
 				return toggleGeneralSidebarEditorPanel( PANEL_NAME );
 			},
+
+			onCategoryChange( category_id ) {
+				return setCategory( category_id );
+			},
+
+			onSearchInputChange( term ) {
+				return setSearchTerm( term );
+			}
 		},
 		undefined,
 		{ storeKey: 'edit-post' }
 	),
-	withSelect( ( select ) => {
+	withSelect( ( select, ownProps ) => {
 		const {
 			getCategories,
 			isRequestingCategories,
-			getArticles,
-			isRequestingArticles,
 		} = select( 'core' );
 
+		const categories = { 0: { id: '', name: isRequestingCategories() ? __( 'Loading categories' ) : __( 'All categories' ) } , ...getCategories() };
 		return {
-			categories: getCategories() || [],
+			categories,
 			isRequestingCategories: isRequestingCategories(),
-			articles: getArticles() || [],
-			isRequestingArticles: isRequestingArticles(),
 		};
-	} )
+	} ),
 )( ArticlesList );

@@ -154,3 +154,33 @@ export const hasMetaBoxes = createSelector(
 export function isSavingMetaBoxes( state ) {
 	return state.isSavingMetaBoxes;
 }
+
+/**
+ * Return the selected category id.
+ * 
+ * @param  {Object}  state 	Global application state.
+ * @return {number}			Selected category id
+ */
+export function getSelectedCategory( state ) {
+	return state.search.selectedCategory || '';
+}
+
+/**
+ * Return the search term for articles search.
+ * 
+ * @param  {Object}  state 	Global application state.
+ * @return {string}			Search term
+ */
+export function getSearchTerm( state ) {
+	return state.search.searchTerm || '';
+}
+
+/**
+ * Return the searched aricles.
+ * 
+ * @param  {Object}  state 	Global application state.
+ * @return {Object}			Articles
+ */
+export function getArticles( state ) {
+	return state.search.articles;
+}
