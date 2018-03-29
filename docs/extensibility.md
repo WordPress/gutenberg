@@ -37,7 +37,7 @@ Learn more in the [Extending Blocks](./extensibility/extending-blocks) documenta
 
 Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
 
-Refer to the [Plugins API](./extensibility/plugins-api) documentation for more information.
+Refer to the **Plugins** and **Edit Post** documentation for more information.
 
 ## Meta Boxes
 
