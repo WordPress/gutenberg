@@ -11,9 +11,9 @@ import { Slot, Fill, withContext } from '@wordpress/components';
  */
 const SLOT_NAME = 'PluginScreenTakeover';
 
-let PluginScreenTakeover = ( { pluginName, name } ) => (
+let PluginScreenTakeover = ( { pluginName, name, children } ) => (
 	<Fill name={ [ SLOT_NAME, pluginName, name ].join( '/' ) }>
-		Render some stuff
+		{ children }
 	</Fill>
 );
 

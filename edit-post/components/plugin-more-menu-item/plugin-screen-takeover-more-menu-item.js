@@ -5,7 +5,7 @@ import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { MenuItem } from '@wordpress/components';
 
-const PluginSidebarMoreMenuItem = ( { children, isSelected, icon, onClick } ) => (
+const PluginScreenTakeoverMoreMenuItem = ( { children, isSelected, icon, onClick } ) => (
 	<MenuItem
 		icon={ isSelected ? 'yes' : icon }
 		isSelected={ isSelected }
@@ -38,4 +38,4 @@ export default compose( [
 			},
 		};
 	} ),
-] )( PluginSidebarMoreMenuItem );
+] )( PluginScreenTakeoverMoreMenuItem );
