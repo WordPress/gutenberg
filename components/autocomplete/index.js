@@ -249,7 +249,7 @@ export class Autocomplete extends Component {
 			const filteredOptions = filterOptions( this.state.search, keyedOptions );
 			const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
 			this.setState( {
-				[ 'options_' + index ]: keyedOptions,
+				[ 'options_' + autocompleterIndex ]: keyedOptions,
 				filteredOptions,
 				selectedIndex,
 			} );
