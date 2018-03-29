@@ -64,3 +64,19 @@ export function receivePostTypes( postTypes ) {
 		postTypes: castArray( postTypes ),
 	};
 }
+
+/**
+ * Returns an action object used in signalling that the user capabilties fora post type have been received.
+ *
+ * @param {string} postTypeSlug Post Type
+ * @param {Object} capabilities Capabilities received.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveUserPostTypeCapabilities( postTypeSlug, capabilities ) {
+	return {
+		type: 'RECEIVE_USER_POST_TYPE_CAPABILITIES',
+		postTypeSlug,
+		capabilities,
+	};
+}

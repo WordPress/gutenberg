@@ -1,38 +1,21 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withAPIData } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import {
-	isCurrentPostPublished,
-	isEditedPostBeingScheduled,
-	isSavingPost,
-	isPublishingPost,
-	getCurrentPostType,
-} from '../../store/selectors';
 
 export function PublishButtonLabel( {
 	isPublished,
 	isBeingScheduled,
 	isSaving,
 	isPublishing,
-	user,
+	canPublishPosts,
 } ) {
-	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
-	const isContributor = user.data && ! userCanPublishPosts;
-
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
 	} else if ( isPublished && isSaving ) {
@@ -41,7 +24,7 @@ export function PublishButtonLabel( {
 		return __( 'Scheduling…' );
 	}
 
-	if ( isContributor ) {
+	if ( canPublishPosts === false ) {
 		return __( 'Submit for Review' );
 	} else if ( isPublished ) {
 		return __( 'Update' );
@@ -52,25 +35,22 @@ export function PublishButtonLabel( {
 	return __( 'Publish' );
 }
 
-const applyConnect = connect(
-	( state, { forceIsSaving } ) => ( {
-		isPublished: isCurrentPostPublished( state ),
-		isBeingScheduled: isEditedPostBeingScheduled( state ),
-		isSaving: forceIsSaving || isSavingPost( state ),
-		isPublishing: isPublishingPost( state ),
-		postType: getCurrentPostType( state ),
-	} )
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postType } = props;
-
-	return {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	};
-} );
-
-export default compose( [
-	applyConnect,
-	applyWithAPIData,
-] )( PublishButtonLabel );
+export default withSelect(
+	( select, { forceIsSaving } ) => {
+		const {
+			getEditedPostAttribute,
+			isCurrentPostPublished,
+			isEditedPostBeingScheduled,
+			isSavingPost,
+			isPublishingPost,
+		} = select( 'core/editor' );
+		const { getUserPostTypeCapability } = select( 'core' );
+		return {
+			isPublished: isCurrentPostPublished(),
+			isBeingScheduled: isEditedPostBeingScheduled(),
+			isSaving: forceIsSaving || isSavingPost(),
+			isPublishing: isPublishingPost(),
+			canPublishPosts: getUserPostTypeCapability( getEditedPostAttribute( 'type' ), 'publish_posts' ),
+		};
+	},
+)( PublishButtonLabel );

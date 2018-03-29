@@ -62,10 +62,27 @@ export function getMedia( state, id ) {
  * Returns the Post Type object by slug.
  *
  * @param {Object} state Data state.
- * @param {number} slug  Post Type slug.
+ * @param {string} slug  Post Type slug.
  *
  * @return {Object?}     Post Type object.
  */
 export function getPostType( state, slug ) {
 	return state.postTypes[ slug ];
+}
+
+/**
+ * Returns whether a user has a capability per post type.
+ *
+ * @param {Object} state        Data state.
+ * @param {string} postTypeSlug Post Type slug.
+ * @param {string} capability   Capability.
+ *
+ * @return {boolean}            Whether the user has the give cabability.
+ */
+export function getUserPostTypeCapability( state, postTypeSlug, capability ) {
+	const capabilities = state.userPostTypeCapabilities[ postTypeSlug ];
+
+	// If the capabilities are not loaded return undefined
+	// If the capabilities are loaded but the capability not set return false
+	return capabilities ? capabilities[ capability ] || false : undefined;
 }

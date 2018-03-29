@@ -6,7 +6,13 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getTerms, isRequestingTerms, getMedia, getPostType } from '../selectors';
+import {
+	getTerms,
+	isRequestingTerms,
+	getMedia,
+	getPostType,
+	getUserPostTypeCapability,
+} from '../selectors';
 
 describe( 'getTerms()', () => {
 	it( 'returns value of terms by taxonomy', () => {
@@ -90,5 +96,36 @@ describe( 'getPostType', () => {
 			},
 		} );
 		expect( getPostType( state, 'post' ) ).toEqual( { slug: 'post' } );
+	} );
+} );
+
+describe( 'getUserPostTypeCapability', () => {
+	it( 'should return undefined for unknown post type', () => {
+		const state = deepFreeze( {
+			userPostTypeCapabilities: {},
+		} );
+		expect( getUserPostTypeCapability( state, 'post', 'publishPost' ) ).toBe( undefined );
+	} );
+
+	it( 'should return false for unknown capability', () => {
+		const state = deepFreeze( {
+			userPostTypeCapabilities: {
+				post: {
+					hasPost: false,
+				},
+			},
+		} );
+		expect( getUserPostTypeCapability( state, 'post', 'publishPost' ) ).toBe( false );
+	} );
+
+	it( 'should return the capability value', () => {
+		const state = deepFreeze( {
+			userPostTypeCapabilities: {
+				post: {
+					publishPost: true,
+				},
+			},
+		} );
+		expect( getUserPostTypeCapability( state, 'post', 'publishPost' ) ).toBe( true );
 	} );
 } );
