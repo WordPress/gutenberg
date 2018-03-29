@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import _ from 'lodash';
 import { connect } from 'react-redux';
 
 /**
@@ -24,7 +25,6 @@ import '@wordpress/core-data';
 const PANEL_NAME = 'articles-list';
 
 // TODO: - make panel title customizable
-// 		 - list of categories
 function ArticlesList(
 	{
 		isOpened,
@@ -40,33 +40,25 @@ function ArticlesList(
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
-			<PanelRow>
-				<FormTokenField
-					placeholder={ __( 'Search articles' ) }
+			<FormTokenField
+				placeholder={ __( 'Search articles' ) }
+				onChange={ event => console.log( event ) }
+			/>
+			{ isRequestingCategories ? ( <p>Loading categories...</p> ) : (
+				<SelectControl
+					// Selected value.
+					value=""
+					label={ __( 'Categories' ) }
+					options={ _.map( categories, cat => ( { value: cat.id, label: cat.name } ) ) }
 					onChange={ event => console.log( event ) }
 				/>
-			</PanelRow>
-
-			<PanelRow>
-				{ isRequestingCategories ? ( <p>Loading categories...</p> ) : (
-					<SelectControl
-						// Selected value.
-						value=""
-						label={ __( 'Categories' ) }
-						options={ categories.map( cat => ( { value: cat.id, label: cat.name } ) ) }
-						onChange={ event => console.log( event ) }
-					/>
-				) }
-			</PanelRow>
+			) }
 
 			{ isRequestingArticles ? ( <PanelRow>Loading articles...</PanelRow> ) : (
 				<div>
 					{
-						articles.map( article => (
-							<PanelRow
-								key={ article.id }>
-								{ article.title }
-							</PanelRow>
+						_.map( articles, article => (
+							<PanelRow key={ article.id }>{ article.title }</PanelRow>
 						) )
 					}
 				</div>
