@@ -6,7 +6,7 @@
     [
       "module-resolver",
       {
-        "root": "../../",
+        "root": "./",
         "alias": {
           "@wordpress/hooks": "./wordpress/hooks",
           "@wordpress/i18n": "./gutenberg/i18n",
