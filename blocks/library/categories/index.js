@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import './editor.scss';
@@ -13,12 +8,6 @@ import CategoriesBlock from './block';
 export const name = 'core/categories';
 
 export const settings = {
-	title: __( 'Categories' ),
-
-	description: __( 'Shows a list of your site\'s categories.' ),
-
-	icon: 'list-view',
-
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
 		if ( 'left' === align || 'right' === align || 'full' === align ) {

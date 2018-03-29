@@ -171,10 +171,6 @@ const EnhancedReusableBlockEdit = compose( [
 export const name = 'core/block';
 
 export const settings = {
-	title: __( 'Shared Block' ),
-
-	isPrivate: true,
-
 	edit: EnhancedReusableBlockEdit,
 
 	save: () => null,

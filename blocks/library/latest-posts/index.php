@@ -70,6 +70,12 @@ function render_block_core_latest_posts( $attributes ) {
  */
 function register_block_core_latest_posts() {
 	register_block_type( 'core/latest-posts', array(
+		'title'           => __( 'Latest Posts', 'gutenberg' ),
+		'description'     => __( 'Shows a list of your site\'s most recent posts.', 'gutenberg' ),
+		'icon'            => 'list-view',
+		'keywords'        => array(
+			__( 'recent posts', 'gutenberg' ),
+		),
 		'category'        => 'widgets',
 		'supports'        => array(
 			'html' => false,

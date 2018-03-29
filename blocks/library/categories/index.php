@@ -89,6 +89,9 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
  */
 function register_block_core_categories() {
 	register_block_type( 'core/categories', array(
+		'title'           => __( 'Categories', 'gutenberg' ),
+		'description'     => __( 'Shows a list of your site\'s categories.', 'gutenberg' ),
+		'icon'            => 'list-view',
 		'category'        => 'widgets',
 		'supports'        => array(
 			'html' => false,

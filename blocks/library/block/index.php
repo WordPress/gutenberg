@@ -33,10 +33,12 @@ function gutenberg_render_block_core_reusable_block( $attributes ) {
 }
 
 register_block_type( 'core/block', array(
+	'title'           => __( 'Shared Block', 'gutenberg' ),
 	'category'        => 'shared',
 	'supports'        => array(
 		'customClassName' => false,
 		'html'            => false,
+		'insertable'      => false,
 	),
 	'attributes'      => array(
 		'ref' => array(
