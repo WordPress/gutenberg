@@ -235,12 +235,17 @@ export class Autocomplete extends Component {
 	/**
 	 * Load options for an autocompleter.
 	 *
-	 * @param {number} index The autocompleter index.
-	 * @param {string} query The query, if any.
+	 * @param {number} autocompleterIndex The autocompleter index.
+	 * @param {string} query               The query, if any.
 	 */
-	loadOptions( index, query ) {
-		this.props.completers[ index ].getOptions( query ).then( ( options ) => {
-			const keyedOptions = map( options, ( option, i ) => ( { ...option, key: index + '-' + i } ) );
+	loadOptions( autocompleterIndex, query ) {
+		this.props.completers[ autocompleterIndex ].getOptions( query ).then( ( options ) => {
+			const keyedOptions = map( options, ( option, i ) => {
+				return {
+					...option,
+					key: autocompleterIndex + '-' + i,
+				};
+			} );
 			const filteredOptions = filterOptions( this.state.search, keyedOptions );
 			const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
 			this.setState( {
