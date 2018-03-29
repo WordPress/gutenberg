@@ -12,6 +12,7 @@ import {
 	hasMetaBoxes,
 	isSavingMetaBoxes,
 	getMetaBox,
+	getActiveScreenTakeoverName,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -276,6 +277,18 @@ describe( 'selectors', () => {
 			expect( getMetaBox( state, 'side' ) ).toEqual( {
 				isActive: true,
 			} );
+		} );
+	} );
+
+	describe( 'getActiveScreenTakeoverName', () => {
+		it( 'should return the name of the active screen takeover', () => {
+			const state = {
+				preferences: {
+					activeScreenTakeover: 'my-namespace/my-screen-takeover',
+				},
+			};
+
+			expect( getActiveScreenTakeoverName( state ) ).toEqual( 'my-namespace/my-screen-takeover')
 		} );
 	} );
 } );
