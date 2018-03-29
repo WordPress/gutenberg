@@ -329,8 +329,8 @@ describe( 'validation', () => {
 
 		it( 'should return true for effectively equivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
-				'<div>Hello<span   class="b a" id="foo"> World!</  span>  </div>',
-				'<div  >Hello\n<span id="foo" class="a  b">World!</span></div>'
+				'<div>&quot; Hello<span   class="b a" id="foo"> World!</  span>  "</div>',
+				'<div  >" Hello\n<span id="foo" class="a  b">World!</span>"</div>'
 			);
 
 			expect( isEquivalent ).toBe( true );
