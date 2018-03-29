@@ -7,16 +7,15 @@ import React from 'react';
 import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
 import Toolbar from './toolbar';
 
+import type { BlockType } from '../store/';
+
 // Gutenberg imports
 import { getBlockType } from '@gutenberg/blocks/api';
 
-type PropsType = {
-	index: number,
-	blockType: string,
-	content: string,
-	focused: boolean,
-	onToolbarButtonPressed: ( button: number, index: number ) => void,
-	onBlockHolderPressed: ( rowId: number ) => void,
+type PropsType = BlockType & {
+	onChange: ( uid: string, attributes: mixed ) => void,
+	onToolbarButtonPressed: ( button: number, uid: string ) => void,
+	onBlockHolderPressed: ( uid: string ) => void,
 };
 type StateType = { selected: boolean, focused: boolean };
 
@@ -24,7 +23,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	renderToolbarIfBlockFocused() {
 		if ( this.props.focused ) {
 			return (
-				<Toolbar index={ this.props.index } onButtonPressed={ this.props.onToolbarButtonPressed } />
+				<Toolbar uid={ this.props.uid } onButtonPressed={ this.props.onToolbarButtonPressed } />
 			);
 		} else {
 			// Return empty view, toolbar won't be rendered
@@ -39,20 +38,21 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 			// TODO: setAttributes needs to change the state/attributes
 			return (
 				<Block
-					attributes={ { ...this.props } }
-					setAttributes={ attrs => console.log( { attrs } ) }
+					attributes={ { ...this.props.attributes } }
+					// pass a curried version of onChanged with just one argument
+					setAttributes={ attrs => this.props.onChange( this.props.uid, attrs ) }
 				/>
 			);
 		} else {
 			// Default block placeholder
-			return <Text>{ this.props.content }</Text>;
+			return <Text>{ this.props.attributes.content }</Text>;
 		}
 	}
 
 	render() {
 		return (
 			<TouchableWithoutFeedback
-				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.index ) }
+				onPress={ this.props.onBlockHolderPressed.bind( this, this.props.uid ) }
 			>
 				<View style={ styles.blockHolder }>
 					<View style={ styles.blockTitle }>
