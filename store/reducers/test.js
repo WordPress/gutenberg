@@ -13,15 +13,19 @@ describe( 'Store', () => {
 			__iniState = {
 				blocks: [
 					{
-						key: '0',
+						uid: '0',
 						blockType: 'title',
-						content: 'Hello World',
+						attributes: {
+							content: 'Hello World',
+						},
 						focused: false,
 					},
 					{
-						key: '1',
+						uid: '1',
 						blockType: 'paragraph',
-						content: 'paragraph content',
+						attributes: {
+							content: 'paragraph content',
+						},
 						focused: false,
 					},
 				],
@@ -37,8 +41,18 @@ describe( 'Store', () => {
 			expect( initialState ).toEqual( __iniState );
 		} );
 
+		it( "should mutate block's content", () => {
+			let newState = reducer(
+				initialState,
+				actions.updateBlockAttributes( '1', { content: 'new content' } )
+			);
+
+			// the title block should still be there at the top
+			expect( newState.blocks[ 1 ].attributes.content ).toEqual( 'new content' );
+		} );
+
 		it( 'should focus a block', () => {
-			let newState = reducer( initialState, actions.focusBlockAction( 0 ) );
+			let newState = reducer( initialState, actions.focusBlockAction( '0' ) );
 
 			// the focused block should have its variable set to true
 			expect( newState.blocks[ 0 ].focused ).toEqual( true );
@@ -47,7 +61,7 @@ describe( 'Store', () => {
 			expect( newState.blocks[ 1 ].focused ).toEqual( false );
 
 			// let's focus on the other block
-			newState = reducer( initialState, actions.focusBlockAction( 1 ) );
+			newState = reducer( initialState, actions.focusBlockAction( '1' ) );
 
 			// the focused block should have its variable set to true
 			expect( newState.blocks[ 1 ].focused ).toEqual( true );
@@ -57,7 +71,7 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should not be able to move top block up', () => {
-			const newState = reducer( initialState, actions.moveBlockUpAction( 0 ) );
+			const newState = reducer( initialState, actions.moveBlockUpAction( '0' ) );
 
 			// blocks should still be in the same places
 			expect( newState.blocks[ 0 ].blockType ).toEqual( 'title' );
@@ -65,7 +79,7 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should move a block up', () => {
-			let newState = reducer( initialState, actions.moveBlockUpAction( 1 ) );
+			let newState = reducer( initialState, actions.moveBlockUpAction( '1' ) );
 
 			// the paragraph block should have moved up
 			expect( newState.blocks[ 0 ].blockType ).toEqual( 'paragraph' );
@@ -75,7 +89,7 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should not be able to move bottom block down', () => {
-			const newState = reducer( initialState, actions.moveBlockDownAction( 1 ) );
+			const newState = reducer( initialState, actions.moveBlockDownAction( '1' ) );
 
 			// blocks should still be in the same places
 			expect( newState.blocks[ 0 ].blockType ).toEqual( 'title' );
@@ -83,7 +97,7 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should move a block down', () => {
-			let newState = reducer( initialState, actions.moveBlockDownAction( 0 ) );
+			let newState = reducer( initialState, actions.moveBlockDownAction( '0' ) );
 
 			// the paragraph block should be at the top now
 			expect( newState.blocks[ 0 ].blockType ).toEqual( 'paragraph' );
@@ -93,7 +107,7 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should delete top block', () => {
-			let newState = reducer( initialState, actions.deleteBlockAction( 0 ) );
+			let newState = reducer( initialState, actions.deleteBlockAction( '0' ) );
 
 			// only one block should be left
 			expect( newState.blocks.length ).toEqual( 1 );
@@ -103,7 +117,7 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should delete bottom block', () => {
-			let newState = reducer( initialState, actions.deleteBlockAction( 1 ) );
+			let newState = reducer( initialState, actions.deleteBlockAction( '1' ) );
 
 			// only one block should be left
 			expect( newState.blocks.length ).toEqual( 1 );
@@ -121,12 +135,14 @@ describe( 'Store', () => {
 					{
 						key: '2',
 						blockType: 'core/code',
-						content: 'Hello code',
+						attributes: {
+							content: 'Hello code',
+						},
 						focused: false,
 					},
 				],
 			};
-			let newState = reducer( extraState, actions.deleteBlockAction( 1 ) );
+			let newState = reducer( extraState, actions.deleteBlockAction( '1' ) );
 
 			// only two blocks should be left
 			expect( newState.blocks.length ).toEqual( 2 );

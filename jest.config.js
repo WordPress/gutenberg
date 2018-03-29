@@ -9,7 +9,8 @@ if ( process.env.TEST_RN_PLATFORM ) {
 }
 
 module.exports = {
-	preset: 'jest-expo',
+	preset: 'jest-react-native',
+	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [
 		"/node_modules/",
 		"/gutenberg/"

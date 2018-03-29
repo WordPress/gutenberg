@@ -5,27 +5,35 @@
 
 import ActionTypes from './ActionTypes';
 
-export type BlockActionType = number => {
+export type BlockActionType = string => {
 	type: $Values<typeof ActionTypes.BLOCK>,
-	rowId: number,
+	uid: string,
 };
 
-export const focusBlockAction: BlockActionType = ( index: number ) => ( {
+export function updateBlockAttributes( uid: string, attributes: mixed ) {
+	return {
+		type: ActionTypes.BLOCK.UPDATE_ATTRIBUTES,
+		uid,
+		attributes,
+	};
+}
+
+export const focusBlockAction: BlockActionType = uid => ( {
 	type: ActionTypes.BLOCK.FOCUS,
-	rowId: index,
+	uid: uid,
 } );
 
-export const moveBlockUpAction: BlockActionType = index => ( {
+export const moveBlockUpAction: BlockActionType = uid => ( {
 	type: ActionTypes.BLOCK.MOVE_UP,
-	rowId: index,
+	uid: uid,
 } );
 
-export const moveBlockDownAction: BlockActionType = index => ( {
+export const moveBlockDownAction: BlockActionType = uid => ( {
 	type: ActionTypes.BLOCK.MOVE_DOWN,
-	rowId: index,
+	uid: uid,
 } );
 
-export const deleteBlockAction: BlockActionType = index => ( {
+export const deleteBlockAction: BlockActionType = uid => ( {
 	type: ActionTypes.BLOCK.DELETE,
-	rowId: index,
+	uid: uid,
 } );

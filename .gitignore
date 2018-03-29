@@ -22,6 +22,7 @@ yarn-error.log*
 # Android builds
 *.apk
 *.ap_
+.gradle/
 
 # files for the dex VM
 *.dex
