@@ -11,6 +11,8 @@ import {
 	toggleFeature,
 	requestMetaBoxUpdates,
 	initializeMetaBoxState,
+	openScreenTakeover,
+	closeScreenTakeover,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -96,6 +98,20 @@ describe( 'actions', () => {
 				type: 'INITIALIZE_META_BOX_STATE',
 				metaBoxes,
 			} );
+		} );
+	} );
+
+	describe( 'openScreenTakeover', () => {
+		const screenTakeoverName = 'my-screen-takeover';
+		expect( openScreenTakeover( screenTakeoverName ) ).toEqual( {
+			type: 'OPEN_SCREEN_TAKEOVER',
+			name: 'my-screen-takeover',
+		} );
+	} );
+
+	describe( 'closeScreenTakeover', () => {
+		expect( closeScreenTakeover() ).toEqual( {
+			type: 'CLOSE_SCREEN_TAKEOVER',
 		} );
 	} );
 } );
