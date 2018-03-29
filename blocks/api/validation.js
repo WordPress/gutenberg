@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { tokenize } from 'simple-html-tokenizer';
-import { xor, fromPairs, isEqual, includes } from 'lodash';
+import { xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
 
 /**
  * Internal dependencies
@@ -281,6 +281,9 @@ export const isEqualAttributesOfName = {
 	style: ( actual, expected ) => {
 		return isEqual( ...[ actual, expected ].map( getStyleProperties ) );
 	},
+	// For each boolean attribute, mere presence of attribute in both is enough
+	// to assume equivalence.
+	...fromPairs( BOOLEAN_ATTRIBUTES.map( ( attribute ) => [ attribute, stubTrue ] ) ),
 };
 
 /**
