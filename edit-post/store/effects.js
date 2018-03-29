@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, values, some } from 'lodash';
+import { reduce, values, some, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,9 +17,12 @@ import {
 	metaBoxUpdatesSuccess,
 	setMetaBoxSavedData,
 	requestMetaBoxUpdates,
+	openGeneralSidebar,
+	closeGeneralSidebar,
 } from './actions';
 import { getMetaBoxes } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
+import { onChangeListener } from './utils';
 
 const effects = {
 	INITIALIZE_META_BOX_STATE( action, store ) {
@@ -41,15 +44,11 @@ const effects = {
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
 		// Saving metaboxes when saving posts
-		let previousIsSaving = select( 'core/editor' ).isSavingPost();
-		subscribe( () => {
-			const isSavingPost = select( 'core/editor' ).isSavingPost();
-			const shouldTriggerSaving = ! isSavingPost && previousIsSaving;
-			previousIsSaving = isSavingPost;
-			if ( shouldTriggerSaving ) {
+		subscribe( onChangeListener( select( 'core/editor' ).isSavingPost, ( isSavingPost ) => {
+			if ( ! isSavingPost ) {
 				store.dispatch( requestMetaBoxUpdates() );
 			}
-		} );
+		} ) );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const state = store.getState();
@@ -90,6 +89,28 @@ const effects = {
 		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
 		speak( message, 'assertive' );
 	},
+	INIT( _, store ) {
+		// Select the block settings tab when the selected block changes
+		subscribe( onChangeListener(
+			() => get( select( 'core/editor' ).getSelectedBlock(), 'uid' ),
+			( selectedBlockUid ) => {
+				if ( selectedBlockUid && select( 'core/edit-post' ).isEditorSidebarOpened() ) {
+					store.dispatch( openGeneralSidebar( 'edit-post/block' ) );
+				}
+			} )
+		);
+
+		// Collapse sidebar when viewport shrinks.
+		subscribe( onChangeListener(
+			() => select( 'core/viewport' ).isViewportMatch( '< medium' ),
+			( isSmall ) => {
+				if ( isSmall ) {
+					store.dispatch( closeGeneralSidebar() );
+				}
+			}
+		) );
+	},
+
 };
 
 export default effects;
