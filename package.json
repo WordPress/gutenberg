@@ -9,6 +9,7 @@
     "flow-bin": "0.56.0",
     "jest-expo": "25.0.0",
     "prettier": "git+https://github.com/Automattic/calypso-prettier.git#calypso-1.9",
+    "react-dom": "^16.2.0",
     "react-native-scripts": "1.11.1",
     "react-test-renderer": "16.2.0",
     "remote-redux-devtools": "^0.5.12"
