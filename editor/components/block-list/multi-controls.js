@@ -41,14 +41,14 @@ function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting,
 export default connect( ( state, ownProps ) => {
 	const { rootUID } = ownProps;
 	const uids = getMultiSelectedBlockUids( state );
-    
-    const firstIndex = getBlockIndex( state, first( uids ), rootUID )
-    const lastIndex = getBlockIndex( state, last( uids ), rootUID )
-    
+
+	const firstIndex = getBlockIndex( state, first( uids ), rootUID );
+	const lastIndex = getBlockIndex( state, last( uids ), rootUID );
+
 	return {
 		multiSelectedBlockUids: uids,
 		isSelecting: isMultiSelecting( state ),
-        isFirst: firstIndex === 0,
+		isFirst: firstIndex === 0,
 		isLast: lastIndex + 1 === getBlockCount( state ),
 	};
 } )( BlockListMultiControls );
