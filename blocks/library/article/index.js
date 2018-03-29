@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { findKey, map } from 'lodash';
+import { findKey, map, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -148,21 +148,23 @@ export const settings = {
 		const controls = isSelected && [
 			<BlockControls key="controls">
 				{ alignmentToolbar }
-				<Toolbar>
-					<MediaUpload
-						onSelect={ onSelectImage }
-						type="image"
-						value={ id }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit image' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
-					/>
-				</Toolbar>
+				{ ! get( window, 'customGutenberg.editor.noMediaLibrary' ) &&
+					<Toolbar>
+						<MediaUpload
+							onSelect={ onSelectImage }
+							type="image"
+							value={ id }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
+					</Toolbar>
+				}
 			</BlockControls>,
 			<InspectorControls key="inspector">
 				<h2>{ __( 'Article Image Settings' ) }</h2>
