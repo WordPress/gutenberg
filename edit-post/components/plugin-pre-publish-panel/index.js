@@ -4,10 +4,7 @@
  * Defines slot to be used by plugins to insert content in the pre-publish sidebar
  * (which appears when a user pushes "Publish" from the main editor).
  *
- * @see /edit-post/README.md
- *
  * @file   This files defines the PluginPrePublishPanel extension
- * @author ChrisShultz
  * @since  2.6.0
  */
 
