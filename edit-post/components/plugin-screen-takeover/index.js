@@ -23,7 +23,7 @@ PluginScreenTakeover = compose( [
 ] )( PluginScreenTakeover );
 
 PluginScreenTakeover.Slot = ( { activeScreenTakeoverName } ) => {
-	return <Slot name={ [ SLOT_NAME, activeScreenTakeoverName ].join( '/' ) } />
+	return <Slot name={ [ SLOT_NAME, activeScreenTakeoverName ].join( '/' ) } />;
 };
 
 PluginScreenTakeover.Slot = withSelect( select => ( {
