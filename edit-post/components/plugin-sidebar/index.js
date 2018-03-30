@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
-import { Slot, Fill, withFocusReturn, withContext } from '@wordpress/components';
+import { Slot, Fill, withFocusReturn } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
+import { PluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -23,15 +24,19 @@ const SLOT_NAME = 'PluginSidebar';
  *
  * @return {WPElement} Plugin sidebar fill.
  */
-function PluginSidebar( { pluginName, name, title, onClose, children } ) {
+function PluginSidebar( { name, title, onClose, children } ) {
 	return (
-		<Fill name={ [ SLOT_NAME, pluginName, name ].join( '/' ) }>
-			<SidebarLayout
-				title={ title }
-				onClose={ onClose } >
-				{ children }
-			</SidebarLayout>
-		</Fill>
+		<PluginContext.Consumer>
+			{ ( { pluginName } ) => (
+				<Fill name={ [ SLOT_NAME, pluginName, name ].join( '/' ) }>
+					<SidebarLayout
+						title={ title }
+						onClose={ onClose } >
+						{ children }
+					</SidebarLayout>
+				</Fill>
+			) }
+		</PluginContext.Consumer>
 	);
 }
 
@@ -42,7 +47,6 @@ PluginSidebar = compose( [
 		};
 	} ),
 	withFocusReturn,
-	withContext( 'pluginName' )(),
 ] )( PluginSidebar );
 
 /**

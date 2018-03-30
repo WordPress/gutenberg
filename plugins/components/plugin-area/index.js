@@ -12,7 +12,7 @@ import { addAction, removeAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import PluginContextProvider from '../plugin-context-provider';
+import PluginContext from '../plugin-context';
 import { getPlugins } from '../../api';
 
 /**
@@ -56,12 +56,12 @@ class PluginArea extends Component {
 					const { render: Plugin } = plugin;
 
 					return (
-						<PluginContextProvider
+						<PluginContext.Provider
 							key={ plugin.name }
-							pluginName={ plugin.name }
+							value={ { pluginName: plugin.name } }
 						>
 							<Plugin />
-						</PluginContextProvider>
+						</PluginContext.Provider>
 					);
 				} ) }
 			</div>

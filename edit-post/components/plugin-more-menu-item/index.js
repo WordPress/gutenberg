@@ -6,7 +6,8 @@ import { flow, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Slot, Fill, withContext } from '@wordpress/components';
+import { Slot, Fill } from '@wordpress/components';
+import { PluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -20,27 +21,33 @@ import PluginSidebarMoreMenuItem from './plugin-sidebar-more-menu-item';
  */
 export const SLOT_NAME = 'PluginMoreMenuItem';
 
-let PluginMoreMenuItem = ( props ) => (
-	<Fill name={ SLOT_NAME }>
-		{ ( fillProps ) => {
-			const { type, onClick = noop } = props;
+const PluginMoreMenuItem = ( props ) => (
+	<PluginContext.Consumer>
+		{ ( { pluginName } ) => (
+			<Fill name={ SLOT_NAME }>
+				{ ( fillProps ) => {
+					const {
+						target,
+						type,
+						onClick = noop,
+					} = props;
 
-			const newProps = { ...props, onClick: flow( onClick, fillProps.onClose ) };
+					const newProps = {
+						...props,
+						onClick: flow( onClick, fillProps.onClose ),
+						target: `${ pluginName }/${ target }`,
+					};
 
-			switch ( type ) {
-				case 'sidebar':
-					return <PluginSidebarMoreMenuItem { ...newProps } />;
-			}
-			return null;
-		} }
-	</Fill>
+					switch ( type ) {
+						case 'sidebar':
+							return <PluginSidebarMoreMenuItem { ...newProps } />;
+					}
+					return null;
+				} }
+			</Fill>
+		) }
+	</PluginContext.Consumer>
 );
-
-PluginMoreMenuItem = withContext( 'pluginName' )( ( pluginName, { target } ) => {
-	return {
-		target: `${ pluginName }/${ target }`,
-	};
-} )( PluginMoreMenuItem );
 
 PluginMoreMenuItem.Slot = ( { fillProps } ) => (
 	<Slot name={ SLOT_NAME } fillProps={ fillProps } />
