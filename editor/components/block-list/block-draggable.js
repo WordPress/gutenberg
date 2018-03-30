@@ -15,9 +15,9 @@ function BlockDraggable( { rootUID, index, uid, layout, isDragging, ...props } )
 
 	const transferData = {
 		type: 'block',
-		rootUID: rootUID,
 		fromIndex: index,
-		uid: uid,
+		rootUID,
+		uid,
 		layout,
 	};
 

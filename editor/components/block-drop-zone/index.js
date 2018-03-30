@@ -23,9 +23,9 @@ import { insertBlocks, updateBlockAttributes, moveBlockToPosition } from '../../
 
 class BlockDropZone extends Component {
 	constructor() {
-		super();
+		super( ...arguments );
 
-		this.onDropFiles = this.onDropFiles.bind( this );
+		this.onFilesDrop = this.onFilesDrop.bind( this );
 		this.onHTMLDrop = this.onHTMLDrop.bind( this );
 		this.onDrop = this.onDrop.bind( this );
 	}
@@ -37,7 +37,7 @@ class BlockDropZone extends Component {
 		}
 	}
 
-	onDropFiles( files, position ) {
+	onFilesDrop( files, position ) {
 		const transformation = findTransform(
 			getBlockTransforms( 'from' ),
 			( transform ) => transform.type === 'files' && transform.isMatch( files )
@@ -90,7 +90,7 @@ class BlockDropZone extends Component {
 
 		return (
 			<DropZone
-				onFilesDrop={ this.onDropFiles }
+				onFilesDrop={ this.onFilesDrop }
 				onHTMLDrop={ this.onHTMLDrop }
 				onDrop={ this.onDrop }
 			/>

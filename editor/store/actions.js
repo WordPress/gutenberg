@@ -209,7 +209,7 @@ export function replaceBlock( uid, block ) {
 }
 
 /**
- * Returns an aciton object signalling that an indexed block should be moved
+ * Returns an action object signalling that an indexed block should be moved
  * to a new index.
  *
  * @param  {?string} uid          The UID of the block.

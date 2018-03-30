@@ -28,6 +28,10 @@ class Draggable extends Component {
 		this.onDragEnd = this.onDragEnd.bind( this );
 	}
 
+	componentWillUnmount() {
+		this.removeDragClone();
+	}
+
 	/**
 	 * Removes the element clone, resets cursor, and removes drag listener.
 	 * @param  {Object} event     The non-custom DragEvent.
@@ -69,10 +73,14 @@ class Draggable extends Component {
 	onDragStart( event ) {
 		const { elementId, transferData, onDragStart = noop } = this.props;
 		const element = document.getElementById( elementId );
+		if ( ! element ) {
+			event.preventDefault();
+			return;
+		}
 
-		// Set a fake drag image to avoid browser defaults. Remove from DOM right after.
-		// event.dataTransfer.setDragImage is not supported yet in IE,
-		// we need to check for its existance first.
+		// Set a fake drag image to avoid browser defaults. Remove from DOM
+		// right after. event.dataTransfer.setDragImage is not supported yet in
+		// IE, we need to check for its existence first.
 		if ( 'function' === typeof event.dataTransfer.setDragImage ) {
 			const dragImage = document.createElement( 'div' );
 			dragImage.id = `drag-image-${ elementId }`;
@@ -111,7 +119,7 @@ class Draggable extends Component {
 		}
 
 		// Hack: Remove iFrames as it's causing the embeds drag clone to freeze
-		[ ...clone.querySelectorAll( 'iframe' ) ].forEach( child => child.remove() );
+		[ ...clone.querySelectorAll( 'iframe' ) ].forEach( child => child.parentNode.removeChild( child ) );
 
 		this.cloneWrapper.appendChild( clone );
 		elementWrapper.appendChild( this.cloneWrapper );
@@ -126,15 +134,11 @@ class Draggable extends Component {
 		this.props.setTimeout( onDragStart );
 	}
 
-	componentWillUnmount() {
-		this.removeDragClone();
-	}
-
 	removeDragClone() {
 		document.removeEventListener( 'dragover', this.onDragOver );
-		if ( this.cloneWrapper && this.cloneWrapper.parentElement ) {
+		if ( this.cloneWrapper && this.cloneWrapper.parentNode ) {
 			// Remove clone.
-			this.cloneWrapper.remove();
+			this.cloneWrapper.parentNode.removeChild( this.cloneWrapper );
 			this.cloneWrapper = null;
 		}
 	}

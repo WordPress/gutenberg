@@ -25,7 +25,7 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	z-index: z-index( '.editor-block-list__block-drag-inset' );
+	z-index: z-index( '.editor-block-list__block-draggable' );
 
 	> .editor-block-list__block-draggable-inner {
 		position: absolute;
@@ -43,7 +43,7 @@
 
 	&.is-visible > .editor-block-list__block-draggable-inner {
 		visibility: visible;
-		z-index: z-index( '.editor-block-list__block-drag-inset.is-visible > .editor-block-list__block-draggable-inner' );
+		z-index: z-index( '.editor-block-list__block-draggable.is-visible > .editor-block-list__block-draggable-inner' );
 	}
 
 	@include break-small {
