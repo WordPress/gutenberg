@@ -5,14 +5,12 @@ import 'moment-timezone/moment-timezone-utils';
 export const settings = window._wpDateSettings;
 
 // Create WP timezone based off dateSettings.
-const offsets = ( settings.timezone.string ) ? momentLib.tz.zone( settings.timezone.string ).offsets : [ -settings.timezone.offset * 60 ];
-const momentTimezone = {
+momentLib.tz.add( momentLib.tz.pack( {
 	name: 'WP',
 	abbrs: [ 'WP' ],
 	untils: [ null ],
-	offsets: [ offsets ],
-};
-momentLib.tz.add( momentLib.tz.pack( momentTimezone ) );
+	offsets: [ -settings.timezone.offset * 60 || 0 ],
+} ) );
 
 // Create a new moment object which mirrors moment but includes
 // the attached timezone, instead of setting a default timezone on
