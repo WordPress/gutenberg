@@ -74,14 +74,14 @@ describe( 'serialize()', () => {
 			expect( result ).toBe( '<video></video>' );
 		} );
 
-		it( 'should render an empty "as-is" attribute', () => {
-			const result = serialize( <video controls="" preload="" /> );
+		it( 'should an explicitly empty string attribute', () => {
+			const result = serialize( <video className="" /> );
 
-			expect( result ).toBe( '<video controls preload=""></video>' );
+			expect( result ).toBe( '<video class=""></video>' );
 		} );
 
-		it( 'should not render an empty attribute if not as-is', () => {
-			const result = serialize( <video className="" /> );
+		it( 'should not render an empty object style', () => {
+			const result = serialize( <video style={ {} } /> );
 
 			expect( result ).toBe( '<video></video>' );
 		} );
@@ -424,6 +424,12 @@ describe( 'renderAttributes()', () => {
 } );
 
 describe( 'renderStyle()', () => {
+	it( 'should return undefined if empty', () => {
+		const result = renderStyle( {} );
+
+		expect( result ).toBe( undefined );
+	} );
+
 	it( 'should render without trailing semi-colon', () => {
 		const result = renderStyle( {
 			color: 'red',

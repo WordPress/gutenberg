@@ -495,11 +495,6 @@ export function renderAttributes( props ) {
 			continue;
 		}
 
-		// Empty values are only rendered if for a meaningful attribute.
-		if ( ! value && ! isMeaningfulAttribute ) {
-			continue;
-		}
-
 		result += ' ' + attribute;
 
 		// Boolean attributes should write attribute name, but without value.
@@ -526,7 +521,7 @@ export function renderAttributes( props ) {
  * @return {string} Style attribute value.
  */
 export function renderStyle( style ) {
-	let result = '';
+	let result;
 
 	for ( const property in style ) {
 		const value = style[ property ];
@@ -536,6 +531,8 @@ export function renderStyle( style ) {
 
 		if ( result ) {
 			result += ';';
+		} else {
+			result = '';
 		}
 
 		result += kebabCase( property ) + ':' + getNormalStyleValue( property, value );
