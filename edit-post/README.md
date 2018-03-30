@@ -11,7 +11,7 @@ They can be found in the global variable `wp.editPost` when defining `wp-edit-po
 
 Experimental components can be found under `wp.editPost.__experimental`. Experimental components are still being evaluated and can change in a future version.
 
-### PluginSidebar
+### `PluginSidebar`
 **Experimental**
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -21,12 +21,24 @@ If you wish to display the sidebar, you can with use the [`PluginMoreMenuItem`](
 wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );
 ```
 
-#### Usage
+_Example:_
 
 ```jsx
-<PluginSidebar name="sidebar-name" title="Sidebar title">
-	<MySidebar />
-</PluginSidebar>
+const { Panel, PanelBody } = wp.components;
+const { PluginSidebar } = wp.editPost;
+
+const MyPluginSidebar = () => (
+	<PluginSidebar
+		name="sidebar-name"
+		title="Sidebar title"
+	>
+		<Panel>
+			<PanelBody>
+				My sidebar content
+			</PanelBody>
+		</Panel>
+	</PluginSidebar>
+);
 ```
 
 #### Props
@@ -46,23 +58,27 @@ Title displayed at the top of the sidebar.
 - Required: Yes
 
 
-### PluginMoreMenuItem
+### `PluginMoreMenuItem`
 **Experimental**
 
 Renders a menu item in the more menu drop down, and can be used to activate other plugin UI components.
 The text within the component appears as the menu item label.
 
-#### Usage
+_Example:_
 
 ```jsx
-<PluginMoreMenuItem
-	name="my-plugin"
-	icon={ <wp.components.DashIcon icon="yes" /> }
-	type="sidebar"
-	target="my-sidebar"
+const { PluginMoreMenuItem } = wp.editPost;
+
+const MyPluginMenuItem = () => (
+	<PluginMoreMenuItem
+		name="my-plugin"
+		icon="yes"
+		type="sidebar"
+		target="my-sidebar"
 	>
-	My Sidebar
-</PluginMoreMenuItem>
+		My Sidebar
+	</PluginMoreMenuItem>
+);
 ```
 
 #### Props
@@ -90,9 +106,9 @@ A string identifying the UI element you wish to be activated by this menu item. 
 
 ##### icon
 
-An SVG React element to be rendered to the left of the menu item label.
+The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
 
-- Type: `Element`
+- Type: `String` | `Element`
 - Required: No
 
 
