@@ -996,7 +996,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockDependantsCacheBust', () => {
-		const rootBlock = { uid: 123, name: 'core/paragraph', attributes: {} };
+		const rootBlock = { uid: 123, name: 'core/text', attributes: {} };
 		const rootOrder = [ 123 ];
 
 		it( 'returns an unchanging reference', () => {
@@ -1062,7 +1062,7 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {
 							123: rootBlock,
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+							456: { uid: 456, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': rootOrder,
@@ -1081,7 +1081,7 @@ describe( 'selectors', () => {
 
 		it( 'returns an unchanging reference on unchanging inner block', () => {
 			const rootBlockOrder = [ 456 ];
-			const childBlock = { uid: 456, name: 'core/paragraph', attributes: {} };
+			const childBlock = { uid: 456, name: 'core/text', attributes: {} };
 			const childBlockOrder = [];
 
 			const state = {
@@ -1135,7 +1135,7 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {
 							123: rootBlock,
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+							456: { uid: 456, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': rootOrder,
@@ -1153,7 +1153,7 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {
 							123: rootBlock,
-							456: { uid: 456, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
+							456: { uid: 456, name: 'core/text', attributes: { content: [ 'foo' ] } },
 						},
 						blockOrder: {
 							'': rootOrder,
@@ -1172,7 +1172,7 @@ describe( 'selectors', () => {
 
 		it( 'returns a new reference on updated grandchild inner block', () => {
 			const rootBlockOrder = [ 456 ];
-			const childBlock = { uid: 456, name: 'core/paragraph', attributes: {} };
+			const childBlock = { uid: 456, name: 'core/text', attributes: {} };
 			const childBlockOrder = [ 789 ];
 			const grandChildBlockOrder = [];
 
@@ -1183,7 +1183,7 @@ describe( 'selectors', () => {
 						blocksByUid: {
 							123: rootBlock,
 							456: childBlock,
-							789: { uid: 789, name: 'core/paragraph', attributes: {} },
+							789: { uid: 789, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': rootOrder,
@@ -1203,7 +1203,7 @@ describe( 'selectors', () => {
 						blocksByUid: {
 							123: rootBlock,
 							456: childBlock,
-							789: { uid: 789, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
+							789: { uid: 789, name: 'core/text', attributes: { content: [ 'foo' ] } },
 						},
 						blockOrder: {
 							'': rootOrder,
@@ -1229,7 +1229,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocksByUid: {
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+							123: { uid: 123, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123 ],
@@ -1242,7 +1242,7 @@ describe( 'selectors', () => {
 
 			expect( getBlock( state, 123 ) ).toEqual( {
 				uid: 123,
-				name: 'core/paragraph',
+				name: 'core/text',
 				attributes: {},
 				innerBlocks: [],
 			} );
@@ -1269,8 +1269,8 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocksByUid: {
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+							123: { uid: 123, name: 'core/text', attributes: {} },
+							456: { uid: 456, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123 ],
@@ -1284,11 +1284,11 @@ describe( 'selectors', () => {
 
 			expect( getBlock( state, 123 ) ).toEqual( {
 				uid: 123,
-				name: 'core/paragraph',
+				name: 'core/text',
 				attributes: {},
 				innerBlocks: [ {
 					uid: 456,
-					name: 'core/paragraph',
+					name: 'core/text',
 					attributes: {},
 					innerBlocks: [],
 				} ],
@@ -1348,7 +1348,7 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+							123: { uid: 123, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123, 23 ],
@@ -1359,7 +1359,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlocks( state ) ).toEqual( [
-				{ uid: 123, name: 'core/paragraph', attributes: {}, innerBlocks: [] },
+				{ uid: 123, name: 'core/text', attributes: {}, innerBlocks: [] },
 				{ uid: 23, name: 'core/heading', attributes: {}, innerBlocks: [] },
 			] );
 		} );
@@ -1372,7 +1372,7 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+							123: { uid: 123, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123, 23 ],
@@ -1390,8 +1390,8 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {
 							123: { uid: 123, name: 'core/columns', attributes: {} },
-							456: { uid: 456, name: 'core/paragraph', attributes: {} },
-							789: { uid: 789, name: 'core/paragraph', attributes: {} },
+							456: { uid: 456, name: 'core/text', attributes: {} },
+							789: { uid: 789, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 123 ],
@@ -1448,7 +1448,7 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+							123: { uid: 123, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 23, 123 ],
@@ -1471,7 +1471,7 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+							123: { uid: 123, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 23, 123 ],
@@ -1494,7 +1494,7 @@ describe( 'selectors', () => {
 					present: {
 						blocksByUid: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
-							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+							123: { uid: 123, name: 'core/text', attributes: {} },
 						},
 						blockOrder: {
 							'': [ 23, 123 ],
@@ -2383,7 +2383,7 @@ describe( 'selectors', () => {
 			expect( getSuggestedPostFormat( state ) ).toBe( 'video' );
 		} );
 
-		it( 'returns Quote if the first block is of type `core/quote` and second is of type `core/paragraph`', () => {
+		it( 'returns Quote if the first block is of type `core/quote` and second is of type `core/text`', () => {
 			const state = {
 				editor: {
 					present: {
@@ -2392,7 +2392,7 @@ describe( 'selectors', () => {
 						},
 						blocksByUid: {
 							456: { uid: 456, name: 'core/quote', attributes: {} },
-							789: { uid: 789, name: 'core/paragraph', attributes: {} },
+							789: { uid: 789, name: 'core/text', attributes: {} },
 						},
 						edits: {},
 					},
@@ -2540,7 +2540,7 @@ describe( 'selectors', () => {
 						'core/block/456': { time: 1000, count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted reusable blocks should be filtered out
 						'core/image': { time: 1000, count: 3, insert: { name: 'core/image' } },
 						'core/block/123': { time: 1000, count: 5, insert: { name: 'core/block', ref: 123 } },
-						'core/paragraph': { time: 1000, count: 2, insert: { name: 'core/paragraph' } },
+						'core/text': { time: 1000, count: 2, insert: { name: 'core/text' } },
 					},
 				},
 				editor: {
@@ -2563,7 +2563,7 @@ describe( 'selectors', () => {
 			expect( getFrecentInserterItems( state, true, 3 ) ).toMatchObject( [
 				{ name: 'core/block', initialAttributes: { ref: 123 } },
 				{ name: 'core/image', initialAttributes: {} },
-				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/text', initialAttributes: {} },
 			] );
 		} );
 
@@ -2572,7 +2572,7 @@ describe( 'selectors', () => {
 				preferences: {
 					insertUsage: {
 						'core/image': { time: Date.now() - 1000, count: 2, insert: { name: 'core/image' } },
-						'core/paragraph': { time: Date.now() - 4000, count: 3, insert: { name: 'core/paragraph' } },
+						'core/text': { time: Date.now() - 4000, count: 3, insert: { name: 'core/text' } },
 					},
 				},
 				editor: {
@@ -2587,7 +2587,7 @@ describe( 'selectors', () => {
 
 			expect( getFrecentInserterItems( state, true, 2 ) ).toMatchObject( [
 				{ name: 'core/image', initialAttributes: {} },
-				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/text', initialAttributes: {} },
 			] );
 		} );
 
@@ -2596,7 +2596,7 @@ describe( 'selectors', () => {
 				preferences: {
 					insertUsage: {
 						'core/image': { time: Date.now(), count: 1, insert: { name: 'core/image' } },
-						'core/paragraph': { time: undefined, count: 5, insert: { name: 'core/paragraph' } },
+						'core/text': { time: undefined, count: 5, insert: { name: 'core/text' } },
 					},
 				},
 				editor: {
@@ -2610,7 +2610,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getFrecentInserterItems( state, true, 2 ) ).toMatchObject( [
-				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/text', initialAttributes: {} },
 				{ name: 'core/image', initialAttributes: {} },
 			] );
 		} );
@@ -2619,7 +2619,7 @@ describe( 'selectors', () => {
 			const state = {
 				preferences: {
 					insertUsage: {
-						'core/image': { time: 1000, count: 2, insert: { name: 'core/paragraph' } },
+						'core/image': { time: 1000, count: 2, insert: { name: 'core/text' } },
 					},
 				},
 				editor: {

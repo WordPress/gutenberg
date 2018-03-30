@@ -65,7 +65,7 @@ export const settings = {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
 						value: [
@@ -104,16 +104,16 @@ export const settings = {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/text' ],
 				transform: ( { value, citation } ) => {
 					// transforming an empty quote
 					if ( ( ! value || ! value.length ) && ! citation ) {
-						return createBlock( 'core/paragraph' );
+						return createBlock( 'core/text' );
 					}
 					// transforming a quote with content
-					return ( value || [] ).map( item => createBlock( 'core/paragraph', {
+					return ( value || [] ).map( item => createBlock( 'core/text', {
 						content: [ get( item, 'children.props.children', '' ) ],
-					} ) ).concat( citation ? createBlock( 'core/paragraph', {
+					} ) ).concat( citation ? createBlock( 'core/text', {
 						content: citation,
 					} ) : [] );
 				},

@@ -87,17 +87,17 @@ Consider a Columns block. When the user changes the layout of a block from one c
 ```html
 <!-- wp:columns -->
 <div class="wp-block-columns">
-	<!-- wp:paragraph {"layout":"column-1"} -->
+	<!-- wp:text {"layout":"column-1"} -->
 	<p>First Paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- /wp:text -->
 
-	<!-- wp:paragraph {"layout":"column-1"} -->
+	<!-- wp:text {"layout":"column-1"} -->
 	<p>Second Paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- /wp:text -->
 
-	<!-- wp:paragraph {"layout":"column-2"} -->
+	<!-- wp:text {"layout":"column-2"} -->
 	<p>Third Paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- /wp:text -->
 </div>
 <!-- /wp:columns -->
 ```
@@ -109,17 +109,17 @@ _Bad:_
 ```html
 <!-- wp:columns -->
 <div class="wp-block-columns">
-	<!-- wp:paragraph {"layout":"column-2"} -->
+	<!-- wp:text {"layout":"column-2"} -->
 	<p>First Paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- /wp:text -->
 
-	<!-- wp:paragraph {"layout":"column-1"} -->
+	<!-- wp:text {"layout":"column-1"} -->
 	<p>Second Paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- /wp:text -->
 
-	<!-- wp:paragraph {"layout":"column-2"} -->
+	<!-- wp:text {"layout":"column-2"} -->
 	<p>Third Paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- /wp:text -->
 </div>
 <!-- /wp:columns -->
 ```
@@ -131,17 +131,17 @@ _Good:_
 ```html
 <!-- wp:columns -->
 <div class="wp-block-columns">
-	<!-- wp:paragraph {"layout":"column-1"} -->
+	<!-- wp:text {"layout":"column-1"} -->
 	<p>Second Paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- /wp:text -->
 
-	<!-- wp:paragraph {"layout":"column-2"} -->
+	<!-- wp:text {"layout":"column-2"} -->
 	<p>First Paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- /wp:text -->
 
-	<!-- wp:paragraph {"layout":"column-2"} -->
+	<!-- wp:text {"layout":"column-2"} -->
 	<p>Third Paragraph</p>
-	<!-- /wp:paragraph -->
+	<!-- /wp:text -->
 </div>
 <!-- /wp:columns -->
 ```

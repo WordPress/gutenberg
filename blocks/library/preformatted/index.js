@@ -33,7 +33,7 @@ export const settings = {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/text' ],
 				transform: ( attributes ) =>
 					createBlock( 'core/preformatted', attributes ),
 			},
@@ -51,9 +51,9 @@ export const settings = {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/text' ],
 				transform: ( attributes ) =>
-					createBlock( 'core/paragraph', attributes ),
+					createBlock( 'core/text', attributes ),
 			},
 		],
 	},

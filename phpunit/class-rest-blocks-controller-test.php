@@ -35,7 +35,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'post_type'    => 'wp_block',
 				'post_status'  => 'publish',
 				'post_title'   => 'My cool block',
-				'post_content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
+				'post_content' => '<!-- wp:core/text --><p>Hello!</p><!-- /wp:core/text -->',
 			)
 		);
 
@@ -82,7 +82,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				array(
 					'id'      => self::$post_id,
 					'title'   => 'My cool block',
-					'content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
+					'content' => '<!-- wp:core/text --><p>Hello!</p><!-- /wp:core/text -->',
 				),
 			), $response->get_data()
 		);
@@ -102,7 +102,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array(
 				'id'      => self::$post_id,
 				'title'   => 'My cool block',
-				'content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
+				'content' => '<!-- wp:core/text --><p>Hello!</p><!-- /wp:core/text -->',
 			), $response->get_data()
 		);
 	}
@@ -117,7 +117,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request->set_body_params(
 			array(
 				'title'   => 'New cool block',
-				'content' => '<!-- wp:core/paragraph --><p>Wow!</p><!-- /wp:core/paragraph -->',
+				'content' => '<!-- wp:core/text --><p>Wow!</p><!-- /wp:core/text -->',
 			)
 		);
 
@@ -128,7 +128,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array(
 				'id'      => self::$post_id,
 				'title'   => 'New cool block',
-				'content' => '<!-- wp:core/paragraph --><p>Wow!</p><!-- /wp:core/paragraph -->',
+				'content' => '<!-- wp:core/text --><p>Wow!</p><!-- /wp:core/text -->',
 			), $response->get_data()
 		);
 	}
@@ -143,7 +143,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request->set_body_params(
 			array(
 				'title'   => 'Updated cool block',
-				'content' => '<!-- wp:core/paragraph --><p>Nice!</p><!-- /wp:core/paragraph -->',
+				'content' => '<!-- wp:core/text --><p>Nice!</p><!-- /wp:core/text -->',
 			)
 		);
 
@@ -154,7 +154,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array(
 				'id'      => self::$post_id,
 				'title'   => 'Updated cool block',
-				'content' => '<!-- wp:core/paragraph --><p>Nice!</p><!-- /wp:core/paragraph -->',
+				'content' => '<!-- wp:core/text --><p>Nice!</p><!-- /wp:core/text -->',
 			), $response->get_data()
 		);
 	}
@@ -176,7 +176,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'previous' => array(
 					'id'      => self::$post_id,
 					'title'   => 'My cool block',
-					'content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
+					'content' => '<!-- wp:core/text --><p>Hello!</p><!-- /wp:core/text -->',
 				),
 			), $response->get_data()
 		);
@@ -243,7 +243,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				$request->set_body_params(
 					array(
 						'title'   => 'Test',
-						'content' => '<!-- wp:core/paragraph --><p>Test</p><!-- /wp:core/paragraph -->',
+						'content' => '<!-- wp:core/text --><p>Test</p><!-- /wp:core/text -->',
 					)
 				);
 
@@ -266,7 +266,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 						'post_type'    => 'wp_block',
 						'post_status'  => 'publish',
 						'post_title'   => 'My cool block',
-						'post_content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
+						'post_content' => '<!-- wp:core/text --><p>Hello!</p><!-- /wp:core/text -->',
 						'post_author'  => $user_id,
 					)
 				);
@@ -275,7 +275,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				$request->set_body_params(
 					array(
 						'title'   => 'Test',
-						'content' => '<!-- wp:core/paragraph --><p>Test</p><!-- /wp:core/paragraph -->',
+						'content' => '<!-- wp:core/text --><p>Test</p><!-- /wp:core/text -->',
 					)
 				);
 
@@ -296,7 +296,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				$request->set_body_params(
 					array(
 						'title'   => 'Test',
-						'content' => '<!-- wp:core/paragraph --><p>Test</p><!-- /wp:core/paragraph -->',
+						'content' => '<!-- wp:core/text --><p>Test</p><!-- /wp:core/text -->',
 					)
 				);
 

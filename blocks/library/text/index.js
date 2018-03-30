@@ -253,7 +253,7 @@ class ParagraphBlock extends Component {
 									setAttributes( { content: before } );
 									insertBlocksAfter( [
 										...blocks,
-										createBlock( 'core/paragraph', { content: after } ),
+										createBlock( 'core/text', { content: after } ),
 									] );
 								} :
 								undefined
@@ -313,7 +313,7 @@ const schema = {
 	},
 };
 
-export const name = 'core/paragraph';
+export const name = 'core/text';
 
 export const settings = {
 	title: __( 'Paragraph' ),

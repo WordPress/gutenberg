@@ -58,7 +58,7 @@ export const settings = {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/heading', {
 						content,
@@ -85,9 +85,9 @@ export const settings = {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
-					return createBlock( 'core/paragraph', {
+					return createBlock( 'core/text', {
 						content,
 					} );
 				},
@@ -156,7 +156,7 @@ export const settings = {
 							setAttributes( { content: before } );
 							insertBlocksAfter( [
 								...blocks,
-								createBlock( 'core/paragraph', { content: after } ),
+								createBlock( 'core/text', { content: after } ),
 							] );
 						} :
 						undefined

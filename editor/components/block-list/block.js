@@ -369,7 +369,7 @@ export class BlockListBlock extends Component {
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
 				this.props.onInsertBlocks( [
-					createBlock( 'core/paragraph' ),
+					createBlock( 'core/text' ),
 				], this.props.order + 1 );
 				event.preventDefault();
 				break;

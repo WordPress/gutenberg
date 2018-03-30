@@ -217,9 +217,9 @@ export function createBlockWithFallback( blockNode ) {
 	// Use type from block content, otherwise find unknown handler.
 	name = name || getUnknownTypeHandlerName();
 
-	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
-	if ( 'core/text' === name || 'core/cover-text' === name ) {
-		name = 'core/paragraph';
+	// Convert 'core/text' blocks in existing content to 'core/text'.
+	if ( 'core/paragraph' === name || 'core/cover-text' === name ) {
+		name = 'core/text';
 	}
 
 	// Try finding the type for known block name, else fall back again.

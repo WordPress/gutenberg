@@ -46,7 +46,7 @@ function myplugin_register_book_post_type() {
 			array( 'core/heading', array(
 				'placeholder' => 'Add Author...',
 			) ),
-			array( 'core/paragraph', array(
+			array( 'core/text', array(
 				'placeholder' => 'Add Description...',
 			) ),
 		),
@@ -77,7 +77,7 @@ It is also possible to assign a template to an existing post type like "posts" a
 function my_add_template_to_posts() {
 	$post_type_object = get_post_type_object( 'post' );
 	$post_type_object->template = array(
-		array( 'core/paragraph', array(
+		array( 'core/text', array(
 			'placeholder' => 'Add Description...',
 		) ),
 	);
@@ -92,12 +92,12 @@ Container blocks like the columns blocks also support templates. This is achieve
 
 ```php
 $template = array(
-	array( 'core/paragraph', array(
+	array( 'core/text', array(
 		'placeholder' => 'Add a root-level paragraph',
 	) ),
 	array( 'core/columns', array(), array(
 		array( 'core/image', array( 'layout' => 'column-1' ) ),
-		array( 'core/paragraph', array(
+		array( 'core/text', array(
 			'placeholder' => 'Add a inner paragraph',
 			'layout' => 'column-2'
 		) ),

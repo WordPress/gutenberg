@@ -1893,7 +1893,7 @@ describe( 'state', () => {
 					[ id ]: {
 						id,
 						name: 'My cool block',
-						type: 'core/paragraph',
+						type: 'core/text',
 						attributes: {
 							content: 'Hello!',
 							dropCap: true,
@@ -2067,7 +2067,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should set the template', () => {
-			const blockTemplate = [ [ 'core/paragraph' ] ];
+			const blockTemplate = [ [ 'core/text' ] ];
 			const state = template( undefined, {
 				type: 'SETUP_EDITOR',
 				settings: { template: blockTemplate, templateLock: 'all' },

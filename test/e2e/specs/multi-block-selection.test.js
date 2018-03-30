@@ -11,7 +11,7 @@ describe( 'Multi-block selection', () => {
 	} );
 
 	it( 'Should select/unselect multiple blocks', async () => {
-		const firstBlockSelector = '[data-type="core/paragraph"]';
+		const firstBlockSelector = '[data-type="core/text"]';
 		const secondBlockSelector = '[data-type="core/image"]';
 		const thirdBlockSelector = '[data-type="core/quote"]';
 		const multiSelectedCssClass = 'is-multi-selected';

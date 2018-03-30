@@ -6,7 +6,7 @@ import {
 	setDefaultBlockName,
 	setUnknownTypeHandlerName,
 } from '../api';
-import * as paragraph from './paragraph';
+import * as paragraph from './text';
 import * as image from './image';
 import * as heading from './heading';
 import * as quote from './quote';

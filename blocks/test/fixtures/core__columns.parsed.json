@@ -6,7 +6,7 @@
         },
         "innerBlocks": [
             {
-                "blockName": "core/paragraph",
+                "blockName": "core/text",
                 "attrs": {
                     "layout": "column-1"
                 },
@@ -14,7 +14,7 @@
                 "innerHTML": "\n\t<p class=\"layout-column-1\">Column One, Paragraph One</p>\n\t"
             },
             {
-                "blockName": "core/paragraph",
+                "blockName": "core/text",
                 "attrs": {
                     "layout": "column-1"
                 },
@@ -22,7 +22,7 @@
                 "innerHTML": "\n\t<p class=\"layout-column-1\">Column One, Paragraph Two</p>\n\t"
             },
             {
-                "blockName": "core/paragraph",
+                "blockName": "core/text",
                 "attrs": {
                     "layout": "column-2"
                 },
@@ -30,7 +30,7 @@
                 "innerHTML": "\n\t<p class=\"layout-column-2\">Column Two, Paragraph One</p>\n\t"
             },
             {
-                "blockName": "core/paragraph",
+                "blockName": "core/text",
                 "attrs": {
                     "layout": "column-3"
                 },

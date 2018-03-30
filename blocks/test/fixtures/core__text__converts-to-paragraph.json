@@ -1,7 +1,7 @@
 [
     {
         "uid": "_uid_0",
-        "name": "core/paragraph",
+        "name": "core/text",
         "isValid": true,
         "attributes": {
             "content": [
