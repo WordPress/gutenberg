@@ -51,6 +51,21 @@ describe( 'element', () => {
 			) ).toBe( '<strong>Courgette</strong>' );
 		} );
 
+		it( 'should escape attributes and html', () => {
+			const result = renderToString( createElement( 'a', {
+				href: '/index.php?foo=bar&qux=<"scary">',
+				style: {
+					backgroundColor: 'red',
+				},
+			}, '<"WordPress" & Friends>' ) );
+
+			expect( result ).toBe(
+				'<a href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;>" style="background-color:red">' +
+				'&lt;"WordPress" &amp; Friends>' +
+				'</a>'
+			);
+		} );
+
 		it( 'strips raw html wrapper', () => {
 			const html = '<p>So scary!</p>';
 

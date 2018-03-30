@@ -89,7 +89,6 @@ const coreGlobals = [
 const externals = {
 	react: 'React',
 	'react-dom': 'ReactDOM',
-	'react-dom/server': 'ReactDOMServer',
 	tinymce: 'tinymce',
 	moment: 'moment',
 	jquery: 'jQuery',
