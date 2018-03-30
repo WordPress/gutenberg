@@ -1,18 +1,13 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
+import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import { getSelectedBlock } from '../../store/selectors';
 import { getBlockWrapperDOMNode } from '../../utils/dom';
 
 const SkipToSelectedBlock = ( { selectedBlock } ) => {
@@ -35,10 +30,8 @@ const SkipToSelectedBlock = ( { selectedBlock } ) => {
 	);
 };
 
-export default connect(
-	( state ) => {
-		return {
-			selectedBlock: getSelectedBlock( state ),
-		};
-	}
-)( SkipToSelectedBlock );
+export default withSelect( ( select ) => {
+	return {
+		selectedBlock: select( 'core/editor' ).getSelectedBlock(),
+	};
+} )( SkipToSelectedBlock );
