@@ -6,9 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './editor.scss';
-import PlainText from '../../plain-text';
 import { createBlock } from '../../api';
+import { edit } from './edit';
 
 export const name = 'core/code';
 
@@ -53,18 +52,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, className } ) {
-		return (
-			<div className={ className }>
-				<PlainText
-					value={ attributes.content }
-					onChange={ ( content ) => setAttributes( { content } ) }
-					placeholder={ __( 'Write code…' ) }
-					aria-label={ __( 'Code' ) }
-				/>
-			</div>
-		);
-	},
+	edit: edit,
 
 	save( { attributes } ) {
 		return <pre><code>{ attributes.content }</code></pre>;
