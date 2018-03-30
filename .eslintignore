@@ -2,6 +2,3 @@ build
 coverage
 node_modules
 vendor
-*.native.js
-*.android.js
-*.ios.js
