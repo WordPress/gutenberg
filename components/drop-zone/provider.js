@@ -6,7 +6,7 @@ import { isEqual, find, some, filter, noop, throttle } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, findDOMNode } from '@wordpress/element';
 
 class DropZoneProvider extends Component {
 	constructor() {
@@ -17,7 +17,6 @@ class DropZoneProvider extends Component {
 		this.dragOverListener = this.dragOverListener.bind( this );
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 		this.onDrop = this.onDrop.bind( this );
-		this.bindContainer = this.bindContainer.bind( this );
 
 		this.state = {
 			isDraggingOverDocument: false,
@@ -25,10 +24,6 @@ class DropZoneProvider extends Component {
 			position: null,
 		};
 		this.dropzones = [];
-	}
-
-	bindContainer( ref ) {
-		this.container = ref;
 	}
 
 	dragOverListener( event ) {
@@ -53,6 +48,7 @@ class DropZoneProvider extends Component {
 		window.addEventListener( 'dragover', this.dragOverListener );
 		window.addEventListener( 'drop', this.onDrop );
 		window.addEventListener( 'mouseup', this.resetDragState );
+		this.container = findDOMNode( this );
 	}
 
 	componentWillUnmount() {
@@ -225,7 +221,7 @@ class DropZoneProvider extends Component {
 
 	render() {
 		const { children } = this.props;
-		return <div ref={ this.bindContainer }>{ children }</div>;
+		return children;
 	}
 }
 
