@@ -33,7 +33,7 @@ import { castArray, omit, kebabCase } from 'lodash';
 /**
  * Internal dependencies
  */
-import { Fragment } from './';
+import { Fragment, RawHTML } from './';
 
 /**
  * Valid attribute types.
@@ -348,28 +348,34 @@ export function renderElement( element, context = {} ) {
 		return renderChildren( element, context );
 	}
 
-	if ( typeof element === 'string' ) {
-		return escapeHTML( element );
-	}
+	switch ( typeof element ) {
+		case 'string':
+			return escapeHTML( element );
 
-	if ( typeof element === 'number' ) {
-		return element.toString();
+		case 'number':
+			return element.toString();
 	}
 
 	const { type: tagName, props } = element;
 
-	if ( tagName === Fragment ) {
-		return renderChildren( props.children, context );
+	switch ( tagName ) {
+		case Fragment:
+			return renderChildren( props.children, context );
+
+		case RawHTML:
+			return props.children;
 	}
 
-	if ( typeof tagName === 'string' ) {
-		return renderNativeComponent( tagName, props, context );
-	} else if ( typeof tagName === 'function' ) {
-		if ( tagName.prototype && typeof tagName.prototype.render === 'function' ) {
-			return renderComponent( tagName, props, context );
-		}
+	switch ( typeof tagName ) {
+		case 'string':
+			return renderNativeComponent( tagName, props, context );
 
-		return renderElement( tagName( props, context ), context );
+		case 'function':
+			if ( tagName.prototype && typeof tagName.prototype.render === 'function' ) {
+				return renderComponent( tagName, props, context );
+			}
+
+			return renderElement( tagName( props, context ), context );
 	}
 
 	return '';

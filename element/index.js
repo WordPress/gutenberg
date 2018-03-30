@@ -101,14 +101,7 @@ export { createPortal };
  *
  * @return {string} HTML.
  */
-export function renderToString( element ) {
-	let rendered = serialize( element );
-
-	// Drop raw HTML wrappers (support dangerous inner HTML without wrapper)
-	rendered = rendered.replace( /<\/?wp-raw-html>/g, '' );
-
-	return rendered;
-}
+export { serialize as renderToString };
 
 /**
  * Concatenate two or more React children objects.

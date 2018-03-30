@@ -6,7 +6,7 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { Component, Fragment } from '../';
+import { Component, Fragment, RawHTML } from '../';
 import serialize, {
 	hasPrefix,
 	renderElement,
@@ -193,10 +193,16 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( '' );
 	} );
 
-	it( 'renders fragment as its inner children', () => {
+	it( 'renders Fragment as its inner children', () => {
 		const result = renderElement( <Fragment>Hello</Fragment> );
 
 		expect( result ).toBe( 'Hello' );
+	} );
+
+	it( 'renders RawHTML as its unescaped children', () => {
+		const result = renderElement( <RawHTML>{ '<img/>' }</RawHTML> );
+
+		expect( result ).toBe( '<img/>' );
 	} );
 } );
 
