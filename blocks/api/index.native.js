@@ -4,7 +4,7 @@
 export { createBlock } from // getPossibleBlockTransformations,
 // switchToBlockType,
 // createReusableBlock,
-'./factory';
+	'./factory';
 // export { default as parse, getBlockAttributes } from './parser';
 // export { default as rawHandler } from './raw-handling';
 // export {
@@ -25,10 +25,11 @@ export {
 	// 	getDefaultBlockName,
 	// 	getDefaultBlockForPostFormat,
 	getBlockType,
-} from // 	getBlockSupport,
-// 	hasBlockSupport,
-// 	isReusableBlock,
-'./registration';
+	// 	getBlockSupport,
+	// 	hasBlockSupport,
+	// 	isReusableBlock,
+} from
+	'./registration';
 // export {
 // 	isUnmodifiedDefaultBlock,
 // } from './utils';
