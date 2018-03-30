@@ -41,15 +41,20 @@ public class ReactAztecView extends AztecText {
         super(context);
         this.setFocusableInTouchMode(true);
         this.setFocusable(true);
-        //this.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         addPlugin(new WordPressCommentsPlugin(this));
         addPlugin(new MoreToolbarButton(this));
         addPlugin(new CaptionShortcodePlugin(this));
         addPlugin(new VideoShortcodePlugin());
         addPlugin(new AudioShortcodePlugin());
-        //this.setImageGetter(new GlideImageLoader(context));
-        //this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));
+        this.setImageGetter(new GlideImageLoader(context));
+        this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));
+    }
+
+    @Override
+    public void refreshText() {
+        super.refreshText();
+        onContentSizeChange();
     }
 
     private void addPlugin(IAztecPlugin plugin) {

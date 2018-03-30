@@ -1,5 +1,33 @@
+buildscript {
+    ext {
+        gradlePluginVersion = '3.0.1'
+        kotlinVersion = '1.2.21'
+        supportLibVersion = '26.1.0'
+        tagSoupVersion = '1.2.1'
+        glideVersion = '3.7.0'
+        picassoVersion = '2.5.2'
+        robolectricVersion = '3.5.1'
+        jUnitVersion = '4.12'
+        jSoupVersion = '1.10.3'
+        wordpressUtilsVersion = '1.18.1'
+        espressoVersion = '3.0.1'
+    }
+
+    repositories {
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:$gradlePluginVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
 allprojects {
     repositories {
+        google()
+        jcenter()
         maven {
             // All of React Native (JS, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
@@ -7,15 +35,28 @@ allprojects {
     }
 }
 
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
 
+subprojects {
+    configurations {
+        ktlint
+    }
 
+    dependencies {
+        ktlint 'com.github.shyiko:ktlint:0.9.2'
+    }
 
+    task ktlint(type: JavaExec) {
+        main = "com.github.shyiko.ktlint.Main"
+        classpath = configurations.ktlint
+        args "src/**/*.kt"
+    }
 
-
-
-
-
-
-
-
-
+    task ktlintFormat(type: JavaExec) {
+        main = "com.github.shyiko.ktlint.Main"
+        classpath = configurations.ktlint
+        args "-F", "src/**/*.kt"
+    }
+}

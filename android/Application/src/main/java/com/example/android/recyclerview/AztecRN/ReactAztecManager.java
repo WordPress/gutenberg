@@ -20,7 +20,6 @@ import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
 import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
-import com.facebook.react.views.textinput.ReactTextInputManager;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.facebook.react.views.textinput.ScrollWatcher;

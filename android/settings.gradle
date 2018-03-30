@@ -1,1 +1,1 @@
-include 'Application'
+include 'Application', ':aztec', ':glide-loader', ':wordpress-comments', ':wordpress-shortcodes'
