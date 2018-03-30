@@ -29,7 +29,14 @@ const effects = {
 		}
 
 		// Allow toggling metaboxes panels
-		window.postboxes.add_postbox_toggles( select( 'core/editor' ).getCurrentPostType() );
+		// We need to wait for all scripts to load
+		// If the meta box loads the post script, it will already trigger this.
+		setTimeout( () => {
+			const postType = select( 'core/editor' ).getCurrentPostType();
+			if ( window.postboxes.page !== postType ) {
+				window.postboxes.add_postbox_toggles( postType );
+			}
+		} );
 
 		// Initialize metaboxes state
 		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
