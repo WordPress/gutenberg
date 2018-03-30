@@ -35,7 +35,7 @@ describe( 'splitting and merging blocks', () => {
 
 		//Switch to Visual Editor to continue testing
 		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		let visualEditorButton = ( await page.$x( '//button[contains(text(), \'Visual Editor\')]' ) )[ 0 ];
+		const visualEditorButton = ( await page.$x( '//button[contains(text(), \'Visual Editor\')]' ) )[ 0 ];
 		await visualEditorButton.click( 'button' );
 
 		//Press Backspace to merge paragraph blocks
