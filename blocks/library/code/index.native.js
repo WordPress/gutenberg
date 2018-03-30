@@ -13,7 +13,7 @@ import { __ } from '../../../i18n';
  */
 // import './editor.scss';
 import PlainText from '../../plain-text';
-// import { createBlock } from '../../api';
+import { createBlock } from '../../api';
 
 export const name = 'core/code';
 
