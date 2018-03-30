@@ -1,8 +1,7 @@
 /**
  * Internal dependencies
  */
-import './style.scss';
-import MenuItemsToggle from './menu-items-toggle';
+import MenuItem from '../menu-item';
 
 export default function MenuItemsChoice( {
 	choices = [],
@@ -12,9 +11,9 @@ export default function MenuItemsChoice( {
 	return choices.map( ( item ) => {
 		const isSelected = value === item.value;
 		return (
-			<MenuItemsToggle
+			<MenuItem
 				key={ item.value }
-				label={ item.label }
+				icon={ isSelected && 'yes' }
 				isSelected={ isSelected }
 				shortcut={ item.shortcut }
 				onClick={ () => {
@@ -22,7 +21,9 @@ export default function MenuItemsChoice( {
 						onSelect( item.value );
 					}
 				} }
-			/>
+			>
+				{ item.label }
+			</MenuItem>
 		);
 	} );
 }

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
 import {
 	map,
 	first,
@@ -23,6 +22,7 @@ import createSelector from 'rememo';
 import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+import { moment } from '@wordpress/date';
 
 /***
  * Module constants
@@ -217,6 +217,17 @@ export function getEditedPostVisibility( state ) {
 }
 
 /**
+ * Returns true if post is pending review.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether current post is pending review.
+ */
+export function isCurrentPostPending( state ) {
+	return getCurrentPost( state ).status === 'pending';
+}
+
+/**
  * Return true if the current post has already been published.
  *
  * @param {Object} state Global application state.
@@ -228,6 +239,17 @@ export function isCurrentPostPublished( state ) {
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
 		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+}
+
+/**
+ * Returns true if post is already scheduled.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether current post is scheduled to be posted.
+ */
+export function isCurrentPostScheduled( state ) {
+	return getCurrentPost( state ).status === 'future' && ! isCurrentPostPublished( state );
 }
 
 /**
@@ -283,11 +305,11 @@ export function isEditedPostEmpty( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = getEditedPostAttribute( state, 'date' );
+	const date = moment( getEditedPostAttribute( state, 'date' ) );
 	// Adding 1 minute as an error threshold between the server and the client dates.
 	const now = moment().add( 1, 'minute' );
 
-	return moment( date ).isAfter( now );
+	return date.isAfter( now );
 }
 
 /**
@@ -300,7 +322,7 @@ export function isEditedPostBeingScheduled( state ) {
 export function getDocumentTitle( state ) {
 	let title = getEditedPostAttribute( state, 'title' );
 
-	if ( ! title.trim() ) {
+	if ( ! title || ! title.trim() ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
 	}
 	return title;
@@ -505,6 +527,18 @@ export function getSelectedBlockCount( state ) {
 	}
 
 	return state.blockSelection.start ? 1 : 0;
+}
+
+/**
+ * Returns true if there is a single selected block, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether a single block is selected.
+ */
+export function hasSelectedBlock( state ) {
+	const { start, end } = state.blockSelection;
+	return !! start && start === end;
 }
 
 /**

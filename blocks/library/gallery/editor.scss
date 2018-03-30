@@ -37,6 +37,9 @@
 	}
 
 	.button.blocks-gallery-add-item-button {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 		box-shadow: none;
 		border: none;
 		border-radius: 0;
@@ -45,7 +48,6 @@
 		& .dashicon {
 			margin-top: 10px;
 		}
-
 
 		&:hover,
 		&:focus {
