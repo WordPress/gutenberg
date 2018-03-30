@@ -21,7 +21,7 @@ If you wish to display the sidebar, you can with use the [`PluginMoreMenuItem`](
 wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );
 ```
 
-__Example:__
+_Example:_
 
 ```jsx
 const { Panel, PanelBody } = wp.components;
@@ -64,7 +64,7 @@ Title displayed at the top of the sidebar.
 Renders a menu item in the more menu drop down, and can be used to activate other plugin UI components.
 The text within the component appears as the menu item label.
 
-__Example:__
+_Example:_
 
 ```jsx
 const { PluginMoreMenuItem } = wp.editPost;

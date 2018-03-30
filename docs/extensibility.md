@@ -31,17 +31,17 @@ If you want to learn more about block creation, the [Blocks Tutorial](./blocks) 
 
 It is also possible to modify the behavior of existing blocks or even remove them completely using filters.
 
-Learn more in the [Extending Blocks](./extensibility/extending-blocks) documentation.
+Learn more in the [Extending Blocks](./extensibility/extending-blocks) section.
 
 ## Extending the Editor UI
 
 Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
 
-Refer to the [Plugins](https://github.com/WordPress/gutenberg/blob/master/plugins/README.md) and [Edit Post](https://github.com/WordPress/gutenberg/blob/master/edit-post/README.md) documentation for more information.
+Refer to the [Plugins](https://github.com/WordPress/gutenberg/blob/master/plugins/README.md) and [Edit Post](https://github.com/WordPress/gutenberg/blob/master/edit-post/README.md) section for more information.
 
 ## Meta Boxes
 
-**Converting PHP meta boxes to blocks is highly encouraged!**
+**Porting PHP meta boxes to blocks is highly encouraged!**
 
 Discover how [Meta Box](./extensibility/meta-box) support works in Gutenberg.
 
@@ -49,4 +49,4 @@ Discover how [Meta Box](./extensibility/meta-box) support works in Gutenberg.
 
 By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or rely on defaults.
 
-There are some advanced block features which require opt-in support in the theme. You can find out more [here](./extensibility/theme-support)
+There are some advanced block features which require opt-in support in the theme. See [theme support](./extensibility/theme-support)

@@ -16,7 +16,7 @@ This method takes two arguments:
 
 See [the edit-post module documentation](../edit-post/) for available components.
 
-__Example:__
+_Example:_
 
 ```jsx
 const { Fragment } = wp.element;
@@ -54,7 +54,7 @@ This method takes one argument:
 
 1. `name`: A string identifying the plugin.
 
-__Example:__
+_Example:_
 
 ```js
 const { unregisterPlugin } = wp.plugins;
@@ -68,7 +68,7 @@ unregisterPlugin( 'plugin-name' );
 
 A component that renders all registered plugins in a hidden div.
 
-__Example:__
+_Example:_
 
 ```jsx
 const { PluginArea } = wp.plugins;
@@ -79,3 +79,4 @@ const Layout = () => (
 		<PluginArea />
 	</div>
 );
+```
