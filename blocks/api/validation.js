@@ -43,7 +43,7 @@ const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
  *
  * @type {Array}
  */
-const BOOLEAN_ATTRIBUTES = new Set( [
+const BOOLEAN_ATTRIBUTES = [
 	'allowfullscreen',
 	'allowpaymentrequest',
 	'allowusermedia',
@@ -72,7 +72,7 @@ const BOOLEAN_ATTRIBUTES = new Set( [
 	'reversed',
 	'selected',
 	'typemustmatch',
-] );
+];
 
 /**
  * Enumerated attributes are attributes which must be of a specific value form.
@@ -88,7 +88,7 @@ const BOOLEAN_ATTRIBUTES = new Set( [
  *
  * @type {Array}
  */
-const ENUMERATED_ATTRIBUTES = new Set( [
+const ENUMERATED_ATTRIBUTES = [
 	'autocomplete',
 	'contenteditable',
 	'crossorigin',
@@ -112,7 +112,7 @@ const ENUMERATED_ATTRIBUTES = new Set( [
 	'type',
 	'workertype',
 	'wrap',
-] );
+];
 
 /**
  * Meaningful attributes are those who cannot be safely ignored when omitted in
