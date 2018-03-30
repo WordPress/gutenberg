@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { tokenize } from 'simple-html-tokenizer';
-import { xor, fromPairs, isEqual, includes } from 'lodash';
+import { xor, fromPairs, isEqual } from 'lodash';
 
 /**
  * Internal dependencies
@@ -43,7 +43,7 @@ const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
  *
  * @type {Array}
  */
-const BOOLEAN_ATTRIBUTES = [
+const BOOLEAN_ATTRIBUTES = new Set( [
 	'allowfullscreen',
 	'allowpaymentrequest',
 	'allowusermedia',
@@ -72,7 +72,7 @@ const BOOLEAN_ATTRIBUTES = [
 	'reversed',
 	'selected',
 	'typemustmatch',
-];
+] );
 
 /**
  * Enumerated attributes are attributes which must be of a specific value form.
@@ -88,7 +88,7 @@ const BOOLEAN_ATTRIBUTES = [
  *
  * @type {Array}
  */
-const ENUMERATED_ATTRIBUTES = [
+const ENUMERATED_ATTRIBUTES = new Set( [
 	'autocomplete',
 	'contenteditable',
 	'crossorigin',
@@ -112,7 +112,7 @@ const ENUMERATED_ATTRIBUTES = [
 	'type',
 	'workertype',
 	'wrap',
-];
+] );
 
 /**
  * Meaningful attributes are those who cannot be safely ignored when omitted in
@@ -120,10 +120,10 @@ const ENUMERATED_ATTRIBUTES = [
  *
  * @type {Array}
  */
-const MEANINGFUL_ATTRIBUTES = [
+const MEANINGFUL_ATTRIBUTES = new Set( [
 	...BOOLEAN_ATTRIBUTES,
 	...ENUMERATED_ATTRIBUTES,
-];
+] );
 
 /**
  * Object of logger functions.
@@ -197,7 +197,7 @@ export function getMeaningfulAttributePairs( token ) {
 		return (
 			value ||
 			key.indexOf( 'data-' ) === 0 ||
-			includes( MEANINGFUL_ATTRIBUTES, key )
+			MEANINGFUL_ATTRIBUTES.has( key )
 		);
 	} );
 }
