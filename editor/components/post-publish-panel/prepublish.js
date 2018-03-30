@@ -11,6 +11,7 @@ import PostVisibility from '../post-visibility';
 import PostVisibilityLabel from '../post-visibility/label';
 import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
+import PluginPrePublishPanel from '../../../edit-post/components/plugin-pre-publish-panel';
 
 function PostPublishPanelPrepublish() {
 	return (
@@ -29,6 +30,7 @@ function PostPublishPanelPrepublish() {
 			] }>
 				<PostSchedule />
 			</PanelBody>
+			{ <PluginPrePublishPanel.Slot /> }
 		</div>
 	);
 }

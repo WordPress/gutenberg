@@ -7,7 +7,9 @@ Refer to [the plugins module documentation](../plugins/) for more information.
 ## Plugin Components
 
 The following components can be used with the `registerPlugin` ([see documentation](../plugins)) API.
-They can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency.
+They can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency. 
+
+**Note:** Plugin scripts should be enqueued to footer by setting `in_footer' option to true ( [see wp_enqueue_script documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_script/) ).
 
 Experimental components can be found under `wp.editPost.__experimental`. Experimental components are still being evaluated and can change in a future version.
 
@@ -109,3 +111,28 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 - Required: No
 
 
+### PluginPrePublishPanel
+**Experimental**
+
+Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when user first pushes "Publish" from main editor).
+
+#### Usage
+
+```jsx
+<PluginPrePublishPanel>
+    <div>My plugin content</div>
+</PluginPrePublishPanel>
+```
+
+### PluginPostPublishPanel
+**Experimental**
+
+Renders provided content to the post-publish panel in the publish flow (panel that opens after user publishes the post)
+
+#### Usage
+
+```jsx
+<PluginPrePublishPanel>
+    <div>My plugin content</div>
+</PluginPrePublishPanel>
+```
