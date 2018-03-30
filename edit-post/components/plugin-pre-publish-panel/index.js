@@ -35,7 +35,7 @@ const SLOT_NAME = 'PluginPrePublishPanel';
 function PluginPrePublishPanel( { children } ) {
 	return (
 		<Fill name={ SLOT_NAME } >
-				{ children }
+			{ children }
 		</Fill>
 	);
 }

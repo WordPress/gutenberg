@@ -4,7 +4,7 @@
  * Defines slot to be used by plugins to insert content in the post-publish sidebar
  * (which appears after a user fully publishes a post).
  *
- * @see /edit-post/README.md 
+ * @see /edit-post/README.md
  *
  * @file   This files defines the PluginPostPublishPanel extension
  * @author ChrisShultz
