@@ -37,9 +37,11 @@ const REGEXP_STYLE_URL_TYPE = /^url\s*\(['"\s]*(.*?)['"\s]*\)$/;
  * See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#boolean-attributes
  * Extracted from: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
  *
- * [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
+ * Object.keys( [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
  *     .filter( ( tr ) => tr.lastChild.textContent.indexOf( 'Boolean attribute' ) !== -1 )
- *     .map( ( tr ) => tr.firstChild.textContent.trim() )
+ *     .reduce( ( result, tr ) => Object.assign( result, {
+ *         [ tr.firstChild.textContent.trim() ]: true
+ *     } ), {} ) ).sort();
  *
  * @type {Array}
  */
@@ -65,7 +67,6 @@ const BOOLEAN_ATTRIBUTES = [
 	'nomodule',
 	'novalidate',
 	'open',
-	'open',
 	'playsinline',
 	'readonly',
 	'required',
@@ -82,35 +83,36 @@ const BOOLEAN_ATTRIBUTES = [
  * See: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#enumerated-attribute
  * Extracted from: https://html.spec.whatwg.org/multipage/indices.html#attributes-3
  *
- * [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
- *     filter( ( tr ) => /("(.+?)";?\s*)+/.test( tr.lastChild.textContent ) )
- *     .map( ( tr ) => tr.firstChild.textContent.trim() )
+ * Object.keys( [ ...document.querySelectorAll( '#attributes-1 > tbody > tr' ) ]
+ *     .filter( ( tr ) => /^("(.+?)";?\s*)+/.test( tr.lastChild.textContent.trim() ) )
+ *     .reduce( ( result, tr ) => Object.assign( result, {
+ *         [ tr.firstChild.textContent.trim() ]: true
+ *     } ), {} ) ).sort();
  *
  * @type {Array}
  */
 const ENUMERATED_ATTRIBUTES = [
+	'autocapitalize',
 	'autocomplete',
+	'charset',
 	'contenteditable',
 	'crossorigin',
-	'dir',
+	'decoding',
 	'dir',
 	'draggable',
 	'enctype',
 	'formenctype',
 	'formmethod',
+	'http-equiv',
 	'inputmode',
 	'kind',
 	'method',
 	'preload',
-	'sandbox',
 	'scope',
 	'shape',
 	'spellcheck',
-	'step',
 	'translate',
 	'type',
-	'type',
-	'workertype',
 	'wrap',
 ];
 
