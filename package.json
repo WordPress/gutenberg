@@ -26,6 +26,7 @@
 		"element-closest": "2.0.2",
 		"escape-string-regexp": "1.0.5",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
+		"formdata-polyfill": "3.0.9",
 		"hpq": "1.2.0",
 		"jed": "1.1.1",
 		"jquery": "3.2.1",

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { reduce, values, some } from 'lodash';
+import { reduce, some } from 'lodash';
+import 'formdata-polyfill';
 
 /**
  * WordPress dependencies
@@ -65,23 +66,35 @@ const effects = {
 		// If we do not provide this data the post will be overriden with the default values.
 		const post = select( 'core/editor' ).getCurrentPost( state );
 		const additionalData = [
-			post.comment_status && `comment_status=${ post.comment_status }`,
-			post.ping_status && `ping_status=${ post.ping_status }`,
-			`post_author=${ post.author }`,
+			post.comment_status ? [ 'comment_status', post.comment_status ] : false,
+			post.ping_status ? [ 'ping_status', post.ping_status ] : false,
+			[ 'post_author', post.author ],
 		].filter( Boolean );
 
-		// To save the metaboxes, we serialize each one of the location forms and combine them
-		// We also add the "common" hidden fields from the base .metabox-base-form
-		const formData = values( dataPerLocation )
-			.concat( jQuery( '.metabox-base-form' ).serialize() )
-			.concat( additionalData )
-			.join( '&' );
+		// We gather all the metaboxes locations data and the base form data
+		const baseFormData = new window.FormData( document.querySelector( '.metabox-base-form' ) );
+		const formDataToMerge = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
+			if ( metabox.isActive ) {
+				memo.push( new window.FormData( getMetaBoxContainer( location ) ) );
+			}
+			return memo;
+		}, [ baseFormData ] );
+
+		// Merge all form data objects into a single one.
+		const formData = reduce( formDataToMerge, ( memo, currentFormData ) => {
+			for ( const [ key, value ] of currentFormData ) {
+				memo.append( key, value );
+			}
+			return memo;
+		}, new window.FormData() );
+		additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
 
 		// Save the metaboxes
 		wp.apiRequest( {
 			url: window._wpMetaBoxUrl,
 			method: 'POST',
-			contentType: 'application/x-www-form-urlencoded',
+			processData: false,
+			contentType: false,
 			data: formData,
 		} )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
