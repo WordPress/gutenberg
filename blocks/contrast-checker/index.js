@@ -32,7 +32,9 @@ function ContrastChecker( { backgroundColor, textColor, isLargeText, fallbackBac
 		__( 'This color combination may be hard for people to read. Try using a brighter background color and/or a darker text color.' );
 	return (
 		<div className="blocks-contrast-checker">
-			<Notice status="warning" content={ msg } isDismissible={ false } />
+			<Notice status="warning" isDismissible={ false }>
+				{ msg }
+			</Notice>
 		</div>
 	);
 }

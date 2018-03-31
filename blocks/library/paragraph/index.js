@@ -389,7 +389,7 @@ export const settings = {
 				},
 			},
 			save( { attributes } ) {
-				return attributes.content;
+				return <RawHTML>{ attributes.content }</RawHTML>;
 			},
 			migrate( attributes ) {
 				return {

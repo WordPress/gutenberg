@@ -103,6 +103,37 @@ JS;
 add_action( 'wp_default_scripts', 'gutenberg_shim_fix_api_request_plain_permalinks' );
 
 /**
+ * Shims support for emulating HTTP/1.0 requests in wp.apiRequest
+ *
+ * @see https://core.trac.wordpress.org/ticket/43605
+ *
+ * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
+ */
+function gutenberg_shim_api_request_emulate_http( $scripts ) {
+	$api_request_fix = <<<JS
+( function( wp ) {
+	var oldApiRequest = wp.apiRequest;
+	wp.apiRequest = function ( options ) {
+		if ( options.method ) {
+			if ( [ 'PATCH', 'PUT', 'DELETE' ].indexOf( options.method.toUpperCase() ) >= 0 ) {
+				if ( ! options.headers ) {
+					options.headers = {};
+				}
+				options.headers['X-HTTP-Method-Override'] = options.method;
+				options.method = 'POST';
+			}
+		}
+
+		return oldApiRequest( options );
+	}
+} )( window.wp );
+JS;
+
+	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
+}
+add_action( 'wp_default_scripts', 'gutenberg_shim_api_request_emulate_http' );
+
+/**
  * Disables wpautop behavior in classic editor when post contains blocks, to
  * prevent removep from invalidating paragraph blocks.
  *

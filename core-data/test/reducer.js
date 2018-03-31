@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { terms, media } from '../reducer';
+import { terms, media, postTypes } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -85,6 +85,27 @@ describe( 'media', () => {
 		expect( state ).toEqual( {
 			1: { id: 1, title: 'beach' },
 			2: { id: 2, title: 'sun' },
+		} );
+	} );
+} );
+
+describe( 'postTypes', () => {
+	it( 'returns an empty object by default', () => {
+		const state = postTypes( undefined, {} );
+
+		expect( state ).toEqual( {} );
+	} );
+
+	it( 'returns with received post types by slug', () => {
+		const originalState = deepFreeze( {} );
+		const state = postTypes( originalState, {
+			type: 'RECEIVE_POST_TYPES',
+			postTypes: [ { slug: 'b', title: 'beach' }, { slug: 's', title: 'sun' } ],
+		} );
+
+		expect( state ).toEqual( {
+			b: { slug: 'b', title: 'beach' },
+			s: { slug: 's', title: 'sun' },
 		} );
 	} );
 } );

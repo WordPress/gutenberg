@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -16,7 +16,7 @@ describe( 'ContrastChecker', () => {
 	const fallbackTextColor = '#000';
 	const sameShade = '#666';
 
-	const wrapper = shallow(
+	const wrapper = mount(
 		<ContrastChecker
 			backgroundColor={ backgroundColor }
 			textColor={ textColor }
@@ -26,7 +26,7 @@ describe( 'ContrastChecker', () => {
 	);
 
 	test( 'should render null when no colors are provided', () => {
-		expect( shallow( <ContrastChecker /> ).html() ).toBeNull();
+		expect( mount( <ContrastChecker /> ).html() ).toBeNull();
 	} );
 
 	test( 'should render null when the colors meet AA WCAG guidelines.', () => {
@@ -34,7 +34,7 @@ describe( 'ContrastChecker', () => {
 	} );
 
 	test( 'should render component when the colors do not meet AA WCAG guidelines.', () => {
-		const componentWrapper = shallow(
+		const componentWrapper = mount(
 			<ContrastChecker
 				backgroundColor={ sameShade }
 				textColor={ sameShade }
@@ -49,7 +49,7 @@ describe( 'ContrastChecker', () => {
 	test( 'should render different message matching snapshot when background color has less brightness than text color.', () => {
 		const darkerShade = '#555';
 
-		const componentWrapper = shallow(
+		const componentWrapper = mount(
 			<ContrastChecker
 				backgroundColor={ darkerShade }
 				textColor={ sameShade }
@@ -62,7 +62,7 @@ describe( 'ContrastChecker', () => {
 	} );
 
 	test( 'should render null when the colors meet AA WCAG guidelines, with only fallback colors.', () => {
-		const componentWrapper = shallow(
+		const componentWrapper = mount(
 			<ContrastChecker
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
@@ -73,7 +73,7 @@ describe( 'ContrastChecker', () => {
 	} );
 
 	test( 'should render messages when the textColor is valid, but the fallback backgroundColor conflicts.', () => {
-		const componentWrapper = shallow(
+		const componentWrapper = mount(
 			<ContrastChecker
 				textColor={ textColor }
 				fallbackBackgroundColor={ textColor } />

@@ -50,3 +50,17 @@ export function receiveMedia( media ) {
 		media: castArray( media ),
 	};
 }
+
+/**
+ * Returns an action object used in signalling that post types have been received.
+ *
+ * @param {Array|Object} postTypes Post Types received.
+ *
+ * @return {Object} Action object.
+ */
+export function receivePostTypes( postTypes ) {
+	return {
+		type: 'RECEIVE_POST_TYPES',
+		postTypes: castArray( postTypes ),
+	};
+}

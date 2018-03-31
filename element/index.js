@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createElement, Component, cloneElement, Children, Fragment } from 'react';
+import { createContext, createElement, Component, cloneElement, Children, Fragment } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import { renderToStaticMarkup } from 'react-dom/server';
 import {
@@ -70,6 +70,15 @@ export { Children };
  * A component which renders its children without any wrapping element.
  */
 export { Fragment };
+
+/**
+ * Creates a context object containing two components: a provider and consumer.
+ *
+ * @param {Object} defaultValue Data stored in the context.
+ *
+ * @return {Object} Context object.
+ */
+export { createContext };
 
 /**
  * Creates a portal into which a component can be rendered.

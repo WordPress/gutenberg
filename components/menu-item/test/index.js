@@ -6,14 +6,14 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import MenuItemsItem from '../item';
+import MenuItem from '../';
 
-describe( 'MenuItemsItem', () => {
+describe( 'MenuItem', () => {
 	test( 'should match snapshot when only label provided', () => {
 		const wrapper = shallow(
-			<MenuItemsItem
-				label="My item"
-			/>
+			<MenuItem>
+				My item
+			</MenuItem>
 		);
 
 		expect( wrapper ).toMatchSnapshot();
@@ -21,14 +21,15 @@ describe( 'MenuItemsItem', () => {
 
 	test( 'should match snapshot when all props provided', () => {
 		const wrapper = shallow(
-			<MenuItemsItem
+			<MenuItem
 				className="my-class"
 				icon="wordpress"
 				isSelected={ true }
-				label="My item"
 				onClick={ () => {} }
 				shortcut="mod+shift+alt+w"
-			/>
+			>
+				My item
+			</MenuItem>
 		);
 
 		expect( wrapper ).toMatchSnapshot();

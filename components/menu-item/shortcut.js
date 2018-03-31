@@ -8,7 +8,7 @@ function MenuItemsShortcut( { shortcut } ) {
 		return null;
 	}
 	return (
-		<span className="components-menu-items__shortcut">{ shortcut }</span>
+		<span className="components-menu-item__shortcut">{ shortcut }</span>
 	);
 }
 
