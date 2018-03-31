@@ -110,9 +110,22 @@ class FormatToolbar extends Component {
 		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: this.props.formats.link.value } );
 	}
 
+	correctLink( link ) {
+		let correctedLink = link;
+
+		if ( ! /^(?:[a-z]+:|#|\?|\.|\/)/.test( link ) ) {
+			correctedLink = 'http://' + link;
+		}
+
+		return correctedLink;
+	}
+
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.onChange( { link: { value: this.state.newLinkValue } } );
+
+		const newLinkValue = this.correctLink( this.state.newLinkValue );
+
+		this.props.onChange( { link: { value: newLinkValue } } );
 		if ( this.state.isAddingLink ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
