@@ -72,9 +72,17 @@ export const settings = {
 		constructor() {
 			super( ...arguments );
 			this.onChangeInput = this.onChangeInput.bind( this );
+
+			this.state = {
+				defaultText: __( 'Read more' ),
+			};
 		}
 
 		onChangeInput( event ) {
+			this.setState( {
+				defaultText: '',
+			} );
+
 			const value = event.target.value.length === 0 ? undefined : event.target.value;
 			this.props.setAttributes( { customText: value } );
 		}
@@ -84,7 +92,7 @@ export const settings = {
 			const { setAttributes, isSelected } = this.props;
 
 			const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
-			const defaultText = __( 'Read more' );
+			const defaultText = this.state.defaultText;
 			const value = customText !== undefined ? customText : defaultText;
 			const inputLength = value.length ? value.length + 1 : 1;
 
