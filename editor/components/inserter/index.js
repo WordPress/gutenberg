@@ -23,16 +23,17 @@ class Inserter extends Component {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
+		this.isInsertingInline = this.isInsertingInline.bind( this );
 		this.state = {
 			isInline: false,
 		};
 	}
 
 	onToggle( isOpen ) {
-		const { onToggle, selectedBlock } = this.props;
+		const { onToggle } = this.props;
 
 		if ( isOpen ) {
-			if ( selectedBlock && hasBlockSupport( selectedBlock.name, 'inlineToken' ) ) {
+			if ( this.isInsertingInline() ) {
 				this.setState( { isInline: true } );
 				// TODO: show inline insertion point
 			} else {
@@ -47,6 +48,15 @@ class Inserter extends Component {
 		if ( onToggle ) {
 			onToggle( isOpen );
 		}
+	}
+
+	isInsertingInline() {
+		const { selectedBlock } = this.props;
+
+		return selectedBlock &&
+			hasBlockSupport( selectedBlock.name, 'inlineToken' ) &&
+			selectedBlock.attributes.content &&
+			selectedBlock.attributes.content.length > 0;
 	}
 
 	render() {
