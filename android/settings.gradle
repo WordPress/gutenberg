@@ -1,1 +1,5 @@
 include 'Application', ':aztec', ':glide-loader', ':wordpress-comments', ':wordpress-shortcodes'
+project(':aztec').projectDir = file("../../AztecEditor-Android/aztec")
+project(':glide-loader').projectDir = file("../../AztecEditor-Android/glide-loader")
+project(':wordpress-comments').projectDir = file("../../AztecEditor-Android/wordpress-comments")
+project(':wordpress-shortcodes').projectDir = file("../../AztecEditor-Android/wordpress-shortcodes")
