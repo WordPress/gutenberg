@@ -254,6 +254,7 @@ class ParagraphBlock extends Component {
 
 const supports = {
 	className: false,
+	inlineToken: true,
 };
 
 const schema = {
@@ -290,10 +291,6 @@ const schema = {
 	},
 	customFontSize: {
 		type: 'number',
-	},
-	canInsertTokens: {
-		type: 'boolean',
-		default: true,
 	},
 };
 

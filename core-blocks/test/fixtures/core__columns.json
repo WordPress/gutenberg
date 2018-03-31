@@ -12,7 +12,6 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
-                    "canInsertTokens": true,
                     "content": [
                         "Column One, Paragraph One"
                     ],
@@ -27,7 +26,6 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
-                    "canInsertTokens": true,
                     "content": [
                         "Column One, Paragraph Two"
                     ],
@@ -42,7 +40,6 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
-                    "canInsertTokens": true,
                     "content": [
                         "Column Two, Paragraph One"
                     ],
@@ -57,7 +54,6 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
-                    "canInsertTokens": true,
                     "content": [
                         "Column Three, Paragraph One"
                     ],

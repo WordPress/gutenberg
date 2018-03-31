@@ -12,7 +12,6 @@
                 },
                 " in #2135."
             ],
-            "canInsertTokens": true,
             "dropCap": false
         },
         "innerBlocks": [],

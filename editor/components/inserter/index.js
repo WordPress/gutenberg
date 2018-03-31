@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { createBlock, isUnmodifiedDefaultBlock, hasBlockSupport } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -23,13 +23,22 @@ class Inserter extends Component {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
+		this.state = {
+			isInline: false,
+		};
 	}
 
 	onToggle( isOpen ) {
-		const { onToggle } = this.props;
+		const { onToggle, selectedBlock } = this.props;
 
 		if ( isOpen ) {
-			this.props.showInsertionPoint();
+			if ( selectedBlock && hasBlockSupport( selectedBlock.name, 'inlineToken' ) ) {
+				this.setState( { isInline: true } );
+				// TODO: show inline insertion point
+			} else {
+				this.setState( { isInline: false } );
+				this.props.showInsertionPoint();
+			}
 		} else {
 			this.props.hideInsertionPoint();
 		}
@@ -48,7 +57,6 @@ class Inserter extends Component {
 			onInsertBlock,
 			hasSupportedBlocks,
 			isLocked,
-			selectedBlock,
 		} = this.props;
 
 		if ( ! hasSupportedBlocks || isLocked ) {
@@ -81,7 +89,7 @@ class Inserter extends Component {
 						onClose();
 					};
 
-					if ( selectedBlock && selectedBlock.attributes.canInsertTokens ) {
+					if ( this.state.isInline ) {
 						return <InserterTokenMenu />;
 					}
 
