@@ -51,12 +51,13 @@ class Inserter extends Component {
 	}
 
 	isInsertingInline() {
-		const { selectedBlock } = this.props;
+		const { selectedBlock, getBlockMode } = this.props;
 
 		return selectedBlock &&
 			hasBlockSupport( selectedBlock.name, 'inlineToken' ) &&
 			selectedBlock.attributes.content &&
-			selectedBlock.attributes.content.length > 0;
+			selectedBlock.attributes.content.length > 0 &&
+			getBlockMode( selectedBlock.uid ) === 'visual';
 	}
 
 	render() {
@@ -118,6 +119,7 @@ export default compose( [
 			getSelectedBlock,
 			getSupportedBlocks,
 			getEditorSettings,
+			getBlockMode,
 		} = select( 'core/editor' );
 		const { allowedBlockTypes, templateLock } = getEditorSettings();
 		const insertionPoint = getBlockInsertionPoint();
@@ -129,6 +131,7 @@ export default compose( [
 			selectedBlock: getSelectedBlock(),
 			hasSupportedBlocks: true === supportedBlocks || ! isEmpty( supportedBlocks ),
 			isLocked: !! templateLock,
+			getBlockMode,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
