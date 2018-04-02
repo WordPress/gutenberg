@@ -2,6 +2,12 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType,
+	setDefaultBlockName,
+} from '@wordpress/blocks';
+
 import { concatChildren } from '@wordpress/element';
 import { Toolbar } from '@wordpress/components';
 
@@ -9,15 +15,12 @@ import { Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import { createBlock } from '../../api';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import InspectorControls from '../../inspector-controls';
 import AlignmentToolbar from '../../alignment-toolbar';
 
-export const name = 'core/heading';
-
-export const settings = {
+registerBlockType( 'core/heading', {
 	title: __( 'Heading' ),
 
 	description: __( 'Search engines use the headings to index the structure and content of your web pages.' ),
@@ -180,4 +183,6 @@ export const settings = {
 			</Tag>
 		);
 	},
-};
+} );
+
+setDefaultBlockName( 'core/heading' );
