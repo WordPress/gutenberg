@@ -70,39 +70,3 @@ export async function newDesktopBrowserPage() {
 	global.page = await browser.newPage();
 	await page.setViewport( { width: 1000, height: 700 } );
 }
-
-/**
- * Wait for all XHR request to finish before continuing.
- *
- * @param {number} minDelay minimum delay in milliseconds to wait for before returning
- * @param {number} maxDelay maximum delay in milliseconds to wait for before returning
- *
- * @return {Promise}        Promise.
- */
-export async function waitForRequests( minDelay = 1000, maxDelay = 20000 ) {
-	const requests = [];
-	let canResolve = false;
-
-	return new Promise( ( resolve ) => {
-		setTimeout( resolve, maxDelay );
-		setTimeout( () => {
-			canResolve = true;
-			maybeResolve();
-		}, minDelay );
-		const maybeResolve = () => {
-			if ( canResolve && requests.length === 0 ) {
-				resolve();
-			}
-		};
-		page.on( 'request', ( request ) => {
-			requests.push( request );
-		} );
-		page.on( 'requestfinished', ( request ) => {
-			const index = requests.indexOf( request );
-			if ( index !== -1 ) {
-				requests.splice( index, 1 );
-				maybeResolve();
-			}
-		} );
-	} );
-}
