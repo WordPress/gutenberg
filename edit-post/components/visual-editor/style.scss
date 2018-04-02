@@ -22,6 +22,10 @@
 	& ol {
 		list-style-type: decimal;
 	}
+
+	& .button {
+		font-family: $default-font;
+	}
 }
 
 .edit-post-visual-editor .editor-writing-flow__click-redirect {

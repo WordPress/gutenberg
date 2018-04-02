@@ -92,20 +92,11 @@
 		transition: opacity 0.2s;
 	}
 
-	&.is-reusable.is-selected > .editor-block-mover:before {
-		border-right: none;
-	}
-
 	&.is-selected > .editor-block-settings-menu:before,
 	&.is-hovered > .editor-block-settings-menu:before {
 		border-left: 1px solid $light-gray-500;
 		left: 6px;
 	}
-
-	&.is-reusable.is-selected > .editor-block-settings-menu:before {
-		border-left: none;
-	}
-
 
 	/**
 	 * Selected Block style
@@ -132,12 +123,6 @@
 		outline: 1px solid $light-gray-500;
 	}
 
-	// give reusable blocks a dashed outline
-	&.is-reusable.is-selected > .editor-block-list__block-edit:before {
-		outline: 1px dashed $light-gray-500;
-	}
-
-
 	/**
 	 * Selection Style
 	 */
@@ -159,6 +144,21 @@
 		background: $blue-medium-highlight;
 	}
 
+	/**
+	 * Reusable Block style
+	 */
+
+	&.is-reusable > .editor-block-mover:before {
+		border-right: none;
+	}
+
+	&.is-reusable > .editor-block-settings-menu:before {
+		border-left: none;
+	}
+
+	&.is-reusable > .editor-block-list__block-edit:before {
+		outline: 1px dashed $light-gray-500;
+	}
 
 	// @todo, this appears to be unused
 	.iframe-overlay {

@@ -197,7 +197,7 @@ describe( 'RichText', () => {
 			const options = {
 				type: 'inline-style',
 				style: {
-					'font-weight': 'bold',
+					'font-weight': '600',
 				},
 			};
 

@@ -2,13 +2,18 @@
  * External Dependencies
  */
 import { connect } from 'react-redux';
-import { reduce, get, find, castArray } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { DropZone, withContext } from '@wordpress/components';
-import { getBlockTypes, rawHandler, cloneBlock } from '@wordpress/blocks';
+import {
+	rawHandler,
+	cloneBlock,
+	getBlockTransforms,
+	findTransform,
+} from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 
 /**
@@ -28,15 +33,10 @@ function BlockDropZone( { index, isLocked, ...props } ) {
 	};
 
 	const onDropFiles = ( files, position ) => {
-		const transformation = reduce( getBlockTypes(), ( ret, blockType ) => {
-			if ( ret ) {
-				return ret;
-			}
-
-			return find( get( blockType, 'transforms.from', [] ), ( transform ) => (
-				transform.type === 'files' && transform.isMatch( files )
-			) );
-		}, false );
+		const transformation = findTransform(
+			getBlockTransforms( 'from' ),
+			( transform ) => transform.type === 'files' && transform.isMatch( files )
+		);
 
 		if ( transformation ) {
 			const insertIndex = getInsertIndex( position );

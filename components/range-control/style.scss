@@ -1,8 +1,11 @@
+
 .components-range-control {
-	display: flex;
-	justify-content: center;
-	flex-wrap: wrap;
-	align-items: center;
+	.components-base-control__field {
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		align-items: center;
+	}
 
 	.dashicon {
 		flex-shrink: 0;

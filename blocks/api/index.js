@@ -3,8 +3,14 @@ export {
 	cloneBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
+	getBlockTransforms,
+	findTransform,
 } from './factory';
-export { default as parse, getBlockAttributes } from './parser';
+export {
+	default as parse,
+	getBlockAttributes,
+	parseWithAttributeSchema,
+} from './parser';
 export { default as rawHandler } from './raw-handling';
 export {
 	default as serialize,

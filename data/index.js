@@ -9,7 +9,6 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { deprecated } from '@wordpress/utils';
 import { Component, getWrapperDisplayName } from '@wordpress/element';
 
 /**
@@ -424,13 +423,3 @@ export function toAsyncIterable( object ) {
 		}
 	}() );
 }
-
-export const query = ( mapSelectToProps ) => {
-	deprecated( 'wp.data.query', {
-		version: '2.5',
-		alternative: 'wp.data.withSelect',
-		plugin: 'Gutenberg',
-	} );
-
-	return withSelect( mapSelectToProps );
-};
