@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { findKey, map, get } from 'lodash';
+import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -18,6 +19,7 @@ import {
 	TextControl,
 	ToggleControl,
 	Toolbar,
+	withAPIData,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -34,7 +36,6 @@ import {
  * Internal dependencies
  */
 import './editor.scss';
-import './style.scss';
 
 const FONT_SIZES = {
 	small: 14,
@@ -106,8 +107,19 @@ class ArticleBlock extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isSelected, className } = this.props;
-		const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, articleId } = attributes;
+		const { attributes, setAttributes, isSelected, className, article } = this.props;
+		const { textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, articleId } = attributes;
+		let { url, title } = attributes;
+
+		console.log('article', article);
+
+		if ( ! url && article.url) {
+			url = article.url;
+		}		
+
+		if ( ! title && article.title) {
+			title = article.title;
+		}
 
 		const fontSize = this.getFontSize();
 		const style = url ? { backgroundImage: `url(${ url })` } : undefined;
@@ -121,7 +133,7 @@ class ArticleBlock extends Component {
 			}
 		);
 
-		const alignmentToolbar	= (
+		const alignmentToolbar = (
 			<AlignmentToolbar
 				value={ textAlign }
 				onChange={ ( nextAlign ) => {
@@ -282,14 +294,14 @@ class ArticleBlock extends Component {
 	}
 }
 
-export default /*withSelect( ( select ) => {
-	const { getCategories, isRequestingCategories } = select( 'core' );
+export default withAPIData( ( props ) => {
+	const { articleId } = props.attributes;
 
 	return {
-		categories: getCategories(),
-		isRequesting: isRequestingCategories(),
+		article: `/wp/v2/articles/${ articleId }`,
 	};
-} )( */ArticleBlock/*)*/;
+} )( ArticleBlock );
+
 
 function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?
