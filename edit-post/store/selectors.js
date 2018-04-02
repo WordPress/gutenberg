@@ -157,7 +157,7 @@ export function isSavingMetaBoxes( state ) {
 
 /**
  * Return the selected category id.
- * 
+ *
  * @param  {Object}  state 	Global application state.
  * @return {number}			Selected category id
  */
@@ -167,7 +167,7 @@ export function getSelectedCategory( state ) {
 
 /**
  * Return the search term for articles search.
- * 
+ *
  * @param  {Object}  state 	Global application state.
  * @return {string}			Search term
  */
@@ -177,7 +177,7 @@ export function getSearchTerm( state ) {
 
 /**
  * Return the searched aricles.
- * 
+ *
  * @param  {Object}  state 	Global application state.
  * @return {Object}			Articles
  */

@@ -167,14 +167,14 @@ export function search( state = { }, action ) {
 	switch ( action.type ) {
 		case 'SET_ARTICLES':
 		case 'UPDATE_SEARCH_VALUES':
-			return { 
+			return {
 				...state,
-				...omit( action, [ 'type' ] ) 
+				...omit( action, [ 'type' ] ),
 			};
 		case 'SEARCH_ARTICLES':
 			return state;
 		default:
-	 		return state;
+			return state;
 	}
 }
 

@@ -96,18 +96,18 @@ const effects = {
 		const { dispatch } = store;
 		dispatch( searchArticles() );
 	},
-	SEARCH_ARTICLES( action, store ) {	
+	SEARCH_ARTICLES( action, store ) {
 		const state	= store.getState();
 		const { dispatch } = store;
 
 		// request articles
-		wp.apiRequest( { 
+		wp.apiRequest( {
 			path: '/wp/v2/articles',
-			data: { category_id: state.search.selectedCategory, s: state.search.searchTerm }
+			data: { category_id: state.search.selectedCategory, s: state.search.searchTerm },
 		} ).then( articles => {
-			store.dispatch( setArticles( articles) );
-		});
-	}
+			dispatch( setArticles( articles ) );
+		} );
+	},
 };
 
 export default effects;

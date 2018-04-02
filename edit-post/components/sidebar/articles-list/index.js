@@ -9,19 +9,19 @@ import { connect } from 'react-redux';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow, TextControl, SelectControl } from '@wordpress/components';
-import { compose, Component } from '@wordpress/element';
+import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
-import { 
+import {
 	isEditorSidebarPanelOpened,
 	getSelectedCategory,
 	getSearchTerm,
 	getArticles,
 } from '../../../store/selectors';
-import { 
+import {
 	toggleGeneralSidebarEditorPanel,
 	setCategory,
 	setSearchTerm,
@@ -33,18 +33,16 @@ import '@wordpress/core-data';
  */
 const PANEL_NAME = 'articles-list';
 
-function ArticlesList ( {
+function ArticlesList( {
 	isOpened,
 	onTogglePanel,
 	categories,
-	isRequestingCategories,
 	articles,
 	selectedCategory,
 	onCategoryChange,
 	onSearchInputChange,
 	searchTerm,
 } ) {
-
 	return (
 		<PanelBody
 			title={ __( 'Stories' ) }
@@ -65,7 +63,7 @@ function ArticlesList ( {
 				onChange={ onCategoryChange }
 			/>
 
-			<PanelRow>Loading articles...</PanelRow> 
+			<PanelRow>Loading articles...</PanelRow>
 			<div>
 				{
 					_.map( articles, article => (
@@ -90,27 +88,27 @@ export default compose(
 				return toggleGeneralSidebarEditorPanel( PANEL_NAME );
 			},
 
-			onCategoryChange( category_id ) {
-				return setCategory( category_id );
+			onCategoryChange( categoryId ) {
+				return setCategory( categoryId );
 			},
 
 			onSearchInputChange( term ) {
 				return setSearchTerm( term );
-			}
+			},
 		},
 		undefined,
 		{ storeKey: 'edit-post' }
 	),
-	withSelect( ( select, ownProps ) => {
+	withSelect( ( select ) => {
 		const {
 			getCategories,
 			isRequestingCategories,
 		} = select( 'core' );
 
-		const categories = { 0: { id: '', name: isRequestingCategories() ? __( 'Loading categories' ) : __( 'All categories' ) } , ...getCategories() };
+		const label = isRequestingCategories() ? __( 'Loading categories' ) : __( 'All categories' );
+		const categories = { 0: { id: '', name: label }, ...getCategories() };
 		return {
 			categories,
-			isRequestingCategories: isRequestingCategories(),
 		};
-	} ),
+	} )
 )( ArticlesList );
