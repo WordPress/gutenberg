@@ -242,7 +242,7 @@
 			margin-right: -$block-side-ui-padding;
 		}
 
-		.editor-block-list__block-edit {
+		> .editor-block-list__block-edit {
 			margin-left: -$block-padding;
 			margin-right: -$block-padding;
 
@@ -252,7 +252,7 @@
 			}
 		}
 
-		.editor-block-list__block-edit:before {
+		> .editor-block-list__block-edit:before {
 			left: 0;
 			right: 0;
 			border-left-width: 0;

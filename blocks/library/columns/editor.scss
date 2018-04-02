@@ -8,15 +8,32 @@
 	&:last-child {
 		margin-right: -$block-padding;
 	}
+
+	// This max-width is used to constrain the main editor column, it should not cascade into columns
+	.editor-block-list__block {
+		max-width: none;
+	}
 }
 
-
-.editor-block-list__block[data-align="full"] .wp-block-columns .editor-block-list__layout,
+// Wide: show no left/right margin on wide, so they stack with the column side UI
 .editor-block-list__block[data-align="wide"] .wp-block-columns .editor-block-list__layout {
 	&:first-child {
 		margin-left: 0;
 	}
 	&:last-child {
 		margin-right: 0;
+	}
+}
+
+// Fullwide: show margin left/right to ensure there's room for the side UI
+// This is not a 1:1 preview with the front-end where these margins would presumably be zero
+// @todo this could be revisited, by for example showing this margin only when the parent block was selected first
+// Then at least an unselected columns block would be an accurate preview
+.editor-block-list__block[data-align="full"] .wp-block-columns .editor-block-list__layout {
+	&:first-child {
+		margin-left: $block-side-ui-padding;
+	}
+	&:last-child {
+		margin-right: $block-side-ui-padding;
 	}
 }
