@@ -36,6 +36,9 @@ gen/
 build/
 build.log
 
+# Local configuration file (sdk path, etc)
+local.properties
+
 # XCode
 build/
 *.pbxuser
