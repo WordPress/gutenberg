@@ -6,6 +6,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+
+import {
+	registerBlockType
+} from '@wordpress/blocks';
+
 import { Button, IconButton, Placeholder, Toolbar } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
@@ -19,9 +24,7 @@ import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-export const name = 'core/audio';
-
-export const settings = {
+registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
 
 	description: __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ),
@@ -179,4 +182,4 @@ export const settings = {
 			</figure>
 		);
 	},
-};
+} );

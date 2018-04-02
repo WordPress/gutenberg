@@ -184,5 +184,3 @@ registerBlockType( 'core/heading', {
 		);
 	},
 } );
-
-setDefaultBlockName( 'core/heading' );

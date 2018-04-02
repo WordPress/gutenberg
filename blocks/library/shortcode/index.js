@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
+
 import { withInstanceId, Dashicon } from '@wordpress/components';
 
 /**
@@ -10,9 +14,7 @@ import { withInstanceId, Dashicon } from '@wordpress/components';
 import './editor.scss';
 import PlainText from '../../plain-text';
 
-export const name = 'core/shortcode';
-
-export const settings = {
+registerBlockType( 'core/shortcode', {
 	title: __( 'Shortcode' ),
 
 	description: __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ),
@@ -82,4 +84,4 @@ export const settings = {
 	save( { attributes } ) {
 		return attributes.text;
 	},
-};
+} );

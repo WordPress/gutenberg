@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
 import { withState } from '@wordpress/components';
 
 /**
@@ -11,9 +14,7 @@ import './editor.scss';
 import BlockControls from '../../block-controls';
 import PlainText from '../../plain-text';
 
-export const name = 'core/html';
-
-export const settings = {
+registerBlockType( 'core/html', {
 	title: __( 'Custom HTML' ),
 
 	description: __( 'Add custom HTML code and preview it right here in the editor.' ),
@@ -72,4 +73,4 @@ export const settings = {
 	save( { attributes } ) {
 		return attributes.content;
 	},
-};
+} );

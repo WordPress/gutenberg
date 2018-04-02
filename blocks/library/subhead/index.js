@@ -2,20 +2,21 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import './style.scss';
-import { createBlock } from '../../api';
 import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 import BlockDescription from '../../block-description';
 
-export const name = 'core/subhead';
-
-export const settings = {
+registerBlockType( 'core/subhead', {
 	title: __( 'Subhead' ),
 
 	icon: 'text',
@@ -90,4 +91,4 @@ export const settings = {
 
 		return <p className={ className }>{ content }</p>;
 	},
-};
+} );

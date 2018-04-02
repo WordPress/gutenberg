@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -9,9 +12,7 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import OldEditor from './old-editor';
 
-export const name = 'core/freeform';
-
-export const settings = {
+registerBlockType( 'core/freeform', {
 	title: __( 'Classic' ),
 
 	desription: __( 'The classic editor, in block form.' ),
@@ -33,4 +34,4 @@ export const settings = {
 		const { content } = attributes;
 		return content;
 	},
-};
+} );

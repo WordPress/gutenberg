@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { Dashicon, IconButton, PanelColor, withFallbackStyles } from '@wordpress/components';
 
@@ -172,9 +175,7 @@ const blockAttributes = {
 	},
 };
 
-export const name = 'core/button';
-
-export const settings = {
+registerBlockType( 'core/button', {
 	title: __( 'Button' ),
 
 	description: __( 'A nice little button. Call something out with it.' ),
@@ -236,4 +237,4 @@ export const settings = {
 			);
 		},
 	} ],
-};
+} );

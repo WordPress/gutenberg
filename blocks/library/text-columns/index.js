@@ -7,6 +7,9 @@ import { times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,9 +22,7 @@ import RangeControl from '../../inspector-controls/range-control';
 import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 
-export const name = 'core/text-columns';
-
-export const settings = {
+registerBlockType( 'core/text-columns', {
 	title: __( 'Text Columns' ),
 
 	description: __( 'Add text across columns. This block is experimental' ),
@@ -119,4 +120,4 @@ export const settings = {
 			</div>
 		);
 	},
-};
+} );

@@ -8,6 +8,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType
+} from '@wordpress/blocks';
 import { Toolbar } from '@wordpress/components';
 
 /**
@@ -15,7 +19,6 @@ import { Toolbar } from '@wordpress/components';
  */
 import './style.scss';
 import './editor.scss';
-import { createBlock } from '../../api';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockControls from '../../block-controls';
 import RichText from '../../rich-text';
@@ -51,9 +54,7 @@ const blockAttributes = {
 	},
 };
 
-export const name = 'core/quote';
-
-export const settings = {
+registerBlockType( 'core/quote', {
 	title: __( 'Quote' ),
 	description: __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ),
 	icon: 'format-quote',
@@ -272,4 +273,4 @@ export const settings = {
 			},
 		},
 	],
-};
+} );

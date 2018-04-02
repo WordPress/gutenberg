@@ -2,17 +2,18 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import PlainText from '../../plain-text';
-import { createBlock } from '../../api';
 
-export const name = 'core/code';
-
-export const settings = {
+registerBlockType( 'core/code', {
 	title: __( 'Code' ),
 
 	description: __( 'The code block maintains spaces and tabs, great for showing code snippets.' ),
@@ -69,4 +70,4 @@ export const settings = {
 	save( { attributes } ) {
 		return <pre><code>{ attributes.content }</code></pre>;
 	},
-};
+} );

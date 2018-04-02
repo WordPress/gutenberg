@@ -7,6 +7,10 @@ import { filter, every } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType
+} from '@wordpress/blocks';
 import { createMediaFromFile, preloadImage } from '@wordpress/utils';
 
 /**
@@ -14,7 +18,6 @@ import { createMediaFromFile, preloadImage } from '@wordpress/utils';
  */
 import './editor.scss';
 import './style.scss';
-import { createBlock } from '../../api';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
 const blockAttributes = {
@@ -60,9 +63,7 @@ const blockAttributes = {
 	},
 };
 
-export const name = 'core/gallery';
-
-export const settings = {
+registerBlockType( 'core/gallery', {
 	title: __( 'Gallery' ),
 	description: __( 'Image galleries are a great way to share groups of pictures on your site.' ),
 	icon: 'format-gallery',
@@ -235,4 +236,4 @@ export const settings = {
 			},
 		},
 	],
-};
+} );

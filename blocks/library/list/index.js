@@ -8,18 +8,19 @@ import { find, compact, get, initial, last, isEmpty } from 'lodash';
  */
 import { Component, createElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { createBlock } from '../../api';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 
-export const name = 'core/list';
-
-export const settings = {
+registerBlockType( 'core/list', {
 	title: __( 'List' ),
 	description: __( 'List. Numbered or bulleted.' ),
 	icon: 'editor-ul',
@@ -315,4 +316,4 @@ export const settings = {
 			values
 		);
 	},
-};
+} );

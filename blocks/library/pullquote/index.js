@@ -7,6 +7,9 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -43,9 +46,7 @@ const blockAttributes = {
 	},
 };
 
-export const name = 'core/pullquote';
-
-export const settings = {
+registerBlockType( 'core/pullquote', {
 
 	title: __( 'Pullquote' ),
 
@@ -149,4 +150,4 @@ export const settings = {
 			);
 		},
 	} ],
-};
+} );

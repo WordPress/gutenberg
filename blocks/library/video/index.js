@@ -6,6 +6,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
 import { Placeholder, Toolbar, IconButton, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
@@ -19,9 +22,7 @@ import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-export const name = 'core/video';
-
-export const settings = {
+registerBlockType( 'core/video', {
 	title: __( 'Video' ),
 
 	description: __( 'The Video block allows you to embed video files and play them back using a simple player.' ),
@@ -181,4 +182,4 @@ export const settings = {
 			</figure>
 		);
 	},
-};
+} );
