@@ -46,7 +46,10 @@ class FlatTermSelector extends Component {
 	componentDidMount() {
 		if ( this.props.terms ) {
 			this.setState( { loading: false } );
-			this.initRequest = this.fetchTerms( { include: this.props.terms, per_page: 100 } );
+			this.initRequest = this.fetchTerms( {
+				include: this.props.terms.join( ',' ),
+				per_page: 100,
+			} );
 			this.initRequest.then(
 				() => {
 					this.setState( { loading: false } );
