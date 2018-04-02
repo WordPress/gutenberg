@@ -11,6 +11,7 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		padding: $block-padding;
 		height: $empty-paragraph-height;
 		font-size: $editor-font-size;
+		font-family: $editor-font;
 		cursor: text;
 		width: 100%;
 		height: $empty-paragraph-height;
