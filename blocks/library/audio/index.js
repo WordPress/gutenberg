@@ -173,7 +173,7 @@ export const settings = {
 		const { src, caption } = attributes;
 		return (
 			<figure>
-				<audio controls="controls" src={ src } />
+				<audio controls src={ src } />
 				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>
 		);

@@ -120,9 +120,7 @@ export const settings = {
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				{ value && value.map( ( paragraph, i ) =>
-					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-				) }
+				{ value.map( ( paragraph ) => paragraph.children ) }
 				{ citation && citation.length > 0 && (
 					<cite>{ citation }</cite>
 				) }
@@ -145,9 +143,7 @@ export const settings = {
 
 			return (
 				<blockquote className={ `align${ align }` }>
-					{ value && value.map( ( paragraph, i ) =>
-						<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-					) }
+					{ value.map( ( paragraph ) => paragraph.children ) }
 					{ citation && citation.length > 0 && (
 						<footer>{ citation }</footer>
 					) }
