@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, PanelRow, TextControl, SelectControl } from '@wordpress/components';
+import { PanelBody, PanelRow, TextControl, CategorySelect } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
@@ -55,11 +55,12 @@ function ArticlesList( {
 				onChange={ onSearchInputChange }
 			/>
 
-			<SelectControl
-				// Selected value.
-				value={ selectedCategory }
-				label={ __( 'Categories' ) }
-				options={ _.map( categories, cat => ( { value: cat.id, label: cat.name } ) ) }
+			<CategorySelect
+				key="query-controls-category-select"
+				categoriesList={ categories }
+				label={ __( 'Category' ) }
+				noOptionLabel={ __( 'All' ) }
+				selectedCategoryId={ selectedCategory }
 				onChange={ onCategoryChange }
 			/>
 
@@ -79,7 +80,7 @@ export default compose(
 	connect(
 		( state ) => ( {
 			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
-			selectedCategory: getSelectedCategory( state ),
+			selectedCategoryId: getSelectedCategory( state ),
 			searchTerm: getSearchTerm( state ),
 			articles: getArticles( state ),
 		} ),
@@ -100,15 +101,10 @@ export default compose(
 		{ storeKey: 'edit-post' }
 	),
 	withSelect( ( select ) => {
-		const {
-			getCategories,
-			isRequestingCategories,
-		} = select( 'core' );
+		const { getCategories } = select( 'core' );
 
-		const label = isRequestingCategories() ? __( 'Loading categories' ) : __( 'All categories' );
-		const categories = { 0: { id: '', name: label }, ...getCategories() };
 		return {
-			categories,
+			categories: getCategories(),
 		};
 	} )
 )( ArticlesList );
