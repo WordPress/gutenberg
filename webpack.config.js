@@ -207,4 +207,8 @@ const config = {
 	},
 };
 
+if ( config.mode !== 'production' ) {
+	config.devtool = 'source-map';
+}
+
 module.exports = config;
