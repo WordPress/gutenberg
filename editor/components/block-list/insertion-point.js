@@ -60,7 +60,7 @@ export default compose(
 	connect(
 		( state, { uid, rootUID } ) => {
 			const blockIndex = uid ? getBlockIndex( state, uid, rootUID ) : -1;
-			const insertIndex = blockIndex + 1;
+			const insertIndex = blockIndex;
 			const insertionPoint = getBlockInsertionPoint( state );
 			const block = uid ? getBlock( state, uid ) : null;
 
