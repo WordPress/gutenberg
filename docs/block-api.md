@@ -122,7 +122,7 @@ transforms: {
     from: [
         {
             type: 'block',
-            blocks: [ 'core/paragraph' ],
+            blocks: [ 'core/text' ],
             transform: function ( content ) {
                 return createBlock( 'core/heading', {
                     content,
@@ -138,7 +138,7 @@ transforms: {
     from: [
         {
             type: 'block',
-            blocks: [ 'core/paragraph' ],
+            blocks: [ 'core/text' ],
             transform: ( { content } ) => {
                 return createBlock( 'core/heading', {
                     content,
@@ -222,9 +222,9 @@ transforms: {
     to: [
         {
             type: 'block',
-            blocks: [ 'core/paragraph' ],
+            blocks: [ 'core/text' ],
             transform: function( content ) {
-                return createBlock( 'core/paragraph', {
+                return createBlock( 'core/text', {
                     content,
                 } );
             },
@@ -238,9 +238,9 @@ transforms: {
     to: [
         {
             type: 'block',
-            blocks: [ 'core/paragraph' ],
+            blocks: [ 'core/text' ],
             transform: ( { content } ) => {
-                return createBlock( 'core/paragraph', {
+                return createBlock( 'core/text', {
                     content,
                 } );
             },

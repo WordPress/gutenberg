@@ -40,7 +40,7 @@ function TableOfContentsPanel( { blocks } ) {
 				<div className="table-of-contents__count">
 					{ __( 'Paragraphs' ) }
 					<span className="table-of-contents__number">
-						{ blockCount[ 'core/paragraph' ] || 0 }
+						{ blockCount[ 'core/text' ] || 0 }
 					</span>
 				</div>
 				<div className="table-of-contents__count">

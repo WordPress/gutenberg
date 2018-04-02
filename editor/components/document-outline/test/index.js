@@ -16,7 +16,7 @@ import { DocumentOutline } from '../';
 describe( 'DocumentOutline', () => {
 	registerCoreBlocks();
 
-	const paragraph = createBlock( 'core/paragraph' );
+	const paragraph = createBlock( 'core/text' );
 	const headingH1 = createBlock( 'core/heading', {
 		content: 'Heading 1',
 		nodeName: 'H1',

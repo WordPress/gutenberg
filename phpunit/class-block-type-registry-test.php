@@ -73,7 +73,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	 * Should accept valid block names
 	 */
 	function test_register_block_type() {
-		$name     = 'core/paragraph';
+		$name     = 'core/text';
 		$settings = array(
 			'icon' => 'editor-paragraph',
 		);
@@ -90,7 +90,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	 * @expectedIncorrectUsage WP_Block_Type_Registry::register
 	 */
 	function test_register_block_type_twice() {
-		$name     = 'core/paragraph';
+		$name     = 'core/text';
 		$settings = array(
 			'icon' => 'editor-paragraph',
 		);
@@ -125,7 +125,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	 * Should unregister existing blocks
 	 */
 	function test_unregister_block_type() {
-		$name     = 'core/paragraph';
+		$name     = 'core/text';
 		$settings = array(
 			'icon' => 'editor-paragraph',
 		);
@@ -138,7 +138,7 @@ class Block_Type_Registry_Test extends WP_UnitTestCase {
 	}
 
 	function test_get_all_registered() {
-		$names    = array( 'core/paragraph', 'core/image', 'core/blockquote' );
+		$names    = array( 'core/text', 'core/image', 'core/blockquote' );
 		$settings = array(
 			'icon' => 'random',
 		);

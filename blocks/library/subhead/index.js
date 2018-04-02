@@ -36,7 +36,7 @@ export const settings = {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/subhead', {
 						content,
@@ -47,9 +47,9 @@ export const settings = {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/text' ],
 				transform: ( { content } ) => {
-					return createBlock( 'core/paragraph', {
+					return createBlock( 'core/text', {
 						content,
 					} );
 				},

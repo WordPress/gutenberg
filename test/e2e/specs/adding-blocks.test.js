@@ -16,7 +16,7 @@ describe( 'adding blocks', () => {
 		await page.click( '.editor-post-title__input' );
 
 		// Post is empty, the newly created paragraph has been removed on focus out
-		const paragraphBlock = await page.$( '[data-type="core/paragraph"]' );
+		const paragraphBlock = await page.$( '[data-type="core/text"]' );
 		expect( paragraphBlock ).toBeNull();
 
 		// Using the placeholder
@@ -39,7 +39,7 @@ describe( 'adding blocks', () => {
 		// Using the between inserter
 		await page.mouse.move( 200, 300 );
 		await page.mouse.move( 250, 350 );
-		await page.click( '[data-type="core/paragraph"] .editor-block-list__insertion-point-inserter' );
+		await page.click( '[data-type="core/text"] .editor-block-list__insertion-point-inserter' );
 		await page.keyboard.type( 'Second paragraph' );
 
 		// Switch to Text Mode to check HTML Output

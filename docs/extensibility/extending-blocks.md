@@ -19,7 +19,7 @@ Used to modify the block's `edit` component. It receives the original block `edi
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
 #### `blocks.getSaveContent.extraProps`
- 
+
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element. It receives the current props of the `save` element, the block type and the block attributes as arguments.
 
 _Example:_
@@ -105,7 +105,7 @@ If you want to disable all blocks except a whitelisted list, you can adapt the s
 ```js
 // myplugin.js
 var allowedBlocks = [
-	'core/paragraph',
+	'core/text',
 	'core/image',
 	'core/html',
 	'core/freeform'
@@ -124,6 +124,6 @@ On the server, you can filter the list of blocks shown in the inserter using the
 
 ```php
 add_filter( 'allowed_block_types', function() {
-	return [ 'core/paragraph' ];
+	return [ 'core/text' ];
 } );
 ```

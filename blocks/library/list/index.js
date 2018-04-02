@@ -51,7 +51,7 @@ export const settings = {
 			{
 				type: 'block',
 				isMultiBlock: true,
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/text' ],
 				transform: ( blockAttributes ) => {
 					const items = blockAttributes.map( ( { content } ) => content );
 					const hasItems = ! items.every( isEmpty );
@@ -104,10 +104,10 @@ export const settings = {
 		to: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
+				blocks: [ 'core/text' ],
 				transform: ( { values } ) =>
 					compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
-						.map( ( content ) => createBlock( 'core/paragraph', {
+						.map( ( content ) => createBlock( 'core/text', {
 							content: [ content ],
 						} ) ),
 			},
@@ -284,7 +284,7 @@ export const settings = {
 						insertBlocksAfter ?
 							( before, after, ...blocks ) => {
 								if ( ! blocks.length ) {
-									blocks.push( createBlock( 'core/paragraph' ) );
+									blocks.push( createBlock( 'core/text' ) );
 								}
 
 								if ( after.length ) {

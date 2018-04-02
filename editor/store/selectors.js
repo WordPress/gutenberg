@@ -1087,7 +1087,7 @@ export function getSuggestedPostFormat( state ) {
 	// If there are two blocks in the content and the last one is a text blocks
 	// grab the name of the first one to also suggest a post format from it.
 	if ( blocks.length === 2 ) {
-		if ( getBlock( state, blocks[ 1 ] ).name === 'core/paragraph' ) {
+		if ( getBlock( state, blocks[ 1 ] ).name === 'core/text' ) {
 			name = getBlock( state, blocks[ 0 ] ).name;
 		}
 	}

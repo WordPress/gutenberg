@@ -47,7 +47,7 @@ The tree of objects describes the list of blocks that compose a post.
         ]
     },
     {
-        type: 'core/paragraph',
+        type: 'core/text',
         children: [
             "Lately I've been hearing plen…"
         ]

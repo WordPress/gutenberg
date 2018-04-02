@@ -1,6 +1,6 @@
 [
     {
-        "blockName": "core/paragraph",
+        "blockName": "core/text",
         "attrs": {
             "align": "right"
         },

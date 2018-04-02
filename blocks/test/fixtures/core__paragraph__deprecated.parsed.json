@@ -1,6 +1,6 @@
 [
     {
-        "blockName": "core/paragraph",
+        "blockName": "core/text",
         "attrs": null,
         "innerBlocks": [],
         "innerHTML": "\nUnwrapped is <em>still</em> valid.\n"

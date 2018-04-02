@@ -498,7 +498,7 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should return false for other blocks', () => {
-			const block = { name: 'core/paragraph' };
+			const block = { name: 'core/text' };
 			expect( isReusableBlock( block ) ).toBe( false );
 		} );
 	} );

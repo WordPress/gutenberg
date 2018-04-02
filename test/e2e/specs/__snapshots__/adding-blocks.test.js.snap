@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`adding blocks Should insert content using the placeholder and the regular inserter 1`] = `
-"<!-- wp:paragraph -->
+"<!-- wp:text -->
 <p>Paragraph block</p>
-<!-- /wp:paragraph -->
+<!-- /wp:text -->
 
-<!-- wp:paragraph -->
+<!-- wp:text -->
 <p>Second paragraph</p>
-<!-- /wp:paragraph -->
+<!-- /wp:text -->
 
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\">

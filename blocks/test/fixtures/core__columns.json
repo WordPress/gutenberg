@@ -9,7 +9,7 @@
         "innerBlocks": [
             {
                 "uid": "_uid_0",
-                "name": "core/paragraph",
+                "name": "core/text",
                 "isValid": true,
                 "attributes": {
                     "content": [
@@ -23,7 +23,7 @@
             },
             {
                 "uid": "_uid_1",
-                "name": "core/paragraph",
+                "name": "core/text",
                 "isValid": true,
                 "attributes": {
                     "content": [
@@ -37,7 +37,7 @@
             },
             {
                 "uid": "_uid_2",
-                "name": "core/paragraph",
+                "name": "core/text",
                 "isValid": true,
                 "attributes": {
                     "content": [
@@ -51,7 +51,7 @@
             },
             {
                 "uid": "_uid_3",
-                "name": "core/paragraph",
+                "name": "core/text",
                 "isValid": true,
                 "attributes": {
                     "content": [

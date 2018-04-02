@@ -53,7 +53,7 @@ class Reusable_Blocks_Render_Test extends WP_UnitTestCase {
 			'post_type'    => 'wp_block',
 			'post_status'  => 'publish',
 			'post_title'   => 'Test Block',
-			'post_content' => '<!-- wp:core/paragraph --><p>Hello world!</p><!-- /wp:core/paragraph -->',
+			'post_content' => '<!-- wp:core/text --><p>Hello world!</p><!-- /wp:core/text -->',
 		) );
 	}
 
