@@ -334,6 +334,7 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
+				priority: 20,
 				isMatch: ( node ) => (
 					node.nodeName === 'P' &&
 					// Do not allow embedded content.
@@ -388,7 +389,7 @@ export const settings = {
 				},
 			},
 			save( { attributes } ) {
-				return attributes.content;
+				return <RawHTML>{ attributes.content }</RawHTML>;
 			},
 			migrate( attributes ) {
 				return {

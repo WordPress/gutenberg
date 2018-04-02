@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItemsChoice, MenuItemsGroup } from '@wordpress/components';
+import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -41,7 +41,7 @@ function ModeSwitcher( { onSwitch, mode } ) {
 	} );
 
 	return (
-		<MenuItemsGroup
+		<MenuGroup
 			label={ __( 'Editor' ) }
 			filterName="editPost.MoreMenu.editor"
 		>
@@ -50,7 +50,7 @@ function ModeSwitcher( { onSwitch, mode } ) {
 				value={ mode }
 				onSelect={ onSwitch }
 			/>
-		</MenuItemsGroup>
+		</MenuGroup>
 	);
 }
 

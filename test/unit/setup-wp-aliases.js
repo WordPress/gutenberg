@@ -1,7 +1,8 @@
 // Set up `wp.*` aliases.  Handled by Webpack outside of the test build.
 global.wp = {
 	shortcode: {
-		next: () => {},
+		next() {},
+		regexp: jest.fn().mockReturnValue( new RegExp() ),
 	},
 };
 

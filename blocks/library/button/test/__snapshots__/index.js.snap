@@ -9,9 +9,11 @@ exports[`core/button block edit matches snapshot 1`] = `
   >
     <span
       aria-label="Add text…"
+      aria-multiline="false"
       class="wp-block-button__link blocks-rich-text__tinymce"
       contenteditable="true"
       data-is-placeholder-visible="true"
+      role="textbox"
     />
     <span
       class="blocks-rich-text__tinymce wp-block-button__link"

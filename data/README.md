@@ -180,7 +180,7 @@ A higher-order component is a function which accepts a [component](https://githu
 
 Use `withSelect` to inject state-derived props into a component. Passed a function which returns an object mapping prop names to the subscribed data source, a higher-order component function is returned. The higher-order component can be used to enhance a presentational component, updating it automatically when state changes. The mapping function is passed the [`select` function](#select) and the props passed to the original component.
 
-__Example:__
+_Example:_
 
 ```js
 function PriceDisplay( { price, currency } ) {

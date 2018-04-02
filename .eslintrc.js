@@ -92,4 +92,13 @@ module.exports = {
 			},
 		],
 	},
+	overrides: [
+		{
+			files: [ 'test/e2e/**/*.js' ],
+			globals: {
+				page: true,
+				browser: true,
+			},
+		},
+	],
 };
