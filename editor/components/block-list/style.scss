@@ -350,7 +350,7 @@
 	&.is-hovered {
 		.editor-block-settings-menu,
 		.editor-block-mover {
-			z-index: 9999;	// @todo
+			z-index: z-index( '.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}' );
 		}
 	}
 
