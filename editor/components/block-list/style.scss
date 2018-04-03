@@ -48,11 +48,19 @@
 	@include break-small {
 		left: -$block-side-ui-padding;
 		right: -$block-side-ui-padding;
+
+		// Full width blocks don't have the place to expand on the side
+		.editor-block-list__block[data-align="full"] & {
+			left: 0;
+			right: 0;
+		}
 	}
+
 
 	cursor: move;/* Fallback for IE/Edge < 14 */
 	cursor: grab;
 }
+
 
 // Allow Drag & Drop when clicking on the empty area of the mover and the settings menu
 .editor-block-list__block .editor-block-mover,
