@@ -42,7 +42,7 @@ public class MainActivity extends SampleRNBaseActivity {
 
         if (savedInstanceState == null) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            MyListFragment fragment = new MyListFragment();
+            MyFragment fragment = new MyFragment();
             transaction.replace(R.id.sample_content_fragment, fragment);
             transaction.commit();
         }

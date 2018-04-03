@@ -11,9 +11,9 @@ import com.example.android.common.activities.SampleRNBaseActivity;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 
-public class MyListFragment extends Fragment {
+public class MyFragment extends Fragment {
 
-    private static final String TAG = "MyListFragment";
+    private static final String TAG = "MyFragment";
 
     private ReactInstanceManager mReactInstanceManager;
 
