@@ -4,9 +4,10 @@
  */
 
 import { find, findIndex, reduce } from 'lodash';
+import { DataSource } from 'react-native-recyclerview-list';
 
 import ActionTypes from '../actions/ActionTypes';
-import type { StateType } from '../';
+import type { StateType, BlockType } from '../';
 import type { BlockActionType } from '../actions';
 
 function findBlock( blocks, uid: string ) {
@@ -22,13 +23,13 @@ function findBlockIndex( blocks, uid: string ) {
 }
 
 export const reducer = (
-	state: StateType = { blocks: [], refresh: false },
+	state: StateType = { dataSource: new DataSource( [], ( item: BlockType, index ) => item.uid ), refresh: false },
 	action: BlockActionType
 ) => {
-	const blocks = [ ...state.blocks ];
+	const dataSource = [ state.dataSource ];
 	switch ( action.type ) {
 		case ActionTypes.BLOCK.UPDATE_ATTRIBUTES:
-			const block = findBlock( blocks, action.uid );
+			const block = findBlock( dataSource, action.uid );
 
 			// Ignore updates if block isn't known
 			if ( ! block ) {
