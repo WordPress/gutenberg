@@ -32,6 +32,7 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false 
 			onClick={ onToggleMode }
 			icon="html"
 			label={ small ? label : undefined }
+			role="menuitem"
 		>
 			{ ! small && label }
 		</IconButton>

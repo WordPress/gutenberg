@@ -35,6 +35,7 @@ export function BlockInspectorButton( {
 			onClick={ flow( areAdvancedSettingsOpened ? closeSidebar : openEditorSidebar, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }
+			role="menuitem"
 		>
 			{ ! small && label }
 		</IconButton>

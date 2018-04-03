@@ -29,6 +29,7 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small =
 			onClick={ flow( onRemove, onClick ) }
 			icon="trash"
 			label={ small ? label : undefined }
+			role="menuitem"
 		>
 			{ ! small && label }
 		</IconButton>

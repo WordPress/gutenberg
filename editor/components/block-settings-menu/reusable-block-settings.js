@@ -26,6 +26,7 @@ export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onCon
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
 					onClick={ onConvertToReusable }
+					role="menuitem"
 				>
 					{ __( 'Convert to Shared Block' ) }
 				</IconButton>
@@ -36,6 +37,7 @@ export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onCon
 						className="editor-block-settings-menu__control"
 						icon="controls-repeat"
 						onClick={ onConvertToStatic }
+						role="menuitem"
 					>
 						{ __( 'Convert to Regular Block' ) }
 					</IconButton>
@@ -44,6 +46,7 @@ export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onCon
 						icon="no"
 						disabled={ reusableBlock.isTemporary }
 						onClick={ () => onDelete( reusableBlock.id ) }
+						role="menuitem"
 					>
 						{ __( 'Delete Shared Block' ) }
 					</IconButton>

@@ -29,6 +29,7 @@ export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isL
 			onClick={ flow( onDuplicate, onClick ) }
 			icon="admin-page"
 			label={ small ? label : undefined }
+			role="menuitem"
 		>
 			{ ! small && label }
 		</IconButton>

@@ -43,6 +43,7 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 						} }
 						icon={ icon }
 						label={ small ? title : undefined }
+						role="menuitem"
 					>
 						{ ! small && title }
 					</IconButton>

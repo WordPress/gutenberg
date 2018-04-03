@@ -39,6 +39,7 @@ export function UnknownConverter( { block, onReplace, small, user } ) {
 			onClick={ convertToBlocks }
 			icon="screenoptions"
 			label={ small ? label : undefined }
+			role="menuitem"
 		>
 			{ ! small && label }
 		</IconButton>
