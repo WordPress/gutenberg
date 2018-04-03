@@ -45,9 +45,9 @@ describe( 'flags warnings with invalid scss', () => {
 		) );
 	});
 
-	it( 'flags seven warnings', () => {
+	it( 'flags eight warnings', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings ).toHaveLength( 6 )
+			expect( data.results[0].warnings ).toHaveLength( 8 )
 		) );
 	});
 
@@ -228,6 +228,65 @@ describe( 'flags warnings with invalid scss', () => {
 	it( 'correct sixth warning column number', () => {
 		return result.then( data => (
 			expect( data.results[0].warnings[5].column ).toBe( 2 )
+		) );
+	});
+
+	it( 'correct seventh warning text', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[6].text ).toBe( 'Expected a leading zero (number-leading-zero)' )
+		) );
+	});
+
+	it( 'correct seventh warning rule flagged', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[6].rule ).toBe( 'number-leading-zero' )
+		) );
+	});
+
+	it( 'correct seventh warning severity flagged', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[6].severity ).toBe( 'error' )
+		) );
+	});
+
+	it( 'correct seventh warning line number', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[6].line ).toBe( 31 )
+		) );
+	});
+
+	it( 'correct seventh warning column number', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[6].column ).toBe( 7 )
+		) );
+	});
+	it( 'correct eighth warning text', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[7].text ).toBe( 'Unexpected extra semicolon (no-extra-semicolons)' )
+		) );
+	});
+
+	it( 'correct eighth warning rule flagged', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[7].rule ).toBe( 'no-extra-semicolons' )
+		) );
+	});
+
+	it( 'correct eighth warning severity flagged', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[7].severity ).toBe( 'error' )
+		) );
+	});
+
+	it( 'correct eighth warning line number', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[7].line ).toBe( 28 )
+		) );
+	});
+
+	it( 'correct eighth warning column number', () => {
+		return result.then( data => (
+			expect( data.results[0].warnings[7].column ).toBe( 15 )
 		) );
 	});
 });
