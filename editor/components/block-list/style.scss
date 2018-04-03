@@ -222,16 +222,16 @@
 	 */
 
 	::-moz-selection {
-		background: $blue-medium-highlight;
+		background-color: $blue-medium-highlight;
 	}
 
 	::selection {
-		background: $blue-medium-highlight;
+		background-color: $blue-medium-highlight;
 	}
 
 	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
-		background: transparent;
+		background-color: transparent;
 	}
 
 	&.is-multi-selected .editor-block-list__block-edit:before {
