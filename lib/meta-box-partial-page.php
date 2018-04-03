@@ -326,7 +326,7 @@ function the_gutenberg_metaboxes() {
 	 */
 	wp_add_inline_script(
 		'wp-edit-post',
-		'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
+		'window.addEventListener( "DOMContentLoaded", function() { window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } ); } );'
 	);
 
 	// Reset meta box data.

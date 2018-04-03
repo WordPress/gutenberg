@@ -940,9 +940,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script  = '( function() {';
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
 	$script .= <<<JS
-		window._wpLoadGutenbergEditor = wp.api.init().then( function() {
-			wp.blocks.registerCoreBlocks();
-			return wp.editPost.initializeEditor( 'editor', window._wpGutenbergPost, editorSettings );
+		window.addEventListener( 'DOMContentLoaded', function() {
+			window._wpLoadGutenbergEditor = wp.api.init().then( function() {
+				wp.blocks.registerCoreBlocks();
+				return wp.editPost.initializeEditor( 'editor', window._wpGutenbergPost, editorSettings );
+			} );
 		} );
 JS;
 	$script .= '} )();';
@@ -973,3 +975,21 @@ JS;
 	 */
 	do_action( 'enqueue_block_editor_assets' );
 }
+
+/**
+ * Adds the "defer" property to the wp-edit-post script, so that it doesn't block rendering while loading.
+ *
+ * @since 2.6.0
+ *
+ * @param string $tag    The <script> tag being printed.
+ * @param string $handle The script handle for the <script>.
+ * @return string The <script> tag with the defer property added.
+ */
+function gutenberg_editor_defer( $tag, $handle ) {
+	if ( 'wp-edit-post' === $handle ) {
+		return str_replace( ' src', ' defer="defer" src', $tag );
+	}
+
+	return $tag;
+}
+add_filter( 'script_loader_tag', 'gutenberg_editor_defer', 10, 2 );
