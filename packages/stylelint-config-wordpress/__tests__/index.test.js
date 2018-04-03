@@ -51,33 +51,9 @@ describe( 'flags warnings with invalid css', () => {
 		) );
 	});
 
-	it( 'correct warning text', () => {
+	it( 'snapshot matches warnings', () => {
 		return result.then( data => (
-			expect( data.results[0].warnings[0].text ).toBe( 'Expected a leading zero (number-leading-zero)' )
-		) );
-	});
-
-	it( 'correct rule flagged', () => {
-		return result.then( data => (
-			expect( data.results[0].warnings[0].rule ).toBe( 'number-leading-zero' )
-		) );
-	});
-
-	it( 'correct severity flagged', () => {
-		return result.then( data => (
-			expect( data.results[0].warnings[0].severity ).toBe( 'error' )
-		) );
-	});
-
-	it( 'correct line number', () => {
-		return result.then( data => (
-			expect( data.results[0].warnings[0].line ).toBe( 2 )
-		) );
-	});
-
-	it( 'correct column number', () => {
-		return result.then( data => (
-			expect( data.results[0].warnings[0].column ).toBe( 7 )
+			expect( data.results[0].warnings ).toMatchSnapshot()
 		) );
 	});
 });
