@@ -280,7 +280,7 @@ class ImageBlock extends Component {
 					<RichText
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
+						value={ caption || [] }
 						onFocus={ this.onFocusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
 						isSelected={ this.state.captionFocused }
