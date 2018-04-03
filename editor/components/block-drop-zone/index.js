@@ -76,8 +76,9 @@ class BlockDropZone extends Component {
 		}
 		const { index } = this.props;
 		const positionIndex = this.getInsertIndex( position );
-		// If the block is kept at the same level and moved downwards,
-		// we need to substract "1" from the insert index.
+
+		// If the block is kept at the same level and moved downwards, subtract
+		// to account for blocks shifting upward to occupy its old position.
 		const insertIndex = index && fromIndex < index && rootUID === this.props.rootUID ? positionIndex - 1 : positionIndex;
 		this.props.moveBlockToPosition( uid, rootUID, insertIndex );
 	}

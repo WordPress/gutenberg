@@ -4,9 +4,6 @@
 
 ## Usage
 
-
-## Usage
-
 ```jsx
 import { DropZoneProvider, DropZone } from '@wordpress/components';
 
