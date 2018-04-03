@@ -13,7 +13,11 @@
 	}
 
 	.blocks-plain-text {
-		flex: 1 0 0;
+		/*
+		 * Unit required on zero value to work around IE bug.
+		 * https://github.com/philipwalton/flexbugs#flexbug-4
+		 */
+		flex: 1 0 0%;
 		padding: 4px 8px;
 		border: 1px solid $light-gray-500;
 		font-family: $default-font;
