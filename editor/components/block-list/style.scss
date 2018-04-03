@@ -369,7 +369,6 @@
 	// Left side UI
 	> .editor-block-mover {
 		left: -$block-side-ui-width;
-		z-index: z-index( '.editor-block-mover' );
 
 		// Mobile
 		display: none;
