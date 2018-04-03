@@ -60,11 +60,8 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 						<ChromePicker
 							color={ value }
 							onChangeComplete={ ( color ) => {
-								if ( typeof color === 'undefined' ) {
-									onChange( undefined );
-								}
 								let colorString;
-								if ( color.rgb.a === 1 ) {
+								if ( typeof color.rgb === 'undefined' || color.rgb.a === 1 ) {
 									colorString = color.hex;
 								} else {
 									const { r, g, b, a } = color.rgb;
