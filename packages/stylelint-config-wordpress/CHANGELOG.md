@@ -1,5 +1,6 @@
 # HEAD
 
+-   Added: Added SCSS _shared config_ `extends` tests.
 -   Updated: `stylelint-scss` to `3.0.0`.
 
 # 13.0.0
