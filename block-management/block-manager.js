@@ -64,19 +64,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					windowSize={ 20 }
 					initialScrollIndex={ 0 }
 					ListEmptyComponent={
-						<View style={ { borderColor: '#e7e7e7', borderWidth: 1, margin: 10, padding: 20 } }>
+						<View style={ { borderColor: '#e7e7e7', borderWidth: 10, margin: 10, padding: 20 } }>
 							<Text style={ { fontSize: 15 } }>No results.</Text>
 						</View>
-					}
-					ItemSeparatorComponent={
-						<View
-							style={ {
-								borderBottomWidth: 1,
-								borderColor: '#e7e7e7',
-								marginHorizontal: 5,
-								marginVertical: 10,
-							} }
-						/>
 					}
 				/>
 			</View>
