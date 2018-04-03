@@ -43,9 +43,9 @@ public class MyListFragment extends Fragment {
         }
 
         ReactRootView reactRootView = new ReactRootView(getContext());
-        Bundle RNPropos = new Bundle();
-        RNPropos.putString("text", EXAMPLE);
-        reactRootView.startReactApplication(mReactInstanceManager, "SimpleTextInput", RNPropos);
+        Bundle RNProps = new Bundle();
+        RNProps.putString("text", EXAMPLE);
+        reactRootView.startReactApplication(mReactInstanceManager, "SimpleTextInput", RNProps);
         return reactRootView;
     }
 
