@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
@@ -44,7 +45,7 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 		</div>,
 		<InspectorControls.Slot key="inspector-controls" />,
 		<InspectorAdvancedControls.Slot key="inspector-advanced-controls">
-			{ ( fills ) => fills.length && (
+			{ ( fills ) => ! isEmpty( fills ) && (
 				<PanelBody
 					className="editor-block-inspector__advanced"
 					title={ __( 'Advanced' ) }
