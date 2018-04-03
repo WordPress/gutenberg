@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, FlatList } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
@@ -53,9 +53,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	render() {
 		const { dataSource } = this.props;
-		return (
-			<View style={ styles.container }>
-				<View style={ { height: 30 } } />
+		const androidList =
 				<RecyclerViewList
 					ref={ component => ( this._recycler = component ) }
 					style={ styles.list }
@@ -65,10 +63,25 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					initialScrollIndex={ 0 }
 					ListEmptyComponent={
 						<View style={ { borderColor: '#e7e7e7', borderWidth: 10, margin: 10, padding: 20 } }>
-							<Text style={ { fontSize: 15 } }>No results.</Text>
+							<Text style={ { fontSize: 15 } }>No blocnks :(</Text>
 						</View>
 					}
 				/>
+
+		// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS
+		const defaultList =
+				<FlatList
+					style={ styles.list }
+					data={ dataSource._data }
+					extraData={ this.props.refresh }
+					keyExtractor={ ( item, index ) => item.uid }
+					renderItem={ this.renderItem.bind( this ) }
+					/>
+
+		return (
+			<View style={ styles.container }>
+				<View style={ { height: 30 } } />
+				{ Platform.OS === 'android' ? androidList : defaultList }
 			</View>
 		);
 	}
