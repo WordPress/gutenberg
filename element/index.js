@@ -12,6 +12,11 @@ import {
 } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { deprecated } from '@wordpress/utils';
+
+/**
  * Internal dependencies
  */
 import serialize from './serialize';
@@ -164,9 +169,36 @@ export { flowRight as compose };
  * @return {string} Wrapped display name.
  */
 export function getWrapperDisplayName( BaseComponent, wrapperName ) {
+	deprecated( 'getWrapperDisplayName', {
+		version: '2.7',
+		alternative: 'wp.element.createHigherOrderComponent',
+		plugin: 'Gutenberg',
+	} );
+
 	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;
 
 	return `${ upperFirst( camelCase( wrapperName ) ) }(${ displayName })`;
+}
+
+/**
+ * Given a function mapping a component to an enhanced component and modifier
+ * name, returns the enhanced component augmented with a generated displayName.
+ *
+ * @param {Function} mapComponentToEnhancedComponent Function mapping component
+ *                                                   to enhanced component.
+ * @param {string}   modifierName                    Seed name from which to
+ *                                                   generated display name.
+ *
+ * @return {WPComponent} Component class with generated display name assigned.
+ */
+export function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
+	return ( OriginalComponent ) => {
+		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
+		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
+		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
+
+		return EnhancedComponent;
+	};
 }
 
 /**

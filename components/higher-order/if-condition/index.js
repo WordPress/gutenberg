@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getWrapperDisplayName } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/element';
 
 /**
  * Higher-order component creator, creating a new component which renders if
@@ -11,18 +11,15 @@ import { getWrapperDisplayName } from '@wordpress/element';
  *
  * @return {Function} Higher-order component.
  */
-const ifCondition = ( predicate ) => ( WrappedComponent ) => {
-	const EnhancedComponent = ( props ) => {
+const ifCondition = ( predicate ) => createHigherOrderComponent(
+	( WrappedComponent ) => ( props ) => {
 		if ( ! predicate( props ) ) {
 			return null;
 		}
 
 		return <WrappedComponent { ...props } />;
-	};
-
-	EnhancedComponent.displayName = getWrapperDisplayName( WrappedComponent, 'ifCondition' );
-
-	return EnhancedComponent;
-};
+	},
+	'ifCondition'
+);
 
 export default ifCondition;

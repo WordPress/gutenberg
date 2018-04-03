@@ -6,7 +6,7 @@ import { assign } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getWrapperDisplayName } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -56,8 +56,8 @@ export function addAttribute( settings ) {
  *
  * @return {string} Wrapped component.
  */
-export function withInspectorControl( BlockEdit ) {
-	const WrappedBlockEdit = ( props ) => {
+export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
 		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.isSelected;
 		return [
 			<BlockEdit key="block-edit-anchor" { ...props } />,
@@ -75,10 +75,7 @@ export function withInspectorControl( BlockEdit ) {
 			</InspectorControls>,
 		];
 	};
-	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'anchor' );
-
-	return WrappedBlockEdit;
-}
+}, 'withInspectorControl' );
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
