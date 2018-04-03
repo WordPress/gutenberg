@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton, Toolbar, withSpokenMessages, Fill } from '@wordpress/components';
-import { keycodes } from '@wordpress/utils';
+import { keycodes, correctLink } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -110,20 +110,10 @@ class FormatToolbar extends Component {
 		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: this.props.formats.link.value } );
 	}
 
-	correctLink( link ) {
-		let correctedLink = link;
-
-		if ( ! /^(?:[a-z]+:|#|\?|\.|\/)/.test( link ) ) {
-			correctedLink = 'http://' + link;
-		}
-
-		return correctedLink;
-	}
-
 	submitLink( event ) {
 		event.preventDefault();
 
-		const newLinkValue = this.correctLink( this.state.newLinkValue );
+		const newLinkValue = correctLink( this.state.newLinkValue );
 
 		this.props.onChange( { link: { value: newLinkValue } } );
 		if ( this.state.isAddingLink ) {

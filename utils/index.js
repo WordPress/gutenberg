@@ -12,5 +12,6 @@ export * from './dom';
 export * from './mediaupload';
 export * from './terms';
 export * from './deprecation';
+export * from './hyperlink';
 
 export { viewPort };
