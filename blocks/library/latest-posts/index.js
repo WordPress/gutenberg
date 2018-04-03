@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -10,9 +13,7 @@ import './editor.scss';
 import './style.scss';
 import LatestPostsBlock from './block';
 
-export const name = 'core/latest-posts';
-
-export const settings = {
+registerBlockType( 'core/latest-posts', {
 	title: __( 'Latest Posts' ),
 
 	description: __( 'Shows a list of your site\'s most recent posts.' ),
@@ -39,4 +40,4 @@ export const settings = {
 	save() {
 		return null;
 	},
-};
+} );

@@ -32,12 +32,19 @@ function gutenberg_render_block_core_reusable_block( $attributes ) {
 	return gutenberg_render_block( $block );
 }
 
-register_block_type( 'core/block', array(
-	'attributes'      => array(
-		'ref' => array(
-			'type' => 'number',
-		),
-	),
+function register_core_reusable_block() {
+	wp_register_script( 'core-reusable-block', gutenberg_url( '/build/__block_block.js' ) );
 
-	'render_callback' => 'gutenberg_render_block_core_reusable_block',
-) );
+	register_block_type( 'core/block', array(
+		'editor_script' => 'core-reusable-block',
+		'attributes'      => array(
+			'ref' => array(
+				'type' => 'number',
+			),
+		),
+	
+		'render_callback' => 'gutenberg_render_block_core_reusable_block',
+	) );
+}
+
+add_action( 'init', 'register_core_reusable_block' );

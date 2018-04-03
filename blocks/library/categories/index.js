@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -10,9 +13,7 @@ import './editor.scss';
 import './style.scss';
 import CategoriesBlock from './block';
 
-export const name = 'core/categories';
-
-export const settings = {
+registerBlockType( 'core/categories', {
 	title: __( 'Categories' ),
 
 	description: __( 'Shows a list of your site\'s categories.' ),
@@ -55,4 +56,4 @@ export const settings = {
 	save() {
 		return null;
 	},
-};
+} );

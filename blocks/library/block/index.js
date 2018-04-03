@@ -10,6 +10,9 @@ import { connect } from 'react-redux';
 import { Component } from '@wordpress/element';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -155,9 +158,7 @@ const ConnectedReusableBlockEdit = connect(
 	} )
 )( ReusableBlockEdit );
 
-export const name = 'core/block';
-
-export const settings = {
+registerBlockType( 'core/block', {
 	title: __( 'Reusable Block' ),
 	category: 'reusable-blocks',
 	isPrivate: true,
@@ -175,4 +176,4 @@ export const settings = {
 
 	edit: ConnectedReusableBlockEdit,
 	save: () => null,
-};
+} );
