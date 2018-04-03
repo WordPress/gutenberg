@@ -1,4 +1,4 @@
-.editor-skip-to-selected-block {
+.skip-to-selected-block {
 	position: absolute;
 	top: -9999em;
 
@@ -19,7 +19,7 @@
 	}
 }
 
-.edit-post-sidebar .editor-skip-to-selected-block:focus {
+.edit-post-sidebar .skip-to-selected-block:focus {
 	top: auto;
 	right: 10px;
 	bottom: 10px;

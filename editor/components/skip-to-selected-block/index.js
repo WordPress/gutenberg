@@ -12,7 +12,7 @@ import { getBlockWrapperDOMNode } from '../../utils/dom';
 
 const SkipToSelectedBlock = ( { selectedBlock } ) => {
 	if ( ! selectedBlock ) {
-		return <span className="editor-skip-to-selected-block__no-blocks">{ __( 'No block selected.' ) }</span>;
+		return null;
 	}
 
 	const { uid } = selectedBlock;
@@ -23,8 +23,8 @@ const SkipToSelectedBlock = ( { selectedBlock } ) => {
 	};
 
 	return (
-		uid &&
-		<button type="button" className="button editor-skip-to-selected-block screen-reader-shortcut" onClick={ onClick }>
+		selectedBlock && uid &&
+		<button type="button" className="button skip-to-selected-block" onClick={ onClick }>
 			{ __( 'Skip to the selected block' ) }
 		</button>
 	);
