@@ -3,6 +3,7 @@
 module.exports = {
 	extends: [
 		'./',
+		'stylelint-config-recommended-scss',
 	].map( require.resolve ),
 
 	plugins: [
@@ -12,7 +13,6 @@ module.exports = {
 	rules: {
 
 		// stylelint-config-wordpress css overrides
-		'at-rule-no-unknown': null,
 		'at-rule-empty-line-before': [ 'always', {
 			except: ['blockless-after-blockless'],
 			ignore: ['after-comment'],
@@ -29,7 +29,6 @@ module.exports = {
 		'scss/at-else-closing-brace-newline-after': 'always-last-in-chain',
 		'scss/at-else-closing-brace-space-after': 'always-intermediate',
 		'scss/at-else-empty-line-before': 'never',
-		'scss/at-rule-no-unknown': true,
 		'scss/at-if-closing-brace-newline-after': 'always-last-in-chain',
 		'scss/at-if-closing-brace-space-after': 'always-intermediate',
 		'scss/selector-no-redundant-nesting-selector': true,

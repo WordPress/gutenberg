@@ -24,13 +24,6 @@ Array [
     "text": "Unxpected empty line before @else (scss/at-else-empty-line-before)",
   },
   Object {
-    "column": 1,
-    "line": 1,
-    "rule": "scss/at-rule-no-unknown",
-    "severity": "error",
-    "text": "Unexpected unknown at-rule \\"@unknown\\" (at-rule-no-unknown) (scss/at-rule-no-unknown)",
-  },
-  Object {
     "column": 2,
     "line": 12,
     "rule": "scss/at-if-closing-brace-newline-after",
@@ -57,6 +50,13 @@ Array [
     "rule": "no-extra-semicolons",
     "severity": "error",
     "text": "Unexpected extra semicolon (no-extra-semicolons)",
+  },
+  Object {
+    "column": 1,
+    "line": 1,
+    "rule": "scss/at-rule-no-unknown",
+    "severity": "error",
+    "text": "Unexpected unknown at-rule \\"@unknown\\" (at-rule-no-unknown) (scss/at-rule-no-unknown)",
   },
 ]
 `;
