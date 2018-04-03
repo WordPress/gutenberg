@@ -39,6 +39,7 @@ import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
+import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
@@ -438,11 +439,11 @@ export class BlockListBlock extends Component {
 
 		// Insertion point can only be made visible when the side inserter is
 		// not present, and either the block is at the extent of a selection or
-		// is the last block in the top-level list rendering.
+		// is the first block in the top-level list rendering.
 		const shouldShowInsertionPoint = (
-			( ! isMultiSelected && ! isLast ) ||
+			( ! isMultiSelected && ! isFirst ) ||
 			( isMultiSelected && isLastInSelection ) ||
-			( isLast && ! rootUID && ! isEmptyDefaultBlock )
+			( isFirst && ! rootUID && ! isEmptyDefaultBlock )
 		);
 
 		// Generate the wrapper class names handling the different states of the block.
@@ -479,6 +480,7 @@ export class BlockListBlock extends Component {
 			<IgnoreNestedEvents
 				ref={ this.setBlockListRef }
 				onMouseOver={ this.maybeHover }
+				onMouseOverHandled={ this.hideHoverEffects }
 				onMouseLeave={ this.hideHoverEffects }
 				className={ wrapperClassName }
 				data-type={ block.name }
@@ -493,6 +495,13 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
+				{ shouldShowInsertionPoint && (
+					<BlockInsertionPoint
+						uid={ block.uid }
+						rootUID={ rootUID }
+						layout={ layout }
+					/>
+				) }
 				<BlockDropZone
 					index={ order }
 					rootUID={ rootUID }
@@ -514,6 +523,7 @@ export class BlockListBlock extends Component {
 						renderBlockMenu={ renderBlockMenu }
 					/>
 				) }
+				{ isHovered && <BlockBreadcrumb uid={ block.uid } /> }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
 				<IgnoreNestedEvents
@@ -561,13 +571,6 @@ export class BlockListBlock extends Component {
 					) }
 				</IgnoreNestedEvents>
 				{ !! error && <BlockCrashWarning /> }
-				{ shouldShowInsertionPoint && (
-					<BlockInsertionPoint
-						uid={ block.uid }
-						rootUID={ rootUID }
-						layout={ layout }
-					/>
-				) }
 				{ showSideInserter && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">

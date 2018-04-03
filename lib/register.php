@@ -254,11 +254,12 @@ function gutenberg_collect_meta_box_data() {
  *
  * @since 0.5.0
  *
- * @param int|WP_Post $post_id Post.
+ * @param int|WP_Post $post Post ID or WP_Post object.
  * @return bool Whether the post can be edited with Gutenberg.
  */
-function gutenberg_can_edit_post( $post_id ) {
-	$post = get_post( $post_id );
+function gutenberg_can_edit_post( $post ) {
+	$post = get_post( $post );
+
 	if ( ! $post ) {
 		return false;
 	}
@@ -271,7 +272,7 @@ function gutenberg_can_edit_post( $post_id ) {
 		return false;
 	}
 
-	return current_user_can( 'edit_post', $post_id );
+	return current_user_can( 'edit_post', $post->ID );
 }
 
 /**

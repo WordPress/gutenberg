@@ -15,6 +15,7 @@ import { RangeControl } from '@wordpress/components';
  * Internal dependencies
  */
 import './style.scss';
+import './editor.scss';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { countBy, filter, get } from 'lodash';
 
 /**
@@ -9,15 +8,13 @@ import { countBy, filter, get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { withAPIData } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import DocumentOutlineItem from './item';
-import { getBlocks, getCurrentPostType, getEditedPostAttribute } from '../../store/selectors';
-import { selectBlock } from '../../store/actions';
 
 /**
  * Module constants
@@ -61,7 +58,7 @@ const getHeadingLevel = heading => {
 
 const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-export const DocumentOutline = ( { blocks = [], title, onSelect, postType } ) => {
+export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupported } ) => {
 	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
 
 	if ( headings.length < 1 ) {
@@ -81,7 +78,6 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, postType } ) =>
 		}
 	};
 
-	const isTitleSupported = get( postType, [ 'data', 'supports', 'title' ], false );
 	const hasTitle = isTitleSupported && title;
 	const items = headings.map( ( heading ) => ( {
 		...heading,
@@ -136,23 +132,21 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, postType } ) =>
 };
 
 export default compose(
-	connect(
-		( state ) => {
-			return {
-				title: getEditedPostAttribute( state, 'title' ),
-				blocks: getBlocks( state ),
-				postTypeName: getCurrentPostType( state ),
-			};
-		},
-		{
-			onSelect( uid ) {
-				return selectBlock( uid );
-			},
-		},
-	),
-	withAPIData( ( { postTypeName } ) => {
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute, getBlocks } = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
 		return {
-			postType: postTypeName ? `/wp/v2/types/${ postTypeName }?context=edit` : undefined,
+			title: getEditedPostAttribute( 'title' ),
+			blocks: getBlocks(),
+			isTitleSupported: get( postType, [ 'supports', 'title' ], false ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { selectBlock } = dispatch( 'core/editor' );
+		return {
+			onSelect: selectBlock,
 		};
 	} )
 )( DocumentOutline );
