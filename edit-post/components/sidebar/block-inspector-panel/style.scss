@@ -9,4 +9,8 @@
 	.components-panel__body-toggle {
 		color: $dark-gray-500;
 	}
+
+	&.editor-block-inspector__advanced {
+		margin-bottom: -16px;
+	}
 }

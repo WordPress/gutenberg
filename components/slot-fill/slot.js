@@ -45,32 +45,34 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { name, bubblesVirtually = false, fillProps = {} } = this.props;
+		const { children, name, bubblesVirtually = false, fillProps = {} } = this.props;
 		const { getFills = noop } = this.context;
 
 		if ( bubblesVirtually ) {
 			return <div ref={ this.bindNode } />;
 		}
 
+		const fills = map( getFills( name ), ( fill ) => {
+			const fillKey = fill.occurrence;
+
+			// If a function is passed as a child, render it with the fillProps.
+			if ( isFunction( fill.props.children ) ) {
+				return cloneElement( fill.props.children( fillProps ), { key: fillKey } );
+			}
+
+			return Children.map( fill.props.children, ( child, childIndex ) => {
+				if ( ! child || isString( child ) ) {
+					return child;
+				}
+
+				const childKey = `${ fillKey }---${ child.key || childIndex }`;
+				return cloneElement( child, { key: childKey } );
+			} );
+		} );
+
 		return (
 			<div ref={ this.bindNode }>
-				{ map( getFills( name ), ( fill ) => {
-					const fillKey = fill.occurrence;
-
-					// If a function is passed as a child, render it with the fillProps.
-					if ( isFunction( fill.props.children ) ) {
-						return cloneElement( fill.props.children( fillProps ), { key: fillKey } );
-					}
-
-					return Children.map( fill.props.children, ( child, childIndex ) => {
-						if ( ! child || isString( child ) ) {
-							return child;
-						}
-
-						const childKey = `${ fillKey }---${ child.key || childIndex }`;
-						return cloneElement( child, { key: childKey } );
-					} );
-				} ) }
+				{ isFunction( children ) ? children( fills.filter( Boolean ) ) : fills }
 			</div>
 		);
 	}

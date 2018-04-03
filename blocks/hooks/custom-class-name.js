@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/element';
+import { createHigherOrderComponent, Fragment } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { hasBlockSupport } from '../api';
-import InspectorControls from '../inspector-controls';
+import InspectorAdvancedControls from '../inspector-advanced-controls';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
@@ -51,20 +51,24 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 	return ( props ) => {
 		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true ) && props.isSelected;
 
-		return [
-			<BlockEdit key="block-edit-custom-class-name" { ...props } />,
-			hasCustomClassName && <InspectorControls key="inspector-custom-class-name">
-				<TextControl
-					label={ __( 'Additional CSS Class' ) }
-					value={ props.attributes.className || '' }
-					onChange={ ( nextValue ) => {
-						props.setAttributes( {
-							className: nextValue,
-						} );
-					} }
-				/>
-			</InspectorControls>,
-		];
+		return (
+			<Fragment>
+				<BlockEdit { ...props } />
+				{ hasCustomClassName && (
+					<InspectorAdvancedControls>
+						<TextControl
+							label={ __( 'Additional CSS Class' ) }
+							value={ props.attributes.className || '' }
+							onChange={ ( nextValue ) => {
+								props.setAttributes( {
+									className: nextValue,
+								} );
+							} }
+						/>
+					</InspectorAdvancedControls>
+				) }
+			</Fragment>
+		);
 	};
 }, 'withInspectorControl' );
 
