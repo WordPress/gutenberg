@@ -60,7 +60,6 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 						<ChromePicker
 							color={ value }
 							onChangeComplete={ ( color ) => onChange( color.hex ) }
-							style={ { width: '100%' } }
 							disableAlpha
 						/>
 					) }
