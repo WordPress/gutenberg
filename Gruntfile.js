@@ -544,6 +544,10 @@ module.exports = function(grunt) {
 				},
 				src: SOURCE_DIR + 'wp-includes/js/jquery/jquery.masonry.js',
 				dest: SOURCE_DIR + 'wp-includes/js/jquery/jquery.masonry.min.js'
+			},
+			imgareaselect: {
+				src: SOURCE_DIR + 'wp-includes/js/imgareaselect/jquery.imgareaselect.js',
+				dest: SOURCE_DIR + 'wp-includes/js/imgareaselect/jquery.imgareaselect.min.js'
 			}
 		},
 		webpack: {
@@ -799,6 +803,7 @@ module.exports = function(grunt) {
 		'webpack:prod',
 		'jshint:corejs',
 		'uglify:masonry',
+		'uglify:imgareaselect',
 		'qunit:compiled'
 	] );
 
