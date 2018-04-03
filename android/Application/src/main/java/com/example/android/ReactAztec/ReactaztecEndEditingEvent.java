@@ -1,4 +1,4 @@
-package com.example.android.AztecRN;
+package com.example.android.ReactAztec;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
@@ -6,14 +6,20 @@ import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 /**
- * Event emitted by Aztec native view when it receives focus.
+ * Event emitted by Aztec native view when text editing ends,
+ * because of the user leaving the text input.
  */
-class ReactAztecFocusEvent extends Event<ReactAztecFocusEvent> {
+class ReactaztecEndEditingEvent extends Event<ReactaztecEndEditingEvent> {
 
-  private static final String EVENT_NAME = "topFocus";
+  private static final String EVENT_NAME = "topEndEditing";
 
-  public ReactAztecFocusEvent(int viewId) {
+  private String mText;
+
+  public ReactaztecEndEditingEvent(
+      int viewId,
+      String text) {
     super(viewId);
+    mText = text;
   }
 
   @Override
@@ -34,6 +40,7 @@ class ReactAztecFocusEvent extends Event<ReactAztecFocusEvent> {
   private WritableMap serializeEventData() {
     WritableMap eventData = Arguments.createMap();
     eventData.putInt("target", getViewTag());
+    eventData.putString("text", mText);
     return eventData;
   }
 }

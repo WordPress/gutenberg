@@ -1,4 +1,4 @@
-package com.example.android.AztecRN;
+package com.example.android.ReactAztec;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
