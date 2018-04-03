@@ -19,8 +19,6 @@ package com.example.android.common.activities;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
-import com.example.android.common.logger.Log;
-import com.example.android.common.logger.LogWrapper;
 import com.example.android.AztecRN.ReactAztecPackage;
 import com.example.android.recyclerview.BuildConfig;
 import com.facebook.react.ReactInstanceManager;
@@ -50,26 +48,9 @@ public class SampleActivityBase extends FragmentActivity implements DefaultHardw
                 .build();
     }
 
-    @Override
-    protected  void onStart() {
-        super.onStart();
-        initializeLogging();
-    }
-
     public ReactInstanceManager getReactInstanceManager() {
         return mReactInstanceManager;
     }
-
-    /** Set up targets to receive log data */
-    public void initializeLogging() {
-        // Using Log, front-end to the logging chain, emulates android.util.log method signatures.
-        // Wraps Android's native log framework
-        LogWrapper logWrapper = new LogWrapper();
-        Log.setLogNode(logWrapper);
-
-        Log.i(TAG, "Ready");
-    }
-
 
     @Override
     protected void onPause() {

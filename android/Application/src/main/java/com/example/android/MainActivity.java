@@ -22,9 +22,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 
 import com.example.android.common.activities.SampleActivityBase;
-import com.example.android.common.logger.Log;
-import com.example.android.common.logger.LogWrapper;
-import com.example.android.common.logger.MessageOnlyLogFilter;
 import com.example.android.recyclerview.R;
 
 /**
@@ -37,9 +34,6 @@ import com.example.android.recyclerview.R;
 public class MainActivity extends SampleActivityBase {
 
     public static final String TAG = "MainActivity";
-
-    // Whether the Log Fragment is currently shown
-    private boolean mLogShown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,18 +57,4 @@ public class MainActivity extends SampleActivityBase {
         return super.onKeyUp(keyCode, event);
     }
 
-    /** Create a chain of targets that will receive log data */
-    @Override
-    public void initializeLogging() {
-        // Wraps Android's native log framework.
-        LogWrapper logWrapper = new LogWrapper();
-        // Using Log, front-end to the logging chain, emulates android.util.log method signatures.
-        Log.setLogNode(logWrapper);
-
-        // Filter strips out everything except the message text.
-        MessageOnlyLogFilter msgFilter = new MessageOnlyLogFilter();
-        logWrapper.setNext(msgFilter);
-
-        Log.i(TAG, "Ready");
-    }
 }
