@@ -1,4 +1,4 @@
-package com.example.android.recyclerview;
+package com.example.android;
 
 import android.app.Activity;
 import android.os.Bundle;

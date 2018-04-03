@@ -15,7 +15,7 @@
 */
 
 
-package com.example.android.recyclerview;
+package com.example.android;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
@@ -25,6 +25,7 @@ import com.example.android.common.activities.SampleActivityBase;
 import com.example.android.common.logger.Log;
 import com.example.android.common.logger.LogWrapper;
 import com.example.android.common.logger.MessageOnlyLogFilter;
+import com.example.android.recyclerview.R;
 
 /**
  * A simple launcher activity containing a summary sample description, sample log and a custom

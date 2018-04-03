@@ -21,7 +21,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.example.android.common.logger.Log;
 import com.example.android.common.logger.LogWrapper;
-import com.example.android.recyclerview.AztecRN.ReactAztecPackage;
+import com.example.android.AztecRN.ReactAztecPackage;
 import com.example.android.recyclerview.BuildConfig;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.common.LifecycleState;
