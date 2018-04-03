@@ -13,10 +13,10 @@ import type { BlockType } from '../store/';
 
 export type BlockListType = {
 	onChange: ( uid: string, attributes: mixed ) => void,
-	focusBlockAction: number => mixed,
-	moveBlockUpAction: number => mixed,
-	moveBlockDownAction: number => mixed,
-	deleteBlockAction: number => mixed,
+	focusBlockAction: string => mixed,
+	moveBlockUpAction: string => mixed,
+	moveBlockDownAction: string => mixed,
+	deleteBlockAction: string => mixed,
 	dataSource: Object,
 	refresh: boolean,
 };

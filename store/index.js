@@ -21,7 +21,7 @@ export type StateType = {
 
 const blocks: Array<BlockType> = [
 {
-	uid: '0',
+	uid: 'uid0',
 	blockType: 'title',
 	attributes: {
 		content: 'Hello World',
@@ -29,7 +29,7 @@ const blocks: Array<BlockType> = [
 	focused: false,
 },
 {
-	uid: '1',
+	uid: 'uid1',
 	blockType: 'paragraph',
 	attributes: {
 		content:
@@ -38,7 +38,7 @@ const blocks: Array<BlockType> = [
 	focused: false,
 },
 {
-	uid: '2',
+	uid: 'uid2',
 	blockType: 'paragraph',
 	attributes: {
 		content:
@@ -47,7 +47,7 @@ const blocks: Array<BlockType> = [
 	focused: false,
 },
 {
-	uid: '3',
+	uid: 'uid3',
 	blockType: 'core/code',
 	attributes: {
 		content: 'if name == "World":\n    return "Hello World"\nelse:\n    return "Hello Pony"',
@@ -55,7 +55,7 @@ const blocks: Array<BlockType> = [
 	focused: false,
 },
 {
-	uid: '4',
+	uid: 'uid4',
 	blockType: 'paragraph',
 	attributes: {
 		content:
