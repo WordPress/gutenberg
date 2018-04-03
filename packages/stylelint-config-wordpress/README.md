@@ -5,6 +5,8 @@
 
 Configuration rules to ensure your CSS is compliant with the [WordPress CSS Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/).
 
+-   `stylelint-config-wordpress` extends [`stylelint-config-recommended`](https://github.com/stylelint/stylelint-config-recommended)
+
 ## Table of Contents
 
 -   [Installation](#installation)
@@ -40,7 +42,7 @@ If you've globally installed `stylelint-config-wordpress` using the `-g` flag, t
 
 ## Presets
 
-In addition to the default preset, there are also specific presets. All presets extend the default one.
+In addition to the default preset, there is also a SCSS preset. This preset extends both `stylelint-config-wordpress` and [`stylelint-config-recommended-scss`](https://github.com/kristerkari/stylelint-config-recommended-scss).
 
 ### SCSS
 
