@@ -1,3 +1,7 @@
+# HEAD
+
+-   Updated: `stylelint-scss` to `3.0.0`.
+
 # 13.0.0
 
 -   Added: stylelint `9.1.3` support.
