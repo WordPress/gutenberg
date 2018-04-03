@@ -2,6 +2,9 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -12,9 +15,7 @@ import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-export const name = 'core/table';
-
-export const settings = {
+registerBlockType( 'core/table', {
 	title: __( 'Table' ),
 	description: __( 'Tables. Best used for tabular data.' ),
 	icon: 'editor-table',
@@ -86,4 +87,4 @@ export const settings = {
 			</table>
 		);
 	},
-};
+} );

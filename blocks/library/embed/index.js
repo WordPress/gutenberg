@@ -8,6 +8,10 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType
+} from '@wordpress/blocks';
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
 import { addQueryArgs } from '@wordpress/url';
@@ -17,7 +21,6 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import './style.scss';
 import './editor.scss';
-import { createBlock } from '../../api';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -237,25 +240,25 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 	};
 }
 
-export const name = 'core/embed';
-
-export const settings = getEmbedBlockSettings( {
-	title: __( 'Embed' ),
-	icon: 'embed-generic',
-	transforms: {
-		from: [
-			{
-				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*/i.test( node.textContent ),
-				transform: ( node ) => {
-					return createBlock( 'core/embed', {
-						url: node.textContent.trim(),
-					} );
+registerBlockType( 'core/embed', 
+	getEmbedBlockSettings( {
+		title: __( 'Embed' ),
+		icon: 'embed-generic',
+		transforms: {
+			from: [
+				{
+					type: 'raw',
+					isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*/i.test( node.textContent ),
+					transform: ( node ) => {
+						return createBlock( 'core/embed', {
+							url: node.textContent.trim(),
+						} );
+					},
 				},
-			},
-		],
-	},
-} );
+			],
+		},
+	}
+ ) );
 
 export const common = [
 	{
