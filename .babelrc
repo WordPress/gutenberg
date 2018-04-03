@@ -3,6 +3,7 @@
     "babel-preset-react-native-stage-0/decorator-support"
   ],
   "plugins": [
+    "react-require",
     [
       "module-resolver",
       {

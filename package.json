@@ -4,6 +4,7 @@
   "private": true,
   "devDependencies": {
     "@wordpress/babel-preset-default": "^1.1.2",
+    "babel-plugin-react-require": "^3.0.0",
     "babel-plugin-transform-async-generator-functions": "^6.24.1",
     "babel-preset-react-native-stage-0": "^1.0.1",
     "cross-env": "^5.1.4",
