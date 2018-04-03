@@ -9,7 +9,8 @@ The data module is built upon and shares many of the same core principles of [Re
 Use the `registerStore` function to add your own store to the centralized data registry. This function accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
 
 ```js
-const { registerStore } = wp.data;
+const { data, apiRequest } = wp;
+const { registerStore, dispatch } = data;
 
 const DEFAULT_STATE = {
 	prices: {},
@@ -55,11 +56,18 @@ registerStore( 'my-shop', {
 	},
 
 	selectors: {
-		getPrice( item ) {
+		getPrice( state, item ) {
 			const { prices, discountPercent } = state;
 			const price = prices[ item ];
 
 			return price * ( 1 - ( 0.01 * discountPercent ) );
+		},
+	},
+
+	resolvers: {
+		async getPrice( state, item ) {
+			const price = await apiRequest( { path: '/wp/v2/prices/' + item } );
+			dispatch( 'my-shop' ).setPrice( item, price );
 		},
 	},
 } );
@@ -172,7 +180,7 @@ A higher-order component is a function which accepts a [component](https://githu
 
 Use `withSelect` to inject state-derived props into a component. Passed a function which returns an object mapping prop names to the subscribed data source, a higher-order component function is returned. The higher-order component can be used to enhance a presentational component, updating it automatically when state changes. The mapping function is passed the [`select` function](#select) and the props passed to the original component.
 
-__Example:__
+_Example:_
 
 ```js
 function PriceDisplay( { price, currency } ) {

@@ -49,6 +49,7 @@ export const settings = {
 						},
 					},
 				},
+				priority: 20,
 			},
 		],
 	},

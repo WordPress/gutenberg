@@ -28,13 +28,15 @@
 		border-right: none;
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
-		height: 100%;
+		height: auto;
+		max-height: calc( 100vh - #{ $admin-bar-height-big + $panel-header-height } );
 		margin-top: -1px;
 		margin-bottom: -1px;
 
 		@include break-small() {
 			overflow: inherit;
 			height: auto;
+			max-height: none;
 		}
 	}
 

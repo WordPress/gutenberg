@@ -1,3 +1,18 @@
 .editor-block-list__block:not( .is-multi-selected ) .wp-block-paragraph {
 	background: white;
 }
+
+// Don't show white background when a nesting parent is selected
+.editor-block-list__layout .editor-block-list__layout .editor-block-list__block .wp-block-paragraph {
+	background: inherit;
+}
+
+.blocks-font-size__main {
+	display: flex;
+	justify-content: space-between;
+}
+
+.blocks-font-size .blocks-range-control__slider + .dashicon {
+	width: 30px;
+	height: 30px;
+}

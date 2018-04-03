@@ -6,6 +6,7 @@ exports[`core/list block edit matches snapshot 1`] = `
 >
   <ul
     aria-label="Write list…"
+    aria-multiline="true"
     class="blocks-rich-text__tinymce"
     contenteditable="true"
     data-is-placeholder-visible="true"

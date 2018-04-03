@@ -46,6 +46,7 @@ $block-padding: 14px;
 $block-mover-margin: 18px;
 $block-spacing: 4px;
 $block-side-ui-padding: 36px;
+$block-side-ui-width: 28px;		// The side UI max height matches a single line of text, 56px. 28px is half, allowing 2 mover arrows
 
 // Buttons & UI Widgets
 $button-style__radius-roundrect: 4px;

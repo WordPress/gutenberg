@@ -30,7 +30,7 @@ input[type="search"].editor-inserter__search {
 	display: block;
 	width: 100%;
 	margin: 0;
-	padding: 8px 11px;
+	padding: 11px 16px;
 	position: relative;
 	z-index: 1;
 	border: none;
@@ -83,16 +83,25 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__block {
 	display: flex;
 	flex-direction: column;
-	width: 33%;
-	border-radius: $button-style__radius-roundrect;
+	width: calc( 33% - 8px );
+	margin: 4px;
 	font-size: $default-font-size;
 	color: $dark-gray-500;
-	padding: 12px;
+	padding: 8px 4px;
 	align-items: center;
+	justify-content: center;
 	cursor: pointer;
 	border: none;
-	line-height: 20px;
+	line-height: 1em;
 	background: transparent;
+	outline: 1px solid $light-gray-200;
+	min-height: 5em;
+	overflow: hidden;
+	word-break: break-word;
+
+	.dashicon {
+		margin-bottom: 3px;
+	}
 
 	&:disabled {
 		@include button-style__disabled;
@@ -137,7 +146,7 @@ input[type="search"].editor-inserter__search {
 	display: block;
 	text-align: center;
 	font-style: italic;
-	padding: 8px;
+	padding: 24px;
 }
 
 .editor-inserter__tabs {
@@ -170,7 +179,7 @@ input[type="search"].editor-inserter__search {
 		display: flex;
 		justify-content: space-between;
 		position: relative;
-		background: $light-gray-300;
+		background: $light-gray-100;
 		border-bottom: 1px solid $light-gray-500;
 		flex-shrink: 0;
 		margin-top: 1px;

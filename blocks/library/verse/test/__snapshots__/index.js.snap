@@ -6,9 +6,11 @@ exports[`core/verse block edit matches snapshot 1`] = `
 >
   <pre
     aria-label="Write…"
+    aria-multiline="false"
     class="blocks-rich-text__tinymce"
     contenteditable="true"
     data-is-placeholder-visible="true"
+    role="textbox"
   />
   <pre
     class="blocks-rich-text__tinymce"

@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockEdit from '../../block-edit';
 import ReusableBlockEditPanel from './edit-panel';
+import ReusableBlockIndicator from './indicator';
 
 class ReusableBlockEdit extends Component {
 	constructor( { reusableBlock } ) {
@@ -30,6 +31,7 @@ class ReusableBlockEdit extends Component {
 		this.state = {
 			isEditing: !! ( reusableBlock && reusableBlock.isTemporary ),
 			title: null,
+			changedAttributes: null,
 		};
 	}
 
@@ -45,6 +47,7 @@ class ReusableBlockEdit extends Component {
 		this.setState( {
 			isEditing: true,
 			title: reusableBlock.title,
+			changedAttributes: {},
 		} );
 	}
 
@@ -52,12 +55,16 @@ class ReusableBlockEdit extends Component {
 		this.setState( {
 			isEditing: false,
 			title: null,
+			changedAttributes: null,
 		} );
 	}
 
 	setAttributes( attributes ) {
-		const { updateAttributes, block } = this.props;
-		updateAttributes( block.uid, attributes );
+		this.setState( ( prevState ) => {
+			if ( prevState.changedAttributes !== null ) {
+				return { changedAttributes: { ...prevState.changedAttributes, ...attributes } };
+			}
+		} );
 	}
 
 	setTitle( title ) {
@@ -65,13 +72,14 @@ class ReusableBlockEdit extends Component {
 	}
 
 	save() {
-		const { reusableBlock, onUpdateTitle, onSave } = this.props;
+		const { reusableBlock, onUpdateTitle, updateAttributes, block, onSave } = this.props;
+		const { title, changedAttributes } = this.state;
 
-		const { title } = this.state;
 		if ( title !== reusableBlock.title ) {
 			onUpdateTitle( title );
 		}
 
+		updateAttributes( block.uid, changedAttributes );
 		onSave();
 
 		this.stopEditing();
@@ -79,7 +87,7 @@ class ReusableBlockEdit extends Component {
 
 	render() {
 		const { isSelected, reusableBlock, block, isFetching, isSaving } = this.props;
-		const { isEditing, title } = this.state;
+		const { isEditing, title, changedAttributes } = this.state;
 
 		if ( ! reusableBlock && isFetching ) {
 			return <Placeholder><Spinner /></Placeholder>;
@@ -95,7 +103,7 @@ class ReusableBlockEdit extends Component {
 				isSelected={ isEditing && isSelected }
 				id={ block.uid }
 				name={ block.name }
-				attributes={ block.attributes }
+				attributes={ { ...block.attributes, ...changedAttributes } }
 				setAttributes={ isEditing ? this.setAttributes : noop }
 			/>
 		);
@@ -118,6 +126,7 @@ class ReusableBlockEdit extends Component {
 						onCancel={ this.stopEditing }
 					/>
 				) }
+				{ ! isSelected && ! isEditing && <ReusableBlockIndicator title={ reusableBlock.title } /> }
 			</Fragment>
 		);
 	}

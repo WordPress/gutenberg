@@ -45,11 +45,19 @@ function gutenberg_collect_meta_box_data() {
 	if ( isset( $_REQUEST['post'] ) ) {
 		$post    = get_post( absint( $_REQUEST['post'] ) );
 		$typenow = $post->post_type;
+
+		if ( ! gutenberg_can_edit_post( $post->ID ) ) {
+			return;
+		}
 	} else {
 		// Eventually add handling for creating new posts of different types in Gutenberg.
 	}
 	$post_type        = $post->post_type;
 	$post_type_object = get_post_type_object( $post_type );
+
+	if ( ! gutenberg_can_edit_post_type( $post_type ) ) {
+		return;
+	}
 
 	$thumbnail_support = current_theme_supports( 'post-thumbnails', $post_type ) && post_type_supports( $post_type, 'thumbnail' );
 	if ( ! $thumbnail_support && 'attachment' === $post_type && $post->post_mime_type ) {
@@ -246,11 +254,12 @@ function gutenberg_collect_meta_box_data() {
  *
  * @since 0.5.0
  *
- * @param int|WP_Post $post_id Post.
+ * @param int|WP_Post $post Post ID or WP_Post object.
  * @return bool Whether the post can be edited with Gutenberg.
  */
-function gutenberg_can_edit_post( $post_id ) {
-	$post = get_post( $post_id );
+function gutenberg_can_edit_post( $post ) {
+	$post = get_post( $post );
+
 	if ( ! $post ) {
 		return false;
 	}
@@ -263,7 +272,7 @@ function gutenberg_can_edit_post( $post_id ) {
 		return false;
 	}
 
-	return current_user_can( 'edit_post', $post_id );
+	return current_user_can( 'edit_post', $post->ID );
 }
 
 /**
@@ -410,6 +419,11 @@ function gutenberg_register_post_types() {
 
 	foreach ( $caps_map as $role_name => $caps ) {
 		$role = get_role( $role_name );
+
+		if ( empty( $role ) ) {
+			continue;
+		}
+
 		foreach ( $caps as $cap ) {
 			if ( ! $role->has_cap( $cap ) ) {
 				$role->add_cap( $cap );
