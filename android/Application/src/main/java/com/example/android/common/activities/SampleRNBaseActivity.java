@@ -29,9 +29,9 @@ import com.facebook.react.shell.MainReactPackage;
 /**
  * Base launcher activity, to handle most of the common plumbing for samples.
  */
-public class SampleActivityBase extends FragmentActivity implements DefaultHardwareBackBtnHandler {
+public class SampleRNBaseActivity extends FragmentActivity implements DefaultHardwareBackBtnHandler {
 
-    public static final String TAG = "SampleActivityBase";
+    public static final String TAG = "SampleRNBaseActivity";
     protected ReactInstanceManager mReactInstanceManager;
 
     @Override

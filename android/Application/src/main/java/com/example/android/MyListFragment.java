@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.common.activities.SampleActivityBase;
+import com.example.android.common.activities.SampleRNBaseActivity;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 
@@ -21,9 +21,9 @@ public class MyListFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mReactInstanceManager = ((SampleActivityBase) activity).getReactInstanceManager();
+            mReactInstanceManager = ((SampleRNBaseActivity) activity).getReactInstanceManager();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must extends SampleActivityBase");
+            throw new ClassCastException(activity.toString() + " must extends SampleRNBaseActivity");
         }
     }
 
@@ -36,9 +36,9 @@ public class MyListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (mReactInstanceManager == null) {
             try {
-                mReactInstanceManager = ((SampleActivityBase) getActivity()).getReactInstanceManager();
+                mReactInstanceManager = ((SampleRNBaseActivity) getActivity()).getReactInstanceManager();
             } catch (ClassCastException e) {
-                throw new ClassCastException(getActivity().toString() + " must extends SampleActivityBase");
+                throw new ClassCastException(getActivity().toString() + " must extends SampleRNBaseActivity");
             }
         }
 
