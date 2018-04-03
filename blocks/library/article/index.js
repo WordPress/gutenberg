@@ -12,14 +12,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import ArticleBlock from './block';
-
-const FONT_SIZES = {
-	small: 14,
-	regular: 16,
-	large: 36,
-	larger: 48,
-};
+import ArticleBlock, { FONT_SIZES, dimRatioToClass } from './block';
 
 export const name = 'dynamic/article';
 
@@ -70,7 +63,6 @@ export const settings = {
 		},
 		articleId: {
 			type: 'string',
-			default: '',
 		},
 	},
 
@@ -109,9 +101,3 @@ export const settings = {
 		);
 	},
 };
-
-function dimRatioToClass( ratio ) {
-	return ( ratio === 0 || ratio === 50 ) ?
-		null :
-		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
-}

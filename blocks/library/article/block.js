@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import { findKey, map, get } from 'lodash';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -37,7 +36,7 @@ import {
  */
 import './editor.scss';
 
-const FONT_SIZES = {
+export const FONT_SIZES = {
 	small: 14,
 	regular: 16,
 	large: 36,
@@ -53,12 +52,16 @@ class ArticleBlock extends Component {
 		this.setDimRatio = this.setDimRatio.bind( this );
 		this.setFontSize = this.setFontSize.bind( this );
 		this.getFontSize = this.getFontSize.bind( this );
+		this.setTitle = this.setTitle.bind( this );
 	}
 
 	onSelectImage( media ) {
 		const { setAttributes } = this.props;
 
-		setAttributes( { url: media.url, id: media.id } );
+		setAttributes( {
+			url: media.url,
+			id: media.id,
+		} );
 	}
 
 	toggleParallax() {
@@ -106,20 +109,31 @@ class ArticleBlock extends Component {
 		}
 	}
 
-	render() {
-		const { attributes, setAttributes, isSelected, className, article } = this.props;
-		const { textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, articleId } = attributes;
-		let { url, title } = attributes;
+	setTitle( value ) {
+		const { setAttributes } = this.props;
 
-		console.log('article', article);
+		setAttributes( { title: value } );
+	}
 
-		if ( ! url && article.url) {
-			url = article.url;
-		}		
+	componentWillReceiveProps( nextProps ) {
+		const { setAttributes } = this.props;
+		const { article } = nextProps;
 
-		if ( ! title && article.title) {
-			title = article.title;
+		// Only update article properties if a new article is returned
+		if ( this.props.article !== nextProps.article ) {
+			if ( article && article.data ) {
+				setAttributes( {
+					title: [ get( article.data, 'title.rendered' ) ],
+					url: article.data.image_url,
+					articleId: '', // reset articleId
+				} );
+			}
 		}
+	}
+
+	render() {
+		const { attributes, setAttributes, isSelected, className } = this.props;
+		const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, articleId } = attributes;
 
 		const fontSize = this.getFontSize();
 		const style = url ? { backgroundImage: `url(${ url })` } : undefined;
@@ -261,7 +275,7 @@ class ArticleBlock extends Component {
 					fontSize: fontSize ? fontSize + 'px' : undefined,
 					textAlign: textAlign,
 				} }
-				onChange={ ( value ) => setAttributes( { title: value } ) }
+				onChange={ this.setTitle }
 				isSelected={ isSelected }
 				inlineToolbar
 			/>
@@ -297,13 +311,14 @@ class ArticleBlock extends Component {
 export default withAPIData( ( props ) => {
 	const { articleId } = props.attributes;
 
-	return {
-		article: `/wp/v2/articles/${ articleId }`,
-	};
+	if ( articleId ) {
+		return {
+			article: `/wp/v2/articles/${ articleId }`,
+		};
+	}
 } )( ArticleBlock );
 
-
-function dimRatioToClass( ratio ) {
+export function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?
 		null :
 		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
