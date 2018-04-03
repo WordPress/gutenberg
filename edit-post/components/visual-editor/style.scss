@@ -6,12 +6,15 @@
 	grid-template-columns:
 	  [full-start] minmax(1em, 1fr)
 	  [wide-start] minmax(0, 1fr)
-	  [content-start] minmax(0, 700px) [content-end]
+	  [content-start] minmax(0, 350px) [middle] minmax(0, 350px) [content-end]
 	  minmax(0, 1fr) [wide-end]
 	  minmax(1em, 1fr) [full-end];
 
-	> div,
-	> div > .block-list {
+	.editor-writing-flow,
+	.editor-writing-flow > div,
+	.editor-writing-flow > div > div,
+	.editor-writing-flow > div > div > div,
+	.editor-writing-flow .editor-block-list__layout {
 		grid-column: full;
 		display: inherit;
 		grid-template-columns: inherit;
@@ -69,6 +72,26 @@
 			margin-left: auto;
 			margin-right: auto;
 		}
+	}
+
+	&[data-align="card"] {
+		grid-column: wide-start / middle;
+
+
+		+ div {
+			grid-column: middle / wide-end;
+			align-self: center;
+		}
+	}
+
+	&[data-align="left"] {
+		grid-column: wide-start / content-start;
+		height: 0;
+	}
+
+	&[data-align="right"] {
+		grid-column: content-end / wide-end;
+		height: 0;
 	}
 
 	&[data-align="wide"] {
