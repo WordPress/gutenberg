@@ -2,6 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType,
+	getBlockAttributes,
+	getBlockType
+} from '@wordpress/blocks';
 import { createMediaFromFile, preloadImage } from '@wordpress/utils';
 
 /**
@@ -9,12 +15,9 @@ import { createMediaFromFile, preloadImage } from '@wordpress/utils';
  */
 import './style.scss';
 import './editor.scss';
-import { createBlock, getBlockAttributes, getBlockType } from '../../api';
 import ImageBlock from './block';
 
-export const name = 'core/image';
-
-export const settings = {
+registerBlockType( 'core/image', {
 	title: __( 'Image' ),
 
 	description: __( 'Worth a thousand words.' ),
@@ -181,4 +184,4 @@ export const settings = {
 			</figure>
 		);
 	},
-};
+} );
