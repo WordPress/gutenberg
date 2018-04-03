@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isString } from 'lodash';
 
 /**
  * Internal dependencies
@@ -15,7 +16,7 @@ function Placeholder( { icon, children, label, instructions, className, ...addit
 	return (
 		<div { ...additionalProps } className={ classes }>
 			<div className="components-placeholder__label">
-				{ !! icon && <Dashicon icon={ icon } /> }
+				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
 				{ label }
 			</div>
 			{ !! instructions && <div className="components-placeholder__instructions">{ instructions }</div> }
