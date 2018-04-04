@@ -217,6 +217,17 @@ export function getEditedPostVisibility( state ) {
 }
 
 /**
+ * Returns true if post is pending review.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether current post is pending review.
+ */
+export function isCurrentPostPending( state ) {
+	return getCurrentPost( state ).status === 'pending';
+}
+
+/**
  * Return true if the current post has already been published.
  *
  * @param {Object} state Global application state.
@@ -228,6 +239,17 @@ export function isCurrentPostPublished( state ) {
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
 		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+}
+
+/**
+ * Returns true if post is already scheduled.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether current post is scheduled to be posted.
+ */
+export function isCurrentPostScheduled( state ) {
+	return getCurrentPost( state ).status === 'future' && ! isCurrentPostPublished( state );
 }
 
 /**
@@ -356,6 +378,20 @@ export const getBlockDependantsCacheBust = createSelector(
 		( innerBlockUID ) => getBlock( state, innerBlockUID ),
 	),
 );
+
+/**
+ * Returns a block's name given its UID, or null if no block exists with the
+ * UID.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {string} Block name.
+ */
+export function getBlockName( state, uid ) {
+	const block = state.editor.present.blocksByUid[ uid ];
+	return block ? block.name : null;
+}
 
 /**
  * Returns a block given its unique ID. This is a parsed copy of the block,

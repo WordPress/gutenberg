@@ -27,8 +27,8 @@ function BlockSettingsMenu( {
 	onSelect,
 	focus,
 	rootUID,
-	renderBlockMenu = ( { children } ) => children }
-) {
+	renderBlockMenu = ( { children } ) => children,
+} ) {
 	const count = uids.length;
 
 	return (

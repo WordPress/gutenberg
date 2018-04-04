@@ -141,7 +141,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-element',
 		gutenberg_url( 'element/build/index.js' ),
-		array( 'react', 'react-dom', 'react-dom-server' ),
+		array( 'react', 'react-dom', 'wp-utils' ),
 		filemtime( gutenberg_dir_path() . 'element/build/index.js' )
 	);
 	wp_register_script(
@@ -379,16 +379,11 @@ function gutenberg_register_vendor_scripts() {
 
 	gutenberg_register_vendor_script(
 		'react',
-		'https://unpkg.com/react@16.2.0/umd/react' . $react_suffix . '.js'
+		'https://unpkg.com/react@16.3.0/umd/react' . $react_suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
 		'react-dom',
-		'https://unpkg.com/react-dom@16.2.0/umd/react-dom' . $react_suffix . '.js',
-		array( 'react' )
-	);
-	gutenberg_register_vendor_script(
-		'react-dom-server',
-		'https://unpkg.com/react-dom@16.2.0/umd/react-dom-server.browser' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@16.3.0/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
 	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';

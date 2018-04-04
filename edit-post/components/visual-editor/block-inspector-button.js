@@ -21,9 +21,9 @@ export function BlockInspectorButton( {
 } ) {
 	const speakMessage = () => {
 		if ( areAdvancedSettingsOpened ) {
-			speak( __( 'Additional settings are now available in the Editor advanced settings sidebar' ) );
-		} else {
 			speak( __( 'Advanced settings closed' ) );
+		} else {
+			speak( __( 'Additional settings are now available in the Editor advanced settings sidebar' ) );
 		}
 	};
 

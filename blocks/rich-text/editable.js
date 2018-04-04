@@ -12,7 +12,7 @@ class Editable extends RichText {
 	constructor() {
 		super( ...arguments );
 		deprecated( 'Editable', {
-			version: '2.5',
+			version: '2.6',
 			alternative: 'wp.blocks.RichText',
 			plugin: 'Gutenberg',
 		} );
