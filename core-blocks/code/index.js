@@ -47,10 +47,21 @@ export const settings = {
 			{
 				type: 'raw',
 				isMatch: ( node ) => (
-					node.nodeName === 'PRE' &&
+					node.matches( 'pre' ) &&
 					node.children.length === 1 &&
-					node.firstChild.nodeName === 'CODE'
+					node.firstChild.matches( 'code' )
 				),
+				schema: {
+					pre: {
+						children: {
+							code: {
+								children: {
+									'#text': {},
+								},
+							},
+						},
+					},
+				},
 			},
 		],
 	},

@@ -32,7 +32,10 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'HR',
+				selector: 'hr',
+				schema: {
+					hr: {},
+				},
 			},
 		],
 	},

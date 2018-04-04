@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	RichText,
+	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 
 /**
@@ -42,12 +43,17 @@ export const settings = {
 			{
 				type: 'raw',
 				isMatch: ( node ) => (
-					node.nodeName === 'PRE' &&
+					node.matches( 'pre' ) &&
 					! (
 						node.children.length === 1 &&
-						node.firstChild.nodeName === 'CODE'
+						node.firstChild.matches( 'code' )
 					)
 				),
+				schema: {
+					pre: {
+						children: getPhrasingContentSchema(),
+					},
+				},
 			},
 		],
 		to: [

@@ -7,6 +7,7 @@ import {
 	getBlockAttributes,
 	getBlockType,
 	RichText,
+	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 
 /**
@@ -57,6 +58,29 @@ const blockAttributes = {
 	},
 };
 
+const imageSchema = {
+	img: {
+		attributes: [ 'src', 'alt' ],
+		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone' ],
+	},
+};
+
+const schema = {
+	figure: {
+		require: [ 'img' ],
+		children: {
+			...imageSchema,
+			a: {
+				attributes: [ 'href' ],
+				children: imageSchema,
+			},
+			figcaption: {
+				children: getPhrasingContentSchema(),
+			},
+		},
+	},
+};
+
 export const settings = {
 	title: __( 'Image' ),
 
@@ -74,13 +98,9 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
-				isMatch( node ) {
-					const tag = node.nodeName.toLowerCase();
-					const hasImage = node.querySelector( 'img' );
-
-					return tag === 'img' || ( hasImage && tag === 'figure' );
-				},
-				transform( node ) {
+				isMatch: ( node ) => node.matches( 'figure' ) && !! node.querySelector( 'img' ),
+				schema,
+				transform: ( node ) => {
 					const matches = /align(left|center|right)/.exec( node.className );
 					const align = matches ? matches[ 1 ] : undefined;
 					const blockType = getBlockType( 'core/image' );
