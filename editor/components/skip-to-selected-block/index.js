@@ -10,20 +10,14 @@ import { __ } from '@wordpress/i18n';
 import './style.scss';
 import { getBlockFocusableWrapper } from '../../utils/dom';
 
-const SkipToSelectedBlock = ( { selectedBlock } ) => {
-	if ( ! selectedBlock ) {
-		return null;
-	}
-
-	const { uid } = selectedBlock;
-
+const SkipToSelectedBlock = ( { selectedBlockUID } ) => {
 	const onClick = () => {
-		const selectedBlockElement = getBlockFocusableWrapper( uid );
+		const selectedBlockElement = getBlockFocusableWrapper( selectedBlockUID );
 		selectedBlockElement.focus();
 	};
 
 	return (
-		selectedBlock && uid &&
+		selectedBlockUID &&
 		<button type="button" className="button editor-skip-to-selected-block" onClick={ onClick }>
 			{ __( 'Skip to the selected block' ) }
 		</button>
@@ -32,6 +26,6 @@ const SkipToSelectedBlock = ( { selectedBlock } ) => {
 
 export default withSelect( ( select ) => {
 	return {
-		selectedBlock: select( 'core/editor' ).getSelectedBlock(),
+		selectedBlockUID: select( 'core/editor' ).getBlockSelectionStart(),
 	};
 } )( SkipToSelectedBlock );
