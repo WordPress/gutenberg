@@ -770,6 +770,27 @@ export function isInsertionPointVisible( state = false, action ) {
 }
 
 /**
+ * Reducer returning the inline insertion point visibility, a boolean value
+ * reflecting whether the inline insertion point should be shown.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function isInlineInsertionPointVisible( state = false, action ) {
+	switch ( action.type ) {
+		case 'SHOW_INLINE_INSERTION_POINT':
+			return true;
+
+		case 'HIDE_INLINE_INSERTION_POINT':
+			return false;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning whether the post blocks match the defined template or not.
  *
  * @param {Object} state  Current state.
@@ -1065,6 +1086,7 @@ export default optimist( combineReducers( {
 	blocksMode,
 	blockListSettings,
 	isInsertionPointVisible,
+	isInlineInsertionPointVisible,
 	preferences,
 	saving,
 	notices,

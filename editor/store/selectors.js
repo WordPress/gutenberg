@@ -1053,6 +1053,17 @@ export function isBlockInsertionPointVisible( state ) {
 }
 
 /**
+ * Returns true if we should show the inline insertion point.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?boolean} Whether the insertion point is visible or not.
+ */
+export function isInlineInsertionPointVisible( state ) {
+	return state.isInlineInsertionPointVisible;
+}
+
+/**
  * Returns whether the blocks matches the template or not.
  *
  * @param {boolean} state
