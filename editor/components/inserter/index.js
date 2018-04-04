@@ -24,6 +24,8 @@ class Inserter extends Component {
 
 		this.onToggle = this.onToggle.bind( this );
 		this.isInsertingInline = this.isInsertingInline.bind( this );
+		this.showInsertionPoint = this.showInsertionPoint.bind( this );
+		this.hideInsertionPoint = this.hideInsertionPoint.bind( this );
 		this.state = {
 			isInline: false,
 		};
@@ -33,20 +35,36 @@ class Inserter extends Component {
 		const { onToggle } = this.props;
 
 		if ( isOpen ) {
-			if ( this.isInsertingInline() ) {
-				this.setState( { isInline: true } );
-				// TODO: show inline insertion point
-			} else {
-				this.setState( { isInline: false } );
-				this.props.showInsertionPoint();
-			}
+			this.showInsertionPoint();
 		} else {
-			this.props.hideInsertionPoint();
+			this.hideInsertionPoint();
 		}
 
 		// Surface toggle callback to parent component
 		if ( onToggle ) {
 			onToggle( isOpen );
+		}
+	}
+
+	showInsertionPoint() {
+		const { showInlineInsertionPoint, showInsertionPoint } = this.props;
+
+		if ( this.isInsertingInline() ) {
+			this.setState( { isInline: true } );
+			showInlineInsertionPoint();
+		} else {
+			this.setState( { isInline: false } );
+			showInsertionPoint();
+		}
+	}
+
+	hideInsertionPoint() {
+		const { hideInlineInsertionPoint, hideInsertionPoint } = this.props;
+
+		if ( this.state.isInline ) {
+			hideInlineInsertionPoint();
+		} else {
+			hideInsertionPoint();
 		}
 	}
 
@@ -147,5 +165,7 @@ export default compose( [
 			}
 			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
 		},
+		showInlineInsertionPoint: dispatch( 'core/editor' ).showInlineInsertionPoint,
+		hideInlineInsertionPoint: dispatch( 'core/editor' ).hideInlineInsertionPoint,
 	} ) ),
 ] )( Inserter );
