@@ -7,12 +7,13 @@ export { createBlock } from // getPossibleBlockTransformations,
 	'./factory';
 // export { default as parse, getBlockAttributes } from './parser';
 // export { default as rawHandler } from './raw-handling';
-// export {
+export {
 // 	default as serialize,
-// 	getBlockContent,
+	getBlockContent,
 // 	getBlockDefaultClassname,
 // 	getSaveElement,
-// } from './serializer';
+} from
+	'./serializer';
 // export { isValidBlock } from './validation';
 // export { getCategories } from './categories';
 // 	getBlockTypes,
