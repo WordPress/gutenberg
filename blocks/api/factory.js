@@ -65,13 +65,13 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
  * Given a block object, returns a copy of the block object, optionally merging
  * new attributes and/or replacing its inner blocks.
  *
- * @param {Object} block           Block object.
- * @param {Object} mergeAttributes Block attributes.
- * @param {?Array} innerBlocks     Nested blocks.
+ * @param {Object} block              Block object.
+ * @param {Object} mergeAttributes    Block attributes.
+ * @param {?Array} newInnerBlocks     Nested blocks.
  *
  * @return {Object} A cloned block.
  */
-export function cloneBlock( block, mergeAttributes = {}, innerBlocks = block.innerBlocks ) {
+export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	return {
 		...block,
 		uid: uuid(),
@@ -79,7 +79,8 @@ export function cloneBlock( block, mergeAttributes = {}, innerBlocks = block.inn
 			...block.attributes,
 			...mergeAttributes,
 		},
-		innerBlocks,
+		innerBlocks: newInnerBlocks ||
+			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),
 	};
 }
 
