@@ -1,4 +1,4 @@
-i18n
+@wordpress/i18n
 ======
 
 Internationalization utilities for client-side localization.
@@ -74,3 +74,5 @@ Creates a new Jed instance with specified locale data configuration.
 Returns the current Jed instance, initializing with a default configuration if not already assigned.
 
 See: http://messageformat.github.io/Jed/
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
