@@ -17,7 +17,7 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
-	dataSource: Object,
+	dataSource: DataSource,
 	refresh: boolean,
 };
 
@@ -31,7 +31,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.props.focusBlockAction( uid );
 	}
 
-	onToolbarButtonPressed( button: number, uid: string  ) {
+	onToolbarButtonPressed( button: number, uid: string ) {
 		switch ( button ) {
 			case ToolbarButton.UP:
 				this.props.moveBlockUpAction( uid );
@@ -48,37 +48,44 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		}
 	}
 
+	componentDidUpdate() {
+		// List has been updated, tell the recycler view to update the view
+		this.props.dataSource.setDirty();
+	}
+
 	render() {
-		const { dataSource } = this.props;
-		const androidList =
+		var list;
+		if ( Platform.OS === 'android' ) {
+			list = (
 				<RecyclerViewList
 					ref={ component => ( this._recycler = component ) }
 					style={ styles.list }
-					dataSource={ dataSource }
+					dataSource={ this.props.dataSource }
 					renderItem={ this.renderItem.bind( this ) }
-					windowSize={ 20 }
-					initialScrollIndex={ 0 }
 					ListEmptyComponent={
 						<View style={ { borderColor: '#e7e7e7', borderWidth: 10, margin: 10, padding: 20 } }>
-							<Text style={ { fontSize: 15 } }>No blocnks :(</Text>
+							<Text style={ { fontSize: 15 } }>No blocks :(</Text>
 						</View>
 					}
 				/>
-
-		// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS
-		const defaultList =
+			);
+		} else {
+			// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS
+			list = (
 				<FlatList
 					style={ styles.list }
-					data={ dataSource._data }
+					data={ this.props.dataSource._data }
 					extraData={ this.props.refresh }
 					keyExtractor={ ( item, index ) => item.uid }
 					renderItem={ this.renderItem.bind( this ) }
-					/>
+				/>
+			);
+		}
 
 		return (
 			<View style={ styles.container }>
 				<View style={ { height: 30 } } />
-				{ Platform.OS === 'android' ? androidList : defaultList }
+				{ list }
 			</View>
 		);
 	}

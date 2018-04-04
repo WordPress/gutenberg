@@ -23,10 +23,13 @@ function findBlockIndex( dataSource, uid: string ) {
 }
 
 export const reducer = (
-	state: StateType = { dataSource: new DataSource( [], ( item: BlockType, index ) => item.uid ), refresh: false },
+	state: StateType = {
+		dataSource: new DataSource( [], ( item: BlockType, index ) => item.uid ),
+		refresh: false,
+	},
 	action: BlockActionType
 ) => {
-	const dataSource : DataSource = state.dataSource;
+	const dataSource: DataSource = state.dataSource;
 	switch ( action.type ) {
 		case ActionTypes.BLOCK.UPDATE_ATTRIBUTES:
 			const block = findBlock( dataSource, action.uid );
@@ -62,13 +65,12 @@ export const reducer = (
 
 			// Otherwise merge attributes into state
 			var index = findBlockIndex( dataSource, action.uid );
-			dataSource.get(index ).set({
+			dataSource.get( index ).set( {
 				...block,
 				attributes: nextAttributes,
-			});
+			} );
 			return { dataSource: dataSource, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.FOCUS:
-			console.log(dataSource._data)
 			const destBlock = findBlock( dataSource, action.uid );
 			const destBlockState = destBlock.focused;
 			// Deselect all blocks
@@ -80,11 +82,11 @@ export const reducer = (
 			return { dataSource: dataSource, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.MOVE_UP:
 			var index = findBlockIndex( dataSource, action.uid );
-			dataSource.moveUp(index)
+			dataSource.moveUp( index );
 			return { dataSource: dataSource, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.MOVE_DOWN:
 			var index = findBlockIndex( dataSource, action.uid );
-			dataSource.moveDown(index)
+			dataSource.moveDown( index );
 			return { dataSource: dataSource, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.DELETE:
 			var index = findBlockIndex( dataSource, action.uid );
