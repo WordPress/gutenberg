@@ -49,12 +49,12 @@ export function addAttribute( settings ) {
  */
 export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
-		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true ) && props.isSelected;
+		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true );
 
-		return (
-			<Fragment>
-				<BlockEdit { ...props } />
-				{ hasCustomClassName && (
+		if ( hasCustomClassName && props.isSelected ) {
+			return (
+				<Fragment>
+					<BlockEdit { ...props } />
 					<InspectorAdvancedControls>
 						<TextControl
 							label={ __( 'Additional CSS Class' ) }
@@ -66,9 +66,11 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 							} }
 						/>
 					</InspectorAdvancedControls>
-				) }
-			</Fragment>
-		);
+				</Fragment>
+			);
+		}
+
+		return <BlockEdit { ...props } />;
 	};
 }, 'withInspectorControl' );
 

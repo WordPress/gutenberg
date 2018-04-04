@@ -58,11 +58,12 @@ export function addAttribute( settings ) {
  */
 export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
-		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.isSelected;
-		return (
-			<Fragment>
-				<BlockEdit { ...props } />
-				{ hasAnchor && (
+		const hasAnchor = hasBlockSupport( props.name, 'anchor' );
+
+		if ( hasAnchor && props.isSelected ) {
+			return (
+				<Fragment>
+					<BlockEdit { ...props } />
 					<InspectorAdvancedControls>
 						<TextControl
 							label={ __( 'HTML Anchor' ) }
@@ -75,9 +76,11 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 								} );
 							} } />
 					</InspectorAdvancedControls>
-				) }
-			</Fragment>
-		);
+				</Fragment>
+			);
+		}
+
+		return <BlockEdit { ...props } />;
 	};
 }, 'withInspectorControl' );
 
