@@ -20,7 +20,9 @@ function ContrastChecker( { backgroundColor, textColor, isLargeText, fallbackBac
 	}
 	const tinyBackgroundColor = tinycolor( backgroundColor || fallbackBackgroundColor );
 	const tinyTextColor = tinycolor( textColor || fallbackTextColor );
-	if ( tinycolor.isReadable(
+	const hasTransparency = tinyBackgroundColor.getAlpha() !== 1 || tinyTextColor.getAlpha() !== 1;
+
+	if ( hasTransparency || tinycolor.isReadable(
 		tinyBackgroundColor,
 		tinyTextColor,
 		{ level: 'AA', size: ( isLargeText ? 'large' : 'small' ) }

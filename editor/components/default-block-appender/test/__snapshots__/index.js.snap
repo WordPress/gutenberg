@@ -36,7 +36,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     value="Write your story"
   />
   <WrappedComponent />
-  <Select(Dispatch(WrappedComponent))
+  <WithSelect(WithDispatch(WrappedComponent))
     position="top right"
   />
 </div>
@@ -60,7 +60,7 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
     value="Write your story"
   />
   <WrappedComponent />
-  <Select(Dispatch(WrappedComponent))
+  <WithSelect(WithDispatch(WrappedComponent))
     position="top right"
   />
 </div>
@@ -84,7 +84,7 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
     value=""
   />
   <WrappedComponent />
-  <Select(Dispatch(WrappedComponent))
+  <WithSelect(WithDispatch(WrappedComponent))
     position="top right"
   />
 </div>

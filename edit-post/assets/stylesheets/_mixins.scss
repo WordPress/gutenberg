@@ -184,11 +184,10 @@ $float-margin: calc( 50% - #{ $content-width-padding / 2 } );
 }
 
 @mixin menu-style__focus() {
-	color: $black;
+	color: $dark-gray-900;
 	border: none;
 	box-shadow: none;
 	outline-offset: -2px;
-	color: $dark-gray-900;
 	outline: 1px dotted $dark-gray-500;
 }
 

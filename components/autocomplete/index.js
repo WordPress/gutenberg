@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, filter, map } from 'lodash';
+import { escapeRegExp, find, filter, map, debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -141,6 +141,7 @@ export class Autocomplete extends Component {
 		this.search = this.search.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.getWordRect = this.getWordRect.bind( this );
+		this.debouncedLoadOptions = debounce( this.loadOptions, 250 );
 
 		this.state = this.constructor.getInitialState();
 	}
@@ -231,13 +232,24 @@ export class Autocomplete extends Component {
 		}
 	}
 
-	loadOptions( index ) {
-		this.props.completers[ index ].getOptions().then( ( options ) => {
-			const keyedOptions = map( options, ( option, i ) => ( { ...option, key: index + '-' + i } ) );
+	/**
+	 * Load options for an autocompleter.
+	 *
+	 * @param {number} autocompleterIndex The autocompleter index.
+	 * @param {string} query               The query, if any.
+	 */
+	loadOptions( autocompleterIndex, query ) {
+		this.props.completers[ autocompleterIndex ].getOptions( query ).then( ( options ) => {
+			const keyedOptions = map( options, ( option, i ) => {
+				return {
+					...option,
+					key: autocompleterIndex + '-' + i,
+				};
+			} );
 			const filteredOptions = filterOptions( this.state.search, keyedOptions );
 			const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
 			this.setState( {
-				[ 'options_' + index ]: keyedOptions,
+				[ 'options_' + autocompleterIndex ]: keyedOptions,
 				filteredOptions,
 				selectedIndex,
 			} );
@@ -322,7 +334,7 @@ export class Autocomplete extends Component {
 	}
 
 	search( event ) {
-		const { open: wasOpen, suppress: wasSuppress } = this.state;
+		const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 		const { completers } = this.props;
 		const container = event.target;
 		// ensure that the cursor location is unambiguous
@@ -334,8 +346,12 @@ export class Autocomplete extends Component {
 		const match = this.findMatch( container, cursor, completers, wasOpen );
 		const { open, query, range } = match || {};
 		// asynchronously load the options for the open completer
-		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx ) ) {
-			this.loadOptions( open.idx );
+		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx || query !== wasQuery ) ) {
+			if ( this.props.completers[ open.idx ].isDebounced ) {
+				this.debouncedLoadOptions( open.idx, query );
+			} else {
+				this.loadOptions( open.idx, query );
+			}
 		}
 		// create a regular expression to filter the options
 		const search = open ? new RegExp( '(?:\\b|\\s|^)' + escapeRegExp( query ), 'i' ) : /./;
@@ -452,6 +468,7 @@ export class Autocomplete extends Component {
 
 	componentWillUnmount() {
 		this.toggleKeyEvents( false );
+		this.debouncedLoadOptions.cancel();
 	}
 
 	render() {

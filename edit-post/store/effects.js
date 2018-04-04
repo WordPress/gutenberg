@@ -19,9 +19,12 @@ import {
 	requestMetaBoxUpdates,
 	searchArticles,
 	setArticles,
+	openGeneralSidebar,
+	closeGeneralSidebar,
 } from './actions';
 import { getMetaBoxes } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
+import { onChangeListener } from './utils';
 
 const effects = {
 	INITIALIZE_META_BOX_STATE( action, store ) {
@@ -43,15 +46,11 @@ const effects = {
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
 		// Saving metaboxes when saving posts
-		let previousIsSaving = select( 'core/editor' ).isSavingPost();
-		subscribe( () => {
-			const isSavingPost = select( 'core/editor' ).isSavingPost();
-			const shouldTriggerSaving = ! isSavingPost && previousIsSaving;
-			previousIsSaving = isSavingPost;
-			if ( shouldTriggerSaving ) {
+		subscribe( onChangeListener( select( 'core/editor' ).isSavingPost, ( isSavingPost ) => {
+			if ( ! isSavingPost ) {
 				store.dispatch( requestMetaBoxUpdates() );
 			}
-		} );
+		} ) );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const state = store.getState();
@@ -112,6 +111,32 @@ const effects = {
 		} ).then( articles => {
 			dispatch( setArticles( articles ) );
 		} );
+	},
+	INIT( _, store ) {
+		// Select the block settings tab when the selected block changes
+		subscribe( onChangeListener(
+			() => select( 'core/editor' ).getBlockSelectionStart(),
+			( selectionStart ) => {
+				if ( ! select( 'core/edit-post' ).isEditorSidebarOpened() ) {
+					return;
+				}
+				if ( selectionStart ) {
+					store.dispatch( openGeneralSidebar( 'edit-post/block' ) );
+				} else {
+					store.dispatch( openGeneralSidebar( 'edit-post/document' ) );
+				}
+			} )
+		);
+
+		// Collapse sidebar when viewport shrinks.
+		subscribe( onChangeListener(
+			() => select( 'core/viewport' ).isViewportMatch( '< medium' ),
+			( isSmall ) => {
+				if ( isSmall ) {
+					store.dispatch( closeGeneralSidebar() );
+				}
+			}
+		) );
 	},
 };
 

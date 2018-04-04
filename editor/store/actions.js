@@ -209,6 +209,29 @@ export function replaceBlock( uid, block ) {
 }
 
 /**
+ * Returns an action object signalling that an indexed block should be moved
+ * to a new index.
+ *
+ * @param  {?string} uid          The UID of the block.
+ * @param  {?string} fromRootUID  root UID source.
+ * @param  {?string} toRootUID    root UID destination.
+ * @param  {?string} layout       layout to move the block into.
+ * @param  {number}  index        The index to move the block into.
+ *
+ * @return {Object} Action object.
+ */
+export function moveBlockToPosition( uid, fromRootUID, toRootUID, layout, index ) {
+	return {
+		type: 'MOVE_BLOCK_TO_POSITION',
+		fromRootUID,
+		toRootUID,
+		uid,
+		index,
+		layout,
+	};
+}
+
+/**
  * Returns an action object used in signalling that a single block should be
  * inserted, optionally at a specific index respective a root block list.
  *

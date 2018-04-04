@@ -39,10 +39,12 @@ import InvalidBlockWarning from './invalid-block-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
+import BlockBreadcrumb from './breadcrumb';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import BlockMultiControls from './multi-controls';
 import BlockMobileToolbar from './block-mobile-toolbar';
 import BlockInsertionPoint from './insertion-point';
+import BlockDraggable from './block-draggable';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
@@ -85,19 +87,22 @@ export class BlockListBlock extends Component {
 		this.maybeHover = this.maybeHover.bind( this );
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
+		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
 		this.deleteOrInsertAfterWrapper = this.deleteOrInsertAfterWrapper.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
-		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
+		this.onDragStart = this.onDragStart.bind( this );
+		this.onDragEnd = this.onDragEnd.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
 		this.hadTouchStart = false;
 
 		this.state = {
 			error: null,
+			dragging: false,
 			isHovered: false,
 		};
 	}
@@ -392,6 +397,14 @@ export class BlockListBlock extends Component {
 		this.setState( { error } );
 	}
 
+	onDragStart() {
+		this.setState( { dragging: true } );
+	}
+
+	onDragEnd() {
+		this.setState( { dragging: false } );
+	}
+
 	selectOnOpen( open ) {
 		if ( open && ! this.props.isSelected ) {
 			this.props.onSelect();
@@ -407,6 +420,7 @@ export class BlockListBlock extends Component {
 			isLocked,
 			isFirst,
 			isLast,
+			uid,
 			rootUID,
 			layout,
 			renderBlockMenu,
@@ -434,15 +448,15 @@ export class BlockListBlock extends Component {
 		const shouldShowSettingsMenu = shouldShowMovers;
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
 		const shouldShowMobileToolbar = shouldAppearSelected;
-		const { error } = this.state;
+		const { error, dragging } = this.state;
 
 		// Insertion point can only be made visible when the side inserter is
 		// not present, and either the block is at the extent of a selection or
-		// is the last block in the top-level list rendering.
+		// is the first block in the top-level list rendering.
 		const shouldShowInsertionPoint = (
-			( ! isMultiSelected && ! isLast ) ||
+			( ! isMultiSelected && ! isFirst ) ||
 			( isMultiSelected && isLastInSelection ) ||
-			( isLast && ! rootUID && ! isEmptyDefaultBlock )
+			( isFirst && ! rootUID && ! isEmptyDefaultBlock )
 		);
 
 		// Generate the wrapper class names handling the different states of the block.
@@ -452,6 +466,7 @@ export class BlockListBlock extends Component {
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
 			'is-reusable': isReusableBlock( blockType ),
+			'is-hidden': dragging,
 			'is-typing': isTypingWithinBlock,
 		} );
 
@@ -465,6 +480,7 @@ export class BlockListBlock extends Component {
 				...blockType.getEditWrapperProps( block.attributes ),
 			};
 		}
+		const blockElementId = `block-${ uid }`;
 
 		// Disable reasons:
 		//
@@ -477,8 +493,10 @@ export class BlockListBlock extends Component {
 		/* eslint-disable jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<IgnoreNestedEvents
+				id={ blockElementId }
 				ref={ this.setBlockListRef }
 				onMouseOver={ this.maybeHover }
+				onMouseOverHandled={ this.hideHoverEffects }
 				onMouseLeave={ this.hideHoverEffects }
 				className={ wrapperClassName }
 				data-type={ block.name }
@@ -493,6 +511,25 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
+				{ ! isMultiSelected && (
+					<BlockDraggable
+						rootUID={ rootUID }
+						index={ order }
+						uid={ uid }
+						layout={ layout }
+						onDragStart={ this.onDragStart }
+						onDragEnd={ this.onDragEnd }
+						isDragging={ dragging }
+						elementId={ blockElementId }
+					/>
+				) }
+				{ shouldShowInsertionPoint && (
+					<BlockInsertionPoint
+						uid={ uid }
+						rootUID={ rootUID }
+						layout={ layout }
+					/>
+				) }
 				<BlockDropZone
 					index={ order }
 					rootUID={ rootUID }
@@ -500,7 +537,7 @@ export class BlockListBlock extends Component {
 				/>
 				{ shouldShowMovers && (
 					<BlockMover
-						uids={ [ block.uid ] }
+						uids={ [ uid ] }
 						rootUID={ rootUID }
 						layout={ layout }
 						isFirst={ isFirst }
@@ -509,11 +546,12 @@ export class BlockListBlock extends Component {
 				) }
 				{ shouldShowSettingsMenu && ! showSideInserter && (
 					<BlockSettingsMenu
-						uids={ [ block.uid ] }
+						uids={ [ uid ] }
 						rootUID={ rootUID }
 						renderBlockMenu={ renderBlockMenu }
 					/>
 				) }
+				{ isHovered && <BlockBreadcrumb uid={ uid } /> }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
 				<IgnoreNestedEvents
@@ -522,8 +560,9 @@ export class BlockListBlock extends Component {
 					onMouseDown={ this.onPointerDown }
 					className="editor-block-list__block-edit"
 					aria-label={ blockLabel }
-					data-block={ block.uid }
+					data-block={ uid }
 				>
+
 					<BlockCrashBoundary onError={ this.onBlockError }>
 						{ isValid && mode === 'visual' && (
 							<BlockEdit
@@ -534,13 +573,13 @@ export class BlockListBlock extends Component {
 								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 								onReplace={ isLocked ? undefined : onReplace }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
-								id={ block.uid }
+								id={ uid }
 								isSelectionEnabled={ this.props.isSelectionEnabled }
 								toggleSelection={ this.props.toggleSelection }
 							/>
 						) }
 						{ isValid && mode === 'html' && (
-							<BlockHtml uid={ block.uid } />
+							<BlockHtml uid={ uid } />
 						) }
 						{ ! isValid && [
 							<div key="invalid-preview">
@@ -555,23 +594,16 @@ export class BlockListBlock extends Component {
 					{ shouldShowMobileToolbar && (
 						<BlockMobileToolbar
 							rootUID={ rootUID }
-							uid={ block.uid }
+							uid={ uid }
 							renderBlockMenu={ renderBlockMenu }
 						/>
 					) }
 				</IgnoreNestedEvents>
 				{ !! error && <BlockCrashWarning /> }
-				{ shouldShowInsertionPoint && (
-					<BlockInsertionPoint
-						uid={ block.uid }
-						rootUID={ rootUID }
-						layout={ layout }
-					/>
-				) }
 				{ showSideInserter && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">
-							<InserterWithShortcuts uid={ block.uid } layout={ layout } onToggle={ this.selectOnOpen } />
+							<InserterWithShortcuts uid={ uid } layout={ layout } onToggle={ this.selectOnOpen } />
 						</div>
 						<div className="editor-block-list__empty-block-inserter">
 							<Inserter
@@ -613,11 +645,9 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onChange( uid, attributes ) {
 		dispatch( updateBlockAttributes( uid, attributes ) );
 	},
-
 	onSelect( uid = ownProps.uid, initialPosition ) {
 		dispatch( selectBlock( uid, initialPosition ) );
 	},
-
 	onInsertBlocks( blocks, index ) {
 		const { rootUID, layout } = ownProps;
 
@@ -625,15 +655,12 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 
 		dispatch( insertBlocks( blocks, index, rootUID ) );
 	},
-
 	onRemove( uid ) {
 		dispatch( removeBlock( uid ) );
 	},
-
 	onMerge( ...args ) {
 		dispatch( mergeBlocks( ...args ) );
 	},
-
 	onReplace( blocks ) {
 		const { layout } = ownProps;
 
@@ -643,11 +670,9 @@ const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 
 		dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
 	},
-
 	onMetaChange( meta ) {
 		dispatch( editPost( { meta } ) );
 	},
-
 	toggleSelection( selectionEnabled ) {
 		dispatch( toggleSelection( selectionEnabled ) );
 	},

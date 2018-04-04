@@ -39,6 +39,7 @@ const {
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
 	getBlockDependantsCacheBust,
+	getBlockName,
 	getBlock,
 	getBlocks,
 	getBlockCount,
@@ -1219,6 +1220,51 @@ describe( 'selectors', () => {
 			expect(
 				getBlockDependantsCacheBust( state, 123 )
 			).not.toBe( getBlockDependantsCacheBust( nextState, 123 ) );
+		} );
+	} );
+
+	describe( 'getBlockName', () => {
+		it( 'returns null if no block by uid', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+			};
+
+			const name = getBlockName( state, 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' );
+
+			expect( name ).toBe( null );
+		} );
+
+		it( 'returns block name', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+								uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+								name: 'core/paragraph',
+								attributes: {},
+							},
+						},
+						blockOrder: {
+							'': [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': [],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const name = getBlockName( state, 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' );
+
+			expect( name ).toBe( 'core/paragraph' );
 		} );
 	} );
 
