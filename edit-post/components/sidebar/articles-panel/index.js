@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import _ from 'lodash';
+import { map } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, PanelRow, TextControl, CategorySelect } from '@wordpress/components';
+import { PanelBody, PanelRow, TextControl, CategorySelect, ArticlesList } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
@@ -25,15 +25,16 @@ import {
 	toggleGeneralSidebarEditorPanel,
 	setCategory,
 	setSearchTerm,
+	searchArticles,
 } from '../../../store/actions';
 import '@wordpress/core-data';
 
 /**
  * Module Constants
  */
-const PANEL_NAME = 'articles-list';
+const PANEL_NAME = 'articles-panel';
 
-function ArticlesList( {
+function ArticlesPanel( {
 	isOpened,
 	onTogglePanel,
 	categories,
@@ -64,14 +65,9 @@ function ArticlesList( {
 				onChange={ onCategoryChange }
 			/>
 
-			<PanelRow>Loading articles...</PanelRow>
-			<div>
-				{
-					_.map( articles, article => (
-						<PanelRow key={ article.id }>{ article.title }</PanelRow>
-					) )
-				}
-			</div>
+			<ArticlesList
+				articles={ articles }
+			/>
 		</PanelBody>
 	);
 }
@@ -96,6 +92,11 @@ export default compose(
 			onSearchInputChange( term ) {
 				return setSearchTerm( term );
 			},
+
+			// componentDidMount() {
+			// 	console.log('componentDidMount');
+			// 	return searchArticles();
+			// }
 		},
 		undefined,
 		{ storeKey: 'edit-post' }
@@ -107,4 +108,4 @@ export default compose(
 			categories: getCategories(),
 		};
 	} )
-)( ArticlesList );
+)( ArticlesPanel );

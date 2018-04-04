@@ -1,5 +1,6 @@
 // Components
 export { default as APIProvider } from './higher-order/with-api-data/provider';
+export { default as ArticlesList } from './articles-list';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';

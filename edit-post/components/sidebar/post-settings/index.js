@@ -27,7 +27,7 @@ const panel = () => {
 	return (
 		<Panel>
 			{ items.includes( 'post-status' ) ? <PostStatus /> : '' }
-			{ items.includes( 'articles-list' ) ? <ArticlesList /> : '' }
+			{ items.includes( 'articles-panel' ) ? <ArticlesPanel /> : '' }
 			{ items.includes( 'settings-panel' ) ? <SettingsPanel /> : '' }
 			{ items.includes( 'last-revision' ) ? <LastRevision /> : '' }
 			{ items.includes( 'post-taxonomies' ) ? <PostTaxonomies /> : '' }
