@@ -6,8 +6,8 @@ import { connect } from 'react-redux';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Component, compose } from '@wordpress/element';
+import { Button, ifCondition, withContext } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -123,14 +123,21 @@ export class PostPreviewButton extends Component {
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		postId: state.currentPost.id,
-		link: getEditedPostPreviewLink( state ),
-		isDirty: isEditedPostDirty( state ),
-		isNew: isEditedPostNew( state ),
-		isSaveable: isEditedPostSaveable( state ),
-		modified: getEditedPostAttribute( state, 'modified' ),
-	} ),
-	{ autosave }
+export default compose(
+	withContext( 'editor' )(
+		( { disablePreview } ) => ( { disablePreview } )
+	),
+	ifCondition( ( { disablePreview } ) => ! disablePreview ),
+	connect(
+		( state ) => ( {
+			postId: state.currentPost.id,
+			link: getEditedPostPreviewLink( state ),
+			isDirty: isEditedPostDirty( state ),
+			isNew: isEditedPostNew( state ),
+			isSaveable: isEditedPostSaveable( state ),
+			modified: getEditedPostAttribute( state, 'modified' ),
+		} ),
+		{ autosave }
+	),
+
 )( PostPreviewButton );
