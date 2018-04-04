@@ -104,15 +104,6 @@ export const settings = {
 	edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
-		const alignmentToolbar = (
-			<AlignmentToolbar
-				value={ align }
-				onChange={ ( nextAlign ) => {
-					setAttributes( { align: nextAlign } );
-				} }
-			/>
-		);
-
 		return [
 			isSelected && (
 				<BlockControls
@@ -127,7 +118,12 @@ export const settings = {
 						} ) )
 					}
 				>
-					{ alignmentToolbar }
+				<AlignmentToolbar
+					value={ align }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { align: nextAlign } );
+					} }
+				/>
 				</BlockControls>
 			),
 			isSelected && (
