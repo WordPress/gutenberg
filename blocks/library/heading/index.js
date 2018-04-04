@@ -145,8 +145,6 @@ export const settings = {
 							} ) )
 						}
 					/>
-					<p>{ __( 'Text Alignment' ) }</p>
-					{ alignmentToolbar }
 				</InspectorControls>
 			),
 			<RichText
