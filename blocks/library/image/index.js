@@ -76,7 +76,7 @@ export const settings = {
 					return tag === 'img' || ( hasImage && tag === 'figure' );
 				},
 				transform( node ) {
-					const matches = /align(left|center|right|card)/.exec( node.className );
+					const matches = /align(left|center|right|pullLeft|pullRight|twoFold)/.exec( node.className );
 					const align = matches ? matches[ 1 ] : undefined;
 					const blockType = getBlockType( 'core/image' );
 					const attributes = getBlockAttributes( blockType, node.outerHTML, { align } );
@@ -150,7 +150,7 @@ export const settings = {
 
 	getEditWrapperProps( attributes ) {
 		const { align, width } = attributes;
-		if ( 'left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align || 'card' === align ) {
+		if ( 'left' === align || 'pullLeft' === align || 'center' === align || 'right' === align || 'pullRight' === align || 'wide' === align || 'full' === align || 'twoFold' === align ) {
 			return { 'data-align': align, 'data-resized': !! width };
 		}
 	},

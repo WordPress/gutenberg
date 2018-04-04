@@ -74,7 +74,7 @@
 		}
 	}
 
-	&[data-align="card"] {
+	&[data-align="twoFold"] {
 		grid-column: wide-start / middle;
 
 
@@ -84,14 +84,28 @@
 		}
 	}
 
-	&[data-align="left"] {
+	&[data-align="pullLeft"] {
 		grid-column: wide-start / content-start;
 		height: 0;
+		align-self: start;
+	}
+
+	&[data-align="pullRight"] {
+		grid-column: content-end / wide-end;
+		height: 0;
+		align-self: end;
+	}
+
+	&[data-align="left"] {
+		grid-column: content-start / middle;
+
+		+ div {
+			grid-column: middle / content-end;
+		}
 	}
 
 	&[data-align="right"] {
 		grid-column: content-end / wide-end;
-		height: 0;
 	}
 
 	&[data-align="wide"] {
