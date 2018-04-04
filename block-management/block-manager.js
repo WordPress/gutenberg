@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-import jsxToString from 'jsx-to-string';
 import { Switch, StyleSheet, Text, View, FlatList, TextInput } from 'react-native';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
@@ -12,7 +11,7 @@ import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 
 // Gutenberg imports
-import { getBlockType } from '@gutenberg/blocks/api';
+import { getBlockType, getBlockContent } from '@gutenberg/blocks/api';
 
 export type BlockListType = {
 	onChange: ( uid: string, attributes: mixed ) => void,
@@ -62,9 +61,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	serializeToHtml() {
 		return this.props.blocks
 			.map( block => {
-				const blockType = getBlockType( block.blockType );
+				const blockType = getBlockType( block.name );
 				if ( blockType ) {
-					return jsxToString( blockType.save( { attributes: block.attributes } ) );
+					return getBlockContent( block );
 				} else {
 					return '<span>' + block.attributes.content + '</span>';
 				}
