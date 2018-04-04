@@ -1508,6 +1508,22 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should reset if replacing with empty set', () => {
+			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
+			const state = blockSelection( original, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'chicken' ],
+				blocks: [],
+			} );
+
+			expect( state ).toEqual( {
+				start: null,
+				end: null,
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+		} );
+
 		it( 'should keep the selected block', () => {
 			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
 			const state = blockSelection( original, {
