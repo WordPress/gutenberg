@@ -192,11 +192,11 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this.fetchRequest ) {
+		if ( this.fetchRequest && typeof this.fetchRequest.abort !== 'undefined' ) {
 			this.fetchRequest.abort();
 		}
 
-		if ( this.addRequest ) {
+		if ( this.addRequest && typeof this.addRequest.abort !== 'undefined' ) {
 			this.addRequest.abort();
 		}
 	}

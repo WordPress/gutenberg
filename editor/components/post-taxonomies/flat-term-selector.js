@@ -68,8 +68,11 @@ class FlatTermSelector extends Component {
 	}
 
 	componentWillUnmount() {
-		this.initRequest.abort();
-		if ( this.searchRequest ) {
+		if ( this.initRequest && typeof this.initRequest.abort !== 'undefined' ) {
+			this.initRequest.abort();
+		}
+
+		if ( this.searchRequest && typeof this.searchRequest.abort !== 'undefined' ) {
 			this.searchRequest.abort();
 		}
 	}
@@ -160,7 +163,7 @@ class FlatTermSelector extends Component {
 	}
 
 	searchTerms( search = '' ) {
-		if ( this.searchRequest ) {
+		if ( this.searchRequest && typeof this.searchRequest.abort !== 'undefined' ) {
 			this.searchRequest.abort();
 		}
 		this.searchRequest = this.fetchTerms( { search } );
