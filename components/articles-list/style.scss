@@ -4,7 +4,20 @@
 	.components-articles-list-item {
 		list-style: none;
 		color: $blue-medium-500;
-		padding: 5px 0px;
-		cursor: pointer;
+		padding: 10px 0px;
+		// cursor: pointer;
+
+		&.components-articles-list-item-draggable {
+			position: absolute;
+		    top: 0;
+		    right: 0;
+		    bottom: 0;
+		    left: 0;
+		    z-index: 0;
+
+			&:hover {
+				cursor: grab;
+			}
+		}
 	}
 }
