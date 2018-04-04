@@ -103,7 +103,12 @@ const effects = {
 		// request articles
 		wp.apiRequest( {
 			path: '/wp/v2/articles',
-			data: { category_id: state.search.selectedCategory, s: state.search.searchTerm },
+			data: {
+				category_id: state.search.selectedCategory,
+				s: state.search.searchTerm,
+				order: 'desc',
+				orderBy: 'date',
+			},
 		} ).then( articles => {
 			dispatch( setArticles( articles ) );
 		} );

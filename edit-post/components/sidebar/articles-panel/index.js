@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, PanelRow, TextControl, CategorySelect, ArticlesList } from '@wordpress/components';
+import { PanelBody, TextControl, CategorySelect, ArticlesList } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
@@ -35,12 +34,11 @@ import '@wordpress/core-data';
 const PANEL_NAME = 'articles-panel';
 
 class ArticlesPanel extends Component {
-
 	componentWillMount() {
 		this.props.searchArticles();
 	}
 
-	render() { 
+	render() {
 		const {
 			isOpened,
 			onTogglePanel,
@@ -50,7 +48,7 @@ class ArticlesPanel extends Component {
 			onCategoryChange,
 			onSearchInputChange,
 			searchTerm,
-		} = this.props; 
+		} = this.props;
 
 		return (
 			<PanelBody
@@ -102,7 +100,7 @@ export default compose(
 				return setSearchTerm( term );
 			},
 
-			searchArticles
+			searchArticles,
 		},
 		undefined,
 		{ storeKey: 'edit-post' }
