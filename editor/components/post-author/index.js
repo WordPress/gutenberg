@@ -39,7 +39,7 @@ export class PostAuthor extends Component {
 		// See: https://codex.wordpress.org/Roles_and_Capabilities#User_Levels
 		const { users } = this.props;
 		return filter( users.data, ( user ) => {
-			return user.capabilities.level_1;
+			return undefined !== user.capabilities && user.capabilities.level_1;
 		} );
 	}
 
