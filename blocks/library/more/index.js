@@ -92,7 +92,7 @@ export const settings = {
 			const { setAttributes, isSelected } = this.props;
 
 			const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
-			const defaultText = this.state.defaultText;
+			const { defaultText } = this.state;
 			const value = customText !== undefined ? customText : defaultText;
 			const inputLength = value.length ? value.length + 1 : 1;
 
