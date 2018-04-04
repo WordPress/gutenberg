@@ -4,15 +4,13 @@ global.wp = {
 		next() {},
 		regexp: jest.fn().mockReturnValue( new RegExp() ),
 	},
-	utils: {
-		WordCounter: 'test',
-	},
 };
 
 [
 	'element',
 	'i18n',
 	'components',
+	'utils',
 	'blocks',
 	'date',
 	'editor',

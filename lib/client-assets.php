@@ -91,9 +91,11 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'utils/build/index.js' ),
-		array( 'word-count', 'tinymce-latest' ),
+		array( 'tinymce-latest' ),
 		filemtime( gutenberg_dir_path() . 'utils/build/index.js' )
 	);
+	wp_add_inline_script( 'wp-utils', 'var originalUtils = wp.utils;', 'before' );
+	wp_add_inline_script( 'wp-utils', 'for ( var key in originalUtils ) wp.utils[ key ] = originalUtils[ key ];' );
 	wp_register_script(
 		'wp-hooks',
 		gutenberg_url( 'hooks/build/index.js' ),
