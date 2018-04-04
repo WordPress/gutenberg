@@ -79,6 +79,7 @@ export const settings = {
 		}
 
 		onChangeInput( event ) {
+			// Set defaultText to an empty string, allowing the user to clear/replace the input field's text
 			this.setState( {
 				defaultText: '',
 			} );
