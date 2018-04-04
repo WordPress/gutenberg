@@ -27,6 +27,7 @@ import embeddedContentReducer from './embedded-content-reducer';
 import { deepFilterHTML, isInvalidInline, isNotWhitelisted, isPlain, isInline } from './utils';
 import shortcodeConverter from './shortcode-converter';
 import slackMarkdownVariantCorrector from './slack-markdown-variant-corrector';
+import injectMissingSpaces from './inject-missing-spaces';
 
 /**
  * Converts an HTML string to known blocks. Strips everything else.
@@ -103,6 +104,8 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 			createUnwrapper( ( node ) => ! isInline( node, tagName ) ),
 		] );
 
+		HTML = injectMissingSpaces( HTML, plainText );
+
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Processed inline HTML:\n\n', HTML );
 
@@ -142,6 +145,8 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 		] );
 
 		piece = normaliseBlocks( piece );
+
+		piece = injectMissingSpaces( piece, plainText );
 
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Processed HTML piece:\n\n', piece );
