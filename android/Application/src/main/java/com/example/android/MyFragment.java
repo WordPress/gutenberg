@@ -1,25 +1,19 @@
-package com.example.android.recyclerview;
+package com.example.android;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
 
-import com.example.android.common.activities.SampleActivityBase;
+import com.example.android.common.activities.SampleRNBaseActivity;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 
-public class MyListFragment extends Fragment {
+public class MyFragment extends Fragment {
 
-    private static final String TAG = "MyListFragment";
+    private static final String TAG = "MyFragment";
 
     private ReactInstanceManager mReactInstanceManager;
 
@@ -27,9 +21,9 @@ public class MyListFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mReactInstanceManager = ((SampleActivityBase) activity).getReactInstanceManager();
+            mReactInstanceManager = ((SampleRNBaseActivity) activity).getReactInstanceManager();
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must extends SampleActivityBase");
+            throw new ClassCastException(activity.toString() + " must extends SampleRNBaseActivity");
         }
     }
 
@@ -42,16 +36,16 @@ public class MyListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (mReactInstanceManager == null) {
             try {
-                mReactInstanceManager = ((SampleActivityBase) getActivity()).getReactInstanceManager();
+                mReactInstanceManager = ((SampleRNBaseActivity) getActivity()).getReactInstanceManager();
             } catch (ClassCastException e) {
-                throw new ClassCastException(getActivity().toString() + " must extends SampleActivityBase");
+                throw new ClassCastException(getActivity().toString() + " must extends SampleRNBaseActivity");
             }
         }
 
         ReactRootView reactRootView = new ReactRootView(getContext());
-        Bundle RNPropos = new Bundle();
-        RNPropos.putString("text", EXAMPLE);
-        reactRootView.startReactApplication(mReactInstanceManager, "SimpleTextInput", RNPropos);
+        Bundle RNProps = new Bundle();
+        RNProps.putString("text", EXAMPLE);
+        reactRootView.startReactApplication(mReactInstanceManager, "RichTextInput", RNProps);
         return reactRootView;
     }
 

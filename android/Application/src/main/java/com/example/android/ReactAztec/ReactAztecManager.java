@@ -1,4 +1,4 @@
-package com.example.android.recyclerview.AztecRN;
+package com.example.android.ReactAztec;
 
 
 import android.content.Context;

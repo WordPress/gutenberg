@@ -16,7 +16,7 @@
 -->
 
 <resources>
-    <string name="app_name">RN FlatList</string>
+    <string name="app_name">Aztec React Native example</string>
     <string name="intro_message">
         <![CDATA[
         
