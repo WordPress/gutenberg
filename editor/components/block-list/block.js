@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { get, reduce, size, castArray, first, last, noop } from 'lodash';
 import tinymce from 'tinymce';
@@ -28,6 +27,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters, withContext } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -49,31 +49,6 @@ import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import { createInnerBlockList } from '../../utils/block-list';
-import {
-	editPost,
-	insertBlocks,
-	mergeBlocks,
-	removeBlock,
-	replaceBlocks,
-	selectBlock,
-	updateBlockAttributes,
-	toggleSelection,
-} from '../../store/actions';
-import {
-	getBlock,
-	isMultiSelecting,
-	getBlockIndex,
-	getEditedPostAttribute,
-	getNextBlockUid,
-	getPreviousBlockUid,
-	isBlockMultiSelected,
-	isBlockSelected,
-	isFirstMultiSelectedBlock,
-	isSelectionEnabled,
-	isTyping,
-	getBlockMode,
-	getSelectedBlocksInitialCaretPosition,
-} from '../../store/selectors';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -619,63 +594,87 @@ export class BlockListBlock extends Component {
 	}
 }
 
-const mapStateToProps = ( state, { uid, rootUID } ) => {
-	const isSelected = isBlockSelected( state, uid );
+const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
+	const {
+		isBlockSelected,
+		getPreviousBlockUid,
+		getNextBlockUid,
+		getBlock,
+		isBlockMultiSelected,
+		isFirstMultiSelectedBlock,
+		isMultiSelecting,
+		isTyping,
+		getBlockIndex,
+		getEditedPostAttribute,
+		getBlockMode,
+		isSelectionEnabled,
+		getSelectedBlocksInitialCaretPosition,
+		getBlockSelectionEnd,
+	} = select( 'core/editor' );
+	const isSelected = isBlockSelected( uid );
 	return {
-		previousBlockUid: getPreviousBlockUid( state, uid ),
-		nextBlockUid: getNextBlockUid( state, uid ),
-		block: getBlock( state, uid ),
-		isMultiSelected: isBlockMultiSelected( state, uid ),
-		isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
-		isMultiSelecting: isMultiSelecting( state ),
-		isLastInSelection: state.blockSelection.end === uid,
+		previousBlockUid: getPreviousBlockUid( uid ),
+		nextBlockUid: getNextBlockUid( uid ),
+		block: getBlock( uid ),
+		isMultiSelected: isBlockMultiSelected( uid ),
+		isFirstMultiSelected: isFirstMultiSelectedBlock( uid ),
+		isMultiSelecting: isMultiSelecting(),
+		isLastInSelection: getBlockSelectionEnd() === uid, // todo
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
-		isTypingWithinBlock: isSelected && isTyping( state ),
-		order: getBlockIndex( state, uid, rootUID ),
-		meta: getEditedPostAttribute( state, 'meta' ),
-		mode: getBlockMode( state, uid ),
-		isSelectionEnabled: isSelectionEnabled( state ),
-		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
+		isTypingWithinBlock: isSelected && isTyping(),
+		order: getBlockIndex( uid, rootUID ),
+		meta: getEditedPostAttribute( 'meta' ),
+		mode: getBlockMode( uid ),
+		isSelectionEnabled: isSelectionEnabled(),
+		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isSelected,
 	};
-};
+} );
 
-const mapDispatchToProps = ( dispatch, ownProps ) => ( {
-	onChange( uid, attributes ) {
-		dispatch( updateBlockAttributes( uid, attributes ) );
-	},
-	onSelect( uid = ownProps.uid, initialPosition ) {
-		dispatch( selectBlock( uid, initialPosition ) );
-	},
-	onInsertBlocks( blocks, index ) {
-		const { rootUID, layout } = ownProps;
-
-		blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
-
-		dispatch( insertBlocks( blocks, index, rootUID ) );
-	},
-	onRemove( uid ) {
-		dispatch( removeBlock( uid ) );
-	},
-	onMerge( ...args ) {
-		dispatch( mergeBlocks( ...args ) );
-	},
-	onReplace( blocks ) {
-		const { layout } = ownProps;
-
-		blocks = castArray( blocks ).map( ( block ) => (
-			cloneBlock( block, { layout } )
-		) );
-
-		dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
-	},
-	onMetaChange( meta ) {
-		dispatch( editPost( { meta } ) );
-	},
-	toggleSelection( selectionEnabled ) {
-		dispatch( toggleSelection( selectionEnabled ) );
-	},
+const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
+	const {
+		updateBlockAttributes,
+		selectBlock,
+		insertBlocks,
+		removeBlock,
+		mergeBlocks,
+		replaceBlocks,
+		editPost,
+		toggleSelection,
+	} = dispatch( 'core/editor' );
+	return {
+		onChange( uid, attributes ) {
+			updateBlockAttributes( uid, attributes );
+		},
+		onSelect( uid = ownProps.uid, initialPosition ) {
+			selectBlock( uid, initialPosition );
+		},
+		onInsertBlocks( blocks, index ) {
+			const { rootUID, layout } = ownProps;
+			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
+			insertBlocks( blocks, index, rootUID );
+		},
+		onRemove( uid ) {
+			removeBlock( uid );
+		},
+		onMerge( ...args ) {
+			mergeBlocks( ...args );
+		},
+		onReplace( blocks ) {
+			const { layout } = ownProps;
+			blocks = castArray( blocks ).map( ( block ) => (
+				cloneBlock( block, { layout } )
+			) );
+			replaceBlocks( [ ownProps.uid ], blocks );
+		},
+		onMetaChange( meta ) {
+			editPost( { meta } );
+		},
+		toggleSelection( selectionEnabled ) {
+			toggleSelection( selectionEnabled );
+		},
+	};
 } );
 
 BlockListBlock.childContextTypes = {
@@ -683,7 +682,8 @@ BlockListBlock.childContextTypes = {
 };
 
 export default compose(
-	connect( mapStateToProps, mapDispatchToProps ),
+	applyWithSelect,
+	applyWithDispatch,
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
 
