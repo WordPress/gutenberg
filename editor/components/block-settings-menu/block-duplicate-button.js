@@ -22,7 +22,6 @@ export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isL
 	}
 
 	const label = __( 'Duplicate' );
-	const { ariaRole } = props;
 
 	return (
 		<IconButton
@@ -30,7 +29,7 @@ export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isL
 			onClick={ flow( onDuplicate, onClick ) }
 			icon="admin-page"
 			label={ small ? label : undefined }
-			role={ ariaRole }
+			{ ...props }
 		>
 			{ ! small && label }
 		</IconButton>

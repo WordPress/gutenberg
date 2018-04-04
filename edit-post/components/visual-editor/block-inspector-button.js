@@ -29,7 +29,6 @@ export function BlockInspectorButton( {
 	};
 
 	const label = areAdvancedSettingsOpened ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
-	const { ariaRole } = props;
 
 	return (
 		<IconButton
@@ -37,7 +36,7 @@ export function BlockInspectorButton( {
 			onClick={ flow( areAdvancedSettingsOpened ? closeSidebar : openEditorSidebar, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }
-			role={ ariaRole }
+			{ ...props }
 		>
 			{ ! small && label }
 		</IconButton>

@@ -24,7 +24,6 @@ export function UnknownConverter( { block, onReplace, small, user, ...props } ) 
 	}
 
 	const label = __( 'Convert to blocks' );
-	const { ariaRole } = props;
 
 	const convertToBlocks = () => {
 		onReplace( block.uid, rawHandler( {
@@ -40,7 +39,7 @@ export function UnknownConverter( { block, onReplace, small, user, ...props } ) 
 			onClick={ convertToBlocks }
 			icon="screenoptions"
 			label={ small ? label : undefined }
-			role={ ariaRole }
+			{ ...props }
 		>
 			{ ! small && label }
 		</IconButton>

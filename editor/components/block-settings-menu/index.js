@@ -61,12 +61,12 @@ function BlockSettingsMenu( {
 				// Should this just use a DropdownMenu instead of a DropDown ?
 				<NavigableMenu className="editor-block-settings-menu__content">
 					{ renderBlockMenu( { onClose, children: [
-						count === 1 && <BlockModeToggle key="mode-toggle" uid={ uids[ 0 ] } onToggle={ onClose } ariaRole="menuitem" />,
-						count === 1 && <UnknownConverter key="unknown-converter" uid={ uids[ 0 ] } ariaRole="menuitem" />,
-						<BlockRemoveButton key="remove" uids={ uids } ariaRole="menuitem" />,
-						<BlockDuplicateButton key="duplicate" uids={ uids } rootUID={ rootUID } ariaRole="menuitem" />,
-						count === 1 && <ReusableBlockSettings key="reusable-block" uid={ uids[ 0 ] } onToggle={ onClose } ariaRole="menuitem" />,
-						<BlockTransformations key="transformations" uids={ uids } onClick={ onClose } itemsAriaRole="menuitem" />,
+						count === 1 && <BlockModeToggle key="mode-toggle" uid={ uids[ 0 ] } onToggle={ onClose } role="menuitem" />,
+						count === 1 && <UnknownConverter key="unknown-converter" uid={ uids[ 0 ] } role="menuitem" />,
+						<BlockRemoveButton key="remove" uids={ uids } role="menuitem" />,
+						<BlockDuplicateButton key="duplicate" uids={ uids } rootUID={ rootUID } role="menuitem" />,
+						count === 1 && <ReusableBlockSettings key="reusable-block" uid={ uids[ 0 ] } onToggle={ onClose } itemsRole="menuitem" />,
+						<BlockTransformations key="transformations" uids={ uids } onClick={ onClose } itemsRole="menuitem" />,
 					] } ) }
 				</NavigableMenu>
 			) }

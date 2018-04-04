@@ -22,7 +22,6 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false,
 		return null;
 	}
 
-	const { ariaRole } = props;
 	const label = mode === 'visual' ?
 		__( 'Edit as HTML' ) :
 		__( 'Edit visually' );
@@ -33,7 +32,7 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false,
 			onClick={ onToggleMode }
 			icon="html"
 			label={ small ? label : undefined }
-			role={ ariaRole }
+			{ ...props }
 		>
 			{ ! small && label }
 		</IconButton>

@@ -22,7 +22,6 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small =
 	}
 
 	const label = __( 'Remove' );
-	const { ariaRole } = props;
 
 	return (
 		<IconButton
@@ -30,7 +29,7 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small =
 			onClick={ flow( onRemove, onClick ) }
 			icon="trash"
 			label={ small ? label : undefined }
-			role={ ariaRole }
+			{ ...props }
 		>
 			{ ! small && label }
 		</IconButton>
