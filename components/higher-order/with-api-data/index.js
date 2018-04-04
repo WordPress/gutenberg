@@ -7,6 +7,7 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -135,6 +136,9 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 		}
 
 		request( propName, method, path ) {
+
+			path = applyFilters( 'request.path', path, propName, method );
+
 			this.setIntoDataProp( propName, {
 				[ this.getPendingKey( method ) ]: true,
 			} );
