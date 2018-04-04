@@ -1,0 +1,10 @@
+.components-articles-list {
+	padding-left: 0;
+
+	.components-articles-list-item {
+		list-style: none;
+		color: $blue-medium-500;
+		padding: 5px 0px;
+		cursor: pointer;
+	}
+}
