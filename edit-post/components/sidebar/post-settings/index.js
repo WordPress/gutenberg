@@ -16,7 +16,7 @@ import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
 import DocumentOutlinePanel from '../document-outline-panel';
 import MetaBoxes from '../../meta-boxes';
-import ArticlesList from '../articles-list';
+import ArticlesPanel from '../articles-panel';
 import SettingsPanel from '../settings-panel';
 
 import { getPanelItems } from '../panel-items.js';

@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow, TextControl, CategorySelect, ArticlesList } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -34,43 +34,51 @@ import '@wordpress/core-data';
  */
 const PANEL_NAME = 'articles-panel';
 
-function ArticlesPanel( {
-	isOpened,
-	onTogglePanel,
-	categories,
-	articles,
-	selectedCategory,
-	onCategoryChange,
-	onSearchInputChange,
-	searchTerm,
-} ) {
-	return (
-		<PanelBody
-			title={ __( 'Stories' ) }
-			opened={ isOpened }
-			onToggle={ onTogglePanel }
-		>
-			<TextControl
-				placeholder={ __( 'Search articles' ) }
-				value={ searchTerm }
-				onChange={ onSearchInputChange }
-			/>
+class ArticlesPanel extends Component {
 
-			<CategorySelect
-				key="query-controls-category-select"
-				categoriesList={ categories }
-				label={ __( 'Category' ) }
-				noOptionLabel={ __( 'All' ) }
-				selectedCategoryId={ selectedCategory }
-				onChange={ onCategoryChange }
-			/>
+	componentWillMount() {
+		this.props.searchArticles();
+	}
 
-			<ArticlesList
-				key="articles-list"
-				articles={ articles }
-			/>
-		</PanelBody>
-	);
+	render() { 
+		const {
+			isOpened,
+			onTogglePanel,
+			categories,
+			articles,
+			selectedCategory,
+			onCategoryChange,
+			onSearchInputChange,
+			searchTerm,
+		} = this.props; 
+
+		return (
+			<PanelBody
+				title={ __( 'Stories' ) }
+				opened={ isOpened }
+				onToggle={ onTogglePanel }
+			>
+				<TextControl
+					placeholder={ __( 'Search articles' ) }
+					value={ searchTerm }
+					onChange={ onSearchInputChange }
+				/>
+
+				<CategorySelect
+					key="query-controls-category-select"
+					categoriesList={ categories }
+					label={ __( 'Category' ) }
+					noOptionLabel={ __( 'All' ) }
+					selectedCategoryId={ selectedCategory }
+					onChange={ onCategoryChange }
+				/>
+
+				<ArticlesList
+					articles={ articles }
+				/>
+			</PanelBody>
+		);
+	}
 }
 
 export default compose(
