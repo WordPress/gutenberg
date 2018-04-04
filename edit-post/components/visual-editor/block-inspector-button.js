@@ -18,6 +18,7 @@ export function BlockInspectorButton( {
 	onClick = noop,
 	small = false,
 	speak,
+	ariaRole,
 } ) {
 	const speakMessage = () => {
 		if ( areAdvancedSettingsOpened ) {
@@ -35,7 +36,7 @@ export function BlockInspectorButton( {
 			onClick={ flow( areAdvancedSettingsOpened ? closeSidebar : openEditorSidebar, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }
-			role="menuitem"
+			role={ ariaRole }
 		>
 			{ ! small && label }
 		</IconButton>

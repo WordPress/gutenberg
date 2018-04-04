@@ -16,7 +16,7 @@ import { compose } from '@wordpress/element';
  */
 import { removeBlocks } from '../../store/actions';
 
-export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small = false } ) {
+export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small = false, ariaRole } ) {
 	if ( isLocked ) {
 		return null;
 	}
@@ -29,7 +29,7 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small =
 			onClick={ flow( onRemove, onClick ) }
 			icon="trash"
 			label={ small ? label : undefined }
-			role="menuitem"
+			role={ ariaRole }
 		>
 			{ ! small && label }
 		</IconButton>

@@ -24,7 +24,7 @@ import BlockInspectorButton from './block-inspector-button';
 function VisualEditorBlockMenu( { children, onClose } ) {
 	return (
 		<Fragment>
-			<BlockInspectorButton onClick={ onClose } />
+			<BlockInspectorButton onClick={ onClose } ariaRole="menuitem" />
 			{ children }
 		</Fragment>
 	);

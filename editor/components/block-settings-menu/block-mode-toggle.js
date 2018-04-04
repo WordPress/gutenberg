@@ -17,7 +17,7 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { getBlockMode, getBlock } from '../../store/selectors';
 import { toggleBlockMode } from '../../store/actions';
 
-export function BlockModeToggle( { blockType, mode, onToggleMode, small = false } ) {
+export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, ariaRole } ) {
 	if ( ! hasBlockSupport( blockType, 'html', true ) ) {
 		return null;
 	}
@@ -32,7 +32,7 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false 
 			onClick={ onToggleMode }
 			icon="html"
 			label={ small ? label : undefined }
-			role="menuitem"
+			role={ ariaRole }
 		>
 			{ ! small && label }
 		</IconButton>
