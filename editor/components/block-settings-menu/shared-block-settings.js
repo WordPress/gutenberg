@@ -9,10 +9,21 @@ import { noop } from 'lodash';
 import { Fragment, compose } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { isSharedBlock } from '@wordpress/blocks';
+import { isSharedBlock, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvertToShared, onDelete, itemsRole } ) {
+export function SharedBlockSettings( {
+	block,
+	sharedBlock,
+	onConvertToStatic,
+	onConvertToShared,
+	onDelete,
+	itemsRole,
+} ) {
+	if ( ! hasBlockSupport( block.name, 'sharing', true ) ) {
+		return null;
+	}
+
 	return (
 		<Fragment>
 			{ ! sharedBlock && (
@@ -55,6 +66,7 @@ export default compose( [
 		const { getBlock, getSharedBlock } = select( 'core/editor' );
 		const block = getBlock( uid );
 		return {
+			block,
 			sharedBlock: block && isSharedBlock( block ) ? getSharedBlock( block.attributes.ref ) : null,
 		};
 	} ),
