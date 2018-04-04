@@ -24,7 +24,7 @@ const SkipToSelectedBlock = ( { selectedBlock } ) => {
 
 	return (
 		selectedBlock && uid &&
-		<button type="button" className="button skip-to-selected-block" onClick={ onClick }>
+		<button type="button" className="button editor-skip-to-selected-block" onClick={ onClick }>
 			{ __( 'Skip to the selected block' ) }
 		</button>
 	);

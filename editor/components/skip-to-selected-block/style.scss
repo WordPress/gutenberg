@@ -1,4 +1,4 @@
-.skip-to-selected-block {
+.editor-skip-to-selected-block {
 	position: absolute;
 	top: -9999em;
 
@@ -17,11 +17,4 @@
 		outline: none;
 		z-index: z-index( '.skip-to-selected-block' );
 	}
-}
-
-.edit-post-sidebar .skip-to-selected-block:focus {
-	top: auto;
-	right: 10px;
-	bottom: 10px;
-	left: auto;
 }
