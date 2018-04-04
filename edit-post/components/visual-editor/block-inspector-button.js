@@ -18,7 +18,7 @@ export function BlockInspectorButton( {
 	onClick = noop,
 	small = false,
 	speak,
-	ariaRole,
+	...props
 } ) {
 	const speakMessage = () => {
 		if ( areAdvancedSettingsOpened ) {
@@ -29,6 +29,7 @@ export function BlockInspectorButton( {
 	};
 
 	const label = areAdvancedSettingsOpened ? __( 'Hide Advanced Settings' ) : __( 'Show Advanced Settings' );
+	const { ariaRole } = props;
 
 	return (
 		<IconButton

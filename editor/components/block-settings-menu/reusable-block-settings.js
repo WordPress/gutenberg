@@ -18,7 +18,9 @@ import { isReusableBlock } from '@wordpress/blocks';
 import { getBlock, getReusableBlock } from '../../store/selectors';
 import { convertBlockToStatic, convertBlockToReusable, deleteReusableBlock } from '../../store/actions';
 
-export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onConvertToReusable, onDelete, ariaRole } ) {
+export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onConvertToReusable, onDelete, ...props } ) {
+	const { ariaRole } = props;
+
 	return (
 		<Fragment>
 			{ ! reusableBlock && (

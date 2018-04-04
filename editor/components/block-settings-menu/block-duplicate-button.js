@@ -12,7 +12,7 @@ import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { cloneBlock, getBlockType } from '@wordpress/blocks';
 
-export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false, ariaRole } ) {
+export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false, ...props } ) {
 	const canDuplicate = every( blocks, block => {
 		const type = getBlockType( block.name );
 		return ! type.useOnce;
@@ -22,6 +22,7 @@ export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isL
 	}
 
 	const label = __( 'Duplicate' );
+	const { ariaRole } = props;
 
 	return (
 		<IconButton

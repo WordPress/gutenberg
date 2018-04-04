@@ -16,12 +16,13 @@ import { compose } from '@wordpress/element';
  */
 import { removeBlocks } from '../../store/actions';
 
-export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small = false, ariaRole } ) {
+export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small = false, ...props } ) {
 	if ( isLocked ) {
 		return null;
 	}
 
 	const label = __( 'Remove' );
+	const { ariaRole } = props;
 
 	return (
 		<IconButton

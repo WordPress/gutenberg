@@ -18,12 +18,13 @@ import { compose } from '@wordpress/element';
 import { getBlock, getCurrentPostType } from '../../store/selectors';
 import { replaceBlocks } from '../../store/actions';
 
-export function UnknownConverter( { block, onReplace, small, user, ariaRole } ) {
+export function UnknownConverter( { block, onReplace, small, user, ...props } ) {
 	if ( ! block || getUnknownTypeHandlerName() !== block.name ) {
 		return null;
 	}
 
 	const label = __( 'Convert to blocks' );
+	const { ariaRole } = props;
 
 	const convertToBlocks = () => {
 		onReplace( block.uid, rawHandler( {

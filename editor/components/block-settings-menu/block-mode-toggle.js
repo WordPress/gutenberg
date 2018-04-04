@@ -17,11 +17,12 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { getBlockMode, getBlock } from '../../store/selectors';
 import { toggleBlockMode } from '../../store/actions';
 
-export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, ariaRole } ) {
+export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, ...props } ) {
 	if ( ! hasBlockSupport( blockType, 'html', true ) ) {
 		return null;
 	}
 
+	const { ariaRole } = props;
 	const label = mode === 'visual' ?
 		__( 'Edit as HTML' ) :
 		__( 'Edit visually' );
