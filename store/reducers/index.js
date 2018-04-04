@@ -65,8 +65,12 @@ export const reducer = (
 
 			// Otherwise merge attributes into state
 			var index = findBlockIndex( dataSource, action.uid );
-			dataSource.set( index, { ...block, attributes: nextAttributes } );
-			return { dataSource: dataSource, refresh: ! state.refresh };
+			var newDataSource = new DataSource(
+				dataSource._data,
+				( item: BlockType, index ) => item.uid
+			);
+			newDataSource.set( index, { ...block, attributes: nextAttributes } );
+			return { dataSource: newDataSource, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.FOCUS:
 			const destBlock = findBlock( dataSource, action.uid );
 			const destBlockState = destBlock.focused;
