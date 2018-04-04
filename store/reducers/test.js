@@ -2,6 +2,7 @@
 
 import { reducer } from './';
 import * as actions from '../actions/';
+import { DataSource } from 'react-native-recyclerview-list';
 
 describe( 'Store', () => {
 	describe( 'reducer', () => {
@@ -29,12 +30,16 @@ describe( 'Store', () => {
 						focused: false,
 					},
 				],
-				refresh: false,
 			};
 		} );
 
 		beforeEach( () => {
-			initialState = { ...__iniState };
+			initialState = {
+				dataSource: new DataSource(
+					[ ...__iniState.blocks ],
+					( item: BlockType, index ) => item.uid
+				),
+			};
 		} );
 
 		afterEach( () => {
