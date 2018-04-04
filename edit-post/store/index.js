@@ -5,9 +5,6 @@ import {
 	registerStore,
 	withRehydratation,
 	loadAndPersist,
-	subscribe,
-	dispatch,
-	select,
 } from '@wordpress/data';
 
 /**
@@ -31,17 +28,6 @@ const store = registerStore( 'core/edit-post', {
 
 applyMiddlewares( store );
 loadAndPersist( store, reducer, 'preferences', STORAGE_KEY );
-
-let lastIsSmall;
-subscribe( () => {
-	const isSmall = select( 'core/viewport' ).isViewportMatch( '< medium' );
-	const hasViewportShrunk = isSmall && ! lastIsSmall;
-	lastIsSmall = isSmall;
-
-	// Collapse sidebar when viewport shrinks.
-	if ( hasViewportShrunk ) {
-		dispatch( 'core/edit-post' ).closeGeneralSidebar();
-	}
-} );
+store.dispatch( { type: 'INIT' } );
 
 export default store;

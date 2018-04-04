@@ -46,7 +46,10 @@ class FlatTermSelector extends Component {
 	componentDidMount() {
 		if ( this.props.terms ) {
 			this.setState( { loading: false } );
-			this.initRequest = this.fetchTerms( { include: this.props.terms } );
+			this.initRequest = this.fetchTerms( {
+				include: this.props.terms.join( ',' ),
+				per_page: 100,
+			} );
 			this.initRequest.then(
 				() => {
 					this.setState( { loading: false } );
@@ -94,10 +97,14 @@ class FlatTermSelector extends Component {
 	}
 
 	updateSelectedTerms( terms = [] ) {
-		const selectedTerms = terms.map( ( termId ) => {
+		const selectedTerms = terms.reduce( ( result, termId ) => {
 			const termObject = find( this.state.availableTerms, ( term ) => term.id === termId );
-			return termObject ? termObject.name : '';
-		} );
+			if ( termObject ) {
+				result.push( termObject.name );
+			}
+
+			return result;
+		}, [] );
 		this.setState( {
 			selectedTerms,
 		} );

@@ -68,7 +68,7 @@ div.components-toolbar {
 
 	// subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
-		padding: 4px 8px 4px 0px;
+		padding: 4px 8px 4px 0;
 	}
 
 	&[data-subscript]:after {

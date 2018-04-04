@@ -9,7 +9,7 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { Component, getWrapperDisplayName } from '@wordpress/element';
+import { Component, createHigherOrderComponent } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -231,8 +231,8 @@ export function dispatch( reducerKey ) {
  *
  * @return {Component} Enhanced component with merged state data props.
  */
-export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
-	class ComponentWithSelect extends Component {
+export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	return class ComponentWithSelect extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -286,12 +286,8 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 		render() {
 			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
 		}
-	}
-
-	ComponentWithSelect.displayName = getWrapperDisplayName( WrappedComponent, 'select' );
-
-	return ComponentWithSelect;
-};
+	};
+}, 'withSelect' );
 
 /**
  * Higher-order component used to add dispatch props using registered action
@@ -305,8 +301,8 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
  *
  * @return {Component} Enhanced component with merged dispatcher props.
  */
-export const withDispatch = ( mapDispatchToProps ) => ( WrappedComponent ) => {
-	class ComponentWithDispatch extends Component {
+export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	return class ComponentWithDispatch extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -345,12 +341,8 @@ export const withDispatch = ( mapDispatchToProps ) => ( WrappedComponent ) => {
 		render() {
 			return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
 		}
-	}
-
-	ComponentWithDispatch.displayName = getWrapperDisplayName( WrappedComponent, 'dispatch' );
-
-	return ComponentWithDispatch;
-};
+	};
+}, 'withDispatch' );
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.
