@@ -56,7 +56,7 @@ Media ID (or media IDs if multiple is true) to be selected by default when openi
 
 Callback called when the media modal is closed, the selected media are passed as an argument.
 
-- Type: `Func`
+- Type: `Function`
 - Required: Yes
 
 ## render

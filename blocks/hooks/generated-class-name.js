@@ -11,7 +11,7 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { hasBlockSupport, getBlockDefaultClassname } from '../api';
+import { hasBlockSupport, getBlockDefaultClassName } from '../api';
 
 /**
  * Override props assigned to save component to inject generated className if
@@ -31,13 +31,13 @@ export function addGeneratedClassName( extraProps, blockType ) {
 			// We use uniq to prevent duplicate classnames
 
 			extraProps.className = uniq( [
-				getBlockDefaultClassname( blockType.name ),
+				getBlockDefaultClassName( blockType.name ),
 				...extraProps.className.split( ' ' ),
 			] ).join( ' ' ).trim();
 		} else {
 			// There is no string in the className variable,
 			// so we just dump the default name in there
-			extraProps.className = getBlockDefaultClassname( blockType.name );
+			extraProps.className = getBlockDefaultClassName( blockType.name );
 		}
 	}
 	return extraProps;

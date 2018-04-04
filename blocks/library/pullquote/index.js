@@ -90,6 +90,7 @@ export const settings = {
 							value: fromRichTextValue( nextValue ),
 						} )
 					}
+					/* translators: the text of the quotation */
 					placeholder={ __( 'Write quote…' ) }
 					wrapperClassName="blocks-pullquote__content"
 					isSelected={ isSelected && editable === 'content' }
@@ -99,7 +100,8 @@ export const settings = {
 					<RichText
 						tagName="cite"
 						value={ citation }
-						placeholder={ __( 'Write caption…' ) }
+						/* translators: the individual or entity quoted */
+						placeholder={ __( 'Write citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,

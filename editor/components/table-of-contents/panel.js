@@ -21,7 +21,12 @@ function TableOfContentsPanel( { blocks } ) {
 
 	return (
 		<Fragment>
-			<div className="table-of-contents__counts">
+			<div
+				className="table-of-contents__counts"
+				role="note"
+				aria-label={ __( 'Document Statistics' ) }
+				tabIndex="0"
+			>
 				<div className="table-of-contents__count">
 					{ __( 'Words' ) }
 					<WordCount />

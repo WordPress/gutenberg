@@ -1,3 +1,7 @@
+/**
+ * Breakpoint mixins
+ */
+
 @mixin break-huge() {
 	@media ( min-width: #{ ( $break-huge ) } ) {
 		@content;
@@ -33,6 +37,7 @@
 		@content;
 	}
 }
+
 
 /**
  * Long content fade mixin
@@ -108,8 +113,8 @@
 	}
 }
 
-$visual-editor-max-width-padding: $visual-editor-max-width + $block-mover-padding-visible + $block-mover-padding-visible;
-$float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
+$content-width-padding: $content-width + $block-side-ui-padding + $block-side-ui-padding;
+$float-margin: calc( 50% - #{ $content-width-padding / 2 } );
 
 /**
  * Button states and focus styles
@@ -179,11 +184,10 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 }
 
 @mixin menu-style__focus() {
-	color: $black;
+	color: $dark-gray-900;
 	border: none;
 	box-shadow: none;
 	outline-offset: -2px;
-	color: $dark-gray-900;
 	outline: 1px dotted $dark-gray-500;
 }
 

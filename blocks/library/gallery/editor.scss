@@ -1,5 +1,7 @@
-.wp-block-gallery:not( .components-placeholder ) {
-	margin: -8px;
+.wp-block-gallery:not( .components-placeholder ):not( .alignfull ) {
+	// allow gallery items to go edge to edge
+	margin-left: -8px;
+	margin-right: -8px;
 }
 
 .blocks-gallery-item {
@@ -35,6 +37,9 @@
 	}
 
 	.button.blocks-gallery-add-item-button {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 		box-shadow: none;
 		border: none;
 		border-radius: 0;
@@ -43,7 +48,6 @@
 		& .dashicon {
 			margin-top: 10px;
 		}
-
 
 		&:hover,
 		&:focus {

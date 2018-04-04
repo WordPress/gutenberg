@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getWrapperDisplayName } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -47,8 +47,8 @@ export function addAttribute( settings ) {
  *
  * @return {string} Wrapped component.
  */
-export function withInspectorControl( BlockEdit ) {
-	const WrappedBlockEdit = ( props ) => {
+export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
 		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true ) && props.isSelected;
 
 		return [
@@ -66,10 +66,7 @@ export function withInspectorControl( BlockEdit ) {
 			</InspectorControls>,
 		];
 	};
-	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'customClassName' );
-
-	return WrappedBlockEdit;
-}
+}, 'withInspectorControl' );
 
 /**
  * Override props assigned to save component to inject anchor ID, if block

@@ -7,6 +7,8 @@ import { reduce, values, some } from 'lodash';
  * WordPress dependencies
  */
 import { select, subscribe } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,9 +17,12 @@ import {
 	metaBoxUpdatesSuccess,
 	setMetaBoxSavedData,
 	requestMetaBoxUpdates,
+	openGeneralSidebar,
+	closeGeneralSidebar,
 } from './actions';
 import { getMetaBoxes } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
+import { onChangeListener } from './utils';
 
 const effects = {
 	INITIALIZE_META_BOX_STATE( action, store ) {
@@ -27,7 +32,7 @@ const effects = {
 		}
 
 		// Allow toggling metaboxes panels
-		window.postboxes.add_postbox_toggles( 'post' );
+		window.postboxes.add_postbox_toggles( select( 'core/editor' ).getCurrentPostType() );
 
 		// Initialize metaboxes state
 		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
@@ -39,15 +44,11 @@ const effects = {
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
 
 		// Saving metaboxes when saving posts
-		let previousIsSaving = select( 'core/editor' ).isSavingPost();
-		subscribe( () => {
-			const isSavingPost = select( 'core/editor' ).isSavingPost();
-			const shouldTriggerSaving = ! isSavingPost && previousIsSaving;
-			previousIsSaving = isSavingPost;
-			if ( shouldTriggerSaving ) {
+		subscribe( onChangeListener( select( 'core/editor' ).isSavingPost, ( isSavingPost ) => {
+			if ( ! isSavingPost ) {
 				store.dispatch( requestMetaBoxUpdates() );
 			}
-		} );
+		} ) );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const state = store.getState();
@@ -84,6 +85,37 @@ const effects = {
 		} )
 			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
+	SWITCH_MODE( action ) {
+		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
+		speak( message, 'assertive' );
+	},
+	INIT( _, store ) {
+		// Select the block settings tab when the selected block changes
+		subscribe( onChangeListener(
+			() => select( 'core/editor' ).getBlockSelectionStart(),
+			( selectionStart ) => {
+				if ( ! select( 'core/edit-post' ).isEditorSidebarOpened() ) {
+					return;
+				}
+				if ( selectionStart ) {
+					store.dispatch( openGeneralSidebar( 'edit-post/block' ) );
+				} else {
+					store.dispatch( openGeneralSidebar( 'edit-post/document' ) );
+				}
+			} )
+		);
+
+		// Collapse sidebar when viewport shrinks.
+		subscribe( onChangeListener(
+			() => select( 'core/viewport' ).isViewportMatch( '< medium' ),
+			( isSmall ) => {
+				if ( isSmall ) {
+					store.dispatch( closeGeneralSidebar() );
+				}
+			}
+		) );
+	},
+
 };
 
 export default effects;

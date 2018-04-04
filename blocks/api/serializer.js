@@ -10,6 +10,7 @@ import isShallowEqual from 'shallowequal';
  */
 import { Component, cloneElement, renderToString } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -24,10 +25,28 @@ import BlockContentProvider from '../block-content-provider';
  *
  * @return {string} The block's default class.
  */
-export function getBlockDefaultClassname( blockName ) {
+export function getBlockDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
 	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
-	return 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+	const className = 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+
+	return applyFilters( 'blocks.getBlockDefaultClassName', className, blockName );
+}
+
+/**
+ * Returns the block's default classname from its name.
+ *
+ * @param {string} blockName The block name.
+ *
+ * @return {string} The block's default class.
+ */
+export function getBlockDefaultClassname( blockName ) {
+	deprecated( 'getBlockDefaultClassname', {
+		version: '2.6',
+		alternative: 'wp.blocks.getBlockDefaultClassName',
+		plugin: 'Gutenberg',
+	} );
+	return getBlockDefaultClassName( blockName );
 }
 
 /**

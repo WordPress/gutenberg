@@ -13,11 +13,6 @@ import {
 	isSavingMetaBoxes,
 	getMetaBox,
 } from '../selectors';
-import { getSidebarSettings as getSidebarSettingsMock } from '../../api/sidebar';
-
-jest.mock( '../../api/sidebar', () => ( {
-	getSidebarSettings: jest.fn().mockReturnValue( null ),
-} ) );
 
 describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
@@ -118,11 +113,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return true when the plugin sidebar is opened', () => {
-			getSidebarSettingsMock.mockReturnValueOnce( {
-				title: 'My Sidebar',
-				render: () => 'My Sidebar',
-			} );
-			const name = 'my-plugin/my-sidebar';
+			const name = 'plugin-sidebar/my-plugin/my-sidebar';
 			const state = {
 				preferences: {
 					activeGeneralSidebar: name,
@@ -130,7 +121,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isPluginSidebarOpened( state ) ).toBe( true );
-			expect( getSidebarSettingsMock ).toHaveBeenCalledWith( name );
 		} );
 	} );
 

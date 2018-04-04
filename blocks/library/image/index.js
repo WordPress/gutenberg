@@ -35,7 +35,7 @@ const blockAttributes = {
 	href: {
 		type: 'string',
 		source: 'attribute',
-		selector: 'a',
+		selector: 'figure > a',
 		attribute: 'href',
 	},
 	id: {

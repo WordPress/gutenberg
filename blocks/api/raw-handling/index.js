@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { find, get, compact } from 'lodash';
+import { compact } from 'lodash';
 import showdown from 'showdown';
 
 /**
  * Internal dependencies
  */
-import { createBlock } from '../factory';
-import { getBlockTypes, getUnknownTypeHandlerName } from '../registration';
+import { createBlock, getBlockTransforms, findTransform } from '../factory';
+import { getBlockType, getUnknownTypeHandlerName } from '../registration';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import stripAttributes from './strip-attributes';
@@ -59,6 +59,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 
 		converter.setOption( 'noHeaderId', true );
 		converter.setOption( 'tables', true );
+		converter.setOption( 'literalMidWordUnderscores', true );
 		converter.setOption( 'omitExtraWLInCodeBlocks', true );
 		converter.setOption( 'simpleLineBreaks', true );
 
@@ -149,34 +150,26 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 
 		doc.body.innerHTML = piece;
 
+		const transformsFrom = getBlockTransforms( 'from' );
+
 		const blocks = Array.from( doc.body.children ).map( ( node ) => {
-			const block = getBlockTypes().reduce( ( acc, blockType ) => {
-				if ( acc ) {
-					return acc;
-				}
+			const transformation = findTransform( transformsFrom, ( transform ) => (
+				transform.type === 'raw' &&
+				transform.isMatch( node )
+			) );
 
-				const transformsFrom = get( blockType, 'transforms.from', [] );
-				const transform = find( transformsFrom, ( { type } ) => type === 'raw' );
-
-				if ( ! transform || ! transform.isMatch( node ) ) {
-					return acc;
-				}
-
-				if ( transform.transform ) {
-					return transform.transform( node );
+			if ( transformation ) {
+				if ( transformation.transform ) {
+					return transformation.transform( node );
 				}
 
 				return createBlock(
-					blockType.name,
+					transformation.blockName,
 					getBlockAttributes(
-						blockType,
+						getBlockType( transformation.blockName ),
 						node.outerHTML
 					)
 				);
-			}, null );
-
-			if ( block ) {
-				return block;
 			}
 
 			return createBlock( getUnknownTypeHandlerName(), {
