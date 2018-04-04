@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal Dependencies
  */
 import './style.scss';
-import { getBlockWrapperDOMNode } from '../../utils/dom';
+import { getBlockFocusableWrapper } from '../../utils/dom';
 
 const SkipToSelectedBlock = ( { selectedBlock } ) => {
 	if ( ! selectedBlock ) {
@@ -18,7 +18,7 @@ const SkipToSelectedBlock = ( { selectedBlock } ) => {
 	const { uid } = selectedBlock;
 
 	const onClick = () => {
-		const selectedBlockElement = getBlockWrapperDOMNode( uid );
+		const selectedBlockElement = getBlockFocusableWrapper( uid );
 		selectedBlockElement.focus();
 	};
 

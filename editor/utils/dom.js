@@ -16,7 +16,16 @@ export function getBlockDOMNode( uid ) {
 	return document.querySelector( '[data-block="' + uid + '"]' );
 }
 
-export function getBlockWrapperDOMNode( uid ) {
+/**
+ * Given a block UID, returns the corresponding DOM node for the block focusable
+ * wrapper, if exists. As much as possible, this helper should be avoided, and
+ * used only in cases where isolated behaviors need remote access to a block node.
+ *
+ * @param {string} uid Block UID.
+ *
+ * @return {Element} Block DOM node.
+ */
+export function getBlockFocusableWrapper( uid ) {
 	return getBlockDOMNode( uid ).closest( '.editor-block-list__block' );
 }
 
