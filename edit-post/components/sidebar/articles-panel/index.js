@@ -66,6 +66,7 @@ function ArticlesPanel( {
 			/>
 
 			<ArticlesList
+				key="articles-list"
 				articles={ articles }
 			/>
 		</PanelBody>
@@ -93,10 +94,7 @@ export default compose(
 				return setSearchTerm( term );
 			},
 
-			// componentDidMount() {
-			// 	console.log('componentDidMount');
-			// 	return searchArticles();
-			// }
+			searchArticles
 		},
 		undefined,
 		{ storeKey: 'edit-post' }
