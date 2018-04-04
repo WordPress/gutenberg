@@ -62,8 +62,8 @@ export async function visitAdmin( adminPath ) {
 	}
 }
 
-export async function newPost() {
-	await visitAdmin( 'post-new.php' );
+export async function newPost( postType ) {
+	await visitAdmin( 'post-new.php' + ( postType ? '?post_type=' + postType : '' ) );
 }
 
 export async function newDesktopBrowserPage() {

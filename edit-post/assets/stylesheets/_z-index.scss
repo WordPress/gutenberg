@@ -22,16 +22,29 @@ $z-layers: (
 	'.components-popover__close': 5,
 	'.editor-block-list__insertion-point': 5,
 	'.blocks-format-toolbar__link-modal': 6,
-	'.editor-block-mover': 1,
 	'.blocks-gallery-item__inline-menu': 20,
 	'.editor-block-settings-menu__popover': 20, // Below the header
 	'.blocks-url-input__suggestions': 30,
 	'.edit-post-header': 30,
 	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
 
+	// Should have lower index than anything else positioned inside the block containers
+	'.editor-block-list__block-draggable': 0,
+
+	// The draggable element should show up above the entire UI
+	'.components-draggable__clone': 1000000000,
+
+	// Should have higher index than the inset/underlay used for dragging
+	'.components-placeholder__fieldset': 1,
+	'.editor-block-list__block-edit .reusable-block-edit-panel *': 1,
+
 	// Show drop zone above most standard content, but below any overlays
 	'.components-drop-zone': 100,
 	'.components-drop-zone__content': 110,
+
+	// Block controls, particularly in nested contexts, floats aside block and
+	// should overlap most block content.
+	'.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}': 100,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }

@@ -380,6 +380,20 @@ export const getBlockDependantsCacheBust = createSelector(
 );
 
 /**
+ * Returns a block's name given its UID, or null if no block exists with the
+ * UID.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {string} Block name.
+ */
+export function getBlockName( state, uid ) {
+	const block = state.editor.present.blocksByUid[ uid ];
+	return block ? block.name : null;
+}
+
+/**
  * Returns a block given its unique ID. This is a parsed copy of the block,
  * containing its `blockName`, identifier (`uid`), and current `attributes`
  * state. This is not the block's registration settings, which must be

@@ -107,8 +107,12 @@ export function blockAutocompleter( { onReplace } ) {
  * @return {Completer} Completer object used by the Autocomplete component.
  */
 export function userAutocompleter() {
-	const getOptions = () => {
-		return wp.apiRequest( { path: '/wp/v2/users' } ).then( ( users ) => {
+	const getOptions = ( search ) => {
+		let payload = '';
+		if ( search ) {
+			payload = '?search=' + encodeURIComponent( search );
+		}
+		return wp.apiRequest( { path: '/wp/v2/users' + payload } ).then( ( users ) => {
 			return users.map( ( user ) => {
 				return {
 					value: user,
@@ -137,5 +141,6 @@ export function userAutocompleter() {
 		getOptions,
 		allowNode,
 		onSelect,
+		isDebounced: true,
 	};
 }

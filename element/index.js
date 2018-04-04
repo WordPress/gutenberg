@@ -3,7 +3,6 @@
  */
 import { createContext, createElement, Component, cloneElement, Children, Fragment } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
-import { renderToStaticMarkup } from 'react-dom/server';
 import {
 	camelCase,
 	flowRight,
@@ -11,6 +10,16 @@ import {
 	upperFirst,
 	isEmpty,
 } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { deprecated } from '@wordpress/utils';
+
+/**
+ * Internal dependencies
+ */
+import serialize from './serialize';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -97,14 +106,7 @@ export { createPortal };
  *
  * @return {string} HTML.
  */
-export function renderToString( element ) {
-	let rendered = renderToStaticMarkup( element );
-
-	// Drop raw HTML wrappers (support dangerous inner HTML without wrapper)
-	rendered = rendered.replace( /<\/?wp-raw-html>/g, '' );
-
-	return rendered;
-}
+export { serialize as renderToString };
 
 /**
  * Concatenate two or more React children objects.
@@ -167,9 +169,36 @@ export { flowRight as compose };
  * @return {string} Wrapped display name.
  */
 export function getWrapperDisplayName( BaseComponent, wrapperName ) {
+	deprecated( 'getWrapperDisplayName', {
+		version: '2.7',
+		alternative: 'wp.element.createHigherOrderComponent',
+		plugin: 'Gutenberg',
+	} );
+
 	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;
 
 	return `${ upperFirst( camelCase( wrapperName ) ) }(${ displayName })`;
+}
+
+/**
+ * Given a function mapping a component to an enhanced component and modifier
+ * name, returns the enhanced component augmented with a generated displayName.
+ *
+ * @param {Function} mapComponentToEnhancedComponent Function mapping component
+ *                                                   to enhanced component.
+ * @param {string}   modifierName                    Seed name from which to
+ *                                                   generated display name.
+ *
+ * @return {WPComponent} Component class with generated display name assigned.
+ */
+export function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
+	return ( OriginalComponent ) => {
+		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
+		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
+		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
+
+		return EnhancedComponent;
+	};
 }
 
 /**
