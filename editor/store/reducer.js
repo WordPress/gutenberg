@@ -17,6 +17,7 @@ import {
 	isEqual,
 	includes,
 	overSome,
+	get,
 } from 'lodash';
 
 /**
@@ -663,13 +664,18 @@ export function blockSelection( state = {
 				isMultiSelecting: false,
 			};
 		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
+			if ( action.uids.indexOf( state.start ) === -1 ) {
 				return state;
 			}
+
+			// If there is replacement block(s), assign first's UID as the next
+			// selected block. If empty replacement, reset to null.
+			const nextSelectedBlockUID = get( action.blocks, [ 0, 'uid' ], null );
+
 			return {
 				...state,
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
+				start: nextSelectedBlockUID,
+				end: nextSelectedBlockUID,
 				initialPosition: null,
 				isMultiSelecting: false,
 			};
