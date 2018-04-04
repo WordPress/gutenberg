@@ -118,12 +118,12 @@ export const settings = {
 						} ) )
 					}
 				>
-				<AlignmentToolbar
-					value={ align }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
-					} }
-				/>
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
 				</BlockControls>
 			),
 			isSelected && (
