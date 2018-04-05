@@ -34,15 +34,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	onToolbarButtonPressed( button: number, uid: string  ) {
 		switch ( button ) {
 			case ToolbarButton.UP:
-				this.props.dataSource.moveUp( uid );
 				this.props.moveBlockUpAction( uid );
 				break;
 			case ToolbarButton.DOWN:
-				this.props.dataSource.moveDown( uid );
 				this.props.moveBlockDownAction( uid );
 				break;
 			case ToolbarButton.DELETE:
-				this.props.dataSource.splice( uid, 1 );
 				this.props.deleteBlockAction( uid );
 				break;
 			case ToolbarButton.SETTINGS:
