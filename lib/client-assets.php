@@ -282,6 +282,11 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'edit-post/build/index.js' ),
 		true
 	);
+	wp_add_inline_script(
+		'wp-edit-post',
+		gutenberg_get_script_polyfill( array( 'false' => 'formdata' ) ),
+		'before'
+	);
 
 	// Editor Styles.
 	wp_register_style(
@@ -432,6 +437,10 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'promise',
 		'https://unpkg.com/promise-polyfill@7.0.0/dist/promise' . $suffix . '.js'
+	);
+	gutenberg_register_vendor_script(
+		'formdata',
+		'https://unpkg.com/formdata-polyfill@3.0.9/formdata.min.js'
 	);
 }
 
