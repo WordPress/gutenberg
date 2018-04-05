@@ -5,7 +5,8 @@
 		list-style: none;
 		color: $blue-medium-500;
 		padding: 10px 0px;
-		// cursor: pointer;
+		position: relative;
+		background-color: white;
 
 		.components-articles-list-item-draggable {
 			position: absolute;
@@ -17,6 +18,7 @@
 
 			&:hover {
 				cursor: grab;
+				border: 1px solid grey;
 			}
 		}
 	}

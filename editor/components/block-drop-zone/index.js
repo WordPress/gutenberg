@@ -63,10 +63,10 @@ class BlockDropZone extends Component {
 			return;
 		}
 
-		let uid, type, rootUID, fromIndex;
+		let uid, type, rootUID, fromIndex, blocks;
 
 		try {
-			( { uid, type, rootUID, fromIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
+			( { uid, type, rootUID, fromIndex, blocks } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
 		} catch ( err ) {
 			return;
 		}
@@ -80,7 +80,13 @@ class BlockDropZone extends Component {
 		// If the block is kept at the same level and moved downwards, subtract
 		// to account for blocks shifting upward to occupy its old position.
 		const insertIndex = index && fromIndex < index && rootUID === this.props.rootUID ? positionIndex - 1 : positionIndex;
-		this.props.moveBlockToPosition( uid, rootUID, insertIndex );
+
+		if ( blocks ) {
+			// TODO: Replace !
+			this.props.insertBlocks( blocks, insertIndex );
+		} else {
+			this.props.moveBlockToPosition( uid, rootUID, insertIndex );
+		}
 	}
 
 	render() {

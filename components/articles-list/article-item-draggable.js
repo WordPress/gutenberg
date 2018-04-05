@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { Draggable } from '@wordpress/components';
 
-function ArticleItemDraggable( { rootUID, index, uid, layout, isDragging, ...props } ) {
+function ArticleItemDraggable( { rootUID, index, uid, layout, isDragging, block, ...props } ) {
 	const className = classnames( 'components-articles-list-item-draggable', {
 		'is-visible': isDragging,
 	} );
@@ -19,6 +19,9 @@ function ArticleItemDraggable( { rootUID, index, uid, layout, isDragging, ...pro
 		rootUID,
 		uid,
 		layout,
+		blocks: [ {
+			...block
+		} ],
 	};
 
 	return (
