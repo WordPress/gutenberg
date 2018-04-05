@@ -40,7 +40,7 @@ import serialize from './serialize';
  *
  * @return {WPElement} Element.
  */
-// export { createElement };
+export { createElement };
 
 /**
  * Renders a given element into the target DOM node.
