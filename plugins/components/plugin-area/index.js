@@ -25,45 +25,48 @@ class PluginArea extends Component {
 		super( ...arguments );
 
 		this.setPlugins = this.setPlugins.bind( this );
+		this.state = this.getCurrentPluginsState();
+	}
 
-		this.state = {
-			plugins: getPlugins(),
+	getCurrentPluginsState() {
+		return {
+			plugins: map( getPlugins(), ( { name, render } ) => {
+				return {
+					name,
+					Plugin: render,
+					context: {
+						pluginName: name,
+					},
+				};
+			} ),
 		};
 	}
 
 	componentDidMount() {
-		addAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area-plugins-registered', this.setPlugins );
-		addAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area-plugins-unregistered', this.setPlugins );
+		addAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area/plugins-registered', this.setPlugins );
+		addAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area/plugins-unregistered', this.setPlugins );
 	}
 
 	componentWillUnmount() {
-		removeAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area-plugins-registered' );
-		removeAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area-plugins-unregistered' );
+		removeAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area/plugins-registered' );
+		removeAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area/plugins-unregistered' );
 	}
 
 	setPlugins() {
-		this.setState( () => {
-			return {
-				plugins: getPlugins(),
-			};
-		} );
+		this.setState( this.getCurrentPluginsState );
 	}
 
 	render() {
 		return (
 			<div style={ { display: 'none' } }>
-				{ map( this.state.plugins, ( plugin ) => {
-					const { render: Plugin } = plugin;
-
-					return (
-						<PluginContext.Provider
-							key={ plugin.name }
-							value={ { pluginName: plugin.name } }
-						>
-							<Plugin />
-						</PluginContext.Provider>
-					);
-				} ) }
+				{ map( this.state.plugins, ( { context, name, Plugin } ) => (
+					<PluginContext.Provider
+						key={ name }
+						value={ context }
+					>
+						<Plugin />
+					</PluginContext.Provider>
+				) ) }
 			</div>
 		);
 	}
