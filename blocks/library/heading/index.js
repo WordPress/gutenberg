@@ -117,7 +117,14 @@ export const settings = {
 							subscript: level,
 						} ) )
 					}
-				/>
+				>
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				</BlockControls>
 			),
 			isSelected && (
 				<InspectorControls key="inspector">
@@ -133,13 +140,6 @@ export const settings = {
 								subscript: level,
 							} ) )
 						}
-					/>
-					<p>{ __( 'Text Alignment' ) }</p>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
 					/>
 				</InspectorControls>
 			),
