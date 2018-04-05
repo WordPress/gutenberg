@@ -1,5 +1,9 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 2.8.0
+
+- `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See: https://github.com/WordPress/gutenberg/blob/master/components/autocomplete/README.md.
+
 ## 2.7.0
 
 - `wp.element.getWrapperDisplayName` function removed. Please use `wp.element.createHigherOrderComponent` instead.

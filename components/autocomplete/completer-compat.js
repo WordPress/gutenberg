@@ -17,16 +17,21 @@ export function isDeprecatedCompleter( completer ) {
 }
 
 export function toCompatibleCompleter( deprecatedCompleter ) {
-	deprecated( 'Original autocompleter interface', {
+	deprecated( 'Original autocompleter interface in wp.components.Autocomplete', {
 		version: '2.8',
-		alternative: 'Latest autocompleter interface',
+		alternative: 'latest autocompleter interface',
 		plugin: 'Gutenberg',
 		link: 'https://github.com/WordPress/gutenberg/blob/master/components/autocomplete/README.md',
 	} );
 
 	const optionalProperties = [ 'className', 'allowNode', 'allowContext' ]
 		.filter( key => key in deprecatedCompleter )
-		.map( key => deprecatedCompleter[ key ] );
+		.reduce( ( properties, key ) => {
+			return {
+				...properties,
+				[ key ]: deprecatedCompleter[ key ],
+			};
+		}, {} );
 
 	return {
 		name: generateCompleterName(),
