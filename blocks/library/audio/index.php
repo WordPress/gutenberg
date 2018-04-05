@@ -8,7 +8,17 @@
 function register_core_audio_block() {
 	wp_register_script( 'core-audio-block', gutenberg_url( '/build/__block_audio.js' ) );
 
+	wp_register_style(
+		'core-audio-block',
+		gutenberg_url( '/build/__block_audio.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/__block_audio.css' )
+	);
+	
+	wp_style_add_data( 'core-audio-block', 'rtl', 'replace' );
+
 	register_block_type( 'core/audio', array(
+		'style' => 'core-audio-block',
 		'editor_script' => 'core-audio-block',
 	) );
 }

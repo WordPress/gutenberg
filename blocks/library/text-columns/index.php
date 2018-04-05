@@ -8,7 +8,17 @@
 function register_core_text_columns_block() {
 	wp_register_script( 'core-text-columns-block', gutenberg_url( '/build/__block_textColumns.js' ) );
 
+	wp_register_style(
+		'core-text-columns-block',
+		gutenberg_url( '/build/__block_textColumns.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/__block_textColumns.css' )
+	);
+
+	wp_style_add_data( 'core-text-columns-block', 'rtl', 'replace' );
+
 	register_block_type( 'core/text-columns', array(
+		'style' => 'core-text-columns-block',
 		'editor_script' => 'core-text-columns-block',
 	) );
 }

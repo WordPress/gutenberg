@@ -8,7 +8,17 @@
 function register_core_embed_block() {
 	wp_register_script( 'core-embed-block', gutenberg_url( '/build/__block_embed.js' ) );
 
+	wp_register_style(
+		'core-embed-block',
+		gutenberg_url( '/build/__block_embed.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/__block_embed.css' )
+	);
+
+	wp_style_add_data( 'core-embed-block', 'rtl', 'replace' );
+
 	register_block_type( 'core/embed', array(
+		'style' => 'core-embed-block',
 		'editor_script' => 'core-embed-block',
 	) );
 }
