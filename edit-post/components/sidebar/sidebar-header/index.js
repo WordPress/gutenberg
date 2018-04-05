@@ -11,11 +11,16 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 
-const Header = ( { children, className, closeLabel, closeSidebar, title } ) => {
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+
+const SidebarHeader = ( { children, className, closeLabel, closeSidebar, title } ) => {
 	return (
 		<Fragment>
-			<div className="components-panel__header edit-post-sidebar__header">
-				<span className="edit-post-sidebar__title">
+			<div className="components-panel__header edit-post-sidebar-header__small">
+				<span className="edit-post-sidebar-header__title">
 					{ title || __( '(no title)' ) }
 				</span>
 				<IconButton
@@ -24,7 +29,7 @@ const Header = ( { children, className, closeLabel, closeSidebar, title } ) => {
 					label={ closeLabel }
 				/>
 			</div>
-			<div className={ classnames( 'components-panel__header', className ) }>
+			<div className={ classnames( 'components-panel__header edit-post-sidebar-header', className ) }>
 				{ children }
 				<IconButton
 					onClick={ closeSidebar }
@@ -43,4 +48,4 @@ export default compose(
 	withDispatch( ( dispatch ) => ( {
 		closeSidebar: dispatch( 'core/edit-post' ).closeGeneralSidebar,
 	} ) ),
-)( Header );
+)( SidebarHeader );

@@ -40,7 +40,6 @@ function Layout( {
 	mode,
 	editorSidebarOpened,
 	pluginSidebarOpened,
-	sidebarName,
 	publishSidebarOpened,
 	hasFixedToolbar,
 	closePublishSidebar,
@@ -89,7 +88,7 @@ function Layout( {
 			) }
 			<DocumentSidebar />
 			<BlockSidebar />
-			{ pluginSidebarOpened && <PluginSidebar.Slot name={ sidebarName } /> }
+			<PluginSidebar.Slot />
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />
 			}
@@ -104,7 +103,6 @@ export default compose(
 		mode: select( 'core/edit-post' ).getEditorMode(),
 		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
-		sidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
 		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),

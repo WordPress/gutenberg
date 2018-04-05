@@ -1,16 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
-import { Slot, Fill, withFocusReturn } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { Fill, Panel, Slot } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { PluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
-import SidebarLayout from './sidebar-layout';
+import Sidebar from '../sidebar';
+import SidebarHeader from '../sidebar/sidebar-header';
 
 /**
  * Name of slot in which the sidebar should fill.
@@ -24,38 +23,37 @@ const SLOT_NAME = 'PluginSidebar';
  *
  * @return {WPElement} Plugin sidebar fill.
  */
-function PluginSidebar( { name, title, onClose, children } ) {
+function PluginSidebar( { name, title, children } ) {
 	return (
 		<PluginContext.Consumer>
 			{ ( { pluginName } ) => (
-				<Fill name={ [ SLOT_NAME, pluginName, name ].join( '/' ) }>
-					<SidebarLayout
-						title={ title }
-						onClose={ onClose } >
-						{ children }
-					</SidebarLayout>
+				<Fill name={ SLOT_NAME }>
+					<Sidebar
+						name={ [ pluginName, name ].join( '/' ) }
+						label={ __( 'Editor plugins' ) }
+					>
+						<SidebarHeader
+							closeLabel={ __( 'Close plugin' ) }
+						>
+							<strong>{ title }</strong>
+						</SidebarHeader>
+						<Panel>
+							{ children }
+						</Panel>
+					</Sidebar>
 				</Fill>
 			) }
 		</PluginContext.Consumer>
 	);
 }
 
-PluginSidebar = compose( [
-	withDispatch( dispatch => {
-		return {
-			onClose: dispatch( 'core/edit-post' ).closeGeneralSidebar,
-		};
-	} ),
-	withFocusReturn,
-] )( PluginSidebar );
-
 /**
  * The plugin sidebar slot.
  *
  * @return {WPElement} The plugin sidebar slot.
  */
-PluginSidebar.Slot = ( { name } ) => (
-	<Slot name={ [ SLOT_NAME, name ].join( '/' ) } />
+PluginSidebar.Slot = () => (
+	<Slot name={ SLOT_NAME } />
 );
 
 export default PluginSidebar;

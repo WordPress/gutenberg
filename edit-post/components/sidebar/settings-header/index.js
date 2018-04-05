@@ -9,14 +9,14 @@ import { withDispatch, withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import './style.scss';
-import Header from '../header';
+import SidebarHeader from '../sidebar-header';
 
 const SettingsHeader = ( { count, openSidebar, sidebarName } ) => {
 	// Do not display "0 Blocks".
 	count = count === 0 ? 1 : count;
 
 	return (
-		<Header
+		<SidebarHeader
 			className="edit-post-sidebar__panel-tabs"
 			closeLabel={ __( 'Close settings' ) }
 		>
@@ -34,7 +34,7 @@ const SettingsHeader = ( { count, openSidebar, sidebarName } ) => {
 			>
 				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }
 			</button>
-		</Header>
+		</SidebarHeader>
 	);
 };
 
