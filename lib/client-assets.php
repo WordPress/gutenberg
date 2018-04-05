@@ -284,7 +284,7 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_add_inline_script(
 		'wp-edit-post',
-		gutenberg_get_script_polyfill( array( 'false' => 'formdata' ) ),
+		gutenberg_get_script_polyfill( array( 'window.FormData && window.FormData.prototype.keys' => 'formdata' ) ),
 		'before'
 	);
 
