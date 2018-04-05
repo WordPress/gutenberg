@@ -20,9 +20,10 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString, Fragment } from '@wordpress/element';
-import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange } from '@wordpress/utils';
+import { createElement, Component, renderToString, Fragment, compose } from '@wordpress/element';
+import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange, getScrollContainer } from '@wordpress/utils';
 import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -415,11 +416,11 @@ export class RichText extends Component {
 	 * absolutely position the toolbar. It does this by finding the closest
 	 * relative element.
 	 *
+	 * @param {DOMRect} position Caret range rectangle.
+	 *
 	 * @return {{top: number, left: number}} The desired position of the toolbar.
 	 */
-	getFocusPosition() {
-		const position = getRectangleFromRange( this.editor.selection.getRng() );
-
+	getFocusPosition( position ) {
 		// Find the parent "relative" or "absolute" positioned container
 		const findRelativeParent = ( node ) => {
 			const style = window.getComputedStyle( node );
@@ -529,6 +530,40 @@ export class RichText extends Component {
 		if ( keyCode === BACKSPACE ) {
 			this.onChange();
 		}
+
+		// `scrollToRect` is called on `nodechange`, whereas calling it on
+		// `keyup` *when* moving to a new RichText element results in incorrect
+		// scrolling. Though the following allows false positives, it results
+		// in much smoother scrolling.
+		if ( this.props.isViewportSmall && keyCode !== BACKSPACE && keyCode !== ENTER ) {
+			this.scrollToRect( getRectangleFromRange( this.editor.selection.getRng() ) );
+		}
+	}
+
+	scrollToRect( rect ) {
+		const { top: caretTop } = rect;
+		const container = getScrollContainer( this.editor.getBody() );
+
+		if ( ! container ) {
+			return;
+		}
+
+		// When scrolling, avoid positioning the caret at the very top of
+		// the viewport, providing some "air" and some textual context for
+		// the user, and avoiding toolbars.
+		const graceOffset = 100;
+
+		// Avoid pointless scrolling by establishing a threshold under
+		// which scrolling should be skipped;
+		const epsilon = 10;
+		const delta = caretTop - graceOffset;
+
+		if ( Math.abs( delta ) > epsilon ) {
+			container.scrollTo(
+				container.scrollLeft,
+				container.scrollTop + delta,
+			);
+		}
 	}
 
 	/**
@@ -632,8 +667,17 @@ export class RichText extends Component {
 			return accFormats;
 		}, {} );
 
-		const focusPosition = this.getFocusPosition();
+		const rect = getRectangleFromRange( this.editor.selection.getRng() );
+		const focusPosition = this.getFocusPosition( rect );
+
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
+
+		if ( this.props.isViewportSmall ) {
+			// Originally called on `focusin`, that hook turned out to be
+			// premature. On `nodechange` we can work with the finalized TinyMCE
+			// instance and scroll to proper position.
+			this.scrollToRect( rect );
+		}
 	}
 
 	updateContent() {
@@ -838,4 +882,12 @@ RichText.defaultProps = {
 	formatters: [],
 };
 
-export default withSafeTimeout( RichText );
+export default compose( [
+	withSelect( ( select ) => {
+		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
+		return {
+			isViewportSmall: isViewportMatch( '< small' ),
+		};
+	} ),
+	withSafeTimeout,
+] )( RichText );
