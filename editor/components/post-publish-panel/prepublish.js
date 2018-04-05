@@ -30,7 +30,7 @@ function PostPublishPanelPrepublish() {
 			] }>
 				<PostSchedule />
 			</PanelBody>
-			{ <PluginPrePublishPanel.Slot /> }
+			<PluginPrePublishPanel.Slot />
 		</div>
 	);
 }

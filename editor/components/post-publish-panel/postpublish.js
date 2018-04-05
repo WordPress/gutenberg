@@ -84,7 +84,7 @@ class PostPublishPanelPostpublish extends Component {
 						</ClipboardButton>
 					</div>
 				</PanelBody>
-				{ <PluginPostPublishPanel.Slot /> }
+				<PluginPostPublishPanel.Slot />
 			</div>
 		);
 	}
