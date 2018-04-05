@@ -18,7 +18,7 @@ import { isReusableBlock } from '@wordpress/blocks';
 import { getBlock, getReusableBlock } from '../../store/selectors';
 import { convertBlockToStatic, convertBlockToReusable, deleteReusableBlock } from '../../store/actions';
 
-export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onConvertToReusable, onDelete } ) {
+export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onConvertToReusable, onDelete, itemsRole } ) {
 	return (
 		<Fragment>
 			{ ! reusableBlock && (
@@ -26,6 +26,7 @@ export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onCon
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
 					onClick={ onConvertToReusable }
+					role={ itemsRole }
 				>
 					{ __( 'Convert to Shared Block' ) }
 				</IconButton>
@@ -36,6 +37,7 @@ export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onCon
 						className="editor-block-settings-menu__control"
 						icon="controls-repeat"
 						onClick={ onConvertToStatic }
+						role={ itemsRole }
 					>
 						{ __( 'Convert to Regular Block' ) }
 					</IconButton>
@@ -44,6 +46,7 @@ export function ReusableBlockSettings( { reusableBlock, onConvertToStatic, onCon
 						icon="no"
 						disabled={ reusableBlock.isTemporary }
 						onClick={ () => onDelete( reusableBlock.id ) }
+						role={ itemsRole }
 					>
 						{ __( 'Delete Shared Block' ) }
 					</IconButton>
