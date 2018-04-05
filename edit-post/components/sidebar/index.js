@@ -12,7 +12,7 @@ import { compose } from '@wordpress/element';
 import './style.scss';
 import PostSettings from './post-settings';
 import BlockInspectorPanel from './block-inspector-panel';
-import Header from './header';
+import SettingsHeader from './header';
 
 /**
  * Renders a sidebar with the relevant panel.
@@ -29,7 +29,7 @@ const Sidebar = ( { activeSidebarName } ) => {
 			aria-label={ __( 'Editor advanced settings' ) }
 			tabIndex="-1"
 		>
-			<Header />
+			<SettingsHeader activeSidebarName={ activeSidebarName } />
 			{ activeSidebarName === 'edit-post/block' ?
 				<BlockInspectorPanel /> :
 				<PostSettings />
