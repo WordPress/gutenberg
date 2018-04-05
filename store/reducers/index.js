@@ -10,14 +10,14 @@ import ActionTypes from '../actions/ActionTypes';
 import type { StateType, BlockType } from '../';
 import type { BlockActionType } from '../actions';
 
-function findBlock( blocks, uid: string ) {
-	return find( blocks, obj => {
+function findBlock( dataSource, uid: string ) {
+	return find( dataSource._data, obj => {
 		return obj.uid === uid;
 	} );
 }
 
-function findBlockIndex( blocks, uid: string ) {
-	return findIndex( blocks, obj => {
+function findBlockIndex( dataSource, uid: string ) {
+	return findIndex( dataSource._data, obj => {
 		return obj.uid === uid;
 	} );
 }
