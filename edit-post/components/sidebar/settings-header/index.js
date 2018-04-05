@@ -11,7 +11,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import './style.scss';
 import Header from '../header';
 
-const SettingsHeader = ( { count, activeSidebarName, openSidebar } ) => {
+const SettingsHeader = ( { count, openSidebar, sidebarName } ) => {
 	// Do not display "0 Blocks".
 	count = count === 0 ? 1 : count;
 
@@ -22,14 +22,14 @@ const SettingsHeader = ( { count, activeSidebarName, openSidebar } ) => {
 		>
 			<button
 				onClick={ () => openSidebar( 'edit-post/document' ) }
-				className={ `edit-post-sidebar__panel-tab ${ activeSidebarName === 'edit-post/document' ? 'is-active' : '' }` }
+				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/document' ? 'is-active' : '' }` }
 				aria-label={ __( 'Document settings' ) }
 			>
 				{ __( 'Document' ) }
 			</button>
 			<button
 				onClick={ () => openSidebar( 'edit-post/block' ) }
-				className={ `edit-post-sidebar__panel-tab ${ activeSidebarName === 'edit-post/block' ? 'is-active' : '' }` }
+				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/block' ? 'is-active' : '' }` }
 				aria-label={ __( 'Block settings' ) }
 			>
 				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }

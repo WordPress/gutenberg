@@ -26,8 +26,9 @@ import { withViewportMatch } from '@wordpress/viewport';
  * Internal dependencies
  */
 import './style.scss';
+import BlockSidebar from '../sidebar/block-sidebar';
+import DocumentSidebar from '../sidebar/document-sidebar';
 import Header from '../header';
-import Sidebar from '../sidebar';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
@@ -86,7 +87,8 @@ function Layout( {
 					forceIsSaving={ isSaving }
 				/>
 			) }
-			{ editorSidebarOpened && <Sidebar /> }
+			<DocumentSidebar />
+			<BlockSidebar />
 			{ pluginSidebarOpened && <PluginSidebar.Slot name={ sidebarName } /> }
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />
