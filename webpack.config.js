@@ -14,12 +14,12 @@ const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
 
 // CSS loader for styles specific to block editing.
 const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/edit-blocks.css',
+	filename: './build/[name]_editor.css',
 } );
 
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/style.css',
+	filename: './build/[name].css',
 } );
 
 // Configuration for the ExtractTextPlugin.
