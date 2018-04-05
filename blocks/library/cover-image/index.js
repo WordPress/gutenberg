@@ -130,6 +130,8 @@ export const settings = {
 				/>
 
 				{ alignmentToolbar }
+
+			{ url ?
 				<Toolbar>
 					<MediaUpload
 						onSelect={ onSelectImage }
@@ -145,6 +147,7 @@ export const settings = {
 						) }
 					/>
 				</Toolbar>
+			: '' }
 			</BlockControls>,
 			<InspectorControls key="inspector">
 				<PanelBody title={ __( 'Cover Image Settings' ) }>
