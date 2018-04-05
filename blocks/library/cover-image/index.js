@@ -131,23 +131,23 @@ export const settings = {
 
 				{ alignmentToolbar }
 
-			{ url ?
-				<Toolbar>
-					<MediaUpload
-						onSelect={ onSelectImage }
-						type="image"
-						value={ id }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit image' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
-					/>
-				</Toolbar>
-			: '' }
+				{ url ?
+					<Toolbar>
+						<MediaUpload
+							onSelect={ onSelectImage }
+							type="image"
+							value={ id }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
+					</Toolbar> :
+					'' }
 			</BlockControls>,
 			<InspectorControls key="inspector">
 				<PanelBody title={ __( 'Cover Image Settings' ) }>
