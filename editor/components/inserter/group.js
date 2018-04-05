@@ -62,8 +62,6 @@ export default class InserterGroup extends Component {
 
 		const isCurrent = current && current.id === item.id;
 
-		console.log('item', item);
-
 		return (
 			<button
 				role="menuitem"

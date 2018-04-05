@@ -1,16 +1,12 @@
 /**
  * External Dependencies
  */
-import { map, fromPairs } from 'lodash';
-import classnames from 'classnames';
+import { map } from 'lodash';
 
 /**
  * WordPress Dependencies
  */
-import { Component, compose } from '@wordpress/element';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
-// import { removeBlock } from '';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal Dependencies
@@ -27,8 +23,7 @@ class ArticlesList extends Component {
 
 		this.state = {
 			dragging: false,
-			articlesBlocks: { },
-		}
+		};
 	}
 
 	onDragStart() {
@@ -39,74 +34,22 @@ class ArticlesList extends Component {
 		this.setState( { dragging: false } );
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( this.props.articles !== nextProps.articles ) {
-
-			const oldArticlesBlocks = this.state.articlesBlocks;
-
-			const articlesBlocks = fromPairs( 
-				map( nextProps.articles, article => {
-					// the block already exists 
-					if ( oldArticlesBlocks[ article.id ] ) {
-						return [ article.id, oldArticlesBlocks[ article.id ] ];
-					}
-
-					const item = {
-						name: 'dynamic/article',
-						initialAttributes: {
-							url: article.image_url,
-							title: [ article.title.rendered ],
-							layout: '',
-						},
-					};
-
-					const { name, initialAttributes, layout } = item;
-
-					// create a new block
-					const createdBlock = createBlock( name, { ...initialAttributes } );
-					// insert it to state but hidden to the editor
-					// this.props.onInsertBlock( { ...createdBlock, hidden: true } );
-
-					return [ article.id, createdBlock ];
-				} )
-			);
-
-			this.setState( { articlesBlocks } );
-		}		
-	}
-
-	// componentWillUnmount() {
-	// 	console.log( 'componentWillUnmount' );
-		
-	// 	map( this.props.articles, article => {
-	// 		removeBlock( article.uid );
-	// 	});
-
-	// 	// remove created blocks
-	// }
-
 	renderArticles() {
-		const { dragging, articlesBlocks } = this.state;
+		const { dragging } = this.state;
 		const { articles } = this.props;
-		const { index, rootUID } = this.props.insertionPoint;
-		const layout = '';
 
 		return map( articles, article => {
 			const elementId = `article-item-${ article.id }`;
-			
-			return (				
+
+			return (
 				<li id={ elementId } className="components-articles-list-item" key={ article.id }>
-					{ ( articlesBlocks[ article.id ] && <ArticleItemDraggable
-						rootUID={ rootUID }
-					    index={ index }
-					 	layout={ layout }
-						uid={ articlesBlocks[ article.id ].uid }
+					<ArticleItemDraggable
+						article={ article }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
 						isDragging={ dragging }
 						elementId={ elementId }
-						block={ articlesBlocks[ article.id ] }
-					/> ) }
+					/>
 					<div>{ article.title.rendered }</div>
 				</li>
 			);
@@ -114,8 +57,6 @@ class ArticlesList extends Component {
 	}
 
 	render() {
-		const { isDragging } = this.props;
-
 		return (
 			<ul className="components-articles-list">
 				{ this.renderArticles() }
@@ -124,14 +65,4 @@ class ArticlesList extends Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint(),
-	} ) ),
-	// withDispatch( ( dispatch, ownProps ) => ( {
-	// 	onInsertBlock: ( insertedBlock ) => {
-	// 		const { index, rootUID } = ownProps.insertionPoint;
-	// 		return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
-	// 	},
-	// } ) ),
-] )( ArticlesList );
+export default ArticlesList;
