@@ -20,7 +20,7 @@ import {
 	openGeneralSidebar,
 	closeGeneralSidebar,
 } from './actions';
-import { getMetaBoxes } from './selectors';
+import { getMetaBoxes, getActiveGeneralSidebarName } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { onChangeListener } from './utils';
 
@@ -32,7 +32,16 @@ const effects = {
 		}
 
 		// Allow toggling metaboxes panels
-		window.postboxes.add_postbox_toggles( select( 'core/editor' ).getCurrentPostType() );
+		// We need to wait for all scripts to load
+		// If the meta box loads the post script, it will already trigger this.
+		// After merge in Core, make sure to drop the timeout and update the postboxes script
+		// to avoid the double binding.
+		setTimeout( () => {
+			const postType = select( 'core/editor' ).getCurrentPostType();
+			if ( window.postboxes.page !== postType ) {
+				window.postboxes.add_postbox_toggles( postType );
+			}
+		} );
 
 		// Initialize metaboxes state
 		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
@@ -108,11 +117,21 @@ const effects = {
 		// Collapse sidebar when viewport shrinks.
 		subscribe( onChangeListener(
 			() => select( 'core/viewport' ).isViewportMatch( '< medium' ),
-			( isSmall ) => {
-				if ( isSmall ) {
-					store.dispatch( closeGeneralSidebar() );
-				}
-			}
+			( () => {
+				// contains the sidebar we close when going to viewport sizes lower than medium.
+				// This allows to reopen it when going again to viewport sizes greater than medium.
+				let sidebarToReOpenOnExpand = null;
+				return ( isSmall ) => {
+					if ( isSmall ) {
+						sidebarToReOpenOnExpand = getActiveGeneralSidebarName( store.getState() );
+						if ( sidebarToReOpenOnExpand ) {
+							store.dispatch( closeGeneralSidebar() );
+						}
+					} else if ( sidebarToReOpenOnExpand && ! getActiveGeneralSidebarName( store.getState() ) ) {
+						store.dispatch( openGeneralSidebar( sidebarToReOpenOnExpand ) );
+					}
+				};
+			} )()
 		) );
 	},
 

@@ -60,7 +60,7 @@ export class InserterMenu extends Component {
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			tab: 'frequent',
+			tab: 'suggested',
 			selectedItem: null,
 		};
 		this.filter = this.filter.bind( this );
@@ -69,7 +69,7 @@ export class InserterMenu extends Component {
 		this.sortItems = this.sortItems.bind( this );
 		this.selectItem = this.selectItem.bind( this );
 
-		this.tabScrollTop = { frequent: 0, blocks: 0, embeds: 0 };
+		this.tabScrollTop = { suggested: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
 		this.previewItem = this.previewItem.bind( this );
 	}
@@ -127,7 +127,7 @@ export class InserterMenu extends Component {
 
 		let predicate;
 		switch ( tab ) {
-			case 'frequent':
+			case 'suggested':
 				return frecentItems;
 
 			case 'blocks':
@@ -147,7 +147,7 @@ export class InserterMenu extends Component {
 	}
 
 	sortItems( items ) {
-		if ( 'frequent' === this.state.tab && ! this.state.filterValue ) {
+		if ( 'suggested' === this.state.tab && ! this.state.filterValue ) {
 			return items;
 		}
 
@@ -220,8 +220,8 @@ export class InserterMenu extends Component {
 	renderTabView( tab ) {
 		const itemsForTab = this.getItemsForTab( tab );
 
-		// If the Frequent tab is selected, don't render category headers
-		if ( 'frequent' === tab ) {
+		// If the Suggested tab is selected, don't render category headers
+		if ( 'suggested' === tab ) {
 			return this.renderItems( itemsForTab );
 		}
 
@@ -248,7 +248,7 @@ export class InserterMenu extends Component {
 
 	// Passed to TabbableContainer, extending its event-handling logic
 	eventToOffset( event ) {
-		// If a tab (Frequent, Blocks, …) is focused, pressing the down arrow
+		// If a tab (Suggested, Blocks, …) is focused, pressing the down arrow
 		// moves focus to the selected panel below.
 		if (
 			event.keyCode === keycodes.DOWN &&
@@ -297,8 +297,8 @@ export class InserterMenu extends Component {
 						onSelect={ this.switchTab }
 						tabs={ [
 							{
-								name: 'frequent',
-								title: __( 'Frequent' ),
+								name: 'suggested',
+								title: __( 'Suggested' ),
 								className: 'editor-inserter__tab',
 							},
 							{

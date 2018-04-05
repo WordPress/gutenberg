@@ -9,4 +9,9 @@
 	.components-panel__body-toggle {
 		color: $dark-gray-500;
 	}
+
+	&.editor-block-inspector__advanced {
+		border-top: 1px solid $light-gray-500;
+		margin-bottom: -16px;
+	}
 }

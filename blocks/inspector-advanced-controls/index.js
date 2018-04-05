@@ -3,4 +3,4 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-export default createSlotFill( 'InspectorControls' );
+export default createSlotFill( 'InspectorAdvancedControls' );

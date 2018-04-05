@@ -114,7 +114,6 @@ module.exports = {
 		'react/jsx-key': 'error',
 		'react/jsx-tag-spacing': 'error',
 		'react/no-children-prop': 'off',
-		'react/no-find-dom-node': 'warn',
 		'react/prop-types': 'off',
 		semi: 'error',
 		'semi-spacing': 'error',
