@@ -13,7 +13,7 @@ import { Component } from '@wordpress/element';
  * Internal Dependencies
  */
 import './style.scss';
-import ArticleItemDraggable from './article-item--draggable';
+import ArticleItemDraggable from './article-item-draggable';
 
 class ArticlesList extends Component {
 	constructor() {
@@ -39,9 +39,10 @@ class ArticlesList extends Component {
 		const { dragging } = this.state;
 
 		return map( this.props.articles, article => {
+			const elementId = `article-item-${ article.id }`;
 
 			return (				
-				<li className="components-articles-list-item" key={ article.id }>
+				<li id={ elementId } className="components-articles-list-item" key={ article.id }>
 					<ArticleItemDraggable
 						// rootUID={ rootUID }
 						// index={ order }
@@ -50,7 +51,7 @@ class ArticlesList extends Component {
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
 						isDragging={ dragging }
-						// elementId={ blockElementId }
+						elementId={ elementId }
 					/>
 					<div>{ article.title.rendered }</div>
 				</li>
