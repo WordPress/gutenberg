@@ -434,6 +434,7 @@
 	}
 
 	// Elevate when selected or hovered
+	&.is-multi-selected,
 	&.is-selected,
 	&.is-hovered {
 		.editor-block-settings-menu,
