@@ -68,13 +68,8 @@ class FlatTermSelector extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this.initRequest && typeof this.initRequest.abort !== 'undefined' ) {
-			this.initRequest.abort();
-		}
-
-		if ( this.searchRequest && typeof this.searchRequest.abort !== 'undefined' ) {
-			this.searchRequest.abort();
-		}
+		lodashResult( this.initRequest, 'abort' );
+		lodashResult( this.searchRequest, 'abort' );
 	}
 
 	componentWillReceiveProps( newProps ) {
