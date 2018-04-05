@@ -11,7 +11,7 @@ import {
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
 } from '@wordpress/editor';
-import { Fragment, compose, Component } from '@wordpress/element';
+import { Fragment, compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 
@@ -21,40 +21,32 @@ import { withViewportMatch } from '@wordpress/viewport';
 import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
 
-class VisualEditor extends Component {
-	constructor() {
-		super( ...arguments );
-		this.renderBlockMenu = this.renderBlockMenu.bind( this );
-	}
+function VisualEditorBlockMenu( { children, onClose } ) {
+	return (
+		<Fragment>
+			<BlockInspectorButton onClick={ onClose } />
+			{ children }
+		</Fragment>
+	);
+}
 
-	renderBlockMenu( { children, onClose } ) {
-		return (
-			<Fragment>
-				<BlockInspectorButton onClick={ onClose } />
-				{ children }
-			</Fragment>
-		);
-	}
-
-	render() {
-		const { hasFixedToolbar, isLargeViewport } = this.props;
-		return (
-			<BlockSelectionClearer className="edit-post-visual-editor">
-				<EditorGlobalKeyboardShortcuts />
-				<CopyHandler />
-				<MultiSelectScrollIntoView />
-				<WritingFlow>
-					<ObserveTyping>
-						<PostTitle />
-						<BlockList
-							showContextualToolbar={ ! isLargeViewport || ! hasFixedToolbar }
-							renderBlockMenu={ this.renderBlockMenu }
-						/>
-					</ObserveTyping>
-				</WritingFlow>
-			</BlockSelectionClearer>
-		);
-	}
+function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
+	return (
+		<BlockSelectionClearer className="edit-post-visual-editor">
+			<EditorGlobalKeyboardShortcuts />
+			<CopyHandler />
+			<MultiSelectScrollIntoView />
+			<WritingFlow>
+				<ObserveTyping>
+					<PostTitle />
+					<BlockList
+						showContextualToolbar={ ! isLargeViewport || ! hasFixedToolbar }
+						renderBlockMenu={ VisualEditorBlockMenu }
+					/>
+				</ObserveTyping>
+			</WritingFlow>
+		</BlockSelectionClearer>
+	);
 }
 
 export default compose( [

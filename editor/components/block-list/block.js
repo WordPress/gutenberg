@@ -619,7 +619,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isMultiSelected: isBlockMultiSelected( uid ),
 		isFirstMultiSelected: isFirstMultiSelectedBlock( uid ),
 		isMultiSelecting: isMultiSelecting(),
-		isLastInSelection: getBlockSelectionEnd() === uid, // todo
+		isLastInSelection: getBlockSelectionEnd() === uid,
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 		isTypingWithinBlock: isSelected && isTyping(),
