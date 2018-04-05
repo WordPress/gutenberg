@@ -76,6 +76,16 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.state.dataSource.setDirty();
 	}
 
+	onChange( uid: string, attributes: mixed ) {
+		// Update datasource UI
+		const index = this.getDataSourceIndexFromUid( uid );
+		const dataSource = this.state.dataSource;
+		var block = dataSource.get( this.getDataSourceIndexFromUid( uid ) );
+		dataSource.set( index, { ...block, attributes: attributes } );
+		// Update Redux store
+		this.props.onChange( uid, attributes );
+	}
+
 	render() {
 		var list;
 		if ( Platform.OS === 'android' ) {
@@ -118,7 +128,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			<BlockHolder
 				onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
 				onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }
-				onChange={ this.props.onChange.bind( this ) }
+				onChange={ this.onChange.bind( this ) }
 				focused={ value.item.focused }
 				uid={ value.uid }
 				{ ...value.item }
