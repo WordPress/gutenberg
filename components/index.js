@@ -51,7 +51,7 @@ export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
-export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
+export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
 export { default as ifCondition } from './higher-order/if-condition';

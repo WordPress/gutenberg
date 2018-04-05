@@ -48,6 +48,9 @@ class DropZoneProvider extends Component {
 		window.addEventListener( 'dragover', this.dragOverListener );
 		window.addEventListener( 'drop', this.onDrop );
 		window.addEventListener( 'mouseup', this.resetDragState );
+
+		// Disable reason: Can't use a ref since this component just renders its children
+		// eslint-disable-next-line react/no-find-dom-node
 		this.container = findDOMNode( this );
 	}
 

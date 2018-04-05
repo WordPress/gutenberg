@@ -88,7 +88,7 @@ describe( 'InserterMenu', () => {
 	// wrapper.find have had to be strengthened (and the filterWhere strengthened also), otherwise two
 	// results would be returned even though only one was in the DOM.
 
-	it( 'should show the frequent tab by default', () => {
+	it( 'should show the suggested tab by default', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
@@ -102,7 +102,7 @@ describe( 'InserterMenu', () => {
 		);
 
 		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Frequent' );
+		expect( activeCategory.text() ).toBe( 'Suggested' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks ).toHaveLength( 0 );
@@ -124,7 +124,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks ).toHaveLength( 0 );
 	} );
 
-	it( 'should show the frequently used items in the frequent tab', () => {
+	it( 'should show frecently used items in the suggested tab', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
+import { isEmpty } from 'lodash';
 
 /**
  * Internal dependencies
@@ -101,6 +102,42 @@ describe( 'Slot', () => {
 		element.find( 'button' ).simulate( 'click' );
 
 		expect( onClose ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should render empty Fills without HTML wrapper when render props used', () => {
+		const element = mount(
+			<Provider>
+				<Slot name="chicken">
+					{ ( fills ) => ( ! isEmpty( fills ) && (
+						<blockquote>
+							{ fills }
+						</blockquote>
+					) ) }
+				</Slot>
+				<Fill name="chicken" />
+			</Provider>
+		);
+
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div></div>' );
+	} );
+
+	it( 'should render a string Fill with HTML wrapper when render props used', () => {
+		const element = mount(
+			<Provider>
+				<Slot name="chicken">
+					{ ( fills ) => ( fills && (
+						<blockquote>
+							{ fills }
+						</blockquote>
+					) ) }
+				</Slot>
+				<Fill name="chicken">
+					content
+				</Fill>
+			</Provider>
+		);
+
+		expect( element.find( 'Slot > div' ).html() ).toBe( '<div><blockquote>content</blockquote></div>' );
 	} );
 
 	it( 'should re-render Slot when not bubbling virtually', () => {

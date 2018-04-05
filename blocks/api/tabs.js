@@ -16,8 +16,8 @@ import { __ } from '@wordpress/i18n';
 const tabs = [
 	{
 		options: {
-			name: 'frequent',
-			title: __( 'Frequent' ),
+			name: 'suggested',
+			title: __( 'Suggested' ),
 			className: 'editor-inserter__tab',
 		},
 		tabScrollTop: 0,
@@ -26,6 +26,7 @@ const tabs = [
 				return items;
 			}
 		},
+		// If the Suggested tab is selected, don't render category headers
 		renderTabView( items ) {
 			return items;
 		},

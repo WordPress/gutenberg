@@ -218,6 +218,7 @@ export class InserterMenu extends Component {
 	renderTabView( tab ) {
 		const itemsForTab = this.getItemsForTab( tab );
 
+		// If the tab is selected and we have no results, display a friendly message
 		if ( itemsForTab.length === 0 ) {
 			return (
 				<NoBlocks>
@@ -245,7 +246,7 @@ export class InserterMenu extends Component {
 
 	// Passed to TabbableContainer, extending its event-handling logic
 	eventToOffset( event ) {
-		// If a tab (Frequent, Blocks, …) is focused, pressing the down arrow
+		// If a tab (Suggested, Blocks, …) is focused, pressing the down arrow
 		// moves focus to the selected panel below.
 		if (
 			event.keyCode === keycodes.DOWN &&
