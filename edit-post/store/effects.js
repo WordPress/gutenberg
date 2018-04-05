@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { reduce, some } from 'lodash';
-import 'formdata-polyfill';
 
 /**
  * WordPress dependencies
