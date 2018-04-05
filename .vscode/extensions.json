@@ -1,6 +1,5 @@
 {
     "recommendations": [
-    	"flowtype.flow-for-vscode",
-        "ms-vscode.js-atom-grammar"
+    	"gcazaciuc.vscode-flow-ide"
     ]
 }
