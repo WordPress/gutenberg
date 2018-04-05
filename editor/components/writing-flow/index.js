@@ -70,6 +70,7 @@ class WritingFlow extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 		this.clearVerticalRect = this.clearVerticalRect.bind( this );
+		this.focusLastTextField = this.focusLastTextField.bind( this );
 
 		/**
 		 * Here a rectangle is stored while moving the caret vertically so
