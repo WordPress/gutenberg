@@ -298,6 +298,13 @@ className: false,
 html: false,
 ```
 
+- `insertable` (default `true`): By default, Gutenberg will show all blocks in the inserter. To disable this behavior, set `insertable` to `false`.
+
+```js
+// Hide from the inserter.
+insertable: false,
+```
+
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](https://wordpress.org/gutenberg/handbook/block-edit-save/).
