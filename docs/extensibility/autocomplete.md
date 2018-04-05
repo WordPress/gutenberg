@@ -1,5 +1,5 @@
-Autocompletion
-==============
+Autocomplete
+============
 
 Gutenberg provides a `blocks.Autocomplete.completers` filter for extending and overriding the list of autocompleters used by blocks.
 

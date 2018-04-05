@@ -51,6 +51,6 @@ By default, blocks provide their styles to enable basic support for blocks in th
 
 There are some advanced block features which require opt-in support in the theme. See [theme support](./extensibility/theme-support).
 
-## Autocompletion
+## Autocomplete
 
-Autocompleters within blocks may be extended and overridden. See [autocompletion](./extensibility/autocompletion).
+Autocompleters within blocks may be extended and overridden. See [autocomplete](./extensibility/autocomplete).
