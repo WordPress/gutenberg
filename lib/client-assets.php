@@ -97,6 +97,8 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'utils/build/index.js' ),
 		true
 	);
+	wp_add_inline_script( 'wp-utils', 'var originalUtils = wp.utils;', 'before' );
+	wp_add_inline_script( 'wp-utils', 'for ( var key in originalUtils ) wp.utils[ key ] = originalUtils[ key ];' );
 	wp_register_script(
 		'wp-hooks',
 		gutenberg_url( 'hooks/build/index.js' ),
@@ -810,11 +812,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	add_filter( 'user_can_richedit', '__return_true' );
 
 	wp_enqueue_script( 'wp-edit-post' );
-
-	// Register `wp-utils` as a dependency of `word-count` to ensure that
-	// `wp-utils` doesn't clobbber `word-count`.  See WordPress/gutenberg#1569.
-	$word_count_script = wp_scripts()->query( 'word-count' );
-	array_push( $word_count_script->deps, 'wp-utils' );
 
 	global $post;
 	// Generate API-prepared post.
