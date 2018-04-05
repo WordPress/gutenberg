@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { get, unescape as unescapeString, without, find, some } from 'lodash';
+import { get, unescape as unescapeString, without, find, some, result } from 'lodash';
 import { stringify } from 'querystring';
 
 /**
@@ -192,13 +192,8 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this.fetchRequest && typeof this.fetchRequest.abort !== 'undefined' ) {
-			this.fetchRequest.abort();
-		}
-
-		if ( this.addRequest && typeof this.addRequest.abort !== 'undefined' ) {
-			this.addRequest.abort();
-		}
+		result( this.fetchRequest, 'abort' );
+		result( this.addRequest, 'abort' );
 	}
 
 	renderTerms( renderedTerms ) {

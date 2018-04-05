@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy } from 'lodash';
+import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy, result as lodashResult } from 'lodash';
 import { stringify } from 'querystring';
 
 /**
@@ -163,9 +163,7 @@ class FlatTermSelector extends Component {
 	}
 
 	searchTerms( search = '' ) {
-		if ( this.searchRequest && typeof this.searchRequest.abort !== 'undefined' ) {
-			this.searchRequest.abort();
-		}
+		lodashResult( this.searchRequest, 'abort' );
 		this.searchRequest = this.fetchTerms( { search } );
 	}
 
