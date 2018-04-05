@@ -20,7 +20,7 @@ import {
 	openGeneralSidebar,
 	closeGeneralSidebar,
 } from './actions';
-import { getMetaBoxes } from './selectors';
+import { getMetaBoxes, getActiveGeneralSidebarName } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { onChangeListener } from './utils';
 
@@ -117,11 +117,21 @@ const effects = {
 		// Collapse sidebar when viewport shrinks.
 		subscribe( onChangeListener(
 			() => select( 'core/viewport' ).isViewportMatch( '< medium' ),
-			( isSmall ) => {
-				if ( isSmall ) {
-					store.dispatch( closeGeneralSidebar() );
-				}
-			}
+			( () => {
+				// contains the sidebar we close when going to viewport sizes lower than medium.
+				// This allows to reopen it when going again to viewport sizes greater than medium.
+				let sidebarToReOpenOnExpand = null;
+				return ( isSmall ) => {
+					if ( isSmall ) {
+						sidebarToReOpenOnExpand = getActiveGeneralSidebarName( store.getState() );
+						if ( sidebarToReOpenOnExpand ) {
+							store.dispatch( closeGeneralSidebar() );
+						}
+					} else if ( sidebarToReOpenOnExpand && ! getActiveGeneralSidebarName( store.getState() ) ) {
+						store.dispatch( openGeneralSidebar( sidebarToReOpenOnExpand ) );
+					}
+				};
+			} )()
 		) );
 	},
 
