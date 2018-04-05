@@ -69,11 +69,11 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
-	getReusableBlock,
-	isSavingReusableBlock,
-	isFetchingReusableBlock,
+	getSharedBlock,
+	isSavingSharedBlock,
+	isFetchingSharedBlock,
 	isSelectionEnabled,
-	getReusableBlocks,
+	getSharedBlocks,
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
 	getInserterItems,
@@ -2474,7 +2474,7 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
@@ -2493,7 +2493,7 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
@@ -2526,7 +2526,7 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
@@ -2535,7 +2535,7 @@ describe( 'selectors', () => {
 			expect( items[ 0 ].isDisabled ).toBe( true );
 		} );
 
-		it( 'should properly list reusable blocks', () => {
+		it( 'should properly list shared blocks', () => {
 			const state = {
 				editor: {
 					present: {
@@ -2547,9 +2547,9 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {
-						123: { uid: 'carrot', title: 'My reusable block' },
+						123: { uid: 'carrot', title: 'My shared block' },
 					},
 				},
 			};
@@ -2559,7 +2559,7 @@ describe( 'selectors', () => {
 					id: 'core/block/123',
 					name: 'core/block',
 					initialAttributes: { ref: 123 },
-					title: 'My reusable block',
+					title: 'My shared block',
 					icon: 'test',
 					category: 'shared',
 					keywords: [],
@@ -2583,7 +2583,7 @@ describe( 'selectors', () => {
 				preferences: {
 					insertUsage: {
 						'core/deleted-block': { time: 1000, count: 10, insert: { name: 'core/deleted-block' } }, // Deleted blocks should be filtered out
-						'core/block/456': { time: 1000, count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted reusable blocks should be filtered out
+						'core/block/456': { time: 1000, count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted shared blocks should be filtered out
 						'core/image': { time: 1000, count: 3, insert: { name: 'core/image' } },
 						'core/block/123': { time: 1000, count: 5, insert: { name: 'core/block', ref: 123 } },
 						'core/paragraph': { time: 1000, count: 2, insert: { name: 'core/paragraph' } },
@@ -2598,7 +2598,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {
 						123: { uid: 'carrot' },
 					},
@@ -2626,7 +2626,7 @@ describe( 'selectors', () => {
 						blockOrder: [],
 					},
 				},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
@@ -2650,7 +2650,7 @@ describe( 'selectors', () => {
 						blockOrder: [],
 					},
 				},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
@@ -2682,10 +2682,10 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getReusableBlock', () => {
-		it( 'should return a reusable block', () => {
+	describe( 'getSharedBlock', () => {
+		it( 'should return a shared block', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {
 						8109: {
 							uid: 'foo',
@@ -2695,8 +2695,8 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const actualReusableBlock = getReusableBlock( state, 8109 );
-			expect( actualReusableBlock ).toEqual( {
+			const actualSharedBlock = getSharedBlock( state, 8109 );
+			expect( actualSharedBlock ).toEqual( {
 				id: 8109,
 				isTemporary: false,
 				uid: 'foo',
@@ -2704,11 +2704,11 @@ describe( 'selectors', () => {
 			} );
 		} );
 
-		it( 'should return a temporary reusable block', () => {
+		it( 'should return a temporary shared block', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {
-						reusable1: {
+						shared1: {
 							uid: 'foo',
 							title: 'My cool block',
 						},
@@ -2716,106 +2716,106 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const actualReusableBlock = getReusableBlock( state, 'reusable1' );
-			expect( actualReusableBlock ).toEqual( {
-				id: 'reusable1',
+			const actualSharedBlock = getSharedBlock( state, 'shared1' );
+			expect( actualSharedBlock ).toEqual( {
+				id: 'shared1',
 				isTemporary: true,
 				uid: 'foo',
 				title: 'My cool block',
 			} );
 		} );
 
-		it( 'should return null when no reusable block exists', () => {
+		it( 'should return null when no shared block exists', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
 
-			const reusableBlock = getReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
-			expect( reusableBlock ).toBeNull();
+			const sharedBlock = getSharedBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
+			expect( sharedBlock ).toBeNull();
 		} );
 	} );
 
-	describe( 'isSavingReusableBlock', () => {
+	describe( 'isSavingSharedBlock', () => {
 		it( 'should return false when the block is not being saved', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					isSaving: {},
 				},
 			};
 
-			const isSaving = isSavingReusableBlock( state, 5187 );
+			const isSaving = isSavingSharedBlock( state, 5187 );
 			expect( isSaving ).toBe( false );
 		} );
 
 		it( 'should return true when the block is being saved', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					isSaving: {
 						5187: true,
 					},
 				},
 			};
 
-			const isSaving = isSavingReusableBlock( state, 5187 );
+			const isSaving = isSavingSharedBlock( state, 5187 );
 			expect( isSaving ).toBe( true );
 		} );
 	} );
 
-	describe( 'isFetchingReusableBlock', () => {
+	describe( 'isFetchingSharedBlock', () => {
 		it( 'should return false when the block is not being fetched', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					isFetching: {},
 				},
 			};
 
-			const isFetching = isFetchingReusableBlock( state, 5187 );
+			const isFetching = isFetchingSharedBlock( state, 5187 );
 			expect( isFetching ).toBe( false );
 		} );
 
 		it( 'should return true when the block is being fetched', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					isFetching: {
 						5187: true,
 					},
 				},
 			};
 
-			const isFetching = isFetchingReusableBlock( state, 5187 );
+			const isFetching = isFetchingSharedBlock( state, 5187 );
 			expect( isFetching ).toBe( true );
 		} );
 	} );
 
-	describe( 'getReusableBlocks', () => {
-		it( 'should return an array of reusable blocks', () => {
+	describe( 'getSharedBlocks', () => {
+		it( 'should return an array of shared blocks', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {
 						123: { uid: 'carrot' },
-						reusable1: { uid: 'broccoli' },
+						shared1: { uid: 'broccoli' },
 					},
 				},
 			};
 
-			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [
+			const sharedBlocks = getSharedBlocks( state );
+			expect( sharedBlocks ).toEqual( [
 				{ id: 123, isTemporary: false, uid: 'carrot' },
-				{ id: 'reusable1', isTemporary: true, uid: 'broccoli' },
+				{ id: 'shared1', isTemporary: true, uid: 'broccoli' },
 			] );
 		} );
 
-		it( 'should return an empty array when no reusable blocks exist', () => {
+		it( 'should return an empty array when no shared blocks exist', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
 
-			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [] );
+			const sharedBlocks = getSharedBlocks( state );
+			expect( sharedBlocks ).toEqual( [] );
 		} );
 	} );
 

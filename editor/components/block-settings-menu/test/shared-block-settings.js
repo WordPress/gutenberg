@@ -6,15 +6,15 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { ReusableBlockSettings } from '../reusable-block-settings';
+import { SharedBlockSettings } from '../shared-block-settings';
 
-describe( 'ReusableBlockSettings', () => {
-	it( 'should allow converting a static block to reusable', () => {
+describe( 'SharedBlockSettings', () => {
+	it( 'should allow converting a static block to a shared block', () => {
 		const onConvert = jest.fn();
 		const wrapper = shallow(
-			<ReusableBlockSettings
-				reusableBlock={ null }
-				onConvertToReusable={ onConvert }
+			<SharedBlockSettings
+				sharedBlock={ null }
+				onConvertToShared={ onConvert }
 			/>
 		);
 
@@ -25,11 +25,11 @@ describe( 'ReusableBlockSettings', () => {
 		expect( onConvert ).toHaveBeenCalled();
 	} );
 
-	it( 'should allow converting a reusable block to static', () => {
+	it( 'should allow converting a shared block to static', () => {
 		const onConvert = jest.fn();
 		const wrapper = shallow(
-			<ReusableBlockSettings
-				reusableBlock={ {} }
+			<SharedBlockSettings
+				sharedBlock={ {} }
 				onConvertToStatic={ onConvert }
 			/>
 		);
@@ -41,11 +41,11 @@ describe( 'ReusableBlockSettings', () => {
 		expect( onConvert ).toHaveBeenCalled();
 	} );
 
-	it( 'should allow deleting a reusable block', () => {
+	it( 'should allow deleting a shared block', () => {
 		const onDelete = jest.fn();
 		const wrapper = shallow(
-			<ReusableBlockSettings
-				reusableBlock={ { id: 123 } }
+			<SharedBlockSettings
+				sharedBlock={ { id: 123 } }
 				onDelete={ onDelete }
 			/>
 		);
