@@ -17,29 +17,52 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
-	dataSource: DataSource,
+	blocks: Array<BlockType>,
 	refresh: boolean,
 };
 
 type PropsType = BlockListType;
-type StateType = {};
+type StateType = {
+	dataSource: DataSource,
+};
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
 	_recycler = null;
+
+	constructor( props: PropsType ) {
+		super( props );
+		this.state = {
+			dataSource: new DataSource( this.props.blocks, ( item: BlockType, index ) => item.uid ),
+		};
+	}
 
 	onBlockHolderPressed( uid: string ) {
 		this.props.focusBlockAction( uid );
 	}
 
+	getDataSourceIndexFromUid( uid: string ) {
+		for ( var i = 0; i < this.state.dataSource.size(); ++i ) {
+			const block = this.state.dataSource.get( i );
+			if ( block.uid === uid ) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	onToolbarButtonPressed( button: number, uid: string ) {
+		const dataSourceBlockIndex = this.getDataSourceIndexFromUid( uid );
 		switch ( button ) {
 			case ToolbarButton.UP:
+				this.state.dataSource.moveUp( dataSourceBlockIndex );
 				this.props.moveBlockUpAction( uid );
 				break;
 			case ToolbarButton.DOWN:
+				this.state.dataSource.moveDown( dataSourceBlockIndex );
 				this.props.moveBlockDownAction( uid );
 				break;
 			case ToolbarButton.DELETE:
+				this.state.dataSource.splice( dataSourceBlockIndex, 1 );
 				this.props.deleteBlockAction( uid );
 				break;
 			case ToolbarButton.SETTINGS:
@@ -50,7 +73,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	componentDidUpdate() {
 		// List has been updated, tell the recycler view to update the view
-		this.props.dataSource.setDirty();
+		this.state.dataSource.setDirty();
 	}
 
 	render() {
@@ -60,7 +83,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				<RecyclerViewList
 					ref={ component => ( this._recycler = component ) }
 					style={ styles.list }
-					dataSource={ this.props.dataSource }
+					dataSource={ this.state.dataSource }
 					renderItem={ this.renderItem.bind( this ) }
 					ListEmptyComponent={
 						<View style={ { borderColor: '#e7e7e7', borderWidth: 10, margin: 10, padding: 20 } }>
@@ -74,7 +97,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			list = (
 				<FlatList
 					style={ styles.list }
-					data={ this.props.dataSource._data }
+					data={ this.props.blocks }
 					extraData={ this.props.refresh }
 					keyExtractor={ ( item, index ) => item.uid }
 					renderItem={ this.renderItem.bind( this ) }
