@@ -101,12 +101,12 @@ const effects = {
 	INIT( _, store ) {
 		// Select the block settings tab when the selected block changes
 		subscribe( onChangeListener(
-			() => select( 'core/editor' ).getBlockSelectionStart(),
-			( selectionStart ) => {
+			() => !! select( 'core/editor' ).getBlockSelectionStart(),
+			( hasBlockSelection ) => {
 				if ( ! select( 'core/edit-post' ).isEditorSidebarOpened() ) {
 					return;
 				}
-				if ( selectionStart ) {
+				if ( hasBlockSelection ) {
 					store.dispatch( openGeneralSidebar( 'edit-post/block' ) );
 				} else {
 					store.dispatch( openGeneralSidebar( 'edit-post/document' ) );
