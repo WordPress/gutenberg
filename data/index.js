@@ -241,6 +241,10 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			this.state = {};
 		}
 
+		shouldComponentUpdate( nextProps, nextState ) {
+			return ! isShallowEqual( nextProps, this.props ) || ! isShallowEqual( nextState, this.state );
+		}
+
 		componentWillMount() {
 			this.subscribe();
 
