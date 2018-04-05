@@ -72,6 +72,12 @@
 		"parent": "extensibility"
 	},
 	{
+		"title": "Autocompletion",
+		"slug": "autocompletion",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/autocompletion.md",
+		"parent": "extensibility"
+	},
+	{
 		"title": "Creating Block Types",
 		"slug": "blocks",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/blocks.md",
