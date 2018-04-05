@@ -25,7 +25,7 @@ import * as list from './list';
 import * as more from './more';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
-import * as reusableBlock from './block';
+import * as sharedBlock from './block';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as subhead from './subhead';
@@ -62,8 +62,8 @@ export const registerCoreBlocks = () => {
 		more,
 		preformatted,
 		pullquote,
-		reusableBlock,
 		separator,
+		sharedBlock,
 		subhead,
 		table,
 		textColumns,

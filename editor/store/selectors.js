@@ -1165,7 +1165,7 @@ export function getNotices( state ) {
 
 /**
  * An item that appears in the inserter. Inserting this item will create a new
- * block. Inserter items encapsulate both regular blocks and reusable blocks.
+ * block. Inserter items encapsulate both regular blocks and shared blocks.
  *
  * @typedef {Object} Editor.InserterItem
  * @property {string}   id                Unique identifier for the item.
@@ -1214,16 +1214,16 @@ function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
 }
 
 /**
- * Given a reusable block, constructs an item that appears in the inserter.
+ * Given a shared block, constructs an item that appears in the inserter.
  *
  * @param {Object}           state             Global application state.
  * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
- * @param {Object}           reusableBlock     Reusable block, likely from getReusableBlock().
+ * @param {Object}           sharedBlock       Shared block, likely from getSharedBlock().
  *
  * @return {Editor.InserterItem} Item that appears in inserter.
  */
-function buildInserterItemFromReusableBlock( state, enabledBlockTypes, reusableBlock ) {
-	if ( ! enabledBlockTypes || ! reusableBlock ) {
+function buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock ) {
+	if ( ! enabledBlockTypes || ! sharedBlock ) {
 		return null;
 	}
 
@@ -1232,7 +1232,7 @@ function buildInserterItemFromReusableBlock( state, enabledBlockTypes, reusableB
 		return null;
 	}
 
-	const referencedBlock = getBlock( state, reusableBlock.uid );
+	const referencedBlock = getBlock( state, sharedBlock.uid );
 	if ( ! referencedBlock ) {
 		return null;
 	}
@@ -1243,10 +1243,10 @@ function buildInserterItemFromReusableBlock( state, enabledBlockTypes, reusableB
 	}
 
 	return {
-		id: `core/block/${ reusableBlock.id }`,
+		id: `core/block/${ sharedBlock.id }`,
 		name: 'core/block',
-		initialAttributes: { ref: reusableBlock.id },
-		title: reusableBlock.title,
+		initialAttributes: { ref: sharedBlock.id },
+		title: sharedBlock.title,
 		icon: referencedBlockType.icon,
 		category: 'shared',
 		keywords: [],
@@ -1256,7 +1256,7 @@ function buildInserterItemFromReusableBlock( state, enabledBlockTypes, reusableB
 
 /**
  * Determines the items that appear in the the inserter. Includes both static
- * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
+ * items (e.g. a regular block type) and dynamic items (e.g. a shared block).
  *
  * @param {Object}           state             Global application state.
  * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
@@ -1272,8 +1272,8 @@ export function getInserterItems( state, enabledBlockTypes = true ) {
 		buildInserterItemFromBlockType( state, enabledBlockTypes, blockType )
 	);
 
-	const dynamicItems = getReusableBlocks( state ).map( reusableBlock =>
-		buildInserterItemFromReusableBlock( state, enabledBlockTypes, reusableBlock )
+	const dynamicItems = getSharedBlocks( state ).map( sharedBlock =>
+		buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock )
 	);
 
 	const items = [ ...staticItems, ...dynamicItems ];
@@ -1300,8 +1300,8 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
 
 	const items = fillWithCommonBlocks( inserts ).map( insert => {
 		if ( insert.ref ) {
-			const reusableBlock = getReusableBlock( state, insert.ref );
-			return buildInserterItemFromReusableBlock( state, enabledBlockTypes, reusableBlock );
+			const sharedBlock = getSharedBlock( state, insert.ref );
+			return buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock );
 		}
 
 		const blockType = getBlockType( insert.name );
@@ -1350,16 +1350,16 @@ export function getFrecentInserterItems( state, enabledBlockTypes = true, maximu
 }
 
 /**
- * Returns the reusable block with the given ID.
+ * Returns the shared block with the given ID.
  *
  * @param {Object}        state Global application state.
- * @param {number|string} ref   The reusable block's ID.
+ * @param {number|string} ref   The shared block's ID.
  *
- * @return {Object} The reusable block, or null if none exists.
+ * @return {Object} The shared block, or null if none exists.
  */
-export const getReusableBlock = createSelector(
+export const getSharedBlock = createSelector(
 	( state, ref ) => {
-		const block = state.reusableBlocks.data[ ref ];
+		const block = state.sharedBlocks.data[ ref ];
 		if ( ! block ) {
 			return null;
 		}
@@ -1373,44 +1373,44 @@ export const getReusableBlock = createSelector(
 		};
 	},
 	( state, ref ) => [
-		state.reusableBlocks.data[ ref ],
+		state.sharedBlocks.data[ ref ],
 	],
 );
 
 /**
- * Returns whether or not the reusable block with the given ID is being saved.
+ * Returns whether or not the shared block with the given ID is being saved.
  *
  * @param {Object} state Global application state.
- * @param {string} ref   The reusable block's ID.
+ * @param {string} ref   The shared block's ID.
  *
- * @return {boolean} Whether or not the reusable block is being saved.
+ * @return {boolean} Whether or not the shared block is being saved.
  */
-export function isSavingReusableBlock( state, ref ) {
-	return state.reusableBlocks.isSaving[ ref ] || false;
+export function isSavingSharedBlock( state, ref ) {
+	return state.sharedBlocks.isSaving[ ref ] || false;
 }
 
 /**
- * Returns true if the reusable block with the given ID is being fetched, or
+ * Returns true if the shared block with the given ID is being fetched, or
  * false otherwise.
  *
  * @param {Object} state Global application state.
- * @param {string} ref   The reusable block's ID.
+ * @param {string} ref   The shared block's ID.
  *
- * @return {boolean} Whether the reusable block is being fetched.
+ * @return {boolean} Whether the shared block is being fetched.
  */
-export function isFetchingReusableBlock( state, ref ) {
-	return !! state.reusableBlocks.isFetching[ ref ];
+export function isFetchingSharedBlock( state, ref ) {
+	return !! state.sharedBlocks.isFetching[ ref ];
 }
 
 /**
- * Returns an array of all reusable blocks.
+ * Returns an array of all shared blocks.
  *
  * @param {Object} state Global application state.
  *
- * @return {Array} An array of all reusable blocks.
+ * @return {Array} An array of all shared blocks.
  */
-export function getReusableBlocks( state ) {
-	return map( state.reusableBlocks.data, ( value, ref ) => getReusableBlock( state, ref ) );
+export function getSharedBlocks( state ) {
+	return map( state.sharedBlocks.data, ( value, ref ) => getSharedBlock( state, ref ) );
 }
 
 /**

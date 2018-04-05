@@ -78,8 +78,8 @@
 		visibility: hidden;
 	}
 
-	.editor-block-list__block-edit .reusable-block-edit-panel * {
-		z-index: z-index( '.editor-block-list__block-edit .reusable-block-edit-panel *' );
+	.editor-block-list__block-edit .shared-block-edit-panel * {
+		z-index: z-index( '.editor-block-list__block-edit .shared-block-edit-panel *' );
 	}
 }
 
@@ -239,18 +239,18 @@
 	}
 
 	/**
-	 * Reusable Block style
+	 * Shared blocks
 	 */
 
-	&.is-reusable > .editor-block-mover:before {
+	&.is-shared > .editor-block-mover:before {
 		border-right: none;
 	}
 
-	&.is-reusable > .editor-block-settings-menu:before {
+	&.is-shared > .editor-block-settings-menu:before {
 		border-left: none;
 	}
 
-	&.is-reusable > .editor-block-list__block-edit:before {
+	&.is-shared > .editor-block-list__block-edit:before {
 		outline: 1px dashed $light-gray-500;
 	}
 

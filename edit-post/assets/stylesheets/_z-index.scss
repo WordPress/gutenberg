@@ -36,7 +36,7 @@ $z-layers: (
 
 	// Should have higher index than the inset/underlay used for dragging
 	'.components-placeholder__fieldset': 1,
-	'.editor-block-list__block-edit .reusable-block-edit-panel *': 1,
+	'.editor-block-list__block-edit .shared-block-edit-panel *': 1,
 
 	// Show drop zone above most standard content, but below any overlays
 	'.components-drop-zone': 100,
