@@ -416,11 +416,11 @@ export class RichText extends Component {
 	 * absolutely position the toolbar. It does this by finding the closest
 	 * relative element.
 	 *
+	 * @param {DOMRect} position Caret range rectangle.
+	 *
 	 * @return {{top: number, left: number}} The desired position of the toolbar.
 	 */
-	getFocusPosition() {
-		const position = getRectangleFromRange( this.editor.selection.getRng() );
-
+	getFocusPosition( position ) {
 		// Find the parent "relative" or "absolute" positioned container
 		const findRelativeParent = ( node ) => {
 			const style = window.getComputedStyle( node );
@@ -531,23 +531,19 @@ export class RichText extends Component {
 			this.onChange();
 		}
 
-		// `scrollToCaret` is called on `nodechange`, whereas calling it on
+		// `scrollToRect` is called on `nodechange`, whereas calling it on
 		// `keyup` *when* moving to a new RichText element results in incorrect
 		// scrolling. Though the following allows false positives, it results
 		// in much smoother scrolling.
-		if ( keyCode !== BACKSPACE && keyCode !== ENTER ) {
-			this.scrollToCaret();
+		if ( this.props.isViewportSmall && keyCode !== BACKSPACE && keyCode !== ENTER ) {
+			this.scrollToRect( getRectangleFromRange( this.editor.selection.getRng() ) );
 		}
 	}
 
-	scrollToCaret() {
-		if ( ! this.props.isViewportSmall ) {
-			return;
-		}
-
-		const { top: caretTop } = this.getEditorSelectionRect();
-
+	scrollToRect( rect ) {
+		const { top: caretTop } = rect;
 		const container = getScrollContainer( this.editor.getBody() );
+
 		if ( ! container ) {
 			return;
 		}
@@ -671,13 +667,17 @@ export class RichText extends Component {
 			return accFormats;
 		}, {} );
 
-		const focusPosition = this.getFocusPosition();
+		const rect = getRectangleFromRange( this.editor.selection.getRng() );
+		const focusPosition = this.getFocusPosition( rect );
+
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
 
-		// Originally called on `focusin`, that hook turned out to be
-		// premature. On `nodechange` we can work with the finalized TinyMCE
-		// instance and scroll to proper position.
-		this.scrollToCaret();
+		if ( this.props.isViewportSmall ) {
+			// Originally called on `focusin`, that hook turned out to be
+			// premature. On `nodechange` we can work with the finalized TinyMCE
+			// instance and scroll to proper position.
+			this.scrollToRect( rect );
+		}
 	}
 
 	updateContent() {
