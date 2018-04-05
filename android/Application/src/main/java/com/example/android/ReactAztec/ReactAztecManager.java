@@ -155,26 +155,25 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
     }
 
     @Override
-    protected void addEventEmitters(final ThemedReactContext reactContext, final ReactAztecView container) {
-        final ReactAztecText editText = container.getAztecText();
-        editText.addTextChangedListener(new AztecTextWatcher(reactContext, editText));
+    protected void addEventEmitters(final ThemedReactContext reactContext, final ReactAztecView aztecView) {
+        final ReactAztecText editText = aztecView.getAztecText();
+        editText.addTextChangedListener(new AztecTextWatcher(reactContext, aztecView));
         editText.setOnFocusChangeListener(
                 new View.OnFocusChangeListener() {
                     public void onFocusChange(View v, boolean hasFocus) {
-                        EventDispatcher eventDispatcher =
-                                reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+                        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
                         if (hasFocus) {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecFocusEvent(
-                                            editText.getId())); // TODO is the correct ID?
+                                            aztecView.getId())); // TODO is the correct ID?
                         } else {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecBlurEvent(
-                                            editText.getId()));
+                                            aztecView.getId()));
 
                             eventDispatcher.dispatchEvent(
                                     new ReactaztecEndEditingEvent(
-                                            editText.getId(),
+                                            aztecView.getId(),
                                             editText.getText().toString()));
                         }
                     }
@@ -188,13 +187,13 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
 
         private EventDispatcher mEventDispatcher;
         private ReactAztecText mEditText;
+        private ReactAztecView mAztecView;
         private String mPreviousText;
 
-        public AztecTextWatcher(
-                final ReactContext reactContext,
-                final ReactAztecText editText) {
+        public AztecTextWatcher(final ReactContext reactContext, final ReactAztecView aztec) {
             mEventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-            mEditText = editText;
+            mAztecView = aztec;
+            mEditText = aztec.getAztecText();
             mPreviousText = null;
         }
 
@@ -224,13 +223,13 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
             // TODO: t7936714 merge these events
             mEventDispatcher.dispatchEvent(
                     new ReactTextChangedEvent(
-                            mEditText.getId(),
+                            mAztecView.getId(),
                             s.toString(),
                             mEditText.incrementAndGetEventCounter()));
 
             mEventDispatcher.dispatchEvent(
                     new ReactTextInputEvent(
-                            mEditText.getId(),
+                            mAztecView.getId(),
                             newText,
                             oldText,
                             start,
