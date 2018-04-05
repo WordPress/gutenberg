@@ -24,6 +24,7 @@ export { default as Editable } from './rich-text/editable';
 export { default as ImagePlaceholder } from './image-placeholder';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorControls } from './inspector-controls';
+export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as PlainText } from './plain-text';
 export { default as MediaUpload } from './media-upload';
 export { default as RichText } from './rich-text';

@@ -6,7 +6,7 @@ import { assign } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/element';
+import { createHigherOrderComponent, Fragment } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { hasBlockSupport } from '../api';
-import InspectorControls from '../inspector-controls';
+import InspectorAdvancedControls from '../inspector-advanced-controls';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
@@ -58,22 +58,29 @@ export function addAttribute( settings ) {
  */
 export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
-		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.isSelected;
-		return [
-			<BlockEdit key="block-edit-anchor" { ...props } />,
-			hasAnchor && <InspectorControls key="inspector-anchor">
-				<TextControl
-					label={ __( 'HTML Anchor' ) }
-					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
-					value={ props.attributes.anchor || '' }
-					onChange={ ( nextValue ) => {
-						nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-						props.setAttributes( {
-							anchor: nextValue,
-						} );
-					} } />
-			</InspectorControls>,
-		];
+		const hasAnchor = hasBlockSupport( props.name, 'anchor' );
+
+		if ( hasAnchor && props.isSelected ) {
+			return (
+				<Fragment>
+					<BlockEdit { ...props } />
+					<InspectorAdvancedControls>
+						<TextControl
+							label={ __( 'HTML Anchor' ) }
+							help={ __( 'Anchors lets you link directly to a section on a page.' ) }
+							value={ props.attributes.anchor || '' }
+							onChange={ ( nextValue ) => {
+								nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
+								props.setAttributes( {
+									anchor: nextValue,
+								} );
+							} } />
+					</InspectorAdvancedControls>
+				</Fragment>
+			);
+		}
+
+		return <BlockEdit { ...props } />;
 	};
 }, 'withInspectorControl' );
 
