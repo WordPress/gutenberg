@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { createProvider } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { render, unmountComponentAtNode } from '@wordpress/element';
@@ -43,14 +38,11 @@ export function reinitializeEditor( target, settings ) {
 	unmountComponentAtNode( target );
 
 	const reboot = reinitializeEditor.bind( null, target, settings );
-	const ReduxProvider = createProvider( 'edit-post' );
 
 	render(
 		<EditorProvider settings={ settings } recovery>
 			<ErrorBoundary onError={ reboot }>
-				<ReduxProvider store={ store }>
-					<Layout />
-				</ReduxProvider>
+				<Layout />
 			</ErrorBoundary>
 		</EditorProvider>,
 		target
@@ -72,14 +64,11 @@ export function reinitializeEditor( target, settings ) {
 export function initializeEditor( id, post, settings ) {
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, target, settings );
-	const ReduxProvider = createProvider( 'edit-post' );
 
 	render(
 		<EditorProvider settings={ settings } post={ post }>
 			<ErrorBoundary onError={ reboot }>
-				<ReduxProvider store={ store }>
-					<Layout />
-				</ReduxProvider>
+				<Layout />
 			</ErrorBoundary>
 		</EditorProvider>,
 		target

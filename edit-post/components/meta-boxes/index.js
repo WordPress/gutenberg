@@ -1,14 +1,13 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { connect } from 'react-redux';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import MetaBoxesArea from './meta-boxes-area';
 import MetaBoxesPanel from './meta-boxes-panel';
-import { getMetaBox } from '../../store/selectors';
 
 function MetaBoxes( { location, isActive, usePanel = false } ) {
 	if ( ! isActive ) {
@@ -28,11 +27,8 @@ function MetaBoxes( { location, isActive, usePanel = false } ) {
 	);
 }
 
-export default connect(
-	( state, ownProps ) => ( {
-		isActive: getMetaBox( state, ownProps.location ).isActive,
+export default withSelect(
+	( select, ownProps ) => ( {
+		isActive: select( 'core/edit-post' ).getMetaBox( ownProps.location ).isActive,
 	} ),
-	undefined,
-	undefined,
-	{ storeKey: 'edit-post' }
 )( MetaBoxes );
