@@ -148,7 +148,8 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-element',
 		gutenberg_url( 'element/build/index.js' ),
 		array( 'react', 'react-dom', 'wp-utils' ),
-		filemtime( gutenberg_dir_path() . 'element/build/index.js' )
+		filemtime( gutenberg_dir_path() . 'element/build/index.js' ),
+		true
 	);
 	wp_register_script(
 		'wp-components',
