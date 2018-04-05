@@ -33,14 +33,33 @@ describe( 'adding blocks', () => {
 		return page.mouse.click( x, y );
 	}
 
-	it( 'Should insert content using the placeholder and the regular inserter', async () => {
-		// Default block appender is provisional
-		await page.click( '.editor-default-block-appender' );
-		await page.click( '.editor-post-title__input' );
+	/**
+	 * Given a Puppeteer ElementHandle, clicks below its bounding box.
+	 *
+	 * @param {Puppeteer.ElementHandle} elementHandle Element handle.
+	 *
+	 * @return {Promise} Promise resolving when click occurs.
+	 */
+	async function clickBelow( elementHandle ) {
+		const box = await elementHandle.boundingBox();
+		const x = box.x + ( box.width / 2 );
+		const y = box.y + box.height + 1;
+		return page.mouse.click( x, y );
+	}
 
-		// Post is empty, the newly created paragraph has been removed on focus out
-		const paragraphBlock = await page.$( '[data-type="core/paragraph"]' );
-		expect( paragraphBlock ).toBeNull();
+	it( 'Should insert content using the placeholder and the regular inserter', async () => {
+		// Click below editor to focus last field (block appender)
+		await clickBelow( await page.$( '.editor-default-block-appender' ) );
+		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
+
+		// Up to return back to title. Assumes that appender results in focus
+		// to a new block.
+		// TODO: Backspace should be sufficient to return to title.
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Post is empty, the newly created paragraph has been removed on focus
+		// out because default block is provisional.
+		expect( await page.$( '[data-type="core/paragraph"]' ) ).toBeNull();
 
 		// Using the placeholder
 		await page.click( '.editor-default-block-appender' );
