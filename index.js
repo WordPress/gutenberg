@@ -26,12 +26,9 @@ class AztecTextInput extends React.Component {
                     <RCTAztecView
                          {...this.props}
                          style={[styles.hello, {minHeight: myMinHeight}]}
-                         multiline={true}
                          text = {this.props.text}
-                         onScroll = {(event) => {
-                             console.log(event.nativeEvent);
-                         }}
                          onContentSizeChange= {(event) => {
+                         console.log(event.nativeEvent);
                               this.setState({height: event.nativeEvent.contentSize.height});
                           }}
                          color = {'black'}
@@ -50,7 +47,7 @@ var styles = StyleSheet.create({
     },
     hello: {
     margin: 10,
-    minHeight: 200,
+    minHeight: 400,
   },
 });
 

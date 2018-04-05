@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.AttributeSet;
 
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.uimanager.ThemedReactContext;
@@ -39,7 +40,7 @@ public class ReactAztecText extends AztecText {
 
     public ReactAztecText(ThemedReactContext reactContext, Context context) {
         super(context);
-        this.setFocusableInTouchMode(true);
+       /* this.setFocusableInTouchMode(true);
         this.setFocusable(true);
 
         addPlugin(new WordPressCommentsPlugin(this));
@@ -48,7 +49,20 @@ public class ReactAztecText extends AztecText {
         addPlugin(new VideoShortcodePlugin());
         addPlugin(new AudioShortcodePlugin());
         this.setImageGetter(new GlideImageLoader(context));
-        this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));
+        this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));*/
+    }
+
+    public ReactAztecText(Context context, AttributeSet attrs) {
+        super(context, attrs, 0);
+        this.setFocusableInTouchMode(true);
+        this.setFocusable(true);
+      /*  addPlugin(new WordPressCommentsPlugin(this));
+        addPlugin(new MoreToolbarButton(this));
+        addPlugin(new CaptionShortcodePlugin(this));
+        addPlugin(new VideoShortcodePlugin());
+        addPlugin(new AudioShortcodePlugin());
+        this.setImageGetter(new GlideImageLoader(context));
+        this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));*/
     }
 
     @Override
