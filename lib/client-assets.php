@@ -986,22 +986,8 @@ JS;
  * @return string The <script> tag with the defer property added.
  */
 function gutenberg_editor_defer( $tag, $handle ) {
-	$async_handles = array(
-		'wp-blocks',
-		'wp-components',
-		'wp-core-data',
-		'wp-data',
-		'wp-edit-post',
-		'wp-editor',
-		'wp-element',
-		'wp-hooks',
-		'wp-plugins',
-		'wp-utils',
-		'wp-viewport',
-	);
-
-	if ( in_array( $handle, $async_handles, true ) ) {
-		return str_replace( ' src', ' defer src', $tag );
+	if ( 'wp-edit-post' === $handle ) {
+		return str_replace( ' src', ' defer="defer" src', $tag );
 	}
 
 	return $tag;
