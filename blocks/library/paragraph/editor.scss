@@ -3,7 +3,9 @@
 	justify-content: space-between;
 }
 
-.blocks-font-size .blocks-range-control__slider + .dashicon {
-	width: 30px;
-	height: 30px;
+.blocks-paragraph__custom-size-slider {
+	.components-range-control__slider + .dashicon {
+		width: 30px;
+		height: 30px;
+	}
 }

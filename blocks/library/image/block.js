@@ -19,6 +19,7 @@ import { Component, compose } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	IconButton,
+	PanelBody,
 	SelectControl,
 	TextControl,
 	Toolbar,
@@ -201,19 +202,25 @@ class ImageBlock extends Component {
 			controls,
 			isSelected && (
 				<InspectorControls key="inspector">
-					<h2>{ __( 'Image Settings' ) }</h2>
-					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
-					{ ! isEmpty( availableSizes ) && (
-						<SelectControl
-							label={ __( 'Size' ) }
-							value={ url }
-							options={ map( availableSizes, ( size, name ) => ( {
-								value: size.source_url,
-								label: startCase( name ),
-							} ) ) }
-							onChange={ this.updateImageURL }
+					<PanelBody title={ __( 'Image Settings' ) }>
+						<TextControl
+							label={ __( 'Textual Alternative' ) }
+							value={ alt }
+							onChange={ this.updateAlt }
+							help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) }
 						/>
-					) }
+						{ ! isEmpty( availableSizes ) && (
+							<SelectControl
+								label={ __( 'Size' ) }
+								value={ url }
+								options={ map( availableSizes, ( size, name ) => ( {
+									value: size.source_url,
+									label: startCase( name ),
+								} ) ) }
+								onChange={ this.updateImageURL }
+							/>
+						) }
+					</PanelBody>
 				</InspectorControls>
 			),
 			<figure key="image" className={ classes } style={ figureStyle }>
