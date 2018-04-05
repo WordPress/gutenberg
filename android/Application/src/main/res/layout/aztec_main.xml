@@ -22,13 +22,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="top|start"
-            android:hint="TEst"
+            android:hint="Test"
             android:paddingEnd="16dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:paddingTop="16dp"
-            android:scrollbars="vertical"
             android:imeOptions="flagNoExtractUi"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             aztec:historyEnable="true"
             aztec:historySize="10"/>
 
@@ -43,12 +44,13 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:paddingTop="16dp"
-            android:scrollbars="vertical"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:textSize="14sp"
             android:visibility="gone"
             android:imeOptions="flagNoExtractUi"
             aztec:codeBackgroundColor="@android:color/transparent"
-            aztec:codeTextColor="@android:color/white"/>
+            aztec:codeTextColor="@android:color/black"/>
 
     </FrameLayout>
 </com.example.android.ReactAztec.ReactAztecView>

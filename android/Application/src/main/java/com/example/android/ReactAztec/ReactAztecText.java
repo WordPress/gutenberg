@@ -7,14 +7,15 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 
 import com.facebook.react.bridge.ReactContext;
-import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.views.textinput.ContentSizeWatcher;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
 import org.wordpress.aztec.AztecText;
+import org.wordpress.aztec.plugins.CssUnderlinePlugin;
 import org.wordpress.aztec.plugins.IAztecPlugin;
+import org.wordpress.aztec.plugins.IToolbarButton;
 import org.wordpress.aztec.plugins.shortcodes.AudioShortcodePlugin;
 import org.wordpress.aztec.plugins.shortcodes.CaptionShortcodePlugin;
 import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
@@ -38,31 +39,24 @@ public class ReactAztecText extends AztecText {
 
     private int mNativeEventCount = 0;
 
-    public ReactAztecText(ThemedReactContext reactContext, Context context) {
-        super(context);
-       /* this.setFocusableInTouchMode(true);
-        this.setFocusable(true);
+   /* public ReactAztecText(ThemedReactContext reactContext, Context context) {
+       this(context, null);
+    }
+*/
+    public ReactAztecText(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initEditor(context);
+    }
 
+    private void initEditor(Context context) {
         addPlugin(new WordPressCommentsPlugin(this));
         addPlugin(new MoreToolbarButton(this));
         addPlugin(new CaptionShortcodePlugin(this));
         addPlugin(new VideoShortcodePlugin());
         addPlugin(new AudioShortcodePlugin());
+        addPlugin(new CssUnderlinePlugin());
         this.setImageGetter(new GlideImageLoader(context));
-        this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));*/
-    }
-
-    public ReactAztecText(Context context, AttributeSet attrs) {
-        super(context, attrs, 0);
-        this.setFocusableInTouchMode(true);
-        this.setFocusable(true);
-      /*  addPlugin(new WordPressCommentsPlugin(this));
-        addPlugin(new MoreToolbarButton(this));
-        addPlugin(new CaptionShortcodePlugin(this));
-        addPlugin(new VideoShortcodePlugin());
-        addPlugin(new AudioShortcodePlugin());
-        this.setImageGetter(new GlideImageLoader(context));
-        this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));*/
+        //this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));
     }
 
     @Override
@@ -73,10 +67,9 @@ public class ReactAztecText extends AztecText {
 
     private void addPlugin(IAztecPlugin plugin) {
         super.getPlugins().add(plugin);
-       /* if (plugin instanceof IToolbarButton) {
-            toolbar.addButton(plugin)
+        if (plugin instanceof IToolbarButton && getToolbar() != null ) {
+            getToolbar().addButton((IToolbarButton)plugin);
         }
-*/
     }
 
     public void setScrollWatcher(ScrollWatcher scrollWatcher) {

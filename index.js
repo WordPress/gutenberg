@@ -28,7 +28,6 @@ class AztecTextInput extends React.Component {
                          style={[styles.hello, {minHeight: myMinHeight}]}
                          text = {this.props.text}
                          onContentSizeChange= {(event) => {
-                         console.log(event.nativeEvent);
                               this.setState({height: event.nativeEvent.contentSize.height});
                           }}
                          color = {'black'}
