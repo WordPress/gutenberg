@@ -26,7 +26,7 @@ export const reducer = (
 	state: StateType = { dataSource: new DataSource( [], ( item: BlockType, index ) => item.uid ), refresh: false },
 	action: BlockActionType
 ) => {
-	const dataSource = [ state.dataSource ];
+	const dataSource : DataSource = state.dataSource;
 	switch ( action.type ) {
 		case ActionTypes.BLOCK.UPDATE_ATTRIBUTES:
 			const block = findBlock( dataSource, action.uid );
@@ -42,7 +42,7 @@ export const reducer = (
 				( result, value, key ) => {
 					if ( value !== result[ key ] ) {
 						// Avoid mutating original block by creating shallow clone
-						if ( result === findBlock( blocks, action.uid ).attributes ) {
+						if ( result === findBlock( dataSource, action.uid ).attributes ) {
 							result = { ...result };
 						}
 
@@ -51,52 +51,45 @@ export const reducer = (
 
 					return result;
 				},
-				findBlock( blocks, action.uid ).attributes
+				findBlock( dataSource, action.uid ).attributes
 			);
 
 			// Skip update if nothing has been changed. The reference will
 			// match the original block if `reduce` had no changed values.
-			if ( nextAttributes === findBlock( blocks, action.uid ).attributes ) {
+			if ( nextAttributes === findBlock( dataSource, action.uid ).attributes ) {
 				return state;
 			}
 
 			// Otherwise merge attributes into state
-			var index = findBlockIndex( blocks, action.uid );
-			blocks[ index ] = {
+			var index = findBlockIndex( dataSource, action.uid );
+			dataSource.get(index ).set({
 				...block,
 				attributes: nextAttributes,
-			};
-			return { blocks: blocks, refresh: ! state.refresh };
+			});
+			return { dataSource: dataSource, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.FOCUS:
-			const destBlock = findBlock( blocks, action.uid );
+			console.log(dataSource._data)
+			const destBlock = findBlock( dataSource, action.uid );
 			const destBlockState = destBlock.focused;
 			// Deselect all blocks
-			for ( let block of blocks ) {
+			for ( let block of dataSource._data ) {
 				block.focused = false;
 			}
 			// Select or deselect pressed block
 			destBlock.focused = ! destBlockState;
-			return { blocks: blocks, refresh: ! state.refresh };
+			return { dataSource: dataSource, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.MOVE_UP:
-			if ( blocks[ 0 ].uid === action.uid ) return state;
-
-			var index = findBlockIndex( blocks, action.uid );
-			var tmp = blocks[ index ];
-			blocks[ index ] = blocks[ index - 1 ];
-			blocks[ index - 1 ] = tmp;
-			return { blocks: blocks, refresh: ! state.refresh };
+			var index = findBlockIndex( dataSource, action.uid );
+			dataSource.moveUp(index)
+			return { dataSource: dataSource, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.MOVE_DOWN:
-			if ( blocks[ blocks.length - 1 ].uid === action.uid ) return state;
-
-			var index = findBlockIndex( blocks, action.uid );
-			var tmp = blocks[ index ];
-			blocks[ index ] = blocks[ index + 1 ];
-			blocks[ index + 1 ] = tmp;
-			return { blocks: blocks, refresh: ! state.refresh };
+			var index = findBlockIndex( dataSource, action.uid );
+			dataSource.moveDown(index)
+			return { dataSource: dataSource, refresh: ! state.refresh };
 		case ActionTypes.BLOCK.DELETE:
-			var index = findBlockIndex( blocks, action.uid );
-			blocks.splice( index, 1 );
-			return { blocks: blocks, refresh: ! state.refresh };
+			var index = findBlockIndex( dataSource, action.uid );
+			dataSource.splice( index, 1 );
+			return { dataSource: dataSource, refresh: ! state.refresh };
 		default:
 			return state;
 	}
