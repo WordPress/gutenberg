@@ -37,12 +37,10 @@ public class ReactAztecText extends AztecText {
     private @Nullable ContentSizeWatcher mContentSizeWatcher;
     private @Nullable ScrollWatcher mScrollWatcher;
 
+    // FIXME: Used in `incrementAndGetEventCounter` but never read. I guess we can get rid of it, but before this
+    // check when it's used in EditText in RN. (maybe tests?)
     private int mNativeEventCount = 0;
 
-   /* public ReactAztecText(ThemedReactContext reactContext, Context context) {
-       this(context, null);
-    }
-*/
     public ReactAztecText(Context context, AttributeSet attrs) {
         super(context, attrs);
         initEditor(context);
@@ -56,7 +54,7 @@ public class ReactAztecText extends AztecText {
         addPlugin(new AudioShortcodePlugin());
         addPlugin(new CssUnderlinePlugin());
         this.setImageGetter(new GlideImageLoader(context));
-        //this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));
+        this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(context));
     }
 
     @Override
