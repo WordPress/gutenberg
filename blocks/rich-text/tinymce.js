@@ -14,6 +14,7 @@ import { Component, Children, createElement } from '@wordpress/element';
  * Internal dependencies
  */
 import { diffAriaProps, pickAriaProps } from './aria';
+import { stringToElement } from './format';
 
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
 export default class TinyMCE extends Component {
@@ -96,7 +97,7 @@ export default class TinyMCE extends Component {
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible } = this.props;
+		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible, format } = this.props;
 		const ariaProps = pickAriaProps( this.props );
 		if ( [ 'ul', 'ol', 'table' ].indexOf( tagName ) === -1 ) {
 			ariaProps.role = 'textbox';
@@ -107,7 +108,7 @@ export default class TinyMCE extends Component {
 		// us to show and focus the content before it's truly ready to edit.
 		let children;
 		if ( defaultValue ) {
-			children = Children.toArray( defaultValue );
+			children = format === 'string' ? stringToElement( defaultValue ) : Children.toArray( defaultValue );
 		}
 
 		return createElement( tagName, {
