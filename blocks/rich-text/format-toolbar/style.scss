@@ -33,6 +33,10 @@
 	}
 }
 
+.blocks-format-toolbar__link-settings-toggle .dashicon {
+	transform: rotate(90deg);
+}
+
 .blocks-format-toolbar__link-value {
 	margin: 10px;
 	flex-grow: 1;
