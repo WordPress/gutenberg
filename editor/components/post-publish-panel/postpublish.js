@@ -15,7 +15,6 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import PostScheduleLabel from '../post-schedule/label';
-import PluginPostPublishPanel from '../../../edit-post/components/plugin-post-publish-panel';
 
 class PostPublishPanelPostpublish extends Component {
 	constructor() {
@@ -84,7 +83,7 @@ class PostPublishPanelPostpublish extends Component {
 						</ClipboardButton>
 					</div>
 				</PanelBody>
-				<PluginPostPublishPanel.Slot />
+				{ this.props.children }
 			</div>
 		);
 	}
