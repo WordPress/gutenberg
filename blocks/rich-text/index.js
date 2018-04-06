@@ -20,15 +20,17 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString } from '@wordpress/element';
-import { keycodes, createBlobURL, isHorizontalEdge } from '@wordpress/utils';
+import { createElement, Component, renderToString, Fragment, compose } from '@wordpress/element';
+import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange, getScrollContainer } from '@wordpress/utils';
 import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { rawHandler } from '../api';
+import Autocomplete from '../autocomplete';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
@@ -407,36 +409,6 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Determines the DOM rectangle for the selection in the editor.
-	 *
-	 * @return {DOMRect} The DOMRect based on the selection in the editor.
-	 */
-	getEditorSelectionRect() {
-		let range = this.editor.selection.getRng();
-
-		// getBoundingClientRect doesn't work in Safari when range is collapsed
-		if ( range.collapsed ) {
-			const { startContainer, startOffset } = range;
-			range = document.createRange();
-
-			if ( ( ! startContainer.nodeValue ) || startContainer.nodeValue.length === 0 ) {
-				// container has no text content, select node (empty block)
-				range.selectNode( startContainer );
-			} else if ( startOffset === startContainer.nodeValue.length ) {
-				// at end of text content, select last character
-				range.setStart( startContainer, startContainer.nodeValue.length - 1 );
-				range.setEnd( startContainer, startContainer.nodeValue.length );
-			} else {
-				// select 1 character from current position
-				range.setStart( startContainer, startOffset );
-				range.setEnd( startContainer, startOffset + 1 );
-			}
-		}
-
-		return range.getBoundingClientRect();
-	}
-
-	/**
 	 * Calculates the relative position where the link toolbar should be.
 	 *
 	 * Based on the selection of the text inside this element a position is
@@ -444,11 +416,11 @@ export class RichText extends Component {
 	 * absolutely position the toolbar. It does this by finding the closest
 	 * relative element.
 	 *
+	 * @param {DOMRect} position Caret range rectangle.
+	 *
 	 * @return {{top: number, left: number}} The desired position of the toolbar.
 	 */
-	getFocusPosition() {
-		const position = this.getEditorSelectionRect();
-
+	getFocusPosition( position ) {
 		// Find the parent "relative" or "absolute" positioned container
 		const findRelativeParent = ( node ) => {
 			const style = window.getComputedStyle( node );
@@ -558,6 +530,40 @@ export class RichText extends Component {
 		if ( keyCode === BACKSPACE ) {
 			this.onChange();
 		}
+
+		// `scrollToRect` is called on `nodechange`, whereas calling it on
+		// `keyup` *when* moving to a new RichText element results in incorrect
+		// scrolling. Though the following allows false positives, it results
+		// in much smoother scrolling.
+		if ( this.props.isViewportSmall && keyCode !== BACKSPACE && keyCode !== ENTER ) {
+			this.scrollToRect( getRectangleFromRange( this.editor.selection.getRng() ) );
+		}
+	}
+
+	scrollToRect( rect ) {
+		const { top: caretTop } = rect;
+		const container = getScrollContainer( this.editor.getBody() );
+
+		if ( ! container ) {
+			return;
+		}
+
+		// When scrolling, avoid positioning the caret at the very top of
+		// the viewport, providing some "air" and some textual context for
+		// the user, and avoiding toolbars.
+		const graceOffset = 100;
+
+		// Avoid pointless scrolling by establishing a threshold under
+		// which scrolling should be skipped;
+		const epsilon = 10;
+		const delta = caretTop - graceOffset;
+
+		if ( Math.abs( delta ) > epsilon ) {
+			container.scrollTo(
+				container.scrollLeft,
+				container.scrollTop + delta,
+			);
+		}
 	}
 
 	/**
@@ -661,8 +667,17 @@ export class RichText extends Component {
 			return accFormats;
 		}, {} );
 
-		const focusPosition = this.getFocusPosition();
+		const rect = getRectangleFromRange( this.editor.selection.getRng() );
+		const focusPosition = this.getFocusPosition( rect );
+
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
+
+		if ( this.props.isViewportSmall ) {
+			// Originally called on `focusin`, that hook turned out to be
+			// premature. On `nodechange` we can work with the finalized TinyMCE
+			// instance and scroll to proper position.
+			this.scrollToRect( rect );
+		}
 	}
 
 	updateContent() {
@@ -784,9 +799,10 @@ export class RichText extends Component {
 			keepPlaceholderOnFocus = false,
 			isSelected = false,
 			formatters,
+			autocompleters,
 		} = this.props;
 
-		const ariaProps = pickAriaProps( this.props );
+		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
@@ -818,27 +834,37 @@ export class RichText extends Component {
 						{ formatToolbar }
 					</div>
 				}
-				<TinyMCE
-					tagName={ Tagname }
-					getSettings={ this.getSettings }
-					onSetup={ this.onSetup }
-					style={ style }
-					defaultValue={ value }
-					isPlaceholderVisible={ isPlaceholderVisible }
-					aria-label={ placeholder }
-					{ ...ariaProps }
-					className={ className }
-					key={ key }
-				/>
-				{ isPlaceholderVisible &&
-					<Tagname
-						className={ classnames( 'blocks-rich-text__tinymce', className ) }
-						style={ style }
-					>
-						{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
-					</Tagname>
-				}
-				{ isSelected && <Slot name="RichText.Siblings" /> }
+				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
+					{ ( { isExpanded, listBoxId, activeId } ) => (
+						<Fragment>
+							<TinyMCE
+								tagName={ Tagname }
+								getSettings={ this.getSettings }
+								onSetup={ this.onSetup }
+								style={ style }
+								defaultValue={ value }
+								isPlaceholderVisible={ isPlaceholderVisible }
+								aria-label={ placeholder }
+								aria-autocomplete="list"
+								aria-expanded={ isExpanded }
+								aria-owns={ listBoxId }
+								aria-activedescendant={ activeId }
+								{ ...ariaProps }
+								className={ className }
+								key={ key }
+							/>
+							{ isPlaceholderVisible &&
+								<Tagname
+									className={ classnames( 'blocks-rich-text__tinymce', className ) }
+									style={ style }
+								>
+									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
+								</Tagname>
+							}
+							{ isSelected && <Slot name="RichText.Siblings" /> }
+						</Fragment>
+					) }
+				</Autocomplete>
 			</div>
 		);
 	}
@@ -856,4 +882,12 @@ RichText.defaultProps = {
 	formatters: [],
 };
 
-export default withSafeTimeout( RichText );
+export default compose( [
+	withSelect( ( select ) => {
+		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
+		return {
+			isViewportSmall: isViewportMatch( '< small' ),
+		};
+	} ),
+	withSafeTimeout,
+] )( RichText );

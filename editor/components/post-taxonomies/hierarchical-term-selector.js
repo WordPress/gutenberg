@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { get, unescape as unescapeString, without, find, some } from 'lodash';
+import { get, unescape as unescapeString, without, find, some, invoke } from 'lodash';
 import { stringify } from 'querystring';
 
 /**
@@ -145,6 +145,7 @@ class HierarchicalTermSelector extends Component {
 					)
 				);
 				this.props.speak( termAddedMessage, 'assertive' );
+				this.addRequest = null;
 				this.setState( {
 					adding: false,
 					formName: '',
@@ -157,6 +158,7 @@ class HierarchicalTermSelector extends Component {
 				if ( xhr.statusText === 'abort' ) {
 					return;
 				}
+				this.addRequest = null;
 				this.setState( {
 					adding: false,
 				} );
@@ -165,34 +167,33 @@ class HierarchicalTermSelector extends Component {
 
 	componentDidMount() {
 		const basePath = wp.api.getTaxonomyRoute( this.props.slug );
-		this.fetchRequest = wp.apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( DEFAULT_QUERY ) }` } )
-			.done( ( terms ) => {
+		this.fetchRequest = wp.apiRequest( { path: `/wp/v2/${ basePath }?${ stringify( DEFAULT_QUERY ) }` } );
+		this.fetchRequest.then(
+			( terms ) => { // resolve
 				const availableTermsTree = buildTermsTree( terms );
 
+				this.fetchRequest = null;
 				this.setState( {
 					loading: false,
 					availableTermsTree,
 					availableTerms: terms,
 				} );
-			} )
-			.fail( ( xhr ) => {
+			},
+			( xhr ) => { // reject
 				if ( xhr.statusText === 'abort' ) {
 					return;
 				}
+				this.fetchRequest = null;
 				this.setState( {
 					loading: false,
 				} );
-			} );
+			}
+		);
 	}
 
 	componentWillUnmount() {
-		if ( this.fetchRequest ) {
-			this.fetchRequest.abort();
-		}
-
-		if ( this.addRequest ) {
-			this.addRequest.abort();
-		}
+		invoke( this.fetchRequest, [ 'abort' ] );
+		invoke( this.addRequest, [ 'abort' ] );
 	}
 
 	renderTerms( renderedTerms ) {

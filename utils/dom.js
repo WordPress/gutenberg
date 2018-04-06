@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { includes, first } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
  * Browser dependencies
  */
-const { getComputedStyle } = window;
-const { TEXT_NODE } = window.Node;
+const { getComputedStyle, DOMRect } = window;
+const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
  * Check whether the caret is horizontally at the edge of the container.
@@ -114,11 +114,7 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 		return false;
 	}
 
-	// Adjust for empty containers.
-	const rangeRect =
-		range.startContainer.nodeType === window.Node.ELEMENT_NODE ?
-			range.startContainer.getBoundingClientRect() :
-			range.getClientRects()[ 0 ];
+	const rangeRect = getRectangleFromRange( range );
 
 	if ( ! rangeRect ) {
 		return false;
@@ -140,11 +136,47 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 	return true;
 }
 
+/**
+ * Get the rectangle of a given Range.
+ *
+ * @param {Range} range The range.
+ *
+ * @return {DOMRect} The rectangle.
+ */
+export function getRectangleFromRange( range ) {
+	// For uncollapsed ranges, get the rectangle that bounds the contents of the
+	// range; this a rectangle enclosing the union of the bounding rectangles
+	// for all the elements in the range.
+	if ( ! range.collapsed ) {
+		return range.getBoundingClientRect();
+	}
+
+	// If the collapsed range starts (and therefore ends) at an element node,
+	// `getClientRects` will return undefined. To fix this we can get the
+	// bounding rectangle of the element node to create a DOMRect based on that.
+	if ( range.startContainer.nodeType === ELEMENT_NODE ) {
+		const { x, y, height } = range.startContainer.getBoundingClientRect();
+
+		// Create a new DOMRect with zero width.
+		return new DOMRect( x, y, 0, height );
+	}
+
+	// For normal collapsed ranges (exception above), the bounding rectangle of
+	// the range may be inaccurate in some browsers. There will only be one
+	// rectangle since it is a collapsed range, so it is safe to pass this as
+	// the union of them. This works consistently in all browsers.
+	return first( range.getClientRects() );
+}
+
+/**
+ * Get the rectangle for the selection in a container.
+ *
+ * @param {Element} container Editable container.
+ *
+ * @return {?DOMRect} The rectangle.
+ */
 export function computeCaretRect( container ) {
-	if (
-		includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ||
-		! container.isContentEditable
-	) {
+	if ( ! container.isContentEditable ) {
 		return;
 	}
 
@@ -155,10 +187,7 @@ export function computeCaretRect( container ) {
 		return;
 	}
 
-	// Adjust for empty containers.
-	return range.startContainer.nodeType === window.Node.ELEMENT_NODE ?
-		range.startContainer.getBoundingClientRect() :
-		range.getClientRects()[ 0 ];
+	return getRectangleFromRange( range );
 }
 
 /**
@@ -377,4 +406,38 @@ export function getScrollContainer( node ) {
 
 	// Continue traversing
 	return getScrollContainer( node.parentNode );
+}
+
+/**
+ * Given two DOM nodes, replaces the former with the latter in the DOM.
+ *
+ * @param {Element} processedNode Node to be removed.
+ * @param {Element} newNode       Node to be inserted in its place.
+ * @return {void}
+ */
+export function replace( processedNode, newNode ) {
+	insertAfter( newNode, processedNode.parentNode );
+	remove( processedNode );
+}
+
+/**
+ * Given a DOM node, removes it from the DOM.
+ *
+ * @param {Element} node Node to be removed.
+ * @return {void}
+ */
+export function remove( node ) {
+	node.parentNode.removeChild( node );
+}
+
+/**
+ * Given two DOM nodes, inserts the former in the DOM as the next sibling of
+ * the latter.
+ *
+ * @param {Element} newNode       Node to be inserted.
+ * @param {Element} referenceNode Node after which to perform the insertion.
+ * @return {void}
+ */
+export function insertAfter( newNode, referenceNode ) {
+	referenceNode.parentNode.insertBefore( newNode, referenceNode.nextSibling );
 }

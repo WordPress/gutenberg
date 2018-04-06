@@ -1,31 +1,29 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Spinner, ResponsiveWrapper, withAPIData } from '@wordpress/components';
+import { Button, Spinner, ResponsiveWrapper } from '@wordpress/components';
 import { MediaUpload } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostFeaturedImageCheck from './check';
-import { getCurrentPostType, getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
 
 //used when labels from post tyoe were not yet loaded or when they are not present.
 const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
 const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove featured image' );
 
 function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
-	const postLabel = get( postType, 'data.labels', {} );
+	const postLabel = get( postType, 'labels', {} );
 
 	return (
 		<PostFeaturedImageCheck>
@@ -38,15 +36,15 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
 							<Button className="button-link editor-post-featured-image__preview" onClick={ open } >
-								{ media && !! media.data &&
+								{ media &&
 									<ResponsiveWrapper
-										naturalWidth={ media.data.media_details.width }
-										naturalHeight={ media.data.media_details.height }
+										naturalWidth={ media.media_details.width }
+										naturalHeight={ media.media_details.height }
 									>
-										<img src={ media.data.source_url } alt={ __( 'Featured image' ) } />
+										<img src={ media.source_url } alt={ __( 'Featured image' ) } />
 									</ResponsiveWrapper>
 								}
-								{ media && media.isLoading && <Spinner /> }
+								{ ! media && <Spinner /> }
 							</Button>
 						) }
 					/>
@@ -79,31 +77,31 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 	);
 }
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			featuredImageId: getEditedPostAttribute( state, 'featured_media' ),
-			postTypeName: getCurrentPostType( state ),
-		};
-	},
-	{
+const applyWithSelect = withSelect( ( select ) => {
+	const { getMedia, getPostType } = select( 'core' );
+	const { getEditedPostAttribute } = select( 'core/editor' );
+	const featuredImageId = getEditedPostAttribute( 'featured_media' );
+
+	return {
+		media: featuredImageId ? getMedia( featuredImageId ) : null,
+		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		featuredImageId,
+	};
+} );
+
+const applyWithDispatch = withDispatch( ( dispatch ) => {
+	const { editPost } = dispatch( 'core/editor' );
+	return {
 		onUpdateImage( image ) {
-			return editPost( { featured_media: image.id } );
+			editPost( { featured_media: image.id } );
 		},
 		onRemoveImage() {
-			return editPost( { featured_media: 0 } );
+			editPost( { featured_media: 0 } );
 		},
-	}
-);
-
-const applyWithAPIData = withAPIData( ( { featuredImageId, postTypeName } ) => {
-	return {
-		media: featuredImageId ? `/wp/v2/media/${ featuredImageId }` : undefined,
-		postType: postTypeName ? `/wp/v2/types/${ postTypeName }?context=edit` : undefined,
 	};
 } );
 
 export default compose(
-	applyConnect,
-	applyWithAPIData,
+	applyWithSelect,
+	applyWithDispatch,
 )( PostFeaturedImage );

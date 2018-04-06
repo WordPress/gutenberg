@@ -3,7 +3,7 @@
  */
 import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
-import isEqualShallow from 'is-equal-shallow';
+import isShallowEqual from 'shallowequal';
 
 /**
  * WordPress dependencies
@@ -24,10 +24,12 @@ import BlockContentProvider from '../block-content-provider';
  *
  * @return {string} The block's default class.
  */
-export function getBlockDefaultClassname( blockName ) {
+export function getBlockDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
 	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
-	return 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+	const className = 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+
+	return applyFilters( 'blocks.getBlockDefaultClassName', className, blockName );
 }
 
 /**
@@ -68,7 +70,7 @@ export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 			attributes
 		);
 
-		if ( ! isEqualShallow( props, element.props ) ) {
+		if ( ! isShallowEqual( props, element.props ) ) {
 			element = cloneElement( element, props );
 		}
 	}

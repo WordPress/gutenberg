@@ -16,6 +16,7 @@ cache:
   directories:
     - $HOME/.composer/cache
     - $HOME/.phpbrew
+    - $HOME/.npm
 
 before_install:
   - nvm install && nvm use

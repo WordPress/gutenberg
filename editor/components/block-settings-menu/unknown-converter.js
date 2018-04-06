@@ -18,7 +18,7 @@ import { compose } from '@wordpress/element';
 import { getBlock, getCurrentPostType } from '../../store/selectors';
 import { replaceBlocks } from '../../store/actions';
 
-export function UnknownConverter( { block, onReplace, small, user } ) {
+export function UnknownConverter( { block, onReplace, small, user, role } ) {
 	if ( ! block || getUnknownTypeHandlerName() !== block.name ) {
 		return null;
 	}
@@ -39,6 +39,7 @@ export function UnknownConverter( { block, onReplace, small, user } ) {
 			onClick={ convertToBlocks }
 			icon="screenoptions"
 			label={ small ? label : undefined }
+			role={ role }
 		>
 			{ ! small && label }
 		</IconButton>

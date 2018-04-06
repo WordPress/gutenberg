@@ -18,6 +18,10 @@ import {
  * Internal dependencies
  */
 import {
+	hasSameKeys,
+	isUpdatingSameBlockAttribute,
+	isUpdatingSamePostProperty,
+	shouldOverwriteState,
 	getPostRawValue,
 	editor,
 	currentPost,
@@ -29,10 +33,221 @@ import {
 	provisionalBlockUID,
 	blocksMode,
 	isInsertionPointVisible,
-	reusableBlocks,
+	sharedBlocks,
+	template,
 } from '../reducer';
 
 describe( 'state', () => {
+	describe( 'hasSameKeys()', () => {
+		it( 'returns false if two objects do not have the same keys', () => {
+			const a = { foo: 10 };
+			const b = { bar: 10 };
+
+			expect( hasSameKeys( a, b ) ).toBe( false );
+		} );
+
+		it( 'returns false if two objects have the same keys', () => {
+			const a = { foo: 10 };
+			const b = { foo: 20 };
+
+			expect( hasSameKeys( a, b ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isUpdatingSameBlockAttribute()', () => {
+		it( 'should return false if not updating block attributes', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not updating the same block', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not updating the same block attributes', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					bar: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating the same block attributes', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isUpdatingSamePostProperty()', () => {
+		it( 'should return false if not editing post', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 10,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not editing the same post properties', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					bar: 20,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating the same post properties', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'shouldOverwriteState()', () => {
+		it( 'should return false if no previous action', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = undefined;
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if the action types are different', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_DIFFERENT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating same block attribute', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				uid: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				attributes: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
+		} );
+
+		it( 'should return true if updating same post property', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'getPostRawValue', () => {
 		it( 'returns original value for non-rendered content', () => {
 			const value = getPostRawValue( '' );
@@ -276,7 +491,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should update the reusable block reference if the temporary id is swapped', () => {
+		it( 'should update the shared block reference if the temporary id is swapped', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
@@ -291,7 +506,7 @@ describe( 'state', () => {
 			} );
 
 			const state = editor( deepFreeze( original ), {
-				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+				type: 'SAVE_SHARED_BLOCK_SUCCESS',
 				id: 'random-uid',
 				updatedId: 3,
 			} );
@@ -667,7 +882,7 @@ describe( 'state', () => {
 			expect( state.present.blockOrder[ '' ] ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
 		} );
 
-		it( 'should remove associated blocks when deleting a reusable block', () => {
+		it( 'should move block to lower index', () => {
 			const original = editor( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ {
@@ -680,22 +895,78 @@ describe( 'state', () => {
 					name: 'core/test-block',
 					attributes: {},
 					innerBlocks: [],
+				}, {
+					uid: 'veggies',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [],
 				} ],
 			} );
 			const state = editor( original, {
-				type: 'REMOVE_REUSABLE_BLOCK',
-				id: 123,
-				associatedBlockUids: [ 'chicken', 'veggies' ],
+				type: 'MOVE_BLOCK_TO_POSITION',
+				uid: 'ribs',
+				index: 0,
 			} );
 
-			expect( state.present.blockOrder[ '' ] ).toEqual( [ 'ribs' ] );
-			expect( state.present.blocksByUid ).toEqual( {
-				ribs: {
+			expect( state.present.blockOrder[ '' ] ).toEqual( [ 'ribs', 'chicken', 'veggies' ] );
+		} );
+
+		it( 'should move block to higher index', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [],
+				}, {
 					uid: 'ribs',
 					name: 'core/test-block',
 					attributes: {},
-				},
+					innerBlocks: [],
+				}, {
+					uid: 'veggies',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [],
+				} ],
 			} );
+			const state = editor( original, {
+				type: 'MOVE_BLOCK_TO_POSITION',
+				uid: 'ribs',
+				index: 2,
+			} );
+
+			expect( state.present.blockOrder[ '' ] ).toEqual( [ 'chicken', 'veggies', 'ribs' ] );
+		} );
+
+		it( 'should not move block if passed same index', () => {
+			const original = editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					uid: 'chicken',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [],
+				}, {
+					uid: 'ribs',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [],
+				}, {
+					uid: 'veggies',
+					name: 'core/test-block',
+					attributes: {},
+					innerBlocks: [],
+				} ],
+			} );
+			const state = editor( original, {
+				type: 'MOVE_BLOCK_TO_POSITION',
+				uid: 'ribs',
+				index: 1,
+			} );
+
+			expect( state.present.blockOrder[ '' ] ).toEqual( [ 'chicken', 'ribs', 'veggies' ] );
 		} );
 
 		describe( 'edits()', () => {
@@ -1237,6 +1508,22 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should reset if replacing with empty set', () => {
+			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
+			const state = blockSelection( original, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'chicken' ],
+				blocks: [],
+			} );
+
+			expect( state ).toEqual( {
+				start: null,
+				end: null,
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+		} );
+
 		it( 'should keep the selected block', () => {
 			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
 			const state = blockSelection( original, {
@@ -1246,6 +1533,41 @@ describe( 'state', () => {
 					uid: 'wings',
 					name: 'core/freeform',
 				} ],
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
+		it( 'should remove the selection if we are removing the selected block', () => {
+			const original = deepFreeze( {
+				start: 'chicken',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+			const state = blockSelection( original, {
+				type: 'REMOVE_BLOCKS',
+				uids: [ 'chicken' ],
+			} );
+
+			expect( state ).toEqual( {
+				start: null,
+				end: null,
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+		} );
+
+		it( 'should keep the selection if we are not removing the selected block', () => {
+			const original = deepFreeze( {
+				start: 'chicken',
+				end: 'chicken',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
+			const state = blockSelection( original, {
+				type: 'REMOVE_BLOCKS',
+				uids: [ 'ribs' ],
 			} );
 
 			expect( state ).toBe( original );
@@ -1322,7 +1644,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should remove recorded reusable blocks that are deleted', () => {
+		it( 'should remove recorded shared blocks that are deleted', () => {
 			const initialState = {
 				insertUsage: {
 					'core/block/123': {
@@ -1334,7 +1656,7 @@ describe( 'state', () => {
 			};
 
 			const state = preferences( deepFreeze( initialState ), {
-				type: 'REMOVE_REUSABLE_BLOCK',
+				type: 'REMOVE_SHARED_BLOCK',
 				id: 123,
 			} );
 
@@ -1475,7 +1797,7 @@ describe( 'state', () => {
 		const PROVISIONAL_UPDATE_ACTION_TYPES = [
 			'UPDATE_BLOCK_ATTRIBUTES',
 			'UPDATE_BLOCK',
-			'CONVERT_BLOCK_TO_REUSABLE',
+			'CONVERT_BLOCK_TO_SHARED',
 		];
 
 		const PROVISIONAL_REPLACE_ACTION_TYPES = [
@@ -1587,9 +1909,9 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'reusableBlocks()', () => {
+	describe( 'sharedBlocks()', () => {
 		it( 'should start out empty', () => {
-			const state = reusableBlocks( undefined, {} );
+			const state = sharedBlocks( undefined, {} );
 			expect( state ).toEqual( {
 				data: {},
 				isFetching: {},
@@ -1597,56 +1919,77 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should add fetched reusable blocks', () => {
-			const reusableBlock = {
+		it( 'should add received shared blocks', () => {
+			const state = sharedBlocks( {}, {
+				type: 'RECEIVE_SHARED_BLOCKS',
+				results: [ {
+					sharedBlock: {
+						id: 123,
+						title: 'My cool block',
+					},
+					parsedBlock: {
+						uid: 'foo',
+					},
+				} ],
+			} );
+
+			expect( state ).toEqual( {
+				data: {
+					123: { uid: 'foo', title: 'My cool block' },
+				},
+				isFetching: {},
+				isSaving: {},
+			} );
+		} );
+
+		it( 'should update a shared block', () => {
+			const initialState = {
+				data: {
+					123: { uid: '', title: '' },
+				},
+				isFetching: {},
+				isSaving: {},
+			};
+
+			const state = sharedBlocks( initialState, {
+				type: 'UPDATE_SHARED_BLOCK_TITLE',
 				id: 123,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-
-			const state = reusableBlocks( {}, {
-				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
-				reusableBlocks: [ reusableBlock ],
+				title: 'My block',
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					[ reusableBlock.id ]: reusableBlock,
+					123: { uid: '', title: 'My block' },
 				},
 				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
-		it( 'should add a reusable block', () => {
-			const reusableBlock = {
-				id: 123,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
+		it( 'should update the shared block\'s id if it was temporary', () => {
+			const initialState = {
+				data: {
+					shared1: { uid: '', title: '' },
 				},
+				isSaving: {},
 			};
 
-			const state = reusableBlocks( {}, {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id: reusableBlock.id,
-				reusableBlock,
+			const state = sharedBlocks( initialState, {
+				type: 'SAVE_SHARED_BLOCK_SUCCESS',
+				id: 'shared1',
+				updatedId: 123,
 			} );
 
 			expect( state ).toEqual( {
 				data: {
-					[ reusableBlock.id ]: reusableBlock,
+					123: { uid: '', title: '' },
 				},
 				isFetching: {},
 				isSaving: {},
 			} );
 		} );
 
-		it( 'should update a reusable block', () => {
+		it( 'should remove a shared block', () => {
 			const id = 123;
 			const initialState = {
 				data: {
@@ -1664,95 +2007,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = reusableBlocks( initialState, {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id,
-				reusableBlock: {
-					name: 'My better block',
-					attributes: {
-						content: 'Yo!',
-					},
-				},
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					[ id ]: {
-						id,
-						name: 'My better block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Yo!',
-							dropCap: true,
-						},
-					},
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should update the reusable block\'s id if it was temporary', () => {
-			const id = 123;
-			const initialState = {
-				data: {
-					[ id ]: {
-						id,
-						isTemporary: true,
-						name: 'My cool block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Hello!',
-							dropCap: true,
-						},
-					},
-				},
-				isSaving: {},
-			};
-
-			const state = reusableBlocks( initialState, {
-				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-				id,
-				updatedId: 3,
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					3: {
-						id: 3,
-						name: 'My cool block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Hello!',
-							dropCap: true,
-						},
-					},
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should remove a reusable block', () => {
-			const id = 123;
-			const initialState = {
-				data: {
-					[ id ]: {
-						id,
-						name: 'My cool block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Hello!',
-							dropCap: true,
-						},
-					},
-				},
-				isFetching: {},
-				isSaving: {},
-			};
-
-			const state = reusableBlocks( deepFreeze( initialState ), {
-				type: 'REMOVE_REUSABLE_BLOCK',
+			const state = sharedBlocks( deepFreeze( initialState ), {
+				type: 'REMOVE_SHARED_BLOCK',
 				id,
 			} );
 
@@ -1763,7 +2019,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should indicate that a reusable block is fetching', () => {
+		it( 'should indicate that a shared block is fetching', () => {
 			const id = 123;
 			const initialState = {
 				data: {},
@@ -1771,8 +2027,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = reusableBlocks( initialState, {
-				type: 'FETCH_REUSABLE_BLOCKS',
+			const state = sharedBlocks( initialState, {
+				type: 'FETCH_SHARED_BLOCKS',
 				id,
 			} );
 
@@ -1785,7 +2041,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should stop indicating that a reusable block is saving when the fetch succeeded', () => {
+		it( 'should stop indicating that a shared block is saving when the fetch succeeded', () => {
 			const id = 123;
 			const initialState = {
 				data: {
@@ -1797,8 +2053,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = reusableBlocks( initialState, {
-				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+			const state = sharedBlocks( initialState, {
+				type: 'FETCH_SHARED_BLOCKS_SUCCESS',
 				id,
 				updatedId: id,
 			} );
@@ -1812,7 +2068,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should stop indicating that a reusable block is fetching when there is an error', () => {
+		it( 'should stop indicating that a shared block is fetching when there is an error', () => {
 			const id = 123;
 			const initialState = {
 				data: {},
@@ -1822,8 +2078,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = reusableBlocks( initialState, {
-				type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+			const state = sharedBlocks( initialState, {
+				type: 'FETCH_SHARED_BLOCKS_FAILURE',
 				id,
 			} );
 
@@ -1834,7 +2090,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should indicate that a reusable block is saving', () => {
+		it( 'should indicate that a shared block is saving', () => {
 			const id = 123;
 			const initialState = {
 				data: {},
@@ -1842,8 +2098,8 @@ describe( 'state', () => {
 				isSaving: {},
 			};
 
-			const state = reusableBlocks( initialState, {
-				type: 'SAVE_REUSABLE_BLOCK',
+			const state = sharedBlocks( initialState, {
+				type: 'SAVE_SHARED_BLOCK',
 				id,
 			} );
 
@@ -1856,7 +2112,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should stop indicating that a reusable block is saving when the save succeeded', () => {
+		it( 'should stop indicating that a shared block is saving when the save succeeded', () => {
 			const id = 123;
 			const initialState = {
 				data: {
@@ -1868,8 +2124,8 @@ describe( 'state', () => {
 				},
 			};
 
-			const state = reusableBlocks( initialState, {
-				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
+			const state = sharedBlocks( initialState, {
+				type: 'SAVE_SHARED_BLOCK_SUCCESS',
 				id,
 				updatedId: id,
 			} );
@@ -1883,7 +2139,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should stop indicating that a reusable block is saving when there is an error', () => {
+		it( 'should stop indicating that a shared block is saving when there is an error', () => {
 			const id = 123;
 			const initialState = {
 				data: {},
@@ -1893,8 +2149,8 @@ describe( 'state', () => {
 				},
 			};
 
-			const state = reusableBlocks( initialState, {
-				type: 'SAVE_REUSABLE_BLOCK_FAILURE',
+			const state = sharedBlocks( initialState, {
+				type: 'SAVE_SHARED_BLOCK_FAILURE',
 				id,
 			} );
 
@@ -1903,6 +2159,34 @@ describe( 'state', () => {
 				isFetching: {},
 				isSaving: {},
 			} );
+		} );
+	} );
+
+	describe( 'template', () => {
+		it( 'should default to visible', () => {
+			const state = template( undefined, {} );
+
+			expect( state ).toEqual( { isValid: true } );
+		} );
+
+		it( 'should set the template', () => {
+			const blockTemplate = [ [ 'core/paragraph' ] ];
+			const state = template( undefined, {
+				type: 'SETUP_EDITOR',
+				settings: { template: blockTemplate, templateLock: 'all' },
+			} );
+
+			expect( state ).toEqual( { isValid: true, template: blockTemplate, lock: 'all' } );
+		} );
+
+		it( 'should reset the validity flag', () => {
+			const original = deepFreeze( { isValid: false, template: [] } );
+			const state = template( original, {
+				type: 'SET_TEMPLATE_VALIDITY',
+				isValid: true,
+			} );
+
+			expect( state ).toEqual( { isValid: true, template: [] } );
 		} );
 	} );
 } );

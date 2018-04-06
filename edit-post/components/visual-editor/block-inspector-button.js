@@ -18,12 +18,13 @@ export function BlockInspectorButton( {
 	onClick = noop,
 	small = false,
 	speak,
+	role,
 } ) {
 	const speakMessage = () => {
 		if ( areAdvancedSettingsOpened ) {
-			speak( __( 'Additional settings are now available in the Editor advanced settings sidebar' ) );
-		} else {
 			speak( __( 'Advanced settings closed' ) );
+		} else {
+			speak( __( 'Additional settings are now available in the Editor advanced settings sidebar' ) );
 		}
 	};
 
@@ -35,6 +36,7 @@ export function BlockInspectorButton( {
 			onClick={ flow( areAdvancedSettingsOpened ? closeSidebar : openEditorSidebar, speakMessage, onClick ) }
 			icon="admin-generic"
 			label={ small ? label : undefined }
+			role={ role }
 		>
 			{ ! small && label }
 		</IconButton>

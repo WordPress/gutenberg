@@ -8,21 +8,23 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { MenuItemsGroup, MenuItemsToggle, withInstanceId } from '@wordpress/components';
+import { MenuGroup, MenuItem, withInstanceId } from '@wordpress/components';
 import { ifViewportMatches } from '@wordpress/viewport';
 
 function FeatureToggle( { onToggle, isActive } ) {
 	return (
-		<MenuItemsGroup
+		<MenuGroup
 			label={ __( 'Settings' ) }
 			filterName="editPost.MoreMenu.settings"
 		>
-			<MenuItemsToggle
-				label={ __( 'Fix Toolbar to Top' ) }
+			<MenuItem
+				icon={ isActive && 'yes' }
 				isSelected={ isActive }
 				onClick={ onToggle }
-			/>
-		</MenuItemsGroup>
+			>
+				{ __( 'Fix Toolbar to Top' ) }
+			</MenuItem>
+		</MenuGroup>
 	);
 }
 

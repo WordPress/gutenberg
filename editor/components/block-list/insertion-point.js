@@ -8,7 +8,8 @@ import { connect } from 'react-redux';
  */
 import { __ } from '@wordpress/i18n';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
+import { ifCondition, withContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -53,24 +54,27 @@ class BlockInsertionPoint extends Component {
 		);
 	}
 }
+export default compose(
+	withContext( 'editor' )( ( { templateLock } ) => ( { templateLock } ) ),
+	ifCondition( ( { templateLock } ) => ! templateLock ),
+	connect(
+		( state, { uid, rootUID } ) => {
+			const blockIndex = uid ? getBlockIndex( state, uid, rootUID ) : -1;
+			const insertIndex = blockIndex;
+			const insertionPoint = getBlockInsertionPoint( state );
+			const block = uid ? getBlock( state, uid ) : null;
 
-export default connect(
-	( state, { uid, rootUID } ) => {
-		const blockIndex = uid ? getBlockIndex( state, uid, rootUID ) : -1;
-		const insertIndex = blockIndex + 1;
-		const insertionPoint = getBlockInsertionPoint( state );
-		const block = uid ? getBlock( state, uid ) : null;
-
-		return {
-			showInsertionPoint: (
-				isBlockInsertionPointVisible( state ) &&
+			return {
+				showInsertionPoint: (
+					isBlockInsertionPointVisible( state ) &&
 				insertionPoint.index === insertIndex &&
 				insertionPoint.rootUID === rootUID &&
 				( ! block || ! isUnmodifiedDefaultBlock( block ) )
-			),
-			showInserter: ! isTyping( state ),
-			index: insertIndex,
-		};
-	},
-	{ insertDefaultBlock, startTyping }
+				),
+				showInserter: ! isTyping( state ),
+				index: insertIndex,
+			};
+		},
+		{ insertDefaultBlock, startTyping }
+	)
 )( BlockInsertionPoint );

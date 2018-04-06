@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
 import { filter, property, union } from 'lodash';
 
 /**
@@ -9,6 +8,7 @@ import { filter, property, union } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { registerBlockType, unregisterBlockType, registerCoreBlocks, getBlockTypes } from '@wordpress/blocks';
+import { moment } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -30,16 +30,20 @@ const {
 	getDocumentTitle,
 	getEditedPostExcerpt,
 	getEditedPostVisibility,
+	isCurrentPostPending,
 	isCurrentPostPublished,
+	isCurrentPostScheduled,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
 	getBlockDependantsCacheBust,
+	getBlockName,
 	getBlock,
 	getBlocks,
 	getBlockCount,
+	hasSelectedBlock,
 	getSelectedBlock,
 	getBlockRootUID,
 	getEditedPostAttribute,
@@ -53,6 +57,7 @@ const {
 	getNextBlockUid,
 	isBlockSelected,
 	isBlockWithinSelection,
+	hasMultiSelection,
 	isBlockMultiSelected,
 	isFirstMultiSelectedBlock,
 	getBlockMode,
@@ -64,15 +69,19 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getNotices,
-	getReusableBlock,
-	isSavingReusableBlock,
+	getSharedBlock,
+	isSavingSharedBlock,
+	isFetchingSharedBlock,
 	isSelectionEnabled,
-	getReusableBlocks,
+	getSharedBlocks,
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
 	getInserterItems,
 	getFrecentInserterItems,
 	getProvisionalBlockUID,
+	isValidTemplate,
+	getTemplate,
+	getTemplateLock,
 	POST_UPDATE_TRANSACTION_ID,
 } = selectors;
 
@@ -581,6 +590,36 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isCurrentPostPending', () => {
+		it( 'should return true for posts in pending state', () => {
+			const state = {
+				currentPost: {
+					status: 'pending',
+				},
+			};
+
+			expect( isCurrentPostPending( state ) ).toBe( true );
+		} );
+
+		it( 'should return false for draft posts', () => {
+			const state = {
+				currentPost: {
+					status: 'draft',
+				},
+			};
+
+			expect( isCurrentPostPending( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if status is unknown', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( isCurrentPostPending( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isCurrentPostPublished', () => {
 		it( 'should return true for public posts', () => {
 			const state = {
@@ -621,6 +660,48 @@ describe( 'selectors', () => {
 			};
 
 			expect( isCurrentPostPublished( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isCurrentPostScheduled', () => {
+		it( 'should return true for future scheduled posts', () => {
+			const state = {
+				currentPost: {
+					status: 'future',
+					date: '2100-05-30T17:21:39',
+				},
+			};
+
+			expect( isCurrentPostScheduled( state ) ).toBe( true );
+		} );
+
+		it( 'should return false for old scheduled posts that were already published', () => {
+			const state = {
+				currentPost: {
+					status: 'future',
+					date: '2016-05-30T17:21:39',
+				},
+			};
+
+			expect( isCurrentPostScheduled( state ) ).toBe( false );
+		} );
+
+		it( 'should return false for auto draft posts', () => {
+			const state = {
+				currentPost: {
+					status: 'auto-draft',
+				},
+			};
+
+			expect( isCurrentPostScheduled( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if status is unknown', () => {
+			const state = {
+				currentPost: {},
+			};
+
+			expect( isCurrentPostScheduled( state ) ).toBe( false );
 		} );
 	} );
 
@@ -1142,6 +1223,51 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getBlockName', () => {
+		it( 'returns null if no block by uid', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+			};
+
+			const name = getBlockName( state, 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' );
+
+			expect( name ).toBe( null );
+		} );
+
+		it( 'returns block name', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+								uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+								name: 'core/paragraph',
+								attributes: {},
+							},
+						},
+						blockOrder: {
+							'': [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': [],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			const name = getBlockName( state, 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' );
+
+			expect( name ).toBe( 'core/paragraph' );
+		} );
+	} );
+
 	describe( 'getBlock', () => {
 		it( 'should return the block', () => {
 			const state = {
@@ -1322,6 +1448,41 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockCount( state, '123' ) ).toBe( 2 );
+		} );
+	} );
+
+	describe( 'hasSelectedBlock', () => {
+		it( 'should return false if no selection', () => {
+			const state = {
+				blockSelection: {
+					start: null,
+					end: null,
+				},
+			};
+
+			expect( hasSelectedBlock( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if multi-selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				},
+			};
+
+			expect( hasSelectedBlock( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if singular selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				},
+			};
+
+			expect( hasSelectedBlock( state ) ).toBe( true );
 		} );
 	} );
 
@@ -1804,6 +1965,41 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'hasMultiSelection', () => {
+		it( 'should return false if no selection', () => {
+			const state = {
+				blockSelection: {
+					start: null,
+					end: null,
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if singular selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if multi-selection', () => {
+			const state = {
+				blockSelection: {
+					start: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+					end: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				},
+			};
+
+			expect( hasMultiSelection( state ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'isBlockMultiSelected', () => {
 		const state = {
 			editor: {
@@ -2278,7 +2474,7 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
@@ -2297,7 +2493,7 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
@@ -2330,7 +2526,7 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
@@ -2339,23 +2535,21 @@ describe( 'selectors', () => {
 			expect( items[ 0 ].isDisabled ).toBe( true );
 		} );
 
-		it( 'should properly list reusable blocks', () => {
+		it( 'should properly list shared blocks', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUid: {
+							carrot: { name: 'core/test-block' },
+						},
 						blockOrder: {},
 						edits: {},
 					},
 				},
 				currentPost: {},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {
-						123: {
-							id: 123,
-							title: 'My reusable block',
-							type: 'core/test-block',
-						},
+						123: { uid: 'carrot', title: 'My shared block' },
 					},
 				},
 			};
@@ -2365,7 +2559,7 @@ describe( 'selectors', () => {
 					id: 'core/block/123',
 					name: 'core/block',
 					initialAttributes: { ref: 123 },
-					title: 'My reusable block',
+					title: 'My shared block',
 					icon: 'test',
 					category: 'shared',
 					keywords: [],
@@ -2389,7 +2583,7 @@ describe( 'selectors', () => {
 				preferences: {
 					insertUsage: {
 						'core/deleted-block': { time: 1000, count: 10, insert: { name: 'core/deleted-block' } }, // Deleted blocks should be filtered out
-						'core/block/456': { time: 1000, count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted reusable blocks should be filtered out
+						'core/block/456': { time: 1000, count: 4, insert: { name: 'core/block', ref: 456 } }, // Deleted shared blocks should be filtered out
 						'core/image': { time: 1000, count: 3, insert: { name: 'core/image' } },
 						'core/block/123': { time: 1000, count: 5, insert: { name: 'core/block', ref: 123 } },
 						'core/paragraph': { time: 1000, count: 2, insert: { name: 'core/paragraph' } },
@@ -2397,20 +2591,73 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
+						blocksByUid: {
+							carrot: { name: 'core/test-block' },
+						},
 						blockOrder: [],
+						edits: {},
 					},
 				},
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {
-						123: { id: 123, type: 'core/test-block' },
+						123: { uid: 'carrot' },
 					},
 				},
+				currentPost: {},
 			};
 
 			expect( getFrecentInserterItems( state, true, 3 ) ).toMatchObject( [
 				{ name: 'core/block', initialAttributes: { ref: 123 } },
 				{ name: 'core/image', initialAttributes: {} },
 				{ name: 'core/paragraph', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should weight by time', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/image': { time: Date.now() - 1000, count: 2, insert: { name: 'core/image' } },
+						'core/paragraph': { time: Date.now() - 4000, count: 3, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				sharedBlocks: {
+					data: {},
+				},
+			};
+
+			expect( getFrecentInserterItems( state, true, 2 ) ).toMatchObject( [
+				{ name: 'core/image', initialAttributes: {} },
+				{ name: 'core/paragraph', initialAttributes: {} },
+			] );
+		} );
+
+		it( 'should be backwards-compatible with old preferences values', () => {
+			const state = {
+				preferences: {
+					insertUsage: {
+						'core/image': { time: Date.now(), count: 1, insert: { name: 'core/image' } },
+						'core/paragraph': { time: undefined, count: 5, insert: { name: 'core/paragraph' } },
+					},
+				},
+				editor: {
+					present: {
+						blockOrder: [],
+					},
+				},
+				sharedBlocks: {
+					data: {},
+				},
+			};
+
+			expect( getFrecentInserterItems( state, true, 2 ) ).toMatchObject( [
+				{ name: 'core/paragraph', initialAttributes: {} },
+				{ name: 'core/image', initialAttributes: {} },
 			] );
 		} );
 
@@ -2435,108 +2682,140 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getReusableBlock', () => {
-		it( 'should return a reusable block', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			const expectedReusableBlock = {
-				id,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
+	describe( 'getSharedBlock', () => {
+		it( 'should return a shared block', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {
-						[ id ]: expectedReusableBlock,
+						8109: {
+							uid: 'foo',
+							title: 'My cool block',
+						},
 					},
 				},
 			};
 
-			const actualReusableBlock = getReusableBlock( state, id );
-			expect( actualReusableBlock ).toEqual( expectedReusableBlock );
+			const actualSharedBlock = getSharedBlock( state, 8109 );
+			expect( actualSharedBlock ).toEqual( {
+				id: 8109,
+				isTemporary: false,
+				uid: 'foo',
+				title: 'My cool block',
+			} );
 		} );
 
-		it( 'should return null when no reusable block exists', () => {
+		it( 'should return a temporary shared block', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
+					data: {
+						shared1: {
+							uid: 'foo',
+							title: 'My cool block',
+						},
+					},
+				},
+			};
+
+			const actualSharedBlock = getSharedBlock( state, 'shared1' );
+			expect( actualSharedBlock ).toEqual( {
+				id: 'shared1',
+				isTemporary: true,
+				uid: 'foo',
+				title: 'My cool block',
+			} );
+		} );
+
+		it( 'should return null when no shared block exists', () => {
+			const state = {
+				sharedBlocks: {
 					data: {},
 				},
 			};
 
-			const reusableBlock = getReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
-			expect( reusableBlock ).toBeNull();
+			const sharedBlock = getSharedBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
+			expect( sharedBlock ).toBeNull();
 		} );
 	} );
 
-	describe( 'isSavingReusableBlock', () => {
+	describe( 'isSavingSharedBlock', () => {
 		it( 'should return false when the block is not being saved', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					isSaving: {},
 				},
 			};
 
-			const isSaving = isSavingReusableBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
+			const isSaving = isSavingSharedBlock( state, 5187 );
 			expect( isSaving ).toBe( false );
 		} );
 
 		it( 'should return true when the block is being saved', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					isSaving: {
-						[ id ]: true,
+						5187: true,
 					},
 				},
 			};
 
-			const isSaving = isSavingReusableBlock( state, id );
+			const isSaving = isSavingSharedBlock( state, 5187 );
 			expect( isSaving ).toBe( true );
 		} );
 	} );
 
-	describe( 'getReusableBlocks', () => {
-		it( 'should return an array of reusable blocks', () => {
-			const reusableBlock1 = {
-				id: '358b59ee-bab3-4d6f-8445-e8c6971a5605',
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-			const reusableBlock2 = {
-				id: '687e1a87-cca1-41f2-a782-197ddaea9abf',
-				name: 'My neat block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Goodbye!',
-				},
-			};
+	describe( 'isFetchingSharedBlock', () => {
+		it( 'should return false when the block is not being fetched', () => {
 			const state = {
-				reusableBlocks: {
-					data: {
-						[ reusableBlock1.id ]: reusableBlock1,
-						[ reusableBlock2.id ]: reusableBlock2,
+				sharedBlocks: {
+					isFetching: {},
+				},
+			};
+
+			const isFetching = isFetchingSharedBlock( state, 5187 );
+			expect( isFetching ).toBe( false );
+		} );
+
+		it( 'should return true when the block is being fetched', () => {
+			const state = {
+				sharedBlocks: {
+					isFetching: {
+						5187: true,
 					},
 				},
 			};
 
-			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [ reusableBlock1, reusableBlock2 ] );
+			const isFetching = isFetchingSharedBlock( state, 5187 );
+			expect( isFetching ).toBe( true );
+		} );
+	} );
+
+	describe( 'getSharedBlocks', () => {
+		it( 'should return an array of shared blocks', () => {
+			const state = {
+				sharedBlocks: {
+					data: {
+						123: { uid: 'carrot' },
+						shared1: { uid: 'broccoli' },
+					},
+				},
+			};
+
+			const sharedBlocks = getSharedBlocks( state );
+			expect( sharedBlocks ).toEqual( [
+				{ id: 123, isTemporary: false, uid: 'carrot' },
+				{ id: 'shared1', isTemporary: true, uid: 'broccoli' },
+			] );
 		} );
 
-		it( 'should return an empty array when no reusable blocks exist', () => {
+		it( 'should return an empty array when no shared blocks exist', () => {
 			const state = {
-				reusableBlocks: {
+				sharedBlocks: {
 					data: {},
 				},
 			};
 
-			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [] );
+			const sharedBlocks = getSharedBlocks( state );
+			expect( sharedBlocks ).toEqual( [] );
 		} );
 	} );
 
@@ -2726,6 +3005,45 @@ describe( 'selectors', () => {
 			} );
 
 			expect( provisionalBlockUID ).toBe( 'chicken' );
+		} );
+	} );
+
+	describe( 'isValidTemplate', () => {
+		it( 'should return true if template is valid', () => {
+			const state = {
+				template: { isValid: true },
+			};
+
+			expect( isValidTemplate( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if template is not valid', () => {
+			const state = {
+				template: { isValid: false },
+			};
+
+			expect( isValidTemplate( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getTemplate', () => {
+		it( 'should return the template object', () => {
+			const template = [];
+			const state = {
+				template: { isValid: true, template },
+			};
+
+			expect( getTemplate( state ) ).toBe( template );
+		} );
+	} );
+
+	describe( 'getTemplateLock', () => {
+		it( 'should return the template object', () => {
+			const state = {
+				template: { isValid: true, lock: 'all' },
+			};
+
+			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 	} );
 } );

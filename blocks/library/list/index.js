@@ -234,6 +234,7 @@ export const settings = {
 				setAttributes,
 				mergeBlocks,
 				onReplace,
+				className,
 			} = this.props;
 			const { nodeName, values } = attributes;
 
@@ -276,6 +277,7 @@ export const settings = {
 					onChange={ this.setNextValues }
 					value={ values }
 					wrapperClassName="blocks-list"
+					className={ className }
 					placeholder={ __( 'Write list…' ) }
 					onMerge={ mergeBlocks }
 					onSplit={

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { find, get, escapeRegExp, groupBy, drop } from 'lodash';
+import { filter, escapeRegExp, groupBy, drop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,7 @@ import { keycodes } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import { getBlockTypes } from '../api/registration';
+import { getBlockTransforms, findTransform } from '../api/factory';
 
 const { ESCAPE, ENTER, SPACE, BACKSPACE } = keycodes;
 
@@ -26,11 +26,7 @@ export default function( editor ) {
 	const {
 		enter: enterPatterns,
 		undefined: spacePatterns,
-	} = groupBy( getBlockTypes().reduce( ( acc, blockType ) => {
-		const transformsFrom = get( blockType, 'transforms.from', [] );
-		const transforms = transformsFrom.filter( ( { type } ) => type === 'pattern' );
-		return [ ...acc, ...transforms ];
-	}, [] ), 'trigger' );
+	} = groupBy( filter( getBlockTransforms( 'from' ), { type: 'pattern' } ), 'trigger' );
 
 	const inlinePatterns = settings.inline || [
 		{ delimiter: '`', format: 'code' },
@@ -56,7 +52,7 @@ export default function( editor ) {
 		}
 
 		if ( keyCode === ENTER ) {
-			enter();
+			enter( event );
 		// Wait for the browser to insert the character.
 		} else if ( keyCode === SPACE ) {
 			setTimeout( () => searchFirstText( spacePatterns ) );
@@ -181,16 +177,15 @@ export default function( editor ) {
 
 		const firstText = content[ 0 ];
 
-		const { result, pattern } = patterns.reduce( ( acc, item ) => {
-			return acc.result ? acc : {
-				result: item.regExp.exec( firstText ),
-				pattern: item,
-			};
-		}, {} );
+		const transformation = findTransform( patterns, ( item ) => {
+			return item.regExp.test( firstText );
+		} );
 
-		if ( ! result ) {
+		if ( ! transformation ) {
 			return;
 		}
+
+		const result = firstText.match( transformation.regExp );
 
 		const range = editor.selection.getRng();
 		const matchLength = result[ 0 ].length;
@@ -201,7 +196,7 @@ export default function( editor ) {
 			return;
 		}
 
-		const block = pattern.transform( {
+		const block = transformation.transform( {
 			content: [ remainingText, ...drop( content ) ],
 			match: result,
 		} );
@@ -209,7 +204,7 @@ export default function( editor ) {
 		onReplace( [ block ] );
 	}
 
-	function enter() {
+	function enter( event ) {
 		if ( ! onReplace ) {
 			return;
 		}
@@ -223,14 +218,18 @@ export default function( editor ) {
 			return;
 		}
 
-		const pattern = find( enterPatterns, ( { regExp } ) => regExp.test( content[ 0 ] ) );
+		const pattern = findTransform( enterPatterns, ( { regExp } ) => regExp.test( content[ 0 ] ) );
 
 		if ( ! pattern ) {
 			return;
 		}
 
 		const block = pattern.transform( { content } );
+		onReplace( [ block ] );
 
-		editor.once( 'keyup', () => onReplace( [ block ] ) );
+		// We call preventDefault to prevent additional newlines.
+		event.preventDefault();
+		// stopImmediatePropagation is called to prevent TinyMCE's own processing of keydown which conflicts with the block replacement.
+		event.stopImmediatePropagation();
 	}
 }
