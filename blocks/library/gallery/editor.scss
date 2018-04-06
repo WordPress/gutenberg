@@ -1,4 +1,4 @@
-.wp-block-gallery:not( .components-placeholder ):not( .alignfull ) {
+.gutenberg .wp-block-gallery:not( .components-placeholder ) {
 	// allow gallery items to go edge to edge
 	margin-left: -8px;
 	margin-right: -8px;

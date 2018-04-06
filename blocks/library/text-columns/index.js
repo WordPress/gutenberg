@@ -7,7 +7,7 @@ import { times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RangeControl } from '@wordpress/components';
+import { PanelBody, RangeControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -73,13 +73,15 @@ export const settings = {
 			),
 			isSelected && (
 				<InspectorControls key="inspector">
-					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ ( value ) => setAttributes( { columns: value } ) }
-						min={ 2 }
-						max={ 4 }
-					/>
+					<PanelBody>
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ ( value ) => setAttributes( { columns: value } ) }
+							min={ 2 }
+							max={ 4 }
+						/>
+					</PanelBody>
 				</InspectorControls>
 			),
 			<div className={ `${ className } align${ width } columns-${ columns }` } key="block">

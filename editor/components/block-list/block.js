@@ -22,7 +22,7 @@ import {
 	cloneBlock,
 	getBlockType,
 	getSaveElement,
-	isReusableBlock,
+	isSharedBlock,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { withFilters, withContext } from '@wordpress/components';
@@ -440,7 +440,7 @@ export class BlockListBlock extends Component {
 			'is-selected': shouldAppearSelected,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
-			'is-reusable': isReusableBlock( blockType ),
+			'is-shared': isSharedBlock( blockType ),
 			'is-hidden': dragging,
 			'is-typing': isTypingWithinBlock,
 		} );

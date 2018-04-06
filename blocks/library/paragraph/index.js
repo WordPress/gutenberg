@@ -10,7 +10,6 @@ import { findKey, isFinite, map, omit } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { concatChildren, Component, RawHTML } from '@wordpress/element';
 import {
-	Autocomplete,
 	PanelBody,
 	PanelColor,
 	RangeControl,
@@ -26,7 +25,8 @@ import {
 import './editor.scss';
 import './style.scss';
 import { createBlock } from '../../api';
-import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
+import { blockAutocompleter } from '../../autocompleters';
+import { defaultAutocompleters } from '../../hooks/default-autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
@@ -55,6 +55,8 @@ const FONT_SIZES = {
 	large: 36,
 	larger: 48,
 };
+
+const autocompleters = [ blockAutocompleter, ...defaultAutocompleters ];
 
 class ParagraphBlock extends Component {
 	constructor() {
@@ -102,6 +104,8 @@ class ParagraphBlock extends Component {
 		if ( customFontSize ) {
 			return customFontSize;
 		}
+
+		return FONT_SIZES.regular;
 	}
 
 	setFontSize( fontSizeValue ) {
@@ -184,8 +188,9 @@ class ParagraphBlock extends Component {
 							</Button>
 						</div>
 						<RangeControl
+							className="blocks-paragraph__custom-size-slider"
 							label={ __( 'Custom Size' ) }
-							value={ fontSize || '' }
+							value={ fontSize }
 							onChange={ ( value ) => this.setFontSize( value ) }
 							min={ 12 }
 							max={ 100 }
@@ -225,51 +230,41 @@ class ParagraphBlock extends Component {
 				</InspectorControls>
 			),
 			<div key="editable" ref={ this.bindRef }>
-				<Autocomplete completers={ [
-					blockAutocompleter( { onReplace } ),
-					userAutocompleter(),
-				] }>
-					{ ( { isExpanded, listBoxId, activeId } ) => (
-						<RichText
-							tagName="p"
-							className={ classnames( 'wp-block-paragraph', className, {
-								'has-background': backgroundColor,
-								'has-drop-cap': dropCap,
-							} ) }
-							style={ {
-								backgroundColor: backgroundColor,
-								color: textColor,
-								fontSize: fontSize ? fontSize + 'px' : undefined,
-								textAlign: align,
-							} }
-							value={ content }
-							onChange={ ( nextContent ) => {
-								setAttributes( {
-									content: nextContent,
-								} );
-							} }
-							onSplit={ insertBlocksAfter ?
-								( before, after, ...blocks ) => {
-									setAttributes( { content: before } );
-									insertBlocksAfter( [
-										...blocks,
-										createBlock( 'core/paragraph', { content: after } ),
-									] );
-								} :
-								undefined
-							}
-							onMerge={ mergeBlocks }
-							onReplace={ this.onReplace }
-							onRemove={ () => onReplace( [] ) }
-							placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-							aria-autocomplete="list"
-							aria-expanded={ isExpanded }
-							aria-owns={ listBoxId }
-							aria-activedescendant={ activeId }
-							isSelected={ isSelected }
-						/>
-					) }
-				</Autocomplete>
+				<RichText
+					tagName="p"
+					className={ classnames( 'wp-block-paragraph', className, {
+						'has-background': backgroundColor,
+						'has-drop-cap': dropCap,
+					} ) }
+					style={ {
+						backgroundColor: backgroundColor,
+						color: textColor,
+						fontSize: fontSize !== FONT_SIZES.regular ? fontSize + 'px' : undefined,
+						textAlign: align,
+					} }
+					value={ content }
+					onChange={ ( nextContent ) => {
+						setAttributes( {
+							content: nextContent,
+						} );
+					} }
+					onSplit={ insertBlocksAfter ?
+						( before, after, ...blocks ) => {
+							setAttributes( { content: before } );
+							insertBlocksAfter( [
+								...blocks,
+								createBlock( 'core/paragraph', { content: after } ),
+							] );
+						} :
+						undefined
+					}
+					onMerge={ mergeBlocks }
+					onReplace={ this.onReplace }
+					onRemove={ () => onReplace( [] ) }
+					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+					isSelected={ isSelected }
+					autocompleters={ autocompleters }
+				/>
 			</div>,
 		];
 	}

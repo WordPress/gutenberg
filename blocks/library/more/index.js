@@ -7,7 +7,7 @@ import { compact } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToggleControl } from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { Component, RawHTML } from '@wordpress/element';
 
 /**
@@ -100,11 +100,13 @@ export const settings = {
 			return [
 				isSelected && (
 					<InspectorControls key="inspector">
-						<ToggleControl
-							label={ __( 'Hide the teaser before the "More" tag' ) }
-							checked={ !! noTeaser }
-							onChange={ toggleNoTeaser }
-						/>
+						<PanelBody>
+							<ToggleControl
+								label={ __( 'Hide the teaser before the "More" tag' ) }
+								checked={ !! noTeaser }
+								onChange={ toggleNoTeaser }
+							/>
+						</PanelBody>
 					</InspectorControls>
 				),
 				<div key="more-tag" className="wp-block-more">

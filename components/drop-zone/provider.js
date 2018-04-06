@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { isEqual, find, some, filter, noop, throttle } from 'lodash';
+import isShallowEqual from 'shallowequal';
 
 /**
  * WordPress dependencies
@@ -170,11 +171,14 @@ class DropZoneProvider extends Component {
 			} );
 		} );
 
-		this.setState( {
+		const newState = {
 			isDraggingOverDocument: true,
 			hoveredDropZone: hoveredDropZoneIndex,
 			position,
-		} );
+		};
+		if ( ! isShallowEqual( newState, this.state ) ) {
+			this.setState( newState );
+		}
 	}
 
 	isWithinZoneBounds( dropzone, x, y ) {

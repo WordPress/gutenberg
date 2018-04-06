@@ -26,7 +26,7 @@ import {
 	withSpokenMessages,
 	withContext,
 } from '@wordpress/components';
-import { getCategories, isReusableBlock } from '@wordpress/blocks';
+import { getCategories, isSharedBlock } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -36,7 +36,7 @@ import './style.scss';
 import NoBlocks from './no-blocks';
 
 import { getInserterItems, getFrecentInserterItems } from '../../store/selectors';
-import { fetchReusableBlocks } from '../../store/actions';
+import { fetchSharedBlocks } from '../../store/actions';
 import { default as InserterGroup } from './group';
 import BlockPreview from '../block-preview';
 
@@ -75,7 +75,7 @@ export class InserterMenu extends Component {
 	}
 
 	componentDidMount() {
-		this.props.fetchReusableBlocks();
+		this.props.fetchSharedBlocks();
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -330,7 +330,7 @@ export class InserterMenu extends Component {
 						{ this.renderCategories( this.getVisibleItemsByCategory( items ) ) }
 					</div>
 				}
-				{ selectedItem && isReusableBlock( selectedItem ) &&
+				{ selectedItem && isSharedBlock( selectedItem ) &&
 					<BlockPreview name={ selectedItem.name } attributes={ selectedItem.initialAttributes } />
 				}
 			</TabbableContainer>
@@ -354,7 +354,7 @@ export default compose(
 				frecentItems: getFrecentInserterItems( state, ownProps.enabledBlockTypes ),
 			};
 		},
-		{ fetchReusableBlocks }
+		{ fetchSharedBlocks }
 	),
 	withSpokenMessages,
 	withInstanceId

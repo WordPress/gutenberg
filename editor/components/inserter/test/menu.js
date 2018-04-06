@@ -64,11 +64,11 @@ const textEmbedItem = {
 	isDisabled: false,
 };
 
-const reusableItem = {
+const sharedItem = {
 	id: 'core/block/123',
 	name: 'core/block',
 	initialAttributes: { ref: 123 },
-	title: 'My reusable block',
+	title: 'My shared block',
 	category: 'shared',
 	isDisabled: false,
 };
@@ -80,7 +80,7 @@ const items = [
 	moreItem,
 	youtubeItem,
 	textEmbedItem,
-	reusableItem,
+	sharedItem,
 ];
 
 describe( 'InserterMenu', () => {
@@ -96,7 +96,7 @@ describe( 'InserterMenu', () => {
 				items={ [] }
 				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 				blockTypes
 			/>
 		);
@@ -116,7 +116,7 @@ describe( 'InserterMenu', () => {
 				items={ [] }
 				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 
@@ -132,7 +132,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				frecentItems={ [ advancedTextItem, textItem, someOtherItem ] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 
@@ -151,7 +151,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 		const embedTab = wrapper.find( '.editor-inserter__tab' )
@@ -167,7 +167,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
 	} );
 
-	it( 'should show reusable items in the shared tab', () => {
+	it( 'should show shared items in the shared tab', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
@@ -175,7 +175,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 		const embedTab = wrapper.find( '.editor-inserter__tab' )
@@ -187,10 +187,10 @@ describe( 'InserterMenu', () => {
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks ).toHaveLength( 1 );
-		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My reusable block' );
+		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My shared block' );
 	} );
 
-	it( 'should show all items except embeds and reusable blocks in the blocks tab', () => {
+	it( 'should show all items except embeds and shared blocks in the blocks tab', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
@@ -198,7 +198,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
@@ -224,7 +224,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				frecentItems={ items }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 
@@ -241,7 +241,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 		wrapper.setState( { filterValue: 'text' } );
@@ -264,7 +264,7 @@ describe( 'InserterMenu', () => {
 				items={ items }
 				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 		wrapper.setState( { filterValue: ' text' } );
