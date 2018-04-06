@@ -79,9 +79,13 @@ export function matcherFromSource( sourceConfig ) {
 			return children( sourceConfig.selector );
 		case 'node':
 			return node( sourceConfig.selector );
-		case 'query':
-			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
+		case 'query': {
+			const subMatchers = sourceConfig.query ?
+				mapValues( sourceConfig.query, matcherFromSource ) :
+				( element ) => node()( element );
+
 			return query( sourceConfig.selector, subMatchers );
+		}
 		default:
 			// eslint-disable-next-line no-console
 			console.error( `Unknown source type "${ sourceConfig.source }"` );
