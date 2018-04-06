@@ -103,7 +103,7 @@ export function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
 		case 'link' : {
 			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
-			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', node: anchor } : {};
+			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', target: anchor.getAttribute( 'target' ) || '', node: anchor } : {};
 		}
 		default:
 			return {};
@@ -753,7 +753,7 @@ export class RichText extends Component {
 					if ( ! anchor ) {
 						this.removeFormat( 'link' );
 					}
-					this.applyFormat( 'link', { href: formatValue.value }, anchor );
+					this.applyFormat( 'link', { href: formatValue.value, target: formatValue.target }, anchor );
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
