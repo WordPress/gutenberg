@@ -1,7 +1,7 @@
-const recast = require('recast');
-const { forEach, reduce, includes, has, isEmpty, isFunction } = require('lodash');
-const { writeFileSync } = require('fs');
-const NormalModule = require('webpack/lib/NormalModule');
+const recast = require( 'recast' );
+const { forEach, reduce, includes, has, isEmpty, isFunction } = require( 'lodash' );
+const { writeFileSync } = require( 'fs' );
+const NormalModule = require( 'webpack/lib/NormalModule' );
 
 class wpi18nExtractor {
 	constructor( options ) {
@@ -10,6 +10,7 @@ class wpi18nExtractor {
 			'_n',
 			'_x',
 			'_nx',
+			'sprintf',
 		];
 		this.options = options || {};
 		this.options.filename = this.options.filename || 'translation-map.json';
@@ -43,19 +44,19 @@ class wpi18nExtractor {
 			const ast = recast.parse( source );
 			const { types } = recast;
 			types.visit( ast, {
-				visitCallExpression: function(path) {
+				visitCallExpression: function( path ) {
 					const node = path.node;
-					if (includes(extractor.functionNames, node.callee.name)
-						&& node.arguments
+					if ( includes( extractor.functionNames, node.callee.name ) &&
+						node.arguments
 					) {
 						strings = strings.concat(
 							extractor.extractStringFromFunctionCall(
-								types.getFieldValue(node, 'arguments'),
+								types.getFieldValue( node, 'arguments' ),
 								node.callee.name,
 							)
 						);
 					}
-					this.traverse(path);
+					this.traverse( path );
 				},
 			} );
 		} catch ( e ) {
@@ -69,8 +70,8 @@ class wpi18nExtractor {
 		reduce(
 			Array.from( modules ),
 			function( mapped, module ) {
-				if ( ! module instanceof NormalModule
-					|| ! isFunction( module.originalSource )
+				if ( ! module instanceof NormalModule ||
+					! isFunction( module.originalSource )
 				) {
 					return mapped;
 				}
