@@ -156,23 +156,23 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
 
     @Override
     protected void addEventEmitters(final ThemedReactContext reactContext, final ReactAztecView aztecView) {
-        final ReactAztecText editText = aztecView.getAztecText();
-        editText.addTextChangedListener(new AztecTextWatcher(reactContext, aztecView));
-        editText.setOnFocusChangeListener(
+        aztecView.getAztecText().addTextChangedListener(new AztecTextWatcher(reactContext, aztecView));
+        aztecView.getAztecText().setOnFocusChangeListener(
                 new View.OnFocusChangeListener() {
                     public void onFocusChange(View v, boolean hasFocus) {
                         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+                        final ReactAztecText editText = (ReactAztecText)v;
                         if (hasFocus) {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecFocusEvent(
-                                            aztecView.getId())); // TODO is the correct ID?
+                                            aztecView.getId()));
                         } else {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecBlurEvent(
                                             aztecView.getId()));
 
                             eventDispatcher.dispatchEvent(
-                                    new ReactaztecEndEditingEvent(
+                                    new ReactAztecEndEditingEvent(
                                             aztecView.getId(),
                                             editText.getText().toString()));
                         }
