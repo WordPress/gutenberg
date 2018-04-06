@@ -3,7 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Toolbar, withSpokenMessages, Fill } from '@wordpress/components';
+import {
+	Fill,
+	IconButton,
+	ToggleControl,
+	Toolbar,
+	withSpokenMessages,
+} from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -12,7 +18,6 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
-import ToggleControl from '../../inspector-controls/toggle-control';
 
 const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } = keycodes;
 
@@ -106,8 +111,7 @@ class FormatToolbar extends Component {
 		this.setState( ( state ) => ( { settingsVisible: ! state.settingsVisible } ) );
 	}
 
-	setLinkTarget( event ) {
-		const opensInNewWindow = event.target.checked;
+	setLinkTarget( opensInNewWindow ) {
 		this.setState( { opensInNewWindow } );
 		this.props.onChange( { link: { value: this.props.formats.link.value, target: opensInNewWindow ? '_blank' : '' } } );
 	}
