@@ -12,6 +12,7 @@ describe( 'ColorPalette', () => {
 	const colors = [ 'red', 'white', 'blue' ];
 	const currentColor = 'red';
 	const currentColorWithAlpha = { r: 255, g: 0, b: 0, a: 0.5 };
+	const currentColorWithAlphaParsed = 'rgba(255,0,0,0.5)';
 	const onChange = jest.fn();
 
 	const wrapper = shallow( <ColorPalette colors={ colors } value={ currentColor } onChange={ onChange } /> );
@@ -108,7 +109,7 @@ describe( 'ColorPalette', () => {
 				renderedContentWithAlpha.simulate( 'changeComplete', { rgb: currentColorWithAlpha } );
 
 				expect( onChange ).toHaveBeenCalledTimes( 1 );
-				expect( onChange ).toHaveBeenCalledWith( currentColorWithAlpha );
+				expect( onChange ).toHaveBeenCalledWith( currentColorWithAlphaParsed );
 			} );
 		} );
 	} );
