@@ -9,19 +9,17 @@ import { connect } from 'react-redux';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, TextControl, CategorySelect, ArticlesList } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
 import {
-	isEditorSidebarPanelOpened,
 	getSelectedCategory,
 	getSearchTerm,
 	getArticles,
 } from '../../../store/selectors';
 import {
-	toggleGeneralSidebarEditorPanel,
 	setCategory,
 	setSearchTerm,
 	searchArticles,
@@ -79,19 +77,14 @@ class ArticlesPanel extends Component {
 	}
 }
 
-export default compose(
+export default compose( [
 	connect(
 		( state ) => ( {
-			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
 			selectedCategoryId: getSelectedCategory( state ),
 			searchTerm: getSearchTerm( state ),
 			articles: getArticles( state ),
 		} ),
 		{
-			onTogglePanel() {
-				return toggleGeneralSidebarEditorPanel( PANEL_NAME );
-			},
-
 			onCategoryChange( categoryId ) {
 				return setCategory( categoryId );
 			},
@@ -102,14 +95,18 @@ export default compose(
 
 			searchArticles,
 		},
-		undefined,
-		{ storeKey: 'edit-post' }
 	),
 	withSelect( ( select ) => {
-		const { getCategories } = select( 'core' );
+		const { getCategories, isEditorSidebarPanelOpened } = select( 'core' );
 
 		return {
+			isOpened: isEditorSidebarPanelOpened( PANEL_NAME ),
 			categories: getCategories(),
 		};
-	} )
-)( ArticlesPanel );
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		onTogglePanel() {
+			return dispatch( 'core/edit-post' ).toggleGeneralSidebarEditorPanel( PANEL_NAME );
+		},
+	} ) ),
+] )( ArticlesPanel );
