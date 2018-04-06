@@ -76,10 +76,27 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
 	public function get_item_permissions_check( $request ) {
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			return new WP_Error( 'gutenberg_block_cannot_read', __( 'Sorry, you are not allowed to read Gutenberg blocks as this user.', 'gutenberg' ), array(
-				'status' => rest_authorization_required_code(),
-			) );
+		global $post;
+
+		$post_ID = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
+
+		if ( 0 < $post_ID ) {
+			$post = get_post( $post_ID );
+			if ( ! $post || ! current_user_can( 'edit_post', $post->ID ) ) {
+				return new WP_Error( 'gutenberg_block_cannot_read', __( 'Sorry, you are not allowed to read Gutenberg blocks of this post', 'gutenberg' ), array(
+					'status' => rest_authorization_required_code(),
+				) );
+			}
+
+			// Set up postdata since this will be needed if post_ID was set.
+			setup_postdata( $post );
+
+		} else {
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				return new WP_Error( 'gutenberg_block_cannot_read', __( 'Sorry, you are not allowed to read Gutenberg blocks as this user.', 'gutenberg' ), array(
+					'status' => rest_authorization_required_code(),
+				) );
+			}
 		}
 
 		return true;

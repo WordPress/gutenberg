@@ -20,11 +20,25 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	protected static $block_name = 'core/test-block';
 
 	/**
+	 * Test post context block's name.
+	 *
+	 * @var string
+	 */
+	protected static $context_block_name = 'core/context-test-block';
+
+	/**
 	 * Test API user's ID.
 	 *
 	 * @var int
 	 */
 	protected static $user_id;
+
+	/**
+	 * Test post ID.
+	 *
+	 * @var int
+	 */
+	protected static $post_id;
 
 	/**
 	 * Create test data before the tests run.
@@ -37,6 +51,10 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 				'role' => 'editor',
 			)
 		);
+
+		self::$post_id = $factory->post->create( array(
+			'post_title' => 'Test Post',
+		) );
 	}
 
 	/**
@@ -53,6 +71,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	 */
 	public function setUp() {
 		$this->register_test_block();
+		$this->register_post_context_test_block();
 		parent::setUp();
 	}
 
@@ -61,6 +80,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	 */
 	public function tearDown() {
 		WP_Block_Type_Registry::get_instance()->unregister( self::$block_name );
+		WP_Block_Type_Registry::get_instance()->unregister( self::$context_block_name );
 		parent::tearDown();
 	}
 
@@ -89,6 +109,16 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	/**
+	 * Register test block with post_id as attribute for post context test.
+	 */
+	public function register_post_context_test_block() {
+		register_block_type( self::$context_block_name, array(
+			'attributes'      => array(),
+			'render_callback' => array( $this, 'render_post_context_test_block' ),
+		) );
+	}
+
+	/**
 	 * Test render callback.
 	 *
 	 * @param array $attributes Props.
@@ -96,6 +126,15 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	 */
 	public function render_test_block( $attributes ) {
 		return wp_json_encode( $attributes );
+	}
+
+	/**
+	 * Test render callback for testing post context.
+	 *
+	 * @return string
+	 */
+	public function render_post_context_test_block() {
+		return get_the_title();
 	}
 
 	/**
@@ -227,6 +266,33 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 			json_decode( $block_type->render( $attributes ), true ),
 			json_decode( $data['rendered'], true )
 		);
+	}
+
+	/**
+	 * Test getting item with post context.
+	 */
+	public function test_get_item_with_post_context() {
+		wp_set_current_user( self::$user_id );
+
+		$expected_title = 'Test Post';
+		$request        = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$context_block_name );
+
+		// Test without post ID.
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+
+		$this->assertTrue( empty( $data['rendered'] ) );
+
+		// Now test with post ID.
+		$request->set_param( 'post_id', self::$post_id );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+
+		$this->assertEquals( $expected_title, $data['rendered'] );
 	}
 
 	/**
