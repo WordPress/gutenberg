@@ -24,7 +24,9 @@
     "test-debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/jest/bin/jest.js --runInBand --verbose --config jest.config.js",
     "flow": "flow",
     "prettier": "prettier --write *.js *block-management/*.js",
-    "prettier-check": "prettier -l *.js *block-management/*.js"
+    "prettier-check": "prettier -l *.js *block-management/*.js",
+    "clean": "watchman watch-del-all; rm -rf node_modules; rm -f yarn.lock; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*",
+    "clean-install": "yarn clean; yarn"
   },
   "dependencies": {
     "babel-plugin-module-resolver": "^3.1.0",
