@@ -149,44 +149,19 @@ export function setMetaBoxSavedData( dataPerLocation ) {
 	};
 }
 
-/**
- * Return an action object used to set category id,
- * one of the articles search values.
- *
- * @param 	{number}	selectedCategory	Category identification
- * @return {Object}                 		Action object.
- */
-export function setCategory( selectedCategory ) {
-	return {
-		type: 'UPDATE_SEARCH_VALUES',
-		selectedCategory,
-	};
-}
 
 /**
  * Return an action object used to set term,
  * one of the articles search values.
  *
- * @param 	{string}	searchTerm 	Search term
- * @return {Object}          		Action object.
- */
-export function setSearchTerm( searchTerm ) {
-	return {
-		type: 'UPDATE_SEARCH_VALUES',
-		searchTerm,
-	};
-}
-
-/**
- * Return an action object used to set term,
- * one of the articles search values.
- *
- * @param 	{string}	searchTerm 	Search term
+ * @param 	{Object}	searchValues 	Search term and category id
  * @return  {Object}          		Action object.
  */
-export function searchArticles() {
+export function searchArticles( searchValues ) {
+	console.log('SEARCH_ARTICLES', searchValues);
 	return {
 		type: 'SEARCH_ARTICLES',
+		...searchValues
 	};
 }
 

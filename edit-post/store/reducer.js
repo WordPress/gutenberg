@@ -26,6 +26,8 @@ import { PREFERENCES_DEFAULTS } from './defaults';
  */
 export const preferences = combineReducers( {
 	activeGeneralSidebar( state = PREFERENCES_DEFAULTS.activeGeneralSidebar, action ) {
+			console.log('action', action);
+			
 		switch ( action.type ) {
 			case 'OPEN_GENERAL_SIDEBAR':
 				return action.name;
@@ -166,14 +168,18 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
  */
 export function search( state = { }, action ) {
 	switch ( action.type ) {
-		case 'SET_ARTICLES':
-		case 'UPDATE_SEARCH_VALUES':
+		case 'SEARCH_ARTICLES':
+			console.log('SEARCH_ARTICLES reducer');
+
 			return {
 				...state,
 				...omit( action, [ 'type' ] ),
 			};
-		case 'SEARCH_ARTICLES':
-			return state;
+		case 'SET_ARTICLES':
+			return {
+				...state,
+				...omit( action, [ 'type' ] ),
+			};
 		default:
 			return state;
 	}

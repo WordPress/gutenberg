@@ -10,11 +10,11 @@ import { get } from 'lodash';
  */
 const panelItems = [
 	'post-status',
-	'post-excerpt',
+	'last-revision',
 	'post-taxonomies',
 	'featured-image',
+	'post-excerpt',
 	'discussion-panel',
-	'last-revision',
 	'page-attributes',
 	'document-outline-panel',
 	'meta-boxes',

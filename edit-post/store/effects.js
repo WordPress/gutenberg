@@ -112,13 +112,11 @@ const effects = {
 		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
 		speak( message, 'assertive' );
 	},
-	UPDATE_SEARCH_VALUES( action, store ) {
-		const { dispatch } = store;
-		dispatch( searchArticles() );
-	},
 	SEARCH_ARTICLES( action, store ) {
 		const state	= store.getState();
 		const { dispatch } = store;
+
+		console.log('SEARCH_ARTICLES effects', store);
 
 		// request articles
 		wp.apiRequest( {
