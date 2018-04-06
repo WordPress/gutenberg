@@ -878,9 +878,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Prepare Jed locale data.
 	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
 	wp_add_inline_script(
-		'wp-edit-post',
-		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );',
-		'before'
+		'wp-i18n',
+		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
 	);
 
 	// Preload server-registered block schemas.
