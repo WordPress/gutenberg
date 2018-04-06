@@ -3,6 +3,7 @@
  */
 import { isEmpty } from 'lodash';
 import { connect } from 'react-redux';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -32,15 +33,21 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 	}
 
 	const blockType = getBlockType( selectedBlock.name );
+	const className = classnames( 'editor-block-inspector__card', {
+		'has-description': blockType.description,
+	} );
 
 	return [
-		<div className="editor-block-inspector__card" key="card">
+		<div className={ className } key="card">
 			<div className="editor-block-inspector__card-icon">
 				<BlockIcon icon={ blockType.icon } />
 			</div>
 			<div className="editor-block-inspector__card-content">
 				<div className="editor-block-inspector__card-title">{ blockType.title }</div>
-				<div className="editor-block-inspector__card-description">{ blockType.description }</div>
+				{ blockType.description ?
+					<div className="editor-block-inspector__card-description">{ blockType.description }</div> :
+					''
+				}
 			</div>
 		</div>,
 		<InspectorControls.Slot key="inspector-controls" />,
