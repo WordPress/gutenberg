@@ -13,28 +13,35 @@
 
 .editor-block-inspector__card {
 	display: flex;
-	align-items: flex-start;
+	align-items: center;
 	margin: -16px;
 	padding: 16px;
-}
-
-.editor-block-inspector__card-icon {
-	border: 1px solid $light-gray-700;
-	padding: 8px;
-	margin-right: 10px;
-	height: 36px;
-	width: 36px;
-}
-
-.editor-block-inspector__card-content {
-	flex-grow: 1;
-}
-
-.editor-block-inspector__card-title {
-	font-weight: 500;
-	margin-bottom: 5px;
-}
-
-.editor-block-inspector__card-description {
-	font-size: 12px;
+    
+    &.has-description {
+        align-items: flex-start;    
+    }
+    
+    &-icon {
+    	border: 1px solid $light-gray-700;
+    	padding: 8px;
+    	margin-right: 10px;
+    	height: 36px;
+    	width: 36px;
+    }
+    
+    &-content {
+    	flex-grow: 1;
+    }
+    
+    &-title {
+    	font-weight: 500;
+    }
+    
+    &-title:not(:last-child) {
+        margin-bottom: 5px;
+    }
+    
+    &-description {
+    	font-size: 12px;
+    }
 }

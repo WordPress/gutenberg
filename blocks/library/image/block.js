@@ -156,6 +156,7 @@ class ImageBlock extends Component {
 						onChange={ this.updateAlignment }
 					/>
 
+				{ url ?
 					<Toolbar>
 						<MediaUpload
 							onSelect={ this.onSelectImage }
@@ -172,6 +173,7 @@ class ImageBlock extends Component {
 						/>
 						<UrlInputButton onChange={ this.onSetHref } url={ href } />
 					</Toolbar>
+				: '' }
 				</BlockControls>
 			)
 		);
