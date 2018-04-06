@@ -2,14 +2,16 @@ import React, { Component } from 'react';
 import {AppRegistry, StyleSheet, View, FlatList} from 'react-native';
 import RCTAztecView from './AztecView';
 
+const _minHeight = 300;
+
 class AztecTextInput extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {isShowingText: true, height: 200};
+        this.state = {isShowingText: true, height: _minHeight};
     }
 
     render() {
-        let myMinHeight = Math.max(200, this.state.height);
+        let myMinHeight = Math.max(_minHeight, this.state.height);
         return (
               <View style={styles.container}>
               <FlatList
@@ -25,12 +27,8 @@ class AztecTextInput extends React.Component {
                     renderItem={({item}) =>
                     <RCTAztecView
                          {...this.props}
-                         style={[styles.hello, {minHeight: myMinHeight}]}
-                         multiline={true}
+                         style={[styles.aztec_editor, {minHeight: myMinHeight}]}
                          text = {this.props.text}
-                         onScroll = {(event) => {
-                             console.log(event.nativeEvent);
-                         }}
                          onContentSizeChange= {(event) => {
                               this.setState({height: event.nativeEvent.contentSize.height});
                           }}
@@ -45,12 +43,10 @@ class AztecTextInput extends React.Component {
 
 var styles = StyleSheet.create({
     container: {
-     flex: 1,
-     paddingTop: 22
+     flex: 1
     },
-    hello: {
-    margin: 10,
-    minHeight: 200,
+    aztec_editor: {
+    minHeight: _minHeight,
   },
 });
 

@@ -6,8 +6,10 @@ import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 
+import com.example.android.recyclerview.R;
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.common.MapBuilder;
@@ -17,12 +19,18 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.EventDispatcher;
+import com.facebook.react.views.scroll.ScrollEvent;
+import com.facebook.react.views.scroll.ScrollEventType;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
 import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
-import com.facebook.react.views.scroll.ScrollEvent;
-import com.facebook.react.views.scroll.ScrollEventType;
 import com.facebook.react.views.textinput.ScrollWatcher;
+
+import org.jetbrains.annotations.NotNull;
+import org.wordpress.aztec.ITextFormat;
+import org.wordpress.aztec.source.SourceViewEditText;
+import org.wordpress.aztec.toolbar.AztecToolbar;
+import org.wordpress.aztec.toolbar.IAztecToolbarClickListener;
 
 import java.util.Map;
 
@@ -43,7 +51,25 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
 
     @Override
     protected ReactAztecView createViewInstance(ThemedReactContext reactContext) {
-        return new ReactAztecView(reactContext, mCallerContext);
+        LayoutInflater li = LayoutInflater.from(mCallerContext);
+        ReactAztecView aztecView = (ReactAztecView) li.inflate(R.layout.aztec_main, null);
+        ReactAztecText aztecText = aztecView.findViewById(R.id.aztec);
+        aztecView.setAztecText(aztecText);
+        SourceViewEditText sourceEditor = aztecView.findViewById(R.id.source);
+        aztecView.setSourceEditor(sourceEditor);
+        AztecToolbar toolbar = aztecView.findViewById(R.id.formatting_toolbar);
+        aztecView.setToolbar(toolbar);
+
+        // init Toolbar
+        toolbar.setEditor(aztecText, sourceEditor);
+        toolbar.setToolbarListener(new ToolbarClickListener(aztecView));
+        aztecText.setToolbar(toolbar);
+        //initSourceEditorHistory();
+
+        aztecText.setCalypsoMode(false);
+        sourceEditor.setCalypsoMode(false);
+
+        return aztecView;
     }
 
     @Nullable
@@ -86,7 +112,8 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
 
     @ReactProp(name = "text")
     public void setText(ReactAztecView view, String text) {
-        view.fromHtml(text);
+        view.getAztecText().fromHtml(text);
+        view.getSourceEditor().displayStyledAndFormattedHtml(text);
     }
 
     @ReactProp(name = "color")
@@ -96,60 +123,57 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
             newColor = Color.parseColor(color);
         } catch (IllegalArgumentException e) {
         }
-        view.setTextColor(newColor);
+        view.getAztecText().setTextColor(newColor);
     }
 
     @ReactProp(name = "maxImagesWidth")
     public void setMaxImagesWidth(ReactAztecView view, int maxWidth) {
-        view.setMaxImagesWidth(maxWidth);
+        view.getAztecText().setMaxImagesWidth(maxWidth);
     }
 
     @ReactProp(name = "minImagesWidth")
     public void setMinImagesWidth(ReactAztecView view, int minWidth) {
-        view.setMinImagesWidth(minWidth);
+        view.getAztecText().setMinImagesWidth(minWidth);
     }
 
     @ReactProp(name = "onContentSizeChange", defaultBoolean = false)
     public void setOnContentSizeChange(final ReactAztecView view, boolean onContentSizeChange) {
         if (onContentSizeChange) {
-            view.setContentSizeWatcher(new AztecContentSizeWatcher(view));
+            view.getAztecText().setContentSizeWatcher(new AztecContentSizeWatcher(view));
         } else {
-            view.setContentSizeWatcher(null);
+            view.getAztecText().setContentSizeWatcher(null);
         }
     }
 
     @ReactProp(name = "onScroll", defaultBoolean = false)
     public void setOnScroll(final ReactAztecView view, boolean onScroll) {
         if (onScroll) {
-            view.setScrollWatcher(new AztecScrollWatcher(view));
+            view.getAztecText().setScrollWatcher(new AztecScrollWatcher(view.getAztecText()));
         } else {
-            view.setScrollWatcher(null);
+            view.getAztecText().setScrollWatcher(null);
         }
     }
 
     @Override
-    protected void addEventEmitters(
-            final ThemedReactContext reactContext,
-            final ReactAztecView editText) {
-        editText.addTextChangedListener(new AztecTextWatcher(reactContext, editText));
-
-        editText.setOnFocusChangeListener(
+    protected void addEventEmitters(final ThemedReactContext reactContext, final ReactAztecView aztecView) {
+        aztecView.getAztecText().addTextChangedListener(new AztecTextWatcher(reactContext, aztecView));
+        aztecView.getAztecText().setOnFocusChangeListener(
                 new View.OnFocusChangeListener() {
                     public void onFocusChange(View v, boolean hasFocus) {
-                        EventDispatcher eventDispatcher =
-                                reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+                        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+                        final ReactAztecText editText = (ReactAztecText)v;
                         if (hasFocus) {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecFocusEvent(
-                                            editText.getId()));
+                                            aztecView.getId()));
                         } else {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecBlurEvent(
-                                            editText.getId()));
+                                            aztecView.getId()));
 
                             eventDispatcher.dispatchEvent(
-                                    new ReactaztecEndEditingEvent(
-                                            editText.getId(),
+                                    new ReactAztecEndEditingEvent(
+                                            aztecView.getId(),
                                             editText.getText().toString()));
                         }
                     }
@@ -162,14 +186,14 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
     private class AztecTextWatcher implements TextWatcher {
 
         private EventDispatcher mEventDispatcher;
-        private ReactAztecView mEditText;
+        private ReactAztecText mEditText;
+        private ReactAztecView mAztecView;
         private String mPreviousText;
 
-        public AztecTextWatcher(
-                final ReactContext reactContext,
-                final ReactAztecView editText) {
+        public AztecTextWatcher(final ReactContext reactContext, final ReactAztecView aztec) {
             mEventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-            mEditText = editText;
+            mAztecView = aztec;
+            mEditText = aztec.getAztecText();
             mPreviousText = null;
         }
 
@@ -199,13 +223,13 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
             // TODO: t7936714 merge these events
             mEventDispatcher.dispatchEvent(
                     new ReactTextChangedEvent(
-                            mEditText.getId(),
+                            mAztecView.getId(),
                             s.toString(),
                             mEditText.incrementAndGetEventCounter()));
 
             mEventDispatcher.dispatchEvent(
                     new ReactTextInputEvent(
-                            mEditText.getId(),
+                            mAztecView.getId(),
                             newText,
                             oldText,
                             start,
@@ -217,53 +241,98 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
         }
     }
 
+    private class ToolbarClickListener implements IAztecToolbarClickListener {
+        private ReactAztecView mAztecView;
+
+        public ToolbarClickListener(ReactAztecView aztecView) {
+            this.mAztecView = aztecView;
+        }
+
+        @Override
+        public void onToolbarCollapseButtonClicked() {
+
+        }
+
+        @Override
+        public void onToolbarExpandButtonClicked() {
+
+        }
+
+        @Override
+        public void onToolbarFormatButtonClicked(@NotNull ITextFormat format, boolean isKeyboardShortcut) {
+
+        }
+
+        @Override
+        public void onToolbarHeadingButtonClicked() {
+
+        }
+
+        @Override
+        public void onToolbarHtmlButtonClicked() {
+            mAztecView.getToolbar().toggleEditorMode();
+        }
+
+        @Override
+        public void onToolbarListButtonClicked() {
+
+        }
+
+        @Override
+        public boolean onToolbarMediaButtonClicked() {
+            return false;
+        }
+    }
+
     private class AztecContentSizeWatcher implements com.facebook.react.views.textinput.ContentSizeWatcher {
-        private ReactAztecView mEditText;
+        private ReactAztecView mReactAztecView;
         private EventDispatcher mEventDispatcher;
         private int mPreviousContentWidth = 0;
         private int mPreviousContentHeight = 0;
 
-        public AztecContentSizeWatcher(ReactAztecView editText) {
-            mEditText = editText;
-            ReactContext reactContext = (ReactContext) editText.getContext();
+        public AztecContentSizeWatcher(ReactAztecView view) {
+            mReactAztecView = view;
+            ReactContext reactContext = (ReactContext) mReactAztecView.getAztecText().getContext();
             mEventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         }
 
         @Override
         public void onLayout() {
-            int contentWidth = mEditText.getWidth();
-            int contentHeight = mEditText.getHeight();
+            final ReactAztecText aztecText = mReactAztecView.getAztecText();
+            int contentWidth = aztecText.getWidth();
+            int contentHeight = aztecText.getHeight();
 
             // Use instead size of text content within EditText when available
-            if (mEditText.getLayout() != null) {
-                contentWidth = mEditText.getCompoundPaddingLeft() + mEditText.getLayout().getWidth() +
-                        mEditText.getCompoundPaddingRight();
-                contentHeight = mEditText.getCompoundPaddingTop() + mEditText.getLayout().getHeight() +
-                        mEditText.getCompoundPaddingBottom();
+            if (aztecText.getLayout() != null) {
+                contentWidth = aztecText.getCompoundPaddingLeft() + aztecText.getLayout().getWidth() +
+                        aztecText.getCompoundPaddingRight();
+                contentHeight = aztecText.getCompoundPaddingTop() + aztecText.getLayout().getHeight() +
+                        aztecText.getCompoundPaddingBottom();
             }
 
             if (contentWidth != mPreviousContentWidth || contentHeight != mPreviousContentHeight) {
                 mPreviousContentHeight = contentHeight;
                 mPreviousContentWidth = contentWidth;
 
+                // FIXME: Note the 2 hacks here
                 mEventDispatcher.dispatchEvent(
                         new ReactContentSizeChangedEvent(
-                                mEditText.getId(),
-                                PixelUtil.toDIPFromPixel(contentWidth),
-                                PixelUtil.toDIPFromPixel(contentHeight)));
+                                mReactAztecView.getId(), // Note the ID of the parent here ;)
+                                PixelUtil.toDIPFromPixel(contentWidth) + 48,
+                                PixelUtil.toDIPFromPixel(contentHeight) + 48));
             }
         }
     }
 
     private class AztecScrollWatcher implements ScrollWatcher {
 
-        private ReactAztecView mReactAztecView;
+        private ReactAztecText mReactAztecText;
         private EventDispatcher mEventDispatcher;
         private int mPreviousHoriz;
         private int mPreviousVert;
 
-        public AztecScrollWatcher(ReactAztecView editText) {
-            mReactAztecView = editText;
+        public AztecScrollWatcher(ReactAztecText editText) {
+            mReactAztecText = editText;
             ReactContext reactContext = (ReactContext) editText.getContext();
             mEventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         }
@@ -272,7 +341,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
         public void onScrollChanged(int horiz, int vert, int oldHoriz, int oldVert) {
             if (mPreviousHoriz != horiz || mPreviousVert != vert) {
                 ScrollEvent event = ScrollEvent.obtain(
-                        mReactAztecView.getId(),
+                        mReactAztecText.getId(),
                         ScrollEventType.SCROLL,
                         horiz,
                         vert,
@@ -280,8 +349,8 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
                         0f, // can't get y velocity
                         0, // can't get content width
                         0, // can't get content height
-                        mReactAztecView.getWidth(),
-                        mReactAztecView.getHeight());
+                        mReactAztecText.getWidth(),
+                        mReactAztecText.getHeight());
 
                 mEventDispatcher.dispatchEvent(event);
 
