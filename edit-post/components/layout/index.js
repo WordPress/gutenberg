@@ -34,7 +34,7 @@ import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import PluginSidebar from '../plugin-sidebar';
+import Sidebar from '../sidebar';
 
 function Layout( {
 	mode,
@@ -88,7 +88,7 @@ function Layout( {
 			) }
 			<DocumentSidebar />
 			<BlockSidebar />
-			<PluginSidebar.Slot />
+			<Sidebar.Slot />
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />
 			}
