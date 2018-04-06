@@ -15,7 +15,7 @@
 	height: $block-side-ui-width;
 	border-radius: $button-style__radius-roundrect;
 
-	// Try a background, only for nested situations @todo
+	// Apply a background in nested contexts, only on desktop
 	@include break-small() {
 		.editor-block-list__layout .editor-block-list__layout & {
 			background: $white;
@@ -24,15 +24,12 @@
 			border-width: 1px;
 		}
 	}
-
 }
 
-.editor-block-settings-menu__toggle {
-	.dashicon {
-		transform: rotate( 90deg );
-	}
+.editor-block-settings-menu__toggle .dashicon {
+	transform: rotate( 90deg );
 }
-
+	
 // Popout menu
 .editor-block-settings-menu__popover {
 	z-index: z-index( '.editor-block-settings-menu__popover' );

@@ -69,7 +69,6 @@ export class BlockSettingsMenu extends Component {
 					} );
 
 					return [
-						<BlockRemoveButton key="remove" uids={ uids } role="menuitem" />,
 						<IconButton
 							className={ toggleClassname }
 							onClick={ () => {
@@ -84,7 +83,8 @@ export class BlockSettingsMenu extends Component {
 							focus={ focus }
 							onFocus={ this.onFocus }
 							onBlur={ this.onBlur }
-						/>
+						/>,
+						<BlockRemoveButton key="remove" uids={ uids } role="menuitem" />
 					];
 				} }
 				renderContent={ ( { onClose } ) => (
