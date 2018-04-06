@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
 import {
 	map,
 	first,
@@ -23,6 +22,7 @@ import createSelector from 'rememo';
 import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
+import { moment } from '@wordpress/date';
 
 /***
  * Module constants
@@ -217,6 +217,17 @@ export function getEditedPostVisibility( state ) {
 }
 
 /**
+ * Returns true if post is pending review.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether current post is pending review.
+ */
+export function isCurrentPostPending( state ) {
+	return getCurrentPost( state ).status === 'pending';
+}
+
+/**
  * Return true if the current post has already been published.
  *
  * @param {Object} state Global application state.
@@ -228,6 +239,17 @@ export function isCurrentPostPublished( state ) {
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
 		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+}
+
+/**
+ * Returns true if post is already scheduled.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether current post is scheduled to be posted.
+ */
+export function isCurrentPostScheduled( state ) {
+	return getCurrentPost( state ).status === 'future' && ! isCurrentPostPublished( state );
 }
 
 /**
@@ -283,11 +305,11 @@ export function isEditedPostEmpty( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = getEditedPostAttribute( state, 'date' );
+	const date = moment( getEditedPostAttribute( state, 'date' ) );
 	// Adding 1 minute as an error threshold between the server and the client dates.
 	const now = moment().add( 1, 'minute' );
 
-	return moment( date ).isAfter( now );
+	return date.isAfter( now );
 }
 
 /**
@@ -300,7 +322,7 @@ export function isEditedPostBeingScheduled( state ) {
 export function getDocumentTitle( state ) {
 	let title = getEditedPostAttribute( state, 'title' );
 
-	if ( ! title.trim() ) {
+	if ( ! title || ! title.trim() ) {
 		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
 	}
 	return title;
@@ -356,6 +378,20 @@ export const getBlockDependantsCacheBust = createSelector(
 		( innerBlockUID ) => getBlock( state, innerBlockUID ),
 	),
 );
+
+/**
+ * Returns a block's name given its UID, or null if no block exists with the
+ * UID.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {string} Block name.
+ */
+export function getBlockName( state, uid ) {
+	const block = state.editor.present.blocksByUid[ uid ];
+	return block ? block.name : null;
+}
 
 /**
  * Returns a block given its unique ID. This is a parsed copy of the block,
@@ -505,6 +541,18 @@ export function getSelectedBlockCount( state ) {
 	}
 
 	return state.blockSelection.start ? 1 : 0;
+}
+
+/**
+ * Returns true if there is a single selected block, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether a single block is selected.
+ */
+export function hasSelectedBlock( state ) {
+	const { start, end } = state.blockSelection;
+	return !! start && start === end;
 }
 
 /**
@@ -871,7 +919,23 @@ export function isBlockWithinSelection( state, uid ) {
 }
 
 /**
- * Whether in the process of multi-selecting or not.
+ * Returns true if a multi-selection has been made, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether multi-selection has been made.
+ */
+export function hasMultiSelection( state ) {
+	const { start, end } = state.blockSelection;
+	return start !== end;
+}
+
+/**
+ * Whether in the process of multi-selecting or not. This flag is only true
+ * while the multi-selection is being selected (by mouse move), and is false
+ * once the multi-selection has been settled.
+ *
+ * @see hasMultiSelection
  *
  * @param {Object} state Global application state.
  *
@@ -948,6 +1012,36 @@ export function getBlockInsertionPoint( state ) {
  */
 export function isBlockInsertionPointVisible( state ) {
 	return state.isInsertionPointVisible;
+}
+
+/**
+ * Returns whether the blocks matches the template or not.
+ *
+ * @param {boolean} state
+ * @return {?boolean} Whether the template is valid or not.
+ */
+export function isValidTemplate( state ) {
+	return state.template.isValid;
+}
+
+/**
+ * Returns the defined block template
+ *
+ * @param {boolean} state
+ * @return {?Arary}        Block Template
+ */
+export function getTemplate( state ) {
+	return state.template.template;
+}
+
+/**
+ * Returns the defined block template lock
+ *
+ * @param {boolean} state
+ * @return {?string}        Block Template Lock
+ */
+export function getTemplateLock( state ) {
+	return state.template.lock;
 }
 
 /**
@@ -1071,7 +1165,7 @@ export function getNotices( state ) {
 
 /**
  * An item that appears in the inserter. Inserting this item will create a new
- * block. Inserter items encapsulate both regular blocks and reusable blocks.
+ * block. Inserter items encapsulate both regular blocks and shared blocks.
  *
  * @typedef {Object} Editor.InserterItem
  * @property {string}   id                Unique identifier for the item.
@@ -1120,15 +1214,16 @@ function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
 }
 
 /**
- * Given a reusable block, constructs an item that appears in the inserter.
+ * Given a shared block, constructs an item that appears in the inserter.
  *
+ * @param {Object}           state             Global application state.
  * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
- * @param {Object}           reusableBlock     Reusable block, likely from getReusableBlock().
+ * @param {Object}           sharedBlock       Shared block, likely from getSharedBlock().
  *
  * @return {Editor.InserterItem} Item that appears in inserter.
  */
-function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) {
-	if ( ! enabledBlockTypes || ! reusableBlock ) {
+function buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock ) {
+	if ( ! enabledBlockTypes || ! sharedBlock ) {
 		return null;
 	}
 
@@ -1137,16 +1232,21 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 		return null;
 	}
 
-	const referencedBlockType = getBlockType( reusableBlock.type );
+	const referencedBlock = getBlock( state, sharedBlock.uid );
+	if ( ! referencedBlock ) {
+		return null;
+	}
+
+	const referencedBlockType = getBlockType( referencedBlock.name );
 	if ( ! referencedBlockType ) {
 		return null;
 	}
 
 	return {
-		id: `core/block/${ reusableBlock.id }`,
+		id: `core/block/${ sharedBlock.id }`,
 		name: 'core/block',
-		initialAttributes: { ref: reusableBlock.id },
-		title: reusableBlock.title,
+		initialAttributes: { ref: sharedBlock.id },
+		title: sharedBlock.title,
 		icon: referencedBlockType.icon,
 		category: 'shared',
 		keywords: [],
@@ -1156,7 +1256,7 @@ function buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock ) 
 
 /**
  * Determines the items that appear in the the inserter. Includes both static
- * items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
+ * items (e.g. a regular block type) and dynamic items (e.g. a shared block).
  *
  * @param {Object}           state             Global application state.
  * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
@@ -1172,8 +1272,8 @@ export function getInserterItems( state, enabledBlockTypes = true ) {
 		buildInserterItemFromBlockType( state, enabledBlockTypes, blockType )
 	);
 
-	const dynamicItems = getReusableBlocks( state ).map( reusableBlock =>
-		buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock )
+	const dynamicItems = getSharedBlocks( state ).map( sharedBlock =>
+		buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock )
 	);
 
 	const items = [ ...staticItems, ...dynamicItems ];
@@ -1200,8 +1300,8 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
 
 	const items = fillWithCommonBlocks( inserts ).map( insert => {
 		if ( insert.ref ) {
-			const reusableBlock = getReusableBlock( state, insert.ref );
-			return buildInserterItemFromReusableBlock( enabledBlockTypes, reusableBlock );
+			const sharedBlock = getSharedBlock( state, insert.ref );
+			return buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock );
 		}
 
 		const blockType = getBlockType( insert.name );
@@ -1226,6 +1326,10 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
  */
 export function getFrecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
 	const calculateFrecency = ( time, count ) => {
+		if ( ! time ) {
+			return count;
+		}
+
 		const duration = Date.now() - time;
 		switch ( true ) {
 			case duration < 3600:
@@ -1246,38 +1350,67 @@ export function getFrecentInserterItems( state, enabledBlockTypes = true, maximu
 }
 
 /**
- * Returns the reusable block with the given ID.
+ * Returns the shared block with the given ID.
+ *
+ * @param {Object}        state Global application state.
+ * @param {number|string} ref   The shared block's ID.
+ *
+ * @return {Object} The shared block, or null if none exists.
+ */
+export const getSharedBlock = createSelector(
+	( state, ref ) => {
+		const block = state.sharedBlocks.data[ ref ];
+		if ( ! block ) {
+			return null;
+		}
+
+		const isTemporary = isNaN( parseInt( ref ) );
+
+		return {
+			...block,
+			id: isTemporary ? ref : +ref,
+			isTemporary,
+		};
+	},
+	( state, ref ) => [
+		state.sharedBlocks.data[ ref ],
+	],
+);
+
+/**
+ * Returns whether or not the shared block with the given ID is being saved.
  *
  * @param {Object} state Global application state.
- * @param {string} ref   The reusable block's ID.
+ * @param {string} ref   The shared block's ID.
  *
- * @return {Object} The reusable block, or null if none exists.
+ * @return {boolean} Whether or not the shared block is being saved.
  */
-export function getReusableBlock( state, ref ) {
-	return state.reusableBlocks.data[ ref ] || null;
+export function isSavingSharedBlock( state, ref ) {
+	return state.sharedBlocks.isSaving[ ref ] || false;
 }
 
 /**
- * Returns whether or not the reusable block with the given ID is being saved.
+ * Returns true if the shared block with the given ID is being fetched, or
+ * false otherwise.
  *
- * @param {*} state Global application state.
- * @param {*} ref   The reusable block's ID.
+ * @param {Object} state Global application state.
+ * @param {string} ref   The shared block's ID.
  *
- * @return {boolean} Whether or not the reusable block is being saved.
+ * @return {boolean} Whether the shared block is being fetched.
  */
-export function isSavingReusableBlock( state, ref ) {
-	return state.reusableBlocks.isSaving[ ref ] || false;
+export function isFetchingSharedBlock( state, ref ) {
+	return !! state.sharedBlocks.isFetching[ ref ];
 }
 
 /**
- * Returns an array of all reusable blocks.
+ * Returns an array of all shared blocks.
  *
  * @param {Object} state Global application state.
  *
- * @return {Array} An array of all reusable blocks.
+ * @return {Array} An array of all shared blocks.
  */
-export function getReusableBlocks( state ) {
-	return Object.values( state.reusableBlocks.data );
+export function getSharedBlocks( state ) {
+	return map( state.sharedBlocks.data, ( value, ref ) => getSharedBlock( state, ref ) );
 }
 
 /**

@@ -38,7 +38,7 @@ class ToggleControl extends Component {
 				label={ label }
 				id={ id }
 				help={ help }
-				className="blocks-toggle-control"
+				className="components-toggle-control"
 			>
 				<FormToggle
 					id={ id }

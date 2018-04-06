@@ -19,12 +19,13 @@ import { Component, compose } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	IconButton,
+	PanelBody,
 	SelectControl,
 	TextControl,
 	Toolbar,
-	withAPIData,
 	withContext,
 } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -136,7 +137,7 @@ class ImageBlock extends Component {
 	}
 
 	getAvailableSizes() {
-		return get( this.props.image, [ 'data', 'media_details', 'sizes' ], {} );
+		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
 	}
 
 	render() {
@@ -201,19 +202,25 @@ class ImageBlock extends Component {
 			controls,
 			isSelected && (
 				<InspectorControls key="inspector">
-					<h2>{ __( 'Image Settings' ) }</h2>
-					<TextControl label={ __( 'Textual Alternative' ) } value={ alt } onChange={ this.updateAlt } help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) } />
-					{ ! isEmpty( availableSizes ) && (
-						<SelectControl
-							label={ __( 'Size' ) }
-							value={ url }
-							options={ map( availableSizes, ( size, name ) => ( {
-								value: size.source_url,
-								label: startCase( name ),
-							} ) ) }
-							onChange={ this.updateImageURL }
+					<PanelBody title={ __( 'Image Settings' ) }>
+						<TextControl
+							label={ __( 'Textual Alternative' ) }
+							value={ alt }
+							onChange={ this.updateAlt }
+							help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) }
 						/>
-					) }
+						{ ! isEmpty( availableSizes ) && (
+							<SelectControl
+								label={ __( 'Size' ) }
+								value={ url }
+								options={ map( availableSizes, ( size, name ) => ( {
+									value: size.source_url,
+									label: startCase( name ),
+								} ) ) }
+								onChange={ this.updateImageURL }
+							/>
+						) }
+					</PanelBody>
 				</InspectorControls>
 			),
 			<figure key="image" className={ classes } style={ figureStyle }>
@@ -280,7 +287,7 @@ class ImageBlock extends Component {
 					<RichText
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
+						value={ caption || [] }
 						onFocus={ this.onFocusCaption }
 						onChange={ ( value ) => setAttributes( { caption: value } ) }
 						isSelected={ this.state.captionFocused }
@@ -297,14 +304,12 @@ export default compose( [
 	withContext( 'editor' )( ( settings ) => {
 		return { settings };
 	} ),
-	withAPIData( ( props ) => {
+	withSelect( ( select, props ) => {
+		const { getMedia } = select( 'core' );
 		const { id } = props.attributes;
-		if ( ! id ) {
-			return {};
-		}
 
 		return {
-			image: `/wp/v2/media/${ id }`,
+			image: id ? getMedia( id ) : null,
 		};
 	} ),
 ] )( ImageBlock );

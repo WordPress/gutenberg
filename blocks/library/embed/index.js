@@ -143,7 +143,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			render() {
 				const { html, type, error, fetching } = this.state;
 				const { align, url, caption } = this.props.attributes;
-				const { setAttributes, isSelected } = this.props;
+				const { setAttributes, isSelected, className } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
 				const controls = isSelected && (
@@ -207,14 +207,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 						/>
 					</div>
 				);
-				let typeClassName = 'wp-block-embed';
-				if ( 'video' === type ) {
-					typeClassName += ' is-video';
-				}
 
 				return [
 					controls,
-					<figure key="embed" className={ typeClassName }>
+					<figure key="embed" className={ classnames( className, { 'is-video': 'video' === type } ) }>
 						{ ( cannotPreview ) ? (
 							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
@@ -240,7 +236,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			const { url, caption, align, type, providerNameSlug } = attributes;
 
 			if ( ! url ) {
-				return;
+				return null;
 			}
 
 			const embedClassName = classnames( 'wp-block-embed', {

@@ -12,3 +12,5 @@ A list of meetups about Gutenberg so far:
 - [What's New In WordPress 4.9 and Gutenberg 1.5](https://www.meetup.com/Tuscaloosa-WordPress-Meetup/events/244584939/), Tuscaloosa, Alabama, USA
 - [WordPress & JavaScript: Let's talk Gutenberg!](https://www.meetup.com/WordPress-Lahore/events/246446478/), Lahore, PK
 - [The state of Gutenberg](https://www.meetup.com/WP-Porto/events/245585131/), Porto, Portugal
+- [Discuss and learn about the new WordPress Editor : Gutenberg](https://www.meetup.com/Pune-WordPress-Knowledge-Exchange/events/248496830/), Pune, India
+

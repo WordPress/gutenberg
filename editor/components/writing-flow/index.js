@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { find, reverse, get } from 'lodash';
+import { overEvery, find, findLast, reverse, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,6 +22,7 @@ import {
 /**
  * Internal dependencies
  */
+import './style.scss';
 import {
 	getPreviousBlockUid,
 	getNextBlockUid,
@@ -39,9 +40,28 @@ import {
 } from '../../utils/dom';
 
 /**
+ * Browser dependencies
+ */
+
+const { DOMRect } = window;
+
+/**
  * Module Constants
  */
 const { UP, DOWN, LEFT, RIGHT } = keycodes;
+
+/**
+ * Given an element, returns true if the element is a tabbable text field, or
+ * false otherwise.
+ *
+ * @param {Element} element Element to test.
+ *
+ * @return {boolean} Whether element is a tabbable text field.
+ */
+const isTabbableTextField = overEvery( [
+	isTextField,
+	focus.tabbable.isTabbableIndex,
+] );
 
 class WritingFlow extends Component {
 	constructor() {
@@ -50,6 +70,15 @@ class WritingFlow extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 		this.clearVerticalRect = this.clearVerticalRect.bind( this );
+		this.focusLastTextField = this.focusLastTextField.bind( this );
+
+		/**
+		 * Here a rectangle is stored while moving the caret vertically so
+		 * vertical position of the start position can be restored.
+		 * This is to recreate browser behaviour across blocks.
+		 *
+		 * @type {?DOMRect}
+		 */
 		this.verticalRect = null;
 	}
 
@@ -194,13 +223,35 @@ class WritingFlow extends Component {
 			this.moveSelection( isReverse );
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
-			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
-			event.preventDefault();
+			if ( closestTabbable ) {
+				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
+				event.preventDefault();
+			}
 		} else if ( isHorizontal && isHorizontalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
 		}
+	}
+
+	/**
+	 * Shifts focus to the last tabbable text field — if one exists — at the
+	 * given mouse event's X coordinate.
+	 *
+	 * @param {MouseEvent} event Mouse event to align caret X offset.
+	 */
+	focusLastTextField( event ) {
+		const focusableNodes = focus.focusable.find( this.container );
+		const target = findLast( focusableNodes, isTabbableTextField );
+		if ( ! target ) {
+			return;
+		}
+
+		// Emulate a rect at which caret should be placed using mouse event.
+		const rect = target.getBoundingClientRect();
+		const targetRect = new DOMRect( event.clientX, rect.top, 0, rect.height );
+
+		placeCaretAtVerticalEdge( target, false, targetRect );
 	}
 
 	render() {
@@ -210,12 +261,20 @@ class WritingFlow extends Component {
 		// bubbling events from children to determine focus transition intents.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div
-				ref={ this.bindContainer }
-				onKeyDown={ this.onKeyDown }
-				onMouseDown={ this.clearVerticalRect }
-			>
-				{ children }
+			<div className="editor-writing-flow">
+				<div
+					ref={ this.bindContainer }
+					onKeyDown={ this.onKeyDown }
+					onMouseDown={ this.clearVerticalRect }
+				>
+					{ children }
+				</div>
+				<div
+					aria-hidden
+					tabIndex={ -1 }
+					onClick={ this.focusLastTextField }
+					className="editor-writing-flow__click-redirect"
+				/>
 			</div>
 		);
 		/* eslint-disable jsx-a11y/no-static-element-interactions */

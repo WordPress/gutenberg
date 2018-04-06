@@ -9,7 +9,8 @@ The data module is built upon and shares many of the same core principles of [Re
 Use the `registerStore` function to add your own store to the centralized data registry. This function accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
 
 ```js
-const { registerStore } = wp.data;
+const { data, apiRequest } = wp;
+const { registerStore, dispatch } = data;
 
 const DEFAULT_STATE = {
 	prices: {},
@@ -55,11 +56,18 @@ registerStore( 'my-shop', {
 	},
 
 	selectors: {
-		getPrice( item ) {
+		getPrice( state, item ) {
 			const { prices, discountPercent } = state;
 			const price = prices[ item ];
 
 			return price * ( 1 - ( 0.01 * discountPercent ) );
+		},
+	},
+
+	resolvers: {
+		async getPrice( state, item ) {
+			const price = await apiRequest( { path: '/wp/v2/prices/' + item } );
+			dispatch( 'my-shop' ).setPrice( item, price );
 		},
 	},
 } );
@@ -130,6 +138,40 @@ const unsubscribe = subscribe( () => {
 unsubscribe();
 ```
 
+### Helpers
+
+#### `combineReducers( reducers: Object ): Function`
+
+As your app grows more complex, you'll want to split your reducing function into separate functions, each managing independent parts of the state. The `combineReducers` helper function turns an object whose values are different reducing functions into a single reducing function you can pass to `registerStore`.
+
+_Example:_
+
+```js
+const { combineReducers, registerStore } = wp.data;
+
+const prices = ( state = {}, action ) => {
+	return action.type === 'SET_PRICE' ?
+		{
+			...state,
+			[ action.item ]: action.price,
+		} :
+		state;
+};
+
+const discountPercent = ( state = 0, action ) => {
+	return action.type === 'START_SALE' ?
+		action.discountPercent :
+		state;
+};
+
+registerStore( 'my-shop', {
+	reducer: combineReducers( {
+		prices,
+		discountPercent,
+	} ),
+} );
+```
+
 ### Higher-Order Components
 
 A higher-order component is a function which accepts a [component](https://github.com/WordPress/gutenberg/tree/master/element) and returns a new, enhanced component. A stateful user interface should respond to changes in the underlying state and updates its displayed element accordingly. WordPress uses higher-order components both as a means to separate the purely visual aspects of an interface from its data backing, and to ensure that the data is kept in-sync with the stores.
@@ -138,7 +180,7 @@ A higher-order component is a function which accepts a [component](https://githu
 
 Use `withSelect` to inject state-derived props into a component. Passed a function which returns an object mapping prop names to the subscribed data source, a higher-order component function is returned. The higher-order component can be used to enhance a presentational component, updating it automatically when state changes. The mapping function is passed the [`select` function](#select) and the props passed to the original component.
 
-__Example:__
+_Example:_
 
 ```js
 function PriceDisplay( { price, currency } ) {
@@ -175,6 +217,8 @@ function Button( { onClick, children } ) {
 	return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
+const { withDispatch } = wp.data;
+
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 	const { startSale } = dispatch( 'my-shop' );
 	const { discountPercent = 20 } = ownProps;
@@ -184,7 +228,7 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 			startSale( discountPercent );
 		},
 	};
-} );
+} )( Button );
 
 // Rendered in the application:
 //

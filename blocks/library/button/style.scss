@@ -18,8 +18,8 @@ $blocks-button__line-height: $big-font-size + 6px;
 		padding: ( $blocks-button__height - $blocks-button__line-height ) / 2 24px;
 		text-align: center;
 		text-decoration: none;
-		white-space: nowrap;
-		word-break: break-word;
+		white-space: normal;
+		word-break: break-all;
 
 		&:hover,
 		&:focus,

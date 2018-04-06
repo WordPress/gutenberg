@@ -6,11 +6,11 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock, getBlockType } from '@wordpress/blocks';
+import { createBlock, getBlockType, findTransform, getBlockTransforms } from '@wordpress/blocks';
 import { Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { Warning } from '@wordpress/editor';
-import { compose, getWrapperDisplayName } from '@wordpress/element';
+import { compose, createHigherOrderComponent } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
@@ -49,8 +49,8 @@ const enhance = compose(
 	} ) ),
 );
 
-function withUseOnceValidation( BlockEdit ) {
-	const WrappedBlockEdit = ( {
+const withUseOnceValidation = createHigherOrderComponent( ( BlockEdit ) => {
+	return enhance( ( {
 		originalBlockUid,
 		selectFirst,
 		...props
@@ -60,53 +60,55 @@ function withUseOnceValidation( BlockEdit ) {
 		}
 
 		const blockType = getBlockType( props.name );
-		const outboundType = getOutboundType( blockType );
+		const outboundType = getOutboundType( props.name );
 
 		return [
 			<div key="invalid-preview" style={ { minHeight: '100px' } }>
 				<BlockEdit key="block-edit" { ...props } />
 			</div>,
-			<Warning key="use-once-warning">
-				<p>
-					<strong>{ blockType.title }: </strong>
-					{ __( 'This block may not be used more than once.' ) }</p>
-				<p>
-					<Button isLarge onClick={
-						selectFirst
-					}>{ __( 'Find original' ) }</Button>
-					<Button isLarge onClick={
-						() => props.onReplace( [] )
-					}>{ __( 'Remove' ) }</Button>
-					{ outboundType &&
-						<Button isLarge onClick={ () => props.onReplace(
-							createBlock( outboundType.name, props.attributes )
-						) }>
+			<Warning
+				key="use-once-warning"
+				actions={ [
+					<Button key="find-original" isLarge onClick={ selectFirst }>
+						{ __( 'Find original' ) }
+					</Button>,
+					<Button key="remove" isLarge onClick={ () => props.onReplace( [] ) }>
+						{ __( 'Remove' ) }
+					</Button>,
+					outboundType && (
+						<Button
+							key="transform"
+							isLarge
+							onClick={ () => props.onReplace(
+								createBlock( outboundType.name, props.attributes )
+							) }
+						>
 							{ __( 'Transform into:' ) }{ ' ' }
 							{ outboundType.title }
 						</Button>
-					}
-				</p>
+					),
+				] }
+			>
+				<strong>{ blockType.title }: </strong>
+				{ __( 'This block may not be used more than once.' ) }
 			</Warning>,
 		];
-	};
-
-	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'useOnceValidation' );
-
-	return enhance( WrappedBlockEdit );
-}
+	} );
+}, 'withUseOnceValidation' );
 
 /**
- * Given a base block type, returns the default block type to which to offer
+ * Given a base block name, returns the default block type to which to offer
  * transforms.
  *
- * @param {Object} blockType Base block type.
- * @return {?Object}         The chosen default block type.
+ * @param {string} blockName Base block name.
+ *
+ * @return {?Object} The chosen default block type.
  */
-function getOutboundType( blockType ) {
+function getOutboundType( blockName ) {
 	// Grab the first outbound transform
-	const { to = [] } = blockType.transforms || {};
-	const transform = find( to, ( { type, blocks } ) =>
-		type === 'block' && blocks.length === 1 // What about when .length > 1?
+	const transform = findTransform(
+		getBlockTransforms( 'to', blockName ),
+		( { type, blocks } ) => type === 'block' && blocks.length === 1 // What about when .length > 1?
 	);
 
 	if ( ! transform ) {
