@@ -1,5 +1,5 @@
 .components-draggable__clone {
-	.editor-block-list__block-draggable {
+	& > .editor-block-list__block > .editor-block-list__block-draggable {
 		background: white;
 		box-shadow: $shadow-popover;
 
