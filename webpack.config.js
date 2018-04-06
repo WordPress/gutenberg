@@ -5,6 +5,7 @@ const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
+const wpi18nExtractor = require( './bin/i18n-map-extractor.js' );
 
 /**
  * WordPress dependencies
@@ -178,6 +179,7 @@ const config = {
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
+		new wpi18nExtractor(),
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',
