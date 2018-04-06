@@ -3,11 +3,11 @@
 }
 
 .blocks-format-toolbar__link-modal {
-	position: absolute;
+	position: relative;
+	left: -50%;
 	box-shadow: 0 3px 20px rgba( 18, 24, 30, .1 ), 0 1px 3px rgba( 18, 24, 30, .1 );
 	border: 1px solid #e0e5e9;
 	background: #fff;
-	width: 305px;
 	display: flex;
 	flex-direction: column;
 	font-family: $default-font;
@@ -16,7 +16,7 @@
 	z-index: z-index( '.blocks-format-toolbar__link-modal' );
 
 	.blocks-url-input {
-		width: auto;
+		width: 230px;
 	}
 }
 
@@ -42,13 +42,11 @@
 	flex-grow: 1;
 	flex-shrink: 1;
 	overflow: hidden;
+	text-overflow: ellipsis;
 	position: relative;
 	white-space: nowrap;
-	min-width: 0;
-
-	&:after {
-		@include long-content-fade( $size: 40% );
-	}
+	min-width: 150px;
+	max-width: 500px;
 }
 
 .blocks-format-toolbar__link-settings {

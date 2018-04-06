@@ -146,9 +146,6 @@ class FormatToolbar extends Component {
 	render() {
 		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
 		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow } = this.state;
-		const linkStyle = focusPosition ?
-			{ position: 'absolute', ...focusPosition } :
-			null;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
 			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
@@ -185,64 +182,64 @@ class FormatToolbar extends Component {
 			<div className="blocks-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
 
-				{ ( isAddingLink || isEditingLink ) &&
-					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-					/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+				{ ( isAddingLink || isEditingLink || formats.link ) && (
 					<Fill name="RichText.Siblings">
-						<form
-							className="blocks-format-toolbar__link-modal"
-							style={ linkStyle }
-							onKeyPress={ stopKeyPropagation }
-							onKeyDown={ this.onKeyDown }
-							onSubmit={ this.submitLink }>
-							<div className="blocks-format-toolbar__link-modal-line">
-								<IconButton
-									className="blocks-format-toolbar__link-settings-toggle"
-									icon="ellipsis"
-									label={ __( 'Link Settings' ) }
-									onClick={ this.toggleLinkSettingsVisibility }
-									aria-expanded={ settingsVisible }
-								/>
-								<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
-								<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-							</div>
-							{ linkSettings }
-						</form>
-					</Fill>
-					/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-				}
+						<div style={ { position: 'absolute', ...focusPosition } }>
+							{ ( isAddingLink || isEditingLink ) && (
+								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+								<form
+									className="blocks-format-toolbar__link-modal"
+									onKeyPress={ stopKeyPropagation }
+									onKeyDown={ this.onKeyDown }
+									onSubmit={ this.submitLink }>
+									<div className="blocks-format-toolbar__link-modal-line">
+										<IconButton
+											className="blocks-format-toolbar__link-settings-toggle"
+											icon="ellipsis"
+											label={ __( 'Link Settings' ) }
+											onClick={ this.toggleLinkSettingsVisibility }
+											aria-expanded={ settingsVisible }
+										/>
+										<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
+										<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+									</div>
+									{ linkSettings }
+								</form>
+								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+							) }
 
-				{ !! formats.link && ! isAddingLink && ! isEditingLink &&
-					// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-					/* eslint-disable jsx-a11y/no-static-element-interactions */
-					<Fill name="RichText.Siblings">
-						<div
-							className="blocks-format-toolbar__link-modal"
-							style={ linkStyle }
-							onKeyPress={ stopKeyPropagation }
-						>
-							<div className="blocks-format-toolbar__link-modal-line">
-								<IconButton
-									className="blocks-format-toolbar__link-settings-toggle"
-									icon="ellipsis"
-									label={ __( 'Link Settings' ) }
-									onClick={ this.toggleLinkSettingsVisibility }
-									aria-expanded={ settingsVisible }
-								/>
-								<a
-									className="blocks-format-toolbar__link-value"
-									href={ formats.link.value }
-									target="_blank"
+							{ formats.link && ! isAddingLink && ! isEditingLink && (
+								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+								/* eslint-disable jsx-a11y/no-static-element-interactions */
+								<div
+									className="blocks-format-toolbar__link-modal"
+									onKeyPress={ stopKeyPropagation }
 								>
-									{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
-								</a>
-								<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
-							</div>
-							{ linkSettings }
+									<div className="blocks-format-toolbar__link-modal-line">
+										<IconButton
+											className="blocks-format-toolbar__link-settings-toggle"
+											icon="ellipsis"
+											label={ __( 'Link Settings' ) }
+											onClick={ this.toggleLinkSettingsVisibility }
+											aria-expanded={ settingsVisible }
+										/>
+										<a
+											className="blocks-format-toolbar__link-value"
+											href={ formats.link.value }
+											target="_blank"
+										>
+											{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
+										</a>
+										<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
+									</div>
+									{ linkSettings }
+								</div>
+								/* eslint-enable jsx-a11y/no-static-element-interactions */
+							) }
 						</div>
 					</Fill>
-					/* eslint-enable jsx-a11y/no-static-element-interactions */
-				}
+				) }
 			</div>
 		);
 	}
