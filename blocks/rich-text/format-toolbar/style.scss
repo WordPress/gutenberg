@@ -14,22 +14,46 @@
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 	z-index: z-index( '.blocks-format-toolbar__link-modal' );
-
-	.blocks-url-input {
-		width: 230px;
-	}
 }
 
 .blocks-format-toolbar__link-modal-line {
+	$button-size: 36px;
+	$input-padding: 10px;
+	$input-size: 230px;
+
 	display: flex;
 	flex-direction: row;
 	flex-grow: 1;
 	flex-shrink: 1;
 	min-width: 0;
-	align-items: center;
+	align-items: flex-start;
 
 	.components-button {
 		flex-shrink: 0;
+		width: $button-size;
+		height: $button-size;
+	}
+
+	.blocks-url-input {
+		width: $input-size;
+
+		input {
+			padding: $input-padding;
+		}
+	}
+
+	.blocks-url-input__suggestions {
+		border-top: 1px solid $light-gray-500;
+		box-shadow: none;
+		left: -( $button-size );
+		padding: 4px 0;
+		position: relative;
+		width: $input-size + $button-size * 2;
+	}
+
+	.blocks-url-input__suggestion {
+		color: $dark-gray-100;
+		padding: 4px ( $button-size + $input-padding );
 	}
 }
 
