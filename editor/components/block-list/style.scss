@@ -459,9 +459,8 @@
 		}
 
 		.editor-inserter__toggle,
-		.editor-block-settings-menu__toggle,
-		& > .editor-block-settings-menu__control,
-		.editor-block-mover__control {
+		.editor-block-mover__control,
+		.editor-block-settings-menu .components-button {
 			width: $icon-button-size;
 			height: $icon-button-size;
 			border-radius: $button-style__radius-roundrect;
@@ -484,6 +483,11 @@
 			.editor-block-mover__control {
 				float: left;
 			}
+		}
+	
+		// Block Settings
+		.editor-block-settings-menu .components-button {
+			float: left;
 		}
 	}
 }

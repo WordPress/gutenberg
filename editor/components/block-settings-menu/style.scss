@@ -7,11 +7,12 @@
 }
 
 // The Blocks "More" Menu ellipsis icon button
+.editor-block-settings-remove,
 .editor-block-settings-menu__toggle {
 	justify-content: center;
 	padding: 0;
 	width: $block-side-ui-width;
-	height: $block-side-ui-width * 2;	// same height as a single line of text, our smallest block
+	height: $block-side-ui-width;
 	border-radius: $button-style__radius-roundrect;
 
 	// Try a background, only for nested situations @todo
@@ -24,6 +25,9 @@
 		}
 	}
 
+}
+
+.editor-block-settings-menu__toggle {
 	.dashicon {
 		transform: rotate( 90deg );
 	}
