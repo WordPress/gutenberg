@@ -93,6 +93,7 @@
 		"puppeteer": "1.2.0",
 		"raw-loader": "0.5.1",
 		"react-test-renderer": "16.3.2",
+		"rimraf": "2.6.2",
 		"sass-loader": "6.0.7",
 		"sprintf-js": "1.1.1",
 		"style-loader": "0.20.3",
@@ -141,6 +142,7 @@
 	"scripts": {
 		"prebuild": "npm run check-engines",
 		"build:packages": "rimraf ./packages/*/build ./packages/*/build-module && node ./bin/packages/build.js",
+		"build-parser": "pegjs -o test/parser/bin/parser.js blocks/api/post.pegjs",
 		"build": "npm run build:packages && cross-env NODE_ENV=production webpack",
 		"check-engines": "check-node-version --package",
 		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
@@ -172,5 +174,8 @@
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
 		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit"
+		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
+		"test-e2e:watch": "npm run test-e2e -- --watch",
+		"test-parser": "npx jest test/parser/test.js"
 	}
 }

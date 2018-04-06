@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`parser autoclosing-block 1`] = `
+Array [
+  Object {
+    "attrs": Object {
+      "ref": 123,
+    },
+    "blockName": "core/block",
+    "innerBlocks": Array [],
+    "innerHTML": "",
+  },
+  Object {
+    "attrs": Object {},
+    "innerHTML": "
+",
+  },
+]
+`;
