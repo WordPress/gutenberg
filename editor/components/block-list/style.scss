@@ -389,26 +389,10 @@
 	}
 
 	// Dropzones
-	& > .components-drop-zone {
-		border: none;
+	.editor-block-drop-zone {
 		top: -4px;
 		bottom: -3px;
 		margin: 0 $block-padding;
-		border-radius: 0;
-
-		.components-drop-zone__content {
-			display: none;
-		}
-
-		&.is-close-to-top {
-			background: none;
-			border-top: 3px solid $blue-medium-500;
-		}
-
-		&.is-close-to-bottom {
-			background: none;
-			border-bottom: 3px solid $blue-medium-500;
-		}
 	}
 }
 
