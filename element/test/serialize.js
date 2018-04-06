@@ -204,6 +204,12 @@ describe( 'renderElement()', () => {
 
 		expect( result ).toBe( '<img/>' );
 	} );
+
+	it( 'renders RawHTML with wrapper if props passed', () => {
+		const result = renderElement( <RawHTML className="foo">{ '<img/>' }</RawHTML> );
+
+		expect( result ).toBe( '<div class="foo"><img/></div>' );
+	} );
 } );
 
 describe( 'renderNativeComponent()', () => {

@@ -28,7 +28,7 @@
 /**
  * External dependencies
  */
-import { castArray, omit, kebabCase } from 'lodash';
+import { isEmpty, castArray, omit, kebabCase } from 'lodash';
 
 /**
  * Internal dependencies
@@ -363,7 +363,18 @@ export function renderElement( element, context = {} ) {
 			return renderChildren( props.children, context );
 
 		case RawHTML:
-			return props.children;
+			const { children, ...wrapperProps } = props;
+			if ( isEmpty( wrapperProps ) ) {
+				return children;
+			}
+
+			return renderElement( {
+				type: 'div',
+				props: {
+					...wrapperProps,
+					dangerouslySetInnerHTML: { __html: children },
+				},
+			} );
 	}
 
 	switch ( typeof tagName ) {
