@@ -12,6 +12,7 @@
 	padding: 0;
 	width: $block-side-ui-width;
 	height: $block-side-ui-width * 2;	// same height as a single line of text, our smallest block
+	border-radius: $button-style__radius-roundrect;
 
 	// Try a background, only for nested situations @todo
 	@include break-small() {
