@@ -464,6 +464,7 @@
 		.editor-block-mover__control {
 			width: $icon-button-size;
 			height: $icon-button-size;
+			border-radius: $button-style__radius-roundrect;
 			padding: 3px;
 			margin: 0;
 			justify-content: center;
@@ -649,6 +650,7 @@
 .editor-block-list__breadcrumb .components-toolbar {
 	border: 1px solid $light-gray-500;
 	width: 100%;
+	background: $white;
 
 	// this prevents floats from messing up the position
 	position: absolute;
