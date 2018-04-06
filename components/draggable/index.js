@@ -23,13 +23,15 @@ const clonePadding = 20;
 class Draggable extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragOver = this.onDragOver.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
+		this.resetDragState = this.resetDragState.bind( this );
 	}
 
 	componentWillUnmount() {
-		this.removeDragClone();
+		this.resetDragState();
 	}
 
 	/**
@@ -38,10 +40,9 @@ class Draggable extends Component {
 	 */
 	onDragEnd( event ) {
 		const { onDragEnd = noop } = this.props;
-		this.removeDragClone();
-		// Reset cursor.
-		document.body.classList.remove( 'is-dragging-components-draggable' );
 		event.preventDefault();
+
+		this.resetDragState();
 
 		this.props.setTimeout( onDragEnd );
 	}
@@ -134,13 +135,20 @@ class Draggable extends Component {
 		this.props.setTimeout( onDragStart );
 	}
 
-	removeDragClone() {
+	/**
+	 * Cleans up drag state when drag has completed, or component unmounts
+	 * while dragging.
+	 */
+	resetDragState() {
+		// Remove drag clone
 		document.removeEventListener( 'dragover', this.onDragOver );
 		if ( this.cloneWrapper && this.cloneWrapper.parentNode ) {
-			// Remove clone.
 			this.cloneWrapper.parentNode.removeChild( this.cloneWrapper );
 			this.cloneWrapper = null;
 		}
+
+		// Reset cursor.
+		document.body.classList.remove( 'is-dragging-components-draggable' );
 	}
 
 	render() {

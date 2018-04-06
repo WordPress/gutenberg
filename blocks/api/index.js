@@ -15,7 +15,6 @@ export { default as rawHandler } from './raw-handling';
 export {
 	default as serialize,
 	getBlockContent,
-	getBlockDefaultClassname,
 	getBlockDefaultClassName,
 	getSaveElement,
 } from './serializer';
@@ -34,7 +33,7 @@ export {
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
-	isReusableBlock,
+	isSharedBlock,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,

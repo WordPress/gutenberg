@@ -282,6 +282,11 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'edit-post/build/index.js' ),
 		true
 	);
+	wp_add_inline_script(
+		'wp-edit-post',
+		gutenberg_get_script_polyfill( array( 'window.FormData && window.FormData.prototype.keys' => 'formdata' ) ),
+		'before'
+	);
 
 	// Editor Styles.
 	wp_register_style(
@@ -432,6 +437,10 @@ function gutenberg_register_vendor_scripts() {
 	gutenberg_register_vendor_script(
 		'promise',
 		'https://unpkg.com/promise-polyfill@7.0.0/dist/promise' . $suffix . '.js'
+	);
+	gutenberg_register_vendor_script(
+		'formdata',
+		'https://unpkg.com/formdata-polyfill@3.0.9/formdata.min.js'
 	);
 }
 
@@ -869,9 +878,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Prepare Jed locale data.
 	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
 	wp_add_inline_script(
-		'wp-edit-post',
-		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );',
-		'before'
+		'wp-i18n',
+		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
 	);
 
 	// Preload server-registered block schemas.

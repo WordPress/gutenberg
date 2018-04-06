@@ -10,8 +10,12 @@
 		color: $dark-gray-500;
 	}
 
-	&.editor-block-inspector__advanced {
+	&:first-child {
 		border-top: 1px solid $light-gray-500;
+		margin-top: 16px;
+	}
+
+	&:last-child {
 		margin-bottom: -16px;
 	}
 }

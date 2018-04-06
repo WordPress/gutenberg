@@ -290,14 +290,14 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 }
 
 /**
- * Determines whether or not the given block is a reusable block. This is a
- * special block type that is used to point to a global block stored via
- * the API.
+ * Determines whether or not the given block is a shared block. This is a
+ * special block type that is used to point to a global block stored via the
+ * API.
  *
  * @param {Object} blockOrType Block or Block Type to test.
  *
- * @return {boolean} Whether the given block is a reusable block.
+ * @return {boolean} Whether the given block is a shared block.
  */
-export function isReusableBlock( blockOrType ) {
+export function isSharedBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';
 }

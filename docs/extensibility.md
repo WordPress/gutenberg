@@ -49,4 +49,8 @@ Discover how [Meta Box](./extensibility/meta-box) support works in Gutenberg.
 
 By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or rely on defaults.
 
-There are some advanced block features which require opt-in support in the theme. See [theme support](./extensibility/theme-support)
+There are some advanced block features which require opt-in support in the theme. See [theme support](./extensibility/theme-support).
+
+## Autocomplete
+
+Autocompleters within blocks may be extended and overridden. See [autocomplete](./extensibility/autocomplete).

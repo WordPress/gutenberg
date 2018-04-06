@@ -13,6 +13,7 @@ import {
 	IconButton,
 	DropZone,
 	FormFileUpload,
+	PanelBody,
 	RangeControl,
 	SelectControl,
 	ToggleControl,
@@ -206,25 +207,26 @@ class GalleryBlock extends Component {
 			controls,
 			isSelected && (
 				<InspectorControls key="inspector">
-					<h2>{ __( 'Gallery Settings' ) }</h2>
-					{ images.length > 1 && <RangeControl
-						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ this.setColumnsNumber }
-						min={ 1 }
-						max={ Math.min( MAX_COLUMNS, images.length ) }
-					/> }
-					<ToggleControl
-						label={ __( 'Crop Images' ) }
-						checked={ !! imageCrop }
-						onChange={ this.toggleImageCrop }
-					/>
-					<SelectControl
-						label={ __( 'Link to' ) }
-						value={ linkTo }
-						onChange={ this.setLinkTo }
-						options={ linkOptions }
-					/>
+					<PanelBody title={ __( 'Gallery Settings' ) }>
+						{ images.length > 1 && <RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ this.setColumnsNumber }
+							min={ 1 }
+							max={ Math.min( MAX_COLUMNS, images.length ) }
+						/> }
+						<ToggleControl
+							label={ __( 'Crop Images' ) }
+							checked={ !! imageCrop }
+							onChange={ this.toggleImageCrop }
+						/>
+						<SelectControl
+							label={ __( 'Link to' ) }
+							value={ linkTo }
+							onChange={ this.setLinkTo }
+							options={ linkOptions }
+						/>
+					</PanelBody>
 				</InspectorControls>
 			),
 			<ul key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>

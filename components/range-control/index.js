@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -10,13 +11,18 @@ import { BaseControl, Button, Dashicon } from '../';
 import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
-function RangeControl( { label, value, instanceId, onChange, beforeIcon, afterIcon, help, allowReset, ...props } ) {
+function RangeControl( { className, label, value, instanceId, onChange, beforeIcon, afterIcon, help, allowReset, ...props } ) {
 	const id = `inspector-range-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
 
 	return (
-		<BaseControl label={ label } id={ id } help={ help } className="components-range-control">
-			{ beforeIcon && <Dashicon icon={ beforeIcon } size={ 20 } /> }
+		<BaseControl
+			label={ label }
+			id={ id }
+			help={ help }
+			className={ classnames( 'components-range-control', className ) }
+		>
+			{ beforeIcon && <Dashicon icon={ beforeIcon } /> }
 			<input
 				className="components-range-control__slider"
 				id={ id }
