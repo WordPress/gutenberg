@@ -3,6 +3,25 @@ MediaUpload
 
 MediaUpload is a React component used to render a button that opens a the WordPress media modal.
 
+## Setup
+
+This is a placeholder component necessary to make it possible to provide an integration with the core blocks that handle media files. By default it renders nothing but it provides a way to have it overridden with the `components.MediaUpload` filter.
+
+```jsx
+import { addFilter } from '@wordpress/hooks';
+import MediaUpload from './media-upload';
+
+const replaceMediaUpload = () => MediaUpload;
+
+addFilter(
+	'blocks.MediaUpload',
+	'core/edit-post/blocks/media-upload/replaceMediaUpload',
+	replaceMediaUpload
+);
+```
+
+You can check how this component is implemented for the edit post page using `wp.media` module in [edit-post](../../edit-post/hooks/blocks/media-upload/index.js).
+
 ## Usage
 
 

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Placeholder, Spinner, ToggleControl } from '@wordpress/components';
+import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { times, unescape } from 'lodash';
@@ -148,22 +148,23 @@ class CategoriesBlock extends Component {
 
 		const inspectorControls = focus && (
 			<InspectorControls key="inspector">
-				<h3>{ __( 'Categories Settings' ) }</h3>
-				<ToggleControl
-					label={ __( 'Display as dropdown' ) }
-					checked={ displayAsDropdown }
-					onChange={ this.toggleDisplayAsDropdown }
-				/>
-				<ToggleControl
-					label={ __( 'Show post counts' ) }
-					checked={ showPostCounts }
-					onChange={ this.toggleShowPostCounts }
-				/>
-				<ToggleControl
-					label={ __( 'Show hierarchy' ) }
-					checked={ showHierarchy }
-					onChange={ this.toggleShowHierarchy }
-				/>
+				<PanelBody title={ __( 'Categories Settings' ) }>
+					<ToggleControl
+						label={ __( 'Display as dropdown' ) }
+						checked={ displayAsDropdown }
+						onChange={ this.toggleDisplayAsDropdown }
+					/>
+					<ToggleControl
+						label={ __( 'Show post counts' ) }
+						checked={ showPostCounts }
+						onChange={ this.toggleShowPostCounts }
+					/>
+					<ToggleControl
+						label={ __( 'Show hierarchy' ) }
+						checked={ showHierarchy }
+						onChange={ this.toggleShowHierarchy }
+					/>
+				</PanelBody>
 			</InspectorControls>
 		);
 

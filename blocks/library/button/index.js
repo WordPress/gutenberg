@@ -3,7 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Dashicon, IconButton, PanelColor, ToggleControl, withFallbackStyles } from '@wordpress/components';
+import {
+	Dashicon,
+	IconButton,
+	PanelBody,
+	PanelColor,
+	ToggleControl,
+	withFallbackStyles,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -96,29 +103,31 @@ class ButtonBlock extends Component {
 				/>
 				{ isSelected &&
 					<InspectorControls key="inspector">
-						<ToggleControl
-							label={ __( 'Wrap text' ) }
-							checked={ !! clear }
-							onChange={ this.toggleClear }
-						/>
-						<PanelColor title={ __( 'Background Color' ) } colorValue={ color } >
-							<ColorPalette
-								value={ color }
-								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
+						<PanelBody>
+							<ToggleControl
+								label={ __( 'Wrap text' ) }
+								checked={ !! clear }
+								onChange={ this.toggleClear }
 							/>
-						</PanelColor>
-						<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
-							<ColorPalette
-								value={ textColor }
-								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
-							/>
-						</PanelColor>
-						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
-							node={ this.nodeRef }
-							textColor={ textColor }
-							backgroundColor={ color }
-							isLargeText={ true }
-						/> }
+							<PanelColor title={ __( 'Background Color' ) } colorValue={ color } >
+								<ColorPalette
+									value={ color }
+									onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
+								/>
+							</PanelColor>
+							<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
+								<ColorPalette
+									value={ textColor }
+									onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+								/>
+							</PanelColor>
+							{ this.nodeRef && <ContrastCheckerWithFallbackStyles
+								node={ this.nodeRef }
+								textColor={ textColor }
+								backgroundColor={ color }
+								isLargeText={ true }
+							/> }
+						</PanelBody>
 					</InspectorControls>
 				}
 			</span>,

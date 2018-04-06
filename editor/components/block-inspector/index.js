@@ -1,14 +1,20 @@
 /**
  * External dependencies
  */
+import { isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Slot } from '@wordpress/components';
-import { getBlockType, BlockIcon } from '@wordpress/blocks';
+import {
+	BlockIcon,
+	getBlockType,
+	InspectorControls,
+	InspectorAdvancedControls,
+} from '@wordpress/blocks';
+import { PanelBody } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -37,7 +43,17 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 				<div className="editor-block-inspector__card-description">{ blockType.description }</div>
 			</div>
 		</div>,
-		<Slot name="Inspector.Controls" key="inspector-controls" />,
+		<InspectorControls.Slot key="inspector-controls" />,
+		<InspectorAdvancedControls.Slot key="inspector-advanced-controls">
+			{ ( fills ) => ! isEmpty( fills ) && (
+				<PanelBody
+					className="editor-block-inspector__advanced"
+					title={ __( 'Advanced' ) }
+				>
+					{ fills }
+				</PanelBody>
+			) }
+		</InspectorAdvancedControls.Slot>,
 	];
 };
 

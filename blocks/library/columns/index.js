@@ -9,7 +9,7 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { RangeControl } from '@wordpress/components';
+import { PanelBody, RangeControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -84,17 +84,19 @@ export const settings = {
 					/>
 				</BlockControls>,
 				<InspectorControls key="inspector">
-					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ ( nextColumns ) => {
-							setAttributes( {
-								columns: nextColumns,
-							} );
-						} }
-						min={ 2 }
-						max={ 6 }
-					/>
+					<PanelBody>
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ ( nextColumns ) => {
+								setAttributes( {
+									columns: nextColumns,
+								} );
+							} }
+							min={ 2 }
+							max={ 6 }
+						/>
+					</PanelBody>
 				</InspectorControls>,
 			] : [],
 			<div className={ classes } key="container">

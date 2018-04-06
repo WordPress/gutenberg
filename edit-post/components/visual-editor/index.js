@@ -21,6 +21,15 @@ import { withViewportMatch } from '@wordpress/viewport';
 import './style.scss';
 import BlockInspectorButton from './block-inspector-button';
 
+function VisualEditorBlockMenu( { children, onClose } ) {
+	return (
+		<Fragment>
+			<BlockInspectorButton onClick={ onClose } role="menuitem" />
+			{ children }
+		</Fragment>
+	);
+}
+
 function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor">
@@ -32,12 +41,7 @@ function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
 					<PostTitle />
 					<BlockList
 						showContextualToolbar={ ! isLargeViewport || ! hasFixedToolbar }
-						renderBlockMenu={ ( { children, onClose } ) => (
-							<Fragment>
-								<BlockInspectorButton onClick={ onClose } />
-								{ children }
-							</Fragment>
-						) }
+						renderBlockMenu={ VisualEditorBlockMenu }
 					/>
 				</ObserveTyping>
 			</WritingFlow>

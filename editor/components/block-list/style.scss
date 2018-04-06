@@ -1,3 +1,88 @@
+.components-draggable__clone {
+	.editor-block-list__block-draggable {
+		background: white;
+		box-shadow: $shadow-popover;
+
+		@include break-small {
+			left: 0;
+			right: 0;
+		}
+	}
+
+	// Hide the Block UI when dragging the block
+	// This ensures the page scroll properly (no sticky elements)
+	.editor-block-contextual-toolbar,
+	.editor-block-mover,
+	.editor-block-settings-menu {
+		// I think important is fine here to avoid over complexing the selector
+		display: none !important;
+	}
+}
+
+.editor-block-list__block-draggable {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: z-index( '.editor-block-list__block-draggable' );
+
+	> .editor-block-list__block-draggable-inner {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background-color: $light-gray-200;
+		visibility: hidden;
+
+		@include break-small {
+			margin: 0 48px;
+		}
+	}
+
+	&.is-visible > .editor-block-list__block-draggable-inner {
+		visibility: visible;
+	}
+
+	@include break-small {
+		left: -$block-side-ui-padding;
+		right: -$block-side-ui-padding;
+
+		// Full width blocks don't have the place to expand on the side
+		.editor-block-list__block[data-align="full"] & {
+			left: 0;
+			right: 0;
+		}
+	}
+
+
+	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: grab;
+}
+
+
+// Allow Drag & Drop when clicking on the empty area of the mover and the settings menu
+.editor-block-list__block .editor-block-mover,
+.editor-block-list__block .editor-block-settings-menu {
+	pointer-events: none;
+
+	> * {
+		pointer-events: auto;
+	}
+}
+
+.editor-block-list__block {
+	&.is-hidden *,
+	&.is-hidden > * {
+		visibility: hidden;
+	}
+
+	.editor-block-list__block-edit .shared-block-edit-panel * {
+		z-index: z-index( '.editor-block-list__block-edit .shared-block-edit-panel *' );
+	}
+}
+
 .editor-block-list__layout {
 	// make room in the main content column for the side UI
 	// the side UI uses negative margins to position itself so as to not affect the block width
@@ -70,7 +155,6 @@
 		background-image: linear-gradient( to bottom, transparent, #fff );
 	}
 
-
 	/**
 	 * Hovered Block style
 	 */
@@ -138,16 +222,16 @@
 	 */
 
 	::-moz-selection {
-		background: $blue-medium-highlight;
+		background-color: $blue-medium-highlight;
 	}
 
 	::selection {
-		background: $blue-medium-highlight;
+		background-color: $blue-medium-highlight;
 	}
 
 	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
-		background: transparent;
+		background-color: transparent;
 	}
 
 	&.is-multi-selected .editor-block-list__block-edit:before {
@@ -155,18 +239,18 @@
 	}
 
 	/**
-	 * Reusable Block style
+	 * Shared blocks
 	 */
 
-	&.is-reusable > .editor-block-mover:before {
+	&.is-shared > .editor-block-mover:before {
 		border-right: none;
 	}
 
-	&.is-reusable > .editor-block-settings-menu:before {
+	&.is-shared > .editor-block-settings-menu:before {
 		border-left: none;
 	}
 
-	&.is-reusable > .editor-block-list__block-edit:before {
+	&.is-shared > .editor-block-list__block-edit:before {
 		outline: 1px dashed $light-gray-500;
 	}
 
@@ -305,11 +389,11 @@
 	}
 
 	// Dropzones
-	& .components-drop-zone {
+	& > .components-drop-zone {
 		border: none;
 		top: -4px;
 		bottom: -3px;
-		margin: 0 $block-side-ui-padding;
+		margin: 0 $block-padding;
 		border-radius: 0;
 
 		.components-drop-zone__content {
@@ -343,9 +427,14 @@
 		bottom: -.9px; // utilize full vertical space to increase hoverable area
 		padding: 0;
 		width: $block-side-ui-width;
+
+		/* Necessary for drag indicator */
+		cursor: move;/* Fallback for IE/Edge < 14 */
+		cursor: grab;
 	}
 
 	// Elevate when selected or hovered
+	&.is-multi-selected,
 	&.is-selected,
 	&.is-hovered {
 		.editor-block-settings-menu,
@@ -369,7 +458,6 @@
 	// Left side UI
 	> .editor-block-mover {
 		left: -$block-side-ui-width;
-		z-index: z-index( '.editor-block-mover' );
 
 		// Mobile
 		display: none;
@@ -432,6 +520,8 @@
 
 .editor-block-list .editor-inserter {
 	margin: $item-spacing;
+	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: grab;
 
 	.editor-inserter__toggle {
 		color: $dark-gray-300;

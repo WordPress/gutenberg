@@ -10,6 +10,7 @@ export { default as CodeEditor } from './code-editor';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as Disabled } from './disabled';
+export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
@@ -48,7 +49,7 @@ export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
-export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
+export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
 export { default as ifCondition } from './higher-order/if-condition';

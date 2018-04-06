@@ -1,4 +1,4 @@
-.reusable-block-edit-panel {
+.shared-block-edit-panel {
 	align-items: center;
 	background: $light-gray-100;
 	color: $dark-gray-500;
@@ -11,15 +11,15 @@
 	position: relative;
 	top: $block-padding;
 
-	.reusable-block-edit-panel__spinner {
+	.shared-block-edit-panel__spinner {
 		margin: 0 5px;
 	}
 
-	.reusable-block-edit-panel__info {
+	.shared-block-edit-panel__info {
 		margin-right: auto;
 	}
 
-	.reusable-block-edit-panel__title {
+	.shared-block-edit-panel__title {
 		flex-grow: 1;
 		font-size: 14px;
 		height: 30px;
@@ -28,7 +28,7 @@
 	}
 
 	// Needs specificity to override the margin-bottom set by .button
-	.wp-core-ui & .reusable-block-edit-panel__button {
+	.wp-core-ui & .shared-block-edit-panel__button {
 		margin: 0 0 0 5px;
 	}
 }

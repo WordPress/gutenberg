@@ -1,20 +1,14 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import shortcuts from '../../keyboard-shortcuts';
-import { getEditorMode } from '../../store/selectors';
-import { switchEditorMode } from '../../store/actions';
 
 class EditorModeKeyboardShortcuts extends Component {
 	constructor() {
@@ -37,19 +31,17 @@ class EditorModeKeyboardShortcuts extends Component {
 	}
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			mode: getEditorMode( state ),
+			mode: select( 'core/edit-post' ).getEditorMode(),
 		};
-	},
-	( dispatch ) => {
+	} ),
+	withDispatch( ( dispatch ) => {
 		return {
 			switchMode: ( mode ) => {
-				dispatch( switchEditorMode( mode ) );
+				dispatch( 'core/edit-post' ).switchEditorMode( mode );
 			},
 		};
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
-)( EditorModeKeyboardShortcuts );
+	} ),
+] )( EditorModeKeyboardShortcuts );

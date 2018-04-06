@@ -13,7 +13,7 @@ import {
 	switchToBlockType,
 	createBlock,
 	serialize,
-	isReusableBlock,
+	isSharedBlock,
 	getDefaultBlockForPostFormat,
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
@@ -29,14 +29,14 @@ import {
 	setupEditorState,
 	resetPost,
 	receiveBlocks,
-	receiveReusableBlocks,
+	receiveSharedBlocks,
 	replaceBlock,
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
 	removeNotice,
 	savePost,
-	saveReusableBlock,
+	saveSharedBlock,
 	insertBlock,
 	removeBlocks,
 	selectBlock,
@@ -57,7 +57,7 @@ import {
 	getBlockCount,
 	getBlockRootUID,
 	getBlocks,
-	getReusableBlock,
+	getSharedBlock,
 	getPreviousBlockUid,
 	getProvisionalBlockUID,
 	getSelectedBlock,
@@ -72,7 +72,7 @@ import {
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
-const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
+const SHARED_BLOCK_NOTICE_ID = 'SHARED_BLOCK_NOTICE_ID';
 
 /**
  * Effect handler returning an action to remove the provisional block, if one
@@ -365,9 +365,9 @@ export default {
 
 		return setTemplateValidity( isValid );
 	},
-	FETCH_REUSABLE_BLOCKS( action, store ) {
+	FETCH_SHARED_BLOCKS( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
-		// until there is a filter to not use reusable blocks if undefined
+		// until there is a filter to not use shared blocks if undefined
 		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
 		if ( ! basePath ) {
 			return;
@@ -384,23 +384,23 @@ export default {
 		}
 
 		result.then(
-			( reusableBlockOrBlocks ) => {
-				dispatch( receiveReusableBlocks( map(
-					castArray( reusableBlockOrBlocks ),
-					( reusableBlock ) => ( {
-						reusableBlock,
-						parsedBlock: parse( reusableBlock.content )[ 0 ],
+			( sharedBlockOrBlocks ) => {
+				dispatch( receiveSharedBlocks( map(
+					castArray( sharedBlockOrBlocks ),
+					( sharedBlock ) => ( {
+						sharedBlock,
+						parsedBlock: parse( sharedBlock.content )[ 0 ],
 					} )
 				) ) );
 
 				dispatch( {
-					type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+					type: 'FETCH_SHARED_BLOCKS_SUCCESS',
 					id,
 				} );
 			},
 			( error ) => {
 				dispatch( {
-					type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
+					type: 'FETCH_SHARED_BLOCKS_FAILURE',
 					id,
 					error: error.responseJSON || {
 						code: 'unknown_error',
@@ -410,12 +410,12 @@ export default {
 			}
 		);
 	},
-	RECEIVE_REUSABLE_BLOCKS( action ) {
+	RECEIVE_SHARED_BLOCKS( action ) {
 		return receiveBlocks( map( action.results, 'parsedBlock' ) );
 	},
-	SAVE_REUSABLE_BLOCK( action, store ) {
+	SAVE_SHARED_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
-		// until there is a filter to not use reusable blocks if undefined
+		// until there is a filter to not use shared blocks if undefined
 		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
 		if ( ! basePath ) {
 			return;
@@ -425,7 +425,7 @@ export default {
 		const { dispatch } = store;
 		const state = store.getState();
 
-		const { uid, title, isTemporary } = getReusableBlock( state, id );
+		const { uid, title, isTemporary } = getSharedBlock( state, id );
 		const { name, attributes, innerBlocks } = getBlock( state, uid );
 		const content = serialize( createBlock( name, attributes, innerBlocks ) );
 
@@ -434,28 +434,28 @@ export default {
 		const method = isTemporary ? 'POST' : 'PUT';
 
 		wp.apiRequest( { path, data, method } ).then(
-			( updatedReusableBlock ) => {
+			( updatedSharedBlock ) => {
 				dispatch( {
-					type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-					updatedId: updatedReusableBlock.id,
+					type: 'SAVE_SHARED_BLOCK_SUCCESS',
+					updatedId: updatedSharedBlock.id,
 					id,
 				} );
 				const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
-				dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+				dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
 			},
 			( error ) => {
-				dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
+				dispatch( { type: 'SAVE_SHARED_BLOCK_FAILURE', id } );
 				const message = __( 'An unknown error occurred.' );
 				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
-					id: REUSABLE_BLOCK_NOTICE_ID,
+					id: SHARED_BLOCK_NOTICE_ID,
 					spokenMessage: message,
 				} ) );
 			}
 		);
 	},
-	DELETE_REUSABLE_BLOCK( action, store ) {
+	DELETE_SHARED_BLOCK( action, store ) {
 		// TODO: these are potentially undefined, this fix is in place
-		// until there is a filter to not use reusable blocks if undefined
+		// until there is a filter to not use shared blocks if undefined
 		const basePath = wp.api.getPostTypeRoute( 'wp_block' );
 		if ( ! basePath ) {
 			return;
@@ -464,21 +464,21 @@ export default {
 		const { id } = action;
 		const { getState, dispatch } = store;
 
-		// Don't allow a reusable block with a temporary ID to be deleted
-		const reusableBlock = getReusableBlock( getState(), id );
-		if ( ! reusableBlock || reusableBlock.isTemporary ) {
+		// Don't allow a shared block with a temporary ID to be deleted
+		const sharedBlock = getSharedBlock( getState(), id );
+		if ( ! sharedBlock || sharedBlock.isTemporary ) {
 			return;
 		}
 
-		// Remove any other blocks that reference this reusable block
+		// Remove any other blocks that reference this shared block
 		const allBlocks = getBlocks( getState() );
-		const associatedBlocks = allBlocks.filter( block => isReusableBlock( block ) && block.attributes.ref === id );
+		const associatedBlocks = allBlocks.filter( block => isSharedBlock( block ) && block.attributes.ref === id );
 		const associatedBlockUids = associatedBlocks.map( block => block.uid );
 
 		const transactionId = uniqueId();
 
 		dispatch( {
-			type: 'REMOVE_REUSABLE_BLOCK',
+			type: 'REMOVE_SHARED_BLOCK',
 			id,
 			optimist: { type: BEGIN, id: transactionId },
 		} );
@@ -486,28 +486,28 @@ export default {
 		// Remove the parsed block.
 		dispatch( removeBlocks( [
 			...associatedBlockUids,
-			reusableBlock.uid,
+			sharedBlock.uid,
 		] ) );
 
 		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }`, method: 'DELETE' } ).then(
 			() => {
 				dispatch( {
-					type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
+					type: 'DELETE_SHARED_BLOCK_SUCCESS',
 					id,
 					optimist: { type: COMMIT, id: transactionId },
 				} );
 				const message = __( 'Block deleted.' );
-				dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+				dispatch( createSuccessNotice( message, { id: SHARED_BLOCK_NOTICE_ID } ) );
 			},
 			( error ) => {
 				dispatch( {
-					type: 'DELETE_REUSABLE_BLOCK_FAILURE',
+					type: 'DELETE_SHARED_BLOCK_FAILURE',
 					id,
 					optimist: { type: REVERT, id: transactionId },
 				} );
 				const message = __( 'An unknown error occurred.' );
 				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
-					id: REUSABLE_BLOCK_NOTICE_ID,
+					id: SHARED_BLOCK_NOTICE_ID,
 					spokenMessage: message,
 				} ) );
 			}
@@ -516,32 +516,32 @@ export default {
 	CONVERT_BLOCK_TO_STATIC( action, store ) {
 		const state = store.getState();
 		const oldBlock = getBlock( state, action.uid );
-		const reusableBlock = getReusableBlock( state, oldBlock.attributes.ref );
-		const referencedBlock = getBlock( state, reusableBlock.uid );
+		const sharedBlock = getSharedBlock( state, oldBlock.attributes.ref );
+		const referencedBlock = getBlock( state, sharedBlock.uid );
 		const newBlock = createBlock( referencedBlock.name, referencedBlock.attributes );
 		store.dispatch( replaceBlock( oldBlock.uid, newBlock ) );
 	},
-	CONVERT_BLOCK_TO_REUSABLE( action, store ) {
+	CONVERT_BLOCK_TO_SHARED( action, store ) {
 		const { getState, dispatch } = store;
 
 		const parsedBlock = getBlock( getState(), action.uid );
-		const reusableBlock = {
-			id: uniqueId( 'reusable' ),
+		const sharedBlock = {
+			id: uniqueId( 'shared' ),
 			uid: parsedBlock.uid,
 			title: __( 'Untitled block' ),
 		};
 
-		dispatch( receiveReusableBlocks( [ {
-			reusableBlock,
+		dispatch( receiveSharedBlocks( [ {
+			sharedBlock,
 			parsedBlock,
 		} ] ) );
 
-		dispatch( saveReusableBlock( reusableBlock.id ) );
+		dispatch( saveSharedBlock( sharedBlock.id ) );
 
 		dispatch( replaceBlock(
 			parsedBlock.uid,
 			createBlock( 'core/block', {
-				ref: reusableBlock.id,
+				ref: sharedBlock.id,
 				layout: parsedBlock.attributes.layout,
 			} )
 		) );

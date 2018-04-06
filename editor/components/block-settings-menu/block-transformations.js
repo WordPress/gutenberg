@@ -19,7 +19,7 @@ import './style.scss';
 import { getBlock } from '../../store/selectors';
 import { replaceBlocks } from '../../store/actions';
 
-function BlockTransformations( { blocks, small = false, onTransform, onClick = noop, isLocked } ) {
+function BlockTransformations( { blocks, small = false, onTransform, onClick = noop, isLocked, itemsRole } ) {
 	const possibleBlockTransformations = getPossibleBlockTransformations( blocks );
 	if ( isLocked || ! possibleBlockTransformations.length ) {
 		return null;
@@ -43,6 +43,7 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 						} }
 						icon={ icon }
 						label={ small ? title : undefined }
+						role={ itemsRole }
 					>
 						{ ! small && title }
 					</IconButton>
