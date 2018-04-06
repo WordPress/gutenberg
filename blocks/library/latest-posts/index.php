@@ -77,8 +77,18 @@ function register_core_latest_posts_block() {
 
 	wp_style_add_data( 'core-latest-posts-block', 'rtl', 'replace' );
 
+	wp_register_style(
+		'core-latest-posts-block-editor',
+		gutenberg_url( '/build/__block_latestPosts_editor.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/__block_latestPosts_editor.css' )
+	);
+	
+	wp_style_add_data( 'core-latest-posts-block-editor', 'rtl', 'replace' );
+
 	register_block_type( 'core/latest-posts', array(
 		'style' => 'core-latest-posts-block',
+		'editor_style' => 'core-latest-posts-block-editor',
 		'editor_script' => 'core-latest-posts-block',
 		'attributes'      => array(
 			'categories'      => array(

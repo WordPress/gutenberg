@@ -17,8 +17,18 @@ function register_core_quote_block() {
 
 	wp_style_add_data( 'core-quote-block', 'rtl', 'replace' );
 
+	wp_register_style(
+		'core-quote-block-editor',
+		gutenberg_url( '/build/__block_quote_editor.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/__block_quote_editor.css' )
+	);
+	
+	wp_style_add_data( 'core-quote-block-editor', 'rtl', 'replace' );
+
 	register_block_type( 'core/quote', array(
 		'style' => 'core-quote-block',
+		'editor_style' => 'core-quote-block-editor',
 		'editor_script' => 'core-quote-block',
 	) );
 }

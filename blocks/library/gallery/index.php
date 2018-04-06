@@ -17,8 +17,18 @@ function register_core_gallery_block() {
 
 	wp_style_add_data( 'core-gallery-block', 'rtl', 'replace' );
 
+	wp_register_style(
+		'core-gallery-block-editor',
+		gutenberg_url( '/build/__block_gallery_editor.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/__block_gallery_editor.css' )
+	);
+	
+	wp_style_add_data( 'core-gallery-block-editor', 'rtl', 'replace' );
+
 	register_block_type( 'core/gallery', array(
 		'style' => 'core-gallery-block',
+		'editor_style' => 'core-gallery-block-editor',
 		'editor_script' => 'core-gallery-block',
 	) );
 	

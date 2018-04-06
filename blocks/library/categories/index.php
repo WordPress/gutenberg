@@ -96,8 +96,18 @@ function register_core_categories_block() {
 	
 	wp_style_add_data( 'core-categories-block', 'rtl', 'replace' );
 
+	wp_register_style(
+		'core-categories-block-editor',
+		gutenberg_url( '/build/__block_categories_editor.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/__block_categories_editor.css' )
+	);
+	
+	wp_style_add_data( 'core-categories-block-editor', 'rtl', 'replace' );
+
 	register_block_type( 'core/categories', array(
 		'style' => 'core-categories-block',
+		'editor_style' => 'core-categories-block-editor',
 		'editor_script' => 'core-categories-block',
 		'render_callback' => 'gutenberg_render_block_core_categories',
 	) );
