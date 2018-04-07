@@ -74,6 +74,7 @@ function gutenberg_get_script_polyfill( $tests ) {
  */
 function gutenberg_register_scripts_and_styles() {
 	gutenberg_register_vendor_scripts();
+	gutenberg_register_wpi18n_for_scripts();
 
 	// Editor Scripts.
 	wp_register_script(
@@ -800,6 +801,27 @@ function gutenberg_capture_code_editor_settings( $settings ) {
 	return false;
 }
 
+
+function gutenberg_register_wpi18n_for_scripts() {
+	$handles_and_chunks = array(
+		'wp-data' => 'data',
+		'wp-core-data' => 'coreData',
+		'wp-utils' => 'utils',
+		'wp-hooks' => 'hooks',
+		'wp-date' => 'date',
+		'wp-element' => 'element',
+		'wp-components' => 'components',
+		'wp-blocks' => 'blocks',
+		'wp-viewport' => 'viewport',
+		'wp-editor' => 'editor',
+		'wp-edit-post' => 'editPost',
+		'wp-plugins' => 'plugins'
+	);
+	foreach ( $handles_and_chunks as $handle => $chunk ) {
+		gutenberg_register_script_i18n( $handle, $chunk, 'gutenberg' );
+	}
+}
+
 /**
  * Scripts & Styles.
  *
@@ -883,11 +905,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	// Prepare Jed locale data.
-	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
-	wp_add_inline_script(
-		'wp-i18n',
-		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
-	);
+	// $locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
+	// 	// wp_add_inline_script(
+	// 	// 	'wp-i18n',
+	// 	// 	'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
+	// 	// );
 
 	// Preload server-registered block schemas.
 	wp_localize_script( 'wp-blocks', '_wpBlocks', gutenberg_prepare_blocks_for_js() );
