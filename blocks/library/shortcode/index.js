@@ -3,7 +3,7 @@
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withInstanceId, Dashicon } from '@wordpress/components';
+import { withInstanceId } from '@wordpress/components';
 
 /**
  * Internal dependencies
