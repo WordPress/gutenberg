@@ -39,6 +39,7 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import InlineInsertionPoint from './inline-insertion-point';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
@@ -417,6 +418,20 @@ export class RichText extends Component {
 		this.context.onCreateUndoLevel();
 	}
 
+	getContainerPosition() {
+		// Find the parent "relative" or "absolute" positioned container
+		const findRelativeParent = ( node ) => {
+			const style = window.getComputedStyle( node );
+			if ( style.position === 'relative' || style.position === 'absolute' ) {
+				return node;
+			}
+			return findRelativeParent( node.parentNode );
+		};
+		const container = findRelativeParent( this.editor.getBody() );
+
+		return container.getBoundingClientRect();
+	}
+
 	/**
 	 * Calculates the relative position where the link toolbar should be.
 	 *
@@ -436,6 +451,17 @@ export class RichText extends Component {
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
 			left: position.left - containerPosition.left + ( position.width / 2 ) + toolbarOffset.left,
+		};
+	}
+
+	getInsertionPosition() {
+		const containerPosition = this.getContainerPosition();
+		const rect = getRectangleFromRange( this.editor.selection.getRng() );
+
+		return {
+			top: rect.top - containerPosition.top,
+			left: rect.right - containerPosition.left,
+			height: rect.height,
 		};
 	}
 
@@ -834,6 +860,7 @@ export class RichText extends Component {
 			formatters,
 			autocompleters,
 			format,
+			isInlineInsertionPointVisible = false,
 		} = this.props;
 
 		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
@@ -871,6 +898,11 @@ export class RichText extends Component {
 						{ formatToolbar }
 					</div>
 				) }
+				{ isSelected && isInlineInsertionPointVisible &&
+					<InlineInsertionPoint
+						style={ this.getInsertionPosition() }
+					/>
+				}
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>
@@ -942,9 +974,11 @@ const RichTextContainer = compose( [
 	} ),
 	withSelect( ( select ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
+		const { isInlineInsertionPointVisible = noop } = select( 'core/editor' ) || {};
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
+			isInlineInsertionPointVisible: isInlineInsertionPointVisible(),
 		};
 	} ),
 	withSafeTimeout,
