@@ -123,7 +123,7 @@ function gutenberg_render_block( $block ) {
  * @param  string $content Post content.
  * @return string          Updated post content.
  */
-function do_blocks( $content ) {
+function render_dynamic_blocks( $content ) {
 	$rendered_content = '';
 
 	$dynamic_block_names   = get_dynamic_block_names();
@@ -199,9 +199,33 @@ function do_blocks( $content ) {
 	// Append remaining unmatched content.
 	$rendered_content .= $content;
 
-	// Strip remaining block comment demarcations.
-	$rendered_content = preg_replace( '/<!--\s+\/?wp:.*?-->\r?\n?/m', '', $rendered_content );
-
 	return $rendered_content;
 }
-add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
+
+function gutenberg_strip_block_comments( $content ) {
+	
+	// Strip remaining block comment demarcations.
+	$content = preg_replace_callback( '/<!--\s+\/?wp:.*?-->\r?\n?/m', 'gutenberg_process_block_comment', $content );
+
+	return $content;
+}
+
+function gutenberg_process_block_comment( $matches ) {
+
+	$block_comment = $matches[0];
+	
+	// Only process the block comment if it's not a closing tag for a block. If it's a closing tag, we can just return. 
+	if ( preg_match( '/\/wp:/m', $block_comment ) !== 1 ) {
+		$matches2 = Array();
+
+		preg_match( '/wp:(.*?)\s+/m', $block_comment, $matches2); //Should it be ' +' or '/s+'. Research more about this.
+
+		$block_type_name = $matches2[1];
+		//WP_Parsed_Block_Types_Registry::get_instance()->add( $block_type_name );
+	}
+
+	return '';
+}
+
+add_filter( 'the_content', 'render_dynamic_blocks', 8 ); // BEFORE do_shortcode().
+add_filter( 'the_content', 'gutenberg_strip_block_comments', 9);
