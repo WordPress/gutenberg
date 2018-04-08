@@ -211,20 +211,43 @@ function gutenberg_strip_block_comments( $content ) {
 }
 
 function gutenberg_process_block_comment( $matches ) {
-
 	$block_comment = $matches[0];
 	
 	// Only process the block comment if it's not a closing tag for a block. If it's a closing tag, we can just return. 
 	if ( preg_match( '/\/wp:/m', $block_comment ) !== 1 ) {
-		$matches2 = Array();
+		
+		$match = Array();
 
-		preg_match( '/wp:(.*?)\s+/m', $block_comment, $matches2); //Should it be ' +' or '/s+'. Research more about this.
+		preg_match( '/wp:(.*?)\s+/m', $block_comment, $match); //Should it be ' +' or '/s+'. Research more about this.
 
-		$block_type_name = $matches2[1];
+		$block_type_name = $match[1];
+		$block_type_name = gutenberg_prefix_core_namespace_if_not_found( $block_type_name );
+		
 		//WP_Parsed_Block_Types_Registry::get_instance()->add( $block_type_name );
 	}
 
 	return '';
+}
+
+/**
+ * Prefixes 'core/' as the namespace to the block type name if the namespace isn't found in the block type name
+ *
+ * @since 2.6.0
+ *
+ * @param  string $block_type Name of the block type.
+ * @return string             Name of the block type, prefixed by the core namespace if needed.
+ */
+function gutenberg_prefix_core_namespace_if_not_found( $block_type ) {
+	$block_type = trim( $block_type );
+
+	$index_of_slash = strpos( $block_type, '/' );
+
+	// If namespace isn't found in the block type name, prefix it with 'core/'
+	if ( $index_of_slash === FALSE ) {
+		return 'core/' . $block_type;
+	}
+
+	return $block_type;
 }
 
 add_filter( 'the_content', 'render_dynamic_blocks', 8 ); // BEFORE do_shortcode().
