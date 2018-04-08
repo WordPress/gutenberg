@@ -447,7 +447,7 @@ function gutenberg_replace_default_add_new_button() {
 			position: relative;
 			vertical-align: top;
 			text-decoration: none !important;
-			padding: 4px 5px 4px 3px;
+			padding: 3px 5px 3px 3px;
 		}
 
 		.split-page-title-action .dropdown {
@@ -470,6 +470,10 @@ function gutenberg_replace_default_add_new_button() {
 			<?php else : ?>
 			padding-right: 9px;
 			<?php endif; ?>
+		}
+
+		.expander {
+			outline: none;
 		}
 
 	</style>
