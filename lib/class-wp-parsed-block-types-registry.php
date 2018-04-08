@@ -107,6 +107,7 @@ class WP_Parsed_Block_Types_Registry {
 	 *
 	 * The instance will be created if it does not exist yet.
 	 *
+	 * @since 2.6.0
 	 * @access public
 	 * @static
 	 *
