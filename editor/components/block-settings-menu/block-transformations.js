@@ -7,10 +7,10 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
 import { getPossibleBlockTransformations, switchToBlockType } from '@wordpress/blocks';
-import { compose } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,16 +19,20 @@ import './style.scss';
 import { getBlock } from '../../store/selectors';
 import { replaceBlocks } from '../../store/actions';
 
-function BlockTransformations( { blocks, small = false, onTransform, onClick = noop, isLocked } ) {
+function BlockTransformations( { blocks, small = false, onTransform, onClick = noop, isLocked, itemsRole } ) {
 	const possibleBlockTransformations = getPossibleBlockTransformations( blocks );
 	if ( isLocked || ! possibleBlockTransformations.length ) {
 		return null;
 	}
 	return (
-		<div className="editor-block-settings-menu__section">
+		<Fragment>
+			<div className="editor-block-settings-menu__separator" />
+			<span
+				className="editor-block-settings-menu__title"
+			>
+				{ __( 'Transform into:' ) }
+			</span>
 			{ possibleBlockTransformations.map( ( { name, title, icon } ) => {
-			/* translators: label indicating the transformation of a block into another block */
-				const shownText = sprintf( __( 'Turn into %s' ), title );
 				return (
 					<IconButton
 						key={ name }
@@ -38,13 +42,14 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 							onClick( event );
 						} }
 						icon={ icon }
-						label={ small ? shownText : undefined }
+						label={ small ? title : undefined }
+						role={ itemsRole }
 					>
-						{ ! small && shownText }
+						{ ! small && title }
 					</IconButton>
 				);
 			} ) }
-		</div>
+		</Fragment>
 	);
 }
 export default compose(

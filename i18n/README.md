@@ -19,7 +19,7 @@ add_action( 'admin_enqueue_scripts', 'myplugin_enqueue_scripts' );
 The script dependency will add a new `wp.i18n` object to your browser's global scope when loaded. In most cases you'll find parallels between [WordPress PHP localization functions](https://codex.wordpress.org/I18n_for_WordPress_Developers#Strings_for_Translation) and those on the `wp.i18n` object:
 
 ```js
-wp.i18n.sprintf( wp.i18n._n( '%d hat', '%d hats', 4 ), 4 )
+wp.i18n.sprintf( wp.i18n._n( '%d hat', '%d hats', 4, 'text-domain' ), 4 )
 // 4 hats
 ```
 
@@ -39,25 +39,25 @@ If you include the `.pot` file in your project's repository, you should be sure 
 
 ## API
 
-`wp.i18n.__( text: string ): string`
+`wp.i18n.__( text: string, domain: string ): string`
 
 Retrieve the translation of text.
 
 See: https://developer.wordpress.org/reference/functions/__/
 
-`wp.i18n._x( text: string, context: string ): string`
+`wp.i18n._x( text: string, context: string, domain: string ): string`
 
 Retrieve translated string with gettext context.
 
 See: https://developer.wordpress.org/reference/functions/_x/
 
-`wp.i18n._n( single: string, plural: string, number: Number ): string`
+`wp.i18n._n( single: string, plural: string, number: Number, domain: string ): string`
 
 Translates and retrieves the singular or plural form based on the supplied number.
 
 See: https://developer.wordpress.org/reference/functions/_n/
 
-`wp.i18n._nx( single: string, plural: string, number: Number, context: string ): string`
+`wp.i18n._nx( single: string, plural: string, number: Number, context: string, domain: string ): string`
 
 Translates and retrieves the singular or plural form based on the supplied number, with gettext context.
 

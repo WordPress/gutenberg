@@ -6,7 +6,14 @@ import {
 	registerBlockType
 } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
-import { Dashicon, IconButton, PanelColor, withFallbackStyles } from '@wordpress/components';
+import {
+	Dashicon,
+	IconButton,
+	PanelBody,
+	PanelColor,
+	ToggleControl,
+	withFallbackStyles,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -16,7 +23,6 @@ import './style.scss';
 import RichText from '../../rich-text';
 import UrlInput from '../../url-input';
 import BlockControls from '../../block-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
@@ -63,8 +69,7 @@ class ButtonBlock extends Component {
 		const {
 			attributes,
 			setAttributes,
-			focus,
-			setFocus,
+			isSelected,
 			className,
 		} = this.props;
 
@@ -79,7 +84,7 @@ class ButtonBlock extends Component {
 		} = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
@@ -89,8 +94,6 @@ class ButtonBlock extends Component {
 					tagName="span"
 					placeholder={ __( 'Add text…' ) }
 					value={ text }
-					focus={ focus }
-					onFocus={ setFocus }
 					onChange={ ( value ) => setAttributes( { text: value } ) }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 					className="wp-block-button__link"
@@ -98,37 +101,40 @@ class ButtonBlock extends Component {
 						backgroundColor: color,
 						color: textColor,
 					} }
+					isSelected={ isSelected }
 					keepPlaceholderOnFocus
 				/>
-				{ focus &&
+				{ isSelected &&
 					<InspectorControls key="inspector">
-						<ToggleControl
-							label={ __( 'Wrap text' ) }
-							checked={ !! clear }
-							onChange={ this.toggleClear }
-						/>
-						<PanelColor title={ __( 'Background Color' ) } colorValue={ color } >
-							<ColorPalette
-								value={ color }
-								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
+						<PanelBody>
+							<ToggleControl
+								label={ __( 'Wrap text' ) }
+								checked={ !! clear }
+								onChange={ this.toggleClear }
 							/>
-						</PanelColor>
-						<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
-							<ColorPalette
-								value={ textColor }
-								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
-							/>
-						</PanelColor>
-						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
-							node={ this.nodeRef }
-							textColor={ textColor }
-							backgroundColor={ color }
-							isLargeText={ true }
-						/> }
+							<PanelColor title={ __( 'Background Color' ) } colorValue={ color } >
+								<ColorPalette
+									value={ color }
+									onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
+								/>
+							</PanelColor>
+							<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
+								<ColorPalette
+									value={ textColor }
+									onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+								/>
+							</PanelColor>
+							{ this.nodeRef && <ContrastCheckerWithFallbackStyles
+								node={ this.nodeRef }
+								textColor={ textColor }
+								backgroundColor={ color }
+								isLargeText={ true }
+							/> }
+						</PanelBody>
 					</InspectorControls>
 				}
 			</span>,
-			focus && (
+			isSelected && (
 				<form
 					key="form-link"
 					className="blocks-button__inline-link"
@@ -188,7 +194,7 @@ registerBlockType( 'core/button', {
 
 	getEditWrapperProps( attributes ) {
 		const { align, clear } = attributes;
-		const props = {};
+		const props = { 'data-resized': true };
 
 		if ( 'left' === align || 'right' === align || 'center' === align ) {
 			props[ 'data-align' ] = align;

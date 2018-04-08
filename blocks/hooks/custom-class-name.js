@@ -7,15 +7,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getWrapperDisplayName } from '@wordpress/element';
+import { createHigherOrderComponent, Fragment } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { hasBlockSupport } from '../api';
-import InspectorControls from '../inspector-controls';
+import InspectorAdvancedControls from '../inspector-advanced-controls';
 
 /**
  * Filters registered block settings, extending attributes with anchor using ID
@@ -23,7 +24,7 @@ import InspectorControls from '../inspector-controls';
  *
  * @param {Object} settings Original block settings.
  *
- * @returns {Object} Filtered block settings.
+ * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
@@ -44,31 +45,34 @@ export function addAttribute( settings ) {
  *
  * @param {function|Component} BlockEdit Original component.
  *
- * @returns {string} Wrapped component.
+ * @return {string} Wrapped component.
  */
-export function withInspectorControl( BlockEdit ) {
-	const WrappedBlockEdit = ( props ) => {
-		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true ) && props.focus;
+export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		const hasCustomClassName = hasBlockSupport( props.name, 'customClassName', true );
 
-		return [
-			<BlockEdit key="block-edit-custom-class-name" { ...props } />,
-			hasCustomClassName && <InspectorControls key="inspector-custom-class-name">
-				<InspectorControls.TextControl
-					label={ __( 'Additional CSS Class' ) }
-					value={ props.attributes.className || '' }
-					onChange={ ( nextValue ) => {
-						props.setAttributes( {
-							className: nextValue,
-						} );
-					} }
-				/>
-			</InspectorControls>,
-		];
+		if ( hasCustomClassName && props.isSelected ) {
+			return (
+				<Fragment>
+					<BlockEdit { ...props } />
+					<InspectorAdvancedControls>
+						<TextControl
+							label={ __( 'Additional CSS Class' ) }
+							value={ props.attributes.className || '' }
+							onChange={ ( nextValue ) => {
+								props.setAttributes( {
+									className: nextValue,
+								} );
+							} }
+						/>
+					</InspectorAdvancedControls>
+				</Fragment>
+			);
+		}
+
+		return <BlockEdit { ...props } />;
 	};
-	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'customClassName' );
-
-	return WrappedBlockEdit;
-}
+}, 'withInspectorControl' );
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
@@ -79,7 +83,7 @@ export function withInspectorControl( BlockEdit ) {
  * @param {Object} blockType  Block type.
  * @param {Object} attributes Current block attributes.
  *
- * @returns {Object} Filtered props applied to save element.
+ * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
 	if ( hasBlockSupport( blockType, 'customClassName', true ) && attributes.className ) {

@@ -1,4 +1,23 @@
-import moment from 'moment';
+import momentLib from 'moment';
+import 'moment-timezone';
+import 'moment-timezone/moment-timezone-utils';
+
+export const settings = window._wpDateSettings;
+
+// Create WP timezone based off dateSettings.
+momentLib.tz.add( momentLib.tz.pack( {
+	name: 'WP',
+	abbrs: [ 'WP' ],
+	untils: [ null ],
+	offsets: [ -settings.timezone.offset * 60 || 0 ],
+} ) );
+
+// Create a new moment object which mirrors moment but includes
+// the attached timezone, instead of setting a default timezone on
+// the global moment object.
+export const moment = ( ...args ) => {
+	return momentLib.tz( ...args, 'WP' );
+};
 
 // Date constants.
 /**
@@ -45,7 +64,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	S( momentDate ) {
 		// Do - D
@@ -60,7 +79,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	z( momentDate ) {
 		// DDD - 1
@@ -80,7 +99,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	t( momentDate ) {
 		return momentDate.daysInMonth();
@@ -92,7 +111,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	L( momentDate ) {
 		return momentDate.isLeapYear() ? '1' : '0';
@@ -109,10 +128,10 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	B( momentDate ) {
-		const timezoned = moment( momentDate ).utcOffset( 60 );
+		const timezoned = momentLib( momentDate ).utcOffset( 60 );
 		const seconds = parseInt( timezoned.format( 's' ), 10 ),
 			minutes = parseInt( timezoned.format( 'm' ), 10 ),
 			hours = parseInt( timezoned.format( 'H' ), 10 );
@@ -140,7 +159,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	I( momentDate ) {
 		return momentDate.isDST() ? '1' : '0';
@@ -153,7 +172,7 @@ const formatMap = {
 	 *
 	 * @param {moment} momentDate Moment instance.
 	 *
-	 * @returns {string} Formatted date.
+	 * @return {string} Formatted date.
 	 */
 	Z( momentDate ) {
 		// Timezone offset in seconds.
@@ -171,37 +190,37 @@ const formatMap = {
 /**
  * Adds a locale to moment, using the format supplied by `wp_localize_script()`.
  *
- * @param {Object} settings Settings, including locale data.
+ * @param {Object} localSettings Settings, including locale data.
  */
-function setupLocale( settings ) {
+function setupLocale( localSettings ) {
 	// Backup and restore current locale.
-	const currentLocale = moment.locale();
-	moment.updateLocale( settings.l10n.locale, {
+	const currentLocale = momentLib.locale();
+	momentLib.updateLocale( localSettings.l10n.locale, {
 		// Inherit anything missing from the default locale.
 		parentLocale: currentLocale,
-		months: settings.l10n.months,
-		monthsShort: settings.l10n.monthsShort,
-		weekdays: settings.l10n.weekdays,
-		weekdaysShort: settings.l10n.weekdaysShort,
+		months: localSettings.l10n.months,
+		monthsShort: localSettings.l10n.monthsShort,
+		weekdays: localSettings.l10n.weekdays,
+		weekdaysShort: localSettings.l10n.weekdaysShort,
 		meridiem( hour, minute, isLowercase ) {
 			if ( hour < 12 ) {
-				return isLowercase ? settings.l10n.meridiem.am : settings.l10n.meridiem.AM;
+				return isLowercase ? localSettings.l10n.meridiem.am : localSettings.l10n.meridiem.AM;
 			}
-			return isLowercase ? settings.l10n.meridiem.pm : settings.l10n.meridiem.PM;
+			return isLowercase ? localSettings.l10n.meridiem.pm : localSettings.l10n.meridiem.PM;
 		},
 		longDateFormat: {
-			LT: settings.formats.time,
+			LT: localSettings.formats.time,
 			LTS: null,
 			L: null,
-			LL: settings.formats.date,
-			LLL: settings.formats.datetime,
+			LL: localSettings.formats.date,
+			LLL: localSettings.formats.datetime,
 			LLLL: null,
 		},
 		// From human_time_diff?
 		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
 		relativeTime: {
-			future: settings.l10n.relative.future,
-			past: settings.l10n.relative.past,
+			future: localSettings.l10n.relative.future,
+			past: localSettings.l10n.relative.past,
 			s: 'seconds',
 			m: 'a minute',
 			mm: '%d minutes',
@@ -215,7 +234,7 @@ function setupLocale( settings ) {
 			yy: '%d years',
 		},
 	} );
-	moment.locale( currentLocale );
+	momentLib.locale( currentLocale );
 }
 
 /**
@@ -226,12 +245,12 @@ function setupLocale( settings ) {
  * @param {(Date|string|moment|null)} dateValue  Date object or string,
  *                                               parsable by moment.js.
  *
- * @returns {string} Formatted date.
+ * @return {string} Formatted date.
  */
 export function format( dateFormat, dateValue = new Date() ) {
 	let i, char;
 	let newFormat = [];
-	const momentDate = moment( dateValue );
+	const momentDate = momentLib( dateValue );
 	for ( i = 0; i < dateFormat.length; i++ ) {
 		char = dateFormat[ i ];
 		// Is this an escape?
@@ -267,11 +286,11 @@ export function format( dateFormat, dateValue = new Date() ) {
  * @param {(Date|string|moment|null)} dateValue  Date object or string,
  *                                               parsable by moment.js.
  *
- * @returns {string} Formatted date.
+ * @return {string} Formatted date.
  */
 export function date( dateFormat, dateValue = new Date() ) {
 	const offset = window._wpDateSettings.timezone.offset * HOUR_IN_MINUTES;
-	const dateMoment = moment( dateValue ).utcOffset( offset, true );
+	const dateMoment = momentLib( dateValue ).utcOffset( offset, true );
 	return format( dateFormat, dateMoment );
 }
 
@@ -283,10 +302,10 @@ export function date( dateFormat, dateValue = new Date() ) {
  * @param {(Date|string|moment|null)} dateValue  Date object or string,
  *                                               parsable by moment.js.
  *
- * @returns {string} Formatted date.
+ * @return {string} Formatted date.
  */
 export function gmdate( dateFormat, dateValue = new Date() ) {
-	const dateMoment = moment( dateValue ).utc();
+	const dateMoment = momentLib( dateValue ).utc();
 	return format( dateFormat, dateMoment );
 }
 
@@ -300,21 +319,19 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
  * @param {boolean}                   gmt        True for GMT/UTC, false for
  *                                               site's timezone.
  *
- * @returns {string} Formatted date.
+ * @return {string} Formatted date.
  */
 export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 	// Defaults.
 	const offset = gmt ? 0 : window._wpDateSettings.timezone.offset * HOUR_IN_MINUTES;
 	// Convert to moment object.
-	const dateMoment = moment( dateValue ).utcOffset( offset, true );
+	const dateMoment = momentLib( dateValue ).utcOffset( offset, true );
 
 	// Set the locale.
 	dateMoment.locale( window._wpDateSettings.l10n.locale );
 	// Format and return.
 	return format( dateFormat, dateMoment );
 }
-
-export const settings = window._wpDateSettings;
 
 // Initialize.
 setupLocale( window._wpDateSettings );

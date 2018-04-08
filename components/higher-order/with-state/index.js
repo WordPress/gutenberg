@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, getWrapperDisplayName } from '@wordpress/element';
+import { Component, createHigherOrderComponent } from '@wordpress/element';
 
 /**
  * A Higher Order Component used to provide and manage internal component state
@@ -9,11 +9,11 @@ import { Component, getWrapperDisplayName } from '@wordpress/element';
  *
  * @param {?Object} initialState Optional initial state of the component.
  *
- * @returns {Component} Wrapped component.
+ * @return {Component} Wrapped component.
  */
-function withState( initialState = {} ) {
-	return ( OriginalComponent ) => {
-		class WrappedComponent extends Component {
+export default function withState( initialState = {} ) {
+	return createHigherOrderComponent( ( OriginalComponent ) => {
+		return class WrappedComponent extends Component {
 			constructor() {
 				super( ...arguments );
 
@@ -31,12 +31,6 @@ function withState( initialState = {} ) {
 					/>
 				);
 			}
-		}
-
-		WrappedComponent.displayName = getWrapperDisplayName( WrappedComponent, 'state' );
-
-		return WrappedComponent;
-	};
+		};
+	}, 'withState' );
 }
-
-export default withState;

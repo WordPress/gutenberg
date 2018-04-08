@@ -4,7 +4,7 @@ This document is a checklist for building and releasing a new version of Gutenbe
 
 ## Writing the Release Post and Changelog
 
-* Open the [recently updated PRs view](https://github.com/WordPress/gutenberg/pulls?page=2&q=is%3Apr+is%3Aclosed+sort%3Aupdated-desc), and find the PR where the last version bump occurred.
+* Open the [recently updated PRs view](https://github.com/WordPress/gutenberg/pulls?q=is%3Apr+is%3Aclosed+sort%3Aupdated-desc), and find the PR where the last version bump occurred.
 * Read through each PR since then, to determine if it needs to be included in the Release Post and/or changelog.
 * Choose a feature or two to highlight in the release post - record an animation of them in action.
 * Save the draft post on [make.wordpress.org/core](https://make.wordpress.org/core/), for publishing after the release.
@@ -31,12 +31,13 @@ Note: The `1.x.0` notation `git` and `svn` commands should be replaced with the 
 * Have a checkout of https://wordpress.org/plugins/gutenberg/.
   First time: `svn checkout https://plugins.svn.wordpress.org/gutenberg`
   Subsequent times: `svn up`
-* Delete the contents of `trunk` except for the `readme.txt` file (this file doesn’t exist in github, only on svn).
+* Delete the contents of `trunk` except for the `readme.txt` and `changelog.txt` files (these files don’t exist in github, only on svn).
 * Copy all the contents of the zip file to `trunk`.
-* Edit `readme.txt` to include the changelog for the current release.
+* Edit `readme.txt` to include the changelog for the current release, replacing the previous release's.
+* Add the changelog for the current release to `changelog.txt`.
 * Add new files to the SVN repo, and remove old files, in the `trunk` directory:
-  Add new files: `svn st | grep '^\?' | awk '{print $2}' | svn add`
-  Delete old files: `svn st | grep '^!' | awk '{print $2}' | svn rm`
+  Add new files: `svn st | grep '^\?' | awk '{print $2}' | xargs svn add`
+  Delete old files: `svn st | grep '^!' | awk '{print $2}' | xargs svn rm`
 * Commit the new version to `trunk`:
   `svn ci -m "Committing version 1.x.0"`
 * Tag the new version. Change to the parent directory, and run:

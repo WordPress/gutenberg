@@ -1,7 +1,8 @@
 // Set up `wp.*` aliases.  Handled by Webpack outside of the test build.
 global.wp = {
 	shortcode: {
-		next: () => {},
+		next() {},
+		regexp: jest.fn().mockReturnValue( new RegExp() ),
 	},
 };
 
@@ -15,6 +16,9 @@ global.wp = {
 	'editor',
 	'data',
 	'editPost',
+	'core-data',
+	'viewport',
+	'plugins',
 ].forEach( entryPointName => {
 	Object.defineProperty( global.wp, entryPointName, {
 		get: () => require( entryPointName ),

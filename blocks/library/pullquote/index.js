@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType
 } from '@wordpress/blocks';
+import { withState } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -65,12 +66,15 @@ registerBlockType( 'core/pullquote', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit: withState( {
+		editable: 'content',
+	} )( ( { attributes, setAttributes, isSelected, className, editable, setState } ) => {
 		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -87,28 +91,30 @@ registerBlockType( 'core/pullquote', {
 							value: fromRichTextValue( nextValue ),
 						} )
 					}
+					/* translators: the text of the quotation */
 					placeholder={ __( 'Write quote…' ) }
-					focus={ focus && focus.editable === 'value' ? focus : null }
-					onFocus={ ( props ) => setFocus( { ...props, editable: 'value' } ) }
 					wrapperClassName="blocks-pullquote__content"
+					isSelected={ isSelected && editable === 'content' }
+					onFocus={ onSetActiveEditable( 'content' ) }
 				/>
-				{ ( citation || !! focus ) && (
+				{ ( citation || isSelected ) && (
 					<RichText
 						tagName="cite"
 						value={ citation }
-						placeholder={ __( 'Write caption…' ) }
+						/* translators: the individual or entity quoted */
+						placeholder={ __( 'Write citation…' ) }
 						onChange={
 							( nextCitation ) => setAttributes( {
 								citation: nextCitation,
 							} )
 						}
-						focus={ focus && focus.editable === 'citation' ? focus : null }
-						onFocus={ ( props ) => setFocus( { ...props, editable: 'citation' } ) }
+						isSelected={ isSelected && editable === 'cite' }
+						onFocus={ onSetActiveEditable( 'cite' ) }
 					/>
 				) }
 			</blockquote>,
 		];
-	},
+	} ),
 
 	save( { attributes } ) {
 		const { value, citation, align } = attributes;

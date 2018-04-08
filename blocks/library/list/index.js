@@ -230,17 +230,17 @@ registerBlockType( 'core/list', {
 		render() {
 			const {
 				attributes,
-				focus,
-				setFocus,
+				isSelected,
 				insertBlocksAfter,
 				setAttributes,
 				mergeBlocks,
 				onReplace,
+				className,
 			} = this.props;
 			const { nodeName, values } = attributes;
 
 			return [
-				focus && (
+				isSelected && (
 					<BlockControls
 						key="controls"
 						controls={ [
@@ -277,9 +277,8 @@ registerBlockType( 'core/list', {
 					onSetup={ this.setupEditor }
 					onChange={ this.setNextValues }
 					value={ values }
-					focus={ focus }
-					onFocus={ setFocus }
 					wrapperClassName="blocks-list"
+					className={ className }
 					placeholder={ __( 'Write list…' ) }
 					onMerge={ mergeBlocks }
 					onSplit={
@@ -302,6 +301,7 @@ registerBlockType( 'core/list', {
 							undefined
 					}
 					onRemove={ () => onReplace( [] ) }
+					isSelected={ isSelected }
 				/>,
 			];
 		}

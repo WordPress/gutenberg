@@ -1,8 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { combineReducers } from 'redux';
-import { get, omit } from 'lodash';
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,45 +17,48 @@ import { PREFERENCES_DEFAULTS } from './defaults';
  * @param {Object}  state.panels          The state of the different sidebar panels.
  * @param {Object}  action                Dispatched action.
  *
- * @returns {string} Updated state.
+ * @return {string} Updated state.
  */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
-		case 'TOGGLE_SIDEBAR':
-			return {
-				...state,
-				sidebars: {
-					...state.sidebars,
-					[ action.sidebar ]: action.forcedValue !== undefined ? action.forcedValue : ! state.sidebars[ action.sidebar ],
-				},
-			};
-		case 'TOGGLE_SIDEBAR_PANEL':
-			return {
-				...state,
-				panels: {
-					...state.panels,
-					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
-				},
-			};
-		case 'SWITCH_MODE':
-			return {
-				...state,
-				mode: action.mode,
-			};
-		case 'TOGGLE_FEATURE':
-			return {
-				...state,
-				features: {
-					...state.features,
-					[ action.feature ]: ! state.features[ action.feature ],
-				},
-			};
-		case 'SERIALIZE':
-			return omit( state, [ 'sidebars.mobile', 'sidebars.publish' ] );
-	}
+export const preferences = combineReducers( {
+	activeGeneralSidebar( state = PREFERENCES_DEFAULTS.activeGeneralSidebar, action ) {
+		switch ( action.type ) {
+			case 'OPEN_GENERAL_SIDEBAR':
+				return action.name;
 
-	return state;
-}
+			case 'CLOSE_GENERAL_SIDEBAR':
+				return null;
+		}
+
+		return state;
+	},
+	panels( state = PREFERENCES_DEFAULTS.panels, action ) {
+		if ( action.type === 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL' ) {
+			return {
+				...state,
+				[ action.panel ]: ! state[ action.panel ],
+			};
+		}
+
+		return state;
+	},
+	features( state = PREFERENCES_DEFAULTS.features, action ) {
+		if ( action.type === 'TOGGLE_FEATURE' ) {
+			return {
+				...state,
+				[ action.feature ]: ! state[ action.feature ],
+			};
+		}
+
+		return state;
+	},
+	editorMode( state = PREFERENCES_DEFAULTS.editorMode, action ) {
+		if ( action.type === 'SWITCH_MODE' ) {
+			return action.mode;
+		}
+
+		return state;
+	},
+} );
 
 export function panel( state = 'document', action ) {
 	switch ( action.type ) {
@@ -67,15 +69,91 @@ export function panel( state = 'document', action ) {
 	return state;
 }
 
-export function mobile( state = false, action ) {
-	if ( action.type === 'UPDATE_MOBILE_STATE' ) {
-		return action.isMobile;
+export function publishSidebarActive( state = false, action ) {
+	switch ( action.type ) {
+		case 'OPEN_PUBLISH_SIDEBAR':
+			return true;
+		case 'CLOSE_PUBLISH_SIDEBAR':
+			return false;
+		case 'TOGGLE_PUBLISH_SIDEBAR':
+			return ! state;
 	}
 	return state;
+}
+
+const locations = [
+	'normal',
+	'side',
+	'advanced',
+];
+
+const defaultMetaBoxState = locations.reduce( ( result, key ) => {
+	result[ key ] = {
+		isActive: false,
+	};
+
+	return result;
+}, {} );
+
+/**
+ * Reducer keeping track of the meta boxes isSaving state.
+ * A "true" value means the meta boxes saving request is in-flight.
+ *
+ *
+ * @param {boolean}  state   Previous state.
+ * @param {Object}   action  Action Object.
+ * @return {Object}         Updated state.
+ */
+export function isSavingMetaBoxes( state = false, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_META_BOX_UPDATES':
+			return true;
+		case 'META_BOX_UPDATES_SUCCESS':
+			return false;
+		default:
+			return state;
+	}
+}
+
+/**
+ * Reducer keeping track of the state of each meta box location.
+ * This includes:
+ *  - isActive: Whether the location is active or not.
+ *  - data: The last saved form data for this location.
+ *    This is used to check whether the form is dirty
+ *    before leaving the page.
+ *
+ * @param {boolean}  state   Previous state.
+ * @param {Object}   action  Action Object.
+ * @return {Object}         Updated state.
+ */
+export function metaBoxes( state = defaultMetaBoxState, action ) {
+	switch ( action.type ) {
+		case 'INITIALIZE_META_BOX_STATE':
+			return locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					isActive: action.metaBoxes[ location ],
+				};
+				return newState;
+			}, { ...state } );
+		case 'META_BOX_SET_SAVED_DATA':
+			return locations.reduce( ( newState, location ) => {
+				newState[ location ] = {
+					...state[ location ],
+					data: action.dataPerLocation[ location ],
+				};
+				return newState;
+			}, { ...state } );
+		default:
+			return state;
+	}
 }
 
 export default combineReducers( {
 	preferences,
 	panel,
-	mobile,
+	publishSidebarActive,
+	metaBoxes,
+	isSavingMetaBoxes,
 } );

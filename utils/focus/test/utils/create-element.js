@@ -4,7 +4,7 @@
  *
  * @param {string} type Element type.
  *
- * @returns {HTMLElement} Layout-emulated element.
+ * @return {HTMLElement} Layout-emulated element.
  */
 export default function createElement( type ) {
 	const element = document.createElement( type );

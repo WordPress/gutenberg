@@ -17,21 +17,21 @@ import MediaUpload from '../media-upload';
 import { rawHandler } from '../api';
 
 /**
- *  ImagePlaceHolder is a react component used by blocks containing user configurable images e.g: image and cover image.
+ *  ImagePlaceholder is a react component used by blocks containing user configurable images e.g: image and cover image.
  *
  * @param   {Object} props  React props passed to the component.
  *
- * @returns {Object} Rendered placeholder.
+ * @return {Object} Rendered placeholder.
  */
-export default function ImagePlaceHolder( { className, icon, label, onSelectImage, multiple = false } ) {
+export default function ImagePlaceholder( { className, icon, label, onSelectImage, multiple = false } ) {
 	const setImage = multiple ? onSelectImage : ( [ image ] ) => onSelectImage( image );
-	const onFilesDrop = ( files ) => mediaUpload( files, setImage );
+	const onFilesDrop = ( files ) => mediaUpload( files, setImage, 'image' );
 	const onHTMLDrop = ( HTML ) => setImage( map(
 		rawHandler( { HTML, mode: 'BLOCKS' } )
 			.filter( ( { name } ) => name === 'core/image' ),
 		'attributes'
 	) );
-	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setImage );
+	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setImage, 'image' );
 	return (
 		<Placeholder
 			className={ className }

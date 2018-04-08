@@ -1,52 +1,46 @@
 /**
- * External Dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
 import { PostTaxonomies as PostTaxonomiesForm, PostTaxonomiesCheck } from '@wordpress/editor';
+import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { isEditorSidebarPanelOpened } from '../../../store/selectors';
-import { toggleSidebarPanel } from '../../../store/actions';
+import TaxonomyPanel from './taxonomy-panel';
 
 /**
  * Module Constants
  */
 const PANEL_NAME = 'post-taxonomies';
 
-function PostTaxonomies( { isOpened, onTogglePanel } ) {
+function PostTaxonomies() {
 	return (
 		<PostTaxonomiesCheck>
-			<PanelBody
-				title={ __( 'Categories & Tags' ) }
-				opened={ isOpened }
-				onToggle={ onTogglePanel }
-			>
-				<PostTaxonomiesForm />
-			</PanelBody>
+			<PostTaxonomiesForm
+				taxonomyWrapper={ ( content, taxonomy ) => {
+					return (
+						<TaxonomyPanel taxonomy={ taxonomy }>
+							{ content }
+						</TaxonomyPanel>
+					);
+				} }
+			/>
 		</PostTaxonomiesCheck>
 	);
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
+			isOpened: select( 'core/edit-post' ).isEditorSidebarPanelOpened( PANEL_NAME ),
 		};
-	},
-	{
+	} ),
+	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
+			return dispatch( 'core/edit-post' ).toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
-)( PostTaxonomies );
+	} ) ),
+] )( PostTaxonomies );
 

@@ -11,8 +11,16 @@ import {
 	registerBlockType
 } from '@wordpress/blocks';
 
-import { Button, IconButton, Placeholder, Toolbar } from '@wordpress/components';
+import {
+	Button,
+	FormFileUpload,
+	IconButton,
+	Placeholder,
+	Toolbar,
+} from '@wordpress/components';
+
 import { Component } from '@wordpress/element';
+import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -22,7 +30,6 @@ import './editor.scss';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),
@@ -40,9 +47,6 @@ registerBlockType( 'core/audio', {
 			selector: 'audio',
 			attribute: 'src',
 		},
-		align: {
-			type: 'string',
-		},
 		caption: {
 			type: 'array',
 			source: 'children',
@@ -53,29 +57,25 @@ registerBlockType( 'core/audio', {
 		},
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( 'left' === align || 'right' === align || 'wide' === align || 'full' === align ) {
-			return { 'data-align': align };
-		}
+	supports: {
+		align: true,
 	},
 
 	edit: class extends Component {
-		constructor( { className } ) {
+		constructor() {
 			super( ...arguments );
 			// edit component has its own src in the state so it can be edited
 			// without setting the actual value outside of the edit UI
 			this.state = {
 				editing: ! this.props.attributes.src,
 				src: this.props.attributes.src,
-				className,
 			};
 		}
+
 		render() {
-			const { align, caption, id } = this.props.attributes;
-			const { setAttributes, focus, setFocus } = this.props;
-			const { editing, className, src } = this.state;
-			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+			const { caption, id } = this.props.attributes;
+			const { setAttributes, isSelected, className } = this.props;
+			const { editing, src } = this.state;
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
 			};
@@ -96,30 +96,12 @@ registerBlockType( 'core/audio', {
 				}
 				return false;
 			};
-			const controls = focus && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit audio' ) }
-							onClick={ switchToEditing }
-							icon="edit"
-						/>
-					</Toolbar>
-				</BlockControls>
-			);
-
-			const focusCaption = ( focusValue ) => setFocus( { editable: 'caption', ...focusValue } );
+			const setAudio = ( [ audio ] ) => onSelectAudio( audio );
+			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAudio, 'audio' );
 
 			if ( editing ) {
-				return [
-					controls,
+				return (
 					<Placeholder
-						key="placeholder"
 						icon="media-audio"
 						label={ __( 'Audio' ) }
 						instructions={ __( 'Select an audio file from your library, or upload a new one' ) }
@@ -137,6 +119,14 @@ registerBlockType( 'core/audio', {
 								{ __( 'Use URL' ) }
 							</Button>
 						</form>
+						<FormFileUpload
+							isLarge
+							className="wp-block-audio__upload-button"
+							onChange={ uploadFromFiles }
+							accept="audio/*"
+						>
+							{ __( 'Upload' ) }
+						</FormFileUpload>
 						<MediaUpload
 							onSelect={ onSelectAudio }
 							type="audio"
@@ -147,23 +137,33 @@ registerBlockType( 'core/audio', {
 								</Button>
 							) }
 						/>
-					</Placeholder>,
-				];
+					</Placeholder>
+				);
 			}
 
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 			return [
-				controls,
+				isSelected && (
+					<BlockControls key="controls">
+						<Toolbar>
+							<IconButton
+								className="components-icon-button components-toolbar__control"
+								label={ __( 'Edit audio' ) }
+								onClick={ switchToEditing }
+								icon="edit"
+							/>
+						</Toolbar>
+					</BlockControls>
+				),
 				<figure key="audio" className={ className }>
 					<audio controls="controls" src={ src } />
-					{ ( ( caption && caption.length ) || !! focus ) && (
+					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
-							focus={ focus && focus.editable === 'caption' ? focus : undefined }
-							onFocus={ focusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							isSelected={ isSelected }
 							inlineToolbar
 						/>
 					) }
@@ -174,9 +174,9 @@ registerBlockType( 'core/audio', {
 	},
 
 	save( { attributes } ) {
-		const { align, src, caption } = attributes;
+		const { src, caption } = attributes;
 		return (
-			<figure className={ align ? `align${ align }` : null }>
+			<figure>
 				<audio controls="controls" src={ src } />
 				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>

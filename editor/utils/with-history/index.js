@@ -1,57 +1,100 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { overSome, includes, first, last, drop, dropRight } from 'lodash';
 
 /**
- * Reducer enhancer which transforms the result of the original reducer into an
- * object tracking its own history (past, present, future).
+ * Default options for withHistory reducer enhancer. Refer to withHistory
+ * documentation for options explanation.
  *
- * @param {Function} reducer            Original reducer.
- * @param {?Object}  options            Optional options.
- * @param {?Array}   options.resetTypes Action types upon which to clear past.
+ * @see withHistory
  *
- * @returns {Function} Enhanced reducer.
+ * @type {Object}
  */
-export default function withHistory( reducer, options = {} ) {
+const DEFAULT_OPTIONS = {
+	resetTypes: [],
+	ignoreTypes: [],
+	shouldOverwriteState: () => false,
+};
+
+/**
+ * Higher-order reducer creator which transforms the result of the original
+ * reducer into an object tracking its own history (past, present, future).
+ *
+ * @param {?Object}   options                      Optional options.
+ * @param {?Array}    options.resetTypes           Action types upon which to
+ *                                                 clear past.
+ * @param {?Array}    options.ignoreTypes          Action types upon which to
+ *                                                 avoid history tracking.
+ * @param {?Function} options.shouldOverwriteState Function receiving last and
+ *                                                 current actions, returning
+ *                                                 boolean indicating whether
+ *                                                 present should be merged,
+ *                                                 rather than add undo level.
+ *
+ * @return {Function} Higher-order reducer.
+ */
+const withHistory = ( options = {} ) => ( reducer ) => {
+	options = { ...DEFAULT_OPTIONS, ...options };
+
+	// `ignoreTypes` is simply a convenience for `shouldOverwriteState`
+	options.shouldOverwriteState = overSome( [
+		options.shouldOverwriteState,
+		( action ) => includes( options.ignoreTypes, action.type ),
+	] );
+
 	const initialState = {
 		past: [],
 		present: reducer( undefined, {} ),
 		future: [],
 	};
 
+	let lastAction;
+	let shouldCreateUndoLevel = false;
+
+	const {
+		resetTypes = [],
+		shouldOverwriteState = () => false,
+	} = options;
+
 	return ( state = initialState, action ) => {
 		const { past, present, future } = state;
+		const previousAction = lastAction;
+
+		lastAction = action;
 
 		switch ( action.type ) {
 			case 'UNDO':
-				// Can't undo if no past
+				// Can't undo if no past.
 				if ( ! past.length ) {
-					break;
+					return state;
 				}
 
 				return {
-					past: past.slice( 0, past.length - 1 ),
-					present: past[ past.length - 1 ],
+					past: dropRight( past ),
+					present: last( past ),
 					future: [ present, ...future ],
 				};
-
 			case 'REDO':
-				// Can't redo if no future
+				// Can't redo if no future.
 				if ( ! future.length ) {
-					break;
+					return state;
 				}
 
 				return {
 					past: [ ...past, present ],
-					present: future[ 0 ],
-					future: future.slice( 1 ),
+					present: first( future ),
+					future: drop( future ),
 				};
+
+			case 'CREATE_UNDO_LEVEL':
+				shouldCreateUndoLevel = true;
+				return state;
 		}
 
 		const nextPresent = reducer( present, action );
 
-		if ( includes( options.resetTypes, action.type ) ) {
+		if ( includes( resetTypes, action.type ) ) {
 			return {
 				past: [],
 				present: nextPresent,
@@ -63,10 +106,22 @@ export default function withHistory( reducer, options = {} ) {
 			return state;
 		}
 
+		let nextPast = past;
+
+		shouldCreateUndoLevel = ! past.length || shouldCreateUndoLevel;
+
+		if ( shouldCreateUndoLevel || ! shouldOverwriteState( action, previousAction ) ) {
+			nextPast = [ ...past, present ];
+		}
+
+		shouldCreateUndoLevel = false;
+
 		return {
-			past: [ ...past, present ],
+			past: nextPast,
 			present: nextPresent,
 			future: [],
 		};
 	};
-}
+};
+
+export default withHistory;

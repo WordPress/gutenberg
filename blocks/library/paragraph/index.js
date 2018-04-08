@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { findKey, isFinite, map, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,22 +13,29 @@ import {
 	registerBlockType,
 	setDefaultBlockName,
 } from '@wordpress/blocks';
-import { concatChildren, Component } from '@wordpress/element';
-import { Autocomplete, PanelBody, PanelColor, withFallbackStyles } from '@wordpress/components';
+import { concatChildren, Component, RawHTML } from '@wordpress/element';
+import {
+	PanelBody,
+	PanelColor,
+	RangeControl,
+	ToggleControl,
+	Button,
+	ButtonGroup,
+	withFallbackStyles,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 import './style.scss';
-import { blockAutocompleter, userAutocompleter } from '../../autocompleters';
+import { blockAutocompleter } from '../../autocompleters';
+import { defaultAutocompleters } from '../../hooks/default-autocompleters';
 import AlignmentToolbar from '../../alignment-toolbar';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import BlockControls from '../../block-controls';
 import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
-import ToggleControl from '../../inspector-controls/toggle-control';
-import RangeControl from '../../inspector-controls/range-control';
 import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
 
@@ -45,12 +53,38 @@ const ContrastCheckerWithFallbackStyles = withFallbackStyles( ( node, ownProps )
 	};
 } )( ContrastChecker );
 
+const FONT_SIZES = {
+	small: 14,
+	regular: 16,
+	large: 36,
+	larger: 48,
+};
+
+const autocompleters = [ blockAutocompleter, ...defaultAutocompleters ];
+
 class ParagraphBlock extends Component {
 	constructor() {
 		super( ...arguments );
 		this.nodeRef = null;
 		this.bindRef = this.bindRef.bind( this );
+		this.onReplace = this.onReplace.bind( this );
 		this.toggleDropCap = this.toggleDropCap.bind( this );
+		this.getFontSize = this.getFontSize.bind( this );
+		this.setFontSize = this.setFontSize.bind( this );
+	}
+
+	onReplace( blocks ) {
+		const { attributes, onReplace } = this.props;
+		onReplace( blocks.map( ( block, index ) => (
+			index === 0 && block.name === name ?
+				{ ...block,
+					attributes: {
+						...attributes,
+						...block.attributes,
+					},
+				} :
+				block
+		) ) );
 	}
 
 	toggleDropCap() {
@@ -65,15 +99,44 @@ class ParagraphBlock extends Component {
 		this.nodeRef = node;
 	}
 
+	getFontSize() {
+		const { customFontSize, fontSize } = this.props.attributes;
+		if ( fontSize ) {
+			return FONT_SIZES[ fontSize ];
+		}
+
+		if ( customFontSize ) {
+			return customFontSize;
+		}
+
+		return FONT_SIZES.regular;
+	}
+
+	setFontSize( fontSizeValue ) {
+		const { setAttributes } = this.props;
+		const thresholdFontSize = findKey( FONT_SIZES, ( size ) => size === fontSizeValue );
+		if ( thresholdFontSize ) {
+			setAttributes( {
+				fontSize: thresholdFontSize,
+				customFontSize: undefined,
+			} );
+			return;
+		}
+		setAttributes( {
+			fontSize: undefined,
+			customFontSize: fontSizeValue,
+		} );
+	}
+
 	render() {
 		const {
 			attributes,
 			setAttributes,
 			insertBlocksAfter,
-			focus,
-			setFocus,
+			isSelected,
 			mergeBlocks,
 			onReplace,
+			className,
 		} = this.props;
 
 		const {
@@ -81,16 +144,15 @@ class ParagraphBlock extends Component {
 			content,
 			dropCap,
 			placeholder,
-			fontSize,
 			backgroundColor,
 			textColor,
 			width,
 		} = attributes;
 
-		const className = dropCap ? 'has-drop-cap' : null;
+		const fontSize = this.getFontSize();
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<AlignmentToolbar
 						value={ align }
@@ -100,22 +162,49 @@ class ParagraphBlock extends Component {
 					/>
 				</BlockControls>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
-					<PanelBody title={ __( 'Text Settings' ) }>
+					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
+						<div className="blocks-font-size__main">
+							<ButtonGroup aria-label={ __( 'Font Size' ) }>
+								{ map( {
+									S: 'small',
+									M: 'regular',
+									L: 'large',
+									XL: 'larger',
+								}, ( size, label ) => (
+									<Button
+										key={ label }
+										isLarge
+										isPrimary={ fontSize === FONT_SIZES[ size ] }
+										aria-pressed={ fontSize === FONT_SIZES[ size ] }
+										onClick={ () => this.setFontSize( FONT_SIZES[ size ] ) }
+									>
+										{ label }
+									</Button>
+								) ) }
+							</ButtonGroup>
+							<Button
+								isLarge
+								onClick={ () => this.setFontSize( undefined ) }
+							>
+								{ __( 'Reset' ) }
+							</Button>
+						</div>
+						<RangeControl
+							className="blocks-paragraph__custom-size-slider"
+							label={ __( 'Custom Size' ) }
+							value={ fontSize }
+							onChange={ ( value ) => this.setFontSize( value ) }
+							min={ 12 }
+							max={ 100 }
+							beforeIcon="editor-textcolor"
+							afterIcon="editor-textcolor"
+						/>
 						<ToggleControl
 							label={ __( 'Drop Cap' ) }
 							checked={ !! dropCap }
 							onChange={ this.toggleDropCap }
-						/>
-						<RangeControl
-							label={ __( 'Font Size' ) }
-							value={ fontSize || '' }
-							onChange={ ( value ) => setAttributes( { fontSize: value } ) }
-							min={ 10 }
-							max={ 200 }
-							beforeIcon="editor-textcolor"
-							allowReset
 						/>
 					</PanelBody>
 					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
@@ -145,56 +234,83 @@ class ParagraphBlock extends Component {
 				</InspectorControls>
 			),
 			<div key="editable" ref={ this.bindRef }>
-				<Autocomplete completers={ [
-					blockAutocompleter( { onReplace } ),
-					userAutocompleter(),
-				] }>
-					{ ( { isExpanded, listBoxId, activeId } ) => (
-						<RichText
-							tagName="p"
-							className={ classnames( 'wp-block-paragraph', className, {
-								[ `align${ width }` ]: width,
-								'has-background': backgroundColor,
-							} ) }
-							style={ {
-								backgroundColor: backgroundColor,
-								color: textColor,
-								fontSize: fontSize ? fontSize + 'px' : undefined,
-								textAlign: align,
-							} }
-							value={ content }
-							onChange={ ( nextContent ) => {
-								setAttributes( {
-									content: nextContent,
-								} );
-							} }
-							focus={ focus }
-							onFocus={ setFocus }
-							onSplit={ insertBlocksAfter ?
-								( before, after, ...blocks ) => {
-									setAttributes( { content: before } );
-									insertBlocksAfter( [
-										...blocks,
-										createBlock( 'core/paragraph', { content: after } ),
-									] );
-								} :
-								undefined
-							}
-							onMerge={ mergeBlocks }
-							onReplace={ onReplace }
-							onRemove={ () => onReplace( [] ) }
-							placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-							aria-autocomplete="list"
-							aria-expanded={ isExpanded }
-							aria-owns={ listBoxId }
-							aria-activedescendant={ activeId }
-						/>
-					) }
-				</Autocomplete>
+				<RichText
+					tagName="p"
+					className={ classnames( 'wp-block-paragraph', className, {
+						'has-background': backgroundColor,
+						'has-drop-cap': dropCap,
+					} ) }
+					style={ {
+						backgroundColor: backgroundColor,
+						color: textColor,
+						fontSize: fontSize !== FONT_SIZES.regular ? fontSize + 'px' : undefined,
+						textAlign: align,
+					} }
+					value={ content }
+					onChange={ ( nextContent ) => {
+						setAttributes( {
+							content: nextContent,
+						} );
+					} }
+					onSplit={ insertBlocksAfter ?
+						( before, after, ...blocks ) => {
+							setAttributes( { content: before } );
+							insertBlocksAfter( [
+								...blocks,
+								createBlock( 'core/paragraph', { content: after } ),
+							] );
+						} :
+						undefined
+					}
+					onMerge={ mergeBlocks }
+					onReplace={ this.onReplace }
+					onRemove={ () => onReplace( [] ) }
+					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+					isSelected={ isSelected }
+					autocompleters={ autocompleters }
+				/>
 			</div>,
 		];
 	}
 }
+
+const supports = {
+	className: false,
+};
+
+const schema = {
+	content: {
+		type: 'array',
+		source: 'children',
+		selector: 'p',
+		default: [],
+	},
+	align: {
+		type: 'string',
+	},
+	dropCap: {
+		type: 'boolean',
+		default: false,
+	},
+	placeholder: {
+		type: 'string',
+	},
+	width: {
+		type: 'string',
+	},
+	textColor: {
+		type: 'string',
+	},
+	backgroundColor: {
+		type: 'string',
+	},
+	fontSize: {
+		type: 'string',
+	},
+	customFontSize: {
+		type: 'number',
+	},
+};
 
 registerBlockType( 'core/paragraph', {
 	title: __( 'Paragraph' ),
@@ -207,44 +323,15 @@ registerBlockType( 'core/paragraph', {
 
 	keywords: [ __( 'text' ) ],
 
-	supports: {
-		className: false,
-	},
+	supports,
 
-	attributes: {
-		content: {
-			type: 'array',
-			source: 'children',
-			selector: 'p',
-		},
-		align: {
-			type: 'string',
-		},
-		dropCap: {
-			type: 'boolean',
-			default: false,
-		},
-		placeholder: {
-			type: 'string',
-		},
-		width: {
-			type: 'string',
-		},
-		textColor: {
-			type: 'string',
-		},
-		backgroundColor: {
-			type: 'string',
-		},
-		fontSize: {
-			type: 'number',
-		},
-	},
+	attributes: schema,
 
 	transforms: {
 		from: [
 			{
 				type: 'raw',
+				priority: 20,
 				isMatch: ( node ) => (
 					node.nodeName === 'P' &&
 					// Do not allow embedded content.
@@ -253,6 +340,64 @@ registerBlockType( 'core/paragraph', {
 			},
 		],
 	},
+
+	deprecated: [
+		{
+			supports,
+			attributes: omit( {
+				...schema,
+				fontSize: {
+					type: 'number',
+				},
+			}, 'customFontSize' ),
+			save( { attributes } ) {
+				const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+				const className = classnames( {
+					[ `align${ width }` ]: width,
+					'has-background': backgroundColor,
+					'has-drop-cap': dropCap,
+				} );
+				const styles = {
+					backgroundColor: backgroundColor,
+					color: textColor,
+					fontSize: fontSize,
+					textAlign: align,
+				};
+
+				return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+			},
+			migrate( attributes ) {
+				if ( isFinite( attributes.fontSize ) ) {
+					return omit( {
+						...attributes,
+						customFontSize: attributes.fontSize,
+					}, 'fontSize' );
+				}
+				return attributes;
+			},
+		},
+		{
+			supports,
+			attributes: {
+				...schema,
+				content: {
+					type: 'string',
+					source: 'html',
+				},
+			},
+			save( { attributes } ) {
+				return <RawHTML>{ attributes.content }</RawHTML>;
+			},
+			migrate( attributes ) {
+				return {
+					...attributes,
+					content: [
+						<RawHTML key="html">{ attributes.content }</RawHTML>,
+					],
+				};
+			},
+		},
+	],
 
 	merge( attributes, attributesToMerge ) {
 		return {
@@ -270,16 +415,28 @@ registerBlockType( 'core/paragraph', {
 	edit: ParagraphBlock,
 
 	save( { attributes } ) {
-		const { width, align, content, dropCap, backgroundColor, textColor, fontSize } = attributes;
+		const {
+			width,
+			align,
+			content,
+			dropCap,
+			backgroundColor,
+			textColor,
+			fontSize,
+			customFontSize,
+		} = attributes;
+
 		const className = classnames( {
 			[ `align${ width }` ]: width,
 			'has-background': backgroundColor,
 			'has-drop-cap': dropCap,
+			[ `is-${ fontSize }-text` ]: fontSize && FONT_SIZES[ fontSize ],
 		} );
+
 		const styles = {
 			backgroundColor: backgroundColor,
 			color: textColor,
-			fontSize: fontSize,
+			fontSize: ! fontSize && customFontSize ? customFontSize : undefined,
 			textAlign: align,
 		};
 

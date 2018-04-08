@@ -8,6 +8,8 @@ import deepFreeze from 'deep-freeze';
  */
 import {
 	preferences,
+	isSavingMetaBoxes,
+	metaBoxes,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -16,86 +18,73 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				mode: 'visual',
-				sidebars: {
-					desktop: true,
-					mobile: false,
-					publish: false,
-				},
+				activeGeneralSidebar: 'edit-post/document',
+				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
 			} );
 		} );
 
-		it( 'should toggle the given sidebar flag', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-				desktop: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
+		it( 'should set the general sidebar', () => {
+			const original = deepFreeze( preferences( undefined, {} ) );
+			const state = preferences( original, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
 			} );
 
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: false,
-			} );
+			expect( state.activeGeneralSidebar ).toBe( 'edit-post/document' );
 		} );
 
-		it( 'should set the sidebar open flag to true if unset', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
+		it( 'should does not update if sidebar is already set to value', () => {
+			const original = deepFreeze( preferences( undefined, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
+			} ) );
+			const state = preferences( original, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
 			} );
 
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: true,
-			} );
+			expect( original ).toBe( state );
 		} );
 
-		it( 'should force the given sidebar flag', () => {
-			const state = preferences( deepFreeze( { sidebars: {
-				mobile: true,
-			} } ), {
-				type: 'TOGGLE_SIDEBAR',
-				sidebar: 'desktop',
-				forcedValue: false,
+		it( 'should unset the general sidebar', () => {
+			const original = deepFreeze( preferences( undefined, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
+			} ) );
+			const state = preferences( original, {
+				type: 'CLOSE_GENERAL_SIDEBAR',
 			} );
 
-			expect( state.sidebars ).toEqual( {
-				mobile: true,
-				desktop: false,
-			} );
+			expect( state.activeGeneralSidebar ).toBe( null );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
-			const state = preferences( deepFreeze( {} ), {
-				type: 'TOGGLE_SIDEBAR_PANEL',
+			const state = preferences( deepFreeze( { panels: {} } ), {
+				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { panels: { 'post-taxonomies': true } } );
+			expect( state.panels ).toEqual( { 'post-taxonomies': true } );
 		} );
 
 		it( 'should toggle the sidebar panel open flag', () => {
 			const state = preferences( deepFreeze( { panels: { 'post-taxonomies': true } } ), {
-				type: 'TOGGLE_SIDEBAR_PANEL',
+				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { panels: { 'post-taxonomies': false } } );
+			expect( state.panels ).toEqual( { 'post-taxonomies': false } );
 		} );
 
 		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( {} ), {
+			const state = preferences( deepFreeze( { editorMode: 'visual' } ), {
 				type: 'SWITCH_MODE',
 				mode: 'text',
 			} );
 
-			expect( state ).toEqual( { mode: 'text' } );
+			expect( state.editorMode ).toBe( 'text' );
 		} );
 
 		it( 'should toggle a feature flag', () => {
@@ -103,7 +92,96 @@ describe( 'state', () => {
 				type: 'TOGGLE_FEATURE',
 				feature: 'chicken',
 			} );
-			expect( state ).toEqual( { features: { chicken: false } } );
+
+			expect( state.features ).toEqual( { chicken: false } );
+		} );
+	} );
+
+	describe( 'isSavingMetaBoxes', () => {
+		it( 'should return default state', () => {
+			const actual = isSavingMetaBoxes( undefined, {} );
+			expect( actual ).toBe( false );
+		} );
+
+		it( 'should set saving flag to true', () => {
+			const action = {
+				type: 'REQUEST_META_BOX_UPDATES',
+			};
+			const actual = isSavingMetaBoxes( false, action );
+
+			expect( actual ).toBe( true );
+		} );
+
+		it( 'should set saving flag to false', () => {
+			const action = {
+				type: 'META_BOX_UPDATES_SUCCESS',
+			};
+			const actual = isSavingMetaBoxes( true, action );
+
+			expect( actual ).toBe( false );
+		} );
+	} );
+
+	describe( 'metaBoxes()', () => {
+		it( 'should return default state', () => {
+			const actual = metaBoxes( undefined, {} );
+			const expected = {
+				normal: {
+					isActive: false,
+				},
+				side: {
+					isActive: false,
+				},
+				advanced: {
+					isActive: false,
+				},
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+
+		it( 'should set the sidebar to active', () => {
+			const theMetaBoxes = {
+				normal: false,
+				advanced: false,
+				side: true,
+			};
+
+			const action = {
+				type: 'INITIALIZE_META_BOX_STATE',
+				metaBoxes: theMetaBoxes,
+			};
+
+			const actual = metaBoxes( undefined, action );
+			const expected = {
+				normal: {
+					isActive: false,
+				},
+				side: {
+					isActive: true,
+				},
+				advanced: {
+					isActive: false,
+				},
+			};
+
+			expect( actual ).toEqual( expected );
+		} );
+
+		it( 'should set the meta boxes saved data', () => {
+			const action = {
+				type: 'META_BOX_SET_SAVED_DATA',
+				dataPerLocation: {
+					side: 'a=b',
+				},
+			};
+
+			const theMetaBoxes = metaBoxes( { normal: { isActive: true }, side: { isActive: false } }, action );
+			expect( theMetaBoxes ).toEqual( {
+				advanced: { data: undefined },
+				normal: { isActive: true, data: undefined },
+				side: { isActive: false, data: 'a=b' },
+			} );
 		} );
 	} );
 } );

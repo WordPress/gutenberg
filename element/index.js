@@ -1,10 +1,25 @@
 /**
  * External dependencies
  */
-import { createElement, Component, cloneElement, Children, Fragment } from 'react';
+import { createContext, createElement, Component, cloneElement, Children, Fragment } from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
-import { renderToStaticMarkup } from 'react-dom/server';
-import { camelCase, flowRight, isString, upperFirst } from 'lodash';
+import {
+	camelCase,
+	flowRight,
+	isString,
+	upperFirst,
+	isEmpty,
+} from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { deprecated } from '@wordpress/utils';
+
+/**
+ * Internal dependencies
+ */
+import serialize from './serialize';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -16,7 +31,7 @@ import { camelCase, flowRight, isString, upperFirst } from 'lodash';
  *                                       pass through to element creator
  * @param {...WPElement}       children Descendant elements
  *
- * @returns {WPElement} Element.
+ * @return {WPElement} Element.
  */
 export { createElement };
 
@@ -46,7 +61,7 @@ export { Component };
  * @param {WPElement} element Element
  * @param {?Object}   props   Props to apply to cloned element
  *
- * @returns {WPElement} Cloned element.
+ * @return {WPElement} Cloned element.
  */
 export { cloneElement };
 
@@ -66,6 +81,15 @@ export { Children };
 export { Fragment };
 
 /**
+ * Creates a context object containing two components: a provider and consumer.
+ *
+ * @param {Object} defaultValue Data stored in the context.
+ *
+ * @return {Object} Context object.
+ */
+export { createContext };
+
+/**
  * Creates a portal into which a component can be rendered.
  *
  * @see https://github.com/facebook/react/issues/10309#issuecomment-318433235
@@ -80,16 +104,16 @@ export { createPortal };
  *
  * @param {WPElement} element Element to render
  *
- * @returns {String} HTML.
+ * @return {string} HTML.
  */
-export { renderToStaticMarkup as renderToString };
+export { serialize as renderToString };
 
 /**
  * Concatenate two or more React children objects.
  *
  * @param {...?Object} childrenArguments Array of children arguments (array of arrays/strings/objects) to concatenate.
  *
- * @returns {Array} The concatenated value.
+ * @return {Array} The concatenated value.
  */
 export function concatChildren( ...childrenArguments ) {
 	return childrenArguments.reduce( ( memo, children, i ) => {
@@ -113,7 +137,7 @@ export function concatChildren( ...childrenArguments ) {
  * @param {?Object} children Children object.
  * @param {string}  nodeName Node name.
  *
- * @returns {?Object} The updated children object.
+ * @return {?Object} The updated children object.
  */
 export function switchChildrenNodeName( children, nodeName ) {
 	return children && Children.map( children, ( elt, index ) => {
@@ -131,7 +155,7 @@ export function switchChildrenNodeName( children, nodeName ) {
  *
  * @param {...Function} hocs The HOC functions to invoke.
  *
- * @returns {Function} Returns the new composite function.
+ * @return {Function} Returns the new composite function.
  */
 export { flowRight as compose };
 
@@ -142,10 +166,60 @@ export { flowRight as compose };
  * @param {Function|Component} BaseComponent Used to detect the existing display name.
  * @param {string} wrapperName Wrapper name to prepend to the display name.
  *
- * @returns {string} Wrapped display name.
+ * @return {string} Wrapped display name.
  */
 export function getWrapperDisplayName( BaseComponent, wrapperName ) {
+	deprecated( 'getWrapperDisplayName', {
+		version: '2.7',
+		alternative: 'wp.element.createHigherOrderComponent',
+		plugin: 'Gutenberg',
+	} );
+
 	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;
 
 	return `${ upperFirst( camelCase( wrapperName ) ) }(${ displayName })`;
+}
+
+/**
+ * Given a function mapping a component to an enhanced component and modifier
+ * name, returns the enhanced component augmented with a generated displayName.
+ *
+ * @param {Function} mapComponentToEnhancedComponent Function mapping component
+ *                                                   to enhanced component.
+ * @param {string}   modifierName                    Seed name from which to
+ *                                                   generated display name.
+ *
+ * @return {WPComponent} Component class with generated display name assigned.
+ */
+export function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
+	return ( OriginalComponent ) => {
+		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
+		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
+		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
+
+		return EnhancedComponent;
+	};
+}
+
+/**
+ * Component used as equivalent of Fragment with unescaped HTML, in cases where
+ * it is desirable to render dangerous HTML without needing a wrapper element.
+ * To preserve additional props, a `div` wrapper _will_ be created if any props
+ * aside from `children` are passed.
+ *
+ * @param {string} props.children HTML to render.
+ *
+ * @return {WPElement} Dangerously-rendering element.
+ */
+export function RawHTML( { children, ...props } ) {
+	// Render wrapper only if props are non-empty.
+	const tagName = isEmpty( props ) ? 'wp-raw-html' : 'div';
+
+	// Merge HTML into assigned props.
+	props = {
+		dangerouslySetInnerHTML: { __html: children },
+		...props,
+	};
+
+	return createElement( tagName, props );
 }

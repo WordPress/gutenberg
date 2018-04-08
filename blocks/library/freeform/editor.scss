@@ -3,18 +3,20 @@
 	margin: -4px;
 	padding: 4px;
 
-	p {
+	p,
+	li {
 		line-height: $editor-line-height;
 	}
 
-	ul, ol {
+	ul,
+	ol {
 		padding-left: 2.5em;
 		margin-left: 0;
 	}
 
 	blockquote {
 		margin: 0;
-		box-shadow: inset 0px 0px 0px 0px $light-gray-500;
+		box-shadow: inset 0 0 0 0 $light-gray-500;
 		border-left: 4px solid $black;
 		padding-left: 1em;
 	}
@@ -85,6 +87,32 @@
 
 	&:focus code[data-mce-selected] {
 		background: $light-gray-400;
+	}
+
+	.alignright {
+		float: right;
+		margin: 0.5em 0 0.5em 1em;
+	}
+
+	.alignleft {
+		float: left;
+		margin: 0.5em 1em 0.5em 0;
+	}
+
+	.aligncenter {
+		display: block;
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.wp-more-tag {
+		width: 96%;
+		height: 0;
+		display: block;
+		margin: 15px auto;
+		outline: 0;
+		cursor: default;
+		border: 2px dashed rgb( 186, 186, 186 );
 	}
 }
 

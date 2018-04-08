@@ -6,7 +6,7 @@ import { mapValues, reduce, forEach, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, getWrapperDisplayName } from '@wordpress/element';
+import { Component, createHigherOrderComponent } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ import { Component, getWrapperDisplayName } from '@wordpress/element';
 import request, { getCachedResponse } from './request';
 import { getRoute } from './routes';
 
-export default ( mapPropsToData ) => ( WrappedComponent ) => {
+export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedComponent ) => {
 	class APIDataComponent extends Component {
 		constructor( props, context ) {
 			super( ...arguments );
@@ -221,8 +221,6 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 		}
 	}
 
-	APIDataComponent.displayName = getWrapperDisplayName( WrappedComponent, 'apiData' );
-
 	APIDataComponent.contextTypes = {
 		getAPISchema: noop,
 		getAPIPostTypeRestBaseMapping: noop,
@@ -230,4 +228,4 @@ export default ( mapPropsToData ) => ( WrappedComponent ) => {
 	};
 
 	return APIDataComponent;
-};
+}, 'withAPIData' );

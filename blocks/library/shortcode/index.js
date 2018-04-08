@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType
@@ -19,7 +20,7 @@ registerBlockType( 'core/shortcode', {
 
 	description: __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ),
 
-	icon: 'marker',
+	icon: 'shortcode',
 
 	category: 'widgets',
 
@@ -50,6 +51,7 @@ registerBlockType( 'core/shortcode', {
 						},
 					},
 				},
+				priority: 20,
 			},
 		],
 	},
@@ -82,6 +84,6 @@ registerBlockType( 'core/shortcode', {
 	),
 
 	save( { attributes } ) {
-		return attributes.text;
+		return <RawHTML>{ attributes.text }</RawHTML>;
 	},
 } );

@@ -16,6 +16,7 @@
 		border: none;
 		box-shadow: none;
 		white-space: nowrap;
+		text-align: center;
 
 		&:focus {
 			box-shadow: none;
@@ -26,8 +27,8 @@
 		content: '';
 		position: absolute;
 		top: calc( 50% );
-		left: $block-mover-padding-visible + $block-padding;
-		right: $block-mover-padding-visible + $block-padding;
+		left: $block-side-ui-padding + $block-padding;
+		right: $block-side-ui-padding + $block-padding;
 		border-top: 3px dashed $light-gray-700;
 		z-index: z-index( '.editor-block-list__block .wp-block-more:before' );
 	}

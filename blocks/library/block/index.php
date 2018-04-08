@@ -12,17 +12,17 @@
  *
  * @return string Rendered HTML of the referenced block.
  */
-function gutenberg_render_block_core_reusable_block( $attributes ) {
+function gutenberg_render_core_reusable_block( $attributes ) {
 	if ( empty( $attributes['ref'] ) ) {
 		return '';
 	}
 
-	$reusable_block = get_post( $attributes['ref'] );
-	if ( ! $reusable_block || 'wp_block' !== $reusable_block->post_type ) {
+	$shared_block = get_post( $attributes['ref'] );
+	if ( ! $shared_block || 'wp_block' !== $shared_block->post_type ) {
 		return '';
 	}
 
-	$blocks = gutenberg_parse_blocks( $reusable_block->post_content );
+	$blocks = gutenberg_parse_blocks( $shared_block->post_content );
 
 	$block = array_shift( $blocks );
 	if ( ! $block ) {
@@ -43,7 +43,7 @@ function register_core_reusable_block() {
 			),
 		),
 	
-		'render_callback' => 'gutenberg_render_block_core_reusable_block',
+		'render_callback' => 'gutenberg_render_core_reusable_block',
 	) );
 }
 

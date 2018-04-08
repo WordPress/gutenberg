@@ -1,8 +1,6 @@
 .editor-block-list__block[data-type="core/pullquote"] {
 	&[data-align="left"],
 	&[data-align="right"] {
-		max-width: 400px;
-
 		& .blocks-pullquote__content .blocks-rich-text__tinymce[data-is-empty="true"]:before,
 		& .blocks-rich-text p {
 			font-size: 20px;
@@ -11,6 +9,10 @@
 }
 
 .wp-block-pullquote {
+	cite {
+		display: block;
+	}
+
 	cite .blocks-rich-text__tinymce[data-is-empty="true"]:before {
 		font-size: 14px;
 		font-family: $default-font;

@@ -5,6 +5,8 @@ It turns out that writing the simplest possible block which contains only static
 - [zgordon/gutenberg-course](https://github.com/zgordon/gutenberg-course) - a repository for Zac Gordon's Gutenberg Development Course
 - [ahmadawais/Gutenberg-Boilerplate](https://github.com/ahmadawais/Gutenberg-Boilerplate) - an inline documented starter WordPress plugin for the new Gutenberg editor
 
+It might be also a good idea to browse the folder with [all core blocks](https://github.com/WordPress/gutenberg/tree/master/blocks/library) to see how they are implemented.
+
 ## WP-CLI
 
 Another way of making developer's life easier is to use [WP-CLI](http://wp-cli.org/), which provides a command-line interface for many actions you might perform on the WordPress instance. One of the commands generates all the code required to register a Gutenberg block for a plugin or theme. 
@@ -18,8 +20,6 @@ Before installing `WP-CLI`, please make sure your environment meets the minimum 
 * WordPress 3.7 or later
 
 Once you’ve verified requirements, you should follow the [installation instructions](http://wp-cli.org/#installing). Downloading the Phar file is the recommended installation method for most users. Should you need, see also the documentation on [alternative installation methods](https://make.wordpress.org/cli/handbook/installing/).
-
-_Important_: To use scaffolding command for blocks you temporary need (until v1.5.0 is released) to run `wp cli update --nightly` to use the latest nightly build of `WP-CLI`. The nightly build is more or less stable enough for you to use in your development environment, and always includes the latest and greatest `WP-CLI` features.
 
 ### Using `wp scaffold block`
 

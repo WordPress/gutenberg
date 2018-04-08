@@ -37,6 +37,8 @@ export function PublishButtonLabel( {
 		return __( 'Publishing…' );
 	} else if ( isPublished && isSaving ) {
 		return __( 'Updating…' );
+	} else if ( isBeingScheduled && isSaving ) {
+		return __( 'Scheduling…' );
 	}
 
 	if ( isContributor ) {
@@ -51,10 +53,10 @@ export function PublishButtonLabel( {
 }
 
 const applyConnect = connect(
-	( state ) => ( {
+	( state, { forceIsSaving } ) => ( {
 		isPublished: isCurrentPostPublished( state ),
 		isBeingScheduled: isEditedPostBeingScheduled( state ),
-		isSaving: isSavingPost( state ),
+		isSaving: forceIsSaving || isSavingPost( state ),
 		isPublishing: isPublishingPost( state ),
 		postType: getCurrentPostType( state ),
 	} )

@@ -6,15 +6,16 @@ import { assign } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getWrapperDisplayName } from '@wordpress/element';
+import { createHigherOrderComponent, Fragment } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { hasBlockSupport } from '../api';
-import InspectorControls from '../inspector-controls';
+import InspectorAdvancedControls from '../inspector-advanced-controls';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
@@ -29,7 +30,7 @@ const ANCHOR_REGEX = /[\s#]/g;
  *
  * @param {Object} settings Original block settings.
  *
- * @returns {Object} Filtered block settings.
+ * @return {Object} Filtered block settings.
  */
 export function addAttribute( settings ) {
 	if ( hasBlockSupport( settings, 'anchor' ) ) {
@@ -53,32 +54,35 @@ export function addAttribute( settings ) {
  *
  * @param {function|Component} BlockEdit Original component.
  *
- * @returns {string} Wrapped component.
+ * @return {string} Wrapped component.
  */
-export function withInspectorControl( BlockEdit ) {
-	const WrappedBlockEdit = ( props ) => {
-		const hasAnchor = hasBlockSupport( props.name, 'anchor' ) && props.focus;
+export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		const hasAnchor = hasBlockSupport( props.name, 'anchor' );
 
-		return [
-			<BlockEdit key="block-edit-anchor" { ...props } />,
-			hasAnchor && <InspectorControls key="inspector-anchor">
-				<InspectorControls.TextControl
-					label={ __( 'HTML Anchor' ) }
-					help={ __( 'Anchors lets you link directly to a section on a page.' ) }
-					value={ props.attributes.anchor || '' }
-					onChange={ ( nextValue ) => {
-						nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-						props.setAttributes( {
-							anchor: nextValue,
-						} );
-					} } />
-			</InspectorControls>,
-		];
+		if ( hasAnchor && props.isSelected ) {
+			return (
+				<Fragment>
+					<BlockEdit { ...props } />
+					<InspectorAdvancedControls>
+						<TextControl
+							label={ __( 'HTML Anchor' ) }
+							help={ __( 'Anchors lets you link directly to a section on a page.' ) }
+							value={ props.attributes.anchor || '' }
+							onChange={ ( nextValue ) => {
+								nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
+								props.setAttributes( {
+									anchor: nextValue,
+								} );
+							} } />
+					</InspectorAdvancedControls>
+				</Fragment>
+			);
+		}
+
+		return <BlockEdit { ...props } />;
 	};
-	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'anchor' );
-
-	return WrappedBlockEdit;
-}
+}, 'withInspectorControl' );
 
 /**
  * Override props assigned to save component to inject anchor ID, if block
@@ -89,7 +93,7 @@ export function withInspectorControl( BlockEdit ) {
  * @param {Object} blockType  Block type.
  * @param {Object} attributes Current block attributes.
  *
- * @returns {Object} Filtered props applied to save element.
+ * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
 	if ( hasBlockSupport( blockType, 'anchor' ) ) {

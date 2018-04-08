@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Using a CPT with a predefined template Should add a custom post types with a predefined template 1`] = `
+"<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\" /></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph {\\"placeholder\\":\\"Add a book description\\"} -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:columns -->
+<div class=\\"wp-block-columns has-2-columns\\">
+    <!-- wp:image {\\"layout\\":\\"column-1\\"} -->
+    <figure class=\\"wp-block-image layout-column-1\\"><img alt=\\"\\" /></figure>
+    <!-- /wp:image -->
+
+    <!-- wp:paragraph {\\"placeholder\\":\\"Add a inner paragraph\\",\\"layout\\":\\"column-2\\"} -->
+    <p class=\\"layout-column-2\\"></p>
+    <!-- /wp:paragraph -->
+</div>
+<!-- /wp:columns -->"
+`;

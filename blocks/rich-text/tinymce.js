@@ -15,6 +15,7 @@ import { Component, Children, createElement } from '@wordpress/element';
  */
 import { diffAriaProps, pickAriaProps } from './aria';
 
+const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
 export default class TinyMCE extends Component {
 	componentDidMount() {
 		this.initialize();
@@ -28,13 +29,15 @@ export default class TinyMCE extends Component {
 		return false;
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		const name = 'data-is-placeholder-visible';
-		const isPlaceholderVisible = String( !! nextProps.isPlaceholderVisible );
-
-		if ( this.editorNode.getAttribute( name ) !== isPlaceholderVisible ) {
-			this.editorNode.setAttribute( name, isPlaceholderVisible );
+	configureIsPlaceholderVisible( isPlaceholderVisible ) {
+		const isPlaceholderVisibleString = String( !! isPlaceholderVisible );
+		if ( this.editorNode.getAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME ) !== isPlaceholderVisibleString ) {
+			this.editorNode.setAttribute( IS_PLACEHOLDER_VISIBLE_ATTR_NAME, isPlaceholderVisibleString );
 		}
+	}
+
+	componentWillReceiveProps( nextProps ) {
+		this.configureIsPlaceholderVisible( nextProps.isPlaceholderVisible );
 
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
 			this.editorNode.setAttribute( 'style', '' );
@@ -66,8 +69,6 @@ export default class TinyMCE extends Component {
 	}
 
 	initialize() {
-		const { focus } = this.props;
-
 		const settings = this.props.getSettings( {
 			theme: false,
 			inline: true,
@@ -92,15 +93,14 @@ export default class TinyMCE extends Component {
 				this.props.onSetup( editor );
 			},
 		} );
-
-		if ( focus ) {
-			this.editorNode.focus();
-		}
 	}
 
 	render() {
-		const { tagName = 'div', style, defaultValue, className } = this.props;
+		const { tagName = 'div', style, defaultValue, className, isPlaceholderVisible } = this.props;
 		const ariaProps = pickAriaProps( this.props );
+		if ( [ 'ul', 'ol', 'table' ].indexOf( tagName ) === -1 ) {
+			ariaProps.role = 'textbox';
+		}
 
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
@@ -111,12 +111,13 @@ export default class TinyMCE extends Component {
 		}
 
 		return createElement( tagName, {
-			ref: ( node ) => this.editorNode = node,
-			contentEditable: true,
-			suppressContentEditableWarning: true,
-			className: classnames( className, 'blocks-rich-text__tinymce' ),
-			style,
 			...ariaProps,
+			className: classnames( className, 'blocks-rich-text__tinymce' ),
+			contentEditable: true,
+			[ IS_PLACEHOLDER_VISIBLE_ATTR_NAME ]: isPlaceholderVisible,
+			ref: ( node ) => this.editorNode = node,
+			style,
+			suppressContentEditableWarning: true,
 		}, children );
 	}
 }

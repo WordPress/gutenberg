@@ -12,7 +12,7 @@
  *
  * @return string Returns the categories list/dropdown markup.
  */
-function gutenberg_render_block_core_categories( $attributes ) {
+function gutenberg_render_core_categories_block( $attributes ) {
 	static $block_id = 0;
 	$block_id++;
 
@@ -38,7 +38,7 @@ function gutenberg_render_block_core_categories( $attributes ) {
 		$type                     = 'dropdown';
 
 		if ( ! is_admin() ) {
-			$wrapper_markup .= gutenberg_build_dropdown_script_block_core_categories( $id );
+			$wrapper_markup .= build_dropdown_script_block_core_categories( $id );
 		}
 	} else {
 		$wrapper_markup = '<div class="%1$s"><ul>%2$s</ul></div>';
@@ -64,7 +64,7 @@ function gutenberg_render_block_core_categories( $attributes ) {
  *
  * @return string Returns the dropdown onChange redirection script.
  */
-function gutenberg_build_dropdown_script_block_core_categories( $dropdown_id ) {
+function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	ob_start();
 	?>
 	<script type='text/javascript'>
@@ -109,7 +109,7 @@ function register_core_categories_block() {
 		'style' => 'core-categories-block',
 		'editor_style' => 'core-categories-block-editor',
 		'editor_script' => 'core-categories-block',
-		'render_callback' => 'gutenberg_render_block_core_categories',
+		'render_callback' => 'gutenberg_render_core_categories_block',
 	) );
 }
 

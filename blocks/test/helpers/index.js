@@ -11,8 +11,8 @@ import {
 	createBlock,
 	getBlockType,
 	registerBlockType,
-	BlockEdit,
 } from '../..';
+import { BlockEdit } from '../../block-edit';
 
 export const blockEditRender = ( name, settings ) => {
 	if ( ! getBlockType( name ) ) {
@@ -23,9 +23,11 @@ export const blockEditRender = ( name, settings ) => {
 	return render(
 		<BlockEdit
 			name={ name }
-			focus={ false }
+			isSelected={ false }
 			attributes={ block.attributes }
 			setAttributes={ noop }
+			user={ {} }
+			createInnerBlockList={ noop }
 		/>
 	);
 };

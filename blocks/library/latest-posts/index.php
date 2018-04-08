@@ -12,7 +12,7 @@
  *
  * @return string Returns the post content with latest posts added.
  */
-function gutenberg_render_block_core_latest_posts( $attributes ) {
+function gutenberg_render_core_latest_posts_block( $attributes ) {
 	$recent_posts = wp_get_recent_posts( array(
 		'numberposts' => $attributes['postsToShow'],
 		'post_status' => 'publish',
@@ -48,11 +48,11 @@ function gutenberg_render_block_core_latest_posts( $attributes ) {
 	}
 
 	$class = "wp-block-latest-posts align{$attributes['align']}";
-	if ( isset( $attributes['layout'] ) && 'grid' === $attributes['layout'] ) {
+	if ( isset( $attributes['postLayout'] ) && 'grid' === $attributes['postLayout'] ) {
 		$class .= ' is-grid';
 	}
 
-	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['layout'] ) {
+	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['postLayout'] ) {
 		$class .= ' columns-' . $attributes['columns'];
 	}
 
@@ -102,7 +102,7 @@ function register_core_latest_posts_block() {
 				'type'    => 'boolean',
 				'default' => false,
 			),
-			'layout'          => array(
+			'postLayout'      => array(
 				'type'    => 'string',
 				'default' => 'list',
 			),
@@ -123,7 +123,7 @@ function register_core_latest_posts_block() {
 				'default' => 'date',
 			),
 		),
-		'render_callback' => 'gutenberg_render_block_core_latest_posts',
+		'render_callback' => 'gutenberg_render_core_latest_posts_block',
 	) );
 }
 

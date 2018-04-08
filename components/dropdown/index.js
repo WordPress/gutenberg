@@ -6,10 +6,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal Dependencies
  */
-import withFocusReturn from '../higher-order/with-focus-return';
 import Popover from '../popover';
-
-const FocusManaged = withFocusReturn( ( { children } ) => children );
 
 class Dropdown extends Component {
 	constructor() {
@@ -68,6 +65,7 @@ class Dropdown extends Component {
 			className,
 			contentClassName,
 			expandOnMobile,
+			headerTitle,
 		} = this.props;
 
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
@@ -80,18 +78,18 @@ class Dropdown extends Component {
 				   */ }
 				<div>
 					{ renderToggle( args ) }
-					<Popover
-						className={ contentClassName }
-						isOpen={ isOpen }
-						position={ position }
-						onClose={ this.close }
-						onClickOutside={ this.clickOutside }
-						expandOnMobile={ expandOnMobile }
-					>
-						<FocusManaged>
+					{ isOpen && (
+						<Popover
+							className={ contentClassName }
+							position={ position }
+							onClose={ this.close }
+							onClickOutside={ this.clickOutside }
+							expandOnMobile={ expandOnMobile }
+							headerTitle={ headerTitle }
+						>
 							{ renderContent( args ) }
-						</FocusManaged>
-					</Popover>
+						</Popover>
+					) }
 				</div>
 			</div>
 		);

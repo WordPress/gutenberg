@@ -1,21 +1,15 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItemsGroup } from '@wordpress/components';
+import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import shortcuts from '../../../keyboard-shortcuts';
-import { getEditorMode } from '../../../store/selectors';
-import { switchEditorMode } from '../../../store/actions';
-
 /**
  * Set of available mode options.
  *
@@ -41,25 +35,27 @@ function ModeSwitcher( { onSwitch, mode } ) {
 	} );
 
 	return (
-		<MenuItemsGroup
+		<MenuGroup
 			label={ __( 'Editor' ) }
-			choices={ choices }
-			value={ mode }
-			onSelect={ onSwitch }
-		/>
+			filterName="editPost.MoreMenu.editor"
+		>
+			<MenuItemsChoice
+				choices={ choices }
+				value={ mode }
+				onSelect={ onSwitch }
+			/>
+		</MenuGroup>
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		mode: getEditorMode( state ),
-	} ),
-	( dispatch, ownProps ) => ( {
+export default compose( [
+	withSelect( ( select ) => ( {
+		mode: select( 'core/edit-post' ).getEditorMode(),
+	} ) ),
+	withDispatch( ( dispatch, ownProps ) => ( {
 		onSwitch( mode ) {
-			dispatch( switchEditorMode( mode ) );
+			dispatch( 'core/edit-post' ).switchEditorMode( mode );
 			ownProps.onSelect( mode );
 		},
-	} ),
-	undefined,
-	{ storeKey: 'edit-post' }
-)( ModeSwitcher );
+	} ) ),
+] )( ModeSwitcher );

@@ -2,13 +2,13 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { first, last } from 'lodash';
+import { first } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withContext } from '@wordpress/components';
+import { IconButton, withContext, withInstanceId } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 
@@ -16,11 +16,11 @@ import { compose } from '@wordpress/element';
  * Internal dependencies
  */
 import './style.scss';
-import { getBlockMoverLabel } from './mover-label';
-import { isFirstBlock, isLastBlock, getBlockIndex, getBlock } from '../../store/selectors';
-import { selectBlock } from '../../store/actions';
+import { getBlockMoverDescription } from './mover-description';
+import { getBlockIndex, getBlock } from '../../store/selectors';
+import { upArrow, downArrow } from './arrows';
 
-export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked } ) {
+export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId } ) {
 	if ( isLocked ) {
 		return null;
 	}
@@ -34,70 +34,79 @@ export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, block
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ isFirst ? null : onMoveUp }
-				icon={ <svg tabIndex="-1" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M12.293 12.207L9 8.914l-3.293 3.293-1.414-1.414L9 6.086l4.707 4.707z" /></svg> }
-				tooltip={ __( 'Move Up' ) }
-				label={ getBlockMoverLabel(
-					uids.length,
-					blockType && blockType.title,
-					firstIndex,
-					isFirst,
-					isLast,
-					-1,
-				) }
+				icon={ upArrow }
+				label={ __( 'Move up' ) }
+				aria-describedby={ `editor-block-mover__up-description-${ instanceId }` }
 				aria-disabled={ isFirst }
 			/>
 			<IconButton
 				className="editor-block-mover__control"
 				onClick={ isLast ? null : onMoveDown }
-				icon={ <svg tabIndex="-1" width="18" height="18" xmlns="http://www.w3.org/2000/svg"><path d="M12.293 6.086L9 9.379 5.707 6.086 4.293 7.5 9 12.207 13.707 7.5z" /></svg> }
-				tooltip={ __( 'Move Down' ) }
-				label={ getBlockMoverLabel(
-					uids.length,
-					blockType && blockType.title,
-					firstIndex,
-					isFirst,
-					isLast,
-					1,
-				) }
+				icon={ downArrow }
+				label={ __( 'Move down' ) }
+				aria-describedby={ `editor-block-mover__down-description-${ instanceId }` }
 				aria-disabled={ isLast }
 			/>
+			<span id={ `editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description">
+				{
+					getBlockMoverDescription(
+						uids.length,
+						blockType && blockType.title,
+						firstIndex,
+						isFirst,
+						isLast,
+						-1,
+					)
+				}
+			</span>
+			<span id={ `editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description">
+				{
+					getBlockMoverDescription(
+						uids.length,
+						blockType && blockType.title,
+						firstIndex,
+						isFirst,
+						isLast,
+						1,
+					)
+				}
+			</span>
 		</div>
 	);
+}
+
+/**
+ * Action creator creator which, given the action type to dispatch and the
+ * arguments of mapDispatchToProps, creates a prop dispatcher callback for
+ * managing block movement.
+ *
+ * @param {string}   type     Action type to dispatch.
+ * @param {Function} dispatch Store dispatch.
+ * @param {Object}   ownProps The wrapped component's own props.
+ *
+ * @return {Function} Prop dispatcher callback.
+ */
+function createOnMove( type, dispatch, ownProps ) {
+	return () => {
+		const { uids, rootUID } = ownProps;
+		dispatch( { type, uids, rootUID } );
+	};
 }
 
 export default compose(
 	connect(
 		( state, ownProps ) => {
-			const block = getBlock( state, first( ownProps.uids ) );
+			const { uids, rootUID } = ownProps;
+			const block = getBlock( state, first( uids ) );
 
 			return ( {
-				isFirst: isFirstBlock( state, first( ownProps.uids ) ),
-				isLast: isLastBlock( state, last( ownProps.uids ) ),
-				firstIndex: getBlockIndex( state, first( ownProps.uids ) ),
+				firstIndex: getBlockIndex( state, first( uids ), rootUID ),
 				blockType: block ? getBlockType( block.name ) : null,
 			} );
 		},
-		( dispatch, ownProps ) => ( {
-			onMoveDown() {
-				if ( ownProps.uids.length === 1 ) {
-					dispatch( selectBlock( first( ownProps.uids ) ) );
-				}
-
-				dispatch( {
-					type: 'MOVE_BLOCKS_DOWN',
-					uids: ownProps.uids,
-				} );
-			},
-			onMoveUp() {
-				if ( ownProps.uids.length === 1 ) {
-					dispatch( selectBlock( first( ownProps.uids ) ) );
-				}
-
-				dispatch( {
-					type: 'MOVE_BLOCKS_UP',
-					uids: ownProps.uids,
-				} );
-			},
+		( ...args ) => ( {
+			onMoveDown: createOnMove( 'MOVE_BLOCKS_DOWN', ...args ),
+			onMoveUp: createOnMove( 'MOVE_BLOCKS_UP', ...args ),
 		} )
 	),
 	withContext( 'editor' )( ( settings ) => {
@@ -107,4 +116,5 @@ export default compose(
 			isLocked: templateLock === 'all',
 		};
 	} ),
+	withInstanceId,
 )( BlockMover );

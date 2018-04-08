@@ -11,7 +11,7 @@ import {
 	createBlock,
 	registerBlockType
 } from '@wordpress/blocks';
-import { createMediaFromFile, preloadImage } from '@wordpress/utils';
+import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -29,24 +29,33 @@ const blockAttributes = {
 		type: 'array',
 		default: [],
 		source: 'query',
-		selector: 'ul.wp-block-gallery .blocks-gallery-item img',
+		selector: 'ul.wp-block-gallery .blocks-gallery-item',
 		query: {
 			url: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'src',
 			},
 			link: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'data-link',
 			},
 			alt: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'alt',
 				default: '',
 			},
 			id: {
 				source: 'attribute',
+				selector: 'img',
 				attribute: 'data-id',
+			},
+			caption: {
+				type: 'array',
+				source: 'children',
+				selector: 'figcaption',
 			},
 		},
 	},
@@ -81,7 +90,7 @@ registerBlockType( 'core/gallery', {
 					const validImages = filter( attributes, ( { id, url } ) => id && url );
 					if ( validImages.length > 0 ) {
 						return createBlock( 'core/gallery', {
-							images: validImages.map( ( { id, url, alt } ) => ( { id, url, alt } ) ),
+							images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
 						} );
 					}
 					return createBlock( 'core/gallery' );
@@ -123,23 +132,12 @@ registerBlockType( 'core/gallery', {
 					return files.length !== 1 && every( files, ( file ) => file.type.indexOf( 'image/' ) === 0 );
 				},
 				transform( files, onChange ) {
-					const block = createBlock( 'core/gallery', {
-						images: files.map( ( file ) => ( {
-							url: window.URL.createObjectURL( file ),
-						} ) ),
-					} );
-
-					Promise.all( files.map( ( file ) =>
-						createMediaFromFile( file )
-							.then( ( media ) => preloadImage( media.source_url ).then( () => media ) )
-					) ).then( ( medias ) => onChange( block.uid, {
-						images: medias.map( media => ( {
-							id: media.id,
-							url: media.source_url,
-							link: media.link,
-						} ) ),
-					} ) );
-
+					const block = createBlock( 'core/gallery' );
+					mediaUpload(
+						files,
+						( images ) => onChange( block.uid, { images } ),
+						'image'
+					);
 					return block;
 				},
 			},
@@ -150,7 +148,7 @@ registerBlockType( 'core/gallery', {
 				blocks: [ 'core/image' ],
 				transform: ( { images } ) => {
 					if ( images.length > 0 ) {
-						return images.map( ( { id, url, alt } ) => createBlock( 'core/image', { id, url, alt } ) );
+						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption } ) );
 					}
 					return createBlock( 'core/image' );
 				},
@@ -189,6 +187,7 @@ registerBlockType( 'core/gallery', {
 						<li key={ image.id || image.url } className="blocks-gallery-item">
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
+								{ image.caption && image.caption.length > 0 && <figcaption>{ image.caption }</figcaption> }
 							</figure>
 						</li>
 					);

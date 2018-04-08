@@ -9,7 +9,7 @@ import {
 } from '@wordpress/blocks';
 
 import { concatChildren } from '@wordpress/element';
-import { Toolbar } from '@wordpress/components';
+import { PanelBody, Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -104,11 +104,11 @@ registerBlockType( 'core/heading', {
 		};
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, mergeBlocks, insertBlocksAfter, onReplace } ) {
+	edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls
 					key="controls"
 					controls={
@@ -122,28 +122,29 @@ registerBlockType( 'core/heading', {
 					}
 				/>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
-					<h3>{ __( 'Heading Settings' ) }</h3>
-					<p>{ __( 'Level' ) }</p>
-					<Toolbar
-						controls={
-							'123456'.split( '' ).map( ( level ) => ( {
-								icon: 'heading',
-								title: sprintf( __( 'Heading %s' ), level ),
-								isActive: 'H' + level === nodeName,
-								onClick: () => setAttributes( { nodeName: 'H' + level } ),
-								subscript: level,
-							} ) )
-						}
-					/>
-					<p>{ __( 'Text Alignment' ) }</p>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
+					<PanelBody title={ __( 'Heading Settings' ) }>
+						<p>{ __( 'Level' ) }</p>
+						<Toolbar
+							controls={
+								'123456'.split( '' ).map( ( level ) => ( {
+									icon: 'heading',
+									title: sprintf( __( 'Heading %s' ), level ),
+									isActive: 'H' + level === nodeName,
+									onClick: () => setAttributes( { nodeName: 'H' + level } ),
+									subscript: level,
+								} ) )
+							}
+						/>
+						<p>{ __( 'Text Alignment' ) }</p>
+						<AlignmentToolbar
+							value={ align }
+							onChange={ ( nextAlign ) => {
+								setAttributes( { align: nextAlign } );
+							} }
+						/>
+					</PanelBody>
 				</InspectorControls>
 			),
 			<RichText
@@ -151,8 +152,6 @@ registerBlockType( 'core/heading', {
 				wrapperClassName="wp-block-heading"
 				tagName={ nodeName.toLowerCase() }
 				value={ content }
-				focus={ focus }
-				onFocus={ setFocus }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
 				onSplit={
@@ -168,7 +167,9 @@ registerBlockType( 'core/heading', {
 				}
 				onRemove={ () => onReplace( [] ) }
 				style={ { textAlign: align } }
+				className={ className }
 				placeholder={ placeholder || __( 'Write heading…' ) }
+				isSelected={ isSelected }
 			/>,
 		];
 	},

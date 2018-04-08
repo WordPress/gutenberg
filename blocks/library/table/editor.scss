@@ -1,21 +1,3 @@
-.editor-block-list__block[data-type="core/table"] {
-	&[data-align="left"],
-	&[data-align="right"] {
-		min-width: 33%;
-		max-width: 50%;
-	}
-
-	&[data-align="left"] {
-		float: left;
-		margin-right: $block-padding;
-	}
-
-	&[data-align="right"] {
-		float: right;
-		margin-left: $block-padding;
-	}
-}
-
 .wp-block-table {
 	td,
 	th {

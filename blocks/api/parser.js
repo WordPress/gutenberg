@@ -27,7 +27,7 @@ import { attr, prop, html, text, query, node, children } from './matchers';
  * @param {*}      value Original value.
  * @param {string} type  Type to coerce.
  *
- * @returns {*} Coerced value.
+ * @return {*} Coerced value.
  */
 export function asType( value, type ) {
 	switch ( type ) {
@@ -63,7 +63,7 @@ export function asType( value, type ) {
  *
  * @param {Object} sourceConfig Attribute Source object.
  *
- * @returns {Function} A hpq Matcher.
+ * @return {Function} A hpq Matcher.
  */
 export function matcherFromSource( sourceConfig ) {
 	switch ( sourceConfig.source ) {
@@ -84,8 +84,21 @@ export function matcherFromSource( sourceConfig ) {
 			return query( sourceConfig.selector, subMatchers );
 		default:
 			// eslint-disable-next-line no-console
-			console.error( `Unkown source type "${ sourceConfig.source }"` );
+			console.error( `Unknown source type "${ sourceConfig.source }"` );
 	}
+}
+
+/**
+ * Given a block's raw content and an attribute's schema returns the attribute's
+ * value depending on its source.
+ *
+ * @param {string} innerHTML         Block's raw content.
+ * @param {Object} attributeSchema   Attribute's schema.
+ *
+ * @return {*} Attribute value.
+ */
+export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
+	return hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
 }
 
 /**
@@ -98,7 +111,7 @@ export function matcherFromSource( sourceConfig ) {
  * @param {string} innerHTML         Block's raw content.
  * @param {Object} commentAttributes Block's comment attributes.
  *
- * @returns {*} Attribute value.
+ * @return {*} Attribute value.
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
 	let value;
@@ -114,7 +127,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'children':
 		case 'node':
 		case 'query':
-			value = hpqParse( innerHTML, matcherFromSource( attributeSchema ) );
+			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 			break;
 	}
 
@@ -128,7 +141,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
  * @param {string}  innerHTML  Raw block content.
  * @param {?Object} attributes Known block attributes (from delimiters).
  *
- * @returns {Object} All block attributes.
+ * @return {Object} All block attributes.
  */
 export function getBlockAttributes( blockType, innerHTML, attributes ) {
 	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
@@ -146,13 +159,19 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
  * @param {string}  innerHTML  Raw block content.
  * @param {?Object} attributes Known block attributes (from delimiters).
  *
- * @returns {Object} Block attributes.
+ * @return {Object} Block attributes.
  */
 export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attributes ) {
-	if ( ! blockType.deprecated ) {
+	// Not all blocks need a deprecated definition so avoid unnecessary computational cycles
+	// as early as possible when `deprecated` property is not supplied.
+	if ( ! blockType.deprecated || ! blockType.deprecated.length ) {
 		return;
 	}
 
+	// There is no notion of version numbers for blocks. Instead, deprecated versions
+	// are defined implicitly as successive array entries containing the relevant definitions
+	// for handling each block variation. In order to validate a provided source, it has
+	// to attempt to parse each array entry at a time.
 	for ( let i = 0; i < blockType.deprecated.length; i++ ) {
 		const deprecatedBlockType = {
 			...omit( blockType, [ 'attributes', 'save', 'supports' ] ), // Parsing/Serialization properties
@@ -160,17 +179,17 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 		};
 
 		try {
-			// Parse using the deprecated block version .
-			// Try to validate the parsed block using this same deprecated version.
-			// Ignore this version if the the validation fails.
+			// Handle migration of older attributes into current version if necessary.
 			const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
 			const migratedBlockAttributes = deprecatedBlockType.migrate ? deprecatedBlockType.migrate( deprecatedBlockAttributes ) : deprecatedBlockAttributes;
+
+			// Attempt to validate the parsed block. Ignore if the the validation step fails.
 			const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
 			if ( isValid ) {
 				return migratedBlockAttributes;
 			}
 		} catch ( error ) {
-			// ignore error, it means this deprecated version is invalid
+			// Ignore error, it means this deprecated version is invalid.
 		}
 	}
 }
@@ -178,23 +197,32 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 /**
  * Creates a block with fallback to the unknown type handler.
  *
- * @param {?string} name       Block type name.
- * @param {string}  innerHTML  Raw block content.
- * @param {?Object} attributes Attributes obtained from block delimiters.
+ * @param {Object} blockNode Parsed block node.
  *
- * @returns {?Object} An initialized block object (if possible).
+ * @return {?Object} An initialized block object (if possible).
  */
-export function createBlockWithFallback( name, innerHTML, attributes ) {
+export function createBlockWithFallback( blockNode ) {
+	let {
+		blockName: name,
+		attrs: attributes,
+		innerBlocks = [],
+		innerHTML,
+	} = blockNode;
+
+	attributes = attributes || {};
+
+	// Trim content to avoid creation of intermediary freeform segments.
+	innerHTML = innerHTML.trim();
+
 	// Use type from block content, otherwise find unknown handler.
 	name = name || getUnknownTypeHandlerName();
 
-	// Convert 'core/text' blocks in existing content to the new
-	// 'core/paragraph'.
+	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';
 	}
 
-	// Try finding type for known block name, else fall back again.
+	// Try finding the type for known block name, else fall back again.
 	let blockType = getBlockType( name );
 
 	const fallbackBlock = getUnknownTypeHandlerName();
@@ -217,6 +245,9 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 		blockType = getBlockType( name );
 	}
 
+	// Coerce inner blocks from parsed form to canonical form.
+	innerBlocks = innerBlocks.map( createBlockWithFallback );
+
 	// Include in set only if type were determined.
 	if ( ! blockType || ( ! innerHTML && name === fallbackBlock ) ) {
 		return;
@@ -224,12 +255,14 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 
 	const block = createBlock(
 		name,
-		getBlockAttributes( blockType, innerHTML, attributes )
+		getBlockAttributes( blockType, innerHTML, attributes ),
+		innerBlocks
 	);
 
-	// Validate that the parsed block is valid, meaning that if we were to
-	// reserialize it given the assumed attributes, the markup matches the
-	// original value.
+	// Block validation assumes an idempotent operation from source block to serialized block
+	// provided there are no changes in attributes. The validation procedure thus compares the
+	// provided source value with the serialized output before there are any modifications to
+	// the block. When both match, the block is marked as valid.
 	if ( name !== fallbackBlock ) {
 		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
 	}
@@ -238,8 +271,8 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
 	// invalid, or future serialization attempt results in an error.
 	block.originalContent = innerHTML;
 
-	// When block is invalid, attempt to parse it using deprecated definition.
-	// This enables blocks to modify attribute and markup structure without
+	// When the block is invalid, attempt to parse it using a deprecated definition.
+	// This enables blocks to modify its attributes and markup structure without
 	// invalidating content written in previous formats.
 	if ( ! block.isValid ) {
 		const attributesParsedWithDeprecatedVersion = getAttributesFromDeprecatedVersion(
@@ -260,12 +293,11 @@ export function createBlockWithFallback( name, innerHTML, attributes ) {
  *
  * @param {string} content The post content.
  *
- * @returns {Array} Block list.
+ * @return {Array} Block list.
  */
 export function parseWithGrammar( content ) {
 	return grammarParse( content ).reduce( ( memo, blockNode ) => {
-		const { blockName, innerHTML, attrs } = blockNode;
-		const block = createBlockWithFallback( blockName, innerHTML.trim(), attrs );
+		const block = createBlockWithFallback( blockNode );
 		if ( block ) {
 			memo.push( block );
 		}

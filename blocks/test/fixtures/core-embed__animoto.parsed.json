@@ -5,7 +5,7 @@
             "url": "https://animoto.com/"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-embed-animoto\">\n    https://animoto.com/\n    <figcaption>Embedded content from animoto</figcaption>\n</figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-embed-animoto wp-block-embed\">\n    https://animoto.com/\n    <figcaption>Embedded content from animoto</figcaption>\n</figure>\n"
     },
     {
         "attrs": {},

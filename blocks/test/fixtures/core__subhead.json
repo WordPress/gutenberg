@@ -13,6 +13,7 @@
                 "."
             ]
         },
+        "innerBlocks": [],
         "originalContent": "<p class=\"wp-block-subhead\">This is a <em>subhead</em>.</p>"
     }
 ]

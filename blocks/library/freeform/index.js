@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType
@@ -15,7 +16,7 @@ import OldEditor from './old-editor';
 registerBlockType( 'core/freeform', {
 	title: __( 'Classic' ),
 
-	desription: __( 'The classic editor, in block form.' ),
+	description: __( 'The classic editor, in block form.' ),
 
 	icon: 'editor-kitchensink',
 
@@ -28,10 +29,16 @@ registerBlockType( 'core/freeform', {
 		},
 	},
 
+	supports: {
+		className: false,
+		customClassName: false,
+	},
+
 	edit: OldEditor,
 
 	save( { attributes } ) {
 		const { content } = attributes;
-		return content;
+
+		return <RawHTML>{ content }</RawHTML>;
 	},
 } );

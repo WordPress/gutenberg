@@ -18,50 +18,71 @@ import './style.scss';
 import PostPublishButton from '../post-publish-button';
 import PostPublishPanelPrepublish from './prepublish';
 import PostPublishPanelPostpublish from './postpublish';
-import { getCurrentPostType, isCurrentPostPublished, isSavingPost } from '../../store/selectors';
+import {
+	getCurrentPostType,
+	isCurrentPostPublished,
+	isCurrentPostScheduled,
+	isSavingPost,
+	isEditedPostDirty,
+} from '../../store/selectors';
 
 class PostPublishPanel extends Component {
 	constructor() {
 		super( ...arguments );
-		this.onPublish = this.onPublish.bind( this );
+		this.onSubmit = this.onSubmit.bind( this );
 		this.state = {
 			loading: false,
-			published: false,
+			submitted: false,
 		};
 	}
 
 	componentWillReceiveProps( newProps ) {
 		if (
-			newProps.isPublished &&
-			! this.state.published &&
-			! newProps.isSaving
+			! this.state.submitted &&
+			! newProps.isSaving &&
+			( newProps.isPublished || newProps.isScheduled )
 		) {
 			this.setState( {
-				published: true,
+				submitted: true,
 				loading: false,
 			} );
 		}
 	}
 
-	onPublish() {
+	componentDidUpdate( prevProps ) {
+		// Automatically collapse the publish sidebar when a post
+		// is published and the user makes an edit.
+		if ( prevProps.isPublished && this.props.isDirty ) {
+			this.props.onClose();
+		}
+	}
+
+	onSubmit() {
+		const { user, onClose } = this.props;
+		const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
+		const isContributor = user.data && ! userCanPublishPosts;
+		if ( isContributor ) {
+			onClose();
+			return;
+		}
 		this.setState( { loading: true } );
 	}
 
 	render() {
-		const { onClose, user } = this.props;
-		const { loading, published } = this.state;
-		const canPublish = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
-
+		const { isScheduled, onClose, forceIsDirty, forceIsSaving } = this.props;
+		const { loading, submitted } = this.state;
 		return (
 			<div className="editor-post-publish-panel">
 				<div className="editor-post-publish-panel__header">
-					{ ! published && (
+					{ ! submitted && (
 						<div className="editor-post-publish-panel__header-publish-button">
-							<PostPublishButton onSubmit={ this.onPublish } />
+							<PostPublishButton onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
 						</div>
 					) }
-					{ published && (
-						<div className="editor-post-publish-panel__header-published">{ __( 'Published' ) }</div>
+					{ submitted && (
+						<div className="editor-post-publish-panel__header-published">
+							{ isScheduled ? __( 'Scheduled' ) : __( 'Published' ) }
+						</div>
 					) }
 					<IconButton
 						onClick={ onClose }
@@ -70,9 +91,9 @@ class PostPublishPanel extends Component {
 					/>
 				</div>
 				<div className="editor-post-publish-panel__content">
-					{ canPublish && ! loading && ! published && <PostPublishPanelPrepublish /> }
-					{ loading && ! published && <Spinner /> }
-					{ published && <PostPublishPanelPostpublish /> }
+					{ ! loading && ! submitted && <PostPublishPanelPrepublish /> }
+					{ loading && ! submitted && <Spinner /> }
+					{ submitted && <PostPublishPanelPostpublish /> }
 				</div>
 			</div>
 		);
@@ -84,7 +105,9 @@ const applyConnect = connect(
 		return {
 			postType: getCurrentPostType( state ),
 			isPublished: isCurrentPostPublished( state ),
+			isScheduled: isCurrentPostScheduled( state ),
 			isSaving: isSavingPost( state ),
+			isDirty: isEditedPostDirty( state ),
 		};
 	},
 );

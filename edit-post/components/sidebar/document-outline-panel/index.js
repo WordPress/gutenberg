@@ -1,20 +1,11 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { DocumentOutline, DocumentOutlineCheck } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
-import { isEditorSidebarPanelOpened } from '../../../store/selectors';
-import { toggleSidebarPanel } from '../../../store/actions';
+import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Module constants
@@ -31,17 +22,15 @@ function DocumentOutlinePanel( { isOpened, onTogglePanel } ) {
 	);
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
+			isOpened: select( 'core/edit-post' ).isEditorSidebarPanelOpened( PANEL_NAME ),
 		};
-	},
-	{
+	} ),
+	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
+			return dispatch( 'core/edit-post' ).toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
-)( DocumentOutlinePanel );
+	} ) ),
+] )( DocumentOutlinePanel );

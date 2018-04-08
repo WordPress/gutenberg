@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType
 } from '@wordpress/blocks';
+import { PanelBody, RangeControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -18,7 +19,6 @@ import './style.scss';
 import './editor.scss';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import RangeControl from '../../inspector-controls/range-control';
 import RichText from '../../rich-text';
 import InspectorControls from '../../inspector-controls';
 
@@ -59,11 +59,11 @@ registerBlockType( 'core/text-columns', {
 		}
 	},
 
-	edit( { attributes, setAttributes, className, focus, setFocus } ) {
+	edit( { attributes, setAttributes, className, isSelected } ) {
 		const { width, content, columns } = attributes;
 
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ width }
@@ -72,15 +72,17 @@ registerBlockType( 'core/text-columns', {
 					/>
 				</BlockControls>
 			),
-			focus && (
+			isSelected && (
 				<InspectorControls key="inspector">
-					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ ( value ) => setAttributes( { columns: value } ) }
-						min={ 2 }
-						max={ 4 }
-					/>
+					<PanelBody>
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ ( value ) => setAttributes( { columns: value } ) }
+							min={ 2 }
+							max={ 4 }
+						/>
+					</PanelBody>
 				</InspectorControls>
 			),
 			<div className={ `${ className } align${ width } columns-${ columns }` } key="block">
@@ -98,9 +100,8 @@ registerBlockType( 'core/text-columns', {
 									],
 								} );
 							} }
-							focus={ focus && focus.column === index }
-							onFocus={ () => setFocus( { column: index } ) }
 							placeholder={ __( 'New Column' ) }
+							isSelected={ isSelected }
 						/>
 					</div>
 				) }

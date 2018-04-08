@@ -43,6 +43,19 @@ export default class InserterGroup extends Component {
 		}
 	}
 
+	/**
+	 * Returns an event handler triggered when hovering a block.
+	 *
+	 * @param   {Object} block Block object.
+	 * @return  {Func}         Event Handler.
+	 */
+	createToggleBlockHover( block ) {
+		if ( ! this.props.onHover ) {
+			return null;
+		}
+		return () => this.props.onHover( block );
+	}
+
 	renderItem( item ) {
 		const { current } = this.state;
 		const { onSelectItem } = this.props;
@@ -57,6 +70,11 @@ export default class InserterGroup extends Component {
 				onClick={ () => onSelectItem( item ) }
 				tabIndex={ isCurrent || item.isDisabled ? null : '-1' }
 				disabled={ item.isDisabled }
+				onMouseEnter={ this.createToggleBlockHover( item ) }
+				onMouseLeave={ this.createToggleBlockHover( null ) }
+				onFocus={ this.createToggleBlockHover( item ) }
+				onBlur={ this.createToggleBlockHover( null ) }
+				aria-label={ item.title } // Fix for IE11 and JAWS 2018.
 			>
 				<BlockIcon icon={ item.icon } />
 				{ item.title }

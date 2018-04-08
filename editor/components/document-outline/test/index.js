@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount, shallow } from 'enzyme';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,8 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { DocumentOutline } from '../';
+
+jest.mock( '../../block-title', () => () => 'Block Title' );
 
 describe( 'DocumentOutline', () => {
 	// TODO: Need to load/register core blocks. Maybe requireIndex ?
@@ -29,6 +31,8 @@ describe( 'DocumentOutline', () => {
 		content: 'Heading child',
 		nodeName: 'H3',
 	} );
+
+	const nestedHeading = createBlock( 'core/columns', undefined, [ headingChild ] );
 
 	describe( 'no header blocks present', () => {
 		it( 'should not render when no blocks provided', () => {
@@ -72,6 +76,34 @@ describe( 'DocumentOutline', () => {
 			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
 
 			expect( wrapper ).toMatchSnapshot();
+		} );
+	} );
+
+	describe( 'nested headings', () => {
+		it( 'should render even if the heading is nested', () => {
+			const tableOfContentItemsSelector = 'TableOfContentsItem';
+			const outlineLevelsSelector = '.document-outline__level';
+			const outlineItemContentSelector = '.document-outline__item-content';
+
+			const blocks = [ headingParent, nestedHeading ];
+			const wrapper = mount( <DocumentOutline blocks={ blocks } /> );
+
+			//heading parent and nested heading should appear as items
+			const tableOfContentItems = wrapper.find( tableOfContentItemsSelector );
+			expect( tableOfContentItems ).toHaveLength( 2 );
+
+			//heading parent test
+			const firstItemLevels = tableOfContentItems.at( 0 ).find( outlineLevelsSelector );
+			expect( firstItemLevels ).toHaveLength( 1 );
+			expect( firstItemLevels.at( 0 ).text() ).toEqual( 'H2' );
+			expect( tableOfContentItems.at( 0 ).find( outlineItemContentSelector ).text() ).toEqual( 'Heading parent' );
+
+			//nested heading test
+			const secondItemLevels = tableOfContentItems.at( 1 ).find( outlineLevelsSelector );
+			expect( secondItemLevels ).toHaveLength( 2 );
+			expect( secondItemLevels.at( 0 ).text() ).toEqual( 'Block Title' );
+			expect( secondItemLevels.at( 1 ).text() ).toEqual( 'H3' );
+			expect( tableOfContentItems.at( 1 ).find( outlineItemContentSelector ).text() ).toEqual( 'Heading child' );
 		} );
 	} );
 } );

@@ -14,10 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The HTML returned by this page is irrelevant, it's being called in AJAX ignoring its output
  *
  * @since 1.8.0
- *
- * @param string $post_type Current post type.
  */
-function gutenberg_meta_box_save( $post_type ) {
+function gutenberg_meta_box_save() {
 	/**
 	 * Needs classic editor to be active.
 	 *
@@ -49,7 +47,7 @@ function gutenberg_meta_box_save( $post_type ) {
 	the_gutenberg_metaboxes();
 }
 
-add_action( 'do_meta_boxes', 'gutenberg_meta_box_save', 1000, 2 );
+add_action( 'do_meta_boxes', 'gutenberg_meta_box_save', 1000 );
 
 /**
  * Allows the meta box endpoint to correctly redirect to the meta box endpoint
@@ -86,16 +84,30 @@ add_filter( 'redirect_post_location', 'gutenberg_meta_box_save_redirect', 10, 2 
  * @since 1.5.0
  *
  * @param array $meta_boxes Meta box data.
+ * @return array Meta box data without core meta boxes.
  */
 function gutenberg_filter_meta_boxes( $meta_boxes ) {
 	$core_side_meta_boxes = array(
 		'submitdiv',
 		'formatdiv',
-		'categorydiv',
-		'tagsdiv-post_tag',
 		'pageparentdiv',
 		'postimagediv',
 	);
+
+	$custom_taxonomies = get_taxonomies(
+		array(
+			'show_ui' => true,
+		),
+		'objects'
+	);
+
+	// Following the same logic as meta box generation in:
+	// https://github.com/WordPress/wordpress-develop/blob/c896326/src/wp-admin/edit-form-advanced.php#L288-L292.
+	foreach ( $custom_taxonomies as $custom_taxonomy ) {
+		$core_side_meta_boxes [] = $custom_taxonomy->hierarchical ?
+			$custom_taxonomy->name . 'div' :
+			'tagsdiv-' . $custom_taxonomy->name;
+	}
 
 	$core_normal_meta_boxes = array(
 		'revisionsdiv',
@@ -119,8 +131,7 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 				foreach ( $boxes as $name => $data ) {
 					if ( 'normal' === $context && in_array( $name, $core_normal_meta_boxes ) ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
-					}
-					if ( 'side' === $context && in_array( $name, $core_side_meta_boxes ) ) {
+					} elseif ( 'side' === $context && in_array( $name, $core_side_meta_boxes ) ) {
 						unset( $meta_boxes[ $page ][ $context ][ $priority ][ $name ] );
 					}
 					// Filter out any taxonomies as Gutenberg already provides JS alternative.
@@ -137,32 +148,6 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 	}
 
 	return $meta_boxes;
-}
-
-/**
- * Check whether a meta box is empty.
- *
- * @since 1.5.0
- *
- * @param array  $meta_boxes Meta box data.
- * @param string $context    Location of meta box, one of side, advanced, normal.
- * @param string $post_type  Post type to investigate.
- * @return boolean Whether the meta box is empty.
- */
-function gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type ) {
-	$page = $post_type;
-
-	if ( ! isset( $meta_boxes[ $page ][ $context ] ) ) {
-		return true;
-	}
-
-	foreach ( $meta_boxes[ $page ][ $context ] as $priority => $boxes ) {
-		if ( ! empty( $boxes ) ) {
-			return false;
-		}
-	}
-
-	return true;
 }
 
 add_filter( 'filter_gutenberg_meta_boxes', 'gutenberg_filter_meta_boxes' );
@@ -306,7 +291,7 @@ function the_gutenberg_metaboxes() {
 	 */
 	$wp_meta_boxes = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
 	$locations     = array( 'side', 'normal', 'advanced' );
-
+	$meta_box_data = array();
 	// Render meta boxes.
 	?>
 	<form class="metabox-base-form">
@@ -317,17 +302,32 @@ function the_gutenberg_metaboxes() {
 			<div id="poststuff" class="sidebar-open">
 				<div id="postbox-container-2" class="postbox-container">
 					<?php
-					do_meta_boxes(
+					$number_metaboxes = do_meta_boxes(
 						$current_screen,
 						$location,
 						$post
 					);
+
+					$meta_box_data[ $location ] = $number_metaboxes > 0;
 					?>
 				</div>
 			</div>
 		</form>
 	<?php endforeach; ?>
 	<?php
+
+	/**
+	 * Sadly we probably can not add this data directly into editor settings.
+	 *
+	 * ACF and other meta boxes need admin_head to fire for meta box registry.
+	 * admin_head fires after admin_enqueue_scripts which is where we create our
+	 * editor instance. If a cleaner solution can be imagined, please change
+	 * this, and try to get this data to load directly into the editor settings.
+	 */
+	wp_add_inline_script(
+		'wp-edit-post',
+		'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
+	);
 
 	// Reset meta box data.
 	$wp_meta_boxes = $_original_meta_boxes;
@@ -356,7 +356,6 @@ function gutenberg_meta_box_post_form_hidden_fields( $post ) {
 	<input type="hidden" id="user-id" name="user_ID" value="<?php echo (int) $user_id; ?>" />
 	<input type="hidden" id="hiddenaction" name="action" value="<?php echo esc_attr( $form_action ); ?>" />
 	<input type="hidden" id="originalaction" name="originalaction" value="<?php echo esc_attr( $form_action ); ?>" />
-	<input type="hidden" id="post_author" name="post_author" value="<?php echo esc_attr( $post->post_author ); ?>" />
 	<input type="hidden" id="post_type" name="post_type" value="<?php echo esc_attr( $post->post_type ); ?>" />
 	<input type="hidden" id="original_post_status" name="original_post_status" value="<?php echo esc_attr( $post->post_status ); ?>" />
 	<input type="hidden" id="referredby" name="referredby" value="<?php echo $referer ? esc_url( $referer ) : ''; ?>" />

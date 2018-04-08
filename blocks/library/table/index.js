@@ -54,11 +54,11 @@ registerBlockType( 'core/table', {
 		}
 	},
 
-	edit( { attributes, setAttributes, focus, setFocus, className } ) {
+	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { content } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		return [
-			focus && (
+			isSelected && (
 				<BlockControls key="toolbar">
 					<BlockAlignmentToolbar
 						value={ attributes.align }
@@ -72,9 +72,8 @@ registerBlockType( 'core/table', {
 					setAttributes( { content: nextContent } );
 				} }
 				content={ content }
-				focus={ focus }
-				onFocus={ setFocus }
 				className={ className }
+				isSelected={ isSelected }
 			/>,
 		];
 	},

@@ -70,6 +70,10 @@
 		opacity: 0.5;
 		pointer-events: none;
 	}
+
+	&.mce-content-body {
+		line-height: $editor-line-height;
+	}
 }
 
 .has-drop-cap .blocks-rich-text__tinymce:not( :focus )  {
@@ -78,7 +82,7 @@
 		font-size: 4.1em;
 		line-height: 0.7;
 		font-family: serif;
-		font-weight: bold;
+		font-weight: 600;
 		margin: .07em .23em 0 0;
 		text-transform: uppercase;
 		font-style: normal;
