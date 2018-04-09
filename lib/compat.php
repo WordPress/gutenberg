@@ -473,3 +473,17 @@ function gutenberg_register_sample_permalink_function( $post_type ) {
 	return $post_type;
 }
 add_filter( 'registered_post_type', 'gutenberg_register_sample_permalink_function' );
+
+/**
+ * Add an is_viewable flag to the  posttype REST API response.
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post_Type     $post_type The post_type being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing is_viewable flag.
+ */
+function gutenberg_add_viewable_flag_to_post_types( $response, $post_type, $request ) {
+	$response->data['is_viewable'] = is_post_type_viewable( $post_type );
+	return $response;
+}
+add_filter( 'rest_prepare_post_type', 'gutenberg_add_viewable_flag_to_post_types', 10, 3 );
