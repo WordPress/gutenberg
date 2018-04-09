@@ -1527,10 +1527,6 @@ export function getProvisionalBlockUID( state ) {
 export function isPermalinkEditable( state ) {
 	const samplePermalinkData = getEditedPostAttribute( state, 'sample_permalink' );
 
-	if ( ! samplePermalinkData || samplePermalinkData.length < 2 ) {
-		return false;
-	}
-
 	return /%(?:postname|pagename)%/.test( samplePermalinkData[ 0 ] );
 }
 
@@ -1543,10 +1539,6 @@ export function isPermalinkEditable( state ) {
  */
 export function getSamplePermalink( state ) {
 	const samplePermalinkData = getEditedPostAttribute( state, 'sample_permalink' );
-
-	if ( ! samplePermalinkData || samplePermalinkData.length < 2 ) {
-		return false;
-	}
 
 	return samplePermalinkData[ 0 ].replace( /%(?:postname|pagename)%/, samplePermalinkData[ 1 ] );
 }
