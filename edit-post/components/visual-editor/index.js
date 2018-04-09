@@ -12,8 +12,6 @@ import {
 	MultiSelectScrollIntoView,
 } from '@wordpress/editor';
 import { Fragment, compose } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
-import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -30,7 +28,7 @@ function VisualEditorBlockMenu( { children, onClose } ) {
 	);
 }
 
-function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
+function VisualEditor() {
 	return (
 		<BlockSelectionClearer className="edit-post-visual-editor">
 			<EditorGlobalKeyboardShortcuts />
@@ -39,10 +37,7 @@ function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
 			<WritingFlow>
 				<ObserveTyping>
 					<PostTitle />
-					<BlockList
-						showContextualToolbar={ ! isLargeViewport || ! hasFixedToolbar }
-						renderBlockMenu={ VisualEditorBlockMenu }
-					/>
+					<BlockList renderBlockMenu={ VisualEditorBlockMenu } />
 				</ObserveTyping>
 			</WritingFlow>
 		</BlockSelectionClearer>
@@ -50,8 +45,4 @@ function VisualEditor( { hasFixedToolbar, isLargeViewport } ) {
 }
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-	} ) ),
-	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( VisualEditor );

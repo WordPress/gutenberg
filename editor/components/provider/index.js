@@ -28,33 +28,29 @@ class EditorProvider extends Component {
 
 		this.store = store;
 
-		this.settings = {
-			...EditorSettings.defaultSettings,
-			...props.settings,
-		};
-
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
-			this.store.dispatch( setupEditor( props.post, this.settings ) );
-		}
-	}
-
-	componentWillReceiveProps( nextProps ) {
-		if (
-			nextProps.settings !== this.props.settings
-		) {
-			// eslint-disable-next-line no-console
-			console.error( 'The Editor Provider Props are immutable.' );
+			this.store.dispatch(
+				setupEditor( props.post, {
+					...EditorSettings.defaultSettings,
+					...this.props.settings,
+				} )
+			);
 		}
 	}
 
 	render() {
-		const { children } = this.props;
+		const { children, settings } = this.props;
 		const providers = [
 			// Editor settings provider
 			[
 				EditorSettings.Provider,
-				{ value: this.settings },
+				{
+					value: {
+						...EditorSettings.defaultSettings,
+						...settings,
+					},
+				},
 			],
 
 			// Redux provider:

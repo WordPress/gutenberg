@@ -25,12 +25,10 @@ const INNER_BLOCK_LIST_CACHE = {};
  *                                         BlockList component.
  * @param {Function} renderBlockMenu       Render function for block menu of
  *                                         nested BlockList.
- * @param {boolean}  showContextualToolbar Whether contextual toolbar is to be
- *                                         used.
  *
  * @return {Component} Pre-bound BlockList component
  */
-export function createInnerBlockList( uid, renderBlockMenu, showContextualToolbar ) {
+export function createInnerBlockList( uid, renderBlockMenu ) {
 	if ( ! INNER_BLOCK_LIST_CACHE[ uid ] ) {
 		INNER_BLOCK_LIST_CACHE[ uid ] = [
 			// The component class:
@@ -52,7 +50,6 @@ export function createInnerBlockList( uid, renderBlockMenu, showContextualToolba
 						<BlockList
 							rootUID={ uid }
 							renderBlockMenu={ renderBlockMenu }
-							showContextualToolbar={ showContextualToolbar }
 							{ ...this.props } />
 					);
 				}
