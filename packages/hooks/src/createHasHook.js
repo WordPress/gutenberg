@@ -13,11 +13,10 @@ function createHasHook( hooks ) {
 	 *
 	 * @param  {string}  hookName The name of the hook to check for.
 	 *
-	 * @return {boolean}          Whether there are handlers that are attached to
-	 *                            the given hook.
+	 * @return {boolean} Whether there are handlers that are attached to the given hook.
 	 */
 	return function hasHook( hookName ) {
-		return hooks[ hookName ] ? true : false;
+		return hookName in hooks;
 	};
 }
 
