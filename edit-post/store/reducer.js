@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -26,8 +21,6 @@ import { PREFERENCES_DEFAULTS } from './defaults';
  */
 export const preferences = combineReducers( {
 	activeGeneralSidebar( state = PREFERENCES_DEFAULTS.activeGeneralSidebar, action ) {
-			console.log('action', action);
-			
 		switch ( action.type ) {
 			case 'OPEN_GENERAL_SIDEBAR':
 				return action.name;
@@ -157,39 +150,10 @@ export function metaBoxes( state = defaultMetaBoxState, action ) {
 	}
 }
 
-/**
- * Reducer keeping track of the state of articles
- * This includes:
- * 	- selectedCategory
- * 	- searchTerm
- * @param  {Object}	state 	Prvious state.
- * @param  {Object} action 	Action object.
- * @return {Object}			Updated state.
- */
-export function search( state = { }, action ) {
-	switch ( action.type ) {
-		case 'SEARCH_ARTICLES':
-			console.log('SEARCH_ARTICLES reducer');
-
-			return {
-				...state,
-				...omit( action, [ 'type' ] ),
-			};
-		case 'SET_ARTICLES':
-			return {
-				...state,
-				...omit( action, [ 'type' ] ),
-			};
-		default:
-			return state;
-	}
-}
-
 export default combineReducers( {
 	preferences,
 	panel,
 	publishSidebarActive,
 	metaBoxes,
 	isSavingMetaBoxes,
-	search,
 } );

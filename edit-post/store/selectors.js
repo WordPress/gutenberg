@@ -154,13 +154,3 @@ export const hasMetaBoxes = createSelector(
 export function isSavingMetaBoxes( state ) {
 	return state.isSavingMetaBoxes;
 }
-
-/**
- * Return the searched aricles.
- *
- * @param  {Object}  state 	Global application state.
- * @return {Object}			Articles
- */
-export function getArticles( state ) {
-	return state.search.articles;
-}

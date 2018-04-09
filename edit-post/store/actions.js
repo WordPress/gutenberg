@@ -148,33 +148,3 @@ export function setMetaBoxSavedData( dataPerLocation ) {
 		dataPerLocation,
 	};
 }
-
-
-/**
- * Return an action object used to set term,
- * one of the articles search values.
- *
- * @param 	{Object}	searchValues 	Search term and category id
- * @return  {Object}          		Action object.
- */
-export function searchArticles( searchValues ) {
-	console.log('SEARCH_ARTICLES', searchValues);
-	return {
-		type: 'SEARCH_ARTICLES',
-		...searchValues
-	};
-}
-
-/**
- * Return an action object used to set articles,
- * one of the articles search values.
- *
- * @param 	{Object}	articles 	Articles
- * @return  {Object}          		Action object.
- */
-export function setArticles( articles ) {
-	return {
-		type: 'SET_ARTICLES',
-		articles,
-	};
-}

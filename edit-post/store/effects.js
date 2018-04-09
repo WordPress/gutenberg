@@ -17,8 +17,6 @@ import {
 	metaBoxUpdatesSuccess,
 	setMetaBoxSavedData,
 	requestMetaBoxUpdates,
-	searchArticles,
-	setArticles,
 	openGeneralSidebar,
 	closeGeneralSidebar,
 } from './actions';
@@ -111,25 +109,6 @@ const effects = {
 	SWITCH_MODE( action ) {
 		const message = action.mode === 'visual' ? __( 'Visual editor selected' ) : __( 'Code editor selected' );
 		speak( message, 'assertive' );
-	},
-	SEARCH_ARTICLES( action, store ) {
-		const state	= store.getState();
-		const { dispatch } = store;
-
-		console.log('SEARCH_ARTICLES effects', store);
-
-		// request articles
-		wp.apiRequest( {
-			path: '/wp/v2/articles',
-			data: {
-				category_id: state.search.selectedCategory,
-				s: state.search.searchTerm,
-				order: 'desc',
-				orderBy: 'date',
-			},
-		} ).then( articles => {
-			dispatch( setArticles( articles ) );
-		} );
 	},
 	INIT( _, store ) {
 		// Select the block settings tab when the selected block changes
