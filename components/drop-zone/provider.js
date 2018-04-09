@@ -81,6 +81,7 @@ class DropZoneProvider extends Component {
 				isDraggingOverDocument: false,
 				isDraggingOverElement: false,
 				position: null,
+				type: null,
 			} );
 		} );
 	}
@@ -164,10 +165,12 @@ class DropZoneProvider extends Component {
 		// Notifying the dropzones
 		dropzonesToUpdate.map( ( dropzone ) => {
 			const index = this.dropzones.indexOf( dropzone );
+			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
 			dropzone.updateState( {
-				isDraggingOverElement: index === hoveredDropZoneIndex,
-				position: index === hoveredDropZoneIndex ? position : null,
+				isDraggingOverElement: isDraggingOverDropZone,
+				position: isDraggingOverDropZone ? position : null,
 				isDraggingOverDocument: this.doesDropzoneSupportType( dropzone, dragEventType ),
+				type: isDraggingOverDropZone ? dragEventType : null,
 			} );
 		} );
 

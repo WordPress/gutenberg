@@ -104,8 +104,6 @@ class ParagraphBlock extends Component {
 		if ( customFontSize ) {
 			return customFontSize;
 		}
-
-		return FONT_SIZES.regular;
 	}
 
 	setFontSize( fontSizeValue ) {
@@ -190,7 +188,7 @@ class ParagraphBlock extends Component {
 						<RangeControl
 							className="blocks-paragraph__custom-size-slider"
 							label={ __( 'Custom Size' ) }
-							value={ fontSize }
+							value={ fontSize || '' }
 							onChange={ ( value ) => this.setFontSize( value ) }
 							min={ 12 }
 							max={ 100 }
@@ -239,7 +237,7 @@ class ParagraphBlock extends Component {
 					style={ {
 						backgroundColor: backgroundColor,
 						color: textColor,
-						fontSize: fontSize !== FONT_SIZES.regular ? fontSize + 'px' : undefined,
+						fontSize: fontSize ? fontSize + 'px' : undefined,
 						textAlign: align,
 					} }
 					value={ content }
