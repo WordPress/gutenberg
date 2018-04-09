@@ -3,7 +3,7 @@
  */
 import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
-import { flowRight, without, mapValues } from 'lodash';
+import { flowRight, without, mapValues, isPlainObject } from 'lodash';
 import memoize from 'memize';
 
 /**
@@ -136,15 +136,15 @@ export function registerResolvers( reducerKey, newResolvers ) {
 			return selector;
 		}
 
-		// Ensure single invocation per argument set via memoization.
-		const fulfill = memoize( async ( ...args ) => {
-			const store = stores[ reducerKey ];
+		const store = stores[ reducerKey ];
+		const resolver = isPlainObject( newResolvers[ key ] ) ? newResolvers[ key ] : { fulfill: newResolvers[ key ] };
 
+		const rawFullfill = async ( ...args ) => {
 			// At this point, selectors have already been pre-bound to inject
 			// state, it would not be otherwise provided to fulfill.
 			const state = store.getState();
 
-			let fulfillment = newResolvers[ key ]( state, ...args );
+			let fulfillment = resolver.fulfill( state, ...args );
 
 			// Attempt to normalize fulfillment as async iterable.
 			fulfillment = toAsyncIterable( fulfillment );
@@ -158,7 +158,16 @@ export function registerResolvers( reducerKey, newResolvers ) {
 					store.dispatch( maybeAction );
 				}
 			}
-		} );
+		};
+
+		// Ensure single invocation per argument set via memoization
+		// or via isFulfilled call if provided.
+		const fulfill = resolver.isFulfilled ? ( ...args ) => {
+			const state = store.getState();
+			if ( ! resolver.isFulfilled( state, ...args ) ) {
+				rawFullfill( ...args );
+			}
+		} : memoize( rawFullfill );
 
 		return ( ...args ) => {
 			fulfill( ...args );
