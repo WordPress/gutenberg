@@ -44,7 +44,7 @@ $z-layers: (
 
 	// Block controls, particularly in nested contexts, floats aside block and
 	// should overlap most block content.
-	'.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}': 100,
+	'.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}': 80,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
@@ -53,7 +53,7 @@ $z-layers: (
 
 	// Show sidebar in greater than small viewports above editor related elements
 	// but bellow #adminmenuback { z-index: 100 }
-	'.edit-post-sidebar {greater than small}': 50,
+	'.edit-post-sidebar {greater than small}': 90,
 
 	// Show notices below expanded wp-admin submenus:
 	// #adminmenuwrap { z-index: 9990 }
