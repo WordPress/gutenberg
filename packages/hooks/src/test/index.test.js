@@ -454,7 +454,7 @@ test( 'Test doingAction, didAction and hasAction.', () => {
 	expect( doingAction( 'test.action' ) ).toBe( false );
 
 	expect( didAction( 'test.action' ) ).toBe( 0 );
-	expect( hasAction( 'test.action' ) ).toBe( 0 );
+	expect( hasAction( 'test.action' ) ).toBe( false );
 
 	addAction( 'test.action', 'my_callback', () => {
 		actionCalls++;
@@ -466,7 +466,7 @@ test( 'Test doingAction, didAction and hasAction.', () => {
 	// Verify action added, not running yet.
 	expect( doingAction( 'test.action' ) ).toBe( false );
 	expect( didAction( 'test.action' ) ).toBe( 0 );
-	expect( hasAction( 'test.action' ) ).toBe( 1 );
+	expect( hasAction( 'test.action' ) ).toBe( true );
 
 	doAction( 'test.action' );
 
@@ -474,7 +474,7 @@ test( 'Test doingAction, didAction and hasAction.', () => {
 	expect( actionCalls ).toBe( 1 );
 	expect( doingAction( 'test.action' ) ).toBe( false );
 	expect( didAction( 'test.action' ) ).toBe( 1 );
-	expect( hasAction( 'test.action' ) ).toBe( 1 );
+	expect( hasAction( 'test.action' ) ).toBe( true );
 	expect( doingAction() ).toBe( false );
 	expect( doingAction( 'test.action' ) ).toBe( false );
 	expect( doingAction( 'notatest.action' ) ).toBe( false );
@@ -489,13 +489,13 @@ test( 'Test doingAction, didAction and hasAction.', () => {
 	// Verify state is reset appropriately.
 	expect( doingAction( 'test.action' ) ).toBe( false );
 	expect( didAction( 'test.action' ) ).toBe( 2 );
-	expect( hasAction( 'test.action' ) ).toBe( 0 );
+	expect( hasAction( 'test.action' ) ).toBe( true );
 
 	doAction( 'another.action' );
 	expect( doingAction( 'test.action' ) ).toBe( false );
 
 	// Verify hasAction returns 0 when no matching action.
-	expect( hasAction( 'notatest.action' ) ).toBe( 0 );
+	expect( hasAction( 'notatest.action' ) ).toBe( false );
 } );
 
 test( 'Verify doingFilter, didFilter and hasFilter.', () => {
@@ -514,8 +514,8 @@ test( 'Verify doingFilter, didFilter and hasFilter.', () => {
 	expect( test ).toBe( 'someValue' );
 	expect( filterCalls ).toBe( 1 );
 	expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
-	expect( hasFilter( 'runtest.filter' ) ).toBe( 1 );
-	expect( hasFilter( 'notatest.filter' ) ).toBe( 0 );
+	expect( hasFilter( 'runtest.filter' ) ).toBe( true );
+	expect( hasFilter( 'notatest.filter' ) ).toBe( false );
 	expect( doingFilter() ).toBe( false );
 	expect( doingFilter( 'runtest.filter' ) ).toBe( false );
 	expect( doingFilter( 'notatest.filter' ) ).toBe( false );
@@ -523,7 +523,7 @@ test( 'Verify doingFilter, didFilter and hasFilter.', () => {
 
 	expect( removeAllFilters( 'runtest.filter' ) ).toBe( 1 );
 
-	expect( hasFilter( 'runtest.filter' ) ).toBe( 0 );
+	expect( hasFilter( 'runtest.filter' ) ).toBe( true );
 	expect( didFilter( 'runtest.filter' ) ).toBe( 1 );
 } );
 
