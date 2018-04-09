@@ -88,6 +88,27 @@ function gutenberg_shim_fix_api_request_plain_permalinks( $scripts ) {
 
 	buildAjaxOptions = wp.apiRequest.buildAjaxOptions;
 
+	function getStablePath( path ) {
+		var splitted = path.split( '?' );
+		var query = splitted[ 1 ];
+		var base = splitted[ 0 ];
+		if ( ! query ) {
+			return base;
+		}
+
+		// 'b=1&c=2&a=5'
+		return base + '?' + query
+			// [ 'b=1', 'c=2', 'a=5' ]
+			.split( '&' )
+			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
+			.map( ( entry ) => entry.split( '=' ) )
+			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
+			.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] ) )
+			// [ 'a=5', 'b=1', 'c=2' ]
+			.map( ( pair ) => pair.join( '=' ) )
+			// 'a=5&b=1&c=2'
+			.join( '&' );
+	};
 	wp.apiRequest.buildAjaxOptions = function( options ) {
 		if ( 'string' === typeof options.path ) {
 			options.path = options.path.replace( '?', '&' );
@@ -95,6 +116,20 @@ function gutenberg_shim_fix_api_request_plain_permalinks( $scripts ) {
 
 		return buildAjaxOptions.call( wp.apiRequest, options );
 	};
+
+	var previousApiRequest = wp.apiRequest;
+	wp.apiRequest = function( request ) {
+		var method = request.method || 'GET';
+		var path = getStablePath( request.path )
+		if ( 'GET' === method && window._wpAPIDataPreload[ path ] ) {
+			return Promise.resolve( window._wpAPIDataPreload[ path ].body );
+		}
+
+		return previousApiRequest(request);
+	}
+	wp.apiRequest.transport = previousApiRequest.transport;
+	wp.apiRequest.buildAjaxOptions = previousApiRequest.buildAjaxOptions;
+
 } )( window.wp, window.wpApiSettings );
 JS;
 
