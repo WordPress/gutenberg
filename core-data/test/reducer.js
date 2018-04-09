@@ -6,7 +6,49 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { terms, media, postTypes } from '../reducer';
+import { requests, terms, media, postTypes } from '../reducer';
+
+describe( 'requests', () => {
+	it( 'returns an empty object by default', () => {
+		const state = requests( undefined, {} );
+
+		expect( state ).toEqual( {} );
+	} );
+
+	it( 'returns an object with isRequesting to true', () => {
+		const originalState = deepFreeze( {} );
+		const state = requests( originalState, {
+			type: 'SET_REQUESTING',
+			dataType: 'terms',
+			id: 'categories',
+		} );
+
+		expect( state ).toEqual( {
+			terms: { categories: { isRequesting: true } },
+		} );
+	} );
+
+	it( 'returns an object with isRequested to true', () => {
+		const originalState = deepFreeze( {
+			terms: {
+				tag: { isRequesting: true },
+				categories: { isRequesting: true },
+			},
+		} );
+		const state = requests( originalState, {
+			type: 'SET_REQUESTED',
+			dataType: 'terms',
+			id: 'categories',
+		} );
+
+		expect( state ).toEqual( {
+			terms: {
+				tag: { isRequesting: true },
+				categories: { isRequesting: false, isRequested: true },
+			},
+		} );
+	} );
+} );
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -26,45 +68,6 @@ describe( 'terms()', () => {
 		expect( state ).toEqual( {
 			categories: [ { id: 1 } ],
 		} );
-	} );
-
-	it( 'assigns requested taxonomy to null', () => {
-		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'terms',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {
-			categories: null,
-		} );
-	} );
-
-	it( 'does not assign requested taxonomy to null if received', () => {
-		const originalState = deepFreeze( {
-			categories: [ { id: 1 } ],
-		} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'terms',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {
-			categories: [ { id: 1 } ],
-		} );
-	} );
-
-	it( 'does not assign requested taxonomy if not terms data type', () => {
-		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'foo',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {} );
 	} );
 } );
 

@@ -6,7 +6,90 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getTerms, isRequestingTerms, getMedia, getPostType } from '../selectors';
+import {
+	isRequested,
+	isRequesting,
+	getTerms,
+	isRequestingTerms,
+	getMedia,
+	getPostType,
+} from '../selectors';
+
+describe( 'isRequesting', () => {
+	it( 'returns false if never requested', () => {
+		const state = deepFreeze( {
+			requests: { terms: {} },
+		} );
+
+		const result = isRequesting( state, 'terms', 'categories' );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'returns false if requested', () => {
+		const state = deepFreeze( {
+			requests: { terms: {
+				categories: {
+					isRequested: true,
+					isRequesting: false,
+				},
+			} },
+		} );
+
+		const result = isRequesting( state, 'terms', 'categories' );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'returns true if requesting', () => {
+		const state = deepFreeze( {
+			requests: { terms: {
+				categories: {
+					isRequesting: true,
+				},
+			} },
+		} );
+
+		const result = isRequesting( state, 'terms', 'categories' );
+		expect( result ).toBe( true );
+	} );
+} );
+
+describe( 'isRequested', () => {
+	it( 'returns false if never requested', () => {
+		const state = deepFreeze( {
+			requests: { terms: {} },
+		} );
+
+		const result = isRequested( state, 'terms', 'categories' );
+		expect( result ).toBe( false );
+	} );
+
+	it( 'returns true if requested', () => {
+		const state = deepFreeze( {
+			requests: { terms: {
+				categories: {
+					isRequested: true,
+					isRequesting: false,
+				},
+			} },
+		} );
+
+		const result = isRequested( state, 'terms', 'categories' );
+		expect( result ).toBe( true );
+	} );
+
+	it( 'returns false if requesting', () => {
+		const state = deepFreeze( {
+			requests: { terms: {
+				categories: {
+					isRequesting: true,
+				},
+			} },
+		} );
+
+		const result = isRequested( state, 'terms', 'categories' );
+		expect( result ).toBe( false );
+	} );
+} );
 
 describe( 'getTerms()', () => {
 	it( 'returns value of terms by taxonomy', () => {
@@ -25,31 +108,13 @@ describe( 'getTerms()', () => {
 } );
 
 describe( 'isRequestingTerms()', () => {
-	it( 'returns false if never requested', () => {
-		const state = deepFreeze( {
-			terms: {},
-		} );
-
-		const result = isRequestingTerms( state, 'categories' );
-		expect( result ).toBe( false );
-	} );
-
-	it( 'returns false if terms received', () => {
-		const state = deepFreeze( {
-			terms: {
-				categories: [ { id: 1 } ],
-			},
-		} );
-
-		const result = isRequestingTerms( state, 'categories' );
-		expect( result ).toBe( false );
-	} );
-
 	it( 'returns true if requesting', () => {
 		const state = deepFreeze( {
-			terms: {
-				categories: null,
-			},
+			requests: { terms: {
+				categories: {
+					isRequesting: true,
+				},
+			} },
 		} );
 
 		const result = isRequestingTerms( state, 'categories' );
