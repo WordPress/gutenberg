@@ -35,12 +35,13 @@ class PostPermalinkEditor extends Component {
 	 */
 	getPermalinkParts() {
 		const [ template, postName ] = this.props.samplePermalinkData;
+		const { editedPostName } = this.state;
 		const [ samplePermalinkPrefix, samplePermalinkSuffix ] = template.split( /%(?:postname|pagename)%/ );
 
 		return {
 			samplePermalinkPrefix,
 			samplePermalinkSuffix,
-			postName,
+			editedPostName: editedPostName || postName,
 		};
 	}
 
@@ -70,7 +71,7 @@ class PostPermalinkEditor extends Component {
 		const {
 			samplePermalinkPrefix,
 			samplePermalinkSuffix,
-			postName,
+			editedPostName,
 		} = this.getPermalinkParts();
 
 		/* eslint-disable jsx-a11y/no-autofocus */
@@ -85,7 +86,7 @@ class PostPermalinkEditor extends Component {
 				<input
 					className="editor-post-permalink-editor__edit"
 					aria-label={ __( 'Edit post permalink' ) }
-					defaultValue={ postName }
+					value={ editedPostName }
 					onChange={ ( event ) => this.setState( { editedPostName: event.target.value } ) }
 					required
 					autoFocus
