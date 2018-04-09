@@ -48,19 +48,19 @@ describe( 'ColorPalette', () => {
 
 	test( 'should call onClick with undefined, when the clearButton onClick is triggered', () => {
 		const clearButton = wrapper.find( '.button-link.blocks-color-palette__clear' );
-		
+
 		expect( clearButton ).toHaveLength( 1 );
-		
+
 		clearButton.simulate( 'click' );
-		
+
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).toHaveBeenCalledWith( undefined );
 	} );
-	
+
 	test( 'should allow disabling custom color picker', () => {
 		expect( shallow( <ColorPalette colors={ colors } disableCustomColors={ true } value={ currentColor } onChange={ onChange } /> ) ).toMatchSnapshot();
 	} );
-	
+
 	describe( 'Dropdown', () => {
 		const dropdown = wrapper.find( 'Dropdown' );
 
@@ -113,5 +113,4 @@ describe( 'ColorPalette', () => {
 			} );
 		} );
 	} );
-
 } );
