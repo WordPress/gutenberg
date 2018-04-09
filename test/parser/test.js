@@ -11,7 +11,7 @@ import { exec } from 'child_process';
 import rimraf from 'rimraf';
 import { uniq } from 'lodash';
 
-const parserBinary = process.env.BINARY;
+const parserExecutable = process.env.PARSER;
 const fixturesDir = path.join( __dirname, 'fixtures' );
 const tempDir = path.join( __dirname, 'temp' );
 
@@ -39,7 +39,7 @@ describe( 'parser', () => {
 			const inputFile = path.resolve( fixturesDir, f + '.html' );
 			const temporaryFileOutput = path.resolve( tempDir, f + '.json' );
 
-			exec( `${ parserBinary } ${ inputFile } ${ temporaryFileOutput }`, ( err ) => {
+			exec( `${ parserExecutable } ${ inputFile } ${ temporaryFileOutput }`, ( err ) => {
 				if ( err ) {
 					throw new Error(
 						'Parsing error for fixture file: ' + f
