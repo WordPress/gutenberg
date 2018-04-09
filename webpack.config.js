@@ -4,7 +4,6 @@
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const fs = require( 'fs' );
-const { camelCase, castArray } = require( 'lodash' );
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
 
@@ -86,11 +85,10 @@ const entryPointNames = [
 	'viewport',
 	'core-data',
 	'plugins',
-	[ 'editPost', 'edit-post' ],
-	...fs.readdirSync( './blocks/library' ).map( ( block ) => [
-		'__block_' + camelCase( block ),
-		'blocks/library/' + block,
-	] ),
+	'edit-post',
+	...fs.readdirSync( './blocks/library' ).map( ( block ) => 
+        'blocks/library/' + block
+    ),
 ];
 
 const packageNames = [
@@ -123,10 +121,9 @@ const config = {
 	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 
 	entry: Object.assign(
-		entryPointNames.reduce( ( memo, entryPoint ) => {
-			entryPoint = castArray( entryPoint );
-			const [ name, path = name ] = entryPoint;
-			memo[ name ] = `./${ path }/index.js`;
+		entryPointNames.reduce( ( memo, path ) => {
+			const name = camelCaseDash( path );
+			memo[ name ] = `./${ path }`;
 			return memo;
 		}, {} ),
 		packageNames.reduce( ( memo, packageName ) => {
