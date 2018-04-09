@@ -35,7 +35,7 @@
 	white-space: nowrap;
 
 	&:after {
-		@include long-content-fade( $size: 20% );
+		@include long-content-fade( $size: 20%, $edge: 1px );
 	}
 }
 
