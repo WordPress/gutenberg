@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import {

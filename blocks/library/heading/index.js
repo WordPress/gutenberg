@@ -4,7 +4,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	createBlock,
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 
 import { concatChildren } from '@wordpress/element';

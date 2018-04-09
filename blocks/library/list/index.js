@@ -10,7 +10,7 @@ import { Component, createElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 
 /**

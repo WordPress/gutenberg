@@ -10,7 +10,7 @@ import classnames from 'classnames';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	createBlock,
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 import { Toolbar, withState } from '@wordpress/components';
 

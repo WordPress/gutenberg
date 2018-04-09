@@ -24,7 +24,7 @@ const editBlocksCSSPlugin = new ExtractTextPlugin( {
 
 // CSS loader for each individual block's styles
 const individualBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/[name].css'
+	filename: './build/[name].css',
 } );
 
 // CSS loader for common styles specific to blocks in general.
@@ -86,9 +86,9 @@ const entryPointNames = [
 	'core-data',
 	'plugins',
 	'edit-post',
-	...fs.readdirSync( './blocks/library' ).map( ( block ) => 
-        'blocks/library/' + block
-    ),
+	...fs.readdirSync( './blocks/library' ).map( ( block ) =>
+		'blocks/library/' + block
+	),
 ];
 
 const packageNames = [

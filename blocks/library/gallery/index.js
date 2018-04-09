@@ -9,7 +9,7 @@ import { filter, every } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 import { mediaUpload } from '@wordpress/utils';
 

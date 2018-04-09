@@ -8,7 +8,7 @@ import { times } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import {
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 import { PanelBody, RangeControl } from '@wordpress/components';
 

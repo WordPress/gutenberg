@@ -10,7 +10,7 @@ import memoize from 'memize';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 import { PanelBody, RangeControl } from '@wordpress/components';
 

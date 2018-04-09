@@ -6,7 +6,7 @@ import {
 	createBlock,
 	registerBlockType,
 	getBlockAttributes,
-	getBlockType
+	getBlockType,
 } from '@wordpress/blocks';
 
 /**

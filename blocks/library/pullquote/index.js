@@ -8,7 +8,7 @@ import { map } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import {
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 import { withState } from '@wordpress/components';
 

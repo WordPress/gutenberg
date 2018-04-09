@@ -11,7 +11,7 @@ import { stringify } from 'querystring';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	createBlock,
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
@@ -258,7 +258,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 	};
 }
 
-registerBlockType( 'core/embed', 
+registerBlockType( 'core/embed',
 	getEmbedBlockSettings( {
 		title: __( 'Embed' ),
 		icon: 'embed-generic',
@@ -276,7 +276,7 @@ registerBlockType( 'core/embed',
 			],
 		},
 	}
- ) );
+	) );
 
 export const common = [
 	{

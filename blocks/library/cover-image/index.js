@@ -10,7 +10,7 @@ import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar } from '@wo
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 import classnames from 'classnames';
 

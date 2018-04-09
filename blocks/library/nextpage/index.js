@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
-	registerBlockType
+	registerBlockType,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 
