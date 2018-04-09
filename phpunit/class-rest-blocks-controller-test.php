@@ -124,13 +124,16 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertArraySubset(
-			array(
-				'id'      => self::$post_id,
-				'title'   => 'New cool block',
-				'content' => '<!-- wp:core/paragraph --><p>Wow!</p><!-- /wp:core/paragraph -->',
-			), $response->get_data()
-		);
+
+		$data = $response->get_data();
+
+		$this->assertArrayHasKey( 'id', $data );
+		$this->assertArrayHasKey( 'title', $data );
+		$this->assertArrayHasKey( 'content', $data );
+
+		$this->assertEquals( self::$post_id, $data['id'] );
+		$this->assertEquals( 'New cool block', $data['title'] );
+		$this->assertEquals( '<!-- wp:core/paragraph --><p>Wow!</p><!-- /wp:core/paragraph -->', $data['content'] );
 	}
 
 	/**
@@ -150,13 +153,16 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertArraySubset(
-			array(
-				'id'      => self::$post_id,
-				'title'   => 'Updated cool block',
-				'content' => '<!-- wp:core/paragraph --><p>Nice!</p><!-- /wp:core/paragraph -->',
-			), $response->get_data()
-		);
+
+		$data = $response->get_data();
+
+		$this->assertArrayHasKey( 'id', $data );
+		$this->assertArrayHasKey( 'title', $data );
+		$this->assertArrayHasKey( 'content', $data );
+
+		$this->assertEquals( self::$post_id, $data['id'] );
+		$this->assertEquals( 'Updated cool block', $data['title'] );
+		$this->assertEquals( '<!-- wp:core/paragraph --><p>Nice!</p><!-- /wp:core/paragraph -->', $data['content'] );
 	}
 
 	/**
@@ -170,16 +176,21 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertArraySubset(
-			array(
-				'deleted'  => true,
-				'previous' => array(
-					'id'      => self::$post_id,
-					'title'   => 'My cool block',
-					'content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
-				),
-			), $response->get_data()
-		);
+
+		$data = $response->get_data();
+
+		$this->assertArrayHasKey( 'deleted', $data );
+		$this->assertArrayHasKey( 'previous', $data );
+
+		$this->assertTrue( $data['deleted'] );
+
+		$this->assertArrayHasKey( 'id', $data['previous'] );
+		$this->assertArrayHasKey( 'title', $data['previous'] );
+		$this->assertArrayHasKey( 'content', $data['previous'] );
+
+		$this->assertEquals( self::$post_id, $data['previous']['id'] );
+		$this->assertEquals( 'My cool block', $data['previous']['title'] );
+		$this->assertEquals( '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->', $data['previous']['content'] );
 	}
 
 	/**
