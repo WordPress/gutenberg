@@ -22,11 +22,15 @@
 
 // Popout menu
 .editor-block-settings-menu__popover {
-	z-index: z-index( '.editor-block-settings-menu__popover' );
 
 	&:before,
 	&:after {
 		margin-left: 2px;
+	}
+
+	// Lower z-index for bottom block setting menu.
+	&:not(.is-mobile).is-bottom {
+		z-index: z-index('.editor-block-settings-menu__popover');
 	}
 
 	.components-popover__content {

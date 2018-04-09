@@ -54,6 +54,8 @@ class Popover extends Component {
 		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.setOffset = this.setOffset.bind( this );
 		this.throttledSetOffset = this.throttledSetOffset.bind( this );
+		this.setForcedPositions = this.setForcedPositions.bind( this );
+		this.throttledSetPosition = this.throttledSetPosition.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
 
 		this.nodes = {};
@@ -104,6 +106,10 @@ class Popover extends Component {
 		window.cancelAnimationFrame( this.rafHandle );
 		window[ handler ]( 'resize', this.throttledSetOffset );
 		window[ handler ]( 'scroll', this.throttledSetOffset, true );
+
+		window.cancelAnimationFrame( this.positionHandle );
+		window[ handler ]( 'resize', this.throttledSetPosition );
+		window[ handler ]( 'scroll', this.throttledSetPosition, true );
 	}
 
 	focus() {
@@ -129,6 +135,10 @@ class Popover extends Component {
 
 	throttledSetOffset() {
 		this.rafHandle = window.requestAnimationFrame( this.setOffset );
+	}
+
+	throttledSetPosition() {
+		this.positionHandle = window.requestAnimationFrame( this.setForcedPositions );
 	}
 
 	getAnchorRect() {
