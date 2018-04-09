@@ -72,6 +72,7 @@ class PostPermalinkEditor extends Component {
 		} = this.getPermalinkParts();
 
 		/* eslint-disable jsx-a11y/no-autofocus */
+		// Autofocus is allowed here, as this mini-UI is only loaded when the user clicks to open it.
 		return (
 			<form
 				className="editor-post-permalink-editor"
