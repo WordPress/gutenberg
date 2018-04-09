@@ -3,10 +3,13 @@
 
 	.components-articles-list-item {
 		list-style: none;
-		color: $blue-medium-500;
-		padding: 10px 0px;
 		position: relative;
-		background-color: white;
+
+		.components-articles-list-item-title {
+			color: $blue-medium-500;
+			padding: 10px;
+			background: $white;
+		}
 
 		.components-articles-list-item-draggable {
 			position: absolute;
@@ -18,8 +21,21 @@
 
 			&:hover {
 				cursor: grab;
-				border: 1px solid grey;
+				box-shadow: $shadow-popover;
+				border: 1px solid $light-gray-500;
+				height: 100%;
 			}
+		}
+	}
+}
+
+.components-draggable__clone {
+	.components-articles-list-item-draggable {
+		box-shadow: $shadow-popover;
+
+		@include break-small {
+			left: 0;
+			right: 0;
 		}
 	}
 }

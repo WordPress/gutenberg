@@ -50,7 +50,7 @@ class ArticlesList extends Component {
 						isDragging={ dragging }
 						elementId={ elementId }
 					/>
-					<div>{ article.title.rendered }</div>
+					<div className="components-articles-list-item-title">{ article.title.rendered }</div>
 				</li>
 			);
 		} );
