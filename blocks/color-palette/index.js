@@ -8,13 +8,14 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Dropdown, withContext } from '@wordpress/components';
+import { Dropdown } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { withEditorSettings } from '../editor-settings';
 
 export function ColorPalette( { colors, disableCustomColors = false, value, onChange } ) {
 	function applyOrUnset( color ) {
@@ -78,7 +79,7 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 	);
 }
 
-export default withContext( 'editor' )(
+export default withEditorSettings(
 	( settings, props ) => ( {
 		colors: props.colors || settings.colors,
 		disableCustomColors: props.disableCustomColors !== undefined ?

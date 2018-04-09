@@ -23,7 +23,6 @@ import {
 	SelectControl,
 	TextareaControl,
 	Toolbar,
-	withContext,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -39,6 +38,7 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
 import { mediaUpload } from '../../../utils/mediaupload';
+import { withEditorSettings } from '../../editor-settings';
 
 /**
  * Module constants
@@ -301,9 +301,7 @@ class ImageBlock extends Component {
 }
 
 export default compose( [
-	withContext( 'editor' )( ( settings ) => {
-		return { settings };
-	} ),
+	withEditorSettings(),
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { id } = props.attributes;

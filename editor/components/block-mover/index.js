@@ -8,8 +8,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withContext, withInstanceId } from '@wordpress/components';
-import { getBlockType } from '@wordpress/blocks';
+import { IconButton, withInstanceId } from '@wordpress/components';
+import { getBlockType, withEditorSettings } from '@wordpress/blocks';
 import { compose, Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -121,7 +121,7 @@ export default compose(
 			onMoveUp: partial( moveBlocksUp, uids, rootUID ),
 		};
 	} ),
-	withContext( 'editor' )( ( settings ) => {
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {

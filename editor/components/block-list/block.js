@@ -24,8 +24,9 @@ import {
 	getSaveElement,
 	isSharedBlock,
 	isUnmodifiedDefaultBlock,
+	withEditorSettings,
 } from '@wordpress/blocks';
-import { withFilters, withContext } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -691,7 +692,7 @@ BlockListBlock.childContextTypes = {
 export default compose(
 	applyWithSelect,
 	applyWithDispatch,
-	withContext( 'editor' )( ( settings ) => {
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {

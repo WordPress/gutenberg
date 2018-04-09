@@ -3,13 +3,13 @@
  */
 import { bindActionCreators } from 'redux';
 import { Provider as ReduxProvider } from 'react-redux';
-import { flow, pick, noop } from 'lodash';
+import { flow, pick } from 'lodash';
 
 /**
  * WordPress Dependencies
  */
 import { createElement, Component } from '@wordpress/element';
-import { RichTextProvider } from '@wordpress/blocks';
+import { RichTextProvider, EditorSettings } from '@wordpress/blocks';
 import {
 	APIProvider,
 	DropZoneProvider,
@@ -22,38 +22,6 @@ import {
 import { setupEditor, undo, redo, createUndoLevel } from '../../store/actions';
 import store from '../../store';
 
-/**
- * The default editor settings
- * You can override any default settings when calling initializeEditor
- *
- *  alignWide   boolean   Enable/Disable Wide/Full Alignments
- *
- * @var {Object} DEFAULT_SETTINGS
- */
-const DEFAULT_SETTINGS = {
-	alignWide: false,
-	colors: [
-		'#f78da7',
-		'#cf2e2e',
-		'#ff6900',
-		'#fcb900',
-		'#7bdcb5',
-		'#00d084',
-		'#8ed1fc',
-		'#0693e3',
-		'#eee',
-		'#abb8c3',
-		'#313131',
-	],
-
-	// This is current max width of the block inner area
-	// It's used to constraint image resizing and this value could be overriden later by themes
-	maxWidth: 608,
-
-	// Allowed block types for the editor, defaulting to true (all supported).
-	allowedBlockTypes: true,
-};
-
 class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -61,7 +29,7 @@ class EditorProvider extends Component {
 		this.store = store;
 
 		this.settings = {
-			...DEFAULT_SETTINGS,
+			...EditorSettings.defaultSettings,
 			...props.settings,
 		};
 
@@ -69,12 +37,6 @@ class EditorProvider extends Component {
 		if ( ! props.recovery ) {
 			this.store.dispatch( setupEditor( props.post, this.settings ) );
 		}
-	}
-
-	getChildContext() {
-		return {
-			editor: this.settings,
-		};
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -89,6 +51,12 @@ class EditorProvider extends Component {
 	render() {
 		const { children } = this.props;
 		const providers = [
+			// Editor settings provider
+			[
+				EditorSettings.Provider,
+				{ value: this.settings },
+			],
+
 			// Redux provider:
 			//
 			//  - context.store
@@ -151,9 +119,5 @@ class EditorProvider extends Component {
 		return createEditorElement( children );
 	}
 }
-
-EditorProvider.childContextTypes = {
-	editor: noop,
-};
 
 export default EditorProvider;
