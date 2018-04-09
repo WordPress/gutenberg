@@ -77,10 +77,15 @@ class GB_Scripts {
 		}
 		if ( $handle && ! empty( $this->queued_chunk_translations ) ) {
 			foreach ( $this->queued_chunk_translations as $domain => $translations ) {
+				$index_translation = isset( $translations[""] ) ?
+					$translations[""]
+					: '';
+				unset($translations[""]);
 				$translations = call_user_func_array( 'array_merge', $translations );
+				$translations[""] = $index_translation;
 				wp_add_inline_script(
-					$handle,
-					'wp.i18n.setLocaleData( ' . json_encode( $translations ) . ', "' . $domain . '" );'
+					'wp-i18n',
+					'wp.i18n.setLocaleData( ' . json_encode( $translations ) . ' );'
 				);
 			}
 		}
