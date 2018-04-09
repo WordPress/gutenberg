@@ -33,10 +33,10 @@ const Sidebar = ( { children, label } ) => {
 };
 
 const WrappedSidebar = compose(
-	withSelect( ( select ) => ( {
-		activeSidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
+	withSelect( ( select, { name } ) => ( {
+		isActive: select( 'core/edit-post' ).getActiveGeneralSidebarName() === name,
 	} ) ),
-	ifCondition( ( { activeSidebarName, name } ) => activeSidebarName === name ),
+	ifCondition( ( { isActive } ) => isActive ),
 	withFocusReturn,
 )( Sidebar );
 
