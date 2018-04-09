@@ -124,7 +124,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertEquals(
+		$this->assertArraySubset(
 			array(
 				'id'      => self::$post_id,
 				'title'   => 'New cool block',
@@ -150,7 +150,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertEquals(
+		$this->assertArraySubset(
 			array(
 				'id'      => self::$post_id,
 				'title'   => 'Updated cool block',
@@ -170,7 +170,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = $this->server->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
-		$this->assertEquals(
+		$this->assertArraySubset(
 			array(
 				'deleted'  => true,
 				'previous' => array(
