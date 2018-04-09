@@ -121,6 +121,9 @@ function gutenberg_shim_api_request_emulate_http( $scripts ) {
 				}
 				options.headers['X-HTTP-Method-Override'] = options.method;
 				options.method = 'POST';
+
+				options.contentType = 'application/json';
+				options.data = JSON.stringify( options.data );
 			}
 		}
 

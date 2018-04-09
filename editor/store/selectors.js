@@ -8,6 +8,7 @@ import {
 	has,
 	last,
 	reduce,
+	size,
 	compact,
 	find,
 	unionWith,
@@ -471,6 +472,31 @@ export const getBlocks = createSelector(
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
+		state.editor.present.blocksByUid,
+	]
+);
+
+/**
+ * Returns the total number of blocks, or the total number of blocks with a specific name in a post.
+ * The number returned includes nested blocks.
+ *
+ * @param {Object}  state     Global application state.
+ * @param {?String} blockName Optional block name, if specified only blocks of that type will be counted.
+ *
+ * @return {number} Number of blocks in the post, or number of blocks with name equal to blockName.
+ */
+export const getGlobalBlockCount = createSelector(
+	( state, blockName ) => {
+		if ( ! blockName ) {
+			return size( state.editor.present.blocksByUid );
+		}
+		return reduce(
+			state.editor.present.blocksByUid,
+			( count, block ) => block.name === blockName ? count + 1 : count,
+			0
+		);
+	},
+	( state ) => [
 		state.editor.present.blocksByUid,
 	]
 );

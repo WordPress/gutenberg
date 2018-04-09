@@ -47,6 +47,7 @@ const {
 	getSelectedBlock,
 	getBlockRootUID,
 	getEditedPostAttribute,
+	getGlobalBlockCount,
 	getMultiSelectedBlockUids,
 	getMultiSelectedBlocks,
 	getMultiSelectedBlocksStartUid,
@@ -1486,6 +1487,52 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getGlobalBlockCount', () => {
+		it( 'should return the global number of top-level blocks in the post', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+							23: { uid: 23, name: 'core/heading', attributes: {} },
+							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						},
+					},
+				},
+			};
+
+			expect( getGlobalBlockCount( state ) ).toBe( 2 );
+		} );
+
+		it( 'should return the global umber of blocks of a given type', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+							123: { uid: 123, name: 'core/columns', attributes: {} },
+							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+							789: { uid: 789, name: 'core/paragraph', attributes: {} },
+							124: { uid: 123, name: 'core/heading', attributes: {} },
+						},
+					},
+				},
+			};
+
+			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 1 );
+		} );
+
+		it( 'should return 0 if no blocks exist', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+						},
+					},
+				},
+			};
+			expect( getGlobalBlockCount( state ) ).toBe( 0 );
+			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 0 );
+		} );
+	} );
 	describe( 'getSelectedBlock', () => {
 		it( 'should return null if no block is selected', () => {
 			const state = {
