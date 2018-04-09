@@ -23,9 +23,14 @@ const editBlocksCSSPlugin = new ExtractTextPlugin( {
 	filename: './build/[name]_editor.css',
 } );
 
-// CSS loader for styles specific to blocks in general.
-const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/[name].css',
+// CSS loader for each individual block's styles
+const individualBlocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './build/[name].css'
+} );
+
+// CSS loader for common styles specific to blocks in general.
+const commonBlocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './blocks/build/style.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -158,7 +163,17 @@ const config = {
 				include: [
 					/blocks/,
 				],
-				use: blocksCSSPlugin.extract( extractConfig ),
+				exclude: [
+					/blocks\/library/,
+				],
+				use: commonBlocksCSSPlugin.extract( extractConfig ),
+			},
+			{
+				test: /style\.s?css$/,
+				include: [
+					/blocks\/library/,
+				],
+				use: individualBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /editor\.s?css$/,
@@ -177,7 +192,8 @@ const config = {
 		],
 	},
 	plugins: [
-		blocksCSSPlugin,
+		commonBlocksCSSPlugin,
+		individualBlocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix
