@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { Component, compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
@@ -15,7 +10,6 @@ import { Button } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute } from '../../store/selectors';
 
 class PostPermalinkEditor extends Component {
 	constructor() {
@@ -107,9 +101,10 @@ class PostPermalinkEditor extends Component {
 }
 
 export default compose( [
-	connect( ( state ) => {
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
 		return {
-			samplePermalinkData: getEditedPostAttribute( state, 'sample_permalink' ),
+			samplePermalinkData: getEditedPostAttribute( 'sample_permalink' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
