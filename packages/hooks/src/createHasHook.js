@@ -17,9 +17,7 @@ function createHasHook( hooks ) {
 	 *                            the given hook.
 	 */
 	return function hasHook( hookName ) {
-		return hooks[ hookName ]
-			? true
-			: false;
+		return hooks[ hookName ] ? true : false;
 	};
 }
 
