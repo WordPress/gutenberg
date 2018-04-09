@@ -444,14 +444,10 @@ add_action( 'rest_api_init', 'gutenberg_add_taxonomy_visibility_field' );
  * @param WP_REST_Response $response WP REST API response of a post.
  * @param WP_Post          $post The post being returned.
  * @param WP_REST_Request  $request WP REST API request.
- * @return WP_REST_Response Response containing the sample_permalink, where appropriate.
+ * @return WP_REST_Response Response containing the sample_permalink.
  */
-function gutenberg_add_sample_permalink_to_draft_posts( $response, $post, $request ) {
+function gutenberg_add_sample_permalink_to_posts( $response, $post, $request ) {
 	if ( 'edit' !== $request['context'] ) {
-		return $response;
-	}
-
-	if ( ! get_post_type_object( $post->post_type )->public ) {
 		return $response;
 	}
 
@@ -469,7 +465,7 @@ function gutenberg_add_sample_permalink_to_draft_posts( $response, $post, $reque
  * @return string That same post type.
  */
 function gutenberg_register_sample_permalink_function( $post_type ) {
-	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_sample_permalink_to_draft_posts', 10, 3 );
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_sample_permalink_to_posts', 10, 3 );
 	return $post_type;
 }
 add_filter( 'registered_post_type', 'gutenberg_register_sample_permalink_function' );
