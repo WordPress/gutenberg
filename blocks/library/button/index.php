@@ -6,22 +6,22 @@
  */
 
 function register_core_button_block() {
-	wp_register_script( 'core-button-block', gutenberg_url( '/build/__block_button.js' ) );
+	wp_register_script( 'core-button-block', gutenberg_url( '/build/blocks/library/button.js' ) );
 
 	wp_register_style(
 		'core-button-block',
-		gutenberg_url( '/build/__block_button.css' ),
+		gutenberg_url( '/build/blocks/library/button.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/__block_button.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks/library/button.css' )
 	);
 	
 	wp_style_add_data( 'core-button-block', 'rtl', 'replace' );
 
 	wp_register_style(
 		'core-button-block-editor',
-		gutenberg_url( '/build/__block_button_editor.css' ),
+		gutenberg_url( '/build/blocks/library/button_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/__block_button_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks/library/button_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-button-block-editor', 'rtl', 'replace' );

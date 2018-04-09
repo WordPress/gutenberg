@@ -6,22 +6,22 @@
  */
 
 function register_core_pullquote_block() {
-	wp_register_script( 'core-pullquote-block', gutenberg_url( '/build/__block_pullquote.js' ) );
+	wp_register_script( 'core-pullquote-block', gutenberg_url( '/build/blocks/library/pullquote.js' ) );
 
 	wp_register_style(
 		'core-pullquote-block',
-		gutenberg_url( '/build/__block_pullquote.css' ),
+		gutenberg_url( '/build/blocks/library/pullquote.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/__block_pullquote.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks/library/pullquote.css' )
 	);
 
 	wp_style_add_data( 'core-pullquote-block', 'rtl', 'replace' );
 
 	wp_register_style(
 		'core-pullquote-block-editor',
-		gutenberg_url( '/build/__block_pullquote_editor.css' ),
+		gutenberg_url( '/build/blocks/library/pullquote_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/__block_pullquote_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks/library/pullquote_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-pullquote-block-editor', 'rtl', 'replace' );

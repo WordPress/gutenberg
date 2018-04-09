@@ -6,22 +6,22 @@
  */
 
 function register_core_text_columns_block() {
-	wp_register_script( 'core-text-columns-block', gutenberg_url( '/build/__block_textColumns.js' ) );
+	wp_register_script( 'core-text-columns-block', gutenberg_url( '/build/blocks/library/textColumns.js' ) );
 
 	wp_register_style(
 		'core-text-columns-block',
-		gutenberg_url( '/build/__block_textColumns.css' ),
+		gutenberg_url( '/build/blocks/library/textColumns.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/__block_textColumns.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks/library/textColumns.css' )
 	);
 
 	wp_style_add_data( 'core-text-columns-block', 'rtl', 'replace' );
 
 	wp_register_style(
 		'core-text-columns-block-editor',
-		gutenberg_url( '/build/__block_textColumns_editor.css' ),
+		gutenberg_url( '/build/blocks/library/textColumns_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/__block_textColumns_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks/library/textColumns_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-text-columns-block-editor', 'rtl', 'replace' );

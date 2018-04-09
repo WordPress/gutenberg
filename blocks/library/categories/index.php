@@ -85,22 +85,22 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 }
 
 function register_core_categories_block() {
-	wp_register_script( 'core-categories-block', gutenberg_url( '/build/__block_categories.js' ) );
+	wp_register_script( 'core-categories-block', gutenberg_url( '/build/blocks/library/categories.js' ) );
 
 	wp_register_style(
 		'core-categories-block',
-		gutenberg_url( '/build/__block_categories.css' ),
+		gutenberg_url( '/build/blocks/library/categories.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/__block_categories.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks/library/categories.css' )
 	);
 	
 	wp_style_add_data( 'core-categories-block', 'rtl', 'replace' );
 
 	wp_register_style(
 		'core-categories-block-editor',
-		gutenberg_url( '/build/__block_categories_editor.css' ),
+		gutenberg_url( '/build/blocks/library/categories_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/__block_categories_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks/library/categories_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-categories-block-editor', 'rtl', 'replace' );

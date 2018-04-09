@@ -6,22 +6,22 @@
  */
 
 function register_core_audio_block() {
-	wp_register_script( 'core-audio-block', gutenberg_url( '/build/__block_audio.js' ) );
+	wp_register_script( 'core-audio-block', gutenberg_url( '/build/blocks/library/audio.js' ) );
 
 	wp_register_style(
 		'core-audio-block',
-		gutenberg_url( '/build/__block_audio.css' ),
+		gutenberg_url( '/build/blocks/library/audio.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/__block_audio.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks/library/audio.css' )
 	);
 	
 	wp_style_add_data( 'core-audio-block', 'rtl', 'replace' );
 
 	wp_register_style(
 		'core-audio-block-editor',
-		gutenberg_url( '/build/__block_audio_editor.css' ),
+		gutenberg_url( '/build/blocks/library/audio_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/__block_audio_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks/library/audio_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-audio-block-editor', 'rtl', 'replace' );
