@@ -11,7 +11,6 @@ import './hooks';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
-import PluginMoreMenuItem from './components/plugin-more-menu-item';
 
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
@@ -78,8 +77,6 @@ export function initializeEditor( id, post, settings ) {
 	};
 }
 
-export const __experimental = {
-	PluginMoreMenuItem,
-};
-
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
+export { default as PluginsMoreMenuGroup } from './components/header/plugins-more-menu-group';
+export { default as SidebarMoreMenuItem } from './components/header/sidebar-more-menu-item';
