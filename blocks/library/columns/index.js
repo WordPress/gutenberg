@@ -9,6 +9,9 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	registerBlockType
+} from '@wordpress/blocks';
 import { PanelBody, RangeControl } from '@wordpress/components';
 
 /**
@@ -36,9 +39,7 @@ const getColumnLayouts = memoize( ( columns ) => {
 	} ) );
 } );
 
-export const name = 'core/columns';
-
-export const settings = {
+registerBlockType( 'core/columns', {
 	title: sprintf(
 		/* translators: Block title modifier */
 		__( '%1$s (%2$s)' ),
@@ -114,4 +115,4 @@ export const settings = {
 			</div>
 		);
 	},
-};
+} );

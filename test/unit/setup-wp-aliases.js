@@ -15,7 +15,7 @@ global.wp = {
 	'date',
 	'editor',
 	'data',
-	'editPost',
+	'edit-post',
 	'core-data',
 	'viewport',
 	'plugins',

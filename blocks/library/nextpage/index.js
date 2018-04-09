@@ -2,17 +2,18 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType
+} from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import { createBlock } from '../../api';
 
-export const name = 'core/nextpage';
-
-export const settings = {
+registerBlockType( 'core/nextpage', {
 	title: __( 'Page break' ),
 
 	description: __( 'This block allows you to set break points on your post. Visitors of your blog are then presented with content split into multiple pages.' ),
@@ -58,4 +59,4 @@ export const settings = {
 			</RawHTML>
 		);
 	},
-};
+} );
