@@ -194,6 +194,8 @@ class FormatToolbar extends Component {
 									onKeyDown={ this.onKeyDown }
 									onSubmit={ this.submitLink }>
 									<div className="blocks-format-toolbar__link-modal-line">
+										<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
+										<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 										<IconButton
 											className="blocks-format-toolbar__link-settings-toggle"
 											icon="ellipsis"
@@ -201,8 +203,6 @@ class FormatToolbar extends Component {
 											onClick={ this.toggleLinkSettingsVisibility }
 											aria-expanded={ settingsVisible }
 										/>
-										<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
-										<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 									</div>
 									{ linkSettings }
 								</form>
@@ -217,13 +217,6 @@ class FormatToolbar extends Component {
 									onKeyPress={ stopKeyPropagation }
 								>
 									<div className="blocks-format-toolbar__link-modal-line">
-										<IconButton
-											className="blocks-format-toolbar__link-settings-toggle"
-											icon="ellipsis"
-											label={ __( 'Link Settings' ) }
-											onClick={ this.toggleLinkSettingsVisibility }
-											aria-expanded={ settingsVisible }
-										/>
 										<a
 											className="blocks-format-toolbar__link-value"
 											href={ formats.link.value }
@@ -232,6 +225,13 @@ class FormatToolbar extends Component {
 											{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
 										</a>
 										<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
+										<IconButton
+											className="blocks-format-toolbar__link-settings-toggle"
+											icon="ellipsis"
+											label={ __( 'Link Settings' ) }
+											onClick={ this.toggleLinkSettingsVisibility }
+											aria-expanded={ settingsVisible }
+										/>
 									</div>
 									{ linkSettings }
 								</div>
