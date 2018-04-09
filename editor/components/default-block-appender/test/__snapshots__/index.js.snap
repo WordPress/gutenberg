@@ -5,7 +5,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WrappedComponent) />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -47,7 +47,7 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WrappedComponent) />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -71,7 +71,7 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WrappedComponent) />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
