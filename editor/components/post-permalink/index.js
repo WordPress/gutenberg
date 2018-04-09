@@ -31,10 +31,7 @@ class PostPermalink extends Component {
 	componentDidUpdate( prevProps, prevState ) {
 		// If we've just stopped editing the permalink, focus on the new permalink.
 		if ( prevState.editingPermalink && ! this.state.editingPermalink ) {
-			const permalinkButton = document.querySelector( '.editor-post-permalink__link' );
-			if ( permalinkButton ) {
-				permalinkButton.focus();
-			}
+			this.permalinkButton.focus();
 		}
 	}
 
@@ -61,7 +58,12 @@ class PostPermalink extends Component {
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
 				{ ! editingPermalink &&
-					<Button className="editor-post-permalink__link" href={ previewLink } target="_blank">
+					<Button
+						className="editor-post-permalink__link"
+						href={ previewLink }
+						target="_blank"
+						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
+					>
 						{ decodeURI( samplePermalink ) }
 					</Button>
 				}
