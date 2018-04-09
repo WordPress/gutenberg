@@ -214,7 +214,7 @@ const config = {
 };
 
 if ( config.mode !== 'production' ) {
-	config.devtool = 'source-map';
+	config.devtool = process.env.SOURCEMAP || 'source-map';
 }
 
 module.exports = config;
