@@ -76,7 +76,8 @@ class PostPermalink extends Component {
 
 				{ isEditable && ! editingPermalink &&
 					<Button
-						className="editor-post-permalink__edit button"
+						className="editor-post-permalink__edit"
+						isLarge
 						onClick={ () => this.setState( { editingPermalink: true } ) }
 					>
 						{ __( 'Edit' ) }
@@ -85,7 +86,8 @@ class PostPermalink extends Component {
 
 				{ ! isEditable &&
 					<Button
-						className="editor-post-permalink__change button"
+						className="editor-post-permalink__change"
+						isLarge
 						href={ getWPAdminURL( 'options-permalink.php' ) }
 						target="_blank"
 					>

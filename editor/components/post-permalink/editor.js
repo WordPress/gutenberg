@@ -89,7 +89,8 @@ class PostPermalinkEditor extends Component {
 					{ samplePermalinkSuffix }
 				</span>
 				<Button
-					className="editor-post-permalink-editor__save button"
+					className="editor-post-permalink-editor__save"
+					isLarge
 					onClick={ this.onSavePermalink }
 				>
 					{ __( 'OK' ) }
