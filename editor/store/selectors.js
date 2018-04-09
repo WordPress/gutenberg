@@ -1209,17 +1209,17 @@ export function getNotices( state ) {
  * Given a regular block type, constructs an item that appears in the inserter.
  *
  * @param {Object}           state             Global application state.
- * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {string[]|boolean} allowedBlockTypes Allowed block types, or true/false to enable/disable all types.
  * @param {Object}           blockType         Block type, likely from getBlockType().
  *
  * @return {Editor.InserterItem} Item that appears in inserter.
  */
-function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
-	if ( ! enabledBlockTypes || ! blockType ) {
+function buildInserterItemFromBlockType( state, allowedBlockTypes, blockType ) {
+	if ( ! allowedBlockTypes || ! blockType ) {
 		return null;
 	}
 
-	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! includes( enabledBlockTypes, blockType.name );
+	const blockTypeIsDisabled = Array.isArray( allowedBlockTypes ) && ! includes( allowedBlockTypes, blockType.name );
 	if ( blockTypeIsDisabled ) {
 		return null;
 	}
@@ -1244,17 +1244,17 @@ function buildInserterItemFromBlockType( state, enabledBlockTypes, blockType ) {
  * Given a shared block, constructs an item that appears in the inserter.
  *
  * @param {Object}           state             Global application state.
- * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {string[]|boolean} allowedBlockTypes Allowed block types, or true/false to enable/disable all types.
  * @param {Object}           sharedBlock       Shared block, likely from getSharedBlock().
  *
  * @return {Editor.InserterItem} Item that appears in inserter.
  */
-function buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock ) {
-	if ( ! enabledBlockTypes || ! sharedBlock ) {
+function buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock ) {
+	if ( ! allowedBlockTypes || ! sharedBlock ) {
 		return null;
 	}
 
-	const blockTypeIsDisabled = Array.isArray( enabledBlockTypes ) && ! includes( enabledBlockTypes, 'core/block' );
+	const blockTypeIsDisabled = Array.isArray( allowedBlockTypes ) && ! includes( allowedBlockTypes, 'core/block' );
 	if ( blockTypeIsDisabled ) {
 		return null;
 	}
@@ -1286,30 +1286,30 @@ function buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock
  * items (e.g. a regular block type) and dynamic items (e.g. a shared block).
  *
  * @param {Object}           state             Global application state.
- * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {string[]|boolean} allowedBlockTypes Allowed block types, or true/false to enable/disable all types.
  *
  * @return {Editor.InserterItem[]} Items that appear in inserter.
  */
-export function getInserterItems( state, enabledBlockTypes ) {
-	if ( enabledBlockTypes === undefined ) {
-		enabledBlockTypes = true;
-		deprecated( 'getInserterItems with no enabledBlockTypes argument', {
+export function getInserterItems( state, allowedBlockTypes ) {
+	if ( allowedBlockTypes === undefined ) {
+		allowedBlockTypes = true;
+		deprecated( 'getInserterItems with no allowedBlockTypes argument', {
 			version: '2.8',
-			alternative: 'getInserterItems with an explcit enabledBlockTypes argument',
+			alternative: 'getInserterItems with an explcit allowedBlockTypes argument',
 			plugin: 'Gutenberg',
 		} );
 	}
 
-	if ( ! enabledBlockTypes ) {
+	if ( ! allowedBlockTypes ) {
 		return [];
 	}
 
 	const staticItems = getBlockTypes().map( blockType =>
-		buildInserterItemFromBlockType( state, enabledBlockTypes, blockType )
+		buildInserterItemFromBlockType( state, allowedBlockTypes, blockType )
 	);
 
 	const dynamicItems = getSharedBlocks( state ).map( sharedBlock =>
-		buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock )
+		buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock )
 	);
 
 	const items = [ ...staticItems, ...dynamicItems ];
@@ -1329,19 +1329,19 @@ function fillWithCommonBlocks( inserts ) {
 	return unionWith( items, commonInserts, areInsertsEqual );
 }
 
-function getItemsFromInserts( state, inserts, enabledBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
-	if ( ! enabledBlockTypes ) {
+function getItemsFromInserts( state, inserts, allowedBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
+	if ( ! allowedBlockTypes ) {
 		return [];
 	}
 
 	const items = fillWithCommonBlocks( inserts ).map( insert => {
 		if ( insert.ref ) {
 			const sharedBlock = getSharedBlock( state, insert.ref );
-			return buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock );
+			return buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock );
 		}
 
 		const blockType = getBlockType( insert.name );
-		return buildInserterItemFromBlockType( state, enabledBlockTypes, blockType );
+		return buildInserterItemFromBlockType( state, allowedBlockTypes, blockType );
 	} );
 
 	return compact( items ).slice( 0, maximum );
@@ -1355,17 +1355,17 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes, maximum = MAX_R
  * https://en.wikipedia.org/wiki/Frecency
  *
  * @param {Object}           state             Global application state.
- * @param {string[]|boolean} enabledBlockTypes Enabled block types, or true/false to enable/disable all types.
+ * @param {string[]|boolean} allowedBlockTypes Allowed block types, or true/false to enable/disable all types.
  * @param {number}           maximum           Number of items to return.
  *
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
-export function getFrecentInserterItems( state, enabledBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
-	if ( enabledBlockTypes === undefined ) {
-		enabledBlockTypes = true;
-		deprecated( 'getFrecentInserterItems with no enabledBlockTypes argument', {
+export function getFrecentInserterItems( state, allowedBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
+	if ( allowedBlockTypes === undefined ) {
+		allowedBlockTypes = true;
+		deprecated( 'getFrecentInserterItems with no allowedBlockTypes argument', {
 			version: '2.8',
-			alternative: 'getFrecentInserterItems with an explcit enabledBlockTypes argument',
+			alternative: 'getFrecentInserterItems with an explcit allowedBlockTypes argument',
 			plugin: 'Gutenberg',
 		} );
 	}
@@ -1391,7 +1391,7 @@ export function getFrecentInserterItems( state, enabledBlockTypes, maximum = MAX
 	const sortedInserts = values( state.preferences.insertUsage )
 		.sort( ( a, b ) => calculateFrecency( b.time, b.count ) - calculateFrecency( a.time, a.count ) )
 		.map( ( { insert } ) => insert );
-	return getItemsFromInserts( state, sortedInserts, enabledBlockTypes, maximum );
+	return getItemsFromInserts( state, sortedInserts, allowedBlockTypes, maximum );
 }
 
 /**

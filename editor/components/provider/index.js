@@ -51,7 +51,7 @@ const DEFAULT_SETTINGS = {
 	maxWidth: 608,
 
 	// Allowed block types for the editor, defaulting to true (all supported).
-	blockTypes: true,
+	allowedBlockTypes: true,
 };
 
 class EditorProvider extends Component {
