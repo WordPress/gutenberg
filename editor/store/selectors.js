@@ -24,6 +24,7 @@ import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
+import { deprecated } from '@wordpress/utils';
 
 /***
  * Module constants
@@ -1289,7 +1290,16 @@ function buildInserterItemFromSharedBlock( state, enabledBlockTypes, sharedBlock
  *
  * @return {Editor.InserterItem[]} Items that appear in inserter.
  */
-export function getInserterItems( state, enabledBlockTypes = true ) {
+export function getInserterItems( state, enabledBlockTypes ) {
+	if ( enabledBlockTypes === undefined ) {
+		enabledBlockTypes = true;
+		deprecated( 'getInserterItems with no enabledBlockTypes argument', {
+			version: '2.8',
+			alternative: 'getInserterItems with an explcit enabledBlockTypes argument',
+			plugin: 'Gutenberg',
+		} );
+	}
+
 	if ( ! enabledBlockTypes ) {
 		return [];
 	}
@@ -1319,7 +1329,7 @@ function fillWithCommonBlocks( inserts ) {
 	return unionWith( items, commonInserts, areInsertsEqual );
 }
 
-function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
+function getItemsFromInserts( state, inserts, enabledBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
 	if ( ! enabledBlockTypes ) {
 		return [];
 	}
@@ -1350,7 +1360,16 @@ function getItemsFromInserts( state, inserts, enabledBlockTypes = true, maximum 
  *
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
-export function getFrecentInserterItems( state, enabledBlockTypes = true, maximum = MAX_RECENT_BLOCKS ) {
+export function getFrecentInserterItems( state, enabledBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
+	if ( enabledBlockTypes === undefined ) {
+		enabledBlockTypes = true;
+		deprecated( 'getFrecentInserterItems with no enabledBlockTypes argument', {
+			version: '2.8',
+			alternative: 'getFrecentInserterItems with an explcit enabledBlockTypes argument',
+			plugin: 'Gutenberg',
+		} );
+	}
+
 	const calculateFrecency = ( time, count ) => {
 		if ( ! time ) {
 			return count;
