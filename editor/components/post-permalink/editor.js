@@ -44,9 +44,11 @@ class PostPermalinkEditor extends Component {
 		};
 	}
 
-	onSavePermalink() {
+	onSavePermalink( event ) {
 		const postName = this.state.editedPostName.replace( /\s+/g, '-' );
 		const [ template, oldPostName ] = this.props.samplePermalinkData;
+
+		event.preventDefault();
 
 		this.props.onSave();
 
