@@ -8,7 +8,12 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
-import { createBlock, isUnmodifiedDefaultBlock, hasBlockSupport } from '@wordpress/blocks';
+import {
+	createBlock,
+	isUnmodifiedDefaultBlock,
+	hasBlockSupport,
+	MediaUpload,
+} from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -28,6 +33,7 @@ class Inserter extends Component {
 		this.hideInsertionPoint = this.hideInsertionPoint.bind( this );
 		this.state = {
 			isInline: false,
+			mediaLibraryOpen: false,
 		};
 	}
 
@@ -93,38 +99,55 @@ class Inserter extends Component {
 		}
 
 		return (
-			<Dropdown
-				className="editor-inserter"
-				position={ position }
-				onToggle={ this.onToggle }
-				expandOnMobile
-				headerTitle={ title }
-				renderToggle={ ( { onToggle, isOpen } ) => (
-					<IconButton
-						icon="insert"
-						label={ __( 'Add block' ) }
-						onClick={ onToggle }
-						className="editor-inserter__toggle"
-						aria-haspopup="true"
-						aria-expanded={ isOpen }
-					>
-						{ children }
-					</IconButton>
-				) }
-				renderContent={ ( { onClose } ) => {
-					const onSelect = ( item ) => {
-						onInsertBlock( item );
+			<div>
+				{ this.state.mediaLibraryOpen &&
+					<MediaUpload
+						type="image"
+						onSelect={ () => ( this.setState( { mediaLibraryOpen: false } ) ) }
+						onClose={ () => ( this.setState( { mediaLibraryOpen: false } ) ) }
+						render={ ( { open } ) => {
+							open();
+							return null;
+						} }
+					/>
+				}
+				<Dropdown
+					className="editor-inserter"
+					position={ position }
+					onToggle={ this.onToggle }
+					expandOnMobile
+					headerTitle={ title }
+					renderToggle={ ( { onToggle, isOpen } ) => (
+						<IconButton
+							icon="insert"
+							label={ __( 'Add block' ) }
+							onClick={ onToggle }
+							className="editor-inserter__toggle"
+							aria-haspopup="true"
+							aria-expanded={ isOpen }
+						>
+							{ children }
+						</IconButton>
+					) }
+					renderContent={ ( { onClose } ) => {
+						const onSelect = ( item ) => {
+							onInsertBlock( item );
 
-						onClose();
-					};
+							onClose();
+						};
 
-					if ( this.state.isInline ) {
-						return <InserterTokenMenu />;
-					}
+						if ( this.state.isInline ) {
+							return (
+								<InserterTokenMenu
+									onImageSelect={ () => this.setState( { mediaLibraryOpen: true } ) }
+								/>
+							);
+						}
 
-					return <InserterMenu onSelect={ onSelect } />;
-				} }
-			/>
+						return <InserterMenu onSelect={ onSelect } />;
+					} }
+				/>
+			</div>
 		);
 	}
 }

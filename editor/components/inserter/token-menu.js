@@ -18,6 +18,7 @@ export default class InserterTokenMenu extends Component {
 				</div>
 				<button
 					className="editor-inserter__block"
+					onClick={ this.props.onImageSelect }
 				>
 					<BlockIcon icon="format-image" />
 					Inline Image
