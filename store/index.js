@@ -66,7 +66,15 @@ const initialState: StateType = {
 			innerBlocks: [],
 			focused: false,
 		},
-		{ ...codeBlockInstance, focused: false},
+		{ ...codeBlockInstance, focused: false },
+		{
+			uid: '5',
+			name: 'core/more',
+			isValid: true,
+			attributes: {},
+			innerBlocks: [],
+			focused: false,
+		},
 		{
 			uid: '4',
 			name: 'paragraph',
