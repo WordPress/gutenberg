@@ -521,7 +521,7 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
  *
  * @since 1.5.0
  *
- * @param string $classes Space seperated string of classes being added to the body tag.
+ * @param string $classes Space separated string of classes being added to the body tag.
  * @return string The $classes string, with gutenberg-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {

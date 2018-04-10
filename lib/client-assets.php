@@ -97,7 +97,7 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'utils/build/index.js' ),
 		true
 	);
-	wp_add_inline_script( 'wp-utils', 'var originalUtils = wp.utils;', 'before' );
+	wp_add_inline_script( 'wp-utils', 'var originalUtils = window.wp && window.wp.utils ? window.wp.utils : {};', 'before' );
 	wp_add_inline_script( 'wp-utils', 'for ( var key in originalUtils ) wp.utils[ key ] = originalUtils[ key ];' );
 	wp_register_script(
 		'wp-hooks',
@@ -936,7 +936,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$editor_settings = array(
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'availableTemplates'  => wp_get_theme()->get_page_templates( get_post( $post_to_edit['id'] ) ),
-		'blockTypes'          => $allowed_block_types,
+		'allowedBlockTypes'   => $allowed_block_types,
 		'disableCustomColors' => get_theme_support( 'disable-custom-colors' ),
 		'disablePostFormats'  => ! current_theme_supports( 'post-formats' ),
 		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),

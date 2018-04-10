@@ -73,7 +73,6 @@ const entryPointNames = [
 	'date',
 	'editor',
 	'element',
-	'i18n',
 	'utils',
 	'data',
 	'viewport',
@@ -84,6 +83,7 @@ const entryPointNames = [
 
 const packageNames = [
 	'hooks',
+	'i18n',
 ];
 
 const coreGlobals = [
@@ -207,7 +207,7 @@ const config = {
 };
 
 if ( config.mode !== 'production' ) {
-	config.devtool = 'source-map';
+	config.devtool = process.env.SOURCEMAP || 'source-map';
 }
 
 module.exports = config;

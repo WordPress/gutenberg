@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { Panel } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal Dependencies
  */
-import './style.scss';
 import PostStatus from '../post-status';
 import PostExcerpt from '../post-excerpt';
 import PostTaxonomies from '../post-taxonomies';
@@ -16,15 +16,21 @@ import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
 import DocumentOutlinePanel from '../document-outline-panel';
 import MetaBoxes from '../../meta-boxes';
-import ArticlesPanel from '../articles-panel';
-import SettingsPanel from '../settings-panel';
+import SettingsHeader from '../settings-header';
+import Sidebar from '../';
 
 import { getPanelItems } from '../panel-items.js';
 
 const items = getPanelItems();
 
-const panel = () => {
-	return (
+const SIDEBAR_NAME = 'edit-post/document';
+
+const DocumentSidebar = () => (
+	<Sidebar
+		name={ SIDEBAR_NAME }
+		label={ __( 'Editor advanced settings' ) }
+	>
+		<SettingsHeader sidebarName={ SIDEBAR_NAME } />
 		<Panel>
 			{ items.includes( 'post-status' ) ? <PostStatus /> : '' }
 			{ items.includes( 'articles-panel' ) ? <ArticlesPanel /> : '' }
@@ -38,7 +44,7 @@ const panel = () => {
 			{ items.includes( 'document-outline-panel' ) ? <DocumentOutlinePanel /> : '' }
 			{ items.includes( 'meta-boxes' ) ? <MetaBoxes location="side" usePanel /> : '' }
 		</Panel>
-	);
-};
+	</Sidebar>
+);
 
-export default panel;
+export default DocumentSidebar;

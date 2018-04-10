@@ -8,7 +8,6 @@ global.wp = {
 
 [
 	'element',
-	'i18n',
 	'components',
 	'utils',
 	'blocks',
