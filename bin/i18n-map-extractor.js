@@ -70,7 +70,7 @@ class wpi18nExtractor {
 		reduce(
 			Array.from( modules ),
 			function( mapped, module ) {
-				if ( ! module instanceof NormalModule ||
+				if ( ! ( module instanceof NormalModule ) ||
 					! isFunction( module.originalSource )
 				) {
 					return mapped;
@@ -87,26 +87,42 @@ class wpi18nExtractor {
 	}
 
 	apply( compiler ) {
+		const { processChunks } = this;
+		const extractor = this;
+
+		/**
+		 * webpack 4 registration
+		 */
+		if ( has( compiler, 'hooks' ) ) {
+			compiler.hooks.thisCompilation.tap( 'webpack-i18n-map-extractor', compilation => {
+				compilation.hooks.optimizeChunks.tap( 'webpack-i18n-map-extractor', chunks => {
+					processChunks( chunks, extractor );
+				} );
+			} );
+		} else {
+			compiler.plugin( 'this-compilation', ( compilation ) => {
+				compilation.plugin( [ 'optimize-chunks', 'optimize-extracted-chunks' ], ( chunks ) => {
+					processChunks( chunks, extractor );
+				} );
+			} );
+		}
+	}
+
+	processChunks( chunks, extractor ) {
 		const {
 			options,
 			translationMap,
 			parseSourcesToMap,
-		} = this;
-		const extractor = this;
-
-		compiler.plugin( 'this-compilation', ( compilation ) => {
-			compilation.plugin( [ 'optimize-chunks', 'optimize-extracted-chunks' ], ( chunks ) => {
-				forEach( chunks, function( chunk ) {
-					if ( chunk.name ) {
-						parseSourcesToMap( chunk._modules, chunk.name, extractor );
-					}
-				} );
-				writeFileSync( './' + options.filename,
-					JSON.stringify( translationMap, null, 2 ),
-					'utf-8'
-				);
-			} );
+		} = extractor;
+		forEach( chunks, function( chunk ) {
+			if ( chunk.name ) {
+				parseSourcesToMap( chunk._modules, chunk.name, extractor );
+			}
 		} );
+		writeFileSync( './' + options.filename,
+			JSON.stringify( translationMap, null, 2 ),
+			'utf-8'
+		);
 	}
 }
 
