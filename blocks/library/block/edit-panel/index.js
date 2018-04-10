@@ -9,7 +9,7 @@ import { keycodes } from '@wordpress/utils';
 /**
  * Internal dependencies
  */
-import './style.scss';
+import './editor.scss';
 
 /**
  * Module constants
