@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -28,7 +33,7 @@ const INNER_BLOCK_LIST_CACHE = {};
  *
  * @return {Component} Pre-bound BlockList component
  */
-export function createInnerBlockList( uid, renderBlockMenu ) {
+export function createInnerBlockList( uid, renderBlockMenu = noop ) {
 	if ( ! INNER_BLOCK_LIST_CACHE[ uid ] ) {
 		INNER_BLOCK_LIST_CACHE[ uid ] = [
 			// The component class:
