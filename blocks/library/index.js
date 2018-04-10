@@ -35,9 +35,7 @@ import * as verse from './verse';
 import * as video from './video';
 
 import * as article from './article';
-import * as row6x6 from './rows/col6-col6';
-import * as row4x4x4 from './rows/col4-col4-col4';
-import * as row5x7 from './rows/col5-col7';
+import * as rows from './rows';
 
 export const registerCoreBlocks = () => {
 	[
@@ -49,6 +47,7 @@ export const registerCoreBlocks = () => {
 		gallery,
 		list,
 		quote,
+		...rows.blocks,
 
 		// Register all remaining core blocks.
 		shortcode,
@@ -75,9 +74,6 @@ export const registerCoreBlocks = () => {
 		verse,
 		video,
 		article,
-		row6x6,
-		row4x4x4,
-		row5x7,
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );
