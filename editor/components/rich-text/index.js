@@ -28,7 +28,7 @@ import {
 	deprecated,
 } from '@wordpress/utils';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
 
 /**
@@ -123,6 +123,7 @@ export class RichText extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
+		this.insertToken = this.insertToken.bind( this );
 
 		this.state = {
 			formats: {},
@@ -465,6 +466,19 @@ export class RichText extends Component {
 		};
 	}
 
+	insertToken() {
+		const { inlineToken, completeInlineInsert } = this.props;
+
+		if ( inlineToken.type === 'image' ) {
+			const { url, alt } = inlineToken;
+			const img = `<img src=${ url } alt=${ alt } />`;
+
+			this.editor.insertContent( img );
+		}
+
+		completeInlineInsert();
+	}
+
 	/**
 	 * Handles a keydown event from tinyMCE.
 	 *
@@ -749,9 +763,16 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		if ( ! this.editor ) {
+			return;
+		}
+
+		if ( this.props.inlineToken ) {
+			this.insertToken();
+		}
+
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
-			!! this.editor &&
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
 			this.props.value !== this.savedContent &&
@@ -975,11 +996,17 @@ const RichTextContainer = compose( [
 	withSelect( ( select ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
 		const { isInlineInsertionPointVisible = noop } = select( 'core/editor' ) || {};
+		const { getInlineToken = noop } = select( 'core/editor' ) || {};
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			isInlineInsertionPointVisible: isInlineInsertionPointVisible(),
+			inlineToken: getInlineToken(),
 		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { completeInlineInsert = noop } = dispatch( 'core/editor' ) || {};
+		return { completeInlineInsert };
 	} ),
 	withSafeTimeout,
 ] )( RichText );

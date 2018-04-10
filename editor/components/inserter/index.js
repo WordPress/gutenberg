@@ -90,6 +90,7 @@ class Inserter extends Component {
 			title,
 			children,
 			onInsertBlock,
+			onInsertInline,
 			hasSupportedBlocks,
 			isLocked,
 		} = this.props;
@@ -103,7 +104,10 @@ class Inserter extends Component {
 				{ this.state.mediaLibraryOpen &&
 					<MediaUpload
 						type="image"
-						onSelect={ () => ( this.setState( { mediaLibraryOpen: false } ) ) }
+						onSelect={ ( { type, url, alt } ) => {
+							onInsertInline( { type, url, alt } );
+							this.setState( { mediaLibraryOpen: false } );
+						} }
 						onClose={ () => ( this.setState( { mediaLibraryOpen: false } ) ) }
 						render={ ( { open } ) => {
 							open();
@@ -190,5 +194,6 @@ export default compose( [
 		},
 		showInlineInsertionPoint: dispatch( 'core/editor' ).showInlineInsertionPoint,
 		hideInlineInsertionPoint: dispatch( 'core/editor' ).hideInlineInsertionPoint,
+		onInsertInline: dispatch( 'core/editor' ).insertInline,
 	} ) ),
 ] )( Inserter );
