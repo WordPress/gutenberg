@@ -35,7 +35,7 @@ import { registerCoreBlocks } from 'gutenberg';
 registerCoreBlocks();
 ```
 
-Gutenberg by requires `window.wpApiSettings`, `window.wp`, `window._wpDateSettings`, `window.userSettings`, `window.jQuery`, `window.wpEditorL10n`
+Gutenberg by Front requires `window.wpApiSettings`, `window.wp`, `window._wpDateSettings`, `window.userSettings`, `window.jQuery`, `window.wpEditorL10n`
 
 ### Webpack setup
 
