@@ -101,11 +101,17 @@ function gutenberg_shim_fix_api_request_plain_permalinks( $scripts ) {
 			// [ 'b=1', 'c=2', 'a=5' ]
 			.split( '&' )
 			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
-			.map( ( entry ) => entry.split( '=' ) )
+			.map( function ( entry ) {
+				return entry.split( '=' );
+			 } )
 			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
-			.sort( ( a, b ) => a[ 0 ].localeCompare( b[ 0 ] ) )
+			.sort( function ( a, b ) {
+				return a[ 0 ].localeCompare( b[ 0 ] );
+			 } )
 			// [ 'a=5', 'b=1', 'c=2' ]
-			.map( ( pair ) => pair.join( '=' ) )
+			.map( function ( pair ) {
+				return pair.join( '=' );
+			 } )
 			// 'a=5&b=1&c=2'
 			.join( '&' );
 	};
@@ -122,7 +128,9 @@ function gutenberg_shim_fix_api_request_plain_permalinks( $scripts ) {
 		var method = request.method || 'GET';
 		var path = getStablePath( request.path )
 		if ( 'GET' === method && window._wpAPIDataPreload[ path ] ) {
-			return Promise.resolve( window._wpAPIDataPreload[ path ].body );
+			var deferred = jQuery.Deferred();
+			deferred.resolve( window._wpAPIDataPreload[ path ].body );
+			return deferred.promise();
 		}
 
 		return previousApiRequest(request);
