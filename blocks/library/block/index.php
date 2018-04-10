@@ -35,7 +35,17 @@ function gutenberg_render_core_reusable_block( $attributes ) {
 function register_core_reusable_block() {
 	wp_register_script( 'core-reusable-block', gutenberg_url( '/build/__block_block.js' ) );
 
+	wp_register_style(
+		'core-reusable-block-editor',
+		gutenberg_url( '/build/__block_block_editor.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/__block_block_editor.css' )
+	);
+	
+	wp_style_add_data( 'core-reusable-block-editor', 'rtl', 'replace' );
+
 	register_block_type( 'core/block', array(
+		'editor_style' => 'core-reusable-block-editor',
 		'editor_script' => 'core-reusable-block',
 		'attributes'      => array(
 			'ref' => array(
