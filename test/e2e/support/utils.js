@@ -12,20 +12,21 @@ const {
 
 const NAVIGATION_TIMEOUT = 20000;
 
-function getUrl( ...WPPaths ) {
+function getUrl( WPPath, query = '' ) {
 	const url = new URL( WP_BASE_URL );
 
-	url.pathname = join( url.pathname, ...WPPaths );
+	url.pathname = join( url.pathname, WPPath );
+	url.search = query;
 
 	return url.href;
 }
 
-function isWPPath( ...WPPaths ) {
+function isWPPath( WPPath, query = '' ) {
 	const currentUrl = new URL( page.url() );
 
-	currentUrl.search = '';
+	currentUrl.search = query;
 
-	return getUrl( ...WPPaths ) === currentUrl.href;
+	return getUrl( WPPath ) === currentUrl.href;
 }
 
 async function navigationTimeout( promise ) {
@@ -42,8 +43,8 @@ async function navigationTimeout( promise ) {
 	} );
 }
 
-async function goToWPPath( ...WPPaths ) {
-	await navigationTimeout( page.goto( getUrl( ...WPPaths ), { timeout: 0 } ) );
+async function goToWPPath( WPPath, query ) {
+	await navigationTimeout( page.goto( getUrl( WPPath, query ), { timeout: 0 } ) );
 }
 
 async function login() {
@@ -53,17 +54,17 @@ async function login() {
 	await navigationTimeout( page.waitForNavigation( { timeout: 0 } ) );
 }
 
-export async function visitAdmin( adminPath ) {
-	await goToWPPath( 'wp-admin', adminPath );
+export async function visitAdmin( adminPath, query ) {
+	await goToWPPath( join( 'wp-admin', adminPath ), query );
 
 	if ( isWPPath( 'wp-login.php' ) ) {
 		await login();
-		return visitAdmin( adminPath );
+		return visitAdmin( adminPath, query );
 	}
 }
 
-export async function newPost( postType ) {
-	await visitAdmin( 'post-new.php' + ( postType ? '?post_type=' + postType : '' ) );
+export async function newPost( query ) {
+	await visitAdmin( 'post-new.php', query );
 }
 
 export async function newDesktopBrowserPage() {

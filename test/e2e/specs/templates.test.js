@@ -3,18 +3,11 @@
  */
 import '../support/bootstrap';
 import { newPost, newDesktopBrowserPage } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Using a CPT with a predefined template', () => {
 	beforeAll( async () => {
 		await newDesktopBrowserPage();
-		await activatePlugin( 'gutenberg-test-plugin-templates' );
-		await newPost( 'book' );
-	} );
-
-	afterAll( async () => {
-		await newDesktopBrowserPage();
-		await deactivatePlugin( 'gutenberg-test-plugin-templates' );
+		await newPost( 'post_type=book&e2e_test_plugin=templates' );
 	} );
 
 	it( 'Should add a custom post types with a predefined template', async () => {
