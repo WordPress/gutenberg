@@ -11,7 +11,7 @@ import { ToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 
 // Gutenberg imports
-import { getBlockType, getBlockContent } from '@gutenberg/blocks/api';
+import { getBlockType, serialize } from '@gutenberg/blocks/api';
 
 export type BlockListType = {
 	onChange: ( uid: string, attributes: mixed ) => void,
@@ -63,7 +63,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			.map( block => {
 				const blockType = getBlockType( block.name );
 				if ( blockType ) {
-					return getBlockContent( block );
+					return serialize( [ block ] );
 				} else {
 					return '<span>' + block.attributes.content + '</span>';
 				}
