@@ -36,11 +36,11 @@ const getColumnLayouts = memoize( ( columns ) => {
 
 /**
  * Returns the block name
- * @param  {object} row Row object
+ * @param  {Object} row Row object
  * @return {string}     Block name
  */
 function getBlockName( row ) {
-	if ( !row.cols ) {
+	if ( ! row.cols ) {
 		return false;
 	}
 
@@ -50,11 +50,10 @@ function getBlockName( row ) {
 
 /**
  * Return the block settings
- * @param  {object} row Row object
- * @return {object}     Block settings object
+ * @param  {Object} row Row object
+ * @return {Object}     Block settings object
  */
 function getBlockSettings( row ) {
-
 	return {
 		title: row.title,
 		description: row.description,
@@ -110,9 +109,9 @@ function getBlockSettings( row ) {
 	};
 }
 
-export const blocks = reduce(rows, (res, row) => {
-	if ( sum( row.cols ) == 12 ) {
-		res.push( { 
+export const blocks = reduce( rows, ( res, row ) => {
+	if ( sum( row.cols ) === 12 ) {
+		res.push( {
 			name: getBlockName( row ),
 			settings: getBlockSettings( row ),
 		} );

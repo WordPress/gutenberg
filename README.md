@@ -179,8 +179,8 @@ cons customGutenberg = {
 		}
 	],
 	rows: [
-		{ cols: [ 6, 6 ], title: 'col6 x 2',  description: __( '2 eq columns layout' ) },
-		{ cols: [ 4, 4, 4 ], title: 'col4 x 3',  description: __( '3 eq columns layout' ) }, 
+		{ cols: [ 6, 6 ], title: 'col6 x 2', description: __( '2 eq columns layout' ) },
+		{ cols: [ 4, 4, 4 ], title: 'col4 x 3', description: __( '3 eq columns layout' ) }, 
 	]
 	panel: [ 'post-status', 'post-excerpt', 'post-taxonomies', 'featured-image', 'discussion-panel', 'last-revision', 'page-attributes', 'document-outline-panel', 'meta-boxes', 'panel-settings', 'articles-panel' ],
 	editor: {
