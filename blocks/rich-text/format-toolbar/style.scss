@@ -3,11 +3,11 @@
 }
 
 .blocks-format-toolbar__link-modal {
-	position: absolute;
+	position: relative;
+	left: -50%;
 	box-shadow: 0 3px 20px rgba( 18, 24, 30, .1 ), 0 1px 3px rgba( 18, 24, 30, .1 );
 	border: 1px solid #e0e5e9;
 	background: #fff;
-	width: 300px;
 	display: flex;
 	flex-direction: column;
 	font-family: $default-font;
@@ -17,16 +17,47 @@
 }
 
 .blocks-format-toolbar__link-modal-line {
+	$button-size: 36px;
+	$input-padding: 10px;
+	$input-size: 230px;
+
 	display: flex;
 	flex-direction: row;
 	flex-grow: 1;
 	flex-shrink: 1;
 	min-width: 0;
-	align-items: center;
+	align-items: flex-start;
 
 	.components-button {
 		flex-shrink: 0;
+		width: $button-size;
+		height: $button-size;
 	}
+
+	.blocks-url-input {
+		width: $input-size;
+
+		input {
+			padding: $input-padding;
+		}
+	}
+
+	.blocks-url-input__suggestions {
+		border-top: 1px solid $light-gray-500;
+		box-shadow: none;
+		padding: 4px 0;
+		position: relative;
+		width: $input-size + $button-size * 2;
+	}
+
+	.blocks-url-input__suggestion {
+		color: $dark-gray-100;
+		padding: 4px ( $button-size + $input-padding );
+	}
+}
+
+.blocks-format-toolbar__link-settings-toggle .dashicon {
+	transform: rotate(90deg);
 }
 
 .blocks-format-toolbar__link-value {
@@ -34,11 +65,21 @@
 	flex-grow: 1;
 	flex-shrink: 1;
 	overflow: hidden;
+	text-overflow: ellipsis;
 	position: relative;
 	white-space: nowrap;
-	min-width: 0;
+	min-width: 150px;
+	max-width: 500px;
+}
 
-	&:after {
-		@include long-content-fade( $size: 40% );
+.blocks-format-toolbar__link-settings {
+	padding: 7px 8px;
+	border-top: 1px solid $light-gray-500;
+	padding-top: 8px; // add 1px for the border
+
+	.components-base-control {
+		margin: 0;
+		flex-grow: 1;
+		flex-shrink: 1;
 	}
 }
