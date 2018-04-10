@@ -66,7 +66,7 @@ const tabs = [
 ];
 
 /**
- * Returns all the avialable tabs.
+ * Returns all the available tabs.
  *
  * @return {Array} tabs.
  */

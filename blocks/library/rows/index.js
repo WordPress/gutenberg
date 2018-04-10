@@ -15,11 +15,9 @@ import { BlockAlignmentToolbar, BlockControls, InnerBlocks } from '@wordpress/bl
  * Internal dependencies
  */
 import './style.scss';
+import { getRows } from './rows';
 
-const rows = [
-	{ cols: [ 6, 6 ], title: 'col6 x 2',  description: __( '2 eq columns layout' ) },
-	{ cols: [ 4, 4, 4 ], title: 'col4 x 3',  description: __( '3 eq columns layout' ) }, 
-];
+const rows = getRows();
 
 /**
  * Returns the layouts configuration for a given number of columns.
