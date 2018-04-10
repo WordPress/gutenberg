@@ -25,7 +25,7 @@
     "flow": "flow",
     "prettier": "prettier --write *.js *block-management/*.js",
     "prettier-check": "prettier -l *.js *block-management/*.js",
-    "clean": "watchman watch-del-all; rm -rf node_modules; rm -f yarn.lock; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*",
+    "clean": "yarn test --clearCache; watchman watch-del-all; rm -rf node_modules; rm -f yarn.lock; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
     "clean-install": "yarn clean; yarn"
   },
   "dependencies": {
