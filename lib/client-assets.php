@@ -748,7 +748,7 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 		$parsed          = gutenberg_parse_blocks( $post->post_content );
 		$block_instances = array();
 
-		foreach ( $parsed as $block ){
+		foreach ( $parsed as $block ) {
 			if ( ! isset( $block['blockName'] ) ) {
 				continue;
 			}
@@ -786,7 +786,7 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 		// If the block contains 'assets_callback', we should trigger it here
 		// for all instances of the block present on the post.
 		if ( isset( $block_instances[ $block_name ] ) && ! empty( $block_type->assets_callback ) ) {
-			foreach ( $block_instances[ $block_name ] as $attrs ){
+			foreach ( $block_instances[ $block_name ] as $attrs ) {
 				$attributes = $block_type->prepare_attributes_for_render( $attrs );
 
 				return (string) call_user_func( $block_type->assets_callback, $attributes );
