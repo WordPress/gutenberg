@@ -6,25 +6,27 @@ exports[`core/list block edit matches snapshot 1`] = `
 >
   <div>
     <div>
-      <div
-        class="components-autocomplete"
-      >
-        <ul
-          aria-autocomplete="list"
-          aria-expanded="false"
-          aria-label="Write list…"
-          aria-multiline="true"
-          class="blocks-rich-text__tinymce"
-          contenteditable="true"
-          data-is-placeholder-visible="true"
-        />
-        <ul
-          class="blocks-rich-text__tinymce"
+      <div>
+        <div
+          class="components-autocomplete"
         >
-          <li>
-            Write list…
-          </li>
-        </ul>
+          <ul
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-label="Write list…"
+            aria-multiline="true"
+            class="blocks-rich-text__tinymce"
+            contenteditable="true"
+            data-is-placeholder-visible="true"
+          />
+          <ul
+            class="blocks-rich-text__tinymce"
+          >
+            <li>
+              Write list…
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

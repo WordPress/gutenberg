@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, filter, map, debounce } from 'lodash';
+import { escapeRegExp, find, filter, includes, map, debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
+import BackCompatibleOnInput from '../back-compatible-on-input';
 import { isDeprecatedCompleter, toCompatibleCompleter } from './completer-compat';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import Button from '../button';
@@ -318,8 +319,14 @@ export class Autocomplete extends Component {
 	getCursor( container ) {
 		const selection = window.getSelection();
 		if ( selection.isCollapsed ) {
+			// Internet Explorer only supports contains() for elements.
+			// We are simulating and identical condition using textContent and a string includes,
+			// So we don't throw errors when we should not on IE.
 			if ( 'production' !== process.env.NODE_ENV ) {
-				if ( ! container.contains( selection.anchorNode ) ) {
+				if ( ! container.contains( selection.anchorNode ) &&
+					selection.anchorNode &&
+					! container.textContent.includes( selection.anchorNode.textContent.trim() )
+				) {
 					throw new Error( 'Invalid assumption: expected selection to be within the autocomplete container' );
 				}
 			}
@@ -466,6 +473,12 @@ export class Autocomplete extends Component {
 	}
 
 	search( event ) {
+		// if the event contains a key code because of compatibility with browser that don't support onInput,
+		// ignore keys that we are already catching to manage the autocomplete.
+		if ( event.keyCode && includes( [ ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE ], event.keyCode ) ) {
+			return;
+		}
+
 		const { completers, open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 		const container = event.target;
 
@@ -614,44 +627,45 @@ export class Autocomplete extends Component {
 		// Disable reason: Clicking the editor should reset the autocomplete when the menu is suppressed
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<div
-				ref={ this.bindNode }
-				onInput={ this.search }
-				onClick={ this.resetWhenSuppressed }
-				className="components-autocomplete"
-			>
-				{ children( { isExpanded, listBoxId, activeId } ) }
-				{ isExpanded && (
-					<Popover
-						focusOnMount={ false }
-						onClose={ this.reset }
-						position="top right"
-						className="components-autocomplete__popover"
-						getAnchorRect={ this.getWordRect }
-					>
-						<div
-							id={ listBoxId }
-							role="listbox"
-							className="components-autocomplete__results"
+			<BackCompatibleOnInput onInput={ this.search } >
+				<div
+					className="components-autocomplete"
+					onClick={ this.resetWhenSuppressed }
+					ref={ this.bindNode }
+				>
+					{ children( { isExpanded, listBoxId, activeId } ) }
+					{ isExpanded && (
+						<Popover
+							focusOnMount={ false }
+							onClose={ this.reset }
+							position="top right"
+							className="components-autocomplete__popover"
+							getAnchorRect={ this.getWordRect }
 						>
-							{ isExpanded && map( filteredOptions, ( option, index ) => (
-								<Button
-									key={ option.key }
-									id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
-									role="option"
-									aria-selected={ index === selectedIndex }
-									className={ classnames( 'components-autocomplete__result', className, {
-										'is-selected': index === selectedIndex,
-									} ) }
-									onClick={ () => this.select( option ) }
-								>
-									{ option.label }
-								</Button>
-							) ) }
-						</div>
-					</Popover>
-				) }
-			</div>
+							<div
+								id={ listBoxId }
+								role="listbox"
+								className="components-autocomplete__results"
+							>
+								{ isExpanded && map( filteredOptions, ( option, index ) => (
+									<Button
+										key={ option.key }
+										id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+										role="option"
+										aria-selected={ index === selectedIndex }
+										className={ classnames( 'components-autocomplete__result', className, {
+											'is-selected': index === selectedIndex,
+										} ) }
+										onClick={ () => this.select( option ) }
+									>
+										{ option.label }
+									</Button>
+								) ) }
+							</div>
+						</Popover>
+					) }
+				</div>
+			</BackCompatibleOnInput>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}

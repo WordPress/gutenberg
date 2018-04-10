@@ -6,24 +6,26 @@ exports[`core/verse block edit matches snapshot 1`] = `
 >
   <div>
     <div>
-      <div
-        class="components-autocomplete"
-      >
-        <pre
-          aria-autocomplete="list"
-          aria-expanded="false"
-          aria-label="Write…"
-          aria-multiline="false"
-          class="blocks-rich-text__tinymce"
-          contenteditable="true"
-          data-is-placeholder-visible="true"
-          role="textbox"
-        />
-        <pre
-          class="blocks-rich-text__tinymce"
+      <div>
+        <div
+          class="components-autocomplete"
         >
-          Write…
-        </pre>
+          <pre
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-label="Write…"
+            aria-multiline="false"
+            class="blocks-rich-text__tinymce"
+            contenteditable="true"
+            data-is-placeholder-visible="true"
+            role="textbox"
+          />
+          <pre
+            class="blocks-rich-text__tinymce"
+          >
+            Write…
+          </pre>
+        </div>
       </div>
     </div>
   </div>
