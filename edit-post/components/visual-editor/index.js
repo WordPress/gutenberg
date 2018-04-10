@@ -11,7 +11,7 @@ import {
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
 } from '@wordpress/editor';
-import { Fragment, compose } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,5 +44,4 @@ function VisualEditor() {
 	);
 }
 
-export default compose( [
-] )( VisualEditor );
+export default VisualEditor;
