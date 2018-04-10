@@ -107,10 +107,10 @@ export default compose( [
 		},
 	} ) ),
 	withContext( 'editor' )( ( settings ) => {
-		const { blockTypes, templateLock } = settings;
+		const { allowedBlockTypes, templateLock } = settings;
 
 		return {
-			hasSupportedBlocks: true === blockTypes || ! isEmpty( blockTypes ),
+			hasSupportedBlocks: true === allowedBlockTypes || ! isEmpty( allowedBlockTypes ),
 			isLocked: !! templateLock,
 		};
 	} ),

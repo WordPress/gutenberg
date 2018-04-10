@@ -3,6 +3,8 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 ## 2.8.0
 
 - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See: https://github.com/WordPress/gutenberg/blob/master/components/autocomplete/README.md.
+- `getInserterItems`: the `allowedBlockTypes` argument is now mandatory.
+- `getFrecentInserterItems`: the `allowedBlockTypes` argument is now mandatory.
 
 ## 2.7.0
 
