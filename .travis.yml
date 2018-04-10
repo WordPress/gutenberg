@@ -7,6 +7,9 @@ language: php
 services:
   - docker
 
+addons:
+  - chrome: stable
+
 notifications:
   email:
     on_success: never
@@ -58,6 +61,7 @@ jobs:
         - ./bin/run-wp-unit-tests.sh
 
     - stage: test
+      env: PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true E2E_EXECUTABLE_PATH=google-chrome-stable
       script:
         - npm install || exit 1
         - npm run build || exit 1
