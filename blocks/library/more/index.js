@@ -7,8 +7,8 @@ import { compact } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToggleControl } from '@wordpress/components';
-import { RawHTML } from '@wordpress/element';
+import { PanelBody, ToggleControl } from '@wordpress/components';
+import { Component, RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -68,33 +68,57 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, isSelected } ) {
-		const { customText, noTeaser } = attributes;
+	edit: class extends Component {
+		constructor() {
+			super( ...arguments );
+			this.onChangeInput = this.onChangeInput.bind( this );
 
-		const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
-		const defaultText = __( 'Read more' );
-		const value = customText !== undefined ? customText : defaultText;
-		const inputLength = value.length ? value.length + 1 : 1;
+			this.state = {
+				defaultText: __( 'Read more' ),
+			};
+		}
 
-		return [
-			isSelected && (
-				<InspectorControls key="inspector">
-					<ToggleControl
-						label={ __( 'Hide the teaser before the "More" tag' ) }
-						checked={ !! noTeaser }
-						onChange={ toggleNoTeaser }
+		onChangeInput( event ) {
+			// Set defaultText to an empty string, allowing the user to clear/replace the input field's text
+			this.setState( {
+				defaultText: '',
+			} );
+
+			const value = event.target.value.length === 0 ? undefined : event.target.value;
+			this.props.setAttributes( { customText: value } );
+		}
+
+		render() {
+			const { customText, noTeaser } = this.props.attributes;
+			const { setAttributes, isSelected } = this.props;
+
+			const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
+			const { defaultText } = this.state;
+			const value = customText !== undefined ? customText : defaultText;
+			const inputLength = value.length + 1;
+
+			return [
+				isSelected && (
+					<InspectorControls key="inspector">
+						<PanelBody>
+							<ToggleControl
+								label={ __( 'Hide the teaser before the "More" tag' ) }
+								checked={ !! noTeaser }
+								onChange={ toggleNoTeaser }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				),
+				<div key="more-tag" className="wp-block-more">
+					<input
+						type="text"
+						value={ value }
+						size={ inputLength }
+						onChange={ this.onChangeInput }
 					/>
-				</InspectorControls>
-			),
-			<div key="more-tag" className="wp-block-more">
-				<input
-					type="text"
-					value={ value }
-					size={ inputLength }
-					onChange={ ( event ) => setAttributes( { customText: event.target.value } ) }
-				/>
-			</div>,
-		];
+				</div>,
+			];
+		}
 	},
 
 	save( { attributes } ) {

@@ -5,8 +5,9 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WrappedComponent) />
   <input
+    aria-label="Add block"
     className="editor-default-block-appender__content"
     onClick={
       [MockFunction] {
@@ -30,11 +31,12 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
       }
     }
     readOnly={true}
+    role="button"
     type="text"
     value="Write your story"
   />
   <WrappedComponent />
-  <Select(Dispatch(WrappedComponent))
+  <WithSelect(WithDispatch(WrappedComponent))
     position="top right"
   />
 </div>
@@ -45,18 +47,20 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WrappedComponent) />
   <input
+    aria-label="Add block"
     className="editor-default-block-appender__content"
     onClick={[MockFunction]}
     onFocus={[MockFunction]}
     onKeyDown={[MockFunction]}
     readOnly={true}
+    role="button"
     type="text"
     value="Write your story"
   />
   <WrappedComponent />
-  <Select(Dispatch(WrappedComponent))
+  <WithSelect(WithDispatch(WrappedComponent))
     position="top right"
   />
 </div>
@@ -67,18 +71,20 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WrappedComponent) />
   <input
+    aria-label="Add block"
     className="editor-default-block-appender__content"
     onClick={[MockFunction]}
     onFocus={[MockFunction]}
     onKeyDown={[MockFunction]}
     readOnly={true}
+    role="button"
     type="text"
     value=""
   />
   <WrappedComponent />
-  <Select(Dispatch(WrappedComponent))
+  <WithSelect(WithDispatch(WrappedComponent))
     position="top right"
   />
 </div>

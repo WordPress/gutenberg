@@ -9,4 +9,13 @@
 	.components-panel__body-toggle {
 		color: $dark-gray-500;
 	}
+
+	&:first-child {
+		border-top: 1px solid $light-gray-500;
+		margin-top: 16px;
+	}
+
+	&:last-child {
+		margin-bottom: -16px;
+	}
 }

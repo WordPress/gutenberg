@@ -2,26 +2,30 @@
 
 exports[`core/paragraph block edit matches snapshot 1`] = `
 <div>
-  <div>
-    <div
-      class="components-autocomplete"
-    >
-      <div
-        class="blocks-rich-text"
-      >
-        <p
-          aria-autocomplete="list"
-          aria-expanded="false"
-          aria-label="Add text or type / to add content"
-          class="wp-block-paragraph blocks-rich-text__tinymce"
-          contenteditable="true"
-          data-is-placeholder-visible="true"
-        />
-        <p
-          class="blocks-rich-text__tinymce wp-block-paragraph"
+  <div
+    class="blocks-rich-text"
+  >
+    <div>
+      <div>
+        <div
+          class="components-autocomplete"
         >
-          Add text or type / to add content
-        </p>
+          <p
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-label="Add text or type / to add content"
+            aria-multiline="false"
+            class="wp-block-paragraph blocks-rich-text__tinymce"
+            contenteditable="true"
+            data-is-placeholder-visible="true"
+            role="textbox"
+          />
+          <p
+            class="blocks-rich-text__tinymce wp-block-paragraph"
+          >
+            Add text or type / to add content
+          </p>
+        </div>
       </div>
     </div>
   </div>

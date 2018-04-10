@@ -4,9 +4,15 @@
 import { map } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+import { addAction, removeAction } from '@wordpress/hooks';
+
+/**
  * Internal dependencies
  */
-import PluginContextProvider from '../plugin-context-provider';
+import PluginContext from '../plugin-context';
 import { getPlugins } from '../../api';
 
 /**
@@ -14,23 +20,56 @@ import { getPlugins } from '../../api';
  *
  * @return {WPElement} Plugin area.
  */
-function PluginArea() {
-	return (
-		<div style={ { display: 'none' } }>
-			{ map( getPlugins(), ( plugin ) => {
-				const { render: Plugin } = plugin;
+class PluginArea extends Component {
+	constructor() {
+		super( ...arguments );
 
-				return (
-					<PluginContextProvider
-						key={ plugin.name }
-						pluginName={ plugin.name }
+		this.setPlugins = this.setPlugins.bind( this );
+		this.state = this.getCurrentPluginsState();
+	}
+
+	getCurrentPluginsState() {
+		return {
+			plugins: map( getPlugins(), ( { name, render } ) => {
+				return {
+					name,
+					Plugin: render,
+					context: {
+						pluginName: name,
+					},
+				};
+			} ),
+		};
+	}
+
+	componentDidMount() {
+		addAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area/plugins-registered', this.setPlugins );
+		addAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area/plugins-unregistered', this.setPlugins );
+	}
+
+	componentWillUnmount() {
+		removeAction( 'plugins.pluginRegistered', 'core/plugins/plugin-area/plugins-registered' );
+		removeAction( 'plugins.pluginUnregistered', 'core/plugins/plugin-area/plugins-unregistered' );
+	}
+
+	setPlugins() {
+		this.setState( this.getCurrentPluginsState );
+	}
+
+	render() {
+		return (
+			<div style={ { display: 'none' } }>
+				{ map( this.state.plugins, ( { context, name, Plugin } ) => (
+					<PluginContext.Provider
+						key={ name }
+						value={ context }
 					>
 						<Plugin />
-					</PluginContextProvider>
-				);
-			} ) }
-		</div>
-	);
+					</PluginContext.Provider>
+				) ) }
+			</div>
+		);
+	}
 }
 
 export default PluginArea;

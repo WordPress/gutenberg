@@ -3,14 +3,18 @@ export {
 	cloneBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
-	createReusableBlock,
+	getBlockTransforms,
+	findTransform,
 } from './factory';
-export { default as parse, getBlockAttributes } from './parser';
+export {
+	default as parse,
+	getBlockAttributes,
+	parseWithAttributeSchema,
+} from './parser';
 export { default as rawHandler } from './raw-handling';
 export {
 	default as serialize,
 	getBlockContent,
-	getBlockDefaultClassname,
 	getBlockDefaultClassName,
 	getSaveElement,
 } from './serializer';
@@ -28,7 +32,7 @@ export {
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
-	isReusableBlock,
+	isSharedBlock,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,

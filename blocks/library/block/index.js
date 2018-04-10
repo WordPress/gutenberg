@@ -15,10 +15,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockEdit from '../../block-edit';
-import ReusableBlockEditPanel from './edit-panel';
+import SharedBlockEditPanel from './edit-panel';
+import SharedBlockIndicator from './indicator';
 
-class ReusableBlockEdit extends Component {
-	constructor( { reusableBlock } ) {
+class SharedBlockEdit extends Component {
+	constructor( { sharedBlock } ) {
 		super( ...arguments );
 
 		this.startEditing = this.startEditing.bind( this );
@@ -28,23 +29,25 @@ class ReusableBlockEdit extends Component {
 		this.save = this.save.bind( this );
 
 		this.state = {
-			isEditing: !! ( reusableBlock && reusableBlock.isTemporary ),
+			isEditing: !! ( sharedBlock && sharedBlock.isTemporary ),
 			title: null,
+			changedAttributes: null,
 		};
 	}
 
 	componentDidMount() {
-		if ( ! this.props.reusableBlock ) {
-			this.props.fetchReusableBlock();
+		if ( ! this.props.sharedBlock ) {
+			this.props.fetchSharedBlock();
 		}
 	}
 
 	startEditing() {
-		const { reusableBlock } = this.props;
+		const { sharedBlock } = this.props;
 
 		this.setState( {
 			isEditing: true,
-			title: reusableBlock.title,
+			title: sharedBlock.title,
+			changedAttributes: {},
 		} );
 	}
 
@@ -52,12 +55,16 @@ class ReusableBlockEdit extends Component {
 		this.setState( {
 			isEditing: false,
 			title: null,
+			changedAttributes: null,
 		} );
 	}
 
 	setAttributes( attributes ) {
-		const { updateAttributes, block } = this.props;
-		updateAttributes( block.uid, attributes );
+		this.setState( ( prevState ) => {
+			if ( prevState.changedAttributes !== null ) {
+				return { changedAttributes: { ...prevState.changedAttributes, ...attributes } };
+			}
+		} );
 	}
 
 	setTitle( title ) {
@@ -65,27 +72,28 @@ class ReusableBlockEdit extends Component {
 	}
 
 	save() {
-		const { reusableBlock, onUpdateTitle, onSave } = this.props;
+		const { sharedBlock, onUpdateTitle, updateAttributes, block, onSave } = this.props;
+		const { title, changedAttributes } = this.state;
 
-		const { title } = this.state;
-		if ( title !== reusableBlock.title ) {
+		if ( title !== sharedBlock.title ) {
 			onUpdateTitle( title );
 		}
 
+		updateAttributes( block.uid, changedAttributes );
 		onSave();
 
 		this.stopEditing();
 	}
 
 	render() {
-		const { isSelected, reusableBlock, block, isFetching, isSaving } = this.props;
-		const { isEditing, title } = this.state;
+		const { isSelected, sharedBlock, block, isFetching, isSaving } = this.props;
+		const { isEditing, title, changedAttributes } = this.state;
 
-		if ( ! reusableBlock && isFetching ) {
+		if ( ! sharedBlock && isFetching ) {
 			return <Placeholder><Spinner /></Placeholder>;
 		}
 
-		if ( ! reusableBlock || ! block ) {
+		if ( ! sharedBlock || ! block ) {
 			return <Placeholder>{ __( 'Block has been deleted or is unavailable.' ) }</Placeholder>;
 		}
 
@@ -95,7 +103,7 @@ class ReusableBlockEdit extends Component {
 				isSelected={ isEditing && isSelected }
 				id={ block.uid }
 				name={ block.name }
-				attributes={ block.attributes }
+				attributes={ { ...block.attributes, ...changedAttributes } }
 				setAttributes={ isEditing ? this.setAttributes : noop }
 			/>
 		);
@@ -108,56 +116,57 @@ class ReusableBlockEdit extends Component {
 			<Fragment>
 				{ element }
 				{ ( isSelected || isEditing ) && (
-					<ReusableBlockEditPanel
+					<SharedBlockEditPanel
 						isEditing={ isEditing }
-						title={ title !== null ? title : reusableBlock.title }
-						isSaving={ isSaving && ! reusableBlock.isTemporary }
+						title={ title !== null ? title : sharedBlock.title }
+						isSaving={ isSaving && ! sharedBlock.isTemporary }
 						onEdit={ this.startEditing }
 						onChangeTitle={ this.setTitle }
 						onSave={ this.save }
 						onCancel={ this.stopEditing }
 					/>
 				) }
+				{ ! isSelected && ! isEditing && <SharedBlockIndicator title={ sharedBlock.title } /> }
 			</Fragment>
 		);
 	}
 }
 
-const EnhancedReusableBlockEdit = compose( [
+const EnhancedSharedBlockEdit = compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
-			getReusableBlock,
-			isFetchingReusableBlock,
-			isSavingReusableBlock,
+			getSharedBlock,
+			isFetchingSharedBlock,
+			isSavingSharedBlock,
 			getBlock,
 		} = select( 'core/editor' );
 		const { ref } = ownProps.attributes;
-		const reusableBlock = getReusableBlock( ref );
+		const sharedBlock = getSharedBlock( ref );
 
 		return {
-			reusableBlock,
-			isFetching: isFetchingReusableBlock( ref ),
-			isSaving: isSavingReusableBlock( ref ),
-			block: reusableBlock ? getBlock( reusableBlock.uid ) : null,
+			sharedBlock,
+			isFetching: isFetchingSharedBlock( ref ),
+			isSaving: isSavingSharedBlock( ref ),
+			block: sharedBlock ? getBlock( sharedBlock.uid ) : null,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
-			fetchReusableBlocks,
+			fetchSharedBlocks,
 			updateBlockAttributes,
-			updateReusableBlockTitle,
-			saveReusableBlock,
+			updateSharedBlockTitle,
+			saveSharedBlock,
 		} = dispatch( 'core/editor' );
 		const { ref } = ownProps.attributes;
 
 		return {
-			fetchReusableBlock: partial( fetchReusableBlocks, ref ),
+			fetchSharedBlock: partial( fetchSharedBlocks, ref ),
 			updateAttributes: updateBlockAttributes,
-			onUpdateTitle: partial( updateReusableBlockTitle, ref ),
-			onSave: partial( saveReusableBlock, ref ),
+			onUpdateTitle: partial( updateSharedBlockTitle, ref ),
+			onSave: partial( saveSharedBlock, ref ),
 		};
 	} ),
-] )( ReusableBlockEdit );
+] )( SharedBlockEdit );
 
 export const name = 'core/block';
 
@@ -177,6 +186,6 @@ export const settings = {
 		html: false,
 	},
 
-	edit: EnhancedReusableBlockEdit,
+	edit: EnhancedSharedBlockEdit,
 	save: () => null,
 };

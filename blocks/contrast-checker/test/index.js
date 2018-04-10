@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -15,8 +15,9 @@ describe( 'ContrastChecker', () => {
 	const fallbackBackgroundColor = '#fff';
 	const fallbackTextColor = '#000';
 	const sameShade = '#666';
+	const colorWithTransparency = 'rgba(102,102,102,0.5)';
 
-	const wrapper = shallow(
+	const wrapper = mount(
 		<ContrastChecker
 			backgroundColor={ backgroundColor }
 			textColor={ textColor }
@@ -26,7 +27,7 @@ describe( 'ContrastChecker', () => {
 	);
 
 	test( 'should render null when no colors are provided', () => {
-		expect( shallow( <ContrastChecker /> ).html() ).toBeNull();
+		expect( mount( <ContrastChecker /> ).html() ).toBeNull();
 	} );
 
 	test( 'should render null when the colors meet AA WCAG guidelines.', () => {
@@ -34,7 +35,7 @@ describe( 'ContrastChecker', () => {
 	} );
 
 	test( 'should render component when the colors do not meet AA WCAG guidelines.', () => {
-		const componentWrapper = shallow(
+		const componentWrapper = mount(
 			<ContrastChecker
 				backgroundColor={ sameShade }
 				textColor={ sameShade }
@@ -46,10 +47,36 @@ describe( 'ContrastChecker', () => {
 		expect( componentWrapper ).toMatchSnapshot();
 	} );
 
+	test( 'should render render null if background color contains a transparency', () => {
+		const componentWrapper = mount(
+			<ContrastChecker
+				backgroundColor={ colorWithTransparency }
+				textColor={ sameShade }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor } />
+		);
+
+		expect( componentWrapper.html() ).toBeNull();
+	} );
+
+	test( 'should render render null if text color contains a transparency', () => {
+		const componentWrapper = mount(
+			<ContrastChecker
+				backgroundColor={ sameShade }
+				textColor={ colorWithTransparency }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor } />
+		);
+
+		expect( componentWrapper.html() ).toBeNull();
+	} );
+
 	test( 'should render different message matching snapshot when background color has less brightness than text color.', () => {
 		const darkerShade = '#555';
 
-		const componentWrapper = shallow(
+		const componentWrapper = mount(
 			<ContrastChecker
 				backgroundColor={ darkerShade }
 				textColor={ sameShade }
@@ -62,7 +89,7 @@ describe( 'ContrastChecker', () => {
 	} );
 
 	test( 'should render null when the colors meet AA WCAG guidelines, with only fallback colors.', () => {
-		const componentWrapper = shallow(
+		const componentWrapper = mount(
 			<ContrastChecker
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
@@ -73,7 +100,7 @@ describe( 'ContrastChecker', () => {
 	} );
 
 	test( 'should render messages when the textColor is valid, but the fallback backgroundColor conflicts.', () => {
-		const componentWrapper = shallow(
+		const componentWrapper = mount(
 			<ContrastChecker
 				textColor={ textColor }
 				fallbackBackgroundColor={ textColor } />

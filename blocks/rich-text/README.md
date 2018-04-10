@@ -59,6 +59,10 @@ a traditional `input` field, usually when the user exits the field.
 
 *Optional.* By default, the placeholder will hide as soon as the editable field receives focus. With this setting it can be be kept while the field is focussed and empty.
 
+### `autocompleters: Array<Completer>`
+
+*Optional.* A list of autocompleters to use instead of the default.
+
 ## Example
 
 {% codetabs %}

@@ -1,18 +1,13 @@
 /**
- * External Dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { PostTaxonomies as PostTaxonomiesForm, PostTaxonomiesCheck } from '@wordpress/editor';
+import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { isEditorSidebarPanelOpened } from '../../../store/selectors';
-import { toggleGeneralSidebarEditorPanel } from '../../../store/actions';
 import TaxonomyPanel from './taxonomy-panel';
 
 /**
@@ -36,18 +31,16 @@ function PostTaxonomies() {
 	);
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
+			isOpened: select( 'core/edit-post' ).isEditorSidebarPanelOpened( PANEL_NAME ),
 		};
-	},
-	{
+	} ),
+	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
-			return toggleGeneralSidebarEditorPanel( PANEL_NAME );
+			return dispatch( 'core/edit-post' ).toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
-)( PostTaxonomies );
+	} ) ),
+] )( PostTaxonomies );
 

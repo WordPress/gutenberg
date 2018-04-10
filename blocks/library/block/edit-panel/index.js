@@ -16,7 +16,7 @@ import './style.scss';
  */
 const { ESCAPE } = keycodes;
 
-class ReusableBlockEditPanel extends Component {
+class SharedBlockEditPanel extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -58,22 +58,22 @@ class ReusableBlockEditPanel extends Component {
 		return (
 			<Fragment>
 				{ ( ! isEditing && ! isSaving ) && (
-					<div className="reusable-block-edit-panel">
-						<b className="reusable-block-edit-panel__info">
+					<div className="shared-block-edit-panel">
+						<b className="shared-block-edit-panel__info">
 							{ title }
 						</b>
-						<Button isLarge className="reusable-block-edit-panel__button" onClick={ onEdit }>
+						<Button isLarge className="shared-block-edit-panel__button" onClick={ onEdit }>
 							{ __( 'Edit' ) }
 						</Button>
 					</div>
 				) }
 				{ ( isEditing || isSaving ) && (
-					<form className="reusable-block-edit-panel" onSubmit={ this.handleFormSubmit }>
+					<form className="shared-block-edit-panel" onSubmit={ this.handleFormSubmit }>
 						<input
 							ref={ this.bindTitleRef }
 							type="text"
 							disabled={ isSaving }
-							className="reusable-block-edit-panel__title"
+							className="shared-block-edit-panel__title"
 							value={ title }
 							onChange={ this.handleTitleChange }
 							onKeyDown={ this.handleTitleKeyDown }
@@ -84,7 +84,7 @@ class ReusableBlockEditPanel extends Component {
 							isLarge
 							isBusy={ isSaving }
 							disabled={ ! title || isSaving }
-							className="reusable-block-edit-panel__button"
+							className="shared-block-edit-panel__button"
 							onClick={ onSave }
 						>
 							{ __( 'Save' ) }
@@ -92,7 +92,7 @@ class ReusableBlockEditPanel extends Component {
 						<Button
 							isLarge
 							disabled={ isSaving }
-							className="reusable-block-edit-panel__button"
+							className="shared-block-edit-panel__button"
 							onClick={ onCancel }
 						>
 							{ __( 'Cancel' ) }
@@ -104,4 +104,4 @@ class ReusableBlockEditPanel extends Component {
 	}
 }
 
-export default ReusableBlockEditPanel;
+export default SharedBlockEditPanel;

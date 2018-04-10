@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
-import { get, unescape as unescapeString, find, throttle, uniqBy } from 'lodash';
+import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy, invoke } from 'lodash';
 import { stringify } from 'querystring';
 
 /**
@@ -44,9 +44,12 @@ class FlatTermSelector extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.terms ) {
+		if ( ! isEmpty( this.props.terms ) ) {
 			this.setState( { loading: false } );
-			this.initRequest = this.fetchTerms( { include: this.props.terms } );
+			this.initRequest = this.fetchTerms( {
+				include: this.props.terms.join( ',' ),
+				per_page: 100,
+			} );
 			this.initRequest.then(
 				() => {
 					this.setState( { loading: false } );
@@ -65,10 +68,8 @@ class FlatTermSelector extends Component {
 	}
 
 	componentWillUnmount() {
-		this.initRequest.abort();
-		if ( this.searchRequest ) {
-			this.searchRequest.abort();
-		}
+		invoke( this.initRequest, [ 'abort' ] );
+		invoke( this.searchRequest, [ 'abort' ] );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -94,10 +95,14 @@ class FlatTermSelector extends Component {
 	}
 
 	updateSelectedTerms( terms = [] ) {
-		const selectedTerms = terms.map( ( termId ) => {
+		const selectedTerms = terms.reduce( ( result, termId ) => {
 			const termObject = find( this.state.availableTerms, ( term ) => term.id === termId );
-			return termObject ? termObject.name : '';
-		} );
+			if ( termObject ) {
+				result.push( termObject.name );
+			}
+
+			return result;
+		}, [] );
 		this.setState( {
 			selectedTerms,
 		} );
@@ -153,9 +158,7 @@ class FlatTermSelector extends Component {
 	}
 
 	searchTerms( search = '' ) {
-		if ( this.searchRequest ) {
-			this.searchRequest.abort();
-		}
+		invoke( this.searchRequest, [ 'abort' ] );
 		this.searchRequest = this.fetchTerms( { search } );
 	}
 

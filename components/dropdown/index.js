@@ -65,6 +65,7 @@ class Dropdown extends Component {
 			className,
 			contentClassName,
 			expandOnMobile,
+			headerTitle,
 		} = this.props;
 
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
@@ -84,6 +85,7 @@ class Dropdown extends Component {
 							onClose={ this.close }
 							onClickOutside={ this.clickOutside }
 							expandOnMobile={ expandOnMobile }
+							headerTitle={ headerTitle }
 						>
 							{ renderContent( args ) }
 						</Popover>

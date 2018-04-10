@@ -3,7 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { concatChildren } from '@wordpress/element';
-import { Toolbar } from '@wordpress/components';
+import { PanelBody, Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -121,26 +121,27 @@ export const settings = {
 			),
 			isSelected && (
 				<InspectorControls key="inspector">
-					<h3>{ __( 'Heading Settings' ) }</h3>
-					<p>{ __( 'Level' ) }</p>
-					<Toolbar
-						controls={
-							'123456'.split( '' ).map( ( level ) => ( {
-								icon: 'heading',
-								title: sprintf( __( 'Heading %s' ), level ),
-								isActive: 'H' + level === nodeName,
-								onClick: () => setAttributes( { nodeName: 'H' + level } ),
-								subscript: level,
-							} ) )
-						}
-					/>
-					<p>{ __( 'Text Alignment' ) }</p>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
+					<PanelBody title={ __( 'Heading Settings' ) }>
+						<p>{ __( 'Level' ) }</p>
+						<Toolbar
+							controls={
+								'123456'.split( '' ).map( ( level ) => ( {
+									icon: 'heading',
+									title: sprintf( __( 'Heading %s' ), level ),
+									isActive: 'H' + level === nodeName,
+									onClick: () => setAttributes( { nodeName: 'H' + level } ),
+									subscript: level,
+								} ) )
+							}
+						/>
+						<p>{ __( 'Text Alignment' ) }</p>
+						<AlignmentToolbar
+							value={ align }
+							onChange={ ( nextAlign ) => {
+								setAttributes( { align: nextAlign } );
+							} }
+						/>
+					</PanelBody>
 				</InspectorControls>
 			),
 			<RichText

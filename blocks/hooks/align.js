@@ -7,7 +7,7 @@ import { assign, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getWrapperDisplayName } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import BlockControls from '../block-controls';
 import BlockAlignmentToolbar from '../block-alignment-toolbar';
@@ -71,8 +71,8 @@ export function getBlockValidAlignments( blockName ) {
  * @param  {Function} BlockEdit Original component
  * @return {Function}           Wrapped component
  */
-export function withToolbarControls( BlockEdit ) {
-	const WrappedBlockEdit = ( props ) => {
+export const withToolbarControls = createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
 		const validAlignments = getBlockValidAlignments( props.name );
 
 		const updateAlignment = ( nextAlign ) => props.setAttributes( { align: nextAlign } );
@@ -90,10 +90,7 @@ export function withToolbarControls( BlockEdit ) {
 			<BlockEdit key="edit" { ...props } />,
 		];
 	};
-	WrappedBlockEdit.displayName = getWrapperDisplayName( BlockEdit, 'align' );
-
-	return WrappedBlockEdit;
-}
+}, 'withToolbarControls' );
 
 /**
  * Override the default block element to add alignment wrapper props.
@@ -101,8 +98,8 @@ export function withToolbarControls( BlockEdit ) {
  * @param  {Function} BlockListBlock Original component
  * @return {Function}                Wrapped component
  */
-export function withAlign( BlockListBlock ) {
-	const WrappedComponent = ( props ) => {
+export const withAlign = createHigherOrderComponent( ( BlockListBlock ) => {
+	return ( props ) => {
 		const { align } = props.block.attributes;
 		const validAlignments = getBlockValidAlignments( props.block.name );
 
@@ -113,11 +110,7 @@ export function withAlign( BlockListBlock ) {
 
 		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
 	};
-
-	WrappedComponent.displayName = getWrapperDisplayName( BlockListBlock, 'align' );
-
-	return WrappedComponent;
-}
+}, 'withAlign' );
 
 /**
  * Override props assigned to save component to inject alignment class name if

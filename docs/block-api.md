@@ -250,6 +250,7 @@ transforms: {
 ```
 {% end %}
 
+To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 #### useOnce (optional)
 
@@ -279,14 +280,14 @@ anchor: true,
 - `customClassName` (default `true`): This property adds a field to define a custom className for the block's wrapper.
 
 ```js
-// Remove the support for a the custom className .
+// Remove the support for the custom className.
 customClassName: false,
 ```
 
 - `className` (default `true`): By default, Gutenberg adds a class with the form `.wp-block-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
 
 ```js
-// Remove the support for a the generated className .
+// Remove the support for the generated className.
 className: false,
 ```
 

@@ -12,6 +12,8 @@ import {
 	cloneBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
+	getBlockTransforms,
+	findTransform,
 } from '../factory';
 import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
 
@@ -183,6 +185,43 @@ describe( 'block factory', () => {
 
 			expect( clonedBlock.innerBlocks ).toHaveLength( 1 );
 			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toHaveProperty( 'align' );
+		} );
+
+		it( 'should clone innerBlocks if innerBlocks are not passed', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					isDifferent: {
+						type: 'boolean',
+						default: false,
+					},
+				},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+			const block = deepFreeze(
+				createBlock(
+					'core/test-block',
+					{ align: 'left' },
+					[
+						createBlock( 'core/test-block', { align: 'right' } ),
+						createBlock( 'core/test-block', { align: 'left' } ),
+					],
+				)
+			);
+
+			const clonedBlock = cloneBlock( block );
+
+			expect( clonedBlock.innerBlocks ).toHaveLength( 2 );
+			expect( clonedBlock.innerBlocks[ 0 ].uid ).not.toBe( block.innerBlocks[ 0 ].uid );
+			expect( clonedBlock.innerBlocks[ 0 ].attributes ).not.toBe( block.innerBlocks[ 0 ].attributes );
+			expect( clonedBlock.innerBlocks[ 0 ].attributes ).toEqual( block.innerBlocks[ 0 ].attributes );
+			expect( clonedBlock.innerBlocks[ 1 ].uid ).not.toBe( block.innerBlocks[ 1 ].uid );
+			expect( clonedBlock.innerBlocks[ 1 ].attributes ).not.toBe( block.innerBlocks[ 1 ].attributes );
+			expect( clonedBlock.innerBlocks[ 1 ].attributes ).toEqual( block.innerBlocks[ 1 ].attributes );
 		} );
 	} );
 
@@ -697,6 +736,105 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 1 ].attributes ).toEqual( {
 				value: 'smoked ribs',
 			} );
+		} );
+	} );
+
+	describe( 'getBlockTransforms', () => {
+		beforeEach( () => {
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/transform-from-text-block-1', {
+				transforms: {
+					from: [ {
+						blocks: [ 'core/text-block' ],
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/transform-from-text-block-2', {
+				transforms: {
+					from: [ {
+						blocks: [ 'core/text-block' ],
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated text block',
+			} );
+		} );
+
+		it( 'should return all block types of direction', () => {
+			const transforms = getBlockTransforms( 'from' );
+
+			expect( transforms ).toEqual( [
+				{
+					blocks: [ 'core/text-block' ],
+					blockName: 'core/transform-from-text-block-1',
+				},
+				{
+					blocks: [ 'core/text-block' ],
+					blockName: 'core/transform-from-text-block-2',
+				},
+			] );
+		} );
+
+		it( 'should return empty array if no block type by name', () => {
+			const transforms = getBlockTransforms( 'from', 'core/not-exists' );
+
+			expect( transforms ).toEqual( [] );
+		} );
+
+		it( 'should return empty array if no defined transforms', () => {
+			const transforms = getBlockTransforms( 'to', 'core/transform-from-text-block-1' );
+
+			expect( transforms ).toEqual( [] );
+		} );
+
+		it( 'should return single block type transforms of direction', () => {
+			const transforms = getBlockTransforms( 'from', 'core/transform-from-text-block-1' );
+
+			expect( transforms ).toEqual( [
+				{
+					blocks: [ 'core/text-block' ],
+					blockName: 'core/transform-from-text-block-1',
+				},
+			] );
+		} );
+	} );
+
+	describe( 'findTransform', () => {
+		const transforms = [
+			{
+				blocks: [ 'core/text-block' ],
+				priority: 20,
+				blockName: 'core/transform-from-text-block-1',
+			},
+			{
+				blocks: [ 'core/text-block' ],
+				blockName: 'core/transform-from-text-block-3',
+				priority: 5,
+			},
+			{
+				blocks: [ 'core/text-block' ],
+				blockName: 'core/transform-from-text-block-2',
+			},
+		];
+
+		it( 'should return highest priority (lowest numeric value) transform', () => {
+			const transform = findTransform( transforms, () => true );
+
+			expect( transform ).toEqual( {
+				blocks: [ 'core/text-block' ],
+				blockName: 'core/transform-from-text-block-3',
+				priority: 5,
+			} );
+		} );
+
+		it( 'should return null if no matching transform', () => {
+			const transform = findTransform( transforms, () => false );
+
+			expect( transform ).toBe( null );
 		} );
 	} );
 } );
