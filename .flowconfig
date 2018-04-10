@@ -48,6 +48,9 @@
 <PROJECT_ROOT>/gutenberg/node_modules/cypress/.*
 <PROJECT_ROOT>/gutenberg/node_modules/config-chain/.*
 
+; Mirror some ignores from Gutenberg tools
+<PROJECT_ROOT>/node_modules/config-chain/.*
+
 ; Hack to make Flow works on OS X with a RN project
 <PROJECT_ROOT>/node_modules/metro/.*
 <PROJECT_ROOT>/node_modules/react-native/.*
