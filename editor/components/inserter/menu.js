@@ -341,17 +341,17 @@ export class InserterMenu extends Component {
 
 export default compose(
 	withContext( 'editor' )( ( settings ) => {
-		const { blockTypes } = settings;
+		const { allowedBlockTypes } = settings;
 
 		return {
-			enabledBlockTypes: blockTypes,
+			allowedBlockTypes,
 		};
 	} ),
 	connect(
-		( state, ownProps ) => {
+		( state, { allowedBlockTypes } ) => {
 			return {
-				items: getInserterItems( state, ownProps.enabledBlockTypes ),
-				frecentItems: getFrecentInserterItems( state, ownProps.enabledBlockTypes ),
+				items: getInserterItems( state, allowedBlockTypes ),
+				frecentItems: getFrecentInserterItems( state, allowedBlockTypes ),
 			};
 		},
 		{ fetchSharedBlocks }

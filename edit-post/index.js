@@ -13,7 +13,6 @@ import Layout from './components/layout';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 
-import PluginSidebar from './components/plugin-sidebar';
 import PluginMoreMenuItem from './components/plugin-more-menu-item';
 
 /**
@@ -82,6 +81,7 @@ export function initializeEditor( id, post, settings ) {
 }
 
 export const __experimental = {
-	PluginSidebar,
 	PluginMoreMenuItem,
 };
+
+export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
