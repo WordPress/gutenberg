@@ -133,7 +133,7 @@ function gutenberg_shim_fix_api_request_plain_permalinks( $scripts ) {
 			return deferred.promise();
 		}
 
-		return previousApiRequest(request);
+		return previousApiRequest.call( previousApiRequest, request );
 	}
 	wp.apiRequest.transport = previousApiRequest.transport;
 	wp.apiRequest.buildAjaxOptions = previousApiRequest.buildAjaxOptions;
