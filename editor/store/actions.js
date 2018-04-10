@@ -286,6 +286,33 @@ export function insertBlocks( blocks, index, rootUID ) {
 }
 
 /**
+ * Returns an action object used in signalling that an inline token should be
+ * inserted.
+ *
+ * @param {Object}  token Token object to insert.
+ *
+ * @return {Object} Action object.
+ */
+export function insertInline( token ) {
+	return {
+		type: 'INSERT_INLINE',
+		token,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that inline token insertion is
+ * complete.
+ *
+ * @return {Object} Action object.
+ */
+export function completeInlineInsert() {
+	return {
+		type: 'INLINE_INSERT_COMPLETE',
+	};
+}
+
+/**
  * Returns an action object used in signalling that the insertion point should
  * be shown.
  *

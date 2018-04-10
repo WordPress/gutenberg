@@ -791,6 +791,26 @@ export function isInlineInsertionPointVisible( state = false, action ) {
 }
 
 /**
+ * Reducer returning a token object for inline insertion.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+*/
+export function inlineToken( state = null, action ) {
+	switch ( action.type ) {
+		case 'INSERT_INLINE':
+			return action.token;
+
+		case 'INLINE_INSERT_COMPLETE':
+			return null;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning whether the post blocks match the defined template or not.
  *
  * @param {Object} state  Current state.
@@ -1087,6 +1107,7 @@ export default optimist( combineReducers( {
 	blockListSettings,
 	isInsertionPointVisible,
 	isInlineInsertionPointVisible,
+	inlineToken,
 	preferences,
 	saving,
 	notices,

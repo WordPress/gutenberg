@@ -1064,6 +1064,17 @@ export function isInlineInsertionPointVisible( state ) {
 }
 
 /**
+ * Returns the token object for inline insertion.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Token object with `type` and properties for the `type`.
+ */
+export function getInlineToken( state ) {
+	return state.inlineToken;
+}
+
+/**
  * Returns whether the blocks matches the template or not.
  *
  * @param {boolean} state
