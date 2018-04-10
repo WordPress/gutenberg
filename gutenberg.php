@@ -527,11 +527,3 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
 function gutenberg_add_admin_body_class( $classes ) {
 	return "$classes gutenberg-editor-page";
 }
-
-if (
-	defined( 'GUTENBERG_DEVELOPMENT_MODE' ) &&
-	GUTENBERG_DEVELOPMENT_MODE &&
-	isset( $_GET['e2e_test_plugin'] )
-) {
-	require_once 'test/e2e/test-plugins/' . $_GET['e2e_test_plugin'] . '.php';
-}
