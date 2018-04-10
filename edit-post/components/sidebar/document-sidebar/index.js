@@ -18,6 +18,8 @@ import DocumentOutlinePanel from '../document-outline-panel';
 import MetaBoxes from '../../meta-boxes';
 import SettingsHeader from '../settings-header';
 import Sidebar from '../';
+import ArticlesPanel from '../articles-panel';
+import SettingsPanel from '../settings-panel';
 
 import { getPanelItems } from '../panel-items.js';
 
