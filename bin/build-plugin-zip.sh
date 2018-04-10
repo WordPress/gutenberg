@@ -80,7 +80,7 @@ npm install
 status "Generating build..."
 npm run build
 status "Generating PHP file for wordpress.org to parse translations..."
-npm run pot-to-php
+npx pot-to-php ./languages/gutenberg.pot ./languages/gutenberg-translations.php gutenberg
 
 # Remove any existing zip file
 rm -f gutenberg.zip

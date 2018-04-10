@@ -49,6 +49,7 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 				<PanelBody
 					className="editor-block-inspector__advanced"
 					title={ __( 'Advanced' ) }
+					initialOpen={ false }
 				>
 					{ fills }
 				</PanelBody>
