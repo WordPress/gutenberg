@@ -8,7 +8,7 @@ export { createBlock } from // getPossibleBlockTransformations,
 // export { default as parse, getBlockAttributes } from './parser';
 // export { default as rawHandler } from './raw-handling';
 export {
-// 	default as serialize,
+	default as serialize,
 	getBlockContent,
 // 	getBlockDefaultClassname,
 // 	getSaveElement,
