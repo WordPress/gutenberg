@@ -6,22 +6,22 @@
  */
 
 function register_core_cover_image_block() {
-	wp_register_script( 'core-cover-image-block', gutenberg_url( '/build/blocks/library/coverImage.js' ) );
+	wp_register_script( 'core-cover-image-block', gutenberg_url( '/build/__block_coverImage.js' ) );
 
 	wp_register_style(
 		'core-cover-image-block',
-		gutenberg_url( '/build/blocks/library/coverImage.css' ),
+		gutenberg_url( '/build/__block_coverImage.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/coverImage.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_coverImage.css' )
 	);
 
 	wp_style_add_data( 'core-cover-image-block', 'rtl', 'replace' );
 
 	wp_register_style(
 		'core-cover-image-block-editor',
-		gutenberg_url( '/build/blocks/library/coverImage_editor.css' ),
+		gutenberg_url( '/build/__block_coverImage_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/coverImage_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_coverImage_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-cover-image-block-editor', 'rtl', 'replace' );

@@ -6,13 +6,13 @@
  */
 
 function register_core_heading_block() {
-	wp_register_script( 'core-heading-block', gutenberg_url( '/build/blocks/library/heading.js' ) );
+	wp_register_script( 'core-heading-block', gutenberg_url( '/build/__block_heading.js' ) );
 
 	wp_register_style(
 		'core-heading-block-editor',
-		gutenberg_url( '/build/blocks/library/heading_editor.css' ),
+		gutenberg_url( '/build/__block_heading_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/heading_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_heading_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-heading-block-editor', 'rtl', 'replace' );

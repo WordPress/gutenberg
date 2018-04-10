@@ -66,22 +66,22 @@ function gutenberg_render_core_latest_posts_block( $attributes ) {
 }
 
 function register_core_latest_posts_block() {
-	wp_register_script( 'core-latest-posts-block', gutenberg_url( '/build/blocks/library/latestPosts.js' ) );
+	wp_register_script( 'core-latest-posts-block', gutenberg_url( '/build/__block_latestPosts.js' ) );
 
 	wp_register_style(
 		'core-latest-posts-block',
-		gutenberg_url( '/build/blocks/library/latestPosts.css' ),
+		gutenberg_url( '/build/__block_latestPosts.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/latestPosts.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_latestPosts.css' )
 	);
 
 	wp_style_add_data( 'core-latest-posts-block', 'rtl', 'replace' );
 
 	wp_register_style(
 		'core-latest-posts-block-editor',
-		gutenberg_url( '/build/blocks/library/latestPosts_editor.css' ),
+		gutenberg_url( '/build/__block_latestPosts_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/latestPosts_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_latestPosts_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-latest-posts-block-editor', 'rtl', 'replace' );

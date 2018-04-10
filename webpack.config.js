@@ -122,7 +122,8 @@ const config = {
 
 	entry: Object.assign(
 		entryPointNames.reduce( ( memo, path ) => {
-			const name = camelCaseDash( path );
+			let name = camelCaseDash( path );
+			name = name.replace( 'blocks/library/', '__block_' );
 			memo[ name ] = `./${ path }`;
 			return memo;
 		}, {} ),

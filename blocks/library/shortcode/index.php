@@ -6,13 +6,13 @@
  */
 
 function register_core_shortcode_block() {
-	wp_register_script( 'core-shortcode-block', gutenberg_url( '/build/blocks/library/shortcode.js' ) );
+	wp_register_script( 'core-shortcode-block', gutenberg_url( '/build/__block_shortcode.js' ) );
 
 	wp_register_style(
 		'core-shortcode-block-editor',
-		gutenberg_url( '/build/blocks/library/shortcode_editor.css' ),
+		gutenberg_url( '/build/__block_shortcode_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/shortcode_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_shortcode_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-shortcode-block-editor', 'rtl', 'replace' );

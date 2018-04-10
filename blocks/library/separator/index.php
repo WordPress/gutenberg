@@ -6,13 +6,13 @@
  */
 
 function register_core_separator_block() {
-	wp_register_script( 'core-separator-block', gutenberg_url( '/build/blocks/library/separator.js' ) );
+	wp_register_script( 'core-separator-block', gutenberg_url( '/build/__block_separator.js' ) );
 
 	wp_register_style(
 		'core-separator-block',
-		gutenberg_url( '/build/blocks/library/separator.css' ),
+		gutenberg_url( '/build/__block_separator.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/separator.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_separator.css' )
 	);
 
 	wp_style_add_data( 'core-separator-block', 'rtl', 'replace' );

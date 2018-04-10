@@ -6,13 +6,13 @@
  */
 
 function register_core_more_block() {
-	wp_register_script( 'core-more-block', gutenberg_url( '/build/blocks/library/more.js' ) );
+	wp_register_script( 'core-more-block', gutenberg_url( '/build/__block_more.js' ) );
 
 	wp_register_style(
 		'core-more-block-editor',
-		gutenberg_url( '/build/blocks/library/more_editor.css' ),
+		gutenberg_url( '/build/__block_more_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/more_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_more_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-more-block-editor', 'rtl', 'replace' );

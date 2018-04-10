@@ -6,13 +6,13 @@
  */
 
 function register_core_nextpage_block() {
-	wp_register_script( 'core-nextpage-block', gutenberg_url( '/build/blocks/library/nextpage.js' ) );
+	wp_register_script( 'core-nextpage-block', gutenberg_url( '/build/__block_nextpage.js' ) );
 
 	wp_register_style(
 		'core-nextpage-block-editor',
-		gutenberg_url( '/build/blocks/library/nextpage_editor.css' ),
+		gutenberg_url( '/build/__block_nextpage_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/nextpage_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_nextpage_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-nextpage-block-editor', 'rtl', 'replace' );

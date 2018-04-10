@@ -6,22 +6,22 @@
  */
 
 function register_core_gallery_block() {
-	wp_register_script( 'core-gallery-block', gutenberg_url( '/build/blocks/library/gallery.js' ) );
+	wp_register_script( 'core-gallery-block', gutenberg_url( '/build/__block_gallery.js' ) );
 
 	wp_register_style(
 		'core-gallery-block',
-		gutenberg_url( '/build/blocks/library/gallery.css' ),
+		gutenberg_url( '/build/__block_gallery.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/gallery.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_gallery.css' )
 	);
 
 	wp_style_add_data( 'core-gallery-block', 'rtl', 'replace' );
 
 	wp_register_style(
 		'core-gallery-block-editor',
-		gutenberg_url( '/build/blocks/library/gallery_editor.css' ),
+		gutenberg_url( '/build/__block_gallery_editor.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/blocks/library/gallery_editor.css' )
+		filemtime( gutenberg_dir_path() . 'build/__block_gallery_editor.css' )
 	);
 	
 	wp_style_add_data( 'core-gallery-block-editor', 'rtl', 'replace' );
