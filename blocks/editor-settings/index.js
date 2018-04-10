@@ -5,11 +5,12 @@ import { createContext } from '@wordpress/element';
 
 /**
  * The default editor settings
- * You can override any default settings when calling initializeEditor
  *
- *  alignWide   boolean   Enable/Disable Wide/Full Alignments
- *
- * @var {Object} DEFAULT_SETTINGS
+ *  alignWide         boolean        Enable/Disable Wide/Full Alignments
+ *  colors            Array          Palette colors
+ *  maxWidth          number         Max width to constraint resizing
+ *  blockTypes        boolean|Array  Allowed block types
+ *  hasFixedToolbar   boolean        Whether or not the editor toolbar is fixed
  */
 const DEFAULT_SETTINGS = {
 	alignWide: false,
