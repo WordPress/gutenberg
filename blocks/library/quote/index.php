@@ -6,7 +6,11 @@
  */
 
 function register_core_quote_block() {
-	wp_register_script( 'core-quote-block', gutenberg_url( '/build/__block_quote.js' ) );
+	wp_register_script(
+		'core-quote-block',
+		gutenberg_url( '/build/__block_quote.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components' )
+	);
 
 	wp_register_style(
 		'core-quote-block',

@@ -6,7 +6,11 @@
  */
 
 function register_core_separator_block() {
-	wp_register_script( 'core-separator-block', gutenberg_url( '/build/__block_separator.js' ) );
+	wp_register_script(
+		'core-separator-block',
+		gutenberg_url( '/build/__block_separator.js' ),
+		array( 'wp-blocks', 'wp-i18n' )
+	);
 
 	wp_register_style(
 		'core-separator-block',

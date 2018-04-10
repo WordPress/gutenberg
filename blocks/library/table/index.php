@@ -6,7 +6,11 @@
  */
 
 function register_core_table_block() {
-	wp_register_script( 'core-table-block', gutenberg_url( '/build/__block_table.js' ) );
+	wp_register_script(
+		'core-table-block',
+		gutenberg_url( '/build/__block_table.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element' )
+	);
 
 	wp_register_style(
 		'core-table-block',

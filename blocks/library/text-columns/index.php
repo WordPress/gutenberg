@@ -6,7 +6,11 @@
  */
 
 function register_core_text_columns_block() {
-	wp_register_script( 'core-text-columns-block', gutenberg_url( '/build/__block_textColumns.js' ) );
+	wp_register_script(
+		'core-text-columns-block',
+		gutenberg_url( '/build/__block_textColumns.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components' )
+	);
 
 	wp_register_style(
 		'core-text-columns-block',

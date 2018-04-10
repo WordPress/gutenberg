@@ -6,7 +6,11 @@
  */
 
 function register_core_embed_block() {
-	wp_register_script( 'core-embed-block', gutenberg_url( '/build/__block_embed.js' ) );
+	wp_register_script(
+		'core-embed-block',
+		gutenberg_url( '/build/__block_embed.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element' )
+	);
 
 	wp_register_style(
 		'core-embed-block',

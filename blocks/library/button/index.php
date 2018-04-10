@@ -6,7 +6,11 @@
  */
 
 function register_core_button_block() {
-	wp_register_script( 'core-button-block', gutenberg_url( '/build/__block_button.js' ) );
+	wp_register_script( 
+		'core-button-block',
+		gutenberg_url( '/build/__block_button.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element' )
+	);
 
 	wp_register_style(
 		'core-button-block',

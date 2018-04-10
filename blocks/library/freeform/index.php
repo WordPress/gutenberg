@@ -6,7 +6,11 @@
  */
 
 function register_core_freeform_block() {
-	wp_register_script( 'core-freeform-block', gutenberg_url( '/build/__block_freeform.js' ) );
+	wp_register_script(
+		'core-freeform-block',
+		gutenberg_url( '/build/__block_freeform.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-utils' )
+	);
 
 	wp_register_style(
 		'core-freeform-block-editor',

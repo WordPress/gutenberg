@@ -6,7 +6,11 @@
  */
 
 function register_core_gallery_block() {
-	wp_register_script( 'core-gallery-block', gutenberg_url( '/build/__block_gallery.js' ) );
+	wp_register_script(
+		'core-gallery-block',
+		gutenberg_url( '/build/__block_gallery.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element', 'wp-utils', 'wp-data' )
+	);
 
 	wp_register_style(
 		'core-gallery-block',

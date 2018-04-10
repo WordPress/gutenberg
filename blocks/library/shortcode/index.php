@@ -6,7 +6,11 @@
  */
 
 function register_core_shortcode_block() {
-	wp_register_script( 'core-shortcode-block', gutenberg_url( '/build/__block_shortcode.js' ) );
+	wp_register_script(
+		'core-shortcode-block',
+		gutenberg_url( '/build/__block_shortcode.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element' )
+	);
 
 	wp_register_style(
 		'core-shortcode-block-editor',

@@ -6,7 +6,11 @@
  */
 
 function register_core_preformatted_block() {
-	wp_register_script( 'core-preformatted-block', gutenberg_url( '/build/__block_preformatted.js' ) );
+	wp_register_script(
+		'core-preformatted-block',
+		gutenberg_url( '/build/__block_preformatted.js' ),
+		array( 'wp-blocks', 'wp-i18n' )
+	);
 
 	wp_register_style(
 		'core-preformatted-block-editor',

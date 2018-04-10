@@ -6,7 +6,11 @@
  */
 
 function register_core_list_block() {
-	wp_register_script( 'core-list-block', gutenberg_url( '/build/__block_list.js' ) );
+	wp_register_script(
+		'core-list-block',
+		gutenberg_url( '/build/__block_list.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-element' )
+	);
 
 	wp_register_style(
 		'core-list-block-editor',

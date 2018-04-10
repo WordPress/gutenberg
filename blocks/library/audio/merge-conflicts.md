@@ -1,1 +1,0 @@
-both modified:   test/unit/setup-wp-aliases.js

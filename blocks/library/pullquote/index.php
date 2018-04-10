@@ -6,7 +6,11 @@
  */
 
 function register_core_pullquote_block() {
-	wp_register_script( 'core-pullquote-block', gutenberg_url( '/build/__block_pullquote.js' ) );
+	wp_register_script(
+		'core-pullquote-block',
+		gutenberg_url( '/build/__block_pullquote.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components' )
+	);
 
 	wp_register_style(
 		'core-pullquote-block',

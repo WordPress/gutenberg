@@ -6,7 +6,11 @@
  */
 
 function register_core_subhead_block() {
-	wp_register_script( 'core-subhead-block', gutenberg_url( '/build/__block_subhead.js' ) );
+	wp_register_script(
+		'core-subhead-block',
+		gutenberg_url( '/build/__block_subhead.js' ),
+		array( 'wp-blocks', 'wp-i18n' )
+	);
 
 	wp_register_style(
 		'core-subhead-block',

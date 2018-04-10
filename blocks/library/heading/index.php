@@ -6,7 +6,11 @@
  */
 
 function register_core_heading_block() {
-	wp_register_script( 'core-heading-block', gutenberg_url( '/build/__block_heading.js' ) );
+	wp_register_script(
+		'core-heading-block',
+		gutenberg_url( '/build/__block_heading.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element' )
+	);
 
 	wp_register_style(
 		'core-heading-block-editor',

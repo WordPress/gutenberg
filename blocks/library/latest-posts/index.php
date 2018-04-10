@@ -66,7 +66,11 @@ function gutenberg_render_core_latest_posts_block( $attributes ) {
 }
 
 function register_core_latest_posts_block() {
-	wp_register_script( 'core-latest-posts-block', gutenberg_url( '/build/__block_latestPosts.js' ) );
+	wp_register_script(
+		'core-latest-posts-block',
+		gutenberg_url( '/build/__block_latestPosts.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element', 'wp-utils' )
+	);
 
 	wp_register_style(
 		'core-latest-posts-block',

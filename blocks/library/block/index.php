@@ -33,7 +33,11 @@ function gutenberg_render_core_reusable_block( $attributes ) {
 }
 
 function register_core_reusable_block() {
-	wp_register_script( 'core-reusable-block', gutenberg_url( '/build/__block_block.js' ) );
+	wp_register_script(
+		'core-reusable-block',
+		gutenberg_url( '/build/__block_block.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element', 'wp-data', 'wp-utils' )
+	);
 
 	wp_register_style(
 		'core-reusable-block-editor',

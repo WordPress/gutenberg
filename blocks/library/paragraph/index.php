@@ -6,7 +6,11 @@
  */
 
 function register_core_paragraph_block() {
-	wp_register_script( 'core-paragraph-block', gutenberg_url( '/build/__block_paragraph.js' ) );
+	wp_register_script(
+		'core-paragraph-block',
+		gutenberg_url( '/build/__block_paragraph.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element' )
+	);
 
 	wp_register_style(
 		'core-paragraph-block',

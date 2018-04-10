@@ -85,7 +85,11 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 }
 
 function register_core_categories_block() {
-	wp_register_script( 'core-categories-block', gutenberg_url( '/build/__block_categories.js' ) );
+	wp_register_script(
+		'core-categories-block',
+		gutenberg_url( '/build/__block_categories.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element', 'wp-data' )
+	);
 
 	wp_register_style(
 		'core-categories-block',

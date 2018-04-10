@@ -6,7 +6,11 @@
  */
 
 function register_core_verse_block() {
-	wp_register_script( 'core-verse-block', gutenberg_url( '/build/__block_verse.js' ) );
+	wp_register_script(
+		'core-verse-block',
+		gutenberg_url( '/build/__block_verse.js' ),
+		array( 'wp-blocks', 'wp-i18n' )
+	);
 
 	wp_register_style(
 		'core-verse-block-editor',

@@ -6,7 +6,11 @@
  */
 
 function register_core_cover_image_block() {
-	wp_register_script( 'core-cover-image-block', gutenberg_url( '/build/__block_coverImage.js' ) );
+	wp_register_script(
+		'core-cover-image-block',
+		gutenberg_url( '/build/__block_coverImage.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components' )
+	);
 
 	wp_register_style(
 		'core-cover-image-block',

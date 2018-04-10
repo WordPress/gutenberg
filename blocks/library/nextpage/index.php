@@ -6,7 +6,11 @@
  */
 
 function register_core_nextpage_block() {
-	wp_register_script( 'core-nextpage-block', gutenberg_url( '/build/__block_nextpage.js' ) );
+	wp_register_script(
+		'core-nextpage-block',
+		gutenberg_url( '/build/__block_nextpage.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-element' )
+	);
 
 	wp_register_style(
 		'core-nextpage-block-editor',
