@@ -2527,7 +2527,7 @@ describe( 'selectors', () => {
 			};
 
 			const blockTypes = getBlockTypes().filter( blockType => ! blockType.isPrivate );
-			expect( getInserterItems( state ) ).toHaveLength( blockTypes.length );
+			expect( getInserterItems( state, true ) ).toHaveLength( blockTypes.length );
 		} );
 
 		it( 'should properly list a regular block type', () => {

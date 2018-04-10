@@ -47,16 +47,16 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 
 export default compose(
 	withContext( 'editor' )( ( settings ) => {
-		const { templateLock, blockTypes } = settings;
+		const { templateLock, allowedBlockTypes } = settings;
 
 		return {
 			isLocked: !! templateLock,
-			enabledBlockTypes: blockTypes,
+			allowedBlockTypes,
 		};
 	} ),
 	connect(
-		( state, { enabledBlockTypes } ) => ( {
-			items: getFrecentInserterItems( state, enabledBlockTypes, 4 ),
+		( state, { allowedBlockTypes } ) => ( {
+			items: getFrecentInserterItems( state, allowedBlockTypes, 4 ),
 		} )
 	),
 	withDispatch( ( dispatch, ownProps ) => {

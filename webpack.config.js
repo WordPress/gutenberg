@@ -79,7 +79,6 @@ const entryPointNames = [
 	'date',
 	'editor',
 	'element',
-	'i18n',
 	'utils',
 	'data',
 	'viewport',
@@ -93,6 +92,7 @@ const entryPointNames = [
 
 const packageNames = [
 	'hooks',
+	'i18n',
 ];
 
 const coreGlobals = [
