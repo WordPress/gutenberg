@@ -25,11 +25,11 @@ const MoreMenu = () => (
 				aria-expanded={ isOpen }
 			/>
 		) }
-		renderContent={ ( args ) => (
-			<MoreMenuContextProvider value={ args }>
+		renderContent={ ( { onClose } ) => (
+			<MoreMenuContextProvider value={ { onClose } }>
 				<div className="edit-post-more-menu__content">
-					<ModeSwitcher onSelect={ args.onClose } />
-					<FixedToolbarToggle onToggle={ args.onClose } />
+					<ModeSwitcher onSelect={ onClose } />
+					<FixedToolbarToggle onToggle={ onClose } />
 					<PluginMoreMenuGroup.Slot />
 					<MenuGroup
 						label={ __( 'Tools' ) }

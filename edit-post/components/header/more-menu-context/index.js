@@ -8,7 +8,7 @@ import { noop } from 'lodash';
  */
 import { createContext, createHigherOrderComponent } from '@wordpress/element';
 
-const MoreMenuContext = createContext( { onMenuClose: noop } );
+const MoreMenuContext = createContext( { onClose: noop } );
 
 export const MoreMenuContextProvider = MoreMenuContext.Provider;
 

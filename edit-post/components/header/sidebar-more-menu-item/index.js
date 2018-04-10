@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose, createHigherOrderComponent } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { MenuItem } from '@wordpress/components';
+import { PluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -21,21 +22,37 @@ const SidebarMoreMenuItem = ( { children, isSelected, icon, onClick } ) => (
 );
 
 export default compose(
-	withMoreMenuContext,
+	createHigherOrderComponent(
+		( OriginalComponent ) => ( props ) => (
+			<PluginContext.Consumer>
+				{ ( { pluginName } ) => (
+					<OriginalComponent
+						{ ...props }
+						pluginName={ pluginName }
+					/>
+				) }
+			</PluginContext.Consumer>
+		),
+		'withPluginContext'
+	),
 	withSelect( ( select, ownProps ) => {
-		const { target } = ownProps;
+		const { pluginName, target } = ownProps;
+		const sidebarName = `${ pluginName }/${ target }`;
+
 		return {
-			isSelected: select( 'core/edit-post' ).getActiveGeneralSidebarName() === target,
+			isSelected: select( 'core/edit-post' ).getActiveGeneralSidebarName() === sidebarName,
+			sidebarName,
 		};
 	} ),
-	withDispatch( ( dispatch, { isSelected, moreMenuContext, target } ) => {
+	withMoreMenuContext,
+	withDispatch( ( dispatch, { isSelected, moreMenuContext, sidebarName } ) => {
 		const {
 			closeGeneralSidebar,
 			openGeneralSidebar,
 		} = dispatch( 'core/edit-post' );
 		const onClick = isSelected ?
 			closeGeneralSidebar :
-			() => openGeneralSidebar( target );
+			() => openGeneralSidebar( sidebarName );
 		return {
 			onClick: compose( onClick, moreMenuContext.onClose ),
 		};
