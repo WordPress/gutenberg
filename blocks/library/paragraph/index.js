@@ -76,7 +76,7 @@ class ParagraphBlock extends Component {
 	onReplace( blocks ) {
 		const { attributes, onReplace } = this.props;
 		onReplace( blocks.map( ( block, index ) => (
-			index === 0 && block.name === name ?
+			index === 0 && block.name === 'core/paragraph' ?
 				{ ...block,
 					attributes: {
 						...attributes,

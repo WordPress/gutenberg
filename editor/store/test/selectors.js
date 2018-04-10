@@ -7,7 +7,7 @@ import { filter, property, union } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, unregisterBlockType, registerCoreBlocks, getBlockTypes } from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 
 /**
