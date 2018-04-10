@@ -135,6 +135,15 @@
 	&:first-of-type {
 		margin-top: 0;
 	}
+	
+	.blocks-base-control {
+		width: 100%;
+	}
+	
+	.blocks-base-control:last-child,
+	.blocks-toggle-control > .blocks-base-control__label {
+		margin-bottom: 0;
+	}
 }
 
 .components-panel .circle-picker {
