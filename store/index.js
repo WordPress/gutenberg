@@ -4,7 +4,6 @@
  */
 
 import { createStore } from 'redux';
-import { DataSource } from 'react-native-recyclerview-list';
 import { reducer } from './reducers';
 
 export type BlockType = {

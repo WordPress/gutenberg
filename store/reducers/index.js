@@ -6,7 +6,7 @@
 import { find, findIndex, reduce } from 'lodash';
 
 import ActionTypes from '../actions/ActionTypes';
-import type { StateType, BlockType } from '../';
+import type { StateType } from '../';
 import type { BlockActionType } from '../actions';
 
 function findBlock( blocks, uid: string ) {
