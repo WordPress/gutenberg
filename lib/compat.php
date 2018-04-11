@@ -316,6 +316,41 @@ function gutenberg_register_rest_api_post_type_capabilities() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities' );
 
 /**
+ * Includes the value for the 'previewable' attribute of a post type resource.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43739
+ *
+ * @param object $post_type Post type object.
+ * @param string $name      Post type name.
+ * @return boolean Whether or not the post type can be previewed.
+ */
+function gutenberg_get_post_type_previewable( $post_type, $name ) {
+	return is_post_type_viewable( $name );
+}
+
+/**
+ * Adds the 'previewable' attribute to the REST API response of a post type.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43739
+ */
+function gutenberg_register_rest_api_post_type_previewable() {
+	register_rest_field( 'type',
+		'previewable',
+		array(
+			'get_callback' => 'gutenberg_get_post_type_previewable',
+			'schema'       => array(
+				'description' => __( 'Whether or not the post type can be previewed', 'gutenberg' ),
+				'type'        => 'boolean',
+				'context'     => array( 'edit' ),
+				'readonly'    => true,
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_previewable' );
+
+
+/**
  * Make sure oEmbed REST Requests apply the WP Embed security mechanism for WordPress embeds.
  *
  * @see  https://core.trac.wordpress.org/ticket/32522
