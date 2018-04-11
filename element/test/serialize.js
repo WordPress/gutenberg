@@ -234,6 +234,12 @@ describe( 'renderNativeComponent()', () => {
 			expect( result ).toBe( '<div>&lt;img/></div>' );
 		} );
 
+		it( 'should not render invalid dangerouslySetInnerHTML', () => {
+			const result = renderNativeComponent( 'div', { dangerouslySetInnerHTML: { __html: undefined } } );
+
+			expect( result ).toBe( '<div></div>' );
+		} );
+
 		it( 'should not escape children with dangerouslySetInnerHTML', () => {
 			const result = renderNativeComponent( 'div', { dangerouslySetInnerHTML: { __html: '<img/>' } } );
 

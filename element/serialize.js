@@ -409,7 +409,8 @@ export function renderNativeComponent( type, props, context = {} ) {
 		// as well.
 		content = renderChildren( [ props.value ], context );
 		props = omit( props, 'value' );
-	} else if ( props.dangerouslySetInnerHTML ) {
+	} else if ( props.dangerouslySetInnerHTML &&
+			typeof props.dangerouslySetInnerHTML.__html === 'string' ) {
 		// Dangerous content is left unescaped.
 		content = props.dangerouslySetInnerHTML.__html;
 	} else if ( typeof props.children !== 'undefined' ) {
