@@ -14,7 +14,7 @@ const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-web
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './[basename]/build/style.css',
+	filename: './build/[name].css',
 } );
 
 // CSS loader for styles specific to block editing.
@@ -25,11 +25,6 @@ const editBlocksCSSPlugin = new ExtractTextPlugin( {
 // CSS loader for each individual block's styles
 const individualBlocksCSSPlugin = new ExtractTextPlugin( {
 	filename: './build/[name].css',
-} );
-
-// CSS loader for common styles specific to blocks in general.
-const commonBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/style.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -159,16 +154,6 @@ const config = {
 			{
 				test: /style\.s?css$/,
 				include: [
-					/blocks/,
-				],
-				exclude: [
-					/blocks\/library/,
-				],
-				use: commonBlocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /style\.s?css$/,
-				include: [
 					/blocks\/library/,
 				],
 				use: individualBlocksCSSPlugin.extract( extractConfig ),
@@ -176,21 +161,20 @@ const config = {
 			{
 				test: /editor\.s?css$/,
 				include: [
-					/blocks/,
+					/blocks\/library/,
 				],
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /\.s?css$/,
 				exclude: [
-					/blocks/,
+					/blocks\/library/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
 		],
 	},
 	plugins: [
-		commonBlocksCSSPlugin,
 		individualBlocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
