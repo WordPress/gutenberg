@@ -446,7 +446,7 @@ add_action( 'rest_api_init', 'gutenberg_add_taxonomy_visibility_field' );
  * @param WP_REST_Request  $request WP REST API request.
  * @return WP_REST_Response Response containing the permalink_template.
  */
-function gutenberg_add_sample_permalink_to_posts( $response, $post, $request ) {
+function gutenberg_add_permalink_template_to_posts( $response, $post, $request ) {
 	if ( 'edit' !== $request['context'] ) {
 		return $response;
 	}
@@ -459,17 +459,18 @@ function gutenberg_add_sample_permalink_to_posts( $response, $post, $request ) {
 	$response->data['permalink_template'] = $sample_permalink[0];
 	return $response;
 }
+
 /**
  * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
  *
  * @param string $post_type The newly registered post type.
  * @return string That same post type.
  */
-function gutenberg_register_sample_permalink_function( $post_type ) {
-	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_sample_permalink_to_posts', 10, 3 );
+function gutenberg_register_permalink_template_function( $post_type ) {
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
 	return $post_type;
 }
-add_filter( 'registered_post_type', 'gutenberg_register_sample_permalink_function' );
+add_filter( 'registered_post_type', 'gutenberg_register_permalink_template_function' );
 
 /**
  * Add an is_viewable flag to the  posttype REST API response.

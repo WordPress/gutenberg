@@ -1539,10 +1539,8 @@ export function isPermalinkEditable( state ) {
  * @return {string} The permalink.
  */
 export function getPermalink( state ) {
-	const {prefix, postName, suffix } = getPermalinkParts( state );
+	const { prefix, postName, suffix } = getPermalinkParts( state );
 	return prefix + postName + suffix;
-
-	return permalinkParts.values().join( '' );
 }
 
 /**
