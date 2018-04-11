@@ -5,6 +5,7 @@
   },
   "plugins": [
     "react",
+    "react-native",
     "wordpress",
     "jsx-a11y",
     "jest"
