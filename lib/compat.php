@@ -134,8 +134,11 @@ function gutenberg_shim_api_request( $scripts ) {
 
 		return previousApiRequest.call( previousApiRequest, request );
 	}
-	wp.apiRequest.transport = previousApiRequest.transport;
-	wp.apiRequest.buildAjaxOptions = previousApiRequest.buildAjaxOptions;
+	for ( var name in previousApiRequest ) {
+		if ( previousApiRequest.hasOwnProperty( name ) ) {
+			wp.apiRequest[ name ] = previousApiRequest[ name ];
+		}
+	}
 
 } )( window.wp, window.wpApiSettings );
 JS;
