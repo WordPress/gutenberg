@@ -21,23 +21,6 @@ export function elementToString( value ) {
 }
 
 /**
- * Transforms a string HTML to its corresponding WP element.
- *
- * @param {string} value HTML.
- *
- * @return {WPElement} Element.
- */
-export function stringToElement( value ) {
-	if ( ! value ) {
-		return [];
-	}
-	const domElement = document.createElement( 'div' );
-	domElement.innerHTML = value;
-
-	return domToElement( domElement.childNodes );
-}
-
-/**
  * Strips out TinyMCE specific attributes and nodes from a WPElement
  *
  * @param {string} type    Element type

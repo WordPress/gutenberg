@@ -14,7 +14,6 @@ import { createElement } from '@wordpress/element';
 import {
 	createTinyMCEElement,
 	elementToString,
-	stringToElement,
 	domToElement,
 	domToString,
 } from '../format';
@@ -64,16 +63,6 @@ describe( 'elementToString', () => {
 			createElement( 'strong', {}, 'content' )
 		);
 		expect( elementToString( element ) ).toBe( '<div class="container"><strong>content</strong></div>' );
-	} );
-} );
-
-describe( 'stringToElement', () => {
-	test( 'should return an empty array', () => {
-		expect( stringToElement( '' ) ).toEqual( [] );
-	} );
-
-	test( 'should return the corresponding element ', () => {
-		expect( stringToElement( '<div class="container"><strong>content</strong></div>' ) ).toMatchSnapshot();
 	} );
 } );
 

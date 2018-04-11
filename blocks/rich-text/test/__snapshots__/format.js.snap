@@ -21,15 +21,3 @@ Array [
   </div>,
 ]
 `;
-
-exports[`stringToElement should return the corresponding element  1`] = `
-Array [
-  <div
-    className="container"
-  >
-    <strong>
-      content
-    </strong>
-  </div>,
-]
-`;
