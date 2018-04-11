@@ -304,7 +304,7 @@
 
 	// Full-wide
 	&[data-align="full"] {
-
+		
 		// compensate for main container padding
 		@include break-small() {
 			margin-left: -$block-side-ui-padding;
@@ -318,6 +318,11 @@
 			@include break-small() {
 				margin-left: -$block-side-ui-padding - $block-padding;
 				margin-right: -$block-side-ui-padding - $block-padding;
+			}
+
+			// this explicitly sets the width of the block, to override the fit-content from the image block
+			figure {
+				width: 100%;
 			}
 		}
 
