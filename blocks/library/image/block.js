@@ -226,6 +226,9 @@ class ImageBlock extends Component {
 							/>
 						) }
 						<div className="blocks-image-dimensions">
+							<p className="blocks-image-dimensions__row">
+								{ __( 'Image Dimensions' ) }
+							</p>
 							<div className="blocks-image-dimensions__row">
 								<TextControl
 									type="number"
