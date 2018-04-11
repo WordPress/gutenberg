@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, FlatList } from 'react-native';
+import { Platform, StyleSheet, Text, View, FlatList } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
@@ -32,7 +32,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
-			dataSource: new DataSource( this.props.blocks, ( item: BlockType, index ) => item.uid ),
+			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.uid ),
 		};
 	}
 
@@ -41,7 +41,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	getDataSourceIndexFromUid( uid: string ) {
-		for ( var i = 0; i < this.state.dataSource.size(); ++i ) {
+		for ( let i = 0; i < this.state.dataSource.size(); ++i ) {
 			const block = this.state.dataSource.get( i );
 			if ( block.uid === uid ) {
 				return i;
@@ -80,14 +80,14 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		// Update datasource UI
 		const index = this.getDataSourceIndexFromUid( uid );
 		const dataSource = this.state.dataSource;
-		var block = dataSource.get( this.getDataSourceIndexFromUid( uid ) );
+		const block = dataSource.get( this.getDataSourceIndexFromUid( uid ) );
 		dataSource.set( index, { ...block, attributes: attributes } );
 		// Update Redux store
 		this.props.onChange( uid, attributes );
 	}
 
 	render() {
-		var list;
+		let list;
 		if ( Platform.OS === 'android' ) {
 			list = (
 				<RecyclerViewList
@@ -109,7 +109,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					style={ styles.list }
 					data={ this.props.blocks }
 					extraData={ this.props.refresh }
-					keyExtractor={ ( item, index ) => item.uid }
+					keyExtractor={ item => item.uid }
 					renderItem={ this.renderItem.bind( this ) }
 				/>
 			);

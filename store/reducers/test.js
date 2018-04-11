@@ -43,8 +43,9 @@ describe( 'Store', () => {
 			expect( initialState ).toEqual( __iniState );
 		} );
 
+		// eslint-disable-next-line quotes
 		it( "should mutate block's content", () => {
-			let newState = reducer(
+			const newState = reducer(
 				initialState,
 				actions.updateBlockAttributes( '1', { content: 'new content' } )
 			);
@@ -81,7 +82,7 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should move a block up', () => {
-			let newState = reducer( initialState, actions.moveBlockUpAction( '1' ) );
+			const newState = reducer( initialState, actions.moveBlockUpAction( '1' ) );
 
 			// the paragraph block should have moved up
 			expect( newState.blocks[ 0 ].blockType ).toEqual( 'paragraph' );
@@ -99,7 +100,7 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should move a block down', () => {
-			let newState = reducer( initialState, actions.moveBlockDownAction( '0' ) );
+			const newState = reducer( initialState, actions.moveBlockDownAction( '0' ) );
 
 			// the paragraph block should be at the top now
 			expect( newState.blocks[ 0 ].blockType ).toEqual( 'paragraph' );
@@ -109,20 +110,20 @@ describe( 'Store', () => {
 		} );
 
 		it( 'should delete top block', () => {
-			let newState = reducer( initialState, actions.deleteBlockAction( '0' ) );
+			const newState = reducer( initialState, actions.deleteBlockAction( '0' ) );
 
 			// only one block should be left
-			expect( newState.blocks.length ).toEqual( 1 );
+			expect( newState.blocks ).toHaveLength( 1 );
 
 			// the paragraph block should be at the top now
 			expect( newState.blocks[ 0 ].blockType ).toEqual( 'paragraph' );
 		} );
 
 		it( 'should delete bottom block', () => {
-			let newState = reducer( initialState, actions.deleteBlockAction( '1' ) );
+			const newState = reducer( initialState, actions.deleteBlockAction( '1' ) );
 
 			// only one block should be left
-			expect( newState.blocks.length ).toEqual( 1 );
+			expect( newState.blocks ).toHaveLength( 1 );
 
 			// the title block should still be there at the top
 			expect( newState.blocks[ 0 ].blockType ).toEqual( 'title' );
@@ -144,10 +145,10 @@ describe( 'Store', () => {
 					},
 				],
 			};
-			let newState = reducer( extraState, actions.deleteBlockAction( '1' ) );
+			const newState = reducer( extraState, actions.deleteBlockAction( '1' ) );
 
 			// only two blocks should be left
-			expect( newState.blocks.length ).toEqual( 2 );
+			expect( newState.blocks ).toHaveLength( 2 );
 
 			// the title block should still be there at the top
 			expect( newState.blocks[ 0 ].blockType ).toEqual( 'title' );

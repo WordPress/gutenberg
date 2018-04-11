@@ -78,13 +78,26 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 
 Run the style checker with this command that lists the files having at least one style violation:
 ```
-$ npm run prettier-check
+$ npm run prettier:check
 ```
 
 Fix style violations:
 ```
 $ npm run prettier
 ```
+
+## Linter
+
+Note: our linter configuration does some style checking as well. Run the linter to list errors and warnings:
+```
+$ npm run lint
+```
+
+It's capable of fixing _some_ of the lint warnings and errors:
+```
+$ npm run lint:fix
+```
+
 
 ## License
 

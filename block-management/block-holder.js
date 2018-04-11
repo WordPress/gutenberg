@@ -25,16 +25,17 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 			return (
 				<Toolbar uid={ this.props.uid } onButtonPressed={ this.props.onToolbarButtonPressed } />
 			);
-		} else {
-			// Return empty view, toolbar won't be rendered
-			return <View />;
 		}
+
+		// Return empty view, toolbar won't be rendered
+		return <View />;
 	}
 
 	getBlockForType() {
 		const blockType = getBlockType( this.props.blockType );
 		if ( blockType ) {
 			const Block = blockType.edit;
+
 			// TODO: setAttributes needs to change the state/attributes
 			return (
 				<Block
@@ -43,10 +44,10 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 					setAttributes={ attrs => this.props.onChange( this.props.uid, attrs ) }
 				/>
 			);
-		} else {
-			// Default block placeholder
-			return <Text>{ this.props.attributes.content }</Text>;
 		}
+
+		// Default block placeholder
+		return <Text>{ this.props.attributes.content }</Text>;
 	}
 
 	render() {

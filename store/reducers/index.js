@@ -27,7 +27,7 @@ export const reducer = (
 ) => {
 	const blocks = [ ...state.blocks ];
 	switch ( action.type ) {
-		case ActionTypes.BLOCK.UPDATE_ATTRIBUTES:
+		case ActionTypes.BLOCK.UPDATE_ATTRIBUTES: {
 			const block = findBlock( blocks, action.uid );
 
 			// Ignore updates if block isn't known
@@ -60,42 +60,53 @@ export const reducer = (
 			}
 
 			// Otherwise merge attributes into state
-			var index = findBlockIndex( blocks, action.uid );
+			const index = findBlockIndex( blocks, action.uid );
 			blocks[ index ] = {
 				...block,
 				attributes: nextAttributes,
 			};
 			return { blocks: blocks, refresh: ! state.refresh };
-		case ActionTypes.BLOCK.FOCUS:
+		}
+		case ActionTypes.BLOCK.FOCUS: {
 			const destBlock = findBlock( blocks, action.uid );
 			const destBlockState = destBlock.focused;
+
 			// Deselect all blocks
-			for ( let block of blocks ) {
+			for ( const block of blocks ) {
 				block.focused = false;
 			}
+
 			// Select or deselect pressed block
 			destBlock.focused = ! destBlockState;
 			return { blocks: blocks, refresh: ! state.refresh };
-		case ActionTypes.BLOCK.MOVE_UP:
-			if ( blocks[ 0 ].uid === action.uid ) return state;
+		}
+		case ActionTypes.BLOCK.MOVE_UP: {
+			if ( blocks[ 0 ].uid === action.uid ) {
+				return state;
+			}
 
-			var index = findBlockIndex( blocks, action.uid );
-			var tmp = blocks[ index ];
+			const index = findBlockIndex( blocks, action.uid );
+			const tmp = blocks[ index ];
 			blocks[ index ] = blocks[ index - 1 ];
 			blocks[ index - 1 ] = tmp;
 			return { blocks: blocks, refresh: ! state.refresh };
-		case ActionTypes.BLOCK.MOVE_DOWN:
-			if ( blocks[ blocks.length - 1 ].uid === action.uid ) return state;
+		}
+		case ActionTypes.BLOCK.MOVE_DOWN: {
+			if ( blocks[ blocks.length - 1 ].uid === action.uid ) {
+				return state;
+			}
 
-			var index = findBlockIndex( blocks, action.uid );
-			var tmp = blocks[ index ];
+			const index = findBlockIndex( blocks, action.uid );
+			const tmp = blocks[ index ];
 			blocks[ index ] = blocks[ index + 1 ];
 			blocks[ index + 1 ] = tmp;
 			return { blocks: blocks, refresh: ! state.refresh };
-		case ActionTypes.BLOCK.DELETE:
-			var index = findBlockIndex( blocks, action.uid );
+		}
+		case ActionTypes.BLOCK.DELETE: {
+			const index = findBlockIndex( blocks, action.uid );
 			blocks.splice( index, 1 );
 			return { blocks: blocks, refresh: ! state.refresh };
+		}
 		default:
 			return state;
 	}
