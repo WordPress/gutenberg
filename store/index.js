@@ -19,6 +19,7 @@ export type StateType = {
 };
 
 const initialState: StateType = {
+
 	// TODO: get blocks list block state should be externalized (shared with Gutenberg at some point?).
 	// If not it should be created from a string parsing (commented HTML to json).
 	blocks: [
