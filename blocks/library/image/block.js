@@ -21,7 +21,7 @@ import {
 	IconButton,
 	PanelBody,
 	SelectControl,
-	TextControl,
+	TextareaControl,
 	Toolbar,
 	withContext,
 } from '@wordpress/components';
@@ -203,7 +203,7 @@ class ImageBlock extends Component {
 			isSelected && (
 				<InspectorControls key="inspector">
 					<PanelBody title={ __( 'Image Settings' ) }>
-						<TextControl
+						<TextareaControl
 							label={ __( 'Textual Alternative' ) }
 							value={ alt }
 							onChange={ this.updateAlt }
