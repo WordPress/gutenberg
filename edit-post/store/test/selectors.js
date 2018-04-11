@@ -288,7 +288,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getActiveScreenTakeoverName( state ) ).toEqual( 'my-namespace/my-screen-takeover')
+			expect( getActiveScreenTakeoverName( state ) ).toEqual( 'my-namespace/my-screen-takeover' );
 		} );
 	} );
 } );
