@@ -210,6 +210,18 @@ describe( 'renderElement()', () => {
 
 		expect( result ).toBe( '<div class="foo"><img/></div>' );
 	} );
+
+	it( 'renders RawHTML with empty children as empty string', () => {
+		const result = renderElement( <RawHTML /> );
+
+		expect( result ).toBe( '' );
+	} );
+
+	it( 'renders RawHTML with wrapper and empty children', () => {
+		const result = renderElement( <RawHTML className="foo" /> );
+
+		expect( result ).toBe( '<div class="foo"></div>' );
+	} );
 } );
 
 describe( 'renderNativeComponent()', () => {

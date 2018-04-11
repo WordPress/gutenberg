@@ -364,17 +364,15 @@ export function renderElement( element, context = {} ) {
 
 		case RawHTML:
 			const { children, ...wrapperProps } = props;
-			if ( isEmpty( wrapperProps ) ) {
-				return children;
-			}
 
-			return renderElement( {
-				type: 'div',
-				props: {
+			return renderNativeComponent(
+				isEmpty( wrapperProps ) ? null : 'div',
+				{
 					...wrapperProps,
 					dangerouslySetInnerHTML: { __html: children },
 				},
-			} );
+				context
+			);
 	}
 
 	switch ( typeof tagName ) {
@@ -395,7 +393,8 @@ export function renderElement( element, context = {} ) {
 /**
  * Serializes a native component type to string.
  *
- * @param {string}  type    Native component type to serialize.
+ * @param {?string} type    Native component type to serialize, or null if
+ *                          rendering as fragment of children content.
  * @param {Object}  props   Props object.
  * @param {?Object} context Context object.
  *
@@ -415,6 +414,10 @@ export function renderNativeComponent( type, props, context = {} ) {
 		content = props.dangerouslySetInnerHTML.__html;
 	} else if ( typeof props.children !== 'undefined' ) {
 		content = renderChildren( castArray( props.children ), context );
+	}
+
+	if ( ! type ) {
+		return content;
 	}
 
 	const attributes = renderAttributes( props );
