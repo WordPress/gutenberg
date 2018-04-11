@@ -61,7 +61,7 @@ function PostPublishPanelToggle( {
 			disabled={ ! isButtonEnabled }
 			isBusy={ isSaving && isPublished }
 		>
-			{ isBeingScheduled ? __( 'Schedule...' ) : __( 'Publish...' ) }
+			{ isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' ) }
 		</Button>
 	);
 }
