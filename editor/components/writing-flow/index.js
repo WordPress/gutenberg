@@ -40,14 +40,9 @@ import {
 } from '../../utils/dom';
 
 /**
- * Browser dependencies
- */
-
-const { DOMRect } = window;
-
-/**
  * Module Constants
  */
+
 const { UP, DOWN, LEFT, RIGHT } = keycodes;
 
 /**
@@ -228,32 +223,14 @@ class WritingFlow extends Component {
 	}
 
 	/**
-	 * Shifts focus to the last tabbable text field — if one exists — at the
-	 * given mouse event's X coordinate.
-	 *
-	 * @param {MouseEvent} event Mouse event to align caret X offset.
+	 * Sets focus to the end of the last tabbable text field, if one exists.
 	 */
-	focusLastTextField( event ) {
+	focusLastTextField() {
 		const focusableNodes = focus.focusable.find( this.container );
 		const target = findLast( focusableNodes, isTabbableTextField );
-		if ( ! target ) {
-			return;
+		if ( target ) {
+			placeCaretAtHorizontalEdge( target, true );
 		}
-
-		// To generate a caret rect (where its height determines buffer offset
-		// for caret target point), the element must first be focused.
-		target.focus();
-		const rect = computeCaretRect( target );
-
-		// `computeCaretRect` may return undefined if it's unable to find a
-		// collapsed range.
-		if ( ! rect ) {
-			return;
-		}
-
-		// Emulate a rect at which caret should be placed using mouse event.
-		const targetRect = new DOMRect( event.clientX, 0, 0, rect.height );
-		placeCaretAtVerticalEdge( target, true, targetRect );
 	}
 
 	render() {
