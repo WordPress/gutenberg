@@ -15,6 +15,7 @@ fi
 
 if [ "$CHECK_CORRECTNESS" = true ] ; then
   npm run flow || pFail
+  npm run prettier:check || pFail
   npm run lint || pFail
 fi
 
