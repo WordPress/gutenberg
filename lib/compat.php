@@ -439,12 +439,12 @@ function gutenberg_get_taxonomy_visibility_data( $object ) {
 add_action( 'rest_api_init', 'gutenberg_add_taxonomy_visibility_field' );
 
 /**
- * Add a sample permalink to draft posts in the post REST API response.
+ * Add a permalink template to posts in the post REST API response.
  *
  * @param WP_REST_Response $response WP REST API response of a post.
  * @param WP_Post          $post The post being returned.
  * @param WP_REST_Request  $request WP REST API request.
- * @return WP_REST_Response Response containing the sample_permalink.
+ * @return WP_REST_Response Response containing the permalink_template.
  */
 function gutenberg_add_sample_permalink_to_posts( $response, $post, $request ) {
 	if ( 'edit' !== $request['context'] ) {
@@ -455,7 +455,8 @@ function gutenberg_add_sample_permalink_to_posts( $response, $post, $request ) {
 		require_once ABSPATH . '/wp-admin/includes/post.php';
 	}
 
-	$response->data['sample_permalink'] = get_sample_permalink( $post->ID );
+	$sample_permalink = get_sample_permalink( $post->ID );
+	$response->data['permalink_template'] = $sample_permalink[0];
 	return $response;
 }
 /**

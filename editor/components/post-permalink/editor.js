@@ -22,38 +22,19 @@ class PostPermalinkEditor extends Component {
 		this.onSavePermalink = this.onSavePermalink.bind( this );
 	}
 
-	/**
-	 * Returns the permalink parts to populate the form.
-	 *
-	 * @return {Object} The prefix, suffix, and postName for the form.
-	 */
-	getPermalinkParts() {
-		const [ template, postName ] = this.props.samplePermalinkData;
-		const { editedPostName } = this.state;
-		const [ samplePermalinkPrefix, samplePermalinkSuffix ] = template.split( /%(?:postname|pagename)%/ );
-
-		return {
-			samplePermalinkPrefix,
-			samplePermalinkSuffix,
-			editedPostName: editedPostName || postName,
-		};
-	}
-
 	onSavePermalink( event ) {
 		const postName = this.state.editedPostName.replace( /\s+/g, '-' );
-		const [ template, oldPostName ] = this.props.samplePermalinkData;
 
 		event.preventDefault();
 
 		this.props.onSave();
 
-		if ( ! postName || postName === oldPostName ) {
+		if ( ! postName || postName === this.props.postName ) {
 			return;
 		}
 
 		this.props.editPost( {
 			slug: postName,
-			sample_permalink: [ template, postName ],
 		} );
 
 		this.setState( {
@@ -63,10 +44,11 @@ class PostPermalinkEditor extends Component {
 
 	render() {
 		const {
-			samplePermalinkPrefix,
-			samplePermalinkSuffix,
-			editedPostName,
-		} = this.getPermalinkParts();
+			prefix,
+			suffix,
+			postName,
+		} = this.props.permalinkParts;
+		const editedPostName = this.state.editedPostName || postName;
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		// Autofocus is allowed here, as this mini-UI is only loaded when the user clicks to open it.
@@ -77,7 +59,7 @@ class PostPermalinkEditor extends Component {
 			>
 				<span>
 					<span className="editor-post-permalink-editor__prefix">
-						{ samplePermalinkPrefix }
+						{ prefix }
 					</span>
 					<input
 						className="editor-post-permalink-editor__edit"
@@ -88,7 +70,7 @@ class PostPermalinkEditor extends Component {
 						autoFocus
 					/>
 					<span className="editor-post-permalink-editor__suffix">
-						{ samplePermalinkSuffix }
+						{ suffix }
 					</span>
 					&lrm;
 				</span>
@@ -107,9 +89,9 @@ class PostPermalinkEditor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getPermalinkParts } = select( 'core/editor' );
 		return {
-			samplePermalinkData: getEditedPostAttribute( 'sample_permalink' ),
+			permalinkParts: getPermalinkParts(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

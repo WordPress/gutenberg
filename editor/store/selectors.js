@@ -31,6 +31,7 @@ import { deprecated } from '@wordpress/utils';
  */
 const MAX_RECENT_BLOCKS = 9;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
+const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -1525,20 +1526,41 @@ export function getProvisionalBlockUID( state ) {
  * @return {boolean} Whether or not the permalink is editable.
  */
 export function isPermalinkEditable( state ) {
-	const samplePermalinkData = getEditedPostAttribute( state, 'sample_permalink' );
+	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
 
-	return /%(?:postname|pagename)%/.test( samplePermalinkData[ 0 ] );
+	return PERMALINK_POSTNAME_REGEX.test( permalinkTemplate );
 }
 
 /**
- * Returns the sample permalink for the post.
+ * Returns the permalink for the post.
  *
  * @param {Object} state Editor state.
  *
- * @return {string} The sample permalink.
+ * @return {string} The permalink.
  */
-export function getSamplePermalink( state ) {
-	const samplePermalinkData = getEditedPostAttribute( state, 'sample_permalink' );
+export function getPermalink( state ) {
+	const {prefix, postName, suffix } = getPermalinkParts( state );
+	return prefix + postName + suffix;
 
-	return samplePermalinkData[ 0 ].replace( /%(?:postname|pagename)%/, samplePermalinkData[ 1 ] );
+	return permalinkParts.values().join( '' );
+}
+
+/**
+ * Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The prefix, postName, and suffix for the permalink.
+ */
+export function getPermalinkParts( state ) {
+	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
+	const postName = getEditedPostAttribute( state, 'slug' );
+
+	const [ prefix, suffix ] = permalinkTemplate.split( PERMALINK_POSTNAME_REGEX );
+
+	return {
+		prefix,
+		postName,
+		suffix,
+	};
 }

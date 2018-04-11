@@ -15,7 +15,7 @@ import { Dashicon, Button, ClipboardButton, Tooltip } from '@wordpress/component
  */
 import './style.scss';
 import PostPermalinkEditor from './editor.js';
-import { isEditedPostNew, isPermalinkEditable, getEditedPostPreviewLink, getSamplePermalink } from '../../store/selectors';
+import { isEditedPostNew, isPermalinkEditable, getEditedPostPreviewLink, getPermalink } from '../../store/selectors';
 import { getWPAdminURL } from '../../utils/url';
 
 class PostPermalink extends Component {
@@ -106,7 +106,7 @@ export default connect(
 			isNew: isEditedPostNew( state ),
 			previewLink: getEditedPostPreviewLink( state ),
 			isEditable: isPermalinkEditable( state ),
-			samplePermalink: getSamplePermalink( state ),
+			samplePermalink: getPermalink( state ),
 		};
 	}
 )( PostPermalink );
