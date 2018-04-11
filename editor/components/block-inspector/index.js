@@ -20,6 +20,7 @@ import { PanelBody } from '@wordpress/components';
  * Internal Dependencies
  */
 import './style.scss';
+import SkipToSelectedBlock from '../skip-to-selected-block';
 import { getSelectedBlock, getSelectedBlockCount } from '../../store/selectors';
 
 const BlockInspector = ( { selectedBlock, count } ) => {
@@ -55,6 +56,7 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 				</PanelBody>
 			) }
 		</InspectorAdvancedControls.Slot>,
+		<SkipToSelectedBlock key="back" />,
 	];
 };
 

@@ -11,9 +11,22 @@ import { BaseControl, Button, Dashicon } from '../';
 import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
-function RangeControl( { className, label, value, instanceId, onChange, beforeIcon, afterIcon, help, allowReset, ...props } ) {
+function RangeControl( {
+	className,
+	label,
+	value,
+	instanceId,
+	onChange,
+	beforeIcon,
+	afterIcon,
+	help,
+	allowReset,
+	initialPosition,
+	...props
+} ) {
 	const id = `inspector-range-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
+	const initialSliderValue = value || initialPosition || '';
 
 	return (
 		<BaseControl
@@ -27,7 +40,7 @@ function RangeControl( { className, label, value, instanceId, onChange, beforeIc
 				className="components-range-control__slider"
 				id={ id }
 				type="range"
-				value={ value }
+				value={ initialSliderValue }
 				onChange={ onChangeValue }
 				aria-describedby={ !! help ? id + '__help' : undefined }
 				{ ...props } />
