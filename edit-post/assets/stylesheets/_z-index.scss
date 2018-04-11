@@ -68,6 +68,8 @@ $z-layers: (
 	'.components-popover.is-bottom': 99990,
 
 	'.components-autocomplete__results': 1000000,
+
+	'.skip-to-selected-block': 100000,
 );
 
 @function z-index( $key ) {
