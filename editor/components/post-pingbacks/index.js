@@ -26,7 +26,6 @@ function PostPingbacks( { pingStatus = 'open', instanceId, ...props } ) {
 			key="toggle"
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }
-			showHint={ false }
 			id={ pingbacksToggleId }
 		/>,
 	];
@@ -42,4 +41,3 @@ export default connect(
 		editPost,
 	}
 )( withInstanceId( PostPingbacks ) );
-

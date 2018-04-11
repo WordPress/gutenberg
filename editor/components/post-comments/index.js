@@ -26,7 +26,6 @@ function PostComments( { commentStatus = 'open', instanceId, ...props } ) {
 			key="toggle"
 			checked={ commentStatus === 'open' }
 			onChange={ onToggleComments }
-			showHint={ false }
 			id={ commentsToggleId }
 		/>,
 	];
@@ -42,4 +41,3 @@ export default connect(
 		editPost,
 	}
 )( withInstanceId( PostComments ) );
-
