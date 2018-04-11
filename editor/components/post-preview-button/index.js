@@ -130,7 +130,7 @@ export default compose(
 		const { getPostType } = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
-			isPreviewable: postType.previewable,
+			isPreviewable: postType && postType.previewable,
 		};
 	} ),
 	ifCondition( ( { isPreviewable } ) => isPreviewable ),
