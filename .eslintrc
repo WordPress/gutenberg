@@ -7,10 +7,17 @@
   "plugins": [
     "react",
     "react-native",
-    "jest"
+    "jest",
+    "flowtype"
   ],
   "extends": [
-    "./gutenberg/eslint/config.js"
+    "./gutenberg/eslint/config.js",
+    "plugin:flowtype/recommended"
   ],
+  "settings": {
+    "flowtype": {
+      "onlyFilesWithFlowAnnotation": true
+    }
+  },
   "rules": {}
 }
