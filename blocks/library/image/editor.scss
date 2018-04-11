@@ -7,6 +7,10 @@
 		width: 100%;
 	}
 
+	&.is-resized img {
+		height: 100%;
+	}
+
 	&.is-transient img {
 		@include loading_fade;
 	}
