@@ -117,6 +117,7 @@ export default {
 					type: 'REQUEST_POST_UPDATE_SUCCESS',
 					previousPost: post,
 					post: newPost,
+					edits: toSend,
 					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
 				} );
 			},
@@ -135,7 +136,7 @@ export default {
 		);
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post } = action;
+		const { previousPost, post, edits } = action;
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -173,6 +174,14 @@ export default {
 				</p>,
 				{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 			) );
+		}
+
+		// The server can return a sanitised version of the slug,
+		// in which case we need to update our local copy.
+		if ( edits.slug !== post.slug ) {
+			dispatch( {
+				type: 'POSTNAME_SANITIZED',
+			} );
 		}
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {
