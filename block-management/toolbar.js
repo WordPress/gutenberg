@@ -1,7 +1,7 @@
 /** @format */
 
 import React from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import { StyleSheet, View, Button } from 'react-native';
 import { ToolbarButton } from './constants';
 
 type PropsType = {
