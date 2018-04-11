@@ -320,12 +320,11 @@ add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities
  *
  * @see https://core.trac.wordpress.org/ticket/43739
  *
- * @param object $post_type Post type object.
- * @param string $name      Post type name.
+ * @param object $post_type Post type response object.
  * @return boolean Whether or not the post type can be previewed.
  */
-function gutenberg_get_post_type_previewable( $post_type, $name ) {
-	return is_post_type_viewable( $name );
+function gutenberg_get_post_type_previewable( $post_type ) {
+	return is_post_type_viewable( $post_type['slug'] );
 }
 
 /**
