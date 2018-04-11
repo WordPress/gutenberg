@@ -40,7 +40,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				this.props.deleteBlockAction( uid );
 				break;
 			case ToolbarButton.SETTINGS:
-
 				// TODO: implement settings
 				break;
 		}
