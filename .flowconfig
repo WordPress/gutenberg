@@ -40,6 +40,9 @@
 <PROJECT_ROOT>/node_modules/graphql/.*
 <PROJECT_ROOT>/node_modules/prettier/.*
 
+; Ignore react-native-recyclerview-list example app
+<PROJECT_ROOT>/node_modules/react-native-recyclerview-list/example
+
 ; Ignore immutable-js. See https://github.com/facebook/immutable-js/issues/1308
 <PROJECT_ROOT>/node_modules/immutable/.*
 

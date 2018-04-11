@@ -6,7 +6,7 @@ import {
 	moveBlockUpAction,
 	moveBlockDownAction,
 	deleteBlockAction,
-} from './store/actions';
+} from '../store/actions';
 import MainApp from './MainApp';
 
 const mapStateToProps = state => ( {

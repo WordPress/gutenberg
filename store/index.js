@@ -66,7 +66,7 @@ const initialState: StateType = {
 			innerBlocks: [],
 			focused: false,
 		},
-		{ ...codeBlockInstance, focused: false},
+		{ ...codeBlockInstance, focused: false },
 		{
 			uid: '4',
 			name: 'paragraph',
@@ -83,7 +83,7 @@ const initialState: StateType = {
 };
 
 const devToolsEnhancer =
-	( process.env.NODE_ENV === 'development' && require( 'remote-redux-devtools' ).default ) ||
+	( 'development' === process.env.NODE_ENV && require( 'remote-redux-devtools' ).default ) ||
 	( () => {} );
 
 export function setupStore( state: StateType = initialState ) {

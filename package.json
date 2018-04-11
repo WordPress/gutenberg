@@ -2,12 +2,24 @@
   "name": "gutenberg-mobile",
   "version": "0.1.0",
   "private": true,
+  "config": {
+    "jsfiles": "index.js app/*.js app/**/*.js block-management/*.js block-management/**/*.js store/*.js store/**/*.js"
+  },
   "devDependencies": {
     "@wordpress/babel-preset-default": "^1.1.2",
+    "babel-eslint": "^8.2.2",
     "babel-plugin-react-require": "^3.0.0",
     "babel-plugin-transform-async-generator-functions": "^6.24.1",
     "babel-preset-react-native-stage-0": "^1.0.1",
     "cross-env": "^5.1.4",
+    "eslint": "^4.19.1",
+    "eslint-config-wordpress": "^2.0.0",
+    "eslint-plugin-flowtype": "^2.46.1",
+    "eslint-plugin-jest": "^21.15.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "eslint-plugin-react-native": "^3.2.1",
+    "eslint-plugin-wordpress": "git+https://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
     "flow-bin": "0.56.0",
     "jest": "^22.4.3",
     "jest-react-native": "^18.0.0",
@@ -21,12 +33,14 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "test": "cross-env NODE_ENV=test node node_modules/jest/bin/jest.js --verbose --config jest.config.js",
-    "test-debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/jest/bin/jest.js --runInBand --verbose --config jest.config.js",
+    "test:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/jest/bin/jest.js --runInBand --verbose --config jest.config.js",
     "flow": "flow",
-    "prettier": "prettier --write *.js *block-management/*.js",
-    "prettier-check": "prettier -l *.js *block-management/*.js",
+    "prettier": "prettier --write $npm_package_config_jsfiles",
+    "prettier:check": "prettier -l $npm_package_config_jsfiles",
     "clean": "yarn test --clearCache; watchman watch-del-all; rm -rf node_modules; rm -f yarn.lock; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
-    "clean-install": "yarn clean; yarn"
+    "clean:install": "yarn clean; yarn",
+    "lint": "eslint $npm_package_config_jsfiles",
+    "lint:fix": "eslint $npm_package_config_jsfiles --fix"
   },
   "dependencies": {
     "babel-plugin-module-resolver": "^3.1.0",
@@ -37,6 +51,7 @@
     "memize": "^1.0.5",
     "react": "16.2.0",
     "react-native": "0.52.0",
+    "react-native-recyclerview-list": "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#bfccbaab6b5954e18f8b0ed441ba38275853b79c",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
     "shallowequal": "^1.0.2"

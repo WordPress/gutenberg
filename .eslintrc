@@ -1,0 +1,23 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "jest/globals": true
+  },
+  "plugins": [
+    "react",
+    "react-native",
+    "jest",
+    "flowtype"
+  ],
+  "extends": [
+    "./gutenberg/eslint/config.js",
+    "plugin:flowtype/recommended"
+  ],
+  "settings": {
+    "flowtype": {
+      "onlyFilesWithFlowAnnotation": true
+    }
+  },
+  "rules": {}
+}

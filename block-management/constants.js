@@ -9,6 +9,5 @@ const ToolbarButton = {
 	SETTINGS: 3,
 	DELETE: 4,
 };
-type ToolbarButtonType = $Keys<typeof ToolbarButton>;
 
 export { ToolbarButton };
