@@ -34,7 +34,7 @@ export const settings = {
 		return [
 			<ResizableBox
 				size={ {
-					height: height,
+					height,
 				} }
 				minHeight="20"
 				handleClasses={ {
@@ -71,7 +71,7 @@ export const settings = {
 							height: parseInt( event.target.value, 10 ),
 						} );
 					} }
-					aria-label="Height"
+					aria-label={ __( 'Height for the spacer element in pixels.' ) }
 					value={ height }
 					min="20"
 					step="10"
@@ -81,6 +81,6 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		return <div style={ { height: attributes.height } } />;
+		return <div style={ { height: attributes.height } } aria-hidden />;
 	},
 };
