@@ -6,7 +6,7 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 
 import App from './App';
-import BlockHolder from './block-management/block-holder';
+import BlockHolder from '../block-management/block-holder';
 
 describe( 'App', () => {
 	it( 'renders without crashing', () => {
@@ -19,7 +19,7 @@ describe( 'App', () => {
 			.create( <App /> )
 			.root.findAllByType( BlockHolder )
 			.forEach( blockHolder => {
-				if ( blockHolder.props.blockType === 'core/code' ) {
+				if ( 'core/code' === blockHolder.props.blockType ) {
 					// TODO: hardcoded indices are ugly and error prone. Can we do better here?
 					const blockHolderContainer = blockHolder.children[ 0 ].children[ 0 ].children[ 0 ];
 					const contentComponent = blockHolderContainer.children[ 1 ];
