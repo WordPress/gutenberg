@@ -7,6 +7,7 @@ import AppContainer from './AppContainer';
 
 const store = setupStore();
 
+// eslint-disable-next-line react/display-name
 export default () => (
 	<Provider store={ store }>
 		<AppContainer />
