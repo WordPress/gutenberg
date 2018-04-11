@@ -70,37 +70,82 @@ function _gutenberg_utf8_split( $str ) {
 }
 
 /**
- * Shims fix for apiRequest on sites configured to use plain permalinks.
+ * Shims fix for apiRequest on sites configured to use plain permalinks and add Preloading support.
  *
  * @see https://core.trac.wordpress.org/ticket/42382
  *
  * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
  */
-function gutenberg_shim_fix_api_request_plain_permalinks( $scripts ) {
+function gutenberg_shim_api_request( $scripts ) {
 	$api_request_fix = <<<JS
 ( function( wp, wpApiSettings ) {
-	var buildAjaxOptions;
 
-	if ( 'string' !== typeof wpApiSettings.root ||
-			-1 === wpApiSettings.root.indexOf( '?' ) ) {
-		return;
+	// Fix plain permalinks sites
+	var buildAjaxOptions;
+	if ( 'string' === typeof wpApiSettings.root && -1 !== wpApiSettings.root.indexOf( '?' ) ) {
+		buildAjaxOptions = wp.apiRequest.buildAjaxOptions;
+		wp.apiRequest.buildAjaxOptions = function( options ) {
+			if ( 'string' === typeof options.path ) {
+				options.path = options.path.replace( '?', '&' );
+			}
+
+			return buildAjaxOptions.call( wp.apiRequest, options );
+		};
 	}
 
-	buildAjaxOptions = wp.apiRequest.buildAjaxOptions;
-
-	wp.apiRequest.buildAjaxOptions = function( options ) {
-		if ( 'string' === typeof options.path ) {
-			options.path = options.path.replace( '?', '&' );
+	function getStablePath( path ) {
+		var splitted = path.split( '?' );
+		var query = splitted[ 1 ];
+		var base = splitted[ 0 ];
+		if ( ! query ) {
+			return base;
 		}
 
-		return buildAjaxOptions.call( wp.apiRequest, options );
+		// 'b=1&c=2&a=5'
+		return base + '?' + query
+			// [ 'b=1', 'c=2', 'a=5' ]
+			.split( '&' )
+			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
+			.map( function ( entry ) {
+				return entry.split( '=' );
+			 } )
+			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
+			.sort( function ( a, b ) {
+				return a[ 0 ].localeCompare( b[ 0 ] );
+			 } )
+			// [ 'a=5', 'b=1', 'c=2' ]
+			.map( function ( pair ) {
+				return pair.join( '=' );
+			 } )
+			// 'a=5&b=1&c=2'
+			.join( '&' );
 	};
+
+	// Add preloading support
+	var previousApiRequest = wp.apiRequest;
+	wp.apiRequest = function( request ) {
+		var method = request.method || 'GET';
+		var path = getStablePath( request.path );
+		if ( 'GET' === method && window._wpAPIDataPreload[ path ] ) {
+			var deferred = jQuery.Deferred();
+			deferred.resolve( window._wpAPIDataPreload[ path ].body );
+			return deferred.promise();
+		}
+
+		return previousApiRequest.call( previousApiRequest, request );
+	}
+	for ( var name in previousApiRequest ) {
+		if ( previousApiRequest.hasOwnProperty( name ) ) {
+			wp.apiRequest[ name ] = previousApiRequest[ name ];
+		}
+	}
+
 } )( window.wp, window.wpApiSettings );
 JS;
 
 	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
 }
-add_action( 'wp_default_scripts', 'gutenberg_shim_fix_api_request_plain_permalinks' );
+add_action( 'wp_default_scripts', 'gutenberg_shim_api_request' );
 
 /**
  * Shims support for emulating HTTP/1.0 requests in wp.apiRequest

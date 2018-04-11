@@ -41,17 +41,17 @@ import ContrastChecker from '../../contrast-checker';
 
 const { getComputedStyle } = window;
 
-const ContrastCheckerWithFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor } = ownProps;
-	//avoid the use of querySelector if both colors are known and verify if node is available.
-	const editableNode = ( ! textColor || ! backgroundColor ) && node ? node.querySelector( '[contenteditable="true"]' ) : null;
+const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+	const { textColor, backgroundColor, fontSize, customFontSize } = ownProps.attributes;
+	const editableNode = node.querySelector( '[contenteditable="true"]' );
 	//verify if editableNode is available, before using getComputedStyle.
 	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
 	return {
 		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
 		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
+		fallbackFontSize: fontSize || customFontSize || ! computedStyles ? undefined : parseInt( computedStyles.fontSize ) || undefined,
 	};
-} )( ContrastChecker );
+} );
 
 const FONT_SIZES = {
 	small: 14,
@@ -65,8 +65,6 @@ const autocompleters = [ blockAutocompleter, ...defaultAutocompleters ];
 class ParagraphBlock extends Component {
 	constructor() {
 		super( ...arguments );
-		this.nodeRef = null;
-		this.bindRef = this.bindRef.bind( this );
 		this.onReplace = this.onReplace.bind( this );
 		this.toggleDropCap = this.toggleDropCap.bind( this );
 		this.getFontSize = this.getFontSize.bind( this );
@@ -90,13 +88,6 @@ class ParagraphBlock extends Component {
 	toggleDropCap() {
 		const { attributes, setAttributes } = this.props;
 		setAttributes( { dropCap: ! attributes.dropCap } );
-	}
-
-	bindRef( node ) {
-		if ( ! node ) {
-			return;
-		}
-		this.nodeRef = node;
 	}
 
 	getFontSize() {
@@ -135,6 +126,9 @@ class ParagraphBlock extends Component {
 			mergeBlocks,
 			onReplace,
 			className,
+			fallbackBackgroundColor,
+			fallbackTextColor,
+			fallbackFontSize,
 		} = this.props;
 
 		const {
@@ -193,6 +187,7 @@ class ParagraphBlock extends Component {
 							className="blocks-paragraph__custom-size-slider"
 							label={ __( 'Custom Size' ) }
 							value={ fontSize || '' }
+							initialPosition={ fallbackFontSize }
 							onChange={ ( value ) => this.setFontSize( value ) }
 							min={ 12 }
 							max={ 100 }
@@ -217,12 +212,15 @@ class ParagraphBlock extends Component {
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 						/>
 					</PanelColor>
-					{ this.nodeRef && <ContrastCheckerWithFallbackStyles
-						node={ this.nodeRef }
-						textColor={ textColor }
-						backgroundColor={ backgroundColor }
+					<ContrastChecker
+						{ ...{
+							textColor,
+							backgroundColor,
+							fallbackBackgroundColor,
+							fallbackTextColor,
+						} }
 						isLargeText={ fontSize >= 18 }
-					/> }
+					/>
 					<PanelBody title={ __( 'Block Alignment' ) }>
 						<BlockAlignmentToolbar
 							value={ width }
@@ -231,7 +229,7 @@ class ParagraphBlock extends Component {
 					</PanelBody>
 				</InspectorControls>
 			),
-			<div key="editable" ref={ this.bindRef }>
+			<div key="editable">
 				<RichText
 					tagName="p"
 					className={ classnames( 'wp-block-paragraph', className, {
@@ -410,7 +408,7 @@ registerBlockType( 'core/paragraph', {
 		}
 	},
 
-	edit: ParagraphBlock,
+	edit: FallbackStyles( ParagraphBlock ),
 
 	save( { attributes } ) {
 		const {

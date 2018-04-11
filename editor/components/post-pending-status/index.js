@@ -31,7 +31,6 @@ export function PostPendingStatus( { instanceId, status, onUpdateStatus } ) {
 				id={ pendingId }
 				checked={ status === 'pending' }
 				onChange={ togglePendingStatus }
-				showHint={ false }
 			/>
 		</PostPendingStatusCheck>
 	);

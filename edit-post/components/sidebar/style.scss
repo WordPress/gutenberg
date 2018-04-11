@@ -81,6 +81,13 @@
 	p + div.components-toolbar {
 		margin-top: -1em;
 	}
+
+	.editor-skip-to-selected-block:focus {
+		top: auto;
+		right: 10px;
+		bottom: 10px;
+		left: auto;
+	}
 }
 
 /* Visual and Text editor both */
