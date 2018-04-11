@@ -17,4 +17,16 @@
 	animation: slide_in_right 0.1s forwards;
 }
 
+@mixin fade_in {
+	animation: fade-in 0.5s ease-out;
+	animation-fill-mode: forwards;
+}
 
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}

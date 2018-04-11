@@ -3,6 +3,7 @@
  */
 import { connect } from 'react-redux';
 import { first } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -10,7 +11,7 @@ import { first } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { IconButton, withContext, withInstanceId } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
-import { compose } from '@wordpress/element';
+import { compose, Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,59 +21,88 @@ import { getBlockMoverDescription } from './mover-description';
 import { getBlockIndex, getBlock } from '../../store/selectors';
 import { upArrow, downArrow } from './arrows';
 
-export function BlockMover( { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId } ) {
-	if ( isLocked ) {
-		return null;
+export class BlockMover extends Component {
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			isFocused: false,
+		};
+		this.onFocus = this.onFocus.bind( this );
+		this.onBlur = this.onBlur.bind( this );
 	}
 
-	// We emulate a disabled state because forcefully applying the `disabled`
-	// attribute on the button while it has focus causes the screen to change
-	// to an unfocused state (body as active element) without firing blur on,
-	// the rendering parent, leaving it unable to react to focus out.
-	return (
-		<div className="editor-block-mover">
-			<IconButton
-				className="editor-block-mover__control"
-				onClick={ isFirst ? null : onMoveUp }
-				icon={ upArrow }
-				label={ __( 'Move up' ) }
-				aria-describedby={ `editor-block-mover__up-description-${ instanceId }` }
-				aria-disabled={ isFirst }
-			/>
-			<IconButton
-				className="editor-block-mover__control"
-				onClick={ isLast ? null : onMoveDown }
-				icon={ downArrow }
-				label={ __( 'Move down' ) }
-				aria-describedby={ `editor-block-mover__down-description-${ instanceId }` }
-				aria-disabled={ isLast }
-			/>
-			<span id={ `editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description">
-				{
-					getBlockMoverDescription(
-						uids.length,
-						blockType && blockType.title,
-						firstIndex,
-						isFirst,
-						isLast,
-						-1,
-					)
-				}
-			</span>
-			<span id={ `editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description">
-				{
-					getBlockMoverDescription(
-						uids.length,
-						blockType && blockType.title,
-						firstIndex,
-						isFirst,
-						isLast,
-						1,
-					)
-				}
-			</span>
-		</div>
-	);
+	onFocus() {
+		this.setState( {
+			isFocused: true,
+		} );
+	}
+
+	onBlur() {
+		this.setState( {
+			isFocused: false,
+		} );
+	}
+
+	render() {
+		const { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
+		const { isFocused } = this.state;
+		if ( isLocked ) {
+			return null;
+		}
+
+		// We emulate a disabled state because forcefully applying the `disabled`
+		// attribute on the button while it has focus causes the screen to change
+		// to an unfocused state (body as active element) without firing blur on,
+		// the rendering parent, leaving it unable to react to focus out.
+		return (
+			<div className={ classnames( 'editor-block-mover', { 'is-visible': isFocused || ! isHidden } ) }>
+				<IconButton
+					className="editor-block-mover__control"
+					onClick={ isFirst ? null : onMoveUp }
+					icon={ upArrow }
+					label={ __( 'Move up' ) }
+					aria-describedby={ `editor-block-mover__up-description-${ instanceId }` }
+					aria-disabled={ isFirst }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
+				/>
+				<IconButton
+					className="editor-block-mover__control"
+					onClick={ isLast ? null : onMoveDown }
+					icon={ downArrow }
+					label={ __( 'Move down' ) }
+					aria-describedby={ `editor-block-mover__down-description-${ instanceId }` }
+					aria-disabled={ isLast }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
+				/>
+				<span id={ `editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description">
+					{
+						getBlockMoverDescription(
+							uids.length,
+							blockType && blockType.title,
+							firstIndex,
+							isFirst,
+							isLast,
+							-1,
+						)
+					}
+				</span>
+				<span id={ `editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description">
+					{
+						getBlockMoverDescription(
+							uids.length,
+							blockType && blockType.title,
+							firstIndex,
+							isFirst,
+							isLast,
+							1,
+						)
+					}
+				</span>
+			</div>
+		);
+	}
 }
 
 /**
