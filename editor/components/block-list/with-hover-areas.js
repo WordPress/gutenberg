@@ -3,11 +3,6 @@
  */
 import { Component, findDOMNode } from '@wordpress/element';
 
-/**
- * Module constants
- */
-const HOVER_AREA_SIZE = 120;
-
 const withHoverAreas = ( WrappedComponent ) => {
 	class WithHoverAreasComponent extends Component {
 		constructor() {
@@ -40,12 +35,11 @@ const withHoverAreas = ( WrappedComponent ) => {
 
 		onMouseMove( event ) {
 			const { width, left, right } = this.container.getBoundingClientRect();
-			const isSmall = width < ( HOVER_AREA_SIZE * 2 ) + 10;
 
 			let hoverArea = null;
-			if ( ( event.clientX - left ) < ( isSmall ? width / 2 : HOVER_AREA_SIZE ) ) {
+			if ( ( event.clientX - left ) < width / 3 ) {
 				hoverArea = 'left';
-			} else if ( ( right - event.clientX ) < ( isSmall ? width / 2 : HOVER_AREA_SIZE ) ) {
+			} else if ( ( right - event.clientX ) < width / 3 ) {
 				hoverArea = 'right';
 			}
 
