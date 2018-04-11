@@ -70,7 +70,7 @@ const initialState: StateType = {
 };
 
 const devToolsEnhancer =
-	( process.env.NODE_ENV === 'development' && require( 'remote-redux-devtools' ).default ) ||
+	( 'development' === process.env.NODE_ENV && require( 'remote-redux-devtools' ).default ) ||
 	( () => {} );
 
 export function setupStore( state: StateType = initialState ) {
