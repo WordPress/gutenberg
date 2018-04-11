@@ -14,7 +14,7 @@ import { createElement, renderToString } from '@wordpress/element';
  *
  * @param {WPElement} value Element.
  *
- * @return {string}         HTML.
+ * @return {string} HTML.
  */
 export function elementToString( value ) {
 	return renderToString( value );
@@ -23,9 +23,9 @@ export function elementToString( value ) {
 /**
  * Transforms a string HTML to its corresponding WP element.
  *
- * @param {string}     value HTML.
+ * @param {string} value HTML.
  *
- * @return {WPElement}       Element.
+ * @return {WPElement} Element.
  */
 export function stringToElement( value ) {
 	if ( ! value ) {
@@ -44,7 +44,7 @@ export function stringToElement( value ) {
  * @param {Object} props   Element Props
  * @param {Array} children Element Children
  *
- * @return {Element}       WPElement.
+ * @return {Element} WPElement.
  */
 export function createTinyMCEElement( type, props, ...children ) {
 	if ( props[ 'data-mce-bogus' ] === 'all' ) {
@@ -65,9 +65,9 @@ export function createTinyMCEElement( type, props, ...children ) {
 /**
  * Transforms an array of DOM Elements to their corresponding WP element.
  *
- * @param {Array}     value  DOM Elements.
+ * @param {Array} value DOM Elements.
  *
- * @return {WPElement}       WP Element.
+ * @return {WPElement} WP Element.
  */
 export function domToElement( value ) {
 	return nodeListToReact( value || [], createTinyMCEElement );
@@ -76,9 +76,9 @@ export function domToElement( value ) {
 /**
  * Transforms an array of DOM Elements to their corresponding HTML string output.
  *
- * @param {Array}     value  DOM Elements.
+ * @param {Array} value DOM Elements.
  *
- * @return {string}          HTML.
+ * @return {string} HTML.
  */
 export function domToString( value ) {
 	return map( value, element => element.outerHTML ).join( '' );
