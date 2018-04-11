@@ -16,7 +16,7 @@ import { _x } from '@wordpress/i18n';
  */
 import {
 	getEditedPostPreviewLink,
-	getEditedPostAttribute,
+	getEditedPostAttribute as getStateEditedPostAttribute,
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
@@ -141,7 +141,7 @@ export default compose(
 			isDirty: isEditedPostDirty( state ),
 			isNew: isEditedPostNew( state ),
 			isSaveable: isEditedPostSaveable( state ),
-			modified: getEditedPostAttribute( state, 'modified' ),
+			modified: getStateEditedPostAttribute( state, 'modified' ),
 		} ),
 		{ autosave }
 	)
