@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { StyleSheet, Text, View, FlatList, TextInput } from 'react-native';
+import { StyleSheet, View, FlatList } from 'react-native';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
@@ -53,7 +53,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					style={ styles.list }
 					data={ this.props.blocks }
 					extraData={ this.props.refresh }
-					keyExtractor={ ( item, index ) => item.uid }
+					keyExtractor={ item => item.uid }
 					renderItem={ this.renderItem.bind( this ) }
 				/>
 			</View>
