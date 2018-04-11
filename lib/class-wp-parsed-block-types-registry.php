@@ -66,7 +66,7 @@ class WP_Parsed_Block_Types_Registry {
 		}
 
 		if ( ! WP_Block_Type_Registry::get_instance()->is_registered( $block_type ) ) {
-			/* translators: 1: block name */
+			// translators: 1: block name 
 			$message = sprintf( __( 'Block type "%s" isn\'t registered yet.', 'gutenberg' ), $block_type );
 			_doing_it_wrong( __METHOD__, $message, '0.1.0' );
 			return false;
@@ -85,7 +85,7 @@ class WP_Parsed_Block_Types_Registry {
 	 *
 	 * @return array Array of block types present on the web page being currently served (As an array of strings)
 	 */
-	public function get_block_types_present_in_current_page() {
+	public function get_block_types_in_current_page() {
 		return $this->block_types_in_current_page;
 	}
 

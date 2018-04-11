@@ -223,7 +223,7 @@ function gutenberg_process_block_comment( $matches ) {
 		$block_type_name = $match[1];
 		$block_type_name = gutenberg_prefix_core_namespace_if_not_found( $block_type_name );
 		
-		//WP_Parsed_Block_Types_Registry::get_instance()->add( $block_type_name );
+		WP_Parsed_Block_Types_Registry::get_instance()->add( $block_type_name );
 	}
 
 	return '';
