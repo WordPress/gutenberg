@@ -1,20 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { Toolbar, Fill } from '@wordpress/components';
+import { createSlotFill, Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { ifEditBlockSelected } from '../block-edit/context';
 
-export function BlockControls( { controls, children } ) {
-	return (
-		<Fill name="Block.Toolbar">
-			<Toolbar controls={ controls } />
-			{ children }
-		</Fill>
-	);
-}
+const Fill = createSlotFill( 'BlockControls' );
+const { Slot } = Fill;
 
-export default ifEditBlockSelected( BlockControls );
+const BlockControlsFill = ( { controls, children } ) => (
+	<Fill>
+		<Toolbar controls={ controls } />
+		{ children }
+	</Fill>
+);
+
+const BlockControls = ifEditBlockSelected( BlockControlsFill );
+
+BlockControls.Slot = Slot;
+
+export default BlockControls;

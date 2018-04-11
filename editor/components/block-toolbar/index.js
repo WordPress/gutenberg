@@ -1,6 +1,7 @@
 /**
  * WordPress Dependencies
  */
+import { BlockControls } from '@wordpress/blocks';
 import { Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -18,7 +19,7 @@ function BlockToolbar( { block, mode } ) {
 	return (
 		<div className="editor-block-toolbar">
 			<BlockSwitcher uids={ [ block.uid ] } />
-			<Slot name="Block.Toolbar" />
+			<BlockControls.Slot />
 			<Slot name="Formatting.Toolbar" />
 		</div>
 	);
