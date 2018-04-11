@@ -83,3 +83,20 @@ export function domToElement( value ) {
 export function domToString( value ) {
 	return map( value, element => element.outerHTML ).join( '' );
 }
+
+/**
+ * Transforms an array of DOM Elements to the given format.
+ *
+ * @param {Array}  value  DOM Elements.
+ * @param {string} format Output format (string or element)
+ *
+ * @return {*} Output.
+ */
+export function domToFormat( value, format ) {
+	switch ( format ) {
+		case 'string':
+			return domToString( value );
+		default:
+			return domToElement( value );
+	}
+}

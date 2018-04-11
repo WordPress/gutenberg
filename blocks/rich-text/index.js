@@ -36,7 +36,7 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
-import { domToElement, domToString, elementToString } from './format';
+import { domToString, elementToString } from './format';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -476,8 +476,8 @@ export class RichText extends Component {
 				const afterNodes = childNodes.slice( index + 1 );
 
 				const { format } = this.props;
-				const before = format === 'string' ? domToString( beforeNodes ) : domToElement( beforeNodes );
-				const after = format === 'string' ? domToString( afterNodes ) : domToElement( afterNodes );
+				const before = domToFormat( beforeNodes, format );
+				const after = domToFormat( afterNodes, format );
 
 				this.restoreContentAndSplit( before, after );
 			} else {
@@ -571,9 +571,8 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const { format } = this.props;
-			const before = format === 'string' ? domToString( beforeFragment.childNodes ) : domToElement( beforeFragment.childNodes );
-			const filteredAfterFragment = filterEmptyNodes( afterFragment.childNodes );
-			const after = format === 'string' ? domToString( filteredAfterFragment ) : domToElement( filteredAfterFragment );
+			const before = domToFormat( beforeFragment.childNodes, format );
+			const after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format );
 
 			this.restoreContentAndSplit( before, after, blocks );
 		} else {
@@ -625,8 +624,8 @@ export class RichText extends Component {
 
 		const { format } = this.props;
 		this.restoreContentAndSplit(
-			format === 'string' ? domToString( before ) : domToElement( before ),
-			format === 'string' ? domToString( after ) : domToElement( after )
+			domToFormat( before, format ),
+			domToFormat( after, format )
 		);
 	}
 
@@ -698,7 +697,7 @@ export class RichText extends Component {
 			default:
 				return this.editor.dom.isEmpty( this.editor.getBody() ) ?
 					[] :
-					domToElement( this.editor.getBody().childNodes || [] );
+					domToFormat( this.editor.getBody().childNodes || [], 'element' );
 		}
 	}
 
