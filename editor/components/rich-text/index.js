@@ -767,7 +767,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		if ( this.props.inlineToken ) {
+		if ( this.props.inlineToken && this.props.isSelected ) {
 			this.insertToken();
 		}
 
