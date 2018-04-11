@@ -65,6 +65,7 @@ class PostPermalink extends Component {
 						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
 					>
 						{ decodeURI( samplePermalink ) }
+						&lrm;
 					</Button>
 				}
 
