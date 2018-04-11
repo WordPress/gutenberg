@@ -1,7 +1,9 @@
 /** @format */
 
-import * as element from '@gutenberg/element';
+import { createElement } from '@wordpress/element';
 
 global.wp = {
-	element, // load the element creation function, needed by Gutenberg-web
+	element: {
+		createElement, // load the element creation function, needed by Gutenberg-web
+	},
 };

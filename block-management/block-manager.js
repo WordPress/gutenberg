@@ -4,12 +4,15 @@
  */
 
 import React from 'react';
-import { Platform, StyleSheet, Text, View, FlatList } from 'react-native';
+import { Platform, Switch, StyleSheet, Text, View, FlatList } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
 import type { BlockType } from '../store/';
+
+// Gutenberg imports
+import { getBlockType, serialize } from '@gutenberg/blocks/api';
 
 export type BlockListType = {
 	onChange: ( uid: string, attributes: mixed ) => void,
@@ -24,6 +27,7 @@ export type BlockListType = {
 type PropsType = BlockListType;
 type StateType = {
 	dataSource: DataSource,
+	showHtml: boolean,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
@@ -33,6 +37,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		super( props );
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.uid ),
+			showHtml: false,
 		};
 	}
 
@@ -69,6 +74,21 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				// TODO: implement settings
 				break;
 		}
+	}
+
+	serializeToHtml() {
+		return this.props.blocks
+			.map( block => {
+				const blockType = getBlockType( block.name );
+				if ( blockType ) {
+					return serialize( [ block ] ) + '\n\n';
+				}
+
+				return '<span>' + block.attributes.content + '</span>\n\n';
+			} )
+			.reduce( ( prevVal, value ) => {
+				return prevVal + value;
+			}, '' );
 	}
 
 	componentDidUpdate() {
@@ -118,7 +138,17 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return (
 			<View style={ styles.container }>
 				<View style={ { height: 30 } } />
-				{ list }
+				<View style={ styles.switch }>
+					<Text>View html output</Text>
+					<Switch
+						activeText={ 'On' }
+						inActiveText={ 'Off' }
+						value={ this.state.showHtml }
+						onValueChange={ value => this.setState( { showHtml: value } ) }
+					/>
+				</View>
+				{ this.state.showHtml && <Text style={ styles.list }>{ this.serializeToHtml() }</Text> }
+				{ ! this.state.showHtml && list }
 			</View>
 		);
 	}
@@ -140,10 +170,20 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 const styles = StyleSheet.create( {
 	container: {
 		flex: 1,
+		justifyContent: 'flex-start',
 		backgroundColor: '#caa',
 	},
 	list: {
 		flex: 1,
 		backgroundColor: '#ccc',
+	},
+	htmlView: {
+		flex: 1,
+		backgroundColor: '#fff',
+	},
+	switch: {
+		flexDirection: 'row',
+		justifyContent: 'flex-start',
+		alignItems: 'center',
 	},
 } );

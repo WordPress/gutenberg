@@ -32,7 +32,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	getBlockForType() {
-		const blockType = getBlockType( this.props.blockType );
+		const blockType = getBlockType( this.props.name );
 		if ( blockType ) {
 			const Block = blockType.edit;
 
@@ -57,7 +57,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 			>
 				<View style={ styles.blockHolder }>
 					<View style={ styles.blockTitle }>
-						<Text>BlockType: { this.props.blockType }</Text>
+						<Text>BlockType: { this.props.name }</Text>
 					</View>
 					<View style={ styles.blockContainer }>{ this.getBlockForType.bind( this )() }</View>
 					{ this.renderToolbarIfBlockFocused.bind( this )() }
