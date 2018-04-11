@@ -29,15 +29,10 @@ const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
 	return {
 		title,
-
-		description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
-
+		description: __( `This embed block embeds content from ${ title }` ),
 		icon,
-
 		category,
-
 		keywords,
-
 		attributes: {
 			url: {
 				type: 'string',
