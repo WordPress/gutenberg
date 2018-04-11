@@ -1,4 +1,6 @@
-/** @format */
+/**
+ * @format
+ */
 
 import { reducer } from './';
 import * as actions from '../actions/';
