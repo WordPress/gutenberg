@@ -137,9 +137,12 @@ export function registerResolvers( reducerKey, newResolvers ) {
 		}
 
 		const store = stores[ reducerKey ];
-		const resolver = isPlainObject( newResolvers[ key ] ) ? newResolvers[ key ] : { fulfill: newResolvers[ key ] };
+		let resolver = newResolvers[ key ];
+		if ( ! isPlainObject( resolver ) ) {
+			resolver = { fulfill: resolver };
+		}
 
-		const rawFullfill = async ( ...args ) => {
+		const rawFulfill = async ( ...args ) => {
 			// At this point, selectors have already been pre-bound to inject
 			// state, it would not be otherwise provided to fulfill.
 			const state = store.getState();
@@ -165,9 +168,9 @@ export function registerResolvers( reducerKey, newResolvers ) {
 		const fulfill = resolver.isFulfilled ? ( ...args ) => {
 			const state = store.getState();
 			if ( ! resolver.isFulfilled( state, ...args ) ) {
-				rawFullfill( ...args );
+				rawFulfill( ...args );
 			}
-		} : memoize( rawFullfill );
+		} : memoize( rawFulfill );
 
 		return ( ...args ) => {
 			fulfill( ...args );
