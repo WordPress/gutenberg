@@ -70,23 +70,28 @@ function _gutenberg_utf8_split( $str ) {
 }
 
 /**
- * Shims fix for apiRequest on sites configured to use plain permalinks.
+ * Shims fix for apiRequest on sites configured to use plain permalinks and add Preloading support.
  *
  * @see https://core.trac.wordpress.org/ticket/42382
  *
  * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
  */
-function gutenberg_shim_fix_api_request_plain_permalinks( $scripts ) {
+function gutenberg_shim_api_request( $scripts ) {
 	$api_request_fix = <<<JS
 ( function( wp, wpApiSettings ) {
+
+	// Fix plain permalinks sites
 	var buildAjaxOptions;
+	if ( 'string' === typeof wpApiSettings.root && -1 !== wpApiSettings.root.indexOf( '?' ) ) {
+		buildAjaxOptions = wp.apiRequest.buildAjaxOptions;
+		wp.apiRequest.buildAjaxOptions = function( options ) {
+			if ( 'string' === typeof options.path ) {
+				options.path = options.path.replace( '?', '&' );
+			}
 
-	if ( 'string' !== typeof wpApiSettings.root ||
-			-1 === wpApiSettings.root.indexOf( '?' ) ) {
-		return;
+			return buildAjaxOptions.call( wp.apiRequest, options );
+		};
 	}
-
-	buildAjaxOptions = wp.apiRequest.buildAjaxOptions;
 
 	function getStablePath( path ) {
 		var splitted = path.split( '?' );
@@ -115,18 +120,12 @@ function gutenberg_shim_fix_api_request_plain_permalinks( $scripts ) {
 			// 'a=5&b=1&c=2'
 			.join( '&' );
 	};
-	wp.apiRequest.buildAjaxOptions = function( options ) {
-		if ( 'string' === typeof options.path ) {
-			options.path = options.path.replace( '?', '&' );
-		}
 
-		return buildAjaxOptions.call( wp.apiRequest, options );
-	};
-
+	// Add preloading support
 	var previousApiRequest = wp.apiRequest;
 	wp.apiRequest = function( request ) {
 		var method = request.method || 'GET';
-		var path = getStablePath( request.path )
+		var path = getStablePath( request.path );
 		if ( 'GET' === method && window._wpAPIDataPreload[ path ] ) {
 			var deferred = jQuery.Deferred();
 			deferred.resolve( window._wpAPIDataPreload[ path ].body );
@@ -143,7 +142,7 @@ JS;
 
 	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
 }
-add_action( 'wp_default_scripts', 'gutenberg_shim_fix_api_request_plain_permalinks' );
+add_action( 'wp_default_scripts', 'gutenberg_shim_api_request' );
 
 /**
  * Shims support for emulating HTTP/1.0 requests in wp.apiRequest
