@@ -81,10 +81,10 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			.map( block => {
 				const blockType = getBlockType( block.name );
 				if ( blockType ) {
-					return serialize( [ block ] );
+					return serialize( [ block ] ) + '\n\n';
 				}
 
-				return '<span>' + block.attributes.content + '</span>';
+				return '<span>' + block.attributes.content + '</span>\n\n';
 			} )
 			.reduce( ( prevVal, value ) => {
 				return prevVal + value;
