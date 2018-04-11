@@ -1,5 +1,3 @@
-import { initializeEditor } from '@wordpress/edit-post';
-import { registerCoreBlocks } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
-
-export { registerCoreBlocks, Component, initializeEditor };
+export { initializeEditor } from '@wordpress/edit-post';
+export { registerCoreBlocks } from '@wordpress/blocks';
+export { Component } from '@wordpress/element';

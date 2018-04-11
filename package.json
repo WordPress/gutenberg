@@ -140,6 +140,8 @@
 		"test-unit:coverage-ci": "npm run test-unit -- --coverage --maxWorkers 1 && codecov",
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
-		"test-e2e:watch": "npm run test-e2e -- --watch"
+		"test-e2e:watch": "npm run test-e2e -- --watch",
+		"prepublish": "rm -r gutenberg-package || npm run lint && NODE_ENV=production webpack --config webpack.config.dist.js",
+		"build-package": "npm run prepublish && cp 'package.dist.json' 'gutenberg-package/package.json'"
 	}
 }
