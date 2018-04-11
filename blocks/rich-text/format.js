@@ -21,6 +21,23 @@ export function elementToString( value ) {
 }
 
 /**
+ * Transforms a value in a given format into string.
+ *
+ * @param {Array|string?}  value  DOM Elements.
+ * @param {string} format Output format (string or element)
+ *
+ * @return {string} HTML output as string.
+ */
+export function valueToString( value, format ) {
+	switch ( format ) {
+		case 'string':
+			return value || '';
+		default:
+			return elementToString( value );
+	}
+}
+
+/**
  * Strips out TinyMCE specific attributes and nodes from a WPElement
  *
  * @param {string} type    Element type

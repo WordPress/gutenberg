@@ -8,12 +8,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, Children, createElement } from '@wordpress/element';
+import { Component, createElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { diffAriaProps, pickAriaProps } from './aria';
+import { valueToString } from './format';
 
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
 export default class TinyMCE extends Component {
@@ -105,12 +106,6 @@ export default class TinyMCE extends Component {
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
 		// us to show and focus the content before it's truly ready to edit.
-		let extraProps = {};
-		if ( defaultValue && format === 'string' ) {
-			extraProps = { dangerouslySetInnerHTML: { __html: defaultValue } };
-		} else if ( defaultValue ) {
-			extraProps = { children: Children.toArray( defaultValue ) };
-		}
 
 		return createElement( tagName, {
 			...ariaProps,
@@ -120,7 +115,7 @@ export default class TinyMCE extends Component {
 			ref: ( node ) => this.editorNode = node,
 			style,
 			suppressContentEditableWarning: true,
-			...extraProps,
+			dangerouslySetInnerHTML: { __html: valueToString( defaultValue, format ) },
 		} );
 	}
 }

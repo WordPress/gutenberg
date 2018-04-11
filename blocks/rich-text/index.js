@@ -36,7 +36,7 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
-import { domToString, elementToString } from './format';
+import { domToFormat, valueToString } from './format';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -679,13 +679,7 @@ export class RichText extends Component {
 
 	setContent( content ) {
 		const { format } = this.props;
-		switch ( format ) {
-			case 'string':
-				this.editor.setContent( content || '' );
-				break;
-			default:
-				this.editor.setContent( elementToString( content ) );
-		}
+		this.editor.setContent( valueToString( content, format ) );
 	}
 
 	getContent() {
