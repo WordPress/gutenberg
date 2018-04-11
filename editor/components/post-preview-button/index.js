@@ -133,7 +133,7 @@ export default compose(
 			isPreviewable: postType.previewable,
 		};
 	} ),
-	ifCondition( ( isPreviewable ) => isPreviewable ),
+	ifCondition( ( { isPreviewable } ) => isPreviewable ),
 	connect(
 		( state ) => ( {
 			postId: state.currentPost.id,
