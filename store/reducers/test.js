@@ -41,7 +41,8 @@ describe( 'Store', () => {
 			expect( initialState ).toEqual( __iniState );
 		} );
 
-		it( 'should mutate block\'s content', () => {
+		// eslint-disable-next-line quotes
+		it( "should mutate block's content", () => {
 			const newState = reducer(
 				initialState,
 				actions.updateBlockAttributes( '1', { content: 'new content' } )
