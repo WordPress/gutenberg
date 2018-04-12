@@ -8,6 +8,8 @@
   "devDependencies": {
     "@wordpress/babel-preset-default": "^1.1.2",
     "babel-eslint": "^8.2.2",
+    "babel-plugin-react-native-classname-to-style": "^1.2.1",
+    "babel-plugin-react-native-platform-specific-extensions": "^1.0.1",
     "babel-plugin-react-require": "^3.0.0",
     "babel-plugin-transform-async-generator-functions": "^6.24.1",
     "babel-preset-react-native-stage-0": "^1.0.1",
@@ -25,6 +27,7 @@
     "jest-react-native": "^18.0.0",
     "prettier": "git+https://github.com/Automattic/calypso-prettier.git#calypso-1.9",
     "react-dom": "^16.2.0",
+    "react-native-sass-transformer": "^1.1.1",
     "react-test-renderer": "16.2.0",
     "remote-redux-devtools": "^0.5.12"
   },
@@ -49,6 +52,7 @@
     "js-beautify": "^1.7.5",
     "jsx-to-string": "^1.3.1",
     "memize": "^1.0.5",
+    "node-sass": "^4.8.3",
     "react": "16.2.0",
     "react-native": "0.52.0",
     "react-native-recyclerview-list": "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#bfccbaab6b5954e18f8b0ed441ba38275853b79c",
