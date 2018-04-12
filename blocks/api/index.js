@@ -20,6 +20,7 @@ export {
 } from './serializer';
 export { isValidBlock } from './validation';
 export { getCategories } from './categories';
+export { getTabs, getDefaultTab, getTabByName } from './tabs';
 export {
 	registerBlockType,
 	unregisterBlockType,

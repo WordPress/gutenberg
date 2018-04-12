@@ -21,6 +21,7 @@ module.exports = {
 		wp: true,
 		window: true,
 		document: true,
+		customGutenberg: true,
 	},
 	plugins: [
 		'wordpress',

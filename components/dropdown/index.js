@@ -1,5 +1,5 @@
 /**
- * WordPress Dependeencies
+ * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
 

@@ -1,0 +1,20 @@
+$totalColumns: 12;
+$rows: [ 5, 7 ], [ 7, 5 ], [ 1, 10, 1], [ 2, 8, 2];
+
+@each $row in $rows {
+	$sum: sum($row);
+
+	@if $sum = 12 {
+		$classname: '';
+		$percentage: null;
+
+		@each $col in $row {
+			$classname: '#{$classname}-col#{$col}';
+			$percentage: $percentage percentage($col / $totalColumns);
+		}
+
+		.wp-block-rows#{$classname} {
+			grid-template-columns: $percentage;
+		}
+	}
+}
