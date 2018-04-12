@@ -11,6 +11,13 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	registerBlockType,
+	RichText,
+	AlignmentToolbar,
+	MediaUpload,
+	ImagePlaceholder,
+	BlockControls,
+	BlockAlignmentToolbar,
+	InspectorControls,
 } from '@wordpress/blocks';
 import classnames from 'classnames';
 
@@ -19,13 +26,6 @@ import classnames from 'classnames';
  */
 import './editor.scss';
 import './style.scss';
-import RichText from '../../rich-text';
-import AlignmentToolbar from '../../alignment-toolbar';
-import MediaUpload from '../../media-upload';
-import ImagePlaceholder from '../../image-placeholder';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InspectorControls from '../../inspector-controls';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 

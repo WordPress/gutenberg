@@ -2,6 +2,11 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import {
+	InspectorControls,
+	BlockControls,
+	BlockAlignmentToolbar,
+} from '@wordpress/blocks';
 import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -12,9 +17,6 @@ import { times, unescape } from 'lodash';
  */
 import './editor.scss';
 import './style.scss';
-import InspectorControls from '../../inspector-controls';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 class CategoriesBlock extends Component {
 	constructor() {

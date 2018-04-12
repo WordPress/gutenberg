@@ -15,6 +15,15 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	RichText,
+	ImagePlaceholder,
+	MediaUpload,
+	InspectorControls,
+	BlockControls,
+	BlockAlignmentToolbar,
+	UrlInputButton,
+} from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
@@ -30,13 +39,6 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import RichText from '../../rich-text';
-import ImagePlaceholder from '../../image-placeholder';
-import MediaUpload from '../../media-upload';
-import InspectorControls from '../../inspector-controls';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
 import { mediaUpload } from '../../../utils/mediaupload';
 

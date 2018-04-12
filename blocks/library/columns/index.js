@@ -11,6 +11,10 @@ import memoize from 'memize';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	InspectorControls,
+	BlockControls,
+	BlockAlignmentToolbar,
+	InnerBlocks,
 } from '@wordpress/blocks';
 import { PanelBody, RangeControl } from '@wordpress/components';
 
@@ -19,10 +23,6 @@ import { PanelBody, RangeControl } from '@wordpress/components';
  */
 import './style.scss';
 import './editor.scss';
-import InspectorControls from '../../inspector-controls';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import InnerBlocks from '../../inner-blocks';
 
 /**
  * Returns the layouts configuration for a given number of columns.

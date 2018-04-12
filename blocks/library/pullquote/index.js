@@ -9,6 +9,9 @@ import { map } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	RichText,
+	BlockControls,
+	BlockAlignmentToolbar,
 } from '@wordpress/blocks';
 import { withState } from '@wordpress/components';
 
@@ -17,9 +20,6 @@ import { withState } from '@wordpress/components';
  */
 import './editor.scss';
 import './style.scss';
-import RichText from '../../rich-text';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const toRichTextValue = value => map( value, ( subValue => subValue.children ) );
 const fromRichTextValue = value => map( value, ( subValue ) => ( {

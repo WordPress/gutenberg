@@ -11,6 +11,11 @@ import { stringify } from 'querystringify';
  */
 import { Component } from '@wordpress/element';
 import {
+	InspectorControls,
+	BlockControls,
+	BlockAlignmentToolbar,
+} from '@wordpress/blocks';
+import {
 	PanelBody,
 	Placeholder,
 	QueryControls,
@@ -28,9 +33,6 @@ import { decodeEntities } from '@wordpress/utils';
  */
 import './editor.scss';
 import './style.scss';
-import InspectorControls from '../../inspector-controls';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 const MAX_POSTS_COLUMNS = 6;
 

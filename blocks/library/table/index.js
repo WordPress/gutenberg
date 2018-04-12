@@ -4,6 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	BlockControls,
+	BlockAlignmentToolbar,
 } from '@wordpress/blocks';
 
 /**
@@ -12,8 +14,6 @@ import {
 import './editor.scss';
 import './style.scss';
 import TableBlock from './table-block';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 registerBlockType( 'core/table', {
 	title: __( 'Table' ),

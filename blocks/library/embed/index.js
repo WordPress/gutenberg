@@ -12,6 +12,9 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	createBlock,
 	registerBlockType,
+	RichText,
+	BlockControls,
+	BlockAlignmentToolbar,
 } from '@wordpress/blocks';
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
@@ -22,9 +25,6 @@ import classnames from 'classnames';
  */
 import './style.scss';
 import './editor.scss';
-import RichText from '../../rich-text';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];

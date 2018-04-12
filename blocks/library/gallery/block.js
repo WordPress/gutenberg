@@ -7,6 +7,13 @@ import { filter, pick } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import {
+	MediaUpload,
+	ImagePlaceholder,
+	InspectorControls,
+	BlockControls,
+	BlockAlignmentToolbar,
+} from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { mediaUpload } from '@wordpress/utils';
 import {
@@ -23,11 +30,6 @@ import {
 /**
  * Internal dependencies
  */
-import MediaUpload from '../../media-upload';
-import ImagePlaceholder from '../../image-placeholder';
-import InspectorControls from '../../inspector-controls';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import GalleryImage from './gallery-image';
 
 const MAX_COLUMNS = 8;

@@ -9,6 +9,10 @@ import { times } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	BlockControls,
+	BlockAlignmentToolbar,
+	RichText,
+	InspectorControls,
 } from '@wordpress/blocks';
 import { PanelBody, RangeControl } from '@wordpress/components';
 
@@ -17,10 +21,6 @@ import { PanelBody, RangeControl } from '@wordpress/components';
  */
 import './style.scss';
 import './editor.scss';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import RichText from '../../rich-text';
-import InspectorControls from '../../inspector-controls';
 
 registerBlockType( 'core/text-columns', {
 	title: __( 'Text Columns' ),

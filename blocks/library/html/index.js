@@ -5,6 +5,7 @@ import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	BlockControls,
 } from '@wordpress/blocks';
 import { withState, SandBox, CodeEditor } from '@wordpress/components';
 
@@ -12,7 +13,6 @@ import { withState, SandBox, CodeEditor } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import BlockControls from '../../block-controls';
 
 registerBlockType( 'core/html', {
 	title: __( 'Custom HTML' ),

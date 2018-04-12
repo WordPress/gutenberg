@@ -5,6 +5,10 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	createBlock,
 	registerBlockType,
+	RichText,
+	BlockControls,
+	InspectorControls,
+	AlignmentToolbar,
 } from '@wordpress/blocks';
 
 import { concatChildren } from '@wordpress/element';
@@ -14,10 +18,6 @@ import { PanelBody, Toolbar } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import RichText from '../../rich-text';
-import BlockControls from '../../block-controls';
-import InspectorControls from '../../inspector-controls';
-import AlignmentToolbar from '../../alignment-toolbar';
 
 registerBlockType( 'core/heading', {
 	title: __( 'Heading' ),

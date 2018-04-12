@@ -2,14 +2,12 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import {
+	RichText,
+	BlockControls,
+} from '@wordpress/blocks';
 import { Toolbar, DropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import RichText from '../../rich-text';
-import BlockControls from '../../block-controls';
 
 function isTableSelected( editor ) {
 	return editor.dom.getParent(

@@ -5,13 +5,13 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	registerBlockType,
+	PlainText,
 } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import PlainText from '../../plain-text';
 
 registerBlockType( 'core/code', {
 	title: __( 'Code' ),

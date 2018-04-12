@@ -11,14 +11,14 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	registerBlockType,
+	RichText,
+	BlockControls,
 } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import RichText from '../../rich-text';
-import BlockControls from '../../block-controls';
 
 registerBlockType( 'core/list', {
 	title: __( 'List' ),

@@ -12,6 +12,12 @@ import {
 	createBlock,
 	registerBlockType,
 	setDefaultBlockName,
+	AlignmentToolbar,
+	BlockAlignmentToolbar,
+	BlockControls,
+	RichText,
+	InspectorControls,
+	ColorPalette,
 } from '@wordpress/blocks';
 import { concatChildren, Component, RawHTML } from '@wordpress/element';
 import {
@@ -31,12 +37,6 @@ import './editor.scss';
 import './style.scss';
 import { blockAutocompleter } from '../../autocompleters';
 import { defaultAutocompleters } from '../../hooks/default-autocompleters';
-import AlignmentToolbar from '../../alignment-toolbar';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import BlockControls from '../../block-controls';
-import RichText from '../../rich-text';
-import InspectorControls from '../../inspector-controls';
-import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
 
 const { getComputedStyle } = window;

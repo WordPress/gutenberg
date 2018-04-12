@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	registerBlockType,
+	RichText,
 } from '@wordpress/blocks';
 
 /**
@@ -12,7 +13,6 @@ import {
  */
 import './editor.scss';
 import './style.scss';
-import RichText from '../../rich-text';
 
 registerBlockType( 'core/subhead', {
 	title: __( 'Subhead' ),

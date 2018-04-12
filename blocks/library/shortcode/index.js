@@ -5,6 +5,7 @@ import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	PlainText,
 } from '@wordpress/blocks';
 
 import { withInstanceId, Dashicon } from '@wordpress/components';
@@ -13,7 +14,6 @@ import { withInstanceId, Dashicon } from '@wordpress/components';
  * Internal dependencies
  */
 import './editor.scss';
-import PlainText from '../../plain-text';
 
 registerBlockType( 'core/shortcode', {
 	title: __( 'Shortcode' ),

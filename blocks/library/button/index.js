@@ -4,6 +4,12 @@
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	RichText,
+	UrlInput,
+	BlockControls,
+	BlockAlignmentToolbar,
+	ColorPalette,
+	InspectorControls,
 } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import {
@@ -20,13 +26,7 @@ import {
  */
 import './editor.scss';
 import './style.scss';
-import RichText from '../../rich-text';
-import UrlInput from '../../url-input';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
-import ColorPalette from '../../color-palette';
 import ContrastChecker from '../../contrast-checker';
-import InspectorControls from '../../inspector-controls';
 
 const { getComputedStyle } = window;
 

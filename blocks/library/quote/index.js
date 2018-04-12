@@ -11,6 +11,9 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	createBlock,
 	registerBlockType,
+	AlignmentToolbar,
+	BlockControls,
+	RichText,
 } from '@wordpress/blocks';
 import { Toolbar, withState } from '@wordpress/components';
 
@@ -19,9 +22,6 @@ import { Toolbar, withState } from '@wordpress/components';
  */
 import './style.scss';
 import './editor.scss';
-import AlignmentToolbar from '../../alignment-toolbar';
-import BlockControls from '../../block-controls';
-import RichText from '../../rich-text';
 
 const toRichTextValue = value => value.map( ( subValue => subValue.children ) );
 const fromRichTextValue = value => value.map( ( subValue ) => ( {

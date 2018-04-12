@@ -8,14 +8,10 @@ import classnames from 'classnames';
  */
 import { Component } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
+import { RichText } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
 import { withSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import RichText from '../../rich-text';
 
 /**
  * Module constants

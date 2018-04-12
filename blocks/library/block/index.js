@@ -12,12 +12,12 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	BlockEdit,
 } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import BlockEdit from '../../block-edit';
 import SharedBlockEditPanel from './edit-panel';
 import SharedBlockIndicator from './indicator';
 

@@ -9,6 +9,9 @@ import { __ } from '@wordpress/i18n';
 
 import {
 	registerBlockType,
+	MediaUpload,
+	RichText,
+	BlockControls,
 } from '@wordpress/blocks';
 
 import {
@@ -27,9 +30,6 @@ import { mediaUpload } from '@wordpress/utils';
  */
 import './style.scss';
 import './editor.scss';
-import MediaUpload from '../../media-upload';
-import RichText from '../../rich-text';
-import BlockControls from '../../block-controls';
 
 registerBlockType( 'core/audio', {
 	title: __( 'Audio' ),

@@ -9,6 +9,8 @@ import { compact } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	createBlock,
+	InspectorControls,
 } from '@wordpress/blocks';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { Component, RawHTML } from '@wordpress/element';
@@ -17,8 +19,6 @@ import { Component, RawHTML } from '@wordpress/element';
  * Internal dependencies
  */
 import './editor.scss';
-import { createBlock } from '../../api';
-import InspectorControls from '../../inspector-controls';
 
 registerBlockType( 'core/more', {
 	title: __( 'More' ),

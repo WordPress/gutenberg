@@ -5,13 +5,13 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	registerBlockType,
+	RichText,
 } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import RichText from '../../rich-text';
 
 registerBlockType( 'core/verse', {
 	title: __( 'Verse' ),
