@@ -24,20 +24,20 @@ class PostPermalink extends Component {
 
 		this.state = {
 			iconClass: '',
-			editingPermalink: false,
+			isEditingPermalink: false,
 		};
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
 		// If we've just stopped editing the permalink, focus on the new permalink.
-		if ( prevState.editingPermalink && ! this.state.editingPermalink ) {
+		if ( prevState.isEditingPermalink && ! this.state.isEditingPermalink ) {
 			this.permalinkButton.focus();
 		}
 	}
 
 	render() {
 		const { isNew, previewLink, isEditable, samplePermalink } = this.props;
-		const { iconClass, editingPermalink } = this.state;
+		const { iconClass, isEditingPermalink } = this.state;
 
 		if ( isNew || ! previewLink ) {
 			return null;
@@ -57,7 +57,7 @@ class PostPermalink extends Component {
 
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
-				{ ! editingPermalink &&
+				{ ! isEditingPermalink &&
 					<Button
 						className="editor-post-permalink__link"
 						href={ previewLink }
@@ -69,17 +69,17 @@ class PostPermalink extends Component {
 					</Button>
 				}
 
-				{ editingPermalink &&
+				{ isEditingPermalink &&
 					<PostPermalinkEditor
-						onSave={ () => this.setState( { editingPermalink: false } ) }
+						onSave={ () => this.setState( { isEditingPermalink: false } ) }
 					/>
 				}
 
-				{ isEditable && ! editingPermalink &&
+				{ isEditable && ! isEditingPermalink &&
 					<Button
 						className="editor-post-permalink__edit"
 						isLarge
-						onClick={ () => this.setState( { editingPermalink: true } ) }
+						onClick={ () => this.setState( { isEditingPermalink: true } ) }
 					>
 						{ __( 'Edit' ) }
 					</Button>
