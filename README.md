@@ -10,6 +10,14 @@ npm install @frontkom/gutenberg
 
 Check the package [documentation](https://www.npmjs.com/package/@frontkom/gutenberg).
 
+## Development
+
+During the development you can use `npm link` to link this package and test it without having to publish it. 
+
+From the package folder (`gutenberg-package`) run `npm link` to create the link. Then in project folder which as the package as dependency, run `npm link @frontkom/gutenberg` so the package could be linked. 
+
+Now all changes you made on package will be watched.
+
 ## Publishing
 
 Don't forget to update the package version in `package.dist.json` file. To prepare the package run the following command from the root:
