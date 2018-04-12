@@ -102,6 +102,12 @@ export default class Dashicon extends wp.element.Component {
 			case 'align-none':
 				path = 'M3 5h14V3H3v2zm10 8V7H3v6h10zM3 17h14v-2H3v2z';
 				break;
+			case 'align-pull-left':
+				path = 'M11 5h6V3h-6v2zm-2 6V3H3v8h6zm2-2h6V7h-6v2zm0 4h6v-2h-6v2zm0 4h6v-2h-6v2z';
+				break;
+			case 'align-pull-right':
+				path = 'M9 3H3v2h6V3zm8 8V3h-6v8h6zM9 7H3v2h6V7zm0 4H3v2h6v-2zm0 4H3v2h6v-2z';
+				break;
 			case 'align-right':
 				path = 'M3 5h14V3H3v2zm0 4h3V7H3v2zm14 4V7H8v6h9zM3 13h3v-2H3v2zm0 4h14v-2H3v2z';
 				break;
@@ -551,6 +557,9 @@ export default class Dashicon extends wp.element.Component {
 				break;
 			case 'laptop':
 				path = 'M3 3h14c.6 0 1 .4 1 1v10c0 .6-.4 1-1 1H3c-.6 0-1-.4-1-1V4c0-.6.4-1 1-1zm13 2H4v8h12V5zm-3 1H5v4zm6 11v-1H1v1c0 .6.5 1 1.1 1h15.8c.6 0 1.1-.4 1.1-1z';
+				break;
+			case 'layout-two-fold':
+				path = 'M9 16V4H3v12h6zm2-7h6V7h-6v2zm0 4h6v-2h-6v2z';
 				break;
 			case 'layout':
 				path = 'M2 2h5v11H2V2zm6 0h5v5H8V2zm6 0h4v16h-4V2zM8 8h5v5H8V8zm-6 6h11v4H2v-4z';

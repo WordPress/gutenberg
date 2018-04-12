@@ -102,6 +102,7 @@
 	position: relative;
 	padding-left: $block-padding;
 	padding-right: $block-padding;
+	grid-column: content;
 
 	@include break-small() {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
@@ -258,55 +259,55 @@
 	 * Alignments
 	 */
 
-	&[data-align="left"],
-	&[data-align="right"] {
-		// Without z-index, won't be clickable as "above" adjacent content
-		z-index: z-index( '.editor-block-list__block {core/image aligned left or right}' );
-		width: 100%;
-
-		// When images are floated, the block itself should collapse to zero height
-		margin-bottom: 0;
-
-		// Hide block outline when an image is floated
-		&:before {
-			content: none;
-		}
-	}
-
-	// Apply max-width to floated items that have no intrinsic width, like Cover Image or Gallery
-	&[data-align="left"],
-	&[data-align="right"] {
-		> .editor-block-list__block-edit {
-			max-width: 360px;
-			width: 100%;
-		}
-
-		// reset when data-resized
-		&[data-resized="true"] > .editor-block-list__block-edit {
-			max-width: none;
-			width: auto;
-		}
-	}
-
-	// Left
-	&[data-align="left"] {
-		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
-			float: left;
-			margin-right: 2em;
-		}
-	}
-
-	// Right
-	&[data-align="right"] {
-		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
-			float: right;
-			margin-left: 2em;
-		}
-
-		.editor-block-toolbar {
-			float: right;
-		}
-	}
+	// &[data-align="left"],
+	// &[data-align="right"] {
+	// 	// Without z-index, won't be clickable as "above" adjacent content
+	// 	z-index: z-index( '.editor-block-list__block {core/image aligned left or right}' );
+	// 	width: 100%;
+	//
+	// 	// When images are floated, the block itself should collapse to zero height
+	// 	margin-bottom: 0;
+	//
+	// 	// Hide block outline when an image is floated
+	// 	&:before {
+	// 		content: none;
+	// 	}
+	// }
+	//
+	// // Apply max-width to floated items that have no intrinsic width, like Cover Image or Gallery
+	// &[data-align="left"],
+	// &[data-align="right"] {
+	// 	> .editor-block-list__block-edit {
+	// 		max-width: 360px;
+	// 		width: 100%;
+	// 	}
+	//
+	// 	// reset when data-resized
+	// 	&[data-resized="true"] > .editor-block-list__block-edit {
+	// 		max-width: none;
+	// 		width: auto;
+	// 	}
+	// }
+	//
+	// // Left
+	// &[data-align="left"] {
+	// 	.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+	// 		float: left;
+	// 		margin-right: 2em;
+	// 	}
+	// }
+	//
+	// // Right
+	// &[data-align="right"] {
+	// 	.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
+	// 		float: right;
+	// 		margin-left: 2em;
+	// 	}
+	//
+	// 	.editor-block-toolbar {
+	// 		float: right;
+	// 	}
+	// }
 
 	// Wide and full-wide
 	&[data-align="full"],

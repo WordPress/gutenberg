@@ -25,10 +25,22 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 		icon: 'align-full-width',
 		title: __( 'Full width' ),
 	},
+	pullLeft: {
+		icon: 'align-pull-left',
+		title: __( 'Pull left' ),
+	},
+	pullRight: {
+		icon: 'align-pull-right',
+		title: __( 'Pull right' ),
+	},
+	twoFold: {
+		icon: 'layout-two-fold',
+		title: __( 'Two Fold' ),
+	},
 };
 
-const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
-const WIDE_CONTROLS = [ 'wide', 'full' ];
+const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'pullLeft', 'pullRight', 'wide', 'full', 'twoFold' ];
+const WIDE_CONTROLS = [ 'pullLeft', 'pullRight', 'wide', 'full', 'twoFold' ];
 
 export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CONTROLS, wideControlsEnabled = false } ) {
 	function applyOrUnset( align ) {
