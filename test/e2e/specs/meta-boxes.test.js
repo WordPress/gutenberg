@@ -26,9 +26,10 @@ describe( 'Meta boxes', () => {
 		expect( await page.$( '.editor-post-save-draft' ) ).not.toBe( null );
 
 		await Promise.all( [
-			// Transitions between two states "Saving..." -> "Save Draft" (the
-			// button is always visible while meta are present).
-			page.waitForSelector( '.editor-post-saved-state__saving' ),
+			// Transitions between three states "Saving..." -> "Saved" -> "Save
+			// Draft" (the button is always visible while meta are present).
+			page.waitForSelector( '.editor-post-saved-state.is-saving' ),
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 			page.waitForSelector( '.editor-post-save-draft' ),
 
 			// Keyboard shortcut Ctrl+S save.
