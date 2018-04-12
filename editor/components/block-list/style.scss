@@ -699,3 +699,11 @@
 		padding-top: 6px;
 	}
 }
+
+.editor-block-breadcrumb {
+	opacity: 0;
+
+	&.is-visible {
+		@include fade_in;
+	}
+}

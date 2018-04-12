@@ -147,3 +147,12 @@ body.gutenberg-editor-page {
 		padding: 6px 10px;
 	}
 }
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
