@@ -37,6 +37,10 @@
 		background-image: linear-gradient( -45deg, $blue-medium-500 28%, $blue-dark-900 28%, $blue-dark-900 72%, $blue-medium-500 72%) !important;
 		border-color: $blue-dark-900 !important;
 	}
+
+	.wp-core-ui.gutenberg-editor-page & {
+		font-size: $default-font-size;
+	}
 }
 
 @keyframes components-button__busy-animation {

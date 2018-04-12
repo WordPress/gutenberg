@@ -158,7 +158,7 @@ registerBlockType( 'core/video', {
 							id={ id }
 							render={ ( { open } ) => (
 								<Button isLarge onClick={ open } >
-									{ __( 'Add from Media Library' ) }
+									{ __( 'Media Library' ) }
 								</Button>
 							) }
 						/>

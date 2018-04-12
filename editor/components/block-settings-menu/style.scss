@@ -1,3 +1,11 @@
+.editor-block-settings-menu {
+	opacity: 0;
+
+	&.is-visible {
+		@include fade_in;
+	}
+}
+
 // The Blocks "More" Menu ellipsis icon button
 .editor-block-settings-menu__toggle {
 	justify-content: center;

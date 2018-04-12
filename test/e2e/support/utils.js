@@ -10,8 +10,6 @@ const {
 	WP_PASSWORD = 'password',
 } = process.env;
 
-const NAVIGATION_TIMEOUT = 20000;
-
 function getUrl( WPPath, query = '' ) {
 	const url = new URL( WP_BASE_URL );
 
@@ -29,29 +27,18 @@ function isWPPath( WPPath, query = '' ) {
 	return getUrl( WPPath ) === currentUrl.href;
 }
 
-async function navigationTimeout( promise ) {
-	await new Promise( ( resolve ) => {
-		let resolved = false;
-		const markResolvedAndResolve = () => {
-			if ( ! resolved ) {
-				resolve();
-				resolved = true;
-			}
-		};
-		setTimeout( markResolvedAndResolve, NAVIGATION_TIMEOUT );
-		promise.then( markResolvedAndResolve );
-	} );
-}
-
 async function goToWPPath( WPPath, query ) {
-	await navigationTimeout( page.goto( getUrl( WPPath, query ), { timeout: 0 } ) );
+	await page.goto( getUrl( WPPath, query ) );
 }
 
 async function login() {
 	await page.type( '#user_login', WP_USERNAME );
 	await page.type( '#user_pass', WP_PASSWORD );
-	await page.click( '#wp-submit' );
-	await navigationTimeout( page.waitForNavigation( { timeout: 0 } ) );
+
+	await Promise.all( [
+		page.waitForNavigation(),
+		page.click( '#wp-submit' ),
+	] );
 }
 
 export async function visitAdmin( adminPath, query ) {

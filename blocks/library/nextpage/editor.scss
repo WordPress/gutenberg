@@ -5,36 +5,31 @@
 .wp-block-nextpage {
 	display: block;
 	text-align: center;
-	overflow: hidden;
 	white-space: nowrap;
-}
 
-.wp-block-nextpage > span {
-	position: relative;
-	display: inline-block;
-	font-size: 12px;
-	text-transform: uppercase;
-	font-weight: 600;
-	font-family: $default-font;
-	color: $dark-gray-300;
-}
+	// Label
+	> span {
+		position: relative;
+		display: inline-block;
+		font-size: 12px;
+		text-transform: uppercase;
+		font-weight: 600;
+		font-family: $default-font;
+		color: $dark-gray-300;
+		border-radius: 4px;
+		background: $white;
+		padding: 6px 8px;
+		height: $icon-button-size-small;
+	}
 
-.wp-block-nextpage > span:before,
-.wp-block-nextpage > span:after {
-	content: '';
-	position: absolute;
-	top: 50%;
-	width: 100vw;
-	border-top: 3px dashed $light-gray-700;
-	margin-top: -2px;
-}
-
-.wp-block-nextpage > span:before {
-	right: 100%;
-	margin-right: 20px;
-}
-
-.wp-block-nextpage > span:after {
-	left: 100%;
-	margin-left: 20px;
+	// Dashed line
+	&:before {
+		content: '';
+		position: absolute;
+		top: calc( 50% );
+		left: 0;
+		right: 0;
+		border-top: 3px dashed $light-gray-700;
+		z-index: z-index( '.editor-block-list__block .wp-block-more:before' );
+	}
 }
