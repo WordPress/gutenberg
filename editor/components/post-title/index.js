@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { KeyboardShortcuts, withContext, withInstanceId, withFocusOutside, withAPIData } from '@wordpress/components';
+import { KeyboardShortcuts, withContext, withInstanceId, withFocusOutside } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -92,7 +92,7 @@ class PostTitle extends Component {
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 		const decodedPlaceholder = decodeEntities( placeholder );
-		const isPostTypeViewable = get( postType, 'data.is_viewable', false );
+		const isPostTypeViewable = get( postType, 'is_viewable', false );
 
 		return (
 			<PostTypeSupportCheck supportKeys="title">
@@ -125,19 +125,12 @@ class PostTitle extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute, getCurrentPostType } = select( 'core/editor' );
+	const { getEditedPostAttribute } = select( 'core/editor' );
+	const { getPostType } = select( 'core' );
 
 	return {
 		title: getEditedPostAttribute( 'title' ),
-		postTypeSlug: getCurrentPostType(),
-	};
-} );
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postTypeSlug } = props;
-
-	return {
-		postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
+		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 	};
 } );
 
@@ -171,7 +164,6 @@ const applyEditorSettings = withContext( 'editor' )(
 
 export default compose(
 	applyWithSelect,
-	applyWithAPIData,
 	applyWithDispatch,
 	applyEditorSettings,
 	withInstanceId,
