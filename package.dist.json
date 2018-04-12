@@ -8,7 +8,7 @@
     "url": "git+https://github.com/front/gutenberg.git"
   },
   "author": "The Frontkom Contributors",
-  "license": "UNLICENSED",
+  "license": "GPL-2.0-or-later",
   "keywords": [
     "Frontkom",
     "Gutenberg",

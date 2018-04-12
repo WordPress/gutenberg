@@ -1,6 +1,8 @@
 # Gutenberg by Front
 
-We made [Gutenberg](https://github.com/front/gutenberg) editor a little more customizable! Gutenberg editor can be easly used in your apps and you can customize things like which tabs and blocks categories or document panels to show and more! 
+We made [Gutenberg](https://github.com/front/gutenberg) editor a little more **customizable**! 
+
+Gutenberg editor can **be easly included in your apps** with this package. Also you can customize blocks menu tabs, blocks categories, document panels and more! 
 
 ## Table of contents
 * [Installation](#installation)
@@ -81,9 +83,23 @@ So we recommend you to set up them all in one file called `globals.js` or `setti
 
 ``` js
 // globals.js
+import React from 'react';
+import jQuery from 'jquery';
+
+window.jQuery = jQuery;
 
 window.wp = window.wp || { };
+window.wp.api = {
+    models: {},
+    collections: {},
+    views: {},
+    getPostTypeRoute: function( posType ) {
+        // do something here or just 
+	return posType;
+    }
+};
 window.wp.apiRequest = apiRequest;
+window.wp.element = React;
 window.wp.url = { addQueryArgs };
 
 window._wpDateSettings = { 
