@@ -124,12 +124,17 @@ function gutenberg_shim_api_request( $scripts ) {
 	// Add preloading support
 	var previousApiRequest = wp.apiRequest;
 	wp.apiRequest = function( request ) {
-		var method = request.method || 'GET';
-		var path = getStablePath( request.path );
-		if ( 'GET' === method && window._wpAPIDataPreload[ path ] ) {
-			var deferred = jQuery.Deferred();
-			deferred.resolve( window._wpAPIDataPreload[ path ].body );
-			return deferred.promise();
+		var method, path;
+
+		if ( typeof request.path === 'string' ) {
+			method = request.method || 'GET';
+			path = getStablePath( request.path );
+
+			if ( 'GET' === method && window._wpAPIDataPreload[ path ] ) {
+				var deferred = jQuery.Deferred();
+				deferred.resolve( window._wpAPIDataPreload[ path ].body );
+				return deferred.promise();
+			}
 		}
 
 		return previousApiRequest.call( previousApiRequest, request );
