@@ -4,10 +4,12 @@
  */
 
 import React from 'react';
-import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import Toolbar from './toolbar';
 
 import type { BlockType } from '../store/';
+
+import styles from './block-holder.scss';
 
 // Gutenberg imports
 import { getBlockType } from '@gutenberg/blocks/api';
@@ -66,21 +68,3 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		);
 	}
 }
-
-const styles = StyleSheet.create( {
-	blockHolder: {
-		flex: 1,
-	},
-	blockContainer: {
-		backgroundColor: 'white',
-	},
-	blockContent: {
-		padding: 10,
-	},
-	blockTitle: {
-		backgroundColor: 'grey',
-		paddingLeft: 10,
-		paddingTop: 4,
-		paddingBottom: 4,
-	},
-} );
