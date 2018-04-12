@@ -2,16 +2,16 @@
  * External dependencies
  */
 import { TextInput } from 'react-native';
-import classnames from 'classnames';
 
 /**
  * Internal dependencies
  */
+import styles from './style.scss';
 
 function PlainText( { onChange, className, ...props } ) {
 	return (
 		<TextInput
-			className={ classnames( 'blocks-plain-text', className ) }
+			className={ [ styles.blocks_plain_text, className ] }
 			onChangeText={ ( text ) => onChange( text ) }
 			{ ...props }
 		/>
