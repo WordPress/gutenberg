@@ -107,9 +107,11 @@ const externals = {
 	...packageNames,
 	...coreGlobals,
 ].forEach( ( name ) => {
-	externals[ `@wordpress/${ name }` ] = {
-		this: [ 'wp', camelCaseDash( name ) ],
-	};
+	if ( ! name.includes( 'blocks/library' ) ) {
+		externals[ `@wordpress/${ name }` ] = {
+			this: [ 'wp', camelCaseDash( name ) ],
+		};
+	}
 } );
 
 const config = {
