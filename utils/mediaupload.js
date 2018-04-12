@@ -12,8 +12,9 @@ import { compact, get, startsWith } from 'lodash';
  * @param {Array}    filesList    List of files.
  * @param {Function} onFileChange Function to be called each time a file or a temporary representation of the file is available.
  * @param {string}   allowedType  The type of media that can be uploaded.
+ * @paran {Integer}  parentId     Parent post id if one exists.
  */
-export function mediaUpload( filesList, onFileChange, allowedType ) {
+export function mediaUpload( filesList, onFileChange, allowedType, parentId = null ) {
 	// Cast filesList to array
 	const files = [ ...filesList ];
 
@@ -33,7 +34,7 @@ export function mediaUpload( filesList, onFileChange, allowedType ) {
 		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
 		onFileChange( filesSet );
 
-		return createMediaFromFile( mediaFile ).then(
+		return createMediaFromFile( mediaFile, parentId ).then(
 			( savedMedia ) => {
 				const mediaObject = {
 					id: savedMedia.id,
@@ -57,13 +58,15 @@ export function mediaUpload( filesList, onFileChange, allowedType ) {
 
 /**
  * @param {File} file Media File to Save.
+ * @param {Integer} parentId Parent post id if one exists.
  *
  * @return {Promise} Media Object Promise.
  */
-function createMediaFromFile( file ) {
+function createMediaFromFile( file, parentId = null ) {
 	// Create upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
+	data.append( 'parent', parentId );
 	return wp.apiRequest( {
 		path: '/wp/v2/media',
 		data,

@@ -23,7 +23,7 @@ import { rawHandler } from '../api';
  *
  * @return {Object} Rendered placeholder.
  */
-export default function ImagePlaceholder( { className, icon, label, onSelectImage, multiple = false } ) {
+export default function ImagePlaceholder( { className, icon, label, onSelectImage, multiple = false, parentId = null } ) {
 	const setImage = multiple ? onSelectImage : ( [ image ] ) => onSelectImage( image );
 	const onFilesDrop = ( files ) => mediaUpload( files, setImage, 'image' );
 	const onHTMLDrop = ( HTML ) => setImage( map(
@@ -31,7 +31,7 @@ export default function ImagePlaceholder( { className, icon, label, onSelectImag
 			.filter( ( { name } ) => name === 'core/image' ),
 		'attributes'
 	) );
-	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setImage, 'image' );
+	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setImage, 'image', parentId );
 	return (
 		<Placeholder
 			className={ className }
