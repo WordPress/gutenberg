@@ -262,6 +262,8 @@ window.customGutenberg = {
 };
 ```
 
+![Rows example](https://raw.githubusercontent.com/front/gutenberg/develop/rows_screenshot.png)
+
 ### Document Panels
 
 At sidebar there are a few panels that could be customize. By default, Gutenberg has `'post-status'`, `last-revision`, `post-taxonomies`, `featured-image`, `post-excerpt`, `discussion-panel`, `page-attributes`, `document-outline-panel`, `meta-boxes` which you can omit or change the order.
@@ -275,9 +277,9 @@ window.customGutenberg = {
 ```
 #### Articles Panel
 
-The Articles Panel (`articles-panel`) contains a list of articles which could be filtered by category and/or searched be name and then can be added to your page in form of an (Article block)[#article-block] by drag and drop.
+The **Articles Panel** (`articles-panel`) contains a list of articles which could be filtered by category and/or searched be name and then can be added to your page in form of an (Article block)[#article-block] by drag and drop.
 
-Articles and Categories should follow this structure:
+*Articles* and *Categories* should follow this structure:
 
 ```js
 const article = {
@@ -299,30 +301,32 @@ window.wpApiSettings = {
     ...,
     schema: {
         ...,
-	routes: {
-	    ..., 
-	    "\/wp\/v2\/categories": { methods: [ 'GET' ] }, // get all categories
-	    "\/wp\/v2\/articles\/(?P<id>[\\d]+)": { methods: [ 'GET' ] }, // get a article by name
-	    "\/wp\/v2\/articles": { methods: [ 'GET' ] }, // get all articles
-	}
+	    routes: {
+	        ..., 
+	        "\/wp\/v2\/categories": { methods: [ 'GET' ] }, // get all categories
+	        "\/wp\/v2\/articles\/(?P<id>[\\d]+)": { methods: [ 'GET' ] }, // get a article by name
+	        "\/wp\/v2\/articles": { methods: [ 'GET' ] }, // get all articles
+	    }
     }
 };
 ```
 
 #### Article Block
 
-The Article Block is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a tite.
+The **Article Block** is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a title.
+
+![Article Block example](https://raw.githubusercontent.com/front/gutenberg/develop/article_block_screenshot.png)
 
 ### Editor Settings
 
-For now, there is only two kinds of settings releated with editor: `hideTitle` and `noMediaLibrary`
+For now, there is only two kinds of settings releated with editor: `hideTitle` and `noMediaLibrary`.
 
 ```js
 window.customGutenberg = {
     ...,
     editor: {
-    	hideTitle: true, // to hide page title
-	    noMediaLibrary: true, // to editor don't expect use a media library
+        hideTitle: true, // to hide page title
+        noMediaLibrary: true, // to editor don't expect use a media library
     },
     ...,
 };
