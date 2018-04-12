@@ -3,7 +3,7 @@
  */
 import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
-import { flowRight, without, mapValues, isPlainObject } from 'lodash';
+import { flowRight, without, mapValues } from 'lodash';
 import memoize from 'memize';
 
 /**
@@ -137,17 +137,15 @@ export function registerResolvers( reducerKey, newResolvers ) {
 		}
 
 		const store = stores[ reducerKey ];
-		let resolver = newResolvers[ key ];
-		if ( ! isPlainObject( resolver ) ) {
-			resolver = { fulfill: resolver };
-		}
+		const resolver = newResolvers[ key ];
 
 		const rawFulfill = async ( ...args ) => {
 			// At this point, selectors have already been pre-bound to inject
 			// state, it would not be otherwise provided to fulfill.
 			const state = store.getState();
 
-			let fulfillment = resolver.fulfill( state, ...args );
+			const fulfill = resolver.fulfill ? resolver.fulfill : resolver;
+			let fulfillment = fulfill( state, ...args );
 
 			// Attempt to normalize fulfillment as async iterable.
 			fulfillment = toAsyncIterable( fulfillment );
