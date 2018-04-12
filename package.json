@@ -23,6 +23,7 @@
     "eslint-plugin-react-native": "^3.2.1",
     "eslint-plugin-wordpress": "git+https://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
     "flow-bin": "0.56.0",
+    "identity-obj-proxy": "^3.0.0",
     "jest": "^22.4.3",
     "jest-react-native": "^18.0.0",
     "prettier": "git+https://github.com/Automattic/calypso-prettier.git#calypso-1.9",
