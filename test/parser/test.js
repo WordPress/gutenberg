@@ -36,7 +36,7 @@ describe( 'parser', () => {
 		fs.mkdirSync( tempDir );
 	} );
 
-	afterEach( () => {
+	afterAll( () => {
 		rimraf.sync( tempDir );
 	} );
 
