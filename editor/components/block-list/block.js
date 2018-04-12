@@ -522,7 +522,7 @@ export class BlockListBlock extends Component {
 						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
-						isHidden={ ! isHovered || hoverArea !== 'left' }
+						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 					/>
 				) }
 				{ shouldRenderBlockSettings && (
@@ -530,10 +530,10 @@ export class BlockListBlock extends Component {
 						uids={ [ uid ] }
 						rootUID={ rootUID }
 						renderBlockMenu={ renderBlockMenu }
-						isHidden={ ! isHovered || hoverArea !== 'right' }
+						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' }
 					/>
 				) }
-				{ shouldShowBreadcrumb && <BlockBreadcrumb uid={ uid } isHidden={ hoverArea !== 'left' } /> }
+				{ shouldShowBreadcrumb && <BlockBreadcrumb uid={ uid } isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' } /> }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
 				<IgnoreNestedEvents
