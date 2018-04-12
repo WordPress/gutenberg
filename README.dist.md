@@ -4,6 +4,8 @@ We made [Gutenberg](https://github.com/front/gutenberg) editor a little more **c
 
 Gutenberg editor can **be easly included in your apps** with this package. Also you can customize blocks menu tabs, blocks categories, document panels and more! 
 
+This package is based on Gutenberg v2.0.6.
+
 ## Table of contents
 * [Installation](#installation)
 * [Usage](#usage)
@@ -30,7 +32,7 @@ npm install @frontkom/gutenberg
 
 We've tried to make it easy to import **Gutenberg by Frontkom** editor in your apps.
 
-``` js
+```js
 // Importing global variables Gutenberg requires
 import './globals'; 
 
@@ -81,7 +83,7 @@ Here we're only presenting those variables which - by our experience - we belive
 
 So we recommend you to set up them all in one file called `globals.js` or `settings.js` for example and import them before Gutenberg call. Feel free to override Gutenberg global variables if you need.
 
-``` js
+```js
 // globals.js
 import React from 'react';
 import jQuery from 'jquery';
@@ -96,7 +98,7 @@ window.wp.api = {
     getPostTypeRoute: function( posType ) {
         // do something here or just 
 	return posType;
-    }
+    },
 };
 window.wp.apiRequest = apiRequest;
 window.wp.element = React;
@@ -129,7 +131,7 @@ window.wpEditorL10n = {
 	    toolbar4: '',
 	},
 	suffix: '.min',
-    }
+    },
 };
 
 window.wpApiSettings = {
@@ -140,8 +142,7 @@ window.wpApiSettings = {
 	    "\/wp\/v2\/posts": { methods: [ 'GET' ] },
 	    ...
 	},
-    }
-
+    },
 };
 ```
 
@@ -153,7 +154,7 @@ Those two are very important for comunication between the editor and remaining a
 
 ***apiRequest*** is the method that will handle with data operations on Gutenberg, like getting resources (categories for example), saving page changes or deleting pages, etc. It receives an object with `path`, `method`, `data`, etc, so you can treat it as you want.
 
-``` js
+```js
 function apiRequest( options ) {
     // Do something with those options like calling an API or actions from your store...
 }
@@ -161,7 +162,7 @@ function apiRequest( options ) {
 
 ***url*** should has a function called `addQueryArgs( url, args )` that handle with `url` and `args` and returns the final url to different actions. The original implementation is the following, feel free to keep it or change it according to your needs.
 
-``` js
+```js
 /**
  * External dependencies
  */
@@ -188,7 +189,7 @@ export function addQueryArgs( url, args ) {
 
 Following the same logic, we've created the `customGutenberg` global object where you can set eveything that we made customizable on Gutenberg.
 
-``` js
+```js
 window.customGutenberg = { ... };
 ```
 
@@ -198,9 +199,9 @@ Important to say that Gutenberg works perfectly without the settings of this obj
 
 You can customize the tabs are displayed on the editor *Add blocks popup*, like as which block categories they should display and how. By default, Gutenberg display `suggested`, `blocks`, `embeds` and `shared` tabs.
 
-``` js
+```js
 window.customGutenberg = {
-    ...
+    ...,
     tabs: [ 
         {
 	    options: { name: 'suggested', title: 'Suggested', className: 'editor-inserter__tab' },
@@ -221,56 +222,64 @@ window.customGutenberg = {
 	        return ( item ) => item.category !== 'embed' && item.category !== 'shared';
 	    },
 	},
-	...
+	...,
     ],
-    ...
-}
+    ...,
+};
 ```
 
 ### Block Categories
 
 You can set which block categories and consequently which blocks will be displayed on your editor. By default, Gutenberg has `common`, `formatting`, `layout`, `widgets`, `embed` and `shared` blocks categories.
 
-``` js
+```js
 window.customGutenberg = {
-    ...
+    ...,
     categories: [ 
         { slug: 'common', title: 'Common blocks' }, // this category should allways be included because of the default block (paragraph)
 	{ slug: 'formatting', title: 'Formatting' },
 	{ slug: 'layout', title: 'Layout Elements' },
-	...
+	...,
     ],
-    ...
-}
+    ...,
+};
 ```
 
 ### Rows
 
 ** Gutenberg by Frontkom ** introduces a new category of blocks: the rows. Rows are divided in columns which you can set up. The total of columns are 12 and it must be the sum of `cols` array items. By default, the rows blocks will be available under the Blocks tab.
 
-``` js
+```js
 window.customGutenberg = {
-    ...
+    ...,
     rows: [
         { cols: [ 6, 6 ], title: 'col6 x 2', description: '2 eq columns layout' },
 	{ cols: [ 4, 4, 4 ], title: 'col4 x 3', description: '3 eq columns layout' },
 	{ cols: [ 7, 5 ], title: 'col7-col5', description: 'A col7 and a col5' },
 	{ cols: [ 2, 8, 2 ], title: 'col2-col8-col2', description: 'A col2, a col8 and a col2' },
     ],
-    ....
-}
+    ...,
+};
 ```
 
 ### Document Panels
 
-At sidebar there are a few panels that could be customize.
+At sidebar there are a few panels that could be customize. By default, Gutenberg has `'post-status'`, `last-revision`, `post-taxonomies`, `featured-image`, `post-excerpt`, `discussion-panel`, `page-attributes`, `document-outline-panel`, `meta-boxes` which you can omit or change the order.
 
+```js
+window.customGutenberg = {
+    ...,
+    panel: [ 'post-status', 'last-revision', 'meta-boxes', ... ],
+    ...,
+};
+```
 #### Articles Panel
 
-The Articles Panel contains a list of articles which could be filtered by category and/or searched be name and then be added to your page by drag and drop in form of an (Article block)[#article-block] . 
+The Articles Panel (`articles-panel`) contains a list of articles which could be filtered by category and/or searched be name and then can be added to your page in form of an (Article block)[#article-block] by drag and drop.
 
-Articles and Categories should follow this structure
-``` js
+Articles and Categories should follow this structure:
+
+```js
 const article = {
     id: 1,
     title: { rendered: 'First article title' },
@@ -285,9 +294,9 @@ const category = { id: 1, name: 'Category 1', parent: 0 };
 
 To use this panel you should set up those `window.wpApiSettings.schema.routes` and implement their behavior on `window.wp.apiRequest`.
 
-``` js
+```js
 window.wpApiSettings = { 
-    ... ,
+    ...,
     schema: {
         ...,
 	routes: {
@@ -297,7 +306,7 @@ window.wpApiSettings = {
 	    "\/wp\/v2\/articles": { methods: [ 'GET' ] }, // get all articles
 	}
     }
-}
+};
 ```
 
 #### Article Block
@@ -308,13 +317,13 @@ The Article Block is another kind of blocks created by **Gutenberg by Frontkom**
 
 For now, there is only two kinds of settings releated with editor: `hideTitle` and `noMediaLibrary`
 
-``` js
+```js
 window.customGutenberg = {
-    ...
+    ...,
     editor: {
     	hideTitle: true, // to hide page title
-	noMediaLibrary: true, // to editor don't expect use a media library
+	    noMediaLibrary: true, // to editor don't expect use a media library
     },
-    ....
-}
+    ...,
+};
 ```
