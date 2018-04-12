@@ -340,7 +340,7 @@ export function savePost() {
 export function refreshPost() {
 	return {
 		type: 'UPDATE_POST_FROM_SERVER',
-	}
+	};
 }
 
 export function trashPost( postId, postType ) {

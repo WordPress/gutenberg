@@ -25,7 +25,7 @@ class PostPermalink extends Component {
 		};
 	}
 
-	onVisibilityChange( event ) {
+	onVisibilityChange() {
 		const { isEditable, refreshPost } = this.props;
 		// If the user just returned after having clicked the "Change Permalinks" button,
 		// fetch a new copy of the post from the server, just in case they enabled permalinks.

@@ -1543,9 +1543,9 @@ export function getPermalink( state ) {
 
 	if ( isPermalinkEditable( state ) ) {
 		return prefix + postName + suffix;
-	} else {
-		return prefix;
 	}
+
+	return prefix;
 }
 
 /**
