@@ -15,6 +15,7 @@ import './hooks';
 export * from './api';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
+export { blockAutocompleter, userAutocompleter } from './autocompleters';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockControls } from './block-controls';
 export { default as BlockEdit } from './block-edit';
