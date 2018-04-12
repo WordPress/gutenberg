@@ -20,7 +20,8 @@ class CodeEditor extends Component {
 	}
 
 	componentDidMount() {
-		const instance = wp.codeEditor.initialize( this.textarea, window._wpGutenbergCodeEditorSettings );
+		const settings = this.props.settings || window._wpGutenbergCodeEditorSettings;
+		const instance = wp.codeEditor.initialize( this.textarea, settings );
 		this.editor = instance.codemirror;
 
 		this.editor.on( 'focus', this.onFocus );
@@ -38,6 +39,10 @@ class CodeEditor extends Component {
 
 		if ( this.props.focus !== prevProps.focus ) {
 			this.updateFocus();
+		}
+
+		if ( this.props.editorUpdate ) {
+			this.props.editorUpdate( this.editor, prevProps );
 		}
 	}
 
