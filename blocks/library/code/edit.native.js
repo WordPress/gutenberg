@@ -12,11 +12,12 @@ import { __ } from '../../../i18n';
  */
 import PlainText from '../../plain-text';
 
-export function edit( { attributes, setAttributes, className } ) {
+export function edit( { attributes, setAttributes, style } ) {
 	return (
-		<View className={ className }>
+		<View>
 			<PlainText
 				value={ attributes.content }
+				style={ style }
 				multiline={ true }
 				underlineColorAndroid="transparent"
 				onChange={ content => setAttributes( { content } ) }
