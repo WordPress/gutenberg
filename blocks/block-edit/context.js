@@ -3,7 +3,7 @@
  */
 import { createContext, createHigherOrderComponent } from '@wordpress/element';
 
-const EditBlockContext = createContext( {
+const { Consumer, Provider } = createContext( {
 	isSelected: true,
 } );
 
@@ -15,13 +15,34 @@ const EditBlockContext = createContext( {
  *
  * @return {Component} Component with a BlockEdit context set.
  */
-export const withEditBlockContextProvider = createHigherOrderComponent( ( OriginalComponent ) => {
+export const withBlockEditContextProvider = createHigherOrderComponent( ( OriginalComponent ) => {
 	return ( props ) => (
-		<EditBlockContext.Provider value={ { isSelected: props.isSelected } }>
+		<Provider value={ { isSelected: props.isSelected } }>
 			<OriginalComponent { ...props } />
-		</EditBlockContext.Provider>
+		</Provider>
 	);
-}, 'withEditBlockContextProvider' );
+}, 'withBlockEditContextProvider' );
+
+/**
+ * A Higher Order Component used to inject BlockEdit context to the
+ * wrapped component.
+ *
+ * @param {Component} OriginalComponent Component to wrap.
+ *
+ * @return {Component} Component which has BlockEdit context injected.
+ */
+export const withBlockEditContext = createHigherOrderComponent( ( OriginalComponent ) => {
+	return ( props ) => (
+		<Consumer>
+			{ ( context ) => (
+				<OriginalComponent
+					{ ...props }
+					blockEditContext={ context }
+				/>
+			) }
+		</Consumer>
+	);
+}, 'withBlockEditContext' );
 
 /**
  * A Higher Order Component used to render conditionally the wrapped
@@ -31,12 +52,12 @@ export const withEditBlockContextProvider = createHigherOrderComponent( ( Origin
  *
  * @return {Component} Component which renders only when the BlockEdit is selected.
  */
-export const ifEditBlockSelected = createHigherOrderComponent( ( OriginalComponent ) => {
+export const ifBlockEditSelected = createHigherOrderComponent( ( OriginalComponent ) => {
 	return ( props ) => (
-		<EditBlockContext.Consumer>
+		<Consumer>
 			{ ( { isSelected } ) => isSelected && (
 				<OriginalComponent { ...props } />
 			) }
-		</EditBlockContext.Consumer>
+		</Consumer>
 	);
-}, 'ifEditBlockSelected' );
+}, 'ifBlockEditSelected' );

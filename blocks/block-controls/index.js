@@ -6,7 +6,7 @@ import { createSlotFill, Toolbar } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { ifEditBlockSelected } from '../block-edit/context';
+import { ifBlockEditSelected } from '../block-edit/context';
 
 const Fill = createSlotFill( 'BlockControls' );
 const { Slot } = Fill;
@@ -18,7 +18,7 @@ const BlockControlsFill = ( { controls, children } ) => (
 	</Fill>
 );
 
-const BlockControls = ifEditBlockSelected( BlockControlsFill );
+const BlockControls = ifBlockEditSelected( BlockControlsFill );
 
 BlockControls.Slot = Slot;
 

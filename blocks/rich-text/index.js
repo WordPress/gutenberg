@@ -37,6 +37,7 @@ import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
+import { withBlockEditContext } from '../block-edit/context';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -802,7 +803,7 @@ export class RichText extends Component {
 			placeholder,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
-			isSelected = false,
+			isSelected,
 			formatters,
 			autocompleters,
 		} = this.props;
@@ -829,7 +830,7 @@ export class RichText extends Component {
 
 		return (
 			<div className={ classes }>
-				{ ! inlineToolbar && (
+				{ isSelected && ! inlineToolbar && (
 					<BlockFormatControls>
 						{ formatToolbar }
 					</BlockFormatControls>
@@ -888,10 +889,13 @@ RichText.defaultProps = {
 };
 
 export default compose( [
-	withSelect( ( select ) => {
+	withBlockEditContext,
+	withSelect( ( select, { isSelected, blockEditContext } ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
+
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
+			isSelected: isSelected !== false && blockEditContext.isSelected,
 		};
 	} ),
 	withSafeTimeout,

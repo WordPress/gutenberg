@@ -6,12 +6,12 @@ import { createSlotFill } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { ifEditBlockSelected } from '../block-edit/context';
+import { ifBlockEditSelected } from '../block-edit/context';
 
 const Fill = createSlotFill( 'BlockFormatControls' );
 const { Slot } = Fill;
 
-const BlockFormatControls = ifEditBlockSelected( Fill );
+const BlockFormatControls = ifBlockEditSelected( Fill );
 
 BlockFormatControls.Slot = Slot;
 
