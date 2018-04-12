@@ -32,11 +32,11 @@
 		}
 
 		figcaption {
-			padding-top: 3px;
+			padding: 40px 10px 5px;
 			color: $white;
 			text-align: center;
 			font-size: $default-font-size;
-			background-color: rgba($color: $black, $alpha: 0.7);
+			background: linear-gradient( 0deg, rgba( $color: $black, $alpha: 0.7 ) 0, rgba($color: $black, $alpha: 0.3) 60%, transparent );
 			position: absolute;
 			width: 100%;
 			max-height: 100%;
