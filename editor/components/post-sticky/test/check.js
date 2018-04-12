@@ -9,18 +9,9 @@ import { shallow } from 'enzyme';
 import { PostStickyCheck } from '../check';
 
 describe( 'PostSticky', () => {
-	const user = {
-		data: {
-			post_type_capabilities: {
-				edit_others_posts: true,
-				publish_posts: true,
-			},
-		},
-	};
-
 	it( 'should not render anything if the post type is not "post"', () => {
 		const wrapper = shallow(
-			<PostStickyCheck postType="page" user={ user }>
+			<PostStickyCheck postType="page" canPublishPosts canEditOtherPosts>
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
@@ -29,25 +20,21 @@ describe( 'PostSticky', () => {
 
 	it( 'should not render anything if the user doesn\'t have the right capabilities', () => {
 		let wrapper = shallow(
-			<PostStickyCheck postType="post" user={ {} }>
+			<PostStickyCheck postType="post">
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
 		expect( wrapper.type() ).toBe( null );
 
 		wrapper = shallow(
-			<PostStickyCheck postType="post" user={
-				{ data: { post_type_capabilities: { edit_others_posts: false, publish_posts: true } } }
-			}>
+			<PostStickyCheck postType="post" canPublishPosts canEditOtherPosts={ false }>
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
 		expect( wrapper.type() ).toBe( null );
 
 		wrapper = shallow(
-			<PostStickyCheck postType="post" user={
-				{ data: { post_type_capabilities: { edit_others_posts: true, publish_posts: false } } }
-			}>
+			<PostStickyCheck postType="post" canPublishPosts={ false } canEditOtherPosts>
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
@@ -56,7 +43,7 @@ describe( 'PostSticky', () => {
 
 	it( 'should render if the user has the correct capability', () => {
 		const wrapper = shallow(
-			<PostStickyCheck postType="post" user={ user }>
+			<PostStickyCheck postType="post" canPublishPosts canEditOtherPosts>
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);

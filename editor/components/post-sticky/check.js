@@ -1,27 +1,13 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withAPIData } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { getCurrentPostType } from '../../store/selectors';
-
-export function PostStickyCheck( { postType, children, user } ) {
-	const userCan = get( user.data, 'post_type_capabilities', false );
-
+export function PostStickyCheck( { postType, children, canEditOtherPosts, canPublishPosts } ) {
 	if (
 		postType !== 'post' ||
-		! userCan.publish_posts ||
-		! userCan.edit_others_posts
+		! canPublishPosts ||
+		! canEditOtherPosts
 	) {
 		return null;
 	}
@@ -29,23 +15,15 @@ export function PostStickyCheck( { postType, children, user } ) {
 	return children;
 }
 
-const applyConnect = connect(
-	( state ) => {
+export default withSelect(
+	( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getUserPostTypeCapability } = select( 'core' );
+		const postType = getEditedPostAttribute( 'type' );
 		return {
-			postType: getCurrentPostType( state ),
+			canPublishPosts: getUserPostTypeCapability( postType, 'publish_posts' ),
+			canEditOtherPosts: getUserPostTypeCapability( postType, 'edit_others_posts' ),
+			postType,
 		};
 	},
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postType } = props;
-
-	return {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	};
-} );
-
-export default compose( [
-	applyConnect,
-	applyWithAPIData,
-] )( PostStickyCheck );
+)( PostStickyCheck );

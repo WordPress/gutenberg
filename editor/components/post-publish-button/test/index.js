@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import { merge } from 'lodash';
 
 /**
  * Internal dependencies
@@ -10,23 +9,6 @@ import { merge } from 'lodash';
 import { PostPublishButton } from '../';
 
 describe( 'PostPublishButton', () => {
-	const user = {
-		data: {
-			id: 1,
-			post_type_capabilities: {
-				publish_posts: true,
-			},
-		},
-	};
-
-	const contributor = merge( {}, user, {
-		data: {
-			post_type_capabilities: {
-				publish_posts: false,
-			},
-		},
-	} );
-
 	describe( 'disabled', () => {
 		it( 'should be disabled if current user is unknown', () => {
 			const wrapper = shallow(
@@ -38,7 +20,7 @@ describe( 'PostPublishButton', () => {
 
 		it( 'should be disabled if post is currently saving', () => {
 			const wrapper = shallow(
-				<PostPublishButton user={ user } isSaving />
+				<PostPublishButton canPublishPosts isSaving />
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
@@ -46,7 +28,7 @@ describe( 'PostPublishButton', () => {
 
 		it( 'should be disabled if post is not publishable', () => {
 			const wrapper = shallow(
-				<PostPublishButton user={ user } isPublishable={ false } />
+				<PostPublishButton canPublishPosts isPublishable={ false } />
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
@@ -54,7 +36,7 @@ describe( 'PostPublishButton', () => {
 
 		it( 'should be disabled if post is not saveable', () => {
 			const wrapper = shallow(
-				<PostPublishButton user={ user } isSaveable={ false } />
+				<PostPublishButton canPublishPosts isSaveable={ false } />
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
@@ -62,7 +44,7 @@ describe( 'PostPublishButton', () => {
 
 		it( 'should be enabled otherwise', () => {
 			const wrapper = shallow(
-				<PostPublishButton user={ user } isPublishable isSaveable />
+				<PostPublishButton canPublishPosts isPublishable isSaveable />
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( false );
@@ -75,7 +57,7 @@ describe( 'PostPublishButton', () => {
 			const onSave = jest.fn();
 			const wrapper = shallow(
 				<PostPublishButton
-					user={ contributor }
+					canPublishPosts={ false }
 					onStatusChange={ onStatusChange }
 					onSave={ onSave } />
 			);
@@ -90,7 +72,7 @@ describe( 'PostPublishButton', () => {
 			const onSave = jest.fn();
 			const wrapper = shallow(
 				<PostPublishButton
-					user={ user }
+					canPublishPosts
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
 					isBeingScheduled />
@@ -106,7 +88,7 @@ describe( 'PostPublishButton', () => {
 			const onSave = jest.fn();
 			const wrapper = shallow(
 				<PostPublishButton
-					user={ user }
+					canPublishPosts
 					onStatusChange={ onStatusChange }
 					onSave={ onSave }
 					visibility="private" />
@@ -122,7 +104,7 @@ describe( 'PostPublishButton', () => {
 			const onSave = jest.fn();
 			const wrapper = shallow(
 				<PostPublishButton
-					user={ user }
+					canPublishPosts
 					onStatusChange={ onStatusChange }
 					onSave={ onSave } />
 			);
@@ -139,7 +121,7 @@ describe( 'PostPublishButton', () => {
 			const onSave = jest.fn();
 			const wrapper = shallow(
 				<PostPublishButton
-					user={ user }
+					canPublishPosts
 					onStatusChange={ onStatusChange }
 					onSave={ onSave } />
 			);
@@ -153,7 +135,7 @@ describe( 'PostPublishButton', () => {
 
 	it( 'should have save modifier class', () => {
 		const wrapper = shallow(
-			<PostPublishButton user={ user } isSaving />
+			<PostPublishButton canPublishPosts isSaving />
 		);
 
 		expect( wrapper.hasClass( 'is-saving' ) ).toBe( true );

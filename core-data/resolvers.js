@@ -11,6 +11,7 @@ import {
 	receiveTerms,
 	receiveMedia,
 	receivePostTypes,
+	receiveUserPostTypeCapabilities,
 } from './actions';
 
 /**
@@ -38,9 +39,21 @@ export async function* getMedia( state, id ) {
  * Requests a post type element from the REST API.
  *
  * @param {Object} state State tree
- * @param {number} slug  Post Type slug
+ * @param {string} slug  Post Type slug
  */
 export async function* getPostType( state, slug ) {
 	const postType = await apiRequest( { path: `/wp/v2/types/${ slug }?context=edit` } );
 	yield receivePostTypes( postType );
 }
+
+/**
+ * Request user capabilities for a given post type from the REST API.
+ * @param {Object} state         State tree
+ * @param {string} postTypeSlug  Post Type slug
+ */
+export async function* getUserPostTypeCapabilities( state, postTypeSlug ) {
+	const userWithCapabilities = await apiRequest( { path: `/wp/v2/users/me?post_type=${ postTypeSlug }&context=edit` } );
+	yield receiveUserPostTypeCapabilities( postTypeSlug, userWithCapabilities.post_type_capabilities );
+}
+
+export const getUserPostTypeCapability = getUserPostTypeCapabilities;

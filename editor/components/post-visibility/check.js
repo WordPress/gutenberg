@@ -1,43 +1,18 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withAPIData } from '@wordpress/components';
-import { compose } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
-/**
- * Internal Dependencies
- */
-import { getCurrentPostType } from '../../store/selectors';
-
-export function PostVisibilityCheck( { user, render } ) {
-	const canEdit = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
-
-	return render( { canEdit } );
+export function PostVisibilityCheck( { canPublishPosts, render } ) {
+	return render( { canEdit: canPublishPosts } );
 }
 
-const applyConnect = connect(
-	( state ) => {
+export default withSelect(
+	( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getUserPostTypeCapability } = select( 'core' );
 		return {
-			postType: getCurrentPostType( state ),
+			canPublishPosts: getUserPostTypeCapability( getEditedPostAttribute( 'type' ), 'publish_posts' ),
 		};
 	},
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postType } = props;
-
-	return {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	};
-} );
-
-export default compose( [
-	applyConnect,
-	applyWithAPIData,
-] )( PostVisibilityCheck );
+)( PostVisibilityCheck );

@@ -82,8 +82,29 @@ export function postTypes( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing user post types capabilties state. Keyed by post type.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function userPostTypeCapabilities( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_USER_POST_TYPE_CAPABILITIES':
+			return {
+				...state,
+				[ action.postTypeSlug ]: action.capabilities,
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	media,
 	postTypes,
+	userPostTypeCapabilities,
 } );

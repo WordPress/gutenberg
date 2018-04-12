@@ -1,30 +1,21 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { noop, get } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Button, withAPIData } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { compose } from '@wordpress/element';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PublishButtonLabel from './label';
-import { editPost, savePost } from '../../store/actions';
-import {
-	isSavingPost,
-	isEditedPostBeingScheduled,
-	getEditedPostVisibility,
-	isEditedPostSaveable,
-	isEditedPostPublishable,
-	getCurrentPostType,
-} from '../../store/selectors';
 
 export function PostPublishButton( {
 	isSaving,
@@ -34,15 +25,14 @@ export function PostPublishButton( {
 	visibility,
 	isPublishable,
 	isSaveable,
-	user,
+	canPublishPosts,
 	onSubmit = noop,
 	forceIsSaving,
 } ) {
-	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
-	const isContributor = ! get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
+	const isButtonEnabled = ! isSaving && isPublishable && isSaveable;
 
 	let publishStatus;
-	if ( isContributor ) {
+	if ( canPublishPosts === false ) {
 		publishStatus = 'pending';
 	} else if ( isBeingScheduled ) {
 		publishStatus = 'future';
@@ -75,30 +65,35 @@ export function PostPublishButton( {
 	);
 }
 
-const applyConnect = connect(
-	( state, { forceIsSaving, forceIsDirty } ) => ( {
-		isSaving: forceIsSaving || isSavingPost( state ),
-		isBeingScheduled: isEditedPostBeingScheduled( state ),
-		visibility: getEditedPostVisibility( state ),
-		isSaveable: isEditedPostSaveable( state ),
-		isPublishable: forceIsDirty || isEditedPostPublishable( state ),
-		postType: getCurrentPostType( state ),
-	} ),
-	{
-		onStatusChange: ( status ) => editPost( { status } ),
-		onSave: savePost,
-	}
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postType } = props;
-
-	return {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	};
-} );
-
 export default compose( [
-	applyConnect,
-	applyWithAPIData,
+	withSelect(
+		( select, { forceIsSaving, forceIsDirty } ) => {
+			const {
+				getEditedPostAttribute,
+				isSavingPost,
+				isEditedPostBeingScheduled,
+				getEditedPostVisibility,
+				isEditedPostSaveable,
+				isEditedPostPublishable,
+			} = select( 'core/editor' );
+			const { getUserPostTypeCapability } = select( 'core' );
+			return {
+				isSaving: forceIsSaving || isSavingPost(),
+				isBeingScheduled: isEditedPostBeingScheduled(),
+				visibility: getEditedPostVisibility(),
+				isSaveable: isEditedPostSaveable(),
+				isPublishable: forceIsDirty || isEditedPostPublishable(),
+				canPublishPosts: getUserPostTypeCapability( getEditedPostAttribute( 'type' ), 'publish_posts' ),
+			};
+		},
+	),
+	withDispatch(
+		( dispatch ) => {
+			const { editPost, savePost } = dispatch( 'core/editor' );
+			return {
+				onStatusChange: ( status ) => editPost( { status } ),
+				onSave: savePost,
+			};
+		}
+	),
 ] )( PostPublishButton );

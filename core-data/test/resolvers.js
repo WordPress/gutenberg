@@ -6,8 +6,19 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getCategories, getMedia, getPostType } from '../resolvers';
-import { setRequested, receiveTerms, receiveMedia, receivePostTypes } from '../actions';
+import {
+	getCategories,
+	getMedia,
+	getPostType,
+	getUserPostTypeCapabilities,
+} from '../resolvers';
+import {
+	setRequested,
+	receiveTerms,
+	receiveMedia,
+	receivePostTypes,
+	receiveUserPostTypeCapabilities,
+} from '../actions';
 
 jest.mock( '@wordpress/api-request' );
 
@@ -66,3 +77,22 @@ describe( 'getPostType', () => {
 		expect( received ).toEqual( receivePostTypes( POST_TYPE ) );
 	} );
 } );
+
+describe( 'getUserPostTypeCapabilities', () => {
+	const USER = { post_type_capabilities: { publishPost: true } };
+
+	beforeAll( () => {
+		apiRequest.mockImplementation( ( options ) => {
+			if ( options.path === '/wp/v2/users/me?post_type=post&context=edit' ) {
+				return Promise.resolve( USER );
+			}
+		} );
+	} );
+
+	it( 'yields with received capabilties', async () => {
+		const fulfillment = getUserPostTypeCapabilities( {}, 'post' );
+		const received = ( await fulfillment.next() ).value;
+		expect( received ).toEqual( receiveUserPostTypeCapabilities( 'post', { publishPost: true } ) );
+	} );
+} );
+
