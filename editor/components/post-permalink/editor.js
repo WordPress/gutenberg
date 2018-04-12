@@ -12,11 +12,11 @@ import { Button } from '@wordpress/components';
 import './style.scss';
 
 class PostPermalinkEditor extends Component {
-	constructor() {
+	constructor( { permalinkParts } ) {
 		super( ...arguments );
 
 		this.state = {
-			editedPostName: '',
+			editedPostName: permalinkParts.postName,
 		};
 
 		this.onSavePermalink = this.onSavePermalink.bind( this );
@@ -43,12 +43,8 @@ class PostPermalinkEditor extends Component {
 	}
 
 	render() {
-		const {
-			prefix,
-			suffix,
-			postName,
-		} = this.props.permalinkParts;
-		const editedPostName = this.state.editedPostName || postName;
+		const { prefix, suffix } = this.props.permalinkParts;
+		const { editedPostName } = this.state;
 
 		/* eslint-disable jsx-a11y/no-autofocus */
 		// Autofocus is allowed here, as this mini-UI is only loaded when the user clicks to open it.
