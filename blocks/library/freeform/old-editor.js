@@ -28,6 +28,7 @@ export default class OldEditor extends Component {
 		super( props );
 		this.initialize = this.initialize.bind( this );
 		this.onSetup = this.onSetup.bind( this );
+		this.focus = this.focus.bind( this );
 	}
 
 	componentDidMount() {
@@ -78,6 +79,8 @@ export default class OldEditor extends Component {
 		const { attributes: { content }, setAttributes } = this.props;
 		const { ref } = this;
 
+		this.editor = editor;
+
 		if ( content ) {
 			editor.on( 'loadContent', () => editor.setContent( content ) );
 		}
@@ -110,35 +113,38 @@ export default class OldEditor extends Component {
 			},
 		} );
 
-		// To do: get TinyMCE to add a setting to the inline theme to always
-		// display toolbars. In the meantime, force display with CSS and force
-		// the creation of toolbars by manually focussing the editor on
-		// initialisation.
 		editor.on( 'init', () => {
-			const { activeElement } = document;
+			const rootNode = this.editor.getBody();
 
-			// Force fire focus, even if the editor already has focus.
-			editor.fire( 'focus' );
-
-			// Set focus back to where it was, unless it was this editor.
-			// This should only be true during page load, where the active
-			// element will be the document.
-			if ( activeElement !== editor.getBody() ) {
-				activeElement.focus();
+			// Create the toolbar by refocussing the editor.
+			if ( document.activeElement === rootNode ) {
+				rootNode.blur();
+				this.editor.focus();
 			}
 		} );
+	}
+
+	focus() {
+		if ( this.editor ) {
+			this.editor.focus();
+		}
 	}
 
 	render() {
 		const { isSelected, id } = this.props;
 
 		return [
+			// Disable reason: Clicking on this visual placeholder should create
+			// the toolbar, it can also be created by focussing the field below.
+			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 			<div
 				key="toolbar"
 				id={ `toolbar-${ id }` }
 				ref={ ref => this.ref = ref }
 				className="freeform-toolbar"
 				style={ ! isSelected ? { display: 'none' } : {} }
+				onClick={ this.focus }
+				data-placeholder={ __( 'Classic' ) }
 			/>,
 			<div
 				key="editor"

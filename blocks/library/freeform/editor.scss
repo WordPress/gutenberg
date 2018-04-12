@@ -116,7 +116,7 @@
 	}
 }
 
-.edit-post-visual-editor div[data-type="core/freeform"]:before {
+.editor-block-list__layout .editor-block-list__block[data-type="core/freeform"] .editor-block-list__block-edit:before {
 	outline: 1px solid #e2e4e7;
 }
 
@@ -133,6 +133,19 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	width: auto;
 	margin: - $block-padding;
 	margin-bottom: $block-padding;
+}
+
+.freeform-toolbar:empty {
+	height: 37px;
+	background: #f5f5f5;
+	border-bottom: 1px solid #e2e4e7;
+
+	&:before {
+		content: attr( data-placeholder );
+		color: #555d66;
+		line-height: 37px;
+		padding: $block-padding;
+	}
 }
 
 // TinyMCE hides on blur with inline styles.
