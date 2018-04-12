@@ -4,7 +4,7 @@ We made [Gutenberg](https://github.com/front/gutenberg) editor a little more **c
 
 Gutenberg editor can **be easly included in your apps** with this package. Also you can customize blocks menu tabs, blocks categories, document panels and more! 
 
-This package is based on Gutenberg v2.0.6.
+This package is based on [Gutenberg v2.0.6](https://github.com/WordPress/gutenberg/releases/tag/v2.6.0).
 
 ## Table of contents
 * [Installation](#installation)
@@ -77,76 +77,38 @@ initializeEditor( target, page, settings );
 
 ## Global variables 
 
-Gutenberg depends on several global variables: `wp`, `wpApiSettings`, `_wpDateSettings`, `userSettings`, `wpEditorL10n`, etc. Probably during your Gutenberg experiencie you will discover other required variables, please share with us if you feel they are important to Gutenberg execution. 
+Gutenberg depends on several global variables: `wp`, `wpApiSettings`, `_wpDateSettings`, `userSettings`, `wpEditorL10n`, etc but probably during your Gutenberg experiencie you will discover other required variables, please share with us if you feel they are important to Gutenberg execution. 
 
-Here we're only presenting those variables which - by our experience - we belive are crucial to Gutenberg. If you don't set them up, you'll see that Gutenberg editor won't run.
+Here we're only presenting those variables which - by our experience - we belive are crucial to Gutenberg and already set to them default values. If you don't set them up, you'll see that Gutenberg editor won't run.
 
-So we recommend you to set up them all in one file called `globals.js` or `settings.js` for example and import them before Gutenberg call. Feel free to override Gutenberg global variables if you need.
+So we recommend you to set up them all in one file called `globals.js` or `settings.js` for example and import them **before** Gutenberg call. Feel free to override Gutenberg global variables if you need.
 
 ```js
 // globals.js
-import React from 'react';
-import jQuery from 'jquery';
 
-window.jQuery = jQuery;
-
-window.wp = window.wp || { };
-window.wp.api = {
-    models: {},
-    collections: {},
-    views: {},
-    getPostTypeRoute: function( posType ) {
-        // do something here or just 
-	return posType;
-    },
+window.wp = {
+    apiRequest, 
+    url: { addQueryArgs },
+    ...,
 };
-window.wp.apiRequest = apiRequest;
-window.wp.element = React;
-window.wp.url = { addQueryArgs };
 
+// set the locale
 window._wpDateSettings = { 
-    l10n: {
-    	locale: 'pt_PT',
-	months: [ 'January', ... ],
-	monthsShort: [ 'Jan', ...],
-	weekdays: [ 'Sunday', ...],
-	meridiem: { am: 'am', pm: 'pm', AM: 'AM', PM: 'PM' },
-        relative: { future: 'Daqui a %s', past: 'h\u00e1 %s' },
+    l10n: { 
+        locale: 'pt_PT',
+        ...,
     },
-    formats: { time: 'G:i', date: 'j F, Y', datetime: 'j F, Y G:i' },
-    timezone: { offset: '0', string: '' },
+    ...,
 };
 
-window.userSettings = { uid: 123 };
-
-window.wpEditorL10n = { 
-    tinymce: {
-        baseUrl: 'node_modules/tinymce',
-        settings: {
-	    external_plugins: [],
-	    plugins: 'charmap,colorpicker,hr,lists,media,paste,tabfocus,textcolor,fullscreen,wordpress,wpautoresize,wpeditimage,wpemoji,wpgallery,wplink,wpdialogs,wptextpattern,wpview',
-	    toolbar1: 'formatselect,bold,italic,bullist,numlist,blockquote,alignleft,aligncenter,alignright,link,unlink,wp_more,spellchecker,kitchensink',
-	    toolbar2: 'strikethrough,hr,forecolor,pastetext,removeformat,charmap,outdent,indent,undo,redo,wp_help',
-	    toolbar3: '',
-	    toolbar4: '',
-	},
-	suffix: '.min',
-    },
-};
-
-window.wpApiSettings = {
+// set your root path
+window.wpApiSettings = { 
     root: 'YOUR_ROOT_PATH',
-    nonce: '123456789',
-    schema: {
-    	routes: {
-	    "\/wp\/v2\/posts": { methods: [ 'GET' ] },
-	    ...
-	},
-    },
+    ...,
 };
 ```
 
-We are working to include on **Gutenberg by Frontkom** all settings that shouldn't be part of your apps.
+We are working to include on **Gutenberg by Frontkom** all settings that shouldn't be part of your apps, but you always can override them if you need.
 
 ### *apiRequest* and *url*
 
@@ -185,6 +147,7 @@ export function addQueryArgs( url, args ) {
    return format( { ...parsedURL, query } );
 }
 ```
+
 ## Customize your Gutenberg
 
 Following the same logic, we've created the `customGutenberg` global object where you can set eveything that we made customizable on Gutenberg.
@@ -192,6 +155,8 @@ Following the same logic, we've created the `customGutenberg` global object wher
 ```js
 window.customGutenberg = { ... };
 ```
+
+As the other global variables, also `customGutenberg` should be defined **before** Gutenberg import.
 
 Important to say that Gutenberg works perfectly without the settings of this object :)
 
@@ -237,9 +202,9 @@ window.customGutenberg = {
     ...,
     categories: [ 
         { slug: 'common', title: 'Common blocks' }, // this category should allways be included because of the default block (paragraph)
-	{ slug: 'formatting', title: 'Formatting' },
-	{ slug: 'layout', title: 'Layout Elements' },
-	...,
+	    { slug: 'formatting', title: 'Formatting' },
+	    { slug: 'layout', title: 'Layout Elements' },
+	    ...,
     ],
     ...,
 };
@@ -247,16 +212,16 @@ window.customGutenberg = {
 
 ### Rows
 
-** Gutenberg by Frontkom ** introduces a new category of blocks: the rows. Rows are divided in columns which you can set up. The total of columns are 12 and it must be the sum of `cols` array items. By default, the rows blocks will be available under the Blocks tab.
+** Gutenberg by Frontkom ** introduces a new category of blocks: the rows. Rows are divided in columns (minimum of 2) which you can defined by its size (1, 2, 3, ...). The total of columns are 12 and it must be the sum of `cols` array items. By default, the rows blocks will be available under the Blocks tab.
 
 ```js
 window.customGutenberg = {
     ...,
     rows: [
         { cols: [ 6, 6 ], title: 'col6 x 2', description: '2 eq columns layout' },
-	{ cols: [ 4, 4, 4 ], title: 'col4 x 3', description: '3 eq columns layout' },
-	{ cols: [ 7, 5 ], title: 'col7-col5', description: 'A col7 and a col5' },
-	{ cols: [ 2, 8, 2 ], title: 'col2-col8-col2', description: 'A col2, a col8 and a col2' },
+	    { cols: [ 4, 4, 4 ], title: 'col4 x 3', description: '3 eq columns layout' },
+	    { cols: [ 7, 5 ], title: 'col7-col5', description: 'A col7 and a col5' },
+	    { cols: [ 2, 8, 2 ], title: 'col2-col8-col2', description: 'A col2, a col8 and a col2' },
     ],
     ...,
 };
@@ -279,7 +244,7 @@ window.customGutenberg = {
 
 The **Articles Panel** (`articles-panel`) contains a list of articles which could be filtered by category and/or searched be name and then can be added to your page in form of an (Article block)[#article-block] by drag and drop.
 
-*Articles* and *Categories* should follow this structure:
+*Articles* and *Categories* objects should follow the next structure:
 
 ```js
 const article = {
@@ -292,23 +257,6 @@ const article = {
 };
 
 const category = { id: 1, name: 'Category 1', parent: 0 };
-```
-
-To use this panel you should set up those `window.wpApiSettings.schema.routes` and implement their behavior on `window.wp.apiRequest`.
-
-```js
-window.wpApiSettings = { 
-    ...,
-    schema: {
-        ...,
-	    routes: {
-	        ..., 
-	        "\/wp\/v2\/categories": { methods: [ 'GET' ] }, // get all categories
-	        "\/wp\/v2\/articles\/(?P<id>[\\d]+)": { methods: [ 'GET' ] }, // get a article by name
-	        "\/wp\/v2\/articles": { methods: [ 'GET' ] }, // get all articles
-	    }
-    }
-};
 ```
 
 #### Article Block
