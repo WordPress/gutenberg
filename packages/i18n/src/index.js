@@ -69,7 +69,7 @@ export function getI18n() {
  *
  * @return {string} The translated string.
  */
-export function dcnpgettext( domain = 'default', context, single, plural, number ) {
+export const dcnpgettext = memoize( ( domain = 'default', context, single, plural, number ) => {
 	try {
 		return getI18n().dcnpgettext( domain, context, single, plural, number );
 	} catch ( error ) {
@@ -77,7 +77,7 @@ export function dcnpgettext( domain = 'default', context, single, plural, number
 
 		return single;
 	}
-}
+} );
 
 /**
  * Retrieve the translation of text.
