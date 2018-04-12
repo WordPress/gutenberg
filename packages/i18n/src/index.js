@@ -34,7 +34,11 @@ export function setLocaleData( localeData = { '': {} }, domain = 'default' ) {
 		} );
 	}
 
-	i18n.options.locale_data[ domain ] = localeData;
+	i18n.options.locale_data[ domain ] = Object.assign(
+		{},
+		i18n.options.locale_data[ domain ],
+		localeData
+	);
 }
 
 /**

@@ -10,22 +10,27 @@ jest.mock( 'memize', () => ( fn ) => fn );
 const localeData = {
 	"" : {
 		// Domain name
-		"domain" : "test_domain",
-		"lang" : "fr",
+		domain: 'test_domain',
+		lang: 'fr',
 		// Plural form function for language
-		"plural_forms" : "nplurals=2; plural=(n != 1);"
+		plural_forms: 'nplurals=2; plural=(n != 1);'
 	},
 
-	"hello" : [ "bonjour" ],
+	hello: [ 'bonjour' ],
 
-	"verb\u0004feed": [ "nourrir" ],
+	'verb\u0004feed': [ 'nourrir' ],
 
-	"hello %s": [ "bonjour %s"],
+	'hello %s': [ 'bonjour %s' ],
 
-	"%d banana" : [ "une banane", "%d bananes" ],
+	'%d banana': [ 'une banane', '%d bananes' ],
 
-	"fruit\u0004%d apple" : [ "une pomme", "%d pommes" ],
+	'fruit\u0004%d apple': [ 'une pomme', '%d pommes' ],
 }
+const additionalLocaleData = {
+	cheeseburger: [ 'hamburger au fromage' ],
+	'%d cat': [ 'un chat', '%d chats' ]
+};
+
 setLocaleData( localeData, 'test_domain' );
 
 describe( 'i18n', () => {
@@ -82,6 +87,37 @@ describe( 'i18n', () => {
 			const result = sprintf( __( 'hello %s', 'test_domain'), 'Riad' );
 
 			expect( result ).toBe( 'bonjour Riad' );
+		} );
+	} );
+
+	describe( 'setAdditionalLocale', () => {
+		beforeAll( () => {
+			setLocaleData( additionalLocaleData, 'test_domain' );
+		} );
+		describe( '__', () => {
+			it( 'existing translation still available', () => {
+				expect( __( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
+			} );
+		} );
+
+		describe( '__', () => {
+			it( 'new translation available.', () => {
+				expect( __( 'cheeseburger', 'test_domain' ) ).toBe( 'hamburger au fromage' );
+			} );
+		} );
+
+		describe( '_n', () => {
+			it( 'existing plural form still works', () => {
+				expect( _n( '%d banana', '%d bananas', 3, 'test_domain' ) ).toBe( '%d bananes' );
+			} );
+
+			it( 'new singular form was added', () => {
+				expect( _n( '%d cat', '%d cats', 1, 'test_domain' ) ).toBe( 'un chat' );
+			} );
+
+			it( 'new plural form was added', () => {
+				expect( _n( '%d cat', '%d cats', 3, 'test_domain' ) ).toBe( '%d chats' );
+			} );
 		} );
 	} );
 } );
