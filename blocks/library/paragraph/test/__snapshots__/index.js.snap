@@ -18,10 +18,14 @@ exports[`core/paragraph block edit matches snapshot 1`] = `
             aria-multiline="false"
             class="wp-block-paragraph blocks-rich-text__tinymce"
             contenteditable="true"
-            data-is-placeholder-visible="false"
+            data-is-placeholder-visible="true"
             role="textbox"
           />
-          <div />
+          <p
+            class="blocks-rich-text__tinymce wp-block-paragraph"
+          >
+            Add text or type / to add content
+          </p>
         </div>
       </div>
     </div>
