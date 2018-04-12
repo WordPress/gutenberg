@@ -84,7 +84,7 @@
 		margin-right: auto;
 	}
 
-	&[data-resized="false"] .wp-block-image div {
+	&[data-resized="false"] .wp-block-image > div {
 		margin-left: auto;
 		margin-right: auto;
 	}
