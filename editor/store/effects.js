@@ -247,6 +247,23 @@ export default {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
 		store.dispatch( createErrorNotice( message, { id: TRASH_POST_NOTICE_ID } ) );
 	},
+	UPDATE_POST_FROM_SERVER( action, store ) {
+		const { dispatch, getState } = store;
+
+		const state = getState();
+		const post = getCurrentPost( state );
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
+
+		const data = {
+			context: 'edit',
+		};
+
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'GET', data } ).then(
+			( newPost ) => {
+				dispatch( resetPost( newPost ) );
+			}
+		);
+	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
 		const state = store.getState();

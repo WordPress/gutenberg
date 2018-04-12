@@ -1540,7 +1540,12 @@ export function isPermalinkEditable( state ) {
  */
 export function getPermalink( state ) {
 	const { prefix, postName, suffix } = getPermalinkParts( state );
-	return prefix + postName + suffix;
+
+	if ( isPermalinkEditable( state ) ) {
+		return prefix + postName + suffix;
+	} else {
+		return prefix;
+	}
 }
 
 /**

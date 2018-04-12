@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { Component, compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Dashicon, Button, ClipboardButton, Tooltip } from '@wordpress/components';
 
@@ -15,17 +11,27 @@ import { Dashicon, Button, ClipboardButton, Tooltip } from '@wordpress/component
  */
 import './style.scss';
 import PostPermalinkEditor from './editor.js';
-import { isEditedPostNew, isPermalinkEditable, getEditedPostPreviewLink, getPermalink } from '../../store/selectors';
 import { getWPAdminURL } from '../../utils/url';
 
 class PostPermalink extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.onVisibilityChange = this.onVisibilityChange.bind( this );
+
 		this.state = {
 			iconClass: '',
 			isEditingPermalink: false,
 		};
+	}
+
+	onVisibilityChange( event ) {
+		const { isEditable, refreshPost } = this.props;
+		// If the user just returned after having clicked the "Change Permalinks" button,
+		// fetch a new copy of the post from the server, just in case they enabled permalinks.
+		if ( ! isEditable && 'visible' === document.visibilityState ) {
+			refreshPost();
+		}
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -90,6 +96,7 @@ class PostPermalink extends Component {
 						className="editor-post-permalink__change"
 						isLarge
 						href={ getWPAdminURL( 'options-permalink.php' ) }
+						onClick={ window.addEventListener( 'visibilitychange', this.onVisibilityChange ) }
 						target="_blank"
 					>
 						{ __( 'Change Permalinks' ) }
@@ -100,14 +107,19 @@ class PostPermalink extends Component {
 	}
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
+		const { isEditedPostNew, isPermalinkEditable, getEditedPostPreviewLink, getPermalink } = select( 'core/editor' );
 		return {
-			isNew: isEditedPostNew( state ),
-			previewLink: getEditedPostPreviewLink( state ),
-			isEditable: isPermalinkEditable( state ),
-			samplePermalink: getPermalink( state ),
+			isNew: isEditedPostNew(),
+			previewLink: getEditedPostPreviewLink(),
+			isEditable: isPermalinkEditable(),
+			samplePermalink: getPermalink(),
 		};
-	}
-)( PostPermalink );
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { refreshPost } = dispatch( 'core/editor' );
+		return { refreshPost };
+	} ),
+] )( PostPermalink );
 
