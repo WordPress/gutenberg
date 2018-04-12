@@ -423,8 +423,8 @@ export class BlockListBlock extends Component {
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! showSideInserter && isSelectedNotTyping;
 		// We render block movers and block settings to keep them tabbale even if hidden
-		const shouldRenderMovers = isHovered && ( isSelected || hoverArea === 'left' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
-		const shouldRenderBlockSettings = isHovered && ( isSelected || hoverArea === 'right' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
+		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
+		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
 		const shouldShowBreadcrumb = isHovered;
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
 		const shouldShowMobileToolbar = shouldAppearSelected;
@@ -522,7 +522,7 @@ export class BlockListBlock extends Component {
 						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
-						isHidden={ hoverArea !== 'left' }
+						isHidden={ ! isHovered || hoverArea !== 'left' }
 					/>
 				) }
 				{ shouldRenderBlockSettings && (
@@ -530,7 +530,7 @@ export class BlockListBlock extends Component {
 						uids={ [ uid ] }
 						rootUID={ rootUID }
 						renderBlockMenu={ renderBlockMenu }
-						isHidden={ hoverArea !== 'right' }
+						isHidden={ ! isHovered || hoverArea !== 'right' }
 					/>
 				) }
 				{ shouldShowBreadcrumb && <BlockBreadcrumb uid={ uid } isHidden={ hoverArea !== 'left' } /> }
