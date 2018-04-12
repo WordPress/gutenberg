@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
@@ -37,9 +42,11 @@ function stopPropagation( event ) {
  *
  * @return {WPElement} Breadcrumb element.
  */
-function BlockBreadcrumb( { uid, rootUID, selectRootBlock } ) {
+function BlockBreadcrumb( { uid, rootUID, selectRootBlock, isHidden } ) {
 	return (
-		<NavigableToolbar className="editor-block-breadcrumb">
+		<NavigableToolbar className={ classnames( 'editor-block-breadcrumb', {
+			'is-visible': ! isHidden,
+		} ) }>
 			<Toolbar>
 				{ rootUID && (
 					<Tooltip text={ __( 'Select parent block' ) }>
