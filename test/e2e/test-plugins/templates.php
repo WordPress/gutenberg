@@ -10,7 +10,7 @@
 /**
  * Registers a book CPT with a template
  */
-function register_book_type() {
+function gutenberg_test_templates_register_book_type() {
 	$args = array(
 		'public' => true,
 		'label'  => 'Books',
@@ -43,4 +43,4 @@ function register_book_type() {
 	register_post_type( 'book', $args );
 }
 
-add_action( 'init', 'register_book_type' );
+add_action( 'init', 'gutenberg_test_templates_register_book_type' );

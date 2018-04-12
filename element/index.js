@@ -8,7 +8,6 @@ import {
 	flowRight,
 	isString,
 	upperFirst,
-	isEmpty,
 } from 'lodash';
 
 /**
@@ -212,14 +211,10 @@ export function createHigherOrderComponent( mapComponentToEnhancedComponent, mod
  * @return {WPElement} Dangerously-rendering element.
  */
 export function RawHTML( { children, ...props } ) {
-	// Render wrapper only if props are non-empty.
-	const tagName = isEmpty( props ) ? 'wp-raw-html' : 'div';
-
-	// Merge HTML into assigned props.
-	props = {
+	// The DIV wrapper will be stripped by serializer, unless there are
+	// non-children props present.
+	return createElement( 'div', {
 		dangerouslySetInnerHTML: { __html: children },
 		...props,
-	};
-
-	return createElement( tagName, props );
+	} );
 }
