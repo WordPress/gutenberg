@@ -116,6 +116,27 @@ function gutenberg_render_block( $block ) {
 }
 
 /**
+ * Prefixes the core namespace ('core/') to the block type name if the namespace isn't found in the block type name
+ *
+ * @since 2.7.0
+ *
+ * @param  string $block_type Name of the block type.
+ * @return string             Name of the block type, prefixed by the core namespace if needed.
+ */
+function gutenberg_prefix_core_namespace_if_not_found( $block_type ) {
+	$block_type = trim( $block_type );
+
+	$index_of_slash = strpos( $block_type, '/' );
+
+	// If namespace isn't found in the block type name, prefix it with 'core/'
+	if ( $index_of_slash === FALSE ) {
+		return 'core/' . $block_type;
+	}
+
+	return $block_type;
+}
+
+/**
  * Parses dynamic blocks out of `post_content` and re-renders them.
  *
  * @since 0.1.0
@@ -123,7 +144,8 @@ function gutenberg_render_block( $block ) {
  * @param  string $content Post content.
  * @return string          Updated post content.
  */
-function render_dynamic_blocks( $content ) {
+function gutenberg_render_dynamic_blocks( $content ) {
+
 	$rendered_content = '';
 
 	$dynamic_block_names   = get_dynamic_block_names();
@@ -202,14 +224,43 @@ function render_dynamic_blocks( $content ) {
 	return $rendered_content;
 }
 
+/**
+ * Strips block comments from the post's HTML. This is hooked as a filter 
+ * to 'the_content' and gets executed after dynamic blocks are rendered in
+ * the post's HTML.
+ * 
+ * It registers gutenberg_process_block_comment() as a callback function for
+ * preg_replace_callback(). For each block comment (matched by the Regex) in
+ * the post's HTML, gutenberg_process_block_comment() will get called.
+ *
+ * @since 2.7.0
+ *
+ * @param  string $content Post content.
+ * @return string          Updated post content (without block comments)
+ */
 function gutenberg_strip_block_comments( $content ) {
-	
-	// Strip remaining block comment demarcations.
+
 	$content = preg_replace_callback( '/<!--\s+\/?wp:.*?-->\r?\n?/m', 'gutenberg_process_block_comment', $content );
 
 	return $content;
 }
 
+/**
+ * Registered as a callback function to preg_replace_callback() and is called once for each
+ * block comment parsed from the post's HTML. It returns an empty string for each instantiation
+ * so that the post's HTML gets stripped of block comments.
+ * 
+ * Also, it uses WP_Parsed_Block_Types_Registry to store block types parsed from the block comments.
+ * Those can be later used if needed.
+ *
+ * @since 2.7.0
+ *
+ * @param  string $matches An array filled with the results of search. 
+ *                         $matches[0] will contain the text that matched the full pattern,
+ *                         $matches[1] will have the text that matched the first captured parenthesized subpattern,
+ *                         and so on. 
+ * @return string          Returns an empty string to preg_replace_callback() for each of the block comments
+ */
 function gutenberg_process_block_comment( $matches ) {
 	$block_comment = $matches[0];
 	
@@ -218,7 +269,7 @@ function gutenberg_process_block_comment( $matches ) {
 		
 		$match = Array();
 
-		preg_match( '/wp:(.*?)\s+/m', $block_comment, $match); //Should it be ' +' or '/s+'. Research more about this.
+		preg_match( '/wp:(.*?)\s+/m', $block_comment, $match);
 
 		$block_type_name = $match[1];
 		$block_type_name = gutenberg_prefix_core_namespace_if_not_found( $block_type_name );
@@ -229,26 +280,10 @@ function gutenberg_process_block_comment( $matches ) {
 	return '';
 }
 
-/**
- * Prefixes 'core/' as the namespace to the block type name if the namespace isn't found in the block type name
- *
- * @since 2.6.0
- *
- * @param  string $block_type Name of the block type.
- * @return string             Name of the block type, prefixed by the core namespace if needed.
- */
-function gutenberg_prefix_core_namespace_if_not_found( $block_type ) {
-	$block_type = trim( $block_type );
-
-	$index_of_slash = strpos( $block_type, '/' );
-
-	// If namespace isn't found in the block type name, prefix it with 'core/'
-	if ( $index_of_slash === FALSE ) {
-		return 'core/' . $block_type;
-	}
-
-	return $block_type;
-}
-
-add_filter( 'the_content', 'render_dynamic_blocks', 8 ); // BEFORE do_shortcode().
-add_filter( 'the_content', 'gutenberg_strip_block_comments', 9);
+/*
+ * If both filters have the same priority (9 in this case), they are executed
+ * in the order in which they were added to the action. Therefore, in this case,
+ * gutenberg_render_dynamic_blocks() will get executed before gutenberg_strip_block_comments()
+ */ 
+add_filter( 'the_content', 'gutenberg_render_dynamic_blocks', 9 ); // BEFORE do_shortcode().
+add_filter( 'the_content', 'gutenberg_strip_block_comments', 9); // AFTER the above filter

@@ -770,8 +770,6 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 function gutenberg_enqueue_required_block_styles() {
 
 	if( is_single() || is_page() ) {
-
-		var_dump('here');
 		
 		if( $isEnabled = true ) {
 			// Enable intelligent style loading
