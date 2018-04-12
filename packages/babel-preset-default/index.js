@@ -17,6 +17,5 @@ module.exports = {
 			pragma: 'wp.element.createElement',
 		} ],
 		! isTestEnv && require( 'babel-plugin-transform-runtime' ),
-		! isTestEnv && require( 'babel-plugin-lodash' ),
 	].filter( Boolean ),
 };
