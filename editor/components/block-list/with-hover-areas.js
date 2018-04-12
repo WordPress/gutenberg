@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode } from '@wordpress/element';
+import { Component, findDOMNode, createHigherOrderComponent } from '@wordpress/element';
 
-const withHoverAreas = ( WrappedComponent ) => {
+const withHoverAreas = createHigherOrderComponent( ( WrappedComponent ) => {
 	class WithHoverAreasComponent extends Component {
 		constructor() {
 			super( ...arguments );
@@ -57,6 +57,6 @@ const withHoverAreas = ( WrappedComponent ) => {
 	}
 
 	return WithHoverAreasComponent;
-};
+} );
 
 export default withHoverAreas;
