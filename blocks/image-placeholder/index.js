@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -53,17 +53,19 @@ export default function ImagePlaceholder( { className, icon, label, onSelectImag
 			>
 				{ __( 'Upload' ) }
 			</FormFileUpload>
-			<MediaUpload
-				gallery={ multiple }
-				multiple={ multiple }
-				onSelect={ onSelectImage }
-				type="image"
-				render={ ( { open } ) => (
-					<Button isLarge onClick={ open }>
-						{ __( 'Add from Media Library' ) }
-					</Button>
-				) }
-			/>
+			{ ! get( window, 'customGutenberg.editor.noMediaLibrary' ) &&
+				<MediaUpload
+					gallery={ multiple }
+					multiple={ multiple }
+					onSelect={ onSelectImage }
+					type="image"
+					render={ ( { open } ) => (
+						<Button isLarge onClick={ open }>
+							{ __( 'Add from Media Library' ) }
+						</Button>
+					) }
+				/>
+			}
 		</Placeholder>
 	);
 }

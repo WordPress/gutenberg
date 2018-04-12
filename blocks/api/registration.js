@@ -140,9 +140,9 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 	if ( 'category' in settings && ! some( categories, { slug: settings.category } ) ) {
-		console.error(
-			'The block "' + name + '" must have a registered category.'
-		);
+		// console.error(
+		// 	'The block "' + name + '" must have a registered category.'
+		// );
 		return;
 	}
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
