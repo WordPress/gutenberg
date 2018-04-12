@@ -69,7 +69,7 @@ export class BlockBreadcrumb extends Component {
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }
 							>
-								<Dashicon icon="arrow-left" uid={ uid } />
+								<Dashicon icon="arrow-left-alt" uid={ uid } />
 							</Button>
 						</Tooltip>
 					) }
