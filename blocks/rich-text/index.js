@@ -699,10 +699,6 @@ export class RichText extends Component {
 		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
 	}
 
-	componentWillUnmount() {
-		this.onChange();
-	}
-
 	componentDidUpdate( prevProps ) {
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
