@@ -30,7 +30,7 @@
 		"hpq": "1.2.0",
 		"jquery": "3.2.1",
 		"js-beautify": "1.6.14",
-		"lodash": "4.17.4",
+		"lodash": "4.17.5",
 		"memize": "1.0.5",
 		"moment": "2.21.0",
 		"moment-timezone": "0.5.13",
@@ -58,7 +58,7 @@
 	},
 	"devDependencies": {
 		"@wordpress/babel-plugin-makepot": "1.0.0",
-		"@wordpress/babel-preset-default": "1.1.1",
+		"@wordpress/babel-preset-default": "1.2.0",
 		"@wordpress/custom-templated-path-webpack-plugin": "1.0.0",
 		"@wordpress/jest-preset-default": "1.0.3",
 		"@wordpress/scripts": "1.1.0",
