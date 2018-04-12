@@ -123,7 +123,6 @@ class ParagraphBlock extends Component {
 			attributes,
 			setAttributes,
 			insertBlocksAfter,
-			isSelected,
 			mergeBlocks,
 			onReplace,
 			className,
@@ -259,7 +258,6 @@ class ParagraphBlock extends Component {
 					onReplace={ this.onReplace }
 					onRemove={ () => onReplace( [] ) }
 					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-					isSelected={ isSelected }
 					autocompleters={ autocompleters }
 				/>
 			</Fragment>
