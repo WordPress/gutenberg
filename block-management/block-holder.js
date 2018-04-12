@@ -38,12 +38,18 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		if ( blockType ) {
 			const Block = blockType.edit;
 
+			let style;
+			if ( blockType.name === 'core/code' ) {
+				style = styles.block_code;
+			}
+
 			// TODO: setAttributes needs to change the state/attributes
 			return (
 				<Block
 					attributes={ { ...this.props.attributes } }
 					// pass a curried version of onChanged with just one argument
 					setAttributes={ attrs => this.props.onChange( this.props.uid, attrs ) }
+					style={ style }
 				/>
 			);
 		}
