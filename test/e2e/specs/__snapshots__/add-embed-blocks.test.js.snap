@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`embedding media Should insert a Youtube video 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://www.youtube.com/watch?v=CiwJx557ttk\\",\\"type\\":\\"video\\",\\"providerNameSlug\\":\\"youtube\\"} -->
+<figure class=\\"wp-block-embed is-type-video is-provider-youtube\\">
+    https://www.youtube.com/watch?v=CiwJx557ttk
+</figure>
+<!-- /wp:embed -->"
+`;
+
+exports[`embedding media Should insert an embedded tweet 1`] = `
+"<!-- wp:embed {\\"url\\":\\"https://twitter.com/WordPress/status/980716623060455424\\",\\"type\\":\\"rich\\",\\"providerNameSlug\\":\\"twitter\\"} -->
+<figure class=\\"wp-block-embed is-type-rich is-provider-twitter\\">
+    https://twitter.com/WordPress/status/980716623060455424
+</figure>
+<!-- /wp:embed -->"
+`;
