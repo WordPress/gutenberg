@@ -4,6 +4,8 @@
 import { compose } from '@wordpress/element';
 import { Slot, Fill, withContext } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import './style.scss';
+import EditorScreenTakeover from './editor-screen-takeover';
 
 /**
  * Name of slot in which the screen takeover should fill.
@@ -12,9 +14,14 @@ import { withSelect } from '@wordpress/data';
  */
 const SLOT_NAME = 'PluginScreenTakeover';
 
-let PluginScreenTakeover = ( { pluginName, name, children } ) => (
+let PluginScreenTakeover = ( { pluginName, name, icon, children } ) => (
 	<Fill name={ [ SLOT_NAME, pluginName, name ].join( '/' ) }>
-		{ children }
+		<EditorScreenTakeover
+			icon={ icon }
+			title={ 'Screen Takeover Title' }
+		>
+			{ children }
+		</EditorScreenTakeover>
 	</Fill>
 );
 

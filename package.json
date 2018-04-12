@@ -44,6 +44,7 @@
 		"react-color": "2.13.4",
 		"react-datepicker": "0.61.0",
 		"react-dom": "16.2.0",
+		"react-modal": "3.3.2",
 		"react-redux": "5.0.6",
 		"redux": "3.7.2",
 		"redux-multi": "0.1.12",
