@@ -26,7 +26,7 @@
     [
       "react-native-platform-specific-extensions",
       {
-        "extensions": ["css", "scss", "sass"]
+        "extensions": ["native.scss", "css", "scss", "sass"]
       }
     ]
   ],
