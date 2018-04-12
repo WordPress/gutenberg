@@ -123,6 +123,45 @@ describe( 'registerResolvers', () => {
 		expect( resolver ).toHaveBeenCalledTimes( 2 );
 	} );
 
+	it( 'should support the object resolver definition', () => {
+		const resolver = jest.fn();
+
+		registerReducer( 'demo', ( state = 'OK' ) => state );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: { fulfill: resolver },
+		} );
+
+		const value = select( 'demo' ).getValue( 'arg1', 'arg2' );
+		expect( value ).toBe( 'OK' );
+	} );
+
+	it( 'should use isFulfilled definition before calling the side effect', () => {
+		const resolver = jest.fn();
+		let count = 0;
+
+		registerReducer( 'demo', ( state = 'OK' ) => state );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: {
+				fulfill: ( ...args ) => {
+					count++;
+					resolver( ...args );
+				},
+				isFulfilled: () => count > 1,
+			},
+		} );
+
+		for ( let i = 0; i < 4; i++ ) {
+			select( 'demo' ).getValue( 'arg1', 'arg2' );
+		}
+		expect( resolver ).toHaveBeenCalledTimes( 2 );
+	} );
+
 	it( 'should resolve action to dispatch', ( done ) => {
 		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;
