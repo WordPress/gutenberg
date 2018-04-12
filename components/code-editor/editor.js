@@ -41,6 +41,7 @@ class CodeEditor extends Component {
 			this.updateFocus();
 		}
 
+		// If an editorUpdate prop has been passed down, call it now.
 		if ( this.props.editorUpdate ) {
 			this.props.editorUpdate( this.editor, prevProps );
 		}
