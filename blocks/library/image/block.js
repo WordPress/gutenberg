@@ -156,22 +156,24 @@ class ImageBlock extends Component {
 						onChange={ this.updateAlignment }
 					/>
 
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImage }
-							type="image"
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
-						<UrlInputButton onChange={ this.onSetHref } url={ href } />
-					</Toolbar>
+					{ url ?
+						<Toolbar>
+							<MediaUpload
+								onSelect={ this.onSelectImage }
+								type="image"
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit image' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+							<UrlInputButton onChange={ this.onSetHref } url={ href } />
+						</Toolbar> :
+						'' }
 				</BlockControls>
 			)
 		);
