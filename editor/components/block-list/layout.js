@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import {
 	findLast,
 	map,
@@ -17,7 +16,8 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -26,13 +26,6 @@ import './style.scss';
 import BlockListBlock from './block';
 import IgnoreNestedEvents from './ignore-nested-events';
 import DefaultBlockAppender from '../default-block-appender';
-import {
-	isSelectionEnabled,
-	isMultiSelecting,
-	getMultiSelectedBlocksStartUid,
-	getMultiSelectedBlocksEndUid,
-} from '../../store/selectors';
-import { startMultiSelect, stopMultiSelect, multiSelect, selectBlock } from '../../store/actions';
 
 class BlockListLayout extends Component {
 	constructor( props ) {
@@ -243,29 +236,37 @@ class BlockListLayout extends Component {
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		// Reference block selection value directly, since current selectors
-		// assume either multi-selection (getMultiSelectedBlocksStartUid) or
-		// singular-selection (getSelectedBlock) exclusively.
-		selectionStart: getMultiSelectedBlocksStartUid( state ),
-		selectionEnd: getMultiSelectedBlocksEndUid( state ),
-		selectionStartUID: state.blockSelection.start,
-		isSelectionEnabled: isSelectionEnabled( state ),
-		isMultiSelecting: isMultiSelecting( state ),
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			isSelectionEnabled,
+			isMultiSelecting,
+			getMultiSelectedBlocksStartUid,
+			getMultiSelectedBlocksEndUid,
+			getBlockSelectionStart,
+		} = select( 'core/editor' );
+
+		return {
+			selectionStart: getMultiSelectedBlocksStartUid(),
+			selectionEnd: getMultiSelectedBlocksEndUid(),
+			selectionStartUID: getBlockSelectionStart(),
+			isSelectionEnabled: isSelectionEnabled(),
+			isMultiSelecting: isMultiSelecting(),
+		};
 	} ),
-	( dispatch ) => ( {
-		onStartMultiSelect() {
-			dispatch( startMultiSelect() );
-		},
-		onStopMultiSelect() {
-			dispatch( stopMultiSelect() );
-		},
-		onMultiSelect( start, end ) {
-			dispatch( multiSelect( start, end ) );
-		},
-		onSelect( uid ) {
-			dispatch( selectBlock( uid ) );
-		},
-	} )
-)( BlockListLayout );
+	withDispatch( ( dispatch ) => {
+		const {
+			startMultiSelect,
+			stopMultiSelect,
+			multiSelect,
+			selectBlock,
+		} = dispatch( 'core/editor' );
+
+		return {
+			onStartMultiSelect: startMultiSelect,
+			onStopMultiSelect: stopMultiSelect,
+			onMultiSelect: multiSelect,
+			onSelect: selectBlock,
+		};
+	} ),
+] )( BlockListLayout );

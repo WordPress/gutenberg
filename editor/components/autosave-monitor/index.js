@@ -1,21 +1,8 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { autosave } from '../../store/actions';
-import {
-	isEditedPostDirty,
-	isEditedPostSaveable,
-} from '../../store/selectors';
+import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
@@ -46,12 +33,16 @@ export class AutosaveMonitor extends Component {
 	}
 }
 
-export default connect(
-	( state ) => {
-		return {
-			isDirty: isEditedPostDirty( state ),
-			isSaveable: isEditedPostSaveable( state ),
-		};
-	},
-	{ autosave }
-)( AutosaveMonitor );
+export default compose( [
+	withSelect(
+		( select ) => {
+			const { isEditedPostDirty, isEditedPostSaveable } = select( 'core/editor' );
+			return {
+				isDirty: isEditedPostDirty(),
+				isSaveable: isEditedPostSaveable(),
+			};
+		} ),
+	withDispatch( ( dispatch ) => ( {
+		autosave: dispatch( 'core/editor' ).autosave,
+	} ) ),
+] )( AutosaveMonitor );

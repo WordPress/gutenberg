@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { first } from 'lodash';
+import { first, partial } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -12,13 +11,13 @@ import { __ } from '@wordpress/i18n';
 import { IconButton, withContext, withInstanceId } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { compose, Component } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { getBlockMoverDescription } from './mover-description';
-import { getBlockIndex, getBlock } from '../../store/selectors';
 import { upArrow, downArrow } from './arrows';
 
 export class BlockMover extends Component {
@@ -105,40 +104,23 @@ export class BlockMover extends Component {
 	}
 }
 
-/**
- * Action creator creator which, given the action type to dispatch and the
- * arguments of mapDispatchToProps, creates a prop dispatcher callback for
- * managing block movement.
- *
- * @param {string}   type     Action type to dispatch.
- * @param {Function} dispatch Store dispatch.
- * @param {Object}   ownProps The wrapped component's own props.
- *
- * @return {Function} Prop dispatcher callback.
- */
-function createOnMove( type, dispatch, ownProps ) {
-	return () => {
-		const { uids, rootUID } = ownProps;
-		dispatch( { type, uids, rootUID } );
-	};
-}
-
 export default compose(
-	connect(
-		( state, ownProps ) => {
-			const { uids, rootUID } = ownProps;
-			const block = getBlock( state, first( uids ) );
+	withSelect( ( select, { uids, rootUID } ) => {
+		const { getBlock, getBlockIndex } = select( 'core/editor' );
+		const block = getBlock( first( uids ) );
 
-			return ( {
-				firstIndex: getBlockIndex( state, first( uids ), rootUID ),
-				blockType: block ? getBlockType( block.name ) : null,
-			} );
-		},
-		( ...args ) => ( {
-			onMoveDown: createOnMove( 'MOVE_BLOCKS_DOWN', ...args ),
-			onMoveUp: createOnMove( 'MOVE_BLOCKS_UP', ...args ),
-		} )
-	),
+		return {
+			firstIndex: getBlockIndex( first( uids ), rootUID ),
+			blockType: block ? getBlockType( block.name ) : null,
+		};
+	} ),
+	withDispatch( ( dispatch, { uids, rootUID } ) => {
+		const { moveBlocksDown, moveBlocksUp } = dispatch( 'core/editor' );
+		return {
+			onMoveDown: partial( moveBlocksDown, uids, rootUID ),
+			onMoveUp: partial( moveBlocksUp, uids, rootUID ),
+		};
+	} ),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
 
