@@ -18,6 +18,7 @@ import {
 	RichText,
 	InspectorControls,
 	ColorPalette,
+	ContrastChecker,
 } from '@wordpress/blocks';
 import { concatChildren, Component, RawHTML } from '@wordpress/element';
 import {
@@ -37,7 +38,6 @@ import './editor.scss';
 import './style.scss';
 import { blockAutocompleter } from '../../autocompleters';
 import { defaultAutocompleters } from '../../hooks/default-autocompleters';
-import ContrastChecker from '../../contrast-checker';
 
 const { getComputedStyle } = window;
 

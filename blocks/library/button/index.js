@@ -9,6 +9,7 @@ import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	ColorPalette,
+	ContrastChecker,
 	InspectorControls,
 } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
@@ -26,7 +27,6 @@ import {
  */
 import './editor.scss';
 import './style.scss';
-import ContrastChecker from '../../contrast-checker';
 
 const { getComputedStyle } = window;
 
