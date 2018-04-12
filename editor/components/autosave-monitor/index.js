@@ -34,14 +34,13 @@ export class AutosaveMonitor extends Component {
 }
 
 export default compose( [
-	withSelect(
-		( select ) => {
-			const { isEditedPostDirty, isEditedPostSaveable } = select( 'core/editor' );
-			return {
-				isDirty: isEditedPostDirty(),
-				isSaveable: isEditedPostSaveable(),
-			};
-		} ),
+	withSelect( ( select ) => {
+		const { isEditedPostDirty, isEditedPostSaveable } = select( 'core/editor' );
+		return {
+			isDirty: isEditedPostDirty(),
+			isSaveable: isEditedPostSaveable(),
+		};
+	} ),
 	withDispatch( ( dispatch ) => ( {
 		autosave: dispatch( 'core/editor' ).autosave,
 	} ) ),

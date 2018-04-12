@@ -75,11 +75,11 @@ export default compose( [
 				onToggle();
 			},
 			onDelete( id ) {
-			// TODO: Make this a <Confirm /> component or similar
-			// eslint-disable-next-line no-alert
+				// TODO: Make this a <Confirm /> component or similar
+				// eslint-disable-next-line no-alert
 				const hasConfirmed = window.confirm( __(
 					'Are you sure you want to delete this Shared Block?\n\n' +
-				'It will be permanently removed from all posts and pages that use it.'
+					'It will be permanently removed from all posts and pages that use it.'
 				) );
 
 				if ( hasConfirmed ) {

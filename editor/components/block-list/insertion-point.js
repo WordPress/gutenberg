@@ -51,16 +51,17 @@ export default compose(
 		const insertIndex = blockIndex;
 		const insertionPoint = getBlockInsertionPoint();
 		const block = uid ? getBlock( uid ) : null;
-
-		return {
-			showInsertionPoint: (
-				isBlockInsertionPointVisible() &&
+		const showInsertionPoint = (
+			isBlockInsertionPointVisible() &&
 			insertionPoint.index === insertIndex &&
 			insertionPoint.rootUID === rootUID &&
 			( ! block || ! isUnmodifiedDefaultBlock( block ) )
-			),
+		);
+
+		return {
 			showInserter: ! isTyping(),
 			index: insertIndex,
+			showInsertionPoint,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
