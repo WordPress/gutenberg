@@ -170,16 +170,8 @@ export const settings = {
 			/>
 		);
 
-		let figureStyle = {};
-
-		if ( width ) {
-			figureStyle = { width };
-		} else if ( align === 'left' || align === 'right' ) {
-			figureStyle = { maxWidth: '50%' };
-		}
-
 		return (
-			<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+			<figure className={ align ? `align${ align }` : null }>
 				{ href ? <a href={ href }>{ image }</a> : image }
 				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
 			</figure>

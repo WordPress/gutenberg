@@ -273,21 +273,6 @@
 		}
 	}
 
-	// Apply max-width to floated items that have no intrinsic width, like Cover Image or Gallery
-	&[data-align="left"],
-	&[data-align="right"] {
-		> .editor-block-list__block-edit {
-			max-width: 360px;
-			width: 100%;
-		}
-
-		// reset when data-resized
-		&[data-resized="true"] > .editor-block-list__block-edit {
-			max-width: none;
-			width: auto;
-		}
-	}
-
 	// Left
 	&[data-align="left"] {
 		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
@@ -319,7 +304,7 @@
 
 	// Full-wide
 	&[data-align="full"] {
-
+		
 		// compensate for main container padding
 		@include break-small() {
 			margin-left: -$block-side-ui-padding;
@@ -333,6 +318,11 @@
 			@include break-small() {
 				margin-left: -$block-side-ui-padding - $block-padding;
 				margin-right: -$block-side-ui-padding - $block-padding;
+			}
+
+			// this explicitly sets the width of the block, to override the fit-content from the image block
+			figure {
+				width: 100%;
 			}
 		}
 
