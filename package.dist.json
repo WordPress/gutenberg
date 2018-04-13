@@ -10,9 +10,13 @@
   "author": "The Frontkom Contributors",
   "license": "GPL-2.0-or-later",
   "keywords": [
+    "CMS",
+    "Drupal",
+    "Editor",
     "Frontkom",
     "Gutenberg",
-    "editor",
+    "Page builder",
+    "WordPress",
     "WYSIWYG"
   ],
   "engines": {
