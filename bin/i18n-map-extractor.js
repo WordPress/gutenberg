@@ -1,5 +1,5 @@
 const recast = require( 'recast' );
-const { forEach, reduce, includes, has, isEmpty, isFunction } = require( 'lodash' );
+const { forEach, reduce, includes, isEmpty, isFunction } = require( 'lodash' );
 const { writeFileSync } = require( 'fs' );
 const NormalModule = require( 'webpack/lib/NormalModule' );
 
@@ -76,7 +76,7 @@ class wpi18nExtractor {
 				) {
 					return mapped;
 				}
-				if ( ! has( mapped, chunkName ) ) {
+				if ( ! mapped.hasOwnProperty( chunkName ) ) {
 					mapped[ chunkName ] = [];
 				}
 				mapped[ chunkName ] = mapped[ chunkName ]
@@ -94,12 +94,13 @@ class wpi18nExtractor {
 		/**
 		 * webpack 4 registration
 		 */
-		if ( has( compiler, 'hooks' ) ) {
+		if ( compiler.hasOwnProperty( 'hooks' ) ) {
 			compiler.hooks.thisCompilation.tap( 'webpack-i18n-map-extractor', compilation => {
 				compilation.hooks.optimizeChunks.tap( 'webpack-i18n-map-extractor', chunks => {
 					processChunks( chunks, extractor );
 				} );
 			} );
+		// webpack 3 registration.
 		} else {
 			compiler.plugin( 'this-compilation', ( compilation ) => {
 				compilation.plugin( [ 'optimize-chunks', 'optimize-extracted-chunks' ], ( chunks ) => {
