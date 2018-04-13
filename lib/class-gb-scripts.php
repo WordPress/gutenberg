@@ -179,7 +179,8 @@ class GB_Scripts {
 			return array();
 		}
 		//some strings with quotes in them will break on the array_flip, so making sure quotes in the string are slashed
-		$string_set = wp_slash( $string_set );
+		//also filter falsey values
+		$string_set = array_unique( array_filter( wp_slash( $string_set ) ) );
 		return array_intersect_key( $translations, array_flip( $string_set ) );
 	}
 
