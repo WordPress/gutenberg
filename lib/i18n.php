@@ -10,6 +10,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
+/**
+ * Register script handle and chunk name for the given domain
+ *
+ * Registered scripts will be matched against the generated `translation-map.json` for any i18n strings to be loaded
+ * when the script with the given handle is enqueued.
+ *
+ * @since 2.6.x
+ *
+ * @param string $handle     Name of the script being registered.
+ * @param string $chunk_name Name of the script chunk corresponding to the script handle.
+ * @param string $domain     i18n domain.
+ */
 function gutenberg_register_script_i18n( $handle, $chunk_name, $domain = '' ) {
 	static $gb_scripts;
 	if ( ! $gb_scripts instanceof GB_Scripts ) {
@@ -29,10 +41,10 @@ function gutenberg_register_script_i18n( $handle, $chunk_name, $domain = '' ) {
  * @return array
  */
 function gutenberg_get_jed_locale_data( $domain ) {
-	//gutenberg doesn't use domain in its js strings but has a domain set by virtue of being a plugin in the WordPress
-	//plugin repository.  So we need to use that to retrieve the gutenberg translations. When GB is merged to WordPress
-	//core this will be unnecessary.
-	$domain = $domain ? $domain : 'gutenberg';
+	// gutenberg doesn't use domain in its js strings but has a domain set by virtue of being a plugin in the WordPress
+	// plugin repository.  So we need to use that to retrieve the gutenberg translations. When GB is merged to WordPress
+	// core this will be unnecessary.
+	$domain       = $domain ? $domain : 'gutenberg';
 	$translations = get_translations_for_domain( $domain );
 
 	$locale = array(

@@ -122,6 +122,7 @@
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
+	  	"lint-php:fix": "docker-compose run --rm composer run-script lint:fix",
 		"predev": "check-node-version --package",
 		"dev": "cross-env webpack --watch",
 		"test": "npm run lint && npm run test-unit",
