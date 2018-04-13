@@ -13,7 +13,6 @@ describe( 'embedding media', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
-
 	} );
 
 	afterEach( async () => {
@@ -30,15 +29,15 @@ describe( 'embedding media', () => {
 		await page.keyboard.press( 'Enter' );
 
 		//wait for link to resolve and block to rerender
-		await page.waitFor(2000);
+		await page.waitFor( 2000 );
 
 		//Check HTML output
 		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		let codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
+		const codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
 		await codeEditorButton.click( 'button' );
 
 		//Assert that the editor now has an embedded tweet block
-		let textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
+		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
 		expect( textEditorContent ).toMatchSnapshot();
 	} );
 
@@ -49,15 +48,15 @@ describe( 'embedding media', () => {
 		await page.keyboard.press( 'Enter' );
 
 		//wait for link to resolve and block to rerender
-		await page.waitFor(2000);
+		await page.waitFor( 2000 );
 
 		//Check HTML output
 		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		let codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
+		const codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
 		await codeEditorButton.click( 'button' );
 
 		//Assert that the editor now has an embedded youtube block
-		let textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
+		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
 		expect( textEditorContent ).toMatchSnapshot();
 	} );
 } );
