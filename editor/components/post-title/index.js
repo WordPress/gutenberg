@@ -126,7 +126,7 @@ class PostTitle extends Component {
 const applyWithSelect = withSelect( ( select ) => {
 	const { getEditedPostAttribute } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
-	const postType = getPostType( getEditedPostAttribute( 'type' ) )
+	const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 	return {
 		title: getEditedPostAttribute( 'title' ),
