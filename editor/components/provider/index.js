@@ -19,7 +19,7 @@ import {
 /**
  * Internal Dependencies
  */
-import { setupEditor, undo, redo, createUndoLevel } from '../../store/actions';
+import { setupEditor, undo, redo, showAutosaveNotice, createUndoLevel } from '../../store/actions';
 import store from '../../store';
 
 class EditorProvider extends Component {
@@ -36,6 +36,11 @@ class EditorProvider extends Component {
 					...this.props.settings,
 				} )
 			);
+		}
+
+		// Display a notice if an autosave exists.
+		if ( props.settings.autosave ) {
+			this.store.dispatch( showAutosaveNotice( props.settings.autosave ) );
 		}
 	}
 

@@ -799,6 +799,41 @@ function gutenberg_capture_code_editor_settings( $settings ) {
 	$gutenberg_captured_code_editor_settings = $settings;
 	return false;
 }
+/**
+ * Retrieve a stored autosave that is newer than the post save.
+ *
+ * Deletes autosaves that are older than the post save.
+ *
+ * @param  WP_Post $post Post object.
+ * @return WP_Post|boolean The post autosave. False if none found.
+ */
+function get_autosave_newer_than_post_save( $post ) {
+	// Add autosave data if it is newer and changed.
+	$autosave      = wp_get_post_autosave( $post->ID );
+	$show_autosave = false;
+
+	// Check if we have an autosave that is newer than the post and different from the current post.
+	if (
+		$autosave &&
+		mysql2date( 'U', $autosave->post_modified_gmt, false ) > mysql2date( 'U', $post->post_modified_gmt, false )
+	) {
+		// Iterate thru revisioned fields checking for any changes.
+		foreach ( _wp_post_revision_fields( $post ) as $autosave_field => $_autosave_field ) {
+			if ( normalize_whitespace( $autosave->$autosave_field ) != normalize_whitespace( $post->$autosave_field ) ) {
+				$show_autosave = true;
+				break;
+			}
+		}
+	}
+
+	// If this autosave isn't newer and different from the current post, remove.
+	if ( $autosave && ! $show_autosave ) {
+		wp_delete_post_revision( $autosave->ID );
+		return false;
+	}
+
+	return $autosave;
+}
 
 /**
  * Scripts & Styles.
@@ -949,6 +984,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
 	);
+
+	$post_autosave = get_autosave_newer_than_post_save( $post );
+	if ( $post_autosave ) {
+		$editor_settings['autosave'] = array(
+			'editLink' => add_query_arg( 'gutenberg', true, get_edit_post_link( $post_autosave->ID ) ),
+		);
+	}
 
 	if ( ! empty( $color_palette ) ) {
 		$editor_settings['colors'] = $color_palette;

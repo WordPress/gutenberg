@@ -394,6 +394,19 @@ export function autosave() {
 }
 
 /**
+ * Returns an action to show the autosave notice.
+ *
+ * @param  {boolean} autosaveStatus Autosave status and data including a link to the autosave.
+ * @return {Object}                 Action object
+ */
+export function showAutosaveNotice( autosaveStatus ) {
+	return {
+		type: 'REQUEST_AUTOSAVE_NOTICE',
+		autosaveStatus,
+	};
+}
+
+/**
  * Returns an action object used in signalling that undo history should
  * restore last popped state.
  *

@@ -34,6 +34,7 @@ import {
 	replaceBlocks,
 	createSuccessNotice,
 	createErrorNotice,
+	createWarningNotice,
 	removeNotice,
 	savePost,
 	saveSharedBlock,
@@ -71,6 +72,7 @@ import {
  * Module Constants
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
+const AUTOSAVE_POST_NOTICE_ID = 'AUTOSAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SHARED_BLOCK_NOTICE_ID = 'SHARED_BLOCK_NOTICE_ID';
 
@@ -109,6 +111,7 @@ export default {
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 		} );
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
+		dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
 		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
 			( newPost ) => {
@@ -200,6 +203,24 @@ export default {
 			messages[ edits.status ] :
 			__( 'Updating failed' );
 		dispatch( createErrorNotice( noticeMessage, { id: SAVE_POST_NOTICE_ID } ) );
+	},
+	REQUEST_AUTOSAVE_NOTICE( action, store ) {
+		const { autosaveStatus } = action;
+		const { dispatch } = store;
+		const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
+		if ( autosaveStatus ) {
+			dispatch( createWarningNotice(
+				<p>
+					<span>{ noticeMessage }</span>
+					{ ' ' }
+					{ <a href={ autosaveStatus.editLink }>{ __( 'View the autosave' ) }</a> }
+				</p>,
+				{
+					id: AUTOSAVE_POST_NOTICE_ID,
+					spokenMessage: noticeMessage,
+				}
+			) );
+		}
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
