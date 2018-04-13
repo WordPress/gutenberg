@@ -20,7 +20,8 @@ import { getCurrentPostType } from '../../store/selectors';
 
 export function PostTaxonomies( { postType, taxonomies, taxonomyWrapper = identity } ) {
 	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => includes( taxonomy.types, postType ) );
-	return availableTaxonomies.map( ( taxonomy ) => {
+	const visibleTaxonomies = filter( availableTaxonomies, ( taxonomy ) => taxonomy.visibility.show_ui );
+	return visibleTaxonomies.map( ( taxonomy ) => {
 		const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
 		return (
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
