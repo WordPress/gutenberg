@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Multi-block selection Should duplicate a multi-block selection 1`] = `
+"<!-- wp:paragraph -->
+<p>First Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>First Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second Paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third Paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Multi-block selection Should transform 3 paragraphs into a list 1`] = `
+"<!-- wp:list -->
+<ul>
+    <li>First Paragraph</li>
+    <li>Second Paragraph</li>
+    <li>Third Paragraph</li>
+</ul>
+<!-- /wp:list -->"
+`;
