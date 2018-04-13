@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { flow, noop } from 'lodash';
 
 /**
@@ -10,11 +9,7 @@ import { flow, noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { IconButton, withContext } from '@wordpress/components';
 import { compose } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { removeBlocks } from '../../store/actions';
+import { withDispatch } from '@wordpress/data';
 
 export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small = false, role } ) {
 	if ( isLocked ) {
@@ -37,14 +32,11 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small =
 }
 
 export default compose(
-	connect(
-		undefined,
-		( dispatch, ownProps ) => ( {
-			onRemove() {
-				dispatch( removeBlocks( ownProps.uids ) );
-			},
-		} )
-	),
+	withDispatch( ( dispatch, { uids } ) => ( {
+		onRemove() {
+			dispatch( 'core/editor' ).removeBlocks( uids );
+		},
+	} ) ),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
 

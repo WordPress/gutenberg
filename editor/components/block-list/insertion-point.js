@@ -1,36 +1,18 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { ifCondition, withContext } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import {
-	getBlockIndex,
-	getBlockInsertionPoint,
-	isBlockInsertionPointVisible,
-	getBlock,
-	isTyping,
-} from '../../store/selectors';
-import {
-	insertDefaultBlock,
-	startTyping,
-} from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 class BlockInsertionPoint extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onClick = this.onClick.bind( this );
 	}
+
 	onClick() {
 		const { layout, rootUID, index, ...props } = this.props;
 		props.insertDefaultBlock( { layout }, rootUID, index );
@@ -57,24 +39,36 @@ class BlockInsertionPoint extends Component {
 export default compose(
 	withContext( 'editor' )( ( { templateLock } ) => ( { templateLock } ) ),
 	ifCondition( ( { templateLock } ) => ! templateLock ),
-	connect(
-		( state, { uid, rootUID } ) => {
-			const blockIndex = uid ? getBlockIndex( state, uid, rootUID ) : -1;
-			const insertIndex = blockIndex;
-			const insertionPoint = getBlockInsertionPoint( state );
-			const block = uid ? getBlock( state, uid ) : null;
+	withSelect( ( select, { uid, rootUID } ) => {
+		const {
+			getBlockIndex,
+			getBlockInsertionPoint,
+			getBlock,
+			isBlockInsertionPointVisible,
+			isTyping,
+		} = select( 'core/editor' );
+		const blockIndex = uid ? getBlockIndex( uid, rootUID ) : -1;
+		const insertIndex = blockIndex;
+		const insertionPoint = getBlockInsertionPoint();
+		const block = uid ? getBlock( uid ) : null;
+		const showInsertionPoint = (
+			isBlockInsertionPointVisible() &&
+			insertionPoint.index === insertIndex &&
+			insertionPoint.rootUID === rootUID &&
+			( ! block || ! isUnmodifiedDefaultBlock( block ) )
+		);
 
-			return {
-				showInsertionPoint: (
-					isBlockInsertionPointVisible( state ) &&
-				insertionPoint.index === insertIndex &&
-				insertionPoint.rootUID === rootUID &&
-				( ! block || ! isUnmodifiedDefaultBlock( block ) )
-				),
-				showInserter: ! isTyping( state ),
-				index: insertIndex,
-			};
-		},
-		{ insertDefaultBlock, startTyping }
-	)
+		return {
+			showInserter: ! isTyping(),
+			index: insertIndex,
+			showInsertionPoint,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { insertDefaultBlock, startTyping } = dispatch( 'core/editor' );
+		return {
+			insertDefaultBlock,
+			startTyping,
+		};
+	} )
 )( BlockInsertionPoint );

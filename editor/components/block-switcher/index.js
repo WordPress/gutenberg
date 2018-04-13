@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -11,13 +6,12 @@ import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu, withContext } f
 import { getBlockType, getPossibleBlockTransformations, switchToBlockType, BlockIcon } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { replaceBlocks } from '../../store/actions';
-import { getBlock } from '../../store/selectors';
 
 /**
  * Module Constants
@@ -102,21 +96,19 @@ export function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 }
 
 export default compose(
-	connect(
-		( state, ownProps ) => {
-			return {
-				blocks: ownProps.uids.map( ( uid ) => getBlock( state, uid ) ),
-			};
+	withSelect( ( select, ownProps ) => {
+		return {
+			blocks: ownProps.uids.map( ( uid ) => select( 'core/editor' ).getBlock( uid ) ),
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => ( {
+		onTransform( blocks, name ) {
+			dispatch( 'core/editor' ).replaceBlocks(
+				ownProps.uids,
+				switchToBlockType( blocks, name )
+			);
 		},
-		( dispatch, ownProps ) => ( {
-			onTransform( blocks, name ) {
-				dispatch( replaceBlocks(
-					ownProps.uids,
-					switchToBlockType( blocks, name )
-				) );
-			},
-		} )
-	),
+	} ) ),
 	withContext( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
 

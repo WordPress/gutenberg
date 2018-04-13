@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -10,6 +9,7 @@ import { connect } from 'react-redux';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,7 +21,6 @@ import BlockDuplicateButton from './block-duplicate-button';
 import BlockTransformations from './block-transformations';
 import SharedBlockSettings from './shared-block-settings';
 import UnknownConverter from './unknown-converter';
-import { selectBlock } from '../../store/actions';
 
 export class BlockSettingsMenu extends Component {
 	constructor() {
@@ -105,11 +104,8 @@ export class BlockSettingsMenu extends Component {
 	}
 }
 
-export default connect(
-	undefined,
-	( dispatch ) => ( {
-		onSelect( uid ) {
-			dispatch( selectBlock( uid ) );
-		},
-	} )
-)( BlockSettingsMenu );
+export default withDispatch( ( dispatch ) => ( {
+	onSelect( uid ) {
+		dispatch( 'core/editor' ).selectBlock( uid );
+	},
+} ) )( BlockSettingsMenu );
