@@ -185,8 +185,8 @@ $float-margin: calc( 50% - #{ $content-width-padding / 2 } );
 
 @mixin input-style__focus() {
 	color: $dark-gray-900;
-	outline: 1px solid $dark-gray-300;
-	box-shadow: 0 0 0 2px $blue-medium-300;
+	outline: 1px solid $blue-medium-600;
+	box-shadow: 0 0 0 2px $blue-medium-200;
 }
 
 // Square buttons
