@@ -8,5 +8,10 @@
   "dependencies": {
     "react": "^16.2.0",
     "react-native": "^0.53.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-flow": "^6.23.0",
+    "flow-bin": "^0.69.0"
   }
 }
