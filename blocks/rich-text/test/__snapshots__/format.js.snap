@@ -1,13 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`createTinyMCEElement should render a TinyMCE element 1`] = `
-<p
-  a-prop="hi"
+<div
+  data-prop="hi"
 >
   <p>
     Child
   </p>
-</p>
+</div>
 `;
 
 exports[`domToElement should return the corresponding element  1`] = `

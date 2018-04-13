@@ -19,7 +19,7 @@ import {
 } from '../format';
 
 describe( 'createTinyMCEElement', () => {
-	const type = 'p';
+	const type = 'div';
 	const children = <p>Child</p>;
 
 	test( 'should return null', () => {
@@ -41,7 +41,7 @@ describe( 'createTinyMCEElement', () => {
 
 	test( 'should render a TinyMCE element', () => {
 		const props = {
-			'a-prop': 'hi',
+			'data-prop': 'hi',
 		};
 
 		const wrapper = shallow( createTinyMCEElement( type, props, children ) );
