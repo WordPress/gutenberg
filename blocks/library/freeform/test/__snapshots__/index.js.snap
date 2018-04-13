@@ -6,7 +6,6 @@ Array [
     class="freeform-toolbar"
     data-placeholder="Classic"
     id="toolbar-undefined"
-    style="display:none"
   />,
   <div
     class="wp-block-freeform blocks-rich-text__tinymce"
