@@ -250,7 +250,7 @@ export default {
 			context: 'edit',
 		};
 
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'GET', data } ).then(
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, data } ).then(
 			( newPost ) => {
 				dispatch( resetPost( newPost ) );
 			}
