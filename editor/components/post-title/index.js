@@ -88,11 +88,10 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title, placeholder, instanceId, postType } = this.props;
+		const { title, placeholder, instanceId, isPostTypeViewable } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 		const decodedPlaceholder = decodeEntities( placeholder );
-		const isPostTypeViewable = get( postType, 'is_viewable', false );
 
 		return (
 			<PostTypeSupportCheck supportKeys="title">
@@ -127,10 +126,11 @@ class PostTitle extends Component {
 const applyWithSelect = withSelect( ( select ) => {
 	const { getEditedPostAttribute } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
+	const postType = getPostType( getEditedPostAttribute( 'type' ) )
 
 	return {
 		title: getEditedPostAttribute( 'title' ),
-		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 	};
 } );
 

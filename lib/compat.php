@@ -475,15 +475,34 @@ function gutenberg_register_permalink_template_function( $post_type ) {
 add_filter( 'registered_post_type', 'gutenberg_register_permalink_template_function' );
 
 /**
- * Add an is_viewable flag to the  posttype REST API response.
+ * Includes the value for the 'viewable' attribute of a post type resource.
  *
- * @param WP_REST_Response $response WP REST API response of a post.
- * @param WP_Post_Type     $post_type The post_type being returned.
- * @param WP_REST_Request  $request WP REST API request.
- * @return WP_REST_Response Response containing is_viewable flag.
+ * @see https://core.trac.wordpress.org/ticket/43739
+ *
+ * @param object $post_type Post type response object.
+ * @return boolean Whether or not the post type can be viewed.
  */
-function gutenberg_add_viewable_flag_to_post_types( $response, $post_type, $request ) {
-	$response->data['is_viewable'] = is_post_type_viewable( $post_type );
-	return $response;
+function gutenberg_get_post_type_viewable( $post_type ) {
+	return is_post_type_viewable( $post_type['slug'] );
 }
-add_filter( 'rest_prepare_post_type', 'gutenberg_add_viewable_flag_to_post_types', 10, 3 );
+
+/**
+ * Adds the 'viewable' attribute to the REST API response of a post type.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43739
+ */
+function gutenberg_register_rest_api_post_type_viewable() {
+	register_rest_field( 'type',
+		'viewable',
+		array(
+			'get_callback' => 'gutenberg_get_post_type_viewable',
+			'schema'       => array(
+				'description' => __( 'Whether or not the post type can be viewed', 'gutenberg' ),
+				'type'        => 'boolean',
+				'context'     => array( 'edit' ),
+				'readonly'    => true,
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_viewable' );
