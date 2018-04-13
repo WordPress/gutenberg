@@ -73,9 +73,9 @@ Note that _selection_ and _focus_ can be different, i.e. an image block can be s
 
 As you scroll down a page on long blocks, the quick toolbar unsticks from the block, and sticks to the top of the screen.
 
-## Advanced Settings
+## Editor Settings
 
-If your block needs advanced configuration, those live in the Settings sidebar. Advanced block settings can also be reached directly by clicking the cog icon next to a block.
+If your block needs advanced configuration, those live in the Settings sidebar. Editor block settings can also be reached directly by clicking the cog icon next to a block.
 
 The sidebar has two tabs, Document and Block:
 
@@ -120,7 +120,7 @@ Selected state:
 - Quick Toolbar: Has basic text alignments
 - Quick Toolbar: Has inline formatting options, bold, italic, strikethrough and link
 
-Advanced block options:
+Editor block settings:
 
 - Has description: "This is a simple text only block for inserting a single paragraph of content."
 - Has option to enable or disable a drop-cap. Note that the drop-cap is only visible in the blocks unselected (preview) state.
@@ -142,7 +142,7 @@ Selected state:
 - Quick Toolbar: Link button
 - A caption input field appears with a "Write caption..." placeholder text below the image
 
-Advanced block options:
+Editor block settings:
 
 - Has description: "Worth a thousand words."
 - Has options for changing or adding `alt` text, and adding additional custom CSS classes.
@@ -160,7 +160,7 @@ Selected state:
 - Quick Toolbar: Alignments
 - Quick Toolbar: Options for picking list view or grid view
 
-Advanced block options:
+Editor block settings:
 
 - Has description: "Shows a list of your site's most recent posts."
 - Has options for showing the post date, changing the default number of posts to show, and an option for adding an additional CSS class.
@@ -179,7 +179,7 @@ Selected state:
 - Shows "Remove" buttons next to fields that can be removed.
 - Shows an "Add field" button, which opens a popout where you can select additional contact field options.
 
-Advanced block options:
+Editor block settings:
 
 - Has description: "A basic contact form."
 - Has options for making email address mandatory, checked by default.
