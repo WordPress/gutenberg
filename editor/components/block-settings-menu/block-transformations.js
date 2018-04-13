@@ -7,8 +7,8 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withContext } from '@wordpress/components';
-import { getPossibleBlockTransformations, switchToBlockType } from '@wordpress/blocks';
+import { IconButton } from '@wordpress/components';
+import { getPossibleBlockTransformations, switchToBlockType, withEditorSettings } from '@wordpress/blocks';
 import { compose, Fragment } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -64,7 +64,7 @@ export default compose(
 			);
 		},
 	} ) ),
-	withContext( 'editor' )( ( settings ) => {
+	withEditorSettings( 'editor' )( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {

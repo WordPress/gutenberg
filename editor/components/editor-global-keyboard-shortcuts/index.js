@@ -7,8 +7,9 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { Component, Fragment, compose } from '@wordpress/element';
-import { KeyboardShortcuts, withContext } from '@wordpress/components';
+import { KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { withEditorSettings } from '@wordpress/blocks';
 
 class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
@@ -120,7 +121,7 @@ export default compose( [
 			onSave: autosave,
 		};
 	} ),
-	withContext( 'editor' )( ( settings ) => {
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {

@@ -11,7 +11,8 @@ import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { KeyboardShortcuts, withContext, withInstanceId, withFocusOutside } from '@wordpress/components';
+import { KeyboardShortcuts, withInstanceId, withFocusOutside } from '@wordpress/components';
+import { withEditorSettings } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -152,7 +153,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-const applyEditorSettings = withContext( 'editor' )(
+const applyEditorSettings = withEditorSettings(
 	( settings ) => ( {
 		placeholder: settings.titlePlaceholder,
 	} )
