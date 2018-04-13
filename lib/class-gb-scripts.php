@@ -71,25 +71,39 @@ class GB_Scripts {
 		if ( empty( $this->registered_i18n ) || empty( $this->chunk_map ) ) {
 			return $handles;
 		}
-		$handle = '';
-		foreach ( (array) $handles as $handle ) {
+		foreach ( ( array ) $handles as $handle ) {
 			$this->queue_i18n_chunk_for_handle( $handle );
 		}
-		if ( $handle && ! empty( $this->queued_chunk_translations ) ) {
-			foreach ( $this->queued_chunk_translations as $domain => $translations ) {
-				$index_translation = isset( $translations[""] ) ?
-					$translations[""]
-					: '';
-				unset($translations[""]);
-				$translations = call_user_func_array( 'array_merge', $translations );
-				$translations[""] = $index_translation;
-				wp_add_inline_script(
-					'wp-i18n',
-					'wp.i18n.setLocaleData( ' . json_encode( $translations ) . ' );'
+		if ( $this->queued_chunk_translations ) {
+			foreach ( $this->queued_chunk_translations as $handle => $translations_for_domain ) {
+				$this->register_inline_script(
+					$handle,
+					$translations_for_domain[ 'translations' ],
+					$translations_for_domain[ 'domain' ]
 				);
 			}
 		}
 		return $handles;
+	}
+	
+	
+	/**
+	 * Registers inline script with translations for given handle and domain.
+	 *
+	 * @param string $handle  Handle used to register javascript file containing translations
+	 * @param array  $translations
+	 * @param string $domain    Domain for translations.  If left empty then strings are registered with the default
+	 *                          domain for the javascript.
+	 */
+	private function register_inline_script( $handle, $translations, $domain = '' ) {
+		$script = $domain ?
+			'wp.i18n.setLocaleData( ' . json_encode( $translations ) . ', ' . $domain .  ' );' :
+			'wp.i18n.setLocaleData( ' . json_encode( $translations ) . ' );';
+		wp_add_inline_script(
+			$handle,
+			$script,
+			'before'
+		);
 	}
 
 
@@ -101,11 +115,13 @@ class GB_Scripts {
 	private function queue_i18n_chunk_for_handle( $handle ) {
 		if ( isset( $this->registered_i18n[ $handle ] ) ) {
 			list( $chunk, $domain ) = $this->registered_i18n[ $handle ];
-			if ( ! isset( $this->queued_chunk_translations[ $domain ] ) ) {
-				$this->queued_chunk_translations[ $domain ][''] = $this->get_initial_jed_locale_data_for_domain( $domain );
+			$translations = $this->get_jed_locale_data_for_domain_and_chunk( $chunk, $domain );
+			if ( count( $translations ) > 1 ) {
+				$this->queued_chunk_translations[ $handle ] = array(
+					'domain'       => $domain,
+					'translations' => $this->get_jed_locale_data_for_domain_and_chunk( $chunk, $domain )
+				);
 			}
-			$this->queued_chunk_translations[ $domain ][] = $this->get_jed_locale_data_for_domain_and_chunk( $chunk, $domain );
-			//make sure we only enqueue once
 			unset ( $this->registered_i18n[ $handle ] );
 		}
 	}
@@ -121,23 +137,11 @@ class GB_Scripts {
 	private function set_chunk_map( $chunk_map ) {
 		if ( empty( $chunk_map ) || ! is_array( $chunk_map) ) {
 			$chunk_map = json_decode(
-				file_get_contents(gutenberg_dir_path() . 'translation-map.json' ),
+				file_get_contents( gutenberg_dir_path() . 'translation-map.json' ),
 				true
 			);
 		}
 		$this->chunk_map = $chunk_map;
-	}
-
-
-	/**
-	 * Provides the base locale data for the domain.
-	 *
-	 * @param $domain
-	 * @return mixed
-	 */
-	protected function get_initial_jed_locale_data_for_domain( $domain ) {
-		$locale_data = gutenberg_get_jed_locale_data( $domain );
-		return $locale_data[''];
 	}
 
 
@@ -151,12 +155,14 @@ class GB_Scripts {
 	 */
 	protected function get_jed_locale_data_for_domain_and_chunk( $chunk, $domain ) {
 		$translations = gutenberg_get_jed_locale_data( $domain );
-		//unset the empty string index because we've already taken care of that earlier
-		unset ( $translations[''] );
-		return $this->get_locale_data_matching_map(
+		//get index for adding back after extracting strings for this $chunk
+		$index = $translations[ '' ];
+		$translations = $this->get_locale_data_matching_map(
 			$this->get_original_strings_for_chunk_from_map( $chunk ),
 			$translations
 		);
+		$translations[ '' ] = $index;
+		return $translations;
 	}
 
 
