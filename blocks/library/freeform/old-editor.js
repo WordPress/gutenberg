@@ -131,7 +131,7 @@ export default class OldEditor extends Component {
 	}
 
 	render() {
-		const { isSelected, id } = this.props;
+		const { id } = this.props;
 
 		return [
 			// Disable reason: Clicking on this visual placeholder should create
@@ -142,7 +142,6 @@ export default class OldEditor extends Component {
 				id={ `toolbar-${ id }` }
 				ref={ ref => this.ref = ref }
 				className="freeform-toolbar"
-				style={ ! isSelected ? { display: 'none' } : {} }
 				onClick={ this.focus }
 				data-placeholder={ __( 'Classic' ) }
 			/>,

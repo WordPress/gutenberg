@@ -125,7 +125,7 @@
 	.editor-block-contextual-toolbar {
 		display: none;
 	}
-	
+
 	// Don't show block type label for classic block
 	&.is-hovered .editor-block-breadcrumb {
 		display: none;
@@ -157,12 +157,6 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 		line-height: 37px;
 		padding: $block-padding;
 	}
-}
-
-// TinyMCE hides on blur with inline styles.
-.freeform-toolbar,
-.freeform-toolbar .mce-tinymce-inline {
-	display: block !important;
 }
 
 // Overwrite inline styles.
