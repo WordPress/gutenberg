@@ -6,7 +6,6 @@ import jQuery from 'jquery';
 import moment from 'moment';
 import { get, includes } from 'lodash';
 import { parse, format } from 'url';
-import { parse as parseQueryString, stringify } from 'querystring';
 
 window.jQuery = window.jQuery || jQuery;
 
@@ -15,6 +14,7 @@ window.wp.element = window.wp.element || React;
 
 window.wp.apiRequest = window.wp.apiRequest || function( options ) {
 	// do something here (this should be a promise)
+	return jQuery.ajax( options );
 };
 
 window.wp.url = window.wp.url || { addQueryArgs: function( url, args ) {
@@ -50,21 +50,21 @@ window._wpDateSettings.l10n.monthsShort = window._wpDateSettings.l10n.monthsShor
 window._wpDateSettings.l10n.weekdays = window._wpDateSettings.l10n.weekdays || localeData.weekdays();
 window._wpDateSettings.l10n.weekdaysShort = window._wpDateSettings.l10n.weekdaysShort || localeData.weekdaysShort();
 window._wpDateSettings.l10n.meridiem = window._wpDateSettings.l10n.meridiem || { am: 'am', pm: 'pm', AM: 'AM', PM: 'PM' };
-window._wpDateSettings.l10n.relative = window._wpDateSettings.l10n.relative || { 
-	future: 'in %s', 
+window._wpDateSettings.l10n.relative = window._wpDateSettings.l10n.relative || {
+	future: 'in %s',
 	past: '%s ago',
 	s: 'a few seconds',
-    ss: '%d seconds',
-    m:  "a minute",
-    mm: "%d minutes",
-    h:  "an hour",
-    hh: "%d hours",
-    d:  "a day",
-    dd: "%d days",
-    M:  "a month",
-    MM: "%d months",
-    y:  "a year",
-    yy: "%d years",
+	ss: '%d seconds',
+	m: 'a minute',
+	mm: '%d minutes',
+	h: 'an hour',
+	hh: '%d hours',
+	d: 'a day',
+	dd: '%d days',
+	M: 'a month',
+	MM: '%d months',
+	y: 'a year',
+	yy: '%d years',
 };
 
 window._wpDateSettings.formats = window._wpDateSettings.formats || { time: 'G:i', date: 'j F, Y', datetime: 'j F, Y G:i' };
@@ -92,12 +92,12 @@ window.wpApiSettings.root = window.wpApiSettings.root || window.location.origin;
 window.wpApiSettings.nonce = window.wpApiSettings.nonce || '123456789';
 window.wpApiSettings.schema = window.wpApiSettings.schema || {};
 window.wpApiSettings.schema.routes = window.wpApiSettings.routes || {};
-window.wpApiSettings.schema.routes[ "\/wp\/v2\/posts" ] = window.wpApiSettings.schema.routes["\/wp\/v2\/posts"] || { methods: [ 'GET' ] };
+window.wpApiSettings.schema.routes[ '\/wp\/v2\/posts' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/posts' ] || { methods: [ 'GET' ] };
 
 const panels = get( window, 'customGutenberg.panels' );
 
 if ( includes( panels, 'articles-panel' ) ) {
-	window.wpApiSettings.schema.routes[ "\/wp\/v2\/categories" ] = window.wpApiSettings.schema.routes[ "\/wp\/v2\/categories" ] || { methods: [ 'GET' ] };
-	window.wpApiSettings.schema.routes[ "\/wp\/v2\/articles\/(?P<id>[\\d]+)" ] = window.wpApiSettings.schema.routes[ "\/wp\/v2\/articles\/(?P<id>[\\d]+)" ] || { methods: [ 'GET' ] };
-	window.wpApiSettings.schema.routes[ "\/wp\/v2\/articles" ] = window.wpApiSettings.schema.routes[ "\/wp\/v2\/articles" ] || { methods: [ 'GET' ] };
+	window.wpApiSettings.schema.routes[ '\/wp\/v2\/categories' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/categories' ] || { methods: [ 'GET' ] };
+	window.wpApiSettings.schema.routes[ '\/wp\/v2\/articles\/(?P<id>[\\d]+)' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/articles\/(?P<id>[\\d]+)' ] || { methods: [ 'GET' ] };
+	window.wpApiSettings.schema.routes[ '\/wp\/v2\/articles' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/articles' ] || { methods: [ 'GET' ] };
 }

@@ -12,8 +12,8 @@
   "keywords": [
     "Frontkom",
     "Gutenberg",
-    "WordPress",
-    "editor"
+    "editor",
+    "WYSIWYG"
   ],
   "engines": {
     "node": ">=8.0.0",

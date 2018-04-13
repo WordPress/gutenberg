@@ -37,7 +37,10 @@ We've tried to make it easy to import **Gutenberg by Frontkom** editor in your a
 import './globals'; 
 
 // Importing Gutenberg
-import { registerCoreBlocks, initializeEditor } from '@frontkom/gutenberg';
+import { 
+    registerCoreBlocks, 
+    initializeEditor, 
+} from '@frontkom/gutenberg';
 
 // Don't forget to import the style
 import '@frontkom/gutenberg/dist/blocks/style.css';
@@ -118,11 +121,12 @@ Those two are very important for comunication between the editor and remaining a
 
 ```js
 function apiRequest( options ) {
-    // Do something with those options like calling an API or actions from your store...
+    // Do something with those options like calling an API 
+    // or actions from your store...
 }
 ```
 
-***url*** should has a function called `addQueryArgs( url, args )` that handle with `url` and `args` and returns the final url to different actions. The original implementation is the following, feel free to keep it or change it according to your needs.
+***url*** should has a function called `addQueryArgs( url, args )` that handles with `url` and `args` and returns the final url to different actions. The original implementation is the following, feel free to keep it or change it according to your needs.
 
 ```js
 /**
@@ -169,25 +173,33 @@ window.customGutenberg = {
     ...,
     tabs: [ 
         {
-	    options: { name: 'suggested', title: 'Suggested', className: 'editor-inserter__tab' },
-	    tabScrollTop: 0, // scroll to top on opening
-	    sortItems( items, state ) { // sorting blocks by usage
-		if ( ! state.filterValue ) {
-		    return items;
-		}
-	   }, 
-	   renderTabView( items ) { // don't render category headers
-		return items;
-	   },
-	},
-	{
-	    options: { name: 'blocks', title: 'Blocks', className: 'editor-inserter__tab' },
-	    tabScrollTop: 0,
-	    getItemsForTab() { // rendering blocks from which categories
-	        return ( item ) => item.category !== 'embed' && item.category !== 'shared';
-	    },
-	},
-	...,
+            options: { 
+                name: 'suggested', 
+                title: 'Suggested', 
+                className: 'editor-inserter__tab', 
+            },
+            tabScrollTop: 0, // scroll to top on opening
+            sortItems( items, state ) { // sorting blocks by usage
+                if ( ! state.filterValue ) {
+                    return items;
+                }
+             }, 
+             renderTabView( items ) { // don't render category headers
+                 return items;
+             },
+        },
+        {
+            options: { 
+                name: 'blocks', 
+                title: 'Blocks', 
+                className: 'editor-inserter__tab', 
+            },
+            tabScrollTop: 0,
+            getItemsForTab() { // rendering blocks from which categories
+                return ( item ) => item.category !== 'embed' && item.category !== 'shared';
+            },
+        },
+        ...,
     ],
     ...,
 };
@@ -201,10 +213,12 @@ You can set which block categories and consequently which blocks will be display
 window.customGutenberg = {
     ...,
     categories: [ 
-        { slug: 'common', title: 'Common blocks' }, // this category should allways be included because of the default block (paragraph)
-	    { slug: 'formatting', title: 'Formatting' },
-	    { slug: 'layout', title: 'Layout Elements' },
-	    ...,
+        // 'common' category should always be included because of 
+        // the default block - paragraph
+        { slug: 'common', title: 'Common blocks' },
+        { slug: 'formatting', title: 'Formatting' },
+        { slug: 'layout', title: 'Layout Elements' },
+        ...,
     ],
     ...,
 };
@@ -212,16 +226,32 @@ window.customGutenberg = {
 
 ### Rows
 
-** Gutenberg by Frontkom ** introduces a new category of blocks: the rows. Rows are divided in columns (minimum of 2) which you can defined by its size (1, 2, 3, ...). The total of columns are 12 and it must be the sum of `cols` array items. By default, the rows blocks will be available under the Blocks tab.
+**Gutenberg by Frontkom** introduces a new category of blocks: the rows. Rows are divided in columns (minimum of 2) which you can defined by its size (1, 2, 3, ...). The total of columns are 12 and it must be the sum of `cols` array items. By default, the rows blocks will be available under the Blocks tab.
 
 ```js
 window.customGutenberg = {
     ...,
     rows: [
-        { cols: [ 6, 6 ], title: 'col6 x 2', description: '2 eq columns layout' },
-	    { cols: [ 4, 4, 4 ], title: 'col4 x 3', description: '3 eq columns layout' },
-	    { cols: [ 7, 5 ], title: 'col7-col5', description: 'A col7 and a col5' },
-	    { cols: [ 2, 8, 2 ], title: 'col2-col8-col2', description: 'A col2, a col8 and a col2' },
+        { 
+            cols: [ 6, 6 ], 
+            title: 'col6 x 2', 
+            description: '2 eq columns layout', 
+        },
+        { 
+            cols: [ 4, 4, 4 ], 
+            title: 'col4 x 3', 
+            description: '3 eq columns layout',
+        },
+        { 
+            cols: [ 7, 5 ], 
+            title: 'col7-col5', 
+            description: 'A col7 and a col5',
+            },
+        { 
+            cols: [ 2, 8, 2 ], 
+            title: 'col2-col8-col2', 
+            description: 'A col2, a col8 and a col2',
+        },
     ],
     ...,
 };
@@ -236,7 +266,7 @@ At sidebar there are a few panels that could be customize. By default, Gutenberg
 ```js
 window.customGutenberg = {
     ...,
-    panel: [ 'post-status', 'last-revision', 'meta-boxes', ... ],
+    panels: [ 'post-status', 'last-revision', 'meta-boxes', ... ],
     ...,
 };
 ```
@@ -273,8 +303,10 @@ For now, there is only two kinds of settings releated with editor: `hideTitle` a
 window.customGutenberg = {
     ...,
     editor: {
-        hideTitle: true, // to hide page title
-        noMediaLibrary: true, // to editor don't expect use a media library
+        // to hide page title
+        hideTitle: true, 
+        // to editor doesn't expect to use a media library
+        noMediaLibrary: true, 
     },
     ...,
 };
