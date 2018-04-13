@@ -22,14 +22,15 @@ class wpi18nExtractor {
 		const strings = [];
 		switch ( functionName ) {
 			case '__':
-			case '_x':
 			case 'sprintf':
+			case '_n':
 				strings.push( args[ 0 ].value );
 				break;
-			case '_n':
-			case '_nx':
-				strings.push( args[ 0 ].value, args[ 1 ].value );
+			case '_x':
+				strings.push( args[ 1 ].value + '\u0004' + args[ 0 ].value );
 				break;
+			case '_nx':
+				strings.push( args[ 3 ].value + '\u0004' + args[ 0 ].value );
 		}
 		return strings;
 	}
