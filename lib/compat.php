@@ -459,6 +459,10 @@ function gutenberg_add_permalink_template_to_posts( $response, $post, $request )
 
 	$response->data['permalink_template'] = $sample_permalink[0];
 
+	if ( 'draft' === $post->post_status && ! $post->post_name ) {
+		$response->data['draft_slug'] = $sample_permalink[1];
+	}
+
 	return $response;
 }
 

@@ -1557,7 +1557,7 @@ export function getPermalink( state ) {
  */
 export function getPermalinkParts( state ) {
 	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
-	const postName = getEditedPostAttribute( state, 'slug' );
+	const postName = getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'draft_slug' );
 
 	const [ prefix, suffix ] = permalinkTemplate.split( PERMALINK_POSTNAME_REGEX );
 
