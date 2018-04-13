@@ -13,9 +13,6 @@ import {
 	registerBlockType,
 } from '../..';
 import { BlockEdit } from '../../block-edit';
-import { withBlockEditContextProvider } from '../../block-edit/context';
-
-const BlockEditWithContext = withBlockEditContextProvider( BlockEdit );
 
 export const blockEditRender = ( name, settings ) => {
 	if ( ! getBlockType( name ) ) {
@@ -24,7 +21,7 @@ export const blockEditRender = ( name, settings ) => {
 	const block = createBlock( name );
 
 	return render(
-		<BlockEditWithContext
+		<BlockEdit
 			name={ name }
 			isSelected={ false }
 			attributes={ block.attributes }
