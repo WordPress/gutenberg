@@ -100,3 +100,20 @@ export function domToFormat( value, format ) {
 			return domToElement( value );
 	}
 }
+
+/**
+ * Checks whether the value is empty or not
+ *
+ * @param {Array|string}  value  Value.
+ * @param {string}        format Format (string or element)
+ *
+ * @return {boolean} Is value empty.
+ */
+export function isEmpty( value, format ) {
+	switch ( format ) {
+		case 'string':
+			return value === '';
+		default:
+			return ! value.length;
+	}
+}

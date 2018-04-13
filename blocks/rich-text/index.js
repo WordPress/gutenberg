@@ -36,7 +36,7 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
-import { domToFormat, valueToString } from './format';
+import { domToFormat, valueToString, isEmpty } from './format';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -264,7 +264,7 @@ export class RichText extends Component {
 		if ( item && ! HTML ) {
 			const blob = item.getAsFile ? item.getAsFile() : item;
 			const rootNode = this.editor.getBody();
-			const isEmpty = this.editor.dom.isEmpty( rootNode );
+			const isEmptyEditor = this.editor.dom.isEmpty( rootNode );
 			const content = rawHandler( {
 				HTML: `<img src="${ createBlobURL( blob ) }">`,
 				mode: 'BLOCKS',
@@ -274,7 +274,7 @@ export class RichText extends Component {
 			// Allows us to ask for this information when we get a report.
 			window.console.log( 'Received item:\n\n', blob );
 
-			if ( isEmpty && this.props.onReplace ) {
+			if ( isEmptyEditor && this.props.onReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
 				this.props.setTimeout( () => this.props.onReplace( content ) );
 			} else if ( this.props.onSplit ) {
@@ -328,11 +328,11 @@ export class RichText extends Component {
 		}
 
 		const rootNode = this.editor.getBody();
-		const isEmpty = this.editor.dom.isEmpty( rootNode );
+		const isEmptyEditor = this.editor.dom.isEmpty( rootNode );
 
 		let mode = 'INLINE';
 
-		if ( isEmpty && this.props.onReplace ) {
+		if ( isEmptyEditor && this.props.onReplace ) {
 			mode = 'BLOCKS';
 		} else if ( this.props.onSplit ) {
 			mode = 'AUTO';
@@ -370,8 +370,8 @@ export class RichText extends Component {
 	 */
 
 	onChange() {
-		this.isEmpty = this.editor.dom.isEmpty( this.editor.getBody() );
 		this.savedContent = this.getContent();
+		this.isEmpty = isEmpty( this.savedContent, this.props.format );
 		this.props.onChange( this.savedContent );
 	}
 
