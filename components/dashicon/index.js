@@ -444,6 +444,9 @@ export default class Dashicon extends wp.element.Component {
 			case 'feedback':
 				path = 'M2 2h16c.55 0 1 .45 1 1v14c0 .55-.45 1-1 1H2c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1zm15 14V7H3v9h14zM4 8v1h3V8H4zm4 0v3h8V8H8zm-4 4v1h3v-1H4zm4 0v3h8v-3H8z';
 				break;
+			case 'filter-alt':
+				path = 'M2 6h16V4H2v2zm3 5h10V9H5v2zm3 5h4v-2H8v2z';
+				break;
 			case 'filter':
 				path = 'M3 4.5v-2s3.34-1 7-1 7 1 7 1v2l-5 7.03v6.97s-1.22-.09-2.25-.59S8 16.5 8 16.5v-4.97z';
 				break;

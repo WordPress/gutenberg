@@ -322,7 +322,7 @@ export class InserterMenu extends Component {
 					/>
 					<IconButton
 						className="editor-inserter__navigation-toggle"
-						icon="ellipsis"
+						icon="filter-alt"
 						label={ __( 'Toggle inserter navigation' ) }
 						onClick={ this.toggleNavigation }
 					/>
