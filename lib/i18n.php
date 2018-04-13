@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 
-function gutenberg_register_script_i18n( $handle, $chunk_name, $domain ) {
+function gutenberg_register_script_i18n( $handle, $chunk_name, $domain = '' ) {
 	static $gb_scripts;
 	if ( ! $gb_scripts instanceof GB_Scripts ) {
 		$gb_scripts = new GB_Scripts();
@@ -29,6 +29,10 @@ function gutenberg_register_script_i18n( $handle, $chunk_name, $domain ) {
  * @return array
  */
 function gutenberg_get_jed_locale_data( $domain ) {
+	//gutenberg doesn't use domain in its js strings but has a domain set by virtue of being a plugin in the WordPress
+	//plugin repository.  So we need to use that to retrieve the gutenberg translations. When GB is merged to WordPress
+	//core this will be unnecessary.
+	$domain = $domain ? $domain : 'gutenberg';
 	$translations = get_translations_for_domain( $domain );
 
 	$locale = array(
