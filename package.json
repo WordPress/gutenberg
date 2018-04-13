@@ -1,9 +1,12 @@
 {
   "name": "AztecReactNativeExampleApp",
   "version": "0.0.1",
+  "license": "GPL-2.0",
   "private": true,
   "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "watchman watch-del-all; rm -rf node_modules/ example/node_modules/ yarn.lock example/yarn.lock package-lock.json example/package-lock.json; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
+    "clean:install": "yarn clean; yarn; pushd example; yarn; popd"
   },
   "dependencies": {
     "react": "^16.2.0",
