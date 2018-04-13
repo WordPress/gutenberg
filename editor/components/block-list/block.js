@@ -653,6 +653,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		editPost,
 		toggleSelection,
 	} = dispatch( 'core/editor' );
+
 	return {
 		onChange( uid, attributes ) {
 			updateBlockAttributes( uid, attributes );

@@ -71,7 +71,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 		edit: class extends Component {
 			constructor() {
 				super( ...arguments );
+
 				this.doServerSideRender = this.doServerSideRender.bind( this );
+
 				this.state = {
 					html: '',
 					type: '',
