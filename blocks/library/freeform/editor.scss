@@ -140,7 +140,7 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 
 .freeform-toolbar {
 	width: auto;
-	margin: - $block-padding;
+	margin: -#{ $block-padding + 1 } -#{ $block-padding } -#{ $block-padding } -#{ $block-padding };
 	margin-bottom: $block-padding;
 }
 
