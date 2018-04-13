@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { createContext, createHigherOrderComponent } from '@wordpress/element';
+import { Component, createContext, createHigherOrderComponent } from '@wordpress/element';
 
 const { Consumer, Provider } = createContext( {
 	isSelected: true,
@@ -16,11 +16,36 @@ const { Consumer, Provider } = createContext( {
  * @return {Component} Component with a BlockEdit context set.
  */
 export const withBlockEditContextProvider = createHigherOrderComponent( ( OriginalComponent ) => {
-	return ( props ) => (
-		<Provider value={ { isSelected: props.isSelected } }>
-			<OriginalComponent { ...props } />
-		</Provider>
-	);
+	return class ComponentWithProvider extends Component {
+		constructor( props ) {
+			super( props );
+			this.state = {
+				context: {
+					isSelected: props.isSelected,
+				},
+			};
+		}
+
+		static getDerivedStateFromProps( nextProps, prevState ) {
+			if ( nextProps.isSelected === prevState.context.isSelected ) {
+				return null;
+			}
+
+			return {
+				context: {
+					isSelected: nextProps.isSelected,
+				},
+			};
+		}
+
+		render() {
+			return (
+				<Provider value={ this.state.context }>
+					<OriginalComponent { ...this.props } />
+				</Provider>
+			);
+		}
+	};
 }, 'withBlockEditContextProvider' );
 
 /**
