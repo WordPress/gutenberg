@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { IconButton, Dropdown, NavigableMenu } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 
@@ -68,24 +68,26 @@ export class BlockSettingsMenu extends Component {
 						'is-opened': isOpen,
 					} );
 
-					return [
-						<IconButton
-							className={ toggleClassname }
-							onClick={ () => {
-								if ( uids.length === 1 ) {
-									onSelect( uids[ 0 ] );
-								}
-								onToggle();
-							} }
-							icon="ellipsis"
-							label={ __( 'More Options' ) }
-							aria-expanded={ isOpen }
-							focus={ focus }
-							onFocus={ this.onFocus }
-							onBlur={ this.onBlur }
-						/>,
-						<BlockRemoveButton key="remove" uids={ uids } />
-					];
+					return (
+						<Fragment>
+							<IconButton
+								className={ toggleClassname }
+								onClick={ () => {
+									if ( uids.length === 1 ) {
+										onSelect( uids[ 0 ] );
+									}
+									onToggle();
+								} }
+								icon="ellipsis"
+								label={ __( 'More Options' ) }
+								aria-expanded={ isOpen }
+								focus={ focus }
+								onFocus={ this.onFocus }
+								onBlur={ this.onBlur }
+							/>
+							<BlockRemoveButton uids={ uids } />
+						</Fragment>
+					);
 				} }
 				renderContent={ ( { onClose } ) => (
 				// Should this just use a DropdownMenu instead of a DropDown ?
