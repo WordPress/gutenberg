@@ -7,8 +7,9 @@ import { Component, renderToString, createRef } from '@wordpress/element';
  * Internal dependencies
  */
 import FocusableIframe from '../focusable-iframe';
+import withGlobalEvents from '../higher-order/with-global-events';
 
-export default class Sandbox extends Component {
+class Sandbox extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -24,16 +25,11 @@ export default class Sandbox extends Component {
 	}
 
 	componentDidMount() {
-		window.addEventListener( 'message', this.checkMessageForResize, false );
 		this.trySandbox();
 	}
 
 	componentDidUpdate() {
 		this.trySandbox();
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener( 'message', this.checkMessageForResize );
 	}
 
 	isFrameAccessible() {
@@ -199,3 +195,9 @@ export default class Sandbox extends Component {
 		);
 	}
 }
+
+Sandbox = withGlobalEvents( {
+	message: 'checkMessageForResize',
+} )( Sandbox );
+
+export default Sandbox;
