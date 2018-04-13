@@ -9,6 +9,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 ## 2.7.0
 
 - `wp.element.getWrapperDisplayName` function removed. Please use `wp.element.createHigherOrderComponent` instead.
+- `isSelected` usage is no longer mandatory with `BlockControls`, `InspectorControls` and `RichText`. It is now handled by the editor internally to ensure that controls are visible only when block is selected. See updated docs: https://github.com/WordPress/gutenberg/blob/master/blocks/README.md#components.
 
 ## 2.6.0
 
