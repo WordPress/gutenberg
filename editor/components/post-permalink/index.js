@@ -17,12 +17,17 @@ class PostPermalink extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.addVisibilityCheck = this.addVisibilityCheck.bind( this );
 		this.onVisibilityChange = this.onVisibilityChange.bind( this );
 
 		this.state = {
 			iconClass: '',
 			isEditingPermalink: false,
 		};
+	}
+
+	addVisibilityCheck() {
+		window.addEventListener( 'visibilitychange', this.onVisibilityChange );
 	}
 
 	onVisibilityChange() {
@@ -39,6 +44,10 @@ class PostPermalink extends Component {
 		if ( prevState.isEditingPermalink && ! this.state.isEditingPermalink ) {
 			this.permalinkButton.focus();
 		}
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'visibilitychange', this.addVisibilityCheck );
 	}
 
 	render() {
@@ -96,7 +105,7 @@ class PostPermalink extends Component {
 						className="editor-post-permalink__change"
 						isLarge
 						href={ getWPAdminURL( 'options-permalink.php' ) }
-						onClick={ window.addEventListener( 'visibilitychange', this.onVisibilityChange ) }
+						onClick={ this.addVisibilityCheck }
 						target="_blank"
 					>
 						{ __( 'Change Permalinks' ) }
