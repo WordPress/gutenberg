@@ -1,6 +1,28 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
+    ext {
+        gradlePluginVersion = '3.0.1'
+        kotlinVersion = '1.2.30'
+        supportLibVersion = '26.1.0'
+        tagSoupVersion = '1.2.1'
+        glideVersion = '3.7.0'
+        picassoVersion = '2.5.2'
+        robolectricVersion = '3.5.1'
+        jUnitVersion = '4.12'
+        jSoupVersion = '1.10.3'
+        wordpressUtilsVersion = '1.18.1'
+        espressoVersion = '3.0.1'
+    }
+
+    repositories {
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:$gradlePluginVersion"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+
     repositories {
         jcenter()
     }
