@@ -180,13 +180,12 @@ class Sandbox extends Component {
 	}
 
 	render() {
-		const { title, onFocus } = this.props;
+		const { title } = this.props;
 
 		return (
 			<FocusableIframe
 				iframeRef={ this.iframe }
 				title={ title }
-				onFocus={ onFocus }
 				scrolling="no"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
 				onLoad={ this.trySandbox }

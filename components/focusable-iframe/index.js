@@ -13,6 +13,12 @@ import { Component, createRef } from '@wordpress/element';
  */
 import withGlobalEvents from '../higher-order/with-global-events';
 
+/**
+ * Browser dependencies
+ */
+
+const { FocusEvent } = window;
+
 class FocusableIframe extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -27,9 +33,18 @@ class FocusableIframe extends Component {
 	 * then received focus, and calls the `onFocus` prop callback.
 	 */
 	checkFocus() {
+		const iframe = this.node.current;
+
+		if ( document.activeElement !== iframe ) {
+			return;
+		}
+
+		const focusEvent = new FocusEvent( 'focus', { bubbles: true } );
+		iframe.dispatchEvent( focusEvent );
+
 		const { onFocus } = this.props;
-		if ( onFocus && document.activeElement === this.node.current ) {
-			onFocus();
+		if ( onFocus ) {
+			onFocus( focusEvent );
 		}
 	}
 
