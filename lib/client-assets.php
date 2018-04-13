@@ -904,13 +904,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		);
 	}
 
-	// Prepare Jed locale data.
-	// $locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
-	// 	// wp_add_inline_script(
-	// 	// 	'wp-i18n',
-	// 	// 	'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
-	// 	// );
-
 	// Preload server-registered block schemas.
 	wp_localize_script( 'wp-blocks', '_wpBlocks', gutenberg_prepare_blocks_for_js() );
 
