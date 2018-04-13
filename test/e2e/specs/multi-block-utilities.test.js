@@ -27,21 +27,21 @@ describe( 'Multi-block selection', () => {
 
 		// Transform blocks into list
 		await page.click( '.editor-block-settings-menu' );
-		let listButton = ( await page.$x( '//button[contains(text(), \'List\')]' ) )[ 0 ];
+		const listButton = ( await page.$x( '//button[contains(text(), \'List\')]' ) )[ 0 ];
 		await listButton.click( 'button' );
 
 		//Switch to Code Editor to check HTML output
 		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		let codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
+		const codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
 		await codeEditorButton.click( 'button' );
 
 		//Assert that there is only 1 list block
-		let textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
+		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
 		expect( textEditorContent ).toMatchSnapshot();
 
 		//Switch to Visual Editor to continue testing
 		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		let visualEditorButton = ( await page.$x( '//button[contains(text(), \'Visual Editor\')]' ) )[ 0 ];
+		const visualEditorButton = ( await page.$x( '//button[contains(text(), \'Visual Editor\')]' ) )[ 0 ];
 		await visualEditorButton.click( 'button' );
 		await page.close();
 	} );
@@ -58,8 +58,8 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( 'Paragraph' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Second Paragraph' );
-		
+        await page.keyboard.type( 'Second Paragraph' );
+
 		// Multiselect blocks via Shift + click
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -71,8 +71,8 @@ describe( 'Multi-block selection', () => {
 		await page.click( '.editor-block-settings-menu' );
 		let listButtonVisible = true;
 		try {
-			let listButton = ( await page.$( '//button[contains(text(), \'List\')]' ) )[ 0 ];
-		} catch( object ) {
+			await page.$( '//button[contains(text(), \'List\')]' )[ 0 ];
+		} catch ( object ) {
 			listButtonVisible = false;
 		}
 		expect( listButtonVisible ).toBe( false );
@@ -95,21 +95,21 @@ describe( 'Multi-block selection', () => {
 
 		// Duplicate blocks
 		await page.click( '.editor-block-settings-menu' );
-		let duplicateButton = ( await page.$x( '//button[contains(text(), \'Duplicate\')]' ) )[ 0 ];
+		const duplicateButton = ( await page.$x( '//button[contains(text(), \'Duplicate\')]' ) )[ 0 ];
 		await duplicateButton.click( 'button' );
 
 		//Switch to Code Editor to check HTML output
 		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		let codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
+		const codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
 		await codeEditorButton.click( 'button' );
 
 		//Assert that there are 6 paragraph blocks
-		let textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
+		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
 		expect( textEditorContent ).toMatchSnapshot();
 
 		//Switch to Visual Editor to continue testing
 		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		let visualEditorButton = ( await page.$x( '//button[contains(text(), \'Visual Editor\')]' ) )[ 0 ];
+		const visualEditorButton = ( await page.$x( '//button[contains(text(), \'Visual Editor\')]' ) )[ 0 ];
 		await visualEditorButton.click( 'button' );
 		await page.close();
 	} );
@@ -131,16 +131,16 @@ describe( 'Multi-block selection', () => {
 
 		// Remove blocks
 		await page.click( '.editor-block-settings-menu' );
-		let removeButton = ( await page.$x( '//button[contains(text(), \'Remove\')]' ) )[ 0 ];
+		const removeButton = ( await page.$x( '//button[contains(text(), \'Remove\')]' ) )[ 0 ];
 		await removeButton.click( 'button' );
 
 		//Switch to Code Editor to check HTML output
 		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		let codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
+		const codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
 		await codeEditorButton.click( 'button' );
 
 		//Assert that there are no paragraph blocks
-		let textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
-		expect( textEditorContent ).toEqual( "" );
-	} );   
+		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
+		expect( textEditorContent ).toEqual( '' );
+	} );
 } );
