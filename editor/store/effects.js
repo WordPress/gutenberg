@@ -178,7 +178,7 @@ export default {
 
 		// The server can return a sanitised version of the slug,
 		// in which case we need to update our local copy.
-		if ( get( edits, 'slug' ) !== post.slug ) {
+		if ( get( edits, [ 'slug' ] ) !== post.slug ) {
 			dispatch( {
 				type: 'POSTNAME_SANITIZED',
 			} );
