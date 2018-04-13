@@ -50,7 +50,7 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 		</Fragment>
 	);
 }
-export default compose(
+export default compose( [
 	withSelect( ( select, ownProps ) => {
 		return {
 			blocks: ownProps.uids.map( ( uid ) => select( 'core/editor' ).getBlock( uid ) ),
@@ -64,11 +64,11 @@ export default compose(
 			);
 		},
 	} ) ),
-	withEditorSettings( 'editor' )( ( settings ) => {
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {
 			isLocked: !! templateLock,
 		};
 	} ),
-)( BlockTransformations );
+] )( BlockTransformations );
