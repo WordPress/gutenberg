@@ -136,7 +136,7 @@ export default {
 		);
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post, edits } = action;
+		const { previousPost, post } = action;
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -174,14 +174,6 @@ export default {
 				</p>,
 				{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 			) );
-		}
-
-		// The server can return a sanitised version of the slug,
-		// in which case we need to update our local copy.
-		if ( get( edits, [ 'slug' ] ) !== post.slug ) {
-			dispatch( {
-				type: 'POSTNAME_SANITIZED',
-			} );
 		}
 
 		if ( get( window.history.state, 'id' ) !== post.id ) {

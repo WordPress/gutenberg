@@ -217,7 +217,7 @@ export const editor = flow( [
 	// Track undo history, starting at editor initialization.
 	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'POSTNAME_SANITIZED' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
 		shouldOverwriteState,
 	} ),
 
@@ -225,7 +225,7 @@ export const editor = flow( [
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
 		resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'POSTNAME_SANITIZED' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
 	} ),
 ] )( {
 	edits( state = {}, action ) {
@@ -254,9 +254,14 @@ export const editor = flow( [
 
 				return state;
 
+			case 'UPDATE_POST':
 			case 'RESET_POST':
+				const getCanonicalValue = action.type === 'UPDATE_POST' ?
+					( key ) => action.edits[ key ] :
+					( key ) => getPostRawValue( action.post[ key ] );
+
 				return reduce( state, ( result, value, key ) => {
-					if ( value !== getPostRawValue( action.post[ key ] ) ) {
+					if ( value !== getCanonicalValue( key ) ) {
 						return result;
 					}
 
@@ -267,11 +272,6 @@ export const editor = flow( [
 					delete result[ key ];
 					return result;
 				}, state );
-
-			case 'POSTNAME_SANITIZED':
-				if ( 'slug' in state ) {
-					return omit( state, 'slug' );
-				}
 		}
 
 		return state;
