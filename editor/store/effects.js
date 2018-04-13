@@ -247,7 +247,7 @@ export default {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
 		store.dispatch( createErrorNotice( message, { id: TRASH_POST_NOTICE_ID } ) );
 	},
-	UPDATE_POST_FROM_SERVER( action, store ) {
+	REFRESH_POST( action, store ) {
 		const { dispatch, getState } = store;
 
 		const state = getState();
