@@ -818,7 +818,7 @@ function gutenberg_register_wpi18n_for_scripts() {
 		'wp-plugins' => 'plugins'
 	);
 	foreach ( $handles_and_chunks as $handle => $chunk ) {
-		gutenberg_register_script_i18n( $handle, $chunk, 'gutenberg' );
+		gutenberg_register_script_i18n( $handle, $chunk );
 	}
 }
 
