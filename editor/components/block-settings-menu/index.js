@@ -84,7 +84,7 @@ export class BlockSettingsMenu extends Component {
 							onFocus={ this.onFocus }
 							onBlur={ this.onBlur }
 						/>,
-						<BlockRemoveButton key="remove" uids={ uids } role="menuitem" />
+						<BlockRemoveButton key="remove" uids={ uids } />
 					];
 				} }
 				renderContent={ ( { onClose } ) => (
@@ -93,7 +93,6 @@ export class BlockSettingsMenu extends Component {
 						{ renderBlockMenu( { onClose, children: [
 							count === 1 && <BlockModeToggle key="mode-toggle" uid={ uids[ 0 ] } onToggle={ onClose } role="menuitem" />,
 							count === 1 && <UnknownConverter key="unknown-converter" uid={ uids[ 0 ] } role="menuitem" />,
-							<BlockRemoveButton key="remove" uids={ uids } role="menuitem" />,
 							<BlockDuplicateButton key="duplicate" uids={ uids } rootUID={ rootUID } role="menuitem" />,
 							count === 1 && <SharedBlockSettings key="shared-block" uid={ uids[ 0 ] } onToggle={ onClose } itemsRole="menuitem" />,
 							<BlockTransformations key="transformations" uids={ uids } onClick={ onClose } itemsRole="menuitem" />,
