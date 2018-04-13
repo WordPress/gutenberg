@@ -116,13 +116,22 @@
 	}
 }
 
-.editor-block-list__layout .editor-block-list__block[data-type="core/freeform"] .editor-block-list__block-edit:before {
-	outline: 1px solid #e2e4e7;
+.editor-block-list__layout .editor-block-list__block[data-type="core/freeform"] {
+	.editor-block-list__block-edit:before {
+		outline: 1px solid #e2e4e7;
+	}
+
+	// Don't show normal block toolbar
+	.editor-block-contextual-toolbar {
+		display: none;
+	}
+	
+	// Don't show block type label for classic block
+	&.is-hovered .editor-block-breadcrumb {
+		display: none;
+	}
 }
 
-div[data-type="core/freeform"] .editor-block-contextual-toolbar {
-	display: none;
-}
 
 div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
     margin-top: 0;
@@ -136,11 +145,13 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 }
 
 .freeform-toolbar:empty {
-	height: 37px;
+	height: $block-toolbar-height;
 	background: #f5f5f5;
 	border-bottom: 1px solid #e2e4e7;
 
 	&:before {
+		font-family: $default-font;
+		font-size: $default-font-size;
 		content: attr( data-placeholder );
 		color: #555d66;
 		line-height: 37px;
