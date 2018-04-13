@@ -119,7 +119,7 @@ android {
         disable 'GradleCompatible'
     }
 }
-/*
+
 buildscript {
     repositories {
         jcenter()
@@ -136,28 +136,22 @@ repositories {
     google()
     maven { url "https://jitpack.io" }
 }
-*/
-dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':aztec')
-    implementation project(':glide-loader')
-    implementation project(':wordpress-comments')
-    implementation project(':wordpress-shortcodes')
 
+dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation "org.wordpress:utils:$wordpressUtilsVersion"
 
-	compile project(':react-native-aztec')
+	implementation project(':react-native-aztec')
 
-    compile "com.android.support:support-v4:$supportLibVersion"
-    compile "com.android.support:gridlayout-v7:$supportLibVersion"
-    compile "com.android.support:cardview-v7:$supportLibVersion"
-    compile "com.android.support:appcompat-v7:$supportLibVersion"
-    compile "com.android.support:recyclerview-v7:$supportLibVersion"
+    implementation "com.android.support:support-v4:$supportLibVersion"
+    implementation "com.android.support:gridlayout-v7:$supportLibVersion"
+    implementation "com.android.support:cardview-v7:$supportLibVersion"
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    implementation "com.android.support:recyclerview-v7:$supportLibVersion"
 
-    compile "com.facebook.react:react-native:+" // From node_modules.
+    implementation "com.facebook.react:react-native:+" // From node_modules.
 }
 
 
