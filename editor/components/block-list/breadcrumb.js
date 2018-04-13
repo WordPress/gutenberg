@@ -58,7 +58,7 @@ export class BlockBreadcrumb extends Component {
 		const { isFocused } = this.state;
 
 		return (
-			<NavigableToolbar className={ classnames( 'editor-block-breadcrumb', {
+			<NavigableToolbar className={ classnames( 'editor-block-list__breadcrumb', {
 				'is-visible': ! isHidden || isFocused,
 			} ) }>
 				<Toolbar>

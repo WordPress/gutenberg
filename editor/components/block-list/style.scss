@@ -597,7 +597,7 @@
  */
 
 .editor-block-contextual-toolbar,
-.editor-block-breadcrumb {
+.editor-block-list__breadcrumb {
 	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
 	white-space: nowrap;
@@ -646,7 +646,7 @@
 }
 
 .editor-block-contextual-toolbar .editor-block-toolbar,
-.editor-block-breadcrumb .components-toolbar {
+.editor-block-list__breadcrumb .components-toolbar {
 	border: 1px solid $light-gray-500;
 	width: 100%;
 
@@ -673,7 +673,7 @@
 	}
 }
 
-.editor-block-breadcrumb .components-toolbar {
+.editor-block-list__breadcrumb .components-toolbar {
 	padding: 0px 12px;
 	line-height: $block-toolbar-height - 1px;
 	font-family: $default-font;
@@ -690,7 +690,7 @@
 	}
 }
 
-.editor-block-breadcrumb {
+.editor-block-list__breadcrumb {
 	opacity: 0;
 
 	&.is-visible {
