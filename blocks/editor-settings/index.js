@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createContext } from '@wordpress/element';
+import { createContext, createHigherOrderComponent } from '@wordpress/element';
 
 /**
  * The default editor settings
@@ -41,17 +41,20 @@ EditorSettings.defaultSettings = DEFAULT_SETTINGS;
 
 export default EditorSettings;
 
-export const withEditorSettings = ( mapSettingsToProps ) => ( Component ) => {
-	return function WithSettingsComponent( props ) {
-		return (
-			<EditorSettings.Consumer>
-				{ settings => (
-					<Component
-						{ ...props }
-						{ ...( mapSettingsToProps ? mapSettingsToProps( settings, props ) : { settings } ) }
-					/>
-				) }
-			</EditorSettings.Consumer>
-		);
-	};
-};
+export const withEditorSettings = ( mapSettingsToProps ) => createHigherOrderComponent(
+	( Component ) => {
+		return function WithSettingsComponent( props ) {
+			return (
+				<EditorSettings.Consumer>
+					{ settings => (
+						<Component
+							{ ...props }
+							{ ...( mapSettingsToProps ? mapSettingsToProps( settings, props ) : { settings } ) }
+						/>
+					) }
+				</EditorSettings.Consumer>
+			);
+		};
+	},
+	'withEditorSettings'
+);
