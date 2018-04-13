@@ -18,6 +18,7 @@ import './style.scss';
 import { getRows } from './rows';
 
 const rows = getRows();
+const colsTotal = 12;
 
 /**
  * Returns the layouts configuration for a given number of columns.
@@ -26,9 +27,9 @@ const rows = getRows();
  *
  * @return {Object[]} Columns layout configuration.
  */
-const getColumnLayouts = memoize( ( columns ) => {
+const getColumnLayouts = memoize( ( columns, sizes ) => {
 	return times( columns, ( n ) => ( {
-		name: `column-${ n + 1 }`,
+		name: `column-${ n + 1 } col${ sizes[ n ] }`,
 		label: sprintf( __( 'Column %d' ), n + 1 ),
 		icon: 'columns',
 	} ) );
@@ -77,7 +78,7 @@ function getBlockSettings( row ) {
 
 		edit( { attributes, setAttributes, className, focus } ) {
 			const { align, columns } = attributes;
-			const classes = classnames( className, 'wp-block-columns', `wp-block-columns has-${ columns }-columns` );
+			const classes = classnames( className, 'wp-block-rows' );
 
 			return [
 				...focus ? [
@@ -92,16 +93,14 @@ function getBlockSettings( row ) {
 					</BlockControls>,
 				] : [],
 				<div className={ classes } key="container">
-					<InnerBlocks layouts={ getColumnLayouts( columns ) } />
+					<InnerBlocks layouts={ getColumnLayouts( columns, row.cols ) } />
 				</div>,
 			];
 		},
 
-		save( { attributes } ) {
-			const { columns } = attributes;
-
+		save( ) {
 			return (
-				<div className={ `wp-block-columns has-${ columns }-columns` }>
+				<div className={ 'wp-block-rows' }>
 					<InnerBlocks.Content />
 				</div>
 			);
@@ -110,7 +109,7 @@ function getBlockSettings( row ) {
 }
 
 export const blocks = reduce( rows, ( res, row ) => {
-	if ( sum( row.cols ) === 12 ) {
+	if ( sum( row.cols ) === colsTotal ) {
 		res.push( {
 			name: getBlockName( row ),
 			settings: getBlockSettings( row ),

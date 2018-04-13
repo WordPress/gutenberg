@@ -1,6 +1,6 @@
 {
   "name": "@frontkom/gutenberg",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Gutenberg by Frontkom - A custom Gutenberg",
   "main": "dist/gutenberg.js",
   "repository": {
@@ -10,10 +10,14 @@
   "author": "The Frontkom Contributors",
   "license": "GPL-2.0-or-later",
   "keywords": [
+    "CMS",
+    "Drupal",
+    "Editor",
     "Frontkom",
     "Gutenberg",
+    "Page builder",
     "WordPress",
-    "editor"
+    "WYSIWYG"
   ],
   "engines": {
     "node": ">=8.0.0",
