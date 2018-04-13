@@ -396,7 +396,7 @@
 		position: absolute;
 		top: 0; // stretch to bottom to utilize full vertical space to increase hoverable area
 		bottom: 0;
-		width: $block-side-ui-width;
+		width: $block-side-ui-width + $block-side-ui-clearance;
 
 		/* Necessary for drag indicator */
 		cursor: move;/* Fallback for IE/Edge < 14 */
@@ -417,7 +417,8 @@
 
 	// Right side UI
 	> .editor-block-settings-menu {
-		right: -$block-side-ui-width;
+		right: -$block-side-ui-width - $block-side-ui-clearance;
+		padding-left: $block-side-ui-clearance;
 
 		// Mobile
 		display: none;
@@ -429,7 +430,8 @@
 
 	// Left side UI
 	> .editor-block-mover {
-		left: -$block-side-ui-width;
+		left: -$block-side-ui-width - $block-side-ui-clearance;
+		padding-right: $block-side-ui-clearance;
 
 		// Mobile
 		display: none;
