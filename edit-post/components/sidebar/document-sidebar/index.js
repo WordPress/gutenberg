@@ -24,7 +24,7 @@ const SIDEBAR_NAME = 'edit-post/document';
 const DocumentSidebar = () => (
 	<Sidebar
 		name={ SIDEBAR_NAME }
-		label={ __( 'Editor block settings' ) }
+		label={ __( 'Editor document settings' ) }
 	>
 		<SettingsHeader sidebarName={ SIDEBAR_NAME } />
 		<Panel>

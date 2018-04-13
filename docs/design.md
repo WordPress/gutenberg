@@ -54,7 +54,7 @@ The **editor bar** holds _document level_ actions. Like editor mode, save status
 
 The **content area** holds the document itself.
 
-The **settings sidebar** holds document metadata. Both for the document itself (tags, categories, schedule etc.), but also advanced settings for blocks in the "Block" tab.
+The **settings sidebar** holds document metadata. Both for the document itself (tags, categories, schedule etc.), but also for blocks in the "Block" tab.
 
 On mobile, the sidebar is hidden until you click the cog button to open it. On a desktop you can dismiss it for an immersive writing experience.
 
