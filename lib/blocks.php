@@ -225,10 +225,10 @@ function gutenberg_render_dynamic_blocks( $content ) {
 }
 
 /**
- * Strips block comments from the post's HTML. This is hooked as a filter 
+ * Strips block comments from the post's HTML. This is hooked as a filter
  * to 'the_content' and gets executed after dynamic blocks are rendered in
  * the post's HTML.
- * 
+ *
  * It registers gutenberg_process_block_comment() as a callback function for
  * preg_replace_callback(). For each block comment (matched by the Regex) in
  * the post's HTML, gutenberg_process_block_comment() will get called.
@@ -249,31 +249,31 @@ function gutenberg_strip_block_comments( $content ) {
  * Registered as a callback function to preg_replace_callback() and is called once for each
  * block comment parsed from the post's HTML. It returns an empty string for each instantiation
  * so that the post's HTML gets stripped of block comments.
- * 
+ *
  * Also, it uses WP_Parsed_Block_Types_Registry to store block types parsed from the block comments.
  * Those can be later used if needed.
  *
  * @since 2.7.0
  *
- * @param  string $matches An array filled with the results of search. 
+ * @param  string $matches An array filled with the results of search.
  *                         $matches[0] will contain the text that matched the full pattern,
  *                         $matches[1] will have the text that matched the first captured parenthesized subpattern,
- *                         and so on. 
+ *                         and so on.
  * @return string          Returns an empty string to preg_replace_callback() for each of the block comments
  */
 function gutenberg_process_block_comment( $matches ) {
 	$block_comment = $matches[0];
-	
-	// Only process the block comment if it's not a closing tag for a block. If it's a closing tag, we can just return. 
+
+	// Only process the block comment if it's not a closing tag for a block. If it's a closing tag, we can just return.
 	if ( preg_match( '/\/wp:/m', $block_comment ) !== 1 ) {
-		
+
 		$match = Array();
 
 		preg_match( '/wp:(.*?)\s+/m', $block_comment, $match);
 
 		$block_type_name = $match[1];
 		$block_type_name = gutenberg_prefix_core_namespace_if_not_found( $block_type_name );
-		
+
 		WP_Parsed_Block_Types_Registry::get_instance()->add( $block_type_name );
 	}
 
@@ -284,6 +284,6 @@ function gutenberg_process_block_comment( $matches ) {
  * If both filters have the same priority (9 in this case), they are executed
  * in the order in which they were added to the action. Therefore, in this case,
  * gutenberg_render_dynamic_blocks() will get executed before gutenberg_strip_block_comments()
- */ 
+ */
 add_filter( 'the_content', 'gutenberg_render_dynamic_blocks', 9 ); // BEFORE do_shortcode().
 add_filter( 'the_content', 'gutenberg_strip_block_comments', 9); // AFTER the above filter

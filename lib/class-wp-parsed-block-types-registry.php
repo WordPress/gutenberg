@@ -41,7 +41,7 @@ class WP_Parsed_Block_Types_Registry {
 	 * @return true|false                      True on success, or false on failure.
 	 */
 	public function add( $block_type ) {
-        
+
 		if ( $block_type instanceof WP_Block_Type ) {
 			$block_type = $block_type->name;
 		}
@@ -66,7 +66,7 @@ class WP_Parsed_Block_Types_Registry {
 		}
 
 		if ( ! WP_Block_Type_Registry::get_instance()->is_registered( $block_type ) ) {
-			// translators: 1: block name 
+			// translators: 1: block name
 			$message = sprintf( __( 'Block type "%s" isn\'t registered yet.', 'gutenberg' ), $block_type );
 			_doing_it_wrong( __METHOD__, $message, '0.1.0' );
 			return false;

@@ -782,7 +782,7 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 	}
 
 	if ( $enqueue_only_required_styles ) {
-		add_action( 'the_content', 'enqueue_required_frontend_block_styles', 10 ); 
+		add_action( 'the_content', 'enqueue_required_frontend_block_styles', 10 );
 	}
 }
 
@@ -793,7 +793,7 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_s
  * Enqueues frontend styles for block types present in the current page/post.
  * This is hooked as a filter to 'the_content' and is executed after block comments
  * are stripped from the HTML.
- * 
+ *
  * It doesn't actually filter the post's content. It returns the post's content as is.
  * It's only hooked as a filter so that it gets executed right after block comments are
  * stripped from the HTML. This will make sure that we enqueue styles as early as we can.
@@ -804,14 +804,14 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_s
  * @return string          Post content returned as-is.
  */
 function enqueue_required_frontend_block_styles( $content ) {
-	
+
 	$all_block_types_registry = WP_Block_Type_Registry::get_instance();
 	$parsed_block_types_registry = WP_Parsed_Block_Types_Registry::get_instance();
 
 	$block_types_in_current_page = $parsed_block_types_registry->get_block_types_in_current_page();
 
 	foreach ( $block_types_in_current_page as $block_type_name ) {
-		
+
 		$block_type = $all_block_types_registry->get_registered( $block_type_name );
 
 		if ( ! isset( $block_type ) ) {
