@@ -24,10 +24,12 @@ import {
 	getSaveElement,
 	isSharedBlock,
 	isUnmodifiedDefaultBlock,
+	withEditorSettings,
 } from '@wordpress/blocks';
-import { withFilters, withContext } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -95,8 +97,8 @@ export class BlockListBlock extends Component {
 		// we inject this function via context.
 		return {
 			createInnerBlockList: ( uid ) => {
-				const { renderBlockMenu, showContextualToolbar } = this.props;
-				return createInnerBlockList( uid, renderBlockMenu, showContextualToolbar );
+				const { renderBlockMenu } = this.props;
+				return createInnerBlockList( uid, renderBlockMenu );
 			},
 		};
 	}
@@ -392,7 +394,7 @@ export class BlockListBlock extends Component {
 			block,
 			order,
 			mode,
-			showContextualToolbar,
+			hasFixedToolbar,
 			isLocked,
 			isFirst,
 			isLast,
@@ -407,6 +409,7 @@ export class BlockListBlock extends Component {
 			isTypingWithinBlock,
 			isMultiSelecting,
 			hoverArea,
+			isLargeViewport,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -426,7 +429,7 @@ export class BlockListBlock extends Component {
 		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
 		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
 		const shouldShowBreadcrumb = isHovered;
-		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
+		const shouldShowContextualToolbar = shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 
@@ -650,6 +653,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		editPost,
 		toggleSelection,
 	} = dispatch( 'core/editor' );
+
 	return {
 		onChange( uid, attributes ) {
 			updateBlockAttributes( uid, attributes );
@@ -691,11 +695,13 @@ BlockListBlock.childContextTypes = {
 export default compose(
 	applyWithSelect,
 	applyWithDispatch,
-	withContext( 'editor' )( ( settings ) => {
+	withViewportMatch( { isLargeViewport: 'medium' } ),
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {
 			isLocked: !! templateLock,
+			hasFixedToolbar: settings.hasFixedToolbar,
 		};
 	} ),
 	withFilters( 'editor.BlockListBlock' ),

@@ -24,9 +24,8 @@ import {
 	TabbableContainer,
 	withInstanceId,
 	withSpokenMessages,
-	withContext,
 } from '@wordpress/components';
-import { getCategories, isSharedBlock } from '@wordpress/blocks';
+import { getCategories, isSharedBlock, withEditorSettings } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -340,7 +339,7 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withContext( 'editor' )( ( settings ) => {
+	withEditorSettings( ( settings ) => {
 		const { allowedBlockTypes } = settings;
 
 		return {
