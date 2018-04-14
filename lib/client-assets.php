@@ -749,11 +749,11 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 function gutenberg_enqueue_registered_block_scripts_and_styles() {
 
 	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
-	$is_frontend = ! $is_editor;
+	$is_front_end = ! $is_editor;
 
 	$is_post_or_page = is_single() || is_page();
 
-	$enqueue_only_required_styles = $is_frontend && $is_post_or_page;
+	$enqueue_only_required_styles = $is_front_end && $is_post_or_page;
 	$enqueue_styles_for_all_blocks = ! $enqueue_only_required_styles;
 
 	$block_registry = WP_Block_Type_Registry::get_instance();
@@ -816,10 +816,8 @@ function enqueue_required_frontend_block_styles( $content ) {
 
 		if ( ! isset( $block_type ) ) {
 			// Log the error here
-		} else {
-			if ( isset( $block_type->style ) ) {
-				wp_enqueue_style( $block_type->style );
-			}
+		} else if ( isset( $block_type->style ) ) {
+			wp_enqueue_style( $block_type->style );
 		}
 	}
 

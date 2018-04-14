@@ -123,7 +123,7 @@ function gutenberg_render_block( $block ) {
  * @param  string $block_type Name of the block type.
  * @return string             Name of the block type, prefixed by the core namespace if needed.
  */
-function gutenberg_prefix_core_namespace_if_not_found( $block_type ) {
+function gutenberg_normalize_block_type( $block_type ) {
 	$block_type = trim( $block_type );
 
 	$index_of_slash = strpos( $block_type, '/' );
@@ -267,12 +267,10 @@ function gutenberg_process_block_comment( $matches ) {
 	// Only process the block comment if it's not a closing tag for a block. If it's a closing tag, we can just return.
 	if ( preg_match( '/\/wp:/m', $block_comment ) !== 1 ) {
 
-		$match = Array();
-
-		preg_match( '/wp:(.*?)\s+/m', $block_comment, $match);
+		preg_match( '/wp:(.*?)\s+/m', $block_comment, $match );
 
 		$block_type_name = $match[1];
-		$block_type_name = gutenberg_prefix_core_namespace_if_not_found( $block_type_name );
+		$block_type_name = gutenberg_normalize_block_type( $block_type_name );
 
 		WP_Parsed_Block_Types_Registry::get_instance()->add( $block_type_name );
 	}
