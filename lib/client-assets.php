@@ -748,12 +748,12 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
  */
 function gutenberg_enqueue_registered_block_scripts_and_styles() {
 
-	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
+	$is_editor    = ( 'enqueue_block_editor_assets' === current_action() );
 	$is_front_end = ! $is_editor;
 
 	$is_post_or_page = is_single() || is_page();
 
-	$enqueue_only_required_styles = $is_front_end && $is_post_or_page;
+	$enqueue_only_required_styles  = $is_front_end && $is_post_or_page;
 	$enqueue_styles_for_all_blocks = ! $enqueue_only_required_styles;
 
 	$block_registry = WP_Block_Type_Registry::get_instance();
@@ -782,30 +782,39 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 	}
 
 	if ( $enqueue_only_required_styles ) {
-		add_action( 'the_content', 'enqueue_required_frontend_block_styles', 10 );
+		enqueue_required_frontend_block_styles();
 	}
 }
 
+/**
+ * Parses block types present in the current post/page while stripping block comments.
+ * It calls apply_filters() on 'the_content' before starting to strip block comments so that
+ * block types added by plugins (through filters on 'the_content') can also be parsed.
+ *
+ * The gutenberg_strip_block_comments() function contains the actual logic for
+ * parsing and stripping block comments
+ *
+ * @since 2.7.0
+ */
+function parse_block_types_while_stripping_comments() {
+	global $post;
+
+	$post->post_content = apply_filters( 'the_content', $post->post_content );
+	$post->post_content = gutenberg_strip_block_comments( $post->post_content );
+}
+
+add_action( 'enqueue_block_assets', 'parse_block_types_while_stripping_comments' );
 add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 
 /**
  * Enqueues frontend styles for block types present in the current page/post.
- * This is hooked as a filter to 'the_content' and is executed after block comments
- * are stripped from the HTML.
- *
- * It doesn't actually filter the post's content. It returns the post's content as is.
- * It's only hooked as a filter so that it gets executed right after block comments are
- * stripped from the HTML. This will make sure that we enqueue styles as early as we can.
  *
  * @since 2.7.0
- *
- * @param  string $content Post content
- * @return string          Post content returned as-is.
  */
-function enqueue_required_frontend_block_styles( $content ) {
+function enqueue_required_frontend_block_styles() {
 
-	$all_block_types_registry = WP_Block_Type_Registry::get_instance();
+	$all_block_types_registry    = WP_Block_Type_Registry::get_instance();
 	$parsed_block_types_registry = WP_Parsed_Block_Types_Registry::get_instance();
 
 	$block_types_in_current_page = $parsed_block_types_registry->get_block_types_in_current_page();
@@ -815,13 +824,11 @@ function enqueue_required_frontend_block_styles( $content ) {
 		$block_type = $all_block_types_registry->get_registered( $block_type_name );
 
 		if ( ! isset( $block_type ) ) {
-			// Log the error here
-		} else if ( isset( $block_type->style ) ) {
+			// Log the error here.
+		} elseif ( isset( $block_type->style ) ) {
 			wp_enqueue_style( $block_type->style );
 		}
 	}
-
-	return $content;
 }
 
 /**
