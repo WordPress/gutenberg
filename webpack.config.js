@@ -144,7 +144,7 @@ const config = {
 		rules: [
 			{
 				test: /\.pegjs/,
-				use: 'pegjs-loader',
+				use: 'pegjs-loader?allowedStartRules[]=Block_List,allowedStartRules[]=Rendered_Output',
 			},
 			{
 				test: /\.js$/,

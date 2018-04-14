@@ -12,6 +12,7 @@ const parser = pegjs.generate(
 	{
 		plugins: [ phpegjs ],
 		phpegjs: {
+			allowedStartRules: [ 'Block_List', 'Rendered_Output' ],
 			parserNamespace: null,
 			parserGlobalNamePrefix: 'Gutenberg_PEG_',
 			mbstringAllowed: false,
