@@ -67,10 +67,11 @@ export const settings = {
 			return (
 				<div className="wp-block-shortcode">
 					<label htmlFor={ inputId }>
-						<Dashicon icon="editor-code" />
+						<Dashicon icon="shortcode" />
 						{ __( 'Shortcode' ) }
 					</label>
 					<PlainText
+						className="input-control"
 						id={ inputId }
 						value={ attributes.text }
 						placeholder={ __( 'Write shortcode here…' ) }

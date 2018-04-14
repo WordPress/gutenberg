@@ -1,19 +1,14 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress Dependencies
  */
 import { Slot } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
 import BlockSwitcher from '../block-switcher';
-import { getBlockMode, getSelectedBlock } from '../../store/selectors';
 
 function BlockToolbar( { block, mode } ) {
 	if ( ! block || ! block.isValid || mode !== 'visual' ) {
@@ -29,11 +24,12 @@ function BlockToolbar( { block, mode } ) {
 	);
 }
 
-export default connect( ( state ) => {
-	const block = getSelectedBlock( state );
+export default withSelect( ( select ) => {
+	const { getSelectedBlock, getBlockMode } = select( 'core/editor' );
+	const block = getSelectedBlock();
 
-	return ( {
+	return {
 		block,
-		mode: block ? getBlockMode( state, block.uid ) : null,
-	} );
+		mode: block ? getBlockMode( block.uid ) : null,
+	};
 } )( BlockToolbar );

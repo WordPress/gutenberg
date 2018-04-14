@@ -6,7 +6,7 @@ import { get, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withContext } from '@wordpress/components';
+import { withEditorSettings } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
@@ -29,7 +29,7 @@ const applyWithSelect = withSelect( ( select ) => {
 	};
 } );
 
-const applyWithContext = withContext( 'editor' )(
+const applyWithEditorSettings = withEditorSettings(
 	( settings ) => ( {
 		availableTemplates: settings.availableTemplates,
 	} )
@@ -37,5 +37,5 @@ const applyWithContext = withContext( 'editor' )(
 
 export default compose( [
 	applyWithSelect,
-	applyWithContext,
+	applyWithEditorSettings,
 ] )( PageAttributesCheck );

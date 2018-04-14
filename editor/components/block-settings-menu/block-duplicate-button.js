@@ -7,10 +7,10 @@ import { flow, noop, last, every, first } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withContext } from '@wordpress/components';
+import { IconButton } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { cloneBlock, getBlockType } from '@wordpress/blocks';
+import { cloneBlock, getBlockType, withEditorSettings } from '@wordpress/blocks';
 
 export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false, role } ) {
 	const canDuplicate = every( blocks, block => {
@@ -54,7 +54,7 @@ export default compose(
 			}
 		},
 	} ) ),
-	withContext( 'editor' )( ( settings ) => {
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {
