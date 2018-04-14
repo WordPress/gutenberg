@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -130,7 +131,7 @@ export default compose(
 		const { getPostType } = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
-			isPreviewable: postType && postType.previewable,
+			isPreviewable: get( postType, 'viewable', false ),
 		};
 	} ),
 	ifCondition( ( { isPreviewable } ) => isPreviewable ),
