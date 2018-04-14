@@ -748,12 +748,12 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
  */
 function gutenberg_enqueue_registered_block_scripts_and_styles() {
 
-	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
+	$is_editor    = ( 'enqueue_block_editor_assets' === current_action() );
 	$is_front_end = ! $is_editor;
 
 	$is_post_or_page = is_single() || is_page();
 
-	$enqueue_only_required_styles = $is_front_end && $is_post_or_page;
+	$enqueue_only_required_styles  = $is_front_end && $is_post_or_page;
 	$enqueue_styles_for_all_blocks = ! $enqueue_only_required_styles;
 
 	$block_registry = WP_Block_Type_Registry::get_instance();
@@ -800,12 +800,12 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_s
  *
  * @since 2.7.0
  *
- * @param  string $content Post content
+ * @param  string $content Post content.
  * @return string          Post content returned as-is.
  */
 function enqueue_required_frontend_block_styles( $content ) {
 
-	$all_block_types_registry = WP_Block_Type_Registry::get_instance();
+	$all_block_types_registry    = WP_Block_Type_Registry::get_instance();
 	$parsed_block_types_registry = WP_Parsed_Block_Types_Registry::get_instance();
 
 	$block_types_in_current_page = $parsed_block_types_registry->get_block_types_in_current_page();
@@ -815,8 +815,8 @@ function enqueue_required_frontend_block_styles( $content ) {
 		$block_type = $all_block_types_registry->get_registered( $block_type_name );
 
 		if ( ! isset( $block_type ) ) {
-			// Log the error here
-		} else if ( isset( $block_type->style ) ) {
+			// Log the error here.
+		} elseif ( isset( $block_type->style ) ) {
 			wp_enqueue_style( $block_type->style );
 		}
 	}

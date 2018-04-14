@@ -128,8 +128,8 @@ function gutenberg_normalize_block_type( $block_type ) {
 
 	$index_of_slash = strpos( $block_type, '/' );
 
-	// If namespace isn't found in the block type name, prefix it with 'core/'
-	if ( $index_of_slash === FALSE ) {
+	// If namespace isn't found in the block type name, prefix it with 'core/'.
+	if ( false === $index_of_slash ) {
 		return 'core/' . $block_type;
 	}
 
@@ -284,4 +284,4 @@ function gutenberg_process_block_comment( $matches ) {
  * gutenberg_render_dynamic_blocks() will get executed before gutenberg_strip_block_comments()
  */
 add_filter( 'the_content', 'gutenberg_render_dynamic_blocks', 9 ); // BEFORE do_shortcode().
-add_filter( 'the_content', 'gutenberg_strip_block_comments', 9); // AFTER the above filter
+add_filter( 'the_content', 'gutenberg_strip_block_comments', 9 ); // AFTER the above filter.
