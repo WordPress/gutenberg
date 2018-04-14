@@ -1,6 +1,6 @@
 <?php
 /**
- * Server-side rendering of the `core/block` block.
+ * Server-side registration and rendering of the `core/block` block.
  *
  * @package gutenberg
  */
@@ -32,6 +32,11 @@ function gutenberg_render_core_reusable_block( $attributes ) {
 	return gutenberg_render_block( $block );
 }
 
+/**
+ * Registers the `core/block` block on the server-side.
+ *
+ * @since 2.7.0
+ */
 function register_core_reusable_block() {
 	wp_register_script(
 		'core-reusable-block',
@@ -45,18 +50,18 @@ function register_core_reusable_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_block_editor.css' )
 	);
-	
+
 	wp_style_add_data( 'core-reusable-block-editor', 'rtl', 'replace' );
 
 	register_block_type( 'core/block', array(
-		'editor_style' => 'core-reusable-block-editor',
-		'editor_script' => 'core-reusable-block',
+		'editor_style'    => 'core-reusable-block-editor',
+		'editor_script'   => 'core-reusable-block',
 		'attributes'      => array(
 			'ref' => array(
 				'type' => 'number',
 			),
 		),
-	
+
 		'render_callback' => 'gutenberg_render_core_reusable_block',
 	) );
 }

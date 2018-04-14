@@ -1,6 +1,6 @@
 <?php
 /**
- * Server-side rendering of the `core/categories` block.
+ * Server-side registration and rendering of the `core/categories` block.
  *
  * @package gutenberg
  */
@@ -84,6 +84,11 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	return ob_get_clean();
 }
 
+/**
+ * Registers the `core/categories` block on the server-side.
+ *
+ * @since 2.7.0
+ */
 function register_core_categories_block() {
 	wp_register_script(
 		'core-categories-block',
@@ -97,7 +102,7 @@ function register_core_categories_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_categories.css' )
 	);
-	
+
 	wp_style_add_data( 'core-categories-block', 'rtl', 'replace' );
 
 	wp_register_style(
@@ -106,13 +111,13 @@ function register_core_categories_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_categories_editor.css' )
 	);
-	
+
 	wp_style_add_data( 'core-categories-block-editor', 'rtl', 'replace' );
 
 	register_block_type( 'core/categories', array(
-		'style' => 'core-categories-block',
-		'editor_style' => 'core-categories-block-editor',
-		'editor_script' => 'core-categories-block',
+		'style'           => 'core-categories-block',
+		'editor_style'    => 'core-categories-block-editor',
+		'editor_script'   => 'core-categories-block',
 		'render_callback' => 'gutenberg_render_core_categories_block',
 	) );
 }

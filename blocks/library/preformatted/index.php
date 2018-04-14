@@ -1,10 +1,15 @@
 <?php
 /**
- * Server-side rendering of the `core/preformatted` block.
+ * Server-side registration of the `core/preformatted` block.
  *
  * @package gutenberg
  */
 
+/**
+ * Registers the `core/preformatted` block on the server-side.
+ *
+ * @since 2.7.0
+ */
 function register_core_preformatted_block() {
 	wp_register_script(
 		'core-preformatted-block',
@@ -18,11 +23,11 @@ function register_core_preformatted_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_preformatted_editor.css' )
 	);
-	
+
 	wp_style_add_data( 'core-preformatted-block-editor', 'rtl', 'replace' );
 
 	register_block_type( 'core/preformatted', array(
-		'editor_style' => 'core-preformatted-block-editor',
+		'editor_style'  => 'core-preformatted-block-editor',
 		'editor_script' => 'core-preformatted-block',
 	) );
 }

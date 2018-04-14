@@ -1,10 +1,15 @@
 <?php
 /**
- * Server-side rendering of the `core/paragraph` block.
+ * Server-side registration of the `core/paragraph` block.
  *
  * @package gutenberg
  */
 
+/**
+ * Registers the `core/paragraph` block on the server-side.
+ *
+ * @since 2.7.0
+ */
 function register_core_paragraph_block() {
 	wp_register_script(
 		'core-paragraph-block',
@@ -27,12 +32,12 @@ function register_core_paragraph_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_paragraph_editor.css' )
 	);
-	
+
 	wp_style_add_data( 'core-paragraph-block-editor', 'rtl', 'replace' );
 
 	register_block_type( 'core/paragraph', array(
-		'style' => 'core-paragraph-block',
-		'editor_style' => 'core-paragraph-block-editor',
+		'style'         => 'core-paragraph-block',
+		'editor_style'  => 'core-paragraph-block-editor',
 		'editor_script' => 'core-paragraph-block',
 	) );
 }

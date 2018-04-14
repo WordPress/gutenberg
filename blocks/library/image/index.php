@@ -1,10 +1,15 @@
 <?php
 /**
- * Server-side rendering of the `core/image` block.
+ * Server-side registration of the `core/image` block.
  *
  * @package gutenberg
  */
 
+/**
+ * Registers the `core/image` block on the server-side.
+ *
+ * @since 2.7.0
+ */
 function register_core_image_block() {
 	wp_register_script(
 		'core-image-block',
@@ -27,12 +32,12 @@ function register_core_image_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_image_editor.css' )
 	);
-	
+
 	wp_style_add_data( 'core-image-block-editor', 'rtl', 'replace' );
 
 	register_block_type( 'core/image', array(
-		'style' => 'core-image-block',
-		'editor_style' => 'core-image-block-editor',
+		'style'         => 'core-image-block',
+		'editor_style'  => 'core-image-block-editor',
 		'editor_script' => 'core-image-block',
 	) );
 }

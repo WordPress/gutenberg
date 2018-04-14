@@ -1,10 +1,15 @@
 <?php
 /**
- * Server-side rendering of the `core/video` block.
+ * Server-side registration of the `core/video` block.
  *
  * @package gutenberg
  */
 
+/**
+ * Registers the `core/video` block on the server-side.
+ *
+ * @since 2.7.0
+ */
 function register_core_video_block() {
 	wp_register_script(
 		'core-video-block',
@@ -27,12 +32,12 @@ function register_core_video_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_video_editor.css' )
 	);
-	
+
 	wp_style_add_data( 'core-video-block-editor', 'rtl', 'replace' );
 
 	register_block_type( 'core/video', array(
-		'style' => 'core-video-block',
-		'editor_style' => 'core-video-block-editor',
+		'style'         => 'core-video-block',
+		'editor_style'  => 'core-video-block-editor',
 		'editor_script' => 'core-video-block',
 	) );
 }

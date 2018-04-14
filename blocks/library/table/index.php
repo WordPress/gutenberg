@@ -1,10 +1,15 @@
 <?php
 /**
- * Server-side rendering of the `core/table` block.
+ * Server-side registration of the `core/table` block.
  *
  * @package gutenberg
  */
 
+/**
+ * Registers the `core/table` block on the server-side.
+ *
+ * @since 2.7.0
+ */
 function register_core_table_block() {
 	wp_register_script(
 		'core-table-block',
@@ -27,12 +32,12 @@ function register_core_table_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_table_editor.css' )
 	);
-	
+
 	wp_style_add_data( 'core-table-block-editor', 'rtl', 'replace' );
 
 	register_block_type( 'core/table', array(
-		'style' => 'core-table-block',
-		'editor_style' => 'core-table-block-editor',
+		'style'         => 'core-table-block',
+		'editor_style'  => 'core-table-block-editor',
 		'editor_script' => 'core-table-block',
 	) );
 }

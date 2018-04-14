@@ -1,12 +1,17 @@
 <?php
 /**
- * Server-side rendering of the `core/audio` block.
+ * Server-side registration of the `core/audio` block.
  *
  * @package gutenberg
  */
 
+/**
+ * Registers the `core/audio` block on the server-side.
+ *
+ * @since 2.7.0
+ */
 function register_core_audio_block() {
-	wp_register_script( 
+	wp_register_script(
 		'core-audio-block',
 		gutenberg_url( '/build/__block_audio.js' ),
 		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element', 'wp-utils' )
@@ -18,7 +23,7 @@ function register_core_audio_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_audio.css' )
 	);
-	
+
 	wp_style_add_data( 'core-audio-block', 'rtl', 'replace' );
 
 	wp_register_style(
@@ -27,12 +32,12 @@ function register_core_audio_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_audio_editor.css' )
 	);
-	
+
 	wp_style_add_data( 'core-audio-block-editor', 'rtl', 'replace' );
 
 	register_block_type( 'core/audio', array(
-		'style' => 'core-audio-block',
-		'editor_style' => 'core-audio-block-editor',
+		'style'         => 'core-audio-block',
+		'editor_style'  => 'core-audio-block-editor',
 		'editor_script' => 'core-audio-block',
 	) );
 }

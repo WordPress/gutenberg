@@ -1,6 +1,6 @@
 <?php
 /**
- * Server-side rendering of the `core/latest-posts` block.
+ * Server-side registration and rendering of the `core/latest-posts` block.
  *
  * @package gutenberg
  */
@@ -65,6 +65,11 @@ function gutenberg_render_core_latest_posts_block( $attributes ) {
 	return $block_content;
 }
 
+/**
+ * Registers the `core/latest-posts` block on the server-side.
+ *
+ * @since 2.7.0
+ */
 function register_core_latest_posts_block() {
 	wp_register_script(
 		'core-latest-posts-block',
@@ -87,13 +92,13 @@ function register_core_latest_posts_block() {
 		array(),
 		filemtime( gutenberg_dir_path() . 'build/__block_latestPosts_editor.css' )
 	);
-	
+
 	wp_style_add_data( 'core-latest-posts-block-editor', 'rtl', 'replace' );
 
 	register_block_type( 'core/latest-posts', array(
-		'style' => 'core-latest-posts-block',
-		'editor_style' => 'core-latest-posts-block-editor',
-		'editor_script' => 'core-latest-posts-block',
+		'style'           => 'core-latest-posts-block',
+		'editor_style'    => 'core-latest-posts-block-editor',
+		'editor_script'   => 'core-latest-posts-block',
 		'attributes'      => array(
 			'categories'      => array(
 				'type' => 'string',
