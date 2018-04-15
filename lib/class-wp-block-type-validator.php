@@ -113,7 +113,7 @@ class WP_Block_Type_Validator {
 		if ( 0 === $error_count ) {
 			return false;
 		} else {
-			return $errors[ $error_count - 1 ];
+			return $this->errors[ $error_count - 1 ];
 		}
 	}
 }
