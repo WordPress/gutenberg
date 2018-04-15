@@ -1,0 +1,22 @@
+{
+	"rootDir": "../../",
+	"collectCoverageFrom": [
+		"(blocks|components|date|editor|element|data|utils|edit-post|viewport|plugins|core-data)/**/*.js"
+	],
+	"moduleNameMapper": {
+		"@wordpress\\/(blocks|components|date|editor|element|data|utils|edit-post|viewport|plugins|core-data)": "$1"
+	},
+	"preset": "@wordpress/jest-preset-default",
+	"setupFiles": [
+		"core-js/fn/symbol/async-iterator",
+		"<rootDir>/test/unit/setup-blocks.js",
+		"<rootDir>/test/unit/setup-wp-aliases.js"
+	],
+	"transform": {
+		"\\.pegjs$": "<rootDir>/test/unit/pegjs-transform.js"
+	},
+	"testPathIgnorePatterns": [
+		"/node_modules/",
+		"/test/e2e"
+	]
+}
