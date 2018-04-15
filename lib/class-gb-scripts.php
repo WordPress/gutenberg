@@ -102,11 +102,7 @@ class GB_Scripts {
 		$script = $domain ?
 			'wp.i18n.setLocaleData( ' . json_encode( $translations ) . ', ' . $domain . ' );' :
 			'wp.i18n.setLocaleData( ' . json_encode( $translations ) . ' );';
-		wp_add_inline_script(
-			$handle,
-			$script,
-			'before'
-		);
+		wp_add_inline_script( $handle, $script, 'before' );
 	}
 
 
