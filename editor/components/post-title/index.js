@@ -3,6 +3,7 @@
  */
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -88,7 +89,7 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title, placeholder, instanceId } = this.props;
+		const { title, placeholder, instanceId, isPostTypeViewable } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 		const decodedPlaceholder = decodeEntities( placeholder );
@@ -96,7 +97,6 @@ class PostTitle extends Component {
 		return (
 			<PostTypeSupportCheck supportKeys="title">
 				<div className={ className }>
-					{ isSelected && <PostPermalink /> }
 					<KeyboardShortcuts
 						shortcuts={ {
 							'mod+z': this.redirectHistory,
@@ -117,6 +117,7 @@ class PostTitle extends Component {
 							onKeyPress={ this.onUnselect }
 						/>
 					</KeyboardShortcuts>
+					{ isSelected && isPostTypeViewable && <PostPermalink /> }
 				</div>
 			</PostTypeSupportCheck>
 		);
@@ -125,9 +126,12 @@ class PostTitle extends Component {
 
 const applyWithSelect = withSelect( ( select ) => {
 	const { getEditedPostAttribute } = select( 'core/editor' );
+	const { getPostType } = select( 'core' );
+	const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 	return {
 		title: getEditedPostAttribute( 'title' ),
+		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 	};
 } );
 

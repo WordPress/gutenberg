@@ -84,6 +84,9 @@ const {
 	getTemplate,
 	getTemplateLock,
 	POST_UPDATE_TRANSACTION_ID,
+	isPermalinkEditable,
+	getPermalink,
+	getPermalinkParts,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3091,6 +3094,95 @@ describe( 'selectors', () => {
 			};
 
 			expect( getTemplateLock( state ) ).toBe( 'all' );
+		} );
+	} );
+
+	describe( 'isPermalinkEditable', () => {
+		it( 'should be false if there is no permalink', () => {
+			const state = {
+				currentPost: { permalink_template: '' },
+			};
+
+			expect( isPermalinkEditable( state ) ).toBe( false );
+		} );
+
+		it( 'should be false if the permalink is not of an editable kind', () => {
+			const state = {
+				currentPost: { permalink_template: 'http://foo.test/bar/%baz%/' },
+			};
+
+			expect( isPermalinkEditable( state ) ).toBe( false );
+		} );
+
+		it( 'should be true if the permalink has %postname%', () => {
+			const state = {
+				currentPost: { permalink_template: 'http://foo.test/bar/%postname%/' },
+			};
+
+			expect( isPermalinkEditable( state ) ).toBe( true );
+		} );
+
+		it( 'should be true if the permalink has %pagename%', () => {
+			const state = {
+				currentPost: { permalink_template: 'http://foo.test/bar/%pagename%/' },
+			};
+
+			expect( isPermalinkEditable( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'getPermalink', () => {
+		it( 'should work if the permalink is not of an editable kind', () => {
+			const url = 'http://foo.test/?post=1';
+			const state = {
+				currentPost: { permalink_template: url },
+			};
+
+			expect( getPermalink( state ) ).toBe( url );
+		} );
+
+		it( 'should return the permalink if it is editable', () => {
+			const state = {
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%postname%/',
+					slug: 'baz',
+				},
+			};
+
+			expect( getPermalink( state ) ).toBe( 'http://foo.test/bar/baz/' );
+		} );
+	} );
+
+	describe( 'getPermalinkParts', () => {
+		it( 'should split the permalink correctly', () => {
+			const parts = {
+				prefix: 'http://foo.test/bar/',
+				postName: 'baz',
+				suffix: '/',
+			};
+			const state = {
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%postname%/',
+					slug: 'baz',
+				},
+			};
+
+			expect( getPermalinkParts( state ) ).toEqual( parts );
+		} );
+
+		it( 'should leave an uneditable permalink in the prefix', () => {
+			const parts = {
+				prefix: 'http://foo.test/?post=1',
+				postName: 'baz',
+			};
+			const state = {
+				currentPost: {
+					permalink_template: 'http://foo.test/?post=1',
+					slug: 'baz',
+				},
+			};
+
+			expect( getPermalinkParts( state ) ).toEqual( parts );
 		} );
 	} );
 } );

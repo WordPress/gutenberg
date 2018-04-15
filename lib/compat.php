@@ -437,3 +437,76 @@ function gutenberg_get_taxonomy_visibility_data( $object ) {
 }
 
 add_action( 'rest_api_init', 'gutenberg_add_taxonomy_visibility_field' );
+
+/**
+ * Add a permalink template to posts in the post REST API response.
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the permalink_template.
+ */
+function gutenberg_add_permalink_template_to_posts( $response, $post, $request ) {
+	if ( 'edit' !== $request['context'] ) {
+		return $response;
+	}
+
+	if ( ! function_exists( 'get_sample_permalink' ) ) {
+		require_once ABSPATH . '/wp-admin/includes/post.php';
+	}
+
+	$sample_permalink = get_sample_permalink( $post->ID );
+
+	$response->data['permalink_template'] = $sample_permalink[0];
+
+	if ( 'draft' === $post->post_status && ! $post->post_name ) {
+		$response->data['draft_slug'] = $sample_permalink[1];
+	}
+
+	return $response;
+}
+
+/**
+ * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
+ *
+ * @param string $post_type The newly registered post type.
+ * @return string That same post type.
+ */
+function gutenberg_register_permalink_template_function( $post_type ) {
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
+	return $post_type;
+}
+add_filter( 'registered_post_type', 'gutenberg_register_permalink_template_function' );
+
+/**
+ * Includes the value for the 'viewable' attribute of a post type resource.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43739
+ *
+ * @param object $post_type Post type response object.
+ * @return boolean Whether or not the post type can be viewed.
+ */
+function gutenberg_get_post_type_viewable( $post_type ) {
+	return is_post_type_viewable( $post_type['slug'] );
+}
+
+/**
+ * Adds the 'viewable' attribute to the REST API response of a post type.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43739
+ */
+function gutenberg_register_rest_api_post_type_viewable() {
+	register_rest_field( 'type',
+		'viewable',
+		array(
+			'get_callback' => 'gutenberg_get_post_type_viewable',
+			'schema'       => array(
+				'description' => __( 'Whether or not the post type can be viewed', 'gutenberg' ),
+				'type'        => 'boolean',
+				'context'     => array( 'edit' ),
+				'readonly'    => true,
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_viewable' );
