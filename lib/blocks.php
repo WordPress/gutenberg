@@ -176,8 +176,8 @@ function gutenberg_render_dynamic_blocks( $content ) {
 		}
 
 		// Since content is a working copy since the last match, append to
-		// rendered content up to the matched offset...
-		$rendered_content .= substr( $content, 0, $offset );
+		// rendered content up to the matched offset (including the opening tag)...
+		$rendered_content .= substr( $content, 0, $offset + strlen( $opening_tag ) );
 
 		// ...then update the working copy of content.
 		$content = substr( $content, $offset + strlen( $opening_tag ) );
@@ -210,11 +210,11 @@ function gutenberg_render_dynamic_blocks( $content ) {
 				break;
 			}
 
-			// Update content to omit text up to and including closing tag.
+			// Update content to omit text up to the closing tag.
 			$end_tag    = $block_match_end[0][0];
 			$end_offset = $block_match_end[0][1];
 
-			$content = substr( $content, $end_offset + strlen( $end_tag ) );
+			$content = substr( $content, $end_offset );
 		}
 	}
 
