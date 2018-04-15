@@ -526,3 +526,11 @@ export const others = [
 		} ),
 	},
 ];
+
+common.map( ( embedBlockType ) =>
+	registerBlockType( embedBlockType.name, embedBlockType.settings )
+);
+
+others.map( ( embedBlockType ) =>
+	registerBlockType( embedBlockType.name, embedBlockType.settings )
+);
