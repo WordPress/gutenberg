@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import {
 	reduce,
 	get,
@@ -12,23 +11,23 @@ import {
  * WordPress dependencies
  */
 import { createElement } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockListLayout from './layout';
-import { getBlocks, getBlockOrder } from '../../store/selectors';
 
-const UngroupedLayoutBlockList = connect(
-	( state, ownProps ) => ( {
-		blockUIDs: getBlockOrder( state, ownProps.rootUID ),
+const UngroupedLayoutBlockList = withSelect(
+	( select, ownProps ) => ( {
+		blockUIDs: select( 'core/editor' ).getBlockOrder( ownProps.rootUID ),
 	} )
 )( BlockListLayout );
 
-const GroupedLayoutBlockList = connect(
-	( state, ownProps ) => ( {
-		blocks: getBlocks( state, ownProps.rootUID ),
+const GroupedLayoutBlockList = withSelect(
+	( select, ownProps ) => ( {
+		blocks: select( 'core/editor' ).getBlocks( ownProps.rootUID ),
 	} ),
 )( ( {
 	blocks,

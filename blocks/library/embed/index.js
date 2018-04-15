@@ -3,6 +3,7 @@
  */
 import { parse } from 'url';
 import { includes, kebabCase, toLower } from 'lodash';
+import { stringify } from 'querystring';
 
 /**
  * WordPress dependencies
@@ -10,7 +11,6 @@ import { includes, kebabCase, toLower } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
-import { addQueryArgs } from '@wordpress/url';
 import classnames from 'classnames';
 
 /**
@@ -71,7 +71,9 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 		edit: class extends Component {
 			constructor() {
 				super( ...arguments );
+
 				this.doServerSideRender = this.doServerSideRender.bind( this );
+
 				this.state = {
 					html: '',
 					type: '',
@@ -109,20 +111,15 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				}
 				const { url } = this.props.attributes;
 				const { setAttributes } = this.props;
-				const apiURL = addQueryArgs( wpApiSettings.root + 'oembed/1.0/proxy', {
-					url: url,
-					_wpnonce: wpApiSettings.nonce,
-				} );
 
 				this.setState( { error: false, fetching: true } );
-				window.fetch( apiURL, {
-					credentials: 'include',
-				} ).then(
-					( response ) => {
-						if ( this.unmounting ) {
-							return;
-						}
-						response.json().then( ( obj ) => {
+				wp.apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } )
+					.then(
+						( obj ) => {
+							if ( this.unmounting ) {
+								return;
+							}
+
 							const { html, provider_name: providerName } = obj;
 							const providerNameSlug = kebabCase( toLower( providerName ) );
 							let { type } = obj;
@@ -136,19 +133,19 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 							} else if ( 'photo' === type ) {
 								this.setState( { html: this.getPhotoHtml( obj ), type, providerNameSlug } );
 								setAttributes( { type, providerNameSlug } );
-							} else {
-								this.setState( { error: true } );
 							}
 							this.setState( { fetching: false } );
-						} );
-					}
-				);
+						},
+						() => {
+							this.setState( { fetching: false, error: true } );
+						}
+					);
 			}
 
 			render() {
 				const { html, type, error, fetching } = this.state;
 				const { align, url, caption } = this.props.attributes;
-				const { setAttributes, isSelected } = this.props;
+				const { setAttributes, isSelected, className } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
 				const controls = isSelected && (
@@ -212,14 +209,10 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 						/>
 					</div>
 				);
-				let typeClassName = 'wp-block-embed';
-				if ( 'video' === type ) {
-					typeClassName += ' is-video';
-				}
 
 				return [
 					controls,
-					<figure key="embed" className={ typeClassName }>
+					<figure key="embed" className={ classnames( className, { 'is-video': 'video' === type } ) }>
 						{ ( cannotPreview ) ? (
 							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
 								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
@@ -245,11 +238,11 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 			const { url, caption, align, type, providerNameSlug } = attributes;
 
 			if ( ! url ) {
-				return;
+				return null;
 			}
 
 			const embedClassName = classnames( 'wp-block-embed', {
-				[ `is-align${ align }` ]: align,
+				[ `align${ align }` ]: align,
 				[ `is-type-${ type }` ]: type,
 				[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
 			} );
@@ -273,7 +266,7 @@ export const settings = getEmbedBlockSettings( {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*/i.test( node.textContent ),
+				isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
 				transform: ( node ) => {
 					return createBlock( 'core/embed', {
 						url: node.textContent.trim(),

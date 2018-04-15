@@ -25,13 +25,13 @@ import { rawHandler } from '../api';
  */
 export default function ImagePlaceholder( { className, icon, label, onSelectImage, multiple = false } ) {
 	const setImage = multiple ? onSelectImage : ( [ image ] ) => onSelectImage( image );
-	const onFilesDrop = ( files ) => mediaUpload( files, setImage );
+	const onFilesDrop = ( files ) => mediaUpload( files, setImage, 'image' );
 	const onHTMLDrop = ( HTML ) => setImage( map(
 		rawHandler( { HTML, mode: 'BLOCKS' } )
 			.filter( ( { name } ) => name === 'core/image' ),
 		'attributes'
 	) );
-	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setImage );
+	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setImage, 'image' );
 	return (
 		<Placeholder
 			className={ className }
@@ -60,7 +60,7 @@ export default function ImagePlaceholder( { className, icon, label, onSelectImag
 				type="image"
 				render={ ( { open } ) => (
 					<Button isLarge onClick={ open }>
-						{ __( 'Add from Media Library' ) }
+						{ __( 'Media Library' ) }
 					</Button>
 				) }
 			/>

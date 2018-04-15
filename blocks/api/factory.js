@@ -4,24 +4,20 @@
 import uuid from 'uuid/v4';
 import {
 	every,
-	get,
 	reduce,
 	castArray,
 	findIndex,
 	includes,
 	isObjectLike,
 	filter,
-	find,
 	first,
 	flatMap,
-	uniqueId,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { applyFilters } from '@wordpress/hooks';
+import { createHooks, applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -55,7 +51,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 	}, {} );
 
 	// Blocks are stored with a unique ID, the assigned type name,
-	// and the block attributes.
+	// the block attributes, and their inner blocks.
 	return {
 		uid: uuid(),
 		name,
@@ -69,13 +65,13 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
  * Given a block object, returns a copy of the block object, optionally merging
  * new attributes and/or replacing its inner blocks.
  *
- * @param {Object} block           Block object.
- * @param {Object} mergeAttributes Block attributes.
- * @param {?Array} innerBlocks     Nested blocks.
+ * @param {Object} block              Block object.
+ * @param {Object} mergeAttributes    Block attributes.
+ * @param {?Array} newInnerBlocks     Nested blocks.
  *
  * @return {Object} A cloned block.
  */
-export function cloneBlock( block, mergeAttributes = {}, innerBlocks = block.innerBlocks ) {
+export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	return {
 		...block,
 		uid: uuid(),
@@ -83,7 +79,8 @@ export function cloneBlock( block, mergeAttributes = {}, innerBlocks = block.inn
 			...block.attributes,
 			...mergeAttributes,
 		},
-		innerBlocks,
+		innerBlocks: newInnerBlocks ||
+			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),
 	};
 }
 
@@ -113,10 +110,10 @@ const isTransformForBlockSource = ( sourceName, isMultiBlock = false ) => ( tran
  *
  * @return {Function} Predicate that receives a block type.
  */
-const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( type ) => (
-	!! find(
-		get( type, 'transforms.from', [] ),
-		isTransformForBlockSource( sourceName, isMultiBlock ),
+const createIsTypeTransformableFrom = ( sourceName, isMultiBlock = false ) => ( blockType ) => (
+	!! findTransform(
+		getBlockTransforms( 'from', blockType.name ),
+		isTransformForBlockSource( sourceName, isMultiBlock )
 	)
 );
 
@@ -140,22 +137,22 @@ export function getPossibleBlockTransformations( blocks ) {
 		return [];
 	}
 
-	//compute the block that have a from transformation able to transfer blocks passed as argument.
+	// Compute the block that have a from transformation able to transfer blocks passed as argument.
 	const blocksToBeTransformedFrom = filter(
 		getBlockTypes(),
 		createIsTypeTransformableFrom( sourceBlockName, isMultiBlock ),
 	).map( type => type.name );
 
 	const blockType = getBlockType( sourceBlockName );
-	const transformsTo = get( blockType, 'transforms.to', [] );
+	const transformsTo = getBlockTransforms( 'to', blockType.name );
 
-	//computes a list of blocks that source block can be transformed into using the "to transformations" implemented in it.
+	// Generate list of block transformations using the supplied "transforms to".
 	const blocksToBeTransformedTo = flatMap(
 		isMultiBlock ? filter( transformsTo, 'isMultiBlock' ) : transformsTo,
 		transformation => transformation.blocks
 	);
 
-	//returns a unique list of blocks that blocks passed as argument can transform into
+	// Returns a unique list of available block transformations.
 	return reduce( [
 		...blocksToBeTransformedFrom,
 		...blocksToBeTransformedTo,
@@ -166,6 +163,72 @@ export function getPossibleBlockTransformations( blocks ) {
 		}
 		return result;
 	}, [] );
+}
+
+/**
+ * Given an array of transforms, returns the highest-priority transform where
+ * the predicate function returns a truthy value. A higher-priority transform
+ * is one with a lower priority value (i.e. first in priority order). Returns
+ * null if the transforms set is empty or the predicate function returns a
+ * falsey value for all entries.
+ *
+ * @param {Object[]} transforms Transforms to search.
+ * @param {Function} predicate  Function returning true on matching transform.
+ *
+ * @return {?Object} Highest-priority transform candidate.
+ */
+export function findTransform( transforms, predicate ) {
+	// The hooks library already has built-in mechanisms for managing priority
+	// queue, so leverage via locally-defined instance.
+	const hooks = createHooks();
+
+	for ( let i = 0; i < transforms.length; i++ ) {
+		const candidate = transforms[ i ];
+		if ( predicate( candidate ) ) {
+			hooks.addFilter(
+				'transform',
+				'transform/' + i.toString(),
+				( result ) => result ? result : candidate,
+				candidate.priority
+			);
+		}
+	}
+
+	// Filter name is arbitrarily chosen but consistent with above aggregation.
+	return hooks.applyFilters( 'transform', null );
+}
+
+/**
+ * Returns normal block transforms for a given transform direction, optionally
+ * for a specific block by name, or an empty array if there are no transforms.
+ * If no block name is provided, returns transforms for all blocks. A normal
+ * transform object includes `blockName` as a property.
+ *
+ * @param {string}  direction Transform direction ("to", "from").
+ * @param {?string} blockName Optional block name.
+ *
+ * @return {Array} Block transforms for direction.
+ */
+export function getBlockTransforms( direction, blockName ) {
+	// When retrieving transforms for all block types, recurse into self.
+	if ( blockName === undefined ) {
+		return flatMap(
+			getBlockTypes(),
+			( { name } ) => getBlockTransforms( direction, name )
+		);
+	}
+
+	// Validate that block type exists and has array of direction.
+	const { transforms } = getBlockType( blockName ) || {};
+	if ( ! transforms || ! Array.isArray( transforms[ direction ] ) ) {
+		return [];
+	}
+
+	// Map transforms to normal form.
+	return transforms[ direction ].map( ( transform ) => ( {
+		...transform,
+		blockName,
+	} ) );
 }
 
 /**
@@ -188,21 +251,19 @@ export function switchToBlockType( blocks, name ) {
 
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
-	const destinationType = getBlockType( name );
-	const sourceType = getBlockType( sourceName );
-	const transformationsFrom = get( destinationType, 'transforms.from', [] );
-	const transformationsTo = get( sourceType, 'transforms.to', [] );
+	const transformationsFrom = getBlockTransforms( 'from', name );
+	const transformationsTo = getBlockTransforms( 'to', sourceName );
 	const transformation =
-		find(
+		findTransform(
 			transformationsTo,
 			t => t.type === 'block' && t.blocks.indexOf( name ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
 		) ||
-		find(
+		findTransform(
 			transformationsFrom,
 			t => t.type === 'block' && t.blocks.indexOf( sourceName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
 		);
 
-	// Stop if there is no valid transformation. (How did we get here?)
+	// Stop if there is no valid transformation.
 	if ( ! transformation ) {
 		return null;
 	}
@@ -256,24 +317,4 @@ export function switchToBlockType( blocks, name ) {
 		 */
 		return applyFilters( 'blocks.switchToBlockType.transformedBlock', transformedBlock, blocks );
 	} );
-}
-
-/**
- * Creates a new reusable block.
- *
- * @param {string} type       The type of the block referenced by the reusable
- *                            block.
- * @param {Object} attributes The attributes of the block referenced by the
- *                            reusable block.
- *
- * @return {Object} A reusable block object.
- */
-export function createReusableBlock( type, attributes ) {
-	return {
-		id: -uniqueId(), // Temorary id replaced when the block is saved server side
-		isTemporary: true,
-		title: __( 'Untitled block' ),
-		type,
-		attributes,
-	};
 }

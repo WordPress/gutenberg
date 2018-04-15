@@ -5,6 +5,14 @@ import uuid from 'uuid/v4';
 import { partial, castArray } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import {
+	getDefaultBlockName,
+	createBlock,
+} from '@wordpress/blocks';
+
+/**
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
@@ -39,9 +47,9 @@ export function resetPost( post ) {
 /**
  * Returns an action object used to setup the editor state when first opening an editor.
  *
- * @param {Object} post   Post object.
- * @param {Array}  blocks Array of blocks.
- * @param {Object} edits  Initial edited attributes object.
+ * @param {Object}  post            Post object.
+ * @param {Array}   blocks          Array of blocks.
+ * @param {Object}  edits           Initial edited attributes object.
  *
  * @return {Object} Action object.
  */
@@ -66,6 +74,22 @@ export function setupEditorState( post, blocks, edits ) {
 export function resetBlocks( blocks ) {
 	return {
 		type: 'RESET_BLOCKS',
+		blocks,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that blocks have been received.
+ * Unlike resetBlocks, these should be appended to the existing known set, not
+ * replacing.
+ *
+ * @param {Object[]} blocks Array of block objects.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveBlocks( blocks ) {
+	return {
+		type: 'RECEIVE_BLOCKS',
 		blocks,
 	};
 }
@@ -167,6 +191,7 @@ export function replaceBlocks( uids, blocks ) {
 		type: 'REPLACE_BLOCKS',
 		uids: castArray( uids ),
 		blocks: castArray( blocks ),
+		time: Date.now(),
 	};
 }
 
@@ -181,6 +206,51 @@ export function replaceBlocks( uids, blocks ) {
  */
 export function replaceBlock( uid, block ) {
 	return replaceBlocks( uid, block );
+}
+
+/**
+ * Action creator creator which, given the action type to dispatch
+ * creates a prop dispatcher callback for
+ * managing block movement.
+ *
+ * @param {string}   type     Action type to dispatch.
+ *
+ * @return {Function} Prop dispatcher callback.
+ */
+function createOnMove( type ) {
+	return ( uids, rootUID ) => {
+		return {
+			type,
+			uids,
+			rootUID,
+		};
+	};
+}
+
+export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );
+export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
+
+/**
+ * Returns an action object signalling that an indexed block should be moved
+ * to a new index.
+ *
+ * @param  {?string} uid          The UID of the block.
+ * @param  {?string} fromRootUID  root UID source.
+ * @param  {?string} toRootUID    root UID destination.
+ * @param  {?string} layout       layout to move the block into.
+ * @param  {number}  index        The index to move the block into.
+ *
+ * @return {Object} Action object.
+ */
+export function moveBlockToPosition( uid, fromRootUID, toRootUID, layout, index ) {
+	return {
+		type: 'MOVE_BLOCK_TO_POSITION',
+		fromRootUID,
+		toRootUID,
+		uid,
+		index,
+		layout,
+	};
 }
 
 /**
@@ -213,6 +283,7 @@ export function insertBlocks( blocks, index, rootUID ) {
 		blocks: castArray( blocks ),
 		index,
 		rootUID,
+		time: Date.now(),
 	};
 }
 
@@ -236,6 +307,42 @@ export function showInsertionPoint() {
 export function hideInsertionPoint() {
 	return {
 		type: 'HIDE_INSERTION_POINT',
+	};
+}
+
+/**
+ * Returns an action object resetting the template validity.
+ *
+ * @param {boolean}  isValid  template validity flag.
+ *
+ * @return {Object} Action object.
+ */
+export function setTemplateValidity( isValid ) {
+	return {
+		type: 'SET_TEMPLATE_VALIDITY',
+		isValid,
+	};
+}
+
+/**
+ * Returns an action object tocheck the template validity.
+ *
+ * @return {Object} Action object.
+ */
+export function checkTemplateValidity() {
+	return {
+		type: 'CHECK_TEMPLATE_VALIDITY',
+	};
+}
+
+/**
+ * Returns an action object synchronize the template with the list of blocks
+ *
+ * @return {Object} Action object.
+ */
+export function synchronizeTemplate() {
+	return {
+		type: 'SYNCHRONIZE_TEMPLATE',
 	};
 }
 
@@ -319,14 +426,16 @@ export function createUndoLevel() {
  * Returns an action object used in signalling that the blocks
  * corresponding to the specified UID set are to be removed.
  *
- * @param {string[]} uids Block UIDs.
+ * @param {string[]} uids           Block UIDs.
+ * @param {boolean}  selectPrevious True if the previous block should be selected when a block is removed.
  *
  * @return {Object} Action object.
  */
-export function removeBlocks( uids ) {
+export function removeBlocks( uids, selectPrevious = true ) {
 	return {
 		type: 'REMOVE_BLOCKS',
 		uids,
+		selectPrevious,
 	};
 }
 
@@ -334,12 +443,13 @@ export function removeBlocks( uids ) {
  * Returns an action object used in signalling that the block with the
  * specified UID is to be removed.
  *
- * @param {string} uid Block UID.
+ * @param {string}  uid            Block UID.
+ * @param {boolean} selectPrevious True if the previous block should be selected when a block is removed.
  *
  * @return {Object} Action object.
  */
-export function removeBlock( uid ) {
-	return removeBlocks( [ uid ] );
+export function removeBlock( uid, selectPrevious = true ) {
+	return removeBlocks( [ uid ], selectPrevious );
 }
 
 /**
@@ -427,71 +537,86 @@ export const createErrorNotice = partial( createNotice, 'error' );
 export const createWarningNotice = partial( createNotice, 'warning' );
 
 /**
- * Returns an action object used to fetch a single reusable block or all
- * reusable blocks from the REST API into the store.
+ * Returns an action object used to fetch a single shared block or all shared
+ * blocks from the REST API into the store.
  *
- * @param {?string} id If given, only a single reusable block with this ID will
+ * @param {?string} id If given, only a single shared block with this ID will
  *                     be fetched.
  *
  * @return {Object} Action object.
  */
-export function fetchReusableBlocks( id ) {
+export function fetchSharedBlocks( id ) {
 	return {
-		type: 'FETCH_REUSABLE_BLOCKS',
+		type: 'FETCH_SHARED_BLOCKS',
 		id,
 	};
 }
 
 /**
- * Returns an action object used to insert or update a reusable block into
- * the store.
+ * Returns an action object used in signalling that shared blocks have been
+ * received. `results` is an array of objects containing:
+ *  - `sharedBlock` - Details about how the shared block is persisted.
+ *  - `parsedBlock` - The original block.
  *
- * @param {Object} id            The ID of the reusable block to update.
- * @param {Object} reusableBlock The new reusable block object. Any omitted keys
- *                               are not changed.
+ * @param {Object[]} results Shared blocks received.
  *
  * @return {Object} Action object.
  */
-export function updateReusableBlock( id, reusableBlock ) {
+export function receiveSharedBlocks( results ) {
 	return {
-		type: 'UPDATE_REUSABLE_BLOCK',
-		id,
-		reusableBlock,
+		type: 'RECEIVE_SHARED_BLOCKS',
+		results,
 	};
 }
 
 /**
- * Returns an action object used to save a reusable block that's in the store
- * to the REST API.
+ * Returns an action object used to save a shared block that's in the store to
+ * the REST API.
  *
- * @param {Object} id The ID of the reusable block to save.
+ * @param {Object} id The ID of the shared block to save.
  *
  * @return {Object} Action object.
  */
-export function saveReusableBlock( id ) {
+export function saveSharedBlock( id ) {
 	return {
-		type: 'SAVE_REUSABLE_BLOCK',
+		type: 'SAVE_SHARED_BLOCK',
 		id,
 	};
 }
 
 /**
- * Returns an action object used to delete a reusable block via the REST API.
+ * Returns an action object used to delete a shared block via the REST API.
  *
- * @param {number} id The ID of the reusable block to delete.
+ * @param {number} id The ID of the shared block to delete.
  *
  * @return {Object} Action object.
  */
-export function deleteReusableBlock( id ) {
+export function deleteSharedBlock( id ) {
 	return {
-		type: 'DELETE_REUSABLE_BLOCK',
+		type: 'DELETE_SHARED_BLOCK',
 		id,
 	};
 }
 
 /**
- * Returns an action object used to convert a reusable block into a static
- * block.
+ * Returns an action object used in signalling that a shared block's title is
+ * to be updated.
+ *
+ * @param {number} id    The ID of the shared block to update.
+ * @param {string} title The new title.
+ *
+ * @return {Object} Action object.
+ */
+export function updateSharedBlockTitle( id, title ) {
+	return {
+		type: 'UPDATE_SHARED_BLOCK_TITLE',
+		id,
+		title,
+	};
+}
+
+/**
+ * Returns an action object used to convert a shared block into a static block.
  *
  * @param {Object} uid The ID of the block to attach.
  *
@@ -505,32 +630,33 @@ export function convertBlockToStatic( uid ) {
 }
 
 /**
- * Returns an action object used to convert a static block into a reusable
- * block.
+ * Returns an action object used to convert a static block into a shared block.
  *
  * @param {Object} uid The ID of the block to detach.
  *
  * @return {Object} Action object.
  */
-export function convertBlockToReusable( uid ) {
+export function convertBlockToShared( uid ) {
 	return {
-		type: 'CONVERT_BLOCK_TO_REUSABLE',
+		type: 'CONVERT_BLOCK_TO_SHARED',
 		uid,
 	};
 }
 /**
  * Returns an action object used in signalling that a new block of the default
- * type should be appended to the block list.
+ * type should be added to the block list.
  *
  * @param {?Object} attributes Optional attributes of the block to assign.
  * @param {?string} rootUID    Optional root UID of block list to append.
+ * @param {?number} index      Optional index where to insert the default block
  *
  * @return {Object} Action object
  */
-export function appendDefaultBlock( attributes, rootUID ) {
+export function insertDefaultBlock( attributes, rootUID, index ) {
+	const block = createBlock( getDefaultBlockName(), attributes );
+
 	return {
-		type: 'APPEND_DEFAULT_BLOCK',
-		attributes,
-		rootUID,
+		...insertBlock( block, index, rootUID ),
+		isProvisional: true,
 	};
 }

@@ -1,12 +1,17 @@
 /**
+ * WordPress dependencies
+ */
+import { remove, replace } from '@wordpress/utils';
+
+/**
  * Browser dependencies
  */
 const { COMMENT_NODE } = window.Node;
 
 /**
- * Looks for `<!--more-->` comments, as well as the `<!--more Some text-->`
- * variant and its `<!--noteaser-->` companion, and replaces them with a custom
- * element representing a future block.
+ * Looks for `<!--nextpage-->` and `<!--more-->` comments, as well as the
+ * `<!--more Some text-->` variant and its `<!--noteaser-->` companion,
+ * and replaces them with a custom element representing a future block.
  *
  * The custom element is a way to bypass the rest of the `raw-handling`
  * transforms, which would eliminate other kinds of node with which to carry
@@ -19,44 +24,39 @@ const { COMMENT_NODE } = window.Node;
  * @return {void}
  */
 export default function( node ) {
-	if (
-		node.nodeType !== COMMENT_NODE ||
-		node.nodeValue.indexOf( 'more' ) !== 0
-	) {
-		// We don't specificially look for `noteaser`, meaning that if one is
-		// found on its own (and not adjacent to `more`), it will be lost.
+	if ( node.nodeType !== COMMENT_NODE ) {
 		return;
 	}
 
-	// Grab any custom text in the comment
-	const customText = node.nodeValue.slice( 4 ).trim();
+	if ( node.nodeValue === 'nextpage' ) {
+		replace( node, createNextpage() );
+		return;
+	}
 
-	// When a `<!--more-->` comment is found, we need to look for any
-	// `<!--noteaser-->` sibling, but it may not be a direct sibling
-	// (whitespace typically lies in between)
-	let sibling = node;
-	let noTeaser = false;
-	while ( ( sibling = sibling.nextSibling ) ) {
-		if (
-			sibling.nodeType === COMMENT_NODE &&
-			sibling.nodeValue === 'noteaser'
-		) {
-			noTeaser = true;
-			sibling.parentNode.removeChild( sibling );
-			break;
+	if ( node.nodeValue.indexOf( 'more' ) === 0 ) {
+		// Grab any custom text in the comment.
+		const customText = node.nodeValue.slice( 4 ).trim();
+
+		/*
+		 * When a `<!--more-->` comment is found, we need to look for any
+		 * `<!--noteaser-->` sibling, but it may not be a direct sibling
+		 * (whitespace typically lies in between)
+		 */
+		let sibling = node;
+		let noTeaser = false;
+		while ( ( sibling = sibling.nextSibling ) ) {
+			if (
+				sibling.nodeType === COMMENT_NODE &&
+				sibling.nodeValue === 'noteaser'
+			) {
+				noTeaser = true;
+				remove( sibling );
+				break;
+			}
 		}
-	}
 
-	// Conjure up a custom More element
-	const more = createMore( customText, noTeaser );
-
-	// Append it to the top level for later conversion to blocks
-	let parent = node.parentNode;
-	while ( parent.nodeName !== 'BODY' ) {
-		parent = parent.parentNode;
+		replace( node, createMore( customText, noTeaser ) );
 	}
-	parent.appendChild( more );
-	node.parentNode.removeChild( node );
 }
 
 function createMore( customText, noTeaser ) {
@@ -69,5 +69,12 @@ function createMore( customText, noTeaser ) {
 		// "Boolean" data attribute
 		node.dataset.noTeaser = '';
 	}
+	return node;
+}
+
+function createNextpage() {
+	const node = document.createElement( 'wp-block' );
+	node.dataset.block = 'core/nextpage';
+
 	return node;
 }

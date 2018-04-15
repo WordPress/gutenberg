@@ -37,6 +37,10 @@
 		background: $light-gray-200;
 		font-family: $editor-html-font;
 		font-size: 14px;
+
+		.is-multi-selected & {
+			background: darken( $blue-medium-highlight, 15% );
+		}
 	}
 
 	&:focus code[data-mce-selected] {
@@ -82,7 +86,7 @@
 		font-size: 4.1em;
 		line-height: 0.7;
 		font-family: serif;
-		font-weight: bold;
+		font-weight: 600;
 		margin: .07em .23em 0 0;
 		text-transform: uppercase;
 		font-style: normal;

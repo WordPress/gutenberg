@@ -8,8 +8,9 @@ import { isEmpty, map } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withContext, withInstanceId } from '@wordpress/components';
+import { withInstanceId } from '@wordpress/components';
 import { compose } from '@wordpress/element';
+import { withEditorSettings } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -54,7 +55,7 @@ const applyConnect = connect(
 	}
 );
 
-const applyWithContext = withContext( 'editor' )(
+const applyWithEditorSettings = withEditorSettings(
 	( settings ) => ( {
 		availableTemplates: settings.availableTemplates,
 	} )
@@ -62,6 +63,6 @@ const applyWithContext = withContext( 'editor' )(
 
 export default compose(
 	applyConnect,
-	applyWithContext,
+	applyWithEditorSettings,
 	withInstanceId,
 )( PageTemplate );

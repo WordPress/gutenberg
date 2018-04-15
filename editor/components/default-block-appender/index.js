@@ -1,57 +1,82 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { withContext } from '@wordpress/components';
+import { getDefaultBlockName, withEditorSettings } from '@wordpress/blocks';
+import { decodeEntities } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockDropZone from '../block-drop-zone';
-import { appendDefaultBlock, startTyping } from '../../store/actions';
-import { getBlock, getBlockCount } from '../../store/selectors';
+import InserterWithShortcuts from '../inserter-with-shortcuts';
+import Inserter from '../inserter';
 
-export function DefaultBlockAppender( { isLocked, isVisible, onAppend, showPrompt } ) {
+export function DefaultBlockAppender( {
+	isLocked,
+	isVisible,
+	onAppend,
+	showPrompt,
+	placeholder,
+	layout,
+	rootUID,
+} ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
 
+	const value = decodeEntities( placeholder ) || __( 'Write your story' );
+
 	return (
-		<div className="editor-default-block-appender">
-			<BlockDropZone />
+		<div
+			data-root-uid={ rootUID || '' }
+			className="editor-default-block-appender">
+			<BlockDropZone rootUID={ rootUID } layout={ layout } />
 			<input
+				role="button"
+				aria-label={ __( 'Add block' ) }
 				className="editor-default-block-appender__content"
 				type="text"
 				readOnly
 				onFocus={ onAppend }
 				onClick={ onAppend }
 				onKeyDown={ onAppend }
-				value={ showPrompt ? __( 'Write your story' ) : '' }
+				value={ showPrompt ? value : '' }
 			/>
+			<InserterWithShortcuts rootUID={ rootUID } layout={ layout } />
+			<Inserter position="top right" />
 		</div>
 	);
 }
 export default compose(
-	connect(
-		( state, ownProps ) => {
-			const isEmpty = ! getBlockCount( state, ownProps.rootUID );
-			const lastBlock = getBlock( state, ownProps.lastBlockUID );
-			const isLastBlockEmptyDefault = lastBlock && isUnmodifiedDefaultBlock( lastBlock );
+	withSelect( ( select, ownProps ) => {
+		const {
+			getBlockCount,
+			getBlock,
+		} = select( 'core/editor' );
+		const isEmpty = ! getBlockCount( ownProps.rootUID );
+		const lastBlock = getBlock( ownProps.lastBlockUID );
+		const isLastBlockDefault = get( lastBlock, 'name' ) === getDefaultBlockName();
 
-			return {
-				isVisible: isEmpty || ! isLastBlockEmptyDefault,
-				showPrompt: isEmpty,
-			};
-		},
-		( dispatch, ownProps ) => ( {
+		return {
+			isVisible: isEmpty || ! isLastBlockDefault,
+			showPrompt: isEmpty,
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const {
+			insertDefaultBlock,
+			startTyping,
+		} = dispatch( 'core/editor' );
+		return {
 			onAppend() {
 				const { layout, rootUID } = ownProps;
 
@@ -60,16 +85,17 @@ export default compose(
 					attributes = { layout };
 				}
 
-				dispatch( appendDefaultBlock( attributes, rootUID ) );
-				dispatch( startTyping() );
+				insertDefaultBlock( attributes, rootUID );
+				startTyping();
 			},
-		} )
-	),
-	withContext( 'editor' )( ( settings ) => {
-		const { templateLock } = settings;
+		};
+	} ),
+	withEditorSettings( ( settings ) => {
+		const { templateLock, bodyPlaceholder } = settings;
 
 		return {
 			isLocked: !! templateLock,
+			placeholder: bodyPlaceholder,
 		};
 	} ),
 )( DefaultBlockAppender );

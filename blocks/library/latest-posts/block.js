@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isUndefined, pickBy } from 'lodash';
+import { get, isUndefined, pickBy } from 'lodash';
 import moment from 'moment';
 import classnames from 'classnames';
 import { stringify } from 'querystringify';
@@ -11,7 +11,9 @@ import { stringify } from 'querystringify';
  */
 import { Component } from '@wordpress/element';
 import {
+	PanelBody,
 	Placeholder,
+	QueryControls,
 	RangeControl,
 	Spinner,
 	ToggleControl,
@@ -26,7 +28,6 @@ import { decodeEntities } from '@wordpress/utils';
  */
 import './editor.scss';
 import './style.scss';
-import QueryPanel from '../../query-panel';
 import InspectorControls from '../../inspector-controls';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
@@ -49,35 +50,37 @@ class LatestPostsBlock extends Component {
 
 	render() {
 		const latestPosts = this.props.latestPosts.data;
-		const { attributes, isSelected, setAttributes } = this.props;
+		const { attributes, categoriesList, isSelected, setAttributes } = this.props;
 		const { displayPostDate, align, layout, columns, order, orderBy, categories, postsToShow } = attributes;
 
 		const inspectorControls = isSelected && (
 			<InspectorControls key="inspector">
-				<h3>{ __( 'Latest Posts Settings' ) }</h3>
-				<QueryPanel
-					{ ...{ order, orderBy } }
-					numberOfItems={ postsToShow }
-					category={ categories }
-					onOrderChange={ ( value ) => setAttributes( { order: value } ) }
-					onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
-					onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
-					onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
-				/>
-				<ToggleControl
-					label={ __( 'Display post date' ) }
-					checked={ displayPostDate }
-					onChange={ this.toggleDisplayPostDate }
-				/>
-				{ layout === 'grid' &&
-					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ ( value ) => setAttributes( { columns: value } ) }
-						min={ 2 }
-						max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+				<PanelBody title={ __( 'Latest Posts Settings' ) }>
+					<QueryControls
+						{ ...{ order, orderBy } }
+						numberOfItems={ postsToShow }
+						categoriesList={ get( categoriesList, 'data', {} ) }
+						selectedCategoryId={ categories }
+						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
+						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
+						onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
+						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
 					/>
-				}
+					<ToggleControl
+						label={ __( 'Display post date' ) }
+						checked={ displayPostDate }
+						onChange={ this.toggleDisplayPostDate }
+					/>
+					{ layout === 'grid' &&
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ ( value ) => setAttributes( { columns: value } ) }
+							min={ 2 }
+							max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+						/>
+					}
+				</PanelBody>
 			</InspectorControls>
 		);
 
@@ -155,14 +158,19 @@ class LatestPostsBlock extends Component {
 
 export default withAPIData( ( props ) => {
 	const { postsToShow, order, orderBy, categories } = props.attributes;
-	const queryString = stringify( pickBy( {
+	const latestPostsQuery = stringify( pickBy( {
 		categories,
 		order,
 		orderBy,
 		per_page: postsToShow,
 		_fields: [ 'date_gmt', 'link', 'title' ],
 	}, value => ! isUndefined( value ) ) );
+	const categoriesListQuery = stringify( {
+		per_page: 100,
+		_fields: [ 'id', 'name', 'parent' ],
+	} );
 	return {
-		latestPosts: `/wp/v2/posts?${ queryString }`,
+		latestPosts: `/wp/v2/posts?${ latestPostsQuery }`,
+		categoriesList: `/wp/v2/categories?${ categoriesListQuery }`,
 	};
 } )( LatestPostsBlock );

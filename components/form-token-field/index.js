@@ -504,7 +504,7 @@ class FormTokenField extends Component {
 	render() {
 		const {
 			disabled,
-			placeholder = _( 'Add item.' ),
+			placeholder = __( 'Add item.' ),
 			instanceId,
 		} = this.props;
 		const classes = classnames( 'components-form-token-field', {

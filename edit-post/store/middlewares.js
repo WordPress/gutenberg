@@ -36,10 +36,8 @@ function applyMiddlewares( store ) {
 	chain = middlewares.map( middleware => middleware( middlewareAPI ) );
 	enhancedDispatch = flowRight( ...chain )( store.dispatch );
 
-	return {
-		...store,
-		dispatch: enhancedDispatch,
-	};
+	store.dispatch = enhancedDispatch;
+	return store;
 }
 
 export default applyMiddlewares;

@@ -11,10 +11,13 @@
 }
 
 .wp-block-video .components-placeholder__fieldset {
-	display: block;
 	max-width: 400px;
 
 	form {
 		max-width: none;
 	}
+}
+
+.editor-block-list__block[data-align="center"] {
+	text-align: center;
 }

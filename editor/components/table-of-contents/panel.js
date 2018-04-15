@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { countBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
@@ -16,12 +11,15 @@ import { withSelect } from '@wordpress/data';
 import WordCount from '../word-count';
 import DocumentOutline from '../document-outline';
 
-function TableOfContentsPanel( { blocks } ) {
-	const blockCount = countBy( blocks, 'name' );
-
+function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks } ) {
 	return (
 		<Fragment>
-			<div className="table-of-contents__counts">
+			<div
+				className="table-of-contents__counts"
+				role="note"
+				aria-label={ __( 'Document Statistics' ) }
+				tabIndex="0"
+			>
 				<div className="table-of-contents__count">
 					{ __( 'Words' ) }
 					<WordCount />
@@ -29,23 +27,23 @@ function TableOfContentsPanel( { blocks } ) {
 				<div className="table-of-contents__count">
 					{ __( 'Headings' ) }
 					<span className="table-of-contents__number">
-						{ blockCount[ 'core/heading' ] || 0 }
+						{ headingCount }
 					</span>
 				</div>
 				<div className="table-of-contents__count">
 					{ __( 'Paragraphs' ) }
 					<span className="table-of-contents__number">
-						{ blockCount[ 'core/paragraph' ] || 0 }
+						{ paragraphCount }
 					</span>
 				</div>
 				<div className="table-of-contents__count">
 					{ __( 'Blocks' ) }
 					<span className="table-of-contents__number">
-						{ blocks.length }
+						{ numberOfBlocks }
 					</span>
 				</div>
 			</div>
-			{ blockCount[ 'core/heading' ] > 0 && (
+			{ headingCount > 0 && (
 				<Fragment>
 					<hr />
 					<span className="table-of-contents__title">
@@ -59,7 +57,10 @@ function TableOfContentsPanel( { blocks } ) {
 }
 
 export default withSelect( ( select ) => {
+	const { getGlobalBlockCount } = select( 'core/editor' );
 	return {
-		blocks: select( 'core/editor' ).getBlocks(),
+		headingCount: getGlobalBlockCount( 'core/heading' ),
+		paragraphCount: getGlobalBlockCount( 'core/paragraph' ),
+		numberOfBlocks: getGlobalBlockCount(),
 	};
 } )( TableOfContentsPanel );

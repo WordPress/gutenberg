@@ -1,56 +1,73 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { clearSelectedBlock } from '../../store/actions';
+import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 class BlockSelectionClearer extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.bindContainer = this.bindContainer.bind( this );
-		this.onClick = this.onClick.bind( this );
+		this.clearSelectionIfFocusTarget = this.clearSelectionIfFocusTarget.bind( this );
 	}
 
 	bindContainer( ref ) {
 		this.container = ref;
 	}
 
-	onClick( event ) {
-		if ( event.target === this.container ) {
-			this.props.clearSelectedBlock();
+	/**
+	 * Clears the selected block on focus if the container is the target of the
+	 * focus. This assumes no other descendents have received focus until event
+	 * has bubbled to the container.
+	 *
+	 * @param {FocusEvent} event Focus event.
+	 */
+	clearSelectionIfFocusTarget( event ) {
+		const {
+			hasSelectedBlock,
+			hasMultiSelection,
+			clearSelectedBlock,
+		} = this.props;
+
+		const hasSelection = ( hasSelectedBlock || hasMultiSelection );
+		if ( event.target === this.container && hasSelection ) {
+			clearSelectedBlock();
 		}
 	}
 
 	render() {
-		const { ...props } = this.props;
-
-		// Disable reason: Clicking the canvas should clear the selection
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
 			<div
-				onMouseDown={ this.onClick }
-				onTouchStart={ this.onClick }
+				tabIndex={ -1 }
+				onFocus={ this.clearSelectionIfFocusTarget }
 				ref={ this.bindContainer }
-				{ ...omit( props, 'clearSelectedBlock' ) }
+				{ ...omit( this.props, [
+					'clearSelectedBlock',
+					'hasSelectedBlock',
+					'hasMultiSelection',
+				] ) }
 			/>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
-export default connect(
-	undefined,
-	{
-		clearSelectedBlock,
-	},
-)( BlockSelectionClearer );
+export default compose( [
+	withSelect( ( select ) => {
+		const { hasSelectedBlock, hasMultiSelection } = select( 'core/editor' );
+
+		return {
+			hasSelectedBlock: hasSelectedBlock(),
+			hasMultiSelection: hasMultiSelection(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { clearSelectedBlock } = dispatch( 'core/editor' );
+		return { clearSelectedBlock };
+	} ),
+] )( BlockSelectionClearer );

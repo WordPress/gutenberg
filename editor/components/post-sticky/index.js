@@ -27,7 +27,6 @@ export function PostSticky( { onUpdateSticky, postSticky = false, instanceId } )
 				key="toggle"
 				checked={ postSticky }
 				onChange={ () => onUpdateSticky( ! postSticky ) }
-				showHint={ false }
 				id={ stickyToggleId }
 			/>
 		</PostStickyCheck>

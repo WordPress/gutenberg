@@ -5,12 +5,11 @@ import {
 	replaceBlocks,
 	startTyping,
 	stopTyping,
-	fetchReusableBlocks,
-	updateReusableBlock,
-	saveReusableBlock,
-	deleteReusableBlock,
+	fetchSharedBlocks,
+	saveSharedBlock,
+	deleteSharedBlock,
 	convertBlockToStatic,
-	convertBlockToReusable,
+	convertBlockToShared,
 	toggleSelection,
 	setupEditor,
 	resetPost,
@@ -163,6 +162,7 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks: [ block ],
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -177,6 +177,7 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks,
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -187,10 +188,12 @@ describe( 'actions', () => {
 				uid: 'ribs',
 			};
 			const index = 5;
-			expect( insertBlock( block, index ) ).toEqual( {
+			expect( insertBlock( block, index, 'test_uid' ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks: [ block ],
 				index,
+				rootUID: 'test_uid',
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -201,10 +204,12 @@ describe( 'actions', () => {
 				uid: 'ribs',
 			} ];
 			const index = 3;
-			expect( insertBlocks( blocks, index ) ).toEqual( {
+			expect( insertBlocks( blocks, index, 'test_uid' ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks,
 				index,
+				rootUID: 'test_uid',
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -296,6 +301,7 @@ describe( 'actions', () => {
 			expect( removeBlocks( uids ) ).toEqual( {
 				type: 'REMOVE_BLOCKS',
 				uids,
+				selectPrevious: true,
 			} );
 		} );
 	} );
@@ -308,6 +314,14 @@ describe( 'actions', () => {
 				uids: [
 					uid,
 				],
+				selectPrevious: true,
+			} );
+			expect( removeBlock( uid, false ) ).toEqual( {
+				type: 'REMOVE_BLOCKS',
+				uids: [
+					uid,
+				],
+				selectPrevious: false,
 			} );
 		} );
 	} );
@@ -446,53 +460,34 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'fetchReusableBlocks', () => {
-		it( 'should return the FETCH_REUSABLE_BLOCKS action', () => {
-			expect( fetchReusableBlocks() ).toEqual( {
-				type: 'FETCH_REUSABLE_BLOCKS',
+	describe( 'fetchSharedBlocks', () => {
+		it( 'should return the FETCH_SHARED_BLOCKS action', () => {
+			expect( fetchSharedBlocks() ).toEqual( {
+				type: 'FETCH_SHARED_BLOCKS',
 			} );
 		} );
 
 		it( 'should take an optional id argument', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( fetchReusableBlocks( id ) ).toEqual( {
-				type: 'FETCH_REUSABLE_BLOCKS',
+			expect( fetchSharedBlocks( id ) ).toEqual( {
+				type: 'FETCH_SHARED_BLOCKS',
 				id,
 			} );
 		} );
 	} );
 
-	describe( 'updateReusableBlock', () => {
-		it( 'should return the UPDATE_REUSABLE_BLOCK action', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			const reusableBlock = {
-				id,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-			expect( updateReusableBlock( id, reusableBlock ) ).toEqual( {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id,
-				reusableBlock,
-			} );
-		} );
-	} );
-
-	describe( 'saveReusableBlock', () => {
+	describe( 'saveSharedBlock', () => {
 		const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( saveReusableBlock( id ) ).toEqual( {
-			type: 'SAVE_REUSABLE_BLOCK',
+		expect( saveSharedBlock( id ) ).toEqual( {
+			type: 'SAVE_SHARED_BLOCK',
 			id,
 		} );
 	} );
 
-	describe( 'deleteReusableBlock', () => {
+	describe( 'deleteSharedBlock', () => {
 		const id = 123;
-		expect( deleteReusableBlock( id ) ).toEqual( {
-			type: 'DELETE_REUSABLE_BLOCK',
+		expect( deleteSharedBlock( id ) ).toEqual( {
+			type: 'DELETE_SHARED_BLOCK',
 			id,
 		} );
 	} );
@@ -505,10 +500,10 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'convertBlockToReusable', () => {
+	describe( 'convertBlockToShared', () => {
 		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( convertBlockToReusable( uid ) ).toEqual( {
-			type: 'CONVERT_BLOCK_TO_REUSABLE',
+		expect( convertBlockToShared( uid ) ).toEqual( {
+			type: 'CONVERT_BLOCK_TO_SHARED',
 			uid,
 		} );
 	} );

@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { filter } from 'lodash';
+import { filter, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,6 +13,7 @@ import {
 	IconButton,
 	DropZone,
 	FormFileUpload,
+	PanelBody,
 	RangeControl,
 	SelectControl,
 	ToggleControl,
@@ -84,10 +85,7 @@ class GalleryBlock extends Component {
 
 	onSelectImages( images ) {
 		this.props.setAttributes( {
-			images: images.map( ( attributes ) => ( {
-				...attributes,
-				caption: attributes.caption ? [ attributes.caption ] : [],
-			} ) ),
+			images: images.map( ( image ) => pick( image, [ 'alt', 'caption', 'id', 'url' ] ) ),
 		} );
 	}
 
@@ -105,6 +103,10 @@ class GalleryBlock extends Component {
 
 	toggleImageCrop() {
 		this.props.setAttributes( { imageCrop: ! this.props.attributes.imageCrop } );
+	}
+
+	getImageCropHelp( checked ) {
+		return checked ? __( 'Thumbnails are cropped to align.' ) : __( 'Thumbnails are not cropped.' );
 	}
 
 	setImageAttributes( index, attributes ) {
@@ -137,7 +139,8 @@ class GalleryBlock extends Component {
 				setAttributes( {
 					images: currentImages.concat( images ),
 				} );
-			}
+			},
+			'image',
 		);
 	}
 
@@ -208,25 +211,27 @@ class GalleryBlock extends Component {
 			controls,
 			isSelected && (
 				<InspectorControls key="inspector">
-					<h2>{ __( 'Gallery Settings' ) }</h2>
-					{ images.length > 1 && <RangeControl
-						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ this.setColumnsNumber }
-						min={ 1 }
-						max={ Math.min( MAX_COLUMNS, images.length ) }
-					/> }
-					<ToggleControl
-						label={ __( 'Crop Images' ) }
-						checked={ !! imageCrop }
-						onChange={ this.toggleImageCrop }
-					/>
-					<SelectControl
-						label={ __( 'Link to' ) }
-						value={ linkTo }
-						onChange={ this.setLinkTo }
-						options={ linkOptions }
-					/>
+					<PanelBody title={ __( 'Gallery Settings' ) }>
+						{ images.length > 1 && <RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ this.setColumnsNumber }
+							min={ 1 }
+							max={ Math.min( MAX_COLUMNS, images.length ) }
+						/> }
+						<ToggleControl
+							label={ __( 'Crop Images' ) }
+							checked={ !! imageCrop }
+							onChange={ this.toggleImageCrop }
+							help={ this.getImageCropHelp }
+						/>
+						<SelectControl
+							label={ __( 'Link to' ) }
+							value={ linkTo }
+							onChange={ this.setLinkTo }
+							options={ linkOptions }
+						/>
+					</PanelBody>
 				</InspectorControls>
 			),
 			<ul key="gallery" className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
@@ -254,7 +259,9 @@ class GalleryBlock extends Component {
 							onChange={ this.uploadFromFiles }
 							accept="image/*"
 							icon="insert"
-						/>
+						>
+							{ __( 'Upload an image' ) }
+						</FormFileUpload>
 					</li>
 				}
 			</ul>,
