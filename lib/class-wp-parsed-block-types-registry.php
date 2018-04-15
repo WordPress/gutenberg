@@ -51,22 +51,13 @@ class WP_Parsed_Block_Types_Registry {
 			$block_type = $block_type->name;
 		}
 
-		if ( ! is_string( $block_type ) ) {
-			$message = __( 'Block type names must be strings.', 'gutenberg' );
-			_doing_it_wrong( __METHOD__, $message, '2.6.0' );
-			return false;
-		}
+		$block_type_validator = new WP_Block_Type_Validator();
+		$is_block_type_valid  = $block_type_validator->validate( $block_type );
 
-		if ( preg_match( '/[A-Z]+/', $block_type ) ) {
-			$message = __( 'Block type names must not contain uppercase characters.', 'gutenberg' );
-			_doing_it_wrong( __METHOD__, $message, '2.6.0' );
-			return false;
-		}
+		if ( ! $is_block_type_valid ) {
+			$error_message = $block_type_validator->get_last_error();
+			_doing_it_wrong( __METHOD__, $error_message, '2.7.0' );
 
-		$name_matcher = '/^[a-z0-9-]+\/[a-z0-9-]+$/';
-		if ( ! preg_match( $name_matcher, $block_type ) ) {
-			$message = __( 'Block type names must contain a namespace prefix. Example: my-plugin/my-custom-block-type', 'gutenberg' );
-			_doing_it_wrong( __METHOD__, $message, '2.6.0' );
 			return false;
 		}
 
