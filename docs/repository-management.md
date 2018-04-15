@@ -38,7 +38,17 @@ We put issues into [milestones](https://github.com/wordpress/gutenberg/milestone
 
 - The next 2 releases we have milestones for (e.g. 2.2, 2.3).
 - [Feature Complete](https://github.com/WordPress/gutenberg/milestone/8): This includes big features and is what will be managing the vision of Gutenberg. All of this would be done before even merge proposal is thought about. Examples here include nesting, drag and drop and extensibility API.
-- [Merge Proposal](https://github.com/WordPress/gutenberg/milestone/22): This will grow over time and include for now most likely bugs and API issues.
+- [Merge Proposal: Editor](https://github.com/WordPress/gutenberg/milestone/22): All issues related to merge proposal for the editor.
+- [Merge Proposal: Rest API](https://github.com/WordPress/gutenberg/milestone/39): All issues related to merge proposal for the Rest API
+- [Merge Proposal: Accessibility](https://github.com/WordPress/gutenberg/milestone/43): All accessibility issues related to merge proposal.
+- [Merge Proposal: Media](https://github.com/WordPress/gutenberg/milestone/42): All issues related to merge proposal for the media component.
+- [Merge Proposal: Documentation](https://github.com/WordPress/gutenberg/milestone/50): All issues related to documenation for the merge proposal.
+- [Merge Proposal: i18n](https://github.com/WordPress/gutenberg/milestone/49): All translation issues for the merge proposal.
+- [Merge Proposal: Customziation](https://github.com/WordPress/gutenberg/milestone/44): All Customization issues for the merge proposal.
+- [Merge Proposal: Plugin](https://github.com/WordPress/gutenberg/milestone/48): All plugin and extensibility issues for the merge proposal.
+- [Merge Proposal: Back Compat](https://github.com/WordPress/gutenberg/milestone/47): All back compatibility issues for the merge proposal.
+- [Merge Proposal: Themes](https://github.com/WordPress/gutenberg/milestone/48): All theme issues for the merge proposal.
+- [Merge Proposal: Core](https://github.com/WordPress/gutenberg/milestone/45): All core issues for the merge proposal that don't fit other merge proposal milestones.
 - [Bonus Features](https://github.com/WordPress/gutenberg/milestone/32): Again likely not part of triage and includes nice to haves for the project, if time before merge. A few examples include collaborative editing and footnotes.
 - [Future](https://github.com/WordPress/gutenberg/milestone/35): this is something that is confirmed by everyone as a good thing but doesn’t fall into other criteria.
 
