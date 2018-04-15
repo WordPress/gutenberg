@@ -53,7 +53,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	/**
 	 * Test dynamic blocks that lack content, including void blocks.
 	 *
-	 * @covers ::do_blocks
+	 * @covers ::gutenberg_render_dynamic_blocks
 	 */
 	function test_dynamic_block_rendering() {
 		$settings = array(
@@ -74,14 +74,14 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			'<!-- wp:core/dummy {"value":"b2"} /-->' .
 			'after';
 
-		$updated_post_content = do_blocks( $post_content );
+		$updated_post_content = gutenberg_render_dynamic_blocks( $post_content );
 		$this->assertEquals( $updated_post_content,
 			'before' .
-			'1:b1' .
-			'2:b1' .
+			'<!-- wp:core/dummy {"value":"b1"} -->' . '1:b1' . '<!-- /wp:core/dummy -->' .
+			'<!-- wp:core/dummy {"value":"b1"} -->' . '2:b1' . '<!-- /wp:core/dummy -->' .
 			'between' .
-			'3:b2' .
-			'4:b2' .
+			'<!-- wp:core/dummy {"value":"b2"} /-->' . '3:b2' .
+			'<!-- wp:core/dummy {"value":"b2"} /-->' . '4:b2' .
 			'after'
 		);
 	}
