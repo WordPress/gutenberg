@@ -13,6 +13,7 @@ class wpi18nExtractor {
 			'sprintf',
 		];
 		this.options = options || {};
+		this.options.aliases = this.options.aliases || {};
 		this.options.filename = this.options.filename || 'translation-map.json';
 		this.translationMap = {};
 		this.functionNames = this.options.functionNames || DEFAULT_FUNCTIONS;
@@ -116,9 +117,14 @@ class wpi18nExtractor {
 			translationMap,
 			parseSourcesToMap,
 		} = extractor;
+		let chunkName;
 		forEach( chunks, function( chunk ) {
 			if ( chunk.name ) {
-				parseSourcesToMap( chunk._modules, chunk.name, extractor );
+				//get chunk.name from alias if it exists
+				chunkName = options.aliases.hasOwnProperty(chunk.name)
+					? options.aliases[chunk.name]
+					: chunk.name;
+				parseSourcesToMap( chunk._modules, chunkName, extractor );
 			}
 		} );
 		writeFileSync( './' + options.filename,

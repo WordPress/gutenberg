@@ -19,15 +19,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 2.6.x
  *
  * @param string $handle     Name of the script being registered.
- * @param string $chunk_name Name of the script chunk corresponding to the script handle.
  * @param string $domain     i18n domain.
  */
-function gutenberg_register_script_i18n( $handle, $chunk_name, $domain = '' ) {
+function gutenberg_register_script_i18n( $handle, $domain = '' ) {
 	static $gb_scripts;
 	if ( ! $gb_scripts instanceof GB_Scripts ) {
 		$gb_scripts = new GB_Scripts();
 	}
-	$gb_scripts->register_script_i18n( $handle, $chunk_name, $domain );
+	$gb_scripts->register_script_i18n( $handle, $domain );
 }
 
 

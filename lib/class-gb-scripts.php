@@ -31,52 +31,51 @@ class GB_Scripts {
 
 
 	/**
-	 * Obtained from the generated json file from the all javascript using wp.i18n with a map of chunk names to
+	 * Obtained from the generated json file from the all javascript using wp.i18n with a map of script handle names to
 	 * translation strings.
 	 *
 	 * @var array
 	 */
-	private $chunk_map;
-
-
+	private $i18n_map;
+	
+	
 	/**
 	 * GB_Scripts constructor.
 	 *
-	 * @param array() $chunk_map  An array of chunks and the strings translated for those chunks.  If not provided class
-	 *                            will look for map in root of plugin with filename of 'translation-map.json'.
+	 * @param array() $i18n_map  An array of script handle names and the strings translated for those handles.  If not
+	 *                            provided, the class will look for map in root of plugin with filename of
+	 *                            'translation-map.json'.
 	 */
-	public function __construct( $chunk_map = array() ) {
-		$this->set_chunk_map( $chunk_map );
+	public function __construct( $i18n_map = array() ) {
+		$this->set_chunk_map( $i18n_map );
 		add_filter( 'print_scripts_array', array( $this, 'queue_i18n' ) );
 	}
-
-
+	
+	
 	/**
-	 * Used to register a script that has i18n strings for its $chunk_name
+	 * Used to register a script that has i18n strings for its $handle
 	 *
-	 * @param string $handle    The script handle reference.
-	 * @param string $chunk_name The name used for the script chunk in the build process.  Should correspond to the an
-	 *                           index for strings in the translation-map.json.
-	 * @param string $domain    The i18n domain for the strings.
+	 * @param string $handle The script handle reference.
+	 * @param string $domain The i18n domain for the strings.
 	 */
-	public function register_script_i18n( $handle, $chunk_name, $domain ) {
-		$this->registered_i18n[ $handle ] = array( $chunk_name, $domain );
+	public function register_script_i18n( $handle, $domain ) {
+		$this->registered_i18n[ $handle ] = $domain;
 	}
 
 
 	/**
-	 * Callback on print_scripts_array to listen for scripts enqueued and handle seting up the localized data.
+	 * Callback on print_scripts_array to listen for scripts enqueued and handle setting up the localized data.
 	 *
 	 * @param array $handles Array of registered script handles.
 	 *
 	 * @return array
 	 */
 	public function queue_i18n( $handles ) {
-		if ( empty( $this->registered_i18n ) || empty( $this->chunk_map ) ) {
+		if ( empty( $this->registered_i18n ) || empty( $this->i18n_map ) ) {
 			return $handles;
 		}
 		foreach ( (array) $handles as $handle ) {
-			$this->queue_i18n_chunk_for_handle( $handle );
+			$this->queue_i18n_translations_for_handle( $handle );
 		}
 		if ( $this->queued_chunk_translations ) {
 			foreach ( $this->queued_chunk_translations as $handle => $translations_for_domain ) {
@@ -116,14 +115,14 @@ class GB_Scripts {
 	 *
 	 * @param string $handle  The script handle being queued up.
 	 */
-	private function queue_i18n_chunk_for_handle( $handle ) {
+	private function queue_i18n_translations_for_handle( $handle ) {
 		if ( isset( $this->registered_i18n[ $handle ] ) ) {
-			list( $chunk, $domain ) = $this->registered_i18n[ $handle ];
-			$translations           = $this->get_jed_locale_data_for_domain_and_chunk( $chunk, $domain );
+			$domain = $this->registered_i18n[ $handle ];
+			$translations           = $this->get_jed_locale_data_for_domain_and_chunk( $handle, $domain );
 			if ( count( $translations ) > 1 ) {
 				$this->queued_chunk_translations[ $handle ] = array(
 					'domain'       => $domain,
-					'translations' => $this->get_jed_locale_data_for_domain_and_chunk( $chunk, $domain ),
+					'translations' => $translations
 				);
 			}
 			unset( $this->registered_i18n[ $handle ] );
@@ -132,38 +131,38 @@ class GB_Scripts {
 
 
 	/**
-	 * Sets the internal chunk_map property.
+	 * Sets the internal i18n_map property.
 	 *
 	 * If $chunk_map is empty or not an array, will attempt to load a chunk map from a default named map.
 	 *
-	 * @param array $chunk_map If provided, an array of translation strings indexed by script chunk_names they
+	 * @param array $i18n_map  If provided, an array of translation strings indexed by script handle names they
 	 *                         correspond to.
 	 */
-	private function set_chunk_map( $chunk_map ) {
-		if ( empty( $chunk_map ) || ! is_array( $chunk_map ) ) {
-			$chunk_map = json_decode(
+	private function set_chunk_map( $i18n_map ) {
+		if ( empty( $i18n_map ) || ! is_array( $i18n_map ) ) {
+			$i18n_map = json_decode(
 				file_get_contents( gutenberg_dir_path() . 'translation-map.json' ),
 				true
 			);
 		}
-		$this->chunk_map = $chunk_map;
+		$this->i18n_map = $i18n_map;
 	}
 
 
 	/**
-	 * Get the jed locale data for a given chunk and domain
+	 * Get the jed locale data for a given $handle and domain
 	 *
-	 * @param string $chunk_name  The name for the script chunk we want strings returned from.
-	 * @param string $domain      The i18n domain.
+	 * @param string $handle The name for the script handle we want strings returned for.
+	 * @param string $domain The i18n domain.
 	 *
 	 * @return array
 	 */
-	protected function get_jed_locale_data_for_domain_and_chunk( $chunk_name, $domain ) {
+	protected function get_jed_locale_data_for_domain_and_chunk( $handle, $domain ) {
 		$translations = gutenberg_get_jed_locale_data( $domain );
 		// get index for adding back after extracting strings for this $chunk.
 		$index            = $translations[''];
 		$translations     = $this->get_locale_data_matching_map(
-			$this->get_original_strings_for_chunk_from_map( $chunk_name ),
+			$this->get_original_strings_for_handle_from_map( $handle ),
 			$translations
 		);
 		$translations[''] = $index;
@@ -193,11 +192,11 @@ class GB_Scripts {
 	/**
 	 * Get original strings to translate for the given chunk from the map
 	 *
-	 * @param string $chunk_name    The script chunk name to get strings from the map for.
+	 * @param string $handle The script handle name to get strings from the map for.
 	 *
 	 * @return array
 	 */
-	protected function get_original_strings_for_chunk_from_map( $chunk_name ) {
-		return isset( $this->chunk_map[ $chunk_name ] ) ? $this->chunk_map[ $chunk_name ] : array();
+	protected function get_original_strings_for_handle_from_map( $handle ) {
+		return isset( $this->i18n_map[ $handle ] ) ? $this->i18n_map[ $handle ] : array();
 	}
 }

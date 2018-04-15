@@ -52,7 +52,7 @@ const extractConfig = {
 };
 
 /**
- * Given a string, returns a new string with dash separators converedd to
+ * Given a string, returns a new string with dash separators converted to
  * camel-case equivalent. This is not as aggressive as `_.camelCase` in
  * converting to uppercase, where Lodash will convert letters following
  * numbers.
@@ -101,6 +101,8 @@ const externals = {
 	'lodash-es': 'lodash',
 };
 
+const aliases = {};
+
 [
 	...entryPointNames,
 	...packageNames,
@@ -109,6 +111,7 @@ const externals = {
 	externals[ `@wordpress/${ name }` ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
 	};
+	aliases[ camelCaseDash( name ) ] = 'wp-' + name;
 } );
 
 const config = {
@@ -179,7 +182,7 @@ const config = {
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
-		new wpi18nExtractor(),
+		new wpi18nExtractor( { aliases } ),
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',

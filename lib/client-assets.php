@@ -836,22 +836,22 @@ function gutenberg_capture_code_editor_settings( $settings ) {
  * @since 2.6.x
  */
 function gutenberg_register_wpi18n_for_scripts() {
-	$handles_and_chunks = array(
-		'wp-data'       => 'data',
-		'wp-core-data'  => 'coreData',
-		'wp-utils'      => 'utils',
-		'wp-hooks'      => 'hooks',
-		'wp-date'       => 'date',
-		'wp-element'    => 'element',
-		'wp-components' => 'components',
-		'wp-blocks'     => 'blocks',
-		'wp-viewport'   => 'viewport',
-		'wp-editor'     => 'editor',
-		'wp-edit-post'  => 'editPost',
-		'wp-plugins'    => 'plugins',
+	$handles = array(
+		'wp-data',
+		'wp-core-data',
+		'wp-utils',
+		'wp-hooks',
+		'wp-date',
+		'wp-element',
+		'wp-components',
+		'wp-blocks',
+		'wp-viewport',
+		'wp-editor',
+		'wp-edit-post',
+		'wp-plugins',
 	);
-	foreach ( $handles_and_chunks as $handle => $chunk ) {
-		gutenberg_register_script_i18n( $handle, $chunk );
+	foreach ( $handles as $handle ) {
+		gutenberg_register_script_i18n( $handle );
 	}
 }
 
