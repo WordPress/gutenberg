@@ -68,7 +68,9 @@ class WP_Parsed_Block_Types_Registry {
 			return false;
 		}
 
-		$this->block_types_in_current_page[] = $block_type;
+		if ( ! in_array( $block_type, $this->block_types_in_current_page ) ) {
+			array_push( $this->block_types_in_current_page, $block_type );
+		}
 
 		return true;
 	}
