@@ -17,7 +17,7 @@ export default function QueryControls( {
 	selectedCategoryId,
 	numberOfItems,
 	order,
-	orderBy,
+	orderby,
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
 	onCategoryChange,
@@ -30,7 +30,7 @@ export default function QueryControls( {
 			<SelectControl
 				key="query-controls-order-select"
 				label={ __( 'Order by' ) }
-				value={ `${ orderBy }/${ order }` }
+				value={ `${ orderby }/${ order }` }
 				options={ [
 					{
 						label: __( 'Newest to Oldest' ),
@@ -56,7 +56,7 @@ export default function QueryControls( {
 					if ( newOrder !== order ) {
 						onOrderChange( newOrder );
 					}
-					if ( newOrderBy !== orderBy ) {
+					if ( newOrderBy !== orderby ) {
 						onOrderByChange( newOrderBy );
 					}
 				} }
