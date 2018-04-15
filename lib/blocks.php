@@ -210,7 +210,7 @@ function gutenberg_render_dynamic_blocks( $content ) {
 				break;
 			}
 
-			// Update content to omit text up to and including closing tag.
+			// Update content to omit text up to the closing tag.
 			$end_tag    = $block_match_end[0][0];
 			$end_offset = $block_match_end[0][1];
 
