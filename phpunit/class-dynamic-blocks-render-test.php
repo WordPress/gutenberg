@@ -77,11 +77,11 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 		$updated_post_content = gutenberg_render_dynamic_blocks( $post_content );
 		$this->assertEquals( $updated_post_content,
 			'before' .
-			'<!-- wp:core/dummy {"value":"b1"} -->'.'1:b1' .'<!-- /wp:core/dummy -->'.
-			'<!-- wp:core/dummy {"value":"b1"} -->'.'2:b1' .'<!-- /wp:core/dummy -->'.
+			'<!-- wp:core/dummy {"value":"b1"} -->' . '1:b1' . '<!-- /wp:core/dummy -->' .
+			'<!-- wp:core/dummy {"value":"b1"} -->' . '2:b1' . '<!-- /wp:core/dummy -->' .
 			'between' .
-			'<!-- wp:core/dummy {"value":"b2"} /-->' .'3:b2' .
-			'<!-- wp:core/dummy {"value":"b2"} /-->' .'4:b2' .
+			'<!-- wp:core/dummy {"value":"b2"} /-->' . '3:b2' .
+			'<!-- wp:core/dummy {"value":"b2"} /-->' . '4:b2' .
 			'after'
 		);
 	}
