@@ -7,3 +7,5 @@ import './custom-class-name';
 import './default-autocompleters';
 import './generated-class-name';
 import './layout';
+
+export { defaultAutocompleters } from './default-autocompleters';
