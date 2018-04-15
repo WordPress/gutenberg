@@ -38,9 +38,8 @@ class WP_Block_Type_Validator {
 
 		if ( ! is_string( $name ) ) {
 			$message = __( 'Block type names must be strings.', 'gutenberg' );
-
 			$this->set_error( $message );
-			_doing_it_wrong( __METHOD__, $message, '0.1.0' );
+
 			return false;
 		}
 
@@ -48,7 +47,6 @@ class WP_Block_Type_Validator {
 			$message = __( 'Block type names must not contain uppercase characters.', 'gutenberg' );
 			$this->set_error( $message );
 
-			_doing_it_wrong( __METHOD__, $message, '1.5.0' );
 			return false;
 		}
 
@@ -57,7 +55,6 @@ class WP_Block_Type_Validator {
 			$message = __( 'Block type names must contain a namespace prefix. Example: my-plugin/my-custom-block-type', 'gutenberg' );
 			$this->set_error( $message );
 
-			_doing_it_wrong( __METHOD__, $message, '0.1.0' );
 			return false;
 		}
 
