@@ -37,8 +37,8 @@ class GB_Scripts {
 	 * @var array
 	 */
 	private $i18n_map;
-	
-	
+
+
 	/**
 	 * GB_Scripts constructor.
 	 *
@@ -50,8 +50,8 @@ class GB_Scripts {
 		$this->set_chunk_map( $i18n_map );
 		add_filter( 'print_scripts_array', array( $this, 'queue_i18n' ) );
 	}
-	
-	
+
+
 	/**
 	 * Used to register a script that has i18n strings for its $handle
 	 *
@@ -113,12 +113,12 @@ class GB_Scripts {
 	 */
 	private function queue_i18n_translations_for_handle( $handle ) {
 		if ( isset( $this->registered_i18n[ $handle ] ) ) {
-			$domain = $this->registered_i18n[ $handle ];
-			$translations           = $this->get_jed_locale_data_for_domain_and_chunk( $handle, $domain );
+			$domain       = $this->registered_i18n[ $handle ];
+			$translations = $this->get_jed_locale_data_for_domain_and_chunk( $handle, $domain );
 			if ( count( $translations ) > 1 ) {
 				$this->queued_chunk_translations[ $handle ] = array(
 					'domain'       => $domain,
-					'translations' => $translations
+					'translations' => $translations,
 				);
 			}
 			unset( $this->registered_i18n[ $handle ] );

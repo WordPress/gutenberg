@@ -121,9 +121,9 @@ class wpi18nExtractor {
 		forEach( chunks, function( chunk ) {
 			if ( chunk.name ) {
 				//get chunk.name from alias if it exists
-				chunkName = options.aliases.hasOwnProperty(chunk.name)
-					? options.aliases[chunk.name]
-					: chunk.name;
+				chunkName = options.aliases.hasOwnProperty( chunk.name ) ?
+					options.aliases[ chunk.name ] :
+					chunk.name;
 				parseSourcesToMap( chunk._modules, chunkName, extractor );
 			}
 		} );
