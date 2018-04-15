@@ -176,8 +176,8 @@ function gutenberg_render_dynamic_blocks( $content ) {
 		}
 
 		// Since content is a working copy since the last match, append to
-		// rendered content up to the matched offset...
-		$rendered_content .= substr( $content, 0, $offset );
+		// rendered content up to the matched offset (including the opening tag)...
+		$rendered_content .= substr( $content, 0, $offset + strlen( $opening_tag ) );
 
 		// ...then update the working copy of content.
 		$content = substr( $content, $offset + strlen( $opening_tag ) );
@@ -214,7 +214,7 @@ function gutenberg_render_dynamic_blocks( $content ) {
 			$end_tag    = $block_match_end[0][0];
 			$end_offset = $block_match_end[0][1];
 
-			$content = substr( $content, $end_offset + strlen( $end_tag ) );
+			$content = substr( $content, $end_offset );
 		}
 	}
 
@@ -284,4 +284,4 @@ function gutenberg_process_block_comment( $matches ) {
  * gutenberg_render_dynamic_blocks() will get executed before gutenberg_strip_block_comments()
  */
 add_filter( 'the_content', 'gutenberg_render_dynamic_blocks', 9 ); // BEFORE do_shortcode().
-add_filter( 'the_content', 'gutenberg_strip_block_comments', 9 ); // AFTER the above filter.
+add_filter( 'the_content', 'gutenberg_strip_block_comments', 9 );  // AFTER the above filter.
