@@ -753,6 +753,11 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 
 	$is_post_or_page = is_single() || is_page();
 
+	// Triggers parsing of post's content so as to save block types present in the post and to strip block comments from the HTML.
+	if ( $is_post_or_page ) {
+		gutenberg_trigger_block_comments_processing();
+	}
+
 	$enqueue_only_required_styles  = $is_front_end && $is_post_or_page;
 	$enqueue_styles_for_all_blocks = ! $enqueue_only_required_styles;
 
@@ -801,7 +806,6 @@ function gutenberg_trigger_block_comments_processing() {
 	$post->post_content = gutenberg_process_block_comments( $post->post_content );
 }
 
-add_action( 'enqueue_block_assets', 'gutenberg_trigger_block_comments_processing' );
 add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 
