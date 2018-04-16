@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { overEvery, find, findLast, reverse, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import {
 	keycodes,
 	focus,
@@ -18,22 +17,12 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import {
-	getPreviousBlockUid,
-	getNextBlockUid,
-	getMultiSelectedBlocksStartUid,
-	getMultiSelectedBlocks,
-	getSelectedBlock,
-} from '../../store/selectors';
-import {
-	multiSelect,
-	selectBlock,
-} from '../../store/actions';
 import {
 	isBlockFocusStop,
 	isInSameBlock,
@@ -267,16 +256,28 @@ class WritingFlow extends Component {
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		previousBlockUid: getPreviousBlockUid( state ),
-		nextBlockUid: getNextBlockUid( state ),
-		selectionStart: getMultiSelectedBlocksStartUid( state ),
-		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
-		selectedBlockUID: get( getSelectedBlock( state ), [ 'uid' ] ),
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getPreviousBlockUid,
+			getNextBlockUid,
+			getMultiSelectedBlocksStartUid,
+			getMultiSelectedBlocks,
+			getSelectedBlock,
+		} = select( 'core/editor' );
+		return {
+			previousBlockUid: getPreviousBlockUid(),
+			nextBlockUid: getNextBlockUid(),
+			selectionStart: getMultiSelectedBlocksStartUid(),
+			hasMultiSelection: getMultiSelectedBlocks().length > 1,
+			selectedBlockUID: get( getSelectedBlock(), [ 'uid' ] ),
+		};
 	} ),
-	{
-		onMultiSelect: multiSelect,
-		onSelectBlock: selectBlock,
-	}
-)( WritingFlow );
+	withDispatch( ( dispatch ) =>{
+		const { multiSelect, selectBlock } = dispatch( 'core/editor' );
+		return {
+			onMultiSelect: multiSelect,
+			onSelectBlock: selectBlock,
+		};
+	} ),
+] )( WritingFlow );

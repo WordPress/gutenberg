@@ -1,13 +1,16 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { find } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
-import { getEditedPostVisibility } from '../../store/selectors';
 import { visibilityOptions } from './utils';
 
 function PostVisibilityLabel( { visibility } ) {
@@ -16,8 +19,6 @@ function PostVisibilityLabel( { visibility } ) {
 	return getVisibilityLabel( visibility );
 }
 
-export default connect(
-	( state ) => ( {
-		visibility: getEditedPostVisibility( state ),
-	} )
-)( PostVisibilityLabel );
+export default withSelect( ( select ) => ( {
+	visibility: select( 'core/editor' ).getEditedPostVisibility(),
+} ) )( PostVisibilityLabel );
