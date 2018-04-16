@@ -751,7 +751,7 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 	$is_editor    = ( 'enqueue_block_editor_assets' === current_action() );
 	$is_front_end = ! $is_editor;
 
-	$is_post_or_page = is_single() || is_page();
+	$is_post_or_page = is_singular( array( 'post', 'page') );
 
 	// Triggers parsing of post's content so as to save block types present in the post and to strip block comments from the HTML.
 	if ( $is_post_or_page ) {
