@@ -1,20 +1,15 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { Notice, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { isValidTemplate } from '../../store/selectors';
-import { setTemplateValidity, synchronizeTemplate } from '../../store/actions';
 
 function TemplateValidationNotice( { isValid, ...props } ) {
 	if ( isValid ) {
@@ -39,12 +34,15 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		isValid: isValidTemplate( state ),
+export default compose( [
+	withSelect( ( select ) => ( {
+		isValid: select( 'core/editor' ).isValidTemplate(),
+	} ) ),
+	withDispatch( ( dispatch ) => {
+		const { setTemplateValidity, synchronizeTemplate } = dispatch( 'core/editor' );
+		return {
+			resetTemplateValidity: () => setTemplateValidity( true ),
+			synchronizeTemplate,
+		};
 	} ),
-	{
-		resetTemplateValidity: () => setTemplateValidity( true ),
-		synchronizeTemplate,
-	}
-)( TemplateValidationNotice );
+] )( TemplateValidationNotice );

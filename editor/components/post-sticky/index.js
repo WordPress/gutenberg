@@ -1,20 +1,14 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
 import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
 import PostStickyCheck from './check';
 
 export function PostSticky( { onUpdateSticky, postSticky = false, instanceId } ) {
@@ -33,22 +27,18 @@ export function PostSticky( { onUpdateSticky, postSticky = false, instanceId } )
 	);
 }
 
-const applyConnect = connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			postSticky: getEditedPostAttribute( state, 'sticky' ),
+			postSticky: select( 'core/editor' ).getEditedPostAttribute( 'sticky' ),
 		};
-	},
-	( dispatch ) => {
+	} ),
+	withDispatch( ( dispatch ) => {
 		return {
 			onUpdateSticky( postSticky ) {
-				dispatch( editPost( { sticky: postSticky } ) );
+				dispatch( 'core/editor' ).editPost( { sticky: postSticky } );
 			},
 		};
-	},
-);
-
-export default compose( [
-	applyConnect,
+	} ),
 	withInstanceId,
 ] )( PostSticky );
