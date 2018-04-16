@@ -142,7 +142,7 @@ export default class OldEditor extends Component {
 	onToolbarKeyDown( event ) {
 		// Prevent WritingFlow from kicking in and allow arrows navigation on the toolbar.
 		event.stopPropagation();
-		// Prevent Mousetrap to move focus to the top toolbar when pressing `alt+f10` on this block toolbar.
+		// Prevent Mousetrap from moving focus to the top toolbar when pressing `alt+f10` on this block toolbar.
 		event.nativeEvent.stopImmediatePropagation();
 	}
 
