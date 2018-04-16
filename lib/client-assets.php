@@ -787,23 +787,21 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 }
 
 /**
- * Parses block types present in the current post/page while stripping block comments.
- * It calls apply_filters() on 'the_content' before starting to strip block comments so that
- * block types added by plugins (through filters on 'the_content') can also be parsed.
- *
- * The gutenberg_strip_block_comments() function contains the actual logic for
- * parsing and stripping block comments
+ * Calls gutenberg_process_block_comments() to parse block types present in the
+ * current post/page while stripping block comments. It calls apply_filters() on
+ * 'the_content' before starting to strip block comments so that block types added by
+ * plugins (through filters added uptil now on 'the_content') can also be parsed.
  *
  * @since 2.7.0
  */
-function parse_block_types_while_stripping_comments() {
+function gutenberg_trigger_block_comments_processing() {
 	global $post;
 
 	$post->post_content = apply_filters( 'the_content', $post->post_content );
-	$post->post_content = gutenberg_strip_block_comments( $post->post_content );
+	$post->post_content = gutenberg_process_block_comments( $post->post_content );
 }
 
-add_action( 'enqueue_block_assets', 'parse_block_types_while_stripping_comments' );
+add_action( 'enqueue_block_assets', 'gutenberg_trigger_block_comments_processing' );
 add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 

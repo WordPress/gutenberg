@@ -183,8 +183,7 @@ function gutenberg_render_dynamic_blocks( $content ) {
 		$content = substr( $content, $offset + strlen( $opening_tag ) );
 
 		// Make implicit core namespace explicit.
-		$is_implicit_core_namespace = ( false === strpos( $block_name, '/' ) );
-		$normalized_block_name      = $is_implicit_core_namespace ? 'core/' . $block_name : $block_name;
+		$normalized_block_name = gutenberg_normalize_block_type( $block_name );
 
 		// Find registered block type. We can assume it exists since we use the
 		// `get_dynamic_block_names` function as a source for pattern matching.
@@ -225,9 +224,8 @@ function gutenberg_render_dynamic_blocks( $content ) {
 }
 
 /**
- * Strips block comments from the post's HTML. This is hooked as a filter
- * to 'the_content' and gets executed after dynamic blocks are rendered in
- * the post's HTML.
+ * Parses block types while stripping block comments from the post's HTML and
+ * calls WP_Parsed_Block_Types_Registry to save those parsed block types.
  *
  * It registers gutenberg_process_block_comment() as a callback function for
  * preg_replace_callback(). For each block comment (matched by the Regex) in
@@ -238,7 +236,7 @@ function gutenberg_render_dynamic_blocks( $content ) {
  * @param  string $content Post content.
  * @return string          Updated post content (without block comments)
  */
-function gutenberg_strip_block_comments( $content ) {
+function gutenberg_process_block_comments( $content ) {
 
 	$content = preg_replace_callback( '/<!--\s+\/?wp:.*?-->\r?\n?/m', 'gutenberg_process_block_comment', $content );
 
