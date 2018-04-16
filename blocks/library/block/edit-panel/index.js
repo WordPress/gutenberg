@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { Component, Fragment } from '@wordpress/element';
+import { Component, Fragment, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
 
@@ -20,8 +20,8 @@ class SharedBlockEditPanel extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindTitleRef = this.bindTitleRef.bind( this );
-		this.bindEditButtonRef = this.bindEditButtonRef.bind( this );
+		this.sharedBlockNameField = createRef();
+		this.editButton = createRef();
 		this.handleFormSubmit = this.handleFormSubmit.bind( this );
 		this.handleTitleChange = this.handleTitleChange.bind( this );
 		this.handleTitleKeyDown = this.handleTitleKeyDown.bind( this );
@@ -30,20 +30,12 @@ class SharedBlockEditPanel extends Component {
 	componentDidUpdate( prevProps ) {
 		// Select the input text only once when the form opens.
 		if ( ! prevProps.isEditing && this.props.isEditing ) {
-			this.titleRef.select();
+			this.sharedBlockNameField.current.select();
 		}
 		// Move focus back to the Edit button after pressing Save or Cancel.
 		if ( ! this.props.isEditing && ! this.props.isSaving ) {
-			this.editButton.focus();
+			this.editButton.current.focus();
 		}
-	}
-
-	bindTitleRef( ref ) {
-		this.titleRef = ref;
-	}
-
-	bindEditButtonRef( ref ) {
-		this.editButton = ref;
 	}
 
 	handleFormSubmit( event ) {
@@ -73,7 +65,7 @@ class SharedBlockEditPanel extends Component {
 							{ title }
 						</b>
 						<Button
-							ref={ this.bindEditButtonRef }
+							ref={ this.editButton }
 							isLarge
 							className="shared-block-edit-panel__button"
 							onClick={ onEdit }
@@ -85,7 +77,7 @@ class SharedBlockEditPanel extends Component {
 				{ ( isEditing || isSaving ) && (
 					<form className="shared-block-edit-panel" onSubmit={ this.handleFormSubmit }>
 						<input
-							ref={ this.bindTitleRef }
+							ref={ this.sharedBlockNameField }
 							type="text"
 							disabled={ isSaving }
 							className="shared-block-edit-panel__title"
