@@ -198,7 +198,6 @@ class ImageBlock extends Component {
 			'is-focused': isSelected,
 		} );
 
-		const figureStyle = width ? { width } : {};
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 
 		// Disable reason: Each block can be selected by clicking on it
@@ -287,7 +286,7 @@ class ImageBlock extends Component {
 					</PanelBody>
 				</InspectorControls>
 			),
-			<figure key="image" className={ classes } style={ figureStyle }>
+			<figure key="image" className={ classes }>
 				<ImageSize src={ url } dirtynessTrigger={ align }>
 					{ ( sizes ) => {
 						const {
