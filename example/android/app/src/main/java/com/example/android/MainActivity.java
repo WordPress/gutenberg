@@ -22,7 +22,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 
 import com.example.android.common.activities.SampleRNBaseActivity;
-import com.example.android.recyclerview.R;
 
 /**
  * A simple launcher activity containing a summary sample description, sample log and a custom

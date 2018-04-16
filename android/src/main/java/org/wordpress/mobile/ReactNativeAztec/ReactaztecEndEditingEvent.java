@@ -1,4 +1,4 @@
-package com.example.android.ReactAztec;
+package org.wordpress.mobile.ReactNativeAztec;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;

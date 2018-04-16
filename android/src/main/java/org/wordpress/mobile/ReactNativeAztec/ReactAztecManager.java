@@ -1,4 +1,4 @@
-package com.example.android.ReactAztec;
+package org.wordpress.mobile.ReactNativeAztec;
 
 
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.example.android.recyclerview.R;
+import org.wordpress.mobile.ReactNativeAztec.R;
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.common.MapBuilder;

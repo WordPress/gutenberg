@@ -1,4 +1,4 @@
-package com.example.android.ReactAztec;
+package org.wordpress.mobile.ReactNativeAztec;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
@@ -6,13 +6,13 @@ import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 /**
- * Event emitted by Aztec native view when it loses focus.
+ * Event emitted by Aztec native view when it receives focus.
  */
-class ReactAztecBlurEvent extends Event<ReactAztecBlurEvent> {
+class ReactAztecFocusEvent extends Event<ReactAztecFocusEvent> {
 
-  private static final String EVENT_NAME = "topBlur";
+  private static final String EVENT_NAME = "topFocus";
 
-  public ReactAztecBlurEvent(int viewId) {
+  public ReactAztecFocusEvent(int viewId) {
     super(viewId);
   }
 
