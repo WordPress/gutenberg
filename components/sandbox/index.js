@@ -1,15 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { Component, renderToString } from '@wordpress/element';
+import { Component, renderToString, createRef } from '@wordpress/element';
 
-export default class Sandbox extends Component {
+/**
+ * Internal dependencies
+ */
+import FocusableIframe from '../focusable-iframe';
+import withGlobalEvents from '../higher-order/with-global-events';
+
+class Sandbox extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.trySandbox = this.trySandbox.bind( this );
 		this.checkMessageForResize = this.checkMessageForResize.bind( this );
-		this.checkFocus = this.checkFocus.bind( this );
+
+		this.iframe = createRef();
 
 		this.state = {
 			width: 0,
@@ -17,16 +24,24 @@ export default class Sandbox extends Component {
 		};
 	}
 
+	componentDidMount() {
+		this.trySandbox();
+	}
+
+	componentDidUpdate() {
+		this.trySandbox();
+	}
+
 	isFrameAccessible() {
 		try {
-			return !! this.iframe.contentDocument.body;
+			return !! this.iframe.current.contentDocument.body;
 		} catch ( e ) {
 			return false;
 		}
 	}
 
 	checkMessageForResize( event ) {
-		const iframe = this.iframe;
+		const iframe = this.iframe.current;
 
 		// Attempt to parse the message data as JSON if passed as string
 		let data = event.data || {};
@@ -51,33 +66,12 @@ export default class Sandbox extends Component {
 		}
 	}
 
-	componentDidMount() {
-		window.addEventListener( 'message', this.checkMessageForResize, false );
-		window.addEventListener( 'blur', this.checkFocus );
-		this.trySandbox();
-	}
-
-	componentDidUpdate() {
-		this.trySandbox();
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener( 'message', this.checkMessageForResize );
-		window.removeEventListener( 'blur', this.checkFocus );
-	}
-
-	checkFocus() {
-		if ( this.props.onFocus && document.activeElement === this.iframe ) {
-			this.props.onFocus();
-		}
-	}
-
 	trySandbox() {
 		if ( ! this.isFrameAccessible() ) {
 			return;
 		}
 
-		const body = this.iframe.contentDocument.body;
+		const body = this.iframe.current.contentDocument.body;
 		if ( null !== body.getAttribute( 'data-resizable-iframe-connected' ) ) {
 			return;
 		}
@@ -172,9 +166,10 @@ export default class Sandbox extends Component {
 		// writing the document like this makes it act in the same way as if it was
 		// loaded over the network, so DOM creation and mutation, script execution, etc.
 		// all work as expected
-		this.iframe.contentWindow.document.open();
-		this.iframe.contentWindow.document.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
-		this.iframe.contentWindow.document.close();
+		const iframeDocument = this.iframe.current.contentWindow.document;
+		iframeDocument.open();
+		iframeDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
+		iframeDocument.close();
 	}
 
 	static get defaultProps() {
@@ -185,10 +180,12 @@ export default class Sandbox extends Component {
 	}
 
 	render() {
+		const { title } = this.props;
+
 		return (
-			<iframe
-				ref={ ( node ) => this.iframe = node }
-				title={ this.props.title }
+			<FocusableIframe
+				iframeRef={ this.iframe }
+				title={ title }
 				scrolling="no"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
 				onLoad={ this.trySandbox }
@@ -197,3 +194,9 @@ export default class Sandbox extends Component {
 		);
 	}
 }
+
+Sandbox = withGlobalEvents( {
+	message: 'checkMessageForResize',
+} )( Sandbox );
+
+export default Sandbox;

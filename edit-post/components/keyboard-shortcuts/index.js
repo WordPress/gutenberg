@@ -24,9 +24,12 @@ class EditorModeKeyboardShortcuts extends Component {
 
 	render() {
 		return (
-			<KeyboardShortcuts shortcuts={ {
-				[ shortcuts.toggleEditorMode.value ]: this.toggleMode,
-			} } />
+			<KeyboardShortcuts
+				bindGlobal
+				shortcuts={ {
+					[ shortcuts.toggleEditorMode.value ]: this.toggleMode,
+				} }
+			/>
 		);
 	}
 }

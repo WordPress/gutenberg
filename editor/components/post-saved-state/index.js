@@ -39,7 +39,7 @@ export class PostSavedState extends Component {
 		const { forceSavedMessage } = this.state;
 		if ( isSaving ) {
 			return (
-				<span className="editor-post-saved-state editor-post-saved-state__saving">
+				<span className="editor-post-saved-state is-saving">
 					<Dashicon icon="cloud" />
 					{ __( 'Saving' ) }
 				</span>
@@ -56,7 +56,7 @@ export class PostSavedState extends Component {
 
 		if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
 			return (
-				<span className="editor-post-saved-state">
+				<span className="editor-post-saved-state is-saved">
 					<Dashicon icon="saved" />
 					{ __( 'Saved' ) }
 				</span>

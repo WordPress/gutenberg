@@ -28,6 +28,7 @@ export default class OldEditor extends Component {
 		super( props );
 		this.initialize = this.initialize.bind( this );
 		this.onSetup = this.onSetup.bind( this );
+		this.focus = this.focus.bind( this );
 	}
 
 	componentDidMount() {
@@ -78,6 +79,8 @@ export default class OldEditor extends Component {
 		const { attributes: { content }, setAttributes } = this.props;
 		const { ref } = this;
 
+		this.editor = editor;
+
 		if ( content ) {
 			editor.on( 'loadContent', () => editor.setContent( content ) );
 		}
@@ -109,18 +112,38 @@ export default class OldEditor extends Component {
 				editor.dom.toggleClass( ref, 'has-advanced-toolbar', active );
 			},
 		} );
+
+		editor.on( 'init', () => {
+			const rootNode = this.editor.getBody();
+
+			// Create the toolbar by refocussing the editor.
+			if ( document.activeElement === rootNode ) {
+				rootNode.blur();
+				this.editor.focus();
+			}
+		} );
+	}
+
+	focus() {
+		if ( this.editor ) {
+			this.editor.focus();
+		}
 	}
 
 	render() {
-		const { isSelected, id } = this.props;
+		const { id } = this.props;
 
 		return [
+			// Disable reason: Clicking on this visual placeholder should create
+			// the toolbar, it can also be created by focussing the field below.
+			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 			<div
 				key="toolbar"
 				id={ `toolbar-${ id }` }
 				ref={ ref => this.ref = ref }
 				className="freeform-toolbar"
-				style={ ! isSelected ? { display: 'none' } : {} }
+				onClick={ this.focus }
+				data-placeholder={ __( 'Classic' ) }
 			/>,
 			<div
 				key="editor"

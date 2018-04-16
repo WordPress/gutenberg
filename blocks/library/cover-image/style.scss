@@ -71,4 +71,12 @@
 		height: inherit;
 	}
 
+	// Apply max-width to floated items that have no intrinsic width
+	[data-align="left"] &,
+	[data-align="right"] &,
+	&.alignleft,
+	&.alignright {
+		max-width: $content-width / 2;
+		width: 100%;
+	}
 }

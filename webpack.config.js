@@ -96,6 +96,8 @@ const externals = {
 	tinymce: 'tinymce',
 	moment: 'moment',
 	jquery: 'jQuery',
+	lodash: 'lodash',
+	'lodash-es': 'lodash',
 };
 
 [
@@ -134,6 +136,9 @@ const config = {
 			__dirname,
 			'node_modules',
 		],
+		alias: {
+			'lodash-es': 'lodash',
+		},
 	},
 	module: {
 		rules: [

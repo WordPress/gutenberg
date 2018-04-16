@@ -105,6 +105,10 @@ class GalleryBlock extends Component {
 		this.props.setAttributes( { imageCrop: ! this.props.attributes.imageCrop } );
 	}
 
+	getImageCropHelp( checked ) {
+		return checked ? __( 'Thumbnails are cropped to align.' ) : __( 'Thumbnails are not cropped.' );
+	}
+
 	setImageAttributes( index, attributes ) {
 		const { attributes: { images }, setAttributes } = this.props;
 		if ( ! images[ index ] ) {
@@ -219,6 +223,7 @@ class GalleryBlock extends Component {
 							label={ __( 'Crop Images' ) }
 							checked={ !! imageCrop }
 							onChange={ this.toggleImageCrop }
+							help={ this.getImageCropHelp }
 						/>
 						<SelectControl
 							label={ __( 'Link to' ) }

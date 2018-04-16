@@ -209,6 +209,28 @@ export function replaceBlock( uid, block ) {
 }
 
 /**
+ * Action creator creator which, given the action type to dispatch
+ * creates a prop dispatcher callback for
+ * managing block movement.
+ *
+ * @param {string}   type     Action type to dispatch.
+ *
+ * @return {Function} Prop dispatcher callback.
+ */
+function createOnMove( type ) {
+	return ( uids, rootUID ) => {
+		return {
+			type,
+			uids,
+			rootUID,
+		};
+	};
+}
+
+export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );
+export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
+
+/**
  * Returns an action object signalling that an indexed block should be moved
  * to a new index.
  *
@@ -334,6 +356,12 @@ export function editPost( edits ) {
 export function savePost() {
 	return {
 		type: 'REQUEST_POST_UPDATE',
+	};
+}
+
+export function refreshPost() {
+	return {
+		type: 'REFRESH_POST',
 	};
 }
 
