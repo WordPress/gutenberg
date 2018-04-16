@@ -84,6 +84,9 @@ module.name_mapper='@gutenberg' -> '<PROJECT_ROOT>/gutenberg'
 module.name_mapper='@wordpress/element' -> '<PROJECT_ROOT>/gutenberg/element'
 module.name_mapper='@wordpress/utils' -> '<PROJECT_ROOT>/gutenberg/utils'
 
+; mock/ignore style files
+module.name_mapper='.*\(.scss\)' -> 'empty/object'
+
 suppress_type=$FlowIssue
 suppress_type=$FlowFixMe
 suppress_type=$FlowFixMeProps

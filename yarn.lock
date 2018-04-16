@@ -2232,6 +2232,12 @@ emoji-regex@6.5.1, emoji-regex@^6.1.0:
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-6.5.1.tgz#9baea929b155565c11ea41c6626eaa65cef992c2"
 
+empty@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/empty/-/empty-0.10.1.tgz#de22fbe9fd0c0bc60cd904943a30eb222b67e042"
+  dependencies:
+    envify "^3.4.0"
+
 encodeurl@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/encodeurl/-/encodeurl-1.0.2.tgz#ad3ff4c86ec2d029322f5a02c3a9a606c95b3f59"
@@ -2242,7 +2248,7 @@ encoding@^0.1.11:
   dependencies:
     iconv-lite "~0.4.13"
 
-envify@^3.0.0:
+envify@^3.0.0, envify@^3.4.0:
   version "3.4.1"
   resolved "https://registry.yarnpkg.com/envify/-/envify-3.4.1.tgz#d7122329e8df1688ba771b12501917c9ce5cbce8"
   dependencies:
