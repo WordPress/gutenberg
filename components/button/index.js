@@ -29,6 +29,10 @@ class Button extends Component {
 		this.ref = ref;
 	}
 
+	focus() {
+		this.ref.focus();
+	}
+
 	render() {
 		const {
 			href,
