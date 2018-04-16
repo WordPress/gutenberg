@@ -45,7 +45,7 @@ public class MyFragment extends Fragment {
         ReactRootView reactRootView = new ReactRootView(getContext());
         Bundle RNProps = new Bundle();
         RNProps.putString("text", EXAMPLE);
-        reactRootView.startReactApplication(mReactInstanceManager, "RichTextInput", RNProps);
+        reactRootView.startReactApplication(mReactInstanceManager, "example", RNProps);
         return reactRootView;
     }
 
