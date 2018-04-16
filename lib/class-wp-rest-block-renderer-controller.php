@@ -59,9 +59,9 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 							'additionalProperties' => false,
 							'properties'           => $block_type->attributes,
 						),
-						'post_id'   => array(
-							'description'          => __( 'ID of the post context.', 'travel' ),
-							'type'                 => 'integer',
+						'post_id'    => array(
+							'description' => __( 'ID of the post context.', 'gutenberg' ),
+							'type'        => 'integer',
 						),
 					),
 				),
@@ -127,7 +127,7 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 
 		if ( null === $block ) {
 			return new WP_Error( 'gutenberg_block_invalid', __( 'Invalid block.', 'gutenberg' ), array(
-				'status' => 404
+				'status' => 404,
 			) );
 		}
 
