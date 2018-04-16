@@ -183,8 +183,7 @@ function gutenberg_render_dynamic_blocks( $content ) {
 		$content = substr( $content, $offset + strlen( $opening_tag ) );
 
 		// Make implicit core namespace explicit.
-		$is_implicit_core_namespace = ( false === strpos( $block_name, '/' ) );
-		$normalized_block_name      = $is_implicit_core_namespace ? 'core/' . $block_name : $block_name;
+		$normalized_block_name = gutenberg_normalize_block_type( $block_name );
 
 		// Find registered block type. We can assume it exists since we use the
 		// `get_dynamic_block_names` function as a source for pattern matching.
@@ -225,9 +224,8 @@ function gutenberg_render_dynamic_blocks( $content ) {
 }
 
 /**
- * Strips block comments from the post's HTML. This is hooked as a filter
- * to 'the_content' and gets executed after dynamic blocks are rendered in
- * the post's HTML.
+ * Parses block types while stripping block comments from the post's HTML and
+ * calls WP_Parsed_Block_Types_Registry to save those parsed block types.
  *
  * It registers gutenberg_process_block_comment() as a callback function for
  * preg_replace_callback(). For each block comment (matched by the Regex) in
@@ -238,7 +236,7 @@ function gutenberg_render_dynamic_blocks( $content ) {
  * @param  string $content Post content.
  * @return string          Updated post content (without block comments)
  */
-function gutenberg_strip_block_comments( $content ) {
+function gutenberg_process_block_comments( $content ) {
 
 	$content = preg_replace_callback( '/<!--\s+\/?wp:.*?-->\r?\n?/m', 'gutenberg_process_block_comment', $content );
 
@@ -278,10 +276,11 @@ function gutenberg_process_block_comment( $matches ) {
 	return '';
 }
 
-/*
- * If both filters have the same priority (9 in this case), they are executed
- * in the order in which they were added to the action. Therefore, in this case,
- * gutenberg_render_dynamic_blocks() will get executed before gutenberg_strip_block_comments()
- */
 add_filter( 'the_content', 'gutenberg_render_dynamic_blocks', 9 ); // BEFORE do_shortcode().
-add_filter( 'the_content', 'gutenberg_strip_block_comments', 9 );  // AFTER the above filter.
+
+/*
+ * This needs to run as late as possible so as to let plugins apply filters to content first.
+ * Have subtracted 1 from the priority since `enqueue_required_frontend_block_styles()`
+ * needs to run after this. Have given that filter PHP_INT_MAX priority.
+ */
+add_filter( 'the_content', 'gutenberg_process_block_comments', PHP_INT_MAX - 1 );
