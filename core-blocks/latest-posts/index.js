@@ -49,7 +49,7 @@ export const settings = {
 			},
 			migrate( { orderBy } ) {
 				return {
-					orderby: orderBy
+					orderby: orderBy,
 				};
 			},
 			save() {
