@@ -45,7 +45,7 @@ export const settings = {
 				orderBy: {
 					type: 'string',
 					default: 'date',
-				}
+				},
 			},
 			migrate( { orderBy } ) {
 				return {
@@ -55,6 +55,6 @@ export const settings = {
 			save() {
 				return null;
 			},
-		}
-	]
+		},
+	],
 };
