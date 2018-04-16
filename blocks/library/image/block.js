@@ -251,10 +251,12 @@ class ImageBlock extends Component {
 
 						return (
 							<ResizableBox
-								size={ {
-									width: currentWidth,
-									height: currentHeight,
-								} }
+								size={
+									width && height ? {
+										width,
+										height,
+									} : undefined
+								}
 								minWidth={ minWidth }
 								maxWidth={ settings.maxWidth }
 								minHeight={ minHeight }
