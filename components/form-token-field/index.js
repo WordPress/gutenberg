@@ -451,9 +451,11 @@ class FormTokenField extends Component {
 		return components;
 	}
 
-	renderToken( token ) {
+	renderToken( token, index, tokens ) {
 		const value = this.getTokenValue( token );
 		const status = token.status ? token.status : undefined;
+		const termPosition = index + 1;
+		const termsCount = tokens.length;
 
 		return (
 			<Token
@@ -468,6 +470,8 @@ class FormTokenField extends Component {
 				onMouseLeave={ token.onMouseLeave }
 				disabled={ 'error' !== status && this.props.disabled }
 				messages={ this.props.messages }
+				termsCount={ termsCount }
+				termPosition={ termPosition }
 			/>
 		);
 	}
@@ -583,7 +587,7 @@ FormTokenField.defaultProps = {
 	messages: {
 		added: __( 'Item added.' ),
 		removed: __( 'Item removed.' ),
-		remove: __( 'Remove item: %s.' ),
+		remove: __( 'Remove item' ),
 	},
 };
 

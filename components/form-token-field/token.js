@@ -7,7 +7,8 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { sprintf } from '@wordpress/i18n';
+import withInstanceId from '../higher-order/with-instance-id';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -25,6 +26,9 @@ function Token( {
 	onMouseEnter,
 	onMouseLeave,
 	messages,
+	termPosition,
+	termsCount,
+	instanceId,
 } ) {
 	const tokenClasses = classnames( 'components-form-token-field__token', {
 		'is-error': 'error' === status,
@@ -36,6 +40,15 @@ function Token( {
 
 	const onClick = () => onClickRemove( { value } );
 
+	const transformedValue = displayTransform( value );
+	const termPositionAndCount = sprintf(
+		/* translators: 1: term name, 2: term position in a set of terms, 3: total term set count. */
+		__( '%1$s (%2$s of %3$s)' ),
+		transformedValue,
+		termPosition,
+		termsCount
+	);
+
 	return (
 		<span
 			className={ tokenClasses }
@@ -43,18 +56,23 @@ function Token( {
 			onMouseLeave={ onMouseLeave }
 			title={ title }
 		>
-			<span className="components-form-token-field__token-text">
-				{ displayTransform( value ) }
+			<span
+				className="components-form-token-field__token-text"
+				id={ `components-form-token-field__token-text-${ instanceId }` }
+			>
+				<span className="screen-reader-text">{ termPositionAndCount }</span>
+				<span aria-hidden="true">{ transformedValue }</span>
 			</span>
 
 			<IconButton
 				className="components-form-token-field__remove-token"
 				icon="dismiss"
 				onClick={ ! disabled && onClick }
-				label={ sprintf( messages.remove, displayTransform( value ) ) }
+				label={ messages.remove }
+				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }
 			/>
 		</span>
 	);
 }
 
-export default Token;
+export default withInstanceId( Token );
