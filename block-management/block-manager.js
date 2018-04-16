@@ -4,12 +4,14 @@
  */
 
 import React from 'react';
-import { Platform, Switch, StyleSheet, Text, View, FlatList } from 'react-native';
+import { Platform, Switch, Text, View, FlatList } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
 import type { BlockType } from '../store/';
+
+import styles from './block-manager.scss';
 
 // Gutenberg imports
 import { getBlockType, serialize } from '@gutenberg/blocks/api';
@@ -166,24 +168,3 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 	}
 }
-
-const styles = StyleSheet.create( {
-	container: {
-		flex: 1,
-		justifyContent: 'flex-start',
-		backgroundColor: '#caa',
-	},
-	list: {
-		flex: 1,
-		backgroundColor: '#ccc',
-	},
-	htmlView: {
-		flex: 1,
-		backgroundColor: '#fff',
-	},
-	switch: {
-		flexDirection: 'row',
-		justifyContent: 'flex-start',
-		alignItems: 'center',
-	},
-} );

@@ -75,6 +75,7 @@ module.file_ext=.js
 module.file_ext=.jsx
 module.file_ext=.json
 module.file_ext=.ios.js
+module.file_ext=.scss
 
 munge_underscores=true
 
@@ -82,6 +83,9 @@ module.name_mapper='^[./a-zA-Z0-9$_-]+\.\(bmp\|gif\|jpg\|jpeg\|png\|psd\|svg\|we
 module.name_mapper='@gutenberg' -> '<PROJECT_ROOT>/gutenberg'
 module.name_mapper='@wordpress/element' -> '<PROJECT_ROOT>/gutenberg/element'
 module.name_mapper='@wordpress/utils' -> '<PROJECT_ROOT>/gutenberg/utils'
+
+; mock/ignore style files
+module.name_mapper='.*\(.scss\)' -> 'empty/object'
 
 suppress_type=$FlowIssue
 suppress_type=$FlowFixMe

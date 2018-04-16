@@ -1,0 +1,22 @@
+/** @format */
+
+.container {
+	flex: 1;
+	justify-content: flex-start;
+	background-color: #caa;
+}
+
+.list {
+	flex: 1;
+	background-color: #ccc;
+}
+
+.htmlView {
+	flex: 1;
+	background-color: #fff;
+}
+
+.switch {
+	flex-direction: row;
+	justify-content: flex-start;
+}

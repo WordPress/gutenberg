@@ -2,8 +2,10 @@
  * @format */
 
 import React from 'react';
-import { StyleSheet, View, Button } from 'react-native';
+import { View, Button } from 'react-native';
 import { ToolbarButton } from './constants';
+
+import styles from './toolbar.scss';
 
 type PropsType = {
 	uid: string,
@@ -42,17 +44,3 @@ export default class Toolbar extends React.Component<PropsType> {
 		);
 	}
 }
-
-const styles = StyleSheet.create( {
-	toolbar: {
-		height: 34,
-		backgroundColor: 'white',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		paddingLeft: 20,
-		paddingRight: 20,
-	},
-	toolbarButton: {
-		padding: 4,
-	},
-} );
