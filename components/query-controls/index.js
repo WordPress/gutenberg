@@ -23,10 +23,10 @@ export default function QueryControls( {
 	onCategoryChange,
 	onNumberOfItemsChange,
 	onOrderChange,
-	onOrderByChange,
+	onOrderbyChange,
 } ) {
 	return [
-		( onOrderChange && onOrderByChange ) && (
+		( onOrderChange && onOrderbyChange ) && (
 			<SelectControl
 				key="query-controls-order-select"
 				label={ __( 'Order by' ) }
@@ -52,12 +52,12 @@ export default function QueryControls( {
 					},
 				] }
 				onChange={ ( value ) => {
-					const [ newOrderBy, newOrder ] = value.split( '/' );
+					const [ newOrderby, newOrder ] = value.split( '/' );
 					if ( newOrder !== order ) {
 						onOrderChange( newOrder );
 					}
-					if ( newOrderBy !== orderby ) {
-						onOrderByChange( newOrderBy );
+					if ( newOrderby !== orderby ) {
+						onOrderbyChange( newOrderby );
 					}
 				} }
 			/>
