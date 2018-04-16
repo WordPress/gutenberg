@@ -10,8 +10,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "react": "^16.3.0-alpha.1",
-    "react-native": "0.54.2"
+    "react": "^16.2.0",
+    "react-native": "^0.53.3"
   },
   "devDependencies": {
     "babel-jest": "20.0.3",
