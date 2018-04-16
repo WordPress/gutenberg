@@ -98,7 +98,8 @@ class WP_Block_Type_Validator {
 	 * This function returns the $this->errors array
 	 *
 	 * @return array An array is returned containing the errors stored in the Validator.
-	 *               The returned array is an array of arrays (each error is an array with `error_text` and `added_from_version` keys)
+	 *               The returned array is an array of errors.
+	 *               Each individual error is an array with `error_text` and `added_from_version` keys.
 	 *               If there are no errors stored, an empty array is returned
 	 */
 	public function get_errors() {
