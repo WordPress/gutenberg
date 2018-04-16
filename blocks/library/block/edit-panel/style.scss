@@ -3,6 +3,7 @@
 	background: $light-gray-100;
 	color: $dark-gray-500;
 	display: flex;
+	flex-wrap: wrap;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	justify-content: flex-end;
@@ -17,6 +18,11 @@
 
 	.shared-block-edit-panel__info {
 		margin-right: auto;
+	}
+
+	.shared-block-edit-panel__label-wrapper {
+		min-width: 100%;
+		padding-bottom: ($block-padding / 2);
 	}
 
 	.shared-block-edit-panel__title {

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, withInstanceId } from '@wordpress/components';
 import { Component, Fragment, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
@@ -55,7 +55,7 @@ class SharedBlockEditPanel extends Component {
 	}
 
 	render() {
-		const { isEditing, title, isSaving, onEdit, onCancel } = this.props;
+		const { isEditing, title, isSaving, onEdit, onCancel, instanceId } = this.props;
 
 		return (
 			<Fragment>
@@ -76,6 +76,11 @@ class SharedBlockEditPanel extends Component {
 				) }
 				{ ( isEditing || isSaving ) && (
 					<form className="shared-block-edit-panel" onSubmit={ this.handleFormSubmit }>
+						<span className="shared-block-edit-panel__label-wrapper">
+							<label htmlFor={ `shared-block-edit-panel__title-${ instanceId }` }>
+								{ __( 'Shared block name:' ) }
+							</label>
+						</span>
 						<input
 							ref={ this.titleField }
 							type="text"
@@ -84,6 +89,7 @@ class SharedBlockEditPanel extends Component {
 							value={ title }
 							onChange={ this.handleTitleChange }
 							onKeyDown={ this.handleTitleKeyDown }
+							id={ `shared-block-edit-panel__title-${ instanceId }` }
 						/>
 						<Button
 							type="submit"
@@ -110,4 +116,4 @@ class SharedBlockEditPanel extends Component {
 	}
 }
 
-export default SharedBlockEditPanel;
+export default withInstanceId( SharedBlockEditPanel );
