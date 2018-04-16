@@ -751,7 +751,7 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 	$is_editor    = ( 'enqueue_block_editor_assets' === current_action() );
 	$is_front_end = ! $is_editor;
 
-	$is_post_or_page = is_singular( array( 'post', 'page') );
+	$is_post_or_page = is_singular( array( 'post', 'page' ) );
 
 	$enqueue_only_required_styles  = $is_front_end && $is_post_or_page;
 	$enqueue_styles_for_all_blocks = ! $enqueue_only_required_styles;
