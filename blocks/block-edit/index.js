@@ -24,11 +24,7 @@ import { BlockEditContextProvider } from './context';
 export class BlockEdit extends Component {
 	constructor( props ) {
 		super( props );
-		this.state = {
-			context: {
-				isSelected: props.isSelected,
-			},
-		};
+		this.state = {};
 	}
 
 	getChildContext() {
@@ -48,7 +44,7 @@ export class BlockEdit extends Component {
 	}
 
 	static getDerivedStateFromProps( nextProps, prevState ) {
-		if ( nextProps.isSelected === prevState.context.isSelected ) {
+		if ( nextProps.isSelected === get( prevState, [ 'context', 'isSelected' ] ) ) {
 			return null;
 		}
 
