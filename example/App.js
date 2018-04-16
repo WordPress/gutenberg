@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {AppRegistry, StyleSheet, View, FlatList} from 'react-native';
 //import RCTAztecView from './AztecView';
+import {example_content} from './content';
 import RCTAztecView from 'react-native-aztec'
 
 const _minHeight = 300;
@@ -8,7 +9,8 @@ const _minHeight = 300;
 export default class example extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {isShowingText: true, height: _minHeight};
+        this.state = {isShowingText: true, height: _minHeight, text: example_content()};
+        console.log("a ver que tiene" + JSON.stringify(this.state));
     }
 
     render() {
@@ -29,7 +31,7 @@ export default class example extends React.Component {
                     <RCTAztecView
                          {...this.props}
                          style={[styles.aztec_editor, {minHeight: myMinHeight}]}
-                         text = {this.props.text}
+                         text = {this.state.text}
                          onContentSizeChange= {(event) => {
                               this.setState({height: event.nativeEvent.contentSize.height});
                           }}
