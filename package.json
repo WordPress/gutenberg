@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "config": {
-    "jsfiles": "index.js app/*.js app/**/*.js block-management/*.js block-management/**/*.js store/*.js store/**/*.js"
+    "jsfiles": "index.js app/*.js app/**/*.js block-management/*.js block-management/**/*.js store/*.js store/**/*.js",
+    "scssfiles": "app/*.js app/**/*.scss block-management/*.scss block-management/**/*.scss store/*.scss store/**/*.scss"
   },
   "devDependencies": {
     "@wordpress/babel-preset-default": "^1.1.2",
@@ -40,8 +41,8 @@
     "test": "cross-env NODE_ENV=test node node_modules/jest/bin/jest.js --verbose --config jest.config.js",
     "test:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/jest/bin/jest.js --runInBand --verbose --config jest.config.js",
     "flow": "flow",
-    "prettier": "prettier --write $npm_package_config_jsfiles",
-    "prettier:check": "prettier -l $npm_package_config_jsfiles",
+    "prettier": "prettier --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
+    "prettier:check": "prettier -l $npm_package_config_jsfiles $npm_package_config_scssfiles",
     "clean": "yarn test --clearCache; watchman watch-del-all; rm -rf node_modules; rm -f yarn.lock; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
     "clean:install": "yarn clean; yarn",
     "lint": "eslint $npm_package_config_jsfiles",
