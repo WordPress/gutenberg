@@ -226,40 +226,42 @@ class ParagraphBlock extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-				<RichText
-					tagName="p"
-					className={ classnames( 'wp-block-paragraph', className, {
-						'has-background': backgroundColor,
-						'has-drop-cap': dropCap,
-					} ) }
-					style={ {
-						backgroundColor: backgroundColor,
-						color: textColor,
-						fontSize: fontSize ? fontSize + 'px' : undefined,
-						textAlign: align,
-					} }
-					value={ content }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
-					} }
-					onSplit={ insertBlocksAfter ?
-						( before, after, ...blocks ) => {
-							setAttributes( { content: before } );
-							insertBlocksAfter( [
-								...blocks,
-								createBlock( 'core/paragraph', { content: after } ),
-							] );
-						} :
-						undefined
-					}
-					onMerge={ mergeBlocks }
-					onReplace={ this.onReplace }
-					onRemove={ () => onReplace( [] ) }
-					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-					autocompleters={ autocompleters }
-				/>
+				<div>
+					<RichText
+						tagName="p"
+						className={ classnames( 'wp-block-paragraph', className, {
+							'has-background': backgroundColor,
+							'has-drop-cap': dropCap,
+						} ) }
+						style={ {
+							backgroundColor: backgroundColor,
+							color: textColor,
+							fontSize: fontSize ? fontSize + 'px' : undefined,
+							textAlign: align,
+						} }
+						value={ content }
+						onChange={ ( nextContent ) => {
+							setAttributes( {
+								content: nextContent,
+							} );
+						} }
+						onSplit={ insertBlocksAfter ?
+							( before, after, ...blocks ) => {
+								setAttributes( { content: before } );
+								insertBlocksAfter( [
+									...blocks,
+									createBlock( 'core/paragraph', { content: after } ),
+								] );
+							} :
+							undefined
+						}
+						onMerge={ mergeBlocks }
+						onReplace={ this.onReplace }
+						onRemove={ () => onReplace( [] ) }
+						placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+						autocompleters={ autocompleters }
+					/>
+				</div>
 			</Fragment>
 		);
 	}
