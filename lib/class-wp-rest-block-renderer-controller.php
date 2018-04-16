@@ -59,6 +59,10 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 							'additionalProperties' => false,
 							'properties'           => $block_type->attributes,
 						),
+						'post_id'   => array(
+							'description'          => __( 'ID of the post context.', 'travel' ),
+							'type'                 => 'integer',
+						),
 					),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
@@ -87,10 +91,6 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 					'status' => rest_authorization_required_code(),
 				) );
 			}
-
-			// Set up postdata since this will be needed if post_ID was set.
-			setup_postdata( $post );
-
 		} else {
 			if ( ! current_user_can( 'edit_posts' ) ) {
 				return new WP_Error( 'gutenberg_block_cannot_read', __( 'Sorry, you are not allowed to read Gutenberg blocks as this user.', 'gutenberg' ), array(
@@ -112,9 +112,26 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
+		global $post;
+
+		$post_ID = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
+
+		if ( 0 < $post_ID ) {
+			$post = get_post( $post_ID );
+
+			// Set up postdata since this will be needed if post_id was set.
+			setup_postdata( $post );
+		}
 		$registry = WP_Block_Type_Registry::get_instance();
 		$block    = $registry->get_registered( $request['name'] );
-		$data     = array(
+
+		if ( null === $block ) {
+			return new WP_Error( 'gutenberg_block_invalid', __( 'Invalid block.', 'gutenberg' ), array(
+				'status' => 404
+			) );
+		}
+
+		$data = array(
 			'rendered' => $block->render( $request->get_param( 'attributes' ) ),
 		);
 		return rest_ensure_response( $data );
@@ -138,6 +155,7 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 					'description' => __( 'The rendered block.', 'gutenberg' ),
 					'type'        => 'string',
 					'required'    => true,
+					'context'     => array( 'edit' ),
 				),
 			),
 		);
