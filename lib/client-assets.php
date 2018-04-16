@@ -820,7 +820,10 @@ function enqueue_required_frontend_block_styles( $content ) {
 		$block_type = $all_block_types_registry->get_registered( $block_type_name );
 
 		if ( ! isset( $block_type ) ) {
-			// Log the error here.
+
+			$error_message = sprintf( __( 'Cannot enqueue front-end styles for "%s" block type since it isn\'t registered.', 'gutenberg' ), $block_type_name );
+			trigger_error( $error_message, E_USER_NOTICE );
+
 		} elseif ( isset( $block_type->style ) ) {
 			wp_enqueue_style( $block_type->style );
 		}
