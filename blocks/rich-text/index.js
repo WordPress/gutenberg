@@ -22,7 +22,7 @@ import 'element-closest';
  */
 import { createElement, Component, renderToString, Fragment, compose } from '@wordpress/element';
 import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange, getScrollContainer } from '@wordpress/utils';
-import { withSafeTimeout, Slot, Fill } from '@wordpress/components';
+import { withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -31,11 +31,13 @@ import { withSelect } from '@wordpress/data';
 import './style.scss';
 import { rawHandler } from '../api';
 import Autocomplete from '../autocomplete';
+import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
+import { withBlockEditContext } from '../block-edit/context';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -656,6 +658,7 @@ export class RichText extends Component {
 		if ( document.activeElement !== this.editor.getBody() ) {
 			return;
 		}
+
 		const formatNames = this.props.formattingControls;
 		const formats = this.editor.formatter.matchAll( formatNames ).reduce( ( accFormats, activeFormat ) => {
 			accFormats[ activeFormat ] = {
@@ -666,7 +669,15 @@ export class RichText extends Component {
 			return accFormats;
 		}, {} );
 
-		const rect = getRectangleFromRange( this.editor.selection.getRng() );
+		let rect;
+		const selectedAnchor = find( parents, ( node ) => node.tagName === 'A' );
+		if ( selectedAnchor ) {
+			// If we selected a link, position the Link UI below the link
+			rect = selectedAnchor.getBoundingClientRect();
+		} else {
+			// Otherwise, position the Link UI below the cursor or text selection
+			rect = getRectangleFromRange( this.editor.selection.getRng() );
+		}
 		const focusPosition = this.getFocusPosition( rect );
 
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
@@ -792,7 +803,7 @@ export class RichText extends Component {
 			placeholder,
 			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
-			isSelected = false,
+			isSelected,
 			formatters,
 			autocompleters,
 		} = this.props;
@@ -819,16 +830,16 @@ export class RichText extends Component {
 
 		return (
 			<div className={ classes }>
-				{ isSelected &&
-					<Fill name="Formatting.Toolbar">
-						{ ! inlineToolbar && formatToolbar }
-					</Fill>
-				}
-				{ isSelected && inlineToolbar &&
+				{ isSelected && ! inlineToolbar && (
+					<BlockFormatControls>
+						{ formatToolbar }
+					</BlockFormatControls>
+				) }
+				{ isSelected && inlineToolbar && (
 					<div className="block-rich-text__inline-toolbar">
 						{ formatToolbar }
 					</div>
-				}
+				) }
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>
@@ -878,10 +889,13 @@ RichText.defaultProps = {
 };
 
 export default compose( [
-	withSelect( ( select ) => {
+	withBlockEditContext,
+	withSelect( ( select, { isSelected, blockEditContext } ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
+
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
+			isSelected: isSelected !== false && blockEditContext.isSelected,
 		};
 	} ),
 	withSafeTimeout,

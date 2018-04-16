@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { get, filter } from 'lodash';
 
 /**
@@ -10,13 +9,12 @@ import { get, filter } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { withAPIData, withInstanceId } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import PostAuthorCheck from './check';
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
 
 export class PostAuthor extends Component {
 	constructor() {
@@ -70,27 +68,21 @@ export class PostAuthor extends Component {
 	}
 }
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			postAuthor: getEditedPostAttribute( state, 'author' ),
-		};
-	},
-	{
-		onUpdateAuthor( author ) {
-			return editPost( { author } );
-		},
-	},
-);
-
-const applyWithAPIData = withAPIData( () => {
-	return {
-		users: '/wp/v2/users?context=edit&per_page=100',
-	};
-} );
-
 export default compose( [
-	applyConnect,
-	applyWithAPIData,
+	withSelect( ( select ) => {
+		return {
+			postAuthor: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		onUpdateAuthor( author ) {
+			dispatch( 'core/editor' ).editPost( { author } );
+		},
+	} ) ),
+	withAPIData( () => {
+		return {
+			users: '/wp/v2/users?context=edit&per_page=100',
+		};
+	} ),
 	withInstanceId,
 ] )( PostAuthor );

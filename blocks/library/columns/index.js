@@ -10,6 +10,7 @@ import memoize from 'memize';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -68,13 +69,13 @@ export const settings = {
 		return { 'data-align': align };
 	},
 
-	edit( { attributes, setAttributes, className, focus } ) {
+	edit( { attributes, setAttributes, className } ) {
 		const { align, columns } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
 
-		return [
-			...focus ? [
-				<BlockControls key="controls">
+		return (
+			<Fragment>
+				<BlockControls>
 					<BlockAlignmentToolbar
 						controls={ [ 'wide', 'full' ] }
 						value={ align }
@@ -82,8 +83,8 @@ export const settings = {
 							setAttributes( { align: nextAlign } );
 						} }
 					/>
-				</BlockControls>,
-				<InspectorControls key="inspector">
+				</BlockControls>
+				<InspectorControls>
 					<PanelBody>
 						<RangeControl
 							label={ __( 'Columns' ) }
@@ -97,12 +98,12 @@ export const settings = {
 							max={ 6 }
 						/>
 					</PanelBody>
-				</InspectorControls>,
-			] : [],
-			<div className={ classes } key="container">
-				<InnerBlocks layouts={ getColumnLayouts( columns ) } />
-			</div>,
-		];
+				</InspectorControls>
+				<div className={ classes }>
+					<InnerBlocks layouts={ getColumnLayouts( columns ) } />
+				</div>
+			</Fragment>
+		);
 	},
 
 	save( { attributes } ) {
