@@ -1,7 +1,6 @@
 /**
  * External Dependencies
  */
-import { connect } from 'react-redux';
 import { get } from 'lodash';
 
 /**
@@ -10,21 +9,12 @@ import { get } from 'lodash';
 import { Button, withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
 import PostPublishButton from '../post-publish-button';
-import {
-	isSavingPost,
-	isEditedPostSaveable,
-	isEditedPostPublishable,
-	isCurrentPostPending,
-	isCurrentPostPublished,
-	isEditedPostBeingScheduled,
-	isCurrentPostScheduled,
-	getCurrentPostType,
-} from '../../store/selectors';
 
 function PostPublishPanelToggle( {
 	user,
@@ -66,28 +56,34 @@ function PostPublishPanelToggle( {
 	);
 }
 
-const applyConnect = connect(
-	( state ) => ( {
-		isSaving: isSavingPost( state ),
-		isSaveable: isEditedPostSaveable( state ),
-		isPublishable: isEditedPostPublishable( state ),
-		isPending: isCurrentPostPending( state ),
-		isPublished: isCurrentPostPublished( state ),
-		isScheduled: isCurrentPostScheduled( state ),
-		isBeingScheduled: isEditedPostBeingScheduled( state ),
-		postType: getCurrentPostType( state ),
-	} ),
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postType } = props;
-
-	return {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	};
-} );
-
 export default compose( [
-	applyConnect,
-	applyWithAPIData,
+	withSelect( ( select ) =>{
+		const {
+			isSavingPost,
+			isEditedPostSaveable,
+			isEditedPostPublishable,
+			isCurrentPostPending,
+			isCurrentPostPublished,
+			isEditedPostBeingScheduled,
+			isCurrentPostScheduled,
+			getCurrentPostType,
+		} = select( 'core/editor' );
+		return {
+			isSaving: isSavingPost(),
+			isSaveable: isEditedPostSaveable(),
+			isPublishable: isEditedPostPublishable(),
+			isPending: isCurrentPostPending(),
+			isPublished: isCurrentPostPublished(),
+			isScheduled: isCurrentPostScheduled(),
+			isBeingScheduled: isEditedPostBeingScheduled(),
+			postType: getCurrentPostType(),
+		};
+	} ),
+	withAPIData( ( props ) => {
+		const { postType } = props;
+
+		return {
+			user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
+		};
+	} ),
 ] )( PostPublishPanelToggle );
