@@ -3,7 +3,11 @@
  */
 import { compose } from '@wordpress/element';
 import { Slot, Fill, withContext } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
 import './style.scss';
 import EditorScreenTakeover from './editor-screen-takeover';
 
@@ -27,6 +31,18 @@ let PluginScreenTakeover = ( { pluginName, name, icon, children } ) => (
 
 PluginScreenTakeover = compose( [
 	withContext( 'pluginName' )(),
+	// withDispatch( ( dispatch, ownProps ) => {
+	// 	console.log( ownProps );
+	// 	return {
+	// 		onClose: dispatch( 'core/edit-post' ).closeScreenTakover,
+	// 	};
+	// } ),
+	// withSelect( ( select, ownProps ) => {
+	// 	const { name } = ownProps;
+	// 	return {
+	// 		isOpen: select( 'core/edit-post' ).getActiveScreenTakeoverName() === name,
+	// 	};
+	// } ),
 ] )( PluginScreenTakeover );
 
 PluginScreenTakeover.Slot = withSelect( select => ( {
