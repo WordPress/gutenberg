@@ -4,7 +4,7 @@
   "private": true,
   "config": {
     "jsfiles": "index.js app/*.js app/**/*.js block-management/*.js block-management/**/*.js store/*.js store/**/*.js",
-    "scssfiles": "app/*.js app/**/*.scss block-management/*.scss block-management/**/*.scss store/*.scss store/**/*.scss"
+    "scssfiles": "app/*.scss app/**/*.scss block-management/*.scss block-management/**/*.scss store/*.scss store/**/*.scss"
   },
   "devDependencies": {
     "@wordpress/babel-preset-default": "^1.1.2",
