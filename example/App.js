@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {AppRegistry, StyleSheet, View, FlatList} from 'react-native';
-//import RCTAztecView from './AztecView';
 import {example_content} from './content';
 import RCTAztecView from 'react-native-aztec'
 
