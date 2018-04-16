@@ -937,8 +937,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	 *
 	 * @param bool|array $allowed_block_types Array of block type slugs, or
 	 *                                        boolean to enable/disable all.
+	 * @param object $post                    The post resource data.
 	 */
-	$allowed_block_types = apply_filters( 'allowed_block_types', true );
+	$allowed_block_types = apply_filters( 'allowed_block_types', true, $post );
 
 	$editor_settings = array(
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
