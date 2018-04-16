@@ -7,7 +7,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Popover, ScrollLock, navigateRegions } from '@wordpress/components';
+import { Popover, ScrollLock, navigateRegions, Overlay } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	AutosaveMonitor,
@@ -96,6 +96,7 @@ function Layout( {
 			<PluginScreenTakeover.Slot />
 			<Popover.Slot />
 			<PluginArea />
+			<Overlay />
 		</div>
 	);
 }
