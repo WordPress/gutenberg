@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omitBy, map } from 'lodash';
+import { omitBy } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 
 /**
@@ -76,12 +76,19 @@ export function domToElement( value ) {
 /**
  * Transforms an array of DOM Elements to their corresponding HTML string output.
  *
- * @param {Array} value DOM Elements.
+ * @param {Array}  value  DOM Elements.
+ * @param {Editor} editor TinyMCE editor instance.
  *
  * @return {string} HTML.
  */
-export function domToString( value ) {
-	return map( value, element => element.outerHTML ).join( '' );
+export function domToString( value, editor ) {
+	const doc = document.implementation.createHTMLDocument( '' );
+
+	Array.from( value ).forEach( ( child ) => {
+		doc.body.appendChild( child );
+	} );
+
+	return editor ? editor.serializer.serialize( doc.body ) : doc.body.innerHTML;
 }
 
 /**
@@ -89,13 +96,14 @@ export function domToString( value ) {
  *
  * @param {Array}  value  DOM Elements.
  * @param {string} format Output format (string or element)
+ * @param {Editor} editor TinyMCE editor instance.
  *
  * @return {*} Output.
  */
-export function domToFormat( value, format ) {
+export function domToFormat( value, format, editor ) {
 	switch ( format ) {
 		case 'string':
-			return domToString( value );
+			return domToString( value, editor );
 		default:
 			return domToElement( value );
 	}
