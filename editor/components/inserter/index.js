@@ -7,8 +7,8 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, IconButton, withContext } from '@wordpress/components';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { Dropdown, IconButton } from '@wordpress/components';
+import { createBlock, isUnmodifiedDefaultBlock, withEditorSettings } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -106,11 +106,11 @@ export default compose( [
 			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
 		},
 	} ) ),
-	withContext( 'editor' )( ( settings ) => {
-		const { blockTypes, templateLock } = settings;
+	withEditorSettings( ( settings ) => {
+		const { allowedBlockTypes, templateLock } = settings;
 
 		return {
-			hasSupportedBlocks: true === blockTypes || ! isEmpty( blockTypes ),
+			hasSupportedBlocks: true === allowedBlockTypes || ! isEmpty( allowedBlockTypes ),
 			isLocked: !! templateLock,
 		};
 	} ),

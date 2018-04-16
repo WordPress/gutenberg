@@ -193,7 +193,7 @@ describe( 'element', () => {
 				</RawHTML>
 			);
 
-			expect( element.type() ).toBe( 'wp-raw-html' );
+			expect( element.type() ).toBe( 'div' );
 			expect( element.prop( 'dangerouslySetInnerHTML' ).__html ).toBe( html );
 			expect( element.prop( 'children' ) ).toBe( undefined );
 		} );

@@ -73,7 +73,6 @@ const entryPointNames = [
 	'date',
 	'editor',
 	'element',
-	'i18n',
 	'utils',
 	'data',
 	'viewport',
@@ -84,6 +83,7 @@ const entryPointNames = [
 
 const packageNames = [
 	'hooks',
+	'i18n',
 ];
 
 const coreGlobals = [
@@ -96,6 +96,8 @@ const externals = {
 	tinymce: 'tinymce',
 	moment: 'moment',
 	jquery: 'jQuery',
+	lodash: 'lodash',
+	'lodash-es': 'lodash',
 };
 
 [
@@ -134,6 +136,9 @@ const config = {
 			__dirname,
 			'node_modules',
 		],
+		alias: {
+			'lodash-es': 'lodash',
+		},
 	},
 	module: {
 		rules: [

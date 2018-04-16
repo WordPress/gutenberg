@@ -1,20 +1,15 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { ExternalLink, withInstanceId } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import { getEditedPostExcerpt } from '../../store/selectors';
-import { editPost } from '../../store/actions';
 
 function PostExcerpt( { excerpt, onUpdateExcerpt, instanceId } ) {
 	const id = `editor-post-excerpt-${ instanceId }`;
@@ -36,15 +31,16 @@ function PostExcerpt( { excerpt, onUpdateExcerpt, instanceId } ) {
 	);
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			excerpt: getEditedPostExcerpt( state ),
+			excerpt: select( 'core/editor' ).getEditedPostExcerpt(),
 		};
-	},
-	{
+	} ),
+	withDispatch( ( dispatch ) => ( {
 		onUpdateExcerpt( excerpt ) {
-			return editPost( { excerpt } );
+			dispatch( 'core/editor' ).editPost( { excerpt } );
 		},
-	}
-)( withInstanceId( PostExcerpt ) );
+	} ) ),
+	withInstanceId,
+] )( PostExcerpt );

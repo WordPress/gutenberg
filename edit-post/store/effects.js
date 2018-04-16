@@ -75,6 +75,7 @@ const effects = {
 		const additionalData = [
 			post.comment_status ? [ 'comment_status', post.comment_status ] : false,
 			post.ping_status ? [ 'ping_status', post.ping_status ] : false,
+			post.sticky ? [ 'sticky', post.sticky ] : false,
 			[ 'post_author', post.author ],
 		].filter( Boolean );
 

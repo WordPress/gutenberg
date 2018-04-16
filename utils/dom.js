@@ -36,6 +36,11 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 		return true;
 	}
 
+	// If the container is empty, the caret is always at the edge.
+	if ( tinymce.DOM.isEmpty( container ) ) {
+		return true;
+	}
+
 	const selection = window.getSelection();
 	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 	if ( collapseRanges ) {
@@ -58,14 +63,8 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 	}
 
 	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
-	const editor = tinymce.get( node.id );
 
-	if (
-		! isReverse &&
-		offset !== maxOffset &&
-		// content editables with only a BR element are considered empty
-		( ! editor || ! editor.dom.isEmpty( node ) )
-	) {
+	if ( ! isReverse && offset !== maxOffset ) {
 		return false;
 	}
 
@@ -300,6 +299,12 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 		return;
 	}
 
+	// Offset by a buffer half the height of the caret rect. This is needed
+	// because caretRangeFromPoint may default to the end of the selection if
+	// offset is too close to the edge. It's unclear how to precisely calculate
+	// this threshold; it may be the padded area of some combination of line
+	// height, caret height, and font size. The buffer offset is effectively
+	// equivalent to a point at half the height of a line of text.
 	const buffer = rect.height / 2;
 	const editableRect = container.getBoundingClientRect();
 	const x = rect.left + ( rect.width / 2 );

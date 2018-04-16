@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { mapValues, omit } from 'lodash';
+import { castArray, mapValues, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -155,13 +155,14 @@ export function getBlockAttributes( blockType, innerHTML, attributes ) {
  * Attempt to parse the innerHTML using using a supplied `deprecated`
  * definition.
  *
- * @param {?Object} blockType  Block type.
- * @param {string}  innerHTML  Raw block content.
- * @param {?Object} attributes Known block attributes (from delimiters).
+ * @param {?Object} blockType   Block type.
+ * @param {string}  innerHTML   Raw block content.
+ * @param {?Object} attributes  Known block attributes (from delimiters).
+ * @param {?Array}  innerBlocks Array of innerBlocks.
  *
  * @return {Object} Block attributes.
  */
-export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attributes ) {
+export function getAttributesAndInnerBlocksFromDeprecatedVersion( blockType, innerHTML, attributes, innerBlocks ) {
 	// Not all blocks need a deprecated definition so avoid unnecessary computational cycles
 	// as early as possible when `deprecated` property is not supplied.
 	if ( ! blockType.deprecated || ! blockType.deprecated.length ) {
@@ -181,12 +182,22 @@ export function getAttributesFromDeprecatedVersion( blockType, innerHTML, attrib
 		try {
 			// Handle migration of older attributes into current version if necessary.
 			const deprecatedBlockAttributes = getBlockAttributes( deprecatedBlockType, innerHTML, attributes );
-			const migratedBlockAttributes = deprecatedBlockType.migrate ? deprecatedBlockType.migrate( deprecatedBlockAttributes ) : deprecatedBlockAttributes;
 
 			// Attempt to validate the parsed block. Ignore if the the validation step fails.
 			const isValid = isValidBlock( innerHTML, deprecatedBlockType, deprecatedBlockAttributes );
 			if ( isValid ) {
-				return migratedBlockAttributes;
+				const migratedBlockAttributesAndInnerBlocks = deprecatedBlockType.migrate &&
+					deprecatedBlockType.migrate( deprecatedBlockAttributes, innerBlocks );
+
+				if ( migratedBlockAttributesAndInnerBlocks ) {
+					const [
+						migratedAttributes,
+						migratedInnerBlocks = innerBlocks,
+					] = castArray( migratedBlockAttributesAndInnerBlocks );
+					return { attributes: migratedAttributes, innerBlocks: migratedInnerBlocks };
+				}
+
+				return { attributes: deprecatedBlockAttributes, innerBlocks };
 			}
 		} catch ( error ) {
 			// Ignore error, it means this deprecated version is invalid.
@@ -275,13 +286,14 @@ export function createBlockWithFallback( blockNode ) {
 	// This enables blocks to modify its attributes and markup structure without
 	// invalidating content written in previous formats.
 	if ( ! block.isValid ) {
-		const attributesParsedWithDeprecatedVersion = getAttributesFromDeprecatedVersion(
-			blockType, innerHTML, attributes
+		const attributesAndInnerBlocksParsedWithDeprecatedVersion = getAttributesAndInnerBlocksFromDeprecatedVersion(
+			blockType, innerHTML, attributes, block.innerBlocks
 		);
 
-		if ( attributesParsedWithDeprecatedVersion ) {
+		if ( attributesAndInnerBlocksParsedWithDeprecatedVersion ) {
 			block.isValid = true;
-			block.attributes = attributesParsedWithDeprecatedVersion;
+			block.attributes = attributesAndInnerBlocksParsedWithDeprecatedVersion.attributes;
+			block.innerBlocks = attributesAndInnerBlocksParsedWithDeprecatedVersion.innerBlocks || [];
 		}
 	}
 

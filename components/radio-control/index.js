@@ -18,20 +18,20 @@ function RadioControl( { label, selected, help, instanceId, onChange, options = 
 		<BaseControl label={ label } id={ id } help={ help } className="components-radio-control">
 			{ options.map( ( option, index ) =>
 				<div
-					key={ ( id + '-' + index ) }
+					key={ `${ id }-${ index }` }
 					className="components-radio-control__option"
 				>
 					<input
-						id={ ( id + '-' + index ) }
+						id={ `${ id }-${ index }` }
 						className="components-radio-control__input"
 						type="radio"
 						name={ id }
 						value={ option.value }
 						onChange={ onChangeValue }
 						checked={ option.value === selected }
-						aria-describedby={ !! help ? id + '__help' : undefined }
+						aria-describedby={ !! help ? `${ id }__help` : undefined }
 					/>
-					<label key={ option.value } htmlFor={ ( id + '-' + index ) }>
+					<label htmlFor={ `${ id }-${ index }` }>
 						{ option.label }
 					</label>
 				</div>
