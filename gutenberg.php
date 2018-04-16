@@ -162,6 +162,12 @@ function gutenberg_init( $return, $post ) {
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
+	/**
+	 * Remove the emoji script as it is incompatible with both React and any
+	 * contenteditable fields.
+	 */
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
 
@@ -521,7 +527,7 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
  *
  * @since 1.5.0
  *
- * @param string $classes Space seperated string of classes being added to the body tag.
+ * @param string $classes Space separated string of classes being added to the body tag.
  * @return string The $classes string, with gutenberg-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {

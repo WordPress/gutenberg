@@ -12,7 +12,6 @@ They can be found in the global variable `wp.editPost` when defining `wp-edit-po
 Experimental components can be found under `wp.editPost.__experimental`. Experimental components are still being evaluated and can change in a future version.
 
 ### `PluginSidebar`
-**Experimental**
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
 
@@ -24,7 +23,7 @@ wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-na
 _Example:_
 
 ```jsx
-const { Panel, PanelBody } = wp.components;
+const { PanelBody } = wp.components;
 const { PluginSidebar } = wp.editPost;
 
 const MyPluginSidebar = () => (
@@ -32,11 +31,9 @@ const MyPluginSidebar = () => (
 		name="sidebar-name"
 		title="Sidebar title"
 	>
-		<Panel>
-			<PanelBody>
-				My sidebar content
-			</PanelBody>
-		</Panel>
+		<PanelBody>
+			My sidebar content
+		</PanelBody>
 	</PluginSidebar>
 );
 ```

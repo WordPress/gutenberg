@@ -28,7 +28,7 @@
 /**
  * External dependencies
  */
-import { castArray, omit, kebabCase } from 'lodash';
+import { isEmpty, castArray, omit, kebabCase } from 'lodash';
 
 /**
  * Internal dependencies
@@ -363,7 +363,16 @@ export function renderElement( element, context = {} ) {
 			return renderChildren( props.children, context );
 
 		case RawHTML:
-			return props.children;
+			const { children, ...wrapperProps } = props;
+
+			return renderNativeComponent(
+				isEmpty( wrapperProps ) ? null : 'div',
+				{
+					...wrapperProps,
+					dangerouslySetInnerHTML: { __html: children },
+				},
+				context
+			);
 	}
 
 	switch ( typeof tagName ) {
@@ -384,7 +393,8 @@ export function renderElement( element, context = {} ) {
 /**
  * Serializes a native component type to string.
  *
- * @param {string}  type    Native component type to serialize.
+ * @param {?string} type    Native component type to serialize, or null if
+ *                          rendering as fragment of children content.
  * @param {Object}  props   Props object.
  * @param {?Object} context Context object.
  *
@@ -398,11 +408,16 @@ export function renderNativeComponent( type, props, context = {} ) {
 		// as well.
 		content = renderChildren( [ props.value ], context );
 		props = omit( props, 'value' );
-	} else if ( props.dangerouslySetInnerHTML ) {
+	} else if ( props.dangerouslySetInnerHTML &&
+			typeof props.dangerouslySetInnerHTML.__html === 'string' ) {
 		// Dangerous content is left unescaped.
 		content = props.dangerouslySetInnerHTML.__html;
 	} else if ( typeof props.children !== 'undefined' ) {
 		content = renderChildren( castArray( props.children ), context );
+	}
+
+	if ( ! type ) {
+		return content;
 	}
 
 	const attributes = renderAttributes( props );

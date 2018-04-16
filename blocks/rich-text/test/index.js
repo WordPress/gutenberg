@@ -145,6 +145,7 @@ describe( 'getFormatProperties', () => {
 		nodeName: 'A',
 		attributes: {
 			href: 'https://www.testing.com',
+			target: '_blank',
 		},
 	};
 
@@ -156,7 +157,7 @@ describe( 'getFormatProperties', () => {
 		expect( getFormatProperties( formatName, [ { ...node, nodeName: 'P' } ] ) ).toEqual( {} );
 	} );
 
-	test( 'should return an object of value and node for a link', () => {
+	test( 'should return a populated object', () => {
 		const mockNode = {
 			...node,
 			getAttribute: jest.fn().mockImplementation( ( attr ) => mockNode.attributes[ attr ] ),
@@ -168,11 +169,12 @@ describe( 'getFormatProperties', () => {
 
 		expect( getFormatProperties( formatName, parents ) ).toEqual( {
 			value: 'https://www.testing.com',
+			target: '_blank',
 			node: mockNode,
 		} );
 	} );
 
-	test( 'should return an object of value and node of empty values when no values are found.', () => {
+	test( 'should return an object with empty values when no link is found', () => {
 		const mockNode = {
 			...node,
 			attributes: {},
@@ -185,6 +187,7 @@ describe( 'getFormatProperties', () => {
 
 		expect( getFormatProperties( formatName, parents ) ).toEqual( {
 			value: '',
+			target: '',
 			node: mockNode,
 		} );
 	} );

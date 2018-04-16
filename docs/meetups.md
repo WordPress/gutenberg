@@ -13,4 +13,4 @@ A list of meetups about Gutenberg so far:
 - [WordPress & JavaScript: Let's talk Gutenberg!](https://www.meetup.com/WordPress-Lahore/events/246446478/), Lahore, PK
 - [The state of Gutenberg](https://www.meetup.com/WP-Porto/events/245585131/), Porto, Portugal
 - [Discuss and learn about the new WordPress Editor : Gutenberg](https://www.meetup.com/Pune-WordPress-Knowledge-Exchange/events/248496830/), Pune, India
-
+- [WordPress 5.0 - Gutenberg is upon us](https://www.meetup.com/WordPress-Perth/events/249490075/), Perth, Australia

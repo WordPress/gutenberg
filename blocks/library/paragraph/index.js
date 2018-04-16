@@ -8,7 +8,12 @@ import { findKey, isFinite, map, omit } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { concatChildren, Component, RawHTML } from '@wordpress/element';
+import {
+	concatChildren,
+	Component,
+	Fragment,
+	RawHTML,
+} from '@wordpress/element';
 import {
 	PanelBody,
 	PanelColor,
@@ -37,17 +42,17 @@ import ContrastChecker from '../../contrast-checker';
 
 const { getComputedStyle } = window;
 
-const ContrastCheckerWithFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor } = ownProps;
-	//avoid the use of querySelector if both colors are known and verify if node is available.
-	const editableNode = ( ! textColor || ! backgroundColor ) && node ? node.querySelector( '[contenteditable="true"]' ) : null;
+const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+	const { textColor, backgroundColor, fontSize, customFontSize } = ownProps.attributes;
+	const editableNode = node.querySelector( '[contenteditable="true"]' );
 	//verify if editableNode is available, before using getComputedStyle.
 	const computedStyles = editableNode ? getComputedStyle( editableNode ) : null;
 	return {
 		fallbackBackgroundColor: backgroundColor || ! computedStyles ? undefined : computedStyles.backgroundColor,
 		fallbackTextColor: textColor || ! computedStyles ? undefined : computedStyles.color,
+		fallbackFontSize: fontSize || customFontSize || ! computedStyles ? undefined : parseInt( computedStyles.fontSize ) || undefined,
 	};
-} )( ContrastChecker );
+} );
 
 const FONT_SIZES = {
 	small: 14,
@@ -61,8 +66,6 @@ const autocompleters = [ blockAutocompleter, ...defaultAutocompleters ];
 class ParagraphBlock extends Component {
 	constructor() {
 		super( ...arguments );
-		this.nodeRef = null;
-		this.bindRef = this.bindRef.bind( this );
 		this.onReplace = this.onReplace.bind( this );
 		this.toggleDropCap = this.toggleDropCap.bind( this );
 		this.getFontSize = this.getFontSize.bind( this );
@@ -88,13 +91,6 @@ class ParagraphBlock extends Component {
 		setAttributes( { dropCap: ! attributes.dropCap } );
 	}
 
-	bindRef( node ) {
-		if ( ! node ) {
-			return;
-		}
-		this.nodeRef = node;
-	}
-
 	getFontSize() {
 		const { customFontSize, fontSize } = this.props.attributes;
 		if ( fontSize ) {
@@ -104,8 +100,6 @@ class ParagraphBlock extends Component {
 		if ( customFontSize ) {
 			return customFontSize;
 		}
-
-		return FONT_SIZES.regular;
 	}
 
 	setFontSize( fontSizeValue ) {
@@ -129,10 +123,12 @@ class ParagraphBlock extends Component {
 			attributes,
 			setAttributes,
 			insertBlocksAfter,
-			isSelected,
 			mergeBlocks,
 			onReplace,
 			className,
+			fallbackBackgroundColor,
+			fallbackTextColor,
+			fallbackFontSize,
 		} = this.props;
 
 		const {
@@ -147,9 +143,9 @@ class ParagraphBlock extends Component {
 
 		const fontSize = this.getFontSize();
 
-		return [
-			isSelected && (
-				<BlockControls key="controls">
+		return (
+			<Fragment>
+				<BlockControls>
 					<AlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -157,9 +153,7 @@ class ParagraphBlock extends Component {
 						} }
 					/>
 				</BlockControls>
-			),
-			isSelected && (
-				<InspectorControls key="inspector">
+				<InspectorControls>
 					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
 						<div className="blocks-font-size__main">
 							<ButtonGroup aria-label={ __( 'Font Size' ) }>
@@ -190,7 +184,8 @@ class ParagraphBlock extends Component {
 						<RangeControl
 							className="blocks-paragraph__custom-size-slider"
 							label={ __( 'Custom Size' ) }
-							value={ fontSize }
+							value={ fontSize || '' }
+							initialPosition={ fallbackFontSize }
 							onChange={ ( value ) => this.setFontSize( value ) }
 							min={ 12 }
 							max={ 100 }
@@ -215,12 +210,15 @@ class ParagraphBlock extends Component {
 							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
 						/>
 					</PanelColor>
-					{ this.nodeRef && <ContrastCheckerWithFallbackStyles
-						node={ this.nodeRef }
-						textColor={ textColor }
-						backgroundColor={ backgroundColor }
+					<ContrastChecker
+						{ ...{
+							textColor,
+							backgroundColor,
+							fallbackBackgroundColor,
+							fallbackTextColor,
+						} }
 						isLargeText={ fontSize >= 18 }
-					/> }
+					/>
 					<PanelBody title={ __( 'Block Alignment' ) }>
 						<BlockAlignmentToolbar
 							value={ width }
@@ -228,45 +226,44 @@ class ParagraphBlock extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
-			),
-			<div key="editable" ref={ this.bindRef }>
-				<RichText
-					tagName="p"
-					className={ classnames( 'wp-block-paragraph', className, {
-						'has-background': backgroundColor,
-						'has-drop-cap': dropCap,
-					} ) }
-					style={ {
-						backgroundColor: backgroundColor,
-						color: textColor,
-						fontSize: fontSize !== FONT_SIZES.regular ? fontSize + 'px' : undefined,
-						textAlign: align,
-					} }
-					value={ content }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
-					} }
-					onSplit={ insertBlocksAfter ?
-						( before, after, ...blocks ) => {
-							setAttributes( { content: before } );
-							insertBlocksAfter( [
-								...blocks,
-								createBlock( 'core/paragraph', { content: after } ),
-							] );
-						} :
-						undefined
-					}
-					onMerge={ mergeBlocks }
-					onReplace={ this.onReplace }
-					onRemove={ () => onReplace( [] ) }
-					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-					isSelected={ isSelected }
-					autocompleters={ autocompleters }
-				/>
-			</div>,
-		];
+				<div>
+					<RichText
+						tagName="p"
+						className={ classnames( 'wp-block-paragraph', className, {
+							'has-background': backgroundColor,
+							'has-drop-cap': dropCap,
+						} ) }
+						style={ {
+							backgroundColor: backgroundColor,
+							color: textColor,
+							fontSize: fontSize ? fontSize + 'px' : undefined,
+							textAlign: align,
+						} }
+						value={ content }
+						onChange={ ( nextContent ) => {
+							setAttributes( {
+								content: nextContent,
+							} );
+						} }
+						onSplit={ insertBlocksAfter ?
+							( before, after, ...blocks ) => {
+								setAttributes( { content: before } );
+								insertBlocksAfter( [
+									...blocks,
+									createBlock( 'core/paragraph', { content: after } ),
+								] );
+							} :
+							undefined
+						}
+						onMerge={ mergeBlocks }
+						onReplace={ this.onReplace }
+						onRemove={ () => onReplace( [] ) }
+						placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+						autocompleters={ autocompleters }
+					/>
+				</div>
+			</Fragment>
+		);
 	}
 }
 
@@ -410,7 +407,7 @@ export const settings = {
 		}
 	},
 
-	edit: ParagraphBlock,
+	edit: FallbackStyles( ParagraphBlock ),
 
 	save( { attributes } ) {
 		const {

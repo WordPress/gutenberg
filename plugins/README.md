@@ -20,7 +20,8 @@ _Example:_
 
 ```jsx
 const { Fragment } = wp.element;
-const { PluginSidebar, PluginMoreMenuItem } = wp.editPost.__experimental;
+const { PluginSidebar } = wp.editPost;
+const { PluginMoreMenuItem } = wp.editPost.__experimental;
 const { registerPlugin } = wp.plugins;
 
 const Component = () => (

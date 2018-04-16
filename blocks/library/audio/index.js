@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -13,7 +9,7 @@ import {
 	Placeholder,
 	Toolbar,
 } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { mediaUpload } from '@wordpress/utils';
 
 /**
@@ -129,7 +125,7 @@ export const settings = {
 							value={ id }
 							render={ ( { open } ) => (
 								<Button isLarge onClick={ open }>
-									{ __( 'Add from Media Library' ) }
+									{ __( 'Media Library' ) }
 								</Button>
 							) }
 						/>
@@ -138,9 +134,9 @@ export const settings = {
 			}
 
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-			return [
-				isSelected && (
-					<BlockControls key="controls">
+			return (
+				<Fragment>
+					<BlockControls>
 						<Toolbar>
 							<IconButton
 								className="components-icon-button components-toolbar__control"
@@ -150,21 +146,20 @@ export const settings = {
 							/>
 						</Toolbar>
 					</BlockControls>
-				),
-				<figure key="audio" className={ className }>
-					<audio controls="controls" src={ src } />
-					{ ( ( caption && caption.length ) || !! isSelected ) && (
-						<RichText
-							tagName="figcaption"
-							placeholder={ __( 'Write caption…' ) }
-							value={ caption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
-							isSelected={ isSelected }
-							inlineToolbar
-						/>
-					) }
-				</figure>,
-			];
+					<figure className={ className }>
+						<audio controls="controls" src={ src } />
+						{ ( ( caption && caption.length ) || !! isSelected ) && (
+							<RichText
+								tagName="figcaption"
+								placeholder={ __( 'Write caption…' ) }
+								value={ caption }
+								onChange={ ( value ) => setAttributes( { caption: value } ) }
+								inlineToolbar
+							/>
+						) }
+					</figure>
+				</Fragment>
+			);
 			/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		}
 	},

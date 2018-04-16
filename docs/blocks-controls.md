@@ -39,8 +39,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 
 	edit: function( props ) {
 		var content = props.attributes.content,
-			alignment = props.attributes.alignment,
-			isSelected = props.isSelected;
+			alignment = props.attributes.alignment;
 
 		function onChangeContent( newContent ) {
 			props.setAttributes( { content: newContent } );
@@ -51,7 +50,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 		}
 
 		return [
-			isSelected && el(
+			el(
 				BlockControls,
 				{ key: 'controls' },
 				el(
@@ -112,7 +111,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 		},
 	},
 
-	edit( { attributes, className, isSelected, setAttributes } ) {
+	edit( { attributes, className, setAttributes } ) {
 		const { content, alignment } = attributes;
 
 		function onChangeContent( newContent ) {
@@ -124,14 +123,12 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 		}
 
 		return [
-			isSelected && (
-				<BlockControls key="controls">
-					<AlignmentToolbar
-						value={ alignment }
-						onChange={ onChangeAlignment }
-					/>
-				</BlockControls>
-			),
+			<BlockControls key="controls">
+				<AlignmentToolbar
+					value={ alignment }
+					onChange={ onChangeAlignment }
+				/>
+			</BlockControls>,
 			<RichText
 				key="editable"
 				tagName="p"
@@ -152,7 +149,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 ```
 {% end %}
 
-Note that you should only include `BlockControls` if the block is currently selected. We must test that the `isSelected` value is truthy before rendering the element, otherwise you will inadvertently cause controls to be shown for the incorrect block type.
+Note that `BlockControls` is only visible when the block is currently selected. 
 
 ## Inspector
 

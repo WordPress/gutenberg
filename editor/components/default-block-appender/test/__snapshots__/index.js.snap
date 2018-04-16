@@ -5,7 +5,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WithEditorSettings(BlockDropZone)) />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -35,8 +35,8 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     type="text"
     value="Write your story"
   />
-  <WrappedComponent />
-  <WithSelect(WithDispatch(WrappedComponent))
+  <WithEditorSettings(WithSelect(WithDispatch(InserterWithShortcuts))) />
+  <WithSelect(WithDispatch(WithEditorSettings(Inserter)))
     position="top right"
   />
 </div>
@@ -47,7 +47,7 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WithEditorSettings(BlockDropZone)) />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -59,8 +59,8 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
     type="text"
     value="Write your story"
   />
-  <WrappedComponent />
-  <WithSelect(WithDispatch(WrappedComponent))
+  <WithEditorSettings(WithSelect(WithDispatch(InserterWithShortcuts))) />
+  <WithSelect(WithDispatch(WithEditorSettings(Inserter)))
     position="top right"
   />
 </div>
@@ -71,7 +71,7 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   className="editor-default-block-appender"
   data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WithEditorSettings(BlockDropZone)) />
   <input
     aria-label="Add block"
     className="editor-default-block-appender__content"
@@ -83,8 +83,8 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
     type="text"
     value=""
   />
-  <WrappedComponent />
-  <WithSelect(WithDispatch(WrappedComponent))
+  <WithEditorSettings(WithSelect(WithDispatch(InserterWithShortcuts))) />
+  <WithSelect(WithDispatch(WithEditorSettings(Inserter)))
     position="top right"
   />
 </div>
