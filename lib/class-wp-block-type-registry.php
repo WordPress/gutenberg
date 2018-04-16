@@ -60,8 +60,8 @@ final class WP_Block_Type_Registry {
 		$is_block_type_valid  = $block_type_validator->validate( $name );
 
 		if ( ! $is_block_type_valid ) {
-			$error_message = $block_type_validator->get_last_error();
-			_doing_it_wrong( __METHOD__, $error_message, '2.7.0' );
+			$error = $block_type_validator->get_last_error();
+			_doing_it_wrong( __METHOD__, $error['error_text'], $error['added_from_version'] );
 
 			return false;
 		}
