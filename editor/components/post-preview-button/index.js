@@ -2,12 +2,14 @@
  * External dependencies
  */
 import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Component, compose } from '@wordpress/element';
+import { Button, ifCondition } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 
 /**
@@ -15,7 +17,7 @@ import { _x } from '@wordpress/i18n';
  */
 import {
 	getEditedPostPreviewLink,
-	getEditedPostAttribute,
+	getEditedPostAttribute as getStateEditedPostAttribute,
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
@@ -123,14 +125,25 @@ export class PostPreviewButton extends Component {
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		postId: state.currentPost.id,
-		link: getEditedPostPreviewLink( state ),
-		isDirty: isEditedPostDirty( state ),
-		isNew: isEditedPostNew( state ),
-		isSaveable: isEditedPostSaveable( state ),
-		modified: getEditedPostAttribute( state, 'modified' ),
+export default compose(
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		return {
+			isPreviewable: get( postType, 'viewable', false ),
+		};
 	} ),
-	{ autosave }
+	ifCondition( ( { isPreviewable } ) => isPreviewable ),
+	connect(
+		( state ) => ( {
+			postId: state.currentPost.id,
+			link: getEditedPostPreviewLink( state ),
+			isDirty: isEditedPostDirty( state ),
+			isNew: isEditedPostNew( state ),
+			isSaveable: isEditedPostSaveable( state ),
+			modified: getStateEditedPostAttribute( state, 'modified' ),
+		} ),
+		{ autosave }
+	)
 )( PostPreviewButton );
