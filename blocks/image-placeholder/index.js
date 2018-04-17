@@ -7,7 +7,6 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { DropZone, FormFileUpload, Placeholder, Button } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
 import { mediaUpload } from '@wordpress/utils';
 import { __ } from '@wordpress/i18n';
 
@@ -24,15 +23,15 @@ import { rawHandler } from '../api';
  *
  * @return {Object} Rendered placeholder.
  */
-function ImagePlaceholder( { className, icon, label, onSelectImage, parentId, multiple = false } ) {
+export default function ImagePlaceholder( { className, icon, label, onSelectImage, multiple = false } ) {
 	const setImage = multiple ? onSelectImage : ( [ image ] ) => onSelectImage( image );
-	const onFilesDrop = ( files ) => mediaUpload( files, setImage, 'image', parentId );
+	const onFilesDrop = ( files ) => mediaUpload( files, setImage, 'image' );
 	const onHTMLDrop = ( HTML ) => setImage( map(
 		rawHandler( { HTML, mode: 'BLOCKS' } )
 			.filter( ( { name } ) => name === 'core/image' ),
 		'attributes'
 	) );
-	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setImage, 'image', parentId );
+	const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setImage, 'image' );
 	return (
 		<Placeholder
 			className={ className }
@@ -68,9 +67,3 @@ function ImagePlaceholder( { className, icon, label, onSelectImage, parentId, mu
 		</Placeholder>
 	);
 }
-
-export default withSelect(
-	( select ) => ( {
-		parentId: select( 'core/editor' ).getCurrentPostId(),
-	} ),
-)( ImagePlaceholder );

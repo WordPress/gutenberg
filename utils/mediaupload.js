@@ -4,6 +4,11 @@
 import { compact, get, startsWith } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { withSelect } from '@wordpress/data';
+
+/**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
  *	when a file upload button is activated.
  *
@@ -12,9 +17,8 @@ import { compact, get, startsWith } from 'lodash';
  * @param {Array}    filesList    List of files.
  * @param {Function} onFileChange Function to be called each time a file or a temporary representation of the file is available.
  * @param {string}   allowedType  The type of media that can be uploaded.
- * @param {number}   parentId     Parent post id if one exists.
  */
-export function mediaUpload( filesList, onFileChange, allowedType, parentId = null ) {
+export function mediaUpload( filesList, onFileChange, allowedType ) {
 	// Cast filesList to array
 	const files = [ ...filesList ];
 
@@ -34,7 +38,7 @@ export function mediaUpload( filesList, onFileChange, allowedType, parentId = nu
 		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
 		onFileChange( filesSet );
 
-		return createMediaFromFile( mediaFile, parentId ).then(
+		return createMediaFromFile( mediaFile ).then(
 			( savedMedia ) => {
 				const mediaObject = {
 					id: savedMedia.id,
@@ -60,12 +64,11 @@ export function mediaUpload( filesList, onFileChange, allowedType, parentId = nu
  * Creates a new media object from a provided file.
  *
  * @param {File} file Media File to Save.
- * @param {number} parentId Parent post id if one exists.
  *
  * @return {Promise} Media Object Promise.
  */
-function createMediaFromFile( file, parentId = null ) {
-	// Create upload payload
+function createMediaFromFileWithoutSelect( { file, parentId } ) {
+	// Create new upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
 	data.append( 'post', parentId );
@@ -76,7 +79,14 @@ function createMediaFromFile( file, parentId = null ) {
 		processData: false,
 		method: 'POST',
 	} );
-}
+};
+
+const createMediaFromFile = withSelect( ( select, ownProps ) => {
+	return {
+		file: ownProps.file,
+		parentId: select( 'core/editor' ).getCurrentPostId(),
+	};
+} )( createMediaFromFileWithoutSelect );
 
 /**
  * Utility used to preload an image before displaying it.
