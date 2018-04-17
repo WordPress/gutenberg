@@ -345,7 +345,7 @@ export default compose(
 	} ),
 	withSelect( ( select, { allowedBlockTypes } ) => {
 		const { getInserterItems, getFrecentInserterItems, getBlockInsertionPoint, getSupportedBlocks } = select( 'core/editor' );
-		const { rootUID } = getBlockInsertionPoint( state );
+		const { rootUID } = getBlockInsertionPoint();
 		const supportedBlocks = getSupportedBlocks( state, rootUID, allowedBlockTypes );
 		return {
 			items: getInserterItems( supportedBlocks ),
