@@ -104,7 +104,7 @@ function gutenberg_render_block( $block ) {
 	if ( $block_name ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 		if ( null !== $block_type && $block_type->is_dynamic() ) {
-			return $block_type->render( $attributes );
+			return $block_type->render( $attributes, $raw_content );
 		}
 	}
 
@@ -146,6 +146,7 @@ function do_blocks( $content ) {
 		$offset          = $block_match[0][1];
 		$block_name      = $block_match[1][0];
 		$is_self_closing = isset( $block_match[4] );
+		$block_content   = '';
 
 		// Reset attributes JSON to prevent scope bleed from last iteration.
 		$block_attributes_json = null;
@@ -177,9 +178,6 @@ function do_blocks( $content ) {
 			}
 		}
 
-		// Replace dynamic block with server-rendered output.
-		$rendered_content .= $block_type->render( $attributes );
-
 		if ( ! $is_self_closing ) {
 			$end_tag_pattern = '/<!--\s+\/wp:' . str_replace( '/', '\/', preg_quote( $block_name ) ) . '\s+-->/';
 			if ( ! preg_match( $end_tag_pattern, $content, $block_match_end, PREG_OFFSET_CAPTURE ) ) {
@@ -192,6 +190,13 @@ function do_blocks( $content ) {
 			$end_tag    = $block_match_end[0][0];
 			$end_offset = $block_match_end[0][1];
 
+			$block_content = substr( $content, 0, $end_offset );
+		}
+
+		// Replace dynamic block with server-rendered output.
+		$rendered_content .= $block_type->render( $attributes, $block_content );
+
+		if ( ! $is_self_closing ) {
 			$content = substr( $content, $end_offset + strlen( $end_tag ) );
 		}
 	}

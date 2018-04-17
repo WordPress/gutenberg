@@ -24,9 +24,9 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	 *
 	 * @return string             Block output.
 	 */
-	function render_dummy_block( $attributes ) {
+	function render_dummy_block( $attributes, $content = '' ) {
 		$this->dummy_block_instance_number += 1;
-		return $this->dummy_block_instance_number . ':' . $attributes['value'];
+		return $this->dummy_block_instance_number . ':' . $attributes['value'] . ':' . $content;
 	}
 
 	/**
@@ -51,7 +51,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test dynamic blocks that lack content, including void blocks.
+	 * Test dynamic blocks, including void blocks.
 	 *
 	 * @covers ::do_blocks
 	 */
@@ -68,21 +68,22 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 		$post_content =
 			'before' .
 			'<!-- wp:core/dummy {"value":"b1"} --><!-- /wp:core/dummy -->' .
-			'<!-- wp:core/dummy {"value":"b1"} --><!-- /wp:core/dummy -->' .
+			'<!-- wp:core/dummy {"value":"b1"} -->hello world<!-- /wp:core/dummy -->' .
 			'between' .
 			'<!-- wp:core/dummy {"value":"b2"} /-->' .
 			'<!-- wp:core/dummy {"value":"b2"} /-->' .
 			'after';
 
 		$updated_post_content = do_blocks( $post_content );
-		$this->assertEquals( $updated_post_content,
+		$this->assertEquals(
 			'before' .
-			'1:b1' .
-			'2:b1' .
+			'1:b1:' .
+			'2:b1:hello world' .
 			'between' .
-			'3:b2' .
-			'4:b2' .
-			'after'
+			'3:b2:' .
+			'4:b2:' .
+			'after',
+			$updated_post_content
 		);
 	}
 

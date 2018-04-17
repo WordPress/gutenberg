@@ -57,6 +57,14 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$this->assertTrue( $block_type->is_dynamic() );
 	}
 
+	function test_dynamic_block_with_content() {
+		$block_type = new WP_Block_Type( 'core/dummy', array(
+			'render_callback' => array( $this, 'render_dummy_block_with_content' ),
+		) );
+		$output     = json_decode( $block_type->render( array(), 'hello world' ), true );
+		$this->assertEquals( 'hello world', $output['_content'] );
+	}
+
 	function test_prepare_attributes() {
 		$attributes = array(
 			'correct'            => 'include',
