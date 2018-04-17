@@ -18,6 +18,7 @@ export { default as Autocomplete } from './autocomplete';
 export { blockAutocompleter, userAutocompleter } from './autocompleters';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockControls } from './block-controls';
+export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockEdit } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as ColorPalette } from './color-palette';

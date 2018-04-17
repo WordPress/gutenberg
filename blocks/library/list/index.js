@@ -6,7 +6,7 @@ import { find, compact, get, initial, last, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createElement } from '@wordpress/element';
+import { Component, createElement, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
@@ -230,7 +230,6 @@ registerBlockType( 'core/list', {
 		render() {
 			const {
 				attributes,
-				isSelected,
 				insertBlocksAfter,
 				setAttributes,
 				mergeBlocks,
@@ -239,10 +238,9 @@ registerBlockType( 'core/list', {
 			} = this.props;
 			const { nodeName, values } = attributes;
 
-			return [
-				isSelected && (
+			return (
+				<Fragment>
 					<BlockControls
-						key="controls"
 						controls={ [
 							{
 								icon: 'editor-ul',
@@ -268,42 +266,40 @@ registerBlockType( 'core/list', {
 							},
 						] }
 					/>
-				),
-				<RichText
-					multiline="li"
-					key="editable"
-					tagName={ nodeName.toLowerCase() }
-					getSettings={ this.getEditorSettings }
-					onSetup={ this.setupEditor }
-					onChange={ this.setNextValues }
-					value={ values }
-					wrapperClassName="blocks-list"
-					className={ className }
-					placeholder={ __( 'Write list…' ) }
-					onMerge={ mergeBlocks }
-					onSplit={
-						insertBlocksAfter ?
-							( before, after, ...blocks ) => {
-								if ( ! blocks.length ) {
-									blocks.push( createBlock( 'core/paragraph' ) );
-								}
+					<RichText
+						multiline="li"
+						tagName={ nodeName.toLowerCase() }
+						getSettings={ this.getEditorSettings }
+						onSetup={ this.setupEditor }
+						onChange={ this.setNextValues }
+						value={ values }
+						wrapperClassName="blocks-list"
+						className={ className }
+						placeholder={ __( 'Write list…' ) }
+						onMerge={ mergeBlocks }
+						onSplit={
+							insertBlocksAfter ?
+								( before, after, ...blocks ) => {
+									if ( ! blocks.length ) {
+										blocks.push( createBlock( 'core/paragraph' ) );
+									}
 
-								if ( after.length ) {
-									blocks.push( createBlock( 'core/list', {
-										nodeName,
-										values: after,
-									} ) );
-								}
+									if ( after.length ) {
+										blocks.push( createBlock( 'core/list', {
+											nodeName,
+											values: after,
+										} ) );
+									}
 
-								setAttributes( { values: before } );
-								insertBlocksAfter( blocks );
-							} :
-							undefined
-					}
-					onRemove={ () => onReplace( [] ) }
-					isSelected={ isSelected }
-				/>,
-			];
+									setAttributes( { values: before } );
+									insertBlocksAfter( blocks );
+								} :
+								undefined
+						}
+						onRemove={ () => onReplace( [] ) }
+					/>
+				</Fragment>
+			);
 		}
 	},
 

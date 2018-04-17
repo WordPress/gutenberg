@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
 import {
 	InspectorControls,
 	BlockControls,
 	BlockAlignmentToolbar,
 } from '@wordpress/blocks';
+import { Component, Fragment } from '@wordpress/element';
 import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -145,11 +145,11 @@ class CategoriesBlock extends Component {
 	}
 
 	render() {
-		const { attributes, focus, setAttributes, isRequesting } = this.props;
+		const { attributes, setAttributes, isRequesting } = this.props;
 		const { align, displayAsDropdown, showHierarchy, showPostCounts } = attributes;
 
-		const inspectorControls = focus && (
-			<InspectorControls key="inspector">
+		const inspectorControls = (
+			<InspectorControls>
 				<PanelBody title={ __( 'Categories Settings' ) }>
 					<ToggleControl
 						label={ __( 'Display as dropdown' ) }
@@ -171,22 +171,23 @@ class CategoriesBlock extends Component {
 		);
 
 		if ( isRequesting ) {
-			return [
-				inspectorControls,
-				<Placeholder
-					key="placeholder"
-					icon="admin-post"
-					label={ __( 'Categories' ) }
-				>
-					<Spinner />
-				</Placeholder>,
-			];
+			return (
+				<Fragment>
+					{ inspectorControls }
+					<Placeholder
+						icon="admin-post"
+						label={ __( 'Categories' ) }
+					>
+						<Spinner />
+					</Placeholder>
+				</Fragment>
+			);
 		}
 
-		return [
-			inspectorControls,
-			focus && (
-				<BlockControls key="controls">
+		return (
+			<Fragment>
+				{ inspectorControls }
+				<BlockControls>
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -195,15 +196,15 @@ class CategoriesBlock extends Component {
 						controls={ [ 'left', 'center', 'right', 'full' ] }
 					/>
 				</BlockControls>
-			),
-			<div key="categories" className={ this.props.className }>
-				{
-					displayAsDropdown ?
-						this.renderCategoryDropdown() :
-						this.renderCategoryList()
-				}
-			</div>,
-		];
+				<div className={ this.props.className }>
+					{
+						displayAsDropdown ?
+							this.renderCategoryDropdown() :
+							this.renderCategoryList()
+					}
+				</div>
+			</Fragment>
+		);
 	}
 }
 

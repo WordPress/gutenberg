@@ -12,7 +12,7 @@ import {
 	ContrastChecker,
 	InspectorControls,
 } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import {
 	Dashicon,
 	IconButton,
@@ -83,29 +83,26 @@ class ButtonBlock extends Component {
 			clear,
 		} = attributes;
 
-		return [
-			isSelected && (
-				<BlockControls key="controls">
+		return (
+			<Fragment>
+				<BlockControls>
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
-			),
-			<span key="button" className={ className } title={ title } ref={ this.bindRef }>
-				<RichText
-					tagName="span"
-					placeholder={ __( 'Add text…' ) }
-					value={ text }
-					onChange={ ( value ) => setAttributes( { text: value } ) }
-					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-					className="wp-block-button__link"
-					style={ {
-						backgroundColor: color,
-						color: textColor,
-					} }
-					isSelected={ isSelected }
-					keepPlaceholderOnFocus
-				/>
-				{ isSelected &&
-					<InspectorControls key="inspector">
+				<span className={ className } title={ title } ref={ this.bindRef }>
+					<RichText
+						tagName="span"
+						placeholder={ __( 'Add text…' ) }
+						value={ text }
+						onChange={ ( value ) => setAttributes( { text: value } ) }
+						formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+						className="wp-block-button__link"
+						style={ {
+							backgroundColor: color,
+							color: textColor,
+						} }
+						keepPlaceholderOnFocus
+					/>
+					<InspectorControls>
 						<PanelBody>
 							<ToggleControl
 								label={ __( 'Wrap text' ) }
@@ -132,22 +129,21 @@ class ButtonBlock extends Component {
 							/> }
 						</PanelBody>
 					</InspectorControls>
-				}
-			</span>,
-			isSelected && (
-				<form
-					key="form-link"
-					className="blocks-button__inline-link"
-					onSubmit={ ( event ) => event.preventDefault() }>
-					<Dashicon icon="admin-links" />
-					<UrlInput
-						value={ url }
-						onChange={ ( value ) => setAttributes( { url: value } ) }
-					/>
-					<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-				</form>
-			),
-		];
+				</span>
+				{ isSelected && (
+					<form
+						className="blocks-button__inline-link"
+						onSubmit={ ( event ) => event.preventDefault() }>
+						<Dashicon icon="admin-links" />
+						<UrlInput
+							value={ url }
+							onChange={ ( value ) => setAttributes( { url: value } ) }
+						/>
+						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+					</form>
+				) }
+			</Fragment>
+		);
 	}
 }
 

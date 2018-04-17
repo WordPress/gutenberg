@@ -51,24 +51,22 @@ registerBlockType( 'core/html', {
 		preview: false,
 	} )( ( { attributes, setAttributes, setState, isSelected, toggleSelection, preview } ) => (
 		<div className="wp-block-html">
-			{ isSelected && (
-				<BlockControls>
-					<div className="components-toolbar">
-						<button
-							className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` }
-							onClick={ () => setState( { preview: false } ) }
-						>
-							<span>HTML</span>
-						</button>
-						<button
-							className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
-							onClick={ () => setState( { preview: true } ) }
-						>
-							<span>{ __( 'Preview' ) }</span>
-						</button>
-					</div>
-				</BlockControls>
-			) }
+			<BlockControls>
+				<div className="components-toolbar">
+					<button
+						className={ `components-tab-button ${ ! preview ? 'is-active' : '' }` }
+						onClick={ () => setState( { preview: false } ) }
+					>
+						<span>HTML</span>
+					</button>
+					<button
+						className={ `components-tab-button ${ preview ? 'is-active' : '' }` }
+						onClick={ () => setState( { preview: true } ) }
+					>
+						<span>{ __( 'Preview' ) }</span>
+					</button>
+				</div>
+			</BlockControls>
 			{ preview ? (
 				<SandBox html={ attributes.content } />
 			) : (

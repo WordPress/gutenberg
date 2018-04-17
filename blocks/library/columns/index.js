@@ -17,6 +17,7 @@ import {
 	InnerBlocks,
 } from '@wordpress/blocks';
 import { PanelBody, RangeControl } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -69,13 +70,13 @@ registerBlockType( 'core/columns', {
 		return { 'data-align': align };
 	},
 
-	edit( { attributes, setAttributes, className, focus } ) {
+	edit( { attributes, setAttributes, className } ) {
 		const { align, columns } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
 
-		return [
-			...focus ? [
-				<BlockControls key="controls">
+		return (
+			<Fragment>
+				<BlockControls>
 					<BlockAlignmentToolbar
 						controls={ [ 'wide', 'full' ] }
 						value={ align }
@@ -83,8 +84,8 @@ registerBlockType( 'core/columns', {
 							setAttributes( { align: nextAlign } );
 						} }
 					/>
-				</BlockControls>,
-				<InspectorControls key="inspector">
+				</BlockControls>
+				<InspectorControls>
 					<PanelBody>
 						<RangeControl
 							label={ __( 'Columns' ) }
@@ -98,12 +99,12 @@ registerBlockType( 'core/columns', {
 							max={ 6 }
 						/>
 					</PanelBody>
-				</InspectorControls>,
-			] : [],
-			<div className={ classes } key="container">
-				<InnerBlocks layouts={ getColumnLayouts( columns ) } />
-			</div>,
-		];
+				</InspectorControls>
+				<div className={ classes }>
+					<InnerBlocks layouts={ getColumnLayouts( columns ) } />
+				</div>
+			</Fragment>
+		);
 	},
 
 	save( { attributes } ) {

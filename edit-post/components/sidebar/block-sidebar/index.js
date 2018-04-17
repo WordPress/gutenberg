@@ -17,7 +17,7 @@ const SIDEBAR_NAME = 'edit-post/block';
 const BlockSidebar = () => (
 	<Sidebar
 		name={ SIDEBAR_NAME }
-		label={ __( 'Editor block settings' ) }
+		label={ __( 'Editor settings' ) }
 	>
 		<SettingsHeader sidebarName={ SIDEBAR_NAME } />
 		<Panel>

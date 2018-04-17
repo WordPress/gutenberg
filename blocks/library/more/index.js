@@ -13,7 +13,7 @@ import {
 	InspectorControls,
 } from '@wordpress/blocks';
 import { PanelBody, ToggleControl } from '@wordpress/components';
-import { Component, RawHTML } from '@wordpress/element';
+import { Component, Fragment, RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -91,16 +91,16 @@ registerBlockType( 'core/more', {
 
 		render() {
 			const { customText, noTeaser } = this.props.attributes;
-			const { setAttributes, isSelected } = this.props;
+			const { setAttributes } = this.props;
 
 			const toggleNoTeaser = () => setAttributes( { noTeaser: ! noTeaser } );
 			const { defaultText } = this.state;
 			const value = customText !== undefined ? customText : defaultText;
 			const inputLength = value.length + 1;
 
-			return [
-				isSelected && (
-					<InspectorControls key="inspector">
+			return (
+				<Fragment>
+					<InspectorControls>
 						<PanelBody>
 							<ToggleControl
 								label={ __( 'Hide the teaser before the "More" tag' ) }
@@ -109,16 +109,16 @@ registerBlockType( 'core/more', {
 							/>
 						</PanelBody>
 					</InspectorControls>
-				),
-				<div key="more-tag" className="wp-block-more">
-					<input
-						type="text"
-						value={ value }
-						size={ inputLength }
-						onChange={ this.onChangeInput }
-					/>
-				</div>,
-			];
+					<div className="wp-block-more">
+						<input
+							type="text"
+							value={ value }
+							size={ inputLength }
+							onChange={ this.onChangeInput }
+						/>
+					</div>
+				</Fragment>
+			);
 		}
 	},
 
