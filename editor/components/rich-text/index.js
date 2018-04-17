@@ -231,6 +231,15 @@ export class RichText extends Component {
 	}
 
 	onInit() {
+		const {
+			isSelected,
+			inlineBlocksEnabled = true,
+			setInsertAvailable,
+		} = this.props;
+
+		if ( isSelected && inlineBlocksEnabled ) {
+			setInsertAvailable();
+		}
 		this.registerCustomFormatters();
 
 		this.editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
@@ -244,8 +253,6 @@ export class RichText extends Component {
 		// Remove TinyMCE Core shortcut for consistency with global editor
 		// shortcuts. Also clashes with Mac browsers.
 		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
-
-		this.props.setInsertAvailable();
 	}
 
 	adaptFormatter( options ) {
@@ -468,7 +475,7 @@ export class RichText extends Component {
 		return {
 			top: rect.top - containerPosition.top,
 			left: rect.right - containerPosition.left,
-			'margin-left': marginLeft,
+			marginLeft,
 			height: rect.height,
 		};
 	}
@@ -487,7 +494,16 @@ export class RichText extends Component {
 	}
 
 	toggleInsertAvailable() {
-		const { isSelected, setInsertAvailable, setInsertUnavailable } = this.props;
+		const {
+			inlineBlocksEnabled = true,
+			isSelected,
+			setInsertAvailable,
+			setInsertUnavailable,
+		} = this.props;
+
+		if ( ! inlineBlocksEnabled ) {
+			return;
+		}
 
 		if ( isSelected ) {
 			// setTimeout prevents bug when switching between two
