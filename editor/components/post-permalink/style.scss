@@ -7,6 +7,7 @@
 	font-family: $default-font;
 	font-size: $default-font-size;
 	height: 40px;
+	white-space: nowrap;
 
 	// put toolbar snugly to edge on mobile
 	margin-left: -$block-padding - 1px;	// stack borders
