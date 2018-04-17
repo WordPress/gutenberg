@@ -32,8 +32,8 @@ class SharedBlockEditPanel extends Component {
 		if ( ! prevProps.isEditing && this.props.isEditing ) {
 			this.sharedBlockNameField.current.select();
 		}
-		// Move focus back to the Edit button after pressing Save or Cancel.
-		if ( ! this.props.isEditing && ! this.props.isSaving ) {
+		// Move focus back to the Edit button after pressing the Escape key, Cancel, or Save.
+		if ( ( prevProps.isEditing || prevProps.isSaving ) && ! this.props.isEditing && ! this.props.isSaving ) {
 			this.editButton.current.focus();
 		}
 	}
