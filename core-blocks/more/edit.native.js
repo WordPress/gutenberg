@@ -11,6 +11,7 @@ import { __ } from '../../../i18n';
  * Internal dependencies
  */
 import PlainText from '../../plain-text';
+import styles from './editor.scss';
 
 export function edit( { attributes, setAttributes, isSelected } ) {
 	const { customText, noTeaser } = attributes;
@@ -18,17 +19,18 @@ export function edit( { attributes, setAttributes, isSelected } ) {
 	const value = customText !== undefined ? customText : defaultText;
 
 	return (
-		<View style={ { padding: 4, alignItems: 'center' } }>
-			<View style={ { alignItems: 'center', flexDirection: 'row' } }>
-				<Text style={ { fontFamily: 'monospace' } }>&lt;!--</Text>
+		<View className={ styles.blocks_more_container }>
+			<View className={ styles.blocks_more_sub_container }>
+				<Text className={ styles.blocks_more_left_marker }>&lt;!--</Text>
 				<PlainText
+					className={ styles.blocks_more_plain_text }
 					value={ value }
-					multiline={ false }
+					multiline={ true }
 					underlineColorAndroid="transparent"
-					onChange={ content => setAttributes( { content } ) }
+					onChange={ value => setAttributes( { customText: value } ) }
 					placeholder={ defaultText }
 				/>
-				<Text style={ { fontFamily: 'monospace' } }>--&gt;</Text>
+				<Text className={ styles.blocks_more_right_marker }>--&gt;</Text>
 			</View>
 		</View> );
 }

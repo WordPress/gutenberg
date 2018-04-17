@@ -1,0 +1,25 @@
+// @format
+
+.blocks_more_container {
+	align-items: center;
+	padding-left: 4;
+	padding-right: 4;
+	padding-top: 4;
+	padding-bottom: 4;
+}
+
+.blocks_more_sub_container {
+	align-items: center;
+	flex-direction: row;
+}
+
+.blocks_more_left_marker	{
+	font-family: monospace;
+	padding-right: 4;
+}
+
+.blocks_more_right_marker	{
+	font-family: monospace;
+	padding-left: 4;
+}
+
