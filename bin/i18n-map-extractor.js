@@ -38,13 +38,13 @@ class wpi18nExtractor {
 
 	getStringsFromModule( module, extractor ) {
 		const source = module.originalSource().source();
+		const { parse, types } = recast;
 		if ( isEmpty( source ) ) {
 			return [];
 		}
 		let strings = [];
 		try {
-			const ast = recast.parse( source );
-			const { types } = recast;
+			const ast = parse( source );
 			types.visit( ast, {
 				visitCallExpression: function( path ) {
 					const node = path.node;
@@ -132,7 +132,6 @@ class wpi18nExtractor {
 		try {
 			finalMap = JSON.parse( readFileSync( './' + options.filename ) );
 		} catch ( e ) {
-			// if there is no existing file then lets just default to an empty object.
 			finalMap = {};
 		}
 		finalMap = Object.assign( {}, finalMap, translationMap );
