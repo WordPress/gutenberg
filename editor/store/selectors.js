@@ -1507,6 +1507,10 @@ export function isPublishingPost( state ) {
 	return !! stateBeforeRequest && ! isCurrentPostPublished( stateBeforeRequest );
 }
 
+export function getBlockListSettings( state, id ) {
+	return state.blockListSettings[ id ];
+}
+
 /**
  * Returns the provisional block UID, or null if there is no provisional block.
  *

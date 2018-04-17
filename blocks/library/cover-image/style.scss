@@ -6,46 +6,7 @@
 	margin: 0 0 1.5em 0;
 	display: flex;
 	justify-content: center;
-	align-items: center;
-
-	&.has-left-content {
-		justify-content: flex-start;
-
-		h2,
-		.wp-block-cover-image-text {
-			margin-left: 0;
-			text-align: left;
-		}
-	}
-
-	&.has-right-content {
-		justify-content: flex-end;
-
-		h2,
-		.wp-block-cover-image-text {
-			margin-right: 0;
-			text-align: right;
-		}
-	}
-
-	h2,
-	.wp-block-cover-image-text {
-		color: white;
-		font-size: 2em;
-		line-height: 1.25;
-		z-index: 1;
-		margin-bottom: 0;
-		max-width: $content-width;
-		padding: $block-padding;
-		text-align: center;
-
-		a,
-		a:hover,
-		a:focus,
-		a:active {
-			color: white;
-		}
-	}
+	flex-direction: column;
 
 	&.has-parallax {
 		background-attachment: fixed;
@@ -78,5 +39,13 @@
 	&.alignright {
 		max-width: $content-width / 2;
 		width: 100%;
+	}
+
+	.wp-block-cover-image__inner-container {
+		width: 100%;
+		p {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
 	}
 }

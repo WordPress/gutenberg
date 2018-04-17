@@ -1006,6 +1006,33 @@ export const sharedBlocks = combineReducers( {
 	},
 } );
 
+export const blockListSettings = ( state = {}, action ) => {
+	switch ( action.type ) {
+		// even if we replace with blocksn with same uid our logic should correct the state
+		case 'REPLACE_BLOCKS' :
+		case 'REMOVE_BLOCKS': {
+			return omit( state, action.uids );
+		}
+		case 'UPDATED_BLOCK_LIST_SETTINGS': {
+			const { id, settings } = action;
+			if ( id && ! settings ) {
+				return omit( state, id );
+			}
+			const blockSettings = state[ id ];
+			const updateIsRequired = ! isEqual( blockSettings, settings );
+			if ( updateIsRequired ) {
+				return {
+					...state,
+					[ id ]: {
+						...settings,
+					},
+				};
+			}
+		}
+	}
+	return state;
+};
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -1013,6 +1040,7 @@ export default optimist( combineReducers( {
 	blockSelection,
 	provisionalBlockUID,
 	blocksMode,
+	blockListSettings,
 	isInsertionPointVisible,
 	preferences,
 	saving,

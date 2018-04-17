@@ -22,10 +22,19 @@
 	}
 
 	&.has-left-content .block-rich-text__inline-toolbar {
-		justify-content: flex-start;
+		display: inline-block;
 	}
 
 	&.has-right-content .block-rich-text__inline-toolbar{
-		justify-content: flex-end;
+		display: inline-block;
 	}
+
+	.editor-block-list__layout {
+		width: 100%;
+		.editor-block-list__block:not(.is-multi-selected) .wp-block-paragraph {
+			background: none;
+		}
+	}
+
+
 }
