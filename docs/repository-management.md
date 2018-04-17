@@ -13,6 +13,7 @@ This document covers:
   - [Design Review](#design-review)
   - [Merging Pull Requests](#merging-pull-requests)
   - [Closing Pull Requests](#closing-pull-requests)
+- [Projects](#projects)
 
 ## Issues
 
@@ -145,3 +146,12 @@ If you’d like a template to follow:
 >
 > For more details, please see ____ and ____.
 
+## Projects
+
+We use [GitHub projects](https://github.com/WordPress/gutenberg/projects) to keep track of details that aren't immediately actionable, but that we want to keep around for future reference.
+
+Some key projects include:
+
+* [Customization](https://github.com/WordPress/gutenberg/projects/13) - Blocks and tasks needed for customization in Gutenberg.
+* [Extensibility](https://github.com/WordPress/gutenberg/projects/14) - Comprises the entirety of extensibility APIs. See [Native Gutenberg Extensibility Overview](https://github.com/WordPress/gutenberg/issues/3330) for more details.
+* [Third-Party Compatibility](https://github.com/WordPress/gutenberg/projects/15) - Issue that impact Gutenberg's adoption in the real world.
