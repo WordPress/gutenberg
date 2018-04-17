@@ -58,9 +58,9 @@ class ManagedOverlay extends Component {
 	}
 
 	render() {
-		const { children } = this.props;
+		const { children, className } = this.props;
 		return (
-			<div ref={ this.containerRef } role="dialog" aria-modal="true">
+			<div className={ className } ref={ this.containerRef } role="dialog" aria-modal={ true }>
 				{ children }
 			</div>
 		);
