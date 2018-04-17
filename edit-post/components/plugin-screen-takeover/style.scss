@@ -15,6 +15,7 @@
 	transform: translate(-50%, -50%);
 	background-color: #fff;
 	outline: none;
+	box-shadow: 0px 3px 25px #000;
 
 	// In small screens the content needs to be full width.
 	@media ( max-width: #{ ( $break-small ) } ) {
@@ -77,6 +78,12 @@ body.ReactModal__Body--open {
 		flex-direction: row;
 		justify-content: left;
 
+		h1 {
+			font-size: 1em;
+			font-weight: normal;
+			padding-left: 5px;
+		}
+
 		span {
 			display: inline-block;
 		}
@@ -85,7 +92,17 @@ body.ReactModal__Body--open {
 			max-width: $icon-button-size;
 			max-height: $icon-button-size;
 			padding: 8px;
-			padding-right: 10px;
 		}
+	}
+}
+
+.edit-post-plugin-screen-takeover__editor-screen-takeover-content {
+	padding: 10px 20px 5px 20px;
+	height: 500px;
+	overflow: auto;
+
+	// For small screens, the content needs to be full height.
+	@media ( max-width: #{ ( $break-small ) } ) {
+		height: 100%
 	}
 }
