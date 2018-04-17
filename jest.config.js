@@ -30,7 +30,6 @@ module.exports = {
 	moduleNameMapper: {
 		'@wordpress/element': '<rootDir>/gutenberg/element',
 		'@wordpress/hooks': '<rootDir>/wordpress/hooks',
-		'@wordpress/i18n': '<rootDir>/gutenberg/i18n',
 		'@wordpress/utils': '<rootDir>/gutenberg/utils',
 		'@gutenberg': '<rootDir>/gutenberg',
 
