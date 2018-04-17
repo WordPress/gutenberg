@@ -336,15 +336,25 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	connect(
-		( state, ownProps ) => {
-			return {
-				items: getInserterItems( state, ownProps.supportedBlockTypes ),
-				frecentItems: getFrecentInserterItems( state, ownProps.supportedBlockTypes ),
-			};
-		},
-		{ fetchReusableBlocks }
-	),
+	withEditorSettings( ( settings ) => {
+		const { allowedBlockTypes } = settings;
+
+		return {
+			allowedBlockTypes,
+		};
+	} ),
+	withSelect( ( select, { allowedBlockTypes } ) => {
+		const { getInserterItems, getFrecentInserterItems, getBlockInsertionPoint, getSupportedBlocks } = select( 'core/editor' );
+		const { rootUID } = getBlockInsertionPoint( state );
+		const supportedBlocks = getSupportedBlocks( state, rootUID, allowedBlockTypes );
+		return {
+			items: getInserterItems( supportedBlocks ),
+			frecentItems: getFrecentInserterItems( supportedBlocks ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
+	} ) ),
 	withSpokenMessages,
 	withInstanceId
 )( InserterMenu );

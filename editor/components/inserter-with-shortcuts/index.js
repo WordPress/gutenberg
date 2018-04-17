@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { filter, get, intersection, isEmpty } from 'lodash';
+import { filter, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +16,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import './style.scss';
-import { getFrecentInserterItems, getBlockInsertionPoint, getBlockListSettings } from '../../store/selectors';
 
 function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 	if ( isLocked ) {
@@ -51,30 +49,16 @@ export default compose(
 
 		return {
 			isLocked: !! templateLock,
-			globalEnabledBlockTypes: blockTypes,
+			allowedBlockTypes,
 		};
 	} ),
-	connect(
-		( state, { globalEnabledBlockTypes } ) => {
-			const insertionPoint = getBlockInsertionPoint( state );
-			const { rootUID } = insertionPoint;
-			const blockListSettings = getBlockListSettings( state, rootUID );
-			const supportedNestedBlocks = get( blockListSettings, 'supportedBlocks' );
-
-			let supportedBlockTypes;
-			if ( ! supportedNestedBlocks ) {
-				supportedBlockTypes = globalEnabledBlockTypes;
-			} else if ( true === globalEnabledBlockTypes ) {
-				supportedBlockTypes = supportedNestedBlocks;
-			} else {
-				supportedBlockTypes = intersection( globalEnabledBlockTypes, supportedNestedBlocks );
-			}
-
-			return {
-				items: getFrecentInserterItems( state, supportedBlockTypes, 3 ),
-			};
-		}
-	),
+	withSelect( ( select, { allowedBlockTypes, rootUID } ) => {
+		const { getFrecentInserterItems, getSupportedBlocks } = select( 'core/editor' );
+		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
+		return {
+			items: getFrecentInserterItems( supportedBlocks, 4 ),
+		};
+	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const { uid, rootUID, layout } = ownProps;
 

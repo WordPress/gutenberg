@@ -113,19 +113,11 @@ export default compose( [
 			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
 		},
 	} ) ),
-	withContext( 'editor' )( ( settings, props ) => {
-		const { blockTypes, templateLock } = settings;
-		let supportedBlockTypes;
-		if ( ! props.supportedBlocks ) {
-			supportedBlockTypes = blockTypes;
-		} else if ( true === blockTypes ) {
-			supportedBlockTypes = props.supportedBlocks;
-		} else {
-			supportedBlockTypes = intersection( blockTypes, props.supportedBlocks );
-		}
+	withEditorSettings( ( settings ) => {
+		const { allowedBlockTypes, templateLock } = settings;
+
 		return {
-			hasSupportedBlocks: ( true === supportedBlockTypes ) || ! isEmpty( supportedBlockTypes ),
-			supportedBlockTypes,
+			hasSupportedBlocks: true === allowedBlockTypes || ! isEmpty( allowedBlockTypes ),
 			isLocked: !! templateLock,
 		};
 	} ),

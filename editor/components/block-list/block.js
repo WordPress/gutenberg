@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, isEqual, reduce, size, castArray, first, last, noop } from 'lodash';
+import { get, reduce, size, castArray, first, last, noop } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
@@ -24,7 +24,7 @@ import {
 	getSaveElement,
 	isSharedBlock,
 	isUnmodifiedDefaultBlock,
-	synchronizeBlocksWithTemplate,
+	withEditorSettings,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -52,33 +52,6 @@ import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
 import { createInnerBlockList } from '../../utils/block-list';
-import {
-	editPost,
-	insertBlocks,
-	mergeBlocks,
-	removeBlock,
-	replaceBlocks,
-	selectBlock,
-	updateBlockAttributes,
-	toggleSelection,
-	updateBlockListSettings,
-} from '../../store/actions';
-import {
-	getBlock,
-	isMultiSelecting,
-	getBlockIndex,
-	getEditedPostAttribute,
-	getNextBlockUid,
-	getPreviousBlockUid,
-	isBlockMultiSelected,
-	isBlockSelected,
-	isFirstMultiSelectedBlock,
-	isSelectionEnabled,
-	isTyping,
-	getBlockMode,
-	getSelectedBlocksInitialCaretPosition,
-	getBlockListSettings,
-} from '../../store/selectors';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -103,8 +76,6 @@ export class BlockListBlock extends Component {
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
-		this.updateNestingSettingsIfRequired = this.updateNestingSettingsIfRequired.bind( this );
-		this.insertTemplateBlocksIfInnerBlocksEmpty = this.insertTemplateBlocksIfInnerBlocksEmpty.bind( this );
 		this.hadTouchStart = false;
 
 		this.state = {
@@ -126,14 +97,8 @@ export class BlockListBlock extends Component {
 		// we inject this function via context.
 		return {
 			createInnerBlockList: ( uid ) => {
-				const { renderBlockMenu, showContextualToolbar } = this.props;
-				return createInnerBlockList(
-					uid,
-					renderBlockMenu,
-					showContextualToolbar,
-					this.updateNestingSettingsIfRequired,
-					this.insertTemplateBlocksIfInnerBlocksEmpty,
-				);
+				const { renderBlockMenu } = this.props;
+				return createInnerBlockList( uid, renderBlockMenu );
 			},
 		};
 	}
@@ -424,19 +389,6 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	insertTemplateBlocksIfInnerBlocksEmpty( template ) {
-		const { block, onInsertBlocks, uid } = this.props;
-		if ( template && ! block.innerBlocks.length ) {
-			onInsertBlocks( synchronizeBlocksWithTemplate( [], template ), 0, uid );
-		}
-	}
-
-	updateNestingSettingsIfRequired( newSettings ) {
-		if ( ! isEqual( this.props.blockListSettings, newSettings ) ) {
-			this.props.updateNestedSettings( this.props.uid, newSettings );
-		}
-	}
-
 	render() {
 		const {
 			block,
@@ -636,7 +588,7 @@ export class BlockListBlock extends Component {
 				{ showSideInserter && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">
-							<InserterWithShortcuts uid={ uid } layout={ layout } onToggle={ this.selectOnOpen } />
+							<InserterWithShortcuts uid={ uid } rootUID={ rootUID } layout={ layout } onToggle={ this.selectOnOpen } />
 						</div>
 						<div className="editor-block-list__empty-block-inserter">
 							<Inserter
@@ -687,52 +639,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isSelected,
-		blockListSettings: getBlockListSettings( state, uid ),
 	};
-} );
-
-const mapDispatchToProps = ( dispatch, ownProps ) => ( {
-	onChange( uid, attributes ) {
-		dispatch( updateBlockAttributes( uid, attributes ) );
-	},
-
-	onSelect( uid = ownProps.uid, initialPosition ) {
-		dispatch( selectBlock( uid, initialPosition ) );
-	},
-
-	onInsertBlocks( blocks, index, uid ) {
-		const { rootUID, layout } = ownProps;
-
-		blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
-
-		dispatch( insertBlocks( blocks, index, uid || rootUID ) );
-	},
-
-	onRemove( uid ) {
-		dispatch( removeBlock( uid ) );
-	},
-
-	onMerge( ...args ) {
-		dispatch( mergeBlocks( ...args ) );
-	},
-
-	onReplace( blocks ) {
-		const { layout } = ownProps;
-
-		blocks = castArray( blocks ).map( ( block ) => (
-			cloneBlock( block, { layout } )
-		) );
-
-		dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
-	},
-
-	toggleSelection( selectionEnabled ) {
-		dispatch( toggleSelection( selectionEnabled ) );
-	},
-
-	updateNestedSettings( uid, settings ) {
-		dispatch( updateBlockListSettings( uid, settings ) );
-	},
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
@@ -746,6 +653,39 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		editPost,
 		toggleSelection,
 	} = dispatch( 'core/editor' );
+
+	return {
+		onChange( uid, attributes ) {
+			updateBlockAttributes( uid, attributes );
+		},
+		onSelect( uid = ownProps.uid, initialPosition ) {
+			selectBlock( uid, initialPosition );
+		},
+		onInsertBlocks( blocks, index ) {
+			const { rootUID, layout } = ownProps;
+			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
+			insertBlocks( blocks, index, rootUID );
+		},
+		onRemove( uid ) {
+			removeBlock( uid );
+		},
+		onMerge( ...args ) {
+			mergeBlocks( ...args );
+		},
+		onReplace( blocks ) {
+			const { layout } = ownProps;
+			blocks = castArray( blocks ).map( ( block ) => (
+				cloneBlock( block, { layout } )
+			) );
+			replaceBlocks( [ ownProps.uid ], blocks );
+		},
+		onMetaChange( meta ) {
+			editPost( { meta } );
+		},
+		toggleSelection( selectionEnabled ) {
+			toggleSelection( selectionEnabled );
+		},
+	};
 } );
 
 BlockListBlock.childContextTypes = {
