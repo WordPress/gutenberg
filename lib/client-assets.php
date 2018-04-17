@@ -753,10 +753,8 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 
 	$is_post_or_page = is_singular( array( 'post', 'page' ) );
 
-	// Triggers parsing of post's content so as to save block types present in the post and to strip block comments from the HTML.
-	if ( $is_post_or_page ) {
-		gutenberg_trigger_block_comments_processing();
-	}
+	// Triggers processing of block comments in the HTML.
+	gutenberg_trigger_block_comments_processing();
 
 	$enqueue_only_required_styles  = $is_front_end && $is_post_or_page;
 	$enqueue_styles_for_all_blocks = ! $enqueue_only_required_styles;
@@ -792,18 +790,33 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 }
 
 /**
- * Calls gutenberg_process_block_comments() to parse block types present in the
- * current post/page while stripping block comments. It calls apply_filters() on
- * 'the_content' before starting to strip block comments so that block types added by
- * plugins (through filters added uptil now on 'the_content') can also be parsed.
+ * For a single post / page, it calls gutenberg_process_block_comments() which parses
+ * `block types` present in the current post/page while stripping `block comments`.
+ * It calls apply_filters() on 'the_content' before starting to strip block comments
+ * so that block types added by plugins (through filters added uptil now on 'the_content')
+ * can also be parsed.
+ *
+ * For pages with multiple posts like category / archive / home page, it just adds
+ * gutenberg_process_block_comments() as a filter on `the_content`'. In that case,
+ * gutenberg_process_block_comments() only strips block comments from the HTML.
+ * We don't need to save `parsed block types` in that case since that's only needed
+ * for intelligent enqueueing of styles right now and because intelligent enqueueing of
+ * styles only needs to be enabled for single posts / pages right now.
  *
  * @since 2.7.0
  */
 function gutenberg_trigger_block_comments_processing() {
-	global $post;
 
-	$post->post_content = apply_filters( 'the_content', $post->post_content );
-	$post->post_content = gutenberg_process_block_comments( $post->post_content );
+	$is_post_or_page = is_singular( array( 'post', 'page' ) );
+
+	if ( $is_post_or_page ) {
+		global $post;
+
+		$post->post_content = apply_filters( 'the_content', $post->post_content );
+		$post->post_content = gutenberg_process_block_comments( $post->post_content );
+	} else {
+		add_filter( 'the_content', 'gutenberg_process_block_comments', 10 );
+	}
 }
 
 add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
