@@ -224,12 +224,18 @@ function gutenberg_render_dynamic_blocks( $content ) {
 }
 
 /**
- * Parses block types while stripping block comments from the post's HTML and
- * calls WP_Parsed_Block_Types_Registry to save those parsed block types.
+ * For a single post / page, this function parses `block types` while stripping
+ * `block comments` from the post's HTML and calls WP_Parsed_Block_Types_Registry
+ * to save those parsed block types. It registers gutenberg_process_block_comment()
+ * as a callback function for preg_replace_callback(). For each block comment
+ * (matched by the Regex) in the post's HTML, gutenberg_process_block_comment()
+ * will get called.
  *
- * It registers gutenberg_process_block_comment() as a callback function for
- * preg_replace_callback(). For each block comment (matched by the Regex) in
- * the post's HTML, gutenberg_process_block_comment() will get called.
+ * For pages containing multiple posts like category / archive / home page, this only strips
+ * block comments (doesn't save the parsed block types in WP_Parsed_Block_Types_Registry).
+ * We don't need to save `parsed block types` for such pages since intelligent enqueuing of
+ * front-end styles (only enqueue styles for `block types` present in the post/page)
+ * only needs to happen for single posts / pages as of now.
  *
  * @since 2.7.0
  *
@@ -238,7 +244,19 @@ function gutenberg_render_dynamic_blocks( $content ) {
  */
 function gutenberg_process_block_comments( $content ) {
 
-	$content = preg_replace_callback( '/<!--\s+\/?wp:.*?-->\r?\n?/m', 'gutenberg_process_block_comment', $content );
+	// Checks if a single page/post is requested.
+	$is_post_or_page = is_singular( array( 'post', 'page' ) );
+
+	/*
+	 * If a single page/post is requested, we need to parse and save `parsed block types` while stripping block comments.
+	 * Otherwise, for category / archive / home page etc, we can simply strip block comments and return the HTML.
+	 */
+
+	if ( $is_post_or_page ) {
+		$content = preg_replace_callback( '/<!--\s+\/?wp:.*?-->\r?\n?/m', 'gutenberg_process_block_comment', $content );
+	} else {
+		$content = preg_replace( '/<!--\s+\/?wp:.*?-->\r?\n?/m', '', $content );
+	}
 
 	return $content;
 }
@@ -260,6 +278,7 @@ function gutenberg_process_block_comments( $content ) {
  * @return string          Returns an empty string to preg_replace_callback() for each of the block comments
  */
 function gutenberg_process_block_comment( $matches ) {
+
 	$block_comment = $matches[0];
 
 	// Only process the block comment if it's not a closing tag for a block. If it's a closing tag, we can just return.
