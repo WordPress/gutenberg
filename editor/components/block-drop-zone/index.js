@@ -7,12 +7,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { DropZone, withContext } from '@wordpress/components';
+import { DropZone } from '@wordpress/components';
 import {
 	rawHandler,
 	cloneBlock,
 	getBlockTransforms,
 	findTransform,
+	withEditorSettings,
 } from '@wordpress/blocks';
 import { compose, Component } from '@wordpress/element';
 import { withDispatch } from '@wordpress/data';
@@ -143,7 +144,7 @@ export default compose(
 			},
 		};
 	} ),
-	withContext( 'editor' )( ( settings ) => {
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {

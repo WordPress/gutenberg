@@ -1,18 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { hasEditorUndo } from '../../store/selectors';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 function EditorHistoryUndo( { hasUndo, undo } ) {
 	return (
@@ -26,11 +18,11 @@ function EditorHistoryUndo( { hasUndo, undo } ) {
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		hasUndo: hasEditorUndo( state ),
-	} ),
-	( dispatch ) => ( {
-		undo: () => dispatch( { type: 'UNDO' } ),
-	} )
-)( EditorHistoryUndo );
+export default compose( [
+	withSelect( ( select ) => ( {
+		hasUndo: select( 'core/editor' ).hasEditorUndo(),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		undo: () => dispatch( 'core/editor' ).undo(),
+	} ) ),
+] )( EditorHistoryUndo );

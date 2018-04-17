@@ -30,7 +30,7 @@ class BlockPreview extends Component {
 		// we inject this function via context.
 		return {
 			createInnerBlockList: ( uid ) => {
-				return createInnerBlockList( uid, noop, noop );
+				return createInnerBlockList( uid );
 			},
 		};
 	}

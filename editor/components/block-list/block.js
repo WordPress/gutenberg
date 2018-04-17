@@ -24,10 +24,12 @@ import {
 	getSaveElement,
 	isSharedBlock,
 	isUnmodifiedDefaultBlock,
+	withEditorSettings,
 } from '@wordpress/blocks';
-import { withFilters, withContext } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -48,6 +50,7 @@ import BlockDraggable from './block-draggable';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
+import withHoverAreas from './with-hover-areas';
 import { createInnerBlockList } from '../../utils/block-list';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
@@ -94,8 +97,8 @@ export class BlockListBlock extends Component {
 		// we inject this function via context.
 		return {
 			createInnerBlockList: ( uid ) => {
-				const { renderBlockMenu, showContextualToolbar } = this.props;
-				return createInnerBlockList( uid, renderBlockMenu, showContextualToolbar );
+				const { renderBlockMenu } = this.props;
+				return createInnerBlockList( uid, renderBlockMenu );
 			},
 		};
 	}
@@ -391,7 +394,7 @@ export class BlockListBlock extends Component {
 			block,
 			order,
 			mode,
-			showContextualToolbar,
+			hasFixedToolbar,
 			isLocked,
 			isFirst,
 			isLast,
@@ -404,8 +407,11 @@ export class BlockListBlock extends Component {
 			isFirstMultiSelected,
 			isLastInSelection,
 			isTypingWithinBlock,
+			isMultiSelecting,
+			hoverArea,
+			isLargeViewport,
 		} = this.props;
-		const isHovered = this.state.isHovered && ! this.props.isMultiSelecting;
+		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -419,9 +425,11 @@ export class BlockListBlock extends Component {
 		const isSelectedNotTyping = isSelected && ! isTypingWithinBlock;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! showSideInserter && isSelectedNotTyping;
-		const shouldShowMovers = ( shouldAppearSelected || isHovered || ( isEmptyDefaultBlock && isSelectedNotTyping ) ) && ! showSideInserter;
-		const shouldShowSettingsMenu = shouldShowMovers;
-		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
+		// We render block movers and block settings to keep them tabbale even if hidden
+		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
+		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
+		const shouldShowBreadcrumb = isHovered;
+		const shouldShowContextualToolbar = shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 
@@ -510,23 +518,25 @@ export class BlockListBlock extends Component {
 					rootUID={ rootUID }
 					layout={ layout }
 				/>
-				{ shouldShowMovers && (
+				{ shouldRenderMovers && (
 					<BlockMover
 						uids={ [ uid ] }
 						rootUID={ rootUID }
 						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
+						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 					/>
 				) }
-				{ shouldShowSettingsMenu && ! showSideInserter && (
+				{ shouldRenderBlockSettings && (
 					<BlockSettingsMenu
 						uids={ [ uid ] }
 						rootUID={ rootUID }
 						renderBlockMenu={ renderBlockMenu }
+						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' }
 					/>
 				) }
-				{ isHovered && <BlockBreadcrumb uid={ uid } /> }
+				{ shouldShowBreadcrumb && <BlockBreadcrumb uid={ uid } isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' } /> }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
 				<IgnoreNestedEvents
@@ -643,6 +653,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		editPost,
 		toggleSelection,
 	} = dispatch( 'core/editor' );
+
 	return {
 		onChange( uid, attributes ) {
 			updateBlockAttributes( uid, attributes );
@@ -684,12 +695,15 @@ BlockListBlock.childContextTypes = {
 export default compose(
 	applyWithSelect,
 	applyWithDispatch,
-	withContext( 'editor' )( ( settings ) => {
+	withViewportMatch( { isLargeViewport: 'medium' } ),
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {
 			isLocked: !! templateLock,
+			hasFixedToolbar: settings.hasFixedToolbar,
 		};
 	} ),
 	withFilters( 'editor.BlockListBlock' ),
+	withHoverAreas
 )( BlockListBlock );

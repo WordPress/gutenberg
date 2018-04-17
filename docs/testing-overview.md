@@ -361,6 +361,12 @@ or interactively
 npm run test-e2e:watch
 ```
 
+If you're using a different setup, you can provide the base URL, username and password like this:
+
+```bash
+WP_BASE_URL=http://localhost:8888 WP_USERNAME=admin WP_PASSWORD=password npm run test-e2e
+```
+
 ## PHP Testing
 
 Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the PHP tests locally using this command:

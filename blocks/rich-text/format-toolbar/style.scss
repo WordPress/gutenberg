@@ -5,9 +5,9 @@
 .blocks-format-toolbar__link-modal {
 	position: relative;
 	left: -50%;
-	box-shadow: 0 3px 20px rgba( 18, 24, 30, .1 ), 0 1px 3px rgba( 18, 24, 30, .1 );
-	border: 1px solid #e0e5e9;
-	background: #fff;
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
+	background: $white;
 	display: flex;
 	flex-direction: column;
 	font-family: $default-font;
@@ -39,6 +39,7 @@
 
 		input {
 			padding: $input-padding;
+			margin: 0;
 		}
 	}
 

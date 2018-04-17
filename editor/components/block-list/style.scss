@@ -273,21 +273,6 @@
 		}
 	}
 
-	// Apply max-width to floated items that have no intrinsic width, like Cover Image or Gallery
-	&[data-align="left"],
-	&[data-align="right"] {
-		> .editor-block-list__block-edit {
-			max-width: 360px;
-			width: 100%;
-		}
-
-		// reset when data-resized
-		&[data-resized="true"] > .editor-block-list__block-edit {
-			max-width: none;
-			width: auto;
-		}
-	}
-
 	// Left
 	&[data-align="left"] {
 		.editor-block-list__block-edit {	// This is in the editor only, on the frontend, the img should be floated
@@ -319,7 +304,7 @@
 
 	// Full-wide
 	&[data-align="full"] {
-
+		
 		// compensate for main container padding
 		@include break-small() {
 			margin-left: -$block-side-ui-padding;
@@ -333,6 +318,11 @@
 			@include break-small() {
 				margin-left: -$block-side-ui-padding - $block-padding;
 				margin-right: -$block-side-ui-padding - $block-padding;
+			}
+
+			// this explicitly sets the width of the block, to override the fit-content from the image block
+			figure {
+				width: 100%;
 			}
 		}
 
@@ -607,7 +597,7 @@
  */
 
 .editor-block-contextual-toolbar,
-.editor-block-breadcrumb {
+.editor-block-list__breadcrumb {
 	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
 	white-space: nowrap;
@@ -656,7 +646,7 @@
 }
 
 .editor-block-contextual-toolbar .editor-block-toolbar,
-.editor-block-breadcrumb .components-toolbar {
+.editor-block-list__breadcrumb .components-toolbar {
 	border: 1px solid $light-gray-500;
 	width: 100%;
 
@@ -683,7 +673,7 @@
 	}
 }
 
-.editor-block-breadcrumb .components-toolbar {
+.editor-block-list__breadcrumb .components-toolbar {
 	padding: 0px 12px;
 	line-height: $block-toolbar-height - 1px;
 	font-family: $default-font;
@@ -697,5 +687,13 @@
 		border-right: 1px solid $light-gray-500;
 		color: $dark-gray-500;
 		padding-top: 6px;
+	}
+}
+
+.editor-block-list__breadcrumb {
+	opacity: 0;
+
+	&.is-visible {
+		@include fade_in;
 	}
 }

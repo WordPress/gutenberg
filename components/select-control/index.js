@@ -39,13 +39,13 @@ function SelectControl( {
 				id={ id }
 				className="components-select-control__input"
 				onChange={ onChangeValue }
-				aria-describedby={ !! help ? id + '__help' : undefined }
+				aria-describedby={ !! help ? `${ id }__help` : undefined }
 				multiple={ multiple }
 				{ ...props }
 			>
-				{ options.map( ( option ) =>
+				{ options.map( ( option, index ) =>
 					<option
-						key={ option.value }
+						key={ `${ option.label }-${ option.value }-${ index }` }
 						value={ option.value }
 					>
 						{ option.label }

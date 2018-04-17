@@ -2,17 +2,15 @@
  * WordPress dependencies
  */
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
 import './hooks';
-import Layout from './components/layout';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
-
+import Editor from './editor';
 import PluginMoreMenuItem from './components/plugin-more-menu-item';
 
 /**
@@ -35,15 +33,10 @@ window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
  */
 export function reinitializeEditor( target, settings ) {
 	unmountComponentAtNode( target );
-
 	const reboot = reinitializeEditor.bind( null, target, settings );
 
 	render(
-		<EditorProvider settings={ settings } recovery>
-			<ErrorBoundary onError={ reboot }>
-				<Layout />
-			</ErrorBoundary>
-		</EditorProvider>,
+		<Editor settings={ settings } onError={ reboot } recovery />,
 		target
 	);
 }
@@ -64,12 +57,17 @@ export function initializeEditor( id, post, settings ) {
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, target, settings );
 
+	if ( 'production' !== process.env.NODE_ENV ) {
+		// Remove with 3.0 release.
+		window.console.info(
+			'`isSelected` usage is no longer mandatory with `BlockControls`, `InspectorControls` and `RichText`. ' +
+			'It is now handled by the editor internally to ensure that controls are visible only when block is selected. ' +
+			'See updated docs: https://github.com/WordPress/gutenberg/blob/master/blocks/README.md#components.'
+		);
+	}
+
 	render(
-		<EditorProvider settings={ settings } post={ post }>
-			<ErrorBoundary onError={ reboot }>
-				<Layout />
-			</ErrorBoundary>
-		</EditorProvider>,
+		<Editor settings={ settings } onError={ reboot } post={ post } />,
 		target
 	);
 

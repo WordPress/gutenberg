@@ -1,20 +1,18 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { first, last } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockMover from '../block-mover';
 import BlockSettingsMenu from '../block-settings-menu';
-import {
-	getMultiSelectedBlockUids,
-	isMultiSelecting,
-	getBlockIndex,
-	getBlockCount,
-} from '../../store/selectors';
 
 function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting, isFirst, isLast } ) {
 	if ( isSelecting ) {
@@ -38,17 +36,21 @@ function BlockListMultiControls( { multiSelectedBlockUids, rootUID, isSelecting,
 	];
 }
 
-export default connect( ( state, ownProps ) => {
-	const { rootUID } = ownProps;
-	const uids = getMultiSelectedBlockUids( state );
-
-	const firstIndex = getBlockIndex( state, first( uids ), rootUID );
-	const lastIndex = getBlockIndex( state, last( uids ), rootUID );
+export default withSelect( ( select, { rootUID } ) => {
+	const {
+		getMultiSelectedBlockUids,
+		isMultiSelecting,
+		getBlockIndex,
+		getBlockCount,
+	} = select( 'core/editor' );
+	const uids = getMultiSelectedBlockUids();
+	const firstIndex = getBlockIndex( first( uids ), rootUID );
+	const lastIndex = getBlockIndex( last( uids ), rootUID );
 
 	return {
 		multiSelectedBlockUids: uids,
-		isSelecting: isMultiSelecting( state ),
+		isSelecting: isMultiSelecting(),
 		isFirst: firstIndex === 0,
-		isLast: lastIndex + 1 === getBlockCount( state ),
+		isLast: lastIndex + 1 === getBlockCount(),
 	};
 } )( BlockListMultiControls );

@@ -1,3 +1,11 @@
+.editor-block-mover {
+	opacity: 0;
+
+	&.is-visible {
+		@include fade_in;
+	}
+}
+
 // Mover icon buttons
 .editor-block-mover__control {
 	display: block;

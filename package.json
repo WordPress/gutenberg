@@ -18,7 +18,7 @@
 		"@wordpress/a11y": "1.0.6",
 		"@wordpress/autop": "1.0.4",
 		"@wordpress/hooks": "1.1.6",
-		"@wordpress/i18n": "1.0.0",
+		"@wordpress/i18n": "1.1.0",
 		"@wordpress/url": "1.0.3",
 		"classnames": "2.2.5",
 		"clipboard": "1.7.1",
@@ -30,7 +30,7 @@
 		"hpq": "1.2.0",
 		"jquery": "3.2.1",
 		"js-beautify": "1.6.14",
-		"lodash": "4.17.4",
+		"lodash": "4.17.5",
 		"memize": "1.0.5",
 		"moment": "2.21.0",
 		"moment-timezone": "0.5.13",
@@ -44,7 +44,6 @@
 		"react-color": "2.13.4",
 		"react-datepicker": "0.61.0",
 		"react-dom": "16.3.0",
-		"react-redux": "5.0.6",
 		"redux": "3.7.2",
 		"redux-multi": "0.1.12",
 		"redux-optimist": "1.0.0",
@@ -58,7 +57,7 @@
 	},
 	"devDependencies": {
 		"@wordpress/babel-plugin-makepot": "1.0.0",
-		"@wordpress/babel-preset-default": "1.1.1",
+		"@wordpress/babel-preset-default": "1.2.0",
 		"@wordpress/custom-templated-path-webpack-plugin": "1.0.0",
 		"@wordpress/jest-preset-default": "1.0.3",
 		"@wordpress/scripts": "1.1.0",
@@ -141,7 +140,7 @@
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
-		"prepublish": "npm run lint && if [ -d gutenberg-package ]; then rm -Rf gutenberg-package; fi && NODE_ENV=production webpack --config webpack.config.dist.js",
+		"prepublishq": "if [ -d gutenberg-package ]; then rm -Rf gutenberg-package; fi && npm run lint && NODE_ENV=production webpack --config webpack.config.dist.js",
 		"build-package": "npm run prepublish && cp 'package.dist.json' 'gutenberg-package/package.json' && cp 'README.dist.md' 'gutenberg-package/README.md'"
 	}
 }

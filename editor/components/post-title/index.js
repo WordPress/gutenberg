@@ -12,7 +12,8 @@ import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { KeyboardShortcuts, withContext, withInstanceId, withFocusOutside } from '@wordpress/components';
+import { KeyboardShortcuts, withInstanceId, withFocusOutside } from '@wordpress/components';
+import { withEditorSettings } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -92,7 +93,7 @@ class PostTitle extends Component {
 			return <h1 className="screen-reader-text">{ title }</h1>;
 		}
 
-		const { title, placeholder, instanceId } = this.props;
+		const { title, placeholder, instanceId, isPostTypeViewable } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 		const decodedPlaceholder = decodeEntities( placeholder );
@@ -100,7 +101,6 @@ class PostTitle extends Component {
 		return (
 			<PostTypeSupportCheck supportKeys="title">
 				<div className={ className }>
-					{ isSelected && <PostPermalink /> }
 					<KeyboardShortcuts
 						shortcuts={ {
 							'mod+z': this.redirectHistory,
@@ -121,6 +121,7 @@ class PostTitle extends Component {
 							onKeyPress={ this.onUnselect }
 						/>
 					</KeyboardShortcuts>
+					{ isSelected && isPostTypeViewable && <PostPermalink /> }
 				</div>
 			</PostTypeSupportCheck>
 		);
@@ -129,9 +130,12 @@ class PostTitle extends Component {
 
 const applyWithSelect = withSelect( ( select ) => {
 	const { getEditedPostAttribute } = select( 'core/editor' );
+	const { getPostType } = select( 'core' );
+	const postType = getPostType( getEditedPostAttribute( 'type' ) );
 
 	return {
 		title: getEditedPostAttribute( 'title' ),
+		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 	};
 } );
 
@@ -157,7 +161,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-const applyEditorSettings = withContext( 'editor' )(
+const applyEditorSettings = withEditorSettings(
 	( settings ) => ( {
 		placeholder: settings.titlePlaceholder,
 	} )
