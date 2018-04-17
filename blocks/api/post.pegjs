@@ -66,6 +66,18 @@ if ( ! function_exists( 'peg_array_partition' ) ) {
     }
 }
 
+if ( ! function_exists( 'peg_is_dynamic_block' ) ) {
+    function peg_is_dynamic_block( $block_name ) {
+        static $dynamic_blocks = null;
+
+        if ( null === $dynamic_blocks ) {
+            $dynamic_blocks = get_dynamic_block_names();
+        }
+
+        return in_array( $block_name, $dynamic_blocks );
+    }
+}
+
 if ( ! function_exists( 'peg_join_blocks' ) ) {
     function peg_join_blocks( $pre, $tokens, $post ) {
         $blocks = array();
@@ -167,6 +179,28 @@ Block_List
   { /** <?php return peg_join_blocks( $pre, $ts, $post ); ?> **/
     return joinBlocks( pre, ts, post );
   }
+
+Rendered_Output
+  = ts:Rendered_Token* { return ts.join( '' ) /** <?php return implode( '', $ts ); ?> **/ }
+
+Rendered_Token
+  = Dynamic_Block
+  / Block_Start { return '' /** <?php return ''; ?> **/ }
+  / Block_End { return '' /** <?php return ''; ?> **/ }
+  / Block_Void { return '' /** <?php return ''; ?> **/ }
+  / .
+
+Dynamic_Block
+  = s:Block_Void
+  & { return false /** <?php return peg_is_dynamic_block( $s['blockName'] ); ?> **/ }
+  { return '' /** <?php return 'dynamic'; ?> **/ }
+  / s:Dynamic_Block_Start c:(!Block_End .)+ e:Block_End
+  { return '' /** <?php return 'dynamic'; ?> **/ }
+
+Dynamic_Block_Start
+  = s:Block_Start
+  & { return false /** <?php return peg_is_dynamic_block( $s['blockName'] ); ?> **/ }
+  { return s /** <?php return $s; ?> **/ }
 
 Token
   = Block_Void
