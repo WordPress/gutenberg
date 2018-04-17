@@ -13,19 +13,16 @@ const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-web
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	// filename: './[basename]/build/style.css',
 	filename: './style.css',
 } );
 
 // CSS loader for styles specific to block editing.
 const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	// filename: './blocks/build/edit-blocks.css',
 	filename: './blocks/edit-blocks.css',
 } );
 
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
-	// filename: './blocks/build/style.css',
 	filename: './blocks/style.css',
 } );
 
@@ -89,8 +86,6 @@ const coreGlobals = [
 	'url',
 ];
 
-const externals = {};
-
 const alias = {};
 
 // call from project folders
@@ -98,10 +93,10 @@ entryPointNames.forEach( ( name ) => {
 	alias[ '@wordpress/' + name ] = __dirname + '/' + name;
 } );
 
-// make them wp external vars (to be set up on each who ha utenberg as dependency)
+// make them wp external vars (to be set up on each project that has Gutenberg as dependency)
 coreGlobals.forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
-		this: [ 'wp', camelCaseDash( name ) ],
+		this: [ 'wp', camelCaseDash( name ) ],	
 	};
 } );
 
