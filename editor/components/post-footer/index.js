@@ -1,19 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
-
-/**
- * Internal Dependencies
- */
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 function PostFooter( { footerStatus = 'open', instanceId, ...props } ) {
 	const onToggleFooter = () => props.editPost( { footer_status: footerStatus === 'open' ? 'closed' : 'open' } );
@@ -32,14 +23,15 @@ function PostFooter( { footerStatus = 'open', instanceId, ...props } ) {
 	];
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			footerStatus: getEditedPostAttribute( state, 'footer_status' ),
+			footerStatus: select( 'core/editor' ).getEditedPostAttribute( 'footer_status' ),
 		};
-	},
-	{
-		editPost,
-	}
-)( withInstanceId( PostFooter ) );
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		editPost: dispatch( 'core/editor' ).editPost,
+	} ) ),
+	withInstanceId,
+] )( PostFooter );
 

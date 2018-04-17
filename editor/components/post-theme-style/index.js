@@ -1,19 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
-
-/**
- * Internal Dependencies
- */
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 function PostThemeStyle( { themeStyleStatus = 'open', instanceId, ...props } ) {
 	const onToggleThemeStyle = () => props.editPost( { theme_style_status: themeStyleStatus === 'open' ? 'closed' : 'open' } );
@@ -21,7 +12,7 @@ function PostThemeStyle( { themeStyleStatus = 'open', instanceId, ...props } ) {
 	const themeStyleToggleId = 'allow-theme-style-toggle-' + instanceId;
 
 	return [
-		<label key="label" htmlFor={ themeStyleToggleId }>{ __( 'Use theme style' ) }</label>,
+		<label key="label" htmlFor={ themeStyleToggleId }>{ __( 'Display theme-style' ) }</label>,
 		<FormToggle
 			key="toggle"
 			checked={ themeStyleStatus === 'open' }
@@ -32,14 +23,15 @@ function PostThemeStyle( { themeStyleStatus = 'open', instanceId, ...props } ) {
 	];
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			themeStyleStatus: getEditedPostAttribute( state, 'theme_style_status' ),
+			themeStyleStatus: select( 'core/editor' ).getEditedPostAttribute( 'theme_style_status' ),
 		};
-	},
-	{
-		editPost,
-	}
-)( withInstanceId( PostThemeStyle ) );
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		editPost: dispatch( 'core/editor' ).editPost,
+	} ) ),
+	withInstanceId,
+] )( PostThemeStyle );
 

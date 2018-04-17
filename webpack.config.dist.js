@@ -88,6 +88,8 @@ const coreGlobals = [
 
 const alias = {};
 
+const externals = {};
+
 // call from project folders
 entryPointNames.forEach( ( name ) => {
 	alias[ '@wordpress/' + name ] = __dirname + '/' + name;
@@ -96,7 +98,7 @@ entryPointNames.forEach( ( name ) => {
 // make them wp external vars (to be set up on each project that has Gutenberg as dependency)
 coreGlobals.forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
-		this: [ 'wp', camelCaseDash( name ) ],	
+		this: [ 'wp', camelCaseDash( name ) ],
 	};
 } );
 

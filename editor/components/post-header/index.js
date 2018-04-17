@@ -1,19 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
-
-/**
- * Internal Dependencies
- */
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 function PostHeader( { headerStatus = 'open', instanceId, ...props } ) {
 	const onToggleHeader = () => props.editPost( { header_status: headerStatus === 'open' ? 'closed' : 'open' } );
@@ -32,14 +23,15 @@ function PostHeader( { headerStatus = 'open', instanceId, ...props } ) {
 	];
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			headerStatus: getEditedPostAttribute( state, 'header_status' ),
+			headerStatus: select( 'core/editor' ).getEditedPostAttribute( 'header_status' ),
 		};
-	},
-	{
-		editPost,
-	}
-)( withInstanceId( PostHeader ) );
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		editPost: dispatch( 'core/editor' ).editPost,
+	} ) ),
+	withInstanceId,
+] )( PostHeader );
 
