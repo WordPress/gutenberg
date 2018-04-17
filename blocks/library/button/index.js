@@ -2,8 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { Dashicon, IconButton, PanelColor, ToggleControl, withFallbackStyles } from '@wordpress/components';
+import { Component, Fragment } from '@wordpress/element';
+import {
+	Dashicon,
+	IconButton,
+	PanelBody,
+	PanelColor,
+	ToggleControl,
+	withFallbackStyles,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -73,69 +80,67 @@ class ButtonBlock extends Component {
 			clear,
 		} = attributes;
 
-		return [
-			isSelected && (
-				<BlockControls key="controls">
+		return (
+			<Fragment>
+				<BlockControls>
 					<BlockAlignmentToolbar value={ align } onChange={ this.updateAlignment } />
 				</BlockControls>
-			),
-			<span key="button" className={ className } title={ title } ref={ this.bindRef }>
-				<RichText
-					tagName="span"
-					placeholder={ __( 'Add text…' ) }
-					value={ text }
-					onChange={ ( value ) => setAttributes( { text: value } ) }
-					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-					className="wp-block-button__link"
-					style={ {
-						backgroundColor: color,
-						color: textColor,
-					} }
-					isSelected={ isSelected }
-					keepPlaceholderOnFocus
-				/>
-				{ isSelected &&
-					<InspectorControls key="inspector">
-						<ToggleControl
-							label={ __( 'Wrap text' ) }
-							checked={ !! clear }
-							onChange={ this.toggleClear }
-						/>
-						<PanelColor title={ __( 'Background Color' ) } colorValue={ color } >
-							<ColorPalette
-								value={ color }
-								onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
-							/>
-						</PanelColor>
-						<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
-							<ColorPalette
-								value={ textColor }
-								onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
-							/>
-						</PanelColor>
-						{ this.nodeRef && <ContrastCheckerWithFallbackStyles
-							node={ this.nodeRef }
-							textColor={ textColor }
-							backgroundColor={ color }
-							isLargeText={ true }
-						/> }
-					</InspectorControls>
-				}
-			</span>,
-			isSelected && (
-				<form
-					key="form-link"
-					className="blocks-button__inline-link"
-					onSubmit={ ( event ) => event.preventDefault() }>
-					<Dashicon icon="admin-links" />
-					<UrlInput
-						value={ url }
-						onChange={ ( value ) => setAttributes( { url: value } ) }
+				<span className={ className } title={ title } ref={ this.bindRef }>
+					<RichText
+						tagName="span"
+						placeholder={ __( 'Add text…' ) }
+						value={ text }
+						onChange={ ( value ) => setAttributes( { text: value } ) }
+						formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+						className="wp-block-button__link"
+						style={ {
+							backgroundColor: color,
+							color: textColor,
+						} }
+						keepPlaceholderOnFocus
 					/>
-					<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-				</form>
-			),
-		];
+					<InspectorControls>
+						<PanelBody>
+							<ToggleControl
+								label={ __( 'Wrap text' ) }
+								checked={ !! clear }
+								onChange={ this.toggleClear }
+							/>
+							<PanelColor title={ __( 'Background Color' ) } colorValue={ color } >
+								<ColorPalette
+									value={ color }
+									onChange={ ( colorValue ) => setAttributes( { color: colorValue } ) }
+								/>
+							</PanelColor>
+							<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } >
+								<ColorPalette
+									value={ textColor }
+									onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+								/>
+							</PanelColor>
+							{ this.nodeRef && <ContrastCheckerWithFallbackStyles
+								node={ this.nodeRef }
+								textColor={ textColor }
+								backgroundColor={ color }
+								isLargeText={ true }
+							/> }
+						</PanelBody>
+					</InspectorControls>
+				</span>
+				{ isSelected && (
+					<form
+						className="blocks-button__inline-link"
+						onSubmit={ ( event ) => event.preventDefault() }>
+						<Dashicon icon="admin-links" />
+						<UrlInput
+							value={ url }
+							onChange={ ( value ) => setAttributes( { url: value } ) }
+						/>
+						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+					</form>
+				) }
+			</Fragment>
+		);
 	}
 }
 

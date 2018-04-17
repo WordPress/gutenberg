@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { overEvery, find, findLast, reverse, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import {
 	keycodes,
 	focus,
@@ -18,36 +17,21 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import {
-	getPreviousBlockUid,
-	getNextBlockUid,
-	getMultiSelectedBlocksStartUid,
-	getMultiSelectedBlocks,
-	getSelectedBlock,
-} from '../../store/selectors';
-import {
-	multiSelect,
-	selectBlock,
-} from '../../store/actions';
-import {
 	isBlockFocusStop,
 	isInSameBlock,
 } from '../../utils/dom';
 
 /**
- * Browser dependencies
- */
-
-const { DOMRect } = window;
-
-/**
  * Module Constants
  */
+
 const { UP, DOWN, LEFT, RIGHT } = keycodes;
 
 /**
@@ -72,6 +56,13 @@ class WritingFlow extends Component {
 		this.clearVerticalRect = this.clearVerticalRect.bind( this );
 		this.focusLastTextField = this.focusLastTextField.bind( this );
 
+		/**
+		 * Here a rectangle is stored while moving the caret vertically so
+		 * vertical position of the start position can be restored.
+		 * This is to recreate browser behaviour across blocks.
+		 *
+		 * @type {?DOMRect}
+		 */
 		this.verticalRect = null;
 	}
 
@@ -228,23 +219,14 @@ class WritingFlow extends Component {
 	}
 
 	/**
-	 * Shifts focus to the last tabbable text field — if one exists — at the
-	 * given mouse event's X coordinate.
-	 *
-	 * @param {MouseEvent} event Mouse event to align caret X offset.
+	 * Sets focus to the end of the last tabbable text field, if one exists.
 	 */
-	focusLastTextField( event ) {
+	focusLastTextField() {
 		const focusableNodes = focus.focusable.find( this.container );
 		const target = findLast( focusableNodes, isTabbableTextField );
-		if ( ! target ) {
-			return;
+		if ( target ) {
+			placeCaretAtHorizontalEdge( target, true );
 		}
-
-		// Emulate a rect at which caret should be placed using mouse event.
-		const rect = target.getBoundingClientRect();
-		const targetRect = new DOMRect( event.clientX, rect.top, 0, rect.height );
-
-		placeCaretAtVerticalEdge( target, false, targetRect );
 	}
 
 	render() {
@@ -274,16 +256,28 @@ class WritingFlow extends Component {
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		previousBlockUid: getPreviousBlockUid( state ),
-		nextBlockUid: getNextBlockUid( state ),
-		selectionStart: getMultiSelectedBlocksStartUid( state ),
-		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
-		selectedBlockUID: get( getSelectedBlock( state ), [ 'uid' ] ),
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getPreviousBlockUid,
+			getNextBlockUid,
+			getMultiSelectedBlocksStartUid,
+			getMultiSelectedBlocks,
+			getSelectedBlock,
+		} = select( 'core/editor' );
+		return {
+			previousBlockUid: getPreviousBlockUid(),
+			nextBlockUid: getNextBlockUid(),
+			selectionStart: getMultiSelectedBlocksStartUid(),
+			hasMultiSelection: getMultiSelectedBlocks().length > 1,
+			selectedBlockUID: get( getSelectedBlock(), [ 'uid' ] ),
+		};
 	} ),
-	{
-		onMultiSelect: multiSelect,
-		onSelectBlock: selectBlock,
-	}
-)( WritingFlow );
+	withDispatch( ( dispatch ) =>{
+		const { multiSelect, selectBlock } = dispatch( 'core/editor' );
+		return {
+			onMultiSelect: multiSelect,
+			onSelectBlock: selectBlock,
+		};
+	} ),
+] )( WritingFlow );

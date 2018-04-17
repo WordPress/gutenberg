@@ -136,15 +136,16 @@ export function registerResolvers( reducerKey, newResolvers ) {
 			return selector;
 		}
 
-		// Ensure single invocation per argument set via memoization.
-		const fulfill = memoize( async ( ...args ) => {
-			const store = stores[ reducerKey ];
+		const store = stores[ reducerKey ];
+		const resolver = newResolvers[ key ];
 
+		const rawFulfill = async ( ...args ) => {
 			// At this point, selectors have already been pre-bound to inject
 			// state, it would not be otherwise provided to fulfill.
 			const state = store.getState();
 
-			let fulfillment = newResolvers[ key ]( state, ...args );
+			const fulfill = resolver.fulfill ? resolver.fulfill : resolver;
+			let fulfillment = fulfill( state, ...args );
 
 			// Attempt to normalize fulfillment as async iterable.
 			fulfillment = toAsyncIterable( fulfillment );
@@ -158,7 +159,16 @@ export function registerResolvers( reducerKey, newResolvers ) {
 					store.dispatch( maybeAction );
 				}
 			}
-		} );
+		};
+
+		// Ensure single invocation per argument set via memoization
+		// or via isFulfilled call if provided.
+		const fulfill = resolver.isFulfilled ? ( ...args ) => {
+			const state = store.getState();
+			if ( ! resolver.isFulfilled( state, ...args ) ) {
+				rawFulfill( ...args );
+			}
+		} : memoize( rawFulfill );
 
 		return ( ...args ) => {
 			fulfill( ...args );
@@ -239,6 +249,10 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 			this.runSelection = this.runSelection.bind( this );
 
 			this.state = {};
+		}
+
+		shouldComponentUpdate( nextProps, nextState ) {
+			return ! isShallowEqual( nextProps, this.props ) || ! isShallowEqual( nextState, this.state );
 		}
 
 		componentWillMount() {

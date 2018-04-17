@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { get, reduce, size, castArray, first, last, noop } from 'lodash';
 import tinymce from 'tinymce';
@@ -23,11 +22,14 @@ import {
 	cloneBlock,
 	getBlockType,
 	getSaveElement,
-	isReusableBlock,
+	isSharedBlock,
 	isUnmodifiedDefaultBlock,
+	withEditorSettings,
 } from '@wordpress/blocks';
-import { withFilters, withContext } from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -48,32 +50,8 @@ import BlockDraggable from './block-draggable';
 import IgnoreNestedEvents from './ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
+import withHoverAreas from './with-hover-areas';
 import { createInnerBlockList } from '../../utils/block-list';
-import {
-	editPost,
-	insertBlocks,
-	mergeBlocks,
-	removeBlock,
-	replaceBlocks,
-	selectBlock,
-	updateBlockAttributes,
-	toggleSelection,
-} from '../../store/actions';
-import {
-	getBlock,
-	isMultiSelecting,
-	getBlockIndex,
-	getEditedPostAttribute,
-	getNextBlockUid,
-	getPreviousBlockUid,
-	isBlockMultiSelected,
-	isBlockSelected,
-	isFirstMultiSelectedBlock,
-	isSelectionEnabled,
-	isTyping,
-	getBlockMode,
-	getSelectedBlocksInitialCaretPosition,
-} from '../../store/selectors';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -119,8 +97,8 @@ export class BlockListBlock extends Component {
 		// we inject this function via context.
 		return {
 			createInnerBlockList: ( uid ) => {
-				const { renderBlockMenu, showContextualToolbar } = this.props;
-				return createInnerBlockList( uid, renderBlockMenu, showContextualToolbar );
+				const { renderBlockMenu } = this.props;
+				return createInnerBlockList( uid, renderBlockMenu );
 			},
 		};
 	}
@@ -416,7 +394,7 @@ export class BlockListBlock extends Component {
 			block,
 			order,
 			mode,
-			showContextualToolbar,
+			hasFixedToolbar,
 			isLocked,
 			isFirst,
 			isLast,
@@ -429,8 +407,11 @@ export class BlockListBlock extends Component {
 			isFirstMultiSelected,
 			isLastInSelection,
 			isTypingWithinBlock,
+			isMultiSelecting,
+			hoverArea,
+			isLargeViewport,
 		} = this.props;
-		const isHovered = this.state.isHovered && ! this.props.isMultiSelecting;
+		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
 		const blockType = getBlockType( blockName );
 		// translators: %s: Type of block (i.e. Text, Image etc)
@@ -444,9 +425,11 @@ export class BlockListBlock extends Component {
 		const isSelectedNotTyping = isSelected && ! isTypingWithinBlock;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! showSideInserter && isSelectedNotTyping;
-		const shouldShowMovers = ( shouldAppearSelected || isHovered || ( isEmptyDefaultBlock && isSelectedNotTyping ) ) && ! showSideInserter;
-		const shouldShowSettingsMenu = shouldShowMovers;
-		const shouldShowContextualToolbar = shouldAppearSelected && isValid && showContextualToolbar;
+		// We render block movers and block settings to keep them tabbale even if hidden
+		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
+		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
+		const shouldShowBreadcrumb = isHovered;
+		const shouldShowContextualToolbar = shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 
@@ -465,7 +448,7 @@ export class BlockListBlock extends Component {
 			'is-selected': shouldAppearSelected,
 			'is-multi-selected': isMultiSelected,
 			'is-hovered': isHovered,
-			'is-reusable': isReusableBlock( blockType ),
+			'is-shared': isSharedBlock( blockType ),
 			'is-hidden': dragging,
 			'is-typing': isTypingWithinBlock,
 		} );
@@ -535,23 +518,25 @@ export class BlockListBlock extends Component {
 					rootUID={ rootUID }
 					layout={ layout }
 				/>
-				{ shouldShowMovers && (
+				{ shouldRenderMovers && (
 					<BlockMover
 						uids={ [ uid ] }
 						rootUID={ rootUID }
 						layout={ layout }
 						isFirst={ isFirst }
 						isLast={ isLast }
+						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 					/>
 				) }
-				{ shouldShowSettingsMenu && ! showSideInserter && (
+				{ shouldRenderBlockSettings && (
 					<BlockSettingsMenu
 						uids={ [ uid ] }
 						rootUID={ rootUID }
 						renderBlockMenu={ renderBlockMenu }
+						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' }
 					/>
 				) }
-				{ isHovered && <BlockBreadcrumb uid={ uid } /> }
+				{ shouldShowBreadcrumb && <BlockBreadcrumb uid={ uid } isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' } /> }
 				{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 				{ isFirstMultiSelected && <BlockMultiControls rootUID={ rootUID } /> }
 				<IgnoreNestedEvents
@@ -619,63 +604,88 @@ export class BlockListBlock extends Component {
 	}
 }
 
-const mapStateToProps = ( state, { uid, rootUID } ) => {
-	const isSelected = isBlockSelected( state, uid );
+const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
+	const {
+		isBlockSelected,
+		getPreviousBlockUid,
+		getNextBlockUid,
+		getBlock,
+		isBlockMultiSelected,
+		isFirstMultiSelectedBlock,
+		isMultiSelecting,
+		isTyping,
+		getBlockIndex,
+		getEditedPostAttribute,
+		getBlockMode,
+		isSelectionEnabled,
+		getSelectedBlocksInitialCaretPosition,
+		getBlockSelectionEnd,
+	} = select( 'core/editor' );
+	const isSelected = isBlockSelected( uid );
 	return {
-		previousBlockUid: getPreviousBlockUid( state, uid ),
-		nextBlockUid: getNextBlockUid( state, uid ),
-		block: getBlock( state, uid ),
-		isMultiSelected: isBlockMultiSelected( state, uid ),
-		isFirstMultiSelected: isFirstMultiSelectedBlock( state, uid ),
-		isMultiSelecting: isMultiSelecting( state ),
-		isLastInSelection: state.blockSelection.end === uid,
+		previousBlockUid: getPreviousBlockUid( uid ),
+		nextBlockUid: getNextBlockUid( uid ),
+		block: getBlock( uid ),
+		isMultiSelected: isBlockMultiSelected( uid ),
+		isFirstMultiSelected: isFirstMultiSelectedBlock( uid ),
+		isMultiSelecting: isMultiSelecting(),
+		isLastInSelection: getBlockSelectionEnd() === uid,
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
-		isTypingWithinBlock: isSelected && isTyping( state ),
-		order: getBlockIndex( state, uid, rootUID ),
-		meta: getEditedPostAttribute( state, 'meta' ),
-		mode: getBlockMode( state, uid ),
-		isSelectionEnabled: isSelectionEnabled( state ),
-		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
+		isTypingWithinBlock: isSelected && isTyping(),
+		order: getBlockIndex( uid, rootUID ),
+		meta: getEditedPostAttribute( 'meta' ),
+		mode: getBlockMode( uid ),
+		isSelectionEnabled: isSelectionEnabled(),
+		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isSelected,
 	};
-};
+} );
 
-const mapDispatchToProps = ( dispatch, ownProps ) => ( {
-	onChange( uid, attributes ) {
-		dispatch( updateBlockAttributes( uid, attributes ) );
-	},
-	onSelect( uid = ownProps.uid, initialPosition ) {
-		dispatch( selectBlock( uid, initialPosition ) );
-	},
-	onInsertBlocks( blocks, index ) {
-		const { rootUID, layout } = ownProps;
+const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
+	const {
+		updateBlockAttributes,
+		selectBlock,
+		insertBlocks,
+		removeBlock,
+		mergeBlocks,
+		replaceBlocks,
+		editPost,
+		toggleSelection,
+	} = dispatch( 'core/editor' );
 
-		blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
-
-		dispatch( insertBlocks( blocks, index, rootUID ) );
-	},
-	onRemove( uid ) {
-		dispatch( removeBlock( uid ) );
-	},
-	onMerge( ...args ) {
-		dispatch( mergeBlocks( ...args ) );
-	},
-	onReplace( blocks ) {
-		const { layout } = ownProps;
-
-		blocks = castArray( blocks ).map( ( block ) => (
-			cloneBlock( block, { layout } )
-		) );
-
-		dispatch( replaceBlocks( [ ownProps.uid ], blocks ) );
-	},
-	onMetaChange( meta ) {
-		dispatch( editPost( { meta } ) );
-	},
-	toggleSelection( selectionEnabled ) {
-		dispatch( toggleSelection( selectionEnabled ) );
-	},
+	return {
+		onChange( uid, attributes ) {
+			updateBlockAttributes( uid, attributes );
+		},
+		onSelect( uid = ownProps.uid, initialPosition ) {
+			selectBlock( uid, initialPosition );
+		},
+		onInsertBlocks( blocks, index ) {
+			const { rootUID, layout } = ownProps;
+			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
+			insertBlocks( blocks, index, rootUID );
+		},
+		onRemove( uid ) {
+			removeBlock( uid );
+		},
+		onMerge( ...args ) {
+			mergeBlocks( ...args );
+		},
+		onReplace( blocks ) {
+			const { layout } = ownProps;
+			blocks = castArray( blocks ).map( ( block ) => (
+				cloneBlock( block, { layout } )
+			) );
+			replaceBlocks( [ ownProps.uid ], blocks );
+		},
+		onMetaChange( meta ) {
+			editPost( { meta } );
+		},
+		toggleSelection( selectionEnabled ) {
+			toggleSelection( selectionEnabled );
+		},
+	};
 } );
 
 BlockListBlock.childContextTypes = {
@@ -683,13 +693,17 @@ BlockListBlock.childContextTypes = {
 };
 
 export default compose(
-	connect( mapStateToProps, mapDispatchToProps ),
-	withContext( 'editor' )( ( settings ) => {
+	applyWithSelect,
+	applyWithDispatch,
+	withViewportMatch( { isLargeViewport: 'medium' } ),
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {
 			isLocked: !! templateLock,
+			hasFixedToolbar: settings.hasFixedToolbar,
 		};
 	} ),
 	withFilters( 'editor.BlockListBlock' ),
+	withHoverAreas
 )( BlockListBlock );

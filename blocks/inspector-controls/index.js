@@ -1,12 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { Fill } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/components';
 
-export default function InspectorControls( { children } ) {
-	return (
-		<Fill name="Inspector.Controls">
-			{ children }
-		</Fill>
-	);
-}
+/**
+ * Internal dependencies
+ */
+import { ifBlockEditSelected } from '../block-edit/context';
+
+const Fill = createSlotFill( 'InspectorControls' );
+const { Slot } = Fill;
+
+const InspectorControls = ifBlockEditSelected( Fill );
+
+InspectorControls.Slot = Slot;
+
+export default InspectorControls;

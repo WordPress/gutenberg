@@ -22,7 +22,7 @@ import {
 	getBlockTypes,
 	getBlockSupport,
 	hasBlockSupport,
-	isReusableBlock,
+	isSharedBlock,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -491,15 +491,15 @@ describe( 'blocks', () => {
 		} );
 	} );
 
-	describe( 'isReusableBlock', () => {
-		it( 'should return true for a reusable block', () => {
+	describe( 'isSharedBlock', () => {
+		it( 'should return true for a shared block', () => {
 			const block = { name: 'core/block' };
-			expect( isReusableBlock( block ) ).toBe( true );
+			expect( isSharedBlock( block ) ).toBe( true );
 		} );
 
 		it( 'should return false for other blocks', () => {
 			const block = { name: 'core/paragraph' };
-			expect( isReusableBlock( block ) ).toBe( false );
+			expect( isSharedBlock( block ) ).toBe( false );
 		} );
 	} );
 } );

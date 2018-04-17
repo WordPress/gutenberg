@@ -204,6 +204,24 @@ describe( 'renderElement()', () => {
 
 		expect( result ).toBe( '<img/>' );
 	} );
+
+	it( 'renders RawHTML with wrapper if props passed', () => {
+		const result = renderElement( <RawHTML className="foo">{ '<img/>' }</RawHTML> );
+
+		expect( result ).toBe( '<div class="foo"><img/></div>' );
+	} );
+
+	it( 'renders RawHTML with empty children as empty string', () => {
+		const result = renderElement( <RawHTML /> );
+
+		expect( result ).toBe( '' );
+	} );
+
+	it( 'renders RawHTML with wrapper and empty children', () => {
+		const result = renderElement( <RawHTML className="foo" /> );
+
+		expect( result ).toBe( '<div class="foo"></div>' );
+	} );
 } );
 
 describe( 'renderNativeComponent()', () => {
@@ -226,6 +244,12 @@ describe( 'renderNativeComponent()', () => {
 			const result = renderNativeComponent( 'div', { children: [ '<img/>' ] } );
 
 			expect( result ).toBe( '<div>&lt;img/></div>' );
+		} );
+
+		it( 'should not render invalid dangerouslySetInnerHTML', () => {
+			const result = renderNativeComponent( 'div', { dangerouslySetInnerHTML: { __html: undefined } } );
+
+			expect( result ).toBe( '<div></div>' );
 		} );
 
 		it( 'should not escape children with dangerouslySetInnerHTML', () => {

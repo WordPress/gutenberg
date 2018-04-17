@@ -1,5 +1,5 @@
 .components-draggable__clone {
-	.editor-block-list__block-draggable {
+	& > .editor-block-list__block > .editor-block-list__block-draggable {
 		background: white;
 		box-shadow: $shadow-popover;
 
@@ -78,8 +78,8 @@
 		visibility: hidden;
 	}
 
-	.editor-block-list__block-edit .reusable-block-edit-panel * {
-		z-index: z-index( '.editor-block-list__block-edit .reusable-block-edit-panel *' );
+	.editor-block-list__block-edit .shared-block-edit-panel * {
+		z-index: z-index( '.editor-block-list__block-edit .shared-block-edit-panel *' );
 	}
 }
 
@@ -239,18 +239,18 @@
 	}
 
 	/**
-	 * Reusable Block style
+	 * Shared blocks
 	 */
 
-	&.is-reusable > .editor-block-mover:before {
+	&.is-shared > .editor-block-mover:before {
 		border-right: none;
 	}
 
-	&.is-reusable > .editor-block-settings-menu:before {
+	&.is-shared > .editor-block-settings-menu:before {
 		border-left: none;
 	}
 
-	&.is-reusable > .editor-block-list__block-edit:before {
+	&.is-shared > .editor-block-list__block-edit:before {
 		outline: 1px dashed $light-gray-500;
 	}
 
@@ -270,21 +270,6 @@
 		// Hide block outline when an image is floated
 		&:before {
 			content: none;
-		}
-	}
-
-	// Apply max-width to floated items that have no intrinsic width, like Cover Image or Gallery
-	&[data-align="left"],
-	&[data-align="right"] {
-		> .editor-block-list__block-edit {
-			max-width: 360px;
-			width: 100%;
-		}
-
-		// reset when data-resized
-		&[data-resized="true"] > .editor-block-list__block-edit {
-			max-width: none;
-			width: auto;
 		}
 	}
 
@@ -319,7 +304,7 @@
 
 	// Full-wide
 	&[data-align="full"] {
-
+		
 		// compensate for main container padding
 		@include break-small() {
 			margin-left: -$block-side-ui-padding;
@@ -333,6 +318,11 @@
 			@include break-small() {
 				margin-left: -$block-side-ui-padding - $block-padding;
 				margin-right: -$block-side-ui-padding - $block-padding;
+			}
+
+			// this explicitly sets the width of the block, to override the fit-content from the image block
+			figure {
+				width: 100%;
 			}
 		}
 
@@ -389,26 +379,10 @@
 	}
 
 	// Dropzones
-	& > .components-drop-zone {
-		border: none;
+	.editor-block-drop-zone {
 		top: -4px;
 		bottom: -3px;
-		margin: 0 $block-side-ui-padding;
-		border-radius: 0;
-
-		.components-drop-zone__content {
-			display: none;
-		}
-
-		&.is-close-to-top {
-			background: none;
-			border-top: 3px solid $blue-medium-500;
-		}
-
-		&.is-close-to-bottom {
-			background: none;
-			border-bottom: 3px solid $blue-medium-500;
-		}
+		margin: 0 $block-padding;
 	}
 }
 
@@ -434,6 +408,7 @@
 	}
 
 	// Elevate when selected or hovered
+	&.is-multi-selected,
 	&.is-selected,
 	&.is-hovered {
 		.editor-block-settings-menu,
@@ -457,7 +432,6 @@
 	// Left side UI
 	> .editor-block-mover {
 		left: -$block-side-ui-width;
-		z-index: z-index( '.editor-block-mover' );
 
 		// Mobile
 		display: none;
@@ -623,7 +597,7 @@
  */
 
 .editor-block-contextual-toolbar,
-.editor-block-breadcrumb {
+.editor-block-list__breadcrumb {
 	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
 	white-space: nowrap;
@@ -672,7 +646,7 @@
 }
 
 .editor-block-contextual-toolbar .editor-block-toolbar,
-.editor-block-breadcrumb .components-toolbar {
+.editor-block-list__breadcrumb .components-toolbar {
 	border: 1px solid $light-gray-500;
 	width: 100%;
 
@@ -699,7 +673,7 @@
 	}
 }
 
-.editor-block-breadcrumb .components-toolbar {
+.editor-block-list__breadcrumb .components-toolbar {
 	padding: 0px 12px;
 	line-height: $block-toolbar-height - 1px;
 	font-family: $default-font;
@@ -713,5 +687,13 @@
 		border-right: 1px solid $light-gray-500;
 		color: $dark-gray-500;
 		padding-top: 6px;
+	}
+}
+
+.editor-block-list__breadcrumb {
+	opacity: 0;
+
+	&.is-visible {
+		@include fade_in;
 	}
 }

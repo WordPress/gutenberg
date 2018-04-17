@@ -17,12 +17,13 @@ import {
 	isEqual,
 	includes,
 	overSome,
+	get,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { isReusableBlock } from '@wordpress/blocks';
+import { isSharedBlock } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
 
 /**
@@ -253,9 +254,14 @@ export const editor = flow( [
 
 				return state;
 
+			case 'UPDATE_POST':
 			case 'RESET_POST':
+				const getCanonicalValue = action.type === 'UPDATE_POST' ?
+					( key ) => action.edits[ key ] :
+					( key ) => getPostRawValue( action.post[ key ] );
+
 				return reduce( state, ( result, value, key ) => {
-					if ( value !== getPostRawValue( action.post[ key ] ) ) {
+					if ( value !== getCanonicalValue( key ) ) {
 						return result;
 					}
 
@@ -368,10 +374,10 @@ export const editor = flow( [
 			case 'REMOVE_BLOCKS':
 				return omit( state, action.uids );
 
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
+			case 'SAVE_SHARED_BLOCK_SUCCESS': {
 				const { id, updatedId } = action;
 
-				// If a temporary reusable block is saved, we swap the temporary id with the final one
+				// If a temporary shared block is saved, we swap the temporary id with the final one
 				if ( id === updatedId ) {
 					return state;
 				}
@@ -663,13 +669,18 @@ export function blockSelection( state = {
 				isMultiSelecting: false,
 			};
 		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
+			if ( action.uids.indexOf( state.start ) === -1 ) {
 				return state;
 			}
+
+			// If there is replacement block(s), assign first's UID as the next
+			// selected block. If empty replacement, reset to null.
+			const nextSelectedBlockUID = get( action.blocks, [ 0, 'uid' ], null );
+
 			return {
 				...state,
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
+				start: nextSelectedBlockUID,
+				end: nextSelectedBlockUID,
 				initialPosition: null,
 				isMultiSelecting: false,
 			};
@@ -706,7 +717,7 @@ export function provisionalBlockUID( state = null, action ) {
 
 		case 'UPDATE_BLOCK_ATTRIBUTES':
 		case 'UPDATE_BLOCK':
-		case 'CONVERT_BLOCK_TO_REUSABLE':
+		case 'CONVERT_BLOCK_TO_SHARED':
 			const { uid } = action;
 			if ( uid === state ) {
 				return null;
@@ -802,7 +813,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 			return action.blocks.reduce( ( prevState, block ) => {
 				let id = block.name;
 				const insert = { name: block.name };
-				if ( isReusableBlock( block ) ) {
+				if ( isSharedBlock( block ) ) {
 					insert.ref = block.attributes.ref;
 					id += '/' + block.attributes.ref;
 				}
@@ -820,7 +831,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 				};
 			}, state );
 
-		case 'REMOVE_REUSABLE_BLOCK':
+		case 'REMOVE_SHARED_BLOCK':
 			return {
 				...state,
 				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
@@ -890,12 +901,12 @@ export function notices( state = [], action ) {
 	return state;
 }
 
-export const reusableBlocks = combineReducers( {
+export const sharedBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
-			case 'RECEIVE_REUSABLE_BLOCKS': {
+			case 'RECEIVE_SHARED_BLOCKS': {
 				return reduce( action.results, ( nextState, result ) => {
-					const { id, title } = result.reusableBlock;
+					const { id, title } = result.sharedBlock;
 					const { uid } = result.parsedBlock;
 
 					const value = { uid, title };
@@ -912,7 +923,7 @@ export const reusableBlocks = combineReducers( {
 				}, state );
 			}
 
-			case 'UPDATE_REUSABLE_BLOCK_TITLE': {
+			case 'UPDATE_SHARED_BLOCK_TITLE': {
 				const { id, title } = action;
 
 				if ( ! state[ id ] || state[ id ].title === title ) {
@@ -928,10 +939,10 @@ export const reusableBlocks = combineReducers( {
 				};
 			}
 
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
+			case 'SAVE_SHARED_BLOCK_SUCCESS': {
 				const { id, updatedId } = action;
 
-				// If a temporary reusable block is saved, we swap the temporary id with the final one
+				// If a temporary shared block is saved, we swap the temporary id with the final one
 				if ( id === updatedId ) {
 					return state;
 				}
@@ -943,7 +954,7 @@ export const reusableBlocks = combineReducers( {
 				};
 			}
 
-			case 'REMOVE_REUSABLE_BLOCK': {
+			case 'REMOVE_SHARED_BLOCK': {
 				const { id } = action;
 				return omit( state, id );
 			}
@@ -954,7 +965,7 @@ export const reusableBlocks = combineReducers( {
 
 	isFetching( state = {}, action ) {
 		switch ( action.type ) {
-			case 'FETCH_REUSABLE_BLOCKS': {
+			case 'FETCH_SHARED_BLOCKS': {
 				const { id } = action;
 				if ( ! id ) {
 					return state;
@@ -966,8 +977,8 @@ export const reusableBlocks = combineReducers( {
 				};
 			}
 
-			case 'FETCH_REUSABLE_BLOCKS_SUCCESS':
-			case 'FETCH_REUSABLE_BLOCKS_FAILURE': {
+			case 'FETCH_SHARED_BLOCKS_SUCCESS':
+			case 'FETCH_SHARED_BLOCKS_FAILURE': {
 				const { id } = action;
 				return omit( state, id );
 			}
@@ -978,14 +989,14 @@ export const reusableBlocks = combineReducers( {
 
 	isSaving( state = {}, action ) {
 		switch ( action.type ) {
-			case 'SAVE_REUSABLE_BLOCK':
+			case 'SAVE_SHARED_BLOCK':
 				return {
 					...state,
 					[ action.id ]: true,
 				};
 
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
-			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
+			case 'SAVE_SHARED_BLOCK_SUCCESS':
+			case 'SAVE_SHARED_BLOCK_FAILURE': {
 				const { id } = action;
 				return omit( state, id );
 			}
@@ -1006,6 +1017,6 @@ export default optimist( combineReducers( {
 	preferences,
 	saving,
 	notices,
-	reusableBlocks,
+	sharedBlocks,
 	template,
 } ) );

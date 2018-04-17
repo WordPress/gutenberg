@@ -1,25 +1,27 @@
 /**
  * External Dependencies
  */
-import { connect } from 'react-redux';
 import { castArray } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { DropZone, withContext } from '@wordpress/components';
+import { DropZone } from '@wordpress/components';
 import {
 	rawHandler,
 	cloneBlock,
 	getBlockTransforms,
 	findTransform,
+	withEditorSettings,
 } from '@wordpress/blocks';
 import { compose, Component } from '@wordpress/element';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { insertBlocks, updateBlockAttributes, moveBlockToPosition } from '../../store/actions';
+import './style.scss';
 
 class BlockDropZone extends Component {
 	constructor() {
@@ -84,13 +86,17 @@ class BlockDropZone extends Component {
 	}
 
 	render() {
-		const { isLocked } = this.props;
+		const { isLocked, index } = this.props;
 		if ( isLocked ) {
 			return null;
 		}
+		const isAppender = index === undefined;
 
 		return (
 			<DropZone
+				className={ classnames( 'editor-block-drop-zone', {
+					'is-appender': isAppender,
+				} ) }
 				onFilesDrop={ this.onFilesDrop }
 				onHTMLDrop={ this.onHTMLDrop }
 				onDrop={ this.onDrop }
@@ -100,36 +106,39 @@ class BlockDropZone extends Component {
 }
 
 export default compose(
-	connect(
-		undefined,
-		( dispatch, ownProps ) => {
-			return {
-				insertBlocks( blocks, insertIndex ) {
-					const { rootUID, layout } = ownProps;
+	withDispatch( ( dispatch, ownProps ) => {
+		const {
+			insertBlocks,
+			updateBlockAttributes,
+			moveBlockToPosition,
+		} = dispatch( 'core/editor' );
 
-					if ( layout ) {
-						// A block's transform function may return a single
-						// transformed block or an array of blocks, so ensure
-						// to first coerce to an array before mapping to inject
-						// the layout attribute.
-						blocks = castArray( blocks ).map( ( block ) => (
-							cloneBlock( block, { layout } )
-						) );
-					}
+		return {
+			insertBlocks( blocks, insertIndex ) {
+				const { rootUID, layout } = ownProps;
 
-					dispatch( insertBlocks( blocks, insertIndex, rootUID ) );
-				},
-				updateBlockAttributes( ...args ) {
-					dispatch( updateBlockAttributes( ...args ) );
-				},
-				moveBlockToPosition( uid, fromRootUID, index ) {
-					const { rootUID, layout } = ownProps;
-					dispatch( moveBlockToPosition( uid, fromRootUID, rootUID, layout, index ) );
-				},
-			};
-		},
-	),
-	withContext( 'editor' )( ( settings ) => {
+				if ( layout ) {
+					// A block's transform function may return a single
+					// transformed block or an array of blocks, so ensure
+					// to first coerce to an array before mapping to inject
+					// the layout attribute.
+					blocks = castArray( blocks ).map( ( block ) => (
+						cloneBlock( block, { layout } )
+					) );
+				}
+
+				insertBlocks( blocks, insertIndex, rootUID );
+			},
+			updateBlockAttributes( ...args ) {
+				updateBlockAttributes( ...args );
+			},
+			moveBlockToPosition( uid, fromRootUID, index ) {
+				const { rootUID, layout } = ownProps;
+				moveBlockToPosition( uid, fromRootUID, rootUID, layout, index );
+			},
+		};
+	} ),
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {

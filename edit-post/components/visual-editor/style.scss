@@ -31,7 +31,8 @@
 .edit-post-visual-editor .editor-writing-flow__click-redirect {
 	// Collapse to minimum height of 50px, to fully occupy editor bottom pad.
 	height: 50px;
-	width: $content-width;
+	width: 100%;
+	max-width: $content-width;
 	// Offset for: Visual editor padding, block (default appender) margin.
 	margin: #{ -1 * $block-spacing } auto -50px;
 }

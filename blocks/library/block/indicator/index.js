@@ -9,14 +9,14 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import './style.scss';
 
-function ReusableBlockIndicator( { title } ) {
+function SharedBlockIndicator( { title } ) {
 	return (
 		<Tooltip text={ sprintf( __( 'Shared Block: %s' ), title ) }>
-			<span className="reusable-block-indicator">
+			<span className="shared-block-indicator">
 				<Dashicon icon="controls-repeat" />
 			</span>
 		</Tooltip>
 	);
 }
 
-export default ReusableBlockIndicator;
+export default SharedBlockIndicator;

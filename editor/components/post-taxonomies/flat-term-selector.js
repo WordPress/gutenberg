@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { get, unescape as unescapeString, find, throttle, uniqBy } from 'lodash';
+import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy, invoke } from 'lodash';
 import { stringify } from 'querystring';
 
 /**
@@ -11,12 +10,7 @@ import { stringify } from 'querystring';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { FormTokenField, withAPIData } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Module constants
@@ -44,7 +38,7 @@ class FlatTermSelector extends Component {
 	}
 
 	componentDidMount() {
-		if ( this.props.terms ) {
+		if ( ! isEmpty( this.props.terms ) ) {
 			this.setState( { loading: false } );
 			this.initRequest = this.fetchTerms( {
 				include: this.props.terms.join( ',' ),
@@ -68,10 +62,8 @@ class FlatTermSelector extends Component {
 	}
 
 	componentWillUnmount() {
-		this.initRequest.abort();
-		if ( this.searchRequest ) {
-			this.searchRequest.abort();
-		}
+		invoke( this.initRequest, [ 'abort' ] );
+		invoke( this.searchRequest, [ 'abort' ] );
 	}
 
 	componentWillReceiveProps( newProps ) {
@@ -160,9 +152,7 @@ class FlatTermSelector extends Component {
 	}
 
 	searchTerms( search = '' ) {
-		if ( this.searchRequest ) {
-			this.searchRequest.abort();
-		}
+		invoke( this.searchRequest, [ 'abort' ] );
 		this.searchRequest = this.fetchTerms( { search } );
 	}
 
@@ -204,29 +194,23 @@ class FlatTermSelector extends Component {
 	}
 }
 
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { slug } = props;
-	return {
-		taxonomy: `/wp/v2/taxonomies/${ slug }?context=edit`,
-	};
-} );
-
-const applyConnect = connect(
-	( state, ownProps ) => {
+export default compose(
+	withAPIData( ( props ) => {
+		const { slug } = props;
 		return {
-			terms: getEditedPostAttribute( state, ownProps.restBase ),
+			taxonomy: `/wp/v2/taxonomies/${ slug }?context=edit`,
 		};
-	},
-	( dispatch ) => {
+	} ),
+	withSelect( ( select, ownProps ) => {
+		return {
+			terms: select( 'core/editor' ).getEditedPostAttribute( ownProps.restBase ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
 		return {
 			onUpdateTerms( terms, restBase ) {
-				dispatch( editPost( { [ restBase ]: terms } ) );
+				dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
 			},
 		};
-	}
-);
-
-export default compose(
-	applyWithAPIData,
-	applyConnect,
+	} )
 )( FlatTermSelector );

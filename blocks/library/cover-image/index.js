@@ -7,6 +7,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
 
@@ -122,50 +123,53 @@ export const settings = {
 				} }
 			/>
 		);
-		const controls = isSelected && [
-			<BlockControls key="controls">
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ updateAlignment }
-				/>
-
-				{ alignmentToolbar }
-				<Toolbar>
-					<MediaUpload
-						onSelect={ onSelectImage }
-						type="image"
-						value={ id }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit image' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
+		const controls = (
+			<Fragment>
+				<BlockControls>
+					<BlockAlignmentToolbar
+						value={ align }
+						onChange={ updateAlignment }
 					/>
-				</Toolbar>
-			</BlockControls>,
-			<InspectorControls key="inspector">
-				<h2>{ __( 'Cover Image Settings' ) }</h2>
-				<ToggleControl
-					label={ __( 'Fixed Background' ) }
-					checked={ !! hasParallax }
-					onChange={ toggleParallax }
-				/>
-				<RangeControl
-					label={ __( 'Background Dimness' ) }
-					value={ dimRatio }
-					onChange={ setDimRatio }
-					min={ 0 }
-					max={ 100 }
-					step={ 10 }
-				/>
-				<PanelBody title={ __( 'Text Alignment' ) }>
+
 					{ alignmentToolbar }
-				</PanelBody>
-			</InspectorControls>,
-		];
+					<Toolbar>
+						<MediaUpload
+							onSelect={ onSelectImage }
+							type="image"
+							value={ id }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
+					</Toolbar>
+				</BlockControls>
+				<InspectorControls>
+					<PanelBody title={ __( 'Cover Image Settings' ) }>
+						<ToggleControl
+							label={ __( 'Fixed Background' ) }
+							checked={ !! hasParallax }
+							onChange={ toggleParallax }
+						/>
+						<RangeControl
+							label={ __( 'Background Dimness' ) }
+							value={ dimRatio }
+							onChange={ setDimRatio }
+							min={ 0 }
+							max={ 100 }
+							step={ 10 }
+						/>
+					</PanelBody>
+					<PanelBody title={ __( 'Text Alignment' ) }>
+						{ alignmentToolbar }
+					</PanelBody>
+				</InspectorControls>
+			</Fragment>
+		);
 
 		if ( ! url ) {
 			const hasTitle = ! isEmpty( title );
@@ -175,40 +179,41 @@ export const settings = {
 					tagName="h2"
 					value={ title }
 					onChange={ ( value ) => setAttributes( { title: value } ) }
-					isSelected={ isSelected }
 					inlineToolbar
 				/>
 			) : __( 'Cover Image' );
 
-			return [
-				controls,
-				<ImagePlaceholder key="cover-image-placeholder"
-					{ ...{ className, icon, label, onSelectImage } }
-				/>,
-			];
+			return (
+				<Fragment>
+					{ controls }
+					<ImagePlaceholder
+						{ ...{ className, icon, label, onSelectImage } }
+					/>
+				</Fragment>
+			);
 		}
 
-		return [
-			controls,
-			<div
-				key="preview"
-				data-url={ url }
-				style={ style }
-				className={ classes }
-			>
-				{ title || isSelected ? (
-					<RichText
-						tagName="p"
-						className="wp-block-cover-image-text"
-						placeholder={ __( 'Write title…' ) }
-						value={ title }
-						onChange={ ( value ) => setAttributes( { title: value } ) }
-						isSelected={ isSelected }
-						inlineToolbar
-					/>
-				) : null }
-			</div>,
-		];
+		return (
+			<Fragment>
+				{ controls }
+				<div
+					data-url={ url }
+					style={ style }
+					className={ classes }
+				>
+					{ title || isSelected ? (
+						<RichText
+							tagName="p"
+							className="wp-block-cover-image-text"
+							placeholder={ __( 'Write title…' ) }
+							value={ title }
+							onChange={ ( value ) => setAttributes( { title: value } ) }
+							inlineToolbar
+						/>
+					) : null }
+				</div>
+			</Fragment>
+		);
 	},
 
 	save( { attributes, className } ) {

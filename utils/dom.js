@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { includes, first } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
  * Browser dependencies
  */
-const { getComputedStyle } = window;
-const { TEXT_NODE } = window.Node;
+const { getComputedStyle, DOMRect } = window;
+const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
  * Check whether the caret is horizontally at the edge of the container.
@@ -36,6 +36,11 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 		return true;
 	}
 
+	// If the container is empty, the caret is always at the edge.
+	if ( tinymce.DOM.isEmpty( container ) ) {
+		return true;
+	}
+
 	const selection = window.getSelection();
 	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 	if ( collapseRanges ) {
@@ -58,14 +63,8 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 	}
 
 	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
-	const editor = tinymce.get( node.id );
 
-	if (
-		! isReverse &&
-		offset !== maxOffset &&
-		// content editables with only a BR element are considered empty
-		( ! editor || ! editor.dom.isEmpty( node ) )
-	) {
+	if ( ! isReverse && offset !== maxOffset ) {
 		return false;
 	}
 
@@ -114,11 +113,7 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 		return false;
 	}
 
-	// Adjust for empty containers.
-	const rangeRect =
-		range.startContainer.nodeType === window.Node.ELEMENT_NODE ?
-			range.startContainer.getBoundingClientRect() :
-			range.getClientRects()[ 0 ];
+	const rangeRect = getRectangleFromRange( range );
 
 	if ( ! rangeRect ) {
 		return false;
@@ -140,11 +135,47 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 	return true;
 }
 
+/**
+ * Get the rectangle of a given Range.
+ *
+ * @param {Range} range The range.
+ *
+ * @return {DOMRect} The rectangle.
+ */
+export function getRectangleFromRange( range ) {
+	// For uncollapsed ranges, get the rectangle that bounds the contents of the
+	// range; this a rectangle enclosing the union of the bounding rectangles
+	// for all the elements in the range.
+	if ( ! range.collapsed ) {
+		return range.getBoundingClientRect();
+	}
+
+	// If the collapsed range starts (and therefore ends) at an element node,
+	// `getClientRects` will return undefined. To fix this we can get the
+	// bounding rectangle of the element node to create a DOMRect based on that.
+	if ( range.startContainer.nodeType === ELEMENT_NODE ) {
+		const { x, y, height } = range.startContainer.getBoundingClientRect();
+
+		// Create a new DOMRect with zero width.
+		return new DOMRect( x, y, 0, height );
+	}
+
+	// For normal collapsed ranges (exception above), the bounding rectangle of
+	// the range may be inaccurate in some browsers. There will only be one
+	// rectangle since it is a collapsed range, so it is safe to pass this as
+	// the union of them. This works consistently in all browsers.
+	return first( range.getClientRects() );
+}
+
+/**
+ * Get the rectangle for the selection in a container.
+ *
+ * @param {Element} container Editable container.
+ *
+ * @return {?DOMRect} The rectangle.
+ */
 export function computeCaretRect( container ) {
-	if (
-		includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ||
-		! container.isContentEditable
-	) {
+	if ( ! container.isContentEditable ) {
 		return;
 	}
 
@@ -155,10 +186,7 @@ export function computeCaretRect( container ) {
 		return;
 	}
 
-	// Adjust for empty containers.
-	return range.startContainer.nodeType === window.Node.ELEMENT_NODE ?
-		range.startContainer.getBoundingClientRect() :
-		range.getClientRects()[ 0 ];
+	return getRectangleFromRange( range );
 }
 
 /**
@@ -271,6 +299,12 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 		return;
 	}
 
+	// Offset by a buffer half the height of the caret rect. This is needed
+	// because caretRangeFromPoint may default to the end of the selection if
+	// offset is too close to the edge. It's unclear how to precisely calculate
+	// this threshold; it may be the padded area of some combination of line
+	// height, caret height, and font size. The buffer offset is effectively
+	// equivalent to a point at half the height of a line of text.
 	const buffer = rect.height / 2;
 	const editableRect = container.getBoundingClientRect();
 	const x = rect.left + ( rect.width / 2 );

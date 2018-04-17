@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, filter, map } from 'lodash';
+import { escapeRegExp, find, filter, map, debounce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
+import { isDeprecatedCompleter, toCompatibleCompleter } from './completer-compat';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import Button from '../button';
 import Popover from '../popover';
@@ -22,6 +23,81 @@ import withInstanceId from '../higher-order/with-instance-id';
 import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 const { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } = keycodes;
+
+/**
+ * A raw completer option.
+ * @typedef {*} CompleterOption
+ */
+
+/**
+ * @callback FnGetOptions
+ *
+ * @returns {(CompleterOption[]|Promise.<CompleterOption[]>)} The completer options or a promise for them.
+ */
+
+/**
+ * @callback FnGetOptionKeywords
+ * @param {CompleterOption} option a completer option.
+ *
+ * @returns {string[]} list of key words to search.
+ */
+
+/**
+ * @callback FnGetOptionLabel
+ * @param {CompleterOption} option a completer option.
+ *
+ * @returns {(string|Array.<(string|Component)>)} list of react components to render.
+ */
+
+/**
+ * @callback FnAllowNode
+ * @param {Node} textNode check if the completer can handle this text node.
+ *
+ * @returns {boolean} true if the completer can handle this text node.
+ */
+
+/**
+ * @callback FnAllowContext
+ * @param {Range} before the range before the auto complete trigger and query.
+ * @param {Range} after the range after the autocomplete trigger and query.
+ *
+ * @returns {boolean} true if the completer can handle these ranges.
+ */
+
+/**
+ * @typedef {Object} OptionCompletion
+ * @property {('insert-at-caret', 'replace')} action the intended placement of the completion.
+ * @property {OptionCompletionValue} value the completion value.
+ */
+
+/**
+ * A completion value.
+ * @typedef {(String|WPElement|Object)} OptionCompletionValue
+ */
+
+/**
+ * @callback FnGetOptionCompletion
+ * @param {CompleterOption} value the value of the completer option.
+ * @param {Range} range the nodes included in the autocomplete trigger and query.
+ * @param {String} query the text value of the autocomplete query.
+ *
+ * @returns {(OptionCompletion|OptionCompletionValue)} the completion for the given option. If an
+ * 													   OptionCompletionValue is returned, the
+ * 													   completion action defaults to `insert-at-caret`.
+ */
+
+/**
+ * @typedef {Object} Completer
+ * @property {String} name a way to identify a completer, useful for selective overriding.
+ * @property {?String} className A class to apply to the popup menu.
+ * @property {String} triggerPrefix the prefix that will display the menu.
+ * @property {(CompleterOption[]|FnGetOptions)} options the completer options or a function to get them.
+ * @property {?FnGetOptionKeywords} getOptionKeywords get the keywords for a given option.
+ * @property {FnGetOptionLabel} getOptionLabel get the label for a given option.
+ * @property {?FnAllowNode} allowNode filter the allowed text nodes in the autocomplete.
+ * @property {?FnAllowContext} allowContext filter the context under which the autocomplete activates.
+ * @property {FnGetOptionCompletion} getOptionCompletion get the completion associated with a given option.
+ */
 
 /**
  * Recursively select the firstChild until hitting a leaf node.
@@ -131,6 +207,36 @@ export class Autocomplete extends Component {
 		};
 	}
 
+	/*
+	 * NOTE: This is necessary for backwards compatibility with the
+	 * previous completer interface. Once we no longer support the
+	 * old interface, we should be able to use the `completers` prop
+	 * directly.
+	 */
+	static getDerivedStateFromProps( nextProps, prevState ) {
+		const { completers: nextCompleters } = nextProps;
+		const { lastAppliedCompleters } = prevState;
+
+		if ( nextCompleters !== lastAppliedCompleters ) {
+			let completers = nextCompleters;
+
+			if ( completers.some( isDeprecatedCompleter ) ) {
+				completers = completers.map( completer => {
+					return isDeprecatedCompleter( completer ) ?
+						toCompatibleCompleter( completer ) :
+						completer;
+				} );
+			}
+
+			return {
+				completers,
+				lastAppliedCompleters: nextCompleters,
+			};
+		}
+
+		return null;
+	}
+
 	constructor() {
 		super( ...arguments );
 
@@ -141,6 +247,7 @@ export class Autocomplete extends Component {
 		this.search = this.search.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.getWordRect = this.getWordRect.bind( this );
+		this.debouncedLoadOptions = debounce( this.loadOptions, 250 );
 
 		this.state = this.constructor.getInitialState();
 	}
@@ -149,7 +256,7 @@ export class Autocomplete extends Component {
 		this.node = node;
 	}
 
-	replace( range, replacement ) {
+	insertCompletion( range, replacement ) {
 		const container = document.createElement( 'div' );
 		container.innerHTML = renderToString( replacement );
 		while ( container.firstChild ) {
@@ -162,15 +269,32 @@ export class Autocomplete extends Component {
 	}
 
 	select( option ) {
+		const { onReplace } = this.props;
 		const { open, range, query } = this.state;
-		const { onSelect } = open || {};
+		const { getOptionCompletion } = open || {};
 
 		this.reset();
 
-		if ( onSelect ) {
-			const replacement = onSelect( option.value, range, query );
-			if ( replacement !== undefined ) {
-				this.replace( range, replacement );
+		if ( getOptionCompletion ) {
+			const completion = getOptionCompletion( option.value, range, query );
+
+			const { action, value } =
+				( undefined === completion.action || undefined === completion.value ) ?
+					{ action: 'insert-at-caret', value: completion } :
+					completion;
+
+			if ( 'replace' === action ) {
+				onReplace( [ value ] );
+			} else if ( 'insert-at-caret' === action ) {
+				this.insertCompletion( range, value );
+			} else if ( 'backcompat' === action ) {
+				// NOTE: This block should be removed once we no longer support the old completer interface.
+				const onSelect = value;
+				const deprecatedOptionObject = option.value;
+				const selectionResult = onSelect( deprecatedOptionObject.value, range, query );
+				if ( selectionResult !== undefined ) {
+					this.insertCompletion( range, selectionResult );
+				}
 			}
 		}
 	}
@@ -231,13 +355,33 @@ export class Autocomplete extends Component {
 		}
 	}
 
-	loadOptions( index ) {
-		this.props.completers[ index ].getOptions().then( ( options ) => {
-			const keyedOptions = map( options, ( option, i ) => ( { ...option, key: index + '-' + i } ) );
+	/**
+	 * Load options for an autocompleter.
+	 *
+	 * @param {Completer} completer The autocompleter.
+	 * @param {string}    query     The query, if any.
+	 */
+	loadOptions( completer, query ) {
+		const { options } = completer;
+
+		/*
+		 * We support both synchronous and asynchronous retrieval of completer options
+		 * but internally treat all as async so we maintain a single, consistent code path.
+		 */
+		Promise.resolve(
+			typeof options === 'function' ? options( query ) : options
+		).then( optionsData => {
+			const keyedOptions = optionsData.map( ( optionData, optionIndex ) => ( {
+				key: `${ completer.idx }-${ optionIndex }`,
+				value: optionData,
+				label: completer.getOptionLabel( optionData ),
+				keywords: completer.getOptionKeywords ? completer.getOptionKeywords( optionData ) : [],
+			} ) );
+
 			const filteredOptions = filterOptions( this.state.search, keyedOptions );
 			const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
 			this.setState( {
-				[ 'options_' + index ]: keyedOptions,
+				[ 'options_' + completer.idx ]: keyedOptions,
 				filteredOptions,
 				selectedIndex,
 			} );
@@ -322,9 +466,9 @@ export class Autocomplete extends Component {
 	}
 
 	search( event ) {
-		const { open: wasOpen, suppress: wasSuppress } = this.state;
-		const { completers } = this.props;
+		const { completers, open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 		const container = event.target;
+
 		// ensure that the cursor location is unambiguous
 		const cursor = this.getCursor( container );
 		if ( ! cursor ) {
@@ -334,8 +478,12 @@ export class Autocomplete extends Component {
 		const match = this.findMatch( container, cursor, completers, wasOpen );
 		const { open, query, range } = match || {};
 		// asynchronously load the options for the open completer
-		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx ) ) {
-			this.loadOptions( open.idx );
+		if ( open && ( ! wasOpen || open.idx !== wasOpen.idx || query !== wasQuery ) ) {
+			if ( open.isDebounced ) {
+				this.debouncedLoadOptions( open, query );
+			} else {
+				this.loadOptions( open, query );
+			}
 		}
 		// create a regular expression to filter the options
 		const search = open ? new RegExp( '(?:\\b|\\s|^)' + escapeRegExp( query ), 'i' ) : /./;
@@ -452,6 +600,7 @@ export class Autocomplete extends Component {
 
 	componentWillUnmount() {
 		this.toggleKeyEvents( false );
+		this.debouncedLoadOptions.cancel();
 	}
 
 	render() {

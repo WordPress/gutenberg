@@ -36,7 +36,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:image {"align":"center"} -->',
-		'<figure class="wp-block-image aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="Beautiful landscape" /><figcaption>Give it a try. Press the "wide" button on the image toolbar.</figcaption></figure>',
+		'<figure class="wp-block-image aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="Beautiful landscape" /><figcaption>If your theme supports it, you\'ll see the "wide" button on the image toolbar. Give it a try.</figcaption></figure>',
 		'<!-- /wp:image -->',
 
 		'<!-- wp:paragraph -->',

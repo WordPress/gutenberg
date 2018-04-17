@@ -1,10 +1,9 @@
-.wp-block-gallery,
-.wp-block-gallery.alignleft,
-.wp-block-gallery.alignright,
-.wp-block-gallery.aligncenter {
+.wp-block-gallery {
 	display: flex;
 	flex-wrap: wrap;
 	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
 
 	.blocks-gallery-image,
 	.blocks-gallery-item {
@@ -30,13 +29,15 @@
 		}
 
 		figcaption {
-			padding-top: 3px;
+			padding: 40px 10px 5px;
 			color: $white;
 			text-align: center;
 			font-size: $default-font-size;
-			background-color: rgba($color: $black, $alpha: 0.7);
+			background: linear-gradient( 0deg, rgba( $color: $black, $alpha: 0.7 ) 0, rgba($color: $black, $alpha: 0.3) 60%, transparent );
 			position: absolute;
 			width: 100%;
+			max-height: 100%;
+			overflow: auto;
 		}
 	}
 
@@ -77,5 +78,14 @@
 				width: calc(100% / #{ $i } - 16px );
 			}
 		}
+	}
+
+	// Apply max-width to floated items that have no intrinsic width
+	[data-align="left"] &,
+	[data-align="right"] &,
+	&.alignleft,
+	&.alignright {
+		max-width: $content-width / 2;
+		width: 100%;
 	}
 }

@@ -22,7 +22,6 @@ $z-layers: (
 	'.components-popover__close': 5,
 	'.editor-block-list__insertion-point': 5,
 	'.blocks-format-toolbar__link-modal': 6,
-	'.editor-block-mover': 1,
 	'.blocks-gallery-item__inline-menu': 20,
 	'.editor-block-settings-menu__popover': 20, // Below the header
 	'.blocks-url-input__suggestions': 30,
@@ -37,7 +36,7 @@ $z-layers: (
 
 	// Should have higher index than the inset/underlay used for dragging
 	'.components-placeholder__fieldset': 1,
-	'.editor-block-list__block-edit .reusable-block-edit-panel *': 1,
+	'.editor-block-list__block-edit .shared-block-edit-panel *': 1,
 
 	// Show drop zone above most standard content, but below any overlays
 	'.components-drop-zone': 100,
@@ -45,7 +44,7 @@ $z-layers: (
 
 	// Block controls, particularly in nested contexts, floats aside block and
 	// should overlap most block content.
-	'.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}': 100,
+	'.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}': 80,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
@@ -54,7 +53,7 @@ $z-layers: (
 
 	// Show sidebar in greater than small viewports above editor related elements
 	// but bellow #adminmenuback { z-index: 100 }
-	'.edit-post-sidebar {greater than small}': 50,
+	'.edit-post-sidebar {greater than small}': 90,
 
 	// Show notices below expanded wp-admin submenus:
 	// #adminmenuwrap { z-index: 9990 }
@@ -69,6 +68,8 @@ $z-layers: (
 	'.components-popover.is-bottom': 99990,
 
 	'.components-autocomplete__results': 1000000,
+
+	'.skip-to-selected-block': 100000,
 );
 
 @function z-index( $key ) {

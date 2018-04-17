@@ -1,7 +1,6 @@
 /**
  * External Dependencies
  */
-import { connect } from 'react-redux';
 import { some, includes } from 'lodash';
 
 /**
@@ -9,11 +8,7 @@ import { some, includes } from 'lodash';
  */
 import { withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { getCurrentPostType } from '../../store/selectors';
+import { withSelect } from '@wordpress/data';
 
 export function PostTaxonomiesCheck( { postType, taxonomies, children } ) {
 	const hasTaxonomies = some( taxonomies.data, ( taxonomy ) => includes( taxonomy.types, postType ) );
@@ -24,20 +19,14 @@ export function PostTaxonomiesCheck( { postType, taxonomies, children } ) {
 	return children;
 }
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			postType: getCurrentPostType( state ),
-		};
-	},
-);
-
-const applyWithAPIData = withAPIData( () => ( {
-	taxonomies: '/wp/v2/taxonomies?context=edit',
-} ) );
-
 export default compose( [
-	applyConnect,
-	applyWithAPIData,
+	withSelect( ( select ) => {
+		return {
+			postType: select( 'core/editor' ).getCurrentPostType(),
+		};
+	} ),
+	withAPIData( () => ( {
+		taxonomies: '/wp/v2/taxonomies?context=edit',
+	} ) ),
 ] )( PostTaxonomiesCheck );
 

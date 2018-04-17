@@ -11,6 +11,7 @@ import { stringify } from 'querystringify';
  */
 import { Component } from '@wordpress/element';
 import {
+	PanelBody,
 	Placeholder,
 	QueryControls,
 	RangeControl,
@@ -54,31 +55,32 @@ class LatestPostsBlock extends Component {
 
 		const inspectorControls = isSelected && (
 			<InspectorControls key="inspector">
-				<h3>{ __( 'Latest Posts Settings' ) }</h3>
-				<QueryControls
-					{ ...{ order, orderBy } }
-					numberOfItems={ postsToShow }
-					categoriesList={ get( categoriesList, 'data', {} ) }
-					selectedCategoryId={ categories }
-					onOrderChange={ ( value ) => setAttributes( { order: value } ) }
-					onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
-					onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
-					onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
-				/>
-				<ToggleControl
-					label={ __( 'Display post date' ) }
-					checked={ displayPostDate }
-					onChange={ this.toggleDisplayPostDate }
-				/>
-				{ layout === 'grid' &&
-					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ ( value ) => setAttributes( { columns: value } ) }
-						min={ 2 }
-						max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+				<PanelBody title={ __( 'Latest Posts Settings' ) }>
+					<QueryControls
+						{ ...{ order, orderBy } }
+						numberOfItems={ postsToShow }
+						categoriesList={ get( categoriesList, 'data', {} ) }
+						selectedCategoryId={ categories }
+						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
+						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
+						onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
+						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
 					/>
-				}
+					<ToggleControl
+						label={ __( 'Display post date' ) }
+						checked={ displayPostDate }
+						onChange={ this.toggleDisplayPostDate }
+					/>
+					{ layout === 'grid' &&
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ ( value ) => setAttributes( { columns: value } ) }
+							min={ 2 }
+							max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+						/>
+					}
+				</PanelBody>
 			</InspectorControls>
 		);
 

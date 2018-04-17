@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { isEqual, find, some, filter, noop, throttle } from 'lodash';
+import isShallowEqual from 'shallowequal';
 
 /**
  * WordPress dependencies
@@ -48,6 +49,9 @@ class DropZoneProvider extends Component {
 		window.addEventListener( 'dragover', this.dragOverListener );
 		window.addEventListener( 'drop', this.onDrop );
 		window.addEventListener( 'mouseup', this.resetDragState );
+
+		// Disable reason: Can't use a ref since this component just renders its children
+		// eslint-disable-next-line react/no-find-dom-node
 		this.container = findDOMNode( this );
 	}
 
@@ -77,6 +81,7 @@ class DropZoneProvider extends Component {
 				isDraggingOverDocument: false,
 				isDraggingOverElement: false,
 				position: null,
+				type: null,
 			} );
 		} );
 	}
@@ -160,18 +165,23 @@ class DropZoneProvider extends Component {
 		// Notifying the dropzones
 		dropzonesToUpdate.map( ( dropzone ) => {
 			const index = this.dropzones.indexOf( dropzone );
+			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
 			dropzone.updateState( {
-				isDraggingOverElement: index === hoveredDropZoneIndex,
-				position: index === hoveredDropZoneIndex ? position : null,
+				isDraggingOverElement: isDraggingOverDropZone,
+				position: isDraggingOverDropZone ? position : null,
 				isDraggingOverDocument: this.doesDropzoneSupportType( dropzone, dragEventType ),
+				type: isDraggingOverDropZone ? dragEventType : null,
 			} );
 		} );
 
-		this.setState( {
+		const newState = {
 			isDraggingOverDocument: true,
 			hoveredDropZone: hoveredDropZoneIndex,
 			position,
-		} );
+		};
+		if ( ! isShallowEqual( newState, this.state ) ) {
+			this.setState( newState );
+		}
 	}
 
 	isWithinZoneBounds( dropzone, x, y ) {

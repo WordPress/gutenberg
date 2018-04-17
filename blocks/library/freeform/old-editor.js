@@ -5,7 +5,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
 
-const { BACKSPACE, DELETE } = keycodes;
+const { BACKSPACE, DELETE, F10 } = keycodes;
 
 function isTmceEmpty( editor ) {
 	// When tinyMce is empty the content seems to be:
@@ -28,6 +28,7 @@ export default class OldEditor extends Component {
 		super( props );
 		this.initialize = this.initialize.bind( this );
 		this.onSetup = this.onSetup.bind( this );
+		this.focus = this.focus.bind( this );
 	}
 
 	componentDidMount() {
@@ -78,6 +79,8 @@ export default class OldEditor extends Component {
 		const { attributes: { content }, setAttributes } = this.props;
 		const { ref } = this;
 
+		this.editor = editor;
+
 		if ( content ) {
 			editor.on( 'loadContent', () => editor.setContent( content ) );
 		}
@@ -96,6 +99,15 @@ export default class OldEditor extends Component {
 				event.preventDefault();
 				event.stopImmediatePropagation();
 			}
+
+			const { altKey } = event;
+			/*
+			 * Prevent Mousetrap from kicking in: TinyMCE already uses its own
+			 * `alt+f10` shortcut to focus its toolbar.
+			 */
+			if ( altKey && event.keyCode === F10 ) {
+				event.stopPropagation();
+			}
 		} );
 
 		editor.addButton( 'kitchensink', {
@@ -109,18 +121,49 @@ export default class OldEditor extends Component {
 				editor.dom.toggleClass( ref, 'has-advanced-toolbar', active );
 			},
 		} );
+
+		editor.on( 'init', () => {
+			const rootNode = this.editor.getBody();
+
+			// Create the toolbar by refocussing the editor.
+			if ( document.activeElement === rootNode ) {
+				rootNode.blur();
+				this.editor.focus();
+			}
+		} );
+	}
+
+	focus() {
+		if ( this.editor ) {
+			this.editor.focus();
+		}
+	}
+
+	onToolbarKeyDown( event ) {
+		// Prevent WritingFlow from kicking in and allow arrows navigation on the toolbar.
+		event.stopPropagation();
+		// Prevent Mousetrap from moving focus to the top toolbar when pressing `alt+f10` on this block toolbar.
+		event.nativeEvent.stopImmediatePropagation();
 	}
 
 	render() {
-		const { isSelected, id } = this.props;
+		const { id } = this.props;
 
+		// Disable reason: the toolbar itself is non-interactive, but must capture
+		// events from the KeyboardShortcuts component to stop their propagation.
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return [
+			// Disable reason: Clicking on this visual placeholder should create
+			// the toolbar, it can also be created by focussing the field below.
+			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 			<div
 				key="toolbar"
 				id={ `toolbar-${ id }` }
 				ref={ ref => this.ref = ref }
 				className="freeform-toolbar"
-				style={ ! isSelected ? { display: 'none' } : {} }
+				onClick={ this.focus }
+				data-placeholder={ __( 'Classic' ) }
+				onKeyDown={ this.onToolbarKeyDown }
 			/>,
 			<div
 				key="editor"
@@ -128,5 +171,6 @@ export default class OldEditor extends Component {
 				className="wp-block-freeform blocks-rich-text__tinymce"
 			/>,
 		];
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
