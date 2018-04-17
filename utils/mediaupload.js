@@ -12,7 +12,7 @@ import { compact, get, startsWith } from 'lodash';
  * @param {Array}    filesList    List of files.
  * @param {Function} onFileChange Function to be called each time a file or a temporary representation of the file is available.
  * @param {string}   allowedType  The type of media that can be uploaded.
- * @paran {Integer}  parentId     Parent post id if one exists.
+ * @param {number}   parentId     Parent post id if one exists.
  */
 export function mediaUpload( filesList, onFileChange, allowedType, parentId = null ) {
 	// Cast filesList to array
@@ -57,8 +57,10 @@ export function mediaUpload( filesList, onFileChange, allowedType, parentId = nu
 }
 
 /**
+ * Creates a new media object from a provided file.
+ *
  * @param {File} file Media File to Save.
- * @param {Integer} parentId Parent post id if one exists.
+ * @param {number} parentId Parent post id if one exists.
  *
  * @return {Promise} Media Object Promise.
  */
@@ -66,7 +68,7 @@ function createMediaFromFile( file, parentId = null ) {
 	// Create upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
-	data.append( 'parent', parentId );
+	data.append( 'post', parentId );
 	return wp.apiRequest( {
 		path: '/wp/v2/media',
 		data,
