@@ -43,13 +43,15 @@ import {
 	removeBlock,
 	resetBlocks,
 	setTemplateValidity,
+	toggleAutosave,
 } from './actions';
 import {
 	getCurrentPost,
 	getCurrentPostType,
 	getEditedPostContent,
 	getPostEdits,
-	isCurrentPostPublished,
+	getEditedPostTitle,
+	getEditedPostExcerpt,
 	isEditedPostDirty,
 	isEditedPostNew,
 	isEditedPostSaveable,
@@ -71,6 +73,7 @@ import {
  * Module Constants
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
+const AUTOSAVE_POST_NOTICE_ID = 'AUTOSAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SHARED_BLOCK_NOTICE_ID = 'SHARED_BLOCK_NOTICE_ID';
 
@@ -102,37 +105,78 @@ export default {
 			content: getEditedPostContent( state ),
 			id: post.id,
 		};
+		const isAutosave = action.options && action.options.autosave;
+		let Model, newModel;
 
-		dispatch( {
-			type: 'UPDATE_POST',
-			edits: toSend,
-			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		} );
-		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
-			( newPost ) => {
-				dispatch( resetPost( newPost ) );
-				dispatch( {
-					type: 'REQUEST_POST_UPDATE_SUCCESS',
-					previousPost: post,
-					post: newPost,
-					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-				} );
+		if ( isAutosave ) {
+			toSend.parent = post.id;
+			delete toSend.id;
+			Model = wp.api.getPostTypeAutosaveModel( getCurrentPostType( state ) );
+			newModel = new Model( toSend );
+			wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }/autosave`, method: 'PUT', data: toSend } ).then(
+				( newPost ) => {
+					dispatch( resetPost( newPost ) );
+					dispatch( {
+						type: 'REQUEST_POST_UPDATE_SUCCESS',
+						previousPost: post,
+						post: newPost,
+						optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+					} );
+					const autosave = {
+						id: newPost.id,
+						title: getEditedPostTitle( state ),
+						excerpt: getEditedPostExcerpt( state ),
+						content: getEditedPostContent( state ),
+					};
+					dispatch( {
+						type: 'RESET_AUTOSAVE',
+						post: autosave,
+					} );
+					dispatch( toggleAutosave( false ) );
+
+					dispatch( {
+						type: 'REQUEST_POST_UPDATE_SUCCESS',
+						previousPost: post,
+						post: post,
+						isAutosave: true,
+					} );
+
 			},
 			( err ) => {
-				dispatch( {
-					type: 'REQUEST_POST_UPDATE_FAILURE',
-					error: get( err, 'responseJSON', {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					} ),
-					post,
-					edits,
-					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-				} );
-			}
-		);
+				dispatch( toggleAutosave( false ) );
+			} )
+		} else {
+			dispatch( {
+				type: 'UPDATE_POST',
+				edits: toSend,
+				optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
+			} );
+			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
+			const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
+			wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
+				( newPost ) => {
+					dispatch( resetPost( newPost ) );
+					dispatch( {
+						type: 'REQUEST_POST_UPDATE_SUCCESS',
+						previousPost: post,
+						post: newPost,
+						optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+					} );
+				},
+				( err ) => {
+					dispatch( {
+						type: 'REQUEST_POST_UPDATE_FAILURE',
+						error: get( err, 'responseJSON', {
+							code: 'unknown_error',
+							message: __( 'An unknown error occurred.' ),
+						} ),
+						post,
+						edits,
+						optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+					} );
+				}
+			);
+		}
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
@@ -159,7 +203,7 @@ export default {
 				private: __( 'Post published privately!' ),
 				future: __( 'Post scheduled!' ),
 			}[ post.status ];
-		} else {
+		} else if ( ! isAutosave ) {
 			// Generic fallback notice
 			noticeMessage = __( 'Post updated!' );
 		}
@@ -295,16 +339,7 @@ export default {
 			return;
 		}
 
-		if ( isCurrentPostPublished( state ) ) {
-			// TODO: Publish autosave.
-			//  - Autosaves are created as revisions for published posts, but
-			//    the necessary REST API behavior does not yet exist
-			//  - May need to check for whether the status of the edited post
-			//    has changed from the saved copy (i.e. published -> pending)
-			return;
-		}
-
-		dispatch( savePost() );
+		dispatch( savePost( { autosave: true } ) );
 	},
 	SETUP_EDITOR( action ) {
 		const { post, settings } = action;

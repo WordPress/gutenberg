@@ -353,9 +353,10 @@ export function editPost( edits ) {
 	};
 }
 
-export function savePost() {
+export function savePost( options ) {
 	return {
 		type: 'REQUEST_POST_UPDATE',
+		options,
 	};
 }
 
@@ -387,9 +388,23 @@ export function mergeBlocks( blockAUid, blockBUid ) {
  *
  * @return {Object} Action object.
  */
-export function autosave() {
+export function doAutosave() {
 	return {
 		type: 'AUTOSAVE',
+	};
+}
+
+export function toggleAutosave( isAutosaving ) {
+	return {
+		type: 'DOING_AUTOSAVE',
+		isAutosaving,
+	};
+}
+
+export function showAutosaveAlert( autosave ) {
+	return {
+		type: 'REQUEST_AUTOSAVE_EXISTS',
+		autosave,
 	};
 }
 

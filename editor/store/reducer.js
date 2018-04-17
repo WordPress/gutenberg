@@ -228,6 +228,15 @@ export const editor = flow( [
 		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
 	} ),
 ] )( {
+	autosave( state = false, action ) {
+		const { post } = action;
+		switch ( action.type ) {
+			case 'RESET_AUTOSAVE':
+				return post;
+		}
+
+		return state;
+	},
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
@@ -574,6 +583,16 @@ export function isTyping( state = false, action ) {
 
 		case 'STOP_TYPING':
 			return false;
+	}
+
+	return state;
+}
+
+export function currentlyAutosaving( state = false, action ) {
+	switch ( action.type ) {
+		case 'DOING_AUTOSAVE':
+			const { isAutosaving } = action;
+			return isAutosaving;
 	}
 
 	return state;
@@ -1003,6 +1022,7 @@ export const sharedBlocks = combineReducers( {
 
 export default optimist( combineReducers( {
 	editor,
+	currentlyAutosaving,
 	currentPost,
 	isTyping,
 	blockSelection,

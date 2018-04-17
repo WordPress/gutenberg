@@ -41,7 +41,7 @@ export class PostSavedState extends Component {
 			return (
 				<span className="editor-post-saved-state is-saving">
 					<Dashicon icon="cloud" />
-					{ __( 'Saving' ) }
+					{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
 				</span>
 			);
 		}
@@ -84,6 +84,7 @@ export default compose( [
 			isSavingPost,
 			isEditedPostSaveable,
 			getCurrentPost,
+			isAutosavingPost,
 		} = select( 'core/editor' );
 		return {
 			post: getCurrentPost(),
@@ -92,6 +93,7 @@ export default compose( [
 			isDirty: forceIsDirty || isEditedPostDirty(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
+			isAutosaving: isAutosavingPost(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
