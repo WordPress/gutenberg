@@ -17,4 +17,7 @@
 	animation: slide_in_right 0.1s forwards;
 }
 
-
+@mixin fade_in {
+	animation: fade-in 0.3s ease-out;
+	animation-fill-mode: forwards;
+}

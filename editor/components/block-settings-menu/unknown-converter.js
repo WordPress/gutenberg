@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { get } from 'lodash';
 
 /**
@@ -11,12 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { IconButton, withAPIData } from '@wordpress/components';
 import { getUnknownTypeHandlerName, rawHandler, serialize } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { getBlock, getCurrentPostType } from '../../store/selectors';
-import { replaceBlocks } from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 export function UnknownConverter( { block, onReplace, small, user, role } ) {
 	if ( ! block || getUnknownTypeHandlerName() !== block.name ) {
@@ -47,15 +41,16 @@ export function UnknownConverter( { block, onReplace, small, user, role } ) {
 }
 
 export default compose(
-	connect(
-		( state, { uid } ) => ( {
-			block: getBlock( state, uid ),
-			postType: getCurrentPostType( state ),
-		} ),
-		{
-			onReplace: replaceBlocks,
-		}
-	),
+	withSelect( ( select, { uid } ) => {
+		const { getBlock, getCurrentPostType } = select( 'core/editor' );
+		return {
+			block: getBlock( uid ),
+			postType: getCurrentPostType(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		onReplace: dispatch( 'core/editor' ).replaceBlocks,
+	} ) ),
 	withAPIData( ( { postType } ) => ( {
 		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 	} ) ),

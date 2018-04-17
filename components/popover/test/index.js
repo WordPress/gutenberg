@@ -83,12 +83,6 @@ describe( 'Popover', () => {
 			expect( document.activeElement ).toBe( content );
 		} );
 
-		it( 'should not focus when opening in response to pointer event', () => {
-			wrapper = mount( <Popover /> );
-
-			expect( document.activeElement ).toBe( document.body );
-		} );
-
 		it( 'should allow focus-on-open behavior to be disabled', () => {
 			const activeElement = document.activeElement;
 
