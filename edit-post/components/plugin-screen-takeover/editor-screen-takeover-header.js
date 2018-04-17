@@ -11,9 +11,9 @@ const ScreenTakeoverHeader = ( { icon, title, onClose, closeLabel } ) => {
 		>
 			<div>
 				{ icon }
-				<span>
+				<h1>
 					{ title }
-				</span>
+				</h1>
 			</div>
 			<IconButton
 				onClick={ onClose }

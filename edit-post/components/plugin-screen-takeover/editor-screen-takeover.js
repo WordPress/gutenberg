@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import Modal from 'react-modal';
 
 /**
@@ -56,7 +56,6 @@ export default class EditorScreenTakeover extends Component {
 	}
 
 	render() {
-		console.log( 'Modal props=', this.props );
 		return this.getModal();
 	}
 }
