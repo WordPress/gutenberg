@@ -11,7 +11,6 @@ import { Dropdown, IconButton } from '@wordpress/components';
 import {
 	createBlock,
 	isUnmodifiedDefaultBlock,
-	hasBlockSupport,
 	MediaUpload,
 } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
@@ -75,13 +74,14 @@ class Inserter extends Component {
 	}
 
 	isInsertingInline() {
-		const { selectedBlock, getBlockMode } = this.props;
+		const { selectedBlock, canInsertInline } = this.props;
+		const isEmptyParagraph = selectedBlock &&
+			selectedBlock.name === 'core/paragraph' &&
+			selectedBlock.attributes.content.length === 0;
 
 		return selectedBlock &&
-			hasBlockSupport( selectedBlock.name, 'inlineToken' ) &&
-			selectedBlock.attributes.content &&
-			selectedBlock.attributes.content.length > 0 &&
-			getBlockMode( selectedBlock.uid ) === 'visual';
+			! isEmptyParagraph &&
+			canInsertInline;
 	}
 
 	render() {
@@ -164,7 +164,7 @@ export default compose( [
 			getSelectedBlock,
 			getSupportedBlocks,
 			getEditorSettings,
-			getBlockMode,
+			isInlineInsertAvailable,
 		} = select( 'core/editor' );
 		const { allowedBlockTypes, templateLock } = getEditorSettings();
 		const insertionPoint = getBlockInsertionPoint();
@@ -176,7 +176,7 @@ export default compose( [
 			selectedBlock: getSelectedBlock(),
 			hasSupportedBlocks: true === supportedBlocks || ! isEmpty( supportedBlocks ),
 			isLocked: !! templateLock,
-			getBlockMode,
+			canInsertInline: isInlineInsertAvailable(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {

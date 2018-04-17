@@ -358,6 +358,18 @@ export function hideInlineInsertionPoint() {
 	};
 }
 
+export function setInlineInsertAvailable() {
+	return {
+		type: 'SET_INLINE_INSERT_AVAILABLE',
+	};
+}
+
+export function setInlineInsertUnavailable() {
+	return {
+		type: 'SET_INLINE_INSERT_UNAVAILABLE',
+	};
+}
+
 /**
  * Returns an action object resetting the template validity.
  *

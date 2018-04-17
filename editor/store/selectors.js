@@ -1074,6 +1074,10 @@ export function getInlineToken( state ) {
 	return state.inlineToken;
 }
 
+export function isInlineInsertAvailable( state ) {
+	return state.isInlineInsertAvailable;
+}
+
 /**
  * Returns whether the blocks matches the template or not.
  *

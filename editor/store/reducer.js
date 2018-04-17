@@ -810,6 +810,18 @@ export function inlineToken( state = null, action ) {
 	return state;
 }
 
+export function isInlineInsertAvailable( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_INLINE_INSERT_AVAILABLE':
+			return true;
+
+		case 'SET_INLINE_INSERT_UNAVAILABLE':
+			return false;
+	}
+
+	return state;
+}
+
 /**
  * Reducer returning whether the post blocks match the defined template or not.
  *
@@ -1108,6 +1120,7 @@ export default optimist( combineReducers( {
 	isInsertionPointVisible,
 	isInlineInsertionPointVisible,
 	inlineToken,
+	isInlineInsertAvailable,
 	preferences,
 	saving,
 	notices,

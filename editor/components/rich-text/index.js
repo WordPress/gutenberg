@@ -123,6 +123,7 @@ export class RichText extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
+		this.toggleInsertAvailable = this.toggleInsertAvailable.bind( this );
 		this.insertToken = this.insertToken.bind( this );
 
 		this.state = {
@@ -241,6 +242,8 @@ export class RichText extends Component {
 		// Remove TinyMCE Core shortcut for consistency with global editor
 		// shortcuts. Also clashes with Mac browsers.
 		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
+
+		this.props.setInsertAvailable();
 	}
 
 	adaptFormatter( options ) {
@@ -477,6 +480,18 @@ export class RichText extends Component {
 		}
 
 		completeInlineInsert();
+	}
+
+	toggleInsertAvailable() {
+		const { isSelected, setInsertAvailable, setInsertUnavailable } = this.props;
+
+		if ( isSelected ) {
+			// setTimeout prevents bug when switching between two
+			// different RichText with keyboard
+			setTimeout( setInsertAvailable, 0 );
+		} else {
+			setInsertUnavailable();
+		}
 	}
 
 	/**
@@ -767,6 +782,10 @@ export class RichText extends Component {
 			return;
 		}
 
+		if ( this.props.isSelected !== prevProps.isSelected ) {
+			this.toggleInsertAvailable();
+		}
+
 		if ( this.props.inlineToken && this.props.isSelected ) {
 			this.insertToken();
 		}
@@ -1005,8 +1024,15 @@ const RichTextContainer = compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
+		const { setInlineInsertAvailable = noop } = dispatch( 'core/editor' ) || {};
+		const { setInlineInsertUnavailable = noop } = dispatch( 'core/editor' ) || {};
 		const { completeInlineInsert = noop } = dispatch( 'core/editor' ) || {};
-		return { completeInlineInsert };
+
+		return {
+			setInsertAvailable: setInlineInsertAvailable,
+			setInsertUnavailable: setInlineInsertUnavailable,
+			completeInlineInsert,
+		};
 	} ),
 	withSafeTimeout,
 ] )( RichText );
