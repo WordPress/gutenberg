@@ -125,6 +125,8 @@ export class RichText extends Component {
 		this.setFocusedElement = this.setFocusedElement.bind( this );
 		this.toggleInsertAvailable = this.toggleInsertAvailable.bind( this );
 		this.insertToken = this.insertToken.bind( this );
+		this.getFocusPosition = this.getFocusPosition.bind( this );
+		this.getInsertionPosition = this.getInsertionPosition.bind( this );
 
 		this.state = {
 			formats: {},
@@ -422,7 +424,7 @@ export class RichText extends Component {
 		this.context.onCreateUndoLevel();
 	}
 
-	getContainerPosition() {
+	getContainerNode() {
 		// Find the parent "relative" or "absolute" positioned container
 		const findRelativeParent = ( node ) => {
 			const style = window.getComputedStyle( node );
@@ -431,9 +433,8 @@ export class RichText extends Component {
 			}
 			return findRelativeParent( node.parentNode );
 		};
-		const container = findRelativeParent( this.editor.getBody() );
 
-		return container.getBoundingClientRect();
+		return findRelativeParent( this.editor.getBody() );
 	}
 
 	/**
@@ -459,12 +460,15 @@ export class RichText extends Component {
 	}
 
 	getInsertionPosition() {
-		const containerPosition = this.getContainerPosition();
+		const container = this.getContainerNode();
+		const marginLeft = window.getComputedStyle( container )[ 'margin-left' ];
+		const containerPosition = container.getBoundingClientRect();
 		const rect = getRectangleFromRange( this.editor.selection.getRng() );
 
 		return {
 			top: rect.top - containerPosition.top,
 			left: rect.right - containerPosition.left,
+			'margin-left': marginLeft,
 			height: rect.height,
 		};
 	}
