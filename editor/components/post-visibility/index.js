@@ -1,24 +1,15 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
 import { visibilityOptions } from './utils';
-import {
-	getEditedPostAttribute,
-	getEditedPostVisibility,
-} from '../../store/selectors';
-import { editPost, savePost } from '../../store/actions';
 
 export class PostVisibility extends Component {
 	constructor( props ) {
@@ -132,21 +123,26 @@ export class PostVisibility extends Component {
 	}
 }
 
-const applyConnect = connect(
-	( state ) => ( {
-		status: getEditedPostAttribute( state, 'status' ),
-		visibility: getEditedPostVisibility( state ),
-		password: getEditedPostAttribute( state, 'password' ),
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getEditedPostAttribute,
+			getEditedPostVisibility,
+		} = select( 'core/editor' );
+		return {
+			status: getEditedPostAttribute( 'status' ),
+			visibility: getEditedPostVisibility(),
+			password: getEditedPostAttribute( 'password' ),
+		};
 	} ),
-	{
-		onSave: savePost,
-		onUpdateVisibility( status, password = null ) {
-			return editPost( { status, password } );
-		},
-	}
-);
-
-export default compose(
-	applyConnect,
-	withInstanceId
-)( PostVisibility );
+	withDispatch( ( dispatch ) => {
+		const { savePost, editPost } = dispatch( 'core/editor' );
+		return {
+			onSave: savePost,
+			onUpdateVisibility( status, password = null ) {
+				editPost( { status, password } );
+			},
+		};
+	} ),
+	withInstanceId,
+] )( PostVisibility );
