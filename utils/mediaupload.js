@@ -6,7 +6,7 @@ import { compact, get, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { select } from '@wordpress/data';
 
 /**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
@@ -67,11 +67,11 @@ export function mediaUpload( filesList, onFileChange, allowedType ) {
  *
  * @return {Promise} Media Object Promise.
  */
-function createMediaFromFileWithoutSelect( { file, parentId } ) {
+function createMediaFromFile( file ) {
 	// Create new upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
-	data.append( 'post', parentId );
+	data.append( 'post', select( 'core/editor' ).getCurrentPostId() );
 	return wp.apiRequest( {
 		path: '/wp/v2/media',
 		data,
@@ -79,14 +79,7 @@ function createMediaFromFileWithoutSelect( { file, parentId } ) {
 		processData: false,
 		method: 'POST',
 	} );
-};
-
-const createMediaFromFile = withSelect( ( select, ownProps ) => {
-	return {
-		file: ownProps.file,
-		parentId: select( 'core/editor' ).getCurrentPostId(),
-	};
-} )( createMediaFromFileWithoutSelect );
+}
 
 /**
  * Utility used to preload an image before displaying it.
