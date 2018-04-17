@@ -29,21 +29,22 @@ $input-size: 230px;
 
 // Suggestions
 .blocks-url-input__suggestions {
-	position: relative;
+	position: absolute;
 	z-index: 0;	// place underneath the input field so focus isn't cropped
 	background: $white;
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
 	max-height: 200px;
 	overflow-y: scroll;
 	transition: all .15s ease-in-out;
 	list-style: none;
-	margin: 0;
+	margin: 0 -1px;
 	padding: 4px 0;
-	border-top: 1px solid $light-gray-500;
-	width: $input-size + $icon-button-size * 2;
+	width: $input-size + $icon-button-size * 2 + 2px; // add borders
 }
 
 .blocks-url-input__suggestion {
-	padding: 4px ( $icon-button-size + $input-padding );
+	padding: 4px #{ $icon-button-size + $input-padding } 4px $input-padding;
 	color: $dark-gray-300; // lightest we can use for contrast
 	display: block;
 	font-size: $default-font-size;
@@ -52,10 +53,17 @@ $input-size: 230px;
 	width: 100%;
 	border: none;
 	text-align: left;
+	@include menu-style__neutral();
 
+	&:hover {
+		background: $light-gray-500;
+	}
+
+	&:focus,
 	&.is-selected {
 		background: darken( $blue-medium-500, 15 ); // is overridden in _admin-schemes.scss to be theme dependant
 		color: $white;
+		outline: none;
 	}
 }
 

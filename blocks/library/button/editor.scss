@@ -13,17 +13,6 @@
 	margin-bottom: 0;
 	position: relative;
 
-	.blocks-format-toolbar__link-modal {
-		z-index: 2;
-		top: calc( 100% + 2px );
-		left: 50%;
-		transform: translateX( -50% );
-	}
-
-	.blocks-link-url__suggestions {
-		right: -35px;
-	}
-
 	.blocks-rich-text__tinymce {
 		cursor: text;
 	}
@@ -31,7 +20,6 @@
 
 .blocks-button__inline-link {
 	background: #fff;
-	width: 280px;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -39,8 +27,20 @@
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 
+	$blocks-button__link-input-width: 280px;
+	width: $blocks-button__link-input-width;
+
 	.blocks-url-input {
 		width: auto;
+	}
+
+	.blocks-url-input__suggestions {
+		width: $blocks-button__link-input-width - $icon-button-size - $icon-button-size;
+		z-index: z-index( '.blocks-button__inline-link .blocks-url-input__suggestions' );
+	}
+
+	> .dashicon {
+		width: $icon-button-size;
 	}
 
 	.dashicon {

@@ -66,6 +66,7 @@ $scheme-sunrise__spot-color: #de823f;
 		}
 
 		// URL suggestions
+		.blocks-url-input__suggestion:focus,
 		.blocks-url-input__suggestion.is-selected {
 			background: darken( $spot-color, 15 );
 		}
