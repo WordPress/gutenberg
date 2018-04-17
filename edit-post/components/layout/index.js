@@ -7,7 +7,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Popover, ScrollLock, navigateRegions, Overlay } from '@wordpress/components';
+import { Popover, ScrollLock, navigateRegions, Overlay, OverlayPortal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	AutosaveMonitor,
@@ -96,7 +96,14 @@ function Layout( {
 			<PluginScreenTakeover.Slot />
 			<Popover.Slot />
 			<PluginArea />
-			<Overlay />
+			<OverlayPortal />
+			<Overlay
+				focusOnMount
+				requestClose={ event => { console.log( 'request close' ); } }>
+				<button>1</button>
+				<button>2</button>
+				<button>3</button>
+			</Overlay>
 		</div>
 	);
 }
