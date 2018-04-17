@@ -254,7 +254,6 @@ class ParagraphBlock extends Component {
 
 const supports = {
 	className: false,
-	inlineToken: true,
 };
 
 const schema = {
