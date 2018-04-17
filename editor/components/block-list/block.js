@@ -689,7 +689,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelected,
 		blockListSettings: getBlockListSettings( state, uid ),
 	};
-};
+} );
 
 const mapDispatchToProps = ( dispatch, ownProps ) => ( {
 	onChange( uid, attributes ) {
