@@ -14,7 +14,7 @@ export type BlockType = {
 	uid: string,
 	name: string,
 	isValid: boolean,
-	attributes: { content: string },
+	attributes: Object,
 	innerBlocks: Array<BlockType>,
 	focused: boolean,
 };
@@ -71,7 +71,7 @@ const initialState: StateType = {
 			uid: '5',
 			name: 'core/more',
 			isValid: true,
-			attributes: { content: '' },
+			attributes: { customText: undefined },
 			innerBlocks: [],
 			focused: false,
 		},
