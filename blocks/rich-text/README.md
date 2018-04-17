@@ -49,11 +49,11 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `formattingControls: Array`
 
-*Optional.* By default, all formatting controls are present. This setting can be used to fine-tune formatting controls. Possible items: `[ 'bold', 'italic', 'strikethrough', 'link' ]`.
+*Optional.* By default, all formatting controls are enabled but hidden from the user. This setting can be used to fine-tune formatting controls. Possible items: `[ 'bold', 'italic', 'strikethrough', 'link' ]`. To show the formatting controls, set `isSelected` to `true`.
 
 ### `isSelected: Boolean`
 
-*Optional.* Whether to show the input is selected or not in order to show the formatting controls. By default it renders the controls when the block is selected.
+*Optional.* Default `false`. Whether to show formatting controls when input is selected.
 
 ### `keepPlaceholderOnFocus: Boolean`
 
