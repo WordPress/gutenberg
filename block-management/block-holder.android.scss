@@ -1,0 +1,27 @@
+/** @format */
+
+.block_code {
+	font-family: monospace;
+}
+
+.blockHolder {
+	flex: 1;
+}
+
+.blockContainer {
+	background-color: white;
+}
+
+.blockContent {
+	padding-left: 10;
+	padding-right: 10;
+	padding-top: 10;
+	padding-bottom: 10;
+}
+
+.blockTitle {
+	background-color: grey;
+	padding-left: 10;
+	padding-top: 4;
+	padding-bottom: 4;
+}

@@ -12,12 +12,30 @@ module.exports = {
 	preset: 'jest-react-native',
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [ '/node_modules/', '/gutenberg/' ],
+	moduleFileExtensions: [
+		'native.js',
+		'android.js',
+		'ios.js',
+		'js',
+		'native.json',
+		'android.json',
+		'ios.json',
+		'json',
+		'native.jsx',
+		'android.jsx',
+		'ios.jsx',
+		'jsx',
+		'node',
+	],
 	moduleNameMapper: {
 		'@wordpress/element': '<rootDir>/gutenberg/element',
 		'@wordpress/hooks': '<rootDir>/wordpress/hooks',
 		'@wordpress/i18n': '<rootDir>/gutenberg/i18n',
 		'@wordpress/utils': '<rootDir>/gutenberg/utils',
 		'@gutenberg': '<rootDir>/gutenberg',
+
+		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
+		'\\.(scss)$': '<rootDir>/__mocks__/styleMock.js',
 	},
 	haste: {
 		defaultPlatform: rnPlatform,

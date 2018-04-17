@@ -4,10 +4,12 @@
  */
 
 import React from 'react';
-import { StyleSheet, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import Toolbar from './toolbar';
 
 import type { BlockType } from '../store/';
+
+import styles from './block-holder.scss';
 
 // Gutenberg imports
 import { getBlockType } from '@gutenberg/blocks/api';
@@ -25,28 +27,35 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 			return (
 				<Toolbar uid={ this.props.uid } onButtonPressed={ this.props.onToolbarButtonPressed } />
 			);
-		} else {
-			// Return empty view, toolbar won't be rendered
-			return <View />;
 		}
+
+		// Return empty view, toolbar won't be rendered
+		return <View />;
 	}
 
 	getBlockForType() {
 		const blockType = getBlockType( this.props.name );
 		if ( blockType ) {
 			const Block = blockType.edit;
+
+			let style;
+			if ( blockType.name === 'core/code' ) {
+				style = styles.block_code;
+			}
+
 			// TODO: setAttributes needs to change the state/attributes
 			return (
 				<Block
 					attributes={ { ...this.props.attributes } }
 					// pass a curried version of onChanged with just one argument
 					setAttributes={ attrs => this.props.onChange( this.props.uid, attrs ) }
+					style={ style }
 				/>
 			);
-		} else {
-			// Default block placeholder
-			return <Text>{ this.props.attributes.content }</Text>;
 		}
+
+		// Default block placeholder
+		return <Text>{ this.props.attributes.content }</Text>;
 	}
 
 	render() {
@@ -65,21 +74,3 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		);
 	}
 }
-
-const styles = StyleSheet.create( {
-	blockHolder: {
-		flex: 1,
-	},
-	blockContainer: {
-		backgroundColor: 'white',
-	},
-	blockContent: {
-		padding: 10,
-	},
-	blockTitle: {
-		backgroundColor: 'grey',
-		paddingLeft: 10,
-		paddingTop: 4,
-		paddingBottom: 4,
-	},
-} );

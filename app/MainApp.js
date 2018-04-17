@@ -4,8 +4,7 @@
 
 import React from 'react';
 
-import BlockManager from './block-management/block-manager';
-import type { BlockListType } from './block-management/block-manager';
+import BlockManager, { type BlockListType } from '../block-management/block-manager';
 
 type PropsType = BlockListType;
 type StateType = {};
