@@ -10,13 +10,13 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
+import editorMediaUpload from '../../editor-media-upload';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
@@ -89,7 +89,7 @@ export const settings = {
 				return false;
 			};
 			const setAudio = ( [ audio ] ) => onSelectAudio( audio );
-			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAudio, 'audio' );
+			const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
 
 			if ( editing ) {
 				return (

@@ -14,13 +14,13 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
+import editorMediaUpload from '../../editor-media-upload';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
@@ -101,7 +101,7 @@ export const settings = {
 				return false;
 			};
 			const setVideo = ( [ audio ] ) => onSelectVideo( audio );
-			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setVideo, 'video' );
+			const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setVideo, 'video' );
 			const controls = isSelected && (
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar

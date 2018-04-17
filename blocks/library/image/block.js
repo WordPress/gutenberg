@@ -29,6 +29,7 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import editorMediaUpload from '../../editor-media-upload';
 import RichText from '../../rich-text';
 import ImagePlaceholder from '../../image-placeholder';
 import MediaUpload from '../../media-upload';
@@ -37,7 +38,6 @@ import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 import UrlInputButton from '../../url-input/button';
 import ImageSize from './image-size';
-import { mediaUpload } from '../../../utils/mediaupload';
 import { withEditorSettings } from '../../editor-settings';
 
 /**
@@ -69,7 +69,7 @@ class ImageBlock extends Component {
 			getBlobByURL( url )
 				.then(
 					( file ) =>
-						mediaUpload(
+						editorMediaUpload(
 							[ file ],
 							( [ image ] ) => {
 								setAttributes( { ...image } );
