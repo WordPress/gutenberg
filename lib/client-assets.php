@@ -781,12 +781,12 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 		}
 	}
 
-	/*
-	* This needs to run after `gutenberg_process_block_comments()` (which attempts to run as
-	* late as it can). Since `gutenberg_process_block_comments()` has (PHP_INT_MAX - 1) priority,
-	* therefore this has been assigned PHP_INT_MAX priority.
-	*/
 	if ( $enqueue_only_required_styles ) {
+		/*
+		* This needs to run after `gutenberg_process_block_comments()` (which attempts to run as
+		* late as it can). Since `gutenberg_process_block_comments()` has (PHP_INT_MAX - 1) priority,
+		* therefore this has been assigned PHP_INT_MAX priority.
+		*/
 		add_filter( 'the_content', 'enqueue_required_frontend_block_styles', PHP_INT_MAX );
 	}
 }
