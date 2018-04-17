@@ -1,5 +1,6 @@
 import { NavigableToolbar } from '../../../editor/components';
 import { IconButton } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 const ScreenTakeoverHeader = ( { icon, title, onClose, closeLabel } ) => {
 	const label = closeLabel ? closeLabel : __( 'Close window' );

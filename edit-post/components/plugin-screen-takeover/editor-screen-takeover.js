@@ -56,6 +56,7 @@ export default class EditorScreenTakeover extends Component {
 	}
 
 	render() {
+		console.log( 'Modal props=', this.props );
 		return this.getModal();
 	}
 }
