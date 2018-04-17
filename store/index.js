@@ -71,7 +71,7 @@ const initialState: StateType = {
 			uid: '5',
 			name: 'core/more',
 			isValid: true,
-			attributes: {},
+			attributes: { content: '' },
 			innerBlocks: [],
 			focused: false,
 		},
@@ -92,7 +92,7 @@ const initialState: StateType = {
 
 const devToolsEnhancer =
 	( 'development' === process.env.NODE_ENV && require( 'remote-redux-devtools' ).default ) ||
-	( () => { } );
+	( () => {} );
 
 export function setupStore( state: StateType = initialState ) {
 	const store = createStore( reducer, state, devToolsEnhancer() );
