@@ -10,7 +10,6 @@
         "alias": {
           "@wordpress/element": "./gutenberg/element",
           "@wordpress/hooks": "./wordpress/hooks",
-          "@wordpress/i18n": "./gutenberg/i18n",
           "@wordpress/utils": "./gutenberg/utils",
           "@gutenberg": "./gutenberg"
         },
@@ -26,7 +25,11 @@
     [
       "react-native-platform-specific-extensions",
       {
-        "extensions": ["css", "scss", "sass"]
+        "extensions": [
+          "css",
+          "scss",
+          "sass"
+        ]
       }
     ]
   ],
