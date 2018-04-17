@@ -303,7 +303,7 @@
 
 	// Full-wide
 	&[data-align="full"] {
-		
+
 		// compensate for main container padding
 		@include break-small() {
 			margin-left: -$block-side-ui-padding;
@@ -355,7 +355,7 @@
 		}
 
 		> .editor-block-mover .editor-block-mover__control,
-		> .editor-block-settings-menu .components-icon-button {
+		> .editor-block-settings-menu > * {
 			float: left;
 		}
 
@@ -484,9 +484,9 @@
 				float: left;
 			}
 		}
-	
+
 		// Block Settings
-		.editor-block-settings-menu .components-button {
+		.editor-block-settings-menu > * {
 			float: left;
 		}
 	}
