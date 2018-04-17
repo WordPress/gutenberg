@@ -61,7 +61,6 @@ body.ReactModal__Body--open {
 .edit-post-plugin-screen-takeover__editor-screen-takeover-header {
 	height: $header-height;
 	border-bottom: 1px solid $light-gray-500;
-	background: red;
 	padding: 10px;
 	display: flex;
 	flex-direction: row;
@@ -86,6 +85,7 @@ body.ReactModal__Body--open {
 			max-width: $icon-button-size;
 			max-height: $icon-button-size;
 			padding: 8px;
+			padding-right: 10px;
 		}
 	}
 }

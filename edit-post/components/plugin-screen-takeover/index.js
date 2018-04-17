@@ -33,18 +33,11 @@ let PluginScreenTakeover = ( { pluginName, name, icon, children, isOpen, onClose
 
 PluginScreenTakeover = compose( [
 	withContext( 'pluginName' )(),
-	withDispatch( ( dispatch, ownProps ) => {
-		console.log( ownProps );
-		return {
-			onClose: dispatch( 'core/edit-post' ).closeScreenTakover,
-		};
-	} ),
+	withDispatch( ( dispatch ) => ( {
+		onClose: dispatch( 'core/edit-post' ).closeScreenTakeover,
+	} ) ),
 	withSelect( ( select, ownProps ) => {
 		const { name, pluginName } = ownProps;
-		console.log( 'withSelect ownProps=', ownProps );
-		console.log( 'getActiveScreenTakeoverName=', select( 'core/edit-post' ).getActiveScreenTakeoverName() );
-		console.log( 'concatenated name=', `${ pluginName }/${ name }` );
-		console.log( 'isOpen=', select( 'core/edit-post' ).getActiveScreenTakeoverName() === `${ pluginName }/${ name }`);
 		return {
 			isOpen: select( 'core/edit-post' ).getActiveScreenTakeoverName() === `${ pluginName }/${ name }`,
 		};
@@ -55,15 +48,8 @@ PluginScreenTakeover.Slot = ( { activeScreenTakeoverName } ) => {
 	return <Slot name={ [ SLOT_NAME, activeScreenTakeoverName ].join( '/' ) } />;
 };
 
-PluginScreenTakeover.Slot = withSelect( select => {
-	const o = {
-		activeScreenTakeoverName: select('core/edit-post').getActiveScreenTakeoverName(),
-	};
-	console.log( 'slot withSelect=', o );
-	return o;
-} )( PluginScreenTakeover.Slot );
-// PluginScreenTakeover.Slot = withSelect( select => ( {
-// 	activeScreenTakeoverName: select( 'core/edit-post' ).getActiveScreenTakeoverName(),
-// } ) )( PluginScreenTakeover.Slot );
+PluginScreenTakeover.Slot = withSelect( select => ( {
+	activeScreenTakeoverName: select( 'core/edit-post' ).getActiveScreenTakeoverName(),
+} ) )( PluginScreenTakeover.Slot );
 
 export default PluginScreenTakeover;
