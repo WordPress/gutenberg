@@ -4,6 +4,11 @@
 import { compact, get, startsWith } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { select } from '@wordpress/data';
+
+/**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
  *	when a file upload button is activated.
  *
@@ -56,14 +61,17 @@ export function mediaUpload( filesList, onFileChange, allowedType ) {
 }
 
 /**
+ * Creates a new media object from a provided file.
+ *
  * @param {File} file Media File to Save.
  *
  * @return {Promise} Media Object Promise.
  */
 function createMediaFromFile( file ) {
-	// Create upload payload
+	// Create new upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
+	data.append( 'post', select( 'core/editor' ).getCurrentPostId() );
 	return wp.apiRequest( {
 		path: '/wp/v2/media',
 		data,
