@@ -1,25 +1,22 @@
 // Link input
-.blocks-url-input {
+$input-padding: 10px;
+$input-size: 230px;
+
+.editor-block-list__block .blocks-url-input {
 	width: 100%;
 	flex-grow: 1;
 	position: relative;
+	width: $input-size;
 
 	input[type=text] {
-		padding: 10px;
-		font-size: $default-font-size;
 		width: 100%;
+		padding: $input-padding;
 		border: none;
-		outline: none;
-		box-shadow: none;
+		margin: 0;
+
 		&::-ms-clear {
 			display: none;
 		}
-	}
-
-	&:focus {
-		border: none;
-		box-shadow: none;
-		outline: none;
 	}
 
 	.spinner {
@@ -30,26 +27,26 @@
 	}
 }
 
+// Suggestions
 .blocks-url-input__suggestions {
-	position: absolute;
-	top: 100%;
-	left: 0;
-	right: -64px; // to match the link modal borders
+	position: relative;
+	z-index: 0;	// place underneath the input field so focus isn't cropped
 	background: $white;
 	max-height: 200px;
 	overflow-y: scroll;
 	transition: all .15s ease-in-out;
 	list-style: none;
 	margin: 0;
-	box-shadow: 0 3px 20px rgba( 18, 24, 30, .1 ), 0 1px 3px rgba( 18, 24, 30, .1 );
-	z-index: z-index( '.blocks-url-input__suggestions' )
+	padding: 4px 0;
+	border-top: 1px solid $light-gray-500;
+	width: $input-size + $icon-button-size * 2;
 }
 
 .blocks-url-input__suggestion {
-	color: $dark-gray-500;
+	padding: 4px ( $icon-button-size + $input-padding );
+	color: $dark-gray-300; // lightest we can use for contrast
 	display: block;
 	font-size: $default-font-size;
-	padding: 4px 8px;
 	cursor: pointer;
 	background: $white;
 	width: 100%;
@@ -57,7 +54,7 @@
 	text-align: left;
 
 	&.is-selected {
-		background: $blue-dark-900;
+		background: darken( $blue-medium-500, 15 ); // is overridden in _admin-schemes.scss to be theme dependant
 		color: $white;
 	}
 }
