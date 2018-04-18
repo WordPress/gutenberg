@@ -315,7 +315,7 @@ export function isPostAutosavable( state ) {
 		return true;
 	}
 
-	const title = getEditedPostTitle( state );
+	const title = getEditedPostAttribute( state, 'title' );
 	const excerpt = getEditedPostExcerpt( state );
 	const content = getEditedPostContent( state );
 	const autosave = state.editor.present.autosave;
