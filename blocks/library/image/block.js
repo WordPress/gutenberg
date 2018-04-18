@@ -169,46 +169,45 @@ class ImageBlock extends Component {
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const controls = (
-			isSelected && (
-				<BlockControls key="controls">
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ this.updateAlignment }
-					/>
+			<BlockControls>
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ this.updateAlignment }
+				/>
 
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImage }
-							type="image"
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
-						<UrlInputButton onChange={ this.onSetHref } url={ href } />
-					</Toolbar>
-				</BlockControls>
-			)
+				<Toolbar>
+					<MediaUpload
+						onSelect={ this.onSelectImage }
+						type="image"
+						value={ id }
+						render={ ( { open } ) => (
+							<IconButton
+								className="components-toolbar__control"
+								label={ __( 'Edit image' ) }
+								icon="edit"
+								onClick={ open }
+							/>
+						) }
+					/>
+					<UrlInputButton onChange={ this.onSetHref } url={ href } />
+				</Toolbar>
+			</BlockControls>
 		);
 
 		const availableSizes = this.getAvailableSizes();
 
 		if ( ! url ) {
-			return [
-				controls,
-				<ImagePlaceholder
-					className={ className }
-					key="image-placeholder"
-					icon="format-image"
-					label={ __( 'Image' ) }
-					onSelectImage={ this.onSelectImage }
-				/>,
-			];
+			return (
+				<Fragment>
+					{ controls }
+					<ImagePlaceholder
+						className={ className }
+						icon="format-image"
+						label={ __( 'Image' ) }
+						onSelectImage={ this.onSelectImage }
+					/>
+				</Fragment>
+			);
 		}
 
 		const classes = classnames( className, {
@@ -296,90 +295,92 @@ class ImageBlock extends Component {
 
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return [
-			controls,
-			<figure key="image" className={ classes }>
-				<ImageSize src={ url } dirtynessTrigger={ align }>
-					{ ( sizes ) => {
-						const {
-							imageWidthWithinContainer,
-							imageHeightWithinContainer,
-							imageWidth,
-							imageHeight,
-						} = sizes;
+		return (
+			<Fragment>
+				{ controls }
+				<figure className={ classes }>
+					<ImageSize src={ url } dirtynessTrigger={ align }>
+						{ ( sizes ) => {
+							const {
+								imageWidthWithinContainer,
+								imageHeightWithinContainer,
+								imageWidth,
+								imageHeight,
+							} = sizes;
 
-						// Disable reason: Image itself is not meant to be
-						// interactive, but should direct focus to block
-						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-						const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							// Disable reason: Image itself is not meant to be
+							// interactive, but should direct focus to block
+							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
 
-						if ( ! isResizable || ! imageWidthWithinContainer ) {
+							if ( ! isResizable || ! imageWidthWithinContainer ) {
+								return (
+									<div style={ { width, height } }>
+										{ img }
+									</div>
+								);
+							}
+
+							const currentWidth = width || imageWidthWithinContainer;
+							const currentHeight = height || imageHeightWithinContainer;
+
+							const ratio = imageWidth / imageHeight;
+							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
+							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
+
 							return (
-								<div style={ { width, height } }>
-									{ img }
-								</div>
+								<Fragment>
+									{ getInspectorControls( imageWidth, imageHeight ) }
+									<ResizableBox
+										size={
+											width && height ? {
+												width,
+												height,
+											} : undefined
+										}
+										minWidth={ minWidth }
+										maxWidth={ settings.maxWidth }
+										minHeight={ minHeight }
+										maxHeight={ settings.maxWidth / ratio }
+										lockAspectRatio
+										handleClasses={ {
+											topRight: 'wp-block-image__resize-handler-top-right',
+											bottomRight: 'wp-block-image__resize-handler-bottom-right',
+											topLeft: 'wp-block-image__resize-handler-top-left',
+											bottomLeft: 'wp-block-image__resize-handler-bottom-left',
+										} }
+										enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
+										onResizeStart={ () => {
+											toggleSelection( false );
+										} }
+										onResizeStop={ ( event, direction, elt, delta ) => {
+											setAttributes( {
+												width: parseInt( currentWidth + delta.width, 10 ),
+												height: parseInt( currentHeight + delta.height, 10 ),
+											} );
+											toggleSelection( true );
+										} }
+									>
+										{ img }
+									</ResizableBox>
+								</Fragment>
 							);
-						}
-
-						const currentWidth = width || imageWidthWithinContainer;
-						const currentHeight = height || imageHeightWithinContainer;
-
-						const ratio = imageWidth / imageHeight;
-						const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
-						const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
-
-						return (
-							<Fragment>
-								{ getInspectorControls( imageWidth, imageHeight ) }
-								<ResizableBox
-									size={
-										width && height ? {
-											width,
-											height,
-										} : undefined
-									}
-									minWidth={ minWidth }
-									maxWidth={ settings.maxWidth }
-									minHeight={ minHeight }
-									maxHeight={ settings.maxWidth / ratio }
-									lockAspectRatio
-									handleClasses={ {
-										topRight: 'wp-block-image__resize-handler-top-right',
-										bottomRight: 'wp-block-image__resize-handler-bottom-right',
-										topLeft: 'wp-block-image__resize-handler-top-left',
-										bottomLeft: 'wp-block-image__resize-handler-bottom-left',
-									} }
-									enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
-									onResizeStart={ () => {
-										toggleSelection( false );
-									} }
-									onResizeStop={ ( event, direction, elt, delta ) => {
-										setAttributes( {
-											width: parseInt( currentWidth + delta.width, 10 ),
-											height: parseInt( currentHeight + delta.height, 10 ),
-										} );
-										toggleSelection( true );
-									} }
-								>
-									{ img }
-								</ResizableBox>
-							</Fragment>
-						);
-					} }
-				</ImageSize>
-				{ ( caption && caption.length > 0 ) || isSelected ? (
-					<RichText
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption || [] }
-						onFocus={ this.onFocusCaption }
-						onChange={ ( value ) => setAttributes( { caption: value } ) }
-						isSelected={ this.state.captionFocused }
-						inlineToolbar
-					/>
-				) : null }
-			</figure>,
-		];
+						} }
+					</ImageSize>
+					{ ( caption && caption.length > 0 ) || isSelected ? (
+						<RichText
+							tagName="figcaption"
+							placeholder={ __( 'Write caption…' ) }
+							value={ caption || [] }
+							onFocus={ this.onFocusCaption }
+							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							isSelected={ this.state.captionFocused }
+							inlineToolbar
+						/>
+					) : null }
+				</figure>
+			</Fragment>
+		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
