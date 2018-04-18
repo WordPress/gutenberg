@@ -115,9 +115,9 @@ class Block_Type_Test extends WP_UnitTestCase {
 		return json_encode( $attributes );
 	}
 
-	function render_dummy_block_with_content( $attributes, $content, $block_name ) {
+	function render_dummy_block_with_content( $attributes, $content, $instance ) {
 		$attributes['_content']    = $content;
-		$attributes['_block_name'] = $block_name;
+		$attributes['_block_name'] = $instance->name;
 
 		return json_encode( $attributes );
 	}
