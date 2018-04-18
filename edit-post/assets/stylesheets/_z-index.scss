@@ -26,6 +26,7 @@ $z-layers: (
 	'.editor-block-settings-menu__popover': 21, // Below the header, but above the block toolbar
 	'.blocks-url-input__suggestions': 30,
 	'.edit-post-header': 30,
+	'.blocks-button__inline-link .blocks-url-input__suggestions': 6, // URL suggestions for button block above sibling inserter
 	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
 
 	// Should have lower index than anything else positioned inside the block containers
