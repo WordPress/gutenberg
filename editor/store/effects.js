@@ -108,17 +108,17 @@ export default {
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
 		const isAutosave = action.options && action.options.autosave;
 
-		dispatch( toggleAutosave( true ) );
 		if ( isAutosave ) {
+			dispatch( toggleAutosave( true ) );
 			toSend.parent = post.id;
 			wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }/autosaves`, method: 'POST', data: toSend } ).then(
 				( autosave ) => {
+					dispatch( toggleAutosave( false ) );
 
 					dispatch( {
 						type: 'RESET_AUTOSAVE',
 						post: autosave,
 					} );
-					dispatch( toggleAutosave( false ) );
 
 					dispatch( {
 						type: 'REQUEST_POST_UPDATE_SUCCESS',
@@ -321,7 +321,7 @@ export default {
 			return;
 		}
 
-		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
+		if ( ! isEditedPostDirty( state ) ) {
 			return;
 		}
 
