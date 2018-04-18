@@ -91,8 +91,8 @@ module.exports = {
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},
 			{
-				selector: 'CallExpression[callee.name="get"] > Literal:nth-child(2)',
-				message: 'Always pass an array as the second argument of Lodash.get',
+				selector: 'CallExpression[callee.name=/^(invokeMap|get|has|hasIn|invoke|result|set|setWith|unset|update|updateWith)$/] > Literal:nth-child(2)',
+				message: 'Always pass an array as the path argument',
 			},
 		],
 	},
