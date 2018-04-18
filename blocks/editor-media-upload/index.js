@@ -14,6 +14,7 @@ import { mediaUpload } from '@wordpress/utils';
  */
 export default function editorMediaUpload( filesList, onFileChange, allowedType ) {
 	let postId = null;
+	// Editor isn't guaranteed in block context.
 	if ( select( 'core/editor' ) ) {
 		postId = select( 'core/editor' ).getCurrentPostId();
 	}
