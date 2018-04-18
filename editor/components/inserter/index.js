@@ -104,8 +104,8 @@ class Inserter extends Component {
 				{ this.state.mediaLibraryOpen &&
 					<MediaUpload
 						type="image"
-						onSelect={ ( { type, url, alt } ) => {
-							onInsertInline( { type, url, alt } );
+						onSelect={ ( { type, url, alt, width, height } ) => {
+							onInsertInline( { type, url, alt, width, height } );
 							this.setState( { mediaLibraryOpen: false } );
 						} }
 						onClose={ () => ( this.setState( { mediaLibraryOpen: false } ) ) }
