@@ -3,13 +3,12 @@
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { withInstanceId, Dashicon } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import PlainText from '../../plain-text';
+import Shortcode from './block';
 
 export const name = 'core/shortcode';
 
@@ -60,27 +59,7 @@ export const settings = {
 		html: false,
 	},
 
-	edit: withInstanceId(
-		( { attributes, setAttributes, instanceId } ) => {
-			const inputId = `blocks-shortcode-input-${ instanceId }`;
-
-			return (
-				<div className="wp-block-shortcode">
-					<label htmlFor={ inputId }>
-						<Dashicon icon="shortcode" />
-						{ __( 'Shortcode' ) }
-					</label>
-					<PlainText
-						className="input-control"
-						id={ inputId }
-						value={ attributes.text }
-						placeholder={ __( 'Write shortcode here…' ) }
-						onChange={ ( text ) => setAttributes( { text } ) }
-					/>
-				</div>
-			);
-		}
-	),
+	edit: Shortcode,
 
 	save( { attributes } ) {
 		return <RawHTML>{ attributes.text }</RawHTML>;
