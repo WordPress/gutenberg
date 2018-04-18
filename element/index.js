@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { createContext, createElement, Component, cloneElement, Children, Fragment } from 'react';
+import {
+	createElement,
+	createContext,
+	createRef,
+	Component,
+	cloneElement,
+	Children,
+	Fragment,
+} from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
 import {
 	camelCase,
@@ -33,6 +41,15 @@ import serialize from './serialize';
  * @return {WPElement} Element.
  */
 export { createElement };
+
+/**
+ * Returns an object tracking a reference to a rendered element via its
+ * `current` property as either a DOMElement or Element, dependent upon the
+ * type of element rendered with the ref attribute.
+ *
+ * @return {Object} Ref object.
+ */
+export { createRef };
 
 /**
  * Renders a given element into the target DOM node.
@@ -82,7 +99,7 @@ export { Fragment };
 /**
  * Creates a context object containing two components: a provider and consumer.
  *
- * @param {Object} defaultValue Data stored in the context.
+ * @param {Object} defaultValue A default data stored in the context.
  *
  * @return {Object} Context object.
  */

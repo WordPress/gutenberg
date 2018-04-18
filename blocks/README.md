@@ -275,12 +275,6 @@ buttons. This is useful for block-level modifications to be made available when
 a block is selected. For example, if your block supports alignment, you may
 want to display alignment options in the selected block's toolbar.
 
-Because the toolbar should only be shown when the block is selected, it is
-important that a `BlockControls` element is only returned when the block's
-`isSelected` prop is
-[truthy](https://developer.mozilla.org/en-US/docs/Glossary/Truthy),
-meaning that the block is currently selected.
-
 Example:
 
 ```js
@@ -292,15 +286,13 @@ Example:
 	function edit( props ) {
 		return [
 			// Controls: (only visible when block is selected)
-			props.isSelected && (
-				el( BlockControls, { key: 'controls' },
-					el( AlignmentToolbar, {
-						value: props.align,
-						onChange: function( nextAlign ) {
-							props.setAttributes( { align: nextAlign } )
-						}
-					} )
-				)
+			el( BlockControls, { key: 'controls' },
+				el( AlignmentToolbar, {
+					value: props.align,
+					onChange: function( nextAlign ) {
+						props.setAttributes( { align: nextAlign } )
+					}
+				} )
 			),
 
 			// Block content: (with alignment as attribute)
