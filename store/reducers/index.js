@@ -65,6 +65,7 @@ export const reducer = (
 				...block,
 				attributes: nextAttributes,
 			};
+
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.FOCUS: {
