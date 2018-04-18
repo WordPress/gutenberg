@@ -40,7 +40,9 @@ const getColumnLayouts = memoize( ( columns ) => {
 	} ) );
 } );
 
-registerBlockType( 'core/columns', {
+export const name = 'core/columns';
+
+export const settings = {
 	title: sprintf(
 		/* translators: Block title modifier */
 		__( '%1$s (%2$s)' ),
@@ -116,4 +118,6 @@ registerBlockType( 'core/columns', {
 			</div>
 		);
 	},
-} );
+};
+
+registerBlockType( name, settings );

@@ -177,7 +177,9 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/button', {
+export const name = 'core/button';
+
+export const settings = {
 	title: __( 'Button' ),
 
 	description: __( 'A nice little button. Call something out with it.' ),
@@ -239,4 +241,6 @@ registerBlockType( 'core/button', {
 			);
 		},
 	} ],
-} );
+};
+
+registerBlockType( name, settings );

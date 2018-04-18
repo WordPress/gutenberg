@@ -47,8 +47,9 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/pullquote', {
+export const name = 'core/pullquote';
 
+export const settings = {
 	title: __( 'Pullquote' ),
 
 	description: __( 'A pullquote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ),
@@ -156,4 +157,6 @@ registerBlockType( 'core/pullquote', {
 			);
 		},
 	} ],
-} );
+};
+
+registerBlockType( name, settings );

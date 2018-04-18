@@ -19,7 +19,9 @@ import { PanelBody, Toolbar } from '@wordpress/components';
  */
 import './editor.scss';
 
-registerBlockType( 'core/heading', {
+export const name = 'core/heading';
+
+export const settings = {
 	title: __( 'Heading' ),
 
 	description: __( 'Search engines use the headings to index the structure and content of your web pages.' ),
@@ -183,4 +185,6 @@ registerBlockType( 'core/heading', {
 			</Tag>
 		);
 	},
-} );
+};
+
+registerBlockType( name, settings );

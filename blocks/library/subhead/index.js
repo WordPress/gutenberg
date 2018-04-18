@@ -14,7 +14,9 @@ import {
 import './editor.scss';
 import './style.scss';
 
-registerBlockType( 'core/subhead', {
+export const name = 'core/subhead';
+
+export const settings = {
 	title: __( 'Subhead' ),
 
 	description: __( 'Explanatory text under the main heading of an article.' ),
@@ -83,4 +85,6 @@ registerBlockType( 'core/subhead', {
 
 		return <p className={ className }>{ content }</p>;
 	},
-} );
+};
+
+registerBlockType( name, settings );

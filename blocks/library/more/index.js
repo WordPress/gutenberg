@@ -20,7 +20,9 @@ import { Component, Fragment, RawHTML } from '@wordpress/element';
  */
 import './editor.scss';
 
-registerBlockType( 'core/more', {
+export const name = 'core/more';
+
+export const settings = {
 	title: __( 'More' ),
 
 	description: __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ),
@@ -139,4 +141,6 @@ registerBlockType( 'core/more', {
 			</RawHTML>
 		);
 	},
-} );
+};
+
+registerBlockType( name, settings );

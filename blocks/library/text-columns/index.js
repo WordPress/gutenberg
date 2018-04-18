@@ -22,7 +22,9 @@ import { PanelBody, RangeControl } from '@wordpress/components';
 import './style.scss';
 import './editor.scss';
 
-registerBlockType( 'core/text-columns', {
+export const name = 'core/text-columns';
+
+export const settings = {
 	title: __( 'Text Columns' ),
 
 	description: __( 'Add text across columns. This block is experimental' ),
@@ -121,4 +123,6 @@ registerBlockType( 'core/text-columns', {
 			</div>
 		);
 	},
-} );
+};
+
+registerBlockType( name, settings );

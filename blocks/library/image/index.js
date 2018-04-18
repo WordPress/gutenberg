@@ -55,7 +55,9 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/image', {
+export const name = 'core/image';
+
+export const settings = {
 	title: __( 'Image' ),
 
 	description: __( 'Worth a thousand words.' ),
@@ -206,4 +208,6 @@ registerBlockType( 'core/image', {
 			},
 		},
 	],
-} );
+};
+
+registerBlockType( name, settings );

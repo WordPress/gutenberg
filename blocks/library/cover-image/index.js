@@ -59,7 +59,9 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/cover-image', {
+export const name = 'core/cover-image';
+
+export const settings = {
 	title: __( 'Cover Image' ),
 
 	description: __( 'Cover Image is a bold image block with an optional title.' ),
@@ -270,7 +272,9 @@ registerBlockType( 'core/cover-image', {
 			);
 		},
 	} ],
-} );
+};
+
+registerBlockType( name, settings );
 
 function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?

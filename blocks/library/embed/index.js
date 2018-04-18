@@ -260,26 +260,28 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 	};
 }
 
-registerBlockType( 'core/embed',
-	getEmbedBlockSettings( {
-		title: __( 'Embed' ),
-		description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
-		icon: 'embed-generic',
-		transforms: {
-			from: [
-				{
-					type: 'raw',
-					isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*/i.test( node.textContent ),
-					transform: ( node ) => {
-						return createBlock( 'core/embed', {
-							url: node.textContent.trim(),
-						} );
-					},
+export const name = 'core/embed';
+
+export const settings = getEmbedBlockSettings( {
+	title: __( 'Embed' ),
+	description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
+	icon: 'embed-generic',
+	transforms: {
+		from: [
+			{
+				type: 'raw',
+				isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*/i.test( node.textContent ),
+				transform: ( node ) => {
+					return createBlock( 'core/embed', {
+						url: node.textContent.trim(),
+					} );
 				},
-			],
-		},
-	}
-	) );
+			},
+		],
+	},
+} );
+
+registerBlockType( name, settings );
 
 export const common = [
 	{

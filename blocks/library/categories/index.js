@@ -13,7 +13,9 @@ import './editor.scss';
 import './style.scss';
 import CategoriesBlock from './block';
 
-registerBlockType( 'core/categories', {
+export const name = 'core/categories';
+
+export const settings = {
 	title: __( 'Categories' ),
 
 	description: __( 'Shows a list of your site\'s categories.' ),
@@ -56,4 +58,6 @@ registerBlockType( 'core/categories', {
 	save() {
 		return null;
 	},
-} );
+};
+
+registerBlockType( name, settings );

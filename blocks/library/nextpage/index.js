@@ -13,7 +13,9 @@ import { RawHTML } from '@wordpress/element';
  */
 import './editor.scss';
 
-registerBlockType( 'core/nextpage', {
+export const name = 'core/nextpage';
+
+export const settings = {
 	title: __( 'Page break' ),
 
 	description: __( 'This block allows you to set break points on your post. Visitors of your blog are then presented with content split into multiple pages.' ),
@@ -59,4 +61,6 @@ registerBlockType( 'core/nextpage', {
 			</RawHTML>
 		);
 	},
-} );
+};
+
+registerBlockType( name, settings );

@@ -26,7 +26,9 @@ import { mediaUpload } from '@wordpress/utils';
 import './style.scss';
 import './editor.scss';
 
-registerBlockType( 'core/audio', {
+export const name = 'core/audio';
+
+export const settings = {
 	title: __( 'Audio' ),
 
 	description: __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ),
@@ -176,4 +178,6 @@ registerBlockType( 'core/audio', {
 			</figure>
 		);
 	},
-} );
+};
+
+registerBlockType( name, settings );

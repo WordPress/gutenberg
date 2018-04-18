@@ -20,7 +20,9 @@ import {
  */
 import './editor.scss';
 
-registerBlockType( 'core/list', {
+export const name = 'core/list';
+
+export const settings = {
 	title: __( 'List' ),
 	description: __( 'List. Numbered or bulleted.' ),
 	icon: 'editor-ul',
@@ -312,4 +314,6 @@ registerBlockType( 'core/list', {
 			values
 		);
 	},
-} );
+};
+
+registerBlockType( name, settings );

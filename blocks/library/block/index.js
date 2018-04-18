@@ -171,7 +171,9 @@ const EnhancedSharedBlockEdit = compose( [
 	} ),
 ] )( SharedBlockEdit );
 
-registerBlockType( 'core/block', {
+export const name = 'core/block';
+
+export const settings = {
 	title: __( 'Shared Block' ),
 	category: 'shared',
 	isPrivate: true,
@@ -189,4 +191,6 @@ registerBlockType( 'core/block', {
 
 	edit: EnhancedSharedBlockEdit,
 	save: () => null,
-} );
+};
+
+registerBlockType( name, settings );

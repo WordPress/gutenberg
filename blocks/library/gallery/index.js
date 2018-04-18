@@ -72,7 +72,9 @@ const blockAttributes = {
 	},
 };
 
-registerBlockType( 'core/gallery', {
+export const name = 'core/gallery';
+
+export const settings = {
 	title: __( 'Gallery' ),
 	description: __( 'Image galleries are a great way to share groups of pictures on your site.' ),
 	icon: 'format-gallery',
@@ -235,4 +237,6 @@ registerBlockType( 'core/gallery', {
 			},
 		},
 	],
-} );
+};
+
+registerBlockType( name, settings );

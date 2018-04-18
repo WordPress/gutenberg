@@ -13,7 +13,9 @@ import {
  */
 import './editor.scss';
 
-registerBlockType( 'core/preformatted', {
+export const name = 'core/preformatted';
+
+export const settings = {
 	title: __( 'Preformatted' ),
 
 	description: __( 'Preformatted text keeps your spaces, tabs and linebreaks as they are.' ),
@@ -84,4 +86,6 @@ registerBlockType( 'core/preformatted', {
 
 		return <pre>{ content }</pre>;
 	},
-} );
+};
+
+registerBlockType( name, settings );

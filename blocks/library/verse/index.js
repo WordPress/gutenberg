@@ -13,7 +13,9 @@ import {
  */
 import './editor.scss';
 
-registerBlockType( 'core/verse', {
+export const name = 'core/verse';
+
+export const settings = {
 	title: __( 'Verse' ),
 
 	description: __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ),
@@ -74,4 +76,6 @@ registerBlockType( 'core/verse', {
 	save( { attributes, className } ) {
 		return <pre className={ className }>{ attributes.content }</pre>;
 	},
-} );
+};
+
+registerBlockType( name, settings );

@@ -15,7 +15,9 @@ import './editor.scss';
 import './style.scss';
 import TableBlock from './table-block';
 
-registerBlockType( 'core/table', {
+export const name = 'core/table';
+
+export const settings = {
 	title: __( 'Table' ),
 	description: __( 'Tables. Best used for tabular data.' ),
 	icon: 'editor-table',
@@ -86,4 +88,6 @@ registerBlockType( 'core/table', {
 			</table>
 		);
 	},
-} );
+};
+
+registerBlockType( name, settings );

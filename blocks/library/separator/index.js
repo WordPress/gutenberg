@@ -12,7 +12,9 @@ import {
  */
 import './style.scss';
 
-registerBlockType( 'core/separator', {
+export const name = 'core/separator';
+
+export const settings = {
 	title: __( 'Separator' ),
 
 	description: __( 'Use the separator to indicate a thematic change in the content.' ),
@@ -45,4 +47,6 @@ registerBlockType( 'core/separator', {
 	save() {
 		return <hr />;
 	},
-} );
+};
+
+registerBlockType( name, settings );

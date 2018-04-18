@@ -13,7 +13,9 @@ import './editor.scss';
 import './style.scss';
 import LatestPostsBlock from './block';
 
-registerBlockType( 'core/latest-posts', {
+export const name = 'core/latest-posts';
+
+export const settings = {
 	title: __( 'Latest Posts' ),
 
 	description: __( 'Shows a list of your site\'s most recent posts.' ),
@@ -40,4 +42,6 @@ registerBlockType( 'core/latest-posts', {
 	save() {
 		return null;
 	},
-} );
+};
+
+registerBlockType( name, settings );

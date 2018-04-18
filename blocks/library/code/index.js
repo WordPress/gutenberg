@@ -13,7 +13,9 @@ import {
  */
 import './editor.scss';
 
-registerBlockType( 'core/code', {
+export const name = 'core/code';
+
+export const settings = {
 	title: __( 'Code' ),
 
 	description: __( 'The code block maintains spaces and tabs, great for showing code snippets.' ),
@@ -70,4 +72,6 @@ registerBlockType( 'core/code', {
 	save( { attributes } ) {
 		return <pre><code>{ attributes.content }</code></pre>;
 	},
-} );
+};
+
+registerBlockType( name, settings );

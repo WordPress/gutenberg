@@ -13,7 +13,9 @@ import {
 import './editor.scss';
 import OldEditor from './old-editor';
 
-registerBlockType( 'core/freeform', {
+export const name = 'core/freeform';
+
+export const settings = {
 	title: __( 'Classic' ),
 
 	description: __( 'The classic editor, in block form.' ),
@@ -41,4 +43,6 @@ registerBlockType( 'core/freeform', {
 
 		return <RawHTML>{ content }</RawHTML>;
 	},
-} );
+};
+
+registerBlockType( name, settings );

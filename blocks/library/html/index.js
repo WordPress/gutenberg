@@ -14,7 +14,9 @@ import { withState, SandBox, CodeEditor } from '@wordpress/components';
  */
 import './editor.scss';
 
-registerBlockType( 'core/html', {
+export const name = 'core/html';
+
+export const settings = {
 	title: __( 'Custom HTML' ),
 
 	description: __( 'Add custom HTML code and preview it right here in the editor.' ),
@@ -83,4 +85,6 @@ registerBlockType( 'core/html', {
 	save( { attributes } ) {
 		return <RawHTML>{ attributes.content }</RawHTML>;
 	},
-} );
+};
+
+registerBlockType( name, settings );

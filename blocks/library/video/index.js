@@ -29,7 +29,9 @@ import { mediaUpload } from '@wordpress/utils';
 import './style.scss';
 import './editor.scss';
 
-registerBlockType( 'core/video', {
+export const name = 'core/video';
+
+export const settings = {
 	title: __( 'Video' ),
 
 	description: __( 'The Video block allows you to embed video files and play them back using a simple player.' ),
@@ -197,4 +199,6 @@ registerBlockType( 'core/video', {
 			</figure>
 		);
 	},
-} );
+};
+
+registerBlockType( name, settings );
