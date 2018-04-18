@@ -4,19 +4,41 @@
 import { castArray } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import { getRequestId } from './utils';
+
+/**
  * Returns an action object used in signalling that the request for a given
  * data type has been made.
  *
  * @param {string}  dataType Data type requested.
- * @param {?string} subType  Optional data sub-type.
+ * @param {*} query          Optional request args.
  *
  * @return {Object} Action object.
  */
-export function setRequested( dataType, subType ) {
+export function setRequested( dataType, query ) {
 	return {
 		type: 'SET_REQUESTED',
+		id: getRequestId( query ),
 		dataType,
-		subType,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the request for a given
+ * data type has been triggered.
+ *
+ * @param {string}  dataType Data type requested.
+ * @param {*} query          Optional request args.
+ *
+ * @return {Object} Action object.
+ */
+export function setRequesting( dataType, query ) {
+	return {
+		type: 'SET_REQUESTING',
+		id: getRequestId( query ),
+		dataType,
 	};
 }
 

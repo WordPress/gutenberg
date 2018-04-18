@@ -1,4 +1,44 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import { getRequestId } from './utils';
+
+/**
+ * Returns whether a request for a given
+ * data type has been made.
+ *
+ * @param {Object} state    Data state.
+ * @param {string}  dataType Data type requested.
+ * @param {*} query          Optional request args.
+ *
+ * @return {boolean}         Request made or not.
+ */
+export function isRequested( state, dataType, query ) {
+	const id = getRequestId( query );
+	return get( state.requests, [ dataType, id, 'isRequested' ], false );
+}
+
+/**
+ * Returns whether a request for a given
+ * data type is in flight.
+ *
+ * @param {Object} state    Data state.
+ * @param {string}  dataType Data type requested.
+ * @param {*} query          Optional request args.
+ *
+ * @return {boolean}         Request made or not.
+ */
+export function isRequesting( state, dataType, query ) {
+	const id = getRequestId( query );
+	return get( state.requests, [ dataType, id, 'isRequesting' ], false );
+}
+
+/**
  * Returns all the available terms for the given taxonomy.
  *
  * @param {Object} state    Data state.
@@ -31,7 +71,7 @@ export function getCategories( state ) {
  * @return {boolean} Whether a request is in progress for taxonomy's terms.
  */
 export function isRequestingTerms( state, taxonomy ) {
-	return state.terms[ taxonomy ] === null;
+	return isRequesting( state, 'terms', taxonomy );
 }
 
 /**

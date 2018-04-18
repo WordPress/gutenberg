@@ -8,6 +8,7 @@ import apiRequest from '@wordpress/api-request';
  */
 import {
 	setRequested,
+	setRequesting,
 	receiveTerms,
 	receiveMedia,
 	receivePostTypes,
@@ -18,9 +19,10 @@ import {
  * progress.
  */
 export async function* getCategories() {
-	yield setRequested( 'terms', 'categories' );
+	yield setRequesting( 'terms', 'categories' );
 	const categories = await apiRequest( { path: '/wp/v2/categories' } );
 	yield receiveTerms( 'categories', categories );
+	yield setRequested( 'terms', 'categories' );
 }
 
 /**

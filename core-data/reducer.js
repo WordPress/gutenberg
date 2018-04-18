@@ -9,6 +9,38 @@ import { keyBy } from 'lodash';
 import { combineReducers } from '@wordpress/data';
 
 /**
+ * Reducer managing the state of async requests keyed by request type and request id
+ * The request id is in general a unique identifier generated based on the request args.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function requests( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_REQUESTING':
+			return {
+				...state,
+				[ action.dataType ]: {
+					...state[ action.dataType ],
+					[ action.id ]: { isRequesting: true },
+				},
+			};
+		case 'SET_REQUESTED':
+			return {
+				...state,
+				[ action.dataType ]: {
+					...state[ action.dataType ],
+					[ action.id ]: { isRequested: true, isRequesting: false },
+				},
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
  * undefined (if no request has been made for given taxonomy), null (if a
  * request is in-flight for given taxonomy), or the array of terms for the
@@ -25,17 +57,6 @@ export function terms( state = {}, action ) {
 			return {
 				...state,
 				[ action.taxonomy ]: action.terms,
-			};
-
-		case 'SET_REQUESTED':
-			const { dataType, subType: taxonomy } = action;
-			if ( dataType !== 'terms' || state.hasOwnProperty( taxonomy ) ) {
-				return state;
-			}
-
-			return {
-				...state,
-				[ taxonomy ]: null,
 			};
 	}
 
@@ -86,4 +107,5 @@ export default combineReducers( {
 	terms,
 	media,
 	postTypes,
+	requests,
 } );
