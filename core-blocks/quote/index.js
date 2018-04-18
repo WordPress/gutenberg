@@ -115,7 +115,7 @@ export const settings = {
 					}
 					// transforming a quote with content
 					return ( value || [] ).map( ( item ) => createBlock( 'core/paragraph', {
-						content: [ get( item, 'children.props.children', '' ) ],
+						content: [ get( item, [ 'children', 'props', 'children' ], '' ) ],
 					} ) ).concat( citation ? createBlock( 'core/paragraph', {
 						content: citation,
 					} ) : [] );

@@ -90,6 +90,10 @@ module.exports = {
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},
+			{
+				selector: 'CallExpression[callee.name="get"] > Literal:nth-child(2)',
+				message: 'Always pass an array as the second argument of Lodash.get',
+			},
 		],
 	},
 	overrides: [

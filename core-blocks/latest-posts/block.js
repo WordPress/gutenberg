@@ -61,7 +61,7 @@ class LatestPostsBlock extends Component {
 					<QueryControls
 						{ ...{ order, orderBy } }
 						numberOfItems={ postsToShow }
-						categoriesList={ get( categoriesList, 'data', {} ) }
+						categoriesList={ get( categoriesList, [ 'data' ], {} ) }
 						selectedCategoryId={ categories }
 						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
 						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
