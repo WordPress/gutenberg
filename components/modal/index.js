@@ -15,6 +15,8 @@ import ManagedContent from './managed-content';
 import * as ariaHelper from './aria-helper';
 import './style.scss';
 
+let modalCount = 0;
+
 function getParentElement( parentSelector ) {
 	return parentSelector ? parentSelector() : document.body;
 }
@@ -25,13 +27,20 @@ class Modal extends Component {
 	}
 
 	componentDidMount() {
+		modalCount++;
 		ariaHelper.hideApp();
+
 		getParentElement(
 			this.props.parentSelector
 		).appendChild( this.node );
 	}
 
 	componentWillUnmount() {
+		modalCount--;
+		if ( modalCount === 0 ) {
+			ariaHelper.showApp();
+		}
+
 		getParentElement(
 			this.props.parentSelector
 		).removeChild( this.node );

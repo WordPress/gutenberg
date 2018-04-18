@@ -1,5 +1,4 @@
-let appElement = null,
-	counter = 0;
+let appElement = null;
 
 export function setAppElement( node ) {
 	if ( ! appElement ) {
@@ -8,13 +7,9 @@ export function setAppElement( node ) {
 }
 
 export function hideApp() {
-	counter++;
 	appElement.setAttribute( 'aria-hidden', 'true' );
 }
 
 export function showApp() {
-	counter--;
-	if ( counter === 0 ) {
-		appElement.removeAttribute( 'aria-hidden' );
-	}
+	appElement.removeAttribute( 'aria-hidden' );
 }
