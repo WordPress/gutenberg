@@ -8,9 +8,10 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "test": "jest",
-    "clean": "watchman watch-del-all; rm -rf node_modules/ example/node_modules/ yarn.lock example/yarn.lock package-lock.json example/package-lock.json; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*; yarn clean-ios;",
+    "clean": "yarn cache clean --force; watchman watch-del-all; rm -rf node_modules/ yarn.lock package-lock.json; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*; yarn clean-ios;",
     "clean-ios": "type xcodebuild &> /dev/null && (xcodebuild -project ./iOS/example.xcodeproj -alltargets clean && rm -rf ./iOS/build);",
-    "clean:install": "yarn clean; yarn; pushd example; yarn; popd"
+    "clean:install": "yarn clean; yarn;",
+    "postinstall": "rm -rf node_modules/react-native-aztec/node_modules node_modules/react-native-aztec/example"
   },
   "dependencies": {
     "react": "16.3.1",
