@@ -70,10 +70,10 @@ export const settings = {
 			{
 				type: 'raw',
 				isMatch( node ) {
-					const tag = node.nodeName.toLowerCase();
-					const hasImage = node.querySelector( 'img' );
+					const isImage = node.nodeName === 'IMG';
+					const hasImage = !! node.querySelector( 'img' );
 
-					return tag === 'img' || ( hasImage && tag === 'figure' );
+					return isImage || hasImage;
 				},
 				transform( node ) {
 					const matches = /align(left|center|right)/.exec( node.className );

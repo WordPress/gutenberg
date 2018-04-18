@@ -13,6 +13,7 @@ import rawHandler from '../../index';
 import serialize from '../../../serializer';
 
 const types = [
+	'anchor-image',
 	'plain',
 	'classic',
 	'apple',

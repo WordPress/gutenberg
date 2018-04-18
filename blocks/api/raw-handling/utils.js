@@ -144,7 +144,8 @@ export function isAllowedBlock( parentNode, node ) {
 }
 
 export function isInvalidInline( element ) {
-	if ( ! isInline( element ) ) {
+	// Allow anchor tag to wrap non-inline elements.
+	if ( ! isInline( element ) || element.nodeName === 'A' ) {
 		return false;
 	}
 
