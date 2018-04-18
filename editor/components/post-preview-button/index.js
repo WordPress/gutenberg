@@ -123,7 +123,7 @@ export default compose( [
 			isEditedPostSaveable,
 		} = select( 'core/editor' );
 		const {
-			getPostType
+			getPostType,
 		} = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
