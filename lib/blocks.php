@@ -104,7 +104,7 @@ function gutenberg_render_block( $block ) {
 	if ( $block_name ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 		if ( null !== $block_type && $block_type->is_dynamic() ) {
-			return $block_type->render( $attributes, $raw_content );
+			return $block_type->render( $attributes, $raw_content, $block_name );
 		}
 	}
 
@@ -194,7 +194,7 @@ function do_blocks( $content ) {
 		}
 
 		// Replace dynamic block with server-rendered output.
-		$rendered_content .= $block_type->render( $attributes, $block_content );
+		$rendered_content .= $block_type->render( $attributes, $block_content, $block_name );
 
 		if ( ! $is_self_closing ) {
 			$content = substr( $content, $end_offset + strlen( $end_tag ) );
