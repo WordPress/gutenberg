@@ -2,20 +2,18 @@
  * External dependencies
  */
 import Textarea from 'react-autosize-textarea';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostContent } from '../../store/selectors';
-import { editPost, resetBlocks, checkTemplateValidity } from '../../store/actions';
 
 class PostTextEditor extends Component {
 	constructor() {
@@ -73,19 +71,20 @@ class PostTextEditor extends Component {
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		value: getEditedPostContent( state ),
+export default compose( [
+	withSelect( ( select ) => ( {
+		value: select( 'core/editor' ).getEditedPostContent(),
+	} ) ),
+	withDispatch( ( dispatch ) => {
+		const { editPost, resetBlocks, checkTemplateValidity } = dispatch( 'core/editor' );
+		return {
+			onChange( content ) {
+				editPost( { content } );
+			},
+			onPersist( content ) {
+				resetBlocks( parse( content ) );
+				checkTemplateValidity();
+			},
+		};
 	} ),
-	{
-		onChange( content ) {
-			return editPost( { content } );
-		},
-		onPersist( content ) {
-			return [
-				resetBlocks( parse( content ) ),
-				checkTemplateValidity(),
-			];
-		},
-	}
-)( PostTextEditor );
+] )( PostTextEditor );

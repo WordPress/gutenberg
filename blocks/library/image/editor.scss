@@ -7,6 +7,10 @@
 		width: 100%;
 	}
 
+	&.is-resized img {
+		height: 100%;
+	}
+
 	&.is-transient img {
 		@include loading_fade;
 	}
@@ -55,16 +59,6 @@
 }
 /*!rtl:end:ignore*/
 
-.editor-block-list__block[data-type="core/image"] {
-	.blocks-format-toolbar__link-modal {
-		top: 0;
-		left: 0;
-		position: absolute;
-		border: none;
-		width: 100%;
-	}
-}
-
 .wp-core-ui .wp-block-audio__upload-button.button,
 .wp-core-ui .wp-block-image__upload-button.button,
 .wp-core-ui .wp-block-video__upload-button.button {
@@ -90,5 +84,43 @@
 	&[data-resized="false"] .wp-block-image > div {
 		margin-left: auto;
 		margin-right: auto;
+	}
+}
+
+.edit-post-sidebar .blocks-image__dimensions {
+	margin-bottom: 1em;
+
+	.blocks-image__dimensions__row {
+		display: flex;
+		justify-content: space-between;
+
+		.blocks-image__dimensions__width,
+		.blocks-image__dimensions__height {
+			margin-bottom: 0.5em;
+
+			// Fix the text and placeholder text being misaligned in Safari
+			input {
+				line-height: 1.25;
+			}
+		}
+
+		.blocks-image__dimensions__width {
+			margin-right: 5px;
+		}
+
+		.blocks-image__dimensions__height {
+			margin-left: 5px;
+		}
+	}
+}
+
+.editor-block-list__block[data-type="core/image"] .editor-block-toolbar .blocks-format-toolbar__link-modal {
+	position: absolute;
+	left: 0;
+	right: 0;
+	margin: -1px 0;
+
+	@include break-small() {
+		margin: -1px;
 	}
 }

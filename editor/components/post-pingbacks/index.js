@@ -1,19 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
-
-/**
- * Internal Dependencies
- */
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 function PostPingbacks( { pingStatus = 'open', instanceId, ...props } ) {
 	const onTogglePingback = () => props.editPost( { ping_status: pingStatus === 'open' ? 'closed' : 'open' } );
@@ -31,13 +22,14 @@ function PostPingbacks( { pingStatus = 'open', instanceId, ...props } ) {
 	];
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			pingStatus: getEditedPostAttribute( state, 'ping_status' ),
+			pingStatus: select( 'core/editor' ).getEditedPostAttribute( 'ping_status' ),
 		};
-	},
-	{
-		editPost,
-	}
-)( withInstanceId( PostPingbacks ) );
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		editPost: dispatch( 'core/editor' ).editPost,
+	} ) ),
+	withInstanceId,
+] )( PostPingbacks );

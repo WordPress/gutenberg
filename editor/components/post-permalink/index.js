@@ -4,7 +4,7 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Component, compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Dashicon, Button, ClipboardButton, Tooltip } from '@wordpress/components';
+import { Dashicon, ClipboardButton, Button, Tooltip } from '@wordpress/components';
 
 /**
  * Internal Dependencies

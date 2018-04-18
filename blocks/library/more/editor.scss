@@ -9,8 +9,8 @@
 	white-space: nowrap;
 
 	// Label
-	input {
-		font-size: 12px;
+	input[type=text] {
+		font-size: $default-font-size;
 		text-transform: uppercase;
 		font-weight: 600;
 		font-family: $default-font;

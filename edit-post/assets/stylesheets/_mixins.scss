@@ -219,7 +219,9 @@ $float-margin: calc( 50% - #{ $content-width-padding / 2 } );
  * Applies editor left position to the selector passed as argument
  */
 @mixin editor-left( $selector ) {
-	.sticky-menu #{$selector} {	/* Sticky is when on smaller breakpoints, nav menu is manually opened */
+	#{$selector} {	/* Set left position when auto-fold is not on the body element. */
+		left: 0;
+		
 		@include break-medium() {
 			left: $admin-sidebar-width;
 		}

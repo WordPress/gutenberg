@@ -1,18 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { hasEditorRedo } from '../../store/selectors';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 function EditorHistoryRedo( { hasRedo, redo } ) {
 	return (
@@ -26,11 +18,11 @@ function EditorHistoryRedo( { hasRedo, redo } ) {
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		hasRedo: hasEditorRedo( state ),
-	} ),
-	( dispatch ) => ( {
-		redo: () => dispatch( { type: 'REDO' } ),
-	} )
-)( EditorHistoryRedo );
+export default compose( [
+	withSelect( ( select ) => ( {
+		hasRedo: select( 'core/editor' ).hasEditorRedo(),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		redo: () => dispatch( 'core/editor' ).redo(),
+	} ) ),
+] )( EditorHistoryRedo );

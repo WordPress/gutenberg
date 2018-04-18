@@ -17,10 +17,6 @@
 }
 
 .blocks-format-toolbar__link-modal-line {
-	$button-size: 36px;
-	$input-padding: 10px;
-	$input-size: 230px;
-
 	display: flex;
 	flex-direction: row;
 	flex-grow: 1;
@@ -30,30 +26,8 @@
 
 	.components-button {
 		flex-shrink: 0;
-		width: $button-size;
-		height: $button-size;
-	}
-
-	.blocks-url-input {
-		width: $input-size;
-
-		input {
-			padding: $input-padding;
-			margin: 0;
-		}
-	}
-
-	.blocks-url-input__suggestions {
-		border-top: 1px solid $light-gray-500;
-		box-shadow: none;
-		padding: 4px 0;
-		position: relative;
-		width: $input-size + $button-size * 2;
-	}
-
-	.blocks-url-input__suggestion {
-		color: $dark-gray-100;
-		padding: 4px ( $button-size + $input-padding );
+		width: $icon-button-size;
+		height: $icon-button-size;
 	}
 }
 
@@ -62,7 +36,7 @@
 }
 
 .blocks-format-toolbar__link-value {
-	margin: 10px;
+	margin: $item-spacing - 1px; // subtract border
 	flex-grow: 1;
 	flex-shrink: 1;
 	overflow: hidden;

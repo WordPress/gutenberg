@@ -85,7 +85,8 @@ class NavigableToolbar extends Component {
 			>
 				<KeyboardShortcuts
 					bindGlobal
-					eventName="keyup"
+					// Use the same event that TinyMCE uses in the Classic block for its own `alt+f10` shortcut.
+					eventName="keydown"
 					shortcuts={ {
 						'alt+f10': this.focusToolbar,
 					} }
