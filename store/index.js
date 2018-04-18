@@ -30,6 +30,10 @@ const codeBlockInstance = createBlock( 'core/code', {
 	content: 'if name == "World":\n    return "Hello World"\nelse:\n    return "Hello Pony"',
 } );
 
+const moreBlockInstance = createBlock( 'core/more', {
+	customText: undefined,
+} );
+
 const initialState: StateType = {
 	// TODO: get blocks list block state should be externalized (shared with Gutenberg at some point?).
 	// If not it should be created from a string parsing (commented HTML to json).
@@ -67,14 +71,7 @@ const initialState: StateType = {
 			focused: false,
 		},
 		{ ...codeBlockInstance, focused: false },
-		{
-			uid: '5',
-			name: 'core/more',
-			isValid: true,
-			attributes: { customText: undefined },
-			innerBlocks: [],
-			focused: false,
-		},
+		{ ...moreBlockInstance, focused: false },
 		{
 			uid: '4',
 			name: 'paragraph',
