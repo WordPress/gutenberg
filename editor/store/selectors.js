@@ -322,9 +322,9 @@ export function isPostAutosavable( state ) {
 
 	// If the title, excerpt or content has changed, the post is autosavable.
 	if (
-		( autosave.title && title !== autosave.title ) ||
-		( autosave.excerpt && excerpt !== autosave.excerpt ) ||
-		( autosave.content && content !== autosave.content )
+		( autosave.title && title !== autosave.title.raw ) ||
+		( autosave.excerpt && excerpt !== autosave.excerpt.raw ) ||
+		( autosave.content && content !== autosave.content.raw )
 	) {
 		return true;
 	}
