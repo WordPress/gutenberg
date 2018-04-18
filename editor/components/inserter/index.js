@@ -13,7 +13,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	MediaUpload,
 } from '@wordpress/blocks';
-import { Component, compose } from '@wordpress/element';
+import { Component, compose, Fragment } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -100,7 +100,7 @@ class Inserter extends Component {
 		}
 
 		return (
-			<div>
+			<Fragment>
 				{ this.state.mediaLibraryOpen &&
 					<MediaUpload
 						type="image"
@@ -151,7 +151,7 @@ class Inserter extends Component {
 						return <InserterMenu onSelect={ onSelect } />;
 					} }
 				/>
-			</div>
+			</Fragment>
 		);
 	}
 }
