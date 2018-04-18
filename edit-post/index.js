@@ -78,5 +78,4 @@ export function initializeEditor( id, post, settings ) {
 }
 
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
-export { default as PluginsMoreMenuGroup } from './components/header/plugins-more-menu-group';
-export { default as SidebarMoreMenuItem } from './components/header/sidebar-more-menu-item';
+export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';

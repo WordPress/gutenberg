@@ -10,7 +10,6 @@ import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
 import './style.scss';
 import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
-import { MoreMenuContextProvider } from '../more-menu-context';
 import PluginMoreMenuGroup from '../plugins-more-menu-group';
 
 const MoreMenu = () => (
@@ -26,17 +25,15 @@ const MoreMenu = () => (
 			/>
 		) }
 		renderContent={ ( { onClose } ) => (
-			<MoreMenuContextProvider value={ { onClose } }>
-				<div className="edit-post-more-menu__content">
-					<ModeSwitcher onSelect={ onClose } />
-					<FixedToolbarToggle onToggle={ onClose } />
-					<PluginMoreMenuGroup.Slot />
-					<MenuGroup
-						label={ __( 'Tools' ) }
-						filterName="editPost.MoreMenu.tools"
-					/>
-				</div>
-			</MoreMenuContextProvider>
+			<div className="edit-post-more-menu__content">
+				<ModeSwitcher onSelect={ onClose } />
+				<FixedToolbarToggle onToggle={ onClose } />
+				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
+				<MenuGroup
+					label={ __( 'Tools' ) }
+					filterName="editPost.MoreMenu.tools"
+				/>
+			</div>
 		) }
 	/>
 );

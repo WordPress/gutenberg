@@ -13,7 +13,7 @@ They can be found in the global variable `wp.editPost` when defining `wp-edit-po
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
 
-If you wish to display the sidebar, you can with use the [`SidebarMoreMenuItem`](#sidebarmoremenuitem) component or the `wp.data.dispatch` API:
+If you wish to display the sidebar, you can with use the [`PluginSidebarMoreMenuItem`](#pluginsidebarmoremenuitem) component or the `wp.data.dispatch` API:
 ```js
 wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );
 ```
@@ -26,8 +26,8 @@ const { PluginSidebar } = wp.editPost;
 
 const MyPluginSidebar = () => (
 	<PluginSidebar
-		name="sidebar-name"
-		title="Sidebar title"
+		name="my-sidebar"
+		title="My sidebar title"
 	>
 		<PanelBody>
 			My sidebar content
@@ -53,39 +53,31 @@ Title displayed at the top of the sidebar.
 - Required: Yes
 
 
-### `SidebarMoreMenuItem`
+### `PluginSidebarMoreMenuItem`
 
-Renders a menu item in the `More Menu` drop down, and can be used to activate other plugin UI components.
+Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to activate the corresponding `PluginSidebar` component.
 The text within the component appears as the menu item label.
 
 _Example:_
 
 ```jsx
-const { SidebarMoreMenuItem } = wp.editPost;
+const { PluginSidebarMoreMenuItem } = wp.editPost;
 
 const MySidebarMoreMenuItem = () => (
-	<SidebarMoreMenuItem
-		name="my-plugin"
-		icon="yes"
+	<PluginSidebarMoreMenuItem
 		target="my-sidebar"
+		icon="yes"
 	>
-		My Sidebar
-	</SidebarMoreMenuItem>
+		My sidebar title
+	</PluginSidebarMoreMenuItem>
 );
 ```
 
 #### Props
 
-##### name
-
-A string identifying the menu item. Must be unique for every menu item registered within the scope of your plugin.
-
-- Type: `String`
-- Required: Yes
-
 ##### target
 
-A string identifying the UI element you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that UI element.
+A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
 
 - Type: `String`
 - Required: Yes
@@ -98,18 +90,3 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 - Required: No
 
 
-### `PluginsMoreMenuGroup`
-
-Renders all menu items passed as `children` inside the `Plugins` menu group in the `More Menu` drop down. 
-
-_Example:_
-
-```jsx
-const { PluginsMoreMenuGroup } = wp.editPost;
-
-const MyPluginsMoreMenuGroup = () => (
-	<PluginsMoreMenuGroup>
-		<MySidebarMoreMenuItem />
-	</PluginsMoreMenuGroup>
-);
-```

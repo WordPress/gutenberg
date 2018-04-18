@@ -9,16 +9,20 @@ import { PluginContext } from '@wordpress/plugins';
 /**
  * Internal dependencies
  */
-import { withMoreMenuContext } from '../more-menu-context';
+import PluginsMoreMenuGroup from '../plugins-more-menu-group';
 
-const SidebarMoreMenuItem = ( { children, isSelected, icon, onClick } ) => (
-	<MenuItem
-		icon={ isSelected ? 'yes' : icon }
-		isSelected={ isSelected }
-		onClick={ onClick }
-	>
-		{ children }
-	</MenuItem>
+const PluginSidebarMoreMenuItem = ( { children, isSelected, icon, onClick } ) => (
+	<PluginsMoreMenuGroup>
+		{ ( fillProps ) => (
+			<MenuItem
+				icon={ isSelected ? 'yes' : icon }
+				isSelected={ isSelected }
+				onClick={ compose( onClick, fillProps.onClose ) }
+			>
+				{ children }
+			</MenuItem>
+		) }
+	</PluginsMoreMenuGroup>
 );
 
 export default compose(
@@ -44,8 +48,7 @@ export default compose(
 			sidebarName,
 		};
 	} ),
-	withMoreMenuContext,
-	withDispatch( ( dispatch, { isSelected, moreMenuContext, sidebarName } ) => {
+	withDispatch( ( dispatch, { isSelected, sidebarName } ) => {
 		const {
 			closeGeneralSidebar,
 			openGeneralSidebar,
@@ -53,8 +56,7 @@ export default compose(
 		const onClick = isSelected ?
 			closeGeneralSidebar :
 			() => openGeneralSidebar( sidebarName );
-		return {
-			onClick: compose( onClick, moreMenuContext.onClose ),
-		};
+
+		return { onClick };
 	} ),
-)( SidebarMoreMenuItem );
+)( PluginSidebarMoreMenuItem );
