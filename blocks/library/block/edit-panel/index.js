@@ -20,7 +20,7 @@ class SharedBlockEditPanel extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.sharedBlockNameField = createRef();
+		this.titleField = createRef();
 		this.editButton = createRef();
 		this.handleFormSubmit = this.handleFormSubmit.bind( this );
 		this.handleTitleChange = this.handleTitleChange.bind( this );
@@ -30,7 +30,7 @@ class SharedBlockEditPanel extends Component {
 	componentDidUpdate( prevProps ) {
 		// Select the input text only once when the form opens.
 		if ( ! prevProps.isEditing && this.props.isEditing ) {
-			this.sharedBlockNameField.current.select();
+			this.titleField.current.select();
 		}
 		// Move focus back to the Edit button after pressing the Escape key, Cancel, or Save.
 		if ( ( prevProps.isEditing || prevProps.isSaving ) && ! this.props.isEditing && ! this.props.isSaving ) {
@@ -77,7 +77,7 @@ class SharedBlockEditPanel extends Component {
 				{ ( isEditing || isSaving ) && (
 					<form className="shared-block-edit-panel" onSubmit={ this.handleFormSubmit }>
 						<input
-							ref={ this.sharedBlockNameField }
+							ref={ this.titleField }
 							type="text"
 							disabled={ isSaving }
 							className="shared-block-edit-panel__title"
