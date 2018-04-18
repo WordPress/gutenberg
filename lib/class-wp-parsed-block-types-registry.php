@@ -7,8 +7,15 @@
  */
 
 /**
- * Core class used for storing a list of block types present in the page being currently served
- * This list of blocks is populated while stripping block comments from the HTML.
+ * Core class used for storing a list of `block types` present in the currently requested post / page.
+ * This list of `block types` is populated while stripping block comments from the post's HTML.
+ *
+ * This registry is later used for intelligent enqueueing of front-end styles (enqueue front-end styles
+ * for only `block types` present in the currently requested post / page)
+ *
+ * This registry is only populated if the current queried object is a a single post / page.
+ * For pages containing multiple posts like `category / archive / home page`, this registry isn't populated
+ * since we don't need to enqueue front-end styles on these pages intelligently.
  *
  * @package gutenberg
  * @since 2.6.0
