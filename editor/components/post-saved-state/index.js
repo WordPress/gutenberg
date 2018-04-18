@@ -35,7 +35,7 @@ export class PostSavedState extends Component {
 	}
 
 	render() {
-		const { isNew, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving, isAutosavable } = this.props;
+		const { isNew, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving } = this.props;
 		const { forceSavedMessage } = this.state;
 		if ( isSaving ) {
 			return (
@@ -53,7 +53,8 @@ export class PostSavedState extends Component {
 		if ( ! isSaveable ) {
 			return null;
 		}
-		if ( forceSavedMessage || ( ! isNew && ( ! isDirty || ! isAutosavable ) ) ) {
+
+		if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
 			return (
 				<span className="editor-post-saved-state is-saved">
 					<Dashicon icon="saved" />
@@ -84,7 +85,6 @@ export default compose( [
 			isEditedPostSaveable,
 			getCurrentPost,
 			isAutosavingPost,
-			isPostAutosavable,
 		} = select( 'core/editor' );
 		return {
 			post: getCurrentPost(),
@@ -94,7 +94,6 @@ export default compose( [
 			isSaving: forceIsSaving || isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
 			isAutosaving: isAutosavingPost(),
-			isAutosavable: isPostAutosavable(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
