@@ -40,7 +40,7 @@ export default class EditorScreenTakeover extends Component {
 		} );
 	}
 
-	getModal() {
+	render() {
 		const { height } = this.state;
 		const { icon, title, children, isOpen, onClose } = this.props;
 		return <Modal
@@ -48,6 +48,7 @@ export default class EditorScreenTakeover extends Component {
 			className={ 'edit-post-plugin-screen-takeover__editor-screen-takeover' }
 			overlayClassName={ 'edit-post-plugin-screen-takeover__editor-screen-takeover-overlay' }
 			parentSelector={ () => document.getElementsByClassName( 'gutenberg' )[ 0 ] }
+			onRequestClose={ onClose }
 			style={ {
 				overlay: {
 					height: height,
@@ -59,9 +60,5 @@ export default class EditorScreenTakeover extends Component {
 				{ children }
 			</div>
 		</Modal>;
-	}
-
-	render() {
-		return this.getModal();
 	}
 }
