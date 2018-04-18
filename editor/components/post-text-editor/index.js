@@ -6,9 +6,12 @@ import Textarea from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/utils';
+import { Component, compose, Fragment } from '@wordpress/element';
+import { parse, withEditorSettings } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { withInstanceId } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -58,15 +61,25 @@ class PostTextEditor extends Component {
 	}
 
 	render() {
+		const { value, placeholder, instanceId } = this.props;
+		const decodedPlaceholder = decodeEntities( placeholder );
+
 		return (
-			<Textarea
-				autoComplete="off"
-				value={ this.state.value || this.props.value }
-				onFocus={ this.startEditing }
-				onChange={ this.edit }
-				onBlur={ this.stopEditing }
-				className="editor-post-text-editor"
-			/>
+			<Fragment>
+				<label htmlFor={ `post-content-${ instanceId }` } className="screen-reader-text">
+					{ decodedPlaceholder || __( 'Add content' ) }
+				</label>
+				<Textarea
+					autoComplete="off"
+					value={ this.state.value || value }
+					onFocus={ this.startEditing }
+					onChange={ this.edit }
+					onBlur={ this.stopEditing }
+					className="editor-post-text-editor"
+					id={ `post-content-${ instanceId }` }
+					placeholder={ decodedPlaceholder || __( 'Add content' ) }
+				/>
+			</Fragment>
 		);
 	}
 }
@@ -87,4 +100,8 @@ export default compose( [
 			},
 		};
 	} ),
+	withEditorSettings( ( settings ) => ( {
+		placeholder: settings.contentPlaceholder,
+	} ) ),
+	withInstanceId,
 ] )( PostTextEditor );
