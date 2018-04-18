@@ -110,7 +110,10 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$this->assertTrue( $result['viewable'] );
 	}
 
-	function test_viewability_field_without_context() {
+	/**
+	 * Should not return viewable field without context set.
+	 */
+	function test_viewable_field_without_context() {
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/types/post' );
 		$response = rest_do_request( $request );
 		$result   = $response->get_data();
