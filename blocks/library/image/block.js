@@ -219,7 +219,7 @@ class ImageBlock extends Component {
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 
-		const getInspectorControls = ( imageWidth, imageHeight )=> (
+		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
 				<PanelBody title={ __( 'Image Settings' ) }>
 					<TextareaControl

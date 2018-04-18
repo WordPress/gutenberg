@@ -57,7 +57,7 @@ function PostPublishPanelToggle( {
 }
 
 export default compose( [
-	withSelect( ( select ) =>{
+	withSelect( ( select ) => {
 		const {
 			isSavingPost,
 			isEditedPostSaveable,
