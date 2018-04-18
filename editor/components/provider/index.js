@@ -22,8 +22,8 @@ class EditorProvider extends Component {
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
 			this.props.setupEditor( props.post, {
-					...EditorSettings.defaultSettings,
-					...this.props.settings,
+				...EditorSettings.defaultSettings,
+				...this.props.settings,
 			} );
 		}
 
