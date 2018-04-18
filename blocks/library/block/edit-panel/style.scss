@@ -29,7 +29,7 @@
 		font-size: 14px;
 		height: 30px;
 		margin: #{ $item-spacing / 2 } 0 $item-spacing;
-		width: 100%;
+		min-width: 100%;
 	}
 
 	// Needs specificity to override the margin-bottom set by .button
