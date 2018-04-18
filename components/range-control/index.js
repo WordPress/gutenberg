@@ -26,7 +26,7 @@ function RangeControl( {
 } ) {
 	const id = `inspector-range-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
-	const initialSliderValue = value || initialPosition || '';
+	const initialSliderValue = value === undefined ? initialPosition || '' : value;
 
 	return (
 		<BaseControl
