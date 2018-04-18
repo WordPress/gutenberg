@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { Component, Fragment } from '@wordpress/element';
+import { Component, Fragment, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
 
@@ -20,20 +20,22 @@ class SharedBlockEditPanel extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindTitleRef = this.bindTitleRef.bind( this );
+		this.titleField = createRef();
+		this.editButton = createRef();
 		this.handleFormSubmit = this.handleFormSubmit.bind( this );
 		this.handleTitleChange = this.handleTitleChange.bind( this );
 		this.handleTitleKeyDown = this.handleTitleKeyDown.bind( this );
 	}
 
-	componentDidMount() {
-		if ( this.props.isEditing ) {
-			this.titleRef.select();
+	componentDidUpdate( prevProps ) {
+		// Select the input text only once when the form opens.
+		if ( ! prevProps.isEditing && this.props.isEditing ) {
+			this.titleField.current.select();
 		}
-	}
-
-	bindTitleRef( ref ) {
-		this.titleRef = ref;
+		// Move focus back to the Edit button after pressing the Escape key, Cancel, or Save.
+		if ( ( prevProps.isEditing || prevProps.isSaving ) && ! this.props.isEditing && ! this.props.isSaving ) {
+			this.editButton.current.focus();
+		}
 	}
 
 	handleFormSubmit( event ) {
@@ -62,7 +64,12 @@ class SharedBlockEditPanel extends Component {
 						<b className="shared-block-edit-panel__info">
 							{ title }
 						</b>
-						<Button isLarge className="shared-block-edit-panel__button" onClick={ onEdit }>
+						<Button
+							ref={ this.editButton }
+							isLarge
+							className="shared-block-edit-panel__button"
+							onClick={ onEdit }
+						>
 							{ __( 'Edit' ) }
 						</Button>
 					</div>
@@ -70,7 +77,7 @@ class SharedBlockEditPanel extends Component {
 				{ ( isEditing || isSaving ) && (
 					<form className="shared-block-edit-panel" onSubmit={ this.handleFormSubmit }>
 						<input
-							ref={ this.bindTitleRef }
+							ref={ this.titleField }
 							type="text"
 							disabled={ isSaving }
 							className="shared-block-edit-panel__title"

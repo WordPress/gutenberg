@@ -29,18 +29,13 @@ import './editor.scss';
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
+function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
 	return {
 		title,
-
-		description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
-
+		description: description || __( `Paste URLs from ${ title } to embed the content in this block.` ),
 		icon,
-
 		category,
-
 		keywords,
-
 		attributes: {
 			url: {
 				type: 'string',
@@ -268,6 +263,7 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 registerBlockType( 'core/embed',
 	getEmbedBlockSettings( {
 		title: __( 'Embed' ),
+		description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
 		icon: 'embed-generic',
 		transforms: {
 			from: [
