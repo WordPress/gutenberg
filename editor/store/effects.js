@@ -105,29 +105,15 @@ export default {
 			content: getEditedPostContent( state ),
 			id: post.id,
 		};
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
 		const isAutosave = action.options && action.options.autosave;
-		let Model, newModel;
 
+		dispatch( toggleAutosave( true ) );
 		if ( isAutosave ) {
 			toSend.parent = post.id;
-			delete toSend.id;
-			Model = wp.api.getPostTypeAutosaveModel( getCurrentPostType( state ) );
-			newModel = new Model( toSend );
-			wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }/autosave`, method: 'PUT', data: toSend } ).then(
-				( newPost ) => {
-					dispatch( resetPost( newPost ) );
-					dispatch( {
-						type: 'REQUEST_POST_UPDATE_SUCCESS',
-						previousPost: post,
-						post: newPost,
-						optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-					} );
-					const autosave = {
-						id: newPost.id,
-						title: getEditedPostTitle( state ),
-						excerpt: getEditedPostExcerpt( state ),
-						content: getEditedPostContent( state ),
-					};
+			wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }/autosaves`, method: 'POST', data: toSend } ).then(
+				( autosave ) => {
+
 					dispatch( {
 						type: 'RESET_AUTOSAVE',
 						post: autosave,
@@ -152,7 +138,6 @@ export default {
 				optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
 			} );
 			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-			const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
 			wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
 				( newPost ) => {
 					dispatch( resetPost( newPost ) );
@@ -179,7 +164,7 @@ export default {
 		}
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post } = action;
+		const { previousPost, post, isAutosave } = action;
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -188,8 +173,9 @@ export default {
 
 		let noticeMessage;
 		let shouldShowLink = true;
-		if ( ! isPublished && ! willPublish ) {
-			// If saving a non published post, don't show any notice
+
+		if ( isAutosave || ( ! isPublished && ! willPublish ) ) {
+			// If autosaving, or saving a non published post, don't show any notice
 			noticeMessage = null;
 		} else if ( isPublished && ! willPublish ) {
 			// If undoing publish status, show specific notice
@@ -203,7 +189,7 @@ export default {
 				private: __( 'Post published privately!' ),
 				future: __( 'Post scheduled!' ),
 			}[ post.status ];
-		} else if ( ! isAutosave ) {
+		} else {
 			// Generic fallback notice
 			noticeMessage = __( 'Post updated!' );
 		}
