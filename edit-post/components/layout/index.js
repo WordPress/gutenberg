@@ -7,7 +7,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Popover, ScrollLock, navigateRegions, Modal, OverlayPortal } from '@wordpress/components';
+import { Popover, ScrollLock, navigateRegions, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	AutosaveMonitor,
@@ -36,6 +36,8 @@ import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import PluginScreenTakeover from '../plugin-screen-takeover';
+
+Modal.setAppElement( document.getElementById( 'wpwrap' ) );
 
 function Layout( {
 	mode,
@@ -96,12 +98,6 @@ function Layout( {
 			<PluginScreenTakeover.Slot />
 			<Popover.Slot />
 			<PluginArea />
-			<OverlayPortal />
-			<Modal isOpen>
-				<button>1</button>
-				<button>2</button>
-				<button>3</button>
-			</Modal>
 		</div>
 	);
 }

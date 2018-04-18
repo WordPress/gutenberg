@@ -24,9 +24,11 @@ class ManagedOverlay extends Component {
 	}
 
 	componentDidMount() {
+		// Focus on mount
 		if ( this.props.focusOnMount ) {
 			this.focusFirstTabbable();
 		}
+		// Key events
 		window.addEventListener( 'keydown', event => {
 			if ( event.keyCode === 27 /* escape */ ) {
 				this.handleEscapePress( event );
@@ -42,25 +44,34 @@ class ManagedOverlay extends Component {
 	}
 
 	handleClickOutside( event ) {
-		this.requestClose( event );
+		this.onRequestClose( event );
 	}
 
 	handleEscapePress( event ) {
 		event.preventDefault();
-		this.requestClose( event );
+		this.onRequestClose( event );
 	}
 
-	requestClose( event ) {
-		const { requestClose } = this.props;
-		if ( requestClose ) {
-			requestClose( event );
+	onRequestClose( event ) {
+		const { onRequestClose } = this.props;
+		if ( onRequestClose ) {
+			onRequestClose( event );
 		}
 	}
 
 	render() {
-		const { children, className } = this.props;
+		const {
+			children,
+			className,
+			isOpen = true,
+		} = this.props;
+
+		if ( ! isOpen ) {
+			return null;
+		}
+
 		return (
-			<div className={ className } ref={ this.containerRef } role="dialog" aria-modal={ true }>
+			<div className={ className } ref={ this.containerRef } tabIndex="-1" role="dialog" aria-modal={ true }>
 				{ children }
 			</div>
 		);

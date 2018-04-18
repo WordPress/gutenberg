@@ -30,7 +30,6 @@ export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
-export { Overlay, OverlayPortal } from './overlay';
 export { default as Panel } from './panel';
 export { default as PanelBody } from './panel/body';
 export { default as PanelColor } from './panel/color';

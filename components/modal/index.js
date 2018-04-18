@@ -1,54 +1,80 @@
 /**
- * External dependency
+ * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import ManagedContent from './managed-content';
+import * as ariaHelper from './aria-helper';
 import './style.scss';
-import { Overlay } from '../overlay';
 
-class Modal extends Component {
+function getParentElement( parentSelector ) {
+	return parentSelector ? parentSelector() : document.body;
+}
+
+class Overlay extends Component {
+	static setAppElement( node ) {
+		ariaHelper.setAppElement( node );
+	}
+
+	componentDidMount() {
+		ariaHelper.hideApp();
+		getParentElement(
+			this.props.parentSelector
+		).appendChild( this.node );
+	}
+
+	componentWillUnmount() {
+		getParentElement(
+			this.props.parentSelector
+		).removeChild( this.node );
+		ariaHelper.showApp();
+	}
+
 	render() {
+		this.props.style = this.props.style || {};
 		const {
 			overlayClassName,
-			modalClassName,
+			className,
+			style: {
+				content = {},
+				overlay = {},
+			},
 			children,
-			isOpen = false,
-			requestClose = noop,
+			...otherProps
 		} = this.props;
 
-		if ( ! isOpen ) {
-			return null;
+		if ( ! this.node ) {
+			this.node = document.createElement( 'div' );
 		}
 
-		const overlayClassNames = classnames(
-			overlayClassName,
-			'components-modal__screen-overlay'
-		);
-		const modalClassNames = classnames(
-			modalClassName,
-			'components-modal__content'
-		);
-
-		return (
-			<Overlay
-				focusOnMount
-				requestClose={ requestClose }
-				className={ overlayClassNames }>
-				<div className={ modalClassNames }>
+		return createPortal(
+			<div
+				className={ classnames(
+					'components-modal__screen-overlay',
+					overlayClassName
+				) }
+				style={ overlay }>
+				<ManagedContent
+					style={ content }
+					className={ classnames(
+						'components-modal__content',
+						className
+					) }
+					{ ...otherProps } >
 					{ children }
-				</div>
-			</Overlay>
+				</ManagedContent>
+			</div>,
+			this.node
 		);
 	}
 }
 
-export default Modal;
+export default Overlay;

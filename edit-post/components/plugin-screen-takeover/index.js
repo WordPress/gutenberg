@@ -2,8 +2,15 @@
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
-import { Slot, Fill, withContext } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { Slot, Fill } from '@wordpress/components';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { PluginContext } from '@wordpress/plugins';
+
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+import EditorScreenTakeover from './editor-screen-takeover';
 
 /**
  * Name of slot in which the screen takeover should fill.
@@ -12,14 +19,33 @@ import { withSelect } from '@wordpress/data';
  */
 const SLOT_NAME = 'PluginScreenTakeover';
 
-let PluginScreenTakeover = ( { pluginName, name, children } ) => (
-	<Fill name={ [ SLOT_NAME, pluginName, name ].join( '/' ) }>
-		{ children }
-	</Fill>
+let PluginScreenTakeover = ( { name, icon, children, onClose } ) => (
+	<PluginContext.Consumer>
+		{ ( { pluginName } ) => {
+			return (
+				<Fill name={ [ SLOT_NAME, pluginName, name ].join( '/' ) }>
+					<EditorScreenTakeover
+						icon={ icon }
+						title={ 'Screen Takeover Title' }
+						onClose={ onClose }
+					>
+						{ children }
+					</EditorScreenTakeover>
+				</Fill>
+			);
+		} }
+	</PluginContext.Consumer>
 );
 
 PluginScreenTakeover = compose( [
-	withContext( 'pluginName' )(),
+	withDispatch( ( dispatch ) => ( {
+		onClose: dispatch( 'core/edit-post' ).closeScreenTakeover,
+	} ) ),
+	withSelect( ( select ) => {
+		return {
+			activeScreenTakeoverName: select( 'core/edit-post' ).getActiveScreenTakeoverName(),
+		};
+	} ),
 ] )( PluginScreenTakeover );
 
 PluginScreenTakeover.Slot = ( { activeScreenTakeoverName } ) => {

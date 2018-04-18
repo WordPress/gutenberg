@@ -1,20 +1,9 @@
 .components-modal {
 	&__screen-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
 		z-index: 1000;
-		margin: auto;
 	}
 
 	&__content {
 		z-index: 1001;
-		width: 500px;
-		margin: 64px auto 0;
-		border: 1px solid black;
-		background-color: white;
-		padding: 10px;
 	}
 }
