@@ -30,7 +30,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		}
 
 		// Return empty view, toolbar won't be rendered
-		return <View />;
+		return <View />
 	}
 
 	getBlockForType() {

@@ -1,5 +1,7 @@
 /** @format */
 
+@import 'fonts.scss';
+
 .container {
 	flex: 1;
 	justify-content: flex-start;
@@ -12,8 +14,13 @@
 }
 
 .htmlView {
+	@extend %monospace-font;
 	flex: 1;
-	background-color: #fff;
+	background-color: #eee;
+	padding-left: 8;
+	padding-right: 8;
+	padding-top: 8;
+	padding-bottom: 8;
 }
 
 .switch {
