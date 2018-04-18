@@ -63,6 +63,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 		) );
 		$output     = json_decode( $block_type->render( array(), 'hello world' ), true );
 		$this->assertEquals( 'hello world', $output['_content'] );
+		$this->assertEquals( 'core/dummy', $output['_block_name'] );
 	}
 
 	function test_prepare_attributes() {
@@ -107,8 +108,9 @@ class Block_Type_Test extends WP_UnitTestCase {
 		return json_encode( $attributes );
 	}
 
-	function render_dummy_block_with_content( $attributes, $content ) {
-		$attributes['_content'] = $content;
+	function render_dummy_block_with_content( $attributes, $content, $block_name ) {
+		$attributes['_content']    = $content;
+		$attributes['_block_name'] = $block_name;
 
 		return json_encode( $attributes );
 	}
