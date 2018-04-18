@@ -8,8 +8,7 @@ import { createSlotFill } from '@wordpress/components';
  */
 import { ifBlockEditSelected } from '../block-edit/context';
 
-const Fill = createSlotFill( 'BlockFormatControls' );
-const { Slot } = Fill;
+const { Fill, Slot } = createSlotFill( 'BlockFormatControls' );
 
 const BlockFormatControls = ifBlockEditSelected( Fill );
 
