@@ -45,17 +45,17 @@ You can either use the Fill component directly, or a wrapper component type as i
 There is also `createSlotFill` helper method which was created to simplify the process of matching the corresponding `Slot` and `Fill` components:
 
 ```jsx
-const Toolbar = createSlotFill( 'Toolbar' );
+const { Fill, Slot } = createSlotFill( 'Toolbar' );
 
-const MyToolbarItem = () => (
-	<Toolbar>
+const ToolbarItem = () => (
+	<Fill>
 		My item
-	</Toolbar>
+	</Fill>
 );
 
-const MyToolbar = () => (
+const Toolbar = () => (
 	<div className="toolbar">
-		<Toolbar.Slot />
+		<Slot />
 	</div>
 ); 
 ```

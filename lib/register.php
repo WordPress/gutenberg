@@ -77,8 +77,6 @@ function gutenberg_collect_meta_box_data() {
 	 * do_meta_boxes( null, 'normal', $post );
 	 * do_meta_boxes( null, 'advanced', $post );
 	 */
-	$meta_boxes_output = array();
-
 	$publish_callback_args = null;
 	if ( post_type_supports( $post_type, 'revisions' ) && 'auto-draft' !== $post->post_status ) {
 		$revisions = wp_get_post_revisions( $post->ID );

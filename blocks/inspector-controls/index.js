@@ -3,4 +3,15 @@
  */
 import { createSlotFill } from '@wordpress/components';
 
-export default createSlotFill( 'InspectorControls' );
+/**
+ * Internal dependencies
+ */
+import { ifBlockEditSelected } from '../block-edit/context';
+
+const { Fill, Slot } = createSlotFill( 'InspectorControls' );
+
+const InspectorControls = ifBlockEditSelected( Fill );
+
+InspectorControls.Slot = Slot;
+
+export default InspectorControls;

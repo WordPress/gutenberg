@@ -11,7 +11,6 @@ import './hooks';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
-import PluginMoreMenuItem from './components/plugin-more-menu-item';
 
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
@@ -57,6 +56,15 @@ export function initializeEditor( id, post, settings ) {
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, target, settings );
 
+	if ( 'production' !== process.env.NODE_ENV ) {
+		// Remove with 3.0 release.
+		window.console.info(
+			'`isSelected` usage is no longer mandatory with `BlockControls`, `InspectorControls` and `RichText`. ' +
+			'It is now handled by the editor internally to ensure that controls are visible only when block is selected. ' +
+			'See updated docs: https://github.com/WordPress/gutenberg/blob/master/blocks/README.md#components.'
+		);
+	}
+
 	render(
 		<Editor settings={ settings } onError={ reboot } post={ post } />,
 		target
@@ -69,8 +77,5 @@ export function initializeEditor( id, post, settings ) {
 	};
 }
 
-export const __experimental = {
-	PluginMoreMenuItem,
-};
-
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
