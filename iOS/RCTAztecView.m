@@ -12,7 +12,9 @@ RCT_EXPORT_MODULE()
 {
   UIView* view = [[UIView alloc] init];
 
-  view.backgroundColor = [UIColor redColor];
+  view.backgroundColor = [UIColor blueColor];
+    
+    return view;
 }
 
 @end
