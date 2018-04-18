@@ -35,7 +35,7 @@ export class PostSavedState extends Component {
 	}
 
 	render() {
-		const { isNew, isPublished, isDirty, isSaving, isSaveable, onSave } = this.props;
+		const { isNew, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving } = this.props;
 		const { forceSavedMessage } = this.state;
 		if ( isSaving ) {
 			return (
