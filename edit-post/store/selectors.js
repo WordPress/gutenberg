@@ -50,6 +50,17 @@ export function getActiveGeneralSidebarName( state ) {
 }
 
 /**
+ * Returns the current active screen takeover name.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} Active general screen takeover name.
+ */
+export function getActiveScreenTakeoverName( state ) {
+	return getPreference( state, 'activeScreenTakeover', null );
+}
+
+/**
  * Returns the preferences (these preferences are persisted locally).
  *
  * @param {Object} state Global application state.

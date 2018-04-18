@@ -1,0 +1,105 @@
+.edit-post-plugin-screen-takeover__editor-screen-takeover {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	right: auto;
+	bottom: auto;
+	width: auto;
+	max-width: 90%;
+	max-height: 90%;
+	min-width: 75%;
+	min-height: 75%;
+	border: 0;
+	border-radius: 0;
+	margin-right: -50%;
+	transform: translate(-50%, -50%);
+	background-color: #fff;
+	outline: none;
+	box-shadow: 0 3px 25px #000;
+
+	// In small screens the content needs to be full width.
+	@media ( max-width: #{ ( $break-small ) } ) {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		margin: 0;
+		transform: initial;
+		max-width: none;
+		max-height: none;
+	}
+}
+
+.edit-post-plugin-screen-takeover__editor-screen-takeover-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.6);
+	z-index: 999999;
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	@include break-small {
+		position: fixed;
+		top: $admin-bar-height-big;
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height;
+	}
+}
+
+@include editor-left('.edit-post-plugin-screen-takeover__editor-screen-takeover-overlay');
+
+// We prevent scrolling of the body when the React Modal screen takeover is opened.
+body.ReactModal__Body--open {
+	overflow-y: hidden;
+}
+
+// The modal needs a separate header that needs its own styling.
+.edit-post-plugin-screen-takeover__editor-screen-takeover-header {
+	height: $header-height;
+	border-bottom: 1px solid $light-gray-500;
+	padding: 10px;
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	justify-content: space-between;
+	z-index: z-index( '.edit-post-header' );
+	left: 0;
+	right: 0;
+
+	div {
+		align-items: center;
+		flex-grow: 1;
+		display: flex;
+		flex-direction: row;
+		justify-content: left;
+
+		h1 {
+			font-size: 1em;
+			font-weight: normal;
+			padding-left: 5px;
+		}
+
+		span {
+			display: inline-block;
+		}
+
+		svg {
+			max-width: $icon-button-size;
+			max-height: $icon-button-size;
+			padding: 8px;
+		}
+	}
+}
+
+// The modal needs a separate header that needs its own styling.
+.edit-post-plugin-screen-takeover__editor-screen-takeover-content {
+	height: calc( 100% - #{ $header-height } );
+	overflow: auto;
+	padding: 10px 20px 5px 20px;
+	position: absolute;
+}
