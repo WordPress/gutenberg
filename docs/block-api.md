@@ -105,7 +105,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](./block-api/attributes.md).**
+* **See: [Attributes](../docs/block-api/attributes.md).**
 
 #### Transforms (optional)
 
@@ -300,4 +300,4 @@ html: false,
 
 ## Edit and Save
 
-The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](./block-api/block-edit-save.md).
+The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).
