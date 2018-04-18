@@ -224,14 +224,14 @@ class ImageBlock extends Component {
 								onChange={ this.updateImageURL }
 							/>
 						) }
-						<div className="blocks-image-dimensions">
-							<p className="blocks-image-dimensions__row">
+						<div className="blocks-image__dimensions">
+							<p className="blocks-image__dimensions__row">
 								{ __( 'Image Dimensions' ) }
 							</p>
-							<div className="blocks-image-dimensions__row">
+							<div className="blocks-image__dimensions__row">
 								<TextControl
 									type="number"
-									className="blocks-image-dimensions__width"
+									className="blocks-image__dimensions__width"
 									label={ __( 'Width' ) }
 									value={ width !== undefined ? width : '' }
 									placeholder={ selectedSize.width }
@@ -241,7 +241,7 @@ class ImageBlock extends Component {
 								/>
 								<TextControl
 									type="number"
-									className="blocks-image-dimensions__height"
+									className="blocks-image__dimensions__height"
 									label={ __( 'Height' ) }
 									value={ height !== undefined ? height : '' }
 									placeholder={ selectedSize.height }
@@ -250,7 +250,7 @@ class ImageBlock extends Component {
 									} }
 								/>
 							</div>
-							<div className="blocks-image-dimensions__row">
+							<div className="blocks-image__dimensions__row">
 								<ButtonGroup aria-label={ __( 'Image Size' ) }>
 									{ [ 25, 50, 75, 100 ].map( ( scale ) => {
 										const scaledWidth = Math.round( selectedSize.width * ( scale / 100 ) );

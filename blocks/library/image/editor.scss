@@ -97,15 +97,15 @@
 	}
 }
 
-.edit-post-sidebar .blocks-image-dimensions {
+.edit-post-sidebar .blocks-image__dimensions {
 	margin-bottom: 1em;
 
-	.blocks-image-dimensions__row {
+	.blocks-image__dimensions__row {
 		display: flex;
 		justify-content: space-between;
 
-		.blocks-image-dimensions__width,
-		.blocks-image-dimensions__height {
+		.blocks-image__dimensions__width,
+		.blocks-image__dimensions__height {
 			margin-bottom: 0.5em;
 
 			// Fix the text and placeholder text being misaligned in Safari
@@ -114,11 +114,11 @@
 			}
 		}
 
-		.blocks-image-dimensions__width {
+		.blocks-image__dimensions__width {
 			margin-right: 5px;
 		}
 
-		.blocks-image-dimensions__height {
+		.blocks-image__dimensions__height {
 			margin-left: 5px;
 		}
 	}
