@@ -254,9 +254,14 @@ export const editor = flow( [
 
 				return state;
 
+			case 'UPDATE_POST':
 			case 'RESET_POST':
+				const getCanonicalValue = action.type === 'UPDATE_POST' ?
+					( key ) => action.edits[ key ] :
+					( key ) => getPostRawValue( action.post[ key ] );
+
 				return reduce( state, ( result, value, key ) => {
-					if ( value !== getPostRawValue( action.post[ key ] ) ) {
+					if ( value !== getCanonicalValue( key ) ) {
 						return result;
 					}
 

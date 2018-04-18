@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-import { bindActionCreators } from 'redux';
-import { Provider as ReduxProvider } from 'react-redux';
 import { flow, pick } from 'lodash';
 
 /**
@@ -15,27 +13,18 @@ import {
 	DropZoneProvider,
 	SlotFillProvider,
 } from '@wordpress/components';
-
-/**
- * Internal Dependencies
- */
-import { setupEditor, undo, redo, showAutosaveNotice, createUndoLevel } from '../../store/actions';
-import store from '../../store';
+import { withDispatch } from '@wordpress/data';
 
 class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		this.store = store;
-
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( ! props.recovery ) {
-			this.store.dispatch(
-				setupEditor( props.post, {
+			this.props.setupEditor( props.post, {
 					...EditorSettings.defaultSettings,
 					...this.props.settings,
-				} )
-			);
+			} );
 		}
 
 		// Display a notice if an autosave exists.
@@ -45,7 +34,13 @@ class EditorProvider extends Component {
 	}
 
 	render() {
-		const { children, settings } = this.props;
+		const {
+			children,
+			settings,
+			undo,
+			redo,
+			createUndoLevel,
+		} = this.props;
 		const providers = [
 			// Editor settings provider
 			[
@@ -58,14 +53,6 @@ class EditorProvider extends Component {
 				},
 			],
 
-			// Redux provider:
-			//
-			//  - context.store
-			[
-				ReduxProvider,
-				{ store: this.store },
-			],
-
 			// RichText provider:
 			//
 			//  - context.onUndo
@@ -73,11 +60,11 @@ class EditorProvider extends Component {
 			//  - context.onCreateUndoLevel
 			[
 				RichTextProvider,
-				bindActionCreators( {
+				{
 					onUndo: undo,
 					onRedo: redo,
 					onCreateUndoLevel: createUndoLevel,
-				}, this.store.dispatch ),
+				},
 			],
 
 			// Slot / Fill provider:
@@ -121,4 +108,17 @@ class EditorProvider extends Component {
 	}
 }
 
-export default EditorProvider;
+export default withDispatch( ( dispatch ) => {
+	const {
+		setupEditor,
+		undo,
+		redo,
+		createUndoLevel,
+	} = dispatch( 'core/editor' );
+	return {
+		setupEditor,
+		undo,
+		redo,
+		createUndoLevel,
+	};
+} )( EditorProvider );

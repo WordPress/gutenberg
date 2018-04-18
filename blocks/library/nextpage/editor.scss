@@ -9,9 +9,9 @@
 
 	// Label
 	> span {
+		font-size: $default-font-size;
 		position: relative;
 		display: inline-block;
-		font-size: 12px;
 		text-transform: uppercase;
 		font-weight: 600;
 		font-family: $default-font;

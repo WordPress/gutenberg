@@ -19,8 +19,14 @@ import {
 	getBlockDefaultClassName,
 	hasBlockSupport,
 } from '../api';
+import { BlockEditContextProvider } from './context';
 
 export class BlockEdit extends Component {
+	constructor( props ) {
+		super( props );
+		this.state = {};
+	}
+
 	getChildContext() {
 		const {
 			id: uid,
@@ -34,6 +40,18 @@ export class BlockEdit extends Component {
 				'capabilities',
 				'unfiltered_html',
 			], false ),
+		};
+	}
+
+	static getDerivedStateFromProps( nextProps, prevState ) {
+		if ( nextProps.isSelected === get( prevState, [ 'context', 'isSelected' ] ) ) {
+			return null;
+		}
+
+		return {
+			context: {
+				isSelected: nextProps.isSelected,
+			},
 		};
 	}
 
@@ -59,12 +77,14 @@ export class BlockEdit extends Component {
 		// For backwards compatibility concerns adds a focus and setFocus prop
 		// These should be removed after some time (maybe when merging to Core)
 		return (
-			<Edit
-				{ ...this.props }
-				className={ className }
-				focus={ isSelected ? {} : false }
-				setFocus={ noop }
-			/>
+			<BlockEditContextProvider value={ this.state.context }>
+				<Edit
+					{ ...this.props }
+					className={ className }
+					focus={ isSelected ? {} : false }
+					setFocus={ noop }
+				/>
+			</BlockEditContextProvider>
 		);
 	}
 }

@@ -359,6 +359,12 @@ export function savePost() {
 	};
 }
 
+export function refreshPost() {
+	return {
+		type: 'REFRESH_POST',
+	};
+}
+
 export function trashPost( postId, postType ) {
 	return {
 		type: 'TRASH_POST',
