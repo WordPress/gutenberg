@@ -19,14 +19,14 @@ import EditorScreenTakeover from './editor-screen-takeover';
  */
 const SLOT_NAME = 'PluginScreenTakeover';
 
-let PluginScreenTakeover = ( { name, icon, children, onClose } ) => (
+let PluginScreenTakeover = ( { name, icon, children, onClose, title } ) => (
 	<PluginContext.Consumer>
 		{ ( { pluginName } ) => {
 			return (
 				<Fill name={ [ SLOT_NAME, pluginName, name ].join( '/' ) }>
 					<EditorScreenTakeover
 						icon={ icon }
-						title={ 'Screen Takeover Title' }
+						title={ title }
 						onClose={ onClose }
 					>
 						{ children }

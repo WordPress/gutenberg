@@ -21,6 +21,7 @@ class ManagedOverlay extends Component {
 		super( ...arguments );
 
 		this.containerRef = createRef();
+		this.handleKeyPressEvents = this.handleKeyPressEvents.bind( this );
 	}
 
 	componentDidMount() {
@@ -29,11 +30,11 @@ class ManagedOverlay extends Component {
 			this.focusFirstTabbable();
 		}
 		// Key events
-		window.addEventListener( 'keydown', event => {
-			if ( event.keyCode === 27 /* escape */ ) {
-				this.handleEscapePress( event );
-			}
-		} );
+		window.addEventListener( 'keydown', this.handleKeyPressEvents );
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'keydown', this.handleKeyPressEvents );
 	}
 
 	focusFirstTabbable() {
@@ -45,6 +46,12 @@ class ManagedOverlay extends Component {
 
 	handleClickOutside( event ) {
 		this.onRequestClose( event );
+	}
+
+	handleKeyPressEvents( event ) {
+		if ( event.keyCode === 27 /* escape */ ) {
+			this.handleEscapePress( event );
+		}
 	}
 
 	handleEscapePress( event ) {
@@ -71,7 +78,7 @@ class ManagedOverlay extends Component {
 		}
 
 		return (
-			<div className={ className } ref={ this.containerRef } tabIndex="-1" role="dialog" aria-modal={ true }>
+			<div className={ className } ref={ this.containerRef } role="dialog" aria-modal={ true }>
 				{ children }
 			</div>
 		);

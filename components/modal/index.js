@@ -19,7 +19,7 @@ function getParentElement( parentSelector ) {
 	return parentSelector ? parentSelector() : document.body;
 }
 
-class Overlay extends Component {
+class Modal extends Component {
 	static setAppElement( node ) {
 		ariaHelper.setAppElement( node );
 	}
@@ -63,6 +63,7 @@ class Overlay extends Component {
 				) }
 				style={ overlay }>
 				<ManagedContent
+					focusOnMount
 					style={ content }
 					className={ classnames(
 						'components-modal__content',
@@ -77,4 +78,4 @@ class Overlay extends Component {
 	}
 }
 
-export default Overlay;
+export default Modal;
