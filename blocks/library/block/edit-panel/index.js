@@ -76,11 +76,12 @@ class SharedBlockEditPanel extends Component {
 				) }
 				{ ( isEditing || isSaving ) && (
 					<form className="shared-block-edit-panel" onSubmit={ this.handleFormSubmit }>
-						<span className="shared-block-edit-panel__label-wrapper">
-							<label htmlFor={ `shared-block-edit-panel__title-${ instanceId }` }>
-								{ __( 'Shared block name:' ) }
-							</label>
-						</span>
+						<label
+							htmlFor={ `shared-block-edit-panel__title-${ instanceId }` }
+							className="shared-block-edit-panel__label"
+						>
+							{ __( 'Shared block name:' ) }
+						</label>
 						<input
 							ref={ this.titleField }
 							type="text"
