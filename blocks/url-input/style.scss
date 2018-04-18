@@ -42,6 +42,15 @@ $input-size: 230px;
 	width: $input-size + $icon-button-size * 2 + 2px; // add borders
 }
 
+// Hide suggestions on mobile until we @todo find a better way to show them
+.blocks-url-input__suggestions,
+.blocks-url-input .spinner {
+	display: none;
+	@include break-small() {
+		display: inherit;
+	}
+}
+
 .blocks-url-input__suggestion {
 	padding: 4px #{ $icon-button-size + $input-padding } 4px $input-padding;
 	color: $dark-gray-300; // lightest we can use for contrast

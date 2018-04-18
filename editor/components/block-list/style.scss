@@ -670,10 +670,6 @@
 		margin-left: -1px;
 	}
 
-	> .editor-block-switcher:first-child {
-		margin-left: -2px;
-	}
-
 	@include break-small() {
 		width: auto;
 	}
