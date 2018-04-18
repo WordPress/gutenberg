@@ -45,7 +45,6 @@ function Layout( {
 	closePublishSidebar,
 	metaBoxes,
 	hasActiveMetaboxes,
-	isSaving,
 	isMobileViewport,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
@@ -83,7 +82,6 @@ function Layout( {
 				<PostPublishPanel
 					onClose={ closePublishSidebar }
 					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
 				/>
 			) }
 			<DocumentSidebar />
@@ -107,7 +105,6 @@ export default compose(
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
 		closePublishSidebar: dispatch( 'core/edit-post' ).closePublishSidebar,

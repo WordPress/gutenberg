@@ -47,8 +47,6 @@ import {
 import {
 	getCurrentPost,
 	getCurrentPostType,
-	getEditedPostContent,
-	getPostEdits,
 	isCurrentPostPublished,
 	isEditedPostDirty,
 	isEditedPostNew,
@@ -63,7 +61,6 @@ import {
 	getSelectedBlock,
 	isBlockSelected,
 	getTemplate,
-	POST_UPDATE_TRANSACTION_ID,
 	getTemplateLock,
 } from './selectors';
 
@@ -93,47 +90,8 @@ export function removeProvisionalBlock( action, store ) {
 
 export default {
 	REQUEST_POST_UPDATE( action, store ) {
-		const { dispatch, getState } = store;
-		const state = getState();
-		const post = getCurrentPost( state );
-		const edits = getPostEdits( state );
-		const toSend = {
-			...edits,
-			content: getEditedPostContent( state ),
-			id: post.id,
-		};
-
-		dispatch( {
-			type: 'UPDATE_POST',
-			edits: toSend,
-			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		} );
+		const { dispatch } = store;
 		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
-			( newPost ) => {
-				dispatch( resetPost( newPost ) );
-				dispatch( {
-					type: 'REQUEST_POST_UPDATE_SUCCESS',
-					previousPost: post,
-					post: newPost,
-					edits: toSend,
-					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-				} );
-			},
-			( err ) => {
-				dispatch( {
-					type: 'REQUEST_POST_UPDATE_FAILURE',
-					error: get( err, 'responseJSON', {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					} ),
-					post,
-					edits,
-					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-				} );
-			}
-		);
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
 		const { previousPost, post } = action;
