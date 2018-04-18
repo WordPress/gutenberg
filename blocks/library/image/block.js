@@ -4,11 +4,12 @@
 import classnames from 'classnames';
 import ResizableBox from 're-resizable';
 import {
-	startCase,
+	find,
+	get,
 	isEmpty,
 	map,
-	get,
 	pick,
+	startCase,
 } from 'lodash';
 
 /**
@@ -18,9 +19,12 @@ import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
+	Button,
+	ButtonGroup,
 	IconButton,
 	PanelBody,
 	SelectControl,
+	TextControl,
 	TextareaControl,
 	Toolbar,
 } from '@wordpress/components';
@@ -55,6 +59,9 @@ class ImageBlock extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
+		this.updateWidth = this.updateWidth.bind( this );
+		this.updateHeight = this.updateHeight.bind( this );
+		this.updateDimensions = this.updateDimensions.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -98,7 +105,11 @@ class ImageBlock extends Component {
 	}
 
 	onSelectImage( media ) {
-		this.props.setAttributes( pick( media, [ 'alt', 'id', 'caption', 'url' ] ) );
+		this.props.setAttributes( {
+			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
+			width: undefined,
+			height: undefined,
+		} );
 	}
 
 	onSetHref( value ) {
@@ -133,7 +144,21 @@ class ImageBlock extends Component {
 	}
 
 	updateImageURL( url ) {
-		this.props.setAttributes( { url } );
+		this.props.setAttributes( { url, width: undefined, height: undefined } );
+	}
+
+	updateWidth( width ) {
+		this.props.setAttributes( { width: parseInt( width, 10 ) } );
+	}
+
+	updateHeight( height ) {
+		this.props.setAttributes( { height: parseInt( height, 10 ) } );
+	}
+
+	updateDimensions( width = undefined, height = undefined ) {
+		return () => {
+			this.props.setAttributes( { width, height } );
+		};
 	}
 
 	getAvailableSizes() {
@@ -143,10 +168,6 @@ class ImageBlock extends Component {
 	render() {
 		const { attributes, setAttributes, isSelected, className, settings, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
-
-		const availableSizes = this.getAvailableSizes();
-		const figureStyle = width ? { width } : {};
-		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 
 		const controls = (
 			isSelected && (
@@ -176,7 +197,10 @@ class ImageBlock extends Component {
 			)
 		);
 
-		if ( ! url ) {
+		const availableSizes = this.getAvailableSizes();
+		const selectedSize = find( availableSizes, ( size ) => size.source_url === url );
+
+		if ( ! url || ! selectedSize ) {
 			return [
 				controls,
 				<ImagePlaceholder
@@ -191,12 +215,13 @@ class ImageBlock extends Component {
 
 		const classes = classnames( className, {
 			'is-transient': 0 === url.indexOf( 'blob:' ),
-			'is-resized': !! width,
+			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
 		} );
 
-		// Disable reason: Each block can be selected by clicking on it
+		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
 
+		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return [
 			controls,
@@ -211,7 +236,7 @@ class ImageBlock extends Component {
 						/>
 						{ ! isEmpty( availableSizes ) && (
 							<SelectControl
-								label={ __( 'Size' ) }
+								label={ __( 'Source Type' ) }
 								value={ url }
 								options={ map( availableSizes, ( size, name ) => ( {
 									value: size.source_url,
@@ -220,10 +245,61 @@ class ImageBlock extends Component {
 								onChange={ this.updateImageURL }
 							/>
 						) }
+						<div className="blocks-image__dimensions">
+							<p className="blocks-image__dimensions__row">
+								{ __( 'Image Dimensions' ) }
+							</p>
+							<div className="blocks-image__dimensions__row">
+								<TextControl
+									type="number"
+									className="blocks-image__dimensions__width"
+									label={ __( 'Width' ) }
+									value={ width !== undefined ? width : '' }
+									placeholder={ selectedSize.width }
+									onChange={ this.updateWidth }
+								/>
+								<TextControl
+									type="number"
+									className="blocks-image__dimensions__height"
+									label={ __( 'Height' ) }
+									value={ height !== undefined ? height : '' }
+									placeholder={ selectedSize.height }
+									onChange={ this.updateHeight }
+								/>
+							</div>
+							<div className="blocks-image__dimensions__row">
+								<ButtonGroup aria-label={ __( 'Image Size' ) }>
+									{ [ 25, 50, 75, 100 ].map( ( scale ) => {
+										const scaledWidth = Math.round( selectedSize.width * ( scale / 100 ) );
+										const scaledHeight = Math.round( selectedSize.height * ( scale / 100 ) );
+
+										const isCurrent = width === scaledWidth && height === scaledHeight;
+
+										return (
+											<Button
+												key={ scale }
+												isSmall
+												isPrimary={ isCurrent }
+												aria-pressed={ isCurrent }
+												onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
+											>
+												{ scale }%
+											</Button>
+										);
+									} ) }
+								</ButtonGroup>
+								<Button
+									isSmall
+									onClick={ this.updateDimensions() }
+								>
+									{ __( 'Reset' ) }
+								</Button>
+							</div>
+						</div>
 					</PanelBody>
 				</InspectorControls>
 			),
-			<figure key="image" className={ classes } style={ figureStyle }>
+			<figure key="image" className={ classes }>
 				<ImageSize src={ url } dirtynessTrigger={ align }>
 					{ ( sizes ) => {
 						const {
@@ -239,7 +315,11 @@ class ImageBlock extends Component {
 						const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
 
 						if ( ! isResizable || ! imageWidthWithinContainer ) {
-							return img;
+							return (
+								<div style={ { width, height } }>
+									{ img }
+								</div>
+							);
 						}
 
 						const currentWidth = width || imageWidthWithinContainer;
