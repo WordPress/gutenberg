@@ -30,7 +30,6 @@ $input-size: 230px;
 // Suggestions
 .blocks-url-input__suggestions {
 	position: absolute;
-	z-index: 0;	// place underneath the input field so focus isn't cropped
 	background: $white;
 	box-shadow: $shadow-popover;
 	border: 1px solid $light-gray-500;
