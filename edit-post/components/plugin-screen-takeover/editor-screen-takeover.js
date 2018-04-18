@@ -2,12 +2,16 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import Modal from 'react-modal';
 
 /**
  * Internal dependencies
  */
 import ScreenTakeoverHeader from './editor-screen-takeover-header';
+
+/**
+ * External dependencies
+ */
+import Modal from 'react-modal';
 
 Modal.setAppElement( document.getElementById( 'editor' ) );
 
