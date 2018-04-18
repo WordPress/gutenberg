@@ -10,12 +10,12 @@ const { Consumer, Provider } = createContext( {
 export { Provider as PluginContextProvider };
 
 /**
- * A Higher Order Component used to inject Plugin context to the
- * wrapped component.
+ * A Higher-order Component used to inject Plugin context into the wrapped
+ * component.
  *
  * @param {Component} OriginalComponent Component to wrap.
  *
- * @return {Component} Component which has Plugin context injected.
+ * @return {Component} Component with Plugin context injected.
  */
 export const withPluginContext = createHigherOrderComponent(
 	( OriginalComponent ) => ( props ) => (
