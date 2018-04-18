@@ -13,5 +13,11 @@ import { mediaUpload } from '@wordpress/utils';
  * @param {string}   allowedType  The type of media that can be uploaded.
  */
 export default function editorMediaUpload( filesList, onFileChange, allowedType ) {
-	mediaUpload( filesList, onFileChange, allowedType, select( 'core/editor' ).getCurrentPostId() );
+	let postId = null;
+	if ( select( 'core/editor' ) ) {
+		postId = select( 'core/editor' ).getCurrentPostId();
+	}
+	mediaUpload( filesList, onFileChange, allowedType, {
+		post: postId,
+	} );
 }
