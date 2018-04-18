@@ -841,6 +841,14 @@ export class RichText extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		const { inlineBlocksEnabled = true, setInsertUnavailable } = this.props;
+
+		if ( inlineBlocksEnabled ) {
+			setInsertUnavailable();
+		}
+	}
+
 	/**
 	 * Returns true if the field is currently empty, or false otherwise.
 	 *
