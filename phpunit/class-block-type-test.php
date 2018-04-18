@@ -36,11 +36,18 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$this->assertEquals( $attributes, json_decode( $output, true ) );
 	}
 
-	function test_render_for_static_block() {
+	function test_render_for_static_block_default() {
 		$block_type = new WP_Block_Type( 'core/dummy', array() );
 		$output     = $block_type->render();
 
 		$this->assertEquals( '', $output );
+	}
+
+	function test_render_for_static_block_with_content() {
+		$block_type = new WP_Block_Type( 'core/dummy', array() );
+		$output     = $block_type->render( array(), 'some dummy content' );
+
+		$this->assertEquals( 'some dummy content', $output );
 	}
 
 	function test_is_dynamic_for_static_block() {

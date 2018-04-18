@@ -100,7 +100,7 @@ class WP_Block_Type {
 	 */
 	public function render( $attributes = array(), $content = '' ) {
 		if ( ! $this->is_dynamic() ) {
-			return '';
+			return $content;
 		}
 
 		$attributes = $this->prepare_attributes_for_render( $attributes );
