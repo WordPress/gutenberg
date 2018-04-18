@@ -7,18 +7,22 @@
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "test": "jest"
+    "test": "jest",
+    "clean": "watchman watch-del-all; rm -rf node_modules/ example/node_modules/ yarn.lock example/yarn.lock package-lock.json example/package-lock.json; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*; yarn clean-ios;",
+    "clean-ios": "type xcodebuild &> /dev/null && (xcodebuild -project ./iOS/example.xcodeproj -alltargets clean && rm -rf ./iOS/build);",
+    "clean:install": "yarn clean; yarn; pushd example; yarn; popd"
   },
   "dependencies": {
-    "react": "^16.2.0",
-    "react-native": "^0.53.3"
+    "react": "16.3.1",
+    "react-native": "0.55.2",
+    "react-native-aztec": "file:../"
   },
   "devDependencies": {
-    "babel-jest": "20.0.3",
-    "babel-plugin-module-resolver": "^3.1.1",
-    "babel-preset-react-native": "^2.1.0",
-    "jest": "20.0.4",
-    "react-test-renderer": "16.0.0-alpha.12"
+    "babel-jest": "22.4.3",
+    "babel-plugin-module-resolver": "3.1.1",
+    "babel-preset-react-native": "4.0.0",
+    "jest": "22.4.3",
+    "react-test-renderer": "16.3.1"
   },
   "license": "GPL-2.0"
 }
