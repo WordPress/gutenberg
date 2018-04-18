@@ -10,7 +10,9 @@ const ScreenTakeoverHeader = ( { icon, title, onClose, closeLabel } ) => {
 			className={ 'edit-post-plugin-screen-takeover__editor-screen-takeover-header' }
 		>
 			<div>
-				{ icon }
+				<span aria-hidden="true">
+					{ icon }
+				</span>
 				<h1>
 					{ title }
 				</h1>
