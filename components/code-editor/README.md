@@ -54,3 +54,21 @@ editor. It is passed the new value as an argument.
 
 - Type: `Function`
 - Required: No
+
+### settings
+
+Used to setup the Code Editor and includes options for linting and CodeMirror. By default this will use window._wpGutenbergCodeEditorSettings.
+
+- Type: `Object`
+- Required: No
+
+### editorRef
+
+A reference to the initialized editor so that it can be dynamically updated from a parent component:
+
+`editorRef={ ( ref ) => this.editorInstance = ref }`
+
+This allows an external component to make changes to the code editor by modifying or updating `this.editorInstance`.
+
+- Type `Function`
+- Required: No

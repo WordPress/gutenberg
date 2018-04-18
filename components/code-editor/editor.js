@@ -29,6 +29,11 @@ class CodeEditor extends Component {
 		this.editor.on( 'cursorActivity', this.onCursorActivity );
 		this.editor.on( 'keyHandled', this.onKeyHandled );
 
+		// Pass a reference to the editor back up.
+		if ( this.props.editorRef ) {
+			this.props.editorRef( this.editor );
+		}
+
 		this.updateFocus();
 	}
 
@@ -39,11 +44,6 @@ class CodeEditor extends Component {
 
 		if ( this.props.focus !== prevProps.focus ) {
 			this.updateFocus();
-		}
-
-		// If an editorUpdate prop has been passed down, call it now.
-		if ( this.props.editorUpdate ) {
-			this.props.editorUpdate( this.editor, prevProps );
 		}
 	}
 
