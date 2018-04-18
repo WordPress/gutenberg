@@ -2,7 +2,7 @@
  * @format */
 
 import React from 'react';
-import { View, Button } from 'react-native';
+import { View, TouchableNativeFeedback, Text } from 'react-native';
 import { ToolbarButton } from './constants';
 
 import styles from './toolbar.scss';
@@ -16,30 +16,49 @@ export default class Toolbar extends React.Component<PropsType> {
 	render() {
 		return (
 			<View style={ styles.toolbar }>
-				<Button
-					style={ styles.toolbarButton }
+				<TouchableNativeFeedback
+					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.PLUS, this.props.uid ) }
+				>
+					<View style={ styles.toolbarButton }>
+						<Text>+</Text>
+					</View>
+				</TouchableNativeFeedback>
+				<View style={ styles.buttonSeparator } />
+				<TouchableNativeFeedback
 					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.UP, this.props.uid ) }
-					title="Up"
-				/>
-				<Button
-					style={ styles.toolbarButton }
+				>
+					<View style={ styles.toolbarButton }>
+						<Text>▲</Text>
+					</View>
+				</TouchableNativeFeedback>
+				<View style={ styles.buttonSeparator } />
+				<TouchableNativeFeedback
 					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DOWN, this.props.uid ) }
-					title="Down"
-				/>
-				<Button
-					style={ styles.toolbarButton }
+				>
+					<View style={ styles.toolbarButton }>
+						<Text>▼</Text>
+					</View>
+				</TouchableNativeFeedback>
+				<View style={ styles.buttonSeparator } />
+				<TouchableNativeFeedback
 					onPress={ this.props.onButtonPressed.bind(
 						this,
 						ToolbarButton.SETTINGS,
 						this.props.uid
 					) }
-					title="Settings"
-				/>
-				<Button
-					style={ styles.toolbarButton }
+				>
+					<View style={ styles.toolbarButton }>
+						<Text>⚙️</Text>
+					</View>
+				</TouchableNativeFeedback>
+				<View style={ styles.buttonSeparator } />
+				<TouchableNativeFeedback
 					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DELETE, this.props.uid ) }
-					title="Delete"
-				/>
+				>
+					<View style={ styles.toolbarButton }>
+						<Text>🗑</Text>
+					</View>
+				</TouchableNativeFeedback>
 			</View>
 		);
 	}
