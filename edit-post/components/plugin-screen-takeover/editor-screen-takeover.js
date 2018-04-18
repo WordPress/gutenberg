@@ -42,9 +42,9 @@ export default class EditorScreenTakeover extends Component {
 
 	render() {
 		const { height } = this.state;
-		const { icon, title, children, isOpen, onClose } = this.props;
+		const { icon, title, children, onClose } = this.props;
 		return <Modal
-			isOpen={ isOpen }
+			isOpen={ true }
 			className={ 'edit-post-plugin-screen-takeover__editor-screen-takeover' }
 			overlayClassName={ 'edit-post-plugin-screen-takeover__editor-screen-takeover-overlay' }
 			parentSelector={ () => document.getElementsByClassName( 'gutenberg' )[ 0 ] }
