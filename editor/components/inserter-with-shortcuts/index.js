@@ -52,9 +52,13 @@ export default compose(
 			allowedBlockTypes,
 		};
 	} ),
-	withSelect( ( select, { allowedBlockTypes } ) => ( {
-		items: select( 'core/editor' ).getFrecentInserterItems( allowedBlockTypes, 4 ),
-	} ) ),
+	withSelect( ( select, { allowedBlockTypes, rootUID } ) => {
+		const { getFrecentInserterItems, getSupportedBlocks } = select( 'core/editor' );
+		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
+		return {
+			items: getFrecentInserterItems( supportedBlocks, 4 ),
+		};
+	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const { uid, rootUID, layout } = ownProps;
 

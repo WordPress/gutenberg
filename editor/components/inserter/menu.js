@@ -344,10 +344,12 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { allowedBlockTypes } ) => {
-		const { getInserterItems, getFrecentInserterItems } = select( 'core/editor' );
+		const { getInserterItems, getFrecentInserterItems, getBlockInsertionPoint, getSupportedBlocks } = select( 'core/editor' );
+		const { rootUID } = getBlockInsertionPoint();
+		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
 		return {
-			items: getInserterItems( allowedBlockTypes ),
-			frecentItems: getFrecentInserterItems( allowedBlockTypes ),
+			items: getInserterItems( supportedBlocks ),
+			frecentItems: getFrecentInserterItems( supportedBlocks ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

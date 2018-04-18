@@ -588,7 +588,7 @@ export class BlockListBlock extends Component {
 				{ showSideInserter && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">
-							<InserterWithShortcuts uid={ uid } layout={ layout } onToggle={ this.selectOnOpen } />
+							<InserterWithShortcuts uid={ uid } rootUID={ rootUID } layout={ layout } onToggle={ this.selectOnOpen } />
 						</div>
 						<div className="editor-block-list__empty-block-inserter">
 							<Inserter

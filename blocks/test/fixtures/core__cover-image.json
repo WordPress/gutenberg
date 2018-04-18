@@ -4,15 +4,30 @@
         "name": "core/cover-image",
         "isValid": true,
         "attributes": {
-            "title": [
-                "Guten Berg!"
-            ],
             "url": "https://cldup.com/uuUqE_dXzy.jpg",
-            "contentAlign": "center",
+            "id": 8398,
             "hasParallax": false,
-            "dimRatio": 40
+            "dimRatio": 50
         },
-        "innerBlocks": [],
-        "originalContent": "<div class=\"wp-block-cover-image has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <p class=\"wp-block-cover-image-text\">Guten Berg!</p>\n</div>"
+        "innerBlocks": [
+            {
+                "uid": "_uid_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": [
+                        "Paragraph 1"
+                    ],
+                    "align": "center",
+                    "dropCap": false,
+                    "placeholder": "Write title…",
+                    "textColor": "#fff",
+                    "fontSize": "37"
+                },
+                "innerBlocks": [],
+                "originalContent": "<p style=\"color:#fff;text-align:center\">Paragraph 1</p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-cover-image has-background-dim has-undefined-content\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <div class=\"wp-block-cover-image__inner-container\">\n        \n    </div>\n</div>"
     }
 ]
