@@ -110,9 +110,8 @@
 	}
 
 	// Prevent collapsing margins @todo try and revisit this, it's conducive to theming to allow these to collapse
-	padding-top: .1px;
-	padding-bottom: .1px;
-
+	padding-top: 1px;
+	padding-bottom: 1px;
 
 	// Space every block using margins instead of padding
 	// This allows margins to collapse, which gives a better representation of how it looks on the frontend
@@ -121,8 +120,8 @@
 		margin-bottom: $block-padding;
 
 		// Prevent collapsing margins @todo try and revisit this, it's conducive to theming to allow these to collapse
-		padding-top: .1px;
-		padding-bottom: .1px;
+		padding-top: 1px;
+		padding-bottom: 1px;
 	}
 
 	margin-bottom: $block-spacing;
@@ -304,7 +303,7 @@
 
 	// Full-wide
 	&[data-align="full"] {
-		
+
 		// compensate for main container padding
 		@include break-small() {
 			margin-left: -$block-side-ui-padding;
@@ -333,43 +332,41 @@
 			border-right-width: 0;
 		}
 
-		// Adjust how movers behave on the full-wide block, and don't affect children
-		> .editor-block-mover {
-			display: none;
-		}
-
-		@include break-wide() {
-			> .editor-block-mover {
-				display: block;
-				top: -29px;
-				left: 10px;
-				height: auto;
-				width: auto;
-				z-index: inherit;
-
-				&:before {
-					content: none;
-				}
-			}
-
-			> .editor-block-mover .editor-block-mover__control {
-				float: left;
-			}
-		}
-
-		// Also adjust block settings menu
+		// Mover and settings in wide
+		> .editor-block-mover,
 		> .editor-block-settings-menu {
-			top: -41px;
-			right: 10px;
+			top: -29px;
+			bottom: auto;
 			height: auto;
+			width: auto;
+			z-index: inherit;
 
 			&:before {
 				content: none;
 			}
 		}
 
-		> .editor-block-settings-menu .editor-block-settings-menu__control {
+		> .editor-block-mover {
+			left: 10px;
+		}
+
+		> .editor-block-settings-menu {
+			right: 10px;
+		}
+
+		> .editor-block-mover .editor-block-mover__control,
+		> .editor-block-settings-menu > * {
 			float: left;
+		}
+
+		// Hide mover until wide breakpoints, or it might be covered by toolbar
+		> .editor-block-mover {
+			display: none;
+		}
+		@include break-wide() {
+			> .editor-block-mover {
+				display: block;
+			}
 		}
 	}
 
@@ -397,10 +394,9 @@
 	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		position: absolute;
-		top: -.9px; // .9px because of the collapsing margins hack, see line 27, @todo revisit when we allow margins to collapse
-		bottom: -.9px; // utilize full vertical space to increase hoverable area
-		padding: 0;
-		width: $block-side-ui-width;
+		top: 0; // stretch to bottom to utilize full vertical space to increase hoverable area
+		bottom: 0;
+		width: $block-side-ui-width + $block-side-ui-clearance;
 
 		/* Necessary for drag indicator */
 		cursor: move;/* Fallback for IE/Edge < 14 */
@@ -408,18 +404,21 @@
 	}
 
 	// Elevate when selected or hovered
-	&.is-multi-selected,
-	&.is-selected,
-	&.is-hovered {
-		.editor-block-settings-menu,
-		.editor-block-mover {
-			z-index: z-index( '.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}' );
+	@include break-small() {
+		&.is-multi-selected,
+		&.is-selected,
+		&.is-hovered {
+			.editor-block-settings-menu,
+			.editor-block-mover {
+				z-index: z-index( '.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}' );
+			}
 		}
 	}
 
 	// Right side UI
 	> .editor-block-settings-menu {
-		right: -$block-side-ui-width;
+		right: -$block-side-ui-width - $block-side-ui-clearance;
+		padding-left: $block-side-ui-clearance;
 
 		// Mobile
 		display: none;
@@ -431,7 +430,8 @@
 
 	// Left side UI
 	> .editor-block-mover {
-		left: -$block-side-ui-width;
+		left: -$block-side-ui-width - $block-side-ui-clearance;
+		padding-right: $block-side-ui-clearance;
 
 		// Mobile
 		display: none;
@@ -459,11 +459,11 @@
 		}
 
 		.editor-inserter__toggle,
-		.editor-block-settings-menu__toggle,
-		& > .editor-block-settings-menu__control,
-		.editor-block-mover__control {
+		.editor-block-mover__control,
+		.editor-block-settings-menu .components-button {
 			width: $icon-button-size;
 			height: $icon-button-size;
+			border-radius: $button-style__radius-roundrect;
 			padding: 3px;
 			margin: 0;
 			justify-content: center;
@@ -483,6 +483,11 @@
 			.editor-block-mover__control {
 				float: left;
 			}
+		}
+
+		// Block Settings
+		.editor-block-settings-menu > * {
+			float: left;
 		}
 	}
 }
@@ -649,6 +654,7 @@
 .editor-block-list__breadcrumb .components-toolbar {
 	border: 1px solid $light-gray-500;
 	width: 100%;
+	background: $white;
 
 	// this prevents floats from messing up the position
 	position: absolute;
