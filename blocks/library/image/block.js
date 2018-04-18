@@ -59,6 +59,9 @@ class ImageBlock extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
+		this.updateWidth = this.updateWidth.bind( this );
+		this.updateHeight = this.updateHeight.bind( this );
+		this.updateDimensions = this.updateDimensions.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -138,6 +141,20 @@ class ImageBlock extends Component {
 
 	updateImageURL( url ) {
 		this.props.setAttributes( { url, width: undefined, height: undefined } );
+	}
+
+	updateWidth( width ) {
+		this.props.setAttributes( { width: parseInt( width, 10 ) } );
+	}
+
+	updateHeight( height ) {
+		this.props.setAttributes( { height: parseInt( height, 10 ) } );
+	}
+
+	updateDimensions( width = undefined, height = undefined ) {
+		return () => {
+			this.props.setAttributes( { width, height } );
+		};
 	}
 
 	getAvailableSizes() {
@@ -235,9 +252,7 @@ class ImageBlock extends Component {
 									label={ __( 'Width' ) }
 									value={ width !== undefined ? width : '' }
 									placeholder={ selectedSize.width }
-									onChange={ ( value ) => {
-										setAttributes( { width: parseInt( value, 10 ) } );
-									} }
+									onChange={ this.updateWidth }
 								/>
 								<TextControl
 									type="number"
@@ -245,9 +260,7 @@ class ImageBlock extends Component {
 									label={ __( 'Height' ) }
 									value={ height !== undefined ? height : '' }
 									placeholder={ selectedSize.height }
-									onChange={ ( value ) => {
-										setAttributes( { height: parseInt( value, 10 ) } );
-									} }
+									onChange={ this.updateHeight }
 								/>
 							</div>
 							<div className="blocks-image__dimensions__row">
@@ -264,9 +277,7 @@ class ImageBlock extends Component {
 												isSmall
 												isPrimary={ isCurrent }
 												aria-pressed={ isCurrent }
-												onClick={ () => {
-													setAttributes( { width: scaledWidth, height: scaledHeight } );
-												} }
+												onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
 											>
 												{ scale }%
 											</Button>
@@ -275,9 +286,7 @@ class ImageBlock extends Component {
 								</ButtonGroup>
 								<Button
 									isSmall
-									onClick={ () => {
-										setAttributes( { width: undefined, height: undefined } );
-									} }
+									onClick={ this.updateDimensions() }
 								>
 									{ __( 'Reset' ) }
 								</Button>
