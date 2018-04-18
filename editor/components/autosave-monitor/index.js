@@ -5,7 +5,6 @@ import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
-
 	componentDidUpdate( prevProps ) {
 		const { isDirty, isSaveable, isAutosavable } = this.props;
 		if (
@@ -46,6 +45,7 @@ export default compose( [
 			isAutosavable: isPostAutosavable(),
 		};
 	} ),
+
 	withDispatch( ( dispatch ) => ( {
 		autosave: dispatch( 'core/editor' ).doAutosave,
 	} ) ),

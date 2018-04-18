@@ -50,10 +50,7 @@ import {
 	getCurrentPostType,
 	getEditedPostContent,
 	getPostEdits,
-	getEditedPostTitle,
-	getEditedPostExcerpt,
 	isEditedPostDirty,
-	isEditedPostNew,
 	isEditedPostSaveable,
 	getBlock,
 	getBlockCount,
@@ -73,7 +70,6 @@ import {
  * Module Constants
  */
 const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
-const AUTOSAVE_POST_NOTICE_ID = 'AUTOSAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 const SHARED_BLOCK_NOTICE_ID = 'SHARED_BLOCK_NOTICE_ID';
 
@@ -126,11 +122,10 @@ export default {
 						post: post,
 						isAutosave: true,
 					} );
-
-			},
-			( err ) => {
-				dispatch( toggleAutosave( false ) );
-			} )
+				},
+				() => {
+					dispatch( toggleAutosave( false ) );
+				} );
 		} else {
 			dispatch( {
 				type: 'UPDATE_POST',

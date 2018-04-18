@@ -23,7 +23,6 @@ import {
 	getEditedPostVisibility,
 	isEditedPostSaveable,
 	isEditedPostPublishable,
-	isAutosavingPost,
 	getCurrentPostType,
 } from '../../store/selectors';
 
