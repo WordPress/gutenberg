@@ -4,7 +4,7 @@
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const { get } = require( 'lodash' );
-const { basename } = require( 'path' );
+const { basename, resolve } = require( 'path' );
 
 /**
  * WordPress dependencies
@@ -50,6 +50,8 @@ const extractConfig = {
 	],
 };
 
+const dirname = resolve();
+
 /**
  * Given a string, returns a new string with dash separators converedd to
  * camel-case equivalent. This is not as aggressive as `_.camelCase` in
@@ -86,16 +88,15 @@ const coreGlobals = [
 	'url',
 ];
 
-const alias = {};
-
 const externals = {};
 
-// call from project folders
+const alias = {};
+
 entryPointNames.forEach( ( name ) => {
-	alias[ '@wordpress/' + name ] = __dirname + '/' + name;
+	alias[ '@wordpress/' + name ] = `${ dirname }/${ name }`;
 } );
 
-// make them wp external vars (to be set up on each project that has Gutenberg as dependency)
+// make them external global vars
 coreGlobals.forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
@@ -104,16 +105,17 @@ coreGlobals.forEach( ( name ) => {
 
 const config = {
 	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+
 	entry: './index.js',
 	output: {
 		filename: 'gutenberg.js',
-		path: __dirname + '/gutenberg-package/dist',
+		path: `${ dirname }/g-package/dist`,
 		libraryTarget: 'this',
 	},
 	externals,
 	resolve: {
 		modules: [
-			__dirname,
+			dirname,
 			'node_modules',
 		],
 		alias: {

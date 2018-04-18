@@ -3,4 +3,4 @@ coverage
 node_modules
 vendor
 package
-gutenberg-package
+g-package/dist
