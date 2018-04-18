@@ -1,0 +1,9 @@
+.components-modal {
+	&__screen-overlay {
+		z-index: 1000;
+	}
+
+	&__content {
+		z-index: 1001;
+	}
+}

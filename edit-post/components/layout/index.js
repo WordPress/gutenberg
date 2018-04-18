@@ -7,7 +7,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Popover, ScrollLock, navigateRegions } from '@wordpress/components';
+import { Popover, ScrollLock, navigateRegions, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	AutosaveMonitor,
@@ -29,12 +29,15 @@ import './style.scss';
 import BlockSidebar from '../sidebar/block-sidebar';
 import DocumentSidebar from '../sidebar/document-sidebar';
 import Header from '../header';
+import Sidebar from '../sidebar';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import Sidebar from '../sidebar';
+import PluginScreenTakeover from '../plugin-screen-takeover';
+
+Modal.setAppElement( document.getElementById( 'wpwrap' ) );
 
 function Layout( {
 	mode,
@@ -92,6 +95,7 @@ function Layout( {
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />
 			}
+			<PluginScreenTakeover.Slot />
 			<Popover.Slot />
 			<PluginArea />
 		</div>
@@ -103,6 +107,7 @@ export default compose(
 		mode: select( 'core/edit-post' ).getEditorMode(),
 		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
+		screenTakeoverName: select( 'core/edit-post' ).getActiveScreenTakeoverName(),
 		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),
