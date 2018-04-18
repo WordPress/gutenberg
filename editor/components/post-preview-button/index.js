@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component, compose } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Button, ifCondition } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -117,16 +122,22 @@ export default compose( [
 			isEditedPostNew,
 			isEditedPostSaveable,
 		} = select( 'core/editor' );
+		const {
+			getPostType,
+		} = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			postId: getCurrentPostId(),
 			link: getEditedPostPreviewLink(),
 			isDirty: isEditedPostDirty(),
 			isNew: isEditedPostNew(),
 			isSaveable: isEditedPostSaveable(),
+			isViewable: get( postType, 'viewable', false ),
 			modified: getEditedPostAttribute( 'modified' ),
 		};
 	} ),
 	withDispatch( ( dispatch )=>( {
 		autosave: dispatch( 'core/editor' ).autosave,
 	} ) ),
+	ifCondition( ( { isViewable } ) => isViewable ),
 ] )( PostPreviewButton );
