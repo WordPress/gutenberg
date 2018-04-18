@@ -105,7 +105,11 @@ class ImageBlock extends Component {
 	}
 
 	onSelectImage( media ) {
-		this.props.setAttributes( pick( media, [ 'alt', 'id', 'caption', 'url' ] ) );
+		this.props.setAttributes( {
+			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
+			width: undefined,
+			height: undefined,
+		} );
 	}
 
 	onSetHref( value ) {
