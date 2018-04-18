@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clickOutside from 'react-click-outside';
+import { defer } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -38,10 +39,13 @@ class ManagedOverlay extends Component {
 	}
 
 	focusFirstTabbable() {
-		const tabbables = focus.tabbable.find( this.containerRef.current );
-		if ( tabbables.length ) {
-			tabbables[ 0 ].focus();
-		}
+		// Required because the node is appended to the DOM after rendering.
+		defer( () => {
+			const tabbables = focus.tabbable.find( this.containerRef.current );
+			if ( tabbables.length ) {
+				tabbables[ 0 ].focus();
+			}
+		} );
 	}
 
 	handleClickOutside( event ) {
