@@ -16,9 +16,6 @@ import { IconButton } from '@wordpress/components';
  */
 import UrlInput from './';
 
-// Stop the key event propagating when start typing in URLInput.
-const stopKeyPropagation = ( event ) => event.stopPropagation();
-
 class UrlInputButton extends Component {
 	constructor() {
 		super( ...arguments );
@@ -54,12 +51,8 @@ class UrlInputButton extends Component {
 					} ) }
 				/>
 				{ expanded &&
-					// Disable reason: KeyPress & KeyDown must be suppressed so the input changes doesn't close the URLInput block.
-					/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 					<form
 						className="blocks-format-toolbar__link-modal"
-						onKeyPress={ stopKeyPropagation }
-						onKeyDown={ stopKeyPropagation }
 						onSubmit={ this.submitLink }>
 						<div className="blocks-format-toolbar__link-modal-line">
 							<IconButton
