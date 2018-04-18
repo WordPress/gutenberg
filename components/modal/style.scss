@@ -1,0 +1,9 @@
+.components-modal {
+	&__screen-overlay {
+		z-index: z-index( '.components-modal__screen-overlay' );
+	}
+
+	&__content {
+		z-index: z-index( '.components-modal__content' );
+	}
+}
