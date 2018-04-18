@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { compose, createHigherOrderComponent } from '@wordpress/element';
+import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { MenuItem } from '@wordpress/components';
-import { PluginContext } from '@wordpress/plugins';
+import { withPluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -26,22 +26,10 @@ const PluginSidebarMoreMenuItem = ( { children, isSelected, icon, onClick } ) =>
 );
 
 export default compose(
-	createHigherOrderComponent(
-		( OriginalComponent ) => ( props ) => (
-			<PluginContext.Consumer>
-				{ ( { pluginName } ) => (
-					<OriginalComponent
-						{ ...props }
-						pluginName={ pluginName }
-					/>
-				) }
-			</PluginContext.Consumer>
-		),
-		'withPluginContext'
-	),
+	withPluginContext,
 	withSelect( ( select, ownProps ) => {
-		const { pluginName, target } = ownProps;
-		const sidebarName = `${ pluginName }/${ target }`;
+		const { pluginContext, target } = ownProps;
+		const sidebarName = `${ pluginContext.name }/${ target }`;
 
 		return {
 			isSelected: select( 'core/edit-post' ).getActiveGeneralSidebarName() === sidebarName,
