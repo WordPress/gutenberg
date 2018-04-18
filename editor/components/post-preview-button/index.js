@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component, compose } from '@wordpress/element';
-import { Button, ifCondition } from '@wordpress/components';
+import { Button, ifCondition, OpensInNewTabMessage } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -107,6 +107,7 @@ export class PostPreviewButton extends Component {
 				disabled={ ! isSaveable }
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
+				<OpensInNewTabMessage />
 			</Button>
 		);
 	}

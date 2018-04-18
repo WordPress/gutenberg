@@ -9,6 +9,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	withSpokenMessages,
+	OpensInNewTabMessage,
 } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { prependHTTP } from '@wordpress/url';
@@ -241,6 +242,7 @@ class FormatToolbar extends Component {
 											target="_blank"
 										>
 											{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
+											<OpensInNewTabMessage />
 										</a>
 										<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 										<IconButton
