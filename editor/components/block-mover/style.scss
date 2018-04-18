@@ -14,7 +14,7 @@
 	border: none;
 	outline: none;
 	background: none;
-	color: $dark-gray-300;
+	color: $dark-opacity-300; // use opacity to work in various editor styles
 	cursor: pointer;
 	padding: 0;
 	width: $block-side-ui-width;
@@ -23,7 +23,7 @@
 
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: $light-gray-300;
+		color: $dark-opacity-light-300; // use opacity to work in various editor styles
 		pointer-events: none;
 	}
 

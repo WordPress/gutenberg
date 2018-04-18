@@ -67,7 +67,7 @@
 		background: none;
 		outline: none;
 		border-radius: 0;
-		color: $dark-gray-500;
+		color: $dark-opacity-500; // use opacity to work in various editor styles
 		text-align: left;
 		cursor: pointer;
 		@include menu-style__neutral;

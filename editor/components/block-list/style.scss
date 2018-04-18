@@ -1,6 +1,6 @@
 .components-draggable__clone {
 	& > .editor-block-list__block > .editor-block-list__block-draggable {
-		background: $white;
+		background: $white; // @todo: ensure this works with themes that invert the color
 		box-shadow: $shadow-popover;
 
 		@include break-small {
@@ -33,7 +33,7 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		background-color: $light-gray-200;
+		background-color: $dark-opacity-light-200;
 		visibility: hidden;
 
 		@include break-small {
@@ -57,7 +57,7 @@
 	}
 
 
-	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 }
 
@@ -168,15 +168,13 @@
 		top: 10px;
 	}
 
-	&.is-selected > .editor-block-mover:before,
 	&.is-hovered > .editor-block-mover:before {
-		border-right: 1px solid $light-gray-500;
+		border-right: 1px solid $dark-opacity-light-500; // use opacity to work in various editor styles
 		right: 0;
 	}
 
-	&.is-selected > .editor-block-settings-menu:before,
 	&.is-hovered > .editor-block-settings-menu:before {
-		border-left: 1px solid $light-gray-500;
+		border-left: 1px solid $dark-opacity-light-500; // use opacity to work in various editor styles
 		left: 0;
 	}
 
@@ -213,7 +211,7 @@
 
 	// focused block-style
 	&.is-selected > .editor-block-list__block-edit:before {
-		outline: 1px solid $light-gray-500;
+		outline: 1px solid $dark-opacity-light-500; // use opacity to work in various editor styles
 	}
 
 	/**
@@ -235,6 +233,7 @@
 
 	&.is-multi-selected .editor-block-list__block-edit:before {
 		background: $blue-medium-highlight;
+		mix-blend-mode: multiply;
 	}
 
 	/**
@@ -652,9 +651,13 @@
 
 .editor-block-contextual-toolbar .editor-block-toolbar,
 .editor-block-list__breadcrumb .components-toolbar {
-	border: 1px solid $light-gray-500;
 	width: 100%;
 	background: $white;
+
+	// use opacity to work in various editor styles
+	border: 1px solid $dark-opacity-light-500; 
+	background-clip: padding-box;
+	box-sizing: padding-box;
 
 	// this prevents floats from messing up the position
 	position: absolute;
@@ -665,14 +668,13 @@
 		right: 0;
 	}
 
-	// remove stacked borders in inline toolbar
-	> div:first-child {
-		margin-left: -1px;
-	}
-
 	@include break-small() {
 		width: auto;
 	}
+}
+
+.editor-block-contextual-toolbar .editor-block-toolbar {
+	border-bottom: none;
 }
 
 .editor-block-list__breadcrumb .components-toolbar {

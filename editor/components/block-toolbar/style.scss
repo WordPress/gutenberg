@@ -24,5 +24,8 @@
 
 .editor-block-toolbar .editor-block-switcher {
 	display: inline-flex;
-	border-left: 1px solid $light-gray-500;
+
+	.edit-post-header-toolbar__block-toolbar & {
+		border-left: 1px solid $light-gray-500;
+	}
 }

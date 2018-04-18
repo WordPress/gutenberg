@@ -25,6 +25,46 @@ $light-gray-200: #f3f4f5;
 $light-gray-100: #f8f9f9;
 $white: #fff;
 
+// Dark opacities, for use with light themes
+$dark-opacity-900: rgba( $dark-gray-900, .8 );
+$dark-opacity-800: rgba( $dark-gray-900, .75 );
+$dark-opacity-700: rgba( $dark-gray-900, .7 );
+$dark-opacity-600: rgba( $dark-gray-900, .65 );
+$dark-opacity-500: rgba( $dark-gray-900, .6 );
+$dark-opacity-400: rgba( $dark-gray-900, .55 );
+$dark-opacity-300: rgba( $dark-gray-900, .5 );
+$dark-opacity-200: rgba( $dark-gray-900, .45 );
+$dark-opacity-100: rgba( $dark-gray-900, .4 );
+$dark-opacity-light-900: rgba( $dark-gray-900, .35 );
+$dark-opacity-light-800: rgba( $dark-gray-900, .3 );
+$dark-opacity-light-700: rgba( $dark-gray-900, .25 );
+$dark-opacity-light-600: rgba( $dark-gray-900, .2 );
+$dark-opacity-light-500: rgba( $dark-gray-900, .15 );
+$dark-opacity-light-400: rgba( $dark-gray-900, .1 );
+$dark-opacity-light-300: rgba( $dark-gray-900, .075 );
+$dark-opacity-light-200: rgba( $dark-gray-900, .05 );
+$dark-opacity-light-100: rgba( $dark-gray-900, .025 );
+
+// Light opacities, for use with dark themes
+$light-opacity-900: rgba( $white, 1 );
+$light-opacity-800: rgba( $white, .9 );
+$light-opacity-700: rgba( $white, .85 );
+$light-opacity-600: rgba( $white, .8 );
+$light-opacity-500: rgba( $white, .75 );
+$light-opacity-400: rgba( $white, .7 );
+$light-opacity-300: rgba( $white, .65 );
+$light-opacity-200: rgba( $white, .6 );
+$light-opacity-100: rgba( $white, .55 );
+$light-opacity-light-900: rgba( $white, .5 );
+$light-opacity-light-800: rgba( $white, .45 );
+$light-opacity-light-700: rgba( $white, .4 );
+$light-opacity-light-600: rgba( $white, .35 );
+$light-opacity-light-500: rgba( $white, .3 );
+$light-opacity-light-400: rgba( $white, .25 );
+$light-opacity-light-300: rgba( $white, .2 );
+$light-opacity-light-200: rgba( $white, .15 );
+$light-opacity-light-100: rgba( $white, .1 );
+
 // Additional colors
 // some from https://make.wordpress.org/design/handbook/foundations/colors/
 $blue-wordpress: #0073aa;
