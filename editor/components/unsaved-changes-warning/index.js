@@ -1,18 +1,9 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { isEditedPostDirty } from '../../store/selectors';
+import { withSelect } from '@wordpress/data';
 
 class UnsavedChangesWarning extends Component {
 	/**
@@ -59,8 +50,6 @@ class UnsavedChangesWarning extends Component {
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		isDirty: isEditedPostDirty( state ),
-	} )
-)( UnsavedChangesWarning );
+export default withSelect( ( select ) => ( {
+	isDirty: select( 'core/editor' ).isEditedPostDirty(),
+} ) )( UnsavedChangesWarning );

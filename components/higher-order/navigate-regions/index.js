@@ -62,10 +62,13 @@ function navigateRegions( WrappedComponent ) {
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 			return (
 				<div ref={ this.bindContainer } className={ className } onClick={ this.onClick }>
-					<KeyboardShortcuts shortcuts={ {
-						'ctrl+`': this.focusNextRegion,
-						'ctrl+shift+`': this.focusPreviousRegion,
-					} } />
+					<KeyboardShortcuts
+						bindGlobal
+						shortcuts={ {
+							'ctrl+`': this.focusNextRegion,
+							'ctrl+shift+`': this.focusPreviousRegion,
+						} }
+					/>
 					<WrappedComponent { ...this.props } />
 				</div>
 			);

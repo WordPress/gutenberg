@@ -9,7 +9,7 @@ import { stringify } from 'querystring';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Component, renderToString } from '@wordpress/element';
+import { Component, Fragment, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
 import classnames from 'classnames';
 
@@ -26,18 +26,13 @@ import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 // These embeds do not work in sandboxes
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
-function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, keywords = [] } ) {
+function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
 	return {
 		title,
-
-		description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
-
+		description: description || __( `Paste URLs from ${ title } to embed the content in this block.` ),
 		icon,
-
 		category,
-
 		keywords,
-
 		attributes: {
 			url: {
 				type: 'string',
@@ -148,8 +143,8 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				const { setAttributes, isSelected, className } = this.props;
 				const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
-				const controls = isSelected && (
-					<BlockControls key="controls">
+				const controls = (
+					<BlockControls>
 						<BlockAlignmentToolbar
 							value={ align }
 							onChange={ updateAlignment }
@@ -158,38 +153,42 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 				);
 
 				if ( fetching ) {
-					return [
-						controls,
-						<div key="loading" className="wp-block-embed is-loading">
-							<Spinner />
-							<p>{ __( 'Embedding…' ) }</p>
-						</div>,
-					];
+					return (
+						<Fragment>
+							{ controls }
+							<div className="wp-block-embed is-loading">
+								<Spinner />
+								<p>{ __( 'Embedding…' ) }</p>
+							</div>
+						</Fragment>
+					);
 				}
 
 				if ( ! html ) {
 					const label = sprintf( __( '%s URL' ), title );
 
-					return [
-						controls,
-						<Placeholder key="placeholder" icon={ icon } label={ label } className="wp-block-embed">
-							<form onSubmit={ this.doServerSideRender }>
-								<input
-									type="url"
-									value={ url || '' }
-									className="components-placeholder__input"
-									aria-label={ label }
-									placeholder={ __( 'Enter URL to embed here…' ) }
-									onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
-								<Button
-									isLarge
-									type="submit">
-									{ __( 'Embed' ) }
-								</Button>
-								{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
-							</form>
-						</Placeholder>,
-					];
+					return (
+						<Fragment>
+							{ controls }
+							<Placeholder icon={ icon } label={ label } className="wp-block-embed">
+								<form onSubmit={ this.doServerSideRender }>
+									<input
+										type="url"
+										value={ url || '' }
+										className="components-placeholder__input"
+										aria-label={ label }
+										placeholder={ __( 'Enter URL to embed here…' ) }
+										onChange={ ( event ) => setAttributes( { url: event.target.value } ) } />
+									<Button
+										isLarge
+										type="submit">
+										{ __( 'Embed' ) }
+									</Button>
+									{ error && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
+								</form>
+							</Placeholder>
+						</Fragment>
+					);
 				}
 
 				const parsedUrl = parse( url );
@@ -210,27 +209,28 @@ function getEmbedBlockSettings( { title, icon, category = 'embed', transforms, k
 					</div>
 				);
 
-				return [
-					controls,
-					<figure key="embed" className={ classnames( className, { 'is-video': 'video' === type } ) }>
-						{ ( cannotPreview ) ? (
-							<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
-								<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
-								<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
-							</Placeholder>
-						) : embedWrapper }
-						{ ( caption && caption.length > 0 ) || isSelected ? (
-							<RichText
-								tagName="figcaption"
-								placeholder={ __( 'Write caption…' ) }
-								value={ caption }
-								onChange={ ( value ) => setAttributes( { caption: value } ) }
-								isSelected={ isSelected }
-								inlineToolbar
-							/>
-						) : null }
-					</figure>,
-				];
+				return (
+					<Fragment>
+						{ controls }
+						<figure className={ classnames( className, { 'is-video': 'video' === type } ) }>
+							{ ( cannotPreview ) ? (
+								<Placeholder icon={ icon } label={ __( 'Embed URL' ) }>
+									<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
+									<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
+								</Placeholder>
+							) : embedWrapper }
+							{ ( caption && caption.length > 0 ) || isSelected ? (
+								<RichText
+									tagName="figcaption"
+									placeholder={ __( 'Write caption…' ) }
+									value={ caption }
+									onChange={ ( value ) => setAttributes( { caption: value } ) }
+									inlineToolbar
+								/>
+							) : null }
+						</figure>
+					</Fragment>
+				);
 			}
 		},
 
@@ -261,6 +261,7 @@ export const name = 'core/embed';
 
 export const settings = getEmbedBlockSettings( {
 	title: __( 'Embed' ),
+	description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
 	icon: 'embed-generic',
 	transforms: {
 		from: [
