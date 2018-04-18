@@ -65,7 +65,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		$this->parent_base         = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
 	}
 
-	/**o
+	/**
 	 * Registers routes for autosaves.
 	 *
 	 * @since 5.0.0
@@ -77,7 +77,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 			$this->rest_namespace, '/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base, array(
 				'args'   => array(
 					'parent' => array(
-						'description' => __( 'The ID for the parent of the object.' ),
+						'description' => __( 'The ID for the parent of the object.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 				),
@@ -101,11 +101,11 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 			$this->rest_namespace, '/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base . '/(?P<id>[\d]+)', array(
 				'args'   => array(
 					'parent' => array(
-						'description' => __( 'The ID for the parent of the object.' ),
+						'description' => __( 'The ID for the parent of the object.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 					'id'     => array(
-						'description' => __( 'The ID for the object.' ),
+						'description' => __( 'The ID for the object.', 'gutenberg' ),
 						'type'        => 'integer',
 					),
 				),
@@ -147,8 +147,9 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 * @return true|WP_Error True if the request has access to create the item, WP_Error object otherwise.
 	 */
 	public function create_item_permissions_check( $request ) {
-		if ( empty( $request->get_param( 'id' ) ) ) {
-			return new WP_Error( 'rest_post_invalid_id', __( 'Invalid item ID.' ), array( 'status' => 404 ) );
+		$id = $request->get_param( 'id' );
+		if ( empty( $id ) ) {
+			return new WP_Error( 'rest_post_invalid_id', __( 'Invalid item ID.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		return $this->parent_controller->update_item_permissions_check( $request );
@@ -212,13 +213,13 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		$parent_id = (int) $request->get_param( 'parent' );
 
 		if ( $parent_id <= 0 ) {
-			return new WP_Error( 'rest_post_invalid_id', __( 'Invalid parent post ID.' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_post_invalid_id', __( 'Invalid parent post ID.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		$autosave = wp_get_post_autosave( $parent_id );
 
 		if ( ! $autosave ) {
-			return new WP_Error( 'rest_post_no_autosave', __( 'There is no autosave revision for this post.' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_post_no_autosave', __( 'There is no autosave revision for this post.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		$response = $this->prepare_item_for_response( $autosave, $request );
@@ -308,7 +309,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 
 			if ( ! $autosave_is_different ) {
 				wp_delete_post_revision( $old_autosave->ID );
-				return new WP_Error( 'rest_autosave_no_changes', __( 'There is nothing to save. The autosave and the post content are the same.' ) );
+				return new WP_Error( 'rest_autosave_no_changes', __( 'There is nothing to save. The autosave and the post content are the same.', 'gutenberg' ) );
 			}
 
 			/**
