@@ -51,7 +51,9 @@ export default class EditorScreenTakeover extends Component {
 			} }
 		>
 			<ScreenTakeoverHeader icon={ icon } title={ title } onClose={ onClose } />
-			{ children }
+			<div className="edit-post-plugin-screen-takeover__editor-screen-takeover-content">
+				{ children }
+			</div>
 		</Modal>;
 	}
 
