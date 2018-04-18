@@ -286,22 +286,22 @@ export function insertBlocks( blocks, index, rootUID ) {
 }
 
 /**
- * Returns an action object used in signalling that an inline token should be
+ * Returns an action object used in signalling that an inline block should be
  * inserted.
  *
- * @param {Object}  token Token object to insert.
+ * @param {Object}  inlineBlock Inline block object to insert.
  *
  * @return {Object} Action object.
  */
-export function insertInline( token ) {
+export function insertInline( inlineBlock ) {
 	return {
 		type: 'INSERT_INLINE',
-		token,
+		inlineBlock,
 	};
 }
 
 /**
- * Returns an action object used in signalling that inline token insertion is
+ * Returns an action object used in signalling that inline block insertion is
  * complete.
  *
  * @return {Object} Action object.

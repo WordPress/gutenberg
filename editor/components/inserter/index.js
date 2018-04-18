@@ -20,7 +20,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import InserterMenu from './menu';
-import InserterTokenMenu from './token-menu';
+import InserterInlineMenu from './inline-menu';
 
 class Inserter extends Component {
 	constructor() {
@@ -142,7 +142,7 @@ class Inserter extends Component {
 
 						if ( this.state.isInline ) {
 							return (
-								<InserterTokenMenu
+								<InserterInlineMenu
 									onImageSelect={ () => this.setState( { mediaLibraryOpen: true } ) }
 								/>
 							);

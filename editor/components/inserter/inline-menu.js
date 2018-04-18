@@ -5,7 +5,7 @@ import { Component } from '@wordpress/element';
 import { NavigableMenu } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/blocks';
 
-export default class InserterTokenMenu extends Component {
+export default class InserterInlineMenu extends Component {
 	render() {
 		return (
 			<NavigableMenu>

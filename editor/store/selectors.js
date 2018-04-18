@@ -1064,14 +1064,14 @@ export function isInlineInsertionPointVisible( state ) {
 }
 
 /**
- * Returns the token object for inline insertion.
+ * Returns the Inline Block object for insertion.
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} Token object with `type` and properties for the `type`.
+ * @return {Object} Inline Block object with `type` and properties for the `type`.
  */
-export function getInlineToken( state ) {
-	return state.inlineToken;
+export function getInlineBlock( state ) {
+	return state.inlineBlock;
 }
 
 export function isInlineInsertAvailable( state ) {

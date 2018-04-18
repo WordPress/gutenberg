@@ -124,7 +124,7 @@ export class RichText extends Component {
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
 		this.toggleInsertAvailable = this.toggleInsertAvailable.bind( this );
-		this.insertToken = this.insertToken.bind( this );
+		this.insertInlineBlock = this.insertInlineBlock.bind( this );
 		this.getFocusPosition = this.getFocusPosition.bind( this );
 		this.getInsertionPosition = this.getInsertionPosition.bind( this );
 
@@ -480,11 +480,11 @@ export class RichText extends Component {
 		};
 	}
 
-	insertToken() {
-		const { inlineToken, completeInlineInsert } = this.props;
+	insertInlineBlock() {
+		const { inlineBlock, completeInlineInsert } = this.props;
 
-		if ( inlineToken.type === 'image' ) {
-			const { url, alt } = inlineToken;
+		if ( inlineBlock.type === 'image' ) {
+			const { url, alt } = inlineBlock;
 			const img = `<img src=${ url } alt=${ alt } />`;
 
 			this.editor.insertContent( img );
@@ -806,8 +806,8 @@ export class RichText extends Component {
 			this.toggleInsertAvailable();
 		}
 
-		if ( this.props.inlineToken && this.props.isSelected ) {
-			this.insertToken();
+		if ( this.props.inlineBlock && this.props.isSelected ) {
+			this.insertInlineBlock();
 		}
 
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
@@ -1035,12 +1035,12 @@ const RichTextContainer = compose( [
 	withSelect( ( select ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
 		const { isInlineInsertionPointVisible = noop } = select( 'core/editor' ) || {};
-		const { getInlineToken = noop } = select( 'core/editor' ) || {};
+		const { getInlineBlock = noop } = select( 'core/editor' ) || {};
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			isInlineInsertionPointVisible: isInlineInsertionPointVisible(),
-			inlineToken: getInlineToken(),
+			inlineBlock: getInlineBlock(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
