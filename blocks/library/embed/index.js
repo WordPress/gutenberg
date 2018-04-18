@@ -29,7 +29,7 @@ const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
 	return {
 		title,
-		description: description || __( `Paste URLs from ${ title } to embed the content in this block` ),
+		description: description || __( `Paste URLs from ${ title } to embed the content in this block.` ),
 		icon,
 		category,
 		keywords,
