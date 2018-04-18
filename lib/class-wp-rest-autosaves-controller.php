@@ -117,18 +117,6 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 					),
 				),
-				array(
-					'methods'             => WP_REST_Server::DELETABLE,
-					'callback'            => array( $this, 'delete_item' ),
-					'permission_callback' => array( $this->revision_controller, 'delete_item_permissions_check' ),
-					'args'                => array(
-						'force' => array(
-							'type'        => 'boolean',
-							'default'     => false,
-							'description' => __( 'Required to be true, as autosaves do not support trashing.' ),
-						),
-					),
-				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
@@ -167,66 +155,6 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	}
 
 	/**
-	 * Create a revision when the autosave content is significantly different.
-	 *
-	 * If the autosave content is significantly different from the current post or the previous autosave,
-	 * create a revision from the old data.
-	 *
-	 * @since 5.0.0
-	 *
-	 * @param WP_Post $post          The current post or the previous autosave revision.
-	 * @param array   $autosave_data The autosave data.
-	 */
-	protected function create_revision_for_autosave( $post, $autosave_data ) {
-
-		if ( ! wp_revisions_enabled( $post ) ) {
-			return;
-		}
-
-		$post_data = get_object_vars( $post );
-
-		if ( $post_data['post_type'] === 'revision' ) {
-			// If the old post is a revision, need to merge it with the actual post.
-			$parent_post = $this->get_parent( $post_data['post_parent'] );
-			foreach ( array_keys( _wp_post_revision_fields( $parent_post ) ) as $field ) {
-				if ( isset( $post_data[ $field ] ) ) {
-					$parent_post->$field = $post_data[ $field ];
-				}
-			}
-			$post_data = get_object_vars( $parent_post );
-		}
-
-		$old_length = strlen( $post_data['post_content'] );
-
-		if ( $old_length > 1000 ) {
-			$difference = 250;
-		} elseif ( $old_length > 500 ) {
-			$difference = (int) $old_length * 0.2;
-		} elseif ( $old_length > 50 ) {
-			$difference = (int) $old_length * 0.3;
-		} else {
-			$difference = (int) $old_length * 0.5;
-		}
-
-		$size_diff = strlen( $autosave_data['post_content'] ) - $old_length;
-		$create_revision = absint( $size_diff ) > $difference;
-		$revision_id = 0;
-
-		/**
-		 * Filter whether a revision is created when an autosave is made via the REST API.
-		 *
-		 * @since 5.0.0
-		 *
-		 * @param bool  $create_revision Create a revision?
-		 * @param array $post_data       The current post data.
-		 * @param int   $size_diff       The calculated autosave difference.
-		 */
-		if ( apply_filters( 'wp_create_revision_for_autosave', $create_revision, $post_data, $size_diff ) ) {
-			_wp_put_post_revision( $post_data );
-		}
-	}
-
-	/**
 	 * Creates, updates or deletes an autosave revision.
 	 *
 	 * @since 5.0.0
@@ -251,16 +179,10 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		$user_id           = get_current_user_id();
 
 		if ( ( 'draft' === $post->post_status || 'auto-draft' === $post->post_status ) && $post->post_author == $user_id ) {
-
-			// Optionally create a revision if the autosave data is significantly different.
-			// This protects the user from errors when editing, accidental deletes, etc.
-			$this->create_revision_for_autosave( $post, (array) $prepared_post );
-
 			// Draft posts for the same author: autosaving updates the post and does not create a revision.
 			// Convert the post object to an array and add slashes, wp_update_post expects escaped array.
 			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );
 		} else {
-
 			// Non-draft posts: create or update the post autosave.
 			$autosave_id = $this->create_post_autosave( (array) $prepared_post );
 		}
@@ -305,6 +227,8 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 
 	/**
 	 * Gets a collection of autosaves using wp_get_post_autosave.
+	 *
+	 * Contains the user's autosave, for empty if it doesn't exist.
 	 *
 	 * @since 5.0.0
 	 *
@@ -391,9 +315,6 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 			 * This filter is documented in wp-admin/post.php.
 			 */
 			do_action( 'wp_creating_autosave', $new_autosave );
-
-			// Optionally create a post revision if the new autosave data is significantly different.
-			$this->create_revision_for_autosave( $old_autosave, $new_autosave );
 
 			// wp_update_post expects escaped array.
 			return wp_update_post( wp_slash( $new_autosave ) );
