@@ -126,7 +126,7 @@ function gutenberg_shim_api_request( $scripts ) {
 	wp.apiRequest = function( request ) {
 		var method, path;
 
-		if ( typeof request.path === 'string' ) {
+		if ( typeof request.path === 'string' && window._wpAPIDataPreload ) {
 			method = request.method || 'GET';
 			path = getStablePath( request.path );
 

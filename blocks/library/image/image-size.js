@@ -6,6 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { withGlobalEvents } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 
 class ImageSize extends Component {
@@ -79,4 +80,6 @@ class ImageSize extends Component {
 	}
 }
 
-export default ImageSize;
+export default withGlobalEvents( {
+	resize: 'calculateSize',
+} )( ImageSize );

@@ -12,7 +12,7 @@ import { compose } from '@wordpress/element';
 import { withDispatch } from '@wordpress/data';
 import { withEditorSettings } from '@wordpress/blocks';
 
-export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small = false, role } ) {
+export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role } ) {
 	if ( isLocked ) {
 		return null;
 	}
@@ -21,14 +21,12 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small =
 
 	return (
 		<IconButton
-			className="editor-block-settings-menu__control"
+			className="editor-block-settings-remove"
 			onClick={ flow( onRemove, onClick ) }
 			icon="trash"
-			label={ small ? label : undefined }
+			label={ label }
 			role={ role }
-		>
-			{ ! small && label }
-		</IconButton>
+		/>
 	);
 }
 
