@@ -22,6 +22,7 @@ import { Component, Fragment, compose } from '@wordpress/element';
 import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange, getScrollContainer } from '@wordpress/utils';
 import { withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -37,6 +38,7 @@ import patterns from './patterns';
 import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString, isEmpty } from './format';
+import NavigableToolbar from '../../editor/components/navigable-toolbar';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -822,9 +824,12 @@ export class RichText extends Component {
 					</BlockFormatControls>
 				) }
 				{ isSelected && inlineToolbar && (
-					<div className="block-rich-text__inline-toolbar">
+					<NavigableToolbar
+						className="block-rich-text__inline-toolbar"
+						aria-label={ __( 'Block secondary controls' ) }
+					>
 						{ formatToolbar }
-					</div>
+					</NavigableToolbar>
 				) }
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
