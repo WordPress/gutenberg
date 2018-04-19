@@ -37,7 +37,7 @@
 		margin: 0 5px 0 0;
 	}
 
-	@include break-medium() {
+	@include break-large() {
 		flex-wrap: nowrap;
 
 		.shared-block-edit-panel__title {
