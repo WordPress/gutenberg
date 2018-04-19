@@ -57,7 +57,7 @@ editor. It is passed the new value as an argument.
 
 ### settings
 
-Used to setup the Code Editor and includes options for linting and CodeMirror. By default this will use window._wpGutenbergCodeEditorSettings.
+Used to setup the Code Editor and includes options for linting and CodeMirror. By default this will use `window._wpGutenbergCodeEditorSettings`.
 
 - Type: `Object`
 - Required: No
