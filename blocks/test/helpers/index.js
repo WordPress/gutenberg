@@ -1,9 +1,9 @@
 /**
  * External dependencie
  */
+import fs from 'fs';
 import { render } from 'enzyme';
 import { noop } from 'lodash';
-import { readdirSync } from 'fs';
 
 /**
  * Internal dependencies
@@ -34,7 +34,7 @@ export const blockEditRender = ( name, settings ) => {
 };
 
 export function registerCoreBlocks() {
-	const dirs = readdirSync( __dirname + '/../../library' );
+	const dirs = fs.readdirSync( __dirname + '/../../library' );
 
 	dirs.forEach( ( dir ) => {
 		if ( ! dir.includes( '.' ) ) {
