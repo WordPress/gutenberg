@@ -7,13 +7,14 @@ import { filter, property, union } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, registerCoreBlocks, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
 import * as selectors from '../selectors';
+import { registerCoreBlocks } from '../../../blocks/test/helpers';
 
 const {
 	hasEditorUndo,

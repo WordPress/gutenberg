@@ -6,12 +6,13 @@ import { mount, shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { createBlock, registerCoreBlocks } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { DocumentOutline } from '../';
+import { registerCoreBlocks } from '../../../../blocks/test/helpers';
 
 jest.mock( '../../block-title', () => () => 'Block Title' );
 

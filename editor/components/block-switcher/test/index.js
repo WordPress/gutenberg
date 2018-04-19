@@ -6,12 +6,12 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { registerCoreBlocks } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
+import { registerCoreBlocks } from '../../../../blocks/test/helpers';
 import { BlockSwitcher } from '../';
 
 const { DOWN } = keycodes;
