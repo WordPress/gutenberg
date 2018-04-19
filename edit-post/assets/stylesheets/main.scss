@@ -44,6 +44,10 @@
 	}
 }
 
+body.gutenberg-editor-page::-webkit-scrollbar {
+	display: none;
+}
+
 body.gutenberg-editor-page {
 	background: $white;
 
