@@ -17,7 +17,6 @@ import { registerCoreBlocks } from '../../../../blocks/test/helpers';
 jest.mock( '../../block-title', () => () => 'Block Title' );
 
 describe( 'DocumentOutline', () => {
-
 	registerCoreBlocks();
 
 	const paragraph = createBlock( 'core/paragraph' );
