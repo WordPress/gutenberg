@@ -8,7 +8,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "test": "jest",
-    "clean": "yarn cache clean --force; watchman watch-del-all; rm -rf node_modules/ yarn.lock package-lock.json; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*; yarn clean-ios;",
+    "clean": "watchman watch-del-all; rm -rf node_modules/ yarn.lock package-lock.json; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*; yarn clean-ios;",
     "clean-ios": "type xcodebuild &> /dev/null && (xcodebuild -project ./iOS/example.xcodeproj -alltargets clean && rm -rf ./iOS/build);",
     "clean:install": "yarn clean; yarn;"
   },

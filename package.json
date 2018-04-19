@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "yarn cache clean --force; watchman watch-del-all; rm -rf node_modules/ yarn.lock package-lock.json; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
+    "clean": "watchman watch-del-all; rm -rf node_modules/ yarn.lock package-lock.json; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
     "clean:install": "yarn clean; yarn; pushd example; yarn; popd"
   },
   "peerDependencies": {
