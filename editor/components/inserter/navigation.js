@@ -9,6 +9,13 @@ import { __ } from '@wordpress/i18n';
  */
 import tabs from './tabs';
 
+const onFocus = ( event ) => {
+	if ( event.target.getAttribute( 'role' ) !== 'tablist' ) {
+		return;
+	}
+	event.target.querySelector( '[role="tab"]' ).focus();
+};
+
 function BlockInserterNavigation( { ariaControlsPrefix, selected, onSelect, onClose } ) {
 	return (
 		<div className="editor-inserter__navigation">
@@ -19,15 +26,17 @@ function BlockInserterNavigation( { ariaControlsPrefix, selected, onSelect, onCl
 				icon="no-alt"
 				label={ __( 'Close Navigation Panel' ) }
 			/>
-			<NavigableMenu role="tablist" aria-orientation="vertical">
+			<NavigableMenu role="tablist" aria-orientation="vertical" tabIndex={ selected ? '-1' : '0' } onFocus={ onFocus }>
 				{ tabs.map( ( tab ) => (
 					<Button
 						key={ tab.name }
 						role="tab"
-						onClick={ () => onSelect( tab.name ) }
+						onFocus={ () => onSelect( tab.name ) }
 						className="editor-inserter__navigation-button"
+						isToggled={ selected === tab.name }
 						aria-selected={ selected === tab.name }
 						aria-controls={ ariaControlsPrefix + '-' + tab.name }
+						tabIndex={ selected === tab.name ? undefined : '-1' }
 					>
 						{ tab.title }
 					</Button>
