@@ -23,7 +23,7 @@
     "node": ">=8.0.0",
     "npm": ">=5.0.0"
   },
-  "dependencies": { },
+  "dependencies": {},
   "bugs": {
     "url": "https://github.com/front/gutenberg/issues"
   },

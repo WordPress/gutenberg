@@ -259,20 +259,9 @@ window.customGutenberg = {
 
 ![Rows example](https://raw.githubusercontent.com/front/gutenberg/develop/rows_screenshot.png)
 
-### Document Panels
+### Articles Panel
 
-At sidebar there are a few panels that could be customize. By default, Gutenberg has `'post-status'`, `last-revision`, `post-taxonomies`, `featured-image`, `post-excerpt`, `discussion-panel`, `page-attributes`, `document-outline-panel`, `meta-boxes` which you can omit or change the order.
-
-```js
-window.customGutenberg = {
-    ...,
-    panels: [ 'post-status', 'last-revision', 'meta-boxes', ... ],
-    ...,
-};
-```
-#### Articles Panel
-
-The **Articles Panel** (`articles-panel`) contains a list of articles which could be filtered by category and/or searched be name and then can be added to your page in form of an (Article block)[#article-block] by drag and drop.
+The **Articles Panel** (`postType.supports[ 'articles' ] = true`) contains a list of articles which could be filtered by category and/or searched be name and then can be added to your page in form of an (Article block)[#article-block] by drag and drop.
 
 *Articles* and *Categories* objects should follow the next structure:
 
@@ -294,20 +283,3 @@ const category = { id: 1, name: 'Category 1', parent: 0 };
 The **Article Block** is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a title.
 
 ![Article Block example](https://raw.githubusercontent.com/front/gutenberg/develop/article_block_screenshot.png)
-
-### Editor Settings
-
-For now, there is only two kinds of settings releated with editor: `hideTitle` and `noMediaLibrary`.
-
-```js
-window.customGutenberg = {
-    ...,
-    editor: {
-        // to hide page title
-        hideTitle: true, 
-        // to editor doesn't expect to use a media library
-        noMediaLibrary: true, 
-    },
-    ...,
-};
-```
