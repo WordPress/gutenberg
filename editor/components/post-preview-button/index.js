@@ -136,7 +136,7 @@ export default compose( [
 			modified: getEditedPostAttribute( 'modified' ),
 		};
 	} ),
-	withDispatch( ( dispatch )=>( {
+	withDispatch( ( dispatch ) => ( {
 		autosave: dispatch( 'core/editor' ).autosave,
 	} ) ),
 	ifCondition( ( { isViewable } ) => isViewable ),
