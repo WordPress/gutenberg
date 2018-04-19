@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "config": {
-    "jsfiles": "index.js app/*.js app/**/*.js block-management/*.js block-management/**/*.js store/*.js store/**/*.js",
-    "scssfiles": "app/*.scss app/**/*.scss block-management/*.scss block-management/**/*.scss store/*.scss store/**/*.scss"
+    "jsfiles": "index.js src/*.js src/**/*.js",
+    "scssfiles": "src/*.scss src/**/*.scss"
   },
   "devDependencies": {
     "@wordpress/babel-preset-default": "^1.1.2",
