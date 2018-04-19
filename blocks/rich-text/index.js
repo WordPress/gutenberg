@@ -104,7 +104,7 @@ export function filterEmptyNodes( childNodes ) {
 export function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
 		case 'link' : {
-			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
+			const anchor = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', target: anchor.getAttribute( 'target' ) || '', node: anchor } : {};
 		}
 		default:

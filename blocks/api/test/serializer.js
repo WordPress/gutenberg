@@ -33,7 +33,7 @@ describe( 'block serializer', () => {
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
-		getBlockTypes().forEach( block => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 	} );

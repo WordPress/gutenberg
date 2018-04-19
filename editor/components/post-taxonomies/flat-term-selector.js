@@ -117,8 +117,8 @@ class FlatTermSelector extends Component {
 					this.addRequest = wp.apiRequest( {
 						path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
 					} );
-					return this.addRequest.then( searchResult => {
-						resolve( find( searchResult, result => isSameTermName( result.name, termName ) ) );
+					return this.addRequest.then( ( searchResult ) => {
+						resolve( find( searchResult, ( result ) => isSameTermName( result.name, termName ) ) );
 					}, reject );
 				}
 				reject( xhr );

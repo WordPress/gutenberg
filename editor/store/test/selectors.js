@@ -2529,7 +2529,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const blockTypes = getBlockTypes().filter( blockType => ! blockType.isPrivate );
+			const blockTypes = getBlockTypes().filter( ( blockType ) => ! blockType.isPrivate );
 			expect( getInserterItems( state, true ) ).toHaveLength( blockTypes.length );
 		} );
 
@@ -2727,7 +2727,7 @@ describe( 'selectors', () => {
 
 			// We should get back 4 items with no duplicates
 			const items = getFrecentInserterItems( state, true, 4 );
-			const blockNames = items.map( item => item.name );
+			const blockNames = items.map( ( item ) => item.name );
 			expect( union( blockNames ) ).toHaveLength( 4 );
 		} );
 	} );

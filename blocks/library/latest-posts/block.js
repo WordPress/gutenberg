@@ -164,7 +164,7 @@ export default withAPIData( ( props ) => {
 		orderBy,
 		per_page: postsToShow,
 		_fields: [ 'date_gmt', 'link', 'title' ],
-	}, value => ! isUndefined( value ) ) );
+	}, ( value ) => ! isUndefined( value ) ) );
 	const categoriesListQuery = stringify( {
 		per_page: 100,
 		_fields: [ 'id', 'name', 'parent' ],
