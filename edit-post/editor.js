@@ -19,6 +19,6 @@ function Editor( { settings, hasFixedToolbar, onError, ...props } ) {
 	);
 }
 
-export default withSelect( select => ( {
+export default withSelect( ( select ) => ( {
 	hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 } ) )( Editor );

@@ -76,7 +76,7 @@ export const settings = {
 					value={ attributes.content }
 					focus={ isSelected }
 					onFocus={ toggleSelection }
-					onChange={ content => setAttributes( { content } ) }
+					onChange={ ( content ) => setAttributes( { content } ) }
 				/>
 			) }
 		</div>

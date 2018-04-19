@@ -23,8 +23,8 @@ import { Toolbar, withState } from '@wordpress/components';
 import './style.scss';
 import './editor.scss';
 
-const toRichTextValue = value => value.map( ( subValue => subValue.children ) );
-const fromRichTextValue = value => value.map( ( subValue ) => ( {
+const toRichTextValue = ( value ) => value.map( ( ( subValue ) => subValue.children ) );
+const fromRichTextValue = ( value ) => value.map( ( subValue ) => ( {
 	children: subValue,
 } ) );
 
@@ -114,7 +114,7 @@ export const settings = {
 						return createBlock( 'core/paragraph' );
 					}
 					// transforming a quote with content
-					return ( value || [] ).map( item => createBlock( 'core/paragraph', {
+					return ( value || [] ).map( ( item ) => createBlock( 'core/paragraph', {
 						content: [ get( item, 'children.props.children', '' ) ],
 					} ) ).concat( citation ? createBlock( 'core/paragraph', {
 						content: citation,

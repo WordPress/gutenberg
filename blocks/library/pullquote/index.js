@@ -21,8 +21,8 @@ import { withState } from '@wordpress/components';
 import './editor.scss';
 import './style.scss';
 
-const toRichTextValue = value => map( value, ( subValue => subValue.children ) );
-const fromRichTextValue = value => map( value, ( subValue ) => ( {
+const toRichTextValue = ( value ) => map( value, ( ( subValue ) => subValue.children ) );
+const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
 	children: subValue,
 } ) );
 const blockAttributes = {

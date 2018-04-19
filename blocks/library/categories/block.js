@@ -58,7 +58,7 @@ class CategoriesBlock extends Component {
 			return categories;
 		}
 
-		return categories.filter( category => category.parent === parentId );
+		return categories.filter( ( category ) => category.parent === parentId );
 	}
 
 	getCategoryListClassName( level ) {
@@ -81,7 +81,7 @@ class CategoriesBlock extends Component {
 
 		return (
 			<ul className={ this.getCategoryListClassName( 0 ) }>
-				{ categories.map( category => this.renderCategoryListItem( category, 0 ) ) }
+				{ categories.map( ( category ) => this.renderCategoryListItem( category, 0 ) ) }
 			</ul>
 		);
 	}
@@ -103,7 +103,7 @@ class CategoriesBlock extends Component {
 					showHierarchy &&
 					!! childCategories.length && (
 						<ul className={ this.getCategoryListClassName( level + 1 ) }>
-							{ childCategories.map( childCategory => this.renderCategoryListItem( childCategory, level + 1 ) ) }
+							{ childCategories.map( ( childCategory ) => this.renderCategoryListItem( childCategory, level + 1 ) ) }
 						</ul>
 					)
 				}
@@ -118,7 +118,7 @@ class CategoriesBlock extends Component {
 
 		return (
 			<select className={ `${ this.props.className }__dropdown` }>
-				{ categories.map( category => this.renderCategoryDropdownItem( category, 0 ) ) }
+				{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
 			</select>
 		);
 	}
@@ -139,7 +139,7 @@ class CategoriesBlock extends Component {
 			</option>,
 			showHierarchy &&
 			!! childCategories.length && (
-				childCategories.map( childCategory => this.renderCategoryDropdownItem( childCategory, level + 1 ) )
+				childCategories.map( ( childCategory ) => this.renderCategoryDropdownItem( childCategory, level + 1 ) )
 			),
 		];
 	}

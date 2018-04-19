@@ -138,7 +138,7 @@ export const settings = {
 								type="url"
 								className="components-placeholder__input"
 								placeholder={ __( 'Enter URL of video file here…' ) }
-								onChange={ event => this.setState( { src: event.target.value } ) }
+								onChange={ ( event ) => this.setState( { src: event.target.value } ) }
 								value={ src || '' } />
 							<Button
 								isLarge

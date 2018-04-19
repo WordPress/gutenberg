@@ -24,8 +24,8 @@ const fixturesDir = path.join( __dirname, 'fixtures' );
 // Get the "base" name for each fixture first.
 const fileBasenames = uniq(
 	fs.readdirSync( fixturesDir )
-		.filter( f => /(\.html|\.json)$/.test( f ) )
-		.map( f => f.replace( /\..+$/, '' ) )
+		.filter( ( f ) => /(\.html|\.json)$/.test( f ) )
+		.map( ( f ) => f.replace( /\..+$/, '' ) )
 );
 
 function readFixtureFile( filename ) {
@@ -48,7 +48,7 @@ function writeFixtureFile( filename, content ) {
 
 function normalizeReactTree( element ) {
 	if ( Array.isArray( element ) ) {
-		return element.map( child => normalizeReactTree( child ) );
+		return element.map( ( child ) => normalizeReactTree( child ) );
 	}
 
 	// Check if we got an object first, then if it actually has a `type` like a
@@ -103,7 +103,7 @@ describe( 'full post content fixture', () => {
 		// TODO: Need to load/register core blocks. Maybe requireIndex ?
 	} );
 
-	fileBasenames.forEach( f => {
+	fileBasenames.forEach( ( f ) => {
 		it( f, () => {
 			const content = readFixtureFile( f + '.html' );
 			if ( content === null ) {
@@ -216,14 +216,14 @@ describe( 'full post content fixture', () => {
 	it( 'should be present for each block', () => {
 		const errors = [];
 
-		getBlockTypes().map( block => block.name ).forEach( name => {
+		getBlockTypes().map( ( block ) => block.name ).forEach( ( name ) => {
 			const nameToFilename = name.replace( /\//g, '__' );
 			const foundFixtures = fileBasenames
-				.filter( basename => (
+				.filter( ( basename ) => (
 					basename === nameToFilename ||
 					startsWith( basename, nameToFilename + '__' )
 				) )
-				.map( basename => {
+				.map( ( basename ) => {
 					// The file that contains the input HTML for this test.
 					const inputFilename = basename + '.html';
 					// The parser output for this test.  For missing files,
@@ -240,7 +240,7 @@ describe( 'full post content fixture', () => {
 						firstBlock,
 					};
 				} )
-				.filter( fixture => fixture.parserOutput !== null );
+				.filter( ( fixture ) => fixture.parserOutput !== null );
 
 			if ( ! foundFixtures.length ) {
 				errors.push( format(
@@ -250,7 +250,7 @@ describe( 'full post content fixture', () => {
 				) );
 			}
 
-			foundFixtures.forEach( fixture => {
+			foundFixtures.forEach( ( fixture ) => {
 				if ( name !== fixture.firstBlock ) {
 					errors.push( format(
 						'Expected fixture file \'%s\' to test the \'%s\' block.',

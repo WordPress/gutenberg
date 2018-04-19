@@ -10,11 +10,17 @@ a traditional `input` field, usually when the user exits the field.
 
 ## Properties
 
-### `value: Array`
+### `format: String`
 
-*Required.* Array of React DOM to make editable. The rendered HTML should be valid, and valid with respect to the `tagName` and `inline` property.
+*Optional.* Format of the RichText provided value prop. It can be `element` or `string`.
 
-### `onChange( value: Array ): Function`
+*Default: `element`*.
+
+### `value: Array|String`
+
+*Required.* Depending on the format prop, this value could be an array of React DOM to make editable or an HTML string. The rendered HTML should be valid, and valid with respect to the `tagName` and `inline` property.
+
+### `onChange( value: Array|String ): Function`
 
 *Required.* Called when the value changes.
 
@@ -31,7 +37,7 @@ a traditional `input` field, usually when the user exits the field.
 
 *Optional.* By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to `p` to create new paragraphs on <kbd>Enter</kbd>.
 
-### `onSplit( before: Array, after: Array, ...blocks: Object ): Function`
+### `onSplit( before: Array|String, after: Array|String, ...blocks: Object ): Function`
 
 *Optional.* Called when the content can be split with `before` and `after`. There might be blocks present, which should be inserted in between.
 
