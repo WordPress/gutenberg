@@ -75,12 +75,9 @@ class Inserter extends Component {
 
 	isInsertingInline() {
 		const { selectedBlock, canInsertInline } = this.props;
-		const isEmptyParagraph = selectedBlock &&
-			selectedBlock.name === 'core/paragraph' &&
-			selectedBlock.attributes.content.length === 0;
 
 		return selectedBlock &&
-			! isEmptyParagraph &&
+			! isUnmodifiedDefaultBlock( selectedBlock ) &&
 			canInsertInline;
 	}
 
