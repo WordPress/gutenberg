@@ -1,10 +1,16 @@
 /**
+ * External dependencies
+ */
+import { get, partial } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { Component, compose } from '@wordpress/element';
-import { PanelBody, TextControl, CategorySelect } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { PanelBody, TextControl, CategorySelect } from '@wordpress/components';
+import { PostTypeSupportCheck } from '@wordpress/editor';
+import { Component, compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal Dependencies
@@ -39,43 +45,47 @@ class ArticlesPanel extends Component {
 	}
 
 	render() {
-		const { isOpened, onTogglePanel, categories } = this.props;
+		const { isOpened, postType, onTogglePanel, categories } = this.props;
 		const { categoryId, term } = this.state;
 
 		return (
-			<PanelBody
-				title={ __( 'Stories' ) }
-				opened={ isOpened }
-				onToggle={ onTogglePanel }
-			>
-				<TextControl
-					placeholder={ __( 'Search articles' ) }
-					value={ term }
-					onChange={ this.onInputChange }
-				/>
+			<PostTypeSupportCheck supportKeys="articles">
+				<PanelBody
+					title={ get( postType, [ 'labels', 'articles' ], __( 'Stories' ) ) }
+					opened={ isOpened }
+					onToggle={ onTogglePanel }
+				>
+					<TextControl
+						placeholder={ __( 'Search articles' ) }
+						value={ term }
+						onChange={ this.onInputChange }
+					/>
 
-				<CategorySelect
-					key="query-controls-category-select"
-					categoriesList={ categories }
-					label={ __( 'Category' ) }
-					noOptionLabel={ __( 'All' ) }
-					selectedCategoryId={ categoryId }
-					onChange={ this.onCategoryChange }
-				/>
+					<CategorySelect
+						key="query-controls-category-select"
+						categoriesList={ categories }
+						label={ __( 'Category' ) }
+						noOptionLabel={ __( 'All' ) }
+						selectedCategoryId={ categoryId }
+						onChange={ this.onCategoryChange }
+					/>
 
-				<ArticlesSearch
-					options={ { categoryId, term } }
-				/>
-			</PanelBody>
+					<ArticlesSearch
+						options={ { categoryId, term } }
+					/>
+				</PanelBody>
+			</PostTypeSupportCheck>
 		);
 	}
 }
 
 const applyWithSelect = withSelect( ( select ) => {
+	const { getPostType, getCategories, isRequestingCategories } = select( 'core' );
+	const { getEditedPostAttribute } = select( 'core/editor' );
 	const { isEditorSidebarPanelOpened } = select( 'core/edit-post' );
-	const { getCategories, isRequestingCategories } = select( 'core' );
 
 	return {
+		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		isOpened: isEditorSidebarPanelOpened( PANEL_NAME ),
 		categories: getCategories(),
 		isRequesting: isRequestingCategories(),
@@ -83,10 +93,10 @@ const applyWithSelect = withSelect( ( select ) => {
 } );
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
+	const { toggleGeneralSidebarEditorPanel } = dispatch( 'core/edit-post' );
+
 	return {
-		onTogglePanel() {
-			return dispatch( 'core/edit-post' ).toggleGeneralSidebarEditorPanel( PANEL_NAME );
-		},
+		onTogglePanel: partial( toggleGeneralSidebarEditorPanel, PANEL_NAME ),
 	};
 } );
 
