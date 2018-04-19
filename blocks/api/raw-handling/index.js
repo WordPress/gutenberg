@@ -42,7 +42,7 @@ import slackMarkdownVariantCorrector from './slack-markdown-variant-corrector';
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
+export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
@@ -54,7 +54,7 @@ export default function rawHandler( { HTML, plainText = '', mode = 'AUTO', tagNa
 	// Parse Markdown (and HTML) if:
 	// * There is a plain text version.
 	// * The HTML version has no formatting.
-	if ( plainText && isPlain( HTML ) ) {
+	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
 		const converter = new showdown.Converter();
 
 		converter.setOption( 'noHeaderId', true );

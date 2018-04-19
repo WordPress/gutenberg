@@ -301,7 +301,7 @@ export class RichText extends Component {
 	 *                                     by tinyMCE.
 	 */
 	onPastePreProcess( event ) {
-		const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
+		const HTML = this.isPlainTextPaste ? '' : event.content;
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', HTML );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
