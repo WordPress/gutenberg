@@ -214,7 +214,7 @@ export default {
 				<p>
 					<span>{ noticeMessage }</span>
 					{ ' ' }
-					{ <a href={ autosaveStatus.editLink }>{ __( 'View the autosave' ) }</a> }
+					<a href={ autosaveStatus.editLink }>{ __( 'View the autosave' ) }</a>
 				</p>,
 				{
 					id: AUTOSAVE_POST_NOTICE_ID,
