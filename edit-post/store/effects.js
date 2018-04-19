@@ -45,6 +45,9 @@ const effects = {
 
 		// Initialize metaboxes state
 		const dataPerLocation = reduce( action.metaBoxes, ( memo, isActive, location ) => {
+			if ( window.tinyMCE ) {
+				window.tinyMCE.triggerSave();
+			}
 			if ( isActive ) {
 				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
 			}
@@ -62,6 +65,9 @@ const effects = {
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const state = store.getState();
 		const dataPerLocation = reduce( getMetaBoxes( state ), ( memo, metabox, location ) => {
+			if ( window.tinyMCE ) {
+				window.tinyMCE.triggerSave();
+			}
 			if ( metabox.isActive ) {
 				memo[ location ] = jQuery( getMetaBoxContainer( location ) ).serialize();
 			}
