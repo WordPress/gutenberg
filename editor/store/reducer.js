@@ -901,24 +901,6 @@ export function notices( state = [], action ) {
 	return state;
 }
 
-/**
- * Reducer returning the currently autosave message.
- *
- * @param  {Object} state  Current state.
- * @param  {Object} action Dispatched action.
- *
- * @return {Object}        Updated state.
- */
-export function autosave( state = { message: '' }, action ) {
-	switch ( action.type ) {
-		case 'UPDATE_AUTOSAVE_STATUS_MESSAGE':
-			return {
-				...state,
-				message: action.message,
-			};
-	}
-}
-
 export const sharedBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
