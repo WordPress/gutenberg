@@ -19,11 +19,7 @@ import MetaBoxes from '../../meta-boxes';
 import SettingsHeader from '../settings-header';
 import Sidebar from '../';
 import ArticlesPanel from '../articles-panel';
-import SettingsPanel from '../settings-panel';
-
-import { getPanelItems } from '../panel-items.js';
-
-const items = getPanelItems();
+import TemplateSettingsPanel from '../template-settings-panel';
 
 const SIDEBAR_NAME = 'edit-post/document';
 
@@ -34,17 +30,17 @@ const DocumentSidebar = () => (
 	>
 		<SettingsHeader sidebarName={ SIDEBAR_NAME } />
 		<Panel>
-			{ items.includes( 'post-status' ) ? <PostStatus /> : '' }
-			{ items.includes( 'articles-panel' ) ? <ArticlesPanel /> : '' }
-			{ items.includes( 'settings-panel' ) ? <SettingsPanel /> : '' }
-			{ items.includes( 'last-revision' ) ? <LastRevision /> : '' }
-			{ items.includes( 'post-taxonomies' ) ? <PostTaxonomies /> : '' }
-			{ items.includes( 'featured-image' ) ? <FeaturedImage /> : '' }
-			{ items.includes( 'post-excerpt' ) ? <PostExcerpt /> : '' }
-			{ items.includes( 'discussion-panel' ) ? <DiscussionPanel /> : '' }
-			{ items.includes( 'page-attributes' ) ? <PageAttributes /> : '' }
-			{ items.includes( 'document-outline-panel' ) ? <DocumentOutlinePanel /> : '' }
-			{ items.includes( 'meta-boxes' ) ? <MetaBoxes location="side" usePanel /> : '' }
+			<PostStatus />
+			<ArticlesPanel />
+			<TemplateSettingsPanel />
+			<LastRevision />
+			<PostTaxonomies />
+			<FeaturedImage />
+			<PostExcerpt />
+			<DiscussionPanel />
+			<PageAttributes />
+			<DocumentOutlinePanel />
+			<MetaBoxes location="side" usePanel />
 		</Panel>
 	</Sidebar>
 );
