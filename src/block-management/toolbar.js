@@ -2,7 +2,7 @@
  * @format */
 
 import React from 'react';
-import { View, TouchableNativeFeedback, Text } from 'react-native';
+import { View, TouchableOpacity, Text } from 'react-native';
 import { ToolbarButton } from './constants';
 
 import styles from './toolbar.scss';
@@ -16,31 +16,31 @@ export default class Toolbar extends React.Component<PropsType> {
 	render() {
 		return (
 			<View style={ styles.toolbar }>
-				<TouchableNativeFeedback
+				<TouchableOpacity
 					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.PLUS, this.props.uid ) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>+</Text>
 					</View>
-				</TouchableNativeFeedback>
+				</TouchableOpacity>
 				<View style={ styles.buttonSeparator } />
-				<TouchableNativeFeedback
+				<TouchableOpacity
 					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.UP, this.props.uid ) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>▲</Text>
 					</View>
-				</TouchableNativeFeedback>
+				</TouchableOpacity>
 				<View style={ styles.buttonSeparator } />
-				<TouchableNativeFeedback
+				<TouchableOpacity
 					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DOWN, this.props.uid ) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>▼</Text>
 					</View>
-				</TouchableNativeFeedback>
+				</TouchableOpacity>
 				<View style={ styles.buttonSeparator } />
-				<TouchableNativeFeedback
+				<TouchableOpacity
 					onPress={ this.props.onButtonPressed.bind(
 						this,
 						ToolbarButton.SETTINGS,
@@ -51,15 +51,15 @@ export default class Toolbar extends React.Component<PropsType> {
 						{ /* eslint-disable-next-line jsx-a11y/accessible-emoji */ }
 						<Text>⚙️</Text>
 					</View>
-				</TouchableNativeFeedback>
+				</TouchableOpacity>
 				<View style={ styles.buttonSeparator } />
-				<TouchableNativeFeedback
+				<TouchableOpacity
 					onPress={ this.props.onButtonPressed.bind( this, ToolbarButton.DELETE, this.props.uid ) }
 				>
 					<View style={ styles.toolbarButton }>
 						<Text>🗑</Text>
 					</View>
-				</TouchableNativeFeedback>
+				</TouchableOpacity>
 			</View>
 		);
 	}
