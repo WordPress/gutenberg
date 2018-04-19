@@ -20,6 +20,8 @@ import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
 
+
+
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
  * authorization intact.
@@ -104,5 +106,6 @@ export function initializeEditor( id, post, settings ) {
 	} );
 }
 
+export { default as PluginPostStatusVisibility } from './components/sidebar/plugin-post-status-visibility';
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
