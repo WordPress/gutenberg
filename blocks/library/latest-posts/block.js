@@ -51,7 +51,7 @@ class LatestPostsBlock extends Component {
 	render() {
 		const latestPosts = this.props.latestPosts.data;
 		const { attributes, categoriesList, setAttributes } = this.props;
-		const { displayPostDate, align, layout, columns, order, orderBy, categories, postsToShow } = attributes;
+		const { displayPostDate, align, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -71,7 +71,7 @@ class LatestPostsBlock extends Component {
 						checked={ displayPostDate }
 						onChange={ this.toggleDisplayPostDate }
 					/>
-					{ layout === 'grid' &&
+					{ postLayout === 'grid' &&
 						<RangeControl
 							label={ __( 'Columns' ) }
 							value={ columns }
@@ -111,14 +111,14 @@ class LatestPostsBlock extends Component {
 			{
 				icon: 'list-view',
 				title: __( 'List View' ),
-				onClick: () => setAttributes( { layout: 'list' } ),
-				isActive: layout === 'list',
+				onClick: () => setAttributes( { postLayout: 'list' } ),
+				isActive: postLayout === 'list',
 			},
 			{
 				icon: 'grid-view',
 				title: __( 'Grid View' ),
-				onClick: () => setAttributes( { layout: 'grid' } ),
-				isActive: layout === 'grid',
+				onClick: () => setAttributes( { postLayout: 'grid' } ),
+				isActive: postLayout === 'grid',
 			},
 		];
 
@@ -137,8 +137,8 @@ class LatestPostsBlock extends Component {
 				</BlockControls>
 				<ul
 					className={ classnames( this.props.className, {
-						'is-grid': layout === 'grid',
-						[ `columns-${ columns }` ]: layout === 'grid',
+						'is-grid': postLayout === 'grid',
+						[ `columns-${ columns }` ]: postLayout === 'grid',
 					} ) }
 				>
 					{ displayPosts.map( ( post, i ) =>
