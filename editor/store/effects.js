@@ -208,20 +208,22 @@ export default {
 	REQUEST_AUTOSAVE_NOTICE( action, store ) {
 		const { autosaveStatus } = action;
 		const { dispatch } = store;
-		const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
-		if ( autosaveStatus ) {
-			dispatch( createWarningNotice(
-				<p>
-					<span>{ noticeMessage }</span>
-					{ ' ' }
-					<a href={ autosaveStatus.editLink }>{ __( 'View the autosave' ) }</a>
-				</p>,
-				{
-					id: AUTOSAVE_POST_NOTICE_ID,
-					spokenMessage: noticeMessage,
-				}
-			) );
+		if ( ! autosaveStatus ) {
+			return;
+
 		}
+		const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
+		dispatch( createWarningNotice(
+			<p>
+				<span>{ noticeMessage }</span>
+				{ ' ' }
+				<a href={ autosaveStatus.editLink }>{ __( 'View the autosave' ) }</a>
+			</p>,
+			{
+				id: AUTOSAVE_POST_NOTICE_ID,
+				spokenMessage: noticeMessage,
+			}
+		) );
 	},
 	TRASH_POST( action, store ) {
 		const { dispatch, getState } = store;
