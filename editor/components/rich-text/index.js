@@ -12,6 +12,7 @@ import {
 	defer,
 	noop,
 	reject,
+	get,
 } from 'lodash';
 import 'element-closest';
 
@@ -468,7 +469,8 @@ export class RichText extends Component {
 
 	getInsertionPosition() {
 		const container = this.getContainerNode();
-		const marginLeft = window.getComputedStyle( container )[ 'margin-left' ];
+		const containerStyle = window.getComputedStyle( container );
+		const marginLeft = get( containerStyle, 'margin-left', 0 );
 		const containerPosition = container.getBoundingClientRect();
 		const rect = getRectangleFromRange( this.editor.selection.getRng() );
 
