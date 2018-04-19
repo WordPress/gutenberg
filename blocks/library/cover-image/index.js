@@ -233,7 +233,9 @@ export const settings = {
 		return (
 			<div className={ classes } style={ style }>
 				{ title && title.length > 0 && (
-					<p className="wp-block-cover-image-text">{ title }</p>
+					<p className="wp-block-cover-image-text">
+						<RichText.Content>{ title }</RichText.Content>
+					</p>
 				) }
 			</div>
 		);
@@ -264,7 +266,9 @@ export const settings = {
 
 			return (
 				<section className={ classes } style={ style }>
-					<h2>{ title }</h2>
+					<h2>
+						<RichText.Content>{ title }</RichText.Content>
+					</h2>
 				</section>
 			);
 		},

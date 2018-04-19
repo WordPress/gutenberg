@@ -70,6 +70,10 @@ export const settings = {
 	},
 
 	save( { attributes, className } ) {
-		return <pre className={ className }>{ attributes.content }</pre>;
+		return (
+			<pre className={ className }>
+				<RichText.Content>{ attributes.content }</RichText.Content>
+			</pre>
+		);
 	},
 };

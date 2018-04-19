@@ -194,7 +194,11 @@ export const settings = {
 
 			<figure className={ align ? `align${ align }` : null }>
 				{ src && <video controls src={ src } /> }
-				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && (
+					<figcaption>
+						<RichText.Content>{ caption }</RichText.Content>
+					</figcaption>
+				) }
 			</figure>
 		);
 	},

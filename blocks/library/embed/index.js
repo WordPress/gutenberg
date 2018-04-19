@@ -250,7 +250,11 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			return (
 				<figure className={ embedClassName }>
 					{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+					{ caption && caption.length > 0 && (
+						<figcaption>
+							<RichText.Content>{ caption }</RichText.Content>
+						</figcaption>
+					) }
 				</figure>
 			);
 		},

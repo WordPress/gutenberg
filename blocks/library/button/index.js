@@ -217,7 +217,7 @@ export const settings = {
 		return (
 			<div className={ `align${ align }` }>
 				<a className={ linkClass } href={ url } title={ title } style={ buttonStyle }>
-					{ text }
+					<RichText.Content>{ text }</RichText.Content>
 				</a>
 			</div>
 		);
@@ -232,7 +232,7 @@ export const settings = {
 			return (
 				<div className={ `align${ align }` } style={ { backgroundColor: color } }>
 					<a href={ url } title={ title } style={ { color: textColor } }>
-						{ text }
+						<RichText.Content>{ text }</RichText.Content>
 					</a>
 				</div>
 			);

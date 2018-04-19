@@ -69,6 +69,11 @@ a traditional `input` field, usually when the user exits the field.
 
 *Optional.* A list of autocompleters to use instead of the default.
 
+## RichText.Content
+
+When using RichText in the edit function of blocks, the usage of `RichText.Content` is recommended in the save function of your blocks to save the correct HTML.
+
+
 ## Example
 
 {% codetabs %}
@@ -95,6 +100,12 @@ wp.blocks.registerBlockType( /* ... */, {
 			}
 		} );
 	},
+
+	save: function() {
+		return wp.element.createElement( 'h2, {},
+			wp.element.createElement( wp.blocks.RichText.Content, {}, props.attributes.content )
+		);
+	}
 } );
 ```
 {% ESNext %}
@@ -122,6 +133,14 @@ registerBlockType( /* ... */, {
 			/>
 		);
 	},
+
+	save( { attributes } ) {
+		return (
+			<h2>
+				<RichText.Content>{attributes.content}</RichText.Content>
+			</h2>
+		);
+	}
 } );
 ```
 {% end %}

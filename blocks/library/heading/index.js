@@ -172,7 +172,7 @@ export const settings = {
 
 		return (
 			<Tag style={ { textAlign: align } } >
-				{ content }
+				<RichText.Content>{ content }</RichText.Content>
 			</Tag>
 		);
 	},

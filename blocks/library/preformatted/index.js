@@ -79,6 +79,6 @@ export const settings = {
 	save( { attributes } ) {
 		const { content } = attributes;
 
-		return <pre>{ content }</pre>;
+		return <pre><RichText.Content>{ content }</RichText.Content></pre>;
 	},
 };

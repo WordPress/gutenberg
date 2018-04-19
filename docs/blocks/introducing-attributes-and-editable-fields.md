@@ -51,7 +51,9 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	save: function( props ) {
 		var content = props.attributes.content;
 
-		return el( 'p', { className: props.className }, content );
+		return el( 'p', { className: props.className },
+			el( RichText.Content, {}, content
+		);
 	},
 } );
 ```
@@ -94,7 +96,11 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	save( { attributes, className } ) {
 		const { content } = attributes;
 
-		return <p className={ className }>{ content }</p>;
+		return (
+			<p className={ className }>
+				<RichText.Content>{ content }</RichText.Content>
+			</p>
+		);
 	},
 } );
 ```
@@ -112,4 +118,4 @@ The `RichText` component can be considered as a super-powered `textarea` element
 
 Implementing this behavior as a component enables you as the block implementer to be much more granular about editable fields. Your block may not need `RichText` at all, or it may need many independent `RichText` elements, each operating on a subset of the overall block state.
 
-Because `RichText` allows for nested nodes, you'll most often use it in conjunction with the `children` attribute source when extracting the value from saved content.
+Because `RichText` allows for nested nodes, you'll most often use it in conjunction with the `children` attribute source when extracting the value from saved content. You'll also most likely use `RichText.Content` in the `save` function to output RichText values.

@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import './style.scss';
 import './editor.scss';
 import { createBlock, getBlockAttributes, getBlockType } from '../../api';
+import RichText from '../../rich-text';
 import ImageBlock from './block';
 
 export const name = 'core/image';
@@ -173,7 +174,11 @@ export const settings = {
 		return (
 			<figure className={ align ? `align${ align }` : null }>
 				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && (
+					<figcaption>
+						<RichText.Content>{ caption }</RichText.Content>
+					</figcaption>
+				) }
 			</figure>
 		);
 	},
@@ -197,7 +202,11 @@ export const settings = {
 				return (
 					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
 						{ href ? <a href={ href }>{ image }</a> : image }
-						{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+						{ caption && caption.length > 0 && (
+							<figcaption>
+								<RichText.Content>{ caption }</RichText.Content>
+							</figcaption>
+						) }
 					</figure>
 				);
 			},
