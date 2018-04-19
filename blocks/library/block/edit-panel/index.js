@@ -55,7 +55,7 @@ class SharedBlockEditPanel extends Component {
 	}
 
 	render() {
-		const { isEditing, title, isSaving, onEdit, onSave, onCancel } = this.props;
+		const { isEditing, title, isSaving, onEdit, onCancel } = this.props;
 
 		return (
 			<Fragment>
@@ -92,7 +92,6 @@ class SharedBlockEditPanel extends Component {
 							isBusy={ isSaving }
 							disabled={ ! title || isSaving }
 							className="shared-block-edit-panel__button"
-							onClick={ onSave }
 						>
 							{ __( 'Save' ) }
 						</Button>

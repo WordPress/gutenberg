@@ -46,7 +46,7 @@ export const withEditorSettings = ( mapSettingsToProps ) => createHigherOrderCom
 		return function WithSettingsComponent( props ) {
 			return (
 				<EditorSettings.Consumer>
-					{ settings => (
+					{ ( settings ) => (
 						<Component
 							{ ...props }
 							{ ...( mapSettingsToProps ? mapSettingsToProps( settings, props ) : { settings } ) }

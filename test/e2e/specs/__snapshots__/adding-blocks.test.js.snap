@@ -11,7 +11,7 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\">
-    <p>Quote block</p>
+	<p>Quote block</p>
 </blockquote>
 <!-- /wp:quote -->
 

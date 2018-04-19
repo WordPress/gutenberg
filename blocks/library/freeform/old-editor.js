@@ -159,7 +159,7 @@ export default class OldEditor extends Component {
 			<div
 				key="toolbar"
 				id={ `toolbar-${ id }` }
-				ref={ ref => this.ref = ref }
+				ref={ ( ref ) => this.ref = ref }
 				className="freeform-toolbar"
 				onClick={ this.focus }
 				data-placeholder={ __( 'Classic' ) }

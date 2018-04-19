@@ -18,8 +18,8 @@ import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
 
-const toRichTextValue = value => map( value, ( subValue => subValue.children ) );
-const fromRichTextValue = value => map( value, ( subValue ) => ( {
+const toRichTextValue = ( value ) => map( value, ( ( subValue ) => subValue.children ) );
+const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
 	children: subValue,
 } ) );
 const blockAttributes = {

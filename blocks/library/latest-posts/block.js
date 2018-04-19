@@ -9,7 +9,7 @@ import { stringify } from 'querystringify';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import {
 	PanelBody,
 	Placeholder,
@@ -50,11 +50,11 @@ class LatestPostsBlock extends Component {
 
 	render() {
 		const latestPosts = this.props.latestPosts.data;
-		const { attributes, categoriesList, isSelected, setAttributes } = this.props;
+		const { attributes, categoriesList, setAttributes } = this.props;
 		const { displayPostDate, align, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
 
-		const inspectorControls = isSelected && (
-			<InspectorControls key="inspector">
+		const inspectorControls = (
+			<InspectorControls>
 				<PanelBody title={ __( 'Latest Posts Settings' ) }>
 					<QueryControls
 						{ ...{ order, orderBy } }
@@ -86,18 +86,20 @@ class LatestPostsBlock extends Component {
 
 		const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 		if ( ! hasPosts ) {
-			return [
-				inspectorControls,
-				<Placeholder key="placeholder"
-					icon="admin-post"
-					label={ __( 'Latest Posts' ) }
-				>
-					{ ! Array.isArray( latestPosts ) ?
-						<Spinner /> :
-						__( 'No posts found.' )
-					}
-				</Placeholder>,
-			];
+			return (
+				<Fragment>
+					{ inspectorControls }
+					<Placeholder
+						icon="admin-post"
+						label={ __( 'Latest Posts' ) }
+					>
+						{ ! Array.isArray( latestPosts ) ?
+							<Spinner /> :
+							__( 'No posts found.' )
+						}
+					</Placeholder>
+				</Fragment>
+			);
 		}
 
 		// Removing posts from display should be instant.
@@ -120,10 +122,10 @@ class LatestPostsBlock extends Component {
 			},
 		];
 
-		return [
-			inspectorControls,
-			isSelected && (
-				<BlockControls key="controls">
+		return (
+			<Fragment>
+				{ inspectorControls }
+				<BlockControls>
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ ( nextAlign ) => {
@@ -133,26 +135,25 @@ class LatestPostsBlock extends Component {
 					/>
 					<Toolbar controls={ layoutControls } />
 				</BlockControls>
-			),
-			<ul
-				className={ classnames( this.props.className, {
-					'is-grid': postLayout === 'grid',
-					[ `columns-${ columns }` ]: postLayout === 'grid',
-				} ) }
-				key="latest-posts"
-			>
-				{ displayPosts.map( ( post, i ) =>
-					<li key={ i }>
-						<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
-						{ displayPostDate && post.date_gmt &&
-							<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
-								{ moment( post.date_gmt ).local().format( 'MMMM DD, Y' ) }
-							</time>
-						}
-					</li>
-				) }
-			</ul>,
-		];
+				<ul
+					className={ classnames( this.props.className, {
+						'is-grid': postLayout === 'grid',
+						[ `columns-${ columns }` ]: postLayout === 'grid',
+					} ) }
+				>
+					{ displayPosts.map( ( post, i ) =>
+						<li key={ i }>
+							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
+							{ displayPostDate && post.date_gmt &&
+								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
+									{ moment( post.date_gmt ).local().format( 'MMMM DD, Y' ) }
+								</time>
+							}
+						</li>
+					) }
+				</ul>
+			</Fragment>
+		);
 	}
 }
 
@@ -164,7 +165,7 @@ export default withAPIData( ( props ) => {
 		orderBy,
 		per_page: postsToShow,
 		_fields: [ 'date_gmt', 'link', 'title' ],
-	}, value => ! isUndefined( value ) ) );
+	}, ( value ) => ! isUndefined( value ) ) );
 	const categoriesListQuery = stringify( {
 		per_page: 100,
 		_fields: [ 'id', 'name', 'parent' ],

@@ -112,7 +112,7 @@ describe( 'rawHandler', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		equal( filtered, '<ul>\n    <li>one</li>\n    <li>two</li>\n    <li>three</li>\n</ul>' );
+		equal( filtered, '<ul>\n\t<li>one</li>\n\t<li>two</li>\n\t<li>three</li>\n</ul>' );
 	} );
 
 	it( 'should parse inline Markdown', () => {
