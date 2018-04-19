@@ -172,7 +172,7 @@ class FlatTermSelector extends Component {
 		);
 		const termAddedLabel = sprintf( _x( '%s added', 'term' ), singularName );
 		const termRemovedLabel = sprintf( _x( '%s removed', 'term' ), singularName );
-		const removeTermLabel = sprintf( _x( 'Remove %s: %%s', 'term' ), singularName );
+		const removeTermLabel = sprintf( _x( 'Remove %s', 'term' ), singularName );
 
 		return (
 			<FormTokenField
