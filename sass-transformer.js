@@ -60,7 +60,7 @@ if ( reactNativeMinorVersion >= 52 ) {
 }
 
 // TODO: need to find a way to pass the include paths and the default asset files via some config
-const autoImportIncludePaths = [ 'src', 'gutenberg/edit-post/assets/stylesheets' ];
+const autoImportIncludePaths = [ 'gutenberg/edit-post/assets/stylesheets' ];
 const autoImportAssets = [
 	'_colors.scss',
 	'_admin-schemes.scss',
