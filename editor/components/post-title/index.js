@@ -89,10 +89,6 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		if ( get( window, 'customGutenberg.editor.hideTitle' ) ) {
-			return <h1 className="screen-reader-text">{ title }</h1>;
-		}
-
 		const { title, placeholder, instanceId, isPostTypeViewable } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
