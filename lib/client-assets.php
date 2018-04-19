@@ -799,6 +799,7 @@ function gutenberg_capture_code_editor_settings( $settings ) {
 	$gutenberg_captured_code_editor_settings = $settings;
 	return false;
 }
+
 /**
  * Retrieve a stored autosave that is newer than the post save.
  *
