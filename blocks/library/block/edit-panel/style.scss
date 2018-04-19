@@ -26,10 +26,10 @@
 	}
 
 	.shared-block-edit-panel__title {
+		flex: 1 1 100%;
 		font-size: 14px;
 		height: 30px;
 		margin: #{ $item-spacing / 2 } 0 $item-spacing;
-		min-width: 100%;
 	}
 
 	// Needs specificity to override the margin-bottom set by .button
@@ -41,9 +41,7 @@
 		flex-wrap: nowrap;
 
 		.shared-block-edit-panel__title {
-			flex-grow: 1;
 			margin: 0;
-			width: auto;
 		}
 
 		.wp-core-ui & .shared-block-edit-panel__button {
