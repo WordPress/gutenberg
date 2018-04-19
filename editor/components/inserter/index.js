@@ -139,11 +139,16 @@ class Inserter extends Component {
 
 							onClose();
 						};
+						const onImageSelect = () => {
+							this.setState( { mediaLibraryOpen: true } );
+
+							onClose();
+						};
 
 						if ( this.state.isInline ) {
 							return (
 								<InserterInlineMenu
-									onImageSelect={ () => this.setState( { mediaLibraryOpen: true } ) }
+									onImageSelect={ onImageSelect }
 								/>
 							);
 						}
