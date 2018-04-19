@@ -120,7 +120,7 @@ function transform( src, filename, options ) {
 				const importerOptions = this.options;
 				const incPaths = importerOptions.includePaths.slice( 0 ).split( ':' );
 				if ( urlPath.dir.length > 0 ) {
-					incPaths.unshift( urlPath.dir ); // add the file's dir to the search array
+					incPaths.unshift( path.resolve( path.dirname( filename ), urlPath.dir ) ); // add the file's dir to the search array
 				}
 				const f = findVariant( urlPath.name, exts, incPaths );
 

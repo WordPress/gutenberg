@@ -149,7 +149,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						onValueChange={ value => this.setState( { showHtml: value } ) }
 					/>
 				</View>
-				{ this.state.showHtml && <Text style={ styles.list }>{ this.serializeToHtml() }</Text> }
+				{ this.state.showHtml && <Text style={ styles.htmlView }>{ this.serializeToHtml() }</Text> }
 				{ ! this.state.showHtml && list }
 			</View>
 		);
