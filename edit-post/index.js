@@ -8,6 +8,7 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
  */
 import './assets/stylesheets/main.scss';
 import './hooks';
+import './plugins';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';

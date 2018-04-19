@@ -18,11 +18,12 @@
 }
 
 .table-of-contents__count {
-	width: 25%;
+	width: 50%;
 	display: flex;
 	flex-direction: column;
 	font-size: $default-font-size;
 	color: $dark-gray-300;
+	margin-bottom: 5px;
 }
 
 .table-of-contents__number,

@@ -12,7 +12,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	Inserter,
 	BlockToolbar,
-	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 	MultiBlocksSwitcher,
@@ -33,7 +32,6 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 			<Inserter position="bottom right" />
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
-			<TableOfContents />
 			<MultiBlocksSwitcher />
 			{ hasFixedToolbar && isLargeViewport && (
 				<div className="edit-post-header-toolbar__block-toolbar">
