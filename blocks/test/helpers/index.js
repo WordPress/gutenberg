@@ -37,7 +37,7 @@ export function registerCoreBlocks() {
 	const dirs = fs.readdirSync( __dirname + '/../../library' );
 
 	dirs.forEach( ( dir ) => {
-		if ( ! dir.includes( '.' ) ) {
+		if ( dir.substring( 0, 1 ) != "." ) {
 			require( '../../library/' + dir );
 		}
 	} );
