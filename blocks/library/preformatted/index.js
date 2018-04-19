@@ -15,7 +15,7 @@ export const name = 'core/preformatted';
 export const settings = {
 	title: __( 'Preformatted' ),
 
-	description: __( 'Preformatted text keeps your spaces, tabs and linebreaks as they are.' ),
+	description: __( 'Preformatted text keeps your spaces, tabs and line breaks as they are.' ),
 
 	icon: 'text',
 
