@@ -18,7 +18,7 @@ global.wp = {
 	'edit-post',
 	'viewport',
 	'plugins',
-].forEach( entryPointName => {
+].forEach( ( entryPointName ) => {
 	Object.defineProperty( global.wp, entryPointName, {
 		get: () => require( entryPointName ),
 	} );

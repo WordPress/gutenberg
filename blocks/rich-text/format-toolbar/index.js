@@ -148,7 +148,7 @@ class FormatToolbar extends Component {
 		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow } = this.state;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
-			.filter( control => enabledControls.indexOf( control.format ) !== -1 )
+			.filter( ( control ) => enabledControls.indexOf( control.format ) !== -1 )
 			.map( ( control ) => {
 				if ( control.format === 'link' ) {
 					const isFormatActive = this.isFormatActive( 'link' );
