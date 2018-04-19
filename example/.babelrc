@@ -1,3 +1,10 @@
 {
-  "presets": ["react-native"]
+  "presets": ["react-native"],
+  "plugins": [
+    ["module-resolver", {
+      "alias": {
+        "react-native-aztec": "../"
+      }
+    }]
+  ]
 }
