@@ -11,8 +11,8 @@ import {
 	some,
 	sortBy,
 	isEmpty,
+	find,
 } from 'lodash';
-import scrollIntoView from 'dom-scroll-into-view';
 import classnames from 'classnames';
 
 /**
@@ -113,19 +113,12 @@ export class InserterMenu extends Component {
 		if ( ! this.props.isLargeViewport ) {
 			this.setState( { isNavigationOpened: false } );
 		}
-
-		// Wait for a rerender so the tab is rendered
-		this.props.setTimeout( () => {
-			scrollIntoView( this.tabs[ tab ], this.scrollContainer, {
-				onlyScrollIfNeeded: true,
-				alignWithTop: true,
-			} );
-		} );
 	}
 
 	toggleNavigation() {
 		this.setState( ( state ) => ( {
 			isNavigationOpened: ! state.isNavigationOpened,
+			selectedTab: null,
 		} ) );
 	}
 
@@ -294,8 +287,9 @@ export class InserterMenu extends Component {
 
 	render() {
 		const { instanceId, items } = this.props;
-		const { selectedItem, isNavigationOpened } = this.state;
+		const { selectedItem, isNavigationOpened, selectedTab } = this.state;
 		const isSearching = this.state.filterValue;
+		const visibleTabs = selectedTab ? [ find( tabs, ( tab ) => tab.name === selectedTab ) ] : tabs;
 
 		// Disable reason: The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of
@@ -327,16 +321,31 @@ export class InserterMenu extends Component {
 						onClick={ this.toggleNavigation }
 					/>
 				</div>
-				{ isNavigationOpened && <BlockInserterNavigation onSelect={ this.selectTab } onClose={ this.toggleNavigation } /> }
-				<div className="editor-inserter__results" ref={ this.bindScrollContainer }>
-					{ ! isSearching && tabs.map( ( tab ) => (
+				{ isNavigationOpened && (
+					<BlockInserterNavigation
+						onSelect={ this.selectTab }
+						onClose={ this.toggleNavigation }
+						selected={ selectedTab }
+						ariaControlsPrefix={ `editor-inserter-tabpanel-${ instanceId }` }
+					/>
+				) }
+				<div
+					className="editor-inserter__results"
+					ref={ this.bindScrollContainer }
+				>
+					{ ! isSearching && visibleTabs.map( ( tab ) => (
 						<div
 							key={ tab.name }
-							role="menu"
+							role="tabpanel"
+							tabIndex="0"
+							id={ `editor-inserter-tabpanel-${ instanceId }-${ tab.name }` }
 							className={ classnames( 'editor-inserter__tab', 'is-' + tab.name ) }
 							ref={ this.bindTab( tab.name ) }
+							aria-labelledby={ `editor-inserter-tabpanel-${ instanceId }-${ tab.name }-label` }
 						>
-							<div className="editor-inserter__tab-title">{ tab.title }</div>
+							<div className="editor-inserter__tab-title" id={ `editor-inserter-tabpanel-${ instanceId }-${ tab.name }-label` }>
+								{ tab.title }
+							</div>
 							{ this.renderTabView( tab.name ) }
 						</div>
 					) ) }
