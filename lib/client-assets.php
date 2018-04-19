@@ -297,33 +297,33 @@ function gutenberg_register_scripts_and_styles() {
 
 	wp_register_style(
 		'wp-editor',
-		gutenberg_url( 'editor/build/style.css' ),
+		gutenberg_url( 'build/editor.css' ),
 		array( 'wp-components', 'wp-blocks', 'wp-editor-font' ),
-		filemtime( gutenberg_dir_path() . 'editor/build/style.css' )
+		filemtime( gutenberg_dir_path() . 'build/editor.css' )
 	);
 	wp_style_add_data( 'wp-editor', 'rtl', 'replace' );
 
 	wp_register_style(
 		'wp-edit-post',
-		gutenberg_url( 'edit-post/build/style.css' ),
+		gutenberg_url( 'build/editPost.css' ),
 		array( 'wp-components', 'wp-editor' ),
-		filemtime( gutenberg_dir_path() . 'edit-post/build/style.css' )
+		filemtime( gutenberg_dir_path() . 'build/editPost.css' )
 	);
 	wp_style_add_data( 'wp-edit-post', 'rtl', 'replace' );
 
 	wp_register_style(
 		'wp-components',
-		gutenberg_url( 'components/build/style.css' ),
+		gutenberg_url( 'build/components.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'components/build/style.css' )
+		filemtime( gutenberg_dir_path() . 'build/components.css' )
 	);
 	wp_style_add_data( 'wp-components', 'rtl', 'replace' );
 
 	wp_register_style(
 		'wp-blocks',
-		gutenberg_url( 'blocks/build/style.css' ),
+		gutenberg_url( 'build/blocks.css' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'blocks/build/style.css' )
+		filemtime( gutenberg_dir_path() . 'build/blocks.css' )
 	);
 	wp_style_add_data( 'wp-blocks', 'rtl', 'replace' );
 
