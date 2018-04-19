@@ -5,6 +5,7 @@ import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	setUnknownTypeHandlerName,
 } from '@wordpress/blocks';
 
 /**
@@ -46,3 +47,5 @@ export const settings = {
 };
 
 registerBlockType( name, settings );
+
+setUnknownTypeHandlerName( name );
