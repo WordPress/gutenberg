@@ -9,6 +9,7 @@ import { format } from 'util';
 /**
  * Internal dependencies
  */
+import { registerCoreBlocks } from './helpers';
 import parse from '../api/parser';
 import { parse as grammarParse } from '../api/post.pegjs';
 import serialize from '../api/serializer';
@@ -100,7 +101,7 @@ describe( 'full post content fixture', () => {
 		// Load all hooks that modify blocks
 		require( 'blocks/hooks' );
 
-		// TODO: Need to load/register core blocks. Maybe requireIndex ?
+		registerCoreBlocks();
 	} );
 
 	fileBasenames.forEach( ( f ) => {

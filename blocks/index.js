@@ -32,6 +32,7 @@ export { default as PlainText } from './plain-text';
 export { default as MediaUpload } from './media-upload';
 export { default as RichText } from './rich-text';
 export { default as RichTextProvider } from './rich-text/provider';
+export { registerCoreBlocks } from './test/helpers';
 export { default as UrlInput } from './url-input';
 export { default as UrlInputButton } from './url-input/button';
 export { default as EditorSettings, withEditorSettings } from './editor-settings';

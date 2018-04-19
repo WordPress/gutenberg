@@ -6,7 +6,7 @@ import { mount, shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, registerCoreBlocks } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,7 +16,8 @@ import { DocumentOutline } from '../';
 jest.mock( '../../block-title', () => () => 'Block Title' );
 
 describe( 'DocumentOutline', () => {
-	// TODO: Need to load/register core blocks. Maybe requireIndex ?
+
+	registerCoreBlocks();
 
 	const paragraph = createBlock( 'core/paragraph' );
 	const headingH1 = createBlock( 'core/heading', {

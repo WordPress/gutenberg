@@ -7,7 +7,7 @@ import { filter, property, union } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
+import { registerBlockType, registerCoreBlocks, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 
 /**
@@ -2626,6 +2626,7 @@ describe( 'selectors', () => {
 	describe( 'getFrecentInserterItems', () => {
 		beforeAll( () => {
 			// TODO: Need to load/register core blocks (or at least some demo blocks). Maybe requireIndex ?
+			registerCoreBlocks();
 		} );
 
 		it( 'should return the most frecently used blocks', () => {

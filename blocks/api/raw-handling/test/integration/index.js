@@ -11,6 +11,8 @@ import path from 'path';
 import rawHandler from '../../index';
 import serialize from '../../../serializer';
 
+import { registerCoreBlocks } from '../../../../test/helpers';
+
 const types = [
 	'plain',
 	'classic',
@@ -29,7 +31,7 @@ describe( 'raw handling: integration', () => {
 		// Load all hooks that modify blocks
 		require( 'blocks/hooks' );
 
-		// TODO: Need to load/register core blocks. Maybe requireIndex ?
+		registerCoreBlocks();
 	} );
 
 	types.forEach( ( type ) => {
