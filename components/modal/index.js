@@ -49,7 +49,6 @@ class Modal extends Component {
 	}
 
 	render() {
-		this.props.style = this.props.style || {};
 		const {
 			overlayClassName,
 			className,
