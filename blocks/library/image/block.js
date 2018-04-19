@@ -157,21 +157,19 @@ class ImageBlock extends Component {
 					/>
 
 					<Toolbar>
-						{ ! get( window, 'customGutenberg.editor.noMediaLibrary' ) &&
-							<MediaUpload
-								onSelect={ this.onSelectImage }
-								type="image"
-								value={ id }
-								render={ ( { open } ) => (
-									<IconButton
-										className="components-toolbar__control"
-										label={ __( 'Edit image' ) }
-										icon="edit"
-										onClick={ open }
-									/>
-								) }
-							/>
-						}
+						<MediaUpload
+							onSelect={ this.onSelectImage }
+							type="image"
+							value={ id }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
 						<UrlInputButton onChange={ this.onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>

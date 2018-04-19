@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { filter, pick, get } from 'lodash';
+import { filter, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -170,7 +170,7 @@ class GalleryBlock extends Component {
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
-				{ ! get( window, 'customGutenberg.editor.noMediaLibrary' ) && !! images.length && (
+				{ !! images.length && (
 					<Toolbar>
 						<MediaUpload
 							onSelect={ this.onSelectImages }

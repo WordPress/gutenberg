@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, get } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -133,23 +133,21 @@ export const settings = {
 					/>
 
 					{ alignmentToolbar }
-					{ ! get( window, 'customGutenberg.editor.noMediaLibrary' ) &&
-						<Toolbar>
-							<MediaUpload
-								onSelect={ onSelectImage }
-								type="image"
-								value={ id }
-								render={ ( { open } ) => (
-									<IconButton
-										className="components-toolbar__control"
-										label={ __( 'Edit image' ) }
-										icon="edit"
-										onClick={ open }
-									/>
-								) }
-							/>
-						</Toolbar>
-					}
+					<Toolbar>
+						<MediaUpload
+							onSelect={ onSelectImage }
+							type="image"
+							value={ id }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
+					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Cover Image Settings' ) }>

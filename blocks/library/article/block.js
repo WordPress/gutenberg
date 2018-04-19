@@ -159,23 +159,21 @@ class ArticleBlock extends Component {
 		const controls = isSelected && [
 			<BlockControls key="controls">
 				{ alignmentToolbar }
-				{ ! get( window, 'customGutenberg.editor.noMediaLibrary' ) &&
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImage }
-							type="image"
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
-					</Toolbar>
-				}
+				<Toolbar>
+					<MediaUpload
+						onSelect={ this.onSelectImage }
+						type="image"
+						value={ id }
+						render={ ( { open } ) => (
+							<IconButton
+								className="components-toolbar__control"
+								label={ __( 'Edit image' ) }
+								icon="edit"
+								onClick={ open }
+							/>
+						) }
+					/>
+				</Toolbar>
 			</BlockControls>,
 			<InspectorControls key="inspector">
 				<PanelBody title={ __( 'Article Settings' ) }>

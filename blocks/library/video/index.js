@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -152,18 +147,16 @@ export const settings = {
 						>
 							{ __( 'Upload' ) }
 						</FormFileUpload>
-						{ ! get( window, 'customGutenberg.editor.noMediaLibrary' ) &&
-							<MediaUpload
-								onSelect={ onSelectVideo }
-								type="video"
-								id={ id }
-								render={ ( { open } ) => (
-									<Button isLarge onClick={ open } >
-										{ __( 'Media Library' ) }
-									</Button>
-								) }
-							/>
-						}
+						<MediaUpload
+							onSelect={ onSelectVideo }
+							type="video"
+							id={ id }
+							render={ ( { open } ) => (
+								<Button isLarge onClick={ open } >
+									{ __( 'Media Library' ) }
+								</Button>
+							) }
+						/>
 					</Placeholder>,
 				];
 			}

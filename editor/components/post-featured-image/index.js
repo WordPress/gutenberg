@@ -54,7 +54,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 						{ __( 'Click the image to edit or update' ) }
 					</p>
 				}
-				{ ! get( window, 'customGutenberg.editor.noMediaLibrary' ) && ! featuredImageId &&
+				{ ! featuredImageId &&
 					<MediaUpload
 						title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
 						onSelect={ onUpdateImage }
