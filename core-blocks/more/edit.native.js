@@ -19,18 +19,18 @@ export function edit( { attributes, setAttributes, isSelected } ) {
 	const value = customText !== undefined ? customText : defaultText;
 
 	return (
-		<View className={ styles.blocks_more_container }>
-			<View className={ styles.blocks_more_sub_container }>
-				<Text className={ styles.blocks_more_left_marker }>&lt;!--</Text>
+		<View className={ styles[ 'blocks-more-container' ] }>
+			<View className={ styles[ 'blocks-more-sub-container' ] }>
+				<Text className={ styles[ 'blocks-more-left-marker' ] }>&lt;!--</Text>
 				<PlainText
-					className={ styles.blocks_more_plain_text }
+					className={ styles[ 'blocks-more-plain-text' ] }
 					value={ value }
 					multiline={ true }
 					underlineColorAndroid="transparent"
 					onChange={ value => setAttributes( { customText: value } ) }
 					placeholder={ defaultText }
 				/>
-				<Text className={ styles.blocks_more_right_marker }>--&gt;</Text>
+				<Text className={ styles[ 'blocks-more-right-marker' ] }>--&gt;</Text>
 			</View>
 		</View> );
 }
