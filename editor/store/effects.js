@@ -18,13 +18,14 @@ import {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
+import { doAction } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
-import { getPostEditUrl, getWPAdminURL } from '../utils/url';
+import { getWPAdminURL } from '../utils/url';
 import {
 	setupEditorState,
 	resetPost,
@@ -176,13 +177,12 @@ export default {
 			) );
 		}
 
-		if ( get( window.history.state, 'id' ) !== post.id ) {
-			window.history.replaceState(
-				{ id: post.id },
-				'Post ' + post.id,
-				getPostEditUrl( post.id )
-			);
-		}
+		/**
+		 * Fires after the post is saved.
+		 *
+		 * @param {Object} post Post object.
+		 */
+		doAction( 'editor.postSaveSucceeded', post );
 	},
 	REQUEST_POST_UPDATE_FAILURE( action, store ) {
 		const { post, edits } = action;
