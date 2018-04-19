@@ -48,6 +48,7 @@ export default class Toolbar extends React.Component<PropsType> {
 					) }
 				>
 					<View style={ styles.toolbarButton }>
+						{ /* eslint-disable-next-line jsx-a11y/accessible-emoji */ }
 						<Text>⚙️</Text>
 					</View>
 				</TouchableNativeFeedback>
