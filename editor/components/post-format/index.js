@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { find, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -30,9 +30,10 @@ const POST_FORMATS = [
 	{ id: 'chat', caption: __( 'Chat' ) },
 ];
 
-function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFormat, instanceId } ) {
+function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFormats, suggestedFormat, instanceId } ) {
 	const postFormatSelectorId = 'post-format-selector-' + instanceId;
-	const suggestion = find( POST_FORMATS, ( format ) => format.id === suggestedFormat );
+	const formats = POST_FORMATS.filter( ( format ) => 'standard' === format.id || supportedFormats.includes( format.id ) );
+	const suggestion = find( formats, ( format ) => format.id === suggestedFormat );
 
 	// Disable reason: We need to change the value immiediately to show/hide the suggestion if needed
 
@@ -47,7 +48,7 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFor
 						onChange={ ( event ) => onUpdatePostFormat( event.target.value ) }
 						id={ postFormatSelectorId }
 					>
-						{ POST_FORMATS.map( ( format ) => (
+						{ formats.map( ( format ) => (
 							<option key={ format.id } value={ format.id }>{ format.caption }</option>
 						) ) }
 					</select>
@@ -70,8 +71,11 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFor
 export default compose( [
 	withSelect( ( select ) => {
 		const { getEditedPostAttribute, getSuggestedPostFormat } = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			postFormat: getEditedPostAttribute( 'format' ),
+			supportedFormats: get( postType, [ 'formats' ], [] ),
 			suggestedFormat: getSuggestedPostFormat(),
 		};
 	} ),
