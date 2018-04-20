@@ -31,7 +31,7 @@ It will run lint, generate the `dist` files and add the `package.json` and `READ
 Finally, you can publish the package! Go to the `gutenberg-package` folder and run the following command (*Note* you have to be [logged in](https://docs.npmjs.com/cli/adduser)):
 
 ```
-npm publish --access=public
+npm publish
 ```
 
 Additionaly, you can add `--tag=beta` option.

@@ -38,7 +38,7 @@ class ArticlesList extends Component {
 		const { dragging } = this.state;
 		const { articles } = this.props;
 
-		return map( articles, article => {
+		return map( articles, ( article ) => {
 			const elementId = `article-item-${ article.id }`;
 
 			return (

@@ -289,7 +289,7 @@ export class InserterMenu extends Component {
 				{ ! isSearching &&
 					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
 						onSelect={ this.switchTab }
-						tabs={ this.tabs.map( tab => tab.options ) }
+						tabs={ this.tabs.map( ( tab ) => tab.options ) }
 					>
 						{ ( tabKey ) => (
 							<div ref={ ( ref ) => this.tabContainer = ref }>

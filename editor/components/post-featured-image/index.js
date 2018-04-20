@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -59,7 +64,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 							onSelect={ onUpdateImage }
 							type="image"
 							modalClass="editor-post-featured-image__media-modal"
-							render={ ( { open } )=>(
+							render={ ( { open } ) => (
 								<Button className="editor-post-featured-image__toggle button-link" onClick={ open }>
 									{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
 								</Button>

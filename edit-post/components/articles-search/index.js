@@ -21,7 +21,7 @@ export default withAPIData( ( props ) => {
 		orderBy: props.options.orderBy || 'date',
 	};
 
-	const articlesListQuery = stringify( pickBy( options, value => ! isUndefined( value ) ) );
+	const articlesListQuery = stringify( pickBy( options, ( value ) => ! isUndefined( value ) ) );
 
 	return {
 		articlesList: `/wp/v2/articles?${ articlesListQuery }`,

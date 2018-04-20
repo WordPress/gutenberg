@@ -90,5 +90,5 @@ window.wpApiSettings = window.wpApiSettings || {};
 window.wpApiSettings.root = window.wpApiSettings.root || window.location.origin;
 window.wpApiSettings.nonce = window.wpApiSettings.nonce || '123456789';
 window.wpApiSettings.schema = window.wpApiSettings.schema || {};
-window.wpApiSettings.schema.routes = window.wpApiSettings.routes || {};
+window.wpApiSettings.schema.routes = window.wpApiSettings.schema.routes || {};
 window.wpApiSettings.schema.routes[ '\/wp\/v2\/posts' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/posts' ] || { methods: [ 'GET' ] };
