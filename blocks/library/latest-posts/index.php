@@ -56,6 +56,10 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' columns-' . $attributes['columns'];
 	}
 
+	if ( isset( $attributes['className'] ) ) {
+		$class .= ' ' . $attributes['className'];
+	}
+
 	$block_content = sprintf(
 		'<ul class="%1$s">%2$s</ul>',
 		esc_attr( $class ),
@@ -72,6 +76,9 @@ function register_block_core_latest_posts() {
 	register_block_type( 'core/latest-posts', array(
 		'attributes'      => array(
 			'categories'      => array(
+				'type' => 'string',
+			),
+			'className'       => array(
 				'type' => 'string',
 			),
 			'postsToShow'     => array(
