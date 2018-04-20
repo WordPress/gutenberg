@@ -876,7 +876,7 @@ RichText.defaultProps = {
 	format: 'element',
 };
 
-RichText = compose( [
+const RichTextContainer = compose( [
 	withBlockEditContext,
 	withSelect( ( select, { isSelected, blockEditContext } ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
@@ -889,7 +889,7 @@ RichText = compose( [
 	withSafeTimeout,
 ] )( RichText );
 
-RichText.Content = ( { value, format = 'element', tagName: Tag, ...props } ) => {
+RichTextContainer.Content = ( { value, format = 'element', tagName: Tag, ...props } ) => {
 	let children;
 	switch ( format ) {
 		case 'string':
@@ -907,4 +907,4 @@ RichText.Content = ( { value, format = 'element', tagName: Tag, ...props } ) => 
 	return children;
 };
 
-export default RichText;
+export default RichTextContainer;
