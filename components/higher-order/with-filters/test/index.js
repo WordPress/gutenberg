@@ -74,7 +74,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<blockquote>
 					<FilteredComponent />
 				</blockquote>
@@ -104,7 +104,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<blockquote>
 					<FilteredComponent />
 				</blockquote>
@@ -130,7 +130,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<blockquote>
 					<FilteredComponent />
 				</blockquote>
@@ -139,7 +139,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-2',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<section>
 					<FilteredComponent />
 				</section>
@@ -164,7 +164,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<div>
 					<FilteredComponent />
 				</div>
@@ -201,7 +201,7 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			FilteredComponent => () => (
+			( FilteredComponent ) => () => (
 				<blockquote>
 					<FilteredComponent />
 				</blockquote>

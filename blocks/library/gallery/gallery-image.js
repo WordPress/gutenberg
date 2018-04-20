@@ -137,7 +137,7 @@ class GalleryImage extends Component {
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
 						isSelected={ this.state.captionSelected }
-						onChange={ newCaption => setAttributes( { caption: newCaption } ) }
+						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 						onFocus={ this.onSelectCaption }
 						inlineToolbar
 					/>
