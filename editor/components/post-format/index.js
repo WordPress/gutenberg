@@ -32,7 +32,7 @@ const POST_FORMATS = [
 
 function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFormats, suggestedFormat, instanceId } ) {
 	const postFormatSelectorId = 'post-format-selector-' + instanceId;
-	const formats = POST_FORMATS.filter( ( format ) => 'standard' === format.id || supportedFormats.includes( format.id ) );
+	const formats = POST_FORMATS.filter( ( format ) => supportedFormats.includes( format.id ) );
 	const suggestion = find( formats, ( format ) => format.id === suggestedFormat );
 
 	// Disable reason: We need to change the value immiediately to show/hide the suggestion if needed
