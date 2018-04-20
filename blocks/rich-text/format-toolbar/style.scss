@@ -14,6 +14,12 @@
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 	z-index: z-index( '.blocks-format-toolbar__link-modal' );
+
+	.edit-post-header-toolbar__block-toolbar & {
+		position: absolute;
+    	left: 0;
+		right: 0;
+	}
 }
 
 .blocks-format-toolbar__link-modal-line {
