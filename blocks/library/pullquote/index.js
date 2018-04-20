@@ -48,9 +48,9 @@ export const name = 'core/pullquote';
 
 export const settings = {
 
-	title: __( 'Pullquote' ),
+	title: __( 'Pull quote' ),
 
-	description: __( 'A pullquote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ),
+	description: __( 'A pull quote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ),
 
 	icon: 'format-quote',
 
