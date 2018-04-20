@@ -8,7 +8,8 @@
     "clean-metro": "rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/metro-bundler-cache-*;",
     "clean-node": "rm -rf node_modules/;",
     "clean-react": "rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/react-native-packager-cache-*;",
-    "clean-watchman": "watchman watch-del-all;"
+    "clean-watchman": "watchman watch-del-all;",
+    "clean:install": "yarn clean && yarn install"
   },
   "peerDependencies": {
     "react": "16.3.1",
