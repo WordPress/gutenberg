@@ -4,6 +4,7 @@
 import { Component } from '@wordpress/element';
 import { NavigableMenu } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 export default class InserterInlineMenu extends Component {
 	render() {
@@ -14,14 +15,14 @@ export default class InserterInlineMenu extends Component {
 					id="editor-inserter__separator-inline"
 					aria-hidden="true"
 				>
-					Inline Blocks
+					{ __( 'Inline Blocks' ) }
 				</div>
 				<button
 					className="editor-inserter__block"
 					onClick={ this.props.onImageSelect }
 				>
 					<BlockIcon icon="format-image" />
-					Inline Image
+					{ __( 'Inline Image' ) }
 				</button>
 			</NavigableMenu>
 		);
