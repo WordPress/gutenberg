@@ -18,7 +18,7 @@ import PostAuthor from '../post-author';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusVisibility from '../plugin-post-status-visibility';
-import PanelRow from "../../../../components/panel/row";
+import PanelRow from '../../../../components/panel/row';
 
 /**
  * Module Constants

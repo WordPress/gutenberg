@@ -20,8 +20,6 @@ import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
 
-
-
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
  * authorization intact.
