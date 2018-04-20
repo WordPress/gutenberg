@@ -82,8 +82,29 @@ export function postTypes( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing indexes data.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function indexData( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_INDEX':
+			return {
+				...state,
+				...action.index,
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	media,
 	postTypes,
+	indexData,
 } );

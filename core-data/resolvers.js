@@ -11,6 +11,7 @@ import {
 	receiveTerms,
 	receiveMedia,
 	receivePostTypes,
+	receiveIndex,
 } from './actions';
 
 /**
@@ -43,4 +44,12 @@ export async function* getMedia( state, id ) {
 export async function* getPostType( state, slug ) {
 	const postType = await apiRequest( { path: `/wp/v2/types/${ slug }?context=edit` } );
 	yield receivePostTypes( postType );
+}
+
+/**
+ * Requests theme supports data from the index.
+ */
+export async function* getThemeSupports() {
+	const index = await apiRequest( { path: '/' } );
+	yield receiveIndex( index, 'theme_supports' );
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get } from 'lodash';
+import { find, get, uniq } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -71,11 +71,16 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 export default compose( [
 	withSelect( ( select ) => {
 		const { getEditedPostAttribute, getSuggestedPostFormat } = select( 'core/editor' );
-		const { getPostType } = select( 'core' );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+		const format = getEditedPostAttribute( 'format' );
+		const themeSupports = select( 'core' ).getThemeSupports();
+		let supportedFormats = get( themeSupports, 'formats', [] );
+		// Ensure current format is always in the set.
+		// The current format may not be a supported format.
+		supportedFormats.push( format );
+		supportedFormats = uniq( supportedFormats );
 		return {
 			postFormat: getEditedPostAttribute( 'format' ),
-			supportedFormats: get( postType, [ 'formats' ], [] ),
+			supportedFormats: supportedFormats,
 			suggestedFormat: getSuggestedPostFormat(),
 		};
 	} ),
