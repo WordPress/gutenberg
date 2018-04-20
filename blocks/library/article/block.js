@@ -7,6 +7,7 @@ import { findKey, map, get } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { PostTypeSupportCheck } from '@wordpress/editor';
 import { Component } from '@wordpress/element';
 import {
 	Button,
@@ -160,19 +161,21 @@ class ArticleBlock extends Component {
 			<BlockControls key="controls">
 				{ alignmentToolbar }
 				<Toolbar>
-					<MediaUpload
-						onSelect={ this.onSelectImage }
-						type="image"
-						value={ id }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit image' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
-					/>
+					<PostTypeSupportCheck supportKeys="media-library">
+						<MediaUpload
+							onSelect={ this.onSelectImage }
+							type="image"
+							value={ id }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
+					</PostTypeSupportCheck>
 				</Toolbar>
 			</BlockControls>,
 			<InspectorControls key="inspector">

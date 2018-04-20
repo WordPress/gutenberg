@@ -1,14 +1,10 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Button, Spinner, ResponsiveWrapper } from '@wordpress/components';
 import { MediaUpload } from '@wordpress/blocks';
+import { PostTypeSupportCheck } from '@wordpress/editor';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -28,26 +24,28 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 	return (
 		<PostFeaturedImageCheck>
 			<div className="editor-post-featured-image">
-				{ ! get( window, 'customGutenberg.editor.noMediaLibrary' ) && !! featuredImageId &&
-					<MediaUpload
-						title={ postLabel.set_featured_image }
-						onSelect={ onUpdateImage }
-						type="image"
-						modalClass="editor-post-featured-image__media-modal"
-						render={ ( { open } ) => (
-							<Button className="button-link editor-post-featured-image__preview" onClick={ open } >
-								{ media &&
-									<ResponsiveWrapper
-										naturalWidth={ media.media_details.width }
-										naturalHeight={ media.media_details.height }
-									>
-										<img src={ media.source_url } alt={ __( 'Featured image' ) } />
-									</ResponsiveWrapper>
-								}
-								{ ! media && <Spinner /> }
-							</Button>
-						) }
-					/>
+				{ !! featuredImageId &&
+					<PostTypeSupportCheck supportKeys="media-library">
+						<MediaUpload
+							title={ postLabel.set_featured_image }
+							onSelect={ onUpdateImage }
+							type="image"
+							modalClass="editor-post-featured-image__media-modal"
+							render={ ( { open } ) => (
+								<Button className="button-link editor-post-featured-image__preview" onClick={ open } >
+									{ media &&
+										<ResponsiveWrapper
+											naturalWidth={ media.media_details.width }
+											naturalHeight={ media.media_details.height }
+										>
+											<img src={ media.source_url } alt={ __( 'Featured image' ) } />
+										</ResponsiveWrapper>
+									}
+									{ ! media && <Spinner /> }
+								</Button>
+							) }
+						/>
+					</PostTypeSupportCheck>
 				}
 				{ !! featuredImageId && media && ! media.isLoading &&
 					<p className="editor-post-featured-image__howto">
@@ -55,17 +53,19 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 					</p>
 				}
 				{ ! featuredImageId &&
-					<MediaUpload
-						title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-						onSelect={ onUpdateImage }
-						type="image"
-						modalClass="editor-post-featured-image__media-modal"
-						render={ ( { open } )=>(
-							<Button className="editor-post-featured-image__toggle button-link" onClick={ open }>
-								{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
-							</Button>
-						) }
-					/>
+					<PostTypeSupportCheck supportKeys="media-library">
+						<MediaUpload
+							title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+							onSelect={ onUpdateImage }
+							type="image"
+							modalClass="editor-post-featured-image__media-modal"
+							render={ ( { open } )=>(
+								<Button className="editor-post-featured-image__toggle button-link" onClick={ open }>
+									{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+								</Button>
+							) }
+						/>
+					</PostTypeSupportCheck>
 				}
 				{ !! featuredImageId &&
 					<Button className="editor-post-featured-image__toggle button-link" onClick={ onRemoveImage }>

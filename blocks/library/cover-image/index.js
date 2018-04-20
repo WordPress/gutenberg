@@ -7,6 +7,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar } from '@wordpress/components';
+import { PostTypeSupportCheck } from '@wordpress/editor';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classnames from 'classnames';
@@ -134,19 +135,21 @@ export const settings = {
 
 					{ alignmentToolbar }
 					<Toolbar>
-						<MediaUpload
-							onSelect={ onSelectImage }
-							type="image"
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
+						<PostTypeSupportCheck supportKeys="media-library">
+							<MediaUpload
+								onSelect={ onSelectImage }
+								type="image"
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit image' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+						</PostTypeSupportCheck>
 					</Toolbar>
 				</BlockControls>
 				<InspectorControls>

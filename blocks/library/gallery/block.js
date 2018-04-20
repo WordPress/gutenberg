@@ -6,6 +6,7 @@ import { filter, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { PostTypeSupportCheck } from '@wordpress/editor';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mediaUpload } from '@wordpress/utils';
@@ -172,21 +173,23 @@ class GalleryBlock extends Component {
 				/>
 				{ !! images.length && (
 					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImages }
-							type="image"
-							multiple
-							gallery
-							value={ images.map( ( img ) => img.id ) }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit Gallery' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
+						<PostTypeSupportCheck supportKeys="media-library">
+							<MediaUpload
+								onSelect={ this.onSelectImages }
+								type="image"
+								multiple
+								gallery
+								value={ images.map( ( img ) => img.id ) }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit Gallery' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+						</PostTypeSupportCheck>
 					</Toolbar>
 				) }
 			</BlockControls>

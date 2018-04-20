@@ -7,6 +7,7 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { DropZone, FormFileUpload, Placeholder, Button } from '@wordpress/components';
+import { PostTypeSupportCheck } from '@wordpress/editor';
 import { mediaUpload } from '@wordpress/utils';
 import { __ } from '@wordpress/i18n';
 
@@ -53,17 +54,19 @@ export default function ImagePlaceholder( { className, icon, label, onSelectImag
 			>
 				{ __( 'Upload' ) }
 			</FormFileUpload>
-			<MediaUpload
-				gallery={ multiple }
-				multiple={ multiple }
-				onSelect={ onSelectImage }
-				type="image"
-				render={ ( { open } ) => (
-					<Button isLarge onClick={ open }>
-						{ __( 'Media Library' ) }
-					</Button>
-				) }
-			/>
+			<PostTypeSupportCheck supportKeys="media-library">
+				<MediaUpload
+					gallery={ multiple }
+					multiple={ multiple }
+					onSelect={ onSelectImage }
+					type="image"
+					render={ ( { open } ) => (
+						<Button isLarge onClick={ open }>
+							{ __( 'Media Library' ) }
+						</Button>
+					) }
+				/>
+			</PostTypeSupportCheck>
 		</Placeholder>
 	);
 }

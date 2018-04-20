@@ -9,6 +9,7 @@ import {
 	Placeholder,
 	Toolbar,
 } from '@wordpress/components';
+import { PostTypeSupportCheck } from '@wordpress/editor';
 import { Component } from '@wordpress/element';
 import { mediaUpload } from '@wordpress/utils';
 
@@ -147,16 +148,18 @@ export const settings = {
 						>
 							{ __( 'Upload' ) }
 						</FormFileUpload>
-						<MediaUpload
-							onSelect={ onSelectVideo }
-							type="video"
-							id={ id }
-							render={ ( { open } ) => (
-								<Button isLarge onClick={ open } >
-									{ __( 'Media Library' ) }
-								</Button>
-							) }
-						/>
+						<PostTypeSupportCheck supportKeys="media-library">
+							<MediaUpload
+								onSelect={ onSelectVideo }
+								type="video"
+								id={ id }
+								render={ ( { open } ) => (
+									<Button isLarge onClick={ open } >
+										{ __( 'Media Library' ) }
+									</Button>
+								) }
+							/>
+						</PostTypeSupportCheck>
 					</Placeholder>,
 				];
 			}

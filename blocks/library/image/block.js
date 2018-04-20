@@ -15,6 +15,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { PostTypeSupportCheck } from '@wordpress/editor';
 import { Component, compose } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
@@ -157,19 +158,21 @@ class ImageBlock extends Component {
 					/>
 
 					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImage }
-							type="image"
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
+						<PostTypeSupportCheck supportKeys="media-library">
+							<MediaUpload
+								onSelect={ this.onSelectImage }
+								type="image"
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit image' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+						</PostTypeSupportCheck>
 						<UrlInputButton onChange={ this.onSetHref } url={ href } />
 					</Toolbar>
 				</BlockControls>
