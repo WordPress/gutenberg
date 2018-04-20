@@ -1,5 +1,5 @@
 /**
- * Defines extensibility lot for the Status & Visibility panel
+ * Defines as extensibility slot for the Status & Visibility panel
  */
 
 import { createSlotFill } from '@wordpress/components';
