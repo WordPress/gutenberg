@@ -4,21 +4,19 @@ We made [Gutenberg](https://github.com/front/gutenberg) editor a little more **c
 
 Gutenberg editor can **be easly included in your apps** with this package. Also you can customize blocks menu tabs, blocks categories, document panels and more! 
 
-This package is based on [Gutenberg v2.0.6](https://github.com/WordPress/gutenberg/releases/tag/v2.6.0).
+This package is based on [Gutenberg v2.7.0](https://github.com/WordPress/gutenberg/releases/tag/v2.7.0).
 
 ## Table of contents
 * [Installation](#installation)
 * [Usage](#usage)
 * [Global variables](#global-variables)
 	* [*apiRequest* and *url*](#apirequest-and-url)
-* [Customize your Gutenberg](#customiza-your-gutenberg)
-	* [Blocks Menu Tabs](#blocks-menu-tabs)
+* [Customize your Gutenberg](#customize-your-gutenberg)
+	* [Block Menu Tabs](#block-menu-tabs)
 	* [Block Categories](#block-categories)
 	* [Rows](#rows)
-	* [Document Panels](#document-panels)
-		* [Articles Panel](articles-panels)
+	* [Articles Panel](articles-panels)
 		* [Article Block](article-block)
-	* [Editor Settings](editor-settings)
 
 ## Installation
 
