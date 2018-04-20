@@ -36,6 +36,11 @@ GPL v2
 ├── src
 │   └── AztecView.js
 ├── index.js
+├── ios
+│   ├── Frameworks
+│   ├── RNTAztecView
+│   │      └── RCTAztecView.m
+│   └── RNTAztecView.xcodeproj
 ├── package.json
 ├── LICENSE.md
 └── README.md
@@ -43,7 +48,7 @@ GPL v2
 
 If you have to change Android native code, you must have a look at the code in `android/src/main/java/` folder.
 
-## Run the example app
+## Android: Run the example app
 
 At the root folder, run:
 ```
@@ -54,11 +59,31 @@ Make sure to have an emulator running or an Android device connected, and then:
 
 ```
 $ cd example/
-$ react-native run-android
+$ yarn clean:install
+$ yarn android
 ```
 
 This will build the Android library (via `gradle`) and example app, then launch the main example activity on your connected device and run the Metro bundler at the same time.
 
+## iOS: Run the example app
+
+At the root folder, clean the library:
+```
+$ yarn clean:install
+```
+
+Then move to the example folder:
+```
+$ cd example/
+```
+
+Clean the example app and run it:
+```
+$ yarn clean:install
+$ yarn ios
+```
+
+This will compile the example project, launch metro, run the simulator and run the app.
 
 ## FAQ / Troubleshooting
 
@@ -82,8 +107,17 @@ yarn
 cd example/
 yarn start --reset-cache
 ```
-This will start metro in this window, then compile/run the app with the following command:
+
+Open a new shell window and run either of these depending on the platform:
+
 ```
-yarn android # in another shell
+yarn android
+
+```
+
+or
+
+```
+yarn ios
 ```
 
