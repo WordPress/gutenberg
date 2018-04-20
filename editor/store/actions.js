@@ -220,8 +220,8 @@ export function replaceBlock( uid, block ) {
 function createOnMove( type ) {
 	return ( uids, rootUID ) => {
 		return {
+			uids: castArray( uids ),
 			type,
-			uids,
 			rootUID,
 		};
 	};
@@ -440,7 +440,7 @@ export function createUndoLevel() {
 export function removeBlocks( uids, selectPrevious = true ) {
 	return {
 		type: 'REMOVE_BLOCKS',
-		uids,
+		uids: castArray( uids ),
 		selectPrevious,
 	};
 }

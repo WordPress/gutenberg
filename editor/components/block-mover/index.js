@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, partial } from 'lodash';
+import { first, partial, castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -45,6 +45,7 @@ export class BlockMover extends Component {
 	render() {
 		const { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
 		const { isFocused } = this.state;
+		const countBlocks = castArray( uids ).length;
 		if ( isLocked ) {
 			return null;
 		}
@@ -78,7 +79,7 @@ export class BlockMover extends Component {
 				<span id={ `editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description">
 					{
 						getBlockMoverDescription(
-							uids.length,
+							countBlocks,
 							blockType && blockType.title,
 							firstIndex,
 							isFirst,
@@ -90,7 +91,7 @@ export class BlockMover extends Component {
 				<span id={ `editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description">
 					{
 						getBlockMoverDescription(
-							uids.length,
+							countBlocks,
 							blockType && blockType.title,
 							firstIndex,
 							isFirst,
@@ -107,10 +108,11 @@ export class BlockMover extends Component {
 export default compose(
 	withSelect( ( select, { uids, rootUID } ) => {
 		const { getBlock, getBlockIndex } = select( 'core/editor' );
-		const block = getBlock( first( uids ) );
+		const firstUID = first( castArray( uids ) );
+		const block = getBlock( firstUID );
 
 		return {
-			firstIndex: getBlockIndex( first( uids ), rootUID ),
+			firstIndex: getBlockIndex( firstUID, rootUID ),
 			blockType: block ? getBlockType( block.name ) : null,
 		};
 	} ),
