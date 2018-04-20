@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some, castArray, first, mapValues, pickBy } from 'lodash';
+import { some, castArray, first, mapValues, pickBy, includes } from 'lodash';
 
 /**
  * Internal dependencies
@@ -38,9 +38,14 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 
 		lastIndex = match.index + match.content.length;
 
-		// If not on new line (or in paragraph from Markdown converter),
-		// consider shortcode as inline text.
-		if ( ! /(\n|<p>)\s*$/.test( beforeHTML ) ) {
+		// If the shortcode content does not contain HTML and the shortcode is
+		// not on a new line (or in paragraph from Markdown converter),
+		// consider the shortcode as inline text, and thus skip conversion for
+		// this segment.
+		if (
+			! includes( match.shortcode.content || '', '<' ) &&
+			! /(\n|<p>)\s*$/.test( beforeHTML )
+		) {
 			return segmentHTMLToShortcodeBlock( HTML, lastIndex );
 		}
 
