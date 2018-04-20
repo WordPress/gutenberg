@@ -9,7 +9,7 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component, createHigherOrderComponent, purify } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -242,17 +242,13 @@ export function dispatch( reducerKey ) {
  * @return {Component} Enhanced component with merged state data props.
  */
 export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
-	return class ComponentWithSelect extends Component {
+	return purify( class ComponentWithSelect extends Component {
 		constructor() {
 			super( ...arguments );
 
 			this.runSelection = this.runSelection.bind( this );
 
 			this.state = {};
-		}
-
-		shouldComponentUpdate( nextProps, nextState ) {
-			return ! isShallowEqual( nextProps, this.props ) || ! isShallowEqual( nextState, this.state );
 		}
 
 		componentWillMount() {
@@ -300,7 +296,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		render() {
 			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
 		}
-	};
+	} );
 }, 'withSelect' );
 
 /**
@@ -316,7 +312,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
  * @return {Component} Enhanced component with merged dispatcher props.
  */
 export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
-	return class ComponentWithDispatch extends Component {
+	return purify( class ComponentWithDispatch extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -355,7 +351,7 @@ export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent
 		render() {
 			return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
 		}
-	};
+	} );
 }, 'withDispatch' );
 
 /**

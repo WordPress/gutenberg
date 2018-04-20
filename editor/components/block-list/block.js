@@ -705,5 +705,5 @@ export default compose(
 		};
 	} ),
 	withFilters( 'editor.BlockListBlock' ),
-	withHoverAreas
+	withHoverAreas,
 )( BlockListBlock );
