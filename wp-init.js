@@ -4,7 +4,6 @@
 import React from 'react';
 import jQuery from 'jquery';
 import moment from 'moment';
-import { get, includes } from 'lodash';
 import { parse, format } from 'url';
 
 window.jQuery = window.jQuery || jQuery;
@@ -93,11 +92,3 @@ window.wpApiSettings.nonce = window.wpApiSettings.nonce || '123456789';
 window.wpApiSettings.schema = window.wpApiSettings.schema || {};
 window.wpApiSettings.schema.routes = window.wpApiSettings.routes || {};
 window.wpApiSettings.schema.routes[ '\/wp\/v2\/posts' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/posts' ] || { methods: [ 'GET' ] };
-
-const panels = get( window, 'customGutenberg.panels' );
-
-if ( includes( panels, 'articles-panel' ) ) {
-	window.wpApiSettings.schema.routes[ '\/wp\/v2\/categories' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/categories' ] || { methods: [ 'GET' ] };
-	window.wpApiSettings.schema.routes[ '\/wp\/v2\/articles\/(?P<id>[\\d]+)' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/articles\/(?P<id>[\\d]+)' ] || { methods: [ 'GET' ] };
-	window.wpApiSettings.schema.routes[ '\/wp\/v2\/articles' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/articles' ] || { methods: [ 'GET' ] };
-}
