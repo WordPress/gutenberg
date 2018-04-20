@@ -429,7 +429,7 @@ export class BlockListBlock extends Component {
 		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
 		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
 		const shouldShowBreadcrumb = isHovered;
-		const shouldShowContextualToolbar = shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
+		const shouldShowContextualToolbar = shouldAppearSelected && isValid && ( ! hasFixedToolbar && isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 

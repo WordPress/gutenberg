@@ -35,7 +35,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 			<EditorHistoryRedo />
 			<TableOfContents />
 			<MultiBlocksSwitcher />
-			{ hasFixedToolbar && isLargeViewport && (
+			{ ( hasFixedToolbar || ! isLargeViewport ) && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />
 				</div>
