@@ -34,11 +34,16 @@ export const blockEditRender = ( name, settings ) => {
 };
 
 export function registerCoreBlocks() {
-	const dirs = fs.readdirSync( __dirname + '/../../library' );
+	const path = __dirname + '/../../library';
+	const dirs = fs.readdirSync( path );
 
 	dirs.forEach( ( dir ) => {
-		if ( dir.substring( 0, 1 ) !== '.' ) {
-			require( '../../library/' + dir );
+		// We only need a list of directories
+		if ( fs.statSync( path + '/' + dir ).isDirectory() ) {
+			// Exclude hidden directories
+			if ( dir.substring( 0, 1 ) !== '.' ) {
+				require( '../../library/' + dir );
+			}
 		}
 	} );
 }
