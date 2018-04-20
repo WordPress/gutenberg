@@ -60,13 +60,12 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, isSelected, className } ) {
+	edit( { attributes, setAttributes, className } ) {
 		const { content, placeholder } = attributes;
 
 		return (
 			<RichText
 				tagName="p"
-				key="editable"
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
@@ -75,7 +74,6 @@ export const settings = {
 				} }
 				className={ className }
 				placeholder={ placeholder || __( 'Write subhead…' ) }
-				isSelected={ isSelected }
 			/>
 		);
 	},

@@ -53,7 +53,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, className, isSelected } ) {
+	edit( { attributes, setAttributes, className } ) {
 		const { content } = attributes;
 
 		return (
@@ -68,7 +68,6 @@ export const settings = {
 				placeholder={ __( 'Write…' ) }
 				wrapperClassName={ className }
 				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-				isSelected={ isSelected }
 			/>
 		);
 	},

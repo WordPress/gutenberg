@@ -14,6 +14,7 @@ import {
 	BlockAlignmentToolbar,
 } from '@wordpress/blocks';
 import { withState } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -74,47 +75,47 @@ export const settings = {
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
-		return [
-			isSelected && (
-				<BlockControls key="controls">
+		return (
+			<Fragment>
+				<BlockControls>
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
 					/>
 				</BlockControls>
-			),
-			<blockquote key="quote" className={ className }>
-				<RichText
-					multiline="p"
-					value={ toRichTextValue( value ) }
-					onChange={
-						( nextValue ) => setAttributes( {
-							value: fromRichTextValue( nextValue ),
-						} )
-					}
-					/* translators: the text of the quotation */
-					placeholder={ __( 'Write quote…' ) }
-					wrapperClassName="blocks-pullquote__content"
-					isSelected={ isSelected && editable === 'content' }
-					onFocus={ onSetActiveEditable( 'content' ) }
-				/>
-				{ ( citation || isSelected ) && (
+				<blockquote className={ className }>
 					<RichText
-						tagName="cite"
-						value={ citation }
-						/* translators: the individual or entity quoted */
-						placeholder={ __( 'Write citation…' ) }
+						multiline="p"
+						value={ toRichTextValue( value ) }
 						onChange={
-							( nextCitation ) => setAttributes( {
-								citation: nextCitation,
+							( nextValue ) => setAttributes( {
+								value: fromRichTextValue( nextValue ),
 							} )
 						}
-						isSelected={ isSelected && editable === 'cite' }
-						onFocus={ onSetActiveEditable( 'cite' ) }
+						/* translators: the text of the quotation */
+						placeholder={ __( 'Write quote…' ) }
+						wrapperClassName="blocks-pullquote__content"
+						isSelected={ isSelected && editable === 'content' }
+						onFocus={ onSetActiveEditable( 'content' ) }
 					/>
-				) }
-			</blockquote>,
-		];
+					{ ( citation || isSelected ) && (
+						<RichText
+							tagName="cite"
+							value={ citation }
+							/* translators: the individual or entity quoted */
+							placeholder={ __( 'Write citation…' ) }
+							onChange={
+								( nextCitation ) => setAttributes( {
+									citation: nextCitation,
+								} )
+							}
+							isSelected={ isSelected && editable === 'cite' }
+							onFocus={ onSetActiveEditable( 'cite' ) }
+						/>
+					) }
+				</blockquote>
+			</Fragment>
+		);
 	} ),
 
 	save( { attributes } ) {

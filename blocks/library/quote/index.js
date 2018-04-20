@@ -16,6 +16,7 @@ import {
 	RichText,
 } from '@wordpress/blocks';
 import { Toolbar, withState } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -174,9 +175,9 @@ export const settings = {
 			setState( { editable: newEditable } );
 		};
 
-		return [
-			isSelected && (
-				<BlockControls key="controls">
+		return (
+			<Fragment>
+				<BlockControls>
 					<Toolbar controls={ [ 1, 2 ].map( ( variation ) => ( {
 						icon: 1 === variation ? 'format-quote' : 'testimonial',
 						title: sprintf( __( 'Quote style %d' ), variation ),
@@ -192,49 +193,48 @@ export const settings = {
 						} }
 					/>
 				</BlockControls>
-			),
-			<blockquote
-				key="quote"
-				className={ containerClassname }
-				style={ { textAlign: align } }
-			>
-				<RichText
-					multiline="p"
-					value={ toRichTextValue( value ) }
-					onChange={
-						( nextValue ) => setAttributes( {
-							value: fromRichTextValue( nextValue ),
-						} )
-					}
-					onMerge={ mergeBlocks }
-					onRemove={ ( forward ) => {
-						const hasEmptyCitation = ! citation || citation.length === 0;
-						if ( ! forward && hasEmptyCitation ) {
-							onReplace( [] );
-						}
-					} }
-					/* translators: the text of the quotation */
-					placeholder={ __( 'Write quote…' ) }
-					isSelected={ isSelected && editable === 'content' }
-					onFocus={ onSetActiveEditable( 'content' ) }
-				/>
-				{ ( ( citation && citation.length > 0 ) || isSelected ) && (
+				<blockquote
+					className={ containerClassname }
+					style={ { textAlign: align } }
+				>
 					<RichText
-						tagName="cite"
-						value={ citation }
+						multiline="p"
+						value={ toRichTextValue( value ) }
 						onChange={
-							( nextCitation ) => setAttributes( {
-								citation: nextCitation,
+							( nextValue ) => setAttributes( {
+								value: fromRichTextValue( nextValue ),
 							} )
 						}
-						/* translators: the individual or entity quoted */
-						placeholder={ __( 'Write citation…' ) }
-						isSelected={ isSelected && editable === 'cite' }
-						onFocus={ onSetActiveEditable( 'cite' ) }
+						onMerge={ mergeBlocks }
+						onRemove={ ( forward ) => {
+							const hasEmptyCitation = ! citation || citation.length === 0;
+							if ( ! forward && hasEmptyCitation ) {
+								onReplace( [] );
+							}
+						} }
+						/* translators: the text of the quotation */
+						placeholder={ __( 'Write quote…' ) }
+						isSelected={ isSelected && editable === 'content' }
+						onFocus={ onSetActiveEditable( 'content' ) }
 					/>
-				) }
-			</blockquote>,
-		];
+					{ ( ( citation && citation.length > 0 ) || isSelected ) && (
+						<RichText
+							tagName="cite"
+							value={ citation }
+							onChange={
+								( nextCitation ) => setAttributes( {
+									citation: nextCitation,
+								} )
+							}
+							/* translators: the individual or entity quoted */
+							placeholder={ __( 'Write citation…' ) }
+							isSelected={ isSelected && editable === 'cite' }
+							onFocus={ onSetActiveEditable( 'cite' ) }
+						/>
+					) }
+				</blockquote>
+			</Fragment>
+		);
 	} ),
 
 	save( { attributes } ) {
