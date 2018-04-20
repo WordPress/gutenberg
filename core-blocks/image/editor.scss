@@ -114,13 +114,19 @@
 	}
 }
 
-.editor-block-list__block[data-type="core/image"] .editor-block-toolbar .blocks-format-toolbar__link-modal {
-	position: absolute;
-	left: 0;
-	right: 0;
-	margin: -1px 0;
+.editor-block-list__block[data-type="core/image"] {
+	.editor-block-toolbar .blocks-format-toolbar__link-modal {
+		position: absolute;
+		left: 0;
+		right: 0;
+		margin: -1px 0;
 
-	@include break-small() {
-		margin: -1px;
+		@include break-small() {
+			margin: -1px;
+		}
+	}
+
+	&[data-resized=true] figcaption {
+		max-width: var( --caption-width ); // use optional width variable for captions
 	}
 }
