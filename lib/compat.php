@@ -491,11 +491,32 @@ function gutenberg_get_post_type_viewable( $post_type ) {
 }
 
 /**
- * Adds the 'viewable' attribute to the REST API response of a post type.
+ * Includes the value for the 'formats' attribute of a post type resource.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43817
+ *
+ * @param object $post_type Post type response object.
+ * @return array The list of post formats that the post type supports.
+ */
+function gutenberg_get_post_type_formats( $post_type ) {
+	if ( ! post_type_supports( $post_type, 'post-formats' ) ) {
+		return array();
+	}
+
+	$formats = get_theme_support( 'post-formats' );
+	$formats = is_array( $formats ) ? array_values( $formats[0] ) : array();
+	$formats = array_merge( array( 'standard' ), $formats );
+
+	return $formats;
+}
+
+/**
+ * Adds extra fields to the REST API post type response.
  *
  * @see https://core.trac.wordpress.org/ticket/43739
+ * @see https://core.trac.wordpress.org/ticket/43817
  */
-function gutenberg_register_rest_api_post_type_viewable() {
+function gutenberg_register_rest_api_post_type_fields() {
 	register_rest_field( 'type',
 		'viewable',
 		array(
@@ -508,5 +529,18 @@ function gutenberg_register_rest_api_post_type_viewable() {
 			),
 		)
 	);
+
+	register_rest_field( 'type',
+		'formats',
+		array(
+			'get_callback' => 'gutenberg_get_post_type_formats',
+			'schema'       => array(
+				'description' => __( 'The list of post formats that this post type supports', 'gutenberg' ),
+				'type'        => 'array',
+				'context'     => array( 'edit', 'view' ),
+				'readonly'    => true,
+			),
+		)
+	);
 }
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_viewable' );
+add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_fields' );
