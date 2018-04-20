@@ -51,9 +51,9 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 		return parseWithGrammar( HTML );
 	}
 
-	// Parse Markdown (and HTML) if:
+	// Parse Markdown (and encoded HTML) if:
 	// * There is a plain text version.
-	// * The HTML version has no formatting.
+	// * There is no HTML version, or it has no formatting.
 	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
 		const converter = new showdown.Converter();
 
