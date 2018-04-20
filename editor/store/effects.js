@@ -210,7 +210,6 @@ export default {
 		const { dispatch } = store;
 		if ( ! autosaveStatus ) {
 			return;
-
 		}
 		const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
 		dispatch( createWarningNotice(
