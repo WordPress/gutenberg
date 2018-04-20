@@ -222,7 +222,7 @@ export function RawHTML( { children, ...props } ) {
  *
  * @return {WPComponent} Component class with generated display name assigned.
  */
-export const purify = createHigherOrderComponent( ( Wrapped ) => {
+export const pure = createHigherOrderComponent( ( Wrapped ) => {
 	if ( Wrapped.prototype instanceof Component ) {
 		return class extends Wrapped {
 			shouldComponentUpdate( nextProps, nextState ) {
@@ -240,4 +240,4 @@ export const purify = createHigherOrderComponent( ( Wrapped ) => {
 			return <Wrapped { ...this.props } />;
 		}
 	};
-}, 'purify' );
+}, 'pure' );

@@ -9,7 +9,7 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent, purify } from '@wordpress/element';
+import { Component, createHigherOrderComponent, pure, compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -241,63 +241,69 @@ export function dispatch( reducerKey ) {
  *
  * @return {Component} Enhanced component with merged state data props.
  */
-export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
-	return purify( class ComponentWithSelect extends Component {
-		constructor() {
-			super( ...arguments );
+export const withSelect = ( mapStateToProps ) => createHigherOrderComponent(
+	compose( [
+		pure,
+		( WrappedComponent ) => {
+			return class ComponentWithSelect extends Component {
+				constructor() {
+					super( ...arguments );
 
-			this.runSelection = this.runSelection.bind( this );
+					this.runSelection = this.runSelection.bind( this );
 
-			this.state = {};
-		}
+					this.state = {};
+				}
 
-		componentWillMount() {
-			this.subscribe();
+				componentWillMount() {
+					this.subscribe();
 
-			// Populate initial state.
-			this.runSelection();
-		}
+					// Populate initial state.
+					this.runSelection();
+				}
 
-		componentWillReceiveProps( nextProps ) {
-			if ( ! isShallowEqual( nextProps, this.props ) ) {
-				this.runSelection( nextProps );
-			}
-		}
+				componentWillReceiveProps( nextProps ) {
+					if ( ! isShallowEqual( nextProps, this.props ) ) {
+						this.runSelection( nextProps );
+					}
+				}
 
-		componentWillUnmount() {
-			this.unsubscribe();
+				componentWillUnmount() {
+					this.unsubscribe();
 
-			// While above unsubscribe avoids future listener calls, callbacks
-			// are snapshotted before being invoked, so if unmounting occurs
-			// during a previous callback, we need to explicitly track and
-			// avoid the `runSelection` that is scheduled to occur.
-			this.isUnmounting = true;
-		}
+					// While above unsubscribe avoids future listener calls, callbacks
+					// are snapshotted before being invoked, so if unmounting occurs
+					// during a previous callback, we need to explicitly track and
+					// avoid the `runSelection` that is scheduled to occur.
+					this.isUnmounting = true;
+				}
 
-		subscribe() {
-			this.unsubscribe = subscribe( this.runSelection );
-		}
+				subscribe() {
+					this.unsubscribe = subscribe( this.runSelection );
+				}
 
-		runSelection( props = this.props ) {
-			if ( this.isUnmounting ) {
-				return;
-			}
+				runSelection( props = this.props ) {
+					if ( this.isUnmounting ) {
+						return;
+					}
 
-			const { mergeProps } = this.state;
-			const nextMergeProps = mapStateToProps( select, props ) || {};
+					const { mergeProps } = this.state;
+					const nextMergeProps = mapStateToProps( select, props ) || {};
 
-			if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
-				this.setState( {
-					mergeProps: nextMergeProps,
-				} );
-			}
-		}
+					if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
+						this.setState( {
+							mergeProps: nextMergeProps,
+						} );
+					}
+				}
 
-		render() {
-			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
-		}
-	} );
-}, 'withSelect' );
+				render() {
+					return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
+				}
+			};
+		},
+	] ),
+	'withSelect'
+);
 
 /**
  * Higher-order component used to add dispatch props using registered action
@@ -311,48 +317,54 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
  *
  * @return {Component} Enhanced component with merged dispatcher props.
  */
-export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
-	return purify( class ComponentWithDispatch extends Component {
-		constructor() {
-			super( ...arguments );
+export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
+	compose( [
+		pure,
+		( WrappedComponent ) => {
+			return class ComponentWithDispatch extends Component {
+				constructor() {
+					super( ...arguments );
 
-			this.proxyProps = {};
-		}
-
-		componentWillMount() {
-			this.setProxyProps( this.props );
-		}
-
-		componentWillUpdate( nextProps ) {
-			this.setProxyProps( nextProps );
-		}
-
-		proxyDispatch( propName, ...args ) {
-			// Original dispatcher is a pre-bound (dispatching) action creator.
-			mapDispatchToProps( dispatch, this.props )[ propName ]( ...args );
-		}
-
-		setProxyProps( props ) {
-			// Assign as instance property so that in reconciling subsequent
-			// renders, the assigned prop values are referentially equal.
-			const propsToDispatchers = mapDispatchToProps( dispatch, props );
-			this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
-				// Prebind with prop name so we have reference to the original
-				// dispatcher to invoke. Track between re-renders to avoid
-				// creating new function references every render.
-				if ( this.proxyProps.hasOwnProperty( propName ) ) {
-					return this.proxyProps[ propName ];
+					this.proxyProps = {};
 				}
 
-				return this.proxyDispatch.bind( this, propName );
-			} );
-		}
+				componentWillMount() {
+					this.setProxyProps( this.props );
+				}
 
-		render() {
-			return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
-		}
-	} );
-}, 'withDispatch' );
+				componentWillUpdate( nextProps ) {
+					this.setProxyProps( nextProps );
+				}
+
+				proxyDispatch( propName, ...args ) {
+					// Original dispatcher is a pre-bound (dispatching) action creator.
+					mapDispatchToProps( dispatch, this.props )[ propName ]( ...args );
+				}
+
+				setProxyProps( props ) {
+					// Assign as instance property so that in reconciling subsequent
+					// renders, the assigned prop values are referentially equal.
+					const propsToDispatchers = mapDispatchToProps( dispatch, props );
+					this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
+						// Prebind with prop name so we have reference to the original
+						// dispatcher to invoke. Track between re-renders to avoid
+						// creating new function references every render.
+						if ( this.proxyProps.hasOwnProperty( propName ) ) {
+							return this.proxyProps[ propName ];
+						}
+
+						return this.proxyDispatch.bind( this, propName );
+					} );
+				}
+
+				render() {
+					return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
+				}
+			};
+		},
+	] ),
+	'withDispatch'
+);
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.
