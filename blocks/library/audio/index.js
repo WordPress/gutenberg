@@ -169,11 +169,7 @@ export const settings = {
 		return (
 			<figure>
 				<audio controls="controls" src={ src } />
-				{ caption && caption.length > 0 && (
-					<figcaption>
-						<RichText.Content>{ caption }</RichText.Content>
-					</figcaption>
-				) }
+				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
 	},

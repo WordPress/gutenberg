@@ -79,9 +79,11 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 		var content = props.attributes.content,
 			alignment = props.attributes.alignment;
 
-		return el( 'p', { className: props.className, style: { textAlign: alignment } },
-			el( RichText.Content, {}, content )
-		);
+		return el( RichText.Content, {
+			className: props.className,
+			style: { textAlign: alignment },
+			value: content
+		} );
 	},
 } );
 ```
@@ -146,9 +148,11 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 		const { content, alignment } = attributes;
 
 		return (
-			<p className={ className } style={ { textAlign: alignment } }>
-				<RichText.Content>{ content }</RichText.Content>
-			</p>
+			<RichText.Content
+				className={ className }
+				style={ { textAlign: alignment } }
+				value={ content }
+			/>
 		);
 	},
 } );

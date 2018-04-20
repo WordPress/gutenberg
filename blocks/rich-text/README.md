@@ -102,9 +102,9 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	save: function() {
-		return wp.element.createElement( 'h2, {},
-			wp.element.createElement( wp.blocks.RichText.Content, {}, props.attributes.content )
-		);
+		return wp.element.createElement( wp.blocks.RichText.Content, {
+			tagName: 'h2', value: props.attributes.content
+		} );
 	}
 } );
 ```
@@ -135,11 +135,7 @@ registerBlockType( /* ... */, {
 	},
 
 	save( { attributes } ) {
-		return (
-			<h2>
-				<RichText.Content>{attributes.content}</RichText.Content>
-			</h2>
-		);
+		return <RichText.Content tagName="h2" value={ attributes.content } />;
 	}
 } );
 ```

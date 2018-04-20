@@ -245,11 +245,7 @@ export const settings = {
 				{ value.map( ( paragraph, i ) => (
 					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
 				) ) }
-				{ citation && citation.length > 0 && (
-					<cite>
-						<RichText.Content>{ citation }</RichText.Content>
-					</cite>
-				) }
+				{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
 	},
@@ -276,11 +272,7 @@ export const settings = {
 						{ value.map( ( paragraph, i ) => (
 							<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
 						) ) }
-						{ citation && citation.length > 0 && (
-							<footer>
-								<RichText.Content>{ citation }</RichText.Content>
-							</footer>
-						) }
+						{ citation && citation.length > 0 && <RichText.Content tagName="footer" value={ citation } /> }
 					</blockquote>
 				);
 			},

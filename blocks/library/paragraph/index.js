@@ -436,9 +436,12 @@ export const settings = {
 		};
 
 		return (
-			<p style={ styles } className={ className ? className : undefined }>
-				<RichText.Content>{ content }</RichText.Content>
-			</p>
+			<RichText.Content
+				tagName="p"
+				style={ styles }
+				className={ className ? className : undefined }
+				value={ content }
+			/>
 		);
 	},
 };

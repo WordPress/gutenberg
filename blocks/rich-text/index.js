@@ -876,7 +876,7 @@ RichText.defaultProps = {
 	format: 'element',
 };
 
-const RichTextContainer = compose( [
+RichText = compose( [
 	withBlockEditContext,
 	withSelect( ( select, { isSelected, blockEditContext } ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
@@ -889,13 +889,22 @@ const RichTextContainer = compose( [
 	withSafeTimeout,
 ] )( RichText );
 
-RichTextContainer.Content = ( { children, format = 'element' } ) => {
+RichText.Content = ( { value, format = 'element', tagName: Tag, ...props } ) => {
+	let children;
 	switch ( format ) {
 		case 'string':
-			return <RawHTML>{ children }</RawHTML>;
+			children = <RawHTML>{ value }</RawHTML>;
+			break;
 		default:
-			return children;
+			children = value;
+			break;
 	}
+
+	if ( Tag ) {
+		return <Tag { ...props }>{ children }</Tag>;
+	}
+
+	return children;
 };
 
-export default RichTextContainer;
+export default RichText;

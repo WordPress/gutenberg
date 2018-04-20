@@ -174,11 +174,7 @@ export const settings = {
 		return (
 			<figure className={ align ? `align${ align }` : null }>
 				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption && caption.length > 0 && (
-					<figcaption>
-						<RichText.Content>{ caption }</RichText.Content>
-					</figcaption>
-				) }
+				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
 	},
@@ -202,11 +198,7 @@ export const settings = {
 				return (
 					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
 						{ href ? <a href={ href }>{ image }</a> : image }
-						{ caption && caption.length > 0 && (
-							<figcaption>
-								<RichText.Content>{ caption }</RichText.Content>
-							</figcaption>
-						) }
+						{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 					</figure>
 				);
 			},

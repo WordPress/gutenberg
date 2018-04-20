@@ -188,9 +188,7 @@ export const settings = {
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
 								{ image.caption && image.caption.length > 0 && (
-									<figcaption>
-										<RichText.Content>{ image.caption }</RichText.Content>
-									</figcaption>
+									<RichText.Content tagName="figcaption" value={ image.caption } />
 								) }
 							</figure>
 						</li>

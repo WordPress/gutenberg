@@ -304,12 +304,9 @@ export const settings = {
 
 	save( { attributes } ) {
 		const { nodeName, values } = attributes;
-		const Tag = nodeName.toLowerCase();
 
 		return (
-			<Tag>
-				<RichText.Content>{ values }</RichText.Content>
-			</Tag>
+			<RichText.Content tagName={ nodeName.toLowerCase() } value={ values } />
 		);
 	},
 };

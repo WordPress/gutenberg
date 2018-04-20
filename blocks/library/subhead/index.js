@@ -79,9 +79,11 @@ export const settings = {
 		const { content } = attributes;
 
 		return (
-			<p className={ className }>
-				<RichText.Content>{ content }</RichText.Content>
-			</p>
+			<RichText.Content
+				tagName="p"
+				className={ className }
+				value={ content }
+			/>
 		);
 	},
 };

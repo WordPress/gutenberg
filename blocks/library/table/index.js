@@ -85,9 +85,7 @@ export const settings = {
 	save( { attributes } ) {
 		const { content, align } = attributes;
 		return (
-			<table className={ align ? `align${ align }` : null }>
-				<RichText.Content>{ content }</RichText.Content>
-			</table>
+			<RichText.Content className={ align ? `align${ align }` : null } value={ content } />
 		);
 	},
 };
