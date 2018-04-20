@@ -15,7 +15,7 @@ import { getBlockAttributes } from '../parser';
  */
 const { shortcode } = window.wp;
 
-function segmentHTMLToShortcodeBlock( HTML ) {
+function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 	// Get all matches.
 	const transformsFrom = getBlockTransforms( 'from' );
 
@@ -32,10 +32,17 @@ function segmentHTMLToShortcodeBlock( HTML ) {
 	const transformTag = first( transformTags );
 
 	let match;
-	let lastIndex = 0;
 
 	if ( ( match = shortcode.next( transformTag, HTML, lastIndex ) ) ) {
+		const beforeHTML = HTML.substr( 0, match.index );
+
 		lastIndex = match.index + match.content.length;
+
+		// If not on new line (or in paragraph from Markdown converter),
+		// consider shortcode as inline text.
+		if ( ! /(\n|<p>)\s*$/.test( beforeHTML ) ) {
+			return segmentHTMLToShortcodeBlock( HTML, lastIndex );
+		}
 
 		const attributes = mapValues(
 			pickBy( transformation.attributes, ( schema ) => schema.shortcode ),
@@ -59,9 +66,9 @@ function segmentHTMLToShortcodeBlock( HTML ) {
 		);
 
 		return [
-			HTML.substr( 0, match.index ),
+			beforeHTML,
 			block,
-			...segmentHTMLToShortcodeBlock( HTML.substr( match.index + match.content.length ) ),
+			...segmentHTMLToShortcodeBlock( HTML.substr( lastIndex ) ),
 		];
 	}
 
