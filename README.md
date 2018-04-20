@@ -88,20 +88,19 @@ Q: The example app gets compiled but ReactNative shows an error
 
 A: try running, from the root folder in the project
 ```
-cd example/
-yarn start --reset-cache
+$ cd example/
+$ yarn start --reset-cache
 ```
 
 Open a new shell window and run either of these depending on the platform:
 
 ```
-yarn android
-
+$ yarn android
 ```
 
 or
 
 ```
-yarn ios
+$ yarn ios
 ```
 
