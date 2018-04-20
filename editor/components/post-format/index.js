@@ -47,7 +47,7 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFor
 						onChange={ ( event ) => onUpdatePostFormat( event.target.value ) }
 						id={ postFormatSelectorId }
 					>
-						{ POST_FORMATS.map( format => (
+						{ POST_FORMATS.map( ( format ) => (
 							<option key={ format.id } value={ format.id }>{ format.caption }</option>
 						) ) }
 					</select>

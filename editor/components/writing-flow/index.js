@@ -273,7 +273,7 @@ export default compose( [
 			selectedBlockUID: get( getSelectedBlock(), [ 'uid' ] ),
 		};
 	} ),
-	withDispatch( ( dispatch ) =>{
+	withDispatch( ( dispatch ) => {
 		const { multiSelect, selectBlock } = dispatch( 'core/editor' );
 		return {
 			onMultiSelect: multiSelect,

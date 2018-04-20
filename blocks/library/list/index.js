@@ -65,7 +65,7 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
-					const items = value.map( p => get( p, 'children.props.children' ) );
+					const items = value.map( ( p ) => get( p, 'children.props.children' ) );
 					if ( ! isEmpty( citation ) ) {
 						items.push( citation );
 					}

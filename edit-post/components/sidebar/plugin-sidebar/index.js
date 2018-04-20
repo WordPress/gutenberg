@@ -3,7 +3,7 @@
  */
 import { Panel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { PluginContext } from '@wordpress/plugins';
+import { withPluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -16,26 +16,22 @@ import SidebarHeader from '../sidebar-header';
  *
  * @return {WPElement} Plugin sidebar component.
  */
-function PluginSidebar( { name, title, children } ) {
+function PluginSidebar( { children, name, pluginContext, title } ) {
 	return (
-		<PluginContext.Consumer>
-			{ ( { pluginName } ) => (
-				<Sidebar
-					name={ `${ pluginName }/${ name }` }
-					label={ __( 'Editor plugins' ) }
-				>
-					<SidebarHeader
-						closeLabel={ __( 'Close plugin' ) }
-					>
-						<strong>{ title }</strong>
-					</SidebarHeader>
-					<Panel>
-						{ children }
-					</Panel>
-				</Sidebar>
-			) }
-		</PluginContext.Consumer>
+		<Sidebar
+			name={ `${ pluginContext.name }/${ name }` }
+			label={ __( 'Editor plugins' ) }
+		>
+			<SidebarHeader
+				closeLabel={ __( 'Close plugin' ) }
+			>
+				<strong>{ title }</strong>
+			</SidebarHeader>
+			<Panel>
+				{ children }
+			</Panel>
+		</Sidebar>
 	);
 }
 
-export default PluginSidebar;
+export default withPluginContext( PluginSidebar );

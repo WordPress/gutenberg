@@ -20,19 +20,17 @@ _Example:_
 
 ```jsx
 const { Fragment } = wp.element;
-const { PluginSidebar } = wp.editPost;
-const { PluginMoreMenuItem } = wp.editPost.__experimental;
+const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editPost;
 const { registerPlugin } = wp.plugins;
 
 const Component = () => (
 	<Fragment>
-		<PluginMoreMenuItem
-			name="menu-item-name"
-			type="sidebar"
+		<PluginSidebarMoreMenuItem
 			target="sidebar-name"
+			icon="smiley"
 		>
 			My Sidebar
-		</PluginMoreMenuItem>
+		</PluginSidebarMoreMenuItem>
 		<PluginSidebar
 			name="sidebar-name"
 			title="My Sidebar"

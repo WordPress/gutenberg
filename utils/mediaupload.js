@@ -83,7 +83,7 @@ function createMediaFromFile( file, additionalData ) {
  * @return {Promise}     Pormise resolved once the image is preloaded.
  */
 export function preloadImage( url ) {
-	return new Promise( resolve => {
+	return new Promise( ( resolve ) => {
 		const newImg = new window.Image();
 		newImg.onload = function() {
 			resolve( url );
