@@ -4,6 +4,11 @@
 import { __ } from '@wordpress/i18n';
 
 /**
+ * WordPress dependencies
+ */
+import { Fragment } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import './editor.scss';
@@ -56,25 +61,24 @@ export const settings = {
 	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { content } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		return [
-			isSelected && (
-				<BlockControls key="toolbar">
+		return (
+			<Fragment>
+				<BlockControls>
 					<BlockAlignmentToolbar
 						value={ attributes.align }
 						onChange={ updateAlignment }
 					/>
 				</BlockControls>
-			),
-			<TableBlock
-				key="editor"
-				onChange={ ( nextContent ) => {
-					setAttributes( { content: nextContent } );
-				} }
-				content={ content }
-				className={ className }
-				isSelected={ isSelected }
-			/>,
-		];
+				<TableBlock
+					onChange={ ( nextContent ) => {
+						setAttributes( { content: nextContent } );
+					} }
+					content={ content }
+					className={ className }
+					isSelected={ isSelected }
+				/>
+			</Fragment>
+		);
 	},
 
 	save( { attributes } ) {

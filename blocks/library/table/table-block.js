@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { Toolbar, DropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -94,23 +94,21 @@ export default class TableBlock extends Component {
 	render() {
 		const { content, onChange, className, isSelected } = this.props;
 
-		return [
-			<RichText
-				key="editor"
-				tagName="table"
-				wrapperClassName={ className }
-				getSettings={ ( settings ) => ( {
-					...settings,
-					plugins: ( settings.plugins || [] ).concat( 'table' ),
-					table_tab_navigation: false,
-				} ) }
-				onSetup={ ( editor ) => this.handleSetup( editor, isSelected ) }
-				onChange={ onChange }
-				value={ content }
-				isSelected={ isSelected }
-			/>,
-			isSelected && (
-				<BlockControls key="menu">
+		return (
+			<Fragment>
+				<RichText
+					tagName="table"
+					wrapperClassName={ className }
+					getSettings={ ( settings ) => ( {
+						...settings,
+						plugins: ( settings.plugins || [] ).concat( 'table' ),
+						table_tab_navigation: false,
+					} ) }
+					onSetup={ ( editor ) => this.handleSetup( editor, isSelected ) }
+					onChange={ onChange }
+					value={ content }
+				/>
+				<BlockControls>
 					<Toolbar>
 						<DropdownMenu
 							icon="editor-table"
@@ -123,7 +121,7 @@ export default class TableBlock extends Component {
 						/>
 					</Toolbar>
 				</BlockControls>
-			),
-		];
+			</Fragment>
+		);
 	}
 }
