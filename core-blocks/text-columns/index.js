@@ -101,7 +101,6 @@ export const settings = {
 										} );
 									} }
 									placeholder={ __( 'New Column' ) }
-									inlineBlocksEnabled={ false }
 								/>
 							</div>
 						);

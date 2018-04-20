@@ -69,9 +69,6 @@ a traditional `input` field, usually when the user exits the field.
 
 *Optional.* A list of autocompleters to use instead of the default.
 
-### `inlineBlocksEnabled: Boolean`
-*Optional.* Whether to allow insertion of Inline Blocks. Defaults to `true`.
-
 ## RichText.Content
 
 When using RichText in the edit function of blocks, the usage of `RichText.Content` is recommended in the save function of your blocks to save the correct HTML.

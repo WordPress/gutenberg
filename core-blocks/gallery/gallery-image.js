@@ -136,7 +136,6 @@ class GalleryImage extends Component {
 						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 						onFocus={ this.onSelectCaption }
 						inlineToolbar
-						inlineBlocksEnabled={ false }
 					/>
 				) : null }
 			</figure>

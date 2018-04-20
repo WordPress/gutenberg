@@ -232,13 +232,9 @@ export class RichText extends Component {
 	}
 
 	onInit() {
-		const {
-			isSelected,
-			inlineBlocksEnabled = true,
-			setInsertAvailable,
-		} = this.props;
+		const { isSelected, setInsertAvailable } = this.props;
 
-		if ( isSelected && inlineBlocksEnabled ) {
+		if ( isSelected ) {
 			setInsertAvailable();
 		}
 		this.registerCustomFormatters();
@@ -503,15 +499,10 @@ export class RichText extends Component {
 
 	toggleInsertAvailable() {
 		const {
-			inlineBlocksEnabled = true,
 			isSelected,
 			setInsertAvailable,
 			setInsertUnavailable,
 		} = this.props;
-
-		if ( ! inlineBlocksEnabled ) {
-			return;
-		}
 
 		if ( isSelected ) {
 			// setTimeout prevents bug when switching between two
@@ -844,11 +835,7 @@ export class RichText extends Component {
 	}
 
 	componentWillUnmount() {
-		const { inlineBlocksEnabled = true, setInsertUnavailable } = this.props;
-
-		if ( inlineBlocksEnabled ) {
-			setInsertUnavailable();
-		}
+		this.props.setInsertUnavailable();
 	}
 
 	/**
