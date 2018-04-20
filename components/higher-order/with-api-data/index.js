@@ -164,12 +164,16 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 
 			const mapping = mapPropsToData( props, this.routeHelpers );
 			const nextDataProps = reduce( mapping, ( result, path, propName ) => {
-				// Skip if mapping already assigned into state data props
-				// Exmaple: Component updates with one new prop and other
+				// Skip if mapping already assigned into state data props,
+				// and the request isn't pending.
+				// Example: Component updates with one new prop and other
 				// previously existing; previously existing should not be
 				// clobbered or re-trigger fetch
 				const dataProp = dataProps[ propName ];
-				if ( dataProp && dataProp.path === path ) {
+				if ( dataProp && dataProp.path === path &&
+						! dataProp.isLoading && ! dataProp.isCreating &&
+						! dataProp.isSaving && ! dataProp.isPatching &&
+						! dataProp.isDeleting ) {
 					result[ propName ] = dataProp;
 					return result;
 				}
