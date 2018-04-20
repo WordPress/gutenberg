@@ -82,7 +82,7 @@ export function getTabs() {
  */
 export function getDefaultTab() {
 	const tabsList = getTabs();
-	const defaultTabs = tabsList.filter( tab => tab.default );
+	const defaultTabs = tabsList.filter( ( tab ) => tab.default );
 
 	// return default tab or the first of the array
 	return defaultTabs.length ? defaultTabs[ 0 ] : tabsList[ 0 ];

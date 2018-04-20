@@ -45,7 +45,7 @@ function getBlockName( row ) {
 		return false;
 	}
 
-	const cols = map( row.cols, col => `col${ col }` );
+	const cols = map( row.cols, ( col ) => `col${ col }` );
 	return `rows/${ cols.join( '-' ) }`;
 }
 
