@@ -1237,7 +1237,7 @@ function buildInserterItemFromBlockType( state, allowedBlockTypes, blockType ) {
 		icon: blockType.icon,
 		category: blockType.category,
 		keywords: blockType.keywords,
-		isDisabled: !! blockType.useOnce && getBlocks( state ).some( block => block.name === blockType.name ),
+		isDisabled: !! blockType.useOnce && getBlocks( state ).some( ( block ) => block.name === blockType.name ),
 	};
 }
 
@@ -1305,11 +1305,11 @@ export function getInserterItems( state, allowedBlockTypes ) {
 		return [];
 	}
 
-	const staticItems = getBlockTypes().map( blockType =>
+	const staticItems = getBlockTypes().map( ( blockType ) =>
 		buildInserterItemFromBlockType( state, allowedBlockTypes, blockType )
 	);
 
-	const dynamicItems = getSharedBlocks( state ).map( sharedBlock =>
+	const dynamicItems = getSharedBlocks( state ).map( ( sharedBlock ) =>
 		buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock )
 	);
 
@@ -1319,12 +1319,12 @@ export function getInserterItems( state, allowedBlockTypes ) {
 
 function fillWithCommonBlocks( inserts ) {
 	// Filter out any inserts that are associated with a block type that isn't registered
-	const items = inserts.filter( insert => getBlockType( insert.name ) );
+	const items = inserts.filter( ( insert ) => getBlockType( insert.name ) );
 
 	// Common blocks that we'll use to pad out our list
 	const commonInserts = getBlockTypes()
-		.filter( blockType => blockType.category === 'common' )
-		.map( blockType => ( { name: blockType.name } ) );
+		.filter( ( blockType ) => blockType.category === 'common' )
+		.map( ( blockType ) => ( { name: blockType.name } ) );
 
 	const areInsertsEqual = ( a, b ) => a.name === b.name && a.ref === b.ref;
 	return unionWith( items, commonInserts, areInsertsEqual );
@@ -1335,7 +1335,7 @@ function getItemsFromInserts( state, inserts, allowedBlockTypes, maximum = MAX_R
 		return [];
 	}
 
-	const items = fillWithCommonBlocks( inserts ).map( insert => {
+	const items = fillWithCommonBlocks( inserts ).map( ( insert ) => {
 		if ( insert.ref ) {
 			const sharedBlock = getSharedBlock( state, insert.ref );
 			return buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock );

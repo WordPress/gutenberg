@@ -34,7 +34,7 @@ describe( 'blocks', () => {
 	} );
 
 	afterEach( () => {
-		getBlockTypes().forEach( block => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 		setUnknownTypeHandlerName( undefined );

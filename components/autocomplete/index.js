@@ -221,7 +221,7 @@ export class Autocomplete extends Component {
 			let completers = nextCompleters;
 
 			if ( completers.some( isDeprecatedCompleter ) ) {
-				completers = completers.map( completer => {
+				completers = completers.map( ( completer ) => {
 					return isDeprecatedCompleter( completer ) ?
 						toCompatibleCompleter( completer ) :
 						completer;
@@ -370,7 +370,7 @@ export class Autocomplete extends Component {
 		 */
 		Promise.resolve(
 			typeof options === 'function' ? options( query ) : options
-		).then( optionsData => {
+		).then( ( optionsData ) => {
 			const keyedOptions = optionsData.map( ( optionData, optionIndex ) => ( {
 				key: `${ completer.idx }-${ optionIndex }`,
 				value: optionData,

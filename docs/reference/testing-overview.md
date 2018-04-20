@@ -21,7 +21,7 @@ When writing tests consider the following:
 
 Tests for JavaScript use [Jest](http://facebook.github.io/jest/) as the test runner and its API for [globals](https://facebook.github.io/jest/docs/en/api.html) (`describe`, `test`, `beforeEach` and so on) [assertions](http://facebook.github.io/jest/docs/en/expect.html), [mocks](http://facebook.github.io/jest/docs/en/mock-functions.html), [spies](http://facebook.github.io/jest/docs/en/jest-object.html#jestspyonobject-methodname) and [mock functions](https://facebook.github.io/jest/docs/en/mock-function-api.html). If needed, you can also use [Enzyme](https://github.com/airbnb/enzyme) for React component testing.
 
-Assuming you've followed the [instructions](../CONTRIBUTING.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
+Assuming you've followed the [instructions](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
 ```
 npm test

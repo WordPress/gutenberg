@@ -10,7 +10,7 @@ import { compose } from '@wordpress/element';
  */
 import './style.scss';
 
-const SidebarFill = createSlotFill( 'editPost.Sidebar' );
+const { Fill, Slot } = createSlotFill( 'Sidebar' );
 
 /**
  * Renders a sidebar with its content.
@@ -19,7 +19,7 @@ const SidebarFill = createSlotFill( 'editPost.Sidebar' );
  */
 const Sidebar = ( { children, label } ) => {
 	return (
-		<SidebarFill>
+		<Fill>
 			<div
 				className="edit-post-sidebar"
 				role="region"
@@ -28,7 +28,7 @@ const Sidebar = ( { children, label } ) => {
 			>
 				{ children }
 			</div>
-		</SidebarFill>
+		</Fill>
 	);
 };
 
@@ -40,6 +40,6 @@ const WrappedSidebar = compose(
 	withFocusReturn,
 )( Sidebar );
 
-WrappedSidebar.Slot = SidebarFill.Slot;
+WrappedSidebar.Slot = Slot;
 
 export default WrappedSidebar;

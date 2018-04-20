@@ -57,49 +57,56 @@ export class BlockSettingsMenu extends Component {
 		const count = uids.length;
 
 		return (
-			<Dropdown
+			<div
 				className={ classnames( 'editor-block-settings-menu', {
 					'is-visible': isFocused || ! isHidden,
 				} ) }
-				contentClassName="editor-block-settings-menu__popover"
-				position="bottom left"
-				renderToggle={ ( { onToggle, isOpen } ) => {
-					const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
-						'is-opened': isOpen,
-					} );
+			>
+				<Dropdown
+					contentClassName="editor-block-settings-menu__popover"
+					position="bottom left"
+					renderToggle={ ( { onToggle, isOpen } ) => {
+						const toggleClassname = classnames( 'editor-block-settings-menu__toggle', {
+							'is-opened': isOpen,
+						} );
 
-					return (
-						<IconButton
-							className={ toggleClassname }
-							onClick={ () => {
-								if ( uids.length === 1 ) {
-									onSelect( uids[ 0 ] );
-								}
-								onToggle();
-							} }
-							icon="ellipsis"
-							label={ __( 'More Options' ) }
-							aria-expanded={ isOpen }
-							focus={ focus }
-							onFocus={ this.onFocus }
-							onBlur={ this.onBlur }
-						/>
-					);
-				} }
-				renderContent={ ( { onClose } ) => (
-				// Should this just use a DropdownMenu instead of a DropDown ?
-					<NavigableMenu className="editor-block-settings-menu__content">
-						{ renderBlockMenu( { onClose, children: [
-							count === 1 && <BlockModeToggle key="mode-toggle" uid={ uids[ 0 ] } onToggle={ onClose } role="menuitem" />,
-							count === 1 && <UnknownConverter key="unknown-converter" uid={ uids[ 0 ] } role="menuitem" />,
-							<BlockRemoveButton key="remove" uids={ uids } role="menuitem" />,
-							<BlockDuplicateButton key="duplicate" uids={ uids } rootUID={ rootUID } role="menuitem" />,
-							count === 1 && <SharedBlockSettings key="shared-block" uid={ uids[ 0 ] } onToggle={ onClose } itemsRole="menuitem" />,
-							<BlockTransformations key="transformations" uids={ uids } onClick={ onClose } itemsRole="menuitem" />,
-						] } ) }
-					</NavigableMenu>
-				) }
-			/>
+						return (
+							<IconButton
+								className={ toggleClassname }
+								onClick={ () => {
+									if ( uids.length === 1 ) {
+										onSelect( uids[ 0 ] );
+									}
+									onToggle();
+								} }
+								icon="ellipsis"
+								label={ __( 'More Options' ) }
+								aria-expanded={ isOpen }
+								focus={ focus }
+								onFocus={ this.onFocus }
+								onBlur={ this.onBlur }
+							/>
+						);
+					} }
+					renderContent={ ( { onClose } ) => (
+						// Should this just use a DropdownMenu instead of a DropDown ?
+						<NavigableMenu className="editor-block-settings-menu__content">
+							{ renderBlockMenu( { onClose, children: [
+								count === 1 && <BlockModeToggle key="mode-toggle" uid={ uids[ 0 ] } onToggle={ onClose } role="menuitem" />,
+								count === 1 && <UnknownConverter key="unknown-converter" uid={ uids[ 0 ] } role="menuitem" />,
+								<BlockDuplicateButton key="duplicate" uids={ uids } rootUID={ rootUID } role="menuitem" />,
+								count === 1 && <SharedBlockSettings key="shared-block" uid={ uids[ 0 ] } onToggle={ onClose } itemsRole="menuitem" />,
+								<BlockTransformations key="transformations" uids={ uids } onClick={ onClose } itemsRole="menuitem" />,
+							] } ) }
+						</NavigableMenu>
+					) }
+				/>
+				<BlockRemoveButton
+					uids={ uids }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
+				/>
+			</div>
 		);
 	}
 }

@@ -32,7 +32,7 @@ describe( 'align', () => {
 	};
 
 	afterEach( () => {
-		getBlockTypes().forEach( block => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 	} );

@@ -10,7 +10,7 @@ import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
 import './style.scss';
 import ModeSwitcher from '../mode-switcher';
 import FixedToolbarToggle from '../fixed-toolbar-toggle';
-import PluginMoreMenuGroup from '../../plugin-more-menu-group';
+import PluginMoreMenuGroup from '../plugins-more-menu-group';
 
 const MoreMenu = () => (
 	<Dropdown
@@ -28,7 +28,7 @@ const MoreMenu = () => (
 			<div className="edit-post-more-menu__content">
 				<ModeSwitcher onSelect={ onClose } />
 				<FixedToolbarToggle onToggle={ onClose } />
-				<PluginMoreMenuGroup fillProps={ { onClose } } />
+				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<MenuGroup
 					label={ __( 'Tools' ) }
 					filterName="editPost.MoreMenu.tools"

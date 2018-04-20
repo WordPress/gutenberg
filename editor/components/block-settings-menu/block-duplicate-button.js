@@ -13,7 +13,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { cloneBlock, getBlockType, withEditorSettings } from '@wordpress/blocks';
 
 export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false, role } ) {
-	const canDuplicate = every( blocks, block => {
+	const canDuplicate = every( blocks, ( block ) => {
 		const type = getBlockType( block.name );
 		return ! type.useOnce;
 	} );
@@ -43,7 +43,7 @@ export default compose(
 	} ) ),
 	withDispatch( ( dispatch, { blocks, index, rootUID } ) => ( {
 		onDuplicate() {
-			const clonedBlocks = blocks.map( block => cloneBlock( block ) );
+			const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 			dispatch( 'core/editor' ).insertBlocks(
 				clonedBlocks,
 				index + 1,
