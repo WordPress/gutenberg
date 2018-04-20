@@ -479,10 +479,10 @@ export class RichText extends Component {
 	}
 
 	insertInlineBlock() {
-		const { inlineBlock, completeInlineInsert } = this.props;
+		const { inlineBlockForInsert, completeInlineInsert } = this.props;
 
-		if ( inlineBlock.type === 'image' ) {
-			const { url, alt, width } = inlineBlock;
+		if ( inlineBlockForInsert.type === 'image' ) {
+			const { url, alt, width } = inlineBlockForInsert;
 			let img;
 
 			if ( width > 150 ) {
@@ -805,7 +805,7 @@ export class RichText extends Component {
 			this.toggleInsertAvailable();
 		}
 
-		if ( this.props.inlineBlock && this.props.isSelected ) {
+		if ( this.props.inlineBlockForInsert && this.props.isSelected ) {
 			this.insertInlineBlock();
 		}
 
@@ -1038,12 +1038,12 @@ const RichTextContainer = compose( [
 	withSelect( ( select ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
 		const { isInlineInsertionPointVisible = noop } = select( 'core/editor' ) || {};
-		const { getInlineBlock = noop } = select( 'core/editor' ) || {};
+		const { getInlineBlockForInsert = noop } = select( 'core/editor' ) || {};
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			isInlineInsertionPointVisible: isInlineInsertionPointVisible(),
-			inlineBlock: getInlineBlock(),
+			inlineBlockForInsert: getInlineBlockForInsert(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

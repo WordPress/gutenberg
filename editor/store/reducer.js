@@ -798,7 +798,7 @@ export function isInlineInsertionPointVisible( state = false, action ) {
  *
  * @return {Object} Updated state.
 */
-export function inlineBlock( state = null, action ) {
+export function inlineBlockForInsert( state = null, action ) {
 	switch ( action.type ) {
 		case 'INSERT_INLINE':
 			return action.inlineBlock;
@@ -1119,7 +1119,7 @@ export default optimist( combineReducers( {
 	blockListSettings,
 	isInsertionPointVisible,
 	isInlineInsertionPointVisible,
-	inlineBlock,
+	inlineBlockForInsert,
 	isInlineInsertAvailable,
 	preferences,
 	saving,

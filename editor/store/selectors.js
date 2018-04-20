@@ -1070,8 +1070,8 @@ export function isInlineInsertionPointVisible( state ) {
  *
  * @return {Object} Inline Block object with `type` and properties for the `type`.
  */
-export function getInlineBlock( state ) {
-	return state.inlineBlock;
+export function getInlineBlockForInsert( state ) {
+	return state.inlineBlockForInsert;
 }
 
 export function isInlineInsertAvailable( state ) {
