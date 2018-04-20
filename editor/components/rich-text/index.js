@@ -505,8 +505,9 @@ export class RichText extends Component {
 		} = this.props;
 
 		if ( isSelected ) {
-			// setTimeout prevents bug when switching between two
-			// different RichText with keyboard
+			// When moving between two different RichText with the keyboard, we need to
+			// make sure `setInsertAvailable` is called after `setInsertUnavailable`
+			// from previous RichText so that editor state is correct
 			setTimeout( setInsertAvailable, 0 );
 		} else {
 			setInsertUnavailable();
