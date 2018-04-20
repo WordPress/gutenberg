@@ -810,30 +810,20 @@ function gutenberg_capture_code_editor_settings( $settings ) {
  */
 function get_autosave_newer_than_post_save( $post ) {
 	// Add autosave data if it is newer and changed.
-	$autosave      = wp_get_post_autosave( $post->ID );
-	$show_autosave = false;
+	$autosave = wp_get_post_autosave( $post->ID );
 
-	// Check if we have an autosave that is newer than the post and different from the current post.
+	// Check if the autosave is newer than the current post.
 	if (
 		$autosave &&
 		mysql2date( 'U', $autosave->post_modified_gmt, false ) > mysql2date( 'U', $post->post_modified_gmt, false )
 	) {
-		// Iterate thru revisioned fields checking for any changes.
-		foreach ( _wp_post_revision_fields( $post ) as $autosave_field => $_autosave_field ) {
-			if ( normalize_whitespace( $autosave->$autosave_field ) != normalize_whitespace( $post->$autosave_field ) ) {
-				$show_autosave = true;
-				break;
-			}
-		}
+		return $autosave
 	}
 
-	// If this autosave isn't newer and different from the current post, remove.
-	if ( $autosave && ! $show_autosave ) {
-		wp_delete_post_revision( $autosave->ID );
-		return false;
-	}
+	// If the autosave isn't newer, remove it.
+	wp_delete_post_revision( $autosave->ID );
 
-	return $autosave;
+	return false;
 }
 
 /**
