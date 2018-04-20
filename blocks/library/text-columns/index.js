@@ -13,7 +13,7 @@ import {
 	BlockAlignmentToolbar,
 	RichText,
 	InspectorControls,
-} from '@wordpress/blocks'
+} from '@wordpress/blocks';
 import { PanelBody, RangeControl, withState } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 
