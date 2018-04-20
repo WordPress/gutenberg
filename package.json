@@ -3,9 +3,12 @@
   "version": "0.0.1",
   "license": "GPL-2.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "clean": "watchman watch-del-all; rm -rf node_modules/ yarn.lock package-lock.json; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
-    "clean:install": "yarn clean; yarn; pushd example; yarn; popd"
+    "clean": "yarn clean-watchman; yarn clean-node; yarn clean-react; yarn clean-metro; yarn clean-jest;",
+    "clean-jest": "rm -rf $TMPDIR/jest_*;",
+    "clean-metro": "rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/metro-bundler-cache-*;",
+    "clean-node": "rm -rf node_modules/;",
+    "clean-react": "rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/react-native-packager-cache-*;",
+    "clean-watchman": "watchman watch-del-all;"
   },
   "peerDependencies": {
     "react": "16.3.1",
