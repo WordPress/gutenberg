@@ -7,14 +7,14 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { BlockEdit } from '../';
+import { Edit } from '../edit';
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
 } from '../../api';
 
-describe( 'BlockEdit', () => {
+describe( 'Edit', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
@@ -22,7 +22,7 @@ describe( 'BlockEdit', () => {
 	} );
 
 	it( 'should return null if block type not defined', () => {
-		const wrapper = shallow( <BlockEdit name="core/test-block" /> );
+		const wrapper = shallow( <Edit name="core/test-block" /> );
 
 		expect( wrapper.type() ).toBe( null );
 	} );
@@ -36,7 +36,7 @@ describe( 'BlockEdit', () => {
 			edit,
 		} );
 
-		const wrapper = shallow( <BlockEdit name="core/test-block" /> );
+		const wrapper = shallow( <Edit name="core/test-block" /> );
 
 		expect( wrapper.find( edit ) ).toBePresent();
 	} );
@@ -49,7 +49,7 @@ describe( 'BlockEdit', () => {
 			title: 'block title',
 		} );
 
-		const wrapper = shallow( <BlockEdit name="core/test-block" /> );
+		const wrapper = shallow( <Edit name="core/test-block" /> );
 
 		expect( wrapper.find( save ) ).toBePresent();
 	} );
@@ -67,7 +67,7 @@ describe( 'BlockEdit', () => {
 		} );
 
 		const wrapper = shallow(
-			<BlockEdit name="core/test-block" attributes={ attributes } />
+			<Edit name="core/test-block" attributes={ attributes } />
 		);
 
 		expect( wrapper.find( edit ) ).toHaveClassName( 'wp-block-test-block my-class' );
