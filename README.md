@@ -107,8 +107,17 @@ yarn
 cd example/
 yarn start --reset-cache
 ```
-This will start metro in this window, then compile/run the app with the following command:
+
+Open a new shell window and run either of these depending on the platform:
+
 ```
-yarn android # in another shell
+yarn android
+
+```
+
+or
+
+```
+yarn ios
 ```
 
