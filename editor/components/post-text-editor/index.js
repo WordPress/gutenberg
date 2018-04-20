@@ -67,7 +67,7 @@ class PostTextEditor extends Component {
 		return (
 			<Fragment>
 				<label htmlFor={ `post-content-${ instanceId }` } className="screen-reader-text">
-					{ decodedPlaceholder || __( 'Add content' ) }
+					{ decodedPlaceholder || __( 'Write your story' ) }
 				</label>
 				<Textarea
 					autoComplete="off"
@@ -77,7 +77,7 @@ class PostTextEditor extends Component {
 					onBlur={ this.stopEditing }
 					className="editor-post-text-editor"
 					id={ `post-content-${ instanceId }` }
-					placeholder={ decodedPlaceholder || __( 'Add content' ) }
+					placeholder={ decodedPlaceholder || __( 'Write your story' ) }
 				/>
 			</Fragment>
 		);
@@ -101,7 +101,7 @@ export default compose( [
 		};
 	} ),
 	withEditorSettings( ( settings ) => ( {
-		placeholder: settings.contentPlaceholder,
+		placeholder: settings.bodyPlaceholder,
 	} ) ),
 	withInstanceId,
 ] )( PostTextEditor );
