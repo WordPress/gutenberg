@@ -499,7 +499,7 @@ function gutenberg_get_post_type_viewable( $post_type ) {
  * @return array The list of post formats that the post type supports.
  */
 function gutenberg_get_post_type_formats( $post_type ) {
-	if ( ! post_type_supports( $post_type, 'post-formats' ) ) {
+	if ( ! post_type_supports( $post_type['slug'], 'post-formats' ) ) {
 		return array();
 	}
 
