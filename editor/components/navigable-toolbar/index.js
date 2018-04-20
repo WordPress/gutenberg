@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { cond, matchesProperty } from 'lodash';
+import { cond, matchesProperty, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,6 +9,12 @@ import { cond, matchesProperty } from 'lodash';
 import { NavigableMenu, KeyboardShortcuts } from '@wordpress/components';
 import { Component, findDOMNode, createRef } from '@wordpress/element';
 import { focus, keycodes } from '@wordpress/utils';
+import { withSelect } from '@wordpress/data';
+
+/**
+ * Internal Dependencies
+ */
+import { getBlockFocusableWrapper } from '../../utils/dom';
 
 /**
  * Browser dependencies
@@ -53,15 +59,28 @@ class NavigableToolbar extends Component {
 	focusSelection() {
 		// Ensure that a selection exists.
 		const selection = getSelection();
-		if ( ! selection ) {
+		if ( ! selection || ! selection.focusNode ) {
 			return;
 		}
 
-		// Focus node may be a text node, which cannot be focused directly.
-		// Find its parent element instead.
 		const { focusNode } = selection;
+		const { selectedBlockUID } = this.props;
+		const selectedBlockFocusableWrapper = getBlockFocusableWrapper( selectedBlockUID );
 		let focusElement = focusNode;
-		if ( focusElement.nodeType !== Node.ELEMENT_NODE ) {
+
+		/*
+		 * Not all blocks have editable fields that can have a selection, or they
+		 * can have both editable fields and other UI parts that can't have a selection.
+		 * In these cases the current selection could be the one from another block.
+		 * Move focus back to the selected block wrapper.
+		 */
+		if ( ! selectedBlockFocusableWrapper.contains( focusNode ) ) {
+			focusElement = selectedBlockFocusableWrapper;
+		} else if ( focusElement.nodeType !== Node.ELEMENT_NODE ) {
+			/*
+			 * Focus node may be a text node, which cannot be focused directly.
+			 * Find its parent element instead.
+			 */
 			focusElement = focusElement.parentElement;
 		}
 
@@ -71,7 +90,8 @@ class NavigableToolbar extends Component {
 	}
 
 	render() {
-		const { children, ...props } = this.props;
+		const { children, ...props } = omit( this.props, 'selectedBlockUID' );
+
 		return (
 			<NavigableMenu
 				orientation="horizontal"
@@ -95,4 +115,8 @@ class NavigableToolbar extends Component {
 	}
 }
 
-export default NavigableToolbar;
+export default withSelect( ( select ) => {
+	return {
+		selectedBlockUID: select( 'core/editor' ).getBlockSelectionStart(),
+	};
+} )( NavigableToolbar );
