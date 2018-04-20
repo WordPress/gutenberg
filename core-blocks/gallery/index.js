@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { filter, every } from 'lodash';
+import { stringify } from 'querystring';
+import memoize from 'memize';
 
 /**
  * WordPress dependencies
@@ -9,12 +11,23 @@ import { filter, every } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, editorMediaUpload } from '@wordpress/editor';
+import { dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import { default as edit, defaultColumnsNumber } from './edit';
+
+// Caches the media API calls, so if blocks get transformed, or deleted and added again, we don't spam the API.
+// This should be replaced as soon as we have an external data layer api that return promises or an equivalent interface.
+const requestMediaById = memoize( ( id ) =>
+	wp.apiRequest( { path: `/wp/v2/media/${ id }?${
+		stringify( {
+			_fields: 'id,source_url,alt_text,caption',
+		} )
+	}` } )
+);
 
 const blockAttributes = {
 	align: {
@@ -122,6 +135,27 @@ export const settings = {
 							return link === 'file' ? 'media' : link;
 						},
 					},
+				},
+				transform( attributes ) {
+					const block = createBlock( 'core/gallery' );
+					if ( attributes.images && attributes.images.length > 0 ) {
+						const convertApiToAttributeImage = ( image ) => ( {
+							alt: image.alt_text,
+							caption: image.caption.rendered,
+							id: image.id,
+							url: image.source_url,
+						} );
+						Promise.all(
+							attributes.images.map( ( { id } ) => requestMediaById( id ) )
+						).then(
+							( apiImages ) => {
+								dispatch( 'core/editor' ).updateBlockAttributes( block.uid, {
+									images: apiImages.map( convertApiToAttributeImage ),
+								} );
+							}
+						);
+					}
+					return block;
 				},
 			},
 			{

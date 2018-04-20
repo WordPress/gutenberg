@@ -10,7 +10,6 @@ import { Component } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
-import { withSelect } from '@wordpress/data';
 import { RichText } from '@wordpress/editor';
 
 /**
@@ -72,14 +71,7 @@ class GalleryImage extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { isSelected, image, url } = this.props;
-		if ( image && ! url ) {
-			this.props.setAttributes( {
-				url: image.source_url,
-				alt: image.alt_text,
-			} );
-		}
-
+		const { isSelected } = this.props;
 		// unselect the caption so when the user selects other image and comeback
 		// the caption is not immediately selected
 		if ( this.state.captionSelected && ! isSelected && prevProps.isSelected ) {
@@ -145,11 +137,4 @@ class GalleryImage extends Component {
 	}
 }
 
-export default withSelect( ( select, ownProps ) => {
-	const { getMedia } = select( 'core' );
-	const { id } = ownProps;
-
-	return {
-		image: id ? getMedia( id ) : null,
-	};
-} )( GalleryImage );
+export default GalleryImage;

@@ -660,9 +660,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		},
 		onReplace( blocks ) {
 			const { layout } = ownProps;
-			blocks = castArray( blocks ).map( ( block ) => (
-				cloneBlock( block, { layout } )
-			) );
+			blocks = castArray( blocks ).map( ( block ) => ( {
+				...block,
+				layout,
+			} ) );
 			replaceBlocks( [ ownProps.uid ], blocks );
 		},
 		onMetaChange( meta ) {
