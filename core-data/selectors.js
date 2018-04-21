@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { filter } from 'lodash';
+
+/**
  * Returns all the available terms for the given taxonomy.
  *
  * @param {Object} state    Data state.
@@ -56,6 +61,18 @@ export function isRequestingCategories( state ) {
  */
 export function getMedia( state, id ) {
 	return state.media[ id ];
+}
+
+/**
+ * Returns media objects attached to a post, given a post ID.
+ *
+ * @param {Object} state  Data state.
+ * @param {number} postId Post id.
+ *
+ * @return {Array} Media list.
+ */
+export function getPostMedia( state, postId ) {
+	return filter( state.media, { post: postId } );
 }
 
 /**

@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getTerms, isRequestingTerms, getMedia, getPostType } from '../selectors';
+import { getTerms, isRequestingTerms, getMedia, getPostMedia, getPostType } from '../selectors';
 
 describe( 'getTerms()', () => {
 	it( 'returns value of terms by taxonomy', () => {
@@ -72,6 +72,30 @@ describe( 'getMedia', () => {
 			},
 		} );
 		expect( getMedia( state, 1 ) ).toEqual( { id: 1 } );
+	} );
+} );
+
+describe( 'getPostMedia', () => {
+	it( 'should return undefined for unknown media', () => {
+		const state = deepFreeze( {
+			media: {},
+		} );
+		expect( getPostMedia( state, 1 ) ).toEqual( [] );
+	} );
+
+	it( 'should return a media element by id', () => {
+		const state = deepFreeze( {
+			media: {
+				1: { id: 1, post: 42 },
+				2: { id: 2, post: 42 },
+				3: { id: 3, post: 84 },
+				4: { id: 4 },
+			},
+		} );
+		expect( getPostMedia( state, 42 ) ).toEqual( [
+			{ id: 1, post: 42 },
+			{ id: 2, post: 42 },
+		] );
 	} );
 } );
 

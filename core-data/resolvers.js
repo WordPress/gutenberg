@@ -36,6 +36,17 @@ export async function* getMedia( state, id ) {
 }
 
 /**
+ * Requests all media elements attached to a post from the REST API.
+ *
+ * @param {Object} state  State tree.
+ * @param {number} postId Post id.
+ */
+export async function* getPostMedia( state, postId ) {
+	const media = await apiRequest( { path: `/wp/v2/media?parent=${ postId }` } );
+	yield receiveMedia( media );
+}
+
+/**
  * Requests a post type element from the REST API.
  *
  * @param {Object} state State tree
