@@ -7,7 +7,7 @@ When updating static blocks markup and attributes, block authors need to conside
 
 A block can have several deprecated versions. Gutenberg will try them one after another until finding the one that matches the saved markup.
 
-To declare a deprecated version, you need to copy the old `attributes`, `support` and `save` properties from the old definition to the `deprecated` property of the udpated block.
+To declare a deprecated version, you need to copy the old `attributes`, `support` and `save` properties from the old definition to the `deprecated` property of the updated block.
 
 ### Example:
 
