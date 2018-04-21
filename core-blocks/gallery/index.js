@@ -59,6 +59,13 @@ const blockAttributes = {
 			},
 		},
 	},
+	// To be set only by the shortcode transform to signal the intent to
+	// converting `[shortcode]` to a Gallery block with images filled in as
+	// attributes.
+	useAttachedImages: {
+		type: 'boolean',
+		default: false,
+	},
 	columns: {
 		type: 'number',
 	},
@@ -113,6 +120,10 @@ export const settings = {
 								id: parseInt( id, 10 ),
 							} ) );
 						},
+					},
+					useAttachedImages: {
+						type: 'boolean',
+						shortcode: ( { named: { ids } } ) => ! ids,
 					},
 					columns: {
 						type: 'number',

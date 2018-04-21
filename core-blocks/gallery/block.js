@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { filter, pick } from 'lodash';
+import { filter, noop, pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,8 +13,10 @@ import {
 	DropZone,
 	FormFileUpload,
 	PanelBody,
+	Placeholder,
 	RangeControl,
 	SelectControl,
+	Spinner,
 	ToggleControl,
 	Toolbar,
 } from '@wordpress/components';
@@ -26,6 +28,7 @@ import {
 	ImagePlaceholder,
 	InspectorControls,
 } from '@wordpress/blocks';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -146,19 +149,39 @@ class GalleryBlock extends Component {
 		);
 	}
 
-	componentWillReceiveProps( nextProps ) {
+	componentWillReceiveProps( { isSelected, attachedImages } ) {
 		// Deselect images when deselecting the block
-		if ( ! nextProps.isSelected && this.props.isSelected ) {
+		if ( ! isSelected && this.props.isSelected ) {
 			this.setState( {
 				selectedImage: null,
 				captionSelected: false,
+			} );
+		}
+
+		// Process REST API data and commit to attributes.
+		if ( attachedImages !== this.props.attachedImages &&
+				attachedImages && ! this.props.url
+		) {
+			this.props.setAttributes( {
+				images: attachedImages.map( ( image ) => ( {
+					url: image.source_url,
+					alt: image.alt_text,
+				} ) ),
+				useAttachedImages: false,
 			} );
 		}
 	}
 
 	render() {
 		const { attributes, isSelected, className } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const {
+			align,
+			columns = defaultColumnsNumber( attributes ),
+			imageCrop,
+			images,
+			linkTo,
+			useAttachedImages,
+		} = attributes;
 
 		const dropZone = (
 			<DropZone
@@ -193,6 +216,19 @@ class GalleryBlock extends Component {
 				) }
 			</BlockControls>
 		);
+
+		if ( useAttachedImages && images.length === 0 ) {
+			return [
+				<Placeholder
+					key="placeholder"
+					instructions={ __( 'Loading gallery images…' ) }
+					icon="format-gallery"
+					label={ __( 'Gallery' ) }
+					className={ className }>
+					<Spinner />
+				</Placeholder>,
+			];
+		}
 
 		if ( images.length === 0 ) {
 			return (
@@ -271,4 +307,15 @@ class GalleryBlock extends Component {
 	}
 }
 
-export default GalleryBlock;
+export default withSelect( ( select, { attributes } ) => {
+	if ( ! attributes.useAttachedImages ) {
+		return;
+	}
+
+	const { getPostMedia = noop } = select( 'core' ) || noop;
+	const { getCurrentPostId = noop } = select( 'core/editor' ) || noop;
+	const postId = getCurrentPostId();
+	return postId && {
+		attachedImages: getPostMedia( postId ),
+	};
+} )( GalleryBlock );

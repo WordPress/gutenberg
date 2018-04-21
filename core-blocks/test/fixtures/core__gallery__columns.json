@@ -17,6 +17,7 @@
                     "caption": []
                 }
             ],
+            "useAttachedImages": false,
             "columns": 1,
             "imageCrop": true,
             "linkTo": "none"
