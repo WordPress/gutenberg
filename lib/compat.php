@@ -501,7 +501,7 @@ function gutenberg_register_rest_api_post_type_viewable() {
 		array(
 			'get_callback' => 'gutenberg_get_post_type_viewable',
 			'schema'       => array(
-				'description' => __( 'Whether or not the post type can be viewed', 'gutenberg' ),
+				'description' => __( 'Whether or not the post type can be viewed.', 'gutenberg' ),
 				'type'        => 'boolean',
 				'context'     => array( 'edit' ),
 				'readonly'    => true,
