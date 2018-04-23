@@ -14,17 +14,19 @@ export { Provider as BlockEditContextProvider };
  * A Higher Order Component used to inject BlockEdit context to the
  * wrapped component.
  *
- * @param {Component} OriginalComponent Component to wrap.
+ * @param {Function} mapContextToProps Function called on every context change,
+ *                                     expected to return object of props to
+ *                                     merge with the component's own props.
  *
- * @return {Component} Component which has BlockEdit context injected.
+ * @return {Component} Enhanced component with injected context as props.
  */
-export const withBlockEditContext = createHigherOrderComponent( ( OriginalComponent ) => {
+export const withBlockEditContext = ( mapContextToProps ) => createHigherOrderComponent( ( OriginalComponent ) => {
 	return ( props ) => (
 		<Consumer>
 			{ ( context ) => (
 				<OriginalComponent
 					{ ...props }
-					blockEditContext={ context }
+					{ ...mapContextToProps( context ) }
 				/>
 			) }
 		</Consumer>

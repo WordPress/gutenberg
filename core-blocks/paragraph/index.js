@@ -26,10 +26,8 @@ import {
 } from '@wordpress/components';
 import {
 	createBlock,
-	blockAutocompleter,
 	getColorClass,
 	withColors,
-	userAutocompleter,
 	AlignmentToolbar,
 	BlockAlignmentToolbar,
 	BlockControls,
@@ -65,8 +63,6 @@ const FONT_SIZES = {
 	large: 36,
 	larger: 48,
 };
-
-const autocompleters = [ blockAutocompleter, userAutocompleter ];
 
 class ParagraphBlock extends Component {
 	constructor() {
@@ -274,7 +270,6 @@ class ParagraphBlock extends Component {
 						onReplace={ this.onReplace }
 						onRemove={ () => onReplace( [] ) }
 						placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-						autocompleters={ autocompleters }
 					/>
 				</div>
 			</Fragment>

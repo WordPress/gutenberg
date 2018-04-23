@@ -74,8 +74,8 @@ export function withFilteredAutocompleters( Autocomplete ) {
 		}
 
 		updateCompletersState() {
-			const { blockEditContext } = this.props;
-			let { completers: nextCompleters } = this.props;
+			const { blockName, completers } = this.props;
+			let nextCompleters = completers;
 			const lastFilteredCompletersProp = nextCompleters;
 
 			if ( hasFilter( 'blocks.Autocomplete.completers' ) ) {
@@ -83,7 +83,7 @@ export function withFilteredAutocompleters( Autocomplete ) {
 					'blocks.Autocomplete.completers',
 					// Provide copies so filters may directly modify them.
 					nextCompleters && nextCompleters.map( clone ),
-					blockEditContext.name,
+					blockName,
 				);
 			}
 
@@ -114,6 +114,10 @@ export function withFilteredAutocompleters( Autocomplete ) {
 }
 
 export default compose( [
-	withBlockEditContext,
+	withBlockEditContext( ( { name } ) => {
+		return {
+			blockName: name,
+		};
+	} ),
 	withFilteredAutocompleters,
 ] )( OriginalAutocomplete );
