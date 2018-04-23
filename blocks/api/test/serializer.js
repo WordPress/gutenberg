@@ -33,7 +33,7 @@ describe( 'block serializer', () => {
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
-		getBlockTypes().forEach( block => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 	} );
@@ -42,7 +42,7 @@ describe( 'block serializer', () => {
 		it( 'returns beautiful content', () => {
 			const content = getBeautifulContent( '<div><div>Beautiful</div></div>' );
 
-			expect( content ).toBe( '<div>\n    <div>Beautiful</div>\n</div>' );
+			expect( content ).toBe( '<div>\n\t<div>Beautiful</div>\n</div>' );
 		} );
 	} );
 
@@ -377,9 +377,9 @@ describe( 'block serializer', () => {
 			expect( serialize( block ) ).toEqual(
 				'<!-- wp:test-block -->\n' +
 				'<p class="wp-block-test-block">Invalid\n' +
-				'    <!-- wp:test-block -->\n' +
-				'    <p class="wp-block-test-block"></p>\n' +
-				'    <!-- /wp:test-block -->\n' +
+				'\t<!-- wp:test-block -->\n' +
+				'\t<p class="wp-block-test-block"></p>\n' +
+				'\t<!-- /wp:test-block -->\n' +
 				'</p>\n' +
 				'<!-- /wp:test-block -->'
 			);

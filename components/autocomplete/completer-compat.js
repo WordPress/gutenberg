@@ -25,7 +25,7 @@ export function toCompatibleCompleter( deprecatedCompleter ) {
 	} );
 
 	const optionalProperties = [ 'className', 'allowNode', 'allowContext' ]
-		.filter( key => key in deprecatedCompleter )
+		.filter( ( key ) => key in deprecatedCompleter )
 		.reduce( ( properties, key ) => {
 			return {
 				...properties,

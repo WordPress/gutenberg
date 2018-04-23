@@ -101,7 +101,11 @@ export class BlockSettingsMenu extends Component {
 						</NavigableMenu>
 					) }
 				/>
-				<BlockRemoveButton uids={ uids } />
+				<BlockRemoveButton
+					uids={ uids }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
+				/>
 			</div>
 		);
 	}

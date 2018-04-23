@@ -51,15 +51,15 @@
 	}
 
 	// Hover, active and focus styles
-	&:not(:disabled):hover {
+	&:not( :disabled ):not( [aria-disabled="true"] ):hover {
 		@include button-style__hover;
 	}
 
-	&:not(:disabled):active {
+	&:not( :disabled ):not( [aria-disabled="true"] ):active {
 		@include button-style__active;
 	}
 
-	&:not(:disabled):focus {
+	&:not( :disabled ):not( [aria-disabled="true"] ):focus {
 		@include button-style__focus-active;
 	}
 }

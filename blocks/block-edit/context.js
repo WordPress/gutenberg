@@ -4,7 +4,7 @@
 import { createContext, createHigherOrderComponent } from '@wordpress/element';
 
 const { Consumer, Provider } = createContext( {
-	isSelected: true,
+	isSelected: false,
 } );
 
 export { Provider as BlockEditContextProvider };

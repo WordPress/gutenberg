@@ -50,7 +50,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, className, isSelected } ) {
+	edit( { attributes, setAttributes, className } ) {
 		const { content } = attributes;
 
 		return (
@@ -65,12 +65,17 @@ export const settings = {
 				placeholder={ __( 'Write…' ) }
 				wrapperClassName={ className }
 				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-				isSelected={ isSelected }
 			/>
 		);
 	},
 
 	save( { attributes, className } ) {
-		return <pre className={ className }>{ attributes.content }</pre>;
+		return (
+			<RichText.Content
+				tagName="pre"
+				className={ className }
+				value={ attributes.content }
+			/>
+		);
 	},
 };

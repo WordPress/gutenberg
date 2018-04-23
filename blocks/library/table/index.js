@@ -4,6 +4,11 @@
 import { __ } from '@wordpress/i18n';
 
 /**
+ * WordPress dependencies
+ */
+import { Fragment } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import './editor.scss';
@@ -11,6 +16,7 @@ import './style.scss';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import RichText from '../../rich-text';
 
 export const name = 'core/table';
 
@@ -56,33 +62,30 @@ export const settings = {
 	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { content } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		return [
-			isSelected && (
-				<BlockControls key="toolbar">
+		return (
+			<Fragment>
+				<BlockControls>
 					<BlockAlignmentToolbar
 						value={ attributes.align }
 						onChange={ updateAlignment }
 					/>
 				</BlockControls>
-			),
-			<TableBlock
-				key="editor"
-				onChange={ ( nextContent ) => {
-					setAttributes( { content: nextContent } );
-				} }
-				content={ content }
-				className={ className }
-				isSelected={ isSelected }
-			/>,
-		];
+				<TableBlock
+					onChange={ ( nextContent ) => {
+						setAttributes( { content: nextContent } );
+					} }
+					content={ content }
+					className={ className }
+					isSelected={ isSelected }
+				/>
+			</Fragment>
+		);
 	},
 
 	save( { attributes } ) {
 		const { content, align } = attributes;
 		return (
-			<table className={ align ? `align${ align }` : null }>
-				{ content }
-			</table>
+			<RichText.Content tagName="table" className={ align ? `align${ align }` : null } value={ content } />
 		);
 	},
 };

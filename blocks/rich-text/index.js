@@ -5,7 +5,6 @@ import classnames from 'classnames';
 import {
 	last,
 	isEqual,
-	omitBy,
 	forEach,
 	merge,
 	identity,
@@ -14,13 +13,12 @@ import {
 	noop,
 	reject,
 } from 'lodash';
-import { nodeListToReact } from 'dom-react';
 import 'element-closest';
 
 /**
  * WordPress dependencies
  */
-import { createElement, Component, renderToString, Fragment, compose } from '@wordpress/element';
+import { Component, Fragment, compose, RawHTML } from '@wordpress/element';
 import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange, getScrollContainer } from '@wordpress/utils';
 import { withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
@@ -38,24 +36,9 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
+import { domToFormat, valueToString, isEmpty } from './format';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
-
-export function createTinyMCEElement( type, props, ...children ) {
-	if ( props[ 'data-mce-bogus' ] === 'all' ) {
-		return null;
-	}
-
-	if ( props.hasOwnProperty( 'data-mce-bogus' ) ) {
-		return children;
-	}
-
-	return createElement(
-		type,
-		omitBy( props, ( value, key ) => key.indexOf( 'data-mce-' ) === 0 ),
-		...children
-	);
-}
 
 /**
  * Returns true if the node is the inline node boundary. This is used in node
@@ -104,7 +87,7 @@ export function filterEmptyNodes( childNodes ) {
 export function getFormatProperties( formatName, parents ) {
 	switch ( formatName ) {
 		case 'link' : {
-			const anchor = find( parents, node => node.nodeName.toLowerCase() === 'a' );
+			const anchor = find( parents, ( node ) => node.nodeName.toLowerCase() === 'a' );
 			return !! anchor ? { value: anchor.getAttribute( 'href' ) || '', target: anchor.getAttribute( 'target' ) || '', node: anchor } : {};
 		}
 		default:
@@ -115,20 +98,8 @@ export function getFormatProperties( formatName, parents ) {
 const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
 export class RichText extends Component {
-	constructor( props ) {
+	constructor( { value } ) {
 		super( ...arguments );
-
-		const { value } = props;
-		if ( 'production' !== process.env.NODE_ENV && undefined !== value &&
-					! Array.isArray( value ) ) {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Invalid value of type ${ typeof value } passed to RichText ` +
-				'(expected array). Attribute values should be sourced using ' +
-				'the `children` source when used with RichText.\n\n' +
-				'See: https://wordpress.org/gutenberg/handbook/block-api/attributes/#children'
-			);
-		}
 
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
@@ -293,7 +264,7 @@ export class RichText extends Component {
 		if ( item && ! HTML ) {
 			const blob = item.getAsFile ? item.getAsFile() : item;
 			const rootNode = this.editor.getBody();
-			const isEmpty = this.editor.dom.isEmpty( rootNode );
+			const isEmptyEditor = this.editor.dom.isEmpty( rootNode );
 			const content = rawHandler( {
 				HTML: `<img src="${ createBlobURL( blob ) }">`,
 				mode: 'BLOCKS',
@@ -303,7 +274,7 @@ export class RichText extends Component {
 			// Allows us to ask for this information when we get a report.
 			window.console.log( 'Received item:\n\n', blob );
 
-			if ( isEmpty && this.props.onReplace ) {
+			if ( isEmptyEditor && this.props.onReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
 				this.props.setTimeout( () => this.props.onReplace( content ) );
 			} else if ( this.props.onSplit ) {
@@ -330,7 +301,7 @@ export class RichText extends Component {
 	 *                                     by tinyMCE.
 	 */
 	onPastePreProcess( event ) {
-		const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
+		const HTML = this.isPlainTextPaste ? '' : event.content;
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', HTML );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
@@ -357,11 +328,11 @@ export class RichText extends Component {
 		}
 
 		const rootNode = this.editor.getBody();
-		const isEmpty = this.editor.dom.isEmpty( rootNode );
+		const isEmptyEditor = this.editor.dom.isEmpty( rootNode );
 
 		let mode = 'INLINE';
 
-		if ( isEmpty && this.props.onReplace ) {
+		if ( isEmptyEditor && this.props.onReplace ) {
 			mode = 'BLOCKS';
 		} else if ( this.props.onSplit ) {
 			mode = 'AUTO';
@@ -399,8 +370,8 @@ export class RichText extends Component {
 	 */
 
 	onChange() {
-		this.isEmpty = this.editor.dom.isEmpty( this.editor.getBody() );
-		this.savedContent = this.isEmpty ? [] : this.getContent();
+		this.savedContent = this.getContent();
+		this.isEmpty = isEmpty( this.savedContent, this.props.format );
 		this.props.onChange( this.savedContent );
 	}
 
@@ -503,10 +474,12 @@ export class RichText extends Component {
 				const index = dom.nodeIndex( selectedNode );
 				const beforeNodes = childNodes.slice( 0, index );
 				const afterNodes = childNodes.slice( index + 1 );
-				const beforeElement = nodeListToReact( beforeNodes, createTinyMCEElement );
-				const afterElement = nodeListToReact( afterNodes, createTinyMCEElement );
 
-				this.restoreContentAndSplit( beforeElement, afterElement );
+				const { format } = this.props;
+				const before = domToFormat( beforeNodes, format, this.editor );
+				const after = domToFormat( afterNodes, format, this.editor );
+
+				this.restoreContentAndSplit( before, after );
 			} else {
 				event.preventDefault();
 				this.onCreateUndoLevel();
@@ -597,10 +570,11 @@ export class RichText extends Component {
 			const beforeFragment = beforeRange.extractContents();
 			const afterFragment = afterRange.extractContents();
 
-			const beforeElement = nodeListToReact( beforeFragment.childNodes, createTinyMCEElement );
-			const afterElement = nodeListToReact( filterEmptyNodes( afterFragment.childNodes ), createTinyMCEElement );
+			const { format } = this.props;
+			const before = domToFormat( beforeFragment.childNodes, format, this.editor );
+			const after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
 
-			this.restoreContentAndSplit( beforeElement, afterElement, blocks );
+			this.restoreContentAndSplit( before, after, blocks );
 		} else {
 			this.restoreContentAndSplit( [], [], blocks );
 		}
@@ -648,9 +622,10 @@ export class RichText extends Component {
 		// Splitting into two blocks
 		this.setContent( this.props.value );
 
+		const { format } = this.props;
 		this.restoreContentAndSplit(
-			nodeListToReact( before, createTinyMCEElement ),
-			nodeListToReact( after, createTinyMCEElement )
+			domToFormat( before, format, this.editor ),
+			domToFormat( after, format, this.editor )
 		);
 	}
 
@@ -702,12 +677,22 @@ export class RichText extends Component {
 		} );
 	}
 
-	setContent( content = '' ) {
-		this.editor.setContent( renderToString( content ) );
+	setContent( content ) {
+		const { format } = this.props;
+		this.editor.setContent( valueToString( content, format ) );
 	}
 
 	getContent() {
-		return nodeListToReact( this.editor.getBody().childNodes || [], createTinyMCEElement );
+		const { format } = this.props;
+
+		switch ( format ) {
+			case 'string':
+				return this.editor.getContent();
+			default:
+				return this.editor.dom.isEmpty( this.editor.getBody() ) ?
+					[] :
+					domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -806,6 +791,7 @@ export class RichText extends Component {
 			isSelected,
 			formatters,
 			autocompleters,
+			format,
 		} = this.props;
 
 		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
@@ -849,6 +835,7 @@ export class RichText extends Component {
 								onSetup={ this.onSetup }
 								style={ style }
 								defaultValue={ value }
+								format={ format }
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-label={ placeholder }
 								aria-autocomplete="list"
@@ -886,9 +873,10 @@ RichText.contextTypes = {
 RichText.defaultProps = {
 	formattingControls: DEFAULT_FORMATS,
 	formatters: [],
+	format: 'element',
 };
 
-export default compose( [
+const RichTextContainer = compose( [
 	withBlockEditContext,
 	withSelect( ( select, { isSelected, blockEditContext } ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
@@ -900,3 +888,23 @@ export default compose( [
 	} ),
 	withSafeTimeout,
 ] )( RichText );
+
+RichTextContainer.Content = ( { value, format = 'element', tagName: Tag, ...props } ) => {
+	let children;
+	switch ( format ) {
+		case 'string':
+			children = <RawHTML>{ value }</RawHTML>;
+			break;
+		default:
+			children = value;
+			break;
+	}
+
+	if ( Tag ) {
+		return <Tag { ...props }>{ children }</Tag>;
+	}
+
+	return children;
+};
+
+export default RichTextContainer;
