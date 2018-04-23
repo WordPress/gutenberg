@@ -435,6 +435,13 @@ export const settings = {
 			textAlign: align,
 		};
 
-		return <p style={ styles } className={ className ? className : undefined }>{ content }</p>;
+		return (
+			<RichText.Content
+				tagName="p"
+				style={ styles }
+				className={ className ? className : undefined }
+				value={ content }
+			/>
+		);
 	},
 };
