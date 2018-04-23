@@ -6,7 +6,8 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { defaultAutocompleters } from '../default-autocompleters';
+import '../default-autocompleters';
+import { defaultAutocompleters } from '../../autocompleters';
 
 describe( 'default-autocompleters', () => {
 	it( 'provides default completers if none are provided', () => {

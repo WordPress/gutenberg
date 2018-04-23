@@ -5,11 +5,11 @@ It turns out that writing the simplest possible block which contains only static
 - [zgordon/gutenberg-course](https://github.com/zgordon/gutenberg-course) - a repository for Zac Gordon's Gutenberg Development Course
 - [ahmadawais/Gutenberg-Boilerplate](https://github.com/ahmadawais/Gutenberg-Boilerplate) - an inline documented starter WordPress plugin for the new Gutenberg editor
 
-It might be also a good idea to browse the folder with [all core blocks](https://github.com/WordPress/gutenberg/tree/master/blocks/library) to see how they are implemented.
+It might be also a good idea to browse the folder with [all core blocks](https://github.com/WordPress/gutenberg/tree/master/core-blocks) to see how they are implemented.
 
 ## WP-CLI
 
-Another way of making developer's life easier is to use [WP-CLI](http://wp-cli.org/), which provides a command-line interface for many actions you might perform on the WordPress instance. One of the commands generates all the code required to register a Gutenberg block for a plugin or theme. 
+Another way of making developer's life easier is to use [WP-CLI](http://wp-cli.org/), which provides a command-line interface for many actions you might perform on the WordPress instance. One of the commands generates all the code required to register a Gutenberg block for a plugin or theme.
 
 ### Installing
 
