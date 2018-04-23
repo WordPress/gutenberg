@@ -24,6 +24,7 @@ export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockEdit } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as ColorPalette } from './color-palette';
+export { default as ContrastChecker } from './contrast-checker';
 export { default as ImagePlaceholder } from './image-placeholder';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorControls } from './inspector-controls';

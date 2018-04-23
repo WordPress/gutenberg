@@ -26,13 +26,13 @@ import {
 import {
 	createBlock,
 	blockAutocompleter,
-	defaultAutocompleters,
+	userAutocompleter,
 	AlignmentToolbar,
 	BlockAlignmentToolbar,
-	InspectorControls,
 	BlockControls,
 	ColorPalette,
 	ContrastChecker,
+	InspectorControls,
 	RichText,
 } from '@wordpress/blocks';
 
@@ -63,7 +63,7 @@ const FONT_SIZES = {
 	larger: 48,
 };
 
-const autocompleters = [ blockAutocompleter, ...defaultAutocompleters ];
+const autocompleters = [ blockAutocompleter, userAutocompleter ];
 
 class ParagraphBlock extends Component {
 	constructor() {
