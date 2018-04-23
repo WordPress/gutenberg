@@ -17,8 +17,10 @@ export default withAPIData( ( props ) => {
 	const options = {
 		category_id: props.options.categoryId || '',
 		s: props.options.term || '',
+		type: 'post',
 		order: props.options.order || 'desc',
 		orderBy: props.options.orderBy || 'date',
+		per_page: 10,
 	};
 
 	const postsListQuery = stringify( pickBy( options, ( value ) => ! isUndefined( value ) ) );
