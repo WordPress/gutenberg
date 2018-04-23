@@ -92,3 +92,4 @@ window.wpApiSettings.nonce = window.wpApiSettings.nonce || '123456789';
 window.wpApiSettings.schema = window.wpApiSettings.schema || {};
 window.wpApiSettings.schema.routes = window.wpApiSettings.schema.routes || {};
 window.wpApiSettings.schema.routes[ '\/wp\/v2\/posts' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/posts' ] || { methods: [ 'GET' ] };
+window.wpApiSettings.schema.routes[ '\/wp\/v2\/posts\/(?P<id>[\\d]+)' ] = window.wpApiSettings.schema.routes[ '\/wp\/v2\/posts\/(?P<id>[\\d]+)' ] || { methods: [ 'GET' ] };

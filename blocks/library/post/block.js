@@ -8,7 +8,7 @@ import { findKey, map, get } from 'lodash';
  * WordPress dependencies
  */
 import { PostTypeSupportCheck } from '@wordpress/editor';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -21,6 +21,7 @@ import {
 	Toolbar,
 	withAPIData,
 } from '@wordpress/components';
+// import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	AlignmentToolbar,
@@ -35,6 +36,7 @@ import {
 /**
  * Internal dependencies
  */
+import '@wordpress/core-data';
 import './editor.scss';
 
 export const FONT_SIZES = {
@@ -121,11 +123,11 @@ class PostBlock extends Component {
 		const { post } = nextProps;
 
 		// Only update post properties if a new post is returned
-		if ( this.props.post !== nextProps.post ) {
+		if ( this.props.post !== post ) {
 			if ( post && post.data ) {
 				setAttributes( {
 					title: [ get( post.data, 'title.rendered' ) ],
-					url: post.data.image_url,
+					// url: post.data.image_url,
 					postId: '', // reset postId
 				} );
 			}
@@ -309,15 +311,26 @@ class PostBlock extends Component {
 	}
 }
 
-export default withAPIData( ( props ) => {
-	const { postId } = props.attributes;
+export default compose( [
+	// withSelect( ( select, props ) => {
+	// 	const { getMedia } = select( 'core' );
+	// 	const featuredMedia = get( props, 'post.featured_media', false);
 
-	if ( postId ) {
+	// 	console.log( props );
+	// 	console.log( featuredMedia );
+
+	// 	return {
+	// 		media: featuredMedia ? getMedia( featuredMedia ) : null,
+	// 	}
+	// } ),
+	withAPIData( ( props ) => {
+		const { postId } = props.attributes;
+
 		return {
-			post: `/wp/v2/posts/${ postId }`,
+			post: postId ? `/wp/v2/posts/${ postId }?type=post` : null,
 		};
-	}
-} )( PostBlock );
+	} ),
+] )( PostBlock );
 
 export function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?
