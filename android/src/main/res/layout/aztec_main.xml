@@ -32,25 +32,5 @@
             android:focusableInTouchMode="true"
             aztec:historyEnable="true"
             aztec:historySize="10"/>
-
-        <org.wordpress.aztec.source.SourceViewEditText
-            android:id="@+id/source"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="top|start"
-            android:hint="Test"
-            android:inputType="textNoSuggestions|textMultiLine"
-            android:paddingEnd="16dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="16dp"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:textSize="14sp"
-            android:visibility="gone"
-            android:imeOptions="flagNoExtractUi"
-            aztec:codeBackgroundColor="@android:color/transparent"
-            aztec:codeTextColor="@android:color/black"/>
-
     </FrameLayout>
 </org.wordpress.mobile.ReactNativeAztec.ReactAztecView>
