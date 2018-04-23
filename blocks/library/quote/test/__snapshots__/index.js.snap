@@ -3,35 +3,5 @@
 exports[`core/quote block edit matches snapshot 1`] = `
 <blockquote
   class="wp-block-quote"
->
-  <div
-    class="blocks-rich-text"
-  >
-    <div>
-      <div>
-        <div
-          class="components-autocomplete"
-        >
-          <div
-            aria-autocomplete="list"
-            aria-expanded="false"
-            aria-label="Write quote…"
-            aria-multiline="true"
-            class="blocks-rich-text__tinymce"
-            contenteditable="true"
-            data-is-placeholder-visible="true"
-            role="textbox"
-          />
-          <div
-            class="blocks-rich-text__tinymce"
-          >
-            <p>
-              Write quote…
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</blockquote>
+/>
 `;
