@@ -216,9 +216,14 @@ export const settings = {
 
 		return (
 			<div className={ `align${ align }` }>
-				<a className={ linkClass } href={ url } title={ title } style={ buttonStyle }>
-					{ text }
-				</a>
+				<RichText.Content
+					tagName="a"
+					className={ linkClass }
+					href={ url }
+					title={ title }
+					style={ buttonStyle }
+					value={ text }
+				/>
 			</div>
 		);
 	},
@@ -231,9 +236,13 @@ export const settings = {
 
 			return (
 				<div className={ `align${ align }` } style={ { backgroundColor: color } }>
-					<a href={ url } title={ title } style={ { color: textColor } }>
-						{ text }
-					</a>
+					<RichText.Content
+						tagName="a"
+						href={ url }
+						title={ title }
+						style={ { color: textColor } }
+						value={ text }
+					/>
 				</div>
 			);
 		},

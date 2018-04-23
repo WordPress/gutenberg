@@ -168,12 +168,13 @@ export const settings = {
 
 	save( { attributes } ) {
 		const { align, nodeName, content } = attributes;
-		const Tag = nodeName.toLowerCase();
 
 		return (
-			<Tag style={ { textAlign: align } } >
-				{ content }
-			</Tag>
+			<RichText.Content
+				tagName={ nodeName.toLowerCase() }
+				style={ { textAlign: align } }
+				value={ content }
+			/>
 		);
 	},
 };

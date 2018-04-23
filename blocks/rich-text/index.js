@@ -18,7 +18,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, compose } from '@wordpress/element';
+import { Component, Fragment, compose, RawHTML } from '@wordpress/element';
 import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange, getScrollContainer } from '@wordpress/utils';
 import { withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
@@ -301,7 +301,7 @@ export class RichText extends Component {
 	 *                                     by tinyMCE.
 	 */
 	onPastePreProcess( event ) {
-		const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
+		const HTML = this.isPlainTextPaste ? '' : event.content;
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', HTML );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
@@ -876,7 +876,7 @@ RichText.defaultProps = {
 	format: 'element',
 };
 
-export default compose( [
+const RichTextContainer = compose( [
 	withBlockEditContext,
 	withSelect( ( select, { isSelected, blockEditContext } ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
@@ -888,3 +888,23 @@ export default compose( [
 	} ),
 	withSafeTimeout,
 ] )( RichText );
+
+RichTextContainer.Content = ( { value, format = 'element', tagName: Tag, ...props } ) => {
+	let children;
+	switch ( format ) {
+		case 'string':
+			children = <RawHTML>{ value }</RawHTML>;
+			break;
+		default:
+			children = value;
+			break;
+	}
+
+	if ( Tag ) {
+		return <Tag { ...props }>{ children }</Tag>;
+	}
+
+	return children;
+};
+
+export default RichTextContainer;

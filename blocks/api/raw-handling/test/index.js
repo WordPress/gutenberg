@@ -134,6 +134,16 @@ describe( 'rawHandler', () => {
 
 		equal( filtered, '<p>Some <strong>bold</strong> text.</p>' );
 	} );
+
+	it( 'should parse Markdown with HTML', () => {
+		const filtered = rawHandler( {
+			HTML: '',
+			plainText: '# Some <em>heading</em>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		equal( filtered, '<h1>Some <em>heading</em></h1>' );
+	} );
 } );
 
 import './integration';

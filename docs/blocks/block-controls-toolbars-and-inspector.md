@@ -79,7 +79,11 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 		var content = props.attributes.content,
 			alignment = props.attributes.alignment;
 
-		return el( 'p', { className: props.className, style: { textAlign: alignment } }, content );
+		return el( RichText.Content, {
+			className: props.className,
+			style: { textAlign: alignment },
+			value: content
+		} );
 	},
 } );
 ```
@@ -143,13 +147,19 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 	save( { attributes, className } ) {
 		const { content, alignment } = attributes;
 
-		return <p className={ className } style={ { textAlign: alignment } }>{ content }</p>;
+		return (
+			<RichText.Content
+				className={ className }
+				style={ { textAlign: alignment } }
+				value={ content }
+			/>
+		);
 	},
 } );
 ```
 {% end %}
 
-Note that `BlockControls` is only visible when the block is currently selected. 
+Note that `BlockControls` is only visible when the block is currently selected.
 
 ## Inspector
 

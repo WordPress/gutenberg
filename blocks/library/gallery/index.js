@@ -15,6 +15,7 @@ import { mediaUpload } from '@wordpress/utils';
 import './editor.scss';
 import './style.scss';
 import { createBlock } from '../../api';
+import RichText from '../../rich-text';
 import { default as GalleryBlock, defaultColumnsNumber } from './block';
 
 const blockAttributes = {
@@ -186,7 +187,9 @@ export const settings = {
 						<li key={ image.id || image.url } className="blocks-gallery-item">
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
-								{ image.caption && image.caption.length > 0 && <figcaption>{ image.caption }</figcaption> }
+								{ image.caption && image.caption.length > 0 && (
+									<RichText.Content tagName="figcaption" value={ image.caption } />
+								) }
 							</figure>
 						</li>
 					);
