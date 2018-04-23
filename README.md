@@ -8,11 +8,6 @@ GPL v2
 
 ## Android: Run the example app
 
-At the root folder, run:
-```
-$ yarn clean:install
-```
-
 Make sure to have an emulator running or an Android device connected, and then:
 
 ```
@@ -25,18 +20,9 @@ This will build the Android library (via `gradle`) and example app, then launch 
 
 ## iOS: Run the example app
 
-At the root folder, clean the library:
-```
-$ yarn clean:install
-```
-
-Then move to the example folder:
+Simply do:
 ```
 $ cd example/
-```
-
-Clean the example app and run it:
-```
 $ yarn clean:install
 $ yarn ios
 ```
@@ -60,22 +46,19 @@ Q: The example app gets compiled but ReactNative shows an error
 
 A: try running, from the root folder in the project
 ```
-yarn clean
-yarn
-cd example/
-yarn start --reset-cache
+$ cd example/
+$ yarn start --reset-cache
 ```
 
 Open a new shell window and run either of these depending on the platform:
 
 ```
-yarn android
-
+$ yarn android
 ```
 
 or
 
 ```
-yarn ios
+$ yarn ios
 ```
 

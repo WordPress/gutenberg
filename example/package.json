@@ -4,16 +4,16 @@
   "description": "Example for running ponies",
   "main": "index.js",
   "scripts": {
+    "install-aztec": "pushd ../ && (yarn install; popd;)",
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "test": "jest",
-    "clean": "watchman watch-del-all; rm -rf node_modules/ yarn.lock package-lock.json; yarn clean-react; yarn clean-metro; yarn clean-jest; yarn clean-ios;",
-    "clean-ios": "type xcodebuild &> /dev/null && (xcodebuild -project ./iOS/example.xcodeproj -alltargets clean && rm -rf ./iOS/build);",
-    "clean-jest": "rm -rf $TMPDIR/jest_*",
-    "clean-metro": "rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/metro-bundler-cache-*;",
-    "clean-react": "rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/react-native-packager-cache-*",
-    "clean:install": "yarn clean; yarn;"
+    "clean": "yarn clean-aztec; yarn clean-node; yarn clean-ios;",
+    "clean-aztec": "pushd ../ && (yarn clean; popd;)",
+    "clean-ios": "type xcodebuild &> /dev/null && (xcodebuild -project ./ios/example.xcodeproj -alltargets clean && rm -rf ./ios/build);",
+    "clean-node": "rm -rf node_modules/;",
+    "clean:install": "yarn clean && yarn install-aztec && yarn install"
   },
   "dependencies": {
     "react": "16.3.1",
