@@ -161,14 +161,22 @@ export function registerResolvers( reducerKey, newResolvers ) {
 			}
 		};
 
-		// Ensure single invocation per argument set via memoization
-		// or via isFulfilled call if provided.
-		const fulfill = resolver.isFulfilled ? ( ...args ) => {
-			const state = store.getState();
-			if ( ! resolver.isFulfilled( state, ...args ) ) {
-				rawFulfill( ...args );
-			}
-		} : memoize( rawFulfill );
+		let fulfill;
+		if ( typeof resolver.isFulfilled === 'function' ) {
+			// When resolver provides its own fulfillment condition, enforce
+			// that fullfillment occurs max once per argument set, with intent
+			// of manual condition in opting _out_ of fulfillment.
+			fulfill = memoize( async ( ...args ) => {
+				const state = store.getState();
+
+				if ( ! resolver.isFulfilled( state, ...args ) ) {
+					rawFulfill( ...args );
+				}
+			} );
+		} else {
+			// Default fulfillment single time by argument set.
+			fulfill = memoize( rawFulfill );
+		}
 
 		return ( ...args ) => {
 			fulfill( ...args );
