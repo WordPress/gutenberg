@@ -44,7 +44,7 @@ export const FONT_SIZES = {
 	larger: 48,
 };
 
-class ArticleBlock extends Component {
+class PostBlock extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -118,15 +118,15 @@ class ArticleBlock extends Component {
 
 	componentWillReceiveProps( nextProps ) {
 		const { setAttributes } = this.props;
-		const { article } = nextProps;
+		const { post } = nextProps;
 
-		// Only update article properties if a new article is returned
-		if ( this.props.article !== nextProps.article ) {
-			if ( article && article.data ) {
+		// Only update post properties if a new post is returned
+		if ( this.props.post !== nextProps.post ) {
+			if ( post && post.data ) {
 				setAttributes( {
-					title: [ get( article.data, 'title.rendered' ) ],
-					url: article.data.image_url,
-					articleId: '', // reset articleId
+					title: [ get( post.data, 'title.rendered' ) ],
+					url: post.data.image_url,
+					postId: '', // reset postId
 				} );
 			}
 		}
@@ -134,7 +134,7 @@ class ArticleBlock extends Component {
 
 	render() {
 		const { attributes, setAttributes, isSelected, className } = this.props;
-		const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, articleId } = attributes;
+		const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, postId } = attributes;
 
 		const fontSize = this.getFontSize();
 		const style = url ? { backgroundImage: `url(${ url })` } : undefined;
@@ -179,16 +179,16 @@ class ArticleBlock extends Component {
 				</Toolbar>
 			</BlockControls>,
 			<InspectorControls key="inspector">
-				<PanelBody title={ __( 'Article Settings' ) }>
+				<PanelBody title={ __( 'Post Settings' ) }>
 					<TextControl
 						label={ __( 'ID' ) }
-						value={ articleId }
-						onChange={ ( idValue ) => setAttributes( { articleId: idValue } ) }
+						value={ postId }
+						onChange={ ( idValue ) => setAttributes( { postId: idValue } ) }
 					>
 					</TextControl>
 				</PanelBody>
 
-				<PanelBody title={ __( 'Article Image Settings' ) }>
+				<PanelBody title={ __( 'Post Image Settings' ) }>
 					<ToggleControl
 						label={ __( 'Fixed Background' ) }
 						checked={ !! hasParallax }
@@ -284,7 +284,7 @@ class ArticleBlock extends Component {
 
 		if ( ! url ) {
 			const icon = 'format-image';
-			const label = __( 'Article image' );
+			const label = __( 'Post image' );
 
 			return [
 				controls,
@@ -310,14 +310,14 @@ class ArticleBlock extends Component {
 }
 
 export default withAPIData( ( props ) => {
-	const { articleId } = props.attributes;
+	const { postId } = props.attributes;
 
-	if ( articleId ) {
+	if ( postId ) {
 		return {
-			article: `/wp/v2/articles/${ articleId }`,
+			post: `/wp/v2/posts/${ postId }`,
 		};
 	}
-} )( ArticleBlock );
+} )( PostBlock );
 
 export function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?

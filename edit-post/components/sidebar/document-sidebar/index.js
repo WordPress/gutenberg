@@ -18,7 +18,7 @@ import DocumentOutlinePanel from '../document-outline-panel';
 import MetaBoxes from '../../meta-boxes';
 import SettingsHeader from '../settings-header';
 import Sidebar from '../';
-import ArticlesPanel from '../articles-panel';
+import PostsPanel from '../posts-panel';
 import TemplateSettingsPanel from '../template-settings-panel';
 
 const SIDEBAR_NAME = 'edit-post/document';
@@ -31,7 +31,7 @@ const DocumentSidebar = () => (
 		<SettingsHeader sidebarName={ SIDEBAR_NAME } />
 		<Panel>
 			<PostStatus />
-			<ArticlesPanel />
+			<PostsPanel />
 			<TemplateSettingsPanel />
 			<LastRevision />
 			<PostTaxonomies />

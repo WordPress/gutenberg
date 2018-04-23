@@ -35,7 +35,7 @@ import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 
-import * as article from './article';
+import * as post from './post';
 import * as rows from './rows';
 
 export const registerCoreBlocks = () => {
@@ -75,7 +75,7 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
-		article,
+		post,
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );

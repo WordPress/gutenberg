@@ -1,17 +1,17 @@
-.components-articles-list {
+.components-posts-list {
 	padding-left: 0;
 
-	.components-articles-list-item {
+	.components-posts-list-item {
 		list-style: none;
 		position: relative;
 
-		.components-articles-list-item-title {
+		.components-posts-list-item-title {
 			color: $blue-medium-500;
 			padding: 10px;
 			background: $white;
 		}
 
-		.components-articles-list-item-draggable {
+		.components-posts-list-item-draggable {
 			position: absolute;
 		    top: 0;
 		    right: 0;
@@ -30,7 +30,7 @@
 }
 
 .components-draggable__clone {
-	.components-articles-list-item-draggable {
+	.components-posts-list-item-draggable {
 		box-shadow: $shadow-popover;
 
 		@include break-small {

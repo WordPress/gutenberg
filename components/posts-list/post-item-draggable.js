@@ -11,7 +11,7 @@ import { Component, compose } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { withSelect } from '@wordpress/data';
 
-class ArticleItemDraggable extends Component {
+class PostItemDraggable extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -21,13 +21,13 @@ class ArticleItemDraggable extends Component {
 	}
 
 	componentDidMount() {
-		const { article } = this.props;
+		const { post } = this.props;
 
 		if ( ! this.state.block.uid ) {
 			// create a new block
-			const block = createBlock( 'dynamic/article', {
-				url: article.image_url,
-				title: [ article.title.rendered ],
+			const block = createBlock( 'custom/post', {
+				url: post.image_url,
+				title: [ post.title.rendered ],
 				layout: '',
 			} );
 
@@ -44,7 +44,7 @@ class ArticleItemDraggable extends Component {
 			return '';
 		}
 
-		const className = classnames( 'components-articles-list-item-draggable', {
+		const className = classnames( 'components-posts-list-item-draggable', {
 			'is-visible': isDragging,
 		} );
 
@@ -59,7 +59,7 @@ class ArticleItemDraggable extends Component {
 
 		return (
 			<Draggable className={ className } transferData={ transferData } { ...props }>
-				<div className="components-articles-list-item-draggable-inner"></div>
+				<div className="components-posts-list-item-draggable-inner"></div>
 			</Draggable>
 		);
 	}
@@ -69,4 +69,4 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint(),
 	} ) ),
-] )( ArticleItemDraggable );
+] )( PostItemDraggable );

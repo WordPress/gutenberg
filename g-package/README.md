@@ -10,13 +10,17 @@ This package is based on [Gutenberg v2.7.0](https://github.com/WordPress/gutenbe
 * [Installation](#installation)
 * [Usage](#usage)
 * [Global variables](#global-variables)
-	* [*apiRequest* and *url*](#apirequest-and-url)
+    * [apiRequest](#apirequest)
+        * [GET types](#get-types)
+        * [PUT post or page](#put-post-or-page)
+        * [GET categories](#get-categories)
+    * [url](#url)
 * [Customize your Gutenberg](#customize-your-gutenberg)
-	* [Block Menu Tabs](#block-menu-tabs)
-	* [Block Categories](#block-categories)
-	* [Rows](#rows)
-	* [Articles Panel](articles-panels)
-		* [Article Block](article-block)
+    * [Block Menu Tabs](#block-menu-tabs)
+    * [Block Categories](#block-categories)
+    * [Rows](#rows)
+    * [Posts Panel](posts-panels)
+        * [Post Block](post-block)
 
 ## Installation
 
@@ -78,7 +82,7 @@ initializeEditor( target, page, settings );
 
 ## Global variables 
 
-Gutenberg depends on several global variables: `wp`, `wpApiSettings`, `_wpDateSettings`, `userSettings`, `wpEditorL10n`, etc but probably during your Gutenberg experiencie you will discover other required variables, please share with us if you feel they are important to Gutenberg execution. 
+Gutenberg depends on several global variables: `wp`, `wpApiSettings`, `_wpDateSettings`, `userSettings`, `wpEditorL10n`, etc and probably during your Gutenberg experiencie you will discover other required variables, please share with us if you feel they are important to Gutenberg execution. 
 
 Here we're only presenting those variables which - by our experience - we belive are crucial to Gutenberg and already set to them default values. If you don't set them up, you'll see that Gutenberg editor won't run.
 
@@ -93,7 +97,7 @@ window.wp = {
     ...,
 };
 
-// set the locale
+// set your locale
 window._wpDateSettings = { 
     l10n: { 
         locale: 'pt_PT',
@@ -111,7 +115,7 @@ window.wpApiSettings = {
 
 We are working to include on **Gutenberg by Frontkom** all settings that shouldn't be part of your apps, but you always can override them if you need.
 
-### *apiRequest* and *url*
+### apiRequest
 
 Those two are very important for comunication between the editor and remaining app, so you should set them up accordingly your needs. 
 
@@ -124,6 +128,70 @@ function apiRequest( options ) {
 }
 ```
 
+Next, we will show some commons API requests Gutenberg does and the respective response it expects. For more information, you can check the [WordPress REST API Documentation](https://v2.wp-api.org/reference/).
+
+#### GET types
+
+When you initialize the editor, Gutenberg will request the settings related with the *postType* you choose (**post** or **page**), invoking this API request `/wp/v2/types/[postType]?context=edit`. Here is an example for a response (check documentation [here](https://v2.wp-api.org/reference/types/)):
+
+```js
+{
+    labels: {
+        ...,
+        posts: 'Stories',
+    ...,
+    },
+    name: 'Posts',
+    rest_base: 'posts',
+    slug: 'post',
+    supports: {
+        author: true,
+    comments: false,
+    custom-fields: true,
+    media-library: false, // to disable Media library from WordPress
+    posts: true, // to show PostsPanel at sidebar
+    template-settings: true, // to show TemplateSettingsPanel at sidebar
+    thumbnail: false,
+    title: true,
+    ...,
+    },
+    ...,
+}
+```
+
+#### PUT post or page
+
+To save a [post](https://v2.wp-api.org/reference/posts/) or a [page](https://v2.wp-api.org/reference/pages/) content, Gutenberg does a PUT request to `/wp/v2/[postType]/[id]` sending a `data` object with `content`, `id` and/or `title` ( if its **postType** requires it). The response should be an object like this:
+
+```js
+{
+    id: 123456,
+    content: { 
+        raw: '<!-- wp:paragraph -->↵<p>World</p>↵<!-- /wp:paragraph -->',
+    rendered: '<p>World</p>',
+    },
+    title: { 
+        raw: 'Hello',
+    rendered: 'Hello',
+    }
+    ...,
+}
+```
+
+#### GET categories
+
+The request to get all [categories](https://v2.wp-api.org/reference/categories/) is `/wp/v2/categories` and expects an array of the follow objects:
+
+```js
+{
+    id: 1,
+    name: 'Category 1',
+    parent: 0,
+    ...,
+}
+```
+
+### url
 ***url*** should has a function called `addQueryArgs( url, args )` that handles with `url` and `args` and returns the final url to different actions. The original implementation is the following, feel free to keep it or change it according to your needs.
 
 ```js
@@ -257,27 +325,12 @@ window.customGutenberg = {
 
 ![Rows example](https://raw.githubusercontent.com/front/gutenberg/develop/rows_screenshot.png)
 
-### Articles Panel
+### Posts Panel
 
-The **Articles Panel** (`postType.supports[ 'articles' ] = true`) contains a list of articles which could be filtered by category and/or searched be name and then can be added to your page in form of an (Article block)[#article-block] by drag and drop.
+The **Posts Panel** (`postType.supports[ 'posts' ] = true`) contains a list of posts which could be filtered by category and/or searched be name and then can be added to your page in form of an (Post block)[#post-block] by drag and drop.
 
-*Articles* and *Categories* objects should follow the next structure:
+#### Post Block
 
-```js
-const article = {
-    id: 1,
-    title: { rendered: 'First article title' },
-    date_gmt: '2018-04-01T00:00:00.000Z',
-    date: '2018-04-01T00:00:00.000Z',
-    category_id: 1,
-    image_url: ABSOLUTE_PATH,
-};
+The **Post Block** is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a title.
 
-const category = { id: 1, name: 'Category 1', parent: 0 };
-```
-
-#### Article Block
-
-The **Article Block** is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a title.
-
-![Article Block example](https://raw.githubusercontent.com/front/gutenberg/develop/article_block_screenshot.png)
+![Post Block example](https://raw.githubusercontent.com/front/gutenberg/develop/post_block_screenshot.png)
