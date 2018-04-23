@@ -6,48 +6,6 @@ Wrapping Aztec Android and Aztec iOS in a React Native component
 
 GPL v2
 
-
-## Directory structure
-
-```
-.
-├── example
-│   ├── android
-│   ├── ios
-│   ├── app.json
-│   ├── index.android.js
-│   ├── index.ios.js
-│   └── package.json
-├── android
-│   └── src
-│      └── main
-│          └── java
-│              └── org
-│                  └── wordpress
-│                      └── mobile
-│                          └── ReactNativeAztec
-│                              ├── ReactAztecBlurEvent.java
-│                              ├── ReactAztecEndEditingEvent.java
-│                              ├── ReactAztecFocusEvent.java
-│                              ├── ReactAztecManager.java
-│                              ├── ReactAztecPackage.java
-│                              ├── ReactAztecText.java
-│                              └── ReactAztecView.java
-├── src
-│   └── AztecView.js
-├── index.js
-├── ios
-│   ├── Frameworks
-│   ├── RNTAztecView
-│   │      └── RCTAztecView.m
-│   └── RNTAztecView.xcodeproj
-├── package.json
-├── LICENSE.md
-└── README.md
-```
-
-If you have to change Android native code, you must have a look at the code in `android/src/main/java/` folder.
-
 ## Android: Run the example app
 
 At the root folder, run:
