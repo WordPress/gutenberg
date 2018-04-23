@@ -48,6 +48,10 @@ function render_block_core_categories( $attributes ) {
 
 	$class = "wp-block-categories wp-block-categories-{$type} align{$align}";
 
+	if ( isset( $attributes['className'] ) ) {
+		$class .= ' ' . $attributes['className'];
+	}
+
 	$block_content = sprintf(
 		$wrapper_markup,
 		esc_attr( $class ),

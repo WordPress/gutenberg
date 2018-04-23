@@ -257,7 +257,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 			},
 
 			save( props ) {
-				return <p>{ props.attributes.title }</div>;
+				return <p>{ props.attributes.title }</p>;
 			},
 		}
 	]

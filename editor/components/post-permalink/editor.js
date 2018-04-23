@@ -62,6 +62,7 @@ class PostPermalinkEditor extends Component {
 						aria-label={ __( 'Edit post permalink' ) }
 						value={ editedPostName }
 						onChange={ ( event ) => this.setState( { editedPostName: event.target.value } ) }
+						type="text"
 						required
 						autoFocus
 					/>

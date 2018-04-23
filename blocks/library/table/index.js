@@ -16,6 +16,7 @@ import './style.scss';
 import TableBlock from './table-block';
 import BlockControls from '../../block-controls';
 import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import RichText from '../../rich-text';
 
 export const name = 'core/table';
 
@@ -84,9 +85,7 @@ export const settings = {
 	save( { attributes } ) {
 		const { content, align } = attributes;
 		return (
-			<table className={ align ? `align${ align }` : null }>
-				{ content }
-			</table>
+			<RichText.Content tagName="table" className={ align ? `align${ align }` : null } value={ content } />
 		);
 	},
 };
