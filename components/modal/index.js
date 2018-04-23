@@ -49,16 +49,31 @@ class Modal extends Component {
 	}
 
 	render() {
-		const { children } = this.props;
+		const {
+			isOpen,
+			render,
+			className,
+			overlayClassName,
+			ariaLabelledBy,
+			children } = this.props;
+
 		return <ReactModal
-			isOpen={ true }
-			render={ true }
-			className={ 'edit-post-plugin-screen-takeover__editor-screen-takeover' }
-			overlayClassName={ 'edit-post-plugin-screen-takeover__editor-screen-takeover-overlay' }
-			aria-labelledby="modalID">
+			isOpen={ isOpen }
+			render={ render }
+			className={ className }
+			overlayClassName={ overlayClassName }
+			aria-labelledby={ ariaLabelledBy }>
 			{ children }
 		</ReactModal>;
 	}
 }
+
+Modal.defaultProps = {
+	isOpen: true,
+	render: true,
+	className: 'edit-post-plugin-screen-takeover__editor-screen-takeover',
+	overlayClassName: 'edit-post-plugin-screen-takeover__editor-screen-takeover-overlay',
+	ariaLabelledBy: 'modalID',
+};
 
 export default Modal;
