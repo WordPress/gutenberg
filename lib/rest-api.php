@@ -107,16 +107,28 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
 
 	// External embeds.
 	if ( '/oembed/1.0/proxy' === $request->get_route() ) {
+		$local_oembed = false;
 		if ( is_wp_error( $response ) ) {
 			// It's possibly a local post, so lets try and retrieve it that way.
 			$post_id = url_to_postid( $_GET['url'] );
 			$data    = get_oembed_response_data( $post_id, apply_filters( 'oembed_default_width', 600 ) );
 
-			if ( ! $data ) {
-				// Not a local post, return the original error.
-				return $response;
+			if ( $data ) {
+				// It's a local post!
+				$local_oembed = true;
+				$response     = (object) $data;
 			}
-			$response = (object) $data;
+		}
+
+		if ( is_wp_error( $response ) || ! $local_oembed ) {
+			global $wp_embed;
+			$html = $wp_embed->shortcode( array(), $_GET['url'] );
+			if ( $html ) {
+				return array(
+					'provider_name' => __( 'Embed Handler', 'gutenberg' ),
+					'html'          => $html,
+				);
+			}
 		}
 
 		// Make sure the HTML is run through the oembed sanitisation routines.
