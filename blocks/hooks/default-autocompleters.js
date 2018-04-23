@@ -12,6 +12,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { blockAutocompleter, userAutocompleter } from '../autocompleters';
+import { getDefaultBlockName } from '../api/registration';
 
 const defaultAutocompleters = [ userAutocompleter ];
 
@@ -20,7 +21,7 @@ function setDefaultCompleters( completers, blockName ) {
 		// Provide copies so filters may directly modify them.
 		completers = defaultAutocompleters.map( clone );
 		// Add blocks autocompleter for Paragraph block
-		if ( blockName === 'core/paragraph' ) {
+		if ( blockName === getDefaultBlockName() ) {
 			completers.push( clone( blockAutocompleter ) );
 		}
 	}

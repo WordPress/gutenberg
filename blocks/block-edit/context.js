@@ -26,7 +26,7 @@ export const withBlockEditContext = ( mapContextToProps ) => createHigherOrderCo
 			{ ( context ) => (
 				<OriginalComponent
 					{ ...props }
-					{ ...mapContextToProps( context ) }
+					{ ...mapContextToProps( context, props ) }
 				/>
 			) }
 		</Consumer>
