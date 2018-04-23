@@ -11,13 +11,13 @@ import {
 } from '@wordpress/components';
 import { PostTypeSupportCheck } from '@wordpress/editor';
 import { Component, Fragment } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
+import editorMediaUpload from '../../editor-media-upload';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
@@ -98,7 +98,7 @@ export const settings = {
 				return false;
 			};
 			const setVideo = ( [ audio ] ) => onSelectVideo( audio );
-			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setVideo, 'video' );
+			const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setVideo, 'video' );
 			const controls = (
 				<BlockControls>
 					<BlockAlignmentToolbar
@@ -193,7 +193,7 @@ export const settings = {
 
 			<figure className={ align ? `align${ align }` : null }>
 				{ src && <video controls src={ src } /> }
-				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
 	},
