@@ -125,7 +125,7 @@ export const settings = {
 			<div className={ `align${ width } columns-${ columns }` }>
 				{ times( columns, ( index ) =>
 					<div className="wp-block-column" key={ `column-${ index }` }>
-						<p>{ content && content[ index ].children }</p>
+						<RichText.Content tagName="p" value={ content && content[ index ].children } />
 					</div>
 				) }
 			</div>

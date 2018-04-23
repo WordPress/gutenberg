@@ -6,6 +6,7 @@ import {
 	registerBlockType,
 	BlockControls,
 	BlockAlignmentToolbar,
+	RichText,
 } from '@wordpress/blocks';
 
 /**
@@ -87,9 +88,7 @@ export const settings = {
 	save( { attributes } ) {
 		const { content, align } = attributes;
 		return (
-			<table className={ align ? `align${ align }` : null }>
-				{ content }
-			</table>
+			<RichText.Content tagName="table" className={ align ? `align${ align }` : null } value={ content } />
 		);
 	},
 };

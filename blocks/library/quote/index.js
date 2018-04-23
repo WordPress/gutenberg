@@ -245,12 +245,8 @@ export const settings = {
 				className={ style === 2 ? 'is-large' : '' }
 				style={ { textAlign: align ? align : null } }
 			>
-				{ value.map( ( paragraph, i ) => (
-					<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-				) ) }
-				{ citation && citation.length > 0 && (
-					<cite>{ citation }</cite>
-				) }
+				<RichText.Content value={ toRichTextValue( value ) } />
+				{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
 	},
@@ -274,12 +270,8 @@ export const settings = {
 						className={ `blocks-quote-style-${ style }` }
 						style={ { textAlign: align ? align : null } }
 					>
-						{ value.map( ( paragraph, i ) => (
-							<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-						) ) }
-						{ citation && citation.length > 0 && (
-							<footer>{ citation }</footer>
-						) }
+						<RichText.Content value={ toRichTextValue( value ) } />
+						{ citation && citation.length > 0 && <RichText.Content tagName="footer" value={ citation } /> }
 					</blockquote>
 				);
 			},

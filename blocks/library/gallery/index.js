@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	registerBlockType,
+	RichText,
 } from '@wordpress/blocks';
 import { mediaUpload } from '@wordpress/utils';
 
@@ -189,7 +190,9 @@ export const settings = {
 						<li key={ image.id || image.url } className="blocks-gallery-item">
 							<figure>
 								{ href ? <a href={ href }>{ img }</a> : img }
-								{ image.caption && image.caption.length > 0 && <figcaption>{ image.caption }</figcaption> }
+								{ image.caption && image.caption.length > 0 && (
+									<RichText.Content tagName="figcaption" value={ image.caption } />
+								) }
 							</figure>
 						</li>
 					);

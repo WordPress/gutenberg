@@ -73,7 +73,13 @@ export const settings = {
 	},
 
 	save( { attributes, className } ) {
-		return <pre className={ className }>{ attributes.content }</pre>;
+		return (
+			<RichText.Content
+				tagName="pre"
+				className={ className }
+				value={ attributes.content }
+			/>
+		);
 	},
 };
 

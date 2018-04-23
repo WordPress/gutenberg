@@ -6,7 +6,7 @@ import { find, compact, get, initial, last, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createElement, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
@@ -308,10 +308,8 @@ export const settings = {
 	save( { attributes } ) {
 		const { nodeName, values } = attributes;
 
-		return createElement(
-			nodeName.toLowerCase(),
-			null,
-			values
+		return (
+			<RichText.Content tagName={ nodeName.toLowerCase() } value={ values } />
 		);
 	},
 };
