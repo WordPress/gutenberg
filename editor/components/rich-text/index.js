@@ -127,11 +127,12 @@ export class RichText extends Component {
 		this.toggleInsertAvailable = this.toggleInsertAvailable.bind( this );
 		this.insertInlineBlock = this.insertInlineBlock.bind( this );
 		this.getFocusPosition = this.getFocusPosition.bind( this );
-		this.getInsertionPosition = this.getInsertionPosition.bind( this );
+		this.setInsertPosition = this.setInsertPosition.bind( this );
 
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
+			insertPosition: {},
 		};
 
 		this.containerRef = createRef();
@@ -463,19 +464,20 @@ export class RichText extends Component {
 		};
 	}
 
-	getInsertionPosition() {
+	setInsertPosition() {
 		const container = this.getContainerNode();
 		const containerStyle = window.getComputedStyle( container );
 		const marginLeft = get( containerStyle, 'margin-left', 0 );
 		const containerPosition = container.getBoundingClientRect();
 		const rect = getRectangleFromRange( this.editor.selection.getRng() );
-
-		return {
+		const insertPosition = {
 			top: rect.top - containerPosition.top,
 			left: rect.right - containerPosition.left,
 			marginLeft,
 			height: rect.height,
 		};
+
+		this.setState( { insertPosition } );
 	}
 
 	insertInlineBlock() {
@@ -806,6 +808,13 @@ export class RichText extends Component {
 			this.toggleInsertAvailable();
 		}
 
+		if (
+			this.props.isInlineInsertionPointVisible &&
+			! prevProps.isInlineInsertionPointVisible
+		) {
+			this.setInsertPosition();
+		}
+
 		if ( this.props.inlineBlockForInsert && this.props.isSelected ) {
 			this.insertInlineBlock();
 		}
@@ -964,7 +973,7 @@ export class RichText extends Component {
 				) }
 				{ isSelected && isInlineInsertionPointVisible &&
 					<InlineInsertionPoint
-						style={ this.getInsertionPosition() }
+						style={ this.state.insertPosition }
 					/>
 				}
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
