@@ -15,7 +15,7 @@ import ReactModal from 'react-modal';
 
 ReactModal.setAppElement( document.getElementById( 'wpwrap' ) );
 
-export default class Modal extends Component {
+class Modal extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -50,9 +50,15 @@ export default class Modal extends Component {
 
 	render() {
 		const { children } = this.props;
-		return <ReactModal isOpen={ true } render={ true } className={ 'edit-post-plugin-screen-takeover__editor-screen-takeover' } overlayClassName={ 'edit-post-plugin-screen-takeover__editor-screen-takeover-overlay' }
+		return <ReactModal
+			isOpen={ true }
+			render={ true }
+			className={ 'edit-post-plugin-screen-takeover__editor-screen-takeover' }
+			overlayClassName={ 'edit-post-plugin-screen-takeover__editor-screen-takeover-overlay' }
 			aria-labelledby="modalID">
 			{ children }
 		</ReactModal>;
 	}
 }
+
+export default Modal;
