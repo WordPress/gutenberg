@@ -32,7 +32,7 @@ $block-inserter-content-height: 262px;
 
 input[type="search"].editor-inserter__search {
 	display: block;
-	width: calc( 100% - 36px );
+	width: 100%;
 	margin: 0;
 	padding: 11px 16px;
 	box-shadow: none;
@@ -45,6 +45,7 @@ input[type="search"].editor-inserter__search {
 	font-size: $mobile-text-min-font-size;
 	@include break-small {
 		font-size: $default-font-size;
+		width: calc( 100% - 36px );
 	}
 
 	&:focus {

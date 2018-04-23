@@ -109,10 +109,6 @@ export class InserterMenu extends Component {
 			selectedTab: tab,
 			filterValue: '',
 		} );
-
-		if ( ! this.props.isLargeViewport ) {
-			this.setState( { isNavigationOpened: false } );
-		}
 	}
 
 	toggleNavigation() {
@@ -286,10 +282,10 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, items } = this.props;
+		const { instanceId, items, isLargeViewport } = this.props;
 		const { selectedItem, isNavigationOpened, selectedTab } = this.state;
 		const isSearching = this.state.filterValue;
-		const visibleTabs = selectedTab ? [ find( tabs, ( tab ) => tab.name === selectedTab ) ] : tabs;
+		const visibleTabs = isLargeViewport && selectedTab ? [ find( tabs, ( tab ) => tab.name === selectedTab ) ] : tabs;
 
 		// Disable reason: The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of
@@ -314,14 +310,16 @@ export class InserterMenu extends Component {
 						onChange={ this.filter }
 						autoFocus
 					/>
-					<IconButton
-						className="editor-inserter__navigation-toggle"
-						icon="filter-alt"
-						label={ __( 'Toggle inserter navigation' ) }
-						onClick={ this.toggleNavigation }
-					/>
+					{ isLargeViewport && (
+						<IconButton
+							className="editor-inserter__navigation-toggle"
+							icon="filter-alt"
+							label={ __( 'Toggle inserter navigation' ) }
+							onClick={ this.toggleNavigation }
+						/>
+					) }
 				</div>
-				{ isNavigationOpened && (
+				{ isNavigationOpened && isLargeViewport && (
 					<BlockInserterNavigation
 						onSelect={ this.selectTab }
 						onClose={ this.toggleNavigation }
