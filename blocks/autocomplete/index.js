@@ -7,8 +7,13 @@ import { clone } from 'lodash';
  * WordPress dependencies
  */
 import { applyFilters, hasFilter } from '@wordpress/hooks';
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { Autocomplete as OriginalAutocomplete } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { withBlockEditContext } from '../block-edit/context';
 
 /*
  * Use one array instance for fallback rather than inline array literals
@@ -69,6 +74,7 @@ export function withFilteredAutocompleters( Autocomplete ) {
 		}
 
 		updateCompletersState() {
+			const { blockEditContext } = this.props;
 			let { completers: nextCompleters } = this.props;
 			const lastFilteredCompletersProp = nextCompleters;
 
@@ -76,7 +82,8 @@ export function withFilteredAutocompleters( Autocomplete ) {
 				nextCompleters = applyFilters(
 					'blocks.Autocomplete.completers',
 					// Provide copies so filters may directly modify them.
-					nextCompleters && nextCompleters.map( clone )
+					nextCompleters && nextCompleters.map( clone ),
+					blockEditContext.name,
 				);
 			}
 
@@ -106,4 +113,7 @@ export function withFilteredAutocompleters( Autocomplete ) {
 	};
 }
 
-export default withFilteredAutocompleters( OriginalAutocomplete );
+export default compose( [
+	withBlockEditContext,
+	withFilteredAutocompleters,
+] )( OriginalAutocomplete );

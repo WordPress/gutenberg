@@ -38,21 +38,23 @@ export class BlockEdit extends Component {
 		};
 	}
 
-	static getDerivedStateFromProps( nextProps, prevState ) {
-		if ( nextProps.isSelected === get( prevState, [ 'context', 'isSelected' ] ) ) {
+	static getDerivedStateFromProps( { name, isSelected }, prevState ) {
+		if (
+			name === prevState.name &&
+			isSelected === prevState.isSelected
+		) {
 			return null;
 		}
 
 		return {
-			context: {
-				isSelected: nextProps.isSelected,
-			},
+			name,
+			isSelected,
 		};
 	}
 
 	render() {
 		return (
-			<BlockEditContextProvider value={ this.state.context }>
+			<BlockEditContextProvider value={ this.state }>
 				<Edit { ...this.props } />
 			</BlockEditContextProvider>
 		);
