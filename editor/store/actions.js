@@ -353,6 +353,13 @@ export function editPost( edits ) {
 	};
 }
 
+/**
+ * Returns an action object to save the post.
+ *
+ * @param {Object} options Set autosave: true for an autosave.
+ *
+ * @return {Object} Action object.
+ */
 export function savePost( options ) {
 	return {
 		type: 'REQUEST_POST_UPDATE',
