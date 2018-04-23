@@ -6,6 +6,7 @@ import {
 	setDefaultBlockName,
 	setUnknownTypeHandlerName,
 } from '@wordpress/blocks';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -38,6 +39,7 @@ import * as table from './table';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import { WSAEPFNOSUPPORT } from 'constants';
 
 export const registerCoreBlocks = () => {
 	[
@@ -81,4 +83,14 @@ export const registerCoreBlocks = () => {
 
 	setDefaultBlockName( paragraph.name );
 	setUnknownTypeHandlerName( freeform.name );
+};
+
+// Backwards compatibility
+wp.blocks.registerCoreBlocks = () => {
+	deprecated( 'wp.blocks.registerCoreBlocks', {
+		version: '3.0',
+		alternative: 'wp.coreBlocks.registerCoreBlocks',
+		plugin: 'Gutenberg',
+	} );
+	registerCoreBlocks();
 };
