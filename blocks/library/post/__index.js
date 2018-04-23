@@ -13,25 +13,25 @@ import { __ } from '@wordpress/i18n';
  */
 import { InnerBlocks } from '@wordpress/blocks';
 
-const getArticleLayout = [
+const getPostLayout = [
 	{
 		name: 'core/cover-image',
-		label: __( 'Article image' ),
+		label: __( 'Post image' ),
 		icon: 'image',
 	},
 	{
 		name: 'core/paragraph',
-		label: __( 'Article title' ),
+		label: __( 'Post title' ),
 		icon: 'image',
 	},
 ];
 
-export const name = 'dynamic/article';
+export const name = 'custom/post';
 
 export const settings = {
-	title: 'Article',
+	title: 'Post',
 
-	description: __( 'Article has an image and a title.' ),
+	description: __( 'Post has an image and a title.' ),
 
 	icon: 'universal-access-alt',
 
@@ -46,7 +46,7 @@ export const settings = {
 
 		return [
 			<div className={ classes } key="container">
-				<InnerBlocks layouts={ getArticleLayout } />
+				<InnerBlocks layouts={ getPostLayout } />
 			</div>,
 		];
 	},

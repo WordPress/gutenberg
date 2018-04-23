@@ -16,14 +16,14 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal Dependencies
  */
 import '@wordpress/core-data';
-import ArticlesSearch from '../../articles-search';
+import PostsSearch from '../../posts-search';
 
 /**
  * Module Constants
  */
-const PANEL_NAME = 'articles-panel';
+const PANEL_NAME = 'posts-panel';
 
-class ArticlesPanel extends Component {
+class PostsPanel extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -49,14 +49,14 @@ class ArticlesPanel extends Component {
 		const { categoryId, term } = this.state;
 
 		return (
-			<PostTypeSupportCheck supportKeys="articles">
+			<PostTypeSupportCheck supportKeys="posts">
 				<PanelBody
-					title={ get( postType, [ 'labels', 'articles' ], __( 'Stories' ) ) }
+					title={ get( postType, [ 'labels', 'posts' ], __( 'Posts' ) ) }
 					opened={ isOpened }
 					onToggle={ onTogglePanel }
 				>
 					<TextControl
-						placeholder={ __( 'Search articles' ) }
+						placeholder={ __( 'Search posts' ) }
 						value={ term }
 						onChange={ this.onInputChange }
 					/>
@@ -70,7 +70,7 @@ class ArticlesPanel extends Component {
 						onChange={ this.onCategoryChange }
 					/>
 
-					<ArticlesSearch
+					<PostsSearch
 						options={ { categoryId, term } }
 					/>
 				</PanelBody>
@@ -103,4 +103,4 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 export default compose( [
 	applyWithSelect,
 	applyWithDispatch,
-] )( ArticlesPanel );
+] )( PostsPanel );

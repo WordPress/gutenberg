@@ -12,14 +12,14 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import ArticleBlock, { FONT_SIZES, dimRatioToClass } from './block';
+import PostBlock, { FONT_SIZES, dimRatioToClass } from './block';
 
-export const name = 'dynamic/article';
+export const name = 'custom/post';
 
 export const settings = {
-	title: 'Article',
+	title: 'Post',
 
-	description: __( 'Article has an image and a title.' ),
+	description: __( 'Post has an image and a title.' ),
 
 	icon: 'universal-access-alt',
 
@@ -61,12 +61,12 @@ export const settings = {
 		customFontSize: {
 			type: 'number',
 		},
-		articleId: {
+		postId: {
 			type: 'string',
 		},
 	},
 
-	edit: ArticleBlock,
+	edit: PostBlock,
 
 	save( { attributes, className } ) {
 		const { url, title, textAlign, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize } = attributes;

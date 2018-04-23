@@ -7,10 +7,10 @@ import { stringify } from 'querystringify';
 /**
  * WordPress dependencies
  */
-import { ArticlesList, withAPIData } from '@wordpress/components';
+import { PostsList, withAPIData } from '@wordpress/components';
 
-function ArticlesSearch( { articlesList } ) {
-	return ( <ArticlesList articles={ get( articlesList, 'data', {} ) } /> );
+function PostsSearch( { postsList } ) {
+	return ( <PostsList posts={ get( postsList, 'data', {} ) } /> );
 }
 
 export default withAPIData( ( props ) => {
@@ -21,9 +21,9 @@ export default withAPIData( ( props ) => {
 		orderBy: props.options.orderBy || 'date',
 	};
 
-	const articlesListQuery = stringify( pickBy( options, ( value ) => ! isUndefined( value ) ) );
+	const postsListQuery = stringify( pickBy( options, ( value ) => ! isUndefined( value ) ) );
 
 	return {
-		articlesList: `/wp/v2/articles?${ articlesListQuery }`,
+		postsList: `/wp/v2/posts?${ postsListQuery }`,
 	};
-} )( ArticlesSearch );
+} )( PostsSearch );

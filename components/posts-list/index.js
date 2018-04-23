@@ -12,9 +12,9 @@ import { Component } from '@wordpress/element';
  * Internal Dependencies
  */
 import './style.scss';
-import ArticleItemDraggable from './article-item-draggable';
+import PostItemDraggable from './post-item-draggable';
 
-class ArticlesList extends Component {
+class PostsList extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -34,23 +34,23 @@ class ArticlesList extends Component {
 		this.setState( { dragging: false } );
 	}
 
-	renderArticles() {
+	renderPosts() {
 		const { dragging } = this.state;
-		const { articles } = this.props;
+		const { posts } = this.props;
 
-		return map( articles, ( article ) => {
-			const elementId = `article-item-${ article.id }`;
+		return map( posts, ( post ) => {
+			const elementId = `post-item-${ post.id }`;
 
 			return (
-				<li id={ elementId } className="components-articles-list-item" key={ article.id }>
-					<ArticleItemDraggable
-						article={ article }
+				<li id={ elementId } className="components-posts-list-item" key={ post.id }>
+					<PostItemDraggable
+						post={ post }
 						onDragStart={ this.onDragStart }
 						onDragEnd={ this.onDragEnd }
 						isDragging={ dragging }
 						elementId={ elementId }
 					/>
-					<div className="components-articles-list-item-title">{ article.title.rendered }</div>
+					<div className="components-posts-list-item-title">{ post.title.rendered }</div>
 				</li>
 			);
 		} );
@@ -58,11 +58,11 @@ class ArticlesList extends Component {
 
 	render() {
 		return (
-			<ul className="components-articles-list">
-				{ this.renderArticles() }
+			<ul className="components-posts-list">
+				{ this.renderPosts() }
 			</ul>
 		);
 	}
 }
 
-export default ArticlesList;
+export default PostsList;
