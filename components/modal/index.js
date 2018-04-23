@@ -16,36 +16,40 @@ import ModalContent from './modal-content';
 import * as ariaHelper from './aria-helper';
 import './style.scss';
 
+// Used to count the number of open modals.
 let modalCount = 0;
 
-function getParentElement( parentSelector ) {
-	return parentSelector ? parentSelector() : document.body;
-}
+let parentElement;
 
 class Modal extends Component {
 	static setAppElement( node ) {
 		ariaHelper.setAppElement( node );
 	}
 
+	static setParentElement( node ) {
+		if ( ! parentElement ) {
+			parentElement = node;
+		}
+	}
+
 	componentDidMount() {
 		modalCount++;
-		ariaHelper.hideApp();
 
-		getParentElement(
-			this.props.parentSelector
-		).appendChild( this.node );
+		if ( ! this.parentElement ) {
+			setElements();
+		}
+
+		ariaHelper.hideApp();
+		parentElement.appendChild( this.node );
 	}
 
 	componentWillUnmount() {
 		modalCount--;
+
 		if ( modalCount === 0 ) {
 			ariaHelper.showApp();
 		}
-
-		getParentElement(
-			this.props.parentSelector
-		).removeChild( this.node );
-		ariaHelper.showApp();
+		parentElement.removeChild( this.node );
 	}
 
 	render() {
@@ -93,7 +97,6 @@ Modal.defaultProps = {
 	focusOnMount: true,
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,
-	parentSelector: () => document.body,
 	style: {
 		content: null,
 		overlay: null,
@@ -105,5 +108,14 @@ Modal.defaultProps = {
 		describedby: null,
 	},
 };
+
+function setElements() {
+	const wpwrapEl = document.getElementById( 'wpwrap' );
+
+	if ( wpwrapEl ) {
+		Modal.setAppElement( wpwrapEl );
+		Modal.setParentElement( wpwrapEl.parentNode );
+	}
+}
 
 export default Modal;

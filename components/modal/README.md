@@ -88,14 +88,6 @@ If this property is added, it will determine whether the modal requests to close
 - Required: No
 - Default: true
 
-### parentSelector
-
-If this property is added, it overrides the default behaviour for selecting the dom node where the modal should mount.
-
-- Type: `function`
-- Required: No
-- Default: `() => document.body`
-
 ### style.content
 
 If this property is added, it will add inline styles to the modal content `div`.
