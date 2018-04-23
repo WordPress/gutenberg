@@ -12,9 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import {
-	BlockControls,
 	InspectorControls,
-	BlockAlignmentToolbar,
 	InnerBlocks,
 } from '@wordpress/blocks';
 
@@ -58,34 +56,20 @@ export const settings = {
 			type: 'number',
 			default: 2,
 		},
-		align: {
-			type: 'string',
-		},
 	},
 
 	description: __( 'A multi-column layout of content.' ),
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-
-		return { 'data-align': align };
+	supports: {
+		align: [ 'wide', 'full' ],
 	},
 
 	edit( { attributes, setAttributes, className } ) {
-		const { align, columns } = attributes;
+		const { columns } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
 
 		return (
 			<Fragment>
-				<BlockControls>
-					<BlockAlignmentToolbar
-						controls={ [ 'wide', 'full' ] }
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</BlockControls>
 				<InspectorControls>
 					<PanelBody>
 						<RangeControl
