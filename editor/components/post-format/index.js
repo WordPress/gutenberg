@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, uniq } from 'lodash';
+import { find, get, union } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -73,11 +73,9 @@ export default compose( [
 		const { getEditedPostAttribute, getSuggestedPostFormat } = select( 'core/editor' );
 		const format = getEditedPostAttribute( 'format' );
 		const themeSupports = select( 'core' ).getThemeSupports();
-		let supportedFormats = get( themeSupports, 'formats', [] );
 		// Ensure current format is always in the set.
-		// The current format may not be a supported format.
-		supportedFormats.push( format );
-		supportedFormats = uniq( supportedFormats );
+		// The current format may not be a format supported by the theme.
+		const supportedFormats = union( [ format ], get( themeSupports, 'formats', [] ) );
 		return {
 			postFormat: getEditedPostAttribute( 'format' ),
 			supportedFormats: supportedFormats,
