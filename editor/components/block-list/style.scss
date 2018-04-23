@@ -603,16 +603,33 @@
 
 .editor-block-contextual-toolbar,
 .editor-block-list__breadcrumb {
-	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
 	white-space: nowrap;
 	text-align: left;
 	pointer-events: none;
 	height: $block-toolbar-height;
 
+	// Position toolbar below the block on mobile
+	position: absolute;
+	bottom: -$block-toolbar-height + 1px;
+	left: $block-padding;
+	right: $block-padding;
+	box-shadow: $shadow-below-only;
+
 	// Position the contextual toolbar above the block, add 1px to each to stack borders
-	margin-top: -$block-toolbar-height - 1px;
-	margin-bottom: $block-padding + 1px;
+	@include break-mobile() {
+		position: sticky;
+		bottom: auto;
+		left: auto;
+		right: auto;
+		box-shadow: none;
+		margin-top: -$block-toolbar-height - 1px;
+		margin-bottom: $block-padding + 1px;
+	}
+
+	@include break-small() {
+		top: -1px;	// stack borders
+	}
 
 	// Floated items have special needs for the contextual toolbar position
 	.editor-block-list__block[data-align="left"] &,
@@ -635,12 +652,6 @@
 			margin-left: -$block-padding - $block-side-ui-padding;
 			margin-right: -$block-padding - $block-side-ui-padding;
 		}
-	}
-
-	// on mobile, toolbars fix differently
-	top: $header-height - 1px; // stack borders
-	@include break-small() {
-		top: -1px;	// stack borders
 	}
 
 	// Reset pointer-events on children.
