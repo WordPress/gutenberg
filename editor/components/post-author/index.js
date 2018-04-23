@@ -1,15 +1,17 @@
 /**
  * External dependencies
  */
-import { get, filter } from 'lodash';
+import { get, filter, throttle, union } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withAPIData, withInstanceId } from '@wordpress/components';
+import { withAPIData, withInstanceId, Autocomplete } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { authorAutocompleter } from '../../../blocks/autocompleters';
+import RichText from '../../../blocks/rich-text';
 
 /**
  * Internal dependencies
@@ -19,32 +21,33 @@ import PostAuthorCheck from './check';
 export class PostAuthor extends Component {
 	constructor() {
 		super( ...arguments );
-
 		this.setAuthorId = this.setAuthorId.bind( this );
+		this.state = {
+			theAuthor: false,
+		};
+		const { postAuthor, instanceId } = this.props;
+		wp.apiRequest( { path: '/wp/v2/users/' + postAuthor + '?context=edit' } )
+			.then( ( response ) => {
+			console.log( 'two', response );
+				this.setState( { theAuthor: response } );
+			} );
 	}
 
-	setAuthorId( event ) {
+	// When an author is selected, set the post author.
+	setAuthorId( value ) {
+		if ( ! value ) {
+			return;
+		}
 		const { onUpdateAuthor } = this.props;
-		const { value } = event.target;
-		onUpdateAuthor( Number( value ) );
+		onUpdateAuthor( Number( value.id ) );
 	}
 
-	getAuthors() {
-		// While User Levels are officially deprecated, the behavior of the
-		// existing users dropdown on `who=authors` tests `user_level != 0`
-		//
-		// See: https://github.com/WordPress/WordPress/blob/a193916/wp-includes/class-wp-user-query.php#L322-L327
-		// See: https://codex.wordpress.org/Roles_and_Capabilities#User_Levels
-		const { users } = this.props;
-		return filter( users.data, ( user ) => {
-			return get( user, [ 'capabilities', 'level_1' ], false );
-		} );
-	}
 
 	render() {
 		const { postAuthor, instanceId } = this.props;
-		const authors = this.getAuthors();
 		const selectId = 'post-author-selector-' + instanceId;
+		const theAuthor = this.state.theAuthor;
+		console.log( theAuthor ? theAuthor.name : '' );
 
 		// Disable reason: A select with an onchange throws a warning
 
@@ -52,16 +55,15 @@ export class PostAuthor extends Component {
 		return (
 			<PostAuthorCheck>
 				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
-				<select
-					id={ selectId }
-					value={ postAuthor }
-					onChange={ this.setAuthorId }
-					className="editor-post-author__select"
-				>
-					{ authors.map( ( author ) => (
-						<option key={ author.id } value={ author.id }>{ author.name }</option>
-					) ) }
-				</select>
+				<RichText
+						tagName="p"
+						className="editor-post-author__select wp-block-paragraph"
+						value={ theAuthor ? theAuthor.name : '' }
+						aria-autocomplete="list"
+						onChange={ this.setAuthorId }
+						autocompleters={ [ authorAutocompleter ] }
+				/>
+
 			</PostAuthorCheck>
 		);
 		/* eslint-enable jsx-a11y/no-onchange */
@@ -79,10 +81,5 @@ export default compose( [
 			dispatch( 'core/editor' ).editPost( { author } );
 		},
 	} ) ),
-	withAPIData( () => {
-		return {
-			users: '/wp/v2/users?context=edit&per_page=100',
-		};
-	} ),
 	withInstanceId,
 ] )( PostAuthor );
