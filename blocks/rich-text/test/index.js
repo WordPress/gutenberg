@@ -8,44 +8,12 @@ import { shallow } from 'enzyme';
  */
 import {
 	RichText,
-	createTinyMCEElement,
 	isEmptyInlineBoundary,
 	isEmptyNode,
 	filterEmptyNodes,
 	getFormatProperties,
 } from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
-
-describe( 'createTinyMCEElement', () => {
-	const type = 'p';
-	const children = <p>Child</p>;
-
-	test( 'should return null', () => {
-		const props = {
-			'data-mce-bogus': 'all',
-		};
-
-		expect( createTinyMCEElement( type, props, children ) ).toBeNull();
-	} );
-
-	test( 'should return children', () => {
-		const props = {
-			'data-mce-bogus': '',
-		};
-
-		const wrapper = createTinyMCEElement( type, props, children );
-		expect( wrapper ).toEqual( [ children ] );
-	} );
-
-	test( 'should render a TinyMCE element', () => {
-		const props = {
-			'a-prop': 'hi',
-		};
-
-		const wrapper = shallow( createTinyMCEElement( type, props, children ) );
-		expect( wrapper ).toMatchSnapshot();
-	} );
-} );
 
 describe( 'isEmptyInlineBoundary', () => {
 	describe( 'link', () => {
@@ -234,37 +202,6 @@ describe( 'RichText', () => {
 		} );
 	} );
 
-	describe( '.propTypes', () => {
-		/* eslint-disable no-console */
-		let consoleError;
-		beforeEach( () => {
-			consoleError = console.error;
-			console.error = jest.fn();
-		} );
-
-		afterEach( () => {
-			console.error = consoleError;
-		} );
-
-		it( 'should warn when rendered with string value', () => {
-			shallow( <RichText value="Uh oh!" /> );
-
-			expect( console.error ).toHaveBeenCalled();
-		} );
-
-		it( 'should not warn when rendered with undefined value', () => {
-			shallow( <RichText /> );
-
-			expect( console.error ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should not warn when rendered with array value', () => {
-			shallow( <RichText value={ [ 'Oh, good' ] } /> );
-
-			expect( console.error ).not.toHaveBeenCalled();
-		} );
-		/* eslint-enable no-console */
-	} );
 	describe( 'pickAriaProps()', () => {
 		it( 'should should filter all properties to only those begining with "aria-"', () => {
 			expect( pickAriaProps( {

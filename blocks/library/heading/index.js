@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { concatChildren } from '@wordpress/element';
+import { concatChildren, Fragment } from '@wordpress/element';
 import { PanelBody, Toolbar } from '@wordpress/components';
 
 /**
@@ -101,13 +101,12 @@ export const settings = {
 		};
 	},
 
-	edit( { attributes, setAttributes, isSelected, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
+	edit( { attributes, setAttributes, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
 		const { align, content, nodeName, placeholder } = attributes;
 
-		return [
-			isSelected && (
+		return (
+			<Fragment>
 				<BlockControls
-					key="controls"
 					controls={
 						'234'.split( '' ).map( ( level ) => ( {
 							icon: 'heading',
@@ -118,9 +117,7 @@ export const settings = {
 						} ) )
 					}
 				/>
-			),
-			isSelected && (
-				<InspectorControls key="inspector">
+				<InspectorControls>
 					<PanelBody title={ __( 'Heading Settings' ) }>
 						<p>{ __( 'Level' ) }</p>
 						<Toolbar
@@ -143,32 +140,30 @@ export const settings = {
 						/>
 					</PanelBody>
 				</InspectorControls>
-			),
-			<RichText
-				key="editable"
-				wrapperClassName="wp-block-heading"
-				tagName={ nodeName.toLowerCase() }
-				value={ content }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
-				onMerge={ mergeBlocks }
-				onSplit={
-					insertBlocksAfter ?
-						( before, after, ...blocks ) => {
-							setAttributes( { content: before } );
-							insertBlocksAfter( [
-								...blocks,
-								createBlock( 'core/paragraph', { content: after } ),
-							] );
-						} :
-						undefined
-				}
-				onRemove={ () => onReplace( [] ) }
-				style={ { textAlign: align } }
-				className={ className }
-				placeholder={ placeholder || __( 'Write heading…' ) }
-				isSelected={ isSelected }
-			/>,
-		];
+				<RichText
+					wrapperClassName="wp-block-heading"
+					tagName={ nodeName.toLowerCase() }
+					value={ content }
+					onChange={ ( value ) => setAttributes( { content: value } ) }
+					onMerge={ mergeBlocks }
+					onSplit={
+						insertBlocksAfter ?
+							( before, after, ...blocks ) => {
+								setAttributes( { content: before } );
+								insertBlocksAfter( [
+									...blocks,
+									createBlock( 'core/paragraph', { content: after } ),
+								] );
+							} :
+							undefined
+					}
+					onRemove={ () => onReplace( [] ) }
+					style={ { textAlign: align } }
+					className={ className }
+					placeholder={ placeholder || __( 'Write heading…' ) }
+				/>
+			</Fragment>
+		);
 	},
 
 	save( { attributes } ) {

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "2.6.0",
+	"version": "2.7.0",
 	"description": "A new WordPress editor experience",
 	"main": "build/app.js",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -37,7 +37,7 @@
 		"mousetrap": "1.6.1",
 		"prop-types": "15.5.10",
 		"querystringify": "1.0.0",
-		"re-resizable": "4.0.3",
+		"re-resizable": "4.4.8",
 		"react": "16.3.0",
 		"react-autosize-textarea": "3.0.2",
 		"react-click-outside": "2.3.1",

@@ -105,7 +105,7 @@ For most blocks, the return value of `save` should be an [instance of WordPress 
 
 _Note:_ While it is possible to return a string value from `save`, it _will be escaped_. If the string includes HTML markup, the markup will be shown on the front of the site verbatim, not as the equivalent HTML node content. If you must return raw HTML from `save`, use `wp.element.RawHTML`. As the name implies, this is prone to [cross-site scripting](https://en.wikipedia.org/wiki/Cross-site_scripting) and therefore is discouraged in favor of a WordPress Element hierarchy whenever possible.
 
-For [dynamic blocks](https://wordpress.org/gutenberg/handbook/blocks/creating-dynamic-blocks/), the return value of `save` could either represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled. Alternatively, return a `null` (empty) value to save no markup in post content for the dynamic block, instead deferring this to always be calculated when the block is shown on the front of the site.
+For [dynamic blocks](../../docs/blocks/creating-dynamic-blocks.md), the return value of `save` could either represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled. Alternatively, return a `null` (empty) value to save no markup in post content for the dynamic block, instead deferring this to always be calculated when the block is shown on the front of the site.
 
 ### attributes
 
@@ -155,10 +155,10 @@ The two most common sources of block invalidations are:
 
 Before starting to debug, be sure to familiarize yourself with the validation step described above documenting the process for detecting whether a block is invalid. A block is invalid if its regenerated markup does not match what is saved in post content, so often this can be caused by the attributes of a block being parsed incorrectly from the saved content.
 
-If you're using [attribute sources](https://wordpress.org/gutenberg/handbook/block-api/attributes/), be sure that attributes sourced from markup are saved exactly as you expect, and in the correct type (usually a `'string'` or `'number'`).
+If you're using [attribute sources](../../docs/block-api/attributes.md), be sure that attributes sourced from markup are saved exactly as you expect, and in the correct type (usually a `'string'` or `'number'`).
 
 When a block is detected as invalid, a warning will be logged into your browser's developer tools console. The warning will include specific details about the exact point at which a difference in markup occurred. Be sure to look closely at any differences in the expected and actual markups to see where problems are occurring.
 
 **I've changed my block's `save` behavior and old content now includes invalid blocks. How can I fix this?**
 
-Refer to the guide on [Deprecated Blocks](https://wordpress.org/gutenberg/handbook/block-api/deprecated-blocks/) to learn more about how to accommodate legacy content in intentional markup changes.
+Refer to the guide on [Deprecated Blocks](../../docs/block-api/deprecated-blocks.md) to learn more about how to accommodate legacy content in intentional markup changes.
