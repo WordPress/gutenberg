@@ -8,6 +8,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
+	editorMediaUpload,
 	MediaUpload,
 	RichText,
 	BlockControls,
@@ -21,7 +22,6 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -104,7 +104,7 @@ export const settings = {
 				return false;
 			};
 			const setVideo = ( [ audio ] ) => onSelectVideo( audio );
-			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setVideo, 'video' );
+			const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setVideo, 'video' );
 			const controls = (
 				<BlockControls>
 					<BlockAlignmentToolbar

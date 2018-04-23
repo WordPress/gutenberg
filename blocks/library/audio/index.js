@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	registerBlockType,
 	MediaUpload,
+	editorMediaUpload,
 	RichText,
 	BlockControls,
 } from '@wordpress/blocks';
@@ -18,7 +19,6 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -94,7 +94,7 @@ export const settings = {
 				return false;
 			};
 			const setAudio = ( [ audio ] ) => onSelectAudio( audio );
-			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAudio, 'audio' );
+			const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
 
 			if ( editing ) {
 				return (

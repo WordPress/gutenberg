@@ -23,6 +23,8 @@ import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	UrlInputButton,
+	withEditorSettings,
+	editorMediaUpload,
 } from '@wordpress/blocks';
 import { Component, compose, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
@@ -42,8 +44,6 @@ import { withSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import ImageSize from './image-size';
-import { mediaUpload } from '../../../utils/mediaupload';
-import { withEditorSettings } from '../../editor-settings';
 
 /**
  * Module constants
@@ -77,7 +77,7 @@ class ImageBlock extends Component {
 			getBlobByURL( url )
 				.then(
 					( file ) =>
-						mediaUpload(
+						editorMediaUpload(
 							[ file ],
 							( [ image ] ) => {
 								setAttributes( { ...image } );

@@ -7,6 +7,7 @@ import { filter, pick } from 'lodash';
  * WordPress dependencies
  */
 import {
+	editorMediaUpload,
 	MediaUpload,
 	ImagePlaceholder,
 	InspectorControls,
@@ -15,7 +16,6 @@ import {
 } from '@wordpress/blocks';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { mediaUpload } from '@wordpress/utils';
 import {
 	IconButton,
 	DropZone,
@@ -135,7 +135,7 @@ class GalleryBlock extends Component {
 	addFiles( files ) {
 		const currentImages = this.props.attributes.images || [];
 		const { setAttributes } = this.props;
-		mediaUpload(
+		editorMediaUpload(
 			files,
 			( images ) => {
 				setAttributes( {
