@@ -140,7 +140,7 @@ export default {
 						type: 'REQUEST_POST_UPDATE_SUCCESS',
 						previousPost: post,
 						post: newPost,
-					edits: toSend,
+						edits: toSend,
 						optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
 					} );
 				},

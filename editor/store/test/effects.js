@@ -305,16 +305,16 @@ describe( 'effects', () => {
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 
-		it( 'should return autosave action for clean, new, saveable post', () => {
+		it( 'should return autosave action for dirty, new, saveable post', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
-			selectors.isEditedPostDirty.mockReturnValue( false );
+			selectors.isEditedPostDirty.mockReturnValue( true );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
 			selectors.isEditedPostNew.mockReturnValue( true );
 
 			handler( {}, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( savePost() );
+			expect( dispatch ).toHaveBeenCalledWith( savePost( { autosave: true } ) );
 		} );
 
 		it( 'should return autosave action for saveable, dirty, published post', () => {
@@ -336,7 +336,7 @@ describe( 'effects', () => {
 
 			handler( {}, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 2 );
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( savePost( { autosave: true } ) );
 		} );
 	} );
