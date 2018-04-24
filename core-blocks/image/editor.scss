@@ -14,6 +14,10 @@
 	&.is-transient img {
 		@include loading_fade;
 	}
+
+	figcaption img {
+		display: inline;
+	}
 }
 
 .wp-block-image__resize-handler-top-right,

@@ -485,13 +485,8 @@ export class RichText extends Component {
 
 		if ( inlineBlockForInsert.type === 'image' ) {
 			const { url, alt, width } = inlineBlockForInsert;
-			let img;
-
-			if ( width > 150 ) {
-				img = `<img src="${ url }" alt="${ alt }" width="150" />`;
-			} else {
-				img = `<img src="${ url }" alt="${ alt }" />`;
-			}
+			const imgWidth = width > 150 ? 150 : width;
+			const img = `<img style="width:${ imgWidth }px;" src="${ url }" alt="${ alt }" />`;
 
 			this.editor.insertContent( img );
 		}
