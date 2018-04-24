@@ -21,6 +21,7 @@ export default withAPIData( ( props ) => {
 		order: props.options.order || 'desc',
 		orderBy: props.options.orderBy || 'date',
 		per_page: 10,
+		datetime: Date.now(), // make postsList is always updated
 	};
 
 	const postsListQuery = stringify( pickBy( options, ( value ) => ! isUndefined( value ) ) );
