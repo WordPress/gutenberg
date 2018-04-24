@@ -21,12 +21,10 @@ class Modal extends Component {
 		super( props );
 
 		this.state = {
-			isOpen: true,
 			height: window.innerHeight - 32,
 		};
 
 		this.updateWindowHeight = this.updateWindowHeight.bind( this );
-		this.onClose = this.onClose.bind( this );
 	}
 
 	componentDidMount() {
@@ -43,21 +41,17 @@ class Modal extends Component {
 		} );
 	}
 
-	onClose() {
-		this.setState( {
-			isOpen: false,
-		} );
-	}
-
 	render() {
 		const {
 			isOpen,
 			render,
 			className,
 			overlayClassName,
+			contentClassName,
 			ariaLabelledBy,
 			icon,
 			title,
+			onRequestClose,
 			children } = this.props;
 
 		return <ReactModal
@@ -66,9 +60,9 @@ class Modal extends Component {
 			className={ className }
 			overlayClassName={ overlayClassName }
 			aria-labelledby={ ariaLabelledBy }
-			onRequestClose={ this.onClose }>
-			<ModalHeader icon={ icon } title={ title } onClose={ this.onClose } />
-			<div className="edit-post-plugin-screen-takeover__editor-screen-takeover-content" aria-labelledby="modalID">
+			onRequestClose={ onRequestClose }>
+			<ModalHeader icon={ icon } title={ title } onClose={ onRequestClose } />
+			<div className={ contentClassName } aria-labelledby="modalID">
 				{ children }
 			</div>
 		</ReactModal>;
@@ -78,11 +72,13 @@ class Modal extends Component {
 Modal.defaultProps = {
 	isOpen: true,
 	render: true,
-	className: 'edit-post-plugin-screen-takeover__editor-screen-takeover',
-	overlayClassName: 'edit-post-plugin-screen-takeover__editor-screen-takeover-overlay',
+	className: 'edit-post-plugin-modal__editor-modal',
+	overlayClassName: 'edit-post-plugin-modal__editor-modal-overlay',
+	contentClassName: 'edit-post-plugin-modal__editor-modal-content',
 	ariaLabelledBy: 'modalID',
 	icon: null,
-	title: 'modal',
+	title: 'Plugin screen',
+	onRequestClose: null,
 };
 
 export default Modal;

@@ -7,7 +7,7 @@ const ModalHeader = ( { icon, title, onClose, closeLabel } ) => {
 
 	return (
 		<div
-			className={ 'edit-post-plugin-screen-takeover__editor-screen-takeover-header' }
+			className={ 'edit-post-plugin-modal__editor-modal-header' }
 		>
 			<div>
 				<span aria-hidden="true">

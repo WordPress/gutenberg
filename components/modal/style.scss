@@ -1,4 +1,4 @@
-.edit-post-plugin-screen-takeover__editor-screen-takeover {
+.edit-post-plugin-modal__editor-modal {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -31,7 +31,7 @@
   }
 }
 
-.edit-post-plugin-screen-takeover__editor-screen-takeover-overlay {
+.edit-post-plugin-modal__editor-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -59,8 +59,8 @@ body.ReactModal__Body--open {
 }
 
 // The modal needs a separate header that needs its own styling.
-.edit-post-plugin-screen-takeover__editor-screen-takeover-header {
-  height: $header-height;
+.edit-post-plugin-modal__editor-modal-header {
+  height: $admin-bar-height;
   border-bottom: 1px solid $light-gray-500;
   padding: 10px;
   display: flex;
@@ -97,7 +97,7 @@ body.ReactModal__Body--open {
 }
 
 // The modal needs a separate header that needs its own styling.
-.edit-post-plugin-screen-takeover__editor-screen-takeover-content {
+.edit-post-plugin-modal__editor-modal-content {
   height: calc( 100% - #{ $header-height } );
   overflow: auto;
   padding: 10px 20px 5px 20px;
