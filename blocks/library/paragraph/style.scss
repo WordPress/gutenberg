@@ -15,22 +15,20 @@ p {
 		font-size: 48px;
 	}
 
-	&.has-drop-cap {
-		&:first-letter {
-			float: left;
-			font-size: 4.1em;
-			line-height: 0.7;
-			font-family: serif;
-			font-weight: 600;
-			margin: .07em .23em 0 0;
-			text-transform: uppercase;
-			font-style: normal;
-		}
+	// Don't show the drop cap when editing the paragraph's content. It causes a
+	// number of bugs in combination with `contenteditable` fields. The caret
+	// cannot be set around it, caret position calculation fails in Chrome, and
+	// typing at the end of the paragraph doesn't work.
+	&.has-drop-cap:not( :focus ):first-letter {
+		float: left;
+		font-size: 4.1em;
+		line-height: 0.7;
+		font-family: serif;
+		font-weight: 600;
+		margin: .07em .23em 0 0;
+		text-transform: uppercase;
+		font-style: normal;
 	}
-}
-
-p.has-drop-cap:not( :focus )  {
-	overflow: hidden;
 }
 
 p.has-background {
