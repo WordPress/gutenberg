@@ -80,7 +80,7 @@ class SharedBlockEditPanel extends Component {
 							htmlFor={ `shared-block-edit-panel__title-${ instanceId }` }
 							className="shared-block-edit-panel__label"
 						>
-							{ __( 'Shared block name:' ) }
+							{ __( 'Name:' ) }
 						</label>
 						<input
 							ref={ this.titleField }
