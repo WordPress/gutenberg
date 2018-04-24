@@ -42,6 +42,7 @@ function Layout( {
 	editorSidebarOpened,
 	pluginSidebarOpened,
 	publishSidebarOpened,
+	screenTakeoverName,
 	hasFixedToolbar,
 	closePublishSidebar,
 	metaBoxes,
@@ -55,6 +56,17 @@ function Layout( {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
+
+	// render screen takeover if active
+	if ( screenTakeoverName ) {
+		console.log( screenTakeoverName );
+		return (
+			<div>
+				<PluginScreenTakeover.Slot />
+				<PluginArea />
+			</div>
+		);
+	}
 
 	return (
 		<div className={ className }>
@@ -93,7 +105,6 @@ function Layout( {
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />
 			}
-			<PluginScreenTakeover.Slot />
 			<Popover.Slot />
 			<PluginArea />
 		</div>
