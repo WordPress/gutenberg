@@ -51,5 +51,5 @@ export async function* getPostType( state, slug ) {
  */
 export async function* getThemeSupports() {
 	const index = await apiRequest( { path: '/' } );
-	yield receiveIndex( index, 'theme_supports' );
+	yield receiveIndex( index );
 }
