@@ -148,7 +148,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                                             aztecText.getId()));
 
                             eventDispatcher.dispatchEvent(
-                                    new ReactAztecEndEditingEvent(
+                                    new ReactAztecTextEndEditingEvent(
                                             aztecText.getId(),
                                             editText.getText().toString()));
                         }
