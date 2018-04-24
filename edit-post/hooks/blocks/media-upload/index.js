@@ -170,6 +170,17 @@ class MediaUpload extends Component {
 	}
 
 	openModal() {
+		const frameContent = this.frame.content.get();
+		// hacky way to refresh the gallery if frame was open before and already has content, should be improved.
+		if ( frameContent ) {
+			const collection = frameContent.collection;
+			// clean all attachments we have in memory.
+			collection.toArray().forEach( ( model ) => model.trigger( 'destroy', model ) );
+			// reset has more flag, if library had small amount of items all items may have been loaded before.
+			collection.mirroring._hasMore = true;
+			// request items
+			collection.more();
+		}
 		this.frame.open();
 	}
 
