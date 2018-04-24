@@ -78,5 +78,5 @@ export function getPostType( state, slug ) {
  * @return {Mixed?}     Index data.
  */
 export function getThemeSupports( state ) {
-	return state.indexData[ 'theme_supports' ];
+	return state.indexData.theme_supports;
 }
