@@ -433,7 +433,8 @@ function gutenberg_register_vendor_scripts() {
 	);
 	gutenberg_register_vendor_script(
 		'lodash',
-		'https://unpkg.com/lodash@4.17.5/lodash' . $suffix . '.js'
+		'https://unpkg.com/lodash@4.17.5/lodash' . $suffix . '.js',
+		array( 'underscore' )
 	);
 	wp_add_inline_script( 'lodash', 'window.lodash = _.noConflict();' );
 	gutenberg_register_vendor_script(
