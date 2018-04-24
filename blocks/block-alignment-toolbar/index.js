@@ -47,7 +47,7 @@ export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CON
 	return (
 		<Toolbar
 			controls={
-				enabledControls.map( control => {
+				enabledControls.map( ( control ) => {
 					return {
 						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
 						isActive: value === control,

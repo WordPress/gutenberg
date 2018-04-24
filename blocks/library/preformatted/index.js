@@ -58,12 +58,11 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, className, isSelected } ) {
+	edit( { attributes, setAttributes, className } ) {
 		const { content } = attributes;
 
-		return [
+		return (
 			<RichText
-				key="block"
 				tagName="pre"
 				value={ content }
 				onChange={ ( nextContent ) => {
@@ -73,14 +72,13 @@ export const settings = {
 				} }
 				placeholder={ __( 'Write preformatted text…' ) }
 				wrapperClassName={ className }
-				isSelected={ isSelected }
-			/>,
-		];
+			/>
+		);
 	},
 
 	save( { attributes } ) {
 		const { content } = attributes;
 
-		return <pre>{ content }</pre>;
+		return <RichText.Content tagName="pre" value={ content } />;
 	},
 };

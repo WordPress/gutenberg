@@ -11,7 +11,6 @@ import './hooks';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
-import PluginMoreMenuItem from './components/plugin-more-menu-item';
 import PluginScreenTakeover from './components/plugin-screen-takeover';
 
 /**
@@ -80,8 +79,8 @@ export function initializeEditor( id, post, settings ) {
 }
 
 export const __experimental = {
-	PluginMoreMenuItem,
 	PluginScreenTakeover,
 };
 
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';

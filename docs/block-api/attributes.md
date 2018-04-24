@@ -137,7 +137,7 @@ edit( { attributes, setAttributes } ) {
 		setAttributes( { author: event.target.value } );
 	}
 
-	return <input value={ attributes.author } onChange={ onChange } />;
+	return <input value={ attributes.author } onChange={ onChange } type="text" />;
 },
 ```
 {% end %}

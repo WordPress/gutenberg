@@ -13,14 +13,14 @@ import {
 	Placeholder,
 	Toolbar,
 } from '@wordpress/components';
-import { Component } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
+import { Component, Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
+import editorMediaUpload from '../../editor-media-upload';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
@@ -101,9 +101,9 @@ export const settings = {
 				return false;
 			};
 			const setVideo = ( [ audio ] ) => onSelectVideo( audio );
-			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setVideo, 'video' );
-			const controls = isSelected && (
-				<BlockControls key="controls">
+			const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setVideo, 'video' );
+			const controls = (
+				<BlockControls>
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
@@ -122,66 +122,68 @@ export const settings = {
 			);
 
 			if ( editing ) {
-				return [
-					controls,
-					<Placeholder
-						key="placeholder"
-						icon="media-video"
-						label={ __( 'Video' ) }
-						instructions={ __( 'Select a video file from your library, or upload a new one' ) }
-						className={ className }>
-						<form onSubmit={ onSelectUrl }>
-							<input
-								type="url"
-								className="components-placeholder__input"
-								placeholder={ __( 'Enter URL of video file here…' ) }
-								onChange={ event => this.setState( { src: event.target.value } ) }
-								value={ src || '' } />
-							<Button
-								isLarge
-								type="submit">
-								{ __( 'Use URL' ) }
-							</Button>
-						</form>
-						<FormFileUpload
-							isLarge
-							className="wp-block-video__upload-button"
-							onChange={ uploadFromFiles }
-							accept="video/*"
-						>
-							{ __( 'Upload' ) }
-						</FormFileUpload>
-						<MediaUpload
-							onSelect={ onSelectVideo }
-							type="video"
-							id={ id }
-							render={ ( { open } ) => (
-								<Button isLarge onClick={ open } >
-									{ __( 'Media Library' ) }
+				return (
+					<Fragment>
+						{ controls }
+						<Placeholder
+							icon="media-video"
+							label={ __( 'Video' ) }
+							instructions={ __( 'Select a video file from your library, or upload a new one' ) }
+							className={ className }>
+							<form onSubmit={ onSelectUrl }>
+								<input
+									type="url"
+									className="components-placeholder__input"
+									placeholder={ __( 'Enter URL of video file here…' ) }
+									onChange={ ( event ) => this.setState( { src: event.target.value } ) }
+									value={ src || '' } />
+								<Button
+									isLarge
+									type="submit">
+									{ __( 'Use URL' ) }
 								</Button>
-							) }
-						/>
-					</Placeholder>,
-				];
+							</form>
+							<FormFileUpload
+								isLarge
+								className="wp-block-video__upload-button"
+								onChange={ uploadFromFiles }
+								accept="video/*"
+							>
+								{ __( 'Upload' ) }
+							</FormFileUpload>
+							<MediaUpload
+								onSelect={ onSelectVideo }
+								type="video"
+								id={ id }
+								render={ ( { open } ) => (
+									<Button isLarge onClick={ open } >
+										{ __( 'Media Library' ) }
+									</Button>
+								) }
+							/>
+						</Placeholder>
+					</Fragment>
+				);
 			}
 
 			/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-			return [
-				controls,
-				<figure key="video" className={ className }>
-					<video controls src={ src } />
-					{ ( ( caption && caption.length ) || isSelected ) && (
-						<RichText
-							tagName="figcaption"
-							placeholder={ __( 'Write caption…' ) }
-							value={ caption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
-							isSelected={ isSelected }
-							inlineToolbar
-						/>
-					) }
-				</figure>,
-			];
+			return (
+				<Fragment>
+					{ controls }
+					<figure className={ className }>
+						<video controls src={ src } />
+						{ ( ( caption && caption.length ) || isSelected ) && (
+							<RichText
+								tagName="figcaption"
+								placeholder={ __( 'Write caption…' ) }
+								value={ caption }
+								onChange={ ( value ) => setAttributes( { caption: value } ) }
+								inlineToolbar
+							/>
+						) }
+					</figure>
+				</Fragment>
+			);
 			/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		}
 	},
@@ -192,7 +194,7 @@ export const settings = {
 
 			<figure className={ align ? `align${ align }` : null }>
 				{ src && <video controls src={ src } /> }
-				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
 	},

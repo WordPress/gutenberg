@@ -51,7 +51,7 @@ Gutenberg will work in modern browsers, and Internet Explorer 11.
 
 ## How do I make my own block?
 
-The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](https://wordpress.org/gutenberg/handbook/blocks/) section to get started.
+The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](../../docs/blocks.md) section to get started.
 
 ## Does Gutenberg involve editing posts/pages in the front-end?
 
@@ -97,7 +97,7 @@ Blocks will be able to provide base structural CSS styles, and themes can add st
 
 Other features, like the new _wide_ and _full-wide_ alignment options, will simply be CSS classes applied to blocks that offer this alignment. We are looking at how a theme can opt in to this feature, for example using `add_theme_support`.
 
-*See:* [Theme Support](https://wordpress.org/gutenberg/handbook/extensibility/theme-support/)
+*See:* [Theme Support](../../docs/extensibility/theme-support.md)
 
 ## How will editor styles work?
 
@@ -146,7 +146,7 @@ If you would like to contribute to the accessibility of Gutenberg, we can always
 
 ## Are there any design resources for Gutenberg?
 
-Yes, primarily in [design principles](https://wordpress.org/gutenberg/handbook/reference/design-principles/)
+Yes, primarily in [design principles](../../docs/reference/design-principles.md)
 
 We are still adding more documentation.
 
@@ -156,7 +156,7 @@ Our approach—as outlined in [the technical overview introduction](https://make
 
 This also [gives us the flexibility](https://github.com/WordPress/gutenberg/issues/1516) to store those blocks that are inherently separate from the content stream (reusable pieces like widgets or small post type elements) elsewhere, and just keep token references for their placement.
 
-We suggest you look at the [language of Gutenberg](../language/) to learn more about how this aspect of the project works.
+We suggest you look at the [language of Gutenberg](../../docs/language.md) to learn more about how this aspect of the project works.
 
 ## How can I parse the post content back out into blocks in PHP or JS?
 In JS:

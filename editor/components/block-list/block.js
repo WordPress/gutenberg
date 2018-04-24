@@ -25,6 +25,7 @@ import {
 	isSharedBlock,
 	isUnmodifiedDefaultBlock,
 	withEditorSettings,
+	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -65,7 +66,6 @@ export class BlockListBlock extends Component {
 		this.maybeHover = this.maybeHover.bind( this );
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
-		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
@@ -270,10 +270,6 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	insertBlocksAfter( blocks ) {
-		this.props.onInsertBlocks( blocks, this.props.order + 1 );
-	}
-
 	/**
 	 * Marks the block as selected when focused and not already selected. This
 	 * specifically handles the case where block does not set focus on its own
@@ -351,9 +347,9 @@ export class BlockListBlock extends Component {
 			case ENTER:
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
-				this.props.onInsertBlocks( [
-					createBlock( 'core/paragraph' ),
-				], this.props.order + 1 );
+				this.props.onInsertBlocksAfter( [
+					createBlock( getDefaultBlockName() ),
+				] );
 				event.preventDefault();
 				break;
 
@@ -555,7 +551,7 @@ export class BlockListBlock extends Component {
 								isSelected={ isSelected }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
-								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
+								insertBlocksAfter={ isLocked ? undefined : this.props.onInsertBlocksAfter }
 								onReplace={ isLocked ? undefined : onReplace }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
 								id={ uid }
@@ -620,6 +616,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled,
 		getSelectedBlocksInitialCaretPosition,
 		getBlockSelectionEnd,
+		getBlockRootUID,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( uid );
 	return {
@@ -639,6 +636,8 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isSelected,
+		rootUIDOfRoot: getBlockRootUID( rootUID ),
+		orderOfRoot: getBlockIndex( rootUID, getBlockRootUID( rootUID ) ),
 	};
 } );
 
@@ -652,6 +651,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		replaceBlocks,
 		editPost,
 		toggleSelection,
+		moveBlockToPosition,
 	} = dispatch( 'core/editor' );
 
 	return {
@@ -661,10 +661,24 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		onSelect( uid = ownProps.uid, initialPosition ) {
 			selectBlock( uid, initialPosition );
 		},
-		onInsertBlocks( blocks, index ) {
-			const { rootUID, layout } = ownProps;
-			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
-			insertBlocks( blocks, index, rootUID );
+		onInsertBlocksAfter( blocks ) {
+			const { block, order, isLast, rootUID, orderOfRoot, rootUIDOfRoot, layout } = ownProps;
+
+			blocks = blocks.map( ( oldBlock ) => cloneBlock( oldBlock, { layout } ) );
+
+			// If the current block is the last nested empty paragraph block,
+			// and we're about to insert another empty paragraph block, then
+			// move the empty paragraph block behind the wrapping block.
+			// This is a way for the user to escape out of wrapping blocks.
+			if (
+				rootUID && isLast && blocks.length === 1 &&
+				isUnmodifiedDefaultBlock( first( blocks ) ) &&
+				isUnmodifiedDefaultBlock( block )
+			) {
+				moveBlockToPosition( block.uid, rootUID, rootUIDOfRoot, layout, orderOfRoot + 1 );
+			} else {
+				insertBlocks( blocks, order + 1, rootUID );
+			}
 		},
 		onRemove( uid ) {
 			removeBlock( uid );

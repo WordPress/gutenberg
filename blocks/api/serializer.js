@@ -168,6 +168,7 @@ export function serializeAttributes( attrs ) {
 export function getBeautifulContent( content ) {
 	return beautifyHtml( content, {
 		indent_inner_html: true,
+		indent_with_tabs: true,
 		wrap_line_length: 0,
 	} );
 }

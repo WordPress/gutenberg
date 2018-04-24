@@ -58,7 +58,7 @@ export default compose( [
 	withSelect( ( select, ownProps ) => ( {
 		block: select( 'core/editor' ).getBlock( ownProps.uid ),
 	} ) ),
-	withDispatch( dispatch => ( {
+	withDispatch( ( dispatch ) => ( {
 		onChange( uid, attributes, originalContent, isValid ) {
 			dispatch( 'core/editor' ).updateBlock( uid, { attributes, originalContent, isValid } );
 		},

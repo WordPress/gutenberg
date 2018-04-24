@@ -10,13 +10,13 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
-import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import './editor.scss';
+import editorMediaUpload from '../../editor-media-upload';
 import MediaUpload from '../../media-upload';
 import RichText from '../../rich-text';
 import BlockControls from '../../block-controls';
@@ -89,7 +89,7 @@ export const settings = {
 				return false;
 			};
 			const setAudio = ( [ audio ] ) => onSelectAudio( audio );
-			const uploadFromFiles = ( event ) => mediaUpload( event.target.files, setAudio, 'audio' );
+			const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
 
 			if ( editing ) {
 				return (
@@ -103,7 +103,7 @@ export const settings = {
 								type="url"
 								className="components-placeholder__input"
 								placeholder={ __( 'Enter URL of audio file here…' ) }
-								onChange={ event => this.setState( { src: event.target.value } ) }
+								onChange={ ( event ) => this.setState( { src: event.target.value } ) }
 								value={ src || '' } />
 							<Button
 								isLarge
@@ -169,7 +169,7 @@ export const settings = {
 		return (
 			<figure>
 				<audio controls="controls" src={ src } />
-				{ caption && caption.length > 0 && <figcaption>{ caption }</figcaption> }
+				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
 	},

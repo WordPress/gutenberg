@@ -2,8 +2,15 @@
     {
         "blockName": "core/pullquote",
         "attrs": null,
-        "innerBlocks": [],
-        "innerHTML": "\n<blockquote class=\"wp-block-pullquote alignnone\">\n<p>Testing pullquote block...</p><cite>...with a caption</cite>\n</blockquote>\n"
+        "innerBlocks": [
+            {
+                "blockName": "core/paragraph",
+                "attrs": null,
+                "innerBlocks": [],
+                "innerHTML": "\n\t<p>Testing pullquote block...</p>\n\t"
+            }
+        ],
+        "innerHTML": "\n<blockquote class=\"wp-block-pullquote alignnone\">\n\t\n\t<cite>...with a caption</cite>\n</blockquote>\n"
     },
     {
         "attrs": {},

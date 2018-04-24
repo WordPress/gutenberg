@@ -19,11 +19,6 @@ import {
 } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { deprecated } from '@wordpress/utils';
-
-/**
  * Internal dependencies
  */
 import serialize from './serialize';
@@ -174,27 +169,6 @@ export function switchChildrenNodeName( children, nodeName ) {
  * @return {Function} Returns the new composite function.
  */
 export { flowRight as compose };
-
-/**
- * Returns a wrapped version of a React component's display name.
- * Higher-order components use getWrapperDisplayName().
- *
- * @param {Function|Component} BaseComponent Used to detect the existing display name.
- * @param {string} wrapperName Wrapper name to prepend to the display name.
- *
- * @return {string} Wrapped display name.
- */
-export function getWrapperDisplayName( BaseComponent, wrapperName ) {
-	deprecated( 'getWrapperDisplayName', {
-		version: '2.7',
-		alternative: 'wp.element.createHigherOrderComponent',
-		plugin: 'Gutenberg',
-	} );
-
-	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;
-
-	return `${ upperFirst( camelCase( wrapperName ) ) }(${ displayName })`;
-}
 
 /**
  * Given a function mapping a component to an enhanced component and modifier

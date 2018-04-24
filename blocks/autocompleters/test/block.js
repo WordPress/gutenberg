@@ -59,9 +59,9 @@ describe( 'block', () => {
 
 		// Only verify that a populated label is returned.
 		// It is likely to be fragile to assert that the contents are renderable by @wordpress/element.
-		const isAllowedLabelType = label => Array.isArray( label ) || ( typeof label === 'string' );
+		const isAllowedLabelType = ( label ) => Array.isArray( label ) || ( typeof label === 'string' );
 
-		getBlockTypes().forEach( blockType => {
+		getBlockTypes().forEach( ( blockType ) => {
 			const label = blockAutocompleter.getOptionLabel( blockType );
 			expect( isAllowedLabelType( label ) ).toBeTruthy();
 		} );
