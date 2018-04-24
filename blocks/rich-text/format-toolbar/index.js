@@ -112,7 +112,11 @@ class FormatToolbar extends Component {
 	setLinkTarget( opensInNewWindow ) {
 		this.setState( { opensInNewWindow } );
 		if ( this.props.formats.link ) {
-			this.props.onChange( { link: { value: this.props.formats.link.value, target: opensInNewWindow ? '_blank' : '' } } );
+			this.props.onChange( { link: {
+				value: this.props.formats.link.value,
+				target: opensInNewWindow ? '_blank' : null,
+				rel: opensInNewWindow ? 'noreferrer noopener' : null,
+			} } );
 		}
 	}
 
@@ -133,7 +137,11 @@ class FormatToolbar extends Component {
 	submitLink( event ) {
 		event.preventDefault();
 		this.setState( { isEditingLink: false, isAddingLink: false, newLinkValue: '' } );
-		this.props.onChange( { link: { value: this.state.newLinkValue, target: this.state.opensInNewWindow ? '_blank' : '' } } );
+		this.props.onChange( { link: {
+			value: this.state.newLinkValue,
+			target: this.state.opensInNewWindow ? '_blank' : null,
+			rel: this.state.opensInNewWindow ? 'noreferrer noopener' : null,
+		} } );
 		if ( this.state.isAddingLink ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
