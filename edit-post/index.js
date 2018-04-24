@@ -12,6 +12,7 @@ import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
 import PluginScreenTakeover from './components/plugin-screen-takeover';
+import PluginScreenTakeoverMoreMenuItem from './components/header/plugin-screen-takeover-more-menu-item';
 
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
@@ -80,6 +81,7 @@ export function initializeEditor( id, post, settings ) {
 
 export const __experimental = {
 	PluginScreenTakeover,
+	PluginScreenTakeoverMoreMenuItem,
 };
 
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
