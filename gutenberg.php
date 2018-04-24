@@ -447,7 +447,7 @@ function gutenberg_replace_default_add_new_button() {
 			position: relative;
 			vertical-align: top;
 			text-decoration: none !important;
-			padding: 3px 5px 3px 3px;
+			padding: 4px 5px 4px 3px;
 		}
 
 		.split-page-title-action .dropdown {
