@@ -27,6 +27,11 @@ export const preferences = combineReducers( {
 
 			case 'CLOSE_GENERAL_SIDEBAR':
 				return null;
+			case 'SERIALIZE': {
+				if ( state === 'edit-post/block' ) {
+					return PREFERENCES_DEFAULTS.activeGeneralSidebar;
+				}
+			}
 		}
 
 		return state;
