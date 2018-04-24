@@ -2,8 +2,10 @@
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
-import { Slot, Fill, withContext } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { Slot, Fill } from '@wordpress/components';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { withPluginContext } from '@wordpress/plugins';
+import ScreenTakeoverHeader from './screen-takeover';
 
 /**
  * Name of slot in which the screen takeover should fill.
@@ -12,14 +14,25 @@ import { withSelect } from '@wordpress/data';
  */
 const SLOT_NAME = 'PluginScreenTakeover';
 
-let PluginScreenTakeover = ( { pluginName, name, children } ) => (
-	<Fill name={ [ SLOT_NAME, pluginName, name ].join( '/' ) }>
-		{ children }
-	</Fill>
-);
+let PluginScreenTakeover = ( { pluginContext, name, title, icon, children } ) => {
+	return (
+		<Fill name={ [ SLOT_NAME, pluginContext.name, name ].join( '/' ) }>
+			<ScreenTakeoverHeader title={ title } icon={ icon } />
+			{ children }
+		</Fill>
+	);
+};
 
 PluginScreenTakeover = compose( [
-	withContext( 'pluginName' )(),
+	withPluginContext,
+	withDispatch( ( dispatch ) => ( {
+		onClose: dispatch( 'core/edit-post' ).closeScreenTakeover,
+	} ) ),
+	withSelect( ( select ) => {
+		return {
+			activeScreenTakeoverName: select( 'core/edit-post' ).getActiveScreenTakeoverName(),
+		};
+	} ),
 ] )( PluginScreenTakeover );
 
 PluginScreenTakeover.Slot = ( { activeScreenTakeoverName } ) => {
