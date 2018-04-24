@@ -14,8 +14,6 @@ import './style.scss';
 import ReactModal from 'react-modal';
 import ModalHeader from './modalHeader';
 
-ReactModal.setAppElement( document.getElementById( 'wpwrap' ) );
-
 class Modal extends Component {
 	constructor( props ) {
 		super( props );
@@ -42,6 +40,8 @@ class Modal extends Component {
 	}
 
 	render() {
+		ReactModal.setAppElement( document.getElementById( 'wpwrap' ) );
+
 		const {
 			isOpen,
 			render,
@@ -51,6 +51,7 @@ class Modal extends Component {
 			ariaLabelledBy,
 			icon,
 			title,
+			bodyOpenClassName,
 			onRequestClose,
 			children } = this.props;
 
@@ -59,6 +60,7 @@ class Modal extends Component {
 			render={ render }
 			className={ className }
 			overlayClassName={ overlayClassName }
+			bodyOpenClassName={ bodyOpenClassName }
 			aria-labelledby={ ariaLabelledBy }
 			onRequestClose={ onRequestClose }>
 			<ModalHeader icon={ icon } title={ title } onClose={ onRequestClose } />
@@ -79,6 +81,7 @@ Modal.defaultProps = {
 	icon: null,
 	title: 'Plugin screen',
 	onRequestClose: null,
+	bodyOpenClassName: 'modal-body--open',
 };
 
 export default Modal;

@@ -1,34 +1,34 @@
 .components-modal {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-    width: auto;
-    max-width: 90%;
-    max-height: 90%;
-    min-width: 75%;
-    min-height: 75%;
-    border: 0;
-    border-radius: 0;
-    margin-right: -50%;
-    transform: translate(-50%, -50%);
-    background-color: #fff;
-    outline: none;
-    box-shadow: 0 3px 25px #000;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  width: auto;
+  max-width: 90%;
+  max-height: 90%;
+  min-height: 50%;
+  border: 0;
+  border-radius: 0;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  outline: none;
+  box-shadow: 0 3px 25px #000;
+  background-color: green;
 
-    // In small screens the content needs to be full width.
-    @media ( max-width: #{ ( $break-small ) } ) {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      left: 0;
-      margin: 0;
-      transform: initial;
-      max-width: none;
-      max-height: none;
-    }
+  // In small screens the content needs to be full width.
+  @media ( max-width: #{ ( $break-small ) } ) {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    margin: 0;
+    transform: initial;
+    max-width: none;
+    max-height: none;
+  }
 
   &__screen-overlay {
     position: fixed;
@@ -90,7 +90,7 @@
 
   // The modal needs a separate header that needs its own styling.
   &__content {
-    height: calc( 100% - #{ $header-height } );
+    height: calc( 100% - #{ $admin-bar-height } );
     overflow: auto;
     padding: 10px 20px 5px 20px;
     position: absolute;
@@ -101,7 +101,7 @@
 @include editor-left('.components-modal__editor-modal-overlay');
 
 // We prevent scrolling of the body when the React Modal screen takeover is opened.
-body.ReactModal__Body--open {
+body.modal-body--open {
   overflow-y: hidden;
 }
 
