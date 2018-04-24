@@ -9,7 +9,6 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import org.wordpress.mobile.ReactNativeAztec.R;
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.common.MapBuilder;
@@ -28,7 +27,6 @@ import com.facebook.react.views.textinput.ScrollWatcher;
 
 import org.jetbrains.annotations.NotNull;
 import org.wordpress.aztec.ITextFormat;
-import org.wordpress.aztec.source.SourceViewEditText;
 import org.wordpress.aztec.toolbar.AztecToolbar;
 import org.wordpress.aztec.toolbar.IAztecToolbarClickListener;
 
@@ -55,19 +53,16 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
         ReactAztecView aztecView = (ReactAztecView) li.inflate(R.layout.aztec_main, null);
         ReactAztecText aztecText = aztecView.findViewById(R.id.aztec);
         aztecView.setAztecText(aztecText);
-        SourceViewEditText sourceEditor = aztecView.findViewById(R.id.source);
-        aztecView.setSourceEditor(sourceEditor);
         AztecToolbar toolbar = aztecView.findViewById(R.id.formatting_toolbar);
         aztecView.setToolbar(toolbar);
-
+        
         // init Toolbar
-        toolbar.setEditor(aztecText, sourceEditor);
+        toolbar.setEditor(aztecText, null);
         toolbar.setToolbarListener(new ToolbarClickListener(aztecView));
         aztecText.setToolbar(toolbar);
         //initSourceEditorHistory();
 
         aztecText.setCalypsoMode(false);
-        sourceEditor.setCalypsoMode(false);
 
         return aztecView;
     }
@@ -113,7 +108,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
     @ReactProp(name = "text")
     public void setText(ReactAztecView view, String text) {
         view.getAztecText().fromHtml(text);
-        view.getSourceEditor().displayStyledAndFormattedHtml(text);
     }
 
     @ReactProp(name = "color")
@@ -270,7 +264,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecView> {
 
         @Override
         public void onToolbarHtmlButtonClicked() {
-            mAztecView.getToolbar().toggleEditorMode();
+            //mAztecView.getToolbar().toggleEditorMode();
         }
 
         @Override
