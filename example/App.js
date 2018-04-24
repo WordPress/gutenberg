@@ -49,6 +49,7 @@ var styles = StyleSheet.create({
     },
     aztec_editor: {
     minHeight: _minHeight,
+    margin: 10,
   },
 });
 

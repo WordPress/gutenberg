@@ -4,15 +4,17 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.AttributeSet;
 
 import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
 import com.facebook.react.views.textinput.ContentSizeWatcher;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
 import org.wordpress.aztec.AztecText;
+import org.wordpress.aztec.glideloader.GlideImageLoader;
+import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
 import org.wordpress.aztec.plugins.CssUnderlinePlugin;
 import org.wordpress.aztec.plugins.IAztecPlugin;
 import org.wordpress.aztec.plugins.IToolbarButton;
@@ -21,8 +23,6 @@ import org.wordpress.aztec.plugins.shortcodes.CaptionShortcodePlugin;
 import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
 import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
 import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
-import org.wordpress.aztec.glideloader.GlideImageLoader;
-import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
 
 import java.util.ArrayList;
 
@@ -41,12 +41,11 @@ public class ReactAztecText extends AztecText {
     // check when it's used in EditText in RN. (maybe tests?)
     private int mNativeEventCount = 0;
 
-    public ReactAztecText(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initEditor(context);
-    }
+    public ReactAztecText(ThemedReactContext reactContext, Context context) {
+        super(context);
+        this.setFocusableInTouchMode(true);
+        this.setFocusable(true);
 
-    private void initEditor(Context context) {
         addPlugin(new WordPressCommentsPlugin(this));
         addPlugin(new MoreToolbarButton(this));
         addPlugin(new CaptionShortcodePlugin(this));
