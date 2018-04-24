@@ -70,7 +70,7 @@ class Modal extends Component {
 }
 
 Modal.defaultProps = {
-	isOpen: true,
+	isOpen: false,
 	render: true,
 	className: 'edit-post-plugin-modal__editor-modal',
 	overlayClassName: 'edit-post-plugin-modal__editor-modal-overlay',
