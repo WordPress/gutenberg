@@ -80,6 +80,19 @@
 	&.mce-content-body {
 		line-height: $editor-line-height;
 	}
+
+	div.mce-resizehandle {
+		border-radius: 50%;
+		border: 2px solid white;
+		width: 15px;
+		height: 15px;
+		background: $blue-medium-500;
+		box-sizing: border-box;
+
+		&:hover {
+			background: $blue-medium-500;
+		}
+	}
 }
 
 .block-rich-text__inline-toolbar {
