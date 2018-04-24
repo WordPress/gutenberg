@@ -224,7 +224,7 @@ export const editor = flow( [
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST', 'RESET_AUTOSAVE' ],
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ],
 		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
 	} ),
 ] )( {

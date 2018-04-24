@@ -311,7 +311,26 @@ export function isPostAutosavable( state ) {
 		return false;
 	}
 
-	return state.autosave && state.autosave.isDirty;
+	// If we don't already have an autosave, the post is autosavable.
+	if ( ! hasAutosave( state ) ) {
+		return true;
+	}
+
+	const title = getEditedPostAttribute( state, 'title' );
+	const excerpt = getEditedPostExcerpt( state );
+	const content = getEditedPostContent( state );
+	const autosave = state.editor.present.autosave;
+
+	// If the title, excerpt or content has changed, the post is autosavable.
+	if (
+		( autosave.title && title !== autosave.title.raw ) ||
+		( autosave.excerpt && excerpt !== autosave.excerpt.raw ) ||
+		( autosave.content && content !== autosave.content.raw )
+	) {
+		return true;
+	}
+
+	return false;
 }
 
 export function hasAutosave( state ) {
