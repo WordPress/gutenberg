@@ -184,7 +184,7 @@ class FormatToolbar extends Component {
 
 				{ ( isAddingLink || isEditingLink || formats.link ) && (
 					<Fill name="RichText.Siblings">
-						<div style={ { position: 'absolute', ...focusPosition } }>
+						<div className="blocks-format-toolbar__link-container" style={ { ...focusPosition } }>
 							{ ( isAddingLink || isEditingLink ) && (
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
