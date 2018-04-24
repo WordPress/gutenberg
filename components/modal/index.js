@@ -12,6 +12,7 @@ import './style.scss';
  * External dependencies
  */
 import ReactModal from 'react-modal';
+import ModalHeader from './modalHeader';
 
 ReactModal.setAppElement( document.getElementById( 'wpwrap' ) );
 
@@ -55,6 +56,8 @@ class Modal extends Component {
 			className,
 			overlayClassName,
 			ariaLabelledBy,
+			icon,
+			title,
 			children } = this.props;
 
 		return <ReactModal
@@ -62,8 +65,12 @@ class Modal extends Component {
 			render={ render }
 			className={ className }
 			overlayClassName={ overlayClassName }
-			aria-labelledby={ ariaLabelledBy }>
-			{ children }
+			aria-labelledby={ ariaLabelledBy }
+			onRequestClose={ this.onClose }>
+			<ModalHeader icon={ icon } title={ title } onClose={ this.onClose } />
+			<div className="edit-post-plugin-screen-takeover__editor-screen-takeover-content" aria-labelledby="modalID">
+				{ children }
+			</div>
 		</ReactModal>;
 	}
 }
@@ -74,6 +81,8 @@ Modal.defaultProps = {
 	className: 'edit-post-plugin-screen-takeover__editor-screen-takeover',
 	overlayClassName: 'edit-post-plugin-screen-takeover__editor-screen-takeover-overlay',
 	ariaLabelledBy: 'modalID',
+	icon: null,
+	title: 'modal',
 };
 
 export default Modal;

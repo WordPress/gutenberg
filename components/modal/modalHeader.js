@@ -1,13 +1,12 @@
-import { NavigableToolbar } from '../../editor/components';
 import { IconButton } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import './style.scss';
+import { __ } from '@wordpress/i18n';
 
 const ModalHeader = ( { icon, title, onClose, closeLabel } ) => {
 	const label = closeLabel ? closeLabel : __( 'Close window' );
 
 	return (
-		<NavigableToolbar
+		<div
 			className={ 'edit-post-plugin-screen-takeover__editor-screen-takeover-header' }
 		>
 			<div>
@@ -23,7 +22,7 @@ const ModalHeader = ( { icon, title, onClose, closeLabel } ) => {
 				icon="no-alt"
 				label={ label }
 			/>
-		</NavigableToolbar>
+		</div>
 	);
 };
 
