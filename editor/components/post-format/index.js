@@ -78,7 +78,7 @@ export default compose( [
 		const supportedFormats = union( [ format ], get( themeSupports, 'formats', [] ) );
 		return {
 			postFormat: getEditedPostAttribute( 'format' ),
-			supportedFormats: supportedFormats,
+			supportedFormats,
 			suggestedFormat: getSuggestedPostFormat(),
 		};
 	} ),
