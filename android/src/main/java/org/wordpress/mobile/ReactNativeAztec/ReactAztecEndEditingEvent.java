@@ -9,13 +9,13 @@ import com.facebook.react.uimanager.events.RCTEventEmitter;
  * Event emitted by AztecText native view when text editing ends,
  * because of the user leaving the text input.
  */
-class ReactAztecTextEndEditingEvent extends Event<ReactAztecTextEndEditingEvent> {
+class ReactAztecEndEditingEvent extends Event<ReactAztecEndEditingEvent> {
 
   private static final String EVENT_NAME = "topEndEditing";
 
   private String mText;
 
-  public ReactAztecTextEndEditingEvent(
+  public ReactAztecEndEditingEvent(
       int viewId,
       String text) {
     super(viewId);
