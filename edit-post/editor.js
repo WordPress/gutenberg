@@ -9,9 +9,18 @@ import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
  */
 import Layout from './components/layout';
 
-function Editor( { settings, hasFixedToolbar, onError, ...props } ) {
+function Editor( { settings, hasFixedToolbar, post, defaultPost, onError, ...props } ) {
+	if ( ! post ) {
+		return null;
+	}
+
+	const editorSettings = {
+		...settings,
+		hasFixedToolbar,
+	};
+
 	return (
-		<EditorProvider settings={ { ...settings, hasFixedToolbar } } { ...props }>
+		<EditorProvider settings={ editorSettings } post={ { ...post, ...defaultPost } } { ...props }>
 			<ErrorBoundary onError={ onError }>
 				<Layout />
 			</ErrorBoundary>
@@ -19,6 +28,7 @@ function Editor( { settings, hasFixedToolbar, onError, ...props } ) {
 	);
 }
 
-export default withSelect( ( select ) => ( {
+export default withSelect( ( select, { postId } ) => ( {
 	hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+	post: select( 'core' ).getPost( postId ),
 } ) )( Editor );

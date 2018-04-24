@@ -627,40 +627,6 @@ function gutenberg_vendor_script_filename( $src ) {
 }
 
 /**
- * Given a REST data response with links, returns the href value of a specified
- * link relation with optional context.
- *
- * @since 0.10.0
- *
- * @param  array  $data    REST response data.
- * @param  string $link    Link relation.
- * @param  string $context Optional context to append.
- * @return string          Link relation URI, or empty string if none exists.
- */
-function gutenberg_get_rest_link( $data, $link, $context = null ) {
-	// Check whether a link entry with href exists.
-	if ( empty( $data['_links'] ) || empty( $data['_links'][ $link ] ) ||
-			! isset( $data['_links'][ $link ][0]['href'] ) ) {
-		return '';
-	}
-
-	$href = $data['_links'][ $link ][0]['href'];
-
-	// Strip API root prefix.
-	$api_root = untrailingslashit( get_rest_url() );
-	if ( 0 === strpos( $href, $api_root ) ) {
-		$href = substr( $href, strlen( $api_root ) );
-	}
-
-	// Add optional context.
-	if ( ! is_null( $context ) ) {
-		$href = add_query_arg( 'context', $context, $href );
-	}
-
-	return $href;
-}
-
-/**
  * Registers a vendor script from a URL, preferring a locally cached version if
  * possible, or downloading it if the cached version is unavailable or
  * outdated.
@@ -770,39 +736,6 @@ JS;
 			wp_json_encode( $schema_response->get_data() )
 		), 'before' );
 	}
-}
-
-/**
- * Get post to edit.
- *
- * @param int $post_id Post ID to edit.
- * @return array|WP_Error The post resource data or a WP_Error on failure.
- */
-function gutenberg_get_post_to_edit( $post_id ) {
-	$post = get_post( $post_id );
-	if ( ! $post ) {
-		return new WP_Error( 'post_not_found', __( 'Post not found.', 'gutenberg' ) );
-	}
-
-	$post_type_object = get_post_type_object( $post->post_type );
-	if ( ! $post_type_object ) {
-		return new WP_Error( 'unrecognized_post_type', __( 'Unrecognized post type.', 'gutenberg' ) );
-	}
-
-	if ( ! current_user_can( 'edit_post', $post->ID ) ) {
-		return new WP_Error( 'unauthorized_post_type', __( 'Unauthorized post type.', 'gutenberg' ) );
-	}
-
-	$request = new WP_REST_Request(
-		'GET',
-		sprintf( '/wp/v2/%s/%d', ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name, $post->ID )
-	);
-	$request->set_param( 'context', 'edit' );
-	$response = rest_do_request( $request );
-	if ( $response->is_error() ) {
-		return $response->as_error();
-	}
-	return rest_get_server()->response_to_data( $response, false );
 }
 
 /**
@@ -990,21 +923,10 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_enqueue_script( 'wp-edit-post' );
 
 	global $post;
-	// Generate API-prepared post.
-	$post_to_edit = gutenberg_get_post_to_edit( $post );
-	if ( is_wp_error( $post_to_edit ) ) {
-		wp_die( $post_to_edit->get_error_message() );
-	}
 
 	// Set initial title to empty string for auto draft for duration of edit.
 	// Otherwise, title defaults to and displays as "Auto Draft".
-	$is_new_post = 'auto-draft' === $post_to_edit['status'];
-	if ( $is_new_post ) {
-		$post_to_edit['title'] = array(
-			'raw'      => '',
-			'rendered' => apply_filters( 'the_title', '', $post->ID ),
-		);
-	}
+	$is_new_post = 'auto-draft' === $post->post_status;
 
 	// Set the post type name.
 	$post_type = get_post_type( $post );
@@ -1012,10 +934,10 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Preload common data.
 	$preload_paths = array(
 		'/',
+		sprintf( '/wp/v2/posts/%s?context=edit', $post->ID ),
 		sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
 		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
 		'/wp/v2/taxonomies?context=edit',
-		gutenberg_get_rest_link( $post_to_edit, 'about', 'edit' ),
 	);
 
 	$preload_data = array_reduce(
@@ -1030,10 +952,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'before'
 	);
 
-	// Initialize the post data.
 	wp_add_inline_script(
 		'wp-edit-post',
-		'window._wpGutenbergPost = ' . wp_json_encode( $post_to_edit ) . ';'
+		sprintf( 'window._wpGutenbergPostId = %s;', $post->ID )
 	);
 
 	// Prepopulate with some test content in demo.
@@ -1041,6 +962,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		wp_add_inline_script(
 			'wp-edit-post',
 			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
+		);
+	} else if ( $is_new_post ) {
+		wp_add_inline_script(
+			'wp-edit-post',
+			sprintf( 'window._wpGutenbergDefaultPost = { title: %s };', wp_json_encode( array(
+				'raw'      => '',
+				'rendered' => apply_filters( 'the_title', '', $post->ID ),
+			) ) )
 		);
 	}
 
@@ -1066,7 +995,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Get admin url for handling meta boxes.
 	$meta_box_url = admin_url( 'post.php' );
 	$meta_box_url = add_query_arg( array(
-		'post'           => $post_to_edit['id'],
+		'post'           => $post->ID,
 		'action'         => 'edit',
 		'classic-editor' => true,
 		'meta_box'       => true,
@@ -1116,7 +1045,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// The "Default template" array element should only be added if the array is
 	// not empty so we do not trigger the template select element without any options
 	// besides the default value.
-	$available_templates = wp_get_theme()->get_page_templates( $post_to_edit['id'] );
+	$available_templates = wp_get_theme()->get_page_templates( get_post( $post->ID ) );
 	$available_templates = ! empty( $available_templates ) ? array_merge( array(
 		'' => apply_filters( 'default_page_template_title', __( 'Default template', 'gutenberg' ), 'rest-api' ),
 	), $available_templates ) : $available_templates;
@@ -1144,7 +1073,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$editor_settings['colors'] = $color_palette;
 	}
 
-	$post_type_object = get_post_type_object( $post_to_edit['type'] );
+	$post_type_object = get_post_type_object( $post->post_type );
 	if ( ! empty( $post_type_object->template ) ) {
 		$editor_settings['template']     = $post_type_object->template;
 		$editor_settings['templateLock'] = ! empty( $post_type_object->template_lock ) ? $post_type_object->template_lock : false;
@@ -1156,7 +1085,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
 			wp.api.init().then( function() {
 				wp.domReady( function() {
-					resolve( wp.editPost.initializeEditor( 'editor', window._wpGutenbergPost, editorSettings ) );
+					resolve( wp.editPost.initializeEditor( 'editor', window._wpGutenbergPostId, editorSettings, window._wpGutenbergDefaultPost ) );
 				} );
 			} );
 		} );
@@ -1168,7 +1097,7 @@ JS;
 	 * Scripts
 	 */
 	wp_enqueue_media( array(
-		'post' => $post_to_edit['id'],
+		'post' => $post->ID,
 	) );
 	wp_enqueue_editor();
 

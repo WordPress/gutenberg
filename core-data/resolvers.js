@@ -11,6 +11,7 @@ import {
 	receiveUserQuery,
 	receiveEntityRecords,
 	receiveThemeSupportsFromIndex,
+	receivePosts,
 } from './actions';
 import { getEntity } from './entities';
 
@@ -64,4 +65,9 @@ export async function* getEntityRecords( state, kind, name ) {
 export async function* getThemeSupports() {
 	const index = await apiRequest( { path: '/' } );
 	yield receiveThemeSupportsFromIndex( index );
+}
+
+export async function* getPost( state, id ) {
+	const post = await apiRequest( { path: `/wp/v2/posts/${ id }?context=edit` } );
+	yield receivePosts( post );
 }
