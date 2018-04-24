@@ -311,7 +311,7 @@ export function isPostAutosavable( state ) {
 		return false;
 	}
 
-	return state.autosave.isDirty;
+	return state.autosave && state.autosave.isDirty;
 }
 
 export function hasAutosave( state ) {
