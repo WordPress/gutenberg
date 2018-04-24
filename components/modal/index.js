@@ -72,7 +72,7 @@ class Modal extends Component {
 Modal.defaultProps = {
 	isOpen: false,
 	render: true,
-	className: 'components-modal__editor-modal',
+	className: 'components-modal',
 	overlayClassName: 'components-modal__screen-overlay',
 	contentClassName: 'components-modal__content',
 	ariaLabelledBy: 'modalID',
