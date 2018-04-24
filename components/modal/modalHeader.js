@@ -7,7 +7,7 @@ const ModalHeader = ( { icon, title, onClose, closeLabel } ) => {
 
 	return (
 		<div
-			className={ 'edit-post-plugin-modal__editor-modal-header' }
+			className={ 'components-modal__header' }
 		>
 			<div>
 				<span aria-hidden="true">

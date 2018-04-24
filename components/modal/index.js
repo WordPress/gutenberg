@@ -72,9 +72,9 @@ class Modal extends Component {
 Modal.defaultProps = {
 	isOpen: false,
 	render: true,
-	className: 'edit-post-plugin-modal__editor-modal',
-	overlayClassName: 'edit-post-plugin-modal__editor-modal-overlay',
-	contentClassName: 'edit-post-plugin-modal__editor-modal-content',
+	className: 'components-modal__editor-modal',
+	overlayClassName: 'components-modal__screen-overlay',
+	contentClassName: 'components-modal__content',
 	ariaLabelledBy: 'modalID',
 	icon: null,
 	title: 'Plugin screen',
