@@ -19,8 +19,8 @@ This package is based on [Gutenberg v2.7.0](https://github.com/WordPress/gutenbe
     * [Block Menu Tabs](#block-menu-tabs)
     * [Block Categories](#block-categories)
     * [Rows](#rows)
-    * [Posts Panel](posts-panels)
-        * [Post Block](post-block)
+    * [Posts Panel](#posts-panel)
+        * [Post Block](#post-block)
 
 ## Installation
 
