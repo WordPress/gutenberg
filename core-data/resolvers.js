@@ -2,28 +2,35 @@
  * WordPress dependencies
  */
 import apiRequest from '@wordpress/api-request';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import {
-	setRequested,
+	toggleIsRequestingTerms,
 	receiveTerms,
 	receiveUserQuery,
 	receiveEntityRecords,
 	receiveThemeSupportsFromIndex,
 } from './actions';
 import { getEntity } from './entities';
+import { hasRequestedCategories } from './selectors';
 
 /**
  * Requests categories from the REST API, yielding action objects on request
  * progress.
  */
-export async function* getCategories() {
-	yield setRequested( 'terms', 'categories' );
-	const categories = await apiRequest( { path: '/wp/v2/categories' } );
-	yield receiveTerms( 'categories', categories );
-}
+export const getCategories = {
+	fulfill: async function* ( state, query ) {
+		yield toggleIsRequestingTerms( 'categories', query, true );
+		const path = addQueryArgs( '/wp/v2/categories', query );
+		const categories = await apiRequest( { path } );
+		yield receiveTerms( 'categories', query, categories );
+		yield toggleIsRequestingTerms( 'categories', query, false );
+	},
+	isFulfilled: hasRequestedCategories,
+};
 
 /**
  * Requests authors from the REST API.

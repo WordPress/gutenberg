@@ -7,6 +7,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import { terms, entities } from '../reducer';
+import { receiveTerms } from '../actions';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -15,56 +16,14 @@ describe( 'terms()', () => {
 		expect( state ).toEqual( {} );
 	} );
 
-	it( 'returns with received terms', () => {
+	it( 'keys by taxonomy', () => {
 		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'RECEIVE_TERMS',
-			taxonomy: 'categories',
-			terms: [ { id: 1 } ],
-		} );
+		const state = terms(
+			originalState,
+			receiveTerms( 'categories', undefined, [ { id: 1 } ] )
+		);
 
-		expect( state ).toEqual( {
-			categories: [ { id: 1 } ],
-		} );
-	} );
-
-	it( 'assigns requested taxonomy to null', () => {
-		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'terms',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {
-			categories: null,
-		} );
-	} );
-
-	it( 'does not assign requested taxonomy to null if received', () => {
-		const originalState = deepFreeze( {
-			categories: [ { id: 1 } ],
-		} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'terms',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {
-			categories: [ { id: 1 } ],
-		} );
-	} );
-
-	it( 'does not assign requested taxonomy if not terms data type', () => {
-		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'foo',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {} );
+		expect( state ).toHaveProperty( 'categories' );
 	} );
 } );
 
