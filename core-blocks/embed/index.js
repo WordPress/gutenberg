@@ -32,7 +32,7 @@ const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 // Caches the embed API calls, so if blocks get transformed, or deleted and added again, we don't spam the API.
 const wpEmbedAPI = memoize( ( url ) => wp.apiRequest( { path: `/oembed/1.0/proxy?${ stringify( { url } ) }` } ) );
 
-const matchesPatterns = ( url, patterns ) => {
+const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {
 		return url.match( pattern );
 	} );
