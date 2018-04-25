@@ -41,6 +41,8 @@ export default ModalWrapper;
 
 ```
 
+Responsibility for properly opening and closing the modal is placed in the implementor.
+
 ## Props
 
 The set of props accepted by the component will be specified below.
@@ -134,6 +136,22 @@ Sets the classname of the open body
 - Type: `String`
 - Required: No
 - Default: 'WordPress-modal'
+
+### shouldCloseOnEsc
+
+If this property is added, it will determine whether the modal requests to close when the escape key is pressed. 
+
+- Type: `bool`
+- Required: No
+- Default: true
+
+### shouldCloseOnOverlayClick
+
+If this property is added, it will determine whether the modal requests to close when a mouse click occurs outside of the modal content.
+
+- Type: `bool`
+- Required: No
+- Default: true
 
 ### onRequestClose
 

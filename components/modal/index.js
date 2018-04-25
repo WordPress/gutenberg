@@ -54,6 +54,8 @@ class Modal extends Component {
 			title,
 			bodyOpenClassName,
 			portalClassName,
+			shouldCloseOnEsc,
+			shouldCloseOnOverlayClick,
 			onRequestClose,
 			children } = this.props;
 
@@ -66,6 +68,8 @@ class Modal extends Component {
 			bodyOpenClassName={ bodyOpenClassName }
 			portalClassName={ portalClassName }
 			aria-labelledby={ ariaLabelledBy }
+			shouldCloseOnEsc={ shouldCloseOnEsc }
+			shouldCloseOnOverlayClick={ shouldCloseOnOverlayClick }
 			onRequestClose={ onRequestClose }>
 			<ModalHeader icon={ icon } title={ title } onClose={ onRequestClose } />
 			<div className={ contentClassName } aria-labelledby="modalID">
@@ -88,6 +92,8 @@ Modal.defaultProps = {
 	onRequestClose: null,
 	bodyOpenClassName: 'modal-body--open',
 	portalClassName: 'WordPress-modal',
+	shouldCloseOnEsc: true,
+	shouldCloseOnOverlayClick: true,
 };
 
 export default Modal;
