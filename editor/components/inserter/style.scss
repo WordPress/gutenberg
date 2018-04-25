@@ -52,6 +52,10 @@ $block-navigation-width: 150px;
 			width: 300px;
 		}
 	}
+
+	> .editor-inserter__tab:first-child {
+		border-top: none;
+	}
 }
 
 .editor-inserter__menu.is-bottom:after {
@@ -107,6 +111,7 @@ input[type="search"].editor-inserter__search {
 	border: none;
 	line-height: 1em;
 	background: transparent;
+	outline: 1px solid $light-gray-200;
 	min-height: 5em;
 	overflow: hidden;
 	word-break: break-word;
@@ -156,7 +161,7 @@ input[type="search"].editor-inserter__search {
 }
 
 .editor-inserter__tab {
-	border-bottom: 1px solid $light-gray-500;
+	border-top: 1px solid $light-gray-500;
 }
 
 .editor-inserter__tab-title {
