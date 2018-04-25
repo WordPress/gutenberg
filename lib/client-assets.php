@@ -191,7 +191,7 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	// Loading the old editor and its config to ensure the classic block works as expected.
 	wp_add_inline_script(
-		'wp-core-blocks', 'window.wp.oldEditor = window.wp.editor;', 'before'
+		'editor', 'window.wp.oldEditor = window.wp.editor;', 'after'
 	);
 	$tinymce_settings = apply_filters( 'tiny_mce_before_init', array(
 		'plugins'          => implode( ',', array_unique( apply_filters( 'tiny_mce_plugins', array(
@@ -275,7 +275,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-viewport',
 			'wp-plugins',
 			'wp-core-data',
-			'word-count',
 			'editor',
 			'lodash',
 		),
