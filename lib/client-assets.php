@@ -964,6 +964,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'disablePostFormats'  => ! current_theme_supports( 'post-formats' ),
 		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
+		'isRTL'               => is_rtl(),
 	);
 
 	if ( ! empty( $color_palette ) ) {
