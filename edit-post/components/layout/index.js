@@ -57,7 +57,7 @@ function Layout( {
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
 
-	// render screen takeover if active
+	// Render screen takeover if a screenTakeoverName is set (i.e. if a screen takeover should be active).
 	if ( screenTakeoverName ) {
 		return (
 			<div>

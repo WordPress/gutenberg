@@ -14,6 +14,16 @@ import ScreenTakeoverHeader from './screen-takeover-header';
  */
 const SLOT_NAME = 'PluginScreenTakeover';
 
+/**
+ * Creates the plugin screen takeover component, which combines the screen takeover header and the content
+ * @param pluginContext
+ * @param name
+ * @param title
+ * @param icon
+ * @param children
+ *
+ * @return {*}
+ */
 let PluginScreenTakeover = ( { pluginContext, name, title, icon, children } ) => {
 	return (
 		<Fill name={ [ SLOT_NAME, pluginContext.name, name ].join( '/' ) }>
