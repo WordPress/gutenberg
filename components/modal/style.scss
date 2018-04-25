@@ -15,7 +15,6 @@
   background-color: #fff;
   outline: none;
   box-shadow: 0 3px 25px #000;
-  background-color: green;
 
   // In small screens the content needs to be full width.
   @media ( max-width: #{ ( $break-small ) } ) {
@@ -90,9 +89,9 @@
 
   // The modal needs a separate header that needs its own styling.
   &__content {
-    height: calc( 100% - #{ $admin-bar-height } );
+    height: calc( 100% - #{ $header-height } );
     overflow: auto;
-    padding: 10px 20px 5px 20px;
+    padding: 0px 20px 0px 20px;
     position: absolute;
     z-index: z-index( '.components-modal__content' );
   }
