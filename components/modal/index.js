@@ -45,6 +45,7 @@ class Modal extends Component {
 		const {
 			isOpen,
 			render,
+			style,
 			className,
 			overlayClassName,
 			contentClassName,
@@ -56,6 +57,7 @@ class Modal extends Component {
 			children } = this.props;
 
 		return <ReactModal
+			style={ style }
 			isOpen={ isOpen }
 			render={ render }
 			className={ className }
@@ -74,6 +76,7 @@ class Modal extends Component {
 Modal.defaultProps = {
 	isOpen: false,
 	render: true,
+	style: {},
 	className: 'components-modal',
 	overlayClassName: 'components-modal__screen-overlay',
 	contentClassName: 'components-modal__content',
