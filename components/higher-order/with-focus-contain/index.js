@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { focus } from '@wordpress/utils';
+import { focus, keycodes } from '@wordpress/utils';
+
+const {
+	TAB,
+} = keycodes;
 
 const withFocusContain = ( WrappedComponent ) => {
 	return class extends Component {
@@ -14,35 +18,32 @@ const withFocusContain = ( WrappedComponent ) => {
 		}
 
 		handleTabBehaviour( event ) {
-			if ( event.keyCode === 9 ) {
-				const tabbables = focus.tabbable.find( this.focusContainRef.current );
-				if ( ! tabbables.length ) {
-					return;
-				}
-				const firstTabbable = tabbables[ 0 ];
-				const lastTabbable = tabbables[ tabbables.length - 1 ];
-
-				if ( event.shiftKey && event.target === firstTabbable ) {
-					event.preventDefault();
-					return lastTabbable.focus();
-				} else if ( ! event.shiftKey && event.target === lastTabbable ) {
-					event.preventDefault();
-					return firstTabbable.focus();
-				}
+			if ( ! event.keyCode === TAB ) {
+				return;
 			}
-		}
 
-		componentDidMount() {
-			this.focusContainRef.current.addEventListener( 'keydown', this.handleTabBehaviour );
-		}
+			const tabbables = focus.tabbable.find( this.focusContainRef.current );
+			if ( ! tabbables.length ) {
+				return;
+			}
+			const firstTabbable = tabbables[ 0 ];
+			const lastTabbable = tabbables[ tabbables.length - 1 ];
 
-		componentWillUnmount() {
-			this.focusContainRef.current.addEventListener( 'keydown', this.handleTabBehaviour );
+			if ( event.shiftKey && event.target === firstTabbable ) {
+				event.preventDefault();
+				return lastTabbable.focus();
+			} else if ( ! event.shiftKey && event.target === lastTabbable ) {
+				event.preventDefault();
+				return firstTabbable.focus();
+			}
 		}
 
 		render() {
 			return (
-				<div ref={ this.focusContainRef }>
+				<div
+					role="presentation"
+					onKeyDown={ this.handleTabBehaviour }
+					ref={ this.focusContainRef } >
 					<WrappedComponent { ...this.props } />
 				</div>
 			);
