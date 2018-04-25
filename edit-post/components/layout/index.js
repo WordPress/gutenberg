@@ -59,7 +59,6 @@ function Layout( {
 
 	// render screen takeover if active
 	if ( screenTakeoverName ) {
-		console.log( screenTakeoverName );
 		return (
 			<div>
 				<PluginScreenTakeover.Slot />
