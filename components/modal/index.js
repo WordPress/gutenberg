@@ -12,7 +12,7 @@ import './style.scss';
  * External dependencies
  */
 import ReactModal from 'react-modal';
-import ModalHeader from './modalHeader';
+import ModalHeader from './modal-header';
 
 class Modal extends Component {
 	constructor( props ) {
@@ -77,7 +77,7 @@ Modal.defaultProps = {
 	isOpen: false,
 	render: true,
 	style: {},
-	className: 'components-modal',
+	className: 'components-modal__frame',
 	overlayClassName: 'components-modal__screen-overlay',
 	contentClassName: 'components-modal__content',
 	ariaLabelledBy: 'modalID',
