@@ -13,7 +13,6 @@ import { createHigherOrderComponent } from '@wordpress/element';
  */
 import { getColorValue, getColorClass, setColorValue } from './utils';
 import { withEditorSettings } from '../editor-settings';
-import './style.scss';
 
 /**
  * Higher-order component, which handles color logic for class generation
