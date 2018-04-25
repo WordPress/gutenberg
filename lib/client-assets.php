@@ -963,7 +963,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			'wp-edit-post',
 			file_get_contents( gutenberg_dir_path() . 'post-content.js' )
 		);
-	} else if ( $is_new_post ) {
+	} elseif ( $is_new_post ) {
 		wp_add_inline_script(
 			'wp-edit-post',
 			sprintf( 'window._wpGutenbergDefaultPost = { title: %s };', wp_json_encode( array(
