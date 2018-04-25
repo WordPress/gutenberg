@@ -21,7 +21,6 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function __construct() {
-		// @codingStandardsIgnoreLine - PHPCS mistakes $this->namespace for the namespace keyword.
 		$this->namespace = 'gutenberg/v1';
 		$this->rest_base = 'block-renderer';
 	}
@@ -38,7 +37,6 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 				continue;
 			}
 
-			// @codingStandardsIgnoreLine - PHPCS mistakes $this->namespace for the namespace keyword.
 			register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<name>' . $block_type->name . ')', array(
 				'args'   => array(
 					'name' => array(
@@ -82,10 +80,10 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	public function get_item_permissions_check( $request ) {
 		global $post;
 
-		$post_ID = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
+		$post_id = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
 
-		if ( 0 < $post_ID ) {
-			$post = get_post( $post_ID );
+		if ( 0 < $post_id ) {
+			$post = get_post( $post_id );
 			if ( ! $post || ! current_user_can( 'edit_post', $post->ID ) ) {
 				return new WP_Error( 'gutenberg_block_cannot_read', __( 'Sorry, you are not allowed to read Gutenberg blocks of this post', 'gutenberg' ), array(
 					'status' => rest_authorization_required_code(),
@@ -114,10 +112,10 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	public function get_item( $request ) {
 		global $post;
 
-		$post_ID = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
+		$post_id = isset( $request['post_id'] ) ? intval( $request['post_id'] ) : 0;
 
-		if ( 0 < $post_ID ) {
-			$post = get_post( $post_ID );
+		if ( 0 < $post_id ) {
+			$post = get_post( $post_id );
 
 			// Set up postdata since this will be needed if post_id was set.
 			setup_postdata( $post );

@@ -41,6 +41,13 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	protected static $post_id;
 
 	/**
+	 * Author test user ID.
+	 *
+	 * @var int
+	 */
+	protected static $author_id;
+
+	/**
 	 * Create test data before the tests run.
 	 *
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
@@ -49,6 +56,12 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		self::$user_id = $factory->user->create(
 			array(
 				'role' => 'editor',
+			)
+		);
+
+		self::$author_id = $factory->user->create(
+			array(
+				'role' => 'author',
 			)
 		);
 
@@ -314,6 +327,38 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		$data = $response->get_data();
 
 		$this->assertEquals( $expected_title, $data['rendered'] );
+	}
+
+	/**
+	 * Test getting item with invalid post ID.
+	 */
+	public function test_get_item_without_permissions_invalid_post() {
+		wp_set_current_user( self::$user_id );
+
+		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$context_block_name );
+		$request->set_param( 'context', 'edit' );
+
+		// Test with invalid post ID.
+		$request->set_param( 'post_id', PHP_INT_MAX );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'gutenberg_block_cannot_read', $response, 403 );
+	}
+
+	/**
+	 * Test getting item without permissions to edit context post.
+	 */
+	public function test_get_item_without_permissions_cannot_edit_post() {
+		wp_set_current_user( self::$author_id );
+
+		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$context_block_name );
+		$request->set_param( 'context', 'edit' );
+
+		// Test with private post ID.
+		$request->set_param( 'post_id', self::$post_id );
+		$response = $this->server->dispatch( $request );
+
+		$this->assertErrorResponse( 'gutenberg_block_cannot_read', $response, 403 );
 	}
 
 	/**
