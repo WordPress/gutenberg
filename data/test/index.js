@@ -142,9 +142,6 @@ describe( 'registerResolvers', () => {
 		const fulfill = jest.fn().mockImplementation( ( state, page ) => {
 			return { type: 'SET_PAGE', page, result: [] };
 		} );
-		const isFulfilled = jest.fn().mockImplementation( ( state, page ) => {
-			return state.hasOwnProperty( page );
-		} );
 
 		const store = registerReducer( 'demo', ( state = {}, action ) => {
 			switch ( action.type ) {
@@ -166,7 +163,9 @@ describe( 'registerResolvers', () => {
 		registerResolvers( 'demo', {
 			getPage: {
 				fulfill,
-				isFulfilled,
+				isFulfilled( state, page ) {
+					return state.hasOwnProperty( page );
+				},
 			},
 		} );
 
@@ -174,26 +173,28 @@ describe( 'registerResolvers', () => {
 		select( 'demo' ).getPage( 2 );
 
 		expect( fulfill ).toHaveBeenCalledTimes( 2 );
-		expect( isFulfilled ).toHaveBeenCalledTimes( 2 );
 
 		select( 'demo' ).getPage( 1 );
 		select( 'demo' ).getPage( 2 );
-		select( 'demo' ).getPage( 3 );
+		select( 'demo' ).getPage( 3, {} );
 
 		// Expected: First and second page fulfillments already triggered, so
 		// should only be one more than previous assertion set.
 		expect( fulfill ).toHaveBeenCalledTimes( 3 );
-		expect( isFulfilled ).toHaveBeenCalledTimes( 3 );
 
 		select( 'demo' ).getPage( 1 );
 		select( 'demo' ).getPage( 2 );
-		select( 'demo' ).getPage( 3 );
+		select( 'demo' ).getPage( 3, {} );
 		select( 'demo' ).getPage( 4 );
 
-		// Expected: Fourth page was pre-filled. Necessary to determine via
-		// isFulfilled, but fulfillment resolver should not be triggered.
+		// Expected:
+		//  - Fourth page was pre-filled. Necessary to determine via
+		//    isFulfilled, but fulfillment resolver should not be triggered.
+		//  - Third page arguments are not strictly equal but are equivalent,
+		//    so fulfillment should already be satisfied.
 		expect( fulfill ).toHaveBeenCalledTimes( 3 );
-		expect( isFulfilled ).toHaveBeenCalledTimes( 4 );
+
+		select( 'demo' ).getPage( 4, {} );
 	} );
 
 	it( 'should resolve action to dispatch', ( done ) => {

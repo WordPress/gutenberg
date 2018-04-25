@@ -3,8 +3,8 @@
  */
 import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
-import { flowRight, without, mapValues } from 'lodash';
-import memoize from 'memize';
+import { flowRight, without, mapValues, overEvery } from 'lodash';
+import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
@@ -137,15 +137,49 @@ export function registerResolvers( reducerKey, newResolvers ) {
 		}
 
 		const store = stores[ reducerKey ];
-		const resolver = newResolvers[ key ];
 
-		const rawFulfill = async ( ...args ) => {
+		// Normalize resolver shape to object.
+		let resolver = newResolvers[ key ];
+		if ( ! resolver.fulfill ) {
+			resolver = { fulfill: resolver };
+		}
+
+		/**
+		 * To ensure that fulfillment occurs only once per arguments set
+		 * (even for deeply "equivalent" arguments), track calls.
+		 *
+		 * @type {EquivalentKeyMap}
+		 */
+		const fulfilledByEquivalentArgs = new EquivalentKeyMap();
+
+		/**
+		 * Returns true if resolver fulfillment has already occurred for an
+		 * equivalent set of arguments. Includes side effect when returning
+		 * false to ensure the next invocation returns true.
+		 *
+		 * @param {Array} args Arguments set.
+		 *
+		 * @return {boolean} Whether fulfillment has already occurred.
+		 */
+		function hasBeenFulfilled( args ) {
+			const hasArguments = fulfilledByEquivalentArgs.has( args );
+			if ( ! hasArguments ) {
+				fulfilledByEquivalentArgs.set( args, true );
+			}
+
+			return hasArguments;
+		}
+
+		async function fulfill( ...args ) {
+			if ( hasBeenFulfilled( args ) ) {
+				return;
+			}
+
 			// At this point, selectors have already been pre-bound to inject
 			// state, it would not be otherwise provided to fulfill.
 			const state = store.getState();
 
-			const fulfill = resolver.fulfill ? resolver.fulfill : resolver;
-			let fulfillment = fulfill( state, ...args );
+			let fulfillment = resolver.fulfill( state, ...args );
 
 			// Attempt to normalize fulfillment as async iterable.
 			fulfillment = toAsyncIterable( fulfillment );
@@ -159,23 +193,18 @@ export function registerResolvers( reducerKey, newResolvers ) {
 					store.dispatch( maybeAction );
 				}
 			}
-		};
+		}
 
-		let fulfill;
 		if ( typeof resolver.isFulfilled === 'function' ) {
-			// When resolver provides its own fulfillment condition, enforce
-			// that fullfillment occurs max once per argument set, with intent
-			// of manual condition in opting _out_ of fulfillment.
-			fulfill = memoize( async ( ...args ) => {
-				const state = store.getState();
-
-				if ( ! resolver.isFulfilled( state, ...args ) ) {
-					rawFulfill( ...args );
-				}
-			} );
-		} else {
-			// Default fulfillment single time by argument set.
-			fulfill = memoize( rawFulfill );
+			// When resolver provides its own fulfillment condition, fulfill
+			// should only occur if not already fulfilled (opt-out condition).
+			fulfill = overEvery( [
+				( ...args ) => {
+					const state = store.getState();
+					return ! resolver.isFulfilled( state, ...args );
+				},
+				fulfill,
+			] );
 		}
 
 		return ( ...args ) => {
