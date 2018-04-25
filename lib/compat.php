@@ -217,6 +217,30 @@ function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
 add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
 
 /**
+ * Ensure that the wp-json index contains the 'theme-supports' setting as
+ * part of its site info elements.
+ *
+ * @param WP_REST_Response $response WP REST API response of the wp-json index.
+ * @return WP_REST_Response Response that contains theme-supports.
+ */
+function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
+	$site_info = $response->get_data();
+	if ( ! array_key_exists( 'theme_supports', $site_info ) ) {
+		$site_info['theme_supports'] = array();
+	}
+	if ( ! array_key_exists( 'formats', $site_info['theme_supports'] ) ) {
+		$formats = get_theme_support( 'post-formats' );
+		$formats = is_array( $formats ) ? array_values( $formats[0] ) : array();
+		$formats = array_merge( array( 'standard' ), $formats );
+
+		$site_info['theme_supports']['formats'] = $formats;
+	}
+	$response->set_data( $site_info );
+	return $response;
+}
+add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_theme_supports' );
+
+/**
  * As a substitute for the default content `wpautop` filter, applies autop
  * behavior only for posts where content does not contain blocks.
  *
@@ -469,11 +493,12 @@ function gutenberg_get_post_type_viewable( $post_type ) {
 }
 
 /**
- * Adds the 'viewable' attribute to the REST API response of a post type.
+ * Adds extra fields to the REST API post type response.
  *
  * @see https://core.trac.wordpress.org/ticket/43739
+ * @see https://core.trac.wordpress.org/ticket/43817
  */
-function gutenberg_register_rest_api_post_type_viewable() {
+function gutenberg_register_rest_api_post_type_fields() {
 	register_rest_field( 'type',
 		'viewable',
 		array(
@@ -486,5 +511,6 @@ function gutenberg_register_rest_api_post_type_viewable() {
 			),
 		)
 	);
+
 }
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_viewable' );
+add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_fields' );
