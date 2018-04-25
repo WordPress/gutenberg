@@ -35,7 +35,7 @@ function ScreenTakeoverHeader( { title, icon, onClose } ) {
 		>
 			<span>
 				{ icon }
-				<h2 className="header-title">{ title }</h2>
+				<h1 className="header-title">{ title }</h1>
 			</span>
 			<IconButton
 				onClick={ onClose }
