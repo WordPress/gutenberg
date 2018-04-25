@@ -112,7 +112,11 @@ class FormatToolbar extends Component {
 	setLinkTarget( opensInNewWindow ) {
 		this.setState( { opensInNewWindow } );
 		if ( this.props.formats.link ) {
-			this.props.onChange( { link: { value: this.props.formats.link.value, target: opensInNewWindow ? '_blank' : '' } } );
+			this.props.onChange( { link: {
+				value: this.props.formats.link.value,
+				target: opensInNewWindow ? '_blank' : null,
+				rel: opensInNewWindow ? 'noreferrer noopener' : null,
+			} } );
 		}
 	}
 
@@ -133,7 +137,11 @@ class FormatToolbar extends Component {
 	submitLink( event ) {
 		event.preventDefault();
 		this.setState( { isEditingLink: false, isAddingLink: false, newLinkValue: '' } );
-		this.props.onChange( { link: { value: this.state.newLinkValue, target: this.state.opensInNewWindow ? '_blank' : '' } } );
+		this.props.onChange( { link: {
+			value: this.state.newLinkValue,
+			target: this.state.opensInNewWindow ? '_blank' : null,
+			rel: this.state.opensInNewWindow ? 'noreferrer noopener' : null,
+		} } );
 		if ( this.state.isAddingLink ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
@@ -184,7 +192,7 @@ class FormatToolbar extends Component {
 
 				{ ( isAddingLink || isEditingLink || formats.link ) && (
 					<Fill name="RichText.Siblings">
-						<div style={ { position: 'absolute', ...focusPosition } }>
+						<div className="blocks-format-toolbar__link-container" style={ { ...focusPosition } }>
 							{ ( isAddingLink || isEditingLink ) && (
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */

@@ -13,7 +13,10 @@ import './hooks';
 // Blocks are inferred from the HTML source of a post through a parsing mechanism
 // and then stored as objects in state, from which it is then rendered for editing.
 export * from './api';
-export { registerCoreBlocks } from './library';
+export * from './autocompleters';
+export * from './colors';
+
+export { default as editorMediaUpload } from './editor-media-upload';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
@@ -22,6 +25,7 @@ export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockEdit } from './block-edit';
 export { default as BlockIcon } from './block-icon';
 export { default as ColorPalette } from './color-palette';
+export { default as ContrastChecker } from './contrast-checker';
 export { default as ImagePlaceholder } from './image-placeholder';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorControls } from './inspector-controls';

@@ -516,7 +516,7 @@ export class BlockListBlock extends Component {
 				/>
 				{ shouldRenderMovers && (
 					<BlockMover
-						uids={ [ uid ] }
+						uids={ uid }
 						rootUID={ rootUID }
 						layout={ layout }
 						isFirst={ isFirst }
@@ -526,7 +526,7 @@ export class BlockListBlock extends Component {
 				) }
 				{ shouldRenderBlockSettings && (
 					<BlockSettingsMenu
-						uids={ [ uid ] }
+						uids={ uid }
 						rootUID={ rootUID }
 						renderBlockMenu={ renderBlockMenu }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' }

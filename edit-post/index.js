@@ -1,7 +1,13 @@
 /**
+ * External dependencies
+ */
+import { get, isString, some } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { render, unmountComponentAtNode } from '@wordpress/element';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -67,8 +73,21 @@ export function initializeEditor( id, post, settings ) {
 		);
 	}
 
+	let migratedSettings;
+	const colors = get( settings, [ 'colors' ] );
+	if ( some( colors, isString ) ) {
+		migratedSettings = {
+			...settings,
+			colors: colors.map( ( color ) => isString( color ) ? { color } : color ),
+		};
+		deprecated( 'Setting theme colors without names', {
+			version: '2.9',
+			alternative: 'add_theme_support( \'colors\', array( \'name\' => \'my-color\', \'color\': \'#ff0\' );' }
+		);
+	}
+
 	render(
-		<Editor settings={ settings } onError={ reboot } post={ post } />,
+		<Editor settings={ migratedSettings || settings } onError={ reboot } post={ post } />,
 		target
 	);
 

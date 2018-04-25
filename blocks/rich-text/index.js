@@ -753,7 +753,8 @@ export class RichText extends Component {
 					if ( ! anchor ) {
 						this.removeFormat( 'link' );
 					}
-					this.applyFormat( 'link', { href: formatValue.value, target: formatValue.target }, anchor );
+					const { value: href, ...params } = formatValue;
+					this.applyFormat( 'link', { href, ...params }, anchor );
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
