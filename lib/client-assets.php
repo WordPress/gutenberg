@@ -275,7 +275,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-viewport',
 			'wp-plugins',
 			'wp-core-data',
-			'word-count',
 			'editor',
 			'lodash',
 		),
