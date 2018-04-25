@@ -50,6 +50,10 @@
 			padding-top: $header-height;
 		}
 	}
+
+	&.is-screen-takeover-opened {
+		display: none;
+	}
 }
 
 @include editor-left('.components-notice-list');
