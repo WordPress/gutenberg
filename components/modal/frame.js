@@ -19,7 +19,7 @@ import withFocusContain from '../higher-order/with-focus-contain';
 
 const ESC_KEY = 27;
 
-class ModalContent extends Component {
+class ModalFrame extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -108,4 +108,4 @@ export default compose( [
 	withFocusReturn,
 	withFocusContain,
 	clickOutside,
-] )( ModalContent );
+] )( ModalFrame );

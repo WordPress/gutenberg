@@ -12,7 +12,7 @@ import { Component, createPortal } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import ModalContent from './modal-content';
+import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
 import './style.scss';
@@ -62,10 +62,8 @@ class Modal extends Component {
 				content,
 				overlay,
 			},
-			/* header */
 			title,
 			icon,
-			onClose,
 			children,
 			...otherProps
 		} = this.props;
@@ -85,7 +83,7 @@ class Modal extends Component {
 					overlayClassName
 				) }
 				style={ overlay }>
-				<ModalContent
+				<ModalFrame
 					style={ content }
 					className={ classnames(
 						'components-modal__frame',
@@ -95,12 +93,13 @@ class Modal extends Component {
 					{ ...otherProps } >
 					<ModalHeader
 						onClose={ onRequestClose }
-						title={ null } />
+						title={ title }
+						icon={ icon } />
 					<div
 						className={ 'components-modal__content' }>
 						{ children }
 					</div>
-				</ModalContent>
+				</ModalFrame>
 			</div>,
 			this.node
 		);

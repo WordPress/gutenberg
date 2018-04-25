@@ -7,7 +7,7 @@ import { some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Popover, ScrollLock, navigateRegions } from '@wordpress/components';
+import { Popover, ScrollLock, navigateRegions, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	AutosaveMonitor,
