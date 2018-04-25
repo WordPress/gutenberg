@@ -1,7 +1,13 @@
 /**
+ * External dependencies
+ */
+import { get, isString, some } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { render, unmountComponentAtNode } from '@wordpress/element';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -11,7 +17,6 @@ import './hooks';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
 import Editor from './editor';
-import PluginMoreMenuItem from './components/plugin-more-menu-item';
 
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
@@ -66,8 +71,21 @@ export function initializeEditor( id, post, settings ) {
 		);
 	}
 
+	let migratedSettings;
+	const colors = get( settings, [ 'colors' ] );
+	if ( some( colors, isString ) ) {
+		migratedSettings = {
+			...settings,
+			colors: colors.map( ( color ) => isString( color ) ? { color } : color ),
+		};
+		deprecated( 'Setting theme colors without names', {
+			version: '2.9',
+			alternative: 'add_theme_support( \'colors\', array( \'name\' => \'my-color\', \'color\': \'#ff0\' );' }
+		);
+	}
+
 	render(
-		<Editor settings={ settings } onError={ reboot } post={ post } />,
+		<Editor settings={ migratedSettings || settings } onError={ reboot } post={ post } />,
 		target
 	);
 
@@ -78,8 +96,5 @@ export function initializeEditor( id, post, settings ) {
 	};
 }
 
-export const __experimental = {
-	PluginMoreMenuItem,
-};
-
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';

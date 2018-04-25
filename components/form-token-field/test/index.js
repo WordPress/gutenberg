@@ -83,9 +83,9 @@ maybeDescribe( 'FormTokenField', function() {
 		return map(
 			filter(
 				div.firstChild.childNodes,
-				childNode => childNode.nodeType !== window.Node.COMMENT_NODE
+				( childNode ) => childNode.nodeType !== window.Node.COMMENT_NODE
 			),
-			childNode => childNode.textContent
+			( childNode ) => childNode.textContent
 		);
 	}
 

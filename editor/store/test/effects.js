@@ -923,7 +923,7 @@ describe( 'effects', () => {
 						sharedBlock: {
 							id: expect.stringMatching( /^shared/ ),
 							uid: staticBlock.uid,
-							title: 'Untitled block',
+							title: 'Untitled shared block',
 						},
 						parsedBlock: staticBlock,
 					} ] )
