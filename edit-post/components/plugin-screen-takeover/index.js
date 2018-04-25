@@ -5,7 +5,7 @@ import { compose } from '@wordpress/element';
 import { Slot, Fill } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withPluginContext } from '@wordpress/plugins';
-import ScreenTakeoverHeader from './screen-takeover';
+import ScreenTakeoverHeader from './screen-takeover-header';
 
 /**
  * Name of slot in which the screen takeover should fill.
