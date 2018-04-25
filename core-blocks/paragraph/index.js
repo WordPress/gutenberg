@@ -96,6 +96,10 @@ class ParagraphBlock extends Component {
 		setAttributes( { dropCap: ! attributes.dropCap } );
 	}
 
+	getDropCapHelp( checked ) {
+		return checked ? __( 'Thumbnails are cropped to align.' ) : __( 'Thumbnails are not cropped.' );
+	}
+
 	getFontSize() {
 		const { customFontSize, fontSize } = this.props.attributes;
 		if ( fontSize ) {
@@ -210,6 +214,7 @@ class ParagraphBlock extends Component {
 							label={ __( 'Drop Cap' ) }
 							checked={ !! dropCap }
 							onChange={ this.toggleDropCap }
+							help={ this.getDropCapHelp }
 						/>
 					</PanelBody>
 					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor.value } initialOpen={ false }>
