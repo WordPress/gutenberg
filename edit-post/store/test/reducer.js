@@ -35,6 +35,24 @@ describe( 'state', () => {
 			expect( state.activeGeneralSidebar ).toBe( 'edit-post/document' );
 		} );
 
+		it( 'should save activeGeneralSidebar default value when serializing if the value was edit-post/block', () => {
+			const state = preferences( {
+				activeGeneralSidebar: 'edit-post/block',
+				editorMode: 'visual',
+				panels: { 'post-status': true },
+				features: { fixedToolbar: false },
+			}, {
+				type: 'SERIALIZE',
+			} );
+
+			expect( state ).toEqual( {
+				activeGeneralSidebar: 'edit-post/document',
+				editorMode: 'visual',
+				panels: { 'post-status': true },
+				features: { fixedToolbar: false },
+			} );
+		} );
+
 		it( 'should does not update if sidebar is already set to value', () => {
 			const original = deepFreeze( preferences( undefined, {
 				type: 'OPEN_GENERAL_SIDEBAR',
