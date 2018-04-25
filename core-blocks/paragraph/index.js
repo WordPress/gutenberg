@@ -97,7 +97,7 @@ class ParagraphBlock extends Component {
 	}
 
 	getDropCapHelp( checked ) {
-		return checked ? __( 'Thumbnails are cropped to align.' ) : __( 'Thumbnails are not cropped.' );
+		return checked ? __( 'Drop Cap is set.' ) : __( 'Drop Cap is not set.' );
 	}
 
 	getFontSize() {
