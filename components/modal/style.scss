@@ -89,7 +89,8 @@
 
   // The modal needs a separate header that needs its own styling.
   &__content {
-    height: calc( 100% - #{ $header-height } );
+    // The height of the content is the height of it's parent, minus the header. after that, the offset was 3px.
+    height: calc( 100% - #{ $header-height } + 3px );
     overflow: auto;
     padding: 0px 20px 0px 20px;
     position: absolute;
@@ -103,6 +104,3 @@
 body.modal-body--open {
   overflow-y: hidden;
 }
-
-
-
