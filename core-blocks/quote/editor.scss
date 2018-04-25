@@ -1,6 +1,10 @@
 .wp-block-quote {
 	margin: 0;
 
+	// compensate nested blocks for collapsing margins
+	padding-top: 1px;
+	padding-bottom: 1px;
+
 	cite {
 		display: block;
 		font-size: $default-font-size;
