@@ -45,7 +45,7 @@ export class BlockMover extends Component {
 	render() {
 		const { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
 		const { isFocused } = this.state;
-		const countBlocks = castArray( uids ).length;
+		const blocksCount = castArray( uids ).length;
 		if ( isLocked ) {
 			return null;
 		}
@@ -79,7 +79,7 @@ export class BlockMover extends Component {
 				<span id={ `editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description">
 					{
 						getBlockMoverDescription(
-							countBlocks,
+							blocksCount,
 							blockType && blockType.title,
 							firstIndex,
 							isFirst,
@@ -91,7 +91,7 @@ export class BlockMover extends Component {
 				<span id={ `editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description">
 					{
 						getBlockMoverDescription(
-							countBlocks,
+							blocksCount,
 							blockType && blockType.title,
 							firstIndex,
 							isFirst,
