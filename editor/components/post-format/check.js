@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { withContext } from '@wordpress/components';
+import { withEditorSettings } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ function PostFormatCheck( { disablePostFormats, ...props } ) {
 		<PostTypeSupportCheck { ...props } supportKeys="post-formats" />;
 }
 
-export default withContext( 'editor' )(
+export default withEditorSettings(
 	( { disablePostFormats } ) => ( { disablePostFormats } )
 )( PostFormatCheck );
 

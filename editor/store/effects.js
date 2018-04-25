@@ -117,6 +117,7 @@ export default {
 					type: 'REQUEST_POST_UPDATE_SUCCESS',
 					previousPost: post,
 					post: newPost,
+					edits: toSend,
 					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
 				} );
 			},
@@ -237,6 +238,23 @@ export default {
 	TRASH_POST_FAILURE( action, store ) {
 		const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
 		store.dispatch( createErrorNotice( message, { id: TRASH_POST_NOTICE_ID } ) );
+	},
+	REFRESH_POST( action, store ) {
+		const { dispatch, getState } = store;
+
+		const state = getState();
+		const post = getCurrentPost( state );
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
+
+		const data = {
+			context: 'edit',
+		};
+
+		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, data } ).then(
+			( newPost ) => {
+				dispatch( resetPost( newPost ) );
+			}
+		);
 	},
 	MERGE_BLOCKS( action, store ) {
 		const { dispatch } = store;
@@ -472,8 +490,8 @@ export default {
 
 		// Remove any other blocks that reference this shared block
 		const allBlocks = getBlocks( getState() );
-		const associatedBlocks = allBlocks.filter( block => isSharedBlock( block ) && block.attributes.ref === id );
-		const associatedBlockUids = associatedBlocks.map( block => block.uid );
+		const associatedBlocks = allBlocks.filter( ( block ) => isSharedBlock( block ) && block.attributes.ref === id );
+		const associatedBlockUids = associatedBlocks.map( ( block ) => block.uid );
 
 		const transactionId = uniqueId();
 
@@ -528,7 +546,7 @@ export default {
 		const sharedBlock = {
 			id: uniqueId( 'shared' ),
 			uid: parsedBlock.uid,
-			title: __( 'Untitled block' ),
+			title: __( 'Untitled shared block' ),
 		};
 
 		dispatch( receiveSharedBlocks( [ {

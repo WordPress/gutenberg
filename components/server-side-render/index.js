@@ -36,7 +36,7 @@ export class ServerSideRender extends Component {
 
 		const path = '/gutenberg/v1/block-renderer/' + block + '?' + this.getQueryUrlFromObject( { attributes } );
 
-		return wp.apiRequest( { path: path } ).then( response => {
+		return wp.apiRequest( { path: path } ).then( ( response ) => {
 			if ( response && response.rendered ) {
 				this.setState( { response: response.rendered } );
 			}

@@ -1,72 +1,73 @@
 /**
  * Node dependencies
  */
-import path from 'path';
-import url from 'url';
+import { join } from 'path';
+import { URL } from 'url';
 
-const BASE_URL = 'http://localhost:8888';
-const USERNAME = 'admin';
-const PASSWORD = 'password';
-const NAVIGATION_TIMEOUT = 20000;
+const {
+	WP_BASE_URL = 'http://localhost:8888',
+	WP_USERNAME = 'admin',
+	WP_PASSWORD = 'password',
+} = process.env;
 
-function getUrl( urlPath ) {
-	return path.join( BASE_URL, urlPath );
+function getUrl( WPPath, query = '' ) {
+	const url = new URL( WP_BASE_URL );
+
+	url.pathname = join( url.pathname, WPPath );
+	url.search = query;
+
+	return url.href;
 }
 
-function getCurrentPathName() {
-	return url.parse( page.url() ).pathname;
+function isWPPath( WPPath, query = '' ) {
+	const currentUrl = new URL( page.url() );
+
+	currentUrl.search = query;
+
+	return getUrl( WPPath ) === currentUrl.href;
 }
 
-async function gotoUrl( destUrl ) {
-	const promise = page.goto( destUrl, { timeout: 0 } );
-	await new Promise( ( resolve ) => {
-		let resolved = false;
-		const markResolvedAndResolve = () => {
-			if ( ! resolved ) {
-				resolve();
-				resolved = true;
-			}
-		};
-		setTimeout( markResolvedAndResolve, NAVIGATION_TIMEOUT );
-		promise.then( markResolvedAndResolve );
-	} );
+async function goToWPPath( WPPath, query ) {
+	await page.goto( getUrl( WPPath, query ) );
 }
 
 async function login() {
-	if ( getCurrentPathName() !== '/wp-login.php' ) {
-		await gotoUrl( getUrl( 'wp-login.php' ) );
-	}
+	await page.type( '#user_login', WP_USERNAME );
+	await page.type( '#user_pass', WP_PASSWORD );
 
-	await page.type( '#user_login', USERNAME );
-	await page.type( '#user_pass', PASSWORD );
-	await page.click( '#wp-submit' );
-
-	await new Promise( ( resolve ) => {
-		let resolved = false;
-		const markResolvedAndResolve = () => {
-			if ( ! resolved ) {
-				resolve();
-				resolved = true;
-			}
-		};
-		setTimeout( markResolvedAndResolve, NAVIGATION_TIMEOUT );
-		page.waitForNavigation( { timeout: 0 } ).then( markResolvedAndResolve );
-	} );
+	await Promise.all( [
+		page.waitForNavigation(),
+		page.click( '#wp-submit' ),
+	] );
 }
 
-export async function visitAdmin( adminPath ) {
-	await gotoUrl( path.join( BASE_URL, 'wp-admin', adminPath ) );
-	if ( getCurrentPathName() === '/wp-login.php' ) {
+export async function visitAdmin( adminPath, query ) {
+	await goToWPPath( join( 'wp-admin', adminPath ), query );
+
+	if ( isWPPath( 'wp-login.php' ) ) {
 		await login();
-		return visitAdmin( adminPath );
+		return visitAdmin( adminPath, query );
 	}
 }
 
 export async function newPost( postType ) {
-	await visitAdmin( 'post-new.php' + ( postType ? '?post_type=' + postType : '' ) );
+	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
 }
 
 export async function newDesktopBrowserPage() {
 	global.page = await browser.newPage();
 	await page.setViewport( { width: 1000, height: 700 } );
+}
+
+export async function switchToEditor( mode ) {
+	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	const [ button ] = await page.$x( `//button[contains(text(), \'${ mode } Editor\')]` );
+	await button.click( 'button' );
+}
+
+export async function getHTMLFromCodeEditor() {
+	await switchToEditor( 'Code' );
+	const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
+	await switchToEditor( 'Visual' );
+	return textEditorContent;
 }

@@ -16,6 +16,7 @@ export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';
+export { default as FocusableIframe } from './focusable-iframe';
 export { default as FormFileUpload } from './form-file-upload';
 export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
@@ -61,6 +62,7 @@ export { default as withFallbackStyles } from './higher-order/with-fallback-styl
 export { default as withFilters } from './higher-order/with-filters';
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
+export { default as withGlobalEvents } from './higher-order/with-global-events';
 export { default as withInstanceId } from './higher-order/with-instance-id';
 export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';

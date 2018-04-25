@@ -7,8 +7,9 @@ import { filter, property, union } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, unregisterBlockType, registerCoreBlocks, getBlockTypes } from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
+import { registerCoreBlocks } from '@wordpress/core-blocks';
 
 /**
  * Internal dependencies
@@ -47,6 +48,7 @@ const {
 	getSelectedBlock,
 	getBlockRootUID,
 	getEditedPostAttribute,
+	getGlobalBlockCount,
 	getMultiSelectedBlockUids,
 	getMultiSelectedBlocks,
 	getMultiSelectedBlocksStartUid,
@@ -83,6 +85,9 @@ const {
 	getTemplate,
 	getTemplateLock,
 	POST_UPDATE_TRANSACTION_ID,
+	isPermalinkEditable,
+	getPermalink,
+	getPermalinkParts,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -1486,6 +1491,52 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'getGlobalBlockCount', () => {
+		it( 'should return the global number of top-level blocks in the post', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+							23: { uid: 23, name: 'core/heading', attributes: {} },
+							123: { uid: 123, name: 'core/paragraph', attributes: {} },
+						},
+					},
+				},
+			};
+
+			expect( getGlobalBlockCount( state ) ).toBe( 2 );
+		} );
+
+		it( 'should return the global umber of blocks of a given type', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+							123: { uid: 123, name: 'core/columns', attributes: {} },
+							456: { uid: 456, name: 'core/paragraph', attributes: {} },
+							789: { uid: 789, name: 'core/paragraph', attributes: {} },
+							124: { uid: 123, name: 'core/heading', attributes: {} },
+						},
+					},
+				},
+			};
+
+			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 1 );
+		} );
+
+		it( 'should return 0 if no blocks exist', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: {
+						},
+					},
+				},
+			};
+			expect( getGlobalBlockCount( state ) ).toBe( 0 );
+			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 0 );
+		} );
+	} );
 	describe( 'getSelectedBlock', () => {
 		it( 'should return null if no block is selected', () => {
 			const state = {
@@ -2479,8 +2530,8 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const blockTypes = getBlockTypes().filter( blockType => ! blockType.isPrivate );
-			expect( getInserterItems( state ) ).toHaveLength( blockTypes.length );
+			const blockTypes = getBlockTypes().filter( ( blockType ) => ! blockType.isPrivate );
+			expect( getInserterItems( state, true ) ).toHaveLength( blockTypes.length );
 		} );
 
 		it( 'should properly list a regular block type', () => {
@@ -2677,7 +2728,7 @@ describe( 'selectors', () => {
 
 			// We should get back 4 items with no duplicates
 			const items = getFrecentInserterItems( state, true, 4 );
-			const blockNames = items.map( item => item.name );
+			const blockNames = items.map( ( item ) => item.name );
 			expect( union( blockNames ) ).toHaveLength( 4 );
 		} );
 	} );
@@ -3044,6 +3095,95 @@ describe( 'selectors', () => {
 			};
 
 			expect( getTemplateLock( state ) ).toBe( 'all' );
+		} );
+	} );
+
+	describe( 'isPermalinkEditable', () => {
+		it( 'should be false if there is no permalink', () => {
+			const state = {
+				currentPost: { permalink_template: '' },
+			};
+
+			expect( isPermalinkEditable( state ) ).toBe( false );
+		} );
+
+		it( 'should be false if the permalink is not of an editable kind', () => {
+			const state = {
+				currentPost: { permalink_template: 'http://foo.test/bar/%baz%/' },
+			};
+
+			expect( isPermalinkEditable( state ) ).toBe( false );
+		} );
+
+		it( 'should be true if the permalink has %postname%', () => {
+			const state = {
+				currentPost: { permalink_template: 'http://foo.test/bar/%postname%/' },
+			};
+
+			expect( isPermalinkEditable( state ) ).toBe( true );
+		} );
+
+		it( 'should be true if the permalink has %pagename%', () => {
+			const state = {
+				currentPost: { permalink_template: 'http://foo.test/bar/%pagename%/' },
+			};
+
+			expect( isPermalinkEditable( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'getPermalink', () => {
+		it( 'should work if the permalink is not of an editable kind', () => {
+			const url = 'http://foo.test/?post=1';
+			const state = {
+				currentPost: { permalink_template: url },
+			};
+
+			expect( getPermalink( state ) ).toBe( url );
+		} );
+
+		it( 'should return the permalink if it is editable', () => {
+			const state = {
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%postname%/',
+					slug: 'baz',
+				},
+			};
+
+			expect( getPermalink( state ) ).toBe( 'http://foo.test/bar/baz/' );
+		} );
+	} );
+
+	describe( 'getPermalinkParts', () => {
+		it( 'should split the permalink correctly', () => {
+			const parts = {
+				prefix: 'http://foo.test/bar/',
+				postName: 'baz',
+				suffix: '/',
+			};
+			const state = {
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%postname%/',
+					slug: 'baz',
+				},
+			};
+
+			expect( getPermalinkParts( state ) ).toEqual( parts );
+		} );
+
+		it( 'should leave an uneditable permalink in the prefix', () => {
+			const parts = {
+				prefix: 'http://foo.test/?post=1',
+				postName: 'baz',
+			};
+			const state = {
+				currentPost: {
+					permalink_template: 'http://foo.test/?post=1',
+					slug: 'baz',
+				},
+			};
+
+			expect( getPermalinkParts( state ) ).toEqual( parts );
 		} );
 	} );
 } );

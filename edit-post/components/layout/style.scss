@@ -9,7 +9,6 @@
 	.components-notice-list {
 		position: sticky;
 		top: $header-height;
-		left: 0;
 		right: 0;
 
 		@include break-small {

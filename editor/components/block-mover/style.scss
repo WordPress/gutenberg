@@ -1,6 +1,16 @@
+.editor-block-mover {
+	opacity: 0;
+
+	&.is-visible {
+		@include fade_in;
+	}
+}
+
 // Mover icon buttons
 .editor-block-mover__control {
-	display: block;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	border: none;
 	outline: none;
 	background: none;
@@ -9,6 +19,7 @@
 	padding: 0;
 	width: $block-side-ui-width;
 	height: $block-side-ui-width;	// the side UI can be no taller than 2 * $block-side-ui-width, which matches the height of a line of text
+	border-radius: $button-style__radius-roundrect;
 
 	&[aria-disabled="true"] {
 		cursor: default;
@@ -16,7 +27,13 @@
 		pointer-events: none;
 	}
 
-	// Try a background, only for nested situations @todo
+	svg {
+		width: $block-side-ui-width;
+		height: $block-side-ui-width;
+		padding: ( $block-side-ui-width - 18px ) / 2;	// this makes the SVG fill the whole available area, without scaling the artwork
+	}
+
+	// Apply a background in nested contexts, only on desktop
 	@include break-small() {
 		.editor-block-list__layout .editor-block-list__layout & {
 			background: $white;
@@ -33,35 +50,17 @@
 		}
 	}
 
-	// apply styles to SVG for movers on the desktop breakpoint
-	@include break-small {
-		// unstyle inherited icon button styles
-		&:not(:disabled):hover,
-		&:not(:disabled):active,
-		&:not(:disabled):focus {
-			box-shadow: none;
-			color: inherit;
-		}
+	// Hover, active and focus styles
+	&:not( :disabled ):not( [aria-disabled="true"] ):hover {
+		@include button-style__hover;
+	}
 
-		svg {
-			display: block;
-			position: relative; // Fixing the Safari bug for `<button>`s overflow
-			border-radius: 50%;
-			margin: auto;
+	&:not( :disabled ):not( [aria-disabled="true"] ):active {
+		@include button-style__active;
+	}
 
-		}
-
-		&:not(:disabled):hover svg {
-			box-shadow: inset 0 0 0 1px $light-gray-500;
-		}
-
-		&:not(:disabled):active svg {
-			@include button-style__active;
-		}
-
-		&:not(:disabled):focus svg {
-			@include button-style__focus-active;
-		}
+	&:not( :disabled ):not( [aria-disabled="true"] ):focus {
+		@include button-style__focus-active;
 	}
 }
 

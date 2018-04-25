@@ -1,11 +1,21 @@
+.editor-block-settings-menu {
+	opacity: 0;
+
+	&.is-visible {
+		@include fade_in;
+	}
+}
+
 // The Blocks "More" Menu ellipsis icon button
+.editor-block-settings-remove,
 .editor-block-settings-menu__toggle {
 	justify-content: center;
 	padding: 0;
 	width: $block-side-ui-width;
-	height: $block-side-ui-width * 2;	// same height as a single line of text, our smallest block
+	height: $block-side-ui-width;
+	border-radius: $button-style__radius-roundrect;
 
-	// Try a background, only for nested situations @todo
+	// Apply a background in nested contexts, only on desktop
 	@include break-small() {
 		.editor-block-list__layout .editor-block-list__layout & {
 			background: $white;
@@ -14,12 +24,12 @@
 			border-width: 1px;
 		}
 	}
-
-	.dashicon {
-		transform: rotate( 90deg );
-	}
 }
 
+.editor-block-settings-menu__toggle .dashicon {
+	transform: rotate( 90deg );
+}
+	
 // Popout menu
 .editor-block-settings-menu__popover {
 	z-index: z-index( '.editor-block-settings-menu__popover' );

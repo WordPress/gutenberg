@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { find } from 'lodash';
 
 /**
@@ -10,14 +9,13 @@ import { find } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/components';
 import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostFormatCheck from './check';
-import { getEditedPostAttribute, getSuggestedPostFormat } from '../../store/selectors';
-import { editPost } from '../../store/actions';
 
 const POST_FORMATS = [
 	{ id: 'aside', caption: __( 'Aside' ) },
@@ -49,7 +47,7 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFor
 						onChange={ ( event ) => onUpdatePostFormat( event.target.value ) }
 						id={ postFormatSelectorId }
 					>
-						{ POST_FORMATS.map( format => (
+						{ POST_FORMATS.map( ( format ) => (
 							<option key={ format.id } value={ format.id }>{ format.caption }</option>
 						) ) }
 					</select>
@@ -70,18 +68,17 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFor
 }
 
 export default compose( [
-	connect(
-		( state ) => {
-			return {
-				postFormat: getEditedPostAttribute( state, 'format' ),
-				suggestedFormat: getSuggestedPostFormat( state ),
-			};
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute, getSuggestedPostFormat } = select( 'core/editor' );
+		return {
+			postFormat: getEditedPostAttribute( 'format' ),
+			suggestedFormat: getSuggestedPostFormat(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		onUpdatePostFormat( postFormat ) {
+			dispatch( 'core/editor' ).editPost( { format: postFormat } );
 		},
-		{
-			onUpdatePostFormat( postFormat ) {
-				return editPost( { format: postFormat } );
-			},
-		},
-	),
+	} ) ),
 	withInstanceId,
 ] )( PostFormat );

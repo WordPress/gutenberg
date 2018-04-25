@@ -27,7 +27,7 @@ const MODES = [
 ];
 
 function ModeSwitcher( { onSwitch, mode } ) {
-	const choices = MODES.map( choice => {
+	const choices = MODES.map( ( choice ) => {
 		if ( choice.value !== mode ) {
 			return { ...choice, shortcut: shortcuts.toggleEditorMode.label };
 		}

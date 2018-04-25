@@ -42,13 +42,8 @@ $scheme-sunrise__spot-color: #de823f;
 				border-color: $spot-color;
 			}
 
-			.components-form-toggle__thumb {
-				background-color: $spot-color;
-			}
-
 			&:before {
 				background-color: $spot-color;
-				border-color: $spot-color;
 			}
 		}
 
@@ -68,6 +63,12 @@ $scheme-sunrise__spot-color: #de823f;
 		// Datepicker
 		.react-datepicker__day--selected {
 			background-color: $spot-color;
+		}
+
+		// URL suggestions
+		.blocks-url-input__suggestion:focus,
+		.blocks-url-input__suggestion.is-selected {
+			background: darken( $spot-color, 15 );
 		}
 	}
 }

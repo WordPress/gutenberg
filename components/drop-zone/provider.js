@@ -81,6 +81,7 @@ class DropZoneProvider extends Component {
 				isDraggingOverDocument: false,
 				isDraggingOverElement: false,
 				position: null,
+				type: null,
 			} );
 		} );
 	}
@@ -124,8 +125,8 @@ class DropZoneProvider extends Component {
 		);
 
 		// Find the leaf dropzone not containing another dropzone
-		const hoveredDropZone = find( hoveredDropZones, zone => (
-			! some( hoveredDropZones, subZone => subZone !== zone && zone.element.parentElement.contains( subZone.element ) )
+		const hoveredDropZone = find( hoveredDropZones, ( zone ) => (
+			! some( hoveredDropZones, ( subZone ) => subZone !== zone && zone.element.parentElement.contains( subZone.element ) )
 		) );
 
 		const hoveredDropZoneIndex = this.dropzones.indexOf( hoveredDropZone );
@@ -164,10 +165,12 @@ class DropZoneProvider extends Component {
 		// Notifying the dropzones
 		dropzonesToUpdate.map( ( dropzone ) => {
 			const index = this.dropzones.indexOf( dropzone );
+			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
 			dropzone.updateState( {
-				isDraggingOverElement: index === hoveredDropZoneIndex,
-				position: index === hoveredDropZoneIndex ? position : null,
+				isDraggingOverElement: isDraggingOverDropZone,
+				position: isDraggingOverDropZone ? position : null,
 				isDraggingOverDocument: this.doesDropzoneSupportType( dropzone, dragEventType ),
+				type: isDraggingOverDropZone ? dragEventType : null,
 			} );
 		} );
 

@@ -44,10 +44,18 @@ Type of the input element to render. Defaults to "text".
 
 ### value
 
-The current value of the input
+The current value of the input.
 
 - Type: `Number`
 - Required: Yes
+
+### className
+
+The class that will be added with "components-base-control" to the classes of the wrapper div.
+If no className is passed only components-base-control is used.
+
+- Type: `String`
+- Required: No
 
 ### onChange
 

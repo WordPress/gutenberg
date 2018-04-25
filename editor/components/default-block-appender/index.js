@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { get } from 'lodash';
 
 /**
@@ -9,17 +8,15 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { getDefaultBlockName } from '@wordpress/blocks';
-import { withContext } from '@wordpress/components';
+import { getDefaultBlockName, withEditorSettings } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockDropZone from '../block-drop-zone';
-import { insertDefaultBlock, startTyping } from '../../store/actions';
-import { getBlock, getBlockCount } from '../../store/selectors';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 
@@ -60,18 +57,26 @@ export function DefaultBlockAppender( {
 	);
 }
 export default compose(
-	connect(
-		( state, ownProps ) => {
-			const isEmpty = ! getBlockCount( state, ownProps.rootUID );
-			const lastBlock = getBlock( state, ownProps.lastBlockUID );
-			const isLastBlockDefault = get( lastBlock, 'name' ) === getDefaultBlockName();
+	withSelect( ( select, ownProps ) => {
+		const {
+			getBlockCount,
+			getBlock,
+		} = select( 'core/editor' );
+		const isEmpty = ! getBlockCount( ownProps.rootUID );
+		const lastBlock = getBlock( ownProps.lastBlockUID );
+		const isLastBlockDefault = get( lastBlock, 'name' ) === getDefaultBlockName();
 
-			return {
-				isVisible: isEmpty || ! isLastBlockDefault,
-				showPrompt: isEmpty,
-			};
-		},
-		( dispatch, ownProps ) => ( {
+		return {
+			isVisible: isEmpty || ! isLastBlockDefault,
+			showPrompt: isEmpty,
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const {
+			insertDefaultBlock,
+			startTyping,
+		} = dispatch( 'core/editor' );
+		return {
 			onAppend() {
 				const { layout, rootUID } = ownProps;
 
@@ -80,12 +85,12 @@ export default compose(
 					attributes = { layout };
 				}
 
-				dispatch( insertDefaultBlock( attributes, rootUID ) );
-				dispatch( startTyping() );
+				insertDefaultBlock( attributes, rootUID );
+				startTyping();
 			},
-		} )
-	),
-	withContext( 'editor' )( ( settings ) => {
+		};
+	} ),
+	withEditorSettings( ( settings ) => {
 		const { templateLock, bodyPlaceholder } = settings;
 
 		return {

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { isEmpty } from 'lodash';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -15,12 +14,13 @@ import {
 	InspectorAdvancedControls,
 } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import { getSelectedBlock, getSelectedBlockCount } from '../../store/selectors';
+import SkipToSelectedBlock from '../skip-to-selected-block';
 
 const BlockInspector = ( { selectedBlock, count } ) => {
 	if ( count > 1 ) {
@@ -49,19 +49,22 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 				<PanelBody
 					className="editor-block-inspector__advanced"
 					title={ __( 'Advanced' ) }
+					initialOpen={ false }
 				>
 					{ fills }
 				</PanelBody>
 			) }
 		</InspectorAdvancedControls.Slot>,
+		<SkipToSelectedBlock key="back" />,
 	];
 };
 
-export default connect(
-	( state ) => {
+export default withSelect(
+	( select ) => {
+		const { getSelectedBlock, getSelectedBlockCount } = select( 'core/editor' );
 		return {
-			selectedBlock: getSelectedBlock( state ),
-			count: getSelectedBlockCount( state ),
+			selectedBlock: getSelectedBlock(),
+			count: getSelectedBlockCount(),
 		};
 	}
 )( BlockInspector );

@@ -63,14 +63,18 @@ describe( 'Toolbar', () => {
 
 		it( 'should render a nested list of controls with separator between', () => {
 			const controls = [
-				[ {
-					icon: 'wordpress',
-					title: 'WordPress',
-				} ],
-				[ {
-					icon: 'wordpress',
-					title: 'WordPress',
-				} ],
+				[ // First set
+					{
+						icon: 'wordpress',
+						title: 'WordPress',
+					},
+				],
+				[ // Second set
+					{
+						icon: 'wordpress',
+						title: 'WordPress',
+					},
+				],
 			];
 
 			const toolbar = shallow( <Toolbar controls={ controls } /> );

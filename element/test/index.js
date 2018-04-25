@@ -126,7 +126,7 @@ describe( 'element', () => {
 	describe( 'createHigherOrderComponent', () => {
 		it( 'should use default name for anonymous function', () => {
 			const TestComponent = createHigherOrderComponent(
-				OriginalComponent => OriginalComponent,
+				( OriginalComponent ) => OriginalComponent,
 				'withTest'
 			)( () => <div /> );
 
@@ -135,7 +135,7 @@ describe( 'element', () => {
 
 		it( 'should use camel case starting with upper for wrapper prefix ', () => {
 			const TestComponent = createHigherOrderComponent(
-				OriginalComponent => OriginalComponent,
+				( OriginalComponent ) => OriginalComponent,
 				'with-one-two_threeFOUR'
 			)( () => <div /> );
 
@@ -147,7 +147,7 @@ describe( 'element', () => {
 				return <div />;
 			}
 			const TestComponent = createHigherOrderComponent(
-				OriginalComponent => OriginalComponent,
+				( OriginalComponent ) => OriginalComponent,
 				'withTest'
 			)( SomeComponent );
 
@@ -161,7 +161,7 @@ describe( 'element', () => {
 				}
 			}
 			const TestComponent = createHigherOrderComponent(
-				OriginalComponent => OriginalComponent,
+				( OriginalComponent ) => OriginalComponent,
 				'withTest'
 			)( SomeAnotherComponent );
 
@@ -176,7 +176,7 @@ describe( 'element', () => {
 			}
 			SomeYetAnotherComponent.displayName = 'CustomDisplayName';
 			const TestComponent = createHigherOrderComponent(
-				OriginalComponent => OriginalComponent,
+				( OriginalComponent ) => OriginalComponent,
 				'withTest'
 			)( SomeYetAnotherComponent );
 
@@ -193,7 +193,7 @@ describe( 'element', () => {
 				</RawHTML>
 			);
 
-			expect( element.type() ).toBe( 'wp-raw-html' );
+			expect( element.type() ).toBe( 'div' );
 			expect( element.prop( 'dangerouslySetInnerHTML' ).__html ).toBe( html );
 			expect( element.prop( 'children' ) ).toBe( undefined );
 		} );

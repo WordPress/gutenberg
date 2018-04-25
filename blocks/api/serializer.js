@@ -33,7 +33,7 @@ export function getBlockDefaultClassName( blockName ) {
 }
 
 /**
- * Given a block type containg a save render implementation and attributes, returns the
+ * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
  * @param {Object} blockType   Block type.
@@ -92,7 +92,7 @@ export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 }
 
 /**
- * Given a block type containg a save render implementation and attributes, returns the
+ * Given a block type containing a save render implementation and attributes, returns the
  * static markup to be saved.
  *
  * @param {Object} blockType   Block type.
@@ -168,6 +168,7 @@ export function serializeAttributes( attrs ) {
 export function getBeautifulContent( content ) {
 	return beautifyHtml( content, {
 		indent_inner_html: true,
+		indent_with_tabs: true,
 		wrap_line_length: 0,
 	} );
 }

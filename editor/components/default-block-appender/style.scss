@@ -1,7 +1,7 @@
 $empty-paragraph-height: $text-editor-font-size * 4;
 
 .editor-default-block-appender {
-	.editor-default-block-appender__content {
+	input[type=text].editor-default-block-appender__content { // needs specificity
 		border: none;
 		background: none;
 		box-shadow: none;
@@ -15,6 +15,7 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		cursor: text;
 		width: 100%;
 		color: $dark-gray-300;
+		font-family: $editor-font;
 		outline: 1px solid transparent;
 		transition: 0.2s outline;
 	}
