@@ -1,16 +1,19 @@
 {
-  "name": "@wordpress/wordcount",
-  "version": "1.0.0",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/WordPress/packages.git"
-  },
-  "description": "WordPress Word Count Utility",
-  "main": "build/index.js",
-  "module": "build-module/index.js",
-  "author": "WordPress",
-  "license": "GPL-2.0+",
-  "dependencies": {
-    "lodash": "^4.17.4"
-  }
+	"name": "@wordpress/wordcount",
+	"version": "1.0.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/packages.git"
+	},
+	"description": "WordPress Word Count Utility",
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"author": "WordPress",
+	"license": "GPL-2.0+",
+	"dependencies": {
+		"lodash": "^4.17.4"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
 }
