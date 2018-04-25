@@ -40,6 +40,7 @@ describe( 'splitting and merging blocks', () => {
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
 		await page.keyboard.type( 'quote' );
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'test' );
 		await page.keyboard.press( 'Enter' );
