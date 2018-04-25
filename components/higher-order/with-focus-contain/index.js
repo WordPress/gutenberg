@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /**
  * WordPress dependencies
  */
@@ -41,7 +42,6 @@ const withFocusContain = ( WrappedComponent ) => {
 		render() {
 			return (
 				<div
-					role="presentation"
 					onKeyDown={ this.handleTabBehaviour }
 					ref={ this.focusContainRef } >
 					<WrappedComponent { ...this.props } />
