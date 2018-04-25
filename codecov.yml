@@ -8,4 +8,6 @@ coverage:
 
 comment:
   require_changes: true
-  
+
+ignore:
+  - "packages/is-shallow-equal/benchmark/*"
