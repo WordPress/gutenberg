@@ -18,6 +18,15 @@ import {
  */
 import './style.scss';
 
+/**
+ * Creates the header for use in the screen takeover component.
+ *
+ * @param { string }     title      The title to be displayed in the header.
+ * @param { SVGElement } icon       An svg icon to be displayed next to the header title.
+ * @param { function }   onClose    The function that closes the screen takeover, as defined in the dispatch.
+ *
+ * @return {*} The header for the screen takeover.
+ */
 function ScreenTakeoverHeader( { title, icon, onClose } ) {
 	return (
 		<NavigableToolbar
