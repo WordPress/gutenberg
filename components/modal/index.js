@@ -22,6 +22,12 @@ let parentElement,
 	modalCount = 0;
 
 class Modal extends Component {
+	constructor() {
+		super( ...arguments );
+
+		this.node = document.createElement( 'div' );
+	}
+
 	static setAppElement( node ) {
 		ariaHelper.setAppElement( node );
 	}
@@ -67,10 +73,6 @@ class Modal extends Component {
 			children,
 			...otherProps
 		} = this.props;
-
-		if ( ! this.node ) {
-			this.node = document.createElement( 'div' );
-		}
 
 		if ( ! isOpen ) {
 			return null;

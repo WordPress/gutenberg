@@ -8,7 +8,7 @@ import { defer } from 'lodash';
  * WordPress dependencies
  */
 import { Component, compose, createRef } from '@wordpress/element';
-import { focus } from '@wordpress/utils';
+import { focus, keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -16,15 +16,18 @@ import { focus } from '@wordpress/utils';
 import './style.scss';
 import withFocusReturn from '../higher-order/with-focus-return';
 import withFocusContain from '../higher-order/with-focus-contain';
+import withGlobalEvents from '../higher-order/with-global-events';
 
-const ESC_KEY = 27;
+const {
+	ESCAPE,
+} = keycodes;
 
 class ModalFrame extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.containerRef = createRef();
-		this.handleKeyPressEvents = this.handleKeyPressEvents.bind( this );
+		this.handleKeyDown = this.handleKeyDown.bind( this );
 	}
 
 	componentDidMount() {
@@ -32,12 +35,6 @@ class ModalFrame extends Component {
 		if ( this.props.focusOnMount ) {
 			this.focusFirstTabbable();
 		}
-		// Key events
-		window.addEventListener( 'keydown', this.handleKeyPressEvents );
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener( 'keydown', this.handleKeyPressEvents );
 	}
 
 	focusFirstTabbable() {
@@ -56,13 +53,13 @@ class ModalFrame extends Component {
 		}
 	}
 
-	handleKeyPressEvents( event ) {
-		if ( event.keyCode === ESC_KEY ) {
-			this.handleEscapePress( event );
+	handleKeyDown( event ) {
+		if ( event.keyCode === ESCAPE ) {
+			this.handleEscapeKeyDown( event );
 		}
 	}
 
-	handleEscapePress( event ) {
+	handleEscapeKeyDown( event ) {
 		if ( this.props.shouldCloseOnEsc ) {
 			event.preventDefault();
 			this.onRequestClose( event );
@@ -105,6 +102,9 @@ class ModalFrame extends Component {
 }
 
 export default compose( [
+	withGlobalEvents( {
+		keydown: 'handleKeyDown',
+	} ),
 	withFocusReturn,
 	withFocusContain,
 	clickOutside,
