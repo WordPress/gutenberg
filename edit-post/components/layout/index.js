@@ -18,7 +18,7 @@ import {
 	PreserveScrollInReorder,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 import { PluginArea } from '@wordpress/plugins';
 import { withViewportMatch } from '@wordpress/viewport';
 
@@ -29,18 +29,20 @@ import './style.scss';
 import BlockSidebar from '../sidebar/block-sidebar';
 import DocumentSidebar from '../sidebar/document-sidebar';
 import Header from '../header';
+import Sidebar from '../sidebar';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
-import Sidebar from '../sidebar';
+import PluginScreenTakeover from '../plugin-screen-takeover';
 
 function Layout( {
 	mode,
 	editorSidebarOpened,
 	pluginSidebarOpened,
 	publishSidebarOpened,
+	screenTakeoverName,
 	hasFixedToolbar,
 	closePublishSidebar,
 	metaBoxes,
@@ -53,48 +55,52 @@ function Layout( {
 	const className = classnames( 'edit-post-layout', {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
+		'is-screen-takeover-opened': !! screenTakeoverName,
 	} );
 
 	return (
-		<div className={ className }>
-			<DocumentTitle />
-			<UnsavedChangesWarning forceIsDirty={ () => {
-				return some( metaBoxes, ( metaBox, location ) => {
-					return metaBox.isActive &&
-						jQuery( getMetaBoxContainer( location ) ).serialize() !== metaBox.data;
-				} );
-			} } />
-			<AutosaveMonitor />
-			<Header />
-			<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
-				<EditorNotices />
-				<PreserveScrollInReorder />
-				<EditorModeKeyboardShortcuts />
-				{ mode === 'text' && <TextEditor /> }
-				{ mode === 'visual' && <VisualEditor /> }
-				<div className="edit-post-layout__metaboxes">
-					<MetaBoxes location="normal" />
+		<Fragment>
+			<PluginScreenTakeover.Slot />
+			<div className={ className }>
+				<DocumentTitle />
+				<UnsavedChangesWarning forceIsDirty={ () => {
+					return some( metaBoxes, ( metaBox, location ) => {
+						return metaBox.isActive &&
+							jQuery( getMetaBoxContainer( location ) ).serialize() !== metaBox.data;
+					} );
+				} } />
+				<AutosaveMonitor />
+				<Header />
+				<div className="edit-post-layout__content" role="region" aria-label={ __( 'Editor content' ) } tabIndex="-1">
+					<EditorNotices />
+					<PreserveScrollInReorder />
+					<EditorModeKeyboardShortcuts />
+					{ mode === 'text' && <TextEditor /> }
+					{ mode === 'visual' && <VisualEditor /> }
+					<div className="edit-post-layout__metaboxes">
+						<MetaBoxes location="normal" />
+					</div>
+					<div className="edit-post-layout__metaboxes">
+						<MetaBoxes location="advanced" />
+					</div>
 				</div>
-				<div className="edit-post-layout__metaboxes">
-					<MetaBoxes location="advanced" />
-				</div>
+				{ publishSidebarOpened && (
+					<PostPublishPanel
+						onClose={ closePublishSidebar }
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+					/>
+				) }
+				<DocumentSidebar />
+				<BlockSidebar />
+				<Sidebar.Slot />
+				{
+					isMobileViewport && sidebarIsOpened && <ScrollLock />
+				}
+				<Popover.Slot />
+				<PluginArea />
 			</div>
-			{ publishSidebarOpened && (
-				<PostPublishPanel
-					onClose={ closePublishSidebar }
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-				/>
-			) }
-			<DocumentSidebar />
-			<BlockSidebar />
-			<Sidebar.Slot />
-			{
-				isMobileViewport && sidebarIsOpened && <ScrollLock />
-			}
-			<Popover.Slot />
-			<PluginArea />
-		</div>
+		</Fragment>
 	);
 }
 
@@ -103,6 +109,7 @@ export default compose(
 		mode: select( 'core/edit-post' ).getEditorMode(),
 		editorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		pluginSidebarOpened: select( 'core/edit-post' ).isPluginSidebarOpened(),
+		screenTakeoverName: select( 'core/edit-post' ).getActiveScreenTakeoverName(),
 		publishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		metaBoxes: select( 'core/edit-post' ).getMetaBoxes(),

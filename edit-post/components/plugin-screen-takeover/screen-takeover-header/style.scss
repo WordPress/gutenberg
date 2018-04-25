@@ -1,0 +1,44 @@
+// hide all action buttons except the inserter on mobile
+.screen-takeover-header {
+	height: $header-height;
+	padding: $item-spacing 2px;
+	border-bottom: 1px solid $light-gray-500;
+	background: $white;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	z-index: z-index( '.edit-post-header' );
+	left: 0;
+	right: 0;
+
+	// mobile edgecase for toolbar
+	top: 0;
+	position: sticky;
+
+	// on mobile the main content area has to scroll
+	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
+	@include break-small {
+		padding: $item-spacing;
+		top: $admin-bar-height-big;
+	}
+
+	@include break-medium() {
+		top: $admin-bar-height;
+	}
+
+	svg {
+		max-width: 24px;
+	}
+
+	span {
+		display: inherit;
+		align-items: center;
+	}
+
+	.header-title {
+		margin-left: 16px;
+	}
+}
+
+@include editor-left('.edit-post-header');
