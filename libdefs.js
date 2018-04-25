@@ -1,5 +1,8 @@
-/** @format */
+/**
+ * @format
+ * @flow
+ */
 
 declare module 'react-native' {
-	declare var exports: any;
+	declare module.exports: any;
 }
