@@ -13,13 +13,13 @@ import { Component, createPortal } from '@wordpress/element';
  * Internal dependencies
  */
 import ModalContent from './modal-content';
+import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
 import './style.scss';
 
 // Used to count the number of open modals.
-let modalCount = 0;
-
-let parentElement;
+let parentElement,
+	modalCount = 0;
 
 class Modal extends Component {
 	static setAppElement( node ) {
@@ -54,18 +54,28 @@ class Modal extends Component {
 
 	render() {
 		const {
+			isOpen,
 			overlayClassName,
 			className,
+			onRequestClose,
 			style: {
 				content,
 				overlay,
 			},
+			/* header */
+			title,
+			icon,
+			onClose,
 			children,
 			...otherProps
 		} = this.props;
 
 		if ( ! this.node ) {
 			this.node = document.createElement( 'div' );
+		}
+
+		if ( ! isOpen ) {
+			return null;
 		}
 
 		return createPortal(
@@ -78,11 +88,18 @@ class Modal extends Component {
 				<ModalContent
 					style={ content }
 					className={ classnames(
-						'components-modal__content',
+						'components-modal__frame',
 						className
 					) }
+					onRequestClose={ onRequestClose }
 					{ ...otherProps } >
-					{ children }
+					<ModalHeader
+						onClose={ onRequestClose }
+						title={ null } />
+					<div
+						className={ 'components-modal__content' }>
+						{ children }
+					</div>
 				</ModalContent>
 			</div>,
 			this.node

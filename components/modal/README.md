@@ -1,4 +1,4 @@
-RangeControl
+Modal
 =======
 
 The modal is used to create an accessible modal over an application.
