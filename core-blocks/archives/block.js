@@ -11,9 +11,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import InspectorControls from '../../inspector-controls';
-import BlockControls from '../../block-controls';
-import BlockAlignmentToolbar from '../../block-alignment-toolbar';
+import {
+	InspectorControls,
+	BlockAlignmentToolbar,
+	BlockControls,
+} from '@wordpress/blocks';
 
 class ArchivesBlock extends Component {
 	constructor() {
