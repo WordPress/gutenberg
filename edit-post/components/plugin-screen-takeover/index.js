@@ -39,7 +39,7 @@ PluginScreenTakeover.Slot = ( { activeScreenTakeoverName } ) => {
 	return <Slot name={ [ SLOT_NAME, activeScreenTakeoverName ].join( '/' ) } />;
 };
 
-PluginScreenTakeover.Slot = withSelect( select => ( {
+PluginScreenTakeover.Slot = withSelect( ( select ) => ( {
 	activeScreenTakeoverName: select( 'core/edit-post' ).getActiveScreenTakeoverName(),
 } ) )( PluginScreenTakeover.Slot );
 
