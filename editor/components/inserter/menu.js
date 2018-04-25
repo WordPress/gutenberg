@@ -294,7 +294,9 @@ export class InserterMenu extends Component {
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<TabbableContainer
-				className="editor-inserter__menu"
+				className={ classnames( 'editor-inserter__menu', {
+					'has-navigation': isLargeViewport && selectedTab,
+				} ) }
 				deep
 				eventToOffset={ this.eventToOffset }
 			>
@@ -320,12 +322,14 @@ export class InserterMenu extends Component {
 					) }
 				</div>
 				{ isNavigationOpened && isLargeViewport && (
-					<BlockInserterNavigation
-						onSelect={ this.selectTab }
-						onClose={ this.toggleNavigation }
-						selected={ selectedTab }
-						ariaControlsPrefix={ `editor-inserter-tabpanel-${ instanceId }` }
-					/>
+					<div className="editor-inserter__navigation-container">
+						<BlockInserterNavigation
+							onSelect={ this.selectTab }
+							onClose={ this.toggleNavigation }
+							selected={ selectedTab }
+							ariaControlsPrefix={ `editor-inserter-tabpanel-${ instanceId }` }
+						/>
+					</div>
 				) }
 				<div
 					className="editor-inserter__results"
