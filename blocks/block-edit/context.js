@@ -6,6 +6,8 @@ import { createContext, createHigherOrderComponent } from '@wordpress/element';
 const { Consumer, Provider } = createContext( {
 	name: '',
 	isSelected: false,
+	focusedElement: null,
+	setFocusedElement: () => {},
 } );
 
 export { Provider as BlockEditContextProvider };

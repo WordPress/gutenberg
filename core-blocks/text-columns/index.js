@@ -7,7 +7,7 @@ import { times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl, withState } from '@wordpress/components';
+import { PanelBody, RangeControl } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import {
 	BlockControls,
@@ -61,13 +61,8 @@ export const settings = {
 		}
 	},
 
-	edit: withState( {
-		editable: 'column-1',
-	} )( ( { attributes, setAttributes, className, isSelected, editable, setState } ) => {
+	edit: ( ( { attributes, setAttributes, className } ) => {
 		const { width, content, columns } = attributes;
-		const onSetActiveEditable = ( newEditable ) => () => {
-			setState( { editable: newEditable } );
-		};
 
 		return (
 			<Fragment>
@@ -91,9 +86,8 @@ export const settings = {
 				</InspectorControls>
 				<div className={ `${ className } align${ width } columns-${ columns }` }>
 					{ times( columns, ( index ) => {
-						const key = `column-${ index }`;
 						return (
-							<div className="wp-block-column" key={ key }>
+							<div className="wp-block-column" key={ `column-${ index }` }>
 								<RichText
 									tagName="p"
 									value={ content && content[ index ] && content[ index ].children }
@@ -107,8 +101,6 @@ export const settings = {
 										} );
 									} }
 									placeholder={ __( 'New Column' ) }
-									isSelected={ isSelected && editable === key }
-									onFocus={ onSetActiveEditable( key ) }
 								/>
 							</div>
 						);

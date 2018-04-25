@@ -27,7 +27,7 @@ import {
 	getScrollContainer,
 	deprecated,
 } from '@wordpress/utils';
-import { withSafeTimeout, Slot } from '@wordpress/components';
+import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -912,17 +912,30 @@ RichText.defaultProps = {
 };
 
 const RichTextContainer = compose( [
-	withBlockEditContext( ( { isSelected } ) => {
+	withInstanceId,
+	withBlockEditContext( ( context, ownProps ) => {
+		// When explicitly set as not selected, do nothing.
+		if ( ownProps.isSelected === false ) {
+			return {};
+		}
+		// When explicitly set as selected or has onFocus prop provided,
+		// use value stored in the context instead.
+		if ( ownProps.isSelected === true || ownProps.onFocus ) {
+			return {
+				isSelected: context.isSelected,
+			};
+		}
+		// Ensures that only one RichText component can be focused.
 		return {
-			isBlockSelected: isSelected,
+			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
+			onFocus: () => context.setFocusedElement( ownProps.instanceId ),
 		};
 	} ),
-	withSelect( ( select, { isSelected, isBlockSelected } ) => {
+	withSelect( ( select ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
-			isSelected: isSelected !== false && isBlockSelected,
 		};
 	} ),
 	withSafeTimeout,
