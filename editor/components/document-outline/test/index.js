@@ -6,7 +6,8 @@ import { mount, shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { createBlock, registerCoreBlocks } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/core-blocks';
 
 /**
  * Internal dependencies
