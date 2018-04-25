@@ -29,7 +29,7 @@ import getQueryParts from './get-query-parts';
  *
  * @return {number[]} Merged array of item IDs.
  */
-export function getMergedItemIds( itemIds = [], nextItemIds, page, perPage ) {
+export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 	const nextItemIdsStartIndex = ( page - 1 ) * perPage;
 
 	// If later page has already been received, default to the larger known
@@ -125,7 +125,7 @@ const queries = flowRight( [
 	// for default query on initialization.
 	withReturnUndefinedOnUnhandledDefault,
 ] )( combineReducers( {
-	itemIds( state = [], action ) {
+	itemIds( state = null, action ) {
 		const { type, page, perPage } = action;
 
 		if ( type !== RECEIVE_ITEMS ) {
@@ -133,7 +133,7 @@ const queries = flowRight( [
 		}
 
 		return getMergedItemIds(
-			state,
+			state || [],
 			map( action.items, 'id' ),
 			page,
 			perPage

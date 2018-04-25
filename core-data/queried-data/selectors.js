@@ -46,6 +46,10 @@ export function getQueriedItems( state, query ) {
 	}
 
 	const itemIds = state.queries[ stableKey ].itemIds;
+	if ( ! itemIds ) {
+		return null;
+	}
+
 	const startOffset = ( page - 1 ) * perPage;
 	const endOffset = startOffset + perPage;
 

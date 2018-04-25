@@ -16,7 +16,7 @@ import reducer, {
 
 describe( 'getMergedItemIds', () => {
 	it( 'should receive a page', () => {
-		const result = getMergedItemIds( undefined, [ 4, 5, 6 ], 2, 3 );
+		const result = getMergedItemIds( [], [ 4, 5, 6 ], 2, 3 );
 
 		expect( result ).toEqual( [
 			undefined,
@@ -164,7 +164,7 @@ describe( 'reducer', () => {
 			items: {},
 			queries: {
 				'': {
-					itemIds: [],
+					itemIds: null,
 					requestingPageByPerPage: {
 						10: {
 							1: true,
