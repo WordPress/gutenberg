@@ -11,28 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Ensure that the wp-json index contains the `permalink_structure` setting as
- * part of its site info elements.
- *
- * @see https://core.trac.wordpress.org/ticket/42465
- *
- * @param WP_REST_Response $response WP REST API response of the wp-json index.
- * @return WP_REST_Response Response that contains the permalink structure.
- */
-function gutenberg_ensure_wp_json_has_permalink_structure( $response ) {
-	$site_info = $response->get_data();
-
-	if ( ! array_key_exists( 'permalink_structure', $site_info ) ) {
-		$site_info['permalink_structure'] = get_option( 'permalink_structure' );
-	}
-
-	$response->set_data( $site_info );
-
-	return $response;
-}
-add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_permalink_structure' );
-
-/**
  * Includes the value for the custom field `post_type_capabities` inside the REST API response of user.
  *
  * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
