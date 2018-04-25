@@ -72,9 +72,9 @@ export function receivePostTypes( postTypes ) {
  *
  * @return {Object} Action object.
  */
-export function receiveIndex( index ) {
+export function receiveThemeSupportsFromIndex( index ) {
 	return {
-		type: 'RECEIVE_INDEX',
-		index: index,
+		type: 'RECEIVE_THEME_SUPPORTS',
+		themeSupports: index.theme_supports,
 	};
 }

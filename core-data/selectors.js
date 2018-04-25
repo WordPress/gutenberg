@@ -73,10 +73,10 @@ export function getPostType( state, slug ) {
 /**
  * Return theme suports data in the index.
  *
- * @param {Object} state    Data state.
+ * @param {Object} state Data state.
  *
- * @return {Mixed?}     Index data.
+ * @return {*}           Index data.
  */
 export function getThemeSupports( state ) {
-	return state.indexData.theme_supports;
+	return state.themeSupports;
 }

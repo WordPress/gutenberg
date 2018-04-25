@@ -83,19 +83,19 @@ export function postTypes( state = {}, action ) {
 }
 
 /**
- * Reducer managing indexes data.
+ * Reducer managing theme supports data.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function indexData( state = {}, action ) {
+export function themeSupports( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_INDEX':
+		case 'RECEIVE_THEME_SUPPORTS':
 			return {
 				...state,
-				...action.index,
+				...action.themeSupports,
 			};
 	}
 
@@ -106,5 +106,5 @@ export default combineReducers( {
 	terms,
 	media,
 	postTypes,
-	indexData,
+	themeSupports,
 } );

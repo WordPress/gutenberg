@@ -11,7 +11,7 @@ import {
 	receiveTerms,
 	receiveMedia,
 	receivePostTypes,
-	receiveIndex,
+	receiveThemeSupportsFromIndex,
 } from './actions';
 
 /**
@@ -51,5 +51,5 @@ export async function* getPostType( state, slug ) {
  */
 export async function* getThemeSupports() {
 	const index = await apiRequest( { path: '/' } );
-	yield receiveIndex( index );
+	yield receiveThemeSupportsFromIndex( index );
 }
