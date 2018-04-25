@@ -76,6 +76,7 @@ export class BlockListBlock extends Component {
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
+		this.createInnerBlockList = this.createInnerBlockList.bind( this );
 		this.hadTouchStart = false;
 
 		this.state = {
@@ -83,6 +84,11 @@ export class BlockListBlock extends Component {
 			dragging: false,
 			isHovered: false,
 		};
+	}
+
+	createInnerBlockList( uid ) {
+		const { renderBlockMenu } = this.props;
+		return createInnerBlockList( uid, renderBlockMenu );
 	}
 
 	/**
@@ -96,10 +102,7 @@ export class BlockListBlock extends Component {
 		// is defined in `@wordpress/blocks`, so to avoid a circular dependency
 		// we inject this function via context.
 		return {
-			createInnerBlockList: ( uid ) => {
-				const { renderBlockMenu } = this.props;
-				return createInnerBlockList( uid, renderBlockMenu );
-			},
+			createInnerBlockList: this.createInnerBlockList,
 		};
 	}
 
