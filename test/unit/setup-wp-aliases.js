@@ -15,10 +15,11 @@ global.wp = {
 	'editor',
 	'data',
 	'core-data',
+	'core-blocks',
 	'edit-post',
 	'viewport',
 	'plugins',
-].forEach( entryPointName => {
+].forEach( ( entryPointName ) => {
 	Object.defineProperty( global.wp, entryPointName, {
 		get: () => require( entryPointName ),
 	} );

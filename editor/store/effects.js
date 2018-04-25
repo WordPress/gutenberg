@@ -490,8 +490,8 @@ export default {
 
 		// Remove any other blocks that reference this shared block
 		const allBlocks = getBlocks( getState() );
-		const associatedBlocks = allBlocks.filter( block => isSharedBlock( block ) && block.attributes.ref === id );
-		const associatedBlockUids = associatedBlocks.map( block => block.uid );
+		const associatedBlocks = allBlocks.filter( ( block ) => isSharedBlock( block ) && block.attributes.ref === id );
+		const associatedBlockUids = associatedBlocks.map( ( block ) => block.uid );
 
 		const transactionId = uniqueId();
 
@@ -546,7 +546,7 @@ export default {
 		const sharedBlock = {
 			id: uniqueId( 'shared' ),
 			uid: parsedBlock.uid,
-			title: __( 'Untitled block' ),
+			title: __( 'Untitled shared block' ),
 		};
 
 		dispatch( receiveSharedBlocks( [ {

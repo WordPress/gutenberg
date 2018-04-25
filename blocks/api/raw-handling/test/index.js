@@ -112,7 +112,7 @@ describe( 'rawHandler', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		equal( filtered, '<ul>\n    <li>one</li>\n    <li>two</li>\n    <li>three</li>\n</ul>' );
+		equal( filtered, '<ul>\n\t<li>one</li>\n\t<li>two</li>\n\t<li>three</li>\n</ul>' );
 	} );
 
 	it( 'should parse inline Markdown', () => {
@@ -133,6 +133,16 @@ describe( 'rawHandler', () => {
 		} ).map( getBlockContent ).join( '' );
 
 		equal( filtered, '<p>Some <strong>bold</strong> text.</p>' );
+	} );
+
+	it( 'should parse Markdown with HTML', () => {
+		const filtered = rawHandler( {
+			HTML: '',
+			plainText: '# Some <em>heading</em>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		equal( filtered, '<h1>Some <em>heading</em></h1>' );
 	} );
 } );
 

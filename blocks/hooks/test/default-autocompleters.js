@@ -6,9 +6,12 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { defaultAutocompleters } from '../default-autocompleters';
+import '../default-autocompleters';
+import { userAutocompleter } from '../../autocompleters';
 
 describe( 'default-autocompleters', () => {
+	const defaultAutocompleters = [ userAutocompleter ];
+
 	it( 'provides default completers if none are provided', () => {
 		const result = applyFilters( 'blocks.Autocomplete.completers', null );
 		/*
