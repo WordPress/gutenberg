@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage } from '../support/utils';
+import { newPost, newDesktopBrowserPage, getHTMLFromCodeEditor } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
@@ -85,14 +85,6 @@ describe( 'adding blocks', () => {
 		await clickAtRightish( inserter );
 		await page.keyboard.type( 'Second paragraph' );
 
-		// Switch to Text Mode to check HTML Output
-		await page.click( '.edit-post-more-menu [aria-label="More"]' );
-		const codeEditorButton = ( await page.$x( '//button[contains(text(), \'Code Editor\')]' ) )[ 0 ];
-		await codeEditorButton.click( 'button' );
-
-		// Assertions
-		const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
-
-		expect( textEditorContent ).toMatchSnapshot();
+		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
 	} );
 } );

@@ -39,7 +39,7 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `onSplit( before: Array|String, after: Array|String, ...blocks: Object ): Function`
 
-*Optional.* Called when the content can be split with `before` and `after`. There might be blocks present, which should be inserted in between.
+*Optional.* Called when the content can be split with `after` as the split off value. There might be blocks present, which should be inserted before the `after` value. Note: the `before` value should no longer be used.
 
 ### `onReplace( blocks: Array ): Function`
 
@@ -69,6 +69,11 @@ a traditional `input` field, usually when the user exits the field.
 
 *Optional.* A list of autocompleters to use instead of the default.
 
+## RichText.Content
+
+When using RichText in the edit function of blocks, the usage of `RichText.Content` is recommended in the save function of your blocks to save the correct HTML.
+
+
 ## Example
 
 {% codetabs %}
@@ -95,6 +100,12 @@ wp.blocks.registerBlockType( /* ... */, {
 			}
 		} );
 	},
+
+	save: function() {
+		return wp.element.createElement( wp.blocks.RichText.Content, {
+			tagName: 'h2', value: props.attributes.content
+		} );
+	}
 } );
 ```
 {% ESNext %}
@@ -122,6 +133,10 @@ registerBlockType( /* ... */, {
 			/>
 		);
 	},
+
+	save( { attributes } ) {
+		return <RichText.Content tagName="h2" value={ attributes.content } />;
+	}
 } );
 ```
 {% end %}

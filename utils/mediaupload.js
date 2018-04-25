@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, get, startsWith } from 'lodash';
+import { compact, forEach, get, startsWith } from 'lodash';
 
 /**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
@@ -9,11 +9,12 @@ import { compact, get, startsWith } from 'lodash';
  *
  *	TODO: future enhancement to add an upload indicator.
  *
- * @param {Array}    filesList    List of files.
- * @param {Function} onFileChange Function to be called each time a file or a temporary representation of the file is available.
- * @param {string}   allowedType  The type of media that can be uploaded.
+ * @param {Array}    filesList      List of files.
+ * @param {Function} onFileChange   Function to be called each time a file or a temporary representation of the file is available.
+ * @param {string}   allowedType    The type of media that can be uploaded.
+ * @param {?Object}  additionalData Additional data to include in the request.
  */
-export function mediaUpload( filesList, onFileChange, allowedType ) {
+export function mediaUpload( filesList, onFileChange, allowedType, additionalData = {} ) {
 	// Cast filesList to array
 	const files = [ ...filesList ];
 
@@ -33,7 +34,7 @@ export function mediaUpload( filesList, onFileChange, allowedType ) {
 		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
 		onFileChange( filesSet );
 
-		return createMediaFromFile( mediaFile ).then(
+		return createMediaFromFile( mediaFile, additionalData ).then(
 			( savedMedia ) => {
 				const mediaObject = {
 					id: savedMedia.id,
@@ -56,14 +57,16 @@ export function mediaUpload( filesList, onFileChange, allowedType ) {
 }
 
 /**
- * @param {File} file Media File to Save.
+ * @param {File}    file           Media File to Save.
+ * @param {?Object} additionalData Additional data to include in the request.
  *
  * @return {Promise} Media Object Promise.
  */
-function createMediaFromFile( file ) {
+function createMediaFromFile( file, additionalData ) {
 	// Create upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
+	forEach( additionalData, ( ( value, key ) => data.append( key, value ) ) );
 	return wp.apiRequest( {
 		path: '/wp/v2/media',
 		data,

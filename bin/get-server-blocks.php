@@ -30,7 +30,7 @@ require_once dirname( dirname( __FILE__ ) ) . '/lib/class-wp-block-type.php';
 require_once dirname( dirname( __FILE__ ) ) . '/lib/client-assets.php';
 
 // Register server-side code for individual blocks.
-foreach ( glob( dirname( dirname( __FILE__ ) ) . '/blocks/library/*/index.php' ) as $block_logic ) {
+foreach ( glob( dirname( dirname( __FILE__ ) ) . '/core-blocks/*/index.php' ) as $block_logic ) {
 	require_once $block_logic;
 }
 
