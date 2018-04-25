@@ -71,13 +71,13 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 export default compose( [
 	withSelect( ( select ) => {
 		const { getEditedPostAttribute, getSuggestedPostFormat } = select( 'core/editor' );
-		const format = getEditedPostAttribute( 'format' );
+		const postFormat = getEditedPostAttribute( 'format' );
 		const themeSupports = select( 'core' ).getThemeSupports();
 		// Ensure current format is always in the set.
 		// The current format may not be a format supported by the theme.
-		const supportedFormats = union( [ format ], get( themeSupports, 'formats', [] ) );
+		const supportedFormats = union( [ postFormat ], get( themeSupports, 'formats', [] ) );
 		return {
-			postFormat: getEditedPostAttribute( 'format' ),
+			postFormat,
 			supportedFormats,
 			suggestedFormat: getSuggestedPostFormat(),
 		};
