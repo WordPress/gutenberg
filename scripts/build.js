@@ -25,6 +25,7 @@ const BUILD_DIR = {
 	module: 'build-module',
 };
 const DONE = chalk.reset.inverse.bold.green( ' DONE ' );
+const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
 
 /**
  * Babel Configuration
@@ -128,10 +129,17 @@ function buildFileFor( file, silent, environment ) {
  */
 function buildPackage( packagePath ) {
 	const srcDir = path.resolve( packagePath, SRC_DIR );
+	const packageFile = packagePath + '/package.json';
 	const files = glob.sync( srcDir + '/**/*.js', { nodir: true } )
 		.filter( file => ! /\.test\.js/.test( file ) );
 
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
+
+	const config = require( packageFile );
+	if ( ! config.publishConfig || 'public' !== config.publishConfig.access ) {
+		process.stdout.write( `${ ERROR } package.json must include "publishConfig": { "access": "public" }\n` );
+		process.exitCode = 1;
+	}
 
 	files.forEach( file => buildFile( file, true ) );
 	process.stdout.write( `${ DONE }\n` );

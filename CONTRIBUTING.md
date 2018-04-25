@@ -44,14 +44,28 @@ $ npm run test:coverage
 
 ## Releasing
 
-This repository uses [lerna](https://lernajs.io) to manage and release the packages. Lerna automatically releases all the outdated packages. To check which packages are outdated and will be released, type `npx lerna updated`.
+This repository uses [lerna](https://lernajs.io) to manage and release the packages. Lerna automatically releases all the outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
+
+If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your npmjs.com account.
+
+### Before releasing
+
+Confirm that you're logged into npm, by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
+
+If you're publishing a new package, ensure that its `package.json` file contains the correct `publishConfig` settings:
+
+```json
+	"publishConfig": {
+		"access": "public"
+	}
+```
 
 ### Development release
 
-Run the following command to release a dev version of the outdated packages:
+Run the following command to release a dev version of the outdated packages, replacing "123456" with your 2FA code. Make sure you're using a freshly generated 2FA code, rather than one that's about to timeout. This is a little cumbersome, but helps to prevent the release process from dying mid-deploy.
 
 ```bash
-npm run publish:dev
+NPM_CONFIG_OTP=123456 npm run publish:dev
 ```
 
 Lerna will ask you which version number you want to choose for each package. For a `dev` release, you'll more likely want to choose the "prerelease" option. Repeat the same for all the outdated packages and confirm your version updates.
@@ -60,10 +74,10 @@ Lerna will then publish to `npm`, commit the `package.json` changes and create t
 
 ### Production release
 
-To release a production version for the outdated packages, run the following command
+To release a production version for the outdated packages, run the following command, replacing "123456" with your (freshly generated, as above) 2FA code:
 
 ```bash
-npm run publish:prod
+NPM_CONFIG_OTP=123456 npm run publish:prod
 ```
 
 Choose the correct version (minor, major or patch) and confirm your choices and let Lerna do its magic.
