@@ -89,7 +89,7 @@ export function isEditedPostNew( state ) {
  * @return {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
-	return state.editor.isDirty || isSavingPost( state );
+	return state.editor.isDirty || inSomeHistory( state, isEditedPostDirty );
 }
 
 /**
@@ -1567,4 +1567,26 @@ export function getPermalinkParts( state ) {
 		postName,
 		suffix,
 	};
+}
+
+/**
+ * Returns true if an optimistic transaction is pending commit, for which the
+ * before state satisfies the given predicate function.
+ *
+ * @param {Object}   state     Editor state.
+ * @param {Function} predicate Function given state, returning true if match.
+ *
+ * @return {boolean} Whether predicate matches for some history.
+ */
+export function inSomeHistory( state, predicate ) {
+	const { optimist } = state;
+
+	// In recursion, optimist state won't exist. Assume exhausted options.
+	if ( ! optimist ) {
+		return false;
+	}
+
+	return optimist.some( ( { beforeState } ) => (
+		beforeState && predicate( beforeState )
+	) );
 }

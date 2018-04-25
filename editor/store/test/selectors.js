@@ -212,13 +212,19 @@ describe( 'selectors', () => {
 			expect( isEditedPostDirty( state ) ).toBe( true );
 		} );
 
-		it( 'should return true if mid-save', () => {
+		it( 'should return true if pending transaction with dirty state', () => {
 			const state = {
+				optimist: [
+					{
+						beforeState: {
+							editor: {
+								isDirty: true,
+							},
+						},
+					},
+				],
 				editor: {
 					isDirty: false,
-				},
-				saving: {
-					requesting: true,
 				},
 			};
 
