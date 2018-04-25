@@ -58,6 +58,7 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				activeGeneralSidebar: 'edit-post/document',
+				activeScreenTakeover: null,
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
