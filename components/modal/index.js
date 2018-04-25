@@ -53,6 +53,7 @@ class Modal extends Component {
 			icon,
 			title,
 			bodyOpenClassName,
+			portalClassName,
 			onRequestClose,
 			children } = this.props;
 
@@ -63,6 +64,7 @@ class Modal extends Component {
 			className={ className }
 			overlayClassName={ overlayClassName }
 			bodyOpenClassName={ bodyOpenClassName }
+			portalClassName={ portalClassName }
 			aria-labelledby={ ariaLabelledBy }
 			onRequestClose={ onRequestClose }>
 			<ModalHeader icon={ icon } title={ title } onClose={ onRequestClose } />
@@ -85,6 +87,7 @@ Modal.defaultProps = {
 	title: 'Plugin screen',
 	onRequestClose: null,
 	bodyOpenClassName: 'modal-body--open',
+	portalClassName: 'WordPress-modal',
 };
 
 export default Modal;

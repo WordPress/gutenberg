@@ -94,7 +94,7 @@
     // The height of the content is the height of it's parent, minus the header. after that, the offset was 3px.
     height: calc( 100% - #{ $header-height } + 3px );
     overflow: auto;
-    padding: 0px 20px 0px 20px;
+    padding: 0 20px;
     position: absolute;
     z-index: z-index( '.components-modal__content' );
   }
