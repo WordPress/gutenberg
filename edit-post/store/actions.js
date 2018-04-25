@@ -148,3 +148,27 @@ export function setMetaBoxSavedData( dataPerLocation ) {
 		dataPerLocation,
 	};
 }
+
+/**
+ * Returns an action object used in signalling that the user opened a screen takeover.
+ *
+ * @param {string} name        Screen takeover name to be opened.
+ * @return {Object}            Action object.
+ */
+export function openScreenTakeover( name ) {
+	return {
+		type: 'OPEN_SCREEN_TAKEOVER',
+		name,
+	};
+}
+
+/**
+ * Returns an action object signalling that the user closed the screen takeover.
+ *
+ * @return {Object} Action object.
+ */
+export function closeScreenTakeover() {
+	return {
+		type: 'CLOSE_SCREEN_TAKEOVER',
+	};
+}
