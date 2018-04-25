@@ -33,7 +33,7 @@ describe( 'block serializer', () => {
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
-		getBlockTypes().forEach( block => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 	} );
@@ -42,7 +42,7 @@ describe( 'block serializer', () => {
 		it( 'returns beautiful content', () => {
 			const content = getBeautifulContent( '<div><div>Beautiful</div></div>' );
 
-			expect( content ).toBe( '<div>\n    <div>Beautiful</div>\n</div>' );
+			expect( content ).toBe( '<div>\n\t<div>Beautiful</div>\n</div>' );
 		} );
 	} );
 
@@ -283,54 +283,6 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'serializeBlock()', () => {
-		describe( '"more" block', () => {
-			beforeEach( () => {
-				registerBlockType( 'core/more', {
-					category: 'layout',
-					title: 'more',
-					attributes: {
-						customText: {
-							type: 'string',
-						},
-						noTeaser: {
-							type: 'boolean',
-							default: false,
-						},
-					},
-
-					save: () => null,
-				} );
-			} );
-
-			it( 'serializes without text', () => {
-				const block = createBlock( 'core/more', {} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!--more-->' );
-			} );
-
-			it( 'serializes with text', () => {
-				const block = createBlock( 'core/more', {
-					customText: 'Read more!',
-				} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!--more Read more!-->' );
-			} );
-
-			it( 'serializes with no teaser', () => {
-				const block = createBlock( 'core/more', {
-					noTeaser: true,
-				} );
-
-				const content = serializeBlock( block );
-
-				expect( content ).toBe( '<!--more-->\n<!--noteaser-->' );
-			} );
-		} );
-
 		it( 'serializes the fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unknown-block', {
 				category: 'common',
@@ -425,9 +377,9 @@ describe( 'block serializer', () => {
 			expect( serialize( block ) ).toEqual(
 				'<!-- wp:test-block -->\n' +
 				'<p class="wp-block-test-block">Invalid\n' +
-				'    <!-- wp:test-block -->\n' +
-				'    <p class="wp-block-test-block"></p>\n' +
-				'    <!-- /wp:test-block -->\n' +
+				'\t<!-- wp:test-block -->\n' +
+				'\t<p class="wp-block-test-block"></p>\n' +
+				'\t<!-- /wp:test-block -->\n' +
 				'</p>\n' +
 				'<!-- /wp:test-block -->'
 			);

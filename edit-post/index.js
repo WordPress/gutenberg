@@ -1,43 +1,22 @@
 /**
  * External dependencies
  */
-import moment from 'moment-timezone';
-import 'moment-timezone/moment-timezone-utils';
-import { createProvider } from 'react-redux';
+import { get, isString, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { settings as dateSettings } from '@wordpress/date';
-import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
 import './hooks';
-import Layout from './components/layout';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
-
-export * from './api';
-
-// Configure moment globally
-moment.locale( dateSettings.l10n.locale );
-if ( dateSettings.timezone.string ) {
-	moment.tz.setDefault( dateSettings.timezone.string );
-} else {
-	const momentTimezone = {
-		name: 'WP',
-		abbrs: [ 'WP' ],
-		untils: [ null ],
-		offsets: [ -dateSettings.timezone.offset * 60 ],
-	};
-	const unpackedTimezone = moment.tz.pack( momentTimezone );
-	moment.tz.add( unpackedTimezone );
-	moment.tz.setDefault( 'WP' );
-}
+import Editor from './editor';
 
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
@@ -59,18 +38,10 @@ window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
  */
 export function reinitializeEditor( target, settings ) {
 	unmountComponentAtNode( target );
-
 	const reboot = reinitializeEditor.bind( null, target, settings );
-	const ReduxProvider = createProvider( 'edit-post' );
 
 	render(
-		<EditorProvider settings={ settings } recovery>
-			<ErrorBoundary onError={ reboot }>
-				<ReduxProvider store={ store }>
-					<Layout />
-				</ReduxProvider>
-			</ErrorBoundary>
-		</EditorProvider>,
+		<Editor settings={ settings } onError={ reboot } recovery />,
 		target
 	);
 }
@@ -90,16 +61,31 @@ export function reinitializeEditor( target, settings ) {
 export function initializeEditor( id, post, settings ) {
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, target, settings );
-	const ReduxProvider = createProvider( 'edit-post' );
+
+	if ( 'production' !== process.env.NODE_ENV ) {
+		// Remove with 3.0 release.
+		window.console.info(
+			'`isSelected` usage is no longer mandatory with `BlockControls`, `InspectorControls` and `RichText`. ' +
+			'It is now handled by the editor internally to ensure that controls are visible only when block is selected. ' +
+			'See updated docs: https://github.com/WordPress/gutenberg/blob/master/blocks/README.md#components.'
+		);
+	}
+
+	let migratedSettings;
+	const colors = get( settings, [ 'colors' ] );
+	if ( some( colors, isString ) ) {
+		migratedSettings = {
+			...settings,
+			colors: colors.map( ( color ) => isString( color ) ? { color } : color ),
+		};
+		deprecated( 'Setting theme colors without names', {
+			version: '2.9',
+			alternative: 'add_theme_support( \'colors\', array( \'name\' => \'my-color\', \'color\': \'#ff0\' );' }
+		);
+	}
 
 	render(
-		<EditorProvider settings={ settings } post={ post }>
-			<ErrorBoundary onError={ reboot }>
-				<ReduxProvider store={ store }>
-					<Layout />
-				</ReduxProvider>
-			</ErrorBoundary>
-		</EditorProvider>,
+		<Editor settings={ migratedSettings || settings } onError={ reboot } post={ post } />,
 		target
 	);
 
@@ -109,3 +95,6 @@ export function initializeEditor( id, post, settings ) {
 		},
 	};
 }
+
+export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';

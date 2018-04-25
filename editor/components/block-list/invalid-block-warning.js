@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -13,46 +8,47 @@ import {
 	createBlock,
 	rawHandler,
 } from '@wordpress/blocks';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { replaceBlock } from '../../store/actions';
 import Warning from '../warning';
 
 function InvalidBlockWarning( { convertToHTML, convertToBlocks } ) {
 	const hasHTMLBlock = !! getBlockType( 'core/html' );
 
 	return (
-		<Warning>
-			<p>{ __( 'This block appears to have been modified externally.' ) }</p>
-			<p>
-				<Button onClick={ convertToBlocks } isLarge isPrimary={ ! hasHTMLBlock }>
+		<Warning
+			actions={ [
+				<Button key="convert" onClick={ convertToBlocks } isLarge isPrimary={ ! hasHTMLBlock }>
 					{ __( 'Convert to Blocks' ) }
-				</Button>
-				{ hasHTMLBlock && (
-					<Button onClick={ convertToHTML } isLarge isPrimary>
+				</Button>,
+				hasHTMLBlock && (
+					<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
 						{ __( 'Edit as HTML' ) }
 					</Button>
-				) }
-			</p>
+				),
+			] }
+		>
+			{ __( 'This block appears to have been modified externally.' ) }
 		</Warning>
 	);
 }
 
-export default connect(
-	null,
-	( dispatch, { block } ) => ( {
+export default withDispatch( ( dispatch, { block } ) => {
+	const { replaceBlock } = dispatch( 'core/editor' );
+	return {
 		convertToHTML() {
-			dispatch( replaceBlock( block.uid, createBlock( 'core/html', {
+			replaceBlock( block.uid, createBlock( 'core/html', {
 				content: block.originalContent,
-			} ) ) );
+			} ) );
 		},
 		convertToBlocks() {
-			dispatch( replaceBlock( block.uid, rawHandler( {
+			replaceBlock( block.uid, rawHandler( {
 				HTML: block.originalContent,
 				mode: 'BLOCKS',
-			} ) ) );
+			} ) );
 		},
-	} )
-)( InvalidBlockWarning );
+	};
+} )( InvalidBlockWarning );

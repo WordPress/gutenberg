@@ -1,49 +1,43 @@
 /**
- * External Dependencies
+ * WordPress Dependencies
  */
-import { connect } from 'react-redux';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * WordPress Dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItemsGroup, MenuItemsToggle, withInstanceId } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { MenuGroup, MenuItem, withInstanceId } from '@wordpress/components';
+import { ifViewportMatches } from '@wordpress/viewport';
 
-/**
- * Internal Dependencies
- */
-import { hasFixedToolbar, isMobile } from '../../../store/selectors';
-import { toggleFeature } from '../../../store/actions';
-
-function FeatureToggle( { onToggle, active, onMobile } ) {
-	if ( onMobile ) {
-		return null;
-	}
+function FeatureToggle( { onToggle, isActive } ) {
 	return (
-		<MenuItemsGroup
+		<MenuGroup
 			label={ __( 'Settings' ) }
 			filterName="editPost.MoreMenu.settings"
 		>
-			<MenuItemsToggle
-				label={ __( 'Fix Toolbar to Top' ) }
-				isSelected={ active }
+			<MenuItem
+				icon={ isActive && 'yes' }
+				isSelected={ isActive }
 				onClick={ onToggle }
-			/>
-		</MenuItemsGroup>
+			>
+				{ __( 'Fix Toolbar to Top' ) }
+			</MenuItem>
+		</MenuGroup>
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		active: hasFixedToolbar( state ),
-		onMobile: isMobile( state ),
-	} ),
-	( dispatch, ownProps ) => ( {
+export default compose( [
+	withSelect( ( select ) => ( {
+		isActive: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
+	} ) ),
+	withDispatch( ( dispatch, ownProps ) => ( {
 		onToggle() {
-			dispatch( toggleFeature( 'fixedToolbar' ) );
+			dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
 			ownProps.onToggle();
 		},
-	} ),
-	undefined,
-	{ storeKey: 'edit-post' }
-)( withInstanceId( FeatureToggle ) );
+	} ) ),
+	ifViewportMatches( 'medium' ),
+	withInstanceId,
+] )( FeatureToggle );

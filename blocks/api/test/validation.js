@@ -188,6 +188,17 @@ describe( 'validation', () => {
 				expect( isEqual ).toBe( false );
 			} );
 		} );
+
+		describe( 'boolean attributes', () => {
+			it( 'returns true if both present', () => {
+				const isEqual = isEqualAttributesOfName.controls(
+					'true',
+					''
+				);
+
+				expect( isEqual ).toBe( true );
+			} );
+		} );
 	} );
 
 	describe( 'isEqualTagAttributePairs()', () => {
@@ -211,10 +222,12 @@ describe( 'validation', () => {
 				[
 					[ 'class', 'b   a c' ],
 					[ 'style', 'color: red;  background-image: url( "https://wordpress.org/img.png" );' ],
+					[ 'controls', '' ],
 				],
 				[
 					[ 'class', 'c  a b' ],
 					[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+					[ 'controls', 'true' ],
 				]
 			);
 
@@ -316,8 +329,8 @@ describe( 'validation', () => {
 
 		it( 'should return true for effectively equivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
-				'<div>Hello<span   class="b a" id="foo"> World!</  span>  </div>',
-				'<div  >Hello\n<span id="foo" class="a  b">World!</span></div>'
+				'<div>&quot; Hello<span   class="b a" id="foo"> World!</  span>  "</div>',
+				'<div  >" Hello\n<span id="foo" class="a  b">World!</span>"</div>'
 			);
 
 			expect( isEquivalent ).toBe( true );
@@ -398,6 +411,34 @@ describe( 'validation', () => {
 
 			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return false when difference of boolean attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<video controls></video>',
+				'<video></video>'
+			);
+
+			expect( console ).toHaveWarned();
+			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return true when same boolean attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<video controls></video>',
+				'<video controls></video>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return true when effectively same boolean attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<video controls></video>',
+				'<video controls=""></video>'
+			);
+
+			expect( isEquivalent ).toBe( true );
 		} );
 	} );
 

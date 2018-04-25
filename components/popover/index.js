@@ -17,6 +17,7 @@ import './style.scss';
 import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
+import ScrollLock from '../scroll-lock';
 import { Slot, Fill } from '../slot-fill';
 
 const FocusManaged = withFocusReturn( ( { children } ) => children );
@@ -239,6 +240,7 @@ class Popover extends Component {
 
 	render() {
 		const {
+			headerTitle,
 			onClose,
 			children,
 			className,
@@ -280,6 +282,9 @@ class Popover extends Component {
 				>
 					{ this.state.isMobile && (
 						<div className="components-popover__header">
+							<span className="components-popover__header-title">
+								{ headerTitle }
+							</span>
 							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
 						</div>
 					) }
@@ -308,7 +313,10 @@ class Popover extends Component {
 			content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
 		}
 
-		return <span ref={ this.bindNode( 'anchor' ) }>{ content }</span>;
+		return <span ref={ this.bindNode( 'anchor' ) }>
+			{ content }
+			{ this.state.isMobile && expandOnMobile && <ScrollLock /> }
+		</span>;
 	}
 }
 

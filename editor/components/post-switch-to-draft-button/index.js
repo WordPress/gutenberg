@@ -1,24 +1,12 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import { editPost, savePost } from '../../store/actions';
-import {
-	isSavingPost,
-	isCurrentPostPublished,
-} from '../../store/selectors';
-
-function PostSwitchToDraftButton( { className, isSaving, isPublished, onClick } ) {
+function PostSwitchToDraftButton( { isSaving, isPublished, onClick } ) {
 	if ( ! isPublished ) {
 		return null;
 	}
@@ -32,7 +20,7 @@ function PostSwitchToDraftButton( { className, isSaving, isPublished, onClick } 
 
 	return (
 		<Button
-			className={ className }
+			className="editor-post-switch-to-draft"
 			isLarge
 			onClick={ onSwitch }
 			disabled={ isSaving }
@@ -42,17 +30,22 @@ function PostSwitchToDraftButton( { className, isSaving, isPublished, onClick } 
 	);
 }
 
-const applyConnect = connect(
-	( state ) => ( {
-		isSaving: isSavingPost( state ),
-		isPublished: isCurrentPostPublished( state ),
+export default compose( [
+	withSelect( ( select ) => {
+		const { isSavingPost, isCurrentPostPublished } = select( 'core/editor' );
+		return {
+			isSaving: isSavingPost(),
+			isPublished: isCurrentPostPublished(),
+		};
 	} ),
-	{
-		onClick: () => [
-			editPost( { status: 'draft' } ),
-			savePost(),
-		],
-	}
-);
+	withDispatch( ( dispatch ) => {
+		const { editPost, savePost } = dispatch( 'core/editor' );
+		return {
+			onClick: () => {
+				editPost( { status: 'draft' } );
+				savePost();
+			},
+		};
+	} ),
+] )( PostSwitchToDraftButton );
 
-export default applyConnect( PostSwitchToDraftButton );

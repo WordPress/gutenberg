@@ -25,12 +25,12 @@ class FormFileUpload extends Component {
 	}
 
 	render() {
-		const { children, multiple = false, accept, onChange, ...props } = this.props;
+		const { children, multiple = false, accept, onChange, icon = 'upload', ...props } = this.props;
 
 		return (
 			<div className="components-form-file-upload">
 				<IconButton
-					icon="upload"
+					icon={ icon }
 					onClick={ this.openFileDialog }
 					{ ...props }
 				>

@@ -21,7 +21,7 @@ describe( 'Tooltip', () => {
 
 		it( 'should render children', () => {
 			const wrapper = shallow(
-				<Tooltip position="bottom right" text="Help Text">
+				<Tooltip position="bottom right" text="Help text">
 					<button>Hover Me!</button>
 				</Tooltip>
 			);
@@ -34,7 +34,7 @@ describe( 'Tooltip', () => {
 
 		it( 'should render children with additional popover when over', () => {
 			const wrapper = shallow(
-				<Tooltip position="bottom right" text="Help Text">
+				<Tooltip position="bottom right" text="Help text">
 					<button>Hover Me!</button>
 				</Tooltip>
 			);
@@ -56,7 +56,7 @@ describe( 'Tooltip', () => {
 			const originalFocus = jest.fn();
 			const event = { type: 'focus', currentTarget: {} };
 			const wrapper = shallow(
-				<Tooltip text="Help Text">
+				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalFocus }
 						onFocus={ originalFocus }
@@ -82,7 +82,7 @@ describe( 'Tooltip', () => {
 			// rendered components: https://github.com/airbnb/enzyme/issues/450
 			const originalMouseEnter = jest.fn();
 			const wrapper = mount(
-				<Tooltip text="Help Text">
+				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalMouseEnter }
 						onFocus={ originalMouseEnter }
@@ -115,7 +115,7 @@ describe( 'Tooltip', () => {
 			// rendered components: https://github.com/airbnb/enzyme/issues/450
 			const originalMouseEnter = jest.fn();
 			const wrapper = mount(
-				<Tooltip text="Help Text">
+				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalMouseEnter }
 						onFocus={ originalMouseEnter }
@@ -146,7 +146,7 @@ describe( 'Tooltip', () => {
 			// rendered components: https://github.com/airbnb/enzyme/issues/450
 			const originalMouseEnter = jest.fn();
 			const wrapper = mount(
-				<Tooltip text="Help Text">
+				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalMouseEnter }
 						onFocus={ originalMouseEnter }

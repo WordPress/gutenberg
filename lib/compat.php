@@ -70,6 +70,123 @@ function _gutenberg_utf8_split( $str ) {
 }
 
 /**
+ * Shims fix for apiRequest on sites configured to use plain permalinks and add Preloading support.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42382
+ *
+ * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
+ */
+function gutenberg_shim_api_request( $scripts ) {
+	$api_request_fix = <<<JS
+( function( wp, wpApiSettings ) {
+
+	// Fix plain permalinks sites
+	var buildAjaxOptions;
+	if ( 'string' === typeof wpApiSettings.root && -1 !== wpApiSettings.root.indexOf( '?' ) ) {
+		buildAjaxOptions = wp.apiRequest.buildAjaxOptions;
+		wp.apiRequest.buildAjaxOptions = function( options ) {
+			if ( 'string' === typeof options.path ) {
+				options.path = options.path.replace( '?', '&' );
+			}
+
+			return buildAjaxOptions.call( wp.apiRequest, options );
+		};
+	}
+
+	function getStablePath( path ) {
+		var splitted = path.split( '?' );
+		var query = splitted[ 1 ];
+		var base = splitted[ 0 ];
+		if ( ! query ) {
+			return base;
+		}
+
+		// 'b=1&c=2&a=5'
+		return base + '?' + query
+			// [ 'b=1', 'c=2', 'a=5' ]
+			.split( '&' )
+			// [ [ 'b, '1' ], [ 'c', '2' ], [ 'a', '5' ] ]
+			.map( function ( entry ) {
+				return entry.split( '=' );
+			 } )
+			// [ [ 'a', '5' ], [ 'b, '1' ], [ 'c', '2' ] ]
+			.sort( function ( a, b ) {
+				return a[ 0 ].localeCompare( b[ 0 ] );
+			 } )
+			// [ 'a=5', 'b=1', 'c=2' ]
+			.map( function ( pair ) {
+				return pair.join( '=' );
+			 } )
+			// 'a=5&b=1&c=2'
+			.join( '&' );
+	};
+
+	// Add preloading support
+	var previousApiRequest = wp.apiRequest;
+	wp.apiRequest = function( request ) {
+		var method, path;
+
+		if ( typeof request.path === 'string' && window._wpAPIDataPreload ) {
+			method = request.method || 'GET';
+			path = getStablePath( request.path );
+
+			if ( 'GET' === method && window._wpAPIDataPreload[ path ] ) {
+				var deferred = jQuery.Deferred();
+				deferred.resolve( window._wpAPIDataPreload[ path ].body );
+				return deferred.promise();
+			}
+		}
+
+		return previousApiRequest.call( previousApiRequest, request );
+	}
+	for ( var name in previousApiRequest ) {
+		if ( previousApiRequest.hasOwnProperty( name ) ) {
+			wp.apiRequest[ name ] = previousApiRequest[ name ];
+		}
+	}
+
+} )( window.wp, window.wpApiSettings );
+JS;
+
+	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
+}
+add_action( 'wp_default_scripts', 'gutenberg_shim_api_request' );
+
+/**
+ * Shims support for emulating HTTP/1.0 requests in wp.apiRequest
+ *
+ * @see https://core.trac.wordpress.org/ticket/43605
+ *
+ * @param WP_Scripts $scripts WP_Scripts instance (passed by reference).
+ */
+function gutenberg_shim_api_request_emulate_http( $scripts ) {
+	$api_request_fix = <<<JS
+( function( wp ) {
+	var oldApiRequest = wp.apiRequest;
+	wp.apiRequest = function ( options ) {
+		if ( options.method ) {
+			if ( [ 'PATCH', 'PUT', 'DELETE' ].indexOf( options.method.toUpperCase() ) >= 0 ) {
+				if ( ! options.headers ) {
+					options.headers = {};
+				}
+				options.headers['X-HTTP-Method-Override'] = options.method;
+				options.method = 'POST';
+
+				options.contentType = 'application/json';
+				options.data = JSON.stringify( options.data );
+			}
+		}
+
+		return oldApiRequest( options );
+	}
+} )( window.wp );
+JS;
+
+	$scripts->add_inline_script( 'wp-api-request', $api_request_fix, 'after' );
+}
+add_action( 'wp_default_scripts', 'gutenberg_shim_api_request_emulate_http' );
+
+/**
  * Disables wpautop behavior in classic editor when post contains blocks, to
  * prevent removep from invalidating paragraph blocks.
  *
@@ -98,28 +215,6 @@ function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
 }
 
 add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
-
-/**
- * Ensure that the wp-json index contains the `permalink_structure` setting as
- * part of its site info elements.
- *
- * @see https://core.trac.wordpress.org/ticket/42465
- *
- * @param WP_REST_Response $response WP REST API response of the wp-json index.
- * @return WP_REST_Response Response that contains the permalink structure.
- */
-function gutenberg_ensure_wp_json_has_permalink_structure( $response ) {
-	$site_info = $response->get_data();
-
-	if ( ! array_key_exists( 'permalink_structure', $site_info ) ) {
-		$site_info['permalink_structure'] = get_option( 'permalink_structure' );
-	}
-
-	$response->set_data( $site_info );
-
-	return $response;
-}
-add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_permalink_structure' );
 
 /**
  * As a substitute for the default content `wpautop` filter, applies autop
@@ -243,3 +338,153 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
 	return $response;
 }
 add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10, 3 );
+
+/**
+ * Add additional 'visibility' rest api field to taxonomies.
+ *
+ * Used so private taxonomies are not displayed in the UI.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42707
+ */
+function gutenberg_add_taxonomy_visibility_field() {
+	register_rest_field(
+		'taxonomy',
+		'visibility',
+		array(
+			'get_callback' => 'gutenberg_get_taxonomy_visibility_data',
+			'schema'       => array(
+				'description' => __( 'The visibility settings for the taxonomy.', 'gutenberg' ),
+				'type'        => 'object',
+				'context'     => array( 'edit' ),
+				'readonly'    => true,
+				'properties'  => array(
+					'public'             => array(
+						'description' => __( 'Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'publicly_queryable' => array(
+						'description' => __( 'Whether the taxonomy is publicly queryable.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'show_ui'            => array(
+						'description' => __( 'Whether to generate a default UI for managing this taxonomy.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'show_admin_column'  => array(
+						'description' => __( 'Whether to allow automatic creation of taxonomy columns on associated post-types table.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'show_in_nav_menus'  => array(
+						'description' => __( 'Whether to make the taxonomy available for selection in navigation menus.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+					'show_in_quick_edit' => array(
+						'description' => __( 'Whether to show the taxonomy in the quick/bulk edit panel.', 'gutenberg' ),
+						'type'        => 'boolean',
+					),
+				),
+			),
+		)
+	);
+}
+
+/**
+ * Gets taxonomy visibility property data.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42707
+ *
+ * @param array $object Taxonomy data from REST API.
+ * @return array Array of taxonomy visibility data.
+ */
+function gutenberg_get_taxonomy_visibility_data( $object ) {
+	// Just return existing data for up-to-date Core.
+	if ( isset( $object['visibility'] ) ) {
+		return $object['visibility'];
+	}
+
+	$taxonomy = get_taxonomy( $object['slug'] );
+
+	return array(
+		'public'             => $taxonomy->public,
+		'publicly_queryable' => $taxonomy->publicly_queryable,
+		'show_ui'            => $taxonomy->show_ui,
+		'show_admin_column'  => $taxonomy->show_admin_column,
+		'show_in_nav_menus'  => $taxonomy->show_in_nav_menus,
+		'show_in_quick_edit' => $taxonomy->show_ui,
+	);
+}
+
+add_action( 'rest_api_init', 'gutenberg_add_taxonomy_visibility_field' );
+
+/**
+ * Add a permalink template to posts in the post REST API response.
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the permalink_template.
+ */
+function gutenberg_add_permalink_template_to_posts( $response, $post, $request ) {
+	if ( 'edit' !== $request['context'] ) {
+		return $response;
+	}
+
+	if ( ! function_exists( 'get_sample_permalink' ) ) {
+		require_once ABSPATH . '/wp-admin/includes/post.php';
+	}
+
+	$sample_permalink = get_sample_permalink( $post->ID );
+
+	$response->data['permalink_template'] = $sample_permalink[0];
+
+	if ( 'draft' === $post->post_status && ! $post->post_name ) {
+		$response->data['draft_slug'] = $sample_permalink[1];
+	}
+
+	return $response;
+}
+
+/**
+ * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
+ *
+ * @param string $post_type The newly registered post type.
+ * @return string That same post type.
+ */
+function gutenberg_register_permalink_template_function( $post_type ) {
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
+	return $post_type;
+}
+add_filter( 'registered_post_type', 'gutenberg_register_permalink_template_function' );
+
+/**
+ * Includes the value for the 'viewable' attribute of a post type resource.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43739
+ *
+ * @param object $post_type Post type response object.
+ * @return boolean Whether or not the post type can be viewed.
+ */
+function gutenberg_get_post_type_viewable( $post_type ) {
+	return is_post_type_viewable( $post_type['slug'] );
+}
+
+/**
+ * Adds the 'viewable' attribute to the REST API response of a post type.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43739
+ */
+function gutenberg_register_rest_api_post_type_viewable() {
+	register_rest_field( 'type',
+		'viewable',
+		array(
+			'get_callback' => 'gutenberg_get_post_type_viewable',
+			'schema'       => array(
+				'description' => __( 'Whether or not the post type can be viewed', 'gutenberg' ),
+				'type'        => 'boolean',
+				'context'     => array( 'edit' ),
+				'readonly'    => true,
+			),
+		)
+	);
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_viewable' );

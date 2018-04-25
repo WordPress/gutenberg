@@ -1,11 +1,15 @@
 /**
  * External dependencies
  */
-const webpack = require( 'webpack' );
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
-const { reduce, escapeRegExp, castArray, get } = require( 'lodash' );
+const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
+
+/**
+ * WordPress dependencies
+ */
+const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -14,12 +18,12 @@ const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
 
 // CSS loader for styles specific to block editing.
 const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/edit-blocks.css',
+	filename: './core-blocks/build/edit-blocks.css',
 } );
 
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/style.css',
+	filename: './core-blocks/build/style.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -46,95 +50,74 @@ const extractConfig = {
 	],
 };
 
+/**
+ * Given a string, returns a new string with dash separators converedd to
+ * camel-case equivalent. This is not as aggressive as `_.camelCase` in
+ * converting to uppercase, where Lodash will convert letters following
+ * numbers.
+ *
+ * @param {string} string Input dash-delimited string.
+ *
+ * @return {string} Camel-cased string.
+ */
+function camelCaseDash( string ) {
+	return string.replace(
+		/-([a-z])/,
+		( match, letter ) => letter.toUpperCase()
+	);
+}
+
 const entryPointNames = [
 	'blocks',
 	'components',
 	'date',
 	'editor',
 	'element',
-	'i18n',
 	'utils',
 	'data',
-	[ 'editPost', 'edit-post' ],
+	'viewport',
+	'core-data',
+	'plugins',
+	'edit-post',
+	'core-blocks',
 ];
 
 const packageNames = [
 	'hooks',
+	'i18n',
+];
+
+const coreGlobals = [
+	'api-request',
 ];
 
 const externals = {
 	react: 'React',
 	'react-dom': 'ReactDOM',
-	'react-dom/server': 'ReactDOMServer',
 	tinymce: 'tinymce',
 	moment: 'moment',
 	jquery: 'jQuery',
+	lodash: 'lodash',
+	'lodash-es': 'lodash',
 };
 
-[ ...entryPointNames, ...packageNames ].forEach( name => {
+[
+	...entryPointNames,
+	...packageNames,
+	...coreGlobals,
+].forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
-		this: [ 'wp', name ],
+		this: [ 'wp', camelCaseDash( name ) ],
 	};
 } );
 
-/**
- * Webpack plugin for handling specific template tags in Webpack configuration
- * values like those supported in the base Webpack functionality (e.g. `name`).
- *
- * @see webpack.TemplatedPathPlugin
- */
-class CustomTemplatedPathPlugin {
-	/**
-	 * CustomTemplatedPathPlugin constructor. Initializes handlers as a tuple
-	 * set of RegExp, handler, where the regular expression is used in matching
-	 * a Webpack asset path.
-	 *
-	 * @param {Object.<string,Function>} handlers Object keyed by tag to match,
-	 *                                            with function value returning
-	 *                                            replacement string.
-	 *
-	 * @return {void}
-	 */
-	constructor( handlers ) {
-		this.handlers = reduce( handlers, ( result, handler, key ) => {
-			const regexp = new RegExp( `\\[${ escapeRegExp( key ) }\\]`, 'gi' );
-			return [ ...result, [ regexp, handler ] ];
-		}, [] );
-	}
-
-	/**
-	 * Webpack plugin application logic.
-	 *
-	 * @param {Object} compiler Webpack compiler
-	 *
-	 * @return {void}
-	 */
-	apply( compiler ) {
-		compiler.plugin( 'compilation', ( compilation ) => {
-			compilation.mainTemplate.plugin( 'asset-path', ( path, data ) => {
-				for ( let i = 0; i < this.handlers.length; i++ ) {
-					const [ regexp, handler ] = this.handlers[ i ];
-					if ( regexp.test( path ) ) {
-						return path.replace( regexp, handler( path, data ) );
-					}
-				}
-
-				return path;
-			} );
-		} );
-	}
-}
-
 const config = {
+	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+
 	entry: Object.assign(
-		entryPointNames.reduce( ( memo, entryPoint ) => {
-			// Normalized entry point as an array of [ name, path ]. If a path
-			// is not explicitly defined, use the name.
-			entryPoint = castArray( entryPoint );
-			const [ name, path = name ] = entryPoint;
-
+		entryPointNames.reduce( ( memo, path ) => {
+			const name = camelCaseDash( path );
 			memo[ name ] = `./${ path }`;
-
 			return memo;
 		}, {} ),
 		packageNames.reduce( ( memo, packageName ) => {
@@ -154,6 +137,9 @@ const config = {
 			__dirname,
 			'node_modules',
 		],
+		alias: {
+			'lodash-es': 'lodash',
+		},
 	},
 	module: {
 		rules: [
@@ -169,30 +155,27 @@ const config = {
 			{
 				test: /style\.s?css$/,
 				include: [
-					/blocks/,
+					/core-blocks/,
 				],
 				use: blocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /editor\.s?css$/,
 				include: [
-					/blocks/,
+					/core-blocks/,
 				],
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /\.s?css$/,
 				exclude: [
-					/blocks/,
+					/core-blocks/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
 		],
 	},
 	plugins: [
-		new webpack.DefinePlugin( {
-			'process.env.NODE_ENV': JSON.stringify( process.env.NODE_ENV || 'development' ),
-		} ),
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
@@ -201,13 +184,21 @@ const config = {
 			suffix: '-rtl',
 			minify: process.env.NODE_ENV === 'production' ? { safe: true } : false,
 		} ),
-		new webpack.LoaderOptionsPlugin( {
-			minimize: process.env.NODE_ENV === 'production',
-			debug: process.env.NODE_ENV !== 'production',
-		} ),
 		new CustomTemplatedPathPlugin( {
 			basename( path, data ) {
-				const rawRequest = get( data, [ 'chunk', 'entryModule', 'rawRequest' ] );
+				let rawRequest;
+
+				const entryModule = get( data, [ 'chunk', 'entryModule' ], {} );
+				switch ( entryModule.type ) {
+					case 'javascript/auto':
+						rawRequest = entryModule.rawRequest;
+						break;
+
+					case 'javascript/esm':
+						rawRequest = entryModule.rootModule.rawRequest;
+						break;
+				}
+
 				if ( rawRequest ) {
 					return basename( rawRequest );
 				}
@@ -221,13 +212,8 @@ const config = {
 	},
 };
 
-switch ( process.env.NODE_ENV ) {
-	case 'production':
-		config.plugins.push( new webpack.optimize.UglifyJsPlugin() );
-		break;
-
-	default:
-		config.devtool = 'source-map';
+if ( config.mode !== 'production' ) {
+	config.devtool = process.env.SOURCEMAP || 'source-map';
 }
 
 module.exports = config;

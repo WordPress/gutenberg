@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { omit, noop } from 'lodash';
+import { omit, noop, includes } from 'lodash';
 
 /**
  * WordPress Dependencies
@@ -74,7 +74,13 @@ class NavigableContainer extends Component {
 		if ( offset !== undefined && stopNavigationEvents ) {
 			// Prevents arrow key handlers bound to the document directly interfering
 			event.nativeEvent.stopImmediatePropagation();
-			event.preventDefault();
+
+			// When navigating a collection of items, prevent scroll containers
+			// from scrolling.
+			if ( event.target.getAttribute( 'role' ) === 'menuitem' ) {
+				event.preventDefault();
+			}
+
 			event.stopPropagation();
 		}
 
@@ -138,9 +144,9 @@ export class NavigableMenu extends Component {
 				previous = [ LEFT, UP ];
 			}
 
-			if ( next.includes( keyCode ) ) {
+			if ( includes( next, keyCode ) ) {
 				return 1;
-			} else if ( previous.includes( keyCode ) ) {
+			} else if ( includes( previous, keyCode ) ) {
 				return -1;
 			}
 		};

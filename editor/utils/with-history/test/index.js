@@ -101,6 +101,21 @@ describe( 'withHistory', () => {
 		} );
 	} );
 
+	it( 'should ignore history by options.ignoreTypes', () => {
+		const reducer = withHistory( { ignoreTypes: [ 'INCREMENT' ] } )( counter );
+
+		let state;
+		state = reducer( undefined, {} );
+		state = reducer( state, { type: 'INCREMENT' } );
+		state = reducer( state, { type: 'INCREMENT' } );
+
+		expect( state ).toEqual( {
+			past: [ 0 ], // Needs at least one history
+			present: 2,
+			future: [],
+		} );
+	} );
+
 	it( 'should return same reference if state has not changed', () => {
 		const reducer = withHistory()( counter );
 		const original = reducer( undefined, {} );

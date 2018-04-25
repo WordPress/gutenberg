@@ -8,12 +8,13 @@ import path from 'path';
 /**
  * Internal dependencies
  */
-import { registerCoreBlocks } from '../../../../library';
+import { registerCoreBlocks } from '../../../../../core-blocks';
 import rawHandler from '../../index';
 import serialize from '../../../serializer';
 
 const types = [
 	'plain',
+	'classic',
 	'apple',
 	'google-docs',
 	'ms-word',

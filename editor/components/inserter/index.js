@@ -7,8 +7,8 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, IconButton, withContext } from '@wordpress/components';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { Dropdown, IconButton } from '@wordpress/components';
+import { createBlock, isUnmodifiedDefaultBlock, withEditorSettings } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -42,6 +42,7 @@ class Inserter extends Component {
 	render() {
 		const {
 			position,
+			title,
 			children,
 			onInsertBlock,
 			hasSupportedBlocks,
@@ -58,6 +59,7 @@ class Inserter extends Component {
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
+				headerTitle={ title }
 				renderToggle={ ( { onToggle, isOpen } ) => (
 					<IconButton
 						icon="insert"
@@ -86,8 +88,9 @@ class Inserter extends Component {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint,
-		selectedBlock: select( 'core/editor' ).getSelectedBlock,
+		title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
+		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint(),
+		selectedBlock: select( 'core/editor' ).getSelectedBlock(),
 	} ) ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
@@ -103,11 +106,11 @@ export default compose( [
 			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
 		},
 	} ) ),
-	withContext( 'editor' )( ( settings ) => {
-		const { blockTypes, templateLock } = settings;
+	withEditorSettings( ( settings ) => {
+		const { allowedBlockTypes, templateLock } = settings;
 
 		return {
-			hasSupportedBlocks: true === blockTypes || ! isEmpty( blockTypes ),
+			hasSupportedBlocks: true === allowedBlockTypes || ! isEmpty( allowedBlockTypes ),
 			isLocked: !! templateLock,
 		};
 	} ),

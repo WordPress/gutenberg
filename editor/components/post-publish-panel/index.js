@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { get } from 'lodash';
 
 /**
@@ -10,6 +9,7 @@ import { get } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { compose, Component } from '@wordpress/element';
 import { withAPIData, IconButton, Spinner } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
@@ -18,31 +18,25 @@ import './style.scss';
 import PostPublishButton from '../post-publish-button';
 import PostPublishPanelPrepublish from './prepublish';
 import PostPublishPanelPostpublish from './postpublish';
-import {
-	getCurrentPostType,
-	isCurrentPostPublished,
-	isSavingPost,
-	isEditedPostDirty,
-} from '../../store/selectors';
 
 class PostPublishPanel extends Component {
 	constructor() {
 		super( ...arguments );
-		this.onPublish = this.onPublish.bind( this );
+		this.onSubmit = this.onSubmit.bind( this );
 		this.state = {
 			loading: false,
-			published: false,
+			submitted: false,
 		};
 	}
 
 	componentWillReceiveProps( newProps ) {
 		if (
-			newProps.isPublished &&
-			! this.state.published &&
-			! newProps.isSaving
+			! this.state.submitted &&
+			! newProps.isSaving &&
+			( newProps.isPublished || newProps.isScheduled )
 		) {
 			this.setState( {
-				published: true,
+				submitted: true,
 				loading: false,
 			} );
 		}
@@ -56,25 +50,32 @@ class PostPublishPanel extends Component {
 		}
 	}
 
-	onPublish() {
+	onSubmit() {
+		const { user, onClose } = this.props;
+		const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
+		const isContributor = user.data && ! userCanPublishPosts;
+		if ( isContributor ) {
+			onClose();
+			return;
+		}
 		this.setState( { loading: true } );
 	}
 
 	render() {
-		const { onClose, user } = this.props;
-		const { loading, published } = this.state;
-		const canPublish = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
-
+		const { isScheduled, onClose, forceIsDirty, forceIsSaving } = this.props;
+		const { loading, submitted } = this.state;
 		return (
 			<div className="editor-post-publish-panel">
 				<div className="editor-post-publish-panel__header">
-					{ ! published && (
+					{ ! submitted && (
 						<div className="editor-post-publish-panel__header-publish-button">
-							<PostPublishButton onSubmit={ this.onPublish } />
+							<PostPublishButton onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
 						</div>
 					) }
-					{ published && (
-						<div className="editor-post-publish-panel__header-published">{ __( 'Published' ) }</div>
+					{ submitted && (
+						<div className="editor-post-publish-panel__header-published">
+							{ isScheduled ? __( 'Scheduled' ) : __( 'Published' ) }
+						</div>
 					) }
 					<IconButton
 						onClick={ onClose }
@@ -83,35 +84,37 @@ class PostPublishPanel extends Component {
 					/>
 				</div>
 				<div className="editor-post-publish-panel__content">
-					{ canPublish && ! loading && ! published && <PostPublishPanelPrepublish /> }
-					{ loading && ! published && <Spinner /> }
-					{ published && <PostPublishPanelPostpublish /> }
+					{ ! loading && ! submitted && <PostPublishPanelPrepublish /> }
+					{ loading && ! submitted && <Spinner /> }
+					{ submitted && <PostPublishPanelPostpublish /> }
 				</div>
 			</div>
 		);
 	}
 }
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			postType: getCurrentPostType( state ),
-			isPublished: isCurrentPostPublished( state ),
-			isSaving: isSavingPost( state ),
-			isDirty: isEditedPostDirty( state ),
-		};
-	},
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postType } = props;
-
-	return {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	};
-} );
-
 export default compose( [
-	applyConnect,
-	applyWithAPIData,
+	withSelect( ( select ) => {
+		const {
+			getCurrentPostType,
+			isCurrentPostPublished,
+			isCurrentPostScheduled,
+			isSavingPost,
+			isEditedPostDirty,
+		} = select( 'core/editor' );
+		return {
+			postType: getCurrentPostType(),
+			isPublished: isCurrentPostPublished(),
+			isScheduled: isCurrentPostScheduled(),
+			isSaving: isSavingPost(),
+			isDirty: isEditedPostDirty(),
+		};
+	} ),
+	withAPIData( ( props ) => {
+		const { postType } = props;
+
+		return {
+			user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
+		};
+	} ),
 ] )( PostPublishPanel );

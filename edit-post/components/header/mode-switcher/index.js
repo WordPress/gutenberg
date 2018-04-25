@@ -1,21 +1,15 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItemsChoice, MenuItemsGroup } from '@wordpress/components';
+import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import shortcuts from '../../../keyboard-shortcuts';
-import { getEditorMode } from '../../../store/selectors';
-import { switchEditorMode } from '../../../store/actions';
-
 /**
  * Set of available mode options.
  *
@@ -33,7 +27,7 @@ const MODES = [
 ];
 
 function ModeSwitcher( { onSwitch, mode } ) {
-	const choices = MODES.map( choice => {
+	const choices = MODES.map( ( choice ) => {
 		if ( choice.value !== mode ) {
 			return { ...choice, shortcut: shortcuts.toggleEditorMode.label };
 		}
@@ -41,7 +35,7 @@ function ModeSwitcher( { onSwitch, mode } ) {
 	} );
 
 	return (
-		<MenuItemsGroup
+		<MenuGroup
 			label={ __( 'Editor' ) }
 			filterName="editPost.MoreMenu.editor"
 		>
@@ -50,20 +44,18 @@ function ModeSwitcher( { onSwitch, mode } ) {
 				value={ mode }
 				onSelect={ onSwitch }
 			/>
-		</MenuItemsGroup>
+		</MenuGroup>
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		mode: getEditorMode( state ),
-	} ),
-	( dispatch, ownProps ) => ( {
+export default compose( [
+	withSelect( ( select ) => ( {
+		mode: select( 'core/edit-post' ).getEditorMode(),
+	} ) ),
+	withDispatch( ( dispatch, ownProps ) => ( {
 		onSwitch( mode ) {
-			dispatch( switchEditorMode( mode ) );
+			dispatch( 'core/edit-post' ).switchEditorMode( mode );
 			ownProps.onSelect( mode );
 		},
-	} ),
-	undefined,
-	{ storeKey: 'edit-post' }
-)( ModeSwitcher );
+	} ) ),
+] )( ModeSwitcher );

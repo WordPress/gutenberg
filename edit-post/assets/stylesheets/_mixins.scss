@@ -1,3 +1,7 @@
+/**
+ * Breakpoint mixins
+ */
+
 @mixin break-huge() {
 	@media ( min-width: #{ ( $break-huge ) } ) {
 		@content;
@@ -33,6 +37,7 @@
 		@content;
 	}
 }
+
 
 /**
  * Long content fade mixin
@@ -108,8 +113,8 @@
 	}
 }
 
-$visual-editor-max-width-padding: $visual-editor-max-width + $block-mover-padding-visible + $block-mover-padding-visible;
-$float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
+$content-width-padding: $content-width + $block-side-ui-padding + $block-side-ui-padding;
+$float-margin: calc( 50% - #{ $content-width-padding / 2 } );
 
 /**
  * Button states and focus styles
@@ -141,6 +146,15 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 	outline-offset: -2px;
 }
 
+// Switch
+@mixin switch-style__focus-active() {
+	box-shadow: 0 0 0 2px $white, 0 0 0 3px $dark-gray-300;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow
+	outline: 2px solid transparent;
+	outline-offset: 2px;
+}
+
 // Formatting Buttons
 @mixin formatting-button-style__hover {
 	color: $dark-gray-500;
@@ -163,13 +177,27 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 }
 
 // Tabs, Inputs, Square buttons
+@mixin input-style__neutral() {
+	outline-offset: -1px;
+	box-shadow: 0 0 0 transparent;
+	transition: box-shadow .05s linear;
+}
+
+@mixin input-style__focus() {
+	color: $dark-gray-900;
+	outline: 1px solid $blue-medium-600;
+	box-shadow: 0 0 0 2px $blue-medium-200;
+}
+
+// Square buttons
 @mixin square-style__neutral() {
 	outline-offset: -1px;
 }
 
-@mixin square-style__focus-active() {
+@mixin square-style__focus() {
 	color: $dark-gray-900;
 	outline: 1px solid $dark-gray-300;
+	box-shadow: none;
 }
 
 // Menu items
@@ -179,32 +207,21 @@ $float-margin: calc( 50% - #{ $visual-editor-max-width-padding / 2 } );
 }
 
 @mixin menu-style__focus() {
-	color: $black;
+	color: $dark-gray-900;
 	border: none;
 	box-shadow: none;
 	outline-offset: -2px;
-	color: $dark-gray-900;
 	outline: 1px dotted $dark-gray-500;
 }
 
-// Old
-@mixin tab-style__focus-active() {
-	outline: none;
-	color: $dark-gray-900;
-	box-shadow: inset 0 0 0 1px $dark-gray-300;
-}
-
-@mixin input-style__focus-active() {
-	outline: none;
-	color: $dark-gray-900;
-	box-shadow: 0 0 0 1px $dark-gray-300;
-}
 
 /**
  * Applies editor left position to the selector passed as argument
  */
 @mixin editor-left( $selector ) {
-	.sticky-menu #{$selector} {	/* Sticky is when on smaller breakpoints, nav menu is manually opened */
+	#{$selector} {	/* Set left position when auto-fold is not on the body element. */
+		left: 0;
+		
 		@include break-medium() {
 			left: $admin-sidebar-width;
 		}

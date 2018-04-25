@@ -4,21 +4,15 @@
 import {
 	getEditorMode,
 	getPreference,
-	isGeneralSidebarPanelOpened,
-	hasOpenSidebar,
+	isEditorSidebarOpened,
 	isEditorSidebarPanelOpened,
-	isMobile,
-	hasFixedToolbar,
 	isFeatureActive,
+	isPluginSidebarOpened,
 	getMetaBoxes,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
 	getMetaBox,
 } from '../selectors';
-
-jest.mock( '../constants', () => ( {
-	BREAK_MEDIUM: 500,
-} ) );
 
 describe( 'selectors', () => {
 	describe( 'getEditorMode', () => {
@@ -65,70 +59,68 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isGeneralSidebarPanelOpened', () => {
-		it( 'should return true when specified the sidebar panel is opened', () => {
-			const state = {
-				preferences: {
-					activeGeneralSidebar: 'editor',
-					viewportType: 'desktop',
-					activeSidebarPanel: 'document',
-				},
-			};
-			const panel = 'document';
-			const sidebar = 'editor';
-
-			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( true );
-		} );
-
-		it( 'should return false when another panel than the specified sidebar panel is opened', () => {
-			const state = {
-				preferences: {
-					activeGeneralSidebar: 'editor',
-					viewportType: 'desktop',
-					activeSidebarPanel: 'blocks',
-				},
-			};
-			const panel = 'document';
-			const sidebar = 'editor';
-
-			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( false );
-		} );
-
-		it( 'should return false when no sidebar panel is opened', () => {
+	describe( 'isEditorSidebarOpened', () => {
+		it( 'should return false when the editor sidebar is not opened', () => {
 			const state = {
 				preferences: {
 					activeGeneralSidebar: null,
-					viewportType: 'desktop',
-					activeSidebarPanel: null,
 				},
 			};
-			const panel = 'blocks';
-			const sidebar = 'editor';
 
-			expect( isGeneralSidebarPanelOpened( state, sidebar, panel ) ).toBe( false );
+			expect( isEditorSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return false when the plugin sidebar is opened', () => {
+			const state = {
+				preferences: {
+					activeGeneralSidebar: 'my-plugin/my-sidebar',
+				},
+			};
+
+			expect( isEditorSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return true when the editor sidebar is opened', () => {
+			const state = {
+				preferences: {
+					activeGeneralSidebar: 'edit-post/document',
+				},
+			};
+
+			expect( isEditorSidebarOpened( state ) ).toBe( true );
 		} );
 	} );
 
-	describe( 'hasOpenSidebar', () => {
-		it( 'should return true if at least one sidebar is open', () => {
+	describe( 'isPluginSidebarOpened', () => {
+		it( 'should return false when the plugin sidebar is not opened', () => {
 			const state = {
-				preferences: {
-					activeSidebarPanel: null,
-				},
-			};
-
-			expect( hasOpenSidebar( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if no sidebar is open', () => {
-			const state = {
-				publishSidebarActive: false,
 				preferences: {
 					activeGeneralSidebar: null,
 				},
 			};
 
-			expect( hasOpenSidebar( state ) ).toBe( false );
+			expect( isPluginSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return false when the editor sidebar is opened', () => {
+			const state = {
+				preferences: {
+					activeGeneralSidebar: 'edit-post/document',
+				},
+			};
+
+			expect( isPluginSidebarOpened( state ) ).toBe( false );
+		} );
+
+		it( 'should return true when the plugin sidebar is opened', () => {
+			const name = 'plugin-sidebar/my-plugin/my-sidebar';
+			const state = {
+				preferences: {
+					activeGeneralSidebar: name,
+				},
+			};
+
+			expect( isPluginSidebarOpened( state ) ).toBe( true );
 		} );
 	} );
 
@@ -155,78 +147,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'isMobile', () => {
-		it( 'should return true if resolution is equal or less than medium breakpoint', () => {
-			const state = {
-				mobile: true,
-			};
-
-			expect( isMobile( state ) ).toBe( true );
-		} );
-
-		it( 'should return true if resolution is greater than medium breakpoint', () => {
-			const state = {
-				mobile: false,
-			};
-
-			expect( isMobile( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'hasFixedToolbar', () => {
-		it( 'should return true if fixedToolbar is active and is not mobile screen size', () => {
-			const state = {
-				mobile: false,
-				preferences: {
-					features: {
-						fixedToolbar: true,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( true );
-		} );
-
-		it( 'should return false if fixedToolbar is active and is mobile screen size', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					features: {
-						fixedToolbar: true,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( false );
-		} );
-
-		it( 'should return false if fixedToolbar is disable and is not mobile screen size', () => {
-			const state = {
-				mobile: false,
-				preferences: {
-					features: {
-						fixedToolbar: false,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( false );
-		} );
-
-		it( 'should return false if fixedToolbar is disable and is mobile screen size', () => {
-			const state = {
-				mobile: true,
-				preferences: {
-					features: {
-						fixedToolbar: false,
-					},
-				},
-			};
-
-			expect( hasFixedToolbar( state ) ).toBe( false );
 		} );
 	} );
 

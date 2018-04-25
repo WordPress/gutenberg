@@ -68,14 +68,14 @@ div.components-toolbar {
 
 	// subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
-		padding: 4px 8px 4px 0px;
+		padding: 4px 8px 4px 0;
 	}
 
 	&[data-subscript]:after {
 		content: attr( data-subscript );
 		font-family: $default-font;
 		font-size: $default-font-size;
-		font-weight: bold;
+		font-weight: 600;
 		position: absolute;
 		right: 8px;
 		bottom: 8px;
@@ -90,6 +90,10 @@ div.components-toolbar {
 	// active & toggled style
 	&:not(:disabled).is-active > svg {
 		@include formatting-button-style__active;
+	}
+
+	&:not(:disabled).is-active[data-subscript]:after {
+		color: $white;
 	}
 
 	// focus style

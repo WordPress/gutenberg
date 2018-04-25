@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { get } from 'lodash';
 
 /**
@@ -10,18 +9,12 @@ import { get } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import {
-	isCurrentPostPublished,
-	isEditedPostBeingScheduled,
-	isSavingPost,
-	isPublishingPost,
-	getCurrentPostType,
-} from '../../store/selectors';
 
 export function PublishButtonLabel( {
 	isPublished,
@@ -37,6 +30,8 @@ export function PublishButtonLabel( {
 		return __( 'Publishing…' );
 	} else if ( isPublished && isSaving ) {
 		return __( 'Updating…' );
+	} else if ( isBeingScheduled && isSaving ) {
+		return __( 'Scheduling…' );
 	}
 
 	if ( isContributor ) {
@@ -50,25 +45,28 @@ export function PublishButtonLabel( {
 	return __( 'Publish' );
 }
 
-const applyConnect = connect(
-	( state ) => ( {
-		isPublished: isCurrentPostPublished( state ),
-		isBeingScheduled: isEditedPostBeingScheduled( state ),
-		isSaving: isSavingPost( state ),
-		isPublishing: isPublishingPost( state ),
-		postType: getCurrentPostType( state ),
-	} )
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postType } = props;
-
-	return {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	};
-} );
-
 export default compose( [
-	applyConnect,
-	applyWithAPIData,
+	withSelect( ( select, { forceIsSaving } ) => {
+		const {
+			isCurrentPostPublished,
+			isEditedPostBeingScheduled,
+			isSavingPost,
+			isPublishingPost,
+			getCurrentPostType,
+		} = select( 'core/editor' );
+		return {
+			isPublished: isCurrentPostPublished(),
+			isBeingScheduled: isEditedPostBeingScheduled(),
+			isSaving: forceIsSaving || isSavingPost(),
+			isPublishing: isPublishingPost(),
+			postType: getCurrentPostType(),
+		};
+	} ),
+	withAPIData( ( props ) => {
+		const { postType } = props;
+
+		return {
+			user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
+		};
+	} ),
 ] )( PublishButtonLabel );

@@ -18,46 +18,73 @@ describe( 'state', () => {
 			const state = preferences( undefined, {} );
 
 			expect( state ).toEqual( {
-				activeGeneralSidebar: 'editor',
-				activeSidebarPanel: {
-					editor: null,
-					plugin: null,
-				},
+				activeGeneralSidebar: 'edit-post/document',
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
-				viewportType: 'desktop',
 			} );
 		} );
 
-		it( 'should set the general sidebar active panel', () => {
-			const state = preferences( deepFreeze( {
-				activeGeneralSidebar: 'editor',
-				activeSidebarPanel: {
-					editor: null,
-					plugin: null,
-				},
-			} ), {
-				type: 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL',
-				sidebar: 'editor',
-				panel: 'document',
+		it( 'should set the general sidebar', () => {
+			const original = deepFreeze( preferences( undefined, {} ) );
+			const state = preferences( original, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
 			} );
+
+			expect( state.activeGeneralSidebar ).toBe( 'edit-post/document' );
+		} );
+
+		it( 'should save activeGeneralSidebar default value when serializing if the value was edit-post/block', () => {
+			const state = preferences( {
+				activeGeneralSidebar: 'edit-post/block',
+				editorMode: 'visual',
+				panels: { 'post-status': true },
+				features: { fixedToolbar: false },
+			}, {
+				type: 'SERIALIZE',
+			} );
+
 			expect( state ).toEqual( {
-				activeGeneralSidebar: 'editor',
-				activeSidebarPanel: {
-					editor: 'document',
-					plugin: null,
-				},
+				activeGeneralSidebar: 'edit-post/document',
+				editorMode: 'visual',
+				panels: { 'post-status': true },
+				features: { fixedToolbar: false },
 			} );
+		} );
+
+		it( 'should does not update if sidebar is already set to value', () => {
+			const original = deepFreeze( preferences( undefined, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
+			} ) );
+			const state = preferences( original, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
+			} );
+
+			expect( original ).toBe( state );
+		} );
+
+		it( 'should unset the general sidebar', () => {
+			const original = deepFreeze( preferences( undefined, {
+				type: 'OPEN_GENERAL_SIDEBAR',
+				name: 'edit-post/document',
+			} ) );
+			const state = preferences( original, {
+				type: 'CLOSE_GENERAL_SIDEBAR',
+			} );
+
+			expect( state.activeGeneralSidebar ).toBe( null );
 		} );
 
 		it( 'should set the sidebar panel open flag to true if unset', () => {
-			const state = preferences( deepFreeze( {} ), {
+			const state = preferences( deepFreeze( { panels: {} } ), {
 				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { panels: { 'post-taxonomies': true } } );
+			expect( state.panels ).toEqual( { 'post-taxonomies': true } );
 		} );
 
 		it( 'should toggle the sidebar panel open flag', () => {
@@ -66,16 +93,16 @@ describe( 'state', () => {
 				panel: 'post-taxonomies',
 			} );
 
-			expect( state ).toEqual( { panels: { 'post-taxonomies': false } } );
+			expect( state.panels ).toEqual( { 'post-taxonomies': false } );
 		} );
 
 		it( 'should return switched mode', () => {
-			const state = preferences( deepFreeze( {} ), {
+			const state = preferences( deepFreeze( { editorMode: 'visual' } ), {
 				type: 'SWITCH_MODE',
 				mode: 'text',
 			} );
 
-			expect( state ).toEqual( { editorMode: 'text' } );
+			expect( state.editorMode ).toBe( 'text' );
 		} );
 
 		it( 'should toggle a feature flag', () => {
@@ -83,7 +110,8 @@ describe( 'state', () => {
 				type: 'TOGGLE_FEATURE',
 				feature: 'chicken',
 			} );
-			expect( state ).toEqual( { features: { chicken: false } } );
+
+			expect( state.features ).toEqual( { chicken: false } );
 		} );
 	} );
 

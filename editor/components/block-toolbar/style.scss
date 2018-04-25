@@ -1,8 +1,15 @@
 .editor-block-toolbar {
 	display: inline-flex;
-	overflow: auto; // allow horizontal scrolling on mobile
 	flex-grow: 1;
 	width: 100%;
+	background: $white;
+	overflow: auto; // allow horizontal scrolling on mobile
+	position: relative;
+
+	// allow overflow on desktop
+	@include break-small() {
+		overflow: inherit;
+	}
 
 	.components-toolbar {
 		border: none;

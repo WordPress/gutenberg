@@ -37,6 +37,10 @@
 		background: $light-gray-200;
 		font-family: $editor-html-font;
 		font-size: 14px;
+
+		.is-multi-selected & {
+			background: darken( $blue-medium-highlight, 15% );
+		}
 	}
 
 	&:focus code[data-mce-selected] {
@@ -74,23 +78,6 @@
 	&.mce-content-body {
 		line-height: $editor-line-height;
 	}
-}
-
-.has-drop-cap .blocks-rich-text__tinymce:not( :focus )  {
-	&:first-letter {
-		float: left;
-		font-size: 4.1em;
-		line-height: 0.7;
-		font-family: serif;
-		font-weight: bold;
-		margin: .07em .23em 0 0;
-		text-transform: uppercase;
-		font-style: normal;
-	}
-}
-
-.has-drop-cap:not( :focus )  {
-	overflow: hidden;
 }
 
 .block-rich-text__inline-toolbar {

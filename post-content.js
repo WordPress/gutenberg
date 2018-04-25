@@ -8,11 +8,11 @@ window._wpGutenbergPost.title = {
 window._wpGutenbergPost.content = {
 	raw: [
 		'<!-- wp:cover-image {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->',
-		'<section class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><h2>Of Mountains &amp; Printing Presses</h2></section>',
+		'<div class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><p class="wp-block-cover-image-text">Of Mountains &amp; Printing Presses</p></div>',
 		'<!-- /wp:cover-image -->',
 
 		'<!-- wp:paragraph -->',
-		'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you&#x27;ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
+		'<p>The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you\'ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.</p>',
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:paragraph -->',
@@ -32,15 +32,15 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:heading -->',
 
 		'<!-- wp:paragraph -->',
-		'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully, you&#x27;ll find aspects of adding captions or going full-width with your pictures much easier and robust than before.</p>',
+		'<p>Handling images and media with the utmost care is a primary focus of the new editor. Hopefully, you\'ll find aspects of adding captions or going full-width with your pictures much easier and robust than before.</p>',
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:image {"align":"center"} -->',
-		'<figure class="wp-block-image aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="Beautiful landscape" /><figcaption>Give it a try. Press the &quot;wide&quot; button on the image toolbar.</figcaption></figure>',
+		'<figure class="wp-block-image aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="Beautiful landscape" /><figcaption>If your theme supports it, you\'ll see the "wide" button on the image toolbar. Give it a try.</figcaption></figure>',
 		'<!-- /wp:image -->',
 
 		'<!-- wp:paragraph -->',
-		'<p>Try selecting and removing or editing the caption, now you don&#x27;t have to be careful about selecting the image or other text by mistake and ruining the presentation.</p>',
+		'<p>Try selecting and removing or editing the caption, now you don\'t have to be careful about selecting the image or other text by mistake and ruining the presentation.</p>',
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:heading -->',
@@ -48,11 +48,11 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:heading -->',
 
 		'<!-- wp:paragraph -->',
-		'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That&#x27;s the spirit behind the inserter—the <code>(+)</code> button you&#x27;ll see around the editor—which allows you to browse all available content blocks and add them into your post. Plugins and themes are able to register their own, opening up all sort of possibilities for rich editing and publishing.</p>',
+		'<p>Imagine everything that WordPress can do is available to you quickly and in the same place on the interface. No need to figure out HTML tags, classes, or remember complicated shortcode syntax. That\'s the spirit behind the inserter—the <code>(+)</code> button you\'ll see around the editor—which allows you to browse all available content blocks and add them into your post. Plugins and themes are able to register their own, opening up all sort of possibilities for rich editing and publishing.</p>',
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:paragraph -->',
-		'<p>Go give it a try, you may discover things WordPress can already add into your posts that you didn&#x27;t know about. Here&#x27;s a short list of what you can currently find there:</p>',
+		'<p>Go give it a try, you may discover things WordPress can already add into your posts that you didn\'t know about. Here\'s a short list of what you can currently find there:</p>',
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:list -->',
@@ -72,11 +72,16 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:quote {"style":1} -->',
-		'<blockquote class="wp-block-quote"><p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p><cite>Matt Mullenweg, 2017</cite></blockquote>',
+		'<blockquote class="wp-block-quote">',
+		'<!-- wp:paragraph -->',
+		'<p>The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.</p>',
+		'<!-- /wp:paragraph -->',
+		'<cite>Matt Mullenweg, 2017</cite>',
+		'</blockquote>',
 		'<!-- /wp:quote -->',
 
 		'<!-- wp:paragraph -->',
-		'<p>The information corresponding to the source of the quote is a separate text field, similar to captions under images, so the structure of the quote is protected even if you select, modify, or remove the source. It&#x27;s always easy to add it back.</p>',
+		'<p>The information corresponding to the source of the quote is a separate text field, similar to captions under images, so the structure of the quote is protected even if you select, modify, or remove the source. It\'s always easy to add it back.</p>',
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:paragraph -->',
@@ -104,7 +109,7 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:image {"align":"full"} -->',
-		'<figure class="wp-block-image alignfull"><img src="https://cldup.com/8lhI-gKnI2.jpg" alt="Accessibility is important don&#x27;t forget image alt attribute" /></figure>',
+		'<figure class="wp-block-image alignfull"><img src="https://cldup.com/8lhI-gKnI2.jpg" alt="Accessibility is important don\'t forget image alt attribute" /></figure>',
 		'<!-- /wp:image -->',
 
 		'<!-- wp:paragraph -->',
@@ -126,8 +131,8 @@ window._wpGutenbergPost.content = {
 		'<p>Any block can opt into these alignments. The embed block has them also, and is responsive out of the box:</p>',
 		'<!-- /wp:paragraph -->',
 
-		'<!-- wp:embed {"url":"https://vimeo.com/22439234","align":"wide"} -->',
-		'<figure class="wp-block-embed alignwide">https://vimeo.com/22439234</figure>',
+		'<!-- wp:embed {"url":"https://vimeo.com/22439234","align":"wide","type":"video","providerNameSlug":"vimeo"} -->',
+		'<figure class="wp-block-embed alignwide is-type-video is-provider-vimeo">https://vimeo.com/22439234</figure>',
 		'<!-- /wp:embed -->',
 
 		'<!-- wp:paragraph -->',
@@ -135,7 +140,12 @@ window._wpGutenbergPost.content = {
 		'<!-- /wp:paragraph -->',
 
 		'<!-- wp:pullquote -->',
-		'<blockquote class="wp-block-pullquote alignnone"><p>Code is Poetry</p><cite>The WordPress community</cite></blockquote>',
+		'<blockquote class="wp-block-pullquote alignnone">',
+		'<!-- wp:paragraph -->',
+		'<p>Code is Poetry</p>',
+		'<!-- /wp:paragraph -->',
+		'<cite>The WordPress community</cite>',
+		'</blockquote>',
 		'<!-- /wp:pullquote -->',
 
 		'<!-- wp:paragraph {"align":"center"} -->',

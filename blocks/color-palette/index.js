@@ -8,13 +8,14 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Dropdown, withContext } from '@wordpress/components';
+import { Dropdown } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import { withEditorSettings } from '../editor-settings';
 
 export function ColorPalette( { colors, disableCustomColors = false, value, onChange } ) {
 	function applyOrUnset( color ) {
@@ -23,7 +24,7 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 
 	return (
 		<div className="blocks-color-palette">
-			{ map( colors, ( color ) => {
+			{ map( colors, ( { color } ) => {
 				const style = { color: color };
 				const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
 
@@ -78,7 +79,7 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 	);
 }
 
-export default withContext( 'editor' )(
+export default withEditorSettings(
 	( settings, props ) => ( {
 		colors: props.colors || settings.colors,
 		disableCustomColors: props.disableCustomColors !== undefined ?

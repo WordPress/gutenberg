@@ -64,12 +64,12 @@ const textEmbedItem = {
 	isDisabled: false,
 };
 
-const reusableItem = {
+const sharedItem = {
 	id: 'core/block/123',
 	name: 'core/block',
 	initialAttributes: { ref: 123 },
-	title: 'My reusable block',
-	category: 'reusable-blocks',
+	title: 'My shared block',
+	category: 'shared',
 	isDisabled: false,
 };
 
@@ -80,7 +80,7 @@ const items = [
 	moreItem,
 	youtubeItem,
 	textEmbedItem,
-	reusableItem,
+	sharedItem,
 ];
 
 describe( 'InserterMenu', () => {
@@ -88,21 +88,21 @@ describe( 'InserterMenu', () => {
 	// wrapper.find have had to be strengthened (and the filterWhere strengthened also), otherwise two
 	// results would be returned even though only one was in the DOM.
 
-	it( 'should show the recent tab by default', () => {
+	it( 'should show the suggested tab by default', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ [] }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 				blockTypes
 			/>
 		);
 
 		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Recent' );
+		expect( activeCategory.text() ).toBe( 'Suggested' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks ).toHaveLength( 0 );
@@ -114,9 +114,9 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ [] }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 
@@ -124,15 +124,15 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks ).toHaveLength( 0 );
 	} );
 
-	it( 'should show the recently used items in the recent tab', () => {
+	it( 'should show frecently used items in the suggested tab', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [ advancedTextItem, textItem, someOtherItem ] }
+				frecentItems={ [ advancedTextItem, textItem, someOtherItem ] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 
@@ -149,9 +149,9 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 		const embedTab = wrapper.find( '.editor-inserter__tab' )
@@ -167,38 +167,38 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
 	} );
 
-	it( 'should show reusable items in the saved tab', () => {
+	it( 'should show shared items in the shared tab', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 		const embedTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Saved' && node.name() === 'button' );
+			.filterWhere( ( node ) => node.text() === 'Shared' && node.name() === 'button' );
 		embedTab.simulate( 'click' );
 
 		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Saved' );
+		expect( activeCategory.text() ).toBe( 'Shared' );
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
 		expect( visibleBlocks ).toHaveLength( 1 );
-		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My reusable block' );
+		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My shared block' );
 	} );
 
-	it( 'should show all items except embeds and reusable blocks in the blocks tab', () => {
+	it( 'should show all items except embeds and shared blocks in the blocks tab', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 		const blocksTab = wrapper.find( '.editor-inserter__tab' )
@@ -222,9 +222,9 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ items }
+				frecentItems={ items }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 
@@ -239,9 +239,9 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 		wrapper.setState( { filterValue: 'text' } );
@@ -262,9 +262,9 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				recentItems={ [] }
+				frecentItems={ [] }
 				debouncedSpeak={ noop }
-				fetchReusableBlocks={ noop }
+				fetchSharedBlocks={ noop }
 			/>
 		);
 		wrapper.setState( { filterValue: ' text' } );

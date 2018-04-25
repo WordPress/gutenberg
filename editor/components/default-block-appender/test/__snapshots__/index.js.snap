@@ -3,9 +3,11 @@
 exports[`DefaultBlockAppender should append a default block when input focused 1`] = `
 <div
   className="editor-default-block-appender"
+  data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WithEditorSettings(BlockDropZone)) />
   <input
+    aria-label="Add block"
     className="editor-default-block-appender__content"
     onClick={
       [MockFunction] {
@@ -29,8 +31,13 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
       }
     }
     readOnly={true}
+    role="button"
     type="text"
     value="Write your story"
+  />
+  <WithEditorSettings(WithSelect(WithDispatch(InserterWithShortcuts))) />
+  <WithSelect(WithDispatch(WithEditorSettings(Inserter)))
+    position="top right"
   />
 </div>
 `;
@@ -38,16 +45,23 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
 exports[`DefaultBlockAppender should match snapshot 1`] = `
 <div
   className="editor-default-block-appender"
+  data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WithEditorSettings(BlockDropZone)) />
   <input
+    aria-label="Add block"
     className="editor-default-block-appender__content"
     onClick={[MockFunction]}
     onFocus={[MockFunction]}
     onKeyDown={[MockFunction]}
     readOnly={true}
+    role="button"
     type="text"
     value="Write your story"
+  />
+  <WithEditorSettings(WithSelect(WithDispatch(InserterWithShortcuts))) />
+  <WithSelect(WithDispatch(WithEditorSettings(Inserter)))
+    position="top right"
   />
 </div>
 `;
@@ -55,16 +69,23 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
 exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
 <div
   className="editor-default-block-appender"
+  data-root-uid=""
 >
-  <Connect(WrappedComponent) />
+  <WithDispatch(WithEditorSettings(BlockDropZone)) />
   <input
+    aria-label="Add block"
     className="editor-default-block-appender__content"
     onClick={[MockFunction]}
     onFocus={[MockFunction]}
     onKeyDown={[MockFunction]}
     readOnly={true}
+    role="button"
     type="text"
     value=""
+  />
+  <WithEditorSettings(WithSelect(WithDispatch(InserterWithShortcuts))) />
+  <WithSelect(WithDispatch(WithEditorSettings(Inserter)))
+    position="top right"
   />
 </div>
 `;

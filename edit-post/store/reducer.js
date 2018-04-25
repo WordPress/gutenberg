@@ -1,8 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { combineReducers } from 'redux';
-import { get, omit } from 'lodash';
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -20,75 +19,51 @@ import { PREFERENCES_DEFAULTS } from './defaults';
  *
  * @return {string} Updated state.
  */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
-	switch ( action.type ) {
-		case 'OPEN_GENERAL_SIDEBAR':
-			const activeSidebarPanel = action.panel ? action.panel : state.activeSidebarPanel[ action.sidebar ];
-			return {
-				...state,
-				activeGeneralSidebar: action.sidebar,
-				activeSidebarPanel: {
-					...state.activeSidebarPanel,
-					[ action.sidebar ]: activeSidebarPanel,
-				},
-			};
-		case 'SET_GENERAL_SIDEBAR_ACTIVE_PANEL':
-			return {
-				...state,
-				activeSidebarPanel: {
-					...state.activeSidebarPanel,
-					[ action.sidebar ]: action.panel,
-				},
-			};
-		case 'CLOSE_GENERAL_SIDEBAR':
-			return {
-				...state,
-				activeGeneralSidebar: null,
-			};
-		case 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL':
-			return {
-				...state,
-				panels: {
-					...state.panels,
-					[ action.panel ]: ! get( state, [ 'panels', action.panel ], false ),
-				},
-			};
-		case 'SET_VIEWPORT_TYPE':
-			return {
-				...state,
-				viewportType: action.viewportType,
-			};
-		case 'UPDATE_MOBILE_STATE':
-			if ( action.isMobile ) {
-				return {
-					...state,
-					viewportType: 'mobile',
-					activeGeneralSidebar: null,
-				};
-			}
-			return {
-				...state,
-				viewportType: 'desktop',
-			};
-		case 'SWITCH_MODE':
-			return {
-				...state,
-				editorMode: action.mode,
-			};
-		case 'TOGGLE_FEATURE':
-			return {
-				...state,
-				features: {
-					...state.features,
-					[ action.feature ]: ! state.features[ action.feature ],
-				},
-			};
-		case 'SERIALIZE':
-			return omit( state, [ 'sidebars.mobile', 'sidebars.publish' ] );
-	}
+export const preferences = combineReducers( {
+	activeGeneralSidebar( state = PREFERENCES_DEFAULTS.activeGeneralSidebar, action ) {
+		switch ( action.type ) {
+			case 'OPEN_GENERAL_SIDEBAR':
+				return action.name;
 
-	return state;
-}
+			case 'CLOSE_GENERAL_SIDEBAR':
+				return null;
+			case 'SERIALIZE': {
+				if ( state === 'edit-post/block' ) {
+					return PREFERENCES_DEFAULTS.activeGeneralSidebar;
+				}
+			}
+		}
+
+		return state;
+	},
+	panels( state = PREFERENCES_DEFAULTS.panels, action ) {
+		if ( action.type === 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL' ) {
+			return {
+				...state,
+				[ action.panel ]: ! state[ action.panel ],
+			};
+		}
+
+		return state;
+	},
+	features( state = PREFERENCES_DEFAULTS.features, action ) {
+		if ( action.type === 'TOGGLE_FEATURE' ) {
+			return {
+				...state,
+				[ action.feature ]: ! state[ action.feature ],
+			};
+		}
+
+		return state;
+	},
+	editorMode( state = PREFERENCES_DEFAULTS.editorMode, action ) {
+		if ( action.type === 'SWITCH_MODE' ) {
+			return action.mode;
+		}
+
+		return state;
+	},
+} );
 
 export function panel( state = 'document', action ) {
 	switch ( action.type ) {
@@ -107,13 +82,6 @@ export function publishSidebarActive( state = false, action ) {
 			return false;
 		case 'TOGGLE_PUBLISH_SIDEBAR':
 			return ! state;
-	}
-	return state;
-}
-
-export function mobile( state = false, action ) {
-	if ( action.type === 'UPDATE_MOBILE_STATE' ) {
-		return action.isMobile;
 	}
 	return state;
 }
@@ -191,7 +159,6 @@ export default combineReducers( {
 	preferences,
 	panel,
 	publishSidebarActive,
-	mobile,
 	metaBoxes,
 	isSavingMetaBoxes,
 } );

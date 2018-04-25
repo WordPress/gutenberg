@@ -9,7 +9,7 @@ import { shallow } from 'enzyme';
 import { ColorPalette } from '../';
 
 describe( 'ColorPalette', () => {
-	const colors = [ 'red', 'white', 'blue' ];
+	const colors = [ { name: 'red', color: 'red' }, { name: 'white', color: 'white' }, { name: 'blue', color: 'blue' } ];
 	const currentColor = 'red';
 	const onChange = jest.fn();
 
