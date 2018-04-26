@@ -97,7 +97,7 @@ class ParagraphBlock extends Component {
 	}
 
 	getDropCapHelp( checked ) {
-		return checked ? __( 'The paragraph will display with a drop cap.' ) : __( 'The paragraph will not display with a drop cap.' );
+		return checked ? __( 'Showing large initial letter.' ) : __( 'Toggle to show a large initial letter.' );
 	}
 
 	getFontSize() {
