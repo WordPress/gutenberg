@@ -157,7 +157,6 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 							// because not all embed code gives us a provider name.
 							const { html, provider_name: providerName } = obj;
 							const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
-
 							// This indicates it's a WordPress embed, there aren't a set of URL patterns we can use to match WordPress URLs.
 							if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
 								type = 'wp-embed';
@@ -173,6 +172,9 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 							} else if ( 'photo' === type ) {
 								this.setState( { html: this.getPhotoHtml( obj ), type, providerNameSlug } );
 								setAttributes( { type, providerNameSlug } );
+							} else {
+								// No html, no custom type that we support, so show the error state.
+								this.setState( { error: true } );
 							}
 							this.setState( { fetching: false } );
 						},
