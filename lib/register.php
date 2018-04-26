@@ -282,7 +282,7 @@ function gutenberg_can_edit_post( $post ) {
  * @since 1.5.2
  *
  * @param string $post_type The post type.
- * @return bool Wehther the post type can be edited with Gutenberg.
+ * @return bool Whether the post type can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post_type( $post_type ) {
 	$can_edit = true;
