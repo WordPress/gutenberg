@@ -9,7 +9,7 @@ import Toolbar from './toolbar';
 
 import type { BlockType } from '../store/';
 
-import styles from './block-holder.scss';
+import styles from './block-holder-style.scss';
 
 // Gutenberg imports
 import { getBlockType } from '@gutenberg/blocks/api';

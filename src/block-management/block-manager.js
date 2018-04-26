@@ -6,12 +6,12 @@
 import React from 'react';
 import { Platform, Switch, Text, View, FlatList } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
-import BlockHolder from './block-holder';
+import BlockHolder from './block-holder.js';
 import { ToolbarButton } from './constants';
 
 import type { BlockType } from '../store/';
 
-import styles from './block-manager.scss';
+import styles from './block-manager-style.scss';
 
 // Gutenberg imports
 import { getBlockType, serialize } from '@gutenberg/blocks/api';
@@ -157,6 +157,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	renderItem( value: { item: BlockType, uid: string } ) {
 		return (
+			// <View>
+			// 	<Text>hello</Text>
+			// </View>
 			<BlockHolder
 				onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
 				onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }

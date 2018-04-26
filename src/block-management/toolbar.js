@@ -5,7 +5,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text } from 'react-native';
 import { ToolbarButton } from './constants';
 
-import styles from './toolbar.scss';
+import styles from './toolbar-style.scss';
 
 type PropsType = {
 	uid: string,
