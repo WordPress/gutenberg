@@ -432,6 +432,17 @@ function gutenberg_register_post_types() {
 add_action( 'init', 'gutenberg_register_post_types' );
 
 /**
+ * Registers the REST API routes needed by the Gutenberg editor.
+ *
+ * @since 2.8.0
+ */
+function gutenberg_register_rest_routes() {
+	$controller = new WP_REST_Block_Renderer_Controller();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
+
+/**
  * Gets revisions details for the selected post.
  *
  * @since 1.6.0
