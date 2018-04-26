@@ -65,20 +65,16 @@ export function registerPlugin( name, settings ) {
 		if ( settings.hooks.filters ) {
 			settings.hooks.filters.forEach( function( hook ) {
 				if ( hook.name && hook.callback ) {
-					var priority = hook.priority ? hook.priority : 10;
-					wp.hooks.addFilter( hook.name, name, hook.callback, priority );
+					wp.hooks.addFilter( hook.name, name, hook.callback, hook.priority ? hook.priority : 10 );
 				}
 			} );
-
 		}
 		if ( settings.hooks.actions ) {
 			settings.hooks.actions.forEach( function( hook ) {
 				if ( hook.name && hook.callback ) {
-					var priority = hook.priority ? hook.priority : 10;
-					wp.hooks.addAction( hook.name, name, hook.callback, priority );
+					wp.hooks.addAction( hook.name, name, hook.callback, hook.priority ? hook.priority : 10 );
 				}
 			} );
-
 		}
 	}
 
