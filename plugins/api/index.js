@@ -61,6 +61,27 @@ export function registerPlugin( name, settings ) {
 
 	settings = applyFilters( 'plugins.registerPlugin', settings, name );
 
+	if ( settings.hooks ) {
+		if ( settings.hooks.filters ) {
+			settings.hooks.filters.forEach( function( hook ) {
+				if ( hook.name && hook.callback ) {
+					var priority = hook.priority ? hook.priority : 10;
+					wp.hooks.addFilter( hook.name, name, hook.callback, proirity );
+				}
+			} );
+
+		}
+		if ( settings.hooks.actions ) {
+			settings.hooks.actions.forEach( function( hook ) {
+				if ( hook.name && hook.callback ) {
+					var priority = hook.priority ? hook.priority : 10;
+					wp.hooks.addAction( hook.name, name, hook.callback, proirity );
+				}
+			} );
+
+		}
+	}
+
 	plugins[ settings.name ] = settings;
 
 	doAction( 'plugins.pluginRegistered', settings, name );
