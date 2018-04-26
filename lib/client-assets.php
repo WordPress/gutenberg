@@ -834,6 +834,18 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// to disable it outright.
 	wp_enqueue_script( 'heartbeat' );
 
+	/**
+	 * Fires after block assets have been enqueued for the editing interface.
+	 *
+	 * Call `add_action` on any hook before 'admin_enqueue_scripts'.
+	 *
+	 * In the function call you supply, simply use `wp_enqueue_script` and
+	 * `wp_enqueue_style` to add your functionality to the Gutenberg editor.
+	 *
+	 * @since 0.4.0
+	 */
+	do_action( 'enqueue_block_editor_assets' );
+
 	// Ignore Classic Editor's `rich_editing` user option, aka "Disable visual
 	// editor". Forcing this to be true guarantees that TinyMCE and its plugins
 	// are available in Gutenberg. Fixes
@@ -999,16 +1011,4 @@ JS;
 	 * Styles
 	 */
 	wp_enqueue_style( 'wp-edit-post' );
-
-	/**
-	 * Fires after block assets have been enqueued for the editing interface.
-	 *
-	 * Call `add_action` on any hook before 'admin_enqueue_scripts'.
-	 *
-	 * In the function call you supply, simply use `wp_enqueue_script` and
-	 * `wp_enqueue_style` to add your functionality to the Gutenberg editor.
-	 *
-	 * @since 0.4.0
-	 */
-	do_action( 'enqueue_block_editor_assets' );
 }
