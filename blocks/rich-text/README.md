@@ -39,7 +39,7 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `onSplit( before: Array|String, after: Array|String, ...blocks: Object ): Function`
 
-*Optional.* Called when the content can be split with `before` and `after`. There might be blocks present, which should be inserted in between.
+*Optional.* Called when the content can be split with `after` as the split off value. There might be blocks present, which should be inserted before the `after` value. Note: the `before` value should no longer be used.
 
 ### `onReplace( blocks: Array ): Function`
 

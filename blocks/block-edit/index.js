@@ -51,8 +51,6 @@ export class BlockEdit extends Component {
 	}
 
 	render() {
-		// For backwards compatibility concerns adds a focus and setFocus prop
-		// These should be removed after some time (maybe when merging to Core)
 		return (
 			<BlockEditContextProvider value={ this.state.context }>
 				<Edit { ...this.props } />

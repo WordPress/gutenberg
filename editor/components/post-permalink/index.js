@@ -51,7 +51,7 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, previewLink, isEditable, samplePermalink } = this.props;
+		const { isNew, previewLink, isEditable, samplePermalink, isPublished } = this.props;
 		const { iconClass, isEditingPermalink } = this.state;
 
 		if ( isNew || ! previewLink ) {
@@ -75,7 +75,7 @@ class PostPermalink extends Component {
 				{ ! isEditingPermalink &&
 					<Button
 						className="editor-post-permalink__link"
-						href={ previewLink }
+						href={ ! isPublished ? previewLink : samplePermalink }
 						target="_blank"
 						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
 					>
@@ -118,12 +118,13 @@ class PostPermalink extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditedPostNew, isPermalinkEditable, getEditedPostPreviewLink, getPermalink } = select( 'core/editor' );
+		const { isEditedPostNew, isPermalinkEditable, getEditedPostPreviewLink, getPermalink, isCurrentPostPublished } = select( 'core/editor' );
 		return {
 			isNew: isEditedPostNew(),
 			previewLink: getEditedPostPreviewLink(),
 			isEditable: isPermalinkEditable(),
 			samplePermalink: getPermalink(),
+			isPublished: isCurrentPostPublished(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

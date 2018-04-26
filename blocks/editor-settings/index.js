@@ -15,17 +15,49 @@ import { createContext, createHigherOrderComponent } from '@wordpress/element';
 const DEFAULT_SETTINGS = {
 	alignWide: false,
 	colors: [
-		'#f78da7',
-		'#cf2e2e',
-		'#ff6900',
-		'#fcb900',
-		'#7bdcb5',
-		'#00d084',
-		'#8ed1fc',
-		'#0693e3',
-		'#eee',
-		'#abb8c3',
-		'#313131',
+		{
+			name: 'pale pink',
+			color: '#f78da7',
+		},
+		{	name: 'vivid red',
+			color: '#cf2e2e',
+		},
+		{
+			name: 'luminous vivid orange',
+			color: '#ff6900',
+		},
+		{
+			name: 'luminous vivid amber',
+			color: '#fcb900',
+		},
+		{
+			name: 'light green cyan',
+			color: '#7bdcb5',
+		},
+		{
+			name: 'vivid green cyan',
+			color: '#00d084',
+		},
+		{
+			name: 'pale cyan blue',
+			color: '#8ed1fc',
+		},
+		{
+			name: 'vivid cyan blue',
+			color: '#0693e3',
+		},
+		{
+			name: 'very light gray',
+			color: '#eeeeee',
+		},
+		{
+			name: 'cyan bluish gray',
+			color: '#abb8c3',
+		},
+		{
+			name: 'very dark gray',
+			color: '#313131',
+		},
 	],
 
 	// This is current max width of the block inner area
