@@ -308,6 +308,33 @@ function getNormalAttributeName( attribute ) {
 
 		case 'className':
 			return 'class';
+
+		case 'xlinkHref':
+			return 'xlink:href';
+
+		case 'xlinkActuate':
+			return 'xlink:actuate';
+
+		case 'xlinkArcrole':
+			return 'xlink:role';
+
+		case 'xlinkShow':
+			return 'xlink:show';
+
+		case 'xlinkTitle':
+			return 'xlink:title';
+
+		case 'xlinkType':
+			return 'xlink:type';
+
+		case 'xmlBase':
+			return 'xml:base';
+
+		case 'xmlLang':
+			return 'xml:lang';
+
+		case 'xmlSpace':
+			return 'xml:space';
 	}
 
 	return attribute.toLowerCase();

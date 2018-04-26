@@ -396,9 +396,10 @@ describe( 'renderAttributes()', () => {
 				htmlFor: 'foo',
 				className: 'bar',
 				contentEditable: true,
+				xlinkHref: 'baz',
 			} );
 
-			expect( result ).toBe( ' for="foo" class="bar" contenteditable="true"' );
+			expect( result ).toBe( ' for="foo" class="bar" contenteditable="true" xlink:href="baz"' );
 		} );
 	} );
 
