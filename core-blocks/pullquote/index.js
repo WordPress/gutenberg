@@ -68,12 +68,9 @@ export const settings = {
 		}
 	},
 
-	edit: withState( {
-		editable: 'content',
-	} )( ( { attributes, setAttributes, isSelected, className, editable, setState } ) => {
+	edit: ( { attributes, setAttributes, isSelected, className } ) => {
 		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
 		return (
 			<Fragment>
@@ -95,8 +92,6 @@ export const settings = {
 						/* translators: the text of the quotation */
 						placeholder={ __( 'Write quote…' ) }
 						wrapperClassName="blocks-pullquote__content"
-						isSelected={ isSelected && editable === 'content' }
-						onFocus={ onSetActiveEditable( 'content' ) }
 					/>
 					{ ( citation || isSelected ) && (
 						<RichText
@@ -109,14 +104,12 @@ export const settings = {
 									citation: nextCitation,
 								} )
 							}
-							isSelected={ isSelected && editable === 'cite' }
-							onFocus={ onSetActiveEditable( 'cite' ) }
 						/>
 					) }
 				</blockquote>
 			</Fragment>
 		);
-	} ),
+	},
 
 	save( { attributes } ) {
 		const { value, citation, align } = attributes;
