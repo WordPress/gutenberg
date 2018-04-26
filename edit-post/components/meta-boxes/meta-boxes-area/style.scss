@@ -2,8 +2,19 @@
 .edit-post-meta-boxes-area {
 	position: relative;
 
+	/**
+	 * The wordpress default for most meta-box elements is content-box. Some
+	 * elements such as textarea and input are set to border-box in forms.css.
+	 * These elements therefore specifically set back to border-box here, while
+	 * other elements (such as .button) are unaffected by Gutenberg's style
+	 * because of their higher specificity.
+	 */
 	* {
 		box-sizing: content-box;
+	}
+
+	textarea, input {
+		box-sizing: border-box;
 	}
 
 	/* Match width and positioning of the meta boxes. Override default styles. */

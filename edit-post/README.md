@@ -9,14 +9,11 @@ Refer to [the plugins module documentation](../plugins/) for more information.
 The following components can be used with the `registerPlugin` ([see documentation](../plugins)) API.
 They can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency.
 
-Experimental components can be found under `wp.editPost.__experimental`. Experimental components are still being evaluated and can change in a future version.
-
 ### `PluginSidebar`
-**Experimental**
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
 
-If you wish to display the sidebar, you can with use the [`PluginMoreMenuItem`](#pluginmoremenuitem) component or the `wp.data.dispatch` API:
+If you wish to display the sidebar, you can with use the [`PluginSidebarMoreMenuItem`](#pluginsidebarmoremenuitem) component or the `wp.data.dispatch` API:
 ```js
 wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );
 ```
@@ -24,19 +21,17 @@ wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-na
 _Example:_
 
 ```jsx
-const { Panel, PanelBody } = wp.components;
+const { PanelBody } = wp.components;
 const { PluginSidebar } = wp.editPost;
 
 const MyPluginSidebar = () => (
 	<PluginSidebar
-		name="sidebar-name"
-		title="Sidebar title"
+		name="my-sidebar"
+		title="My sidebar title"
 	>
-		<Panel>
-			<PanelBody>
-				My sidebar content
-			</PanelBody>
-		</Panel>
+		<PanelBody>
+			My sidebar content
+		</PanelBody>
 	</PluginSidebar>
 );
 ```
@@ -58,48 +53,31 @@ Title displayed at the top of the sidebar.
 - Required: Yes
 
 
-### `PluginMoreMenuItem`
-**Experimental**
+### `PluginSidebarMoreMenuItem`
 
-Renders a menu item in the more menu drop down, and can be used to activate other plugin UI components.
+Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to activate the corresponding `PluginSidebar` component.
 The text within the component appears as the menu item label.
 
 _Example:_
 
 ```jsx
-const { PluginMoreMenuItem } = wp.editPost;
+const { PluginSidebarMoreMenuItem } = wp.editPost;
 
-const MyPluginMenuItem = () => (
-	<PluginMoreMenuItem
-		name="my-plugin"
-		icon="yes"
-		type="sidebar"
+const MySidebarMoreMenuItem = () => (
+	<PluginSidebarMoreMenuItem
 		target="my-sidebar"
+		icon="yes"
 	>
-		My Sidebar
-	</PluginMoreMenuItem>
+		My sidebar title
+	</PluginSidebarMoreMenuItem>
 );
 ```
 
 #### Props
 
-##### name
-
-A string identifying the menu item. Must be unique for every menu item registered within the scope of your plugin.
-
-- Type: `String`
-- Required: Yes
-
-##### type
-
-A string identifying the type of UI element you wish this menu item to activate. Can be: `sidebar`.
-
-- Type: `String`
-- Required: Yes
-
 ##### target
 
-A string identifying the UI element you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that UI element.
+A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
 
 - Type: `String`
 - Required: Yes

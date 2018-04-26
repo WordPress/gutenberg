@@ -17,7 +17,7 @@ final class WP_Block_Type_Registry {
 	 *
 	 * @since 0.6.0
 	 * @access private
-	 * @var array
+	 * @var WP_Block_Type[]
 	 */
 	private $registered_block_types = array();
 
@@ -142,7 +142,7 @@ final class WP_Block_Type_Registry {
 	 * @since 0.6.0
 	 * @access public
 	 *
-	 * @return array Associative array of `$block_type_name => $block_type` pairs.
+	 * @return WP_Block_Type[] Associative array of `$block_type_name => $block_type` pairs.
 	 */
 	public function get_all_registered() {
 		return $this->registered_block_types;

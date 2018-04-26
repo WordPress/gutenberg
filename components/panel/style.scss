@@ -22,7 +22,7 @@
 	border-bottom: 1px solid $light-gray-500;
 
 	h3 {
-		margin: 0 0 .5em 0;
+		margin: 0 0 .5em;
 	}
 
 	&.is-opened {
@@ -73,6 +73,7 @@
 	width: 100%;
 	font-weight: 600;
 	text-align: left;
+	color: $dark-gray-900;
 	@include menu-style__neutral;
 
 	&:focus {

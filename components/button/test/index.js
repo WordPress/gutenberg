@@ -38,7 +38,7 @@ describe( 'Button', () => {
 
 		it( 'should render a button element with button-small class', () => {
 			const button = shallow( <Button isSmall /> );
-			expect( button.hasClass( 'button' ) ).toBe( false );
+			expect( button.hasClass( 'button' ) ).toBe( true );
 			expect( button.hasClass( 'button-large' ) ).toBe( false );
 			expect( button.hasClass( 'button-small' ) ).toBe( true );
 			expect( button.hasClass( 'button-primary' ) ).toBe( false );

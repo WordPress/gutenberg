@@ -15,6 +15,7 @@ describe( 'ContrastChecker', () => {
 	const fallbackBackgroundColor = '#fff';
 	const fallbackTextColor = '#000';
 	const sameShade = '#666';
+	const colorWithTransparency = 'rgba(102,102,102,0.5)';
 
 	const wrapper = mount(
 		<ContrastChecker
@@ -44,6 +45,32 @@ describe( 'ContrastChecker', () => {
 		);
 
 		expect( componentWrapper ).toMatchSnapshot();
+	} );
+
+	test( 'should render render null if background color contains a transparency', () => {
+		const componentWrapper = mount(
+			<ContrastChecker
+				backgroundColor={ colorWithTransparency }
+				textColor={ sameShade }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor } />
+		);
+
+		expect( componentWrapper.html() ).toBeNull();
+	} );
+
+	test( 'should render render null if text color contains a transparency', () => {
+		const componentWrapper = mount(
+			<ContrastChecker
+				backgroundColor={ sameShade }
+				textColor={ colorWithTransparency }
+				isLargeText={ isLargeText }
+				fallbackBackgroundColor={ fallbackBackgroundColor }
+				fallbackTextColor={ fallbackTextColor } />
+		);
+
+		expect( componentWrapper.html() ).toBeNull();
 	} );
 
 	test( 'should render different message matching snapshot when background color has less brightness than text color.', () => {

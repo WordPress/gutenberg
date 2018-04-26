@@ -1,29 +1,17 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
-import { serialize } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import { getBlocks } from '../../store/selectors';
+import { withSelect } from '@wordpress/data';
+import { count as wordCount } from '@wordpress/wordcount';
 
 function WordCount( { content } ) {
-	const wordCount = wp.utils.WordCounter.prototype.count( content );
 	return (
-		<span className="word-count">{ wordCount }</span>
+		<span className="word-count">{ wordCount( content, 'words' ) }</span>
 	);
 }
 
-export default connect(
-	( state ) => {
-		return {
-			content: serialize( getBlocks( state ) ),
-		};
-	}
-)( WordCount );
+export default withSelect( ( select ) => {
+	return {
+		content: select( 'core/editor' ).getEditedPostAttribute( 'content' ),
+	};
+} )( WordCount );

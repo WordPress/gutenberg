@@ -1,22 +1,21 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withContext, withInstanceId } from '@wordpress/components';
+import { withInstanceId } from '@wordpress/components';
 import { compose } from '@wordpress/element';
+import { withEditorSettings } from '@wordpress/blocks';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
 
 export function PageTemplate( { availableTemplates, selectedTemplate, instanceId, onUpdate } ) {
 	if ( isEmpty( availableTemplates ) ) {
@@ -41,27 +40,19 @@ export function PageTemplate( { availableTemplates, selectedTemplate, instanceId
 	);
 }
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			selectedTemplate: getEditedPostAttribute( state, 'template' ),
-		};
-	},
-	{
-		onUpdate( templateSlug ) {
-			return editPost( { template: templateSlug || '' } );
-		},
-	}
-);
-
-const applyWithContext = withContext( 'editor' )(
-	( settings ) => ( {
-		availableTemplates: settings.availableTemplates,
-	} )
-);
-
 export default compose(
-	applyConnect,
-	applyWithContext,
+	withSelect( ( select ) => {
+		return {
+			selectedTemplate: select( 'core/editor' ).getEditedPostAttribute( 'template' ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		onUpdate( templateSlug ) {
+			dispatch( 'core/editor' ).editPost( { template: templateSlug || '' } );
+		},
+	} ) ),
+	withEditorSettings( ( settings ) => ( {
+		availableTemplates: settings.availableTemplates,
+	} ) ),
 	withInstanceId,
 )( PageTemplate );

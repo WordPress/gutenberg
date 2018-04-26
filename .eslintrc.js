@@ -59,10 +59,6 @@ module.exports = {
 				message: 'Use @wordpress/element as import path instead.',
 			},
 			{
-				selector: 'ImportDeclaration[source.value=/^i18n$/]',
-				message: 'Use @wordpress/i18n as import path instead.',
-			},
-			{
 				selector: 'ImportDeclaration[source.value=/^data$/]',
 				message: 'Use @wordpress/data as import path instead.',
 			},
@@ -85,6 +81,10 @@ module.exports = {
 			{
 				"selector": "ImportDeclaration[source.value=/^core-data$/]",
 				"message": "Use @wordpress/core-data as import path instead."
+			},
+			{
+				"selector": "ImportDeclaration[source.value=/^core-blocks$/]",
+				"message": "Use @wordpress/core-blocks as import path instead."
 			},
 			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',

@@ -77,8 +77,6 @@ function gutenberg_collect_meta_box_data() {
 	 * do_meta_boxes( null, 'normal', $post );
 	 * do_meta_boxes( null, 'advanced', $post );
 	 */
-	$meta_boxes_output = array();
-
 	$publish_callback_args = null;
 	if ( post_type_supports( $post_type, 'revisions' ) && 'auto-draft' !== $post->post_status ) {
 		$revisions = wp_get_post_revisions( $post->ID );
@@ -284,7 +282,7 @@ function gutenberg_can_edit_post( $post ) {
  * @since 1.5.2
  *
  * @param string $post_type The post type.
- * @return bool Wehther the post type can be edited with Gutenberg.
+ * @return bool Whether the post type can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post_type( $post_type ) {
 	$can_edit = true;
@@ -432,6 +430,17 @@ function gutenberg_register_post_types() {
 	}
 }
 add_action( 'init', 'gutenberg_register_post_types' );
+
+/**
+ * Registers the REST API routes needed by the Gutenberg editor.
+ *
+ * @since 2.8.0
+ */
+function gutenberg_register_rest_routes() {
+	$controller = new WP_REST_Block_Renderer_Controller();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 
 /**
  * Gets revisions details for the selected post.

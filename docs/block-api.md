@@ -105,7 +105,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](https://wordpress.org/gutenberg/handbook/block-api/attributes/).**
+* **See: [Attributes](../docs/block-api/attributes.md).**
 
 #### Transforms (optional)
 
@@ -280,14 +280,14 @@ anchor: true,
 - `customClassName` (default `true`): This property adds a field to define a custom className for the block's wrapper.
 
 ```js
-// Remove the support for a the custom className .
+// Remove the support for the custom className.
 customClassName: false,
 ```
 
 - `className` (default `true`): By default, Gutenberg adds a class with the form `.wp-block-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
 
 ```js
-// Remove the support for a the generated className .
+// Remove the support for the generated className.
 className: false,
 ```
 
@@ -300,4 +300,4 @@ html: false,
 
 ## Edit and Save
 
-The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](https://wordpress.org/gutenberg/handbook/block-edit-save/).
+The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).

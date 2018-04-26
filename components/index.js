@@ -10,11 +10,13 @@ export { default as CodeEditor } from './code-editor';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as Disabled } from './disabled';
+export { default as Draggable } from './draggable';
 export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';
+export { default as FocusableIframe } from './focusable-iframe';
 export { default as FormFileUpload } from './form-file-upload';
 export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
@@ -41,6 +43,7 @@ export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as SelectControl } from './select-control';
 export { default as Spinner } from './spinner';
+export { default as ServerSideRender } from './server-side-render';
 export { default as TabPanel } from './tab-panel';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
@@ -48,7 +51,7 @@ export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
-export { Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
+export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
 export { default as ifCondition } from './higher-order/if-condition';
@@ -59,6 +62,7 @@ export { default as withFallbackStyles } from './higher-order/with-fallback-styl
 export { default as withFilters } from './higher-order/with-filters';
 export { default as withFocusOutside } from './higher-order/with-focus-outside';
 export { default as withFocusReturn } from './higher-order/with-focus-return';
+export { default as withGlobalEvents } from './higher-order/with-global-events';
 export { default as withInstanceId } from './higher-order/with-instance-id';
 export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';

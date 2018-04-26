@@ -3,13 +3,13 @@
  */
 import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
-import { flowRight, without, mapValues } from 'lodash';
-import memoize from 'memize';
+import { flowRight, without, mapValues, overEvery } from 'lodash';
+import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
  */
-import { Component, getWrapperDisplayName } from '@wordpress/element';
+import { Component, createHigherOrderComponent } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -136,15 +136,50 @@ export function registerResolvers( reducerKey, newResolvers ) {
 			return selector;
 		}
 
-		// Ensure single invocation per argument set via memoization.
-		const fulfill = memoize( async ( ...args ) => {
-			const store = stores[ reducerKey ];
+		const store = stores[ reducerKey ];
+
+		// Normalize resolver shape to object.
+		let resolver = newResolvers[ key ];
+		if ( ! resolver.fulfill ) {
+			resolver = { fulfill: resolver };
+		}
+
+		/**
+		 * To ensure that fulfillment occurs only once per arguments set
+		 * (even for deeply "equivalent" arguments), track calls.
+		 *
+		 * @type {EquivalentKeyMap}
+		 */
+		const fulfilledByEquivalentArgs = new EquivalentKeyMap();
+
+		/**
+		 * Returns true if resolver fulfillment has already occurred for an
+		 * equivalent set of arguments. Includes side effect when returning
+		 * false to ensure the next invocation returns true.
+		 *
+		 * @param {Array} args Arguments set.
+		 *
+		 * @return {boolean} Whether fulfillment has already occurred.
+		 */
+		function hasBeenFulfilled( args ) {
+			const hasArguments = fulfilledByEquivalentArgs.has( args );
+			if ( ! hasArguments ) {
+				fulfilledByEquivalentArgs.set( args, true );
+			}
+
+			return hasArguments;
+		}
+
+		async function fulfill( ...args ) {
+			if ( hasBeenFulfilled( args ) ) {
+				return;
+			}
 
 			// At this point, selectors have already been pre-bound to inject
 			// state, it would not be otherwise provided to fulfill.
 			const state = store.getState();
 
-			let fulfillment = newResolvers[ key ]( state, ...args );
+			let fulfillment = resolver.fulfill( state, ...args );
 
 			// Attempt to normalize fulfillment as async iterable.
 			fulfillment = toAsyncIterable( fulfillment );
@@ -158,7 +193,19 @@ export function registerResolvers( reducerKey, newResolvers ) {
 					store.dispatch( maybeAction );
 				}
 			}
-		} );
+		}
+
+		if ( typeof resolver.isFulfilled === 'function' ) {
+			// When resolver provides its own fulfillment condition, fulfill
+			// should only occur if not already fulfilled (opt-out condition).
+			fulfill = overEvery( [
+				( ...args ) => {
+					const state = store.getState();
+					return ! resolver.isFulfilled( state, ...args );
+				},
+				fulfill,
+			] );
+		}
 
 		return ( ...args ) => {
 			fulfill( ...args );
@@ -231,14 +278,18 @@ export function dispatch( reducerKey ) {
  *
  * @return {Component} Enhanced component with merged state data props.
  */
-export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
-	class ComponentWithSelect extends Component {
+export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	return class ComponentWithSelect extends Component {
 		constructor() {
 			super( ...arguments );
 
 			this.runSelection = this.runSelection.bind( this );
 
 			this.state = {};
+		}
+
+		shouldComponentUpdate( nextProps, nextState ) {
+			return ! isShallowEqual( nextProps, this.props ) || ! isShallowEqual( nextState, this.state );
 		}
 
 		componentWillMount() {
@@ -286,12 +337,8 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
 		render() {
 			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
 		}
-	}
-
-	ComponentWithSelect.displayName = getWrapperDisplayName( WrappedComponent, 'select' );
-
-	return ComponentWithSelect;
-};
+	};
+}, 'withSelect' );
 
 /**
  * Higher-order component used to add dispatch props using registered action
@@ -305,8 +352,8 @@ export const withSelect = ( mapStateToProps ) => ( WrappedComponent ) => {
  *
  * @return {Component} Enhanced component with merged dispatcher props.
  */
-export const withDispatch = ( mapDispatchToProps ) => ( WrappedComponent ) => {
-	class ComponentWithDispatch extends Component {
+export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	return class ComponentWithDispatch extends Component {
 		constructor() {
 			super( ...arguments );
 
@@ -345,12 +392,8 @@ export const withDispatch = ( mapDispatchToProps ) => ( WrappedComponent ) => {
 		render() {
 			return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
 		}
-	}
-
-	ComponentWithDispatch.displayName = getWrapperDisplayName( WrappedComponent, 'dispatch' );
-
-	return ComponentWithDispatch;
-};
+	};
+}, 'withDispatch' );
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.

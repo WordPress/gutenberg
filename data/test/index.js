@@ -123,6 +123,80 @@ describe( 'registerResolvers', () => {
 		expect( resolver ).toHaveBeenCalledTimes( 2 );
 	} );
 
+	it( 'should support the object resolver definition', () => {
+		const resolver = jest.fn();
+
+		registerReducer( 'demo', ( state = 'OK' ) => state );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: { fulfill: resolver },
+		} );
+
+		const value = select( 'demo' ).getValue( 'arg1', 'arg2' );
+		expect( value ).toBe( 'OK' );
+	} );
+
+	it( 'should use isFulfilled definition before calling the side effect', () => {
+		const fulfill = jest.fn().mockImplementation( ( state, page ) => {
+			return { type: 'SET_PAGE', page, result: [] };
+		} );
+
+		const store = registerReducer( 'demo', ( state = {}, action ) => {
+			switch ( action.type ) {
+				case 'SET_PAGE':
+					return {
+						...state,
+						[ action.page ]: action.result,
+					};
+			}
+
+			return state;
+		} );
+
+		store.dispatch( { type: 'SET_PAGE', page: 4, result: [] } );
+
+		registerSelectors( 'demo', {
+			getPage: ( state, page ) => state[ page ],
+		} );
+		registerResolvers( 'demo', {
+			getPage: {
+				fulfill,
+				isFulfilled( state, page ) {
+					return state.hasOwnProperty( page );
+				},
+			},
+		} );
+
+		select( 'demo' ).getPage( 1 );
+		select( 'demo' ).getPage( 2 );
+
+		expect( fulfill ).toHaveBeenCalledTimes( 2 );
+
+		select( 'demo' ).getPage( 1 );
+		select( 'demo' ).getPage( 2 );
+		select( 'demo' ).getPage( 3, {} );
+
+		// Expected: First and second page fulfillments already triggered, so
+		// should only be one more than previous assertion set.
+		expect( fulfill ).toHaveBeenCalledTimes( 3 );
+
+		select( 'demo' ).getPage( 1 );
+		select( 'demo' ).getPage( 2 );
+		select( 'demo' ).getPage( 3, {} );
+		select( 'demo' ).getPage( 4 );
+
+		// Expected:
+		//  - Fourth page was pre-filled. Necessary to determine via
+		//    isFulfilled, but fulfillment resolver should not be triggered.
+		//  - Third page arguments are not strictly equal but are equivalent,
+		//    so fulfillment should already be satisfied.
+		expect( fulfill ).toHaveBeenCalledTimes( 3 );
+
+		select( 'demo' ).getPage( 4, {} );
+	} );
+
 	it( 'should resolve action to dispatch', ( done ) => {
 		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;

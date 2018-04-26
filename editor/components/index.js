@@ -57,6 +57,7 @@ export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockSelectionClearer } from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
+export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as CopyHandler } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
@@ -67,6 +68,7 @@ export { default as MultiSelectScrollIntoView } from './multi-select-scroll-into
 export { default as NavigableToolbar } from './navigable-toolbar';
 export { default as ObserveTyping } from './observe-typing';
 export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder';
+export { default as SkipToSelectedBlock } from './skip-to-selected-block';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 
