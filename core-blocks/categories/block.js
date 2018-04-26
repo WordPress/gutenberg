@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { PanelBody, Placeholder, Spinner, ToggleControl, OpensInNewTabMessage } from '@wordpress/components';
+import { PanelBody, Placeholder, Spinner, ToggleControl, ExternalLink } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { times, unescape } from 'lodash';
@@ -92,10 +92,9 @@ class CategoriesBlock extends Component {
 
 		return (
 			<li key={ category.id }>
-				<a href={ category.link } target="_blank">
+				<ExternalLink href={ category.link } icon={ null }>
 					{ this.renderCategoryName( category ) }
-					<OpensInNewTabMessage />
-				</a>
+				</ExternalLink>
 				{ showPostCounts &&
 					<span className={ `${ this.props.className }__post-count` }>
 						{ ' ' }({ category.count })

@@ -5,4 +5,13 @@
 		margin: 0 .2em;
 		vertical-align: top;
 	}
+
+	&.components-icon-button {
+		display: flex;
+		align-items: center;
+	}
+
+	.wp-core-ui .editor-block-list__layout & {
+		font-size: inherit;
+	}
 }

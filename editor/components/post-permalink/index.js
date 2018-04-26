@@ -78,16 +78,15 @@ class PostPermalink extends Component {
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
 				{ ! isEditingPermalink &&
-					<Button
+					<ExternalLink
 						className="editor-post-permalink__link"
 						href={ ! isPublished ? previewLink : samplePermalink }
-						target="_blank"
+						icon={ null }
 						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
 					>
 						{ decodeURI( samplePermalink ) }
 						&lrm;
-						<OpensInNewTabMessage />
-					</Button>
+					</ExternalLink>
 				}
 
 				{ isEditingPermalink &&
@@ -107,16 +106,16 @@ class PostPermalink extends Component {
 				}
 
 				{ ! isEditable &&
-					<Button
+					<ExternalLink
 						className="editor-post-permalink__change"
 						isLarge
 						href={ getWPAdminURL( 'options-permalink.php' ) }
 						onClick={ this.addVisibilityCheck }
-						target="_blank"
+						icon={ null }
+						rel={ null }
 					>
 						{ __( 'Change Permalinks' ) }
-						<OpensInNewTabMessage />
-					</Button>
+					</ExternalLink>
 				}
 			</div>
 		);
