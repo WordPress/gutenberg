@@ -66,7 +66,7 @@ export function registerPlugin( name, settings ) {
 			settings.hooks.filters.forEach( function( hook ) {
 				if ( hook.name && hook.callback ) {
 					var priority = hook.priority ? hook.priority : 10;
-					wp.hooks.addFilter( hook.name, name, hook.callback, proirity );
+					wp.hooks.addFilter( hook.name, name, hook.callback, priority );
 				}
 			} );
 
@@ -75,7 +75,7 @@ export function registerPlugin( name, settings ) {
 			settings.hooks.actions.forEach( function( hook ) {
 				if ( hook.name && hook.callback ) {
 					var priority = hook.priority ? hook.priority : 10;
-					wp.hooks.addAction( hook.name, name, hook.callback, proirity );
+					wp.hooks.addAction( hook.name, name, hook.callback, priority );
 				}
 			} );
 
