@@ -213,32 +213,7 @@ function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
 	$response['rest-nonce'] = wp_create_nonce( 'wp_rest' );
 	return $response;
 }
-
 add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
-
-/**
- * Ensure that the wp-json index contains the 'theme-supports' setting as
- * part of its site info elements.
- *
- * @param WP_REST_Response $response WP REST API response of the wp-json index.
- * @return WP_REST_Response Response that contains theme-supports.
- */
-function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
-	$site_info = $response->get_data();
-	if ( ! array_key_exists( 'theme_supports', $site_info ) ) {
-		$site_info['theme_supports'] = array();
-	}
-	if ( ! array_key_exists( 'formats', $site_info['theme_supports'] ) ) {
-		$formats = get_theme_support( 'post-formats' );
-		$formats = is_array( $formats ) ? array_values( $formats[0] ) : array();
-		$formats = array_merge( array( 'standard' ), $formats );
-
-		$site_info['theme_supports']['formats'] = $formats;
-	}
-	$response->set_data( $site_info );
-	return $response;
-}
-add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_theme_supports' );
 
 /**
  * As a substitute for the default content `wpautop` filter, applies autop
