@@ -97,7 +97,7 @@ class ParagraphBlock extends Component {
 	}
 
 	getDropCapHelp( checked ) {
-		return checked ? __( 'Drop Cap is set.' ) : __( 'Drop Cap is not set.' );
+		return checked ? __( 'The paragraph will display with a drop cap.' ) : __( 'The paragraph will not display with a drop cap.' );
 	}
 
 	getFontSize() {
