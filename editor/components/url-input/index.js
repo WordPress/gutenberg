@@ -179,9 +179,8 @@ class UrlInput extends Component {
 	}
 
 	render() {
-		const { value = '', instanceId } = this.props;
+		const { value = '', autoFocus = true, instanceId } = this.props;
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
-		const autoFocus = 'undefined' === typeof this.props.autoFocus || this.props.autoFocus;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className="editor-url-input">
