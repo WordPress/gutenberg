@@ -11,6 +11,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Registers the REST API routes needed by the Gutenberg editor.
+ *
+ * @since 2.8.0
+ */
+function gutenberg_register_rest_routes() {
+	$controller = new WP_REST_Block_Renderer_Controller();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
+
+/**
  * Includes the value for the custom field `post_type_capabities` inside the REST API response of user.
  *
  * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
