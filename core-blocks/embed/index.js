@@ -127,6 +127,11 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				}
 				const { url } = this.props.attributes;
 				const { setAttributes } = this.props;
+
+				if ( undefined === url ) {
+					return;
+				}
+
 				const matchingBlock = findBlock( url );
 
 				// WordPress blocks can work on multiple sites, and so don't have patterns,
