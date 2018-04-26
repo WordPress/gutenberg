@@ -1,19 +1,18 @@
 ServerSideRender
 =======
 
-ServerSideRender component is used for server-side rendering preview in Gutenberg editor, specifically for dynamic blocks. Server-side rendering in a block's `edit` function should be mostly limited for blocks which are heavily dependent on (existing) PHP rendering logic that is heavily intertwined with data, such as when there are no endpoints available.
+ServerSideRender is a component used for server-side rendering a preview of dynamic blocks to display in the editor. Server-side rendering in a block's `edit` function should be limited to blocks that are heavily dependent on existing PHP rendering logic that is heavily intertwined with data, particularly when there are no endpoints available.
 
-Usage of ServerSideRender component could also be justified in the following two cases:
-* Lack of potential to take some existing widget-like functionality and improve its user-facing editing experience.
-* Unwillingness to create a full JS experience for a block considered legacy.
+ServerSideRender may also be used when a legacy block is provided as a backwards compatibility measure, rather than needing to re-write the deprecated code that the block may depend on.
 
-Note that ServerSideRender should be regarded as a fallback.
+ServerSideRender should be regarded as a fallback or legacy mechanism, it is not appropriate for developing new features against.
 
-New blocks should be built in conjunction with any necessary REST API endpoints so that JavaScript can be used for rendering client-side in the `edit` function for the best user experience, instead of relying on using the PHP `render_callback`. The logic necessary for rendering should be included in the endpoint so that both the client-side JS and server-side PHP logic should require a mininal amount of differences.
+New blocks should be built in conjunction with any necessary REST API endpoints, so that JavaScript can be used for rendering client-side in the `edit` function. This gives the best user experience, instead of relying on using the PHP `render_callback`. The logic necessary for rendering should be included in the endpoint, so that both the client-side JavaScript and server-side PHP logic should require a mininal amount of differences.
 
 ## Usage
 
 Render core/archives preview.
+
 ```jsx
 	<ServerSideRender
 		block="core/archives"
@@ -23,8 +22,9 @@ Render core/archives preview.
 
 ## Output
 
-Output is using the `render_callback` set when defining the block. For example if `block="core/archives"` as in the example then the output will match `render_callback` output of that block.
+Output uses the block's `render_callback` function, set when defining the block.
 
 ## API Endpoint
-API endpoint for getting the output for ServerSideRender is `/gutenberg/v1/block-renderer/:block`. It accepts any params which are used as `attributes` for the block's `render_callback` method.
+
+The API endpoint for getting the output for ServerSideRender is `/gutenberg/v1/block-renderer/:block`. It accepts any params, which are used as `attributes` for the block's `render_callback` method.
 
