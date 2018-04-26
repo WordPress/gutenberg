@@ -61,6 +61,17 @@ describe( 'adding blocks', () => {
 		// out because default block is provisional.
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).toBeNull();
 
+		// Enter from title creates new default block.
+		await page.keyboard.press( 'Enter' );
+
+		// Using the regular inserter. Should replace the default unmodified
+		// (provisional) block.
+		await page.click( '.edit-post-header [aria-label="Add block"]' );
+		await page.keyboard.type( 'code' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Code block' );
+
 		// Using the placeholder
 		await page.click( '.editor-default-block-appender' );
 		await page.keyboard.type( 'Paragraph block' );
@@ -70,13 +81,6 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( '/quote' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Quote block' );
-
-		// Using the regular inserter
-		await page.click( '.edit-post-header [aria-label="Add block"]' );
-		await page.keyboard.type( 'code' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Code block' );
 
 		// Using the between inserter
 		await page.mouse.move( 200, 300 );
