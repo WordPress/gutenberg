@@ -929,7 +929,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$align_wide              = get_theme_support( 'align-wide' );
-	$color_palette           = get_theme_support( 'editor-color-palette' );
+	$color_palette           = current( (array) get_theme_support( 'editor-color-palette' ) );
 
 	// Backcompat for Color Palette set through `gutenberg` array.
 	if ( empty( $color_palette ) && ! empty( $gutenberg_theme_support[0]['colors'] ) ) {
