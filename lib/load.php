@@ -23,6 +23,6 @@ require dirname( __FILE__ ) . '/parser.php';
 require dirname( __FILE__ ) . '/register.php';
 
 // Register server-side code for individual blocks.
-foreach ( glob( dirname( __FILE__ ) . '/../blocks/library/*/index.php' ) as $block_logic ) {
+foreach ( glob( dirname( __FILE__ ) . '/../core-blocks/*/index.php' ) as $block_logic ) {
 	require $block_logic;
 }

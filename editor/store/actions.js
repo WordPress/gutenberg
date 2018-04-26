@@ -220,8 +220,8 @@ export function replaceBlock( uid, block ) {
 function createOnMove( type ) {
 	return ( uids, rootUID ) => {
 		return {
+			uids: castArray( uids ),
 			type,
-			uids,
 			rootUID,
 		};
 	};
@@ -447,15 +447,15 @@ export function createUndoLevel() {
  * Returns an action object used in signalling that the blocks
  * corresponding to the specified UID set are to be removed.
  *
- * @param {string[]} uids           Block UIDs.
- * @param {boolean}  selectPrevious True if the previous block should be selected when a block is removed.
+ * @param {string|string[]} uids           Block UIDs.
+ * @param {boolean}         selectPrevious True if the previous block should be selected when a block is removed.
  *
  * @return {Object} Action object.
  */
 export function removeBlocks( uids, selectPrevious = true ) {
 	return {
 		type: 'REMOVE_BLOCKS',
-		uids,
+		uids: castArray( uids ),
 		selectPrevious,
 	};
 }

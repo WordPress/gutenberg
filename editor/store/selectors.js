@@ -14,6 +14,7 @@ import {
 	unionWith,
 	includes,
 	values,
+	castArray,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -543,7 +544,7 @@ export const getGlobalBlockCount = createSelector(
 
 export const getBlocksByUID = createSelector(
 	( state, uids ) => {
-		return map( uids, ( uid ) => getBlock( state, uid ) );
+		return map( castArray( uids ), ( uid ) => getBlock( state, uid ) );
 	},
 	( state ) => [
 		state.editor.present.blocksByUid,

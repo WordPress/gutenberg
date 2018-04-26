@@ -64,3 +64,17 @@ export function receivePostTypes( postTypes ) {
 		postTypes: castArray( postTypes ),
 	};
 }
+
+/**
+ * Returns an action object used in signalling that the index has been received.
+ *
+ * @param {Object} index Index received.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveThemeSupportsFromIndex( index ) {
+	return {
+		type: 'RECEIVE_THEME_SUPPORTS',
+		themeSupports: index.theme_supports,
+	};
+}

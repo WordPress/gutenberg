@@ -14,7 +14,7 @@
 	<arg name="extensions" value="php"/>
 
 	<file>./bin</file>
-	<file>./blocks/library</file>
+	<file>./core-blocks</file>
 	<file>./lib</file>
 	<exclude-pattern>./lib/parser.php</exclude-pattern>
 	<file>./phpunit</file>
