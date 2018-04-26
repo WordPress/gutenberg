@@ -12,9 +12,9 @@ import { withPluginContext } from '@wordpress/plugins';
 import PinnedPlugins from '../pinned-plugins';
 import PluginsMoreMenuGroup from '../plugins-more-menu-group';
 
-const PluginSidebarMoreMenuItem = ( { children, isSelected, icon, onClick } ) => (
+const PluginSidebarMoreMenuItem = ( { children, icon, isPinned, isSelected, onClick } ) => (
 	<Fragment>
-		{ icon && (
+		{ isPinned && icon && (
 			<PinnedPlugins>
 				<IconButton
 					icon={ icon }
@@ -42,11 +42,16 @@ const PluginSidebarMoreMenuItem = ( { children, isSelected, icon, onClick } ) =>
 export default compose(
 	withPluginContext,
 	withSelect( ( select, ownProps ) => {
+		const {
+			getActiveGeneralSidebarName,
+			isPluginItemPinned,
+		} = select( 'core/edit-post' );
 		const { pluginContext, target } = ownProps;
 		const sidebarName = `${ pluginContext.name }/${ target }`;
 
 		return {
-			isSelected: select( 'core/edit-post' ).getActiveGeneralSidebarName() === sidebarName,
+			isPinned: isPluginItemPinned( `sidebar/${ sidebarName }` ),
+			isSelected: getActiveGeneralSidebarName() === sidebarName,
 			sidebarName,
 		};
 	} ),

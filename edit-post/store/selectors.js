@@ -154,3 +154,13 @@ export const hasMetaBoxes = createSelector(
 export function isSavingMetaBoxes( state ) {
 	return state.isSavingMetaBoxes;
 }
+
+/**
+ * Returns true if the the plugin item is pinned to the header.
+ *
+ * @param   {Object}  state Global application state.
+ * @return {boolean}       Whether the plugin item is pinned.
+ */
+export function isPluginItemPinned( state ) {
+	return Boolean( state );
+}
