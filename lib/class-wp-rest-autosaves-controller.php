@@ -1,4 +1,3 @@
-
 <?php
 /**
  * REST API: WP_REST_Autosaves_Controller class.
@@ -57,13 +56,13 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 * @param string $parent_post_type Post type of the parent.
 	 */
 	public function __construct( $parent_post_type ) {
-		$this->parent_post_type    = $parent_post_type;
-		$this->parent_controller   = new WP_REST_Posts_Controller( $parent_post_type );
+		$this->parent_post_type     = $parent_post_type;
+		$this->parent_controller    = new WP_REST_Posts_Controller( $parent_post_type );
 		$this->revisions_controller = new WP_REST_Revisions_Controller( $parent_post_type );
-		$this->rest_namespace      = 'wp/v2';
-		$this->rest_base           = 'autosaves';
-		$post_type_object          = get_post_type_object( $parent_post_type );
-		$this->parent_base         = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
+		$this->rest_namespace       = 'wp/v2';
+		$this->rest_base            = 'autosaves';
+		$post_type_object           = get_post_type_object( $parent_post_type );
+		$this->parent_base          = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
 	}
 
 	/**
