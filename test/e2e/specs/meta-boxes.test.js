@@ -30,7 +30,6 @@ describe( 'Meta boxes', () => {
 			// Draft" (the button is always visible while meta are present).
 			page.waitForSelector( '.editor-post-saved-state.is-saving' ),
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
-			page.waitForSelector( '.editor-post-save-draft' ),
 
 			// Keyboard shortcut Ctrl+S save.
 			page.keyboard.down( 'Meta' ),
