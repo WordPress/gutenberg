@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times } from 'lodash';
+import { get, times } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -90,7 +90,7 @@ export const settings = {
 							<div className="wp-block-column" key={ `column-${ index }` }>
 								<RichText
 									tagName="p"
-									value={ content && content[ index ] && content[ index ].children }
+									value={ get( content, [ index, 'children' ] ) }
 									onChange={ ( nextContent ) => {
 										setAttributes( {
 											content: [
@@ -116,7 +116,7 @@ export const settings = {
 			<div className={ `align${ width } columns-${ columns }` }>
 				{ times( columns, ( index ) =>
 					<div className="wp-block-column" key={ `column-${ index }` }>
-						<RichText.Content tagName="p" value={ content && content[ index ].children } />
+						<RichText.Content tagName="p" value={ get( content, [ index, 'children' ] ) } />
 					</div>
 				) }
 			</div>
