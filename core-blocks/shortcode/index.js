@@ -57,7 +57,6 @@ export const settings = {
 		customClassName: false,
 		className: false,
 		html: false,
-		rawContent: true,
 	},
 
 	edit: withInstanceId(

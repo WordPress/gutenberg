@@ -27,6 +27,8 @@ export {
 	getUnknownTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	addRawContentBlockName,
+	isRawContentBlockName,
 	getDefaultBlockForPostFormat,
 	getBlockType,
 	getBlockTypes,

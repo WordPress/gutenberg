@@ -64,6 +64,14 @@ let unknownTypeHandlerName;
 let defaultBlockName;
 
 /**
+ * A set of block names representing block types whose content the serializer
+ * should never attempt to beautify.
+ *
+ * @type {?string}
+ */
+const rawContentBlockNames = new Set();
+
+/**
  * Constant mapping post formats to the expected default block.
  *
  * @type {Object}
@@ -219,6 +227,18 @@ export function setDefaultBlockName( name ) {
  */
 export function getDefaultBlockName() {
 	return defaultBlockName;
+}
+
+export function addRawContentBlockName( name ) {
+	rawContentBlockNames.add( name );
+}
+
+export function isRawContentBlockName( name ) {
+	return rawContentBlockNames.has( name );
+}
+
+export function clearRawContentBlockNames() {
+	rawContentBlockNames.clear();
 }
 
 /**

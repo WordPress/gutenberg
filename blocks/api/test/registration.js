@@ -18,6 +18,9 @@ import {
 	getUnknownTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	addRawContentBlockName,
+	isRawContentBlockName,
+	clearRawContentBlockNames,
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,
@@ -39,6 +42,7 @@ describe( 'blocks', () => {
 		} );
 		setUnknownTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
+		clearRawContentBlockNames();
 		window._wpBlocks = {};
 	} );
 
@@ -303,6 +307,17 @@ describe( 'blocks', () => {
 	describe( 'getDefaultBlockName()', () => {
 		it( 'defaults to undefined', () => {
 			expect( getDefaultBlockName() ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'isRawContentBlockName', () => {
+		it( 'adds block names to a set', () => {
+			addRawContentBlockName( 'core/test-block-1' );
+			addRawContentBlockName( 'core/test-block-2' );
+			addRawContentBlockName( 'core/test-block-1' );
+			expect( isRawContentBlockName( 'core/test-block-1' ) ).toBe( true );
+			expect( isRawContentBlockName( 'core/test-block-2' ) ).toBe( true );
+			expect( isRawContentBlockName( 'core/test-block-3' ) ).toBe( false );
 		} );
 	} );
 

@@ -14,7 +14,7 @@ import { hasFilter, applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { getBlockType, getUnknownTypeHandlerName, hasBlockSupport } from './registration';
+import { getBlockType, getUnknownTypeHandlerName, isRawContentBlockName } from './registration';
 import BlockContentProvider from '../block-content-provider';
 
 /**
@@ -198,7 +198,7 @@ export function getBlockContent( block ) {
 
 	return (
 		getUnknownTypeHandlerName() === block.name ||
-		hasBlockSupport( blockType, 'rawContent' ) ||
+		isRawContentBlockName( block.name ) ||
 		! saveContent
 	) ? saveContent : getBeautifulContent( saveContent );
 }
