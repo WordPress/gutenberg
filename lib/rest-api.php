@@ -233,16 +233,37 @@ function gutenberg_add_permalink_template_to_posts( $response, $post, $request )
 }
 
 /**
+ * Add the block format version to post content in the post REST API response.
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the block_format.
+ */
+function gutenberg_add_block_format_to_post_content( $response, $post, $request ) {
+	if ( 'edit' !== $request['context'] ) {
+		return $response;
+	}
+
+	if ( isset( $response->data['content']['raw'] ) ) {
+		$response->data['content']['block_format'] = gutenberg_content_block_version( $response->data['content']['raw'] );
+	}
+
+	return $response;
+}
+
+/**
  * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
  *
  * @param string $post_type The newly registered post type.
  * @return string That same post type.
  */
-function gutenberg_register_permalink_template_function( $post_type ) {
+function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
 	return $post_type;
 }
-add_filter( 'registered_post_type', 'gutenberg_register_permalink_template_function' );
+add_filter( 'registered_post_type', 'gutenberg_register_post_prepare_functions' );
 
 /**
  * Includes the value for the 'viewable' attribute of a post type resource.
