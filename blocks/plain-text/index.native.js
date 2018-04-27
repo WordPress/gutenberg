@@ -11,7 +11,7 @@ import styles from './style.scss';
 function PlainText( { onChange, className, ...props } ) {
 	return (
 		<TextInput
-			className={ [ styles.blocks_plain_text, className ] }
+			className={ [ styles[ 'blocks-plain-text' ], className ] }
 			onChangeText={ ( text ) => onChange( text ) }
 			{ ...props }
 		/>
