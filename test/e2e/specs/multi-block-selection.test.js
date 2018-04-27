@@ -13,7 +13,7 @@ describe( 'Multi-block selection', () => {
 	it( 'Should select/unselect multiple blocks', async () => {
 		const firstBlockSelector = '[data-type="core/paragraph"]';
 		const secondBlockSelector = '[data-type="core/image"]';
-		const thirdBlockSelector = '[data-type="core/quote"]';
+		const thirdBlockSelector = '[data-type="core/list"]';
 		const multiSelectedCssClass = 'is-multi-selected';
 
 		// Creating test blocks
@@ -24,10 +24,10 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
-		await page.keyboard.type( 'Quote' );
+		await page.keyboard.type( 'List' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Quote Block' );
+		await page.keyboard.type( 'List Block' );
 
 		const blocks = [ firstBlockSelector, secondBlockSelector, thirdBlockSelector ];
 		const expectMultiSelected = ( selectors, areMultiSelected ) => {

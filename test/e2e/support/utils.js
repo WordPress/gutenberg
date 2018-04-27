@@ -58,3 +58,16 @@ export async function newDesktopBrowserPage() {
 	global.page = await browser.newPage();
 	await page.setViewport( { width: 1000, height: 700 } );
 }
+
+export async function switchToEditor( mode ) {
+	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	const [ button ] = await page.$x( `//button[contains(text(), \'${ mode } Editor\')]` );
+	await button.click( 'button' );
+}
+
+export async function getHTMLFromCodeEditor() {
+	await switchToEditor( 'Code' );
+	const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
+	await switchToEditor( 'Visual' );
+	return textEditorContent;
+}

@@ -21,29 +21,22 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 	}
 
 	// Show quick insertion icons faded until hover
-	.editor-inserter-with-shortcuts {
+	.editor-inserter-with-shortcuts,
+	.editor-inserter {
 		.components-icon-button {
 			color: $light-gray-700;
 			transition: color 0.2s;
 		}
 	}
 
-	// Don't show inserter until mousing
-	.editor-inserter {
-		opacity: 0;
-	}
-
 	&:hover {
-		.editor-inserter-with-shortcuts {
+		.editor-inserter-with-shortcuts,
+		.editor-inserter {
 			opacity: 1;
 
 			.components-icon-button {
 				color: $dark-gray-500;
 			}
-		}
-
-		.editor-inserter {
-			opacity: 1;
 		}
 	}
 
@@ -57,8 +50,8 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 .editor-block-list__empty-block-inserter,
 .editor-default-block-appender .editor-inserter {
 	position: absolute;
-		top: $item-spacing;
-		right: $item-spacing;	// show on the right on mobile
+	top: $item-spacing;
+	right: $item-spacing;	// show on the right on mobile
 	transition: opacity 0.2s;
 
 	@include break-small {

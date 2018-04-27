@@ -13,8 +13,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 import { userAutocompleter } from '../autocompleters';
 
-// Exported for unit test.
-export const defaultAutocompleters = [ userAutocompleter ];
+const defaultAutocompleters = [ userAutocompleter ];
 
 function setDefaultCompleters( completers ) {
 	if ( ! completers ) {
