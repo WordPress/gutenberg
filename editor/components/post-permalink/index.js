@@ -1,10 +1,15 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Component, compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Dashicon, ClipboardButton, Button, Tooltip } from '@wordpress/components';
+import { ClipboardButton, Button } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -21,7 +26,7 @@ class PostPermalink extends Component {
 		this.onVisibilityChange = this.onVisibilityChange.bind( this );
 
 		this.state = {
-			iconClass: '',
+			isCopied: false,
 			isEditingPermalink: false,
 		};
 	}
@@ -52,7 +57,7 @@ class PostPermalink extends Component {
 
 	render() {
 		const { isNew, previewLink, isEditable, samplePermalink, isPublished } = this.props;
-		const { iconClass, isEditingPermalink } = this.state;
+		const { isCopied, isEditingPermalink } = this.state;
 
 		if ( isNew || ! previewLink ) {
 			return null;
@@ -60,15 +65,12 @@ class PostPermalink extends Component {
 
 		return (
 			<div className="editor-post-permalink">
-				<Tooltip text={ __( 'Copy the permalink to your clipboard' ) }>
-					<ClipboardButton
-						className="editor-post-permalink__copy"
-						text={ samplePermalink }
-						onCopy={ () => this.setState( { iconClass: 'is-copied' } ) }
-					>
-						<Dashicon icon="admin-links" className={ iconClass } />
-					</ClipboardButton>
-				</Tooltip>
+				<ClipboardButton
+					className={ classnames( 'editor-post-permalink__copy', { 'is-copied': isCopied } ) }
+					text={ samplePermalink }
+					label={ __( 'Copy the permalink' ) }
+					onCopy={ () => this.setState( { isCopied: true } ) }
+				/>
 
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
@@ -132,4 +134,3 @@ export default compose( [
 		return { refreshPost };
 	} ),
 ] )( PostPermalink );
-
