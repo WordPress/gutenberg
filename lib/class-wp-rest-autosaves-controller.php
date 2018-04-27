@@ -26,7 +26,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	private $parent_post_type;
 
 	/**
-	 * Parent controller.
+	 * Parent post controller.
 	 *
 	 * @since 5.0.0
 	 * @var WP_REST_Controller
@@ -34,7 +34,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	private $parent_controller;
 
 	/**
-	 * Parent controller.
+	 * Revision controller.
 	 *
 	 * @since 5.0.0
 	 * @var WP_REST_Controller
