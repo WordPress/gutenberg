@@ -45,10 +45,7 @@ export const settings = {
 					text: {
 						type: 'string',
 						shortcode: ( attrs, { content } ) => {
-							return content.replace(
-								/<br \/>/g,
-								'\n'
-							);
+							return content;
 						},
 					},
 				},
