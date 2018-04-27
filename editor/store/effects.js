@@ -43,7 +43,6 @@ import {
 	removeBlock,
 	resetBlocks,
 	setTemplateValidity,
-	toggleAutosave,
 } from './actions';
 import {
 	getCurrentPost,
@@ -105,12 +104,9 @@ export default {
 		const isAutosave = action.options && action.options.autosave;
 
 		if ( isAutosave ) {
-			dispatch( toggleAutosave( true ) );
 			toSend.parent = post.id;
 			wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }/autosaves`, method: 'POST', data: toSend } ).then(
 				( autosave ) => {
-					dispatch( toggleAutosave( false ) );
-
 					dispatch( {
 						type: 'RESET_AUTOSAVE',
 						post: autosave,
@@ -124,7 +120,10 @@ export default {
 					} );
 				},
 				() => {
-					dispatch( toggleAutosave( false ) );
+					dispatch( {
+						type: 'RESET_AUTOSAVE',
+						post: post,
+					} );
 				} );
 		} else {
 			dispatch( {
