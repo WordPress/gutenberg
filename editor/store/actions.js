@@ -358,12 +358,24 @@ export function hideInlineInsertionPoint() {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that a RichText component is
+ * selected and available for inline insertion.
+ *
+ * @return {Object} Action object.
+ */
 export function setInlineInsertAvailable() {
 	return {
 		type: 'SET_INLINE_INSERT_AVAILABLE',
 	};
 }
 
+/**
+ * Returns an action object used in signalling that inline insertion is not
+ * available.
+ *
+ * @return {Object} Action object.
+ */
 export function setInlineInsertUnavailable() {
 	return {
 		type: 'SET_INLINE_INSERT_UNAVAILABLE',

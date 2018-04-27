@@ -26,6 +26,12 @@ import {
 	insertBlocks,
 	showInsertionPoint,
 	hideInsertionPoint,
+	insertInline,
+	completeInlineInsert,
+	showInlineInsertionPoint,
+	hideInlineInsertionPoint,
+	setInlineInsertAvailable,
+	setInlineInsertUnavailable,
 	editPost,
 	savePost,
 	trashPost,
@@ -225,6 +231,54 @@ describe( 'actions', () => {
 		it( 'should return the HIDE_INSERTION_POINT action', () => {
 			expect( hideInsertionPoint() ).toEqual( {
 				type: 'HIDE_INSERTION_POINT',
+			} );
+		} );
+	} );
+
+	describe( 'insertInline', () => {
+		it( 'should return the INSERT_INLINE action', () => {
+			expect( insertInline() ).toEqual( {
+				type: 'INSERT_INLINE',
+			} );
+		} );
+	} );
+
+	describe( 'completeInlineInsert', () => {
+		it( 'should return the INLINE_INSERT_COMPLETE action', () => {
+			expect( completeInlineInsert() ).toEqual( {
+				type: 'INLINE_INSERT_COMPLETE',
+			} );
+		} );
+	} );
+
+	describe( 'showInlineInsertionPoint', () => {
+		it( 'should return the SHOW_INLINE_INSERTION_POINT action', () => {
+			expect( showInlineInsertionPoint() ).toEqual( {
+				type: 'SHOW_INLINE_INSERTION_POINT',
+			} );
+		} );
+	} );
+
+	describe( 'hideInlineInsertionPoint', () => {
+		it( 'should return the HIDE_INLINE_INSERTION_POINT action', () => {
+			expect( hideInlineInsertionPoint() ).toEqual( {
+				type: 'HIDE_INLINE_INSERTION_POINT',
+			} );
+		} );
+	} );
+
+	describe( 'setInlineInsertAvailable', () => {
+		it( 'should return the SET_INLINE_INSERT_AVAILABLE action', () => {
+			expect( setInlineInsertAvailable() ).toEqual( {
+				type: 'SET_INLINE_INSERT_AVAILABLE',
+			} );
+		} );
+	} );
+
+	describe( 'setInlineInsertUnavailable', () => {
+		it( 'should return the SET_INLINE_INSERT_UNAVAILABLE action', () => {
+			expect( setInlineInsertUnavailable() ).toEqual( {
+				type: 'SET_INLINE_INSERT_UNAVAILABLE',
 			} );
 		} );
 	} );
