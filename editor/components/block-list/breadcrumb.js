@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { compose, Component } from '@wordpress/element';
-import { Dashicon, Tooltip, Toolbar, Button } from '@wordpress/components';
+import { IconButton, Tooltip, Toolbar } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -56,6 +56,7 @@ export class BlockBreadcrumb extends Component {
 	render( ) {
 		const { uid, rootUID, selectRootBlock, isHidden } = this.props;
 		const { isFocused } = this.state;
+		const selectParentLabel = __( 'Select parent block' );
 
 		return (
 			<NavigableToolbar className={ classnames( 'editor-block-list__breadcrumb', {
@@ -63,14 +64,14 @@ export class BlockBreadcrumb extends Component {
 			} ) }>
 				<Toolbar>
 					{ rootUID && (
-						<Tooltip text={ __( 'Select parent block' ) }>
-							<Button
+						<Tooltip text={ selectParentLabel }>
+							<IconButton
 								onClick={ selectRootBlock }
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }
-							>
-								<Dashicon icon="arrow-left-alt" uid={ uid } />
-							</Button>
+								label={ selectParentLabel }
+								icon="arrow-left-alt"
+							/>
 						</Tooltip>
 					) }
 					<BlockTitle uid={ uid } />
