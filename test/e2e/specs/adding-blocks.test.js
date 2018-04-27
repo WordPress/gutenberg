@@ -72,8 +72,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Quote block' );
 
 		// Using the regular inserter
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
 		await page.keyboard.type( 'code' );
 		await page.keyboard.press( 'Tab' );
