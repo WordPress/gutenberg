@@ -30,7 +30,7 @@
 
 	h2,
 	.wp-block-cover-image-text {
-		color: white;
+		color: $white;
 		font-size: 2em;
 		line-height: 1.25;
 		z-index: 1;
@@ -43,7 +43,7 @@
 		a:hover,
 		a:focus,
 		a:active {
-			color: white;
+			color: $white;
 		}
 	}
 
@@ -58,12 +58,12 @@
 		left: 0;
 		bottom: 0;
 		right: 0;
-		background-color: rgba( black, 0.5 );
+		background-color: rgba( $black, 0.5 );
 	}
 
 	@for $i from 1 through 10 {
 		&.has-background-dim.has-background-dim-#{ $i * 10 }:before {
-			background-color: rgba( black, $i * 0.1 );
+			background-color: rgba( $black, $i * 0.1 );
 		}
 	}
 
