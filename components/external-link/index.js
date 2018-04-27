@@ -3,12 +3,12 @@
  */
 import classnames from 'classnames';
 import { compact, uniq } from 'lodash';
-import { Component } from '../../element';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,11 +19,7 @@ import './style.scss';
 
 class ExternalLink extends Component {
 	getRel() {
-		const { rel = '', ...additionalProps } = this.props;
-
-		if ( rel === null || additionalProps.disabled ) {
-			return null;
-		}
+		const { rel = '' } = this.props;
 
 		return uniq( compact( [
 			...rel.split( ' ' ),
