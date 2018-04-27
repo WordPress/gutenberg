@@ -8,7 +8,37 @@ import tinymce from 'tinymce';
  * Browser dependencies
  */
 const { getComputedStyle, DOMRect } = window;
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
+const { TEXT_NODE, ELEMENT_NODE, DOCUMENT_POSITION_PRECEDING } = window.Node;
+
+/**
+ * Returns true if the given selection object is in the forward direction, or
+ * false otherwise.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
+ *
+ * @param {Selection} selection Selection object to check.
+ *
+ * @return {boolean} Whether the selection is forward.
+ */
+function isSelectionForward( selection ) {
+	const {
+		anchorNode,
+		focusNode,
+		anchorOffset,
+		focusOffset,
+	} = selection;
+
+	const position = anchorNode.compareDocumentPosition( focusNode );
+
+	return (
+		// Compare whether anchor node precedes focus node.
+		position !== DOCUMENT_POSITION_PRECEDING &&
+
+		// `compareDocumentPosition` returns 0 when passed the same node, in
+		// which case compare offsets.
+		! ( position === 0 && anchorOffset > focusOffset )
+	);
+}
 
 /**
  * Check whether the caret is horizontally at the edge of the container.
@@ -45,7 +75,9 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 	if ( collapseRanges ) {
 		range = range.cloneRange();
-		range.collapse( isReverse );
+
+		// Collapse to the extent of the selection by direction.
+		range.collapse( ! isSelectionForward( selection ) );
 	}
 
 	if ( ! range || ! range.collapsed ) {
