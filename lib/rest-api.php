@@ -247,8 +247,10 @@ function gutenberg_add_block_format_to_post_content( $response, $post, $request 
 		return $response;
 	}
 
-	if ( isset( $response->data['content']['raw'] ) ) {
-		$response->data['content']['block_format'] = gutenberg_content_block_version( $response->data['content']['raw'] );
+	$response_data = $response->get_data();
+	if ( isset( $response_data['content']['raw'] ) ) {
+		$response_data['content']['block_format'] = gutenberg_content_block_version( $response_data['content']['raw'] );
+		$response->set_data( $response_data );
 	}
 
 	return $response;
