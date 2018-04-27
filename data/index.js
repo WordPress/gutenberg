@@ -128,7 +128,7 @@ export function registerSelectors( reducerKey, newSelectors ) {
 			cacheByState.set( state, cache );
 		}
 
-		const key = { [ selectorName ]: args };
+		const key = [ selectorName, args ];
 		if ( ! cache.has( key ) ) {
 			cache.set( key, selector( state, ...args ) );
 		}
