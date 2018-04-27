@@ -6,10 +6,7 @@ import {
 	every,
 	get,
 	reduce,
-	// castArray,
-	// findIndex,
 	includes,
-	// isObjectLike,
 	filter,
 	find,
 	first,
@@ -21,7 +18,6 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-// import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -167,96 +163,6 @@ export function getPossibleBlockTransformations( blocks ) {
 		return result;
 	}, [] );
 }
-
-// /**
-//  * Switch one or more blocks into one or more blocks of the new block type.
-//  *
-//  * @param {Array|Object} blocks Blocks array or block object.
-//  * @param {string}       name   Block name.
-//  *
-//  * @return {Array} Array of blocks.
-//  */
-// export function switchToBlockType( blocks, name ) {
-// 	const blocksArray = castArray( blocks );
-// 	const isMultiBlock = blocksArray.length > 1;
-// 	const firstBlock = blocksArray[ 0 ];
-// 	const sourceName = firstBlock.name;
-
-// 	if ( isMultiBlock && ! every( blocksArray, ( block ) => ( block.name === sourceName ) ) ) {
-// 		return null;
-// 	}
-
-// 	// Find the right transformation by giving priority to the "to"
-// 	// transformation.
-// 	const destinationType = getBlockType( name );
-// 	const sourceType = getBlockType( sourceName );
-// 	const transformationsFrom = get( destinationType, 'transforms.from', [] );
-// 	const transformationsTo = get( sourceType, 'transforms.to', [] );
-// 	const transformation =
-// 		find(
-// 			transformationsTo,
-// 			t => t.type === 'block' && t.blocks.indexOf( name ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
-// 		) ||
-// 		find(
-// 			transformationsFrom,
-// 			t => t.type === 'block' && t.blocks.indexOf( sourceName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
-// 		);
-
-// 	// Stop if there is no valid transformation. (How did we get here?)
-// 	if ( ! transformation ) {
-// 		return null;
-// 	}
-
-// 	let transformationResults;
-// 	if ( transformation.isMultiBlock ) {
-// 		transformationResults = transformation.transform( blocksArray.map( ( currentBlock ) => currentBlock.attributes ) );
-// 	} else {
-// 		transformationResults = transformation.transform( firstBlock.attributes );
-// 	}
-
-// 	// Ensure that the transformation function returned an object or an array
-// 	// of objects.
-// 	if ( ! isObjectLike( transformationResults ) ) {
-// 		return null;
-// 	}
-
-// 	// If the transformation function returned a single object, we want to work
-// 	// with an array instead.
-// 	transformationResults = castArray( transformationResults );
-
-// 	// Ensure that every block object returned by the transformation has a
-// 	// valid block type.
-// 	if ( transformationResults.some( ( result ) => ! getBlockType( result.name ) ) ) {
-// 		return null;
-// 	}
-
-// 	const firstSwitchedBlock = findIndex( transformationResults, ( result ) => result.name === name );
-
-// 	// Ensure that at least one block object returned by the transformation has
-// 	// the expected "destination" block type.
-// 	if ( firstSwitchedBlock < 0 ) {
-// 		return null;
-// 	}
-
-// 	return transformationResults.map( ( result, index ) => {
-// 		const transformedBlock = {
-// 			...result,
-// 			// The first transformed block whose type matches the "destination"
-// 			// type gets to keep the existing UID of the first block.
-// 			uid: index === firstSwitchedBlock ? firstBlock.uid : result.uid,
-// 		};
-
-// 		/**
-// 		 * Filters an individual transform result from block transformation.
-// 		 * All of the original blocks are passed, since transformations are
-// 		 * many-to-many, not one-to-one.
-// 		 *
-// 		 * @param {Object}   transformedBlock The transformed block.
-// 		 * @param {Object[]} blocks           Original blocks transformed.
-// 		 */
-// 		return applyFilters( 'blocks.switchToBlockType.transformedBlock', transformedBlock, blocks );
-// 	} );
-// }
 
 /**
  * Creates a new reusable block.
