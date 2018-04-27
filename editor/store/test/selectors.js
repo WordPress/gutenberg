@@ -67,6 +67,9 @@ const {
 	isTyping,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
+	isInlineInsertionPointVisible,
+	isInlineInsertAvailable,
+	getInlineBlockForInsert,
 	isSavingPost,
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
@@ -2415,6 +2418,51 @@ describe( 'selectors', () => {
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInlineInsertionPointVisible', () => {
+		it( 'should return the value in state', () => {
+			const state = {
+				isInlineInsertionPointVisible: true,
+			};
+
+			expect( isInlineInsertionPointVisible( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInlineInsertAvailable', () => {
+		it( 'should return the value in state', () => {
+			const state = {
+				isInlineInsertAvailable: true,
+			};
+
+			expect( isInlineInsertAvailable( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'getInlineBlockForInsert', () => {
+		it( 'should return null when not inserting an inline block', () => {
+			const state = {
+				inlineBlockForInsert: null,
+			};
+
+			expect( getInlineBlockForInsert( state ) ).toBe( null );
+		} );
+
+		it( 'should return inline block object when ready for insert', () => {
+			const inlineBlock = {
+				type: 'image',
+				url: 'http://localhost:8888/wp-content/uploads/2018/04/example.jpg',
+				alt: 'example',
+				width: 400,
+				height: 300,
+			};
+			const state = {
+				inlineBlockForInsert: inlineBlock,
+			};
+
+			expect( getInlineBlockForInsert( state ) ).toBe( inlineBlock );
 		} );
 	} );
 

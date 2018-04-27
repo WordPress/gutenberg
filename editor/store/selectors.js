@@ -1068,12 +1068,20 @@ export function isInlineInsertionPointVisible( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} Inline Block object with `type` and properties for the `type`.
+ * @return {Object} Inline Block object with `type` and properties for the `type`,
+ *			or null when not ready for insert.
  */
 export function getInlineBlockForInsert( state ) {
 	return state.inlineBlockForInsert;
 }
 
+/**
+ * Returns whether a RichText component is selected and available for inline
+ * insertion.
+ *
+ * @param {boolean} state
+ * @return {boolean} Whether inline insert is available.
+ */
 export function isInlineInsertAvailable( state ) {
 	return state.isInlineInsertAvailable;
 }
