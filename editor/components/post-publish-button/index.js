@@ -76,6 +76,7 @@ export default compose( [
 			isEditedPostSaveable,
 			isEditedPostPublishable,
 			getCurrentPostType,
+			isAutosavingPost,
 		} = select( 'core/editor' );
 		return {
 			isSaving: forceIsSaving || isSavingPost(),
@@ -84,6 +85,7 @@ export default compose( [
 			isSaveable: isEditedPostSaveable(),
 			isPublishable: forceIsDirty || isEditedPostPublishable(),
 			postType: getCurrentPostType(),
+			isAutosaving: isAutosavingPost(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
