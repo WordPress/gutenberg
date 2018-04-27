@@ -97,7 +97,7 @@ function isInlineForTag( nodeName, tagName ) {
 	if ( ! tagName || ! nodeName ) {
 		return false;
 	}
-	return inlineWhitelistTagGroups.some( tagGroup =>
+	return inlineWhitelistTagGroups.some( ( tagGroup ) =>
 		includes( tagGroup, nodeName ) && includes( tagGroup, tagName )
 	);
 }

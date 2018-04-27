@@ -69,7 +69,7 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	findTerm( terms, parent, name ) {
-		return find( terms, term => {
+		return find( terms, ( term ) => {
 			return ( ( ! term.parent && ! parent ) || parseInt( term.parent ) === parseInt( parent ) ) &&
 				term.name.toLowerCase() === name.toLowerCase();
 		} );
@@ -87,7 +87,7 @@ class HierarchicalTermSelector extends Component {
 		const existingTerm = this.findTerm( availableTerms, formParent, formName );
 		if ( existingTerm ) {
 			// if the term we are adding exists but is not selected select it
-			if ( ! some( terms, term => term === existingTerm.id ) ) {
+			if ( ! some( terms, ( term ) => term === existingTerm.id ) ) {
 				onUpdateTerms( [ ...terms, existingTerm.id ], restBase );
 			}
 			this.setState( {
@@ -119,7 +119,7 @@ class HierarchicalTermSelector extends Component {
 						this.addRequest = wp.apiRequest( {
 							path: `/wp/v2/${ basePath }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
 						} );
-						return this.addRequest.then( searchResult => {
+						return this.addRequest.then( ( searchResult ) => {
 							resolve( this.findTerm( searchResult, formParent, formName ) );
 						}, reject );
 					}

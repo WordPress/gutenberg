@@ -24,7 +24,7 @@ export function ColorPalette( { colors, disableCustomColors = false, value, onCh
 
 	return (
 		<div className="blocks-color-palette">
-			{ map( colors, ( color ) => {
+			{ map( colors, ( { color } ) => {
 				const style = { color: color };
 				const className = classnames( 'blocks-color-palette__item', { 'is-active': value === color } );
 

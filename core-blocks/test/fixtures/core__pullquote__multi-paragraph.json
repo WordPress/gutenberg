@@ -1,0 +1,46 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/pullquote",
+        "isValid": true,
+        "attributes": {
+            "citation": [
+                "by whomever"
+            ],
+            "align": "none"
+        },
+        "innerBlocks": [
+            {
+                "uid": "_uid_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": [
+                        "Paragraph ",
+                        {
+                            "type": "strong",
+                            "children": "one"
+                        }
+                    ],
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p>Paragraph <strong>one</strong></p>"
+            },
+            {
+                "uid": "_uid_1",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": [
+                        "Paragraph two"
+                    ],
+                    "dropCap": false
+                },
+                "innerBlocks": [],
+                "originalContent": "<p>Paragraph two</p>"
+            }
+        ],
+        "originalContent": "<blockquote class=\"wp-block-pullquote alignnone\">\n\t\n    \n    <cite>by whomever</cite>\n</blockquote>"
+    }
+]
