@@ -2,7 +2,7 @@ This component is used to implement dang sweet buttons.
 
 #### Props
 
-The following props are used to control the display of the component. Any additional props will be passed to the rendered `<a />` or `<button />` element. The presence of a `href` prop determines whether an anchor element is rendered instead of a button.
+The component accepts the following props. Any additional props will be passed to the rendered `<a />` or `<button />` element. The presence of a `href` prop determines whether an anchor element is rendered instead of a button.
 
 * `isPrimary`: (bool) whether the button is styled as a primary button.
 * `isLarge`: (bool) whether the button is styled as a large button.

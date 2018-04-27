@@ -56,14 +56,22 @@ class ExternalLink extends Component {
 			...additionalProps
 		} = this.props;
 
-		const { isDisabled, isPrimary, isLarge, isSmall } = additionalProps;
+		const { disabled, isPrimary, isLarge, isSmall } = additionalProps;
 		const targetToUse = target || '_blank';
+		const isDisabled = disabled || ! href;
 		const classes = classnames( 'components-external-link', className, {
 			'components-icon-button': icon && ( isPrimary || isLarge || isSmall ),
 		} );
 
 		return (
-			<Button { ...additionalProps } className={ classes } href={ href } target={ targetToUse } rel={ this.getRel() }>
+			<Button
+				{ ...additionalProps }
+				href={ href }
+				target={ targetToUse }
+				rel={ this.getRel() }
+				disabled={ isDisabled }
+				className={ classes }
+			>
 				{ children }
 				{ ! isDisabled && this.renderOpensInNewTabText() }
 				{ icon && <Dashicon icon="external" /> }
