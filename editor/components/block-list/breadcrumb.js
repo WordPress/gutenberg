@@ -6,15 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { compose, Component } from '@wordpress/element';
-import { IconButton, Toolbar } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
+import { Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import BlockSelectParent from '../block-select-parent';
 
 /**
  * Block breadcrumb component, displaying the label of the block. If the block
@@ -25,7 +24,7 @@ import BlockTitle from '../block-title';
  * @param {string}   props.rootUID         UID of block's root.
  * @param {Function} props.selectRootBlock Callback to select root block.
  */
-export class BlockBreadcrumb extends Component {
+export default class BlockBreadcrumb extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
@@ -35,15 +34,10 @@ export class BlockBreadcrumb extends Component {
 		this.onBlur = this.onBlur.bind( this );
 	}
 
-	onFocus( event ) {
+	onFocus( ) {
 		this.setState( {
 			isFocused: true,
 		} );
-
-		// This is used for improved interoperability
-		// with the block's `onFocus` handler which selects the block, thus conflicting
-		// with the intention to select the root block.
-		event.stopPropagation();
 	}
 
 	onBlur() {
@@ -53,7 +47,7 @@ export class BlockBreadcrumb extends Component {
 	}
 
 	render( ) {
-		const { uid, rootUID, selectRootBlock, isHidden } = this.props;
+		const { uid, isHidden } = this.props;
 		const { isFocused } = this.state;
 
 		return (
@@ -61,37 +55,14 @@ export class BlockBreadcrumb extends Component {
 				'is-visible': ! isHidden || isFocused,
 			} ) }>
 				<Toolbar>
-					{ rootUID && (
-						<IconButton
-							onClick={ selectRootBlock }
-							onFocus={ this.onFocus }
-							onBlur={ this.onBlur }
-							label={ __( 'Select parent block' ) }
-							icon="arrow-left-alt"
-						/>
-					) }
+					<BlockSelectParent
+						uid={ uid }
+						onFocus={ this.onFocus }
+						onBlur={ this.onBlur }
+					/>
 					<BlockTitle uid={ uid } />
 				</Toolbar>
 			</div>
 		);
 	}
 }
-
-export default compose( [
-	withSelect( ( select, ownProps ) => {
-		const { getBlockRootUID } = select( 'core/editor' );
-		const { uid } = ownProps;
-
-		return {
-			rootUID: getBlockRootUID( uid ),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const { rootUID } = ownProps;
-		const { selectBlock } = dispatch( 'core/editor' );
-
-		return {
-			selectRootBlock: () => selectBlock( rootUID ),
-		};
-	} ),
-] )( BlockBreadcrumb );
