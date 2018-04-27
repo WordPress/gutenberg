@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withInstanceId, Dashicon } from '@wordpress/components';
 import { PlainText } from '@wordpress/blocks';
@@ -45,7 +44,7 @@ export const settings = {
 					text: {
 						type: 'string',
 						shortcode: ( attrs, { content } ) => {
-							return content;
+							return content.replace( /<br \/>/g, '' );
 						},
 					},
 				},
@@ -58,6 +57,7 @@ export const settings = {
 		customClassName: false,
 		className: false,
 		html: false,
+		rawContent: true,
 	},
 
 	edit: withInstanceId(
@@ -83,6 +83,6 @@ export const settings = {
 	),
 
 	save( { attributes } ) {
-		return <RawHTML>{ attributes.text }</RawHTML>;
+		return attributes.text;
 	},
 };
