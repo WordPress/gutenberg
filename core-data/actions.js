@@ -68,16 +68,20 @@ export function receiveMedia( media ) {
 }
 
 /**
- * Returns an action object used in signalling that post types have been received.
+ * Returns an action object used in signalling that model records have been received.
  *
- * @param {Array|Object} postTypes Post Types received.
+ * @param {string}       kind    Kind of the received model.
+ * @param {string}       name    Name of the received model.
+ * @param {Array|Object} records Recordds received.
  *
  * @return {Object} Action object.
  */
-export function receivePostTypes( postTypes ) {
+export function receiveModelRecords( kind, name, records ) {
 	return {
-		type: 'RECEIVE_POST_TYPES',
-		postTypes: castArray( postTypes ),
+		type: 'RECEIVE_MODEL_RECORDS',
+		records: castArray( records ),
+		kind,
+		name,
 	};
 }
 

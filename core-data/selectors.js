@@ -91,13 +91,15 @@ export function getUserQueryResults( state, queryID ) {
 /**
  * Returns the Post Type object by slug.
  *
- * @param {Object} state Data state.
- * @param {number} slug  Post Type slug.
+ * @param {Object} state       State tree
+ * @param {string} kind        Model kind.
+ * @param {string} name        Model name.
+ * @param {number} primaryKey  Record's Primary key
  *
- * @return {Object?}     Post Type object.
+ * @return {Object?} Record.
  */
-export function getPostType( state, slug ) {
-	return state.postTypes[ slug ];
+export function getModelRecord( state, kind, name, primaryKey ) {
+	return state.models[ kind ][ name ].byPK[ primaryKey ];
 }
 
 /**
