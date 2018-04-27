@@ -810,6 +810,15 @@ export function inlineBlockForInsert( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning a boolean indicating whether a RichText component is
+ * selected and available for inline block insertion.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
 export function isInlineInsertAvailable( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_INLINE_INSERT_AVAILABLE':

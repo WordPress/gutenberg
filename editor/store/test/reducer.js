@@ -33,6 +33,9 @@ import {
 	provisionalBlockUID,
 	blocksMode,
 	isInsertionPointVisible,
+	isInlineInsertionPointVisible,
+	isInlineInsertAvailable,
+	inlineBlockForInsert,
 	sharedBlocks,
 	template,
 	blockListSettings,
@@ -1295,6 +1298,87 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'isInlineInsertionPointVisible', () => {
+		it( 'should default to false', () => {
+			const state = isInlineInsertionPointVisible( undefined, {} );
+
+			expect( state ).toBe( false );
+		} );
+
+		it( 'should set inline insertion point visible', () => {
+			const state = isInlineInsertionPointVisible( false, {
+				type: 'SHOW_INLINE_INSERTION_POINT',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should clear the inline insertion point', () => {
+			const state = isInlineInsertionPointVisible( true, {
+				type: 'HIDE_INLINE_INSERTION_POINT',
+			} );
+
+			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'isInlineInsertAvailable', () => {
+		it( 'should default to false', () => {
+			const state = isInlineInsertAvailable( undefined, {} );
+
+			expect( state ).toBe( false );
+		} );
+
+		it( 'should set inline insert available', () => {
+			const state = isInlineInsertAvailable( false, {
+				type: 'SET_INLINE_INSERT_AVAILABLE',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set inline insert unavailable', () => {
+			const state = isInlineInsertAvailable( true, {
+				type: 'SET_INLINE_INSERT_UNAVAILABLE',
+			} );
+
+			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'inlineBlockForInsert', () => {
+		const inlineBlock = {
+			type: 'image',
+			url: 'http://localhost:8888/wp-content/uploads/2018/04/example.jpg',
+			alt: 'example',
+			width: 400,
+			height: 300,
+		};
+
+		it( 'should default to null', () => {
+			const state = inlineBlockForInsert( undefined, {} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'should insert inline block object', () => {
+			const state = inlineBlockForInsert( null, {
+				type: 'INSERT_INLINE',
+				inlineBlock,
+			} );
+
+			expect( state ).toBe( inlineBlock );
+		} );
+
+		it( 'should be null after insert complete', () => {
+			const state = inlineBlockForInsert( inlineBlock, {
+				type: 'INLINE_INSERT_COMPLETE',
+			} );
+
+			expect( state ).toBe( null );
 		} );
 	} );
 
