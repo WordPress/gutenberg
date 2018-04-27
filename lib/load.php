@@ -13,7 +13,9 @@ require dirname( __FILE__ ) . '/meta-box-partial-page.php';
 require dirname( __FILE__ ) . '/class-wp-block-type.php';
 require dirname( __FILE__ ) . '/class-wp-block-type-registry.php';
 require dirname( __FILE__ ) . '/class-wp-rest-blocks-controller.php';
-require dirname( __FILE__ ) . '/class-gb-rest-autosaves-controller.php';
+if ( ! class_exists( 'WP_REST_Autosaves_Controller' ) ) {
+	require dirname( __FILE__ ) . '/class-wp-rest-autosaves-controller.php';
+}
 require dirname( __FILE__ ) . '/blocks.php';
 require dirname( __FILE__ ) . '/client-assets.php';
 require dirname( __FILE__ ) . '/compat.php';

@@ -1,6 +1,7 @@
+
 <?php
 /**
- * REST API: GB_REST_Autosaves_Controller class.
+ * REST API: WP_REST_Autosaves_Controller class.
  *
  * @package WordPress
  * @subpackage REST_API
@@ -14,7 +15,7 @@
  *
  * @see WP_REST_Controller
  */
-class GB_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
+class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 
 	/**
 	 * Parent post type.
