@@ -568,7 +568,7 @@ export default {
 		const sharedBlock = {
 			id: uniqueId( 'shared' ),
 			uid: parsedBlock.uid,
-			title: __( 'Untitled block' ),
+			title: __( 'Untitled shared block' ),
 		};
 
 		dispatch( receiveSharedBlocks( [ {

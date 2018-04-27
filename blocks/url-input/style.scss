@@ -2,7 +2,8 @@
 $input-padding: 10px;
 $input-size: 230px;
 
-.editor-block-list__block .blocks-url-input {
+.editor-block-list__block .blocks-url-input,
+.editor-block-toolbar .blocks-url-input {
 	width: 100%;
 	flex-grow: 1;
 	position: relative;

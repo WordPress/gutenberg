@@ -8,11 +8,11 @@ import deepFreeze from 'deep-freeze';
  * WordPress dependencies
  */
 import {
-	registerCoreBlocks,
 	registerBlockType,
 	unregisterBlockType,
 	createBlock,
 } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/core-blocks';
 
 /**
  * Internal dependencies

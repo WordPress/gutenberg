@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Component, findDOMNode, createHigherOrderComponent } from '@wordpress/element';
+import { withEditorSettings } from '@wordpress/blocks';
 
 const withHoverAreas = createHigherOrderComponent( ( WrappedComponent ) => {
 	class WithHoverAreasComponent extends Component {
@@ -34,13 +35,14 @@ const withHoverAreas = createHigherOrderComponent( ( WrappedComponent ) => {
 		}
 
 		onMouseMove( event ) {
+			const { isRTL } = this.props;
 			const { width, left, right } = this.container.getBoundingClientRect();
 
 			let hoverArea = null;
 			if ( ( event.clientX - left ) < width / 3 ) {
-				hoverArea = 'left';
+				hoverArea = isRTL ? 'right' : 'left';
 			} else if ( ( right - event.clientX ) < width / 3 ) {
-				hoverArea = 'right';
+				hoverArea = isRTL ? 'left' : 'right';
 			}
 
 			if ( hoverArea !== this.state.hoverArea ) {
@@ -56,7 +58,11 @@ const withHoverAreas = createHigherOrderComponent( ( WrappedComponent ) => {
 		}
 	}
 
-	return WithHoverAreasComponent;
+	return withEditorSettings( ( { isRTL } ) => {
+		return {
+			isRTL,
+		};
+	} )( WithHoverAreasComponent );
 } );
 
 export default withHoverAreas;

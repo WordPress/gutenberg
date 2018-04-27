@@ -69,3 +69,14 @@ export function getMedia( state, id ) {
 export function getPostType( state, slug ) {
 	return state.postTypes[ slug ];
 }
+
+/**
+ * Return theme suports data in the index.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {*}           Index data.
+ */
+export function getThemeSupports( state ) {
+	return state.themeSupports;
+}
