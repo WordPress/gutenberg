@@ -235,6 +235,8 @@ function gutenberg_add_permalink_template_to_posts( $response, $post, $request )
 /**
  * Add the block format version to post content in the post REST API response.
  *
+ * @todo This will need to be registered to the schema too.
+ *
  * @param WP_REST_Response $response WP REST API response of a post.
  * @param WP_Post          $post The post being returned.
  * @param WP_REST_Request  $request WP REST API request.
