@@ -116,7 +116,26 @@ export { combineReducers };
  */
 export function registerSelectors( reducerKey, newSelectors ) {
 	const store = stores[ reducerKey ];
-	const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
+
+	const cacheByState = new WeakMap();
+
+	const createStateSelector = ( selector, selectorName ) => ( ...args ) => {
+		const state = store.getState();
+
+		let cache = cacheByState.get( state );
+		if ( ! cache ) {
+			cache = new EquivalentKeyMap();
+			cacheByState.set( state, cache );
+		}
+
+		const key = { [ selectorName ]: args };
+		if ( ! cache.has( key ) ) {
+			cache.set( key, selector( state, ...args ) );
+		}
+
+		return cache.get( key );
+	};
+
 	selectors[ reducerKey ] = mapValues( newSelectors, createStateSelector );
 }
 
