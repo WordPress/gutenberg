@@ -39,7 +39,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 * @since 5.0.0
 	 * @var WP_REST_Controller
 	 */
-	private $revision_controller;
+	private $revisions_controller;
 
 	/**
 	 * The base of the parent controller's route.
@@ -59,7 +59,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	public function __construct( $parent_post_type ) {
 		$this->parent_post_type    = $parent_post_type;
 		$this->parent_controller   = new WP_REST_Posts_Controller( $parent_post_type );
-		$this->revision_controller = new WP_REST_Revisions_Controller( $parent_post_type );
+		$this->revisions_controller = new WP_REST_Revisions_Controller( $parent_post_type );
 		$this->rest_namespace      = 'wp/v2';
 		$this->rest_base           = 'autosaves';
 		$post_type_object          = get_post_type_object( $parent_post_type );
@@ -85,7 +85,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
-					'permission_callback' => array( $this->revision_controller, 'get_items_permissions_check' ),
+					'permission_callback' => array( $this->revisions_controller, 'get_items_permissions_check' ),
 					'args'                => $this->get_collection_params(),
 				),
 				array(
@@ -113,7 +113,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 				array(
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this->revision_controller, 'get_item_permissions_check' ),
+					'permission_callback' => array( $this->revisions_controller, 'get_item_permissions_check' ),
 					'args'                => array(
 						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 					),
@@ -133,7 +133,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 * @return WP_Post|WP_Error Post object if ID is valid, WP_Error otherwise.
 	 */
 	protected function get_parent( $parent_id ) {
-		return $this->revision_controller->get_parent( $parent_id );
+		return $this->revisions_controller->get_parent( $parent_id );
 	}
 
 	/**
@@ -266,7 +266,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 * @return array Item schema data.
 	 */
 	public function get_item_schema() {
-		return $this->revision_controller->get_item_schema();
+		return $this->revisions_controller->get_item_schema();
 	}
 
 	/**
@@ -338,7 +338,7 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 	 */
 	public function prepare_item_for_response( $post, $request ) {
 
-		$response = $this->revision_controller->prepare_item_for_response( $post, $request );
+		$response = $this->revisions_controller->prepare_item_for_response( $post, $request );
 
 		/**
 		 * Filters a revision returned from the API.
