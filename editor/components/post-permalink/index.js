@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Component, compose } from '@wordpress/element';
+import { Component, compose, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ClipboardButton, Button, OpensInNewTabMessage } from '@wordpress/components';
 
@@ -24,6 +24,7 @@ class PostPermalink extends Component {
 
 		this.addVisibilityCheck = this.addVisibilityCheck.bind( this );
 		this.onVisibilityChange = this.onVisibilityChange.bind( this );
+		this.permalinkEditButton = createRef();
 
 		this.state = {
 			isCopied: false,
@@ -47,7 +48,7 @@ class PostPermalink extends Component {
 	componentDidUpdate( prevProps, prevState ) {
 		// If we've just stopped editing the permalink, focus on the new permalink.
 		if ( prevState.isEditingPermalink && ! this.state.isEditingPermalink ) {
-			this.permalinkButton.focus();
+			this.permalinkEditButton.current.focus();
 		}
 	}
 
@@ -82,7 +83,6 @@ class PostPermalink extends Component {
 						className="editor-post-permalink__link"
 						href={ ! isPublished ? previewLink : samplePermalink }
 						icon={ null }
-						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
 					>
 						{ decodeURI( samplePermalink ) }
 						&lrm;
@@ -100,6 +100,7 @@ class PostPermalink extends Component {
 						className="editor-post-permalink__edit"
 						isLarge
 						onClick={ () => this.setState( { isEditingPermalink: true } ) }
+						ref={ this.permalinkEditButton }
 					>
 						{ __( 'Edit' ) }
 					</Button>
