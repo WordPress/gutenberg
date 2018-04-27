@@ -21,12 +21,29 @@ class ExternalLink extends Component {
 	getRel() {
 		const { rel = '' } = this.props;
 
-		return uniq( compact( [
+		// Allow to omit the `rel` attribute passing a `null` value.
+		return rel === null ? rel : uniq( compact( [
 			...rel.split( ' ' ),
 			'external',
 			'noreferrer',
 			'noopener',
 		] ) ).join( ' ' );
+	}
+
+	renderOpensInNewTabText() {
+		const { opensInNewTabText = __(
+			/* translators: accessibility text */
+			'(opens in a new tab)'
+		) } = this.props;
+
+		return (
+			<span className="screen-reader-text">
+				{
+					// We need a space to separate this from previous text.
+					' ' + opensInNewTabText
+				}
+			</span>
+		);
 	}
 
 	render() {
@@ -39,27 +56,16 @@ class ExternalLink extends Component {
 			...additionalProps
 		} = this.props;
 
-		const isDisabled = additionalProps.disabled;
-
-		const classes = classnames( 'components-external-link', className, {
-			'components-icon-button': icon && (
-				additionalProps.isPrimary || additionalProps.isLarge || additionalProps.isSmall
-			),
-		} );
-
+		const { isDisabled, isPrimary, isLarge, isSmall } = additionalProps;
 		const targetToUse = target || '_blank';
+		const classes = classnames( 'components-external-link', className, {
+			'components-icon-button': icon && ( isPrimary || isLarge || isSmall ),
+		} );
 
 		return (
 			<Button { ...additionalProps } className={ classes } href={ href } target={ targetToUse } rel={ this.getRel() }>
 				{ children }
-				{ ! isDisabled && <span className="screen-reader-text">
-					{
-						// We need a space to separate this from previous text.
-						' ' +
-						/* translators: accessibility text */
-						__( '(opens in a new tab)' )
-					}
-				</span> }
+				{ ! isDisabled && this.renderOpensInNewTabText() }
 				{ icon && <Dashicon icon="external" /> }
 			</Button>
 		);
