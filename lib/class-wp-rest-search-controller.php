@@ -709,7 +709,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 				'enum' => array_merge( array_keys( $this->get_allowed_post_types() ), array( 'any' ) ),
 				'type' => 'string',
 			),
-			'sanitize_callback' => 'wp_parse_slug_list',
 		);
 
 		return $query_params;
