@@ -719,10 +719,14 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	 */
 	protected function get_allowed_post_stati() {
 
-		return get_post_stati( array(
+		$post_stati = get_post_stati( array(
 			'public'   => true,
 			'internal' => false,
 		) );
+
+		$post_stati['inherit'] = get_post_status_object( 'inherit' );
+
+		return $post_stati;
 	}
 
 	/**
