@@ -169,6 +169,10 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		$posts = array();
 
 		foreach ( $query_result as $post ) {
+			if ( ! $this->check_read_permission( $post ) ) {
+				continue;
+			}
+
 			$data    = $this->prepare_item_for_response( $post, $request );
 			$posts[] = $this->prepare_response_for_collection( $data );
 		}
@@ -222,6 +226,42 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Checks if a post can be read.
+	 *
+	 * Correctly handles posts with the inherit status.
+	 *
+	 * @since 2.9.0
+	 *
+	 * @param object $post Post object.
+	 * @return bool Whether the post can be read.
+	 */
+	public function check_read_permission( $post ) {
+
+		// Is the post readable?
+		if ( 'publish' === $post->post_status || current_user_can( $post_type->cap->read_post, $post->ID ) ) {
+			return true;
+		}
+
+		// Can we read the parent if we're inheriting?
+		if ( 'inherit' === $post->post_status && $post->post_parent > 0 ) {
+			$parent = get_post( $post->post_parent );
+			if ( $parent ) {
+				return $this->check_read_permission( $parent );
+			}
+		}
+
+		/*
+		 * If there isn't a parent, but the status is set to inherit, assume
+		 * it's published (as per get_post_status()).
+		 */
+		if ( 'inherit' === $post->post_status ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
