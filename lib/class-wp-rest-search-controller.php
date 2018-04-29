@@ -347,38 +347,65 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		}
 
 		if ( ! empty( $schema['properties']['title'] ) ) {
-			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
+			if ( post_type_supports( $post->post_type, 'title' ) ) {
+				add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 
-			$data['title'] = array(
-				'raw'      => $post->post_title,
-				'rendered' => get_the_title( $post->ID ),
-			);
+				$data['title'] = array(
+					'raw'      => $post->post_title,
+					'rendered' => get_the_title( $post->ID ),
+				);
 
-			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
+				remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
+			} else {
+				$data['title'] = array(
+					'raw'      => '',
+					'rendered' => '',
+				);
+			}
 		}
 
 		if ( ! empty( $schema['properties']['content'] ) ) {
-			/** This filter is documented in wp-includes/post-template.php */
-			$content         = apply_filters( 'the_content', $post->post_content );
-			$data['content'] = array(
-				'raw'       => $post->post_content,
-				'rendered'  => post_password_required( $post ) ? '' : $content,
-				'protected' => (bool) $post->post_password,
-			);
+			if ( post_type_supports( $post->post_type, 'editor' ) ) {
+				/** This filter is documented in wp-includes/post-template.php */
+				$content         = apply_filters( 'the_content', $post->post_content );
+				$data['content'] = array(
+					'raw'       => $post->post_content,
+					'rendered'  => post_password_required( $post ) ? '' : $content,
+					'protected' => (bool) $post->post_password,
+				);
+			} else {
+				$data['content'] = array(
+					'raw'       => '',
+					'rendered'  => '',
+					'protected' => false,
+				);
+			}
 		}
 
 		if ( ! empty( $schema['properties']['excerpt'] ) ) {
-			/** This filter is documented in wp-includes/post-template.php */
-			$excerpt         = apply_filters( 'the_excerpt', apply_filters( 'get_the_excerpt', $post->post_excerpt, $post ) );
-			$data['excerpt'] = array(
-				'raw'       => $post->post_excerpt,
-				'rendered'  => post_password_required( $post ) ? '' : $excerpt,
-				'protected' => (bool) $post->post_password,
-			);
+			if ( post_type_supports( $post->post_type, 'excerpt' ) ) {
+				/** This filter is documented in wp-includes/post-template.php */
+				$excerpt         = apply_filters( 'the_excerpt', apply_filters( 'get_the_excerpt', $post->post_excerpt, $post ) );
+				$data['excerpt'] = array(
+					'raw'       => $post->post_excerpt,
+					'rendered'  => post_password_required( $post ) ? '' : $excerpt,
+					'protected' => (bool) $post->post_password,
+				);
+			} else {
+				$data['excerpt'] = array(
+					'raw'       => '',
+					'rendered'  => '',
+					'protected' => false,
+				);
+			}
 		}
 
 		if ( ! empty( $schema['properties']['author'] ) ) {
-			$data['author'] = (int) $post->post_author;
+			if ( post_type_supports( $post->post_type, 'author' ) ) {
+				$data['author'] = (int) $post->post_author;
+			} else {
+				$data['author'] = 0;
+			}
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
