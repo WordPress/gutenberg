@@ -702,10 +702,10 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		);
 
 		$query_params['type'] = array(
-			'default'           => 'any',
-			'description'       => __( 'Limit search results to content of one or more types.' ),
-			'type'              => 'array',
-			'items'             => array(
+			'default'     => 'any',
+			'description' => __( 'Limit search results to content of one or more types.' ),
+			'type'        => 'array',
+			'items'       => array(
 				'enum' => array_merge( array_keys( $this->get_allowed_post_types() ), array( 'any' ) ),
 				'type' => 'string',
 			),
