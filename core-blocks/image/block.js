@@ -166,6 +166,10 @@ class ImageBlock extends Component {
 		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
 	}
 
+	isPlaceholder() {
+		return ( ! isEmpty( this.props.image ) );
+	}
+
 	render() {
 		const { attributes, setAttributes, isSelected, className, settings, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
@@ -188,10 +192,12 @@ class ImageBlock extends Component {
 								label={ __( 'Edit image' ) }
 								icon="edit"
 								onClick={ open }
-							/>
-						) }
+								disabled={ ! this.isPlaceholder() }
+							/> ) }
 					/>
+
 					<UrlInputButton onChange={ this.onSetHref } url={ href } />
+
 				</Toolbar>
 			</BlockControls>
 		);
