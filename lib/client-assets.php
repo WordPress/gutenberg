@@ -850,14 +850,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	/**
-	 * Naive implementation of Jetpack's post_content <--> post_content_filtered swap
-	 * on post edit.
+	 * Naive implementation of Jetpack's post_content <--> post_content_filtered swap on post edit.
 	 *
-	 * todo: find out if a filter like rest_request_after_callbacks can solve this in Jetpack
+	 * Todo: find out if a filter like rest_request_after_callbacks can solve this in Jetpack
 	 */
 	if ( $post instanceof WP_Post && class_exists( 'WPCom_Markdown' ) ) {
 		$jetpack_markdown = WPCom_Markdown::get_instance();
-		if($jetpack_markdown->is_markdown( $post->ID )) {
+		if ( $jetpack_markdown->is_markdown( $post->ID ) ) {
 			$post_to_edit['content']['raw'] = $jetpack_markdown->edit_post_content($post->post_content, $post->ID);
 		}
 	}
