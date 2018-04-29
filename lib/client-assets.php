@@ -849,6 +849,19 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		wp_die( $post_to_edit->get_error_message() );
 	}
 
+	/**
+	 * Naive implementation of Jetpack's post_content <--> post_content_filtered swap
+	 * on post edit.
+	 *
+	 * todo: find out if a filter like rest_request_after_callbacks can solve this in Jetpack
+	 */
+	if ( $post instanceof WP_Post && class_exists( 'WPCom_Markdown' ) ) {
+		$jetpack_markdown = WPCom_Markdown::get_instance();
+		if($jetpack_markdown->is_markdown( $post->ID )) {
+			$post_to_edit['content']['raw'] = $jetpack_markdown->edit_post_content($post->post_content, $post->ID);
+		}
+	}
+
 	// Set initial title to empty string for auto draft for duration of edit.
 	// Otherwise, title defaults to and displays as "Auto Draft".
 	$is_new_post = 'auto-draft' === $post_to_edit['status'];
