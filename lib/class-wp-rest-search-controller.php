@@ -69,6 +69,8 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			if ( 'any' !== $request['type'] ) {
 				foreach ( (array) $request['type'] as $post_type ) {
 					if ( 'any' !== $post_type && ! isset( $allowed_post_types[ $post_type ] ) ) {
+
+						/* translators: post type slug */
 						return new WP_Error( 'rest_forbidden_context', sprintf( __( 'Sorry, you are not allowed to edit content of type %s.' ), $post_type ), array( 'status' => rest_authorization_required_code() ) );
 					}
 				}
@@ -655,7 +657,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			'format'      => 'date-time',
 		);
 
-		$query_params['author']         = array(
+		$query_params['author'] = array(
 			'description' => __( 'Limit search results to content assigned to specific authors.' ),
 			'type'        => 'array',
 			'items'       => array(
