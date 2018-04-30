@@ -878,13 +878,17 @@ RichText.defaultProps = {
 };
 
 const RichTextContainer = compose( [
-	withBlockEditContext,
-	withSelect( ( select, { isSelected, blockEditContext } ) => {
+	withBlockEditContext( ( { isSelected } ) => {
+		return {
+			isBlockSelected: isSelected,
+		};
+	} ),
+	withSelect( ( select, { isSelected, isBlockSelected } ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
-			isSelected: isSelected !== false && blockEditContext.isSelected,
+			isSelected: isSelected !== false && isBlockSelected,
 		};
 	} ),
 	withSafeTimeout,
