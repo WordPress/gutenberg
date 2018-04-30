@@ -156,6 +156,17 @@ body.gutenberg-editor-page {
 			@include input-style__focus();
 		}
 	}
+
+	select {
+		padding: 2px;
+
+		&:focus {
+			border-color: $blue-medium-600;
+			// Windows High Contrast mode will show this outline
+			outline: 2px solid transparent;
+			outline-offset: 0;
+		}
+	}
 }
 
 // Placeholder colors
