@@ -160,56 +160,56 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 		}
 
 		applyMapping( props ) {
-			const { dataProps } = this.state;
-
-			const mapping = mapPropsToData( props, this.routeHelpers );
-			const nextDataProps = reduce( mapping, ( result, path, propName ) => {
-				// Skip if mapping already assigned into state data props
-				// Exmaple: Component updates with one new prop and other
-				// previously existing; previously existing should not be
-				// clobbered or re-trigger fetch
-				const dataProp = dataProps[ propName ];
-				if ( dataProp && dataProp.path === path ) {
-					result[ propName ] = dataProp;
-					return result;
-				}
-
-				result[ propName ] = {};
-
-				const route = getRoute( this.schema, path );
-				if ( ! route ) {
-					return result;
-				}
-
-				route.methods.forEach( ( method ) => {
-					// Add request initiater into data props
-					const requestKey = this.getRequestKey( method );
-					result[ propName ][ requestKey ] = this.request.bind(
-						this,
-						propName,
-						method,
-						path
-					);
-
-					// Initialize pending flags as explicitly false
-					const pendingKey = this.getPendingKey( method );
-					result[ propName ][ pendingKey ] = false;
-
-					// If cached data already exists, populate in result
-					const cachedResponse = getCachedResponse( { path, method } );
-					if ( cachedResponse ) {
-						const dataKey = this.getResponseDataKey( method );
-						result[ propName ][ dataKey ] = cachedResponse.body;
+			this.setState( ( prevState ) => {
+				const mapping = mapPropsToData( props, this.routeHelpers );
+				const nextDataProps = reduce( mapping, ( result, path, propName ) => {
+					// Skip if mapping already assigned into state data props
+					// Example: Component updates with one new prop and other
+					// previously existing; previously existing should not be
+					// clobbered or re-trigger fetch
+					const dataProp = result[ propName ];
+					if ( dataProp && dataProp.path === path ) {
+						result[ propName ] = dataProp;
+						return result;
 					}
 
-					// Track path for future map skipping
-					result[ propName ].path = path;
-				} );
+					result[ propName ] = {};
 
-				return result;
-			}, {} );
+					const route = getRoute( this.schema, path );
+					if ( ! route ) {
+						return result;
+					}
 
-			this.setState( () => ( { dataProps: nextDataProps } ) );
+					route.methods.forEach( ( method ) => {
+						// Add request initiater into data props
+						const requestKey = this.getRequestKey( method );
+						result[ propName ][ requestKey ] = this.request.bind(
+							this,
+							propName,
+							method,
+							path
+						);
+
+						// Initialize pending flags as explicitly false
+						const pendingKey = this.getPendingKey( method );
+						result[ propName ][ pendingKey ] = false;
+
+						// If cached data already exists, populate in result
+						const cachedResponse = getCachedResponse( { path, method } );
+						if ( cachedResponse ) {
+							const dataKey = this.getResponseDataKey( method );
+							result[ propName ][ dataKey ] = cachedResponse.body;
+						}
+
+						// Track path for future map skipping
+						result[ propName ].path = path;
+					} );
+
+					return result;
+				}, prevState.dataProps );
+
+				return { dataProps: nextDataProps };
+			} );
 		}
 
 		render() {
