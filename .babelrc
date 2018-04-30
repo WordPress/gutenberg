@@ -8,6 +8,7 @@
       "module-resolver",
       {
         "alias": {
+          "@wordpress/blocks": "./gutenberg/blocks",
           "@wordpress/element": "./gutenberg/element",
           "@wordpress/hooks": "./wordpress/hooks",
           "@wordpress/utils": "./gutenberg/utils",
