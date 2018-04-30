@@ -88,7 +88,7 @@ export const settings = {
 					} }
 					style={ { textAlign: align } }
 					className={ className }
-					placeholder={ placeholder || __( 'Write subhead…' ) }
+					placeholder={ placeholder || __( 'Write subheading…' ) }
 				/>
 			</Fragment>
 		);
