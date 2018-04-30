@@ -33,6 +33,7 @@ export default createHigherOrderComponent(
 						props.attributes[ colorAttribute ],
 						props.attributes[ customColorAttribute ]
 					),
+					name: props.attributes[ colorAttribute ],
 					class: getColorClass( colorContext, props.attributes[ colorAttribute ] ),
 					set: setColorValue( colors, colorAttribute, customColorAttribute, props.setAttributes ),
 				} ),
