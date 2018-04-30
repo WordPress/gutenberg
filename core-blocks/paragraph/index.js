@@ -29,7 +29,6 @@ import {
 	getColorClass,
 	withColors,
 	AlignmentToolbar,
-	BlockAlignmentToolbar,
 	BlockControls,
 	ColorPalette,
 	ContrastChecker,
@@ -142,7 +141,6 @@ class ParagraphBlock extends Component {
 			content,
 			dropCap,
 			placeholder,
-			width,
 		} = attributes;
 
 		const fontSize = this.getFontSize();
@@ -234,12 +232,6 @@ class ParagraphBlock extends Component {
 						} }
 						isLargeText={ fontSize >= 18 }
 					/>
-					<PanelBody title={ __( 'Block Alignment' ) }>
-						<BlockAlignmentToolbar
-							value={ width }
-							onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
-						/>
-					</PanelBody>
 				</InspectorControls>
 				<div>
 					<RichText
