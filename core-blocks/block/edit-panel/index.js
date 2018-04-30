@@ -25,10 +25,11 @@ class ReusableBlockEditPanel extends Component {
 	}
 
 	componentDidMount() {
-		// Select the input text when the form opens.
-		if ( this.props.isEditing && this.titleField.current ) {
-			this.titleField.current.select();
-		}
+		document.addEventListener( 'click', this.handleClickOutside, true );
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener( 'click', this.handleClickOutside, true );
 	}
 
 	componentDidUpdate( prevProps ) {
