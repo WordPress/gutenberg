@@ -230,6 +230,47 @@ EOT;
 			array( (object) array( 'foo', 'bar', 'baz' ), false ),
 		);
 	}
+
+	/**
+	 * @ticket 43619
+	 */
+	function test_is_iterable_availability() {
+		$this->assertTrue( function_exists( 'is_iterable' ) );
+	}
+
+	/**
+	 * Test is_iterable() polyfill.
+	 *
+	 * @ticket 43619
+	 *
+	 * @dataProvider iterable_variable_test_data
+	 */
+	function test_is_iterable_functionality( $variable, $is_iterable ) {
+		$this->assertEquals( is_iterable( $variable ), $is_iterable );
+	}
+
+	/**
+	 * Data provider for test_is_iterable_functionality().
+	 *
+	 * @ticket 43619
+	 *
+	 * @return array {
+	 *     @type array {
+	 *         @type mixed $variable    Variable to check.
+	 *         @type bool  $is_iterable The expected return value of PHP 7.1 is_iterable() function.
+	 *     }
+	 * }
+	 */
+	public function iterable_variable_test_data() {
+		return array(
+			array( array(), true ),
+			array( array( 1, 2, 3 ), true ),
+			array( new ArrayIterator( array( 1, 2, 3 ) ), true ),
+			array( 1, false ),
+			array( 3.14, false ),
+			array( new stdClass(), false ),
+		);
+	}
 }
 
 /* used in test_mb_substr_phpcore */ 
