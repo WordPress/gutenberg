@@ -112,11 +112,20 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
 			$post_id = url_to_postid( $_GET['url'] );
 			$data    = get_oembed_response_data( $post_id, apply_filters( 'oembed_default_width', 600 ) );
 
-			if ( ! $data ) {
-				// Not a local post, return the original error.
-				return $response;
+			if ( $data ) {
+				// It's a local post!
+				$response = (object) $data;
+			} else {
+				// Try using a classic embed, instead.
+				global $wp_embed;
+				$html = $wp_embed->shortcode( array(), $_GET['url'] );
+				if ( $html ) {
+					return array(
+						'provider_name' => __( 'Embed Handler', 'gutenberg' ),
+						'html'          => $html,
+					);
+				}
 			}
-			$response = (object) $data;
 		}
 
 		// Make sure the HTML is run through the oembed sanitisation routines.
