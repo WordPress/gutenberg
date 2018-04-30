@@ -781,7 +781,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Gets the post statuses allowed for search.
 	 *
-	 * @since 1.0.0
+	 * @since 2.9.0
 	 *
 	 * @return array List of post status objects, keyed by their name.
 	 */
@@ -800,7 +800,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Gets the post types allowed for search.
 	 *
-	 * @since 1.0.0
+	 * @since 2.9.0
 	 *
 	 * @param bool $editable Optional. Whether to only include post types where the current user
 	 *                       has edit access. Default false.
