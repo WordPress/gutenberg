@@ -117,14 +117,6 @@ export const settings = {
 			}
 		);
 
-		const alignmentToolbar	= (
-			<AlignmentToolbar
-				value={ contentAlign }
-				onChange={ ( nextAlign ) => {
-					setAttributes( { contentAlign: nextAlign } );
-				} }
-			/>
-		);
 		const controls = (
 			<Fragment>
 				<BlockControls>
@@ -132,8 +124,12 @@ export const settings = {
 						value={ align }
 						onChange={ updateAlignment }
 					/>
-
-					{ alignmentToolbar }
+					<AlignmentToolbar
+						value={ contentAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { contentAlign: nextAlign } );
+						} }
+					/>
 					<Toolbar>
 						<MediaUpload
 							onSelect={ onSelectImage }
@@ -165,9 +161,6 @@ export const settings = {
 							max={ 100 }
 							step={ 10 }
 						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Text Alignment' ) }>
-						{ alignmentToolbar }
 					</PanelBody>
 				</InspectorControls>
 			</Fragment>
