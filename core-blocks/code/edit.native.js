@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { PlainText } from '../../blocks';
 
-export function edit( { attributes, setAttributes, style } ) {
+export default function edit( { attributes, setAttributes, style } ) {
 	return (
 		<View>
 			<PlainText

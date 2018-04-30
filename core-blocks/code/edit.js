@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import { PlainText } from '@wordpress/blocks';
 
-export function edit( { attributes, setAttributes, className } ) {
+export default function edit( { attributes, setAttributes, className } ) {
 	return (
 		<div className={ className }>
 			<PlainText
