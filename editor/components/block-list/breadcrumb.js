@@ -55,7 +55,6 @@ export class BlockBreadcrumb extends Component {
 	render( ) {
 		const { uid, rootUID, selectRootBlock, isHidden } = this.props;
 		const { isFocused } = this.state;
-		const selectParentLabel = __( 'Select parent block' );
 
 		return (
 			<div className={ classnames( 'editor-block-list__breadcrumb', {
@@ -67,7 +66,7 @@ export class BlockBreadcrumb extends Component {
 							onClick={ selectRootBlock }
 							onFocus={ this.onFocus }
 							onBlur={ this.onBlur }
-							label={ selectParentLabel }
+							label={ __( 'Select parent block' ) }
 							icon="arrow-left-alt"
 						/>
 					) }
