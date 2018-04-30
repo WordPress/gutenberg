@@ -29,9 +29,11 @@ import './editor.scss';
 const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
+	// translators: %s: Name of service (e.g. VideoPress, YouTube)
+	const blockDescription = description || __( `Paste URLs from ${ title } to embed the content in this block.` );
 	return {
 		title,
-		description: description || __( `Paste URLs from ${ title } to embed the content in this block.` ),
+		description: blockDescription,
 		icon,
 		category,
 		keywords,
