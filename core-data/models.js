@@ -4,7 +4,7 @@
 import { find } from 'lodash';
 
 const models = [
-	{ name: 'postType', kind: 'root', pk: 'slug', baseUrl: '/wp/v2/types' },
+	{ name: 'postType', kind: 'root', primaryKey: 'slug', baseUrl: '/wp/v2/types' },
 ];
 
 export function getModel( kind, name ) {

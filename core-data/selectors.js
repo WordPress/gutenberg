@@ -99,7 +99,7 @@ export function getUserQueryResults( state, queryID ) {
  * @return {Object?} Record.
  */
 export function getModelRecord( state, kind, name, primaryKey ) {
-	return state.models[ kind ][ name ].byPK[ primaryKey ];
+	return state.models[ kind ][ name ].byPrimaryKey[ primaryKey ];
 }
 
 /**

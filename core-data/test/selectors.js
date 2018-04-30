@@ -80,29 +80,29 @@ describe( 'getModelRecord', () => {
 		const state = deepFreeze( {
 			root: {
 				postType: {
-					byPK: {},
+					byPrimaryKey: {},
 				},
 			},
 		} );
 		expect( getModelRecord( state, 'root', 'post', 10 ) ).toBe( undefined );
 	} );
 
-	it( 'should return undefined for unknown record PK', () => {
+	it( 'should return undefined for unknown record Primary Key', () => {
 		const state = deepFreeze( {
 			root: {
 				postType: {
-					byPK: {},
+					byPrimaryKey: {},
 				},
 			},
 		} );
 		expect( getModelRecord( state, 'root', 'postType', 'post' ) ).toBe( undefined );
 	} );
 
-	it( 'should return a record by PK', () => {
+	it( 'should return a record by Primary Key', () => {
 		const state = deepFreeze( {
 			root: {
 				postType: {
-					byPK: {
+					byPrimaryKey: {
 						post: { slug: 'post' },
 					},
 				},

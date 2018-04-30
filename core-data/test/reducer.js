@@ -93,7 +93,7 @@ describe( 'models', () => {
 	it( 'returns the default state for all defined modedls', () => {
 		const state = models( undefined, {} );
 
-		expect( state.root.postType ).toEqual( { byPK: {} } );
+		expect( state.root.postType ).toEqual( { byPrimaryKey: {} } );
 	} );
 
 	it( 'returns with received post types by slug', () => {
@@ -106,7 +106,7 @@ describe( 'models', () => {
 		} );
 
 		expect( state.root.postType ).toEqual( {
-			byPK: {
+			byPrimaryKey: {
 				b: { slug: 'b', title: 'beach' },
 				s: { slug: 's', title: 'sun' },
 			},
