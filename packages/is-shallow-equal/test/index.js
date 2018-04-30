@@ -61,6 +61,13 @@ describe( 'isShallowEqual', () => {
 		expect( isShallowEqual( obj, obj ) ).toBe( true );
 	} );
 
+	it( 'returns true on objects that are a copy of each other', () => {
+		const a = { foo: 1 };
+		const b = a;
+
+		expect( isShallowEqual( a, b ) ).toBe( true );
+	} );
+
 	it( 'returns true on object deep-but-referentially-equal values', () => {
 		const obj = {};
 		const a = { foo: obj };
@@ -101,6 +108,13 @@ describe( 'isShallowEqual', () => {
 		const obj = {};
 		const a = [ obj ];
 		const b = [ obj ];
+
+		expect( isShallowEqual( a, b ) ).toBe( true );
+	} );
+
+	it( 'returns true on arrays that are a copy of each other', () => {
+		const a = [];
+		const b = a;
 
 		expect( isShallowEqual( a, b ) ).toBe( true );
 	} );
