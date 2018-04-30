@@ -4,13 +4,13 @@
 import { withContext } from '@wordpress/components';
 
 function InnerBlocks( { BlockList, layouts } ) {
-	return BlockList ? <BlockList layouts={ layouts } /> : null;
+	return <BlockList layouts={ layouts } />;
 }
 
 InnerBlocks = withContext( 'BlockList' )()( InnerBlocks );
 
 InnerBlocks.Content = ( { BlockContent } ) => {
-	return BlockContent ? <BlockContent /> : null;
+	return <BlockContent />;
 };
 
 InnerBlocks.Content = withContext( 'BlockContent' )()( InnerBlocks.Content );
