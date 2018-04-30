@@ -11,7 +11,9 @@ import {
 	some,
 	sortBy,
 	isEmpty,
+	find,
 } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -19,22 +21,26 @@ import {
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import {
-	TabPanel,
 	TabbableContainer,
 	withInstanceId,
 	withSpokenMessages,
+	IconButton,
+	withSafeTimeout,
 } from '@wordpress/components';
 import { getCategories, isSharedBlock, withEditorSettings } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import NoBlocks from './no-blocks';
+import BlockInserterNavigation from './navigation';
 import InserterGroup from './group';
 import BlockPreview from '../block-preview';
+import tabs from './tabs';
 
 export const searchItems = ( items, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
@@ -53,28 +59,30 @@ const ARROWS = pick( keycodes, [ 'UP', 'DOWN', 'LEFT', 'RIGHT' ] );
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
-		this.nodes = {};
+		this.tabs = {};
 		this.state = {
 			filterValue: '',
 			tab: 'suggested',
 			selectedItem: null,
+			isNavigationOpened: false,
+			selectedTab: null,
 		};
 		this.filter = this.filter.bind( this );
 		this.searchItems = this.searchItems.bind( this );
 		this.getItemsForTab = this.getItemsForTab.bind( this );
 		this.sortItems = this.sortItems.bind( this );
 		this.selectItem = this.selectItem.bind( this );
-
-		this.tabScrollTop = { suggested: 0, blocks: 0, embeds: 0 };
-		this.switchTab = this.switchTab.bind( this );
 		this.previewItem = this.previewItem.bind( this );
+		this.toggleNavigation = this.toggleNavigation.bind( this );
+		this.selectTab = this.selectTab.bind( this );
+		this.bindScrollContainer = this.bindScrollContainer.bind( this );
 	}
 
 	componentDidMount() {
 		this.props.fetchSharedBlocks();
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
+	componentDidUpdate() {
 		const searchResults = this.searchItems( this.props.items );
 		// Announce the search results to screen readers.
 		if ( this.state.filterValue && !! searchResults.length ) {
@@ -86,10 +94,28 @@ export class InserterMenu extends Component {
 		} else if ( this.state.filterValue ) {
 			this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 		}
+	}
 
-		if ( this.state.tab !== prevState.tab ) {
-			this.tabContainer.scrollTop = this.tabScrollTop[ this.state.tab ];
-		}
+	bindScrollContainer( ref ) {
+		this.scrollContainer = ref;
+	}
+
+	bindTab( tab ) {
+		return ( ref ) => this.tabs[ tab ] = ref;
+	}
+
+	selectTab( tab ) {
+		this.setState( {
+			selectedTab: tab,
+			filterValue: '',
+		} );
+	}
+
+	toggleNavigation() {
+		this.setState( ( state ) => ( {
+			isNavigationOpened: ! state.isNavigationOpened,
+			selectedTab: null,
+		} ) );
 	}
 
 	filter( event ) {
@@ -207,12 +233,6 @@ export class InserterMenu extends Component {
 		);
 	}
 
-	switchTab( tab ) {
-		// store the scrollTop of the tab switched from
-		this.tabScrollTop[ this.state.tab ] = this.tabContainer.scrollTop;
-		this.setState( { tab } );
-	}
-
 	renderTabView( tab ) {
 		const itemsForTab = this.getItemsForTab( tab );
 
@@ -262,9 +282,10 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, items } = this.props;
-		const { selectedItem } = this.state;
+		const { instanceId, items, isLargeViewport } = this.props;
+		const { selectedItem, isNavigationOpened, selectedTab } = this.state;
 		const isSearching = this.state.filterValue;
+		const visibleTabs = isLargeViewport && selectedTab ? [ find( tabs, ( tab ) => tab.name === selectedTab ) ] : tabs;
 
 		// Disable reason: The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of
@@ -273,59 +294,69 @@ export class InserterMenu extends Component {
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<TabbableContainer
-				className="editor-inserter__menu"
+				className={ classnames( 'editor-inserter__menu', {
+					'has-navigation': isLargeViewport && selectedTab,
+				} ) }
 				deep
 				eventToOffset={ this.eventToOffset }
 			>
-				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
-					{ __( 'Search for a block' ) }
-				</label>
-				<input
-					id={ `editor-inserter__search-${ instanceId }` }
-					type="search"
-					placeholder={ __( 'Search for a block' ) }
-					className="editor-inserter__search"
-					onChange={ this.filter }
-					autoFocus
-				/>
-				{ ! isSearching &&
-					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
-						onSelect={ this.switchTab }
-						tabs={ [
-							{
-								name: 'suggested',
-								title: __( 'Suggested' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'blocks',
-								title: __( 'Blocks' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'embeds',
-								title: __( 'Embeds' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'shared',
-								title: __( 'Shared' ),
-								className: 'editor-inserter__tab',
-							},
-						] }
-					>
-						{ ( tabKey ) => (
-							<div ref={ ( ref ) => this.tabContainer = ref }>
-								{ this.renderTabView( tabKey ) }
-							</div>
-						) }
-					</TabPanel>
-				}
-				{ isSearching &&
-					<div role="menu" className="editor-inserter__search-results">
-						{ this.renderCategories( this.getVisibleItemsByCategory( items ) ) }
+				<div className="editor-inserter__filter-form">
+					<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
+						{ __( 'Search for a block' ) }
+					</label>
+					<input
+						id={ `editor-inserter__search-${ instanceId }` }
+						type="search"
+						placeholder={ __( 'Search for a block' ) }
+						className="editor-inserter__search"
+						onChange={ this.filter }
+						autoFocus
+					/>
+					{ isLargeViewport && (
+						<IconButton
+							className="editor-inserter__navigation-toggle"
+							icon="filter-alt"
+							label={ __( 'Toggle inserter navigation' ) }
+							onClick={ this.toggleNavigation }
+						/>
+					) }
+				</div>
+				{ isNavigationOpened && isLargeViewport && (
+					<div className="editor-inserter__navigation-container">
+						<BlockInserterNavigation
+							onSelect={ this.selectTab }
+							onClose={ this.toggleNavigation }
+							selected={ selectedTab }
+							ariaControlsPrefix={ `editor-inserter-tabpanel-${ instanceId }` }
+						/>
 					</div>
-				}
+				) }
+				<div
+					className="editor-inserter__results"
+					ref={ this.bindScrollContainer }
+				>
+					{ ! isSearching && visibleTabs.map( ( tab ) => (
+						<div
+							key={ tab.name }
+							role="tabpanel"
+							tabIndex="0"
+							id={ `editor-inserter-tabpanel-${ instanceId }-${ tab.name }` }
+							className={ classnames( 'editor-inserter__tab', 'is-' + tab.name ) }
+							ref={ this.bindTab( tab.name ) }
+							aria-labelledby={ `editor-inserter-tabpanel-${ instanceId }-${ tab.name }-label` }
+						>
+							<div className="editor-inserter__tab-title" id={ `editor-inserter-tabpanel-${ instanceId }-${ tab.name }-label` }>
+								{ tab.title }
+							</div>
+							{ this.renderTabView( tab.name ) }
+						</div>
+					) ) }
+					{ isSearching &&
+						<div role="menu">
+							{ this.renderCategories( this.getVisibleItemsByCategory( items ) ) }
+						</div>
+					}
+				</div>
 				{ selectedItem && isSharedBlock( selectedItem ) &&
 					<BlockPreview name={ selectedItem.name } attributes={ selectedItem.initialAttributes } />
 				}
@@ -353,6 +384,8 @@ export default compose(
 	withDispatch( ( dispatch ) => ( {
 		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
 	} ) ),
+	withViewportMatch( { isLargeViewport: 'medium' } ),
 	withSpokenMessages,
-	withInstanceId
+	withInstanceId,
+	withSafeTimeout
 )( InserterMenu );

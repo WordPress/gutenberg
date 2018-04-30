@@ -88,26 +88,6 @@ describe( 'InserterMenu', () => {
 	// wrapper.find have had to be strengthened (and the filterWhere strengthened also), otherwise two
 	// results would be returned even though only one was in the DOM.
 
-	it( 'should show the suggested tab by default', () => {
-		const wrapper = mount(
-			<InserterMenu
-				position={ 'top center' }
-				instanceId={ 1 }
-				items={ [] }
-				frecentItems={ [] }
-				debouncedSpeak={ noop }
-				fetchSharedBlocks={ noop }
-				blockTypes
-			/>
-		);
-
-		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Suggested' );
-
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks ).toHaveLength( 0 );
-	} );
-
 	it( 'should show nothing if there are no items', () => {
 		const wrapper = mount(
 			<InserterMenu
@@ -136,7 +116,7 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__tab.is-suggested .editor-inserter__block' );
 		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Text' );
@@ -154,14 +134,8 @@ describe( 'InserterMenu', () => {
 				fetchSharedBlocks={ noop }
 			/>
 		);
-		const embedTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Embeds' && node.name() === 'button' );
-		embedTab.simulate( 'click' );
 
-		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Embeds' );
-
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__tab.is-embeds .editor-inserter__block' );
 		expect( visibleBlocks ).toHaveLength( 2 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'YouTube' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
@@ -178,14 +152,8 @@ describe( 'InserterMenu', () => {
 				fetchSharedBlocks={ noop }
 			/>
 		);
-		const embedTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Shared' && node.name() === 'button' );
-		embedTab.simulate( 'click' );
 
-		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Shared' );
-
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__tab.is-shared .editor-inserter__block' );
 		expect( visibleBlocks ).toHaveLength( 1 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My shared block' );
 	} );
@@ -201,14 +169,8 @@ describe( 'InserterMenu', () => {
 				fetchSharedBlocks={ noop }
 			/>
 		);
-		const blocksTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Blocks' && node.name() === 'button' );
-		blocksTab.simulate( 'click' );
 
-		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Blocks' );
-
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__tab.is-blocks .editor-inserter__block' );
 		expect( visibleBlocks ).toHaveLength( 4 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
@@ -228,7 +190,7 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 
-		const disabledBlocks = wrapper.find( '.editor-inserter__block[disabled=true]' );
+		const disabledBlocks = wrapper.find( '.editor-inserter__tab.is-blocks .editor-inserter__block[disabled=true]' );
 		expect( disabledBlocks ).toHaveLength( 1 );
 		expect( disabledBlocks.at( 0 ).text() ).toBe( 'More' );
 	} );

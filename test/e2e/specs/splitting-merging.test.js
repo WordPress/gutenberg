@@ -15,6 +15,7 @@ describe( 'splitting and merging blocks', () => {
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
 		await page.keyboard.type( 'paragraph' );
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'FirstSecond' );
 
@@ -38,6 +39,7 @@ describe( 'splitting and merging blocks', () => {
 		//Use regular inserter to add paragraph block and text
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
 		await page.keyboard.type( 'quote' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'test' );
