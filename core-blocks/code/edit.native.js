@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { PlainText } from '../../blocks';
+import { PlainText } from '@wordpress/blocks';
 
 export default function edit( { attributes, setAttributes, style } ) {
 	return (
