@@ -8,7 +8,7 @@ import { get, includes, some, castArray } from 'lodash';
  */
 import { withSelect } from '@wordpress/data';
 
-function PostTypeSupportCheck( { postType, children, supportKeys, themeSupports } ) {
+export function PostTypeSupportCheck( { postType, children, supportKeys, themeSupports } ) {
 	supportKeys = castArray( supportKeys );
 	const isSupported = some(
 		supportKeys, ( key ) => get( postType, [ 'supports', key ], false )
