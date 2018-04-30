@@ -30,8 +30,6 @@ function gutenberg_register_rest_routes() {
 			continue;
 		}
 
-		$controller->register_routes();
-
 		if ( post_type_supports( $post_type->name, 'revisions' ) ) {
 			$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
 			$autosaves_controller->register_routes();
