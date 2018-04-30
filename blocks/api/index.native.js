@@ -1,5 +1,3 @@
-/** @format */
-
 export {
 	createBlock,
 } from './factory';

@@ -1,5 +1,3 @@
-/** @format */
-
 import { View } from 'react-native';
 
 /**
