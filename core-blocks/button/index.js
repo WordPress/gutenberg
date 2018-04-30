@@ -75,7 +75,10 @@ class ButtonBlock extends Component {
 	render() {
 		const {
 			attributes,
-			initializeColor,
+			backgroundColor,
+			textColor,
+			setBackgroundColor,
+			setTextColor,
 			setAttributes,
 			isSelected,
 			className,
@@ -88,17 +91,6 @@ class ButtonBlock extends Component {
 			align,
 			clear,
 		} = attributes;
-
-		const textColor = initializeColor( {
-			colorContext: 'color',
-			colorAttribute: 'textColor',
-			customColorAttribute: 'customTextColor',
-		} );
-		const backgroundColor = initializeColor( {
-			colorContext: 'background-color',
-			colorAttribute: 'backgroundColor',
-			customColorAttribute: 'customBackgroundColor',
-		} );
 
 		return (
 			<Fragment>
@@ -136,13 +128,13 @@ class ButtonBlock extends Component {
 							<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor.value } >
 								<ColorPalette
 									value={ backgroundColor.value }
-									onChange={ backgroundColor.set }
+									onChange={ setBackgroundColor }
 								/>
 							</PanelColor>
 							<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor.value } >
 								<ColorPalette
 									value={ textColor.value }
-									onChange={ textColor.set }
+									onChange={ setTextColor }
 								/>
 							</PanelColor>
 							{ this.nodeRef && <ContrastCheckerWithFallbackStyles
@@ -243,7 +235,14 @@ export const settings = {
 		return props;
 	},
 
-	edit: withColors( ButtonBlock ),
+	edit: withColors( ( getColor, setColor, { attributes, setAttributes } ) => {
+		return {
+			backgroundColor: getColor( attributes.backgroundColor, attributes.customBackgroundColor, 'background-color' ),
+			setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor', setAttributes ),
+			textColor: getColor( attributes.textColor, attributes.customTextColor, 'color' ),
+			setTextColor: setColor( 'textColor', 'customTextColor', setAttributes ),
+		};
+	} )( ButtonBlock ),
 
 	save( { attributes } ) {
 		const {
