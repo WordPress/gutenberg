@@ -126,6 +126,7 @@
 		}
 	}
 
+	.is-resized figcaption,
 	&[data-resized=true] figcaption {
 		max-width: var( --caption-width ); // use optional width variable for captions
 	}
