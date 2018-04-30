@@ -32,10 +32,10 @@ const withFocusContain = ( WrappedComponent ) => {
 
 			if ( event.shiftKey && event.target === firstTabbable ) {
 				event.preventDefault();
-				return lastTabbable.focus();
+				lastTabbable.focus();
 			} else if ( ! event.shiftKey && event.target === lastTabbable ) {
 				event.preventDefault();
-				return firstTabbable.focus();
+				firstTabbable.focus();
 			}
 		}
 
