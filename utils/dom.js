@@ -8,48 +8,18 @@ import tinymce from 'tinymce';
  * Browser dependencies
  */
 const { getComputedStyle, DOMRect } = window;
-const { TEXT_NODE, ELEMENT_NODE, DOCUMENT_POSITION_PRECEDING } = window.Node;
-
-/**
- * Returns true if the given selection object is in the forward direction, or
- * false otherwise.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
- *
- * @param {Selection} selection Selection object to check.
- *
- * @return {boolean} Whether the selection is forward.
- */
-function isSelectionForward( selection ) {
-	const {
-		anchorNode,
-		focusNode,
-		anchorOffset,
-		focusOffset,
-	} = selection;
-
-	const position = anchorNode.compareDocumentPosition( focusNode );
-
-	return (
-		// Compare whether anchor node precedes focus node.
-		position !== DOCUMENT_POSITION_PRECEDING &&
-
-		// `compareDocumentPosition` returns 0 when passed the same node, in
-		// which case compare offsets.
-		! ( position === 0 && anchorOffset > focusOffset )
-	);
-}
+const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
  * Check whether the caret is horizontally at the edge of the container.
  *
- * @param {Element} container      Focusable element.
- * @param {boolean} isReverse      Set to true to check left, false for right.
- * @param {boolean} collapseRanges Whether or not to collapse the selection range before the check.
+ * @param {Element} container             Focusable element.
+ * @param {boolean} isReverse             Set to true to check left, false for right.
+ * @param {boolean} requireCollapsedRange Whether or not to collapse the selection range before the check.
  *
  * @return {boolean} True if at the horizontal edge, false if not.
  */
-export function isHorizontalEdge( container, isReverse, collapseRanges = false ) {
+export function isHorizontalEdge( container, isReverse, requireCollapsedRange = false ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
@@ -72,15 +42,13 @@ export function isHorizontalEdge( container, isReverse, collapseRanges = false )
 	}
 
 	const selection = window.getSelection();
-	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	if ( collapseRanges ) {
-		range = range.cloneRange();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
-		// Collapse to the extent of the selection by direction.
-		range.collapse( ! isSelectionForward( selection ) );
+	if ( ! range ) {
+		return false;
 	}
 
-	if ( ! range || ! range.collapsed ) {
+	if ( ! requireCollapsedRange && ! range.collapsed ) {
 		return false;
 	}
 
