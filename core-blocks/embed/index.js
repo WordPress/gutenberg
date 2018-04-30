@@ -100,13 +100,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			}
 
 			componentWillMount() {
-				if ( this.props.attributes.url ) {
-					// if the url is already there, we're loading a saved block, so we need to render
-					// a different thing, which is why this doesn't use 'fetching', as that
-					// is for when the user is putting in a new url on the placeholder form
-					this.setState( { fetching: true } );
-					this.doServerSideRender();
-				}
+				this.doServerSideRender();
 			}
 
 			componentWillUnmount() {
