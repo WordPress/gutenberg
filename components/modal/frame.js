@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clickOutside from 'react-click-outside';
-import { defer } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,6 +16,7 @@ import './style.scss';
 import withFocusReturn from '../higher-order/with-focus-return';
 import withFocusContain from '../higher-order/with-focus-contain';
 import withGlobalEvents from '../higher-order/with-global-events';
+import withSafeTimeout from '../higher-order/with-safe-timeout';
 
 const {
 	ESCAPE,
@@ -29,6 +29,7 @@ class ModalFrame extends Component {
 		this.containerRef = createRef();
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 		this.handleClickOutside = this.handleClickOutside.bind( this );
+		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
 	}
 
 	componentDidMount() {
@@ -40,12 +41,13 @@ class ModalFrame extends Component {
 
 	focusFirstTabbable() {
 		// Required because the node is appended to the DOM after rendering.
-		defer( () => {
+		const { setTimeout } = this.props;
+		setTimeout( () => {
 			const tabbables = focus.tabbable.find( this.containerRef.current );
 			if ( tabbables.length ) {
 				tabbables[ 0 ].focus();
 			}
-		} );
+		}, 0 );
 	}
 
 	handleClickOutside( event ) {
@@ -105,6 +107,7 @@ class ModalFrame extends Component {
 export default compose( [
 	withFocusReturn,
 	withFocusContain,
+	withSafeTimeout,
 	clickOutside,
 	withGlobalEvents( {
 		keydown: 'handleKeyDown',
