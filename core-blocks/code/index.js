@@ -9,7 +9,7 @@ import {
 /**
  * Internal dependencies
  */
-import { edit } from './edit';
+import { edit } from './edit'; // import the specialized `edit` function. Is is different between the web and native mobile.
 
 export const name = 'core/code';
 
