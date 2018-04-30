@@ -10,4 +10,3 @@
 export * from './api';
 
 export { default as editorMediaUpload } from './editor-media-upload';
-export { default as EditorSettings, withEditorSettings } from './editor-settings';

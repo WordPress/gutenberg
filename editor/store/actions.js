@@ -682,3 +682,17 @@ export function updateBlockListSettings( id, settings ) {
 		settings,
 	};
 }
+
+/*
+ * Returns an action object used in signalling that the editor settings have been updated.
+ *
+ * @param {Object} settings Updated settings
+ *
+ * @return {Object} Action object
+ */
+export function updateEditorSettings( settings ) {
+	return {
+		type: 'UPDATE_EDITOR_SETTINGS',
+		settings,
+	};
+}

@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
-import { getBlockType, getPossibleBlockTransformations, switchToBlockType, withEditorSettings } from '@wordpress/blocks';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -98,8 +98,11 @@ export function BlockSwitcher( { blocks, onTransform, isLocked } ) {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
+		const { getBlock, getEditorSettings } = select( 'core/editor' );
+		const { templateLock } = getEditorSettings();
 		return {
-			blocks: ownProps.uids.map( ( uid ) => select( 'core/editor' ).getBlock( uid ) ),
+			blocks: ownProps.uids.map( getBlock ),
+			isLocked: !! templateLock,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
@@ -110,11 +113,4 @@ export default compose(
 			);
 		},
 	} ) ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock } = settings;
-
-		return {
-			isLocked: !! templateLock,
-		};
-	} ),
 )( BlockSwitcher );

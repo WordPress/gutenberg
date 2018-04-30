@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
-import { createBlock, isUnmodifiedDefaultBlock, withEditorSettings } from '@wordpress/blocks';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -87,22 +87,15 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withEditorSettings( ( settings ) => {
-		const { allowedBlockTypes, templateLock } = settings;
-
-		return {
-			allowedBlockTypes,
-			isLocked: !! templateLock,
-		};
-	} ),
-	withSelect( ( select, { allowedBlockTypes } ) => {
+	withSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
 			getBlockInsertionPoint,
 			getSelectedBlock,
 			getSupportedBlocks,
+			getEditorSettings,
 		} = select( 'core/editor' );
-
+		const { allowedBlockTypes, templateLock } = getEditorSettings();
 		const insertionPoint = getBlockInsertionPoint();
 		const { rootUID } = insertionPoint;
 		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
@@ -111,6 +104,7 @@ export default compose( [
 			insertionPoint,
 			selectedBlock: getSelectedBlock(),
 			hasSupportedBlocks: true === supportedBlocks || ! isEmpty( supportedBlocks ),
+			isLocked: !! templateLock,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
