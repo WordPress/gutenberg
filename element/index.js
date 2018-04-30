@@ -5,6 +5,7 @@ import {
 	createElement,
 	createContext,
 	createRef,
+	forwardRef,
 	Component,
 	cloneElement,
 	Children,
@@ -45,6 +46,11 @@ export { createElement };
  * @return {Object} Ref object.
  */
 export { createRef };
+
+/**
+ * todo
+ */
+export { forwardRef };
 
 /**
  * Renders a given element into the target DOM node.

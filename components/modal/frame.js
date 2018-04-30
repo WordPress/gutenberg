@@ -28,6 +28,7 @@ class ModalFrame extends Component {
 
 		this.containerRef = createRef();
 		this.handleKeyDown = this.handleKeyDown.bind( this );
+		this.handleClickOutside = this.handleClickOutside.bind( this );
 	}
 
 	componentDidMount() {
@@ -102,10 +103,10 @@ class ModalFrame extends Component {
 }
 
 export default compose( [
-	withGlobalEvents( {
-		keydown: 'handleKeyDown',
-	} ),
 	withFocusReturn,
 	withFocusContain,
 	clickOutside,
+	withGlobalEvents( {
+		keydown: 'handleKeyDown',
+	} ),
 ] )( ModalFrame );
