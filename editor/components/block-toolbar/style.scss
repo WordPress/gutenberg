@@ -13,7 +13,7 @@
 
 	.components-toolbar {
 		border: none;
-		border-left: 1px solid $light-gray-500;
+		border-left: 1px solid $light-gray-700;
 	}
 
 	// this should probably have its own class
@@ -24,8 +24,5 @@
 
 .editor-block-toolbar .editor-block-switcher {
 	display: inline-flex;
-
-	.edit-post-header-toolbar__block-toolbar & {
-		border-left-color: 1px solid $light-gray-500;
-	}
+	border-left: 1px solid $light-gray-700;
 }

@@ -7,7 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { compose, Component } from '@wordpress/element';
+<<<<<<< HEAD
 import { IconButton, Toolbar } from '@wordpress/components';
+=======
+import { Button, Tooltip, Toolbar } from '@wordpress/components';
+>>>>>>> Polish the breadcrumb, tweak paddings
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -62,14 +66,9 @@ export class BlockBreadcrumb extends Component {
 			} ) }>
 				<Toolbar>
 					{ rootUID && (
-						<IconButton
-							onClick={ selectRootBlock }
-							onFocus={ this.onFocus }
-							onBlur={ this.onBlur }
-							label={ __( 'Select parent block' ) }
-							icon="arrow-left-alt"
-						/>
+						<BlockTitle uid={ rootUID } />
 					) }
+					{ rootUID && ( <span> &rarr; </span> ) }
 					<BlockTitle uid={ uid } />
 				</Toolbar>
 			</div>

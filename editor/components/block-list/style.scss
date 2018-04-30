@@ -1,11 +1,16 @@
-.components-draggable__clone {
+.editor-block-list__layout .components-draggable__clone {
 	& > .editor-block-list__block > .editor-block-list__block-draggable {
 		background: $white; // @todo: ensure this works with themes that invert the color
 		box-shadow: $shadow-popover;
 
 		@include break-small {
-			left: 0;
-			right: 0;
+			left: -$block-parent-side-ui-clearance - 1px;
+			right: -$block-parent-side-ui-clearance - 1px;
+
+			.editor-block-list__layout & {
+				left: -1px;
+				right: -1px;
+			}
 		}
 	}
 
@@ -19,7 +24,7 @@
 	}
 }
 
-.editor-block-list__block-draggable {
+.editor-block-list__layout .editor-block-list__block-draggable {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -52,8 +57,15 @@
 	}
 
 	@include break-small {
-		left: -$block-side-ui-padding;
-		right: -$block-side-ui-padding;
+		// use a wider available space for hovering/selecting/dragging on top level blocks
+		left: -$parent-block-padding - $block-padding;
+		right: -$parent-block-padding - $block-padding;
+
+		// use smaller space for hovering/selecting/dragging on child blocks
+		.editor-block-list__layout & {
+			left: -$block-side-ui-width;
+			right: -$block-side-ui-width;
+		}
 
 		// Full width blocks don't have the place to expand on the side
 		.editor-block-list__block[data-align="full"] & {
@@ -103,6 +115,10 @@
 		padding-right: 0;
 	}
 }
+
+/**
+ * General layout
+ */
 
 .editor-block-list__layout .editor-block-list__block {
 	position: relative;
@@ -181,56 +197,8 @@
 	}
 
 	/**
-	 * Hovered Block style
+	 * Block outline layout
 	 */
-
-	&.is-selected > .editor-block-mover:before,
-	&.is-hovered > .editor-block-mover:before,
-	&.is-selected > .editor-block-settings-menu:before,
-	&.is-hovered > .editor-block-settings-menu:before {
-		content: '';
-		position: absolute;
-		height: 36px;
-		top: 10px;
-	}
-
-	&.is-hovered > .editor-block-mover:before {
-		right: 0;
-
-		// use opacity to work in various editor styles
-		border-right: 1px solid $dark-opacity-light-500;
-
-		.is-dark-theme & {
-			border-right-color: $light-opacity-light-500;
-		}
-	}
-
-	&.is-hovered > .editor-block-settings-menu:before {
-		left: 0;
-
-		// use opacity to work in various editor styles
-		border-left: 1px solid $dark-opacity-light-500;
-
-		.is-dark-theme & {
-			border-left-color: $light-opacity-light-500;
-		}
-	}
-
-	&.is-typing .editor-block-list__empty-block-inserter,
-	&.is-typing .editor-block-list__side-inserter {
-		opacity: 0;
-	}
-
-	.editor-block-list__empty-block-inserter,
-	.editor-block-list__side-inserter {
-		opacity: 1;
-		transition: opacity 0.2s;
-	}
-
-	/**
-	 * Selected Block style
-	 */
-
 	.editor-block-list__block-edit {
 		position: relative;
 
@@ -238,30 +206,51 @@
 			z-index: z-index( '.editor-block-list__block-edit:before' );
 			content: '';
 			position: absolute;
-			top: -$block-padding;
-			right: -$block-padding;
-			bottom: -$block-padding;
-			left: -$block-padding;
 			outline: 1px solid transparent;
+			transition: outline .1s linear;
 			pointer-events: none;
+
+			// show wider padding for top level blocks
+			right: -$parent-block-padding;
+			left: -$parent-block-padding;
+			top: -$block-padding;
+			bottom: -$block-padding;
 		}
 
+		// show smaller padding for child blocks
+		.editor-block-list__block-edit:before {
+			right: -$block-padding;
+			left: -$block-padding;
+			top: -$block-padding;
+			bottom: -$block-padding;
+		}
 	}
 
-	// focused block-style
+
+	// Hover style
+	&.is-hovered > .editor-block-list__block-edit:before {
+		outline: 1px solid $blue-medium-300;
+	}
+
+	// Selected style
 	&.is-selected > .editor-block-list__block-edit:before {
 		// use opacity to work in various editor styles
 		outline: 1px solid $dark-opacity-light-500;
+		top: -$block-padding;
+		bottom: -$block-padding;
 
 		.is-dark-theme & {
 			outline-color: $light-opacity-light-500;
 		}
 	}
+}
 
-	/**
-	 * Selection Style
-	 */
 
+/**
+ * Cross-block selection
+ */
+
+.editor-block-list__layout .editor-block-list__block {
 	::-moz-selection {
 		background-color: $blue-medium-highlight;
 	}
@@ -281,23 +270,60 @@
 		// use opacity to work in various editor styles
 		mix-blend-mode: multiply;
 
+		// Collapse extra vertical padding on selection
+		top: -$block-padding;
+		bottom: -$block-padding;
+
 		.is-dark-theme & {
 			mix-blend-mode: soft-light;
 		}
 	}
+}
 
-	/**
-	 * Shared blocks
-	 */
 
-	&.is-shared > .editor-block-mover:before {
-		border-right: none;
+/**
+ * Block styles and alignments
+ */
+
+.editor-block-list__layout .editor-block-list__block {
+
+	// Warnings
+	 &.has-warning .editor-block-list__block-edit {
+		position: relative;
+		min-height: 250px;
+		max-height: 500px;
+		overflow: hidden;
+
+		> :not( .editor-warning ) {
+			pointer-events: none;
+			user-select: none;
+		}
 	}
 
-	&.is-shared > .editor-block-settings-menu:before {
-		border-left: none;
+	&.has-warning .editor-block-list__block-edit:after {
+		content: '';
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background-color: rgba( $white, 0.6 );
+		background-image: linear-gradient( to bottom, transparent, $white );
 	}
 
+	// Appender
+	&.is-typing .editor-block-list__empty-block-inserter,
+	&.is-typing .editor-block-list__side-inserter {
+		opacity: 0;
+	}
+
+	.editor-block-list__empty-block-inserter,
+	.editor-block-list__side-inserter {
+		opacity: 1;
+		transition: opacity 0.2s;
+	}
+
+	// Shared blocks
 	&.is-shared > .editor-block-list__block-edit:before {
 		// use opacity to work in various editor styles
 		outline: 1px dashed $dark-opacity-light-500;
@@ -307,10 +333,7 @@
 		}
 	}
 
-	/**
-	 * Alignments
-	 */
-
+	// Alignments
 	&[data-align="left"],
 	&[data-align="right"] {
 		// Without z-index, won't be clickable as "above" adjacent content
@@ -448,8 +471,8 @@
 	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		position: absolute;
-		top: 0; // stretch to bottom to utilize full vertical space to increase hoverable area
-		bottom: 0;
+		top: 0;
+		min-height: 50%; // stretch to fill half of the available space to increase hoverable area
 		width: $block-side-ui-width + $block-side-ui-clearance;
 
 		/* Necessary for drag indicator */
@@ -471,8 +494,15 @@
 
 	// Right side UI
 	> .editor-block-settings-menu {
-		right: -$block-side-ui-width - $block-side-ui-clearance;
 		padding-left: $block-side-ui-clearance;
+
+		// Position for top level blocks
+		right: -$block-side-ui-width - $block-side-ui-clearance - $block-parent-side-ui-clearance;
+
+		// Position for nested blocks
+		.editor-block-list__block & {
+			right: -$block-side-ui-width - $block-side-ui-clearance;
+		}
 
 		// Mobile
 		display: none;
@@ -484,8 +514,15 @@
 
 	// Left side UI
 	> .editor-block-mover {
-		left: -$block-side-ui-width - $block-side-ui-clearance;
 		padding-right: $block-side-ui-clearance;
+
+		// Position for top level blocks
+		left: -$block-side-ui-width - $block-side-ui-clearance - $block-parent-side-ui-clearance;
+
+		// Position for nested blocks
+		.editor-block-list__block & {
+			left: -$block-side-ui-width - $block-side-ui-clearance;
+		}
 
 		// Mobile
 		display: none;
@@ -589,11 +626,11 @@
 		background: $white;
 		height: $block-padding * 2 + 8px;
 		width: $block-padding * 2 + 8px;
-	
+
 		&:not(:disabled):not([aria-disabled="true"]):hover {
 			box-shadow: none;
 		}
-	
+
 	}
 
 	// Show a line indicator when hovering, but this is unclickable
@@ -649,8 +686,8 @@
  * Block Toolbar
  */
 
-.editor-block-contextual-toolbar,
-.editor-block-list__breadcrumb {
+ .editor-block-list__block .editor-block-contextual-toolbar {
+	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
 	white-space: nowrap;
 	text-align: left;
@@ -692,8 +729,14 @@
 
 	@include break-small() {
 		// stack borders
-		margin-left: -$block-padding - $block-side-ui-padding - 1px;
-		margin-right: -$block-padding - $block-side-ui-padding - 1px;
+		margin-left: -$block-padding - $block-side-ui-padding - $block-parent-side-ui-clearance - 1px;
+		margin-right: -$block-padding - $block-side-ui-padding - $block-parent-side-ui-clearance - 1px;
+
+		// fixme nested
+		.editor-block-list__block & {
+			margin-left: -$block-padding - $block-side-ui-padding - 1px;
+			margin-right: -$block-padding - $block-side-ui-padding - 1px;
+		}
 
 		// except for wide elements, this causes a horizontal scrollbar
 		[data-align="full"] & {
@@ -709,8 +752,7 @@
 
 }
 
-.editor-block-contextual-toolbar .editor-block-toolbar,
-.editor-block-list__breadcrumb .components-toolbar {
+.editor-block-contextual-toolbar .editor-block-toolbar {
 	width: 100%;
 	background: $white;
 
@@ -733,27 +775,39 @@
 	}
 }
 
-.editor-block-list__breadcrumb .components-toolbar {
-	padding: 0px 12px;
-	line-height: $block-toolbar-height - 1px;
-	font-family: $default-font;
-	font-size: $default-font-size;
-	color: $dark-gray-500;
-	cursor: default;
+/**
+ * Hover label
+ */
+ .editor-block-list__breadcrumb {
+	position: absolute;
+	line-height: 1;
+	background: rgba( $white, .7 );
+	padding: 0px 4px 2px 4px;
+	z-index: z-index( '.editor-block-list__breadcrumb' );
 
-	.components-button {
-		margin-left: -12px;
-		margin-right: 12px;
-		border-right: 1px solid $light-gray-500;
-		color: $dark-gray-500;
-		padding-top: 6px;
+	// Position in the top right of the border
+	right: -$block-parent-side-ui-clearance - 1px;
+	top: -$block-padding - 4px;
+	background-color: $blue-medium-300;
+
+	// Nested
+	.editor-block-list__block-edit & {
+		right: $parent-block-padding - $block-padding - $block-parent-side-ui-clearance - 1px;
 	}
-}
 
-.editor-block-list__breadcrumb {
-	opacity: 0;
+	.components-toolbar {
+		padding: 0;
+		border: none;
+		background: transparent;
+		padding: 0px;
+		line-height: 1;
+		font-family: $default-font;
+		font-size: 11px;
+		color: $white;
+		cursor: default;
 
-	&.is-visible {
-		@include fade_in;
+		> span {
+			margin: 0 4px;
+		}
 	}
 }
