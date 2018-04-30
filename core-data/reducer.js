@@ -149,7 +149,7 @@ function model( modelConfig ) {
 }
 
 const modelsByKind = groupBy( modelsConfig, 'kind' );
-const models = combineReducers( Object.entries( modelsByKind ).reduce( ( memo, [ kind, subModels ] ) => {
+export const models = combineReducers( Object.entries( modelsByKind ).reduce( ( memo, [ kind, subModels ] ) => {
 	const kindReducer = combineReducers( subModels.reduce(
 		( kindMemo, modelConfig ) => ( {
 			...kindMemo,
