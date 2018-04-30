@@ -1,11 +1,13 @@
 /**
- * Internal dependencies
- *
- * @format
+ * WordPress dependencies
  */
 import {
 	registerBlockType,
-} from '../api';
+} from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
 import * as code from './code';
 
 export const registerCoreBlocks = () => {

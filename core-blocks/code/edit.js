@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './editor.scss';
-import PlainText from '../../plain-text';
+import { PlainText } from '@wordpress/blocks';
 
 export function edit( { attributes, setAttributes, className } ) {
 	return (

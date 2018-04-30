@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import PlainText from '../../plain-text';
+import { PlainText } from '../../blocks';
 
 export function edit( { attributes, setAttributes, style } ) {
 	return (
@@ -20,7 +20,7 @@ export function edit( { attributes, setAttributes, style } ) {
 				style={ style }
 				multiline={ true }
 				underlineColorAndroid="transparent"
-				onChange={ content => setAttributes( { content } ) }
+				onChange={ ( content ) => setAttributes( { content } ) }
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
 			/>
