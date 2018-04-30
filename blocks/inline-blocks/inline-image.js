@@ -8,9 +8,10 @@ export default {
 	title: __( 'Inline Image' ),
 	type: 'image',
 	icon: 'format-image',
-	render( { url, alt, width }, editor ) {
+	render( { id, url, alt, width }, editor ) {
 		const imgWidth = width > 150 ? 150 : width;
-		const img = `<img style="width:${ imgWidth }px;" src="${ url }" alt="${ alt }" />`;
+		// set width in style attribute to prevent Block CSS from overriding it
+		const img = `<img class="wp-image-${ id }" style="width:${ imgWidth }px;" src="${ url }" alt="${ alt }" />`;
 
 		editor.insertContent( img );
 	},
