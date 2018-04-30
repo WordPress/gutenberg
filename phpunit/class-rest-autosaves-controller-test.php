@@ -35,7 +35,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 	protected function check_create_autosave_response( $response ) {
 		$this->assertNotInstanceOf( 'WP_Error', $response );
 		$response = rest_ensure_response( $response );
-		$data = $response->get_data();
+		$data     = $response->get_data();
 
 		$this->assertArrayHasKey( 'content', $data );
 		$this->assertArrayHasKey( 'excerpt', $data );
@@ -103,18 +103,21 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 	}
 
 	public function test_context_param() {
-		// Collection
+
+		// Collection.
 		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertEqualSets( array( 'view', 'edit', 'embed' ), $data['endpoints'][0]['args']['context']['enum'] );
-		// Single
+
+		// Single.
 		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . self::$post_id . '/autosaves/' . self::$autosave_post_id );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
-		$this->assertEqualSets( array( 'view', 'edit', 'embed' ), $data['endpoints'][0]['args']['context']['enum'] );	}
+		$this->assertEqualSets( array( 'view', 'edit', 'embed' ), $data['endpoints'][0]['args']['context']['enum'] );
+	}
 
 	public function test_get_items() {
 		wp_set_current_user( self::$editor_id );
@@ -158,7 +161,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/autosaves/' . self::$autosave_post_id );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
-		$data     = $response->get_data();
+		$data = $response->get_data();
 
 		$this->check_get_autosave_response( $response, $this->post_autosave );
 		$fields = array(
@@ -181,7 +184,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 
 	public function test_get_item_embed_context() {
 		wp_set_current_user( self::$editor_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/autosaves/' . self::$autosave_post_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . self::$post_id . '/autosaves/' . self::$autosave_post_id );
 		$request->set_param( 'context', 'embed' );
 		$response = rest_get_server()->dispatch( $request );
 		$fields   = array(
@@ -254,7 +257,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 	public function test_create_item() {
 		wp_set_current_user( self::$editor_id );
 
-		$request  = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 
 		$params = $this->set_post_data(
@@ -270,7 +273,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 
 	public function test_update_item() {
 		wp_set_current_user( self::$editor_id );
-		$request  = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
 		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
 
 		$params = $this->set_post_data(
@@ -308,7 +311,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 	public function test_rest_autosave_published_post() {
 		wp_set_current_user( self::$editor_id );
 
-		$request  = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
 		$request->add_header( 'content-type', 'application/json' );
 
 		$current_post = get_post( self::$post_id );
@@ -329,7 +332,8 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 		$this->assertEquals( $current_post->ID, $new_data['parent'] );
 		$this->assertEquals( $current_post->post_title, $new_data['title']['raw'] );
 		$this->assertEquals( $current_post->post_excerpt, $new_data['excerpt']['raw'] );
-		// Updated post_content
+
+		// Updated post_content.
 		$this->assertNotEquals( $current_post->post_content, $new_data['content']['raw'] );
 
 		$autosave_post = wp_get_post_autosave( self::$post_id );
@@ -346,21 +350,21 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 			'post_title'   => 'Test post title',
 			'post_excerpt' => 'Test post excerpt',
 		);
-		$post_id = wp_insert_post( $post_data );
+		$post_id   = wp_insert_post( $post_data );
 
 		$autosave_data = array(
-			'id' => $post_id,
+			'id'      => $post_id,
 			'content' => 'Updated post \ content',
 			'title'   => 'Updated post title',
 		);
 
-		$request  = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
 		$request->add_header( 'content-type', 'application/json' );
 		$request->set_body( wp_json_encode( $autosave_data ) );
 
 		$response = rest_get_server()->dispatch( $request );
 		$new_data = $response->get_data();
-		$post = get_post( $post_id );
+		$post     = get_post( $post_id );
 
 		$this->assertEquals( $post_id, $new_data['id'] );
 		// The draft post should be updated.
@@ -384,21 +388,21 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 			'post_excerpt' => 'Test post excerpt',
 			'post_author'  => self::$editor_id + 1,
 		);
-		$post_id = wp_insert_post( $post_data );
+		$post_id   = wp_insert_post( $post_data );
 
 		$autosave_data = array(
-			'id' => $post_id,
+			'id'      => $post_id,
 			'content' => 'Updated post content',
 			'excerpt' => $post_data['post_excerpt'],
 			'title'   => $post_data['post_title'],
 		);
 
-		$request  = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
 		$request->add_header( 'content-type', 'application/json' );
 		$request->set_body( wp_json_encode( $autosave_data ) );
 
-		$response = rest_get_server()->dispatch( $request );
-		$new_data = $response->get_data();
+		$response     = rest_get_server()->dispatch( $request );
+		$new_data     = $response->get_data();
 		$current_post = get_post( $post_id );
 
 		$this->assertEquals( $current_post->ID, $new_data['parent'] );
@@ -410,11 +414,11 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 
 		$autosave_post = wp_get_post_autosave( $post_id );
 
-		// No changes
+		// No changes.
 		$this->assertEquals( $current_post->post_title, $autosave_post->post_title );
 		$this->assertEquals( $current_post->post_excerpt, $autosave_post->post_excerpt );
 
-		// Has changes
+		// Has changes.
 		$this->assertEquals( $autosave_data['content'], $autosave_post->post_content );
 
 		wp_delete_post( $post_id );
@@ -477,15 +481,15 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 		$rendered_content = apply_filters( 'the_content', $autosave->post_content );
 		$this->assertEquals( $rendered_content, $response['content']['rendered'] );
 
-		$this->assertEquals( mysql_to_rfc3339( $autosave->post_date ), $response['date'] );
-		$this->assertEquals( mysql_to_rfc3339( $autosave->post_date_gmt ), $response['date_gmt'] );
+		$this->assertEquals( mysql_to_rfc3339( $autosave->post_date ), $response['date'] ); //@codingStandardsIgnoreLine
+		$this->assertEquals( mysql_to_rfc3339( $autosave->post_date_gmt ), $response['date_gmt'] ); //@codingStandardsIgnoreLine
 
 		$rendered_guid = apply_filters( 'get_the_guid', $autosave->guid, $autosave->ID );
 		$this->assertEquals( $rendered_guid, $response['guid']['rendered'] );
 
 		$this->assertEquals( $autosave->ID, $response['id'] );
-		$this->assertEquals( mysql_to_rfc3339( $autosave->post_modified ), $response['modified'] );
-		$this->assertEquals( mysql_to_rfc3339( $autosave->post_modified_gmt ), $response['modified_gmt'] );
+		$this->assertEquals( mysql_to_rfc3339( $autosave->post_modified ), $response['modified'] ); //@codingStandardsIgnoreLine
+		$this->assertEquals( mysql_to_rfc3339( $autosave->post_modified_gmt ), $response['modified_gmt'] ); //@codingStandardsIgnoreLine
 		$this->assertEquals( $autosave->post_name, $response['slug'] );
 
 		$rendered_title = get_the_title( $autosave->ID );
