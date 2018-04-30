@@ -80,7 +80,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	serializeToHtml() {
 		return this.props.blocks
-			.map( block => {
+			.map( ( block ) => {
 				const blockType = getBlockType( block.name );
 				if ( blockType ) {
 					return serialize( [ block ] ) + '\n\n';
@@ -113,7 +113,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		if ( Platform.OS === 'android' ) {
 			list = (
 				<RecyclerViewList
-					ref={ component => ( this._recycler = component ) }
+					ref={ ( component ) => ( this._recycler = component ) }
 					style={ styles.list }
 					dataSource={ this.state.dataSource }
 					renderItem={ this.renderItem.bind( this ) }
@@ -131,7 +131,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					style={ styles.list }
 					data={ this.props.blocks }
 					extraData={ this.props.refresh }
-					keyExtractor={ item => item.uid }
+					keyExtractor={ ( item ) => item.uid }
 					renderItem={ this.renderItem.bind( this ) }
 				/>
 			);
@@ -146,7 +146,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						activeText={ 'On' }
 						inActiveText={ 'Off' }
 						value={ this.state.showHtml }
-						onValueChange={ value => this.setState( { showHtml: value } ) }
+						onValueChange={ ( value ) => this.setState( { showHtml: value } ) }
 					/>
 				</View>
 				{ this.state.showHtml && <Text style={ styles.htmlView }>{ this.serializeToHtml() }</Text> }
