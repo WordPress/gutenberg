@@ -28,6 +28,7 @@ module.exports = {
 		'node',
 	],
 	moduleNameMapper: {
+		'@wordpress/blocks': '<rootDir>/gutenberg/blocks',
 		'@wordpress/element': '<rootDir>/gutenberg/element',
 		'@wordpress/hooks': '<rootDir>/wordpress/hooks',
 		'@wordpress/utils': '<rootDir>/gutenberg/utils',
