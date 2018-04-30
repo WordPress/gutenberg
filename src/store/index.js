@@ -14,7 +14,7 @@ export type BlockType = {
 	uid: string,
 	name: string,
 	isValid: boolean,
-	attributes: { content: string },
+	attributes: Object,
 	innerBlocks: Array<BlockType>,
 	focused: boolean,
 };
@@ -28,6 +28,10 @@ registerCoreBlocks();
 
 const codeBlockInstance = createBlock( 'core/code', {
 	content: 'if name == "World":\n    return "Hello World"\nelse:\n    return "Hello Pony"',
+} );
+
+const moreBlockInstance = createBlock( 'core/more', {
+	customText: undefined,
 } );
 
 const initialState: StateType = {
@@ -67,6 +71,7 @@ const initialState: StateType = {
 			focused: false,
 		},
 		{ ...codeBlockInstance, focused: false },
+		{ ...moreBlockInstance, focused: false },
 		{
 			uid: '4',
 			name: 'paragraph',
