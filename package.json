@@ -20,7 +20,7 @@
 		"@wordpress/dom-ready": "1.0.4",
 		"@wordpress/hooks": "1.1.6",
 		"@wordpress/i18n": "1.1.0",
-		"@wordpress/url": "1.0.3",
+		"@wordpress/url": "1.1.0",
 		"@wordpress/wordcount": "1.0.0",
 		"classnames": "2.2.5",
 		"clipboard": "1.7.1",
