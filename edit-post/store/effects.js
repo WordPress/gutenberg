@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { reduce, some } from 'lodash';
+import { get, reduce, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { select, subscribe } from '@wordpress/data';
+import { select, dispatch, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 
@@ -16,13 +16,12 @@ import { __ } from '@wordpress/i18n';
 import {
 	metaBoxUpdatesSuccess,
 	setMetaBoxSavedData,
-	requestMetaBoxUpdates,
 	openGeneralSidebar,
 	closeGeneralSidebar,
 } from './actions';
 import { getMetaBoxes, getActiveGeneralSidebarName } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
-import { onChangeListener } from './utils';
+import { onChangeListener, onValueMatch } from './utils';
 
 const effects = {
 	INITIALIZE_META_BOX_STATE( action, store ) {
@@ -51,13 +50,6 @@ const effects = {
 			return memo;
 		}, {} );
 		store.dispatch( setMetaBoxSavedData( dataPerLocation ) );
-
-		// Saving metaboxes when saving posts
-		subscribe( onChangeListener( select( 'core/editor' ).isSavingPost, ( isSavingPost ) => {
-			if ( ! isSavingPost ) {
-				store.dispatch( requestMetaBoxUpdates() );
-			}
-		} ) );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		const state = store.getState();
@@ -146,6 +138,64 @@ const effects = {
 				};
 			} )()
 		) );
+
+		// Saving metaboxes when saving posts
+		subscribe( onChangeListener( select( 'core/editor' ).isSavingPost, ( isSavingPost ) => {
+			if ( isSavingPost ) {
+				const {
+					getCurrentPost,
+					getCurrentPostType,
+					getPostEdits,
+					getEditedPostContent,
+				} = select( 'core/editor' );
+
+				const {
+					updatePost,
+					requestPostUpdateSuccess,
+					requestPostUpdateFailure,
+					resetPost,
+				} = dispatch( 'core/editor' );
+
+				const {
+					hasMetaBoxes,
+					isSavingMetaBoxes,
+				} = select( 'core/edit-post' );
+
+				const {
+					requestMetaBoxUpdates,
+				} = dispatch( 'core/edit-post' );
+
+				const post = getCurrentPost();
+				const edits = getPostEdits();
+				const toSend = {
+					...edits,
+					content: getEditedPostContent(),
+					id: post.id,
+				};
+
+				updatePost( toSend );
+
+				const basePath = wp.api.getPostTypeRoute( getCurrentPostType() );
+				wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
+					( newPost ) => {
+						if ( hasMetaBoxes() ) {
+							requestMetaBoxUpdates();
+						}
+						onValueMatch( isSavingMetaBoxes, false, () => {
+							resetPost( newPost );
+							requestPostUpdateSuccess( toSend, post, newPost );
+						} );
+					},
+					( err ) => {
+						const error = get( err, 'responseJSON', {
+							code: 'unknown_error',
+							message: __( 'An unknown error occurred.' ),
+						} );
+						requestPostUpdateFailure( toSend, post, error );
+					}
+				);
+			}
+		} ) );
 	},
 
 };

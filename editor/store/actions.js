@@ -2,6 +2,7 @@
  * External Dependencies
  */
 import uuid from 'uuid/v4';
+import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 import { partial, castArray } from 'lodash';
 
 /**
@@ -11,6 +12,13 @@ import {
 	getDefaultBlockName,
 	createBlock,
 } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import {
+	POST_UPDATE_TRANSACTION_ID,
+} from './selectors';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
@@ -664,5 +672,55 @@ export function insertDefaultBlock( attributes, rootUID, index ) {
 	return {
 		...insertBlock( block, index, rootUID ),
 		isProvisional: true,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the post update process started.
+ *
+ * @param {Object} edits Object representing the editions the post contains.
+ *
+ * @return {Object} Action object
+ */
+export function updatePost( edits ) {
+	return {
+		type: 'UPDATE_POST',
+		edits: edits,
+		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
+	};
+}
+
+/**
+ * Returns an action object used to signal that the post update process ended with success.
+ *
+ * @param {Object} edits        Object representing the editions the post contains.
+ * @param {Object} previousPost Object containing a representation of the post when the update process started.
+ * @param {Object} post         Object containing a new representation of the post after the update.
+ *
+ * @return {Object} Action object
+ */
+export function requestPostUpdateSuccess( edits, previousPost, post ) {
+	return {
+		type: 'REQUEST_POST_UPDATE_SUCCESS',
+		...{ previousPost, post, edits },
+		optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+
+	};
+}
+
+/**
+ * Returns an action object used to signal that the post update process failed.
+ *
+ * @param {Object} edits Object representing the editions the post contains.
+ * @param {Object} post  Object containing a representation of the post when the update process started.
+ * @param {string} error Message with the specifying why the post update failed.
+ *
+ * @return {Object} Action object
+ */
+export function requestPostUpdateFailure( edits, post, error ) {
+	return {
+		type: 'REQUEST_POST_UPDATE_FAILURE',
+		...{ post, edits, error },
+		optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
 	};
 }

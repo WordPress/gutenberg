@@ -62,14 +62,14 @@ class PostPublishPanel extends Component {
 	}
 
 	render() {
-		const { isScheduled, onClose, forceIsDirty, forceIsSaving } = this.props;
+		const { isScheduled, onClose, forceIsDirty } = this.props;
 		const { loading, submitted } = this.state;
 		return (
 			<div className="editor-post-publish-panel">
 				<div className="editor-post-publish-panel__header">
 					{ ! submitted && (
 						<div className="editor-post-publish-panel__header-publish-button">
-							<PostPublishButton onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
+							<PostPublishButton onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } />
 						</div>
 					) }
 					{ submitted && (

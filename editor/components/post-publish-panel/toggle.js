@@ -28,10 +28,9 @@ function PostPublishPanelToggle( {
 	onToggle,
 	isOpen,
 	forceIsDirty,
-	forceIsSaving,
 } ) {
 	const isButtonEnabled = (
-		! isSaving && ! forceIsSaving && isPublishable && isSaveable
+		! isSaving && isPublishable && isSaveable
 	) || isPublished;
 
 	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
@@ -39,7 +38,7 @@ function PostPublishPanelToggle( {
 	const showToggle = ! isPublished && ! ( isScheduled && isBeingScheduled ) && ! ( isPending && isContributor );
 
 	if ( ! showToggle ) {
-		return <PostPublishButton forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />;
+		return <PostPublishButton forceIsDirty={ forceIsDirty } />;
 	}
 
 	return (

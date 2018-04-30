@@ -27,7 +27,6 @@ export function PostPublishButton( {
 	isSaveable,
 	user,
 	onSubmit = noop,
-	forceIsSaving,
 } ) {
 	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
 	const isContributor = ! get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
@@ -61,13 +60,13 @@ export function PostPublishButton( {
 			disabled={ ! isButtonEnabled }
 			className={ className }
 		>
-			<PublishButtonLabel forceIsSaving={ forceIsSaving } />
+			<PublishButtonLabel />
 		</Button>
 	);
 }
 
 export default compose( [
-	withSelect( ( select, { forceIsSaving, forceIsDirty } ) => {
+	withSelect( ( select, { forceIsDirty } ) => {
 		const {
 			isSavingPost,
 			isEditedPostBeingScheduled,
@@ -77,7 +76,7 @@ export default compose( [
 			getCurrentPostType,
 		} = select( 'core/editor' );
 		return {
-			isSaving: forceIsSaving || isSavingPost(),
+			isSaving: isSavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),

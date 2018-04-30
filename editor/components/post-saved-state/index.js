@@ -76,7 +76,7 @@ export class PostSavedState extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { forceIsDirty, forceIsSaving } ) => {
+	withSelect( ( select, { forceIsDirty } ) => {
 		const {
 			isEditedPostNew,
 			isCurrentPostPublished,
@@ -90,7 +90,7 @@ export default compose( [
 			isNew: isEditedPostNew(),
 			isPublished: isCurrentPostPublished(),
 			isDirty: forceIsDirty || isEditedPostDirty(),
-			isSaving: forceIsSaving || isSavingPost(),
+			isSaving: isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
 		};
 	} ),
