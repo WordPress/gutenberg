@@ -597,7 +597,7 @@ export function currentlyAutosaving( state = false, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_UPDATE':
 			const isAutosave = action.options && action.options.autosave;
-			return isAutosave;
+			return !! isAutosave;
 		case 'RESET_AUTOSAVE':
 			return false;
 	}
