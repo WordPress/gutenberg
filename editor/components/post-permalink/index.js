@@ -58,6 +58,7 @@ class PostPermalink extends Component {
 	render() {
 		const { isNew, previewLink, isEditable, samplePermalink, isPublished } = this.props;
 		const { isCopied, isEditingPermalink } = this.state;
+		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
 
 		if ( isNew || ! previewLink ) {
 			return null;
@@ -68,8 +69,9 @@ class PostPermalink extends Component {
 				<ClipboardButton
 					className={ classnames( 'editor-post-permalink__copy', { 'is-copied': isCopied } ) }
 					text={ samplePermalink }
-					label={ __( 'Copy the permalink' ) }
+					label={ ariaLabel }
 					onCopy={ () => this.setState( { isCopied: true } ) }
+					aria-disabled={ isCopied }
 				/>
 
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
