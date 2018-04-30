@@ -295,12 +295,17 @@ class ImageBlock extends Component {
 			</InspectorControls>
 		);
 
+		// Pass optional width as variable
+		const figureWidth = {
+			'--caption-width': width + 'px',
+		};
+
 		// Disable reason: Each block can be selected by clicking on it
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<Fragment>
 				{ controls }
-				<figure className={ classes }>
+				<figure className={ classes } style={ figureWidth }>
 					<ImageSize src={ url } dirtynessTrigger={ align }>
 						{ ( sizes ) => {
 							const {
