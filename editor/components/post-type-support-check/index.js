@@ -19,8 +19,8 @@ function PostTypeSupportCheck( { postType, children, supportKeys, themeSupports 
 	}
 
 	// 'thumbnail' and 'post-thumbnails' are intentionally different.
-	if ( includes( supportKeys, 'thumbnail' )
-		&& ! get( themeSupports, 'post-thumbnails', false ) ) {
+	if ( includes( supportKeys, 'thumbnail' ) &&
+		! get( themeSupports, 'post-thumbnails', false ) ) {
 		return null;
 	}
 
