@@ -35,7 +35,7 @@ import {
 	isInsertionPointVisible,
 	isInlineInsertionPointVisible,
 	isInlineInsertAvailable,
-	inlineBlockForInsert,
+	inlineBlockIdForInsert,
 	sharedBlocks,
 	template,
 	blockListSettings,
@@ -1349,32 +1349,26 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'inlineBlockForInsert', () => {
-		const inlineBlock = {
-			type: 'image',
-			url: 'http://localhost:8888/wp-content/uploads/2018/04/example.jpg',
-			alt: 'example',
-			width: 400,
-			height: 300,
-		};
+	describe( 'inlineBlockIdForInsert', () => {
+		const inlineBlockId = 'inline-image';
 
 		it( 'should default to null', () => {
-			const state = inlineBlockForInsert( undefined, {} );
+			const state = inlineBlockIdForInsert( undefined, {} );
 
 			expect( state ).toBe( null );
 		} );
 
-		it( 'should insert inline block object', () => {
-			const state = inlineBlockForInsert( null, {
+		it( 'should insert inline block id', () => {
+			const state = inlineBlockIdForInsert( null, {
 				type: 'INSERT_INLINE',
-				inlineBlock,
+				inlineBlockId,
 			} );
 
-			expect( state ).toBe( inlineBlock );
+			expect( state ).toBe( inlineBlockId );
 		} );
 
 		it( 'should be null after insert complete', () => {
-			const state = inlineBlockForInsert( inlineBlock, {
+			const state = inlineBlockIdForInsert( inlineBlockId, {
 				type: 'INLINE_INSERT_COMPLETE',
 			} );
 

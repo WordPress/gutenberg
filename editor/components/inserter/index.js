@@ -8,12 +8,8 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
-import {
-	createBlock,
-	isUnmodifiedDefaultBlock,
-	MediaUpload,
-} from '@wordpress/blocks';
-import { Component, compose, Fragment } from '@wordpress/element';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -30,10 +26,7 @@ class Inserter extends Component {
 		this.isInsertingInline = this.isInsertingInline.bind( this );
 		this.showInsertionPoint = this.showInsertionPoint.bind( this );
 		this.hideInsertionPoint = this.hideInsertionPoint.bind( this );
-		this.state = {
-			isInline: false,
-			mediaLibraryOpen: false,
-		};
+		this.state = { isInline: false };
 	}
 
 	onToggle( isOpen ) {
@@ -91,69 +84,53 @@ class Inserter extends Component {
 			hasSupportedBlocks,
 			isLocked,
 		} = this.props;
+		const { isInline } = this.state;
 
 		if ( ! hasSupportedBlocks || isLocked ) {
 			return null;
 		}
 
 		return (
-			<Fragment>
-				{ this.state.mediaLibraryOpen &&
-					<MediaUpload
-						type="image"
-						onSelect={ ( { type, url, alt, width, height } ) => {
-							onInsertInline( { type, url, alt, width, height } );
-							this.setState( { mediaLibraryOpen: false } );
-						} }
-						onClose={ () => ( this.setState( { mediaLibraryOpen: false } ) ) }
-						render={ ( { open } ) => {
-							open();
-							return null;
-						} }
-					/>
-				}
-				<Dropdown
-					className="editor-inserter"
-					position={ position }
-					onToggle={ this.onToggle }
-					expandOnMobile
-					headerTitle={ title }
-					renderToggle={ ( { onToggle, isOpen } ) => (
-						<IconButton
-							icon="insert"
-							label={ __( 'Add block' ) }
-							onClick={ onToggle }
-							className="editor-inserter__toggle"
-							aria-haspopup="true"
-							aria-expanded={ isOpen }
-						>
-							{ children }
-						</IconButton>
-					) }
-					renderContent={ ( { onClose } ) => {
-						const onSelect = ( item ) => {
+			<Dropdown
+				className="editor-inserter"
+				position={ position }
+				onToggle={ this.onToggle }
+				expandOnMobile
+				headerTitle={ title }
+				renderToggle={ ( { onToggle, isOpen } ) => (
+					<IconButton
+						icon="insert"
+						label={ __( 'Add block' ) }
+						onClick={ onToggle }
+						className="editor-inserter__toggle"
+						aria-haspopup="true"
+						aria-expanded={ isOpen }
+					>
+						{ children }
+					</IconButton>
+				) }
+				renderContent={ ( { onClose } ) => {
+					const onSelect = ( item ) => {
+						if ( isInline ) {
+							onInsertInline( item.id );
+						} else {
 							onInsertBlock( item );
-
-							onClose();
-						};
-						const onImageSelect = () => {
-							this.setState( { mediaLibraryOpen: true } );
-
-							onClose();
-						};
-
-						if ( this.state.isInline ) {
-							return (
-								<InserterInlineMenu
-									onImageSelect={ onImageSelect }
-								/>
-							);
 						}
 
-						return <InserterMenu onSelect={ onSelect } />;
-					} }
-				/>
-			</Fragment>
+						onClose();
+					};
+
+					if ( isInline ) {
+						return (
+							<InserterInlineMenu
+								onSelect={ onSelect }
+							/>
+						);
+					}
+
+					return <InserterMenu onSelect={ onSelect } />;
+				} }
+			/>
 		);
 	}
 }

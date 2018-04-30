@@ -22,7 +22,7 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes, getInlineBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
@@ -1068,11 +1068,13 @@ export function isInlineInsertionPointVisible( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} Inline Block object with `type` and properties for the `type`,
- *			or null when not ready for insert.
+ * @return {Object} Inline Block object, or null when not ready for insert.
  */
 export function getInlineBlockForInsert( state ) {
-	return state.inlineBlockForInsert;
+	const id = state.inlineBlockIdForInsert;
+	const inlineBlock = id ? getInlineBlock( id ) : null;
+
+	return inlineBlock;
 }
 
 /**

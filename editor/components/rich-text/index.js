@@ -41,6 +41,7 @@ import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import InlineInsertionPoint from './inline-insertion-point';
+import MediaUpload from '../media-upload';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
@@ -484,14 +485,11 @@ export class RichText extends Component {
 		const { inlineBlockForInsert, completeInlineInsert } = this.props;
 
 		if ( inlineBlockForInsert.type === 'image' ) {
-			const { url, alt, width } = inlineBlockForInsert;
-			const imgWidth = width > 150 ? 150 : width;
-			const img = `<img style="width:${ imgWidth }px;" src="${ url }" alt="${ alt }" />`;
-
-			this.editor.insertContent( img );
+			this.setState( { mediaLibraryOpen: true } );
+		} else {
+			inlineBlockForInsert.render( this.editor );
+			completeInlineInsert();
 		}
-
-		completeInlineInsert();
 	}
 
 	toggleInsertAvailable() {
@@ -810,7 +808,11 @@ export class RichText extends Component {
 			this.setInsertPosition();
 		}
 
-		if ( this.props.inlineBlockForInsert && this.props.isSelected ) {
+		if (
+			this.props.isSelected &&
+			this.props.inlineBlockForInsert &&
+			! prevProps.inlineBlockForInsert
+		) {
 			this.insertInlineBlock();
 		}
 
@@ -929,6 +931,8 @@ export class RichText extends Component {
 			autocompleters,
 			format,
 			isInlineInsertionPointVisible = false,
+			inlineBlockForInsert,
+			completeInlineInsert,
 		} = this.props;
 
 		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
@@ -969,6 +973,21 @@ export class RichText extends Component {
 				{ isSelected && isInlineInsertionPointVisible &&
 					<InlineInsertionPoint
 						style={ this.state.insertPosition }
+					/>
+				}
+				{ this.state.mediaLibraryOpen &&
+					<MediaUpload
+						type="image"
+						onSelect={ ( media ) => {
+							inlineBlockForInsert.render( media, this.editor );
+							completeInlineInsert();
+							this.setState( { mediaLibraryOpen: false } );
+						} }
+						onClose={ () => ( this.setState( { mediaLibraryOpen: false } ) ) }
+						render={ ( { open } ) => {
+							open();
+							return null;
+						} }
 					/>
 				}
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>

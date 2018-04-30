@@ -791,17 +791,17 @@ export function isInlineInsertionPointVisible( state = false, action ) {
 }
 
 /**
- * Reducer returning an Inline Block object for insertion.
+ * Reducer returning an Inline Block id for insertion.
  *
- * @param {Object} state  Current state.
+ * @param {string} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
 */
-export function inlineBlockForInsert( state = null, action ) {
+export function inlineBlockIdForInsert( state = null, action ) {
 	switch ( action.type ) {
 		case 'INSERT_INLINE':
-			return action.inlineBlock;
+			return action.inlineBlockId;
 
 		case 'INLINE_INSERT_COMPLETE':
 			return null;
@@ -1128,7 +1128,7 @@ export default optimist( combineReducers( {
 	blockListSettings,
 	isInsertionPointVisible,
 	isInlineInsertionPointVisible,
-	inlineBlockForInsert,
+	inlineBlockIdForInsert,
 	isInlineInsertAvailable,
 	preferences,
 	saving,

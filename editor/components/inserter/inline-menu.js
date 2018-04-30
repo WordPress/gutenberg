@@ -1,15 +1,29 @@
 /**
+ * External dependencies
+ */
+import { pick } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { NavigableMenu } from '@wordpress/components';
-import { BlockIcon } from '@wordpress/blocks';
+import { Component, Fragment } from '@wordpress/element';
+import { getInlineBlocks } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import InserterGroup from './group';
 
 export default class InserterInlineMenu extends Component {
 	render() {
+		const inlineBlocks = getInlineBlocks();
+		const items = inlineBlocks.map( ( inlineBlock ) => (
+			pick( inlineBlock, [ 'id', 'title', 'icon' ] )
+		) );
+
 		return (
-			<NavigableMenu>
+			<Fragment>
 				<div
 					className="editor-inserter__separator"
 					id="editor-inserter__separator-inline"
@@ -17,14 +31,11 @@ export default class InserterInlineMenu extends Component {
 				>
 					{ __( 'Inline Blocks' ) }
 				</div>
-				<button
-					className="editor-inserter__block"
-					onClick={ this.props.onImageSelect }
-				>
-					<BlockIcon icon="format-image" />
-					{ __( 'Inline Image' ) }
-				</button>
-			</NavigableMenu>
+				<InserterGroup
+					items={ items }
+					onSelectItem={ this.props.onSelect }
+				/>
+			</Fragment>
 		);
 	}
 }
