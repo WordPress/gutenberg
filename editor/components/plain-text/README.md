@@ -29,7 +29,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.blocks.PlainText, {
+		return wp.element.createElement( wp.editor.PlainText, {
 			className: props.className,
 			value: props.attributes.content,
 			onChange: function( content ) {
@@ -41,7 +41,8 @@ wp.blocks.registerBlockType( /* ... */, {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType, PlainText } = wp.blocks;
+const { registerBlockType } = wp.blocks;
+const { PlainText } = wp.editor;
 
 registerBlockType( /* ... */, {
 	// ...

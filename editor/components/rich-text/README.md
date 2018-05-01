@@ -91,7 +91,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.blocks.RichText, {
+		return wp.element.createElement( wp.editor.RichText, {
 			tagName: 'h2',
 			className: props.className,
 			value: props.attributes.content,
@@ -102,7 +102,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	save: function() {
-		return wp.element.createElement( wp.blocks.RichText.Content, {
+		return wp.element.createElement( wp.editor.RichText.Content, {
 			tagName: 'h2', value: props.attributes.content
 		} );
 	}
@@ -110,7 +110,8 @@ wp.blocks.registerBlockType( /* ... */, {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType, RichText } = wp.blocks;
+const { registerBlockType } = wp.blocks;
+const { RichText } = wp.editor;
 
 registerBlockType( /* ... */, {
 	// ...
