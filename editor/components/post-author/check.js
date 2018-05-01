@@ -33,10 +33,9 @@ export default compose( [
 		};
 	} ),
 	withAPIData( ( props ) => {
-		const { postType, authors } = props;
+		const { postType } = props;
 
 		return {
-			authors,
 			user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 		};
 	} ),
