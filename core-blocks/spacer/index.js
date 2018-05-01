@@ -3,12 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 import ResizableBox from 're-resizable';
+import { InspectorControls } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import InspectorControls from '../../inspector-controls';
 
 export const name = 'core/spacer';
 
