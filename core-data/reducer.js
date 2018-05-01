@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy } from 'lodash';
+import { keyBy, uniqBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,7 @@ export function authors( state = [], action ) {
 		case 'RECEIVE_AUTHORS':
 			return [
 				...state,
-				...action.authors,
+				...uniqBy( action.authors, 'id' ),
 			];
 	}
 
