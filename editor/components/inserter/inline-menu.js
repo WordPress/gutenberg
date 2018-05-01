@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { getInlineBlocks } from '@wordpress/blocks';
+import { registerCoreInlineBlocks } from '../../../core-inlineblocks';
+import { getInlineBlockTypes } from '../../../inline-blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -10,9 +11,12 @@ import { __ } from '@wordpress/i18n';
  */
 import InserterGroup from './group';
 
+// TODO: move this to lib/client-assets.php
+registerCoreInlineBlocks();
+
 export default class InserterInlineMenu extends Component {
 	render() {
-		const inlineBlocks = getInlineBlocks();
+		const inlineBlocks = getInlineBlockTypes();
 
 		return (
 			<Fragment>

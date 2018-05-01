@@ -7,7 +7,8 @@ import { filter, property, union } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, unregisterBlockType, getBlockTypes, getInlineBlock } from '@wordpress/blocks';
+import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
+import { getInlineBlockType } from '../../../inline-blocks';
 import { moment } from '@wordpress/date';
 import { registerCoreBlocks } from '@wordpress/core-blocks';
 
@@ -2444,7 +2445,7 @@ describe( 'selectors', () => {
 	describe( 'getInlineBlockForInsert', () => {
 		it( 'should return null when not inserting an inline block', () => {
 			const state = {
-				inlineBlockIdForInsert: null,
+				inlineBlockNameForInsert: null,
 			};
 
 			expect( getInlineBlockForInsert( state ) ).toBe( null );
@@ -2452,9 +2453,9 @@ describe( 'selectors', () => {
 
 		it( 'should return inline block object when ready for insert', () => {
 			const state = {
-				inlineBlockIdForInsert: 'inline-image',
+				inlineBlockNameForInsert: 'core/inline-image',
 			};
-			const inlineBlock = getInlineBlock( 'inline-image' );
+			const inlineBlock = getInlineBlockType( 'core/inline-image' );
 
 			expect( getInlineBlockForInsert( state ) ).toBe( inlineBlock );
 		} );

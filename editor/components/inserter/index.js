@@ -112,7 +112,7 @@ class Inserter extends Component {
 				renderContent={ ( { onClose } ) => {
 					const onSelect = ( item ) => {
 						if ( isInline ) {
-							onInsertInline( item.id );
+							onInsertInline( item.name );
 						} else {
 							onInsertBlock( item );
 						}

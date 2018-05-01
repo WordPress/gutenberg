@@ -3,11 +3,15 @@
  */
 import { __ } from '@wordpress/i18n';
 
-export default {
+export const settings = {
 	id: 'inline-image',
+
 	title: __( 'Inline Image' ),
+
 	type: 'image',
+
 	icon: 'format-image',
+
 	render( { id, url, alt, width }, editor ) {
 		const imgWidth = width > 150 ? 150 : width;
 		// set width in style attribute to prevent Block CSS from overriding it
@@ -16,3 +20,5 @@ export default {
 		editor.insertContent( img );
 	},
 };
+
+export const name = 'core/inline-image';

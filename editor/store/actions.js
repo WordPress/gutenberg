@@ -289,14 +289,14 @@ export function insertBlocks( blocks, index, rootUID ) {
  * Returns an action object used in signalling that an inline block should be
  * inserted.
  *
- * @param {string}  inlineBlockId  ID of inline block to insert.
+ * @param {string}  inlineBlockName Name of inline block to insert.
  *
  * @return {Object} Action object.
  */
-export function insertInline( inlineBlockId ) {
+export function insertInline( inlineBlockName ) {
 	return {
 		type: 'INSERT_INLINE',
-		inlineBlockId,
+		inlineBlockName,
 	};
 }
 
