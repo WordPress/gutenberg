@@ -1,12 +1,20 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { mount, shallow } from 'enzyme';
+
+/**
+ * WordPress dependencies
+ */
+import { createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import Button from '../';
+import ButtonWithForwardedRef, { Button } from '../';
+
+// [TEMPORARY]: Only needed so long as Enzyme does not support React.forwardRef
+jest.unmock( '../' );
 
 describe( 'Button', () => {
 	describe( 'basic rendering', () => {
@@ -91,6 +99,20 @@ describe( 'Button', () => {
 			const button = shallow( <Button href="https://wordpress.org/" disabled /> );
 
 			expect( button.type() ).toBe( 'button' );
+		} );
+	} );
+
+	// Disable reason: This test is desirable, but unsupported by Enzyme in
+	// the current version, as it depends on features new to React in 16.3.0.
+	//
+	// eslint-disable-next-line jest/no-disabled-tests
+	describe.skip( 'ref forwarding', () => {
+		it( 'should enable access to DOM element', () => {
+			const ref = createRef();
+
+			mount( <ButtonWithForwardedRef ref={ ref } /> );
+
+			expect( ref.current.nodeName ).toBe( 'button' );
 		} );
 	} );
 } );
