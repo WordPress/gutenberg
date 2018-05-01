@@ -18,7 +18,6 @@ import {
 } from '@wordpress/utils';
 import {
 	BlockEdit,
-	createBlock,
 	cloneBlock,
 	getBlockType,
 	getSaveElement,
@@ -351,9 +350,7 @@ export class BlockListBlock extends Component {
 			case ENTER:
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
-				this.props.onInsertBlocks( [
-					createBlock( 'core/paragraph' ),
-				], this.props.order + 1 );
+				this.props.onInsertDefaultBlock( this.props.order + 1 );
 				event.preventDefault();
 				break;
 
@@ -647,6 +644,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		updateBlockAttributes,
 		selectBlock,
 		insertBlocks,
+		insertDefaultBlock,
 		removeBlock,
 		mergeBlocks,
 		replaceBlocks,
@@ -666,6 +664,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
 			insertBlocks( blocks, index, rootUID );
 		},
+		onInsertDefaultBlock: insertDefaultBlock,
 		onRemove( uid ) {
 			removeBlock( uid );
 		},
