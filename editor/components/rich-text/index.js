@@ -111,7 +111,6 @@ export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.positionedContainerElement = createRef();
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
@@ -431,19 +430,6 @@ export class RichText extends Component {
 		this.context.onCreateUndoLevel();
 	}
 
-	getContainerNode() {
-		// Find the parent "relative" or "absolute" positioned container
-		const findRelativeParent = ( node ) => {
-			const style = getComputedStyle( node );
-			if ( style.position === 'relative' || style.position === 'absolute' ) {
-				return node;
-			}
-			return findRelativeParent( node.parentNode );
-		};
-
-		return findRelativeParent( this.editor.getBody() );
-	}
-
 	/**
 	 * Calculates the relative position where the link toolbar should be.
 	 *
@@ -467,7 +453,7 @@ export class RichText extends Component {
 	}
 
 	setInsertPosition() {
-		const container = this.positionedContainerElement.current;
+		const container = this.containerRef.current;
 		const containerStyle = window.getComputedStyle( container );
 		const marginLeft = get( containerStyle, 'margin-left', 0 );
 		const containerPosition = container.getBoundingClientRect();
