@@ -22,9 +22,8 @@
 		display: -ms-inline-grid;
 		-ms-grid-columns: min-content;
 
-		> :nth-child(2) {
+		figcaption {
 			-ms-grid-row: 2;
-			display: inline-block;
 		}
 
 		img {
