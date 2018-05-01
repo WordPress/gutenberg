@@ -2,11 +2,8 @@
  * WordPress
  */
 import { __ } from '@wordpress/i18n';
-import {
-	createBlock,
-	RichText,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies

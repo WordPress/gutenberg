@@ -26,7 +26,7 @@ import {
 	getColorClass,
 	withColors,
 	PanelColor,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

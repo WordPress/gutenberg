@@ -7,12 +7,7 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	BlockIcon,
-	getBlockType,
-	InspectorControls,
-	InspectorAdvancedControls,
-} from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -21,6 +16,9 @@ import { withSelect } from '@wordpress/data';
  */
 import './style.scss';
 import SkipToSelectedBlock from '../skip-to-selected-block';
+import BlockIcon from '../block-icon';
+import InspectorControls from '../inspector-controls';
+import InspectorAdvancedControls from '../inspector-advanced-controls';
 
 const BlockInspector = ( { selectedBlock, count } ) => {
 	if ( count > 1 ) {

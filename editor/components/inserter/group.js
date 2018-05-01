@@ -8,7 +8,11 @@ import { isEqual } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { NavigableMenu } from '@wordpress/components';
-import { BlockIcon } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import BlockIcon from '../block-icon';
 
 function deriveActiveItems( items ) {
 	return items.filter( ( item ) => ! item.isDisabled );

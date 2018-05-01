@@ -26,7 +26,7 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

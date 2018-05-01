@@ -30,6 +30,9 @@ import {
 import { withSelect } from '@wordpress/data';
 import {
 	editorMediaUpload,
+	withEditorSettings,
+} from '@wordpress/blocks';
+import {
 	RichText,
 	BlockControls,
 	InspectorControls,
@@ -37,8 +40,7 @@ import {
 	MediaUpload,
 	BlockAlignmentToolbar,
 	UrlInputButton,
-	withEditorSettings,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

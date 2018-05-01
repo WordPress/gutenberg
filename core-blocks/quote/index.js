@@ -10,13 +10,12 @@ import classnames from 'classnames';
 import { __, sprintf } from '@wordpress/i18n';
 import { Toolbar } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
-	createBlock,
 	BlockControls,
 	AlignmentToolbar,
 	RichText,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

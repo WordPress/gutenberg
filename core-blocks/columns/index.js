@@ -14,7 +14,7 @@ import { Fragment } from '@wordpress/element';
 import {
 	InspectorControls,
 	InnerBlocks,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

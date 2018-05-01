@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { isEmpty } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -9,9 +10,8 @@ import { isEmpty } from 'lodash';
 import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import classnames from 'classnames';
+import { createBlock } from '@wordpress/blocks';
 import {
-	createBlock,
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
@@ -19,7 +19,7 @@ import {
 	MediaUpload,
 	AlignmentToolbar,
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
