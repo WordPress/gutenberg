@@ -146,7 +146,7 @@ class LatestPostsBlock extends Component {
 				>
 					{ displayPosts.map( ( post, i ) =>
 						<li key={ i }>
-							<ExternalLink href={ post.link } icon={ null }>
+							<ExternalLink href={ post.link } icon={ false }>
 								{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }
 							</ExternalLink>
 							{ displayPostDate && post.date_gmt &&

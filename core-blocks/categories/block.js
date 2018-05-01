@@ -92,7 +92,7 @@ class CategoriesBlock extends Component {
 
 		return (
 			<li key={ category.id }>
-				<ExternalLink href={ category.link } icon={ null }>
+				<ExternalLink href={ category.link } icon={ false }>
 					{ this.renderCategoryName( category ) }
 				</ExternalLink>
 				{ showPostCounts &&
