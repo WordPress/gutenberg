@@ -23,7 +23,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { isSharedBlock } from '@wordpress/blocks';
+import { isSharedBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
 
 /**
@@ -707,8 +707,9 @@ export function blockSelection( state = {
 export function provisionalBlockUID( state = null, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
-			if ( action.isProvisional ) {
-				return first( action.blocks ).uid;
+			const { blocks } = action;
+			if ( blocks.length === 1 && isUnmodifiedDefaultBlock( blocks[ 0 ] ) ) {
+				return blocks[ 0 ].uid;
 			}
 			break;
 
