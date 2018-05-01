@@ -581,7 +581,7 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const { format } = this.props;
-			const before = domToFormat( beforeFragment.childNodes, format, this.editor );
+			const before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
 			const after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
 
 			this.restoreContentAndSplit( before, after, blocks );
