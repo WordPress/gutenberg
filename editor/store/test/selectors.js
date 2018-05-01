@@ -204,6 +204,28 @@ describe( 'selectors', () => {
 				editor: {
 					isDirty: true,
 				},
+				saving: {
+					requesting: false,
+				},
+			};
+
+			expect( isEditedPostDirty( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if pending transaction with dirty state', () => {
+			const state = {
+				optimist: [
+					{
+						beforeState: {
+							editor: {
+								isDirty: true,
+							},
+						},
+					},
+				],
+				editor: {
+					isDirty: false,
+				},
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
@@ -213,6 +235,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					isDirty: false,
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -230,6 +255,9 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'auto-draft',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( true );
@@ -244,6 +272,9 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'draft',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
@@ -257,6 +288,9 @@ describe( 'selectors', () => {
 				currentPost: {
 					id: 1,
 					status: 'auto-draft',
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -432,6 +466,9 @@ describe( 'selectors', () => {
 					},
 					isDirty: false,
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
@@ -449,6 +486,9 @@ describe( 'selectors', () => {
 							title: 'Modified Title',
 						},
 					},
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -470,6 +510,9 @@ describe( 'selectors', () => {
 					},
 					isDirty: false,
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
@@ -489,6 +532,9 @@ describe( 'selectors', () => {
 						blockOrder: {},
 					},
 					isDirty: true,
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -719,6 +765,9 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'pending',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -731,6 +780,9 @@ describe( 'selectors', () => {
 				},
 				currentPost: {
 					status: 'draft',
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -745,6 +797,9 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'publish',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -757,6 +812,9 @@ describe( 'selectors', () => {
 				},
 				currentPost: {
 					status: 'publish',
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -771,6 +829,9 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'private',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -784,6 +845,9 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'future',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -796,6 +860,9 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					isDirty: true,
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
