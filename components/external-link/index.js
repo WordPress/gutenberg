@@ -49,7 +49,7 @@ class ExternalLink extends Component {
 	render() {
 		const {
 			href,
-			target,
+			target = '_blank',
 			icon = true,
 			children,
 			className,
@@ -57,7 +57,6 @@ class ExternalLink extends Component {
 		} = this.props;
 
 		const { disabled, isPrimary, isLarge, isSmall } = additionalProps;
-		const targetToUse = target || '_blank';
 		const isDisabled = disabled || ! href;
 		const classes = classnames( 'components-external-link', className, {
 			'components-icon-button': icon && ( isPrimary || isLarge || isSmall ),
@@ -67,7 +66,7 @@ class ExternalLink extends Component {
 			<Button
 				{ ...additionalProps }
 				href={ href }
-				target={ targetToUse }
+				target={ target }
 				rel={ this.getRel() }
 				disabled={ isDisabled }
 				className={ classes }
