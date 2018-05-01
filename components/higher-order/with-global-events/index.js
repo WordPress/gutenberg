@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
+import { forEach, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -53,18 +53,18 @@ function withGlobalEvents( eventTypesToHandlers ) {
 				}
 			}
 
-			setRef( el ) {
+			handleRef( el ) {
 				this.wrappedRef = el;
 				this.props.forwardedRef( el );
 			}
 
 			render() {
-				return <WrappedComponent { ...this.props } ref={ this.setRef } />;
+				return <WrappedComponent { ...this.props } ref={ this.handleRef } />;
 			}
 		};
 
 		return forwardRef( ( props, ref ) => {
-			return <Wrapper { ...props } forwardedRef={ ref } />;
+			return <Wrapper { ...props } forwardedRef={ ref || noop } />;
 		} );
 	}, 'withGlobalEvents' );
 }
