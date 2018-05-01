@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Gutenberg Dev
+ * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
  * Version: 2.7.0
