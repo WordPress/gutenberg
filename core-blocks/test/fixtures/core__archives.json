@@ -1,0 +1,14 @@
+[
+  {
+    "uid": "_uid_0",
+    "name": "core/archives",
+    "isValid": true,
+    "attributes": {
+      "showPostCounts": false,
+      "displayAsDropdown": false,
+      "align": "center"
+    },
+    "innerBlocks": [],
+    "originalContent": ""
+  }
+]
