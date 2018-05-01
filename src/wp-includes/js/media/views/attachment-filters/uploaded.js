@@ -16,6 +16,7 @@ Uploaded = wp.media.view.AttachmentFilters.extend(/** @lends wp.media.view.Attac
 	createFilters: function() {
 		var type = this.model.get('type'),
 			types = wp.media.view.settings.mimeTypes,
+			uid = window.userSettings ? parseInt( window.userSettings.uid, 10 ) : 0,
 			text;
 
 		if ( types && type ) {
@@ -28,7 +29,8 @@ Uploaded = wp.media.view.AttachmentFilters.extend(/** @lends wp.media.view.Attac
 				props: {
 					uploadedTo: null,
 					orderby: 'date',
-					order:   'DESC'
+					order:   'DESC',
+					author:	 null
 				},
 				priority: 10
 			},
@@ -38,7 +40,8 @@ Uploaded = wp.media.view.AttachmentFilters.extend(/** @lends wp.media.view.Attac
 				props: {
 					uploadedTo: wp.media.view.settings.post.id,
 					orderby: 'menuOrder',
-					order:   'ASC'
+					order:   'ASC',
+					author:	 null
 				},
 				priority: 20
 			},
@@ -48,11 +51,24 @@ Uploaded = wp.media.view.AttachmentFilters.extend(/** @lends wp.media.view.Attac
 				props: {
 					uploadedTo: 0,
 					orderby: 'menuOrder',
-					order:   'ASC'
+					order:   'ASC',
+					author:	 null
 				},
 				priority: 50
 			}
 		};
+
+		if ( uid ) {
+			this.filters.mine = {
+				text:  l10n.mine,
+				props: {
+					orderby: 'date',
+					order:   'DESC',
+					author:  uid
+				},
+				priority: 50
+			};
+		}
 	}
 });
 
