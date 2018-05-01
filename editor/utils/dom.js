@@ -17,6 +17,19 @@ export function getBlockDOMNode( uid ) {
 }
 
 /**
+ * Given a block UID, returns the corresponding DOM node for the block focusable
+ * wrapper, if exists. As much as possible, this helper should be avoided, and
+ * used only in cases where isolated behaviors need remote access to a block node.
+ *
+ * @param {string} uid Block UID.
+ *
+ * @return {Element} Block DOM node.
+ */
+export function getBlockFocusableWrapper( uid ) {
+	return getBlockDOMNode( uid ).closest( '.editor-block-list__block' );
+}
+
+/**
  * Returns true if the given HTMLElement is a block focus stop. Blocks without
  * their own text fields rely on the focus stop to be keyboard navigable.
  *

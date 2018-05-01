@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { countBy, filter, get } from 'lodash';
+import { countBy, flatMap, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -33,7 +33,7 @@ const multipleH1Headings = [
 	<em key="incorrect-message-multiple-h1">{ __( '(Multiple H1 headings are not recommended)' ) }</em>,
 ];
 
-const getHeadingLevel = heading => {
+const getHeadingLevel = ( heading ) => {
 	switch ( heading.attributes.nodeName ) {
 		case 'h1':
 		case 'H1':
@@ -55,11 +55,36 @@ const getHeadingLevel = heading => {
 			return 6;
 	}
 };
+/**
+ * Returns an array of heading blocks enhanced with the following properties:
+ * path    - An array of blocks that are ancestors of the heading starting from a top-level node.
+ *           Can be an empty array if the heading is a top-level node (is not nested inside another block).
+ * level   - An integer with the heading level.
+ * isEmpty - Flag indicating if the heading has no content.
+ *
+ * @param {?Array} blocks An array of blocks.
+ * @param {?Array} path   An array of blocks that are ancestors of the blocks passed as blocks.
+ *
+ * @return {Array} An array of heading blocks enhanced with the properties described above.
+ */
+const computeOutlineHeadings = ( blocks = [], path = [] ) => {
+	return flatMap( blocks, ( block = {} ) => {
+		if ( block.name === 'core/heading' ) {
+			return {
+				...block,
+				path,
+				level: getHeadingLevel( block ),
+				isEmpty: isEmptyHeading( block ),
+			};
+		}
+		return computeOutlineHeadings( block.innerBlocks, [ ...path, block ] );
+	} );
+};
 
-const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
+const isEmptyHeading = ( heading ) => ! heading.attributes.content || heading.attributes.content.length === 0;
 
 export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupported } ) => {
-	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
+	const headings = computeOutlineHeadings( blocks );
 
 	if ( headings.length < 1 ) {
 		return null;
@@ -79,12 +104,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 	};
 
 	const hasTitle = isTitleSupported && title;
-	const items = headings.map( ( heading ) => ( {
-		...heading,
-		level: getHeadingLevel( heading ),
-		isEmpty: isEmptyHeading( heading ),
-	} ) );
-	const countByLevel = countBy( items, 'level' );
+	const countByLevel = countBy( headings, 'level' );
 	const hasMultipleH1 = countByLevel[ 1 ] > 1;
 
 	return (
@@ -99,7 +119,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 						{ title }
 					</DocumentOutlineItem>
 				) }
-				{ items.map( ( item, index ) => {
+				{ headings.map( ( item, index ) => {
 					// Headings remain the same, go up by one, or down by any amount.
 					// Otherwise there are missing levels.
 					const isIncorrectLevel = item.level > prevHeadingLevel + 1;
@@ -118,6 +138,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 							level={ `H${ item.level }` }
 							isValid={ isValid }
 							onClick={ () => onSelectHeading( item.uid ) }
+							path={ item.path }
 						>
 							{ item.isEmpty ? emptyHeadingContent : item.attributes.content }
 							{ isIncorrectLevel && incorrectLevelContent }

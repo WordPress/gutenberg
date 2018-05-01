@@ -1,19 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
-
-/**
- * Internal Dependencies
- */
-import { getEditedPostAttribute } from '../../store/selectors';
-import { editPost } from '../../store/actions';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 function PostComments( { commentStatus = 'open', instanceId, ...props } ) {
 	const onToggleComments = () => props.editPost( { comment_status: commentStatus === 'open' ? 'closed' : 'open' } );
@@ -26,20 +17,19 @@ function PostComments( { commentStatus = 'open', instanceId, ...props } ) {
 			key="toggle"
 			checked={ commentStatus === 'open' }
 			onChange={ onToggleComments }
-			showHint={ false }
 			id={ commentsToggleId }
 		/>,
 	];
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			commentStatus: getEditedPostAttribute( state, 'comment_status' ),
+			commentStatus: select( 'core/editor' ).getEditedPostAttribute( 'comment_status' ),
 		};
-	},
-	{
-		editPost,
-	}
-)( withInstanceId( PostComments ) );
-
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		editPost: dispatch( 'core/editor' ).editPost,
+	} ) ),
+	withInstanceId,
+] )( PostComments );

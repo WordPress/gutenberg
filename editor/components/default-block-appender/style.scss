@@ -1,7 +1,7 @@
 $empty-paragraph-height: $text-editor-font-size * 4;
 
 .editor-default-block-appender {
-	.editor-default-block-appender__content {
+	input[type=text].editor-default-block-appender__content { // needs specificity
 		border: none;
 		background: none;
 		box-shadow: none;
@@ -11,10 +11,11 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		padding: $block-padding;
 		height: $empty-paragraph-height;
 		font-size: $editor-font-size;
+		font-family: $editor-font;
 		cursor: text;
 		width: 100%;
-		height: $empty-paragraph-height;
 		color: $dark-gray-300;
+		font-family: $editor-font;
 		outline: 1px solid transparent;
 		transition: 0.2s outline;
 	}
@@ -28,7 +29,7 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 	}
 
 	// Don't show inserter until mousing
-	.editor-inserter {
+	.editor-inserter__toggle:not( [aria-expanded="true"] ) {
 		opacity: 0;
 	}
 
@@ -41,7 +42,7 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 			}
 		}
 
-		.editor-inserter {
+		.editor-inserter__toggle {
 			opacity: 1;
 		}
 	}
@@ -56,8 +57,8 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 .editor-block-list__empty-block-inserter,
 .editor-default-block-appender .editor-inserter {
 	position: absolute;
-		top: $item-spacing;
-		right: $item-spacing;	// show on the right on mobile
+	top: $item-spacing;
+	right: $item-spacing;	// show on the right on mobile
 	transition: opacity 0.2s;
 
 	@include break-small {

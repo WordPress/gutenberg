@@ -5,6 +5,7 @@
 	justify-content: center;
 	padding: 1em;
 	min-height: 200px;
+	width: 100%;
 	text-align: center;
 	font-family: $default-font;
 	font-size: $default-font-size;
@@ -30,6 +31,7 @@
 	width: 100%;
 	max-width: 280px;
 	flex-wrap: wrap;
+	z-index: z-index( '.components-placeholder__fieldset' );
 
 	p {
 		font-family: $default-font;

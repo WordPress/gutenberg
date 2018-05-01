@@ -18,12 +18,12 @@ const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
 
 // CSS loader for styles specific to block editing.
 const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/edit-blocks.css',
+	filename: './core-blocks/build/edit-blocks.css',
 } );
 
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/style.css',
+	filename: './core-blocks/build/style.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -73,17 +73,18 @@ const entryPointNames = [
 	'date',
 	'editor',
 	'element',
-	'i18n',
 	'utils',
 	'data',
 	'viewport',
 	'core-data',
 	'plugins',
 	'edit-post',
+	'core-blocks',
 ];
 
 const packageNames = [
 	'hooks',
+	'i18n',
 ];
 
 const coreGlobals = [
@@ -93,10 +94,11 @@ const coreGlobals = [
 const externals = {
 	react: 'React',
 	'react-dom': 'ReactDOM',
-	'react-dom/server': 'ReactDOMServer',
 	tinymce: 'tinymce',
 	moment: 'moment',
 	jquery: 'jQuery',
+	lodash: 'lodash',
+	'lodash-es': 'lodash',
 };
 
 [
@@ -135,6 +137,9 @@ const config = {
 			__dirname,
 			'node_modules',
 		],
+		alias: {
+			'lodash-es': 'lodash',
+		},
 	},
 	module: {
 		rules: [
@@ -150,21 +155,21 @@ const config = {
 			{
 				test: /style\.s?css$/,
 				include: [
-					/blocks/,
+					/core-blocks/,
 				],
 				use: blocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /editor\.s?css$/,
 				include: [
-					/blocks/,
+					/core-blocks/,
 				],
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /\.s?css$/,
 				exclude: [
-					/blocks/,
+					/core-blocks/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
@@ -206,5 +211,9 @@ const config = {
 		children: false,
 	},
 };
+
+if ( config.mode !== 'production' ) {
+	config.devtool = process.env.SOURCEMAP || 'source-map';
+}
 
 module.exports = config;

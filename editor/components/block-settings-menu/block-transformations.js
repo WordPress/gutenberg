@@ -1,25 +1,23 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withContext } from '@wordpress/components';
-import { getPossibleBlockTransformations, switchToBlockType } from '@wordpress/blocks';
+import { IconButton } from '@wordpress/components';
+import { getPossibleBlockTransformations, switchToBlockType, withEditorSettings } from '@wordpress/blocks';
 import { compose, Fragment } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getBlock } from '../../store/selectors';
-import { replaceBlocks } from '../../store/actions';
 
-function BlockTransformations( { blocks, small = false, onTransform, onClick = noop, isLocked } ) {
+function BlockTransformations( { blocks, small = false, onTransform, onClick = noop, isLocked, itemsRole } ) {
 	const possibleBlockTransformations = getPossibleBlockTransformations( blocks );
 	if ( isLocked || ! possibleBlockTransformations.length ) {
 		return null;
@@ -43,6 +41,7 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 						} }
 						icon={ icon }
 						label={ small ? title : undefined }
+						role={ itemsRole }
 					>
 						{ ! small && title }
 					</IconButton>
@@ -51,27 +50,25 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 		</Fragment>
 	);
 }
-export default compose(
-	connect(
-		( state, ownProps ) => {
-			return {
-				blocks: ownProps.uids.map( ( uid ) => getBlock( state, uid ) ),
-			};
+export default compose( [
+	withSelect( ( select, { uids } ) => {
+		return {
+			blocks: select( 'core/editor' ).getBlocksByUID( uids ),
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => ( {
+		onTransform( blocks, name ) {
+			dispatch( 'core/editor' ).replaceBlocks(
+				ownProps.uids,
+				switchToBlockType( blocks, name )
+			);
 		},
-		( dispatch, ownProps ) => ( {
-			onTransform( blocks, name ) {
-				dispatch( replaceBlocks(
-					ownProps.uids,
-					switchToBlockType( blocks, name )
-				) );
-			},
-		} )
-	),
-	withContext( 'editor' )( ( settings ) => {
+	} ) ),
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {
 			isLocked: !! templateLock,
 		};
 	} ),
-)( BlockTransformations );
+] )( BlockTransformations );

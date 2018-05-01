@@ -10,11 +10,17 @@ a traditional `input` field, usually when the user exits the field.
 
 ## Properties
 
-### `value: Array`
+### `format: String`
 
-*Required.* Array of React DOM to make editable. The rendered HTML should be valid, and valid with respect to the `tagName` and `inline` property.
+*Optional.* Format of the RichText provided value prop. It can be `element` or `string`.
 
-### `onChange( value: Array ): Function`
+*Default: `element`*.
+
+### `value: Array|String`
+
+*Required.* Depending on the format prop, this value could be an array of React DOM to make editable or an HTML string. The rendered HTML should be valid, and valid with respect to the `tagName` and `inline` property.
+
+### `onChange( value: Array|String ): Function`
 
 *Required.* Called when the value changes.
 
@@ -31,7 +37,7 @@ a traditional `input` field, usually when the user exits the field.
 
 *Optional.* By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to `p` to create new paragraphs on <kbd>Enter</kbd>.
 
-### `onSplit( before: Array, after: Array, ...blocks: Object ): Function`
+### `onSplit( before: Array|String, after: Array|String, ...blocks: Object ): Function`
 
 *Optional.* Called when the content can be split with `before` and `after`. There might be blocks present, which should be inserted in between.
 
@@ -53,11 +59,20 @@ a traditional `input` field, usually when the user exits the field.
 
 ### `isSelected: Boolean`
 
-*Optional.* Whether to show the input is selected or not in order to show the formatting controls.
+*Optional.* Whether to show the input is selected or not in order to show the formatting controls. By default it renders the controls when the block is selected.
 
 ### `keepPlaceholderOnFocus: Boolean`
 
 *Optional.* By default, the placeholder will hide as soon as the editable field receives focus. With this setting it can be be kept while the field is focussed and empty.
+
+### `autocompleters: Array<Completer>`
+
+*Optional.* A list of autocompleters to use instead of the default.
+
+## RichText.Content
+
+When using RichText in the edit function of blocks, the usage of `RichText.Content` is recommended in the save function of your blocks to save the correct HTML.
+
 
 ## Example
 
@@ -85,6 +100,12 @@ wp.blocks.registerBlockType( /* ... */, {
 			}
 		} );
 	},
+
+	save: function() {
+		return wp.element.createElement( wp.blocks.RichText.Content, {
+			tagName: 'h2', value: props.attributes.content
+		} );
+	}
 } );
 ```
 {% ESNext %}
@@ -112,6 +133,10 @@ registerBlockType( /* ... */, {
 			/>
 		);
 	},
+
+	save( { attributes } ) {
+		return <RichText.Content tagName="h2" value={ attributes.content } />;
+	}
 } );
 ```
 {% end %}

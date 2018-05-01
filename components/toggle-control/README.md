@@ -11,6 +11,7 @@ Render a user interface to change fixed background setting.
 	<ToggleControl
 		label={ __( 'Fixed Background' ) }
 		checked={ !! hasParallax }
+		help={ ( checked ) => checked ? __( 'Has fixed background.' ) : __( 'No fixed background.' ) } 
 		onChange={ toggleParallax }
 	/>
 ```
@@ -30,7 +31,7 @@ If this property is added, a label will be generated using label property as the
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String`
+- Type: `String` | `Function`
 - Required: No
 
 ### checked

@@ -1,9 +1,100 @@
+.components-draggable__clone {
+	& > .editor-block-list__block > .editor-block-list__block-draggable {
+		background: $white;
+		box-shadow: $shadow-popover;
+
+		@include break-small {
+			left: 0;
+			right: 0;
+		}
+	}
+
+	// Hide the Block UI when dragging the block
+	// This ensures the page scroll properly (no sticky elements)
+	.editor-block-contextual-toolbar,
+	.editor-block-mover,
+	.editor-block-settings-menu {
+		// I think important is fine here to avoid over complexing the selector
+		display: none !important;
+	}
+}
+
+.editor-block-list__block-draggable {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: z-index( '.editor-block-list__block-draggable' );
+
+	> .editor-block-list__block-draggable-inner {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background-color: $light-gray-200;
+		visibility: hidden;
+
+		@include break-small {
+			margin: 0 48px;
+		}
+	}
+
+	&.is-visible > .editor-block-list__block-draggable-inner {
+		visibility: visible;
+	}
+
+	@include break-small {
+		left: -$block-side-ui-padding;
+		right: -$block-side-ui-padding;
+
+		// Full width blocks don't have the place to expand on the side
+		.editor-block-list__block[data-align="full"] & {
+			left: 0;
+			right: 0;
+		}
+	}
+
+
+	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: grab;
+}
+
+
+// Allow Drag & Drop when clicking on the empty area of the mover and the settings menu
+.editor-block-list__block .editor-block-mover,
+.editor-block-list__block .editor-block-settings-menu {
+	pointer-events: none;
+
+	> * {
+		pointer-events: auto;
+	}
+}
+
+.editor-block-list__block {
+	&.is-hidden *,
+	&.is-hidden > * {
+		visibility: hidden;
+	}
+
+	.editor-block-list__block-edit .shared-block-edit-panel * {
+		z-index: z-index( '.editor-block-list__block-edit .shared-block-edit-panel *' );
+	}
+}
+
 .editor-block-list__layout {
 	// make room in the main content column for the side UI
 	// the side UI uses negative margins to position itself so as to not affect the block width
 	@include break-small() {
 		padding-left: $block-side-ui-padding;
 		padding-right: $block-side-ui-padding;
+	}
+
+	// Don't add side padding for nested blocks, @todo see if this can be scoped better
+	.editor-block-list__block & {
+		padding-left: 0;
+		padding-right: 0;
 	}
 }
 
@@ -19,15 +110,18 @@
 	}
 
 	// Prevent collapsing margins @todo try and revisit this, it's conducive to theming to allow these to collapse
-	padding-top: .1px;
-	padding-bottom: .1px;
-
+	padding-top: 1px;
+	padding-bottom: 1px;
 
 	// Space every block using margins instead of padding
 	// This allows margins to collapse, which gives a better representation of how it looks on the frontend
 	.editor-block-list__block-edit {
 		margin-top: $block-padding;
 		margin-bottom: $block-padding;
+
+		// Prevent collapsing margins @todo try and revisit this, it's conducive to theming to allow these to collapse
+		padding-top: 1px;
+		padding-bottom: 1px;
 	}
 
 	margin-bottom: $block-spacing;
@@ -57,9 +151,8 @@
 		bottom: 0;
 		left: 0;
 		background-color: rgba( $white, 0.6 );
-		background-image: linear-gradient( to bottom, transparent, #fff );
+		background-image: linear-gradient( to bottom, transparent, $white );
 	}
-
 
 	/**
 	 * Hovered Block style
@@ -78,7 +171,13 @@
 	&.is-selected > .editor-block-mover:before,
 	&.is-hovered > .editor-block-mover:before {
 		border-right: 1px solid $light-gray-500;
-		right: 6px;
+		right: 0;
+	}
+
+	&.is-selected > .editor-block-settings-menu:before,
+	&.is-hovered > .editor-block-settings-menu:before {
+		border-left: 1px solid $light-gray-500;
+		left: 0;
 	}
 
 	&.is-typing .editor-block-list__empty-block-inserter,
@@ -90,12 +189,6 @@
 	.editor-block-list__side-inserter {
 		opacity: 1;
 		transition: opacity 0.2s;
-	}
-
-	&.is-selected > .editor-block-settings-menu:before,
-	&.is-hovered > .editor-block-settings-menu:before {
-		border-left: 1px solid $light-gray-500;
-		left: 6px;
 	}
 
 	/**
@@ -128,16 +221,16 @@
 	 */
 
 	::-moz-selection {
-		background: $blue-medium-highlight;
+		background-color: $blue-medium-highlight;
 	}
 
 	::selection {
-		background: $blue-medium-highlight;
+		background-color: $blue-medium-highlight;
 	}
 
 	// selection style for multiple blocks
 	&.is-multi-selected *::selection {
-		background: transparent;
+		background-color: transparent;
 	}
 
 	&.is-multi-selected .editor-block-list__block-edit:before {
@@ -145,40 +238,20 @@
 	}
 
 	/**
-	 * Reusable Block style
+	 * Shared blocks
 	 */
 
-	&.is-reusable > .editor-block-mover:before {
+	&.is-shared > .editor-block-mover:before {
 		border-right: none;
 	}
 
-	&.is-reusable > .editor-block-settings-menu:before {
+	&.is-shared > .editor-block-settings-menu:before {
 		border-left: none;
 	}
 
-	&.is-reusable > .editor-block-list__block-edit:before {
+	&.is-shared > .editor-block-list__block-edit:before {
 		outline: 1px dashed $light-gray-500;
 	}
-
-	// @todo, this appears to be unused
-	.iframe-overlay {
-		position: relative;
-	}
-
-	.iframe-overlay:before {
-		content: '';
-		display: block;
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-	}
-
-	&.is-selected .iframe-overlay:before {
-		display: none;
-	}
-
 
 	/**
 	 * Alignments
@@ -196,21 +269,6 @@
 		// Hide block outline when an image is floated
 		&:before {
 			content: none;
-		}
-	}
-
-	// Apply max-width to floated items that have no intrinsic width, like Cover Image or Gallery
-	&[data-align="left"],
-	&[data-align="right"] {
-		> .editor-block-list__block-edit {
-			max-width: 360px;
-			width: 100%;
-		}
-
-		// reset when data-resized
-		&[data-resized="true"] > .editor-block-list__block-edit {
-			max-width: none;
-			width: auto;
 		}
 	}
 
@@ -252,7 +310,7 @@
 			margin-right: -$block-side-ui-padding;
 		}
 
-		.editor-block-list__block-edit {
+		> .editor-block-list__block-edit {
 			margin-left: -$block-padding;
 			margin-right: -$block-padding;
 
@@ -260,49 +318,54 @@
 				margin-left: -$block-side-ui-padding - $block-padding;
 				margin-right: -$block-side-ui-padding - $block-padding;
 			}
+
+			// this explicitly sets the width of the block, to override the fit-content from the image block
+			figure {
+				width: 100%;
+			}
 		}
 
-		.editor-block-list__block-edit:before {
+		> .editor-block-list__block-edit:before {
 			left: 0;
 			right: 0;
 			border-left-width: 0;
 			border-right-width: 0;
 		}
 
-		.editor-block-mover {
-			display: none;
-		}
-
-		@include break-wide() {
-			.editor-block-mover {
-				display: block;
-				top: -29px;
-				left: 10px;
-				height: auto;
-
-				&:before {
-					content: none;
-				}
-			}
-
-			.editor-block-mover__control {
-				float: left;
-				margin-right: 8px;
-			}
-		}
-
-		.editor-block-settings-menu__control {
-			float: left;
-			margin-right: 8px;
-		}
-
-		.editor-block-settings-menu {
-			top: -41px;
-			right: 10px;
+		// Mover and settings in wide
+		> .editor-block-mover,
+		> .editor-block-settings-menu {
+			top: -29px;
+			bottom: auto;
 			height: auto;
+			width: auto;
+			z-index: inherit;
 
 			&:before {
 				content: none;
+			}
+		}
+
+		> .editor-block-mover {
+			left: 10px;
+		}
+
+		> .editor-block-settings-menu {
+			right: 10px;
+		}
+
+		> .editor-block-mover .editor-block-mover__control,
+		> .editor-block-settings-menu > * {
+			float: left;
+		}
+
+		// Hide mover until wide breakpoints, or it might be covered by toolbar
+		> .editor-block-mover {
+			display: none;
+		}
+		@include break-wide() {
+			> .editor-block-mover {
+				display: block;
 			}
 		}
 	}
@@ -313,44 +376,49 @@
 	}
 
 	// Dropzones
-	& .components-drop-zone {
-		border: none;
+	.editor-block-drop-zone {
 		top: -4px;
 		bottom: -3px;
-		margin: 0 $block-side-ui-padding;
-		border-radius: 0;
-
-		.components-drop-zone__content {
-			display: none;
-		}
-
-		&.is-close-to-top {
-			background: none;
-			border-top: 3px solid $blue-medium-500;
-		}
-
-		&.is-close-to-bottom {
-			background: none;
-			border-bottom: 3px solid $blue-medium-500;
-		}
+		margin: 0 $block-padding;
 	}
+}
 
 
-	/**
-	 * Left and right side UI
-	 */
+/**
+ * Left and right side UI
+ */
 
+.editor-block-list__block {
+
+	// Left and right
 	> .editor-block-settings-menu,
 	> .editor-block-mover {
 		position: absolute;
-		top: 0;
-		padding: 0;
+		top: 0; // stretch to bottom to utilize full vertical space to increase hoverable area
+		bottom: 0;
+		width: $block-side-ui-width + $block-side-ui-clearance;
+
+		/* Necessary for drag indicator */
+		cursor: move;/* Fallback for IE/Edge < 14 */
+		cursor: grab;
+	}
+
+	// Elevate when selected or hovered
+	@include break-small() {
+		&.is-multi-selected,
+		&.is-selected,
+		&.is-hovered {
+			.editor-block-settings-menu,
+			.editor-block-mover {
+				z-index: z-index( '.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}' );
+			}
+		}
 	}
 
 	// Right side UI
 	> .editor-block-settings-menu {
-		right: #{ -1 * $block-mover-margin - $block-padding + 2px };
-		padding-top: 2px;
+		right: -$block-side-ui-width - $block-side-ui-clearance;
+		padding-left: $block-side-ui-clearance;
 
 		// Mobile
 		display: none;
@@ -362,9 +430,8 @@
 
 	// Left side UI
 	> .editor-block-mover {
-		left: -$block-mover-margin - $block-padding + 4px;
-		padding-top: 6px;
-		z-index: z-index( '.editor-block-mover' );
+		left: -$block-side-ui-width - $block-side-ui-clearance;
+		padding-right: $block-side-ui-clearance;
 
 		// Mobile
 		display: none;
@@ -373,7 +440,7 @@
 		}
 	}
 
-	// Mobile tools
+	// Show side UI inline below the block on mobile
 	.editor-block-list__block-mobile-toolbar {
 		display: flex;
 		flex-direction: row;
@@ -392,11 +459,11 @@
 		}
 
 		.editor-inserter__toggle,
-		.editor-block-settings-menu__toggle,
-		& > .editor-block-settings-menu__control,
-		.editor-block-mover__control {
+		.editor-block-mover__control,
+		.editor-block-settings-menu .components-button {
 			width: $icon-button-size;
 			height: $icon-button-size;
+			border-radius: $button-style__radius-roundrect;
 			padding: 3px;
 			margin: 0;
 			justify-content: center;
@@ -417,11 +484,23 @@
 				float: left;
 			}
 		}
+
+		// Block Settings
+		.editor-block-settings-menu > * {
+			float: left;
+		}
 	}
 }
 
+
+/**
+ * In-Canvas Inserter
+ */
+
 .editor-block-list .editor-inserter {
 	margin: $item-spacing;
+	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: grab;
 
 	.editor-inserter__toggle {
 		color: $dark-gray-300;
@@ -489,22 +568,11 @@
 	}
 }
 
-// In between blocks
 .editor-block-list__block > .editor-block-list__insertion-point {
 	position: absolute;
-	bottom: -$block-padding;
-	height: $block-padding * 2; // Matches the whole empty space between two blocks
-	top: auto;
-	left: 0;
-	right: 0;
-}
-
-// Before the first block
-.editor-block-list__layout > .editor-block-list__insertion-point {
-	position: relative;
 	top: -$block-padding;
-	margin-left: auto;
-	margin-right: auto;
+	height: $block-padding * 2; // Matches the whole empty space between two blocks
+	bottom: auto;
 	left: 0;
 	right: 0;
 }
@@ -533,7 +601,8 @@
  * Block Toolbar
  */
 
-.editor-block-contextual-toolbar {
+.editor-block-contextual-toolbar,
+.editor-block-list__breadcrumb {
 	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
 	white-space: nowrap;
@@ -557,8 +626,15 @@
 	margin-right: -$block-padding - 1px;
 
 	@include break-small() {
-		margin-left: -$block-padding - $block-side-ui-padding - 1px;	// stack borders
+		// stack borders
+		margin-left: -$block-padding - $block-side-ui-padding - 1px;
 		margin-right: -$block-padding - $block-side-ui-padding - 1px;
+
+		// except for wide elements, this causes a horizontal scrollbar
+		[data-align="full"] & {
+			margin-left: -$block-padding - $block-side-ui-padding;
+			margin-right: -$block-padding - $block-side-ui-padding;
+		}
 	}
 
 	// on mobile, toolbars fix differently
@@ -567,35 +643,59 @@
 		top: -1px;	// stack borders
 	}
 
-	.editor-block-toolbar {
-		border: 1px solid $light-gray-500;
-		width: 100%;
-
-		// this prevents floats from messing up the position
-		position: absolute;
-		left: 0;
-
-		.editor-block-list__block[data-align="right"] & {
-			left: auto;
-			right: 0;
-		}
-
-		// remove stacked borders in inline toolbar
-		> div:first-child {
-			margin-left: -1px;
-		}
-
-		> .editor-block-switcher:first-child {
-			margin-left: -2px;
-		}
-
-		@include break-small() {
-			width: auto;
-		}
-	}
-
 	// Reset pointer-events on children.
 	& > * {
 		pointer-events: auto;
+	}
+
+}
+
+.editor-block-contextual-toolbar .editor-block-toolbar,
+.editor-block-list__breadcrumb .components-toolbar {
+	border: 1px solid $light-gray-500;
+	width: 100%;
+	background: $white;
+
+	// this prevents floats from messing up the position
+	position: absolute;
+	left: 0;
+
+	.editor-block-list__block[data-align="right"] & {
+		left: auto;
+		right: 0;
+	}
+
+	// remove stacked borders in inline toolbar
+	> div:first-child {
+		margin-left: -1px;
+	}
+
+	@include break-small() {
+		width: auto;
+	}
+}
+
+.editor-block-list__breadcrumb .components-toolbar {
+	padding: 0px 12px;
+	line-height: $block-toolbar-height - 1px;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	color: $dark-gray-500;
+	cursor: default;
+
+	.components-button {
+		margin-left: -12px;
+		margin-right: 12px;
+		border-right: 1px solid $light-gray-500;
+		color: $dark-gray-500;
+		padding-top: 6px;
+	}
+}
+
+.editor-block-list__breadcrumb {
+	opacity: 0;
+
+	&.is-visible {
+		@include fade_in;
 	}
 }

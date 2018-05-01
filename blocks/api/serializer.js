@@ -10,7 +10,6 @@ import isShallowEqual from 'shallowequal';
  */
 import { Component, cloneElement, renderToString } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
-import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -34,23 +33,7 @@ export function getBlockDefaultClassName( blockName ) {
 }
 
 /**
- * Returns the block's default classname from its name.
- *
- * @param {string} blockName The block name.
- *
- * @return {string} The block's default class.
- */
-export function getBlockDefaultClassname( blockName ) {
-	deprecated( 'getBlockDefaultClassname', {
-		version: '2.6',
-		alternative: 'wp.blocks.getBlockDefaultClassName',
-		plugin: 'Gutenberg',
-	} );
-	return getBlockDefaultClassName( blockName );
-}
-
-/**
- * Given a block type containg a save render implementation and attributes, returns the
+ * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
  * @param {Object} blockType   Block type.
@@ -109,7 +92,7 @@ export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 }
 
 /**
- * Given a block type containg a save render implementation and attributes, returns the
+ * Given a block type containing a save render implementation and attributes, returns the
  * static markup to be saved.
  *
  * @param {Object} blockType   Block type.
@@ -185,6 +168,7 @@ export function serializeAttributes( attrs ) {
 export function getBeautifulContent( content ) {
 	return beautifyHtml( content, {
 		indent_inner_html: true,
+		indent_with_tabs: true,
 		wrap_line_length: 0,
 	} );
 }

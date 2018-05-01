@@ -1,22 +1,18 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { flow, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton, withContext } from '@wordpress/components';
+import { IconButton } from '@wordpress/components';
 import { compose } from '@wordpress/element';
+import { withDispatch } from '@wordpress/data';
+import { withEditorSettings } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { removeBlocks } from '../../store/actions';
-
-export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small = false } ) {
+export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, ...props } ) {
 	if ( isLocked ) {
 		return null;
 	}
@@ -25,26 +21,23 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, small =
 
 	return (
 		<IconButton
-			className="editor-block-settings-menu__control"
+			className="editor-block-settings-remove"
 			onClick={ flow( onRemove, onClick ) }
 			icon="trash"
-			label={ small ? label : undefined }
-		>
-			{ ! small && label }
-		</IconButton>
+			label={ label }
+			role={ role }
+			{ ...props }
+		/>
 	);
 }
 
 export default compose(
-	connect(
-		undefined,
-		( dispatch, ownProps ) => ( {
-			onRemove() {
-				dispatch( removeBlocks( ownProps.uids ) );
-			},
-		} )
-	),
-	withContext( 'editor' )( ( settings ) => {
+	withDispatch( ( dispatch, { uids } ) => ( {
+		onRemove() {
+			dispatch( 'core/editor' ).removeBlocks( uids );
+		},
+	} ) ),
+	withEditorSettings( ( settings ) => {
 		const { templateLock } = settings;
 
 		return {

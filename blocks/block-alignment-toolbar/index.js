@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Toolbar, withContext } from '@wordpress/components';
+import { Toolbar } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { withEditorSettings } from '../editor-settings';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
@@ -42,7 +47,7 @@ export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CON
 	return (
 		<Toolbar
 			controls={
-				enabledControls.map( control => {
+				enabledControls.map( ( control ) => {
 					return {
 						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
 						isActive: value === control,
@@ -54,7 +59,7 @@ export function BlockAlignmentToolbar( { value, onChange, controls = DEFAULT_CON
 	);
 }
 
-export default withContext( 'editor' )(
+export default withEditorSettings(
 	( settings ) => ( {
 		wideControlsEnabled: settings.alignWide,
 	} )

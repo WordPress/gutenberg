@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -9,11 +9,12 @@ import { shallow } from 'enzyme';
 import {
 	Component,
 	createElement,
+	createHigherOrderComponent,
 	concatChildren,
 	renderToString,
 	switchChildrenNodeName,
-	getWrapperDisplayName,
 	RawHTML,
+	pure,
 } from '../';
 
 describe( 'element', () => {
@@ -49,6 +50,21 @@ describe( 'element', () => {
 			expect( renderToString(
 				createElement( 'strong', null, 'Courgette' )
 			) ).toBe( '<strong>Courgette</strong>' );
+		} );
+
+		it( 'should escape attributes and html', () => {
+			const result = renderToString( createElement( 'a', {
+				href: '/index.php?foo=bar&qux=<"scary">',
+				style: {
+					backgroundColor: 'red',
+				},
+			}, '<"WordPress" & Friends>' ) );
+
+			expect( result ).toBe(
+				'<a href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;>" style="background-color:red">' +
+				'&lt;"WordPress" &amp; Friends>' +
+				'</a>'
+			);
 		} );
 
 		it( 'strips raw html wrapper', () => {
@@ -108,42 +124,64 @@ describe( 'element', () => {
 		} );
 	} );
 
-	describe( 'getWrapperDisplayName()', () => {
+	describe( 'createHigherOrderComponent', () => {
 		it( 'should use default name for anonymous function', () => {
-			expect( getWrapperDisplayName( () => <div />, 'test' ) ).toBe( 'Test(Component)' );
+			const TestComponent = createHigherOrderComponent(
+				( OriginalComponent ) => OriginalComponent,
+				'withTest'
+			)( () => <div /> );
+
+			expect( TestComponent.displayName ).toBe( 'WithTest(Component)' );
 		} );
 
 		it( 'should use camel case starting with upper for wrapper prefix ', () => {
-			expect( getWrapperDisplayName( () => <div />, 'one-two_threeFOUR' ) ).toBe( 'OneTwoThreeFour(Component)' );
+			const TestComponent = createHigherOrderComponent(
+				( OriginalComponent ) => OriginalComponent,
+				'with-one-two_threeFOUR'
+			)( () => <div /> );
+
+			expect( TestComponent.displayName ).toBe( 'WithOneTwoThreeFour(Component)' );
 		} );
 
 		it( 'should use function name', () => {
 			function SomeComponent() {
 				return <div />;
 			}
+			const TestComponent = createHigherOrderComponent(
+				( OriginalComponent ) => OriginalComponent,
+				'withTest'
+			)( SomeComponent );
 
-			expect( getWrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(SomeComponent)' );
+			expect( TestComponent.displayName ).toBe( 'WithTest(SomeComponent)' );
 		} );
 
 		it( 'should use component class name', () => {
-			class SomeComponent extends Component {
+			class SomeAnotherComponent extends Component {
 				render() {
 					return <div />;
 				}
 			}
+			const TestComponent = createHigherOrderComponent(
+				( OriginalComponent ) => OriginalComponent,
+				'withTest'
+			)( SomeAnotherComponent );
 
-			expect( getWrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(SomeComponent)' );
+			expect( TestComponent.displayName ).toBe( 'WithTest(SomeAnotherComponent)' );
 		} );
 
 		it( 'should use displayName property', () => {
-			class SomeComponent extends Component {
+			class SomeYetAnotherComponent extends Component {
 				render() {
 					return <div />;
 				}
 			}
-			SomeComponent.displayName = 'CustomDisplayName';
+			SomeYetAnotherComponent.displayName = 'CustomDisplayName';
+			const TestComponent = createHigherOrderComponent(
+				( OriginalComponent ) => OriginalComponent,
+				'withTest'
+			)( SomeYetAnotherComponent );
 
-			expect( getWrapperDisplayName( SomeComponent, 'test' ) ).toBe( 'Test(CustomDisplayName)' );
+			expect( TestComponent.displayName ).toBe( 'WithTest(CustomDisplayName)' );
 		} );
 	} );
 
@@ -156,7 +194,7 @@ describe( 'element', () => {
 				</RawHTML>
 			);
 
-			expect( element.type() ).toBe( 'wp-raw-html' );
+			expect( element.type() ).toBe( 'div' );
 			expect( element.prop( 'dangerouslySetInnerHTML' ).__html ).toBe( html );
 			expect( element.prop( 'children' ) ).toBe( undefined );
 		} );
@@ -173,6 +211,50 @@ describe( 'element', () => {
 			expect( element.prop( 'className' ) ).toBe( 'foo' );
 			expect( element.prop( 'dangerouslySetInnerHTML' ).__html ).toBe( html );
 			expect( element.prop( 'children' ) ).toBe( undefined );
+		} );
+	} );
+
+	describe( 'pure', () => {
+		it( 'functional component should rerender only when props change', () => {
+			let i = 0;
+			const MyComp = pure( () => {
+				return <p>{ ++i }</p>;
+			} );
+			const wrapper = mount( <MyComp /> );
+			wrapper.update(); // Updating with same props doesn't rerender
+			expect( wrapper.html() ).toBe( '<p>1</p>' );
+			wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender
+			expect( wrapper.html() ).toBe( '<p>2</p>' );
+			wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender
+			expect( wrapper.html() ).toBe( '<p>2</p>' );
+			wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender
+			expect( wrapper.html() ).toBe( '<p>3</p>' );
+		} );
+
+		it( 'class component should rerender if the props or state change', () => {
+			let i = 0;
+			const MyComp = pure( class extends Component {
+				constructor() {
+					super( ...arguments );
+					this.state = {};
+				}
+				render() {
+					return <p>{ ++i }</p>;
+				}
+			} );
+			const wrapper = mount( <MyComp /> );
+			wrapper.update(); // Updating with same props doesn't rerender
+			expect( wrapper.html() ).toBe( '<p>1</p>' );
+			wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender
+			expect( wrapper.html() ).toBe( '<p>2</p>' );
+			wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender
+			expect( wrapper.html() ).toBe( '<p>2</p>' );
+			wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender
+			expect( wrapper.html() ).toBe( '<p>3</p>' );
+			wrapper.setState( { state: 'a' } ); // New state value should trigger a rerender
+			expect( wrapper.html() ).toBe( '<p>4</p>' );
+			wrapper.setState( { state: 'a' } ); // Keeping the same state value should not trigger a rerender
+			expect( wrapper.html() ).toBe( '<p>4</p>' );
 		} );
 	} );
 } );

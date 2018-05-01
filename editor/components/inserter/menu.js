@@ -12,7 +12,6 @@ import {
 	sortBy,
 	isEmpty,
 } from 'lodash';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -24,20 +23,17 @@ import {
 	TabbableContainer,
 	withInstanceId,
 	withSpokenMessages,
-	withContext,
 } from '@wordpress/components';
-import { getCategories, isReusableBlock } from '@wordpress/blocks';
+import { getCategories, isSharedBlock, withEditorSettings } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import NoBlocks from './no-blocks';
-
-import { getInserterItems, getFrecentInserterItems } from '../../store/selectors';
-import { fetchReusableBlocks } from '../../store/actions';
-import { default as InserterGroup } from './group';
+import InserterGroup from './group';
 import BlockPreview from '../block-preview';
 
 export const searchItems = ( items, searchTerm ) => {
@@ -60,7 +56,7 @@ export class InserterMenu extends Component {
 		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			tab: 'frequent',
+			tab: 'suggested',
 			selectedItem: null,
 		};
 		this.filter = this.filter.bind( this );
@@ -69,13 +65,13 @@ export class InserterMenu extends Component {
 		this.sortItems = this.sortItems.bind( this );
 		this.selectItem = this.selectItem.bind( this );
 
-		this.tabScrollTop = { frequent: 0, blocks: 0, embeds: 0 };
+		this.tabScrollTop = { suggested: 0, blocks: 0, embeds: 0 };
 		this.switchTab = this.switchTab.bind( this );
 		this.previewItem = this.previewItem.bind( this );
 	}
 
 	componentDidMount() {
-		this.props.fetchReusableBlocks();
+		this.props.fetchSharedBlocks();
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -127,7 +123,7 @@ export class InserterMenu extends Component {
 
 		let predicate;
 		switch ( tab ) {
-			case 'frequent':
+			case 'suggested':
 				return frecentItems;
 
 			case 'blocks':
@@ -147,7 +143,7 @@ export class InserterMenu extends Component {
 	}
 
 	sortItems( items ) {
-		if ( 'frequent' === this.state.tab && ! this.state.filterValue ) {
+		if ( 'suggested' === this.state.tab && ! this.state.filterValue ) {
 			return items;
 		}
 
@@ -220,8 +216,8 @@ export class InserterMenu extends Component {
 	renderTabView( tab ) {
 		const itemsForTab = this.getItemsForTab( tab );
 
-		// If the Frequent tab is selected, don't render category headers
-		if ( 'frequent' === tab ) {
+		// If the Suggested tab is selected, don't render category headers
+		if ( 'suggested' === tab ) {
 			return this.renderItems( itemsForTab );
 		}
 
@@ -248,7 +244,7 @@ export class InserterMenu extends Component {
 
 	// Passed to TabbableContainer, extending its event-handling logic
 	eventToOffset( event ) {
-		// If a tab (Frequent, Blocks, …) is focused, pressing the down arrow
+		// If a tab (Suggested, Blocks, …) is focused, pressing the down arrow
 		// moves focus to the selected panel below.
 		if (
 			event.keyCode === keycodes.DOWN &&
@@ -297,8 +293,8 @@ export class InserterMenu extends Component {
 						onSelect={ this.switchTab }
 						tabs={ [
 							{
-								name: 'frequent',
-								title: __( 'Frequent' ),
+								name: 'suggested',
+								title: __( 'Suggested' ),
 								className: 'editor-inserter__tab',
 							},
 							{
@@ -330,7 +326,7 @@ export class InserterMenu extends Component {
 						{ this.renderCategories( this.getVisibleItemsByCategory( items ) ) }
 					</div>
 				}
-				{ selectedItem && isReusableBlock( selectedItem ) &&
+				{ selectedItem && isSharedBlock( selectedItem ) &&
 					<BlockPreview name={ selectedItem.name } attributes={ selectedItem.initialAttributes } />
 				}
 			</TabbableContainer>
@@ -340,22 +336,23 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withContext( 'editor' )( ( settings ) => {
-		const { blockTypes } = settings;
+	withEditorSettings( ( settings ) => {
+		const { allowedBlockTypes } = settings;
 
 		return {
-			enabledBlockTypes: blockTypes,
+			allowedBlockTypes,
 		};
 	} ),
-	connect(
-		( state, ownProps ) => {
-			return {
-				items: getInserterItems( state, ownProps.enabledBlockTypes ),
-				frecentItems: getFrecentInserterItems( state, ownProps.enabledBlockTypes ),
-			};
-		},
-		{ fetchReusableBlocks }
-	),
+	withSelect( ( select, { allowedBlockTypes } ) => {
+		const { getInserterItems, getFrecentInserterItems } = select( 'core/editor' );
+		return {
+			items: getInserterItems( allowedBlockTypes ),
+			frecentItems: getFrecentInserterItems( allowedBlockTypes ),
+		};
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
+	} ) ),
 	withSpokenMessages,
 	withInstanceId
 )( InserterMenu );
