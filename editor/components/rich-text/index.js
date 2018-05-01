@@ -434,7 +434,7 @@ export class RichText extends Component {
 	getContainerNode() {
 		// Find the parent "relative" or "absolute" positioned container
 		const findRelativeParent = ( node ) => {
-			const style = window.getComputedStyle( node );
+			const style = getComputedStyle( node );
 			if ( style.position === 'relative' || style.position === 'absolute' ) {
 				return node;
 			}
