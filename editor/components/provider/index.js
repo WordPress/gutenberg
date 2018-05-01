@@ -39,7 +39,7 @@ class EditorProvider extends Component {
 		} = this.props;
 		const {
 			modalAppElementId,
-			...editorSettings,
+			...editorSettings
 		} = settings;
 		const providers = [
 			// Editor settings provider
@@ -48,7 +48,7 @@ class EditorProvider extends Component {
 				{
 					value: {
 						...EditorSettings.defaultSettings,
-						...settings,
+						...editorSettings,
 					},
 				},
 			],
