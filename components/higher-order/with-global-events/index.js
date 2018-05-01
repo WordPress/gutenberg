@@ -31,7 +31,7 @@ function withGlobalEvents( eventTypesToHandlers ) {
 				super( ...arguments );
 
 				this.handleEvent = this.handleEvent.bind( this );
-				this.setRef = this.setRef.bind( this );
+				this.handleRef = this.handleRef.bind( this );
 			}
 
 			componentDidMount() {
