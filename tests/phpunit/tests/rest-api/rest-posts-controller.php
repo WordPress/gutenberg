@@ -3134,7 +3134,21 @@ class WP_Test_REST_Posts_Controller extends WP_Test_REST_Post_Type_Controller_Te
 		$this->assertEquals( 'array', $status_arg['type'] );
 		$this->assertEquals( array(
 			'type' => 'string',
-			'enum' => array( 'publish', 'future', 'draft', 'pending', 'private', 'trash', 'auto-draft', 'inherit', 'any' ),
+			'enum' => array(
+				'publish',
+				'future',
+				'draft',
+				'pending',
+				'private',
+				'trash',
+				'auto-draft',
+				'inherit',
+				'request-pending',
+				'request-confirmed',
+				'request-failed',
+				'request-completed',
+				'any',
+			),
 		), $status_arg['items'] );
 	}
 
