@@ -18,7 +18,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, compose, RawHTML } from '@wordpress/element';
+import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
 import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange, getScrollContainer } from '@wordpress/utils';
 import { withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
@@ -121,6 +121,7 @@ export class RichText extends Component {
 		};
 
 		this.isEmpty = ! value || ! value.length;
+		this.containerRef = createRef();
 	}
 
 	/**
@@ -386,24 +387,15 @@ export class RichText extends Component {
 	 *
 	 * Based on the selection of the text inside this element a position is
 	 * calculated where the toolbar should be. This can be used downstream to
-	 * absolutely position the toolbar. It does this by finding the closest
-	 * relative element.
+	 * absolutely position the toolbar.
 	 *
 	 * @param {DOMRect} position Caret range rectangle.
 	 *
 	 * @return {{top: number, left: number}} The desired position of the toolbar.
 	 */
 	getFocusPosition( position ) {
-		// Find the parent "relative" or "absolute" positioned container
-		const findRelativeParent = ( node ) => {
-			const style = window.getComputedStyle( node );
-			if ( style.position === 'relative' || style.position === 'absolute' ) {
-				return node;
-			}
-			return findRelativeParent( node.parentNode );
-		};
-		const container = findRelativeParent( this.editor.getBody() );
-		const containerPosition = container.getBoundingClientRect();
+		// The container is relatively positioned.
+		const containerPosition = this.containerRef.current.getBoundingClientRect();
 		const toolbarOffset = { top: 10, left: 0 };
 
 		return {
@@ -816,7 +808,7 @@ export class RichText extends Component {
 		);
 
 		return (
-			<div className={ classes }>
+			<div className={ classes } ref={ this.containerRef }>
 				{ isSelected && ! inlineToolbar && (
 					<BlockFormatControls>
 						{ formatToolbar }
