@@ -38,8 +38,10 @@ var acronymCompleter = {
 };
 
 // Our filter function
-function appendAcronymCompleter( completers ) {
-	return completers.concat( acronymCompleter );
+function appendAcronymCompleter( completers, blockName ) {
+	return blockName === 'my-plugin/foo' ?
+		completers.concat( acronymCompleter ) :
+		completers;
 }
 
 // Adding the filter
@@ -71,8 +73,10 @@ const acronymCompleter = {
 };
 
 // Our filter function
-function appendAcronymCompleter( completers ) {
-	return [ ...completers, acronymCompleter ];
+function appendAcronymCompleter( completers, blockName ) {
+	return blockName === 'my-plugin/foo' ?
+		[ ...completers, acronymCompleter ] :
+		completers;
 }
 
 // Adding the filter

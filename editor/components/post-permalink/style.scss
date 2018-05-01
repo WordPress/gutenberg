@@ -19,15 +19,16 @@
 }
 
 .editor-post-permalink__copy {
-	margin-top: 4px;
+	border-radius: 4px;
+	padding: 6px;
 }
 
-.editor-post-permalink__copy .is-copied {
+.editor-post-permalink__copy.is-copied {
 	opacity: 0.3;
 }
 
 .editor-post-permalink__label {
-	margin: 0 10px;
+	margin: 0 10px 0 5px;
 }
 
 .editor-post-permalink__link {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { some, castArray, first, mapValues, pickBy } from 'lodash';
+import { some, castArray, first, mapValues, pickBy, includes } from 'lodash';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ import { getBlockAttributes } from '../parser';
  */
 const { shortcode } = window.wp;
 
-function segmentHTMLToShortcodeBlock( HTML ) {
+function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 	// Get all matches.
 	const transformsFrom = getBlockTransforms( 'from' );
 
@@ -32,10 +32,22 @@ function segmentHTMLToShortcodeBlock( HTML ) {
 	const transformTag = first( transformTags );
 
 	let match;
-	let lastIndex = 0;
 
 	if ( ( match = shortcode.next( transformTag, HTML, lastIndex ) ) ) {
+		const beforeHTML = HTML.substr( 0, match.index );
+
 		lastIndex = match.index + match.content.length;
+
+		// If the shortcode content does not contain HTML and the shortcode is
+		// not on a new line (or in paragraph from Markdown converter),
+		// consider the shortcode as inline text, and thus skip conversion for
+		// this segment.
+		if (
+			! includes( match.shortcode.content || '', '<' ) &&
+			! /(\n|<p>)\s*$/.test( beforeHTML )
+		) {
+			return segmentHTMLToShortcodeBlock( HTML, lastIndex );
+		}
 
 		const attributes = mapValues(
 			pickBy( transformation.attributes, ( schema ) => schema.shortcode ),
@@ -59,9 +71,9 @@ function segmentHTMLToShortcodeBlock( HTML ) {
 		);
 
 		return [
-			HTML.substr( 0, match.index ),
+			beforeHTML,
 			block,
-			...segmentHTMLToShortcodeBlock( HTML.substr( match.index + match.content.length ) ),
+			...segmentHTMLToShortcodeBlock( HTML.substr( lastIndex ) ),
 		];
 	}
 

@@ -26,10 +26,8 @@ import {
 } from '@wordpress/components';
 import {
 	createBlock,
-	blockAutocompleter,
 	getColorClass,
 	withColors,
-	userAutocompleter,
 	AlignmentToolbar,
 	BlockAlignmentToolbar,
 	BlockControls,
@@ -66,8 +64,6 @@ const FONT_SIZES = {
 	larger: 48,
 };
 
-const autocompleters = [ blockAutocompleter, userAutocompleter ];
-
 class ParagraphBlock extends Component {
 	constructor() {
 		super( ...arguments );
@@ -94,6 +90,10 @@ class ParagraphBlock extends Component {
 	toggleDropCap() {
 		const { attributes, setAttributes } = this.props;
 		setAttributes( { dropCap: ! attributes.dropCap } );
+	}
+
+	getDropCapHelp( checked ) {
+		return checked ? __( 'Showing large initial letter.' ) : __( 'Toggle to show a large initial letter.' );
 	}
 
 	getFontSize() {
@@ -210,15 +210,16 @@ class ParagraphBlock extends Component {
 							label={ __( 'Drop Cap' ) }
 							checked={ !! dropCap }
 							onChange={ this.toggleDropCap }
+							help={ this.getDropCapHelp }
 						/>
 					</PanelBody>
-					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor.value } initialOpen={ false }>
+					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor.value } colorName={ backgroundColor.name } initialOpen={ false }>
 						<ColorPalette
 							value={ backgroundColor.value }
 							onChange={ backgroundColor.set }
 						/>
 					</PanelColor>
-					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor.value } initialOpen={ false }>
+					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor.value } colorName={ textColor.name } initialOpen={ false }>
 						<ColorPalette
 							value={ textColor.value }
 							onChange={ textColor.set }
@@ -262,7 +263,8 @@ class ParagraphBlock extends Component {
 							} );
 						} }
 						onSplit={ insertBlocksAfter ?
-							( unused, after, ...blocks ) => {
+							( before, after, ...blocks ) => {
+								setAttributes( { content: before } );
 								insertBlocksAfter( [
 									...blocks,
 									createBlock( 'core/paragraph', { content: after } ),
@@ -274,7 +276,6 @@ class ParagraphBlock extends Component {
 						onReplace={ this.onReplace }
 						onRemove={ () => onReplace( [] ) }
 						placeholder={ placeholder || __( 'Add text or type / to add content' ) }
-						autocompleters={ autocompleters }
 					/>
 				</div>
 			</Fragment>

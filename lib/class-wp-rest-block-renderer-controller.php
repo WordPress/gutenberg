@@ -3,13 +3,13 @@
  * Block Renderer REST API: WP_REST_Block_Renderer_Controller class
  *
  * @package gutenberg
- * @since ?
+ * @since 2.8.0
  */
 
 /**
  * Controller which provides REST endpoint for rendering a block.
  *
- * @since ?
+ * @since 2.8.0
  *
  * @see WP_REST_Controller
  */
@@ -71,7 +71,7 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to read blocks.
 	 *
-	 * @since ?
+	 * @since 2.8.0
 	 * @access public
 	 *
 	 * @param WP_REST_Request $request Request.
@@ -103,7 +103,7 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	/**
 	 * Returns block output from block's registered render_callback.
 	 *
-	 * @since ?
+	 * @since 2.8.0
 	 * @access public
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
@@ -138,7 +138,7 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves block's output schema, conforming to JSON Schema.
 	 *
-	 * @since ?
+	 * @since 2.8.0
 	 * @access public
 	 *
 	 * @return array Item schema data.

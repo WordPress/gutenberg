@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Button } from '../';
+import IconButton from '../icon-button';
 
 class ClipboardButton extends Component {
 	constructor() {
@@ -82,9 +82,9 @@ class ClipboardButton extends Component {
 
 		return (
 			<span ref={ this.bindContainer }>
-				<Button { ...buttonProps } className={ classes }>
+				<IconButton { ...buttonProps } icon="admin-links" className={ classes }>
 					{ children }
-				</Button>
+				</IconButton>
 			</span>
 		);
 	}

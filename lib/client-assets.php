@@ -191,7 +191,7 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	// Loading the old editor and its config to ensure the classic block works as expected.
 	wp_add_inline_script(
-		'wp-core-blocks', 'window.wp.oldEditor = window.wp.editor;', 'before'
+		'editor', 'window.wp.oldEditor = window.wp.editor;', 'after'
 	);
 	$tinymce_settings = apply_filters( 'tiny_mce_before_init', array(
 		'plugins'          => implode( ',', array_unique( apply_filters( 'tiny_mce_plugins', array(
@@ -275,7 +275,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-viewport',
 			'wp-plugins',
 			'wp-core-data',
-			'word-count',
 			'editor',
 			'lodash',
 		),
@@ -964,6 +963,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'disablePostFormats'  => ! current_theme_supports( 'post-formats' ),
 		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
+		'isRTL'               => is_rtl(),
 	);
 
 	if ( ! empty( $color_palette ) ) {
@@ -979,8 +979,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script  = '( function() {';
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
 	$script .= <<<JS
-		window._wpLoadGutenbergEditor = wp.api.init().then( function() {
-			wp.coreBlocks.registerCoreBlocks();
+		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
+			wp.api.init().then( resolve );
+		} ).then( function() {
 			return wp.editPost.initializeEditor( 'editor', window._wpGutenbergPost, editorSettings );
 		} );
 JS;

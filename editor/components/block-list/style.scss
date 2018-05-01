@@ -1,6 +1,6 @@
 .components-draggable__clone {
 	& > .editor-block-list__block > .editor-block-list__block-draggable {
-		background: white;
+		background: $white;
 		box-shadow: $shadow-popover;
 
 		@include break-small {
@@ -151,7 +151,7 @@
 		bottom: 0;
 		left: 0;
 		background-color: rgba( $white, 0.6 );
-		background-image: linear-gradient( to bottom, transparent, #fff );
+		background-image: linear-gradient( to bottom, transparent, $white );
 	}
 
 	/**
