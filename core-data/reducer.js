@@ -50,13 +50,13 @@ export function terms( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function authors( state = {}, action ) {
+export function authors( state = [], action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_AUTHORS':
-			return {
+			return [
 				...state,
 				...action.authors,
-			};
+			];
 	}
 
 	return state;

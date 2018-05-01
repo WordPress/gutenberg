@@ -17,7 +17,6 @@ import PostTypeSupportCheck from '../post-type-support-check';
 
 export function PostAuthorCheck( { user, authors, children } ) {
 	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
-	authors = castArray( authors );
 
 	if ( ! userCanPublishPosts || authors.length < 2 ) {
 		return null;
