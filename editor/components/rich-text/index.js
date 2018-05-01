@@ -111,6 +111,7 @@ export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.positionedContainerElement = createRef();
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
@@ -466,7 +467,7 @@ export class RichText extends Component {
 	}
 
 	setInsertPosition() {
-		const container = this.getContainerNode();
+		const container = this.positionedContainerElement.current;
 		const containerStyle = window.getComputedStyle( container );
 		const marginLeft = get( containerStyle, 'margin-left', 0 );
 		const containerPosition = container.getBoundingClientRect();
