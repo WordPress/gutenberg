@@ -12,6 +12,7 @@ import { Component, createPortal } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { withModalContext } from './context';
 import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
@@ -41,8 +42,13 @@ class Modal extends Component {
 	componentDidMount() {
 		modalCount++;
 
+		const {
+			modalContext,
+		} = this.props;
+
 		if ( ! this.parentElement ) {
-			setElements();
+			console.log( modalContext );
+			setElements( modalContext.elementId );
 		}
 
 		ariaHelper.hideApp();
@@ -127,8 +133,13 @@ Modal.defaultProps = {
 	},
 };
 
-function setElements() {
-	const wpwrapEl = document.getElementById( 'wpwrap' );
+/**
+ * Sets the element where the modal should mount itself.
+ *
+ * @param {string} elementId The element id.
+ */
+function setElements( elementId ) {
+	const wpwrapEl = document.getElementById( elementId );
 
 	if ( wpwrapEl ) {
 		Modal.setAppElement( wpwrapEl );
@@ -136,4 +147,5 @@ function setElements() {
 	}
 }
 
-export default Modal;
+export { ModalContextProvider } from './context';
+export default withModalContext( Modal );
