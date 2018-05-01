@@ -107,7 +107,7 @@ class EditorProvider extends Component {
 						appElementId: modalAppElementId,
 					},
 				},
-			]
+			],
 		];
 
 		const createEditorElement = flow(

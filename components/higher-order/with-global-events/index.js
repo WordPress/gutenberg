@@ -61,7 +61,7 @@ function withGlobalEvents( eventTypesToHandlers ) {
 			render() {
 				return <WrappedComponent { ...this.props } ref={ this.handleRef } />;
 			}
-		};
+		}
 
 		return forwardRef( ( props, ref ) => {
 			return <Wrapper { ...props } forwardedRef={ ref || noop } />;
