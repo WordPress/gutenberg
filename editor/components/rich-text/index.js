@@ -474,7 +474,7 @@ export class RichText extends Component {
 		if ( inlineBlockForInsert.type === 'image' ) {
 			this.setState( { mediaLibraryOpen: true } );
 		} else {
-			inlineBlockForInsert.render( this.editor );
+			this.editor.insertContent( inlineBlockForInsert.render() );
 			completeInlineInsert();
 		}
 	}
@@ -966,7 +966,8 @@ export class RichText extends Component {
 					<MediaUpload
 						type="image"
 						onSelect={ ( media ) => {
-							inlineBlockForInsert.render( media, this.editor );
+							const img = inlineBlockForInsert.render( media );
+							this.editor.insertContent( img );
 							completeInlineInsert();
 							this.setState( { mediaLibraryOpen: false } );
 						} }
