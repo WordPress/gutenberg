@@ -62,7 +62,7 @@ const extractConfig = {
  */
 function camelCaseDash( string ) {
 	return string.replace(
-		/-([a-z])/,
+		/-([a-z])/g,
 		( match, letter ) => letter.toUpperCase()
 	);
 }
