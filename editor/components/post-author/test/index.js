@@ -43,30 +43,12 @@ describe( 'PostAuthor', () => {
 		},
 	};
 
-	describe( '#getAuthors()', () => {
-		it( 'returns empty array on unknown users', () => {
-			const wrapper = shallow( <PostAuthor users={ {} } user={ user } /> );
-
-			const authors = wrapper.instance().getAuthors();
-
-			expect( authors ).toEqual( [] );
-		} );
-
-		it( 'filters users to authors', () => {
-			const wrapper = shallow( <PostAuthor users={ users } user={ user } /> );
-
-			const authors = wrapper.instance().getAuthors();
-
-			expect( authors.map( ( author ) => author.id ).sort() ).toEqual( [ 1, 3 ] );
-		} );
-	} );
-
 	describe( '#render()', () => {
 		it( 'should update author', () => {
 			const onUpdateAuthor = jest.fn();
 			const wrapper = shallow(
 				<PostAuthor
-					users={ users }
+					authors={ users }
 					user={ user }
 					onUpdateAuthor={ onUpdateAuthor } />
 			);

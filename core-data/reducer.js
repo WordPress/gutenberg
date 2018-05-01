@@ -43,6 +43,26 @@ export function terms( state = {}, action ) {
 }
 
 /**
+ * Reducer managing authors state. Keyed by id.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function authors( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_AUTHORS':
+			return {
+				...state,
+				...action.authors,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer managing media state. Keyed by id.
  *
  * @param {Object} state  Current state.
@@ -104,6 +124,7 @@ export function themeSupports( state = {}, action ) {
 
 export default combineReducers( {
 	terms,
+	authors,
 	media,
 	postTypes,
 	themeSupports,

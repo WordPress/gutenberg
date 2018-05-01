@@ -38,6 +38,20 @@ export function receiveTerms( taxonomy, terms ) {
 }
 
 /**
+ * Returns an action object used in signalling that authors have been received.
+ *
+ * @param {Array|Object} authors Authors received.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveAuthors( authors ) {
+	return {
+		type: 'RECEIVE_AUTHORS',
+		authors: castArray( authors ),
+	};
+}
+
+/**
  * Returns an action object used in signalling that media have been received.
  *
  * @param {Array|Object} media Media received.

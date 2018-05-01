@@ -59,6 +59,17 @@ export function getMedia( state, id ) {
 }
 
 /**
+ * Returns all available authors.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Authors list.
+ */
+export function getAuthors( state ) {
+	return state.authors;
+}
+
+/**
  * Returns the Post Type object by slug.
  *
  * @param {Object} state Data state.
