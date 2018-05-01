@@ -121,6 +121,26 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Only returns wp:action-sticky when current user can sticky.
+	 */
+	function test_link_sticky_only_appears_for_editor() {
+		$post_id   = $this->factory->post->create();
+		$check_key = 'https://api.w.org/action-sticky';
+		// authors cannot sticky.
+		wp_set_current_user( $this->author );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+		// editors can sticky.
+		wp_set_current_user( $this->editor );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertTrue( isset( $links[ $check_key ] ) );
+	}
+
+	/**
 	 * Should include relevant data in the 'theme_supports' key of index.
 	 */
 	function test_theme_supports_index() {
