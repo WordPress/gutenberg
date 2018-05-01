@@ -1,3 +1,5 @@
+'use strict';
+
 const Benchmark = require( 'benchmark' );
 
 const suite = new Benchmark.Suite;
@@ -12,9 +14,10 @@ const afterArrayEqual = [ 1, 2, 3, 4, 5, 6, 7 ];
 const afterArrayUnequal = [ 1, 2, 3, 4, 5, 'Unequal', 7 ];
 
 [
+	[ '@wordpress/is-shallow-equal (type specific)', require( '../objects' ), require( '../arrays' ) ],
 	[ '@wordpress/is-shallow-equal', require( '../' ) ],
 	[ 'shallowequal', require( 'shallowequal' ) ],
-	[ 'shallow-equal', require( 'shallow-equal/objects' ), require( 'shallow-equal/arrays' ) ],
+	[ 'shallow-equal (type specific)', require( 'shallow-equal/objects' ), require( 'shallow-equal/arrays' ) ],
 	[ 'is-equal-shallow', require( 'is-equal-shallow' ) ],
 	[ 'shallow-equals', require( 'shallow-equals' ) ],
 	[ 'fbjs/lib/shallowEqual', require( 'fbjs/lib/shallowEqual' ) ],

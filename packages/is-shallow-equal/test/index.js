@@ -11,6 +11,7 @@ describe( 'isShallowEqual', () => {
 		const b = { 0: 1 };
 
 		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
 	it( 'returns false if a object has more keys than b', () => {
@@ -18,6 +19,7 @@ describe( 'isShallowEqual', () => {
 		const b = { foo: 1 };
 
 		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
 	it( 'returns false if b object has more keys than a', () => {
@@ -25,6 +27,7 @@ describe( 'isShallowEqual', () => {
 		const b = { foo: 1, bar: 2 };
 
 		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
 	it( 'returns false if a object has different value than b', () => {
@@ -32,6 +35,7 @@ describe( 'isShallowEqual', () => {
 		const b = { foo: 1, bar: 1 };
 
 		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
 	it( 'returns false if a object has different key than b', () => {
@@ -39,6 +43,7 @@ describe( 'isShallowEqual', () => {
 		const b = { foo: 1, baz: 2 };
 
 		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
 	it( 'returns false if b object has different key than a', () => {
@@ -46,6 +51,7 @@ describe( 'isShallowEqual', () => {
 		const b = { foo: 1, bar: 2 };
 
 		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
 	it( 'returns true if a object has same values as b', () => {
@@ -53,6 +59,7 @@ describe( 'isShallowEqual', () => {
 		const b = { foo: 1, bar: 2 };
 
 		expect( isShallowEqual( a, b ) ).toBe( true );
+		expect( isShallowEqual( b, a ) ).toBe( true );
 	} );
 
 	it( 'returns true if a object strictly equals b', () => {
@@ -74,6 +81,7 @@ describe( 'isShallowEqual', () => {
 		const b = { foo: obj };
 
 		expect( isShallowEqual( a, b ) ).toBe( true );
+		expect( isShallowEqual( b, a ) ).toBe( true );
 	} );
 
 	it( 'returns false if a array has more keys than b', () => {
@@ -81,6 +89,7 @@ describe( 'isShallowEqual', () => {
 		const b = [ 1 ];
 
 		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
 	it( 'returns false if b array has more keys than a', () => {
@@ -88,6 +97,7 @@ describe( 'isShallowEqual', () => {
 		const b = [ 1, 2 ];
 
 		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
 	it( 'returns false if a array has different value than b', () => {
@@ -95,6 +105,7 @@ describe( 'isShallowEqual', () => {
 		const b = [ 1, 2 ];
 
 		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
 	it( 'returns true if a array has same values as b', () => {
@@ -102,6 +113,7 @@ describe( 'isShallowEqual', () => {
 		const b = [ 1, 2 ];
 
 		expect( isShallowEqual( a, b ) ).toBe( true );
+		expect( isShallowEqual( b, a ) ).toBe( true );
 	} );
 
 	it( 'returns true on array deep-but-referentially-equal values', () => {
@@ -110,6 +122,20 @@ describe( 'isShallowEqual', () => {
 		const b = [ obj ];
 
 		expect( isShallowEqual( a, b ) ).toBe( true );
+		expect( isShallowEqual( b, a ) ).toBe( true );
+	} );
+
+	it( 'falls back to strict equality when one of arguments is non-object-like', () => {
+		expect( isShallowEqual( undefined, {} ) ).toBe( false );
+		expect( isShallowEqual( undefined, [] ) ).toBe( false );
+		expect( isShallowEqual( undefined, undefined ) ).toBe( true );
+		expect( isShallowEqual( {}, null ) ).toBe( false );
+		expect( isShallowEqual( [], {} ) ).toBe( false );
+		expect( isShallowEqual( null, [] ) ).toBe( false );
+		expect( isShallowEqual( null, null ) ).toBe( true );
+		expect( isShallowEqual( 1, true ) ).toBe( false );
+		expect( isShallowEqual( true, true ) ).toBe( true );
+		expect( isShallowEqual( null, undefined ) ).toBe( false );
 	} );
 
 	it( 'returns true on arrays that are a copy of each other', () => {
