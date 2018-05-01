@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import {
+	PanelBody,
 	ServerSideRender,
 	ToggleControl,
 } from '@wordpress/components';
@@ -45,17 +46,18 @@ class ArchivesBlock extends Component {
 
 		const inspectorControls = isSelected && (
 			<InspectorControls key="inspector">
-				<h3>{ __( 'Archives Settings' ) }</h3>
-				<ToggleControl
-					label={ __( 'Show post counts' ) }
-					checked={ showPostCounts }
-					onChange={ this.toggleShowPostCounts }
-				/>
-				<ToggleControl
-					label={ __( 'Display as dropdown' ) }
-					checked={ displayAsDropdown }
-					onChange={ this.toggleDisplayAsDropdown }
-				/>
+				<PanelBody title={ __( 'Archives Settings' ) }>
+					<ToggleControl
+						label={ __( 'Show post counts' ) }
+						checked={ showPostCounts }
+						onChange={ this.toggleShowPostCounts }
+					/>
+					<ToggleControl
+						label={ __( 'Display as dropdown' ) }
+						checked={ displayAsDropdown }
+						onChange={ this.toggleDisplayAsDropdown }
+					/>
+				</PanelBody>
 			</InspectorControls>
 		);
 
