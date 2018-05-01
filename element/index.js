@@ -17,7 +17,11 @@ import {
 	isString,
 	upperFirst,
 } from 'lodash';
-import isShallowEqual from 'shallowequal';
+
+/**
+ * WordPress dependencies
+ */
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
