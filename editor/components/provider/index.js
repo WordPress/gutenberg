@@ -38,7 +38,7 @@ class EditorProvider extends Component {
 			createUndoLevel,
 		} = this.props;
 		const {
-			modalElementId,
+			modalAppElementId,
 			...editorSettings,
 		} = settings;
 		const providers = [
@@ -104,7 +104,7 @@ class EditorProvider extends Component {
 				ModalContextProvider,
 				{
 					value: {
-						elementId: modalElementId,
+						appElementId: modalAppElementId,
 					},
 				},
 			]

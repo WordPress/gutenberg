@@ -8,25 +8,23 @@ The modal is used to create an accessible modal over an application.
 ## Usage
 
 Render a screen overlay with a modal on top.
-```js
-// When the app element is set it puts an aria-hidden="true" to the provided node.
-Modal.setAppElement( document.getElementById( 'wpwrap' ).parentNode )
-```
 ```jsx
-    <Modal
-        aria={ {
-            labelledby: 'modal-title',
-            describedby: 'modal-description',
-        } }
-        parentSelector={ () => {
-            return document.getElementById( 'wpwrap' );
-        } )
-        >
-        <ModalContent>
-            <h2 id="modal-title">My awesome modal!</h2>
-            <p id="modal-description">This modal is meant to be awesome!</p>
-        </ModalConent>
-    </Modal>
+	<ModalContextProvider value={ { elementId: 'wpwrap' } }>
+		<Modal
+			aria={ {
+				labelledby: 'modal-title',
+				describedby: 'modal-description',
+			} }
+			parentSelector={ () => {
+				return document.getElementById( 'wpwrap' );
+			} )
+			>
+			<ModalContent>
+				<h2 id="modal-title">My awesome modal!</h2>
+				<p id="modal-description">This modal is meant to be awesome!</p>
+			</ModalConent>
+		</Modal>
+    </ModalContextProvider>
 ```
 
 ## Props

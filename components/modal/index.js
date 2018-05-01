@@ -47,8 +47,7 @@ class Modal extends Component {
 		} = this.props;
 
 		if ( ! this.parentElement ) {
-			console.log( modalContext );
-			setElements( modalContext.elementId );
+			setElements( modalContext.appElementId );
 		}
 
 		ariaHelper.hideApp();
@@ -136,14 +135,17 @@ Modal.defaultProps = {
 /**
  * Sets the element where the modal should mount itself.
  *
- * @param {string} elementId The element id.
+ * Note that the modal will mount itself as a sibling of this element, so using body is
+ * not possible since it cannot have additional sibling elements.
+ *
+ * @param {string} appElementId The element id of the element that contains your application.
  */
-function setElements( elementId ) {
-	const wpwrapEl = document.getElementById( elementId );
+function setElements( appElementId ) {
+	const element = document.getElementById( appElementId );
 
-	if ( wpwrapEl ) {
-		Modal.setAppElement( wpwrapEl );
-		Modal.setParentElement( wpwrapEl.parentNode );
+	if ( element ) {
+		Modal.setAppElement( element );
+		Modal.setParentElement( element.parentNode );
 	}
 }
 
