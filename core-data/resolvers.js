@@ -9,7 +9,7 @@ import apiRequest from '@wordpress/api-request';
 import {
 	setRequested,
 	receiveTerms,
-	receiveAuthors,
+	receiveUserQuery,
 	receiveMedia,
 	receivePostTypes,
 	receiveThemeSupportsFromIndex,
@@ -29,8 +29,8 @@ export async function* getCategories() {
  * Requests authors from the REST API.
  */
 export async function* getAuthors() {
-	const authors = await apiRequest( { path: '/wp/v2/users/?who=authors' } );
-	yield receiveAuthors( authors );
+	const users = await apiRequest( { path: '/wp/v2/users/?who=authors' } );
+	yield receiveUserQuery( 'authors', users );
 }
 
 /**

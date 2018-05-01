@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * Returns all the available terms for the given taxonomy.
  *
  * @param {Object} state    Data state.
@@ -66,7 +71,21 @@ export function getMedia( state, id ) {
  * @return {Array} Authors list.
  */
 export function getAuthors( state ) {
-	return state.authors;
+	return getUserQueryResults( state, 'authors' );
+}
+
+/**
+ * Returns all the users returned by a query ID.
+ *
+ * @param {Object} state   Data state.
+ * @param {string} queryID Query ID.
+ *
+ * @return {Array} Users list.
+ */
+export function getUserQueryResults( state, queryID ) {
+	const queryResults = state.users.queries[ queryID ];
+
+	return map( queryResults, ( id ) => state.users.byId[ id ] );
 }
 
 /**
