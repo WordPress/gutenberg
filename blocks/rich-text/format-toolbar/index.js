@@ -16,6 +16,10 @@ import { prependHTTP } from '@wordpress/url';
 /**
  * Internal dependencies
  */
+import keyboardShortcut, {
+	ALT,
+	CONTROL,
+} from 'utils/keyboard-shortcut';
 import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
@@ -26,25 +30,25 @@ const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',
 		title: __( 'Bold' ),
-		shortcut: '⌘B',
+		shortcut: keyboardShortcut(CONTROL, 'B'),
 		format: 'bold',
 	},
 	{
 		icon: 'editor-italic',
 		title: __( 'Italic' ),
-		shortcut: '⌘I',
+		shortcut: keyboardShortcut(CONTROL, 'I'),
 		format: 'italic',
 	},
 	{
 		icon: 'editor-strikethrough',
 		title: __( 'Strikethrough' ),
-		shortcut: 'Ctrl+Alt+D',
+		shortcut: keyboardShortcut(CONTROL, ALT, 'D'),
 		format: 'strikethrough',
 	},
 	{
 		icon: 'admin-links',
 		title: __( 'Link' ),
-		shortcut: '⌘K',
+		shortcut: keyboardShortcut(CONTROL, 'K'),
 		format: 'link',
 	},
 ];
