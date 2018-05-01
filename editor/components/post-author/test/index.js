@@ -9,31 +9,29 @@ import { shallow } from 'enzyme';
 import { PostAuthor } from '../';
 
 describe( 'PostAuthor', () => {
-	const users = {
-		data: [
-			{
-				id: 1,
-				name: 'admin',
-				capabilities: {
-					level_1: true,
-				},
+	const authors = [
+		{
+			id: 1,
+			name: 'admin',
+			capabilities: {
+				level_1: true,
 			},
-			{
-				id: 2,
-				name: 'subscriber',
-				capabilities: {
-					level_0: true,
-				},
+		},
+		{
+			id: 2,
+			name: 'subscriber',
+			capabilities: {
+				level_0: true,
 			},
-			{
-				id: 3,
-				name: 'andrew',
-				capabilities: {
-					level_1: true,
-				},
+		},
+		{
+			id: 3,
+			name: 'andrew',
+			capabilities: {
+				level_1: true,
 			},
-		],
-	};
+		},
+	];
 
 	const user = {
 		data: {
@@ -48,7 +46,7 @@ describe( 'PostAuthor', () => {
 			const onUpdateAuthor = jest.fn();
 			const wrapper = shallow(
 				<PostAuthor
-					authors={ users }
+					authors={ authors }
 					user={ user }
 					onUpdateAuthor={ onUpdateAuthor } />
 			);

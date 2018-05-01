@@ -44,13 +44,13 @@ describe( 'PostAuthorCheck', () => {
 	};
 
 	it( 'should not render anything if users unknown', () => {
-		const wrapper = shallow( <PostAuthorCheck authors={ {} } user={ user }>authors</PostAuthorCheck> );
+		const wrapper = shallow( <PostAuthorCheck authors={ [] } user={ user }>authors</PostAuthorCheck> );
 		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( 'should not render anything if single user', () => {
 		const wrapper = shallow(
-			<PostAuthorCheck authors={ { data: users.data.slice( 0, 1 ) } } user={ user }>
+			<PostAuthorCheck authors={ users.data.slice( 0, 1 ) } user={ user }>
 				authors
 			</PostAuthorCheck>
 		);
