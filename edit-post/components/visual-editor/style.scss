@@ -86,6 +86,7 @@
 	.editor-post-permalink {
 		left: $block-padding;
 		right: $block-padding;
+		color: $dark-gray-900;
 	}
 
 	@include break-small() {

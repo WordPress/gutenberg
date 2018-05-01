@@ -14,17 +14,27 @@
 	border: none;
 	outline: none;
 	background: none;
-	color: $dark-opacity-300; // use opacity to work in various editor styles
 	cursor: pointer;
 	padding: 0;
 	width: $block-side-ui-width;
 	height: $block-side-ui-width;	// the side UI can be no taller than 2 * $block-side-ui-width, which matches the height of a line of text
 	border-radius: $button-style__radius-roundrect;
 
+	// use opacity to work in various editor styles
+	color: $dark-opacity-300;
+
+	.is-dark-theme & {
+		color: $light-opacity-300;
+	}
+
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: $dark-opacity-light-300; // use opacity to work in various editor styles
 		pointer-events: none;
+		color: $dark-opacity-light-300; // use opacity to work in various editor styles
+
+		.is-dark-theme & {
+			color: $light-opacity-light-300;
+		}
 	}
 
 	svg {

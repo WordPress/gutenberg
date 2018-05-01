@@ -192,6 +192,21 @@ body.gutenberg-editor-page {
 		&:-moz-placeholder {
 			color: $dark-opacity-300;
 		}
+
+		.is-dark-theme & {
+			&::-webkit-input-placeholder {
+				color: $light-opacity-300;
+			}
+			&::-moz-placeholder {
+				color: $light-opacity-300;
+			}
+			&:-ms-input-placeholder {
+				color: $light-opacity-300;
+			}
+			&:-moz-placeholder {
+				color: $light-opacity-300;
+			}
+		}
 	}
 }
 

@@ -20,7 +20,12 @@
 
 	&.is-selected .editor-post-title__input,
 	.editor-post-title__input:hover {
-		border: 1px solid $dark-opacity-light-500; // use opacity to work in various editor styles
+		// use opacity to work in various editor styles
+		border: 1px solid $dark-opacity-light-500;
+
+		.is-dark-theme & {
+			border: 1px solid $light-opacity-light-500;
+		}
 	}
 }
 

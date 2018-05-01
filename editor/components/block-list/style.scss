@@ -33,8 +33,14 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		background-color: $dark-opacity-light-200;
 		visibility: hidden;
+
+		// use opacity to work in various editor styles
+		background-color: $dark-opacity-light-200;
+
+		.is-dark-theme & {
+			background-color: $light-opacity-light-200;
+		}
 
 		@include break-small {
 			margin: 0 48px;
@@ -169,13 +175,25 @@
 	}
 
 	&.is-hovered > .editor-block-mover:before {
-		border-right: 1px solid $dark-opacity-light-500; // use opacity to work in various editor styles
 		right: 0;
+
+		// use opacity to work in various editor styles
+		border-right: 1px solid $dark-opacity-light-500;
+
+		.is-dark-theme & {
+			border-right: 1px solid $light-opacity-light-500;
+		}
 	}
 
 	&.is-hovered > .editor-block-settings-menu:before {
-		border-left: 1px solid $dark-opacity-light-500; // use opacity to work in various editor styles
 		left: 0;
+
+		// use opacity to work in various editor styles
+		border-left: 1px solid $dark-opacity-light-500; 
+
+		.is-dark-theme & {
+			border-left: 1px solid $light-opacity-light-500;
+		}
 	}
 
 	&.is-typing .editor-block-list__empty-block-inserter,
@@ -211,7 +229,12 @@
 
 	// focused block-style
 	&.is-selected > .editor-block-list__block-edit:before {
-		outline: 1px solid $dark-opacity-light-500; // use opacity to work in various editor styles
+		// use opacity to work in various editor styles
+		outline: 1px solid $dark-opacity-light-500;
+	
+		.is-dark-theme & {
+			outline: 1px solid $light-opacity-light-500;
+		}
 	}
 
 	/**
@@ -233,7 +256,13 @@
 
 	&.is-multi-selected .editor-block-list__block-edit:before {
 		background: $blue-medium-highlight;
+
+		// use opacity to work in various editor styles
 		mix-blend-mode: multiply;
+	
+		.is-dark-theme & {
+			mix-blend-mode: soft-light;
+		}
 	}
 
 	/**
@@ -249,7 +278,12 @@
 	}
 
 	&.is-shared > .editor-block-list__block-edit:before {
-		outline: 1px dashed $light-gray-500;
+		// use opacity to work in various editor styles
+		outline: 1px dashed $dark-opacity-light-500;
+
+		.is-dark-theme & {
+			outline: 1px dashed $light-opacity-light-500;
+		}
 	}
 
 	/**
@@ -500,11 +534,6 @@
 	margin: $item-spacing;
 	cursor: move;/* Fallback for IE/Edge < 14 */
 	cursor: grab;
-
-	.editor-inserter__toggle {
-		color: $dark-gray-300;
-		margin: 4px 0 0 -4px;	// align better with text blocks
-	}
 }
 
 .editor-block-list__insertion-point {
@@ -655,9 +684,13 @@
 	background: $white;
 
 	// use opacity to work in various editor styles
-	border: 1px solid $dark-opacity-light-500; 
 	background-clip: padding-box;
 	box-sizing: padding-box;
+	border: 1px solid $dark-opacity-light-500; 
+
+	.is-dark-theme & {
+		border: 1px solid $light-opacity-light-500; 
+	}
 
 	// this prevents floats from messing up the position
 	position: absolute;

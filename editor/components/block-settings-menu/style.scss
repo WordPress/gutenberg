@@ -6,7 +6,7 @@
 	}
 }
 
-// The Blocks "More" Menu ellipsis icon button
+// The Blocks "More" Menu ellipsis icon button, and trash button
 .editor-block-settings-remove,
 .editor-block-settings-menu__toggle {
 	justify-content: center;
@@ -14,6 +14,13 @@
 	width: $block-side-ui-width;
 	height: $block-side-ui-width;
 	border-radius: $button-style__radius-roundrect;
+
+	// use opacity to work in various editor styles
+	color: $dark-opacity-300;
+
+	.is-dark-theme & {
+		color: $light-opacity-300;
+	}
 
 	// Apply a background in nested contexts, only on desktop
 	@include break-small() {
@@ -67,7 +74,7 @@
 		background: none;
 		outline: none;
 		border-radius: 0;
-		color: $dark-opacity-500; // use opacity to work in various editor styles
+		color: $dark-gray-500;
 		text-align: left;
 		cursor: pointer;
 		@include menu-style__neutral;
