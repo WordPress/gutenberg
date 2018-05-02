@@ -63,7 +63,7 @@ const extractConfig = {
  */
 function camelCaseDash( string ) {
 	return string.replace(
-		/-([a-z])/,
+		/-([a-z])/g,
 		( match, letter ) => letter.toUpperCase()
 	);
 }
@@ -80,14 +80,19 @@ const entryPointNames = [
 	'core-data',
 	'plugins',
 	'edit-post',
-	...fs.readdirSync( './blocks/library' ).map( ( block ) =>
-		'blocks/library/' + block
+	...fs.readdirSync( './core-blocks' ).reduce( (blockList, block ) => {
+		if ( block !== 'test' ) {
+			blockList.push( 'core-blocks/' + block )
+		}
+		return blockList;
+	}, []
 	),
 ];
 
 const packageNames = [
 	'hooks',
 	'i18n',
+	'is-shallow-equal',
 ];
 
 const coreGlobals = [
@@ -109,7 +114,7 @@ const externals = {
 	...packageNames,
 	...coreGlobals,
 ].forEach( ( name ) => {
-	if ( ! name.includes( 'blocks/library' ) ) {
+	if ( ! name.includes( 'core-blocks/' ) ) {
 		externals[ `@wordpress/${ name }` ] = {
 			this: [ 'wp', camelCaseDash( name ) ],
 		};
@@ -127,7 +132,8 @@ const config = {
 			return memo;
 		}, {} ),
 		packageNames.reduce( ( memo, packageName ) => {
-			memo[ packageName ] = `./node_modules/@wordpress/${ packageName }`;
+			const name = camelCaseDash( packageName );
+			memo[ name ] = `./node_modules/@wordpress/${ packageName }`;
 			return memo;
 		}, {} )
 	),
@@ -161,21 +167,21 @@ const config = {
 			{
 				test: /style\.s?css$/,
 				include: [
-					/blocks\/library/,
+					/core-blocks/,
 				],
 				use: individualBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /editor\.s?css$/,
 				include: [
-					/blocks\/library/,
+					/core-blocks/,
 				],
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /\.s?css$/,
 				exclude: [
-					/blocks\/library/,
+					/core-blocks/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},

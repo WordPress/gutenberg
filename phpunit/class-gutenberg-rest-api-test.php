@@ -21,6 +21,13 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$this->editor        = $this->factory->user->create( array(
 			'role' => 'editor',
 		) );
+		$this->subscriber    = $this->factory->user->create(
+			array(
+				'role'         => 'subscriber',
+				'display_name' => 'subscriber',
+				'user_email'   => 'subscriber@example.com',
+			)
+		);
 	}
 
 	function tearDown() {
@@ -118,5 +125,48 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$response = rest_do_request( $request );
 		$result   = $response->get_data();
 		$this->assertFalse( isset( $result['viewable'] ) );
+	}
+
+	/**
+	 * Should include relevant data in the 'theme_supports' key of index.
+	 */
+	function test_theme_supports_index() {
+		$request  = new WP_REST_Request( 'GET', '/' );
+		$response = rest_do_request( $request );
+		$result   = $response->get_data();
+		$this->assertTrue( isset( $result['theme_supports'] ) );
+		$this->assertTrue( isset( $result['theme_supports']['formats'] ) );
+		$this->assertTrue( in_array( 'standard', $result['theme_supports']['formats'] ) );
+	}
+
+	public function test_get_items_who_author_query() {
+		wp_set_current_user( $this->administrator );
+		// First request should include subscriber in the set.
+		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
+		$request->set_param( 'search', 'subscriber' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertCount( 1, $response->get_data() );
+		// Second request should exclude subscriber.
+		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
+		$request->set_param( 'who', 'authors' );
+		$request->set_param( 'search', 'subscriber' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertCount( 0, $response->get_data() );
+	}
+
+	/**
+	 * Any user with 'edit_posts' on a show_in_rest post type
+	 * can view authors. Others (e.g. subscribers) cannot.
+	 */
+	public function test_get_items_who_unauthorized_query() {
+		wp_set_current_user( $this->subscriber );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
+		$request->set_param( 'who', 'authors' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 403, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 'rest_forbidden_who', $data['code'] );
 	}
 }

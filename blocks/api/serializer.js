@@ -3,13 +3,13 @@
  */
 import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
-import isShallowEqual from 'shallowequal';
 
 /**
  * WordPress dependencies
  */
 import { Component, cloneElement, renderToString } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -33,7 +33,7 @@ export function getBlockDefaultClassName( blockName ) {
 }
 
 /**
- * Given a block type containg a save render implementation and attributes, returns the
+ * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
  * @param {Object} blockType   Block type.
@@ -92,7 +92,7 @@ export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
 }
 
 /**
- * Given a block type containg a save render implementation and attributes, returns the
+ * Given a block type containing a save render implementation and attributes, returns the
  * static markup to be saved.
  *
  * @param {Object} blockType   Block type.

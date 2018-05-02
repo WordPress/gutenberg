@@ -14,8 +14,9 @@ global.wp = {
 	'date',
 	'editor',
 	'data',
-	'edit-post',
 	'core-data',
+	'core-blocks',
+	'edit-post',
 	'viewport',
 	'plugins',
 ].forEach( ( entryPointName ) => {

@@ -12,6 +12,7 @@ import {
 	unregisterBlockType,
 	createBlock,
 } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/core-blocks';
 
 /**
  * Internal dependencies

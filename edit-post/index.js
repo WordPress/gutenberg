@@ -1,11 +1,19 @@
 /**
+ * External dependencies
+ */
+import { get, isString, some } from 'lodash';
+
+/**
  * WordPress dependencies
  */
+import domReady from '@wordpress/dom-ready';
 import { render, unmountComponentAtNode } from '@wordpress/element';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
+import { registerCoreBlocks } from '../core-blocks/test/helpers';
 import './assets/stylesheets/main.scss';
 import './hooks';
 import store from './store';
@@ -53,9 +61,6 @@ export function reinitializeEditor( target, settings ) {
  * @return {Object} Editor interface.
  */
 export function initializeEditor( id, post, settings ) {
-	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, target, settings );
-
 	if ( 'production' !== process.env.NODE_ENV ) {
 		// Remove with 3.0 release.
 		window.console.info(
@@ -65,16 +70,38 @@ export function initializeEditor( id, post, settings ) {
 		);
 	}
 
-	render(
-		<Editor settings={ settings } onError={ reboot } post={ post } />,
-		target
-	);
+	let migratedSettings;
+	const colors = get( settings, [ 'colors' ] );
+	if ( some( colors, isString ) ) {
+		migratedSettings = {
+			...settings,
+			colors: colors.map( ( color ) => isString( color ) ? { color } : color ),
+		};
+		deprecated( 'Setting theme colors without names', {
+			version: '2.9',
+			alternative: 'add_theme_support( \'colors\', array( \'name\' => \'my-color\', \'color\': \'#ff0\' );' }
+		);
+	}
 
-	return {
-		initializeMetaBoxes( metaBoxes ) {
-			store.dispatch( initializeMetaBoxState( metaBoxes ) );
-		},
-	};
+	return new Promise( ( resolve ) => {
+		domReady( () => {
+			const target = document.getElementById( id );
+			const reboot = reinitializeEditor.bind( null, target, settings );
+
+			registerCoreBlocks();
+
+			render(
+				<Editor settings={ migratedSettings || settings } onError={ reboot } post={ post } />,
+				target
+			);
+
+			resolve( {
+				initializeMetaBoxes( metaBoxes ) {
+					store.dispatch( initializeMetaBoxState( metaBoxes ) );
+				},
+			} );
+		} );
+	} );
 }
 
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';

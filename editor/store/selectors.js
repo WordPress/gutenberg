@@ -14,6 +14,7 @@ import {
 	unionWith,
 	includes,
 	values,
+	castArray,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -88,7 +89,7 @@ export function isEditedPostNew( state ) {
  * @return {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
-	return state.editor.isDirty;
+	return state.editor.isDirty || inSomeHistory( state, isEditedPostDirty );
 }
 
 /**
@@ -147,7 +148,7 @@ export function getCurrentPostId( state ) {
  * @return {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
-	return get( getCurrentPost( state ), 'revisions.count', 0 );
+	return get( getCurrentPost( state ), [ 'revisions', 'count' ], 0 );
 }
 
 /**
@@ -159,7 +160,7 @@ export function getCurrentPostRevisionsCount( state ) {
  * @return {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
-	return get( getCurrentPost( state ), 'revisions.last_id', null );
+	return get( getCurrentPost( state ), [ 'revisions', 'last_id' ], null );
 }
 
 /**
@@ -505,7 +506,7 @@ export const getGlobalBlockCount = createSelector(
 
 export const getBlocksByUID = createSelector(
 	( state, uids ) => {
-		return map( uids, ( uid ) => getBlock( state, uid ) );
+		return map( castArray( uids ), ( uid ) => getBlock( state, uid ) );
 	},
 	( state ) => [
 		state.editor.present.blocksByUid,
@@ -634,7 +635,7 @@ export function getBlockRootUID( state, uid ) {
 export function getAdjacentBlockUid( state, startUID, modifier = 1 ) {
 	// Default to selected block.
 	if ( startUID === undefined ) {
-		startUID = get( getSelectedBlock( state ), 'uid' );
+		startUID = get( getSelectedBlock( state ), [ 'uid' ] );
 	}
 
 	// Try multi-selection starting at extent based on modifier.
@@ -1566,4 +1567,26 @@ export function getPermalinkParts( state ) {
 		postName,
 		suffix,
 	};
+}
+
+/**
+ * Returns true if an optimistic transaction is pending commit, for which the
+ * before state satisfies the given predicate function.
+ *
+ * @param {Object}   state     Editor state.
+ * @param {Function} predicate Function given state, returning true if match.
+ *
+ * @return {boolean} Whether predicate matches for some history.
+ */
+export function inSomeHistory( state, predicate ) {
+	const { optimist } = state;
+
+	// In recursion, optimist state won't exist. Assume exhausted options.
+	if ( ! optimist ) {
+		return false;
+	}
+
+	return optimist.some( ( { beforeState } ) => (
+		beforeState && predicate( beforeState )
+	) );
 }
