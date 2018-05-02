@@ -27,7 +27,9 @@ class Tests_User extends WP_UnitTestCase {
 			'display_name' => 'John Doe',
 			'user_email' => 'blackburn@battlefield3.com',
 			'user_url' => 'http://tacos.com',
-			'role' => 'contributor'
+			'role' => 'contributor',
+			'nickname' => 'Johnny',
+			'description' => 'I am a WordPress user that cares about privacy.',
 		) );
 
 		self::$user_ids[] = self::$author_id = $factory->user->create( array(
@@ -1448,5 +1450,41 @@ class Tests_User extends WP_UnitTestCase {
 
 		$this->assertContains( '\'Test\' blog\'s "name" has <html entities> &', $email->subject, 'Email subject does not contain the decoded HTML entities' );
 		$this->assertNotContains( '&#039;Test&#039; blog&#039;s &quot;name&quot; has &lt;html entities&gt; &amp;', $email->subject, 'Email subject does contains HTML entities' );
+	}
+
+	/**
+	 * Testing the `wp_user_personal_data_exporter_no_user` function when no user exists.
+	 *
+	 * @ticket 43547
+	 */
+	function test_wp_user_personal_data_exporter_no_user() {
+		$actual = wp_user_personal_data_exporter( 'not-a-user-email@test.com' );
+
+		$expected = array(
+			'data' => array(),
+			'done' => true,
+		);
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Testing the `wp_user_personal_data_exporter_no_user` function when the requested
+	 * user exists.
+	 *
+	 * @ticket 43547
+	 */
+	function test_wp_user_personal_data_exporter() {
+		$test_user = new WP_User( self::$contrib_id );
+
+		$actual = wp_user_personal_data_exporter( $test_user->user_email );
+
+		$this->assertTrue( $actual['done'] );
+
+		// Number of exported users.
+		$this->assertSame( 1, count( $actual['data'] ) );
+
+		// Number of exported user properties.
+		$this->assertSame( 11, count( $actual['data'][0]['data'] ) );
 	}
 }
