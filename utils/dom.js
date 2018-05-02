@@ -11,21 +11,6 @@ const { getComputedStyle, DOMRect } = window;
 const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
- * Returns true if there is a selection and if the selection is collapsed, or
- * false otherwise.
- *
- * @return {boolean} Whether there is a collapsed selection.
- */
-export function hasCollapsedSelection() {
-	const selection = window.getSelection();
-
-	return (
-		selection.rangeCount > 0 &&
-		selection.getRangeAt( 0 ).collapsed
-	);
-}
-
-/**
  * Check whether the caret is horizontally at the edge of the container.
  *
  * @param {Element} container Focusable element.

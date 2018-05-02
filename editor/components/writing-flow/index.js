@@ -12,7 +12,6 @@ import {
 	focus,
 	isTextField,
 	computeCaretRect,
-	hasCollapsedSelection,
 	isHorizontalEdge,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
@@ -28,6 +27,12 @@ import {
 	isBlockFocusStop,
 	isInSameBlock,
 } from '../../utils/dom';
+
+/**
+ * Browser constants
+ */
+
+const { getSelection } = window;
 
 /**
  * Module Constants
@@ -223,7 +228,7 @@ class WritingFlow extends Component {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 				event.preventDefault();
 			}
-		} else if ( isHorizontal && hasCollapsedSelection() && isHorizontalEdge( target, isReverse ) ) {
+		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
