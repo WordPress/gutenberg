@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { upperFirst, camelCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { registerStore } from '@wordpress/data';
@@ -15,23 +10,21 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
-import entities from './entities';
+import { default as entities, getMethodName } from './entities';
 
 const entityResolvers = entities.reduce( ( memo, { kind, name } ) => {
-	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
-	const nameSuffix = upperFirst( camelCase( name ) );
+	const methodName = getMethodName( kind, name );
 	return {
 		...memo,
-		[ `get${ kindPrefix }${ nameSuffix }` ]: ( state, key ) => resolvers.getEntityRecord( state, kind, name, key ),
+		[ methodName ]: ( state, key ) => resolvers.getEntityRecord( state, kind, name, key ),
 	};
 }, {} );
 
 const entitySelectors = entities.reduce( ( memo, { kind, name } ) => {
-	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
-	const nameSuffix = upperFirst( camelCase( name ) );
+	const methodName = getMethodName( kind, name );
 	return {
 		...memo,
-		[ `get${ kindPrefix }${ nameSuffix }` ]: ( state, key ) => selectors.getEntityRecord( state, kind, name, key ),
+		[ methodName ]: ( state, key ) => selectors.getEntityRecord( state, kind, name, key ),
 	};
 }, {} );
 
