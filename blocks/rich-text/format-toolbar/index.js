@@ -30,25 +30,25 @@ const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',
 		title: __( 'Bold' ),
-		shortcut: keyboardShortcut(CONTROL, 'B'),
+		shortcut: keyboardShortcut( CONTROL, 'B' ),
 		format: 'bold',
 	},
 	{
 		icon: 'editor-italic',
 		title: __( 'Italic' ),
-		shortcut: keyboardShortcut(CONTROL, 'I'),
+		shortcut: keyboardShortcut( CONTROL, 'I' ),
 		format: 'italic',
 	},
 	{
 		icon: 'editor-strikethrough',
 		title: __( 'Strikethrough' ),
-		shortcut: keyboardShortcut(CONTROL, ALT, 'D'),
+		shortcut: keyboardShortcut( CONTROL, ALT, 'D' ),
 		format: 'strikethrough',
 	},
 	{
 		icon: 'admin-links',
 		title: __( 'Link' ),
-		shortcut: keyboardShortcut(CONTROL, 'K'),
+		shortcut: keyboardShortcut( CONTROL, 'K' ),
 		format: 'link',
 	},
 ];

@@ -15,27 +15,27 @@ describe( 'keyboardShortcut', () => {
 		const windowsWindow = { navigator: { platform: 'Windows' } };
 
 		it( 'should output Ctrl for CONTROL key', () => {
-			const shortcut = keyboardShortcut(windowsWindow, CONTROL);
+			const shortcut = keyboardShortcut( windowsWindow, CONTROL );
 			expect( shortcut ).toEqual( 'Ctrl' );
 		} );
 
 		it( 'should output Alt for ALT key', () => {
-			const shortcut = keyboardShortcut(windowsWindow, ALT);
+			const shortcut = keyboardShortcut( windowsWindow, ALT );
 			expect( shortcut ).toEqual( 'Alt' );
 		} );
 
 		it( 'should output Windows Unicode for META key', () => {
-			const shortcut = keyboardShortcut(windowsWindow, META);
+			const shortcut = keyboardShortcut( windowsWindow, META );
 			expect( shortcut ).toEqual( '⊞' );
 		} );
 
 		it( 'should output Shift for SHIFT key', () => {
-			const shortcut = keyboardShortcut(windowsWindow, SHIFT);
+			const shortcut = keyboardShortcut( windowsWindow, SHIFT );
 			expect( shortcut ).toEqual( 'Shift' );
 		} );
 
 		it( 'should combine keys with "+" character', () => {
-			const shortcut = keyboardShortcut(windowsWindow, CONTROL, ALT, 'B');
+			const shortcut = keyboardShortcut( windowsWindow, CONTROL, ALT, 'B' );
 			expect( shortcut ).toEqual( 'Ctrl+Alt+B' );
 		} );
 	} );
@@ -44,27 +44,27 @@ describe( 'keyboardShortcut', () => {
 		const macWindow = { navigator: { platform: 'MacOS' } };
 
 		it( 'should output MacOS Clover for CONTROL key', () => {
-			const shortcut = keyboardShortcut(macWindow, CONTROL);
+			const shortcut = keyboardShortcut( macWindow, CONTROL );
 			expect( shortcut ).toEqual( '⌘' );
 		} );
 
 		it( 'should output option symbol for ALT key', () => {
-			const shortcut = keyboardShortcut(macWindow, ALT);
+			const shortcut = keyboardShortcut( macWindow, ALT );
 			expect( shortcut ).toEqual( '⌥' );
 		} );
 
 		it( 'should output control caret for META key', () => {
-			const shortcut = keyboardShortcut(macWindow, META);
+			const shortcut = keyboardShortcut( macWindow, META );
 			expect( shortcut ).toEqual( '⌃' );
 		} );
 
 		it( 'should output Shift unicode for SHIFT key', () => {
-			const shortcut = keyboardShortcut(macWindow, SHIFT);
+			const shortcut = keyboardShortcut( macWindow, SHIFT );
 			expect( shortcut ).toEqual( '⇧' );
 		} );
 
 		it( 'should combine keys with no character', () => {
-			const shortcut = keyboardShortcut(macWindow, CONTROL, ALT, 'B');
+			const shortcut = keyboardShortcut( macWindow, CONTROL, ALT, 'B' );
 			expect( shortcut ).toEqual( '⌘⌥B' );
 		} );
 	} );

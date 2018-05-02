@@ -10,6 +10,6 @@ import keyboardShortcut, {
 export default {
 	toggleEditorMode: {
 		value: 'mod+shift+alt+m',
-		label: keyboardShortcut(CONTROL, SHIFT, ALT, 'M'),
+		label: keyboardShortcut( CONTROL, SHIFT, ALT, 'M' ),
 	},
 };
