@@ -99,6 +99,7 @@ export const settings = {
 				this.setState( { editing: true } );
 			};
 			const onSelectVideo = ( media ) => {
+
 				if ( media && media.url ) {
 					// sets the block's attribute and updates the edit component from the
 					// selected media, then switches off the editing UI
@@ -208,7 +209,7 @@ export const settings = {
 						</PanelBody>
 					</InspectorControls>
 					<figure className={ className }>
-						<video controls src={ src } />
+						<video controls src={ src } width={ this.props.attributes.width } height={ this.props.attributes.height } />
 						{ ( ( caption && caption.length ) || isSelected ) && (
 							<RichText
 								tagName="figcaption"
