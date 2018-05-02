@@ -40,14 +40,16 @@ export function receiveTerms( taxonomy, terms ) {
 /**
  * Returns an action object used in signalling that authors have been received.
  *
- * @param {Array|Object} authors Authors received.
+ * @param {string}       queryID Query ID.
+ * @param {Array|Object} users   Users received.
  *
  * @return {Object} Action object.
  */
-export function receiveAuthors( authors ) {
+export function receiveUserQuery( queryID, users ) {
 	return {
-		type: 'RECEIVE_AUTHORS',
-		authors: castArray( authors ),
+		type: 'RECEIVE_USER_QUERY',
+		users: castArray( users ),
+		queryID,
 	};
 }
 
