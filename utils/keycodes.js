@@ -83,7 +83,7 @@ export function keyboardShortcut( keys, _isMacOS = isMacOS ) {
  * @return {string}          The keyboard shortcut.
  */
 export function accessShortcut( character, _isMacOS = isMacOS ) {
-	const keyCombo = _isMacOS() ? `${ PRIMARY }+${ ALT }` : `${ SHIFT }+${ ALT }`;
+	const keyCombo = _isMacOS() ? `${ META }+${ ALT }` : `${ SHIFT }+${ ALT }`;
 	return keyboardShortcut( `${ keyCombo }+${ character }`, _isMacOS );
 }
 

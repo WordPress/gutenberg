@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { primaryAccessShortcut } from 'utils/keyboard-shortcut';
+import { primaryAccessShortcut } from 'utils/keycodes';
 
 export default {
 	toggleEditorMode: {

@@ -93,9 +93,9 @@ describe( 'accessShortcut', () => {
 		expect( shortcut ).toEqual( 'Shift+Alt+M' );
 	} );
 
-	it( 'should output command+option symbols on MacOS', () => {
+	it( 'should output control+option symbols on MacOS', () => {
 		const shortcut = accessShortcut( 'M', isMacOSTrue );
-		expect( shortcut ).toEqual( '⌘⌥M' );
+		expect( shortcut ).toEqual( '⌃⌥M' );
 	} );
 } );
 
