@@ -8,7 +8,8 @@ let hiddenElements = [],
 
 /**
  * Hides all elements in the body element from screen-readers except
- * the provided element.
+ * the provided element, script elements and elements that already have
+ * an `aria-hidden="true"` attribute.
  *
  * @param {Element} unhiddenElement The element that should not be hidden.
  */
@@ -18,7 +19,11 @@ export function hideApp( unhiddenElement ) {
 	}
 	const elements = document.body.children;
 	forEach( elements, element => {
-		if ( element === unhiddenElement ) {
+		if (
+			element === unhiddenElement ||
+			element.tagName === 'SCRIPT' ||
+			element.hasAttribute( 'aria-hidden', 'true')
+		) {
 			return;
 		}
 		element.setAttribute( 'aria-hidden', 'true' );
