@@ -29,9 +29,7 @@ class BlockPreview extends Component {
 		// is defined in `@wordpress/blocks`, so to avoid a circular dependency
 		// we inject this function via context.
 		return {
-			createInnerBlockList: ( uid ) => {
-				return createInnerBlockList( uid );
-			},
+			createInnerBlockList,
 		};
 	}
 
