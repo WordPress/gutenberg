@@ -92,8 +92,6 @@ add_theme_support( 'disable-custom-colors' );
 
 This flag will make sure users are only able to choose colors from the `editor-color-palette` the theme provided or from the editor default colors if the theme did not provide one.
 
-
-
 ## Editor styles
 
 A theme can provide a stylesheet to the editor itself, to change colors, fonts, and any aspect of the editor.
@@ -111,8 +109,6 @@ function mytheme_block_editor_styles() {
 }
 add_action( 'enqueue_block_editor_assets', 'mytheme_block_editor_styles' );
 ```
-
-
 
 Now create a new stylesheet, `style-editor.css` and save it in your theme directory.
 
@@ -153,7 +149,5 @@ body.gutenberg-editor-page .editor-block-list__block[data-align="full"] {
 ```
 
 You can use those editor widths to match those in your theme. You can use any CSS width unit, including `%` or `px`.
-
-
 
 See also, [Applying Styles with Stylesheets](https://wordpress.org/gutenberg/handbook/blocks/applying-styles-with-stylesheets/).
