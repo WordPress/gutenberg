@@ -32,6 +32,9 @@ class ModalFrame extends Component {
 		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
 	}
 
+	/**
+	 * Focuses the first tabbable element when props.focusOnMount is true.
+	 */
 	componentDidMount() {
 		// Focus on mount
 		if ( this.props.focusOnMount ) {
@@ -95,7 +98,6 @@ class ModalFrame extends Component {
 				style={ style }
 				ref={ this.containerRef }
 				role={ role }
-				aria-modal={ true }
 				aria-label={ contentLabel }
 				aria-labelledby={ labelledby }
 				aria-describedby={ describedby }>

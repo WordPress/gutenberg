@@ -11,6 +11,11 @@ let hiddenElements = [],
  * the provided element, script elements and elements that already have
  * an `aria-hidden="true"` attribute.
  *
+ * The reason we do this is because `aria-modal="true"` currently is bugged
+ * in Safari, and support is spotty in other browsers overall. In the future
+ * we should consider removing these helper functions in favor of
+ * `aria-modal="true"`.
+ *
  * @param {Element} unhiddenElement The element that should not be hidden.
  */
 export function hideApp( unhiddenElement ) {
