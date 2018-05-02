@@ -68,17 +68,17 @@ export function receiveMedia( media ) {
 }
 
 /**
- * Returns an action object used in signalling that model records have been received.
+ * Returns an action object used in signalling that entity records have been received.
  *
- * @param {string}       kind    Kind of the received model.
- * @param {string}       name    Name of the received model.
+ * @param {string}       kind    Kind of the received entity.
+ * @param {string}       name    Name of the received entity.
  * @param {Array|Object} records Recordds received.
  *
  * @return {Object} Action object.
  */
-export function receiveModelRecords( kind, name, records ) {
+export function receiveEntityRecords( kind, name, records ) {
 	return {
-		type: 'RECEIVE_MODEL_RECORDS',
+		type: 'RECEIVE_ENTITY_RECORDS',
 		records: castArray( records ),
 		kind,
 		name,

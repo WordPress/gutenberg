@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { terms, media, models } from '../reducer';
+import { terms, media, entities } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -89,17 +89,17 @@ describe( 'media', () => {
 	} );
 } );
 
-describe( 'models', () => {
-	it( 'returns the default state for all defined modedls', () => {
-		const state = models( undefined, {} );
+describe( 'entities', () => {
+	it( 'returns the default state for all defined entities', () => {
+		const state = entities( undefined, {} );
 
 		expect( state.root.postType ).toEqual( { byPrimaryKey: {} } );
 	} );
 
 	it( 'returns with received post types by slug', () => {
 		const originalState = deepFreeze( {} );
-		const state = models( originalState, {
-			type: 'RECEIVE_MODEL_RECORDS',
+		const state = entities( originalState, {
+			type: 'RECEIVE_ENTITY_RECORDS',
 			records: [ { slug: 'b', title: 'beach' }, { slug: 's', title: 'sun' } ],
 			kind: 'root',
 			name: 'postType',

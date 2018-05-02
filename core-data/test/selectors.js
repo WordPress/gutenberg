@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getTerms, isRequestingTerms, getMedia, getModelRecord } from '../selectors';
+import { getTerms, isRequestingTerms, getMedia, getEntityRecord } from '../selectors';
 
 describe( 'getTerms()', () => {
 	it( 'returns value of terms by taxonomy', () => {
@@ -75,10 +75,10 @@ describe( 'getMedia', () => {
 	} );
 } );
 
-describe( 'getModelRecord', () => {
+describe( 'getEntityRecord', () => {
 	it( 'should return undefined for unknown record Primary Key', () => {
 		const state = deepFreeze( {
-			models: {
+			entities: {
 				root: {
 					postType: {
 						byPrimaryKey: {},
@@ -86,12 +86,12 @@ describe( 'getModelRecord', () => {
 				},
 			},
 		} );
-		expect( getModelRecord( state, 'root', 'postType', 'post' ) ).toBe( undefined );
+		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toBe( undefined );
 	} );
 
 	it( 'should return a record by Primary Key', () => {
 		const state = deepFreeze( {
-			models: {
+			entities: {
 				root: {
 					postType: {
 						byPrimaryKey: {
@@ -101,6 +101,6 @@ describe( 'getModelRecord', () => {
 				},
 			},
 		} );
-		expect( getModelRecord( state, 'root', 'postType', 'post' ) ).toEqual( { slug: 'post' } );
+		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toEqual( { slug: 'post' } );
 	} );
 } );

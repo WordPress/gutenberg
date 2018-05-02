@@ -6,8 +6,8 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getCategories, getMedia, getModelRecord } from '../resolvers';
-import { setRequested, receiveTerms, receiveMedia, receiveModelRecords } from '../actions';
+import { getCategories, getMedia, getEntityRecord } from '../resolvers';
+import { setRequested, receiveTerms, receiveMedia, receiveEntityRecords } from '../actions';
 
 jest.mock( '@wordpress/api-request' );
 
@@ -49,7 +49,7 @@ describe( 'getMedia', () => {
 	} );
 } );
 
-describe( 'getModelRecord', () => {
+describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
 
 	beforeAll( () => {
@@ -61,8 +61,8 @@ describe( 'getModelRecord', () => {
 	} );
 
 	it( 'yields with requested post type', async () => {
-		const fulfillment = getModelRecord( {}, 'root', 'postType', 'post' );
+		const fulfillment = getEntityRecord( {}, 'root', 'postType', 'post' );
 		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveModelRecords( 'root', 'postType', POST_TYPE ) );
+		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', POST_TYPE ) );
 	} );
 } );

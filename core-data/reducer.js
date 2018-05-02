@@ -11,7 +11,7 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import modelsConfig from './models';
+import entitiesConfig from './entities';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -114,28 +114,28 @@ export function themeSupports( state = {}, action ) {
 }
 
 /**
- * Higher Order Reducer for a given model config. It supports:
+ * Higher Order Reducer for a given entity config. It supports:
  *
  *  - Fetching a record by primariy key
  *
- * @param {Object} modelConfig  Model config.
+ * @param {Object} entityConfig  Entity config.
  *
  * @return {Function} Reducer.
  */
-function model( modelConfig ) {
+function entity( entityConfig ) {
 	return ( state = { byPrimaryKey: {} }, action ) => {
 		if (
 			! action.name ||
 			! action.kind ||
-			action.name !== modelConfig.name ||
-			action.kind !== modelConfig.kind
+			action.name !== entityConfig.name ||
+			action.kind !== entityConfig.kind
 		) {
 			return state;
 		}
 
-		const primaryKey = modelConfig.primaryKey || 'id';
+		const primaryKey = entityConfig.primaryKey || 'id';
 		switch ( action.type ) {
-			case 'RECEIVE_MODEL_RECORDS':
+			case 'RECEIVE_ENTITY_RECORDS':
 				return {
 					byPrimaryKey: {
 						...state.byPrimaryKey,
@@ -148,12 +148,12 @@ function model( modelConfig ) {
 	};
 }
 
-const modelsByKind = groupBy( modelsConfig, 'kind' );
-export const models = combineReducers( Object.entries( modelsByKind ).reduce( ( memo, [ kind, subModels ] ) => {
-	const kindReducer = combineReducers( subModels.reduce(
-		( kindMemo, modelConfig ) => ( {
+const entitiesByKind = groupBy( entitiesConfig, 'kind' );
+export const entities = combineReducers( Object.entries( entitiesByKind ).reduce( ( memo, [ kind, subEntities ] ) => {
+	const kindReducer = combineReducers( subEntities.reduce(
+		( kindMemo, entityConfig ) => ( {
 			...kindMemo,
-			[ modelConfig.name ]: model( modelConfig ),
+			[ entityConfig.name ]: entity( entityConfig ),
 		} ),
 		{}
 	) );
@@ -167,5 +167,5 @@ export default combineReducers( {
 	users,
 	media,
 	themeSupports,
-	models,
+	entities,
 } );
