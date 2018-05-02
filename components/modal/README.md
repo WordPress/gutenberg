@@ -9,18 +9,25 @@ The modal is used to create an accessible modal over an application.
 
 Render a screen overlay with a modal on top.
 ```jsx
-		<Modal>
-			<ModalContent>
-				<h2 id="modal-title">My awesome modal!</h2>
-				<p id="modal-description">This modal is meant to be awesome!</p>
-			</ModalConent>
-		</Modal>
+	<Modal
+		title="My Modal"
+		onRequestClose={ closeFunction }
+		isOpen={ openState }
+		>
+		<ModalContent>
+			<p id="modal-description">This modal is meant to be awesome!</p>
+		</ModalConent>
+	</Modal>
 ```
 
 ## Implement close logic
 
+For the modal to properly work it's important you implement the close logic for the modal properly. The following example shows you how to properly implement a modal.
+
 ```js
 const { Component, Fragment } = wp.element;
+const { Modal } = wp.components;
+
 class MyModalWrapper extends Component {
 	constructor() {
 		super( ...arguments );
