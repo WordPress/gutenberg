@@ -28,6 +28,9 @@ class Modal extends Component {
 		this.node = document.createElement( 'div' );
 	}
 
+	/**
+	 * Opens the modal if the initial isOpen prop is true.
+	 */
 	componentDidMount() {
 		const { isOpen } = this.props;
 		if ( isOpen ) {
@@ -35,6 +38,11 @@ class Modal extends Component {
 		}
 	}
 
+	/**
+	 * Opens or closes the modal based on whether the isOpen prop changed.
+	 *
+	 * @param {Object} prevProps The previous props.
+	 */
 	componentDidUpdate( prevProps ) {
 		const openStateChanged = this.props.isOpen !== prevProps.isOpen;
 		if ( openStateChanged && ! prevProps.isOpen ) {
@@ -44,6 +52,9 @@ class Modal extends Component {
 		}
 	}
 
+	/**
+	 * Closes the modal if it is open before unmount.
+	 */
 	componentWillUnmount() {
 		const { isOpen } = this.props;
 		if ( isOpen ) {
@@ -51,6 +62,11 @@ class Modal extends Component {
 		}
 	}
 
+	/**
+	 * Appends the modal's node to the DOM, so the portal can render the
+	 * modal in it. Also calls the openFirstModal when this is the first modal to be
+	 * opened.
+	 */
 	openModal() {
 		openModalCount++;
 
@@ -60,6 +76,13 @@ class Modal extends Component {
 		parentElement.appendChild( this.node );
 	}
 
+	/**
+	 * Prepares the DOM for this modal and any additional modal to be mounted.
+	 *
+	 * It appends an additional div to the body for the modals to be rendered in,
+	 * it hides any other elements from screen-readers and adds an additional class
+	 * to the body to prevent scrolling while the modal is open.
+	 */
 	openFirstModal() {
 		parentElement = document.createElement( 'div' );
 		document.body.appendChild( parentElement );
@@ -67,6 +90,10 @@ class Modal extends Component {
 		document.body.classList.add( this.props.bodyOpenClassName );
 	}
 
+	/**
+	 * Removes the modal's node from the DOM. Also calls closeLastModal when this is
+	 * the last modal to be closed.
+	 */
 	closeModal() {
 		openModalCount--;
 
@@ -76,6 +103,10 @@ class Modal extends Component {
 		}
 	}
 
+	/**
+	 * Cleans up the DOM after the last modal is closed and makes the app available
+	 * for screen-readers again.
+	 */
 	closeLastModal() {
 		document.body.classList.remove( this.props.bodyOpenClassName );
 		ariaHelper.showApp();
@@ -83,6 +114,11 @@ class Modal extends Component {
 		parentElement = null;
 	}
 
+	/**
+	 * Renders the modal.
+	 *
+	 * @return {WPElement} The modal element.
+	 */
 	render() {
 		const {
 			isOpen,
