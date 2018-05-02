@@ -17,7 +17,7 @@ const entities = [
  * @return {Object} Entity
  */
 export function getEntity( kind, name ) {
-	return find( entities, ( entity ) => entity.kind === kind && entity.name === name );
+	return find( entities, { kind, name } );
 }
 
 /**
