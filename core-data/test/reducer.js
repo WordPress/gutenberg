@@ -93,7 +93,7 @@ describe( 'entities', () => {
 	it( 'returns the default state for all defined entities', () => {
 		const state = entities( undefined, {} );
 
-		expect( state.root.postType ).toEqual( { byPrimaryKey: {} } );
+		expect( state.root.postType ).toEqual( { byKey: {} } );
 	} );
 
 	it( 'returns with received post types by slug', () => {
@@ -106,7 +106,7 @@ describe( 'entities', () => {
 		} );
 
 		expect( state.root.postType ).toEqual( {
-			byPrimaryKey: {
+			byKey: {
 				b: { slug: 'b', title: 'beach' },
 				s: { slug: 's', title: 'sun' },
 			},

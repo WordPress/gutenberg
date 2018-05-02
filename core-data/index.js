@@ -22,7 +22,7 @@ const entityResolvers = entities.reduce( ( memo, { kind, name } ) => {
 	const nameSuffix = upperFirst( camelCase( name ) );
 	return {
 		...memo,
-		[ `get${ kindPrefix }${ nameSuffix }` ]: ( state, primaryKey ) => resolvers.getEntityRecord( state, kind, name, primaryKey ),
+		[ `get${ kindPrefix }${ nameSuffix }` ]: ( state, key ) => resolvers.getEntityRecord( state, kind, name, key ),
 	};
 }, {} );
 
@@ -31,7 +31,7 @@ const entitySelectors = entities.reduce( ( memo, { kind, name } ) => {
 	const nameSuffix = upperFirst( camelCase( name ) );
 	return {
 		...memo,
-		[ `get${ kindPrefix }${ nameSuffix }` ]: ( state, primaryKey ) => selectors.getEntityRecord( state, kind, name, primaryKey ),
+		[ `get${ kindPrefix }${ nameSuffix }` ]: ( state, key ) => selectors.getEntityRecord( state, kind, name, key ),
 	};
 }, {} );
 

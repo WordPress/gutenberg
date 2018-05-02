@@ -4,7 +4,7 @@
 import { find } from 'lodash';
 
 const entities = [
-	{ name: 'postType', kind: 'root', primaryKey: 'slug', baseUrl: '/wp/v2/types' },
+	{ name: 'postType', kind: 'root', key: 'slug', baseUrl: '/wp/v2/types' },
 ];
 
 export function getEntity( kind, name ) {

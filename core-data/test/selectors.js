@@ -76,12 +76,12 @@ describe( 'getMedia', () => {
 } );
 
 describe( 'getEntityRecord', () => {
-	it( 'should return undefined for unknown record Primary Key', () => {
+	it( 'should return undefined for unknown record\'s key', () => {
 		const state = deepFreeze( {
 			entities: {
 				root: {
 					postType: {
-						byPrimaryKey: {},
+						byKey: {},
 					},
 				},
 			},
@@ -89,12 +89,12 @@ describe( 'getEntityRecord', () => {
 		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toBe( undefined );
 	} );
 
-	it( 'should return a record by Primary Key', () => {
+	it( 'should return a record by key', () => {
 		const state = deepFreeze( {
 			entities: {
 				root: {
 					postType: {
-						byPrimaryKey: {
+						byKey: {
 							post: { slug: 'post' },
 						},
 					},

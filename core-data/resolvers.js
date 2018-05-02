@@ -48,14 +48,14 @@ export async function* getMedia( state, id ) {
 /**
  * Requests a entity's record from the REST API.
  *
- * @param {Object} state       State tree
- * @param {string} kind        Entity kind.
- * @param {string} name        Entity name.
- * @param {number} primaryKey  Record's Primary key
+ * @param {Object} state  State tree
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {number} key    Record's key
  */
-export async function* getEntityRecord( state, kind, name, primaryKey ) {
+export async function* getEntityRecord( state, kind, name, key ) {
 	const entity = getEntity( kind, name );
-	const record = await apiRequest( { path: `${ entity.baseUrl }/${ primaryKey }?context=edit` } );
+	const record = await apiRequest( { path: `${ entity.baseUrl }/${ key }?context=edit` } );
 	yield receiveEntityRecords( kind, name, record );
 }
 
