@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { includes, first } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
  * Browser dependencies
  */
 const { getComputedStyle } = window;
-const { TEXT_NODE } = window.Node;
+const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
  * Check whether the caret is horizontally at the edge of the container.
@@ -136,22 +136,35 @@ export function getRectangleFromRange( range ) {
 		return range.getBoundingClientRect();
 	}
 
-	let rect = range.getClientRects()[ 0 ];
+	const { startContainer, startOffset } = range;
 
 	// If the collapsed range starts (and therefore ends) at an element node,
-	// `getClientRects` will be empty. To account for this, append a temporary
-	// node with zero-width character to use as source for dimensions.
-	if ( ! rect ) {
-		const span = document.createElement( 'span' );
-		span.appendChild( document.createTextNode( '\u200b' ) );
-		range.insertNode( span );
-		rect = span.getClientRects()[ 0 ];
-		const spanParent = span.parentNode;
-		spanParent.removeChild( span );
-		spanParent.normalize();
+	// `getClientRects` will return undefined. To fix this we can get the
+	// selected child node and calculate a rectangle for that.
+	if ( startContainer.nodeType === ELEMENT_NODE ) {
+		const { childNodes } = startContainer;
+		const selectedNode = childNodes[
+			// Make sure there can be no errors.
+			Math.min( startOffset, childNodes.length - 1 )
+		];
+
+		if ( selectedNode.nodeType === ELEMENT_NODE ) {
+			return selectedNode.getBoundingClientRect();
+		}
+
+		// Text nodes have no `getBoundingClientRect` method, so create a range.
+		range = document.createRange();
+		range.setStart( selectedNode, 0 );
+		range.setEnd( selectedNode, 0 );
+
+		return range.getBoundingClientRect();
 	}
 
-	return rect;
+	// For normal collapsed ranges (exception above), the bounding rectangle of
+	// the range may be inaccurate in some browsers. There will only be one
+	// rectangle since it is a collapsed range, so it is safe to pass this as
+	// the union of them. This works consistently in all browsers.
+	return first( range.getClientRects() );
 }
 
 /**
