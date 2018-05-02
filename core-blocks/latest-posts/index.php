@@ -17,7 +17,7 @@ function render_block_core_latest_posts( $attributes ) {
 		'numberposts' => $attributes['postsToShow'],
 		'post_status' => 'publish',
 		'order'       => $attributes['order'],
-		'orderby'     => $attributes['orderby'],
+		'orderby'     => $attributes['orderBy'],
 		'category'    => $attributes['categories'],
 	) );
 
