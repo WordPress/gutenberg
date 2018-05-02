@@ -135,18 +135,19 @@ If you'd like to change the main column width of the editor, you can add the fol
 
 ```
 /* Main column width */
-body.gutenberg-editor-page .edit-post-visual-editor .editor-post-title,
-body.gutenberg-editor-page .edit-post-visual-editor .editor-block-list__block {
+body.gutenberg-editor-page .editor-post-title,
+body.gutenberg-editor-page .editor-default-block-appender,
+body.gutenberg-editor-page .editor-block-list__block {
 	max-width: 720px;
 }
 
 /* Width of "wide" blocks */
-body.gutenberg-editor-page .edit-post-visual-editor .editor-block-list__block[data-align="wide"] {
+body.gutenberg-editor-page .editor-block-list__block[data-align="wide"] {
 	max-width: 1080px;
 }
 
 /* Width of "full-wide" blocks */
-body.gutenberg-editor-page .edit-post-visual-editor .editor-block-list__block[data-align="full"] {
+body.gutenberg-editor-page .editor-block-list__block[data-align="full"] {
 	max-width: none;
 }
 ```
