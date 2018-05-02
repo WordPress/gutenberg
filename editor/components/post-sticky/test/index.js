@@ -13,9 +13,9 @@ describe( 'PostSticky', () => {
 		const wrapper = shallow(
 			<PostStickyCheck postType="page" post={ {
 				_links: {
-					self: {
+					self: [ {
 						href: 'https://w.org/wp-json/wp/v2/posts/5',
-					},
+					} ],
 				},
 				title: 'Not a stickyable post',
 			} }>
@@ -29,9 +29,9 @@ describe( 'PostSticky', () => {
 		const wrapper = shallow(
 			<PostStickyCheck postType="post" post={ {
 				_links: {
-					self: {
+					self: [ {
 						href: 'https://w.org/wp-json/wp/v2/posts/5',
-					},
+					} ],
 				},
 				title: 'Not a stickyable post',
 			} }>
@@ -45,12 +45,12 @@ describe( 'PostSticky', () => {
 		const wrapper = shallow(
 			<PostStickyCheck postType="post" post={ {
 				_links: {
-					self: {
+					self: [ {
 						href: 'https://w.org/wp-json/wp/v2/posts/5',
-					},
-					'wp:action-sticky': {
+					} ],
+					'wp:action-sticky': [ {
 						href: 'https://w.org/wp-json/wp/v2/posts/5',
-					},
+					} ],
 				},
 				title: 'A stickyable post',
 			} }>
