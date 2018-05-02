@@ -216,7 +216,7 @@ class WritingFlow extends Component {
 			// Moving from block multi-selection to single block selection
 			this.moveSelection( isReverse );
 			event.preventDefault();
-		} else if ( isVertical && hasCollapsedSelection() && isVerticalEdge( target, isReverse ) ) {
+		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 
 			if ( closestTabbable ) {

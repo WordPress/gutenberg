@@ -114,10 +114,6 @@ export function isVerticalEdge( container, isReverse ) {
 		return false;
 	}
 
-	if ( ! range || ! range.collapsed ) {
-		return false;
-	}
-
 	const rangeRect = getRectangleFromRange( range );
 
 	if ( ! rangeRect ) {
@@ -187,7 +183,7 @@ export function computeCaretRect( container ) {
 	const selection = window.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
-	if ( ! range || ! range.collapsed ) {
+	if ( ! range ) {
 		return;
 	}
 
@@ -319,7 +315,7 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	// equivalent to a point at half the height of a line of text.
 	const buffer = rect.height / 2;
 	const editableRect = container.getBoundingClientRect();
-	const x = rect.left + ( rect.width / 2 );
+	const x = rect.left;
 	const y = isReverse ? ( editableRect.bottom - buffer ) : ( editableRect.top + buffer );
 	const selection = window.getSelection();
 
