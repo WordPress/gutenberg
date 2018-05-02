@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { includes, first } from 'lodash';
+import { includes } from 'lodash';
 import tinymce from 'tinymce';
 
 /**
  * Browser dependencies
  */
-const { getComputedStyle, DOMRect } = window;
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
+const { getComputedStyle } = window;
+const { TEXT_NODE } = window.Node;
 
 /**
  * Check whether the caret is horizontally at the edge of the container.
@@ -136,21 +136,22 @@ export function getRectangleFromRange( range ) {
 		return range.getBoundingClientRect();
 	}
 
-	// If the collapsed range starts (and therefore ends) at an element node,
-	// `getClientRects` will return undefined. To fix this we can get the
-	// bounding rectangle of the element node to create a DOMRect based on that.
-	if ( range.startContainer.nodeType === ELEMENT_NODE ) {
-		const { x, y, height } = range.startContainer.getBoundingClientRect();
+	let rect = range.getClientRects()[ 0 ];
 
-		// Create a new DOMRect with zero width.
-		return new DOMRect( x, y, 0, height );
+	// If the collapsed range starts (and therefore ends) at an element node,
+	// `getClientRects` will be empty. To account for this, append a temporary
+	// node with zero-width character to use as source for dimensions.
+	if ( ! rect ) {
+		const span = document.createElement( 'span' );
+		span.appendChild( document.createTextNode( '\u200b' ) );
+		range.insertNode( span );
+		rect = span.getClientRects()[ 0 ];
+		const spanParent = span.parentNode;
+		spanParent.removeChild( span );
+		spanParent.normalize();
 	}
 
-	// For normal collapsed ranges (exception above), the bounding rectangle of
-	// the range may be inaccurate in some browsers. There will only be one
-	// rectangle since it is a collapsed range, so it is safe to pass this as
-	// the union of them. This works consistently in all browsers.
-	return first( range.getClientRects() );
+	return rect;
 }
 
 /**
