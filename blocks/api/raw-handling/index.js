@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { find, flatMap, filter, compact } from 'lodash';
+// Also polyfills Element#matches.
+import 'element-closest';
 
 /**
  * Internal dependencies

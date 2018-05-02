@@ -98,7 +98,7 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.matches( 'figure' ) && !! node.querySelector( 'img' ),
+				isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
 				schema,
 				transform: ( node ) => {
 					const matches = /align(left|center|right)/.exec( node.className );

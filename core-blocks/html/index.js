@@ -41,7 +41,7 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.matches( 'figure' ) && !! node.querySelector( 'iframe' ),
+				isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'iframe' ),
 				schema: {
 					figure: {
 						require: [ 'iframe' ],
