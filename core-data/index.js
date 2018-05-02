@@ -12,21 +12,15 @@ import * as actions from './actions';
 import * as resolvers from './resolvers';
 import { default as entities, getMethodName } from './entities';
 
-const entityResolvers = entities.reduce( ( memo, { kind, name } ) => {
+const createEntityRecordGetter = ( source ) => entities.reduce( ( result, entity ) => {
+	const { kind, name } = entity;
 	const methodName = getMethodName( kind, name );
-	return {
-		...memo,
-		[ methodName ]: ( state, key ) => resolvers.getEntityRecord( state, kind, name, key ),
-	};
-}, {} );
+	result[ methodName ] = ( state, key ) => source.getEntityRecord( state, kind, name, key );
+	return result;
+} );
 
-const entitySelectors = entities.reduce( ( memo, { kind, name } ) => {
-	const methodName = getMethodName( kind, name );
-	return {
-		...memo,
-		[ methodName ]: ( state, key ) => selectors.getEntityRecord( state, kind, name, key ),
-	};
-}, {} );
+const entityResolvers = createEntityRecordGetter( resolvers );
+const entitySelectors = createEntityRecordGetter( selectors );
 
 const store = registerStore( 'core', {
 	reducer,
