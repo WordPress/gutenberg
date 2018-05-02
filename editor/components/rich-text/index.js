@@ -45,6 +45,16 @@ import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
 
+/**
+ * Browser dependencies
+ */
+
+const { getSelection } = window;
+
+/**
+ * Module constants
+ */
+
 const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
 
 /**
@@ -440,40 +450,59 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Handles a Backspace or Delete keydown event to delegate merge or remove
+	 * if key event occurs while at the extent edge of the field. Prevents
+	 * default browser behavior if delegated to prop callback handler.
+	 *
+	 * @param {KeyboardEvent} event Keydown event.
+	 */
+	onDeleteKeyDown( event ) {
+		const { onMerge, onRemove } = this.props;
+		if ( ! onMerge && ! onRemove ) {
+			return;
+		}
+
+		if ( ! getSelection().isCollapsed ) {
+			return;
+		}
+
+		const isForward = ( event.keyCode === DELETE );
+		const rootNode = this.editor.getBody();
+		if ( ! isHorizontalEdge( rootNode, ! isForward ) ) {
+			return;
+		}
+
+		this.onCreateUndoLevel();
+
+		if ( onMerge ) {
+			onMerge( isForward );
+		}
+
+		if ( onRemove && this.isEmpty() ) {
+			onRemove( isForward );
+		}
+
+		event.preventDefault();
+
+		// Calling onMerge() or onRemove() will destroy the editor, so it's
+		// important that other handlers (e.g. ones registered by TinyMCE) do
+		// not also attempt to handle this event.
+		event.stopImmediatePropagation();
+	}
+
+	/**
 	 * Handles a keydown event from tinyMCE.
 	 *
 	 * @param {KeydownEvent} event The keydow event as triggered by tinyMCE.
 	 */
 	onKeyDown( event ) {
+		const { keyCode } = event;
 		const dom = this.editor.dom;
 		const rootNode = this.editor.getBody();
 
-		if (
-			( event.keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
-			( event.keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
-		) {
-			if ( ! this.props.onMerge && ! this.props.onRemove ) {
-				return;
-			}
-
-			this.onCreateUndoLevel();
-
-			const forward = event.keyCode === DELETE;
-
-			if ( this.props.onMerge ) {
-				this.props.onMerge( forward );
-			}
-
-			if ( this.props.onRemove && this.isEmpty() ) {
-				this.props.onRemove( forward );
-			}
-
-			event.preventDefault();
-
-			// Calling onMerge() or onRemove() will destroy the editor, so it's important
-			// that we stop other handlers (e.g. ones registered by TinyMCE) from
-			// also handling this event.
-			event.stopImmediatePropagation();
+		const isDeleteKey = keyCode === BACKSPACE || keyCode === DELETE;
+		if ( isDeleteKey ) {
+			this.onDeleteKeyDown( event );
 		}
 
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
