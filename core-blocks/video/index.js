@@ -22,7 +22,7 @@ import {
 	BlockControls,
 	MediaUpload,
 	RichText,
-	InspectorControls
+	InspectorControls,
 } from '@wordpress/blocks';
 
 /**
@@ -68,8 +68,8 @@ export const settings = {
 		height: {
 			selector: 'video',
 			type: 'string',
-			attribute: 'height'
-		}
+			attribute: 'height',
+		},
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -93,7 +93,7 @@ export const settings = {
 		render() {
 			const { align, caption, id } = this.props.attributes;
 			const { setAttributes, isSelected, className } = this.props;
-			const { editing, src, width, height   } = this.state;
+			const { editing, src } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
@@ -194,13 +194,13 @@ export const settings = {
 									label={ __( 'Width' ) }
 									value={ this.props.attributes.width }
 									placeholder="100%"
-									onChange={( value ) => setAttributes( { width: value } )}
+									onChange={ ( value ) => setAttributes( { width: value } ) }
 								/>
 								<TextControl
 									type="text"
 									className="blocks-video__dimensions__height"
 									label={ __( 'Height' ) }
-									value={  this.props.attributes.height }
+									value={ this.props.attributes.height }
 									placeholder="100%"
 									onChange={ ( value ) => setAttributes( { height: value } ) }
 								/>
@@ -230,7 +230,7 @@ export const settings = {
 		return (
 
 			<figure className={ align ? `align${ align }` : null }>
-				{ src && <video controls src={ src } width={ width } height={ height }/> }
+				{ src && <video controls src={ src } width={ width } height={ height } /> }
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
