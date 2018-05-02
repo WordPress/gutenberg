@@ -42,6 +42,9 @@ class ModalFrame extends Component {
 		}
 	}
 
+	/**
+	 * Focuses the first tabbable element.
+	 */
 	focusFirstTabbable() {
 		// Required because the node is appended to the DOM after rendering.
 		const { setTimeout } = this.props;
@@ -53,18 +56,35 @@ class ModalFrame extends Component {
 		}, 0 );
 	}
 
+	/**
+	 * Callback function called when clicked outside the modal.
+	 *
+	 * @param {Object} event Mouse click event.
+	 */
 	handleClickOutside( event ) {
 		if ( this.props.shouldCloseOnClickOutside ) {
 			this.onRequestClose( event );
 		}
 	}
 
+	/**
+	 * Callback function called when a key is pressed.
+	 *
+	 * @param {Object} event Key down event.
+	 */
 	handleKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
 			this.handleEscapeKeyDown( event );
 		}
 	}
 
+	/**
+	 * Handles a escape key down event.
+	 *
+	 * Calls onRequestClose and prevents default key press behaviour.
+	 *
+	 * @param {Object} event Key down event.
+	 */
 	handleEscapeKeyDown( event ) {
 		if ( this.props.shouldCloseOnEsc ) {
 			event.preventDefault();
@@ -72,6 +92,11 @@ class ModalFrame extends Component {
 		}
 	}
 
+	/**
+	 * Calls the onRequestClose callback props when it is available.
+	 *
+	 * @param {Object} event Event object.
+	 */
 	onRequestClose( event ) {
 		const { onRequestClose } = this.props;
 		if ( onRequestClose ) {
@@ -79,6 +104,11 @@ class ModalFrame extends Component {
 		}
 	}
 
+	/**
+	 * Renders the modal frame element.
+	 *
+	 * @return {WPElement} The modal frame element.
+	 */
 	render() {
 		const {
 			contentLabel,
