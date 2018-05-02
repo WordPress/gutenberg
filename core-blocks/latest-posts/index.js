@@ -39,22 +39,4 @@ export const settings = {
 	save() {
 		return null;
 	},
-	deprecated: [
-		{
-			attributes: {
-				orderBy: {
-					type: 'string',
-					default: 'date',
-				},
-			},
-			migrate( { orderBy } ) {
-				return {
-					orderby: orderBy,
-				};
-			},
-			save() {
-				return null;
-			},
-		},
-	],
 };

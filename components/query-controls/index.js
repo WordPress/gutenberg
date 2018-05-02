@@ -17,20 +17,20 @@ export default function QueryControls( {
 	selectedCategoryId,
 	numberOfItems,
 	order,
-	orderby,
+	orderBy,
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
 	onCategoryChange,
 	onNumberOfItemsChange,
 	onOrderChange,
-	onOrderbyChange,
+	onorderByChange,
 } ) {
 	return [
-		( onOrderChange && onOrderbyChange ) && (
+		( onOrderChange && onorderByChange ) && (
 			<SelectControl
 				key="query-controls-order-select"
 				label={ __( 'Order by' ) }
-				value={ `${ orderby }/${ order }` }
+				value={ `${ orderBy }/${ order }` }
 				options={ [
 					{
 						label: __( 'Newest to Oldest' ),
@@ -52,12 +52,12 @@ export default function QueryControls( {
 					},
 				] }
 				onChange={ ( value ) => {
-					const [ newOrderby, newOrder ] = value.split( '/' );
+					const [ neworderBy, newOrder ] = value.split( '/' );
 					if ( newOrder !== order ) {
 						onOrderChange( newOrder );
 					}
-					if ( newOrderby !== orderby ) {
-						onOrderbyChange( newOrderby );
+					if ( neworderBy !== orderBy ) {
+						onorderByChange( neworderBy );
 					}
 				} }
 			/>
