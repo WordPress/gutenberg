@@ -79,7 +79,7 @@ class PostPublishPanelPostpublish extends Component {
 							</Button>
 						) }
 
-						<ClipboardButton className="button" text={ post.link } onCopy={ this.onCopy } icon={ null }>
+						<ClipboardButton className="button" text={ post.link } onCopy={ this.onCopy }>
 							{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy Link' ) }
 						</ClipboardButton>
 					</div>

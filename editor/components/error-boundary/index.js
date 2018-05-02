@@ -54,10 +54,10 @@ class ErrorBoundary extends Component {
 					<Button key="recovery" onClick={ this.reboot } isLarge>
 						{ __( 'Attempt Recovery' ) }
 					</Button>,
-					<ClipboardButton key="copy-post" text={ this.getContent } isLarge icon={ null }>
+					<ClipboardButton key="copy-post" text={ this.getContent } isLarge>
 						{ __( 'Copy Post Text' ) }
 					</ClipboardButton>,
-					<ClipboardButton key="copy-error" text={ error.stack } isLarge icon={ null }>
+					<ClipboardButton key="copy-error" text={ error.stack } isLarge>
 						{ __( 'Copy Error' ) }
 					</ClipboardButton>,
 				] }
