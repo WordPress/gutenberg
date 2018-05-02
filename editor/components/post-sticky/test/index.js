@@ -14,7 +14,7 @@ describe( 'PostSticky', () => {
 			<PostStickyCheck postType="page" post={ {
 				_links: {
 					self: [ {
-						href: 'https://w.org/wp-json/wp/v2/posts/5',
+						href: 'https://w.org/wp-json/wp/v2/pages/5',
 					} ],
 				},
 				title: 'Not a stickyable post',
