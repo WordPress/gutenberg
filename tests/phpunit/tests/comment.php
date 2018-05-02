@@ -765,10 +765,10 @@ class Tests_Comment extends WP_UnitTestCase {
 
 		$actual   = wp_comments_personal_data_eraser( 'nocommentsfound@local.host' );
 		$expected = array(
-			'num_items_removed'  => 0,
-			'num_items_retained' => 0,
-			'messages'           => array(),
-			'done'               => true,
+			'items_removed'  => false,
+			'items_retained' => false,
+			'messages'       => array(),
+			'done'           => true,
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -796,10 +796,10 @@ class Tests_Comment extends WP_UnitTestCase {
 
 		$actual   = wp_comments_personal_data_eraser( $args['comment_author_email'] );
 		$expected = array(
-			'num_items_removed'  => 1,
-			'num_items_retained' => 0,
-			'messages'           => array(),
-			'done'               => true,
+			'items_removed'  => true,
+			'items_retained' => false,
+			'messages'       => array(),
+			'done'           => true,
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -827,10 +827,10 @@ class Tests_Comment extends WP_UnitTestCase {
 
 		$actual   = wp_comments_personal_data_eraser( $args['comment_author_email'], 2 );
 		$expected = array(
-			'num_items_removed'  => 0,
-			'num_items_retained' => 0,
-			'messages'           => array(),
-			'done'               => true,
+			'items_removed'  => false,
+			'items_retained' => false,
+			'messages'       => array(),
+			'done'           => true,
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -863,10 +863,10 @@ class Tests_Comment extends WP_UnitTestCase {
 		$message = sprintf( 'Comment %d contains personal data but could not be anonymized.', $comment_id );
 
 		$expected = array(
-			'num_items_removed'  => 0,
-			'num_items_retained' => 1,
-			'messages'           => array( $message ),
-			'done'               => true,
+			'items_removed'  => false,
+			'items_retained' => true,
+			'messages'       => array( $message ),
+			'done'           => true,
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -899,10 +899,10 @@ class Tests_Comment extends WP_UnitTestCase {
 		$message = sprintf( 'Some custom message for comment %d.', $comment_id );
 
 		$expected = array(
-			'num_items_removed'  => 0,
-			'num_items_retained' => 1,
-			'messages'           => array( $message ),
-			'done'               => true,
+			'items_removed'  => false,
+			'items_retained' => true,
+			'messages'       => array( $message ),
+			'done'           => true,
 		);
 
 		$this->assertSame( $expected, $actual );
