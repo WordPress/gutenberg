@@ -1002,6 +1002,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	/**
 	 * Testing the `wp_comments_personal_data_exporter()` function.
 	 *
+	 * @group privacy
 	 * @ticket 43440
 	 */
 	public function test_wp_comments_personal_data_exporter() {
@@ -1016,7 +1017,7 @@ class Tests_Comment extends WP_UnitTestCase {
 			'comment_content'      => 'Comment',
 		);
 
-		$c = self::factory()->comment->create( $args );
+		$comment_id = self::factory()->comment->create( $args );
 
 		$actual   = wp_comments_personal_data_exporter( $args['comment_author_email'] );
 		$expected = $args;
@@ -1041,12 +1042,13 @@ class Tests_Comment extends WP_UnitTestCase {
 		$this->assertSame( $expected['comment_agent'], $actual['data'][0]['data'][4]['value'] );
 		$this->assertSame( $expected['comment_date'], $actual['data'][0]['data'][5]['value'] );
 		$this->assertSame( $expected['comment_content'], $actual['data'][0]['data'][6]['value'] );
-		$this->assertSame( get_comment_link( $c ), $actual['data'][0]['data'][7]['value'] );
+		$this->assertSame( get_comment_link( $comment_id ), strip_tags( $actual['data'][0]['data'][7]['value'] ) );
 	}
 
 	/**
 	 * Testing the `wp_comments_personal_data_exporter()` function for no comments found.
 	 *
+	 * @group privacy
 	 * @ticket 43440
 	 */
 	public function test_wp_comments_personal_data_exporter_no_comments_found() {
@@ -1064,6 +1066,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	/**
 	 * Testing the `wp_comments_personal_data_exporter()` function for an empty comment property.
 	 *
+	 * @group privacy
 	 * @ticket 43440
 	 */
 	public function test_wp_comments_personal_data_exporter_empty_comment_prop() {
@@ -1094,6 +1097,7 @@ class Tests_Comment extends WP_UnitTestCase {
 	/**
 	 * Testing the `wp_comments_personal_data_exporter()` function with an empty second page.
 	 *
+	 * @group privacy
 	 * @ticket 43440
 	 */
 	public function test_wp_comments_personal_data_exporter_empty_second_page() {
