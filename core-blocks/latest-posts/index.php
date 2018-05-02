@@ -105,7 +105,7 @@ function register_block_core_latest_posts() {
 				'type'    => 'string',
 				'default' => 'desc',
 			),
-			'orderby'         => array(
+			'orderBy'         => array(
 				'type'    => 'string',
 				'default' => 'date',
 			),
