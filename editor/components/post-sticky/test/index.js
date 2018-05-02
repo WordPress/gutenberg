@@ -11,14 +11,7 @@ import { PostStickyCheck } from '../check';
 describe( 'PostSticky', () => {
 	it( 'should not render anything if the post type is not "post"', () => {
 		const wrapper = shallow(
-			<PostStickyCheck postType="page" post={ {
-				_links: {
-					self: [ {
-						href: 'https://w.org/wp-json/wp/v2/pages/5',
-					} ],
-				},
-				title: 'Not a stickyable post',
-			} }>
+			<PostStickyCheck postType="page" hasStickyAction={ true }>
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
@@ -27,14 +20,7 @@ describe( 'PostSticky', () => {
 
 	it( 'should not render anything if post doesn\'t support stickying', () => {
 		const wrapper = shallow(
-			<PostStickyCheck postType="post" post={ {
-				_links: {
-					self: [ {
-						href: 'https://w.org/wp-json/wp/v2/posts/5',
-					} ],
-				},
-				title: 'Not a stickyable post',
-			} }>
+			<PostStickyCheck postType="post" hasStickyAction={ false }>
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
@@ -43,17 +29,7 @@ describe( 'PostSticky', () => {
 
 	it( 'should render if the post supports stickying', () => {
 		const wrapper = shallow(
-			<PostStickyCheck postType="post" post={ {
-				_links: {
-					self: [ {
-						href: 'https://w.org/wp-json/wp/v2/posts/5',
-					} ],
-					'wp:action-sticky': [ {
-						href: 'https://w.org/wp-json/wp/v2/posts/5',
-					} ],
-				},
-				title: 'A stickyable post',
-			} }>
+			<PostStickyCheck postType="post" hasStickyAction={ true }>
 				Can Toggle Sticky
 			</PostStickyCheck>
 		);
