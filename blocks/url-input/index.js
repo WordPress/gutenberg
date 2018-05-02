@@ -51,7 +51,7 @@ class UrlInput extends Component {
 			this.suggestionsRequest.abort();
 		}
 
-		// Show the suggestions after typing at least 3 characters
+		// Show the suggestions after typing at least 2 characters
 		if ( value.length < 2 ) {
 			this.setState( {
 				showSuggestions: false,
