@@ -6,24 +6,26 @@ exports[`core/preformatted block edit matches snapshot 1`] = `
 >
   <div>
     <div>
-      <div
-        class="components-autocomplete"
-      >
-        <pre
-          aria-autocomplete="list"
-          aria-expanded="false"
-          aria-label="Write preformatted text…"
-          aria-multiline="false"
-          class="blocks-rich-text__tinymce"
-          contenteditable="true"
-          data-is-placeholder-visible="true"
-          role="textbox"
-        />
-        <pre
-          class="blocks-rich-text__tinymce"
+      <div>
+        <div
+          class="components-autocomplete"
         >
-          Write preformatted text…
-        </pre>
+          <pre
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-label="Write preformatted text…"
+            aria-multiline="false"
+            class="blocks-rich-text__tinymce"
+            contenteditable="true"
+            data-is-placeholder-visible="true"
+            role="textbox"
+          />
+          <pre
+            class="blocks-rich-text__tinymce"
+          >
+            Write preformatted text…
+          </pre>
+        </div>
       </div>
     </div>
   </div>

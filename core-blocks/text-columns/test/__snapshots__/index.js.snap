@@ -12,24 +12,26 @@ exports[`core/text-columns block edit matches snapshot 1`] = `
     >
       <div>
         <div>
-          <div
-            class="components-autocomplete"
-          >
-            <p
-              aria-autocomplete="list"
-              aria-expanded="false"
-              aria-label="New Column"
-              aria-multiline="false"
-              class="blocks-rich-text__tinymce"
-              contenteditable="true"
-              data-is-placeholder-visible="true"
-              role="textbox"
-            />
-            <p
-              class="blocks-rich-text__tinymce"
+          <div>
+            <div
+              class="components-autocomplete"
             >
-              New Column
-            </p>
+              <p
+                aria-autocomplete="list"
+                aria-expanded="false"
+                aria-label="New Column"
+                aria-multiline="false"
+                class="blocks-rich-text__tinymce"
+                contenteditable="true"
+                data-is-placeholder-visible="true"
+                role="textbox"
+              />
+              <p
+                class="blocks-rich-text__tinymce"
+              >
+                New Column
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -43,24 +45,26 @@ exports[`core/text-columns block edit matches snapshot 1`] = `
     >
       <div>
         <div>
-          <div
-            class="components-autocomplete"
-          >
-            <p
-              aria-autocomplete="list"
-              aria-expanded="false"
-              aria-label="New Column"
-              aria-multiline="false"
-              class="blocks-rich-text__tinymce"
-              contenteditable="true"
-              data-is-placeholder-visible="true"
-              role="textbox"
-            />
-            <p
-              class="blocks-rich-text__tinymce"
+          <div>
+            <div
+              class="components-autocomplete"
             >
-              New Column
-            </p>
+              <p
+                aria-autocomplete="list"
+                aria-expanded="false"
+                aria-label="New Column"
+                aria-multiline="false"
+                class="blocks-rich-text__tinymce"
+                contenteditable="true"
+                data-is-placeholder-visible="true"
+                role="textbox"
+              />
+              <p
+                class="blocks-rich-text__tinymce"
+              >
+                New Column
+              </p>
+            </div>
           </div>
         </div>
       </div>

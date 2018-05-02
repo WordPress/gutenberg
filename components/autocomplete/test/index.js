@@ -215,7 +215,7 @@ describe( 'Autocomplete', () => {
 		it( 'renders children', () => {
 			const wrapper = makeAutocompleter( [] );
 			expect( wrapper.state().open ).toBeUndefined();
-			expect( wrapper.childAt( 0 ).hasClass( 'components-autocomplete' ) ).toBe( true );
+			expect( wrapper.find( '.components-autocomplete' ) ).toHaveLength( 1 );
 			expect( wrapper.find( '.fake-editor' ) ).toHaveLength( 1 );
 		} );
 
