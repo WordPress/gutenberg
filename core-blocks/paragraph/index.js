@@ -279,7 +279,23 @@ const supports = {
 	className: false,
 };
 
+const deprecatedSchema = {
+	customTextColor: {
+		type: 'string',
+	},
+	customBackgroundColor: {
+		type: 'string',
+	},
+	customFontSize: {
+		type: 'number',
+	},
+	width: {
+		type: 'string',
+	},
+};
+
 const schema = {
+	...deprecatedSchema,
 	content: {
 		type: 'array',
 		source: 'children',
@@ -296,26 +312,14 @@ const schema = {
 	placeholder: {
 		type: 'string',
 	},
-	width: {
-		type: 'string',
-	},
 	textColor: {
-		type: 'string',
-	},
-	customTextColor: {
 		type: 'string',
 	},
 	backgroundColor: {
 		type: 'string',
 	},
-	customBackgroundColor: {
-		type: 'string',
-	},
 	fontSize: {
 		type: 'string',
-	},
-	customFontSize: {
-		type: 'number',
 	},
 };
 
@@ -351,6 +355,53 @@ export const settings = {
 	},
 
 	deprecated: [
+		{
+			supports,
+			attributes: schema,
+			save( { attributes } ) {
+				const {
+					width,
+					align,
+					content,
+					dropCap,
+					backgroundColor,
+					textColor,
+					customBackgroundColor,
+					customTextColor,
+					fontSize,
+					customFontSize,
+				} = attributes;
+
+				const textClass = getColorClass( 'color', textColor );
+				const backgroundClass = getColorClass( 'background-color', backgroundColor );
+				const fontSizeClass = fontSize && FONT_SIZES[ fontSize ] && `is-${ fontSize }-text`;
+
+				const className = classnames( {
+					[ `align${ width }` ]: width,
+					'has-background': backgroundColor || customBackgroundColor,
+					'has-drop-cap': dropCap,
+					[ fontSizeClass ]: fontSizeClass,
+					[ textClass ]: textClass,
+					[ backgroundClass ]: backgroundClass,
+				} );
+
+				const styles = {
+					backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+					color: textClass ? undefined : customTextColor,
+					fontSize: fontSizeClass ? undefined : customFontSize,
+					textAlign: align,
+				};
+
+				return (
+					<RichText.Content
+						tagName="p"
+						style={ styles }
+						className={ className ? className : undefined }
+						value={ content }
+					/>
+				);
+			},
+		},
 		{
 			supports,
 			attributes: omit( {
@@ -427,7 +478,6 @@ export const settings = {
 
 	save( { attributes } ) {
 		const {
-			width,
 			align,
 			content,
 			dropCap,
@@ -444,7 +494,6 @@ export const settings = {
 		const fontSizeClass = fontSize && FONT_SIZES[ fontSize ] && `is-${ fontSize }-text`;
 
 		const className = classnames( {
-			[ `align${ width }` ]: width,
 			'has-background': backgroundColor || customBackgroundColor,
 			'has-drop-cap': dropCap,
 			[ fontSizeClass ]: fontSizeClass,
