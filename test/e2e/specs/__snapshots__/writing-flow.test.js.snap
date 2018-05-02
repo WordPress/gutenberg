@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`adding blocks Should navigate with arrow keys 1`] = `"Hello World!"`;
+
+exports[`adding blocks Should navigate with arrow keys 2`] = `"Hello"`;
+
+exports[`adding blocks Should navigate with arrow keys 3`] = `"Hello to the World!"`;
+
+exports[`adding blocks Should navigate with arrow keys 4`] = `"Greeting: Hello to the World!"`;
+
+exports[`adding blocks Should navigate with arrow keys 5`] = `"The Greeting: <br>Hello to the World!"`;
