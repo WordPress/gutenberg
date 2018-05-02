@@ -4,4 +4,4 @@
 
 import { createSlotFill } from '@wordpress/components';
 
-export default createSlotFill( 'PluginPostStatusVisibility' );
+export default createSlotFill( 'PluginPostStatusInfo' );
