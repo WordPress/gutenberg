@@ -370,6 +370,11 @@ function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
 
 		$site_info['theme_supports']['formats'] = $formats;
 	}
+	if ( ! array_key_exists( 'post-thumbnails', $site_info['theme_supports'] ) ) {
+		if ( get_theme_support( 'post-thumbnails' ) ) {
+			$site_info['theme_supports']['post-thumbnails'] = true;
+		}
+	}
 	$response->set_data( $site_info );
 	return $response;
 }
