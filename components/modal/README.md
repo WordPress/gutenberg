@@ -9,28 +9,67 @@ The modal is used to create an accessible modal over an application.
 
 Render a screen overlay with a modal on top.
 ```jsx
-	<ModalContextProvider value={ { elementId: 'wpwrap' } }>
-		<Modal
-			aria={ {
-				labelledby: 'modal-title',
-				describedby: 'modal-description',
-			} }
-			parentSelector={ () => {
-				return document.getElementById( 'wpwrap' );
-			} )
-			>
+		<Modal>
 			<ModalContent>
 				<h2 id="modal-title">My awesome modal!</h2>
 				<p id="modal-description">This modal is meant to be awesome!</p>
 			</ModalConent>
 		</Modal>
-    </ModalContextProvider>
+```
+
+## Implement close logic
+
+```js
+const { Component, Fragment } = wp.element;
+class MyModalWrapper extends Component {
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			isOpen: true,
+		}
+	}
+
+	closeModal() {
+		if ( this.state.isOpen ) {
+			this.setState( { isOpen: false } );
+		}
+	}
+	
+	openModal() {
+		if ( ! this.state.isOpen ) {
+			this.setState( { isOpen: true } );
+		}
+	}
+
+	render() {
+		return (
+			<Fragment>
+				<button onClick={ this.openModal.bind( this ) }>Open Modal</button>
+				<Modal
+					title="This is my modal"
+					onRequestClose={ this.closeModal.bind( this ) }
+					isOpen={ this.state.isOpen }>
+					<button onClick={ this.closeModal.bind( this ) }>
+						My custom close button
+					</button>
+				</Modal>
+			</Fragment>
+		);
+	}
+}
 ```
 
 ## Props
 
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input elements.
+
+### title
+
+This property is used as the modal header's title. It is required for accessibility reasons.
+
+- Type: `String`
+- Required: Yes
 
 ### onRequestClose
 
@@ -54,6 +93,7 @@ You are encouraged to use this when the modal is visually labelled.
 
 - Type: `String`
 - Required: No
+- Default: `modal-heading`
 
 ### aria.describedby
 
@@ -106,6 +146,14 @@ If this property is added, it will an additional class name to the modal content
 
 - Type: `String`
 - Required: No
+
+### role
+
+If this property is added, it will override the default role of the modal.
+
+- Type: `String`
+- Required: No
+- Default: `dialog`
 
 ### overlayClassName
 

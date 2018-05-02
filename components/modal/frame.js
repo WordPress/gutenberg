@@ -85,6 +85,7 @@ class ModalFrame extends Component {
 			},
 			children,
 			className,
+			role,
 			style,
 		} = this.props;
 
@@ -93,7 +94,7 @@ class ModalFrame extends Component {
 				className={ className }
 				style={ style }
 				ref={ this.containerRef }
-				role="dialog"
+				role={ role }
 				aria-modal={ true }
 				aria-label={ contentLabel }
 				aria-labelledby={ labelledby }

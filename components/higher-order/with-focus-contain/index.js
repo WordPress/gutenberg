@@ -19,7 +19,7 @@ const withFocusContain = ( WrappedComponent ) => {
 		}
 
 		handleTabBehaviour( event ) {
-			if ( ! event.keyCode === TAB ) {
+			if ( event.keyCode !== TAB ) {
 				return;
 			}
 

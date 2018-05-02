@@ -92,6 +92,7 @@ class Modal extends Component {
 			},
 			title,
 			icon,
+			closeButtonLabel,
 			children,
 			...otherProps
 		} = this.props;
@@ -116,6 +117,7 @@ class Modal extends Component {
 					onRequestClose={ onRequestClose }
 					{ ...otherProps } >
 					<ModalHeader
+						closeLabel={ closeButtonLabel }
 						onClose={ onRequestClose }
 						title={ title }
 						icon={ icon } />
@@ -132,6 +134,8 @@ class Modal extends Component {
 
 Modal.defaultProps = {
 	className: null,
+	role: 'dialog',
+	title: null,
 	overlayClassName: null,
 	onRequestClose: noop,
 	focusOnMount: true,
@@ -144,7 +148,7 @@ Modal.defaultProps = {
 	/* accessibility */
 	contentLabel: null,
 	aria: {
-		labelledby: null,
+		labelledby: 'modal-heading',
 		describedby: null,
 	},
 };

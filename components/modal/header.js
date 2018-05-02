@@ -10,10 +10,12 @@ const ModalHeader = ( { icon, title, onClose, closeLabel } ) => {
 			className={ 'components-modal__header' }
 		>
 			<div>
-				<span aria-hidden="true">
-					{ icon }
-				</span>
-				<h1 id="modalID" >
+				{ icon &&
+					<span aria-hidden="true">
+						{ icon }
+					</span>
+				}
+				<h1 id="modal-heading" >
 					{ title }
 				</h1>
 			</div>
