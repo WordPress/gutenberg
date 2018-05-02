@@ -24,7 +24,7 @@
 		border: 1px solid $dark-opacity-light-500;
 
 		.is-dark-theme & {
-			border: 1px solid $light-opacity-light-500;
+			border-color: $light-opacity-light-500;
 		}
 	}
 }

@@ -181,7 +181,7 @@
 		border-right: 1px solid $dark-opacity-light-500;
 
 		.is-dark-theme & {
-			border-right: 1px solid $light-opacity-light-500;
+			border-right-color: $light-opacity-light-500;
 		}
 	}
 
@@ -192,7 +192,7 @@
 		border-left: 1px solid $dark-opacity-light-500; 
 
 		.is-dark-theme & {
-			border-left: 1px solid $light-opacity-light-500;
+			border-left-color: $light-opacity-light-500;
 		}
 	}
 
@@ -233,7 +233,7 @@
 		outline: 1px solid $dark-opacity-light-500;
 	
 		.is-dark-theme & {
-			outline: 1px solid $light-opacity-light-500;
+			outline-color: $light-opacity-light-500;
 		}
 	}
 
@@ -282,7 +282,7 @@
 		outline: 1px dashed $dark-opacity-light-500;
 
 		.is-dark-theme & {
-			outline: 1px dashed $light-opacity-light-500;
+			outline-color: $light-opacity-light-500;
 		}
 	}
 
@@ -689,7 +689,7 @@
 	border: 1px solid $dark-opacity-light-500; 
 
 	.is-dark-theme & {
-		border: 1px solid $light-opacity-light-500; 
+		border-color: $light-opacity-light-500; 
 	}
 
 	// this prevents floats from messing up the position
