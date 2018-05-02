@@ -52,18 +52,6 @@ export function isRequestingCategories( state ) {
 }
 
 /**
- * Returns the media object by id.
- *
- * @param {Object} state Data state.
- * @param {number} id    Media id.
- *
- * @return {Object?}     Media object.
- */
-export function getMedia( state, id ) {
-	return state.media[ id ];
-}
-
-/**
  * Returns all available authors.
  *
  * @param {Object} state Data state.
@@ -89,15 +77,17 @@ export function getUserQueryResults( state, queryID ) {
 }
 
 /**
- * Returns the Post Type object by slug.
+ * Returns the Entity's record object by key.
  *
- * @param {Object} state Data state.
- * @param {number} slug  Post Type slug.
+ * @param {Object} state  State tree
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {number} key    Record's key
  *
- * @return {Object?}     Post Type object.
+ * @return {Object?} Record.
  */
-export function getPostType( state, slug ) {
-	return state.postTypes[ slug ];
+export function getEntityRecord( state, kind, name, key ) {
+	return state.entities[ kind ][ name ].byKey[ key ];
 }
 
 /**

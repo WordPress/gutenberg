@@ -54,30 +54,20 @@ export function receiveUserQuery( queryID, users ) {
 }
 
 /**
- * Returns an action object used in signalling that media have been received.
+ * Returns an action object used in signalling that entity records have been received.
  *
- * @param {Array|Object} media Media received.
- *
- * @return {Object} Action object.
- */
-export function receiveMedia( media ) {
-	return {
-		type: 'RECEIVE_MEDIA',
-		media: castArray( media ),
-	};
-}
-
-/**
- * Returns an action object used in signalling that post types have been received.
- *
- * @param {Array|Object} postTypes Post Types received.
+ * @param {string}       kind    Kind of the received entity.
+ * @param {string}       name    Name of the received entity.
+ * @param {Array|Object} records Recordds received.
  *
  * @return {Object} Action object.
  */
-export function receivePostTypes( postTypes ) {
+export function receiveEntityRecords( kind, name, records ) {
 	return {
-		type: 'RECEIVE_POST_TYPES',
-		postTypes: castArray( postTypes ),
+		type: 'RECEIVE_ENTITY_RECORDS',
+		records: castArray( records ),
+		kind,
+		name,
 	};
 }
 
