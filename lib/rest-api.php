@@ -388,7 +388,8 @@ function gutenberg_handle_early_callback_checks( $response, $handler, $request )
 			$can_view = false;
 			$types    = get_post_types( array( 'show_in_rest' => true ), 'objects' );
 			foreach ( $types as $type ) {
-				if ( current_user_can( $type->cap->edit_posts ) ) {
+				if ( post_type_supports( $type->name, 'author' )
+					&& current_user_can( $type->cap->edit_posts ) ) {
 					$can_view = true;
 				}
 			}
