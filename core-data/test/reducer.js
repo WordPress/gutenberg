@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { terms, media, entities } from '../reducer';
+import { terms, entities } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -65,27 +65,6 @@ describe( 'terms()', () => {
 		} );
 
 		expect( state ).toEqual( {} );
-	} );
-} );
-
-describe( 'media', () => {
-	it( 'returns an empty object by default', () => {
-		const state = media( undefined, {} );
-
-		expect( state ).toEqual( {} );
-	} );
-
-	it( 'returns with received media by id', () => {
-		const originalState = deepFreeze( {} );
-		const state = media( originalState, {
-			type: 'RECEIVE_MEDIA',
-			media: [ { id: 1, title: 'beach' }, { id: 2, title: 'sun' } ],
-		} );
-
-		expect( state ).toEqual( {
-			1: { id: 1, title: 'beach' },
-			2: { id: 2, title: 'sun' },
-		} );
 	} );
 } );
 

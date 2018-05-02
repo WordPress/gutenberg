@@ -10,7 +10,6 @@ import {
 	setRequested,
 	receiveTerms,
 	receiveUserQuery,
-	receiveMedia,
 	receiveEntityRecords,
 	receiveThemeSupportsFromIndex,
 } from './actions';
@@ -32,17 +31,6 @@ export async function* getCategories() {
 export async function* getAuthors() {
 	const users = await apiRequest( { path: '/wp/v2/users/?who=authors' } );
 	yield receiveUserQuery( 'authors', users );
-}
-
-/**
- * Requests a media element from the REST API.
- *
- * @param {Object} state State tree
- * @param {number} id    Media id
- */
-export async function* getMedia( state, id ) {
-	const media = await apiRequest( { path: `/wp/v2/media/${ id }` } );
-	yield receiveMedia( media );
 }
 
 /**

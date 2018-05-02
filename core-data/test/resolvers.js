@@ -6,8 +6,8 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getCategories, getMedia, getEntityRecord } from '../resolvers';
-import { setRequested, receiveTerms, receiveMedia, receiveEntityRecords } from '../actions';
+import { getCategories, getEntityRecord } from '../resolvers';
+import { setRequested, receiveTerms, receiveEntityRecords } from '../actions';
 
 jest.mock( '@wordpress/api-request' );
 
@@ -28,24 +28,6 @@ describe( 'getCategories', () => {
 		expect( requested.type ).toBe( setRequested().type );
 		const received = ( await fulfillment.next() ).value;
 		expect( received ).toEqual( receiveTerms( 'categories', CATEGORIES ) );
-	} );
-} );
-
-describe( 'getMedia', () => {
-	const MEDIA = { id: 1 };
-
-	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
-			if ( options.path === '/wp/v2/media/1' ) {
-				return Promise.resolve( MEDIA );
-			}
-		} );
-	} );
-
-	it( 'yields with requested media', async () => {
-		const fulfillment = getMedia( {}, 1 );
-		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveMedia( MEDIA ) );
 	} );
 } );
 

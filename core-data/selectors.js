@@ -52,18 +52,6 @@ export function isRequestingCategories( state ) {
 }
 
 /**
- * Returns the media object by id.
- *
- * @param {Object} state Data state.
- * @param {number} id    Media id.
- *
- * @return {Object?}     Media object.
- */
-export function getMedia( state, id ) {
-	return state.media[ id ];
-}
-
-/**
  * Returns all available authors.
  *
  * @param {Object} state Data state.
