@@ -146,23 +146,25 @@ export const settings = {
 						/>
 					</Toolbar>
 				</BlockControls>
-				<InspectorControls>
-					<PanelBody title={ __( 'Cover Image Settings' ) }>
-						<ToggleControl
-							label={ __( 'Fixed Background' ) }
-							checked={ !! hasParallax }
-							onChange={ toggleParallax }
-						/>
-						<RangeControl
-							label={ __( 'Background Dimness' ) }
-							value={ dimRatio }
-							onChange={ setDimRatio }
-							min={ 0 }
-							max={ 100 }
-							step={ 10 }
-						/>
-					</PanelBody>
-				</InspectorControls>
+				{ !! url && (
+					<InspectorControls>
+						<PanelBody title={ __( 'Cover Image Settings' ) }>
+							<ToggleControl
+								label={ __( 'Fixed Background' ) }
+								checked={ !! hasParallax }
+								onChange={ toggleParallax }
+							/>
+							<RangeControl
+								label={ __( 'Background Dimness' ) }
+								value={ dimRatio }
+								onChange={ setDimRatio }
+								min={ 0 }
+								max={ 100 }
+								step={ 10 }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				) }
 			</Fragment>
 		);
 
