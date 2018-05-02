@@ -22,7 +22,7 @@ import Dashicon from '../dashicon';
 class IconButton extends Component {
 	render() {
 		const { icon, children, label, className, tooltip, focus, ...additionalProps } = this.props;
-		const classes = classnames( 'components-icon-button', className );
+		const classes = classnames( { 'components-icon-button': icon }, className );
 		const tooltipText = tooltip || label;
 
 		// Should show the tooltip if an explicit tooltip is passed

@@ -77,12 +77,12 @@ class ClipboardButton extends Component {
 	render() {
 		// Disable reason: Exclude from spread props passed to Button
 		// eslint-disable-next-line no-unused-vars
-		const { className, children, onCopy, onFinishCopy, text, ...buttonProps } = this.props;
+		const { className, children, onCopy, onFinishCopy, text, icon = 'admin-links', ...buttonProps } = this.props;
 		const classes = classnames( 'components-clipboard-button', className );
 
 		return (
 			<span ref={ this.bindContainer }>
-				<IconButton { ...buttonProps } icon="admin-links" className={ classes }>
+				<IconButton { ...buttonProps } icon={ icon } className={ classes }>
 					{ children }
 				</IconButton>
 			</span>

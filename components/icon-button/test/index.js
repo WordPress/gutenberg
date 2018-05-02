@@ -11,7 +11,7 @@ import IconButton from '../';
 describe( 'IconButton', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an top level element with only a class property', () => {
-			const iconButton = shallow( <IconButton /> );
+			const iconButton = shallow( <IconButton icon="wordpress" /> );
 			expect( iconButton.hasClass( 'components-icon-button' ) ).toBe( true );
 			expect( iconButton.prop( 'aria-label' ) ).toBeUndefined();
 		} );

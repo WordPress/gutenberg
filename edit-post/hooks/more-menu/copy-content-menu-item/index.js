@@ -13,6 +13,7 @@ function CopyContentMenuItem( { editedPostContent, hasCopied, setState } ) {
 			className="components-menu-item__button"
 			onCopy={ () => setState( { hasCopied: true } ) }
 			onFinishCopy={ () => setState( { hasCopied: false } ) }
+			icon={ null }
 		>
 			{ hasCopied ?
 				__( 'Copied!' ) :
