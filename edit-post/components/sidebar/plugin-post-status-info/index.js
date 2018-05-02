@@ -1,7 +1,21 @@
 /**
  * Defines as extensibility slot for the Status & Visibility panel
  */
+import { createSlotFill, PanelRow } from '@wordpress/components';
 
-import { createSlotFill } from '@wordpress/components';
+export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
 
-export default createSlotFill( 'PluginPostStatusInfo' );
+const PluginPostStatusInfo = ( { children } ) => {
+	return (
+		<Fill>
+			{children}
+		</Fill>
+	)
+};
+
+PluginPostStatusInfo.Slot = () => (
+		<PanelRow>
+			<Slot />
+		</PanelRow>
+);
+export default PluginPostStatusInfo;

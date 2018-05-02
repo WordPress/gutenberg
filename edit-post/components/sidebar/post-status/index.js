@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, PanelRow } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -33,9 +33,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			<PostSticky />
 			<PostPendingStatus />
 			<PostAuthor />
-			<PanelRow>
-				<PluginPostStatusInfo.Slot />
-			</PanelRow>
+			<PluginPostStatusInfo.Slot />
 			<PostTrash />
 		</PanelBody>
 	);
