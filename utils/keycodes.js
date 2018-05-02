@@ -37,7 +37,7 @@ export function isMacOS( _window = window ) {
  * Create a keyboard shortcut based on a string of modifiers + key(s).
  *
  * This function is not intended to be used directly by developers.
- * Instead, use primaryShortcut(), altShortcut(), etc.
+ * Instead, use primaryShortcut(), accessShortcut(), etc.
  *
  * @param {string} keys      Modifier and keyboard keys, seperated by "+".
  * @param {Object} _isMacOS  isMacOS function by default; used for DI testing.
@@ -54,8 +54,8 @@ export function keyboardShortcut( keys, _isMacOS = isMacOS ) {
 
 	const replacementKeyMap = {
 		[ ALT ]: alt,
-		[ PRIMARY ]: primary,
 		[ META ]: meta,
+		[ PRIMARY ]: primary,
 		[ SHIFT ]: shift,
 	};
 
@@ -72,10 +72,9 @@ export function keyboardShortcut( keys, _isMacOS = isMacOS ) {
 }
 
 /**
- * Create an access key combonation shortcut based on a single character.
+ * Create an access key shortcut based on a single character.
  *
- * Access key combo is: Command+Alt on MacOS; Shift+Alt everywhere else.
- * This will output Shift+Alt+G on Windows when "G" is supplied as an argument.
+ * Access key combo is: Shift+Alt.
  *
  * @param {string} character The character for the access combination.
  * @param {Object} _isMacOS  isMacOS function by default; used for DI testing.
@@ -83,23 +82,11 @@ export function keyboardShortcut( keys, _isMacOS = isMacOS ) {
  * @return {string}          The keyboard shortcut.
  */
 export function accessShortcut( character, _isMacOS = isMacOS ) {
-	const keyCombo = _isMacOS() ? `${ META }+${ ALT }` : `${ SHIFT }+${ ALT }`;
-	return keyboardShortcut( `${ keyCombo }+${ character }`, _isMacOS );
+	return keyboardShortcut( accessKeyCode( character.toUpperCase() ), _isMacOS );
 }
 
-/**
- * Create a Meta shortcut based on a single character.
- *
- * This will output Windows+G on Windows when "G" is supplied as an argument.
- * This will output Control+G on MacOS when "G" is supplied as an argument.
- *
- * @param {string} character The character for the key command.
- * @param {Object} _isMacOS  isMacOS function by default; used for DI testing.
- *
- * @return {string}          The keyboard shortcut.
- */
-export function metaShortcut( character, _isMacOS = isMacOS ) {
-	return keyboardShortcut( `${ META }+${ character }`, _isMacOS );
+export function accessKeyCode( character ) {
+	return `${ SHIFT }+${ ALT }+${ character }`;
 }
 
 /**
@@ -114,39 +101,5 @@ export function metaShortcut( character, _isMacOS = isMacOS ) {
  * @return {string}          The keyboard shortcut.
  */
 export function primaryShortcut( character, _isMacOS = isMacOS ) {
-	return keyboardShortcut( `${ PRIMARY }+${ character }`, _isMacOS );
-}
-
-/**
- * Create a modifier+access shortcut based on a single character.
- *
- * This will output Ctrl+Shift+Alt+G on Windows when "G" is supplied as an argument.
- * This will output Option+Shift+Command+G on MacOS when "G" is supplied as an argument.
- *
- * @param {string} character The character for the key command.
- * @param {Object} _isMacOS  isMacOS function by default; used for DI testing.
- *
- * @return {string}          The keyboard shortcut.
- */
-export function primaryAccessShortcut( character, _isMacOS = isMacOS ) {
-	const keyCombo = _isMacOS() ?
-		`${ ALT }+${ SHIFT }+${ PRIMARY }` : `${ PRIMARY }+${ SHIFT }+${ ALT }`;
-	return keyboardShortcut( `${ keyCombo }+${ character }`, _isMacOS );
-}
-
-/**
- * Create a modifier+alt shortcut based on a single character.
- *
- * This will output Ctrl+Alt+G on Windows when "G" is supplied as an argument.
- * This will output Alt+Command+G on MacOS when "G" is supplied as an argument.
- *
- * @param {string} character The character for the key command.
- * @param {Object} _isMacOS  isMacOS function by default; used for DI testing.
- *
- * @return {string}          The keyboard shortcut.
- */
-export function primaryAltShortcut( character, _isMacOS = isMacOS ) {
-	const keyCombo = _isMacOS() ?
-		`${ ALT }+${ PRIMARY }` : `${ PRIMARY }+${ ALT }`;
-	return keyboardShortcut( `${ keyCombo }+${ character }`, _isMacOS );
+	return keyboardShortcut( `${ PRIMARY }+${ character.toUpperCase() }`, _isMacOS );
 }

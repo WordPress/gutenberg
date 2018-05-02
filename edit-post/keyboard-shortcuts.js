@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { primaryAccessShortcut } from 'utils/keycodes';
+import { accessKeyCode, accessShortcut } from 'utils/keycodes';
 
 export default {
 	toggleEditorMode: {
-		value: 'mod+shift+alt+m',
-		label: primaryAccessShortcut( 'M' ),
+		value: accessKeyCode( 'm' ),
+		label: accessShortcut( 'M' ),
 	},
 };

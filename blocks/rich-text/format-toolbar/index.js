@@ -16,7 +16,7 @@ import { prependHTTP } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { primaryShortcut, primaryAltShortcut } from 'utils/keycodes';
+import { primaryShortcut, accessShortcut } from 'utils/keycodes';
 import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
@@ -39,7 +39,7 @@ const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-strikethrough',
 		title: __( 'Strikethrough' ),
-		shortcut: primaryAltShortcut( 'D' ),
+		shortcut: accessShortcut( 'D' ),
 		format: 'strikethrough',
 	},
 	{
