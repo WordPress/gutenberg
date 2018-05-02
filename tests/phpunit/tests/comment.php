@@ -777,4 +777,123 @@ class Tests_Comment extends WP_UnitTestCase {
 
 		$this->assertSame( '1', $comment->comment_approved );
 	}
+
+	/**
+	 * Testing the `wp_comments_personal_data_exporter()` function.
+	 *
+	 * @ticket 43440
+	 */
+	public function test_wp_comments_personal_data_exporter() {
+		$args = array(
+			'comment_post_ID'      => self::$post_id,
+			'comment_author'       => 'Comment Author',
+			'comment_author_email' => 'personal@local.host',
+			'comment_author_url'   => 'https://local.host/',
+			'comment_author_IP'    => '192.168.0.1',
+			'comment_agent'        => 'SOME_AGENT',
+			'comment_date'         => '2018-03-28 20:05:00',
+			'comment_content'      => 'Comment',
+		);
+
+		$c = self::factory()->comment->create( $args );
+
+		$actual   = wp_comments_personal_data_exporter( $args['comment_author_email'] );
+		$expected = $args;
+
+		$this->assertTrue( $actual['done'] );
+
+		// Number of exported comments.
+		$this->assertSame( 1, count( $actual['data'] ) );
+
+		// Number of exported comment properties.
+		$this->assertSame( 8, count( $actual['data'][0]['data'] ) );
+
+		// Exported group.
+		$this->assertSame( 'comments', $actual['data'][0]['group_id'] );
+		$this->assertSame( 'Comments', $actual['data'][0]['group_label'] );
+
+		// Exported comment properties.
+		$this->assertSame( $expected['comment_author'], $actual['data'][0]['data'][0]['value'] );
+		$this->assertSame( $expected['comment_author_email'], $actual['data'][0]['data'][1]['value'] );
+		$this->assertSame( $expected['comment_author_url'], $actual['data'][0]['data'][2]['value'] );
+		$this->assertSame( $expected['comment_author_IP'], $actual['data'][0]['data'][3]['value'] );
+		$this->assertSame( $expected['comment_agent'], $actual['data'][0]['data'][4]['value'] );
+		$this->assertSame( $expected['comment_date'], $actual['data'][0]['data'][5]['value'] );
+		$this->assertSame( $expected['comment_content'], $actual['data'][0]['data'][6]['value'] );
+		$this->assertSame( get_comment_link( $c ), $actual['data'][0]['data'][7]['value'] );
+	}
+
+	/**
+	 * Testing the `wp_comments_personal_data_exporter()` function for no comments found.
+	 *
+	 * @ticket 43440
+	 */
+	public function test_wp_comments_personal_data_exporter_no_comments_found() {
+
+		$actual = wp_comments_personal_data_exporter( 'nocommentsfound@local.host' );
+
+		$expected = array(
+			'data' => array(),
+			'done' => true,
+		);
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * Testing the `wp_comments_personal_data_exporter()` function for an empty comment property.
+	 *
+	 * @ticket 43440
+	 */
+	public function test_wp_comments_personal_data_exporter_empty_comment_prop() {
+		$args = array(
+			'comment_post_ID'      => self::$post_id,
+			'comment_author'       => 'Comment Author',
+			'comment_author_email' => 'personal@local.host',
+			'comment_author_url'   => 'https://local.host/',
+			'comment_author_IP'    => '192.168.0.1',
+			'comment_date'         => '2018-03-28 20:05:00',
+			'comment_agent'        => '',
+			'comment_content'      => 'Comment',
+		);
+
+		$c = self::factory()->comment->create( $args );
+
+		$actual = wp_comments_personal_data_exporter( $args['comment_author_email'] );
+
+		$this->assertTrue( $actual['done'] );
+
+		// Number of exported comments.
+		$this->assertSame( 1, count( $actual['data'] ) );
+
+		// Number of exported comment properties.
+		$this->assertSame( 7, count( $actual['data'][0]['data'] ) );
+	}
+
+	/**
+	 * Testing the `wp_comments_personal_data_exporter()` function with an empty second page.
+	 *
+	 * @ticket 43440
+	 */
+	public function test_wp_comments_personal_data_exporter_empty_second_page() {
+		$args = array(
+			'comment_post_ID'      => self::$post_id,
+			'comment_author'       => 'Comment Author',
+			'comment_author_email' => 'personal@local.host',
+			'comment_author_url'   => 'https://local.host/',
+			'comment_author_IP'    => '192.168.0.1',
+			'comment_date'         => '2018-03-28 20:05:00',
+			'comment_agent'        => 'SOME_AGENT',
+			'comment_content'      => 'Comment',
+		);
+
+		$c = self::factory()->comment->create( $args );
+
+		$actual = wp_comments_personal_data_exporter( $args['comment_author_email'], 2 );
+
+		$this->assertTrue( $actual['done'] );
+
+		// Number of exported comments.
+		$this->assertSame( 0, count( $actual['data'] ) );
+	}
 }
