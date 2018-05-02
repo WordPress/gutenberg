@@ -3,7 +3,7 @@ import './style.scss';
 import { __ } from '@wordpress/i18n';
 
 const ModalHeader = ( { icon, title, onClose, closeLabel } ) => {
-	const label = closeLabel ? closeLabel : __( 'Close window' );
+	const label = closeLabel ? closeLabel : __( 'Close dialog' );
 
 	return (
 		<div
