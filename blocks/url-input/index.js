@@ -52,18 +52,8 @@ class UrlInput extends Component {
 		}
 
 		// Show the suggestions after typing at least 2 characters
-		if ( value.length < 2 ) {
-			this.setState( {
-				showSuggestions: false,
-				selectedSuggestion: null,
-				loading: false,
-			} );
-
-			return;
-		}
-
-		// Disable suggestions for URLs
-		if ( /^https?:/.test( value ) ) {
+		// and also for URLs
+		if ( value.length < 2 || /^https?:/.test( value ) ) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
