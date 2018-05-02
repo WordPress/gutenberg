@@ -23,7 +23,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { isSharedBlock } from '@wordpress/blocks';
+import { isSharedBlock, parseFootnotesFromContent } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
 
 /**
@@ -321,6 +321,7 @@ export const editor = flow( [
 					[ action.uid ]: {
 						...state[ action.uid ],
 						attributes: nextAttributes,
+						footnotes: parseFootnotesFromContent( nextAttributes.content ),
 					},
 				};
 

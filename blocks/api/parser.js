@@ -206,6 +206,29 @@ export function getAttributesAndInnerBlocksFromDeprecatedVersion( blockType, inn
 }
 
 /**
+ * Parses the content and extracts the list of footnotes.
+ *
+ * @param {?Array} content The content to parse.
+ *
+ * @return {Array} Array of footnote ids.
+ */
+export function parseFootnotesFromContent( content ) {
+	if ( ! content || ! Array.isArray( content ) ) {
+		return [];
+	}
+
+	return content.reduce( ( footnotes, element ) => {
+		if ( element.type === 'sup' &&
+				element.props.className === 'footnote' &&
+				element.props[ 'data-footnote-id' ] ) {
+			return footnotes.concat( { id: element.props[ 'data-footnote-id' ] } );
+		}
+
+		return footnotes;
+	}, [] );
+}
+
+/**
  * Creates a block with fallback to the unknown type handler.
  *
  * @param {Object} blockNode Parsed block node.
@@ -295,6 +318,11 @@ export function createBlockWithFallback( blockNode ) {
 			block.attributes = attributesAndInnerBlocksParsedWithDeprecatedVersion.attributes;
 			block.innerBlocks = attributesAndInnerBlocksParsedWithDeprecatedVersion.innerBlocks || [];
 		}
+	}
+
+	const footnotes = parseFootnotesFromContent( block.attributes.content );
+	if ( footnotes.length ) {
+		block.footnotes = footnotes;
 	}
 
 	return block;
