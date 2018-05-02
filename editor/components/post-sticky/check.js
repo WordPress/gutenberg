@@ -9,10 +9,10 @@ import { get } from 'lodash';
 import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
-export function PostStickyCheck( { post, postType, children } ) {
+export function PostStickyCheck( { hasStickyAction, postType, children } ) {
 	if (
 		postType !== 'post' ||
-		! get( post, [ '_links', 'wp:action-sticky' ], false )
+		! hasStickyAction
 	) {
 		return null;
 	}
@@ -22,8 +22,9 @@ export function PostStickyCheck( { post, postType, children } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
+		const post = select( 'core/editor' ).getCurrentPost();
 		return {
-			post: select( 'core/editor' ).getCurrentPost(),
+			hasStickyAction: get( post, [ '_links', 'wp:action-sticky' ], false ),
 			postType: select( 'core/editor' ).getCurrentPostType(),
 		};
 	} ),
