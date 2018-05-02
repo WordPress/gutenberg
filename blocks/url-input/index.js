@@ -63,7 +63,7 @@ class UrlInput extends Component {
 		}
 
 		// Disable suggestions for URLs
-		if ( /^https?:/.test( value )  ) {
+		if ( /^https?:/.test( value ) ) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
