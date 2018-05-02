@@ -43,7 +43,7 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
-import { domToFormat, valueToString, isEmpty } from './format';
+import { domToFormat, valueToString } from './format';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -283,8 +283,7 @@ export class RichText extends Component {
 		// Note: a pasted file may have the URL as plain text.
 		if ( item && ! HTML ) {
 			const blob = item.getAsFile ? item.getAsFile() : item;
-			const rootNode = this.editor.getBody();
-			const isEmptyEditor = this.editor.dom.isEmpty( rootNode );
+			const isEmptyEditor = this.isEmpty();
 			const content = rawHandler( {
 				HTML: `<img src="${ createBlobURL( blob ) }">`,
 				mode: 'BLOCKS',
@@ -347,8 +346,7 @@ export class RichText extends Component {
 			}
 		}
 
-		const rootNode = this.editor.getBody();
-		const isEmptyEditor = this.editor.dom.isEmpty( rootNode );
+		const isEmptyEditor = this.isEmpty();
 
 		let mode = 'INLINE';
 
@@ -377,7 +375,7 @@ export class RichText extends Component {
 				return;
 			}
 
-			if ( isEmpty && this.props.onReplace ) {
+			if ( isEmptyEditor && this.props.onReplace ) {
 				this.props.onReplace( content );
 			} else {
 				this.splitContent( content );
@@ -447,7 +445,7 @@ export class RichText extends Component {
 				this.props.onMerge( forward );
 			}
 
-			if ( this.props.onRemove && dom.isEmpty( rootNode ) ) {
+			if ( this.props.onRemove && this.isEmpty() ) {
 				this.props.onRemove( forward );
 			}
 
@@ -732,6 +730,16 @@ export class RichText extends Component {
 		}
 	}
 
+	/**
+	 * Returns true if the field is currently empty, or false otherwise.
+	 *
+	 * @return {boolean} Whether field is empty.
+	 */
+	isEmpty() {
+		const { value } = this.props;
+		return ! value || ! value.length;
+	}
+
 	isFormatActive( format ) {
 		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
 	}
@@ -811,7 +819,7 @@ export class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && isEmpty( value, format );
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const classes = classnames( wrapperClassName, 'blocks-rich-text' );
 
 		const formatToolbar = (
