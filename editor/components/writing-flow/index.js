@@ -168,7 +168,7 @@ class WritingFlow extends Component {
 	 */
 	isTabbableEdge( target, isReverse ) {
 		const closestTabbable = this.getClosestTabbable( target, isReverse );
-		return ! isInSameBlock( target, closestTabbable );
+		return ! closestTabbable || ! isInSameBlock( target, closestTabbable );
 	}
 
 	onKeyDown( event ) {
