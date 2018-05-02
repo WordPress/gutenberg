@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy } from 'lodash';
+import { keyBy, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,6 +36,32 @@ export function terms( state = {}, action ) {
 			return {
 				...state,
 				[ taxonomy ]: null,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing authors state. Keyed by id.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function users( state = { byId: {}, queries: {} }, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_USER_QUERY':
+			return {
+				byId: {
+					...state.byId,
+					...keyBy( action.users, 'id' ),
+				},
+				queries: {
+					...state.queries,
+					[ action.queryID ]: map( action.users, ( user ) => user.id ),
+				},
 			};
 	}
 
@@ -104,6 +130,7 @@ export function themeSupports( state = {}, action ) {
 
 export default combineReducers( {
 	terms,
+	users,
 	media,
 	postTypes,
 	themeSupports,

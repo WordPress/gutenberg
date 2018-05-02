@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, get } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,8 +15,7 @@ import { withSelect } from '@wordpress/data';
  */
 import PostTypeSupportCheck from '../post-type-support-check';
 
-export function PostAuthorCheck( { user, users, children } ) {
-	const authors = filter( users.data, ( { capabilities } ) => get( capabilities, [ 'level_1' ], false ) );
+export function PostAuthorCheck( { user, authors, children } ) {
 	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
 
 	if ( ! userCanPublishPosts || authors.length < 2 ) {
@@ -30,13 +29,13 @@ export default compose( [
 	withSelect( ( select ) => {
 		return {
 			postType: select( 'core/editor' ).getCurrentPostType(),
+			authors: select( 'core' ).getAuthors(),
 		};
 	} ),
 	withAPIData( ( props ) => {
 		const { postType } = props;
 
 		return {
-			users: '/wp/v2/users?context=edit&per_page=100',
 			user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 		};
 	} ),

@@ -38,6 +38,22 @@ export function receiveTerms( taxonomy, terms ) {
 }
 
 /**
+ * Returns an action object used in signalling that authors have been received.
+ *
+ * @param {string}       queryID Query ID.
+ * @param {Array|Object} users   Users received.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveUserQuery( queryID, users ) {
+	return {
+		type: 'RECEIVE_USER_QUERY',
+		users: castArray( users ),
+		queryID,
+	};
+}
+
+/**
  * Returns an action object used in signalling that media have been received.
  *
  * @param {Array|Object} media Media received.
