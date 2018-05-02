@@ -8,14 +8,14 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
 const PluginPostStatusInfo = ( { children } ) => {
 	return (
 		<Fill>
-			{children}
+			{ children }
 		</Fill>
-	)
+	);
 };
 
 PluginPostStatusInfo.Slot = () => (
-		<PanelRow>
-			<Slot />
-		</PanelRow>
+	<PanelRow>
+		<Slot />
+	</PanelRow>
 );
 export default PluginPostStatusInfo;
