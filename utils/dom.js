@@ -11,15 +11,29 @@ const { getComputedStyle, DOMRect } = window;
 const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
+ * Returns true if there is a selection and if the selection is collapsed, or
+ * false otherwise.
+ *
+ * @return {boolean} Whether there is a collapsed selection.
+ */
+export function hasCollapsedSelection() {
+	const selection = window.getSelection();
+
+	return (
+		selection.rangeCount > 0 &&
+		selection.getRangeAt( 0 ).collapsed
+	);
+}
+
+/**
  * Check whether the caret is horizontally at the edge of the container.
  *
- * @param {Element} container             Focusable element.
- * @param {boolean} isReverse             Set to true to check left, false for right.
- * @param {boolean} requireCollapsedRange Whether or not to collapse the selection range before the check.
+ * @param {Element} container Focusable element.
+ * @param {boolean} isReverse Set to true to check left, false for right.
  *
  * @return {boolean} True if at the horizontal edge, false if not.
  */
-export function isHorizontalEdge( container, isReverse, requireCollapsedRange = false ) {
+export function isHorizontalEdge( container, isReverse ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
@@ -45,10 +59,6 @@ export function isHorizontalEdge( container, isReverse, requireCollapsedRange = 
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
-		return false;
-	}
-
-	if ( ! requireCollapsedRange && ! range.collapsed ) {
 		return false;
 	}
 
@@ -84,13 +94,12 @@ export function isHorizontalEdge( container, isReverse, requireCollapsedRange = 
 /**
  * Check whether the caret is vertically at the edge of the container.
  *
- * @param {Element} container      Focusable element.
- * @param {boolean} isReverse      Set to true to check top, false for bottom.
- * @param {boolean} collapseRanges Whether or not to collapse the selection range before the check.
+ * @param {Element} container Focusable element.
+ * @param {boolean} isReverse Set to true to check top, false for bottom.
  *
  * @return {boolean} True if at the edge, false if not.
  */
-export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
+export function isVerticalEdge( container, isReverse ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		return isHorizontalEdge( container, isReverse );
 	}
@@ -100,13 +109,9 @@ export function isVerticalEdge( container, isReverse, collapseRanges = false ) {
 	}
 
 	const selection = window.getSelection();
-	let range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	if ( collapseRanges && range && ! range.collapsed ) {
-		const newRange = document.createRange();
-		// Get the end point of the selection (see focusNode vs. anchorNode)
-		newRange.setStart( selection.focusNode, selection.focusOffset );
-		newRange.collapse( true );
-		range = newRange;
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	if ( ! range ) {
+		return false;
 	}
 
 	if ( ! range || ! range.collapsed ) {
