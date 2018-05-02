@@ -1,11 +1,15 @@
 // Output overrides for each scheme
-@include admin-scheme-color-overrides( 'blue', $scheme-blue__spot-color );
-@include admin-scheme-color-overrides( 'coffee', $scheme-coffee__spot-color );
-@include admin-scheme-color-overrides( 'ectoplasm', $scheme-ectoplasm__spot-color );
-@include admin-scheme-color-overrides( 'midnight', $scheme-midnight__spot-color );
-@include admin-scheme-color-overrides( 'ocean', $scheme-ocean__spot-color );
-@include admin-scheme-color-overrides( 'sunrise', $scheme-sunrise__spot-color );
+// Almost all schemes use only one color swatch, a few have exceptions to ensure usability
+@include admin-scheme-color-overrides( 'fresh', $scheme-fresh__spot-color, $scheme-fresh__spot-color );
+@include admin-scheme-color-overrides( 'light', $scheme-light__spot-color, $scheme-light__spot-color );
+@include admin-scheme-color-overrides( 'blue', $scheme-blue__spot-color, $scheme-blue__spot-color );
+@include admin-scheme-color-overrides( 'coffee', $scheme-coffee__spot-color, $scheme-coffee__spot-color );
+@include admin-scheme-color-overrides( 'ectoplasm', $scheme-ectoplasm__spot-color, $scheme-ectoplasm__spot-color );
+@include admin-scheme-color-overrides( 'midnight', $scheme-midnight__spot-color, $scheme-midnight__spot-color-2 ); // exception to ensure usability
+@include admin-scheme-color-overrides( 'ocean', $scheme-ocean__spot-color, $scheme-ocean__spot-color );
+@include admin-scheme-color-overrides( 'sunrise', $scheme-sunrise__spot-color, $scheme-sunrise__spot-color-2 ); // exception to ensure usability
 
+// Fade animations
 @keyframes animate_fade {
 	from {
 		opacity: 0;
@@ -150,6 +154,17 @@ body.gutenberg-editor-page {
 
 		&:focus {
 			@include input-style__focus();
+		}
+	}
+
+	select {
+		padding: 2px;
+
+		&:focus {
+			border-color: $blue-medium-600;
+			// Windows High Contrast mode will show this outline
+			outline: 2px solid transparent;
+			outline-offset: 0;
 		}
 	}
 }

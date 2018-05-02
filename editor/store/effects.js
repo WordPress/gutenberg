@@ -124,7 +124,7 @@ export default {
 			( err ) => {
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_FAILURE',
-					error: get( err, 'responseJSON', {
+					error: get( err, [ 'responseJSON' ], {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
 					} ),
@@ -176,7 +176,7 @@ export default {
 			) );
 		}
 
-		if ( get( window.history.state, 'id' ) !== post.id ) {
+		if ( get( window.history.state, [ 'id' ] ) !== post.id ) {
 			window.history.replaceState(
 				{ id: post.id },
 				'Post ' + post.id,
@@ -218,7 +218,7 @@ export default {
 				dispatch( {
 					...action,
 					type: 'TRASH_POST_FAILURE',
-					error: get( err, 'responseJSON', {
+					error: get( err, [ 'responseJSON' ], {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
 					} ),
@@ -464,7 +464,7 @@ export default {
 			( error ) => {
 				dispatch( { type: 'SAVE_SHARED_BLOCK_FAILURE', id } );
 				const message = __( 'An unknown error occurred.' );
-				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+				dispatch( createErrorNotice( get( error.responseJSON, [ 'message' ], message ), {
 					id: SHARED_BLOCK_NOTICE_ID,
 					spokenMessage: message,
 				} ) );
@@ -524,7 +524,7 @@ export default {
 					optimist: { type: REVERT, id: transactionId },
 				} );
 				const message = __( 'An unknown error occurred.' );
-				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+				dispatch( createErrorNotice( get( error.responseJSON, [ 'message' ], message ), {
 					id: SHARED_BLOCK_NOTICE_ID,
 					spokenMessage: message,
 				} ) );
@@ -546,7 +546,7 @@ export default {
 		const sharedBlock = {
 			id: uniqueId( 'shared' ),
 			uid: parsedBlock.uid,
-			title: __( 'Untitled block' ),
+			title: __( 'Untitled shared block' ),
 		};
 
 		dispatch( receiveSharedBlocks( [ {
@@ -573,7 +573,7 @@ export default {
 	},
 
 	EDIT_POST( action, { getState } ) {
-		const format = get( action, 'edits.format' );
+		const format = get( action, [ 'edits', 'format' ] );
 		if ( ! format ) {
 			return;
 		}

@@ -9,12 +9,12 @@ import { shallow } from 'enzyme';
 import { ColorPalette } from '../';
 
 describe( 'ColorPalette', () => {
-	const colors = [ 'red', 'white', 'blue' ];
-	const currentColor = 'red';
+	const colors = [ { name: 'red', color: '#f00' }, { name: 'white', color: '#fff' }, { name: 'blue', color: '#00f' } ];
+	const currentColor = '#f00';
 	const onChange = jest.fn();
 
 	const wrapper = shallow( <ColorPalette colors={ colors } value={ currentColor } onChange={ onChange } /> );
-	const buttons = wrapper.find( '.blocks-color-palette__item-wrapper > button' );
+	const buttons = wrapper.find( '.blocks-color-palette__item-wrapper button' );
 
 	beforeEach( () => {
 		onChange.mockClear();
@@ -69,14 +69,14 @@ describe( 'ColorPalette', () => {
 			const isOpen = true;
 			const onToggle = jest.fn();
 
-			const renderedToggle = shallow( dropdown.props().renderToggle( { isOpen, onToggle } ) );
+			const renderedToggleButton = shallow( dropdown.props().renderToggle( { isOpen, onToggle } ).props.children );
 
 			test( 'should render dropdown content', () => {
-				expect( renderedToggle ).toMatchSnapshot();
+				expect( renderedToggleButton ).toMatchSnapshot();
 			} );
 
 			test( 'should call onToggle on click.', () => {
-				renderedToggle.simulate( 'click' );
+				renderedToggleButton.simulate( 'click' );
 
 				expect( onToggle ).toHaveBeenCalledTimes( 1 );
 			} );

@@ -98,7 +98,7 @@ status "Creating archive..."
 zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
-	blocks/library/*/*.php \
+	core-blocks/*/*.php \
 	post-content.js \
 	$vendor_scripts \
 	$build_files \

@@ -119,4 +119,16 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$result   = $response->get_data();
 		$this->assertFalse( isset( $result['viewable'] ) );
 	}
+
+	/**
+	 * Should include relevant data in the 'theme_supports' key of index.
+	 */
+	function test_theme_supports_index() {
+		$request  = new WP_REST_Request( 'GET', '/' );
+		$response = rest_do_request( $request );
+		$result   = $response->get_data();
+		$this->assertTrue( isset( $result['theme_supports'] ) );
+		$this->assertTrue( isset( $result['theme_supports']['formats'] ) );
+		$this->assertTrue( in_array( 'standard', $result['theme_supports']['formats'] ) );
+	}
 }

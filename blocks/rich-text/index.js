@@ -18,8 +18,15 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, compose } from '@wordpress/element';
-import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange, getScrollContainer } from '@wordpress/utils';
+import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
+import {
+	keycodes,
+	createBlobURL,
+	isHorizontalEdge,
+	getRectangleFromRange,
+	getScrollContainer,
+	deprecated,
+} from '@wordpress/utils';
 import { withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -121,6 +128,7 @@ export class RichText extends Component {
 		};
 
 		this.isEmpty = ! value || ! value.length;
+		this.containerRef = createRef();
 	}
 
 	/**
@@ -153,6 +161,19 @@ export class RichText extends Component {
 		this.editor = editor;
 
 		EVENTS.forEach( ( name ) => {
+			if ( ! this.props.hasOwnProperty( 'on' + name ) ) {
+				return;
+			}
+
+			deprecated( 'Raw TinyMCE event handlers for RichText', {
+				version: '3.0',
+				alternative: (
+					'Documented props, ancestor event handler, or onSetup ' +
+					'access to the internal editor instance event hub'
+				),
+				plugin: 'gutenberg',
+			} );
+
 			editor.on( name, this.proxyPropHandler( name ) );
 		} );
 
@@ -301,7 +322,7 @@ export class RichText extends Component {
 	 *                                     by tinyMCE.
 	 */
 	onPastePreProcess( event ) {
-		const HTML = this.isPlainTextPaste ? this.pastedPlainText : event.content;
+		const HTML = this.isPlainTextPaste ? '' : event.content;
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', HTML );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
@@ -386,24 +407,15 @@ export class RichText extends Component {
 	 *
 	 * Based on the selection of the text inside this element a position is
 	 * calculated where the toolbar should be. This can be used downstream to
-	 * absolutely position the toolbar. It does this by finding the closest
-	 * relative element.
+	 * absolutely position the toolbar.
 	 *
 	 * @param {DOMRect} position Caret range rectangle.
 	 *
 	 * @return {{top: number, left: number}} The desired position of the toolbar.
 	 */
 	getFocusPosition( position ) {
-		// Find the parent "relative" or "absolute" positioned container
-		const findRelativeParent = ( node ) => {
-			const style = window.getComputedStyle( node );
-			if ( style.position === 'relative' || style.position === 'absolute' ) {
-				return node;
-			}
-			return findRelativeParent( node.parentNode );
-		};
-		const container = findRelativeParent( this.editor.getBody() );
-		const containerPosition = container.getBoundingClientRect();
+		// The container is relatively positioned.
+		const containerPosition = this.containerRef.current.getBoundingClientRect();
 		const toolbarOffset = { top: 10, left: 0 };
 
 		return {
@@ -744,7 +756,8 @@ export class RichText extends Component {
 					if ( ! anchor ) {
 						this.removeFormat( 'link' );
 					}
-					this.applyFormat( 'link', { href: formatValue.value, target: formatValue.target }, anchor );
+					const { value: href, ...params } = formatValue;
+					this.applyFormat( 'link', { href, ...params }, anchor );
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
@@ -815,7 +828,7 @@ export class RichText extends Component {
 		);
 
 		return (
-			<div className={ classes }>
+			<div className={ classes } ref={ this.containerRef }>
 				{ isSelected && ! inlineToolbar && (
 					<BlockFormatControls>
 						{ formatToolbar }
@@ -876,15 +889,39 @@ RichText.defaultProps = {
 	format: 'element',
 };
 
-export default compose( [
-	withBlockEditContext,
-	withSelect( ( select, { isSelected, blockEditContext } ) => {
+const RichTextContainer = compose( [
+	withBlockEditContext( ( { isSelected } ) => {
+		return {
+			isBlockSelected: isSelected,
+		};
+	} ),
+	withSelect( ( select, { isSelected, isBlockSelected } ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
-			isSelected: isSelected !== false && blockEditContext.isSelected,
+			isSelected: isSelected !== false && isBlockSelected,
 		};
 	} ),
 	withSafeTimeout,
 ] )( RichText );
+
+RichTextContainer.Content = ( { value, format = 'element', tagName: Tag, ...props } ) => {
+	let children;
+	switch ( format ) {
+		case 'string':
+			children = <RawHTML>{ value }</RawHTML>;
+			break;
+		default:
+			children = value;
+			break;
+	}
+
+	if ( Tag ) {
+		return <Tag { ...props }>{ children }</Tag>;
+	}
+
+	return children;
+};
+
+export default RichTextContainer;

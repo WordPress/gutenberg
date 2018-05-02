@@ -26,7 +26,7 @@ export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvert
 				</IconButton>
 			) }
 			{ sharedBlock && (
-				<div className="editor-block-settings-menu__section">
+				<Fragment>
 					<IconButton
 						className="editor-block-settings-menu__control"
 						icon="controls-repeat"
@@ -44,7 +44,7 @@ export function SharedBlockSettings( { sharedBlock, onConvertToStatic, onConvert
 					>
 						{ __( 'Delete Shared Block' ) }
 					</IconButton>
-				</div>
+				</Fragment>
 			) }
 		</Fragment>
 	);

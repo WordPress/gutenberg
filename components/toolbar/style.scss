@@ -47,8 +47,8 @@ div.components-toolbar {
 
 	// unset icon button styles
 	&:active,
-	&:hover,
-	&:focus {
+	&:not( [aria-disabled="true"] ):hover,
+	&:not( [aria-disabled="true"] ):focus {
 		outline: none;
 		box-shadow: none;
 		background: none;
