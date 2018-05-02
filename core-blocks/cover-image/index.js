@@ -17,7 +17,6 @@ import {
 	BlockAlignmentToolbar,
 	ImagePlaceholder,
 	MediaUpload,
-	AlignmentToolbar,
 	RichText,
 	InnerBlocks,
 } from '@wordpress/blocks';
@@ -114,12 +113,6 @@ export const settings = {
 					<BlockAlignmentToolbar
 						value={ align }
 						onChange={ updateAlignment }
-					/>
-					<AlignmentToolbar
-						value={ contentAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { contentAlign: nextAlign } );
-						} }
 					/>
 					<Toolbar>
 						<MediaUpload
