@@ -942,7 +942,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$allowed_block_types = apply_filters( 'allowed_block_types', true, $post );
 
 	$editor_settings = array(
-		'modalAppElementId'   => 'wpwrap',
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
 		'availableTemplates'  => wp_get_theme()->get_page_templates( get_post( $post_to_edit['id'] ) ),
 		'allowedBlockTypes'   => $allowed_block_types,

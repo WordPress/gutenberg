@@ -12,7 +12,6 @@ import { Component, createPortal } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { withModalContext } from './context';
 import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
@@ -20,47 +19,65 @@ import './style.scss';
 
 // Used to count the number of open modals.
 let parentElement,
-	modalCount = 0;
+	modalCount = 0,
+	openModalCount = 0;
 
 class Modal extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.node = document.createElement( 'div' );
-	}
-
-	static setAppElement( node ) {
-		ariaHelper.setAppElement( node );
-	}
-
-	static setParentElement( node ) {
 		if ( ! parentElement ) {
-			parentElement = node;
+			parentElement = document.createElement( 'div' );
+			document.body.appendChild( parentElement );
 		}
+		this.node = document.createElement( 'div' );
 	}
 
 	componentDidMount() {
 		modalCount++;
 
-		const {
-			modalContext,
-		} = this.props;
-
-		if ( ! this.parentElement ) {
-			setElements( modalContext.appElementId );
+		const { isOpen } = this.props;
+		if ( isOpen ) {
+			this.openModal();
 		}
+	}
 
-		ariaHelper.hideApp();
-		parentElement.appendChild( this.node );
+	componentDidUpdate( prevProps ) {
+		const openStateChanged = this.props.isOpen !== prevProps.isOpen;
+		if ( openStateChanged && ! prevProps.isOpen ) {
+			this.openModal();
+		} else if ( openStateChanged && prevProps.isOpen ) {
+			this.closeModal();
+		}
 	}
 
 	componentWillUnmount() {
-		modalCount--;
+		const { isOpen } = this.props;
+		if ( isOpen ) {
+			this.closeModal();
+		}
 
+		modalCount--;
 		if ( modalCount === 0 ) {
+			document.body.removeChild( parentElement );
+			parentElement = null;
+		}
+	}
+
+	openModal() {
+		openModalCount++;
+
+		ariaHelper.hideApp( parentElement );
+		parentElement.appendChild( this.node );
+	}
+
+	closeModal() {
+		openModalCount--;
+
+		parentElement.removeChild( this.node );
+		if ( openModalCount === 0 ) {
 			ariaHelper.showApp();
 		}
-		parentElement.removeChild( this.node );
 	}
 
 	render() {
@@ -132,22 +149,4 @@ Modal.defaultProps = {
 	},
 };
 
-/**
- * Sets the element where the modal should mount itself.
- *
- * Note that the modal will mount itself as a sibling of this element, so using body is
- * not possible since it cannot have additional sibling elements.
- *
- * @param {string} appElementId The element id of the element that contains your application.
- */
-function setElements( appElementId ) {
-	const element = document.getElementById( appElementId );
-
-	if ( element ) {
-		Modal.setAppElement( element );
-		Modal.setParentElement( element.parentNode );
-	}
-}
-
-export { ModalContextProvider } from './context';
-export default withModalContext( Modal );
+export default Modal;

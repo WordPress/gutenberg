@@ -12,7 +12,6 @@ import {
 	APIProvider,
 	DropZoneProvider,
 	SlotFillProvider,
-	ModalContextProvider,
 } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 
@@ -37,10 +36,7 @@ class EditorProvider extends Component {
 			redo,
 			createUndoLevel,
 		} = this.props;
-		const {
-			modalAppElementId,
-			...editorSettings
-		} = settings;
+
 		const providers = [
 			// Editor settings provider
 			[
@@ -48,7 +44,7 @@ class EditorProvider extends Component {
 				{
 					value: {
 						...EditorSettings.defaultSettings,
-						...editorSettings,
+						...settings,
 					},
 				},
 			],
@@ -95,18 +91,6 @@ class EditorProvider extends Component {
 			// DropZone provider:
 			[
 				DropZoneProvider,
-			],
-
-			// Modal provider
-			//
-			//  - context.modalContext.elementId
-			[
-				ModalContextProvider,
-				{
-					value: {
-						appElementId: modalAppElementId,
-					},
-				},
 			],
 		];
 
