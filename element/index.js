@@ -5,6 +5,7 @@ import {
 	createElement,
 	createContext,
 	createRef,
+	forwardRef,
 	Component,
 	cloneElement,
 	Children,
@@ -45,6 +46,18 @@ export { createElement };
  * @return {Object} Ref object.
  */
 export { createRef };
+
+/**
+ * Allows a `ref` to be forwarded to a component further down the component
+ * tree.
+ *
+ * @param {Function} forwardFunction A function receiving the component's props and ref,
+ *                                   allowing the ref to be mapped to a different prop in
+ *                                   order to be passed further down the tree.
+ *
+ * @return {Component} The component with the forwarded ref.
+ */
+export { forwardRef };
 
 /**
  * Renders a given element into the target DOM node.

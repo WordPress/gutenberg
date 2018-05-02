@@ -19,23 +19,16 @@ import './style.scss';
 
 // Used to count the number of open modals.
 let parentElement,
-	modalCount = 0,
 	openModalCount = 0;
 
 class Modal extends Component {
 	constructor() {
 		super( ...arguments );
 
-		if ( ! parentElement ) {
-			parentElement = document.createElement( 'div' );
-			document.body.appendChild( parentElement );
-		}
 		this.node = document.createElement( 'div' );
 	}
 
 	componentDidMount() {
-		modalCount++;
-
 		const { isOpen } = this.props;
 		if ( isOpen ) {
 			this.openModal();
@@ -56,19 +49,22 @@ class Modal extends Component {
 		if ( isOpen ) {
 			this.closeModal();
 		}
-
-		modalCount--;
-		if ( modalCount === 0 ) {
-			document.body.removeChild( parentElement );
-			parentElement = null;
-		}
 	}
 
 	openModal() {
 		openModalCount++;
 
-		ariaHelper.hideApp( parentElement );
+		if ( openModalCount === 1 ) {
+			this.openFirstModal();
+		}
 		parentElement.appendChild( this.node );
+	}
+
+	openFirstModal() {
+		parentElement = document.createElement( 'div' );
+		document.body.appendChild( parentElement );
+		ariaHelper.hideApp( parentElement );
+		document.body.classList.add( this.props.bodyOpenClassName );
 	}
 
 	closeModal() {
@@ -76,8 +72,15 @@ class Modal extends Component {
 
 		parentElement.removeChild( this.node );
 		if ( openModalCount === 0 ) {
-			ariaHelper.showApp();
+			this.closeLastModal();
 		}
+	}
+
+	closeLastModal() {
+		document.body.classList.remove( this.props.bodyOpenClassName );
+		ariaHelper.showApp();
+		document.body.removeChild( parentElement );
+		parentElement = null;
 	}
 
 	render() {
@@ -134,9 +137,10 @@ class Modal extends Component {
 
 Modal.defaultProps = {
 	className: null,
+	overlayClassName: null,
+	bodyOpenClassName: 'modal-open',
 	role: 'dialog',
 	title: null,
-	overlayClassName: null,
 	onRequestClose: noop,
 	focusOnMount: true,
 	shouldCloseOnEsc: true,
