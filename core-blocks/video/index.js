@@ -12,6 +12,8 @@ import {
 	IconButton,
 	Placeholder,
 	Toolbar,
+	PanelBody,
+	TextControl,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
@@ -20,6 +22,7 @@ import {
 	BlockControls,
 	MediaUpload,
 	RichText,
+	InspectorControls
 } from '@wordpress/blocks';
 
 /**
@@ -57,6 +60,16 @@ export const settings = {
 			source: 'children',
 			selector: 'figcaption',
 		},
+		width: {
+			selector: 'video',
+			type: 'string',
+			attribute: 'width',
+		},
+		height: {
+			selector: 'video',
+			type: 'string',
+			attribute: 'height'
+		}
 	},
 
 	getEditWrapperProps( attributes ) {
@@ -80,7 +93,7 @@ export const settings = {
 		render() {
 			const { align, caption, id } = this.props.attributes;
 			const { setAttributes, isSelected, className } = this.props;
-			const { editing, src } = this.state;
+			const { editing, src, width, height   } = this.state;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const switchToEditing = () => {
 				this.setState( { editing: true } );
@@ -172,6 +185,28 @@ export const settings = {
 			return (
 				<Fragment>
 					{ controls }
+					<InspectorControls>
+						<PanelBody title={ __( 'Video Settings' ) }>
+							<div className="blocks-image__dimensions__row">
+								<TextControl
+									type="text"
+									className="blocks-video__dimensions__width"
+									label={ __( 'Width' ) }
+									value={ this.props.attributes.width }
+									placeholder="100%"
+									onChange={( value ) => setAttributes( { width: value } )}
+								/>
+								<TextControl
+									type="text"
+									className="blocks-video__dimensions__height"
+									label={ __( 'Height' ) }
+									value={  this.props.attributes.height }
+									placeholder="100%"
+									onChange={ ( value ) => setAttributes( { height: value } ) }
+								/>
+							</div>
+						</PanelBody>
+					</InspectorControls>
 					<figure className={ className }>
 						<video controls src={ src } />
 						{ ( ( caption && caption.length ) || isSelected ) && (
@@ -191,11 +226,11 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { src, caption, align } = attributes;
+		const { src, caption, align, width, height } = attributes;
 		return (
 
 			<figure className={ align ? `align${ align }` : null }>
-				{ src && <video controls src={ src } /> }
+				{ src && <video controls src={ src } width={ width } height={ height }/> }
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
