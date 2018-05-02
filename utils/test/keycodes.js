@@ -7,12 +7,10 @@ import {
 	META,
 	SHIFT,
 	accessShortcut,
-	altShortcut,
 	metaShortcut,
 	primaryShortcut,
 	primaryAccessShortcut,
 	primaryAltShortcut,
-	shiftShortcut,
 	keyboardShortcut,
 	isMacOS,
 } from '../keycodes';
@@ -101,18 +99,6 @@ describe( 'accessShortcut', () => {
 	} );
 } );
 
-describe( 'altShortcut', () => {
-	it( 'should output Alt text on Windows', () => {
-		const shortcut = altShortcut( 'M', isMacOSFalse );
-		expect( shortcut ).toEqual( 'Alt+M' );
-	} );
-
-	it( 'should output option symbol on MacOS', () => {
-		const shortcut = altShortcut( 'M', isMacOSTrue );
-		expect( shortcut ).toEqual( '⌥M' );
-	} );
-} );
-
 describe( 'metaShortcut', () => {
 	it( 'should output Windows logo symbol on Windows', () => {
 		const shortcut = metaShortcut( 'M', isMacOSFalse );
@@ -158,18 +144,6 @@ describe( 'primaryAltShortcut', () => {
 	it( 'should output option+command symbols on MacOS', () => {
 		const shortcut = primaryAltShortcut( 'M', isMacOSTrue );
 		expect( shortcut ).toEqual( '⌥⌘M' );
-	} );
-} );
-
-describe( 'shiftShortcut', () => {
-	it( 'should output Control text on Windows', () => {
-		const shortcut = shiftShortcut( 'M', isMacOSFalse );
-		expect( shortcut ).toEqual( 'Shift+M' );
-	} );
-
-	it( 'should output control symbol on MacOS', () => {
-		const shortcut = shiftShortcut( 'M', isMacOSTrue );
-		expect( shortcut ).toEqual( '⇧M' );
 	} );
 } );
 

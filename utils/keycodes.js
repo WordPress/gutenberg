@@ -88,20 +88,6 @@ export function accessShortcut( character, _isMacOS = isMacOS ) {
 }
 
 /**
- * Create an Alt/option shortcut based on a single character.
- *
- * This will output Alt+G on Windows when "G" is supplied as an argument.
- *
- * @param {string} character The character for the key command.
- * @param {Object} _isMacOS  isMacOS function by default; used for DI testing.
- *
- * @return {string}          The keyboard shortcut.
- */
-export function altShortcut( character, _isMacOS = isMacOS ) {
-	return keyboardShortcut( `${ ALT }+${ character }`, _isMacOS );
-}
-
-/**
  * Create a Meta shortcut based on a single character.
  *
  * This will output Windows+G on Windows when "G" is supplied as an argument.
@@ -163,18 +149,4 @@ export function primaryAltShortcut( character, _isMacOS = isMacOS ) {
 	const keyCombo = _isMacOS() ?
 		`${ ALT }+${ PRIMARY }` : `${ PRIMARY }+${ ALT }`;
 	return keyboardShortcut( `${ keyCombo }+${ character }`, _isMacOS );
-}
-
-/**
- * Create a shift shortcut based on a single character.
- *
- * This will output Shift+G on Windows when "G" is supplied as an argument.
- *
- * @param {string} character The character for the key command.
- * @param {Object} _isMacOS  isMacOS function by default; used for DI testing.
- *
- * @return {string}          The keyboard shortcut.
- */
-export function shiftShortcut( character, _isMacOS = isMacOS ) {
-	return keyboardShortcut( `${ SHIFT }+${ character }`, _isMacOS );
 }
