@@ -17,7 +17,7 @@ const createEntityRecordGetter = ( source ) => entities.reduce( ( result, entity
 	const methodName = getMethodName( kind, name );
 	result[ methodName ] = ( state, key ) => source.getEntityRecord( state, kind, name, key );
 	return result;
-} );
+}, {} );
 
 const entityResolvers = createEntityRecordGetter( resolvers );
 const entitySelectors = createEntityRecordGetter( selectors );
