@@ -103,6 +103,8 @@ export function themeSupports( state = {}, action ) {
  * @return {Function} Reducer.
  */
 function entity( entityConfig ) {
+	const key = entityConfig.key || 'id';
+
 	return ( state = { byKey: {} }, action ) => {
 		if (
 			! action.name ||
@@ -113,7 +115,6 @@ function entity( entityConfig ) {
 			return state;
 		}
 
-		const key = entityConfig.key || 'id';
 		switch ( action.type ) {
 			case 'RECEIVE_ENTITY_RECORDS':
 				return {
