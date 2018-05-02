@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import uuid from 'uuid/v4';
 import classnames from 'classnames';
 import {
 	last,
@@ -119,6 +120,7 @@ export class RichText extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
+		this.addFootnote = this.addFootnote.bind( this );
 		this.onPropagateUndo = this.onPropagateUndo.bind( this );
 		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
@@ -829,6 +831,14 @@ export class RichText extends Component {
 		} ) );
 	}
 
+	addFootnote() {
+		this.editor.selection.collapse();
+		if ( this.editor.selection.getNode().tagName === 'SUP' ) {
+			return;
+		}
+		this.editor.insertContent( '<sup class="footnote" data-footnote-id="' + uuid() + '">*</sup> ' );
+	}
+
 	/**
 	 * Calling onSplit means we need to abort the change done by TinyMCE.
 	 * we need to call updateContent to restore the initial content before calling onSplit.
@@ -875,6 +885,7 @@ export class RichText extends Component {
 				focusPosition={ this.state.focusPosition }
 				formats={ this.state.formats }
 				onChange={ this.changeFormats }
+				onAddFootnote={ this.addFootnote }
 				enabledControls={ formattingControls }
 				customControls={ formatters }
 			/>

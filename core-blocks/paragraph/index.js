@@ -163,6 +163,8 @@ class ParagraphBlock extends Component {
 
 		const fontSize = this.getFontSize();
 
+		const formattingControls = [ 'bold', 'italic', 'strikethrough', 'link', 'footnote' ];
+
 		return (
 			<Fragment>
 				<BlockControls>
@@ -251,6 +253,7 @@ class ParagraphBlock extends Component {
 						onReplace={ this.onReplace }
 						onRemove={ () => onReplace( [] ) }
 						placeholder={ placeholder || __( 'Add text or type / to add content' ) }
+						formattingControls={ formattingControls }
 					/>
 				</div>
 			</Fragment>
