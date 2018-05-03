@@ -1,16 +1,23 @@
 /**
  * External dependencies.
  */
-import { isEqual, isObject, map } from 'lodash';
+import { isEqual, isPlainObject, map } from 'lodash';
 
 /**
- * WordPress dependencies
+ * WordPress dependencies.
  */
 import {
 	Component,
 	RawHTML,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import apiRequest from '@wordpress/api-request';
+
+/**
+ * Internal dependencies.
+ */
+import Placeholder from '../placeholder';
+import Spinner from '../spinner';
 
 export class ServerSideRender extends Component {
 	constructor( props ) {
@@ -20,8 +27,16 @@ export class ServerSideRender extends Component {
 		};
 	}
 
+	componentWillMount() {
+		this.isStillMounted = true;
+	}
+
 	componentDidMount() {
 		this.fetch( this.props );
+	}
+
+	componentWillUnmount() {
+		this.isStillMounted = false;
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -31,13 +46,15 @@ export class ServerSideRender extends Component {
 	}
 
 	fetch( props ) {
-		this.setState( { response: null } );
+		if ( null !== this.state.response ) {
+			this.setState( { response: null } );
+		}
 		const { block, attributes } = props;
 
 		const path = '/gutenberg/v1/block-renderer/' + block + '?context=edit&' + this.getQueryUrlFromObject( { attributes } );
 
-		return wp.apiRequest( { path: path } ).then( ( response ) => {
-			if ( response && response.rendered ) {
+		return apiRequest( { path: path } ).then( ( response ) => {
+			if ( this.isStillMounted && response && response.rendered ) {
 				this.setState( { response: response.rendered } );
 			}
 		} );
@@ -45,21 +62,21 @@ export class ServerSideRender extends Component {
 
 	getQueryUrlFromObject( obj, prefix ) {
 		return map( obj, ( paramValue, paramName ) => {
-			const key = prefix ? prefix + '[' + paramName + ']' : paramName,
-				value = obj[ paramName ];
-			return isObject( paramValue ) ? this.getQueryUrlFromObject( value, key ) :
-				encodeURIComponent( key ) + '=' + encodeURIComponent( value );
+			const key = prefix ? prefix + '[' + paramName + ']' : paramName;
+			return isPlainObject( paramValue ) ? this.getQueryUrlFromObject( paramValue, key ) :
+				encodeURIComponent( key ) + '=' + encodeURIComponent( paramValue );
 		} ).join( '&' );
 	}
 
 	render() {
 		const response = this.state.response;
-		if ( ! response || ! response.length ) {
+		if ( ! response ) {
 			return (
-				<div key="loading" className="wp-block-embed is-loading">
-
-					<p>{ __( 'Loading...' ) }</p>
-				</div>
+				<Placeholder><Spinner /></Placeholder>
+			);
+		} else if ( ! response.length ) {
+			return (
+				<Placeholder>{ __( 'No results found.' ) }</Placeholder>
 			);
 		}
 
