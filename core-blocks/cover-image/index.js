@@ -153,6 +153,7 @@ export const settings = {
 								label={ __( 'Fixed Background' ) }
 								checked={ !! hasParallax }
 								onChange={ toggleParallax }
+								help={ getFixedBackgroundHelp }
 							/>
 							<RangeControl
 								label={ __( 'Background Dimness' ) }
@@ -278,4 +279,8 @@ function backgroundImageStyles( url ) {
 	return url ?
 		{ backgroundImage: `url(${ url })` } :
 		undefined;
+}
+
+function getFixedBackgroundHelp( checked ) {
+	return checked ? __( 'The background does not move with the element' ) : __( 'The background scrolls with the element.' );
 }
