@@ -11,7 +11,7 @@ const { getComputedStyle } = window;
 const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 /**
- * Check whether the caret is horizontally at the edge of the container.
+ * Check whether the selection is horizontally at the edge of the container.
  *
  * @param {Element} container Focusable element.
  * @param {boolean} isReverse Set to true to check left, false for right.
@@ -35,7 +35,7 @@ export function isHorizontalEdge( container, isReverse ) {
 		return true;
 	}
 
-	// If the container is empty, the caret is always at the edge.
+	// If the container is empty, the selection is always at the edge.
 	if ( tinymce.DOM.isEmpty( container ) ) {
 		return true;
 	}
@@ -77,7 +77,7 @@ export function isHorizontalEdge( container, isReverse ) {
 }
 
 /**
- * Check whether the caret is vertically at the edge of the container.
+ * Check whether the selection is vertically at the edge of the container.
  *
  * @param {Element} container Focusable element.
  * @param {boolean} isReverse Set to true to check top, false for bottom.
