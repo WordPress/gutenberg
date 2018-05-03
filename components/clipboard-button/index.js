@@ -85,7 +85,7 @@ class ClipboardButton extends Component {
 
 		return (
 			<span ref={ this.bindContainer }>
-				<ComponentToUse { ...buttonProps } icon={ icon } className={ classes }>
+				<ComponentToUse { ...buttonProps } className={ classes }>
 					{ children }
 				</ComponentToUse>
 			</span>
