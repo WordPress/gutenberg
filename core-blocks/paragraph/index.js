@@ -280,15 +280,6 @@ const supports = {
 };
 
 const deprecatedSchema = {
-	customTextColor: {
-		type: 'string',
-	},
-	customBackgroundColor: {
-		type: 'string',
-	},
-	customFontSize: {
-		type: 'number',
-	},
 	width: {
 		type: 'string',
 	},
@@ -315,11 +306,20 @@ const schema = {
 	textColor: {
 		type: 'string',
 	},
+	customTextColor: {
+		type: 'string',
+	},
 	backgroundColor: {
+		type: 'string',
+	},
+	customBackgroundColor: {
 		type: 'string',
 	},
 	fontSize: {
 		type: 'string',
+	},
+	customFontSize: {
+		type: 'number',
 	},
 };
 
