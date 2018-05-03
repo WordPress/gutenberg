@@ -25,7 +25,6 @@ import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
-import { deprecated } from '@wordpress/utils';
 
 /***
  * Module constants
@@ -1293,15 +1292,6 @@ function buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock
  * @return {Editor.InserterItem[]} Items that appear in inserter.
  */
 export function getInserterItems( state, allowedBlockTypes ) {
-	if ( allowedBlockTypes === undefined ) {
-		allowedBlockTypes = true;
-		deprecated( 'getInserterItems with no allowedBlockTypes argument', {
-			version: '2.8',
-			alternative: 'getInserterItems with an explcit allowedBlockTypes argument',
-			plugin: 'Gutenberg',
-		} );
-	}
-
 	if ( ! allowedBlockTypes ) {
 		return [];
 	}
@@ -1363,15 +1353,6 @@ function getItemsFromInserts( state, inserts, allowedBlockTypes, maximum = MAX_R
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
 export function getFrecentInserterItems( state, allowedBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
-	if ( allowedBlockTypes === undefined ) {
-		allowedBlockTypes = true;
-		deprecated( 'getFrecentInserterItems with no allowedBlockTypes argument', {
-			version: '2.8',
-			alternative: 'getFrecentInserterItems with an explcit allowedBlockTypes argument',
-			plugin: 'Gutenberg',
-		} );
-	}
-
 	const calculateFrecency = ( time, count ) => {
 		if ( ! time ) {
 			return count;
