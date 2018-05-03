@@ -13,7 +13,6 @@ import {
 	Dashicon,
 	IconButton,
 	PanelBody,
-	PanelColor,
 	ToggleControl,
 	withFallbackStyles,
 } from '@wordpress/components';
@@ -22,11 +21,11 @@ import {
 	RichText,
 	BlockControls,
 	BlockAlignmentToolbar,
-	ColorPalette,
 	ContrastChecker,
 	InspectorControls,
 	getColorClass,
 	withColors,
+	PanelColor,
 } from '@wordpress/blocks';
 
 /**
@@ -75,7 +74,10 @@ class ButtonBlock extends Component {
 	render() {
 		const {
 			attributes,
-			initializeColor,
+			backgroundColor,
+			textColor,
+			setBackgroundColor,
+			setTextColor,
 			setAttributes,
 			isSelected,
 			className,
@@ -88,17 +90,6 @@ class ButtonBlock extends Component {
 			align,
 			clear,
 		} = attributes;
-
-		const textColor = initializeColor( {
-			colorContext: 'color',
-			colorAttribute: 'textColor',
-			customColorAttribute: 'customTextColor',
-		} );
-		const backgroundColor = initializeColor( {
-			colorContext: 'background-color',
-			colorAttribute: 'backgroundColor',
-			customColorAttribute: 'customBackgroundColor',
-		} );
 
 		return (
 			<Fragment>
@@ -133,18 +124,18 @@ class ButtonBlock extends Component {
 								checked={ !! clear }
 								onChange={ this.toggleClear }
 							/>
-							<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor.value } >
-								<ColorPalette
-									value={ backgroundColor.value }
-									onChange={ backgroundColor.set }
-								/>
-							</PanelColor>
-							<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor.value } >
-								<ColorPalette
-									value={ textColor.value }
-									onChange={ textColor.set }
-								/>
-							</PanelColor>
+							<PanelColor
+								colorName={ backgroundColor.name }
+								colorValue={ backgroundColor.value }
+								title={ __( 'Background Color' ) }
+								onChange={ setBackgroundColor }
+							/>
+							<PanelColor
+								colorName={ textColor.name }
+								colorValue={ textColor.value }
+								title={ __( 'Text Color' ) }
+								onChange={ setTextColor }
+							/>
 							{ this.nodeRef && <ContrastCheckerWithFallbackStyles
 								node={ this.nodeRef }
 								textColor={ textColor.value }
@@ -243,7 +234,14 @@ export const settings = {
 		return props;
 	},
 
-	edit: withColors( ButtonBlock ),
+	edit: withColors( ( getColor, setColor, { attributes, setAttributes } ) => {
+		return {
+			backgroundColor: getColor( attributes.backgroundColor, attributes.customBackgroundColor, 'background-color' ),
+			setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor', setAttributes ),
+			textColor: getColor( attributes.textColor, attributes.customTextColor, 'color' ),
+			setTextColor: setColor( 'textColor', 'customTextColor', setAttributes ),
+		};
+	} )( ButtonBlock ),
 
 	save( { attributes } ) {
 		const {

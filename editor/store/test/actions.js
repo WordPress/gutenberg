@@ -42,6 +42,7 @@ import {
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
+	updateBlockListSettings,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -527,6 +528,24 @@ describe( 'actions', () => {
 			expect( toggleSelection( false ) ).toEqual( {
 				type: 'TOGGLE_SELECTION',
 				isSelectionEnabled: false,
+			} );
+		} );
+	} );
+
+	describe( 'updateBlockListSettings', () => {
+		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS with undefined settings', () => {
+			expect( updateBlockListSettings( 'chicken' ) ).toEqual( {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: 'chicken',
+				settings: undefined,
+			} );
+		} );
+
+		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS action with the passed settings', () => {
+			expect( updateBlockListSettings( 'chicken', { chicken: 'ribs' } ) ).toEqual( {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: 'chicken',
+				settings: { chicken: 'ribs' },
 			} );
 		} );
 	} );

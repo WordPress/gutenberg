@@ -6,6 +6,7 @@ import {
 	first,
 	get,
 	has,
+	intersection,
 	last,
 	reduce,
 	size,
@@ -89,7 +90,7 @@ export function isEditedPostNew( state ) {
  * @return {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
-	return state.editor.isDirty;
+	return state.editor.isDirty || inSomeHistory( state, isEditedPostDirty );
 }
 
 /**
@@ -148,7 +149,7 @@ export function getCurrentPostId( state ) {
  * @return {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
-	return get( getCurrentPost( state ), 'revisions.count', 0 );
+	return get( getCurrentPost( state ), [ 'revisions', 'count' ], 0 );
 }
 
 /**
@@ -160,7 +161,7 @@ export function getCurrentPostRevisionsCount( state ) {
  * @return {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
-	return get( getCurrentPost( state ), 'revisions.last_id', null );
+	return get( getCurrentPost( state ), [ 'revisions', 'last_id' ], null );
 }
 
 /**
@@ -673,7 +674,7 @@ export function getBlockRootUID( state, uid ) {
 export function getAdjacentBlockUid( state, startUID, modifier = 1 ) {
 	// Default to selected block.
 	if ( startUID === undefined ) {
-		startUID = get( getSelectedBlock( state ), 'uid' );
+		startUID = get( getSelectedBlock( state ), [ 'uid' ] );
 	}
 
 	// Try multi-selection starting at extent based on modifier.
@@ -1615,4 +1616,67 @@ export function getPermalinkParts( state ) {
 		postName,
 		suffix,
 	};
+}
+
+/**
+ * Returns true if an optimistic transaction is pending commit, for which the
+ * before state satisfies the given predicate function.
+ *
+ * @param {Object}   state     Editor state.
+ * @param {Function} predicate Function given state, returning true if match.
+ *
+ * @return {boolean} Whether predicate matches for some history.
+ */
+export function inSomeHistory( state, predicate ) {
+	const { optimist } = state;
+
+	// In recursion, optimist state won't exist. Assume exhausted options.
+	if ( ! optimist ) {
+		return false;
+	}
+
+	return optimist.some( ( { beforeState } ) => (
+		beforeState && predicate( beforeState )
+	) );
+}
+
+/**
+ * Returns the Block List settings of a block if any.
+ *
+ * @param {Object}  state Editor state.
+ * @param {?string} uid   Block UID.
+ *
+ * @return {?Object} Block settings of the block if set.
+ */
+export function getBlockListSettings( state, uid ) {
+	return state.blockListSettings[ uid ];
+}
+
+/**
+ * Determines the blocks that can be nested inside a given block. Or globally if a block is not specified.
+ *
+ * @param {Object}           state                     Global application state.
+ * @param {?string}          uid                       Block UID.
+ * @param {string[]|boolean} globallyEnabledBlockTypes Globally enabled block types, or true/false to enable/disable all types.
+ *
+ * @return {string[]|boolean} Blocks that can be nested inside the block with the specified uid, or true/false to enable/disable all types.
+ */
+export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
+	if ( ! globallyEnabledBlockTypes ) {
+		return false;
+	}
+
+	const supportedNestedBlocks = get( getBlockListSettings( state, uid ), [ 'supportedBlocks' ] );
+	if ( supportedNestedBlocks === true || supportedNestedBlocks === undefined ) {
+		return globallyEnabledBlockTypes;
+	}
+
+	if ( ! supportedNestedBlocks ) {
+		return false;
+	}
+
+	if ( globallyEnabledBlockTypes === true ) {
+		return supportedNestedBlocks;
+	}
+	return intersection( globallyEnabledBlockTypes, supportedNestedBlocks );
 }

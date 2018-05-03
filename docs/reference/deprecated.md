@@ -3,6 +3,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 ## 3.0.0
 
 - `wp.blocks.registerCoreBlocks` function removed. Please use `wp.coreBlocks.registerCoreBlocks` instead.
+- Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](https://wordpress.org/gutenberg/handbook/block-api/rich-text-api/), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
 
 ## 2.8.0
 

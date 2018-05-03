@@ -391,3 +391,70 @@ function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
 	return $response;
 }
 add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_theme_supports' );
+
+/**
+ * Handle any necessary checks early.
+ *
+ * @param WP_HTTP_Response $response Result to send to the client. Usually a WP_REST_Response.
+ * @param WP_REST_Server   $handler  ResponseHandler instance (usually WP_REST_Server).
+ * @param WP_REST_Request  $request  Request used to generate the response.
+ */
+function gutenberg_handle_early_callback_checks( $response, $handler, $request ) {
+	if ( '/wp/v2/users' === $request->get_route() ) {
+		if ( ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
+			$can_view = false;
+			$types    = get_post_types( array( 'show_in_rest' => true ), 'objects' );
+			foreach ( $types as $type ) {
+				if ( post_type_supports( $type->name, 'author' )
+					&& current_user_can( $type->cap->edit_posts ) ) {
+					$can_view = true;
+				}
+			}
+			if ( ! $can_view ) {
+				return new WP_Error( 'rest_forbidden_who', __( 'Sorry, you are not allowed to query users by this parameter.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+			}
+		}
+	}
+	return $response;
+}
+add_filter( 'rest_request_before_callbacks', 'gutenberg_handle_early_callback_checks', 10, 3 );
+
+/**
+ * Include additional query parameters on the user query endpoint.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42202
+ *
+ * @param array $query_params JSON Schema-formatted collection parameters.
+ * @return array
+ */
+function gutenberg_filter_user_collection_parameters( $query_params ) {
+	$query_params['who'] = array(
+		'description' => __( 'Limit result set to users who are considered authors.', 'gutenberg' ),
+		'type'        => 'string',
+		'enum'        => array(
+			'authors',
+		),
+	);
+	return $query_params;
+}
+add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_parameters' );
+
+/**
+ * Filter user collection query parameters to include specific behavior.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42202
+ *
+ * @param array           $prepared_args Array of arguments for WP_User_Query.
+ * @param WP_REST_Request $request       The current request.
+ * @return array
+ */
+function gutenberg_filter_user_query_arguments( $prepared_args, $request ) {
+	if ( ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
+		$prepared_args['who'] = 'authors';
+		if ( isset( $prepared_args['has_published_posts'] ) ) {
+			unset( $prepared_args['has_published_posts'] );
+		}
+	}
+	return $prepared_args;
+}
+add_filter( 'rest_user_query', 'gutenberg_filter_user_query_arguments', 10, 2 );

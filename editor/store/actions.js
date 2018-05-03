@@ -674,3 +674,19 @@ export function insertDefaultBlock( attributes, rootUID, index ) {
 		isProvisional: true,
 	};
 }
+
+/**
+ * Returns an action object that changes the nested settings of a given block.
+ *
+ * @param {string} id       UID of the block whose nested setting.
+ * @param {Object} settings Object with the new settings for the nested block.
+ *
+ * @return {Object} Action object
+ */
+export function updateBlockListSettings( id, settings ) {
+	return {
+		type: 'UPDATE_BLOCK_LIST_SETTINGS',
+		id,
+		settings,
+	};
+}

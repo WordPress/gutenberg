@@ -23,7 +23,7 @@ const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
 const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove featured image' );
 
 function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
-	const postLabel = get( postType, 'labels', {} );
+	const postLabel = get( postType, [ 'labels' ], {} );
 
 	return (
 		<PostFeaturedImageCheck>

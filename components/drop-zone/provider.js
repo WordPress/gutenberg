@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { isEqual, find, some, filter, noop, throttle } from 'lodash';
-import isShallowEqual from 'shallowequal';
 
 /**
  * WordPress dependencies
  */
 import { Component, findDOMNode } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 class DropZoneProvider extends Component {
 	constructor() {

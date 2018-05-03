@@ -11,7 +11,7 @@ import CodeEditor from '../editor';
 
 describe( 'CodeEditor', () => {
 	it( 'should render without an error', () => {
-		set( global, 'wp.codeEditor.initialize', () => ( {
+		set( global, [ 'wp', 'codeEditor', 'initialize' ], () => ( {
 			codemirror: {
 				on: noop,
 				hasFocus: () => false,

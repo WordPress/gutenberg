@@ -62,7 +62,7 @@ const extractConfig = {
  */
 function camelCaseDash( string ) {
 	return string.replace(
-		/-([a-z])/,
+		/-([a-z])/g,
 		( match, letter ) => letter.toUpperCase()
 	);
 }
@@ -85,6 +85,7 @@ const entryPointNames = [
 const packageNames = [
 	'hooks',
 	'i18n',
+	'is-shallow-equal',
 ];
 
 const coreGlobals = [
@@ -121,7 +122,8 @@ const config = {
 			return memo;
 		}, {} ),
 		packageNames.reduce( ( memo, packageName ) => {
-			memo[ packageName ] = `./node_modules/@wordpress/${ packageName }`;
+			const name = camelCaseDash( packageName );
+			memo[ name ] = `./node_modules/@wordpress/${ packageName }`;
 			return memo;
 		}, {} )
 	),

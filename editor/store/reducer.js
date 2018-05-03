@@ -224,8 +224,8 @@ export const editor = flow( [
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'UPDATE_POST' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST' ],
 	} ),
 ] )( {
 	autosave( state = false, action ) {
@@ -1027,6 +1027,42 @@ export const sharedBlocks = combineReducers( {
 	},
 } );
 
+/**
+ * Reducer that for each block uid stores an object that represents its nested settings.
+ * E.g: what blocks can be nested inside a block.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const blockListSettings = ( state = {}, action ) => {
+	switch ( action.type ) {
+		// even if the replaced blocks have the same uid our logic should correct the state.
+		case 'REPLACE_BLOCKS' :
+		case 'REMOVE_BLOCKS': {
+			return omit( state, action.uids );
+		}
+		case 'UPDATE_BLOCK_LIST_SETTINGS': {
+			const { id, settings } = action;
+			if ( id && ! settings ) {
+				return omit( state, id );
+			}
+			const blockSettings = state[ id ];
+			const updateIsRequired = ! isEqual( blockSettings, settings );
+			if ( updateIsRequired ) {
+				return {
+					...state,
+					[ id ]: {
+						...settings,
+					},
+				};
+			}
+		}
+	}
+	return state;
+};
+
 export default optimist( combineReducers( {
 	editor,
 	currentlyAutosaving,
@@ -1035,6 +1071,7 @@ export default optimist( combineReducers( {
 	blockSelection,
 	provisionalBlockUID,
 	blocksMode,
+	blockListSettings,
 	isInsertionPointVisible,
 	preferences,
 	saving,
