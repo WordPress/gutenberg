@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { get, filter, throttle, union } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withAPIData, withInstanceId, Autocomplete } from '@wordpress/components';
+import { withInstanceId } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { authorAutocompleter } from '../../../blocks/autocompleters';
@@ -42,9 +37,8 @@ export class PostAuthor extends Component {
 		onUpdateAuthor( Number( value.id ) );
 	}
 
-
 	render() {
-		const { postAuthor, instanceId } = this.props;
+		const { postAuthor, instanceId, authors } = this.props;
 		const selectId = 'post-author-selector-' + instanceId;
 		const theAuthor = this.state.theAuthor;
 		console.log( theAuthor ? theAuthor.name : '' );
@@ -74,6 +68,7 @@ export default compose( [
 	withSelect( ( select ) => {
 		return {
 			postAuthor: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
+			authors: select( 'core' ).getAuthors(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

@@ -14,9 +14,9 @@ import { buildTermsTree } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 export function PageAttributesParent( { parent, postType, items, onUpdateParent } ) {
-	const isHierarchical = get( postType, 'hierarchical', false );
-	const parentPageLabel = get( postType, 'labels.parent_item_colon' );
-	const pageItems = get( items, 'data', [] );
+	const isHierarchical = get( postType, [ 'hierarchical' ], false );
+	const parentPageLabel = get( postType, [ 'labels', 'parent_item_colon' ] );
+	const pageItems = get( items, [ 'data' ], [] );
 	if ( ! isHierarchical || ! parentPageLabel || ! pageItems.length ) {
 		return null;
 	}
@@ -60,7 +60,7 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 
 const applyWithAPIDataItems = withAPIData( ( props, { type } ) => {
 	const { postTypeSlug, postId } = props;
-	const isHierarchical = get( props, 'postType.hierarchical', false );
+	const isHierarchical = get( props, [ 'postType', 'hierarchical' ], false );
 	const queryString = stringify( {
 		context: 'edit',
 		per_page: 100,

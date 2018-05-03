@@ -11,7 +11,7 @@ import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
 export function PostStickyCheck( { postType, children, user } ) {
-	const userCan = get( user.data, 'post_type_capabilities', false );
+	const userCan = get( user.data, [ 'post_type_capabilities' ], false );
 
 	if (
 		postType !== 'post' ||

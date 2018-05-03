@@ -11,15 +11,19 @@ import { addFilter } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import { userAutocompleter } from '../autocompleters';
+import { blockAutocompleter, userAutocompleter } from '../autocompleters';
+import { getDefaultBlockName } from '../api/registration';
 
-// Exported for unit test.
-export const defaultAutocompleters = [ userAutocompleter ];
+const defaultAutocompleters = [ userAutocompleter ];
 
-function setDefaultCompleters( completers ) {
+function setDefaultCompleters( completers, blockName ) {
 	if ( ! completers ) {
 		// Provide copies so filters may directly modify them.
 		completers = defaultAutocompleters.map( clone );
+		// Add blocks autocompleter for Paragraph block
+		if ( blockName === getDefaultBlockName() ) {
+			completers.push( clone( blockAutocompleter ) );
+		}
 	}
 	return completers;
 }

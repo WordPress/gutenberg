@@ -40,15 +40,15 @@ describe( 'Autocomplete', () => {
 		);
 
 		const expectedCompleters = [ {}, {}, {} ];
-		wrapper = mount( <FilteredComponent completers={ expectedCompleters } /> );
+		wrapper = mount( <FilteredComponent completers={ expectedCompleters } blockName="core/foo" /> );
 
 		expect( completersFilter ).not.toHaveBeenCalled();
 		wrapper.find( 'input' ).simulate( 'focus' );
-		expect( completersFilter ).toHaveBeenCalledWith( expectedCompleters );
+		expect( completersFilter ).toHaveBeenCalledWith( expectedCompleters, 'core/foo' );
 	} );
 
 	it( 'filters completers supplied when already focused', () => {
-		wrapper = mount( <FilteredComponent completers={ [] } /> );
+		wrapper = mount( <FilteredComponent completers={ [] } blockName="core/foo" /> );
 
 		wrapper.find( 'input' ).getDOMNode().focus();
 		expect( wrapper.getDOMNode().contains( document.activeElement ) ).toBeTruthy();
@@ -64,7 +64,7 @@ describe( 'Autocomplete', () => {
 
 		expect( completersFilter ).not.toHaveBeenCalled();
 		wrapper.setProps( { completers: expectedCompleters } );
-		expect( completersFilter ).toHaveBeenCalledWith( expectedCompleters );
+		expect( completersFilter ).toHaveBeenCalledWith( expectedCompleters, 'core/foo' );
 	} );
 
 	it( 'provides copies of completers to filter', () => {
