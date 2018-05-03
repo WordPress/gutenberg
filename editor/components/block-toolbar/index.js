@@ -8,6 +8,7 @@ import { withSelect } from '@wordpress/data';
  * Internal Dependencies
  */
 import './style.scss';
+import BlockSwitcher from '../block-switcher';
 
 function BlockToolbar( { block, mode } ) {
 	if ( ! block || ! block.isValid || mode !== 'visual' ) {
@@ -16,6 +17,7 @@ function BlockToolbar( { block, mode } ) {
 
 	return (
 		<div className="editor-block-toolbar">
+			<BlockSwitcher uids={ [ block.uid ] } />
 			<BlockControls.Slot />
 			<BlockFormatControls.Slot />
 		</div>
