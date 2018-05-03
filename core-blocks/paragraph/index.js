@@ -279,14 +279,7 @@ const supports = {
 	className: false,
 };
 
-const deprecatedSchema = {
-	width: {
-		type: 'string',
-	},
-};
-
 const schema = {
-	...deprecatedSchema,
 	content: {
 		type: 'array',
 		source: 'children',
@@ -357,7 +350,12 @@ export const settings = {
 	deprecated: [
 		{
 			supports,
-			attributes: schema,
+			attributes: {
+				...schema,
+				width: {
+					type: 'string',
+				},
+			},
 			save( { attributes } ) {
 				const {
 					width,
