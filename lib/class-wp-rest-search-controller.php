@@ -63,7 +63,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			$allowed_post_types = $this->get_allowed_post_types( true );
 
 			if ( empty( $allowed_post_types ) ) {
-				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit content.' ), array( 'status' => rest_authorization_required_code() ) );
+				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit content.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 			}
 
 			if ( 'any' !== $request['type'] ) {
@@ -71,7 +71,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 					if ( 'any' !== $post_type && ! isset( $allowed_post_types[ $post_type ] ) ) {
 
 						/* translators: post type slug */
-						return new WP_Error( 'rest_forbidden_context', sprintf( __( 'Sorry, you are not allowed to edit content of type %s.' ), $post_type ), array( 'status' => rest_authorization_required_code() ) );
+						return new WP_Error( 'rest_forbidden_context', sprintf( __( 'Sorry, you are not allowed to edit content of type %s.', 'gutenberg' ), $post_type ), array( 'status' => rest_authorization_required_code() ) );
 					}
 				}
 			}
@@ -92,7 +92,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 
 		// Ensure a search string is set in case the orderby is set to 'relevance'.
 		if ( ! empty( $request['orderby'] ) && 'relevance' === $request['orderby'] && empty( $request['search'] ) ) {
-			return new WP_Error( 'rest_no_search_term_defined', __( 'You need to define a search term to order by relevance.' ), array( 'status' => 400 ) );
+			return new WP_Error( 'rest_no_search_term_defined', __( 'You need to define a search term to order by relevance.', 'gutenberg' ), array( 'status' => 400 ) );
 		}
 
 		// Retrieve the list of registered collection query parameters.
@@ -199,7 +199,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		$max_pages = ceil( $total_posts / (int) $posts_query->query_vars['posts_per_page'] );
 
 		if ( $page > $max_pages && $total_posts > 0 ) {
-			return new WP_Error( 'rest_post_invalid_page_number', __( 'The page number requested is larger than the number of pages available.' ), array( 'status' => 400 ) );
+			return new WP_Error( 'rest_post_invalid_page_number', __( 'The page number requested is larger than the number of pages available.', 'gutenberg' ), array( 'status' => 400 ) );
 		}
 
 		$response = rest_ensure_response( $posts );
@@ -477,30 +477,30 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			'type'       => 'object',
 			'properties' => array(
 				'author'       => array(
-					'description' => __( 'The ID for the author of the object.' ),
+					'description' => __( 'The ID for the author of the object.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
 				'content'      => array(
-					'description' => __( 'The content for the object.' ),
+					'description' => __( 'The content for the object.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),
 					'properties'  => array(
 						'raw'       => array(
-							'description' => __( 'Content for the object, as it exists in the database.' ),
+							'description' => __( 'Content for the object, as it exists in the database.', 'gutenberg' ),
 							'type'        => 'string',
 							'context'     => array( 'edit' ),
 							'readonly'    => true,
 						),
 						'rendered'  => array(
-							'description' => __( 'HTML content for the object, transformed for display.' ),
+							'description' => __( 'HTML content for the object, transformed for display.', 'gutenberg' ),
 							'type'        => 'string',
 							'context'     => array( 'view', 'edit' ),
 							'readonly'    => true,
 						),
 						'protected' => array(
-							'description' => __( 'Whether the content is protected with a password.' ),
+							'description' => __( 'Whether the content is protected with a password.', 'gutenberg' ),
 							'type'        => 'boolean',
 							'context'     => array( 'view', 'edit', 'embed' ),
 							'readonly'    => true,
@@ -508,38 +508,38 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 					),
 				),
 				'date'         => array(
-					'description' => __( "The date the object was published, in the site's timezone." ),
+					'description' => __( "The date the object was published, in the site's timezone.", 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
 				'date_gmt'     => array(
-					'description' => __( 'The date the object was published, as GMT.' ),
+					'description' => __( 'The date the object was published, as GMT.', 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'excerpt'      => array(
-					'description' => __( 'The excerpt for the object.' ),
+					'description' => __( 'The excerpt for the object.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'properties'  => array(
 						'raw'       => array(
-							'description' => __( 'Excerpt for the object, as it exists in the database.' ),
+							'description' => __( 'Excerpt for the object, as it exists in the database.', 'gutenberg' ),
 							'type'        => 'string',
 							'context'     => array( 'edit' ),
 							'readonly'    => true,
 						),
 						'rendered'  => array(
-							'description' => __( 'HTML excerpt for the object, transformed for display.' ),
+							'description' => __( 'HTML excerpt for the object, transformed for display.', 'gutenberg' ),
 							'type'        => 'string',
 							'context'     => array( 'view', 'edit', 'embed' ),
 							'readonly'    => true,
 						),
 						'protected' => array(
-							'description' => __( 'Whether the excerpt is protected with a password.' ),
+							'description' => __( 'Whether the excerpt is protected with a password.', 'gutenberg' ),
 							'type'        => 'boolean',
 							'context'     => array( 'view', 'edit', 'embed' ),
 							'readonly'    => true,
@@ -547,19 +547,19 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 					),
 				),
 				'guid'         => array(
-					'description' => __( 'The globally unique identifier for the object.' ),
+					'description' => __( 'The globally unique identifier for the object.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 					'properties'  => array(
 						'raw'      => array(
-							'description' => __( 'GUID for the object, as it exists in the database.' ),
+							'description' => __( 'GUID for the object, as it exists in the database.', 'gutenberg' ),
 							'type'        => 'string',
 							'context'     => array( 'edit' ),
 							'readonly'    => true,
 						),
 						'rendered' => array(
-							'description' => __( 'GUID for the object, transformed for display.' ),
+							'description' => __( 'GUID for the object, transformed for display.', 'gutenberg' ),
 							'type'        => 'string',
 							'context'     => array( 'view', 'edit' ),
 							'readonly'    => true,
@@ -567,58 +567,58 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 					),
 				),
 				'id'           => array(
-					'description' => __( 'Unique identifier for the object.' ),
+					'description' => __( 'Unique identifier for the object.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
 				'link'         => array(
-					'description' => __( 'URL to the object.' ),
+					'description' => __( 'URL to the object.', 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'uri',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
 				'modified'     => array(
-					'description' => __( "The date the object was last modified, in the site's timezone." ),
+					'description' => __( "The date the object was last modified, in the site's timezone.", 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'modified_gmt' => array(
-					'description' => __( 'The date the object was last modified, as GMT.' ),
+					'description' => __( 'The date the object was last modified, as GMT.', 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'date-time',
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'slug'         => array(
-					'description' => __( 'An alphanumeric identifier for the object unique to its type.' ),
+					'description' => __( 'An alphanumeric identifier for the object unique to its type.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
 				'status'       => array(
-					'description' => __( 'A named status for the object.' ),
+					'description' => __( 'A named status for the object.', 'gutenberg' ),
 					'type'        => 'string',
 					'enum'        => array_keys( $this->get_allowed_post_stati() ),
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'title'        => array(
-					'description' => __( 'The title for the object.' ),
+					'description' => __( 'The title for the object.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'properties'  => array(
 						'raw'      => array(
-							'description' => __( 'Title for the object, as it exists in the database.' ),
+							'description' => __( 'Title for the object, as it exists in the database.', 'gutenberg' ),
 							'type'        => 'string',
 							'context'     => array( 'edit' ),
 							'readonly'    => true,
 						),
 						'rendered' => array(
-							'description' => __( 'HTML title for the object, transformed for display.' ),
+							'description' => __( 'HTML title for the object, transformed for display.', 'gutenberg' ),
 							'type'        => 'string',
 							'context'     => array( 'view', 'edit', 'embed' ),
 							'readonly'    => true,
@@ -626,7 +626,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 					),
 				),
 				'type'         => array(
-					'description' => __( 'Type of the object.' ),
+					'description' => __( 'Type of the object.', 'gutenberg' ),
 					'type'        => 'string',
 					'enum'        => array_keys( $this->get_allowed_post_types() ),
 					'context'     => array( 'view', 'edit', 'embed' ),
@@ -652,13 +652,13 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		$query_params['context']['default'] = 'view';
 
 		$query_params['after'] = array(
-			'description' => __( 'Limit search results to content published after a given ISO8601 compliant date.' ),
+			'description' => __( 'Limit search results to content published after a given ISO8601 compliant date.', 'gutenberg' ),
 			'type'        => 'string',
 			'format'      => 'date-time',
 		);
 
 		$query_params['author'] = array(
-			'description' => __( 'Limit search results to content assigned to specific authors.' ),
+			'description' => __( 'Limit search results to content assigned to specific authors.', 'gutenberg' ),
 			'type'        => 'array',
 			'items'       => array(
 				'type' => 'integer',
@@ -667,20 +667,20 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		);
 
 		$query_params['before'] = array(
-			'description' => __( 'Limit search results to content published before a given ISO8601 compliant date.' ),
+			'description' => __( 'Limit search results to content published before a given ISO8601 compliant date.', 'gutenberg' ),
 			'type'        => 'string',
 			'format'      => 'date-time',
 		);
 
 		$query_params['order'] = array(
-			'description' => __( 'Order sort attribute ascending or descending.' ),
+			'description' => __( 'Order sort attribute ascending or descending.', 'gutenberg' ),
 			'type'        => 'string',
 			'default'     => 'desc',
 			'enum'        => array( 'asc', 'desc' ),
 		);
 
 		$query_params['orderby'] = array(
-			'description' => __( 'Sort collection by object attribute.' ),
+			'description' => __( 'Sort collection by object attribute.', 'gutenberg' ),
 			'type'        => 'string',
 			'default'     => 'date',
 			'enum'        => array(
@@ -695,7 +695,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		);
 
 		$query_params['slug'] = array(
-			'description'       => __( 'Limit search results to content with one or more specific slugs.' ),
+			'description'       => __( 'Limit search results to content with one or more specific slugs.', 'gutenberg' ),
 			'type'              => 'array',
 			'items'             => array(
 				'type' => 'string',
@@ -705,7 +705,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 
 		$query_params['type'] = array(
 			'default'     => 'any',
-			'description' => __( 'Limit search results to content of one or more types.' ),
+			'description' => __( 'Limit search results to content of one or more types.', 'gutenberg' ),
 			'type'        => 'array',
 			'items'       => array(
 				'enum' => array_merge( array_keys( $this->get_allowed_post_types() ), array( 'any' ) ),
