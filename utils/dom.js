@@ -40,16 +40,13 @@ export function isHorizontalEdge( container, isReverse ) {
 		return true;
 	}
 
-	const selection = window.getSelection();
-
-	const position = isReverse ? 'focus' : 'anchor';
-	const offset = selection[ `${ position }Offset` ];
+	const { focusNode, focusOffset: offset } = window.getSelection();
 
 	if ( isReverse && offset !== 0 ) {
 		return false;
 	}
 
-	let node = selection[ `${ position }Node` ];
+	let node = focusNode;
 	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
 
 	if ( ! isReverse && offset !== maxOffset ) {
