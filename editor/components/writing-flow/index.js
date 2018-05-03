@@ -53,6 +53,41 @@ const isTabbableTextField = overEvery( [
 	focus.tabbable.isTabbableIndex,
 ] );
 
+/**
+ * Returns true if the given node is a TinyMCE inline boundary node.
+ *
+ * @param {Node} node Node to test.
+ *
+ * @return {boolean} Whether node is a TinyMCE inline boundary node.
+ */
+function isInlineBoundary( node ) {
+	return node.getAttribute( 'data-mce-selected' ) === 'inline-boundary';
+}
+
+/**
+ * Returns true if it can be inferred that horizontal navigation has already
+ * been handled in the desired direction, or false otherwise. Specifically,
+ * this accounts for TinyMCE's inline boundary traversal, where its keydown
+ * event takes effect before the event propagates to WritingFlow. This avoids
+ * the caret from being moved outside the block when inline boundary occurs at
+ * the end of a RichText.
+ *
+ * @see tinymce/src/core/main/ts/keyboard/ArrowKeys.ts (executeKeydownOverride)
+ *
+ * @param {boolean} isReverse Whether to test in reverse.
+ *
+ * @return {boolean} Whether horizontal navigation has been handled.
+ */
+function isHorizontalNavigationHandled( isReverse ) {
+	const { isCollapsed, focusNode } = getSelection();
+	if ( ! isCollapsed ) {
+		return false;
+	}
+
+	const siblingNode = focusNode[ isReverse ? 'nextSibling' : 'previousSibling' ];
+	return !! siblingNode && isInlineBoundary( siblingNode );
+}
+
 class WritingFlow extends Component {
 	constructor() {
 		super( ...arguments );
@@ -228,7 +263,8 @@ class WritingFlow extends Component {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 				event.preventDefault();
 			}
-		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverse ) ) {
+		} else if ( isHorizontal && getSelection().isCollapsed &&
+				! isHorizontalNavigationHandled( isReverse ) && isHorizontalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();

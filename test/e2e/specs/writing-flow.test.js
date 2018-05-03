@@ -7,7 +7,12 @@ import { times } from 'lodash';
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier } from '../support/utils';
+import {
+	newPost,
+	newDesktopBrowserPage,
+	pressWithModifier,
+	getHTMLFromCodeEditor,
+} from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
@@ -111,5 +116,36 @@ describe( 'adding blocks', () => {
 		await page.keyboard.up( 'Shift' );
 		await page.keyboard.type( ' (Suffix)' );
 		await expectParagraphToMatchSnapshot( 1 );
+
+		// Should arrow once to escape out of inline boundary (bold, etc), and
+		// escaping out should nullify any block traversal.
+		await page.keyboard.press( 'Enter' );
+		await pressWithModifier( 'Mod', 'B' ); // Bold
+		await page.keyboard.type( 'Bolded' );
+		await expectParagraphToMatchSnapshot( 2 );
+
+		// Pressing space while having escaped on right edge of inline boundary
+		// should continue text as bolded.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( ' Words' );
+		await expectParagraphToMatchSnapshot( 2 );
+
+		// But typing immediately after escaping should not be within.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'After' );
+		await expectParagraphToMatchSnapshot( 2 );
+
+		// Navigate back to previous block. Change "(Suffix)" to "(Suffixed)"
+		//
+		// "Bolded WordsAfter" =   17 characters
+		//                       +  2 inline boundaries
+		//                       +  1 horizontal block traversal
+		//                       +  1 into parenthesis
+		//                       = 21
+		await promiseSequence( times( 21, () => () => page.keyboard.press( 'ArrowLeft' ) ) );
+		await page.keyboard.type( 'ed' );
+		await expectParagraphToMatchSnapshot( 1 );
+
+		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
 	} );
 } );
