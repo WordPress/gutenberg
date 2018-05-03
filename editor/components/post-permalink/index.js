@@ -72,6 +72,7 @@ class PostPermalink extends Component {
 					label={ ariaLabel }
 					onCopy={ () => this.setState( { isCopied: true } ) }
 					aria-disabled={ isCopied }
+					icon="admin-links"
 				/>
 
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
