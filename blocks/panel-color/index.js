@@ -14,13 +14,15 @@ import { compose } from '@wordpress/element';
  */
 import ColorPalette from '../color-palette';
 import withColorContext from '../with-color-context';
+import { getColorName } from '../colors';
 
-function PanelColor( { title, colorName, colorValue, initialOpen, ...props } ) {
+function PanelColor( { colors, title, colorValue, initialOpen, ...props } ) {
+	const colorName = getColorName( colors, colorValue );
 	return (
 		<PanelColorComponent { ...{ title, colorName, colorValue, initialOpen } } >
 			<ColorPalette
 				value={ colorValue }
-				{ ...omit( props, [ 'disableCustomColors', 'colors' ] ) }
+				{ ...omit( props, [ 'disableCustomColors' ] ) }
 			/>
 		</PanelColorComponent>
 	);

@@ -24,6 +24,19 @@ export const getColorValue = ( colors, namedColor, customColor ) => {
 };
 
 /**
+* Provided an array of named colors and a color value returns the color name.
+*
+* @param {Array}   colors      Array of color objects containing the "name" and "color" value as properties.
+* @param {?string} colorValue  A string containing the color value.
+*
+* @return {?string} If colorValue is defined and matches a color part of the colors array, it returns the color name for that color.
+*/
+export const getColorName = ( colors, colorValue ) => {
+	const colorObj = find( colors, { color: colorValue } );
+	return colorObj ? colorObj.name : undefined;
+};
+
+/**
  * Returns a function that receives the color value and sets it using the attribute for named colors or for custom colors.
  *
  * @param {Array}  colors                   Array of color objects containing the "name" and "color" value as properties.
