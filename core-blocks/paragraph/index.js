@@ -341,6 +341,8 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
+				// Paragraph is a fallback and should be matched last.
+				priority: 20,
 				selector: 'p',
 				schema: {
 					p: {
