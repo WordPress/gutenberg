@@ -271,7 +271,6 @@ export const settings = getEmbedBlockSettings( {
 		from: [
 			{
 				type: 'raw',
-				priority: 0,
 				isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
 				transform: ( node ) => {
 					return createBlock( 'core/embed', {
