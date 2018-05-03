@@ -238,7 +238,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'deactivate_plugins'     => array( 'administrator' ),
 			'export_others_personal_data' => array( 'administrator' ),
 			'erase_others_personal_data'  => array( 'administrator' ),
-			'manage_privacy_policy'       => array( 'administrator' ),
+			'manage_privacy_options'      => array( 'administrator' ),
 
 			'edit_categories'        => array( 'administrator', 'editor' ),
 			'delete_categories'      => array( 'administrator', 'editor' ),
@@ -272,7 +272,7 @@ class Tests_User_Capabilities extends WP_UnitTestCase {
 			'deactivate_plugins'     => array(),
 			'export_others_personal_data' => array( '' ),
 			'erase_others_personal_data'  => array( '' ),
-			'manage_privacy_policy'       => array(),
+			'manage_privacy_options'       => array(),
 
 			'customize'              => array( 'administrator' ),
 			'delete_site'            => array( 'administrator' ),
