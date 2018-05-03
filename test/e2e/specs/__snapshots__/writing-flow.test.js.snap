@@ -9,3 +9,7 @@ exports[`adding blocks Should navigate with arrow keys 3`] = `"Hello to the Worl
 exports[`adding blocks Should navigate with arrow keys 4`] = `"Greeting: Hello to the World!"`;
 
 exports[`adding blocks Should navigate with arrow keys 5`] = `"The Greeting: <br>Hello to the World!"`;
+
+exports[`adding blocks Should navigate with arrow keys 6`] = `"Prefix: Hello"`;
+
+exports[`adding blocks Should navigate with arrow keys 7`] = `"The Greeting: <br>Hello to the World! (Suffix)"`;

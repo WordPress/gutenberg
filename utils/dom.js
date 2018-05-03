@@ -8,7 +8,37 @@ import tinymce from 'tinymce';
  * Browser dependencies
  */
 const { getComputedStyle } = window;
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
+const { TEXT_NODE, ELEMENT_NODE, DOCUMENT_POSITION_PRECEDING } = window.Node;
+
+/**
+ * Returns true if the given selection object is in the forward direction, or
+ * false otherwise.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
+ *
+ * @param {Selection} selection Selection object to check.
+ *
+ * @return {boolean} Whether the selection is forward.
+ */
+function isSelectionForward( selection ) {
+	const {
+		anchorNode,
+		focusNode,
+		anchorOffset,
+		focusOffset,
+	} = selection;
+
+	const position = anchorNode.compareDocumentPosition( focusNode );
+
+	return (
+		// Compare whether anchor node precedes focus node.
+		position !== DOCUMENT_POSITION_PRECEDING &&
+
+		// `compareDocumentPosition` returns 0 when passed the same node, in
+		// which case compare offsets.
+		! ( position === 0 && anchorOffset > focusOffset )
+	);
+}
 
 /**
  * Check whether the selection is horizontally at the edge of the container.
@@ -47,22 +77,28 @@ export function isHorizontalEdge( container, isReverse ) {
 		return false;
 	}
 
-	const position = isReverse ? 'start' : 'end';
-	const order = isReverse ? 'first' : 'last';
-	const offset = range[ `${ position }Offset` ];
+	// Start and end offsets are always sorted small to large regardless of
+	// selection direction. If `isReverse` is does not align to selection
+	// being backward, invert the position.
+	let position = isReverse ? 'start' : 'end';
+	if ( isReverse === isSelectionForward( selection ) ) {
+		position = ( position === 'start' ) ? 'end' : 'start';
+	}
 
-	let node = range.startContainer;
+	const offset = range[ `${ position }Offset` ];
 
 	if ( isReverse && offset !== 0 ) {
 		return false;
 	}
 
+	let node = range.startContainer;
 	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
 
 	if ( ! isReverse && offset !== maxOffset ) {
 		return false;
 	}
 
+	const order = isReverse ? 'first' : 'last';
 	while ( node !== container ) {
 		const parentNode = node.parentNode;
 

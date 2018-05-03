@@ -84,5 +84,32 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( 'The ' );
 		await expectParagraphToMatchSnapshot( 1 );
+
+		// Pressing down from last paragraph should move caret to end of the
+		// text of the last paragraph
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		// Regression test: Ensure selection can be progressively collapsed at
+		// beginning and end of text while shift is held.
+		await promiseSequence( times( 5, () => () => page.keyboard.press( 'ArrowLeft' ) ) );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.type( 'Prefix: ' );
+		await expectParagraphToMatchSnapshot( 2 );
+
+		// Likewise, ensure progressive collapse from previous block (previous
+		// to guard against multi-selection behavior). Asserts arrow left to
+		// traverse horizontally to previous.
+		await promiseSequence( times( 9, () => () => page.keyboard.press( 'ArrowLeft' ) ) );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.type( ' (Suffix)' );
+		await expectParagraphToMatchSnapshot( 1 );
 	} );
 } );
