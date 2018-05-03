@@ -28,7 +28,7 @@ import {
 	deprecated,
 } from '@wordpress/utils';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
 
 /**
@@ -39,8 +39,7 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
-import InlineInsertionPoint from './inline-insertion-point';
-import MediaUpload from '../media-upload';
+import InlineBlocks from './inline-blocks';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
@@ -124,15 +123,12 @@ export class RichText extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
-		this.toggleInsertAvailable = this.toggleInsertAvailable.bind( this );
-		this.insertInlineBlock = this.insertInlineBlock.bind( this );
 		this.getFocusPosition = this.getFocusPosition.bind( this );
-		this.setInsertPosition = this.setInsertPosition.bind( this );
+		this.getInsertPosition = this.getInsertPosition.bind( this );
 
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
-			insertPosition: {},
 		};
 
 		this.containerRef = createRef();
@@ -233,11 +229,6 @@ export class RichText extends Component {
 	}
 
 	onInit() {
-		const { isSelected, setInsertAvailable } = this.props;
-
-		if ( isSelected ) {
-			setInsertAvailable();
-		}
 		this.registerCustomFormatters();
 
 		this.editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
@@ -451,45 +442,16 @@ export class RichText extends Component {
 		};
 	}
 
-	setInsertPosition() {
+	getInsertPosition() {
 		// The container is relatively positioned.
 		const containerPosition = this.containerRef.current.getBoundingClientRect();
 		const rect = getRectangleFromRange( this.editor.selection.getRng() );
-		const insertPosition = {
+
+		return {
 			top: rect.top - containerPosition.top,
 			left: rect.right - containerPosition.left,
 			height: rect.height,
 		};
-
-		this.setState( { insertPosition } );
-	}
-
-	insertInlineBlock() {
-		const { inlineBlockForInsert, completeInlineInsert } = this.props;
-
-		if ( inlineBlockForInsert.type === 'image' ) {
-			this.setState( { mediaLibraryOpen: true } );
-		} else {
-			this.editor.insertContent( inlineBlockForInsert.render() );
-			completeInlineInsert();
-		}
-	}
-
-	toggleInsertAvailable() {
-		const {
-			isSelected,
-			setInsertAvailable,
-			setInsertUnavailable,
-		} = this.props;
-
-		if ( isSelected ) {
-			// When moving between two different RichText with the keyboard, we need to
-			// make sure `setInsertAvailable` is called after `setInsertUnavailable`
-			// from previous RichText so that editor state is correct
-			setTimeout( setInsertAvailable, 0 );
-		} else {
-			setInsertUnavailable();
-		}
 	}
 
 	/**
@@ -780,25 +742,6 @@ export class RichText extends Component {
 			return;
 		}
 
-		if ( this.props.isSelected !== prevProps.isSelected ) {
-			this.toggleInsertAvailable();
-		}
-
-		if (
-			this.props.isInlineInsertionPointVisible &&
-			! prevProps.isInlineInsertionPointVisible
-		) {
-			this.setInsertPosition();
-		}
-
-		if (
-			this.props.isSelected &&
-			this.props.inlineBlockForInsert &&
-			! prevProps.inlineBlockForInsert
-		) {
-			this.insertInlineBlock();
-		}
-
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
 			this.props.tagName === prevProps.tagName &&
@@ -822,10 +765,6 @@ export class RichText extends Component {
 				console.error( 'Formatters passed via `formatters` prop will only be registered once. Formatters can be enabled/disabled via the `formattingControls` prop.' );
 			}
 		}
-	}
-
-	componentWillUnmount() {
-		this.props.setInsertUnavailable();
 	}
 
 	/**
@@ -913,9 +852,6 @@ export class RichText extends Component {
 			formatters,
 			autocompleters,
 			format,
-			isInlineInsertionPointVisible = false,
-			inlineBlockForInsert,
-			completeInlineInsert,
 		} = this.props;
 
 		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
@@ -953,25 +889,10 @@ export class RichText extends Component {
 						{ formatToolbar }
 					</div>
 				) }
-				{ isSelected && isInlineInsertionPointVisible &&
-					<InlineInsertionPoint
-						style={ this.state.insertPosition }
-					/>
-				}
-				{ this.state.mediaLibraryOpen &&
-					<MediaUpload
-						type="image"
-						onSelect={ ( media ) => {
-							const img = inlineBlockForInsert.render( media );
-							this.editor.insertContent( img );
-							completeInlineInsert();
-							this.setState( { mediaLibraryOpen: false } );
-						} }
-						onClose={ () => ( this.setState( { mediaLibraryOpen: false } ) ) }
-						render={ ( { open } ) => {
-							open();
-							return null;
-						} }
+				{ isSelected &&
+					<InlineBlocks
+						editor={ this.editor }
+						getInsertPosition={ this.getInsertPosition }
 					/>
 				}
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
@@ -1045,24 +966,9 @@ const RichTextContainer = compose( [
 	} ),
 	withSelect( ( select ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
-		const { isInlineInsertionPointVisible = noop } = select( 'core/editor' ) || {};
-		const { getInlineBlockForInsert = noop } = select( 'core/editor' ) || {};
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
-			isInlineInsertionPointVisible: isInlineInsertionPointVisible(),
-			inlineBlockForInsert: getInlineBlockForInsert(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { setInlineInsertAvailable = noop } = dispatch( 'core/editor' ) || {};
-		const { setInlineInsertUnavailable = noop } = dispatch( 'core/editor' ) || {};
-		const { completeInlineInsert = noop } = dispatch( 'core/editor' ) || {};
-
-		return {
-			setInsertAvailable: setInlineInsertAvailable,
-			setInsertUnavailable: setInlineInsertUnavailable,
-			completeInlineInsert,
 		};
 	} ),
 	withSafeTimeout,
