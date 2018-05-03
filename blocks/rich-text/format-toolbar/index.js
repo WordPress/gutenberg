@@ -16,7 +16,7 @@ import { prependHTTP } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { primaryShortcut, accessShortcut } from 'utils/keycodes';
+import { accessShortcut, primaryShortcut } from 'utils/keycodes';
 import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';

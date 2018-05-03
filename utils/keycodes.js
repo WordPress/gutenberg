@@ -3,6 +3,10 @@
  * functions in this file are intentional and should not be changed. They're
  * designed to fit with the standard menu keyboard shortcuts shown in the
  * user's platform.
+ *
+ * For example, on MacOS menu shortcuts will place Shift before Command, but
+ * on Windows Control will usually come first. So don't provide your own
+ * shortcut combos directly to keyboardShortcut().
  */
 export const BACKSPACE = 8;
 export const TAB = 9;
