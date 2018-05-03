@@ -15,6 +15,7 @@ import {
 	BlockControls,
 	AlignmentToolbar,
 	RichText,
+	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 
 /**
@@ -101,7 +102,16 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'BLOCKQUOTE',
+				selector: 'blockquote',
+				schema: {
+					blockquote: {
+						children: {
+							p: {
+								children: getPhrasingContentSchema(),
+							},
+						},
+					},
+				},
 			},
 		],
 		to: [
@@ -115,7 +125,7 @@ export const settings = {
 					}
 					// transforming a quote with content
 					return ( value || [] ).map( ( item ) => createBlock( 'core/paragraph', {
-						content: [ get( item, 'children.props.children', '' ) ],
+						content: [ get( item, [ 'children', 'props', 'children' ], '' ) ],
 					} ) ).concat( citation ? createBlock( 'core/paragraph', {
 						content: citation,
 					} ) : [] );

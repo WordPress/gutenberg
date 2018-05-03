@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues, overEvery } from 'lodash';
 import EquivalentKeyMap from 'equivalent-key-map';
@@ -10,6 +9,7 @@ import EquivalentKeyMap from 'equivalent-key-map';
  * WordPress dependencies
  */
 import { Component, createHigherOrderComponent, pure, compose } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -278,69 +278,80 @@ export function dispatch( reducerKey ) {
  *
  * @return {Component} Enhanced component with merged state data props.
  */
-export const withSelect = ( mapStateToProps ) => createHigherOrderComponent(
-	compose( [
-		pure,
-		( WrappedComponent ) => {
-			return class ComponentWithSelect extends Component {
-				constructor() {
-					super( ...arguments );
+export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	return class ComponentWithSelect extends Component {
+		constructor() {
+			super( ...arguments );
 
-					this.runSelection = this.runSelection.bind( this );
+			this.runSelection = this.runSelection.bind( this );
 
-					this.state = {};
-				}
+			/**
+			 * Boolean tracking known render conditions (own props or merged
+			 * props update) for `shouldComponentUpdate`.
+			 *
+			 * @type {boolean}
+			 */
+			this.shouldComponentUpdate = false;
 
-				componentWillMount() {
-					this.subscribe();
+			this.state = {};
+		}
 
-					// Populate initial state.
-					this.runSelection();
-				}
+		shouldComponentUpdate() {
+			return this.shouldComponentUpdate;
+		}
 
-				componentWillReceiveProps( nextProps ) {
-					if ( ! isShallowEqual( nextProps, this.props ) ) {
-						this.runSelection( nextProps );
-					}
-				}
+		componentWillMount() {
+			this.subscribe();
 
-				componentWillUnmount() {
-					this.unsubscribe();
+			// Populate initial state.
+			this.runSelection();
+		}
 
-					// While above unsubscribe avoids future listener calls, callbacks
-					// are snapshotted before being invoked, so if unmounting occurs
-					// during a previous callback, we need to explicitly track and
-					// avoid the `runSelection` that is scheduled to occur.
-					this.isUnmounting = true;
-				}
+		componentWillReceiveProps( nextProps ) {
+			if ( ! isShallowEqual( nextProps, this.props ) ) {
+				this.runSelection( nextProps );
+				this.shouldComponentUpdate = true;
+			}
+		}
 
-				subscribe() {
-					this.unsubscribe = subscribe( this.runSelection );
-				}
+		componentWillUnmount() {
+			this.unsubscribe();
 
-				runSelection( props = this.props ) {
-					if ( this.isUnmounting ) {
-						return;
-					}
+			// While above unsubscribe avoids future listener calls, callbacks
+			// are snapshotted before being invoked, so if unmounting occurs
+			// during a previous callback, we need to explicitly track and
+			// avoid the `runSelection` that is scheduled to occur.
+			this.isUnmounting = true;
+		}
 
-					const { mergeProps } = this.state;
-					const nextMergeProps = mapStateToProps( select, props ) || {};
+		subscribe() {
+			this.unsubscribe = subscribe( this.runSelection );
+		}
 
-					if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
-						this.setState( {
-							mergeProps: nextMergeProps,
-						} );
-					}
-				}
+		runSelection( props = this.props ) {
+			if ( this.isUnmounting ) {
+				return;
+			}
 
-				render() {
-					return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
-				}
-			};
-		},
-	] ),
-	'withSelect'
-);
+			const { mergeProps } = this.state;
+			const nextMergeProps = mapStateToProps( select, props ) || {};
+
+			if ( ! isShallowEqual( nextMergeProps, mergeProps ) ) {
+				this.setState( {
+					mergeProps: nextMergeProps,
+				} );
+
+				this.shouldComponentUpdate = true;
+			}
+		}
+
+		render() {
+			this.shouldComponentUpdate = false;
+
+			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
+		}
+	};
+}, 'withSelect' );
 
 /**
  * Higher-order component used to add dispatch props using registered action

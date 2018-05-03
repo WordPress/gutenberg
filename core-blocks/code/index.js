@@ -51,6 +51,17 @@ export const settings = {
 					node.children.length === 1 &&
 					node.firstChild.nodeName === 'CODE'
 				),
+				schema: {
+					pre: {
+						children: {
+							code: {
+								children: {
+									'#text': {},
+								},
+							},
+						},
+					},
+				},
 			},
 		],
 	},
