@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,11 +10,9 @@ import { __ } from '@wordpress/i18n';
 import { withState } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import {
-	createBlock,
 	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
-	InnerBlocks,
 } from '@wordpress/blocks';
 
 /**
@@ -23,7 +21,21 @@ import {
 import './editor.scss';
 import './style.scss';
 
+const toRichTextValue = ( value ) => map( value, ( ( subValue ) => subValue.children ) );
+const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
+	children: subValue,
+} ) );
 const blockAttributes = {
+	value: {
+		type: 'array',
+		source: 'query',
+		selector: 'blockquote > p',
+		query: {
+			children: {
+				source: 'node',
+			},
+		},
+	},
 	citation: {
 		type: 'array',
 		source: 'children',
@@ -59,7 +71,7 @@ export const settings = {
 	edit: withState( {
 		editable: 'content',
 	} )( ( { attributes, setAttributes, isSelected, className, editable, setState } ) => {
-		const { citation, align } = attributes;
+		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
@@ -72,7 +84,20 @@ export const settings = {
 					/>
 				</BlockControls>
 				<blockquote className={ className }>
-					<InnerBlocks />
+					<RichText
+						multiline="p"
+						value={ toRichTextValue( value ) }
+						onChange={
+							( nextValue ) => setAttributes( {
+								value: fromRichTextValue( nextValue ),
+							} )
+						}
+						/* translators: the text of the quotation */
+						placeholder={ __( 'Write quote…' ) }
+						wrapperClassName="blocks-pullquote__content"
+						isSelected={ isSelected && editable === 'content' }
+						onFocus={ onSetActiveEditable( 'content' ) }
+					/>
 					{ ( citation || isSelected ) && (
 						<RichText
 							tagName="cite"
@@ -94,11 +119,11 @@ export const settings = {
 	} ),
 
 	save( { attributes } ) {
-		const { citation, align } = attributes;
+		const { value, citation, align } = attributes;
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				<InnerBlocks.Content />
+				<RichText.Content value={ toRichTextValue( value ) } />
 				{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
@@ -107,54 +132,6 @@ export const settings = {
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
-			value: {
-				type: 'array',
-				source: 'query',
-				selector: 'blockquote > p',
-				query: {
-					children: {
-						source: 'node',
-					},
-				},
-			},
-		},
-
-		migrate( { value = [], ...attributes } ) {
-			return [
-				attributes,
-				value.map( ( { children: paragraph } ) =>
-					createBlock( 'core/paragraph', {
-						content: castArray( paragraph.props.children ),
-					} )
-				),
-			];
-		},
-
-		save( { attributes } ) {
-			const { value, citation, align } = attributes;
-
-			return (
-				<blockquote className={ `align${ align }` }>
-					{ value && value.map( ( paragraph, i ) =>
-						<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-					) }
-					{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
-				</blockquote>
-			);
-		},
-	}, {
-		attributes: {
-			...blockAttributes,
-			value: {
-				type: 'array',
-				source: 'query',
-				selector: 'blockquote > p',
-				query: {
-					children: {
-						source: 'node',
-					},
-				},
-			},
 			citation: {
 				type: 'array',
 				source: 'children',
@@ -167,9 +144,7 @@ export const settings = {
 
 			return (
 				<blockquote className={ `align${ align }` }>
-					{ value && value.map( ( paragraph, i ) =>
-						<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-					) }
+					<RichText.Content value={ toRichTextValue( value ) } />
 					{ citation && citation.length > 0 && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
 			);

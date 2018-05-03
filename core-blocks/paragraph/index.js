@@ -96,6 +96,10 @@ class ParagraphBlock extends Component {
 		setAttributes( { dropCap: ! attributes.dropCap } );
 	}
 
+	getDropCapHelp( checked ) {
+		return checked ? __( 'Showing large initial letter.' ) : __( 'Toggle to show a large initial letter.' );
+	}
+
 	getFontSize() {
 		const { customFontSize, fontSize } = this.props.attributes;
 		if ( fontSize ) {
@@ -210,6 +214,7 @@ class ParagraphBlock extends Component {
 							label={ __( 'Drop Cap' ) }
 							checked={ !! dropCap }
 							onChange={ this.toggleDropCap }
+							help={ this.getDropCapHelp }
 						/>
 					</PanelBody>
 					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor.value } initialOpen={ false }>
@@ -262,7 +267,8 @@ class ParagraphBlock extends Component {
 							} );
 						} }
 						onSplit={ insertBlocksAfter ?
-							( unused, after, ...blocks ) => {
+							( before, after, ...blocks ) => {
+								setAttributes( { content: before } );
 								insertBlocksAfter( [
 									...blocks,
 									createBlock( 'core/paragraph', { content: after } ),

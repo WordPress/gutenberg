@@ -979,8 +979,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script  = '( function() {';
 	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
 	$script .= <<<JS
-		window._wpLoadGutenbergEditor = wp.api.init().then( function() {
-			wp.coreBlocks.registerCoreBlocks();
+		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
+			wp.api.init().then( resolve );
+		} ).then( function() {
 			return wp.editPost.initializeEditor( 'editor', window._wpGutenbergPost, editorSettings );
 		} );
 JS;

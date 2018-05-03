@@ -2,7 +2,7 @@
 
 exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
 <Chrome
-  color="red"
+  color="#f00"
   disableAlpha={true}
   hex="#ff0000"
   hsl={
@@ -69,54 +69,66 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
 >
   <div
     className="blocks-color-palette__item-wrapper"
-    key="red"
+    key="#f00"
   >
-    <button
-      aria-label="Color: red"
-      aria-pressed={true}
-      className="blocks-color-palette__item is-active"
-      onClick={[Function]}
-      style={
-        Object {
-          "color": "red",
+    <Tooltip
+      text="red"
+    >
+      <button
+        aria-label="Color: red"
+        aria-pressed={true}
+        className="blocks-color-palette__item is-active"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#f00",
+          }
         }
-      }
-      type="button"
-    />
+        type="button"
+      />
+    </Tooltip>
   </div>
   <div
     className="blocks-color-palette__item-wrapper"
-    key="white"
+    key="#fff"
   >
-    <button
-      aria-label="Color: white"
-      aria-pressed={false}
-      className="blocks-color-palette__item"
-      onClick={[Function]}
-      style={
-        Object {
-          "color": "white",
+    <Tooltip
+      text="white"
+    >
+      <button
+        aria-label="Color: white"
+        aria-pressed={false}
+        className="blocks-color-palette__item"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#fff",
+          }
         }
-      }
-      type="button"
-    />
+        type="button"
+      />
+    </Tooltip>
   </div>
   <div
     className="blocks-color-palette__item-wrapper"
-    key="blue"
+    key="#00f"
   >
-    <button
-      aria-label="Color: blue"
-      aria-pressed={false}
-      className="blocks-color-palette__item"
-      onClick={[Function]}
-      style={
-        Object {
-          "color": "blue",
+    <Tooltip
+      text="blue"
+    >
+      <button
+        aria-label="Color: blue"
+        aria-pressed={false}
+        className="blocks-color-palette__item"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#00f",
+          }
         }
-      }
-      type="button"
-    />
+        type="button"
+      />
+    </Tooltip>
   </div>
   <button
     className="button-link blocks-color-palette__clear"
@@ -134,54 +146,66 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
 >
   <div
     className="blocks-color-palette__item-wrapper"
-    key="red"
+    key="#f00"
   >
-    <button
-      aria-label="Color: red"
-      aria-pressed={true}
-      className="blocks-color-palette__item is-active"
-      onClick={[Function]}
-      style={
-        Object {
-          "color": "red",
+    <Tooltip
+      text="red"
+    >
+      <button
+        aria-label="Color: red"
+        aria-pressed={true}
+        className="blocks-color-palette__item is-active"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#f00",
+          }
         }
-      }
-      type="button"
-    />
+        type="button"
+      />
+    </Tooltip>
   </div>
   <div
     className="blocks-color-palette__item-wrapper"
-    key="white"
+    key="#fff"
   >
-    <button
-      aria-label="Color: white"
-      aria-pressed={false}
-      className="blocks-color-palette__item"
-      onClick={[Function]}
-      style={
-        Object {
-          "color": "white",
+    <Tooltip
+      text="white"
+    >
+      <button
+        aria-label="Color: white"
+        aria-pressed={false}
+        className="blocks-color-palette__item"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#fff",
+          }
         }
-      }
-      type="button"
-    />
+        type="button"
+      />
+    </Tooltip>
   </div>
   <div
     className="blocks-color-palette__item-wrapper"
-    key="blue"
+    key="#00f"
   >
-    <button
-      aria-label="Color: blue"
-      aria-pressed={false}
-      className="blocks-color-palette__item"
-      onClick={[Function]}
-      style={
-        Object {
-          "color": "blue",
+    <Tooltip
+      text="blue"
+    >
+      <button
+        aria-label="Color: blue"
+        aria-pressed={false}
+        className="blocks-color-palette__item"
+        onClick={[Function]}
+        style={
+          Object {
+            "color": "#00f",
+          }
         }
-      }
-      type="button"
-    />
+        type="button"
+      />
+    </Tooltip>
   </div>
   <Dropdown
     className="blocks-color-palette__item-wrapper blocks-color-palette__custom-color"

@@ -345,6 +345,21 @@ function gutenberg_content_has_blocks( $content ) {
 }
 
 /**
+ * Returns the current version of the block format that the content string is using.
+ *
+ * If the string doesn't contain blocks, it returns 0.
+ *
+ * @since 2.8.0
+ * @see gutenberg_content_has_blocks()
+ *
+ * @param string $content Content to test.
+ * @return int The block format version.
+ */
+function gutenberg_content_block_version( $content ) {
+	return gutenberg_content_has_blocks( $content ) ? 1 : 0;
+}
+
+/**
  * Adds a "Gutenberg" post state for post tables, if the post contains blocks.
  *
  * @param  array   $post_states An array of post display states.
