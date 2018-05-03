@@ -61,7 +61,7 @@ class LatestPostsBlock extends Component {
 					<QueryControls
 						{ ...{ order, orderBy } }
 						numberOfItems={ postsToShow }
-						categoriesList={ get( categoriesList, 'data', {} ) }
+						categoriesList={ get( categoriesList, [ 'data' ], {} ) }
 						selectedCategoryId={ categories }
 						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
 						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
@@ -164,7 +164,7 @@ export default withAPIData( ( props ) => {
 	const latestPostsQuery = stringify( pickBy( {
 		categories,
 		order,
-		orderBy,
+		orderby: orderBy,
 		per_page: postsToShow,
 		_fields: [ 'date_gmt', 'link', 'title' ],
 	}, ( value ) => ! isUndefined( value ) ) );

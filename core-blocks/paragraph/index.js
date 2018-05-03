@@ -17,7 +17,6 @@ import {
 } from '@wordpress/element';
 import {
 	PanelBody,
-	PanelColor,
 	RangeControl,
 	ToggleControl,
 	Button,
@@ -31,10 +30,11 @@ import {
 	AlignmentToolbar,
 	BlockAlignmentToolbar,
 	BlockControls,
-	ColorPalette,
 	ContrastChecker,
 	InspectorControls,
+	PanelColor,
 	RichText,
+	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 
 /**
@@ -131,7 +131,10 @@ class ParagraphBlock extends Component {
 			mergeBlocks,
 			onReplace,
 			className,
-			initializeColor,
+			backgroundColor,
+			textColor,
+			setBackgroundColor,
+			setTextColor,
 			fallbackBackgroundColor,
 			fallbackTextColor,
 			fallbackFontSize,
@@ -146,16 +149,6 @@ class ParagraphBlock extends Component {
 		} = attributes;
 
 		const fontSize = this.getFontSize();
-		const textColor = initializeColor( {
-			colorContext: 'color',
-			colorAttribute: 'textColor',
-			customColorAttribute: 'customTextColor',
-		} );
-		const backgroundColor = initializeColor( {
-			colorContext: 'background-color',
-			colorAttribute: 'backgroundColor',
-			customColorAttribute: 'customBackgroundColor',
-		} );
 
 		return (
 			<Fragment>
@@ -213,18 +206,21 @@ class ParagraphBlock extends Component {
 							help={ this.getDropCapHelp }
 						/>
 					</PanelBody>
-					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor.value } colorName={ backgroundColor.name } initialOpen={ false }>
-						<ColorPalette
-							value={ backgroundColor.value }
-							onChange={ backgroundColor.set }
-						/>
-					</PanelColor>
-					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor.value } colorName={ textColor.name } initialOpen={ false }>
-						<ColorPalette
-							value={ textColor.value }
-							onChange={ textColor.set }
-						/>
-					</PanelColor>
+					<PanelColor
+						colorName={ backgroundColor.name }
+						colorValue={ backgroundColor.value }
+						initialOpen={ false }
+						title={ __( 'Background Color' ) }
+						onChange={ setBackgroundColor }
+					/>
+					<PanelColor
+						colorName={ textColor.name }
+						colorValue={ textColor.value }
+						initialOpen={ false }
+						title={ __( 'Text Color' ) }
+						onChange={ setTextColor }
+						value={ textColor.value }
+					/>
 					<ContrastChecker
 						textColor={ textColor.value }
 						backgroundColor={ backgroundColor.value }
@@ -348,12 +344,12 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
-				priority: 20,
-				isMatch: ( node ) => (
-					node.nodeName === 'P' &&
-					// Do not allow embedded content.
-					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
-				),
+				selector: 'p',
+				schema: {
+					p: {
+						children: getPhrasingContentSchema(),
+					},
+				},
 			},
 		],
 	},
@@ -429,7 +425,14 @@ export const settings = {
 	},
 
 	edit: compose(
-		withColors,
+		withColors( ( getColor, setColor, { attributes, setAttributes } ) => {
+			return {
+				backgroundColor: getColor( attributes.backgroundColor, attributes.customBackgroundColor, 'background-color' ),
+				setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor', setAttributes ),
+				textColor: getColor( attributes.textColor, attributes.customTextColor, 'color' ),
+				setTextColor: setColor( 'textColor', 'customTextColor', setAttributes ),
+			};
+		} ),
 		FallbackStyles,
 	)( ParagraphBlock ),
 

@@ -446,3 +446,41 @@ export function remove( node ) {
 export function insertAfter( newNode, referenceNode ) {
 	referenceNode.parentNode.insertBefore( newNode, referenceNode.nextSibling );
 }
+
+/**
+ * Unwrap the given node. This means any child nodes are moved to the parent.
+ *
+ * @param {Node} node The node to unwrap.
+ *
+ * @return {void}
+ */
+export function unwrap( node ) {
+	const parent = node.parentNode;
+
+	while ( node.firstChild ) {
+		parent.insertBefore( node.firstChild, node );
+	}
+
+	parent.removeChild( node );
+}
+
+/**
+ * Replaces the given node with a new node with the given tag name.
+ *
+ * @param {Element}  node    The node to replace
+ * @param {string}   tagName The new tag name.
+ * @param {Document} doc     The document of the node.
+ *
+ * @return {Element} The new node.
+ */
+export function replaceTag( node, tagName, doc ) {
+	const newNode = doc.createElement( tagName );
+
+	while ( node.firstChild ) {
+		newNode.appendChild( node.firstChild );
+	}
+
+	node.parentNode.replaceChild( newNode, node );
+
+	return newNode;
+}

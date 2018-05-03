@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues, overEvery } from 'lodash';
 import EquivalentKeyMap from 'equivalent-key-map';
@@ -10,6 +9,7 @@ import EquivalentKeyMap from 'equivalent-key-map';
  * WordPress dependencies
  */
 import { Component, createHigherOrderComponent, pure, compose } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies

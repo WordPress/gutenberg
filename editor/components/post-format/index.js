@@ -75,7 +75,7 @@ export default compose( [
 		const themeSupports = select( 'core' ).getThemeSupports();
 		// Ensure current format is always in the set.
 		// The current format may not be a format supported by the theme.
-		const supportedFormats = union( [ postFormat ], get( themeSupports, 'formats', [] ) );
+		const supportedFormats = union( [ postFormat ], get( themeSupports, [ 'formats' ], [] ) );
 		return {
 			postFormat,
 			supportedFormats,

@@ -18,8 +18,15 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, compose, RawHTML } from '@wordpress/element';
-import { keycodes, createBlobURL, isHorizontalEdge, getRectangleFromRange, getScrollContainer } from '@wordpress/utils';
+import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
+import {
+	keycodes,
+	createBlobURL,
+	isHorizontalEdge,
+	getRectangleFromRange,
+	getScrollContainer,
+	deprecated,
+} from '@wordpress/utils';
 import { withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
@@ -36,7 +43,7 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
-import { domToFormat, valueToString, isEmpty } from './format';
+import { domToFormat, valueToString } from './format';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -98,7 +105,7 @@ export function getFormatProperties( formatName, parents ) {
 const DEFAULT_FORMATS = [ 'bold', 'italic', 'strikethrough', 'link' ];
 
 export class RichText extends Component {
-	constructor( { value } ) {
+	constructor() {
 		super( ...arguments );
 
 		this.onInit = this.onInit.bind( this );
@@ -120,7 +127,7 @@ export class RichText extends Component {
 			selectedNodeId: 0,
 		};
 
-		this.isEmpty = ! value || ! value.length;
+		this.containerRef = createRef();
 	}
 
 	/**
@@ -153,6 +160,19 @@ export class RichText extends Component {
 		this.editor = editor;
 
 		EVENTS.forEach( ( name ) => {
+			if ( ! this.props.hasOwnProperty( 'on' + name ) ) {
+				return;
+			}
+
+			deprecated( 'Raw TinyMCE event handlers for RichText', {
+				version: '3.0',
+				alternative: (
+					'Documented props, ancestor event handler, or onSetup ' +
+					'access to the internal editor instance event hub'
+				),
+				plugin: 'gutenberg',
+			} );
+
 			editor.on( name, this.proxyPropHandler( name ) );
 		} );
 
@@ -263,8 +283,7 @@ export class RichText extends Component {
 		// Note: a pasted file may have the URL as plain text.
 		if ( item && ! HTML ) {
 			const blob = item.getAsFile ? item.getAsFile() : item;
-			const rootNode = this.editor.getBody();
-			const isEmptyEditor = this.editor.dom.isEmpty( rootNode );
+			const isEmptyEditor = this.isEmpty();
 			const content = rawHandler( {
 				HTML: `<img src="${ createBlobURL( blob ) }">`,
 				mode: 'BLOCKS',
@@ -327,8 +346,7 @@ export class RichText extends Component {
 			}
 		}
 
-		const rootNode = this.editor.getBody();
-		const isEmptyEditor = this.editor.dom.isEmpty( rootNode );
+		const isEmptyEditor = this.isEmpty();
 
 		let mode = 'INLINE';
 
@@ -357,7 +375,7 @@ export class RichText extends Component {
 				return;
 			}
 
-			if ( isEmpty && this.props.onReplace ) {
+			if ( isEmptyEditor && this.props.onReplace ) {
 				this.props.onReplace( content );
 			} else {
 				this.splitContent( content );
@@ -371,7 +389,6 @@ export class RichText extends Component {
 
 	onChange() {
 		this.savedContent = this.getContent();
-		this.isEmpty = isEmpty( this.savedContent, this.props.format );
 		this.props.onChange( this.savedContent );
 	}
 
@@ -386,24 +403,15 @@ export class RichText extends Component {
 	 *
 	 * Based on the selection of the text inside this element a position is
 	 * calculated where the toolbar should be. This can be used downstream to
-	 * absolutely position the toolbar. It does this by finding the closest
-	 * relative element.
+	 * absolutely position the toolbar.
 	 *
 	 * @param {DOMRect} position Caret range rectangle.
 	 *
 	 * @return {{top: number, left: number}} The desired position of the toolbar.
 	 */
 	getFocusPosition( position ) {
-		// Find the parent "relative" or "absolute" positioned container
-		const findRelativeParent = ( node ) => {
-			const style = window.getComputedStyle( node );
-			if ( style.position === 'relative' || style.position === 'absolute' ) {
-				return node;
-			}
-			return findRelativeParent( node.parentNode );
-		};
-		const container = findRelativeParent( this.editor.getBody() );
-		const containerPosition = container.getBoundingClientRect();
+		// The container is relatively positioned.
+		const containerPosition = this.containerRef.current.getBoundingClientRect();
 		const toolbarOffset = { top: 10, left: 0 };
 
 		return {
@@ -437,7 +445,7 @@ export class RichText extends Component {
 				this.props.onMerge( forward );
 			}
 
-			if ( this.props.onRemove && dom.isEmpty( rootNode ) ) {
+			if ( this.props.onRemove && this.isEmpty() ) {
 				this.props.onRemove( forward );
 			}
 
@@ -571,7 +579,7 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const { format } = this.props;
-			const before = domToFormat( beforeFragment.childNodes, format, this.editor );
+			const before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
 			const after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
 
 			this.restoreContentAndSplit( before, after, blocks );
@@ -722,6 +730,16 @@ export class RichText extends Component {
 		}
 	}
 
+	/**
+	 * Returns true if the field is currently empty, or false otherwise.
+	 *
+	 * @return {boolean} Whether field is empty.
+	 */
+	isEmpty() {
+		const { value } = this.props;
+		return ! value || ! value.length;
+	}
+
 	isFormatActive( format ) {
 		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
 	}
@@ -801,7 +819,7 @@ export class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty;
+		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const classes = classnames( wrapperClassName, 'blocks-rich-text' );
 
 		const formatToolbar = (
@@ -816,7 +834,7 @@ export class RichText extends Component {
 		);
 
 		return (
-			<div className={ classes }>
+			<div className={ classes } ref={ this.containerRef }>
 				{ isSelected && ! inlineToolbar && (
 					<BlockFormatControls>
 						{ formatToolbar }
