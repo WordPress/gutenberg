@@ -50,6 +50,10 @@ class LatestPostsBlock extends Component {
 		setAttributes( { displayPostDate: ! displayPostDate } );
 	}
 
+	getDisplayPostDateHelp( checked ) {
+		return checked ? __( 'Showing post date.' ) : __( 'Toggle to show post date.' );
+	}
+
 	render() {
 		const latestPosts = this.props.latestPosts.data;
 		const { attributes, categoriesList, setAttributes } = this.props;
@@ -72,6 +76,7 @@ class LatestPostsBlock extends Component {
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
 						onChange={ this.toggleDisplayPostDate }
+						help={ this.getDisplayPostDateHelp }
 					/>
 					{ postLayout === 'grid' &&
 						<RangeControl
