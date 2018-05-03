@@ -74,12 +74,12 @@ class PostPublishPanelPostpublish extends Component {
 					/>
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (
-							<Button className="button" href={ post.link }>
+							<Button isDefault href={ post.link }>
 								{ viewPostLabel }
 							</Button>
 						) }
 
-						<ClipboardButton className="button" text={ post.link } onCopy={ this.onCopy }>
+						<ClipboardButton isDefault text={ post.link } onCopy={ this.onCopy }>
 							{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy Link' ) }
 						</ClipboardButton>
 					</div>

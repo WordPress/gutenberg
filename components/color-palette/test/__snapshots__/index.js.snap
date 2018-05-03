@@ -130,13 +130,14 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
       />
     </Tooltip>
   </div>
-  <button
-    className="button-link components-color-palette__clear"
+  <Button
+    className="components-color-palette__clear"
+    isLink={true}
     onClick={[Function]}
     type="button"
   >
     Clear
-  </button>
+  </Button>
 </div>
 `;
 
@@ -213,12 +214,13 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
     renderContent={[Function]}
     renderToggle={[Function]}
   />
-  <button
-    className="button-link components-color-palette__clear"
+  <Button
+    className="components-color-palette__clear"
+    isLink={true}
     onClick={[Function]}
     type="button"
   >
     Clear
-  </button>
+  </Button>
 </div>
 `;
