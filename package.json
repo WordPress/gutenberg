@@ -44,7 +44,7 @@
     "flow": "flow",
     "prettier": "prettier --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
     "prettier:check": "prettier -l $npm_package_config_jsfiles $npm_package_config_scssfiles",
-    "clean": "yarn test --clearCache; watchman watch-del-all; rm -rf node_modules; rm -f yarn.lock; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/metro-symbolicate*; rm -rf $TMPDIR/jest_*",
+    "clean": "yarn test --clearCache; watchman watch-del-all; rm -rf node_modules; rm -f yarn.lock; rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/jest_*",
     "clean:install": "yarn clean; yarn",
     "lint": "eslint $npm_package_config_jsfiles",
     "lint:fix": "eslint $npm_package_config_jsfiles --fix"
