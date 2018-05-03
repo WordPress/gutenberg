@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "config": {
-    "jsfiles": "index.js src/*.js src/**/*.js",
+    "jsfiles": "./*.js src/*.js src/**/*.js",
     "scssfiles": "src/*.scss src/**/*.scss"
   },
   "devDependencies": {
