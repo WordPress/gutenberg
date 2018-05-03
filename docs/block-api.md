@@ -264,6 +264,18 @@ A once-only block can be inserted into each post, one time only. For example, th
 useOnce: true,
 ```
 
+#### isPrivate (optional)
+
+* **Type:** `Bool`
+* **Default:** `false`
+
+A block can be excluded from the block inserter and can be used internally. For example, using a block as a meta box. You can register a block to display and save meta values and set `isPrivate` to true so that it's not available to the user in block inserter.
+
+```js
+// Hide block from inserter
+isPrivate: true,
+```
+
 #### supports (optional)
 
 * **Type:** `Object`
