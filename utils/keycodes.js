@@ -124,11 +124,11 @@ export function primaryShortcut( character, _isMacOS = isMacOS ) {
  *
  * @return {string}          The keyboard shortcut.
  */
-export function tertiaryShortcut( character, _isMacOS = isMacOS ) {
-	return keyboardShortcut( tertiaryKeyCode( character.toUpperCase(), _isMacOS ), _isMacOS );
+export function secondaryShortcut( character, _isMacOS = isMacOS ) {
+	return keyboardShortcut( secondaryKeyCode( character.toUpperCase(), _isMacOS ), _isMacOS );
 }
 
-export function tertiaryKeyCode( character, _isMacOS = isMacOS ) {
+export function secondaryKeyCode( character, _isMacOS = isMacOS ) {
 	const keyCombo = _isMacOS() ? `${ SHIFT }+${ ALT }+${ PRIMARY }` : `${ PRIMARY }+${ SHIFT }+${ ALT }`;
 	return `${ keyCombo }+${ character }`;
 }

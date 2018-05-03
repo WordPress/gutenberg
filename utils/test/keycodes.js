@@ -11,8 +11,8 @@ import {
 	isMacOS,
 	keyboardShortcut,
 	primaryShortcut,
-	tertiaryKeyCode,
-	tertiaryShortcut,
+	secondaryKeyCode,
+	secondaryShortcut,
 } from '../keycodes';
 
 const isMacOSFalse = () => false;
@@ -131,30 +131,30 @@ describe( 'primaryShortcut', () => {
 	} );
 } );
 
-describe( 'tertiaryShortcut', () => {
+describe( 'secondaryShortcut', () => {
 	it( 'should uppercase character', () => {
-		const shortcut = tertiaryShortcut( 'm', isMacOSFalse );
+		const shortcut = secondaryShortcut( 'm', isMacOSFalse );
 		expect( shortcut ).toEqual( 'Ctrl+Shift+Alt+M' );
 	} );
 
 	it( 'should output Shift+Alt text on Windows', () => {
-		const shortcut = tertiaryShortcut( 'M', isMacOSFalse );
+		const shortcut = secondaryShortcut( 'M', isMacOSFalse );
 		expect( shortcut ).toEqual( 'Ctrl+Shift+Alt+M' );
 	} );
 
 	it( 'should output control+option symbols on MacOS', () => {
-		const shortcut = tertiaryShortcut( 'M', isMacOSTrue );
+		const shortcut = secondaryShortcut( 'M', isMacOSTrue );
 		expect( shortcut ).toEqual( '⇧⌥⌘M' );
 	} );
 } );
 
-describe( 'tertiaryKeyCode', () => {
+describe( 'secondaryKeyCode', () => {
 	it( 'outputs the correct keycode on MacOS', () => {
-		expect( tertiaryKeyCode( 'm', isMacOSTrue ) ).toEqual( 'shift+alt+mod+m' );
+		expect( secondaryKeyCode( 'm', isMacOSTrue ) ).toEqual( 'shift+alt+mod+m' );
 	} );
 
 	it( 'outputs the correct keycode on Windows', () => {
-		expect( tertiaryKeyCode( 'm', isMacOSFalse ) ).toEqual( 'mod+shift+alt+m' );
+		expect( secondaryKeyCode( 'm', isMacOSFalse ) ).toEqual( 'mod+shift+alt+m' );
 	} );
 } );
 
