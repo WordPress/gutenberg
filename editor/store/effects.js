@@ -589,6 +589,8 @@ export default {
 
 	MULTI_SELECT: removeProvisionalBlock,
 
+	INSERT_BLOCKS: removeProvisionalBlock,
+
 	REMOVE_BLOCKS( action, { getState, dispatch } ) {
 		// if the action says previous block should not be selected don't do anything.
 		if ( ! action.selectPrevious ) {

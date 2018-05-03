@@ -660,9 +660,5 @@ export function convertBlockToShared( uid ) {
  */
 export function insertDefaultBlock( attributes, rootUID, index ) {
 	const block = createBlock( getDefaultBlockName(), attributes );
-
-	return {
-		...insertBlock( block, index, rootUID ),
-		isProvisional: true,
-	};
+	return insertBlock( block, index, rootUID );
 }

@@ -37,6 +37,11 @@ import {
 	template,
 } from '../reducer';
 
+jest.mock( '@wordpress/blocks', () => ( {
+	...require.requireActual( '@wordpress/blocks' ),
+	isUnmodifiedDefaultBlock: jest.fn().mockReturnValue( false ),
+} ) );
+
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {
 		it( 'returns false if two objects do not have the same keys', () => {
@@ -1812,9 +1817,10 @@ describe( 'state', () => {
 		} );
 
 		it( 'returns the uid of the first inserted provisional block', () => {
+			require( '@wordpress/blocks' ).isUnmodifiedDefaultBlock.mockReturnValueOnce( true );
+
 			const state = provisionalBlockUID( null, {
 				type: 'INSERT_BLOCKS',
-				isProvisional: true,
 				blocks: [
 					{ uid: 'chicken' },
 				],

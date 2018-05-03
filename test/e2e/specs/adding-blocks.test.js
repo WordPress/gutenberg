@@ -61,22 +61,36 @@ describe( 'adding blocks', () => {
 		// out because default block is provisional.
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).toBeNull();
 
-		// Using the placeholder
+		// Enter from title creates new default block.
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/image' );
+		await page.keyboard.press( 'Enter' );
+
+		// Using the placeholder (works only below non-default blocks)
 		await page.click( '.editor-default-block-appender' );
 		await page.keyboard.type( 'Paragraph block' );
 
-		// Using the slash command
+		// Using the regular inserter. Should replace the default unmodified
+		// (provisional) block.
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '/quote' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'Quote block' );
-
-		// Using the regular inserter
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
 		await page.keyboard.type( 'code' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Code block' );
+
+		// Using the slash command
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( '/quote' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Quote block' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Can have multiple paragraphs' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( 'Cite' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Can have line breaks as well' );
+		await page.keyboard.press( 'ArrowDown' );
 
 		// Using the between inserter
 		await page.mouse.move( 200, 300 );
