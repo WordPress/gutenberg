@@ -8,9 +8,11 @@ import {
 	SHIFT,
 	accessKeyCode,
 	accessShortcut,
-	primaryShortcut,
-	keyboardShortcut,
 	isMacOS,
+	keyboardShortcut,
+	primaryShortcut,
+	tertiaryKeyCode,
+	tertiaryShortcut,
 } from '../keycodes';
 
 const isMacOSFalse = () => false;
@@ -98,13 +100,17 @@ describe( 'accessShortcut', () => {
 
 	it( 'should output control+option symbols on MacOS', () => {
 		const shortcut = accessShortcut( 'M', isMacOSTrue );
-		expect( shortcut ).toEqual( '⇧⌥M' );
+		expect( shortcut ).toEqual( '⌃⌥M' );
 	} );
 } );
 
 describe( 'accessKeyCode', () => {
-	it( 'outputs the correct keycode', () => {
-		expect( accessKeyCode( 'm' ) ).toEqual( 'shift+alt+m' );
+	it( 'outputs the correct keycode on MacOS', () => {
+		expect( accessKeyCode( 'm', isMacOSTrue ) ).toEqual( 'meta+alt+m' );
+	} );
+
+	it( 'outputs the correct keycode on Windows', () => {
+		expect( accessKeyCode( 'm', isMacOSFalse ) ).toEqual( 'shift+alt+m' );
 	} );
 } );
 
@@ -122,6 +128,33 @@ describe( 'primaryShortcut', () => {
 	it( 'should output control symbol on MacOS', () => {
 		const shortcut = primaryShortcut( 'M', isMacOSTrue );
 		expect( shortcut ).toEqual( '⌘M' );
+	} );
+} );
+
+describe( 'tertiaryShortcut', () => {
+	it( 'should uppercase character', () => {
+		const shortcut = tertiaryShortcut( 'm', isMacOSFalse );
+		expect( shortcut ).toEqual( 'Ctrl+Shift+Alt+M' );
+	} );
+
+	it( 'should output Shift+Alt text on Windows', () => {
+		const shortcut = tertiaryShortcut( 'M', isMacOSFalse );
+		expect( shortcut ).toEqual( 'Ctrl+Shift+Alt+M' );
+	} );
+
+	it( 'should output control+option symbols on MacOS', () => {
+		const shortcut = tertiaryShortcut( 'M', isMacOSTrue );
+		expect( shortcut ).toEqual( '⇧⌥⌘M' );
+	} );
+} );
+
+describe( 'tertiaryKeyCode', () => {
+	it( 'outputs the correct keycode on MacOS', () => {
+		expect( tertiaryKeyCode( 'm', isMacOSTrue ) ).toEqual( 'shift+alt+mod+m' );
+	} );
+
+	it( 'outputs the correct keycode on Windows', () => {
+		expect( tertiaryKeyCode( 'm', isMacOSFalse ) ).toEqual( 'mod+shift+alt+m' );
 	} );
 } );
 

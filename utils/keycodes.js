@@ -18,6 +18,7 @@ export const DELETE = 46;
 export const F10 = 121;
 
 export const ALT = 'alt';
+export const CTRL = 'ctrl';
 export const PRIMARY = 'mod';
 export const META = 'meta';
 export const SHIFT = 'shift';
@@ -74,7 +75,9 @@ export function keyboardShortcut( keys, _isMacOS = isMacOS ) {
 /**
  * Create an access key shortcut based on a single character.
  *
- * Access key combo is: Shift+Alt.
+ * Access key combo is:
+ *  - Control+Alt on MacOS.
+ *  - Shift+Alt on Windows/everywhere else.
  *
  * @param {string} character The character for the access combination.
  * @param {Object} _isMacOS  isMacOS function by default; used for DI testing.
@@ -82,11 +85,12 @@ export function keyboardShortcut( keys, _isMacOS = isMacOS ) {
  * @return {string}          The keyboard shortcut.
  */
 export function accessShortcut( character, _isMacOS = isMacOS ) {
-	return keyboardShortcut( accessKeyCode( character.toUpperCase() ), _isMacOS );
+	return keyboardShortcut( accessKeyCode( character.toUpperCase(), _isMacOS ), _isMacOS );
 }
 
-export function accessKeyCode( character ) {
-	return `${ SHIFT }+${ ALT }+${ character }`;
+export function accessKeyCode( character, _isMacOS = isMacOS ) {
+	const keyCombo = _isMacOS() ? `${ META }+${ ALT }` : `${ SHIFT }+${ ALT }`;
+	return `${ keyCombo }+${ character }`;
 }
 
 /**
@@ -102,4 +106,25 @@ export function accessKeyCode( character ) {
  */
 export function primaryShortcut( character, _isMacOS = isMacOS ) {
 	return keyboardShortcut( `${ PRIMARY }+${ character.toUpperCase() }`, _isMacOS );
+}
+
+/**
+ * Create an access key + primary key shortcut based on a single character.
+ *
+ * Access key combo is:
+ *  - Control+Alt+Command on MacOS.
+ *  - Control+Shift+Alt on Windows/everywhere else.
+ *
+ * @param {string} character The character for the access combination.
+ * @param {Object} _isMacOS  isMacOS function by default; used for DI testing.
+ *
+ * @return {string}          The keyboard shortcut.
+ */
+export function tertiaryShortcut( character, _isMacOS = isMacOS ) {
+	return keyboardShortcut( tertiaryKeyCode( character.toUpperCase(), _isMacOS ), _isMacOS );
+}
+
+export function tertiaryKeyCode( character, _isMacOS = isMacOS ) {
+	const keyCombo = _isMacOS() ? `${ SHIFT }+${ ALT }+${ PRIMARY }` : `${ PRIMARY }+${ SHIFT }+${ ALT }`;
+	return `${ keyCombo }+${ character }`;
 }
