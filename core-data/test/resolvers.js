@@ -6,8 +6,8 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getCategories, getEntityRecord, getEntityRecords, getPost } from '../resolvers';
-import { receiveTerms, receiveEntityRecords, receivePosts } from '../actions';
+import { getCategories, getEntityRecord, getEntityRecords } from '../resolvers';
+import { receiveTerms, receiveEntityRecords } from '../actions';
 
 jest.mock( '@wordpress/api-request' );
 
@@ -65,23 +65,5 @@ describe( 'getEntityRecords', () => {
 		const fulfillment = getEntityRecords( {}, 'root', 'postType' );
 		const received = ( await fulfillment.next() ).value;
 		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ) ) );
-	} );
-} );
-
-describe( 'getPost', () => {
-	const POST = { id: 10 };
-
-	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
-			if ( options.path === '/wp/v2/posts/10?context=edit' ) {
-				return Promise.resolve( POST );
-			}
-		} );
-	} );
-
-	it( 'yields with requested post', async () => {
-		const fulfillment = getPost( {}, 10 );
-		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receivePosts( POST ) );
 	} );
 } );

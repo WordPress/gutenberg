@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map } from 'lodash';
+import { map, find, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -104,6 +104,31 @@ export const getUserQueryResults = createSelector(
 );
 
 /**
+ * Returns whether the entities for the give kind are loaded.
+ *
+ * @param {Object} state   Data state.
+ * @param {string} kind  Entity kind.
+ *
+ * @return {boolean} Whether the entities are loaded
+ */
+export function hasEntitiesByKind( state, kind ) {
+	return state.entities.config[ kind ] !== undefined;
+}
+
+/**
+ * Returns the entity object given its kind and name.
+ *
+ * @param {Object} state   Data state.
+ * @param {string} kind  Entity kind.
+ * @param {string} name  Entity name.
+ *
+ * @return {Object} Entity
+ */
+export function getEntity( state, kind, name ) {
+	return find( state.entities.config, { kind, name } );
+}
+
+/**
  * Returns the Entity's record object by key.
  *
  * @param {Object} state  State tree
@@ -114,7 +139,7 @@ export const getUserQueryResults = createSelector(
  * @return {Object?} Record.
  */
 export function getEntityRecord( state, kind, name, key ) {
-	return state.entities[ kind ][ name ].byKey[ key ];
+	return get( state.entities.data, [ kind, name, 'byKey', key ] );
 }
 
 /**
@@ -142,16 +167,4 @@ export const getEntityRecords = createSelector(
  */
 export function getThemeSupports( state ) {
 	return state.themeSupports;
-}
-
-/**
- * Returns the Post object by ID.
- *
- * @param {Object} state Data state.
- * @param {number} id    Post ID.
- *
- * @return {Object?}     Post object.
- */
-export function getPost( state, id ) {
-	return state.posts[ id ];
 }

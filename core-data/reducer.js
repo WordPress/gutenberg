@@ -11,7 +11,7 @@ import { combineReducers } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import entitiesConfig from './entities';
+import { defaultEntities } from './entities';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -135,19 +135,60 @@ function entity( entityConfig ) {
 	};
 }
 
-const entitiesByKind = groupBy( entitiesConfig, 'kind' );
-export const entities = combineReducers( Object.entries( entitiesByKind ).reduce( ( memo, [ kind, subEntities ] ) => {
-	const kindReducer = combineReducers( subEntities.reduce(
-		( kindMemo, entityConfig ) => ( {
-			...kindMemo,
-			[ entityConfig.name ]: entity( entityConfig ),
-		} ),
-		{}
-	) );
+/**
+ * Reducer keeping track of the registered entities.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function entitiesConfig( state = defaultEntities, action ) {
+	switch ( action.type ) {
+		case 'ADD_ENTITIES':
+			return [
+				...state,
+				...action.entities,
+			];
+	}
 
-	memo[ kind ] = kindReducer;
-	return memo;
-}, {} ) );
+	return state;
+}
+
+/**
+ * Reducer keeping track of the registered entities config and data.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const entities = ( state = {}, action ) => {
+	const newConfig = entitiesConfig( state.config, action );
+
+	// Generates a dynamic reducer for the entities
+	const entitiesByKind = groupBy( newConfig, 'kind' );
+	const entitiesDataReducer = combineReducers( Object.entries( entitiesByKind ).reduce( ( memo, [ kind, subEntities ] ) => {
+		const kindReducer = combineReducers( subEntities.reduce(
+			( kindMemo, entityConfig ) => ( {
+				...kindMemo,
+				[ entityConfig.name ]: entity( entityConfig ),
+			} ),
+			{}
+		) );
+
+		memo[ kind ] = kindReducer;
+		return memo;
+	}, {} ) );
+
+	const newData = entitiesDataReducer( state.data, action );
+
+	if ( newData === state.data && newConfig === state.config ) {
+		return state;
+	}
+
+	return { data: newData, config: newConfig };
+};
 
 /*
  * Reducer managing posts state. Keyed by ID.
@@ -176,4 +217,5 @@ export default combineReducers( {
 	themeSupports,
 	entities,
 	posts,
+	users,
 } );

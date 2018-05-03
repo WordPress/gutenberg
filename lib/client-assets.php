@@ -934,10 +934,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Preload common data.
 	$preload_paths = array(
 		'/',
+		'/wp/v2/types?context=edit',
+		'/wp/v2/taxonomies?context=edit',
 		sprintf( '/wp/v2/posts/%s?context=edit', $post->ID ),
 		sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
 		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
-		'/wp/v2/taxonomies?context=edit',
 	);
 
 	$preload_data = array_reduce(
@@ -950,11 +951,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'wp-components',
 		sprintf( 'window._wpAPIDataPreload = %s', wp_json_encode( $preload_data ) ),
 		'before'
-	);
-
-	wp_add_inline_script(
-		'wp-edit-post',
-		sprintf( 'window._wpGutenbergPostId = %s;', $post->ID )
 	);
 
 	// Prepopulate with some test content in demo.
@@ -1079,18 +1075,20 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$editor_settings['templateLock'] = ! empty( $post_type_object->template_lock ) ? $post_type_object->template_lock : false;
 	}
 
-	$script  = '( function() {';
-	$script .= sprintf( 'var editorSettings = %s;', wp_json_encode( $editor_settings ) );
-	$script .= <<<JS
+	$init_script = <<<JS
+	( function() {
+		var editorSettings = %s;
 		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
 			wp.api.init().then( function() {
 				wp.domReady( function() {
-					resolve( wp.editPost.initializeEditor( 'editor', window._wpGutenbergPostId, editorSettings, window._wpGutenbergDefaultPost ) );
+					resolve( wp.editPost.initializeEditor( 'editor', %d, "%s", editorSettings, window._wpGutenbergDefaultPost ) );
 				} );
 			} );
 		} );
+} )();
 JS;
-	$script .= '} )();';
+
+	$script = sprintf( $init_script, wp_json_encode( $editor_settings ), $post->ID, $post->post_type );
 	wp_add_inline_script( 'wp-edit-post', $script );
 
 	/**

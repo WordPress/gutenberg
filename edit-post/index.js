@@ -29,16 +29,17 @@ window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
  * an initial state from prior to the crash.
  *
  * @param {Object}  postId   ID of the post to edit.
+ * @param {Object}  postType      Post type of the post to edit.
  * @param {Element} target   DOM node in which editor is rendered.
  * @param {?Object} settings Editor settings object.
  * @param {Object}  defaultPost   Post initilization object
  */
-export function reinitializeEditor( postId, target, settings, defaultPost ) {
+export function reinitializeEditor( postId, postType, target, settings, defaultPost ) {
 	unmountComponentAtNode( target );
 	const reboot = reinitializeEditor.bind( null, postId, target, settings, defaultPost );
 
 	render(
-		<Editor settings={ settings } onError={ reboot } postId={ postId } defaultPost={ defaultPost } recovery />,
+		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } defaultPost={ defaultPost } recovery />,
 		target
 	);
 }
@@ -51,12 +52,13 @@ export function reinitializeEditor( postId, target, settings, defaultPost ) {
  *
  * @param {string}  id            Unique identifier for editor instance.
  * @param {Object}  postId        ID of the post to edit.
+ * @param {Object}  postType      Post type of the post to edit.
  * @param {?Object} settings      Editor settings object.
  * @param {Object}  defaultPost   Post initilization object
  *
  * @return {Object} Editor interface.
  */
-export function initializeEditor( id, postId, settings, defaultPost ) {
+export function initializeEditor( id, postId, postType, settings, defaultPost ) {
 	if ( 'production' !== process.env.NODE_ENV ) {
 		// Remove with 3.0 release.
 		window.console.info(
@@ -67,12 +69,12 @@ export function initializeEditor( id, postId, settings, defaultPost ) {
 	}
 
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, postId, target, settings, defaultPost );
+	const reboot = reinitializeEditor.bind( null, postId, postType, target, settings, defaultPost );
 
 	registerCoreBlocks();
 
 	render(
-		<Editor settings={ settings } onError={ reboot } postId={ postId } defaultPost={ defaultPost } />,
+		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } defaultPost={ defaultPost } />,
 		target
 	);
 

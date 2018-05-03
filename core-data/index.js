@@ -10,7 +10,7 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
-import { default as entities, getMethodName } from './entities';
+import { defaultEntities, getMethodName } from './entities';
 
 /**
  * The reducer key used by core data in store registration.
@@ -19,7 +19,7 @@ import { default as entities, getMethodName } from './entities';
  */
 export const REDUCER_KEY = 'core';
 
-const createEntityRecordGetter = ( source ) => entities.reduce( ( result, entity ) => {
+const createEntityRecordGetter = ( source ) => defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name ) ] = ( state, key ) => source.getEntityRecord( state, kind, name, key );
 	result[ getMethodName( kind, name, 'get', true ) ] = ( state ) => source.getEntityRecords( state, kind, name );

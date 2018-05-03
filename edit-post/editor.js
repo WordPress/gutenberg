@@ -28,7 +28,7 @@ function Editor( { settings, hasFixedToolbar, post, defaultPost, onError, ...pro
 	);
 }
 
-export default withSelect( ( select, { postId } ) => ( {
+export default withSelect( ( select, { postId, postType } ) => ( {
 	hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-	post: select( 'core' ).getPost( postId ),
+	post: select( 'core' ).getEntityRecord( 'postType', postType, postId ),
 } ) )( Editor );
