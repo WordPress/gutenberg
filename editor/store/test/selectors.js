@@ -58,6 +58,7 @@ const {
 	getPreviousBlockUid,
 	getNextBlockUid,
 	isBlockSelected,
+	hasSelectedInnerBlock,
 	isBlockWithinSelection,
 	hasMultiSelection,
 	isBlockMultiSelected,
@@ -2080,6 +2081,38 @@ describe( 'selectors', () => {
 			};
 
 			expect( isBlockSelected( state, 23 ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'hasSelectedInnerBlock', () => {
+		it( 'should return false if the selected block is a child of the given UID', () => {
+			const state = {
+				blockSelection: { start: 5, end: 5 },
+				editor: {
+					present: {
+						blockOrder: {
+							4: [ 3, 2, 1 ],
+						},
+					},
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, 4 ) ).toBe( false );
+		} );
+
+		it( 'should return true if the selected block is a child of the given UID', () => {
+			const state = {
+				blockSelection: { start: 3, end: 3 },
+				editor: {
+					present: {
+						blockOrder: {
+							4: [ 3, 2, 1 ],
+						},
+					},
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, 4 ) ).toBe( true );
 		} );
 	} );
 

@@ -378,6 +378,15 @@
 		z-index: z-index( '.editor-block-list__block {core/image aligned wide or fullwide}' );
 	}
 
+	// Wide
+	&[data-align="wide"] {
+		// compensate for main container padding
+		@include break-small() {
+			margin-left: $block-side-ui-padding;
+			margin-right: $block-side-ui-padding;
+		}
+	}
+
 	// Full-wide
 	&[data-align="full"] {
 
@@ -409,11 +418,12 @@
 			border-right-width: 0;
 		}
 
-		// Mover and settings in wide
+		// Mover and settings in full-wide
 		> .editor-block-mover,
 		> .editor-block-settings-menu {
-			top: -29px;
+			top: -$block-side-ui-width - 1px; // move upwards the height of the button +1px for border
 			bottom: auto;
+			min-height: 0;
 			height: auto;
 			width: auto;
 			z-index: inherit;
@@ -429,11 +439,24 @@
 
 		> .editor-block-settings-menu {
 			right: 10px;
+			width: $block-side-ui-width * 2;
+			flex-direction: row;
 		}
 
 		> .editor-block-mover .editor-block-mover__control,
 		> .editor-block-settings-menu > * {
 			float: left;
+		}
+
+		// There is no side UI clearance on fullwide elements, so they are simply not draggable on the sides
+		> .editor-block-list__block-draggable {
+			left: 0;
+			right: 0;
+		}
+
+		// Position hover label on the right
+		> .editor-block-list__breadcrumb {
+			right: 0;
 		}
 
 		// Hide mover until wide breakpoints, or it might be covered by toolbar
@@ -653,13 +676,20 @@
 	}
 }
 
-.editor-block-list__block > .editor-block-list__insertion-point {
-	position: absolute;
-	top: -$block-padding - $block-spacing / 2;
-	height: $block-padding * 2; // Matches the whole empty space between two blocks
-	bottom: auto;
-	left: -1px;
-	right: -1px;
+.editor-block-list__block {
+	> .editor-block-list__insertion-point {
+		position: absolute;
+		top: -$block-padding - $block-spacing / 2;
+		height: $block-padding * 2; // Matches the whole empty space between two blocks
+		bottom: auto;
+		left: -1px;
+		right: -1px;
+	}
+
+	&[data-align="full"] > .editor-block-list__insertion-point {
+		left: 0;
+		right: 0;
+	}
 }
 
 .editor-block-list__block .editor-block-list__block-html-textarea {

@@ -15,6 +15,7 @@ import {
 	orderBy,
 	reduce,
 	size,
+	some,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -933,6 +934,18 @@ export function isBlockSelected( state, uid ) {
 	}
 
 	return start === uid;
+}
+
+/**
+ * Returns true if one of the block's inner blocks is selected.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {boolean} Whether the block as an inner block selected
+ */
+export function hasSelectedInnerBlock( state, uid ) {
+	return some( getBlockOrder( state, uid ), ( innerUID ) => isBlockSelected( state, innerUID ) );
 }
 
 /**

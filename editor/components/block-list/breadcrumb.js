@@ -7,13 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { compose, Component } from '@wordpress/element';
-<<<<<<< HEAD
-import { IconButton, Toolbar } from '@wordpress/components';
-=======
-import { Button, Tooltip, Toolbar } from '@wordpress/components';
->>>>>>> Polish the breadcrumb, tweak paddings
+import { Toolbar } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -57,7 +52,7 @@ export class BlockBreadcrumb extends Component {
 	}
 
 	render( ) {
-		const { uid, rootUID, selectRootBlock, isHidden } = this.props;
+		const { uid, rootUID, isHidden } = this.props;
 		const { isFocused } = this.state;
 
 		return (
