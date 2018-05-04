@@ -54,7 +54,7 @@ export const settings = {
 		],
 	},
 
-	edit: edit,
+	edit,
 
 	save( { attributes } ) {
 		return <pre><code>{ attributes.content }</code></pre>;
