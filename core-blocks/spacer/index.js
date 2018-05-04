@@ -8,7 +8,7 @@ import ResizableBox from 're-resizable';
  */
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/blocks';
+import { InspectorControls } from '@wordpress/editor';
 import { BaseControl, PanelBody } from '@wordpress/components';
 
 /**

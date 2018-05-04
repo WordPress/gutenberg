@@ -32,7 +32,7 @@ import {
 	withColorContext,
 	getColorClass,
 	getColorName,
-	withColor,
+	withColors,
 } from './components';
 
 const componentsToDepreacate = {
@@ -61,7 +61,7 @@ const functionsToDeprecate = {
 	withColorContext,
 	getColorClass,
 	getColorName,
-	withColor,
+	withColors,
 };
 
 forEach( componentsToDepreacate, ( WrappedComponent, key ) => {
