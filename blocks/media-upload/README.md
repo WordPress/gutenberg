@@ -78,6 +78,21 @@ Callback called when the media modal is closed, the selected media are passed as
 - Type: `Function`
 - Required: Yes
 
+### title
+
+Title displayed in the media modal.
+
+- Type: `String`
+- Required: No
+- Default: `Select or Upload Media`
+
+### modalClass
+
+CSS class added to the media modal frame.
+
+- Type: `String`
+- Required: No
+
 ## render
 
 A callback invoked to render the Button opening the media library.

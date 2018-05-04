@@ -6,8 +6,8 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getCategories, getMedia, getPostType } from '../resolvers';
-import { setRequested, receiveTerms, receiveMedia, receivePostTypes } from '../actions';
+import { getCategories, getEntityRecord } from '../resolvers';
+import { setRequested, receiveTerms, receiveEntityRecords } from '../actions';
 
 jest.mock( '@wordpress/api-request' );
 
@@ -31,25 +31,7 @@ describe( 'getCategories', () => {
 	} );
 } );
 
-describe( 'getMedia', () => {
-	const MEDIA = { id: 1 };
-
-	beforeAll( () => {
-		apiRequest.mockImplementation( ( options ) => {
-			if ( options.path === '/wp/v2/media/1' ) {
-				return Promise.resolve( MEDIA );
-			}
-		} );
-	} );
-
-	it( 'yields with requested media', async () => {
-		const fulfillment = getMedia( {}, 1 );
-		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receiveMedia( MEDIA ) );
-	} );
-} );
-
-describe( 'getPostType', () => {
+describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
 
 	beforeAll( () => {
@@ -61,8 +43,8 @@ describe( 'getPostType', () => {
 	} );
 
 	it( 'yields with requested post type', async () => {
-		const fulfillment = getPostType( {}, 'post' );
+		const fulfillment = getEntityRecord( {}, 'root', 'postType', 'post' );
 		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( receivePostTypes( POST_TYPE ) );
+		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', POST_TYPE ) );
 	} );
 } );

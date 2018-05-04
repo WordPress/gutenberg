@@ -13,6 +13,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
+import Button from '../button';
 
 class ClipboardButton extends Component {
 	constructor() {
@@ -78,13 +79,15 @@ class ClipboardButton extends Component {
 		// Disable reason: Exclude from spread props passed to Button
 		// eslint-disable-next-line no-unused-vars
 		const { className, children, onCopy, onFinishCopy, text, ...buttonProps } = this.props;
+		const { icon } = buttonProps;
 		const classes = classnames( 'components-clipboard-button', className );
+		const ComponentToUse = icon ? IconButton : Button;
 
 		return (
 			<span ref={ this.bindContainer }>
-				<IconButton { ...buttonProps } icon="admin-links" className={ classes }>
+				<ComponentToUse { ...buttonProps } className={ classes }>
 					{ children }
-				</IconButton>
+				</ComponentToUse>
 			</span>
 		);
 	}

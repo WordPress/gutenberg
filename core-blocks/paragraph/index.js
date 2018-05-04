@@ -17,7 +17,6 @@ import {
 } from '@wordpress/element';
 import {
 	PanelBody,
-	PanelColor,
 	RangeControl,
 	ToggleControl,
 	Button,
@@ -29,12 +28,12 @@ import {
 	getColorClass,
 	withColors,
 	AlignmentToolbar,
-	BlockAlignmentToolbar,
 	BlockControls,
-	ColorPalette,
 	ContrastChecker,
 	InspectorControls,
+	PanelColor,
 	RichText,
+	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 
 /**
@@ -145,7 +144,6 @@ class ParagraphBlock extends Component {
 			content,
 			dropCap,
 			placeholder,
-			width,
 		} = attributes;
 
 		const fontSize = this.getFontSize();
@@ -206,18 +204,18 @@ class ParagraphBlock extends Component {
 							help={ this.getDropCapHelp }
 						/>
 					</PanelBody>
-					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor.value } colorName={ backgroundColor.name } initialOpen={ false }>
-						<ColorPalette
-							value={ backgroundColor.value }
-							onChange={ setBackgroundColor }
-						/>
-					</PanelColor>
-					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor.value } colorName={ textColor.name } initialOpen={ false }>
-						<ColorPalette
-							value={ textColor.value }
-							onChange={ setTextColor }
-						/>
-					</PanelColor>
+					<PanelColor
+						colorValue={ backgroundColor.value }
+						initialOpen={ false }
+						title={ __( 'Background Color' ) }
+						onChange={ setBackgroundColor }
+					/>
+					<PanelColor
+						colorValue={ textColor.value }
+						initialOpen={ false }
+						title={ __( 'Text Color' ) }
+						onChange={ setTextColor }
+					/>
 					<ContrastChecker
 						textColor={ textColor.value }
 						backgroundColor={ backgroundColor.value }
@@ -227,12 +225,6 @@ class ParagraphBlock extends Component {
 						} }
 						isLargeText={ fontSize >= 18 }
 					/>
-					<PanelBody title={ __( 'Block Alignment' ) }>
-						<BlockAlignmentToolbar
-							value={ width }
-							onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
-						/>
-					</PanelBody>
 				</InspectorControls>
 				<div>
 					<RichText
@@ -297,9 +289,6 @@ const schema = {
 	placeholder: {
 		type: 'string',
 	},
-	width: {
-		type: 'string',
-	},
 	textColor: {
 		type: 'string',
 	},
@@ -341,17 +330,71 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
+				// Paragraph is a fallback and should be matched last.
 				priority: 20,
-				isMatch: ( node ) => (
-					node.nodeName === 'P' &&
-					// Do not allow embedded content.
-					! node.querySelector( 'audio, canvas, embed, iframe, img, math, object, svg, video' )
-				),
+				selector: 'p',
+				schema: {
+					p: {
+						children: getPhrasingContentSchema(),
+					},
+				},
 			},
 		],
 	},
 
 	deprecated: [
+		{
+			supports,
+			attributes: {
+				...schema,
+				width: {
+					type: 'string',
+				},
+			},
+			save( { attributes } ) {
+				const {
+					width,
+					align,
+					content,
+					dropCap,
+					backgroundColor,
+					textColor,
+					customBackgroundColor,
+					customTextColor,
+					fontSize,
+					customFontSize,
+				} = attributes;
+
+				const textClass = getColorClass( 'color', textColor );
+				const backgroundClass = getColorClass( 'background-color', backgroundColor );
+				const fontSizeClass = fontSize && FONT_SIZES[ fontSize ] && `is-${ fontSize }-text`;
+
+				const className = classnames( {
+					[ `align${ width }` ]: width,
+					'has-background': backgroundColor || customBackgroundColor,
+					'has-drop-cap': dropCap,
+					[ fontSizeClass ]: fontSizeClass,
+					[ textClass ]: textClass,
+					[ backgroundClass ]: backgroundClass,
+				} );
+
+				const styles = {
+					backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+					color: textClass ? undefined : customTextColor,
+					fontSize: fontSizeClass ? undefined : customFontSize,
+					textAlign: align,
+				};
+
+				return (
+					<RichText.Content
+						tagName="p"
+						style={ styles }
+						className={ className ? className : undefined }
+						value={ content }
+					/>
+				);
+			},
+		},
 		{
 			supports,
 			attributes: omit( {
@@ -435,7 +478,6 @@ export const settings = {
 
 	save( { attributes } ) {
 		const {
-			width,
 			align,
 			content,
 			dropCap,
@@ -452,7 +494,6 @@ export const settings = {
 		const fontSizeClass = fontSize && FONT_SIZES[ fontSize ] && `is-${ fontSize }-text`;
 
 		const className = classnames( {
-			[ `align${ width }` ]: width,
 			'has-background': backgroundColor || customBackgroundColor,
 			'has-drop-cap': dropCap,
 			[ fontSizeClass ]: fontSizeClass,

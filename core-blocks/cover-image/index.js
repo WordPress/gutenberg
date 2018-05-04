@@ -117,14 +117,6 @@ export const settings = {
 			}
 		);
 
-		const alignmentToolbar	= (
-			<AlignmentToolbar
-				value={ contentAlign }
-				onChange={ ( nextAlign ) => {
-					setAttributes( { contentAlign: nextAlign } );
-				} }
-			/>
-		);
 		const controls = (
 			<Fragment>
 				<BlockControls>
@@ -132,8 +124,12 @@ export const settings = {
 						value={ align }
 						onChange={ updateAlignment }
 					/>
-
-					{ alignmentToolbar }
+					<AlignmentToolbar
+						value={ contentAlign }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { contentAlign: nextAlign } );
+						} }
+					/>
 					<Toolbar>
 						<MediaUpload
 							onSelect={ onSelectImage }
@@ -150,26 +146,25 @@ export const settings = {
 						/>
 					</Toolbar>
 				</BlockControls>
-				<InspectorControls>
-					<PanelBody title={ __( 'Cover Image Settings' ) }>
-						<ToggleControl
-							label={ __( 'Fixed Background' ) }
-							checked={ !! hasParallax }
-							onChange={ toggleParallax }
-						/>
-						<RangeControl
-							label={ __( 'Background Dimness' ) }
-							value={ dimRatio }
-							onChange={ setDimRatio }
-							min={ 0 }
-							max={ 100 }
-							step={ 10 }
-						/>
-					</PanelBody>
-					<PanelBody title={ __( 'Text Alignment' ) }>
-						{ alignmentToolbar }
-					</PanelBody>
-				</InspectorControls>
+				{ !! url && (
+					<InspectorControls>
+						<PanelBody title={ __( 'Cover Image Settings' ) }>
+							<ToggleControl
+								label={ __( 'Fixed Background' ) }
+								checked={ !! hasParallax }
+								onChange={ toggleParallax }
+							/>
+							<RangeControl
+								label={ __( 'Background Dimness' ) }
+								value={ dimRatio }
+								onChange={ setDimRatio }
+								min={ 0 }
+								max={ 100 }
+								step={ 10 }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				) }
 			</Fragment>
 		);
 

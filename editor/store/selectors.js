@@ -6,6 +6,7 @@ import {
 	first,
 	get,
 	has,
+	intersection,
 	last,
 	reduce,
 	size,
@@ -25,7 +26,6 @@ import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
-import { deprecated } from '@wordpress/utils';
 
 /***
  * Module constants
@@ -1293,15 +1293,6 @@ function buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock
  * @return {Editor.InserterItem[]} Items that appear in inserter.
  */
 export function getInserterItems( state, allowedBlockTypes ) {
-	if ( allowedBlockTypes === undefined ) {
-		allowedBlockTypes = true;
-		deprecated( 'getInserterItems with no allowedBlockTypes argument', {
-			version: '2.8',
-			alternative: 'getInserterItems with an explcit allowedBlockTypes argument',
-			plugin: 'Gutenberg',
-		} );
-	}
-
 	if ( ! allowedBlockTypes ) {
 		return [];
 	}
@@ -1363,15 +1354,6 @@ function getItemsFromInserts( state, inserts, allowedBlockTypes, maximum = MAX_R
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
 export function getFrecentInserterItems( state, allowedBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
-	if ( allowedBlockTypes === undefined ) {
-		allowedBlockTypes = true;
-		deprecated( 'getFrecentInserterItems with no allowedBlockTypes argument', {
-			version: '2.8',
-			alternative: 'getFrecentInserterItems with an explcit allowedBlockTypes argument',
-			plugin: 'Gutenberg',
-		} );
-	}
-
 	const calculateFrecency = ( time, count ) => {
 		if ( ! time ) {
 			return count;
@@ -1589,4 +1571,45 @@ export function inSomeHistory( state, predicate ) {
 	return optimist.some( ( { beforeState } ) => (
 		beforeState && predicate( beforeState )
 	) );
+}
+
+/**
+ * Returns the Block List settings of a block if any.
+ *
+ * @param {Object}  state Editor state.
+ * @param {?string} uid   Block UID.
+ *
+ * @return {?Object} Block settings of the block if set.
+ */
+export function getBlockListSettings( state, uid ) {
+	return state.blockListSettings[ uid ];
+}
+
+/**
+ * Determines the blocks that can be nested inside a given block. Or globally if a block is not specified.
+ *
+ * @param {Object}           state                     Global application state.
+ * @param {?string}          uid                       Block UID.
+ * @param {string[]|boolean} globallyEnabledBlockTypes Globally enabled block types, or true/false to enable/disable all types.
+ *
+ * @return {string[]|boolean} Blocks that can be nested inside the block with the specified uid, or true/false to enable/disable all types.
+ */
+export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
+	if ( ! globallyEnabledBlockTypes ) {
+		return false;
+	}
+
+	const supportedNestedBlocks = get( getBlockListSettings( state, uid ), [ 'supportedBlocks' ] );
+	if ( supportedNestedBlocks === true || supportedNestedBlocks === undefined ) {
+		return globallyEnabledBlockTypes;
+	}
+
+	if ( ! supportedNestedBlocks ) {
+		return false;
+	}
+
+	if ( globallyEnabledBlockTypes === true ) {
+		return supportedNestedBlocks;
+	}
+	return intersection( globallyEnabledBlockTypes, supportedNestedBlocks );
 }
