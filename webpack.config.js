@@ -13,17 +13,17 @@ const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-web
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './[basename]/build/style.css',
+	filename: './build/[basename]/style.css',
 } );
 
 // CSS loader for styles specific to block editing.
 const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './core-blocks/build/edit-blocks.css',
+	filename: './build/core-blocks/edit-blocks.css',
 } );
 
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './core-blocks/build/style.css',
+	filename: './build/core-blocks/style.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -128,7 +128,7 @@ const config = {
 		}, {} )
 	),
 	output: {
-		filename: '[basename]/build/index.js',
+		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
