@@ -34,3 +34,7 @@
 		@include button-style__hover;
 	}
 }
+
+.autocomplete-token[data-mce-selected] {
+	background-color: $blue-medium-highlight;
+}

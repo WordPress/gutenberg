@@ -231,22 +231,44 @@ export class Autocomplete extends Component {
 		this.node = node;
 	}
 
-	insertCompletion( range, replacement ) {
-		const container = document.createElement( 'div' );
-		container.innerHTML = renderToString( replacement );
-		while ( container.firstChild ) {
-			const child = container.firstChild;
-			container.removeChild( child );
-			range.insertNode( child );
-			range.setStartAfter( child );
-		}
+	insertCompletion( range, replacement, completerName ) {
+		// Wrap completions so we can treat them as tokens with editing boundaries.
+		const tokenWrapper = document.createElement( 'span' );
+		tokenWrapper.classList.add( 'autocomplete-token' );
+		tokenWrapper.classList.add( `autocomplete-token-${ completerName }` );
+
+		tokenWrapper.innerHTML = renderToString( replacement );
+
+		range.insertNode( tokenWrapper );
+		range.setStartAfter( tokenWrapper );
 		range.deleteContents();
+
+		/*
+		 * Add non-breaking space after a completion because:
+		 * 1. If the inserted token is the last child in Chrome 66 and desktop Safari 11,
+		 *    we can set the cursor after the token and receive user input,
+		 *    but if the input isn't preceded by a space, the user may not place the
+		 *    cursor within the text by clicking. Adding a subsequent non-breaking space
+		 *    avoids this issue. A regular space is insufficient.
+		 * 2. It seems reasonable to separate a token from subsequent text with a space.
+		 */
+		tokenWrapper.parentNode.insertBefore(
+			document.createTextNode( '\u00A0' ),
+			tokenWrapper.nextSibling
+		);
+
+		const selection = window.getSelection();
+		selection.removeAllRanges();
+
+		const newCursorPosition = document.createRange();
+		newCursorPosition.setStartAfter( tokenWrapper.nextSibling );
+		selection.addRange( newCursorPosition );
 	}
 
 	select( option ) {
 		const { onReplace } = this.props;
 		const { open, range, query } = this.state;
-		const { getOptionCompletion } = open || {};
+		const { getOptionCompletion, name: completerName } = open || {};
 
 		if ( option.isDisabled ) {
 			return;
@@ -265,14 +287,14 @@ export class Autocomplete extends Component {
 			if ( 'replace' === action ) {
 				onReplace( [ value ] );
 			} else if ( 'insert-at-caret' === action ) {
-				this.insertCompletion( range, value );
+				this.insertCompletion( range, value, completerName );
 			} else if ( 'backcompat' === action ) {
 				// NOTE: This block should be removed once we no longer support the old completer interface.
 				const onSelect = value;
 				const deprecatedOptionObject = option.value;
 				const selectionResult = onSelect( deprecatedOptionObject.value, range, query );
 				if ( selectionResult !== undefined ) {
-					this.insertCompletion( range, selectionResult );
+					this.insertCompletion( range, selectionResult, completerName );
 				}
 			}
 		}

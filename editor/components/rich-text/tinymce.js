@@ -161,7 +161,7 @@ export default class TinyMCE extends Component {
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
-			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
+			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub,.autocomplete-token',
 			plugins: [],
 			formats: {
 				strikethrough: { inline: 'del' },
