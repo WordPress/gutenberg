@@ -24,7 +24,7 @@ import {
 	withInstanceId,
 	withSpokenMessages,
 } from '@wordpress/components';
-import { getCategories, isSharedBlock, withEditorSettings } from '@wordpress/blocks';
+import { getCategories, isSharedBlock } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -35,6 +35,7 @@ import './style.scss';
 import NoBlocks from './no-blocks';
 import InserterGroup from './group';
 import BlockPreview from '../block-preview';
+import withAllowedBlockTypes from './../higher-order/with-allowed-block-types';
 
 export const searchItems = ( items, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
@@ -336,25 +337,15 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withEditorSettings( ( settings ) => {
-		const { allowedBlockTypes } = settings;
-
-		return {
-			allowedBlockTypes,
-		};
-	} ),
+	withAllowedBlockTypes(),
 	withSelect( ( select, { allowedBlockTypes } ) => {
 		const {
-			getBlockInsertionPoint,
 			getInserterItems,
 			getFrecentInserterItems,
-			getSupportedBlocks,
 		} = select( 'core/editor' );
-		const { rootUID } = getBlockInsertionPoint();
-		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
 		return {
-			items: getInserterItems( supportedBlocks ),
-			frecentItems: getFrecentInserterItems( supportedBlocks ),
+			items: getInserterItems( allowedBlockTypes ),
+			frecentItems: getFrecentInserterItems( allowedBlockTypes ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

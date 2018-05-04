@@ -35,8 +35,8 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     type="text"
     value="Write your story"
   />
-  <WithEditorSettings(WithSelect(WithDispatch(InserterWithShortcuts))) />
-  <WithEditorSettings(WithSelect(WithDispatch(Inserter)))
+  <WithAllowedBlockTypes(IfCondition(WithSelect(WithDispatch(InserterWithShortcuts)))) />
+  <WithSelect(WithAllowedBlockTypes(IfCondition(WithDispatch(Inserter))))
     position="top right"
   />
 </div>
@@ -59,8 +59,8 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
     type="text"
     value="Write your story"
   />
-  <WithEditorSettings(WithSelect(WithDispatch(InserterWithShortcuts))) />
-  <WithEditorSettings(WithSelect(WithDispatch(Inserter)))
+  <WithAllowedBlockTypes(IfCondition(WithSelect(WithDispatch(InserterWithShortcuts)))) />
+  <WithSelect(WithAllowedBlockTypes(IfCondition(WithDispatch(Inserter))))
     position="top right"
   />
 </div>
@@ -83,8 +83,8 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
     type="text"
     value=""
   />
-  <WithEditorSettings(WithSelect(WithDispatch(InserterWithShortcuts))) />
-  <WithEditorSettings(WithSelect(WithDispatch(Inserter)))
+  <WithAllowedBlockTypes(IfCondition(WithSelect(WithDispatch(InserterWithShortcuts)))) />
+  <WithSelect(WithAllowedBlockTypes(IfCondition(WithDispatch(Inserter))))
     position="top right"
   />
 </div>
