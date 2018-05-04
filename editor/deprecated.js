@@ -89,7 +89,7 @@ forEach( functionsToDeprecate, ( wrappedFunction, key ) => {
 			alternative: 'wp.editor.' + key,
 			plugin: 'Gutenberg',
 		} );
-		wrappedFunction( ...args );
+		return wrappedFunction( ...args );
 	};
 } );
 

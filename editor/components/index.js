@@ -1,4 +1,4 @@
-// Block Creation Component
+// Block Creation Components
 export { default as Autocomplete } from './autocomplete';
 export * from './autocompleters';
 export { default as AlignmentToolbar } from './alignment-toolbar';
