@@ -12,7 +12,6 @@ const { Consumer, Provider } = createContext( {
 	name: '',
 	isSelected: false,
 	focusedElement: null,
-	initFocusedElement: noop,
 	setFocusedElement: noop,
 } );
 

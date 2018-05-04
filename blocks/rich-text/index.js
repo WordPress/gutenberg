@@ -121,6 +121,7 @@ export class RichText extends Component {
 		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
+		this.setFocusedElement = this.setFocusedElement.bind( this );
 
 		this.state = {
 			formats: {},
@@ -192,6 +193,12 @@ export class RichText extends Component {
 
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
+		}
+	}
+
+	setFocusedElement() {
+		if ( this.props.setFocusedElement ) {
+			this.props.setFocusedElement( this.props.instanceId );
 		}
 	}
 
@@ -850,7 +857,10 @@ export class RichText extends Component {
 		);
 
 		return (
-			<div className={ classes } ref={ this.containerRef }>
+			<div className={ classes }
+				ref={ this.containerRef }
+				onFocus={ this.setFocusedElement }
+			>
 				{ isSelected && ! inlineToolbar && (
 					<BlockFormatControls>
 						{ formatToolbar }
@@ -928,12 +938,7 @@ const RichTextContainer = compose( [
 		// Ensures that only one RichText component can be focused.
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
-			onSetup() {
-				context.initFocusedElement( ownProps.instanceId );
-			},
-			onFocus() {
-				context.setFocusedElement( ownProps.instanceId );
-			},
+			setFocusedElement: context.setFocusedElement,
 		};
 	} ),
 	withSelect( ( select ) => {

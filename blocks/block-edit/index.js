@@ -19,11 +19,9 @@ import { BlockEditContextProvider } from './context';
 export class BlockEdit extends Component {
 	constructor( props ) {
 		super( props );
-		this.initFocusedElement = this.initFocusedElement.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
 		this.state = {
 			focusedElement: null,
-			initFocusedElement: this.initFocusedElement,
 			setFocusedElement: this.setFocusedElement,
 		};
 	}
@@ -42,15 +40,6 @@ export class BlockEdit extends Component {
 				'unfiltered_html',
 			], false ),
 		};
-	}
-
-	initFocusedElement( focusedElement ) {
-		this.setState( ( prevState ) => {
-			if ( prevState.focusedElement !== null ) {
-				return null;
-			}
-			return { focusedElement };
-		} );
 	}
 
 	setFocusedElement( focusedElement ) {
