@@ -316,8 +316,7 @@ function gutenberg_register_scripts_and_styles() {
 			'tinymce-latest-paste',
 			'tinymce-latest-table',
 		),
-		filemtime( gutenberg_dir_path() . 'build/editor/index.js' ),
-		true
+		filemtime( gutenberg_dir_path() . 'build/editor/index.js' )
 	);
 
 	wp_register_script(
@@ -1064,3 +1063,14 @@ JS;
 	 */
 	do_action( 'enqueue_block_editor_assets' );
 }
+
+/**
+ * Ensure the editor module is loaded before third party plugins.
+ *
+ * Remove this in Gutenberg 3.1
+ */
+function polyfill_blocks_module_in_scripts() {
+	wp_enqueue_script( 'wp-editor' );
+}
+
+add_action( 'enqueue_block_editor_assets', 'polyfill_blocks_module_in_scripts', 9 );
