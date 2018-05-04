@@ -12,6 +12,7 @@ import {
 	Placeholder,
 	ToggleControl,
 	SelectControl,
+	ServerSideRender,
 	withAPIData,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -19,8 +20,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TermList from './term-list';
-import InspectorControls from '../../inspector-controls';
+import { InspectorControls } from '@wordpress/blocks';
 
 class TagCloudBlock extends Component {
 	constructor() {
@@ -33,7 +33,7 @@ class TagCloudBlock extends Component {
 	getTaxonomies() {
 		const taxonomies = filter( this.props.taxonomies.data, 'show_cloud' );
 
-		return map( taxonomies, taxonomy => {
+		return map( taxonomies, ( taxonomy ) => {
 			return {
 				value: taxonomy.slug,
 				label: taxonomy.name,
@@ -57,9 +57,7 @@ class TagCloudBlock extends Component {
 	render() {
 		const {
 			attributes,
-			focus,
-			termList,
-			className,
+			isSelected,
 		} = this.props;
 		const { taxonomy, showTagCounts } = attributes;
 		const taxonomies = this.getTaxonomies();
@@ -70,15 +68,8 @@ class TagCloudBlock extends Component {
 			},
 			...taxonomies,
 		];
-		const terms = termList.data ? (
-			<TermList
-				terms={ termList.data }
-				showTagCounts={ showTagCounts }
-				className={ className }
-			/>
-		) : null;
 
-		const inspectorControls = focus && (
+		const inspectorControls = isSelected && (
 			<InspectorControls key="inspector">
 				<h3>{ __( 'Tag Cloud Settings' ) }</h3>
 				<SelectControl
@@ -114,7 +105,11 @@ class TagCloudBlock extends Component {
 
 		return [
 			inspectorControls,
-			terms,
+			<ServerSideRender
+				key="tag-cloud"
+				block="core/tag-cloud"
+				attributes={ attributes }
+			/>,
 		];
 	}
 }
