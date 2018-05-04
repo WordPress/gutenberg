@@ -104,6 +104,6 @@ export function initializeEditor( id, post, settings ) {
 	} );
 }
 
-export { Fill as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
+export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
