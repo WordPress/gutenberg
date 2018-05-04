@@ -23,4 +23,54 @@ describe( 'getQueriedItems', () => {
 
 		expect( result ).toBe( null );
 	} );
+
+	it( 'should return an array of items', () => {
+		const state = {
+			items: {
+				1: { id: 1 },
+				2: { id: 2 },
+			},
+			queries: {
+				'': {
+					itemIds: [ 1, 2 ],
+					requestingPageByPerPage: {
+						10: {
+							1: true,
+						},
+					},
+				},
+			},
+		};
+
+		const result = getQueriedItems( state );
+
+		expect( result ).toEqual( [
+			{ id: 1 },
+			{ id: 2 },
+		] );
+	} );
+
+	it( 'should cache on query by state', () => {
+		const state = {
+			items: {
+				1: { id: 1 },
+				2: { id: 2 },
+			},
+			queries: {
+				'': {
+					itemIds: [ 1, 2 ],
+					requestingPageByPerPage: {
+						10: {
+							1: true,
+						},
+					},
+				},
+			},
+		};
+
+		const resultA = getQueriedItems( state, {} );
+		const resultB = getQueriedItems( state, {} );
+
+		expect( resultA ).toBe( resultB );
+	} );
 } );
