@@ -90,3 +90,32 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 - Required: No
 
 
+## SlotsFill
+SlotFills provide plugin or theme authors the ability to add items into the Gutenberg interface. While these slots appear in certain locations, 
+it should be noted that they are named and implemented around the function they serve and not their current location, which may change in future iterations.
+
+### PluginPostStatusInfo
+
+_Example_
+```jsx
+var el = wp.element.createElement;
+var __ = wp.i18n.__;
+var registerPlugin = wp.plugins.registerPlugin;
+var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
+
+function MyPlugin() {
+	return (
+		el(
+			PluginPostStatusInfo,
+			{},
+			__( 'My post status info' )
+		)
+	);
+};
+
+registerPlugin( 'my-plugin', {
+	render: MyPlugin,
+} )
+```
+
+
