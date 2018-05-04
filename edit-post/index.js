@@ -7,7 +7,6 @@ import { get, isString, some } from 'lodash';
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/core-blocks';
-import domReady from '@wordpress/dom-ready';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { deprecated } from '@wordpress/utils';
 
