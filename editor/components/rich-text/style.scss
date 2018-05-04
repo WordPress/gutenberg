@@ -61,6 +61,16 @@
 		}
 	}
 
+	img {
+		&[data-mce-selected] {
+			outline: none;
+		}
+
+		&::selection {
+			background: none !important;
+		}
+	}
+
 	&[data-is-placeholder-visible="true"] {
 		position: absolute;
 		top: 0;
@@ -83,14 +93,14 @@
 
 	div.mce-resizehandle {
 		border-radius: 50%;
-		border: 2px solid white;
-		width: 15px;
-		height: 15px;
-		background: $blue-medium-500;
+		border: 1px solid $black;
+		width: 12px;
+		height: 12px;
+		background: $white;
 		box-sizing: border-box;
 
 		&:hover {
-			background: $blue-medium-500;
+			background: $white;
 		}
 	}
 }
