@@ -5,6 +5,11 @@
 .table-of-contents__popover {
 	.components-popover__content {
 		padding: 16px;
+
+		@include break-small {
+			max-height: calc(100vh - 120px);
+			overflow-y: auto;
+		}
 	}
 
 	hr {
