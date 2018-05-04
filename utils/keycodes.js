@@ -44,18 +44,18 @@ export function isMacOS( _window = window ) {
  * This function is not intended to be used directly by developers.
  * Instead, use primaryShortcut(), accessShortcut(), etc.
  *
- * @param {string} keys      Modifier and keyboard keys, seperated by "+".
- * @param {Object} _isMacOS  isMacOS function by default; used for DI testing.
+ * @param {string} keys          Modifier and keyboard keys, seperated by "+".
+ * @param {Object} _isMacOS      isMacOS function by default; used for DI testing.
  *
  * @return {string}          The keyboard shortcut.
  */
 export function keyboardShortcut( keys, _isMacOS = isMacOS ) {
 	const isMac = _isMacOS();
 
-	const alt = isMac ? '⌥' : 'Alt';
-	const meta = isMac ? '⌃' : '⊞';
+	const alt = isMac ? '⌥option' : 'Alt';
+	const meta = isMac ? '⌃control' : '⊞';
 	const primary = isMac ? '⌘' : 'Ctrl';
-	const shift = isMac ? '⇧' : 'Shift';
+	const shift = isMac ? '⇧shift' : 'Shift';
 
 	const replacementKeyMap = {
 		[ ALT ]: alt,
@@ -64,8 +64,6 @@ export function keyboardShortcut( keys, _isMacOS = isMacOS ) {
 		[ SHIFT ]: shift,
 	};
 
-	const joinCharacter = isMac ? '' : '+';
-
 	return keys
 		.replace( /\s/g, '' )
 		.split( '+' )
@@ -73,7 +71,11 @@ export function keyboardShortcut( keys, _isMacOS = isMacOS ) {
 			return replacementKeyMap.hasOwnProperty( key ) ?
 				replacementKeyMap[ key ] : key;
 		} )
-		.join( joinCharacter );
+		.join( '+' )
+		// Because we use just the clover symbol for MacOS's "command" key, remove
+		// the key join character ("+") between it and the final character if that
+		// final character is alphanumeric. ⌘S looks nicer than ⌘+S.
+		.replace( /⌘\+([a-zA-Z0-9])$/g, '⌘$1' );
 }
 
 /**

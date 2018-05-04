@@ -23,11 +23,11 @@ describe( 'keyboardShortcut', () => {
 	const windowsShortcut = ( keyString ) => keyboardShortcut( keyString, isMacOSFalse );
 
 	it( 'should split string by "+" character', () => {
-		expect( macShortcut( `${ PRIMARY }+S` ) ).toEqual( '⌘S' );
+		expect( windowsShortcut( `${ PRIMARY }+S` ) ).toEqual( 'Ctrl+S' );
 	} );
 
 	it( 'should remove whitespace from string', () => {
-		expect( macShortcut( `${ PRIMARY }+ S` ) ).toEqual( '⌘S' );
+		expect( windowsShortcut( `${ PRIMARY }+ S` ) ).toEqual( 'Ctrl+S' );
 	} );
 
 	// TODO: Make a generic version outside of Windows as a fallback so we
@@ -67,22 +67,30 @@ describe( 'keyboardShortcut', () => {
 
 		it( 'should output option symbol for ALT key', () => {
 			const shortcut = macShortcut( ALT );
-			expect( shortcut ).toEqual( '⌥' );
+			expect( shortcut ).toEqual( '⌥option' );
 		} );
 
 		it( 'should output control caret for META key', () => {
 			const shortcut = macShortcut( META );
-			expect( shortcut ).toEqual( '⌃' );
+			expect( shortcut ).toEqual( '⌃control' );
 		} );
 
 		it( 'should output Shift unicode for SHIFT key', () => {
 			const shortcut = macShortcut( SHIFT );
-			expect( shortcut ).toEqual( '⇧' );
+			expect( shortcut ).toEqual( '⇧shift' );
 		} );
 
-		it( 'should combine keys with no character', () => {
-			const shortcut = macShortcut( `${ PRIMARY }+${ ALT }+B` );
-			expect( shortcut ).toEqual( '⌘⌥B' );
+		it( 'should strip + between command and single ending character', () => {
+			const simpleShortcut = macShortcut( `${ PRIMARY }+B` );
+			expect( simpleShortcut ).toEqual( '⌘B' );
+
+			const modifiedShortcut = macShortcut( `${ ALT }+${ PRIMARY }+B` );
+			expect( modifiedShortcut ).toEqual( '⌥option+⌘B' );
+		} );
+
+		it( 'should not strip + between command and other character', () => {
+			const shortcut = macShortcut( `${ PRIMARY }+Space` );
+			expect( shortcut ).toEqual( '⌘+Space' );
 		} );
 	} );
 } );
@@ -100,7 +108,7 @@ describe( 'accessShortcut', () => {
 
 	it( 'should output control+option symbols on MacOS', () => {
 		const shortcut = accessShortcut( 'M', isMacOSTrue );
-		expect( shortcut ).toEqual( '⌃⌥M' );
+		expect( shortcut ).toEqual( '⌃control+⌥option+M' );
 	} );
 } );
 
@@ -144,7 +152,7 @@ describe( 'secondaryShortcut', () => {
 
 	it( 'should output control+option symbols on MacOS', () => {
 		const shortcut = secondaryShortcut( 'M', isMacOSTrue );
-		expect( shortcut ).toEqual( '⇧⌥⌘M' );
+		expect( shortcut ).toEqual( '⇧shift+⌥option+⌘M' );
 	} );
 } );
 
