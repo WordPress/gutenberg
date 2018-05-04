@@ -75,7 +75,35 @@ function gutenberg_get_script_polyfill( $tests ) {
 function gutenberg_register_scripts_and_styles() {
 	gutenberg_register_vendor_scripts();
 
-	// Editor Scripts.
+	// WordPress packages
+	wp_register_script(
+		'wp-dom-ready',
+		gutenberg_url( 'build/dom-ready/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/dom-ready/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-a11y',
+		gutenberg_url( 'build/a11y/index.js' ),
+		array( 'wp-dom-ready' ),
+		filemtime( gutenberg_dir_path() . 'build/a11y/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-hooks',
+		gutenberg_url( 'build/hooks/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/hooks/index.js' ),
+		true
+	);
+	wp_register_script(
+		'wp-i18n',
+		gutenberg_url( 'build/i18n/index.js' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/i18n/index.js' ),
+		true
+	);
 	wp_register_script(
 		'wp-is-shallow-equal',
 		gutenberg_url( 'build/is-shallow-equal/index.js' ),
@@ -83,6 +111,8 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/is-shallow-equal/index.js' ),
 		true
 	);
+
+	// Editor Scripts.
 	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'build/data/index.js' ),
@@ -106,13 +136,6 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_add_inline_script( 'wp-utils', 'var originalUtils = window.wp && window.wp.utils ? window.wp.utils : {};', 'before' );
 	wp_add_inline_script( 'wp-utils', 'for ( var key in originalUtils ) wp.utils[ key ] = originalUtils[ key ];' );
-	wp_register_script(
-		'wp-hooks',
-		gutenberg_url( 'build/hooks/index.js' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'build/hooks/index.js' ),
-		true
-	);
 	wp_register_script(
 		'wp-date',
 		gutenberg_url( 'build/date/index.js' ),
@@ -147,13 +170,6 @@ function gutenberg_register_scripts_and_styles() {
 		),
 	) ), 'before' );
 	wp_register_script(
-		'wp-i18n',
-		gutenberg_url( 'build/i18n/index.js' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'build/i18n/index.js' ),
-		true
-	);
-	wp_register_script(
 		'wp-element',
 		gutenberg_url( 'build/element/index.js' ),
 		array( 'react', 'react-dom', 'wp-utils', 'wp-is-shallow-equal', 'lodash' ),
@@ -163,7 +179,17 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-components',
 		gutenberg_url( 'build/components/index.js' ),
-		array( 'wp-element', 'wp-i18n', 'wp-utils', 'wp-hooks', 'wp-api-request', 'wp-is-shallow-equal', 'moment', 'lodash' ),
+		array(
+			'lodash',
+			'moment',
+			'wp-a11y',
+			'wp-api-request',
+			'wp-element',
+			'wp-hooks',
+			'wp-i18n',
+			'wp-is-shallow-equal',
+			'wp-utils',
+		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
 		true
 	);
@@ -283,21 +309,22 @@ function gutenberg_register_scripts_and_styles() {
 		'wp-editor',
 		gutenberg_url( 'build/editor/index.js' ),
 		array(
-			'postbox',
+			'editor',
 			'jquery',
+			'lodash',
+			'postbox',
+			'wp-a11y',
 			'wp-api',
+			'wp-blocks',
+			'wp-components',
+			'wp-core-data',
 			'wp-data',
 			'wp-date',
 			'wp-i18n',
-			'wp-blocks',
 			'wp-element',
-			'wp-components',
+			'wp-plugins',
 			'wp-utils',
 			'wp-viewport',
-			'wp-plugins',
-			'wp-core-data',
-			'editor',
-			'lodash',
 		),
 		filemtime( gutenberg_dir_path() . 'build/editor/index.js' ),
 		true
@@ -306,7 +333,25 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-edit-post',
 		gutenberg_url( 'build/edit-post/index.js' ),
-		array( 'jquery', 'media-views', 'media-models', 'wp-element', 'wp-components', 'wp-editor', 'wp-i18n', 'wp-date', 'wp-utils', 'wp-data', 'wp-embed', 'wp-viewport', 'wp-plugins', 'wp-core-blocks', 'lodash' ),
+		array(
+			'jquery',
+			'lodash',
+			'media-models',
+			'media-views',
+			'wp-a11y',
+			'wp-components',
+			'wp-core-blocks',
+			'wp-date',
+			'wp-data',
+			'wp-dom-ready',
+			'wp-editor',
+			'wp-element',
+			'wp-embed',
+			'wp-i18n',
+			'wp-plugins',
+			'wp-viewport',
+			'wp-utils',
+		),
 		filemtime( gutenberg_dir_path() . 'build/edit-post/index.js' ),
 		true
 	);

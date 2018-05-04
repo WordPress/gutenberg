@@ -83,6 +83,8 @@ const entryPointNames = [
 ];
 
 const packageNames = [
+	'a11y',
+	'dom-ready',
 	'hooks',
 	'i18n',
 	'is-shallow-equal',
