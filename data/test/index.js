@@ -32,6 +32,11 @@ jest.mock( '@wordpress/utils', () => ( {
 	deprecated: jest.fn(),
 } ) );
 
+// Mock data store to prevent self-initialization, as it needs to be reset
+// between tests of `registerResolvers` by replacement (new `registerStore`).
+jest.mock( '../store', () => () => {} );
+const registerDataStore = require.requireActual( '../store' ).default;
+
 describe( 'registerStore', () => {
 	it( 'should be shorthand for reducer, actions, selectors registration', () => {
 		const store = registerStore( 'butcher', {
@@ -79,6 +84,12 @@ describe( 'registerReducer', () => {
 } );
 
 describe( 'registerResolvers', () => {
+	let store;
+
+	beforeEach( () => {
+		registerDataStore();
+	} );
+
 	const unsubscribes = [];
 	afterEach( () => {
 		let unsubscribe;
@@ -88,7 +99,7 @@ describe( 'registerResolvers', () => {
 	} );
 
 	function subscribeWithUnsubscribe( ...args ) {
-		const unsubscribe = subscribe( ...args );
+		const unsubscribe = store.subscribe( ...args );
 		unsubscribes.push( unsubscribe );
 		return unsubscribe;
 	}
@@ -143,7 +154,7 @@ describe( 'registerResolvers', () => {
 			return { type: 'SET_PAGE', page, result: [] };
 		} );
 
-		const store = registerReducer( 'demo', ( state = {}, action ) => {
+		store = registerReducer( 'demo', ( state = {}, action ) => {
 			switch ( action.type ) {
 				case 'SET_PAGE':
 					return {
@@ -198,7 +209,7 @@ describe( 'registerResolvers', () => {
 	} );
 
 	it( 'should resolve action to dispatch', ( done ) => {
-		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+		store = registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;
 		} );
 		registerSelectors( 'demo', {
@@ -221,7 +232,7 @@ describe( 'registerResolvers', () => {
 	} );
 
 	it( 'should resolve mixed type action array to dispatch', ( done ) => {
-		registerReducer( 'counter', ( state = 0, action ) => {
+		store = registerReducer( 'counter', ( state = 0, action ) => {
 			return action.type === 'INCREMENT' ? state + 1 : state;
 		} );
 		registerSelectors( 'counter', {
@@ -244,7 +255,7 @@ describe( 'registerResolvers', () => {
 	} );
 
 	it( 'should resolve generator action to dispatch', ( done ) => {
-		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+		store = registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;
 		} );
 		registerSelectors( 'demo', {
@@ -269,7 +280,7 @@ describe( 'registerResolvers', () => {
 	} );
 
 	it( 'should resolve promise action to dispatch', ( done ) => {
-		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+		store = registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;
 		} );
 		registerSelectors( 'demo', {
@@ -316,7 +327,7 @@ describe( 'registerResolvers', () => {
 	} );
 
 	it( 'should resolve async iterator action to dispatch', ( done ) => {
-		registerReducer( 'counter', ( state = 0, action ) => {
+		store = registerReducer( 'counter', ( state = 0, action ) => {
 			return action.type === 'INCREMENT' ? state + 1 : state;
 		} );
 		registerSelectors( 'counter', {
@@ -339,7 +350,7 @@ describe( 'registerResolvers', () => {
 	} );
 
 	it( 'should not dispatch resolved promise action on subsequent selector calls', ( done ) => {
-		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+		store = registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' && state === 'NOTOK' ? 'OK' : 'NOTOK';
 		} );
 		registerSelectors( 'demo', {
@@ -383,7 +394,7 @@ describe( 'select', () => {
 } );
 
 describe( 'withSelect', () => {
-	let wrapper;
+	let wrapper, store;
 
 	const unsubscribes = [];
 	afterEach( () => {
@@ -399,7 +410,7 @@ describe( 'withSelect', () => {
 	} );
 
 	function subscribeWithUnsubscribe( ...args ) {
-		const unsubscribe = subscribe( ...args );
+		const unsubscribe = store.subscribe( ...args );
 		unsubscribes.push( unsubscribe );
 		return unsubscribe;
 	}
@@ -500,7 +511,7 @@ describe( 'withSelect', () => {
 		// until after the current listener stack is called, we don't attempt
 		// to setState on an unmounting `withSelect` component. It will fail if
 		// an attempt is made to `setState` on an unmounted component.
-		const store = registerReducer( 'counter', ( state = 0, action ) => {
+		store = registerReducer( 'counter', ( state = 0, action ) => {
 			if ( action.type === 'increment' ) {
 				return state + 1;
 			}
@@ -526,7 +537,7 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'should not rerun selection on unchanging state', () => {
-		const store = registerReducer( 'unchanging', ( state = {} ) => state );
+		store = registerReducer( 'unchanging', ( state = {} ) => state );
 
 		registerSelectors( 'unchanging', {
 			getState: ( state ) => state,
