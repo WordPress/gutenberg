@@ -107,7 +107,7 @@ export const settings = {
 					<InspectorControls>
 						<PanelBody>
 							<ToggleControl
-								label={ __( 'Hide the teaser before the "More" tag' ) }
+								label={ __( 'Hide intro content' ) }
 								checked={ !! noTeaser }
 								onChange={ toggleNoTeaser }
 								help={ getHideTeaserHelp }
@@ -147,5 +147,5 @@ export const settings = {
 };
 
 function getHideTeaserHelp( checked ) {
-	return checked ? __( 'Hiding the content before the "More" tag in single post.' ) : __( 'Toggle to hide content before the "More" tag in single post.' );
+	return checked ? __( 'Hiding the content before the "More" tag on single post.' ) : __( 'Toggle to hide content before the "More" tag on single post.' );
 }
