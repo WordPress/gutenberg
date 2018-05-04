@@ -34,6 +34,10 @@ class CategoriesBlock extends Component {
 		setAttributes( { displayAsDropdown: ! displayAsDropdown } );
 	}
 
+	getDisplayAsDropdownHelp( checked ) {
+		return checked ? __( 'Showing as dropdown.' ) : __( 'Toggle to show as dropdown.' );
+	}
+
 	toggleShowPostCounts() {
 		const { attributes, setAttributes } = this.props;
 		const { showPostCounts } = attributes;
@@ -41,11 +45,19 @@ class CategoriesBlock extends Component {
 		setAttributes( { showPostCounts: ! showPostCounts } );
 	}
 
+	getShowPostCountsHelp( checked ) {
+		return checked ? __( 'Showing post counts.' ) : __( 'Toggle to show post counts.' );
+	}
+
 	toggleShowHierarchy() {
 		const { attributes, setAttributes } = this.props;
 		const { showHierarchy } = attributes;
 
 		setAttributes( { showHierarchy: ! showHierarchy } );
+	}
+
+	getShowHierarchyHelp( checked ) {
+		return checked ? __( 'Showing hierarchy.' ) : __( 'Toggle to show hierarchy.' );
 	}
 
 	getCategories( parentId = null ) {
@@ -155,16 +167,19 @@ class CategoriesBlock extends Component {
 						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
 						onChange={ this.toggleDisplayAsDropdown }
+						help={ this.getDisplayAsDropdownHelp }
 					/>
 					<ToggleControl
-						label={ __( 'Show post counts' ) }
+						label={ __( 'Display post counts' ) }
 						checked={ showPostCounts }
 						onChange={ this.toggleShowPostCounts }
+						help={ this.getShowPostCountsHelp }
 					/>
 					<ToggleControl
 						label={ __( 'Show hierarchy' ) }
 						checked={ showHierarchy }
 						onChange={ this.toggleShowHierarchy }
+						help={ this.getShowHierarchyHelp }
 					/>
 				</PanelBody>
 			</InspectorControls>
