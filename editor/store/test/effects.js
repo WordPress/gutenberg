@@ -501,6 +501,18 @@ describe( 'effects', () => {
 	describe( '.SETUP_EDITOR', () => {
 		const handler = effects.SETUP_EDITOR;
 
+		beforeEach( () => {
+			registerBlockType( 'core/footnotes', {
+				title: 'Footnotes',
+				category: 'common',
+				save: () => null,
+				attributes: {
+					footnotes: [],
+					names: {},
+				},
+			} );
+		} );
+
 		afterEach( () => {
 			getBlockTypes().forEach( ( block ) => {
 				unregisterBlockType( block.name );
@@ -526,10 +538,17 @@ describe( 'effects', () => {
 			} );
 
 			const result = handler( { post, settings: {} }, { getState } );
+			const footnotesBlock = {
+				attributes: {},
+				innerBlocks: [],
+				isValid: true,
+				name: 'core/footnotes',
+				uid: result[ 1 ].blocks[ 0 ].uid,
+			};
 
 			expect( result ).toEqual( [
 				setTemplateValidity( true ),
-				setupEditorState( post, [], {} ),
+				setupEditorState( post, [ footnotesBlock ], {} ),
 			] );
 		} );
 
@@ -554,7 +573,7 @@ describe( 'effects', () => {
 
 			const result = handler( { post }, { getState } );
 
-			expect( result[ 1 ].blocks ).toHaveLength( 1 );
+			expect( result[ 1 ].blocks ).toHaveLength( 2 );
 			expect( result ).toEqual( [
 				setTemplateValidity( true ),
 				setupEditorState( post, result[ 1 ].blocks, {} ),
@@ -580,10 +599,17 @@ describe( 'effects', () => {
 			} );
 
 			const result = handler( { post }, { getState } );
+			const footnotesBlock = {
+				attributes: {},
+				innerBlocks: [],
+				isValid: true,
+				name: 'core/footnotes',
+				uid: result[ 1 ].blocks[ 0 ].uid,
+			};
 
 			expect( result ).toEqual( [
 				setTemplateValidity( true ),
-				setupEditorState( post, [], { title: 'A History of Pork', status: 'draft' } ),
+				setupEditorState( post, [ footnotesBlock ], { title: 'A History of Pork', status: 'draft' } ),
 			] );
 		} );
 	} );

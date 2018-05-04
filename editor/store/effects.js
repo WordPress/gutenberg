@@ -350,6 +350,19 @@ export default {
 			blocks = [];
 		}
 
+		// Append footnotes block if not present
+		let hasFootnotesBlock = false;
+		for ( let i = 0; i < blocks.length; i++ ) {
+			if ( blocks[ i ].name === 'core/footnotes' ) {
+				hasFootnotesBlock = true;
+				break;
+			}
+		}
+
+		if ( ! hasFootnotesBlock ) {
+			blocks.push( createBlock( 'core/footnotes' ) );
+		}
+
 		// Include auto draft title in edits while not flagging post as dirty
 		const edits = {};
 		if ( post.status === 'auto-draft' ) {

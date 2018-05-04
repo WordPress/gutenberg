@@ -1170,6 +1170,68 @@ describe( 'state', () => {
 
 				expect( state.present.blocksByUID ).toBe( state.present.blocksByUID );
 			} );
+
+			it( 'should update footnotes when block attributes are updated', () => {
+				const original = deepFreeze( editor( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat',
+						attributes: {
+							content: [
+								'Lorem ipsum',
+							],
+						},
+						innerBlocks: [],
+					}, {
+						uid: 'footnotes',
+						name: 'core/footnotes',
+						attributes: {
+							footnotes: [],
+						},
+						innerBlocks: [],
+					} ],
+				} ) );
+				const newFootnote = 'fn-1234';
+				const newContent = [
+					'Lorem ipsum',
+					{
+						type: 'sup',
+						props: {
+							className: 'footnote',
+							'data-footnote-id': newFootnote,
+						},
+					},
+					'is a text',
+				];
+
+				const state = editor( original, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					uid: 'kumquat',
+					attributes: {
+						content: newContent,
+					},
+				} );
+
+				const expectedKumquatBlock = {
+					uid: 'kumquat',
+					attributes: {
+						content: newContent,
+					},
+					footnotes: [ newFootnote ],
+				};
+				const expectedFootnotesBlock = {
+					uid: 'footnotes',
+					name: 'core/footnotes',
+					attributes: {
+						footnotes: [ newFootnote ],
+					},
+				};
+
+				expect( state.present.blocksByUid ).toEqual( {
+					kumquat: expectedKumquatBlock,
+					footnotes: expectedFootnotesBlock,
+				} );
+			} );
 		} );
 
 		describe( 'withHistory', () => {

@@ -221,7 +221,7 @@ export function parseFootnotesFromContent( content ) {
 		if ( element.type === 'sup' &&
 				element.props.className === 'footnote' &&
 				element.props[ 'data-footnote-id' ] ) {
-			return footnotes.concat( { id: element.props[ 'data-footnote-id' ] } );
+			return footnotes.concat( element.props[ 'data-footnote-id' ] );
 		}
 
 		return footnotes;
