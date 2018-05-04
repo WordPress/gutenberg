@@ -1,0 +1,13 @@
+[
+    {
+        "uid": "_uid_0",
+        "name": "core/tag-cloud",
+        "isValid": true,
+        "attributes": {
+            "taxonomy": "category",
+            "showTagCounts": false
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
+]
