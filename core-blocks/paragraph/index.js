@@ -28,7 +28,6 @@ import {
 	getColorClass,
 	withColors,
 	AlignmentToolbar,
-	BlockAlignmentToolbar,
 	BlockControls,
 	ContrastChecker,
 	InspectorControls,
@@ -145,7 +144,6 @@ class ParagraphBlock extends Component {
 			content,
 			dropCap,
 			placeholder,
-			width,
 		} = attributes;
 
 		const fontSize = this.getFontSize();
@@ -207,19 +205,16 @@ class ParagraphBlock extends Component {
 						/>
 					</PanelBody>
 					<PanelColor
-						colorName={ backgroundColor.name }
 						colorValue={ backgroundColor.value }
 						initialOpen={ false }
 						title={ __( 'Background Color' ) }
 						onChange={ setBackgroundColor }
 					/>
 					<PanelColor
-						colorName={ textColor.name }
 						colorValue={ textColor.value }
 						initialOpen={ false }
 						title={ __( 'Text Color' ) }
 						onChange={ setTextColor }
-						value={ textColor.value }
 					/>
 					<ContrastChecker
 						textColor={ textColor.value }
@@ -230,12 +225,6 @@ class ParagraphBlock extends Component {
 						} }
 						isLargeText={ fontSize >= 18 }
 					/>
-					<PanelBody title={ __( 'Block Alignment' ) }>
-						<BlockAlignmentToolbar
-							value={ width }
-							onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
-						/>
-					</PanelBody>
 				</InspectorControls>
 				<div>
 					<RichText
@@ -300,9 +289,6 @@ const schema = {
 	placeholder: {
 		type: 'string',
 	},
-	width: {
-		type: 'string',
-	},
 	textColor: {
 		type: 'string',
 	},
@@ -344,6 +330,8 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
+				// Paragraph is a fallback and should be matched last.
+				priority: 20,
 				selector: 'p',
 				schema: {
 					p: {
@@ -355,6 +343,58 @@ export const settings = {
 	},
 
 	deprecated: [
+		{
+			supports,
+			attributes: {
+				...schema,
+				width: {
+					type: 'string',
+				},
+			},
+			save( { attributes } ) {
+				const {
+					width,
+					align,
+					content,
+					dropCap,
+					backgroundColor,
+					textColor,
+					customBackgroundColor,
+					customTextColor,
+					fontSize,
+					customFontSize,
+				} = attributes;
+
+				const textClass = getColorClass( 'color', textColor );
+				const backgroundClass = getColorClass( 'background-color', backgroundColor );
+				const fontSizeClass = fontSize && FONT_SIZES[ fontSize ] && `is-${ fontSize }-text`;
+
+				const className = classnames( {
+					[ `align${ width }` ]: width,
+					'has-background': backgroundColor || customBackgroundColor,
+					'has-drop-cap': dropCap,
+					[ fontSizeClass ]: fontSizeClass,
+					[ textClass ]: textClass,
+					[ backgroundClass ]: backgroundClass,
+				} );
+
+				const styles = {
+					backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+					color: textClass ? undefined : customTextColor,
+					fontSize: fontSizeClass ? undefined : customFontSize,
+					textAlign: align,
+				};
+
+				return (
+					<RichText.Content
+						tagName="p"
+						style={ styles }
+						className={ className ? className : undefined }
+						value={ content }
+					/>
+				);
+			},
+		},
 		{
 			supports,
 			attributes: omit( {
@@ -438,7 +478,6 @@ export const settings = {
 
 	save( { attributes } ) {
 		const {
-			width,
 			align,
 			content,
 			dropCap,
@@ -455,7 +494,6 @@ export const settings = {
 		const fontSizeClass = fontSize && FONT_SIZES[ fontSize ] && `is-${ fontSize }-text`;
 
 		const className = classnames( {
-			[ `align${ width }` ]: width,
 			'has-background': backgroundColor || customBackgroundColor,
 			'has-drop-cap': dropCap,
 			[ fontSizeClass ]: fontSizeClass,
