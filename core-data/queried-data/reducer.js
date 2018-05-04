@@ -58,25 +58,6 @@ export function getMergedItemIds( itemIds, nextItemIds, page, perPage ) {
 }
 
 /**
- * Higher-order reducer which returns undefined if the original reducer returns
- * the default state value. Used in combination with `onSubKey` in avoiding
- * assingment for undefined value to key.
- *
- * @param {Function} reducer Original reducer.
- *
- * @return {Function} Enhanced reducer.
- */
-function withReturnUndefinedOnUnhandledDefault( reducer ) {
-	const defaultState = reducer( undefined, {} );
-	return ( state = defaultState, action ) => {
-		const nextState = reducer( state, action );
-		if ( nextState !== defaultState ) {
-			return nextState;
-		}
-	};
-}
-
-/**
  * Reducer tracking items state, keyed by ID. Items are assumed to be normal,
  * where identifiers are common across all queries.
  *
@@ -112,18 +93,23 @@ const queries = flowRight( [
 	ifMatchingAction( ( action ) => 'query' in action ),
 
 	// Inject query parts into action for use both in `onSubKey` and reducer.
-	replaceAction( ( action ) => ( {
-		...action,
-		...getQueryParts( action.query ),
-	} ) ),
+	replaceAction( ( action ) => {
+		// `ifMatchingAction` still passes on initialization, where state is
+		// undefined and a query is not assigned. Avoid attempting to parse
+		// parts. `onSubKey` will omit by lack of `stableKey`.
+		if ( action.query ) {
+			return {
+				...action,
+				...getQueryParts( action.query ),
+			};
+		}
+
+		return action;
+	} ),
 
 	// Queries shape is shared, but keyed by query `stableKey` part. Original
 	// reducer tracks only a single query object.
 	onSubKey( 'stableKey' ),
-
-	// Since query is optional for handled actions, avoid tracking empty object
-	// for default query on initialization.
-	withReturnUndefinedOnUnhandledDefault,
 ] )( combineReducers( {
 	itemIds( state = null, action ) {
 		const { type, page, perPage } = action;

@@ -23,7 +23,7 @@ import { withWeakMapCache } from './utils';
  *
  * @return {WPQueriedDataQueryParts} Query parts.
  */
-export function getQueryParts( query = {} ) {
+export function getQueryParts( query ) {
 	/**
 	 * @type {WPQueriedDataQueryParts}
 	 */

@@ -19,7 +19,7 @@ import getQueryParts from './get-query-parts';
  *
  * @return {?boolean} `requestingPageByPerPage` value for query.
  */
-function getRequestingPageByPerPage( state, query ) {
+function getRequestingPageByPerPage( state, query = {} ) {
 	const { stableKey, page, perPage } = getQueryParts( query );
 
 	return get( state, [
@@ -39,7 +39,7 @@ function getRequestingPageByPerPage( state, query ) {
  *
  * @return {?Array} Query items.
  */
-export function getQueriedItems( state, query ) {
+export function getQueriedItems( state, query = {} ) {
 	const { stableKey, page, perPage } = getQueryParts( query );
 	if ( ! state.queries[ stableKey ] ) {
 		return null;

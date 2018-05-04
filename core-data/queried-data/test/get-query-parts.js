@@ -4,16 +4,6 @@
 import { getQueryParts } from '../get-query-parts';
 
 describe( 'getQueryParts', () => {
-	it( 'returns default value if passed undefined', () => {
-		const parts = getQueryParts();
-
-		expect( parts ).toEqual( {
-			page: 1,
-			perPage: 10,
-			stableKey: '',
-		} );
-	} );
-
 	it( 'parses out pagination data', () => {
 		const parts = getQueryParts( { page: 2, perPage: 2 } );
 
