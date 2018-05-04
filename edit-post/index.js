@@ -83,25 +83,21 @@ export function initializeEditor( id, post, settings ) {
 		);
 	}
 
-	return new Promise( ( resolve ) => {
-		domReady( () => {
-			const target = document.getElementById( id );
-			const reboot = reinitializeEditor.bind( null, target, settings );
+	const target = document.getElementById( id );
+	const reboot = reinitializeEditor.bind( null, target, settings );
 
-			registerCoreBlocks();
+	registerCoreBlocks();
 
-			render(
-				<Editor settings={ migratedSettings || settings } onError={ reboot } post={ post } />,
-				target
-			);
+	render(
+		<Editor settings={ migratedSettings || settings } onError={ reboot } post={ post } />,
+		target
+	);
 
-			resolve( {
-				initializeMetaBoxes( metaBoxes ) {
-					store.dispatch( initializeMetaBoxState( metaBoxes ) );
-				},
-			} );
-		} );
-	} );
+	return {
+		initializeMetaBoxes( metaBoxes ) {
+			store.dispatch( initializeMetaBoxState( metaBoxes ) );
+		},
+	};
 }
 
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
