@@ -251,6 +251,12 @@ function caretRangeFromPoint( doc, x, y ) {
 	}
 
 	const point = doc.caretPositionFromPoint( x, y );
+
+	// Happens when point is out of view.
+	if ( ! point ) {
+		return null;
+	}
+
 	const range = doc.createRange();
 
 	range.setStart( point.offsetNode, point.offset );
