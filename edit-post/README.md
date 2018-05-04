@@ -90,11 +90,10 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 - Required: No
 
 
-## SlotFills
-SlotFills provide plugin or theme authors the ability to add items into the Gutenberg interface. While these slots appear in certain locations, 
-it should be noted that they are named and implemented around the function they serve and not their current location, which may change in future iterations.
-
 ### PluginPostStatusInfo
+
+Currently, this slotFill appears in the Status & Visibility panel of the sidebar.
+It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
 
 _Example_
 ```jsx
