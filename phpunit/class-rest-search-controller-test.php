@@ -364,6 +364,9 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
 	}
 
+	/**
+	 * Tests that post type capabilities are considered in edit context for author.
+	 */
 	public function test_prohibited_type_in_edit_context() {
 		wp_set_current_user( self::$author_id );
 
@@ -374,6 +377,9 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertErrorResponse( 'rest_forbidden_context', $response, 403 );
 	}
 
+	/**
+	 * Tests that post type capabilities are considered in edit context for editor.
+	 */
 	public function test_allowed_type_in_edit_context() {
 		wp_set_current_user( self::$editor_id );
 
