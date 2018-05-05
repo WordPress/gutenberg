@@ -68,7 +68,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 
 			if ( 'any' !== $request['type'] ) {
 				foreach ( (array) $request['type'] as $post_type ) {
-					if ( 'any' !== $post_type && ! isset( $allowed_post_types[ $post_type ] ) ) {
+					if ( 'any' !== $post_type && ! in_array( $post_type, $request['type_exclude'], true ) && ! isset( $allowed_post_types[ $post_type ] ) ) {
 
 						/* translators: post type slug */
 						return new WP_Error( 'rest_forbidden_context', sprintf( __( 'Sorry, you are not allowed to edit content of type %s.', 'gutenberg' ), $post_type ), array( 'status' => rest_authorization_required_code() ) );
@@ -104,8 +104,13 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		);
 
 		// Transform 'any' into actual post type list.
-		if ( in_array( 'any', (array) $request['type'], true ) ) {
+		if ( in_array( 'any', $request['type'], true ) ) {
 			$query_args['post_type'] = array_keys( $this->get_allowed_post_types( 'edit' === $request['context'] ) );
+		}
+
+		// Ensure to exclude post types as necessary.
+		if ( ! empty( $request['type_exclude'] ) ) {
+			$query_args['post_type'] = array_diff( $query_args['post_type'], $request['type_exclude'] );
 		}
 
 		/*
@@ -714,6 +719,16 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			'type'        => 'array',
 			'items'       => array(
 				'enum' => array_merge( array_keys( $this->get_allowed_post_types() ), array( 'any' ) ),
+				'type' => 'string',
+			),
+		);
+
+		$query_params['type_exclude'] = array(
+			'default'     => array(),
+			'description' => __( 'Ensure search results exclude content of one or more specific types.', 'gutenberg' ),
+			'type'        => 'array',
+			'items'       => array(
+				'enum' => array_keys( $this->get_allowed_post_types() ),
 				'type' => 'string',
 			),
 		);

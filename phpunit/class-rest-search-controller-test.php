@@ -186,6 +186,26 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Search through all content but attachments.
+	 */
+	public function test_get_items_search_exclude_attachments() {
+		$response = $this->do_request_with_params( array(
+			'per_page'     => 100,
+			'type_exclude' => 'attachment',
+		) );
+
+		$this->assertEquals( 200, $response->get_status() );
+		$this->assertEqualSets(
+			array_merge(
+				self::$my_title_post_ids,
+				self::$my_title_page_ids,
+				self::$my_content_post_ids
+			),
+			wp_list_pluck( $response->get_data(), 'id' )
+		);
+	}
+
+	/**
 	 * Search through all content with slug 'my-footitle'.
 	 */
 	public function test_get_items_search_by_slug() {
