@@ -1231,6 +1231,112 @@ describe( 'state', () => {
 					footnotes: expectedFootnotesBlock,
 				} );
 			} );
+
+			it( 'should update footnotes when a block is inserted', () => {
+				const original = deepFreeze( editor( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat1',
+						attributes: {
+							content: [
+								'Lorem ipsum',
+								{
+									type: 'sup',
+									props: {
+										'data-footnote-id': 'footnote-1',
+									},
+								},
+							],
+						},
+						innerBlocks: [],
+						footnotes: [ 'footnote-1' ],
+					}, {
+						uid: 'footnotes',
+						name: 'core/footnotes',
+						attributes: {
+							footnotes: [ 'footnote-1' ],
+						},
+						innerBlocks: [],
+					} ],
+				} ) );
+
+				const state = editor( original, {
+					type: 'INSERT_BLOCKS',
+					uid: 'kumquat2',
+					blocks: [ {
+						uid: 'kumquat2',
+						attributes: {
+							content: [
+								'is a text',
+								{
+									type: 'sup',
+									props: {
+										'data-footnote-id': 'footnote-2',
+									},
+								},
+							],
+						},
+						innerBlocks: [],
+					} ],
+				} );
+
+				expect( state.present.blocksByUid.footnotes.attributes ).toEqual( {
+					footnotes: [ 'footnote-1', 'footnote-2' ],
+				} );
+			} );
+
+			it( 'should update footnotes when a block is removed', () => {
+				const original = deepFreeze( editor( undefined, {
+					type: 'RESET_BLOCKS',
+					blocks: [ {
+						uid: 'kumquat1',
+						attributes: {
+							content: [
+								'Lorem ipsum',
+								{
+									type: 'sup',
+									props: {
+										'data-footnote-id': 'footnote-1',
+									},
+								},
+							],
+						},
+						innerBlocks: [],
+						footnotes: [ 'footnote-1' ],
+					}, {
+						uid: 'kumquat2',
+						attributes: {
+							content: [
+								{
+									type: 'sup',
+									props: {
+										'data-footnote-id': 'footnote-2',
+									},
+								},
+								'is a text',
+							],
+						},
+						innerBlocks: [],
+						footnotes: [ 'footnote-2' ],
+					}, {
+						uid: 'footnotes',
+						name: 'core/footnotes',
+						attributes: {
+							footnotes: [ 'footnote-1', 'footnote-2' ],
+						},
+						innerBlocks: [],
+					} ],
+				} ) );
+
+				const state = editor( original, {
+					type: 'REMOVE_BLOCKS',
+					uids: [ 'kumquat2' ],
+				} );
+
+				expect( state.present.blocksByUid.footnotes.attributes ).toEqual( {
+					footnotes: [ 'footnote-1' ],
+				} );
+			} );
 		} );
 
 		describe( 'withHistory', () => {

@@ -437,10 +437,21 @@ export const editor = flow( [
 				};
 
 			case 'INSERT_BLOCKS':
-				return {
+				const newBlocks = action.blocks.map( ( block ) => {
+					if ( ! block.attributes || ! block.attributes.content ) {
+						return block;
+					}
+
+					return {
+						...block,
+						footnotes: parseFootnotesFromContent( block.attributes.content ),
+					};
+				} );
+
+				return updateFootnotes( {
 					...state,
-					...getFlattenedBlocks( action.blocks ),
-				};
+					...getFlattenedBlocks( newBlocks ),
+				} );
 
 			case 'REPLACE_BLOCKS':
 				if ( ! action.blocks ) {
@@ -453,7 +464,7 @@ export const editor = flow( [
 				};
 
 			case 'REMOVE_BLOCKS':
-				return omit( state, action.uids );
+				return updateFootnotes( omit( state, action.uids ) );
 
 			case 'SAVE_SHARED_BLOCK_SUCCESS': {
 				const { id, updatedId } = action;
