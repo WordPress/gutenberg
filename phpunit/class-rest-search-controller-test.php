@@ -335,7 +335,7 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_set_current_user( self::$editor_id );
 
 		$response = $this->do_request_with_params( array(
-			'_fields' => 'id,title,type,link'
+			'_fields' => 'id,title,type,link',
 		) );
 		$this->assertEquals( 200, $response->get_status() );
 
@@ -414,7 +414,7 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Perform a REST request to our search endpoint with given parameters.
 	 */
 	private function do_request_with_params( $params = array(), $method = 'GET' ) {
-		$request  = new WP_REST_Request( $method, '/gutenberg/v1/search' );
+		$request = new WP_REST_Request( $method, '/gutenberg/v1/search' );
 
 		foreach ( $params as $param => $value ) {
 			$request->set_param( $param, $value );
