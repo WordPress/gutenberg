@@ -6,11 +6,17 @@ import { IconButton } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { primaryShortcut } from 'utils/keycodes';
+
 function EditorHistoryRedo( { hasRedo, redo } ) {
 	return (
 		<IconButton
 			icon="redo"
 			label={ __( 'Redo' ) }
+			shortcut={ primaryShortcut( 'Y' ) }
 			disabled={ ! hasRedo }
 			onClick={ redo }
 			className="editor-history__undo"

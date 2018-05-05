@@ -11,6 +11,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import './style.scss';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
+import { primaryShortcut } from 'utils/keycodes';
 
 /**
  * Component showing whether the post is saved or not and displaying save links.
@@ -68,6 +69,7 @@ export class PostSavedState extends Component {
 				className="editor-post-save-draft"
 				onClick={ onSave }
 				icon="cloud-upload"
+				shortcut={ primaryShortcut( 'S' ) }
 			>
 				{ __( 'Save Draft' ) }
 			</IconButton>

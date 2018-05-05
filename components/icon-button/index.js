@@ -25,14 +25,21 @@ class IconButton extends Component {
 		const classes = classnames( 'components-icon-button', className );
 		const tooltipText = tooltip || label;
 
-		// Should show the tooltip if an explicit tooltip is passed
-		// or if there's a label and the children are empty and the tooltip is not explicitely disabled
-		const showTooltip = !! tooltip ||
+		// Should show the tooltip...
+		const showTooltip = (
+			// if an explicit tooltip is passed or...
+			!! tooltip ||
+			// if there's a shortcut or...
+			!! shortcut ||
 			(
-				label &&
+				// if there's a label and...
+				!! label &&
+				// the children are empty and...
 				( ! children || ( isArray( children ) && ! children.length ) ) &&
+				// the tooltip is not explicitely disabled.
 				false !== tooltip
-			);
+			)
+		);
 
 		let element = (
 			<Button { ...additionalProps } aria-label={ label } className={ classes } focus={ focus }>
