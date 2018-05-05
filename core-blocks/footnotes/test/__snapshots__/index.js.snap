@@ -1,7 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`core/footnotes block edit matches snapshot 1`] = `
-<ol
-  class="blocks-footnotes__footnotes-list"
-/>
-`;
+exports[`core/footnotes block edit matches snapshot 1`] = `null`;

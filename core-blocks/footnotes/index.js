@@ -44,6 +44,11 @@ export const settings = {
 		editable: null,
 	} )( ( { attributes, editable, isSelected, setAttributes, setState } ) => {
 		const { footnotes, texts } = attributes;
+
+		if ( ! footnotes.length ) {
+			return null;
+		}
+
 		const onSetActiveEditable = ( index ) => () => {
 			setState( { editable: index } );
 		};
@@ -78,6 +83,11 @@ export const settings = {
 
 	save( { attributes } ) {
 		const { footnotes, texts } = attributes;
+
+		if ( ! footnotes.length ) {
+			return null;
+		}
+
 		const footnotesBlock = footnotes.map( ( footnote ) => (
 			<li id={ footnote } key={ footnote }>
 				{ getFootnotesText( texts[ footnote ] ) }
