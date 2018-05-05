@@ -243,7 +243,12 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	public function check_read_permission( $post ) {
 
 		// Is the post readable?
-		if ( 'publish' === $post->post_status || current_user_can( $post_type->cap->read_post, $post->ID ) ) {
+		if ( 'publish' === $post->post_status ) {
+			return true;
+		}
+
+		$post_type = get_post_type_object( $post->post_type );
+		if ( current_user_can( $post_type->cap->read_post, $post->ID ) ) {
 			return true;
 		}
 
@@ -790,7 +795,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		$post_stati = get_post_stati( array(
 			'public'   => true,
 			'internal' => false,
-		) );
+		), 'objects' );
 
 		$post_stati['inherit'] = get_post_status_object( 'inherit' );
 
@@ -811,7 +816,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		$post_types = get_post_types( array(
 			'public'       => true,
 			'show_in_rest' => true,
-		) );
+		), 'objects' );
 
 		if ( $editable ) {
 			$allowed = array();
