@@ -1197,7 +1197,6 @@ describe( 'state', () => {
 					{
 						type: 'sup',
 						props: {
-							className: 'footnote',
 							'data-footnote-id': newFootnote,
 						},
 					},

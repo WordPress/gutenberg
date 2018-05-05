@@ -19,6 +19,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
 import {
 	isHorizontalEdge,
@@ -836,7 +837,8 @@ export class RichText extends Component {
 		if ( this.editor.selection.getNode().tagName === 'SUP' ) {
 			return;
 		}
-		this.editor.insertContent( '<sup class="footnote" data-footnote-id="' + uuid() + '">*</sup> ' );
+		const uid = uuid();
+		this.editor.insertContent( '<sup data-footnote-id="' + uid + '"><a href="#' + uid + '" class="wp-footnote"><span class="screen-reader-text">' + __( 'See footnote' ) + '</span></a></sup> ' );
 	}
 
 	/**

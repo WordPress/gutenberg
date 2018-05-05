@@ -8,6 +8,7 @@ import { RichText } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import './style.scss';
 import './editor.scss';
 
 export const name = 'core/footnotes';
