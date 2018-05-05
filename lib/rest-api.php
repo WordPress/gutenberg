@@ -278,7 +278,7 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 	$orig_links = $response->get_links();
 	$post_type  = get_post_type_object( $post->post_type );
 	// Only Posts can be sticky.
-	if ( 'post' === $post->post_type ) {
+	if ( 'post' === $post->post_type && 'edit' === $request['context'] ) {
 		if ( current_user_can( $post_type->cap->edit_others_posts )
 			&& current_user_can( $post_type->cap->publish_posts ) ) {
 			$new_links['https://api.w.org/action-sticky'] = array(
@@ -286,11 +286,11 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 					'title'        => __( 'Sticky Post', 'gutenberg' ),
 					'href'         => $orig_links['self'][0]['href'],
 					'targetSchema' => array(
-						'type'       => 'object',
-						'properties' => array(
+						'type'        => 'object',
+						'description' => __( 'Whether or not the current user can sticky the post.', 'gutenberg' ),
+						'properties'  => array(
 							'sticky' => array(
-								'type'        => 'boolean',
-								'description' => __( 'Whether or not the object should be treated as sticky.', 'gutenberg' ),
+								'type' => 'boolean',
 							),
 						),
 					),

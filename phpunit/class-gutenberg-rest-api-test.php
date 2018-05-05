@@ -128,16 +128,25 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$check_key = 'https://api.w.org/action-sticky';
 		// authors cannot sticky.
 		wp_set_current_user( $this->author );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
 		$response = rest_do_request( $request );
 		$links    = $response->get_links();
 		$this->assertFalse( isset( $links[ $check_key ] ) );
 		// editors can sticky.
 		wp_set_current_user( $this->editor );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
 		$response = rest_do_request( $request );
 		$links    = $response->get_links();
 		$this->assertTrue( isset( $links[ $check_key ] ) );
+		// editors can sticky but not included for context != edit.
+		wp_set_current_user( $this->editor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'view' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
 	}
 
 	/**
