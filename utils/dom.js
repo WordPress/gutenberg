@@ -252,7 +252,8 @@ function caretRangeFromPoint( doc, x, y ) {
 
 	const point = doc.caretPositionFromPoint( x, y );
 
-	// Happens when point is out of view.
+	// If x or y are negative, outside viewport, or there is no text entry node.
+	// https://developer.mozilla.org/en-US/docs/Web/API/Document/caretRangeFromPoint
 	if ( ! point ) {
 		return null;
 	}
