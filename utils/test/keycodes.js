@@ -4,6 +4,7 @@
 import {
 	isMacOS,
 	displayShortcut,
+	rawShortcut,
 } from '../keycodes';
 
 const isMacOSFalse = () => false;
@@ -12,36 +13,36 @@ const isMacOSTrue = () => true;
 describe( 'displayShortcut', () => {
 	describe( 'primary', () => {
 		it( 'should output Control text on Windows', () => {
-			const shortcut = displayShortcut.primary( 'M', isMacOSFalse );
+			const shortcut = displayShortcut.primary( 'm', isMacOSFalse );
 			expect( shortcut ).toEqual( 'Ctrl+M' );
 		} );
 
 		it( 'should output command symbol on MacOS', () => {
-			const shortcut = displayShortcut.primary( 'M', isMacOSTrue );
+			const shortcut = displayShortcut.primary( 'm', isMacOSTrue );
 			expect( shortcut ).toEqual( '⌘M' );
 		} );
 	} );
 
 	describe( 'primaryShift', () => {
 		it( 'should output Ctrl+Shift text on Windows', () => {
-			const shortcut = displayShortcut.primaryShift( 'M', isMacOSFalse );
+			const shortcut = displayShortcut.primaryShift( 'm', isMacOSFalse );
 			expect( shortcut ).toEqual( 'Ctrl+Shift+M' );
 		} );
 
 		it( 'should output shift+command symbols on MacOS', () => {
-			const shortcut = displayShortcut.primaryShift( 'M', isMacOSTrue );
+			const shortcut = displayShortcut.primaryShift( 'm', isMacOSTrue );
 			expect( shortcut ).toEqual( '⇧shift+⌘M' );
 		} );
 	} );
 
 	describe( 'secondary', () => {
 		it( 'should output Ctrl+Shift+Alt text on Windows', () => {
-			const shortcut = displayShortcut.secondary( 'M', isMacOSFalse );
+			const shortcut = displayShortcut.secondary( 'm', isMacOSFalse );
 			expect( shortcut ).toEqual( 'Ctrl+Shift+Alt+M' );
 		} );
 
 		it( 'should output shift+option+command symbols on MacOS', () => {
-			const shortcut = displayShortcut.secondary( 'M', isMacOSTrue );
+			const shortcut = displayShortcut.secondary( 'm', isMacOSTrue );
 			expect( shortcut ).toEqual( '⇧shift+⌥option+⌘M' );
 		} );
 	} );
@@ -53,8 +54,58 @@ describe( 'displayShortcut', () => {
 		} );
 
 		it( 'should output control+option symbols on MacOS', () => {
-			const shortcut = displayShortcut.access( 'M', isMacOSTrue );
+			const shortcut = displayShortcut.access( 'm', isMacOSTrue );
 			expect( shortcut ).toEqual( '⌃control+⌥option+M' );
+		} );
+	} );
+} );
+
+describe( 'rawShortcut', () => {
+	describe( 'primary', () => {
+		it( 'should output ctrl on Windows', () => {
+			const shortcut = rawShortcut.primary( 'm', isMacOSFalse );
+			expect( shortcut ).toEqual( 'ctrl+m' );
+		} );
+
+		it( 'should output meta on MacOS', () => {
+			const shortcut = rawShortcut.primary( 'm', isMacOSTrue );
+			expect( shortcut ).toEqual( 'meta+m' );
+		} );
+	} );
+
+	describe( 'primaryShift', () => {
+		it( 'should output ctrl+shift on Windows', () => {
+			const shortcut = rawShortcut.primaryShift( 'm', isMacOSFalse );
+			expect( shortcut ).toEqual( 'ctrl+shift+m' );
+		} );
+
+		it( 'should output shift+meta on MacOS', () => {
+			const shortcut = rawShortcut.primaryShift( 'm', isMacOSTrue );
+			expect( shortcut ).toEqual( 'shift+meta+m' );
+		} );
+	} );
+
+	describe( 'secondary', () => {
+		it( 'should output ctrl+shift+alt on Windows', () => {
+			const shortcut = rawShortcut.secondary( 'm', isMacOSFalse );
+			expect( shortcut ).toEqual( 'ctrl+shift+alt+m' );
+		} );
+
+		it( 'should output shift+alt+meta on MacOS', () => {
+			const shortcut = rawShortcut.secondary( 'm', isMacOSTrue );
+			expect( shortcut ).toEqual( 'shift+alt+meta+m' );
+		} );
+	} );
+
+	describe( 'access', () => {
+		it( 'should output shift+alt on Windows', () => {
+			const shortcut = rawShortcut.access( 'm', isMacOSFalse );
+			expect( shortcut ).toEqual( 'shift+alt+m' );
+		} );
+
+		it( 'should output ctrl+alt on MacOS', () => {
+			const shortcut = rawShortcut.access( 'm', isMacOSTrue );
+			expect( shortcut ).toEqual( 'ctrl+alt+m' );
 		} );
 	} );
 } );
