@@ -394,7 +394,7 @@ export const editor = flow( [
 				}
 
 				// Otherwise merge attributes into state
-				const newState = {
+				const nextState = {
 					...state,
 					[ action.uid ]: {
 						...state[ action.uid ],
@@ -403,7 +403,7 @@ export const editor = flow( [
 					},
 				};
 
-				return updateFootnotes( newState );
+				return updateFootnotes( nextState );
 
 			case 'MOVE_BLOCK_TO_POSITION':
 				// Avoid creating a new instance if the layout didn't change.
@@ -437,7 +437,7 @@ export const editor = flow( [
 				};
 
 			case 'INSERT_BLOCKS':
-				const newBlocks = action.blocks.map( ( block ) => {
+				const nextBlocks = action.blocks.map( ( block ) => {
 					if ( ! block.attributes || ! block.attributes.content ) {
 						return block;
 					}
@@ -450,7 +450,7 @@ export const editor = flow( [
 
 				return updateFootnotes( {
 					...state,
-					...getFlattenedBlocks( newBlocks ),
+					...getFlattenedBlocks( nextBlocks ),
 				} );
 
 			case 'REPLACE_BLOCKS':
