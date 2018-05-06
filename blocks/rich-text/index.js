@@ -193,12 +193,6 @@ export class RichText extends Component {
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
 		}
-
-		editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
-		editor.shortcuts.add( rawShortcut.access( 'a' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
-		editor.shortcuts.add( rawShortcut.access( 's' ), '', () => this.changeFormats( { link: undefined } ) );
-		editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => this.changeFormats( { strikethrough: ! this.state.formats.strikethrough } ) );
-		editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => this.changeFormats( { code: ! this.state.formats.code } ) );
 	}
 
 	/**
@@ -226,6 +220,18 @@ export class RichText extends Component {
 
 	onInit() {
 		this.registerCustomFormatters();
+
+		this.editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
+		this.editor.shortcuts.add( rawShortcut.access( 'a' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
+		this.editor.shortcuts.add( rawShortcut.access( 's' ), '', () => this.changeFormats( { link: undefined } ) );
+		this.editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => this.changeFormats( { strikethrough: ! this.state.formats.strikethrough } ) );
+		this.editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => this.changeFormats( { code: ! this.state.formats.code } ) );
+		this.editor.shortcuts.add( rawShortcut.primary( 'z' ), '', 'Undo' );
+		this.editor.shortcuts.add( rawShortcut.primaryShift( 'z' ), '', 'Redo' );
+
+		// Remove TinyMCE Core shortcut for consistency with global editor
+		// shortcuts. Also clashes with Mac browsers.
+		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
 	}
 
 	adaptFormatter( options ) {
