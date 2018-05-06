@@ -16,36 +16,35 @@ import { prependHTTP } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { accessShortcut, primaryShortcut } from 'utils/keycodes';
 import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
 
-const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } = keycodes;
+const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER, displayShortcut } = keycodes;
 
 const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',
 		title: __( 'Bold' ),
-		shortcut: primaryShortcut( 'B' ),
+		shortcut: displayShortcut.primary( 'b' ),
 		format: 'bold',
 	},
 	{
 		icon: 'editor-italic',
 		title: __( 'Italic' ),
-		shortcut: primaryShortcut( 'I' ),
+		shortcut: displayShortcut.primary( 'i' ),
 		format: 'italic',
 	},
 	{
 		icon: 'editor-strikethrough',
 		title: __( 'Strikethrough' ),
-		shortcut: accessShortcut( 'D' ),
+		shortcut: displayShortcut.access( 'd' ),
 		format: 'strikethrough',
 	},
 	{
 		icon: 'admin-links',
 		title: __( 'Link' ),
-		shortcut: primaryShortcut( 'K' ),
+		shortcut: displayShortcut.primary( 'k' ),
 		format: 'link',
 	},
 ];
