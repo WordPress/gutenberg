@@ -23,7 +23,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { isSharedBlock, parseFootnotesFromContent } from '@wordpress/blocks';
+import { isSharedBlock } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
 
 /**
@@ -203,8 +203,13 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  */
 const getFootnotes = ( blocksByUid ) => {
 	return Object.keys( blocksByUid ).reduce(
-		( footnotes, blockUid ) =>
-			footnotes.concat( blocksByUid[ blockUid ].footnotes || [] ),
+		( footnotes, blockUid ) => {
+			if ( ! blocksByUid[ blockUid ].attributes ||
+					! blocksByUid[ blockUid ].attributes.blockFootnotes ) {
+				return footnotes;
+			}
+			return footnotes.concat( blocksByUid[ blockUid ].attributes.blockFootnotes );
+		},
 		[]
 	);
 };
@@ -399,7 +404,6 @@ export const editor = flow( [
 					[ action.uid ]: {
 						...state[ action.uid ],
 						attributes: nextAttributes,
-						footnotes: parseFootnotesFromContent( nextAttributes.content ),
 					},
 				};
 
@@ -437,20 +441,9 @@ export const editor = flow( [
 				};
 
 			case 'INSERT_BLOCKS':
-				const nextBlocks = action.blocks.map( ( block ) => {
-					if ( ! block.attributes || ! block.attributes.content ) {
-						return block;
-					}
-
-					return {
-						...block,
-						footnotes: parseFootnotesFromContent( block.attributes.content ),
-					};
-				} );
-
 				return updateFootnotes( {
 					...state,
-					...getFlattenedBlocks( nextBlocks ),
+					...getFlattenedBlocks( action.blocks ),
 				} );
 
 			case 'REPLACE_BLOCKS':

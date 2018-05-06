@@ -1176,11 +1176,7 @@ describe( 'state', () => {
 					type: 'RESET_BLOCKS',
 					blocks: [ {
 						uid: 'kumquat',
-						attributes: {
-							content: [
-								'Lorem ipsum',
-							],
-						},
+						attributes: {},
 						innerBlocks: [],
 					}, {
 						uid: 'footnotes',
@@ -1192,43 +1188,17 @@ describe( 'state', () => {
 					} ],
 				} ) );
 				const newFootnote = 'fn-1234';
-				const newContent = [
-					'Lorem ipsum',
-					{
-						type: 'sup',
-						props: {
-							'data-footnote-id': newFootnote,
-						},
-					},
-					'is a text',
-				];
 
 				const state = editor( original, {
 					type: 'UPDATE_BLOCK_ATTRIBUTES',
 					uid: 'kumquat',
 					attributes: {
-						content: newContent,
+						blockFootnotes: [ newFootnote ],
 					},
 				} );
 
-				const expectedKumquatBlock = {
-					uid: 'kumquat',
-					attributes: {
-						content: newContent,
-					},
+				expect( state.present.blocksByUid.footnotes.attributes ).toEqual( {
 					footnotes: [ newFootnote ],
-				};
-				const expectedFootnotesBlock = {
-					uid: 'footnotes',
-					name: 'core/footnotes',
-					attributes: {
-						footnotes: [ newFootnote ],
-					},
-				};
-
-				expect( state.present.blocksByUid ).toEqual( {
-					kumquat: expectedKumquatBlock,
-					footnotes: expectedFootnotesBlock,
 				} );
 			} );
 
@@ -1238,18 +1208,9 @@ describe( 'state', () => {
 					blocks: [ {
 						uid: 'kumquat1',
 						attributes: {
-							content: [
-								'Lorem ipsum',
-								{
-									type: 'sup',
-									props: {
-										'data-footnote-id': 'footnote-1',
-									},
-								},
-							],
+							blockFootnotes: [ 'footnote-1' ],
 						},
 						innerBlocks: [],
-						footnotes: [ 'footnote-1' ],
 					}, {
 						uid: 'footnotes',
 						name: 'core/footnotes',
@@ -1266,15 +1227,7 @@ describe( 'state', () => {
 					blocks: [ {
 						uid: 'kumquat2',
 						attributes: {
-							content: [
-								'is a text',
-								{
-									type: 'sup',
-									props: {
-										'data-footnote-id': 'footnote-2',
-									},
-								},
-							],
+							blockFootnotes: [ 'footnote-2' ],
 						},
 						innerBlocks: [],
 					} ],
@@ -1291,33 +1244,15 @@ describe( 'state', () => {
 					blocks: [ {
 						uid: 'kumquat1',
 						attributes: {
-							content: [
-								'Lorem ipsum',
-								{
-									type: 'sup',
-									props: {
-										'data-footnote-id': 'footnote-1',
-									},
-								},
-							],
+							blockFootnotes: [ 'footnote-1' ],
 						},
 						innerBlocks: [],
-						footnotes: [ 'footnote-1' ],
 					}, {
 						uid: 'kumquat2',
 						attributes: {
-							content: [
-								{
-									type: 'sup',
-									props: {
-										'data-footnote-id': 'footnote-2',
-									},
-								},
-								'is a text',
-							],
+							blockFootnotes: [ 'footnote-2' ],
 						},
 						innerBlocks: [],
-						footnotes: [ 'footnote-2' ],
 					}, {
 						uid: 'footnotes',
 						name: 'core/footnotes',

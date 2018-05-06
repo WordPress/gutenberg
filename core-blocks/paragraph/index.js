@@ -24,6 +24,7 @@ import {
 import {
 	getColorClass,
 	withColors,
+	parseFootnotesFromContent,
 	AlignmentToolbar,
 	BlockControls,
 	ContrastChecker,
@@ -231,18 +232,25 @@ class ParagraphBlock extends Component {
 						onChange={ ( nextContent ) => {
 							setAttributes( {
 								content: nextContent,
+								blockFootnotes: parseFootnotesFromContent( nextContent ),
 							} );
 						} }
 						onSplit={ insertBlocksAfter ?
 							( before, after, ...blocks ) => {
 								if ( after ) {
-									blocks.push( createBlock( name, { content: after } ) );
+									blocks.push( createBlock( name, {
+										content: after,
+										blockFootnotes: parseFootnotesFromContent( after ),
+									} ) );
 								}
 
 								insertBlocksAfter( blocks );
 
 								if ( before ) {
-									setAttributes( { content: before } );
+									setAttributes( {
+										content: before,
+										blockFootnotes: parseFootnotesFromContent( before ),
+									} );
 								} else {
 									onReplace( [] );
 								}
@@ -299,6 +307,9 @@ const schema = {
 	},
 	customFontSize: {
 		type: 'number',
+	},
+	blockFootnotes: {
+		type: 'array',
 	},
 };
 
