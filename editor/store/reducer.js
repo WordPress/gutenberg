@@ -194,89 +194,6 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 };
 
 /**
- * Returns the footnotes contained in the blocks.
- *
- * @param {Object} blocksByUid Object containing the blocks where to extract
- * the footnotes from.
- *
- * @return {Array} Footnote ids contained in the blocks.
- */
-const getFootnotes = ( blocksByUid ) => {
-	return Object.keys( blocksByUid ).reduce(
-		( footnotes, blockUid ) => {
-			if ( ! blocksByUid[ blockUid ].attributes ||
-					! blocksByUid[ blockUid ].attributes.blockFootnotes ) {
-				return footnotes;
-			}
-			return footnotes.concat( blocksByUid[ blockUid ].attributes.blockFootnotes );
-		},
-		[]
-	);
-};
-
-/**
- * Returns the footnotes block.
- *
- * @param {Object} blocksByUid Object containing the blocks where to search
- * for the footnotes block.
- *
- * @return {Object|null} Footnotes block or null if there isn't a footnotes
- * block.
- */
-const getFootnotesBlock = ( blocksByUid ) => {
-	for ( let i = 0; i < Object.keys( blocksByUid ).length; i++ ) {
-		const block = blocksByUid[ Object.keys( blocksByUid )[ i ] ];
-		if ( block.name === 'core/footnotes' ) {
-			return block;
-		}
-	}
-
-	return null;
-};
-
-/**
- * Updates footnotes block with new footnotes.
- *
- * @param {Object} footnotesBlock Object of the footnotes block.
- * @param {Array}  footnotes      Array of new footnotes.
- *
- * @return {Object} Footnotes block updated with the new footnotes.
- */
-const updateFootnotesBlock = ( footnotesBlock, footnotes ) => {
-	return {
-		...footnotesBlock,
-		attributes: {
-			...footnotesBlock.attributes,
-			footnotes,
-		},
-	};
-};
-
-/**
- * Updates footnotes block if it exists in the list of blocks.
- *
- * @param {Object} blocksByUid Object containing the blocks.
- *
- * @return {Object} New blocks with the footnotes block updated with the
- * footnotes from the other blocks.
- */
-const updateFootnotes = ( blocksByUid ) => {
-	const footnotesBlock = getFootnotesBlock( blocksByUid );
-
-	if ( ! footnotesBlock ) {
-		return blocksByUid;
-	}
-
-	const footnotes = getFootnotes( blocksByUid );
-	const updatedFootnotesBlock = updateFootnotesBlock( footnotesBlock, footnotes );
-
-	return {
-		...blocksByUid,
-		[ footnotesBlock.uid ]: updatedFootnotesBlock,
-	};
-};
-
-/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -364,7 +281,7 @@ export const editor = flow( [
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
-				return updateFootnotes( getFlattenedBlocks( action.blocks ) );
+				return getFlattenedBlocks( action.blocks );
 
 			case 'RECEIVE_BLOCKS':
 				return {
@@ -399,15 +316,13 @@ export const editor = flow( [
 				}
 
 				// Otherwise merge attributes into state
-				const nextState = {
+				return {
 					...state,
 					[ action.uid ]: {
 						...state[ action.uid ],
 						attributes: nextAttributes,
 					},
 				};
-
-				return updateFootnotes( nextState );
 
 			case 'MOVE_BLOCK_TO_POSITION':
 				// Avoid creating a new instance if the layout didn't change.
@@ -441,10 +356,10 @@ export const editor = flow( [
 				};
 
 			case 'INSERT_BLOCKS':
-				return updateFootnotes( {
+				return {
 					...state,
 					...getFlattenedBlocks( action.blocks ),
-				} );
+				};
 
 			case 'REPLACE_BLOCKS':
 				if ( ! action.blocks ) {
@@ -457,7 +372,7 @@ export const editor = flow( [
 				};
 
 			case 'REMOVE_BLOCKS':
-				return updateFootnotes( omit( state, action.uids ) );
+				return omit( state, action.uids );
 
 			case 'SAVE_SHARED_BLOCK_SUCCESS': {
 				const { id, updatedId } = action;

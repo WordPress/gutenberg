@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { withState } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { RichText } from '@wordpress/blocks';
 
 /**
@@ -13,14 +14,48 @@ import './editor.scss';
 
 export const name = 'core/footnotes';
 
+/**
+ * Returns the text to be used for the footnotes.
+ *
+ * @param {?Array|string} text Text which might be a string or an array of
+ * strings and nodes.
+ *
+ * @return {Array} Same text formatted as an array.
+ */
 const getFootnotesText = ( text ) => {
 	if ( ! text ) {
 		return [];
 	}
+
 	if ( ! Array.isArray( text ) ) {
 		return [ text ];
 	}
+
 	return text;
+};
+
+/**
+ * Returns the footnotes contained in the blocks.
+ *
+ * @param {Object} blocksByUid Object containing the blocks where to extract
+ * the footnotes from.
+ *
+ * @return {Array} Footnote ids contained in the blocks.
+ */
+const getFootnotesFromBlocks = ( blocksByUid ) => {
+	return Object.keys( blocksByUid ).reduce(
+		( footnotes, blockUid ) => {
+			const block = blocksByUid[ blockUid ];
+
+			if ( ! block.attributes ||
+					! block.attributes.blockFootnotes ) {
+				return footnotes;
+			}
+
+			return footnotes.concat( block.attributes.blockFootnotes );
+		},
+		[]
+	);
 };
 
 export const settings = {
@@ -40,15 +75,18 @@ export const settings = {
 		},
 	},
 
-	edit: withState( {
+	edit: withSelect( ( select ) => ( {
+		blocks: select( 'core/editor' ) ? select( 'core/editor' ).getBlocks() : [],
+	} ) )( withState( {
 		editable: null,
-	} )( ( { attributes, editable, isSelected, setAttributes, setState } ) => {
-		const { footnotes, texts } = attributes;
+	} )( ( { attributes, blocks, editable, isSelected, setAttributes, setState } ) => {
+		const footnotes = getFootnotesFromBlocks( blocks );
 
 		if ( ! footnotes.length ) {
 			return null;
 		}
 
+		const { texts } = attributes;
 		const onSetActiveEditable = ( index ) => () => {
 			setState( { editable: index } );
 		};
@@ -79,18 +117,26 @@ export const settings = {
 				{ footnotesBlock }
 			</ol>
 		);
-	} ),
+	} ) ),
 
 	save( { attributes } ) {
-		const { footnotes, texts } = attributes;
+		const { texts } = attributes;
+		const footnoteIds = Object.keys( texts );
 
-		if ( ! footnotes.length ) {
+		if ( ! footnoteIds.length ) {
 			return null;
 		}
 
-		const footnotesBlock = footnotes.map( ( footnote ) => (
-			<li id={ footnote } key={ footnote }>
-				{ getFootnotesText( texts[ footnote ] ) }
+		const footnotesToPrint = footnoteIds.map( ( footnoteId ) => {
+			return {
+				id: footnoteId,
+				text: texts[ footnoteId ],
+			};
+		} );
+
+		const footnotesBlock = footnotesToPrint.map( ( footnote ) => (
+			<li id={ footnote.id } key={ footnote.id }>
+				{ getFootnotesText( footnote.text ) }
 			</li>
 		) );
 
