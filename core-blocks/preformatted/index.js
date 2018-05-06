@@ -6,6 +6,7 @@ import {
 	createBlock,
 	registerBlockType,
 	RichText,
+	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 
 /**
@@ -49,6 +50,11 @@ export const settings = {
 						node.firstChild.nodeName === 'CODE'
 					)
 				),
+				schema: {
+					pre: {
+						children: getPhrasingContentSchema(),
+					},
+				},
 			},
 		],
 		to: [

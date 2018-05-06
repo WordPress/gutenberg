@@ -1,9 +1,11 @@
-const isMac = window.navigator.platform.toUpperCase().indexOf( 'MAC' ) >= 0;
-const mod = isMac ? '⌘' : 'Ctrl';
+/**
+ * Internal dependencies
+ */
+import { secondaryKeyCode, secondaryShortcut } from 'utils/keycodes';
 
 export default {
 	toggleEditorMode: {
-		value: 'mod+shift+alt+m',
-		label: `${ mod }+Shift+Alt+M`,
+		value: secondaryKeyCode( 'm' ),
+		label: secondaryShortcut( 'M' ),
 	},
 };

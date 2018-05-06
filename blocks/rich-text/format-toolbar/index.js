@@ -16,6 +16,7 @@ import { prependHTTP } from '@wordpress/url';
 /**
  * Internal dependencies
  */
+import { accessShortcut, primaryShortcut } from 'utils/keycodes';
 import './style.scss';
 import UrlInput from '../../url-input';
 import { filterURLForDisplay } from '../../../editor/utils/url';
@@ -26,19 +27,25 @@ const FORMATTING_CONTROLS = [
 	{
 		icon: 'editor-bold',
 		title: __( 'Bold' ),
+		shortcut: primaryShortcut( 'B' ),
 		format: 'bold',
 	},
 	{
 		icon: 'editor-italic',
 		title: __( 'Italic' ),
+		shortcut: primaryShortcut( 'I' ),
 		format: 'italic',
 	},
 	{
 		icon: 'editor-strikethrough',
 		title: __( 'Strikethrough' ),
+		shortcut: accessShortcut( 'D' ),
 		format: 'strikethrough',
 	},
 	{
+		icon: 'admin-links',
+		title: __( 'Link' ),
+		shortcut: primaryShortcut( 'K' ),
 		format: 'link',
 	},
 ];
@@ -85,13 +92,16 @@ class FormatToolbar extends Component {
 	componentWillReceiveProps( nextProps ) {
 		if ( this.props.selectedNodeId !== nextProps.selectedNodeId ) {
 			this.setState( {
-				isAddingLink: false,
 				isEditingLink: false,
 				settingsVisible: false,
 				opensInNewWindow: !! nextProps.formats.link && !! nextProps.formats.link.target,
 				newLinkValue: '',
 			} );
 		}
+
+		this.setState( {
+			isAddingLink: !! nextProps.formats.link && nextProps.formats.link.isAdding,
+		} );
 	}
 
 	onChangeLinkValue( value ) {

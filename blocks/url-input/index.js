@@ -51,8 +51,9 @@ class UrlInput extends Component {
 			this.suggestionsRequest.abort();
 		}
 
-		// Show the suggestions after typing at least 3 characters
-		if ( value.length < 2 ) {
+		// Show the suggestions after typing at least 2 characters
+		// and also for URLs
+		if ( value.length < 2 || /^https?:/.test( value ) ) {
 			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
@@ -111,10 +112,10 @@ class UrlInput extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { selectedSuggestion, posts } = this.state;
-		// If the suggestions are not shown, we shouldn't handle the arrow keys
+		const { showSuggestions, selectedSuggestion, posts, loading } = this.state;
+		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
-		if ( ! this.state.showSuggestions || ! this.state.posts.length ) {
+		if ( ! showSuggestions || ! posts.length || loading ) {
 			return;
 		}
 

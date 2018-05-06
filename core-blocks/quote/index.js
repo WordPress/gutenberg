@@ -14,6 +14,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
+	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 import { Toolbar, withState } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
@@ -102,7 +103,16 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'BLOCKQUOTE',
+				selector: 'blockquote',
+				schema: {
+					blockquote: {
+						children: {
+							p: {
+								children: getPhrasingContentSchema(),
+							},
+						},
+					},
+				},
 			},
 		],
 		to: [

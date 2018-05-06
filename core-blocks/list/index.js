@@ -12,13 +12,31 @@ import {
 	createBlock,
 	registerBlockType,
 	BlockControls,
-	RichText
+	RichText,
+	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
+
+const listContentSchema = {
+	...getPhrasingContentSchema(),
+	ul: {},
+	ol: { attributes: [ 'type' ] },
+};
+
+// Recursion is needed.
+// Possible: ul > li > ul.
+// Impossible: ul > ul.
+[ 'ul', 'ol' ].forEach( ( tag ) => {
+	listContentSchema[ tag ].children = {
+		li: {
+			children: listContentSchema,
+		},
+	};
+} );
 
 export const name = 'core/list';
 
@@ -81,7 +99,11 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
+				selector: 'ol,ul',
+				schema: {
+					ol: listContentSchema.ol,
+					ul: listContentSchema.ul,
+				},
 			},
 			{
 				type: 'pattern',

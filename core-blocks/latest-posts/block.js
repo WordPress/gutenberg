@@ -164,7 +164,7 @@ export default withAPIData( ( props ) => {
 	const latestPostsQuery = stringify( pickBy( {
 		categories,
 		order,
-		orderBy,
+		orderby: orderBy,
 		per_page: postsToShow,
 		_fields: [ 'date_gmt', 'link', 'title' ],
 	}, ( value ) => ! isUndefined( value ) ) );
