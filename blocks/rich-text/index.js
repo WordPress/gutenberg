@@ -45,7 +45,7 @@ import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
 
-const { BACKSPACE, DELETE, ENTER } = keycodes;
+const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
 
 /**
  * Returns true if the node is the inline node boundary. This is used in node
@@ -193,12 +193,6 @@ export class RichText extends Component {
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
 		}
-
-		editor.shortcuts.add( 'meta+k', '', () => this.changeFormats( { link: { isAdding: true } } ) );
-		editor.shortcuts.add( 'access+a', '', () => this.changeFormats( { link: { isAdding: true } } ) );
-		editor.shortcuts.add( 'access+s', '', () => this.changeFormats( { link: undefined } ) );
-		editor.shortcuts.add( 'access+d', '', () => this.changeFormats( { strikethrough: ! this.state.formats.strikethrough } ) );
-		editor.shortcuts.add( 'access+x', '', () => this.changeFormats( { code: ! this.state.formats.code } ) );
 	}
 
 	/**
@@ -226,6 +220,18 @@ export class RichText extends Component {
 
 	onInit() {
 		this.registerCustomFormatters();
+
+		this.editor.shortcuts.add( rawShortcut.primary( 'k' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
+		this.editor.shortcuts.add( rawShortcut.access( 'a' ), '', () => this.changeFormats( { link: { isAdding: true } } ) );
+		this.editor.shortcuts.add( rawShortcut.access( 's' ), '', () => this.changeFormats( { link: undefined } ) );
+		this.editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => this.changeFormats( { strikethrough: ! this.state.formats.strikethrough } ) );
+		this.editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => this.changeFormats( { code: ! this.state.formats.code } ) );
+		this.editor.shortcuts.add( rawShortcut.primary( 'z' ), '', 'Undo' );
+		this.editor.shortcuts.add( rawShortcut.primaryShift( 'z' ), '', 'Redo' );
+
+		// Remove TinyMCE Core shortcut for consistency with global editor
+		// shortcuts. Also clashes with Mac browsers.
+		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
 	}
 
 	adaptFormatter( options ) {

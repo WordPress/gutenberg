@@ -1,11 +1,13 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { secondaryKeyCode, secondaryShortcut } from 'utils/keycodes';
+import { keycodes } from '@wordpress/utils';
+
+const { rawShortcut, displayShortcut } = keycodes;
 
 export default {
 	toggleEditorMode: {
-		value: secondaryKeyCode( 'm' ),
-		label: secondaryShortcut( 'M' ),
+		value: rawShortcut.secondary( 'm' ),
+		label: displayShortcut.secondary( 'm' ),
 	},
 };
