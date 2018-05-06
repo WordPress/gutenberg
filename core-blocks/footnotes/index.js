@@ -90,31 +90,30 @@ export const settings = {
 		const onSetActiveEditable = ( index ) => () => {
 			setState( { editable: index } );
 		};
-		const footnotesBlock = footnotes.map( ( footnote, i ) => (
-			<li key={ footnote }>
-				<RichText
-					tagName="span"
-					value={ getFootnotesText( texts[ footnote ] ) }
-					onChange={
-						( nextValue ) => {
-							setAttributes( {
-								texts: {
-									...texts,
-									[ footnote ]: nextValue,
-								},
-							} );
-						}
-					}
-					isSelected={ isSelected && editable === i }
-					placeholder={ __( 'Write footnote…' ) }
-					onFocus={ onSetActiveEditable( i ) }
-				/>
-			</li>
-		) );
 
 		return (
 			<ol className="blocks-footnotes__footnotes-list">
-				{ footnotesBlock }
+				{ footnotes.map( ( footnote, i ) => (
+					<li key={ footnote }>
+						<RichText
+							tagName="span"
+							value={ getFootnotesText( texts[ footnote ] ) }
+							onChange={
+								( nextValue ) => {
+									setAttributes( {
+										texts: {
+											...texts,
+											[ footnote ]: nextValue,
+										},
+									} );
+								}
+							}
+							isSelected={ isSelected && editable === i }
+							placeholder={ __( 'Write footnote…' ) }
+							onFocus={ onSetActiveEditable( i ) }
+						/>
+					</li>
+				) ) }
 			</ol>
 		);
 	} ) ),
@@ -127,23 +126,21 @@ export const settings = {
 			return null;
 		}
 
-		const footnotesToPrint = footnoteIds.map( ( footnoteId ) => {
+		const footnotes = footnoteIds.map( ( footnoteId ) => {
 			return {
 				id: footnoteId,
 				text: texts[ footnoteId ],
 			};
 		} );
 
-		const footnotesBlock = footnotesToPrint.map( ( footnote ) => (
-			<li id={ footnote.id } key={ footnote.id }>
-				{ getFootnotesText( footnote.text ) }
-			</li>
-		) );
-
 		return (
 			<div>
 				<ol>
-					{ footnotesBlock }
+					{ footnotes.map( ( footnote ) => (
+						<li id={ footnote.id } key={ footnote.id }>
+							{ getFootnotesText( footnote.text ) }
+						</li>
+					) ) }
 				</ol>
 			</div>
 		);
