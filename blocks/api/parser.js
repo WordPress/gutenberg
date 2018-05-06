@@ -318,11 +318,6 @@ export function createBlockWithFallback( blockNode ) {
 		}
 	}
 
-	const footnotes = parseFootnotesFromContent( block.attributes.content );
-	if ( footnotes.length ) {
-		block.footnotes = footnotes;
-	}
-
 	return block;
 }
 

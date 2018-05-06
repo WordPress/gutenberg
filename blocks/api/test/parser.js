@@ -322,13 +322,7 @@ describe( 'block parser', () => {
 		it( 'should parse content and return footnote ids', () => {
 			const content = [
 				'Lorem ipsum',
-				{
-					type: 'sup',
-					props: {
-						className: 'footnote',
-						'data-footnote-id': '12345',
-					},
-				},
+				{ type: 'sup', props: { 'data-footnote-id': '12345' } },
 				'is a text',
 			];
 
