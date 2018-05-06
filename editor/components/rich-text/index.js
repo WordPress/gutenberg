@@ -838,7 +838,7 @@ export class RichText extends Component {
 			return;
 		}
 		const uid = uuid();
-		this.editor.insertContent( '<sup data-footnote-id="' + uid + '"><a href="#' + uid + '" class="wp-footnote"><span class="screen-reader-text">' + __( 'See footnote' ) + '</span></a></sup> ' );
+		this.editor.insertContent( `<sup data-footnote-id="${ uid }"><a href="#${ uid }" class="wp-footnote"><span class="screen-reader-text">${ __( 'See footnote' ) }</span></a></sup> ` );
 	}
 
 	/**
