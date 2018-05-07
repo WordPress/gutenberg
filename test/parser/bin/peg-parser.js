@@ -3,23 +3,13 @@
 /**
  * Node Dependencies
  */
-const fs = require( 'fs' );
+const getStdin = require( 'get-stdin' );
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 const parser = require( './parser' );
 
-const args = process.argv.slice( 2 );
-
-function parserFromFile( fileInput, fileOutput ) {
-	const input = fs.readFileSync( fileInput, 'utf8' );
-	const output = parser.parse( input );
-
-	fs.writeFileSync( fileOutput, JSON.stringify( output ) );
-}
-
-parserFromFile(
-	args[ 0 ],
-	args[ 1 ]
-);
+getStdin().then( input => {
+	process.stdout.write( JSON.stringify( parser.parse( input ) ) );
+} );
