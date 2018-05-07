@@ -10,8 +10,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	editorMediaUpload,
-	RichText,
 } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies

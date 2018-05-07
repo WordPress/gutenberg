@@ -4,13 +4,13 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { concatChildren, Fragment } from '@wordpress/element';
 import { PanelBody, Toolbar } from '@wordpress/components';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
-	createBlock,
 	RichText,
 	BlockControls,
 	InspectorControls,
 	AlignmentToolbar,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -69,7 +69,15 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => /H\d/.test( node.nodeName ),
+				selector: 'h1,h2,h3,h4,h5,h6',
+				schema: {
+					h1: { children: getPhrasingContentSchema() },
+					h2: { children: getPhrasingContentSchema() },
+					h3: { children: getPhrasingContentSchema() },
+					h4: { children: getPhrasingContentSchema() },
+					h5: { children: getPhrasingContentSchema() },
+					h6: { children: getPhrasingContentSchema() },
+				},
 			},
 			{
 				type: 'pattern',

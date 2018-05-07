@@ -8,14 +8,14 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Toolbar, withState } from '@wordpress/components';
+import { Toolbar } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
-	createBlock,
 	BlockControls,
 	AlignmentToolbar,
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -101,7 +101,16 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'BLOCKQUOTE',
+				selector: 'blockquote',
+				schema: {
+					blockquote: {
+						children: {
+							p: {
+								children: getPhrasingContentSchema(),
+							},
+						},
+					},
+				},
 			},
 		],
 		to: [
@@ -115,7 +124,7 @@ export const settings = {
 					}
 					// transforming a quote with content
 					return ( value || [] ).map( ( item ) => createBlock( 'core/paragraph', {
-						content: [ get( item, 'children.props.children', '' ) ],
+						content: [ get( item, [ 'children', 'props', 'children' ], '' ) ],
 					} ) ).concat( citation ? createBlock( 'core/paragraph', {
 						content: citation,
 					} ) : [] );
@@ -165,14 +174,9 @@ export const settings = {
 		],
 	},
 
-	edit: withState( {
-		editable: 'content',
-	} )( ( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className, editable, setState } ) => {
+	edit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 		const { align, value, citation, style } = attributes;
 		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
-		const onSetActiveEditable = ( newEditable ) => () => {
-			setState( { editable: newEditable } );
-		};
 
 		return (
 			<Fragment>
@@ -213,8 +217,6 @@ export const settings = {
 						} }
 						/* translators: the text of the quotation */
 						placeholder={ __( 'Write quote…' ) }
-						isSelected={ isSelected && editable === 'content' }
-						onFocus={ onSetActiveEditable( 'content' ) }
 					/>
 					{ ( ( citation && citation.length > 0 ) || isSelected ) && (
 						<RichText
@@ -227,14 +229,12 @@ export const settings = {
 							}
 							/* translators: the individual or entity quoted */
 							placeholder={ __( 'Write citation…' ) }
-							isSelected={ isSelected && editable === 'cite' }
-							onFocus={ onSetActiveEditable( 'cite' ) }
 						/>
 					) }
 				</blockquote>
 			</Fragment>
 		);
-	} ),
+	},
 
 	save( { attributes } ) {
 		const { align, value, citation, style } = attributes;

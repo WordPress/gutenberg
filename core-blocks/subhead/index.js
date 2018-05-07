@@ -4,12 +4,12 @@
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { PanelBody } from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
 import {
-	createBlock,
 	RichText,
 	InspectorControls,
 	AlignmentToolbar,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

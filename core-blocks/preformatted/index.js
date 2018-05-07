@@ -2,10 +2,8 @@
  * WordPress
  */
 import { __ } from '@wordpress/i18n';
-import {
-	createBlock,
-	RichText,
-} from '@wordpress/blocks';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -48,6 +46,11 @@ export const settings = {
 						node.firstChild.nodeName === 'CODE'
 					)
 				),
+				schema: {
+					pre: {
+						children: getPhrasingContentSchema(),
+					},
+				},
 			},
 		],
 		to: [

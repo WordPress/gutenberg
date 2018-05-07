@@ -14,10 +14,14 @@ describe( 'withChangeDetection()', () => {
 	function originalReducer( state = initialState, action ) {
 		switch ( action.type ) {
 			case 'INCREMENT':
-				return { ...state, count: state.count + 1 };
+				return {
+					count: state.count + 1,
+				};
 
 			case 'RESET_AND_CHANGE_REFERENCE':
-				return { ...state };
+				return {
+					count: state.count,
+				};
 		}
 
 		return state;
@@ -72,8 +76,9 @@ describe( 'withChangeDetection()', () => {
 		state = reducer( deepFreeze( state ), { type: 'INCREMENT' } );
 		expect( state ).toEqual( { count: 1, isDirty: true } );
 
-		state = reducer( deepFreeze( state ), {} );
-		expect( state ).toEqual( { count: 1, isDirty: true } );
+		const afterState = reducer( deepFreeze( state ), {} );
+		expect( afterState ).toEqual( { count: 1, isDirty: true } );
+		expect( afterState ).toBe( state );
 	} );
 
 	it( 'should maintain separate states', () => {

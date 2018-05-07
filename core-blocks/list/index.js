@@ -8,16 +8,33 @@ import { find, compact, get, initial, last, isEmpty } from 'lodash';
  */
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
-	createBlock,
 	BlockControls,
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
+
+const listContentSchema = {
+	...getPhrasingContentSchema(),
+	ul: {},
+	ol: { attributes: [ 'type' ] },
+};
+
+// Recursion is needed.
+// Possible: ul > li > ul.
+// Impossible: ul > ul.
+[ 'ul', 'ol' ].forEach( ( tag ) => {
+	listContentSchema[ tag ].children = {
+		li: {
+			children: listContentSchema,
+		},
+	};
+} );
 
 export const name = 'core/list';
 
@@ -67,7 +84,7 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { value, citation } ) => {
-					const items = value.map( ( p ) => get( p, 'children.props.children' ) );
+					const items = value.map( ( p ) => get( p, [ 'children', 'props', 'children' ] ) );
 					if ( ! isEmpty( citation ) ) {
 						items.push( citation );
 					}
@@ -80,7 +97,11 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
+				selector: 'ol,ul',
+				schema: {
+					ol: listContentSchema.ol,
+					ul: listContentSchema.ul,
+				},
 			},
 			{
 				type: 'pattern',
@@ -108,7 +129,7 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
-					compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
+					compact( values.map( ( value ) => get( value, [ 'props', 'children' ], null ) ) )
 						.map( ( content ) => createBlock( 'core/paragraph', {
 							content: [ content ],
 						} ) ),
@@ -119,9 +140,9 @@ export const settings = {
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
 						value: compact( ( values.length === 1 ? values : initial( values ) )
-							.map( ( value ) => get( value, 'props.children', null ) ) )
+							.map( ( value ) => get( value, [ 'props', 'children' ], null ) ) )
 							.map( ( children ) => ( { children: <p>{ children }</p> } ) ),
-						citation: ( values.length === 1 ? undefined : [ get( last( values ), 'props.children' ) ] ),
+						citation: ( values.length === 1 ? undefined : [ get( last( values ), [ 'props', 'children' ] ) ] ),
 					} );
 				},
 			},

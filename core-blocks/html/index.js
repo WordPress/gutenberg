@@ -4,7 +4,8 @@
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withState, SandBox, CodeEditor } from '@wordpress/components';
-import { BlockControls } from '@wordpress/blocks';
+import { getPhrasingContentSchema } from '@wordpress/blocks';
+import { BlockControls } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -41,7 +42,20 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'IFRAME',
+				isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'iframe' ),
+				schema: {
+					figure: {
+						require: [ 'iframe' ],
+						children: {
+							iframe: {
+								attributes: [ 'src', 'allowfullscreen', 'height', 'width' ],
+							},
+							figcaption: {
+								children: getPhrasingContentSchema(),
+							},
+						},
+					},
+				},
 			},
 		],
 	},

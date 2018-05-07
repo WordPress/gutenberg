@@ -84,6 +84,8 @@ const {
 	isValidTemplate,
 	getTemplate,
 	getTemplateLock,
+	getBlockListSettings,
+	getSupportedBlocks,
 	POST_UPDATE_TRANSACTION_ID,
 	isPermalinkEditable,
 	getPermalink,
@@ -204,6 +206,28 @@ describe( 'selectors', () => {
 				editor: {
 					isDirty: true,
 				},
+				saving: {
+					requesting: false,
+				},
+			};
+
+			expect( isEditedPostDirty( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if pending transaction with dirty state', () => {
+			const state = {
+				optimist: [
+					{
+						beforeState: {
+							editor: {
+								isDirty: true,
+							},
+						},
+					},
+				],
+				editor: {
+					isDirty: false,
+				},
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
@@ -213,6 +237,9 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					isDirty: false,
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -230,6 +257,9 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'auto-draft',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( true );
@@ -244,6 +274,9 @@ describe( 'selectors', () => {
 					id: 1,
 					status: 'draft',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isCleanNewPost( state ) ).toBe( false );
@@ -257,6 +290,9 @@ describe( 'selectors', () => {
 				currentPost: {
 					id: 1,
 					status: 'auto-draft',
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -432,6 +468,9 @@ describe( 'selectors', () => {
 					},
 					isDirty: false,
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( 'The Title' );
@@ -449,6 +488,9 @@ describe( 'selectors', () => {
 							title: 'Modified Title',
 						},
 					},
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -470,6 +512,9 @@ describe( 'selectors', () => {
 					},
 					isDirty: false,
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( getDocumentTitle( state ) ).toBe( __( 'New post' ) );
@@ -489,6 +534,9 @@ describe( 'selectors', () => {
 						blockOrder: {},
 					},
 					isDirty: true,
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -719,6 +767,9 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'pending',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
@@ -731,6 +782,9 @@ describe( 'selectors', () => {
 				},
 				currentPost: {
 					status: 'draft',
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -745,6 +799,9 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'publish',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -757,6 +814,9 @@ describe( 'selectors', () => {
 				},
 				currentPost: {
 					status: 'publish',
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -771,6 +831,9 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'private',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -784,6 +847,9 @@ describe( 'selectors', () => {
 				currentPost: {
 					status: 'future',
 				},
+				saving: {
+					requesting: false,
+				},
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( false );
@@ -796,6 +862,9 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					isDirty: true,
+				},
+				saving: {
+					requesting: false,
 				},
 			};
 
@@ -3184,6 +3253,121 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPermalinkParts( state ) ).toEqual( parts );
+		} );
+	} );
+
+	describe( 'getBlockListSettings', () => {
+		it( 'should return the settings of a block', () => {
+			const state = {
+				blockListSettings: {
+					chicken: {
+						setting1: false,
+					},
+					ribs: {
+						setting2: true,
+					},
+				},
+			};
+
+			expect( getBlockListSettings( state, 'chicken' ) ).toEqual( {
+				setting1: false,
+			} );
+		} );
+
+		it( 'should return undefined if settings for the block don\'t exist', () => {
+			const state = {
+				blockListSettings: {},
+			};
+
+			expect( getBlockListSettings( state, 'chicken' ) ).toBe( undefined );
+		} );
+	} );
+
+	describe( 'getSupportedBlocks', () => {
+		it( 'should return false if all blocks are disabled globally', () => {
+			const state = {
+				blockListSettings: {
+					block1: {
+						supportedBlocks: [ 'core/block1' ],
+					},
+				},
+			};
+
+			expect( getSupportedBlocks( state, 'block1', false ) ).toBe( false );
+		} );
+
+		it( 'should return the supportedBlocks of root block if all blocks are supported globally', () => {
+			const state = {
+				blockListSettings: {
+					block1: {
+						supportedBlocks: [ 'core/block1' ],
+					},
+				},
+			};
+
+			expect( getSupportedBlocks( state, 'block1', true ) ).toEqual( [ 'core/block1' ] );
+		} );
+
+		it( 'should return the globally supported blocks if all blocks are enable inside the root block', () => {
+			const state = {
+				blockListSettings: {
+					block1: {
+						supportedBlocks: true,
+					},
+				},
+			};
+
+			expect( getSupportedBlocks( state, 'block1', [ 'core/block1' ] ) ).toEqual( [ 'core/block1' ] );
+		} );
+
+		it( 'should return the globally supported blocks if the root block does not sets the supported blocks', () => {
+			const state = {
+				blockListSettings: {
+					block1: {
+						chicken: 'ribs',
+					},
+				},
+			};
+
+			expect( getSupportedBlocks( state, 'block1', [ 'core/block1' ] ) ).toEqual( [ 'core/block1' ] );
+		} );
+
+		it( 'should return the globally supported blocks if there are no settings for the root block', () => {
+			const state = {
+				blockListSettings: {
+					block1: {
+						supportedBlocks: true,
+					},
+				},
+			};
+
+			expect( getSupportedBlocks( state, 'block2', [ 'core/block1' ] ) ).toEqual( [ 'core/block1' ] );
+		} );
+
+		it( 'should return false if all blocks are disabled inside the root block ', () => {
+			const state = {
+				blockListSettings: {
+					block1: {
+						supportedBlocks: false,
+					},
+				},
+			};
+
+			expect( getSupportedBlocks( state, 'block1', [ 'core/block1' ] ) ).toBe( false );
+		} );
+
+		it( 'should return the intersection of globally supported blocks with the supported blocks of the root block if both sets are defined', () => {
+			const state = {
+				blockListSettings: {
+					block1: {
+						supportedBlocks: [ 'core/block1', 'core/block2', 'core/block3' ],
+					},
+				},
+			};
+
+			expect( getSupportedBlocks( state, 'block1', [ 'core/block2', 'core/block4', 'core/block5' ] ) ).toEqual(
+				[ 'core/block2' ]
+			);
 		} );
 	} );
 } );

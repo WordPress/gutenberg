@@ -15,19 +15,19 @@
 		@include loading_fade;
 	}
 
-	.blocks-rich-text {
+	.editor-rich-text {
 		position: absolute;
 		width: 100%;
 		max-height: 100%;
 		overflow-y: auto;
 	}
 
-	.blocks-rich-text figcaption:not( [data-is-placeholder-visible="true"] ) {
+	.editor-rich-text figcaption:not( [data-is-placeholder-visible="true"] ) {
 		position: relative;
 		overflow: hidden;
 	}
 
-	.is-selected .blocks-rich-text {
+	.is-selected .editor-rich-text {
 		width: calc( 100% - 8px );
 		left: 4px;
 		margin-top: -4px;

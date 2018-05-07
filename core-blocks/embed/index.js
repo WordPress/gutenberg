@@ -4,6 +4,7 @@
 import { parse } from 'url';
 import { includes, kebabCase, toLower } from 'lodash';
 import { stringify } from 'querystring';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -11,13 +12,12 @@ import { stringify } from 'querystring';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
-import classnames from 'classnames';
+import { createBlock } from '@wordpress/blocks';
 import {
-	createBlock,
 	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

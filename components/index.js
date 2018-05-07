@@ -7,6 +7,7 @@ export { default as ButtonGroup } from './button-group';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as CodeEditor } from './code-editor';
+export { default as ColorPalette } from './color-palette';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as Disabled } from './disabled';

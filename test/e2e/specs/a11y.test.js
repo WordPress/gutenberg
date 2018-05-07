@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage } from '../support/utils';
+import { newPost, newDesktopBrowserPage, pressWithModifier } from '../support/utils';
 
 describe( 'a11y', () => {
 	beforeAll( async () => {
@@ -11,9 +11,7 @@ describe( 'a11y', () => {
 	} );
 
 	it( 'tabs header bar', async () => {
-		await page.keyboard.down( 'Control' );
-		await page.keyboard.press( '~' );
-		await page.keyboard.up( 'Control' );
+		await pressWithModifier( 'Control', '~' );
 
 		await page.keyboard.press( 'Tab' );
 

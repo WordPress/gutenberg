@@ -15,6 +15,7 @@ import {
 	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
+	MultiBlocksSwitcher,
 	NavigableToolbar,
 } from '@wordpress/editor';
 
@@ -33,6 +34,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport } ) {
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents />
+			<MultiBlocksSwitcher />
 			{ hasFixedToolbar && isLargeViewport && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />

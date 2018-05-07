@@ -14,7 +14,7 @@ import {
 } from '@wordpress/blocks';
 
 // Hack to avoid the wrapping HoCs.
-import { BlockEdit } from '../../../blocks/block-edit';
+import { BlockEdit } from '../../../editor/components/block-edit';
 
 export const blockEditRender = ( name, settings ) => {
 	if ( ! getBlockType( name ) ) {
