@@ -11,7 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require dirname( __FILE__ ) . '/meta-box-partial-page.php';
 require dirname( __FILE__ ) . '/class-wp-block-type.php';
+require dirname( __FILE__ ) . '/class-wp-block-type-validator.php';
 require dirname( __FILE__ ) . '/class-wp-block-type-registry.php';
+require dirname( __FILE__ ) . '/class-wp-parsed-block-types-registry.php';
 require dirname( __FILE__ ) . '/class-wp-rest-blocks-controller.php';
 require dirname( __FILE__ ) . '/class-wp-rest-block-renderer-controller.php';
 require dirname( __FILE__ ) . '/blocks.php';

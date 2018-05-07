@@ -403,6 +403,7 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/plugins/index.js' )
 	);
 }
+
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 
@@ -807,12 +808,24 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
  * @since 2.0.0
  */
 function gutenberg_enqueue_registered_block_scripts_and_styles() {
-	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
+
+	$is_editor    = ( 'enqueue_block_editor_assets' === current_action() );
+	$is_front_end = ! $is_editor;
+
+	$is_post_or_page = is_singular( array( 'post', 'page' ) );
+
+	// Triggers processing of block comments in the HTML.
+	gutenberg_trigger_block_comments_processing();
+
+	$enqueue_only_required_styles  = $is_front_end && $is_post_or_page;
+	$enqueue_styles_for_all_blocks = ! $enqueue_only_required_styles;
 
 	$block_registry = WP_Block_Type_Registry::get_instance();
+
 	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+
 		// Front-end styles.
-		if ( ! empty( $block_type->style ) ) {
+		if ( ! empty( $block_type->style ) && $enqueue_styles_for_all_blocks ) {
 			wp_enqueue_style( $block_type->style );
 		}
 
@@ -831,9 +844,68 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 			wp_enqueue_script( $block_type->editor_script );
 		}
 	}
+
+	if ( $enqueue_only_required_styles ) {
+		enqueue_required_frontend_block_styles();
+	}
 }
+
+/**
+ * For a single post / page, it calls gutenberg_process_block_comments() which parses
+ * `block types` present in the current post/page while stripping `block comments`.
+ * It calls apply_filters() on 'the_content' before starting to strip block comments
+ * so that block types added by plugins (through filters added uptil now on 'the_content')
+ * can also be parsed.
+ *
+ * For pages with multiple posts like category / archive / home page, it just adds
+ * gutenberg_process_block_comments() as a filter on `the_content`'. In that case,
+ * gutenberg_process_block_comments() only strips block comments from the HTML.
+ * We don't need to save `parsed block types` in that case since that's only needed
+ * for intelligent enqueueing of styles right now and because intelligent enqueueing of
+ * styles only needs to be enabled for single posts / pages right now.
+ *
+ * @since 2.7.0
+ */
+function gutenberg_trigger_block_comments_processing() {
+
+	$is_post_or_page = is_singular( array( 'post', 'page' ) );
+
+	if ( $is_post_or_page ) {
+		global $post;
+
+		$post->post_content = apply_filters( 'the_content', $post->post_content );
+		$post->post_content = gutenberg_process_block_comments( $post->post_content );
+	} else {
+		add_filter( 'the_content', 'gutenberg_process_block_comments', 10 );
+	}
+}
+
 add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
+
+/**
+ * Enqueues frontend styles for block types present in the current page/post.
+ *
+ * @since 2.7.0
+ */
+function enqueue_required_frontend_block_styles() {
+
+	$all_block_types_registry    = WP_Block_Type_Registry::get_instance();
+	$parsed_block_types_registry = WP_Parsed_Block_Types_Registry::get_instance();
+
+	$block_types_in_current_page = $parsed_block_types_registry->get_block_types_in_current_page();
+
+	foreach ( $block_types_in_current_page as $block_type_name ) {
+
+		$block_type = $all_block_types_registry->get_registered( $block_type_name );
+
+		if ( ! isset( $block_type ) ) {
+			// Log the error here.
+		} elseif ( isset( $block_type->style ) ) {
+			wp_enqueue_style( $block_type->style );
+		}
+	}
+}
 
 /**
  * The code editor settings that were last captured by
