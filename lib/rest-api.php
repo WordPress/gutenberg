@@ -283,12 +283,11 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 			&& current_user_can( $post_type->cap->publish_posts ) ) {
 			$new_links['https://api.w.org/action-sticky'] = array(
 				array(
-					'title'        => __( 'Sticky Post', 'gutenberg' ),
+					'title'        => __( 'The current user can sticky this post.', 'gutenberg' ),
 					'href'         => $orig_links['self'][0]['href'],
 					'targetSchema' => array(
-						'type'        => 'object',
-						'description' => __( 'Whether or not the current user can sticky the post.', 'gutenberg' ),
-						'properties'  => array(
+						'type'       => 'object',
+						'properties' => array(
 							'sticky' => array(
 								'type' => 'boolean',
 							),
