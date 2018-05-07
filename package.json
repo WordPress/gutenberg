@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "@wordpress/i18n": "^1.1.0",
+    "@wordpress/is-shallow-equal": "^1.0.1",
     "babel-plugin-module-resolver": "^3.1.0",
     "classnames": "^2.2.5",
     "jed": "^1.1.1",
