@@ -2,7 +2,7 @@
 
 exports[`core/verse block edit matches snapshot 1`] = `
 <div
-  class="wp-block-verse blocks-rich-text"
+  class="wp-block-verse editor-rich-text"
 >
   <div>
     <div>
@@ -14,13 +14,13 @@ exports[`core/verse block edit matches snapshot 1`] = `
           aria-expanded="false"
           aria-label="Write…"
           aria-multiline="false"
-          class="blocks-rich-text__tinymce"
+          class="editor-rich-text__tinymce"
           contenteditable="true"
           data-is-placeholder-visible="true"
           role="textbox"
         />
         <pre
-          class="blocks-rich-text__tinymce"
+          class="editor-rich-text__tinymce"
         >
           Write…
         </pre>

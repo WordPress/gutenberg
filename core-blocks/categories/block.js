@@ -10,7 +10,7 @@ import {
 	InspectorControls,
 	BlockControls,
 	BlockAlignmentToolbar,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

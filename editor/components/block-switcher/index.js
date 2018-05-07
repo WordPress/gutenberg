@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
-import { getBlockType, getPossibleBlockTransformations, switchToBlockType, BlockIcon, withEditorSettings } from '@wordpress/blocks';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType, withEditorSettings } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -12,6 +12,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import './style.scss';
+import BlockIcon from '../block-icon';
 
 /**
  * Module Constants

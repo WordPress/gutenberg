@@ -24,7 +24,6 @@ import {
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
-	createBlock,
 	getColorClass,
 	withColors,
 	AlignmentToolbar,
@@ -33,8 +32,8 @@ import {
 	InspectorControls,
 	PanelColor,
 	RichText,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

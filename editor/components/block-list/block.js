@@ -17,7 +17,6 @@ import {
 	placeCaretAtVerticalEdge,
 } from '@wordpress/utils';
 import {
-	BlockEdit,
 	createBlock,
 	cloneBlock,
 	getBlockType,
@@ -34,6 +33,7 @@ import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
+import BlockEdit from '../block-edit';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';

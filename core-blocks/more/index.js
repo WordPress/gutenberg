@@ -9,10 +9,8 @@ import { compact } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { Component, Fragment, RawHTML } from '@wordpress/element';
-import {
-	createBlock,
-	InspectorControls,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
+import { InspectorControls } from '@wordpress/editor';
 
 /**
  * Internal dependencies

@@ -7,12 +7,12 @@ import { __ } from '@wordpress/i18n';
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
+import { getPhrasingContentSchema } from '@wordpress/blocks';
 import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
