@@ -422,6 +422,7 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/plugins/index.js' )
 	);
 }
+
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 
@@ -826,12 +827,21 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
  * @since 2.0.0
  */
 function gutenberg_enqueue_registered_block_scripts_and_styles() {
-	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
+
+	$is_editor    = ( 'enqueue_block_editor_assets' === current_action() );
+	$is_front_end = ! $is_editor;
+
+	$is_post_or_page = is_singular( array( 'post', 'page' ) );
+
+	$enqueue_only_required_styles  = $is_front_end && $is_post_or_page;
+	$enqueue_styles_for_all_blocks = ! $enqueue_only_required_styles;
 
 	$block_registry = WP_Block_Type_Registry::get_instance();
+
 	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
+
 		// Front-end styles.
-		if ( ! empty( $block_type->style ) ) {
+		if ( ! empty( $block_type->style ) && $enqueue_styles_for_all_blocks ) {
 			wp_enqueue_style( $block_type->style );
 		}
 
@@ -850,9 +860,57 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 			wp_enqueue_script( $block_type->editor_script );
 		}
 	}
+
+	if ( $enqueue_only_required_styles ) {
+		/*
+		* This needs to run after `gutenberg_process_block_comments()` (which attempts to run as
+		* late as it can). Since `gutenberg_process_block_comments()` has (PHP_INT_MAX - 1) priority,
+		* therefore this has been assigned PHP_INT_MAX priority.
+		*/
+		add_filter( 'the_content', 'enqueue_required_frontend_block_styles', PHP_INT_MAX );
+	}
 }
+
 add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
+
+/**
+ * Enqueues frontend styles for block types present in the current page/post.
+ * This is hooked as a filter to 'the_content' and is executed after block comments
+ * are stripped from the HTML.
+ *
+ * It doesn't actually filter the post's content. It returns the post's content as is.
+ * It's only hooked as a filter so that it gets executed right after block comments are
+ * stripped from the HTML. This will make sure that we enqueue styles as early as we can.
+ *
+ * @since 2.7.0
+ *
+ * @param  string $content Post content.
+ * @return string          Post content returned as-is.
+ */
+function enqueue_required_frontend_block_styles( $content ) {
+
+	$all_block_types_registry    = WP_Block_Type_Registry::get_instance();
+	$parsed_block_types_registry = WP_Parsed_Block_Types_Registry::get_instance();
+
+	$block_types_in_current_page = $parsed_block_types_registry->get_block_types_in_current_page();
+
+	foreach ( $block_types_in_current_page as $block_type_name ) {
+
+		$block_type = $all_block_types_registry->get_registered( $block_type_name );
+
+		if ( ! isset( $block_type ) ) {
+
+			$error_message = sprintf( __( 'Cannot enqueue front-end styles for "%s" block type since it isn\'t registered.', 'gutenberg' ), $block_type_name );
+			trigger_error( $error_message, E_USER_NOTICE );
+
+		} elseif ( isset( $block_type->style ) ) {
+			wp_enqueue_style( $block_type->style );
+		}
+	}
+
+	return $content;
+}
 
 /**
  * The code editor settings that were last captured by
