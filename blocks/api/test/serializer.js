@@ -130,14 +130,21 @@ describe( 'block serializer', () => {
 		it( 'should not break HTML comments', () => {
 			expect( serializeAttributes( { a: '-- and --' } ) ).toBe( '{"a":"\\u002d\\u002d and \\u002d\\u002d"}' );
 		} );
+
 		it( 'should not break standard-non-compliant tools for "<"', () => {
 			expect( serializeAttributes( { a: '< and <' } ) ).toBe( '{"a":"\\u003c and \\u003c"}' );
 		} );
+
 		it( 'should not break standard-non-compliant tools for ">"', () => {
 			expect( serializeAttributes( { a: '> and >' } ) ).toBe( '{"a":"\\u003e and \\u003e"}' );
 		} );
+
 		it( 'should not break standard-non-compliant tools for "&"', () => {
 			expect( serializeAttributes( { a: '& and &' } ) ).toBe( '{"a":"\\u0026 and \\u0026"}' );
+		} );
+
+		it( 'should replace quotation marks', () => {
+			expect( serializeAttributes( { a: '" and "' } ) ).toBe( '{"a":"\\u0022 and \\u0022"}' );
 		} );
 	} );
 
