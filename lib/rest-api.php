@@ -266,6 +266,43 @@ function gutenberg_add_block_format_to_post_content( $response, $post, $request 
 }
 
 /**
+ * Include target schema attributes to links, based on whether the user can.
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the new links.
+ */
+function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
+	$new_links  = array();
+	$orig_links = $response->get_links();
+	$post_type  = get_post_type_object( $post->post_type );
+	// Only Posts can be sticky.
+	if ( 'post' === $post->post_type && 'edit' === $request['context'] ) {
+		if ( current_user_can( $post_type->cap->edit_others_posts )
+			&& current_user_can( $post_type->cap->publish_posts ) ) {
+			$new_links['https://api.w.org/action-sticky'] = array(
+				array(
+					'title'        => __( 'The current user can sticky this post.', 'gutenberg' ),
+					'href'         => $orig_links['self'][0]['href'],
+					'targetSchema' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'sticky' => array(
+								'type' => 'boolean',
+							),
+						),
+					),
+				),
+			);
+		}
+	}
+
+	$response->add_links( $new_links );
+	return $response;
+}
+
+/**
  * Whenever a post type is registered, ensure we're hooked into it's WP REST API response.
  *
  * @param string $post_type The newly registered post type.
@@ -274,6 +311,7 @@ function gutenberg_add_block_format_to_post_content( $response, $post, $request 
 function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
 	return $post_type;
 }
 add_filter( 'registered_post_type', 'gutenberg_register_post_prepare_functions' );
