@@ -72,5 +72,8 @@ export { default as SkipToSelectedBlock } from './skip-to-selected-block';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
 
+// Higher order components
+export { default as withAllowedBlockTypes } from './higher-order/with-allowed-block-types';
+
 // State Related Components
 export { default as EditorProvider } from './provider';

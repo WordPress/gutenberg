@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, IconButton } from '@wordpress/components';
-import { createBlock, isUnmodifiedDefaultBlock, withEditorSettings } from '@wordpress/blocks';
+import { Dropdown, IconButton, ifCondition } from '@wordpress/components';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -16,6 +11,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import withAllowedBlockTypes from './../higher-order/with-allowed-block-types';
 
 class Inserter extends Component {
 	constructor() {
@@ -45,14 +41,7 @@ class Inserter extends Component {
 			title,
 			children,
 			onInsertBlock,
-			hasSupportedBlocks,
-			isLocked,
 		} = this.props;
-
-		if ( ! hasSupportedBlocks || isLocked ) {
-			return null;
-		}
-
 		return (
 			<Dropdown
 				className="editor-inserter"
@@ -87,32 +76,22 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withEditorSettings( ( settings ) => {
-		const { allowedBlockTypes, templateLock } = settings;
-
-		return {
-			allowedBlockTypes,
-			isLocked: !! templateLock,
-		};
-	} ),
-	withSelect( ( select, { allowedBlockTypes } ) => {
+	withSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
 			getBlockInsertionPoint,
 			getSelectedBlock,
-			getSupportedBlocks,
 		} = select( 'core/editor' );
 
 		const insertionPoint = getBlockInsertionPoint();
-		const { rootUID } = insertionPoint;
-		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			insertionPoint,
 			selectedBlock: getSelectedBlock(),
-			hasSupportedBlocks: true === supportedBlocks || ! isEmpty( supportedBlocks ),
 		};
 	} ),
+	withAllowedBlockTypes( ( { insertionPoint } ) => insertionPoint.rootUID ),
+	ifCondition( ( { allowedBlockTypes } ) => allowedBlockTypes ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
 		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
