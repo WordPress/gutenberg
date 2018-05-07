@@ -13,8 +13,8 @@ import { __ } from '@wordpress/i18n';
 import { PlainText } from '@wordpress/editor';
 import styles from './editor.scss';
 
-export default function edit( { attributes, setAttributes, isSelected } ) {
-	const { customText, noTeaser } = attributes;
+export default function edit( { attributes, setAttributes } ) {
+	const { customText } = attributes;
 	const defaultText = __( 'Read more' );
 	const value = customText !== undefined ? customText : defaultText;
 

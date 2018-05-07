@@ -62,4 +62,4 @@ export default class edit extends Component {
 			</Fragment>
 		);
 	}
-};
+}
