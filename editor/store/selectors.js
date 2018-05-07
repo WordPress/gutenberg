@@ -1235,154 +1235,164 @@ function getInsertUsage( state, id ) {
  * @property {number}   frecency          Hueristic that combines recency and frecency. Useful for
  *                                        ordering items by relevancy.
  */
-export function getInserterItems( state, editorAllowedBlockTypes, parentUID = null ) {
-	const editorAllowList = parseAllowList( editorAllowedBlockTypes );
+export const getInserterItems = createSelector(
+	( state, editorAllowedBlockTypes, parentUID = null ) => {
+		const editorAllowList = parseAllowList( editorAllowedBlockTypes );
 
-	let parentAllowList, parentName;
-	if ( parentUID ) {
-		const parentBlockListSettings = getBlockListSettings( state, parentUID );
-		const parentAllowedBlockTypes = get( parentBlockListSettings, [ 'supportedBlocks' ] );
-		parentAllowList = parseAllowList( parentAllowedBlockTypes );
-		parentName = getBlockName( state, parentUID );
-	} else {
-		parentAllowList = parseAllowList( true );
-		parentName = getCurrentPostType( state );
-	}
-
-	const calculateUtility = ( category, count, isContextual ) => {
-		if ( isContextual ) {
-			return 3;
-		} else if ( count > 0 ) {
-			return 2;
-		} else if ( category === 'common' ) {
-			return 1;
-		}
-		return 0;
-	};
-
-	const calculateFrecency = ( time, count ) => {
-		if ( ! time ) {
-			return count;
+		let parentAllowList, parentName;
+		if ( parentUID ) {
+			const parentBlockListSettings = getBlockListSettings( state, parentUID );
+			const parentAllowedBlockTypes = get( parentBlockListSettings, [ 'supportedBlocks' ] );
+			parentAllowList = parseAllowList( parentAllowedBlockTypes );
+			parentName = getBlockName( state, parentUID );
+		} else {
+			parentAllowList = parseAllowList( true );
+			parentName = getCurrentPostType( state );
 		}
 
-		const duration = Date.now() - time;
-		switch ( true ) {
-			case duration < 3600:
-				return count * 4;
-			case duration < ( 24 * 3600 ):
-				return count * 2;
-			case duration < ( 7 * 24 * 3600 ):
-				return count / 2;
-			default:
-				return count / 4;
-		}
-	};
-
-	const canInsertBlockType = ( blockType ) => {
-		const isAllowedInEditor = editorAllowList[ blockType.name ] || editorAllowList[ '*' ];
-		if ( ! isAllowedInEditor ) {
-			return false;
-		}
-
-		if ( blockType.name in parentAllowList ) {
-			return parentAllowList[ blockType.name ];
-		}
-
-		const blockAllowList = parseAllowList( blockType.allowedParents );
-
-		if ( parentName in blockAllowList ) {
-			return blockAllowList[ parentName ];
-		}
-
-		return parentAllowList[ '*' ] && blockAllowList[ '*' ];
-	};
-
-	const buildBlockTypeInserterItem = ( blockType ) => {
-		const id = blockType.name;
-
-		let isDisabled = false;
-		if ( blockType.useOnce ) {
-			isDisabled = getBlocks( state ).some( ( block ) => block.name === blockType.name );
-		}
-
-		const blockAllowList = parseAllowList( blockType.allowedParents );
-		const isContextual = blockType.name in parentAllowList || parentName in blockAllowList;
-
-		const { time, count } = getInsertUsage( state, id );
-		const utility = calculateUtility( blockType.category, count, isContextual );
-		const frecency = calculateFrecency( time, count );
-
-		return {
-			id,
-			name: blockType.name,
-			initialAttributes: {},
-			title: blockType.title,
-			icon: blockType.icon,
-			category: blockType.category,
-			keywords: blockType.keywords,
-			isDisabled,
-			utility,
-			frecency,
+		const calculateUtility = ( category, count, isContextual ) => {
+			if ( isContextual ) {
+				return 3;
+			} else if ( count > 0 ) {
+				return 2;
+			} else if ( category === 'common' ) {
+				return 1;
+			}
+			return 0;
 		};
-	};
 
-	const canInsertSharedBlock = ( sharedBlock ) => {
-		const isAllowedInEditor = editorAllowList[ 'core/block' ] || editorAllowList[ '*' ];
-		if ( ! isAllowedInEditor ) {
-			return false;
-		}
+		const calculateFrecency = ( time, count ) => {
+			if ( ! time ) {
+				return count;
+			}
 
-		const isAllowedInParent = parentAllowList[ 'core/block' ] || parentAllowList[ '*' ];
-		if ( ! isAllowedInParent ) {
-			return false;
-		}
-
-		const referencedBlock = getBlock( state, sharedBlock.uid );
-		if ( ! referencedBlock ) {
-			return false;
-		}
-
-		const referencedBlockType = getBlockType( referencedBlock.name );
-		if ( ! referencedBlockType ) {
-			return false;
-		}
-
-		if ( ! canInsertBlockType( referencedBlockType ) ) {
-			return false;
-		}
-
-		return true;
-	};
-
-	const buildSharedBlockInserterItem = ( sharedBlock ) => {
-		const id = `core/block/${ sharedBlock.id }`;
-
-		const referencedBlock = getBlock( state, sharedBlock.uid );
-		const referencedBlockType = getBlockType( referencedBlock.name );
-
-		const { time, count } = getInsertUsage( state, id );
-		const utility = calculateUtility( 'shared', count, false );
-		const frecency = calculateFrecency( time, count );
-
-		return {
-			id,
-			name: 'core/block',
-			initialAttributes: { ref: sharedBlock.id },
-			title: sharedBlock.title,
-			icon: referencedBlockType.icon,
-			category: 'shared',
-			keywords: [],
-			isDisabled: false,
-			utility,
-			frecency,
+			const duration = Date.now() - time;
+			switch ( true ) {
+				case duration < 3600:
+					return count * 4;
+				case duration < ( 24 * 3600 ):
+					return count * 2;
+				case duration < ( 7 * 24 * 3600 ):
+					return count / 2;
+				default:
+					return count / 4;
+			}
 		};
-	};
 
-	return [
-		...getBlockTypes().filter( canInsertBlockType ).map( buildBlockTypeInserterItem ),
-		...getSharedBlocks( state ).filter( canInsertSharedBlock ).map( buildSharedBlockInserterItem ),
-	];
-}
+		const canInsertBlockType = ( blockType ) => {
+			const isAllowedInEditor = editorAllowList[ blockType.name ] || editorAllowList[ '*' ];
+			if ( ! isAllowedInEditor ) {
+				return false;
+			}
+
+			if ( blockType.name in parentAllowList ) {
+				return parentAllowList[ blockType.name ];
+			}
+
+			const blockAllowList = parseAllowList( blockType.allowedParents );
+
+			if ( parentName in blockAllowList ) {
+				return blockAllowList[ parentName ];
+			}
+
+			return parentAllowList[ '*' ] && blockAllowList[ '*' ];
+		};
+
+		const buildBlockTypeInserterItem = ( blockType ) => {
+			const id = blockType.name;
+
+			let isDisabled = false;
+			if ( blockType.useOnce ) {
+				isDisabled = getBlocks( state ).some( ( block ) => block.name === blockType.name );
+			}
+
+			const blockAllowList = parseAllowList( blockType.allowedParents );
+			const isContextual = blockType.name in parentAllowList || parentName in blockAllowList;
+
+			const { time, count } = getInsertUsage( state, id );
+			const utility = calculateUtility( blockType.category, count, isContextual );
+			const frecency = calculateFrecency( time, count );
+
+			return {
+				id,
+				name: blockType.name,
+				initialAttributes: {},
+				title: blockType.title,
+				icon: blockType.icon,
+				category: blockType.category,
+				keywords: blockType.keywords,
+				isDisabled,
+				utility,
+				frecency,
+			};
+		};
+
+		const canInsertSharedBlock = ( sharedBlock ) => {
+			const isAllowedInEditor = editorAllowList[ 'core/block' ] || editorAllowList[ '*' ];
+			if ( ! isAllowedInEditor ) {
+				return false;
+			}
+
+			const isAllowedInParent = parentAllowList[ 'core/block' ] || parentAllowList[ '*' ];
+			if ( ! isAllowedInParent ) {
+				return false;
+			}
+
+			const referencedBlock = getBlock( state, sharedBlock.uid );
+			if ( ! referencedBlock ) {
+				return false;
+			}
+
+			const referencedBlockType = getBlockType( referencedBlock.name );
+			if ( ! referencedBlockType ) {
+				return false;
+			}
+
+			if ( ! canInsertBlockType( referencedBlockType ) ) {
+				return false;
+			}
+
+			return true;
+		};
+
+		const buildSharedBlockInserterItem = ( sharedBlock ) => {
+			const id = `core/block/${ sharedBlock.id }`;
+
+			const referencedBlock = getBlock( state, sharedBlock.uid );
+			const referencedBlockType = getBlockType( referencedBlock.name );
+
+			const { time, count } = getInsertUsage( state, id );
+			const utility = calculateUtility( 'shared', count, false );
+			const frecency = calculateFrecency( time, count );
+
+			return {
+				id,
+				name: 'core/block',
+				initialAttributes: { ref: sharedBlock.id },
+				title: sharedBlock.title,
+				icon: referencedBlockType.icon,
+				category: 'shared',
+				keywords: [],
+				isDisabled: false,
+				utility,
+				frecency,
+			};
+		};
+
+		return [
+			...getBlockTypes().filter( canInsertBlockType ).map( buildBlockTypeInserterItem ),
+			...getSharedBlocks( state ).filter( canInsertSharedBlock ).map( buildSharedBlockInserterItem ),
+		];
+	},
+	( state, editorAllowedBlockTypes, parentUID ) => [
+		state.editor.present.blockOrder,
+		state.editor.present.blocksByUid,
+		state.sharedBlocks.data,
+		state.currentPost.type,
+		state.blockListSettings[ parentUID ],
+		state.preferences.insertUsage,
+	],
+);
 
 /**
  * Returns a list of items which the user is likely to want to insert. These
