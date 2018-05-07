@@ -18,14 +18,14 @@ import {
 	ToggleControl,
 	Toolbar,
 } from '@wordpress/components';
+import { editorMediaUpload } from '@wordpress/blocks';
 import {
-	editorMediaUpload,
 	BlockControls,
 	BlockAlignmentToolbar,
 	MediaUpload,
 	ImagePlaceholder,
 	InspectorControls,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

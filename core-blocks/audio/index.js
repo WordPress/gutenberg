@@ -10,12 +10,12 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
+import { editorMediaUpload } from '@wordpress/blocks';
 import {
-	editorMediaUpload,
 	MediaUpload,
 	RichText,
 	BlockControls,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

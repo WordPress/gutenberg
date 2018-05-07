@@ -94,42 +94,42 @@ This flag will make sure users are only able to choose colors from the `editor-c
 
 ## Editor styles
 
-A theme can provide a stylesheet to the editor itself, to change colors, fonts, and any aspect of the editor.
+A theme can provide a stylesheet that will change the editor's appearance. You can use this to change colors, fonts, and any other visual aspect of the editor.
 
 ### Add the stylesheet
 
-First thing you need to do is to enqueue the new editor style. Like this:
+The first thing to do is to create a new stylesheet file in your theme directory. We'll assume the file is named `style-editor.css`.
 
-```
+Next, load your newly-created editor stylesheet in your theme:
+
+```php
 /**
  * Enqueue block editor style
  */
 function mytheme_block_editor_styles() {
-	 wp_enqueue_style( 'mytheme-block-editor-styles', get_theme_file_uri( '/style-editor.css' ), false, '1.0', 'all' );
+	wp_enqueue_style( 'mytheme-block-editor-styles', get_theme_file_uri( '/style-editor.css' ), false, '1.0', 'all' );
 }
+
 add_action( 'enqueue_block_editor_assets', 'mytheme_block_editor_styles' );
 ```
 
-Now create a new stylesheet, `style-editor.css` and save it in your theme directory.
-
 ### Basic colors
 
-You can style the editor like any other webpage. Here's an example for how to change the background color and the font color. Paste this in your `style-editor.css `file:
+You can style the editor like any other webpage. Here's how to change the background color and the font color to blue:
 
-```
+```css
+/* Add this to your `style-editor.css` file */
 body.gutenberg-editor-page {
 	background-color: #d3ebf3;
 	color: #00005d;
 }
 ```
 
-This will make your editor use blue shades.
-
 ### Changing the width of the editor
 
-If you'd like to change the main column width of the editor, you can add the following to your `style-editor.css` file:
+To change the main column width of the editor, add the following CSS to `style-editor.css`:
 
-```
+```css
 /* Main column width */
 body.gutenberg-editor-page .editor-post-title,
 body.gutenberg-editor-page .editor-default-block-appender,
@@ -150,4 +150,4 @@ body.gutenberg-editor-page .editor-block-list__block[data-align="full"] {
 
 You can use those editor widths to match those in your theme. You can use any CSS width unit, including `%` or `px`.
 
-See also, [Applying Styles with Stylesheets](https://wordpress.org/gutenberg/handbook/blocks/applying-styles-with-stylesheets/).
+Further reading: [Applying Styles with Stylesheets](https://wordpress.org/gutenberg/handbook/blocks/applying-styles-with-stylesheets/).
