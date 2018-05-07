@@ -233,7 +233,7 @@ function gutenberg_add_permalink_template_to_posts( $response, $post, $request )
 	$sample_permalink = get_sample_permalink( $post->ID, $post->post_title, '' );
 
 	$response->data['permalink_template'] = $sample_permalink[0];
-	$response->data['generated_slug'] = $sample_permalink[1];
+	$response->data['generated_slug']     = $sample_permalink[1];
 
 	return $response;
 }
