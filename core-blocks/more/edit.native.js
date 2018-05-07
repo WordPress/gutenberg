@@ -10,10 +10,10 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import PlainText from '../../plain-text';
+import { PlainText } from '@wordpress/editor';
 import styles from './editor.scss';
 
-export function edit( { attributes, setAttributes, isSelected } ) {
+export default function edit( { attributes, setAttributes, isSelected } ) {
 	const { customText, noTeaser } = attributes;
 	const defaultText = __( 'Read more' );
 	const value = customText !== undefined ? customText : defaultText;
@@ -27,7 +27,7 @@ export function edit( { attributes, setAttributes, isSelected } ) {
 					value={ value }
 					multiline={ true }
 					underlineColorAndroid="transparent"
-					onChange={ value => setAttributes( { customText: value } ) }
+					onChange={ ( newValue ) => setAttributes( { customText: newValue } ) }
 					placeholder={ defaultText }
 				/>
 				<Text className={ styles[ 'blocks-more-right-marker' ] }>--&gt;</Text>
