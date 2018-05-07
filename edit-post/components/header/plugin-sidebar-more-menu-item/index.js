@@ -14,9 +14,9 @@ import PluginsMoreMenuGroup from '../plugins-more-menu-group';
 
 const PluginSidebarMoreMenuItem = ( { children, icon, isPinned, isSelected, onClick } ) => (
 	<Fragment>
-		{ isPinned && icon && (
+		{ icon && (
 			<PinnedPlugins>
-				{ <IconButton
+				{ isPinned && <IconButton
 					icon={ icon }
 					label={ children }
 					onClick={ onClick }
@@ -50,7 +50,7 @@ export default compose(
 		const sidebarName = `${ pluginContext.name }/${ target }`;
 
 		return {
-			isPinned: isPluginItemPinned( `sidebar/${ sidebarName }` ),
+			isPinned: isPluginItemPinned( sidebarName ),
 			isSelected: getActiveGeneralSidebarName() === sidebarName,
 			sidebarName,
 		};
