@@ -2,8 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType,
+} from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -62,3 +65,5 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );

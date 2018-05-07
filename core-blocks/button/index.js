@@ -8,6 +8,19 @@ import { omit, pick } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType,
+	RichText,
+	UrlInput,
+	BlockControls,
+	BlockAlignmentToolbar,
+	ColorPalette,
+	ContrastChecker,
+	InspectorControls,
+	getColorClass,
+	withColors,
+	PanelColor,
+} from '@wordpress/blocks';
 import { Component, Fragment } from '@wordpress/element';
 import {
 	Dashicon,
@@ -16,17 +29,6 @@ import {
 	ToggleControl,
 	withFallbackStyles,
 } from '@wordpress/components';
-import {
-	UrlInput,
-	RichText,
-	BlockControls,
-	BlockAlignmentToolbar,
-	ContrastChecker,
-	InspectorControls,
-	getColorClass,
-	withColors,
-	PanelColor,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -348,3 +350,5 @@ export const settings = {
 	},
 	],
 };
+
+registerBlockType( name, settings );

@@ -3,6 +3,7 @@
  */
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+const fs = require( 'fs' );
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
 
@@ -13,17 +14,17 @@ const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-web
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './[basename]/build/style.css',
+	filename: './build/[name].css',
 } );
 
 // CSS loader for styles specific to block editing.
 const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './core-blocks/build/edit-blocks.css',
+	filename: './build/[name]_editor.css',
 } );
 
-// CSS loader for styles specific to blocks in general.
-const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './core-blocks/build/style.css',
+// CSS loader for each individual block's styles
+const individualBlocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './build/[name].css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -79,7 +80,13 @@ const entryPointNames = [
 	'core-data',
 	'plugins',
 	'edit-post',
-	'core-blocks',
+	...fs.readdirSync( './core-blocks' ).reduce( (blockList, block ) => {
+		if ( block !== 'test' ) {
+			blockList.push( 'core-blocks/' + block )
+		}
+		return blockList;
+	}, []
+	),
 ];
 
 const packageNames = [
@@ -107,9 +114,11 @@ const externals = {
 	...packageNames,
 	...coreGlobals,
 ].forEach( ( name ) => {
-	externals[ `@wordpress/${ name }` ] = {
-		this: [ 'wp', camelCaseDash( name ) ],
-	};
+	if ( ! name.includes( 'core-blocks/' ) ) {
+		externals[ `@wordpress/${ name }` ] = {
+			this: [ 'wp', camelCaseDash( name ) ],
+		};
+	}
 } );
 
 const config = {
@@ -117,7 +126,8 @@ const config = {
 
 	entry: Object.assign(
 		entryPointNames.reduce( ( memo, path ) => {
-			const name = camelCaseDash( path );
+			let name = camelCaseDash( path );
+			name = name.replace( 'blocks/library/', '__block_' );
 			memo[ name ] = `./${ path }`;
 			return memo;
 		}, {} ),
@@ -128,7 +138,7 @@ const config = {
 		}, {} )
 	),
 	output: {
-		filename: '[basename]/build/index.js',
+		filename: 'build/[name].js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
@@ -159,7 +169,7 @@ const config = {
 				include: [
 					/core-blocks/,
 				],
-				use: blocksCSSPlugin.extract( extractConfig ),
+				use: individualBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /editor\.s?css$/,
@@ -178,7 +188,7 @@ const config = {
 		],
 	},
 	plugins: [
-		blocksCSSPlugin,
+		individualBlocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix

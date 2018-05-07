@@ -2,16 +2,18 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { concatChildren, Fragment } from '@wordpress/element';
-import { PanelBody, Toolbar } from '@wordpress/components';
 import {
 	createBlock,
+	registerBlockType,
 	RichText,
 	BlockControls,
 	InspectorControls,
 	AlignmentToolbar,
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
+
+import { concatChildren, Fragment } from '@wordpress/element';
+import { PanelBody, Toolbar } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -189,3 +191,5 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );

@@ -4,6 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
+	registerBlockType,
+	PlainText,
 } from '@wordpress/blocks';
 
 /**
@@ -71,3 +73,5 @@ export const settings = {
 		return <pre><code>{ attributes.content }</code></pre>;
 	},
 };
+
+registerBlockType( name, settings );

@@ -7,12 +7,12 @@ import { mount, shallow } from 'enzyme';
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { registerCoreBlocks } from '@wordpress/core-blocks';
 
 /**
  * Internal dependencies
  */
 import { DocumentOutline } from '../';
+import { registerCoreBlocks } from '../../../../blocks/test/helpers';
 
 jest.mock( '../../block-title', () => () => 'Block Title' );
 

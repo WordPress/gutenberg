@@ -1577,7 +1577,7 @@ describe( 'state', () => {
 
 	describe( 'preferences()', () => {
 		beforeAll( () => {
-			registerCoreBlocks();
+			// TODO: Need to load/register core blocks (or at least some demo blocks). Maybe requireIndex ?
 		} );
 
 		it( 'should apply all defaults', () => {

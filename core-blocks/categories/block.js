@@ -1,16 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
-import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { times, unescape } from 'lodash';
 import {
 	InspectorControls,
 	BlockControls,
 	BlockAlignmentToolbar,
 } from '@wordpress/blocks';
+import { Component, Fragment } from '@wordpress/element';
+import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { times, unescape } from 'lodash';
 
 /**
  * Internal dependencies

@@ -3,8 +3,12 @@
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType,
+	BlockControls,
+	getPhrasingContentSchema,
+} from '@wordpress/blocks';
 import { withState, SandBox, CodeEditor } from '@wordpress/components';
-import { BlockControls, getPhrasingContentSchema } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -96,3 +100,5 @@ export const settings = {
 		return <RawHTML>{ attributes.content }</RawHTML>;
 	},
 };
+
+registerBlockType( name, settings );

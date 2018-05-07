@@ -7,12 +7,13 @@ import { compact } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, ToggleControl } from '@wordpress/components';
-import { Component, Fragment, RawHTML } from '@wordpress/element';
 import {
+	registerBlockType,
 	createBlock,
 	InspectorControls,
 } from '@wordpress/blocks';
+import { PanelBody, ToggleControl } from '@wordpress/components';
+import { Component, Fragment, RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -144,3 +145,5 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );

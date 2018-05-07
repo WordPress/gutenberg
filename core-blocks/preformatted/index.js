@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
+	registerBlockType,
 	RichText,
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
@@ -90,3 +91,5 @@ export const settings = {
 		return <RichText.Content tagName="pre" value={ content } />;
 	},
 };
+
+registerBlockType( name, settings );

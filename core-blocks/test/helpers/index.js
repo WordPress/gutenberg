@@ -1,6 +1,7 @@
 /**
  * External dependencie
  */
+import fs from 'fs';
 import { render } from 'enzyme';
 import { noop } from 'lodash';
 
@@ -33,3 +34,21 @@ export const blockEditRender = ( name, settings ) => {
 		/>
 	);
 };
+
+export function registerCoreBlocks() {
+	const path = __dirname + '/../../';
+	const dirs = fs.readdirSync( path );
+
+	dirs.forEach( ( dir ) => {
+		// We need to exclude the 'test' directory
+		if ( dir !== 'test') {
+			// We only need a list of directories
+			if ( fs.statSync( path + '/' + dir ).isDirectory() ) {
+				// Exclude hidden directories
+				if ( dir.substring( 0, 1 ) !== '.' ) {
+					require( '../../' + dir );
+				}
+			}
+		}
+	} );
+}

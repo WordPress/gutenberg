@@ -8,9 +8,10 @@ import path from 'path';
 /**
  * Internal dependencies
  */
-import { registerCoreBlocks } from '../../../../../core-blocks';
 import rawHandler from '../../index';
 import serialize from '../../../serializer';
+
+import { registerCoreBlocks } from '../../../../test/helpers';
 
 const types = [
 	'plain',
@@ -35,6 +36,7 @@ describe( 'raw handling: integration', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
 		require( 'blocks/hooks' );
+
 		registerCoreBlocks();
 	} );
 

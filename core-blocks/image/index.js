@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
+	registerBlockType,
 	getBlockAttributes,
 	getBlockType,
 	RichText,
@@ -16,8 +17,6 @@ import {
 import './style.scss';
 import './editor.scss';
 import ImageBlock from './block';
-
-export const name = 'core/image';
 
 const blockAttributes = {
 	url: {
@@ -57,6 +56,8 @@ const blockAttributes = {
 		type: 'number',
 	},
 };
+
+export const name = 'core/image';
 
 const imageSchema = {
 	img: {
@@ -229,3 +230,5 @@ export const settings = {
 		},
 	],
 };
+
+registerBlockType( name, settings );

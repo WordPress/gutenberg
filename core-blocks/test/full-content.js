@@ -14,7 +14,7 @@ import { getBlockTypes, parse, serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { registerCoreBlocks } from '../';
+import { registerCoreBlocks } from './helpers';
 import { parse as grammarParse } from '../../blocks/api/post.pegjs';
 
 const fixturesDir = path.join( __dirname, 'fixtures' );
@@ -102,6 +102,7 @@ describe( 'full post content fixture', () => {
 
 		// Load all hooks that modify blocks
 		require( 'blocks/hooks' );
+
 		registerCoreBlocks();
 	} );
 

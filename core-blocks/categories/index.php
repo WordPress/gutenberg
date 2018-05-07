@@ -1,6 +1,6 @@
 <?php
 /**
- * Server-side rendering of the `core/categories` block.
+ * Server-side registration and rendering of the `core/categories` block.
  *
  * @package gutenberg
  */
@@ -12,7 +12,7 @@
  *
  * @return string Returns the categories list/dropdown markup.
  */
-function render_block_core_categories( $attributes ) {
+function gutenberg_render_core_categories_block( $attributes ) {
 	static $block_id = 0;
 	$block_id++;
 
@@ -89,12 +89,41 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 }
 
 /**
- * Registers the `core/categories` block on server.
+ * Registers the `core/categories` block on the server-side.
+ *
+ * @since 2.7.0
  */
-function register_block_core_categories() {
+function register_core_categories_block() {
+	wp_register_script(
+		'core-categories-block',
+		gutenberg_url( '/build/__block_categories.js' ),
+		array( 'wp-blocks', 'wp-i18n', 'wp-components', 'wp-element', 'wp-data' )
+	);
+
+	wp_register_style(
+		'core-categories-block',
+		gutenberg_url( '/build/__block_categories.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/__block_categories.css' )
+	);
+
+	wp_style_add_data( 'core-categories-block', 'rtl', 'replace' );
+
+	wp_register_style(
+		'core-categories-block-editor',
+		gutenberg_url( '/build/__block_categories_editor.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/__block_categories_editor.css' )
+	);
+
+	wp_style_add_data( 'core-categories-block-editor', 'rtl', 'replace' );
+
 	register_block_type( 'core/categories', array(
-		'render_callback' => 'render_block_core_categories',
+		'style'           => 'core-categories-block',
+		'editor_style'    => 'core-categories-block-editor',
+		'editor_script'   => 'core-categories-block',
+		'render_callback' => 'gutenberg_render_core_categories_block',
 	) );
 }
 
-add_action( 'init', 'register_block_core_categories' );
+add_action( 'init', 'register_core_categories_block' );

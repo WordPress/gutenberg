@@ -10,6 +10,7 @@ import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
+	registerBlockType,
 	BlockControls,
 	RichText,
 	getPhrasingContentSchema,
@@ -334,3 +335,5 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );

@@ -11,6 +11,11 @@ import { stringify } from 'querystringify';
  */
 import { Component, Fragment } from '@wordpress/element';
 import {
+	InspectorControls,
+	BlockControls,
+	BlockAlignmentToolbar,
+} from '@wordpress/blocks';
+import {
 	PanelBody,
 	Placeholder,
 	QueryControls,
@@ -22,11 +27,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
-import {
-	InspectorControls,
-	BlockAlignmentToolbar,
-	BlockControls,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies

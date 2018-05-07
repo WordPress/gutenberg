@@ -7,13 +7,14 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withState } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import {
+	registerBlockType,
+	RichText,
 	BlockControls,
 	BlockAlignmentToolbar,
-	RichText,
 } from '@wordpress/blocks';
+import { withState } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -50,7 +51,6 @@ const blockAttributes = {
 export const name = 'core/pullquote';
 
 export const settings = {
-
 	title: __( 'Pullquote' ),
 
 	description: __( 'A pullquote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ),
@@ -151,3 +151,5 @@ export const settings = {
 		},
 	} ],
 };
+
+registerBlockType( name, settings );

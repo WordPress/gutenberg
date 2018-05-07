@@ -9,6 +9,24 @@ import { findKey, isFinite, map, omit } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import {
+	AlignmentToolbar,
+	BlockAlignmentToolbar,
+	BlockControls,
+	createBlock,
+	blockAutocompleter,
+	ColorPalette,
+	ContrastChecker,
+	defaultAutocompleters,
+	getColorClass,
+	getPhrasingContentSchema,
+	InspectorControls,
+	PanelColor,
+	registerBlockType,
+	RichText,
+	setDefaultBlockName,
+	withColors,
+} from '@wordpress/blocks';
+import {
 	concatChildren,
 	Component,
 	compose,
@@ -23,18 +41,6 @@ import {
 	ButtonGroup,
 	withFallbackStyles,
 } from '@wordpress/components';
-import {
-	createBlock,
-	getColorClass,
-	withColors,
-	AlignmentToolbar,
-	BlockControls,
-	ContrastChecker,
-	InspectorControls,
-	PanelColor,
-	RichText,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -75,7 +81,7 @@ class ParagraphBlock extends Component {
 	onReplace( blocks ) {
 		const { attributes, onReplace } = this.props;
 		onReplace( blocks.map( ( block, index ) => (
-			index === 0 && block.name === name ?
+			index === 0 && block.name === 'core/paragraph' ?
 				{ ...block,
 					attributes: {
 						...attributes,
@@ -518,3 +524,7 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );
+
+setDefaultBlockName( name );

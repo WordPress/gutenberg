@@ -6,6 +6,14 @@ import { filter, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
+import {
+	editorMediaUpload,
+	MediaUpload,
+	ImagePlaceholder,
+	InspectorControls,
+	BlockControls,
+	BlockAlignmentToolbar,
+} from '@wordpress/blocks';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -18,14 +26,6 @@ import {
 	ToggleControl,
 	Toolbar,
 } from '@wordpress/components';
-import {
-	editorMediaUpload,
-	BlockControls,
-	BlockAlignmentToolbar,
-	MediaUpload,
-	ImagePlaceholder,
-	InspectorControls,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies

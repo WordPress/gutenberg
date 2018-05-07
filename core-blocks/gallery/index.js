@@ -10,8 +10,10 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	editorMediaUpload,
+	registerBlockType,
 	RichText,
 } from '@wordpress/blocks';
+import { mediaUpload } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -240,3 +242,5 @@ export const settings = {
 		},
 	],
 };
+
+registerBlockType( name, settings );

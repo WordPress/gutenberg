@@ -9,15 +9,16 @@ import { stringify } from 'querystring';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	createBlock,
+	registerBlockType,
+	RichText,
+	BlockControls,
+	BlockAlignmentToolbar,
+} from '@wordpress/blocks';
 import { Component, Fragment, renderToString } from '@wordpress/element';
 import { Button, Placeholder, Spinner, SandBox } from '@wordpress/components';
 import classnames from 'classnames';
-import {
-	createBlock,
-	BlockControls,
-	BlockAlignmentToolbar,
-	RichText,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -271,7 +272,7 @@ export const settings = getEmbedBlockSettings( {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
+				isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*/i.test( node.textContent ),
 				transform: ( node ) => {
 					return createBlock( 'core/embed', {
 						url: node.textContent.trim(),
@@ -281,6 +282,8 @@ export const settings = getEmbedBlockSettings( {
 		],
 	},
 } );
+
+registerBlockType( name, settings );
 
 export const common = [
 	{
@@ -528,3 +531,11 @@ export const others = [
 		} ),
 	},
 ];
+
+common.map( ( embedBlockType ) =>
+	registerBlockType( embedBlockType.name, embedBlockType.settings )
+);
+
+others.map( ( embedBlockType ) =>
+	registerBlockType( embedBlockType.name, embedBlockType.settings )
+);

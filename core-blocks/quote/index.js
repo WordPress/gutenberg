@@ -8,15 +8,16 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Toolbar, withState } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import {
 	createBlock,
-	BlockControls,
+	registerBlockType,
 	AlignmentToolbar,
+	BlockControls,
 	RichText,
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
+import { Toolbar, withState } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -287,3 +288,5 @@ export const settings = {
 		},
 	],
 };
+
+registerBlockType( name, settings );

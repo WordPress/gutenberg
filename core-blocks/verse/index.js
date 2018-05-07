@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
+	registerBlockType,
 	RichText,
 } from '@wordpress/blocks';
 
@@ -81,3 +82,5 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );

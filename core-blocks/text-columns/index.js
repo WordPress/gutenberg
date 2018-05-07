@@ -7,14 +7,15 @@ import { times } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl, withState } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import {
+	registerBlockType,
 	BlockControls,
 	BlockAlignmentToolbar,
-	InspectorControls,
 	RichText,
+	InspectorControls,
 } from '@wordpress/blocks';
+import { PanelBody, RangeControl, withState } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -131,3 +132,5 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );

@@ -3,8 +3,12 @@
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType,
+	PlainText,
+} from '@wordpress/blocks';
+
 import { withInstanceId, Dashicon } from '@wordpress/components';
-import { PlainText } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -86,3 +90,5 @@ export const settings = {
 		return <RawHTML>{ attributes.text }</RawHTML>;
 	},
 };
+
+registerBlockType( name, settings );

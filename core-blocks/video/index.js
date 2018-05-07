@@ -7,6 +7,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
+	registerBlockType,
+	editorMediaUpload,
+	MediaUpload,
+	RichText,
+	BlockControls,
+	BlockAlignmentToolbar,
+} from '@wordpress/blocks';
+import {
 	Button,
 	FormFileUpload,
 	IconButton,
@@ -14,13 +22,6 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
-import {
-	editorMediaUpload,
-	BlockAlignmentToolbar,
-	BlockControls,
-	MediaUpload,
-	RichText,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -201,3 +202,5 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );

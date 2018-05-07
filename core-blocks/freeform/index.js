@@ -3,6 +3,10 @@
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	registerBlockType,
+	setUnknownTypeHandlerName,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -41,3 +45,7 @@ export const settings = {
 		return <RawHTML>{ content }</RawHTML>;
 	},
 };
+
+registerBlockType( name, settings );
+
+setUnknownTypeHandlerName( name );

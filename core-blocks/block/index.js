@@ -10,7 +10,10 @@ import { Component, Fragment, compose } from '@wordpress/element';
 import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BlockEdit } from '@wordpress/blocks';
+import {
+	registerBlockType,
+	BlockEdit,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -189,3 +192,5 @@ export const settings = {
 	edit: EnhancedSharedBlockEdit,
 	save: () => null,
 };
+
+registerBlockType( name, settings );

@@ -2,6 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+
+import {
+	registerBlockType,
+	MediaUpload,
+	editorMediaUpload,
+	RichText,
+	BlockControls,
+} from '@wordpress/blocks';
+
 import {
 	Button,
 	FormFileUpload,
@@ -10,12 +19,6 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
-import {
-	editorMediaUpload,
-	MediaUpload,
-	RichText,
-	BlockControls,
-} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -176,3 +179,5 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );

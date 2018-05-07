@@ -15,6 +15,7 @@ import { registerCoreBlocks } from '@wordpress/core-blocks';
  * Internal dependencies
  */
 import * as selectors from '../selectors';
+import { registerCoreBlocks } from '../../../blocks/test/helpers';
 
 const {
 	hasEditorUndo,
@@ -2695,6 +2696,7 @@ describe( 'selectors', () => {
 
 	describe( 'getFrecentInserterItems', () => {
 		beforeAll( () => {
+			// TODO: Need to load/register core blocks (or at least some demo blocks). Maybe requireIndex ?
 			registerCoreBlocks();
 		} );
 

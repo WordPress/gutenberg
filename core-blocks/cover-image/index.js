@@ -9,17 +9,18 @@ import { isEmpty } from 'lodash';
 import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import classnames from 'classnames';
 import {
 	createBlock,
-	BlockControls,
-	InspectorControls,
-	BlockAlignmentToolbar,
-	ImagePlaceholder,
-	MediaUpload,
-	AlignmentToolbar,
+	registerBlockType,
 	RichText,
+	AlignmentToolbar,
+	MediaUpload,
+	ImagePlaceholder,
+	BlockControls,
+	BlockAlignmentToolbar,
+	InspectorControls,
 } from '@wordpress/blocks';
+import classnames from 'classnames';
 
 /**
  * Internal dependencies
@@ -267,6 +268,8 @@ export const settings = {
 		},
 	} ],
 };
+
+registerBlockType( name, settings );
 
 function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?

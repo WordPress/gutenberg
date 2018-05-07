@@ -9,12 +9,15 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { PanelBody, RangeControl } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import {
+	registerBlockType,
 	InspectorControls,
+	BlockControls,
+	BlockAlignmentToolbar,
 	InnerBlocks,
 } from '@wordpress/blocks';
+import { PanelBody, RangeControl } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -102,3 +105,5 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );

@@ -2,17 +2,18 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-/**
- * WordPress dependencies
- */
-import { Fragment } from '@wordpress/element';
 import {
+	registerBlockType,
 	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
+
+/**
+ * WordPress dependencies
+ */
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -122,3 +123,5 @@ export const settings = {
 		);
 	},
 };
+
+registerBlockType( name, settings );
