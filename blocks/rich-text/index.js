@@ -27,7 +27,7 @@ import {
 	getScrollContainer,
 	deprecated,
 } from '@wordpress/utils';
-import { withSafeTimeout, Slot } from '@wordpress/components';
+import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -121,6 +121,7 @@ export class RichText extends Component {
 		this.onPastePreProcess = this.onPastePreProcess.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
+		this.setFocusedElement = this.setFocusedElement.bind( this );
 
 		this.state = {
 			formats: {},
@@ -192,6 +193,12 @@ export class RichText extends Component {
 
 		if ( this.props.onSetup ) {
 			this.props.onSetup( editor );
+		}
+	}
+
+	setFocusedElement() {
+		if ( this.props.setFocusedElement ) {
+			this.props.setFocusedElement( this.props.instanceId );
 		}
 	}
 
@@ -850,7 +857,10 @@ export class RichText extends Component {
 		);
 
 		return (
-			<div className={ classes } ref={ this.containerRef }>
+			<div className={ classes }
+				ref={ this.containerRef }
+				onFocus={ this.setFocusedElement }
+			>
 				{ isSelected && ! inlineToolbar && (
 					<BlockFormatControls>
 						{ formatToolbar }
@@ -912,17 +922,29 @@ RichText.defaultProps = {
 };
 
 const RichTextContainer = compose( [
-	withBlockEditContext( ( { isSelected } ) => {
+	withInstanceId,
+	withBlockEditContext( ( context, ownProps ) => {
+		// When explicitly set as not selected, do nothing.
+		if ( ownProps.isSelected === false ) {
+			return {};
+		}
+		// When explicitly set as selected, use the value stored in the context instead.
+		if ( ownProps.isSelected === true ) {
+			return {
+				isSelected: context.isSelected,
+			};
+		}
+		// Ensures that only one RichText component can be focused.
 		return {
-			isBlockSelected: isSelected,
+			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
+			setFocusedElement: context.setFocusedElement,
 		};
 	} ),
-	withSelect( ( select, { isSelected, isBlockSelected } ) => {
+	withSelect( ( select ) => {
 		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
-			isSelected: isSelected !== false && isBlockSelected,
 		};
 	} ),
 	withSafeTimeout,

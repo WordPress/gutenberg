@@ -1,11 +1,18 @@
 /**
  * External dependencies
  */
+import { noop } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
 import { createContext, createHigherOrderComponent } from '@wordpress/element';
 
 const { Consumer, Provider } = createContext( {
 	name: '',
 	isSelected: false,
+	focusedElement: null,
+	setFocusedElement: noop,
 } );
 
 export { Provider as BlockEditContextProvider };
