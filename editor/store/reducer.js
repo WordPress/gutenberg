@@ -1102,17 +1102,17 @@ export const blockListSettings = ( state = {}, action ) => {
 			return omit( state, action.uids );
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
-			const { id, settings } = action;
-			if ( id && ! settings ) {
+			const { id } = action;
+			if ( id && ! action.settings ) {
 				return omit( state, id );
 			}
 			const blockSettings = state[ id ];
-			const updateIsRequired = ! isEqual( blockSettings, settings );
+			const updateIsRequired = ! isEqual( blockSettings, action.settings );
 			if ( updateIsRequired ) {
 				return {
 					...state,
 					[ id ]: {
-						...settings,
+						...action.settings,
 					},
 				};
 			}
