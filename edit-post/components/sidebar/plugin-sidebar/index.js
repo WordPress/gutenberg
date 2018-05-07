@@ -32,7 +32,7 @@ function PluginSidebar( { children, isPinned, sidebarName, title, togglePin, pin
 					<IconButton
 						onClick={ togglePin }
 						icon={ isPinned ? 'star-filled' : 'star-empty' }
-						label={ isPinned ? __( 'Unpin plugin' ) : __( 'Pin plugin' ) }
+						label={ isPinned ? __( 'Unpin from toolbar' ) : __( 'Pin to toolbar' ) }
 						isToggled={ isPinned }
 						aria-expanded={ isPinned }
 					/>

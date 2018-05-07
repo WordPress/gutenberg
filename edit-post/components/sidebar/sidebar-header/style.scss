@@ -20,7 +20,11 @@
 
 	.components-icon-button {
 		display: none;
-		margin-left: auto;
+		margin-left: 0;
+
+		&:first-of-type {
+			margin-left: auto;
+		}
 
 		@include break-medium() {
 			display: flex;
