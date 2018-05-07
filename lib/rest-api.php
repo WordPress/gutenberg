@@ -427,16 +427,24 @@ add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_theme_supports' );
  */
 function gutenberg_handle_early_callback_checks( $response, $handler, $request ) {
 	if ( '/wp/v2/users' === $request->get_route() ) {
-		if ( ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
-			$can_view = false;
-			$types    = get_post_types( array( 'show_in_rest' => true ), 'objects' );
-			foreach ( $types as $type ) {
-				if ( post_type_supports( $type->name, 'author' )
-					&& current_user_can( $type->cap->edit_posts ) ) {
-					$can_view = true;
+		$can_view_authors    = false;
+		$can_unbounded_query = false;
+		$types               = get_post_types( array( 'show_in_rest' => true ), 'objects' );
+		foreach ( $types as $type ) {
+			if ( current_user_can( $type->cap->edit_posts ) ) {
+				$can_unbounded_query = true;
+				if ( post_type_supports( $type->name, 'author' ) ) {
+					$can_view_authors = true;
 				}
 			}
-			if ( ! $can_view ) {
+		}
+		if ( $request['per_page'] < 0 ) {
+			if ( ! $can_unbounded_query ) {
+				return new WP_Error( 'rest_forbidden_per_page', __( 'Sorry, you are not allowed make unbounded queries.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+			}
+		}
+		if ( ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
+			if ( ! $can_view_authors ) {
 				return new WP_Error( 'rest_forbidden_who', __( 'Sorry, you are not allowed to query users by this parameter.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 			}
 		}
@@ -449,11 +457,19 @@ add_filter( 'rest_request_before_callbacks', 'gutenberg_handle_early_callback_ch
  * Include additional query parameters on the user query endpoint.
  *
  * @see https://core.trac.wordpress.org/ticket/42202
+ * @see https://core.trac.wordpress.org/ticket/43998
  *
  * @param array $query_params JSON Schema-formatted collection parameters.
  * @return array
  */
 function gutenberg_filter_user_collection_parameters( $query_params ) {
+	if ( isset( $query_params['per_page'] ) ) {
+		// Change from '1' to '-1', which means unlimited.
+		$query_params['per_page']['minimum'] = -1;
+		// Default sanitize callback is 'absint', which won't work in our case.
+		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
+	}
+	// Support for 'who' query param.
 	$query_params['who'] = array(
 		'description' => __( 'Limit result set to users who are considered authors.', 'gutenberg' ),
 		'type'        => 'string',
