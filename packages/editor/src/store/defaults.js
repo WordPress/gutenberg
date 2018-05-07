@@ -12,6 +12,7 @@ export const PREFERENCES_DEFAULTS = {
  *
  *  alignWide         boolean        Enable/Disable Wide/Full Alignments
  *  colors            Array          Palette colors
+ *  fontSizes         Array          Available font sizes
  *  maxWidth          number         Max width to constraint resizing
  *  blockTypes        boolean|Array  Allowed block types
  *  hasFixedToolbar   boolean        Whether or not the editor toolbar is fixed
@@ -72,6 +73,33 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 			name: __( 'very dark gray' ),
 			slug: 'very-dark-gray',
 			color: '#313131',
+		},
+	],
+
+	fontSizes: [
+		{
+			name: __( 'small' ),
+			shortName: __( 'S' ),
+			size: 14,
+			slug: 'small',
+		},
+		{
+			name: __( 'regular' ),
+			shortName: __( 'M' ),
+			size: 16,
+			slug: 'regular',
+		},
+		{
+			name: __( 'large' ),
+			shortName: __( 'L' ),
+			size: 36,
+			slug: 'large',
+		},
+		{
+			name: __( 'larger' ),
+			shortName: __( 'XL' ),
+			size: 48,
+			slug: 'larger',
 		},
 	],
 
