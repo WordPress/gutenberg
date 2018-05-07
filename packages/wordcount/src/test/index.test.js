@@ -84,6 +84,13 @@ describe( 'WordCounter', () => {
 				words: 1,
 				characters_excluding_spaces: 5,
 				characters_including_spaces: 6
+			},
+			{
+				message: "Empty Tags",
+				string: "<p></p>",
+				words: 0,
+				characters_excluding_spaces: 0,
+				characters_including_spaces: 0
 			}
 	];
 
