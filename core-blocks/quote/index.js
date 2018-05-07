@@ -175,7 +175,7 @@ export const settings = {
 		],
 	},
 
-	edit: ( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) => {
+	edit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 		const { align, value, citation, style } = attributes;
 		const containerClassname = classnames( className, style === 2 ? 'is-large' : '' );
 

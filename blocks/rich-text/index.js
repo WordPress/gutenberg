@@ -928,9 +928,8 @@ const RichTextContainer = compose( [
 		if ( ownProps.isSelected === false ) {
 			return {};
 		}
-		// When explicitly set as selected or has onFocus prop provided,
-		// use value stored in the context instead.
-		if ( ownProps.isSelected === true || ownProps.onFocus ) {
+		// When explicitly set as selected, use the value stored in the context instead.
+		if ( ownProps.isSelected === true ) {
 			return {
 				isSelected: context.isSelected,
 			};

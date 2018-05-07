@@ -67,7 +67,7 @@ export const settings = {
 		}
 	},
 
-	edit: ( { attributes, setAttributes, isSelected, className } ) => {
+	edit( { attributes, setAttributes, isSelected, className } ) {
 		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 
