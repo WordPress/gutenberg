@@ -79,4 +79,18 @@
 		max-width: $content-width / 2;
 		width: 100%;
 	}
+
+	.wp-block-cover-image__inner-container {
+		width: calc( 100% - 70px );
+		color: $light-gray-100;
+		z-index: z-index( '.wp-block-cover-image__inner-container' );
+		p {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
+	}
+
+	h1, h2, h3, h4, h5, h6, .wp-block-subhead {
+		color: inherit;
+	}
 }

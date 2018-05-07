@@ -72,6 +72,8 @@ $z-layers: (
 	'.components-autocomplete__results': 1000000,
 
 	'.skip-to-selected-block': 100000,
+
+	'.wp-block-cover-image__inner-container': 0,
 );
 
 @function z-index( $key ) {
