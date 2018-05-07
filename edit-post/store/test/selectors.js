@@ -8,6 +8,7 @@ import {
 	isEditorSidebarPanelOpened,
 	isFeatureActive,
 	isPluginSidebarOpened,
+	isPluginItemPinned,
 	getMetaBoxes,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
@@ -186,6 +187,25 @@ describe( 'selectors', () => {
 			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
 		} );
 	} );
+
+	describe( 'isPluginItemPinned', () => {
+		const state = {
+			preferences: {
+				pinnedPluginItems: {
+					'foo/bar': true,
+				},
+			},
+		};
+
+		it( 'should return false if plugin item is not pinned', () => {
+			expect( isPluginItemPinned( state, 'foo/unknown' ) ).toBe( false );
+		} );
+
+		it( 'should return true if plugin item item is pinned', () => {
+			expect( isPluginItemPinned( state, 'foo/bar' ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'hasMetaBoxes', () => {
 		it( 'should return true if there are active meta boxes', () => {
 			const state = {

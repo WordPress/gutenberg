@@ -22,6 +22,7 @@ describe( 'state', () => {
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
+				pinnedPluginItems: {},
 			} );
 		} );
 
@@ -50,6 +51,7 @@ describe( 'state', () => {
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
+				pinnedPluginItems: {},
 			} );
 		} );
 
@@ -112,6 +114,37 @@ describe( 'state', () => {
 			} );
 
 			expect( state.features ).toEqual( { chicken: false } );
+		} );
+
+		describe( 'pinnedPluginItems', () => {
+			const initialState = deepFreeze( {
+				pinnedPluginItems: {
+					'foo/enabled': true,
+				},
+			} );
+
+			it( 'should enable a pinned plugin flag when the value does not exist', () => {
+				const state = preferences( initialState, {
+					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+					pluginName: 'foo/does-not-exist',
+				} );
+
+				expect( state.pinnedPluginItems ).toEqual( {
+					'foo/enabled': true,
+					'foo/does-not-exist': true,
+				} );
+			} );
+
+			it( 'should disable a pinned plugin flag when it is enabled', () => {
+				const state = preferences( initialState, {
+					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+					pluginName: 'foo/enabled',
+				} );
+
+				expect( state.pinnedPluginItems ).toEqual( {
+					'foo/enabled': false,
+				} );
+			} );
 		} );
 	} );
 

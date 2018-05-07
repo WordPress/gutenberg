@@ -16,13 +16,13 @@ const PluginSidebarMoreMenuItem = ( { children, icon, isPinned, isSelected, onCl
 	<Fragment>
 		{ isPinned && icon && (
 			<PinnedPlugins>
-				<IconButton
+				{ <IconButton
 					icon={ icon }
 					label={ children }
 					onClick={ onClick }
 					isToggled={ isSelected }
 					aria-expanded={ isSelected }
-				/>
+				/> }
 			</PinnedPlugins>
 		) }
 		<PluginsMoreMenuGroup>

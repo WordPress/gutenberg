@@ -109,6 +109,18 @@ export function isFeatureActive( state, feature ) {
 }
 
 /**
+ * Returns true if the the plugin item is pinned to the header.
+ *
+ * @param  {Object}  state      Global application state.
+ * @param  {string}  pluginName Plugin item name.
+ * @return {boolean}            Whether the plugin item is pinned.
+ */
+export function isPluginItemPinned( state, pluginName ) {
+	const pinnedPluginItems = getPreference( state, 'pinnedPluginItems', {} );
+	return Boolean( pinnedPluginItems[ pluginName ] );
+}
+
+/**
  * Returns the state of legacy meta boxes.
  *
  * @param   {Object} state Global application state.
@@ -153,14 +165,4 @@ export const hasMetaBoxes = createSelector(
  */
 export function isSavingMetaBoxes( state ) {
 	return state.isSavingMetaBoxes;
-}
-
-/**
- * Returns true if the the plugin item is pinned to the header.
- *
- * @param   {Object}  state Global application state.
- * @return {boolean}       Whether the plugin item is pinned.
- */
-export function isPluginItemPinned( state ) {
-	return Boolean( state );
 }

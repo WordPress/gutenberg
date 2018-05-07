@@ -63,6 +63,15 @@ export const preferences = combineReducers( {
 
 		return state;
 	},
+	pinnedPluginItems( state = PREFERENCES_DEFAULTS.pinnedPluginItems, action ) {
+		if ( action.type === 'TOGGLE_PINNED_PLUGIN_ITEM' ) {
+			return {
+				...state,
+				[ action.pluginName ]: ! state[ action.pluginName ],
+			};
+		}
+		return state;
+	},
 } );
 
 export function panel( state = 'document', action ) {
