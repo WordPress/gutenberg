@@ -9,6 +9,7 @@ import { get, isFunction, some } from 'lodash';
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -159,6 +160,14 @@ export function registerBlockType( name, settings ) {
 	}
 	if ( ! settings.icon ) {
 		settings.icon = 'block-default';
+	}
+	if ( 'isPrivate' in settings ) {
+		deprecated( 'isPrivate', {
+			version: '3.0',
+			alternative: 'allowedPostTypes',
+			plugin: 'Gutenberg',
+		} );
+		settings.allowedParents = !! settings.isPrivate;
 	}
 
 	return blocks[ name ] = settings;

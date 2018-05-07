@@ -16,6 +16,8 @@ const textItem = {
 	title: 'Text',
 	category: 'common',
 	isDisabled: false,
+	utility: 2,
+	frecency: 1,
 };
 
 const advancedTextItem = {
@@ -25,6 +27,8 @@ const advancedTextItem = {
 	title: 'Advanced Text',
 	category: 'common',
 	isDisabled: false,
+	utility: 2,
+	frecency: 3,
 };
 
 const someOtherItem = {
@@ -34,6 +38,8 @@ const someOtherItem = {
 	title: 'Some Other Block',
 	category: 'common',
 	isDisabled: false,
+	utility: 1,
+	frecency: 1,
 };
 
 const moreItem = {
@@ -43,6 +49,8 @@ const moreItem = {
 	title: 'More',
 	category: 'layout',
 	isDisabled: true,
+	utility: 1,
+	frecency: 0,
 };
 
 const youtubeItem = {
@@ -53,6 +61,8 @@ const youtubeItem = {
 	category: 'embed',
 	keywords: [ 'google' ],
 	isDisabled: false,
+	utility: 0,
+	frecency: 0,
 };
 
 const textEmbedItem = {
@@ -62,6 +72,8 @@ const textEmbedItem = {
 	title: 'A Text Embed',
 	category: 'embed',
 	isDisabled: false,
+	utility: 0,
+	frecency: 0,
 };
 
 const sharedItem = {
@@ -71,6 +83,8 @@ const sharedItem = {
 	title: 'My shared block',
 	category: 'shared',
 	isDisabled: false,
+	utility: 0,
+	frecency: 0,
 };
 
 const items = [
@@ -94,7 +108,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ [] }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 				blockTypes
@@ -114,7 +127,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ [] }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -130,17 +142,17 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [ advancedTextItem, textItem, someOtherItem ] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
 		);
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks ).toHaveLength( 3 );
+		expect( visibleBlocks ).toHaveLength( 4 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
+		expect( visibleBlocks.at( 3 ).text() ).toBe( 'More' );
 	} );
 
 	it( 'should show items from the embed category in the embed tab', () => {
@@ -149,7 +161,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -173,7 +184,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -196,7 +206,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -222,7 +231,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -239,7 +247,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -262,7 +269,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>

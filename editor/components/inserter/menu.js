@@ -7,10 +7,11 @@ import {
 	flow,
 	groupBy,
 	includes,
+	isEmpty,
+	orderBy,
 	pick,
 	some,
 	sortBy,
-	isEmpty,
 } from 'lodash';
 
 /**
@@ -24,9 +25,9 @@ import {
 	withInstanceId,
 	withSpokenMessages,
 } from '@wordpress/components';
-import { getCategories, isSharedBlock, withEditorSettings } from '@wordpress/blocks';
+import { getCategories, isSharedBlock } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -49,6 +50,7 @@ export const searchItems = ( items, searchTerm ) => {
  * Module constants
  */
 const ARROWS = pick( keycodes, [ 'UP', 'DOWN', 'LEFT', 'RIGHT' ] );
+const MAX_SUGGESTED_ITEMS = 9;
 
 export class InserterMenu extends Component {
 	constructor() {
@@ -114,7 +116,7 @@ export class InserterMenu extends Component {
 	}
 
 	getItemsForTab( tab ) {
-		const { items, frecentItems } = this.props;
+		const { items } = this.props;
 
 		// If we're searching, use everything, otherwise just get the items visible in this tab
 		if ( this.state.filterValue ) {
@@ -124,7 +126,8 @@ export class InserterMenu extends Component {
 		let predicate;
 		switch ( tab ) {
 			case 'suggested':
-				return frecentItems;
+				predicate = ( item ) => item.utility > 0;
+				break;
 
 			case 'blocks':
 				predicate = ( item ) => item.category !== 'embed' && item.category !== 'shared';
@@ -144,7 +147,8 @@ export class InserterMenu extends Component {
 
 	sortItems( items ) {
 		if ( 'suggested' === this.state.tab && ! this.state.filterValue ) {
-			return items;
+			const sortedItems = orderBy( items, [ 'utility', 'frecency' ], [ 'desc', 'desc' ] );
+			return sortedItems.slice( 0, MAX_SUGGESTED_ITEMS );
 		}
 
 		const getCategoryIndex = ( item ) => {
@@ -156,6 +160,13 @@ export class InserterMenu extends Component {
 
 	groupByCategory( items ) {
 		return groupBy( items, ( item ) => item.category );
+	}
+
+	getVisibleItems( items ) {
+		return flow(
+			this.searchItems,
+			this.sortItems,
+		)( items );
 	}
 
 	getVisibleItemsByCategory( items ) {
@@ -216,11 +227,6 @@ export class InserterMenu extends Component {
 	renderTabView( tab ) {
 		const itemsForTab = this.getItemsForTab( tab );
 
-		// If the Suggested tab is selected, don't render category headers
-		if ( 'suggested' === tab ) {
-			return this.renderItems( itemsForTab );
-		}
-
 		// If the Shared tab is selected and we have no results, display a friendly message
 		if ( 'shared' === tab && itemsForTab.length === 0 ) {
 			return (
@@ -228,6 +234,11 @@ export class InserterMenu extends Component {
 					{ __( 'No shared blocks.' ) }
 				</NoBlocks>
 			);
+		}
+
+		// If the Suggested tab is selected, don't render category headers
+		if ( 'suggested' === tab ) {
+			return this.renderItems( this.getVisibleItems( itemsForTab ) );
 		}
 
 		const visibleItemsByCategory = this.getVisibleItemsByCategory( itemsForTab );
@@ -336,27 +347,6 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withEditorSettings( ( settings ) => {
-		const { allowedBlockTypes } = settings;
-
-		return {
-			allowedBlockTypes,
-		};
-	} ),
-	withSelect( ( select, { allowedBlockTypes } ) => {
-		const {
-			getBlockInsertionPoint,
-			getInserterItems,
-			getFrecentInserterItems,
-			getSupportedBlocks,
-		} = select( 'core/editor' );
-		const { rootUID } = getBlockInsertionPoint();
-		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
-		return {
-			items: getInserterItems( supportedBlocks ),
-			frecentItems: getFrecentInserterItems( supportedBlocks ),
-		};
-	} ),
 	withDispatch( ( dispatch ) => ( {
 		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
 	} ) ),
