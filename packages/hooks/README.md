@@ -1,6 +1,6 @@
 # @wordpress/hooks
 
-A lightweight & efficient EventManager for JavaScript in WordPress.
+A lightweight & efficient EventManager for JavaScript.
 
 ## Installation
 
@@ -11,10 +11,15 @@ npm install @wordpress/hooks --save
 ```
 
 ### Usage
+In your JavaScript project, use hooks as follows:
+```javascript
+import { createHooks } from '@wordpress/hooks';
 
-API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc.
+myObject.hooks = createHooks();
+myObject.hooks.addAction(); //etc...
+```
 
-A lightweight & efficient filter and action manager.
+In the WordPress context, API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc.
 
 ### API Usage
 
@@ -36,12 +41,6 @@ A lightweight & efficient filter and action manager.
 * `actions`
 * `filters`
 
-Hooks can be added to an object via composition:
-`import { createHooks } from '@wordpress/hooks';`
-
-`myObject.hooks = createHooks();`
-
-API functions are then be called: `myObject.hooks.addAction()`.
 
 ### Events on action/filter add or remove
 
