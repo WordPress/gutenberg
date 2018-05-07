@@ -209,7 +209,7 @@ const colorsMigration = ( attributes ) => {
 export const settings = {
 	title: __( 'Button' ),
 
-	description: __( 'A nice little button. Call something out with it.' ),
+	description: __( 'Want visitors to click to subscribe, buy, or read more? Get their attention with a button.' ),
 
 	icon: 'button',
 

@@ -22,7 +22,7 @@ export const name = 'core/more';
 export const settings = {
 	title: __( 'More' ),
 
-	description: __( '"More" allows you to break your post into a part shown on index pages, and the subsequent after clicking a "Read More" link.' ),
+	description: __( 'Want to show only part of this post on your blog\'s home page? Insert a "More" block where you want the split.' ),
 
 	icon: 'editor-insertmore',
 

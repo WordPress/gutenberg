@@ -52,7 +52,7 @@ export const settings = {
 
 	title: __( 'Pullquote' ),
 
-	description: __( 'A pullquote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ),
+	description: __( 'Highlight a quote from your post or page by displaying it as a graphic element.' ),
 
 	icon: 'format-quote',
 

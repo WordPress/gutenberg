@@ -22,7 +22,7 @@ export const name = 'core/heading';
 export const settings = {
 	title: __( 'Heading' ),
 
-	description: __( 'Search engines use the headings to index the structure and content of your web pages.' ),
+	description: __( 'Insert a headline above your post or page content.' ),
 
 	icon: 'heading',
 
