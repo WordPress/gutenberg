@@ -21,6 +21,7 @@ wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-na
 _Example:_
 
 ```jsx
+const { __ } = wp.i18n;
 const { PanelBody } = wp.components;
 const { PluginSidebar } = wp.editPost;
 
@@ -30,7 +31,7 @@ const MyPluginSidebar = () => (
 		title="My sidebar title"
 	>
 		<PanelBody>
-			My sidebar content
+			{ __( 'My sidebar content' ) }
 		</PanelBody>
 	</PluginSidebar>
 );
@@ -61,6 +62,7 @@ The text within the component appears as the menu item label.
 _Example:_
 
 ```jsx
+const { __ } = wp.i18n;
 const { PluginSidebarMoreMenuItem } = wp.editPost;
 
 const MySidebarMoreMenuItem = () => (
@@ -68,7 +70,7 @@ const MySidebarMoreMenuItem = () => (
 		target="my-sidebar"
 		icon="yes"
 	>
-		My sidebar title
+		{ __( 'My sidebar title' ) }
 	</PluginSidebarMoreMenuItem>
 );
 ```
@@ -90,31 +92,21 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 - Required: No
 
 
-### PluginPostStatusInfo
+### `PluginPostStatusInfo`
 
-Currently, this slotFill appears in the Status & Visibility panel of the sidebar.
+Renders a row in the Status & Visibility panel of the Document sidebar.
 It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
 
-_Example_
+_Example:_
 ```jsx
-var el = wp.element.createElement;
-var __ = wp.i18n.__;
-var registerPlugin = wp.plugins.registerPlugin;
-var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
+const { __ } = wp.i18n;
+const { PluginPostStatusInfo } = wp.editPost;
 
-function MyPlugin() {
-	return (
-		el(
-			PluginPostStatusInfo,
-			{},
-			__( 'My post status info' )
-		)
-	);
-};
-
-registerPlugin( 'my-plugin', {
-	render: MyPlugin,
-} )
+const MyPluginPostStatusInfo = () => (
+	<PluginPostStatusInfo>
+		{ __( 'My post status info' ) }
+	</PluginPostStatusInfo>
+);
 ```
 
 
