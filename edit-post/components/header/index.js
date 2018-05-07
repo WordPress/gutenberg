@@ -51,15 +51,13 @@ function Header( {
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
 					/>
-					<PinnedPlugins>
-						<IconButton
-							icon="admin-generic"
-							onClick={ toggleGeneralSidebar }
-							isToggled={ isEditorSidebarOpened }
-							label={ __( 'Settings' ) }
-							aria-expanded={ isEditorSidebarOpened }
-						/>
-					</PinnedPlugins>
+					<IconButton
+						icon="admin-generic"
+						onClick={ toggleGeneralSidebar }
+						isToggled={ isEditorSidebarOpened }
+						label={ __( 'Settings' ) }
+						aria-expanded={ isEditorSidebarOpened }
+					/>
 					<PinnedPlugins.Slot />
 					<MoreMenu />
 				</div>
