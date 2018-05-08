@@ -6,9 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './editor.scss';
 import './style.scss';
-import CategoriesBlock from './block';
+import edit from './edit';
 
 export const name = 'core/categories';
 
@@ -50,7 +49,7 @@ export const settings = {
 		}
 	},
 
-	edit: CategoriesBlock,
+	edit,
 
 	save() {
 		return null;

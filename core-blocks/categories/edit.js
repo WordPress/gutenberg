@@ -16,9 +16,8 @@ import {
  * Internal dependencies
  */
 import './editor.scss';
-import './style.scss';
 
-class CategoriesBlock extends Component {
+class CategoriesEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -215,4 +214,4 @@ export default withSelect( ( select ) => {
 		categories: getCategories(),
 		isRequesting: isRequestingCategories(),
 	};
-} )( CategoriesBlock );
+} )( CategoriesEdit );
