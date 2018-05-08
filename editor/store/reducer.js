@@ -228,15 +228,6 @@ export const editor = flow( [
 		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST' ],
 	} ),
 ] )( {
-	autosave( state = false, action ) {
-		const { post } = action;
-		switch ( action.type ) {
-			case 'RESET_AUTOSAVE':
-				return post;
-		}
-
-		return state;
-	},
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
@@ -1063,6 +1054,16 @@ export const blockListSettings = ( state = {}, action ) => {
 	return state;
 };
 
+export const autosave = ( state = false, action ) => {
+	const { post } = action;
+	switch ( action.type ) {
+		case 'RESET_AUTOSAVE':
+			return post;
+	}
+
+	return state;
+};
+
 export default optimist( combineReducers( {
 	editor,
 	isAutosaving,
@@ -1078,4 +1079,5 @@ export default optimist( combineReducers( {
 	notices,
 	sharedBlocks,
 	template,
+	autosave,
 } ) );
