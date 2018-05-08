@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Component, compose, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ClipboardButton, Button, OpensInNewTabMessage } from '@wordpress/components';
+import { ClipboardButton, Button, ExternalLink } from '@wordpress/components';
 
 /**
  * Internal Dependencies
