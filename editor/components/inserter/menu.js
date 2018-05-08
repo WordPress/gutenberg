@@ -148,7 +148,9 @@ export class InserterMenu extends Component {
 	sortItems( items ) {
 		if ( 'suggested' === this.state.tab && ! this.state.filterValue ) {
 			const sortedItems = orderBy( items, [ 'utility', 'frecency' ], [ 'desc', 'desc' ] );
-			return sortedItems.slice( 0, MAX_SUGGESTED_ITEMS );
+
+			const maxSuggestedItems = this.props.maxSuggestedItems || MAX_SUGGESTED_ITEMS;
+			return sortedItems.slice( 0, maxSuggestedItems );
 		}
 
 		const getCategoryIndex = ( item ) => {

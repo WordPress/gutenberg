@@ -136,7 +136,7 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks ).toHaveLength( 0 );
 	} );
 
-	it( 'should show frecently used items in the suggested tab', () => {
+	it( 'should show items in the suggested tab ordered by utility,frecency', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
@@ -153,6 +153,22 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
 		expect( visibleBlocks.at( 3 ).text() ).toBe( 'More' );
+	} );
+
+	it( 'should limit the number of items shown in the suggested tab', () => {
+		const wrapper = mount(
+			<InserterMenu
+				position={ 'top center' }
+				instanceId={ 1 }
+				items={ items }
+				debouncedSpeak={ noop }
+				fetchSharedBlocks={ noop }
+				maxSuggestedItems={ 2 }
+			/>
+		);
+
+		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		expect( visibleBlocks ).toHaveLength( 2 );
 	} );
 
 	it( 'should show items from the embed category in the embed tab', () => {
