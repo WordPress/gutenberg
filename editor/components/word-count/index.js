@@ -1,19 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { serialize } from '@wordpress/blocks';
-import { WordCounter } from '@wordpress/utils';
 import { withSelect } from '@wordpress/data';
+import { count as wordCount } from '@wordpress/wordcount';
 
 function WordCount( { content } ) {
-	const wordCount = WordCounter.prototype.count( content );
 	return (
-		<span className="word-count">{ wordCount }</span>
+		<span className="word-count">{ wordCount( content, 'words' ) }</span>
 	);
 }
 
 export default withSelect( ( select ) => {
 	return {
-		content: serialize( select( 'core/editor' ).getBlocks() ),
+		content: select( 'core/editor' ).getEditedPostAttribute( 'content' ),
 	};
 } )( WordCount );

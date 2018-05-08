@@ -13,17 +13,17 @@ const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-web
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './[basename]/build/style.css',
+	filename: './build/[basename]/style.css',
 } );
 
 // CSS loader for styles specific to block editing.
 const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/edit-blocks.css',
+	filename: './build/core-blocks/edit-blocks.css',
 } );
 
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/build/style.css',
+	filename: './build/core-blocks/style.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -62,7 +62,7 @@ const extractConfig = {
  */
 function camelCaseDash( string ) {
 	return string.replace(
-		/-([a-z])/,
+		/-([a-z])/g,
 		( match, letter ) => letter.toUpperCase()
 	);
 }
@@ -79,11 +79,15 @@ const entryPointNames = [
 	'core-data',
 	'plugins',
 	'edit-post',
+	'core-blocks',
 ];
 
 const packageNames = [
+	'a11y',
+	'dom-ready',
 	'hooks',
 	'i18n',
+	'is-shallow-equal',
 ];
 
 const coreGlobals = [
@@ -120,12 +124,13 @@ const config = {
 			return memo;
 		}, {} ),
 		packageNames.reduce( ( memo, packageName ) => {
-			memo[ packageName ] = `./node_modules/@wordpress/${ packageName }`;
+			const name = camelCaseDash( packageName );
+			memo[ name ] = `./node_modules/@wordpress/${ packageName }`;
 			return memo;
 		}, {} )
 	),
 	output: {
-		filename: '[basename]/build/index.js',
+		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
@@ -154,21 +159,21 @@ const config = {
 			{
 				test: /style\.s?css$/,
 				include: [
-					/blocks/,
+					/core-blocks/,
 				],
 				use: blocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /editor\.s?css$/,
 				include: [
-					/blocks/,
+					/core-blocks/,
 				],
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
 				test: /\.s?css$/,
 				exclude: [
-					/blocks/,
+					/core-blocks/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},

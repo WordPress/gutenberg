@@ -51,9 +51,9 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 	);
 }
 export default compose( [
-	withSelect( ( select, ownProps ) => {
+	withSelect( ( select, { uids } ) => {
 		return {
-			blocks: ownProps.uids.map( ( uid ) => select( 'core/editor' ).getBlock( uid ) ),
+			blocks: select( 'core/editor' ).getBlocksByUID( uids ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {

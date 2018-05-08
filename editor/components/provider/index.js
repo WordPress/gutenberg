@@ -7,13 +7,18 @@ import { flow, pick } from 'lodash';
  * WordPress Dependencies
  */
 import { createElement, Component } from '@wordpress/element';
-import { RichTextProvider, EditorSettings } from '@wordpress/blocks';
+import { EditorSettings } from '@wordpress/blocks';
 import {
 	APIProvider,
 	DropZoneProvider,
 	SlotFillProvider,
 } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import RichTextProvider from '../rich-text/provider';
 
 class EditorProvider extends Component {
 	constructor( props ) {

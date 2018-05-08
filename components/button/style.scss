@@ -14,11 +14,11 @@
 		opacity: 0.3;
 	}
 
-	&:not( :disabled ) {
+	&:not( :disabled ):not( [aria-disabled="true"] ) {
 		cursor: pointer;
 	}
 
-	&:focus {
+	&:not( :disabled ):not( [aria-disabled="true"] ):focus {
 		@include button-style__focus-active;
 	}
 
