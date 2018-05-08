@@ -19,6 +19,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	withAPIData,
+	ExternalLink,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
@@ -145,7 +146,9 @@ class LatestPostsBlock extends Component {
 				>
 					{ displayPosts.map( ( post, i ) =>
 						<li key={ i }>
-							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
+							<ExternalLink href={ post.link } icon={ false }>
+								{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }
+							</ExternalLink>
 							{ displayPostDate && post.date_gmt &&
 								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
 									{ moment( post.date_gmt ).local().format( 'MMMM DD, Y' ) }

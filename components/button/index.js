@@ -17,6 +17,7 @@ export function Button( props, ref ) {
 	const {
 		href,
 		target,
+		rel,
 		isPrimary,
 		isLarge,
 		isSmall,
@@ -38,7 +39,7 @@ export function Button( props, ref ) {
 	} );
 
 	const tag = href !== undefined && ! disabled ? 'a' : 'button';
-	const tagProps = tag === 'a' ? { href, target } : { type: 'button', disabled };
+	const tagProps = tag === 'a' ? { href, target, rel } : { type: 'button', disabled };
 
 	return createElement( tag, {
 		...tagProps,

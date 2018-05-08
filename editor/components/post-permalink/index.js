@@ -7,9 +7,9 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Component, compose } from '@wordpress/element';
+import { Component, compose, createRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { ClipboardButton, Button } from '@wordpress/components';
+import { ClipboardButton, Button, ExternalLink } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -24,6 +24,7 @@ class PostPermalink extends Component {
 
 		this.addVisibilityCheck = this.addVisibilityCheck.bind( this );
 		this.onVisibilityChange = this.onVisibilityChange.bind( this );
+		this.permalinkEditButton = createRef();
 
 		this.state = {
 			isCopied: false,
@@ -47,7 +48,7 @@ class PostPermalink extends Component {
 	componentDidUpdate( prevProps, prevState ) {
 		// If we've just stopped editing the permalink, focus on the new permalink.
 		if ( prevState.isEditingPermalink && ! this.state.isEditingPermalink ) {
-			this.permalinkButton.focus();
+			this.permalinkEditButton.current.focus();
 		}
 	}
 
@@ -78,15 +79,14 @@ class PostPermalink extends Component {
 				<span className="editor-post-permalink__label">{ __( 'Permalink:' ) }</span>
 
 				{ ! isEditingPermalink &&
-					<Button
+					<ExternalLink
 						className="editor-post-permalink__link"
 						href={ ! isPublished ? previewLink : samplePermalink }
-						target="_blank"
-						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
+						icon={ false }
 					>
 						{ decodeURI( samplePermalink ) }
 						&lrm;
-					</Button>
+					</ExternalLink>
 				}
 
 				{ isEditingPermalink &&
@@ -100,21 +100,23 @@ class PostPermalink extends Component {
 						className="editor-post-permalink__edit"
 						isLarge
 						onClick={ () => this.setState( { isEditingPermalink: true } ) }
+						ref={ this.permalinkEditButton }
 					>
 						{ __( 'Edit' ) }
 					</Button>
 				}
 
 				{ ! isEditable &&
-					<Button
+					<ExternalLink
 						className="editor-post-permalink__change"
 						isLarge
 						href={ getWPAdminURL( 'options-permalink.php' ) }
 						onClick={ this.addVisibilityCheck }
-						target="_blank"
+						icon={ false }
+						rel={ null }
 					>
 						{ __( 'Change Permalinks' ) }
-					</Button>
+					</ExternalLink>
 				}
 			</div>
 		);
