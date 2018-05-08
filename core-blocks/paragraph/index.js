@@ -313,7 +313,7 @@ export const name = 'core/paragraph';
 export const settings = {
 	title: __( 'Paragraph' ),
 
-	description: __( 'This is a simple text only block for adding a single paragraph of content.' ),
+	description: __( 'Add some basic text.' ),
 
 	icon: 'editor-paragraph',
 

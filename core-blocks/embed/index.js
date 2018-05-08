@@ -30,7 +30,7 @@ const HOSTS_NO_PREVIEWS = [ 'facebook.com' ];
 
 function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [] } ) {
 	// translators: %s: Name of service (e.g. VideoPress, YouTube)
-	const blockDescription = description || sprintf( __( 'Paste URLs from %s to embed the content in this block' ), title );
+	const blockDescription = description || sprintf( __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' ), title );
 	return {
 		title,
 		description: blockDescription,

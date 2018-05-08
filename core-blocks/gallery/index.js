@@ -76,7 +76,7 @@ export const name = 'core/gallery';
 
 export const settings = {
 	title: __( 'Gallery' ),
-	description: __( 'Image galleries are a great way to share groups of pictures on your site.' ),
+	description: __( 'Display multiple images in an elegantly organized tiled layout.' ),
 	icon: 'format-gallery',
 	category: 'common',
 	keywords: [ __( 'images' ), __( 'photos' ) ],

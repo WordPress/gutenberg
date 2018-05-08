@@ -15,7 +15,7 @@ export const name = 'core/audio';
 export const settings = {
 	title: __( 'Audio' ),
 
-	description: __( 'The Audio block allows you to embed audio files and play them back using a simple player.' ),
+	description: __( 'Embed an audio file and a simple audio player.' ),
 
 	icon: 'format-audio',
 

@@ -14,7 +14,7 @@ export const name = 'core/code';
 export const settings = {
 	title: __( 'Code' ),
 
-	description: __( 'The code block maintains spaces and tabs, great for showing code snippets.' ),
+	description: __( 'Add text that respects your spacing and tabs -- perfect for displaying code.' ),
 
 	icon: 'editor-code',
 

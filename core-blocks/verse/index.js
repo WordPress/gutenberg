@@ -15,7 +15,7 @@ export const name = 'core/verse';
 export const settings = {
 	title: __( 'Verse' ),
 
-	description: __( 'Write poetry and other literary expressions honoring all spaces and line-breaks.' ),
+	description: __( 'A block for haiku? Why not? Blocks for all the things! (See what we did here?)' ),
 
 	icon: 'edit',
 
