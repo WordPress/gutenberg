@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map, find, get } from 'lodash';
+import { map, find, get, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -112,7 +112,7 @@ export const getUserQueryResults = createSelector(
  * @return {boolean} Whether the entities are loaded
  */
 export function hasEntitiesByKind( state, kind ) {
-	return state.entities.config[ kind ] !== undefined;
+	return some( state.entities.config, { kind } );
 }
 
 /**
