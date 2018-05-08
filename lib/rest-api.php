@@ -298,7 +298,7 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 			$new_links['https://api.w.org/action-sticky'] = array(
 				array(
 					'title'        => __( 'The current user can sticky this post.', 'gutenberg' ),
-					'href'         => $orig_links['self'][0]['href'],
+					'href'         => isset( $orig_links['self'] ) ? $orig_links['self'][0]['href'] : null,
 					'targetSchema' => array(
 						'type'       => 'object',
 						'properties' => array(
