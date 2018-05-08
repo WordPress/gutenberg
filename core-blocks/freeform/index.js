@@ -15,7 +15,7 @@ export const name = 'core/freeform';
 export const settings = {
 	title: __( 'Classic' ),
 
-	description: __( 'It\'s the classic WordPress editor and a it\'s block! Drop the editor right in.' ),
+	description: __( 'It\'s the classic WordPress editor and it\'s block! Drop the editor right in.' ),
 
 	icon: 'editor-kitchensink',
 

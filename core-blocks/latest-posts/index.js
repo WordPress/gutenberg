@@ -15,7 +15,7 @@ export const name = 'core/latest-posts';
 export const settings = {
 	title: __( 'Latest Posts' ),
 
-	description: __( 'Display a list your most recent posts.' ),
+	description: __( 'Display a list of your most recent posts.' ),
 
 	icon: 'list-view',
 
