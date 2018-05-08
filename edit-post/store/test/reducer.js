@@ -120,19 +120,17 @@ describe( 'state', () => {
 			const initialState = deepFreeze( {
 				pinnedPluginItems: {
 					'foo/enabled': true,
+					'foo/disabled': false,
 				},
 			} );
 
-			it( 'should enable a pinned plugin flag when the value does not exist', () => {
+			it( 'should disable a pinned plugin flag when the value does not exist', () => {
 				const state = preferences( initialState, {
 					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
 					pluginName: 'foo/does-not-exist',
 				} );
 
-				expect( state.pinnedPluginItems ).toEqual( {
-					'foo/enabled': true,
-					'foo/does-not-exist': true,
-				} );
+				expect( state.pinnedPluginItems[ 'foo/does-not-exist' ] ).toBe( false );
 			} );
 
 			it( 'should disable a pinned plugin flag when it is enabled', () => {
@@ -141,9 +139,16 @@ describe( 'state', () => {
 					pluginName: 'foo/enabled',
 				} );
 
-				expect( state.pinnedPluginItems ).toEqual( {
-					'foo/enabled': false,
+				expect( state.pinnedPluginItems[ 'foo/enabled' ] ).toBe( false );
+			} );
+
+			it( 'should enable a pinned plugin flag when it is disabled', () => {
+				const state = preferences( initialState, {
+					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+					pluginName: 'foo/disabled',
 				} );
+
+				expect( state.pinnedPluginItems[ 'foo/disabled' ] ).toBe( true );
 			} );
 		} );
 	} );

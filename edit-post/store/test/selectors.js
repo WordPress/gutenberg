@@ -198,8 +198,8 @@ describe( 'selectors', () => {
 			},
 		};
 
-		it( 'should return false if the flag is not set for the plugin item', () => {
-			expect( isPluginItemPinned( state, 'foo/unknown' ) ).toBe( false );
+		it( 'should return true if the flag is not set for the plugin item', () => {
+			expect( isPluginItemPinned( state, 'foo/unknown' ) ).toBe( true );
 		} );
 
 		it( 'should return true if plugin item is not pinned', () => {

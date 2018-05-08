@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isUndefined } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -67,7 +72,9 @@ export const preferences = combineReducers( {
 		if ( action.type === 'TOGGLE_PINNED_PLUGIN_ITEM' ) {
 			return {
 				...state,
-				[ action.pluginName ]: ! state[ action.pluginName ],
+				[ action.pluginName ]: isUndefined( state[ action.pluginName ] ) ?
+					false :
+					! state[ action.pluginName ],
 			};
 		}
 		return state;

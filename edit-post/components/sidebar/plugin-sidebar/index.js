@@ -90,6 +90,7 @@ export default compose(
 	withDispatch( ( dispatch, { isActive, sidebarName } ) => {
 		const {
 			closeGeneralSidebar,
+			openGeneralSidebar,
 			togglePinnedPluginItem,
 		} = dispatch( 'core/edit-post' );
 
@@ -100,6 +101,8 @@ export default compose(
 			toggleSidebar() {
 				if ( isActive ) {
 					closeGeneralSidebar();
+				} else {
+					openGeneralSidebar( sidebarName );
 				}
 			},
 		};
