@@ -9,7 +9,6 @@ import {
 	Placeholder,
 	Toolbar,
 } from '@wordpress/components';
-import { PostTypeSupportCheck } from '@wordpress/editor';
 import { Component, Fragment } from '@wordpress/element';
 import { editorMediaUpload } from '@wordpress/blocks';
 import {
@@ -17,6 +16,7 @@ import {
 	BlockControls,
 	MediaUpload,
 	RichText,
+	PostTypeSupportCheck,
 } from '@wordpress/editor';
 
 /**

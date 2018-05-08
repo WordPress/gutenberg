@@ -9,6 +9,8 @@ import { parse, format } from 'url';
 window.jQuery = window.jQuery || jQuery;
 
 window.wp = window.wp || {};
+window.wp.blocks = window.wp.blocks || {};
+window.wp.components = window.wp.components || {};
 window.wp.element = window.wp.element || React;
 
 window.wp.apiRequest = window.wp.apiRequest || function( options ) {

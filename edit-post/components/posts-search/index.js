@@ -10,7 +10,7 @@ import { stringify } from 'querystringify';
 import { PostsList, withAPIData } from '@wordpress/components';
 
 function PostsSearch( { postsList } ) {
-	return ( <PostsList posts={ get( postsList, 'data', {} ) } /> );
+	return ( <PostsList posts={ get( postsList, [ 'data' ], {} ) } /> );
 }
 
 export default withAPIData( ( props ) => {

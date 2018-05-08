@@ -2,13 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { findKey, map, get } from 'lodash';
+import { findKey, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { PostTypeSupportCheck } from '@wordpress/editor';
-import { Component, compose, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -16,12 +15,13 @@ import {
 	PanelBody,
 	PanelColor,
 	RangeControl,
-	TextControl,
+	// TextControl,
 	ToggleControl,
 	Toolbar,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
+	PostTypeSupportCheck,
 	AlignmentToolbar,
 	BlockControls,
 	ColorPalette,
@@ -29,13 +29,12 @@ import {
 	InspectorControls,
 	MediaUpload,
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-// import '@wordpress/core-data';
 import './editor.scss';
 
 export const FONT_SIZES = {
@@ -110,20 +109,15 @@ class PostBlock extends Component {
 		}
 	}
 
-	// componentWillReceiveProps( nextProps ) {
-	// 	console.log( 'componentWillReceiveProps', nextProps );
-	// // 	if ( image && ! url ) {
-	// 		this.props.setAttributes( {
-	// 			url: 'http://localhost:3000/sample2.jpg',
-	// 		} );
-	// // 	}
-	// }
-
 	render() {
-		const { attributes, setAttributes, isSelected, className } = this.props;
-		const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, mediaId } = attributes;
+		const { attributes, setAttributes, isSelected, className, image } = this.props;
+		const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor } = attributes;
 
 		const fontSize = this.getFontSize();
+
+		if ( image && image.source_url ) {
+			setAttributes( { url: image.source_url } );
+		}
 
 		const style = backgroundImageStyles( url );
 		const classes = classnames(
@@ -167,7 +161,7 @@ class PostBlock extends Component {
 					</Toolbar>
 				</BlockControls>
 				<InspectorControls>
-					{/* <PanelBody title={ __( 'Post Settings' ) }>
+					{ /* <PanelBody title={ __( 'Post Settings' ) }>
 						<TextControl
 							label={ __( 'ID' ) }
 							value={ postId }
@@ -299,14 +293,14 @@ class PostBlock extends Component {
 	}
 }
 
-export default /*withSelect( ( select, ownProps ) => {
+export default withSelect( ( select, ownProps ) => {
 	const { getMedia } = select( 'core' );
 	const { mediaId } = ownProps.attributes;
 
 	return {
 		image: mediaId ? getMedia( mediaId ) : null,
-	}
-} ) ( */PostBlock/* )*/;
+	};
+} ) ( PostBlock );
 
 export function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?

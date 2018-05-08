@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RichText } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
@@ -71,7 +71,7 @@ export const settings = {
 	edit: PostBlock,
 
 	save( { attributes, className } ) {
-		const { url, title, textAlign, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize, mediaId } = attributes;
+		const { url, title, textAlign, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize } = attributes;
 		const imageStyle = backgroundImageStyles( url );
 		const imageClasses = classnames(
 			'wp-block-cover-image',

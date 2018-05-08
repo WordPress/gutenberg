@@ -9,7 +9,8 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockAlignmentToolbar, BlockControls, InnerBlocks } from '@wordpress/blocks';
+import { Fragment } from '@wordpress/element';
+import { InnerBlocks } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -57,40 +58,30 @@ function getBlockName( row ) {
 function getBlockSettings( row ) {
 	return {
 		title: row.title,
-		description: row.description,
+
 		icon: 'columns',
+
 		category: 'rows',
+
 		attributes: {
 			columns: {
 				type: 'number',
 				default: row.cols.length,
 			},
-			align: {
-				type: 'string',
-			},
 		},
 
-		getEditWrapperProps( attributes ) {
-			const { align } = attributes;
+		description: row.description,
 
-			return { 'data-align': align };
-		},
+		// supports: {
+		// 	align: [ 'wide', 'full' ],
+		// },
 
-		edit( { attributes, setAttributes, className } ) {
-			const { align, columns } = attributes;
+		edit( { attributes, className } ) {
+			const { columns } = attributes;
 			const classes = classnames( className, 'wp-block-rows' );
 
 			return (
 				<Fragment>
-					<BlockControls>
-						<BlockAlignmentToolbar
-							controls={ [ 'wide', 'full' ] }
-							value={ align }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { align: nextAlign } );
-							} }
-						/>
-					</BlockControls>
 					<div className={ classes }>
 						<InnerBlocks layouts={ getColumnLayouts( columns, row.cols ) } />
 					</div>

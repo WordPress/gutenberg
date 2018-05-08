@@ -107,9 +107,9 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 	if ( blocks[ name ] ) {
-		console.error(
-			'Block "' + name + '" is already registered.'
-		);
+		// console.error(
+		// 	'Block "' + name + '" is already registered.'
+		// );
 		return;
 	}
 

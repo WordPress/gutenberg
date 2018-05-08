@@ -39,27 +39,21 @@ We've tried to make it easy to import **Gutenberg by Frontkom** editor in your a
 import './globals'; 
 
 // Importing Gutenberg
-import { 
-    registerCoreBlocks, 
-    initializeEditor, 
-} from '@frontkom/gutenberg';
+import { initializeEditor } from '@frontkom/gutenberg';
 
 // Don't forget to import the style
 import '@frontkom/gutenberg/dist/blocks/style.css';
 import '@frontkom/gutenberg/dist/blocks/edit-blocks.css';
 import '@frontkom/gutenberg/dist/style.css';
 
-// Registering the core blocks
-registerCoreBlocks();
-
 // DOM element id where editor will be displayed
 const target = 'editor'; 
 
 // Page properties
 const page = { 
-    content: { raw: '' },
+    content: { raw: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->', rendered: '<p>Hello</p>' },
     templates: '', // feel free to create your own templates
-    title: { raw: 'My first page' },
+    title: { raw: 'My first page', rendered: '' },
     type: 'page', // or 'post'
     id: 12345,
     ...

@@ -15,7 +15,6 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PostTypeSupportCheck } from '@wordpress/editor';
 import { Component, compose, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
@@ -41,6 +40,7 @@ import {
 	MediaUpload,
 	BlockAlignmentToolbar,
 	UrlInputButton,
+	PostTypeSupportCheck,
 } from '@wordpress/editor';
 
 /**
