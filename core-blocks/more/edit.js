@@ -11,7 +11,7 @@ import { InspectorControls } from '@wordpress/editor';
  */
 import './editor.scss';
 
-export default class edit extends Component {
+export default class MoreEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChangeInput = this.onChangeInput.bind( this );
