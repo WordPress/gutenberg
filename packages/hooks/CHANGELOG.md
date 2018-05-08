@@ -1,4 +1,4 @@
-## 1.1.7 (2018-05-08)
+## 1.1.8 (2018-05-08)
 
 - Documentation: Improve usage examples ([#121](https://github.com/WordPress/packages/pull/121))
 
