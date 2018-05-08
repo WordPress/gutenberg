@@ -13,7 +13,7 @@
 	margin-bottom: 0;
 	position: relative;
 
-	.blocks-rich-text__tinymce {
+	.editor-rich-text__tinymce {
 		cursor: text;
 	}
 }
@@ -30,13 +30,13 @@
 	$blocks-button__link-input-width: 280px;
 	width: $blocks-button__link-input-width;
 
-	.blocks-url-input {
+	.editor-url-input {
 		width: auto;
 	}
 
-	.blocks-url-input__suggestions {
+	.editor-url-input__suggestions {
 		width: $blocks-button__link-input-width - $icon-button-size - $icon-button-size;
-		z-index: z-index( '.blocks-button__inline-link .blocks-url-input__suggestions' );
+		z-index: z-index( '.blocks-button__inline-link .editor-url-input__suggestions' );
 	}
 
 	> .dashicon {
@@ -47,7 +47,7 @@
 		color: $dark-gray-100;
 	}
 
-	.blocks-url-input input[type=text]::placeholder {
+	.editor-url-input input[type=text]::placeholder {
 		color: $dark-gray-100;
 	}
 

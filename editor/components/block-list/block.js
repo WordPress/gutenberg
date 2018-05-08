@@ -17,7 +17,6 @@ import {
 	placeCaretAtVerticalEdge,
 } from '@wordpress/utils';
 import {
-	BlockEdit,
 	createBlock,
 	cloneBlock,
 	getBlockType,
@@ -34,6 +33,7 @@ import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
+import BlockEdit from '../block-edit';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
@@ -429,8 +429,8 @@ export class BlockListBlock extends Component {
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! showSideInserter && isSelectedNotTyping;
 		// We render block movers and block settings to keep them tabbale even if hidden
-		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
-		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
+		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
+		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
 		const shouldShowBreadcrumb = isHovered;
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;

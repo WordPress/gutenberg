@@ -6,9 +6,9 @@ import {
 	createBlock,
 	getBlockAttributes,
 	getBlockType,
-	RichText,
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies

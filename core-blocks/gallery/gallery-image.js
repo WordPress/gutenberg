@@ -11,7 +11,7 @@ import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
 import { withSelect } from '@wordpress/data';
-import { RichText } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Module constants

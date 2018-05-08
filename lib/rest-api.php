@@ -247,13 +247,10 @@ function gutenberg_add_permalink_template_to_posts( $response, $post, $request )
 		require_once ABSPATH . '/wp-admin/includes/post.php';
 	}
 
-	$sample_permalink = get_sample_permalink( $post->ID );
+	$sample_permalink = get_sample_permalink( $post->ID, $post->post_title, '' );
 
 	$response->data['permalink_template'] = $sample_permalink[0];
-
-	if ( 'draft' === $post->post_status && ! $post->post_name ) {
-		$response->data['draft_slug'] = $sample_permalink[1];
-	}
+	$response->data['generated_slug']     = $sample_permalink[1];
 
 	return $response;
 }
@@ -274,11 +271,48 @@ function gutenberg_add_block_format_to_post_content( $response, $post, $request 
 	}
 
 	$response_data = $response->get_data();
-	if ( is_array( $response_data['content'] ) && isset( $response_data['content']['raw'] ) ) {
+	if ( isset( $response_data['content'] ) && is_array( $response_data['content'] ) && isset( $response_data['content']['raw'] ) ) {
 		$response_data['content']['block_format'] = gutenberg_content_block_version( $response_data['content']['raw'] );
 		$response->set_data( $response_data );
 	}
 
+	return $response;
+}
+
+/**
+ * Include target schema attributes to links, based on whether the user can.
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the new links.
+ */
+function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
+	$new_links  = array();
+	$orig_links = $response->get_links();
+	$post_type  = get_post_type_object( $post->post_type );
+	// Only Posts can be sticky.
+	if ( 'post' === $post->post_type && 'edit' === $request['context'] ) {
+		if ( current_user_can( $post_type->cap->edit_others_posts )
+			&& current_user_can( $post_type->cap->publish_posts ) ) {
+			$new_links['https://api.w.org/action-sticky'] = array(
+				array(
+					'title'        => __( 'The current user can sticky this post.', 'gutenberg' ),
+					'href'         => $orig_links['self'][0]['href'],
+					'targetSchema' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'sticky' => array(
+								'type' => 'boolean',
+							),
+						),
+					),
+				),
+			);
+		}
+	}
+
+	$response->add_links( $new_links );
 	return $response;
 }
 
@@ -291,6 +325,7 @@ function gutenberg_add_block_format_to_post_content( $response, $post, $request 
 function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
 	return $post_type;
 }
 add_filter( 'registered_post_type', 'gutenberg_register_post_prepare_functions' );
@@ -386,6 +421,11 @@ function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
 		$formats = array_merge( array( 'standard' ), $formats );
 
 		$site_info['theme_supports']['formats'] = $formats;
+	}
+	if ( ! array_key_exists( 'post-thumbnails', $site_info['theme_supports'] ) ) {
+		if ( get_theme_support( 'post-thumbnails' ) ) {
+			$site_info['theme_supports']['post-thumbnails'] = true;
+		}
 	}
 	$response->set_data( $site_info );
 	return $response;

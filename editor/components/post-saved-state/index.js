@@ -5,12 +5,15 @@ import { __ } from '@wordpress/i18n';
 import { Dashicon, IconButton, withSafeTimeout } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
+
+const { displayShortcut } = keycodes;
 
 /**
  * Component showing whether the post is saved or not and displaying save links.
@@ -68,6 +71,7 @@ export class PostSavedState extends Component {
 				className="editor-post-save-draft"
 				onClick={ onSave }
 				icon="cloud-upload"
+				shortcut={ displayShortcut.primary( 's' ) }
 			>
 				{ __( 'Save Draft' ) }
 			</IconButton>

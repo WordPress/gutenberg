@@ -26,7 +26,7 @@ import {
 	getColorClass,
 	withColors,
 	PanelColor,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -125,13 +125,11 @@ class ButtonBlock extends Component {
 								onChange={ this.toggleClear }
 							/>
 							<PanelColor
-								colorName={ backgroundColor.name }
 								colorValue={ backgroundColor.value }
 								title={ __( 'Background Color' ) }
 								onChange={ setBackgroundColor }
 							/>
 							<PanelColor
-								colorName={ textColor.name }
 								colorValue={ textColor.value }
 								title={ __( 'Text Color' ) }
 								onChange={ setTextColor }
