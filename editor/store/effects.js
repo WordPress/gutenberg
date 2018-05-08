@@ -333,10 +333,6 @@ export default {
 			return;
 		}
 
-		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
-			return;
-		}
-
 		if ( ! isEditedPostDirty( state ) ) {
 			return;
 		}
