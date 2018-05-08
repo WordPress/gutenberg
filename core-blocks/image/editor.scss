@@ -87,6 +87,10 @@
 	}
 }
 
+.editor-block-list__block[data-type="core/image"] .editor-block-list__block-edit {
+	display: table;
+}
+
 .edit-post-sidebar .blocks-image__dimensions {
 	margin-bottom: 1em;
 
