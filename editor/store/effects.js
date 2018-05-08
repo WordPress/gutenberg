@@ -146,7 +146,7 @@ export default {
 				( err ) => {
 					dispatch( {
 						type: 'REQUEST_POST_UPDATE_FAILURE',
-					error: get( err, [ 'responseJSON' ], {
+						error: get( err, [ 'responseJSON' ], {
 							code: 'unknown_error',
 							message: __( 'An unknown error occurred.' ),
 						} ),
