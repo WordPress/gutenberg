@@ -300,7 +300,7 @@ export default withSelect( ( select, ownProps ) => {
 	return {
 		image: mediaId ? getMedia( mediaId ) : null,
 	};
-} ) ( PostBlock );
+} )( PostBlock );
 
 export function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?
