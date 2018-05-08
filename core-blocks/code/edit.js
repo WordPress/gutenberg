@@ -1,3 +1,4 @@
+
 /**
  * WordPress dependencies
  */
@@ -9,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import './editor.scss';
 import { PlainText } from '@wordpress/editor';
 
-export default function edit( { attributes, setAttributes, className } ) {
+export default function CodeEdit( { attributes, setAttributes, className } ) {
 	return (
 		<div className={ className }>
 			<PlainText
