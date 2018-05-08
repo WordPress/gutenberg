@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit, mergeWith, includes } from 'lodash';
+import { omit, mergeWith, includes, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -204,13 +204,17 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 
 					// Strip invalid classes.
 					if ( node.classList.length ) {
-						const newClasses = classes.filter( ( name ) =>
-							node.classList.contains( name )
-						);
+						Array.from( node.classList ).forEach( ( name ) => {
+							if ( find( classes, ( item ) => {
+								return typeof item === 'string' ? item === name : item.test( name );
+							} ) ) {
+								return;
+							}
 
-						if ( newClasses.length ) {
-							node.setAttribute( 'class', newClasses.join( ' ' ) );
-						} else {
+							node.classList.remove( name );
+						} );
+
+						if ( ! node.classList.length ) {
 							node.removeAttribute( 'class' );
 						}
 					}
