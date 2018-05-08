@@ -13,7 +13,6 @@ import {
 	Dashicon,
 	IconButton,
 	PanelBody,
-	ToggleControl,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
@@ -52,16 +51,10 @@ class ButtonBlock extends Component {
 		this.nodeRef = null;
 		this.bindRef = this.bindRef.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
-		this.toggleClear = this.toggleClear.bind( this );
 	}
 
 	updateAlignment( nextAlign ) {
 		this.props.setAttributes( { align: nextAlign } );
-	}
-
-	toggleClear() {
-		const { attributes, setAttributes } = this.props;
-		setAttributes( { clear: ! attributes.clear } );
 	}
 
 	bindRef( node ) {
@@ -88,7 +81,6 @@ class ButtonBlock extends Component {
 			url,
 			title,
 			align,
-			clear,
 		} = attributes;
 
 		return (
@@ -119,11 +111,6 @@ class ButtonBlock extends Component {
 					/>
 					<InspectorControls>
 						<PanelBody>
-							<ToggleControl
-								label={ __( 'Wrap text' ) }
-								checked={ !! clear }
-								onChange={ this.toggleClear }
-							/>
 							<PanelColor
 								colorValue={ backgroundColor.value }
 								title={ __( 'Background Color' ) }
