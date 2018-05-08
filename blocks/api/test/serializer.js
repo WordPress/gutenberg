@@ -23,17 +23,19 @@ import {
 	setUnknownTypeHandlerName,
 } from '../registration';
 import { createBlock } from '../';
-import InnerBlocks from '../../inner-blocks';
+
+// Todo: move the test to the inner-blocks folder
+import InnerBlocks from '../../../editor/components/inner-blocks';
 
 describe( 'block serializer', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		require( 'editor/hooks' );
 	} );
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
-		getBlockTypes().forEach( block => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 	} );
@@ -42,7 +44,7 @@ describe( 'block serializer', () => {
 		it( 'returns beautiful content', () => {
 			const content = getBeautifulContent( '<div><div>Beautiful</div></div>' );
 
-			expect( content ).toBe( '<div>\n    <div>Beautiful</div>\n</div>' );
+			expect( content ).toBe( '<div>\n\t<div>Beautiful</div>\n</div>' );
 		} );
 	} );
 
@@ -377,9 +379,9 @@ describe( 'block serializer', () => {
 			expect( serialize( block ) ).toEqual(
 				'<!-- wp:test-block -->\n' +
 				'<p class="wp-block-test-block">Invalid\n' +
-				'    <!-- wp:test-block -->\n' +
-				'    <p class="wp-block-test-block"></p>\n' +
-				'    <!-- /wp:test-block -->\n' +
+				'\t<!-- wp:test-block -->\n' +
+				'\t<p class="wp-block-test-block"></p>\n' +
+				'\t<!-- /wp:test-block -->\n' +
 				'</p>\n' +
 				'<!-- /wp:test-block -->'
 			);

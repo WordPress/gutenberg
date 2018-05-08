@@ -29,7 +29,7 @@ class PostPermalinkEditor extends Component {
 
 		this.props.onSave();
 
-		if ( ! postName || postName === this.props.postName ) {
+		if ( postName === this.props.postName ) {
 			return;
 		}
 
@@ -62,7 +62,7 @@ class PostPermalinkEditor extends Component {
 						aria-label={ __( 'Edit post permalink' ) }
 						value={ editedPostName }
 						onChange={ ( event ) => this.setState( { editedPostName: event.target.value } ) }
-						required
+						type="text"
 						autoFocus
 					/>
 					<span className="editor-post-permalink-editor__suffix">

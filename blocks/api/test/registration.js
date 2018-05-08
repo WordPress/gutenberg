@@ -30,11 +30,11 @@ describe( 'blocks', () => {
 
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		require( 'editor/hooks' );
 	} );
 
 	afterEach( () => {
-		getBlockTypes().forEach( block => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 		setUnknownTypeHandlerName( undefined );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, noop, last, every, first } from 'lodash';
+import { flow, noop, last, every, first, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { cloneBlock, getBlockType, withEditorSettings } from '@wordpress/blocks';
 
 export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false, role } ) {
-	const canDuplicate = every( blocks, block => {
+	const canDuplicate = every( blocks, ( block ) => {
 		const type = getBlockType( block.name );
 		return ! type.useOnce;
 	} );
@@ -39,11 +39,11 @@ export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isL
 export default compose(
 	withSelect( ( select, { uids, rootUID } ) => ( {
 		blocks: select( 'core/editor' ).getBlocksByUID( uids ),
-		index: select( 'core/editor' ).getBlockIndex( last( uids ), rootUID ),
+		index: select( 'core/editor' ).getBlockIndex( last( castArray( uids ) ), rootUID ),
 	} ) ),
 	withDispatch( ( dispatch, { blocks, index, rootUID } ) => ( {
 		onDuplicate() {
-			const clonedBlocks = blocks.map( block => cloneBlock( block ) );
+			const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 			dispatch( 'core/editor' ).insertBlocks(
 				clonedBlocks,
 				index + 1,

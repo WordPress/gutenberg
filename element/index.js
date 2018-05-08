@@ -20,6 +20,11 @@ import {
 } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import isShallowEqual from '@wordpress/is-shallow-equal';
+
+/**
  * Internal dependencies
  */
 import serialize from './serialize';
@@ -48,14 +53,15 @@ export { createElement };
 export { createRef };
 
 /**
- * Allows a `ref` to be forwarded to a component further down the component
- * tree.
+ * Component enhancer used to enable passing a ref to its wrapped component.
+ * Pass a function argument which receives `props` and `ref` as its arguments,
+ * returning an element using the forwarded ref. The return value is a new
+ * component which forwards its ref.
  *
- * @param {Function} forwardFunction A function receiving the component's props and ref,
- *                                   allowing the ref to be mapped to a different prop in
- *                                   order to be passed further down the tree.
+ * @param {Function} forwarder Function passed `props` and `ref`, expected to
+ *                             return an element.
  *
- * @return {Component} The component with the forwarded ref.
+ * @return {WPComponent} Enhanced component.
  */
 export { forwardRef };
 
@@ -222,3 +228,34 @@ export function RawHTML( { children, ...props } ) {
 		...props,
 	} );
 }
+
+/**
+ * Given a component returns the enhanced component augmented with a component
+ * only rerendering when its props/state change
+ *
+ * @param {Function} mapComponentToEnhancedComponent Function mapping component
+ *                                                   to enhanced component.
+ * @param {string}   modifierName                    Seed name from which to
+ *                                                   generated display name.
+ *
+ * @return {WPComponent} Component class with generated display name assigned.
+ */
+export const pure = createHigherOrderComponent( ( Wrapped ) => {
+	if ( Wrapped.prototype instanceof Component ) {
+		return class extends Wrapped {
+			shouldComponentUpdate( nextProps, nextState ) {
+				return ! isShallowEqual( nextProps, this.props ) || ! isShallowEqual( nextState, this.state );
+			}
+		};
+	}
+
+	return class extends Component {
+		shouldComponentUpdate( nextProps ) {
+			return ! isShallowEqual( nextProps, this.props );
+		}
+
+		render() {
+			return <Wrapped { ...this.props } />;
+		}
+	};
+}, 'pure' );

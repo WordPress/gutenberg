@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -14,6 +14,7 @@ import {
 	renderToString,
 	switchChildrenNodeName,
 	RawHTML,
+	pure,
 } from '../';
 
 describe( 'element', () => {
@@ -126,7 +127,7 @@ describe( 'element', () => {
 	describe( 'createHigherOrderComponent', () => {
 		it( 'should use default name for anonymous function', () => {
 			const TestComponent = createHigherOrderComponent(
-				OriginalComponent => OriginalComponent,
+				( OriginalComponent ) => OriginalComponent,
 				'withTest'
 			)( () => <div /> );
 
@@ -135,7 +136,7 @@ describe( 'element', () => {
 
 		it( 'should use camel case starting with upper for wrapper prefix ', () => {
 			const TestComponent = createHigherOrderComponent(
-				OriginalComponent => OriginalComponent,
+				( OriginalComponent ) => OriginalComponent,
 				'with-one-two_threeFOUR'
 			)( () => <div /> );
 
@@ -147,7 +148,7 @@ describe( 'element', () => {
 				return <div />;
 			}
 			const TestComponent = createHigherOrderComponent(
-				OriginalComponent => OriginalComponent,
+				( OriginalComponent ) => OriginalComponent,
 				'withTest'
 			)( SomeComponent );
 
@@ -161,7 +162,7 @@ describe( 'element', () => {
 				}
 			}
 			const TestComponent = createHigherOrderComponent(
-				OriginalComponent => OriginalComponent,
+				( OriginalComponent ) => OriginalComponent,
 				'withTest'
 			)( SomeAnotherComponent );
 
@@ -176,7 +177,7 @@ describe( 'element', () => {
 			}
 			SomeYetAnotherComponent.displayName = 'CustomDisplayName';
 			const TestComponent = createHigherOrderComponent(
-				OriginalComponent => OriginalComponent,
+				( OriginalComponent ) => OriginalComponent,
 				'withTest'
 			)( SomeYetAnotherComponent );
 
@@ -210,6 +211,50 @@ describe( 'element', () => {
 			expect( element.prop( 'className' ) ).toBe( 'foo' );
 			expect( element.prop( 'dangerouslySetInnerHTML' ).__html ).toBe( html );
 			expect( element.prop( 'children' ) ).toBe( undefined );
+		} );
+	} );
+
+	describe( 'pure', () => {
+		it( 'functional component should rerender only when props change', () => {
+			let i = 0;
+			const MyComp = pure( () => {
+				return <p>{ ++i }</p>;
+			} );
+			const wrapper = mount( <MyComp /> );
+			wrapper.update(); // Updating with same props doesn't rerender
+			expect( wrapper.html() ).toBe( '<p>1</p>' );
+			wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender
+			expect( wrapper.html() ).toBe( '<p>2</p>' );
+			wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender
+			expect( wrapper.html() ).toBe( '<p>2</p>' );
+			wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender
+			expect( wrapper.html() ).toBe( '<p>3</p>' );
+		} );
+
+		it( 'class component should rerender if the props or state change', () => {
+			let i = 0;
+			const MyComp = pure( class extends Component {
+				constructor() {
+					super( ...arguments );
+					this.state = {};
+				}
+				render() {
+					return <p>{ ++i }</p>;
+				}
+			} );
+			const wrapper = mount( <MyComp /> );
+			wrapper.update(); // Updating with same props doesn't rerender
+			expect( wrapper.html() ).toBe( '<p>1</p>' );
+			wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender
+			expect( wrapper.html() ).toBe( '<p>2</p>' );
+			wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender
+			expect( wrapper.html() ).toBe( '<p>2</p>' );
+			wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender
+			expect( wrapper.html() ).toBe( '<p>3</p>' );
+			wrapper.setState( { state: 'a' } ); // New state value should trigger a rerender
+			expect( wrapper.html() ).toBe( '<p>4</p>' );
+			wrapper.setState( { state: 'a' } ); // Keeping the same state value should not trigger a rerender
+			expect( wrapper.html() ).toBe( '<p>4</p>' );
 		} );
 	} );
 } );

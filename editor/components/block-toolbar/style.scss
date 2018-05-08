@@ -4,6 +4,7 @@
 	width: 100%;
 	background: $white;
 	overflow: auto; // allow horizontal scrolling on mobile
+	position: relative;
 
 	// allow overflow on desktop
 	@include break-small() {

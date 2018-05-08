@@ -12,7 +12,7 @@ import { compose } from '@wordpress/element';
 import { withDispatch } from '@wordpress/data';
 import { withEditorSettings } from '@wordpress/blocks';
 
-export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role } ) {
+export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, ...props } ) {
 	if ( isLocked ) {
 		return null;
 	}
@@ -26,6 +26,7 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role } 
 			icon="trash"
 			label={ label }
 			role={ role }
+			{ ...props }
 		/>
 	);
 }

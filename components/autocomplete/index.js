@@ -15,7 +15,6 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { isDeprecatedCompleter, toCompatibleCompleter } from './completer-compat';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import Button from '../button';
 import Popover from '../popover';
@@ -207,36 +206,6 @@ export class Autocomplete extends Component {
 		};
 	}
 
-	/*
-	 * NOTE: This is necessary for backwards compatibility with the
-	 * previous completer interface. Once we no longer support the
-	 * old interface, we should be able to use the `completers` prop
-	 * directly.
-	 */
-	static getDerivedStateFromProps( nextProps, prevState ) {
-		const { completers: nextCompleters } = nextProps;
-		const { lastAppliedCompleters } = prevState;
-
-		if ( nextCompleters !== lastAppliedCompleters ) {
-			let completers = nextCompleters;
-
-			if ( completers.some( isDeprecatedCompleter ) ) {
-				completers = completers.map( completer => {
-					return isDeprecatedCompleter( completer ) ?
-						toCompatibleCompleter( completer ) :
-						completer;
-				} );
-			}
-
-			return {
-				completers,
-				lastAppliedCompleters: nextCompleters,
-			};
-		}
-
-		return null;
-	}
-
 	constructor() {
 		super( ...arguments );
 
@@ -370,7 +339,7 @@ export class Autocomplete extends Component {
 		 */
 		Promise.resolve(
 			typeof options === 'function' ? options( query ) : options
-		).then( optionsData => {
+		).then( ( optionsData ) => {
 			const keyedOptions = optionsData.map( ( optionData, optionIndex ) => ( {
 				key: `${ completer.idx }-${ optionIndex }`,
 				value: optionData,
@@ -466,7 +435,8 @@ export class Autocomplete extends Component {
 	}
 
 	search( event ) {
-		const { completers, open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
+		const { completers } = this.props;
+		const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 		const container = event.target;
 
 		// ensure that the cursor location is unambiguous
