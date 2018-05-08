@@ -356,7 +356,8 @@ export function editPost( edits ) {
 /**
  * Returns an action object to save the post.
  *
- * @param {Object} options Set autosave: true for an autosave.
+ * @param {Object} options          Options for the save.
+ * @param {Object} options.autosave Perform an autosave if true.
  *
  * @return {Object} Action object.
  */
