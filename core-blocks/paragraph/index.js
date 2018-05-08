@@ -24,7 +24,6 @@ import {
 import {
 	getColorClass,
 	withColors,
-	parseFootnotesFromContent,
 	AlignmentToolbar,
 	BlockControls,
 	ContrastChecker,
@@ -32,7 +31,11 @@ import {
 	PanelColor,
 	RichText,
 } from '@wordpress/editor';
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import {
+	createBlock,
+	getPhrasingContentSchema,
+	parseFootnotesFromContent,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
