@@ -12,9 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 // These files only need to be loaded if within a rest server instance
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
-    require dirname( __FILE__ ) . '/class-wp-rest-blocks-controller.php';
-    require dirname( __FILE__ ) . '/class-wp-rest-block-renderer-controller.php';
-    require dirname( __FILE__ ) . '/rest-api.php';
+	require dirname( __FILE__ ) . '/class-wp-rest-blocks-controller.php';
+	require dirname( __FILE__ ) . '/class-wp-rest-block-renderer-controller.php';
+	require dirname( __FILE__ ) . '/rest-api.php';
 }
 
 require dirname( __FILE__ ) . '/meta-box-partial-page.php';
