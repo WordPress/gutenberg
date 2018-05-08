@@ -286,6 +286,18 @@ export function insertBlocks( blocks, index, rootUID ) {
 }
 
 /**
+ * Returns an action object used in signalling that a footnotes block should be
+ * added to the block list.
+ *
+ * @return {Object} Action object
+ */
+export function insertFootnotesBlock() {
+	return {
+		...insertBlock( createBlock( 'core/footnotes', {} ) ),
+	};
+}
+
+/**
  * Returns an action object used in signalling that the insertion point should
  * be shown.
  *
@@ -646,6 +658,7 @@ export function convertBlockToShared( uid ) {
 		uid,
 	};
 }
+
 /**
  * Returns an action object used in signalling that a new block of the default
  * type should be added to the block list.

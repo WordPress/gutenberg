@@ -26,7 +26,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { select as selectFunction, withDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 
 /**
@@ -190,8 +190,14 @@ export class BlockListBlock extends Component {
 	}
 
 	setAttributes( attributes ) {
-		const { block, onChange } = this.props;
+		const { block, onAddFirstFootnote, onChange } = this.props;
 		const type = getBlockType( block.name );
+
+		if ( attributes.blockFootnotes && attributes.blockFootnotes.length > 0 &&
+				! selectFunction( 'core/editor' ).getFootnotesBlockUid() ) {
+			onAddFirstFootnote();
+		}
+
 		onChange( block.uid, attributes );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
@@ -652,6 +658,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	const {
 		updateBlockAttributes,
+		insertFootnotesBlock,
 		selectBlock,
 		insertBlocks,
 		removeBlock,
@@ -664,6 +671,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	return {
 		onChange( uid, attributes ) {
 			updateBlockAttributes( uid, attributes );
+		},
+		onAddFirstFootnote() {
+			insertFootnotesBlock();
 		},
 		onSelect( uid = ownProps.uid, initialPosition ) {
 			selectBlock( uid, initialPosition );

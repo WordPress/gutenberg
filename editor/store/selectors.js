@@ -714,6 +714,26 @@ export function getNextBlockUid( state, startUID ) {
 }
 
 /**
+ * Returns the UID from the footnotes block if it exists, or null if there isn't
+ * any footnotes block.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string|null} Footnotes block's UID, or null if none exists.
+ */
+export function getFootnotesBlockUid( state ) {
+	const blocks = getBlocks( state );
+
+	for ( let i = 0; i < blocks.length; i++ ) {
+		if ( blocks[ i ].name === 'core/footnotes' ) {
+			return blocks[ i ].uid;
+		}
+	}
+
+	return null;
+}
+
+/**
  * Returns the initial caret position for the selected block.
  * This position is to used to position the caret properly when the selected block changes.
  *

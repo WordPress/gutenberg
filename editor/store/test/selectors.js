@@ -63,6 +63,7 @@ const {
 	getBlockIndex,
 	getPreviousBlockUid,
 	getNextBlockUid,
+	getFootnotesBlockUid,
 	isBlockSelected,
 	isBlockWithinSelection,
 	hasMultiSelection,
@@ -2027,6 +2028,45 @@ describe( 'selectors', () => {
 			};
 
 			expect( getNextBlockUid( state, 56, '123' ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'getFootnotesBlockUid', () => {
+		it( 'should return the footnotes block\'s UID', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUID: {
+							uid1: {
+								uid: 'uid1',
+								name: 'core/footnotes',
+								attributes: {},
+							},
+						},
+						blockOrder: {
+							'': [ 'uid1' ],
+							uid1: [],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect( getFootnotesBlockUid( state ) ).toEqual( 'uid1' );
+		} );
+
+		it( 'should return null if there isn\'t any footnotes block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: [],
+						blockOrder: { '': [] },
+					},
+				},
+			};
+
+			expect( getFootnotesBlockUid( state ) ).toBeNull();
 		} );
 	} );
 
