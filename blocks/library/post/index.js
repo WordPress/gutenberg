@@ -7,12 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
+import { RichText } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import PostBlock, { FONT_SIZES, dimRatioToClass } from './block';
+import PostBlock, { FONT_SIZES, dimRatioToClass, backgroundImageStyles } from './block';
 
 export const name = 'custom/post';
 
@@ -61,17 +61,17 @@ export const settings = {
 		customFontSize: {
 			type: 'number',
 		},
-		postId: {
-			type: 'string',
-		},
+		mediaId: {
+			type: 'number',
+		}
 	},
 
 	edit: PostBlock,
 
 	save( { attributes, className } ) {
-		const { url, title, textAlign, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize } = attributes;
+		const { url, title, textAlign, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize, mediaId } = attributes;
 
-		const imageStyle = url ? { backgroundImage: `url(${ url })` } : undefined;
+		const imageStyle = backgroundImageStyles( url );
 		const imageClasses = classnames(
 			'wp-block-cover-image',
 			dimRatioToClass( dimRatio ),
@@ -95,8 +95,8 @@ export const settings = {
 
 		return (
 			<div className={ className }>
-				<section className={ imageClasses ? imageClasses : undefined } style={ imageStyle }></section>
-				<p className={ textClasses ? textClasses : undefined } style={ textStyle }>{ title }</p>
+				<section className={ imageClasses ? imageClasses : undefined } style={ imageStyle } />
+				<RichText.Content tagName="p" className={ textClasses ? textClasses : undefined } style={ textStyle } value={ title } />
 			</div>
 		);
 	},

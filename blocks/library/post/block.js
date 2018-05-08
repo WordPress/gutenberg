@@ -8,7 +8,7 @@ import { findKey, map, get } from 'lodash';
  * WordPress dependencies
  */
 import { PostTypeSupportCheck } from '@wordpress/editor';
-import { Component, compose } from '@wordpress/element';
+import { Component, compose, Fragment } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -19,9 +19,7 @@ import {
 	TextControl,
 	ToggleControl,
 	Toolbar,
-	withAPIData,
 } from '@wordpress/components';
-// import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	AlignmentToolbar,
@@ -32,11 +30,12 @@ import {
 	MediaUpload,
 	RichText,
 } from '@wordpress/blocks';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import '@wordpress/core-data';
+// import '@wordpress/core-data';
 import './editor.scss';
 
 export const FONT_SIZES = {
@@ -55,7 +54,6 @@ class PostBlock extends Component {
 		this.setDimRatio = this.setDimRatio.bind( this );
 		this.setFontSize = this.setFontSize.bind( this );
 		this.getFontSize = this.getFontSize.bind( this );
-		this.setTitle = this.setTitle.bind( this );
 	}
 
 	onSelectImage( media ) {
@@ -63,7 +61,7 @@ class PostBlock extends Component {
 
 		setAttributes( {
 			url: media.url,
-			id: media.id,
+			mediaId: media.id,
 		} );
 	}
 
@@ -112,34 +110,22 @@ class PostBlock extends Component {
 		}
 	}
 
-	setTitle( value ) {
-		const { setAttributes } = this.props;
-
-		setAttributes( { title: value } );
-	}
-
 	componentWillReceiveProps( nextProps ) {
-		const { setAttributes } = this.props;
-		const { post } = nextProps;
-
-		// Only update post properties if a new post is returned
-		if ( this.props.post !== post ) {
-			if ( post && post.data ) {
-				setAttributes( {
-					title: [ get( post.data, 'title.rendered' ) ],
-					// url: post.data.image_url,
-					postId: '', // reset postId
-				} );
-			}
-		}
+		console.log( 'componentWillReceiveProps', nextProps );
+	// 	if ( image && ! url ) {
+			this.props.setAttributes( {
+				url: 'http://localhost:3000/sample2.jpg',
+			} );
+	// 	}
 	}
 
 	render() {
 		const { attributes, setAttributes, isSelected, className } = this.props;
-		const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, postId } = attributes;
+		const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, mediaId } = attributes;
+
+console.log( `render ${ title }`, url );
 
 		const fontSize = this.getFontSize();
-		const style = url ? { backgroundImage: `url(${ url })` } : undefined;
 
 		const classes = classnames(
 			'wp-block-cover-image',
@@ -159,111 +145,112 @@ class PostBlock extends Component {
 			/>
 		);
 
-		const controls = isSelected && [
-			<BlockControls key="controls">
-				{ alignmentToolbar }
-				<Toolbar>
-					<PostTypeSupportCheck supportKeys="media-library">
-						<MediaUpload
-							onSelect={ this.onSelectImage }
-							type="image"
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
-					</PostTypeSupportCheck>
-				</Toolbar>
-			</BlockControls>,
-			<InspectorControls key="inspector">
-				<PanelBody title={ __( 'Post Settings' ) }>
-					<TextControl
-						label={ __( 'ID' ) }
-						value={ postId }
-						onChange={ ( idValue ) => setAttributes( { postId: idValue } ) }
-					>
-					</TextControl>
-				</PanelBody>
-
-				<PanelBody title={ __( 'Post Image Settings' ) }>
-					<ToggleControl
-						label={ __( 'Fixed Background' ) }
-						checked={ !! hasParallax }
-						onChange={ this.toggleParallax }
-					/>
-					<RangeControl
-						label={ __( 'Background Dimness' ) }
-						value={ dimRatio }
-						onChange={ this.setDimRatio }
-						min={ 0 }
-						max={ 100 }
-						step={ 10 }
-					/>
-				</PanelBody>
-
-				<PanelBody title={ __( 'Text Settings' ) }>
-					<div className="blocks-font-size__main">
-						<ButtonGroup aria-label={ __( 'Font Size' ) }>
-							{ map( {
-								S: 'small',
-								M: 'regular',
-								L: 'large',
-								XL: 'larger',
-							}, ( size, label ) => (
-								<Button
-									key={ label }
-									isLarge
-									isPrimary={ fontSize === FONT_SIZES[ size ] }
-									aria-pressed={ fontSize === FONT_SIZES[ size ] }
-									onClick={ () => this.setFontSize( FONT_SIZES[ size ] ) }
-								>
-									{ label }
-								</Button>
-							) ) }
-						</ButtonGroup>
-						<Button
-							isLarge
-							onClick={ () => this.setFontSize( undefined ) }
-						>
-							{ __( 'Reset' ) }
-						</Button>
-					</div>
-					<RangeControl
-						label={ __( 'Custom Size' ) }
-						value={ fontSize || '' }
-						onChange={ ( value ) => this.setFontSize( value ) }
-						min={ 12 }
-						max={ 100 }
-						beforeIcon="editor-textcolor"
-						afterIcon="editor-textcolor"
-					/>
+		const controls = (
+			<Fragment>
+				<BlockControls>
 					{ alignmentToolbar }
-				</PanelBody>
+					<Toolbar>
+						<PostTypeSupportCheck supportKeys="media-library">
+							<MediaUpload
+								onSelect={ this.onSelectImage }
+								type="image"
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit image' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+						</PostTypeSupportCheck>
+					</Toolbar>
+				</BlockControls>
+				<InspectorControls>
+					{/* <PanelBody title={ __( 'Post Settings' ) }>
+						<TextControl
+							label={ __( 'ID' ) }
+							value={ postId }
+							onChange={ ( idValue ) => setAttributes( { postId: idValue } ) }
+						>
+						</TextControl>
+					</PanelBody> */ }
 
-				<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
-					<ColorPalette
-						value={ backgroundColor }
-						onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
-					/>
-				</PanelColor>
+					<PanelBody title={ __( 'Post Image Settings' ) }>
+						<ToggleControl
+							label={ __( 'Fixed Background' ) }
+							checked={ !! hasParallax }
+							onChange={ this.toggleParallax }
+						/>
+						<RangeControl
+							label={ __( 'Background Dimness' ) }
+							value={ dimRatio }
+							onChange={ this.setDimRatio }
+							min={ 0 }
+							max={ 100 }
+							step={ 10 }
+						/>
+					</PanelBody>
 
-				<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
-					<ColorPalette
-						value={ textColor }
-						onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
-					/>
-				</PanelColor>
-			</InspectorControls>,
-		];
+					<PanelBody title={ __( 'Text Settings' ) }>
+						<div className="blocks-font-size__main">
+							<ButtonGroup aria-label={ __( 'Font Size' ) }>
+								{ map( {
+									S: 'small',
+									M: 'regular',
+									L: 'large',
+									XL: 'larger',
+								}, ( size, label ) => (
+									<Button
+										key={ label }
+										isLarge
+										isPrimary={ fontSize === FONT_SIZES[ size ] }
+										aria-pressed={ fontSize === FONT_SIZES[ size ] }
+										onClick={ () => this.setFontSize( FONT_SIZES[ size ] ) }
+									>
+										{ label }
+									</Button>
+								) ) }
+							</ButtonGroup>
+							<Button
+								isLarge
+								onClick={ () => this.setFontSize( undefined ) }
+							>
+								{ __( 'Reset' ) }
+							</Button>
+						</div>
+						<RangeControl
+							label={ __( 'Custom Size' ) }
+							value={ fontSize || '' }
+							onChange={ ( value ) => this.setFontSize( value ) }
+							min={ 12 }
+							max={ 100 }
+							beforeIcon="editor-textcolor"
+							afterIcon="editor-textcolor"
+						/>
+						{ alignmentToolbar }
+					</PanelBody>
+
+					<PanelColor title={ __( 'Background Color' ) } colorValue={ backgroundColor } initialOpen={ false }>
+						<ColorPalette
+							value={ backgroundColor }
+							onChange={ ( colorValue ) => setAttributes( { backgroundColor: colorValue } ) }
+						/>
+					</PanelColor>
+
+					<PanelColor title={ __( 'Text Color' ) } colorValue={ textColor } initialOpen={ false }>
+						<ColorPalette
+							value={ textColor }
+							onChange={ ( colorValue ) => setAttributes( { textColor: colorValue } ) }
+						/>
+					</PanelColor>
+				</InspectorControls>
+			</Fragment>
+		);
 
 		const richText = (
 			<RichText
-				key="title"
 				tagName="p"
 				placeholder={ __( 'Write a title…' ) }
 				value={ title }
@@ -278,8 +265,7 @@ class PostBlock extends Component {
 					fontSize: fontSize ? fontSize + 'px' : undefined,
 					textAlign: textAlign,
 				} }
-				onChange={ this.setTitle }
-				isSelected={ isSelected }
+				onChange={ ( value ) => setAttributes( { title: value } ) }
 				inlineToolbar
 			/>
 		);
@@ -288,52 +274,51 @@ class PostBlock extends Component {
 			const icon = 'format-image';
 			const label = __( 'Post image' );
 
-			return [
-				controls,
-				<ImagePlaceholder
-					key="cover-image-placeholder"
-					{ ...{ className, icon, label, onSelectImage: this.onSelectImage } }
-				/>,
-				richText,
-			];
+			return (
+				<Fragment>
+					{ controls }
+					<ImagePlaceholder
+						{ ...{ className, icon, label, onSelectImage: this.onSelectImage } }
+					/>
+					{ richText }
+				</Fragment>
+			);
 		}
 
-		return [
-			controls,
-			<section
-				key="preview"
-				data-url={ url }
-				style={ style }
-				className={ classes }
-			/>,
-			( title || isSelected ? richText : null ),
-		];
+		const style = backgroundImageStyles( url );
+
+		return (
+			<Fragment>
+				{ controls }
+				<section
+					key="preview"
+					data-url={ url }
+					style={ style }
+					className={ classes }
+				/>
+				{ title || isSelected ? richText : null }
+			</Fragment>
+		);
 	}
 }
 
-export default compose( [
-	// withSelect( ( select, props ) => {
-	// 	const { getMedia } = select( 'core' );
-	// 	const featuredMedia = get( props, 'post.featured_media', false);
+export default /*withSelect( ( select, ownProps ) => {
+	const { getMedia } = select( 'core' );
+	const { mediaId } = ownProps.attributes;
 
-	// 	console.log( props );
-	// 	console.log( featuredMedia );
-
-	// 	return {
-	// 		media: featuredMedia ? getMedia( featuredMedia ) : null,
-	// 	}
-	// } ),
-	withAPIData( ( props ) => {
-		const { postId } = props.attributes;
-
-		return {
-			post: postId ? `/wp/v2/posts/${ postId }?type=post` : null,
-		};
-	} ),
-] )( PostBlock );
+	return {
+		image: mediaId ? getMedia( mediaId ) : null,
+	}
+} ) ( */PostBlock/* )*/;
 
 export function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?
 		null :
 		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
+}
+
+export function backgroundImageStyles( url ) {
+	return url ?
+		{ backgroundImage: `url(${ url })` } :
+		undefined;
 }

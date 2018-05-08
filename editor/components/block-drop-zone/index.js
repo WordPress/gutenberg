@@ -84,7 +84,6 @@ class BlockDropZone extends Component {
 		const insertIndex = index && fromIndex < index && rootUID === this.props.rootUID ? positionIndex - 1 : positionIndex;
 
 		if ( blocks ) {
-			// TODO: Replace !
 			this.props.insertBlocks( blocks, insertIndex );
 		} else {
 			this.props.moveBlockToPosition( uid, rootUID, insertIndex );
