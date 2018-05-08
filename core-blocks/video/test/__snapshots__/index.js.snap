@@ -43,6 +43,11 @@ exports[`core/video block edit matches snapshot 1`] = `
         type="submit"
       >
         Use URL
+        <span
+          class="screen-reader-text"
+        >
+           (opens in a new tab)
+        </span>
       </button>
     </form>
     <div
@@ -67,6 +72,11 @@ exports[`core/video block edit matches snapshot 1`] = `
           />
         </svg>
         Upload
+        <span
+          class="screen-reader-text"
+        >
+           (opens in a new tab)
+        </span>
       </button>
       <input
         accept="video/*"
