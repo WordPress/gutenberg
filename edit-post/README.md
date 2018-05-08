@@ -53,6 +53,22 @@ Title displayed at the top of the sidebar.
 - Type: `String`
 - Required: Yes
 
+##### pinnable
+
+Whether to allow to pin sidebar to toolbar.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`
+
+##### icon
+
+The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+
+- Type: `String` | `Element`
+- Required: No
+- Default: `admin-plugins`
+
 
 ### `PluginSidebarMoreMenuItem`
 
