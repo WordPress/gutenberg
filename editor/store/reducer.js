@@ -593,7 +593,7 @@ export function isTyping( state = false, action ) {
 	return state;
 }
 
-export function currentlyAutosaving( state = false, action ) {
+export function isAutosaving( state = false, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_UPDATE':
 			const isAutosave = action.options && action.options.autosave;
@@ -1065,7 +1065,7 @@ export const blockListSettings = ( state = {}, action ) => {
 
 export default optimist( combineReducers( {
 	editor,
-	currentlyAutosaving,
+	isAutosaving,
 	currentPost,
 	isTyping,
 	blockSelection,
