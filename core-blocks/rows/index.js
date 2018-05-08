@@ -76,13 +76,13 @@ function getBlockSettings( row ) {
 			return { 'data-align': align };
 		},
 
-		edit( { attributes, setAttributes, className, focus } ) {
+		edit( { attributes, setAttributes, className } ) {
 			const { align, columns } = attributes;
 			const classes = classnames( className, 'wp-block-rows' );
 
-			return [
-				...focus ? [
-					<BlockControls key="controls">
+			return (
+				<Fragment>
+					<BlockControls>
 						<BlockAlignmentToolbar
 							controls={ [ 'wide', 'full' ] }
 							value={ align }
@@ -90,12 +90,12 @@ function getBlockSettings( row ) {
 								setAttributes( { align: nextAlign } );
 							} }
 						/>
-					</BlockControls>,
-				] : [],
-				<div className={ classes } key="container">
-					<InnerBlocks layouts={ getColumnLayouts( columns, row.cols ) } />
-				</div>,
-			];
+					</BlockControls>
+					<div className={ classes }>
+						<InnerBlocks layouts={ getColumnLayouts( columns, row.cols ) } />
+					</div>
+				</Fragment>
+			);
 		},
 
 		save( ) {

@@ -14,10 +14,51 @@ import { RichText } from '@wordpress/blocks';
 import './editor.scss';
 import PostBlock, { FONT_SIZES, dimRatioToClass, backgroundImageStyles } from './block';
 
+const blockAttributes = {
+	title: {
+		type: 'array',
+		source: 'children',
+		selector: 'p',
+	},
+	url: {
+		type: 'string',
+	},
+	textAlign: {
+		type: 'string',
+		default: 'left',
+	},
+	id: {
+		type: 'number',
+	},
+	hasParallax: {
+		type: 'boolean',
+		default: false,
+	},
+	dimRatio: {
+		type: 'number',
+		default: 0,
+	},
+	textColor: {
+		type: 'string',
+	},
+	backgroundColor: {
+		type: 'string',
+	},
+	fontSize: {
+		type: 'string',
+	},
+	customFontSize: {
+		type: 'number',
+	},
+	mediaId: {
+		type: 'number',
+	},
+};
+
 export const name = 'custom/post';
 
 export const settings = {
-	title: 'Post',
+	title: __( 'Post' ),
 
 	description: __( 'Post has an image and a title.' ),
 
@@ -25,52 +66,12 @@ export const settings = {
 
 	category: 'common',
 
-	attributes: {
-		title: {
-			type: 'array',
-			source: 'children',
-			selector: 'p',
-		},
-		url: {
-			type: 'string',
-		},
-		textAlign: {
-			type: 'string',
-			default: 'left',
-		},
-		id: {
-			type: 'number',
-		},
-		hasParallax: {
-			type: 'boolean',
-			default: false,
-		},
-		dimRatio: {
-			type: 'number',
-			default: 0,
-		},
-		textColor: {
-			type: 'string',
-		},
-		backgroundColor: {
-			type: 'string',
-		},
-		fontSize: {
-			type: 'string',
-		},
-		customFontSize: {
-			type: 'number',
-		},
-		mediaId: {
-			type: 'number',
-		}
-	},
+	attributes: blockAttributes,
 
 	edit: PostBlock,
 
 	save( { attributes, className } ) {
 		const { url, title, textAlign, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize, mediaId } = attributes;
-
 		const imageStyle = backgroundImageStyles( url );
 		const imageClasses = classnames(
 			'wp-block-cover-image',
@@ -95,8 +96,8 @@ export const settings = {
 
 		return (
 			<div className={ className }>
-				<section className={ imageClasses ? imageClasses : undefined } style={ imageStyle } />
-				<RichText.Content tagName="p" className={ textClasses ? textClasses : undefined } style={ textStyle } value={ title } />
+				<section className={ imageClasses } style={ imageStyle } />
+				<RichText.Content tagName="p" className={ textClasses } style={ textStyle } value={ title } />
 			</div>
 		);
 	},

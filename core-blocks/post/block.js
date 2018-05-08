@@ -110,23 +110,22 @@ class PostBlock extends Component {
 		}
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		console.log( 'componentWillReceiveProps', nextProps );
-	// 	if ( image && ! url ) {
-			this.props.setAttributes( {
-				url: 'http://localhost:3000/sample2.jpg',
-			} );
-	// 	}
-	}
+	// componentWillReceiveProps( nextProps ) {
+	// 	console.log( 'componentWillReceiveProps', nextProps );
+	// // 	if ( image && ! url ) {
+	// 		this.props.setAttributes( {
+	// 			url: 'http://localhost:3000/sample2.jpg',
+	// 		} );
+	// // 	}
+	// }
 
 	render() {
 		const { attributes, setAttributes, isSelected, className } = this.props;
 		const { url, title, textAlign, id, hasParallax, dimRatio, textColor, backgroundColor, mediaId } = attributes;
 
-console.log( `render ${ title }`, url );
-
 		const fontSize = this.getFontSize();
 
+		const style = backgroundImageStyles( url );
 		const classes = classnames(
 			'wp-block-cover-image',
 			dimRatioToClass( dimRatio ),
@@ -284,8 +283,6 @@ console.log( `render ${ title }`, url );
 				</Fragment>
 			);
 		}
-
-		const style = backgroundImageStyles( url );
 
 		return (
 			<Fragment>
