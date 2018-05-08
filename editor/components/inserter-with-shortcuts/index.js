@@ -24,6 +24,16 @@ function filterItems( items ) {
 }
 
 function orderItems( items ) {
+	/**
+	 * Sort items in the following order:
+	 *
+	 * 1. Blocks that are contextually useful (utility = 3)
+	 * 2. Blocks that have been previously inserted (utility = 2)
+	 * 3. Blocks that are in the common category (utility = 1)
+	 * 4. All other blocks (utility = 0)
+	 *
+	 * @see selectors.getInserterItems()
+	 */
 	return orderBy( items, [ 'utility', 'frecency' ], [ 'desc', 'desc' ] );
 }
 

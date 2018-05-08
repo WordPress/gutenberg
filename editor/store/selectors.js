@@ -1214,6 +1214,21 @@ function getInsertUsage( state, id ) {
  * Determines the items that appear in the the inserter. Includes both static
  * items (e.g. a regular block type) and dynamic items (e.g. a shared block).
  *
+ * Each item object contains what's necessary to display a button in the
+ * inserter and handle its selection.
+ *
+ * The 'utility' property which allows us to suggest items in order of how
+ * useful we think they will be to the user, namely:
+ *
+ * 1. Blocks that are contextually useful (utility = 3)
+ * 2. Blocks that have been previously inserted (utility = 2)
+ * 3. Blocks that are in the common category (utility = 1)
+ * 4. All other blocks (utility = 0)
+ *
+ * The 'frecency' property is a herustic (https://en.wikipedia.org/wiki/Frecency)
+ * that combines block usage frequenty and recency. This is useful for ordering
+ * items within the above categories.
+ *
  * @param {Object}           state                   Global application state.
  * @param {string[]|boolean} editorAllowedBlockTypes Allowed block types, or true/false to
  *                                                   enable/disable all types.
