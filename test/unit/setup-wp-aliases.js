@@ -15,6 +15,7 @@ global.wp = {
 	'editor',
 	'data',
 	'core-data',
+	'core-blocks',
 	'edit-post',
 	'viewport',
 	'plugins',

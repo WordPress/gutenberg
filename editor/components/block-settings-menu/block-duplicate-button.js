@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, noop, last, every, first } from 'lodash';
+import { flow, noop, last, every, first, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,7 +39,7 @@ export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isL
 export default compose(
 	withSelect( ( select, { uids, rootUID } ) => ( {
 		blocks: select( 'core/editor' ).getBlocksByUID( uids ),
-		index: select( 'core/editor' ).getBlockIndex( last( uids ), rootUID ),
+		index: select( 'core/editor' ).getBlockIndex( last( castArray( uids ) ), rootUID ),
 	} ) ),
 	withDispatch( ( dispatch, { blocks, index, rootUID } ) => ( {
 		onDuplicate() {
