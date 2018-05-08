@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiRequest from '@wordpress/api-request';
@@ -17,12 +12,8 @@ import {
 	receiveUserQuery,
 	receiveEntityRecords,
 	receiveThemeSupportsFromIndex,
-	addEntities,
 } from './actions';
-import {
-	hasEntitiesByKind,
-} from './selectors';
-import { kinds } from './entities';
+import { loadKindEntities } from './entities';
 
 /**
  * Requests categories from the REST API, yielding action objects on request
@@ -39,22 +30,6 @@ export async function* getCategories() {
 export async function* getAuthors() {
 	const users = await apiRequest( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
 	yield receiveUserQuery( 'authors', users );
-}
-
-async function* loadKindEntities( state, kind ) {
-	const hasEntities = hasEntitiesByKind( state, kind );
-
-	if ( hasEntities ) {
-		return;
-	}
-
-	const kindConfig = find( kinds, { name: kind } );
-	if ( ! kindConfig ) {
-		return;
-	}
-
-	const entities = await kindConfig.loadEntities();
-	yield addEntities( entities );
 }
 
 /**

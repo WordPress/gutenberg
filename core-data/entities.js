@@ -1,12 +1,18 @@
 /**
  * External dependencies
  */
-import { upperFirst, camelCase, map } from 'lodash';
+import { upperFirst, camelCase, map, find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import apiRequest from '@wordpress/api-request';
+
+/**
+ * Internal dependencies
+ */
+import { hasEntitiesByKind } from './selectors';
+import { addEntities } from './actions';
 
 export const defaultEntities = [
 	{ name: 'postType', kind: 'root', key: 'slug', baseUrl: '/wp/v2/types' },
@@ -51,3 +57,25 @@ export const getMethodName = ( kind, name, prefix = 'get', usePlural = false ) =
 	const suffix = usePlural && entity.plural ? upperFirst( camelCase( entity.plural ) ) : nameSuffix;
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
+
+/**
+ * Loads the kind entities into the store.
+ *
+ * @param {Object} state Global state
+ * @param {string} kind  Kind
+ */
+export async function* loadKindEntities( state, kind ) {
+	const hasEntities = hasEntitiesByKind( state, kind );
+
+	if ( hasEntities ) {
+		return;
+	}
+
+	const kindConfig = find( kinds, { name: kind } );
+	if ( ! kindConfig ) {
+		return;
+	}
+
+	const entities = await kindConfig.loadEntities();
+	yield addEntities( entities );
+}
