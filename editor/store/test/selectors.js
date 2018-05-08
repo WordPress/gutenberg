@@ -46,6 +46,7 @@ const {
 	getBlockCount,
 	hasSelectedBlock,
 	getSelectedBlock,
+	getSelectedBlockUID,
 	getBlockRootUID,
 	getEditedPostAttribute,
 	getGlobalBlockCount,
@@ -1606,6 +1607,33 @@ describe( 'selectors', () => {
 			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 0 );
 		} );
 	} );
+
+	describe( 'getSelectedBlockUID', () => {
+		it( 'should return null if no block is selected', () => {
+			const state = {
+				blockSelection: { start: null, end: null },
+			};
+
+			expect( getSelectedBlockUID( state ) ).toBe( null );
+		} );
+
+		it( 'should return null if there is multi selection', () => {
+			const state = {
+				blockSelection: { start: 23, end: 123 },
+			};
+
+			expect( getSelectedBlockUID( state ) ).toBe( null );
+		} );
+
+		it( 'should return the selected block UID', () => {
+			const state = {
+				blockSelection: { start: 23, end: 23 },
+			};
+
+			expect( getSelectedBlockUID( state ) ).toEqual( 23 );
+		} );
+	} );
+
 	describe( 'getSelectedBlock', () => {
 		it( 'should return null if no block is selected', () => {
 			const state = {

@@ -585,6 +585,19 @@ export function hasSelectedBlock( state ) {
 }
 
 /**
+ * Returns the currently selected block UID, or null if there is no selected
+ * block.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?Object} Selected block UID.
+ */
+export function getSelectedBlockUID( state ) {
+	const { start, end } = state.blockSelection;
+	return start === end && start ? start : null;
+}
+
+/**
  * Returns the currently selected block, or null if there is no selected block.
  *
  * @param {Object} state Global application state.
@@ -592,12 +605,8 @@ export function hasSelectedBlock( state ) {
  * @return {?Object} Selected block.
  */
 export function getSelectedBlock( state ) {
-	const { start, end } = state.blockSelection;
-	if ( start !== end || ! start ) {
-		return null;
-	}
-
-	return getBlock( state, start );
+	const uid = getSelectedBlockUID( state );
+	return uid ? getBlock( state, uid ) : null;
 }
 
 /**
