@@ -734,6 +734,31 @@ export function getFootnotesBlockUid( state ) {
 }
 
 /**
+ * Returns an array with all footnotes UIDs.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} Footnote ids.
+ */
+export function getFootnotes( state ) {
+	const blocks = getBlocks( state );
+
+	return Object.keys( blocks ).reduce(
+		( footnotes, blockUid ) => {
+			const block = blocks[ blockUid ];
+
+			if ( ! block.attributes ||
+					! block.attributes.blockFootnotes ) {
+				return footnotes;
+			}
+
+			return footnotes.concat( block.attributes.blockFootnotes );
+		},
+		[]
+	);
+}
+
+/**
  * Returns the initial caret position for the selected block.
  * This position is to used to position the caret properly when the selected block changes.
  *

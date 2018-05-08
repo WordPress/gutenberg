@@ -190,12 +190,23 @@ export class BlockListBlock extends Component {
 	}
 
 	setAttributes( attributes ) {
-		const { block, onAddFirstFootnote, onChange } = this.props;
+		const { block, onAddFirstFootnote, onChange, onRemoveLastFootnote } = this.props;
 		const type = getBlockType( block.name );
+		const footnotesBlockUid = selectFunction( 'core/editor' ).getFootnotesBlockUid();
+		const nextBlockFootnotes = attributes.blockFootnotes ?
+			attributes.blockFootnotes.length : 0;
 
-		if ( attributes.blockFootnotes && attributes.blockFootnotes.length > 0 &&
-				! selectFunction( 'core/editor' ).getFootnotesBlockUid() ) {
+		if ( ! footnotesBlockUid && nextBlockFootnotes > 0 ) {
 			onAddFirstFootnote();
+		} else if ( footnotesBlockUid && nextBlockFootnotes === 0 ) {
+			const postFootnotes = selectFunction( 'core/editor' ).getFootnotes().length;
+			const currentBlockFootnotes = block.attributes.blockFootnotes ?
+				block.attributes.blockFootnotes.length : 0;
+			const footnotesBlockChange = nextBlockFootnotes - currentBlockFootnotes;
+
+			if ( postFootnotes + footnotesBlockChange === 0 ) {
+				onRemoveLastFootnote( footnotesBlockUid );
+			}
 		}
 
 		onChange( block.uid, attributes );
@@ -674,6 +685,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		},
 		onAddFirstFootnote() {
 			insertFootnotesBlock();
+		},
+		onRemoveLastFootnote( footnotesBlockUid ) {
+			removeBlock( footnotesBlockUid );
 		},
 		onSelect( uid = ownProps.uid, initialPosition ) {
 			selectBlock( uid, initialPosition );

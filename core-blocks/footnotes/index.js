@@ -34,30 +34,6 @@ const getFootnotesText = ( text ) => {
 	return text;
 };
 
-/**
- * Returns the footnotes contained in the blocks.
- *
- * @param {Object} blocksByUid Object containing the blocks where to extract
- * the footnotes from.
- *
- * @return {Array} Footnote ids contained in the blocks.
- */
-const getFootnotesFromBlocks = ( blocksByUid ) => {
-	return Object.keys( blocksByUid ).reduce(
-		( footnotes, blockUid ) => {
-			const block = blocksByUid[ blockUid ];
-
-			if ( ! block.attributes ||
-					! block.attributes.blockFootnotes ) {
-				return footnotes;
-			}
-
-			return footnotes.concat( block.attributes.blockFootnotes );
-		},
-		[]
-	);
-};
-
 export const settings = {
 	title: __( 'Footnotes' ),
 	description: __( 'List of footnotes from the article' ),
@@ -76,16 +52,10 @@ export const settings = {
 	},
 
 	edit: withSelect( ( select ) => ( {
-		blocks: select( 'core/editor' ) ? select( 'core/editor' ).getBlocks() : [],
+		footnotes: select( 'core/editor' ) ? select( 'core/editor' ).getFootnotes() : [],
 	} ) )( withState( {
 		editable: null,
-	} )( ( { attributes, blocks, editable, isSelected, setAttributes, setState } ) => {
-		const footnotes = getFootnotesFromBlocks( blocks );
-
-		if ( ! footnotes.length ) {
-			return null;
-		}
-
+	} )( ( { attributes, editable, footnotes, isSelected, setAttributes, setState } ) => {
 		const { texts } = attributes;
 		const onSetActiveEditable = ( index ) => () => {
 			setState( { editable: index } );
@@ -121,10 +91,6 @@ export const settings = {
 	save( { attributes } ) {
 		const { texts } = attributes;
 		const footnoteIds = Object.keys( texts );
-
-		if ( ! footnoteIds.length ) {
-			return null;
-		}
 
 		const footnotes = footnoteIds.map( ( footnoteId ) => {
 			return {

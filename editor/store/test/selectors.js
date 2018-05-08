@@ -64,6 +64,7 @@ const {
 	getPreviousBlockUid,
 	getNextBlockUid,
 	getFootnotesBlockUid,
+	getFootnotes,
 	isBlockSelected,
 	isBlockWithinSelection,
 	hasMultiSelection,
@@ -2067,6 +2068,55 @@ describe( 'selectors', () => {
 			};
 
 			expect( getFootnotesBlockUid( state ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'getFootnotes', () => {
+		it( 'should return the footnotes array ordered', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUid: {
+							uid1: {
+								uid: 'uid1',
+								name: 'core/paragraph',
+								attributes: {
+									blockFootnotes: [ '123', '456' ],
+								},
+							},
+							uid2: {
+								uid: 'uid2',
+								name: 'core/paragraph',
+								attributes: {
+									blockFootnotes: [ '789' ],
+								},
+							},
+						},
+						blockOrder: {
+							'': [ 'uid2', 'uid1' ],
+							uid1: [],
+							uid2: [],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect( getFootnotes( state ) ).toEqual( [ '789', '123', '456' ] );
+		} );
+
+		it( 'should return empty array if there isn\'t any footnote', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUid: [],
+						blockOrder: { '': [] },
+					},
+				},
+			};
+
+			expect( getFootnotes( state ) ).toEqual( [] );
 		} );
 	} );
 
