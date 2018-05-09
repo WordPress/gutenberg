@@ -11,19 +11,21 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { InnerBlocks } from '@wordpress/blocks';
+import { createBlock, InnerBlocks } from '@wordpress/blocks';
 
-const getPostLayout = [
-	{
-		name: 'core/cover-image',
-		label: __( 'Post image' ),
-		icon: 'image',
-	},
-	{
-		name: 'core/paragraph',
-		label: __( 'Post title' ),
-		icon: 'image',
-	},
+const getPostTemplate = [
+	createBlock( 'core/cover-image' ),
+	createBlock( 'core/paragraph' ),
+	// {
+	// 	name: 'core/cover-image',
+	// 	label: __( 'Post image' ),
+	// 	icon: 'image',
+	// },
+	// {
+	// 	name: 'core/paragraph',
+	// 	label: __( 'Post title' ),
+	// 	icon: 'image',
+	// },
 ];
 
 export const name = 'custom/post';
@@ -46,7 +48,7 @@ export const settings = {
 
 		return [
 			<div className={ classes } key="container">
-				<InnerBlocks layouts={ getPostLayout } />
+				<InnerBlocks allowedBlocks={ [ 'core/cover-image', 'core/paragraph' ] } template={ getPostTemplate } />
 			</div>,
 		];
 	},

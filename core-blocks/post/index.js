@@ -7,17 +7,58 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
+import { RichText } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
 import './editor.scss';
-import PostBlock, { FONT_SIZES, dimRatioToClass } from './block';
+import PostBlock, { FONT_SIZES, dimRatioToClass, backgroundImageStyles } from './block';
+
+const blockAttributes = {
+	title: {
+		type: 'array',
+		source: 'children',
+		selector: 'p',
+	},
+	url: {
+		type: 'string',
+	},
+	textAlign: {
+		type: 'string',
+		default: 'left',
+	},
+	id: {
+		type: 'number',
+	},
+	hasParallax: {
+		type: 'boolean',
+		default: false,
+	},
+	dimRatio: {
+		type: 'number',
+		default: 0,
+	},
+	textColor: {
+		type: 'string',
+	},
+	backgroundColor: {
+		type: 'string',
+	},
+	fontSize: {
+		type: 'string',
+	},
+	customFontSize: {
+		type: 'number',
+	},
+	mediaId: {
+		type: 'number',
+	},
+};
 
 export const name = 'custom/post';
 
 export const settings = {
-	title: 'Post',
+	title: __( 'Post' ),
 
 	description: __( 'Post has an image and a title.' ),
 
@@ -25,53 +66,13 @@ export const settings = {
 
 	category: 'common',
 
-	attributes: {
-		title: {
-			type: 'array',
-			source: 'children',
-			selector: 'p',
-		},
-		url: {
-			type: 'string',
-		},
-		textAlign: {
-			type: 'string',
-			default: 'left',
-		},
-		id: {
-			type: 'number',
-		},
-		hasParallax: {
-			type: 'boolean',
-			default: false,
-		},
-		dimRatio: {
-			type: 'number',
-			default: 0,
-		},
-		textColor: {
-			type: 'string',
-		},
-		backgroundColor: {
-			type: 'string',
-		},
-		fontSize: {
-			type: 'string',
-		},
-		customFontSize: {
-			type: 'number',
-		},
-		postId: {
-			type: 'string',
-		},
-	},
+	attributes: blockAttributes,
 
 	edit: PostBlock,
 
 	save( { attributes, className } ) {
 		const { url, title, textAlign, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize } = attributes;
-
-		const imageStyle = url ? { backgroundImage: `url(${ url })` } : undefined;
+		const imageStyle = backgroundImageStyles( url );
 		const imageClasses = classnames(
 			'wp-block-cover-image',
 			dimRatioToClass( dimRatio ),
@@ -95,8 +96,8 @@ export const settings = {
 
 		return (
 			<div className={ className }>
-				<section className={ imageClasses ? imageClasses : undefined } style={ imageStyle }></section>
-				<p className={ textClasses ? textClasses : undefined } style={ textStyle }>{ title }</p>
+				<section className={ imageClasses } style={ imageStyle } />
+				<RichText.Content tagName="p" className={ textClasses } style={ textStyle } value={ title } />
 			</div>
 		);
 	},

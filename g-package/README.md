@@ -1,8 +1,8 @@
 # Gutenberg by Front
 
-We made [Gutenberg](https://github.com/front/gutenberg) editor a little more **customizable**! 
+We made [Gutenberg](https://github.com/Wordpress/gutenberg) editor a little more **customizable**! 
 
-Gutenberg editor can **be easly included in your apps** with this package. Also you can customize blocks menu tabs, blocks categories, document panels and more! 
+Gutenberg editor can **be easly included in your apps** with this [package](https://github.com/front/gutenberg). Also you can customize blocks menu tabs, blocks categories, document panels and more! 
 
 This package is based on [Gutenberg v2.7.0](https://github.com/WordPress/gutenberg/releases/tag/v2.7.0).
 
@@ -19,8 +19,8 @@ This package is based on [Gutenberg v2.7.0](https://github.com/WordPress/gutenbe
     * [Block Menu Tabs](#block-menu-tabs)
     * [Block Categories](#block-categories)
     * [Rows](#rows)
-    * [Posts Panel](posts-panels)
-        * [Post Block](post-block)
+    * [Posts Panel](#posts-panel)
+        * [Post Block](#post-block)
 
 ## Installation
 
@@ -39,27 +39,21 @@ We've tried to make it easy to import **Gutenberg by Frontkom** editor in your a
 import './globals'; 
 
 // Importing Gutenberg
-import { 
-    registerCoreBlocks, 
-    initializeEditor, 
-} from '@frontkom/gutenberg';
+import { initializeEditor } from '@frontkom/gutenberg';
 
 // Don't forget to import the style
 import '@frontkom/gutenberg/dist/blocks/style.css';
 import '@frontkom/gutenberg/dist/blocks/edit-blocks.css';
 import '@frontkom/gutenberg/dist/style.css';
 
-// Registering the core blocks
-registerCoreBlocks();
-
 // DOM element id where editor will be displayed
 const target = 'editor'; 
 
 // Page properties
 const page = { 
-    content: { raw: '' },
+    content: { raw: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->', rendered: '<p>Hello</p>' },
     templates: '', // feel free to create your own templates
-    title: { raw: 'My first page' },
+    title: { raw: 'My first page', rendered: '' },
     type: 'page', // or 'post'
     id: 12345,
     ...
@@ -139,21 +133,22 @@ When you initialize the editor, Gutenberg will request the settings related with
     labels: {
         ...,
         posts: 'Stories',
-    ...,
+        ...,
     },
     name: 'Posts',
     rest_base: 'posts',
     slug: 'post',
     supports: {
         author: true,
-    comments: false,
-    custom-fields: true,
-    media-library: false, // to disable Media library from WordPress
-    posts: true, // to show PostsPanel at sidebar
-    template-settings: true, // to show TemplateSettingsPanel at sidebar
-    thumbnail: false,
-    title: true,
-    ...,
+        comments: false,
+        custom-fields: true,
+        thumbnail: false,
+        title: true,
+        // Gutenberg by Frontkom supports flags
+        media-library: false,    // disable Media library from WordPress
+        posts: true,             // add PostsPanel to sidebar
+        template-settings: true, // add TemplateSettingsPanel to sidebar
+        ...,
     },
     ...,
 }
@@ -168,11 +163,11 @@ To save a [post](https://v2.wp-api.org/reference/posts/) or a [page](https://v2.
     id: 123456,
     content: { 
         raw: '<!-- wp:paragraph -->↵<p>World</p>↵<!-- /wp:paragraph -->',
-    rendered: '<p>World</p>',
+        rendered: '<p>World</p>',
     },
     title: { 
         raw: 'Hello',
-    rendered: 'Hello',
+        rendered: 'Hello',
     }
     ...,
 }

@@ -19,6 +19,6 @@ const rows = [
  * @return {Array} rows.
  */
 export function getRows() {
-	const customRows = get( window, 'customGutenberg.rows' );
+	const customRows = get( window, [ 'customGutenberg', 'rows' ] );
 	return customRows || rows;
 }

@@ -15,7 +15,6 @@ import { withSelect, withDispatch } from '@wordpress/data';
 /**
  * Internal Dependencies
  */
-import '@wordpress/core-data';
 import PostsSearch from '../../posts-search';
 
 /**

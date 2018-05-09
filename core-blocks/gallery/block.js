@@ -6,7 +6,6 @@ import { filter, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { PostTypeSupportCheck } from '@wordpress/editor';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -26,6 +25,7 @@ import {
 	MediaUpload,
 	ImagePlaceholder,
 	InspectorControls,
+	PostTypeSupportCheck,
 } from '@wordpress/editor';
 
 /**

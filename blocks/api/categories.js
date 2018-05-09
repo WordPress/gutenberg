@@ -28,6 +28,6 @@ const categories = [
  * @return {Array} Block categories.
  */
 export function getCategories() {
-	const customCategories = get( window, 'customGutenberg.categories' );
+	const customCategories = get( window, [ 'customGutenberg', 'categories' ] );
 	return customCategories || categories;
 }
