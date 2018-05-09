@@ -12,7 +12,7 @@
 	],
 	"engines": {
 		"node": ">=8.0.0",
-		"npm": ">=5.0.0"
+		"npm": ">=6.0.0"
 	},
 	"dependencies": {
 		"@wordpress/a11y": "1.0.6",
