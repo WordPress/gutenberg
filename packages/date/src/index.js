@@ -2,15 +2,96 @@ import momentLib from 'moment';
 import 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
-export const settings = window._wpDateSettings;
+let settings = {
+	l10n: {
+		locale: 'en_US',
+		months: [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ],
+		monthsShort: [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ],
+		weekdays: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ],
+		weekdaysShort: [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat' ],
+		meridiem: { am: 'am', pm: 'pm', AM: 'AM', PM: 'PM' },
+		relative: { future: ' % s from now', past: '% s ago' },
+	},
+	formats: {
+		time: 'g: i a',
+		date: 'F j, Y',
+		datetime: 'F j, Y g: i a',
+	},
+	timezone: { offset: '0', string: '' },
+};
 
-// Create WP timezone based off dateSettings.
-momentLib.tz.add( momentLib.tz.pack( {
-	name: 'WP',
-	abbrs: [ 'WP' ],
-	untils: [ null ],
-	offsets: [ -settings.timezone.offset * 60 || 0 ],
-} ) );
+/**
+ * Adds a locale to moment, using the format supplied by `wp_localize_script()`.
+ *
+ * @param {Object} dateSettings Settings, including locale data.
+ */
+export function setSettings( dateSettings ) {
+	settings = dateSettings;
+
+	// Backup and restore current locale.
+	const currentLocale = momentLib.locale();
+	momentLib.updateLocale( dateSettings.l10n.locale, {
+		// Inherit anything missing from the default locale.
+		parentLocale: currentLocale,
+		months: dateSettings.l10n.months,
+		monthsShort: dateSettings.l10n.monthsShort,
+		weekdays: dateSettings.l10n.weekdays,
+		weekdaysShort: dateSettings.l10n.weekdaysShort,
+		meridiem( hour, minute, isLowercase ) {
+			if ( hour < 12 ) {
+				return isLowercase ? dateSettings.l10n.meridiem.am : dateSettings.l10n.meridiem.AM;
+			}
+			return isLowercase ? dateSettings.l10n.meridiem.pm : dateSettings.l10n.meridiem.PM;
+		},
+		longDateFormat: {
+			LT: dateSettings.formats.time,
+			LTS: null,
+			L: null,
+			LL: dateSettings.formats.date,
+			LLL: dateSettings.formats.datetime,
+			LLLL: null,
+		},
+		// From human_time_diff?
+		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
+		relativeTime: {
+			future: dateSettings.l10n.relative.future,
+			past: dateSettings.l10n.relative.past,
+			s: 'seconds',
+			m: 'a minute',
+			mm: '%d minutes',
+			h: 'an hour',
+			hh: '%d hours',
+			d: 'a day',
+			dd: '%d days',
+			M: 'a month',
+			MM: '%d months',
+			y: 'a year',
+			yy: '%d years',
+		},
+	} );
+	momentLib.locale( currentLocale );
+
+	setupWPTimezone();
+}
+
+/**
+ * Returns the currently defined date settings.
+ *
+ * @return {Object} Settings, including locale data.
+ */
+export function getSettings() {
+	return settings;
+}
+
+function setupWPTimezone() {
+	// Create WP timezone based off dateSettings.
+	momentLib.tz.add( momentLib.tz.pack( {
+		name: 'WP',
+		abbrs: [ 'WP' ],
+		untils: [ null ],
+		offsets: [ -settings.timezone.offset * 60 || 0 ],
+	} ) );
+}
 
 // Create a new moment object which mirrors moment but includes
 // the attached timezone, instead of setting a default timezone on
@@ -188,56 +269,6 @@ const formatMap = {
 };
 
 /**
- * Adds a locale to moment, using the format supplied by `wp_localize_script()`.
- *
- * @param {Object} localSettings Settings, including locale data.
- */
-function setupLocale( localSettings ) {
-	// Backup and restore current locale.
-	const currentLocale = momentLib.locale();
-	momentLib.updateLocale( localSettings.l10n.locale, {
-		// Inherit anything missing from the default locale.
-		parentLocale: currentLocale,
-		months: localSettings.l10n.months,
-		monthsShort: localSettings.l10n.monthsShort,
-		weekdays: localSettings.l10n.weekdays,
-		weekdaysShort: localSettings.l10n.weekdaysShort,
-		meridiem( hour, minute, isLowercase ) {
-			if ( hour < 12 ) {
-				return isLowercase ? localSettings.l10n.meridiem.am : localSettings.l10n.meridiem.AM;
-			}
-			return isLowercase ? localSettings.l10n.meridiem.pm : localSettings.l10n.meridiem.PM;
-		},
-		longDateFormat: {
-			LT: localSettings.formats.time,
-			LTS: null,
-			L: null,
-			LL: localSettings.formats.date,
-			LLL: localSettings.formats.datetime,
-			LLLL: null,
-		},
-		// From human_time_diff?
-		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
-		relativeTime: {
-			future: localSettings.l10n.relative.future,
-			past: localSettings.l10n.relative.past,
-			s: 'seconds',
-			m: 'a minute',
-			mm: '%d minutes',
-			h: 'an hour',
-			hh: '%d hours',
-			d: 'a day',
-			dd: '%d days',
-			M: 'a month',
-			MM: '%d months',
-			y: 'a year',
-			yy: '%d years',
-		},
-	} );
-	momentLib.locale( currentLocale );
-}
-
-/**
  * Formats a date. Does not alter the date's timezone.
  *
  * @param {string}                    dateFormat PHP-style formatting string.
@@ -289,7 +320,7 @@ export function format( dateFormat, dateValue = new Date() ) {
  * @return {string} Formatted date.
  */
 export function date( dateFormat, dateValue = new Date() ) {
-	const offset = window._wpDateSettings.timezone.offset * HOUR_IN_MINUTES;
+	const offset = settings.timezone.offset * HOUR_IN_MINUTES;
 	const dateMoment = momentLib( dateValue ).utcOffset( offset, true );
 	return format( dateFormat, dateMoment );
 }
@@ -323,15 +354,14 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
  */
 export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 	// Defaults.
-	const offset = gmt ? 0 : window._wpDateSettings.timezone.offset * HOUR_IN_MINUTES;
+	const offset = gmt ? 0 : settings.timezone.offset * HOUR_IN_MINUTES;
 	// Convert to moment object.
 	const dateMoment = momentLib( dateValue ).utcOffset( offset, true );
 
 	// Set the locale.
-	dateMoment.locale( window._wpDateSettings.l10n.locale );
+	dateMoment.locale( settings.l10n.locale );
 	// Format and return.
 	return format( dateFormat, dateMoment );
 }
 
-// Initialize.
-setupLocale( window._wpDateSettings );
+setupWPTimezone();
