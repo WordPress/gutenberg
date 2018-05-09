@@ -127,9 +127,9 @@ const config = {
 			memo[ name ] = `./${ path }`;
 			return memo;
 		}, {} ),
-		gutenbergPackages.reduce( ( memo, path ) => {
-			const name = camelCaseDash( path );
-			memo[ name ] = `./packages/${ path }/src`;
+		gutenbergPackages.reduce( ( memo, packageName ) => {
+			const name = camelCaseDash( packageName );
+			memo[ name ] = `./packages/${ packageName }/src`;
 			return memo;
 		}, {} ),
 		wordPressPackages.reduce( ( memo, packageName ) => {
