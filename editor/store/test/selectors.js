@@ -2077,7 +2077,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							uid1: {
 								uid: 'uid1',
 								name: 'core/paragraph',
@@ -2106,11 +2106,41 @@ describe( 'selectors', () => {
 			expect( getFootnotes( state ) ).toEqual( [ '789', '123', '456' ] );
 		} );
 
+		it( 'should return the footnotes from inner blocks', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocksByUID: {
+							uid1: {
+								uid: 'uid1',
+								name: 'core/columns',
+							},
+							uid2: {
+								uid: 'uid2',
+								name: 'core/paragraph',
+								attributes: {
+									blockFootnotes: [ '123' ],
+								},
+							},
+						},
+						blockOrder: {
+							'': [ 'uid1' ],
+							uid1: [ 'uid2' ],
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect( getFootnotes( state ) ).toEqual( [ '123' ] );
+		} );
+
 		it( 'should return empty array if there isn\'t any footnote', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: [],
+						blocksByUID: [],
 						blockOrder: { '': [] },
 					},
 				},

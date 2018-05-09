@@ -125,3 +125,29 @@ export function createInnerBlockList( uid, renderBlockMenu = noop ) {
 
 	return INNER_BLOCK_LIST_CACHE[ uid ][ 0 ];
 }
+
+/**
+ * Given an array of blocks, returns an object containing all blocks, recursing
+ * into inner blocks. Keys correspond to the block UID, the value of which is
+ * the block object.
+ *
+ * @param {Array} blocks Blocks to flatten.
+ *
+ * @return {Object} Flattened blocks object.
+ */
+export function getFlattenedBlocks( blocks ) {
+	const flattenedBlocks = {};
+
+	const stack = [ ...blocks ];
+	while ( stack.length ) {
+		// `innerBlocks` is redundant data which can fall out of sync, since
+		// this is reflected in `blockOrder`, so exclude from appended block.
+		const { innerBlocks, ...block } = stack.shift();
+
+		stack.push( ...innerBlocks );
+
+		flattenedBlocks[ block.uid ] = block;
+	}
+
+	return flattenedBlocks;
+}

@@ -27,6 +27,11 @@ import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
 
+/**
+ * Internal dependencies
+ */
+import { getFlattenedBlocks } from '../utils/block-list';
+
 /***
  * Module constants
  */
@@ -741,7 +746,7 @@ export function getFootnotesBlockUid( state ) {
  * @return {Array} Footnote ids.
  */
 export function getFootnotes( state ) {
-	const blocks = getBlocks( state );
+	const blocks = getFlattenedBlocks( getBlocks( state ) );
 
 	return Object.keys( blocks ).reduce(
 		( footnotes, blockUid ) => {
