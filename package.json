@@ -22,7 +22,7 @@
 		"@wordpress/i18n": "1.1.0",
 		"@wordpress/is-shallow-equal": "1.0.1",
 		"@wordpress/url": "1.1.0",
-		"@wordpress/wordcount": "1.0.0",
+		"@wordpress/wordcount": "1.0.2",
 		"classnames": "2.2.5",
 		"clipboard": "1.7.1",
 		"dom-react": "2.2.1",
