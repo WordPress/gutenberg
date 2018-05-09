@@ -26,6 +26,12 @@ window.wp.url = window.wp.url || { addQueryArgs: function( url, args ) {
 	return format( { ...parsedURL, query } );
 } };
 
+window.wp.oldEditor = window.wp.oldEditor || {
+	initialize: function() {
+		
+	}
+};
+
 window.wp.api = window.wp.api || {};
 window.wp.api.models = window.wp.api.models || {};
 window.wp.api.collections = window.wp.api.collections || {};

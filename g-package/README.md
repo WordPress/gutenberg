@@ -1,8 +1,8 @@
 # Gutenberg by Front
 
-We made [Gutenberg](https://github.com/front/gutenberg) editor a little more **customizable**! 
+We made [Gutenberg](https://github.com/Wordpress/gutenberg) editor a little more **customizable**! 
 
-Gutenberg editor can **be easly included in your apps** with this package. Also you can customize blocks menu tabs, blocks categories, document panels and more! 
+Gutenberg editor can **be easly included in your apps** with this [package](https://github.com/front/gutenberg). Also you can customize blocks menu tabs, blocks categories, document panels and more! 
 
 This package is based on [Gutenberg v2.7.0](https://github.com/WordPress/gutenberg/releases/tag/v2.7.0).
 
@@ -133,21 +133,22 @@ When you initialize the editor, Gutenberg will request the settings related with
     labels: {
         ...,
         posts: 'Stories',
-    ...,
+        ...,
     },
     name: 'Posts',
     rest_base: 'posts',
     slug: 'post',
     supports: {
         author: true,
-    comments: false,
-    custom-fields: true,
-    media-library: false, // to disable Media library from WordPress
-    posts: true, // to show PostsPanel at sidebar
-    template-settings: true, // to show TemplateSettingsPanel at sidebar
-    thumbnail: false,
-    title: true,
-    ...,
+        comments: false,
+        custom-fields: true,
+        thumbnail: false,
+        title: true,
+        // Gutenberg by Frontkom supports flags
+        media-library: false,    // disable Media library from WordPress
+        posts: true,             // add PostsPanel to sidebar
+        template-settings: true, // add TemplateSettingsPanel to sidebar
+        ...,
     },
     ...,
 }
@@ -162,11 +163,11 @@ To save a [post](https://v2.wp-api.org/reference/posts/) or a [page](https://v2.
     id: 123456,
     content: { 
         raw: '<!-- wp:paragraph -->↵<p>World</p>↵<!-- /wp:paragraph -->',
-    rendered: '<p>World</p>',
+        rendered: '<p>World</p>',
     },
     title: { 
         raw: 'Hello',
-    rendered: 'Hello',
+        rendered: 'Hello',
     }
     ...,
 }
