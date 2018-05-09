@@ -281,7 +281,7 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 		if ( current_user_can( $post_type->cap->edit_others_posts ) ) {
 			$new_links['https://api.w.org/action-assign-author'] = array(
 				array(
-					'title'        => __( 'The current user change author on this post.', 'gutenberg' ),
+					'title'        => __( 'The current user can change the author on this post.', 'gutenberg' ),
 					'href'         => $orig_links['self'][0]['href'],
 					'targetSchema' => array(
 						'type'       => 'object',
