@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { isInteger } from 'lodash';
-import moment from 'moment';
 
 /**
  * WordPress dependencies
  */
+import { moment } from '@wordpress/date';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 

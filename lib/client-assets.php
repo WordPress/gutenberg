@@ -181,9 +181,9 @@ function gutenberg_register_scripts_and_styles() {
 		gutenberg_url( 'build/components/index.js' ),
 		array(
 			'lodash',
-			'moment',
 			'wp-a11y',
 			'wp-api-request',
+			'wp-date',
 			'wp-element',
 			'wp-hooks',
 			'wp-i18n',
@@ -218,7 +218,18 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-core-blocks',
 		gutenberg_url( 'build/core-blocks/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-blocks', 'wp-editor', 'wp-i18n', 'editor', 'wp-core-data', 'lodash' ),
+		array(
+			'editor',
+			'lodash',
+			'wp-blocks',
+			'wp-components',
+			'wp-core-data',
+			'wp-date',
+			'wp-editor',
+			'wp-element',
+			'wp-i18n',
+			'wp-utils',
+		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
 		true
 	);
@@ -469,7 +480,7 @@ function gutenberg_register_vendor_scripts() {
 	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
 	gutenberg_register_vendor_script(
 		'moment',
-		'https://unpkg.com/moment@2.21.0/' . $moment_script,
+		'https://unpkg.com/moment@2.22.1/' . $moment_script,
 		array()
 	);
 	$tinymce_version = '4.7.2';

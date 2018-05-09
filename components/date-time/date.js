@@ -2,7 +2,11 @@
  * External dependencies
  */
 import ReactDatePicker from 'react-datepicker';
-import moment from 'moment';
+
+/**
+ * WordPress dependencies
+ */
+import { moment } from '@wordpress/date';
 
 /**
  * Module Constants

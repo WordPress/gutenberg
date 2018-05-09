@@ -6,7 +6,7 @@ const { escapeRegExp } = require( 'lodash' );
 /**
  * Internal dependencies
  */
-const { version } = require( './package' );
+const { version } = require( './lerna' );
 
 /**
  * Regular expression string matching a SemVer string with equal major/minor to
