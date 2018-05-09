@@ -129,7 +129,7 @@ const config = {
 		}, {} ),
 		gutenbergPackages.reduce( ( memo, packageName ) => {
 			const name = camelCaseDash( packageName );
-			memo[ name ] = `./packages/${ packageName }/src`;
+			memo[ name ] = `./packages/${ packageName }`;
 			return memo;
 		}, {} ),
 		wordPressPackages.reduce( ( memo, packageName ) => {
