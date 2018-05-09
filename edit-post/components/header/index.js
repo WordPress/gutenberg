@@ -53,9 +53,9 @@ function Header( {
 					/>
 					<IconButton
 						icon="admin-generic"
+						label={ __( 'Settings' ) }
 						onClick={ toggleGeneralSidebar }
 						isToggled={ isEditorSidebarOpened }
-						label={ __( 'Settings' ) }
 						aria-expanded={ isEditorSidebarOpened }
 					/>
 					<PinnedPlugins.Slot />

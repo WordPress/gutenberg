@@ -29,6 +29,7 @@ const MyPluginSidebar = () => (
 	<PluginSidebar
 		name="my-sidebar"
 		title="My sidebar title"
+		icon="smiley"
 	>
 		<PanelBody>
 			{ __( 'My sidebar content' ) }
@@ -53,7 +54,7 @@ Title displayed at the top of the sidebar.
 - Type: `String`
 - Required: Yes
 
-##### pinnable
+##### isPinnable
 
 Whether to allow to pin sidebar to toolbar.
 

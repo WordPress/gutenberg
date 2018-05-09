@@ -15,8 +15,8 @@ import './style.scss';
 
 const { Fill: PinnedPlugins, Slot } = createSlotFill( 'PinnedPlugins' );
 
-PinnedPlugins.Slot = ( { fillProps } ) => (
-	<Slot fillProps={ fillProps }>
+PinnedPlugins.Slot = ( props ) => (
+	<Slot { ...props }>
 		{ ( fills ) => ! isEmpty( fills ) && (
 			<div className="edit-post-pinned-plugins">
 				{ fills }

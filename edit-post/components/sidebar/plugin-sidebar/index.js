@@ -25,8 +25,8 @@ function PluginSidebar( props ) {
 		children,
 		icon = 'admin-plugins',
 		isActive,
+		isPinnable = true,
 		isPinned,
-		pinnable = true,
 		sidebarName,
 		title,
 		togglePin,
@@ -35,7 +35,7 @@ function PluginSidebar( props ) {
 
 	return (
 		<Fragment>
-			{ pinnable && (
+			{ isPinnable && (
 				<PinnedPlugins>
 					{ isPinned && <IconButton
 						icon={ icon }
@@ -54,11 +54,11 @@ function PluginSidebar( props ) {
 					closeLabel={ __( 'Close plugin' ) }
 				>
 					<strong>{ title }</strong>
-					{ pinnable && (
+					{ isPinnable && (
 						<IconButton
-							onClick={ togglePin }
 							icon={ isPinned ? 'star-filled' : 'star-empty' }
 							label={ isPinned ? __( 'Unpin from toolbar' ) : __( 'Pin to toolbar' ) }
+							onClick={ togglePin }
 							isToggled={ isPinned }
 							aria-expanded={ isPinned }
 						/>
