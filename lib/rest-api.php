@@ -492,7 +492,7 @@ function gutenberg_filter_post_query_arguments( $prepared_args, $request ) {
 	$post_types = array( 'page', 'wp_block' );
 	if ( in_array( $prepared_args['post_type'], $post_types, true ) ) {
 		// Avoid triggering 'rest_post_invalid_page_number' error
-		// which will need to be addressed in https://core.trac.wordpress.org/ticket/43998
+		// which will need to be addressed in https://core.trac.wordpress.org/ticket/43998.
 		if ( -1 === $prepared_args['posts_per_page'] ) {
 			$prepared_args['posts_per_page'] = 100000;
 		}
