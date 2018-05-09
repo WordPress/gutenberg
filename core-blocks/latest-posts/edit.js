@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get, isUndefined, pickBy } from 'lodash';
+import moment from 'moment';
 import classnames from 'classnames';
 import { stringify } from 'querystringify';
 
@@ -19,7 +20,6 @@ import {
 	Toolbar,
 	withAPIData,
 } from '@wordpress/components';
-import { moment } from '@wordpress/date';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
 import {

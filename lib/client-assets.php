@@ -181,9 +181,9 @@ function gutenberg_register_scripts_and_styles() {
 		gutenberg_url( 'build/components/index.js' ),
 		array(
 			'lodash',
+			'moment',
 			'wp-a11y',
 			'wp-api-request',
-			'wp-date',
 			'wp-element',
 			'wp-hooks',
 			'wp-i18n',
@@ -218,18 +218,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-core-blocks',
 		gutenberg_url( 'build/core-blocks/index.js' ),
-		array(
-			'editor',
-			'lodash',
-			'wp-blocks',
-			'wp-components',
-			'wp-core-data',
-			'wp-date',
-			'wp-editor',
-			'wp-element',
-			'wp-i18n',
-			'wp-utils',
-		),
+		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-blocks', 'wp-editor', 'wp-i18n', 'editor', 'wp-core-data', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
 		true
 	);
