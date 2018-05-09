@@ -7,8 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './editor.scss';
-import OldEditor from './old-editor';
+import edit from './edit';
 
 export const name = 'core/freeform';
 
@@ -33,7 +32,7 @@ export const settings = {
 		customClassName: false,
 	},
 
-	edit: OldEditor,
+	edit,
 
 	save( { attributes } ) {
 		const { content } = attributes;

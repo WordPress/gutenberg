@@ -16,9 +16,8 @@ import { RichText } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import './editor.scss';
 import './style.scss';
-import { default as GalleryBlock, defaultColumnsNumber } from './block';
+import { default as edit, defaultColumnsNumber } from './edit';
 
 const blockAttributes = {
 	align: {
@@ -165,7 +164,7 @@ export const settings = {
 		}
 	},
 
-	edit: GalleryBlock,
+	edit,
 
 	save( { attributes } ) {
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;

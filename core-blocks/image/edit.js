@@ -45,6 +45,7 @@ import {
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import ImageSize from './image-size';
 
 /**
@@ -52,7 +53,7 @@ import ImageSize from './image-size';
  */
 const MIN_SIZE = 20;
 
-class ImageBlock extends Component {
+class ImageEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
@@ -399,4 +400,4 @@ export default compose( [
 			image: id ? getMedia( id ) : null,
 		};
 	} ),
-] )( ImageBlock );
+] )( ImageEdit );
