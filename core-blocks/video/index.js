@@ -14,13 +14,13 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
+import { editorMediaUpload } from '@wordpress/blocks';
 import {
-	editorMediaUpload,
 	BlockAlignmentToolbar,
 	BlockControls,
 	MediaUpload,
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -33,7 +33,7 @@ export const name = 'core/video';
 export const settings = {
 	title: __( 'Video' ),
 
-	description: __( 'The Video block allows you to embed video files and play them back using a simple player.' ),
+	description: __( 'Embed an video file and a simple video player.' ),
 
 	icon: 'format-video',
 

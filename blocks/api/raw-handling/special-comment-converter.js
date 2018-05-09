@@ -20,16 +20,17 @@ const { COMMENT_NODE } = window.Node;
  * The custom element is then expected to be recognized by any registered
  * block's `raw` transform.
  *
- * @param {Node} node The node to be processed.
+ * @param {Node}     node The node to be processed.
+ * @param {Document} doc  The document of the node.
  * @return {void}
  */
-export default function( node ) {
+export default function( node, doc ) {
 	if ( node.nodeType !== COMMENT_NODE ) {
 		return;
 	}
 
 	if ( node.nodeValue === 'nextpage' ) {
-		replace( node, createNextpage() );
+		replace( node, createNextpage( doc ) );
 		return;
 	}
 
@@ -55,12 +56,12 @@ export default function( node ) {
 			}
 		}
 
-		replace( node, createMore( customText, noTeaser ) );
+		replace( node, createMore( customText, noTeaser, doc ) );
 	}
 }
 
-function createMore( customText, noTeaser ) {
-	const node = document.createElement( 'wp-block' );
+function createMore( customText, noTeaser, doc ) {
+	const node = doc.createElement( 'wp-block' );
 	node.dataset.block = 'core/more';
 	if ( customText ) {
 		node.dataset.customText = customText;
@@ -72,8 +73,8 @@ function createMore( customText, noTeaser ) {
 	return node;
 }
 
-function createNextpage() {
-	const node = document.createElement( 'wp-block' );
+function createNextpage( doc ) {
+	const node = doc.createElement( 'wp-block' );
 	node.dataset.block = 'core/nextpage';
 
 	return node;

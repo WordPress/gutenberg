@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getTerms, isRequestingTerms, getMedia, getPostType } from '../selectors';
+import { getTerms, isRequestingTerms, getEntityRecord } from '../selectors';
 
 describe( 'getTerms()', () => {
 	it( 'returns value of terms by taxonomy', () => {
@@ -57,38 +57,32 @@ describe( 'isRequestingTerms()', () => {
 	} );
 } );
 
-describe( 'getMedia', () => {
-	it( 'should return undefined for unknown media', () => {
+describe( 'getEntityRecord', () => {
+	it( 'should return undefined for unknown record\'s key', () => {
 		const state = deepFreeze( {
-			media: {},
-		} );
-		expect( getMedia( state, 1 ) ).toBe( undefined );
-	} );
-
-	it( 'should return a media element by id', () => {
-		const state = deepFreeze( {
-			media: {
-				1: { id: 1 },
+			entities: {
+				root: {
+					postType: {
+						byKey: {},
+					},
+				},
 			},
 		} );
-		expect( getMedia( state, 1 ) ).toEqual( { id: 1 } );
-	} );
-} );
-
-describe( 'getPostType', () => {
-	it( 'should return undefined for unknown post type', () => {
-		const state = deepFreeze( {
-			postTypes: {},
-		} );
-		expect( getPostType( state, 'post' ) ).toBe( undefined );
+		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toBe( undefined );
 	} );
 
-	it( 'should return a post type by slug', () => {
+	it( 'should return a record by key', () => {
 		const state = deepFreeze( {
-			postTypes: {
-				post: { slug: 'post' },
+			entities: {
+				root: {
+					postType: {
+						byKey: {
+							post: { slug: 'post' },
+						},
+					},
+				},
 			},
 		} );
-		expect( getPostType( state, 'post' ) ).toEqual( { slug: 'post' } );
+		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toEqual( { slug: 'post' } );
 	} );
 } );

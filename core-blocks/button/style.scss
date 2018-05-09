@@ -5,11 +5,9 @@ $blocks-button__line-height: $big-font-size + 6px;
 	margin-bottom: 1.5em;
 
 	& .wp-block-button__link {
-		background-color: $dark-gray-700;
 		border: none;
 		border-radius: $blocks-button__height / 2;
 		box-shadow: none;
-		color: $white;
 		cursor: pointer;
 		display: inline-block;
 		font-size: $big-font-size;
@@ -20,13 +18,6 @@ $blocks-button__line-height: $big-font-size + 6px;
 		text-decoration: none;
 		white-space: normal;
 		word-break: break-all;
-
-		&:hover,
-		&:focus,
-		&:active {
-			background-color: $dark-gray-700;
-			color: $white;
-		}
 	}
 
 	&.aligncenter {
@@ -35,5 +26,23 @@ $blocks-button__line-height: $big-font-size + 6px;
 
 	&.alignright {
 		text-align: right;
+	}
+}
+
+.wp-block-button__link:not(.has-background) {
+	background-color: $dark-gray-700;
+	&:hover,
+	&:focus,
+	&:active {
+		background-color: $dark-gray-700;
+	}
+}
+
+.wp-block-button__link:not(.has-text-color) {
+	color: $white;
+	&:hover,
+	&:focus,
+	&:active {
+		color: $white;
 	}
 }

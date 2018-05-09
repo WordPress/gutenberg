@@ -64,7 +64,7 @@ export default compose(
 		} = select( 'core/editor' );
 		const isEmpty = ! getBlockCount( ownProps.rootUID );
 		const lastBlock = getBlock( ownProps.lastBlockUID );
-		const isLastBlockDefault = get( lastBlock, 'name' ) === getDefaultBlockName();
+		const isLastBlockDefault = get( lastBlock, [ 'name' ] ) === getDefaultBlockName();
 
 		return {
 			isVisible: isEmpty || ! isLastBlockDefault,

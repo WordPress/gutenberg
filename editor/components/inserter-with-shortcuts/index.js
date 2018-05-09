@@ -6,7 +6,7 @@ import { filter, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { BlockIcon, createBlock, getDefaultBlockName, withEditorSettings } from '@wordpress/blocks';
+import { createBlock, getDefaultBlockName, withEditorSettings } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -15,6 +15,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import BlockIcon from '../block-icon';
 import './style.scss';
 
 function InserterWithShortcuts( { items, isLocked, onInsert } ) {
@@ -52,9 +53,13 @@ export default compose(
 			allowedBlockTypes,
 		};
 	} ),
-	withSelect( ( select, { allowedBlockTypes } ) => ( {
-		items: select( 'core/editor' ).getFrecentInserterItems( allowedBlockTypes, 4 ),
-	} ) ),
+	withSelect( ( select, { allowedBlockTypes, rootUID } ) => {
+		const { getFrecentInserterItems, getSupportedBlocks } = select( 'core/editor' );
+		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
+		return {
+			items: getFrecentInserterItems( supportedBlocks, 4 ),
+		};
+	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const { uid, rootUID, layout } = ownProps;
 

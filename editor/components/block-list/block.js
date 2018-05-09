@@ -17,7 +17,6 @@ import {
 	placeCaretAtVerticalEdge,
 } from '@wordpress/utils';
 import {
-	BlockEdit,
 	createBlock,
 	cloneBlock,
 	getBlockType,
@@ -25,7 +24,6 @@ import {
 	isSharedBlock,
 	isUnmodifiedDefaultBlock,
 	withEditorSettings,
-	getDefaultBlockName,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -35,6 +33,7 @@ import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
+import BlockEdit from '../block-edit';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
@@ -66,6 +65,7 @@ export class BlockListBlock extends Component {
 		this.maybeHover = this.maybeHover.bind( this );
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
+		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
@@ -76,6 +76,7 @@ export class BlockListBlock extends Component {
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
+		this.createInnerBlockList = this.createInnerBlockList.bind( this );
 		this.hadTouchStart = false;
 
 		this.state = {
@@ -83,6 +84,11 @@ export class BlockListBlock extends Component {
 			dragging: false,
 			isHovered: false,
 		};
+	}
+
+	createInnerBlockList( uid ) {
+		const { renderBlockMenu } = this.props;
+		return createInnerBlockList( uid, renderBlockMenu );
 	}
 
 	/**
@@ -96,10 +102,7 @@ export class BlockListBlock extends Component {
 		// is defined in `@wordpress/blocks`, so to avoid a circular dependency
 		// we inject this function via context.
 		return {
-			createInnerBlockList: ( uid ) => {
-				const { renderBlockMenu } = this.props;
-				return createInnerBlockList( uid, renderBlockMenu );
-			},
+			createInnerBlockList: this.createInnerBlockList,
 		};
 	}
 
@@ -270,6 +273,10 @@ export class BlockListBlock extends Component {
 		}
 	}
 
+	insertBlocksAfter( blocks ) {
+		this.props.onInsertBlocks( blocks, this.props.order + 1 );
+	}
+
 	/**
 	 * Marks the block as selected when focused and not already selected. This
 	 * specifically handles the case where block does not set focus on its own
@@ -347,9 +354,9 @@ export class BlockListBlock extends Component {
 			case ENTER:
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
-				this.props.onInsertBlocksAfter( [
-					createBlock( getDefaultBlockName() ),
-				] );
+				this.props.onInsertBlocks( [
+					createBlock( 'core/paragraph' ),
+				], this.props.order + 1 );
 				event.preventDefault();
 				break;
 
@@ -419,11 +426,11 @@ export class BlockListBlock extends Component {
 		// Empty paragraph blocks should always show up as unselected.
 		const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( block );
 		const isSelectedNotTyping = isSelected && ! isTypingWithinBlock;
-		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
-		const shouldAppearSelected = ! showSideInserter && isSelectedNotTyping;
+		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
+		const shouldAppearSelected = ! showEmptyBlockSideInserter && isSelectedNotTyping;
 		// We render block movers and block settings to keep them tabbale even if hidden
-		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
-		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
+		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
+		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
 		const shouldShowBreadcrumb = isHovered;
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
@@ -551,7 +558,7 @@ export class BlockListBlock extends Component {
 								isSelected={ isSelected }
 								attributes={ block.attributes }
 								setAttributes={ this.setAttributes }
-								insertBlocksAfter={ isLocked ? undefined : this.props.onInsertBlocksAfter }
+								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 								onReplace={ isLocked ? undefined : onReplace }
 								mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
 								id={ uid }
@@ -581,10 +588,10 @@ export class BlockListBlock extends Component {
 					) }
 				</IgnoreNestedEvents>
 				{ !! error && <BlockCrashWarning /> }
-				{ showSideInserter && (
+				{ showEmptyBlockSideInserter && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">
-							<InserterWithShortcuts uid={ uid } layout={ layout } onToggle={ this.selectOnOpen } />
+							<InserterWithShortcuts uid={ uid } rootUID={ rootUID } layout={ layout } onToggle={ this.selectOnOpen } />
 						</div>
 						<div className="editor-block-list__empty-block-inserter">
 							<Inserter
@@ -616,7 +623,6 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled,
 		getSelectedBlocksInitialCaretPosition,
 		getBlockSelectionEnd,
-		getBlockRootUID,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( uid );
 	return {
@@ -636,8 +642,6 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isSelected,
-		rootUIDOfRoot: getBlockRootUID( rootUID ),
-		orderOfRoot: getBlockIndex( rootUID, getBlockRootUID( rootUID ) ),
 	};
 } );
 
@@ -651,7 +655,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		replaceBlocks,
 		editPost,
 		toggleSelection,
-		moveBlockToPosition,
 	} = dispatch( 'core/editor' );
 
 	return {
@@ -661,24 +664,10 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		onSelect( uid = ownProps.uid, initialPosition ) {
 			selectBlock( uid, initialPosition );
 		},
-		onInsertBlocksAfter( blocks ) {
-			const { block, order, isLast, rootUID, orderOfRoot, rootUIDOfRoot, layout } = ownProps;
-
-			blocks = blocks.map( ( oldBlock ) => cloneBlock( oldBlock, { layout } ) );
-
-			// If the current block is the last nested empty paragraph block,
-			// and we're about to insert another empty paragraph block, then
-			// move the empty paragraph block behind the wrapping block.
-			// This is a way for the user to escape out of wrapping blocks.
-			if (
-				rootUID && isLast && blocks.length === 1 &&
-				isUnmodifiedDefaultBlock( first( blocks ) ) &&
-				isUnmodifiedDefaultBlock( block )
-			) {
-				moveBlockToPosition( block.uid, rootUID, rootUIDOfRoot, layout, orderOfRoot + 1 );
-			} else {
-				insertBlocks( blocks, order + 1, rootUID );
-			}
+		onInsertBlocks( blocks, index ) {
+			const { rootUID, layout } = ownProps;
+			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
+			insertBlocks( blocks, index, rootUID );
 		},
 		onRemove( uid ) {
 			removeBlock( uid );
@@ -719,5 +708,5 @@ export default compose(
 		};
 	} ),
 	withFilters( 'editor.BlockListBlock' ),
-	withHoverAreas
+	withHoverAreas,
 )( BlockListBlock );

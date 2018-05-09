@@ -139,27 +139,62 @@ describe( 'registerResolvers', () => {
 	} );
 
 	it( 'should use isFulfilled definition before calling the side effect', () => {
-		const resolver = jest.fn();
-		let count = 0;
+		const fulfill = jest.fn().mockImplementation( ( state, page ) => {
+			return { type: 'SET_PAGE', page, result: [] };
+		} );
 
-		registerReducer( 'demo', ( state = 'OK' ) => state );
+		const store = registerReducer( 'demo', ( state = {}, action ) => {
+			switch ( action.type ) {
+				case 'SET_PAGE':
+					return {
+						...state,
+						[ action.page ]: action.result,
+					};
+			}
+
+			return state;
+		} );
+
+		store.dispatch( { type: 'SET_PAGE', page: 4, result: [] } );
+
 		registerSelectors( 'demo', {
-			getValue: ( state ) => state,
+			getPage: ( state, page ) => state[ page ],
 		} );
 		registerResolvers( 'demo', {
-			getValue: {
-				fulfill: ( ...args ) => {
-					count++;
-					resolver( ...args );
+			getPage: {
+				fulfill,
+				isFulfilled( state, page ) {
+					return state.hasOwnProperty( page );
 				},
-				isFulfilled: () => count > 1,
 			},
 		} );
 
-		for ( let i = 0; i < 4; i++ ) {
-			select( 'demo' ).getValue( 'arg1', 'arg2' );
-		}
-		expect( resolver ).toHaveBeenCalledTimes( 2 );
+		select( 'demo' ).getPage( 1 );
+		select( 'demo' ).getPage( 2 );
+
+		expect( fulfill ).toHaveBeenCalledTimes( 2 );
+
+		select( 'demo' ).getPage( 1 );
+		select( 'demo' ).getPage( 2 );
+		select( 'demo' ).getPage( 3, {} );
+
+		// Expected: First and second page fulfillments already triggered, so
+		// should only be one more than previous assertion set.
+		expect( fulfill ).toHaveBeenCalledTimes( 3 );
+
+		select( 'demo' ).getPage( 1 );
+		select( 'demo' ).getPage( 2 );
+		select( 'demo' ).getPage( 3, {} );
+		select( 'demo' ).getPage( 4 );
+
+		// Expected:
+		//  - Fourth page was pre-filled. Necessary to determine via
+		//    isFulfilled, but fulfillment resolver should not be triggered.
+		//  - Third page arguments are not strictly equal but are equivalent,
+		//    so fulfillment should already be satisfied.
+		expect( fulfill ).toHaveBeenCalledTimes( 3 );
+
+		select( 'demo' ).getPage( 4, {} );
 	} );
 
 	it( 'should resolve action to dispatch', ( done ) => {

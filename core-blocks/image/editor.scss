@@ -22,7 +22,7 @@
 .wp-block-image__resize-handler-bottom-left {
 	display: none;
 	border-radius: 50%;
-	border: 2px solid white;
+	border: 2px solid $white;
 	width: 15px !important;
 	height: 15px !important;
 	position: absolute;
@@ -114,7 +114,7 @@
 	}
 }
 
-.editor-block-list__block[data-type="core/image"] .editor-block-toolbar .blocks-format-toolbar__link-modal {
+.editor-block-list__block[data-type="core/image"] .editor-block-toolbar .editor-format-toolbar__link-modal {
 	position: absolute;
 	left: 0;
 	right: 0;

@@ -2,10 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	createBlock,
-	RichText,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -18,7 +16,7 @@ export const name = 'core/subhead';
 export const settings = {
 	title: __( 'Subhead' ),
 
-	description: __( 'Explanatory text under the main heading of an article.' ),
+	description: __( 'What\'s a subhead? Smaller than a headline, bigger than basic text.' ),
 
 	icon: 'text',
 

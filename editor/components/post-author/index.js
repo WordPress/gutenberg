@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { get, filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withAPIData, withInstanceId } from '@wordpress/components';
+import { withInstanceId } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -29,21 +24,8 @@ export class PostAuthor extends Component {
 		onUpdateAuthor( Number( value ) );
 	}
 
-	getAuthors() {
-		// While User Levels are officially deprecated, the behavior of the
-		// existing users dropdown on `who=authors` tests `user_level != 0`
-		//
-		// See: https://github.com/WordPress/WordPress/blob/a193916/wp-includes/class-wp-user-query.php#L322-L327
-		// See: https://codex.wordpress.org/Roles_and_Capabilities#User_Levels
-		const { users } = this.props;
-		return filter( users.data, ( user ) => {
-			return get( user, [ 'capabilities', 'level_1' ], false );
-		} );
-	}
-
 	render() {
-		const { postAuthor, instanceId } = this.props;
-		const authors = this.getAuthors();
+		const { postAuthor, instanceId, authors } = this.props;
 		const selectId = 'post-author-selector-' + instanceId;
 
 		// Disable reason: A select with an onchange throws a warning
@@ -72,6 +54,7 @@ export default compose( [
 	withSelect( ( select ) => {
 		return {
 			postAuthor: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
+			authors: select( 'core' ).getAuthors(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
@@ -79,10 +62,5 @@ export default compose( [
 			dispatch( 'core/editor' ).editPost( { author } );
 		},
 	} ) ),
-	withAPIData( () => {
-		return {
-			users: '/wp/v2/users?context=edit&per_page=100',
-		};
-	} ),
 	withInstanceId,
 ] )( PostAuthor );

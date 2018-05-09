@@ -43,7 +43,7 @@ describe( 'block parser', () => {
 
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		require( 'editor/hooks' );
 	} );
 
 	afterEach( () => {

@@ -6,16 +6,15 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import './editor.scss';
 import './style.scss';
-import LatestPostsBlock from './block';
+import edit from './edit';
 
 export const name = 'core/latest-posts';
 
 export const settings = {
 	title: __( 'Latest Posts' ),
 
-	description: __( 'Shows a list of your site\'s most recent posts.' ),
+	description: __( 'Display a list of your most recent posts.' ),
 
 	icon: 'list-view',
 
@@ -34,7 +33,7 @@ export const settings = {
 		}
 	},
 
-	edit: LatestPostsBlock,
+	edit,
 
 	save() {
 		return null;

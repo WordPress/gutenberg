@@ -17,6 +17,7 @@ import PostSticky from '../post-sticky';
 import PostAuthor from '../post-author';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
+import PluginPostStatusInfo from '../plugin-post-status-info';
 
 /**
  * Module Constants
@@ -32,6 +33,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			<PostSticky />
 			<PostPendingStatus />
 			<PostAuthor />
+			<PluginPostStatusInfo.Slot />
 			<PostTrash />
 		</PanelBody>
 	);

@@ -10,6 +10,9 @@ import { Component, Fragment, compose } from '@wordpress/element';
 import { KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withEditorSettings } from '@wordpress/blocks';
+import { keycodes } from '@wordpress/utils';
+
+const { rawShortcut } = keycodes;
 
 class EditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
@@ -30,6 +33,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 
 	undoOrRedo( event ) {
 		const { onRedo, onUndo } = this.props;
+
 		if ( event.shiftKey ) {
 			onRedo();
 		} else {
@@ -69,9 +73,9 @@ class EditorGlobalKeyboardShortcuts extends Component {
 			<Fragment>
 				<KeyboardShortcuts
 					shortcuts={ {
-						'mod+a': this.selectAll,
-						'mod+z': this.undoOrRedo,
-						'mod+shift+z': this.undoOrRedo,
+						[ rawShortcut.primary( 'a' ) ]: this.selectAll,
+						[ rawShortcut.primary( 'z' ) ]: this.undoOrRedo,
+						[ rawShortcut.primaryShift( 'z' ) ]: this.undoOrRedo,
 						backspace: this.deleteSelectedBlocks,
 						del: this.deleteSelectedBlocks,
 						escape: this.clearMultiSelection,
@@ -80,7 +84,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						'mod+s': this.save,
+						[ rawShortcut.primary( 's' ) ]: this.save,
 					} }
 				/>
 			</Fragment>
