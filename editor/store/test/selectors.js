@@ -2080,14 +2080,12 @@ describe( 'selectors', () => {
 						blocksByUID: {
 							uid1: {
 								uid: 'uid1',
-								name: 'core/paragraph',
 								attributes: {
 									blockFootnotes: [ '123', '456' ],
 								},
 							},
 							uid2: {
 								uid: 'uid2',
-								name: 'core/paragraph',
 								attributes: {
 									blockFootnotes: [ '789' ],
 								},
@@ -2114,11 +2112,9 @@ describe( 'selectors', () => {
 						blocksByUID: {
 							uid1: {
 								uid: 'uid1',
-								name: 'core/columns',
 							},
 							uid2: {
 								uid: 'uid2',
-								name: 'core/paragraph',
 								attributes: {
 									blockFootnotes: [ '123' ],
 								},
