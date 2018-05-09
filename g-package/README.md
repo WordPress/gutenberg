@@ -21,6 +21,7 @@ This package is based on [Gutenberg v2.8.0](https://github.com/WordPress/gutenbe
     * [Rows](#rows)
     * [Posts Panel](#posts-panel)
         * [Post Block](#post-block)
+    * [Events](#events-experimental)
 
 ## Installation
 
@@ -332,3 +333,22 @@ The **Posts Panel** (`postType.supports[ 'posts' ] = true`) contains a list of p
 The **Post Block** is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a title.
 
 ![Post Block example](https://raw.githubusercontent.com/front/gutenberg/develop/post_block_screenshot.png)
+
+### Events (experimental)
+
+**Gutenberg by Frontkom** makes possible to define a callback (or effect) for Gutenberg actions. Since it is an experimental feature, we are only providing this for 'OPEN_GENERAL_SIDEBAR' and 'CLOSE_GENERAL_SIDEBAR' actions.
+
+```js
+window.customGutenberg = {
+    ...,
+    events: {
+        'OPEN_GENERAL_SIDEBAR': function( action, store ) {
+            console.log( 'OPEN_GENERAL_SIDEBAR', action, store );
+        },
+        'CLOSE_GENERAL_SIDEBAR': function( action, store ) {
+            console.log( 'CLOSE_GENERAL_SIDEBAR', action, store );
+        },
+    },
+    ...,
+};
+```
