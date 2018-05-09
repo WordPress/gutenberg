@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, some } from 'lodash';
+import { reduce, some, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -146,6 +146,16 @@ const effects = {
 				};
 			} )()
 		) );
+	},
+	OPEN_GENERAL_SIDEBAR( action, store ) {
+		if ( get( window, [ 'customGutenberg', 'events', 'OPEN_GENERAL_SIDEBAR' ] ) ) {
+			window.customGutenberg.events.OPEN_GENERAL_SIDEBAR( action, store );
+		}
+	},
+	CLOSE_GENERAL_SIDEBAR( action, store ) {
+		if ( get( window, [ 'customGutenberg', 'events', 'CLOSE_GENERAL_SIDEBAR' ] ) ) {
+			window.customGutenberg.events.CLOSE_GENERAL_SIDEBAR( action, store );
+		}
 	},
 };
 

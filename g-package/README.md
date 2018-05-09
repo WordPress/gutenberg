@@ -4,7 +4,7 @@ We made [Gutenberg](https://github.com/Wordpress/gutenberg) editor a little more
 
 Gutenberg editor can **be easly included in your apps** with this [package](https://github.com/front/gutenberg). Also you can customize blocks menu tabs, blocks categories, document panels and more! 
 
-This package is based on [Gutenberg v2.7.0](https://github.com/WordPress/gutenberg/releases/tag/v2.7.0).
+This package is based on [Gutenberg v2.8.0](https://github.com/WordPress/gutenberg/releases/tag/v2.8.0).
 
 ## Table of contents
 * [Installation](#installation)
@@ -51,7 +51,10 @@ const target = 'editor';
 
 // Page properties
 const page = { 
-    content: { raw: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->', rendered: '<p>Hello</p>' },
+    content: { 
+        raw: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->', 
+        rendered: '<p>Hello</p>' 
+    },
     templates: '', // feel free to create your own templates
     title: { raw: 'My first page', rendered: '' },
     type: 'page', // or 'post'
