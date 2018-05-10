@@ -7,11 +7,8 @@ import { filter, every } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	createBlock,
-	editorMediaUpload,
-} from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import { createBlock } from '@wordpress/blocks';
+import { RichText, editorMediaUpload } from '@wordpress/editor';
 
 /**
  * Internal dependencies

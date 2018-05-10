@@ -35,6 +35,7 @@ import {
 	getColorName,
 	withColors,
 } from './components';
+import { editorMediaUpload } from './utils';
 
 const componentsToDepreacate = {
 	Autocomplete,
@@ -63,6 +64,7 @@ const functionsToDeprecate = {
 	getColorClass,
 	getColorName,
 	withColors,
+	editorMediaUpload,
 };
 
 forEach( componentsToDepreacate, ( WrappedComponent, key ) => {

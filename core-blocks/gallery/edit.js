@@ -18,13 +18,13 @@ import {
 	ToggleControl,
 	Toolbar,
 } from '@wordpress/components';
-import { editorMediaUpload } from '@wordpress/blocks';
 import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	MediaUpload,
 	ImagePlaceholder,
 	InspectorControls,
+	editorMediaUpload,
 } from '@wordpress/editor';
 
 /**
