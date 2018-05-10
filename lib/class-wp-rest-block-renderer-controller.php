@@ -37,19 +37,6 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 				continue;
 			}
 
-			$layout = array(
-				'layout' => array(
-					'type' => 'string',
-				),
-			);
-
-			// Add layout to attributes since this is used in case of columns block.
-			if ( is_array( $block_type->attributes ) ) {
-				$attributes = array_merge( $block_type->attributes, $layout );
-			} else {
-				$attributes = $layout;
-			}
-
 			register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<name>' . $block_type->name . ')', array(
 				'args'   => array(
 					'name' => array(
@@ -68,7 +55,7 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 							'description'          => sprintf( __( 'Attributes for %s block', 'gutenberg' ), $block_type->name ),
 							'type'                 => 'object',
 							'additionalProperties' => false,
-							'properties'           => $attributes,
+							'properties'           => $block_type->get_attributes(),
 						),
 						'post_id'    => array(
 							'description' => __( 'ID of the post context.', 'gutenberg' ),

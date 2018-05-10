@@ -27,11 +27,8 @@ export class ServerSideRender extends Component {
 		};
 	}
 
-	componentWillMount() {
-		this.isStillMounted = true;
-	}
-
 	componentDidMount() {
+		this.isStillMounted = true;
 		this.fetch( this.props );
 	}
 
@@ -53,7 +50,15 @@ export class ServerSideRender extends Component {
 
 		const path = '/gutenberg/v1/block-renderer/' + block + '?context=edit&' + this.getQueryUrlFromObject( { attributes } );
 
-		return apiRequest( { path: path } ).then( ( response ) => {
+		return apiRequest( { path } ).fail( ( response ) => {
+			let failResponse = {
+				error: true,
+				errorMsg: response.responseJSON.message || __( 'Unknown error' )
+			};
+			if ( this.isStillMounted ) {
+				this.setState( { response: failResponse } );
+			}
+		} ).done( ( response ) => {
 			if ( this.isStillMounted && response && response.rendered ) {
 				this.setState( { response: response.rendered } );
 			}
@@ -73,6 +78,10 @@ export class ServerSideRender extends Component {
 		if ( ! response ) {
 			return (
 				<Placeholder><Spinner /></Placeholder>
+			);
+		} else if ( response.error ) {
+			return (
+				<Placeholder>{ __( 'Error loading block: ' ) + response.errorMsg }</Placeholder>
 			);
 		} else if ( ! response.length ) {
 			return (
