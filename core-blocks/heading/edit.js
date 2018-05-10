@@ -25,15 +25,23 @@ export default function HeadingEdit( {
 
 	return (
 		<Fragment>
-			<BlockControls
-				controls={ '234'.split( '' ).map( ( level ) => ( {
-					icon: 'heading',
-					title: sprintf( __( 'Heading %s' ), level ),
-					isActive: 'H' + level === nodeName,
-					onClick: () => setAttributes( { nodeName: 'H' + level } ),
-					subscript: level,
-				} ) ) }
-			/>
+			<BlockControls>
+				<Toolbar
+					controls={ '234'.split( '' ).map( ( level ) => ( {
+						icon: 'heading',
+						title: sprintf( __( 'Heading %s' ), level ),
+						isActive: 'H' + level === nodeName,
+						onClick: () => setAttributes( { nodeName: 'H' + level } ),
+						subscript: level,
+					} ) ) }
+				/>
+				<AlignmentToolbar
+					value={ align }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { align: nextAlign } );
+					} }
+				/>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading Settings' ) }>
 					<p>{ __( 'Level' ) }</p>
@@ -45,13 +53,6 @@ export default function HeadingEdit( {
 							onClick: () => setAttributes( { nodeName: 'H' + level } ),
 							subscript: level,
 						} ) ) }
-					/>
-					<p>{ __( 'Text Alignment' ) }</p>
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
 					/>
 				</PanelBody>
 			</InspectorControls>
