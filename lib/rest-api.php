@@ -303,6 +303,7 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 						'properties' => array(
 							'status' => array(
 								'type' => 'string',
+								'enum' => array( 'publish', 'future' ),
 							),
 						),
 					),
