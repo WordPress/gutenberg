@@ -274,17 +274,37 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 	$new_links  = array();
 	$orig_links = $response->get_links();
 	$post_type  = get_post_type_object( $post->post_type );
+	$orig_href  = ! empty( $orig_links['self'][0]['href'] ) ? $orig_links['self'][0]['href'] : null;
 	if ( 'edit' === $request['context'] && post_type_supports( $post_type->name, 'author' ) ) {
 		if ( current_user_can( $post_type->cap->edit_others_posts ) ) {
 			$new_links['https://api.w.org/action-assign-author'] = array(
 				array(
 					'title'        => __( 'The current user can change the author on this post.', 'gutenberg' ),
-					'href'         => $orig_links['self'][0]['href'],
+					'href'         => $orig_href,
 					'targetSchema' => array(
 						'type'       => 'object',
 						'properties' => array(
 							'author' => array(
 								'type' => 'integer',
+							),
+						),
+					),
+				),
+			);
+		}
+	}
+	if ( 'edit' === $request['context'] ) {
+		if ( current_user_can( $post_type->cap->publish_posts ) ) {
+			$new_links['https://api.w.org/action-publish'] = array(
+				array(
+					'title'        => __( 'The current user can publish this post.', 'gutenberg' ),
+					'href'         => $orig_href,
+					'targetSchema' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'status' => array(
+								'type' => 'string',
+								'enum' => array( 'publish', 'future' ),
 							),
 						),
 					),
@@ -299,7 +319,7 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 			$new_links['https://api.w.org/action-sticky'] = array(
 				array(
 					'title'        => __( 'The current user can sticky this post.', 'gutenberg' ),
-					'href'         => $orig_links['self'][0]['href'],
+					'href'         => $orig_href,
 					'targetSchema' => array(
 						'type'       => 'object',
 						'properties' => array(
