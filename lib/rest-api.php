@@ -430,7 +430,7 @@ function gutenberg_handle_early_callback_checks( $response, $handler, $request )
 		'/wp/v2/pages',
 		'/wp/v2/users',
 	);
-	if ( in_array( $request->get_route(), $routes ) ) {
+	if ( in_array( $request->get_route(), $routes, true ) ) {
 		$can_view_authors    = false;
 		$can_unbounded_query = false;
 		$types               = get_post_types( array( 'show_in_rest' => true ), 'objects' );
