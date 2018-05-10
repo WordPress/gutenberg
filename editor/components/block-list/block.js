@@ -23,7 +23,6 @@ import {
 	getSaveElement,
 	isSharedBlock,
 	isUnmodifiedDefaultBlock,
-	withEditorSettings,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -623,8 +622,11 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled,
 		getSelectedBlocksInitialCaretPosition,
 		getBlockSelectionEnd,
+		getEditorSettings,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( uid );
+	const { templateLock, hasFixedToolbar } = getEditorSettings();
+
 	return {
 		previousBlockUid: getPreviousBlockUid( uid ),
 		nextBlockUid: getNextBlockUid( uid ),
@@ -642,6 +644,8 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isSelected,
+		isLocked: !! templateLock,
+		hasFixedToolbar,
 	};
 } );
 
@@ -699,14 +703,6 @@ export default compose(
 	applyWithSelect,
 	applyWithDispatch,
 	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock } = settings;
-
-		return {
-			isLocked: !! templateLock,
-			hasFixedToolbar: settings.hasFixedToolbar,
-		};
-	} ),
 	withFilters( 'editor.BlockListBlock' ),
 	withHoverAreas,
 )( BlockListBlock );
