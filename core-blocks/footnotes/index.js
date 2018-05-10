@@ -38,6 +38,7 @@ export const settings = {
 	title: __( 'Footnotes' ),
 	description: __( 'List of footnotes from the article' ),
 	category: 'common',
+	useOnce: true,
 	keywords: [ __( 'footnotes' ), __( 'references' ) ],
 
 	attributes: {
