@@ -18,7 +18,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
+import { Component, Fragment, compose, RawHTML, Children, createRef } from '@wordpress/element';
 import {
 	keycodes,
 	createBlobURL,
@@ -817,8 +817,15 @@ export class RichText extends Component {
 	 * @return {boolean} Whether field is empty.
 	 */
 	isEmpty() {
-		const { value } = this.props;
-		return ! value || ! value.length;
+		const { value, format } = this.props;
+		if ( ! value ) {
+			return true;
+		}
+
+		return (
+			format === 'string' ||
+			! Children.count( value )
+		);
 	}
 
 	isFormatActive( format ) {
