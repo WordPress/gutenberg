@@ -449,12 +449,12 @@ export const settings = {
 	},
 
 	edit: compose(
-		withColors( ( getColor, setColor, { attributes, setAttributes } ) => {
+		withColors( ( getColor, setColor, { attributes } ) => {
 			return {
 				backgroundColor: getColor( attributes.backgroundColor, attributes.customBackgroundColor, 'background-color' ),
-				setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor', setAttributes ),
+				setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor' ),
 				textColor: getColor( attributes.textColor, attributes.customTextColor, 'color' ),
-				setTextColor: setColor( 'textColor', 'customTextColor', setAttributes ),
+				setTextColor: setColor( 'textColor', 'customTextColor' ),
 			};
 		} ),
 		FallbackStyles,
