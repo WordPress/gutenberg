@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 import momentLib from 'moment';
 import 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
