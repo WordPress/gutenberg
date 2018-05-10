@@ -188,6 +188,8 @@ EOT;
 	}
 
 	/**
+	 * Test that is_countable() is always available (either from PHP or WP).
+	 *
 	 * @ticket 43583
 	 */
 	function test_is_countable_availability() {
@@ -200,9 +202,12 @@ EOT;
 	 * @ticket 43583
 	 *
 	 * @dataProvider countable_variable_test_data
+	 *
+	 * @param mixed $variable     Variable to check.
+	 * @param bool  $is_countable The expected return value of PHP 7.3 is_countable() function.
 	 */
 	function test_is_countable_functionality( $variable, $is_countable ) {
-		$this->assertEquals( is_countable( $variable ), $is_countable );
+		$this->assertSame( is_countable( $variable ), $is_countable );
 	}
 
 	/**
@@ -232,6 +237,34 @@ EOT;
 	}
 
 	/**
+	 * Test is_countable() polyfill for ResourceBundle.
+	 *
+	 * @ticket 43583
+	 */
+	function test_is_countable_ResourceBundle() {
+		if ( ! class_exists( 'ResourceBundle' ) ) {
+			$this->markTestSkipped( 'The intl extension is not loaded. ResourceBundle not tested for is_countable().' );
+		}
+
+		$this->assertTrue( is_countable( new ResourceBundle( 'en', null ) ) );
+	}
+
+	/**
+	 * Test is_countable() polyfill for SimpleXMLElement.
+	 *
+	 * @ticket 43583
+	 */
+	function test_is_countable_SimpleXMLElement() {
+		if ( ! class_exists( 'SimpleXMLElement' ) ) {
+			$this->markTestSkipped( 'The xml extension is not loaded. SimpleXMLElement not tested for is_countable().' );
+		}
+
+		$this->assertTrue( is_countable( new SimpleXMLElement( '<xml><tag>1</tag><tag>2</tag></xml>' ) ) );
+	}
+
+	/**
+	 * Test that is_iterable() is always available (either from PHP or WP).
+	 *
 	 * @ticket 43619
 	 */
 	function test_is_iterable_availability() {
@@ -244,9 +277,12 @@ EOT;
 	 * @ticket 43619
 	 *
 	 * @dataProvider iterable_variable_test_data
+	 *
+	 * @param mixed $variable    Variable to check.
+	 * @param bool  $is_iterable The expected return value of PHP 7.1 is_iterable() function.
 	 */
 	function test_is_iterable_functionality( $variable, $is_iterable ) {
-		$this->assertEquals( is_iterable( $variable ), $is_iterable );
+		$this->assertSame( is_iterable( $variable ), $is_iterable );
 	}
 
 	/**
