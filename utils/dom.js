@@ -2,13 +2,42 @@
  * External dependencies
  */
 import { includes } from 'lodash';
-import tinymce from 'tinymce';
 
 /**
  * Browser dependencies
  */
 const { getComputedStyle } = window;
-const { TEXT_NODE } = window.Node;
+const { TEXT_NODE, DOCUMENT_POSITION_PRECEDING } = window.Node;
+
+/**
+ * Returns true if the given selection object is in the forward direction, or
+ * false otherwise.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/Node/compareDocumentPosition
+ *
+ * @param {Selection} selection Selection object to check.
+ *
+ * @return {boolean} Whether the selection is forward.
+ */
+function isSelectionForward( selection ) {
+	const {
+		anchorNode,
+		focusNode,
+		anchorOffset,
+		focusOffset,
+	} = selection;
+
+	const position = anchorNode.compareDocumentPosition( focusNode );
+
+	return (
+		// Compare whether anchor node precedes focus node.
+		position !== DOCUMENT_POSITION_PRECEDING &&
+
+		// `compareDocumentPosition` returns 0 when passed the same node, in
+		// which case compare offsets.
+		! ( position === 0 && anchorOffset > focusOffset )
+	);
+}
 
 /**
  * Check whether the selection is horizontally at the edge of the container.
@@ -35,38 +64,23 @@ export function isHorizontalEdge( container, isReverse ) {
 		return true;
 	}
 
-	// If the container is empty, the selection is always at the edge.
-	if ( tinymce.DOM.isEmpty( container ) ) {
-		return true;
+	const selection = window.getSelection();
+
+	// Create copy of range for setting selection to find effective offset.
+	const range = selection.getRangeAt( 0 ).cloneRange();
+
+	// Collapse in direction of selection.
+	if ( ! selection.isCollapsed ) {
+		range.collapse( ! isSelectionForward( selection ) );
 	}
 
-	// Focus offset accounts for direction of selection (offset where selection
-	// ends).
-	const { focusNode, focusOffset } = window.getSelection();
-	if ( isReverse && focusOffset !== 0 ) {
-		return false;
-	}
+	const { endContainer, endOffset } = range;
+	range.selectNodeContents( container );
+	range.setEnd( endContainer, endOffset );
 
-	let node = focusNode;
-	const maxOffset = node.nodeType === TEXT_NODE ? node.nodeValue.length : node.childNodes.length;
-
-	if ( ! isReverse && focusOffset !== maxOffset ) {
-		return false;
-	}
-
-	const order = isReverse ? 'first' : 'last';
-
-	while ( node !== container ) {
-		const parentNode = node.parentNode;
-
-		if ( parentNode[ `${ order }Child` ] !== node ) {
-			return false;
-		}
-
-		node = parentNode;
-	}
-
-	return true;
+	// Edge reached if effective caret position is at expected extreme.
+	const caretOffset = range.toString().length;
+	return caretOffset === ( isReverse ? 0 : container.textContent.length );
 }
 
 /**

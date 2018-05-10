@@ -14,24 +14,30 @@ exports[`adding blocks Should navigate with arrow keys 6`] = `"Prefix: Hello"`;
 
 exports[`adding blocks Should navigate with arrow keys 7`] = `"The Greeting: <br>Hello to the World! (Suffix)"`;
 
-exports[`adding blocks Should navigate with arrow keys 8`] = `"<span id=\\"_mce_caret\\" data-mce-bogus=\\"1\\"><strong data-mce-selected=\\"inline-boundary\\">﻿Bolded</strong></span><br data-mce-bogus=\\"1\\">"`;
+exports[`adding blocks Should navigate with arrow keys 8`] = `"<span id=\\"_mce_caret\\" data-mce-bogus=\\"1\\" data-mce-type=\\"format-caret\\"><strong data-mce-selected=\\"inline-boundary\\">﻿Bolded</strong></span><br data-mce-bogus=\\"1\\">"`;
 
-exports[`adding blocks Should navigate with arrow keys 9`] = `"<strong data-mce-selected=\\"inline-boundary\\">Bolded Words﻿</strong><br data-mce-bogus=\\"1\\">"`;
+exports[`adding blocks Should navigate with arrow keys 9`] = `"<strong>Bolded</strong>&nbsp;After<br data-mce-bogus=\\"1\\">"`;
 
-exports[`adding blocks Should navigate with arrow keys 10`] = `"<strong>Bolded Words</strong>After<br data-mce-bogus=\\"1\\">"`;
+exports[`adding blocks Should navigate with arrow keys 10`] = `"The Greeting: <br>Hello to the World! (Suffixed)"`;
 
-exports[`adding blocks Should navigate with arrow keys 11`] = `"The Greeting: <br>Hello to the World! (Suffixed)"`;
+exports[`adding blocks Should navigate with arrow keys 11`] = `"<strong data-mce-selected=\\"inline-boundary\\">More Bolded (Still Bolded)﻿</strong><br data-mce-bogus=\\"1\\">"`;
 
-exports[`adding blocks Should navigate with arrow keys 12`] = `
+exports[`adding blocks Should navigate with arrow keys 12`] = `"The Prefix: Hello"`;
+
+exports[`adding blocks Should navigate with arrow keys 13`] = `
 "<!-- wp:paragraph -->
 <p>The Greeting: <br/>Hello to the World! (Suffixed)</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><strong>Bolded Words</strong>After</p>
+<p><strong>Bolded</strong> After</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Prefix: Hello</p>
+<p><strong>More Bolded (Still Bolded)</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The Prefix: Hello</p>
 <!-- /wp:paragraph -->"
 `;

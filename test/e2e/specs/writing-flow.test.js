@@ -49,6 +49,20 @@ describe( 'adding blocks', () => {
 		expect( content ).toMatchSnapshot();
 	}
 
+	/**
+	 * Presses the bold text key combination. TinyMCE initialization may not
+	 * have occurred, so must wait for it to become ready.
+	 *
+	 * TODO: Asynchronous code smell; if our tests are too fast for TinyMCE,
+	 * there's a good chance a fast user could encounter this as well.
+	 */
+	async function bold() {
+		await page.waitForFunction( () => {
+			return document.activeElement.id.startsWith( 'mce_' );
+		} );
+		await pressWithModifier( 'Mod', 'B' );
+	}
+
 	it( 'Should navigate with arrow keys', async () => {
 		// Add demo content
 		await page.click( '.editor-default-block-appender__content' );
@@ -120,31 +134,54 @@ describe( 'adding blocks', () => {
 		// Should arrow once to escape out of inline boundary (bold, etc), and
 		// escaping out should nullify any block traversal.
 		await page.keyboard.press( 'Enter' );
-		await pressWithModifier( 'Mod', 'B' ); // Bold
+		await bold();
 		await page.keyboard.type( 'Bolded' );
-		await expectParagraphToMatchSnapshot( 2 );
-
-		// Pressing space while having escaped on right edge of inline boundary
-		// should continue text as bolded.
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( ' Words' );
 		await expectParagraphToMatchSnapshot( 2 );
 
 		// But typing immediately after escaping should not be within.
 		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'After' );
+		// [BUGFIX]: This appears to be a bug within TinyMCE that, in Chromium,
+		// pressing space after escaping inline boundary on the right resumes
+		// inline node. Workaround is to navigate back in and out again.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
+		// [/ENDBUGFIX]
+		await page.keyboard.type( ' After' );
 		await expectParagraphToMatchSnapshot( 2 );
 
 		// Navigate back to previous block. Change "(Suffix)" to "(Suffixed)"
 		//
-		// "Bolded WordsAfter" =   17 characters
-		//                       +  2 inline boundaries
-		//                       +  1 horizontal block traversal
-		//                       +  1 into parenthesis
-		//                       = 21
-		await promiseSequence( times( 21, () => () => page.keyboard.press( 'ArrowLeft' ) ) );
+		// "Bolded After" =   12 characters
+		//                  +  2 inline boundaries
+		//                  +  1 horizontal block traversal
+		//                  +  1 into parenthesis
+		//                  = 16
+		await promiseSequence( times( 16, () => () => page.keyboard.press( 'ArrowLeft' ) ) );
 		await page.keyboard.type( 'ed' );
 		await expectParagraphToMatchSnapshot( 1 );
+
+		// Should require two arrow presses while at end of paragraph within
+		// inline boundary to horizontal navigate to next block
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Enter' );
+		await bold();
+		await page.keyboard.type( 'More Bolded' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' ); // Before "Prefix:"
+
+		// Should navigate across empty paragraph (where bogus `br` nodes from
+		// TinyMCE exist) in both directions
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowLeft' ); // In empty new paragraph
+		await page.keyboard.press( 'ArrowLeft' ); // In "More Bolded"
+		await page.keyboard.type( ' (Still Bolded)' );
+		await expectParagraphToMatchSnapshot( 3 );
+		await page.keyboard.press( 'ArrowRight' ); // After inline boundary
+		await page.keyboard.press( 'ArrowRight' ); // In empty paragraph
+		await page.keyboard.press( 'ArrowRight' ); // Before "Prefix:"
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( 'The ' );
+		await expectParagraphToMatchSnapshot( 4 );
 
 		expect( await getHTMLFromCodeEditor() ).toMatchSnapshot();
 	} );
