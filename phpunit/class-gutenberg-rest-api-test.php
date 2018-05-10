@@ -21,6 +21,9 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$this->editor        = $this->factory->user->create( array(
 			'role' => 'editor',
 		) );
+		$this->contributor   = $this->factory->user->create( array(
+			'role' => 'contributor',
+		) );
 		$this->subscriber    = $this->factory->user->create(
 			array(
 				'role'         => 'subscriber',
@@ -149,6 +152,37 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$this->assertTrue( isset( $links[ $check_key ] ) );
 		// editors can assign author but not included for context != edit.
 		wp_set_current_user( $this->editor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'view' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+	}
+
+	/**
+	 * Only returns wp:action-publish when current user can publish.
+	 */
+	function test_link_publish_only_appears_for_author() {
+		$post_id   = $this->factory->post->create( array(
+			'post_author' => $this->author,
+		) );
+		$check_key = 'https://api.w.org/action-publish';
+		// contributors cannot sticky.
+		wp_set_current_user( $this->contributor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+		// authors can publish.
+		wp_set_current_user( $this->author );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertTrue( isset( $links[ $check_key ] ) );
+		// authors can publish but not included for context != edit.
+		wp_set_current_user( $this->author );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
 		$request->set_param( 'context', 'view' );
 		$response = rest_do_request( $request );

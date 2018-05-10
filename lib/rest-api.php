@@ -292,6 +292,24 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 			);
 		}
 	}
+	if ( 'edit' === $request['context'] ) {
+		if ( current_user_can( $post_type->cap->publish_posts ) ) {
+			$new_links['https://api.w.org/action-publish'] = array(
+				array(
+					'title'        => __( 'The current user can publish this post.', 'gutenberg' ),
+					'href'         => $orig_links['self'][0]['href'],
+					'targetSchema' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'status' => array(
+								'type' => 'string',
+							),
+						),
+					),
+				),
+			);
+		}
+	}
 	// Only Posts can be sticky.
 	if ( 'post' === $post->post_type && 'edit' === $request['context'] ) {
 		if ( current_user_can( $post_type->cap->edit_others_posts )
