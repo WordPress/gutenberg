@@ -58,7 +58,7 @@ export class ServerSideRender extends Component {
 			return (
 				<div key="loading" className="wp-block-embed is-loading">
 
-					<p>{ __( 'Loading...' ) }</p>
+					<p>{ __( 'Loading…' ) }</p>
 				</div>
 			);
 		}
