@@ -7,7 +7,7 @@ import { nodeListToReact } from 'dom-react';
 /**
  * WordPress dependencies
  */
-import { Fragment, createElement, renderToString } from '@wordpress/element';
+import { createElement, renderToString } from '@wordpress/element';
 
 /**
  * Browser dependencies
@@ -88,10 +88,12 @@ export function tinyMCENodeToElement( node ) {
 		child = child.next;
 	}
 
-	const tagName = node.type === Node.DOCUMENT_FRAGMENT_NODE ? Fragment : node.name;
-	const attributes = get( node.attributes, [ 'map' ], {} );
+	if ( node.type === Node.DOCUMENT_FRAGMENT_NODE ) {
+		return children;
+	}
 
-	return createElement( tagName, attributes, ...children );
+	const attributes = get( node.attributes, [ 'map' ], {} );
+	return createElement( node.name, attributes, ...children );
 }
 
 /**
