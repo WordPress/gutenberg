@@ -50,6 +50,22 @@ describe( 'adding blocks', () => {
 	}
 
 	/**
+	 * Waits for TinyMCE to finish initializing within as the current active
+	 * element at the nth paragraph block.
+	 *
+	 * TODO: Asynchronous code smell; if our tests are too fast for TinyMCE,
+	 * there's a good chance a fast user could encounter this as well.
+	 *
+	 * @param {number} nthChild 1-based index of paragraph.
+	 */
+	async function waitUntilNthParagraphActive( nthChild ) {
+		await page.waitForFunction( ( _nthChild ) => {
+			const paragraph = `.editor-block-list__block:nth-child( ${ _nthChild } ) .wp-block-paragraph[id^="mce_"]`;
+			return document.activeElement = paragraph;
+		}, nthChild );
+	}
+
+	/**
 	 * Presses the bold text key combination. TinyMCE initialization may not
 	 * have occurred, so must wait for it to become ready.
 	 *
@@ -68,22 +84,26 @@ describe( 'adding blocks', () => {
 		await page.click( '.editor-default-block-appender__content' );
 		await page.keyboard.type( 'Hello World' );
 		await page.keyboard.press( 'Enter' );
+		await waitUntilNthParagraphActive( 2 );
 		await page.keyboard.type( 'Hello World' );
 
 		// Traverse back to first paragraph. With identical content, assume
 		// caret will be at end of content. Append.
 		await page.keyboard.press( 'ArrowUp' );
+		await waitUntilNthParagraphActive( 1 );
 		await page.keyboard.type( '!' );
 		await expectParagraphToMatchSnapshot( 1 );
 
 		// Likewise, pressing arrow down when subsequent paragraph is shorter
 		// should move caret to end of the paragraph. Remove second word.
 		await page.keyboard.press( 'ArrowDown' );
+		await waitUntilNthParagraphActive( 2 );
 		await promiseSequence( times( 6, () => () => page.keyboard.press( 'Backspace' ) ) );
 		await expectParagraphToMatchSnapshot( 2 );
 
 		// Arrow up should preserve caret X position. Add content to middle.
 		await page.keyboard.press( 'ArrowUp' );
+		await waitUntilNthParagraphActive( 1 );
 		await page.keyboard.type( ' to the' );
 		await expectParagraphToMatchSnapshot( 1 );
 
@@ -94,6 +114,7 @@ describe( 'adding blocks', () => {
 		await promiseSequence( times( 5, () => () => page.keyboard.press( 'ArrowLeft' ) ) );
 		await page.keyboard.up( 'Shift' );
 		await page.keyboard.press( 'ArrowUp' );
+		await waitUntilNthParagraphActive( 1 );
 		await page.keyboard.type( 'Greeting: ' );
 		await expectParagraphToMatchSnapshot( 1 );
 
@@ -109,6 +130,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
+		await waitUntilNthParagraphActive( 2 );
 
 		// Regression test: Ensure selection can be progressively collapsed at
 		// beginning and end of text while shift is held.
@@ -124,6 +146,7 @@ describe( 'adding blocks', () => {
 		// to guard against multi-selection behavior). Asserts arrow left to
 		// traverse horizontally to previous.
 		await promiseSequence( times( 9, () => () => page.keyboard.press( 'ArrowLeft' ) ) );
+		await waitUntilNthParagraphActive( 1 );
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowRight' );
@@ -134,6 +157,7 @@ describe( 'adding blocks', () => {
 		// Should arrow once to escape out of inline boundary (bold, etc), and
 		// escaping out should nullify any block traversal.
 		await page.keyboard.press( 'Enter' );
+		await waitUntilNthParagraphActive( 2 );
 		await bold();
 		await page.keyboard.type( 'Bolded' );
 		await expectParagraphToMatchSnapshot( 2 );
@@ -157,6 +181,7 @@ describe( 'adding blocks', () => {
 		//                  +  1 into parenthesis
 		//                  = 16
 		await promiseSequence( times( 16, () => () => page.keyboard.press( 'ArrowLeft' ) ) );
+		await waitUntilNthParagraphActive( 1 );
 		await page.keyboard.type( 'ed' );
 		await expectParagraphToMatchSnapshot( 1 );
 
@@ -164,21 +189,25 @@ describe( 'adding blocks', () => {
 		// inline boundary to horizontal navigate to next block
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
+		await waitUntilNthParagraphActive( 3 );
 		await bold();
 		await page.keyboard.type( 'More Bolded' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowRight' ); // Before "Prefix:"
+		await waitUntilNthParagraphActive( 4 );
 
 		// Should navigate across empty paragraph (where bogus `br` nodes from
 		// TinyMCE exist) in both directions
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowLeft' ); // In empty new paragraph
 		await page.keyboard.press( 'ArrowLeft' ); // In "More Bolded"
+		await waitUntilNthParagraphActive( 3 );
 		await page.keyboard.type( ' (Still Bolded)' );
 		await expectParagraphToMatchSnapshot( 3 );
 		await page.keyboard.press( 'ArrowRight' ); // After inline boundary
 		await page.keyboard.press( 'ArrowRight' ); // In empty paragraph
 		await page.keyboard.press( 'ArrowRight' ); // Before "Prefix:"
+		await waitUntilNthParagraphActive( 4 );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( 'The ' );
 		await expectParagraphToMatchSnapshot( 4 );
