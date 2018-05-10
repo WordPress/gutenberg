@@ -3,11 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
-	InspectorControls,
+	BlockControls,
 	AlignmentToolbar,
 } from '@wordpress/editor';
 
@@ -71,17 +70,14 @@ export const settings = {
 
 		return (
 			<Fragment>
-				<InspectorControls>
-					<PanelBody title={ __( 'Subhead Settings' ) }>
-						<p>{ __( 'Text Alignment' ) }</p>
-						<AlignmentToolbar
-							value={ align }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { align: nextAlign } );
-							} }
-						/>
-					</PanelBody>
-				</InspectorControls>
+				<BlockControls>
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				</BlockControls>
 				<RichText
 					tagName="p"
 					value={ content }
