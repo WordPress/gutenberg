@@ -111,7 +111,7 @@ export const getUserQueryResults = createSelector(
  *
  * @return {boolean} Whether the entities are loaded
  */
-export function hasEntitiesByKind( state, kind ) {
+export function getEntitiesByKind( state, kind ) {
 	return some( state.entities.config, { kind } );
 }
 

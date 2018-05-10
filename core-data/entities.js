@@ -11,7 +11,7 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { hasEntitiesByKind } from './selectors';
+import { getEntitiesByKind } from './selectors';
 import { addEntities } from './actions';
 
 export const defaultEntities = [
@@ -63,19 +63,23 @@ export const getMethodName = ( kind, name, prefix = 'get', usePlural = false ) =
  *
  * @param {Object} state Global state
  * @param {string} kind  Kind
+ *
+ * @return {Array} Entities
  */
-export async function* loadKindEntities( state, kind ) {
-	const hasEntities = hasEntitiesByKind( state, kind );
+export async function* getKindEntities( state, kind ) {
+	let entities = getEntitiesByKind( state, kind );
 
-	if ( hasEntities ) {
-		return;
+	if ( entities ) {
+		return entities;
 	}
 
 	const kindConfig = find( kinds, { name: kind } );
 	if ( ! kindConfig ) {
-		return;
+		return [];
 	}
 
-	const entities = await kindConfig.loadEntities();
+	entities = await kindConfig.loadEntities();
 	yield addEntities( entities );
+
+	return entities;
 }
