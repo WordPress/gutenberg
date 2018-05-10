@@ -37,5 +37,5 @@ export default compose( [
 		onUpdateExcerpt( excerpt ) {
 			dispatch( 'core/editor' ).editPost( { excerpt } );
 		},
-	} ),
+	} ) ),
 ] )( PostExcerpt );
