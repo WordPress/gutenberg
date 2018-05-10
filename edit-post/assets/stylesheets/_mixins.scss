@@ -1,6 +1,6 @@
-/**
- * Breakpoint mixins
- */
+//
+// Breakpoint mixins
+//
 
 @mixin break-huge() {
 	@media ( min-width: #{ ( $break-huge ) } ) {
@@ -38,13 +38,12 @@
 	}
 }
 
-
-/**
- * Long content fade mixin
- *
- * Creates a fading overlay to signify that the content is longer
- * than the space allows.
- */
+//
+// Long content fade mixin
+//
+// Creates a fading overlay to signify that the content is longer
+// than the space allows.
+//
 
 @mixin long-content-fade( $direction: right, $size: 20%, $color: #fff, $edge: 0px, $z-index: false) {
 	content: '';
@@ -101,11 +100,11 @@
 	}
 }
 
-/**
- * Editor Width mixin
- *
- * This mixin seeks to take the vinegar out of the responsive alignments in the editor.
- */
+//
+// Editor Width mixin
+//
+// This mixin seeks to take the vinegar out of the responsive alignments in the editor.
+//
 
 @mixin editor-width( $width ) {
 	@media ( min-width: #{ ( $width ) } ) {
@@ -116,9 +115,9 @@
 $content-width-padding: $content-width + $block-side-ui-padding + $block-side-ui-padding;
 $float-margin: calc( 50% - #{ $content-width-padding / 2 } );
 
-/**
- * Button states and focus styles
- */
+//
+// Button states and focus styles
+//
 
 // Buttons with rounded corners
 @mixin button-style__disabled {
@@ -214,10 +213,10 @@ $float-margin: calc( 50% - #{ $content-width-padding / 2 } );
 	outline: 1px dotted $dark-gray-500;
 }
 
+//
+// Applies editor left position to the selector passed as argument
+//
 
-/**
- * Applies editor left position to the selector passed as argument
- */
 @mixin editor-left( $selector ) {
 	#{$selector} {	/* Set left position when auto-fold is not on the body element. */
 		left: 0;
@@ -261,10 +260,11 @@ $float-margin: calc( 50% - #{ $content-width-padding / 2 } );
 	}
 }
 
-/**
- * Applies editor right position to the selector passed as argument
- */
- @mixin editor-right( $selector ) {
+//
+// Applies editor right position to the selector passed as argument
+//
+
+@mixin editor-right( $selector ) {
 	#{ $selector } {
 		right: 0;
 	}
