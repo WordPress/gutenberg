@@ -49,13 +49,23 @@ import { domToFormat, valueToString } from './format';
  * Browser dependencies
  */
 
-const { getSelection } = window;
+const { getSelection, Node } = window;
 
 /**
  * Module constants
  */
 
 const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
+
+/**
+ * Zero-width space character used by TinyMCE as a caret landing point for
+ * inline boundary nodes.
+ *
+ * @see tinymce/src/core/main/ts/text/Zwsp.ts
+ *
+ * @type {string}
+ */
+const TINYMCE_ZWSP = '\uFEFF';
 
 /**
  * Returns true if the node is the inline node boundary. This is used in node
@@ -71,7 +81,7 @@ const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
  */
 export function isEmptyInlineBoundary( node ) {
 	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
-	return text === '\uFEFF';
+	return text === TINYMCE_ZWSP;
 }
 
 /**
@@ -132,6 +142,7 @@ export class RichText extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
+		this.removeZwsp = this.removeZwsp.bind( this );
 
 		this.state = {
 			formats: {},
@@ -196,6 +207,7 @@ export class RichText extends Component {
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
 		editor.on( 'input', this.onChange );
+		editor.on( 'focusout', this.removeZwsp );
 		// The change event in TinyMCE fires every time an undo level is added.
 		editor.on( 'change', this.onCreateUndoLevel );
 
@@ -209,6 +221,27 @@ export class RichText extends Component {
 	setFocusedElement() {
 		if ( this.props.setFocusedElement ) {
 			this.props.setFocusedElement( this.props.instanceId );
+		}
+	}
+
+	/**
+	 * Cleans up after TinyMCE when leaving the field, removing lingering zero-
+	 * width space characters. Without removal, future horizontal navigation
+	 * into the field would land on the zero-width space, where it's preferred
+	 * to consistently land within an inline boundary where the zero-width
+	 * space had existed to delineate.
+	 */
+	removeZwsp() {
+		const rootNode = this.editor.getBody();
+
+		const stack = [ ...rootNode.childNodes ];
+		while ( stack.length ) {
+			const node = stack.pop();
+			if ( node.nodeType === Node.TEXT_NODE && node.nodeValue === TINYMCE_ZWSP ) {
+				node.parentNode.removeChild( node );
+			}
+
+			stack.push( ...node.childNodes );
 		}
 	}
 
