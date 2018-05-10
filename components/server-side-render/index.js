@@ -51,9 +51,9 @@ export class ServerSideRender extends Component {
 		const path = '/gutenberg/v1/block-renderer/' + block + '?context=edit&' + this.getQueryUrlFromObject( { attributes } );
 
 		return apiRequest( { path } ).fail( ( response ) => {
-			let failResponse = {
+			const failResponse = {
 				error: true,
-				errorMsg: response.responseJSON.message || __( 'Unknown error' )
+				errorMsg: response.responseJSON.message || __( 'Unknown error' ),
 			};
 			if ( this.isStillMounted ) {
 				this.setState( { response: failResponse } );
