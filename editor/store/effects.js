@@ -401,7 +401,7 @@ export default {
 		if ( id ) {
 			result = wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
 		} else {
-			result = wp.apiRequest( { path: `/wp/v2/${ basePath }` } );
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }?per_page=-1` } );
 		}
 
 		result.then(
