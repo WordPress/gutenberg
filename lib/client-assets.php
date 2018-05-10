@@ -472,7 +472,7 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/moment@2.21.0/' . $moment_script,
 		array()
 	);
-	$tinymce_version = '4.7.2';
+	$tinymce_version = '4.7.12';
 	gutenberg_register_vendor_script(
 		'tinymce-latest',
 		'https://unpkg.com/tinymce@' . $tinymce_version . '/tinymce' . $suffix . '.js'

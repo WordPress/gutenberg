@@ -43,7 +43,11 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
-import { domToFormat, valueToString } from './format';
+import {
+	domToFormat,
+	valueToString,
+	tinyMCENodeToElement,
+} from './format';
 
 /**
  * Browser dependencies
@@ -820,9 +824,7 @@ export class RichText extends Component {
 			case 'string':
 				return this.editor.getContent();
 			default:
-				return this.editor.dom.isEmpty( this.editor.getBody() ) ?
-					[] :
-					domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
+				return tinyMCENodeToElement( this.editor.getContent( { format: 'tree' } ) );
 		}
 	}
 
