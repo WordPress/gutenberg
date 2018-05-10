@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isInline, isEmpty } from './utils';
+import { isPhrasingContent, isEmpty } from './utils';
 
 /**
  * Browser dependencies
@@ -26,7 +26,7 @@ export default function( HTML ) {
 				decu.removeChild( node );
 			} else {
 				if ( ! accu.lastChild || accu.lastChild.nodeName !== 'P' ) {
-					accu.appendChild( document.createElement( 'P' ) );
+					accu.appendChild( accuDoc.createElement( 'P' ) );
 				}
 
 				accu.lastChild.appendChild( node );
@@ -36,7 +36,7 @@ export default function( HTML ) {
 			// BR nodes: create a new paragraph on double, or append to previous.
 			if ( node.nodeName === 'BR' ) {
 				if ( node.nextSibling && node.nextSibling.nodeName === 'BR' ) {
-					accu.appendChild( document.createElement( 'P' ) );
+					accu.appendChild( accuDoc.createElement( 'P' ) );
 					decu.removeChild( node.nextSibling );
 				}
 
@@ -57,9 +57,9 @@ export default function( HTML ) {
 				} else {
 					accu.appendChild( node );
 				}
-			} else if ( isInline( node ) ) {
+			} else if ( isPhrasingContent( node ) ) {
 				if ( ! accu.lastChild || accu.lastChild.nodeName !== 'P' ) {
-					accu.appendChild( document.createElement( 'P' ) );
+					accu.appendChild( accuDoc.createElement( 'P' ) );
 				}
 				accu.lastChild.appendChild( node );
 			} else {

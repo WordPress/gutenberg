@@ -35,6 +35,7 @@ import {
 	isInsertionPointVisible,
 	sharedBlocks,
 	template,
+	blockListSettings,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -2169,16 +2170,6 @@ describe( 'state', () => {
 			expect( state ).toEqual( { isValid: true } );
 		} );
 
-		it( 'should set the template', () => {
-			const blockTemplate = [ [ 'core/paragraph' ] ];
-			const state = template( undefined, {
-				type: 'SETUP_EDITOR',
-				settings: { template: blockTemplate, templateLock: 'all' },
-			} );
-
-			expect( state ).toEqual( { isValid: true, template: blockTemplate, lock: 'all' } );
-		} );
-
 		it( 'should reset the validity flag', () => {
 			const original = deepFreeze( { isValid: false, template: [] } );
 			const state = template( original, {
@@ -2187,6 +2178,83 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( { isValid: true, template: [] } );
+		} );
+	} );
+
+	describe( 'blockListSettings', () => {
+		it( 'should add new settings', () => {
+			const original = deepFreeze( {} );
+			const state = blockListSettings( original, {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: 'chicken',
+				settings: {
+					chicken: 'ribs',
+				},
+			} );
+			expect( state ).toEqual( {
+				chicken: {
+					chicken: 'ribs',
+				},
+			} );
+		} );
+
+		it( 'should update the settings of a block', () => {
+			const original = deepFreeze( {
+				chicken: {
+					chicken: 'ribs',
+				},
+				otherBlock: {
+					setting1: true,
+				},
+			} );
+			const state = blockListSettings( original, {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: 'chicken',
+				settings: {
+					ribs: 'not-chicken',
+				},
+			} );
+			expect( state ).toEqual( {
+				chicken: {
+					ribs: 'not-chicken',
+				},
+				otherBlock: {
+					setting1: true,
+				},
+			} );
+		} );
+
+		it( 'should remove the settings of a block when it is replaced', () => {
+			const original = deepFreeze( {
+				chicken: {
+					chicken: 'ribs',
+				},
+				otherBlock: {
+					setting1: true,
+				},
+			} );
+			const state = blockListSettings( original, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'otherBlock' ],
+			} );
+			expect( state ).toEqual( {
+				chicken: {
+					chicken: 'ribs',
+				},
+			} );
+		} );
+
+		it( 'should remove the settings of a block when it is removed', () => {
+			const original = deepFreeze( {
+				otherBlock: {
+					setting1: true,
+				},
+			} );
+			const state = blockListSettings( original, {
+				type: 'REPLACE_BLOCKS',
+				uids: [ 'otherBlock' ],
+			} );
+			expect( state ).toEqual( {} );
 		} );
 	} );
 } );

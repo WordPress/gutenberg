@@ -9,10 +9,11 @@ import apiRequest from '@wordpress/api-request';
 import {
 	setRequested,
 	receiveTerms,
-	receiveMedia,
-	receivePostTypes,
+	receiveUserQuery,
+	receiveEntityRecords,
 	receiveThemeSupportsFromIndex,
 } from './actions';
+import { getEntity } from './entities';
 
 /**
  * Requests categories from the REST API, yielding action objects on request
@@ -25,25 +26,25 @@ export async function* getCategories() {
 }
 
 /**
- * Requests a media element from the REST API.
- *
- * @param {Object} state State tree
- * @param {number} id    Media id
+ * Requests authors from the REST API.
  */
-export async function* getMedia( state, id ) {
-	const media = await apiRequest( { path: `/wp/v2/media/${ id }` } );
-	yield receiveMedia( media );
+export async function* getAuthors() {
+	const users = await apiRequest( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
+	yield receiveUserQuery( 'authors', users );
 }
 
 /**
- * Requests a post type element from the REST API.
+ * Requests a entity's record from the REST API.
  *
- * @param {Object} state State tree
- * @param {number} slug  Post Type slug
+ * @param {Object} state  State tree
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {number} key    Record's key
  */
-export async function* getPostType( state, slug ) {
-	const postType = await apiRequest( { path: `/wp/v2/types/${ slug }?context=edit` } );
-	yield receivePostTypes( postType );
+export async function* getEntityRecord( state, kind, name, key ) {
+	const entity = getEntity( kind, name );
+	const record = await apiRequest( { path: `${ entity.baseUrl }/${ key }?context=edit` } );
+	yield receiveEntityRecords( kind, name, record );
 }
 
 /**

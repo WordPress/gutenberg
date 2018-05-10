@@ -112,11 +112,20 @@ function gutenberg_filter_oembed_result( $response, $handler, $request ) {
 			$post_id = url_to_postid( $_GET['url'] );
 			$data    = get_oembed_response_data( $post_id, apply_filters( 'oembed_default_width', 600 ) );
 
-			if ( ! $data ) {
-				// Not a local post, return the original error.
-				return $response;
+			if ( $data ) {
+				// It's a local post!
+				$response = (object) $data;
+			} else {
+				// Try using a classic embed, instead.
+				global $wp_embed;
+				$html = $wp_embed->shortcode( array(), $_GET['url'] );
+				if ( $html ) {
+					return array(
+						'provider_name' => __( 'Embed Handler', 'gutenberg' ),
+						'html'          => $html,
+					);
+				}
 			}
-			$response = (object) $data;
 		}
 
 		// Make sure the HTML is run through the oembed sanitisation routines.
@@ -221,14 +230,110 @@ function gutenberg_add_permalink_template_to_posts( $response, $post, $request )
 		require_once ABSPATH . '/wp-admin/includes/post.php';
 	}
 
-	$sample_permalink = get_sample_permalink( $post->ID );
+	$sample_permalink = get_sample_permalink( $post->ID, $post->post_title, '' );
 
 	$response->data['permalink_template'] = $sample_permalink[0];
+	$response->data['generated_slug']     = $sample_permalink[1];
 
-	if ( 'draft' === $post->post_status && ! $post->post_name ) {
-		$response->data['draft_slug'] = $sample_permalink[1];
+	return $response;
+}
+
+/**
+ * Add the block format version to post content in the post REST API response.
+ *
+ * @todo This will need to be registered to the schema too.
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the block_format.
+ */
+function gutenberg_add_block_format_to_post_content( $response, $post, $request ) {
+	if ( 'edit' !== $request['context'] ) {
+		return $response;
 	}
 
+	$response_data = $response->get_data();
+	if ( isset( $response_data['content'] ) && is_array( $response_data['content'] ) && isset( $response_data['content']['raw'] ) ) {
+		$response_data['content']['block_format'] = gutenberg_content_block_version( $response_data['content']['raw'] );
+		$response->set_data( $response_data );
+	}
+
+	return $response;
+}
+
+/**
+ * Include target schema attributes to links, based on whether the user can.
+ *
+ * @param WP_REST_Response $response WP REST API response of a post.
+ * @param WP_Post          $post The post being returned.
+ * @param WP_REST_Request  $request WP REST API request.
+ * @return WP_REST_Response Response containing the new links.
+ */
+function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
+	$new_links  = array();
+	$orig_links = $response->get_links();
+	$post_type  = get_post_type_object( $post->post_type );
+	$orig_href  = ! empty( $orig_links['self'][0]['href'] ) ? $orig_links['self'][0]['href'] : null;
+	if ( 'edit' === $request['context'] && post_type_supports( $post_type->name, 'author' ) ) {
+		if ( current_user_can( $post_type->cap->edit_others_posts ) ) {
+			$new_links['https://api.w.org/action-assign-author'] = array(
+				array(
+					'title'        => __( 'The current user can change the author on this post.', 'gutenberg' ),
+					'href'         => $orig_href,
+					'targetSchema' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'author' => array(
+								'type' => 'integer',
+							),
+						),
+					),
+				),
+			);
+		}
+	}
+	if ( 'edit' === $request['context'] ) {
+		if ( current_user_can( $post_type->cap->publish_posts ) ) {
+			$new_links['https://api.w.org/action-publish'] = array(
+				array(
+					'title'        => __( 'The current user can publish this post.', 'gutenberg' ),
+					'href'         => $orig_href,
+					'targetSchema' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'status' => array(
+								'type' => 'string',
+								'enum' => array( 'publish', 'future' ),
+							),
+						),
+					),
+				),
+			);
+		}
+	}
+	// Only Posts can be sticky.
+	if ( 'post' === $post->post_type && 'edit' === $request['context'] ) {
+		if ( current_user_can( $post_type->cap->edit_others_posts )
+			&& current_user_can( $post_type->cap->publish_posts ) ) {
+			$new_links['https://api.w.org/action-sticky'] = array(
+				array(
+					'title'        => __( 'The current user can sticky this post.', 'gutenberg' ),
+					'href'         => $orig_href,
+					'targetSchema' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'sticky' => array(
+								'type' => 'boolean',
+							),
+						),
+					),
+				),
+			);
+		}
+	}
+
+	$response->add_links( $new_links );
 	return $response;
 }
 
@@ -238,11 +343,15 @@ function gutenberg_add_permalink_template_to_posts( $response, $post, $request )
  * @param string $post_type The newly registered post type.
  * @return string That same post type.
  */
-function gutenberg_register_permalink_template_function( $post_type ) {
+function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
+	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
+	add_filter( "rest_{$post_type}_collection_params", 'gutenberg_filter_post_collection_parameters', 10, 2 );
+	add_filter( "rest_{$post_type}_query", 'gutenberg_filter_post_query_arguments', 10, 2 );
 	return $post_type;
 }
-add_filter( 'registered_post_type', 'gutenberg_register_permalink_template_function' );
+add_filter( 'registered_post_type', 'gutenberg_register_post_prepare_functions' );
 
 /**
  * Includes the value for the 'viewable' attribute of a post type resource.
@@ -336,7 +445,143 @@ function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
 
 		$site_info['theme_supports']['formats'] = $formats;
 	}
+	if ( ! array_key_exists( 'post-thumbnails', $site_info['theme_supports'] ) ) {
+		if ( get_theme_support( 'post-thumbnails' ) ) {
+			$site_info['theme_supports']['post-thumbnails'] = true;
+		}
+	}
 	$response->set_data( $site_info );
 	return $response;
 }
 add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_theme_supports' );
+
+/**
+ * Handle any necessary checks early.
+ *
+ * @param WP_HTTP_Response $response Result to send to the client. Usually a WP_REST_Response.
+ * @param WP_REST_Server   $handler  ResponseHandler instance (usually WP_REST_Server).
+ * @param WP_REST_Request  $request  Request used to generate the response.
+ */
+function gutenberg_handle_early_callback_checks( $response, $handler, $request ) {
+	$routes = array(
+		'/wp/v2/blocks',
+		'/wp/v2/pages',
+		'/wp/v2/users',
+	);
+	if ( in_array( $request->get_route(), $routes, true ) ) {
+		$can_view_authors    = false;
+		$can_unbounded_query = false;
+		$types               = get_post_types( array( 'show_in_rest' => true ), 'objects' );
+		foreach ( $types as $type ) {
+			if ( current_user_can( $type->cap->edit_posts ) ) {
+				$can_unbounded_query = true;
+				if ( post_type_supports( $type->name, 'author' ) ) {
+					$can_view_authors = true;
+				}
+			}
+		}
+		if ( $request['per_page'] < 0 ) {
+			if ( ! $can_unbounded_query ) {
+				return new WP_Error( 'rest_forbidden_per_page', __( 'Sorry, you are not allowed make unbounded queries.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+			}
+		}
+		if ( '/wp/v2/users' === $request->get_route()
+			&& ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
+			if ( ! $can_view_authors ) {
+				return new WP_Error( 'rest_forbidden_who', __( 'Sorry, you are not allowed to query users by this parameter.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+			}
+		}
+	}
+	return $response;
+}
+add_filter( 'rest_request_before_callbacks', 'gutenberg_handle_early_callback_checks', 10, 3 );
+
+/**
+ * Include additional query parameters on the posts query endpoint.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43998
+ *
+ * @param array  $query_params JSON Schema-formatted collection parameters.
+ * @param string $post_type    Post type being accessed.
+ * @return array
+ */
+function gutenberg_filter_post_collection_parameters( $query_params, $post_type ) {
+	$post_types = array( 'page', 'wp_block' );
+	if ( in_array( $post_type->name, $post_types, true )
+		&& isset( $query_params['per_page'] ) ) {
+		// Change from '1' to '-1', which means unlimited.
+		$query_params['per_page']['minimum'] = -1;
+		// Default sanitize callback is 'absint', which won't work in our case.
+		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
+	}
+	return $query_params;
+}
+
+/**
+ * Filter post collection query parameters to include specific behavior.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43998
+ *
+ * @param array           $prepared_args Array of arguments for WP_Query.
+ * @param WP_REST_Request $request       The current request.
+ * @return array
+ */
+function gutenberg_filter_post_query_arguments( $prepared_args, $request ) {
+	$post_types = array( 'page', 'wp_block' );
+	if ( in_array( $prepared_args['post_type'], $post_types, true ) ) {
+		// Avoid triggering 'rest_post_invalid_page_number' error
+		// which will need to be addressed in https://core.trac.wordpress.org/ticket/43998.
+		if ( -1 === $prepared_args['posts_per_page'] ) {
+			$prepared_args['posts_per_page'] = 100000;
+		}
+	}
+	return $prepared_args;
+}
+
+/**
+ * Include additional query parameters on the user query endpoint.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42202
+ * @see https://core.trac.wordpress.org/ticket/43998
+ *
+ * @param array $query_params JSON Schema-formatted collection parameters.
+ * @return array
+ */
+function gutenberg_filter_user_collection_parameters( $query_params ) {
+	if ( isset( $query_params['per_page'] ) ) {
+		// Change from '1' to '-1', which means unlimited.
+		$query_params['per_page']['minimum'] = -1;
+		// Default sanitize callback is 'absint', which won't work in our case.
+		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
+	}
+	// Support for 'who' query param.
+	$query_params['who'] = array(
+		'description' => __( 'Limit result set to users who are considered authors.', 'gutenberg' ),
+		'type'        => 'string',
+		'enum'        => array(
+			'authors',
+		),
+	);
+	return $query_params;
+}
+add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_parameters' );
+
+/**
+ * Filter user collection query parameters to include specific behavior.
+ *
+ * @see https://core.trac.wordpress.org/ticket/42202
+ *
+ * @param array           $prepared_args Array of arguments for WP_User_Query.
+ * @param WP_REST_Request $request       The current request.
+ * @return array
+ */
+function gutenberg_filter_user_query_arguments( $prepared_args, $request ) {
+	if ( ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
+		$prepared_args['who'] = 'authors';
+		if ( isset( $prepared_args['has_published_posts'] ) ) {
+			unset( $prepared_args['has_published_posts'] );
+		}
+	}
+	return $prepared_args;
+}
+add_filter( 'rest_user_query', 'gutenberg_filter_user_query_arguments', 10, 2 );
