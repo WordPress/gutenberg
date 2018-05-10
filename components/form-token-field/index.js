@@ -343,7 +343,7 @@ class FormTokenField extends Component {
 			tokens
 				.map( this.props.saveTransform )
 				.filter( Boolean )
-				.filter( token => ! this.valueContainsToken( token ) )
+				.filter( ( token ) => ! this.valueContainsToken( token ) )
 		);
 
 		if ( tokensToAdd.length > 0 ) {
@@ -451,9 +451,11 @@ class FormTokenField extends Component {
 		return components;
 	}
 
-	renderToken( token ) {
+	renderToken( token, index, tokens ) {
 		const value = this.getTokenValue( token );
 		const status = token.status ? token.status : undefined;
+		const termPosition = index + 1;
+		const termsCount = tokens.length;
 
 		return (
 			<Token
@@ -468,6 +470,8 @@ class FormTokenField extends Component {
 				onMouseLeave={ token.onMouseLeave }
 				disabled={ 'error' !== status && this.props.disabled }
 				messages={ this.props.messages }
+				termsCount={ termsCount }
+				termPosition={ termPosition }
 			/>
 		);
 	}
@@ -504,7 +508,7 @@ class FormTokenField extends Component {
 	render() {
 		const {
 			disabled,
-			placeholder = _( 'Add item.' ),
+			placeholder = __( 'Add item.' ),
 			instanceId,
 		} = this.props;
 		const classes = classnames( 'components-form-token-field', {
@@ -583,7 +587,7 @@ FormTokenField.defaultProps = {
 	messages: {
 		added: __( 'Item added.' ),
 		removed: __( 'Item removed.' ),
-		remove: __( 'Remove item: %s.' ),
+		remove: __( 'Remove item' ),
 	},
 };
 

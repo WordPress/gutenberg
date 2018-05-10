@@ -5,18 +5,14 @@ import {
 	replaceBlocks,
 	startTyping,
 	stopTyping,
-	requestMetaBoxUpdates,
-	initializeMetaBoxState,
-	fetchReusableBlocks,
-	updateReusableBlock,
-	saveReusableBlock,
-	deleteReusableBlock,
+	fetchSharedBlocks,
+	saveSharedBlock,
+	deleteSharedBlock,
 	convertBlockToStatic,
-	convertBlockToReusable,
+	convertBlockToShared,
 	toggleSelection,
 	setupEditor,
 	resetPost,
-	setupNewPost,
 	resetBlocks,
 	updateBlockAttributes,
 	updateBlock,
@@ -46,18 +42,17 @@ import {
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
+	updateBlockListSettings,
 } from '../actions';
 
 describe( 'actions', () => {
 	describe( 'setupEditor', () => {
 		it( 'should return the SETUP_EDITOR action', () => {
 			const post = {};
-			const settings = {};
-			const result = setupEditor( post, settings );
+			const result = setupEditor( post );
 			expect( result ).toEqual( {
 				type: 'SETUP_EDITOR',
 				post,
-				settings,
 			} );
 		} );
 	} );
@@ -72,18 +67,6 @@ describe( 'actions', () => {
 			} );
 		} );
 	} );
-
-	describe( 'setupNewPost', () => {
-		it( 'should return the SETUP_NEW_POST action', () => {
-			const edits = {};
-			const result = setupNewPost( edits );
-			expect( result ).toEqual( {
-				type: 'SETUP_NEW_POST',
-				edits,
-			} );
-		} );
-	} );
-
 	describe( 'resetBlocks', () => {
 		it( 'should return the RESET_BLOCKS actions', () => {
 			const blocks = [];
@@ -178,6 +161,7 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks: [ block ],
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -192,6 +176,7 @@ describe( 'actions', () => {
 				type: 'REPLACE_BLOCKS',
 				uids: [ 'chicken' ],
 				blocks,
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -202,10 +187,12 @@ describe( 'actions', () => {
 				uid: 'ribs',
 			};
 			const index = 5;
-			expect( insertBlock( block, index ) ).toEqual( {
+			expect( insertBlock( block, index, 'test_uid' ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks: [ block ],
 				index,
+				rootUID: 'test_uid',
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -216,10 +203,12 @@ describe( 'actions', () => {
 				uid: 'ribs',
 			} ];
 			const index = 3;
-			expect( insertBlocks( blocks, index ) ).toEqual( {
+			expect( insertBlocks( blocks, index, 'test_uid' ) ).toEqual( {
 				type: 'INSERT_BLOCKS',
 				blocks,
 				index,
+				rootUID: 'test_uid',
+				time: expect.any( Number ),
 			} );
 		} );
 	} );
@@ -272,15 +261,11 @@ describe( 'actions', () => {
 
 	describe( 'mergeBlocks', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
-			const blockA = {
-				uid: 'blockA',
-			};
-			const blockB = {
-				uid: 'blockB',
-			};
-			expect( mergeBlocks( blockA, blockB ) ).toEqual( {
+			const blockAUid = 'blockA';
+			const blockBUid = 'blockB';
+			expect( mergeBlocks( blockAUid, blockBUid ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
-				blocks: [ blockA, blockB ],
+				blocks: [ blockAUid, blockBUid ],
 			} );
 		} );
 	} );
@@ -315,6 +300,7 @@ describe( 'actions', () => {
 			expect( removeBlocks( uids ) ).toEqual( {
 				type: 'REMOVE_BLOCKS',
 				uids,
+				selectPrevious: true,
 			} );
 		} );
 	} );
@@ -327,6 +313,14 @@ describe( 'actions', () => {
 				uids: [
 					uid,
 				],
+				selectPrevious: true,
+			} );
+			expect( removeBlock( uid, false ) ).toEqual( {
+				type: 'REMOVE_BLOCKS',
+				uids: [
+					uid,
+				],
+				selectPrevious: false,
 			} );
 		} );
 	} );
@@ -465,76 +459,34 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'requestMetaBoxUpdates', () => {
-		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
-			expect( requestMetaBoxUpdates() ).toEqual( {
-				type: 'REQUEST_META_BOX_UPDATES',
-			} );
-		} );
-	} );
-
-	describe( 'initializeMetaBoxState', () => {
-		it( 'should return the META_BOX_STATE_CHANGED action with a hasChanged flag', () => {
-			const metaBoxes = {
-				side: true,
-				normal: true,
-				advanced: false,
-			};
-
-			expect( initializeMetaBoxState( metaBoxes ) ).toEqual( {
-				type: 'INITIALIZE_META_BOX_STATE',
-				metaBoxes,
-			} );
-		} );
-	} );
-
-	describe( 'fetchReusableBlocks', () => {
-		it( 'should return the FETCH_REUSABLE_BLOCKS action', () => {
-			expect( fetchReusableBlocks() ).toEqual( {
-				type: 'FETCH_REUSABLE_BLOCKS',
+	describe( 'fetchSharedBlocks', () => {
+		it( 'should return the FETCH_SHARED_BLOCKS action', () => {
+			expect( fetchSharedBlocks() ).toEqual( {
+				type: 'FETCH_SHARED_BLOCKS',
 			} );
 		} );
 
 		it( 'should take an optional id argument', () => {
 			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( fetchReusableBlocks( id ) ).toEqual( {
-				type: 'FETCH_REUSABLE_BLOCKS',
+			expect( fetchSharedBlocks( id ) ).toEqual( {
+				type: 'FETCH_SHARED_BLOCKS',
 				id,
 			} );
 		} );
 	} );
 
-	describe( 'updateReusableBlock', () => {
-		it( 'should return the UPDATE_REUSABLE_BLOCK action', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			const reusableBlock = {
-				id,
-				name: 'My cool block',
-				type: 'core/paragraph',
-				attributes: {
-					content: 'Hello!',
-				},
-			};
-			expect( updateReusableBlock( id, reusableBlock ) ).toEqual( {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id,
-				reusableBlock,
-			} );
-		} );
-	} );
-
-	describe( 'saveReusableBlock', () => {
+	describe( 'saveSharedBlock', () => {
 		const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( saveReusableBlock( id ) ).toEqual( {
-			type: 'SAVE_REUSABLE_BLOCK',
+		expect( saveSharedBlock( id ) ).toEqual( {
+			type: 'SAVE_SHARED_BLOCK',
 			id,
 		} );
 	} );
 
-	describe( 'deleteReusableBlock', () => {
+	describe( 'deleteSharedBlock', () => {
 		const id = 123;
-		expect( deleteReusableBlock( id ) ).toEqual( {
-			type: 'DELETE_REUSABLE_BLOCK',
+		expect( deleteSharedBlock( id ) ).toEqual( {
+			type: 'DELETE_SHARED_BLOCK',
 			id,
 		} );
 	} );
@@ -547,10 +499,10 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'convertBlockToReusable', () => {
+	describe( 'convertBlockToShared', () => {
 		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( convertBlockToReusable( uid ) ).toEqual( {
-			type: 'CONVERT_BLOCK_TO_REUSABLE',
+		expect( convertBlockToShared( uid ) ).toEqual( {
+			type: 'CONVERT_BLOCK_TO_SHARED',
 			uid,
 		} );
 	} );
@@ -574,6 +526,24 @@ describe( 'actions', () => {
 			expect( toggleSelection( false ) ).toEqual( {
 				type: 'TOGGLE_SELECTION',
 				isSelectionEnabled: false,
+			} );
+		} );
+	} );
+
+	describe( 'updateBlockListSettings', () => {
+		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS with undefined settings', () => {
+			expect( updateBlockListSettings( 'chicken' ) ).toEqual( {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: 'chicken',
+				settings: undefined,
+			} );
+		} );
+
+		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS action with the passed settings', () => {
+			expect( updateBlockListSettings( 'chicken', { chicken: 'ribs' } ) ).toEqual( {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: 'chicken',
+				settings: { chicken: 'ribs' },
 			} );
 		} );
 	} );

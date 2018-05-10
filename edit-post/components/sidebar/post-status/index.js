@@ -1,13 +1,10 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal Dependencies
@@ -20,10 +17,7 @@ import PostSticky from '../post-sticky';
 import PostAuthor from '../post-author';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
-import {
-	isEditorSidebarPanelOpened,
-} from '../../../store/selectors';
-import { toggleSidebarPanel } from '../../../store/actions';
+import PluginPostStatusInfo from '../plugin-post-status-info';
 
 /**
  * Module Constants
@@ -39,21 +33,20 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			<PostSticky />
 			<PostPendingStatus />
 			<PostAuthor />
+			<PluginPostStatusInfo.Slot />
 			<PostTrash />
 		</PanelBody>
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		isOpened: isEditorSidebarPanelOpened( state, PANEL_NAME ),
-	} ),
-	{
+export default compose( [
+	withSelect( ( select ) => ( {
+		isOpened: select( 'core/edit-post' ).isEditorSidebarPanelOpened( PANEL_NAME ),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
-			return toggleSidebarPanel( PANEL_NAME );
+			return dispatch( 'core/edit-post' ).toggleGeneralSidebarEditorPanel( PANEL_NAME );
 		},
-	},
-	undefined,
-	{ storeKey: 'edit-post' }
-)( PostStatus );
+	} ) ),
+] )( PostStatus );
 

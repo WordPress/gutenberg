@@ -9,4 +9,23 @@ export { Slot };
 export { Fill };
 export { Provider };
 
-export default { Slot, Fill, Provider };
+export function createSlotFill( name ) {
+	const FillComponent = ( { children, ...props } ) => (
+		<Fill name={ name } { ...props }>
+			{ children }
+		</Fill>
+	);
+	FillComponent.displayName = name + 'Fill';
+
+	const SlotComponent = ( { children, ...props } ) => (
+		<Slot name={ name } { ...props }>
+			{ children }
+		</Slot>
+	);
+	SlotComponent.displayName = name + 'Slot';
+
+	return {
+		Fill: FillComponent,
+		Slot: SlotComponent,
+	};
+}

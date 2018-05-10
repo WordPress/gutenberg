@@ -57,7 +57,7 @@ description: 'Block showing a Book card.'
 Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embed`.
 
 ```js
-// Assigning to the 'layout' category
+// Assigning to the 'widgets' category
 category: 'widgets',
 ```
 
@@ -105,11 +105,152 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](https://wordpress.org/gutenberg/handbook/block-api/attributes/).**
+* **See: [Attributes](../docs/block-api/attributes.md).**
 
 #### Transforms (optional)
 
-Work in progress...
+* **Type:** `Array`
+
+Transforms provide rules for what a block can be transformed from and what it can be transformed to. A block can be transformed from another block, a shortcode, a regular expression or a raw DOM node.
+
+For example, a paragraph block can be transformed into a heading block.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: function ( content ) {
+                return createBlock( 'core/heading', {
+                    content,
+                } );
+            },
+        },
+    ]
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: ( { content } ) => {
+                return createBlock( 'core/heading', {
+                    content,
+                } );
+            },
+        },
+    ]
+},
+```
+{% end %}
+
+An existing shortcode can be transformed into its block counterpart.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            // Shortcode tag can also be an array of shortcode aliases
+            tag: 'caption',
+            attributes: {
+                // An attribute can be source from a tag attribute in the shortcode content
+                url: {
+                    type: 'string',
+                    source: 'attribute',
+                    attribute: 'src',
+                    selector: 'img',
+                },
+                // An attribute can be source from the shortcode attributes
+                align: {
+                    type: 'string',
+                    shortcode: function( named ) {
+                        var align = named.align ? named.align : 'alignnone';
+                        return align.replace( 'align', '' );
+                    },
+                },
+            },
+        },
+    ]
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'shortcode',
+            // Shortcode tag can also be an array of shortcode aliases
+            tag: 'caption',
+            attributes: {
+                // An attribute can be source from a tag attribute in the shortcode content
+                url: {
+                    type: 'string',
+                    source: 'attribute',
+                    attribute: 'src',
+                    selector: 'img',
+                },
+                // An attribute can be source from the shortcode attributes
+                align: {
+                    type: 'string',
+                    shortcode: ( { named: { align = 'alignnone' } } ) => {
+                        return align.replace( 'align', '' );
+                    },
+                },
+            },
+        },
+    ]
+},
+
+```
+{% end %}
+
+A block can also be transformed into another block type. For example, a heading block can be transformed into a paragraph block.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: function( content ) {
+                return createBlock( 'core/paragraph', {
+                    content,
+                } );
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'core/paragraph' ],
+            transform: ( { content } ) => {
+                return createBlock( 'core/paragraph', {
+                    content,
+                } );
+            },
+        },
+    ],
+},
+```
+{% end %}
+
+To control the priority with which a transform is applied, define a `priority` numeric property on your transform object, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 #### useOnce (optional)
 
@@ -139,14 +280,14 @@ anchor: true,
 - `customClassName` (default `true`): This property adds a field to define a custom className for the block's wrapper.
 
 ```js
-// Remove the support for a the custom className .
+// Remove the support for the custom className.
 customClassName: false,
 ```
 
 - `className` (default `true`): By default, Gutenberg adds a class with the form `.wp-block-your-block-name` to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If for whatever reason a class is not desired on the markup, this functionality can be disabled.
 
 ```js
-// Remove the support for a the generated className .
+// Remove the support for the generated className.
 className: false,
 ```
 
@@ -159,4 +300,4 @@ html: false,
 
 ## Edit and Save
 
-The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](https://wordpress.org/gutenberg/handbook/block-edit-save/).
+The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).

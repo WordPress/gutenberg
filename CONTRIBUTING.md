@@ -50,9 +50,11 @@ For example, `add/gallery-block` means you're working on adding a new gallery bl
 
 You can pick among all the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue">Good First Issue</a>.
 
+The workflow is documented in greater detail in the [repository management](./docs/reference/repository-management.md) document.
+
 ## Testing
 
-Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Cypress](https://www.cypress.io/). You can find out more details in [Testing Overview document](./docs/testing-overview.md).
+Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Google Puppeteer](https://developers.google.com/web/tools/puppeteer/). You can find out more details in [Testing Overview document](./docs/reference/testing-overview.md).
 
 ## How Designers Can Contribute
 
@@ -67,3 +69,13 @@ To add a new documentation page, you'll have to create a Markdown file in the [d
 ## Reporting Security Issues
 
 Please see [SECURITY.md](./SECURITY.md).
+
+## Localizing Gutenberg Plugin
+
+To translate Gutenburg in your locale or language, [select your locale here](https://translate.wordpress.org/projects/wp-plugins/gutenberg) and translate *Development* (which contains the plugin's string) and/or *Development Readme* (please translate what you see in the Details tab of the [plugin page](https://wordpress.org/plugins/gutenberg/)).
+
+A Global Translation Editor (GTE) or Project Translation Editor (PTE) with suitable rights will process your translations in due time.
+
+Language packs are automatically generated once 95% of the plugin's strings are translated and approved for a locale.
+
+The eventual inclusion of Gutenburg into WordPress core means that more than 51% of WordPress installations running a translated WordPress installation will have Gutenburg's translated strings compiled into the core language pack as well.

@@ -8,7 +8,11 @@ import { isEqual } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { NavigableMenu } from '@wordpress/components';
-import { BlockIcon } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import BlockIcon from '../block-icon';
 
 function deriveActiveItems( items ) {
 	return items.filter( ( item ) => ! item.isDisabled );
@@ -31,7 +35,7 @@ export default class InserterGroup extends Component {
 			this.activeItems = deriveActiveItems( nextProps.items );
 
 			// Try and preserve any still valid selected state.
-			const currentIsStillActive = this.state.current && this.activeItems.some( item =>
+			const currentIsStillActive = this.state.current && this.activeItems.some( ( item ) =>
 				item.id === this.state.current.id
 			);
 
@@ -72,6 +76,9 @@ export default class InserterGroup extends Component {
 				disabled={ item.isDisabled }
 				onMouseEnter={ this.createToggleBlockHover( item ) }
 				onMouseLeave={ this.createToggleBlockHover( null ) }
+				onFocus={ this.createToggleBlockHover( item ) }
+				onBlur={ this.createToggleBlockHover( null ) }
+				aria-label={ item.title } // Fix for IE11 and JAWS 2018.
 			>
 				<BlockIcon icon={ item.icon } />
 				{ item.title }

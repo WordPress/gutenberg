@@ -1,16 +1,33 @@
 /**
  * External dependencies
  */
-import { createElement, Component, cloneElement, Children, Fragment } from 'react';
+import {
+	createElement,
+	createContext,
+	createRef,
+	forwardRef,
+	Component,
+	cloneElement,
+	Children,
+	Fragment,
+} from 'react';
 import { render, findDOMNode, createPortal, unmountComponentAtNode } from 'react-dom';
-import { renderToStaticMarkup } from 'react-dom/server';
 import {
 	camelCase,
 	flowRight,
 	isString,
 	upperFirst,
-	isEmpty,
 } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import isShallowEqual from '@wordpress/is-shallow-equal';
+
+/**
+ * Internal dependencies
+ */
+import serialize from './serialize';
 
 /**
  * Returns a new element of given type. Type can be either a string tag name or
@@ -25,6 +42,28 @@ import {
  * @return {WPElement} Element.
  */
 export { createElement };
+
+/**
+ * Returns an object tracking a reference to a rendered element via its
+ * `current` property as either a DOMElement or Element, dependent upon the
+ * type of element rendered with the ref attribute.
+ *
+ * @return {Object} Ref object.
+ */
+export { createRef };
+
+/**
+ * Component enhancer used to enable passing a ref to its wrapped component.
+ * Pass a function argument which receives `props` and `ref` as its arguments,
+ * returning an element using the forwarded ref. The return value is a new
+ * component which forwards its ref.
+ *
+ * @param {Function} forwarder Function passed `props` and `ref`, expected to
+ *                             return an element.
+ *
+ * @return {WPComponent} Enhanced component.
+ */
+export { forwardRef };
 
 /**
  * Renders a given element into the target DOM node.
@@ -72,6 +111,15 @@ export { Children };
 export { Fragment };
 
 /**
+ * Creates a context object containing two components: a provider and consumer.
+ *
+ * @param {Object} defaultValue A default data stored in the context.
+ *
+ * @return {Object} Context object.
+ */
+export { createContext };
+
+/**
  * Creates a portal into which a component can be rendered.
  *
  * @see https://github.com/facebook/react/issues/10309#issuecomment-318433235
@@ -88,14 +136,7 @@ export { createPortal };
  *
  * @return {string} HTML.
  */
-export function renderToString( element ) {
-	let rendered = renderToStaticMarkup( element );
-
-	// Drop raw HTML wrappers (support dangerous inner HTML without wrapper)
-	rendered = rendered.replace( /<\/?wp-raw-html>/g, '' );
-
-	return rendered;
-}
+export { serialize as renderToString };
 
 /**
  * Concatenate two or more React children objects.
@@ -149,18 +190,24 @@ export function switchChildrenNodeName( children, nodeName ) {
 export { flowRight as compose };
 
 /**
- * Returns a wrapped version of a React component's display name.
- * Higher-order components use getWrapperDisplayName().
+ * Given a function mapping a component to an enhanced component and modifier
+ * name, returns the enhanced component augmented with a generated displayName.
  *
- * @param {Function|Component} BaseComponent Used to detect the existing display name.
- * @param {string} wrapperName Wrapper name to prepend to the display name.
+ * @param {Function} mapComponentToEnhancedComponent Function mapping component
+ *                                                   to enhanced component.
+ * @param {string}   modifierName                    Seed name from which to
+ *                                                   generated display name.
  *
- * @return {string} Wrapped display name.
+ * @return {WPComponent} Component class with generated display name assigned.
  */
-export function getWrapperDisplayName( BaseComponent, wrapperName ) {
-	const { displayName = BaseComponent.name || 'Component' } = BaseComponent;
+export function createHigherOrderComponent( mapComponentToEnhancedComponent, modifierName ) {
+	return ( OriginalComponent ) => {
+		const EnhancedComponent = mapComponentToEnhancedComponent( OriginalComponent );
+		const { displayName = OriginalComponent.name || 'Component' } = OriginalComponent;
+		EnhancedComponent.displayName = `${ upperFirst( camelCase( modifierName ) ) }(${ displayName })`;
 
-	return `${ upperFirst( camelCase( wrapperName ) ) }(${ displayName })`;
+		return EnhancedComponent;
+	};
 }
 
 /**
@@ -174,14 +221,41 @@ export function getWrapperDisplayName( BaseComponent, wrapperName ) {
  * @return {WPElement} Dangerously-rendering element.
  */
 export function RawHTML( { children, ...props } ) {
-	// Render wrapper only if props are non-empty.
-	const tagName = isEmpty( props ) ? 'wp-raw-html' : 'div';
-
-	// Merge HTML into assigned props.
-	props = {
+	// The DIV wrapper will be stripped by serializer, unless there are
+	// non-children props present.
+	return createElement( 'div', {
 		dangerouslySetInnerHTML: { __html: children },
 		...props,
-	};
-
-	return createElement( tagName, props );
+	} );
 }
+
+/**
+ * Given a component returns the enhanced component augmented with a component
+ * only rerendering when its props/state change
+ *
+ * @param {Function} mapComponentToEnhancedComponent Function mapping component
+ *                                                   to enhanced component.
+ * @param {string}   modifierName                    Seed name from which to
+ *                                                   generated display name.
+ *
+ * @return {WPComponent} Component class with generated display name assigned.
+ */
+export const pure = createHigherOrderComponent( ( Wrapped ) => {
+	if ( Wrapped.prototype instanceof Component ) {
+		return class extends Wrapped {
+			shouldComponentUpdate( nextProps, nextState ) {
+				return ! isShallowEqual( nextProps, this.props ) || ! isShallowEqual( nextState, this.state );
+			}
+		};
+	}
+
+	return class extends Component {
+		shouldComponentUpdate( nextProps ) {
+			return ! isShallowEqual( nextProps, this.props );
+		}
+
+		render() {
+			return <Wrapped { ...this.props } />;
+		}
+	};
+}, 'pure' );

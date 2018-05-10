@@ -1,21 +1,20 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { filter, countBy } from 'lodash';
+import { countBy, flatMap, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import DocumentOutlineItem from './item';
-import { getBlocks, getEditedPostTitle } from '../../store/selectors';
-import { selectBlock } from '../../store/actions';
 
 /**
  * Module constants
@@ -34,7 +33,7 @@ const multipleH1Headings = [
 	<em key="incorrect-message-multiple-h1">{ __( '(Multiple H1 headings are not recommended)' ) }</em>,
 ];
 
-const getHeadingLevel = heading => {
+const getHeadingLevel = ( heading ) => {
 	switch ( heading.attributes.nodeName ) {
 		case 'h1':
 		case 'H1':
@@ -56,11 +55,36 @@ const getHeadingLevel = heading => {
 			return 6;
 	}
 };
+/**
+ * Returns an array of heading blocks enhanced with the following properties:
+ * path    - An array of blocks that are ancestors of the heading starting from a top-level node.
+ *           Can be an empty array if the heading is a top-level node (is not nested inside another block).
+ * level   - An integer with the heading level.
+ * isEmpty - Flag indicating if the heading has no content.
+ *
+ * @param {?Array} blocks An array of blocks.
+ * @param {?Array} path   An array of blocks that are ancestors of the blocks passed as blocks.
+ *
+ * @return {Array} An array of heading blocks enhanced with the properties described above.
+ */
+const computeOutlineHeadings = ( blocks = [], path = [] ) => {
+	return flatMap( blocks, ( block = {} ) => {
+		if ( block.name === 'core/heading' ) {
+			return {
+				...block,
+				path,
+				level: getHeadingLevel( block ),
+				isEmpty: isEmptyHeading( block ),
+			};
+		}
+		return computeOutlineHeadings( block.innerBlocks, [ ...path, block ] );
+	} );
+};
 
-const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
+const isEmptyHeading = ( heading ) => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
-	const headings = filter( blocks, ( block ) => block.name === 'core/heading' );
+export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupported } ) => {
+	const headings = computeOutlineHeadings( blocks );
 
 	if ( headings.length < 1 ) {
 		return null;
@@ -79,18 +103,14 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 		}
 	};
 
-	const items = headings.map( ( heading ) => ( {
-		...heading,
-		level: getHeadingLevel( heading ),
-		isEmpty: isEmptyHeading( heading ),
-	} ) );
-	const countByLevel = countBy( items, 'level' );
+	const hasTitle = isTitleSupported && title;
+	const countByLevel = countBy( headings, 'level' );
 	const hasMultipleH1 = countByLevel[ 1 ] > 1;
 
 	return (
 		<div className="document-outline">
 			<ul>
-				{ title && (
+				{ hasTitle && (
 					<DocumentOutlineItem
 						level="Title"
 						isValid
@@ -99,7 +119,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 						{ title }
 					</DocumentOutlineItem>
 				) }
-				{ items.map( ( item, index ) => {
+				{ headings.map( ( item, index ) => {
 					// Headings remain the same, go up by one, or down by any amount.
 					// Otherwise there are missing levels.
 					const isIncorrectLevel = item.level > prevHeadingLevel + 1;
@@ -108,7 +128,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 						! item.isEmpty &&
 						! isIncorrectLevel &&
 						!! item.level &&
-						( item.level !== 1 || ( ! hasMultipleH1 && ! title ) )
+						( item.level !== 1 || ( ! hasMultipleH1 && ! hasTitle ) )
 					);
 					prevHeadingLevel = item.level;
 
@@ -118,11 +138,12 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 							level={ `H${ item.level }` }
 							isValid={ isValid }
 							onClick={ () => onSelectHeading( item.uid ) }
+							path={ item.path }
 						>
 							{ item.isEmpty ? emptyHeadingContent : item.attributes.content }
 							{ isIncorrectLevel && incorrectLevelContent }
 							{ item.level === 1 && hasMultipleH1 && multipleH1Headings }
-							{ title && item.level === 1 && ! hasMultipleH1 && singleH1Headings }
+							{ hasTitle && item.level === 1 && ! hasMultipleH1 && singleH1Headings }
 						</DocumentOutlineItem>
 					);
 				} ) }
@@ -131,16 +152,22 @@ export const DocumentOutline = ( { blocks = [], title, onSelect } ) => {
 	);
 };
 
-export default connect(
-	( state ) => {
+export default compose(
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute, getBlocks } = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
 		return {
-			title: getEditedPostTitle( state ),
-			blocks: getBlocks( state ),
+			title: getEditedPostAttribute( 'title' ),
+			blocks: getBlocks(),
+			isTitleSupported: get( postType, [ 'supports', 'title' ], false ),
 		};
-	},
-	{
-		onSelect( uid ) {
-			return selectBlock( uid );
-		},
-	}
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { selectBlock } = dispatch( 'core/editor' );
+		return {
+			onSelect: selectBlock,
+		};
+	} )
 )( DocumentOutline );

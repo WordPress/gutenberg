@@ -1,50 +1,51 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import 'element-closest';
-import { find, last, reverse } from 'lodash';
-import tinymce from 'tinymce';
+import { overEvery, find, findLast, reverse } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { keycodes, focus } from '@wordpress/utils';
-
-/**
- * Internal dependencies
- */
-import { BlockListBlock } from '../block-list/block';
+import { Component, compose } from '@wordpress/element';
 import {
+	keycodes,
+	focus,
+	isTextField,
 	computeCaretRect,
 	isHorizontalEdge,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
+} from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import './style.scss';
+import {
+	isBlockFocusStop,
+	isInSameBlock,
 } from '../../utils/dom';
-import {
-	getPreviousBlock,
-	getNextBlock,
-	getMultiSelectedBlocksStartUid,
-	getMultiSelectedBlocks,
-	getSelectedBlock,
-	getSelectedBlocksInitialCaretPosition,
-} from '../../store/selectors';
-import {
-	multiSelect,
-	appendDefaultBlock,
-	selectBlock,
-} from '../../store/actions';
 
 /**
  * Module Constants
  */
+
 const { UP, DOWN, LEFT, RIGHT } = keycodes;
 
-function isElementNonEmpty( el ) {
-	return !! el.innerText.trim();
-}
+/**
+ * Given an element, returns true if the element is a tabbable text field, or
+ * false otherwise.
+ *
+ * @param {Element} element Element to test.
+ *
+ * @return {boolean} Whether element is a tabbable text field.
+ */
+const isTabbableTextField = overEvery( [
+	isTextField,
+	focus.tabbable.isTabbableIndex,
+] );
 
 class WritingFlow extends Component {
 	constructor() {
@@ -53,6 +54,15 @@ class WritingFlow extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 		this.clearVerticalRect = this.clearVerticalRect.bind( this );
+		this.focusLastTextField = this.focusLastTextField.bind( this );
+
+		/**
+		 * Here a rectangle is stored while moving the caret vertically so
+		 * vertical position of the start position can be restored.
+		 * This is to recreate browser behaviour across blocks.
+		 *
+		 * @type {?DOMRect}
+		 */
 		this.verticalRect = null;
 	}
 
@@ -64,142 +74,112 @@ class WritingFlow extends Component {
 		this.verticalRect = null;
 	}
 
-	getEditables( target ) {
-		const outer = target.closest( '.editor-block-list__block-edit' );
-		if ( ! outer || target === outer ) {
-			return [ target ];
-		}
-
-		const elements = outer.querySelectorAll( '[contenteditable="true"]' );
-		return [ ...elements ];
-	}
-
-	getVisibleTabbables() {
-		return focus.tabbable
-			.find( this.container )
-			.filter( ( node ) => (
-				node.nodeName === 'INPUT' ||
-				node.nodeName === 'TEXTAREA' ||
-				node.contentEditable === 'true' ||
-				node.classList.contains( 'editor-block-list__block-edit' )
-			) );
-	}
-
+	/**
+	 * Returns the optimal tab target from the given focused element in the
+	 * desired direction. A preference is made toward text fields, falling back
+	 * to the block focus stop if no other candidates exist for the block.
+	 *
+	 * @param {Element} target    Currently focused text field.
+	 * @param {boolean} isReverse True if considering as the first field.
+	 *
+	 * @return {?Element} Optimal tab target, if one exists.
+	 */
 	getClosestTabbable( target, isReverse ) {
-		let focusableNodes = this.getVisibleTabbables();
+		// Since the current focus target is not guaranteed to be a text field,
+		// find all focusables. Tabbability is considered later.
+		let focusableNodes = focus.focusable.find( this.container );
 
 		if ( isReverse ) {
 			focusableNodes = reverse( focusableNodes );
 		}
 
-		focusableNodes = focusableNodes.slice( focusableNodes.indexOf( target ) );
+		// Consider as candidates those focusables after the current target.
+		// It's assumed this can only be reached if the target is focusable
+		// (on its keydown event), so no need to verify it exists in the set.
+		focusableNodes = focusableNodes.slice( focusableNodes.indexOf( target ) + 1 );
 
-		return find( focusableNodes, ( node, i, array ) => {
+		function isTabCandidate( node, i, array ) {
+			// Not a candidate if the node is not tabbable.
+			if ( ! focus.tabbable.isTabbableIndex( node ) ) {
+				return false;
+			}
+
+			// Prefer text fields, but settle for block focus stop.
+			if ( ! isTextField( node ) && ! isBlockFocusStop( node ) ) {
+				return false;
+			}
+
+			// If navigating out of a block (in reverse), don't consider its
+			// block focus stop.
 			if ( node.contains( target ) ) {
 				return false;
 			}
 
-			const nextNode = array[ i + 1 ];
+			// In case of block focus stop, check to see if there's a better
+			// text field candidate within.
+			for ( let offset = 1, nextNode; ( nextNode = array[ i + offset ] ); offset++ ) {
+				// Abort if no longer testing descendents of focus stop.
+				if ( ! node.contains( nextNode ) ) {
+					break;
+				}
 
-			// Skip node if it contains a focusable node.
-			if ( nextNode && node.contains( nextNode ) ) {
-				return false;
+				// Apply same tests by recursion. This is important to consider
+				// nestable blocks where we don't want to settle for the inner
+				// block focus stop.
+				if ( isTabCandidate( nextNode, i + offset, array ) ) {
+					return false;
+				}
 			}
 
 			return true;
-		} );
+		}
+
+		return find( focusableNodes, isTabCandidate );
 	}
 
-	getInnerTabbable( target, isReverse ) {
-		let focusableNodes = this.getVisibleTabbables();
-		if ( isReverse ) {
-			focusableNodes = reverse( focusableNodes );
-		}
+	expandSelection( isReverse ) {
+		const {
+			selectedBlockUID,
+			selectionStartUID,
+			selectionBeforeEndUID,
+			selectionAfterEndUID,
+		} = this.props;
 
-		const innerItem = find( focusableNodes, ( node ) => {
-			return target !== node && target.contains( node );
-		} );
+		const nextSelectionEndUID = isReverse ? selectionBeforeEndUID : selectionAfterEndUID;
 
-		return innerItem ? innerItem : target;
-	}
-
-	isInLastNonEmptyBlock( target ) {
-		const tabbables = this.getVisibleTabbables();
-
-		// Find last tabbable, compare with target
-		const lastTabbable = last( tabbables );
-		if ( ! lastTabbable || ! lastTabbable.contains( target ) ) {
-			return false;
-		}
-
-		// Find block-level ancestor of said last tabbable
-		const blockEl = lastTabbable.closest( '.' + BlockListBlock.className );
-		const blockIndex = tabbables.indexOf( blockEl );
-
-		// Unexpected, so we'll leave quietly.
-		if ( blockIndex === -1 ) {
-			return false;
-		}
-
-		// Maybe there are no descendants, and the target is the block itself?
-		if ( lastTabbable === blockEl ) {
-			return isElementNonEmpty( blockEl );
-		}
-
-		// Otherwise, find the descendants of the ancestor, i.e. the target and
-		// its siblings, and check them instead.
-		return tabbables
-			.slice( blockIndex + 1 )
-			.some( ( el ) =>
-				blockEl.contains( el ) && isElementNonEmpty( el ) );
-	}
-
-	expandSelection( currentStartUid, isReverse ) {
-		const { previousBlock, nextBlock } = this.props;
-
-		const expandedBlock = isReverse ? previousBlock : nextBlock;
-		if ( expandedBlock ) {
-			this.props.onMultiSelect( currentStartUid, expandedBlock.uid );
+		if ( nextSelectionEndUID ) {
+			this.props.onMultiSelect( selectionStartUID || selectedBlockUID, nextSelectionEndUID );
 		}
 	}
 
 	moveSelection( isReverse ) {
-		const { previousBlock, nextBlock } = this.props;
+		const { selectedFirstUid, selectedLastUid } = this.props;
 
-		const focusedBlock = isReverse ? previousBlock : nextBlock;
-		if ( focusedBlock ) {
-			this.props.onSelectBlock( focusedBlock.uid );
+		const focusedBlockUid = isReverse ? selectedFirstUid : selectedLastUid;
+
+		if ( focusedBlockUid ) {
+			this.props.onSelectBlock( focusedBlockUid );
 		}
-	}
-
-	isEditableEdge( moveUp, target ) {
-		const editables = this.getEditables( target );
-		const index = editables.indexOf( target );
-		const edgeIndex = moveUp ? 0 : editables.length - 1;
-		return editables.length > 0 && index === edgeIndex;
 	}
 
 	/**
-	 * Function called to ensure the block parent of the target node is selected.
+	 * Returns true if the given target field is the last in its block which
+	 * can be considered for tab transition. For example, in a block with two
+	 * text fields, this would return true when reversing from the first of the
+	 * two fields, but false when reversing from the second.
 	 *
-	 * @param {DOMElement} target
+	 * @param {Element} target    Currently focused text field.
+	 * @param {boolean} isReverse True if considering as the first field.
+	 *
+	 * @return {boolean} Whether field is at edge for tab transition.
 	 */
-	selectParentBlock( target ) {
-		if ( ! target ) {
-			return;
-		}
-
-		const parentBlock = target.hasAttribute( 'data-block' ) ? target : target.closest( '[data-block]' );
-		if (
-			parentBlock &&
-			( ! this.props.selectedBlock || parentBlock.getAttribute( 'data-block' ) !== this.props.selectedBlock.uid )
-		) {
-			this.props.onSelectBlock( parentBlock.getAttribute( 'data-block' ) );
-		}
+	isTabbableEdge( target, isReverse ) {
+		const closestTabbable = this.getClosestTabbable( target, isReverse );
+		return ! closestTabbable || ! isInSameBlock( target, closestTabbable );
 	}
 
 	onKeyDown( event ) {
-		const { selectedBlock, selectionStart, hasMultiSelection } = this.props;
+		const { hasMultiSelection } = this.props;
 
 		const { keyCode, target } = event;
 		const isUp = keyCode === UP;
@@ -220,61 +200,43 @@ class WritingFlow extends Component {
 			this.verticalRect = computeCaretRect( target );
 		}
 
-		if ( isNav && isShift && hasMultiSelection ) {
-			// Shift key is down and existing block selection
+		if ( ! isNav ) {
+			return;
+		}
+
+		if ( isShift && ( hasMultiSelection || (
+			this.isTabbableEdge( target, isReverse ) &&
+			isNavEdge( target, isReverse, true )
+		) ) ) {
+			// Shift key is down, and there is multi selection or we're at the end of the current block.
+			this.expandSelection( isReverse );
 			event.preventDefault();
-			this.expandSelection( selectionStart, isReverse );
-		} else if ( isNav && isShift && this.isEditableEdge( isReverse, target ) && isNavEdge( target, isReverse, true ) ) {
-			// Shift key is down, but no existing block selection
-			event.preventDefault();
-			this.expandSelection( selectedBlock.uid, isReverse );
-		} else if ( isNav && hasMultiSelection ) {
-			// Moving from multi block selection to single block selection
-			event.preventDefault();
+		} else if ( hasMultiSelection ) {
+			// Moving from block multi-selection to single block selection
 			this.moveSelection( isReverse );
+			event.preventDefault();
 		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
-			placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
-			this.selectParentBlock( closestTabbable );
-			event.preventDefault();
+
+			if ( closestTabbable ) {
+				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
+				event.preventDefault();
+			}
 		} else if ( isHorizontal && isHorizontalEdge( target, isReverse, isShift ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
-			this.selectParentBlock( closestTabbable );
 			event.preventDefault();
-		}
-
-		if ( isDown && ! isShift && ! hasMultiSelection &&
-				this.isInLastNonEmptyBlock( target ) &&
-				isVerticalEdge( target, false, false )
-		) {
-			this.props.onBottomReached();
 		}
 	}
 
-	componentDidUpdate( prevProps ) {
-		// When selecting a new block, we focus its first editable or the container
-		if (
-			this.props.selectedBlock &&
-			( ! prevProps.selectedBlock || this.props.selectedBlock.uid !== prevProps.selectedBlock.uid )
-		) {
-			const blockContainer = this.container.querySelector( `[data-block="${ this.props.selectedBlock.uid }"]` );
-			if ( blockContainer && ! blockContainer.contains( document.activeElement ) ) {
-				const target = this.getInnerTabbable( blockContainer, this.props.initialPosition === -1 );
-				target.focus();
-				if ( this.props.initialPosition === -1 ) {
-					// Special casing RichText components because the two functions at the bottom are not working as expected.
-					// When merging two sibling paragraph blocks (backspacing) the focus is not moved to the right position.
-					const editor = tinymce.get( target.getAttribute( 'id' ) );
-					if ( editor ) {
-						editor.selection.select( editor.getBody(), true );
-						editor.selection.collapse( false );
-					} else {
-						placeCaretAtHorizontalEdge( target, true );
-						placeCaretAtVerticalEdge( target, true );
-					}
-				}
-			}
+	/**
+	 * Sets focus to the end of the last tabbable text field, if one exists.
+	 */
+	focusLastTextField() {
+		const focusableNodes = focus.focusable.find( this.container );
+		const target = findLast( focusableNodes, isTabbableTextField );
+		if ( target ) {
+			placeCaretAtHorizontalEdge( target, true );
 		}
 	}
 
@@ -285,30 +247,58 @@ class WritingFlow extends Component {
 		// bubbling events from children to determine focus transition intents.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div
-				ref={ this.bindContainer }
-				onKeyDown={ this.onKeyDown }
-				onMouseDown={ this.clearVerticalRect }
-			>
-				{ children }
+			<div className="editor-writing-flow">
+				<div
+					ref={ this.bindContainer }
+					onKeyDown={ this.onKeyDown }
+					onMouseDown={ this.clearVerticalRect }
+				>
+					{ children }
+				</div>
+				<div
+					aria-hidden
+					tabIndex={ -1 }
+					onClick={ this.focusLastTextField }
+					className="editor-writing-flow__click-redirect"
+				/>
 			</div>
 		);
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		previousBlock: getPreviousBlock( state ),
-		nextBlock: getNextBlock( state ),
-		selectionStart: getMultiSelectedBlocksStartUid( state ),
-		hasMultiSelection: getMultiSelectedBlocks( state ).length > 1,
-		selectedBlock: getSelectedBlock( state ),
-		initialPosition: getSelectedBlocksInitialCaretPosition( state ),
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getSelectedBlockUID,
+			getMultiSelectedBlocksStartUid,
+			getMultiSelectedBlocksEndUid,
+			getPreviousBlockUid,
+			getNextBlockUid,
+			getFirstMultiSelectedBlockUid,
+			getLastMultiSelectedBlockUid,
+			hasMultiSelection,
+		} = select( 'core/editor' );
+
+		const selectedBlockUID = getSelectedBlockUID();
+		const selectionStartUID = getMultiSelectedBlocksStartUid();
+		const selectionEndUID = getMultiSelectedBlocksEndUid();
+
+		return {
+			selectedBlockUID,
+			selectionStartUID,
+			selectionBeforeEndUID: getPreviousBlockUid( selectionEndUID || selectedBlockUID ),
+			selectionAfterEndUID: getNextBlockUid( selectionEndUID || selectedBlockUID ),
+			selectedFirstUid: getFirstMultiSelectedBlockUid(),
+			selectedLastUid: getLastMultiSelectedBlockUid(),
+			hasMultiSelection: hasMultiSelection(),
+		};
 	} ),
-	{
-		onMultiSelect: multiSelect,
-		onBottomReached: appendDefaultBlock,
-		onSelectBlock: selectBlock,
-	}
-)( WritingFlow );
+	withDispatch( ( dispatch ) => {
+		const { multiSelect, selectBlock } = dispatch( 'core/editor' );
+		return {
+			onMultiSelect: multiSelect,
+			onSelectBlock: selectBlock,
+		};
+	} ),
+] )( WritingFlow );

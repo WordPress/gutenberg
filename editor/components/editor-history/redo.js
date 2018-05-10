@@ -1,24 +1,20 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
+import { keycodes } from '@wordpress/utils';
 
-/**
- * Internal dependencies
- */
-import { hasEditorRedo } from '../../store/selectors';
+const { displayShortcut } = keycodes;
 
 function EditorHistoryRedo( { hasRedo, redo } ) {
 	return (
 		<IconButton
 			icon="redo"
 			label={ __( 'Redo' ) }
+			shortcut={ displayShortcut.primaryShift( 'z' ) }
 			disabled={ ! hasRedo }
 			onClick={ redo }
 			className="editor-history__undo"
@@ -26,11 +22,11 @@ function EditorHistoryRedo( { hasRedo, redo } ) {
 	);
 }
 
-export default connect(
-	( state ) => ( {
-		hasRedo: hasEditorRedo( state ),
-	} ),
-	( dispatch ) => ( {
-		redo: () => dispatch( { type: 'REDO' } ),
-	} )
-)( EditorHistoryRedo );
+export default compose( [
+	withSelect( ( select ) => ( {
+		hasRedo: select( 'core/editor' ).hasEditorRedo(),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		redo: () => dispatch( 'core/editor' ).redo(),
+	} ) ),
+] )( EditorHistoryRedo );

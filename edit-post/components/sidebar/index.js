@@ -1,46 +1,45 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress Dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { withFocusReturn } from '@wordpress/components';
+import { createSlotFill, ifCondition, withFocusReturn } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import PostSettings from './post-settings';
-import BlockInspectorPanel from './block-inspector-panel';
-import Header from './header';
 
-import { getActivePanel } from '../../store/selectors';
+const { Fill, Slot } = createSlotFill( 'Sidebar' );
 
-const Sidebar = ( { panel } ) => {
+/**
+ * Renders a sidebar with its content.
+ *
+ * @return {Object} The rendered sidebar.
+ */
+const Sidebar = ( { children, label } ) => {
 	return (
-		<div
-			className="edit-post-sidebar"
-			role="region"
-			aria-label={ __( 'Editor advanced settings' ) }
-			tabIndex="-1"
-		>
-			<Header />
-			{ panel === 'document' && <PostSettings /> }
-			{ panel === 'block' && <BlockInspectorPanel /> }
-		</div>
+		<Fill>
+			<div
+				className="edit-post-sidebar"
+				role="region"
+				aria-label={ label }
+				tabIndex="-1"
+			>
+				{ children }
+			</div>
+		</Fill>
 	);
 };
 
-export default connect(
-	( state ) => {
-		return {
-			panel: getActivePanel( state ),
-		};
-	},
-	undefined,
-	undefined,
-	{ storeKey: 'edit-post' }
-)( withFocusReturn( Sidebar ) );
+const WrappedSidebar = compose(
+	withSelect( ( select, { name } ) => ( {
+		isActive: select( 'core/edit-post' ).getActiveGeneralSidebarName() === name,
+	} ) ),
+	ifCondition( ( { isActive } ) => isActive ),
+	withFocusReturn,
+)( Sidebar );
+
+WrappedSidebar.Slot = Slot;
+
+export default WrappedSidebar;

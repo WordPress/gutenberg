@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 2.1.0
+ * Version: 2.8.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -109,7 +109,7 @@ function gutenberg_build_files_notice() {
  * @since 1.5.0
  */
 function gutenberg_pre_init() {
-	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/blocks/build' ) ) {
+	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/build/blocks' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}
@@ -161,6 +161,12 @@ function gutenberg_init( $return, $post ) {
 	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
+
+	/**
+	 * Remove the emoji script as it is incompatible with both React and any
+	 * contenteditable fields.
+	 */
+	remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
@@ -496,14 +502,18 @@ function gutenberg_replace_default_add_new_button() {
 			button.remove();
 
 			var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
+			var dropdown = expander.parentNode.querySelector( '.dropdown' );
+			function toggleDropdown() {
+				dropdown.classList.toggle( 'visible' );
+			}
 			expander.addEventListener( 'click', function( e ) {
 				e.preventDefault();
-				e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
+				toggleDropdown();
 			} );
 			expander.addEventListener( 'keydown', function( e ) {
 				if ( 13 === e.which || 32 === e.which ) {
 					e.preventDefault();
-					e.target.parentNode.getElementsByClassName( 'dropdown' ).item( 0 ).classList.toggle( 'visible' );
+					toggleDropdown();
 				}
 			} );
 		} );
@@ -517,7 +527,7 @@ add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_b
  *
  * @since 1.5.0
  *
- * @param string $classes Space seperated string of classes being added to the body tag.
+ * @param string $classes Space separated string of classes being added to the body tag.
  * @return string The $classes string, with gutenberg-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {

@@ -6,8 +6,9 @@ import {
 	getBlockAttributes,
 	asType,
 	createBlockWithFallback,
-	getAttributesFromDeprecatedVersion,
+	getAttributesAndInnerBlocksFromDeprecatedVersion,
 	default as parse,
+	parseWithAttributeSchema,
 } from '../parser';
 import {
 	registerBlockType,
@@ -42,7 +43,7 @@ describe( 'block parser', () => {
 
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		require( 'editor/hooks' );
 	} );
 
 	afterEach( () => {
@@ -87,6 +88,20 @@ describe( 'block parser', () => {
 
 			expect( asType( obj, 'object' ) ).toBe( obj );
 			expect( asType( {}, 'object' ) ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'parseWithAttributeSchema', () => {
+		it( 'should return the matcher\'s attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<div>chicken</div>',
+				{
+					type: 'string',
+					source: 'text',
+					selector: 'div',
+				},
+			);
+			expect( value ).toBe( 'chicken' );
 		} );
 	} );
 
@@ -170,18 +185,18 @@ describe( 'block parser', () => {
 		} );
 	} );
 
-	describe( 'getAttributesFromDeprecatedVersion', () => {
+	describe( 'getAttributesAndInnerBlocksFromDeprecatedVersion', () => {
 		it( 'should return undefined if the block has no deprecated versions', () => {
-			const attributes = getAttributesFromDeprecatedVersion(
+			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
 				defaultBlockSettings,
 				'<span class="wp-block-test-block">Bananas</span>',
 				{},
 			);
-			expect( attributes ).toBeUndefined();
+			expect( attributesAndInnerBlocks ).toBeUndefined();
 		} );
 
 		it( 'should return undefined if no valid deprecated version found', () => {
-			const attributes = getAttributesFromDeprecatedVersion(
+			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
 				{
 					name: 'core/test-block',
 					...defaultBlockSettings,
@@ -196,13 +211,13 @@ describe( 'block parser', () => {
 				'<span class="wp-block-test-block">Bananas</span>',
 				{},
 			);
-			expect( attributes ).toBeUndefined();
+			expect( attributesAndInnerBlocks ).toBeUndefined();
 			expect( console ).toHaveErrored();
 			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should return the attributes parsed by the deprecated version', () => {
-			const attributes = getAttributesFromDeprecatedVersion(
+			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
 				{
 					name: 'core/test-block',
 					...defaultBlockSettings,
@@ -223,7 +238,77 @@ describe( 'block parser', () => {
 				'<span class="wp-block-test-block">Bananas</span>',
 				{},
 			);
-			expect( attributes ).toEqual( { fruit: 'Bananas' } );
+			expect( attributesAndInnerBlocks.attributes ).toEqual( { fruit: 'Bananas' } );
+		} );
+
+		it( 'should return the innerBlocks if they are passed', () => {
+			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
+				{
+					name: 'core/test-block',
+					...defaultBlockSettings,
+					save: ( props ) => <div>{ props.attributes.fruit }</div>,
+					deprecated: [
+						{
+							attributes: {
+								fruit: {
+									type: 'string',
+									source: 'text',
+									selector: 'span',
+								},
+							},
+							save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						},
+					],
+				},
+				'<span class="wp-block-test-block">Bananas</span>',
+				{},
+				[ {
+					name: 'core/test-block',
+					attributes: { aaa: 'bbb' },
+				} ]
+			);
+
+			expect( attributesAndInnerBlocks.innerBlocks ).toHaveLength( 1 );
+			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
+			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+		} );
+
+		it( 'should be able to migrate attributes and innerBlocks', () => {
+			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
+				{
+					name: 'core/test-block',
+					...defaultBlockSettings,
+					save: ( props ) => <div>{ props.attributes.fruit }</div>,
+					deprecated: [
+						{
+							attributes: {
+								fruit: {
+									type: 'string',
+									source: 'text',
+									selector: 'span',
+								},
+							},
+							save: ( props ) => <span>{ props.attributes.fruit }</span>,
+							migrate: ( attributes ) => {
+								return [
+									{ newFruit: attributes.fruit },
+									[ {
+										name: 'core/test-block',
+										attributes: { aaa: 'bbb' },
+									} ],
+								];
+							},
+						},
+					],
+				},
+				'<span class="wp-block-test-block">Bananas</span>',
+				{},
+			);
+
+			expect( attributesAndInnerBlocks.attributes ).toEqual( { newFruit: 'Bananas' } );
+			expect( attributesAndInnerBlocks.innerBlocks ).toHaveLength( 1 );
+			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
+			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
 		} );
 	} );
 

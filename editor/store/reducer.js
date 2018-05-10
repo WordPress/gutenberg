@@ -2,10 +2,8 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
-import { combineReducers } from 'redux';
 import {
 	flow,
-	partialRight,
 	reduce,
 	first,
 	last,
@@ -14,19 +12,27 @@ import {
 	mapValues,
 	findIndex,
 	reject,
+	omitBy,
+	keys,
+	isEqual,
+	includes,
+	overSome,
+	get,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { isReusableBlock } from '@wordpress/blocks';
+import { isSharedBlock } from '@wordpress/blocks';
+import { combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
-import { PREFERENCES_DEFAULTS } from './defaults';
+import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
+import { insertAt, moveTo } from './array';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -95,6 +101,99 @@ function getFlattenedBlocks( blocks ) {
 }
 
 /**
+ * Returns true if the two object arguments have the same keys, or false
+ * otherwise.
+ *
+ * @param {Object} a First object.
+ * @param {Object} b Second object.
+ *
+ * @return {boolean} Whether the two objects have the same keys.
+ */
+export function hasSameKeys( a, b ) {
+	return isEqual( keys( a ), keys( b ) );
+}
+
+/**
+ * Returns true if, given the currently dispatching action and the previously
+ * dispatched action, the two actions are updating the same block attribute, or
+ * false otherwise.
+ *
+ * @param {Object} action         Currently dispatching action.
+ * @param {Object} previousAction Previously dispatched action.
+ *
+ * @return {boolean} Whether actions are updating the same block attribute.
+ */
+export function isUpdatingSameBlockAttribute( action, previousAction ) {
+	return (
+		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
+		action.uid === previousAction.uid &&
+		hasSameKeys( action.attributes, previousAction.attributes )
+	);
+}
+
+/**
+ * Returns true if, given the currently dispatching action and the previously
+ * dispatched action, the two actions are editing the same post property, or
+ * false otherwise.
+ *
+ * @param {Object} action         Currently dispatching action.
+ * @param {Object} previousAction Previously dispatched action.
+ *
+ * @return {boolean} Whether actions are updating the same post property.
+ */
+export function isUpdatingSamePostProperty( action, previousAction ) {
+	return (
+		action.type === 'EDIT_POST' &&
+		hasSameKeys( action.edits, previousAction.edits )
+	);
+}
+
+/**
+ * Returns true if, given the currently dispatching action and the previously
+ * dispatched action, the two actions are modifying the same property such that
+ * undo history should be batched.
+ *
+ * @param {Object} action         Currently dispatching action.
+ * @param {Object} previousAction Previously dispatched action.
+ *
+ * @return {boolean} Whether to overwrite present state.
+ */
+export function shouldOverwriteState( action, previousAction ) {
+	if ( ! previousAction || action.type !== previousAction.type ) {
+		return false;
+	}
+
+	return overSome( [
+		isUpdatingSameBlockAttribute,
+		isUpdatingSamePostProperty,
+	] )( action, previousAction );
+}
+
+/**
+ * Higher-order reducer targeting the combined editor reducer, augmenting
+ * block UIDs in remove action to include cascade of inner blocks.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
+	if ( state && action.type === 'REMOVE_BLOCKS' ) {
+		const uids = [ ...action.uids ];
+
+		// For each removed UID, include its inner blocks in UIDs to remove,
+		// recursing into those so long as inner blocks exist.
+		for ( let i = 0; i < uids.length; i++ ) {
+			uids.push( ...state.blockOrder[ uids[ i ] ] );
+		}
+
+		action = { ...action, uids };
+	}
+
+	return reducer( state, action );
+};
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -113,17 +212,26 @@ function getFlattenedBlocks( blocks ) {
 export const editor = flow( [
 	combineReducers,
 
+	withInnerBlocksRemoveCascade,
+
 	// Track undo history, starting at editor initialization.
-	partialRight( withHistory, { resetTypes: [ 'SETUP_NEW_POST', 'SETUP_EDITOR' ] } ),
+	withHistory( {
+		resetTypes: [ 'SETUP_EDITOR_STATE' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
+		shouldOverwriteState,
+	} ),
 
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
-	partialRight( withChangeDetection, { resetTypes: [ 'SETUP_NEW_POST', 'RESET_POST' ] } ),
+	withChangeDetection( {
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'UPDATE_POST' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST' ],
+	} ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-			case 'SETUP_NEW_POST':
+			case 'SETUP_EDITOR_STATE':
 				return reduce( action.edits, ( result, value, key ) => {
 					// Only assign into result if not already same value
 					if ( value !== state[ key ] ) {
@@ -146,9 +254,14 @@ export const editor = flow( [
 
 				return state;
 
+			case 'UPDATE_POST':
 			case 'RESET_POST':
+				const getCanonicalValue = action.type === 'UPDATE_POST' ?
+					( key ) => action.edits[ key ] :
+					( key ) => getPostRawValue( action.post[ key ] );
+
 				return reduce( state, ( result, value, key ) => {
-					if ( value !== getPostRawValue( action.post[ key ] ) ) {
+					if ( value !== getCanonicalValue( key ) ) {
 						return result;
 					}
 
@@ -167,7 +280,14 @@ export const editor = flow( [
 	blocksByUid( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
+			case 'SETUP_EDITOR_STATE':
 				return getFlattenedBlocks( action.blocks );
+
+			case 'RECEIVE_BLOCKS':
+				return {
+					...state,
+					...getFlattenedBlocks( action.blocks ),
+				};
 
 			case 'UPDATE_BLOCK_ATTRIBUTES':
 				// Ignore updates if block isn't known
@@ -204,6 +324,23 @@ export const editor = flow( [
 					},
 				};
 
+			case 'MOVE_BLOCK_TO_POSITION':
+				// Avoid creating a new instance if the layout didn't change.
+				if ( state[ action.uid ].attributes.layout === action.layout ) {
+					return state;
+				}
+
+				return {
+					...state,
+					[ action.uid ]: {
+						...state[ action.uid ],
+						attributes: {
+							...state[ action.uid ].attributes,
+							layout: action.layout,
+						},
+					},
+				};
+
 			case 'UPDATE_BLOCK':
 				// Ignore updates if block isn't known
 				if ( ! state[ action.uid ] ) {
@@ -237,10 +374,10 @@ export const editor = flow( [
 			case 'REMOVE_BLOCKS':
 				return omit( state, action.uids );
 
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
+			case 'SAVE_SHARED_BLOCK_SUCCESS': {
 				const { id, updatedId } = action;
 
-				// If a temporary reusable block is saved, we swap the temporary id with the final one
+				// If a temporary shared block is saved, we swap the temporary id with the final one
 				if ( id === updatedId ) {
 					return state;
 				}
@@ -259,9 +396,6 @@ export const editor = flow( [
 					return block;
 				} );
 			}
-
-			case 'REMOVE_REUSABLE_BLOCK':
-				return omit( state, action.associatedBlockUids );
 		}
 
 		return state;
@@ -270,31 +404,53 @@ export const editor = flow( [
 	blockOrder( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
+			case 'SETUP_EDITOR_STATE':
 				return mapBlockOrder( action.blocks );
+
+			case 'RECEIVE_BLOCKS':
+				return {
+					...state,
+					...omit( mapBlockOrder( action.blocks ), '' ),
+				};
 
 			case 'INSERT_BLOCKS': {
 				const { rootUID = '', blocks } = action;
-
 				const subState = state[ rootUID ] || [];
 				const mappedBlocks = mapBlockOrder( blocks, rootUID );
-
 				const { index = subState.length } = action;
 
 				return {
 					...state,
 					...mappedBlocks,
-					[ rootUID ]: [
-						...subState.slice( 0, index ),
-						...mappedBlocks[ rootUID ],
-						...subState.slice( index ),
-					],
+					[ rootUID ]: insertAt( subState, mappedBlocks[ rootUID ], index ),
+				};
+			}
+
+			case 'MOVE_BLOCK_TO_POSITION': {
+				const { fromRootUID = '', toRootUID = '', uid } = action;
+				const { index = state[ toRootUID ].length } = action;
+
+				// Moving inside the same parent block
+				if ( fromRootUID === toRootUID ) {
+					const subState = state[ toRootUID ];
+					const fromIndex = subState.indexOf( uid );
+					return {
+						...state,
+						[ toRootUID ]: moveTo( state[ toRootUID ], fromIndex, index ),
+					};
+				}
+
+				// Moving from a parent block to another
+				return {
+					...state,
+					[ fromRootUID ]: without( state[ fromRootUID ], uid ),
+					[ toRootUID ]: insertAt( state[ toRootUID ], uid, index ),
 				};
 			}
 
 			case 'MOVE_BLOCKS_UP': {
 				const { uids, rootUID = '' } = action;
 				const firstUid = first( uids );
-				const lastUid = last( uids );
 				const subState = state[ rootUID ];
 
 				if ( ! subState.length || firstUid === first( subState ) ) {
@@ -302,17 +458,10 @@ export const editor = flow( [
 				}
 
 				const firstIndex = subState.indexOf( firstUid );
-				const lastIndex = subState.indexOf( lastUid );
-				const swappedUid = subState[ firstIndex - 1 ];
 
 				return {
 					...state,
-					[ rootUID ]: [
-						...subState.slice( 0, firstIndex - 1 ),
-						...uids,
-						swappedUid,
-						...subState.slice( lastIndex + 1 ),
-					],
+					[ rootUID ]: moveTo( subState, firstIndex, firstIndex - 1, uids.length ),
 				};
 			}
 
@@ -327,17 +476,10 @@ export const editor = flow( [
 				}
 
 				const firstIndex = subState.indexOf( firstUid );
-				const lastIndex = subState.indexOf( lastUid );
-				const swappedUid = subState[ lastIndex + 1 ];
 
 				return {
 					...state,
-					[ rootUID ]: [
-						...subState.slice( 0, firstIndex ),
-						swappedUid,
-						...uids,
-						...subState.slice( lastIndex + 2 ),
-					],
+					[ rootUID ]: moveTo( subState, firstIndex, firstIndex + 1, uids.length ),
 				};
 			}
 
@@ -351,6 +493,10 @@ export const editor = flow( [
 
 				return flow( [
 					( nextState ) => omit( nextState, uids ),
+					( nextState ) => ( {
+						...nextState,
+						...omit( mappedBlocks, '' ),
+					} ),
 					( nextState ) => mapValues( nextState, ( subState ) => (
 						reduce( subState, ( result, uid ) => {
 							if ( uid === uids[ 0 ] ) {
@@ -367,27 +513,19 @@ export const editor = flow( [
 							return result;
 						}, [] )
 					) ),
-				] )( {
-					...state,
-					...omit( mappedBlocks, '' ),
-				} );
+				] )( state );
 			}
 
 			case 'REMOVE_BLOCKS':
-			case 'REMOVE_REUSABLE_BLOCK': {
-				const { type, uids, associatedBlockUids } = action;
-				const uidsToRemove = type === 'REMOVE_BLOCKS' ? uids : associatedBlockUids;
-
 				return flow( [
 					// Remove inner block ordering for removed blocks
-					( nextState ) => omit( nextState, uidsToRemove ),
+					( nextState ) => omit( nextState, action.uids ),
 
 					// Remove deleted blocks from other blocks' orderings
 					( nextState ) => mapValues( nextState, ( subState ) => (
-						without( subState, ...uidsToRemove )
+						without( subState, ...action.uids )
 					) ),
 				] )( state );
-			}
 		}
 
 		return state;
@@ -405,6 +543,7 @@ export const editor = flow( [
  */
 export function currentPost( state = {}, action ) {
 	switch ( action.type ) {
+		case 'SETUP_EDITOR_STATE':
 		case 'RESET_POST':
 		case 'UPDATE_POST':
 			let post;
@@ -518,14 +657,30 @@ export function blockSelection( state = {
 				initialPosition: null,
 				isMultiSelecting: false,
 			};
-		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state.start ) === -1 ) {
+		case 'REMOVE_BLOCKS':
+			if ( ! action.uids || ! action.uids.length || action.uids.indexOf( state.start ) === -1 ) {
 				return state;
 			}
 			return {
 				...state,
-				start: action.blocks[ 0 ].uid,
-				end: action.blocks[ 0 ].uid,
+				start: null,
+				end: null,
+				initialPosition: null,
+				isMultiSelecting: false,
+			};
+		case 'REPLACE_BLOCKS':
+			if ( action.uids.indexOf( state.start ) === -1 ) {
+				return state;
+			}
+
+			// If there is replacement block(s), assign first's UID as the next
+			// selected block. If empty replacement, reset to null.
+			const nextSelectedBlockUID = get( action.blocks, [ 0, 'uid' ], null );
+
+			return {
+				...state,
+				start: nextSelectedBlockUID,
+				end: nextSelectedBlockUID,
 				initialPosition: null,
 				isMultiSelecting: false,
 			};
@@ -540,27 +695,42 @@ export function blockSelection( state = {
 }
 
 /**
- * Reducer returning hovered block state.
+ * Reducer returning the UID of the provisional block. A provisional block is
+ * one which is to be removed if it does not receive updates in the time until
+ * the next selection or block reset.
  *
- * @param {Object} state  Current state.
+ * @param {string} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string} Updated state.
  */
-export function hoveredBlock( state = null, action ) {
+export function provisionalBlockUID( state = null, action ) {
 	switch ( action.type ) {
-		case 'TOGGLE_BLOCK_HOVERED':
-			return action.hovered ? action.uid : null;
-		case 'SELECT_BLOCK':
-		case 'START_TYPING':
-		case 'MULTI_SELECT':
-			return null;
-		case 'REPLACE_BLOCKS':
-			if ( ! action.blocks || ! action.blocks.length || action.uids.indexOf( state ) === -1 ) {
-				return state;
+		case 'INSERT_BLOCKS':
+			if ( action.isProvisional ) {
+				return first( action.blocks ).uid;
 			}
+			break;
 
-			return action.blocks[ 0 ].uid;
+		case 'RESET_BLOCKS':
+			return null;
+
+		case 'UPDATE_BLOCK_ATTRIBUTES':
+		case 'UPDATE_BLOCK':
+		case 'CONVERT_BLOCK_TO_SHARED':
+			const { uid } = action;
+			if ( uid === state ) {
+				return null;
+			}
+			break;
+
+		case 'REPLACE_BLOCKS':
+		case 'REMOVE_BLOCKS':
+			const { uids } = action;
+			if ( includes( uids, state ) ) {
+				return null;
+			}
+			break;
 	}
 
 	return state;
@@ -600,6 +770,46 @@ export function isInsertionPointVisible( state = false, action ) {
 }
 
 /**
+ * Reducer returning whether the post blocks match the defined template or not.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function template( state = { isValid: true }, action ) {
+	switch ( action.type ) {
+		case 'SET_TEMPLATE_VALIDITY':
+			return {
+				...state,
+				isValid: action.isValid,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the editor setting.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_EDITOR_SETTINGS':
+			return {
+				...state,
+				...action.settings,
+			};
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the user preferences.
  *
  * @param {Object}  state                 Current state.
@@ -613,27 +823,32 @@ export function isInsertionPointVisible( state = false, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
+		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
+				let id = block.name;
 				const insert = { name: block.name };
-				if ( isReusableBlock( block ) ) {
+				if ( isSharedBlock( block ) ) {
 					insert.ref = block.attributes.ref;
+					id += '/' + block.attributes.ref;
 				}
-
-				const isSameAsInsert = ( { name, ref } ) => name === insert.name && ref === insert.ref;
 
 				return {
 					...prevState,
-					recentInserts: [
-						insert,
-						...reject( prevState.recentInserts, isSameAsInsert ),
-					],
+					insertUsage: {
+						...prevState.insertUsage,
+						[ id ]: {
+							time: action.time,
+							count: prevState.insertUsage[ id ] ? prevState.insertUsage[ id ].count + 1 : 1,
+							insert,
+						},
+					},
 				};
 			}, state );
 
-		case 'REMOVE_REUSABLE_BLOCK':
+		case 'REMOVE_SHARED_BLOCK':
 			return {
 				...state,
-				recentInserts: reject( state.recentInserts, insert => insert.ref === action.id ),
+				insertUsage: omitBy( state.insertUsage, ( { insert } ) => insert.ref === action.id ),
 			};
 	}
 
@@ -700,119 +915,60 @@ export function notices( state = [], action ) {
 	return state;
 }
 
-const locations = [
-	'normal',
-	'side',
-	'advanced',
-];
-
-const defaultMetaBoxState = locations.reduce( ( result, key ) => {
-	result[ key ] = {
-		isActive: false,
-	};
-
-	return result;
-}, {} );
-
-/**
- * Reducer keeping track of the meta boxes isSaving state.
- * A "true" value means the meta boxes saving request is in-flight.
- *
- *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
- * @return {Object}         Updated state.
- */
-export function isSavingMetaBoxes( state = false, action ) {
-	switch ( action.type ) {
-		case 'REQUEST_META_BOX_UPDATES':
-			return true;
-		case 'META_BOX_UPDATES_SUCCESS':
-			return false;
-		default:
-			return state;
-	}
-}
-
-/**
- * Reducer keeping track of the state of each meta box location.
- * This includes:
- *  - isActive: Whether the location is active or not.
- *  - data: The last saved form data for this location.
- *    This is used to check whether the form is dirty
- *    before leaving the page.
- *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
- * @return {Object}         Updated state.
- */
-export function metaBoxes( state = defaultMetaBoxState, action ) {
-	switch ( action.type ) {
-		case 'INITIALIZE_META_BOX_STATE':
-			return locations.reduce( ( newState, location ) => {
-				newState[ location ] = {
-					...state[ location ],
-					isActive: action.metaBoxes[ location ],
-				};
-				return newState;
-			}, { ...state } );
-		case 'META_BOX_SET_SAVED_DATA':
-			return locations.reduce( ( newState, location ) => {
-				newState[ location ] = {
-					...state[ location ],
-					data: action.dataPerLocation[ location ],
-				};
-				return newState;
-			}, { ...state } );
-		default:
-			return state;
-	}
-}
-
-export const reusableBlocks = combineReducers( {
+export const sharedBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
-			case 'FETCH_REUSABLE_BLOCKS_SUCCESS': {
-				return reduce( action.reusableBlocks, ( newState, reusableBlock ) => ( {
-					...newState,
-					[ reusableBlock.id ]: reusableBlock,
-				} ), state );
+			case 'RECEIVE_SHARED_BLOCKS': {
+				return reduce( action.results, ( nextState, result ) => {
+					const { id, title } = result.sharedBlock;
+					const { uid } = result.parsedBlock;
+
+					const value = { uid, title };
+
+					if ( ! isEqual( nextState[ id ], value ) ) {
+						if ( nextState === state ) {
+							nextState = { ...nextState };
+						}
+
+						nextState[ id ] = value;
+					}
+
+					return nextState;
+				}, state );
 			}
 
-			case 'UPDATE_REUSABLE_BLOCK': {
-				const { id, reusableBlock } = action;
-				const existingReusableBlock = state[ id ];
+			case 'UPDATE_SHARED_BLOCK_TITLE': {
+				const { id, title } = action;
+
+				if ( ! state[ id ] || state[ id ].title === title ) {
+					return state;
+				}
 
 				return {
 					...state,
 					[ id ]: {
-						...existingReusableBlock,
-						...reusableBlock,
-						attributes: {
-							...( existingReusableBlock && existingReusableBlock.attributes ),
-							...reusableBlock.attributes,
-						},
+						...state[ id ],
+						title,
 					},
 				};
 			}
 
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
+			case 'SAVE_SHARED_BLOCK_SUCCESS': {
 				const { id, updatedId } = action;
 
-				// If a temporary reusable block is saved, we swap the temporary id with the final one
+				// If a temporary shared block is saved, we swap the temporary id with the final one
 				if ( id === updatedId ) {
 					return state;
 				}
+
+				const value = state[ id ];
 				return {
 					...omit( state, id ),
-					[ updatedId ]: {
-						...omit( state[ id ], [ 'id', 'isTemporary' ] ),
-						id: updatedId,
-					},
+					[ updatedId ]: value,
 				};
 			}
 
-			case 'REMOVE_REUSABLE_BLOCK': {
+			case 'REMOVE_SHARED_BLOCK': {
 				const { id } = action;
 				return omit( state, id );
 			}
@@ -823,7 +979,7 @@ export const reusableBlocks = combineReducers( {
 
 	isFetching( state = {}, action ) {
 		switch ( action.type ) {
-			case 'FETCH_REUSABLE_BLOCKS': {
+			case 'FETCH_SHARED_BLOCKS': {
 				const { id } = action;
 				if ( ! id ) {
 					return state;
@@ -835,8 +991,8 @@ export const reusableBlocks = combineReducers( {
 				};
 			}
 
-			case 'FETCH_REUSABLE_BLOCKS_SUCCESS':
-			case 'FETCH_REUSABLE_BLOCKS_FAILURE': {
+			case 'FETCH_SHARED_BLOCKS_SUCCESS':
+			case 'FETCH_SHARED_BLOCKS_FAILURE': {
 				const { id } = action;
 				return omit( state, id );
 			}
@@ -847,14 +1003,14 @@ export const reusableBlocks = combineReducers( {
 
 	isSaving( state = {}, action ) {
 		switch ( action.type ) {
-			case 'SAVE_REUSABLE_BLOCK':
+			case 'SAVE_SHARED_BLOCK':
 				return {
 					...state,
 					[ action.id ]: true,
 				};
 
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS':
-			case 'SAVE_REUSABLE_BLOCK_FAILURE': {
+			case 'SAVE_SHARED_BLOCK_SUCCESS':
+			case 'SAVE_SHARED_BLOCK_FAILURE': {
 				const { id } = action;
 				return omit( state, id );
 			}
@@ -864,18 +1020,55 @@ export const reusableBlocks = combineReducers( {
 	},
 } );
 
+/**
+ * Reducer that for each block uid stores an object that represents its nested settings.
+ * E.g: what blocks can be nested inside a block.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const blockListSettings = ( state = {}, action ) => {
+	switch ( action.type ) {
+		// even if the replaced blocks have the same uid our logic should correct the state.
+		case 'REPLACE_BLOCKS' :
+		case 'REMOVE_BLOCKS': {
+			return omit( state, action.uids );
+		}
+		case 'UPDATE_BLOCK_LIST_SETTINGS': {
+			const { id } = action;
+			if ( id && ! action.settings ) {
+				return omit( state, id );
+			}
+			const blockSettings = state[ id ];
+			const updateIsRequired = ! isEqual( blockSettings, action.settings );
+			if ( updateIsRequired ) {
+				return {
+					...state,
+					[ id ]: {
+						...action.settings,
+					},
+				};
+			}
+		}
+	}
+	return state;
+};
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
 	isTyping,
 	blockSelection,
-	hoveredBlock,
+	provisionalBlockUID,
 	blocksMode,
+	blockListSettings,
 	isInsertionPointVisible,
 	preferences,
 	saving,
 	notices,
-	metaBoxes,
-	isSavingMetaBoxes,
-	reusableBlocks,
+	sharedBlocks,
+	template,
+	settings,
 } ) );

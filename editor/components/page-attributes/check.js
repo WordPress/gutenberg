@@ -1,22 +1,15 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { get, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { withAPIData, withContext } from '@wordpress/components';
-import { compose } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { getCurrentPostType } from '../../store/selectors';
+import { withSelect } from '@wordpress/data';
 
 export function PageAttributesCheck( { availableTemplates, postType, children } ) {
-	const supportsPageAttributes = get( postType, 'data.supports.page-attributes', false );
+	const supportsPageAttributes = get( postType, [ 'supports', 'page-attributes' ], false );
 
 	// Only render fields if post type supports page attributes or available templates exist.
 	if ( ! supportsPageAttributes && isEmpty( availableTemplates ) ) {
@@ -26,30 +19,12 @@ export function PageAttributesCheck( { availableTemplates, postType, children } 
 	return children;
 }
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			postTypeSlug: getCurrentPostType( state ),
-		};
-	}
-);
-
-const applyWithContext = withContext( 'editor' )(
-	( settings ) => ( {
-		availableTemplates: settings.availableTemplates,
-	} )
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postTypeSlug } = props;
-
+export default withSelect( ( select ) => {
+	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
+	const { getPostType } = select( 'core' );
+	const { availableTemplates } = getEditorSettings();
 	return {
-		postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
+		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		availableTemplates,
 	};
-} );
-
-export default compose( [
-	applyConnect,
-	applyWithAPIData,
-	applyWithContext,
-] )( PageAttributesCheck );
+} )( PageAttributesCheck );

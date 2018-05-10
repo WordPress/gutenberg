@@ -1,20 +1,24 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Slot } from '@wordpress/components';
-import { getBlockType, BlockIcon } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
+import { PanelBody } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import { getSelectedBlock, getSelectedBlockCount } from '../../store/selectors';
+import SkipToSelectedBlock from '../skip-to-selected-block';
+import BlockIcon from '../block-icon';
+import InspectorControls from '../inspector-controls';
+import InspectorAdvancedControls from '../inspector-advanced-controls';
 
 const BlockInspector = ( { selectedBlock, count } ) => {
 	if ( count > 1 ) {
@@ -37,15 +41,28 @@ const BlockInspector = ( { selectedBlock, count } ) => {
 				<div className="editor-block-inspector__card-description">{ blockType.description }</div>
 			</div>
 		</div>,
-		<Slot name="Inspector.Controls" key="inspector-controls" />,
+		<InspectorControls.Slot key="inspector-controls" />,
+		<InspectorAdvancedControls.Slot key="inspector-advanced-controls">
+			{ ( fills ) => ! isEmpty( fills ) && (
+				<PanelBody
+					className="editor-block-inspector__advanced"
+					title={ __( 'Advanced' ) }
+					initialOpen={ false }
+				>
+					{ fills }
+				</PanelBody>
+			) }
+		</InspectorAdvancedControls.Slot>,
+		<SkipToSelectedBlock key="back" />,
 	];
 };
 
-export default connect(
-	( state ) => {
+export default withSelect(
+	( select ) => {
+		const { getSelectedBlock, getSelectedBlockCount } = select( 'core/editor' );
 		return {
-			selectedBlock: getSelectedBlock( state ),
-			count: getSelectedBlockCount( state ),
+			selectedBlock: getSelectedBlock(),
+			count: getSelectedBlockCount(),
 		};
 	}
 )( BlockInspector );

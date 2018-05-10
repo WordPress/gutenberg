@@ -1,7 +1,9 @@
 Keyboard Shortcuts
 ==================
 
-`<KeyboardShortcuts />` is a component which renders no children of its own, but instead handles keyboard sequences during the lifetime of the rendering element.
+`<KeyboardShortcuts />` is a component which handles keyboard sequences during the lifetime of the rendering element.
+
+When passed children, it will capture key events which occur on or within the children. If no children are passed, events are captured on the document.
 
 It uses the [Mousetrap](https://craig.is/killing/mice) library to implement keyboard sequence bindings.
 
@@ -39,6 +41,13 @@ class SelectAllDetection extends Component {
 ## Props
 
 The component accepts the following props:
+
+### children
+
+Elements to render, upon whom key events are to be monitored.
+
+- Type: `Element` | `Element[]`
+- Required: No
 
 ### shortcuts
 
