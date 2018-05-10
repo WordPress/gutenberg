@@ -28,7 +28,6 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { editorMediaUpload } from '@wordpress/blocks';
 import {
 	RichText,
 	BlockControls,
@@ -37,6 +36,7 @@ import {
 	MediaUpload,
 	BlockAlignmentToolbar,
 	UrlInputButton,
+	editorMediaUpload,
 } from '@wordpress/editor';
 
 /**

@@ -14,12 +14,12 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
-import { editorMediaUpload } from '@wordpress/blocks';
 import {
 	BlockAlignmentToolbar,
 	BlockControls,
 	MediaUpload,
 	RichText,
+	editorMediaUpload,
 } from '@wordpress/editor';
 
 /**
