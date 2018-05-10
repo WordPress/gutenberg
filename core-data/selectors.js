@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * Returns all the available terms for the given taxonomy.
  *
  * @param {Object} state    Data state.
@@ -47,25 +52,51 @@ export function isRequestingCategories( state ) {
 }
 
 /**
- * Returns the media object by id.
+ * Returns all available authors.
  *
  * @param {Object} state Data state.
- * @param {number} id    Media id.
  *
- * @return {Object?}     Media object.
+ * @return {Array} Authors list.
  */
-export function getMedia( state, id ) {
-	return state.media[ id ];
+export function getAuthors( state ) {
+	return getUserQueryResults( state, 'authors' );
 }
 
 /**
- * Returns the Post Type object by slug.
+ * Returns all the users returned by a query ID.
+ *
+ * @param {Object} state   Data state.
+ * @param {string} queryID Query ID.
+ *
+ * @return {Array} Users list.
+ */
+export function getUserQueryResults( state, queryID ) {
+	const queryResults = state.users.queries[ queryID ];
+
+	return map( queryResults, ( id ) => state.users.byId[ id ] );
+}
+
+/**
+ * Returns the Entity's record object by key.
+ *
+ * @param {Object} state  State tree
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {number} key    Record's key
+ *
+ * @return {Object?} Record.
+ */
+export function getEntityRecord( state, kind, name, key ) {
+	return state.entities[ kind ][ name ].byKey[ key ];
+}
+
+/**
+ * Return theme suports data in the index.
  *
  * @param {Object} state Data state.
- * @param {number} slug  Post Type slug.
  *
- * @return {Object?}     Post Type object.
+ * @return {*}           Index data.
  */
-export function getPostType( state, slug ) {
-	return state.postTypes[ slug ];
+export function getThemeSupports( state ) {
+	return state.themeSupports;
 }

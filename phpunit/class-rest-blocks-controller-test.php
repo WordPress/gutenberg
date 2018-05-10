@@ -59,7 +59,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Check that our routes get set up properly.
 	 */
 	public function test_register_routes() {
-		$routes = $this->server->get_routes();
+		$routes = rest_get_server()->get_routes();
 
 		$this->assertArrayHasKey( '/wp/v2/blocks', $routes );
 		$this->assertCount( 2, $routes['/wp/v2/blocks'] );
@@ -74,7 +74,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_set_current_user( self::$user_id );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/blocks' );
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals(
@@ -95,7 +95,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_set_current_user( self::$user_id );
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/blocks/' . self::$post_id );
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertEquals(
@@ -121,7 +121,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 
@@ -150,7 +150,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 
@@ -173,7 +173,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$request = new WP_REST_Request( 'DELETE', '/wp/v2/blocks/' . self::$post_id );
 
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertEquals( 200, $response->get_status() );
 
@@ -198,7 +198,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_get_item_schema() {
 		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/blocks' );
-		$response   = $this->server->dispatch( $request );
+		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
@@ -258,7 +258,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					)
 				);
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				break;
@@ -266,7 +266,7 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			case 'read':
 				$request = new WP_REST_Request( 'GET', '/wp/v2/blocks/' . self::$post_id );
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				break;
@@ -290,12 +290,12 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					)
 				);
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				$request = new WP_REST_Request( 'DELETE', '/wp/v2/blocks/' . $post_id );
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				wp_delete_post( $post_id );
@@ -311,12 +311,12 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					)
 				);
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				$request = new WP_REST_Request( 'DELETE', '/wp/v2/blocks/' . self::$post_id );
 
-				$response = $this->server->dispatch( $request );
+				$response = rest_get_server()->dispatch( $request );
 				$this->assertEquals( $expected_status, $response->get_status() );
 
 				break;

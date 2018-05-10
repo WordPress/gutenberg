@@ -11,7 +11,7 @@ export {
 	getBlockAttributes,
 	parseWithAttributeSchema,
 } from './parser';
-export { default as rawHandler } from './raw-handling';
+export { default as rawHandler, getPhrasingContentSchema } from './raw-handling';
 export {
 	default as serialize,
 	getBlockContent,

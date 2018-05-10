@@ -282,7 +282,7 @@ function gutenberg_can_edit_post( $post ) {
  * @since 1.5.2
  *
  * @param string $post_type The post type.
- * @return bool Wehther the post type can be edited with Gutenberg.
+ * @return bool Whether the post type can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post_type( $post_type ) {
 	$can_edit = true;
@@ -342,6 +342,21 @@ function gutenberg_post_has_blocks( $post ) {
  */
 function gutenberg_content_has_blocks( $content ) {
 	return false !== strpos( $content, '<!-- wp:' );
+}
+
+/**
+ * Returns the current version of the block format that the content string is using.
+ *
+ * If the string doesn't contain blocks, it returns 0.
+ *
+ * @since 2.8.0
+ * @see gutenberg_content_has_blocks()
+ *
+ * @param string $content Content to test.
+ * @return int The block format version.
+ */
+function gutenberg_content_block_version( $content ) {
+	return gutenberg_content_has_blocks( $content ) ? 1 : 0;
 }
 
 /**
@@ -430,46 +445,6 @@ function gutenberg_register_post_types() {
 	}
 }
 add_action( 'init', 'gutenberg_register_post_types' );
-
-/**
- * Gets revisions details for the selected post.
- *
- * @since 1.6.0
- *
- * @param array $post The post object from the response.
- * @return array|null Revisions details or null when no revisions present.
- */
-function gutenberg_get_post_revisions( $post ) {
-	$revisions       = wp_get_post_revisions( $post['id'] );
-	$revisions_count = count( $revisions );
-	if ( 0 === $revisions_count ) {
-		return null;
-	}
-
-	$last_revision = array_shift( $revisions );
-
-	return array(
-		'count'   => $revisions_count,
-		'last_id' => $last_revision->ID,
-	);
-}
-
-/**
- * Adds the custom field `revisions` to the REST API response of post.
- *
- * TODO: This is a temporary solution. Next step would be to find a solution that is limited to the editor.
- *
- * @since 1.6.0
- */
-function gutenberg_register_rest_api_post_revisions() {
-	register_rest_field( get_post_types( '', 'names' ),
-		'revisions',
-		array(
-			'get_callback' => 'gutenberg_get_post_revisions',
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
 
 /**
  * Injects a hidden input in the edit form to propagate the information that classic editor is selected.

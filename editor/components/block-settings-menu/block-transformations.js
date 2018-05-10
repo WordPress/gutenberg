@@ -8,7 +8,7 @@ import { noop } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
-import { getPossibleBlockTransformations, switchToBlockType, withEditorSettings } from '@wordpress/blocks';
+import { getPossibleBlockTransformations, switchToBlockType } from '@wordpress/blocks';
 import { compose, Fragment } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -51,9 +51,12 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 	);
 }
 export default compose( [
-	withSelect( ( select, ownProps ) => {
+	withSelect( ( select, { uids } ) => {
+		const { getEditorSettings, getBlocksByUID } = select( 'core/editor' );
+		const { templateLock } = getEditorSettings();
 		return {
-			blocks: ownProps.uids.map( ( uid ) => select( 'core/editor' ).getBlock( uid ) ),
+			isLocked: !! templateLock,
+			blocks: getBlocksByUID( uids ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
@@ -64,11 +67,4 @@ export default compose( [
 			);
 		},
 	} ) ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock } = settings;
-
-		return {
-			isLocked: !! templateLock,
-		};
-	} ),
 ] )( BlockTransformations );

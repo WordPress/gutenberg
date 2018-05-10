@@ -17,14 +17,12 @@ import {
 	placeCaretAtVerticalEdge,
 } from '@wordpress/utils';
 import {
-	BlockEdit,
 	createBlock,
 	cloneBlock,
 	getBlockType,
 	getSaveElement,
 	isSharedBlock,
 	isUnmodifiedDefaultBlock,
-	withEditorSettings,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -34,6 +32,7 @@ import { withViewportMatch } from '@wordpress/viewport';
 /**
  * Internal dependencies
  */
+import BlockEdit from '../block-edit';
 import BlockMover from '../block-mover';
 import BlockDropZone from '../block-drop-zone';
 import BlockSettingsMenu from '../block-settings-menu';
@@ -76,6 +75,7 @@ export class BlockListBlock extends Component {
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
+		this.createInnerBlockList = this.createInnerBlockList.bind( this );
 		this.hadTouchStart = false;
 
 		this.state = {
@@ -83,6 +83,11 @@ export class BlockListBlock extends Component {
 			dragging: false,
 			isHovered: false,
 		};
+	}
+
+	createInnerBlockList( uid ) {
+		const { renderBlockMenu } = this.props;
+		return createInnerBlockList( uid, renderBlockMenu );
 	}
 
 	/**
@@ -96,10 +101,7 @@ export class BlockListBlock extends Component {
 		// is defined in `@wordpress/blocks`, so to avoid a circular dependency
 		// we inject this function via context.
 		return {
-			createInnerBlockList: ( uid ) => {
-				const { renderBlockMenu } = this.props;
-				return createInnerBlockList( uid, renderBlockMenu );
-			},
+			createInnerBlockList: this.createInnerBlockList,
 		};
 	}
 
@@ -423,11 +425,11 @@ export class BlockListBlock extends Component {
 		// Empty paragraph blocks should always show up as unselected.
 		const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( block );
 		const isSelectedNotTyping = isSelected && ! isTypingWithinBlock;
-		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
-		const shouldAppearSelected = ! showSideInserter && isSelectedNotTyping;
+		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
+		const shouldAppearSelected = ! showEmptyBlockSideInserter && isSelectedNotTyping;
 		// We render block movers and block settings to keep them tabbale even if hidden
-		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
-		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! showSideInserter && ! isMultiSelecting && ! isMultiSelected;
+		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
+		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
 		const shouldShowBreadcrumb = isHovered;
 		const shouldShowContextualToolbar = shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
@@ -520,7 +522,7 @@ export class BlockListBlock extends Component {
 				/>
 				{ shouldRenderMovers && (
 					<BlockMover
-						uids={ [ uid ] }
+						uids={ uid }
 						rootUID={ rootUID }
 						layout={ layout }
 						isFirst={ isFirst }
@@ -530,7 +532,7 @@ export class BlockListBlock extends Component {
 				) }
 				{ shouldRenderBlockSettings && (
 					<BlockSettingsMenu
-						uids={ [ uid ] }
+						uids={ uid }
 						rootUID={ rootUID }
 						renderBlockMenu={ renderBlockMenu }
 						isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'right' }
@@ -585,10 +587,10 @@ export class BlockListBlock extends Component {
 					) }
 				</IgnoreNestedEvents>
 				{ !! error && <BlockCrashWarning /> }
-				{ showSideInserter && (
+				{ showEmptyBlockSideInserter && (
 					<Fragment>
 						<div className="editor-block-list__side-inserter">
-							<InserterWithShortcuts uid={ uid } layout={ layout } onToggle={ this.selectOnOpen } />
+							<InserterWithShortcuts uid={ uid } rootUID={ rootUID } layout={ layout } onToggle={ this.selectOnOpen } />
 						</div>
 						<div className="editor-block-list__empty-block-inserter">
 							<Inserter
@@ -620,8 +622,11 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled,
 		getSelectedBlocksInitialCaretPosition,
 		getBlockSelectionEnd,
+		getEditorSettings,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( uid );
+	const { templateLock, hasFixedToolbar } = getEditorSettings();
+
 	return {
 		previousBlockUid: getPreviousBlockUid( uid ),
 		nextBlockUid: getNextBlockUid( uid ),
@@ -639,6 +644,8 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isSelected,
+		isLocked: !! templateLock,
+		hasFixedToolbar,
 	};
 } );
 
@@ -696,14 +703,6 @@ export default compose(
 	applyWithSelect,
 	applyWithDispatch,
 	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock } = settings;
-
-		return {
-			isLocked: !! templateLock,
-			hasFixedToolbar: settings.hasFixedToolbar,
-		};
-	} ),
 	withFilters( 'editor.BlockListBlock' ),
-	withHoverAreas
+	withHoverAreas,
 )( BlockListBlock );

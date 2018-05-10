@@ -93,3 +93,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @thrijith |
 | @Cloud887 |
 | @hblackett |
+| @vishalkakadiya |

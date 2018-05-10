@@ -1,99 +1,20 @@
 /**
  * External dependencies
  */
-import { equal, deepEqual } from 'assert';
+import { equal } from 'assert';
 
 /**
  * Internal dependencies
  */
 import rawHandler from '../index';
-import { registerBlockType, unregisterBlockType, setUnknownTypeHandlerName } from '../../registration';
-import { createBlock } from '../../factory';
 import { getBlockContent } from '../../serializer';
+import { registerCoreBlocks } from '../../../../core-blocks';
 
 describe( 'rawHandler', () => {
-	it( 'should convert recognised raw content', () => {
-		registerBlockType( 'test/figure', {
-			category: 'common',
-			title: 'test figure',
-			attributes: {
-				content: {
-					type: 'array',
-					source: 'children',
-					selector: 'figure',
-				},
-			},
-			transforms: {
-				from: [
-					{
-						type: 'raw',
-						isMatch: ( node ) => node.nodeName === 'FIGURE',
-					},
-				],
-			},
-			save: () => {},
-		} );
-
-		const block = rawHandler( { HTML: '<figure>test</figure>' } )[ 0 ];
-		const { name, attributes } = createBlock( 'test/figure', { content: [ 'test' ] } );
-
-		equal( block.name, name );
-		deepEqual( block.attributes, attributes );
-
-		unregisterBlockType( 'test/figure' );
-	} );
-
-	it( 'should handle unknown raw content', () => {
-		registerBlockType( 'test/unknown', {
-			category: 'common',
-			title: 'test unknown',
-			attributes: {
-				content: {
-					type: 'string',
-					source: 'property',
-					property: 'innerHTML',
-				},
-			},
-			save: () => {},
-		} );
-		setUnknownTypeHandlerName( 'test/unknown' );
-
-		const block = rawHandler( { HTML: '<figcaption>test</figcaption>' } )[ 0 ];
-
-		equal( block.name, 'test/unknown' );
-		equal( block.attributes.content, '<figcaption>test</figcaption>' );
-
-		unregisterBlockType( 'test/unknown' );
-		setUnknownTypeHandlerName( undefined );
-	} );
-
-	it( 'should handle raw content with transform', () => {
-		registerBlockType( 'test/transform', {
-			category: 'common',
-			title: 'test figure',
-			attributes: {
-				content: {
-					type: 'array',
-				},
-			},
-			transforms: {
-				from: [
-					{
-						type: 'raw',
-						isMatch: ( node ) => node.nodeName === 'FIGURE',
-						transform: ( node ) => createBlock( 'test/transform', { content: node.nodeName } ),
-					},
-				],
-			},
-			save: () => {},
-		} );
-
-		const block = rawHandler( { HTML: '<figure>test</figure>' } )[ 0 ];
-
-		equal( block.name, 'test/transform' );
-		equal( block.attributes.content, 'FIGURE' );
-
-		unregisterBlockType( 'test/transform' );
+	beforeAll( () => {
+		// Load all hooks that modify blocks
+		require( 'editor/hooks' );
+		registerCoreBlocks();
 	} );
 
 	it( 'should filter inline content', () => {
@@ -133,6 +54,25 @@ describe( 'rawHandler', () => {
 		} ).map( getBlockContent ).join( '' );
 
 		equal( filtered, '<p>Some <strong>bold</strong> text.</p>' );
+	} );
+
+	it( 'should parse Markdown with HTML', () => {
+		const filtered = rawHandler( {
+			HTML: '',
+			plainText: '# Some <em>heading</em>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		equal( filtered, '<h1>Some <em>heading</em></h1>' );
+	} );
+
+	it( 'should break up forced inline content', () => {
+		const filtered = rawHandler( {
+			HTML: '<p>test</p><p>test</p>',
+			mode: 'INLINE',
+		} );
+
+		equal( filtered, 'test<br>test' );
 	} );
 } );
 

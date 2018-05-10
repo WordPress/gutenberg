@@ -13,7 +13,6 @@ import { Component, compose } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { KeyboardShortcuts, withInstanceId, withFocusOutside } from '@wordpress/components';
-import { withEditorSettings } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -125,13 +124,15 @@ class PostTitle extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
+	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
 	const postType = getPostType( getEditedPostAttribute( 'type' ) );
+	const { titlePlaceholder } = getEditorSettings();
 
 	return {
 		title: getEditedPostAttribute( 'title' ),
 		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
+		placeholder: titlePlaceholder,
 	};
 } );
 
@@ -157,16 +158,9 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-const applyEditorSettings = withEditorSettings(
-	( settings ) => ( {
-		placeholder: settings.titlePlaceholder,
-	} )
-);
-
 export default compose(
 	applyWithSelect,
 	applyWithDispatch,
-	applyEditorSettings,
 	withInstanceId,
 	withFocusOutside
 )( PostTitle );

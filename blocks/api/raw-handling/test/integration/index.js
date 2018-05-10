@@ -8,7 +8,7 @@ import path from 'path';
 /**
  * Internal dependencies
  */
-import { registerCoreBlocks } from '../../../../library';
+import { registerCoreBlocks } from '../../../../../core-blocks';
 import rawHandler from '../../index';
 import serialize from '../../../serializer';
 
@@ -23,23 +23,30 @@ const types = [
 	'iframe-embed',
 	'one-image',
 	'two-images',
+	'markdown',
+	'wordpress',
 ];
+
+function readFile( filePath ) {
+	return fs.existsSync( filePath ) ? fs.readFileSync( filePath, 'utf8' ).trim() : '';
+}
 
 describe( 'raw handling: integration', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		require( 'editor/hooks' );
 		registerCoreBlocks();
 	} );
 
 	types.forEach( ( type ) => {
 		it( type, () => {
-			const input = fs.readFileSync( path.join( __dirname, `${ type }-in.html` ), 'utf8' ).trim();
-			const output = fs.readFileSync( path.join( __dirname, `${ type }-out.html` ), 'utf8' ).trim();
-			const converted = rawHandler( { HTML: input, canUserUseUnfilteredHTML: true } );
+			const HTML = readFile( path.join( __dirname, `${ type }-in.html` ) );
+			const plainText = readFile( path.join( __dirname, `${ type }-in.txt` ) );
+			const output = readFile( path.join( __dirname, `${ type }-out.html` ) );
+			const converted = rawHandler( { HTML, plainText, canUserUseUnfilteredHTML: true } );
 			const serialized = typeof converted === 'string' ? converted : serialize( converted );
 
-			equal( output, serialized );
+			equal( serialized, output );
 		} );
 	} );
 } );

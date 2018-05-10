@@ -23,12 +23,14 @@ import {
 	setUnknownTypeHandlerName,
 } from '../registration';
 import { createBlock } from '../';
-import InnerBlocks from '../../inner-blocks';
+
+// Todo: move the test to the inner-blocks folder
+import InnerBlocks from '../../../editor/components/inner-blocks';
 
 describe( 'block serializer', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		require( 'editor/hooks' );
 	} );
 
 	afterEach( () => {

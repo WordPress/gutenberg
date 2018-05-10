@@ -1,12 +1,17 @@
 /**
  * External dependencies
  */
-import { keyBy } from 'lodash';
+import { keyBy, map, groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import entitiesConfig from './entities';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -43,19 +48,25 @@ export function terms( state = {}, action ) {
 }
 
 /**
- * Reducer managing media state. Keyed by id.
+ * Reducer managing authors state. Keyed by id.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function media( state = {}, action ) {
+export function users( state = { byId: {}, queries: {} }, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_MEDIA':
+		case 'RECEIVE_USER_QUERY':
 			return {
-				...state,
-				...keyBy( action.media, 'id' ),
+				byId: {
+					...state.byId,
+					...keyBy( action.users, 'id' ),
+				},
+				queries: {
+					...state.queries,
+					[ action.queryID ]: map( action.users, ( user ) => user.id ),
+				},
 			};
 	}
 
@@ -63,27 +74,78 @@ export function media( state = {}, action ) {
 }
 
 /**
- * Reducer managing post types state. Keyed by slug.
+ * Reducer managing theme supports data.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function postTypes( state = {}, action ) {
+export function themeSupports( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_POST_TYPES':
+		case 'RECEIVE_THEME_SUPPORTS':
 			return {
 				...state,
-				...keyBy( action.postTypes, 'slug' ),
+				...action.themeSupports,
 			};
 	}
 
 	return state;
 }
 
+/**
+ * Higher Order Reducer for a given entity config. It supports:
+ *
+ *  - Fetching a record by primariy key
+ *
+ * @param {Object} entityConfig  Entity config.
+ *
+ * @return {Function} Reducer.
+ */
+function entity( entityConfig ) {
+	const key = entityConfig.key || 'id';
+
+	return ( state = { byKey: {} }, action ) => {
+		if (
+			! action.name ||
+			! action.kind ||
+			action.name !== entityConfig.name ||
+			action.kind !== entityConfig.kind
+		) {
+			return state;
+		}
+
+		switch ( action.type ) {
+			case 'RECEIVE_ENTITY_RECORDS':
+				return {
+					byKey: {
+						...state.key,
+						...keyBy( action.records, key ),
+					},
+				};
+			default:
+				return state;
+		}
+	};
+}
+
+const entitiesByKind = groupBy( entitiesConfig, 'kind' );
+export const entities = combineReducers( Object.entries( entitiesByKind ).reduce( ( memo, [ kind, subEntities ] ) => {
+	const kindReducer = combineReducers( subEntities.reduce(
+		( kindMemo, entityConfig ) => ( {
+			...kindMemo,
+			[ entityConfig.name ]: entity( entityConfig ),
+		} ),
+		{}
+	) );
+
+	memo[ kind ] = kindReducer;
+	return memo;
+}, {} ) );
+
 export default combineReducers( {
 	terms,
-	media,
-	postTypes,
+	users,
+	themeSupports,
+	entities,
 } );
