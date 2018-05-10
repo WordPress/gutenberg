@@ -9,11 +9,7 @@ import { get, isFunction, some } from 'lodash';
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
-import { getCategories } from './categories';
+import { select, dispatch } from '@wordpress/data';
 
 /**
  * Defined behavior of a block type.
@@ -39,15 +35,6 @@ import { getCategories } from './categories';
  * @property {WPComponent}        edit       Component rendering element to be
  *                                           interacted with in an editor.
  */
-
-/**
- * Block type definitions keyed by block name.
- *
- * @type {Object.<string,WPBlockType>}
- */
-const blocks = {};
-
-const categories = getCategories();
 
 /**
  * Name of block handling unknown types.
@@ -106,7 +93,7 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( blocks[ name ] ) {
+	if ( select( 'core/blocks' ).getBlockType( name ) ) {
 		console.error(
 			'Block "' + name + '" is already registered.'
 		);
@@ -139,7 +126,10 @@ export function registerBlockType( name, settings ) {
 		);
 		return;
 	}
-	if ( 'category' in settings && ! some( categories, { slug: settings.category } ) ) {
+	if (
+		'category' in settings &&
+		! some( select( 'core/blocks' ).getCategories(), { slug: settings.category } )
+	) {
 		console.error(
 			'The block "' + name + '" must have a registered category.'
 		);
@@ -161,7 +151,9 @@ export function registerBlockType( name, settings ) {
 		settings.icon = 'block-default';
 	}
 
-	return blocks[ name ] = settings;
+	dispatch( 'core/blocks' ).addBlockTypes( settings );
+
+	return settings;
 }
 
 /**
@@ -173,14 +165,14 @@ export function registerBlockType( name, settings ) {
  *                     unregistered; otherwise `undefined`.
  */
 export function unregisterBlockType( name ) {
-	if ( ! blocks[ name ] ) {
+	const oldBlock = select( 'core/blocks' ).getBlockType( name );
+	if ( ! oldBlock ) {
 		console.error(
 			'Block "' + name + '" is not registered.'
 		);
 		return;
 	}
-	const oldBlock = blocks[ name ];
-	delete blocks[ name ];
+	dispatch( 'core/blocks' ).removeBlockTypes( name );
 	return oldBlock;
 }
 
@@ -243,7 +235,7 @@ export function getDefaultBlockForPostFormat( postFormat ) {
  * @return {?Object} Block type.
  */
 export function getBlockType( name ) {
-	return blocks[ name ];
+	return select( 'core/blocks' ).getBlockType( name );
 }
 
 /**
@@ -252,7 +244,7 @@ export function getBlockType( name ) {
  * @return {Array} Block settings.
  */
 export function getBlockTypes() {
-	return Object.values( blocks );
+	return select( 'core/blocks' ).getBlockTypes();
 }
 
 /**

@@ -31,6 +31,9 @@ describe( 'blocks', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
 		require( 'editor/hooks' );
+
+		// Initialize the block store
+		require( '../../store' );
 	} );
 
 	afterEach( () => {
