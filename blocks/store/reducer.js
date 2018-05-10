@@ -29,14 +29,35 @@ export const DEFAULT_CATEGORIES = [
  *
  * @return {Object} Updated state.
  */
-export function blockTypes( state = [], action ) {
+export function blockTypes( state = { types: [] }, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_TYPES':
 			const addedNames = map( action.blockTypes, ( blockType ) => blockType.name );
-			const previousState = filter( state, ( blockType ) => addedNames.indexOf( blockType.name ) === -1 );
-			return [ ...previousState, ...action.blockTypes ];
+			const previousState = filter(
+				state.types,
+				( blockType ) => addedNames.indexOf( blockType.name ) === -1
+			);
+			return {
+				...state,
+				types: [ ...previousState, ...action.blockTypes ],
+			};
 		case 'REMOVE_BLOCK_TYPES':
-			return filter( state, ( blockType ) => action.names.indexOf( blockType.name ) === -1 );
+			return {
+				...state,
+				types: filter( state.types, ( blockType ) => action.names.indexOf( blockType.name ) === -1 ),
+				defaultBlockType: action.names.indexOf( state.defaultBlockType ) !== -1 ? undefined : state.defaultBlockType,
+				fallbackBlockType: action.names.indexOf( state.fallbackBlockType ) !== -1 ? undefined : state.fallbackBlockType,
+			};
+		case 'SET_DEFAULT_BLOCK_TYPE':
+			return {
+				...state,
+				defaultBlockType: action.name,
+			};
+		case 'SET_FALLBACK_BLOCK_TYPE':
+			return {
+				...state,
+				fallbackBlockType: action.name,
+			};
 	}
 
 	return state;

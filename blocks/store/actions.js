@@ -30,3 +30,31 @@ export function removeBlockTypes( names ) {
 		names: castArray( names ),
 	};
 }
+
+/**
+ * Returns an action object used to set the default block type.
+ *
+ * @param {string} name Block name.
+ *
+ * @return {Object} Action object.
+ */
+export function setDefaultBlockType( name ) {
+	return {
+		type: 'SET_DEFAULT_BLOCK_TYPE',
+		name,
+	};
+}
+
+/**
+ * Returns an action object used to set the fallback block type.
+ *
+ * @param {string} name Block name.
+ *
+ * @return {Object} Action object.
+ */
+export function setFallbackBlockType( name ) {
+	return {
+		type: 'SET_FALLBACK_BLOCK_TYPE',
+		name,
+	};
+}

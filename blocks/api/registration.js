@@ -37,20 +37,6 @@ import { select, dispatch } from '@wordpress/data';
  */
 
 /**
- * Name of block handling unknown types.
- *
- * @type {?string}
- */
-let unknownTypeHandlerName;
-
-/**
- * Name of the default block.
- *
- * @type {?string}
- */
-let defaultBlockName;
-
-/**
  * Constant mapping post formats to the expected default block.
  *
  * @type {Object}
@@ -182,7 +168,7 @@ export function unregisterBlockType( name ) {
  * @param {string} name Block name.
  */
 export function setUnknownTypeHandlerName( name ) {
-	unknownTypeHandlerName = name;
+	dispatch( 'core/blocks' ).setFallbackBlockType( name );
 }
 
 /**
@@ -192,7 +178,7 @@ export function setUnknownTypeHandlerName( name ) {
  * @return {?string} Blog name.
  */
 export function getUnknownTypeHandlerName() {
-	return unknownTypeHandlerName;
+	return select( 'core/blocks' ).getFallbackBlockTypeName();
 }
 
 /**
@@ -201,7 +187,7 @@ export function getUnknownTypeHandlerName() {
  * @param {string} name Block name.
  */
 export function setDefaultBlockName( name ) {
-	defaultBlockName = name;
+	dispatch( 'core/blocks' ).setDefaultBlockType( name );
 }
 
 /**
@@ -210,7 +196,7 @@ export function setDefaultBlockName( name ) {
  * @return {?string} Block name.
  */
 export function getDefaultBlockName() {
-	return defaultBlockName;
+	return select( 'core/blocks' ).getDefaultBlockTypeName();
 }
 
 /**
