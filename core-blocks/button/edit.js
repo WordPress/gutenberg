@@ -142,7 +142,7 @@ class ButtonEdit extends Component {
 				</span>
 				{ isSelected && (
 					<form
-						className="blocks-button__inline-link"
+						className="core-blocks-button__inline-link"
 						onSubmit={ ( event ) => event.preventDefault() }>
 						<Dashicon icon="admin-links" />
 						<UrlInput

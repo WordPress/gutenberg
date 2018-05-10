@@ -240,14 +240,14 @@ class ImageEdit extends Component {
 							onChange={ this.updateImageURL }
 						/>
 					) }
-					<div className="blocks-image__dimensions">
-						<p className="blocks-image__dimensions__row">
+					<div className="core-blocks-image__dimensions">
+						<p className="core-blocks-image__dimensions__row">
 							{ __( 'Image Dimensions' ) }
 						</p>
-						<div className="blocks-image__dimensions__row">
+						<div className="core-blocks-image__dimensions__row">
 							<TextControl
 								type="number"
-								className="blocks-image__dimensions__width"
+								className="core-blocks-image__dimensions__width"
 								label={ __( 'Width' ) }
 								value={ width !== undefined ? width : '' }
 								placeholder={ imageWidth }
@@ -255,14 +255,14 @@ class ImageEdit extends Component {
 							/>
 							<TextControl
 								type="number"
-								className="blocks-image__dimensions__height"
+								className="core-blocks-image__dimensions__height"
 								label={ __( 'Height' ) }
 								value={ height !== undefined ? height : '' }
 								placeholder={ imageHeight }
 								onChange={ this.updateHeight }
 							/>
 						</div>
-						<div className="blocks-image__dimensions__row">
+						<div className="core-blocks-image__dimensions__row">
 							<ButtonGroup aria-label={ __( 'Image Size' ) }>
 								{ [ 25, 50, 75, 100 ].map( ( scale ) => {
 									const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
