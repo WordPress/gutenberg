@@ -69,7 +69,7 @@ export const getMethodName = ( kind, name, prefix = 'get', usePlural = false ) =
 export async function* getKindEntities( state, kind ) {
 	let entities = getEntitiesByKind( state, kind );
 
-	if ( entities ) {
+	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}
 
