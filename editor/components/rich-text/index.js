@@ -55,7 +55,7 @@ const { getSelection, Node } = window;
  * Module constants
  */
 
-const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
+const { LEFT, RIGHT, BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
 
 /**
  * Zero-width space character used by TinyMCE as a caret landing point for
@@ -524,9 +524,46 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Handles a horizontal navigation key down event to stop propagation if it
+	 * can be inferred that it will be handled by TinyMCE (notably transitions
+	 * out of an inline boundary node).
+	 *
+	 * @param {KeyboardEvent} event Keydown event.
+	 */
+	onHorizontalNavigationKeyDown( event ) {
+		const { focusNode, focusOffset } = window.getSelection();
+		const { nodeType, nodeValue } = focusNode;
+
+		if ( nodeType !== Node.TEXT_NODE ) {
+			return;
+		}
+
+		const isReverse = event.keyCode === LEFT;
+
+		let offset = focusOffset;
+		if ( isReverse ) {
+			offset--;
+		}
+
+		// [WORKAROUND]: When in a new paragraph in a new inline boundary node,
+		// while typing the zero-width space occurs as the first child instead
+		// of at the end of the inline boundary where the caret is. This should
+		// only be exempt when focusNode is not _only_ the ZWSP, which occurs
+		// when caret is placed on the right outside edge of inline boundary.
+		if ( ! isReverse && focusOffset === nodeValue.length &&
+				nodeValue.length > 1 && nodeValue[ 0 ] === TINYMCE_ZWSP ) {
+			offset = 0;
+		}
+
+		if ( nodeValue[ offset ] === TINYMCE_ZWSP ) {
+			event.stopPropagation();
+		}
+	}
+
+	/**
 	 * Handles a keydown event from tinyMCE.
 	 *
-	 * @param {KeydownEvent} event The keydow event as triggered by tinyMCE.
+	 * @param {KeyboardEvent} event Keydown event.
 	 */
 	onKeyDown( event ) {
 		const { keyCode } = event;
@@ -536,6 +573,11 @@ export class RichText extends Component {
 		const isDeleteKey = keyCode === BACKSPACE || keyCode === DELETE;
 		if ( isDeleteKey ) {
 			this.onDeleteKeyDown( event );
+		}
+
+		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
+		if ( isHorizontalNavigation ) {
+			this.onHorizontalNavigationKeyDown( event );
 		}
 
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
