@@ -246,6 +246,11 @@ EOT;
 			$this->markTestSkipped( 'The intl extension is not loaded. ResourceBundle not tested for is_countable().' );
 		}
 
+		if ( version_compare( PHP_VERSION, '5.4', '<' ) ) {
+			$this->markTestSkipped( 'ResourceBundle is only countable in PHP 5.4+' );
+			return;
+		}
+
 		$this->assertTrue( is_countable( new ResourceBundle( 'en', null ) ) );
 	}
 
