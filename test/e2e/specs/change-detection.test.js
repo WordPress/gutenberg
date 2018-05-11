@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+
+/**
  * Internal dependencies
  */
 import '../support/bootstrap';
@@ -51,6 +57,19 @@ describe( 'Change detection', () => {
 		page.removeListener( 'request', handleInterceptedRequest );
 		await page.setRequestInterception( false );
 	}
+
+	it( 'Should autosave post', async () => {
+		await page.type( '.editor-post-title__input', 'Hello World' );
+		const isSavingState = await page.waitForSelector( '.editor-post-saved-state.is-saving' );
+		const autosaveState = await ( await isSavingState.getProperty( 'innerText' ) ).jsonValue();
+
+		expect( autosaveState ).toBe( __( 'Autosaving' ) );
+
+		await page.waitForSelector( '.editor-post-saved-state.is-saved' );
+
+		// Still dirty after an autosave.
+		await assertIsDirty( true );
+	} );
 
 	it( 'Should not prompt to confirm unsaved changes', async () => {
 		await assertIsDirty( false );
