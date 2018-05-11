@@ -590,7 +590,7 @@ export function isTyping( state = false, action ) {
  * @param  {boolean} state  Current state.
  * @param  {Object}  action Dispatched action.
  *
- * @return {Boolean} Updated state.
+ * @return {boolean} Updated state.
  */
 export function isAutosaving( state = false, action ) {
 	switch ( action.type ) {
