@@ -22,11 +22,8 @@ function gutenberg_register_rest_routes() {
 	foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
 		$class = ! empty( $post_type->rest_controller_class ) ? $post_type->rest_controller_class : 'WP_REST_Posts_Controller';
 
-		if ( ! class_exists( $class ) ) {
-			continue;
-		}
-		$controller = new $class( $post_type->name );
-		if ( ! is_subclass_of( $controller, 'WP_REST_Controller' ) ) {
+		// Check if the class exists and is a subclass of WP_REST_Controller.
+		if ( ! is_subclass_of( $class, 'WP_REST_Controller' ) ) {
 			continue;
 		}
 
