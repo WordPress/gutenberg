@@ -14,8 +14,7 @@ import { RichText } from '@wordpress/editor';
  * Internal dependencies
  */
 import './style.scss';
-import './editor.scss';
-import ImageBlock from './block';
+import edit from './edit';
 
 export const name = 'core/image';
 
@@ -84,7 +83,7 @@ const schema = {
 export const settings = {
 	title: __( 'Image' ),
 
-	description: __( 'Worth a thousand words.' ),
+	description: __( 'They\'re worth 1,000 words! Insert a single image.' ),
 
 	icon: 'format-image',
 
@@ -180,7 +179,7 @@ export const settings = {
 		}
 	},
 
-	edit: ImageBlock,
+	edit,
 
 	save( { attributes } ) {
 		const { url, alt, caption, align, href, width, height, id } = attributes;

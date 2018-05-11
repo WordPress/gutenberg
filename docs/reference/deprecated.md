@@ -3,6 +3,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 ## 3.1.0
 
  - All components in `wp.blocks.*` are removed. Please use `wp.editor.*` instead.
+ - `wp.blocks.withEditorSettings` is removed. Please use the data module to access the editor settings `wp.data.select( "core/editor" ).getEditorSettings()`.
 
 ## 3.0.0
 

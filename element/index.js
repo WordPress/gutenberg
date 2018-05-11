@@ -5,6 +5,7 @@ import {
 	createElement,
 	createContext,
 	createRef,
+	forwardRef,
 	Component,
 	cloneElement,
 	Children,
@@ -50,6 +51,19 @@ export { createElement };
  * @return {Object} Ref object.
  */
 export { createRef };
+
+/**
+ * Component enhancer used to enable passing a ref to its wrapped component.
+ * Pass a function argument which receives `props` and `ref` as its arguments,
+ * returning an element using the forwarded ref. The return value is a new
+ * component which forwards its ref.
+ *
+ * @param {Function} forwarder Function passed `props` and `ref`, expected to
+ *                             return an element.
+ *
+ * @return {WPComponent} Enhanced component.
+ */
+export { forwardRef };
 
 /**
  * Renders a given element into the target DOM node.

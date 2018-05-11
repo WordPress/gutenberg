@@ -15,7 +15,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	Button,
@@ -29,10 +29,6 @@ import {
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import {
-	editorMediaUpload,
-	withEditorSettings,
-} from '@wordpress/blocks';
-import {
 	RichText,
 	BlockControls,
 	InspectorControls,
@@ -40,11 +36,13 @@ import {
 	MediaUpload,
 	BlockAlignmentToolbar,
 	UrlInputButton,
+	editorMediaUpload,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import ImageSize from './image-size';
 
 /**
@@ -52,7 +50,7 @@ import ImageSize from './image-size';
  */
 const MIN_SIZE = 20;
 
-class ImageBlock extends Component {
+class ImageEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
@@ -169,7 +167,7 @@ class ImageBlock extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isSelected, className, settings, toggleSelection } = this.props;
+		const { attributes, setAttributes, isSelected, className, maxWidth, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const controls = (
@@ -343,9 +341,9 @@ class ImageBlock extends Component {
 											} : undefined
 										}
 										minWidth={ minWidth }
-										maxWidth={ settings.maxWidth }
+										maxWidth={ maxWidth }
 										minHeight={ minHeight }
-										maxHeight={ settings.maxWidth / ratio }
+										maxHeight={ maxWidth / ratio }
 										lockAspectRatio
 										handleClasses={ {
 											topRight: 'wp-block-image__resize-handler-top-right',
@@ -389,14 +387,14 @@ class ImageBlock extends Component {
 	}
 }
 
-export default compose( [
-	withEditorSettings(),
-	withSelect( ( select, props ) => {
-		const { getMedia } = select( 'core' );
-		const { id } = props.attributes;
+export default withSelect( ( select, props ) => {
+	const { getMedia } = select( 'core' );
+	const { getEditorSettings } = select( 'core/editor' );
+	const { id } = props.attributes;
+	const { maxWidth } = getEditorSettings();
 
-		return {
-			image: id ? getMedia( id ) : null,
-		};
-	} ),
-] )( ImageBlock );
+	return {
+		image: id ? getMedia( id ) : null,
+		maxWidth,
+	};
+} )( ImageEdit );

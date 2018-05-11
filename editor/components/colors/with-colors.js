@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/element';
-import { withEditorSettings } from '@wordpress/blocks';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -24,8 +24,9 @@ import { getColorValue, getColorClass, setColorValue } from './utils';
  * @return {Function} Higher-order component.
  */
 export default ( mapGetSetColorToProps ) => createHigherOrderComponent(
-	withEditorSettings(
-		( settings, props ) => {
+	withSelect(
+		( select, props ) => {
+			const settings = select( 'core/editor' ).getEditorSettings();
 			const colors = get( settings, [ 'colors' ], [] );
 			const getColor = ( colorName, customColorValue, colorContext ) => {
 				return {

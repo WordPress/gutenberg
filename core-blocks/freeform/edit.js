@@ -5,6 +5,11 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
 
+/**
+ * Internal dependencies
+ */
+import './editor.scss';
+
 const { BACKSPACE, DELETE, F10 } = keycodes;
 
 function isTmceEmpty( editor ) {
@@ -23,7 +28,7 @@ function isTmceEmpty( editor ) {
 	return /^\n?$/.test( body.innerText || body.textContent );
 }
 
-export default class OldEditor extends Component {
+export default class FreeformEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.initialize = this.initialize.bind( this );
