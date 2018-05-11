@@ -3,6 +3,7 @@ module.exports = {
 	extends: [
 		'wordpress',
 		'plugin:wordpress/esnext',
+		'plugin:wordpress/i18n',
 		'plugin:react/recommended',
 		'plugin:jsx-a11y/recommended',
 	],
