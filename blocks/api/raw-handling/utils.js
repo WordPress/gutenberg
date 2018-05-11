@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { omit, mergeWith, includes, find } from 'lodash';
+import { omit, mergeWith, includes, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -204,14 +204,20 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 
 					// Strip invalid classes.
 					if ( node.classList.length ) {
-						Array.from( node.classList ).forEach( ( name ) => {
-							if ( find( classes, ( item ) => {
-								return typeof item === 'string' ? item === name : item.test( name );
-							} ) ) {
-								return;
+						const mattchers = classes.map( ( item ) => {
+							if ( typeof item === 'string' ) {
+								return ( className ) => className === item;
+							} else if ( item instanceof RegExp ) {
+								return ( className ) => item.test( className );
 							}
 
-							node.classList.remove( name );
+							return noop;
+						} );
+
+						Array.from( node.classList ).forEach( ( name ) => {
+							if ( ! mattchers.some( ( isMatch ) => isMatch( name ) ) ) {
+								node.classList.remove( name );
+							}
 						} );
 
 						if ( ! node.classList.length ) {

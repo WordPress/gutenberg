@@ -61,7 +61,7 @@ const blockAttributes = {
 const imageSchema = {
 	img: {
 		attributes: [ 'src', 'alt' ],
-		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /wp-image-\d+/ ],
+		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/ ],
 	},
 };
 
@@ -101,10 +101,12 @@ export const settings = {
 				isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
 				schema,
 				transform: ( node ) => {
+					// Search both figure and image classes. Alignment could be
+					// set on either. ID is set on the image.
 					const className = node.className + ' ' + node.querySelector( 'img' ).className;
-					const alignMatches = /align(left|center|right)/.exec( className );
+					const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec( className );
 					const align = alignMatches ? alignMatches[ 1 ] : undefined;
-					const idMatches = /wp-image-(\d+)/.exec( className );
+					const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec( className );
 					const id = idMatches ? idMatches[ 1 ] : undefined;
 					const blockType = getBlockType( 'core/image' );
 					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id } );
