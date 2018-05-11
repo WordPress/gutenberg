@@ -156,7 +156,6 @@ class ParagraphBlock extends Component {
 
 		const {
 			align,
-			content,
 			dropCap,
 			placeholder,
 		} = attributes;
@@ -213,6 +212,7 @@ class ParagraphBlock extends Component {
 				<div>
 					<RichText
 						tagName="p"
+						name="content"
 						className={ classnames( 'wp-block-paragraph', className, {
 							'has-background': backgroundColor.value,
 							'has-drop-cap': dropCap,
@@ -224,12 +224,6 @@ class ParagraphBlock extends Component {
 							color: textColor.class ? undefined : textColor.value,
 							fontSize: fontSize ? fontSize + 'px' : undefined,
 							textAlign: align,
-						} }
-						value={ content }
-						onChange={ ( nextContent ) => {
-							setAttributes( {
-								content: nextContent,
-							} );
 						} }
 						onSplit={ insertBlocksAfter ?
 							( before, after, ...blocks ) => {

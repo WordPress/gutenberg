@@ -10,6 +10,8 @@ import { createContext, createHigherOrderComponent } from '@wordpress/element';
 
 const { Consumer, Provider } = createContext( {
 	name: '',
+	attributes: {},
+	setAttribute: noop,
 	isSelected: false,
 	focusedElement: null,
 	setFocusedElement: noop,

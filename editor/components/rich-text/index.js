@@ -405,10 +405,14 @@ export class RichText extends Component {
 	/**
 	 * Handles any case where the content of the tinyMCE instance has changed.
 	 */
-
 	onChange() {
+		const { name, onChange, setAttribute } = this.props;
+		const setContent = setAttribute && name ?
+			setAttribute.bind( null, name ) :
+			onChange;
+
 		this.savedContent = this.getContent();
-		this.props.onChange( this.savedContent );
+		setContent( this.savedContent );
 	}
 
 	onCreateUndoLevel() {
@@ -924,18 +928,29 @@ RichText.defaultProps = {
 const RichTextContainer = compose( [
 	withInstanceId,
 	withBlockEditContext( ( context, ownProps ) => {
+		let newProps = {};
+
+		if ( ! ownProps.onChange && ownProps.name ) {
+			newProps = {
+				value: context.attributes[ ownProps.name ],
+				setAttribute: context.setAttribute,
+			};
+		}
+
 		// When explicitly set as not selected, do nothing.
 		if ( ownProps.isSelected === false ) {
-			return {};
+			return newProps;
 		}
 		// When explicitly set as selected, use the value stored in the context instead.
 		if ( ownProps.isSelected === true ) {
 			return {
+				...newProps,
 				isSelected: context.isSelected,
 			};
 		}
 		// Ensures that only one RichText component can be focused.
 		return {
+			...newProps,
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
 			setFocusedElement: context.setFocusedElement,
 		};
