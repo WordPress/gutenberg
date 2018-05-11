@@ -24,40 +24,66 @@ export const DEFAULT_CATEGORIES = [
 /**
  * Reducer managing the block types
  *
- * @param {Object} state  Current state.
+ * @param {Array} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {Array} Updated state.
  */
-export function blockTypes( state = { types: [] }, action ) {
+export function blockTypes( state = [], action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_TYPES':
 			const addedNames = map( action.blockTypes, ( blockType ) => blockType.name );
 			const previousState = filter(
-				state.types,
+				state,
 				( blockType ) => addedNames.indexOf( blockType.name ) === -1
 			);
-			return {
-				...state,
-				types: [ ...previousState, ...action.blockTypes ],
-			};
+			return [ ...previousState, ...action.blockTypes ];
 		case 'REMOVE_BLOCK_TYPES':
-			return {
-				...state,
-				types: filter( state.types, ( blockType ) => action.names.indexOf( blockType.name ) === -1 ),
-				defaultBlockType: action.names.indexOf( state.defaultBlockType ) !== -1 ? undefined : state.defaultBlockType,
-				fallbackBlockType: action.names.indexOf( state.fallbackBlockType ) !== -1 ? undefined : state.fallbackBlockType,
-			};
+			return filter( state, ( blockType ) => action.names.indexOf( blockType.name ) === -1 );
+	}
+
+	return state;
+}
+
+/**
+ * Reducer keeping track of the default block type.
+ *
+ * @param {string?} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string?} Updated state.
+ */
+export function defaultBlockType( state = null, action ) {
+	switch ( action.type ) {
+		case 'REMOVE_BLOCK_TYPES':
+			if ( action.names.indexOf( state ) !== -1 ) {
+				return null;
+			}
+			return state;
 		case 'SET_DEFAULT_BLOCK_TYPE':
-			return {
-				...state,
-				defaultBlockType: action.name,
-			};
+			return action.name || null;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer keeping track of the fallback block type.
+ *
+ * @param {string?} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string?} Updated state.
+ */
+export function fallbackBlockType( state = null, action ) {
+	switch ( action.type ) {
+		case 'REMOVE_BLOCK_TYPES':
+			if ( action.names.indexOf( state ) !== -1 ) {
+				return null;
+			}
+			return state;
 		case 'SET_FALLBACK_BLOCK_TYPE':
-			return {
-				...state,
-				fallbackBlockType: action.name,
-			};
+			return action.name || null;
 	}
 
 	return state;
@@ -83,5 +109,7 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 
 export default combineReducers( {
 	blockTypes,
+	defaultBlockType,
+	fallbackBlockType,
 	categories,
 } );

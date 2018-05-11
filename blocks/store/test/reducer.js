@@ -6,77 +6,91 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { blockTypes, categories, DEFAULT_CATEGORIES } from '../reducer';
+import { blockTypes, categories, defaultBlockType, fallbackBlockType, DEFAULT_CATEGORIES } from '../reducer';
 
 describe( 'blockTypes', () => {
 	it( 'should return an empty array as default state', () => {
-		expect( blockTypes( undefined, {} ) ).toEqual( { types: [] } );
+		expect( blockTypes( undefined, {} ) ).toEqual( [] );
 	} );
 
 	it( 'should add add a new block type', () => {
-		const original = deepFreeze( {
-			types: [
-				{ name: 'core/paragraph' },
-			],
-		} );
+		const original = deepFreeze( [
+			{ name: 'core/paragraph' },
+		] );
 
 		const state = blockTypes( original, {
 			type: 'ADD_BLOCK_TYPES',
 			blockTypes: [ { name: 'core/code' } ],
 		} );
 
-		expect( state.types ).toEqual( [
+		expect( state ).toEqual( [
 			{ name: 'core/paragraph' },
 			{ name: 'core/code' },
 		] );
 	} );
 
 	it( 'should remove block types', () => {
-		const original = deepFreeze( {
-			types: [
-				{ name: 'core/paragraph' },
-				{ name: 'core/code' },
-			],
-		} );
+		const original = deepFreeze( [
+			{ name: 'core/paragraph' },
+			{ name: 'core/code' },
+		] );
 
 		const state = blockTypes( original, {
 			type: 'REMOVE_BLOCK_TYPES',
 			names: [ 'core/code' ],
 		} );
 
-		expect( state.types ).toEqual( [
+		expect( state ).toEqual( [
 			{ name: 'core/paragraph' },
 		] );
 	} );
+} );
+
+describe( 'defaultBlockType', () => {
+	it( 'should return null as default state', () => {
+		expect( defaultBlockType( undefined, {} ) ).toBeNull();
+	} );
 
 	it( 'should set the default block type', () => {
-		const original = deepFreeze( {
-			types: [
-				{ name: 'core/paragraph' },
-			],
-		} );
-
-		const state = blockTypes( original, {
+		const state = defaultBlockType( null, {
 			type: 'SET_DEFAULT_BLOCK_TYPE',
 			name: 'core/paragraph',
 		} );
 
-		expect( state.defaultBlockType ).toBe( 'core/paragraph' );
+		expect( state ).toBe( 'core/paragraph' );
+	} );
+
+	it( 'should reset the fallback block type', () => {
+		const state = defaultBlockType( 'core/code', {
+			type: 'REMOVE_BLOCK_TYPES',
+			names: [ 'core/code' ],
+		} );
+
+		expect( state ).toBeNull();
+	} );
+} );
+
+describe( 'fallbackBlockType', () => {
+	it( 'should return null as default state', () => {
+		expect( fallbackBlockType( undefined, {} ) ).toBeNull();
 	} );
 
 	it( 'should set the fallback block type', () => {
-		const original = deepFreeze( {
-			types: [
-				{ name: 'core/paragraph' },
-			],
-		} );
-
-		const state = blockTypes( original, {
+		const state = fallbackBlockType( null, {
 			type: 'SET_FALLBACK_BLOCK_TYPE',
 			name: 'core/paragraph',
 		} );
 
-		expect( state.fallbackBlockType ).toBe( 'core/paragraph' );
+		expect( state ).toBe( 'core/paragraph' );
+	} );
+
+	it( 'should reset the fallback block type', () => {
+		const state = fallbackBlockType( 'core/code', {
+			type: 'REMOVE_BLOCK_TYPES',
+			names: [ 'core/code' ],
+		} );
+
+		expect( state ).toBeNull();
 	} );
 } );
 

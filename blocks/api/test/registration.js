@@ -291,7 +291,7 @@ describe( 'blocks', () => {
 
 	describe( 'getUnknownTypeHandlerName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getUnknownTypeHandlerName() ).toBeUndefined();
+			expect( getUnknownTypeHandlerName() ).toBeNull();
 		} );
 	} );
 
@@ -305,7 +305,7 @@ describe( 'blocks', () => {
 
 	describe( 'getDefaultBlockName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getDefaultBlockName() ).toBeUndefined();
+			expect( getDefaultBlockName() ).toBeNull();
 		} );
 	} );
 

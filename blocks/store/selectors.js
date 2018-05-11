@@ -11,11 +11,11 @@ import { find } from 'lodash';
  * @return {Array} Block Types.
  */
 export function getBlockTypes( state ) {
-	return state.blockTypes.types;
+	return state.blockTypes;
 }
 
 export function getBlockType( state, name ) {
-	return find( state.blockTypes.types, { name } );
+	return find( state.blockTypes, { name } );
 }
 
 /**
@@ -37,7 +37,7 @@ export function getCategories( state ) {
  * @return {string?} Default block type name.
  */
 export function getDefaultBlockTypeName( state ) {
-	return state.blockTypes.defaultBlockType;
+	return state.defaultBlockType;
 }
 
 /**
@@ -48,5 +48,5 @@ export function getDefaultBlockTypeName( state ) {
  * @return {string?} Fallback block type name.
  */
 export function getFallbackBlockTypeName( state ) {
-	return state.blockTypes.fallbackBlockType;
+	return state.fallbackBlockType;
 }
