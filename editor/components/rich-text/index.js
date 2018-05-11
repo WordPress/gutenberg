@@ -829,7 +829,6 @@ export class RichText extends Component {
 			formattingControls,
 			placeholder,
 			multiline: MultilineTag,
-			keepPlaceholderOnFocus = false,
 			isSelected,
 			formatters,
 			autocompleters,
@@ -842,7 +841,7 @@ export class RichText extends Component {
 		// changes, we unmount and destroy the previous TinyMCE element, then
 		// mount and initialize a new child element in its place.
 		const key = [ 'editor', Tagname ].join();
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
+		const isPlaceholderVisible = placeholder && this.isEmpty();
 		const classes = classnames( wrapperClassName, 'editor-rich-text' );
 
 		const formatToolbar = (

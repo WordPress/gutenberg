@@ -112,7 +112,6 @@ class ButtonEdit extends Component {
 							backgroundColor: backgroundColor.class ? undefined : backgroundColor.value,
 							color: textColor.class ? undefined : textColor.value,
 						} }
-						keepPlaceholderOnFocus
 					/>
 					<InspectorControls>
 						<PanelBody>
