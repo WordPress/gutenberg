@@ -52,11 +52,11 @@ function BlockTransformations( { blocks, small = false, onTransform, onClick = n
 }
 export default compose( [
 	withSelect( ( select, { uids } ) => {
-		const { getEditorSettings, getblocksByUID } = select( 'core/editor' );
+		const { getEditorSettings, getBlocksByUID } = select( 'core/editor' );
 		const { templateLock } = getEditorSettings();
 		return {
 			isLocked: !! templateLock,
-			blocks: getblocksByUID( uids ),
+			blocks: getBlocksByUID( uids ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {

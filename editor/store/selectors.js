@@ -504,7 +504,7 @@ export const getGlobalBlockCount = createSelector(
 	]
 );
 
-export const getblocksByUID = createSelector(
+export const getBlocksByUID = createSelector(
 	( state, uids ) => {
 		return map( castArray( uids ), ( uid ) => getBlock( state, uid ) );
 	},
