@@ -65,6 +65,17 @@ export async function newPost( postType ) {
 
 export async function newDesktopBrowserPage() {
 	global.page = await browser.newPage();
+
+	page.on( 'pageerror', ( error ) => {
+		// Disable reason: `jest/globals` doesn't include `fail`, but it is
+		// part of the global context supplied by the underlying Jasmine:
+		//
+		//  https://jasmine.github.io/api/3.0/global.html#fail
+
+		// eslint-disable-next-line no-undef
+		fail( error );
+	} );
+
 	await page.setViewport( { width: 1000, height: 700 } );
 }
 
