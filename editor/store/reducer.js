@@ -1076,6 +1076,14 @@ export const blockListSettings = ( state = {}, action ) => {
 	return state;
 };
 
+/**
+ * Reducer returning the most recent autosave.
+ *
+ * @param  {Object} state  The autosave object.
+ * @param  {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
 export const autosave = ( state = null, action ) => {
 	const { post } = action;
 	switch ( action.type ) {
