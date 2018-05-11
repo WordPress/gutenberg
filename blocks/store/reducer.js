@@ -46,21 +46,21 @@ export function blockTypes( state = [], action ) {
 }
 
 /**
- * Reducer keeping track of the default block type.
+ * Reducer keeping track of the default block name.
  *
  * @param {string?} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {string?} Updated state.
  */
-export function defaultBlockType( state = null, action ) {
+export function defaultBlockName( state = null, action ) {
 	switch ( action.type ) {
 		case 'REMOVE_BLOCK_TYPES':
 			if ( action.names.indexOf( state ) !== -1 ) {
 				return null;
 			}
 			return state;
-		case 'SET_DEFAULT_BLOCK_TYPE':
+		case 'SET_DEFAULT_BLOCK_NAME':
 			return action.name || null;
 	}
 
@@ -68,21 +68,21 @@ export function defaultBlockType( state = null, action ) {
 }
 
 /**
- * Reducer keeping track of the fallback block type.
+ * Reducer keeping track of the fallback block name.
  *
  * @param {string?} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {string?} Updated state.
  */
-export function fallbackBlockType( state = null, action ) {
+export function fallbackBlockName( state = null, action ) {
 	switch ( action.type ) {
 		case 'REMOVE_BLOCK_TYPES':
 			if ( action.names.indexOf( state ) !== -1 ) {
 				return null;
 			}
 			return state;
-		case 'SET_FALLBACK_BLOCK_TYPE':
+		case 'SET_FALLBACK_BLOCK_NAME':
 			return action.name || null;
 	}
 
@@ -109,7 +109,7 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 
 export default combineReducers( {
 	blockTypes,
-	defaultBlockType,
-	fallbackBlockType,
+	defaultBlockName,
+	fallbackBlockName,
 	categories,
 } );

@@ -168,7 +168,7 @@ export function unregisterBlockType( name ) {
  * @param {string} name Block name.
  */
 export function setUnknownTypeHandlerName( name ) {
-	dispatch( 'core/blocks' ).setFallbackBlockType( name );
+	dispatch( 'core/blocks' ).setFallbackBlockName( name );
 }
 
 /**
@@ -178,7 +178,7 @@ export function setUnknownTypeHandlerName( name ) {
  * @return {?string} Blog name.
  */
 export function getUnknownTypeHandlerName() {
-	return select( 'core/blocks' ).getFallbackBlockTypeName();
+	return select( 'core/blocks' ).getFallbackBlockName();
 }
 
 /**
@@ -187,7 +187,7 @@ export function getUnknownTypeHandlerName() {
  * @param {string} name Block name.
  */
 export function setDefaultBlockName( name ) {
-	dispatch( 'core/blocks' ).setDefaultBlockType( name );
+	dispatch( 'core/blocks' ).setDefaultBlockName( name );
 }
 
 /**
@@ -196,7 +196,7 @@ export function setDefaultBlockName( name ) {
  * @return {?string} Block name.
  */
 export function getDefaultBlockName() {
-	return select( 'core/blocks' ).getDefaultBlockTypeName();
+	return select( 'core/blocks' ).getDefaultBlockName();
 }
 
 /**

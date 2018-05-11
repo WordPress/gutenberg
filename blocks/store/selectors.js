@@ -30,23 +30,23 @@ export function getCategories( state ) {
 }
 
 /**
- * Returns the name of the default block type
+ * Returns the name of the default block name.
  *
  * @param {Object} state Data state.
  *
- * @return {string?} Default block type name.
+ * @return {string?} Default block name.
  */
-export function getDefaultBlockTypeName( state ) {
-	return state.defaultBlockType;
+export function getDefaultBlockName( state ) {
+	return state.defaultBlockName;
 }
 
 /**
- * Returns the name of the fallback block type
+ * Returns the name of the fallback block name.
  *
  * @param {Object} state Data state.
  *
- * @return {string?} Fallback block type name.
+ * @return {string?} Fallback block name.
  */
-export function getFallbackBlockTypeName( state ) {
-	return state.fallbackBlockType;
+export function getFallbackBlockName( state ) {
+	return state.fallbackBlockName;
 }

@@ -32,29 +32,29 @@ export function removeBlockTypes( names ) {
 }
 
 /**
- * Returns an action object used to set the default block type.
+ * Returns an action object used to set the default block name.
  *
  * @param {string} name Block name.
  *
  * @return {Object} Action object.
  */
-export function setDefaultBlockType( name ) {
+export function setDefaultBlockName( name ) {
 	return {
-		type: 'SET_DEFAULT_BLOCK_TYPE',
+		type: 'SET_DEFAULT_BLOCK_NAME',
 		name,
 	};
 }
 
 /**
- * Returns an action object used to set the fallback block type.
+ * Returns an action object used to set the fallback block name.
  *
  * @param {string} name Block name.
  *
  * @return {Object} Action object.
  */
-export function setFallbackBlockType( name ) {
+export function setFallbackBlockName( name ) {
 	return {
-		type: 'SET_FALLBACK_BLOCK_TYPE',
+		type: 'SET_FALLBACK_BLOCK_NAME',
 		name,
 	};
 }

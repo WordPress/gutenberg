@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { blockTypes, categories, defaultBlockType, fallbackBlockType, DEFAULT_CATEGORIES } from '../reducer';
+import { blockTypes, categories, defaultBlockName, fallbackBlockName, DEFAULT_CATEGORIES } from '../reducer';
 
 describe( 'blockTypes', () => {
 	it( 'should return an empty array as default state', () => {
@@ -46,22 +46,22 @@ describe( 'blockTypes', () => {
 	} );
 } );
 
-describe( 'defaultBlockType', () => {
+describe( 'defaultBlockName', () => {
 	it( 'should return null as default state', () => {
-		expect( defaultBlockType( undefined, {} ) ).toBeNull();
+		expect( defaultBlockName( undefined, {} ) ).toBeNull();
 	} );
 
-	it( 'should set the default block type', () => {
-		const state = defaultBlockType( null, {
-			type: 'SET_DEFAULT_BLOCK_TYPE',
+	it( 'should set the default block name', () => {
+		const state = defaultBlockName( null, {
+			type: 'SET_DEFAULT_BLOCK_NAME',
 			name: 'core/paragraph',
 		} );
 
 		expect( state ).toBe( 'core/paragraph' );
 	} );
 
-	it( 'should reset the fallback block type', () => {
-		const state = defaultBlockType( 'core/code', {
+	it( 'should reset the fallback block name', () => {
+		const state = defaultBlockName( 'core/code', {
 			type: 'REMOVE_BLOCK_TYPES',
 			names: [ 'core/code' ],
 		} );
@@ -70,22 +70,22 @@ describe( 'defaultBlockType', () => {
 	} );
 } );
 
-describe( 'fallbackBlockType', () => {
+describe( 'fallbackBlockName', () => {
 	it( 'should return null as default state', () => {
-		expect( fallbackBlockType( undefined, {} ) ).toBeNull();
+		expect( fallbackBlockName( undefined, {} ) ).toBeNull();
 	} );
 
-	it( 'should set the fallback block type', () => {
-		const state = fallbackBlockType( null, {
-			type: 'SET_FALLBACK_BLOCK_TYPE',
+	it( 'should set the fallback block name', () => {
+		const state = fallbackBlockName( null, {
+			type: 'SET_FALLBACK_BLOCK_NAME',
 			name: 'core/paragraph',
 		} );
 
 		expect( state ).toBe( 'core/paragraph' );
 	} );
 
-	it( 'should reset the fallback block type', () => {
-		const state = fallbackBlockType( 'core/code', {
+	it( 'should reset the fallback block name', () => {
+		const state = fallbackBlockName( 'core/code', {
 			type: 'REMOVE_BLOCK_TYPES',
 			names: [ 'core/code' ],
 		} );
