@@ -1085,10 +1085,9 @@ export const blockListSettings = ( state = {}, action ) => {
  * @return {Object} Updated state.
  */
 export const autosave = ( state = null, action ) => {
-	const { post } = action;
 	switch ( action.type ) {
 		case 'RESET_AUTOSAVE':
-			return post;
+			return action.post;
 	}
 
 	return state;
