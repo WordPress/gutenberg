@@ -82,7 +82,6 @@ export const settings = {
 					style={ { textAlign: textAlign } }
 					placeholder={ __( 'Write…' ) }
 					wrapperClassName={ className }
-					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
 				/>
 			</Fragment>
 		);
