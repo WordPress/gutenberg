@@ -323,15 +323,11 @@ export function isPostAutosavable( state ) {
 	const autosave = state.editor.present.autosave;
 
 	// If the title, excerpt or content has changed, the post is autosavable.
-	if (
+	return (
 		( title !== autosave.title.raw ) ||
 		( excerpt !== autosave.excerpt.raw ) ||
 		( content !== autosave.content.raw )
-	) {
-		return true;
-	}
-
-	return false;
+	);
 }
 
 export function hasAutosave( state ) {
