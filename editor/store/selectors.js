@@ -331,7 +331,7 @@ export function isPostAutosaveable( state ) {
 }
 
 export function hasAutosave( state ) {
-	return !! state.editor.present.autosave;
+	return !! state.autosave;
 }
 
 /**
