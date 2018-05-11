@@ -584,6 +584,14 @@ export function isTyping( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning autosave state. True if an autosave is currently occurring.
+ *
+ * @param  {boolean} state  Current state.
+ * @param  {Object}  action Dispatched action.
+ *
+ * @return {Boolean} Updated state.
+ */
 export function isAutosaving( state = false, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_UPDATE':
