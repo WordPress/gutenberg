@@ -170,6 +170,50 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( '<div class="greeting">Hello</div>' );
 	} );
 
+	it( 'does not beautify by default', () => {
+		const result = renderElement(
+			<section>
+				<p>Content</p>
+			</section>
+		);
+
+		expect( result ).toBe(
+			'<section><p>Content</p></section>'
+		);
+	} );
+
+	it( 'performs basic beautification on children of block-level elements', () => {
+		const result = renderElement(
+			<section>
+				String
+				<RawHTML>Raw</RawHTML>
+				{ '\n\tString' }
+				<h2>Hello <em>World!</em></h2>
+				<span>On previous line</span>
+				<p>This is content.</p>
+				<div>
+					<span>Nesting:</span>
+					<p>Can get out of control.</p>
+				</div><pre><code>{ 'foo\nbar\t' }</code></pre>
+			</section>,
+			{},
+			0
+		);
+
+		expect( result ).toBe(
+			'<section>StringRaw\n' +
+			'\tString\n' +
+			'\t<h2>Hello <em>World!</em></h2><span>On previous line</span>\n' +
+			'\t<p>This is content.</p>\n' +
+			'\t<div><span>Nesting:</span>\n' +
+			'\t\t<p>Can get out of control.</p>\n' +
+			'\t</div>\n' +
+			'\t<pre><code>foo\n' +
+			'bar	</code></pre>\n' +
+			'</section>'
+		);
+	} );
+
 	it( 'renders function component', () => {
 		function Greeting() {
 			return <div className="greeting">Hello</div>;
@@ -274,13 +318,13 @@ describe( 'renderNativeComponent()', () => {
 		it( 'should render self-closing elements', () => {
 			const result = renderNativeComponent( 'img', { src: 'foo.png' } );
 
-			expect( result ).toBe( '<img src="foo.png"/>' );
+			expect( result ).toBe( '<img src="foo.png" />' );
 		} );
 
 		it( 'should ignore self-closing elements children', () => {
 			const result = renderNativeComponent( 'img', { src: 'foo.png', children: [ 'Surprise!' ] } );
 
-			expect( result ).toBe( '<img src="foo.png"/>' );
+			expect( result ).toBe( '<img src="foo.png" />' );
 		} );
 	} );
 
