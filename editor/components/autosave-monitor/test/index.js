@@ -23,7 +23,7 @@ describe( 'AutosaveMonitor', () => {
 
 	describe( '#componentDidUpdate()', () => {
 		it( 'should start autosave timer when having become dirty and saveable', () => {
-			wrapper.setProps( { isDirty: true, isSaveable: true, isAutosavable: true } );
+			wrapper.setProps( { isDirty: true, isSaveable: true, isAutosaveable: true } );
 
 			expect( toggleTimer ).toHaveBeenCalledWith( true );
 		} );

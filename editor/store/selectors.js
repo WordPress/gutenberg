@@ -306,13 +306,13 @@ export function isEditedPostEmpty( state ) {
  * @param  {Object}  state Global application state
  * @return {boolean}       Whether the post can be autosaved
  */
-export function isPostAutosavable( state ) {
-	// If the post is autosaving, it is not autosavable.
+export function isPostAutosaveable( state ) {
+	// If the post is autosaving, it is not autosaveable.
 	if ( state.isAutosaving ) {
 		return false;
 	}
 
-	// If we don't already have an autosave, the post is autosavable.
+	// If we don't already have an autosave, the post is autosaveable.
 	if ( ! hasAutosave( state ) ) {
 		return true;
 	}
@@ -322,7 +322,7 @@ export function isPostAutosavable( state ) {
 	const content = getEditedPostContent( state );
 	const autosave = state.editor.present.autosave;
 
-	// If the title, excerpt or content has changed, the post is autosavable.
+	// If the title, excerpt or content has changed, the post is autosaveable.
 	return (
 		( title !== autosave.title.raw ) ||
 		( excerpt !== autosave.excerpt.raw ) ||

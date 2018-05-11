@@ -265,7 +265,7 @@ describe( 'effects', () => {
 		beforeAll( () => {
 			selectors.isEditedPostSaveable = jest.spyOn( selectors, 'isEditedPostSaveable' );
 			selectors.isEditedPostDirty = jest.spyOn( selectors, 'isEditedPostDirty' );
-			selectors.isPostAutosavable = jest.spyOn( selectors, 'isPostAutosavable' );
+			selectors.isPostAutosaveable = jest.spyOn( selectors, 'isPostAutosaveable' );
 			selectors.isCurrentPostPublished = jest.spyOn( selectors, 'isCurrentPostPublished' );
 			selectors.isEditedPostNew = jest.spyOn( selectors, 'isEditedPostNew' );
 		} );
@@ -274,7 +274,7 @@ describe( 'effects', () => {
 			dispatch.mockReset();
 			selectors.isEditedPostSaveable.mockReset();
 			selectors.isEditedPostDirty.mockReset();
-			selectors.isPostAutosavable.mockReset();
+			selectors.isPostAutosaveable.mockReset();
 			selectors.isCurrentPostPublished.mockReset();
 			selectors.isEditedPostNew.mockReset();
 		} );
@@ -282,7 +282,7 @@ describe( 'effects', () => {
 		afterAll( () => {
 			selectors.isEditedPostSaveable.mockRestore();
 			selectors.isEditedPostDirty.mockRestore();
-			selectors.isPostAutosavable.mockRestore();
+			selectors.isPostAutosaveable.mockRestore();
 			selectors.isCurrentPostPublished.mockRestore();
 			selectors.isEditedPostNew.mockRestore();
 		} );
@@ -330,7 +330,7 @@ describe( 'effects', () => {
 		it( 'should return update action for saveable, dirty draft', () => {
 			selectors.isEditedPostSaveable.mockReturnValue( true );
 			selectors.isEditedPostDirty.mockReturnValue( true );
-			selectors.isPostAutosavable.mockReturnValue( true );
+			selectors.isPostAutosaveable.mockReturnValue( true );
 			selectors.isCurrentPostPublished.mockReturnValue( false );
 			selectors.isEditedPostNew.mockReturnValue( false );
 
