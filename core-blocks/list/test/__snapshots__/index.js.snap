@@ -2,7 +2,7 @@
 
 exports[`core/list block edit matches snapshot 1`] = `
 <div
-  class="blocks-list editor-rich-text"
+  class="core-blocks-list editor-rich-text"
 >
   <div>
     <div>

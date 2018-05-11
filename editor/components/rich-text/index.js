@@ -867,7 +867,7 @@ export class RichText extends Component {
 					</BlockFormatControls>
 				) }
 				{ isSelected && inlineToolbar && (
-					<div className="block-rich-text__inline-toolbar">
+					<div className="editor-rich-text__inline-toolbar">
 						{ formatToolbar }
 					</div>
 				) }
