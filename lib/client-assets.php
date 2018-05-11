@@ -929,14 +929,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$is_new_post = 'auto-draft' === $post->post_status;
 
 	// Set the post type name.
-	$post_type = get_post_type( $post );
+	$post_type        = get_post_type( $post );
+	$post_type_object = get_post_type_object( $post_type );
+	$rest_base        = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
 
 	// Preload common data.
 	$preload_paths = array(
 		'/',
 		'/wp/v2/types?context=edit',
 		'/wp/v2/taxonomies?context=edit',
-		sprintf( '/wp/v2/posts/%s?context=edit', $post->ID ),
+		sprintf( '/wp/v2/%s/%s?context=edit', $rest_base, $post->ID ),
 		sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
 		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
 	);
@@ -1069,7 +1071,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$editor_settings['colors'] = $color_palette;
 	}
 
-	$post_type_object = get_post_type_object( $post->post_type );
 	if ( ! empty( $post_type_object->template ) ) {
 		$editor_settings['template']     = $post_type_object->template;
 		$editor_settings['templateLock'] = ! empty( $post_type_object->template_lock ) ? $post_type_object->template_lock : false;
