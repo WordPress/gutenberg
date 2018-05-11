@@ -28,7 +28,7 @@ describe( 'AutosaveMonitor', () => {
 			expect( toggleTimer ).toHaveBeenCalledWith( true );
 		} );
 
-		it( 'should not startautosave timer when the autosave is up to date', () => {
+		it( 'should stop autosave timer when the autosave is up to date', () => {
 			wrapper.setProps( { isDirty: true, isSaveable: true, isAutosaveable: false } );
 
 			expect( toggleTimer ).toHaveBeenCalledWith( false );
