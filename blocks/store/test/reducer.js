@@ -9,40 +9,40 @@ import deepFreeze from 'deep-freeze';
 import { blockTypes, categories, defaultBlockName, fallbackBlockName, DEFAULT_CATEGORIES } from '../reducer';
 
 describe( 'blockTypes', () => {
-	it( 'should return an empty array as default state', () => {
-		expect( blockTypes( undefined, {} ) ).toEqual( [] );
+	it( 'should return an empty object as default state', () => {
+		expect( blockTypes( undefined, {} ) ).toEqual( {} );
 	} );
 
 	it( 'should add add a new block type', () => {
-		const original = deepFreeze( [
-			{ name: 'core/paragraph' },
-		] );
+		const original = deepFreeze( {
+			'core/paragraph': { name: 'core/paragraph' },
+		} );
 
 		const state = blockTypes( original, {
 			type: 'ADD_BLOCK_TYPES',
 			blockTypes: [ { name: 'core/code' } ],
 		} );
 
-		expect( state ).toEqual( [
-			{ name: 'core/paragraph' },
-			{ name: 'core/code' },
-		] );
+		expect( state ).toEqual( {
+			'core/paragraph': { name: 'core/paragraph' },
+			'core/code': { name: 'core/code' },
+		} );
 	} );
 
 	it( 'should remove block types', () => {
-		const original = deepFreeze( [
-			{ name: 'core/paragraph' },
-			{ name: 'core/code' },
-		] );
+		const original = deepFreeze( {
+			'core/paragraph': { name: 'core/paragraph' },
+			'core/code': { name: 'core/code' },
+		} );
 
 		const state = blockTypes( original, {
 			type: 'REMOVE_BLOCK_TYPES',
 			names: [ 'core/code' ],
 		} );
 
-		expect( state ).toEqual( [
-			{ name: 'core/paragraph' },
-		] );
+		expect( state ).toEqual( {
+			'core/paragraph': { name: 'core/paragraph' },
+		} );
 	} );
 } );
 

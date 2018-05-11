@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import createSelector from 'rememo';
 
 /**
  * Returns all the available block types.
@@ -10,12 +10,21 @@ import { find } from 'lodash';
  *
  * @return {Array} Block Types.
  */
-export function getBlockTypes( state ) {
-	return state.blockTypes;
-}
+export const getBlockTypes = createSelector(
+	( state ) => Object.values( state.blockTypes ),
+	( state ) => state.blockTypes
+);
 
+/**
+ * Returns a block type by name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name Block type name.
+ *
+ * @return {Object?} Block Type.
+ */
 export function getBlockType( state, name ) {
-	return find( state.blockTypes, { name } );
+	return state.blockTypes[ name ];
 }
 
 /**

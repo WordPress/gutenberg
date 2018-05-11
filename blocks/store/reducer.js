@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, map } from 'lodash';
+import { filter, map, keyBy, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,22 +24,20 @@ export const DEFAULT_CATEGORIES = [
 /**
  * Reducer managing the block types
  *
- * @param {Array} state  Current state.
+ * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @return {Array} Updated state.
+ * @return {Object} Updated state.
  */
-export function blockTypes( state = [], action ) {
+export function blockTypes( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_TYPES':
-			const addedNames = map( action.blockTypes, ( blockType ) => blockType.name );
-			const previousState = filter(
-				state,
-				( blockType ) => addedNames.indexOf( blockType.name ) === -1
-			);
-			return [ ...previousState, ...action.blockTypes ];
+			return {
+				...state,
+				...keyBy( action.blockTypes, 'name' ),
+			};
 		case 'REMOVE_BLOCK_TYPES':
-			return filter( state, ( blockType ) => action.names.indexOf( blockType.name ) === -1 );
+			return omit( state, action.names );
 	}
 
 	return state;
