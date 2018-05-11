@@ -486,7 +486,7 @@ function gutenberg_handle_early_callback_checks( $response, $handler, $request )
 		$can_view_authors    = false;
 		$can_unbounded_query = false;
 		$types               = get_post_types( array( 'show_in_rest' => true ), 'objects' );
-			foreach ( $types as $type ) {
+		foreach ( $types as $type ) {
 			if ( current_user_can( $type->cap->edit_posts ) ) {
 				$can_unbounded_query = true;
 				if ( post_type_supports( $type->name, 'author' ) ) {
@@ -497,8 +497,8 @@ function gutenberg_handle_early_callback_checks( $response, $handler, $request )
 		if ( $request['per_page'] < 0 ) {
 			if ( ! $can_unbounded_query ) {
 				return new WP_Error( 'rest_forbidden_per_page', __( 'Sorry, you are not allowed make unbounded queries.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
-				}
 			}
+		}
 		if ( '/wp/v2/users' === $request->get_route()
 			&& ! empty( $request['who'] ) && 'authors' === $request['who'] ) {
 			if ( ! $can_view_authors ) {
