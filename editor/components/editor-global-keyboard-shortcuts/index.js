@@ -115,7 +115,7 @@ export default compose( [
 			redo,
 			undo,
 			removeBlocks,
-			autosave,
+			savePost,
 		} = dispatch( 'core/editor' );
 
 		return {
@@ -124,7 +124,7 @@ export default compose( [
 			onRedo: redo,
 			onUndo: undo,
 			onRemove: removeBlocks,
-			onSave: autosave,
+			onSave: savePost,
 		};
 	} ),
 ] )( EditorGlobalKeyboardShortcuts );
