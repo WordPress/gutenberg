@@ -17,15 +17,13 @@ import {
  * the specified post object and editor settings.
  *
  * @param {Object} post     Post object.
- * @param {Object} settings Editor settings object.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post, settings ) {
+export function setupEditor( post ) {
 	return {
 		type: 'SETUP_EDITOR',
 		post,
-		settings,
 	};
 }
 
@@ -688,6 +686,20 @@ export function updateBlockListSettings( id, settings ) {
 	return {
 		type: 'UPDATE_BLOCK_LIST_SETTINGS',
 		id,
+		settings,
+	};
+}
+
+/*
+ * Returns an action object used in signalling that the editor settings have been updated.
+ *
+ * @param {Object} settings Updated settings
+ *
+ * @return {Object} Action object
+ */
+export function updateEditorSettings( settings ) {
+	return {
+		type: 'UPDATE_EDITOR_SETTINGS',
 		settings,
 	};
 }

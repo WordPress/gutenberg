@@ -58,7 +58,7 @@ export const name = 'core/quote';
 
 export const settings = {
 	title: __( 'Quote' ),
-	description: __( 'Quote. In quoting others, we cite ourselves. (Julio Cortázar)' ),
+	description: __( 'Maybe someone else said it better -- add some quoted text.' ),
 	icon: 'format-quote',
 	category: 'common',
 

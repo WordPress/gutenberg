@@ -40,7 +40,7 @@ export const name = 'core/list';
 
 export const settings = {
 	title: __( 'List' ),
-	description: __( 'List. Numbered or bulleted.' ),
+	description: __( 'Numbers, bullets, up to you. Add a list of items.' ),
 	icon: 'editor-ul',
 	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],

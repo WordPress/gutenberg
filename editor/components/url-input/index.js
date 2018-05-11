@@ -179,13 +179,13 @@ class UrlInput extends Component {
 	}
 
 	render() {
-		const { value = '', instanceId } = this.props;
+		const { value = '', autoFocus = true, instanceId } = this.props;
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
 			<div className="editor-url-input">
 				<input
-					autoFocus
+					autoFocus={ autoFocus }
 					type="text"
 					aria-label={ __( 'URL' ) }
 					required

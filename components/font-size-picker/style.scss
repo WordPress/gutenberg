@@ -1,10 +1,10 @@
-.blocks-font-size__main {
+.components-font-size-picker__buttons {
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: 1em;
 }
 
-.blocks-paragraph__custom-size-slider {
+.components-font-size-picker__custom-input {
 	.components-range-control__slider + .dashicon {
 		width: 30px;
 		height: 30px;

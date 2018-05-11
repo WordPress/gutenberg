@@ -522,8 +522,14 @@ describe( 'effects', () => {
 				},
 				status: 'draft',
 			};
+			const getState = () => ( {
+				settings: {
+					template: null,
+					templateLock: false,
+				},
+			} );
 
-			const result = handler( { post, settings: {} } );
+			const result = handler( { post, settings: {} }, { getState } );
 
 			expect( result ).toEqual( [
 				setTemplateValidity( true ),
@@ -543,8 +549,14 @@ describe( 'effects', () => {
 				},
 				status: 'draft',
 			};
+			const getState = () => ( {
+				settings: {
+					template: null,
+					templateLock: false,
+				},
+			} );
 
-			const result = handler( { post, settings: {} } );
+			const result = handler( { post }, { getState } );
 
 			expect( result[ 1 ].blocks ).toHaveLength( 1 );
 			expect( result ).toEqual( [
@@ -564,8 +576,14 @@ describe( 'effects', () => {
 				},
 				status: 'auto-draft',
 			};
+			const getState = () => ( {
+				settings: {
+					template: null,
+					templateLock: false,
+				},
+			} );
 
-			const result = handler( { post, settings: {} } );
+			const result = handler( { post }, { getState } );
 
 			expect( result ).toEqual( [
 				setTemplateValidity( true ),

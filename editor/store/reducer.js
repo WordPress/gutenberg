@@ -31,7 +31,7 @@ import { combineReducers } from '@wordpress/data';
  */
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
-import { PREFERENCES_DEFAULTS } from './defaults';
+import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 
 /**
@@ -791,16 +791,30 @@ export function isInsertionPointVisible( state = false, action ) {
  */
 export function template( state = { isValid: true }, action ) {
 	switch ( action.type ) {
-		case 'SETUP_EDITOR':
-			return {
-				...state,
-				template: action.settings.template,
-				lock: action.settings.templateLock,
-			};
 		case 'SET_TEMPLATE_VALIDITY':
 			return {
 				...state,
 				isValid: action.isValid,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the editor setting.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_EDITOR_SETTINGS':
+			return {
+				...state,
+				...action.settings,
 			};
 	}
 
@@ -1035,17 +1049,17 @@ export const blockListSettings = ( state = {}, action ) => {
 			return omit( state, action.uids );
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
-			const { id, settings } = action;
-			if ( id && ! settings ) {
+			const { id } = action;
+			if ( id && ! action.settings ) {
 				return omit( state, id );
 			}
 			const blockSettings = state[ id ];
-			const updateIsRequired = ! isEqual( blockSettings, settings );
+			const updateIsRequired = ! isEqual( blockSettings, action.settings );
 			if ( updateIsRequired ) {
 				return {
 					...state,
 					[ id ]: {
-						...settings,
+						...action.settings,
 					},
 				};
 			}
@@ -1080,4 +1094,5 @@ export default optimist( combineReducers( {
 	sharedBlocks,
 	template,
 	autosave,
+	settings,
 } ) );

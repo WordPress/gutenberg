@@ -49,12 +49,10 @@ describe( 'actions', () => {
 	describe( 'setupEditor', () => {
 		it( 'should return the SETUP_EDITOR action', () => {
 			const post = {};
-			const settings = {};
-			const result = setupEditor( post, settings );
+			const result = setupEditor( post );
 			expect( result ).toEqual( {
 				type: 'SETUP_EDITOR',
 				post,
-				settings,
 			} );
 		} );
 	} );

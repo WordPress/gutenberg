@@ -73,6 +73,9 @@ fi
 echo -e $(status_message "Installing and updating NPM packages..." )
 npm install
 
+# Make sure npm is up-to-date
+npm install npm -g
+
 # There was a bug in NPM that caused changes in package-lock.json. Handle that.
 if [ "$TRAVIS" != "true" ] && ! git diff --exit-code package-lock.json >/dev/null; then
 	if ask "$(warning_message "Your package-lock.json changed, which may mean there's an issue with your NPM cache. Would you like to try and automatically clean it up?" )" N 10; then

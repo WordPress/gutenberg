@@ -8,6 +8,7 @@ import { forEach } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { deprecated } from '@wordpress/utils';
+import { withSelect } from '@wordpress/data';
 
 import {
 	Autocomplete,
@@ -34,6 +35,7 @@ import {
 	getColorName,
 	withColors,
 } from './components';
+import { editorMediaUpload } from './utils';
 
 const componentsToDepreacate = {
 	Autocomplete,
@@ -62,6 +64,7 @@ const functionsToDeprecate = {
 	getColorClass,
 	getColorName,
 	withColors,
+	editorMediaUpload,
 };
 
 forEach( componentsToDepreacate, ( WrappedComponent, key ) => {
@@ -93,3 +96,20 @@ forEach( functionsToDeprecate, ( wrappedFunction, key ) => {
 	};
 } );
 
+wp.blocks.withEditorSettings = ( mapSettingsToProps ) => ( WrappedComponent ) => {
+	const applyWithSelect = withSelect( ( select, ownProps ) => {
+		const settings = select( 'core/editor' ).getEditorSettings();
+		if ( ! mapSettingsToProps ) {
+			return { settings };
+		}
+		return mapSettingsToProps( settings, ownProps );
+	} );
+
+	deprecated( 'wp.blocks.withEditorSettings', {
+		version: '3.1',
+		alternative: 'the data module to access the editor settings `wp.data.select( "core/editor" ).getEditorSettings()`',
+		plugin: 'Gutenberg',
+	} );
+
+	return applyWithSelect( WrappedComponent );
+};
