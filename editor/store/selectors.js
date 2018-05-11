@@ -320,7 +320,7 @@ export function isPostAutosaveable( state ) {
 	const title = getEditedPostAttribute( state, 'title' );
 	const excerpt = getEditedPostExcerpt( state );
 	const content = getEditedPostContent( state );
-	const autosave = state.editor.present.autosave;
+	const autosave = state.autosave;
 
 	// If the title, excerpt or content has changed, the post is autosaveable.
 	return (
