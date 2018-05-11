@@ -4,19 +4,27 @@
 import { castArray } from 'lodash';
 
 /**
- * Returns an action object used in signalling that the request for a given
- * data type has been made.
+ * Internal dependencies
+ */
+import {
+	toggleIsRequesting,
+	receiveQueriedItems,
+} from './queried-data';
+
+/**
+ * Returns an action object used in signalling whether a request for a given
+ * terms of a taxonomy is in progress.
  *
- * @param {string}  dataType Data type requested.
- * @param {?string} subType  Optional data sub-type.
+ * @param {string}  taxonomy     Data type requested.
+ * @param {?Object} query        Optional terms query.
+ * @param {boolean} isRequesting Whether a request is in progress.
  *
  * @return {Object} Action object.
  */
-export function setRequested( dataType, subType ) {
+export function toggleIsRequestingTerms( taxonomy, query, isRequesting ) {
 	return {
-		type: 'SET_REQUESTED',
-		dataType,
-		subType,
+		...toggleIsRequesting( query, isRequesting ),
+		taxonomy,
 	};
 }
 
@@ -25,15 +33,15 @@ export function setRequested( dataType, subType ) {
  * for a given taxonomy.
  *
  * @param {string}   taxonomy Taxonomy name.
+ * @param {?Object}  query    Optional terms query.
  * @param {Object[]} terms    Terms received.
  *
  * @return {Object} Action object.
  */
-export function receiveTerms( taxonomy, terms ) {
+export function receiveTerms( taxonomy, query, terms ) {
 	return {
-		type: 'RECEIVE_TERMS',
+		...receiveQueriedItems( query, terms ),
 		taxonomy,
-		terms,
 	};
 }
 

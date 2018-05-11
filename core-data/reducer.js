@@ -12,6 +12,8 @@ import { combineReducers } from '@wordpress/data';
  * Internal dependencies
  */
 import entitiesConfig from './entities';
+import { reducer as queriedDataReducer } from './queried-data';
+import { onSubKey } from './utils';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -24,28 +26,7 @@ import entitiesConfig from './entities';
  *
  * @return {Object} Updated state.
  */
-export function terms( state = {}, action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_TERMS':
-			return {
-				...state,
-				[ action.taxonomy ]: action.terms,
-			};
-
-		case 'SET_REQUESTED':
-			const { dataType, subType: taxonomy } = action;
-			if ( dataType !== 'terms' || state.hasOwnProperty( taxonomy ) ) {
-				return state;
-			}
-
-			return {
-				...state,
-				[ taxonomy ]: null,
-			};
-	}
-
-	return state;
-}
+export const terms = onSubKey( 'taxonomy' )( queriedDataReducer );
 
 /**
  * Reducer managing authors state. Keyed by id.
