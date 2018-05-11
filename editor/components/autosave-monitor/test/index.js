@@ -28,6 +28,12 @@ describe( 'AutosaveMonitor', () => {
 			expect( toggleTimer ).toHaveBeenCalledWith( true );
 		} );
 
+		it( 'should not startautosave timer when the autosave is up to date', () => {
+			wrapper.setProps( { isDirty: true, isSaveable: true, isAutosaveable: false } );
+
+			expect( toggleTimer ).toHaveBeenCalledWith( false );
+		} );
+
 		it( 'should stop autosave timer when having become dirty but not saveable', () => {
 			wrapper.setProps( { isDirty: true, isSaveable: false } );
 
