@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { registerCoreInlineBlocks } from '../../../core-inlineblocks';
+import { registerCoreInlineBlocks } from '../../../core-inline-blocks';
 import { getInlineBlockTypes } from '../../../inline-blocks';
 import { __ } from '@wordpress/i18n';
 
