@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { isUnmodifiedDefaultBlock, withEditorSettings } from '@wordpress/blocks';
+import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { ifCondition } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -37,8 +37,6 @@ class BlockInsertionPoint extends Component {
 	}
 }
 export default compose(
-	withEditorSettings( ( { templateLock } ) => ( { templateLock } ) ),
-	ifCondition( ( { templateLock } ) => ! templateLock ),
 	withSelect( ( select, { uid, rootUID } ) => {
 		const {
 			getBlockIndex,
@@ -46,6 +44,7 @@ export default compose(
 			getBlock,
 			isBlockInsertionPointVisible,
 			isTyping,
+			getEditorSettings,
 		} = select( 'core/editor' );
 		const blockIndex = uid ? getBlockIndex( uid, rootUID ) : -1;
 		const insertIndex = blockIndex;
@@ -59,11 +58,13 @@ export default compose(
 		);
 
 		return {
+			templateLock: getEditorSettings().templateLock,
 			showInserter: ! isTyping(),
 			index: insertIndex,
 			showInsertionPoint,
 		};
 	} ),
+	ifCondition( ( { templateLock } ) => ! templateLock ),
 	withDispatch( ( dispatch ) => {
 		const { insertDefaultBlock, startTyping } = dispatch( 'core/editor' );
 		return {

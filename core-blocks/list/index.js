@@ -8,12 +8,11 @@ import { find, compact, get, initial, last, isEmpty } from 'lodash';
  */
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
-	createBlock,
 	BlockControls,
 	RichText,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -41,7 +40,7 @@ export const name = 'core/list';
 
 export const settings = {
 	title: __( 'List' ),
-	description: __( 'List. Numbered or bulleted.' ),
+	description: __( 'Numbers, bullets, up to you. Add a list of items.' ),
 	icon: 'editor-ul',
 	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
@@ -296,7 +295,7 @@ export const settings = {
 						onSetup={ this.setupEditor }
 						onChange={ this.setNextValues }
 						value={ values }
-						wrapperClassName="blocks-list"
+						wrapperClassName="core-blocks-list"
 						className={ className }
 						placeholder={ __( 'Write list…' ) }
 						onMerge={ mergeBlocks }

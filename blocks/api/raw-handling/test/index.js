@@ -13,7 +13,7 @@ import { registerCoreBlocks } from '../../../../core-blocks';
 describe( 'rawHandler', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		require( 'editor/hooks' );
 		registerCoreBlocks();
 	} );
 

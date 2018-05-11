@@ -1,3 +1,28 @@
+// Block Creation Components
+export { default as Autocomplete } from './autocomplete';
+export * from './autocompleters';
+export { default as AlignmentToolbar } from './alignment-toolbar';
+export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
+export { default as BlockControls } from './block-controls';
+export { default as BlockEdit } from './block-edit';
+export { default as BlockFormatControls } from './block-format-controls';
+export { default as BlockIcon } from './block-icon';
+export { default as ColorPalette } from './color-palette';
+export { default as withColorContext } from './color-palette/with-color-context';
+export * from './colors';
+export { default as ContrastChecker } from './contrast-checker';
+export { default as ImagePlaceholder } from './image-placeholder';
+export { default as InnerBlocks } from './inner-blocks';
+export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
+export { default as InspectorControls } from './inspector-controls';
+export { default as PanelColor } from './panel-color';
+export { default as PlainText } from './plain-text';
+export { default as RichText } from './rich-text';
+export { default as RichTextProvider } from './rich-text/provider';
+export { default as MediaUpload } from './media-upload';
+export { default as UrlInput } from './url-input';
+export { default as UrlInputButton } from './url-input/button';
+
 // Post Related Components
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
@@ -63,6 +88,7 @@ export { default as CopyHandler } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as Inserter } from './inserter';
+export { default as MultiBlocksSwitcher } from './block-switcher/multi-blocks-switcher';
 export { default as MultiSelectScrollIntoView } from './multi-select-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';
 export { default as ObserveTyping } from './observe-typing';

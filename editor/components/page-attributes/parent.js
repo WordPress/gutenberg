@@ -63,7 +63,7 @@ const applyWithAPIDataItems = withAPIData( ( props, { type } ) => {
 	const isHierarchical = get( props, [ 'postType', 'hierarchical' ], false );
 	const queryString = stringify( {
 		context: 'edit',
-		per_page: 100,
+		per_page: -1,
 		exclude: postId,
 		parent_exclude: postId,
 		_fields: [ 'id', 'parent', 'title' ],

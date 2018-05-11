@@ -7,12 +7,12 @@ import { __ } from '@wordpress/i18n';
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
+import { getPhrasingContentSchema } from '@wordpress/blocks';
 import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -54,7 +54,7 @@ export const name = 'core/table';
 
 export const settings = {
 	title: __( 'Table' ),
-	description: __( 'Tables. Best used for tabular data.' ),
+	description: __( 'Insert a table -- perfect for sharing charts and data.' ),
 	icon: 'editor-table',
 	category: 'formatting',
 

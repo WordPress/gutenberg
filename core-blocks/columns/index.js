@@ -14,7 +14,7 @@ import { Fragment } from '@wordpress/element';
 import {
 	InspectorControls,
 	InnerBlocks,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -58,7 +58,7 @@ export const settings = {
 		},
 	},
 
-	description: __( 'A multi-column layout of content.' ),
+	description: __( 'Add a block that displays content in multiple columns, then add whatever content blocks you\'d like.' ),
 
 	supports: {
 		align: [ 'wide', 'full' ],

@@ -11,7 +11,6 @@ $z-layers: (
 	'.freeform-toolbar': 10,
 	'.editor-warning': 1,
 	'.components-form-toggle__input': 1,
-	'.editor-format-list__menu': 1,
 	'.editor-inserter__tabs': 1,
 	'.editor-inserter__tab.is-active': 1,
 	'.components-panel__header': 1,
@@ -21,13 +20,13 @@ $z-layers: (
 	'.editor-block-switcher__menu': 5,
 	'.components-popover__close': 5,
 	'.editor-block-list__insertion-point': 5,
-	'.blocks-format-toolbar__link-modal': 81, // should appear above block controls
-	'.blocks-format-toolbar__link-container': 81, // link suggestions should also
-	'.blocks-gallery-item__inline-menu': 20,
+	'.editor-format-toolbar__link-modal': 81, // should appear above block controls
+	'.editor-format-toolbar__link-container': 81, // link suggestions should also
+	'.core-blocks-gallery-item__inline-menu': 20,
 	'.editor-block-settings-menu__popover': 21, // Below the header, but above the block toolbar
-	'.blocks-url-input__suggestions': 30,
+	'.editor-url-input__suggestions': 30,
 	'.edit-post-header': 30,
-	'.blocks-button__inline-link .blocks-url-input__suggestions': 6, // URL suggestions for button block above sibling inserter
+	'.core-blocks-button__inline-link .editor-url-input__suggestions': 6, // URL suggestions for button block above sibling inserter
 	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
 
 	// Should have lower index than anything else positioned inside the block containers
