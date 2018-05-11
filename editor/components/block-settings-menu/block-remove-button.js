@@ -9,8 +9,7 @@ import { flow, noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { compose } from '@wordpress/element';
-import { withDispatch } from '@wordpress/data';
-import { withEditorSettings } from '@wordpress/blocks';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, ...props } ) {
 	if ( isLocked ) {
@@ -37,8 +36,8 @@ export default compose(
 			dispatch( 'core/editor' ).removeBlocks( uids );
 		},
 	} ) ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock } = settings;
+	withSelect( ( select ) => {
+		const { templateLock } = select( 'core/editor' ).getEditorSettings();
 
 		return {
 			isLocked: !! templateLock,

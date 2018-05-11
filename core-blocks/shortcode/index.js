@@ -4,7 +4,7 @@
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withInstanceId, Dashicon } from '@wordpress/components';
-import { PlainText } from '@wordpress/blocks';
+import { PlainText } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -16,7 +16,7 @@ export const name = 'core/shortcode';
 export const settings = {
 	title: __( 'Shortcode' ),
 
-	description: __( 'A shortcode is a WordPress-specific code snippet that is written between square brackets as [shortcode]. ' ),
+	description: __( 'Add a shortcode -- a WordPress-specific snippet of code written between square brackets.' ),
 
 	icon: 'shortcode',
 

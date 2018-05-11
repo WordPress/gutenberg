@@ -34,7 +34,7 @@ function readFile( filePath ) {
 describe( 'raw handling: integration', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		require( 'editor/hooks' );
 		registerCoreBlocks();
 	} );
 

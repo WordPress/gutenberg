@@ -26,7 +26,6 @@ import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
-import { deprecated } from '@wordpress/utils';
 
 /***
  * Module constants
@@ -586,6 +585,19 @@ export function hasSelectedBlock( state ) {
 }
 
 /**
+ * Returns the currently selected block UID, or null if there is no selected
+ * block.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?Object} Selected block UID.
+ */
+export function getSelectedBlockUID( state ) {
+	const { start, end } = state.blockSelection;
+	return start === end && start ? start : null;
+}
+
+/**
  * Returns the currently selected block, or null if there is no selected block.
  *
  * @param {Object} state Global application state.
@@ -593,12 +605,8 @@ export function hasSelectedBlock( state ) {
  * @return {?Object} Selected block.
  */
 export function getSelectedBlock( state ) {
-	const { start, end } = state.blockSelection;
-	if ( start !== end || ! start ) {
-		return null;
-	}
-
-	return getBlock( state, start );
+	const uid = getSelectedBlockUID( state );
+	return uid ? getBlock( state, uid ) : null;
 }
 
 /**
@@ -1061,7 +1069,7 @@ export function isValidTemplate( state ) {
  * @return {?Arary}        Block Template
  */
 export function getTemplate( state ) {
-	return state.template.template;
+	return state.settings.template;
 }
 
 /**
@@ -1071,7 +1079,7 @@ export function getTemplate( state ) {
  * @return {?string}        Block Template Lock
  */
 export function getTemplateLock( state ) {
-	return state.template.lock;
+	return state.settings.templateLock;
 }
 
 /**
@@ -1294,15 +1302,6 @@ function buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock
  * @return {Editor.InserterItem[]} Items that appear in inserter.
  */
 export function getInserterItems( state, allowedBlockTypes ) {
-	if ( allowedBlockTypes === undefined ) {
-		allowedBlockTypes = true;
-		deprecated( 'getInserterItems with no allowedBlockTypes argument', {
-			version: '2.8',
-			alternative: 'getInserterItems with an explcit allowedBlockTypes argument',
-			plugin: 'Gutenberg',
-		} );
-	}
-
 	if ( ! allowedBlockTypes ) {
 		return [];
 	}
@@ -1364,15 +1363,6 @@ function getItemsFromInserts( state, inserts, allowedBlockTypes, maximum = MAX_R
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
 export function getFrecentInserterItems( state, allowedBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
-	if ( allowedBlockTypes === undefined ) {
-		allowedBlockTypes = true;
-		deprecated( 'getFrecentInserterItems with no allowedBlockTypes argument', {
-			version: '2.8',
-			alternative: 'getFrecentInserterItems with an explcit allowedBlockTypes argument',
-			plugin: 'Gutenberg',
-		} );
-	}
-
 	const calculateFrecency = ( time, count ) => {
 		if ( ! time ) {
 			return count;
@@ -1559,7 +1549,7 @@ export function getPermalink( state ) {
  */
 export function getPermalinkParts( state ) {
 	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
-	const postName = getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'draft_slug' );
+	const postName = getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'generated_slug' );
 
 	const [ prefix, suffix ] = permalinkTemplate.split( PERMALINK_POSTNAME_REGEX );
 
@@ -1631,4 +1621,15 @@ export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
 		return supportedNestedBlocks;
 	}
 	return intersection( globallyEnabledBlockTypes, supportedNestedBlocks );
+}
+
+/*
+ * Returns the editor settings.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor settings object
+ */
+export function getEditorSettings( state ) {
+	return state.settings;
 }
