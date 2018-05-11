@@ -393,7 +393,7 @@ export const getBlockDependantsCacheBust = createSelector(
  * @return {string} Block name.
  */
 export function getBlockName( state, uid ) {
-	const block = state.editor.present.blocksByUid[ uid ];
+	const block = state.editor.present.blocksByUID[ uid ];
 	return block ? block.name : null;
 }
 
@@ -410,7 +410,7 @@ export function getBlockName( state, uid ) {
  */
 export const getBlock = createSelector(
 	( state, uid ) => {
-		const block = state.editor.present.blocksByUid[ uid ];
+		const block = state.editor.present.blocksByUID[ uid ];
 		if ( ! block ) {
 			return null;
 		}
@@ -443,7 +443,7 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, uid ) => [
-		state.editor.present.blocksByUid[ uid ],
+		state.editor.present.blocksByUID[ uid ],
 		getBlockDependantsCacheBust( state, uid ),
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
@@ -475,7 +475,7 @@ export const getBlocks = createSelector(
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 	]
 );
 
@@ -491,29 +491,29 @@ export const getBlocks = createSelector(
 export const getGlobalBlockCount = createSelector(
 	( state, blockName ) => {
 		if ( ! blockName ) {
-			return size( state.editor.present.blocksByUid );
+			return size( state.editor.present.blocksByUID );
 		}
 		return reduce(
-			state.editor.present.blocksByUid,
+			state.editor.present.blocksByUID,
 			( count, block ) => block.name === blockName ? count + 1 : count,
 			0
 		);
 	},
 	( state ) => [
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 	]
 );
 
-export const getBlocksByUID = createSelector(
+export const getblocksByUID = createSelector(
 	( state, uids ) => {
 		return map( castArray( uids ), ( uid ) => getBlock( state, uid ) );
 	},
 	( state ) => [
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 		state.editor.present.blockOrder,
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 	]
 );
 
@@ -791,7 +791,7 @@ export const getMultiSelectedBlocks = createSelector(
 		state.editor.present.blockOrder,
 		state.blockSelection.start,
 		state.blockSelection.end,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
 	]
@@ -1185,7 +1185,7 @@ export const getEditedPostContent = createSelector(
 	},
 	( state ) => [
 		state.editor.present.edits.content,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 		state.editor.present.blockOrder,
 	],
 );
