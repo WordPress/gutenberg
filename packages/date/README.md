@@ -7,5 +7,5 @@ Date module for WordPress.
 Install the module
 
 ```bash
-npm install @wordpress/date --save
+npm install @wordpress/date@next --save
 ```

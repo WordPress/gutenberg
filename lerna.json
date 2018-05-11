@@ -8,5 +8,5 @@
 	"packages": [
 		"packages/*"
 	],
-	"version": "2.8.0"
+	"version": "independent"
 }
