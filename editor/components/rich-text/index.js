@@ -25,7 +25,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, rawShortcut } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
@@ -45,6 +45,22 @@ import { domToFormat, valueToString } from './format';
 import TokenUI from './tokens/ui';
 
 /**
+ * Browser dependencies
+ */
+
+const { Node } = window;
+
+/**
+ * Zero-width space character used by TinyMCE as a caret landing point for
+ * inline boundary nodes.
+ *
+ * @see tinymce/src/core/main/ts/text/Zwsp.ts
+ *
+ * @type {string}
+ */
+const TINYMCE_ZWSP = '\uFEFF';
+
+/**
  * Returns true if the node is the inline node boundary. This is used in node
  * filtering prevent the inline boundary from being included in the split which
  * occurs while within but at the end of an inline node, since TinyMCE includes
@@ -58,7 +74,7 @@ import TokenUI from './tokens/ui';
  */
 export function isEmptyInlineBoundary( node ) {
 	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
-	return text === '\uFEFF';
+	return text === TINYMCE_ZWSP;
 }
 
 /**
@@ -112,6 +128,7 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
+		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
@@ -433,6 +450,42 @@ export class RichText extends Component {
 			left: position.left - containerPosition.left + ( position.width / 2 ),
 		};
 	}
+	/**
+	 * Handles a horizontal navigation key down event to stop propagation if it
+	 * can be inferred that it will be handled by TinyMCE (notably transitions
+	 * out of an inline boundary node).
+	 *
+	 * @param {KeyboardEvent} event Keydown event.
+	 */
+	onHorizontalNavigationKeyDown( event ) {
+		const { focusNode, focusOffset } = window.getSelection();
+		const { nodeType, nodeValue } = focusNode;
+
+		if ( nodeType !== Node.TEXT_NODE ) {
+			return;
+		}
+
+		const isReverse = event.keyCode === LEFT;
+
+		let offset = focusOffset;
+		if ( isReverse ) {
+			offset--;
+		}
+
+		// [WORKAROUND]: When in a new paragraph in a new inline boundary node,
+		// while typing the zero-width space occurs as the first child instead
+		// of at the end of the inline boundary where the caret is. This should
+		// only be exempt when focusNode is not _only_ the ZWSP, which occurs
+		// when caret is placed on the right outside edge of inline boundary.
+		if ( ! isReverse && focusOffset === nodeValue.length &&
+				nodeValue.length > 1 && nodeValue[ 0 ] === TINYMCE_ZWSP ) {
+			offset = 0;
+		}
+
+		if ( nodeValue[ offset ] === TINYMCE_ZWSP ) {
+			event.stopPropagation();
+		}
+	}
 
 	/**
 	 * Handles a keydown event from TinyMCE.
@@ -442,10 +495,11 @@ export class RichText extends Component {
 	onKeyDown( event ) {
 		const dom = this.editor.dom;
 		const rootNode = this.editor.getBody();
+		const { keyCode } = event;
 
 		if (
-			( event.keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
-			( event.keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
+			( keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
+			( keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
 		) {
 			if ( ! this.props.onMerge && ! this.props.onRemove ) {
 				return;
@@ -453,7 +507,7 @@ export class RichText extends Component {
 
 			this.onCreateUndoLevel();
 
-			const forward = event.keyCode === DELETE;
+			const forward = keyCode === DELETE;
 
 			if ( this.props.onMerge ) {
 				this.props.onMerge( forward );
@@ -471,9 +525,14 @@ export class RichText extends Component {
 			event.stopImmediatePropagation();
 		}
 
+		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
+		if ( isHorizontalNavigation ) {
+			this.onHorizontalNavigationKeyDown( event );
+		}
+
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
-		if ( event.keyCode === ENTER ) {
+		if ( keyCode === ENTER ) {
 			if ( this.props.multiline ) {
 				if ( ! this.props.onSplit ) {
 					return;
