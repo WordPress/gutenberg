@@ -2,8 +2,13 @@
  * WordPress
  */
 import { __ } from '@wordpress/i18n';
+import { Fragment } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import {
+	RichText,
+	BlockControls,
+	AlignmentToolbar,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -29,6 +34,9 @@ export const settings = {
 			source: 'children',
 			selector: 'pre',
 		},
+		align: {
+			type: 'string',
+		},
 	},
 
 	transforms: {
@@ -51,30 +59,44 @@ export const settings = {
 	},
 
 	edit( { attributes, setAttributes, className } ) {
-		const { content } = attributes;
+		const { align, content } = attributes;
 
 		return (
-			<RichText
-				tagName="pre"
-				value={ content }
-				onChange={ ( nextContent ) => {
-					setAttributes( {
-						content: nextContent,
-					} );
-				} }
-				placeholder={ __( 'Write…' ) }
-				wrapperClassName={ className }
-				formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-			/>
+			<Fragment>
+				<BlockControls>
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
+					/>
+				</BlockControls>
+				<RichText
+					tagName="pre"
+					value={ content }
+					onChange={ ( nextContent ) => {
+						setAttributes( {
+							content: nextContent,
+						} );
+					} }
+					style={ { textAlign: align } }
+					placeholder={ __( 'Write…' ) }
+					wrapperClassName={ className }
+					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
+				/>
+			</Fragment>
 		);
 	},
 
 	save( { attributes, className } ) {
+		const { align, content } = attributes;
+
 		return (
 			<RichText.Content
 				tagName="pre"
 				className={ className }
-				value={ attributes.content }
+				style={ { textAlign: align } }
+				value={ content }
 			/>
 		);
 	},
