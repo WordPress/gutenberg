@@ -1,0 +1,23 @@
+.wp-block-file .components-placeholder__input {
+	margin-top: 0.5em;
+}
+
+.wp-block-file .button.button-large {
+	margin-top: 0.5em;
+}
+
+.wp-block-file file {
+	width: 100%;
+}
+
+.wp-block-file .components-placeholder__fieldset {
+	max-width: 400px;
+
+	form {
+		max-width: none;
+	}
+}
+
+.wp-block-file__editing {
+	margin-bottom: 0;
+}

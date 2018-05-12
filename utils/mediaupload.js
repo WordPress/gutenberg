@@ -4,14 +4,14 @@
 import { compact, forEach, get, startsWith } from 'lodash';
 
 /**
- *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
- *	when a file upload button is activated.
+ *	Media Upload is used by audio, image, gallery, video, and file blocks to
+ *	handle uploading a media file	when a file upload button is activated.
  *
  *	TODO: future enhancement to add an upload indicator.
  *
  * @param {Array}    filesList      List of files.
  * @param {Function} onFileChange   Function to be called each time a file or a temporary representation of the file is available.
- * @param {string}   allowedType    The type of media that can be uploaded.
+ * @param {string}   allowedType    The type of media that can be uploaded, or '*' to allow all.
  * @param {?Object}  additionalData Additional data to include in the request.
  */
 export function mediaUpload( filesList, onFileChange, allowedType, additionalData = {} ) {
@@ -23,7 +23,9 @@ export function mediaUpload( filesList, onFileChange, allowedType, additionalDat
 		filesSet[ idx ] = value;
 		onFileChange( compact( filesSet ) );
 	};
-	const isAllowedType = ( fileType ) => startsWith( fileType, `${ allowedType }/` );
+	const isAllowedType = ( fileType ) => {
+		return ( allowedType === '*' ) || startsWith( fileType, `${ allowedType }/` );
+	};
 	files.forEach( ( mediaFile, idx ) => {
 		if ( ! isAllowedType( mediaFile.type ) ) {
 			return;
@@ -40,6 +42,7 @@ export function mediaUpload( filesList, onFileChange, allowedType, additionalDat
 					id: savedMedia.id,
 					url: savedMedia.source_url,
 					link: savedMedia.link,
+					title: savedMedia.title.raw,
 				};
 				const caption = get( savedMedia, [ 'caption', 'raw' ] );
 				if ( caption ) {
