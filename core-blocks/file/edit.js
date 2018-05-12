@@ -61,7 +61,11 @@ export default class FileEdit extends Component {
 			event.preventDefault();
 			if ( href ) {
 				// set the block's href from the edit component's state, and switch off the editing UI
-				setAttributes( { href: href, textLinkHref: href } );
+				setAttributes( {
+					href: href,
+					textLinkHref: href,
+					id: undefined,
+				} );
 				this.setState( { editing: false } );
 			}
 			return false;
