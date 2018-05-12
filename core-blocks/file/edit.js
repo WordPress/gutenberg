@@ -35,8 +35,10 @@ export default class FileEdit extends Component {
 
 	render() {
 		const { id, textLinkHref } = this.props.attributes;
-		const { setAttributes, className } = this.props;
+		const { setAttributes } = this.props;
 		const { editing, href, fileName } = this.state;
+		const classNames =
+			`${ this.props.className } ${ this.props.className }__editing`;
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
 		};
@@ -81,7 +83,7 @@ export default class FileEdit extends Component {
 					icon="media-default"
 					label={ __( 'File' ) }
 					instructions={ __( 'Select a file from your library, or upload a new one' ) }
-					className={ className }>
+					className={ classNames }>
 					<form onSubmit={ onSelectUrl }>
 						<input
 							type="url"
@@ -130,7 +132,7 @@ export default class FileEdit extends Component {
 						/>
 					</Toolbar>
 				</BlockControls>
-				<div className={ `${ className } ${ className }__editing` }>
+				<div className={ classNames }>
 					<a href={ textLinkHref }>
 						{ fileName }
 					</a>
