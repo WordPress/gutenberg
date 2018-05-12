@@ -20,4 +20,8 @@
 
 .wp-block-file__editing {
 	margin-bottom: 0;
+
+	&.is-transient {
+		@include loading_fade;
+	}
 }

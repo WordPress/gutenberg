@@ -84,6 +84,7 @@ export default class FileEdit extends Component {
 		const classNames = [
 			this.props.className,
 			`${ this.props.className }__editing`,
+			this.isBlobURL( href ) ? 'is-transient' : '',
 		].join( ' ' );
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
