@@ -73,7 +73,7 @@ export default class FileEdit extends Component {
 		editorMediaUpload( files, ( [ media ] ) => this.onSelectFile( media ), '*' );
 	}
 
-	isBlobURL( url ) {
+	isBlobURL( url = '' ) {
 		return url.indexOf( 'blob:' ) === 0;
 	}
 
