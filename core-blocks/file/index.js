@@ -80,7 +80,7 @@ export const settings = {
 				<a
 					href={ href }
 					className="wp-block-file__button"
-					download="download">
+					download={ fileName }>
 					{ __( 'Download' ) }
 				</a>
 			</div>

@@ -168,7 +168,7 @@ export default class FileEdit extends Component {
 					<a
 						href={ href }
 						className="wp-block-file__button"
-						download>
+						download={ fileName }>
 						{ __( 'Download' ) }
 					</a>
 				</div>
