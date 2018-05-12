@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { createBlobURL } from '@wordpress/utils';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -53,8 +54,14 @@ export const settings = {
 				type: 'files',
 				isMatch: ( files ) => files.length === 1,
 				transform: ( files ) => {
+					const file = files[ 0 ];
+					const blobURL = createBlobURL( file );
+
+					// File will be uploaded in componentDidMount()
 					return createBlock( 'core/file', {
-						downloadableHref: window.URL.createObjectURL( files[ 0 ] ),
+						href: blobURL,
+						fileName: file.name,
+						textLinkHref: blobURL,
 					} );
 				},
 			},

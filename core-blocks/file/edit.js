@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { getBlobByURL, revokeBlobURL } from '@wordpress/utils';
 import {
 	Button,
 	FormFileUpload,
@@ -24,6 +25,9 @@ import './editor.scss';
 export default class FileEdit extends Component {
 	constructor() {
 		super( ...arguments );
+		this.onSelectFile = this.onSelectFile.bind( this );
+		this.uploadFromFiles = this.uploadFromFiles.bind( this );
+
 		// edit component has its own href in the state so it can be edited
 		// without setting the actual value outside of the edit UI
 		this.state = {
@@ -33,31 +37,56 @@ export default class FileEdit extends Component {
 		};
 	}
 
+	componentDidMount() {
+		const { href } = this.state;
+
+		if ( this.isBlobURL( href ) ) {
+			getBlobByURL( href )
+				.then( ( file ) => {
+					this.uploadFromFiles( [ file ] );
+					revokeBlobURL( href );
+				} );
+		}
+	}
+
+	onSelectFile( media ) {
+		const { fileName } = this.props.attributes;
+
+		if ( media && media.url ) {
+			// sets the block's attributes and updates the edit component from the
+			// selected media, then switches off the editing UI
+			this.props.setAttributes( {
+				href: media.url,
+				fileName: media.title || fileName,
+				textLinkHref: media.url,
+				id: media.id,
+			} );
+			this.setState( {
+				href: media.url,
+				fileName: media.title || fileName,
+				editing: false,
+			} );
+		}
+	}
+
+	uploadFromFiles( files ) {
+		editorMediaUpload( files, ( [ media ] ) => this.onSelectFile( media ), '*' );
+	}
+
+	isBlobURL( url ) {
+		return url.indexOf( 'blob:' ) === 0;
+	}
+
 	render() {
 		const { id, textLinkHref } = this.props.attributes;
 		const { setAttributes } = this.props;
 		const { editing, href, fileName } = this.state;
-		const classNames =
-			`${ this.props.className } ${ this.props.className }__editing`;
+		const classNames = [
+			this.props.className,
+			`${ this.props.className }__editing`,
+		].join( ' ' );
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
-		};
-		const onSelectFile = ( media ) => {
-			if ( media && media.url ) {
-				// sets the block's attribute and updates the edit component from the
-				// selected media, then switches off the editing UI
-				setAttributes( {
-					href: media.url,
-					fileName: media.title,
-					textLinkHref: media.url,
-					id: media.id,
-				} );
-				this.setState( {
-					href: media.url,
-					fileName: media.title,
-					editing: false,
-				} );
-			}
 		};
 		const onSelectUrl = ( event ) => {
 			event.preventDefault();
@@ -72,9 +101,8 @@ export default class FileEdit extends Component {
 			}
 			return false;
 		};
-		const uploadFromFiles = ( event ) => {
-			const setFile = ( [ file ] ) => onSelectFile( file );
-			editorMediaUpload( event.target.files, setFile, '*' );
+		const uploadFilesFromInput = ( event ) => {
+			this.uploadFromFiles( event.target.files );
 		};
 
 		if ( editing ) {
@@ -100,13 +128,13 @@ export default class FileEdit extends Component {
 					<FormFileUpload
 						isLarge
 						className="wp-block-file__upload-button"
-						onChange={ uploadFromFiles }
+						onChange={ uploadFilesFromInput }
 						accept="*"
 					>
 						{ __( 'Upload' ) }
 					</FormFileUpload>
 					<MediaUpload
-						onSelect={ onSelectFile }
+						onSelect={ this.onSelectFile }
 						type="*"
 						value={ id }
 						render={ ( { open } ) => (
