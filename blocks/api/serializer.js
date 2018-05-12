@@ -14,7 +14,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import { getBlockType, getUnknownTypeHandlerName, isRawContentBlockName } from './registration';
 import BlockContentProvider from '../block-content-provider';
 
 /**
@@ -196,7 +196,11 @@ export function getBlockContent( block ) {
 		} catch ( error ) {}
 	}
 
-	return getUnknownTypeHandlerName() === block.name || ! saveContent ? saveContent : getBeautifulContent( saveContent );
+	return (
+		getUnknownTypeHandlerName() === block.name ||
+		isRawContentBlockName( block.name ) ||
+		! saveContent
+	) ? saveContent : getBeautifulContent( saveContent );
 }
 
 /**

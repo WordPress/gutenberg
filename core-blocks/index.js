@@ -5,6 +5,7 @@ import {
 	registerBlockType,
 	setDefaultBlockName,
 	setUnknownTypeHandlerName,
+	addRawContentBlockName,
 } from '@wordpress/blocks';
 import { deprecated } from '@wordpress/utils';
 
@@ -85,6 +86,7 @@ export const registerCoreBlocks = () => {
 
 	setDefaultBlockName( paragraph.name );
 	setUnknownTypeHandlerName( freeform.name );
+	addRawContentBlockName( shortcode.name );
 };
 
 // Backwards compatibility
