@@ -78,7 +78,7 @@ export const settings = {
 
 	save( { attributes } ) {
 		const { href, fileName, textLinkHref, openInNewWindow } = attributes;
-		return (
+		return ( href &&
 			<div>
 				<a
 					href={ textLinkHref }
