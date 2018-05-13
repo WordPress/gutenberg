@@ -1,16 +1,18 @@
 /**
  * External dependencies
  */
-import { equal } from 'assert';
 import fs from 'fs';
 import path from 'path';
 
 /**
+ * WordPress dependencies
+ */
+import { rawHandler, serialize } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
-import { registerCoreBlocks } from '../../../../../core-blocks';
-import rawHandler from '../../index';
-import serialize from '../../../serializer';
+import { registerCoreBlocks } from '../';
 
 const types = [
 	'plain',
@@ -40,13 +42,13 @@ describe( 'raw handling: integration', () => {
 
 	types.forEach( ( type ) => {
 		it( type, () => {
-			const HTML = readFile( path.join( __dirname, `${ type }-in.html` ) );
-			const plainText = readFile( path.join( __dirname, `${ type }-in.txt` ) );
-			const output = readFile( path.join( __dirname, `${ type }-out.html` ) );
+			const HTML = readFile( path.join( __dirname, `integration/${ type }-in.html` ) );
+			const plainText = readFile( path.join( __dirname, `integration/${ type }-in.txt` ) );
+			const output = readFile( path.join( __dirname, `integration/${ type }-out.html` ) );
 			const converted = rawHandler( { HTML, plainText, canUserUseUnfilteredHTML: true } );
 			const serialized = typeof converted === 'string' ? converted : serialize( converted );
 
-			equal( serialized, output );
+			expect( serialized ).toBe( output );
 		} );
 	} );
 } );

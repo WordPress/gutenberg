@@ -1,14 +1,12 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { equal } from 'assert';
+import { getBlockContent, rawHandler } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import rawHandler from '../index';
-import { getBlockContent } from '../../serializer';
-import { registerCoreBlocks } from '../../../../core-blocks';
+import { registerCoreBlocks } from '../';
 
 describe( 'rawHandler', () => {
 	beforeAll( () => {
@@ -23,7 +21,7 @@ describe( 'rawHandler', () => {
 			mode: 'INLINE',
 		} );
 
-		equal( filtered, '<em>test</em>' );
+		expect( filtered ).toBe( '<em>test</em>' );
 	} );
 
 	it( 'should parse Markdown', () => {
@@ -33,7 +31,7 @@ describe( 'rawHandler', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		equal( filtered, '<ul>\n\t<li>one</li>\n\t<li>two</li>\n\t<li>three</li>\n</ul>' );
+		expect( filtered ).toBe( '<ul>\n\t<li>one</li>\n\t<li>two</li>\n\t<li>three</li>\n</ul>' );
 	} );
 
 	it( 'should parse inline Markdown', () => {
@@ -43,7 +41,7 @@ describe( 'rawHandler', () => {
 			mode: 'AUTO',
 		} );
 
-		equal( filtered, 'Some <strong>bold</strong> text.' );
+		expect( filtered ).toBe( 'Some <strong>bold</strong> text.' );
 	} );
 
 	it( 'should parse HTML in plainText', () => {
@@ -53,7 +51,7 @@ describe( 'rawHandler', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		equal( filtered, '<p>Some <strong>bold</strong> text.</p>' );
+		expect( filtered ).toBe( '<p>Some <strong>bold</strong> text.</p>' );
 	} );
 
 	it( 'should parse Markdown with HTML', () => {
@@ -63,7 +61,7 @@ describe( 'rawHandler', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		equal( filtered, '<h1>Some <em>heading</em></h1>' );
+		expect( filtered ).toBe( '<h1>Some <em>heading</em></h1>' );
 	} );
 
 	it( 'should break up forced inline content', () => {
@@ -72,8 +70,6 @@ describe( 'rawHandler', () => {
 			mode: 'INLINE',
 		} );
 
-		equal( filtered, 'test<br>test' );
+		expect( filtered ).toBe( 'test<br>test' );
 	} );
 } );
-
-import './integration';
