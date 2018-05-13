@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { RichText } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/utils';
 import { createBlock } from '@wordpress/blocks';
 
@@ -83,7 +84,10 @@ export const settings = {
 					href={ textLinkHref }
 					target={ openInNewWindow }
 				>
-					{ fileName }
+					<RichText.Content
+						tagName="span"
+						value={ fileName }
+					/>
 				</a>
 				<a
 					href={ href }

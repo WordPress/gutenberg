@@ -14,6 +14,7 @@ import { Component, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
 	BlockControls,
+	RichText,
 	editorMediaUpload,
 } from '@wordpress/editor';
 
@@ -27,7 +28,7 @@ export default class FileEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
-		const { href, fileName, id } = this.props.attributes;
+		const { href, id } = this.props.attributes;
 
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
@@ -37,7 +38,6 @@ export default class FileEdit extends Component {
 		this.state = {
 			editing: ! href,
 			href,
-			fileName,
 			attachmentPage: undefined,
 		};
 
@@ -73,6 +73,23 @@ export default class FileEdit extends Component {
 		}
 	}
 
+	componentDidUpdate() {
+		const { fileName } = this.props.attributes;
+		const { isSelected, setAttributes } = this.props;
+
+		// Strip line breaks caused by typing Enter key in RichText
+		if ( /<br \/>/.test( fileName ) ) {
+			setAttributes( {
+				fileName: fileName.replace( '<br />', '' ),
+			} );
+		}
+
+		// Reset filename if filename is empty on blur
+		if ( ! isSelected && fileName === '' ) {
+			setAttributes( { fileName: __( 'Untitled file' ) } );
+		}
+	}
+
 	onSelectFile( media ) {
 		const { fileName } = this.props.attributes;
 
@@ -103,9 +120,9 @@ export default class FileEdit extends Component {
 	}
 
 	render() {
-		const { id, textLinkHref, openInNewWindow } = this.props.attributes;
+		const { fileName, textLinkHref, openInNewWindow, id } = this.props.attributes;
 		const { setAttributes } = this.props;
-		const { editing, href, fileName, attachmentPage } = this.state;
+		const { editing, href, attachmentPage } = this.state;
 
 		const classNames = [
 			this.props.className,
@@ -147,6 +164,12 @@ export default class FileEdit extends Component {
 		const onChangeOpenInNewWindow = ( newValue ) => {
 			setAttributes( {
 				openInNewWindow: newValue ? '_blank' : false,
+			} );
+		};
+
+		const onChangeFileName = ( newFileName ) => {
+			setAttributes( {
+				fileName: ( newFileName.length === 0 ) ? '' : newFileName,
 			} );
 		};
 
@@ -217,8 +240,18 @@ export default class FileEdit extends Component {
 					<a
 						href={ textLinkHref }
 						target={ openInNewWindow }
+						onClick={ ( event ) => event.preventDefault() }
 					>
-						{ fileName }
+						<RichText
+							format="string"
+							tagName="span"
+							className="wp-block-file__textlink"
+							value={ fileName }
+							formattingControls={ [] }
+							placeholder={ __( 'Write file name…' ) }
+							keepPlaceholderOnFocus={ true }
+							onChange={ onChangeFileName }
+						/>
 					</a>
 					<a
 						href={ href }
