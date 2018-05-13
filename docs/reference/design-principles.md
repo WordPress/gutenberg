@@ -1,22 +1,22 @@
-# Gutenberg Design Principles & Vision
+# Gutenbergのデザイン原則とビジョン
 
-This living document serves to describe some of the design principles and patterns that have served in designing the editor interface. The purpose is to explain the background for the design, to help inform future improvements.
+この随時更新される文書は、エディター画面を設計する際に役立つデザイン原則とパターンのいくつかを記述するのに役立ちます。 目的は、デザインの背景を説明し、将来の改善についての周知を助けることです。
 
 ![Block](https://cldup.com/7HCnN5cFc0.png)
 
-This document will also go over how a _good block_ should be designed.
+この文書では、 どのように _良いブロック_ をデザインするべきかという話も超越しようと思います。
 
-## Goal of Gutenberg
+## Gutenbergのゴール
 
-The all-encompassing goal of Gutenberg is to create a post and page building experience that makes it easy to create _rich post layouts_. From the [kickoff post](https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/):
+Gutenberg の包括的な目標は、 _リッチな投稿レイアウト_ を簡単に作成できる投稿とページを構築する経験を作り出すことです。[キックオフポスト](https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/)より:
 
-> The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
+> エディターは、新しいページやポストを簡単に作成し構築する経験を実現するために懸命に努力します。そのために、今日の時点では、ショートコード、カスタム HTML 、または「ミステリー・ミート」埋め込みの検出を容易にするためのブロックがあります。
 
-We can extract from this the following:
+これから以下の事が言えます:
 
-- Authoring rich posts is a key strength of WordPress.
-- The block concept aims to unify multiple different interfaces under a single umbrella. You shouldn't have to write shortcodes, custom HTML or paste URLs to embed. You should only have to learn how the block works, and then know how to do everything.
-- "Mystery meat" refers to hidden features in software, that you have to discover. WordPress already supports a large amount of blocks and 30+ embeds, so let's increase their visibility so people don't install plugins thinking it isn't already there.
+- リッチな投稿の作成は WordPress の強みのカギです。
+- ブロックの概念は、一つの傘の下に複数の異なるインターフェースを統一することを目指しています。オブジェクトを埋め込むためにショートコードやカスタム HTML を書いたり、URL を貼り付ける必要はないのです。ブロックの仕組みを覚えるだけで、全てのやり方が分かるようになるべきです。
+- 「ミステリー・ミート」とは、ソフトウェアの隠された機能を示します。それはあなたが発見しなくてはなりません。 WordPress は既に大量のブロックと30以上の埋め込みをサポートしているので、人々が既にある機能を見つけられずにプラグインをインストールしないで済むように、その視認性を高めましょう。
 
 ## Why
 
