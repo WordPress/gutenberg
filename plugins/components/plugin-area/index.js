@@ -30,12 +30,13 @@ class PluginArea extends Component {
 
 	getCurrentPluginsState() {
 		return {
-			plugins: map( getPlugins(), ( { name, render } ) => {
+			plugins: map( getPlugins(), ( { icon, name, render } ) => {
 				return {
 					name,
 					Plugin: render,
 					context: {
 						name,
+						icon,
 					},
 				};
 			} ),

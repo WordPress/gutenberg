@@ -5,6 +5,7 @@ import { createContext, createHigherOrderComponent } from '@wordpress/element';
 
 const { Consumer, Provider } = createContext( {
 	name: null,
+	icon: null,
 } );
 
 export { Provider as PluginContextProvider };

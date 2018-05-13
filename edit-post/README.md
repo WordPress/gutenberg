@@ -68,7 +68,7 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 
 - Type: `String` | `Element`
 - Required: No
-- Default: `admin-plugins`
+- Default: _inherits from the plugin_
 
 
 ### `PluginSidebarMoreMenuItem`
@@ -85,7 +85,7 @@ const { PluginSidebarMoreMenuItem } = wp.editPost;
 const MySidebarMoreMenuItem = () => (
 	<PluginSidebarMoreMenuItem
 		target="my-sidebar"
-		icon="yes"
+		icon="smiley"
 	>
 		{ __( 'My sidebar title' ) }
 	</PluginSidebarMoreMenuItem>
@@ -107,7 +107,7 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 
 - Type: `String` | `Element`
 - Required: No
-
+- Default: _inherits from the plugin_
 
 ### `PluginPostStatusInfo`
 

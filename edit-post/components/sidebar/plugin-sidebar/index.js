@@ -23,7 +23,7 @@ import SidebarHeader from '../sidebar-header';
 function PluginSidebar( props ) {
 	const {
 		children,
-		icon = 'admin-plugins',
+		icon,
 		isActive,
 		isPinnable = true,
 		isPinned,
@@ -74,7 +74,7 @@ function PluginSidebar( props ) {
 
 export default compose(
 	withPluginContext,
-	withSelect( ( select, { name, pluginContext } ) => {
+	withSelect( ( select, { icon, name, pluginContext } ) => {
 		const {
 			getActiveGeneralSidebarName,
 			isPluginItemPinned,
@@ -82,6 +82,7 @@ export default compose(
 		const sidebarName = `${ pluginContext.name }/${ name }`;
 
 		return {
+			icon: icon || pluginContext.icon,
 			isActive: getActiveGeneralSidebarName() === sidebarName,
 			isPinned: isPluginItemPinned( sidebarName ),
 			sidebarName,
