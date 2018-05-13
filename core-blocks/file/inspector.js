@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
 	SelectControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import {
@@ -18,6 +19,8 @@ export default class FileBlockInspector extends Component {
 			textLinkHref,
 			attachmentPage,
 			onChangeLinkDestinationOption,
+			openInNewWindow,
+			onChangeOpenInNewWindow,
 		} = this.props;
 
 		const linkDestinationOptions = ( () => {
@@ -38,6 +41,11 @@ export default class FileBlockInspector extends Component {
 						value={ textLinkHref }
 						options={ linkDestinationOptions }
 						onChange={ onChangeLinkDestinationOption }
+					/>
+					<ToggleControl
+						label={ __( 'Open in new window' ) }
+						checked={ openInNewWindow }
+						onChange={ onChangeOpenInNewWindow }
 					/>
 				</PanelBody>
 			</InspectorControls>

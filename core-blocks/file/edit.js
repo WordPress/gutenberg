@@ -103,7 +103,7 @@ export default class FileEdit extends Component {
 	}
 
 	render() {
-		const { id, textLinkHref } = this.props.attributes;
+		const { id, textLinkHref, openInNewWindow } = this.props.attributes;
 		const { setAttributes } = this.props;
 		const { editing, href, fileName, attachmentPage } = this.state;
 
@@ -141,6 +141,12 @@ export default class FileEdit extends Component {
 		const onChangeLinkDestinationOption = ( newHref ) => {
 			setAttributes( {
 				textLinkHref: newHref,
+			} );
+		};
+
+		const onChangeOpenInNewWindow = ( newValue ) => {
+			setAttributes( {
+				openInNewWindow: newValue ? '_blank' : false,
 			} );
 		};
 
@@ -194,6 +200,8 @@ export default class FileEdit extends Component {
 					textLinkHref={ textLinkHref }
 					attachmentPage={ attachmentPage }
 					onChangeLinkDestinationOption={ onChangeLinkDestinationOption }
+					openInNewWindow={ openInNewWindow }
+					onChangeOpenInNewWindow={ onChangeOpenInNewWindow }
 				/>
 				<BlockControls>
 					<Toolbar>
@@ -206,7 +214,10 @@ export default class FileEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<div className={ classNames }>
-					<a href={ textLinkHref }>
+					<a
+						href={ textLinkHref }
+						target={ openInNewWindow }
+					>
 						{ fileName }
 					</a>
 					<a

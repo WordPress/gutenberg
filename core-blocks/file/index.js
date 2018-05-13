@@ -39,6 +39,11 @@ export const settings = {
 			selector: 'a:not([download])',
 			attribute: 'href',
 		},
+		openInNewWindow: {
+			source: 'attribute',
+			selector: 'a:not([download])',
+			attribute: 'target',
+		},
 		id: {
 			type: 'number',
 		},
@@ -71,10 +76,13 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { href, fileName, textLinkHref } = attributes;
+		const { href, fileName, textLinkHref, openInNewWindow } = attributes;
 		return (
 			<div>
-				<a href={ textLinkHref }>
+				<a
+					href={ textLinkHref }
+					target={ openInNewWindow }
+				>
 					{ fileName }
 				</a>
 				<a
