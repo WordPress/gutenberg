@@ -121,15 +121,18 @@ export default class FileEdit extends Component {
 
 		const onSelectUrl = ( event ) => {
 			event.preventDefault();
-			if ( href ) {
-				// set the block's href from the edit component's state, and switch off the editing UI
+
+			// if url was changed
+			if ( href && href !== this.props.attributes.href ) {
 				setAttributes( {
 					href,
 					textLinkHref: href,
 					id: undefined,
 				} );
-				this.setState( { editing: false, attachmentPage: undefined } );
+				this.setState( { attachmentPage: undefined } );
 			}
+
+			this.setState( { editing: false } );
 			return false;
 		};
 
