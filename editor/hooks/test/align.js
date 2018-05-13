@@ -7,7 +7,6 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
 import {
 	getBlockTypes,
 	registerBlockType,
@@ -18,10 +17,8 @@ import {
  * Internal dependencies
  */
 import {
-	getBlockValidAlignments,
 	withToolbarControls,
 	withAlign,
-	addAssignedAlign,
 } from '../align';
 
 describe( 'align', () => {
@@ -34,73 +31,6 @@ describe( 'align', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
-		} );
-	} );
-
-	describe( 'addAttribute()', () => {
-		const filterRegisterBlockType = applyFilters.bind( null, 'blocks.registerBlockType' );
-
-		it( 'should do nothing if the block settings does not define align support', () => {
-			const settings = filterRegisterBlockType( blockSettings );
-
-			expect( settings.attributes ).toBeUndefined();
-		} );
-
-		it( 'should assign a new align attribute', () => {
-			const settings = filterRegisterBlockType( {
-				...blockSettings,
-				supports: {
-					align: true,
-				},
-			} );
-
-			expect( settings.attributes ).toHaveProperty( 'align' );
-		} );
-	} );
-
-	describe( 'getBlockValidAlignments()', () => {
-		it( 'should return an empty array if block does not define align support', () => {
-			registerBlockType( 'core/foo', blockSettings );
-			const validAlignments = getBlockValidAlignments( 'core/foo' );
-
-			expect( validAlignments ).toEqual( [] );
-		} );
-
-		it( 'should return all custom align set', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: [ 'left', 'right' ],
-				},
-			} );
-			const validAlignments = getBlockValidAlignments( 'core/foo' );
-
-			expect( validAlignments ).toEqual( [ 'left', 'right' ] );
-		} );
-
-		it( 'should return all aligns if block defines align support', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-				},
-			} );
-			const validAlignments = getBlockValidAlignments( 'core/foo' );
-
-			expect( validAlignments ).toEqual( [ 'left', 'center', 'right', 'wide', 'full' ] );
-		} );
-
-		it( 'should return all aligns except wide if wide align explicitly false', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-					wideAlign: false,
-				},
-			} );
-			const validAlignments = getBlockValidAlignments( 'core/foo' );
-
-			expect( validAlignments ).toEqual( [ 'left', 'center', 'right' ] );
 		} );
 	} );
 
@@ -205,41 +135,6 @@ describe( 'align', () => {
 			);
 
 			expect( wrapper.childAt( 0 ).prop( 'wrapperProps' ) ).toBeUndefined();
-		} );
-	} );
-
-	describe( 'addAssignedAlign', () => {
-		it( 'should do nothing if block does not support align', () => {
-			registerBlockType( 'core/foo', blockSettings );
-
-			const props = addAssignedAlign( {
-				className: 'foo',
-			}, 'core/foo', {
-				align: 'wide',
-			} );
-
-			expect( props ).toEqual( {
-				className: 'foo',
-			} );
-		} );
-
-		it( 'should do add align classname if block supports align', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-				},
-			} );
-
-			const props = addAssignedAlign( {
-				className: 'foo',
-			}, 'core/foo', {
-				align: 'wide',
-			} );
-
-			expect( props ).toEqual( {
-				className: 'alignwide foo',
-			} );
 		} );
 	} );
 } );

@@ -30,7 +30,7 @@ import InnerBlocks from '../../../editor/components/inner-blocks';
 describe( 'block serializer', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
+		require( 'blocks/hooks' );
 	} );
 
 	afterEach( () => {

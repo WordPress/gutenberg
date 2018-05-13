@@ -101,7 +101,7 @@ describe( 'full post content fixture', () => {
 		window._wpBlocks = require( './server-registered.json' );
 
 		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
+		require( 'blocks/hooks' );
 		registerCoreBlocks();
 	} );
 

@@ -7,6 +7,7 @@ import { xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
 /**
  * Internal dependencies
  */
+import { getBlockSupport, hasBlockSupport } from './registration';
 import { getSaveContent } from './serializer';
 
 /**
@@ -460,4 +461,32 @@ export function isValidBlock( innerHTML, blockType, attributes ) {
 	}
 
 	return isValid;
+}
+
+/**
+ * Returns an array of valid alignments for a block type depending on its
+ * defined supports. Returns an empty array if block does not support align.
+ *
+ * @param  {string}   blockName Block name to check
+ * @return {string[]}           Valid alignments for block
+ */
+export function getBlockValidAlignments( blockName ) {
+	// Explicitly defined array set of valid alignments
+	const blockAlign = getBlockSupport( blockName, 'align' );
+	if ( Array.isArray( blockAlign ) ) {
+		return blockAlign;
+	}
+
+	const validAlignments = [];
+	if ( true === blockAlign ) {
+		// `true` includes all alignments...
+		validAlignments.push( 'left', 'center', 'right' );
+
+		// ...including wide alignments unless explicitly `false`.
+		if ( hasBlockSupport( blockName, 'wideAlign', true ) ) {
+			validAlignments.push( 'wide', 'full' );
+		}
+	}
+
+	return validAlignments;
 }
