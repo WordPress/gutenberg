@@ -75,18 +75,12 @@ export default class FileEdit extends Component {
 
 	componentDidUpdate() {
 		const { fileName } = this.props.attributes;
-		const { isSelected, setAttributes } = this.props;
 
 		// Strip line breaks caused by typing Enter key in RichText
 		if ( /<br \/>/.test( fileName ) ) {
-			setAttributes( {
+			this.props.setAttributes( {
 				fileName: fileName.replace( '<br />', '' ),
 			} );
-		}
-
-		// Reset filename if filename is empty on blur
-		if ( ! isSelected && fileName === '' ) {
-			setAttributes( { fileName: __( 'Untitled file' ) } );
 		}
 	}
 

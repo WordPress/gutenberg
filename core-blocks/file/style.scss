@@ -15,7 +15,6 @@
 		color: $white;
 		cursor: pointer;
 		font-size: $default-font-size;
-		margin-left: 0.75em;
 		padding: 0.5em 1em;
 		text-decoration: none;
 
@@ -27,5 +26,9 @@
 			opacity: .85;
 			text-decoration: none;
 		}
+	}
+
+	* + a#{&}__button {
+		margin-left: 0.75em;
 	}
 }

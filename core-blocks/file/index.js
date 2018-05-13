@@ -80,6 +80,7 @@ export const settings = {
 		const { href, fileName, textLinkHref, openInNewWindow } = attributes;
 		return ( href &&
 			<div>
+				{ fileName &&
 					<RichText.Content
 						tagName="span"
 						value={
@@ -92,6 +93,7 @@ export const settings = {
 							</a>
 						}
 					/>
+				}
 				<a
 					href={ href }
 					className="wp-block-file__button"
