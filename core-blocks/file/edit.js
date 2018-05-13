@@ -119,6 +119,19 @@ export default class FileEdit extends Component {
 		return url.indexOf( 'blob:' ) === 0;
 	}
 
+	buildRichTextLink( innerText ) {
+		const { textLinkHref, openInNewWindow } = this.props.attributes;
+		return (
+			<a
+				href={ textLinkHref }
+				target={ openInNewWindow }
+				rel={ openInNewWindow ? 'noreferrer noopener' : false }
+			>
+				{ innerText }
+			</a>
+		);
+	}
+
 	render() {
 		const { fileName, textLinkHref, openInNewWindow, id } = this.props.attributes;
 		const { setAttributes } = this.props;
@@ -167,10 +180,22 @@ export default class FileEdit extends Component {
 			} );
 		};
 
-		const onChangeFileName = ( newFileName ) => {
-			setAttributes( {
-				fileName: ( newFileName.length === 0 ) ? '' : newFileName,
-			} );
+		const onChangeFileName = ( newRichTextLink ) => {
+			if ( newRichTextLink.length === 0 ) {
+				this.props.setAttributes( { fileName: '' } );
+				return;
+			}
+
+			const firstNode = newRichTextLink[ 0 ];
+			let newFileName;
+
+			if ( typeof firstNode === 'string' ) {
+				newFileName = firstNode;
+			} else {
+				newFileName = firstNode.props.children.trim();
+			}
+
+			this.props.setAttributes( { fileName: newFileName } );
 		};
 
 		if ( editing ) {
@@ -237,22 +262,15 @@ export default class FileEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<div className={ classNames }>
-					<a
-						href={ textLinkHref }
-						target={ openInNewWindow }
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						<RichText
-							format="string"
-							tagName="span"
-							className="wp-block-file__textlink"
-							value={ fileName }
-							formattingControls={ [] }
-							placeholder={ __( 'Write file name…' ) }
-							keepPlaceholderOnFocus={ true }
-							onChange={ onChangeFileName }
-						/>
-					</a>
+					<RichText
+						tagName="span"
+						className="wp-block-file__textlink"
+						value={ fileName && [ this.buildRichTextLink( fileName ) ] }
+						formattingControls={ [] }
+						placeholder={ __( 'Write file name…' ) }
+						keepPlaceholderOnFocus={ true }
+						onChange={ onChangeFileName }
+					/>
 					<a
 						href={ href }
 						className="wp-block-file__button"

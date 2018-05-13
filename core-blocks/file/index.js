@@ -80,16 +80,18 @@ export const settings = {
 		const { href, fileName, textLinkHref, openInNewWindow } = attributes;
 		return ( href &&
 			<div>
-				<a
-					href={ textLinkHref }
-					target={ openInNewWindow }
-					rel={ openInNewWindow ? 'noreferrer noopener' : false }
-				>
 					<RichText.Content
 						tagName="span"
-						value={ fileName }
+						value={
+							<a
+								href={ textLinkHref }
+								target={ openInNewWindow }
+								rel={ openInNewWindow ? 'noreferrer noopener' : false }
+							>
+								{ fileName }
+							</a>
+						}
 					/>
-				</a>
 				<a
 					href={ href }
 					className="wp-block-file__button"
