@@ -9,14 +9,11 @@ import {
 	IconButton,
 	Placeholder,
 	Toolbar,
-	PanelBody,
-	SelectControl,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
 	BlockControls,
-	InspectorControls,
 	editorMediaUpload,
 } from '@wordpress/editor';
 
@@ -24,6 +21,7 @@ import {
  * Internal dependencies
  */
 import './editor.scss';
+import FileBlockInspector from './inspector';
 
 export default class FileEdit extends Component {
 	constructor() {
@@ -146,29 +144,6 @@ export default class FileEdit extends Component {
 			} );
 		};
 
-		const linkDestinationOptions = ( () => {
-			if ( attachmentPage ) {
-				return [
-					{ value: href, label: __( 'Media File' ) },
-					{ value: attachmentPage, label: __( 'Attachment Page' ) },
-				];
-			}
-			return [ { value: href, label: __( 'URL' ) } ];
-		} )();
-
-		const inspectorControls = (
-			<InspectorControls>
-				<PanelBody title={ __( 'Text Link Settings' ) }>
-					<SelectControl
-						label={ __( 'Link To' ) }
-						value={ textLinkHref }
-						options={ linkDestinationOptions }
-						onChange={ onChangeLinkDestinationOption }
-					/>
-				</PanelBody>
-			</InspectorControls>
-		);
-
 		if ( editing ) {
 			return (
 				<Placeholder
@@ -214,7 +189,12 @@ export default class FileEdit extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<Fragment>
-				{ inspectorControls }
+				<FileBlockInspector
+					href={ href }
+					textLinkHref={ textLinkHref }
+					attachmentPage={ attachmentPage }
+					onChangeLinkDestinationOption={ onChangeLinkDestinationOption }
+				/>
 				<BlockControls>
 					<Toolbar>
 						<IconButton
