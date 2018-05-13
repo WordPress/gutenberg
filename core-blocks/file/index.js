@@ -83,6 +83,7 @@ export const settings = {
 				<a
 					href={ textLinkHref }
 					target={ openInNewWindow }
+					rel={ openInNewWindow ? 'noreferrer noopener' : false }
 				>
 					<RichText.Content
 						tagName="span"
