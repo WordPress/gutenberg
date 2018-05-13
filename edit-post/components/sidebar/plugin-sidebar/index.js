@@ -73,19 +73,21 @@ function PluginSidebar( props ) {
 }
 
 export default compose(
-	withPluginContext,
-	withSelect( ( select, { icon, name, pluginContext } ) => {
+	withPluginContext( ( context, ownProps ) => {
+		return {
+			icon: ownProps.icon || context.icon,
+			sidebarName: `${ context.name }/${ ownProps.name }`,
+		};
+	} ),
+	withSelect( ( select, { sidebarName } ) => {
 		const {
 			getActiveGeneralSidebarName,
 			isPluginItemPinned,
 		} = select( 'core/edit-post' );
-		const sidebarName = `${ pluginContext.name }/${ name }`;
 
 		return {
-			icon: icon || pluginContext.icon,
 			isActive: getActiveGeneralSidebarName() === sidebarName,
 			isPinned: isPluginItemPinned( sidebarName ),
-			sidebarName,
 		};
 	} ),
 	withDispatch( ( dispatch, { isActive, sidebarName } ) => {

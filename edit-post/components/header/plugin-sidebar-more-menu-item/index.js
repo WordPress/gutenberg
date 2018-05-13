@@ -26,17 +26,19 @@ const PluginSidebarMoreMenuItem = ( { children, icon, isSelected, onClick } ) =>
 );
 
 export default compose(
-	withPluginContext,
-	withSelect( ( select, { icon, pluginContext, target } ) => {
+	withPluginContext( ( context, ownProps ) => {
+		return {
+			icon: ownProps.icon || context.icon,
+			sidebarName: `${ context.name }/${ ownProps.target }`,
+		};
+	} ),
+	withSelect( ( select, { sidebarName } ) => {
 		const {
 			getActiveGeneralSidebarName,
 		} = select( 'core/edit-post' );
-		const sidebarName = `${ pluginContext.name }/${ target }`;
 
 		return {
-			icon: icon || pluginContext.icon,
 			isSelected: getActiveGeneralSidebarName() === sidebarName,
-			sidebarName,
 		};
 	} ),
 	withDispatch( ( dispatch, { isSelected, sidebarName } ) => {
