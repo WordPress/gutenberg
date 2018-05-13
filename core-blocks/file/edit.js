@@ -9,11 +9,14 @@ import {
 	IconButton,
 	Placeholder,
 	Toolbar,
+	PanelBody,
+	SelectControl,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
 	BlockControls,
+	InspectorControls,
 	editorMediaUpload,
 } from '@wordpress/editor';
 
@@ -25,16 +28,39 @@ import './editor.scss';
 export default class FileEdit extends Component {
 	constructor() {
 		super( ...arguments );
+
+		const { href, fileName, id } = this.props.attributes;
+
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 
-		// edit component has its own href in the state so it can be edited
-		// without setting the actual value outside of the edit UI
+		// edit component has its own attributes in the state so it can be edited
+		// without setting the actual values outside of the edit UI
 		this.state = {
-			editing: ! this.props.attributes.href,
-			href: this.props.attributes.href,
-			fileName: this.props.attributes.fileName,
+			editing: ! href,
+			href,
+			fileName,
+			attachmentPage: undefined,
 		};
+
+		const getAttachmentPageURL = ( mediaId ) => {
+			return wp.apiRequest( {
+				path: `/wp/v2/media/${ mediaId }`,
+				method: 'GET',
+			} )
+				.then(
+					( result ) => {
+						this.setState( { attachmentPage: result.link } );
+					},
+					() => {
+						this.setState( { attachmentPage: undefined } );
+					}
+				);
+		};
+
+		if ( id !== undefined ) {
+			getAttachmentPageURL( id );
+		}
 	}
 
 	componentDidMount() {
@@ -64,6 +90,7 @@ export default class FileEdit extends Component {
 			this.setState( {
 				href: media.url,
 				fileName: media.title || fileName,
+				attachmentPage: media.link,
 				editing: false,
 			} );
 		}
@@ -80,31 +107,64 @@ export default class FileEdit extends Component {
 	render() {
 		const { id, textLinkHref } = this.props.attributes;
 		const { setAttributes } = this.props;
-		const { editing, href, fileName } = this.state;
+		const { editing, href, fileName, attachmentPage } = this.state;
+
 		const classNames = [
 			this.props.className,
 			`${ this.props.className }__editing`,
 			this.isBlobURL( href ) ? 'is-transient' : '',
 		].join( ' ' );
+
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
 		};
+
 		const onSelectUrl = ( event ) => {
 			event.preventDefault();
 			if ( href ) {
 				// set the block's href from the edit component's state, and switch off the editing UI
 				setAttributes( {
-					href: href,
+					href,
 					textLinkHref: href,
 					id: undefined,
 				} );
-				this.setState( { editing: false } );
+				this.setState( { editing: false, attachmentPage: undefined } );
 			}
 			return false;
 		};
+
 		const uploadFilesFromInput = ( event ) => {
 			this.uploadFromFiles( event.target.files );
 		};
+
+		const onChangeLinkDestinationOption = ( newHref ) => {
+			setAttributes( {
+				textLinkHref: newHref,
+			} );
+		};
+
+		const linkDestinationOptions = ( () => {
+			if ( attachmentPage ) {
+				return [
+					{ value: href, label: __( 'Media File' ) },
+					{ value: attachmentPage, label: __( 'Attachment Page' ) },
+				];
+			}
+			return [ { value: href, label: __( 'URL' ) } ];
+		} )();
+
+		const inspectorControls = (
+			<InspectorControls>
+				<PanelBody title={ __( 'Text Link Settings' ) }>
+					<SelectControl
+						label={ __( 'Link To' ) }
+						value={ textLinkHref }
+						options={ linkDestinationOptions }
+						onChange={ onChangeLinkDestinationOption }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		);
 
 		if ( editing ) {
 			return (
@@ -151,6 +211,7 @@ export default class FileEdit extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<Fragment>
+				{ inspectorControls }
 				<BlockControls>
 					<Toolbar>
 						<IconButton
