@@ -114,7 +114,8 @@ export function isFeatureActive( state, feature ) {
  *
  * @param  {Object}  state      Global application state.
  * @param  {string}  pluginName Plugin item name.
- * @return {boolean}            Whether the plugin item is pinned.
+ *
+ * @return {boolean} Whether the plugin item is pinned.
  */
 export function isPluginItemPinned( state, pluginName ) {
 	const pinnedPluginItems = getPreference( state, 'pinnedPluginItems', {} );

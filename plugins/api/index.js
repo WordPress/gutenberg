@@ -20,10 +20,10 @@ const plugins = {};
 /**
  * Registers a plugin to the editor.
  *
- * @param {string}   name   The name of the plugin.
- * @param {Object}   settings        The settings for this plugin.
- * @param {Function} settings.render The function that renders the plugin.
- * @param {string}   settings.icon   An icon to be shown in the UI.
+ * @param {string}                    name            The name of the plugin.
+ * @param {Object}                    settings        The settings for this plugin.
+ * @param {Function}                  settings.render The function that renders the plugin.
+ * @param {string|WPElement|Function} settings.icon   An icon to be shown in the UI.
  *
  * @return {Object} The final plugin settings object.
  */

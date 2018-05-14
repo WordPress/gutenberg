@@ -18,6 +18,7 @@ import SidebarHeader from '../sidebar-header';
  * Renders the plugin sidebar component.
  *
  * @param {Object} props Element props.
+ *
  * @return {WPElement} Plugin sidebar component.
  */
 function PluginSidebar( props ) {
