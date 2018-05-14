@@ -9,6 +9,7 @@ import {
 	IconButton,
 	Placeholder,
 	Toolbar,
+	DropZone,
 } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
@@ -199,6 +200,9 @@ export default class FileEdit extends Component {
 					label={ __( 'File' ) }
 					instructions={ __( 'Select a file from your library, or upload a new one' ) }
 					className={ classNames }>
+					<DropZone
+						onFilesDrop={ this.uploadFromFiles }
+					/>
 					<form onSubmit={ onSelectUrl }>
 						<input
 							type="url"
