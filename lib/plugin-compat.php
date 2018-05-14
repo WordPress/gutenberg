@@ -27,8 +27,13 @@
  */
 function gutenberg_remove_wpcom_markdown_support( $post ) {
 	if ( class_exists( 'WPCom_Markdown' ) && gutenberg_content_has_blocks( $post['post_content'] ) ) {
-		WPCom_Markdown::get_instance()->unload_markdown_for_posts();
+		if(
+			! isset(WPCom_Markdown::$is_gutenberg_compatible) ||
+			WPCom_Markdown::$is_gutenberg_compatible !== true
+		) {
+			WPCom_Markdown::get_instance()->unload_markdown_for_posts();
+		}
 	}
 	return $post;
 }
-// add_filter( 'wp_insert_post_data', 'gutenberg_remove_wpcom_markdown_support', 9 ); tmp fix.
+add_filter( 'wp_insert_post_data', 'gutenberg_remove_wpcom_markdown_support', 9 );
