@@ -18,6 +18,20 @@ export function addBlockTypes( blockTypes ) {
 }
 
 /**
+ * Returns an action object used in signalling that block types have been added.
+ *
+ * @param {Array|Object} implementations Block types implementations.
+ *
+ * @return {Object} Action object.
+ */
+export function implementBlockTypes( implementations ) {
+	return {
+		type: 'IMPLEMENT_BLOCK_TYPES',
+		implementations: castArray( implementations ),
+	};
+}
+
+/**
  * Returns an action object used to remove a registered block type.
  *
  * @param {string|Array} names Block name.

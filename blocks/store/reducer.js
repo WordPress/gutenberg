@@ -44,6 +44,28 @@ export function blockTypes( state = {}, action ) {
 }
 
 /**
+ * Reducer managing the block type implementations
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function implementations( state = {}, action ) {
+	switch ( action.type ) {
+		case 'IMPLEMENT_BLOCK_TYPES':
+			return {
+				...state,
+				...keyBy( action.implementations, 'name' ),
+			};
+		case 'REMOVE_BLOCK_TYPES':
+			return omit( state, action.names );
+	}
+
+	return state;
+}
+
+/**
  * Higher-order Reducer creating a reducer keeping track of given block name.
  *
  * @param {string} setActionType  Action type.
@@ -91,6 +113,7 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 
 export default combineReducers( {
 	blockTypes,
+	implementations,
 	defaultBlockName,
 	fallbackBlockName,
 	categories,

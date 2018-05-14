@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { filter, includes, map } from 'lodash';
+import { filter, includes, map, mapValues, compact } from 'lodash';
 
 /**
  * Returns all the available block types.
@@ -12,9 +12,10 @@ import { filter, includes, map } from 'lodash';
  * @return {Array} Block Types.
  */
 export const getBlockTypes = createSelector(
-	( state ) => Object.values( state.blockTypes ),
+	( state ) => compact( Object.values( state.blockTypes ).map( ( { name } ) => getBlockType( state, name ) ) ),
 	( state ) => [
 		state.blockTypes,
+		state.implementations,
 	]
 );
 
@@ -26,9 +27,32 @@ export const getBlockTypes = createSelector(
  *
  * @return {Object?} Block Type.
  */
-export function getBlockType( state, name ) {
-	return state.blockTypes[ name ];
-}
+export const getBlockType = createSelector(
+	( state, name ) => {
+		const blockTypeDefinition = state.blockTypes[ name ];
+		const blockTypeImplementation = state.implementations[ name ];
+
+		if ( ! blockTypeDefinition || ! blockTypeImplementation ) {
+			return null;
+		}
+
+		return {
+			...blockTypeDefinition,
+			...blockTypeImplementation,
+			attributes: mapValues( blockTypeDefinition.attributes, ( attribute, key ) => {
+				const implementationAttribute = blockTypeImplementation.attributes ? blockTypeImplementation.attributes[ key ] : {};
+				return {
+					...attribute,
+					...implementationAttribute,
+				};
+			} ),
+		};
+	},
+	( state ) => [
+		state.blockTypes,
+		state.implementations,
+	]
+);
 
 /**
  * Returns all the available categories.
