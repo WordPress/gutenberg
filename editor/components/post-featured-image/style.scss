@@ -8,7 +8,7 @@
 
 .editor-post-featured-image__toggle {
 	text-decoration: underline;
-	color: $blue-wordpress;
+	color: theme(secondary);
 
 	&:focus {
 		box-shadow: none;
@@ -16,7 +16,7 @@
 	}
 
 	&:hover {
-		color: $blue-medium-500;
+		color: theme(primary);
 	}
 }
 

@@ -1,12 +1,3 @@
-$datepicker__background-color: $light-gray-300;
-$datepicker__border-color: $light-gray-500;
-$datepicker__highlighted-color: $blue-wordpress;
-$datepicker__muted-color: #ccc;
-$datepicker__selected-color: $blue-wordpress;
-$datepicker__text-color: $dark-gray-500;
-$datepicker__header-color: $black;
-$datepicker__navigation-disabled-color: lighten($datepicker__muted-color, 10%);
-
 $datepicker__border-radius: 0;
 $datepicker__day-margin: 0.166rem;
 $datepicker__font-size: 13px;
@@ -29,7 +20,7 @@ $datepicker__triangle-size: 6px;
 
 .react-datepicker__navigation {
 	top: 12px;
-	
+
 	&--previous,
 	&--previous:hover {
 		border-right-color: $black;

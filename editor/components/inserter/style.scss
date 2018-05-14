@@ -202,7 +202,7 @@ input[type="search"].editor-inserter__search {
 	&.is-active {
 		padding-bottom: 8px;
 		font-weight: 600;
-		border-bottom: 3px solid $blue-medium-500;
+		border-bottom: 3px solid theme(primary);
 		position: relative;
 		z-index: z-index( '.editor-inserter__tab.is-active' );
 	}

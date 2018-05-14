@@ -34,7 +34,7 @@
 	&.button-primary.is-busy[disabled] {
 		color: $white !important;
 		background-size: 100px 100% !important;
-		background-image: linear-gradient( -45deg, $blue-medium-500 28%, $blue-dark-900 28%, $blue-dark-900 72%, $blue-medium-500 72%) !important;
+		background-image: linear-gradient( -45deg, theme(primary) 28%, $blue-dark-900 28%, $blue-dark-900 72%, theme(primary) 72%) !important;
 		border-color: $blue-dark-900 !important;
 	}
 

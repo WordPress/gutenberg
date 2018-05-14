@@ -34,6 +34,50 @@ const extractConfig = {
 			loader: 'postcss-loader',
 			options: {
 				plugins: [
+					require( './packages/postcss-themes' )( {
+						defaults: {
+							primary: '#00a0d2',
+							secondary: '#0073aa',
+							'primary-dark15': '#0087b2',
+						},
+						themes: {
+							'admin-color-light': {
+								primary: '#00a0d2',
+								secondary: '#c75726',
+								'primary-dark15': '#0087b2',
+							},
+							'admin-color-blue': {
+								primary: '#82b4cb',
+								secondary: '#d9ab59',
+								'primary-dark15': '#5e9ebc',
+							},
+							'admin-color-coffee': {
+								primary: '#c2a68c',
+								secondary: '#9fa47b',
+								'primary-dark15': '#b08c6b',
+							},
+							'admin-color-ectoplasm': {
+								primary: '#a7b656',
+								secondary: '#c77430',
+								'primary-dark15': '#909f44',
+							},
+							'admin-color-midnight': {
+								primary: '#e34e46',
+								secondary: '#77a6b9',
+								'primary-dark15': '#db2a21',
+							},
+							'admin-color-ocean': {
+								primary: '#a3b9a2',
+								secondary: '#a89d8a',
+								'primary-dark15': '#85a284',
+							},
+							'admin-color-sunrise': {
+								primary: '#d1864a',
+								secondary: '#c8b03c',
+								'primary-dark15': '#bf7030',
+							},
+						},
+					} ),
 					require( 'autoprefixer' ),
 				],
 			},
@@ -42,7 +86,7 @@ const extractConfig = {
 			loader: 'sass-loader',
 			query: {
 				includePaths: [ 'edit-post/assets/stylesheets' ],
-				data: '@import "colors"; @import "admin-schemes"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
+				data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 				outputStyle: 'production' === process.env.NODE_ENV ?
 					'compressed' : 'nested',
 			},

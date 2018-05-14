@@ -7,7 +7,7 @@
 .blocks-gallery-item {
 
 	.is-selected {
-		outline: 4px solid $blue-medium-500;
+		outline: 4px solid theme(primary);
 		outline-offset: -4px;
 	}
 
@@ -64,7 +64,7 @@
 	position: absolute;
 	top: 0;
 	right: 0;
-	background-color: $blue-medium-500;
+	background-color: theme(primary);
 	display: inline-flex;
 	z-index: z-index( '.core-blocks-gallery-item__inline-menu' );
 

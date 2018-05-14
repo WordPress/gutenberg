@@ -83,8 +83,8 @@ $toggle-border-width: 2px;
 		}
 
 		&:before {
-			background-color: $blue-medium-500;
-			border: $toggle-border-width solid $blue-medium-500;
+			background-color: theme(primary);
+			border: $toggle-border-width solid theme(primary);
 		}
 	}
 }
