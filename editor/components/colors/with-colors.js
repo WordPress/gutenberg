@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { get, memoize } from 'lodash';
+import memoize from 'memize';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { createHigherOrderComponent } from '@wordpress/element';
+import { createHigherOrderComponent, Component, compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -14,39 +15,7 @@ import { withSelect } from '@wordpress/data';
  */
 import { getColorValue, getColorClass, setColorValue } from './utils';
 
-const memoizedGetColor = memoize(
-	( colors ) =>
-		memoize(
-			( colorName, customColorValue, colorContext ) => {
-				return {
-					name: colorName,
-					class: getColorClass( colorContext, colorName ),
-					value: getColorValue( colors, colorName, customColorValue ),
-				};
-			},
-			( colorName, customColorValue, colorContext ) =>
-				`${ colorName }-${ customColorValue }-${ colorContext }`
-		)
-);
-/**
- * Even though, we don't expect setAttributes to change memoizing it is essential.
- * If setAttributes is not memoized, each time memoizedSetColor is called:
- * a new function reference is returned (even if setAttributes has not changed).
- * This would make our memoized chain useless.
- */
-const memoizedSetColor = memoize(
-	( setAttributes ) =>
-		memoize(
-			( colors ) =>
-				memoize(
-					( colorNameAttribute, customColorAttribute ) => {
-						return setColorValue( colors, colorNameAttribute, customColorAttribute, setAttributes );
-					},
-					( colorNameAttribute, customColorAttribute ) =>
-						`${ colorNameAttribute }-${ customColorAttribute }`
-				)
-		)
-);
+const DEFAULT_COLORS = [];
 
 /**
  * Higher-order component, which handles color logic for class generation
@@ -58,11 +27,65 @@ const memoizedSetColor = memoize(
  * @return {Function} Higher-order component.
  */
 export default ( mapGetSetColorToProps ) => createHigherOrderComponent(
-	withSelect(
-		( select, props ) => {
-			const settings = select( 'core/editor' ).getEditorSettings();
-			const colors = get( settings, [ 'colors' ], [] );
-			return mapGetSetColorToProps( memoizedGetColor( colors ), memoizedSetColor( props.setAttributes )( colors ), props );
-		} ),
+	compose( [
+		withSelect(
+			( select ) => {
+				const settings = select( 'core/editor' ).getEditorSettings();
+				return {
+					colors: get( settings, [ 'colors' ], DEFAULT_COLORS ),
+				};
+			} ),
+		( WrappedComponent ) => {
+			return class extends Component {
+				constructor() {
+					super( ...arguments );
+					/**
+					* Even though, we don't expect setAttributes or colors to change memoizing it is essential.
+					* If setAttributes or colors are not memoized, each time memoizedGetColor/memoizedSetColor are called:
+					* a new function reference is returned (even if arguments have not changed).
+					* This would make our memoized chain useless.
+					*/
+					this.memoizedGetColor = memoize( this.memoizedGetColor, { maxSize: 1 } );
+					this.memoizedSetColor = memoize( this.memoizedSetColor, { maxSize: 1 } );
+				}
+
+				memoizedGetColor( colors ) {
+					return memoize(
+						( colorName, customColorValue, colorContext ) => {
+							return {
+								name: colorName,
+								class: getColorClass( colorContext, colorName ),
+								value: getColorValue( colors, colorName, customColorValue ),
+							};
+						}
+					);
+				}
+
+				memoizedSetColor( setAttributes, colors ) {
+					return memoize(
+						( colorNameAttribute, customColorAttribute ) => {
+							return setColorValue( colors, colorNameAttribute, customColorAttribute, setAttributes );
+						}
+					);
+				}
+
+				render() {
+					return (
+						<WrappedComponent
+							{ ...{
+								...this.props,
+								colors: undefined,
+								...mapGetSetColorToProps(
+									this.memoizedGetColor( this.props.colors ),
+									this.memoizedSetColor( this.props.setAttributes, this.props.colors ),
+									this.props
+								),
+							} }
+						/>
+					);
+				}
+			};
+		},
+	] ),
 	'withColors'
 );
