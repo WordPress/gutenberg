@@ -10,7 +10,7 @@ import {
 	Component,
 	RawHTML,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import apiRequest from '@wordpress/api-request';
 
 /**
@@ -81,7 +81,7 @@ export class ServerSideRender extends Component {
 			);
 		} else if ( response.error ) {
 			return (
-				<Placeholder>{ __( 'Error loading block: ' ) + response.errorMsg }</Placeholder>
+				<Placeholder>{ sprintf( __( 'Error loading block: %s' ), response.errorMsg ) }</Placeholder>
 			);
 		} else if ( ! response.length ) {
 			return (
