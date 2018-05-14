@@ -152,7 +152,7 @@ export default {
 		}
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post, isAutosave } = action;
+		const { previousPost, post } = action;
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -162,7 +162,7 @@ export default {
 		let noticeMessage;
 		let shouldShowLink = true;
 
-		if ( isAutosave || ( ! isPublished && ! willPublish ) ) {
+		if ( ! isPublished && ! willPublish ) {
 			// If autosaving, or saving a non published post, don't show any notice
 			noticeMessage = null;
 		} else if ( isPublished && ! willPublish ) {
