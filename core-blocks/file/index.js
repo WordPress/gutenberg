@@ -71,6 +71,54 @@ export const settings = {
 					} );
 				},
 			},
+			{
+				type: 'block',
+				blocks: [ 'core/audio' ],
+				transform: ( attributes ) => {
+					return createBlock( 'core/file', {
+						href: attributes.src,
+						fileName: attributes.caption && attributes.caption.join(),
+						textLinkHref: attributes.src,
+						id: attributes.id,
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/video' ],
+				transform: ( attributes ) => {
+					return createBlock( 'core/file', {
+						href: attributes.src,
+						fileName: attributes.caption && attributes.caption.join(),
+						textLinkHref: attributes.src,
+						id: attributes.id,
+					} );
+				},
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/audio' ],
+				transform: ( attributes ) => {
+					return createBlock( 'core/audio', {
+						src: attributes.href,
+						caption: [ attributes.fileName ],
+						id: attributes.id,
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/video' ],
+				transform: ( attributes ) => {
+					return createBlock( 'core/video', {
+						src: attributes.href,
+						caption: [ attributes.fileName ],
+						id: attributes.id,
+					} );
+				},
+			},
 		],
 	},
 
