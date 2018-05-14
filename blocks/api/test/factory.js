@@ -30,8 +30,8 @@ describe( 'block factory', () => {
 	};
 
 	beforeAll( () => {
-		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
+		// Load blocks store
+		require( 'blocks/store' );
 	} );
 
 	afterEach( () => {
@@ -77,41 +77,6 @@ describe( 'block factory', () => {
 			expect( block.innerBlocks ).toHaveLength( 1 );
 			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block' );
 			expect( typeof block.uid ).toBe( 'string' );
-		} );
-
-		it( 'should keep the className if the block supports it', () => {
-			registerBlockType( 'core/test-block', {
-				attributes: {},
-				save: noop,
-				category: 'common',
-				title: 'test block',
-			} );
-			const block = createBlock( 'core/test-block', {
-				className: 'chicken',
-			} );
-
-			expect( block.attributes ).toEqual( {
-				className: 'chicken',
-			} );
-			expect( block.isValid ).toBe( true );
-		} );
-
-		it( 'should not keep the className if the block supports it', () => {
-			registerBlockType( 'core/test-block', {
-				attributes: {},
-				save: noop,
-				category: 'common',
-				title: 'test block',
-				supports: {
-					customClassName: false,
-				},
-			} );
-			const block = createBlock( 'core/test-block', {
-				className: 'chicken',
-			} );
-
-			expect( block.attributes ).toEqual( {} );
-			expect( block.isValid ).toBe( true );
 		} );
 	} );
 
