@@ -304,7 +304,8 @@ export function isEditedPostEmpty( state ) {
  * Returns true if the post can be autosaved, or false otherwise.
  *
  * @param  {Object}  state Global application state
- * @return {boolean}       Whether the post can be autosaved
+ *
+ * @return {boolean} Whether the post can be autosaved
  */
 export function isPostAutosaveable( state ) {
 	// If the post is autosaving, it is not autosaveable.
