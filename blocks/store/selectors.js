@@ -12,7 +12,9 @@ import createSelector from 'rememo';
  */
 export const getBlockTypes = createSelector(
 	( state ) => Object.values( state.blockTypes ),
-	( state ) => state.blockTypes
+	( state ) => [
+		state.blockTypes,
+	]
 );
 
 /**
