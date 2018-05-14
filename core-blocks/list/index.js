@@ -59,6 +59,9 @@ export const settings = {
 			selector: 'ol,ul',
 			default: [],
 		},
+		placeholder: {
+			type: 'string',
+		},
 	},
 
 	supports: {
@@ -258,7 +261,7 @@ export const settings = {
 				onReplace,
 				className,
 			} = this.props;
-			const { nodeName, values } = attributes;
+			const { nodeName, values, placeholder } = attributes;
 
 			return (
 				<Fragment>
@@ -297,7 +300,7 @@ export const settings = {
 						value={ values }
 						wrapperClassName="core-blocks-list"
 						className={ className }
-						placeholder={ __( 'Write list…' ) }
+						placeholder={ placeholder || __( 'Write list…' ) }
 						onMerge={ mergeBlocks }
 						onSplit={
 							insertBlocksAfter ?
