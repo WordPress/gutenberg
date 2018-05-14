@@ -44,48 +44,32 @@ export function blockTypes( state = {}, action ) {
 }
 
 /**
- * Reducer keeping track of the default block name.
+ * Higher-order Reducer creating a reducer keeping track of give block name.
  *
- * @param {string?} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string} setActionType  Action type.
  *
- * @return {string?} Updated state.
+ * @return {function} Reducer.
  */
-export function defaultBlockName( state = null, action ) {
-	switch ( action.type ) {
-		case 'REMOVE_BLOCK_TYPES':
-			if ( action.names.indexOf( state ) !== -1 ) {
-				return null;
-			}
-			return state;
-		case 'SET_DEFAULT_BLOCK_NAME':
-			return action.name || null;
-	}
+export function createBlockNameSetterReducer( setActionType ) {
+	return ( state = null, action ) => {
+		switch ( action.type ) {
+			case 'REMOVE_BLOCK_TYPES':
+				if ( action.names.indexOf( state ) !== -1 ) {
+					return null;
+				}
+				return state;
 
-	return state;
+			case setActionType:
+				return action.name || null;
+		}
+
+		return state;
+	};
 }
 
-/**
- * Reducer keeping track of the fallback block name.
- *
- * @param {string?} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {string?} Updated state.
- */
-export function fallbackBlockName( state = null, action ) {
-	switch ( action.type ) {
-		case 'REMOVE_BLOCK_TYPES':
-			if ( action.names.indexOf( state ) !== -1 ) {
-				return null;
-			}
-			return state;
-		case 'SET_FALLBACK_BLOCK_NAME':
-			return action.name || null;
-	}
+export const defaultBlockName = createBlockNameSetterReducer( 'SET_DEFAULT_BLOCK_NAME' );
 
-	return state;
-}
+export const fallbackBlockName = createBlockNameSetterReducer( 'SET_FALLBACK_BLOCK_NAME' );
 
 /**
  * Reducer managing the categories
