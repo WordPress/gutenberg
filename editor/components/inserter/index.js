@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, IconButton } from '@wordpress/components';
+import { Dropdown, IconButton, ifCondition } from '@wordpress/components';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -45,13 +40,7 @@ class Inserter extends Component {
 			title,
 			children,
 			onInsertBlock,
-			hasSupportedBlocks,
-			isLocked,
 		} = this.props;
-
-		if ( ! hasSupportedBlocks || isLocked ) {
-			return null;
-		}
 
 		return (
 			<Dropdown
@@ -93,20 +82,18 @@ export default compose( [
 			getBlockInsertionPoint,
 			getSelectedBlock,
 			getSupportedBlocks,
-			getEditorSettings,
 		} = select( 'core/editor' );
-		const { allowedBlockTypes, templateLock } = getEditorSettings();
 		const insertionPoint = getBlockInsertionPoint();
 		const { rootUID } = insertionPoint;
-		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
+		const supportedBlocks = getSupportedBlocks( rootUID );
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			insertionPoint,
 			selectedBlock: getSelectedBlock(),
-			hasSupportedBlocks: true === supportedBlocks || ! isEmpty( supportedBlocks ),
-			isLocked: !! templateLock,
+			hasSupportedBlocks: supportedBlocks === true || supportedBlocks.length > 0,
 		};
 	} ),
+	ifCondition( ( { hasSupportedBlocks } ) => hasSupportedBlocks ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
 		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,

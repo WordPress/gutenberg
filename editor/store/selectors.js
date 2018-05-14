@@ -1595,33 +1595,42 @@ export function getBlockListSettings( state, uid ) {
 }
 
 /**
- * Determines the blocks that can be nested inside a given block. Or globally if a block is not specified.
+ * Determines the blocks that can be nested/inserted inside a given block. Or globally if a block is not specified.
  *
  * @param {Object}           state                     Global application state.
  * @param {?string}          uid                       Block UID.
- * @param {string[]|boolean} globallyEnabledBlockTypes Globally enabled block types, or true/false to enable/disable all types.
  *
- * @return {string[]|boolean} Blocks that can be nested inside the block with the specified uid, or true/false to enable/disable all types.
+ * @return {string[]|boolean} Blocks that can be nested/inserted inside the block with the specified uid, or true/false to enable/disable all types.
  */
-export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
-	if ( ! globallyEnabledBlockTypes ) {
-		return false;
-	}
+export const getSupportedBlocks = createSelector(
+	( state, uid ) => {
+		const globallyEnabledBlockTypes = getEditorSettings( state ).allowedBlockTypes;
+		if ( ! globallyEnabledBlockTypes || !! getTemplateLock( state ) ) {
+			return false;
+		}
 
-	const supportedNestedBlocks = get( getBlockListSettings( state, uid ), [ 'supportedBlocks' ] );
-	if ( supportedNestedBlocks === true || supportedNestedBlocks === undefined ) {
-		return globallyEnabledBlockTypes;
-	}
+		const supportedNestedBlocks = get( getBlockListSettings( state, uid ), [ 'supportedBlocks' ] );
+		if ( supportedNestedBlocks === true || supportedNestedBlocks === undefined ) {
+			return globallyEnabledBlockTypes;
+		}
 
-	if ( ! supportedNestedBlocks ) {
-		return false;
-	}
+		if ( ! supportedNestedBlocks ) {
+			return false;
+		}
 
-	if ( globallyEnabledBlockTypes === true ) {
-		return supportedNestedBlocks;
+		if ( globallyEnabledBlockTypes === true ) {
+			return supportedNestedBlocks;
+		}
+		return intersection( globallyEnabledBlockTypes, supportedNestedBlocks );
+	},
+	( state, uid ) => {
+		return [
+			getBlockListSettings( state, uid ),
+			getEditorSettings( state ).allowedBlockTypes,
+			getTemplateLock( state ),
+		];
 	}
-	return intersection( globallyEnabledBlockTypes, supportedNestedBlocks );
-}
+);
 
 /*
  * Returns the editor settings.
