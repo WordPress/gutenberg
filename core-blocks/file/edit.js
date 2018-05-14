@@ -261,7 +261,7 @@ export default class FileEdit extends Component {
 				</BlockControls>
 				<div className={ classNames }>
 					<RichText
-						tagName="span"
+						tagName="div" // must be div (not span) or else cursor disappears
 						className="wp-block-file__textlink"
 						value={ fileName && [ this.buildRichTextLink( fileName ) ] }
 						formattingControls={ [] }
