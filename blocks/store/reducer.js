@@ -44,7 +44,7 @@ export function blockTypes( state = {}, action ) {
 }
 
 /**
- * Higher-order Reducer creating a reducer keeping track of give block name.
+ * Higher-order Reducer creating a reducer keeping track of given block name.
  *
  * @param {string} setActionType  Action type.
  *
