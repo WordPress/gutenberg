@@ -70,10 +70,16 @@ export default compose(
 		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
 	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		openGeneralSidebar: () => dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/document' ),
-		closeGeneralSidebar: dispatch( 'core/edit-post' ).closeGeneralSidebar,
-		togglePublishSidebar: dispatch( 'core/edit-post' ).togglePublishSidebar,
-	} ) ),
+	withDispatch( ( dispatch, { hasBlockSelection } ) => {
+		const { openGeneralSidebar, closeGeneralSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
+		const sidebarToOpen = hasBlockSelection ? 'edit-post/block' : 'edit-post/document';
+		return {
+			openGeneralSidebar: () => openGeneralSidebar( sidebarToOpen ),
+			closeGeneralSidebar: closeGeneralSidebar,
+			togglePublishSidebar: togglePublishSidebar,
+			hasBlockSelection: undefined,
+		};
+	} ),
 )( Header );

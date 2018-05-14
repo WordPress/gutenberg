@@ -90,7 +90,7 @@ export const settings = {
 						}
 						/* translators: the text of the quotation */
 						placeholder={ __( 'Write quote…' ) }
-						wrapperClassName="blocks-pullquote__content"
+						wrapperClassName="core-blocks-pullquote__content"
 					/>
 					{ ( citation || isSelected ) && (
 						<RichText

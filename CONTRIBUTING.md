@@ -56,6 +56,46 @@ The workflow is documented in greater detail in the [repository management](./do
 
 Gutenberg contains both PHP and JavaScript code, and encourages testing and code style linting for both. It also incorporates end-to-end testing using [Google Puppeteer](https://developers.google.com/web/tools/puppeteer/). You can find out more details in [Testing Overview document](./docs/reference/testing-overview.md).
 
+## Releasing packages
+
+This repository uses [lerna](https://lernajs.io) to manage Gutenberg modules and publish them as packages to `npm`. Lerna automatically releases all the outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
+
+If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your npmjs.com account.
+
+### Before releasing
+
+Confirm that you're logged into `npm`, by running `npm whoami`. If you're not logged in, run `npm adduser` to login.
+
+If you're publishing a new package, ensure that its `package.json` file contains the correct `publishConfig` settings:
+
+```json
+	"publishConfig": {
+		"access": "public"
+	}
+```
+
+### Development release
+
+Run the following command to release a dev version of the outdated packages, replacing "123456" with your 2FA code. Make sure you're using a freshly generated 2FA code, rather than one that's about to timeout. This is a little cumbersome, but helps to prevent the release process from dying mid-deploy.
+
+```bash
+NPM_CONFIG_OTP=123456 npm run publish:dev
+```
+
+Lerna will ask you which version number you want to choose for each package. For a `dev` release, you'll more likely want to choose the "prerelease" option. Repeat the same for all the outdated packages and confirm your version updates.
+
+Lerna will then publish to `npm`, commit the `package.json` changes and create the git tags.
+
+### Production release
+
+To release a production version for the outdated packages, run the following command, replacing "123456" with your (freshly generated, as above) 2FA code:
+
+```bash
+NPM_CONFIG_OTP=123456 npm run publish:prod
+```
+
+Choose the correct version (minor, major or patch) and confirm your choices and let Lerna do its magic.
+
 ## How Designers Can Contribute
 
 If you'd like to contribute to the design or front-end, feel free to contribute to tickets labelled <a href="https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+label%3ADesign">Design</a>. We could use your thoughtful replies, mockups, animatics, sketches, doodles. Proposed changes are best done as minimal and specific iterations on the work that precedes it so we can compare. If you use <a href="https://www.sketchapp.com/">Sketch</a>, you can grab <a href="https://cloudup.com/cMPXM8Va2cy">the source file for the mockups</a> (updated April 6th).
