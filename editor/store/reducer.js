@@ -200,7 +200,7 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  * Handles the following state keys:
  *  - edits: an object describing changes to be made to the current post, in
  *           the format accepted by the WP REST API
- *  - blocksByUid: post content blocks keyed by UID
+ *  - blocksByUID: post content blocks keyed by UID
  *  - blockOrder: object where each key is a UID, its value an array of uids
  *                representing the order of its inner blocks
  *
@@ -277,7 +277,7 @@ export const editor = flow( [
 		return state;
 	},
 
-	blocksByUid( state = {}, action ) {
+	blocksByUID( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
