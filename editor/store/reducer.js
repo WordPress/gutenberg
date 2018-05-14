@@ -893,6 +893,7 @@ export function saving( state = {}, action ) {
 				error: null,
 			};
 
+		case 'RESET_AUTOSAVE':
 		case 'REQUEST_POST_UPDATE_SUCCESS':
 			return {
 				requesting: false,

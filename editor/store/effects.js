@@ -111,13 +111,6 @@ export default {
 						type: 'RESET_AUTOSAVE',
 						post: autosave,
 					} );
-
-					dispatch( {
-						type: 'REQUEST_POST_UPDATE_SUCCESS',
-						previousPost: post,
-						post: post,
-						isAutosave: true,
-					} );
 				},
 				() => {
 					dispatch( {
