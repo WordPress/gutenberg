@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -84,8 +85,6 @@ describe( 'registerReducer', () => {
 } );
 
 describe( 'registerResolvers', () => {
-	let store;
-
 	beforeEach( () => {
 		registerDataStore();
 	} );
@@ -99,9 +98,21 @@ describe( 'registerResolvers', () => {
 	} );
 
 	function subscribeWithUnsubscribe( ...args ) {
-		const unsubscribe = store.subscribe( ...args );
+		const unsubscribe = subscribe( ...args );
 		unsubscribes.push( unsubscribe );
 		return unsubscribe;
+	}
+
+	function subscribeUntil( predicates ) {
+		predicates = castArray( predicates );
+
+		return new Promise( ( resolve ) => {
+			subscribeWithUnsubscribe( () => {
+				if ( predicates.every( ( predicate ) => predicate() ) ) {
+					resolve();
+				}
+			} );
+		} );
 	}
 
 	it( 'should not do anything for selectors which do not have resolvers', () => {
@@ -154,7 +165,7 @@ describe( 'registerResolvers', () => {
 			return { type: 'SET_PAGE', page, result: [] };
 		} );
 
-		store = registerReducer( 'demo', ( state = {}, action ) => {
+		const store = registerReducer( 'demo', ( state = {}, action ) => {
 			switch ( action.type ) {
 				case 'SET_PAGE':
 					return {
@@ -208,8 +219,8 @@ describe( 'registerResolvers', () => {
 		select( 'demo' ).getPage( 4, {} );
 	} );
 
-	it( 'should resolve action to dispatch', ( done ) => {
-		store = registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+	it( 'should resolve action to dispatch', () => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;
 		} );
 		registerSelectors( 'demo', {
@@ -219,20 +230,18 @@ describe( 'registerResolvers', () => {
 			getValue: () => ( { type: 'SET_OK' } ),
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			try {
-				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
-				done();
-			} catch ( error ) {
-				done( error );
-			}
-		} );
+		const promise = subscribeUntil( [
+			() => select( 'demo' ).getValue() === 'OK',
+			() => select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
+		] );
 
 		select( 'demo' ).getValue();
+
+		return promise;
 	} );
 
-	it( 'should resolve mixed type action array to dispatch', ( done ) => {
-		store = registerReducer( 'counter', ( state = 0, action ) => {
+	it( 'should resolve mixed type action array to dispatch', () => {
+		registerReducer( 'counter', ( state = 0, action ) => {
 			return action.type === 'INCREMENT' ? state + 1 : state;
 		} );
 		registerSelectors( 'counter', {
@@ -245,17 +254,18 @@ describe( 'registerResolvers', () => {
 			],
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			if ( select( 'counter' ).getCount() === 2 ) {
-				done();
-			}
-		} );
+		const promise = subscribeUntil( [
+			() => select( 'counter' ).getCount() === 2,
+			() => select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
+		] );
 
 		select( 'counter' ).getCount();
+
+		return promise;
 	} );
 
-	it( 'should resolve generator action to dispatch', ( done ) => {
-		store = registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+	it( 'should resolve generator action to dispatch', () => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;
 		} );
 		registerSelectors( 'demo', {
@@ -267,20 +277,18 @@ describe( 'registerResolvers', () => {
 			},
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			try {
-				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
-				done();
-			} catch ( error ) {
-				done( error );
-			}
-		} );
+		const promise = subscribeUntil( [
+			() => select( 'demo' ).getValue() === 'OK',
+			() => select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
+		] );
 
 		select( 'demo' ).getValue();
+
+		return promise;
 	} );
 
-	it( 'should resolve promise action to dispatch', ( done ) => {
-		store = registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+	it( 'should resolve promise action to dispatch', () => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;
 		} );
 		registerSelectors( 'demo', {
@@ -290,16 +298,14 @@ describe( 'registerResolvers', () => {
 			getValue: () => Promise.resolve( { type: 'SET_OK' } ),
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			try {
-				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
-				done();
-			} catch ( error ) {
-				done( error );
-			}
-		} );
+		const promise = subscribeUntil( [
+			() => select( 'demo' ).getValue() === 'OK',
+			() => select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
+		] );
 
 		select( 'demo' ).getValue();
+
+		return promise;
 	} );
 
 	it( 'should resolve promise non-action to dispatch', ( done ) => {
@@ -326,8 +332,8 @@ describe( 'registerResolvers', () => {
 		} );
 	} );
 
-	it( 'should resolve async iterator action to dispatch', ( done ) => {
-		store = registerReducer( 'counter', ( state = 0, action ) => {
+	it( 'should resolve async iterator action to dispatch', () => {
+		registerReducer( 'counter', ( state = 0, action ) => {
 			return action.type === 'INCREMENT' ? state + 1 : state;
 		} );
 		registerSelectors( 'counter', {
@@ -340,17 +346,18 @@ describe( 'registerResolvers', () => {
 			},
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			if ( select( 'counter' ).getCount() === 2 ) {
-				done();
-			}
-		} );
+		const promise = subscribeUntil( [
+			() => select( 'counter' ).getCount() === 2,
+			() => select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
+		] );
 
 		select( 'counter' ).getCount();
+
+		return promise;
 	} );
 
-	it( 'should not dispatch resolved promise action on subsequent selector calls', ( done ) => {
-		store = registerReducer( 'demo', ( state = 'NOTOK', action ) => {
+	it( 'should not dispatch resolved promise action on subsequent selector calls', () => {
+		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' && state === 'NOTOK' ? 'OK' : 'NOTOK';
 		} );
 		registerSelectors( 'demo', {
@@ -360,17 +367,12 @@ describe( 'registerResolvers', () => {
 			getValue: () => Promise.resolve( { type: 'SET_OK' } ),
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			try {
-				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
-				done();
-			} catch ( error ) {
-				done( error );
-			}
-		} );
+		const promise = subscribeUntil( () => select( 'demo' ).getValue() === 'OK' );
 
 		select( 'demo' ).getValue();
 		select( 'demo' ).getValue();
+
+		return promise;
 	} );
 } );
 
