@@ -422,9 +422,10 @@ export class RichText extends Component {
 			return;
 		}
 
-		// Always ensure the content is up-to-date, but avoid dispatching an
-		// action if the original event is blur because the content will already
-		// be up-to-date.
+		// Always ensure the content is up-to-date. This is needed because e.g.
+		// making something bold will trigger a TinyMCE change event but no
+		// input event. Avoid dispatching an action if the original event is
+		// blur because the content will already be up-to-date.
 		if ( ! event || ! event.originalEvent || event.originalEvent.type !== 'blur' ) {
 			this.onChange();
 		}
