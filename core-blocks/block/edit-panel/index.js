@@ -24,14 +24,6 @@ class ReusableBlockEditPanel extends Component {
 		this.handleTitleKeyDown = this.handleTitleKeyDown.bind( this );
 	}
 
-	componentDidMount() {
-		document.addEventListener( 'click', this.handleClickOutside, true );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'click', this.handleClickOutside, true );
-	}
-
 	componentDidUpdate( prevProps ) {
 		// Select the input text only once when the form opens.
 		if ( ! prevProps.isEditing && this.props.isEditing ) {
