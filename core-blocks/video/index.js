@@ -16,27 +16,33 @@ import edit from './edit';
 
 export const name = 'core/video';
 
-export const settings = {
+export const definition = {
 	title: __( 'Video' ),
-
 	description: __( 'Embed an video file and a simple video player.' ),
-
-	icon: 'format-video',
-
 	category: 'common',
-
 	attributes: {
 		id: {
 			type: 'number',
 		},
 		src: {
 			type: 'string',
+		},
+		caption: {
+			type: 'array',
+		},
+	},
+};
+
+export const implementation = {
+	icon: 'format-video',
+
+	attributes: {
+		src: {
 			source: 'attribute',
 			selector: 'video',
 			attribute: 'src',
 		},
 		caption: {
-			type: 'array',
 			source: 'children',
 			selector: 'figcaption',
 		},
