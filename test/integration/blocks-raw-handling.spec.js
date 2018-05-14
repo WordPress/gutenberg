@@ -1,14 +1,20 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { getBlockContent, rawHandler } from '@wordpress/blocks';
+import fs from 'fs';
+import path from 'path';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { registerCoreBlocks } from '../';
+import {
+	getBlockContent,
+	rawHandler,
+	serialize,
+} from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/core-blocks';
 
-describe( 'rawHandler', () => {
+describe( 'Blocks raw handling', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
 		require( 'editor/hooks' );
@@ -71,5 +77,36 @@ describe( 'rawHandler', () => {
 		} );
 
 		expect( filtered ).toBe( 'test<br>test' );
+	} );
+
+	describe( 'serialize', () => {
+		function readFile( filePath ) {
+			return fs.existsSync( filePath ) ? fs.readFileSync( filePath, 'utf8' ).trim() : '';
+		}
+
+		[
+			'plain',
+			'classic',
+			'apple',
+			'google-docs',
+			'ms-word',
+			'ms-word-online',
+			'evernote',
+			'iframe-embed',
+			'one-image',
+			'two-images',
+			'markdown',
+			'wordpress',
+		].forEach( ( type ) => {
+			it( type, () => {
+				const HTML = readFile( path.join( __dirname, `fixtures/${ type }-in.html` ) );
+				const plainText = readFile( path.join( __dirname, `fixtures/${ type }-in.txt` ) );
+				const output = readFile( path.join( __dirname, `fixtures/${ type }-out.html` ) );
+				const converted = rawHandler( { HTML, plainText, canUserUseUnfilteredHTML: true } );
+				const serialized = typeof converted === 'string' ? converted : serialize( converted );
+
+				expect( serialized ).toBe( output );
+			} );
+		} );
 	} );
 } );
