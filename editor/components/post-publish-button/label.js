@@ -7,7 +7,6 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withAPIData } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
@@ -21,11 +20,8 @@ export function PublishButtonLabel( {
 	isBeingScheduled,
 	isSaving,
 	isPublishing,
-	user,
+	hasPublishAction,
 } ) {
-	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
-	const isContributor = user.data && ! userCanPublishPosts;
-
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
 	} else if ( isPublished && isSaving ) {
@@ -34,7 +30,7 @@ export function PublishButtonLabel( {
 		return __( 'Scheduling…' );
 	}
 
-	if ( isContributor ) {
+	if ( ! hasPublishAction ) {
 		return __( 'Submit for Review' );
 	} else if ( isPublished ) {
 		return __( 'Update' );
@@ -52,6 +48,7 @@ export default compose( [
 			isEditedPostBeingScheduled,
 			isSavingPost,
 			isPublishingPost,
+			getCurrentPost,
 			getCurrentPostType,
 		} = select( 'core/editor' );
 		return {
@@ -59,14 +56,8 @@ export default compose( [
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isPublishing: isPublishingPost(),
+			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			postType: getCurrentPostType(),
-		};
-	} ),
-	withAPIData( ( props ) => {
-		const { postType } = props;
-
-		return {
-			user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 		};
 	} ),
 ] )( PublishButtonLabel );
