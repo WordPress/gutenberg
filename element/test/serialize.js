@@ -199,6 +199,12 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( 'Hello' );
 	} );
 
+	it( 'renders Fragment with undefined children', () => {
+		const result = renderElement( <Fragment /> );
+
+		expect( result ).toBe( '' );
+	} );
+
 	it( 'renders RawHTML as its unescaped children', () => {
 		const result = renderElement( <RawHTML>{ '<img/>' }</RawHTML> );
 
