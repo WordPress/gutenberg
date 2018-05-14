@@ -146,13 +146,14 @@ When you initialize the editor, Gutenberg will request the settings related with
     supports: {
         author: true,
         comments: false,
-        custom-fields: true,
+        'custom-fields': true,
         thumbnail: false,
         title: true,
         // Gutenberg by Frontkom supports flags
-        media-library: false,    // disable Media library from WordPress
-        posts: true,             // add PostsPanel to sidebar
-        template-settings: true, // add TemplateSettingsPanel to sidebar
+        document: true             // show Documents tab in sidebar
+        'media-library': false,    // disable Media library from WordPress
+        posts: true,               // add PostsPanel to sidebar
+        'template-settings': true, // add TemplateSettingsPanel to sidebar
         ...,
     },
     ...,
