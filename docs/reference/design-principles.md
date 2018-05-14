@@ -4,7 +4,7 @@
 
 ![Block](https://cldup.com/7HCnN5cFc0.png)
 
-この文書では、どのように _適切なブロック_ をデザインするべきかという話も超越していきます。
+この文書では、どのように _適切なブロック_ をデザインするべきかということも検討していきます。
 
 ## Gutenbergのゴール
 
@@ -20,7 +20,7 @@ Gutenberg の包括的な目標は、 _リッチな投稿レイアウト_ を簡
 
 ## なぜか
 
-WordPress を他のシステムと区別できることの一つとして、自分で想像できるようにリッチ投稿レイアウトを作成できるということがあります -- しかしそれは HTML と CSS を理解し自分のカスタムテーマを構築出来る場合にのみ可能です。リッチな投稿を書けるツールとしてエディターを捉えることによって、数回クリックするだけで美しいレイアウトを作成できるなら、うまくいけば、人々はワンクリックでインストールできるから選ぶだけでなく、 WordPress がコンテンツのために出来ることについて愛してくれるようなるでしょう。
+WordPress を他のシステムと区別できることの一つとして、自分で想像できるようにリッチな投稿レイアウトを作成できるということがあります -- しかしそれは HTML と CSS を理解し自分のカスタムテーマを構築出来る場合にのみ可能です。リッチな投稿を書けるツールとしてエディターを捉えることによって、数回クリックするだけで美しいレイアウトを作成できるなら、うまくいけば、人々はワンクリックでインストールできるから選ぶだけでなく、 WordPress がコンテンツのために出来ることについて愛してくれるようなるでしょう。
 
 ## ビジョン
 
@@ -50,28 +50,28 @@ WordPress を他のシステムと区別できることの一つとして、自�
 
 Gutenberg は上のバーと下のコンテンツの間に基本的な区切りがあります。
 
-The **editor bar** holds _document level_ actions. Like editor mode, save status indicator, global actions for undo/redo/insert, the settings toggle, and finally publish options.
+**editor bar(エディターバー)** は、 _ドキュメントレベル_ のアクションが配置されます。エディターモードと同様に、ステータスインジケーターの保存、取り消し/やり直し/挿入のためのグローバルアクション、設定の切り替え、最後にオプションの公開があります。
 
-The **content area** holds the document itself.
+**content area(コンテンツ領域)** はドキュメントそのものが配置されます。
 
-The **settings sidebar** holds document metadata. Both for the document itself (tags, categories, schedule etc.), but also for blocks in the "Block" tab.
+**settings sidebar(設定サイドバー)** はドキュメントのメタデータが配置されます。どちらもドキュメントそのもの（タグ、カテゴリ、スケジュールなど）のデータだけでなく、「ブロック」タブのブロックも対象となります。
 
-On mobile, the sidebar is hidden until you click the cog button to open it. On a desktop you can dismiss it for an immersive writing experience.
+モバイルでは、歯車ボタンをクリックするまでサイドバーは非表示になります。デスクトップでは書くことに集中するためにそれを隠すことができます。
 
-## The Block Interface
+## ブロックのインターフェイス
 
-The block itself is the most basic unit of the editor. Everything is a block, and you build them together mimicking the vertical flow of the underlying HTML markup. By surfacing each section of the document as a block we can manipulate, we can attach features that are unique to each block, contextually. Inspired by desktop layout apps, it's a way to add a breadth of advanced features without weighing down the UI.
+ブロック自体がエディターの最も基本的な単位です。全てはブロックであり、基礎である HTML マークアップの垂直なフローを模倣して構築されます。ドキュメントの各セクションを操作可能なブロックとして表示させることで、各ブロックに文脈上、固有の機能を付与できます。これはデスクトップのレイアウトアプリからを得たもので、UIに重荷を追わせることなく、高度な機能の拡張を追加するための方法です。
 
-The block interface holds _basic actions_. Through ensuring good defaults, and only the most common actions, you should be able to get all your blogging done without ever having to use the Settings sidebar.
+このブロックのインターフェイスは _基本的なアクション_ を持ちます。適切なデフォルトを保証し、最も一般的なアクションのみを使用することで、設定サイドバーを使用せずにブログを書くこと全てを完了できるようにするべきです。
 
-The block itself has multiple states:
+ブロック自体には複数の状態があります:
 
-- An _unselected block_ is the closest thing to a live preview of the contents itself.
-- A _selected block_ shows the "quick toolbar", direct actions that manipulate the block. Extra elements can also be surfaced in the block content itself. For example an image block surfaces a caption field, a quote surfaces a citation field, and dynamic blocks can surface buttons to let you add form fields.
+- _選択されていないブロック_ は、コンテンツ自体のライブプレビューに最も近いものです。
+- _選択されたブロック_ には、「クイックツールバー」が表示され、ブロックを操作する直接アクションが表示されます。特別な要素もブロックコンテンツ自体に表示されます。たとえば、画像ブロックにはキャプションフィールドが表示され、引用符には引用フィールドが表示され、ダイナミックブロックにはフォームフィールドを追加するためのボタンが表示されます。
 
-Note that _selection_ and _focus_ can be different, i.e. an image block can be selected but the focus can be on the caption field, exposing extra (caption-specific) UI.
+注釈 _選択_ と _フォーカス_ は異なります。つまり、イメージブロックは選択できますがそのフォーカスはキャプションフィールドにあり、特別な（キャプション固有の）UIが表示されます。
 
-As you scroll down a page on long blocks, the quick toolbar unsticks from the block, and sticks to the top of the screen.
+長いブロックのページを下にスクロールすると、クイックツールバーがブロックから外れ、画面の上部に張り付きます。
 
 ## Editor Settings
 
