@@ -408,15 +408,14 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
 
-	// TODO: Uncomment after updating the build to produce theme.css
-	// if ( get_theme_support( 'wp_block_styles' ) ) {
-	// 	wp_register_style(
-	// 		'wp-core-blocks-theme',
-	// 		gutenberg_url( 'build/core-blocks/theme.css' ),
-	// 		array( 'wp-core-blocks' ),
-	// 		filemtime( gutenberg_dir_path() . 'build/core-blocks/theme.css' )
-	// 	);
-	// }
+	if ( get_theme_support( 'wp_block_styles' ) ) {
+		wp_register_style(
+			'wp-core-blocks-theme',
+			gutenberg_url( 'build/core-blocks/theme.css' ),
+			array( 'wp-core-blocks' ),
+			filemtime( gutenberg_dir_path() . 'build/core-blocks/theme.css' )
+		);
+	}
 
 	wp_register_script(
 		'wp-plugins',
