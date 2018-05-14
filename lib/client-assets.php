@@ -864,29 +864,27 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_s
 function gutenberg_enqueue_theme_block_styles() {
 	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
 
-	$block_registry = WP_Block_Type_Registry::get_instance();
+	$block_registry         = WP_Block_Type_Registry::get_instance();
 	$block_themes_directory = get_template_directory() . '/blocks/';
-	$block_themes_uri = get_template_directory_uri() . '/blocks/';
+	$block_themes_uri       = get_template_directory_uri() . '/blocks/';
 
 	if (
-		file_exists( $block_themes_directory ) &&
-		( $block_themes_handle = opendir( $block_themes_directory ) )
-	) {
+		file_exists( $block_themes_directory ) && (
+		$block_themes_handle = opendir( $block_themes_directory )
+	) ) {
 		$core_block_style_dependencies = $is_editor ?
 			array( 'wp-core-blocks', 'wp-edit-blocks' ) :
 			array( 'wp-core-blocks' );
 
-		while (
-			( $filename = readdir( $block_themes_handle ) ) !== false
-		) {
+		while ( $filename = readdir( $block_themes_handle ) ) {
 			if (
 				is_file( $block_themes_directory . $filename ) &&
 				pathinfo( $filename, PATHINFO_EXTENSION ) === 'css'
 			) {
-				$block_name = str_replace( '.', '/', pathinfo( $filename, PATHINFO_FILENAME ) );
-				$block_type = $block_registry->get_registered( $block_name );
+				$block_name         = str_replace( '.', '/', pathinfo( $filename, PATHINFO_FILENAME ) );
+				$block_type         = $block_registry->get_registered( $block_name );
 				$block_style_handle = 'theme-block-style-' . $block_name;
-				$block_style_uri = $block_themes_uri . $filename;
+				$block_style_uri    = $block_themes_uri . $filename;
 
 				if ( $block_type ) {
 					$theme_style_dependencies = array();
@@ -902,7 +900,7 @@ function gutenberg_enqueue_theme_block_styles() {
 					wp_enqueue_style(
 						$block_style_handle, $block_style_uri, $theme_style_dependencies
 					);
-				} else if ( preg_match( '/^core\//', $block_name ) ) {
+				} elseif ( preg_match( '/^core\//', $block_name ) ) {
 					wp_enqueue_style(
 						$block_style_handle, $block_style_uri, $core_block_style_dependencies
 					);
