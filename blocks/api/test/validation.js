@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import {
+	getBlockValidAlignments,
 	getTextPiecesSplitOnWhitespace,
 	getTextWithCollapsedWhitespace,
 	getMeaningfulAttributePairs,
@@ -485,6 +486,52 @@ describe( 'validation', () => {
 			);
 
 			expect( isValid ).toBe( true );
+		} );
+	} );
+
+	describe( 'getBlockValidAlignments()', () => {
+		it( 'should return an empty array if block does not define align support', () => {
+			registerBlockType( 'core/foo', defaultBlockSettings );
+			const validAlignments = getBlockValidAlignments( 'core/foo' );
+
+			expect( validAlignments ).toEqual( [] );
+		} );
+
+		it( 'should return all custom align set', () => {
+			registerBlockType( 'core/foo', {
+				...defaultBlockSettings,
+				supports: {
+					align: [ 'left', 'right' ],
+				},
+			} );
+			const validAlignments = getBlockValidAlignments( 'core/foo' );
+
+			expect( validAlignments ).toEqual( [ 'left', 'right' ] );
+		} );
+
+		it( 'should return all aligns if block defines align support', () => {
+			registerBlockType( 'core/foo', {
+				...defaultBlockSettings,
+				supports: {
+					align: true,
+				},
+			} );
+			const validAlignments = getBlockValidAlignments( 'core/foo' );
+
+			expect( validAlignments ).toEqual( [ 'left', 'center', 'right', 'wide', 'full' ] );
+		} );
+
+		it( 'should return all aligns except wide if wide align explicitly false', () => {
+			registerBlockType( 'core/foo', {
+				...defaultBlockSettings,
+				supports: {
+					align: true,
+					wideAlign: false,
+				},
+			} );
+			const validAlignments = getBlockValidAlignments( 'core/foo' );
+
+			expect( validAlignments ).toEqual( [ 'left', 'center', 'right' ] );
 		} );
 	} );
 } );

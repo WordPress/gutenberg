@@ -18,7 +18,10 @@ export {
 	getBlockDefaultClassName,
 	getSaveElement,
 } from './serializer';
-export { isValidBlock } from './validation';
+export {
+	getBlockValidAlignments,
+	isValidBlock,
+} from './validation';
 export { getCategories } from './categories';
 export {
 	registerBlockType,

@@ -31,7 +31,7 @@ describe( 'block factory', () => {
 
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
+		require( 'blocks/hooks' );
 	} );
 
 	afterEach( () => {
