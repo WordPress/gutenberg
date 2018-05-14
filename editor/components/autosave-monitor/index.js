@@ -42,7 +42,7 @@ export default compose( [
 			isEditedPostDirty,
 			isEditedPostSaveable,
 			isPostAutosaveable,
-			getEditorSettings
+			getEditorSettings,
 		} = select( 'core/editor' );
 		return {
 			isDirty: isEditedPostDirty(),
