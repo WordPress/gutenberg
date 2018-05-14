@@ -30,6 +30,10 @@
 	}
 }
 
+.wp-block-file__richtext-wrapper {
+	display: inline-block;
+}
+
 .wp-block-file__textlink {
 	cursor: text;
 	text-decoration: underline;

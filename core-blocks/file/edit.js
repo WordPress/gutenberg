@@ -40,6 +40,7 @@ export default class FileEdit extends Component {
 			editing: ! href,
 			href,
 			attachmentPage: undefined,
+			isCompositing: false, // for filtering premature onChange events in CJK
 		};
 
 		const getAttachmentPageURL = ( mediaId ) => {
@@ -130,7 +131,7 @@ export default class FileEdit extends Component {
 	render() {
 		const { fileName, textLinkHref, openInNewWindow, id } = this.props.attributes;
 		const { setAttributes } = this.props;
-		const { editing, href, attachmentPage } = this.state;
+		const { editing, href, attachmentPage, isCompositing } = this.state;
 
 		const classNames = [
 			this.props.className,
@@ -175,7 +176,12 @@ export default class FileEdit extends Component {
 			} );
 		};
 
+		// Extract filename from RichText content and update attribute
 		const onChangeFileName = ( newRichTextLink ) => {
+			if ( isCompositing ) {
+				return; // ignore onChange events while composing in CJK
+			}
+
 			if ( newRichTextLink.length === 0 ) {
 				this.props.setAttributes( { fileName: '' } );
 				return;
@@ -260,15 +266,24 @@ export default class FileEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<div className={ classNames }>
-					<RichText
-						tagName="div" // must be div (not span) or else cursor disappears
-						className="wp-block-file__textlink"
-						value={ fileName && [ this.buildRichTextLink( fileName ) ] }
-						formattingControls={ [] }
-						placeholder={ __( 'Write file name…' ) }
-						keepPlaceholderOnFocus={ true }
-						onChange={ onChangeFileName }
-					/>
+					<div // listens if user is in the middle of compositing in CJK
+						className="wp-block-file__richtext-wrapper"
+						onCompositionStart={ () => this.setState( { isCompositing: true } ) }
+						onCompositionEnd={ ( event ) => {
+							this.setState( { isCompositing: false } );
+							setAttributes( { fileName: event.target.innerText } );
+						} }
+					>
+						<RichText
+							tagName="div" // must be div (not span) or else cursor disappears
+							className="wp-block-file__textlink"
+							value={ fileName && [ this.buildRichTextLink( fileName ) ] }
+							formattingControls={ [] } // disable controls
+							placeholder={ __( 'Write file name…' ) }
+							keepPlaceholderOnFocus={ ! isCompositing } // hide when CJK typing starts
+							onChange={ onChangeFileName }
+						/>
+					</div>
 					<a
 						href={ href }
 						className="wp-block-file__button"
