@@ -29,6 +29,7 @@ const MyPluginSidebar = () => (
 	<PluginSidebar
 		name="my-sidebar"
 		title="My sidebar title"
+		icon="smiley"
 	>
 		<PanelBody>
 			{ __( 'My sidebar content' ) }
@@ -53,6 +54,22 @@ Title displayed at the top of the sidebar.
 - Type: `String`
 - Required: Yes
 
+##### isPinnable
+
+Whether to allow to pin sidebar to toolbar.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`
+
+##### icon
+
+The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+
+- Type: `String` | `Element`
+- Required: No
+- Default: _inherits from the plugin_
+
 
 ### `PluginSidebarMoreMenuItem`
 
@@ -68,7 +85,7 @@ const { PluginSidebarMoreMenuItem } = wp.editPost;
 const MySidebarMoreMenuItem = () => (
 	<PluginSidebarMoreMenuItem
 		target="my-sidebar"
-		icon="yes"
+		icon="smiley"
 	>
 		{ __( 'My sidebar title' ) }
 	</PluginSidebarMoreMenuItem>
@@ -90,7 +107,7 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 
 - Type: `String` | `Element`
 - Required: No
-
+- Default: _inherits from the plugin_
 
 ### `PluginPostStatusInfo`
 

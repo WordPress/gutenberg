@@ -17,6 +17,7 @@ import { compose } from '@wordpress/element';
 import './style.scss';
 import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
+import PinnedPlugins from './pinned-plugins';
 
 function Header( {
 	isEditorSidebarOpened,
@@ -52,12 +53,13 @@ function Header( {
 					/>
 					<IconButton
 						icon="admin-generic"
+						label={ __( 'Settings' ) }
 						onClick={ toggleGeneralSidebar }
 						isToggled={ isEditorSidebarOpened }
-						label={ __( 'Settings' ) }
 						aria-expanded={ isEditorSidebarOpened }
 					/>
-					<MoreMenu key="more-menu" />
+					<PinnedPlugins.Slot />
+					<MoreMenu />
 				</div>
 			) }
 		</div>

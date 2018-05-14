@@ -22,6 +22,10 @@
 		display: none;
 		margin-left: auto;
 
+		~ .components-icon-button {
+			margin-left: 0;
+		}
+
 		@include break-medium() {
 			display: flex;
 		}
