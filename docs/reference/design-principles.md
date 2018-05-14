@@ -4,7 +4,7 @@
 
 ![Block](https://cldup.com/7HCnN5cFc0.png)
 
-この文書では、 どのように _良いブロック_ をデザインするべきかという話も超越しようと思います。
+この文書では、 どのように _適切なブロック_ をデザインするべきかという話も超越していきます。
 
 ## Gutenbergのゴール
 
@@ -18,25 +18,25 @@ Gutenberg の包括的な目標は、 _リッチな投稿レイアウト_ を簡
 - ブロックの概念は、一つの傘の下に複数の異なるインターフェースを統一することを目指しています。オブジェクトを埋め込むためにショートコードやカスタム HTML を書いたり、URL を貼り付ける必要はないのです。ブロックの仕組みを覚えるだけで、全てのやり方が分かるようになるべきです。
 - 「ミステリー・ミート」とは、ソフトウェアの隠された機能を示します。それはあなたが発見しなくてはなりません。 WordPress は既に大量のブロックと30以上の埋め込みをサポートしているので、人々が既にある機能を見つけられずにプラグインをインストールしないで済むように、その視認性を高めましょう。
 
-## Why
+## なぜか
 
-One thing that sets WordPress apart from other systems is that it allows you to create as rich a post layout as you can imagine -- but only if you know HTML & CSS and build your own custom theme. By thinking of the editor as a tool to let you write rich posts, and in a few clicks create beautiful layouts, hopefully, we can make people start to love WordPress and what it can do for your content, as opposed to pick it because it installed with one click.
+WordPress を他のシステムと区別できることの一つとして、自分で想像できるようにリッチ投稿レイアウトを作成できるということがあります -- しかしそれは HTML と CSS を理解し自分のカスタムテーマを構築出来る場合にのみ可能です。リッチな投稿を書けるツールとしてエディターを捉えることによって、数回クリックするだけで美しいレイアウトを作成できるなら、うまくいけば、人々はワンクリックでインストールできるから選ぶだけでなく、 WordPress がコンテンツのために出来ることについて愛してくれるようなるでしょう。
 
-## Vision
+## ビジョン
 
-**Everything is a block**. Text, images, galleries, widgets, shortcodes, and even chunks of custom HTML, no matter if it's added by plugins or otherwise. You should only have to learn to master a single interface: the block interface, and then you know how to do everything.
+**全てをブロックにする**。 文章、画像、ギャラリー、ウィジェット、ショートコード、そしてカスタム HTML の塊さえも、たとえプラグインや他の方法によって追加されていたとしても。単一のインターフェイス（ブロックインターフェイス）を習得するだけで、すべての操作方法を知ることができます。
 
-**All blocks are created equal**. They all live in the same inserter interface. We use recency, search, tabs, and grouping, to ensure the blocks you use the most are easily within reach.
+**全てのブロックを均等に作成する**。すべては同じ挿入インターフェースの中にあります。最近の投稿、検索、タブ、およびグループ化を使用して、最も多く使用するブロックを簡単に使えるようにします。
 
-**Drag and drop is additive**. Only when explicit actions (click or tab & space) exist, can we add drag and drop as an additive enhancement on top of it.
+**ドラックアンドドロップが追加できる**。明示的なアクション（クリックまたはタブやスペース）が存在する場合にのみ、ドラッグアンドドロップを追加エンハンスメントとしてその上に追加できます。
 
-**Placeholders are key**. If your block can have a neutral placeholder state, it should. An image placeholder block shows a button to open the media library, a text placeholder block shows a writing prompt. By embracing placeholders we can predefine editable layouts, so all you have to do is _fill in the blanks_.
+**プレースホルダーは重要だ**。ブロックが中立のプレースホルダー状態を持つことができるなら、そうすべきです。画像のプレースホルダーブロックにはメディアライブラリを開くボタンが表示され、テキストのプレースホルダーブロックには書き込みプロンプトが表示されます。プレースホルダーを使用することで編集可能なレイアウトを事前に定義することができるので、あとは _空白を埋める_ だけでよいのです。
 
-**Direct manipulation**. The block technology we are building optimizes for the user experience of manipulating content directly on the page. Plugin and theme authors will have the ability of composing together the different tools core will provide to create their own tailored and specific blocks that give users a WYSIWYG environment for creating on the web.
+**直接操作**。私たちが構築しているブロック技術は、ページ上で直接コンテンツを操作するユーザーエクスペリエンスを最適化します。プラグインとテーマ作成者は、ユーザーがWeb上で創作するための WYSIWYG 環境を提供する目的にぴったり合った具体的なブロックを作成するために、コアが提供するさまざまなツールを一緒に構成する能力を備えるでしょう。
 
-**Customization**. What previously required using complicated markup and shielding users from breaking it—through shortcodes, meta-fields, etc. becomes easier and more intuitive. With blocks a developer would be able to provide a theme-specific block that directly renders a portion of a layout (a three columns grid of features, for instance) and clearly specifies what can be directly edited by the user. That means the user gets a WYSIWYG experience where they can't ruin the markup established but can easily update text, swap images, reduce the number of columns, etc, without having to ask the developer for it and without fearing that they will break things.
+**カスタマイズ**。以前は複雑なマークアップを使用する必要があったため、ショートコードやメタフィールドなどを使用してユーザーがサイトを壊さないように保護していたことが、より簡単で直感的になりました。ブロックを使用すると、開発者はレイアウトの一部（たとえば、フィーチャの3列グリッド）を直接レンダリングするテーマ固有のブロックを提供し、ユーザが直接編集できるものを明確に指定できます。つまり、ユーザーは WYSIWYG エクスペリエンスを得ることができます。壊すかもしれないと恐れる必要もなく、開発者に頼まなくてもマークアップを崩さずに簡単に文章を更新したり、画像を入れ替えたり、コラムの数を減らしたりなどするができます。
 
-Ultimately, the vision for Gutenberg is to make it much easier to author rich content. Through ensuring good defaults, wrapping and bundling advanced layout options blocks, and making the most important actions immediately available, authoring content with WordPress should be accessible to anyone.
+結局のところ、 Gutenberg のビジョンは、リッチなコンテンツを投稿者が簡単に作成できるようにすることです。適切なデフォルトを確保し、高度なレイアウトオプションのブロックをラップしてバンドルし、最も重要なアクションをすぐに利用できるようにすることで、誰でも WordPress でコンテンツを編集し使えるようにするべきなのです。
 
 ## Interface Blueprints
 
