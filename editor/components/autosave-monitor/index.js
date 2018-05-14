@@ -22,11 +22,11 @@ export class AutosaveMonitor extends Component {
 
 	toggleTimer( isPendingSave ) {
 		clearTimeout( this.pendingSave );
-		const { editorSettings } = this.props;
+		const { autosaveInterval } = this.props;
 		if ( isPendingSave ) {
 			this.pendingSave = setTimeout(
 				() => this.props.autosave(),
-				editorSettings.autosaveInterval * 1000
+				autosaveInterval * 1000
 			);
 		}
 	}
@@ -44,11 +44,12 @@ export default compose( [
 			isPostAutosaveable,
 			getEditorSettings,
 		} = select( 'core/editor' );
+		const { autosaveInterval } = getEditorSettings();
 		return {
 			isDirty: isEditedPostDirty(),
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: isPostAutosaveable(),
-			editorSettings: getEditorSettings(),
+			autosaveInterval: autosaveInterval,
 		};
 	} ),
 
