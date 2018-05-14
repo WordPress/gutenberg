@@ -3400,7 +3400,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return false if no autosave is available', () => {
-			const state = {};
+			const state = { autosave: null };
 			expect( hasAutosave( state ) ).toBe( false );
 		} );
 
