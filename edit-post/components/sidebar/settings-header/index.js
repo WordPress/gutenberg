@@ -4,6 +4,7 @@
 import { compose } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { PostTypeSupportCheck } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -20,13 +21,15 @@ const SettingsHeader = ( { count, openSidebar, sidebarName } ) => {
 			className="edit-post-sidebar__panel-tabs"
 			closeLabel={ __( 'Close settings' ) }
 		>
-			<button
-				onClick={ () => openSidebar( 'edit-post/document' ) }
-				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/document' ? 'is-active' : '' }` }
-				aria-label={ __( 'Document settings' ) }
-			>
-				{ __( 'Document' ) }
-			</button>
+			<PostTypeSupportCheck supportKeys="document">
+				<button
+					onClick={ () => openSidebar( 'edit-post/document' ) }
+					className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/document' ? 'is-active' : '' }` }
+					aria-label={ __( 'Document settings' ) }
+				>
+					{ __( 'Document' ) }
+				</button>
+			</PostTypeSupportCheck>
 			<button
 				onClick={ () => openSidebar( 'edit-post/block' ) }
 				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/block' ? 'is-active' : '' }` }
