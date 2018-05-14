@@ -91,6 +91,7 @@ const {
 	isPermalinkEditable,
 	getPermalink,
 	getPermalinkParts,
+	hasAutosave,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3396,6 +3397,18 @@ describe( 'selectors', () => {
 			expect( getSupportedBlocks( state, 'block1', [ 'core/block2', 'core/block4', 'core/block5' ] ) ).toEqual(
 				[ 'core/block2' ]
 			);
+		} );
+
+		it( 'should return false if no autosave is available', () => {
+			const state = {};
+			expect( hasAutosave( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if there is an autosave is available', () => {
+			const state = {
+				autosave: { id: 1 },
+			};
+			expect( hasAutosave( state ) ).toBe( true );
 		} );
 	} );
 } );
