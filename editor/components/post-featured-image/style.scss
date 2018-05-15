@@ -8,7 +8,7 @@
 
 .editor-post-featured-image__toggle {
 	text-decoration: underline;
-	color: theme(secondary);
+	color: theme( secondary );
 
 	&:focus {
 		box-shadow: none;
@@ -16,7 +16,7 @@
 	}
 
 	&:hover {
-		color: theme(primary);
+		color: theme( primary );
 	}
 }
 
