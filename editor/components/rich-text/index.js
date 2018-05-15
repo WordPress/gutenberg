@@ -123,7 +123,6 @@ export class RichText extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
-		this.getInsertPosition = this.getInsertPosition.bind( this );
 
 		this.state = {
 			formats: {},
@@ -438,18 +437,6 @@ export class RichText extends Component {
 		return {
 			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
 			left: position.left - containerPosition.left + ( position.width / 2 ) + toolbarOffset.left,
-		};
-	}
-
-	getInsertPosition() {
-		// The container is relatively positioned.
-		const containerPosition = this.containerRef.current.getBoundingClientRect();
-		const rect = getRectangleFromRange( this.editor.selection.getRng() );
-
-		return {
-			top: rect.top - containerPosition.top,
-			left: rect.right - containerPosition.left,
-			height: rect.height,
 		};
 	}
 
@@ -888,7 +875,7 @@ export class RichText extends Component {
 				{ isSelected &&
 					<InlineBlocks
 						editor={ this.editor }
-						getInsertPosition={ this.getInsertPosition }
+						containerRef={ this.containerRef }
 					/>
 				}
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>

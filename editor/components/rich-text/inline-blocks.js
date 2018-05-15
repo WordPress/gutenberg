@@ -4,6 +4,7 @@
 import { Component, Fragment, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withSafeTimeout } from '@wordpress/components';
+import { getRectangleFromRange } from '@wordpress/utils';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ class InlineBlocks extends Component {
 		super( ...arguments );
 
 		this.insert = this.insert.bind( this );
+		this.getInsertPosition = this.getInsertPosition.bind( this );
 		this.onSelectMedia = this.onSelectMedia.bind( this );
 		this.openMediaLibrary = this.openMediaLibrary.bind( this );
 		this.closeMediaLibrary = this.closeMediaLibrary.bind( this );
@@ -42,6 +44,20 @@ class InlineBlocks extends Component {
 
 	componentWillUnmount() {
 		this.props.setInsertUnavailable();
+	}
+
+	getInsertPosition() {
+		const { containerRef, editor } = this.props;
+
+		// The container is relatively positioned.
+		const containerPosition = containerRef.current.getBoundingClientRect();
+		const rect = getRectangleFromRange( editor.selection.getRng() );
+
+		return {
+			top: rect.top - containerPosition.top,
+			left: rect.right - containerPosition.left,
+			height: rect.height,
+		};
 	}
 
 	insert() {
@@ -81,17 +97,14 @@ class InlineBlocks extends Component {
 	}
 
 	render() {
-		const {
-			isInlineInsertionPointVisible,
-			getInsertPosition,
-		} = this.props;
+		const { isInlineInsertionPointVisible } = this.props;
 		const { mediaLibraryOpen } = this.state;
 
 		return (
 			<Fragment>
 				{ isInlineInsertionPointVisible &&
 					<InlineInsertionPoint
-						style={ getInsertPosition() }
+						style={ this.getInsertPosition() }
 					/>
 				}
 				{ mediaLibraryOpen &&
