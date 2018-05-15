@@ -3,6 +3,7 @@
  */
 import { Component, Fragment, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { withSafeTimeout } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,10 +23,12 @@ class InlineBlocks extends Component {
 	}
 
 	componentDidMount() {
+		const { setTimeout, setInsertAvailable } = this.props;
+
 		// When moving between two different RichText with the keyboard, we need to
 		// make sure `setInsertAvailable` is called after `setInsertUnavailable`
 		// from previous RichText so that editor state is correct
-		setTimeout( this.props.setInsertAvailable );
+		setTimeout( setInsertAvailable );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -132,4 +135,5 @@ export default compose( [
 			completeInsert: completeInlineInsert,
 		};
 	} ),
+	withSafeTimeout,
 ] )( InlineBlocks );
