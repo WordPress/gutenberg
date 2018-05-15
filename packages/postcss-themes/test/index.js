@@ -26,10 +26,11 @@ const defaultOptions = {
 			highlight: 'green',
 		},
 	},
+	from: undefined,
 };
 
 const run = ( input, opts = defaultOptions ) => {
-	return postcss( [ plugin( opts ) ] ).process( input );
+	return postcss( [ plugin( opts ) ] ).process( input, { from: undefined } );
 };
 
 describe( 'postcss-themes', () => {
