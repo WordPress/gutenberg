@@ -43,9 +43,10 @@ export default class FileEdit extends Component {
 			isCompositing: false, // for filtering premature onChange events in CJK
 		};
 
-		const getAttachmentPageURL = ( mediaId ) => {
-			return wp.apiRequest( {
-				path: `/wp/v2/media/${ mediaId }`,
+		if ( id !== undefined ) {
+			// Get Attachment Page URL
+			wp.apiRequest( {
+				path: `/wp/v2/media/${ id }`,
 				method: 'GET',
 			} )
 				.then(
@@ -56,10 +57,6 @@ export default class FileEdit extends Component {
 						this.setState( { attachmentPage: undefined } );
 					}
 				);
-		};
-
-		if ( id !== undefined ) {
-			getAttachmentPageURL( id );
 		}
 	}
 
@@ -160,10 +157,7 @@ export default class FileEdit extends Component {
 			return false;
 		};
 
-		const uploadFilesFromInput = ( event ) => {
-			this.uploadFromFiles( event.target.files );
-		};
-
+		// Choose Media File or Attachment Page (when file is in Media Library)
 		const onChangeLinkDestinationOption = ( newHref ) => {
 			setAttributes( {
 				textLinkHref: newHref,
@@ -225,7 +219,7 @@ export default class FileEdit extends Component {
 					<FormFileUpload
 						isLarge
 						className="wp-block-file__upload-button"
-						onChange={ uploadFilesFromInput }
+						onChange={ ( event ) => this.uploadFromFiles( event.target.files ) }
 						accept="*"
 					>
 						{ __( 'Upload' ) }
