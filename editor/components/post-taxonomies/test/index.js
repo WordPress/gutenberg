@@ -52,7 +52,7 @@ describe( 'PostTaxonomies', () => {
 
 		const wrapperTwo = shallow(
 			<PostTaxonomies postType="book"
-				taxonomies={[
+				taxonomies={ [
 					genresTaxonomy,
 					{
 						...categoriesTaxonomy,
