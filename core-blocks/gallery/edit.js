@@ -18,7 +18,6 @@ import {
 	ToggleControl,
 	Toolbar,
 } from '@wordpress/components';
-import { editorMediaUpload } from '@wordpress/blocks';
 import {
 	BlockControls,
 	BlockAlignmentToolbar,
@@ -26,11 +25,13 @@ import {
 	ImagePlaceholder,
 	InspectorControls,
 	PostTypeSupportCheck,
+	editorMediaUpload,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import GalleryImage from './gallery-image';
 
 const MAX_COLUMNS = 8;
@@ -44,7 +45,7 @@ export function defaultColumnsNumber( attributes ) {
 	return Math.min( 3, attributes.images.length );
 }
 
-class GalleryBlock extends Component {
+export default class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -259,7 +260,7 @@ class GalleryBlock extends Component {
 							<FormFileUpload
 								multiple
 								isLarge
-								className="blocks-gallery-add-item-button"
+								className="core-blocks-gallery-add-item-button"
 								onChange={ this.uploadFromFiles }
 								accept="image/*"
 								icon="insert"
@@ -273,5 +274,3 @@ class GalleryBlock extends Component {
 		);
 	}
 }
-
-export default GalleryBlock;

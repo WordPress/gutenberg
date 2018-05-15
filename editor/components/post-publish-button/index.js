@@ -7,7 +7,7 @@ import { noop, get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, withAPIData } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -25,15 +25,14 @@ export function PostPublishButton( {
 	visibility,
 	isPublishable,
 	isSaveable,
-	user,
+	hasPublishAction,
 	onSubmit = noop,
 	forceIsSaving,
 } ) {
-	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
-	const isContributor = ! get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
+	const isButtonEnabled = ! isSaving && isPublishable && isSaveable;
 
 	let publishStatus;
-	if ( isContributor ) {
+	if ( ! hasPublishAction ) {
 		publishStatus = 'pending';
 	} else if ( isBeingScheduled ) {
 		publishStatus = 'future';
@@ -74,6 +73,7 @@ export default compose( [
 			getEditedPostVisibility,
 			isEditedPostSaveable,
 			isEditedPostPublishable,
+			getCurrentPost,
 			getCurrentPostType,
 		} = select( 'core/editor' );
 		return {
@@ -82,6 +82,7 @@ export default compose( [
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),
 			isPublishable: forceIsDirty || isEditedPostPublishable(),
+			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			postType: getCurrentPostType(),
 		};
 	} ),
@@ -90,13 +91,6 @@ export default compose( [
 		return {
 			onStatusChange: ( status ) => editPost( { status } ),
 			onSave: savePost,
-		};
-	} ),
-	withAPIData( ( props ) => {
-		const { postType } = props;
-
-		return {
-			user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 		};
 	} ),
 ] )( PostPublishButton );

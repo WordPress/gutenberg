@@ -12,7 +12,10 @@ This method takes two arguments:
 
 1. `name`: A string identifying the plugin. Must be unique across all registered plugins.
 2. `settings`: An object containing the following data:
-   - `render`: A component containing the UI elements to be rendered.
+    - `icon: string | WPElement | Function` - An icon to be shown in the UI. It can be a slug
+      of the [Dashicon](https://developer.wordpress.org/resource/dashicons/#awards),
+      or an element (or function returning an element) if you choose to render your own SVG.
+    - `render`: A component containing the UI elements to be rendered.
 
 See [the edit-post module documentation](../edit-post/) for available components.
 
@@ -27,7 +30,6 @@ const Component = () => (
 	<Fragment>
 		<PluginSidebarMoreMenuItem
 			target="sidebar-name"
-			icon="smiley"
 		>
 			My Sidebar
 		</PluginSidebarMoreMenuItem>
@@ -41,6 +43,7 @@ const Component = () => (
 );
 
 registerPlugin( 'plugin-name', {
+	icon: 'smiley',
 	render: Component,
 } );
 ```

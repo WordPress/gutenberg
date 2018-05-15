@@ -464,7 +464,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						edits: {},
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 					},
 					isDirty: false,
@@ -508,7 +508,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						edits: {},
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 					},
 					isDirty: false,
@@ -531,7 +531,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						edits: {},
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 					},
 					isDirty: true,
@@ -878,7 +878,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -893,7 +893,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -910,7 +910,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -927,7 +927,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: {
 								uid: 123,
 								name: 'core/test-block',
@@ -954,7 +954,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -969,7 +969,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: {
 								uid: 123,
 								name: 'core/test-block',
@@ -994,7 +994,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1011,7 +1011,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {
 							content: 'sassel',
@@ -1082,7 +1082,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: rootBlock,
 						},
 						blockOrder: {
@@ -1098,7 +1098,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: rootBlock,
 						},
 						blockOrder: {
@@ -1120,7 +1120,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: rootBlock,
 						},
 						blockOrder: {
@@ -1136,7 +1136,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: rootBlock,
 							456: { uid: 456, name: 'core/paragraph', attributes: {} },
 						},
@@ -1164,7 +1164,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: rootBlock,
 							456: childBlock,
 						},
@@ -1182,7 +1182,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: rootBlock,
 							456: childBlock,
 						},
@@ -1209,7 +1209,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: rootBlock,
 							456: { uid: 456, name: 'core/paragraph', attributes: {} },
 						},
@@ -1227,7 +1227,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: rootBlock,
 							456: { uid: 456, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
 						},
@@ -1256,7 +1256,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: rootBlock,
 							456: childBlock,
 							789: { uid: 789, name: 'core/paragraph', attributes: {} },
@@ -1276,7 +1276,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: rootBlock,
 							456: childBlock,
 							789: { uid: 789, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
@@ -1304,7 +1304,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1321,7 +1321,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
 								uid: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
 								name: 'core/paragraph',
@@ -1349,7 +1349,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: { uid: 123, name: 'core/paragraph', attributes: {} },
 						},
 						blockOrder: {
@@ -1374,7 +1374,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -1389,7 +1389,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: { uid: 123, name: 'core/paragraph', attributes: {} },
 							456: { uid: 456, name: 'core/paragraph', attributes: {} },
 						},
@@ -1438,7 +1438,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: { uid: 123, name: 'core/meta-block', attributes: {} },
 						},
 						blockOrder: {
@@ -1467,7 +1467,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
 							123: { uid: 123, name: 'core/paragraph', attributes: {} },
 						},
@@ -1491,7 +1491,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
 							123: { uid: 123, name: 'core/paragraph', attributes: {} },
 						},
@@ -1509,7 +1509,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: { uid: 123, name: 'core/columns', attributes: {} },
 							456: { uid: 456, name: 'core/paragraph', attributes: {} },
 							789: { uid: 789, name: 'core/paragraph', attributes: {} },
@@ -1566,7 +1566,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
 							123: { uid: 123, name: 'core/paragraph', attributes: {} },
 						},
@@ -1581,7 +1581,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							123: { uid: 123, name: 'core/columns', attributes: {} },
 							456: { uid: 456, name: 'core/paragraph', attributes: {} },
 							789: { uid: 789, name: 'core/paragraph', attributes: {} },
@@ -1598,7 +1598,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 						},
 					},
 				},
@@ -1640,7 +1640,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
 							123: { uid: 123, name: 'core/paragraph', attributes: {} },
 						},
@@ -1663,7 +1663,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
 							123: { uid: 123, name: 'core/paragraph', attributes: {} },
 						},
@@ -1686,7 +1686,7 @@ describe( 'selectors', () => {
 				currentPost: {},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							23: { uid: 23, name: 'core/heading', attributes: {} },
 							123: { uid: 123, name: 'core/paragraph', attributes: {} },
 						},
@@ -1792,7 +1792,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -2261,7 +2261,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							uid1: { uid: 'uid1' },
 						},
 						blockOrder: {
@@ -2291,7 +2291,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							uid1: { uid: 'uid1' },
 							uid2: { uid: 'uid2' },
 						},
@@ -2323,7 +2323,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							uid1: { uid: 'uid1', attributes: { layout: 'wide' } },
 						},
 						blockOrder: {
@@ -2353,7 +2353,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							uid1: { uid: 'uid1' },
 							uid2: { uid: 'uid2' },
 						},
@@ -2385,7 +2385,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							uid1: { uid: 'uid1' },
 							uid2: { uid: 'uid2' },
 						},
@@ -2490,7 +2490,7 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blockOrder: {},
-						blocksByUid: {},
+						blocksByUID: {},
 						edits: {},
 					},
 				},
@@ -2507,7 +2507,7 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 123, 456 ],
 						},
-						blocksByUid: {
+						blocksByUID: {
 							123: { uid: 123, name: 'core/image', attributes: {} },
 							456: { uid: 456, name: 'core/quote', attributes: {} },
 						},
@@ -2527,7 +2527,7 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 123 ],
 						},
-						blocksByUid: {
+						blocksByUID: {
 							123: { uid: 123, name: 'core/image', attributes: {} },
 						},
 						edits: {},
@@ -2546,7 +2546,7 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 456 ],
 						},
-						blocksByUid: {
+						blocksByUID: {
 							456: { uid: 456, name: 'core/quote', attributes: {} },
 						},
 						edits: {},
@@ -2565,7 +2565,7 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 567 ],
 						},
-						blocksByUid: {
+						blocksByUID: {
 							567: { uid: 567, name: 'core-embed/youtube', attributes: {} },
 						},
 						edits: {},
@@ -2584,7 +2584,7 @@ describe( 'selectors', () => {
 						blockOrder: {
 							'': [ 456, 789 ],
 						},
-						blocksByUid: {
+						blocksByUID: {
 							456: { uid: 456, name: 'core/quote', attributes: {} },
 							789: { uid: 789, name: 'core/paragraph', attributes: {} },
 						},
@@ -2616,7 +2616,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -2635,7 +2635,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {},
+						blocksByUID: {},
 						blockOrder: {},
 						edits: {},
 					},
@@ -2664,7 +2664,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							1: { uid: 1, name: 'core/test-block', attributes: {} },
 						},
 						blockOrder: {
@@ -2687,7 +2687,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							carrot: { name: 'core/test-block' },
 						},
 						blockOrder: {},
@@ -2739,7 +2739,7 @@ describe( 'selectors', () => {
 				},
 				editor: {
 					present: {
-						blocksByUid: {
+						blocksByUID: {
 							carrot: { name: 'core/test-block' },
 						},
 						blockOrder: [],
@@ -3178,7 +3178,7 @@ describe( 'selectors', () => {
 		it( 'should return the template object', () => {
 			const template = [];
 			const state = {
-				template: { isValid: true, template },
+				settings: { template },
 			};
 
 			expect( getTemplate( state ) ).toBe( template );
@@ -3188,7 +3188,7 @@ describe( 'selectors', () => {
 	describe( 'getTemplateLock', () => {
 		it( 'should return the template object', () => {
 			const state = {
-				template: { isValid: true, lock: 'all' },
+				settings: { templateLock: 'all' },
 			};
 
 			expect( getTemplateLock( state ) ).toBe( 'all' );

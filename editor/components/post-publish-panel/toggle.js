@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import { Button, withAPIData, ifCondition } from '@wordpress/components';
+import { Button, ifCondition } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
@@ -17,7 +17,7 @@ import { withSelect } from '@wordpress/data';
 import PostPublishButton from '../post-publish-button';
 
 function PostPublishPanelToggle( {
-	user,
+	hasPublishAction,
 	isSaving,
 	isPublishable,
 	isSaveable,
@@ -34,9 +34,7 @@ function PostPublishPanelToggle( {
 		! isSaving && ! forceIsSaving && isPublishable && isSaveable
 	) || isPublished;
 
-	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
-	const isContributor = user.data && ! userCanPublishPosts;
-	const showToggle = ! isPublished && ! ( isScheduled && isBeingScheduled ) && ! ( isPending && isContributor );
+	const showToggle = ! isPublished && ! ( isScheduled && isBeingScheduled ) && ! ( isPending && ! hasPublishAction );
 
 	if ( ! showToggle ) {
 		return <PostPublishButton forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />;
@@ -66,6 +64,7 @@ export default compose( [
 			isCurrentPostPublished,
 			isEditedPostBeingScheduled,
 			isCurrentPostScheduled,
+			getCurrentPost,
 			getCurrentPostType,
 		} = select( 'core/editor' );
 
@@ -76,6 +75,7 @@ export default compose( [
 		const postType = getCurrentPostType();
 
 		return {
+			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			isSaving: isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
 			isPublishable: isEditedPostPublishable(),
@@ -85,13 +85,6 @@ export default compose( [
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			postType: postType,
 			isPostPublishable: get( getPostType( postType ), [ 'publishable' ], true ),
-		};
-	} ),
-	withAPIData( ( props ) => {
-		const { postType } = props;
-
-		return {
-			user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 		};
 	} ),
 	ifCondition( ( { isPostPublishable } ) => isPostPublishable ),

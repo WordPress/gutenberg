@@ -29,9 +29,7 @@ const charCodes = {
 	comma: 44,
 };
 
-const maybeDescribe = process.env.RUN_SLOW_TESTS ? describe : describe.skip;
-
-maybeDescribe( 'FormTokenField', function() {
+describe( 'FormTokenField', function() {
 	let wrapper, textInputNode;
 
 	function setText( text ) {
@@ -58,7 +56,7 @@ maybeDescribe( 'FormTokenField', function() {
 	}
 
 	function getTokensHTML() {
-		const textNodes = wrapper.find( '.components-form-token-field__token-text' );
+		const textNodes = wrapper.find( '.components-form-token-field__token-text span[aria-hidden]' );
 
 		return textNodes.map( getNodeInnerHtml );
 	}
@@ -204,13 +202,6 @@ maybeDescribe( 'FormTokenField', function() {
 	} );
 
 	describe( 'adding tokens', function() {
-		it( 'should add a token when Tab pressed', function() {
-			setText( 'baz' );
-			sendKeyDown( keyCodes.tab );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz' ] );
-			expect( textInputNode.prop( 'value' ) ).toBe( '' );
-		} );
-
 		it( 'should not allow adding blank tokens with Tab', function() {
 			sendKeyDown( keyCodes.tab );
 			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar' ] );
@@ -252,171 +243,16 @@ maybeDescribe( 'FormTokenField', function() {
 			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz' ] );
 		} );
 
-		it( 'should not add a token when < pressed', function() {
-			setText( 'baz' );
-			sendKeyDown( keyCodes.comma, true );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar' ] );
-			// The text input does not register the < keypress when it is sent this way.
-			expect( textInputNode.prop( 'value' ) ).toBe( 'baz' );
-		} );
-
 		it( 'should trim token values when adding', function() {
 			setText( '  baz  ' );
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz' ] );
-		} );
-
-		function testOnBlur( initialText, selectSuggestion, expectedSuggestion, expectedTokens ) {
-			setText( initialText );
-			if ( selectSuggestion ) {
-				sendKeyDown( keyCodes.downArrow ); // 'the'
-				sendKeyDown( keyCodes.downArrow ); // 'to'
-			}
-			expect( getSelectedSuggestion() ).toEqual( expectedSuggestion );
-
-			function testSavedState( isActive ) {
-				expect( wrapper.state( 'tokens' ) ).toEqual( expectedTokens );
-				expect( textInputNode.prop( 'value' ) ).toBe( '' );
-				expect( getSelectedSuggestion() ).toBe( null );
-				expect( wrapper.find( 'div' ).first().hasClass( 'is-active' ) ).toBe( isActive );
-			}
-
-			document.activeElement.blur();
-			textInputNode.simulate( 'blur' );
-			testSavedState( false );
-			textInputNode.simulate( 'focus' );
-			testSavedState( true );
-		}
-
-		it( 'should add the current text when the input field loses focus', function() {
-			testOnBlur(
-				't', // initialText
-				false, // selectSuggestion
-				null, // expectedSuggestion
-				[ 'foo', 'bar', 't' ] // expectedTokens
-			);
-		} );
-
-		it( 'shouldn\'t show any suggestion when the initial text is smaller than two characters', function() {
-			testOnBlur(
-				't', // initialText
-				true, // selectSuggestion
-				null, // expectedSuggestion
-				[ 'foo', 'bar', 'to' ] // expectedTokens
-			);
-		} );
-
-		it( 'should add the suggested token when the (non-blank) input field loses focus', function() {
-			testOnBlur(
-				'to', // initialText
-				true, // selectSuggestion
-				[ 'to' ], // expectedSuggestion
-				[ 'foo', 'bar', 'to' ] // expectedTokens
-			);
-		} );
-
-		it( 'should not lose focus when a suggestion is clicked', function() {
-			// prevents regression of https://github.com/Automattic/wp-calypso/issues/1884
-			setText( 'th' );
-			const firstSuggestion = wrapper.find( '.components-form-token-field__suggestion' ).at( 0 );
-			firstSuggestion.simulate( 'click' );
-
-			// wait for setState call
-			jest.runTimersToTime( 10 );
-
-			expect( wrapper.find( 'div' ).first().hasClass( 'is-active' ) ).toBe( true );
-		} );
-
-		it( 'should add tokens in the middle of the current tokens', function() {
-			sendKeyDown( keyCodes.leftArrow );
-			setText( 'baz' );
-			sendKeyDown( keyCodes.tab );
-			setText( 'quux' );
-			sendKeyDown( keyCodes.tab );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'baz', 'quux', 'bar' ] );
-		} );
-
-		it( 'should add tokens from the selected matching suggestion using Tab', function() {
-			setText( 'th' );
-			expect( getSelectedSuggestion() ).toBe( null );
-			sendKeyDown( keyCodes.downArrow ); // 'the'
-			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'e' ] );
-			sendKeyDown( keyCodes.downArrow ); // 'that'
-			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'at' ] );
-			sendKeyDown( keyCodes.tab );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'that' ] );
-			expect( getSelectedSuggestion() ).toBe( null );
-		} );
-
-		it( 'should add tokens from the selected matching suggestion using Enter', function() {
-			setText( 'th' );
-			expect( getSelectedSuggestion() ).toBe( null );
-			sendKeyDown( keyCodes.downArrow ); // 'the'
-			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'e' ] );
-			sendKeyDown( keyCodes.downArrow ); // 'that'
-			expect( getSelectedSuggestion() ).toEqual( [ 'th', 'at' ] );
-			sendKeyDown( keyCodes.enter );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'that' ] );
-			expect( getSelectedSuggestion() ).toBe( null );
-		} );
-	} );
-
-	describe( 'adding multiple tokens when pasting', function() {
-		it( 'should add multiple comma-separated tokens when pasting', function() {
-			setText( 'baz, quux, wut' );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz', 'quux' ] );
-			expect( textInputNode.prop( 'value' ) ).toBe( ' wut' );
-			setText( 'wut,' );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz', 'quux', 'wut' ] );
-			expect( textInputNode.prop( 'value' ) ).toBe( '' );
-		} );
-
-		it( 'should add multiple tab-separated tokens when pasting', function() {
-			setText( 'baz\tquux\twut' );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz', 'quux' ] );
-			expect( textInputNode.prop( 'value' ) ).toBe( 'wut' );
-		} );
-
-		it( 'should not duplicate tokens when pasting', function() {
-			setText( 'baz \tbaz,  quux \tquux,quux , wut  \twut, wut' );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz', 'quux', 'wut' ] );
-			expect( textInputNode.prop( 'value' ) ).toBe( ' wut' );
-		} );
-
-		it( 'should skip empty tokens at the beginning of a paste', function() {
-			setText( ',  ,\t \t  ,,baz, quux' );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz' ] );
-			expect( textInputNode.prop( 'value' ) ).toBe( ' quux' );
-		} );
-
-		it( 'should skip empty tokens in the middle of a paste', function() {
-			setText( 'baz,  ,\t \t  ,,quux' );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz' ] );
-			expect( textInputNode.prop( 'value' ) ).toBe( 'quux' );
-		} );
-
-		it( 'should skip empty tokens at the end of a paste', function() {
-			setText( 'baz, quux,  ,\t \t  ,,   ' );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo', 'bar', 'baz', 'quux' ] );
-			expect( textInputNode.prop( 'value' ) ).toBe( '   ' );
 		} );
 	} );
 
 	describe( 'removing tokens', function() {
 		it( 'should remove tokens when X icon clicked', function() {
 			wrapper.find( '.components-form-token-field__remove-token' ).first().simulate( 'click' );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'bar' ] );
-		} );
-
-		it( 'should remove the token to the left when backspace pressed', function() {
-			sendKeyDown( keyCodes.backspace );
-			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'foo' ] );
-		} );
-
-		it( 'should remove the token to the right when delete pressed', function() {
-			sendKeyDown( keyCodes.leftArrow );
-			sendKeyDown( keyCodes.leftArrow );
-			sendKeyDown( keyCodes.delete );
 			expect( wrapper.state( 'tokens' ) ).toEqual( [ 'bar' ] );
 		} );
 	} );

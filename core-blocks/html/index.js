@@ -17,7 +17,7 @@ export const name = 'core/html';
 export const settings = {
 	title: __( 'Custom HTML' ),
 
-	description: __( 'Add custom HTML code and preview it right here in the editor.' ),
+	description: __( 'Add your own HTML (and view it right here as you edit!).' ),
 
 	icon: 'html',
 

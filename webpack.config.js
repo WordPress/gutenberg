@@ -70,7 +70,6 @@ function camelCaseDash( string ) {
 const entryPointNames = [
 	'blocks',
 	'components',
-	'date',
 	'editor',
 	'element',
 	'utils',
@@ -82,7 +81,11 @@ const entryPointNames = [
 	'core-blocks',
 ];
 
-const packageNames = [
+const gutenbergPackages = [
+	'date',
+];
+
+const wordPressPackages = [
 	'a11y',
 	'dom-ready',
 	'hooks',
@@ -106,7 +109,8 @@ const externals = {
 
 [
 	...entryPointNames,
-	...packageNames,
+	...gutenbergPackages,
+	...wordPressPackages,
 	...coreGlobals,
 ].forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
@@ -123,7 +127,12 @@ const config = {
 			memo[ name ] = `./${ path }`;
 			return memo;
 		}, {} ),
-		packageNames.reduce( ( memo, packageName ) => {
+		gutenbergPackages.reduce( ( memo, packageName ) => {
+			const name = camelCaseDash( packageName );
+			memo[ name ] = `./packages/${ packageName }`;
+			return memo;
+		}, {} ),
+		wordPressPackages.reduce( ( memo, packageName ) => {
 			const name = camelCaseDash( packageName );
 			memo[ name ] = `./node_modules/@wordpress/${ packageName }`;
 			return memo;

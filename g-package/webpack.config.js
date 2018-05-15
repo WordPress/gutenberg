@@ -72,7 +72,6 @@ function camelCaseDash( string ) {
 const entryPointNames = [
 	'blocks',
 	'components',
-	'date',
 	'editor',
 	'element',
 	'utils',
@@ -82,6 +81,10 @@ const entryPointNames = [
 	'plugins',
 	'edit-post',
 	'core-blocks',
+];
+
+const gutenbergPackages = [
+	'date',
 ];
 
 const coreGlobals = [
@@ -95,6 +98,10 @@ const alias = {};
 
 entryPointNames.forEach( ( name ) => {
 	alias[ '@wordpress/' + name ] = `${ dirname }/${ name }`;
+} );
+
+gutenbergPackages.forEach( ( name ) => {
+	alias[ '@wordpress/' + name ] = `${ dirname }/packages/${ name }`;
 } );
 
 // make them external global vars

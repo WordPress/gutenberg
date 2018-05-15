@@ -11,7 +11,7 @@ import { withPluginContext } from '@wordpress/plugins';
  */
 import PluginsMoreMenuGroup from '../plugins-more-menu-group';
 
-const PluginSidebarMoreMenuItem = ( { children, isSelected, icon, onClick } ) => (
+const PluginSidebarMoreMenuItem = ( { children, icon, isSelected, onClick } ) => (
 	<PluginsMoreMenuGroup>
 		{ ( fillProps ) => (
 			<MenuItem
@@ -26,14 +26,19 @@ const PluginSidebarMoreMenuItem = ( { children, isSelected, icon, onClick } ) =>
 );
 
 export default compose(
-	withPluginContext,
-	withSelect( ( select, ownProps ) => {
-		const { pluginContext, target } = ownProps;
-		const sidebarName = `${ pluginContext.name }/${ target }`;
+	withPluginContext( ( context, ownProps ) => {
+		return {
+			icon: ownProps.icon || context.icon,
+			sidebarName: `${ context.name }/${ ownProps.target }`,
+		};
+	} ),
+	withSelect( ( select, { sidebarName } ) => {
+		const {
+			getActiveGeneralSidebarName,
+		} = select( 'core/edit-post' );
 
 		return {
-			isSelected: select( 'core/edit-post' ).getActiveGeneralSidebarName() === sidebarName,
-			sidebarName,
+			isSelected: getActiveGeneralSidebarName() === sidebarName,
 		};
 	} ),
 	withDispatch( ( dispatch, { isSelected, sidebarName } ) => {

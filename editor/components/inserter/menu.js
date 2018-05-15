@@ -24,7 +24,7 @@ import {
 	withInstanceId,
 	withSpokenMessages,
 } from '@wordpress/components';
-import { getCategories, isSharedBlock, withEditorSettings, getTabs, getTabByName, getDefaultTab } from '@wordpress/blocks';
+import { getCategories, isSharedBlock, getTabs, getTabByName, getDefaultTab } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -313,20 +313,15 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withEditorSettings( ( settings ) => {
-		const { allowedBlockTypes } = settings;
-
-		return {
-			allowedBlockTypes,
-		};
-	} ),
-	withSelect( ( select, { allowedBlockTypes } ) => {
+	withSelect( ( select ) => {
 		const {
 			getBlockInsertionPoint,
 			getInserterItems,
 			getFrecentInserterItems,
 			getSupportedBlocks,
+			getEditorSettings,
 		} = select( 'core/editor' );
+		const { allowedBlockTypes } = getEditorSettings();
 		const { rootUID } = getBlockInsertionPoint();
 		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
 		return {
