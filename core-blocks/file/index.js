@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RichText } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/utils';
 import { createBlock } from '@wordpress/blocks';
 
@@ -129,18 +128,13 @@ export const settings = {
 		return ( href &&
 			<div>
 				{ fileName &&
-					<RichText.Content
-						tagName="span"
-						value={
-							<a
-								href={ textLinkHref }
-								target={ openInNewWindow }
-								rel={ openInNewWindow ? 'noreferrer noopener' : false }
-							>
-								{ fileName }
-							</a>
-						}
-					/>
+					<a
+						href={ textLinkHref }
+						target={ openInNewWindow }
+						rel={ openInNewWindow ? 'noreferrer noopener' : false }
+					>
+						{ fileName }
+					</a>
 				}
 				<a
 					href={ href }
