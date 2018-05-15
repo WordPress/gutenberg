@@ -66,8 +66,8 @@ $toggle-border-width: 2px;
 
 	// checked state
 	&.is-checked .components-form-toggle__track {
-		background-color: $blue-medium-400;
-		border: $toggle-border-width solid $blue-medium-400;
+		background-color: theme(primary);
+		border: $toggle-border-width solid theme(primary);
 		border: #{ $toggle-height / 2 } solid transparent; // expand the border to fake a solid in Windows High Contrast Mode
 	}
 
