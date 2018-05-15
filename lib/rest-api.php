@@ -332,6 +332,53 @@ function gutenberg_add_target_schema_to_links( $response, $post, $request ) {
 			);
 		}
 	}
+	// Term assignment and creation.
+	if ( 'edit' === $request['context'] ) {
+		$taxonomies = get_object_taxonomies( $post_type->name, 'objects' );
+		foreach ( $taxonomies as $tax_obj ) {
+			if ( empty( $tax_obj->show_in_rest ) ) {
+				continue;
+			}
+			$rest_base = ! empty( $tax_obj->rest_base ) ? $tax_obj->rest_base : $tax_obj->name;
+			// 'edit_terms' is required to create hierarchical terms,
+			// but 'assign_terms' is required for non-hierarchical terms.
+			if ( ( is_taxonomy_hierarchical( $tax_obj->name )
+				&& current_user_can( $tax_obj->cap->edit_terms ) )
+				|| ( ! is_taxonomy_hierarchical( $tax_obj->name )
+				&& current_user_can( $tax_obj->cap->assign_terms ) ) ) {
+				$new_links[ 'https://api.w.org/action-create-' . $rest_base ] = array(
+					array(
+						'title'        => __( 'The current user can create terms.', 'gutenberg' ),
+						'href'         => $orig_href,
+						'targetSchema' => array(
+							'type'       => 'object',
+							'properties' => array(
+								$rest_base => array(
+									'type' => 'array',
+								),
+							),
+						),
+					),
+				);
+			}
+			if ( current_user_can( $tax_obj->cap->assign_terms ) ) {
+				$new_links[ 'https://api.w.org/action-assign-' . $rest_base ] = array(
+					array(
+						'title'        => __( 'The current user can assign terms.', 'gutenberg' ),
+						'href'         => $orig_href,
+						'targetSchema' => array(
+							'type'       => 'object',
+							'properties' => array(
+								$rest_base => array(
+									'type' => 'array',
+								),
+							),
+						),
+					),
+				);
+			}
+		}
+	}
 
 	$response->add_links( $new_links );
 	return $response;

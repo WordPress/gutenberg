@@ -220,6 +220,53 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Only returns term-related actions when current user can do so.
+	 */
+	function test_link_term_management_per_user() {
+		$contributor_post  = $this->factory->post->create( array(
+			'post_author' => $this->contributor,
+			'post_status' => 'draft',
+		) );
+		$author_post       = $this->factory->post->create( array(
+			'post_author' => $this->author,
+		) );
+		$create_tags       = 'https://api.w.org/action-create-tags';
+		$assign_tags       = 'https://api.w.org/action-assign-tags';
+		$create_categories = 'https://api.w.org/action-create-categories';
+		$assign_categories = 'https://api.w.org/action-assign-categories';
+		// Contributors can create and assign tags, but only assign categories.
+		wp_set_current_user( $this->contributor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $contributor_post );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertTrue( isset( $links[ $create_tags ] ) );
+		$this->assertTrue( isset( $links[ $assign_tags ] ) );
+		$this->assertFalse( isset( $links[ $create_categories ] ) );
+		$this->assertTrue( isset( $links[ $assign_categories ] ) );
+		// Authors can create and assign tags, but only assign categories.
+		wp_set_current_user( $this->author );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $author_post );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertTrue( isset( $links[ $create_tags ] ) );
+		$this->assertTrue( isset( $links[ $assign_tags ] ) );
+		$this->assertFalse( isset( $links[ $create_categories ] ) );
+		$this->assertTrue( isset( $links[ $assign_categories ] ) );
+		// Editors can do everything.
+		wp_set_current_user( $this->editor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $author_post );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertTrue( isset( $links[ $create_tags ] ) );
+		$this->assertTrue( isset( $links[ $assign_tags ] ) );
+		$this->assertTrue( isset( $links[ $create_categories ] ) );
+		$this->assertTrue( isset( $links[ $assign_categories ] ) );
+	}
+
+	/**
 	 * Should include relevant data in the 'theme_supports' key of index.
 	 */
 	function test_theme_supports_index() {
