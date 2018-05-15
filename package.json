@@ -57,6 +57,7 @@
 		"showdown": "1.8.6",
 		"simple-html-tokenizer": "0.4.1",
 		"tinycolor2": "1.4.1",
+		"tinymce": "4.7.2",
 		"uuid": "3.1.0"
 	},
 	"devDependencies": {
@@ -95,7 +96,6 @@
 		"sass-loader": "6.0.7",
 		"sprintf-js": "1.1.1",
 		"style-loader": "0.20.3",
-		"tinymce": "4.7.2",
 		"webpack": "4.4.1",
 		"webpack-cli": "2.0.13",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"

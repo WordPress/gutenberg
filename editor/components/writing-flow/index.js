@@ -8,15 +8,15 @@ import { overEvery, find, findLast, reverse } from 'lodash';
  */
 import { Component, compose } from '@wordpress/element';
 import {
-	keycodes,
-	focus,
-	isTextField,
 	computeCaretRect,
+	focus,
 	isHorizontalEdge,
+	isTextField,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
-} from '@wordpress/utils';
+} from '@wordpress/dom';
+import { keycodes } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
