@@ -1,13 +1,19 @@
 /**
  * External dependencies
  */
-import { omitBy } from 'lodash';
+import { omitBy, get } from 'lodash';
 import { nodeListToReact } from 'dom-react';
 
 /**
  * WordPress dependencies
  */
 import { createElement, renderToString } from '@wordpress/element';
+
+/**
+ * Browser dependencies
+ */
+
+const { Node } = window;
 
 /**
  * Transforms a WP Element to its corresponding HTML string.
@@ -60,6 +66,34 @@ export function createTinyMCEElement( type, props, ...children ) {
 		omitBy( props, ( _, key ) => key.indexOf( 'data-mce-' ) === 0 ),
 		...children
 	);
+}
+
+/**
+ * Given a TinyMCE Node instance, returns an equivalent WordPress element.
+ *
+ * @param {tinyMCE.html.Node} node TinyMCE node
+ *
+ * @return {WPElement} WordPress element
+ */
+export function tinyMCENodeToElement( node ) {
+	if ( node.type === Node.TEXT_NODE ) {
+		return node.value;
+	}
+
+	const children = [];
+
+	let child = node.firstChild;
+	while ( child ) {
+		children.push( tinyMCENodeToElement( child ) );
+		child = child.next;
+	}
+
+	if ( node.type === Node.DOCUMENT_FRAGMENT_NODE ) {
+		return children;
+	}
+
+	const attributes = get( node.attributes, [ 'map' ], {} );
+	return createElement( node.name, attributes, ...children );
 }
 
 /**

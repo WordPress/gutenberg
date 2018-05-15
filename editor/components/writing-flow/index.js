@@ -29,6 +29,12 @@ import {
 } from '../../utils/dom';
 
 /**
+ * Browser constants
+ */
+
+const { getSelection } = window;
+
+/**
  * Module Constants
  */
 
@@ -206,7 +212,7 @@ class WritingFlow extends Component {
 
 		if ( isShift && ( hasMultiSelection || (
 			this.isTabbableEdge( target, isReverse ) &&
-			isNavEdge( target, isReverse, true )
+			isNavEdge( target, isReverse )
 		) ) ) {
 			// Shift key is down, and there is multi selection or we're at the end of the current block.
 			this.expandSelection( isReverse );
@@ -215,14 +221,14 @@ class WritingFlow extends Component {
 			// Moving from block multi-selection to single block selection
 			this.moveSelection( isReverse );
 			event.preventDefault();
-		} else if ( isVertical && isVerticalEdge( target, isReverse, isShift ) ) {
+		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 
 			if ( closestTabbable ) {
 				placeCaretAtVerticalEdge( closestTabbable, isReverse, this.verticalRect );
 				event.preventDefault();
 			}
-		} else if ( isHorizontal && isHorizontalEdge( target, isReverse, isShift ) ) {
+		} else if ( isHorizontal && getSelection().isCollapsed && isHorizontalEdge( target, isReverse ) ) {
 			const closestTabbable = this.getClosestTabbable( target, isReverse );
 			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();

@@ -18,7 +18,7 @@ import 'element-closest';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
+import { Component, Fragment, compose, RawHTML, Children, createRef } from '@wordpress/element';
 import {
 	keycodes,
 	createBlobURL,
@@ -43,9 +43,33 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
-import { domToFormat, valueToString } from './format';
+import {
+	domToFormat,
+	valueToString,
+	tinyMCENodeToElement,
+} from './format';
 
-const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
+/**
+ * Browser dependencies
+ */
+
+const { getSelection, Node } = window;
+
+/**
+ * Module constants
+ */
+
+const { LEFT, RIGHT, BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
+
+/**
+ * Zero-width space character used by TinyMCE as a caret landing point for
+ * inline boundary nodes.
+ *
+ * @see tinymce/src/core/main/ts/text/Zwsp.ts
+ *
+ * @type {string}
+ */
+const TINYMCE_ZWSP = '\uFEFF';
 
 /**
  * Returns true if the node is the inline node boundary. This is used in node
@@ -61,7 +85,7 @@ const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
  */
 export function isEmptyInlineBoundary( node ) {
 	const text = node.nodeName === 'A' ? node.innerText : node.textContent;
-	return text === '\uFEFF';
+	return text === TINYMCE_ZWSP;
 }
 
 /**
@@ -122,6 +146,7 @@ export class RichText extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
+		this.removeZwsp = this.removeZwsp.bind( this );
 
 		this.state = {
 			formats: {},
@@ -186,6 +211,7 @@ export class RichText extends Component {
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
 		editor.on( 'input', this.onChange );
+		editor.on( 'focusout', this.removeZwsp );
 		// The change event in TinyMCE fires every time an undo level is added.
 		editor.on( 'change', this.onCreateUndoLevel );
 
@@ -199,6 +225,27 @@ export class RichText extends Component {
 	setFocusedElement() {
 		if ( this.props.setFocusedElement ) {
 			this.props.setFocusedElement( this.props.instanceId );
+		}
+	}
+
+	/**
+	 * Cleans up after TinyMCE when leaving the field, removing lingering zero-
+	 * width space characters. Without removal, future horizontal navigation
+	 * into the field would land on the zero-width space, where it's preferred
+	 * to consistently land within an inline boundary where the zero-width
+	 * space had existed to delineate.
+	 */
+	removeZwsp() {
+		const rootNode = this.editor.getBody();
+
+		const stack = [ ...rootNode.childNodes ];
+		while ( stack.length ) {
+			const node = stack.pop();
+			if ( node.nodeType === Node.TEXT_NODE && node.nodeValue === TINYMCE_ZWSP ) {
+				node.parentNode.removeChild( node );
+			}
+
+			stack.push( ...node.childNodes );
 		}
 	}
 
@@ -456,40 +503,101 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Handles a Backspace or Delete keydown event to delegate merge or remove
+	 * if key event occurs while at the extent edge of the field. Prevents
+	 * default browser behavior if delegated to prop callback handler.
+	 *
+	 * @param {KeyboardEvent} event Keydown event.
+	 */
+	onDeleteKeyDown( event ) {
+		const { onMerge, onRemove } = this.props;
+		if ( ! onMerge && ! onRemove ) {
+			return;
+		}
+
+		if ( ! getSelection().isCollapsed ) {
+			return;
+		}
+
+		const isForward = ( event.keyCode === DELETE );
+		const rootNode = this.editor.getBody();
+		if ( ! isHorizontalEdge( rootNode, ! isForward ) ) {
+			return;
+		}
+
+		this.onCreateUndoLevel();
+
+		if ( onMerge ) {
+			onMerge( isForward );
+		}
+
+		if ( onRemove && this.isEmpty() ) {
+			onRemove( isForward );
+		}
+
+		event.preventDefault();
+
+		// Calling onMerge() or onRemove() will destroy the editor, so it's
+		// important that other handlers (e.g. ones registered by TinyMCE) do
+		// not also attempt to handle this event.
+		event.stopImmediatePropagation();
+	}
+
+	/**
+	 * Handles a horizontal navigation key down event to stop propagation if it
+	 * can be inferred that it will be handled by TinyMCE (notably transitions
+	 * out of an inline boundary node).
+	 *
+	 * @param {KeyboardEvent} event Keydown event.
+	 */
+	onHorizontalNavigationKeyDown( event ) {
+		const { focusNode, focusOffset } = window.getSelection();
+		const { nodeType, nodeValue } = focusNode;
+
+		if ( nodeType !== Node.TEXT_NODE ) {
+			return;
+		}
+
+		const isReverse = event.keyCode === LEFT;
+
+		let offset = focusOffset;
+		if ( isReverse ) {
+			offset--;
+		}
+
+		// [WORKAROUND]: When in a new paragraph in a new inline boundary node,
+		// while typing the zero-width space occurs as the first child instead
+		// of at the end of the inline boundary where the caret is. This should
+		// only be exempt when focusNode is not _only_ the ZWSP, which occurs
+		// when caret is placed on the right outside edge of inline boundary.
+		if ( ! isReverse && focusOffset === nodeValue.length &&
+				nodeValue.length > 1 && nodeValue[ 0 ] === TINYMCE_ZWSP ) {
+			offset = 0;
+		}
+
+		if ( nodeValue[ offset ] === TINYMCE_ZWSP ) {
+			event.stopPropagation();
+		}
+	}
+
+	/**
 	 * Handles a keydown event from tinyMCE.
 	 *
-	 * @param {KeydownEvent} event The keydow event as triggered by tinyMCE.
+	 * @param {KeyboardEvent} event Keydown event.
 	 */
 	onKeyDown( event ) {
+		const { keyCode } = event;
 		const dom = this.editor.dom;
 		const rootNode = this.editor.getBody();
 
-		if (
-			( event.keyCode === BACKSPACE && isHorizontalEdge( rootNode, true ) ) ||
-			( event.keyCode === DELETE && isHorizontalEdge( rootNode, false ) )
-		) {
-			if ( ! this.props.onMerge && ! this.props.onRemove ) {
-				return;
-			}
+		const isDeleteKey = keyCode === BACKSPACE || keyCode === DELETE;
+		if ( isDeleteKey ) {
+			this.onDeleteKeyDown( event );
+		}
 
-			this.onCreateUndoLevel();
-
-			const forward = event.keyCode === DELETE;
-
-			if ( this.props.onMerge ) {
-				this.props.onMerge( forward );
-			}
-
-			if ( this.props.onRemove && this.isEmpty() ) {
-				this.props.onRemove( forward );
-			}
-
-			event.preventDefault();
-
-			// Calling onMerge() or onRemove() will destroy the editor, so it's important
-			// that we stop other handlers (e.g. ones registered by TinyMCE) from
-			// also handling this event.
-			event.stopImmediatePropagation();
+		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
+		if ( isHorizontalNavigation ) {
+			this.onHorizontalNavigationKeyDown( event );
 		}
 
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
@@ -732,9 +840,7 @@ export class RichText extends Component {
 			case 'string':
 				return this.editor.getContent();
 			default:
-				return this.editor.dom.isEmpty( this.editor.getBody() ) ?
-					[] :
-					domToFormat( this.editor.getBody().childNodes || [], 'element', this.editor );
+				return tinyMCENodeToElement( this.editor.getContent( { format: 'tree' } ) );
 		}
 	}
 
@@ -771,8 +877,15 @@ export class RichText extends Component {
 	 * @return {boolean} Whether field is empty.
 	 */
 	isEmpty() {
-		const { value } = this.props;
-		return ! value || ! value.length;
+		const { value, format } = this.props;
+		if ( ! value ) {
+			return true;
+		}
+
+		return (
+			format === 'string' ||
+			! Children.count( value )
+		);
 	}
 
 	isFormatActive( format ) {

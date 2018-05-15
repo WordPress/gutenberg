@@ -130,7 +130,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
-		array( 'tinymce-latest', 'lodash' ),
+		array( 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
 		true
 	);
@@ -472,7 +472,7 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/moment@2.22.1/' . $moment_script,
 		array()
 	);
-	$tinymce_version = '4.7.2';
+	$tinymce_version = '4.7.12';
 	gutenberg_register_vendor_script(
 		'tinymce-latest',
 		'https://unpkg.com/tinymce@' . $tinymce_version . '/tinymce' . $suffix . '.js'

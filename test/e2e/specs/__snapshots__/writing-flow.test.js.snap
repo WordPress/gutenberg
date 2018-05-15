@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`adding blocks Should navigate with arrow keys 1`] = `"Hello World!"`;
+
+exports[`adding blocks Should navigate with arrow keys 2`] = `"Hello"`;
+
+exports[`adding blocks Should navigate with arrow keys 3`] = `"Hello to the World!"`;
+
+exports[`adding blocks Should navigate with arrow keys 4`] = `"Greeting: Hello to the World!"`;
+
+exports[`adding blocks Should navigate with arrow keys 5`] = `"The Greeting: <br>Hello to the World!"`;
+
+exports[`adding blocks Should navigate with arrow keys 6`] = `"Prefix: Hello"`;
+
+exports[`adding blocks Should navigate with arrow keys 7`] = `"The Greeting: <br>Hello to the World! (Suffix)"`;
+
+exports[`adding blocks Should navigate with arrow keys 8`] = `"<span id=\\"_mce_caret\\" data-mce-bogus=\\"1\\" data-mce-type=\\"format-caret\\"><strong data-mce-selected=\\"inline-boundary\\">﻿Bolded</strong></span><br data-mce-bogus=\\"1\\">"`;
+
+exports[`adding blocks Should navigate with arrow keys 9`] = `"<strong>Bolded</strong>&nbsp;After<br data-mce-bogus=\\"1\\">"`;
+
+exports[`adding blocks Should navigate with arrow keys 10`] = `"The Greeting: <br>Hello to the World! (Suffixed)"`;
+
+exports[`adding blocks Should navigate with arrow keys 11`] = `"<strong data-mce-selected=\\"inline-boundary\\">More Bolded (Still Bolded)﻿</strong><br data-mce-bogus=\\"1\\">"`;
+
+exports[`adding blocks Should navigate with arrow keys 12`] = `"The Prefix: Hello"`;
+
+exports[`adding blocks Should navigate with arrow keys 13`] = `
+"<!-- wp:paragraph -->
+<p>The Greeting: <br/>Hello to the World! (Suffixed)</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>Bolded</strong> After</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><strong>More Bolded (Still Bolded)</strong></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>The Prefix: Hello</p>
+<!-- /wp:paragraph -->"
+`;
