@@ -1,0 +1,12 @@
+[
+    {
+        "blockName": "core/file",
+        "attrs": null,
+        "innerBlocks": [],
+        "innerHTML": "\n<div class=\"wp-block-file\"><a href=\"https://myexternaldocument.org/file.pdf\" class=\"wp-block-file__button\" download>Download</a></div>\n"
+    },
+    {
+        "attrs": {},
+        "innerHTML": "\n"
+    }
+]

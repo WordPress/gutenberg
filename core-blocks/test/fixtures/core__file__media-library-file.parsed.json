@@ -1,0 +1,14 @@
+[
+    {
+        "blockName": "core/file",
+        "attrs": {
+            "id": "20"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/?attachment_id=4578\">bubble-4225</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/bubble-4225.js\" class=\"wp-block-file__button\" download=\"bubble-4225\">Download</a></div>\n"
+    },
+    {
+        "attrs": {},
+        "innerHTML": "\n"
+    }
+]
