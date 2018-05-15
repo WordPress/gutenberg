@@ -1,6 +1,6 @@
 {
   "name": "@frontkom/gutenberg",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "Gutenberg by Frontkom - A custom Gutenberg",
   "main": "dist/gutenberg.js",
   "repository": {
