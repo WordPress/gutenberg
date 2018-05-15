@@ -6,7 +6,7 @@ import { get } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import { Button, withAPIData } from '@wordpress/components';
+import { Button, withAPIData, ifCondition } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
@@ -68,6 +68,13 @@ export default compose( [
 			isCurrentPostScheduled,
 			getCurrentPostType,
 		} = select( 'core/editor' );
+
+		const {
+			getPostType,
+		} = select( 'core' );
+
+		const postType = getCurrentPostType();
+
 		return {
 			isSaving: isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
@@ -76,7 +83,8 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			isScheduled: isCurrentPostScheduled(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
-			postType: getCurrentPostType(),
+			postType: postType,
+			isPostPublishable: get( getPostType( postType ), [ 'publishable' ], true ),
 		};
 	} ),
 	withAPIData( ( props ) => {
@@ -86,4 +94,5 @@ export default compose( [
 			user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
 		};
 	} ),
+	ifCondition( ( { isPostPublishable } ) => isPostPublishable ),
 ] )( PostPublishPanelToggle );

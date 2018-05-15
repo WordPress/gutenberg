@@ -14,6 +14,7 @@ This package is based on [Gutenberg v2.8.0](https://github.com/WordPress/gutenbe
         * [GET types](#get-types)
         * [PUT post or page](#put-post-or-page)
         * [GET categories](#get-categories)
+        * [GET /](get)
     * [url](#url)
 * [Customize your Gutenberg](#customize-your-gutenberg)
     * [Block Menu Tabs](#block-menu-tabs)
@@ -21,7 +22,7 @@ This package is based on [Gutenberg v2.8.0](https://github.com/WordPress/gutenbe
     * [Rows](#rows)
     * [Posts Panel](#posts-panel)
         * [Post Block](#post-block)
-    * [Events](#events-experimental)
+    * [Events (experimental)](#events-experimental)
 
 ## Installation
 
@@ -145,15 +146,19 @@ When you initialize the editor, Gutenberg will request the settings related with
     supports: {
         author: true,
         comments: false,
-        custom-fields: true,
+        'custom-fields': true,
         thumbnail: false,
         title: true,
         // Gutenberg by Frontkom supports flags
-        media-library: false,    // disable Media library from WordPress
-        posts: true,             // add PostsPanel to sidebar
-        template-settings: true, // add TemplateSettingsPanel to sidebar
+        document: true             // show Documents tab in sidebar
+        'media-library': false,    // disable Media library from WordPress
+        posts: true,               // add PostsPanel to sidebar
+        'template-settings': true, // add TemplateSettingsPanel to sidebar
         ...,
     },
+    viewable: true,
+    publishable: false, // hide Publish Toggle
+    saveable: false,    // disable save button and autosave
     ...,
 }
 ```
@@ -179,13 +184,28 @@ To save a [post](https://v2.wp-api.org/reference/posts/) or a [page](https://v2.
 
 #### GET categories
 
-The request to get all [categories](https://v2.wp-api.org/reference/categories/) is `/wp/v2/categories` and expects an array of the follow objects:
+The request to get all [categories](https://v2.wp-api.org/reference/categories/) is `/wp/v2/categories` and expects an array of objects with the following structure:
 
 ```js
 {
     id: 1,
     name: 'Category 1',
     parent: 0,
+    ...,
+}
+```
+
+#### GET /
+
+Gutenberg will ask for the [theme features](https://codex.wordpress.org/Theme_Features) through the index request (`\`). The response should be the following object.
+
+```js
+{
+    ...,
+    theme_supports: {
+        formats: [ 'standard', 'aside', 'image', 'video', 'quote', 'link', 'gallery', 'audio' ],
+        'post-thumbnails': true,
+    },
     ...,
 }
 ```

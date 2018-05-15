@@ -1,6 +1,6 @@
 {
   "name": "@frontkom/gutenberg",
-  "version": "0.0.12",
+  "version": "0.0.14",
   "description": "Gutenberg by Frontkom - A custom Gutenberg",
   "main": "dist/gutenberg.js",
   "repository": {
@@ -23,7 +23,9 @@
     "node": ">=8.0.0",
     "npm": ">=5.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "tinymce": "4.7.2"
+  },
   "bugs": {
     "url": "https://github.com/front/gutenberg/issues"
   },

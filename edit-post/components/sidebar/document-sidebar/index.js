@@ -3,6 +3,7 @@
  */
 import { Panel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { PostTypeSupportCheck } from '@wordpress/editor';
 
 /**
  * Internal Dependencies
@@ -23,24 +24,26 @@ import TemplateSettingsPanel from '../template-settings-panel';
 const SIDEBAR_NAME = 'edit-post/document';
 
 const DocumentSidebar = () => (
-	<Sidebar
-		name={ SIDEBAR_NAME }
-		label={ __( 'Editor settings' ) }
-	>
-		<SettingsHeader sidebarName={ SIDEBAR_NAME } />
-		<Panel>
-			<PostStatus />
-			<PostsPanel />
-			<TemplateSettingsPanel />
-			<LastRevision />
-			<PostTaxonomies />
-			<FeaturedImage />
-			<PostExcerpt />
-			<DiscussionPanel />
-			<PageAttributes />
-			<MetaBoxes location="side" usePanel />
-		</Panel>
-	</Sidebar>
+	<PostTypeSupportCheck supportKeys="document">
+		<Sidebar
+			name={ SIDEBAR_NAME }
+			label={ __( 'Editor settings' ) }
+		>
+			<SettingsHeader sidebarName={ SIDEBAR_NAME } />
+			<Panel>
+				<PostStatus />
+				<PostsPanel />
+				<TemplateSettingsPanel />
+				<LastRevision />
+				<PostTaxonomies />
+				<FeaturedImage />
+				<PostExcerpt />
+				<DiscussionPanel />
+				<PageAttributes />
+				<MetaBoxes location="side" usePanel />
+			</Panel>
+		</Sidebar>
+	</PostTypeSupportCheck>
 );
 
 export default DocumentSidebar;
