@@ -93,16 +93,13 @@ export default compose( [
 			isSavingPost,
 			isEditedPostSaveable,
 			getCurrentPost,
-			getEditedPostAttribute,
 		} = select( 'core/editor' );
-		
+
 		const {
 			getPostType,
 		} = select( 'core' );
 
 		const post = getCurrentPost();
-
-		console.log(`${ post.type } isPostSaveable `, get( getPostType( post.type ), [ 'saveable' ], true ));
 
 		return {
 			post,
