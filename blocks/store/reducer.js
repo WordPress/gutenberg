@@ -7,19 +7,11 @@ import { filter, map, keyBy, omit } from 'lodash';
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 
 /**
- * Module Constants
+ * Internal dependencies
  */
-export const DEFAULT_CATEGORIES = [
-	{ slug: 'common', title: __( 'Common Blocks' ) },
-	{ slug: 'formatting', title: __( 'Formatting' ) },
-	{ slug: 'layout', title: __( 'Layout Elements' ) },
-	{ slug: 'widgets', title: __( 'Widgets' ) },
-	{ slug: 'embed', title: __( 'Embeds' ) },
-	{ slug: 'shared', title: __( 'Shared Blocks' ) },
-];
+import { DEFAULT_CATEGORIES } from './defaults';
 
 /**
  * Reducer managing the block types
