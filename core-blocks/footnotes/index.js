@@ -53,7 +53,7 @@ export const settings = {
 	},
 
 	edit: withSelect( ( select ) => ( {
-		footnotes: select( 'core/editor' ) ? select( 'core/editor' ).getFootnotes() : [],
+		footnotes: select( 'core/editor' ).getFootnotes(),
 	} ) )( withState( {
 		editable: null,
 	} )( ( { attributes, editable, footnotes, isSelected, setAttributes, setState } ) => {
