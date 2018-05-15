@@ -13,10 +13,9 @@ import {
 	cloneBlock,
 	getBlockTransforms,
 	findTransform,
-	withEditorSettings,
 } from '@wordpress/blocks';
 import { compose, Component } from '@wordpress/element';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -143,8 +142,8 @@ export default compose(
 			},
 		};
 	} ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock } = settings;
+	withSelect( ( select ) => {
+		const { templateLock } = select( 'core/editor' ).getEditorSettings();
 
 		return {
 			isLocked: !! templateLock,

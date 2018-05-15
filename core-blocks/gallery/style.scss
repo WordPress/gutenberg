@@ -2,8 +2,9 @@
 	display: flex;
 	flex-wrap: wrap;
 	list-style-type: none;
-	margin: 0px;
 	padding: 0px;
+	// allow gallery items to go edge to edge
+	margin: 0 -8px 0 -8px;
 
 	.blocks-gallery-image,
 	.blocks-gallery-item {

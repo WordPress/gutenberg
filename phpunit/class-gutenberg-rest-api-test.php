@@ -21,6 +21,9 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$this->editor        = $this->factory->user->create( array(
 			'role' => 'editor',
 		) );
+		$this->contributor   = $this->factory->user->create( array(
+			'role' => 'contributor',
+		) );
 		$this->subscriber    = $this->factory->user->create(
 			array(
 				'role'         => 'subscriber',
@@ -128,6 +131,66 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Only returns wp:action-assign-author when current user can assign author.
+	 */
+	function test_link_assign_author_only_appears_for_editor() {
+		$post_id   = $this->factory->post->create();
+		$check_key = 'https://api.w.org/action-assign-author';
+		// authors cannot assign author.
+		wp_set_current_user( $this->author );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+		// editors can assign author.
+		wp_set_current_user( $this->editor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertTrue( isset( $links[ $check_key ] ) );
+		// editors can assign author but not included for context != edit.
+		wp_set_current_user( $this->editor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'view' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+	}
+
+	/**
+	 * Only returns wp:action-publish when current user can publish.
+	 */
+	function test_link_publish_only_appears_for_author() {
+		$post_id   = $this->factory->post->create( array(
+			'post_author' => $this->author,
+		) );
+		$check_key = 'https://api.w.org/action-publish';
+		// contributors cannot sticky.
+		wp_set_current_user( $this->contributor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+		// authors can publish.
+		wp_set_current_user( $this->author );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertTrue( isset( $links[ $check_key ] ) );
+		// authors can publish but not included for context != edit.
+		wp_set_current_user( $this->author );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
+		$request->set_param( 'context', 'view' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertFalse( isset( $links[ $check_key ] ) );
+	}
+
+	/**
 	 * Only returns wp:action-sticky when current user can sticky.
 	 */
 	function test_link_sticky_only_appears_for_editor() {
@@ -197,5 +260,43 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$this->assertEquals( 403, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertEquals( 'rest_forbidden_who', $data['code'] );
+	}
+
+	public function test_get_items_unbounded_per_page() {
+		wp_set_current_user( $this->author );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
+		$request->set_param( 'per_page', '-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	public function test_get_items_unbounded_per_page_unauthorized() {
+		wp_set_current_user( $this->subscriber );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
+		$request->set_param( 'per_page', '-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 403, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
+	}
+
+	public function test_get_pages_unbounded_per_page() {
+		wp_set_current_user( $this->author );
+		$this->factory->post->create( array( 'post_type' => 'page' ) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pages' );
+		$request->set_param( 'per_page', '-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	public function test_get_pages_unbounded_per_page_unauthorized() {
+		wp_set_current_user( $this->subscriber );
+		$this->factory->post->create( array( 'post_type' => 'page' ) );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pages' );
+		$request->set_param( 'per_page', '-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 403, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
 	}
 }

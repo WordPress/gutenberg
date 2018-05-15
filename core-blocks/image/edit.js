@@ -15,7 +15,7 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
 import {
 	Button,
@@ -29,10 +29,6 @@ import {
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import {
-	editorMediaUpload,
-	withEditorSettings,
-} from '@wordpress/blocks';
-import {
 	RichText,
 	BlockControls,
 	InspectorControls,
@@ -41,11 +37,13 @@ import {
 	BlockAlignmentToolbar,
 	UrlInputButton,
 	PostTypeSupportCheck,
+	editorMediaUpload,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import './editor.scss';
 import ImageSize from './image-size';
 
 /**
@@ -53,7 +51,7 @@ import ImageSize from './image-size';
  */
 const MIN_SIZE = 20;
 
-class ImageBlock extends Component {
+class ImageEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
@@ -170,7 +168,7 @@ class ImageBlock extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isSelected, className, settings, toggleSelection } = this.props;
+		const { attributes, setAttributes, isSelected, className, maxWidth, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const controls = (
@@ -245,14 +243,14 @@ class ImageBlock extends Component {
 							onChange={ this.updateImageURL }
 						/>
 					) }
-					<div className="blocks-image__dimensions">
-						<p className="blocks-image__dimensions__row">
+					<div className="core-blocks-image__dimensions">
+						<p className="core-blocks-image__dimensions__row">
 							{ __( 'Image Dimensions' ) }
 						</p>
-						<div className="blocks-image__dimensions__row">
+						<div className="core-blocks-image__dimensions__row">
 							<TextControl
 								type="number"
-								className="blocks-image__dimensions__width"
+								className="core-blocks-image__dimensions__width"
 								label={ __( 'Width' ) }
 								value={ width !== undefined ? width : '' }
 								placeholder={ imageWidth }
@@ -260,14 +258,14 @@ class ImageBlock extends Component {
 							/>
 							<TextControl
 								type="number"
-								className="blocks-image__dimensions__height"
+								className="core-blocks-image__dimensions__height"
 								label={ __( 'Height' ) }
 								value={ height !== undefined ? height : '' }
 								placeholder={ imageHeight }
 								onChange={ this.updateHeight }
 							/>
 						</div>
-						<div className="blocks-image__dimensions__row">
+						<div className="core-blocks-image__dimensions__row">
 							<ButtonGroup aria-label={ __( 'Image Size' ) }>
 								{ [ 25, 50, 75, 100 ].map( ( scale ) => {
 									const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
@@ -346,9 +344,9 @@ class ImageBlock extends Component {
 											} : undefined
 										}
 										minWidth={ minWidth }
-										maxWidth={ settings.maxWidth }
+										maxWidth={ maxWidth }
 										minHeight={ minHeight }
-										maxHeight={ settings.maxWidth / ratio }
+										maxHeight={ maxWidth / ratio }
 										lockAspectRatio
 										handleClasses={ {
 											topRight: 'wp-block-image__resize-handler-top-right',
@@ -392,14 +390,14 @@ class ImageBlock extends Component {
 	}
 }
 
-export default compose( [
-	withEditorSettings(),
-	withSelect( ( select, props ) => {
-		const { getMedia } = select( 'core' );
-		const { id } = props.attributes;
+export default withSelect( ( select, props ) => {
+	const { getMedia } = select( 'core' );
+	const { getEditorSettings } = select( 'core/editor' );
+	const { id } = props.attributes;
+	const { maxWidth } = getEditorSettings();
 
-		return {
-			image: id ? getMedia( id ) : null,
-		};
-	} ),
-] )( ImageBlock );
+	return {
+		image: id ? getMedia( id ) : null,
+		maxWidth,
+	};
+} )( ImageEdit );

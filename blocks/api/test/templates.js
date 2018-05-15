@@ -11,6 +11,11 @@ import { getBlockTypes, unregisterBlockType, registerBlockType } from '../regist
 import { doBlocksMatchTemplate, synchronizeBlocksWithTemplate } from '../templates';
 
 describe( 'templates', () => {
+	beforeAll( () => {
+		// Initialize the block store
+		require( '../../store' );
+	} );
+
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );

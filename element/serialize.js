@@ -406,14 +406,14 @@ export function renderNativeComponent( type, props, context = {} ) {
 		// Textarea children can be assigned as value prop. If it is, render in
 		// place of children. Ensure to omit so it is not assigned as attribute
 		// as well.
-		content = renderChildren( [ props.value ], context );
+		content = renderChildren( props.value, context );
 		props = omit( props, 'value' );
 	} else if ( props.dangerouslySetInnerHTML &&
 			typeof props.dangerouslySetInnerHTML.__html === 'string' ) {
 		// Dangerous content is left unescaped.
 		content = props.dangerouslySetInnerHTML.__html;
 	} else if ( typeof props.children !== 'undefined' ) {
-		content = renderChildren( castArray( props.children ), context );
+		content = renderChildren( props.children, context );
 	}
 
 	if ( ! type ) {
@@ -464,6 +464,8 @@ export function renderComponent( Component, props, context = {} ) {
  */
 function renderChildren( children, context = {} ) {
 	let result = '';
+
+	children = castArray( children );
 
 	for ( let i = 0; i < children.length; i++ ) {
 		const child = children[ i ];

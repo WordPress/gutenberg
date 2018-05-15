@@ -32,11 +32,10 @@ import {
  * Internal dependencies
  */
 import './editor.scss';
-import './style.scss';
 
 const MAX_POSTS_COLUMNS = 6;
 
-class LatestPostsBlock extends Component {
+class LatestPostsEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -176,4 +175,4 @@ export default withAPIData( ( props ) => {
 		latestPosts: `/wp/v2/posts?${ latestPostsQuery }`,
 		categoriesList: `/wp/v2/categories?${ categoriesListQuery }`,
 	};
-} )( LatestPostsBlock );
+} )( LatestPostsEdit );

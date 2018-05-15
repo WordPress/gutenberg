@@ -27,7 +27,7 @@ export const name = 'core/text-columns';
 export const settings = {
 	title: __( 'Text Columns' ),
 
-	description: __( 'Add text across columns. This block is experimental' ),
+	description: __( 'Add text, and display it in two or more columns. Like a newspaper! This block is experimental.' ),
 
 	icon: 'columns',
 
