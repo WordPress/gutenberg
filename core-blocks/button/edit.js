@@ -157,11 +157,11 @@ class ButtonEdit extends Component {
 	}
 }
 
-export default withColors( ( getColor, setColor, { attributes, setAttributes } ) => {
+export default withColors( ( getColor, setColor, { attributes } ) => {
 	return {
 		backgroundColor: getColor( attributes.backgroundColor, attributes.customBackgroundColor, 'background-color' ),
-		setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor', setAttributes ),
+		setBackgroundColor: setColor( 'backgroundColor', 'customBackgroundColor' ),
 		textColor: getColor( attributes.textColor, attributes.customTextColor, 'color' ),
-		setTextColor: setColor( 'textColor', 'customTextColor', setAttributes ),
+		setTextColor: setColor( 'textColor', 'customTextColor' ),
 	};
 } )( ButtonEdit );

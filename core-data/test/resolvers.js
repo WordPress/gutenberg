@@ -16,7 +16,7 @@ describe( 'getCategories', () => {
 
 	beforeAll( () => {
 		apiRequest.mockImplementation( ( options ) => {
-			if ( options.path === '/wp/v2/categories' ) {
+			if ( options.path === '/wp/v2/categories?per_page=-1' ) {
 				return Promise.resolve( CATEGORIES );
 			}
 		} );
