@@ -37,10 +37,10 @@ const moreBlockInstance = createBlock( 'core/more', {
 } );
 
 const html = serialize( codeBlockInstance );
-console.log( html );
+console.log( html ); // eslint-disable-line no-console
 
 const p = parse( html );
-console.log( p );
+console.log( p ); // eslint-disable-line no-console
 
 const initialState: StateType = {
 	// TODO: get blocks list block state should be externalized (shared with Gutenberg at some point?).
