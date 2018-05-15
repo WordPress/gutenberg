@@ -66,8 +66,8 @@ $toggle-border-width: 2px;
 
 	// checked state
 	&.is-checked .components-form-toggle__track {
-		background-color: theme(primary);
-		border: $toggle-border-width solid theme(primary);
+		background-color: theme(toggle);
+		border: $toggle-border-width solid theme(toggle);
 		border: #{ $toggle-height / 2 } solid transparent; // expand the border to fake a solid in Windows High Contrast Mode
 	}
 
@@ -83,8 +83,8 @@ $toggle-border-width: 2px;
 		}
 
 		&:before {
-			background-color: theme(primary);
-			border: $toggle-border-width solid theme(primary);
+			background-color: theme(toggle);
+			border: $toggle-border-width solid theme(toggle);
 		}
 	}
 }
