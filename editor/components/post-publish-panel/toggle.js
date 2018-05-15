@@ -40,7 +40,7 @@ function PostPublishPanelToggle( {
 		return <PostPublishButton forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />;
 	}
 
-	if ( isContributor ) {
+	if ( ! hasPublishAction ) {
 		return (
 			<Button
 				className="editor-post-publish-panel__toggle"

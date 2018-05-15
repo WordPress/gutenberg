@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, withAPIData } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
@@ -20,11 +20,9 @@ import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
 
 function PostPublishPanelPrepublish( {
-	user,
+	hasPublishAction,
 } ) {
-	const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
-	const isContributor = user.data && ! userCanPublishPosts;
-	if ( isContributor ) {
+	if ( ! hasPublishAction ) {
 		return (
 			<div className="editor-post-publish-panel__prepublish">
 				<div><strong>{ __( 'Are you ready to submit for review?' ) }</strong></div>
@@ -56,17 +54,10 @@ function PostPublishPanelPrepublish( {
 export default compose( [
 	withSelect( ( select ) => {
 		const {
-			getCurrentPostType,
+			getCurrentPost,
 		} = select( 'core/editor' );
 		return {
-			postType: getCurrentPostType(),
-		};
-	} ),
-	withAPIData( ( props ) => {
-		const { postType } = props;
-
-		return {
-			user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
+			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 		};
 	} ),
 ] )( PostPublishPanelPrepublish );
