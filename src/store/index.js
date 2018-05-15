@@ -3,9 +3,11 @@
  * @flow
  */
 
+import { parse } from './post-grammar-gb';
+
 // Gutenberg imports
 import { registerCoreBlocks } from '@gutenberg/core-blocks';
-import { createBlock } from '@gutenberg/blocks';
+import { createBlock, serialize } from '@gutenberg/blocks';
 
 import { createStore } from 'redux';
 import { reducer } from './reducers';
@@ -33,6 +35,12 @@ const codeBlockInstance = createBlock( 'core/code', {
 const moreBlockInstance = createBlock( 'core/more', {
 	customText: undefined,
 } );
+
+const html = serialize( codeBlockInstance );
+console.log( html );
+
+const p = parse( html );
+console.log( p );
 
 const initialState: StateType = {
 	// TODO: get blocks list block state should be externalized (shared with Gutenberg at some point?).
