@@ -157,7 +157,7 @@ class FlatTermSelector extends Component {
 	}
 
 	render() {
-		const { slug, taxonomy } = this.props;
+		const { slug, taxonomy, hasAssignAction } = this.props;
 		const { loading, availableTerms, selectedTerms } = this.state;
 		const termNames = availableTerms.map( ( term ) => term.name );
 		const newTermPlaceholderLabel = get(
@@ -173,6 +173,10 @@ class FlatTermSelector extends Component {
 		const termAddedLabel = sprintf( _x( '%s added', 'term' ), singularName );
 		const termRemovedLabel = sprintf( _x( '%s removed', 'term' ), singularName );
 		const removeTermLabel = sprintf( _x( 'Remove %s', 'term' ), singularName );
+
+		if ( ! hasAssignAction ) {
+			return null;
+		}
 
 		return (
 			<FormTokenField

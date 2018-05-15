@@ -216,7 +216,7 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	render() {
-		const { slug, taxonomy, instanceId } = this.props;
+		const { slug, taxonomy, instanceId, hasCreateAction, hasAssignAction } = this.props;
 		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
@@ -242,10 +242,14 @@ class HierarchicalTermSelector extends Component {
 		const newTermSubmitLabel = newTermButtonLabel;
 		const inputId = `editor-post-taxonomies__hierarchical-terms-input-${ instanceId }`;
 
+		if ( ! hasAssignAction ) {
+			return null;
+		}
+
 		/* eslint-disable jsx-a11y/no-onchange */
 		return [
 			...this.renderTerms( availableTermsTree ),
-			! loading && (
+			! loading && hasCreateAction && (
 				<button
 					key="term-add-button"
 					onClick={ this.onToggleForm }

@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { filter, identity, includes } from 'lodash';
+import { filter, get, identity, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,18 +16,23 @@ import './style.scss';
 import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
 
-export function PostTaxonomies( { postType, taxonomies, taxonomyWrapper = identity } ) {
+export function PostTaxonomies( { post, postType, taxonomies, taxonomyWrapper = identity } ) {
 	const availableTaxonomies = filter( taxonomies, ( taxonomy ) => includes( taxonomy.types, postType ) );
 	const visibleTaxonomies = filter( availableTaxonomies, ( taxonomy ) => taxonomy.visibility.show_ui );
 	return visibleTaxonomies.map( ( taxonomy ) => {
 		const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
+		const restBase = taxonomy.rest_base;
+		const hasCreateAction = get( post, [ '_links', 'wp:action-create-' + restBase ], false );
+		const hasAssignAction = get( post, [ '_links', 'wp:action-assign-' + restBase ], false );
 		return (
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
 				{
 					taxonomyWrapper(
 						<TaxonomyComponent
-							restBase={ taxonomy.rest_base }
+							restBase={ restBase }
 							slug={ taxonomy.slug }
+							hasCreateAction={ hasCreateAction }
+							hasAssignAction={ hasAssignAction }
 						/>,
 						taxonomy
 					)
@@ -40,6 +45,7 @@ export function PostTaxonomies( { postType, taxonomies, taxonomyWrapper = identi
 export default compose( [
 	withSelect( ( select ) => {
 		return {
+			post: select( 'core/editor' ).getCurrentPost(),
 			postType: select( 'core/editor' ).getCurrentPostType(),
 			taxonomies: select( 'core' ).getTaxonomies(),
 		};
