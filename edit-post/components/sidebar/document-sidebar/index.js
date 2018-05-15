@@ -24,7 +24,7 @@ import TemplateSettingsPanel from '../template-settings-panel';
 const SIDEBAR_NAME = 'edit-post/document';
 
 const DocumentSidebar = () => (
-	<PostTypeSupportCheck supportKeys="document">
+	<PostTypeSupportCheck supportKeys="document" defaultValue={ true }>
 		<Sidebar
 			name={ SIDEBAR_NAME }
 			label={ __( 'Editor settings' ) }

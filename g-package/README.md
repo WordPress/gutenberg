@@ -14,7 +14,7 @@ This package is based on [Gutenberg v2.8.0](https://github.com/WordPress/gutenbe
         * [GET types](#get-types)
         * [PUT post or page](#put-post-or-page)
         * [GET categories](#get-categories)
-        * [GET /](get)
+        * [GET /](#get-)
     * [url](#url)
 * [Customize your Gutenberg](#customize-your-gutenberg)
     * [Block Menu Tabs](#block-menu-tabs)
