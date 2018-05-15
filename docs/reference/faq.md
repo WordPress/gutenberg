@@ -30,7 +30,7 @@ The current WordPress editor is an open text window—it’s always been a wonde
 - Pasted links for embeds.
 - `Shortcodes` for specialized assets from plugins.
 - Featured images for the image at the top of a post or page.
-- Excerpts for subheads.
+- Excerpts for subheadings.
 - Widgets for content on the side of a page.
 
 As we thought about these uses and how to make them obvious and consistent, we began to embrace the concept of “blocks.” All of the above items could be blocks: easy to search and understand, and easy to dynamically shift around the page. The block concept is very powerful, and if designed thoughtfully, can offer an outstanding editing and publishing experience.
