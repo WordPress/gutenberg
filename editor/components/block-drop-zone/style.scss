@@ -9,14 +9,14 @@
 
 	&.is-close-to-bottom {
 		background: none;
-		border-bottom: 3px solid $blue-medium-500;
+		border-bottom: 3px solid theme( primary );
 	}
 
 	&.is-close-to-top,
 	&.is-appender.is-close-to-top,
 	&.is-appender.is-close-to-bottom {
 		background: none;
-		border-top: 3px solid $blue-medium-500;
+		border-top: 3px solid theme( primary );
 		border-bottom: none;
 	}
 
