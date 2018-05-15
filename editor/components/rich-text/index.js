@@ -123,7 +123,6 @@ export class RichText extends Component {
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
-		this.getFocusPosition = this.getFocusPosition.bind( this );
 		this.getInsertPosition = this.getInsertPosition.bind( this );
 
 		this.state = {
@@ -738,12 +737,9 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( ! this.editor ) {
-			return;
-		}
-
 		// The `savedContent` var allows us to avoid updating the content right after an `onChange` call
 		if (
+			!! this.editor &&
 			this.props.tagName === prevProps.tagName &&
 			this.props.value !== prevProps.value &&
 			this.props.value !== this.savedContent &&
