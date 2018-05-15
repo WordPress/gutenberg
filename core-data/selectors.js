@@ -91,6 +91,17 @@ export function getEntityRecord( state, kind, name, key ) {
 }
 
 /**
+ * Returns all the available taxonomies.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Taxonomies list.
+ */
+export function getTaxonomies( state ) {
+	return state.taxonomies;
+}
+
+/**
  * Return theme suports data in the index.
  *
  * @param {Object} state Data state.

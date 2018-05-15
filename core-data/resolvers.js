@@ -11,6 +11,7 @@ import {
 	receiveTerms,
 	receiveUserQuery,
 	receiveEntityRecords,
+	receiveTaxonomies,
 	receiveThemeSupportsFromIndex,
 } from './actions';
 import { getEntity } from './entities';
@@ -45,6 +46,15 @@ export async function* getEntityRecord( state, kind, name, key ) {
 	const entity = getEntity( kind, name );
 	const record = await apiRequest( { path: `${ entity.baseUrl }/${ key }?context=edit` } );
 	yield receiveEntityRecords( kind, name, record );
+}
+
+/**
+ * Requests taxonomies from the REST API, yielding action objects on request
+ * progress.
+ */
+export async function* getTaxonomies() {
+	const taxonomies = await apiRequest( { path: '/wp/v2/taxonomies?context=edit' } );
+	yield receiveTaxonomies( taxonomies );
 }
 
 /**
