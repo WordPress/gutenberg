@@ -17,7 +17,7 @@ module.exports = postcss.plugin( 'postcss-test-plugin', function( options ) {
 				let value = decl.value;
 				let parsed;
 				const themeValues = {};
-				while ( ( parsed = themeMatch.exec( value ) ) !== null ) {
+				while ( ( parsed = themeMatch.exec( decl.value ) ) !== null ) {
 					const [ , whole, color ] = parsed;
 					const colorKey = color.trim();
 					const defaultColor = options.defaults[ colorKey ];
@@ -47,7 +47,7 @@ module.exports = postcss.plugin( 'postcss-test-plugin', function( options ) {
 						selector: 'body.' + key + ' ' + rule.selector,
 					} );
 					themeDecls[ key ].forEach( ( decl ) => newRule.append( decl ) );
-					rule.after( newRule );
+					rule.parent.insertAfter( rule, newRule );
 				} );
 			}
 		} );
