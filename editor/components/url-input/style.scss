@@ -70,7 +70,7 @@ $input-size: 230px;
 
 	&:focus,
 	&.is-selected {
-		background: theme(primary-dark15);
+		background: color( theme(primary) shade(15%) );
 		color: $white;
 		outline: none;
 	}
