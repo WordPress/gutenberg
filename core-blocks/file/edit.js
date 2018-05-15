@@ -76,9 +76,10 @@ export default class FileEdit extends Component {
 		const { fileName } = this.props.attributes;
 
 		// Strip line breaks caused by typing Enter key in RichText
-		if ( /<br \/>/.test( fileName ) ) {
+		if ( typeof fileName === 'object' ) {
+			const strings = fileName.filter( ( el ) => typeof el === 'string' );
 			this.props.setAttributes( {
-				fileName: fileName.replace( '<br />', '' ),
+				fileName: strings.join( '' ).trim(),
 			} );
 		}
 	}
@@ -187,7 +188,7 @@ export default class FileEdit extends Component {
 			if ( typeof firstNode === 'string' ) {
 				newFileName = firstNode;
 			} else {
-				newFileName = firstNode.props.children.trim();
+				newFileName = firstNode.props.children;
 			}
 
 			this.props.setAttributes( { fileName: newFileName } );
