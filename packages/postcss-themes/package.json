@@ -22,5 +22,8 @@
 	"main": "src/index.js",
 	"dependencies": {
 		"postcss": "^6.0.16"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }
