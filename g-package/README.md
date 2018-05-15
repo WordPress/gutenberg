@@ -156,6 +156,9 @@ When you initialize the editor, Gutenberg will request the settings related with
         'template-settings': true, // add TemplateSettingsPanel to sidebar
         ...,
     },
+    viewable: true,
+    publishable: false, // hide Publish Toggle
+    saveable: false,    // disable save button and autosave
     ...,
 }
 ```

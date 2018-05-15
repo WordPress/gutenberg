@@ -1,8 +1,13 @@
 /**
+ * External Dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, IconButton, withSafeTimeout } from '@wordpress/components';
+import { Dashicon, IconButton, withSafeTimeout, ifCondition } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { keycodes } from '@wordpress/utils';
@@ -88,18 +93,30 @@ export default compose( [
 			isSavingPost,
 			isEditedPostSaveable,
 			getCurrentPost,
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
+		
+		const {
+			getPostType,
+		} = select( 'core' );
+
+		const post = getCurrentPost();
+
+		console.log(`${ post.type } isPostSaveable `, get( getPostType( post.type ), [ 'saveable' ], true ));
+
 		return {
-			post: getCurrentPost(),
+			post,
 			isNew: isEditedPostNew(),
 			isPublished: isCurrentPostPublished(),
 			isDirty: forceIsDirty || isEditedPostDirty(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
+			isPostSaveable: get( getPostType( post.type ), [ 'saveable' ], true ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		onSave: dispatch( 'core/editor' ).savePost,
 	} ) ),
 	withSafeTimeout,
+	ifCondition( ( { isPostSaveable } ) => isPostSaveable ),
 ] )( PostSavedState );
