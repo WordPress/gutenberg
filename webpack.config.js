@@ -71,7 +71,6 @@ const entryPointNames = [
 	'blocks',
 	'components',
 	'editor',
-	'element',
 	'utils',
 	'data',
 	'viewport',
@@ -83,6 +82,7 @@ const entryPointNames = [
 
 const gutenbergPackages = [
 	'date',
+	'element',
 ];
 
 const wordPressPackages = [
