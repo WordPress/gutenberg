@@ -61,7 +61,7 @@ class FormatToolbar extends Component {
 		this.state = {
 			settingsVisible: false,
 			opensInNewWindow: false,
-			newLinkValue: '',
+			linkValue: '',
 		};
 
 		this.addLink = this.addLink.bind( this );
@@ -97,13 +97,13 @@ class FormatToolbar extends Component {
 			this.setState( {
 				settingsVisible: false,
 				opensInNewWindow: !! nextProps.formats.link && !! nextProps.formats.link.target,
-				newLinkValue: '',
+				linkValue: '',
 			} );
 		}
 	}
 
 	onChangeLinkValue( value ) {
-		this.setState( { newLinkValue: value } );
+		this.setState( { linkValue: value } );
 	}
 
 	toggleFormat( format ) {
@@ -130,24 +130,24 @@ class FormatToolbar extends Component {
 	}
 
 	addLink() {
-		this.setState( { newLinkValue: '' } );
+		this.setState( { linkValue: '' } );
 		this.props.onChange( { link: { isAdding: true } } );
 	}
 
 	dropLink() {
 		this.props.onChange( { link: undefined } );
-		this.setState( { newLinkValue: '' } );
+		this.setState( { linkValue: '' } );
 	}
 
 	editLink( event ) {
 		event.preventDefault();
 		this.props.onChange( { link: { ...this.props.formats.link, isAdding: true } } );
-		this.setState( { newLinkValue: this.props.formats.link.value } );
+		this.setState( { linkValue: this.props.formats.link.value } );
 	}
 
 	submitLink( event ) {
 		event.preventDefault();
-		const value = prependHTTP( this.state.newLinkValue );
+		const value = prependHTTP( this.state.linkValue );
 		this.props.onChange( { link: {
 			isAdding: false,
 			target: this.state.opensInNewWindow ? '_blank' : null,
@@ -155,7 +155,7 @@ class FormatToolbar extends Component {
 			value,
 		} } );
 
-		this.setState( { newLinkValue: value } );
+		this.setState( { linkValue: value } );
 		if ( ! this.props.formats.link.value ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
@@ -167,7 +167,7 @@ class FormatToolbar extends Component {
 
 	render() {
 		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
-		const { newLinkValue, settingsVisible, opensInNewWindow } = this.state;
+		const { linkValue, settingsVisible, opensInNewWindow } = this.state;
 		const isAddingLink = formats.link && formats.link.isAdding;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
@@ -217,7 +217,7 @@ class FormatToolbar extends Component {
 									onKeyDown={ this.onKeyDown }
 									onSubmit={ this.submitLink }>
 									<div className="editor-format-toolbar__link-modal-line">
-										<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
+										<UrlInput value={ linkValue } onChange={ this.onChangeLinkValue } />
 										<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 										<IconButton
 											className="editor-format-toolbar__link-settings-toggle"
