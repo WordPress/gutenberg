@@ -146,11 +146,10 @@ export const settings = {
 		);
 	},
 
-	save( { attributes, className } ) {
+	save( { attributes } ) {
 		const { content, align, hasFixedLayout } = attributes;
 
 		const classes = classnames(
-			className,
 			{
 				'has-fixed-layout': hasFixedLayout,
 				[ `align${ align }` ]: align,
