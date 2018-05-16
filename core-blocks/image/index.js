@@ -196,12 +196,32 @@ export const settings = {
 		{
 			attributes: blockAttributes,
 			save( { attributes } ) {
+				const { url, alt, caption, align, href, width, height, id } = attributes;
+
+				const image = (
+					<img
+						src={ url }
+						alt={ alt }
+						className={ id ? `wp-image-${ id }` : null }
+						width={ width }
+						height={ height }
+					/>
+				);
+
+				return (
+					<figure className={ align ? `align${ align }` : null } >
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+					</figure>
+				);
+			},
+		},
+		{
+			attributes: blockAttributes,
+			save( { attributes } ) {
 				const { url, alt, caption, align, href, width, height } = attributes;
 				const extraImageProps = width || height ? { width, height } : {};
 				const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
-				const classes = classnames( align ? `align${ align }` : null, {
-					'is-resized': !! width || !! height,
-				} );
 
 				let figureStyle = {};
 
@@ -212,7 +232,7 @@ export const settings = {
 				}
 
 				return (
-					<figure className={ classes } style={ figureStyle }>
+					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
 						{ href ? <a href={ href }>{ image }</a> : image }
 						{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 					</figure>
