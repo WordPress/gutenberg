@@ -507,8 +507,9 @@ class FormTokenField extends Component {
 			disabled,
 			placeholder = __( 'Add item.' ),
 			instanceId,
+			className,
 		} = this.props;
-		const classes = classnames( 'components-form-token-field', {
+		const classes = classnames( className, 'components-form-token-field', {
 			'is-active': this.state.isActive,
 			'is-disabled': disabled,
 		} );

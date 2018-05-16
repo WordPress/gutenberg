@@ -2,7 +2,11 @@
  * External dependencies
  */
 import { shallow, mount } from 'enzyme';
-import { Component } from '../../../../element';
+
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies

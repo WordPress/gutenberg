@@ -157,7 +157,7 @@
 
 	&.is-active {
 		padding-bottom: 0;
-		border-bottom: 3px solid $blue-medium-500;
+		border-bottom: 3px solid theme( primary );
 		font-weight: 600;
 	}
 
