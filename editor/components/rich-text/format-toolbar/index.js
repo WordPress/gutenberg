@@ -59,8 +59,6 @@ class FormatToolbar extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
-			isAddingLink: false,
-			isEditingLink: false,
 			settingsVisible: false,
 			opensInNewWindow: false,
 			newLinkValue: '',
@@ -78,9 +76,15 @@ class FormatToolbar extends Component {
 
 	onKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
-			if ( this.state.isEditingLink || this.state.isAddingLink ) {
+			const link = this.props.formats.link;
+			const isAddingLink = link && link.isAdding;
+			if ( isAddingLink ) {
 				event.stopPropagation();
-				this.dropLink();
+				if ( ! link.value ) {
+					this.dropLink();
+				} else {
+					this.props.onChange( { link: { ...link, isAdding: false } } );
+				}
 			}
 		}
 		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
@@ -91,16 +95,11 @@ class FormatToolbar extends Component {
 	componentWillReceiveProps( nextProps ) {
 		if ( this.props.selectedNodeId !== nextProps.selectedNodeId ) {
 			this.setState( {
-				isEditingLink: false,
 				settingsVisible: false,
 				opensInNewWindow: !! nextProps.formats.link && !! nextProps.formats.link.target,
 				newLinkValue: '',
 			} );
 		}
-
-		this.setState( {
-			isAddingLink: !! nextProps.formats.link && nextProps.formats.link.isAdding,
-		} );
 	}
 
 	onChangeLinkValue( value ) {
@@ -131,28 +130,33 @@ class FormatToolbar extends Component {
 	}
 
 	addLink() {
-		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: '' } );
+		this.setState( { newLinkValue: '' } );
+		this.props.onChange( { link: { isAdding: true } } );
 	}
 
 	dropLink() {
 		this.props.onChange( { link: undefined } );
-		this.setState( { isEditingLink: false, isAddingLink: false, newLinkValue: '' } );
+		this.setState( { newLinkValue: '' } );
 	}
 
 	editLink( event ) {
 		event.preventDefault();
-		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: this.props.formats.link.value } );
+		this.props.onChange( { link: { ...this.props.formats.link, isAdding: true } } );
+		this.setState( { newLinkValue: this.props.formats.link.value } );
 	}
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.setState( { isEditingLink: false, isAddingLink: false, newLinkValue: '' } );
+		const value = prependHTTP( this.state.newLinkValue );
 		this.props.onChange( { link: {
-			value: prependHTTP( this.state.newLinkValue ),
+			isAdding: false,
 			target: this.state.opensInNewWindow ? '_blank' : null,
 			rel: this.state.opensInNewWindow ? 'noreferrer noopener' : null,
+			value,
 		} } );
-		if ( this.state.isAddingLink ) {
+
+		this.setState( { newLinkValue: value } );
+		if ( ! this.props.formats.link.value ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
 	}
@@ -163,7 +167,8 @@ class FormatToolbar extends Component {
 
 	render() {
 		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
-		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow } = this.state;
+		const { newLinkValue, settingsVisible, opensInNewWindow } = this.state;
+		const isAddingLink = formats.link && formats.link.isAdding;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
 			.filter( ( control ) => enabledControls.indexOf( control.format ) !== -1 )
@@ -200,10 +205,10 @@ class FormatToolbar extends Component {
 			<div className="editor-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
 
-				{ ( isAddingLink || isEditingLink || formats.link ) && (
+				{ ( isAddingLink || formats.link ) && (
 					<Fill name="RichText.Siblings">
 						<div className="editor-format-toolbar__link-container" style={ { ...focusPosition } }>
-							{ ( isAddingLink || isEditingLink ) && (
+							{ isAddingLink && (
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 								<form
@@ -227,7 +232,7 @@ class FormatToolbar extends Component {
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 							) }
 
-							{ formats.link && ! isAddingLink && ! isEditingLink && (
+							{ formats.link && ! isAddingLink && (
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 								/* eslint-disable jsx-a11y/no-static-element-interactions */
 								<div
