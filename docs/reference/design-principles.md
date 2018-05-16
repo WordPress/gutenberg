@@ -20,11 +20,11 @@ Gutenberg の包括的な目標は、 _リッチな投稿レイアウト_ を簡
 
 ## なぜか
 
-WordPress を他のシステムと区別できることの一つとして、自分で想像できるようにリッチな投稿レイアウトを作成できるということがあります -- しかしそれは HTML と CSS を理解し自分のカスタムテーマを構築出来る場合にのみ可能です。リッチな投稿を書けるツールとしてエディターを捉えることによって、数回クリックするだけで美しいレイアウトを作成できるなら、うまくいけば、人々はワンクリックでインストールできるから選ぶだけでなく、 WordPress がコンテンツのために出来ることについて愛してくれるようなるでしょう。
+WordPress を他のシステムと区別できることの一つとして、自分で想像できるようにリッチな投稿レイアウトを作成できるということがあります -- しかしそれは HTML と CSS を理解し自分のカスタムテーマを構築出来る場合にのみ可能です。リッチな投稿を書けるツールとしてエディターを捉えることによって、数回クリックするだけで美しいレイアウトを作成できるなら、うまくいけば、人々はワンクリックでインストールできるから WordPress を選ぶだけでなく、 WordPress がコンテンツのために出来ることについて気に入ってくれるようなるでしょう。
 
 ## ビジョン
 
-**全てをブロックにする**。 文章、画像、ギャラリー、ウィジェット、ショートコード、そしてカスタム HTML の塊さえも、たとえプラグインや他の方法によって追加されていたとしても、単一のインターフェイス（ブロックインターフェイス）を習得するだけで、すべての操作方法を知ることができます。
+**全てをブロックにする**。 テキスト、画像、ギャラリー、ウィジェット、ショートコード、そしてカスタム HTML の塊さえも、たとえプラグインや他の方法によって追加されていたとしても、単一のインターフェイス（ブロックインターフェイス）を習得するだけで、すべての操作方法を知ることができます。
 
 **全てのブロックを均等に作成する**。すべては同じ挿入インターフェースの中にあります。最近の投稿、検索、タブ、およびグループ化を使用して、最も多く使用するブロックを簡単に使えるようにします。
 
@@ -34,7 +34,7 @@ WordPress を他のシステムと区別できることの一つとして、自�
 
 **直接操作**。私たちが構築しているブロック技術は、ページ上で直接コンテンツを操作するユーザーエクスペリエンスを最適化します。プラグインとテーマ作成者は、ユーザーが Web 上で創作するための WYSIWYG 環境を提供する目的にぴったり合った具体的なブロックを作成するために、コアが提供するさまざまなツールを一緒に構成する能力を備えるでしょう。
 
-**カスタマイズ**。以前は複雑なマークアップを使用する必要があったため、ショートコードやメタフィールドなどを使用してユーザーがサイトを壊さないように保護していたことが、より簡単で直感的になります。ブロックを使用すると、開発者はレイアウトの一部（たとえば、フィーチャの3列グリッド）を直接レンダリングするテーマ固有のブロックを提供し、ユーザが直接編集できるものを明確に指定できます。つまり、ユーザーは WYSIWYG エクスペリエンスを得ることができるのです。壊すかもしれないと恐れる必要もなく、開発者に頼まなくてもマークアップを崩さずに簡単に文章を更新したり、画像を入れ替えたり、コラムの数を減らしたりなどするができます。
+**カスタマイズ**。以前は複雑なマークアップを使用する必要があったため、ショートコードやメタフィールドなどを使用してユーザーがサイトを壊さないように保護していたことが、より簡単で直感的になります。ブロックを使用すると、開発者はレイアウトの一部（たとえば、フィーチャの3列グリッド）を直接レンダリングするテーマ固有のブロックを提供し、ユーザが直接編集できるものを明確に指定できます。つまり、ユーザーは WYSIWYG エクスペリエンスを得ることができるのです。壊すかもしれないと恐れる必要もなく、開発者に頼まなくてもマークアップを崩さずに簡単に文書を更新したり、画像を入れ替えたり、コラムの数を減らしたりなどするができます。
 
 結局のところ、 Gutenberg のビジョンは、リッチなコンテンツを投稿者が簡単に作成できるようにすることです。適切なデフォルトを確保し、高度なレイアウトオプションのブロックをラップしてバンドルし、最も重要なアクションをすぐに利用できるようにすることで、誰でも WordPress でコンテンツを編集し使えるようにするべきなのです。
 
@@ -50,17 +50,17 @@ WordPress を他のシステムと区別できることの一つとして、自�
 
 Gutenberg は上のバーと下のコンテンツの間に基本的な区切りがあります。
 
-**editor bar(エディターバー)** は、 _ドキュメントレベル_ のアクションが配置されます。エディターモードと同様に、ステータスインジケーターの保存、取り消し/やり直し/挿入のためのグローバルアクション、設定の切り替え、最後にオプションの公開があります。
+**editor bar(エディターバー)** は、 _文書レベル_ のアクションが配置されます。エディターモードと同様に、ステータスインジケーターの保存、取り消し/やり直し/挿入のためのグローバルアクション、設定の切り替え、最後にオプションの公開があります。
 
-**content area(コンテンツ領域)** はドキュメントそのものが配置されます。
+**content area(コンテンツ領域)** は文書そのものが配置されます。
 
-**settings sidebar(設定サイドバー)** はドキュメントのメタデータが配置されます。どちらもドキュメントそのもの（タグ、カテゴリ、スケジュールなど）のデータだけでなく、「ブロック」タブのブロックも対象となります。
+**settings sidebar(設定サイドバー)** は文書のメタデータが配置されます。どちらも文書そのもの（タグ、カテゴリ、スケジュールなど）のデータだけでなく、「ブロック」タブのブロックも対象となります。
 
 モバイルでは、歯車ボタンをクリックするまでサイドバーは非表示になります。デスクトップでは書くことに集中するためにそれを隠すことができます。
 
 ## ブロックのインターフェイス
 
-ブロック自体がエディターの最も基本的な単位です。全てはブロックであり、基礎である HTML マークアップの垂直なフローを模倣して構築されます。ドキュメントの各セクションを操作可能なブロックとして表示させることで、各ブロックに文脈上、固有の機能を付与できます。これはデスクトップのレイアウトアプリからを得たもので、UIに重荷を追わせることなく、高度な機能の拡張を追加するための方法です。
+ブロック自体がエディターの最も基本的な単位です。全てはブロックであり、基礎である HTML マークアップの垂直なフローを模倣して構築されます。文書の各セクションを操作可能なブロックとして表示させることで、各ブロックに文脈上、固有の機能を付与できます。これはデスクトップのレイアウトアプリからを得たもので、UIに重荷を追わせることなく、高度な機能の拡張を追加するための方法です。
 
 このブロックのインターフェイスは _基本的なアクション_ を持ちます。適切なデフォルトを保証し、最も一般的なアクションのみを使用することで、設定サイドバーを使用せずにブログを書くこと全てを完了できるようにするべきです。
 
@@ -73,52 +73,52 @@ Gutenberg は上のバーと下のコンテンツの間に基本的な区切り�
 
 長いブロックのページを下にスクロールすると、クイックツールバーがブロックから外れ、画面の上部に張り付きます。
 
-## Editor Settings
+## エディターの設定
 
-If your block needs advanced configuration, those live in the Settings sidebar. Editor block settings can also be reached directly by clicking the cog icon next to a block.
+ブロックに高度な設定が必要な場合は、設定サイドバーに表示されます。エディターのブロック設定は、そのブロックの隣にある歯車アイコンをクリックして直接行うこともできます。
 
-The sidebar has two tabs, Document and Block:
+サイドバーには文書とブロックの2つのタブがあります。
 
-- The "Document" tab shows metadata and settings for the post or page being edited.
-- The "Block" tab shows metadata and settings for the currently selected block.
+- 「文書」タブには編集している投稿やページのメタデータと設定が表示されます。
+- 「ブロック」タブには現在選択されているブロックのメタデータと設定が表示されます。
 
-Don't put anything in the sidebar "Block" tab that is necessary for the basic operation of your block. Your user might dismiss the sidebar for an immersive writing experience. So pick good defaults, and make important actions available in the quick toolbar.
+サイドバーの「ブロック」タブには、ブロックの基本操作に必要なものは置かないでください。ユーザーは書くことに集中するためにサイドバーを隠すかもしれません。 したがって、適切なデフォルトを選択し、クイックツールバーで重要なアクションを利用できるようにします。
 
-Examples of actions that could go in the "Block" tab of the sidebar could be:
+サイドバーの「ブロック」タブに表示されるアクションの例:
 
-- drop cap for text
-- number of columns for galleries
-- number of posts, or category, in the "Latest Posts" block
-- any configuration that you don't _need_ access to in order to perform basic tasks
+- テキストのドロップキャップ
+- ギャラリーの列の数
+- 「最新の投稿」ブロック内での、投稿数やカテゴリー数
+- 基本的なタスクを実行するためにアクセスする _必要_ のない設定
 
-## Block Design Checklist, Do's and Don'ts, and Examples
+## ブロックデザインのチェックリスト、すべきこととすべきでないこと、事例
 
-The following is a list of blocks and which options go where. If you're developing a new block, hopefully this can help suggest where to put an option.
+以下は、ブロックと、どのオプションがどこにあるかのリストです。 新しいブロックを開発している場合は、これがオプションを配置する場所を示唆するのに役立つでしょう。
 
-This is the basic recipe for a block:
+これがブロックの基本的なレシピです:
 
-- It should have a nice icon and label for the Inserter. Keep it simple.
-- When you insert it, it should have a good placeholder state. If it's meant for text input, provide good placeholder text. If it's meant to hold media, have buttons for uploading or accessing media libraries, drop-zones for drag and drop, or anything else. The placeholder state will be used to make page and post templates in the future.
-- Your block when unselected should preview its contents.
-- Your block when selected can surface additional options, like input fields, or — if necessary for basic operation — buttons to configure the block directly.
-- Every block should, at minimum, show a description in the "Block" tab of the Settings sidebar. You can access this for any block by clicking the cog next to the selected block.
-- Additional block options and configuration can be added to the "Block" tab, but keep in mind a user might dismiss the sidebar and never use it, so you can't put configuration critical to the block here.
+- ブロックの挿入ツールには素敵なアイコンとラベルを付けるべきです。出来るだけシンプルに。
+- ブロックを挿入した時には、適切なプレースホルダーの状態を持たせるべきです。テキストの入力の場合は、適切なプレースホルダーのテキストを表示してください。メディアを表示する場合は、メディアライブラリへアップロードまたはアクセスするためのボタンや、ドラッグアンドドロップのドロップゾーンなどを持たせてください。プレースホルダーの状態は、将来、ページや投稿のテンプレートを作成するために使用されるでしょう。
+- 未選択時のブロックにはそのコンテンツがプレビューされるべきです。
+- 選択時のブロックには、入力フィールドなどの、追加のオプションが表示されます。または — 基本的操作にとって必要ならば — ブロックを直接設定するためのボタンが表示されます。
+- 全てのブロックには、設定サイドバーの「ブロック」タブに最低限の説明を表示させるべきです。選択しているブロックの横の歯車をクリックすることで、どのブロックのものにもアクセスできます。
+- 追加ブロックのオプションと設定を「ブロック」タブにも追加することが出来ますが、ユーザーはサイドバーを隠してしまうかもしれませんし一度も使わないかもしれないことを忘れないでください。そのため、ブロックにとって重要な設定はここに置けません。
 
-Here are a couple of block examples, describing which options go where, and why.
+以下にブロックの例を幾つかと、どのオプションがどこに行くか、其の理由を書き出します。
 
-### Text
+### テキスト
 
-The most basic unit of the editor. Text is a simple input field.
+エディターの最も基本的な単位です。テキストはシンプルな入力フィールドです。
 
-Placeholder:
+プレースホルダー:
 
-- Simple placeholder text that says "New Paragraph".
+- 「新しい段落」というシンプルなプレースホルダーのテキスト
 
-Selected state:
+選択された状態:
 
-- Quick Toolbar: Has a switcher to perform transformations to headings, etc.
-- Quick Toolbar: Has basic text alignments
-- Quick Toolbar: Has inline formatting options, bold, italic, strikethrough and link
+- クイックツールバー: 見出しなどへの変換を実行するための切り替えツールを備えています
+- クイックツールバー: 基本的なテキストの配置を備えています
+- クイックツールバー: 太字、イタリック、取り消し線やリンクといったインラインの書式設定オプションを備えています
 
 Editor block settings:
 
