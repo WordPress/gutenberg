@@ -257,7 +257,7 @@ export default class GalleryEdit extends Component {
 							<FormFileUpload
 								multiple
 								isLarge
-								className="blocks-gallery-add-item-button"
+								className="core-blocks-gallery-add-item-button"
 								onChange={ this.uploadFromFiles }
 								accept="image/*"
 								icon="insert"

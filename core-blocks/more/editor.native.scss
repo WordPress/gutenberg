@@ -1,6 +1,6 @@
 // @format
 
-.blocks-more-container {
+.core-blocks-more__container {
 	align-items: center;
 	padding-left: 4;
 	padding-right: 4;
@@ -8,15 +8,15 @@
 	padding-bottom: 4;
 }
 
-.blocks-more-sub-container {
+.core-blocks-more__sub-container {
 	align-items: center;
 	flex-direction: row;
 }
 
-.blocks-more-left-marker {
+.core-blocks-more__left-marker {
 	padding-right: 4;
 }
 
-.blocks-more-right-marker {
+.core-blocks-more__right-marker {
 	padding-left: 4;
 }

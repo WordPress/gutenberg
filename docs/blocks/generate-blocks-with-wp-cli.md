@@ -118,7 +118,7 @@ add_action( 'init', 'movie_block_init' );
 	var registerBlockType = wp.blocks.registerBlockType;
 	/**
 	 * Returns a new element of given type. Element is an abstraction layer atop React.
-	 * @see https://github.com/WordPress/gutenberg/tree/master/element#element
+	 * @see https://github.com/WordPress/gutenberg/tree/master/packages/element#element
 	 */
 	var el = wp.element.createElement;
 	/**

@@ -144,7 +144,7 @@ function gutenberg_register_scripts_and_styles() {
 		true
 	);
 	global $wp_locale;
-	wp_add_inline_script( 'wp-date', 'window._wpDateSettings = ' . wp_json_encode( array(
+	wp_add_inline_script( 'wp-date', sprintf( 'wp.date.setSettings( %s );', wp_json_encode( array(
 		'l10n'     => array(
 			'locale'        => get_user_locale(),
 			'months'        => array_values( $wp_locale->month ),
@@ -168,7 +168,7 @@ function gutenberg_register_scripts_and_styles() {
 			'offset' => get_option( 'gmt_offset', 0 ),
 			'string' => get_option( 'timezone_string', 'UTC' ),
 		),
-	) ), 'before' );
+	) ) ), 'after' );
 	wp_register_script(
 		'wp-element',
 		gutenberg_url( 'build/element/index.js' ),
@@ -469,7 +469,7 @@ function gutenberg_register_vendor_scripts() {
 	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
 	gutenberg_register_vendor_script(
 		'moment',
-		'https://unpkg.com/moment@2.21.0/' . $moment_script,
+		'https://unpkg.com/moment@2.22.1/' . $moment_script,
 		array()
 	);
 	$tinymce_version = '4.6.7';

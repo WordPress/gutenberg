@@ -354,6 +354,17 @@ function gutenberg_register_post_prepare_functions( $post_type ) {
 add_filter( 'registered_post_type', 'gutenberg_register_post_prepare_functions' );
 
 /**
+ * Whenever a taxonomy is registered, ensure we're hooked into its WP REST API response.
+ *
+ * @param string $taxonomy The newly registered taxonomy.
+ */
+function gutenberg_register_taxonomy_prepare_functions( $taxonomy ) {
+	add_filter( "rest_{$taxonomy}_collection_params", 'gutenberg_filter_term_collection_parameters', 10, 2 );
+	add_filter( "rest_{$taxonomy}_query", 'gutenberg_filter_term_query_arguments', 10, 2 );
+}
+add_filter( 'registered_taxonomy', 'gutenberg_register_taxonomy_prepare_functions' );
+
+/**
  * Includes the value for the 'viewable' attribute of a post type resource.
  *
  * @see https://core.trac.wordpress.org/ticket/43739
@@ -463,12 +474,7 @@ add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_theme_supports' );
  * @param WP_REST_Request  $request  Request used to generate the response.
  */
 function gutenberg_handle_early_callback_checks( $response, $handler, $request ) {
-	$routes = array(
-		'/wp/v2/blocks',
-		'/wp/v2/pages',
-		'/wp/v2/users',
-	);
-	if ( in_array( $request->get_route(), $routes, true ) ) {
+	if ( 0 === strpos( $request->get_route(), '/wp/v2/' ) ) {
 		$can_view_authors    = false;
 		$can_unbounded_query = false;
 		$types               = get_post_types( array( 'show_in_rest' => true ), 'objects' );
@@ -533,6 +539,52 @@ function gutenberg_filter_post_query_arguments( $prepared_args, $request ) {
 		// which will need to be addressed in https://core.trac.wordpress.org/ticket/43998.
 		if ( -1 === $prepared_args['posts_per_page'] ) {
 			$prepared_args['posts_per_page'] = 100000;
+		}
+	}
+	return $prepared_args;
+}
+
+/**
+ * Include additional query parameters on the terms query endpoint.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43998
+ *
+ * @param array  $query_params JSON Schema-formatted collection parameters.
+ * @param object $taxonomy     Taxonomy being accessed.
+ * @return array
+ */
+function gutenberg_filter_term_collection_parameters( $query_params, $taxonomy ) {
+	if ( $taxonomy->show_in_rest
+		&& ( false === $taxonomy->rest_controller_class
+			|| 'WP_REST_Terms_Controller' === $taxonomy->rest_controller_class )
+		&& isset( $query_params['per_page'] ) ) {
+		// Change from '1' to '-1', which means unlimited.
+		$query_params['per_page']['minimum'] = -1;
+		// Default sanitize callback is 'absint', which won't work in our case.
+		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
+	}
+	return $query_params;
+}
+
+/**
+ * Filter term collection query parameters to include specific behavior.
+ *
+ * @see https://core.trac.wordpress.org/ticket/43998
+ *
+ * @param array           $prepared_args Array of arguments for WP_Term_Query.
+ * @param WP_REST_Request $request       The current request.
+ * @return array
+ */
+function gutenberg_filter_term_query_arguments( $prepared_args, $request ) {
+	// Can't check the actual taxonomy here because it's not
+	// passed through in $prepared_args (or the filter generally).
+	if ( 0 === strpos( $request->get_route(), '/wp/v2/' ) ) {
+		if ( -1 === $prepared_args['number'] ) {
+			// This should be unset( $prepared_args['number'] )
+			// but WP_REST_Terms Controller needs to be updated to support
+			// unbounded queries.
+			// Will be addressed in https://core.trac.wordpress.org/ticket/43998.
+			$prepared_args['number'] = 100000;
 		}
 	}
 	return $prepared_args;
