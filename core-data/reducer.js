@@ -119,7 +119,7 @@ function entity( entityConfig ) {
 			case 'RECEIVE_ENTITY_RECORDS':
 				return {
 					byKey: {
-						...state.key,
+						...state.byKey,
 						...keyBy( action.records, key ),
 					},
 				};
