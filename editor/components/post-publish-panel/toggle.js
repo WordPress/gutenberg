@@ -40,21 +40,6 @@ function PostPublishPanelToggle( {
 		return <PostPublishButton forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />;
 	}
 
-	if ( ! hasPublishAction ) {
-		return (
-			<Button
-				className="editor-post-publish-panel__toggle"
-				isPrimary
-				onClick={ onToggle }
-				aria-expanded={ isOpen }
-				disabled={ ! isButtonEnabled }
-				isBusy={ isSaving && isPublished }
-			>
-				{ isBeingScheduled ? __( 'Schedule…' ) : __( 'Submit for Review…' ) }
-			</Button>
-		);
-	}
-
 	return (
 		<Button
 			className="editor-post-publish-panel__toggle"
@@ -64,7 +49,12 @@ function PostPublishPanelToggle( {
 			disabled={ ! isButtonEnabled }
 			isBusy={ isSaving && isPublished }
 		>
-			{ isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' ) }
+			{ ! hasPublishAction && (
+				isBeingScheduled ? __( 'Schedule…' ) : __( 'Submit for Review…' )
+			) }
+			{ hasPublishAction && (
+				isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' )
+			) }
 		</Button>
 	);
 }
