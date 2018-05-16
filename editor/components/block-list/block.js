@@ -26,7 +26,7 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { select as selectFunction, withDispatch, withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 
 /**
@@ -51,6 +51,7 @@ import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
 import { createInnerBlockList } from '../../utils/block-list';
+import { updateFootnotesBlockVisibility } from '../../utils/footnotes';
 
 const { BACKSPACE, DELETE, ENTER } = keycodes;
 
@@ -189,24 +190,14 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	setAttributes( attributes ) {
-		const { block, onAddFirstFootnote, onChange, onRemoveLastFootnote } = this.props;
+	setAttributes( attributes, shouldUpdateFootnotesBlockVisibilty = true ) {
+		const { block, onChange } = this.props;
 		const type = getBlockType( block.name );
-		const footnotesBlockUid = selectFunction( 'core/editor' ).getFootnotesBlockUid();
-		const nextBlockFootnotes = attributes.blockFootnotes ?
-			attributes.blockFootnotes.length : 0;
 
-		if ( ! footnotesBlockUid && nextBlockFootnotes > 0 ) {
-			onAddFirstFootnote();
-		} else if ( footnotesBlockUid && nextBlockFootnotes === 0 ) {
-			const postFootnotes = selectFunction( 'core/editor' ).getFootnotes().length;
-			const currentBlockFootnotes = block.attributes.blockFootnotes ?
-				block.attributes.blockFootnotes.length : 0;
-			const footnotesBlockChange = nextBlockFootnotes - currentBlockFootnotes;
-
-			if ( postFootnotes + footnotesBlockChange === 0 ) {
-				onRemoveLastFootnote( footnotesBlockUid );
-			}
+		if ( shouldUpdateFootnotesBlockVisibilty ) {
+			updateFootnotesBlockVisibility( {
+				[ block.uid ]: attributes.blockFootnotes,
+			} );
 		}
 
 		onChange( block.uid, attributes );
@@ -290,6 +281,12 @@ export class BlockListBlock extends Component {
 	}
 
 	insertBlocksAfter( blocks ) {
+		const footnotes = {};
+		blocks.forEach( ( block ) => {
+			footnotes[ block.uid ] = get( block, [ 'attributes', 'blockFootnotes' ] );
+		} );
+
+		updateFootnotesBlockVisibility( footnotes );
 		this.props.onInsertBlocks( blocks, this.props.order + 1 );
 	}
 
@@ -669,7 +666,6 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	const {
 		updateBlockAttributes,
-		insertFootnotesBlock,
 		selectBlock,
 		insertBlocks,
 		removeBlock,
@@ -682,12 +678,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	return {
 		onChange( uid, attributes ) {
 			updateBlockAttributes( uid, attributes );
-		},
-		onAddFirstFootnote() {
-			insertFootnotesBlock();
-		},
-		onRemoveLastFootnote( footnotesBlockUid ) {
-			removeBlock( footnotesBlockUid );
 		},
 		onSelect( uid = ownProps.uid, initialPosition ) {
 			selectBlock( uid, initialPosition );

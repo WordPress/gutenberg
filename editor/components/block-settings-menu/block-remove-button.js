@@ -11,6 +11,11 @@ import { IconButton } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { updateFootnotesBlockVisibility } from '../../utils/footnotes';
+
 export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, ...props } ) {
 	if ( isLocked ) {
 		return null;
@@ -33,6 +38,7 @@ export function BlockRemoveButton( { onRemove, onClick = noop, isLocked, role, .
 export default compose(
 	withDispatch( ( dispatch, { uids } ) => ( {
 		onRemove() {
+			updateFootnotesBlockVisibility( {}, uids );
 			dispatch( 'core/editor' ).removeBlocks( uids );
 		},
 	} ) ),
