@@ -396,7 +396,7 @@ export class RichText extends Component {
 			if ( shouldReplace ) {
 				this.props.onReplace( content );
 			} else {
-				this.splitContent( content );
+				this.splitContent( content, { paste: true } );
 			}
 		}
 	}
@@ -589,9 +589,10 @@ export class RichText extends Component {
 	 * before the selection. Sends the elements after the selection to the `onSplit`
 	 * handler.
 	 *
-	 * @param {Array} blocks The blocks to add after the split point.
+	 * @param {Array}  blocks  The blocks to add after the split point.
+	 * @param {Object} context The context for splitting.
 	 */
-	splitContent( blocks = [] ) {
+	splitContent( blocks = [], context = {} ) {
 		if ( ! this.props.onSplit ) {
 			return;
 		}
@@ -613,10 +614,17 @@ export class RichText extends Component {
 			const afterFragment = afterRange.extractContents();
 
 			const { format } = this.props;
-			const before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
-			const after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
+			let before = domToFormat( filterEmptyNodes( beforeFragment.childNodes ), format, this.editor );
+			let after = domToFormat( filterEmptyNodes( afterFragment.childNodes ), format, this.editor );
+
+			if ( context.paste ) {
+				before = this.isEmpty( before ) ? null : before;
+				after = this.isEmpty( after ) ? null : after;
+			}
 
 			this.restoreContentAndSplit( before, after, blocks );
+		} else if ( context.paste ) {
+			this.restoreContentAndSplit( null, null, blocks );
 		} else {
 			this.restoreContentAndSplit( [], [], blocks );
 		}
@@ -831,11 +839,7 @@ export class RichText extends Component {
 	 */
 	restoreContentAndSplit( before, after, blocks = [] ) {
 		this.updateContent();
-		this.props.onSplit(
-			this.isEmpty( before ) ? null : before,
-			this.isEmpty( after ) ? null : after,
-			...blocks
-		);
+		this.props.onSplit( before, after, ...blocks );
 	}
 
 	render() {
