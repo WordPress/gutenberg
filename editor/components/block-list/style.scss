@@ -601,8 +601,7 @@
  * Block Toolbar
  */
 
-.editor-block-contextual-toolbar,
-.editor-block-list__breadcrumb {
+.editor-block-contextual-toolbar {
 	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
 	white-space: nowrap;
@@ -650,8 +649,7 @@
 
 }
 
-.editor-block-contextual-toolbar .editor-block-toolbar,
-.editor-block-list__breadcrumb .components-toolbar {
+.editor-block-contextual-toolbar .editor-block-toolbar {
 	border: 1px solid $light-gray-500;
 	width: 100%;
 	background: $white;
@@ -675,27 +673,42 @@
 	}
 }
 
-.editor-block-list__breadcrumb .components-toolbar {
-	padding: 0px 12px;
-	line-height: $block-toolbar-height - 1px;
-	font-family: $default-font;
-	font-size: $default-font-size;
-	color: $dark-gray-500;
-	cursor: default;
 
-	.components-button {
-		margin-left: -12px;
-		margin-right: 12px;
-		border-right: 1px solid $light-gray-500;
-		color: $dark-gray-500;
-		padding-top: 6px;
-	}
-}
+/**
+ * Hover Breadcrumb
+ */
 
 .editor-block-list__breadcrumb {
+	// Hide on mobile
+	display: none;
+
+	@include break-large() {
+		display: block;
+	}
+
+	position: absolute;
+	z-index: z-index( '.editor-block-contextual-toolbar' );
+	white-space: nowrap;
+	text-align: right;
+	height: $block-toolbar-height;
+	font-family: $default-font;
+	font-size: $default-font-size;
+
+	// Position to the left of the movers
+	right: calc( 100% + #{ $block-side-ui-width + $block-side-ui-clearance + $block-side-ui-clearance } );
+	top: $block-padding;
+
+	// Hide until hovered
 	opacity: 0;
 
 	&.is-visible {
 		@include fade_in;
+	}
+
+	.components-toolbar {
+		background: transparent;
+		border: none;
+		color: $dark-gray-300;
+		cursor: default;
 	}
 }
