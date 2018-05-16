@@ -729,16 +729,12 @@ function gutenberg_filter_request_after_callbacks( $response, $handler, $request
 		if ( 'rest_cannot_create' === $response->get_error_code()
 			&& is_array( $handler['permission_callback'] )
 			&& is_a( $handler['permission_callback'][0], 'WP_REST_Terms_Controller' ) ) {
-			// 'taxonomy' is a protected attribute, and PHP 5.2 doesn't support
-			// ReflectionProperty->setAccessible(), so we need to get really dirty.
-			$controller_object = var_export( $handler['permission_callback'][0], true );
-			preg_match( "#'taxonomy' =\> '([^']+)'#", $controller_object, $matches );
-			if ( ! empty( $matches[1] ) ) {
-				$taxonomy_obj = get_taxonomy( $matches[1] );
-				if ( ! is_taxonomy_hierarchical( $taxonomy_obj->name )
-					&& current_user_can( $taxonomy_obj->cap->assign_terms ) ) {
-					$should_rerun_response = true;
-				}
+			$schema = $handler['permission_callback'][0]->get_item_schema();
+			$taxonomy = 'tag' === $schema['title'] ? 'post_tag' : $schema['title'];
+			$taxonomy_obj = get_taxonomy( $taxonomy );
+			if ( ! is_taxonomy_hierarchical( $taxonomy_obj->name )
+				&& current_user_can( $taxonomy_obj->cap->assign_terms ) ) {
+				$should_rerun_response = true;
 			}
 		}
 	}
