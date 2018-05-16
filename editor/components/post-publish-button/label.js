@@ -10,11 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import './style.scss';
-
 export function PublishButtonLabel( {
 	isPublished,
 	isBeingScheduled,
