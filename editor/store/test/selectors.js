@@ -7,7 +7,12 @@ import { filter, property, union } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
+import {
+	getBlockTypes,
+	hasBlockSupport,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 import { registerCoreBlocks } from '@wordpress/core-blocks';
 
@@ -2627,7 +2632,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const blockTypes = getBlockTypes().filter( ( blockType ) => ! blockType.isPrivate );
+			const blockTypes = getBlockTypes().filter( ( blockType ) =>
+				hasBlockSupport( blockType, 'inserter', true )
+			);
 			expect( getInserterItems( state, true ) ).toHaveLength( blockTypes.length );
 		} );
 

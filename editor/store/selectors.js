@@ -22,7 +22,7 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
@@ -1235,7 +1235,7 @@ function buildInserterItemFromBlockType( state, allowedBlockTypes, blockType ) {
 		return null;
 	}
 
-	if ( blockType.isPrivate ) {
+	if ( ! hasBlockSupport( blockType, 'inserter', true ) ) {
 		return null;
 	}
 
