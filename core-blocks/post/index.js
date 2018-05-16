@@ -7,27 +7,27 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RichText } from '@wordpress/editor';
+import {
+	getColorClass,
+	RichText,
+} from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import './editor.scss';
-import PostBlock, { FONT_SIZES, dimRatioToClass, backgroundImageStyles } from './block';
+import '../paragraph/style.scss';
+import '../cover-image/style.scss';
+import edit, {
+	dimRatioToClass,
+	backgroundImageStyles,
+} from './edit';
+
+const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 const blockAttributes = {
-	title: {
-		type: 'array',
-		source: 'children',
-		selector: 'p',
-	},
 	url: {
 		type: 'string',
 	},
-	textAlign: {
-		type: 'string',
-		default: 'left',
-	},
-	id: {
+	id: { // mediaId
 		type: 'number',
 	},
 	hasParallax: {
@@ -36,21 +36,37 @@ const blockAttributes = {
 	},
 	dimRatio: {
 		type: 'number',
-		default: 0,
+		default: 50,
+	},
+	title: { // content
+		type: 'array',
+		source: 'children',
+		selector: 'p',
+		default: [],
+	},
+	textAlign: { // align
+		type: 'string',
+	},
+	dropCap: {
+		type: 'boolean',
+		default: false,
 	},
 	textColor: {
 		type: 'string',
 	},
+	customTextColor: {
+		type: 'string',
+	},
 	backgroundColor: {
+		type: 'string',
+	},
+	customBackgroundColor: {
 		type: 'string',
 	},
 	fontSize: {
 		type: 'string',
 	},
 	customFontSize: {
-		type: 'number',
-	},
-	mediaId: {
 		type: 'number',
 	},
 };
@@ -68,10 +84,32 @@ export const settings = {
 
 	attributes: blockAttributes,
 
-	edit: PostBlock,
+	getEditWrapperProps( attributes ) {
+		const { textAlign } = attributes;
+		if ( -1 !== validAlignments.indexOf( textAlign ) ) {
+			return { 'data-align': textAlign };
+		}
+	},
+
+	edit,
 
 	save( { attributes, className } ) {
-		const { url, title, textAlign, hasParallax, dimRatio, textColor, backgroundColor, fontSize, customFontSize } = attributes;
+		const {
+			url,
+			hasParallax,
+			dimRatio,
+			title,
+			textAlign,
+			dropCap,
+			textColor,
+			customTextColor,
+			backgroundColor,
+			customBackgroundColor,
+			fontSize,
+			customFontSize,
+		} = attributes;
+
+		// Image
 		const imageStyle = backgroundImageStyles( url );
 		const imageClasses = classnames(
 			'wp-block-cover-image',
@@ -79,25 +117,39 @@ export const settings = {
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
+				[ `has-${ textAlign }-content` ]: textAlign !== 'center',
 			},
 		);
 
-		const textStyle = {
-			backgroundColor: backgroundColor,
-			color: textColor,
-			fontSize: ! fontSize && customFontSize ? customFontSize : undefined,
-			textAlign: textAlign,
-		};
+		// Title
+		const textClass = getColorClass( 'color', textColor );
+		const backgroundClass = getColorClass( 'background-color', backgroundColor );
+		const fontSizeClass = fontSize && `is-${ fontSize }-text`;
 
 		const textClasses = classnames( {
-			'has-background': backgroundColor,
-			[ `is-${ fontSize }-text` ]: fontSize && FONT_SIZES[ fontSize ],
+			'has-background': backgroundColor || customBackgroundColor,
+			'has-drop-cap': dropCap,
+			[ fontSizeClass ]: fontSizeClass,
+			[ textClass ]: textClass,
+			[ backgroundClass ]: backgroundClass,
 		} );
+
+		const textStyle = {
+			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+			color: textClass ? undefined : customTextColor,
+			fontSize: fontSizeClass ? undefined : customFontSize,
+			textAlign,
+		};
 
 		return (
 			<div className={ className }>
 				<section className={ imageClasses } style={ imageStyle } />
-				<RichText.Content tagName="p" className={ textClasses } style={ textStyle } value={ title } />
+				<RichText.Content
+					tagName="p"
+					style={ textStyle }
+					className={ textClasses ? textClasses : undefined }
+					value={ title }
+				/>
 			</div>
 		);
 	},
