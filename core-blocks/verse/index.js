@@ -34,7 +34,7 @@ export const settings = {
 			source: 'children',
 			selector: 'pre',
 		},
-		align: {
+		textAlign: {
 			type: 'string',
 		},
 	},
@@ -59,15 +59,15 @@ export const settings = {
 	},
 
 	edit( { attributes, setAttributes, className } ) {
-		const { align, content } = attributes;
+		const { textAlign, content } = attributes;
 
 		return (
 			<Fragment>
 				<BlockControls>
 					<AlignmentToolbar
-						value={ align }
+						value={ textAlign }
 						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
+							setAttributes( { textAlign: nextAlign } );
 						} }
 					/>
 				</BlockControls>
@@ -79,7 +79,7 @@ export const settings = {
 							content: nextContent,
 						} );
 					} }
-					style={ { textAlign: align } }
+					style={ { textAlign: textAlign } }
 					placeholder={ __( 'Write…' ) }
 					wrapperClassName={ className }
 					formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
@@ -89,13 +89,13 @@ export const settings = {
 	},
 
 	save( { attributes, className } ) {
-		const { align, content } = attributes;
+		const { textAlign, content } = attributes;
 
 		return (
 			<RichText.Content
 				tagName="pre"
 				className={ className }
-				style={ { textAlign: align } }
+				style={ { textAlign: textAlign } }
 				value={ content }
 			/>
 		);
