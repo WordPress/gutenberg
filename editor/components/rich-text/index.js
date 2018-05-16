@@ -304,17 +304,17 @@ export class RichText extends Component {
 		// Note: a pasted file may have the URL as plain text.
 		if ( item && ! HTML ) {
 			const blob = item.getAsFile ? item.getAsFile() : item;
-			const isEmptyEditor = this.isEmpty();
 			const content = rawHandler( {
 				HTML: `<img src="${ createBlobURL( blob ) }">`,
 				mode: 'BLOCKS',
 				tagName: this.props.tagName,
 			} );
+			const shouldReplace = this.props.onReplace && this.isEmpty();
 
 			// Allows us to ask for this information when we get a report.
 			window.console.log( 'Received item:\n\n', blob );
 
-			if ( isEmptyEditor && this.props.onReplace ) {
+			if ( shouldReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
 				this.props.setTimeout( () => this.props.onReplace( content ) );
 			} else if ( this.props.onSplit ) {
@@ -342,6 +342,9 @@ export class RichText extends Component {
 	 */
 	onPastePreProcess( event ) {
 		const HTML = this.isPlainTextPaste ? '' : event.content;
+
+		event.preventDefault();
+
 		// Allows us to ask for this information when we get a report.
 		window.console.log( 'Received HTML:\n\n', HTML );
 		window.console.log( 'Received plain text:\n\n', this.pastedPlainText );
@@ -361,17 +364,15 @@ export class RichText extends Component {
 				// Allows us to ask for this information when we get a report.
 				window.console.log( 'Created link:\n\n', pastedText );
 
-				event.preventDefault();
-
 				return;
 			}
 		}
 
-		const isEmptyEditor = this.isEmpty();
+		const shouldReplace = this.props.onReplace && this.isEmpty();
 
 		let mode = 'INLINE';
 
-		if ( isEmptyEditor && this.props.onReplace ) {
+		if ( shouldReplace ) {
 			mode = 'BLOCKS';
 		} else if ( this.props.onSplit ) {
 			mode = 'AUTO';
@@ -386,17 +387,13 @@ export class RichText extends Component {
 		} );
 
 		if ( typeof content === 'string' ) {
-			// Let MCE process further with the given content.
-			event.content = content;
+			this.editor.insertContent( content );
 		} else if ( this.props.onSplit ) {
-			// Abort pasting to split the content
-			event.preventDefault();
-
 			if ( ! content.length ) {
 				return;
 			}
 
-			if ( isEmptyEditor && this.props.onReplace ) {
+			if ( shouldReplace ) {
 				this.props.onReplace( content );
 			} else {
 				this.splitContent( content );
@@ -770,10 +767,11 @@ export class RichText extends Component {
 	/**
 	 * Returns true if the field is currently empty, or false otherwise.
 	 *
+	 * @param {Array} value Content to check.
+	 *
 	 * @return {boolean} Whether field is empty.
 	 */
-	isEmpty() {
-		const { value } = this.props;
+	isEmpty( value = this.props.value ) {
 		return ! value || ! value.length;
 	}
 
@@ -833,7 +831,11 @@ export class RichText extends Component {
 	 */
 	restoreContentAndSplit( before, after, blocks = [] ) {
 		this.updateContent();
-		this.props.onSplit( before, after, ...blocks );
+		this.props.onSplit(
+			this.isEmpty( before ) ? null : before,
+			this.isEmpty( after ) ? null : after,
+			...blocks
+		);
 	}
 
 	render() {
