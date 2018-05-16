@@ -1,5 +1,5 @@
 .components-button {
-	display: inline-block;
+	display: inline-flex;
 	text-decoration: none;
 	font-size: $default-font-size;
 	margin: 0;
@@ -22,31 +22,32 @@
 		color: #555;
 		border-color: #cccccc;
 		background: #f7f7f7;
-		box-shadow: 0 1px 0 #cccccc;
+		box-shadow: inset 0 -1px 0 #cccccc;
 		vertical-align: top;
 
 		&:hover {
 			background: #fafafa;
 			border-color: #999;
+			box-shadow: inset 0 -1px 0 #999;
 			color: #23282d;
 		}
 
-		&:focus {
+		&:focus:not(:disabled):not([aria-disabled="true"]) {
 			background: #fafafa;
 			color: #23282d;
-			border-color: #5b9dd9;
-			box-shadow: 0 0 3px rgba( 0, 115, 170, .8 );
+			border-color: #999;
+			box-shadow: inset 0 -1px 0 #999,
+				0 0 0 2px $blue-medium-200;
 		}
 
-		&:active {
+		&:active:not(:disabled):not([aria-disabled="true"]) {
 			background: #eee;
 			border-color: #999;
-			box-shadow: inset 0 2px 5px -3px rgba( 0, 0, 0, 0.5 );
-			-webkit-transform: translateY(1px);
-			transform: translateY(1px);
+			box-shadow: inset 0 1px 0 #999,
 		}
 
-		&:disabled,&[disabled] {
+		&:disabled,
+		&[disabled] {
 			color: #a0a5aa !important;
 			border-color: #ddd !important;
 			background: #f7f7f7 !important;
@@ -61,7 +62,7 @@
 	&.is-primary {
 		background: color( theme( button ) shade( 10% ) );
 		border-color: color( theme( button ) shade( 20% ) ) color( theme( button ) shade( 30% ) ) color( theme( primary ) shade( 30% ) );
-		box-shadow: 0 1px 0 color( theme( button ) shade( 30% ) );
+		box-shadow: inset 0 -1px 0 color( theme( button ) shade( 30% ) );
 		color: #fff;
 		text-decoration: none;
 		text-shadow: 0 -1px 1px color( theme( button ) shade( 30% ) ),
@@ -69,25 +70,28 @@
 			0 1px 1px color( theme( button ) shade( 30% ) ),
 			-1px 0 1px color( theme( button ) shade( 30% ) );
 
-		&:hover, &:focus {
+		&:hover,
+		&:focus:not(:disabled):not([aria-disabled="true"]) {
 			background: color( theme( button ) shade( 15% ) );
-			border-color: color( theme( button ) shade( 30% ) );
-			color: #fff;
+			border-color: color( theme( button ) shade( 50% ) );
+			box-shadow: inset 0 -1px 0 color( theme( button ) shade( 50% ) );
+			color: $white;
 		}
 
-		&:focus {
-			box-shadow: 0 1px 0 color( theme( button ) shade( 20% ) ),
-				0 0 2px 1px color( theme( button ) tint( 20% ) );
+		&:focus:not(:disabled):not([aria-disabled="true"]) {
+			box-shadow: inset 0 -1px 0 color( theme( button ) shade( 50% ) ),
+				0 0 0 2px $blue-medium-200;
 		}
 
-		&:active {
+		&:active:not(:disabled):not([aria-disabled="true"]) {
 			background: color( theme( button ) shade( 20% ) );
-			border-color: color( theme( button ) shade( 30% ) );
-			box-shadow: inset 0 2px 0 color( theme( button ) shade( 30% ) );
+			border-color: color( theme( button ) shade( 50% ) );
+			box-shadow: inset 0 1px 0 color( theme( button ) shade( 50% ) );
 			vertical-align: top;
 		}
 
-		&:disabled, &[disabled] {
+		&:disabled,
+		&[disabled] {
 			color: color( theme( button ) tint( 30% ) ) !important;
 			background: color( theme( button ) shade( 30% ) ) !important;
 			border-color: color( theme( button ) shade( 20% ) ) !important;
