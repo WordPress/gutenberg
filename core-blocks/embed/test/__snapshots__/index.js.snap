@@ -39,11 +39,6 @@ exports[`core/embed block edit matches snapshot 1`] = `
         type="submit"
       >
         Embed
-        <span
-          class="screen-reader-text"
-        >
-           (opens in a new tab)
-        </span>
       </button>
     </form>
   </div>

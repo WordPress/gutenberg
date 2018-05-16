@@ -83,6 +83,7 @@ class PostPermalink extends Component {
 						href={ ! isPublished ? previewLink : samplePermalink }
 						target="_blank"
 						ref={ ( permalinkButton ) => this.permalinkButton = permalinkButton }
+						icon={ false }
 					>
 						{ decodeURI( samplePermalink ) }
 						&lrm;
@@ -112,6 +113,8 @@ class PostPermalink extends Component {
 						href={ getWPAdminURL( 'options-permalink.php' ) }
 						onClick={ this.addVisibilityCheck }
 						target="_blank"
+						icon={ false }
+						rel={ null }
 					>
 						{ __( 'Change Permalinks' ) }
 					</Button>

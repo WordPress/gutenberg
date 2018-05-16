@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
+import { PanelBody, Placeholder, Spinner, ToggleControl, Button } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { times, unescape } from 'lodash';
@@ -88,10 +88,17 @@ class CategoriesEdit extends Component {
 	renderCategoryListItem( category, level ) {
 		const { showHierarchy, showPostCounts } = this.props.attributes;
 		const childCategories = this.getCategories( category.id );
+		const opensInNewTabText = __( '(opens in a new tab from this preview)' );
 
 		return (
 			<li key={ category.id }>
-				<a href={ category.link } target="_blank">{ this.renderCategoryName( category ) }</a>
+				<Button href={ category.link }
+					target="_blank"
+					icon={ false }
+					opensInNewTabText={ opensInNewTabText }
+				>
+					{ this.renderCategoryName( category ) }
+				</Button>
 				{ showPostCounts &&
 					<span className={ `${ this.props.className }__post-count` }>
 						{ ' ' }({ category.count })

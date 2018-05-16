@@ -9,6 +9,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	withSpokenMessages,
+	Button,
 } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { prependHTTP } from '@wordpress/url';
@@ -240,13 +241,14 @@ class FormatToolbar extends Component {
 									onKeyPress={ stopKeyPropagation }
 								>
 									<div className="editor-format-toolbar__link-modal-line">
-										<a
+										<Button
 											className="editor-format-toolbar__link-value"
 											href={ formats.link.value }
 											target="_blank"
+											icon={ false }
 										>
 											{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
-										</a>
+										</Button>
 										<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 										<IconButton
 											className="editor-format-toolbar__link-settings-toggle"

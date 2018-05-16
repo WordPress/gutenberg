@@ -19,6 +19,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	withAPIData,
+	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/utils';
@@ -123,6 +124,8 @@ class LatestPostsEdit extends Component {
 			},
 		];
 
+		const opensInNewTabText = __( '(opens in a new tab from this preview)' );
+
 		return (
 			<Fragment>
 				{ inspectorControls }
@@ -144,7 +147,14 @@ class LatestPostsEdit extends Component {
 				>
 					{ displayPosts.map( ( post, i ) =>
 						<li key={ i }>
-							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
+							<Button
+								href={ post.link }
+								target="_blank"
+								icon={ false }
+								opensInNewTabText={ opensInNewTabText }
+							>
+								{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }
+							</Button>
 							{ displayPostDate && post.date_gmt &&
 								<time dateTime={ moment( post.date_gmt ).utc().format() } className={ `${ this.props.className }__post-date` }>
 									{ moment( post.date_gmt ).local().format( 'MMMM DD, Y' ) }

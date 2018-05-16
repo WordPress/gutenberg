@@ -44,6 +44,15 @@
 	.wp-core-ui.gutenberg-editor-page & {
 		font-size: $default-font-size;
 	}
+
+	&.external-link {
+		.dashicon {
+			width: 1.4em;
+			height: 1.4em;
+			margin: 0 .2em;
+			vertical-align: top;
+		}
+	}
 }
 
 @keyframes components-button__busy-animation {

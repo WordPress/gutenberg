@@ -80,11 +80,6 @@ exports[`core/gallery block edit matches snapshot 1`] = `
           />
         </svg>
         Upload
-        <span
-          class="screen-reader-text"
-        >
-           (opens in a new tab)
-        </span>
       </button>
       <input
         accept="image/*"
