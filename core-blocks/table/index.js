@@ -8,13 +8,13 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
+import { getPhrasingContentSchema } from '@wordpress/blocks';
 import {
-	getPhrasingContentSchema,
 	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
 	InspectorControls,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 import {
 	PanelBody,
@@ -148,7 +148,6 @@ export const settings = {
 
 	save( { attributes } ) {
 		const { content, align, hasFixedLayout } = attributes;
-
 		const classes = classnames(
 			{
 				'has-fixed-layout': hasFixedLayout,
