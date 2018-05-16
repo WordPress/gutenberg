@@ -14,7 +14,7 @@ class CodeEditor extends Component {
 		super( ...arguments );
 
 		this.onFocus = this.onFocus.bind( this );
-		this.onBlur = this.onBlur.bind( this );
+		this.onChange = this.onChange.bind( this );
 		this.onCursorActivity = this.onCursorActivity.bind( this );
 		this.onKeyHandled = this.onKeyHandled.bind( this );
 	}
@@ -25,7 +25,7 @@ class CodeEditor extends Component {
 		this.editor = instance.codemirror;
 
 		this.editor.on( 'focus', this.onFocus );
-		this.editor.on( 'blur', this.onBlur );
+		this.editor.on( 'change', this.onChange );
 		this.editor.on( 'cursorActivity', this.onCursorActivity );
 		this.editor.on( 'keyHandled', this.onKeyHandled );
 
@@ -49,7 +49,7 @@ class CodeEditor extends Component {
 
 	componentWillUnmount() {
 		this.editor.on( 'focus', this.onFocus );
-		this.editor.off( 'blur', this.onBlur );
+		this.editor.off( 'change', this.onChange );
 		this.editor.off( 'cursorActivity', this.onCursorActivity );
 		this.editor.off( 'keyHandled', this.onKeyHandled );
 
@@ -63,7 +63,7 @@ class CodeEditor extends Component {
 		}
 	}
 
-	onBlur( editor ) {
+	onChange( editor ) {
 		if ( this.props.onChange ) {
 			this.props.onChange( editor.getValue() );
 		}
@@ -99,12 +99,12 @@ class CodeEditor extends Component {
 		}
 
 		if ( ! this.props.focus && this.editor.hasFocus() ) {
-			document.activeElement.blur();
+			document.activeElement.change();
 		}
 	}
 
 	render() {
-		return <textarea ref={ ( ref ) => ( this.textarea = ref ) } value={ this.props.value } />;
+		return <textarea ref={ ( ref ) => ( this.textarea = ref ) } value={ this.props.value } onChange={ this.props.onChange } />;
 	}
 }
 
