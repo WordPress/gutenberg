@@ -1,19 +1,20 @@
 /**
  * External dependencies
  */
-import memoize from 'memize';
-import { get } from 'lodash';
+import { get, isFunction, upperFirst } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createHigherOrderComponent, Component, compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import { getColorValue, getColorClass, setColorValue } from './utils';
+import { default as withColorsDeprecated } from './with-colors-deprecated';
 
 const DEFAULT_COLORS = [];
 
@@ -21,71 +22,81 @@ const DEFAULT_COLORS = [];
  * Higher-order component, which handles color logic for class generation
  * color value, retrieval and color attribute setting.
  *
- * @param {Function} mapGetSetColorToProps Function that receives getColor, setColor, and props,
- *                                         and returns additional props to pass to the component.
+ * @param {string} colorAttributeName       Name of the attribute where named colors are stored.
+ * @param {string} customColorAttributeName Name of the attribute where custom colors are stored.
+ * @param {string} colorContext             Context/place where color is being used e.g: background, text etc...
  *
  * @return {Function} Higher-order component.
  */
-export default ( mapGetSetColorToProps ) => createHigherOrderComponent(
-	compose( [
-		withSelect(
-			( select ) => {
+export default ( colorAttributeName, customColorAttributeName, colorContext ) => {
+	if ( isFunction( colorAttributeName ) ) {
+		deprecated( 'Using withColors( mapGetSetColorToProps ) ', {
+			version: '3.1',
+			alternative: 'withColors( colorAttributeName, customColorAttributeName, colorContext )',
+		} );
+		return withColorsDeprecated( colorAttributeName );
+	}
+	return createHigherOrderComponent(
+		compose( [
+			withSelect( ( select ) => {
 				const settings = select( 'core/editor' ).getEditorSettings();
 				return {
 					colors: get( settings, [ 'colors' ], DEFAULT_COLORS ),
 				};
 			} ),
-		( WrappedComponent ) => {
-			return class extends Component {
-				constructor() {
-					super( ...arguments );
-					/**
-					* Even though, we don't expect setAttributes or colors to change memoizing it is essential.
-					* If setAttributes or colors are not memoized, each time memoizedGetColor/memoizedSetColor are called:
-					* a new function reference is returned (even if arguments have not changed).
-					* This would make our memoized chain useless.
-					*/
-					this.memoizedGetColor = memoize( this.memoizedGetColor, { maxSize: 1 } );
-					this.memoizedSetColor = memoize( this.memoizedSetColor, { maxSize: 1 } );
-				}
+			( WrappedComponent ) => {
+				return class extends Component {
+					constructor( props ) {
+						super( props );
+						this.state = {};
+					}
 
-				memoizedGetColor( colors ) {
-					return memoize(
-						( colorName, customColorValue, colorContext ) => {
-							return {
-								name: colorName,
-								class: getColorClass( colorContext, colorName ),
-								value: getColorValue( colors, colorName, customColorValue ),
-							};
+					static getDerivedStateFromProps( { attributes, colors, setAttributes }, prevState ) {
+						const colorName = attributes[ colorAttributeName ];
+						const customColor = attributes[ customColorAttributeName ];
+						if (
+							colorName === prevState.colorName &&
+							customColor === prevState.customColor &&
+							colors === prevState.colors &&
+							setAttributes === prevState.setAttributes
+						) {
+							return null;
 						}
-					);
-				}
 
-				memoizedSetColor( setAttributes, colors ) {
-					return memoize(
-						( colorNameAttribute, customColorAttribute ) => {
-							return setColorValue( colors, colorNameAttribute, customColorAttribute, setAttributes );
-						}
-					);
-				}
+						const colorObject = {
+							name: attributes[ colorAttributeName ],
+							class: getColorClass( colorContext, colorName ),
+							value: getColorValue( colors, colorName, customColor ),
+						};
 
-				render() {
-					return (
-						<WrappedComponent
-							{ ...{
-								...this.props,
-								colors: undefined,
-								...mapGetSetColorToProps(
-									this.memoizedGetColor( this.props.colors ),
-									this.memoizedSetColor( this.props.setAttributes, this.props.colors ),
-									this.props
-								),
-							} }
-						/>
-					);
-				}
-			};
-		},
-	] ),
-	'withColors'
-);
+						const colorSetter = setColorValue( colors, colorAttributeName, customColorAttributeName, setAttributes );
+
+						return {
+							colorName,
+							customColor,
+							colors,
+							setAttributes,
+							mergeProps: {
+								[ colorAttributeName ]: colorObject,
+								[ 'set' + upperFirst( colorAttributeName ) ]: colorSetter,
+							},
+						};
+					}
+
+					render() {
+						return (
+							<WrappedComponent
+								{ ...{
+									...this.props,
+									colors: undefined,
+									...this.state.mergeProps,
+								} }
+							/>
+						);
+					}
+				};
+			},
+		] ),
+		'withColors'
+	);
+};
