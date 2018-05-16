@@ -33,3 +33,19 @@
 		font-size: 0.8em;
 	}
 }
+
+.core-blocks-heading__icon {
+	height: 20px;
+	position: relative;
+	width: 20px;
+
+	&:after {
+		content: attr( data-subscript );
+		font-family: $default-font;
+		font-size: $default-font-size;
+		font-weight: 600;
+		position: absolute;
+		bottom: 0;
+		left: 16px;
+	}
+}
