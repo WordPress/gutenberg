@@ -91,4 +91,29 @@ describe( 'entities', () => {
 			},
 		} );
 	} );
+
+	it( 'appends the received post types by slug', () => {
+		const originalState = deepFreeze( {
+			root: {
+				postType: {
+					byKey: {
+						w: { slug: 'w', title: 'water' },
+					},
+				},
+			},
+		} );
+		const state = entities( originalState, {
+			type: 'RECEIVE_ENTITY_RECORDS',
+			records: [ { slug: 'b', title: 'beach' } ],
+			kind: 'root',
+			name: 'postType',
+		} );
+
+		expect( state.root.postType ).toEqual( {
+			byKey: {
+				w: { slug: 'w', title: 'water' },
+				b: { slug: 'b', title: 'beach' },
+			},
+		} );
+	} );
 } );
