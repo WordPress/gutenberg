@@ -81,7 +81,7 @@ export function receiveEntityRecords( kind, name, records ) {
 export function receiveTaxonomies( taxonomies ) {
 	return {
 		type: 'RECEIVE_TAXONOMIES',
-		taxonomies: taxonomies,
+		taxonomies,
 	};
 }
 
