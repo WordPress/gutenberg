@@ -5,12 +5,12 @@ import BaseControl from '../base-control';
 import withInstanceId from '../higher-order/with-instance-id';
 import './style.scss';
 
-function CheckboxControl( { label, heading, checked, help, instanceId, onChange, ...props } ) {
+function CheckboxControl( { label, className, heading, checked, help, instanceId, onChange, ...props } ) {
 	const id = `inspector-checkbox-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.checked );
 
 	return (
-		<BaseControl label={ heading } id={ id } help={ help }>
+		<BaseControl label={ heading } id={ id } help={ help } className={ className }>
 			<input
 				id={ id }
 				className="components-checkbox-control__input"
