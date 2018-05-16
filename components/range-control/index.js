@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { isFinite } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 
 /**

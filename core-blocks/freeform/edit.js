@@ -173,7 +173,7 @@ export default class FreeformEdit extends Component {
 			<div
 				key="editor"
 				id={ `editor-${ id }` }
-				className="wp-block-freeform blocks-rich-text__tinymce"
+				className="wp-block-freeform core-blocks-rich-text__tinymce"
 			/>,
 		];
 		/* eslint-enable jsx-a11y/no-static-element-interactions */

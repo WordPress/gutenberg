@@ -280,6 +280,26 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
 	}
 
+	public function test_get_categories_unbounded_per_page() {
+		wp_set_current_user( $this->author );
+		$this->factory->category->create();
+		$request = new WP_REST_Request( 'GET', '/wp/v2/categories' );
+		$request->set_param( 'per_page', '-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
+	public function test_get_categories_unbounded_per_page_unauthorized() {
+		wp_set_current_user( $this->subscriber );
+		$this->factory->category->create();
+		$request = new WP_REST_Request( 'GET', '/wp/v2/categories' );
+		$request->set_param( 'per_page', '-1' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 403, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
+	}
+
 	public function test_get_pages_unbounded_per_page() {
 		wp_set_current_user( $this->author );
 		$this->factory->post->create( array( 'post_type' => 'page' ) );

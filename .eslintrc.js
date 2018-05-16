@@ -63,6 +63,10 @@ module.exports = {
 				message: 'Use @wordpress/data as import path instead.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^dom$/]',
+				message: 'Use @wordpress/dom as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^utils$/]',
 				message: 'Use @wordpress/utils as import path instead.',
 			},

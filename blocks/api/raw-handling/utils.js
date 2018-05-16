@@ -6,7 +6,7 @@ import { omit, mergeWith, includes, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { unwrap, insertAfter, remove } from '@wordpress/utils';
+import { unwrap, insertAfter, remove } from '@wordpress/dom';
 
 /**
  * Browser dependencies

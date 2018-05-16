@@ -4,6 +4,8 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
  - All components in `wp.blocks.*` are removed. Please use `wp.editor.*` instead.
  - `wp.blocks.withEditorSettings` is removed. Please use the data module to access the editor settings `wp.data.select( "core/editor" ).getEditorSettings()`.
+ - All DOM utils in `wp.utils.*` are removed. Please use `wp.dom.*` instead.
+ - `isPrivate: true` has been removed from the Block API. Please use `supports.inserter: false` instead.
 
 ## 3.0.0
 

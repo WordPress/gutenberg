@@ -17,7 +17,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Module Constants
  */
 const DEFAULT_QUERY = {
-	per_page: 100,
+	per_page: -1,
 	orderby: 'count',
 	order: 'desc',
 	_fields: 'id,name,parent',

@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
-import { Component } from '../../../element';
 import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
