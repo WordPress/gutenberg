@@ -20,11 +20,13 @@ import 'element-closest';
  */
 import { Component, Fragment, compose, RawHTML, createRef } from '@wordpress/element';
 import {
-	keycodes,
-	createBlobURL,
 	isHorizontalEdge,
 	getRectangleFromRange,
 	getScrollContainer,
+} from '@wordpress/dom';
+import {
+	keycodes,
+	createBlobURL,
 	deprecated,
 } from '@wordpress/utils';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
