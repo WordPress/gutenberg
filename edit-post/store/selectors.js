@@ -157,7 +157,9 @@ export const hasMetaBoxes = createSelector(
 			return metaBox.isActive;
 		} );
 	},
-	( state ) => state.metaBoxes,
+	( state ) => [
+		state.metaBoxes,
+	],
 );
 
 /**
