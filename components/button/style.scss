@@ -26,7 +26,7 @@
 	&.is-busy[disabled] {
 		animation: components-button__busy-animation 2500ms infinite linear;
 		background-size: 100px 100% !important;
-		background-image: linear-gradient( -45deg, $light-gray-500 28%, $white 28%, $white 72%, $light-gray-500 72%) !important;
+		background-image: repeating-linear-gradient( -45deg, $light-gray-500, $white 11px, $white 10px, $light-gray-500 20px) !important;
 		opacity: 1;
 	}
 
@@ -34,8 +34,8 @@
 	&.button-primary.is-busy[disabled] {
 		color: $white !important;
 		background-size: 100px 100% !important;
-		background-image: linear-gradient( -45deg, theme( primary ) 28%, $blue-dark-900 28%, $blue-dark-900 72%, theme( primary ) 72%) !important;
-		border-color: $blue-dark-900 !important;
+		background-image: repeating-linear-gradient( -45deg, theme( primary ), color( theme( primary ) shade( 50% ) ) 11px, color( theme( primary ) shade( 50% ) ) 10px, theme( primary ) 20px) !important;
+		border-color: color( theme( primary ) shade( 50% ) ) !important;
 	}
 
 	.wp-core-ui.gutenberg-editor-page & {

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import { noop, get } from 'lodash';
 
 /**
@@ -14,7 +13,6 @@ import { withSelect, withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import './style.scss';
 import PublishButtonLabel from './label';
 
 export function PostPublishButton( {
@@ -42,10 +40,6 @@ export function PostPublishButton( {
 		publishStatus = 'publish';
 	}
 
-	const className = classnames( 'editor-post-publish-button', {
-		'is-saving': isSaving,
-	} );
-
 	const onClick = () => {
 		onSubmit();
 		onStatusChange( publishStatus );
@@ -54,11 +48,12 @@ export function PostPublishButton( {
 
 	return (
 		<Button
+			className="editor-post-publish-button"
 			isPrimary
 			isLarge
 			onClick={ onClick }
 			disabled={ ! isButtonEnabled }
-			className={ className }
+			isBusy={ isSaving }
 		>
 			<PublishButtonLabel forceIsSaving={ forceIsSaving } />
 		</Button>

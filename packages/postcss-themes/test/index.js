@@ -54,4 +54,11 @@ describe( 'postcss-themes', () => {
 			expect( result.warnings() ).toHaveLength( 0 );
 		} );
 	} );
+
+	it( 'add the prefix selector to all subselectors', () => {
+		return run( 'a, span{ color: theme( main ) }' ).then( ( result ) => {
+			expect( result.css ).toMatchSnapshot();
+			expect( result.warnings() ).toHaveLength( 0 );
+		} );
+	} );
 } );
