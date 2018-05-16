@@ -306,7 +306,10 @@ export default compose( [
 		};
 	} ),
 	withSelect( ( select, ownProps ) => {
+		const { getCurrentPost } = select( 'core/editor' );
 		return {
+			hasCreateAction: get( getCurrentPost(), [ '_links', 'wp:action-create-' + ownProps.restBase ], false ),
+			hasAssignAction: get( getCurrentPost(), [ '_links', 'wp:action-assign-' + ownProps.restBase ], false ),
 			terms: select( 'core/editor' ).getEditedPostAttribute( ownProps.restBase ),
 		};
 	} ),
