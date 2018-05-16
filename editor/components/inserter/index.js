@@ -16,21 +16,26 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import InserterInlineMenu from './inline-menu';
 
 class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
+		this.isInsertingInline = this.isInsertingInline.bind( this );
+		this.showInsertionPoint = this.showInsertionPoint.bind( this );
+		this.hideInsertionPoint = this.hideInsertionPoint.bind( this );
+		this.state = { isInline: false };
 	}
 
 	onToggle( isOpen ) {
 		const { onToggle } = this.props;
 
 		if ( isOpen ) {
-			this.props.showInsertionPoint();
+			this.showInsertionPoint();
 		} else {
-			this.props.hideInsertionPoint();
+			this.hideInsertionPoint();
 		}
 
 		// Surface toggle callback to parent component
@@ -39,15 +44,47 @@ class Inserter extends Component {
 		}
 	}
 
+	showInsertionPoint() {
+		const { showInlineInsertionPoint, showInsertionPoint } = this.props;
+
+		if ( this.isInsertingInline() ) {
+			this.setState( { isInline: true } );
+			showInlineInsertionPoint();
+		} else {
+			this.setState( { isInline: false } );
+			showInsertionPoint();
+		}
+	}
+
+	hideInsertionPoint() {
+		const { hideInlineInsertionPoint, hideInsertionPoint } = this.props;
+
+		if ( this.state.isInline ) {
+			hideInlineInsertionPoint();
+		} else {
+			hideInsertionPoint();
+		}
+	}
+
+	isInsertingInline() {
+		const { selectedBlock, canInsertInline } = this.props;
+
+		return selectedBlock &&
+			! isUnmodifiedDefaultBlock( selectedBlock ) &&
+			canInsertInline;
+	}
+
 	render() {
 		const {
 			position,
 			title,
 			children,
 			onInsertBlock,
+			onInsertInline,
 			hasSupportedBlocks,
 			isLocked,
 		} = this.props;
+		const { isInline } = this.state;
 
 		if ( ! hasSupportedBlocks || isLocked ) {
 			return null;
@@ -74,10 +111,22 @@ class Inserter extends Component {
 				) }
 				renderContent={ ( { onClose } ) => {
 					const onSelect = ( item ) => {
-						onInsertBlock( item );
+						if ( isInline ) {
+							onInsertInline( item.name );
+						} else {
+							onInsertBlock( item );
+						}
 
 						onClose();
 					};
+
+					if ( isInline ) {
+						return (
+							<InserterInlineMenu
+								onSelect={ onSelect }
+							/>
+						);
+					}
 
 					return <InserterMenu onSelect={ onSelect } />;
 				} }
@@ -94,6 +143,7 @@ export default compose( [
 			getSelectedBlock,
 			getSupportedBlocks,
 			getEditorSettings,
+			isInlineInsertAvailable,
 		} = select( 'core/editor' );
 		const { allowedBlockTypes, templateLock } = getEditorSettings();
 		const insertionPoint = getBlockInsertionPoint();
@@ -105,6 +155,7 @@ export default compose( [
 			selectedBlock: getSelectedBlock(),
 			hasSupportedBlocks: true === supportedBlocks || ! isEmpty( supportedBlocks ),
 			isLocked: !! templateLock,
+			canInsertInline: isInlineInsertAvailable(),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
@@ -120,5 +171,8 @@ export default compose( [
 			}
 			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
 		},
+		showInlineInsertionPoint: dispatch( 'core/editor' ).showInlineInsertionPoint,
+		hideInlineInsertionPoint: dispatch( 'core/editor' ).hideInlineInsertionPoint,
+		onInsertInline: dispatch( 'core/editor' ).insertInline,
 	} ) ),
 ] )( Inserter );

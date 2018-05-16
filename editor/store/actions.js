@@ -286,6 +286,33 @@ export function insertBlocks( blocks, index, rootUID ) {
 }
 
 /**
+ * Returns an action object used in signalling that an inline block should be
+ * inserted.
+ *
+ * @param {string}  inlineBlockName Name of inline block to insert.
+ *
+ * @return {Object} Action object.
+ */
+export function insertInline( inlineBlockName ) {
+	return {
+		type: 'INSERT_INLINE',
+		inlineBlockName,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that inline block insertion is
+ * complete.
+ *
+ * @return {Object} Action object.
+ */
+export function completeInlineInsert() {
+	return {
+		type: 'INLINE_INSERT_COMPLETE',
+	};
+}
+
+/**
  * Returns an action object used in signalling that the insertion point should
  * be shown.
  *
@@ -305,6 +332,53 @@ export function showInsertionPoint() {
 export function hideInsertionPoint() {
 	return {
 		type: 'HIDE_INSERTION_POINT',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the inline insertion point
+ * should be shown.
+ *
+ * @return {Object} Action object.
+ */
+export function showInlineInsertionPoint() {
+	return {
+		type: 'SHOW_INLINE_INSERTION_POINT',
+	};
+}
+
+/**
+ * Returns an action object hiding the inline insertion point.
+ *
+ * @return {Object} Action object.
+ */
+export function hideInlineInsertionPoint() {
+	return {
+		type: 'HIDE_INLINE_INSERTION_POINT',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that a RichText component is
+ * selected and available for inline insertion.
+ *
+ * @return {Object} Action object.
+ */
+export function setInlineInsertAvailable() {
+	return {
+		type: 'SET_INLINE_INSERT_AVAILABLE',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that inline insertion is not
+ * available.
+ *
+ * @return {Object} Action object.
+ */
+export function setInlineInsertUnavailable() {
+	return {
+		type: 'SET_INLINE_INSERT_UNAVAILABLE',
 	};
 }
 

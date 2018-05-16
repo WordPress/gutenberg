@@ -41,6 +41,7 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
+import InlineBlocks from './inline-blocks';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { EVENTS } from './constants';
@@ -889,6 +890,12 @@ export class RichText extends Component {
 						{ formatToolbar }
 					</div>
 				) }
+				{ isSelected &&
+					<InlineBlocks
+						editor={ this.editor }
+						containerRef={ this.containerRef }
+					/>
+				}
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>

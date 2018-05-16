@@ -1,0 +1,19 @@
+.blocks-inline-insertion-point {
+	display: inline-block;
+	z-index: 1;
+}
+
+.blocks-inline-insertion-point__caret {
+	display: inline-block;
+	width: 1px;
+	height: 100%;
+	margin-right: 1px;
+	background: $black;
+}
+
+.blocks-inline-insertion-point__indicator {
+	display: inline-block;
+	width: 3px;
+	height: 95%;
+	background: $blue-medium-500;
+}

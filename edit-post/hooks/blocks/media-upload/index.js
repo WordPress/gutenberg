@@ -81,6 +81,7 @@ class MediaUpload extends Component {
 		this.onOpen = this.onOpen.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
+		this.onClose = this.onClose.bind( this );
 		this.processMediaCaption = this.processMediaCaption.bind( this );
 
 		if ( gallery ) {
@@ -122,6 +123,7 @@ class MediaUpload extends Component {
 		this.frame.on( 'select', this.onSelect );
 		this.frame.on( 'update', this.onUpdate );
 		this.frame.on( 'open', this.onOpen );
+		this.frame.on( 'close', this.onClose );
 	}
 
 	componentWillUnmount() {
@@ -167,6 +169,14 @@ class MediaUpload extends Component {
 		}
 		// load the images so they are available in the media modal.
 		getAttachmentsCollection( castArray( this.props.value ) ).more();
+	}
+
+	onClose() {
+		const { onClose } = this.props;
+
+		if ( onClose ) {
+			onClose();
+		}
 	}
 
 	openModal() {
