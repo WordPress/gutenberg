@@ -233,11 +233,17 @@ class ParagraphBlock extends Component {
 						} }
 						onSplit={ insertBlocksAfter ?
 							( before, after, ...blocks ) => {
-								setAttributes( { content: before } );
-								insertBlocksAfter( [
-									...blocks,
-									createBlock( 'core/paragraph', { content: after } ),
-								] );
+								if ( after ) {
+									blocks.push( createBlock( name, { content: after } ) );
+								}
+
+								insertBlocksAfter( blocks );
+
+								if ( before ) {
+									setAttributes( { content: before } );
+								} else {
+									onReplace( [] );
+								}
 							} :
 							undefined
 						}
