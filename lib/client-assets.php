@@ -360,6 +360,9 @@ function gutenberg_register_scripts_and_styles() {
 	);
 
 	// Editor Styles.
+	// This empty stylesheet is defined to ensure backwards compatibility.
+	wp_register_style( 'wp-blocks', false );
+
 	wp_register_style(
 		'wp-editor-font',
 		'https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i'
