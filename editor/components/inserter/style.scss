@@ -1,5 +1,6 @@
 $block-inserter-content-height: 250px;
 $block-inserter-tabs-height: 38px;
+$block-inserter-search-height: 38px;
 
 .editor-inserter {
 	display: inline-block;
@@ -12,6 +13,12 @@ $block-inserter-tabs-height: 38px;
 
 	@include break-medium {
 		position: relative;
+	}
+}
+
+.editor-inserter .editor-inserter__popover:not(.is-mobile) > .components-popover__content {
+	@include break-medium {
+		height: $block-inserter-content-height + $block-inserter-tabs-height + $block-inserter-search-height;
 	}
 }
 
@@ -136,10 +143,6 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__search-results {
 	flex-grow: 1;
 	overflow: auto;
-
-	@include break-medium {
-		height: $block-inserter-content-height + $block-inserter-tabs-height;
-	}
 }
 
 .editor-inserter__no-blocks {
@@ -167,10 +170,6 @@ input[type="search"].editor-inserter__search {
 
 		&:focus:active {
 			outline: none;
-		}
-
-		@include break-medium {
-			height: $block-inserter-content-height;
 		}
 	}
 
