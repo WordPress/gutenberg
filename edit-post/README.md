@@ -109,6 +109,7 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 - Required: No
 - Default: _inherits from the plugin_
 
+
 ### `PluginPostStatusInfo`
 
 Renders a row in the Status & Visibility panel of the Document sidebar.
@@ -127,3 +128,77 @@ const MyPluginPostStatusInfo = () => (
 ```
 
 
+### `PluginPrePublishPanel`
+
+Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when a user first pushes "Publish" from the main editor).
+
+_Example:_
+
+```jsx
+const { __ } = wp.i18n;
+const { PluginPrePublishPanel } = wp.editPost;
+
+const MyPluginPrePublishPanel = () => (
+	<PluginPrePublishPanel
+		title={ __( 'My panel title' ) }
+		initialOpen={ true }
+	>
+	    { __( 'My panel content' ) }
+	</PluginPrePublishPanel>
+);
+```
+
+#### Props
+
+##### title
+
+Title displayed at the top of the panel.
+
+- Type: `String`
+- Required: No
+
+##### initialOpen
+
+Whether to have the panel initially opened. When no title is provided it is always opened.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
+
+### `PluginPostPublishPanel`
+
+Renders provided content to the post-publish panel in the publish flow (side panel that opens after a user publishes the post).
+
+_Example:_
+
+```jsx
+const { __ } = wp.i18n;
+const { PluginPostPublishPanel } = wp.editPost;
+
+const MyPluginPrePublishPanel = () => (
+	<PluginPostPublishPanel
+		title={ __( 'My panel title' ) }
+		initialOpen={ true }
+	>
+        { __( 'My panel content' ) }
+	</PluginPostPublishPanel>
+);
+```
+
+#### Props
+
+##### title
+
+Title displayed at the top of the panel.
+
+- Type: `String`
+- Required: No
+
+##### initialOpen
+
+Whether to have the panel initially opened. When no title is provided it is always opened. 
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
