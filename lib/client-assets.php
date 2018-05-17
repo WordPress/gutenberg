@@ -226,7 +226,18 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-core-blocks',
 		gutenberg_url( 'build/core-blocks/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-blocks', 'wp-editor', 'wp-i18n', 'editor', 'wp-core-data', 'lodash' ),
+		array(
+			'editor',
+			'lodash',
+			'wp-blocks',
+			'wp-components',
+			'wp-core-data',
+			'wp-element',
+			'wp-editor',
+			'wp-i18n',
+			'wp-utils',
+			'wp-viewport',
+		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
 		true
 	);
