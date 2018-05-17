@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { filter, includes, map, mapValues, compact } from 'lodash';
+import { filter, includes, map, mapValues, compact, get } from 'lodash';
 
 /**
  * Returns all the available block types.
@@ -40,7 +40,7 @@ export const getBlockType = createSelector(
 			...blockTypeDefinition,
 			...blockTypeImplementation,
 			attributes: mapValues( blockTypeDefinition.attributes, ( attribute, key ) => {
-				const implementationAttribute = blockTypeImplementation.attributes ? blockTypeImplementation.attributes[ key ] : {};
+				const implementationAttribute = get( blockTypeImplementation.attributes, [ key ], {} );
 				return {
 					...attribute,
 					...implementationAttribute,

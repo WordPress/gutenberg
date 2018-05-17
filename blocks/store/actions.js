@@ -18,7 +18,7 @@ export function addBlockTypes( blockTypes ) {
 }
 
 /**
- * Returns an action object used in signalling that block types have been added.
+ * Returns an action object used in signalling that block types have been implemented.
  *
  * @param {Array|Object} implementations Block types implementations.
  *
