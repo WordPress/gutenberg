@@ -16,7 +16,7 @@ $block-inserter-search-height: 38px;
 	}
 }
 
-.editor-inserter .editor-inserter__popover:not(.is-mobile) > .components-popover__content {
+.editor-inserter__popover:not(.is-mobile) > .components-popover__content {
 	@include break-medium {
 		height: $block-inserter-content-height + $block-inserter-tabs-height + $block-inserter-search-height;
 	}
