@@ -26,9 +26,8 @@ class PostItemDraggable extends Component {
 		if ( ! this.state.block.uid ) {
 			// create a new block
 			const block = createBlock( 'custom/post', {
-				url: '',
 				title: [ post.title.rendered ],
-				mediaId: post.featured_media,
+				id: post.featured_media,
 				layout: '',
 			} );
 

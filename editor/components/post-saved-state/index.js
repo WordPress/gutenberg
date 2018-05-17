@@ -94,10 +94,7 @@ export default compose( [
 			isEditedPostSaveable,
 			getCurrentPost,
 		} = select( 'core/editor' );
-
-		const {
-			getPostType,
-		} = select( 'core' );
+		const { getPostType } = select( 'core' );
 
 		const post = getCurrentPost();
 

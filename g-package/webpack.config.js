@@ -34,7 +34,52 @@ const extractConfig = {
 			loader: 'postcss-loader',
 			options: {
 				plugins: [
+					require( '../packages/postcss-themes' )( {
+						defaults: {
+							primary: '#00a0d2',
+							secondary: '#0073aa',
+							toggle: '#00a0d2',
+						},
+						themes: {
+							'admin-color-light': {
+								primary: '#00a0d2',
+								secondary: '#c75726',
+								toggle: '#00a0d2',
+							},
+							'admin-color-blue': {
+								primary: '#82b4cb',
+								secondary: '#d9ab59',
+								toggle: '#82b4cb',
+							},
+							'admin-color-coffee': {
+								primary: '#c2a68c',
+								secondary: '#9fa47b',
+								toggle: '#c2a68c',
+							},
+							'admin-color-ectoplasm': {
+								primary: '#a7b656',
+								secondary: '#c77430',
+								toggle: '#a7b656',
+							},
+							'admin-color-midnight': {
+								primary: '#e34e46',
+								secondary: '#77a6b9',
+								toggle: '#77a6b9',
+							},
+							'admin-color-ocean': {
+								primary: '#a3b9a2',
+								secondary: '#a89d8a',
+								toggle: '#a3b9a2',
+							},
+							'admin-color-sunrise': {
+								primary: '#d1864a',
+								secondary: '#c8b03c',
+								toggle: '#c8b03c',
+							},
+						},
+					} ),
 					require( 'autoprefixer' ),
+					require( 'postcss-color-function' ),
 				],
 			},
 		},
@@ -42,7 +87,7 @@ const extractConfig = {
 			loader: 'sass-loader',
 			query: {
 				includePaths: [ 'edit-post/assets/stylesheets' ],
-				data: '@import "colors"; @import "admin-schemes"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
+				data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 				outputStyle: 'production' === process.env.NODE_ENV ?
 					'compressed' : 'nested',
 			},
@@ -85,6 +130,8 @@ const entryPointNames = [
 
 const gutenbergPackages = [
 	'date',
+	'dom',
+	'element',
 ];
 
 const coreGlobals = [
@@ -105,7 +152,10 @@ gutenbergPackages.forEach( ( name ) => {
 } );
 
 // make them external global vars
-coreGlobals.forEach( ( name ) => {
+[
+	...coreGlobals,
+	// ...gutenbergPackages,
+].forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
 	};

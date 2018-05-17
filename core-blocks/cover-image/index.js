@@ -19,6 +19,7 @@ import {
 	MediaUpload,
 	AlignmentToolbar,
 	RichText,
+	PostTypeSupportCheck,
 } from '@wordpress/editor';
 
 /**
@@ -131,19 +132,21 @@ export const settings = {
 						} }
 					/>
 					<Toolbar>
-						<MediaUpload
-							onSelect={ onSelectImage }
-							type="image"
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
+						<PostTypeSupportCheck supportKeys="media-library">
+							<MediaUpload
+								onSelect={ onSelectImage }
+								type="image"
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit image' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+						</PostTypeSupportCheck>
 					</Toolbar>
 				</BlockControls>
 				{ !! url && (
