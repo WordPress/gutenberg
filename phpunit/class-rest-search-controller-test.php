@@ -306,6 +306,10 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Test preparing the data with limited fields contains the correct fields.
 	 */
 	public function test_prepare_item_limit_fields() {
+		if ( ! method_exists( 'WP_REST_Controller', 'get_fields_for_response' ) ) {
+			$this->markTestSkipped( 'Limiting fields requires the WP_REST_Controller::get_fields_for_response() method.' );
+		}
+
 		wp_set_current_user( self::$editor_id );
 
 		$response = $this->do_request_with_params( array(
