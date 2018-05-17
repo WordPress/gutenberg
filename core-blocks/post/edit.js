@@ -151,11 +151,18 @@ class PostEdit extends Component {
 		} );
 	}
 
+	componentWillReceiveProps( { image, url } ) {
+		if ( image && ! url ) {
+			this.props.setAttributes( {
+				url: image.source_url,
+			} );
+		}
+	}
+
 	render() {
 		const {
 			attributes,
 			setAttributes,
-			isSelected,
 			className,
 			backgroundColor,
 			textColor,
@@ -164,7 +171,6 @@ class PostEdit extends Component {
 			fallbackBackgroundColor,
 			fallbackTextColor,
 			fallbackFontSize,
-			image,
 		} = this.props;
 
 		const {
@@ -178,12 +184,8 @@ class PostEdit extends Component {
 			placeholder,
 		} = attributes;
 
-		if ( image && image.source_url ) {
-			setAttributes( { url: image.source_url } );
-		}
-
-		const style = backgroundImageStyles( url );
-		const classes = classnames(
+		const imageStyle = backgroundImageStyles( url );
+		const imageClasses = classnames(
 			'wp-block-cover-image',
 			dimRatioToClass( dimRatio ),
 			{
@@ -314,7 +316,7 @@ class PostEdit extends Component {
 					<ImagePlaceholder
 						{ ...{ className, icon, label, onSelectImage: this.onSelectImage } }
 					/>
-					<div>{ richText }</div>
+					{ richText }
 				</Fragment>
 			);
 		}
@@ -322,13 +324,12 @@ class PostEdit extends Component {
 		return (
 			<Fragment>
 				{ controls }
-				<section
-					key="preview"
+				<div
 					data-url={ url }
-					style={ style }
-					className={ classes }
-				/>
-				{ title || isSelected ? richText : null }
+					style={ imageStyle }
+					className={ imageClasses }
+				></div>
+				{ richText }
 			</Fragment>
 		);
 	}
