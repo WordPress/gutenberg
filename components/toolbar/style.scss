@@ -38,12 +38,15 @@ div.components-toolbar {
 	display: inline-flex;
 	align-items: flex-end;
 	margin: 0;
-	padding: 3px;
 	outline: none;
 	cursor: pointer;
 	position: relative;
-	width: $icon-button-size;
 	height: $icon-button-size;
+	padding: 3px 1px;
+
+	@include break-small() {
+		padding: 3px;
+	}
 
 	// unset icon button styles
 	&:active,

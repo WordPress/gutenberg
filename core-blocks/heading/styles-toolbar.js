@@ -51,7 +51,7 @@ const HeadingStylesToolbar = ( { value, onChange } ) => (
 				<span
 					className="core-blocks-heading__styles-toolbar-menu-title"
 				>
-					{ __( 'Transform into:' ) }
+					{ __( 'Heading style:' ) }
 				</span>
 				<NavigableMenu
 					role="menu"
