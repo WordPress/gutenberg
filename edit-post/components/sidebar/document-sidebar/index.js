@@ -14,7 +14,6 @@ import FeaturedImage from '../featured-image';
 import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
-import DocumentOutlinePanel from '../document-outline-panel';
 import MetaBoxes from '../../meta-boxes';
 import SettingsHeader from '../settings-header';
 import Sidebar from '../';
@@ -24,7 +23,7 @@ const SIDEBAR_NAME = 'edit-post/document';
 const DocumentSidebar = () => (
 	<Sidebar
 		name={ SIDEBAR_NAME }
-		label={ __( 'Editor advanced settings' ) }
+		label={ __( 'Editor settings' ) }
 	>
 		<SettingsHeader sidebarName={ SIDEBAR_NAME } />
 		<Panel>
@@ -35,7 +34,6 @@ const DocumentSidebar = () => (
 			<PostExcerpt />
 			<DiscussionPanel />
 			<PageAttributes />
-			<DocumentOutlinePanel />
 			<MetaBoxes location="side" usePanel />
 		</Panel>
 	</Sidebar>

@@ -63,6 +63,10 @@ module.exports = {
 				message: 'Use @wordpress/data as import path instead.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^dom$/]',
+				message: 'Use @wordpress/dom as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^utils$/]',
 				message: 'Use @wordpress/utils as import path instead.',
 			},
@@ -83,8 +87,20 @@ module.exports = {
 				"message": "Use @wordpress/core-data as import path instead."
 			},
 			{
+				"selector": "ImportDeclaration[source.value=/^core-blocks$/]",
+				"message": "Use @wordpress/core-blocks as import path instead."
+			},
+			{
 				selector: 'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' + majorMinorRegExp + '/]',
 				message: 'Deprecated functions must be removed before releasing this version.',
+			},
+			{
+				selector: 'CallExpression[callee.name=/^(invokeMap|get|has|hasIn|invoke|result|set|setWith|unset|update|updateWith)$/] > Literal:nth-child(2)',
+				message: 'Always pass an array as the path argument',
+			},
+			{
+				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
+				message: 'Use ellipsis character (…) in place of three dots',
 			},
 		],
 	},

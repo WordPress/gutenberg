@@ -12,7 +12,6 @@ import {
 	sortBy,
 	isEmpty,
 } from 'lodash';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
@@ -24,20 +23,17 @@ import {
 	TabbableContainer,
 	withInstanceId,
 	withSpokenMessages,
-	withContext,
 } from '@wordpress/components';
 import { getCategories, isSharedBlock } from '@wordpress/blocks';
 import { keycodes } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import NoBlocks from './no-blocks';
-
-import { getInserterItems, getFrecentInserterItems } from '../../store/selectors';
-import { fetchSharedBlocks } from '../../store/actions';
-import { default as InserterGroup } from './group';
+import InserterGroup from './group';
 import BlockPreview from '../block-preview';
 
 export const searchItems = ( items, searchTerm ) => {
@@ -340,22 +336,25 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
-	withContext( 'editor' )( ( settings ) => {
-		const { allowedBlockTypes } = settings;
-
+	withSelect( ( select ) => {
+		const {
+			getBlockInsertionPoint,
+			getInserterItems,
+			getFrecentInserterItems,
+			getSupportedBlocks,
+			getEditorSettings,
+		} = select( 'core/editor' );
+		const { allowedBlockTypes } = getEditorSettings();
+		const { rootUID } = getBlockInsertionPoint();
+		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
 		return {
-			allowedBlockTypes,
+			items: getInserterItems( supportedBlocks ),
+			frecentItems: getFrecentInserterItems( supportedBlocks ),
 		};
 	} ),
-	connect(
-		( state, { allowedBlockTypes } ) => {
-			return {
-				items: getInserterItems( state, allowedBlockTypes ),
-				frecentItems: getFrecentInserterItems( state, allowedBlockTypes ),
-			};
-		},
-		{ fetchSharedBlocks }
-	),
+	withDispatch( ( dispatch ) => ( {
+		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
+	} ) ),
 	withSpokenMessages,
 	withInstanceId
 )( InserterMenu );

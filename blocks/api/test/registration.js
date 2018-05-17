@@ -30,11 +30,14 @@ describe( 'blocks', () => {
 
 	beforeAll( () => {
 		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		require( 'editor/hooks' );
+
+		// Initialize the block store
+		require( '../../store' );
 	} );
 
 	afterEach( () => {
-		getBlockTypes().forEach( block => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 		setUnknownTypeHandlerName( undefined );
@@ -288,7 +291,7 @@ describe( 'blocks', () => {
 
 	describe( 'getUnknownTypeHandlerName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getUnknownTypeHandlerName() ).toBeUndefined();
+			expect( getUnknownTypeHandlerName() ).toBeNull();
 		} );
 	} );
 
@@ -302,7 +305,7 @@ describe( 'blocks', () => {
 
 	describe( 'getDefaultBlockName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getDefaultBlockName() ).toBeUndefined();
+			expect( getDefaultBlockName() ).toBeNull();
 		} );
 	} );
 

@@ -36,14 +36,14 @@ describe( 'FormToggle', () => {
 
 		it( 'should render a checkbox with a noop onChange', () => {
 			const formToggle = shallow( <FormToggle /> );
-			const checkBox = formToggle.prop( 'children' ).find( child => 'input' === child.type && 'checkbox' === child.props.type );
+			const checkBox = formToggle.prop( 'children' ).find( ( child ) => 'input' === child.type && 'checkbox' === child.props.type );
 			expect( checkBox.props.onChange ).toBe( noop );
 		} );
 
 		it( 'should render a checkbox with a user-provided onChange', () => {
 			const testFunction = ( event ) => event;
 			const formToggle = shallow( <FormToggle onChange={ testFunction } /> );
-			const checkBox = formToggle.prop( 'children' ).find( child => 'input' === child.type && 'checkbox' === child.props.type );
+			const checkBox = formToggle.prop( 'children' ).find( ( child ) => 'input' === child.type && 'checkbox' === child.props.type );
 			expect( checkBox.props.onChange ).toBe( testFunction );
 		} );
 	} );

@@ -12,7 +12,7 @@ import { addAction, removeAction } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import PluginContext from '../plugin-context';
+import { PluginContextProvider } from '../plugin-context';
 import { getPlugins } from '../../api';
 
 /**
@@ -30,12 +30,12 @@ class PluginArea extends Component {
 
 	getCurrentPluginsState() {
 		return {
-			plugins: map( getPlugins(), ( { name, render } ) => {
+			plugins: map( getPlugins(), ( { icon, name, render } ) => {
 				return {
-					name,
 					Plugin: render,
 					context: {
-						pluginName: name,
+						name,
+						icon,
 					},
 				};
 			} ),
@@ -59,13 +59,13 @@ class PluginArea extends Component {
 	render() {
 		return (
 			<div style={ { display: 'none' } }>
-				{ map( this.state.plugins, ( { context, name, Plugin } ) => (
-					<PluginContext.Provider
-						key={ name }
+				{ map( this.state.plugins, ( { context, Plugin } ) => (
+					<PluginContextProvider
+						key={ context.name }
 						value={ context }
 					>
 						<Plugin />
-					</PluginContext.Provider>
+					</PluginContextProvider>
 				) ) }
 			</div>
 		);

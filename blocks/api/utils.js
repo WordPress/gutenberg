@@ -36,7 +36,7 @@ export function isUnmodifiedDefaultBlock( block ) {
 		...keys( block.attributes ),
 	] );
 
-	return every( attributeKeys, key =>
+	return every( attributeKeys, ( key ) =>
 		isEqual( newDefaultBlock.attributes[ key ], block.attributes[ key ] )
 	);
 }

@@ -3,7 +3,7 @@ Autocomplete
 
 Gutenberg provides a `blocks.Autocomplete.completers` filter for extending and overriding the list of autocompleters used by blocks.
 
-The `Autocomplete` component found in `@wordpress/blocks` applies this filter. The `@wordpress/components` package provides the foundational `Autocomplete` component that does not apply such a filter, but blocks should generally use the component provided by `@wordpress/blocks`.
+The `Autocomplete` component found in `@wordpress/editor` applies this filter. The `@wordpress/components` package provides the foundational `Autocomplete` component that does not apply such a filter, but blocks should generally use the component provided by `@wordpress/editor`.
 
 ### Example
 
@@ -38,8 +38,10 @@ var acronymCompleter = {
 };
 
 // Our filter function
-function appendAcronymCompleter( completers ) {
-	return completers.concat( acronymCompleter );
+function appendAcronymCompleter( completers, blockName ) {
+	return blockName === 'my-plugin/foo' ?
+		completers.concat( acronymCompleter ) :
+		completers;
 }
 
 // Adding the filter
@@ -71,8 +73,10 @@ const acronymCompleter = {
 };
 
 // Our filter function
-function appendAcronymCompleter( completers ) {
-	return [ ...completers, acronymCompleter ];
+function appendAcronymCompleter( completers, blockName ) {
+	return blockName === 'my-plugin/foo' ?
+		[ ...completers, acronymCompleter ] :
+		completers;
 }
 
 // Adding the filter

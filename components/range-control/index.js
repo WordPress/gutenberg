@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import { isFinite } from 'lodash';
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -26,7 +31,7 @@ function RangeControl( {
 } ) {
 	const id = `inspector-range-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
-	const initialSliderValue = value || initialPosition || '';
+	const initialSliderValue = isFinite( value ) ? value : initialPosition || '';
 
 	return (
 		<BaseControl

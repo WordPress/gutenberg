@@ -2,20 +2,21 @@
  * External dependencies
  */
 import Textarea from 'react-autosize-textarea';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/utils';
+import { Component, compose, Fragment } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { withInstanceId } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostContent } from '../../store/selectors';
-import { editPost, resetBlocks, checkTemplateValidity } from '../../store/actions';
 
 class PostTextEditor extends Component {
 	constructor() {
@@ -60,32 +61,49 @@ class PostTextEditor extends Component {
 	}
 
 	render() {
+		const { value, placeholder, instanceId } = this.props;
+		const decodedPlaceholder = decodeEntities( placeholder );
+
 		return (
-			<Textarea
-				autoComplete="off"
-				value={ this.state.value || this.props.value }
-				onFocus={ this.startEditing }
-				onChange={ this.edit }
-				onBlur={ this.stopEditing }
-				className="editor-post-text-editor"
-			/>
+			<Fragment>
+				<label htmlFor={ `post-content-${ instanceId }` } className="screen-reader-text">
+					{ decodedPlaceholder || __( 'Write your story' ) }
+				</label>
+				<Textarea
+					autoComplete="off"
+					value={ this.state.value || value }
+					onFocus={ this.startEditing }
+					onChange={ this.edit }
+					onBlur={ this.stopEditing }
+					className="editor-post-text-editor"
+					id={ `post-content-${ instanceId }` }
+					placeholder={ decodedPlaceholder || __( 'Write your story' ) }
+				/>
+			</Fragment>
 		);
 	}
 }
 
-export default connect(
-	( state ) => ( {
-		value: getEditedPostContent( state ),
+export default compose( [
+	withSelect( ( select ) => {
+		const { getEditedPostContent, getEditorSettings } = select( 'core/editor' );
+		const { bodyPlaceholder } = getEditorSettings();
+		return {
+			value: getEditedPostContent(),
+			placeholder: bodyPlaceholder,
+		};
 	} ),
-	{
-		onChange( content ) {
-			return editPost( { content } );
-		},
-		onPersist( content ) {
-			return [
-				resetBlocks( parse( content ) ),
-				checkTemplateValidity(),
-			];
-		},
-	}
-)( PostTextEditor );
+	withDispatch( ( dispatch ) => {
+		const { editPost, resetBlocks, checkTemplateValidity } = dispatch( 'core/editor' );
+		return {
+			onChange( content ) {
+				editPost( { content } );
+			},
+			onPersist( content ) {
+				resetBlocks( parse( content ) );
+				checkTemplateValidity();
+			},
+		};
+	} ),
+	withInstanceId,
+] )( PostTextEditor );

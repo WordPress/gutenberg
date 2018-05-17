@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode } from '@wordpress/element';
+import { Component, findDOMNode, createHigherOrderComponent } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
-const withHoverAreas = ( WrappedComponent ) => {
+const withHoverAreas = createHigherOrderComponent( ( WrappedComponent ) => {
 	class WithHoverAreasComponent extends Component {
 		constructor() {
 			super( ...arguments );
@@ -34,13 +35,14 @@ const withHoverAreas = ( WrappedComponent ) => {
 		}
 
 		onMouseMove( event ) {
+			const { isRTL } = this.props;
 			const { width, left, right } = this.container.getBoundingClientRect();
 
 			let hoverArea = null;
 			if ( ( event.clientX - left ) < width / 3 ) {
-				hoverArea = 'left';
+				hoverArea = isRTL ? 'right' : 'left';
 			} else if ( ( right - event.clientX ) < width / 3 ) {
-				hoverArea = 'right';
+				hoverArea = isRTL ? 'left' : 'right';
 			}
 
 			if ( hoverArea !== this.state.hoverArea ) {
@@ -56,7 +58,11 @@ const withHoverAreas = ( WrappedComponent ) => {
 		}
 	}
 
-	return WithHoverAreasComponent;
-};
+	return withSelect( ( select ) => {
+		return {
+			isRTL: select( 'core/editor' ).getEditorSettings().isRTL,
+		};
+	} )( WithHoverAreasComponent );
+} );
 
 export default withHoverAreas;

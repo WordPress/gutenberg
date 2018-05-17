@@ -6,6 +6,7 @@ import {
 	first,
 	get,
 	has,
+	intersection,
 	last,
 	reduce,
 	size,
@@ -14,23 +15,24 @@ import {
 	unionWith,
 	includes,
 	values,
+	castArray,
 } from 'lodash';
 import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
-import { deprecated } from '@wordpress/utils';
 
 /***
  * Module constants
  */
 const MAX_RECENT_BLOCKS = 9;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
+const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -87,7 +89,7 @@ export function isEditedPostNew( state ) {
  * @return {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
-	return state.editor.isDirty;
+	return state.editor.isDirty || inSomeHistory( state, isEditedPostDirty );
 }
 
 /**
@@ -146,7 +148,7 @@ export function getCurrentPostId( state ) {
  * @return {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
-	return get( getCurrentPost( state ), 'revisions.count', 0 );
+	return get( getCurrentPost( state ), [ 'revisions', 'count' ], 0 );
 }
 
 /**
@@ -158,7 +160,7 @@ export function getCurrentPostRevisionsCount( state ) {
  * @return {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
-	return get( getCurrentPost( state ), 'revisions.last_id', null );
+	return get( getCurrentPost( state ), [ 'revisions', 'last_id' ], null );
 }
 
 /**
@@ -391,7 +393,7 @@ export const getBlockDependantsCacheBust = createSelector(
  * @return {string} Block name.
  */
 export function getBlockName( state, uid ) {
-	const block = state.editor.present.blocksByUid[ uid ];
+	const block = state.editor.present.blocksByUID[ uid ];
 	return block ? block.name : null;
 }
 
@@ -408,7 +410,7 @@ export function getBlockName( state, uid ) {
  */
 export const getBlock = createSelector(
 	( state, uid ) => {
-		const block = state.editor.present.blocksByUid[ uid ];
+		const block = state.editor.present.blocksByUID[ uid ];
 		if ( ! block ) {
 			return null;
 		}
@@ -441,7 +443,7 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, uid ) => [
-		state.editor.present.blocksByUid[ uid ],
+		state.editor.present.blocksByUID[ uid ],
 		getBlockDependantsCacheBust( state, uid ),
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
@@ -473,7 +475,7 @@ export const getBlocks = createSelector(
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 	]
 );
 
@@ -489,29 +491,29 @@ export const getBlocks = createSelector(
 export const getGlobalBlockCount = createSelector(
 	( state, blockName ) => {
 		if ( ! blockName ) {
-			return size( state.editor.present.blocksByUid );
+			return size( state.editor.present.blocksByUID );
 		}
 		return reduce(
-			state.editor.present.blocksByUid,
+			state.editor.present.blocksByUID,
 			( count, block ) => block.name === blockName ? count + 1 : count,
 			0
 		);
 	},
 	( state ) => [
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 	]
 );
 
 export const getBlocksByUID = createSelector(
 	( state, uids ) => {
-		return map( uids, ( uid ) => getBlock( state, uid ) );
+		return map( castArray( uids ), ( uid ) => getBlock( state, uid ) );
 	},
 	( state ) => [
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 		state.editor.present.blockOrder,
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 	]
 );
 
@@ -583,6 +585,19 @@ export function hasSelectedBlock( state ) {
 }
 
 /**
+ * Returns the currently selected block UID, or null if there is no selected
+ * block.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?Object} Selected block UID.
+ */
+export function getSelectedBlockUID( state ) {
+	const { start, end } = state.blockSelection;
+	return start === end && start ? start : null;
+}
+
+/**
  * Returns the currently selected block, or null if there is no selected block.
  *
  * @param {Object} state Global application state.
@@ -590,12 +605,8 @@ export function hasSelectedBlock( state ) {
  * @return {?Object} Selected block.
  */
 export function getSelectedBlock( state ) {
-	const { start, end } = state.blockSelection;
-	if ( start !== end || ! start ) {
-		return null;
-	}
-
-	return getBlock( state, start );
+	const uid = getSelectedBlockUID( state );
+	return uid ? getBlock( state, uid ) : null;
 }
 
 /**
@@ -633,7 +644,7 @@ export function getBlockRootUID( state, uid ) {
 export function getAdjacentBlockUid( state, startUID, modifier = 1 ) {
 	// Default to selected block.
 	if ( startUID === undefined ) {
-		startUID = get( getSelectedBlock( state ), 'uid' );
+		startUID = get( getSelectedBlock( state ), [ 'uid' ] );
 	}
 
 	// Try multi-selection starting at extent based on modifier.
@@ -780,7 +791,7 @@ export const getMultiSelectedBlocks = createSelector(
 		state.editor.present.blockOrder,
 		state.blockSelection.start,
 		state.blockSelection.end,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
 	]
@@ -1058,7 +1069,7 @@ export function isValidTemplate( state ) {
  * @return {?Arary}        Block Template
  */
 export function getTemplate( state ) {
-	return state.template.template;
+	return state.settings.template;
 }
 
 /**
@@ -1068,7 +1079,7 @@ export function getTemplate( state ) {
  * @return {?string}        Block Template Lock
  */
 export function getTemplateLock( state ) {
-	return state.template.lock;
+	return state.settings.templateLock;
 }
 
 /**
@@ -1174,7 +1185,7 @@ export const getEditedPostContent = createSelector(
 	},
 	( state ) => [
 		state.editor.present.edits.content,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 		state.editor.present.blockOrder,
 	],
 );
@@ -1224,7 +1235,7 @@ function buildInserterItemFromBlockType( state, allowedBlockTypes, blockType ) {
 		return null;
 	}
 
-	if ( blockType.isPrivate ) {
+	if ( ! hasBlockSupport( blockType, 'inserter', true ) ) {
 		return null;
 	}
 
@@ -1236,7 +1247,7 @@ function buildInserterItemFromBlockType( state, allowedBlockTypes, blockType ) {
 		icon: blockType.icon,
 		category: blockType.category,
 		keywords: blockType.keywords,
-		isDisabled: !! blockType.useOnce && getBlocks( state ).some( block => block.name === blockType.name ),
+		isDisabled: !! blockType.useOnce && getBlocks( state ).some( ( block ) => block.name === blockType.name ),
 	};
 }
 
@@ -1291,24 +1302,15 @@ function buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock
  * @return {Editor.InserterItem[]} Items that appear in inserter.
  */
 export function getInserterItems( state, allowedBlockTypes ) {
-	if ( allowedBlockTypes === undefined ) {
-		allowedBlockTypes = true;
-		deprecated( 'getInserterItems with no allowedBlockTypes argument', {
-			version: '2.8',
-			alternative: 'getInserterItems with an explcit allowedBlockTypes argument',
-			plugin: 'Gutenberg',
-		} );
-	}
-
 	if ( ! allowedBlockTypes ) {
 		return [];
 	}
 
-	const staticItems = getBlockTypes().map( blockType =>
+	const staticItems = getBlockTypes().map( ( blockType ) =>
 		buildInserterItemFromBlockType( state, allowedBlockTypes, blockType )
 	);
 
-	const dynamicItems = getSharedBlocks( state ).map( sharedBlock =>
+	const dynamicItems = getSharedBlocks( state ).map( ( sharedBlock ) =>
 		buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock )
 	);
 
@@ -1318,12 +1320,12 @@ export function getInserterItems( state, allowedBlockTypes ) {
 
 function fillWithCommonBlocks( inserts ) {
 	// Filter out any inserts that are associated with a block type that isn't registered
-	const items = inserts.filter( insert => getBlockType( insert.name ) );
+	const items = inserts.filter( ( insert ) => getBlockType( insert.name ) );
 
 	// Common blocks that we'll use to pad out our list
 	const commonInserts = getBlockTypes()
-		.filter( blockType => blockType.category === 'common' )
-		.map( blockType => ( { name: blockType.name } ) );
+		.filter( ( blockType ) => blockType.category === 'common' )
+		.map( ( blockType ) => ( { name: blockType.name } ) );
 
 	const areInsertsEqual = ( a, b ) => a.name === b.name && a.ref === b.ref;
 	return unionWith( items, commonInserts, areInsertsEqual );
@@ -1334,7 +1336,7 @@ function getItemsFromInserts( state, inserts, allowedBlockTypes, maximum = MAX_R
 		return [];
 	}
 
-	const items = fillWithCommonBlocks( inserts ).map( insert => {
+	const items = fillWithCommonBlocks( inserts ).map( ( insert ) => {
 		if ( insert.ref ) {
 			const sharedBlock = getSharedBlock( state, insert.ref );
 			return buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock );
@@ -1361,15 +1363,6 @@ function getItemsFromInserts( state, inserts, allowedBlockTypes, maximum = MAX_R
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
 export function getFrecentInserterItems( state, allowedBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
-	if ( allowedBlockTypes === undefined ) {
-		allowedBlockTypes = true;
-		deprecated( 'getFrecentInserterItems with no allowedBlockTypes argument', {
-			version: '2.8',
-			alternative: 'getFrecentInserterItems with an explcit allowedBlockTypes argument',
-			plugin: 'Gutenberg',
-		} );
-	}
-
 	const calculateFrecency = ( time, count ) => {
 		if ( ! time ) {
 			return count;
@@ -1515,4 +1508,128 @@ export function isPublishingPost( state ) {
  */
 export function getProvisionalBlockUID( state ) {
 	return state.provisionalBlockUID;
+}
+
+/**
+ * Returns whether the permalink is editable or not.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether or not the permalink is editable.
+ */
+export function isPermalinkEditable( state ) {
+	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
+
+	return PERMALINK_POSTNAME_REGEX.test( permalinkTemplate );
+}
+
+/**
+ * Returns the permalink for the post.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string} The permalink.
+ */
+export function getPermalink( state ) {
+	const { prefix, postName, suffix } = getPermalinkParts( state );
+
+	if ( isPermalinkEditable( state ) ) {
+		return prefix + postName + suffix;
+	}
+
+	return prefix;
+}
+
+/**
+ * Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The prefix, postName, and suffix for the permalink.
+ */
+export function getPermalinkParts( state ) {
+	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
+	const postName = getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'generated_slug' );
+
+	const [ prefix, suffix ] = permalinkTemplate.split( PERMALINK_POSTNAME_REGEX );
+
+	return {
+		prefix,
+		postName,
+		suffix,
+	};
+}
+
+/**
+ * Returns true if an optimistic transaction is pending commit, for which the
+ * before state satisfies the given predicate function.
+ *
+ * @param {Object}   state     Editor state.
+ * @param {Function} predicate Function given state, returning true if match.
+ *
+ * @return {boolean} Whether predicate matches for some history.
+ */
+export function inSomeHistory( state, predicate ) {
+	const { optimist } = state;
+
+	// In recursion, optimist state won't exist. Assume exhausted options.
+	if ( ! optimist ) {
+		return false;
+	}
+
+	return optimist.some( ( { beforeState } ) => (
+		beforeState && predicate( beforeState )
+	) );
+}
+
+/**
+ * Returns the Block List settings of a block if any.
+ *
+ * @param {Object}  state Editor state.
+ * @param {?string} uid   Block UID.
+ *
+ * @return {?Object} Block settings of the block if set.
+ */
+export function getBlockListSettings( state, uid ) {
+	return state.blockListSettings[ uid ];
+}
+
+/**
+ * Determines the blocks that can be nested inside a given block. Or globally if a block is not specified.
+ *
+ * @param {Object}           state                     Global application state.
+ * @param {?string}          uid                       Block UID.
+ * @param {string[]|boolean} globallyEnabledBlockTypes Globally enabled block types, or true/false to enable/disable all types.
+ *
+ * @return {string[]|boolean} Blocks that can be nested inside the block with the specified uid, or true/false to enable/disable all types.
+ */
+export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
+	if ( ! globallyEnabledBlockTypes ) {
+		return false;
+	}
+
+	const supportedNestedBlocks = get( getBlockListSettings( state, uid ), [ 'supportedBlocks' ] );
+	if ( supportedNestedBlocks === true || supportedNestedBlocks === undefined ) {
+		return globallyEnabledBlockTypes;
+	}
+
+	if ( ! supportedNestedBlocks ) {
+		return false;
+	}
+
+	if ( globallyEnabledBlockTypes === true ) {
+		return supportedNestedBlocks;
+	}
+	return intersection( globallyEnabledBlockTypes, supportedNestedBlocks );
+}
+
+/*
+ * Returns the editor settings.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor settings object
+ */
+export function getEditorSettings( state ) {
+	return state.settings;
 }

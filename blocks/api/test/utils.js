@@ -11,6 +11,11 @@ import { getBlockTypes, unregisterBlockType, registerBlockType, setDefaultBlockN
 import { isUnmodifiedDefaultBlock } from '../utils';
 
 describe( 'block helpers', () => {
+	beforeAll( () => {
+		// Initialize the block store
+		require( '../../store' );
+	} );
+
 	afterEach( () => {
 		setDefaultBlockName( undefined );
 		getBlockTypes().forEach( ( block ) => {

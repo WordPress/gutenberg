@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
 import { get } from 'lodash';
 
 /**
@@ -9,7 +8,8 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { compose, Component } from '@wordpress/element';
-import { withAPIData, IconButton, Spinner } from '@wordpress/components';
+import { IconButton, Spinner } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal Dependencies
@@ -18,13 +18,6 @@ import './style.scss';
 import PostPublishButton from '../post-publish-button';
 import PostPublishPanelPrepublish from './prepublish';
 import PostPublishPanelPostpublish from './postpublish';
-import {
-	getCurrentPostType,
-	isCurrentPostPublished,
-	isCurrentPostScheduled,
-	isSavingPost,
-	isEditedPostDirty,
-} from '../../store/selectors';
 
 class PostPublishPanel extends Component {
 	constructor() {
@@ -58,10 +51,8 @@ class PostPublishPanel extends Component {
 	}
 
 	onSubmit() {
-		const { user, onClose } = this.props;
-		const userCanPublishPosts = get( user.data, [ 'post_type_capabilities', 'publish_posts' ], false );
-		const isContributor = user.data && ! userCanPublishPosts;
-		if ( isContributor ) {
+		const { onClose, hasPublishAction } = this.props;
+		if ( ! hasPublishAction ) {
 			onClose();
 			return;
 		}
@@ -100,27 +91,23 @@ class PostPublishPanel extends Component {
 	}
 }
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			postType: getCurrentPostType( state ),
-			isPublished: isCurrentPostPublished( state ),
-			isScheduled: isCurrentPostScheduled( state ),
-			isSaving: isSavingPost( state ),
-			isDirty: isEditedPostDirty( state ),
-		};
-	},
-);
-
-const applyWithAPIData = withAPIData( ( props ) => {
-	const { postType } = props;
-
-	return {
-		user: `/wp/v2/users/me?post_type=${ postType }&context=edit`,
-	};
-} );
-
 export default compose( [
-	applyConnect,
-	applyWithAPIData,
+	withSelect( ( select ) => {
+		const {
+			getCurrentPost,
+			getCurrentPostType,
+			isCurrentPostPublished,
+			isCurrentPostScheduled,
+			isSavingPost,
+			isEditedPostDirty,
+		} = select( 'core/editor' );
+		return {
+			postType: getCurrentPostType(),
+			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			isPublished: isCurrentPostPublished(),
+			isScheduled: isCurrentPostScheduled(),
+			isSaving: isSavingPost(),
+			isDirty: isEditedPostDirty(),
+		};
+	} ),
 ] )( PostPublishPanel );

@@ -44,7 +44,7 @@ input[type="search"].editor-inserter__search {
 	}
 
 	&:focus {
-		@include square-style__focus-active;
+		@include square-style__focus;
 	}
 }
 
@@ -162,7 +162,7 @@ input[type="search"].editor-inserter__search {
 		@include square-style__neutral();
 
 		&:focus {
-			@include square-style__focus-active()
+			@include square-style__focus()
 		}
 
 		&:focus:active {
@@ -202,7 +202,7 @@ input[type="search"].editor-inserter__search {
 	&.is-active {
 		padding-bottom: 8px;
 		font-weight: 600;
-		border-bottom: 3px solid $blue-medium-500;
+		border-bottom: 3px solid theme( primary );
 		position: relative;
 		z-index: z-index( '.editor-inserter__tab.is-active' );
 	}
@@ -210,6 +210,6 @@ input[type="search"].editor-inserter__search {
 	&:active,
 	&:focus {
 		z-index: z-index( '.editor-inserter__tab.is-active' );
-		@include square-style__focus-active();
+		@include square-style__focus();
 	}
 }

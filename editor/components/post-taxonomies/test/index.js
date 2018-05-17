@@ -26,6 +26,9 @@ describe( 'PostTaxonomies', () => {
 			types: [ 'book' ],
 			hierarchical: true,
 			rest_base: 'genres',
+			visibility: {
+				show_ui: true,
+			},
 		};
 
 		const categoriesTaxonomy = {
@@ -34,13 +37,14 @@ describe( 'PostTaxonomies', () => {
 			types: [ 'post', 'page' ],
 			hierarchical: true,
 			rest_base: 'categories',
+			visibility: {
+				show_ui: true,
+			},
 		};
 
 		const wrapperOne = shallow(
 			<PostTaxonomies postType="book"
-				taxonomies={ {
-					data: [ genresTaxonomy, categoriesTaxonomy ],
-				} }
+				taxonomies={ [ genresTaxonomy, categoriesTaxonomy ] }
 			/>
 		);
 
@@ -48,18 +52,50 @@ describe( 'PostTaxonomies', () => {
 
 		const wrapperTwo = shallow(
 			<PostTaxonomies postType="book"
-				taxonomies={ {
-					data: [
-						genresTaxonomy,
-						{
-							...categoriesTaxonomy,
-							types: [ 'post', 'page', 'book' ],
-						},
-					],
-				} }
+				taxonomies={ [
+					genresTaxonomy,
+					{
+						...categoriesTaxonomy,
+						types: [ 'post', 'page', 'book' ],
+					},
+				] }
 			/>
 		);
 
 		expect( wrapperTwo.at( 0 ) ).toHaveLength( 2 );
+	} );
+
+	it( 'should not render taxonomy components that hide their ui', () => {
+		const genresTaxonomy = {
+			name: 'Genres',
+			slug: 'genre',
+			types: [ 'book' ],
+			hierarchical: true,
+			rest_base: 'genres',
+			visibility: {
+				show_ui: true,
+			},
+		};
+
+		const wrapperOne = shallow(
+			<PostTaxonomies postType="book"
+				taxonomies={ [ genresTaxonomy ] }
+			/>
+		);
+
+		expect( wrapperOne.at( 0 ) ).toHaveLength( 1 );
+
+		const wrapperTwo = shallow(
+			<PostTaxonomies postType="book"
+				taxonomies={ [
+					{
+						...genresTaxonomy,
+						visibility: { show_ui: false },
+					},
+				] }
+			/>
+		);
+
+		expect( wrapperTwo.at( 0 ) ).toHaveLength( 0 );
 	} );
 } );

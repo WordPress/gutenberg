@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { DropZone, withContext } from '@wordpress/components';
+import { DropZone } from '@wordpress/components';
 import {
 	rawHandler,
 	cloneBlock,
@@ -15,7 +15,7 @@ import {
 	findTransform,
 } from '@wordpress/blocks';
 import { compose, Component } from '@wordpress/element';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -137,8 +137,8 @@ export default compose(
 			},
 		};
 	} ),
-	withContext( 'editor' )( ( settings ) => {
-		const { templateLock } = settings;
+	withSelect( ( select ) => {
+		const { templateLock } = select( 'core/editor' ).getEditorSettings();
 
 		return {
 			isLocked: !! templateLock,

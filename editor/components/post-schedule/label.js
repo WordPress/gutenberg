@@ -1,29 +1,19 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { dateI18n, settings } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
-import { getEditedPostAttribute } from '../../store/selectors';
+import { dateI18n, getSettings } from '@wordpress/date';
+import { withSelect } from '@wordpress/data';
 
 function PostScheduleLabel( { date } ) {
+	const settings = getSettings();
 	return date ?
 		dateI18n( settings.formats.datetime, date ) :
 		__( 'Immediately' );
 }
 
-export default connect(
-	( state ) => {
-		return {
-			date: getEditedPostAttribute( state, 'date' ),
-		};
-	}
-)( PostScheduleLabel );
+export default withSelect( ( select ) => {
+	return {
+		date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
+	};
+} )( PostScheduleLabel );

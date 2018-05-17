@@ -1,21 +1,17 @@
 /**
  * WordPress dependencies
  */
+import { registerCoreBlocks } from '@wordpress/core-blocks';
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import './assets/stylesheets/main.scss';
 import './hooks';
-import Layout from './components/layout';
 import store from './store';
 import { initializeMetaBoxState } from './store/actions';
-
-import PluginMoreMenuItem from './components/plugin-more-menu-item';
-import PluginPrePublishPanel from './components/plugin-pre-publish-panel';
-import PluginPostPublishPanel from './components/plugin-post-publish-panel';
+import Editor from './editor';
 
 /**
  * Configure heartbeat to refresh the wp-api nonce, keeping the editor
@@ -37,15 +33,10 @@ window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
  */
 export function reinitializeEditor( target, settings ) {
 	unmountComponentAtNode( target );
-
 	const reboot = reinitializeEditor.bind( null, target, settings );
 
 	render(
-		<EditorProvider settings={ settings } recovery>
-			<ErrorBoundary onError={ reboot }>
-				<Layout />
-			</ErrorBoundary>
-		</EditorProvider>,
+		<Editor settings={ settings } onError={ reboot } recovery />,
 		target
 	);
 }
@@ -63,15 +54,22 @@ export function reinitializeEditor( target, settings ) {
  * @return {Object} Editor interface.
  */
 export function initializeEditor( id, post, settings ) {
+	if ( 'production' !== process.env.NODE_ENV ) {
+		// Remove with 3.0 release.
+		window.console.info(
+			'`isSelected` usage is no longer mandatory with `BlockControls`, `InspectorControls` and `RichText`. ' +
+			'It is now handled by the editor internally to ensure that controls are visible only when block is selected. ' +
+			'See updated docs: https://github.com/WordPress/gutenberg/blob/master/blocks/README.md#components.'
+		);
+	}
+
 	const target = document.getElementById( id );
 	const reboot = reinitializeEditor.bind( null, target, settings );
 
+	registerCoreBlocks();
+
 	render(
-		<EditorProvider settings={ settings } post={ post }>
-			<ErrorBoundary onError={ reboot }>
-				<Layout />
-			</ErrorBoundary>
-		</EditorProvider>,
+		<Editor settings={ settings } onError={ reboot } post={ post } />,
 		target
 	);
 
@@ -82,10 +80,8 @@ export function initializeEditor( id, post, settings ) {
 	};
 }
 
-export const __experimental = {
-	PluginMoreMenuItem,
-	PluginPrePublishPanel,
-	PluginPostPublishPanel,
-};
-
+export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-status-info';
+export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
+export { default as PluginPrePublishPanel } from './components/sidebar/plugin-post-status-info';
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
+export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';

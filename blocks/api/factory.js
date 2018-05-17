@@ -141,7 +141,7 @@ export function getPossibleBlockTransformations( blocks ) {
 	const blocksToBeTransformedFrom = filter(
 		getBlockTypes(),
 		createIsTypeTransformableFrom( sourceBlockName, isMultiBlock ),
-	).map( type => type.name );
+	).map( ( type ) => type.name );
 
 	const blockType = getBlockType( sourceBlockName );
 	const transformsTo = getBlockTransforms( 'to', blockType.name );
@@ -149,7 +149,7 @@ export function getPossibleBlockTransformations( blocks ) {
 	// Generate list of block transformations using the supplied "transforms to".
 	const blocksToBeTransformedTo = flatMap(
 		isMultiBlock ? filter( transformsTo, 'isMultiBlock' ) : transformsTo,
-		transformation => transformation.blocks
+		( transformation ) => transformation.blocks
 	);
 
 	// Returns a unique list of available block transformations.
@@ -256,11 +256,11 @@ export function switchToBlockType( blocks, name ) {
 	const transformation =
 		findTransform(
 			transformationsTo,
-			t => t.type === 'block' && t.blocks.indexOf( name ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
+			( t ) => t.type === 'block' && t.blocks.indexOf( name ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
 		) ||
 		findTransform(
 			transformationsFrom,
-			t => t.type === 'block' && t.blocks.indexOf( sourceName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
+			( t ) => t.type === 'block' && t.blocks.indexOf( sourceName ) !== -1 && ( ! isMultiBlock || t.isMultiBlock )
 		);
 
 	// Stop if there is no valid transformation.
