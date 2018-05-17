@@ -437,7 +437,8 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		$item_route = $this->detect_rest_item_route( $post );
 		if ( ! empty( $item_route ) ) {
 			$links['self'] = array(
-				'href' => rest_url( $item_route ),
+				'href'       => rest_url( $item_route ),
+				'embeddable' => true,
 			);
 		}
 
