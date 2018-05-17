@@ -9,7 +9,7 @@ import { EditorProvider, ErrorBoundary } from '@wordpress/editor';
  */
 import Layout from './components/layout';
 
-function Editor( { settings, hasFixedToolbar, post, defaultPost, onError, ...props } ) {
+function Editor( { settings, hasFixedToolbar, post, overridePost, onError, ...props } ) {
 	if ( ! post ) {
 		return null;
 	}
@@ -20,7 +20,7 @@ function Editor( { settings, hasFixedToolbar, post, defaultPost, onError, ...pro
 	};
 
 	return (
-		<EditorProvider settings={ editorSettings } post={ { ...post, ...defaultPost } } { ...props }>
+		<EditorProvider settings={ editorSettings } post={ { ...post, ...overridePost } } { ...props }>
 			<ErrorBoundary onError={ onError }>
 				<Layout />
 			</ErrorBoundary>
