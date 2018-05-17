@@ -1,4 +1,9 @@
 /**
+ * External Dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component, compose } from '@wordpress/element';
@@ -6,10 +11,10 @@ import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
-		const { isDirty, isSaveable } = this.props;
+		const { isPostSaveable, isDirty, isSaveable } = this.props;
 		if ( prevProps.isDirty !== isDirty ||
 				prevProps.isSaveable !== isSaveable ) {
-			this.toggleTimer( isDirty && isSaveable );
+			this.toggleTimer( isPostSaveable && isDirty && isSaveable );
 		}
 	}
 
@@ -35,10 +40,15 @@ export class AutosaveMonitor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditedPostDirty, isEditedPostSaveable } = select( 'core/editor' );
+		const { isEditedPostDirty, isEditedPostSaveable, getCurrentPost } = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
+
+		const post = getCurrentPost();
+
 		return {
 			isDirty: isEditedPostDirty(),
 			isSaveable: isEditedPostSaveable(),
+			isPostSaveable: get( getPostType( post.type ), [ 'saveable' ], true ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
