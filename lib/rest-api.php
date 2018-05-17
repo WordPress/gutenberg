@@ -729,8 +729,8 @@ function gutenberg_filter_request_after_callbacks( $response, $handler, $request
 		if ( 'rest_cannot_create' === $response->get_error_code()
 			&& is_array( $handler['permission_callback'] )
 			&& is_a( $handler['permission_callback'][0], 'WP_REST_Terms_Controller' ) ) {
-			$schema = $handler['permission_callback'][0]->get_item_schema();
-			$taxonomy = 'tag' === $schema['title'] ? 'post_tag' : $schema['title'];
+			$schema       = $handler['permission_callback'][0]->get_item_schema();
+			$taxonomy     = 'tag' === $schema['title'] ? 'post_tag' : $schema['title'];
 			$taxonomy_obj = get_taxonomy( $taxonomy );
 			if ( ! is_taxonomy_hierarchical( $taxonomy_obj->name )
 				&& current_user_can( $taxonomy_obj->cap->assign_terms ) ) {
