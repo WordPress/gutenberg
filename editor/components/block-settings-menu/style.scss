@@ -16,10 +16,10 @@
 	border-radius: $button-style__radius-roundrect;
 
 	// use opacity to work in various editor styles
-	color: $dark-opacity-300;
+	color: $dark-opacity-500;
 
 	.is-dark-theme & {
-		color: $light-opacity-300;
+		color: $light-opacity-500;
 	}
 
 	// Apply a background in nested contexts, only on desktop
