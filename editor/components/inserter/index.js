@@ -56,7 +56,7 @@ class Inserter extends Component {
 		return (
 			<Dropdown
 				className="editor-inserter"
-				contentClassName="editor-inseter__popover"
+				contentClassName="editor-inserter__popover"
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile

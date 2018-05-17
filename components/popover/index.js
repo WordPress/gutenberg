@@ -15,7 +15,6 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
-import withSafeTimeout from '../higher-order/with-safe-timeout';
 import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
@@ -210,11 +209,12 @@ class Popover extends Component {
 			contentWidth = chosenXAxis === 'left' ? leftAlignment.contentWidth : rightAlignment.contentWidth;
 		}
 
+		const popoverTop = chosenYAxis === 'top' ? topAlignment.popoverTop : bottomAlignment.popoverTop;
 		const newPopoverPosition = {
 			isMobile: isMobileViewport() && expandOnMobile,
 			yAxis: chosenYAxis,
 			xAxis: chosenXAxis,
-			popoverTop: chosenYAxis === 'top' ? topAlignment.popoverTop : bottomAlignment.popoverTop,
+			popoverTop,
 			popoverLeft,
 			contentHeight,
 			contentWidth,
@@ -224,6 +224,10 @@ class Popover extends Component {
 			! this.state.popoverLeft ||
 			this.state.yAxis !== chosenYAxis ||
 			this.state.xAxis !== chosenXAxis ||
+			this.state.popoverLeft !== popoverLeft ||
+			this.state.popoverTop !== popoverTop ||
+			this.state.contentHeight !== contentHeight ||
+			this.state.contentWidth !== contentWidth ||
 			this.state.isMobile !== newPopoverPosition.isMobile
 		) {
 			this.setState( newPopoverPosition );
@@ -349,7 +353,7 @@ class Popover extends Component {
 	}
 }
 
-const PopoverContainer = withSafeTimeout( Popover );
+const PopoverContainer = Popover;
 
 PopoverContainer.contextTypes = {
 	getSlot: noop,
