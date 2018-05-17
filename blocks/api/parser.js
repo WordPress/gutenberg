@@ -12,7 +12,7 @@ import { autop } from '@wordpress/autop';
 /**
  * Internal dependencies
  */
-import { parse as grammarParse } from './post.pegjs';
+import { parse as grammarParse } from './post-parser';
 import { getBlockType, getUnknownTypeHandlerName } from './registration';
 import { createBlock } from './factory';
 import { isValidBlock } from './validation';
