@@ -9,6 +9,7 @@ This package is based on [Gutenberg v2.8.0](https://github.com/WordPress/gutenbe
 ## Table of contents
 * [Installation](#installation)
 * [Usage](#usage)
+    * [getPostContent](#getpostcontent)
 * [Global variables](#global-variables)
     * [apiRequest](#apirequest)
         * [GET types](#get-types)
@@ -78,6 +79,22 @@ initializeEditor( target, page, settings );
 ```
 
 **Note**: Gutenberg requires utf-8 encoding, so don't forget to add `<meta charset="utf-8">` tag to your html `<head>`.
+
+### getPostContent
+
+Additionally, after initializing the editor, you can get the content of the post, calling **Gutenberg by Frontkom** `getPostContent` method:
+
+```js
+// Importing getPostContent method from @frontkom/gutenberg package
+import { getPostContent } from '@frontkom/gutenberg';
+
+console.log( getPostContent );
+
+// <!-- wp:paragraph -->
+// <p>Hello</p>
+// <!-- /wp:paragraph -->
+
+```
 
 ## Global variables 
 
