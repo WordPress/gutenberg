@@ -156,7 +156,6 @@ class Popover extends Component {
 		);
 
 		if (
-			! this.state.popoverLeft ||
 			this.state.yAxis !== newPopoverPosition.yAxis ||
 			this.state.xAxis !== newPopoverPosition.xAxis ||
 			this.state.popoverLeft !== newPopoverPosition.popoverLeft ||
