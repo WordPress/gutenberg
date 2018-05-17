@@ -98,7 +98,7 @@ function register_block_core_archives() {
 			),
 			'align'             => array(
 				'type'    => 'string',
-				'default' => 'left',
+				'default' => 'none',
 			),
 		),
 		'render_callback' => 'render_block_core_archives',
