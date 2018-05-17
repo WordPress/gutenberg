@@ -1,12 +1,13 @@
 {
   "name": "@frontkom/gutenberg",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Gutenberg by Frontkom - A custom Gutenberg",
   "main": "dist/gutenberg.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/front/gutenberg.git"
   },
+  "homepage": "https://github.com/front/gutenberg/tree/master/g-package/README.md",
   "author": "The Frontkom Contributors",
   "license": "GPL-2.0-or-later",
   "keywords": [

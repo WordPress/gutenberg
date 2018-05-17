@@ -113,15 +113,6 @@ window.wp = {
     ...,
 };
 
-// set your locale
-window._wpDateSettings = { 
-    l10n: { 
-        locale: 'pt_PT',
-        ...,
-    },
-    ...,
-};
-
 // set your root path
 window.wpApiSettings = { 
     root: 'YOUR_ROOT_PATH',
