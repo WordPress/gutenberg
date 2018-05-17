@@ -7,7 +7,7 @@
  * @param {?string} options.alternative Feature to use instead
  * @param {?string} options.plugin      Plugin name if it's a plugin feature
  * @param {?string} options.link        Link to documentation
- * @param {?string} options.hint		Additional message to help transition away from the deprecated feature.
+ * @param {?string} options.hint        Additional message to help transition away from the deprecated feature.
  */
 export function deprecated( feature, { version, alternative, plugin, link, hint } = {} ) {
 	const pluginMessage = plugin ? ` from ${ plugin }` : '';
