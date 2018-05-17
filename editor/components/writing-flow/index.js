@@ -15,7 +15,7 @@ import {
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
-	isFullySelected,
+	isEntirelySelected,
 } from '@wordpress/dom';
 import { keycodes } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -202,23 +202,23 @@ class WritingFlow extends Component {
 		}
 
 		if ( ! isNav ) {
-			const activeElement = document.activeElement;
-
-			// Set right before the meta+a combination can be pressed.
+			// Set immediately before the meta+a combination can be pressed.
 			if ( is.primary( event ) ) {
-				this.isFullySelected = isFullySelected( activeElement );
+				this.isEntirelySelected = isEntirelySelected( target );
 			}
 
 			if ( is.primary( event, 'a' ) ) {
-				// In the case of contentEditable, we want to know the earlier value
-				// because the selection will have already been set by TinyMCE.
-				if ( activeElement.isContentEditable ? this.isFullySelected : isFullySelected( activeElement ) ) {
+				// When the target is contentEditable, selection will already
+				// have been set by TinyMCE earlier in this call stack. We need
+				// check the previous result, otherwise all blocks will be
+				// selected right away.
+				if ( target.isContentEditable ? this.isEntirelySelected : isEntirelySelected( target ) ) {
 					onMultiSelect( first( blocks ), last( blocks ) );
 					event.preventDefault();
 				}
 
 				// Set in case the meta key doesn't get released.
-				this.isFullySelected = isFullySelected( activeElement );
+				this.isEntirelySelected = isEntirelySelected( target );
 			}
 
 			return;

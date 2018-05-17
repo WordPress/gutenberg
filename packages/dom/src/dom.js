@@ -396,14 +396,14 @@ export function documentHasSelection() {
 }
 
 /**
- * Check wether the contents of the element have been fully selected.
- * Returns true if there is no possibility of full selection.
+ * Check whether the contents of the element have been entirely selected.
+ * Returns true if there is no possibility of selection.
  *
  * @param {Element} element The element to check.
  *
  * @return {boolean} True if fully selected, false if not.
  */
-export function isFullySelected( element ) {
+export function isEntirelySelected( element ) {
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], element.nodeName ) ) {
 		return element.selectionStart === 0 && element.value.length === element.selectionEnd;
 	}
