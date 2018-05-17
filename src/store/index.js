@@ -3,14 +3,19 @@
  * @flow
  */
 
-import { parse } from './post-grammar-gb';
-
 // Gutenberg imports
 import { registerCoreBlocks } from '@gutenberg/core-blocks';
-import { createBlock, serialize } from '@gutenberg/blocks';
+import { createBlock, serialize, parse } from '@gutenberg/blocks';
 
 import { createStore } from 'redux';
 import { reducer } from './reducers';
+
+import jsdom from 'jsdom-jscore';
+
+global.document = jsdom.html( '', null, null );
+global.document.implementation.createHTMLDocument = function( html ) {
+	return jsdom.html( html, null, null );
+};
 
 export type BlockType = {
 	uid: string,
