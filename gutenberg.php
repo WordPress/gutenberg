@@ -472,7 +472,7 @@ function gutenberg_replace_default_add_new_button() {
 			<?php endif; ?>
 		}
 
-		.expander {
+		.split-page-title-action .expander {
 			outline: none;
 		}
 
