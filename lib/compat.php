@@ -170,7 +170,6 @@ function gutenberg_shim_api_request_emulate_http( $scripts ) {
 					options.headers = {};
 				}
 				options.headers['X-HTTP-Method-Override'] = options.method;
-				options.headers['X-WP-Source'] = 'Gutenberg';
 				options.method = 'POST';
 
 				options.contentType = 'application/json';
