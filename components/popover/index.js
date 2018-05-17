@@ -7,7 +7,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { keycodes } from '@wordpress/utils';
 
@@ -15,6 +15,7 @@ import { keycodes } from '@wordpress/utils';
  * Internal dependencies
  */
 import './style.scss';
+import { computePopoverPosition } from './utils';
 import withFocusReturn from '../higher-order/with-focus-return';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
@@ -31,20 +32,19 @@ const { ESCAPE } = keycodes;
  * @type {String}
  */
 const SLOT_NAME = 'Popover';
-const isMobileViewport = () => window.innerWidth < 782;
 
 class Popover extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.focus = this.focus.bind( this );
-		this.bindNode = this.bindNode.bind( this );
 		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.computePopoverPosition = this.computePopoverPosition.bind( this );
 		this.throttledComputePopoverPosition = this.throttledComputePopoverPosition.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
 
-		this.nodes = {};
+		this.contentNode = createRef();
+		this.anchorNode = createRef();
 
 		this.state = {
 			popoverLeft: null,
@@ -84,7 +84,7 @@ class Popover extends Component {
 	}
 
 	throttledComputePopoverPosition( event ) {
-		if ( event.type === 'scroll' && this.nodes.content.contains( event.target ) ) {
+		if ( event.type === 'scroll' && this.contentNode.current.contains( event.target ) ) {
 			return;
 		}
 		this.rafHandle = window.requestAnimationFrame( () => this.computePopoverPosition() );
@@ -96,23 +96,22 @@ class Popover extends Component {
 			return;
 		}
 
-		const { content } = this.nodes;
-		if ( ! content ) {
+		if ( ! this.contentNode.current ) {
 			return;
 		}
 
 		// Find first tabbable node within content and shift focus, falling
 		// back to the popover panel itself.
-		const firstTabbable = focus.tabbable.find( content )[ 0 ];
+		const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
 		if ( firstTabbable ) {
 			firstTabbable.focus();
 		} else {
-			content.focus();
+			this.contentNode.current.focus();
 		}
 	}
 
 	getAnchorRect() {
-		const { anchor } = this.nodes;
+		const anchor = this.anchorNode.current;
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
 		}
@@ -134,8 +133,7 @@ class Popover extends Component {
 	}
 
 	updatePopoverSize() {
-		const { content } = this.nodes;
-		const rect = content.getBoundingClientRect();
+		const rect = this.contentNode.current.getBoundingClientRect();
 		if (
 			! this.state.popoverSize ||
 			rect.width !== this.state.popoverSize.width ||
@@ -152,82 +150,19 @@ class Popover extends Component {
 	}
 
 	computePopoverPosition( popoverSize ) {
-		const { width, height } = popoverSize || this.state.popoverSize;
 		const { getAnchorRect = this.getAnchorRect, position = 'top', expandOnMobile } = this.props;
-		const [ yAxis, xAxis = 'center' ] = position.split( ' ' );
-
-		const rect = getAnchorRect();
-		const popoverLeft = Math.round( rect.left + ( rect.width / 2 ) );
-
-		// y axis aligment choices
-		const topAlignment = {
-			popoverTop: rect.top,
-			contentHeight: rect.top - height > 0 ? height : rect.top,
-		};
-		const bottomAlignment = {
-			popoverTop: rect.bottom,
-			contentHeight: rect.bottom + height > window.innerHeight ? window.innerHeight - rect.bottom : height,
-		};
-
-		// x axis alignment choices
-		const centerAlignment = {
-			contentWidth: (
-				( popoverLeft - ( width / 2 ) > 0 ? ( width / 2 ) : popoverLeft ) +
-				( popoverLeft + ( width / 2 ) > window.innerWidth ? window.innerWidth - popoverLeft : ( width / 2 ) )
-			),
-		};
-		const leftAlignment = {
-			contentWidth: popoverLeft - width > 0 ? width : popoverLeft,
-		};
-		const rightAlignment = {
-			contentWidth: popoverLeft + width > window.innerWidth ? window.innerWidth - popoverLeft : width,
-		};
-
-		// Choosing the y axis
-		let chosenYAxis;
-		let contentHeight = null;
-		if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
-			chosenYAxis = 'top';
-		} else if ( yAxis === 'bottom' && bottomAlignment.contentHeight === height ) {
-			chosenYAxis = 'bottom';
-		} else {
-			chosenYAxis = topAlignment.contentHeight > bottomAlignment.contentHeight ? 'top' : 'bottom';
-			contentHeight = chosenYAxis === 'top' ? topAlignment.contentHeight : bottomAlignment.contentHeight;
-		}
-
-		// Choosing the x axis
-		let chosenXAxis;
-		let contentWidth = null;
-		if ( xAxis === 'center' && centerAlignment.contentWidth === width ) {
-			chosenXAxis = 'center';
-		} else if ( xAxis === 'left' && leftAlignment.contentWidth === width ) {
-			chosenXAxis = 'left';
-		} else if ( xAxis === 'right' && rightAlignment.contentWidth === width ) {
-			chosenXAxis = 'right';
-		} else {
-			chosenXAxis = leftAlignment.contentWidth > rightAlignment.contentWidth ? 'left' : 'right';
-			contentWidth = chosenXAxis === 'left' ? leftAlignment.contentWidth : rightAlignment.contentWidth;
-		}
-
-		const popoverTop = chosenYAxis === 'top' ? topAlignment.popoverTop : bottomAlignment.popoverTop;
-		const newPopoverPosition = {
-			isMobile: isMobileViewport() && expandOnMobile,
-			yAxis: chosenYAxis,
-			xAxis: chosenXAxis,
-			popoverTop,
-			popoverLeft,
-			contentHeight,
-			contentWidth,
-		};
+		const newPopoverPosition = computePopoverPosition(
+			getAnchorRect(), popoverSize || this.state.popoverSize, position, expandOnMobile
+		);
 
 		if (
 			! this.state.popoverLeft ||
-			this.state.yAxis !== chosenYAxis ||
-			this.state.xAxis !== chosenXAxis ||
-			this.state.popoverLeft !== popoverLeft ||
-			this.state.popoverTop !== popoverTop ||
-			this.state.contentHeight !== contentHeight ||
-			this.state.contentWidth !== contentWidth ||
+			this.state.yAxis !== newPopoverPosition.yAxis ||
+			this.state.xAxis !== newPopoverPosition.xAxis ||
+			this.state.popoverLeft !== newPopoverPosition.popoverLeft ||
+			this.state.popoverTop !== newPopoverPosition.popoverTop ||
+			this.state.contentHeight !== newPopoverPosition.contentHeight ||
+			this.state.contentWidth !== newPopoverPosition.contentWidth ||
 			this.state.isMobile !== newPopoverPosition.isMobile
 		) {
 			this.setState( newPopoverPosition );
@@ -247,10 +182,6 @@ class Popover extends Component {
 		if ( onKeyDown ) {
 			onKeyDown( event );
 		}
-	}
-
-	bindNode( name ) {
-		return ( node ) => this.nodes[ name ] = node;
 	}
 
 	render() {
@@ -299,7 +230,6 @@ class Popover extends Component {
 		let content = (
 			<PopoverDetectOutside onClickOutside={ onClickOutside }>
 				<div
-					ref={ this.bindNode( 'popover' ) }
 					className={ classes }
 					style={ {
 						top: ! isMobile && popoverTop ? popoverTop + 'px' : undefined,
@@ -318,7 +248,7 @@ class Popover extends Component {
 						</div>
 					) }
 					<div
-						ref={ this.bindNode( 'content' ) }
+						ref={ this.contentNode }
 						className="components-popover__content"
 						style={ {
 							maxHeight: ! isMobile && contentHeight ? contentHeight + 'px' : undefined,
@@ -346,7 +276,7 @@ class Popover extends Component {
 			content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
 		}
 
-		return <span ref={ this.bindNode( 'anchor' ) }>
+		return <span ref={ this.anchorNode }>
 			{ content }
 			{ isMobile && expandOnMobile && <ScrollLock /> }
 		</span>;
