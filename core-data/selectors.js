@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import createSelector from 'rememo';
 import { map } from 'lodash';
 
 /**
@@ -70,11 +71,14 @@ export function getAuthors( state ) {
  *
  * @return {Array} Users list.
  */
-export function getUserQueryResults( state, queryID ) {
-	const queryResults = state.users.queries[ queryID ];
+export const getUserQueryResults = createSelector(
+	( state, queryID ) => {
+		const queryResults = state.users.queries[ queryID ];
 
-	return map( queryResults, ( id ) => state.users.byId[ id ] );
-}
+		return map( queryResults, ( id ) => state.users.byId[ id ] );
+	},
+	( state, queryID ) => [ state.users.queries[ queryID ], state.users.byId ]
+);
 
 /**
  * Returns the Entity's record object by key.
