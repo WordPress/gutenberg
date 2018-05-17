@@ -115,8 +115,8 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		 * present in $registered will be set.
 		 */
 		$parameter_mappings = array(
-			'page'    => 'paged',
-			'search'  => 's',
+			'page'   => 'paged',
+			'search' => 's',
 		);
 
 		/*
@@ -341,20 +341,20 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			'title'      => 'search',
 			'type'       => 'object',
 			'properties' => array(
-				'id'           => array(
+				'id'    => array(
 					'description' => __( 'Unique identifier for the object.', 'gutenberg' ),
 					'type'        => 'integer',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
-				'link'         => array(
+				'link'  => array(
 					'description' => __( 'URL to the object.', 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'uri',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
-				'title'        => array(
+				'title' => array(
 					'description' => __( 'The title for the object.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit', 'embed' ),
@@ -373,7 +373,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 						),
 					),
 				),
-				'type'         => array(
+				'type'  => array(
 					'description' => __( 'Type of the object.', 'gutenberg' ),
 					'type'        => 'string',
 					'enum'        => array_keys( $this->get_allowed_post_types() ),
