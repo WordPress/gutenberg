@@ -168,12 +168,13 @@ export function registerBlockType( name, settings ) {
 		set( settings, [ 'supports', 'multiple' ], ! settings.useOnce );
 	}
 
-	const blockTypeDefinition = omit( settings, [ 'transforms', 'edit', 'save', 'icon', 'getEditWrapperProps' ] );
+	const implementationOnlyAttributes = [ 'transforms', 'edit', 'save', 'icon', 'getEditWrapperProps' ];
+	const blockTypeDefinition = omit( settings, implementationOnlyAttributes );
 	blockTypeDefinition.attributes = mapValues(
 		settings.attributes,
 		( attribute ) => pick( attribute, [ 'type', 'default' ] )
 	);
-	const blockTypeImplementation = pick( settings, [ 'name', 'transforms', 'edit', 'save', 'icon', 'getEditWrapperProps' ] );
+	const blockTypeImplementation = pick( settings, [ 'name' ].concat( implementationOnlyAttributes ) );
 	blockTypeImplementation.attributes = mapValues(
 		settings.attributes,
 		( attribute ) => omit( attribute, [ 'type', 'default' ] )
