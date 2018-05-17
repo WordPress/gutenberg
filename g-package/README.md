@@ -45,9 +45,9 @@ import './globals';
 import { initializeEditor } from '@frontkom/gutenberg';
 
 // Don't forget to import the style
-import '@frontkom/gutenberg/dist/blocks/style.css';
-import '@frontkom/gutenberg/dist/blocks/edit-blocks.css';
-import '@frontkom/gutenberg/dist/style.css';
+import '@frontkom/gutenberg/dist/css/blocks/style.css';
+import '@frontkom/gutenberg/dist/css/blocks/edit-blocks.css';
+import '@frontkom/gutenberg/dist/css/style.css';
 
 // DOM element id where editor will be displayed
 const target = 'editor'; 
