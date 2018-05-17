@@ -127,3 +127,28 @@ const MyPluginPostStatusInfo = () => (
 ```
 
 
+### PluginPrePublishPanel
+**Experimental**
+
+Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when user first pushes "Publish" from main editor).
+
+#### Usage
+
+```jsx
+<PluginPrePublishPanel>
+    <div>My plugin content</div>
+</PluginPrePublishPanel>
+```
+
+### PluginPostPublishPanel
+**Experimental**
+
+Renders provided content to the post-publish panel in the publish flow (panel that opens after user publishes the post)
+
+#### Usage
+
+```jsx
+<PluginPostPublishPanel>
+    <div>My plugin content</div>
+</PluginPostPublishPanel>
+```

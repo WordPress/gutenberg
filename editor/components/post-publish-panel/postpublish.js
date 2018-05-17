@@ -84,6 +84,7 @@ class PostPublishPanelPostpublish extends Component {
 						</ClipboardButton>
 					</div>
 				</PanelBody>
+				{ this.props.children }
 			</div>
 		);
 	}

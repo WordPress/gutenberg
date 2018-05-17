@@ -35,6 +35,8 @@ import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import Sidebar from '../sidebar';
+import PluginPostPublishPanel from '../plugin-post-publish-panel';
+import PluginPrePublishPanel from '../plugin-pre-publish-panel';
 
 function Layout( {
 	mode,
@@ -84,7 +86,11 @@ function Layout( {
 					onClose={ closePublishSidebar }
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
-				/>
+					prePublishExtension={ <PluginPrePublishPanel.Slot /> }
+					postPublishExtension={ <PluginPostPublishPanel.Slot /> }
+				>
+					<PluginPostPublishPanel.Slot />
+				</PostPublishPanel>
 			) }
 			<DocumentSidebar />
 			<BlockSidebar />

@@ -12,7 +12,7 @@ import PostVisibilityLabel from '../post-visibility/label';
 import PostSchedule from '../post-schedule';
 import PostScheduleLabel from '../post-schedule/label';
 
-function PostPublishPanelPrepublish() {
+function PostPublishPanelPrepublish( props ) {
 	return (
 		<div className="editor-post-publish-panel__prepublish">
 			<div><strong>{ __( 'Are you ready to publish?' ) }</strong></div>
@@ -29,6 +29,7 @@ function PostPublishPanelPrepublish() {
 			] }>
 				<PostSchedule />
 			</PanelBody>
+			{ props.children }
 		</div>
 	);
 }

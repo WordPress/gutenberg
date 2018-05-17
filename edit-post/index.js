@@ -80,6 +80,8 @@ export function initializeEditor( id, post, settings ) {
 	};
 }
 
+export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-status-info';
 export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
+export { default as PluginPrePublishPanel } from './components/sidebar/plugin-post-status-info';
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
