@@ -63,8 +63,8 @@ import {
 	getSelectedBlock,
 	isBlockSelected,
 	getTemplate,
-	POST_UPDATE_TRANSACTION_ID,
 	getTemplateLock,
+	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
 /**
@@ -324,8 +324,11 @@ export default {
 
 		dispatch( savePost() );
 	},
-	SETUP_EDITOR( action ) {
-		const { post, settings } = action;
+	SETUP_EDITOR( action, { getState } ) {
+		const { post } = action;
+		const state = getState();
+		const template = getTemplate( state );
+		const templateLock = getTemplateLock( state );
 
 		// Parse content as blocks
 		let blocks;
@@ -335,12 +338,12 @@ export default {
 
 			// Unlocked templates are considered always valid because they act as default values only.
 			isValidTemplate = (
-				! settings.template ||
-				settings.templateLock !== 'all' ||
-				doBlocksMatchTemplate( blocks, settings.template )
+				! template ||
+				templateLock !== 'all' ||
+				doBlocksMatchTemplate( blocks, template )
 			);
-		} else if ( settings.template ) {
-			blocks = synchronizeBlocksWithTemplate( [], settings.template );
+		} else if ( template ) {
+			blocks = synchronizeBlocksWithTemplate( [], template );
 		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
 			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
 		} else {
@@ -398,7 +401,7 @@ export default {
 		if ( id ) {
 			result = wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
 		} else {
-			result = wp.apiRequest( { path: `/wp/v2/${ basePath }` } );
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }?per_page=-1` } );
 		}
 
 		result.then(

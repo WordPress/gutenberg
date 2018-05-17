@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { findKey, isFinite, map, omit } from 'lodash';
+import { isFinite, find, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,31 +16,26 @@ import {
 	RawHTML,
 } from '@wordpress/element';
 import {
+	FontSizePicker,
 	PanelBody,
-	RangeControl,
 	ToggleControl,
-	Button,
-	ButtonGroup,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
-	createBlock,
 	getColorClass,
 	withColors,
 	AlignmentToolbar,
-	BlockAlignmentToolbar,
 	BlockControls,
 	ContrastChecker,
 	InspectorControls,
 	PanelColor,
 	RichText,
-	getPhrasingContentSchema,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import './editor.scss';
 import './style.scss';
 
 const { getComputedStyle } = window;
@@ -57,12 +52,28 @@ const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	};
 } );
 
-const FONT_SIZES = {
-	small: 14,
-	regular: 16,
-	large: 36,
-	larger: 48,
-};
+const FONT_SIZES = [
+	{
+		name: 'small',
+		shortName: 'S',
+		size: 14,
+	},
+	{
+		name: 'regular',
+		shortName: 'M',
+		size: 16,
+	},
+	{
+		name: 'large',
+		shortName: 'L',
+		size: 36,
+	},
+	{
+		name: 'larger',
+		shortName: 'XL',
+		size: 48,
+	},
+];
 
 class ParagraphBlock extends Component {
 	constructor() {
@@ -99,7 +110,10 @@ class ParagraphBlock extends Component {
 	getFontSize() {
 		const { customFontSize, fontSize } = this.props.attributes;
 		if ( fontSize ) {
-			return FONT_SIZES[ fontSize ];
+			const fontSizeObj = find( FONT_SIZES, { name: fontSize } );
+			if ( fontSizeObj ) {
+				return fontSizeObj.size;
+			}
 		}
 
 		if ( customFontSize ) {
@@ -109,10 +123,10 @@ class ParagraphBlock extends Component {
 
 	setFontSize( fontSizeValue ) {
 		const { setAttributes } = this.props;
-		const thresholdFontSize = findKey( FONT_SIZES, ( size ) => size === fontSizeValue );
+		const thresholdFontSize = find( FONT_SIZES, { size: fontSizeValue } );
 		if ( thresholdFontSize ) {
 			setAttributes( {
-				fontSize: thresholdFontSize,
+				fontSize: thresholdFontSize.name,
 				customFontSize: undefined,
 			} );
 			return;
@@ -145,7 +159,6 @@ class ParagraphBlock extends Component {
 			content,
 			dropCap,
 			placeholder,
-			width,
 		} = attributes;
 
 		const fontSize = this.getFontSize();
@@ -162,42 +175,11 @@ class ParagraphBlock extends Component {
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
-						<div className="blocks-font-size__main">
-							<ButtonGroup aria-label={ __( 'Font Size' ) }>
-								{ map( {
-									S: 'small',
-									M: 'regular',
-									L: 'large',
-									XL: 'larger',
-								}, ( size, label ) => (
-									<Button
-										key={ label }
-										isLarge
-										isPrimary={ fontSize === FONT_SIZES[ size ] }
-										aria-pressed={ fontSize === FONT_SIZES[ size ] }
-										onClick={ () => this.setFontSize( FONT_SIZES[ size ] ) }
-									>
-										{ label }
-									</Button>
-								) ) }
-							</ButtonGroup>
-							<Button
-								isLarge
-								onClick={ () => this.setFontSize( undefined ) }
-							>
-								{ __( 'Reset' ) }
-							</Button>
-						</div>
-						<RangeControl
-							className="blocks-paragraph__custom-size-slider"
-							label={ __( 'Custom Size' ) }
-							value={ fontSize || '' }
-							initialPosition={ fallbackFontSize }
-							onChange={ ( value ) => this.setFontSize( value ) }
-							min={ 12 }
-							max={ 100 }
-							beforeIcon="editor-textcolor"
-							afterIcon="editor-textcolor"
+						<FontSizePicker
+							fontSizes={ FONT_SIZES }
+							fallbackFontSize={ fallbackFontSize }
+							value={ fontSize }
+							onChange={ this.setFontSize }
 						/>
 						<ToggleControl
 							label={ __( 'Drop Cap' ) }
@@ -207,19 +189,16 @@ class ParagraphBlock extends Component {
 						/>
 					</PanelBody>
 					<PanelColor
-						colorName={ backgroundColor.name }
 						colorValue={ backgroundColor.value }
 						initialOpen={ false }
 						title={ __( 'Background Color' ) }
 						onChange={ setBackgroundColor }
 					/>
 					<PanelColor
-						colorName={ textColor.name }
 						colorValue={ textColor.value }
 						initialOpen={ false }
 						title={ __( 'Text Color' ) }
 						onChange={ setTextColor }
-						value={ textColor.value }
 					/>
 					<ContrastChecker
 						textColor={ textColor.value }
@@ -230,12 +209,6 @@ class ParagraphBlock extends Component {
 						} }
 						isLargeText={ fontSize >= 18 }
 					/>
-					<PanelBody title={ __( 'Block Alignment' ) }>
-						<BlockAlignmentToolbar
-							value={ width }
-							onChange={ ( nextWidth ) => setAttributes( { width: nextWidth } ) }
-						/>
-					</PanelBody>
 				</InspectorControls>
 				<div>
 					<RichText
@@ -300,9 +273,6 @@ const schema = {
 	placeholder: {
 		type: 'string',
 	},
-	width: {
-		type: 'string',
-	},
 	textColor: {
 		type: 'string',
 	},
@@ -328,7 +298,7 @@ export const name = 'core/paragraph';
 export const settings = {
 	title: __( 'Paragraph' ),
 
-	description: __( 'This is a simple text only block for adding a single paragraph of content.' ),
+	description: __( 'Add some basic text.' ),
 
 	icon: 'editor-paragraph',
 
@@ -344,6 +314,8 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
+				// Paragraph is a fallback and should be matched last.
+				priority: 20,
 				selector: 'p',
 				schema: {
 					p: {
@@ -355,6 +327,58 @@ export const settings = {
 	},
 
 	deprecated: [
+		{
+			supports,
+			attributes: {
+				...schema,
+				width: {
+					type: 'string',
+				},
+			},
+			save( { attributes } ) {
+				const {
+					width,
+					align,
+					content,
+					dropCap,
+					backgroundColor,
+					textColor,
+					customBackgroundColor,
+					customTextColor,
+					fontSize,
+					customFontSize,
+				} = attributes;
+
+				const textClass = getColorClass( 'color', textColor );
+				const backgroundClass = getColorClass( 'background-color', backgroundColor );
+				const fontSizeClass = fontSize && `is-${ fontSize }-text`;
+
+				const className = classnames( {
+					[ `align${ width }` ]: width,
+					'has-background': backgroundColor || customBackgroundColor,
+					'has-drop-cap': dropCap,
+					[ fontSizeClass ]: fontSizeClass,
+					[ textClass ]: textClass,
+					[ backgroundClass ]: backgroundClass,
+				} );
+
+				const styles = {
+					backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+					color: textClass ? undefined : customTextColor,
+					fontSize: fontSizeClass ? undefined : customFontSize,
+					textAlign: align,
+				};
+
+				return (
+					<RichText.Content
+						tagName="p"
+						style={ styles }
+						className={ className ? className : undefined }
+						value={ content }
+					/>
+				);
+			},
+		},
 		{
 			supports,
 			attributes: omit( {
@@ -438,7 +462,6 @@ export const settings = {
 
 	save( { attributes } ) {
 		const {
-			width,
 			align,
 			content,
 			dropCap,
@@ -452,10 +475,9 @@ export const settings = {
 
 		const textClass = getColorClass( 'color', textColor );
 		const backgroundClass = getColorClass( 'background-color', backgroundColor );
-		const fontSizeClass = fontSize && FONT_SIZES[ fontSize ] && `is-${ fontSize }-text`;
+		const fontSizeClass = fontSize && `is-${ fontSize }-text`;
 
 		const className = classnames( {
-			[ `align${ width }` ]: width,
 			'has-background': backgroundColor || customBackgroundColor,
 			'has-drop-cap': dropCap,
 			[ fontSizeClass ]: fontSizeClass,

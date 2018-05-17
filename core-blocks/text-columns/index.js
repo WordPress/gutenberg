@@ -1,20 +1,20 @@
 /**
  * External dependencies
  */
-import { times } from 'lodash';
+import { get, times } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl, withState } from '@wordpress/components';
+import { PanelBody, RangeControl } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	InspectorControls,
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -27,7 +27,7 @@ export const name = 'core/text-columns';
 export const settings = {
 	title: __( 'Text Columns' ),
 
-	description: __( 'Add text across columns. This block is experimental' ),
+	description: __( 'Add text, and display it in two or more columns. Like a newspaper! This block is experimental.' ),
 
 	icon: 'columns',
 
@@ -61,13 +61,8 @@ export const settings = {
 		}
 	},
 
-	edit: withState( {
-		editable: 'column-1',
-	} )( ( { attributes, setAttributes, className, isSelected, editable, setState } ) => {
+	edit: ( ( { attributes, setAttributes, className } ) => {
 		const { width, content, columns } = attributes;
-		const onSetActiveEditable = ( newEditable ) => () => {
-			setState( { editable: newEditable } );
-		};
 
 		return (
 			<Fragment>
@@ -91,12 +86,11 @@ export const settings = {
 				</InspectorControls>
 				<div className={ `${ className } align${ width } columns-${ columns }` }>
 					{ times( columns, ( index ) => {
-						const key = `column-${ index }`;
 						return (
-							<div className="wp-block-column" key={ key }>
+							<div className="wp-block-column" key={ `column-${ index }` }>
 								<RichText
 									tagName="p"
-									value={ content && content[ index ] && content[ index ].children }
+									value={ get( content, [ index, 'children' ] ) }
 									onChange={ ( nextContent ) => {
 										setAttributes( {
 											content: [
@@ -107,8 +101,6 @@ export const settings = {
 										} );
 									} }
 									placeholder={ __( 'New Column' ) }
-									isSelected={ isSelected && editable === key }
-									onFocus={ onSetActiveEditable( key ) }
 								/>
 							</div>
 						);
@@ -124,7 +116,7 @@ export const settings = {
 			<div className={ `align${ width } columns-${ columns }` }>
 				{ times( columns, ( index ) =>
 					<div className="wp-block-column" key={ `column-${ index }` }>
-						<RichText.Content tagName="p" value={ content && content[ index ].children } />
+						<RichText.Content tagName="p" value={ get( content, [ index, 'children' ] ) } />
 					</div>
 				) }
 			</div>
