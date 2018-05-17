@@ -3,7 +3,6 @@
  */
 import React from 'react';
 import jQuery from 'jquery';
-import moment from 'moment';
 import tinymce from 'tinymce';
 import { parse, format } from 'url';
 import { memoize } from 'lodash';
@@ -101,39 +100,6 @@ window.wp.api.getPostTypeRoute = window.wp.api.getPostTypeRoute || function( pos
 // User settings
 window.userSettings = window.userSettings || {};
 window.userSettings.uid = window.userSettings.uid || 1;
-
-// Date settings
-window._wpDateSettings = window._wpDateSettings || {};
-window._wpDateSettings.l10n = window._wpDateSettings.l10n || {};
-window._wpDateSettings.l10n.locale = window._wpDateSettings.l10n.locale || 'en_US';
-
-moment.locale( window._wpDateSettings.l10n.locale );
-const localeData = moment.localeData();
-
-window._wpDateSettings.l10n.months = window._wpDateSettings.l10n.months || localeData.months();
-window._wpDateSettings.l10n.monthsShort = window._wpDateSettings.l10n.monthsShort || localeData.monthsShort();
-window._wpDateSettings.l10n.weekdays = window._wpDateSettings.l10n.weekdays || localeData.weekdays();
-window._wpDateSettings.l10n.weekdaysShort = window._wpDateSettings.l10n.weekdaysShort || localeData.weekdaysShort();
-window._wpDateSettings.l10n.meridiem = window._wpDateSettings.l10n.meridiem || { am: 'am', pm: 'pm', AM: 'AM', PM: 'PM' };
-window._wpDateSettings.l10n.relative = window._wpDateSettings.l10n.relative || {
-	future: 'in %s',
-	past: '%s ago',
-	s: 'a few seconds',
-	ss: '%d seconds',
-	m: 'a minute',
-	mm: '%d minutes',
-	h: 'an hour',
-	hh: '%d hours',
-	d: 'a day',
-	dd: '%d days',
-	M: 'a month',
-	MM: '%d months',
-	y: 'a year',
-	yy: '%d years',
-};
-
-window._wpDateSettings.formats = window._wpDateSettings.formats || { time: 'G:i', date: 'j F, Y', datetime: 'j F, Y G:i' };
-window._wpDateSettings.timezone = window._wpDateSettings.timezone || { offset: '0', string: '' };
 
 // Editor l10n settings
 window.wpEditorL10n = window.wpEditorL10n || {
