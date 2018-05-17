@@ -7,6 +7,8 @@
 
 /**
  * Tests for WP_REST_Search_Controller.
+ *
+ * @group restsearch
  */
 class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
@@ -206,24 +208,6 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 * Search through all content with slug 'my-footitle'.
-	 */
-	public function test_get_items_search_by_slug() {
-		$response = $this->do_request_with_params( array(
-			'slug' => 'my-footitle',
-		) );
-
-		$this->assertEquals( 200, $response->get_status() );
-		$this->assertEqualSets(
-			array(
-				self::$my_title_post_ids[0],
-				self::$my_title_page_ids[0],
-			),
-			wp_list_pluck( $response->get_data(), 'id' )
-		);
-	}
-
-	/**
 	 * Search through all that matches a 'footitle' search.
 	 */
 	public function test_get_items_search_for_footitle() {
@@ -311,19 +295,9 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data = $response->get_data();
 		$this->assertEquals( array(
 			'id',
-			'date',
-			'date_gmt',
-			'guid',
-			'modified',
-			'modified_gmt',
-			'slug',
-			'status',
 			'type',
 			'link',
 			'title',
-			'content',
-			'excerpt',
-			'author',
 			'_links',
 		), array_keys( $data[0] ) );
 	}
@@ -335,15 +309,13 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_set_current_user( self::$editor_id );
 
 		$response = $this->do_request_with_params( array(
-			'_fields' => 'id,title,type,link',
+			'_fields' => 'id,title',
 		) );
 		$this->assertEquals( 200, $response->get_status() );
 
 		$data = $response->get_data();
 		$this->assertEquals( array(
 			'id',
-			'type',
-			'link',
 			'title',
 			'_links',
 		), array_keys( $data[0] ) );
@@ -358,18 +330,8 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertArrayHasKey( 'author', $properties );
-		$this->assertArrayHasKey( 'content', $properties );
-		$this->assertArrayHasKey( 'date', $properties );
-		$this->assertArrayHasKey( 'date_gmt', $properties );
-		$this->assertArrayHasKey( 'excerpt', $properties );
-		$this->assertArrayHasKey( 'guid', $properties );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'link', $properties );
-		$this->assertArrayHasKey( 'modified', $properties );
-		$this->assertArrayHasKey( 'modified_gmt', $properties );
-		$this->assertArrayHasKey( 'slug', $properties );
-		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'title', $properties );
 		$this->assertArrayHasKey( 'type', $properties );
 	}

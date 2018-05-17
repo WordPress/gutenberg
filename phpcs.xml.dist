@@ -24,10 +24,6 @@
 		<exclude-pattern>lib/class-wp-rest-block-renderer-controller.php</exclude-pattern>
 		<exclude-pattern>lib/class-wp-rest-search-controller.php</exclude-pattern>
 	</rule>
-	<!-- mysql_to_rfc3339() is not part of the mysql extension -->
-	<rule ref="PHPCompatibility.PHP.RemovedExtensions.mysql_DeprecatedRemoved">
-		<exclude-pattern>lib/class-wp-rest-search-controller.php</exclude-pattern>
-	</rule>
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">
 		<exclude-pattern>gutenberg.php</exclude-pattern>

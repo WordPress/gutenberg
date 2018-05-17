@@ -90,11 +90,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 
-		// Ensure a search string is set in case the orderby is set to 'relevance'.
-		if ( ! empty( $request['orderby'] ) && 'relevance' === $request['orderby'] && empty( $request['search'] ) ) {
-			return new WP_Error( 'rest_no_search_term_defined', __( 'You need to define a search term to order by relevance.', 'gutenberg' ), array( 'status' => 400 ) );
-		}
-
 		// Retrieve the list of registered collection query parameters.
 		$registered = $this->get_collection_params();
 		$query_args = array(
@@ -120,12 +115,8 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		 * present in $registered will be set.
 		 */
 		$parameter_mappings = array(
-			'author'  => 'author__in',
-			'order'   => 'order',
-			'orderby' => 'orderby',
 			'page'    => 'paged',
 			'search'  => 's',
-			'slug'    => 'post_name__in',
 		);
 
 		/*
@@ -136,28 +127,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			if ( isset( $registered[ $api_param ], $request[ $api_param ] ) ) {
 				$query_args[ $wp_param ] = $request[ $api_param ];
 			}
-		}
-
-		$orderby_mappings = array(
-			'id'   => 'ID',
-			'slug' => 'name',
-		);
-
-		if ( ! empty( $query_args['orderby'] ) && isset( $orderby_mappings[ $query_args['orderby'] ] ) ) {
-			$query_args['orderby'] = $orderby_mappings[ $query_args['orderby'] ];
-		}
-
-		// Check for & assign any parameters which require special handling or setting.
-		$query_args['date_query'] = array();
-
-		// Set before into date query. Date query must be specified as an array of an array.
-		if ( isset( $registered['before'], $request['before'] ) ) {
-			$query_args['date_query'][0]['before'] = $request['before'];
-		}
-
-		// Set after into date query. Date query must be specified as an array of an array.
-		if ( isset( $registered['after'], $request['after'] ) ) {
-			$query_args['date_query'][0]['after'] = $request['after'];
 		}
 
 		// Ensure our per_page parameter overrides any provided posts_per_page filter.
@@ -291,63 +260,18 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 
 		setup_postdata( $post );
 
-		$fields = $this->get_fields_for_response( $request );
+		if ( method_exists( $this, 'get_fields_for_response' ) ) {
+			$fields = $this->get_fields_for_response( $request );
+		} else {
+			$schema = $this->get_item_schema();
+			$fields = array_keys( $schema['properties'] );
+		}
 
 		// Base fields for every post.
 		$data = array();
 
 		if ( in_array( 'id', $fields, true ) ) {
 			$data['id'] = $post->ID;
-		}
-
-		if ( in_array( 'date', $fields, true ) ) {
-			$data['date'] = $this->prepare_date_response( $post->post_date_gmt, $post->post_date );
-		}
-
-		if ( in_array( 'date_gmt', $fields, true ) ) {
-			// For drafts, `post_date_gmt` may not be set, indicating that the
-			// date of the draft should be updated each time it is saved (see
-			// #38883).  In this case, shim the value based on the `post_date`
-			// field with the site's timezone offset applied.
-			if ( '0000-00-00 00:00:00' === $post->post_date_gmt ) {
-				$post_date_gmt = get_gmt_from_date( $post->post_date );
-			} else {
-				$post_date_gmt = $post->post_date_gmt;
-			}
-			$data['date_gmt'] = $this->prepare_date_response( $post_date_gmt );
-		}
-
-		if ( in_array( 'guid', $fields, true ) ) {
-			$data['guid'] = array(
-				/** This filter is documented in wp-includes/post-template.php */
-				'rendered' => apply_filters( 'get_the_guid', $post->guid, $post->ID ),
-				'raw'      => $post->guid,
-			);
-		}
-
-		if ( in_array( 'modified', $fields, true ) ) {
-			$data['modified'] = $this->prepare_date_response( $post->post_modified_gmt, $post->post_modified );
-		}
-
-		if ( in_array( 'modified_gmt', $fields, true ) ) {
-			// For drafts, `post_modified_gmt` may not be set (see
-			// `post_date_gmt` comments above).  In this case, shim the value
-			// based on the `post_modified` field with the site's timezone
-			// offset applied.
-			if ( '0000-00-00 00:00:00' === $post->post_modified_gmt ) {
-				$post_modified_gmt = date( 'Y-m-d H:i:s', strtotime( $post->post_modified ) - ( get_option( 'gmt_offset' ) * 3600 ) );
-			} else {
-				$post_modified_gmt = $post->post_modified_gmt;
-			}
-			$data['modified_gmt'] = $this->prepare_date_response( $post_modified_gmt );
-		}
-
-		if ( in_array( 'slug', $fields, true ) ) {
-			$data['slug'] = $post->post_name;
-		}
-
-		if ( in_array( 'status', $fields, true ) ) {
-			$data['status'] = $post->post_status;
 		}
 
 		if ( in_array( 'type', $fields, true ) ) {
@@ -376,50 +300,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			}
 		}
 
-		if ( in_array( 'content', $fields, true ) ) {
-			if ( post_type_supports( $post->post_type, 'editor' ) ) {
-				/** This filter is documented in wp-includes/post-template.php */
-				$content         = apply_filters( 'the_content', $post->post_content );
-				$data['content'] = array(
-					'raw'       => $post->post_content,
-					'rendered'  => post_password_required( $post ) ? '' : $content,
-					'protected' => (bool) $post->post_password,
-				);
-			} else {
-				$data['content'] = array(
-					'raw'       => '',
-					'rendered'  => '',
-					'protected' => false,
-				);
-			}
-		}
-
-		if ( in_array( 'excerpt', $fields, true ) ) {
-			if ( post_type_supports( $post->post_type, 'excerpt' ) ) {
-				/** This filter is documented in wp-includes/post-template.php */
-				$excerpt         = apply_filters( 'the_excerpt', apply_filters( 'get_the_excerpt', $post->post_excerpt, $post ) );
-				$data['excerpt'] = array(
-					'raw'       => $post->post_excerpt,
-					'rendered'  => post_password_required( $post ) ? '' : $excerpt,
-					'protected' => (bool) $post->post_password,
-				);
-			} else {
-				$data['excerpt'] = array(
-					'raw'       => '',
-					'rendered'  => '',
-					'protected' => false,
-				);
-			}
-		}
-
-		if ( in_array( 'author', $fields, true ) ) {
-			if ( post_type_supports( $post->post_type, 'author' ) ) {
-				$data['author'] = (int) $post->post_author;
-			} else {
-				$data['author'] = 0;
-			}
-		}
-
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->add_additional_fields_to_object( $data, $request );
 		$data    = $this->filter_response_by_context( $data, $context );
@@ -430,31 +310,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		$response->add_links( $this->prepare_links( $post ) );
 
 		return $response;
-	}
-
-	/**
-	 * Checks the post_date_gmt or modified_gmt and prepare any post or
-	 * modified date for single post output.
-	 *
-	 * @since 2.9.0
-	 *
-	 * @param string      $date_gmt GMT publication time.
-	 * @param string|null $date     Optional. Local publication time. Default null.
-	 * @return string|null ISO8601/RFC3339 formatted datetime.
-	 */
-	protected function prepare_date_response( $date_gmt, $date = null ) {
-		// Use the date if passed.
-		if ( isset( $date ) ) {
-			return mysql_to_rfc3339( $date );
-		}
-
-		// Return null if $date_gmt is empty/zeros.
-		if ( '0000-00-00 00:00:00' === $date_gmt ) {
-			return null;
-		}
-
-		// Return the formatted datetime.
-		return mysql_to_rfc3339( $date_gmt );
 	}
 
 	/**
@@ -486,96 +341,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			'title'      => 'search',
 			'type'       => 'object',
 			'properties' => array(
-				'author'       => array(
-					'description' => __( 'The ID for the author of the object.', 'gutenberg' ),
-					'type'        => 'integer',
-					'context'     => array( 'view', 'edit', 'embed' ),
-					'readonly'    => true,
-				),
-				'content'      => array(
-					'description' => __( 'The content for the object.', 'gutenberg' ),
-					'type'        => 'object',
-					'context'     => array( 'view', 'edit' ),
-					'properties'  => array(
-						'raw'       => array(
-							'description' => __( 'Content for the object, as it exists in the database.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'edit' ),
-							'readonly'    => true,
-						),
-						'rendered'  => array(
-							'description' => __( 'HTML content for the object, transformed for display.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit' ),
-							'readonly'    => true,
-						),
-						'protected' => array(
-							'description' => __( 'Whether the content is protected with a password.', 'gutenberg' ),
-							'type'        => 'boolean',
-							'context'     => array( 'view', 'edit', 'embed' ),
-							'readonly'    => true,
-						),
-					),
-				),
-				'date'         => array(
-					'description' => __( "The date the object was published, in the site's timezone.", 'gutenberg' ),
-					'type'        => 'string',
-					'format'      => 'date-time',
-					'context'     => array( 'view', 'edit', 'embed' ),
-					'readonly'    => true,
-				),
-				'date_gmt'     => array(
-					'description' => __( 'The date the object was published, as GMT.', 'gutenberg' ),
-					'type'        => 'string',
-					'format'      => 'date-time',
-					'context'     => array( 'view', 'edit' ),
-					'readonly'    => true,
-				),
-				'excerpt'      => array(
-					'description' => __( 'The excerpt for the object.', 'gutenberg' ),
-					'type'        => 'object',
-					'context'     => array( 'view', 'edit', 'embed' ),
-					'properties'  => array(
-						'raw'       => array(
-							'description' => __( 'Excerpt for the object, as it exists in the database.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'edit' ),
-							'readonly'    => true,
-						),
-						'rendered'  => array(
-							'description' => __( 'HTML excerpt for the object, transformed for display.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-							'readonly'    => true,
-						),
-						'protected' => array(
-							'description' => __( 'Whether the excerpt is protected with a password.', 'gutenberg' ),
-							'type'        => 'boolean',
-							'context'     => array( 'view', 'edit', 'embed' ),
-							'readonly'    => true,
-						),
-					),
-				),
-				'guid'         => array(
-					'description' => __( 'The globally unique identifier for the object.', 'gutenberg' ),
-					'type'        => 'object',
-					'context'     => array( 'view', 'edit' ),
-					'readonly'    => true,
-					'properties'  => array(
-						'raw'      => array(
-							'description' => __( 'GUID for the object, as it exists in the database.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'edit' ),
-							'readonly'    => true,
-						),
-						'rendered' => array(
-							'description' => __( 'GUID for the object, transformed for display.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit' ),
-							'readonly'    => true,
-						),
-					),
-				),
 				'id'           => array(
 					'description' => __( 'Unique identifier for the object.', 'gutenberg' ),
 					'type'        => 'integer',
@@ -587,33 +352,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'format'      => 'uri',
 					'context'     => array( 'view', 'edit', 'embed' ),
-					'readonly'    => true,
-				),
-				'modified'     => array(
-					'description' => __( "The date the object was last modified, in the site's timezone.", 'gutenberg' ),
-					'type'        => 'string',
-					'format'      => 'date-time',
-					'context'     => array( 'view', 'edit' ),
-					'readonly'    => true,
-				),
-				'modified_gmt' => array(
-					'description' => __( 'The date the object was last modified, as GMT.', 'gutenberg' ),
-					'type'        => 'string',
-					'format'      => 'date-time',
-					'context'     => array( 'view', 'edit' ),
-					'readonly'    => true,
-				),
-				'slug'         => array(
-					'description' => __( 'An alphanumeric identifier for the object unique to its type.', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
-					'readonly'    => true,
-				),
-				'status'       => array(
-					'description' => __( 'A named status for the object.', 'gutenberg' ),
-					'type'        => 'string',
-					'enum'        => array_keys( $this->get_allowed_post_stati() ),
-					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),
 				'title'        => array(
@@ -660,58 +398,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		$query_params = parent::get_collection_params();
 
 		$query_params['context']['default'] = 'view';
-
-		$query_params['after'] = array(
-			'description' => __( 'Limit search results to content published after a given ISO8601 compliant date.', 'gutenberg' ),
-			'type'        => 'string',
-			'format'      => 'date-time',
-		);
-
-		$query_params['author'] = array(
-			'description' => __( 'Limit search results to content assigned to specific authors.', 'gutenberg' ),
-			'type'        => 'array',
-			'items'       => array(
-				'type' => 'integer',
-			),
-			'default'     => array(),
-		);
-
-		$query_params['before'] = array(
-			'description' => __( 'Limit search results to content published before a given ISO8601 compliant date.', 'gutenberg' ),
-			'type'        => 'string',
-			'format'      => 'date-time',
-		);
-
-		$query_params['order'] = array(
-			'description' => __( 'Order sort attribute ascending or descending.', 'gutenberg' ),
-			'type'        => 'string',
-			'default'     => 'desc',
-			'enum'        => array( 'asc', 'desc' ),
-		);
-
-		$query_params['orderby'] = array(
-			'description' => __( 'Sort collection by object attribute.', 'gutenberg' ),
-			'type'        => 'string',
-			'default'     => 'date',
-			'enum'        => array(
-				'author',
-				'date',
-				'id',
-				'modified',
-				'relevance',
-				'slug',
-				'title',
-			),
-		);
-
-		$query_params['slug'] = array(
-			'description'       => __( 'Limit search results to content with one or more specific slugs.', 'gutenberg' ),
-			'type'              => 'array',
-			'items'             => array(
-				'type' => 'string',
-			),
-			'sanitize_callback' => 'wp_parse_slug_list',
-		);
 
 		$query_params['type'] = array(
 			'default'     => 'any',
