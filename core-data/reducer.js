@@ -167,27 +167,38 @@ export const entities = ( state = {}, action ) => {
 	const newConfig = entitiesConfig( state.config, action );
 
 	// Generates a dynamic reducer for the entities
-	const entitiesByKind = groupBy( newConfig, 'kind' );
-	const entitiesDataReducer = combineReducers( Object.entries( entitiesByKind ).reduce( ( memo, [ kind, subEntities ] ) => {
-		const kindReducer = combineReducers( subEntities.reduce(
-			( kindMemo, entityConfig ) => ( {
-				...kindMemo,
-				[ entityConfig.name ]: entity( entityConfig ),
-			} ),
-			{}
-		) );
+	let entitiesDataReducer = state.reducer;
+	if ( ! entitiesDataReducer || newConfig !== state.config ) {
+		const entitiesByKind = groupBy( newConfig, 'kind' );
+		entitiesDataReducer = combineReducers( Object.entries( entitiesByKind ).reduce( ( memo, [ kind, subEntities ] ) => {
+			const kindReducer = combineReducers( subEntities.reduce(
+				( kindMemo, entityConfig ) => ( {
+					...kindMemo,
+					[ entityConfig.name ]: entity( entityConfig ),
+				} ),
+				{}
+			) );
 
-		memo[ kind ] = kindReducer;
-		return memo;
-	}, {} ) );
+			memo[ kind ] = kindReducer;
+			return memo;
+		}, {} ) );
+	}
 
 	const newData = entitiesDataReducer( state.data, action );
 
-	if ( newData === state.data && newConfig === state.config ) {
+	if (
+		newData === state.data &&
+		newConfig === state.config &&
+		entitiesDataReducer === state.reducer
+	) {
 		return state;
 	}
 
-	return { data: newData, config: newConfig };
+	return {
+		reducer: entitiesDataReducer,
+		data: newData,
+		config: newConfig,
+	};
 };
 
 export default combineReducers( {
@@ -196,5 +207,4 @@ export default combineReducers( {
 	taxonomies,
 	themeSupports,
 	entities,
-	users,
 } );
