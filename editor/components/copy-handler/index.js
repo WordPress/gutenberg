@@ -3,7 +3,7 @@
  */
 import { Component, compose } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
-import { documentHasSelection } from '@wordpress/utils';
+import { documentHasSelection } from '@wordpress/dom';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 class CopyHandler extends Component {

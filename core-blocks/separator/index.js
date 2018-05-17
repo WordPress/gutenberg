@@ -14,7 +14,7 @@ export const name = 'core/separator';
 export const settings = {
 	title: __( 'Separator' ),
 
-	description: __( 'Use the separator to indicate a thematic change in the content.' ),
+	description: __( 'Insert a horizontal line where you want to create a break between ideas.' ),
 
 	icon: 'minus',
 
@@ -32,7 +32,10 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'HR',
+				selector: 'hr',
+				schema: {
+					hr: {},
+				},
 			},
 		],
 	},

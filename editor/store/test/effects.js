@@ -518,8 +518,14 @@ describe( 'effects', () => {
 				},
 				status: 'draft',
 			};
+			const getState = () => ( {
+				settings: {
+					template: null,
+					templateLock: false,
+				},
+			} );
 
-			const result = handler( { post, settings: {} } );
+			const result = handler( { post, settings: {} }, { getState } );
 
 			expect( result ).toEqual( [
 				setTemplateValidity( true ),
@@ -539,8 +545,14 @@ describe( 'effects', () => {
 				},
 				status: 'draft',
 			};
+			const getState = () => ( {
+				settings: {
+					template: null,
+					templateLock: false,
+				},
+			} );
 
-			const result = handler( { post, settings: {} } );
+			const result = handler( { post }, { getState } );
 
 			expect( result[ 1 ].blocks ).toHaveLength( 1 );
 			expect( result ).toEqual( [
@@ -560,8 +572,14 @@ describe( 'effects', () => {
 				},
 				status: 'auto-draft',
 			};
+			const getState = () => ( {
+				settings: {
+					template: null,
+					templateLock: false,
+				},
+			} );
 
-			const result = handler( { post, settings: {} } );
+			const result = handler( { post }, { getState } );
 
 			expect( result ).toEqual( [
 				setTemplateValidity( true ),
@@ -607,8 +625,8 @@ describe( 'effects', () => {
 					},
 				] );
 
-				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
-				set( global, 'wp.apiRequest', () => promise );
+				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
+				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const dispatch = jest.fn();
 				const store = { getState: noop, dispatch };
@@ -645,8 +663,8 @@ describe( 'effects', () => {
 					content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 				} );
 
-				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
-				set( global, 'wp.apiRequest', () => promise );
+				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
+				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const dispatch = jest.fn();
 				const store = { getState: noop, dispatch };
@@ -679,8 +697,8 @@ describe( 'effects', () => {
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
 
-				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
-				set( global, 'wp.apiRequest', () => promise );
+				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
+				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const dispatch = jest.fn();
 				const store = { getState: noop, dispatch };
@@ -722,8 +740,8 @@ describe( 'effects', () => {
 				let modelAttributes;
 				const promise = Promise.resolve( { id: 456 } );
 
-				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
-				set( global, 'wp.apiRequest', ( request ) => {
+				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
+				set( global, [ 'wp', 'apiRequest' ], ( request ) => {
 					modelAttributes = request.data;
 					return promise;
 				} );
@@ -759,8 +777,8 @@ describe( 'effects', () => {
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
 
-				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
-				set( global, 'wp.apiRequest', () => promise );
+				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
+				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const sharedBlock = { id: 123, title: 'My cool block' };
 				const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );
@@ -790,8 +808,8 @@ describe( 'effects', () => {
 			it( 'should delete a shared block', () => {
 				const promise = Promise.resolve( {} );
 
-				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
-				set( global, 'wp.apiRequest', () => promise );
+				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
+				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const associatedBlock = createBlock( 'core/block', { ref: 123 } );
 				const sharedBlock = { id: 123, title: 'My cool block' };
@@ -830,8 +848,8 @@ describe( 'effects', () => {
 			it( 'should handle an API error', () => {
 				const promise = Promise.reject( {} );
 
-				set( global, 'wp.api.getPostTypeRoute', () => 'blocks' );
-				set( global, 'wp.apiRequest', () => promise );
+				set( global, [ 'wp', 'api', 'getPostTypeRoute' ], () => 'blocks' );
+				set( global, [ 'wp', 'apiRequest' ], () => promise );
 
 				const sharedBlock = { id: 123, title: 'My cool block' };
 				const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' } );

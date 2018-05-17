@@ -21,6 +21,7 @@ wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-na
 _Example:_
 
 ```jsx
+const { __ } = wp.i18n;
 const { PanelBody } = wp.components;
 const { PluginSidebar } = wp.editPost;
 
@@ -28,9 +29,10 @@ const MyPluginSidebar = () => (
 	<PluginSidebar
 		name="my-sidebar"
 		title="My sidebar title"
+		icon="smiley"
 	>
 		<PanelBody>
-			My sidebar content
+			{ __( 'My sidebar content' ) }
 		</PanelBody>
 	</PluginSidebar>
 );
@@ -52,6 +54,22 @@ Title displayed at the top of the sidebar.
 - Type: `String`
 - Required: Yes
 
+##### isPinnable
+
+Whether to allow to pin sidebar to toolbar.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`
+
+##### icon
+
+The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+
+- Type: `String` | `Element`
+- Required: No
+- Default: _inherits from the plugin_
+
 
 ### `PluginSidebarMoreMenuItem`
 
@@ -61,14 +79,15 @@ The text within the component appears as the menu item label.
 _Example:_
 
 ```jsx
+const { __ } = wp.i18n;
 const { PluginSidebarMoreMenuItem } = wp.editPost;
 
 const MySidebarMoreMenuItem = () => (
 	<PluginSidebarMoreMenuItem
 		target="my-sidebar"
-		icon="yes"
+		icon="smiley"
 	>
-		My sidebar title
+		{ __( 'My sidebar title' ) }
 	</PluginSidebarMoreMenuItem>
 );
 ```
@@ -88,5 +107,23 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 
 - Type: `String` | `Element`
 - Required: No
+- Default: _inherits from the plugin_
+
+### `PluginPostStatusInfo`
+
+Renders a row in the Status & Visibility panel of the Document sidebar.
+It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
+
+_Example:_
+```jsx
+const { __ } = wp.i18n;
+const { PluginPostStatusInfo } = wp.editPost;
+
+const MyPluginPostStatusInfo = () => (
+	<PluginPostStatusInfo>
+		{ __( 'My post status info' ) }
+	</PluginPostStatusInfo>
+);
+```
 
 

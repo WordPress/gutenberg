@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues, overEvery } from 'lodash';
 import EquivalentKeyMap from 'equivalent-key-map';
@@ -9,7 +8,8 @@ import EquivalentKeyMap from 'equivalent-key-map';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component, createHigherOrderComponent, pure, compose } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -285,11 +285,19 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 
 			this.runSelection = this.runSelection.bind( this );
 
+			/**
+			 * Boolean tracking known render conditions (own props or merged
+			 * props update) for `shouldComponentUpdate`.
+			 *
+			 * @type {boolean}
+			 */
+			this.shouldComponentUpdate = false;
+
 			this.state = {};
 		}
 
-		shouldComponentUpdate( nextProps, nextState ) {
-			return ! isShallowEqual( nextProps, this.props ) || ! isShallowEqual( nextState, this.state );
+		shouldComponentUpdate() {
+			return this.shouldComponentUpdate;
 		}
 
 		componentWillMount() {
@@ -302,6 +310,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		componentWillReceiveProps( nextProps ) {
 			if ( ! isShallowEqual( nextProps, this.props ) ) {
 				this.runSelection( nextProps );
+				this.shouldComponentUpdate = true;
 			}
 		}
 
@@ -331,10 +340,14 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 				this.setState( {
 					mergeProps: nextMergeProps,
 				} );
+
+				this.shouldComponentUpdate = true;
 			}
 		}
 
 		render() {
+			this.shouldComponentUpdate = false;
+
 			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
 		}
 	};
@@ -352,48 +365,54 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
  *
  * @return {Component} Enhanced component with merged dispatcher props.
  */
-export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
-	return class ComponentWithDispatch extends Component {
-		constructor() {
-			super( ...arguments );
+export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
+	compose( [
+		pure,
+		( WrappedComponent ) => {
+			return class ComponentWithDispatch extends Component {
+				constructor() {
+					super( ...arguments );
 
-			this.proxyProps = {};
-		}
-
-		componentWillMount() {
-			this.setProxyProps( this.props );
-		}
-
-		componentWillUpdate( nextProps ) {
-			this.setProxyProps( nextProps );
-		}
-
-		proxyDispatch( propName, ...args ) {
-			// Original dispatcher is a pre-bound (dispatching) action creator.
-			mapDispatchToProps( dispatch, this.props )[ propName ]( ...args );
-		}
-
-		setProxyProps( props ) {
-			// Assign as instance property so that in reconciling subsequent
-			// renders, the assigned prop values are referentially equal.
-			const propsToDispatchers = mapDispatchToProps( dispatch, props );
-			this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
-				// Prebind with prop name so we have reference to the original
-				// dispatcher to invoke. Track between re-renders to avoid
-				// creating new function references every render.
-				if ( this.proxyProps.hasOwnProperty( propName ) ) {
-					return this.proxyProps[ propName ];
+					this.proxyProps = {};
 				}
 
-				return this.proxyDispatch.bind( this, propName );
-			} );
-		}
+				componentWillMount() {
+					this.setProxyProps( this.props );
+				}
 
-		render() {
-			return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
-		}
-	};
-}, 'withDispatch' );
+				componentWillUpdate( nextProps ) {
+					this.setProxyProps( nextProps );
+				}
+
+				proxyDispatch( propName, ...args ) {
+					// Original dispatcher is a pre-bound (dispatching) action creator.
+					mapDispatchToProps( dispatch, this.props )[ propName ]( ...args );
+				}
+
+				setProxyProps( props ) {
+					// Assign as instance property so that in reconciling subsequent
+					// renders, the assigned prop values are referentially equal.
+					const propsToDispatchers = mapDispatchToProps( dispatch, props );
+					this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
+						// Prebind with prop name so we have reference to the original
+						// dispatcher to invoke. Track between re-renders to avoid
+						// creating new function references every render.
+						if ( this.proxyProps.hasOwnProperty( propName ) ) {
+							return this.proxyProps[ propName ];
+						}
+
+						return this.proxyDispatch.bind( this, propName );
+					} );
+				}
+
+				render() {
+					return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
+				}
+			};
+		},
+	] ),
+	'withDispatch'
+);
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.

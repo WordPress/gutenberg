@@ -2,16 +2,24 @@
  * External dependencies
  */
 import { __ } from '@wordpress/i18n';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
+import { getPhrasingContentSchema } from '@wordpress/blocks';
 import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
-} from '@wordpress/blocks';
+	InspectorControls,
+} from '@wordpress/editor';
+
+import {
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -20,11 +28,40 @@ import './editor.scss';
 import './style.scss';
 import TableBlock from './table-block';
 
+const tableContentSchema = {
+	tr: {
+		children: {
+			th: {
+				children: getPhrasingContentSchema(),
+			},
+			td: {
+				children: getPhrasingContentSchema(),
+			},
+		},
+	},
+};
+
+const tableSchema = {
+	table: {
+		children: {
+			thead: {
+				children: tableContentSchema,
+			},
+			tfoot: {
+				children: tableContentSchema,
+			},
+			tbody: {
+				children: tableContentSchema,
+			},
+		},
+	},
+};
+
 export const name = 'core/table';
 
 export const settings = {
 	title: __( 'Table' ),
-	description: __( 'Tables. Best used for tabular data.' ),
+	description: __( 'Insert a table -- perfect for sharing charts and data.' ),
 	icon: 'editor-table',
 	category: 'formatting',
 
@@ -43,13 +80,18 @@ export const settings = {
 		align: {
 			type: 'string',
 		},
+		hasFixedLayout: {
+			type: 'boolean',
+			default: false,
+		},
 	},
 
 	transforms: {
 		from: [
 			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'TABLE',
+				selector: 'table',
+				schema: tableSchema,
 			},
 		],
 	},
@@ -62,8 +104,19 @@ export const settings = {
 	},
 
 	edit( { attributes, setAttributes, isSelected, className } ) {
-		const { content } = attributes;
+		const { content, hasFixedLayout } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
+		const toggleFixedLayout = () => {
+			setAttributes( { hasFixedLayout: ! hasFixedLayout } );
+		};
+
+		const classes = classnames(
+			className,
+			{
+				'has-fixed-layout': hasFixedLayout,
+			},
+		);
+
 		return (
 			<Fragment>
 				<BlockControls>
@@ -72,12 +125,21 @@ export const settings = {
 						onChange={ updateAlignment }
 					/>
 				</BlockControls>
+				<InspectorControls>
+					<PanelBody title={ __( 'Table Settings' ) } className="blocks-table-settings">
+						<ToggleControl
+							label={ __( 'Fixed width table cells' ) }
+							checked={ !! hasFixedLayout }
+							onChange={ toggleFixedLayout }
+						/>
+					</PanelBody>
+				</InspectorControls>
 				<TableBlock
 					onChange={ ( nextContent ) => {
 						setAttributes( { content: nextContent } );
 					} }
 					content={ content }
-					className={ className }
+					className={ classes }
 					isSelected={ isSelected }
 				/>
 			</Fragment>
@@ -85,9 +147,16 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { content, align } = attributes;
+		const { content, align, hasFixedLayout } = attributes;
+		const classes = classnames(
+			{
+				'has-fixed-layout': hasFixedLayout,
+				[ `align${ align }` ]: align,
+			},
+		);
+
 		return (
-			<RichText.Content tagName="table" className={ align ? `align${ align }` : null } value={ content } />
+			<RichText.Content tagName="table" className={ classes } value={ content } />
 		);
 	},
 };

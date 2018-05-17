@@ -1,8 +1,16 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 3.1.0
+
+ - All components in `wp.blocks.*` are removed. Please use `wp.editor.*` instead.
+ - `wp.blocks.withEditorSettings` is removed. Please use the data module to access the editor settings `wp.data.select( "core/editor" ).getEditorSettings()`.
+ - All DOM utils in `wp.utils.*` are removed. Please use `wp.dom.*` instead.
+ - `isPrivate: true` has been removed from the Block API. Please use `supports.inserter: false` instead.
+
 ## 3.0.0
 
 - `wp.blocks.registerCoreBlocks` function removed. Please use `wp.coreBlocks.registerCoreBlocks` instead.
+- Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](https://wordpress.org/gutenberg/handbook/block-api/rich-text-api/), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
 
 ## 2.8.0
 

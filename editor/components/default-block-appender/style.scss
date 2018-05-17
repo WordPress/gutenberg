@@ -14,29 +14,45 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		font-family: $editor-font;
 		cursor: text;
 		width: 100%;
-		color: $dark-gray-300;
 		font-family: $editor-font;
 		outline: 1px solid transparent;
 		transition: 0.2s outline;
-	}
 
-	// Show quick insertion icons faded until hover
-	.editor-inserter-with-shortcuts,
-	.editor-inserter {
-		.components-icon-button {
-			color: $light-gray-700;
-			transition: color 0.2s;
+		// use opacity to work in various editor styles
+		color: $dark-opacity-300;
+
+		.is-dark-theme & {
+			color: $light-opacity-300;
 		}
 	}
 
-	&:hover {
-		.editor-inserter-with-shortcuts,
-		.editor-inserter {
-			opacity: 1;
+	// Show quick insertion icons faded until hover
+	.editor-inserter-with-shortcuts {
+		opacity: .5;
+		transition: opacity 0.2s;
 
-			.components-icon-button {
-				color: $dark-gray-500;
+		.components-icon-button:not( :hover ) {
+			// use opacity to work in various editor styles
+			color: $dark-opacity-500;
+
+			.is-dark-theme & {
+				color: $light-opacity-500;
 			}
+		}
+	}
+
+	// Don't show inserter until mousing
+	.editor-inserter__toggle:not( [aria-expanded="true"] ) {
+		opacity: 0;
+	}
+
+	&:hover {
+		.editor-inserter-with-shortcuts {
+			opacity: 1;
+		}
+
+		.editor-inserter__toggle {
+			opacity: 1;
 		}
 	}
 
@@ -52,19 +68,28 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 	position: absolute;
 	top: $item-spacing;
 	right: $item-spacing;	// show on the right on mobile
-	transition: opacity 0.2s;
 
 	@include break-small {
 		left: -$block-side-ui-padding;
 		right: auto;
 	}
 
-	.editor-inserter__toggle {
-		border-radius: 50%;
-	}
-
 	&:disabled {
 		display: none;
+	}
+
+	.editor-inserter__toggle {
+		transition: opacity 0.2s;
+		border-radius: 50%;
+
+		// use opacity to work in various editor styles
+		&:not( :hover ) {
+			color: $dark-opacity-500;
+
+			.is-dark-theme & {
+				color: $light-opacity-500;
+			}
+		}
 	}
 }
 

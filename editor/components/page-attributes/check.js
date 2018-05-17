@@ -6,12 +6,10 @@ import { get, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withEditorSettings } from '@wordpress/blocks';
-import { compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
 export function PageAttributesCheck( { availableTemplates, postType, children } ) {
-	const supportsPageAttributes = get( postType, 'supports.page-attributes', false );
+	const supportsPageAttributes = get( postType, [ 'supports', 'page-attributes' ], false );
 
 	// Only render fields if post type supports page attributes or available templates exist.
 	if ( ! supportsPageAttributes && isEmpty( availableTemplates ) ) {
@@ -21,21 +19,12 @@ export function PageAttributesCheck( { availableTemplates, postType, children } 
 	return children;
 }
 
-const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
+export default withSelect( ( select ) => {
+	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
 	const { getPostType } = select( 'core' );
+	const { availableTemplates } = getEditorSettings();
 	return {
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		availableTemplates,
 	};
-} );
-
-const applyWithEditorSettings = withEditorSettings(
-	( settings ) => ( {
-		availableTemplates: settings.availableTemplates,
-	} )
-);
-
-export default compose( [
-	applyWithSelect,
-	applyWithEditorSettings,
-] )( PageAttributesCheck );
+} )( PageAttributesCheck );

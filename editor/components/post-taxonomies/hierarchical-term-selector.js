@@ -17,7 +17,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Module Constants
  */
 const DEFAULT_QUERY = {
-	per_page: 100,
+	per_page: -1,
 	orderby: 'count',
 	order: 'desc',
 	_fields: 'id,name,parent',
@@ -216,7 +216,12 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	render() {
-		const { slug, taxonomy, instanceId } = this.props;
+		const { slug, taxonomy, instanceId, hasCreateAction, hasAssignAction } = this.props;
+
+		if ( ! hasAssignAction ) {
+			return null;
+		}
+
 		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
@@ -245,7 +250,7 @@ class HierarchicalTermSelector extends Component {
 		/* eslint-disable jsx-a11y/no-onchange */
 		return [
 			...this.renderTerms( availableTermsTree ),
-			! loading && (
+			! loading && hasCreateAction && (
 				<button
 					key="term-add-button"
 					onClick={ this.onToggleForm }
@@ -301,7 +306,10 @@ export default compose( [
 		};
 	} ),
 	withSelect( ( select, ownProps ) => {
+		const { getCurrentPost } = select( 'core/editor' );
 		return {
+			hasCreateAction: get( getCurrentPost(), [ '_links', 'wp:action-create-' + ownProps.restBase ], false ),
+			hasAssignAction: get( getCurrentPost(), [ '_links', 'wp:action-assign-' + ownProps.restBase ], false ),
 			terms: select( 'core/editor' ).getEditedPostAttribute( ownProps.restBase ),
 		};
 	} ),
