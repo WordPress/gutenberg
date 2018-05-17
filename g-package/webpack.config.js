@@ -13,17 +13,17 @@ const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-web
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './style.css',
+	filename: './css/style.css',
 } );
 
 // CSS loader for styles specific to block editing.
 const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/edit-blocks.css',
+	filename: './css/blocks/edit-blocks.css',
 } );
 
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './blocks/style.css',
+	filename: './css/blocks/style.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -164,9 +164,9 @@ gutenbergPackages.forEach( ( name ) => {
 const config = {
 	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 
-	entry: './index.js',
+	entry: `${ dirname }/g-package/src/js/index.js`,
 	output: {
-		filename: 'gutenberg.js',
+		filename: 'js/gutenberg.js',
 		path: `${ dirname }/g-package/dist`,
 		libraryTarget: 'this',
 	},
@@ -211,7 +211,16 @@ const config = {
 					/core-blocks/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
-			},
+			},	
+			{
+				test: /\.s?css$/,
+				include: [
+					/g-package\/src/,
+				],
+				use: [
+					{ loader: 'sass-loader' },  // compiles Sass to CSS
+				],
+			},		
 		],
 	},
 	plugins: [

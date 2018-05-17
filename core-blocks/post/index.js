@@ -84,12 +84,12 @@ export const settings = {
 
 	attributes: blockAttributes,
 
-	getEditWrapperProps( attributes ) {
-		const { textAlign } = attributes;
-		if ( -1 !== validAlignments.indexOf( textAlign ) ) {
-			return { 'data-align': textAlign };
-		}
-	},
+	// getEditWrapperProps( attributes ) {
+	// 	const { textAlign } = attributes;
+	// 	if ( -1 !== validAlignments.indexOf( textAlign ) ) {
+	// 		return { 'data-align': textAlign };
+	// 	}
+	// },
 
 	edit,
 
@@ -117,7 +117,6 @@ export const settings = {
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
-				[ `has-${ textAlign }-content` ]: textAlign !== 'center',
 			},
 		);
 

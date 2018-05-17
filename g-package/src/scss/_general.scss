@@ -1,0 +1,97 @@
+body {
+	margin: 0px;
+	font-family: system-ui;
+	font-size: 13px;
+}
+
+button, 
+input, 
+select, 
+textarea {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+.screen-reader-text, 
+.screen-reader-text span, 
+.ui-helper-hidden-accessible {
+    border: 0;
+    clip: rect(1px,1px,1px,1px);
+    -webkit-clip-path: inset(50%);
+    clip-path: inset(50%);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    word-wrap: normal!important;
+}
+
+.edit-post-visual-editor { 
+    font-family: system-ui;
+    font-size: 13px;
+    padding-left: 46px;
+    padding-right: 46px;
+
+    p {
+        font-family: system-ui;
+        font-size: 13px;
+        margin: 13px 0;
+    }
+
+    .editor-post-title,
+    .editor-block-list__block,
+    .editor-default-block-appender {
+        max-width: initial;
+    }  
+
+    .editor-block-list__layout {
+        padding-left: 0;
+        padding-right: 0;
+
+        .editor-block-list__block {
+            padding-left: 0;
+            padding-right: 0;
+
+            .editor-block-list__block-draggable {
+                left: 0;
+                right: 0;
+            }
+
+            .editor-block-list__block-edit {
+                margin-left: 0;
+                margin-right: 0;
+            }
+
+            &.is-selected,
+            &.is-hovered {
+                outline-width: 0;
+                z-index: 1;
+
+                .editor-block-list__block-edit {
+                    &::before {
+                        background: #e2e4e7;
+                    }
+                }
+
+                .editor-block-mover {
+                    left: -44px;
+                    padding-right: 0;
+                }
+
+                .editor-block-settings-menu {
+                    right: -44px;
+                    padding-left: 0px;
+                }
+
+                .editor-block-contextual-toolbar, 
+                .editor-block-list__breadcrumb {
+                    margin-left: 0;
+                    margin-right: 0;
+                }
+            }
+        }
+    }
+}
