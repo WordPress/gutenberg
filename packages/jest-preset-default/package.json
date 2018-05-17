@@ -20,11 +20,11 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/packages/issues"
 	},
-	"main": "index.js",
 	"files": [
 		"scripts",
 		"jest-preset.json"
 	],
+	"main": "index.js",
 	"dependencies": {
 		"@wordpress/jest-console": "^1.0.6",
 		"babel-jest": "^22.1.0",

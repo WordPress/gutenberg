@@ -18,12 +18,12 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/packages/issues"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
 	"files": [
 		"build",
 		"build-module"
 	],
+	"main": "build/index.js",
+	"module": "build-module/index.js",
 	"dependencies": {
 		"jest-matcher-utils": "^22.4.0",
 		"lodash": "^4.17.4"

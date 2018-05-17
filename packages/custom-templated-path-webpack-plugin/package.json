@@ -8,7 +8,7 @@
 		"webpack",
 		"webpack-plugin"
 	],
-	"homepage": "https://github.com/WordPress/packages/tree/master/packages/custom-templated-path-webpack-plugin/",
+	"homepage": "https://github.com/WordPress/packages/blob/master/packages/custom-templated-path-webpack-plugin/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/packages.git"
@@ -18,9 +18,6 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
-	"publishConfig": {
-		"access": "public"
-	},
 	"dependencies": {
 		"escape-string-regexp": "^1.0.5"
 	},
@@ -29,5 +26,8 @@
 	},
 	"peerDependencies": {
 		"webpack": "^4.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }
