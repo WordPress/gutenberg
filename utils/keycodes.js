@@ -91,7 +91,15 @@ export const displayShortcut = mapValues( modifiers, ( modifier ) => {
 	};
 } );
 
-export const is = mapValues( modifiers, ( getModifiers ) => {
+/**
+ * An object that contains functions to check if a keyboard event matches a
+ * predefined shortcut combination.
+ * E.g. isKeyboardEvent.primary( event, 'm' ) will return true if the event
+ * signals pressing ⌘M.
+ *
+ * @type {Object} Keyed map of functions to match events.
+ */
+export const isKeyboardEvent = mapValues( modifiers, ( getModifiers ) => {
 	return ( event, character, _isMac = isMacOS ) => {
 		const mods = getModifiers( _isMac );
 

@@ -33,7 +33,7 @@ import {
  * Module Constants
  */
 
-const { UP, DOWN, LEFT, RIGHT, is } = keycodes;
+const { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } = keycodes;
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -203,11 +203,11 @@ class WritingFlow extends Component {
 
 		if ( ! isNav ) {
 			// Set immediately before the meta+a combination can be pressed.
-			if ( is.primary( event ) ) {
+			if ( isKeyboardEvent.primary( event ) ) {
 				this.isEntirelySelected = isEntirelySelected( target );
 			}
 
-			if ( is.primary( event, 'a' ) ) {
+			if ( isKeyboardEvent.primary( event, 'a' ) ) {
 				// When the target is contentEditable, selection will already
 				// have been set by TinyMCE earlier in this call stack. We need
 				// check the previous result, otherwise all blocks will be
