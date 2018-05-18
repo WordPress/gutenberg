@@ -189,9 +189,9 @@ _注釈: このブロックは現在Gutenbergには存在しませんが、上�
 
 ## 今後の改善
 
-キックオフ目標の一環としての Gutenberg は、主に、投稿とページの _コンテンツ領域_ （特に `post_content` ）の範囲に限定されています。 これらの領域内では、ブロックを順次に追加することによって、コンテンツの垂直な流れとしてウェブを取り入れています。そして、各ブロックにレイアウトオプションを追加しています。
+キックオフ目標の一環としての Gutenberg は、主に、投稿とページの _コンテンツ領域_ （特に `post_content` ）の範囲に限定されています。 これらの領域内では、ブロックを順次に追加することによって、コンテンツの垂直な流れとして Web を取り入れています。そして、各ブロックにレイアウトオプションを追加しています。
 
-しかし、Web自体の垂直性がより高度なレイアウトを可能にしないように、 Gutenberg が達成できるレイアウトの種類には一定の制限はありません。 そのため、 Gutenberg は、投稿やページ _コンテンツ_ の範囲を超えて、コンテンツを囲むすべてを含め、ページ全体を含めて、発展することが限りなく可能なのです。
+しかし、 Web 自体の垂直性がより高度なレイアウトを可能にしないように、 Gutenberg が達成できるレイアウトの種類には一定の制限はありません。 そのため、 Gutenberg は、投稿やページ _コンテンツ_ の範囲を超えて、コンテンツを囲むすべてを含め、ページ全体を含めて、発展することが限りなく可能なのです。
 
 それを考える方法の1つは、次のような、カンマで区切られただけのブロックのリストであるテーマテンプレートです:
 
@@ -207,18 +207,16 @@ _注釈: このブロックは現在Gutenbergには存在しませんが、上�
   'themename/footer',
 }
 ```
+_コンテンツ_ ブロック内にネストされたすべてのブロックは _再配置可能_ です。すべてのブロックは _編集可能_ です。すべてのブロックは同じ API を使用して作成され、エディターとテーマの両方が同じ `style.css` ファイルを直接ロードします。最終的には、テーマもしくはフロントエンド自体を見ているように、エディターもしくはページビルダーでも同じように見えるようになるでしょう。
 
+*ページテンプレート* 。ブロックが空の状態から、テーマテンプレートはブロックが与えられたページを構成する宣言であると想像しやすくなります。これらのブロックは、自然に、提供できるテーマを達成するために必要な情報を入力するようにユーザーを誘導します — ユーザーが注目したテーマデモを模倣するのは非常に一般的です。これらのテンプレートは、Keynote のようなアプリケーションと同様に機能するでしょう、それは新しいページを作成するときに特定のテンプレートを選択し、特定の外観を実現するためにコンテンツのブロックが既にレイアウトされています。
 
-Every block nested inside the _content_ block would be _rearrangable_. Every block would be _editable_. Every block would be built using the same API, and both the editor and the theme would load the same `style.css` file directly. In the end you'd see the same in the editor/page builder, as you would looking at the theme/front-end itself.
+この概念は思索的なものですが、将来的に Gutenberg が到達できるひとつの方向です。
 
-*Page Templates*. Since blocks have empty states, it becomes easy to imagine theme templates being a declaration of which blocks compose a given page. These blocks would naturally guide a user to fill the information necessary to achieve what the theme promises it can deliver — it's very common that users struggle to mimic the theme demo that caught their attention. These templates could function similarly to apps like Keynote, where you can choose a specific template when creating a new page and have content blocks already laid out to help you achieve specific looks.
+## その他のリソース
 
-This concept is speculative, but it's one direction Gutenberg could go in the future.
+あなたが貢献したい場合は、 Gutenberg モックアップの Sketch ファイルをダウンロードすることができます。それらはまだモックアップであり、正確な1：1ではないことに注意してください。 Sketch ファイルの更新よりも速く開発が進むことがあるため、 Sketch ファイルは最新の Gutenberg 自体で最新ではない可能性もあります!
 
-## More resources
+**<a href="https://cloudup.com/c8Rbgsgg3nq">Sketch のモックアップとパターンファイルをダウンロードする</a>**.
 
-If you'd like to contribute, you can download a Sketch file of the Gutenberg mockups. Note that those are still mockups, and not 1:1 accurate. It is also possibole that the Sketch files aren't up-to-date with the latest Gutenberg itself, as development sometimes moves faster than our updating of the Sketch files!
-
-**<a href="https://cloudup.com/c8Rbgsgg3nq">Download Sketch mockups & patterns files</a>**.
-
-Be sure to also read <a href="https://wordpress.org/gutenberg/handbook/reference/faq/">the FAQ</a>, and <a href="https://wordpress.org/gutenberg/handbook/">how to build blocks</a>.
+<a href="https://wordpress.org/gutenberg/handbook/reference/faq/">the FAQ</a> や <a href="https://wordpress.org/gutenberg/handbook/">ブロックの作成方法</a> も合わせてお読みください。
