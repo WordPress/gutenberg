@@ -557,73 +557,45 @@
 	cursor: grab;
 }
 
-.editor-block-list__insertion-point {
-	position: relative;
+// In-between-serter
+.editor-block-list__block > .editor-block-list__insertion-point {
+	display: flex;
+	max-width: $content-width;
+	position: absolute;
 	z-index: z-index( '.editor-block-list__insertion-point' );
-}
-
-.editor-block-list__insertion-point-indicator {
-	position: absolute;
-	top: $block-padding - 1px; // Half the empty space between two blocks, minus the 2px height
-	height: 2px;
-	left: 0;
-	right: 0;
-	background: theme( primary );
-}
-
-.editor-block-list__insertion-point-inserter {
-	position: absolute;
-	background: none;
-	border: none;
-	display: block;
-	top: 0;
+	top: -$block-padding - 2px; // Matches the 1px paddings we use to prevent collapsing margins
+	bottom: auto;
+	left: -1px; // overlap 1px border
+	right: -1px;
 	height: $block-padding * 2; // Matches the whole empty space between two blocks
-	width: 100%;
-	cursor: pointer;
-	padding: 0;	// Unstyle inherited padding from core button
+	justify-content: center;
 
+	// Show a clickable plus
+	.editor-block-list__insertion-point-button {
+		margin-top: -4px;
+		border-radius: 50%;
+		color: $dark-gray-100;
+		background: $white;
+	}
+	
+	// Show a line indicator when hovering, but this is unclickable
 	&:before {
 		position: absolute;
 		top: $block-padding - 1px; // Half the empty space between two blocks, minus the 2px height
 		height: 2px;
-		left: $block-padding;
-		right: $block-padding;
+		left: 0;
+		right: 0;
 		background: $dark-gray-100;
 		content: '';
-		opacity: 0;
-		transition: opacity 0.1s linear 0.1s;
 	}
 
-	&:hover:before {
+	// Hide both the line and button until hovered
+	opacity: 0;
+	transition: opacity 0.1s linear 0.1s;
+
+	&:hover {
 		opacity: 1;
-		transition: opacity 0.2s linear 0.5s;
 	}
-
-	&:focus {
-		outline: none;
-	}
-
-	// Show focus style when tabbing
-	&:focus:before {
-		opacity: 1;
-		transition: opacity 0.2s linear;
-		outline: 1px solid $dark-gray-300;
-		outline-offset: 2px;
-	}
-
-	// Don't show focus style when clicking
-	&:focus:active:before {
-		outline: none;
-	}
-}
-
-.editor-block-list__block > .editor-block-list__insertion-point {
-	position: absolute;
-	top: -$block-padding;
-	height: $block-padding * 2; // Matches the whole empty space between two blocks
-	bottom: auto;
-	left: 0;
-	right: 0;
 }
 
 .editor-block-list__block .editor-block-list__block-html-textarea {

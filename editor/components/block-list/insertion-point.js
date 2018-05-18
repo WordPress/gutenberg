@@ -7,6 +7,11 @@ import { Component, compose } from '@wordpress/element';
 import { ifCondition } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import IconButton from '../../../components/icon-button';
+
 class BlockInsertionPoint extends Component {
 	constructor() {
 		super( ...arguments );
@@ -26,11 +31,14 @@ class BlockInsertionPoint extends Component {
 			<div className="editor-block-list__insertion-point">
 				{ showInsertionPoint && <div className="editor-block-list__insertion-point-indicator" /> }
 				{ showInserter && (
-					<button
-						className="editor-block-list__insertion-point-inserter"
-						onClick={ this.onClick }
-						aria-label={ __( 'Insert block' ) }
-					/>
+					<div className="editor-block-list__insertion-point">
+						<IconButton
+							icon="insert"
+							className="editor-block-list__insertion-point-button"
+							onClick={ this.onClick }
+							aria-label={ __( 'Insert block' ) }
+						/>
+					</div>
 				) }
 			</div>
 		);
