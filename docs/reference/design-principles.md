@@ -1,6 +1,6 @@
 # Gutenbergのデザイン原則とビジョン
 
-この随時更新される文書は、エディター画面を設計する際に役立つデザイン原則とパターンのいくつかを記述するのに役立ちます。目的は、デザインの背景を説明し、将来の改善についての周知を助けることです。
+この随時更新される文書は、エディター画面を設計する際に役立つデザイン原則とパターンのいくつかを記述するのに役立ちます。目的は、デザインの背景を説明し、今後の改善についての周知を助けることです。
 
 ![Block](https://cldup.com/7HCnN5cFc0.png)
 
@@ -120,80 +120,80 @@ Gutenberg は上のバーと下のコンテンツの間に基本的な区切り�
 - クイックツールバー: 基本的なテキストの配置を備えています
 - クイックツールバー: 太字、イタリック、取り消し線やリンクといったインラインの書式設定オプションを備えています
 
-Editor block settings:
+エディターブロックの設定:
 
-- Has description: "This is a simple text only block for inserting a single paragraph of content."
-- Has option to enable or disable a drop-cap. Note that the drop-cap is only visible in the blocks unselected (preview) state.
+- 「コンテンツに段落を追加するためのシンプルなテキストのみのブロックです。」という説明があります。
+- ドロップキャップを有効または無効にするオプションがあります。 ドロップキャップは、選択されていない（プレビュー）状態のブロックでのみ表示されます。
 
-_Because the drop-cap feature is not critical to the basic operation of the block, it's in the advanced sidebar, thus keeping the Quick Toolbar light-weight._
+_ドロップキャップ機能はブロックの基本操作には重要ではないため、拡張されたサイドバーにあり、クイックツールバーを軽くしています。_
 
-### Image
+### 画像
 
-Basic image block.
+基本的な画像のブロック。
 
-Placeholder:
+プレースホルダー:
 
-- A generic gray placeholder block with options to upload an image, drop an image directly on it, or pick an image from the media library. The placeholder block can be laid out as if it was an actual image, and this layout persists when a user adds an actual image into it.
+- 画像をアップロードしたり、画像を直接ドロップしたり、メディアライブラリから画像を選択したりするためのオプションを備えた包括的なグレーのプレースホルダーのブロックです。 このプレースホルダーのブロックは、実際の画像のようにレイアウトすることができ、ユーザーが実際の画像を追加してもこのレイアウトが維持されます。
 
-Selected state:
+選択された状態:
 
-- Quick Toolbar: Alignments, including wide and full-wide (if the theme supports it).
-- Quick Toolbar: Edit Gallery (opens media library)
-- Quick Toolbar: Link button
-- A caption input field appears with a "Write caption..." placeholder text below the image
+- クイックツールバー： ワイドおよびフルワイド（テーマでサポートされている場合）などの配置。
+- クイックツールバー： ギャラリーの編集（メディアライブラリを開く）
+- クイックツールバー： リンクボタン
+- キャプション入力フィールドが表示され、画像の下に「キャプションを入力...」というプレースホルダテキストが表示されます
 
-Editor block settings:
+エディターブロックの設定:
 
-- Has description: "Worth a thousand words."
-- Has options for changing or adding `alt` text, and adding additional custom CSS classes.
+- 「千の言葉に値する。」という説明があります。
+- `alt` テキストを変更または追加するオプションと、カスタムCSSクラスを追加するオプションがあります。
 
-_Future improvements to the Image block could include getting rid of the media modal, in place of letting you select images directly from the placeholder itself. In general, try to avoid modals._
+_画像ブロックの今後の改善点としては、プレースホルダ自体から直接イメージを選択させる代わりに、メディアのモーダル画面を取り除くことなどがあります。 一般的に、モーダル画面を避けるようにしてください。_
 
-### Latest Posts
+### 最新の投稿
 
-Placeholder:
+プレースホルダー:
 
-- Has no placeholder, as it works fine upon insertion. The default inserted state shows the last 5 posts.
+- プレースホルダーはなく、挿入時に正常に動作します。デフォルトの挿入された状態では最新5件の投稿を表示します。
 
-Selected state:
+選択された状態:
 
-- Quick Toolbar: Alignments
-- Quick Toolbar: Options for picking list view or grid view
+- クイックツールバー: 配置
+- クイックツールバー: リストビューかグリットビューかを選択するオプション
 
-Editor block settings:
+エディターブロックの設定:
 
-- Has description: "Shows a list of your site's most recent posts."
-- Has options for showing the post date, changing the default number of posts to show, and an option for adding an additional CSS class.
+- 「あなたのサイトで最も最近の投稿のリストを表示します」という説明があります。
+- 投稿日を表示したり、デフォルトの表示数を変更したり、追加CSSのクラスを追加できるオプションがあります。
 
-_Latest Posts is fully functional as soon as you insert it, because it comes with good defaults._
+_挿入するとすぐに、最新の投稿は完全に機能します。なぜなら、それは良いデフォルトが付いているからです。_
 
-### Contact Form
+### お問合わせフォーム
 
-Placeholder:
+プレースホルダー:
 
-- Has no placeholder, as the default inserted state shows a functional contact form.
+- プレースホルダはなく、デフォルトの挿入状態には機能するお問合わせフォームが表示されます。
+ 
+選択された状態:
 
-Selected state:
+- クイックツールバー: 配置
+- 削除できるフィールドの横に「削除」ボタンが表示されます。
+- 「フィールドを追加」ボタンが表示され、追加の連絡先フィールドのオプションを選択できるポップアップが開きます。
 
-- Quick Toolbar: Alignments
-- Shows "Remove" buttons next to fields that can be removed.
-- Shows an "Add field" button, which opens a popout where you can select additional contact field options.
+エディターブロックの設定:
 
-Editor block settings:
+- 「基本的なお問合わせフォーム」という説明があります。
+- 電子メールアドレスを必須にするためのオプションがあり、デフォルトでチェックされています。
+- １ページに複数のフォームがある場合に備えて、フォームIDまたは名前を変更するオプションがあります。
 
-- Has description: "A basic contact form."
-- Has options for making email address mandatory, checked by default.
-- Has options for changing the form ID/name, in case you have multiple forms on a page.
+_注釈: このブロックは現在Gutenbergには存在しませんが、上記ではこのようなブロックをデザインするための「ベストプラクティス」について説明しています。より複雑なブロックの1つで、挿入時に完全に機能することが重要であり、適切なデフォルトによって助けられています。_
 
-_Note: this block doesn't exist in Gutenberg currently, but the above describes a "best practices" for designing such a block. Being one of the more complex blocks, it's still important that it is fully functional upon insertion, helped along by good defaults._
+## 今後の改善
 
-## Future Opportunities
+キックオフ目標の一環としての Gutenberg は、主に、投稿とページの _コンテンツ領域_ （特に `post_content` ）の範囲に限定されています。 これらの領域内では、ブロックを順次に追加することによって、コンテンツの垂直な流れとしてウェブを取り入れています。そして、各ブロックにレイアウトオプションを追加しています。
 
-Gutenberg as part of the kickoff goal is primarily limited to the confines of the _content area_ (specifically `post_content`) of posts and pages. Within those confines, we are embracing the web as a vertical river of content, by appending blocks sequentially, then adding layout options to each block.
+しかし、Web自体の垂直性がより高度なレイアウトを可能にしないように、 Gutenberg が達成できるレイアウトの種類には一定の制限はありません。 そのため、 Gutenberg は、投稿やページ _コンテンツ_ の範囲を超えて、コンテンツを囲むすべてを含め、ページ全体を含めて、発展することが限りなく可能なのです。
 
-But just like how the verticality of the web itself doesn't prevent more advanced layouts from being possible, similarly there isn't any fixed limit to the kind of layout Gutenberg will be able to accomplish. As such, it's very possible for Gutenberg to grow beyond the confines of post and page _content_, to include the whole page, including everything that surrounds the content.
-
-One way to think of it is a theme template being just a comma separated list of blocks, like this:
+それを考える方法の1つは、次のような、カンマで区切られただけのブロックのリストであるテーマテンプレートです:
 
 ```{
 {
@@ -207,6 +207,7 @@ One way to think of it is a theme template being just a comma separated list of 
   'themename/footer',
 }
 ```
+
 
 Every block nested inside the _content_ block would be _rearrangable_. Every block would be _editable_. Every block would be built using the same API, and both the editor and the theme would load the same `style.css` file directly. In the end you'd see the same in the editor/page builder, as you would looking at the theme/front-end itself.
 
