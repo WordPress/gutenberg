@@ -4,7 +4,8 @@
 		"publish": {
 			"ignore": [
 				"**/test/*.js"
-			]
+			],
+			"message": "chore(release): publish"
 		}
 	},
 	"packages": [
