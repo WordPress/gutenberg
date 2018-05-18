@@ -17,7 +17,6 @@ import {
 	FontSizePicker,
 	IconButton,
 	PanelBody,
-	PanelColor,
 	RangeControl,
 	ToggleControl,
 	Toolbar,
@@ -32,6 +31,7 @@ import {
 	ImagePlaceholder,
 	InspectorControls,
 	MediaUpload,
+	PanelColor,
 	RichText,
 } from '@wordpress/editor';
 import { withSelect } from '@wordpress/data';

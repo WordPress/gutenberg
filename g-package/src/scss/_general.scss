@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+// @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
 
 body {
 	margin: 0px;
 	font-size: 16px;
-    font-family: 'Noto Serif', serif;
+    // font-family: 'Noto Serif', serif;
+    font-family: inherit;
     line-height: 1.8;
 
     button, 
@@ -23,7 +24,7 @@ body {
 
     .gutenberg__editor {
         position: relative;
-        min-height: auto;
+        // min-height: auto;
         font-size: 13px;
 
         /*.edit-post-layout {
@@ -118,6 +119,7 @@ body {
         .edit-post-visual-editor {
             padding-left: 46px;
             padding-right: 46px;
+            font-family: inherit;
 
             .editor-post-title,
             .editor-block-list__block,

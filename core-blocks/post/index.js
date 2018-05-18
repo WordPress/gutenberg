@@ -65,6 +65,7 @@ const blockAttributes = {
 	},
 	fontSize: {
 		type: 'string',
+		default: 'regular',
 	},
 	customFontSize: {
 		type: 'number',
