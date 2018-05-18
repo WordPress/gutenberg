@@ -16,7 +16,7 @@ import { withSelect } from '@wordpress/data';
  */
 import PostPublishButton from '../post-publish-button';
 
-function PostPublishPanelToggle( {
+export function PostPublishPanelToggle( {
 	hasPublishAction,
 	isSaving,
 	isPublishable,
