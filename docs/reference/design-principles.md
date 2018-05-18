@@ -217,6 +217,6 @@ _コンテンツ_ ブロック内にネストされたすべてのブロック�
 
 あなたが貢献したい場合は、 Gutenberg モックアップの Sketch ファイルをダウンロードすることができます。それらはまだモックアップであり、正確な1：1ではないことに注意してください。 Sketch ファイルの更新よりも速く開発が進むことがあるため、 Sketch ファイルは最新の Gutenberg 自体にとって最新ではない可能性もあります!
 
-**<a href="https://cloudup.com/c8Rbgsgg3nq">Sketch のモックアップとパターンファイルをダウンロードする</a>**.
+**<a href="https://cloudup.com/c8Rbgsgg3nq">Sketch のモックアップとパターンファイルをダウンロードする</a>**。
 
 <a href="https://wordpress.org/gutenberg/handbook/reference/faq/">FAQ</a> や <a href="https://wordpress.org/gutenberg/handbook/">ブロックの作成方法</a> も合わせてお読みください。
