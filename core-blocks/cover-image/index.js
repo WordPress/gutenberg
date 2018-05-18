@@ -15,7 +15,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
-	ImagePlaceholder,
+	MediaPlaceholder,
 	MediaUpload,
 	AlignmentToolbar,
 	RichText,
@@ -183,8 +183,16 @@ export const settings = {
 			return (
 				<Fragment>
 					{ controls }
-					<ImagePlaceholder
-						{ ...{ className, icon, label, onSelectImage } }
+					<MediaPlaceholder
+						icon={ icon }
+						className={ className }
+						labels={ {
+							title: label,
+							name: __( 'an image' ),
+						} }
+						onSelect={ onSelectImage }
+						accept="image/*"
+						type="image"
 					/>
 				</Fragment>
 			);

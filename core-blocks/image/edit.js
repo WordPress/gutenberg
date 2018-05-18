@@ -32,7 +32,7 @@ import {
 	RichText,
 	BlockControls,
 	InspectorControls,
-	ImagePlaceholder,
+	MediaPlaceholder,
 	MediaUpload,
 	BlockAlignmentToolbar,
 	UrlInputButton,
@@ -203,11 +203,16 @@ class ImageEdit extends Component {
 			return (
 				<Fragment>
 					{ controls }
-					<ImagePlaceholder
-						className={ className }
+					<MediaPlaceholder
 						icon="format-image"
-						label={ __( 'Image' ) }
-						onSelectImage={ this.onSelectImage }
+						labels={ {
+							title: __( 'Image' ),
+							name: __( 'an image' ),
+						} }
+						className={ className }
+						onSelect={ this.onSelectImage }
+						accept="image/*"
+						type="image"
 					/>
 				</Fragment>
 			);
