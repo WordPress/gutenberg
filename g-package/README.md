@@ -350,7 +350,7 @@ window.customGutenberg = {
 };
 ```
 
-![Rows example](https://raw.githubusercontent.com/front/gutenberg/develop/rows_screenshot.png)
+![Rows example](https://raw.githubusercontent.com/front/gutenberg/master/g-package/rows_screenshot.png)
 
 ### Posts Panel
 
@@ -360,7 +360,7 @@ The **Posts Panel** (`postType.supports[ 'posts' ] = true`) contains a list of p
 
 The **Post Block** is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a title.
 
-![Post Block example](https://raw.githubusercontent.com/front/gutenberg/develop/post_block_screenshot.png)
+![Post Block example](https://raw.githubusercontent.com/front/gutenberg/master/g-package/post_block_screenshot.png)
 
 ### Events (experimental)
 
