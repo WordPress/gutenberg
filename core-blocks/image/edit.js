@@ -15,8 +15,8 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
-import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
+import { Component, compose, Fragment } from '@wordpress/element';
+import { getBlobByURL, revokeBlobURL } from '@wordpress/utils';
 import {
 	Button,
 	ButtonGroup,
@@ -39,6 +39,7 @@ import {
 	PostTypeSupportCheck,
 	editorMediaUpload,
 } from '@wordpress/editor';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -168,7 +169,7 @@ class ImageEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isSelected, className, maxWidth, toggleSelection } = this.props;
+		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const controls = (
@@ -221,7 +222,7 @@ class ImageEdit extends Component {
 			'is-focused': isSelected,
 		} );
 
-		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
+		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -390,14 +391,17 @@ class ImageEdit extends Component {
 	}
 }
 
-export default withSelect( ( select, props ) => {
-	const { getMedia } = select( 'core' );
-	const { getEditorSettings } = select( 'core/editor' );
-	const { id } = props.attributes;
-	const { maxWidth } = getEditorSettings();
+export default compose( [
+	withSelect( ( select, props ) => {
+		const { getMedia } = select( 'core' );
+		const { getEditorSettings } = select( 'core/editor' );
+		const { id } = props.attributes;
+		const { maxWidth } = getEditorSettings();
 
-	return {
-		image: id ? getMedia( id ) : null,
-		maxWidth,
-	};
-} )( ImageEdit );
+		return {
+			image: id ? getMedia( id ) : null,
+			maxWidth,
+		};
+	} ),
+	withViewportMatch( { isLargeViewport: 'medium' } ),
+] )( ImageEdit );

@@ -31,17 +31,6 @@ export function terms( state = {}, action ) {
 				...state,
 				[ action.taxonomy ]: action.terms,
 			};
-
-		case 'SET_REQUESTED':
-			const { dataType, subType: taxonomy } = action;
-			if ( dataType !== 'terms' || state.hasOwnProperty( taxonomy ) ) {
-				return state;
-			}
-
-			return {
-				...state,
-				[ taxonomy ]: null,
-			};
 	}
 
 	return state;
@@ -68,6 +57,23 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 					[ action.queryID ]: map( action.users, ( user ) => user.id ),
 				},
 			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing taxonomies.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function taxonomies( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_TAXONOMIES':
+			return action.taxonomies;
 	}
 
 	return state;
@@ -146,6 +152,7 @@ export const entities = combineReducers( Object.entries( entitiesByKind ).reduce
 export default combineReducers( {
 	terms,
 	users,
+	taxonomies,
 	themeSupports,
 	entities,
 } );

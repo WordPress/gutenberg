@@ -4,23 +4,6 @@
 import { castArray } from 'lodash';
 
 /**
- * Returns an action object used in signalling that the request for a given
- * data type has been made.
- *
- * @param {string}  dataType Data type requested.
- * @param {?string} subType  Optional data sub-type.
- *
- * @return {Object} Action object.
- */
-export function setRequested( dataType, subType ) {
-	return {
-		type: 'SET_REQUESTED',
-		dataType,
-		subType,
-	};
-}
-
-/**
  * Returns an action object used in signalling that terms have been received
  * for a given taxonomy.
  *
@@ -68,6 +51,20 @@ export function receiveEntityRecords( kind, name, records ) {
 		records: castArray( records ),
 		kind,
 		name,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that taxonomies have been received.
+ *
+ * @param {Array} taxonomies Taxonomies received.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveTaxonomies( taxonomies ) {
+	return {
+		type: 'RECEIVE_TAXONOMIES',
+		taxonomies,
 	};
 }
 
