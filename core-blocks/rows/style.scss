@@ -4,7 +4,7 @@ $totalColumns: 12;
 	display: grid;
 	grid-auto-flow: dense;
 	grid-gap: 0;
-	grid-template-columns: repeat($totalColumns, auto);
+	grid-template-columns: repeat($totalColumns, 1fr);
 
 	@for $i from 1 through $totalColumns {
 		.column-start#{ $i } {
