@@ -1,6 +1,10 @@
-## 2.1.3 (2018-05-18)
+## 2.1.4 (2018-05-18)
 
 - Fix: Standardized `package.json` format  ([#119](https://github.com/WordPress/packages/pull/119))
+
+## 2.1.3 (2018-05-18)
+
+- Docs update of the Browserslist example repo URL  ([#98](https://github.com/WordPress/packages/pull/98))
 
 ## 2.1.2 (2018-02-28)
 
