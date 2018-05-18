@@ -219,4 +219,4 @@ _コンテンツ_ ブロック内にネストされたすべてのブロック�
 
 **<a href="https://cloudup.com/c8Rbgsgg3nq">Sketch のモックアップとパターンファイルをダウンロードする</a>**.
 
-<a href="https://wordpress.org/gutenberg/handbook/reference/faq/">the FAQ</a> や <a href="https://wordpress.org/gutenberg/handbook/">ブロックの作成方法</a> も合わせてお読みください。
+<a href="https://wordpress.org/gutenberg/handbook/reference/faq/">FAQ</a> や <a href="https://wordpress.org/gutenberg/handbook/">ブロックの作成方法</a> も合わせてお読みください。
