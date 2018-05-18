@@ -1,14 +1,18 @@
 $totalColumns: 12;
 
 .wp-block-rows {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: nowrap;
+	display: grid;
+	grid-auto-flow: dense;
+	grid-gap: 0;
+	grid-template-columns: repeat($totalColumns, auto);
 
 	@for $i from 1 through $totalColumns {
-		.col#{$i} {
-			flex: 0 0 percentage( $i / $totalColumns );
-			box-sizing: border-box;
+		.column-start#{ $i } {
+			grid-column-start: #{ $i };
+		}
+
+		.layout-col#{ $i } {
+			grid-column-end: span #{ $i };
 		}
 	}
 }

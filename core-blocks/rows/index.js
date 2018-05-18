@@ -29,11 +29,18 @@ const colsTotal = 12;
  * @return {Object[]} Columns layout configuration.
  */
 const getColumnLayouts = memoize( ( columns, sizes ) => {
-	return times( columns, ( n ) => ( {
-		name: `column-${ n + 1 } col${ sizes[ n ] }`,
-		label: sprintf( __( 'Column %d' ), n + 1 ),
-		icon: 'columns',
-	} ) );
+	let position = 1;
+
+	return times( columns, ( n ) => {
+		const startPostion = position;
+		position = position + sizes[ n ];	
+
+		return {
+			name: `col${ sizes[ n ] } column-start${ startPostion }`,
+			label: sprintf( __( 'Column %d' ), n + 1 ),
+			icon: 'columns',
+		};
+	} );
 } );
 
 /**

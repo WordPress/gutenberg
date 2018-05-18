@@ -135,7 +135,10 @@ export const settings = {
 
 		return (
 			<div className={ className }>
-				<section className={ imageClasses } style={ imageStyle } />
+				<div 
+					className={ imageClasses }
+					style={ imageStyle }
+				></div>
 				<RichText.Content
 					tagName="p"
 					style={ textStyle }
