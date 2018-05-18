@@ -57,5 +57,26 @@ describe( 'PostPublishPanelToggle', () => {
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( false );
 		} );
+
+		it( 'should display Schedule… if able to be scheduled', () => {
+			const wrapper = shallow(
+				<PostPublishPanelToggle isPublishable isSaveable isBeingScheduled />
+			);
+			expect( wrapper.childAt( 0 ).text() ).toBe( 'Schedule…' );
+		} );
+
+		it( 'should display Schedule… if able to be published', () => {
+			const wrapper = shallow(
+				<PostPublishPanelToggle isPublishable isSaveable hasPublishAction />
+			);
+			expect( wrapper.childAt( 0 ).text() ).toBe( 'Publish…' );
+		} );
+
+		it( 'should display Submit for Review… if not scheduled or publishable', () => {
+			const wrapper = shallow(
+				<PostPublishPanelToggle isPublishable isSaveable />
+			);
+			expect( wrapper.childAt( 0 ).text() ).toBe( 'Submit for Review…' );
+		} );
 	} );
 } );
