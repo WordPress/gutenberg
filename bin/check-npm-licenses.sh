@@ -6,6 +6,7 @@
 ALLOWED_LICENSES=(
 	"GPL-2.0-or-later"
 	"GPL-2.0+"
+	"LGPL-2.1"
 	"(GPL-2.0 OR MIT)"
 	"MIT"
 	"ISC"
