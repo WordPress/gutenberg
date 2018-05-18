@@ -27,45 +27,6 @@ describe( 'terms()', () => {
 			categories: [ { id: 1 } ],
 		} );
 	} );
-
-	it( 'assigns requested taxonomy to null', () => {
-		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'terms',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {
-			categories: null,
-		} );
-	} );
-
-	it( 'does not assign requested taxonomy to null if received', () => {
-		const originalState = deepFreeze( {
-			categories: [ { id: 1 } ],
-		} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'terms',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {
-			categories: [ { id: 1 } ],
-		} );
-	} );
-
-	it( 'does not assign requested taxonomy if not terms data type', () => {
-		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'foo',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {} );
-	} );
 } );
 
 describe( 'entities', () => {

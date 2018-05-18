@@ -226,7 +226,18 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-core-blocks',
 		gutenberg_url( 'build/core-blocks/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-blocks', 'wp-editor', 'wp-i18n', 'editor', 'wp-core-data', 'lodash' ),
+		array(
+			'editor',
+			'lodash',
+			'wp-blocks',
+			'wp-components',
+			'wp-core-data',
+			'wp-element',
+			'wp-editor',
+			'wp-i18n',
+			'wp-utils',
+			'wp-viewport',
+		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
 		true
 	);
@@ -360,6 +371,9 @@ function gutenberg_register_scripts_and_styles() {
 	);
 
 	// Editor Styles.
+	// This empty stylesheet is defined to ensure backwards compatibility.
+	wp_register_style( 'wp-blocks', false );
+
 	wp_register_style(
 		'wp-editor-font',
 		'https://fonts.googleapis.com/css?family=Noto+Serif:400,400i,700,700i'
