@@ -139,7 +139,7 @@
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"package-plugin": "./bin/build-plugin-zip.sh",
-		"postinstall": "lerna bootstrap --hoist",
+		"postinstall": "lerna bootstrap --hoist && npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"publish:check": "lerna updated",
 		"publish:dev": "lerna publish --npm-tag next",
