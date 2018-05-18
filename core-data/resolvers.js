@@ -7,7 +7,6 @@ import apiRequest from '@wordpress/api-request';
  * Internal dependencies
  */
 import {
-	setRequested,
 	receiveTerms,
 	receiveUserQuery,
 	receiveEntityRecords,
@@ -21,7 +20,6 @@ import { getEntity } from './entities';
  * progress.
  */
 export async function* getCategories() {
-	yield setRequested( 'terms', 'categories' );
 	const categories = await apiRequest( { path: '/wp/v2/categories?per_page=-1' } );
 	yield receiveTerms( 'categories', categories );
 }
