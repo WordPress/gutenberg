@@ -181,4 +181,4 @@ registerBlockType( 'my-plugin/latest-post', {
 ```
 {% end %}
 
-The PHP code is the same as above and is automatically handled through the Wordpress API.
+The PHP code is the same as above and is automatically handled through the WP REST API.
