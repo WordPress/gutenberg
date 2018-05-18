@@ -723,7 +723,7 @@ function gutenberg_filter_request_after_callbacks( $response, $handler, $request
 				}
 			}
 		}
-		// Handle POST /wp/v2/tags (and non-hiearchical taxonomies) when user
+		// Handle POST /wp/v2/tags (and non-hierarchical taxonomies) when user
 		// can assign_terms but not manage terms. Users should be able to create
 		// terms.
 		if ( 'rest_cannot_create' === $response->get_error_code()
