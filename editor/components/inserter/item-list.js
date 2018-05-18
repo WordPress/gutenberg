@@ -2,12 +2,14 @@
  * External dependencies
  */
 import { isEqual } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { NavigableMenu } from '@wordpress/components';
+import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -72,7 +74,7 @@ class ItemList extends Component {
 						<button
 							role="menuitem"
 							key={ item.id }
-							className="editor-inserter__item"
+							className={ classnames( 'editor-inserter__item', getBlockMenuDefaultClassName( item.id ) ) }
 							onClick={ () => onSelect( item ) }
 							tabIndex={ isCurrent || item.isDisabled ? null : '-1' }
 							disabled={ item.isDisabled }
