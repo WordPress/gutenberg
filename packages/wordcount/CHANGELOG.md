@@ -1,3 +1,7 @@
+## 1.0.3 (2018-05-18)
+
+- Fix: Standardized `package.json` format  ([#119](https://github.com/WordPress/packages/pull/119))
+
 ## 1.0.2 (2018-05-08)
 
 - Fix: Resolve error when input strings contains only whitespace ([#123](https://github.com/WordPress/packages/pull/123))
