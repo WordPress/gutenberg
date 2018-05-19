@@ -61,6 +61,10 @@ export function mediaUpload( {
 				if ( caption ) {
 					mediaObject.caption = [ caption ];
 				}
+				const sizes = get( savedMedia, [ 'media_details', 'sizes' ] );
+				if ( sizes ) {
+					mediaObject.sizes = sizes;
+				}
 				setAndUpdateFiles( idx, mediaObject );
 			},
 			() => {
