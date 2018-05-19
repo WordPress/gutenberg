@@ -22,6 +22,10 @@
 		@include button-style__focus-active;
 	}
 
+	&.button-primary:not( :disabled ):not( [aria-disabled="true"] ):focus {
+		color: $white;
+	}
+
 	&.is-busy,
 	&.is-busy[disabled] {
 		animation: components-button__busy-animation 2500ms infinite linear;
