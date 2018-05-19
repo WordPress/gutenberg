@@ -9,13 +9,15 @@
 		text-align: right;
 	}
 
-	a#{&}__button {
+	&__button {
 		background: $dark-gray-700;
 		border-radius: 2em;
 		color: $white;
-		cursor: pointer;
 		font-size: $default-font-size;
 		padding: 0.5em 1em;
+	}
+
+	a#{&}__button {
 		text-decoration: none;
 
 		&:hover,
@@ -28,7 +30,7 @@
 		}
 	}
 
-	* + a#{&}__button {
+	* + &__button {
 		margin-left: 0.75em;
 	}
 }

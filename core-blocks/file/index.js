@@ -45,6 +45,10 @@ export const settings = {
 		showDownloadButton: {
 			type: 'boolean',
 		},
+		buttonText: {
+			source: 'text',
+			selector: 'a[download]',
+		},
 		id: {
 			type: 'number',
 		},
@@ -131,6 +135,7 @@ export const settings = {
 			textLinkHref,
 			openInNewWindow,
 			showDownloadButton,
+			buttonText,
 		} = attributes;
 
 		return ( href &&
@@ -149,7 +154,7 @@ export const settings = {
 						href={ href }
 						className="wp-block-file__button"
 						download={ fileName }>
-						{ __( 'Download' ) }
+						{ buttonText }
 					</a>
 				}
 			</div>

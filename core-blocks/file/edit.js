@@ -32,6 +32,7 @@ export default class FileEdit extends Component {
 		const {
 			href,
 			showDownloadButton = true,
+			buttonText = __( 'Download' ),
 			id,
 		} = this.props.attributes;
 
@@ -41,6 +42,7 @@ export default class FileEdit extends Component {
 		// Initialize default values if undefined
 		this.props.setAttributes( {
 			showDownloadButton,
+			buttonText,
 		} );
 
 		// edit component has its own attributes in the state so it can be edited
@@ -141,6 +143,7 @@ export default class FileEdit extends Component {
 			textLinkHref,
 			openInNewWindow,
 			showDownloadButton,
+			buttonText,
 			id,
 		} = this.props.attributes;
 		const { setAttributes } = this.props;
@@ -302,13 +305,19 @@ export default class FileEdit extends Component {
 							onChange={ onChangeFileName }
 						/>
 					</div>
-					<a
-						href={ href }
-						className="wp-block-file__button"
-						hidden={ ! showDownloadButton }
-						download={ fileName }>
-						{ __( 'Download' ) }
-					</a>
+					{ showDownloadButton &&
+						<div className="wp-block-file__button-richtext-wrapper">
+							<RichText
+								tagName="div"
+								className="wp-block-file__button"
+								value={ buttonText }
+								formattingControls={ [] } // disable controls
+								onChange={ ( text ) => setAttributes( { buttonText: text } ) }
+								placeholder={ __( 'Add text…' ) }
+								keepPlaceholderOnFocus
+							/>
+						</div>
+					}
 				</div>
 			</Fragment>
 		);
