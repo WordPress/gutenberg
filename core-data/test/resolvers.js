@@ -7,7 +7,7 @@ import apiRequest from '@wordpress/api-request';
  * Internal dependencies
  */
 import { getCategories, getEntityRecord } from '../resolvers';
-import { setRequested, receiveTerms, receiveEntityRecords } from '../actions';
+import { receiveTerms, receiveEntityRecords } from '../actions';
 
 jest.mock( '@wordpress/api-request' );
 
@@ -24,8 +24,6 @@ describe( 'getCategories', () => {
 
 	it( 'yields with requested terms', async () => {
 		const fulfillment = getCategories();
-		const requested = ( await fulfillment.next() ).value;
-		expect( requested.type ).toBe( setRequested().type );
 		const received = ( await fulfillment.next() ).value;
 		expect( received ).toEqual( receiveTerms( 'categories', CATEGORIES ) );
 	} );

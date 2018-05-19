@@ -7,10 +7,10 @@ import apiRequest from '@wordpress/api-request';
  * Internal dependencies
  */
 import {
-	setRequested,
 	receiveTerms,
 	receiveUserQuery,
 	receiveEntityRecords,
+	receiveTaxonomies,
 	receiveThemeSupportsFromIndex,
 } from './actions';
 import { getEntity } from './entities';
@@ -20,7 +20,6 @@ import { getEntity } from './entities';
  * progress.
  */
 export async function* getCategories() {
-	yield setRequested( 'terms', 'categories' );
 	const categories = await apiRequest( { path: '/wp/v2/categories?per_page=-1' } );
 	yield receiveTerms( 'categories', categories );
 }
@@ -45,6 +44,15 @@ export async function* getEntityRecord( state, kind, name, key ) {
 	const entity = getEntity( kind, name );
 	const record = await apiRequest( { path: `${ entity.baseUrl }/${ key }?context=edit` } );
 	yield receiveEntityRecords( kind, name, record );
+}
+
+/**
+ * Requests taxonomies from the REST API, yielding action objects on request
+ * progress.
+ */
+export async function* getTaxonomies() {
+	const taxonomies = await apiRequest( { path: '/wp/v2/taxonomies?context=edit' } );
+	yield receiveTaxonomies( taxonomies );
 }
 
 /**

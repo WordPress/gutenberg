@@ -67,7 +67,7 @@
 
 // This is a focus style shown for blocks that need an indicator even when in an isEditing state
 // like for example an image block that receives arrowkey focus.
-.edit-post-visual-editor .editor-block-list__block:not( .is-selected )   {
+.edit-post-visual-editor .editor-block-list__block:not( .is-selected ) {
 	.editor-block-list__block-edit {
 		box-shadow: 0 0 0 0 $white, 0 0 0 0 $dark-gray-900;
 		transition: .1s box-shadow .05s;
@@ -86,6 +86,7 @@
 	.editor-post-permalink {
 		left: $block-padding;
 		right: $block-padding;
+		color: $dark-gray-900;
 	}
 
 	@include break-small() {

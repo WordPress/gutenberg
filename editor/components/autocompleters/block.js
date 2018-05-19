@@ -1,18 +1,28 @@
 /**
  * External dependencies
  */
-import { sortBy, once } from 'lodash';
+import { filter, sortBy, once, flow } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { createBlock, getBlockTypes } from '@wordpress/blocks';
+import { createBlock, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import BlockIcon from '../block-icon';
+
+function filterBlockTypes( blockTypes ) {
+	// Exclude blocks that don't support being shown in the inserter
+	return filter( blockTypes, ( blockType ) => hasBlockSupport( blockType, 'inserter', true ) );
+}
+
+function sortBlockTypes( blockTypes ) {
+	// Prioritize blocks in the common common category
+	return sortBy( blockTypes, ( { category } ) => 'common' !== category );
+}
 
 /**
  * A blocks repeater for replacing the current block with a selected block type.
@@ -24,13 +34,7 @@ export default {
 	className: 'editor-autocompleters__block',
 	triggerPrefix: '/',
 	options: once( function options() {
-		return Promise.resolve(
-			// Prioritize common category in block type options
-			sortBy(
-				getBlockTypes(),
-				( { category } ) => 'common' !== category
-			)
-		);
+		return Promise.resolve( flow( filterBlockTypes, sortBlockTypes )( getBlockTypes() ) );
 	} ),
 	getOptionKeywords( blockSettings ) {
 		const { title, keywords = [] } = blockSettings;

@@ -37,6 +37,11 @@
 	}
 }
 
+// in order to use mix-blend-mode, this element needs to have an explicitly set background-color
+html {
+	background: $white;
+}
+
 body.gutenberg-editor-page {
 	background: $white;
 
@@ -163,17 +168,33 @@ body.gutenberg-editor-page {
 .editor-block-list__block {
 	input,
 	textarea {
+		// use opacity to work in various editor styles
 		&::-webkit-input-placeholder {
-			color: $dark-gray-300;
+			color: $dark-opacity-300;
 		}
 		&::-moz-placeholder {
-			color: $dark-gray-300;
+			color: $dark-opacity-300;
 		}
 		&:-ms-input-placeholder {
-			color: $dark-gray-300;
+			color: $dark-opacity-300;
 		}
 		&:-moz-placeholder {
-			color: $dark-gray-300;
+			color: $dark-opacity-300;
+		}
+
+		.is-dark-theme & {
+			&::-webkit-input-placeholder {
+				color: $light-opacity-300;
+			}
+			&::-moz-placeholder {
+				color: $light-opacity-300;
+			}
+			&:-ms-input-placeholder {
+				color: $light-opacity-300;
+			}
+			&:-moz-placeholder {
+				color: $light-opacity-300;
+			}
 		}
 	}
 }

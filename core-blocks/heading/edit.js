@@ -35,12 +35,6 @@ export default function HeadingEdit( {
 						subscript: level,
 					} ) ) }
 				/>
-				<AlignmentToolbar
-					value={ align }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
-					} }
-				/>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading Settings' ) }>
@@ -53,6 +47,13 @@ export default function HeadingEdit( {
 							onClick: () => setAttributes( { nodeName: 'H' + level } ),
 							subscript: level,
 						} ) ) }
+					/>
+					<p>{ __( 'Text Alignment' ) }</p>
+					<AlignmentToolbar
+						value={ align }
+						onChange={ ( nextAlign ) => {
+							setAttributes( { align: nextAlign } );
+						} }
 					/>
 				</PanelBody>
 			</InspectorControls>
