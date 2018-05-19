@@ -29,10 +29,19 @@ export default class FileEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
-		const { href, id } = this.props.attributes;
+		const {
+			href,
+			showDownloadButton = true,
+			id,
+		} = this.props.attributes;
 
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
+
+		// Initialize default values if undefined
+		this.props.setAttributes( {
+			showDownloadButton,
+		} );
 
 		// edit component has its own attributes in the state so it can be edited
 		// without setting the actual values outside of the edit UI
@@ -127,7 +136,13 @@ export default class FileEdit extends Component {
 	}
 
 	render() {
-		const { fileName, textLinkHref, openInNewWindow, id } = this.props.attributes;
+		const {
+			fileName,
+			textLinkHref,
+			openInNewWindow,
+			showDownloadButton,
+			id,
+		} = this.props.attributes;
 		const { setAttributes } = this.props;
 		const { editing, href, attachmentPage, isCompositing } = this.state;
 
@@ -168,6 +183,12 @@ export default class FileEdit extends Component {
 		const onChangeOpenInNewWindow = ( newValue ) => {
 			setAttributes( {
 				openInNewWindow: newValue ? '_blank' : false,
+			} );
+		};
+
+		const onChangeShowDownloadButton = ( newValue ) => {
+			setAttributes( {
+				showDownloadButton: newValue,
 			} );
 		};
 
@@ -249,6 +270,8 @@ export default class FileEdit extends Component {
 					onChangeLinkDestinationOption={ onChangeLinkDestinationOption }
 					openInNewWindow={ openInNewWindow }
 					onChangeOpenInNewWindow={ onChangeOpenInNewWindow }
+					showDownloadButton={ showDownloadButton }
+					onChangeShowDownloadButton={ onChangeShowDownloadButton }
 				/>
 				<BlockControls>
 					<Toolbar>
@@ -282,6 +305,7 @@ export default class FileEdit extends Component {
 					<a
 						href={ href }
 						className="wp-block-file__button"
+						hidden={ ! showDownloadButton }
 						download={ fileName }>
 						{ __( 'Download' ) }
 					</a>

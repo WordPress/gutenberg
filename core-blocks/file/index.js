@@ -26,9 +26,7 @@ export const settings = {
 
 	attributes: {
 		href: {
-			source: 'attribute',
-			selector: 'a[download]',
-			attribute: 'href',
+			type: 'string',
 		},
 		fileName: {
 			source: 'text',
@@ -43,6 +41,9 @@ export const settings = {
 			source: 'attribute',
 			selector: 'a:not([download])',
 			attribute: 'target',
+		},
+		showDownloadButton: {
+			type: 'boolean',
 		},
 		id: {
 			type: 'number',
@@ -124,7 +125,14 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { href, fileName, textLinkHref, openInNewWindow } = attributes;
+		const {
+			href,
+			fileName,
+			textLinkHref,
+			openInNewWindow,
+			showDownloadButton,
+		} = attributes;
+
 		return ( href &&
 			<div>
 				{ fileName &&
@@ -136,12 +144,14 @@ export const settings = {
 						{ fileName }
 					</a>
 				}
-				<a
-					href={ href }
-					className="wp-block-file__button"
-					download={ fileName }>
-					{ __( 'Download' ) }
-				</a>
+				{ showDownloadButton &&
+					<a
+						href={ href }
+						className="wp-block-file__button"
+						download={ fileName }>
+						{ __( 'Download' ) }
+					</a>
+				}
 			</div>
 		);
 	},

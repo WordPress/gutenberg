@@ -7,7 +7,7 @@ import {
 	SelectControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import {
 	InspectorControls,
 } from '@wordpress/editor';
@@ -21,6 +21,8 @@ export default class FileBlockInspector extends Component {
 			onChangeLinkDestinationOption,
 			openInNewWindow,
 			onChangeOpenInNewWindow,
+			showDownloadButton,
+			onChangeShowDownloadButton,
 		} = this.props;
 
 		const linkDestinationOptions = ( () => {
@@ -34,21 +36,32 @@ export default class FileBlockInspector extends Component {
 		} )();
 
 		return (
-			<InspectorControls>
-				<PanelBody title={ __( 'Text Link Settings' ) }>
-					<SelectControl
-						label={ __( 'Link To' ) }
-						value={ textLinkHref }
-						options={ linkDestinationOptions }
-						onChange={ onChangeLinkDestinationOption }
-					/>
-					<ToggleControl
-						label={ __( 'Open in new window' ) }
-						checked={ openInNewWindow }
-						onChange={ onChangeOpenInNewWindow }
-					/>
-				</PanelBody>
-			</InspectorControls>
+			<Fragment>
+				<InspectorControls>
+					<PanelBody title={ __( 'Text Link Settings' ) }>
+						<SelectControl
+							label={ __( 'Link To' ) }
+							value={ textLinkHref }
+							options={ linkDestinationOptions }
+							onChange={ onChangeLinkDestinationOption }
+						/>
+						<ToggleControl
+							label={ __( 'Open in new window' ) }
+							checked={ openInNewWindow }
+							onChange={ onChangeOpenInNewWindow }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<InspectorControls>
+					<PanelBody title={ __( 'Download Button' ) }>
+						<ToggleControl
+							label={ __( 'Show button' ) }
+							checked={ showDownloadButton }
+							onChange={ onChangeShowDownloadButton }
+						/>
+					</PanelBody>
+				</InspectorControls>
+			</Fragment>
 		);
 	}
 }
