@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -14,26 +19,6 @@ import './editor.scss';
 
 export const name = 'core/footnotes';
 
-/**
- * Returns the text to be used for the footnotes.
- *
- * @param {?Array|string} text Text which might be a string or an array of
- * strings and nodes.
- *
- * @return {Array} Same text formatted as an array.
- */
-const getFootnotesText = ( text ) => {
-	if ( ! text ) {
-		return [];
-	}
-
-	if ( ! Array.isArray( text ) ) {
-		return [ text ];
-	}
-
-	return text;
-};
-
 export const settings = {
 	title: __( 'Footnotes' ),
 	description: __( 'List of footnotes from the article' ),
@@ -44,68 +29,78 @@ export const settings = {
 	attributes: {
 		footnotes: {
 			type: 'array',
-			default: [],
-		},
-		texts: {
-			type: 'object',
+			source: 'query',
+			selector: 'li',
+			query: {
+				id: {
+					source: 'attribute',
+					attribute: 'id',
+				},
+				text: {
+					source: 'children',
+				},
+			},
 			default: [],
 		},
 	},
 
 	edit: withSelect( ( select ) => ( {
-		footnotes: select( 'core/editor' ).getFootnotes(),
+		footnotesOrder: select( 'core/editor' ).getFootnotes(),
 	} ) )( withState( {
 		editable: null,
-	} )( ( { attributes, editable, footnotes, isSelected, setAttributes, setState } ) => {
-		const { texts } = attributes;
+	} )( ( { attributes, editable, footnotesOrder, isSelected, setAttributes, setState } ) => {
+		const { footnotes } = attributes;
 		const onSetActiveEditable = ( index ) => () => {
 			setState( { editable: index } );
 		};
 
 		return (
 			<ol className="blocks-footnotes__footnotes-list">
-				{ footnotes.map( ( footnote, i ) => (
-					<li key={ footnote }>
-						<RichText
-							tagName="span"
-							value={ getFootnotesText( texts[ footnote ] ) }
-							onChange={
-								( nextValue ) => {
-									setAttributes( {
-										texts: {
-											...texts,
-											[ footnote ]: nextValue,
-										},
-									} );
+				{ footnotesOrder.map( ( footnoteUid, i ) => {
+					const filteredFootnotes = footnotes.filter(
+						( footnote ) => footnote.id === footnoteUid );
+					const value = get( filteredFootnotes, [ 0, 'text' ] );
+
+					return (
+						<li key={ footnoteUid }>
+							<RichText
+								tagName="span"
+								value={ value }
+								onChange={
+									( nextValue ) => {
+										const nextFootnotes = footnotes.filter(
+											( footnote ) => footnote.id !== footnoteUid );
+
+										nextFootnotes.push( {
+											id: footnoteUid,
+											text: nextValue,
+										} );
+
+										setAttributes( {
+											footnotes: nextFootnotes,
+										} );
+									}
 								}
-							}
-							isSelected={ isSelected && editable === i }
-							placeholder={ __( 'Write footnote…' ) }
-							onFocus={ onSetActiveEditable( i ) }
-						/>
-					</li>
-				) ) }
+								isSelected={ isSelected && editable === i }
+								placeholder={ __( 'Write footnote…' ) }
+								onFocus={ onSetActiveEditable( i ) }
+							/>
+						</li>
+					);
+				} ) }
 			</ol>
 		);
 	} ) ),
 
 	save( { attributes } ) {
-		const { texts } = attributes;
-		const footnoteIds = Object.keys( texts );
-
-		const footnotes = footnoteIds.map( ( footnoteId ) => {
-			return {
-				id: footnoteId,
-				text: texts[ footnoteId ],
-			};
-		} );
+		const { footnotes } = attributes;
 
 		return (
 			<div>
 				<ol>
 					{ footnotes.map( ( footnote ) => (
 						<li id={ footnote.id } key={ footnote.id }>
-							{ getFootnotesText( footnote.text ) }
+							{ footnote.text }
 						</li>
 					) ) }
 				</ol>
