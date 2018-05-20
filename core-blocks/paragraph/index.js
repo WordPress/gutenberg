@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isFinite, find, omit } from 'lodash';
+import { isEqual, isFinite, find, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -144,6 +144,7 @@ class ParagraphBlock extends Component {
 	render() {
 		const {
 			attributes,
+			updateFootnotes,
 			setAttributes,
 			insertBlocksAfter,
 			mergeBlocks,
@@ -160,6 +161,7 @@ class ParagraphBlock extends Component {
 
 		const {
 			align,
+			blockFootnotes,
 			content,
 			dropCap,
 			placeholder,
@@ -233,18 +235,26 @@ class ParagraphBlock extends Component {
 						} }
 						value={ content }
 						onChange={ ( nextContent ) => {
+							const footnotes = parseFootnotesFromContent( nextContent );
+
 							setAttributes( {
 								content: nextContent,
-								blockFootnotes: parseFootnotesFromContent( nextContent ),
+								blockFootnotes: footnotes,
 							} );
+							if ( ! isEqual( blockFootnotes, footnotes ) ) {
+								updateFootnotes( footnotes );
+							}
 						} }
 						onSplit={ insertBlocksAfter ?
 							( before, after, ...blocks ) => {
+								const beforeFootnotes = parseFootnotesFromContent( before );
+								const afterFootnotes = parseFootnotesFromContent( after );
+								const afterBlock = createBlock( name, {
+									content: after,
+									blockFootnotes: parseFootnotesFromContent( after ),
+								} );
 								if ( after ) {
-									blocks.push( createBlock( name, {
-										content: after,
-										blockFootnotes: parseFootnotesFromContent( after ),
-									} ) );
+									blocks.push( afterBlock );
 								}
 
 								insertBlocksAfter( blocks );
@@ -256,6 +266,10 @@ class ParagraphBlock extends Component {
 									} );
 								} else {
 									onReplace( [] );
+								}
+
+								if ( ! isEqual( blockFootnotes, beforeFootnotes ) && afterFootnotes.length ) {
+									updateFootnotes( beforeFootnotes, { [ afterBlock.uid ]: afterFootnotes } );
 								}
 							} :
 							undefined

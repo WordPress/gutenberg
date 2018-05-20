@@ -61,6 +61,7 @@ export class BlockListBlock extends Component {
 
 		this.setBlockListRef = this.setBlockListRef.bind( this );
 		this.bindBlockNode = this.bindBlockNode.bind( this );
+		this.updateFootnotes = this.updateFootnotes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
@@ -190,15 +191,18 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	setAttributes( attributes, shouldUpdateFootnotesBlockVisibilty = true ) {
+	updateFootnotes( currentBlockFootnotes, updatedBlocks ) {
+		const { block } = this.props;
+
+		updateFootnotesBlockVisibility( {
+			...updatedBlocks,
+			[ block.uid ]: currentBlockFootnotes,
+		} );
+	}
+
+	setAttributes( attributes ) {
 		const { block, onChange } = this.props;
 		const type = getBlockType( block.name );
-
-		if ( shouldUpdateFootnotesBlockVisibilty ) {
-			updateFootnotesBlockVisibility( {
-				[ block.uid ]: attributes.blockFootnotes,
-			} );
-		}
 
 		onChange( block.uid, attributes );
 
@@ -281,12 +285,6 @@ export class BlockListBlock extends Component {
 	}
 
 	insertBlocksAfter( blocks ) {
-		const footnotes = {};
-		blocks.forEach( ( block ) => {
-			footnotes[ block.uid ] = get( block, [ 'attributes', 'blockFootnotes' ] );
-		} );
-
-		updateFootnotesBlockVisibility( footnotes );
 		this.props.onInsertBlocks( blocks, this.props.order + 1 );
 	}
 
@@ -570,6 +568,7 @@ export class BlockListBlock extends Component {
 								name={ blockName }
 								isSelected={ isSelected }
 								attributes={ block.attributes }
+								updateFootnotes={ this.updateFootnotes }
 								setAttributes={ this.setAttributes }
 								insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 								onReplace={ isLocked ? undefined : onReplace }
