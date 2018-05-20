@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ExternalLink, TextareaControl } from '@wordpress/components';
+import { Button, TextareaControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/element';
 
@@ -20,9 +20,9 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 				onChange={ ( value ) => onUpdateExcerpt( value ) }
 				value={ excerpt }
 			/>
-			<ExternalLink href="https://codex.wordpress.org/Excerpt">
+			<Button href="https://codex.wordpress.org/Excerpt" target="_blank">
 				{ __( 'Learn more about manual excerpts' ) }
-			</ExternalLink>
+			</Button>
 		</div>
 	);
 }
