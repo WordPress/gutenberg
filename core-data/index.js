@@ -12,6 +12,13 @@ import * as actions from './actions';
 import * as resolvers from './resolvers';
 import { default as entities, getMethodName } from './entities';
 
+/**
+ * The reducer key used by core data in store registration.
+ *
+ * @type {string}
+ */
+export const REDUCER_KEY = 'core';
+
 const createEntityRecordGetter = ( source ) => entities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	const methodName = getMethodName( kind, name );
@@ -22,7 +29,7 @@ const createEntityRecordGetter = ( source ) => entities.reduce( ( result, entity
 const entityResolvers = createEntityRecordGetter( resolvers );
 const entitySelectors = createEntityRecordGetter( selectors );
 
-const store = registerStore( 'core', {
+const store = registerStore( REDUCER_KEY, {
 	reducer,
 	actions,
 	selectors: { ...selectors, ...entitySelectors },

@@ -40,3 +40,13 @@ export const remove = wrapFunction( 'remove' );
 export const replace = wrapFunction( 'replace' );
 export const replaceTag = wrapFunction( 'replaceTag' );
 export const unwrap = wrapFunction( 'unwrap' );
+
+export function isExtraSmall() {
+	deprecated( 'wp.utils.isExtraSmall', {
+		version: '3.1',
+		alternative: 'wp.viewport.*',
+		plugin: 'Gutenberg',
+	} );
+
+	return window && window.innerWidth < 782;
+}
