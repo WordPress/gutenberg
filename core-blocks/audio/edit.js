@@ -18,11 +18,38 @@ import './editor.scss';
 export default class AudioEdit extends Component {
 	constructor() {
 		super( ...arguments );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.onAudioClick = this.onAudioClick.bind( this );
 		// edit component has its own src in the state so it can be edited
 		// without setting the actual value outside of the edit UI
 		this.state = {
 			editing: ! this.props.attributes.src,
+			captionFocused: false,
 		};
+	}
+
+	componentWillReceiveProps( { isSelected } ) {
+		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: false,
+			} );
+		}
+	}
+
+	onFocusCaption() {
+		if ( ! this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: true,
+			} );
+		}
+	}
+
+	onAudioClick() {
+		if ( this.state.captionFocused ) {
+			this.setState( {
+				captionFocused: false,
+			} );
+		}
 	}
 
 	render() {
@@ -80,13 +107,15 @@ export default class AudioEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<figure className={ className }>
-					<audio controls="controls" src={ src } />
+					<audio controls="controls" src={ src } onClick={ this.onAudioClick } />
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption }
+							onFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							isSelected={ this.state.captionFocused }
 							inlineToolbar
 						/>
 					) }
