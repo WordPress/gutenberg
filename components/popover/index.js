@@ -8,7 +8,8 @@ import { isEqual, noop } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
+import { focus } from '@wordpress/dom';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies

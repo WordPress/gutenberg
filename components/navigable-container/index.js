@@ -7,7 +7,8 @@ import { omit, noop, includes } from 'lodash';
  * WordPress Dependencies
  */
 import { Component } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
+import { focus } from '@wordpress/dom';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Module constants

@@ -91,7 +91,7 @@ rm -f gutenberg.zip
 php bin/generate-gutenberg-php.php > gutenberg.tmp.php
 mv gutenberg.tmp.php gutenberg.php
 
-build_files=$(ls **/build/*.{js,css})
+build_files=$(ls build/*/*.{js,css})
 
 # Generate the plugin zip file
 status "Creating archive..."

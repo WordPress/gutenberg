@@ -8,7 +8,7 @@ import ResizableBox from 're-resizable';
  */
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/blocks';
+import { InspectorControls } from '@wordpress/editor';
 import { BaseControl, PanelBody } from '@wordpress/components';
 
 /**
@@ -34,7 +34,7 @@ export const settings = {
 		},
 	},
 
-	edit( { attributes, setAttributes, isSelected, toggleSelection } ) {
+	edit( { attributes, setAttributes, toggleSelection } ) {
 		const { height } = attributes;
 
 		return (
@@ -68,26 +68,24 @@ export const settings = {
 						toggleSelection( false );
 					} }
 				/>
-				{ isSelected &&
-					<InspectorControls>
-						<PanelBody title={ __( 'Spacer Settings' ) }>
-							<BaseControl label={ __( 'Height in pixels' ) }>
-								<input
-									type="number"
-									onChange={ ( event ) => {
-										setAttributes( {
-											height: parseInt( event.target.value, 10 ),
-										} );
-									} }
-									aria-label={ __( 'Height for the spacer element in pixels.' ) }
-									value={ height }
-									min="20"
-									step="10"
-								/>
-							</BaseControl>
-						</PanelBody>
-					</InspectorControls>
-				}
+				<InspectorControls>
+					<PanelBody title={ __( 'Spacer Settings' ) }>
+						<BaseControl label={ __( 'Height in pixels' ) }>
+							<input
+								type="number"
+								onChange={ ( event ) => {
+									setAttributes( {
+										height: parseInt( event.target.value, 10 ),
+									} );
+								} }
+								aria-label={ __( 'Height for the spacer element in pixels.' ) }
+								value={ height }
+								min="20"
+								step="10"
+							/>
+						</BaseControl>
+					</PanelBody>
+				</InspectorControls>
 			</Fragment>
 		);
 	},

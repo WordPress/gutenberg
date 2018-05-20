@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 function isTableSelected( editor ) {
 	return editor.dom.getParent(

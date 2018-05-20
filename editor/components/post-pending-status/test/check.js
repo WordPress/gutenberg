@@ -9,21 +9,9 @@ import { shallow } from 'enzyme';
 import { PostPendingStatusCheck } from '../check';
 
 describe( 'PostPendingStatusCheck', () => {
-	const user = {
-		data: {
-			post_type_capabilities: {
-				publish_posts: true,
-			},
-		},
-	};
-
 	it( 'should not render anything if the user doesn\'t have the right capabilities', () => {
-		let wrapper = shallow( <PostPendingStatusCheck user={ {} }>status</PostPendingStatusCheck> );
-		expect( wrapper.type() ).toBe( null );
-		wrapper = shallow(
-			<PostPendingStatusCheck user={
-				{ data: { post_type_capabilities: { publish_posts: false } } }
-			}>
+		const wrapper = shallow(
+			<PostPendingStatusCheck hasPublishAction={ false }>
 				status
 			</PostPendingStatusCheck>
 		);
@@ -31,7 +19,7 @@ describe( 'PostPendingStatusCheck', () => {
 	} );
 
 	it( 'should render if the user has the correct capability', () => {
-		const wrapper = shallow( <PostPendingStatusCheck user={ user }>status</PostPendingStatusCheck> );
+		const wrapper = shallow( <PostPendingStatusCheck hasPublishAction={ true }>status</PostPendingStatusCheck> );
 		expect( wrapper.type() ).not.toBe( null );
 	} );
 } );

@@ -74,6 +74,23 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 }
 
 /**
+ * Reducer managing taxonomies.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function taxonomies( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_TAXONOMIES':
+			return action.taxonomies;
+	}
+
+	return state;
+}
+
+/**
  * Reducer managing theme supports data.
  *
  * @param {Object} state  Current state.
@@ -119,7 +136,7 @@ function entity( entityConfig ) {
 			case 'RECEIVE_ENTITY_RECORDS':
 				return {
 					byKey: {
-						...state.key,
+						...state.byKey,
 						...keyBy( action.records, key ),
 					},
 				};
@@ -146,6 +163,7 @@ export const entities = combineReducers( Object.entries( entitiesByKind ).reduce
 export default combineReducers( {
 	terms,
 	users,
+	taxonomies,
 	themeSupports,
 	entities,
 } );

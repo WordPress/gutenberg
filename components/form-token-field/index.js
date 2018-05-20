@@ -94,7 +94,7 @@ class FormTokenField extends Component {
 
 	onBlur() {
 		if ( this.inputHasValidValue() ) {
-			this.setState( { isActive: false }, this.addCurrentToken );
+			this.setState( { isActive: false } );
 		} else {
 			this.setState( initialState );
 		}
@@ -106,9 +106,6 @@ class FormTokenField extends Component {
 		switch ( event.keyCode ) {
 			case 8: // backspace (delete to left)
 				preventDefault = this.handleDeleteKey( this.deleteTokenBeforeInput );
-				break;
-			case 9: // tab
-				preventDefault = this.addCurrentToken();
 				break;
 			case 13: // enter/return
 				preventDefault = this.addCurrentToken();
@@ -510,8 +507,9 @@ class FormTokenField extends Component {
 			disabled,
 			placeholder = __( 'Add item.' ),
 			instanceId,
+			className,
 		} = this.props;
-		const classes = classnames( 'components-form-token-field', {
+		const classes = classnames( className, 'components-form-token-field', {
 			'is-active': this.state.isActive,
 			'is-disabled': disabled,
 		} );

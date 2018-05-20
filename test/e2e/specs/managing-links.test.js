@@ -32,12 +32,12 @@ describe( 'Managing links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let modal = await page.$( '.blocks-format-toolbar__link-modal' );
+		let modal = await page.$( '.editor-format-toolbar__link-modal' );
 		expect( modal ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		modal = await page.$( '.blocks-format-toolbar__link-modal' );
+		modal = await page.$( '.editor-format-toolbar__link-modal' );
 		expect( modal ).toBeNull();
 	} );
 
@@ -55,12 +55,12 @@ describe( 'Managing links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let modal = await page.$( '.blocks-format-toolbar__link-modal' );
+		let modal = await page.$( '.editor-format-toolbar__link-modal' );
 		expect( modal ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		modal = await page.$( '.blocks-format-toolbar__link-modal' );
+		modal = await page.$( '.editor-format-toolbar__link-modal' );
 		expect( modal ).toBeNull();
 	} );
 } );

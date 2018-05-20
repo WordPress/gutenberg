@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { unwrap, replaceTag } from '@wordpress/utils';
+import { unwrap, replaceTag } from '@wordpress/dom';
 
 /**
  * Internal dependencies

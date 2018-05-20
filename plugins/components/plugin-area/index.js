@@ -30,12 +30,12 @@ class PluginArea extends Component {
 
 	getCurrentPluginsState() {
 		return {
-			plugins: map( getPlugins(), ( { name, render } ) => {
+			plugins: map( getPlugins(), ( { icon, name, render } ) => {
 				return {
-					name,
 					Plugin: render,
 					context: {
 						name,
+						icon,
 					},
 				};
 			} ),
@@ -59,9 +59,9 @@ class PluginArea extends Component {
 	render() {
 		return (
 			<div style={ { display: 'none' } }>
-				{ map( this.state.plugins, ( { context, name, Plugin } ) => (
+				{ map( this.state.plugins, ( { context, Plugin } ) => (
 					<PluginContextProvider
-						key={ name }
+						key={ context.name }
 						value={ context }
 					>
 						<Plugin />

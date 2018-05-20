@@ -7,7 +7,7 @@ import { includes, debounce } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { focus } from '@wordpress/utils';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
