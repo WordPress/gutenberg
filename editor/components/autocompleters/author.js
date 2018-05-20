@@ -21,21 +21,17 @@ export default {
 	getOptionLabel( user ) {
 		return [
 			<span key="name" className="blocks-autocompleters__user-name">{ user.name }</span>,
-			<span key="slug" className="blocks-autocompleters__user-slug">{ user.slug }</span>,
 		];
 	},
 	allowNode() {
 		return true;
 	},
-	onFocus() {
-		console.log( 'onFocus' );
-	},
-	onBlur() {
-		console.log( 'onBlur' );
-	},
+
 	getOptionCompletion( user ) {
-		// After selection.
-		console.log( user );
-		return `${ user.name }`;
+		return {
+			action: 'insert-at-caret',
+			value: `${ user.name }`,
+			id: user.id,
+		};
 	},
 };

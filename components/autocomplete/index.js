@@ -238,10 +238,9 @@ export class Autocomplete extends Component {
 	}
 
 	select( option ) {
-		const { onReplace } = this.props;
+		const { onReplace, onSelect } = this.props;
 		const { open, range, query } = this.state;
 		const { getOptionCompletion } = open || {};
-
 		this.reset();
 
 		if ( getOptionCompletion ) {
@@ -265,7 +264,13 @@ export class Autocomplete extends Component {
 					this.insertCompletion( range, selectionResult );
 				}
 			}
+
+			// Call the Autocomplete component's onSelect method if available.
+			if ( onSelect ) {
+				onSelect( completion );
+			}
 		}
+
 	}
 
 	reset() {

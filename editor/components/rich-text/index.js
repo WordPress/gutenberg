@@ -852,6 +852,7 @@ export class RichText extends Component {
 			formatters,
 			autocompleters,
 			format,
+			onSelect,
 		} = this.props;
 
 		const ariaProps = { ...pickAriaProps( this.props ), 'aria-multiline': !! MultilineTag };
@@ -889,7 +890,7 @@ export class RichText extends Component {
 						{ formatToolbar }
 					</div>
 				) }
-				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
+				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters } onSelect={ onSelect }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>
 							<TinyMCE

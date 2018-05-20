@@ -19,7 +19,7 @@ const PANEL_NAME = 'author-panel';
 export class PostAuthor extends Component {
 	constructor() {
 		super( ...arguments );
-		this.onChange = this.onChange.bind( this );
+		this.onSelect = this.onSelect.bind( this );
 		this.onBlur = this.onBlur.bind( this );
 		this.state = {
 			theAuthor: false,
@@ -33,7 +33,7 @@ export class PostAuthor extends Component {
 	}
 
 	// When an author is selected, set the post author.
-	onChange( value ) {
+	onSelect( value ) {
 		if ( ! value ) {
 			return;
 		}
@@ -42,8 +42,8 @@ export class PostAuthor extends Component {
 		onUpdateAuthor( Number( value.id ) );
 	}
 
-	onBlur( e ) {
-		console.log( 'onBlur', e );
+	onBlur( content ) {
+		//this.onSelect( content[1] )
 	}
 
 
@@ -62,12 +62,14 @@ export class PostAuthor extends Component {
 						<div className="components-form-token-field">
 							<div className="components-form-token-field__input-container">
 								<RichText
-										tagName="p"
-										className="editor-post-author__select wp-block-paragraph"
-										value={ theAuthor ? theAuthor.name : '' }
-										aria-autocomplete="list"
-										onChange={ this.onChange }
-										autocompleters={ [ authorAutocompleter ] }
+									tagName="p"
+									className="editor-post-author__select wp-block-paragraph"
+									value={ theAuthor ? theAuthor.name : '' }
+									aria-autocomplete="list"
+									onSelect={ this.onSelect }
+									onChange={ () => {} }
+									autocompleters={ [ authorAutocompleter ] }
+									onBlur={ this.onBlur }
 								/>
 							</div>
 						</div>
