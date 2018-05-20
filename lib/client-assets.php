@@ -76,7 +76,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_register_vendor_scripts();
 
 	// WordPress packages.
-	wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array( 'jquery' ) );
+	wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array() );
 
 	wp_register_script(
 		'wp-dom-ready',
