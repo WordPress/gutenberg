@@ -14,7 +14,6 @@ import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSchedule from '../post-schedule';
 import PostSticky from '../post-sticky';
-import PostAuthor from '../post-author';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
@@ -32,7 +31,6 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			<PostFormat />
 			<PostSticky />
 			<PostPendingStatus />
-			<PostAuthor />
 			<PluginPostStatusInfo.Slot />
 			<PostTrash />
 		</PanelBody>

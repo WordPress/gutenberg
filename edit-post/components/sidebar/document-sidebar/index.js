@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal Dependencies
  */
 import PostStatus from '../post-status';
+import PostAuthor from '../post-author';
 import PostExcerpt from '../post-excerpt';
 import PostTaxonomies from '../post-taxonomies';
 import FeaturedImage from '../featured-image';
@@ -17,6 +18,7 @@ import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
 import SettingsHeader from '../settings-header';
 import Sidebar from '../';
+
 
 const SIDEBAR_NAME = 'edit-post/document';
 
@@ -28,6 +30,7 @@ const DocumentSidebar = () => (
 		<SettingsHeader sidebarName={ SIDEBAR_NAME } />
 		<Panel>
 			<PostStatus />
+			<PostAuthor />
 			<LastRevision />
 			<PostTaxonomies />
 			<FeaturedImage />

@@ -1,5 +1,5 @@
 /**
-* A user mentions completer.
+* An author autocompleter.
 *
 * @type {Completer}
 */
@@ -27,7 +27,15 @@ export default {
 	allowNode() {
 		return true;
 	},
+	onFocus() {
+		console.log( 'onFocus' );
+	},
+	onBlur() {
+		console.log( 'onBlur' );
+	},
 	getOptionCompletion( user ) {
+		// After selection.
+		console.log( user );
 		return `${ user.name }`;
 	},
 };

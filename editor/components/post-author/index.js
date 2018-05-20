@@ -5,8 +5,8 @@ import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { authorAutocompleter } from '../../../blocks/autocompleters';
-import RichText from '../../../blocks/rich-text';
+import { authorAutocompleter } from '../../../editor/components/autocompleters';
+import RichText from '../../../editor/components/rich-text';
 
 /**
  * Internal dependencies
