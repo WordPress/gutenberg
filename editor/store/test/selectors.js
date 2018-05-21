@@ -1068,11 +1068,11 @@ describe( 'selectors', () => {
 		it( 'should return the correct url adding a preview parameter to the query string', () => {
 			const state = {
 				currentPost: {
-					link: 'https://andalouses.com/beach',
+					preview_link: 'https://andalouses.com/?p=1&preview=true',
 				},
 			};
 
-			expect( getEditedPostPreviewLink( state ) ).toBe( 'https://andalouses.com/beach?preview=true' );
+			expect( getEditedPostPreviewLink( state ) ).toBe( 'https://andalouses.com/?p=1&preview=true' );
 		} );
 	} );
 
