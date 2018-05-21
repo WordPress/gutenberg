@@ -30,6 +30,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 		<PostFeaturedImageCheck>
 			<div className="editor-post-featured-image">
 				{ !! featuredImageId &&
+					<PostTypeSupportCheck supportKeys="media-library">
 						<MediaUpload
 							title={ postLabel.set_featured_image }
 							onSelect={ onUpdateImage }
@@ -49,6 +50,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 								</Button>
 							) }
 						/>
+					</PostTypeSupportCheck>
 				}
 				{ !! featuredImageId && media && ! media.isLoading &&
 					<p className="editor-post-featured-image__howto">
