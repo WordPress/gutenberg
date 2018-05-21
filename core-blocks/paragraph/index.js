@@ -249,16 +249,11 @@ class ParagraphBlock extends Component {
 						} }
 						onSplit={ insertBlocksAfter ?
 							( before, after, ...blocks ) => {
-								const beforeFootnotes = parseFootnotesFromContent( before );
-
-								const afterFootnotes = parseFootnotesFromContent( after );
-								const afterBlock = createBlock( name, {
-									content: after,
-									blockFootnotes: afterFootnotes,
-								} );
-
 								if ( after ) {
-									blocks.push( afterBlock );
+									blocks.push( createBlock( name, {
+										content: after,
+										blockFootnotes: parseFootnotesFromContent( after ),
+									} ) );
 								}
 
 								insertBlocksAfter( blocks );
@@ -266,14 +261,10 @@ class ParagraphBlock extends Component {
 								if ( before ) {
 									setAttributes( {
 										content: before,
-										blockFootnotes: beforeFootnotes,
+										blockFootnotes: parseFootnotesFromContent( before ),
 									} );
 								} else {
 									onReplace( [] );
-								}
-
-								if ( ! isEqual( blockFootnotes, beforeFootnotes ) && afterFootnotes.length ) {
-									updateFootnotes( beforeFootnotes, { [ afterBlock.uid ]: afterFootnotes } );
 								}
 							} :
 							undefined
