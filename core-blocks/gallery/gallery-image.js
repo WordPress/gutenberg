@@ -6,12 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress Dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, compose } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
 import { withSelect } from '@wordpress/data';
-import { RichText } from '@wordpress/editor';
+import { RichText, withBlockEditContext } from '@wordpress/editor';
 
 /**
  * Module constants
@@ -23,41 +23,16 @@ class GalleryImage extends Component {
 		super( ...arguments );
 
 		this.onImageClick = this.onImageClick.bind( this );
-		this.onSelectCaption = this.onSelectCaption.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
-
-		this.state = {
-			captionSelected: false,
-		};
 	}
 
 	bindContainer( ref ) {
 		this.container = ref;
 	}
 
-	onSelectCaption() {
-		if ( ! this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: true,
-			} );
-		}
-
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
-		}
-	}
-
 	onImageClick() {
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
-		}
-
-		if ( this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: false,
-			} );
-		}
+		this.props.setFocusedElement( null );
 	}
 
 	onKeyDown( event ) {
@@ -71,19 +46,11 @@ class GalleryImage extends Component {
 		}
 	}
 
-	componentWillReceiveProps( { isSelected, image, url } ) {
+	componentWillReceiveProps( { image, url } ) {
 		if ( image && ! url ) {
 			this.props.setAttributes( {
 				url: image.source_url,
 				alt: image.alt_text,
-			} );
-		}
-
-		// unselect the caption so when the user selects other image and comeback
-		// the caption is not immediately selected
-		if ( this.state.captionSelected && ! isSelected && this.props.isSelected ) {
-			this.setState( {
-				captionSelected: false,
 			} );
 		}
 	}
@@ -115,7 +82,13 @@ class GalleryImage extends Component {
 		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<figure className={ className } tabIndex="-1" onKeyDown={ this.onKeyDown } ref={ this.bindContainer }>
+			<figure
+				className={ className }
+				tabIndex="-1"
+				onClick={ this.props.onSelect }
+				onKeyDown={ this.onKeyDown }
+				ref={ this.bindContainer }
+			>
 				{ isSelected &&
 					<div className="core-blocks-gallery-item__inline-menu">
 						<IconButton
@@ -132,9 +105,7 @@ class GalleryImage extends Component {
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
-						isSelected={ this.state.captionSelected }
 						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-						onFocus={ this.onSelectCaption }
 						inlineToolbar
 					/>
 				) : null }
@@ -144,11 +115,18 @@ class GalleryImage extends Component {
 	}
 }
 
-export default withSelect( ( select, ownProps ) => {
-	const { getMedia } = select( 'core' );
-	const { id } = ownProps;
+export default compose( [
+	withBlockEditContext( ( { setFocusedElement } ) => {
+		return {
+			setFocusedElement,
+		};
+	} ),
+	withSelect( ( select, ownProps ) => {
+		const { getMedia } = select( 'core' );
+		const { id } = ownProps;
 
-	return {
-		image: id ? getMedia( id ) : null,
-	};
-} )( GalleryImage );
+		return {
+			image: id ? getMedia( id ) : null,
+		};
+	} ),
+] )( GalleryImage );
