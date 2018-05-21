@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, PanelRow } from '@wordpress/components';
-import { withInstanceId } from '@wordpress/components';
+import { PanelBody, PanelRow, withInstanceId } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { authorAutocompleter } from '../../../../editor/components/autocompleters';
@@ -24,10 +23,9 @@ export class PostAuthor extends Component {
 		this.state = {
 			theAuthor: false,
 		};
-		const { postAuthor, instanceId } = this.props;
+		const { postAuthor } = this.props;
 		wp.apiRequest( { path: '/wp/v2/users/' + postAuthor + '?context=edit' } )
 			.then( ( response ) => {
-			console.log( 'two', response );
 				this.setState( { theAuthor: response } );
 			} );
 	}
@@ -37,7 +35,6 @@ export class PostAuthor extends Component {
 		if ( ! value ) {
 			return;
 		}
-		console.log( 'setAuthorId', value )
 		const { onUpdateAuthor } = this.props;
 		onUpdateAuthor( Number( value.id ) );
 	}
@@ -47,17 +44,13 @@ export class PostAuthor extends Component {
 			return;
 		}
 		const range = editor.dom.createRng();
-		range.selectNodeContents(editor.getBody());
-		editor.selection.setRng(range);
+		range.selectNodeContents( editor.getBody() );
+		editor.selection.setRng( range );
 	}
 
-
 	render() {
-		const { postAuthor, instanceId, authors, isOpened, onTogglePanel } = this.props;
-		const selectId = 'post-author-selector-' + instanceId;
+		const { isOpened, onTogglePanel } = this.props;
 		const theAuthor = this.state.theAuthor;
-		console.log( 'render', theAuthor ? theAuthor.name : '' );
-
 
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (

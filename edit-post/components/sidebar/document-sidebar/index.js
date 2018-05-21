@@ -19,7 +19,6 @@ import MetaBoxes from '../../meta-boxes';
 import SettingsHeader from '../settings-header';
 import Sidebar from '../';
 
-
 const SIDEBAR_NAME = 'edit-post/document';
 
 const DocumentSidebar = () => (

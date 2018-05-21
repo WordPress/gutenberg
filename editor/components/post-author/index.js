@@ -20,10 +20,9 @@ export class PostAuthor extends Component {
 		this.state = {
 			theAuthor: false,
 		};
-		const { postAuthor, instanceId } = this.props;
+		const { postAuthor } = this.props;
 		wp.apiRequest( { path: '/wp/v2/users/' + postAuthor + '?context=edit' } )
 			.then( ( response ) => {
-			console.log( 'two', response );
 				this.setState( { theAuthor: response } );
 			} );
 	}
@@ -38,24 +37,22 @@ export class PostAuthor extends Component {
 	}
 
 	render() {
-		const { postAuthor, instanceId, authors } = this.props;
+		const { instanceId } = this.props;
 		const selectId = 'post-author-selector-' + instanceId;
 		const theAuthor = this.state.theAuthor;
-		console.log( theAuthor ? theAuthor.name : '' );
 
 		// Disable reason: A select with an onchange throws a warning
-
 		/* eslint-disable jsx-a11y/no-onchange */
 		return (
 			<PostAuthorCheck>
 				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
 				<RichText
-						tagName="p"
-						className="editor-post-author__select wp-block-paragraph"
-						value={ theAuthor ? theAuthor.name : '' }
-						aria-autocomplete="list"
-						onChange={ this.setAuthorId }
-						autocompleters={ [ authorAutocompleter ] }
+					tagName="p"
+					className="editor-post-author__select wp-block-paragraph"
+					value={ theAuthor ? theAuthor.name : '' }
+					aria-autocomplete="list"
+					onChange={ this.setAuthorId }
+					autocompleters={ [ authorAutocompleter ] }
 				/>
 
 			</PostAuthorCheck>
