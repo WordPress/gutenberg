@@ -27,11 +27,6 @@ import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
 
-/**
- * Internal dependencies
- */
-import { getFlattenedBlocks } from '../utils/block-list';
-
 /***
  * Module constants
  */
@@ -739,27 +734,26 @@ export function getFootnotesBlockUid( state ) {
 }
 
 /**
- * Returns an array with all footnotes UIDs.
+ * Returns an array with all footnote UIDs contained in the specified block
+ * including its children. If no block UID is specified, it returns the array
+ * of footnotes of the entire post.
  *
- * @param {Object} state Global application state.
+ * @param {Object}  state   Global application state.
+ * @param {?string} rootUID Optional root UID of the block to search footnotes in.
  *
  * @return {Array} Footnote ids.
  */
-export function getFootnotes( state ) {
-	const blocks = getFlattenedBlocks( getBlocks( state ) );
+export function getFootnotes( state, rootUID = '' ) {
+	const blockFootnotes = get( state.editor.present.blocksByUID[ rootUID ],
+		[ 'attributes', 'blockFootnotes' ], [] );
+	const innerBlocksUids = getBlockOrder( state, rootUID );
 
-	return Object.keys( blocks ).reduce(
-		( footnotes, blockUid ) => {
-			const block = blocks[ blockUid ];
-
-			if ( ! block.attributes ||
-					! block.attributes.blockFootnotes ) {
-				return footnotes;
-			}
-
-			return footnotes.concat( block.attributes.blockFootnotes );
-		},
-		[]
+	return innerBlocksUids.reduce(
+		( footnotes, blockUid ) => [
+			...footnotes,
+			...getFootnotes( state, blockUid ),
+		],
+		blockFootnotes
 	);
 }
 

@@ -31,7 +31,6 @@ import { combineReducers } from '@wordpress/data';
  */
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
-import { getFlattenedBlocks } from '../utils/block-list';
 import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 
@@ -73,6 +72,32 @@ function mapBlockOrder( blocks, rootUID = '' ) {
 	} );
 
 	return result;
+}
+
+/**
+ * Given an array of blocks, returns an object containing all blocks, recursing
+ * into inner blocks. Keys correspond to the block UID, the value of which is
+ * the block object.
+ *
+ * @param {Array} blocks Blocks to flatten.
+ *
+ * @return {Object} Flattened blocks object.
+ */
+function getFlattenedBlocks( blocks ) {
+	const flattenedBlocks = {};
+
+	const stack = [ ...blocks ];
+	while ( stack.length ) {
+		// `innerBlocks` is redundant data which can fall out of sync, since
+		// this is reflected in `blockOrder`, so exclude from appended block.
+		const { innerBlocks, ...block } = stack.shift();
+
+		stack.push( ...innerBlocks );
+
+		flattenedBlocks[ block.uid ] = block;
+	}
+
+	return flattenedBlocks;
 }
 
 /**
