@@ -122,7 +122,6 @@ input[type="search"].editor-inserter__search {
 	&:not(:disabled) {
 		&:hover {
 			border-color: $light-gray-700;
-			transform: scale( 1.15 );
 
 			.editor-inserter__item-icon {
 				color: $dark-gray-900;
