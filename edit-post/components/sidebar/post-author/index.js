@@ -20,7 +20,7 @@ export class PostAuthor extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSelect = this.onSelect.bind( this );
-		this.onBlur = this.onBlur.bind( this );
+		this.onFocus = this.onFocus.bind( this );
 		this.state = {
 			theAuthor: false,
 		};
@@ -42,8 +42,13 @@ export class PostAuthor extends Component {
 		onUpdateAuthor( Number( value.id ) );
 	}
 
-	onBlur( content ) {
-		//this.onSelect( content[1] )
+	onFocus( editor ) {
+		if ( ! editor.dom ) {
+			return;
+		}
+		const range = editor.dom.createRng();
+		range.selectNodeContents(editor.getBody());
+		editor.selection.setRng(range);
 	}
 
 
@@ -69,7 +74,7 @@ export class PostAuthor extends Component {
 									onSelect={ this.onSelect }
 									onChange={ () => {} }
 									autocompleters={ [ authorAutocompleter ] }
-									onBlur={ this.onBlur }
+									onFocus={ this.onFocus }
 								/>
 							</div>
 						</div>

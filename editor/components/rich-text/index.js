@@ -202,6 +202,10 @@ export class RichText extends Component {
 		if ( this.props.setFocusedElement ) {
 			this.props.setFocusedElement( this.props.instanceId );
 		}
+
+		if ( this.props.onFocus ) {
+			this.props.onFocus( this.editor );
+		}
 	}
 
 	/**
