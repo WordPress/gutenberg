@@ -61,8 +61,8 @@ class Popover extends Component {
 	componentDidMount() {
 		const popoverSize = this.updatePopoverSize();
 		this.computePopoverPosition( popoverSize );
-		this.focus();
 		this.toggleWindowEvents( true );
+		setTimeout( () => this.focus() );
 	}
 
 	componentDidUpdate( prevProps ) {
