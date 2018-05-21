@@ -19,6 +19,11 @@ class BlockInsertionPoint extends Component {
 		props.startTyping();
 	}
 
+	onFocus( event ) {
+		// Ensures that focus doesn't get propagated to BlockContextualToolbar
+		event.stopPropagation();
+	}
+
 	render() {
 		const { showInsertionPoint, showInserter } = this.props;
 
@@ -29,6 +34,7 @@ class BlockInsertionPoint extends Component {
 					<button
 						className="editor-block-list__insertion-point-inserter"
 						onClick={ this.onClick }
+						onFocus={ this.onFocus }
 						aria-label={ __( 'Insert block' ) }
 					/>
 				) }
