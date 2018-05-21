@@ -29,10 +29,7 @@ describe( 'blocks', () => {
 	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
 
 	beforeAll( () => {
-		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
-
-		// Initialize the block store
+		// Initialize the block store.
 		require( '../../store' );
 	} );
 
@@ -91,14 +88,6 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				attributes: {
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
 			} );
 		} );
 
@@ -183,12 +172,6 @@ describe( 'blocks', () => {
 					ok: {
 						type: 'boolean',
 					},
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
 				},
 			} );
 		} );
@@ -204,14 +187,6 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes: {
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
 			} );
 		} );
 
@@ -250,14 +225,6 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: 'block-default',
-					attributes: {
-						className: {
-							type: 'string',
-						},
-						layout: {
-							type: 'string',
-						},
-					},
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -268,14 +235,6 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes: {
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -318,14 +277,6 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes: {
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
 			} );
 		} );
 
@@ -339,14 +290,6 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes: {
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
 			} );
 		} );
 	} );
@@ -367,14 +310,6 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: 'block-default',
-					attributes: {
-						className: {
-							type: 'string',
-						},
-						layout: {
-							type: 'string',
-						},
-					},
 				},
 				{
 					name: 'core/test-block-with-settings',
@@ -383,14 +318,6 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: 'block-default',
-					attributes: {
-						className: {
-							type: 'string',
-						},
-						layout: {
-							type: 'string',
-						},
-					},
 				},
 			] );
 		} );
