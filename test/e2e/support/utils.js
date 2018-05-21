@@ -90,7 +90,32 @@ export async function newDesktopBrowserPage() {
 		fail( error );
 	} );
 
-	await page.setViewport( { width: 1000, height: 700 } );
+	await setViewport( 'large' );
+}
+
+export async function setViewport( type ) {
+	const allowedDimensions = {
+		large: { width: 960, height: 700 },
+		small: { width: 600, height: 700 },
+	};
+	const currentDimmension = allowedDimensions[ type ];
+	await page.setViewport( currentDimmension );
+	await waitForPageDimensions( currentDimmension.width, currentDimmension.height );
+}
+
+/**
+ * Function that waits until the page viewport has the required dimensions.
+ * It is being used to address a problem where after using setViewport the execution may continue,
+ * without the new dimensions being applied.
+ * https://github.com/GoogleChrome/puppeteer/issues/1751
+ *
+ * @param {number} width  Width of the window.
+ * @param {height} height Height of the window.
+ */
+export async function waitForPageDimensions( width, height ) {
+	await page.mainFrame().waitForFunction(
+		`window.innerWidth === ${ width } && window.innerHeight === ${ height }`
+	);
 }
 
 export async function switchToEditor( mode ) {
@@ -196,3 +221,8 @@ export async function publishPost() {
 	// A success notice should show up
 	return page.waitForSelector( '.notice-success' );
 }
+
+export async function clearLocalStorage() {
+	await page.evaluate( () => window.localStorage.clear() );
+}
+
