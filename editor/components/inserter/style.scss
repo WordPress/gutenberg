@@ -113,7 +113,7 @@ input[type="search"].editor-inserter__search {
 	word-break: break-word;
 	border-radius: 3px;
 	border: 1px solid transparent;
-	transition: all 0.03s ease-in-out;
+	transition: all 0.05s ease-in-out;
 
 	&:disabled {
 		@include button-style__disabled;
@@ -121,8 +121,7 @@ input[type="search"].editor-inserter__search {
 
 	&:not(:disabled) {
 		&:hover {
-			border-color: $light-gray-600;
-			box-shadow: 0 0 0 2px white;
+			border-color: $light-gray-700;
 			transform: scale( 1.15 );
 
 			.editor-inserter__item-icon {
@@ -155,7 +154,7 @@ input[type="search"].editor-inserter__search {
 	svg {
 		width: 22px;
 		height: 22px;
-		transition: all 0.2s ease-out;
+		transition: all 0.15s ease-out;
 	}
 }
 
