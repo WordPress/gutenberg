@@ -328,7 +328,7 @@ describe( 'block parser', () => {
 
 			const footnotes = parseFootnotesFromContent( content );
 
-			expect( footnotes ).toEqual( [ '12345' ] );
+			expect( footnotes ).toEqual( [ { id: '12345' } ] );
 		} );
 	} );
 

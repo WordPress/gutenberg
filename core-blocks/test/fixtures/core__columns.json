@@ -12,6 +12,7 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
+                    "blockFootnotes": [],
                     "content": [
                         "Column One, Paragraph One"
                     ],
@@ -26,6 +27,7 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
+                    "blockFootnotes": [],
                     "content": [
                         "Column One, Paragraph Two"
                     ],
@@ -40,6 +42,7 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
+                    "blockFootnotes": [],
                     "content": [
                         "Column Two, Paragraph One"
                     ],
@@ -54,6 +57,7 @@
                 "name": "core/paragraph",
                 "isValid": true,
                 "attributes": {
+                    "blockFootnotes": [],
                     "content": [
                         "Column Three, Paragraph One"
                     ],

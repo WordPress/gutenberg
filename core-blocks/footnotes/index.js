@@ -56,23 +56,23 @@ export const settings = {
 
 		return (
 			<ol className="blocks-footnotes__footnotes-list">
-				{ footnotesOrder.map( ( footnoteUid, i ) => {
+				{ footnotesOrder.map( ( footnotesOrderItem, i ) => {
 					const filteredFootnotes = footnotes.filter(
-						( footnote ) => footnote.id === footnoteUid );
+						( footnote ) => footnote.id === footnotesOrderItem.id );
 					const value = get( filteredFootnotes, [ 0, 'text' ] );
 
 					return (
-						<li key={ footnoteUid }>
+						<li key={ footnotesOrderItem.id }>
 							<RichText
 								tagName="span"
 								value={ value }
 								onChange={
 									( nextValue ) => {
 										const nextFootnotes = footnotes.filter(
-											( footnote ) => footnote.id !== footnoteUid );
+											( footnote ) => footnote.id !== footnotesOrderItem.id );
 
 										nextFootnotes.push( {
-											id: footnoteUid,
+											id: footnotesOrderItem.id,
 											text: nextValue,
 										} );
 

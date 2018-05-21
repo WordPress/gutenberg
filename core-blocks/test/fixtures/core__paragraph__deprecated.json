@@ -4,6 +4,7 @@
         "name": "core/paragraph",
         "isValid": true,
         "attributes": {
+            "blockFootnotes": [],
             "content": [
                 {
                     "key": "html",

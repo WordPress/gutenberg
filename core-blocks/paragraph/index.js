@@ -235,24 +235,28 @@ class ParagraphBlock extends Component {
 						} }
 						value={ content }
 						onChange={ ( nextContent ) => {
+							const previousFootnotes = blockFootnotes || [];
 							const footnotes = parseFootnotesFromContent( nextContent );
 
 							setAttributes( {
 								content: nextContent,
 								blockFootnotes: footnotes,
 							} );
-							if ( ! isEqual( blockFootnotes, footnotes ) ) {
+
+							if ( ! isEqual( previousFootnotes, footnotes ) ) {
 								updateFootnotes( footnotes );
 							}
 						} }
 						onSplit={ insertBlocksAfter ?
 							( before, after, ...blocks ) => {
 								const beforeFootnotes = parseFootnotesFromContent( before );
+
 								const afterFootnotes = parseFootnotesFromContent( after );
 								const afterBlock = createBlock( name, {
 									content: after,
-									blockFootnotes: parseFootnotesFromContent( after ),
+									blockFootnotes: afterFootnotes,
 								} );
+
 								if ( after ) {
 									blocks.push( afterBlock );
 								}
@@ -262,7 +266,7 @@ class ParagraphBlock extends Component {
 								if ( before ) {
 									setAttributes( {
 										content: before,
-										blockFootnotes: parseFootnotesFromContent( before ),
+										blockFootnotes: beforeFootnotes,
 									} );
 								} else {
 									onReplace( [] );
@@ -327,6 +331,14 @@ const schema = {
 	},
 	blockFootnotes: {
 		type: 'array',
+		source: 'query',
+		selector: 'sup',
+		query: {
+			id: {
+				source: 'attribute',
+				attribute: 'data-wp-footnote-id',
+			},
+		},
 	},
 };
 

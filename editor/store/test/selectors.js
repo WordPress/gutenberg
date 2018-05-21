@@ -2081,13 +2081,13 @@ describe( 'selectors', () => {
 							uid1: {
 								uid: 'uid1',
 								attributes: {
-									blockFootnotes: [ '123', '456' ],
+									blockFootnotes: [ { id: '123' }, { id: '456' } ],
 								},
 							},
 							uid2: {
 								uid: 'uid2',
 								attributes: {
-									blockFootnotes: [ '789' ],
+									blockFootnotes: [ { id: '789' } ],
 								},
 							},
 						},
@@ -2101,7 +2101,8 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getFootnotes( state ) ).toEqual( [ '789', '123', '456' ] );
+			expect( getFootnotes( state ) ).toEqual(
+				[ { id: '789' }, { id: '123' }, { id: '456' } ] );
 		} );
 
 		it( 'should return the footnotes from inner blocks', () => {
@@ -2116,7 +2117,7 @@ describe( 'selectors', () => {
 							uid2: {
 								uid: 'uid2',
 								attributes: {
-									blockFootnotes: [ '123' ],
+									blockFootnotes: [ { id: '123' } ],
 								},
 							},
 						},
@@ -2129,7 +2130,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( getFootnotes( state ) ).toEqual( [ '123' ] );
+			expect( getFootnotes( state ) ).toEqual( [ { id: '123' } ] );
 		} );
 
 		it( 'should return empty array if there isn\'t any footnote', () => {
