@@ -1093,9 +1093,25 @@ JS;
  * Remove this in Gutenberg 3.1
  */
 function polyfill_blocks_module_in_scripts() {
-	if ( is_admin() ) {
-		wp_enqueue_script( 'wp-editor' );
+	global $post;
+
+	if ( ! is_admin() ) {
+		return;
 	}
+
+	if ( get_current_screen()->base !== 'post' ) {
+		return;
+	}
+
+	if ( isset( $_GET['classic-editor'] ) ) {
+		return;
+	}
+
+	if ( ! gutenberg_can_edit_post( $post ) ) {
+		return;
+	}
+
+	wp_enqueue_script( 'wp-editor' );
 }
 
 add_action( 'enqueue_block_editor_assets', 'polyfill_blocks_module_in_scripts', 9 );
