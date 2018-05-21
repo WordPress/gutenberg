@@ -859,7 +859,7 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_s
 /**
  * Enqueues block styles provided by the theme.
  *
- * @since 2.9.0
+ * @since 3.0.0
  */
 function gutenberg_enqueue_theme_block_styles() {
 	$is_editor                     = 'enqueue_block_editor_assets' === current_action();

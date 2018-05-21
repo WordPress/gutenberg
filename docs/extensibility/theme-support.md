@@ -154,7 +154,7 @@ Further reading: [Applying Styles with Stylesheets](https://wordpress.org/gutenb
 
 ## Styling blocks
 
-### Default theme styles
+### Default block styles
 
 Core blocks come with default theme styles, but the styles are not enqueued by default. If you'd like to take advantage of these styles, simply add theme support for `wp_block_styles`, and the styles will be enqueued.
 
@@ -164,7 +164,7 @@ add_theme_support( 'wp_block_styles' );
 
 ### Adding block styles
 
-Themes may add styles for individual block types. You can do this by adding a `blocks` folder and filling it will files named after the blocks you want to style.
+Themes may add styles for individual block types. You can do this by adding a `blocks` folder and filling it with files named after the blocks you want to style.
 
 For example, if you want Verse blocks to be written in cursive, you can create a file named `core.verse.css` in your theme's `blocks` folder, and it will be enqueued for both the editor and the front end.
 
