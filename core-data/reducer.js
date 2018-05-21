@@ -31,17 +31,6 @@ export function terms( state = {}, action ) {
 				...state,
 				[ action.taxonomy ]: action.terms,
 			};
-
-		case 'SET_REQUESTED':
-			const { dataType, subType: taxonomy } = action;
-			if ( dataType !== 'terms' || state.hasOwnProperty( taxonomy ) ) {
-				return state;
-			}
-
-			return {
-				...state,
-				[ taxonomy ]: null,
-			};
 	}
 
 	return state;
