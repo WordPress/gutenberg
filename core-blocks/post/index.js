@@ -21,8 +21,6 @@ import edit, {
 	backgroundImageStyles,
 } from './edit';
 
-const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
-
 const blockAttributes = {
 	url: {
 		type: 'string',
@@ -65,6 +63,7 @@ const blockAttributes = {
 	},
 	fontSize: {
 		type: 'string',
+		default: 'regular',
 	},
 	customFontSize: {
 		type: 'number',
@@ -83,13 +82,6 @@ export const settings = {
 	category: 'common',
 
 	attributes: blockAttributes,
-
-	getEditWrapperProps( attributes ) {
-		const { textAlign } = attributes;
-		if ( -1 !== validAlignments.indexOf( textAlign ) ) {
-			return { 'data-align': textAlign };
-		}
-	},
 
 	edit,
 
@@ -117,7 +109,6 @@ export const settings = {
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
-				[ `has-${ textAlign }-content` ]: textAlign !== 'center',
 			},
 		);
 
@@ -143,7 +134,10 @@ export const settings = {
 
 		return (
 			<div className={ className }>
-				<section className={ imageClasses } style={ imageStyle } />
+				<div
+					className={ imageClasses }
+					style={ imageStyle }
+				></div>
 				<RichText.Content
 					tagName="p"
 					style={ textStyle }

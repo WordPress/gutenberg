@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import './wp-init.js';
+import '../scss/theme.scss';
 import '@wordpress/core-data';
 
 /**

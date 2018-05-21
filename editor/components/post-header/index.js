@@ -4,34 +4,37 @@
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 
-function PostHeader( { headerStatus = 'open', instanceId, ...props } ) {
-	const onToggleHeader = () => props.editPost( { header_status: headerStatus === 'open' ? 'closed' : 'open' } );
+function PostHeader( { onToggleHeader, hasHeader = false, instanceId } ) {
+	const headerToggleId = 'header-toggle-' + instanceId;
 
-	const headerToggleId = 'allow-header-toggle-' + instanceId;
-
-	return [
-		<label key="label" htmlFor={ headerToggleId }>{ __( 'Display header' ) }</label>,
-		<FormToggle
-			key="toggle"
-			checked={ headerStatus === 'open' }
-			onChange={ onToggleHeader }
-			showHint={ false }
-			id={ headerToggleId }
-		/>,
-	];
+	return (
+		<Fragment>
+			<label htmlFor={ headerToggleId }>{ __( 'Display header' ) }</label>
+			<FormToggle
+				key="toggle"
+				checked={ hasHeader }
+				onChange={ () => onToggleHeader( ! hasHeader ) }
+				id={ headerToggleId }
+			/>
+		</Fragment>
+	);
 }
 
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			headerStatus: select( 'core/editor' ).getEditedPostAttribute( 'header_status' ),
+			hasHeader: select( 'core/editor' ).getEditedPostAttribute( 'header' ),
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		editPost: dispatch( 'core/editor' ).editPost,
-	} ) ),
+	withDispatch( ( dispatch ) => {
+		return {
+			onToggleHeader( hasHeader ) {
+				dispatch( 'core/editor' ).editPost( { header: hasHeader } );
+			},
+		};
+	} ),
 	withInstanceId,
 ] )( PostHeader );
 

@@ -2,12 +2,12 @@
   "name": "@frontkom/gutenberg",
   "version": "0.0.16",
   "description": "Gutenberg by Frontkom - A custom Gutenberg",
-  "main": "dist/gutenberg.js",
+  "main": "dist/js/gutenberg.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/front/gutenberg.git"
   },
-  "homepage": "https://github.com/front/gutenberg/tree/master/g-package/README.md",
+  "homepage": "https://github.com/front/gutenberg#readme",
   "author": "The Frontkom Contributors",
   "license": "GPL-2.0-or-later",
   "keywords": [
@@ -30,7 +30,6 @@
   "bugs": {
     "url": "https://github.com/front/gutenberg/issues"
   },
-  "homepage": "https://github.com/front/gutenberg#readme",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

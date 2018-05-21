@@ -1,0 +1,183 @@
+// @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
+
+body {
+	margin: 0px;
+	font-size: 16px;
+    // font-family: 'Noto Serif', serif;
+    font-family: inherit;
+    line-height: 1.8;
+
+    button, 
+    input, 
+    select, 
+    textarea {
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        margin: 1px;
+    }
+
+    ol, 
+    ul {
+        padding-left: 1.3em;
+        margin-left: 1.3em;
+    }
+
+    .gutenberg__editor {
+        position: relative;
+        // min-height: auto;
+        font-size: 13px;
+
+        /*.edit-post-layout {
+            display: grid;
+            grid-gap: 0;
+            grid-template: 
+                'header header header header header header'
+                'main main main main main menu';
+
+            .edit-post-header {
+                grid-area: header;
+            }
+
+            .edit-post-layout__content{
+                grid-area: main;
+                margin-right: 0;
+            }
+
+            .edit-post-sidebar {
+                grid-area: menu;
+                position: sticky;
+            }
+        }*/
+
+        * {
+            box-sizing: border-box;
+        }
+
+        .edit-post-layout {
+            padding-top: 0;
+
+            @media (min-width: 960px) {
+                padding-top: 0;
+            }
+
+            @media (min-width: 600px) {
+                padding-top: 0;
+            }
+
+            &.has-fixed-toolbar {
+                padding-top: 0;
+
+                @media (min-width: 960px) {
+                    padding-top: 0;
+                }
+
+                @media (min-width: 600px) {
+                    padding-top: 0;
+                }
+            }
+
+            .edit-post-header {
+                font-family: system-ui;
+                // position: sticky;
+
+                @media (min-width: 782px) {
+                    position: sticky;
+                    left: 0;
+                    top: 0;
+                }
+            }
+
+            .edit-post-sidebar {
+                font-family: system-ui;
+
+                @media (min-width: 782px) {
+                    top: 56px;
+                }
+            }
+
+            .components-popover {            
+                font-family: system-ui;
+            }
+        }   
+
+        .screen-reader-text, 
+        .screen-reader-text span, 
+        .ui-helper-hidden-accessible {
+            border: 0;
+            clip: rect(1px,1px,1px,1px);
+            -webkit-clip-path: inset(50%);
+            clip-path: inset(50%);
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            padding: 0;
+            position: absolute;
+            width: 1px;
+            word-wrap: normal!important;
+        }
+
+        .edit-post-visual-editor {
+            padding-left: 46px;
+            padding-right: 46px;
+            font-family: inherit;
+
+            .editor-post-title,
+            .editor-block-list__block,
+            .editor-default-block-appender {
+                max-width: initial;
+            }
+
+            .editor-post-title,
+            .editor-block-list__layout {
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            .editor-block-list__layout {
+                .editor-block-list__block {
+                    padding-left: 0;
+                    padding-right: 0;
+
+                    .editor-block-list__block-draggable {
+                        left: 0;
+                        right: 0;
+                    }
+
+                    .editor-block-list__block-edit {
+                        margin-left: 0;
+                        margin-right: 0;
+                    }
+
+                    &.is-selected,
+                    &.is-hovered {
+                        outline-width: 0;
+                        z-index: 1;
+
+                        .editor-block-list__block-edit {
+                            &::before {
+                                background: white;
+                            }
+                        }
+
+                        .editor-block-mover {
+                            left: -44px;
+                            padding-right: 0;
+                        }
+
+                        .editor-block-settings-menu {
+                            right: -44px;
+                            padding-left: 0px;
+                        }
+
+                        .editor-block-contextual-toolbar, 
+                        .editor-block-list__breadcrumb {
+                            margin-left: 0;
+                            margin-right: 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

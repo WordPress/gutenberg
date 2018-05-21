@@ -45,9 +45,9 @@ import './globals';
 import { initializeEditor } from '@frontkom/gutenberg';
 
 // Don't forget to import the style
-import '@frontkom/gutenberg/dist/blocks/style.css';
-import '@frontkom/gutenberg/dist/blocks/edit-blocks.css';
-import '@frontkom/gutenberg/dist/style.css';
+import '@frontkom/gutenberg/dist/css/blocks/style.css';
+import '@frontkom/gutenberg/dist/css/blocks/edit-blocks.css';
+import '@frontkom/gutenberg/dist/css/style.css';
 
 // DOM element id where editor will be displayed
 const target = 'editor'; 
@@ -98,7 +98,7 @@ console.log( getPostContent );
 
 ## Global variables 
 
-Gutenberg depends on several global variables: `wp`, `wpApiSettings`, `_wpDateSettings`, `userSettings`, `wpEditorL10n`, etc and probably during your Gutenberg experiencie you will discover other required variables, please share with us if you feel they are important to Gutenberg execution. 
+Gutenberg depends on several global variables: `wp`, `userSettings`, `wpEditorL10n`, `wpApiSettings`, etc and probably during your Gutenberg experiencie you will discover other required variables, please share with us if you feel they are important to Gutenberg execution. 
 
 Here we're only presenting those variables which - by our experience - we belive are crucial to Gutenberg and already set to them default values. If you don't set them up, you'll see that Gutenberg editor won't run.
 
@@ -350,7 +350,7 @@ window.customGutenberg = {
 };
 ```
 
-![Rows example](https://raw.githubusercontent.com/front/gutenberg/develop/rows_screenshot.png)
+![Rows example](https://raw.githubusercontent.com/front/gutenberg/master/g-package/rows_screenshot.png)
 
 ### Posts Panel
 
@@ -360,7 +360,7 @@ The **Posts Panel** (`postType.supports[ 'posts' ] = true`) contains a list of p
 
 The **Post Block** is another kind of blocks created by **Gutenberg by Frontkom** which is composed by a cover image and a title.
 
-![Post Block example](https://raw.githubusercontent.com/front/gutenberg/develop/post_block_screenshot.png)
+![Post Block example](https://raw.githubusercontent.com/front/gutenberg/master/g-package/post_block_screenshot.png)
 
 ### Events (experimental)
 

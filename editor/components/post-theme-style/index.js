@@ -4,34 +4,37 @@
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 
-function PostThemeStyle( { themeStyleStatus = 'open', instanceId, ...props } ) {
-	const onToggleThemeStyle = () => props.editPost( { theme_style_status: themeStyleStatus === 'open' ? 'closed' : 'open' } );
+function PostThemeStyle( { onToggleThemeStyle, themeStyle = false, instanceId } ) {
+	const themeStyleToggleId = 'theme-style-toggle-' + instanceId;
 
-	const themeStyleToggleId = 'allow-theme-style-toggle-' + instanceId;
-
-	return [
-		<label key="label" htmlFor={ themeStyleToggleId }>{ __( 'Display theme-style' ) }</label>,
-		<FormToggle
-			key="toggle"
-			checked={ themeStyleStatus === 'open' }
-			onChange={ onToggleThemeStyle }
-			showHint={ false }
-			id={ themeStyleToggleId }
-		/>,
-	];
+	return (
+		<Fragment>
+			<label htmlFor={ themeStyleToggleId }>{ __( 'Display theme-style' ) }</label>
+			<FormToggle
+				key="toggle"
+				checked={ themeStyle }
+				onChange={ () => onToggleThemeStyle( ! themeStyle ) }
+				id={ themeStyleToggleId }
+			/>
+		</Fragment>
+	);
 }
 
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			themeStyleStatus: select( 'core/editor' ).getEditedPostAttribute( 'theme_style_status' ),
+			themeStyle: select( 'core/editor' ).getEditedPostAttribute( 'theme_style' ),
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		editPost: dispatch( 'core/editor' ).editPost,
-	} ) ),
+	withDispatch( ( dispatch ) => {
+		return {
+			onToggleThemeStyle( themeStyle ) {
+				dispatch( 'core/editor' ).editPost( { theme_style: themeStyle } );
+			},
+		};
+	} ),
 	withInstanceId,
 ] )( PostThemeStyle );
 

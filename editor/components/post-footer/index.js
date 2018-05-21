@@ -4,34 +4,37 @@
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 
-function PostFooter( { footerStatus = 'open', instanceId, ...props } ) {
-	const onToggleFooter = () => props.editPost( { footer_status: footerStatus === 'open' ? 'closed' : 'open' } );
+function PostFooter( { onToggleFooter, hasFooter = false, instanceId } ) {
+	const footerToggleId = 'footer-toggle-' + instanceId;
 
-	const footerToggleId = 'allow-footer-toggle-' + instanceId;
-
-	return [
-		<label key="label" htmlFor={ footerToggleId }>{ __( 'Display footer' ) }</label>,
-		<FormToggle
-			key="toggle"
-			checked={ footerStatus === 'open' }
-			onChange={ onToggleFooter }
-			showHint={ false }
-			id={ footerToggleId }
-		/>,
-	];
+	return (
+		<Fragment>
+			<label htmlFor={ footerToggleId }>{ __( 'Display footer' ) }</label>
+			<FormToggle
+				key="toggle"
+				checked={ hasFooter }
+				onChange={ () => onToggleFooter( ! hasFooter ) }
+				id={ footerToggleId }
+			/>
+		</Fragment>
+	);
 }
 
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			footerStatus: select( 'core/editor' ).getEditedPostAttribute( 'footer_status' ),
+			hasFooter: select( 'core/editor' ).getEditedPostAttribute( 'footer' ),
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		editPost: dispatch( 'core/editor' ).editPost,
-	} ) ),
+	withDispatch( ( dispatch ) => {
+		return {
+			onToggleFooter( hasFooter ) {
+				dispatch( 'core/editor' ).editPost( { footer: hasFooter } );
+			},
+		};
+	} ),
 	withInstanceId,
 ] )( PostFooter );
 
