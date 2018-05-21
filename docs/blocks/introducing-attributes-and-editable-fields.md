@@ -52,7 +52,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 		var content = props.attributes.content;
 
 		return el( RichText.Content, {
-			tagName: 'p'
+			tagName: 'p',
 			className: props.className,
 			value: content
 		} );

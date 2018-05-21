@@ -1093,7 +1093,10 @@ JS;
  * Remove this in Gutenberg 3.1
  */
 function polyfill_blocks_module_in_scripts() {
-	wp_enqueue_script( 'wp-editor' );
+	if ( is_admin() ) {
+		wp_enqueue_script( 'wp-editor' );
+	}
 }
 
 add_action( 'enqueue_block_editor_assets', 'polyfill_blocks_module_in_scripts', 9 );
+add_action( 'enqueue_block_assets', 'polyfill_blocks_module_in_scripts', 9 );

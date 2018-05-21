@@ -152,12 +152,12 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles the onSetup event for the tinyMCE component.
+	 * Handles the onSetup event for the TinyMCE component.
 	 *
-	 * Will setup event handlers for the tinyMCE instance.
+	 * Will setup event handlers for the TinyMCE instance.
 	 * An `onSetup` function in the props will be called if it is present.
 	 *
-	 * @param {tinymce} editor The editor instance as passed by tinyMCE.
+	 * @param {tinymce} editor The editor instance as passed by TinyMCE.
 	 */
 	onSetup( editor ) {
 		this.editor = editor;
@@ -261,7 +261,7 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles an undo event from tinyMCE.
+	 * Handles an undo event from TinyMCE.
 	 *
 	 * @param {UndoEvent} event The undo event as triggered by TinyMCE.
 	 */
@@ -281,11 +281,11 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles a paste event from tinyMCE.
+	 * Handles a paste event from TinyMCE.
 	 *
 	 * Saves the pasted data as plain text in `pastedPlainText`.
 	 *
-	 * @param {PasteEvent} event The paste event as triggered by tinyMCE.
+	 * @param {PasteEvent} event The paste event as triggered by TinyMCE.
 	 */
 	onPaste( event ) {
 		const dataTransfer =
@@ -331,14 +331,14 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles a PrePasteProcess event from tinyMCE.
+	 * Handles a PrePasteProcess event from TinyMCE.
 	 *
 	 * Will call the paste handler with the pasted data. If it is a string tries
-	 * to put it in the containing tinyMCE editor. Otherwise call the `onSplit`
+	 * to put it in the containing TinyMCE editor. Otherwise call the `onSplit`
 	 * handler.
 	 *
 	 * @param {PrePasteProcessEvent} event The PrePasteProcess event as triggered
-	 *                                     by tinyMCE.
+	 *                                     by TinyMCE.
 	 */
 	onPastePreProcess( event ) {
 		const HTML = this.isPlainTextPaste ? '' : event.content;
@@ -402,7 +402,7 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles any case where the content of the tinyMCE instance has changed.
+	 * Handles any case where the content of the TinyMCE instance has changed.
 	 */
 
 	onChange() {
@@ -455,9 +455,9 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles a keydown event from tinyMCE.
+	 * Handles a keydown event from TinyMCE.
 	 *
-	 * @param {KeydownEvent} event The keydow event as triggered by tinyMCE.
+	 * @param {KeydownEvent} event The keydown event as triggered by TinyMCE.
 	 */
 	onKeyDown( event ) {
 		const dom = this.editor.dom;
@@ -536,7 +536,7 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles tinyMCE key up event.
+	 * Handles TinyMCE key up event.
 	 *
 	 * @param {number} keyCode The key code that has been pressed on the keyboard.
 	 */
