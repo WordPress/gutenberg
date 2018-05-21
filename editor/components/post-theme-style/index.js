@@ -18,6 +18,8 @@ function PostThemeStyle( { onToggleThemeStyle, themeStyle = false, instanceId } 
 				onChange={ () => onToggleThemeStyle( ! themeStyle ) }
 				id={ themeStyleToggleId }
 			/>
+
+			{ themeStyle && <link rel="stylesheet" href="http://localhost:3000/style.css" type="text/css" /> }
 		</Fragment>
 	);
 }
