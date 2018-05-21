@@ -293,7 +293,7 @@ export function insertBlocks( blocks, index, rootUID ) {
  */
 export function insertFootnotesBlock() {
 	return {
-		...insertBlock( createBlock( 'core/footnotes', {} ) ),
+		...insertBlock( createBlock( 'core/footnotes' ) ),
 	};
 }
 

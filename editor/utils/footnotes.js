@@ -11,7 +11,7 @@ import { dispatch, select } from '@wordpress/data';
 /**
  * Checks if the updated blocks contain footnotes.
  *
- * @param {Object} updatedBlocks Object containing the updated blocks in a hierarchically
+ * @param {Object} updatedBlocks Object containing the updated blocks in a hierarchical
  * form with a blockFootnotes property which contains the new footnotes.
  *
  * @return {boolean} True if the updated blocks contain footnotes and false if they don't.
@@ -35,7 +35,7 @@ const doUpdatedBlocksContainFootnotes = function( updatedBlocks ) {
  * are ignored.
  *
  * @param {Array}   blocks        Array of blocks from the post
- * @param {Object}  updatedBlocks Object containing the updated blocks in a hierarchically
+ * @param {Object}  updatedBlocks Object containing the updated blocks in a hierarchical
  * form with a blockFootnotes property which contains the new footnotes.
  * @param {?string} removedBlock  Uid of the removed block.
  *
@@ -71,7 +71,7 @@ const doBlocksContainFootnotes = function( blocks, updatedBlocks, removedBlock )
 /**
  * Checks if post being edited contains footnotes.
  *
- * @param {Object}  updatedBlocks Object containing the updated blocks in a hierarchically
+ * @param {Object}  updatedBlocks Object containing the updated blocks in a hierarchical
  * form with a blockFootnotes property which contains the new footnotes.
  * @param {?string} removedBlock  Uid of the removed block.
  *
@@ -89,10 +89,10 @@ const doesPostContainFootnotes = function( updatedBlocks, removedBlock ) {
 };
 
 /**
- * Inserts the footnotes block or removes it depending on if the post blocks contain
+ * Inserts the footnotes block or removes it depending on whether the post blocks contain
  * footnotes or not.
  *
- * @param {Object}  updatedBlocks Object containing the updated blocks in a hierarchically
+ * @param {Object}  updatedBlocks Object containing the updated blocks in a hierarchical
  * form with a blockFootnotes property which contains the new footnotes.
  * @param {?string} removedBlock  Uid of the removed block.
  */

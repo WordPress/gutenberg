@@ -230,7 +230,6 @@ describe( 'actions', () => {
 				save: () => null,
 				attributes: {
 					footnotes: [],
-					names: {},
 				},
 			} );
 		} );

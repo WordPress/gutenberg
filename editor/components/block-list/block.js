@@ -203,7 +203,6 @@ export class BlockListBlock extends Component {
 	setAttributes( attributes ) {
 		const { block, onChange } = this.props;
 		const type = getBlockType( block.name );
-
 		onChange( block.uid, attributes );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
