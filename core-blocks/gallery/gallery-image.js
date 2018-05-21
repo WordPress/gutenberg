@@ -85,7 +85,7 @@ class GalleryImage extends Component {
 			<figure
 				className={ className }
 				tabIndex="-1"
-				onClick={ this.props.onSelect }
+				onFocus={ this.props.onSelect }
 				onKeyDown={ this.onKeyDown }
 				ref={ this.bindContainer }
 			>

@@ -38,6 +38,7 @@ import {
 	BlockAlignmentToolbar,
 	UrlInputButton,
 	editorMediaUpload,
+	withBlockEditContext,
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 
@@ -57,7 +58,6 @@ class ImageEdit extends Component {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
-		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
@@ -65,10 +65,6 @@ class ImageEdit extends Component {
 		this.updateWidth = this.updateWidth.bind( this );
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
-
-		this.state = {
-			captionFocused: false,
-		};
 	}
 
 	componentDidMount() {
@@ -99,14 +95,6 @@ class ImageEdit extends Component {
 		}
 	}
 
-	componentWillReceiveProps( { isSelected } ) {
-		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
-			this.setState( {
-				captionFocused: false,
-			} );
-		}
-	}
-
 	onSelectImage( media ) {
 		if ( ! media ) {
 			this.props.setAttributes( {
@@ -128,20 +116,8 @@ class ImageEdit extends Component {
 		this.props.setAttributes( { href: value } );
 	}
 
-	onFocusCaption() {
-		if ( ! this.state.captionFocused ) {
-			this.setState( {
-				captionFocused: true,
-			} );
-		}
-	}
-
 	onImageClick() {
-		if ( this.state.captionFocused ) {
-			this.setState( {
-				captionFocused: false,
-			} );
-		}
+		this.props.setFocusedElement( null );
 	}
 
 	updateAlt( newAlt ) {
@@ -393,9 +369,7 @@ class ImageEdit extends Component {
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption || [] }
-							onFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
-							isSelected={ this.state.captionFocused }
 							inlineToolbar
 						/>
 					) : null }
@@ -407,6 +381,11 @@ class ImageEdit extends Component {
 }
 
 export default compose( [
+	withBlockEditContext( ( { setFocusedElement } ) => {
+		return {
+			setFocusedElement,
+		};
+	} ),
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
