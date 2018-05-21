@@ -4,20 +4,22 @@
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 
 function PostHeader( { onToggleHeader, hasHeader = false, instanceId } ) {
 	const headerToggleId = 'header-toggle-' + instanceId;
 
-	return [
-		<label htmlFor={ headerToggleId }>{ __( 'Display header' ) }</label>,
-		<FormToggle
-			key="toggle"
-			checked={ hasHeader }
-			onChange={ () => onToggleHeader( ! hasHeader ) }
-			id={ headerToggleId }
-		/>,
-	];
+	return (
+		<Fragment>
+			<label htmlFor={ headerToggleId }>{ __( 'Display header' ) }</label>
+			<FormToggle
+				key="toggle"
+				checked={ hasHeader }
+				onChange={ () => onToggleHeader( ! hasHeader ) }
+				id={ headerToggleId }
+			/>
+		</Fragment>
+	);
 }
 
 export default compose( [
@@ -29,8 +31,8 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		return {
 			onToggleHeader( hasHeader ) {
-				dispatch( 'core/editor' ).editPost( { header: hasHeader } )
-			}
+				dispatch( 'core/editor' ).editPost( { header: hasHeader } );
+			},
 		};
 	} ),
 	withInstanceId,

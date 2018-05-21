@@ -21,8 +21,6 @@ import edit, {
 	backgroundImageStyles,
 } from './edit';
 
-const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
-
 const blockAttributes = {
 	url: {
 		type: 'string',
@@ -136,7 +134,7 @@ export const settings = {
 
 		return (
 			<div className={ className }>
-				<div 
+				<div
 					className={ imageClasses }
 					style={ imageStyle }
 				></div>

@@ -4,20 +4,22 @@
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/element';
+import { compose, Fragment } from '@wordpress/element';
 
 function PostFooter( { onToggleFooter, hasFooter = false, instanceId } ) {
 	const footerToggleId = 'footer-toggle-' + instanceId;
 
-	return [
-		<label htmlFor={ footerToggleId }>{ __( 'Display footer' ) }</label>,
-		<FormToggle
-			key="toggle"
-			checked={ hasFooter }
-			onChange={ () => onToggleFooter( ! hasFooter ) }
-			id={ footerToggleId }
-		/>,
-	];
+	return (
+		<Fragment>
+			<label htmlFor={ footerToggleId }>{ __( 'Display footer' ) }</label>
+			<FormToggle
+				key="toggle"
+				checked={ hasFooter }
+				onChange={ () => onToggleFooter( ! hasFooter ) }
+				id={ footerToggleId }
+			/>
+		</Fragment>
+	);
 }
 
 export default compose( [
@@ -29,8 +31,8 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		return {
 			onToggleFooter( hasFooter ) {
-				dispatch( 'core/editor' ).editPost( { footer: hasFooter } )
-			}
+				dispatch( 'core/editor' ).editPost( { footer: hasFooter } );
+			},
 		};
 	} ),
 	withInstanceId,

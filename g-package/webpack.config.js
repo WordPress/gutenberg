@@ -211,16 +211,16 @@ const config = {
 					/core-blocks/,
 				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
-			},	
+			},
 			{
 				test: /\.s?css$/,
 				include: [
 					/g-package\/src/,
 				],
 				use: [
-					{ loader: 'sass-loader' },  // compiles Sass to CSS
+					{ loader: 'sass-loader' }, // compiles Sass to CSS
 				],
-			},		
+			},
 		],
 	},
 	plugins: [

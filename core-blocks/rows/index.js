@@ -33,7 +33,7 @@ const getColumnLayouts = memoize( ( columns, sizes ) => {
 
 	return times( columns, ( n ) => {
 		const startPostion = position;
-		position = position + sizes[ n ];	
+		position = position + sizes[ n ];
 
 		return {
 			name: `col${ sizes[ n ] } column-start${ startPostion }`,
