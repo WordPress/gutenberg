@@ -9,9 +9,11 @@ import { createStore } from 'redux';
 import { loadAndPersist, withRehydration } from '../persist';
 
 describe( 'loadAndPersist', () => {
+	const persistenceStorage = window.localStorage;
+
 	it( 'should load the initial value from the local storage integrating it into reducer default value.', () => {
 		const storageKey = 'dumbStorageKey';
-		window.localStorage.setItem( storageKey, JSON.stringify( { chicken: true } ) );
+		persistenceStorage.setItem( storageKey, JSON.stringify( { chicken: true } ) );
 		const reducer = () => {
 			return {
 				preferences: { ribs: true },
@@ -29,7 +31,7 @@ describe( 'loadAndPersist', () => {
 
 	it( 'should not load the initial value from the local storage if the storage key is different.', () => {
 		const storageKey = 'dumbStorageKey';
-		window.localStorage.setItem( storageKey, JSON.stringify( { chicken: true } ) );
+		persistenceStorage.setItem( storageKey, JSON.stringify( { chicken: true } ) );
 		const reducer = () => {
 			return {
 				preferences: { ribs: true },
@@ -70,7 +72,7 @@ describe( 'loadAndPersist', () => {
 			storageKey,
 		);
 		store.dispatch( { type: 'UPDATE' } );
-		expect( JSON.parse( window.localStorage.getItem( storageKey ) ) ).toEqual( { chicken: true } );
+		expect( JSON.parse( persistenceStorage.getItem( storageKey ) ) ).toEqual( { chicken: true } );
 	} );
 
 	it( 'should apply defaults to any missing properties on previously stored objects', () => {
@@ -88,7 +90,7 @@ describe( 'loadAndPersist', () => {
 		};
 
 		// store preferences without the `counter` default
-		window.localStorage.setItem( storageKey, JSON.stringify( {} ) );
+		persistenceStorage.setItem( storageKey, JSON.stringify( {} ) );
 
 		const store = createStore( withRehydration( reducer, 'preferences', storageKey ) );
 		loadAndPersist(
@@ -101,7 +103,7 @@ describe( 'loadAndPersist', () => {
 
 		// the default should have been applied, as the `counter` was missing from the
 		// saved preferences, then the INCREMENT action should have taken effect to give us 42
-		expect( JSON.parse( window.localStorage.getItem( storageKey ) ) ).toEqual( { counter: 42 } );
+		expect( JSON.parse( persistenceStorage.getItem( storageKey ) ) ).toEqual( { counter: 42 } );
 	} );
 
 	it( 'should not override stored values with defaults', () => {
@@ -118,7 +120,7 @@ describe( 'loadAndPersist', () => {
 			return state;
 		};
 
-		window.localStorage.setItem( storageKey, JSON.stringify( { counter: 1 } ) );
+		persistenceStorage.setItem( storageKey, JSON.stringify( { counter: 1 } ) );
 
 		const store = createStore( withRehydration( reducer, 'preferences', storageKey ) );
 
@@ -130,6 +132,6 @@ describe( 'loadAndPersist', () => {
 		);
 		store.dispatch( { type: 'INCREMENT' } );
 
-		expect( JSON.parse( window.localStorage.getItem( storageKey ) ) ).toEqual( { counter: 2 } );
+		expect( JSON.parse( persistenceStorage.getItem( storageKey ) ) ).toEqual( { counter: 2 } );
 	} );
 } );
