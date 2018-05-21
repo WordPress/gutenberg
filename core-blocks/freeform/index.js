@@ -30,7 +30,7 @@ export const settings = {
 	supports: {
 		className: false,
 		customClassName: false,
-		sharing: false,
+		_sharing: false,
 	},
 
 	edit,

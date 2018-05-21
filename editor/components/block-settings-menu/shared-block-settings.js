@@ -20,7 +20,12 @@ export function SharedBlockSettings( {
 	onDelete,
 	itemsRole,
 } ) {
-	if ( ! hasBlockSupport( block.name, 'sharing', true ) ) {
+	/**
+	 * Allow blocks to indicate that they cannot be made into a shared block. This
+	 * is a non-public API since the user could work around it by e.g. nesting the
+	 * block within a container block and sharing the container block.
+	 */
+	if ( ! hasBlockSupport( block.name, '_sharing', true ) ) {
 		return null;
 	}
 

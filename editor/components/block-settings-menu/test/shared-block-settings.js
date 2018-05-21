@@ -23,7 +23,7 @@ describe( 'SharedBlockSettings', () => {
 		registerBlockType( 'test/unshareable', {
 			title: 'Don\'t You Dare Share Me',
 			category: 'common',
-			supports: { sharing: false },
+			supports: { _sharing: false },
 			save: () => null,
 		} );
 	} );
