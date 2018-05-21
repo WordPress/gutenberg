@@ -140,6 +140,7 @@ const { PluginPrePublishPanel } = wp.editPost;
 
 const MyPluginPrePublishPanel = () => (
 	<PluginPrePublishPanel
+		className="my-plugin-pre-publish-panel"
 		title={ __( 'My panel title' ) }
 		initialOpen={ true }
 	>
@@ -149,6 +150,13 @@ const MyPluginPrePublishPanel = () => (
 ```
 
 #### Props
+
+##### className
+
+An optional class name added to the panel.
+
+- Type: `String`
+- Required: No
 
 ##### title
 
@@ -176,8 +184,9 @@ _Example:_
 const { __ } = wp.i18n;
 const { PluginPostPublishPanel } = wp.editPost;
 
-const MyPluginPrePublishPanel = () => (
+const MyPluginPostPublishPanel = () => (
 	<PluginPostPublishPanel
+		className="my-plugin-post-publish-panel"
 		title={ __( 'My panel title' ) }
 		initialOpen={ true }
 	>
@@ -187,6 +196,13 @@ const MyPluginPrePublishPanel = () => (
 ```
 
 #### Props
+
+##### className
+
+An optional class name added to the panel.
+
+- Type: `String`
+- Required: No
 
 ##### title
 
