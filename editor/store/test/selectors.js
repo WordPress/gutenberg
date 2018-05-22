@@ -1065,14 +1065,14 @@ describe( 'selectors', () => {
 			expect( getEditedPostPreviewLink( state ) ).toBeNull();
 		} );
 
-		it( 'should return the correct url adding a preview parameter to the query string', () => {
+		it( 'should return the correct url when the post object has a preview_link', () => {
 			const state = {
 				currentPost: {
-					link: 'https://andalouses.com/beach',
+					preview_link: 'https://andalouses.com/?p=1&preview=true',
 				},
 			};
 
-			expect( getEditedPostPreviewLink( state ) ).toBe( 'https://andalouses.com/beach?preview=true' );
+			expect( getEditedPostPreviewLink( state ) ).toBe( 'https://andalouses.com/?p=1&preview=true' );
 		} );
 	} );
 
