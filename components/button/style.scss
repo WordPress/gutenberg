@@ -60,10 +60,10 @@
 	}
 
 	&.is-primary {
-		background: color( theme( button ) shade( 10% ) );
-		border-color: color( theme( button ) shade( 20% ) ) color( theme( button ) shade( 30% ) ) color( theme( primary ) shade( 30% ) );
-		box-shadow: inset 0 -1px 0 color( theme( button ) shade( 30% ) );
-		color: #fff;
+		background: color( theme( button ) );
+		border-color: color( theme( button ) shade( 20% ) ) color( theme( button ) shade( 25% ) ) color( theme( primary ) shade( 25% ) );
+		box-shadow: inset 0 -1px 0 color( theme( button ) shade( 25% ) );
+		color: $white;
 		text-decoration: none;
 		text-shadow: 0 -1px 1px color( theme( button ) shade( 30% ) ),
 			1px 0 1px color( theme( button ) shade( 30% ) ),
@@ -72,7 +72,7 @@
 
 		&:hover,
 		&:focus:not(:disabled):not([aria-disabled="true"]) {
-			background: color( theme( button ) shade( 15% ) );
+			background: color( theme( button ) shade( 5% ) );
 			border-color: color( theme( button ) shade( 50% ) );
 			box-shadow: inset 0 -1px 0 color( theme( button ) shade( 50% ) );
 			color: $white;
@@ -104,7 +104,12 @@
 		&.is-primary.is-busy[disabled] {
 			color: $white !important;
 			background-size: 100px 100% !important;
-			background-image: repeating-linear-gradient( -45deg, theme( primary ), color( theme( primary ) shade( 50% ) ) 11px, color( theme( primary ) shade( 50% ) ) 10px, theme( primary ) 20px) !important;
+			background-image: linear-gradient(
+				-45deg,
+				theme( primary ) 28%,
+				color( theme( primary ) shade( 30% ) ) 28%,
+				color( theme( primary ) shade( 30% ) ) 72%,
+				theme( primary ) 72%) !important;
 			border-color: color( theme( primary ) shade( 50% ) ) !important;
 		}
 	}
