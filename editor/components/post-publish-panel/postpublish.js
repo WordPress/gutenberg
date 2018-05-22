@@ -48,7 +48,7 @@ class PostPublishPanelPostpublish extends Component {
 	}
 
 	render() {
-		const { isScheduled, post, postType } = this.props;
+		const { children, isScheduled, post, postType } = this.props;
 		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
 
 		const postPublishNonLinkHeader = isScheduled ?
@@ -84,6 +84,7 @@ class PostPublishPanelPostpublish extends Component {
 						</ClipboardButton>
 					</div>
 				</PanelBody>
+				{ children }
 			</div>
 		);
 	}
