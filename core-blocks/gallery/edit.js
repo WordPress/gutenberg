@@ -22,7 +22,7 @@ import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	MediaUpload,
-	ImagePlaceholder,
+	MediaPlaceholder,
 	InspectorControls,
 	editorMediaUpload,
 } from '@wordpress/editor';
@@ -199,11 +199,16 @@ export default class GalleryEdit extends Component {
 			return (
 				<Fragment>
 					{ controls }
-					<ImagePlaceholder
-						className={ className }
+					<MediaPlaceholder
 						icon="format-gallery"
-						label={ __( 'Gallery' ) }
-						onSelectImage={ this.onSelectImages }
+						className={ className }
+						labels={ {
+							title: __( 'Gallery' ),
+							name: __( 'images' ),
+						} }
+						onSelect={ this.onSelectImages }
+						accept="image/*"
+						type="image"
 						multiple
 					/>
 				</Fragment>

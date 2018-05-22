@@ -15,7 +15,7 @@ import {
  */
 import './editor.scss';
 
-export default class AudioEdit extends Component {
+export default class VideoEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		// edit component has its own src in the state so it can be edited
@@ -32,7 +32,7 @@ export default class AudioEdit extends Component {
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
 		};
-		const onSelectAudio = ( media ) => {
+		const onSelectVideo = ( media ) => {
 			if ( media && media.url ) {
 				// sets the block's attribute and updates the edit component from the
 				// selected media, then switches off the editing UI
@@ -51,16 +51,16 @@ export default class AudioEdit extends Component {
 		if ( editing ) {
 			return (
 				<MediaPlaceholder
-					icon="media-audio"
+					icon="media-video"
 					labels={ {
-						title: __( 'Audio' ),
-						name: __( 'an audio' ),
+						title: __( 'Video' ),
+						name: __( 'a video' ),
 					} }
 					className={ className }
-					onSelect={ onSelectAudio }
+					onSelect={ onSelectVideo }
 					onSelectUrl={ onSelectUrl }
-					accept="audio/*"
-					type="audio"
+					accept="video/*"
+					type="video"
 					value={ this.props.attributes }
 				/>
 			);
@@ -73,14 +73,14 @@ export default class AudioEdit extends Component {
 					<Toolbar>
 						<IconButton
 							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit audio' ) }
+							label={ __( 'Edit video' ) }
 							onClick={ switchToEditing }
 							icon="edit"
 						/>
 					</Toolbar>
 				</BlockControls>
 				<figure className={ className }>
-					<audio controls="controls" src={ src } />
+					<video controls src={ src } />
 					{ ( ( caption && caption.length ) || !! isSelected ) && (
 						<RichText
 							tagName="figcaption"

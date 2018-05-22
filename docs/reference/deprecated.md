@@ -2,7 +2,8 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 ## 3.2.0
 
-- `wp.data.withRehydratation` has been renamed to `wp.data.withRehydration`.
+ - `wp.data.withRehydratation` has been renamed to `wp.data.withRehydration`.
+ - The `wp.editor.ImagePlaceholder` component is removed. Please use `wp.editor.MediaPlaceholder` instead.
 
 ## 3.1.0
 
