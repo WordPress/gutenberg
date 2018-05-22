@@ -1,5 +1,5 @@
 /**
- * Logs a message to notify developpers about a deprecated feature.
+ * Logs a message to notify developers about a deprecated feature.
  *
  * @param {string}  feature             Name of the deprecated feature.
  * @param {?Object} options             Personalisation options
