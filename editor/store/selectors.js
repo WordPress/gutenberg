@@ -76,7 +76,7 @@ export function hasEditorRedo( state ) {
  * @return {boolean} Whether the post is new.
  */
 export function isEditedPostNew( state ) {
-	return getCurrentPost( state ).status === 'auto-draft';
+	return getEditedPostAttribute( state, 'status' ) === 'auto-draft';
 }
 
 /**
@@ -124,7 +124,7 @@ export function getCurrentPost( state ) {
  * @return {string} Post type.
  */
 export function getCurrentPostType( state ) {
-	return state.currentPost.type;
+	return getEditedPostAttribute( state, 'type' );
 }
 
 /**
@@ -136,7 +136,7 @@ export function getCurrentPostType( state ) {
  * @return {?number} ID of current post.
  */
 export function getCurrentPostId( state ) {
-	return getCurrentPost( state ).id || null;
+	return getEditedPostAttribute( state, 'id' );
 }
 
 /**
@@ -227,7 +227,7 @@ export function getEditedPostVisibility( state ) {
  * @return {boolean} Whether current post is pending review.
  */
 export function isCurrentPostPending( state ) {
-	return getCurrentPost( state ).status === 'pending';
+	return getEditedPostAttribute( state, 'pending' ) === 'pending';
 }
 
 /**
@@ -238,10 +238,11 @@ export function isCurrentPostPending( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isCurrentPostPublished( state ) {
-	const post = getCurrentPost( state );
+	const status = getEditedPostAttribute( state, 'status' );
+	const date = getEditedPostAttribute( state, 'date' );
 
-	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+	return [ 'publish', 'private' ].indexOf( status ) !== -1 ||
+		( status === 'future' && moment( date ).isBefore( moment() ) );
 }
 
 /**
@@ -252,7 +253,7 @@ export function isCurrentPostPublished( state ) {
  * @return {boolean} Whether current post is scheduled to be posted.
  */
 export function isCurrentPostScheduled( state ) {
-	return getCurrentPost( state ).status === 'future' && ! isCurrentPostPublished( state );
+	return getEditedPostAttribute( state, 'status' ) === 'future' && ! isCurrentPostPublished( state );
 }
 
 /**
@@ -263,9 +264,9 @@ export function isCurrentPostScheduled( state ) {
  * @return {boolean} Whether the post can been published.
  */
 export function isEditedPostPublishable( state ) {
-	const post = getCurrentPost( state );
+	const status = getEditedPostAttribute( state, 'status' );
 
-	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
+	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( status ) === -1;
 }
 
 /**
@@ -353,7 +354,7 @@ export function getEditedPostExcerpt( state ) {
  * @return {string} Preview URL.
  */
 export function getEditedPostPreviewLink( state ) {
-	return getCurrentPost( state ).preview_link || null;
+	return getEditedPostAttribute( state, 'preview_link' );
 }
 
 /**
