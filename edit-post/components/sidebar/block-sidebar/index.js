@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import './style.scss';
 import SettingsHeader from '../settings-header';
+import SidebarExtender from '../sidebar-extender';
 import Sidebar from '../';
 
 const SIDEBAR_NAME = 'edit-post/block';
@@ -24,6 +25,7 @@ const BlockSidebar = () => (
 			<PanelBody className="edit-post-block-sidebar__panel">
 				<BlockInspector />
 			</PanelBody>
+			<SidebarExtender.Slot />
 		</Panel>
 	</Sidebar>
 );

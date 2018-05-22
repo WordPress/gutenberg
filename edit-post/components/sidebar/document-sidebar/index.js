@@ -15,6 +15,7 @@ import DiscussionPanel from '../discussion-panel';
 import LastRevision from '../last-revision';
 import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
+import SidebarExtender from '../sidebar-extender';
 import SettingsHeader from '../settings-header';
 import Sidebar from '../';
 
@@ -34,6 +35,7 @@ const DocumentSidebar = () => (
 			<PostExcerpt />
 			<DiscussionPanel />
 			<PageAttributes />
+			<SidebarExtender.Slot />
 			<MetaBoxes location="side" usePanel />
 		</Panel>
 	</Sidebar>
