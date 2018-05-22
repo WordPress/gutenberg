@@ -15,10 +15,6 @@ describe( 'Popover', () => {
 		beforeEach( () => {
 			jest.spyOn( Popover.prototype, 'computePopoverPosition' ).mockImplementation( noop );
 			jest.spyOn( Popover.prototype, 'toggleWindowEvents' ).mockImplementation( noop );
-
-			wrapper = mount(
-				<Popover />
-			);
 		} );
 
 		afterEach( () => {
@@ -34,26 +30,28 @@ describe( 'Popover', () => {
 		} );
 
 		it( 'should add window events', () => {
+			wrapper = mount( <Popover /> );
 			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( true );
 			expect( Popover.prototype.computePopoverPosition ).toHaveBeenCalled();
 		} );
 
 		it( 'should remove window events', () => {
+			wrapper = mount( <Popover /> );
 			wrapper.unmount();
 
 			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( false );
 		} );
 
 		it( 'should set offset and forced positions on changed position', () => {
+			wrapper = mount( <Popover /> );
 			jest.clearAllMocks();
-
 			wrapper.setProps( { position: 'bottom right' } );
 
 			expect( Popover.prototype.toggleWindowEvents ).not.toHaveBeenCalled();
 			expect( Popover.prototype.computePopoverPosition ).toHaveBeenCalled();
 		} );
 
-		it( 'should focus when opening in response to keyboard event', () => {
+		it( 'should focus when opening in response to keyboard event', ( done ) => {
 			// As in the real world, these occur in sequence before the popover
 			// has been mounted. Keyup's resetting is deferred.
 			document.dispatchEvent( new window.KeyboardEvent( 'keydown' ) );
@@ -64,17 +62,26 @@ describe( 'Popover', () => {
 			// are therefore skipped as tabbable, defaulting to popover.
 			wrapper = mount( <Popover /> );
 
-			const content = wrapper.find( '.components-popover__content' ).getDOMNode();
+			setTimeout( () => {
+				const content = wrapper.find( '.components-popover__content' ).getDOMNode();
+				expect( document.activeElement ).toBe( content );
+				done();
+			} );
 
-			expect( document.activeElement ).toBe( content );
+			jest.runAllTimers();
 		} );
 
-		it( 'should allow focus-on-open behavior to be disabled', () => {
+		it( 'should allow focus-on-open behavior to be disabled', ( done ) => {
 			const activeElement = document.activeElement;
 
 			wrapper = mount( <Popover focusOnMount={ false } /> );
 
-			expect( document.activeElement ).toBe( activeElement );
+			setTimeout( () => {
+				expect( document.activeElement ).toBe( activeElement );
+				done();
+			} );
+
+			jest.runAllTimers();
 		} );
 	} );
 
