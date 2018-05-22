@@ -2887,7 +2887,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const sharedBlock = getSharedBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
+			const sharedBlock = getSharedBlock( state, 123 );
 			expect( sharedBlock ).toBeNull();
 		} );
 	} );
