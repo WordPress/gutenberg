@@ -4,13 +4,8 @@
 import { __ } from '@wordpress/i18n';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
-import { ifCondition } from '@wordpress/components';
+import { ifCondition, IconButton } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import IconButton from '../../../components/icon-button';
 
 class BlockInsertionPoint extends Component {
 	constructor() {
@@ -31,7 +26,7 @@ class BlockInsertionPoint extends Component {
 			<div className="editor-block-list__insertion-point">
 				{ showInsertionPoint && <div className="editor-block-list__insertion-point-indicator" /> }
 				{ showInserter && (
-					<div className="editor-block-list__insertion-point">
+					<div className="editor-block-list__insertion-point-inserter">
 						<IconButton
 							icon="insert"
 							className="editor-block-list__insertion-point-button"
@@ -45,7 +40,7 @@ class BlockInsertionPoint extends Component {
 	}
 }
 export default compose(
-	withSelect( ( select, { uid, rootUID } ) => {
+	withSelect( ( select, { uid, rootUID, canShowInserter } ) => {
 		const {
 			getBlockIndex,
 			getBlockInsertionPoint,
@@ -67,7 +62,7 @@ export default compose(
 
 		return {
 			templateLock: getEditorSettings().templateLock,
-			showInserter: ! isTyping(),
+			showInserter: ! isTyping() && canShowInserter,
 			index: insertIndex,
 			showInsertionPoint,
 		};

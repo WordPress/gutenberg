@@ -550,23 +550,34 @@
 /**
  * In-Canvas Inserter
  */
-
 .editor-block-list .editor-inserter {
 	margin: $item-spacing;
 	cursor: move;/* Fallback for IE/Edge < 14 */
 	cursor: grab;
 }
 
-// In-between-serter
-.editor-block-list__block > .editor-block-list__insertion-point {
-	display: flex;
-	max-width: $content-width;
-	position: absolute;
+// Insertion point (includes inbetween inserter and insertion indicator)
+.editor-block-list__insertion-point {
+	position: relative;
 	z-index: z-index( '.editor-block-list__insertion-point' );
-	top: -$block-padding - 2px; // Matches the 1px paddings we use to prevent collapsing margins
+}
+
+.editor-block-list__insertion-point-indicator {
+	position: absolute;
+	top: calc( 50% - 1px);
+	height: 2px;
+	left: 0;
+	right: 0;
+	background: theme( primary );
+}
+
+.editor-block-list__insertion-point-inserter {
+	display: flex;
+	position: absolute;
+	top: 0;
 	bottom: auto;
-	left: -1px; // overlap 1px border
-	right: -1px;
+	left: 0;
+	right: 0;
 	height: $block-padding * 2; // Matches the whole empty space between two blocks
 	justify-content: center;
 
@@ -576,12 +587,19 @@
 		border-radius: 50%;
 		color: $dark-gray-100;
 		background: $white;
-	}
+		height: $block-padding * 2 + 8px;
+		width: $block-padding * 2 + 8px;
 	
+		&:not(:disabled):not([aria-disabled="true"]):hover {
+			box-shadow: none;
+		}
+	
+	}
+
 	// Show a line indicator when hovering, but this is unclickable
 	&:before {
 		position: absolute;
-		top: $block-padding - 1px; // Half the empty space between two blocks, minus the 2px height
+		top: calc( 50% - 1px);
 		height: 2px;
 		left: 0;
 		right: 0;
@@ -596,6 +614,15 @@
 	&:hover {
 		opacity: 1;
 	}
+}
+
+.editor-block-list__block > .editor-block-list__insertion-point {
+	position: absolute;
+	top: -$block-padding - $block-spacing / 2;
+	height: $block-padding * 2; // Matches the whole empty space between two blocks
+	bottom: auto;
+	left: -1px;
+	right: -1px;
 }
 
 .editor-block-list__block .editor-block-list__block-html-textarea {
