@@ -114,6 +114,12 @@ body {
                 padding-right: 0;
             }
 
+            .editor-post-title {
+                .editor-post-title__input {
+                    font-family: inherit;
+                }
+            }
+
             .editor-block-list__layout {
                 .editor-block-list__block {
                     padding-left: 0;
