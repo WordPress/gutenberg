@@ -36,17 +36,17 @@ const extractConfig = {
 				plugins: [
 					require( './packages/postcss-themes' )( {
 						defaults: {
-							primary: '#00a0d2',
-							secondary: '#0073aa',
-							toggle: '#00a0d2',
-							button: '#00a0d2',
+							primary: '#0085ba',
+							secondary: '#11a0d2',
+							toggle: '#11a0d2',
+							button: '#0085ba',
 						},
 						themes: {
 							'admin-color-light': {
-								primary: '#00a0d2',
+								primary: '#0085ba',
 								secondary: '#c75726',
-								toggle: '#00a0d2',
-								button: '#00a0d2',
+								toggle: '#11a0d2',
+								button: '#0085ba',
 							},
 							'admin-color-blue': {
 								primary: '#82b4cb',
@@ -67,10 +67,10 @@ const extractConfig = {
 								button: '#a7b656',
 							},
 							'admin-color-midnight': {
-								primary: '#e34e46',
+								primary: '#e14d43',
 								secondary: '#77a6b9',
 								toggle: '#77a6b9',
-								button: '#e34e46',
+								button: '#e14d43',
 							},
 							'admin-color-ocean': {
 								primary: '#a3b9a2',
