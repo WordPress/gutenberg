@@ -52,7 +52,7 @@ Gutenberg is a big change, and there will be ways to ensure that existing functi
 
 ## Get involved
 
-We’re calling this editor project "Gutenberg" because it's a big undertaking. We are working on it every day in GitHub, and we'd love your help building it. You’re also welcome to give feedback, the easiest is to join us in <a href="https://make.wordpress.org/chat/">our Slack channel</a>, `#core-editor`.
+We’re calling this editor project "Gutenberg" because it's a big undertaking. We are working on it every day in GitHub, and we'd love your help building it. You’re also welcome to give feedback, the easiest is to join us in <a href="https://make.wordpress.org/chat/">our Slack channel</a>, `#core-editor`. A weekly meeting is held in the Slack channel on Wednesdays at 13:00 UTC.
 
 ## Contributors
 

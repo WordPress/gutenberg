@@ -1,5 +1,5 @@
 /**
- * External Depenedencies
+ * External Dependencies
  */
 import classnames from 'classnames';
 

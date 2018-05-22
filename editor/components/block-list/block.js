@@ -10,12 +10,12 @@ import tinymce from 'tinymce';
  */
 import { Component, findDOMNode, Fragment, compose } from '@wordpress/element';
 import {
-	keycodes,
 	focus,
 	isTextField,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
-} from '@wordpress/utils';
+} from '@wordpress/dom';
+import { keycodes } from '@wordpress/utils';
 import {
 	createBlock,
 	cloneBlock,

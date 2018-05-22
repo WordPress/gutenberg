@@ -27,45 +27,6 @@ describe( 'terms()', () => {
 			categories: [ { id: 1 } ],
 		} );
 	} );
-
-	it( 'assigns requested taxonomy to null', () => {
-		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'terms',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {
-			categories: null,
-		} );
-	} );
-
-	it( 'does not assign requested taxonomy to null if received', () => {
-		const originalState = deepFreeze( {
-			categories: [ { id: 1 } ],
-		} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'terms',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {
-			categories: [ { id: 1 } ],
-		} );
-	} );
-
-	it( 'does not assign requested taxonomy if not terms data type', () => {
-		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'SET_REQUESTED',
-			dataType: 'foo',
-			subType: 'categories',
-		} );
-
-		expect( state ).toEqual( {} );
-	} );
 } );
 
 describe( 'entities', () => {
@@ -88,6 +49,31 @@ describe( 'entities', () => {
 			byKey: {
 				b: { slug: 'b', title: 'beach' },
 				s: { slug: 's', title: 'sun' },
+			},
+		} );
+	} );
+
+	it( 'appends the received post types by slug', () => {
+		const originalState = deepFreeze( {
+			root: {
+				postType: {
+					byKey: {
+						w: { slug: 'w', title: 'water' },
+					},
+				},
+			},
+		} );
+		const state = entities( originalState, {
+			type: 'RECEIVE_ENTITY_RECORDS',
+			records: [ { slug: 'b', title: 'beach' } ],
+			kind: 'root',
+			name: 'postType',
+		} );
+
+		expect( state.root.postType ).toEqual( {
+			byKey: {
+				w: { slug: 'w', title: 'water' },
+				b: { slug: 'b', title: 'beach' },
 			},
 		} );
 	} );

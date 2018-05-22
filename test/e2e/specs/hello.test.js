@@ -14,7 +14,7 @@ describe( 'hello', () => {
 		expect( page.url() ).toEqual( expect.stringContaining( 'post-new.php' ) );
 		const title = await page.$( '[placeholder="Add title"]' );
 		expect( title ).not.toBeNull();
-		const postPreviewButton = await page.$( '.editor-post-preview.button' );
+		const postPreviewButton = await page.$( '.editor-post-preview.components-button' );
 		expect( postPreviewButton ).not.toBeNull();
 	} );
 
