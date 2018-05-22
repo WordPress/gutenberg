@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelRow, Dropdown } from '@wordpress/components';
+import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import { PostVisibility as PostVisibilityForm, PostVisibilityLabel, PostVisibilityCheck } from '@wordpress/editor';
 
 /**
@@ -21,14 +21,15 @@ export function PostVisibility() {
 						position="bottom left"
 						contentClassName="edit-post-post-visibility__dialog"
 						renderToggle={ ( { isOpen, onToggle } ) => (
-							<button
+							<Button
 								type="button"
 								aria-expanded={ isOpen }
-								className="edit-post-post-visibility__toggle button-link"
+								className="edit-post-post-visibility__toggle"
 								onClick={ onToggle }
+								isLink
 							>
 								<PostVisibilityLabel />
-							</button>
+							</Button>
 						) }
 						renderContent={ () => <PostVisibilityForm /> }
 					/>

@@ -53,6 +53,10 @@ const blockAttributes = {
 				source: 'children',
 				selector: 'figcaption',
 			},
+			data: {
+				type: 'array',
+				default: [],
+			},
 		},
 	},
 	columns: {
@@ -179,7 +183,13 @@ export const settings = {
 							break;
 					}
 
-					const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } />;
+					const img = <img
+						src={ image.url }
+						alt={ image.alt }
+						data-id={ image.id }
+						data-link={ image.link }
+						{ ...image.data }
+					/>;
 
 					return (
 						<li key={ image.id || image.url } className="blocks-gallery-item">

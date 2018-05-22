@@ -39,7 +39,7 @@ exports[`core/audio block edit matches snapshot 1`] = `
         value=""
       />
       <button
-        class="components-button button button-large"
+        class="components-button is-button is-default is-large"
         type="submit"
       >
         Use URL
@@ -49,7 +49,7 @@ exports[`core/audio block edit matches snapshot 1`] = `
       class="components-form-file-upload"
     >
       <button
-        class="components-button components-icon-button wp-block-audio__upload-button button button-large"
+        class="components-button components-icon-button wp-block-audio__upload-button is-button is-default is-large"
         type="button"
       >
         <svg

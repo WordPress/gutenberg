@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "2.9.1",
+	"version": "2.9.2",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -150,7 +150,8 @@
 		"test-unit:watch": "npm run test-unit -- --watch",
 		"test-e2e": "wp-scripts test-unit-js --config test/e2e/jest.config.json",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
+		"build-package:watch": "NODE_ENV=production webpack --config g-package/webpack.config.js --watch",
 		"build-package": "NODE_ENV=production webpack --config g-package/webpack.config.js",
-		"prepublish": "npm run lint && npm run build-package"
+		"prepublish": "npm run lint:fix && npm run build-package"
 	}
 }

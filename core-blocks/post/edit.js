@@ -91,25 +91,18 @@ class PostEdit extends Component {
 	}
 
 	onSelectImage( media ) {
-		const { setAttributes } = this.props;
-
-		setAttributes( {
+		this.props.setAttributes( {
 			url: media.url,
 			id: media.id,
 		} );
 	}
 
 	toggleParallax() {
-		const { attributes, setAttributes } = this.props;
-		const { hasParallax } = attributes;
-
-		setAttributes( { hasParallax: ! hasParallax } );
+		this.props.setAttributes( { hasParallax: ! this.props.attributes.hasParallax } );
 	}
 
 	setDimRatio( ratio ) {
-		const { setAttributes } = this.props;
-
-		setAttributes( { dimRatio: ratio } );
+		this.props.setAttributes( { dimRatio: ratio } );
 	}
 
 	toggleDropCap() {
@@ -336,9 +329,9 @@ class PostEdit extends Component {
 }
 
 export default compose(
-	withSelect( ( select, ownProps ) => {
+	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
-		const { id } = ownProps.attributes;
+		const { id } = props.attributes;
 
 		return {
 			image: id ? getMedia( id ) : null,

@@ -37,7 +37,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 							type="image"
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
-								<Button className="button-link editor-post-featured-image__preview" onClick={ open } >
+								<Button className="editor-post-featured-image__preview" onClick={ open } isLink>
 									{ media &&
 										<ResponsiveWrapper
 											naturalWidth={ media.media_details.width }
@@ -65,7 +65,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 							type="image"
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
-								<Button className="editor-post-featured-image__toggle button-link" onClick={ open }>
+								<Button className="editor-post-featured-image__toggle" onClick={ open } isLink>
 									{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
 								</Button>
 							) }
@@ -73,7 +73,7 @@ function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, med
 					</PostTypeSupportCheck>
 				}
 				{ !! featuredImageId &&
-					<Button className="editor-post-featured-image__toggle button-link" onClick={ onRemoveImage }>
+					<Button className="editor-post-featured-image__toggle" onClick={ onRemoveImage } isLink>
 						{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
 					</Button>
 				}

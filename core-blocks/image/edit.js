@@ -9,6 +9,7 @@ import {
 	map,
 	pick,
 	startCase,
+	reduce,
 } from 'lodash';
 
 /**
@@ -99,11 +100,15 @@ class ImageEdit extends Component {
 		}
 	}
 
-	componentWillReceiveProps( { isSelected } ) {
+	componentWillReceiveProps( { isSelected, image } ) {
 		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
 			this.setState( {
 				captionFocused: false,
 			} );
+		}
+
+		if ( image && image !== this.props.image && image.data ) {
+			this.updateData( image.data );
 		}
 	}
 
@@ -168,9 +173,20 @@ class ImageEdit extends Component {
 		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
 	}
 
+	updateData( data ) {
+		data = reduce( data, ( result, value, key ) => {
+			key = key.replace( '_', '-' );
+			result[ `data-${ key }` ] = value;
+
+			return result;
+		}, {} );
+
+		this.props.setAttributes( { data } );
+	}
+
 	render() {
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, toggleSelection } = this.props;
-		const { url, alt, caption, align, id, href, width, height } = attributes;
+		const { url, alt, caption, align, id, href, width, height, data } = attributes;
 
 		const controls = (
 			<BlockControls>
@@ -317,7 +333,12 @@ class ImageEdit extends Component {
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							const img = <img
+								src={ url }
+								alt={ alt }
+								onClick={ this.onImageClick }
+								{ ...data }
+							/>;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (

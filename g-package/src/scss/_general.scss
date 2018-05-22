@@ -1,17 +1,17 @@
-// @import url('https://fonts.googleapis.com/css?family=Noto+Sans');
-
 body {
 	margin: 0px;
-	font-size: 16px;
-    // font-family: 'Noto Serif', serif;
-    font-family: inherit;
+    font-size: 16px;
     line-height: 1.8;
+
+    * {
+        font-family: inherit;
+    }
 
     button, 
     input, 
     select, 
     textarea {
-        font-family: inherit;
+        // font-family: inherit;
         font-size: inherit;
         font-weight: inherit;
         margin: 1px;
@@ -25,30 +25,7 @@ body {
 
     .gutenberg__editor {
         position: relative;
-        // min-height: auto;
         font-size: 13px;
-
-        /*.edit-post-layout {
-            display: grid;
-            grid-gap: 0;
-            grid-template: 
-                'header header header header header header'
-                'main main main main main menu';
-
-            .edit-post-header {
-                grid-area: header;
-            }
-
-            .edit-post-layout__content{
-                grid-area: main;
-                margin-right: 0;
-            }
-
-            .edit-post-sidebar {
-                grid-area: menu;
-                position: sticky;
-            }
-        }*/
 
         * {
             box-sizing: border-box;
@@ -79,7 +56,6 @@ body {
 
             .edit-post-header {
                 font-family: system-ui;
-                // position: sticky;
 
                 @media (min-width: 782px) {
                     position: sticky;
@@ -122,6 +98,10 @@ body {
             padding-right: 46px;
             font-family: inherit;
 
+            p {
+                font-family: inherit;
+            }
+
             .editor-post-title,
             .editor-block-list__block,
             .editor-default-block-appender {
@@ -132,6 +112,12 @@ body {
             .editor-block-list__layout {
                 padding-left: 0;
                 padding-right: 0;
+            }
+
+            .editor-post-title {
+                .editor-post-title__input {
+                    font-family: inherit;
+                }
             }
 
             .editor-block-list__layout {

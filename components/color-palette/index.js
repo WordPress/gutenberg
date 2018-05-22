@@ -16,6 +16,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
+import Button from '../button';
 
 export default function ColorPalette( { colors, disableCustomColors = false, value, onChange } ) {
 	function applyOrUnset( color ) {
@@ -72,13 +73,14 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 				/>
 			}
 
-			<button
-				className="button-link components-color-palette__clear"
+			<Button
+				className="components-color-palette__clear"
 				type="button"
 				onClick={ () => onChange( undefined ) }
+				isLink
 			>
 				{ __( 'Clear' ) }
-			</button>
+			</Button>
 		</div>
 	);
 }

@@ -2,6 +2,7 @@
  * External Dependencies
  */
 import classnames from 'classnames';
+import { reduce } from 'lodash';
 
 /**
  * WordPress Dependencies
@@ -86,10 +87,25 @@ class GalleryImage extends Component {
 				captionSelected: false,
 			} );
 		}
+
+		if ( image && image !== this.props.image && image.data ) {
+			this.updateData( image.data );
+		}
+	}
+
+	updateData( data ) {
+		data = reduce( data, ( result, value, key ) => {
+			key = key.replace( '_', '-' );
+			result[ `data-${ key }` ] = value;
+
+			return result;
+		}, {} );
+
+		this.props.setAttributes( { data } );
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, caption, onRemove, setAttributes } = this.props;
+		const { url, alt, id, linkTo, link, data, isSelected, caption, onRemove, setAttributes } = this.props;
 
 		let href;
 
@@ -105,7 +121,7 @@ class GalleryImage extends Component {
 		// Disable reason: Image itself is not meant to be
 		// interactive, but should direct image selection and unfocus caption fields
 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
-		const img = url ? <img src={ url } alt={ alt } data-id={ id } onClick={ this.onImageClick } /> : <Spinner />;
+		const img = url ? <img src={ url } alt={ alt } data-id={ id } onClick={ this.onImageClick } { ...data } /> : <Spinner />;
 
 		const className = classnames( {
 			'is-selected': isSelected,
