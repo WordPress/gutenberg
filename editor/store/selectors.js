@@ -353,11 +353,7 @@ export function getEditedPostExcerpt( state ) {
  * @return {string} Preview URL.
  */
 export function getEditedPostPreviewLink( state ) {
-	const link = state.currentPost.preview_link;
-	if ( link ) {
-		return link;
-	}
-	return null;
+	return getCurrentPost( state ).preview_link || null;
 }
 
 /**
