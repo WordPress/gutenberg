@@ -104,7 +104,12 @@
 		&.is-primary.is-busy[disabled] {
 			color: $white !important;
 			background-size: 100px 100% !important;
-			background-image: repeating-linear-gradient( -45deg, theme( primary ), color( theme( primary ) shade( 50% ) ) 11px, color( theme( primary ) shade( 50% ) ) 10px, theme( primary ) 20px) !important;
+			background-image: linear-gradient(
+				-45deg,
+				theme( primary ) 28%,
+				color( theme( primary ) shade( 30% ) ) 28%,
+				color( theme( primary ) shade( 30% ) ) 72%,
+				theme( primary ) 72%) !important;
 			border-color: color( theme( primary ) shade( 50% ) ) !important;
 		}
 	}
