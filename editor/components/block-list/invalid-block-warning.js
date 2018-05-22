@@ -22,7 +22,7 @@ function InvalidBlockWarning( { convertToHTML, convertToBlocks } ) {
 		<Warning
 			actions={ [
 				<Button key="convert" onClick={ convertToBlocks } isLarge isPrimary={ ! hasHTMLBlock }>
-					{ __( 'Convert to Blocks' ) }
+					{ __( 'Convert to blocks' ) }
 				</Button>,
 				hasHTMLBlock && (
 					<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
