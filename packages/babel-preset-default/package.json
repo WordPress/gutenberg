@@ -23,6 +23,7 @@
 	},
 	"dependencies": {
 		"@wordpress/browserslist-config": "^2.1.4",
+		"babel-plugin-transform-async-generator-functions": "^6.24.1",
 		"babel-plugin-transform-object-rest-spread": "^6.23.0",
 		"babel-plugin-transform-react-jsx": "^6.24.1",
 		"babel-plugin-transform-runtime": "^6.23.0",
