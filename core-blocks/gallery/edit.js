@@ -247,6 +247,7 @@ export default class GalleryEdit extends Component {
 								url={ img.url }
 								alt={ img.alt }
 								id={ img.id }
+								data={ img.data }
 								isSelected={ isSelected && this.state.selectedImage === index }
 								onRemove={ this.onRemoveImage( index ) }
 								onSelect={ this.onSelectImage( index ) }

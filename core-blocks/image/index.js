@@ -60,6 +60,10 @@ const blockAttributes = {
 	height: {
 		type: 'number',
 	},
+	data: {
+		type: 'array',
+		default: [],
+	},
 };
 
 const imageSchema = {
@@ -192,7 +196,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id } = attributes;
+		const { url, alt, caption, align, href, width, height, id, data } = attributes;
 
 		const classes = classnames( align ? `align${ align }` : null, {
 			'is-resized': !! width || !! height,
@@ -205,6 +209,7 @@ export const settings = {
 				className={ id ? `wp-image-${ id }` : null }
 				width={ width }
 				height={ height }
+				{ ...data }
 			/>
 		);
 
