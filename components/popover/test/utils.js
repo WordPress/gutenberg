@@ -98,7 +98,7 @@ describe( 'computePopoverPosition', () => {
 		};
 
 		expect( computePopoverPosition( anchorRect, contentSize, 'right bottom' ) ).toEqual( {
-			contentHeight: 400,
+			contentHeight: 390,
 			contentWidth: null,
 			isMobile: false,
 			popoverLeft: 20,

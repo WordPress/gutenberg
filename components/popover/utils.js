@@ -1,3 +1,8 @@
+
+/**
+ * Module constants
+ */
+const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
 const isMobileViewport = () => window.innerWidth < 782;
 
 /**
@@ -19,11 +24,11 @@ export function computePopoverPosition( anchorRect, contentSize, position = 'top
 	// y axis aligment choices
 	const topAlignment = {
 		popoverTop: anchorRect.top,
-		contentHeight: anchorRect.top - height > 0 ? height : anchorRect.top,
+		contentHeight: anchorRect.top - HEIGHT_OFFSET - height > 0 ? height : anchorRect.top - HEIGHT_OFFSET,
 	};
 	const bottomAlignment = {
 		popoverTop: anchorRect.bottom,
-		contentHeight: anchorRect.bottom + height > window.innerHeight ? window.innerHeight - anchorRect.bottom : height,
+		contentHeight: anchorRect.bottom + HEIGHT_OFFSET + height > window.innerHeight ? window.innerHeight - HEIGHT_OFFSET - anchorRect.bottom : height,
 	};
 
 	// x axis alignment choices
