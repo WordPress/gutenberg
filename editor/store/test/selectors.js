@@ -1065,7 +1065,7 @@ describe( 'selectors', () => {
 			expect( getEditedPostPreviewLink( state ) ).toBeNull();
 		} );
 
-		it( 'should return the correct url adding a preview parameter to the query string', () => {
+		it( 'should return the correct url when the post object has a preview_link', () => {
 			const state = {
 				currentPost: {
 					preview_link: 'https://andalouses.com/?p=1&preview=true',
