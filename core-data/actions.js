@@ -41,7 +41,7 @@ export function receiveUserQuery( queryID, users ) {
  *
  * @param {string}       kind    Kind of the received entity.
  * @param {string}       name    Name of the received entity.
- * @param {Array|Object} records Recordds received.
+ * @param {Array|Object} records Records received.
  *
  * @return {Object} Action object.
  */

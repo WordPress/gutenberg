@@ -102,7 +102,7 @@ export function themeSupports( state = {}, action ) {
 /**
  * Higher Order Reducer for a given entity config. It supports:
  *
- *  - Fetching a record by primariy key
+ *  - Fetching a record by primarily key
  *
  * @param {Object} entityConfig  Entity config.
  *
