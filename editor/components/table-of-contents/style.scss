@@ -1,5 +1,10 @@
 .table-of-contents__popover.components-popover:not(.is-mobile) .components-popover__content {
 	min-width: 380px;
+	height: auto;
+	overflow-y: auto;
+	@include break-medium {
+		max-height: 320px;
+	}
 }
 
 .table-of-contents__popover {
