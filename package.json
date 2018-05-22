@@ -9,7 +9,7 @@
 		"benchmark": "^2.1.4",
 		"chalk": "^2.3.2",
 		"check-node-version": "^3.1.1",
-		"codecov": "^2.3.1",
+		"codecov": "^3.0.2",
 		"glob": "^7.1.2",
 		"is-plain-obj": "^1.1.0",
 		"lerna": "^2.9.0",
