@@ -37,11 +37,9 @@
 .editor-block-settings-menu__toggle .dashicon {
 	transform: rotate( 90deg );
 }
-	
+
 // Popout menu
 .editor-block-settings-menu__popover {
-	z-index: z-index( '.editor-block-settings-menu__popover' );
-
 	&:before,
 	&:after {
 		margin-left: 2px;
@@ -80,9 +78,8 @@
 		cursor: pointer;
 		@include menu-style__neutral;
 
-		&:hover,
-		&:focus,
-		&:not(:disabled):hover {
+		&:hover:not(:disabled):not([aria-disabled="true"]),
+		&:focus:not(:disabled):not([aria-disabled="true"]) {
 			@include menu-style__focus;
 		}
 

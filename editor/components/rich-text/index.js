@@ -410,9 +410,25 @@ export class RichText extends Component {
 		this.props.onChange( this.savedContent );
 	}
 
-	onCreateUndoLevel() {
-		// Always ensure the content is up-to-date.
-		this.onChange();
+	onCreateUndoLevel( event ) {
+		// TinyMCE fires a `change` event when the first letter in an instance
+		// is typed. This should not create a history record in Gutenberg.
+		// https://github.com/tinymce/tinymce/blob/4.7.11/src/core/main/ts/api/UndoManager.ts#L116-L125
+		// In other cases TinyMCE won't fire a `change` with at least a previous
+		// record present, so this is a reliable check.
+		// https://github.com/tinymce/tinymce/blob/4.7.11/src/core/main/ts/api/UndoManager.ts#L272-L275
+		if ( event && event.lastLevel === null ) {
+			return;
+		}
+
+		// Always ensure the content is up-to-date. This is needed because e.g.
+		// making something bold will trigger a TinyMCE change event but no
+		// input event. Avoid dispatching an action if the original event is
+		// blur because the content will already be up-to-date.
+		if ( ! event || ! event.originalEvent || event.originalEvent.type !== 'blur' ) {
+			this.onChange();
+		}
+
 		this.context.onCreateUndoLevel();
 	}
 
@@ -774,17 +790,21 @@ export class RichText extends Component {
 	removeFormat( format ) {
 		this.editor.focus();
 		this.editor.formatter.remove( format );
+		// Formatter does not trigger a change event like `execCommand` does.
+		this.onCreateUndoLevel();
 	}
 
 	applyFormat( format, args, node ) {
 		this.editor.focus();
 		this.editor.formatter.apply( format, args, node );
+		// Formatter does not trigger a change event like `execCommand` does.
+		this.onCreateUndoLevel();
 	}
 
 	changeFormats( formats ) {
 		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
-				if ( formatValue !== undefined ) {
+				if ( !! formatValue ) {
 					if ( formatValue.isAdding ) {
 						return;
 					}

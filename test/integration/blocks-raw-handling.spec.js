@@ -79,6 +79,15 @@ describe( 'Blocks raw handling', () => {
 		expect( filtered ).toBe( 'test<br>test' );
 	} );
 
+	it( 'should normalize decomposed characters', () => {
+		const filtered = rawHandler( {
+			HTML: 'schön',
+			mode: 'INLINE',
+		} );
+
+		expect( filtered ).toBe( 'schön' );
+	} );
+
 	describe( 'serialize', () => {
 		function readFile( filePath ) {
 			return fs.existsSync( filePath ) ? fs.readFileSync( filePath, 'utf8' ).trim() : '';
