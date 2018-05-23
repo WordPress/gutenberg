@@ -59,10 +59,7 @@ describe( 'Change detection', () => {
 
 	it( 'Should autosave post', async () => {
 		await page.type( '.editor-post-title__input', 'Hello World' );
-		// Force autosave to occur immediately.
-		await page.evaluate( function() {
-			window.wp.data.dispatch( 'core/editor' ).doAutosave();
-		} );
+
 		const isSavingState = await page.waitForSelector( '.editor-post-saved-state.is-saving' );
 		const autosaveState = await ( await isSavingState.getProperty( 'innerText' ) ).jsonValue();
 
