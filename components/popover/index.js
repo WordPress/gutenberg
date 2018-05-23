@@ -62,7 +62,7 @@ class Popover extends Component {
 		const popoverSize = this.updatePopoverSize();
 		this.computePopoverPosition( popoverSize );
 		this.toggleWindowEvents( true );
-		setTimeout( () => this.focus() );
+		this.focus();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -100,14 +100,14 @@ class Popover extends Component {
 			return;
 		}
 
+		// Without the setTimeout, the dom node is not being focused
+		// Related https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
+		const focusNode = ( domNode ) => setTimeout( () => domNode.focus() );
+
 		// Find first tabbable node within content and shift focus, falling
 		// back to the popover panel itself.
 		const firstTabbable = focus.tabbable.find( this.contentNode.current )[ 0 ];
-		if ( firstTabbable ) {
-			firstTabbable.focus();
-		} else {
-			this.contentNode.current.focus();
-		}
+		focusNode( firstTabbable ? firstTabbable : this.contentNode.current );
 	}
 
 	getAnchorRect() {
