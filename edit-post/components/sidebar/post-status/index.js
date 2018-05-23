@@ -33,7 +33,7 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			<PostSticky />
 			<PostPendingStatus />
 			<PostAuthor />
-			<PluginPostStatusInfo.Slot />
+			<PluginPostStatusInfo.Slot className="components-panel__row" />
 			<PostTrash />
 		</PanelBody>
 	);
