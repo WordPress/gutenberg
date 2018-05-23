@@ -1,21 +1,18 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withState } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import {
-	createBlock,
 	BlockControls,
 	BlockAlignmentToolbar,
 	RichText,
-	InnerBlocks,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -23,7 +20,21 @@ import {
 import './editor.scss';
 import './style.scss';
 
+const toRichTextValue = ( value ) => map( value, ( ( subValue ) => subValue.children ) );
+const fromRichTextValue = ( value ) => map( value, ( subValue ) => ( {
+	children: subValue,
+} ) );
 const blockAttributes = {
+	value: {
+		type: 'array',
+		source: 'query',
+		selector: 'blockquote > p',
+		query: {
+			children: {
+				source: 'node',
+			},
+		},
+	},
 	citation: {
 		type: 'array',
 		source: 'children',
@@ -41,7 +52,7 @@ export const settings = {
 
 	title: __( 'Pullquote' ),
 
-	description: __( 'A pullquote is a brief, attention-catching quotation taken from the main text of an article and used as a subheading or graphic feature.' ),
+	description: __( 'Highlight a quote from your post or page by displaying it as a graphic element.' ),
 
 	icon: 'format-quote',
 
@@ -56,12 +67,9 @@ export const settings = {
 		}
 	},
 
-	edit: withState( {
-		editable: 'content',
-	} )( ( { attributes, setAttributes, isSelected, className, editable, setState } ) => {
-		const { citation, align } = attributes;
+	edit( { attributes, setAttributes, isSelected, className } ) {
+		const { value, citation, align } = attributes;
 		const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-		const onSetActiveEditable = ( newEditable ) => () => setState( { editable: newEditable } );
 
 		return (
 			<Fragment>
@@ -72,7 +80,18 @@ export const settings = {
 					/>
 				</BlockControls>
 				<blockquote className={ className }>
-					<InnerBlocks />
+					<RichText
+						multiline="p"
+						value={ toRichTextValue( value ) }
+						onChange={
+							( nextValue ) => setAttributes( {
+								value: fromRichTextValue( nextValue ),
+							} )
+						}
+						/* translators: the text of the quotation */
+						placeholder={ __( 'Write quote…' ) }
+						wrapperClassName="core-blocks-pullquote__content"
+					/>
 					{ ( citation || isSelected ) && (
 						<RichText
 							tagName="cite"
@@ -84,21 +103,19 @@ export const settings = {
 									citation: nextCitation,
 								} )
 							}
-							isSelected={ isSelected && editable === 'cite' }
-							onFocus={ onSetActiveEditable( 'cite' ) }
 						/>
 					) }
 				</blockquote>
 			</Fragment>
 		);
-	} ),
+	},
 
 	save( { attributes } ) {
-		const { citation, align } = attributes;
+		const { value, citation, align } = attributes;
 
 		return (
 			<blockquote className={ `align${ align }` }>
-				<InnerBlocks.Content />
+				<RichText.Content value={ toRichTextValue( value ) } />
 				{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
@@ -107,54 +124,6 @@ export const settings = {
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
-			value: {
-				type: 'array',
-				source: 'query',
-				selector: 'blockquote > p',
-				query: {
-					children: {
-						source: 'node',
-					},
-				},
-			},
-		},
-
-		migrate( { value = [], ...attributes } ) {
-			return [
-				attributes,
-				value.map( ( { children: paragraph } ) =>
-					createBlock( 'core/paragraph', {
-						content: castArray( paragraph.props.children ),
-					} )
-				),
-			];
-		},
-
-		save( { attributes } ) {
-			const { value, citation, align } = attributes;
-
-			return (
-				<blockquote className={ `align${ align }` }>
-					{ value && value.map( ( paragraph, i ) =>
-						<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-					) }
-					{ citation && citation.length > 0 && <RichText.Content tagName="cite" value={ citation } /> }
-				</blockquote>
-			);
-		},
-	}, {
-		attributes: {
-			...blockAttributes,
-			value: {
-				type: 'array',
-				source: 'query',
-				selector: 'blockquote > p',
-				query: {
-					children: {
-						source: 'node',
-					},
-				},
-			},
 			citation: {
 				type: 'array',
 				source: 'children',
@@ -167,9 +136,7 @@ export const settings = {
 
 			return (
 				<blockquote className={ `align${ align }` }>
-					{ value && value.map( ( paragraph, i ) =>
-						<p key={ i }>{ paragraph.children && paragraph.children.props.children }</p>
-					) }
+					<RichText.Content value={ toRichTextValue( value ) } />
 					{ citation && citation.length > 0 && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
 			);

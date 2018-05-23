@@ -3,13 +3,13 @@
  */
 import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 import { html as beautifyHtml } from 'js-beautify';
-import isShallowEqual from 'shallowequal';
 
 /**
  * WordPress dependencies
  */
 import { Component, cloneElement, renderToString } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -30,6 +30,21 @@ export function getBlockDefaultClassName( blockName ) {
 	const className = 'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 
 	return applyFilters( 'blocks.getBlockDefaultClassName', className, blockName );
+}
+
+/**
+ * Returns the block's default menu item classname from its name.
+ *
+ * @param {string} blockName The block name.
+ *
+ * @return {string} The block's default menu item class.
+ */
+export function getBlockMenuDefaultClassName( blockName ) {
+	// Generated HTML classes for blocks follow the `editor-block-list-item-{name}` nomenclature.
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+	const className = 'editor-block-list-item-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+
+	return applyFilters( 'blocks.getBlockMenuDefaultClassName', className, blockName );
 }
 
 /**

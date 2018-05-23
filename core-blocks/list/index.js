@@ -1,29 +1,46 @@
 /**
  * External dependencies
  */
-import { find, compact, get, isEmpty } from 'lodash';
+import { find, compact, get, initial, last, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
-	createBlock,
 	BlockControls,
 	RichText,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import './editor.scss';
 
+const listContentSchema = {
+	...getPhrasingContentSchema(),
+	ul: {},
+	ol: { attributes: [ 'type' ] },
+};
+
+// Recursion is needed.
+// Possible: ul > li > ul.
+// Impossible: ul > ul.
+[ 'ul', 'ol' ].forEach( ( tag ) => {
+	listContentSchema[ tag ].children = {
+		li: {
+			children: listContentSchema,
+		},
+	};
+} );
+
 export const name = 'core/list';
 
 export const settings = {
 	title: __( 'List' ),
-	description: __( 'List. Numbered or bulleted.' ),
+	description: __( 'Numbers, bullets, up to you. Add a list of items.' ),
 	icon: 'editor-ul',
 	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
@@ -64,8 +81,27 @@ export const settings = {
 				},
 			},
 			{
+				type: 'block',
+				blocks: [ 'core/quote' ],
+				transform: ( { value, citation } ) => {
+					const items = value.map( ( p ) => get( p, [ 'children', 'props', 'children' ] ) );
+					if ( ! isEmpty( citation ) ) {
+						items.push( citation );
+					}
+					const hasItems = ! items.every( isEmpty );
+					return createBlock( 'core/list', {
+						nodeName: 'UL',
+						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
+					} );
+				},
+			},
+			{
 				type: 'raw',
-				isMatch: ( node ) => node.nodeName === 'OL' || node.nodeName === 'UL',
+				selector: 'ol,ul',
+				schema: {
+					ol: listContentSchema.ol,
+					ul: listContentSchema.ul,
+				},
 			},
 			{
 				type: 'pattern',
@@ -93,10 +129,22 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
-					compact( values.map( ( value ) => get( value, 'props.children', null ) ) )
+					compact( values.map( ( value ) => get( value, [ 'props', 'children' ], null ) ) )
 						.map( ( content ) => createBlock( 'core/paragraph', {
 							content: [ content ],
 						} ) ),
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/quote' ],
+				transform: ( { values } ) => {
+					return createBlock( 'core/quote', {
+						value: compact( ( values.length === 1 ? values : initial( values ) )
+							.map( ( value ) => get( value, [ 'props', 'children' ], null ) ) )
+							.map( ( children ) => ( { children: <p>{ children }</p> } ) ),
+						citation: ( values.length === 1 ? undefined : [ get( last( values ), [ 'props', 'children' ] ) ] ),
+					} );
+				},
 			},
 		],
 	},
@@ -205,6 +253,7 @@ export const settings = {
 			const {
 				attributes,
 				insertBlocksAfter,
+				setAttributes,
 				mergeBlocks,
 				onReplace,
 				className,
@@ -246,13 +295,13 @@ export const settings = {
 						onSetup={ this.setupEditor }
 						onChange={ this.setNextValues }
 						value={ values }
-						wrapperClassName="blocks-list"
+						wrapperClassName="core-blocks-list"
 						className={ className }
 						placeholder={ __( 'Write list…' ) }
 						onMerge={ mergeBlocks }
 						onSplit={
 							insertBlocksAfter ?
-								( unused, after, ...blocks ) => {
+								( before, after, ...blocks ) => {
 									if ( ! blocks.length ) {
 										blocks.push( createBlock( 'core/paragraph' ) );
 									}
@@ -264,6 +313,7 @@ export const settings = {
 										} ) );
 									}
 
+									setAttributes( { values: before } );
 									insertBlocksAfter( blocks );
 								} :
 								undefined

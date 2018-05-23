@@ -10,6 +10,15 @@ const {
 	WP_PASSWORD = 'password',
 } = process.env;
 
+/**
+ * Platform-specific modifier key.
+ *
+ * @see pressWithModifier
+ *
+ * @type {string}
+ */
+const MOD_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
+
 function getUrl( WPPath, query = '' ) {
 	const url = new URL( WP_BASE_URL );
 
@@ -70,4 +79,34 @@ export async function getHTMLFromCodeEditor() {
 	const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
 	await switchToEditor( 'Visual' );
 	return textEditorContent;
+}
+
+/**
+ * Performs a key press with modifier (Shift, Control, Meta, Mod), where "Mod"
+ * is normalized to platform-specific modifier (Meta in MacOS, else Control).
+ *
+ * @param {string} modifier Modifier key.
+ * @param {string} key      Key to press while modifier held.
+ *
+ * @return {Promise} Promise resolving when key combination pressed.
+ */
+export async function pressWithModifier( modifier, key ) {
+	if ( modifier.toLowerCase() === 'mod' ) {
+		modifier = MOD_KEY;
+	}
+
+	await page.keyboard.down( modifier );
+	await page.keyboard.press( key );
+	return page.keyboard.up( modifier );
+}
+
+/**
+ * Promise setTimeout Wrapper.
+ *
+ * @param {number} timeout Timeout in milliseconds
+ *
+ * @return {Promise} Promise resolving after the given timeout
+ */
+export async function wait( timeout ) {
+	return new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
 }

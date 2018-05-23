@@ -137,7 +137,7 @@ class WP_Block_Type {
 			if ( isset( $attributes[ $attribute_name ] ) ) {
 				$is_valid = rest_validate_value_from_schema( $attributes[ $attribute_name ], $schema );
 				if ( ! is_wp_error( $is_valid ) ) {
-					$value = $attributes[ $attribute_name ];
+					$value = rest_sanitize_value_from_schema( $attributes[ $attribute_name ], $schema );
 				}
 			}
 
@@ -168,5 +168,24 @@ class WP_Block_Type {
 		foreach ( $args as $property_name => $property_value ) {
 			$this->$property_name = $property_value;
 		}
+	}
+
+	/**
+	 * Get all available block attributes including possible layout attribute from Columns block.
+	 *
+	 * @return array Array of attributes.
+	 */
+	public function get_attributes() {
+		return is_array( $this->attributes ) ?
+			array_merge( $this->attributes, array(
+				'layout' => array(
+					'type' => 'string',
+				),
+			) ) :
+			array(
+				'layout' => array(
+					'type' => 'string',
+				),
+			);
 	}
 }

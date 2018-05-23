@@ -16,7 +16,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Module constants
  */
 const DEFAULT_QUERY = {
-	per_page: 100,
+	per_page: -1,
 	orderby: 'count',
 	order: 'desc',
 	_fields: 'id,name',
@@ -157,7 +157,12 @@ class FlatTermSelector extends Component {
 	}
 
 	render() {
-		const { slug, taxonomy } = this.props;
+		const { slug, taxonomy, hasAssignAction } = this.props;
+
+		if ( ! hasAssignAction ) {
+			return null;
+		}
+
 		const { loading, availableTerms, selectedTerms } = this.state;
 		const termNames = availableTerms.map( ( term ) => term.name );
 		const newTermPlaceholderLabel = get(
@@ -202,7 +207,10 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, ownProps ) => {
+		const { getCurrentPost } = select( 'core/editor' );
 		return {
+			hasCreateAction: get( getCurrentPost(), [ '_links', 'wp:action-create-' + ownProps.restBase ], false ),
+			hasAssignAction: get( getCurrentPost(), [ '_links', 'wp:action-assign-' + ownProps.restBase ], false ),
 			terms: select( 'core/editor' ).getEditedPostAttribute( ownProps.restBase ),
 		};
 	} ),

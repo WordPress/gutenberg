@@ -15,7 +15,6 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { isDeprecatedCompleter, toCompatibleCompleter } from './completer-compat';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import Button from '../button';
 import Popover from '../popover';
@@ -152,7 +151,7 @@ function onlyTextNode( node ) {
 }
 
 /**
- * Find the index of the last charater in the text that is whitespace.
+ * Find the index of the last character in the text that is whitespace.
  *
  * @param {string} text The text to search.
  *
@@ -205,36 +204,6 @@ export class Autocomplete extends Component {
 			range: undefined,
 			filteredOptions: [],
 		};
-	}
-
-	/*
-	 * NOTE: This is necessary for backwards compatibility with the
-	 * previous completer interface. Once we no longer support the
-	 * old interface, we should be able to use the `completers` prop
-	 * directly.
-	 */
-	static getDerivedStateFromProps( nextProps, prevState ) {
-		const { completers: nextCompleters } = nextProps;
-		const { lastAppliedCompleters } = prevState;
-
-		if ( nextCompleters !== lastAppliedCompleters ) {
-			let completers = nextCompleters;
-
-			if ( completers.some( isDeprecatedCompleter ) ) {
-				completers = completers.map( ( completer ) => {
-					return isDeprecatedCompleter( completer ) ?
-						toCompatibleCompleter( completer ) :
-						completer;
-				} );
-			}
-
-			return {
-				completers,
-				lastAppliedCompleters: nextCompleters,
-			};
-		}
-
-		return null;
 	}
 
 	constructor() {
@@ -466,7 +435,8 @@ export class Autocomplete extends Component {
 	}
 
 	search( event ) {
-		const { completers, open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
+		const { completers } = this.props;
+		const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 		const container = event.target;
 
 		// ensure that the cursor location is unambiguous
@@ -565,18 +535,12 @@ export class Autocomplete extends Component {
 		event.stopPropagation();
 	}
 
-	getWordRect( { isLeft, isRight } ) {
+	getWordRect() {
 		const { range } = this.state;
 		if ( ! range ) {
 			return;
 		}
-		if ( isLeft ) {
-			const rects = range.getClientRects();
-			return rects[ 0 ];
-		} else if ( isRight ) {
-			const rects = range.getClientRects();
-			return rects[ rects.length - 1 ];
-		}
+
 		return range.getBoundingClientRect();
 	}
 

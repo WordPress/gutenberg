@@ -1,3 +1,6 @@
+.wp-block-gallery.components-placeholder {
+	margin: 0px;
+}
 .gutenberg .wp-block-gallery:not( .components-placeholder ) {
 	// allow gallery items to go edge to edge
 	margin-left: -8px;
@@ -7,7 +10,7 @@
 .blocks-gallery-item {
 
 	.is-selected {
-		outline: 4px solid $blue-medium-500;
+		outline: 4px solid theme( primary );
 		outline-offset: -4px;
 	}
 
@@ -15,31 +18,31 @@
 		@include loading_fade;
 	}
 
-	.blocks-rich-text {
+	.editor-rich-text {
 		position: absolute;
 		width: 100%;
 		max-height: 100%;
 		overflow-y: auto;
 	}
 
-	.blocks-rich-text figcaption:not( [data-is-placeholder-visible="true"] ) {
+	.editor-rich-text figcaption:not( [data-is-placeholder-visible="true"] ) {
 		position: relative;
 		overflow: hidden;
 	}
 
-	.is-selected .blocks-rich-text {
+	.is-selected .editor-rich-text {
 		width: calc( 100% - 8px );
 		left: 4px;
 		margin-top: -4px;
 	}
 
 	.components-form-file-upload,
-	.button.blocks-gallery-add-item-button {
+	.components-button.core-blocks-gallery-add-item-button {
 		width: 100%;
 		height: 100%;
 	}
 
-	.button.blocks-gallery-add-item-button {
+	.components-button.core-blocks-gallery-add-item-button {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -59,14 +62,14 @@
 	}
 }
 
-.blocks-gallery-item__inline-menu {
+.core-blocks-gallery-item__inline-menu {
 	padding: 2px;
 	position: absolute;
 	top: 0;
 	right: 0;
-	background-color: $blue-medium-500;
+	background-color: theme( primary );
 	display: inline-flex;
-	z-index: z-index( '.blocks-gallery-item__inline-menu' );
+	z-index: z-index( '.core-blocks-gallery-item__inline-menu' );
 
 	.components-button {
 		color: $white;

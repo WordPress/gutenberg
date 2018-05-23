@@ -21,6 +21,7 @@ wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-na
 _Example:_
 
 ```jsx
+const { __ } = wp.i18n;
 const { PanelBody } = wp.components;
 const { PluginSidebar } = wp.editPost;
 
@@ -28,9 +29,10 @@ const MyPluginSidebar = () => (
 	<PluginSidebar
 		name="my-sidebar"
 		title="My sidebar title"
+		icon="smiley"
 	>
 		<PanelBody>
-			My sidebar content
+			{ __( 'My sidebar content' ) }
 		</PanelBody>
 	</PluginSidebar>
 );
@@ -52,6 +54,22 @@ Title displayed at the top of the sidebar.
 - Type: `String`
 - Required: Yes
 
+##### isPinnable
+
+Whether to allow to pin sidebar to toolbar.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`
+
+##### icon
+
+The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+
+- Type: `String` | `Element`
+- Required: No
+- Default: _inherits from the plugin_
+
 
 ### `PluginSidebarMoreMenuItem`
 
@@ -61,14 +79,15 @@ The text within the component appears as the menu item label.
 _Example:_
 
 ```jsx
+const { __ } = wp.i18n;
 const { PluginSidebarMoreMenuItem } = wp.editPost;
 
 const MySidebarMoreMenuItem = () => (
 	<PluginSidebarMoreMenuItem
 		target="my-sidebar"
-		icon="yes"
+		icon="smiley"
 	>
-		My sidebar title
+		{ __( 'My sidebar title' ) }
 	</PluginSidebarMoreMenuItem>
 );
 ```
@@ -88,5 +107,114 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 
 - Type: `String` | `Element`
 - Required: No
+- Default: _inherits from the plugin_
 
 
+### `PluginPostStatusInfo`
+
+Renders a row in the Status & Visibility panel of the Document sidebar.
+It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
+
+_Example:_
+```jsx
+const { __ } = wp.i18n;
+const { PluginPostStatusInfo } = wp.editPost;
+
+const MyPluginPostStatusInfo = () => (
+	<PluginPostStatusInfo>
+		{ __( 'My post status info' ) }
+	</PluginPostStatusInfo>
+);
+```
+
+
+### `PluginPrePublishPanel`
+
+Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when a user first pushes "Publish" from the main editor).
+
+_Example:_
+
+```jsx
+const { __ } = wp.i18n;
+const { PluginPrePublishPanel } = wp.editPost;
+
+const MyPluginPrePublishPanel = () => (
+	<PluginPrePublishPanel
+		className="my-plugin-pre-publish-panel"
+		title={ __( 'My panel title' ) }
+		initialOpen={ true }
+	>
+	    { __( 'My panel content' ) }
+	</PluginPrePublishPanel>
+);
+```
+
+#### Props
+
+##### className
+
+An optional class name added to the panel.
+
+- Type: `String`
+- Required: No
+
+##### title
+
+Title displayed at the top of the panel.
+
+- Type: `String`
+- Required: No
+
+##### initialOpen
+
+Whether to have the panel initially opened. When no title is provided it is always opened.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+
+
+### `PluginPostPublishPanel`
+
+Renders provided content to the post-publish panel in the publish flow (side panel that opens after a user publishes the post).
+
+_Example:_
+
+```jsx
+const { __ } = wp.i18n;
+const { PluginPostPublishPanel } = wp.editPost;
+
+const MyPluginPostPublishPanel = () => (
+	<PluginPostPublishPanel
+		className="my-plugin-post-publish-panel"
+		title={ __( 'My panel title' ) }
+		initialOpen={ true }
+	>
+        { __( 'My panel content' ) }
+	</PluginPostPublishPanel>
+);
+```
+
+#### Props
+
+##### className
+
+An optional class name added to the panel.
+
+- Type: `String`
+- Required: No
+
+##### title
+
+Title displayed at the top of the panel.
+
+- Type: `String`
+- Required: No
+
+##### initialOpen
+
+Whether to have the panel initially opened. When no title is provided it is always opened. 
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`

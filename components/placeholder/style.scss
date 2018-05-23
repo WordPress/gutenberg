@@ -9,7 +9,13 @@
 	text-align: center;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	background: $light-gray-100;
+
+	// use opacity to work in various editor styles
+	background: $dark-opacity-light-200;
+
+	.is-dark-theme & {
+		background: $light-opacity-light-200;
+	}
 }
 
 .components-placeholder__label {

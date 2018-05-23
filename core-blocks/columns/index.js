@@ -12,11 +12,9 @@ import { __, sprintf } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import {
-	BlockControls,
 	InspectorControls,
-	BlockAlignmentToolbar,
 	InnerBlocks,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -46,7 +44,7 @@ export const settings = {
 		/* translators: Block title modifier */
 		__( '%1$s (%2$s)' ),
 		__( 'Columns' ),
-		__( 'Experimental' )
+		__( 'beta' )
 	),
 
 	icon: 'columns',
@@ -58,34 +56,20 @@ export const settings = {
 			type: 'number',
 			default: 2,
 		},
-		align: {
-			type: 'string',
-		},
 	},
 
-	description: __( 'A multi-column layout of content.' ),
+	description: __( 'Add a block that displays content in multiple columns, then add whatever content blocks you\'d like.' ),
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-
-		return { 'data-align': align };
+	supports: {
+		align: [ 'wide', 'full' ],
 	},
 
 	edit( { attributes, setAttributes, className } ) {
-		const { align, columns } = attributes;
+		const { columns } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
 
 		return (
 			<Fragment>
-				<BlockControls>
-					<BlockAlignmentToolbar
-						controls={ [ 'wide', 'full' ] }
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</BlockControls>
 				<InspectorControls>
 					<PanelBody>
 						<RangeControl

@@ -1,13 +1,18 @@
 .editor-post-permalink {
 	display: inline-flex;
 	align-items: center;
-	border: 1px solid $light-gray-500;
 	background: $white;
 	padding: 5px;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	height: 40px;
 	white-space: nowrap;
+
+	// use opacity to work in various editor styles
+	border: 1px solid $dark-opacity-light-500;
+	border-bottom: none;
+	background-clip: padding-box;
+	box-sizing: padding-box;
 
 	// put toolbar snugly to edge on mobile
 	margin-left: -$block-padding - 1px;	// stack borders
@@ -19,15 +24,16 @@
 }
 
 .editor-post-permalink__copy {
-	margin-top: 4px;
+	border-radius: 4px;
+	padding: 6px;
 }
 
-.editor-post-permalink__copy .is-copied {
+.editor-post-permalink__copy.is-copied {
 	opacity: 0.3;
 }
 
 .editor-post-permalink__label {
-	margin: 0 10px;
+	margin: 0 10px 0 5px;
 }
 
 .editor-post-permalink__link {

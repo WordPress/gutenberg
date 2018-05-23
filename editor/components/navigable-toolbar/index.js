@@ -8,7 +8,8 @@ import { cond, matchesProperty } from 'lodash';
  */
 import { NavigableMenu, KeyboardShortcuts } from '@wordpress/components';
 import { Component, findDOMNode } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
+import { focus } from '@wordpress/dom';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Browser dependencies

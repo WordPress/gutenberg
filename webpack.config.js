@@ -13,17 +13,17 @@ const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-web
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './[basename]/build/style.css',
+	filename: './build/[basename]/style.css',
 } );
 
 // CSS loader for styles specific to block editing.
 const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './core-blocks/build/edit-blocks.css',
+	filename: './build/core-blocks/edit-blocks.css',
 } );
 
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './core-blocks/build/style.css',
+	filename: './build/core-blocks/style.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -34,7 +34,60 @@ const extractConfig = {
 			loader: 'postcss-loader',
 			options: {
 				plugins: [
+					require( './packages/postcss-themes' )( {
+						defaults: {
+							primary: '#0085ba',
+							secondary: '#11a0d2',
+							toggle: '#11a0d2',
+							button: '#0085ba',
+						},
+						themes: {
+							'admin-color-light': {
+								primary: '#0085ba',
+								secondary: '#c75726',
+								toggle: '#11a0d2',
+								button: '#0085ba',
+							},
+							'admin-color-blue': {
+								primary: '#82b4cb',
+								secondary: '#d9ab59',
+								toggle: '#82b4cb',
+								button: '#d9ab59',
+							},
+							'admin-color-coffee': {
+								primary: '#c2a68c',
+								secondary: '#9fa47b',
+								toggle: '#c2a68c',
+								button: '#c2a68c',
+							},
+							'admin-color-ectoplasm': {
+								primary: '#a7b656',
+								secondary: '#c77430',
+								toggle: '#a7b656',
+								button: '#a7b656',
+							},
+							'admin-color-midnight': {
+								primary: '#e14d43',
+								secondary: '#77a6b9',
+								toggle: '#77a6b9',
+								button: '#e14d43',
+							},
+							'admin-color-ocean': {
+								primary: '#a3b9a2',
+								secondary: '#a89d8a',
+								toggle: '#a3b9a2',
+								button: '#a3b9a2',
+							},
+							'admin-color-sunrise': {
+								primary: '#d1864a',
+								secondary: '#c8b03c',
+								toggle: '#c8b03c',
+								button: '#d1864a',
+							},
+						},
+					} ),
 					require( 'autoprefixer' ),
+					require( 'postcss-color-function' ),
 				],
 			},
 		},
@@ -42,7 +95,7 @@ const extractConfig = {
 			loader: 'sass-loader',
 			query: {
 				includePaths: [ 'edit-post/assets/stylesheets' ],
-				data: '@import "colors"; @import "admin-schemes"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
+				data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 				outputStyle: 'production' === process.env.NODE_ENV ?
 					'compressed' : 'nested',
 			},
@@ -62,7 +115,7 @@ const extractConfig = {
  */
 function camelCaseDash( string ) {
 	return string.replace(
-		/-([a-z])/,
+		/-([a-z])/g,
 		( match, letter ) => letter.toUpperCase()
 	);
 }
@@ -70,9 +123,7 @@ function camelCaseDash( string ) {
 const entryPointNames = [
 	'blocks',
 	'components',
-	'date',
 	'editor',
-	'element',
 	'utils',
 	'data',
 	'viewport',
@@ -82,9 +133,18 @@ const entryPointNames = [
 	'core-blocks',
 ];
 
-const packageNames = [
+const gutenbergPackages = [
+	'date',
+	'dom',
+	'element',
+];
+
+const wordPressPackages = [
+	'a11y',
+	'dom-ready',
 	'hooks',
 	'i18n',
+	'is-shallow-equal',
 ];
 
 const coreGlobals = [
@@ -103,7 +163,8 @@ const externals = {
 
 [
 	...entryPointNames,
-	...packageNames,
+	...gutenbergPackages,
+	...wordPressPackages,
 	...coreGlobals,
 ].forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
@@ -120,13 +181,19 @@ const config = {
 			memo[ name ] = `./${ path }`;
 			return memo;
 		}, {} ),
-		packageNames.reduce( ( memo, packageName ) => {
-			memo[ packageName ] = `./node_modules/@wordpress/${ packageName }`;
+		gutenbergPackages.reduce( ( memo, packageName ) => {
+			const name = camelCaseDash( packageName );
+			memo[ name ] = `./packages/${ packageName }`;
+			return memo;
+		}, {} ),
+		wordPressPackages.reduce( ( memo, packageName ) => {
+			const name = camelCaseDash( packageName );
+			memo[ name ] = `./node_modules/@wordpress/${ packageName }`;
 			return memo;
 		}, {} )
 	),
 	output: {
-		filename: '[basename]/build/index.js',
+		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',

@@ -1,5 +1,5 @@
 /**
- * External Depenedencies
+ * External Dependencies
  */
 import classnames from 'classnames';
 
@@ -11,7 +11,7 @@ import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
 import { withSelect } from '@wordpress/data';
-import { RichText } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Module constants
@@ -117,7 +117,7 @@ class GalleryImage extends Component {
 		return (
 			<figure className={ className } tabIndex="-1" onKeyDown={ this.onKeyDown } ref={ this.bindContainer }>
 				{ isSelected &&
-					<div className="blocks-gallery-item__inline-menu">
+					<div className="core-blocks-gallery-item__inline-menu">
 						<IconButton
 							icon="no-alt"
 							onClick={ onRemove }

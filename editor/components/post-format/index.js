@@ -7,7 +7,7 @@ import { find, get, includes, union } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withInstanceId } from '@wordpress/components';
+import { withInstanceId, Button } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -57,9 +57,9 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 				{ suggestion && suggestion.id !== postFormat && (
 					<div className="editor-post-format__suggestion">
 						{ __( 'Suggestion:' ) }{ ' ' }
-						<button className="button-link" onClick={ () => onUpdatePostFormat( suggestion.id ) }>
+						<Button isLink onClick={ () => onUpdatePostFormat( suggestion.id ) }>
 							{ suggestion.caption }
-						</button>
+						</Button>
 					</div>
 				) }
 			</div>
@@ -75,7 +75,7 @@ export default compose( [
 		const themeSupports = select( 'core' ).getThemeSupports();
 		// Ensure current format is always in the set.
 		// The current format may not be a format supported by the theme.
-		const supportedFormats = union( [ postFormat ], get( themeSupports, 'formats', [] ) );
+		const supportedFormats = union( [ postFormat ], get( themeSupports, [ 'formats' ], [] ) );
 		return {
 			postFormat,
 			supportedFormats,

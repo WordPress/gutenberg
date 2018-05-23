@@ -2,10 +2,8 @@
  * WordPress
  */
 import { __ } from '@wordpress/i18n';
-import {
-	createBlock,
-	RichText,
-} from '@wordpress/blocks';
+import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -17,7 +15,7 @@ export const name = 'core/preformatted';
 export const settings = {
 	title: __( 'Preformatted' ),
 
-	description: __( 'Preformatted text keeps your spaces, tabs and linebreaks as they are.' ),
+	description: __( 'Add text that respects your spacing and tabs, and also allows styling.' ),
 
 	icon: 'text',
 
@@ -48,6 +46,11 @@ export const settings = {
 						node.firstChild.nodeName === 'CODE'
 					)
 				),
+				schema: {
+					pre: {
+						children: getPhrasingContentSchema(),
+					},
+				},
 			},
 		],
 		to: [

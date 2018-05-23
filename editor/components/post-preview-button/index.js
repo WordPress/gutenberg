@@ -132,7 +132,7 @@ export default compose( [
 			isDirty: isEditedPostDirty(),
 			isNew: isEditedPostNew(),
 			isSaveable: isEditedPostSaveable(),
-			isViewable: get( postType, 'viewable', false ),
+			isViewable: get( postType, [ 'viewable' ], false ),
 			modified: getEditedPostAttribute( 'modified' ),
 		};
 	} ),

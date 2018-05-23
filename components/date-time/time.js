@@ -143,14 +143,16 @@ class TimePicker extends Component {
 				/>
 				{ is12Hour && <div>
 					<Button
-						className="button components-time-picker__am-button"
+						isDefault
+						className="components-time-picker__am-button"
 						isToggled={ am === 'AM' }
 						onClick={ this.updateAmPm( 'AM' ) }
 					>
 						{ __( 'AM' ) }
 					</Button>
 					<Button
-						className="button components-time-picker__pm-button"
+						isDefault
+						className="components-time-picker__pm-button"
 						isToggled={ am === 'PM' }
 						onClick={ this.updateAmPm( 'PM' ) }
 					>

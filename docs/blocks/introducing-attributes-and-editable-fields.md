@@ -13,7 +13,7 @@ One challenge of maintaining the representation of a block as a JavaScript objec
 ```js
 var el = wp.element.createElement,
 	registerBlockType = wp.blocks.registerBlockType,
-	RichText = wp.blocks.RichText;
+	RichText = wp.editor.RichText;
 
 registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -52,6 +52,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 		var content = props.attributes.content;
 
 		return el( RichText.Content, {
+			tagName: 'p',
 			className: props.className,
 			value: content
 		} );
@@ -60,7 +61,8 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 ```
 {% ESNext %}
 ```js
-const { registerBlockType, RichText, source } = wp.blocks;
+const { registerBlockType } = wp.blocks;
+const { RichText } = wp.editor;
 
 registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 	title: 'Hello World (Step 3)',
@@ -98,7 +100,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 		const { content } = attributes;
 
 		return (
-			<RichText.Content className={ className } value={ content } />
+			<RichText.Content tagName="p" className={ className } value={ content } />
 		);
 	},
 } );

@@ -3,6 +3,7 @@
  */
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal Dependencies
@@ -18,9 +19,9 @@ const SkipToSelectedBlock = ( { selectedBlockUID } ) => {
 
 	return (
 		selectedBlockUID &&
-		<button type="button" className="button editor-skip-to-selected-block" onClick={ onClick }>
+		<Button isDefault type="button" className="editor-skip-to-selected-block" onClick={ onClick }>
 			{ __( 'Skip to the selected block' ) }
-		</button>
+		</Button>
 	);
 };
 

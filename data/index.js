@@ -1,20 +1,21 @@
 /**
  * External dependencies
  */
-import isShallowEqual from 'shallowequal';
 import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues, overEvery } from 'lodash';
-import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent } from '@wordpress/element';
+import { Component, createHigherOrderComponent, pure, compose } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
-export { loadAndPersist, withRehydratation } from './persist';
+import registerDataStore from './store';
+
+export { loadAndPersist, withRehydration, withRehydratation } from './persist';
 
 /**
  * Module constants
@@ -130,50 +131,29 @@ export function registerSelectors( reducerKey, newSelectors ) {
  * @param {Object} newResolvers Resolvers to register.
  */
 export function registerResolvers( reducerKey, newResolvers ) {
-	const createResolver = ( selector, key ) => {
+	const { hasStartedResolution } = select( 'core/data' );
+	const { startResolution, finishResolution } = dispatch( 'core/data' );
+
+	const createResolver = ( selector, selectorName ) => {
 		// Don't modify selector behavior if no resolver exists.
-		if ( ! newResolvers.hasOwnProperty( key ) ) {
+		if ( ! newResolvers.hasOwnProperty( selectorName ) ) {
 			return selector;
 		}
 
 		const store = stores[ reducerKey ];
 
 		// Normalize resolver shape to object.
-		let resolver = newResolvers[ key ];
+		let resolver = newResolvers[ selectorName ];
 		if ( ! resolver.fulfill ) {
 			resolver = { fulfill: resolver };
 		}
 
-		/**
-		 * To ensure that fulfillment occurs only once per arguments set
-		 * (even for deeply "equivalent" arguments), track calls.
-		 *
-		 * @type {EquivalentKeyMap}
-		 */
-		const fulfilledByEquivalentArgs = new EquivalentKeyMap();
-
-		/**
-		 * Returns true if resolver fulfillment has already occurred for an
-		 * equivalent set of arguments. Includes side effect when returning
-		 * false to ensure the next invocation returns true.
-		 *
-		 * @param {Array} args Arguments set.
-		 *
-		 * @return {boolean} Whether fulfillment has already occurred.
-		 */
-		function hasBeenFulfilled( args ) {
-			const hasArguments = fulfilledByEquivalentArgs.has( args );
-			if ( ! hasArguments ) {
-				fulfilledByEquivalentArgs.set( args, true );
-			}
-
-			return hasArguments;
-		}
-
 		async function fulfill( ...args ) {
-			if ( hasBeenFulfilled( args ) ) {
+			if ( hasStartedResolution( reducerKey, selectorName, args ) ) {
 				return;
 			}
+
+			startResolution( reducerKey, selectorName, args );
 
 			// At this point, selectors have already been pre-bound to inject
 			// state, it would not be otherwise provided to fulfill.
@@ -193,6 +173,8 @@ export function registerResolvers( reducerKey, newResolvers ) {
 					store.dispatch( maybeAction );
 				}
 			}
+
+			finishResolution( reducerKey, selectorName, args );
 		}
 
 		if ( typeof resolver.isFulfilled === 'function' ) {
@@ -285,11 +267,19 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 
 			this.runSelection = this.runSelection.bind( this );
 
+			/**
+			 * Boolean tracking known render conditions (own props or merged
+			 * props update) for `shouldComponentUpdate`.
+			 *
+			 * @type {boolean}
+			 */
+			this.shouldComponentUpdate = false;
+
 			this.state = {};
 		}
 
-		shouldComponentUpdate( nextProps, nextState ) {
-			return ! isShallowEqual( nextProps, this.props ) || ! isShallowEqual( nextState, this.state );
+		shouldComponentUpdate() {
+			return this.shouldComponentUpdate;
 		}
 
 		componentWillMount() {
@@ -302,6 +292,7 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 		componentWillReceiveProps( nextProps ) {
 			if ( ! isShallowEqual( nextProps, this.props ) ) {
 				this.runSelection( nextProps );
+				this.shouldComponentUpdate = true;
 			}
 		}
 
@@ -331,10 +322,14 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
 				this.setState( {
 					mergeProps: nextMergeProps,
 				} );
+
+				this.shouldComponentUpdate = true;
 			}
 		}
 
 		render() {
+			this.shouldComponentUpdate = false;
+
 			return <WrappedComponent { ...this.props } { ...this.state.mergeProps } />;
 		}
 	};
@@ -352,48 +347,54 @@ export const withSelect = ( mapStateToProps ) => createHigherOrderComponent( ( W
  *
  * @return {Component} Enhanced component with merged dispatcher props.
  */
-export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
-	return class ComponentWithDispatch extends Component {
-		constructor() {
-			super( ...arguments );
+export const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
+	compose( [
+		pure,
+		( WrappedComponent ) => {
+			return class ComponentWithDispatch extends Component {
+				constructor() {
+					super( ...arguments );
 
-			this.proxyProps = {};
-		}
-
-		componentWillMount() {
-			this.setProxyProps( this.props );
-		}
-
-		componentWillUpdate( nextProps ) {
-			this.setProxyProps( nextProps );
-		}
-
-		proxyDispatch( propName, ...args ) {
-			// Original dispatcher is a pre-bound (dispatching) action creator.
-			mapDispatchToProps( dispatch, this.props )[ propName ]( ...args );
-		}
-
-		setProxyProps( props ) {
-			// Assign as instance property so that in reconciling subsequent
-			// renders, the assigned prop values are referentially equal.
-			const propsToDispatchers = mapDispatchToProps( dispatch, props );
-			this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
-				// Prebind with prop name so we have reference to the original
-				// dispatcher to invoke. Track between re-renders to avoid
-				// creating new function references every render.
-				if ( this.proxyProps.hasOwnProperty( propName ) ) {
-					return this.proxyProps[ propName ];
+					this.proxyProps = {};
 				}
 
-				return this.proxyDispatch.bind( this, propName );
-			} );
-		}
+				componentWillMount() {
+					this.setProxyProps( this.props );
+				}
 
-		render() {
-			return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
-		}
-	};
-}, 'withDispatch' );
+				componentWillUpdate( nextProps ) {
+					this.setProxyProps( nextProps );
+				}
+
+				proxyDispatch( propName, ...args ) {
+					// Original dispatcher is a pre-bound (dispatching) action creator.
+					mapDispatchToProps( dispatch, this.props )[ propName ]( ...args );
+				}
+
+				setProxyProps( props ) {
+					// Assign as instance property so that in reconciling subsequent
+					// renders, the assigned prop values are referentially equal.
+					const propsToDispatchers = mapDispatchToProps( dispatch, props );
+					this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
+						// Prebind with prop name so we have reference to the original
+						// dispatcher to invoke. Track between re-renders to avoid
+						// creating new function references every render.
+						if ( this.proxyProps.hasOwnProperty( propName ) ) {
+							return this.proxyProps[ propName ];
+						}
+
+						return this.proxyDispatch.bind( this, propName );
+					} );
+				}
+
+				render() {
+					return <WrappedComponent { ...this.props } { ...this.proxyProps } />;
+				}
+			};
+		},
+	] ),
+	'withDispatch'
+);
 
 /**
  * Returns true if the given argument appears to be a dispatchable action.
@@ -466,3 +467,5 @@ export function toAsyncIterable( object ) {
 		}
 	}() );
 }
+
+registerDataStore();

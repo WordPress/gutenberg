@@ -4,23 +4,6 @@
 import { castArray } from 'lodash';
 
 /**
- * Returns an action object used in signalling that the request for a given
- * data type has been made.
- *
- * @param {string}  dataType Data type requested.
- * @param {?string} subType  Optional data sub-type.
- *
- * @return {Object} Action object.
- */
-export function setRequested( dataType, subType ) {
-	return {
-		type: 'SET_REQUESTED',
-		dataType,
-		subType,
-	};
-}
-
-/**
  * Returns an action object used in signalling that terms have been received
  * for a given taxonomy.
  *
@@ -38,30 +21,50 @@ export function receiveTerms( taxonomy, terms ) {
 }
 
 /**
- * Returns an action object used in signalling that media have been received.
+ * Returns an action object used in signalling that authors have been received.
  *
- * @param {Array|Object} media Media received.
+ * @param {string}       queryID Query ID.
+ * @param {Array|Object} users   Users received.
  *
  * @return {Object} Action object.
  */
-export function receiveMedia( media ) {
+export function receiveUserQuery( queryID, users ) {
 	return {
-		type: 'RECEIVE_MEDIA',
-		media: castArray( media ),
+		type: 'RECEIVE_USER_QUERY',
+		users: castArray( users ),
+		queryID,
 	};
 }
 
 /**
- * Returns an action object used in signalling that post types have been received.
+ * Returns an action object used in signalling that entity records have been received.
  *
- * @param {Array|Object} postTypes Post Types received.
+ * @param {string}       kind    Kind of the received entity.
+ * @param {string}       name    Name of the received entity.
+ * @param {Array|Object} records Records received.
  *
  * @return {Object} Action object.
  */
-export function receivePostTypes( postTypes ) {
+export function receiveEntityRecords( kind, name, records ) {
 	return {
-		type: 'RECEIVE_POST_TYPES',
-		postTypes: castArray( postTypes ),
+		type: 'RECEIVE_ENTITY_RECORDS',
+		records: castArray( records ),
+		kind,
+		name,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that taxonomies have been received.
+ *
+ * @param {Array} taxonomies Taxonomies received.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveTaxonomies( taxonomies ) {
+	return {
+		type: 'RECEIVE_TAXONOMIES',
+		taxonomies,
 	};
 }
 
