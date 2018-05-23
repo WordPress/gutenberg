@@ -322,6 +322,8 @@ export default {
 	AUTOSAVE( action, store ) {
 		const { getState, dispatch } = store;
 		const state = getState();
+
+		// A post must contain a title, an excerpt, or non-empty content to be valid for an autosave.
 		if ( ! isEditedPostSaveable( state ) ) {
 			return;
 		}
