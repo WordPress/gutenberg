@@ -60,7 +60,8 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	public function get_items_permission_check( $request ) {
 
 		if ( 'edit' === $request['context'] ) {
-			$allowed_post_types = $this->get_allowed_post_types( true );
+			$allowed_post_types = $this->get_allowed_post_types();
+			$allowed_post_types = array_filter( $allowed_post_types, array( $this, 'current_user_can_edit_post_type' ) );
 
 			if ( empty( $allowed_post_types ) ) {
 				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit content.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
@@ -100,7 +101,12 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 
 		// Transform 'any' into actual post type list.
 		if ( in_array( 'any', $request['type'], true ) ) {
-			$query_args['post_type'] = array_keys( $this->get_allowed_post_types( 'edit' === $request['context'] ) );
+			$allowed_post_types = $this->get_allowed_post_types();
+			if ( 'edit' === $request['context'] ) {
+				$allowed_post_types = array_filter( $allowed_post_types, array( $this, 'current_user_can_edit_post_type' ) );
+			}
+
+			$query_args['post_type'] = array_keys( $allowed_post_types );
 		}
 
 		// Ensure to exclude post types as necessary.
@@ -509,31 +515,25 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	 *
 	 * @since 2.9.0
 	 *
-	 * @param bool $editable Optional. Whether to only include post types where the current user
-	 *                       has edit access. Default false.
 	 * @return array List of post type objects, keyed by their name.
 	 */
-	protected function get_allowed_post_types( $editable = false ) {
+	protected function get_allowed_post_types() {
 
-		$post_types = get_post_types( array(
+		return get_post_types( array(
 			'public'       => true,
 			'show_in_rest' => true,
 		), 'objects' );
+	}
 
-		if ( $editable ) {
-			$allowed = array();
-
-			foreach ( $post_types as $name => $post_type ) {
-				if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
-					continue;
-				}
-
-				$allowed[ $name ] = $post_type;
-			}
-
-			return $allowed;
-		}
-
-		return $post_types;
+	/**
+	 * Checks whether the current user can edit posts of a given post type.
+	 *
+	 * @since 2.9.0
+	 *
+	 * @param WP_Post_Type $post_type Post type object.
+	 * @return bool True if the user can edit posts of the post type, false otherwise.
+	 */
+	protected function current_user_can_edit_post_type( $post_type ) {
+		return current_user_can( $post_type->cap->edit_posts );
 	}
 }
