@@ -6,7 +6,12 @@ import { withSelect, withDispatch } from '@wordpress/data';
 
 export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
-		const { isDirty, isSaveable, isAutosaveable } = this.props;
+		const { isDirty, isSaveable, isAutosaveable, isAutosaving } = this.props;
+
+		// Prevent autosaves if an autosave is in progress.
+		if ( isAutosaving ) {
+			return;
+		}
 		if (
 			prevProps.isDirty !== isDirty ||
 			prevProps.isSaveable !== isSaveable ||
@@ -43,6 +48,7 @@ export default compose( [
 			isEditedPostSaveable,
 			isPostAutosaveable,
 			getEditorSettings,
+			isAutosavingPost,
 		} = select( 'core/editor' );
 		const { autosaveInterval } = getEditorSettings();
 		return {
@@ -50,6 +56,7 @@ export default compose( [
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: isPostAutosaveable(),
 			autosaveInterval: autosaveInterval,
+			isAutosaving: isAutosavingPost(),
 		};
 	} ),
 
