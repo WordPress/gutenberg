@@ -80,9 +80,8 @@
 		cursor: pointer;
 		@include menu-style__neutral;
 
-		&:hover,
-		&:focus,
-		&:not(:disabled):hover {
+		&:hover:not(:disabled):not([aria-disabled="true"]),
+		&:focus:not(:disabled):not([aria-disabled="true"]) {
 			@include menu-style__focus;
 		}
 
