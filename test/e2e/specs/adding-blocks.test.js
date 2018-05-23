@@ -81,7 +81,7 @@ describe( 'adding blocks', () => {
 		// Using the between inserter
 		await page.mouse.move( 200, 300 );
 		await page.mouse.move( 250, 350 );
-		const inserter = await page.$( '[data-type="core/quote"] .editor-block-list__insertion-point-inserter' );
+		const inserter = await page.$( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
 		await clickAtRightish( inserter );
 		await page.keyboard.type( 'Second paragraph' );
 
