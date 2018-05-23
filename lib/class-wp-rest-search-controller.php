@@ -59,25 +59,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	 */
 	public function get_items_permission_check( $request ) {
 
-		if ( 'edit' === $request['context'] ) {
-			$allowed_post_types = $this->get_allowed_post_types();
-			$allowed_post_types = array_filter( $allowed_post_types, array( $this, 'current_user_can_edit_post_type' ) );
-
-			if ( empty( $allowed_post_types ) ) {
-				return new WP_Error( 'rest_forbidden_context', __( 'Sorry, you are not allowed to edit content.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
-			}
-
-			if ( 'any' !== $request['type'] ) {
-				foreach ( (array) $request['type'] as $post_type ) {
-					if ( 'any' !== $post_type && ! in_array( $post_type, $request['type_exclude'], true ) && ! isset( $allowed_post_types[ $post_type ] ) ) {
-
-						/* translators: post type slug */
-						return new WP_Error( 'rest_forbidden_context', sprintf( __( 'Sorry, you are not allowed to edit content of type %s.', 'gutenberg' ), $post_type ), array( 'status' => rest_authorization_required_code() ) );
-					}
-				}
-			}
-		}
-
 		return true;
 	}
 
@@ -101,12 +82,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 
 		// Transform 'any' into actual post type list.
 		if ( in_array( 'any', $request['type'], true ) ) {
-			$allowed_post_types = $this->get_allowed_post_types();
-			if ( 'edit' === $request['context'] ) {
-				$allowed_post_types = array_filter( $allowed_post_types, array( $this, 'current_user_can_edit_post_type' ) );
-			}
-
-			$query_args['post_type'] = array_keys( $allowed_post_types );
+			$query_args['post_type'] = array_keys( $this->get_allowed_post_types() );
 		}
 
 		// Ensure to exclude post types as necessary.
@@ -143,11 +119,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 		$posts_query  = new WP_Query();
 		$query_result = $posts_query->query( $query_args );
 
-		// Allow access to all password protected posts if the context is edit.
-		if ( 'edit' === $request['context'] ) {
-			add_filter( 'post_password_required', '__return_false' );
-		}
-
 		$posts = array();
 
 		foreach ( $query_result as $post ) {
@@ -157,11 +128,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 
 			$data    = $this->prepare_item_for_response( $post, $request );
 			$posts[] = $this->prepare_response_for_collection( $data );
-		}
-
-		// Reset filter.
-		if ( 'edit' === $request['context'] ) {
-			remove_filter( 'post_password_required', '__return_false' );
 		}
 
 		$page        = (int) $query_args['paged'];
@@ -292,17 +258,11 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			if ( post_type_supports( $post->post_type, 'title' ) ) {
 				add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 
-				$data['title'] = array(
-					'raw'      => $post->post_title,
-					'rendered' => get_the_title( $post->ID ),
-				);
+				$data['title'] = get_the_title( $post->ID );
 
 				remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 			} else {
-				$data['title'] = array(
-					'raw'      => '',
-					'rendered' => '',
-				);
+				$data['title'] = '';
 			}
 		}
 
@@ -350,40 +310,27 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 				'id'    => array(
 					'description' => __( 'Unique identifier for the object.', 'gutenberg' ),
 					'type'        => 'integer',
-					'context'     => array( 'view', 'edit', 'embed' ),
+					'context'     => array( 'view', 'embed' ),
 					'readonly'    => true,
 				),
 				'link'  => array(
 					'description' => __( 'URL to the object.', 'gutenberg' ),
 					'type'        => 'string',
 					'format'      => 'uri',
-					'context'     => array( 'view', 'edit', 'embed' ),
+					'context'     => array( 'view', 'embed' ),
 					'readonly'    => true,
 				),
 				'title' => array(
 					'description' => __( 'The title for the object.', 'gutenberg' ),
-					'type'        => 'object',
-					'context'     => array( 'view', 'edit', 'embed' ),
-					'properties'  => array(
-						'raw'      => array(
-							'description' => __( 'Title for the object, as it exists in the database.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'edit' ),
-							'readonly'    => true,
-						),
-						'rendered' => array(
-							'description' => __( 'HTML title for the object, transformed for display.', 'gutenberg' ),
-							'type'        => 'string',
-							'context'     => array( 'view', 'edit', 'embed' ),
-							'readonly'    => true,
-						),
-					),
+					'type'        => 'string',
+					'context'     => array( 'view', 'embed' ),
+					'readonly'    => true,
 				),
 				'type'  => array(
 					'description' => __( 'Type of the object.', 'gutenberg' ),
 					'type'        => 'string',
 					'enum'        => array_keys( $this->get_allowed_post_types() ),
-					'context'     => array( 'view', 'edit', 'embed' ),
+					'context'     => array( 'view', 'embed' ),
 					'readonly'    => true,
 				),
 			),
@@ -523,17 +470,5 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			'public'       => true,
 			'show_in_rest' => true,
 		), 'objects' );
-	}
-
-	/**
-	 * Checks whether the current user can edit posts of a given post type.
-	 *
-	 * @since 2.9.0
-	 *
-	 * @param WP_Post_Type $post_type Post type object.
-	 * @return bool True if the user can edit posts of the post type, false otherwise.
-	 */
-	protected function current_user_can_edit_post_type( $post_type ) {
-		return current_user_can( $post_type->cap->edit_posts );
 	}
 }

@@ -7,8 +7,6 @@
 
 /**
  * Tests for WP_REST_Search_Controller.
- *
- * @group restsearch
  */
 class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
@@ -41,20 +39,6 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	private static $my_content_post_ids = array();
 
 	/**
-	 * Author user ID.
-	 *
-	 * @var int
-	 */
-	private static $author_id;
-
-	/**
-	 * Editor user ID.
-	 *
-	 * @var int
-	 */
-	private static $editor_id;
-
-	/**
 	 * Create fake data before our tests run.
 	 *
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
@@ -78,14 +62,6 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		self::$my_content_post_ids = $factory->post->create_many( 6, array(
 			'post_content' => 'my-foocontent',
 		) );
-
-		self::$author_id = $factory->user->create( array(
-			'role' => 'author',
-		) );
-
-		self::$editor_id = $factory->user->create( array(
-			'role' => 'editor',
-		) );
 	}
 
 	/**
@@ -102,9 +78,6 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		foreach ( $post_ids as $post_id ) {
 			wp_delete_post( $post_id, true );
 		}
-
-		self::delete_user( self::$author_id );
-		self::delete_user( self::$editor_id );
 	}
 
 	/**
@@ -125,7 +98,7 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data     = $response->get_data();
 
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
-		$this->assertEquals( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
+		$this->assertEquals( array( 'view', 'embed' ), $data['endpoints'][0]['args']['context']['enum'] );
 	}
 
 	/**
@@ -287,8 +260,6 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Test preparing the data contains the correct fields.
 	 */
 	public function test_prepare_item() {
-		wp_set_current_user( self::$editor_id );
-
 		$response = $this->do_request_with_params();
 		$this->assertEquals( 200, $response->get_status() );
 
@@ -309,8 +280,6 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		if ( ! method_exists( 'WP_REST_Controller', 'get_fields_for_response' ) ) {
 			$this->markTestSkipped( 'Limiting fields requires the WP_REST_Controller::get_fields_for_response() method.' );
 		}
-
-		wp_set_current_user( self::$editor_id );
 
 		$response = $this->do_request_with_params( array(
 			'_fields' => 'id,title',
@@ -348,32 +317,6 @@ class REST_Search_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			'type' => 'post,nav_menu_item',
 		) );
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
-	}
-
-	/**
-	 * Tests that post type capabilities are considered in edit context for author.
-	 */
-	public function test_prohibited_type_in_edit_context() {
-		wp_set_current_user( self::$author_id );
-
-		$response = $this->do_request_with_params( array(
-			'context' => 'edit',
-			'type'    => 'page',
-		) );
-		$this->assertErrorResponse( 'rest_forbidden_context', $response, 403 );
-	}
-
-	/**
-	 * Tests that post type capabilities are considered in edit context for editor.
-	 */
-	public function test_allowed_type_in_edit_context() {
-		wp_set_current_user( self::$editor_id );
-
-		$response = $this->do_request_with_params( array(
-			'context' => 'edit',
-			'type'    => 'page',
-		) );
-		$this->assertEquals( 200, $response->get_status() );
 	}
 
 	/**
