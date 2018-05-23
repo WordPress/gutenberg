@@ -809,20 +809,20 @@ export class RichText extends Component {
 						return;
 					}
 
-					const { value: href, ...params } = formatValue;
+					const { value: href, target } = formatValue;
 
 					if ( ! this.isFormatActive( 'link' ) && this.editor.selection.isCollapsed() ) {
 						// When no link or text is selected, insert a link with the URL as its text
 						const anchorHTML = this.editor.dom.createHTML(
 							'a',
-							{ href, ...params },
+							{ href, target },
 							this.editor.dom.encode( href )
 						);
 						this.editor.insertContent( anchorHTML );
 					} else {
 						// Use built-in TinyMCE command turn the selection into a link. This takes
 						// care of deleting any existing links within the selection
-						this.editor.execCommand( 'mceInsertLink', false, { href, ...params } );
+						this.editor.execCommand( 'mceInsertLink', false, { href, target } );
 					}
 				} else {
 					this.editor.execCommand( 'Unlink' );
