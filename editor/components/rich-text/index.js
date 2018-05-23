@@ -24,10 +24,10 @@ import {
 	getRectangleFromRange,
 	getScrollContainer,
 } from '@wordpress/dom';
+import { deprecated } from '@wordpress/devtools';
 import {
 	keycodes,
 	createBlobURL,
-	deprecated,
 } from '@wordpress/utils';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';

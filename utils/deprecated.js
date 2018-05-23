@@ -2,14 +2,10 @@
  * WordPress dependencies
  */
 import * as dom from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
-import { deprecated } from './deprecation';
+import { deprecated as originalDeprecated } from '@wordpress/devtools';
 
 const wrapFunction = ( functionName, source = dom ) => ( ...args ) => {
-	deprecated( 'wp.utils.' + functionName, {
+	originalDeprecated( 'wp.utils.' + functionName, {
 		version: '3.1',
 		alternative: 'wp.dom.' + functionName,
 		plugin: 'Gutenberg',
@@ -41,10 +37,20 @@ export const replace = wrapFunction( 'replace' );
 export const replaceTag = wrapFunction( 'replaceTag' );
 export const unwrap = wrapFunction( 'unwrap' );
 
+export function deprecated( ...params ) {
+	originalDeprecated( 'wp.utils.deprecated', {
+		version: '3.2',
+		alternative: 'wp.devtools.deprecated',
+		plugin: 'Gutenberg',
+	} );
+
+	return originalDeprecated( ...params );
+}
+
 export function isExtraSmall() {
-	deprecated( 'wp.utils.isExtraSmall', {
+	originalDeprecated( 'wp.utils.isExtraSmall', {
 		version: '3.1',
-		alternative: 'wp.viewport.*',
+		alternative: 'wp.viewport.isExtraSmall',
 		plugin: 'Gutenberg',
 	} );
 

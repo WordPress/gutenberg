@@ -47,8 +47,20 @@ module.exports = {
 				message: 'Use @wordpress/components as import path instead.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^data$/]',
+				message: 'Use @wordpress/data as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^date$/]',
 				message: 'Use @wordpress/date as import path instead.',
+			},
+			{
+				selector: 'ImportDeclaration[source.value=/^devtools$/]',
+				message: 'Use @wordpress/devtools as import path instead.',
+			},
+			{
+				selector: 'ImportDeclaration[source.value=/^dom$/]',
+				message: 'Use @wordpress/dom as import path instead.',
 			},
 			{
 				selector: 'ImportDeclaration[source.value=/^editor$/]',
@@ -57,14 +69,6 @@ module.exports = {
 			{
 				selector: 'ImportDeclaration[source.value=/^element$/]',
 				message: 'Use @wordpress/element as import path instead.',
-			},
-			{
-				selector: 'ImportDeclaration[source.value=/^data$/]',
-				message: 'Use @wordpress/data as import path instead.',
-			},
-			{
-				selector: 'ImportDeclaration[source.value=/^dom$/]',
-				message: 'Use @wordpress/dom as import path instead.',
 			},
 			{
 				selector: 'ImportDeclaration[source.value=/^utils$/]',

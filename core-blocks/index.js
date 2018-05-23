@@ -6,7 +6,7 @@ import {
 	setDefaultBlockName,
 	setUnknownTypeHandlerName,
 } from '@wordpress/blocks';
-import { deprecated } from '@wordpress/utils';
+import { deprecated } from '@wordpress/devtools';
 
 /**
  * Internal dependencies

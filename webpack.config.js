@@ -137,6 +137,7 @@ const entryPointNames = [
 
 const gutenbergPackages = [
 	'date',
+	'devtools',
 	'dom',
 	'element',
 ];
