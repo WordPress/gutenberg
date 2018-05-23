@@ -32,11 +32,6 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
       "r": 255,
     }
   }
-  style={
-    Object {
-      "width": "100%",
-    }
-  }
 />
 `;
 
@@ -57,7 +52,7 @@ exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] 
 exports[`ColorPalette Dropdown should render it correctly 1`] = `
 <Dropdown
   className="components-color-palette__item-wrapper components-color-palette__custom-color"
-  contentClassName="components-color-palette__picker "
+  contentClassName="components-color-palette__picker"
   renderContent={[Function]}
   renderToggle={[Function]}
 />
@@ -130,13 +125,14 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
       />
     </Tooltip>
   </div>
-  <button
-    className="button-link components-color-palette__clear"
+  <Button
+    className="components-color-palette__clear"
+    isLink={true}
     onClick={[Function]}
     type="button"
   >
     Clear
-  </button>
+  </Button>
 </div>
 `;
 
@@ -209,16 +205,17 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
   </div>
   <Dropdown
     className="components-color-palette__item-wrapper components-color-palette__custom-color"
-    contentClassName="components-color-palette__picker "
+    contentClassName="components-color-palette__picker"
     renderContent={[Function]}
     renderToggle={[Function]}
   />
-  <button
-    className="button-link components-color-palette__clear"
+  <Button
+    className="components-color-palette__clear"
+    isLink={true}
     onClick={[Function]}
     type="button"
   >
     Clear
-  </button>
+  </Button>
 </div>
 `;

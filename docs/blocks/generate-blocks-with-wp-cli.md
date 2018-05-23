@@ -83,9 +83,7 @@ function movie_block_init() {
 	wp_register_style(
 		'movie-block-editor',
 		plugins_url( $editor_css, __FILE__ ),
-		array(
-			'wp-blocks',
-		),
+		array(),
 		filemtime( "$dir/$editor_css" )
 	);
 
@@ -93,9 +91,7 @@ function movie_block_init() {
 	wp_register_style(
 		'movie-block',
 		plugins_url( $style_css, __FILE__ ),
-		array(
-			'wp-blocks',
-		),
+		array(),
 		filemtime( "$dir/$style_css" )
 	);
 
@@ -118,7 +114,7 @@ add_action( 'init', 'movie_block_init' );
 	var registerBlockType = wp.blocks.registerBlockType;
 	/**
 	 * Returns a new element of given type. Element is an abstraction layer atop React.
-	 * @see https://github.com/WordPress/gutenberg/tree/master/element#element
+	 * @see https://github.com/WordPress/gutenberg/tree/master/packages/element#element
 	 */
 	var el = wp.element.createElement;
 	/**

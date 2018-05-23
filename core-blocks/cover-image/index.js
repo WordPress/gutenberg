@@ -15,7 +15,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	BlockAlignmentToolbar,
-	ImagePlaceholder,
+	MediaPlaceholder,
 	MediaUpload,
 	AlignmentToolbar,
 	RichText,
@@ -63,7 +63,7 @@ export const name = 'core/cover-image';
 export const settings = {
 	title: __( 'Cover Image' ),
 
-	description: __( 'Cover Image is a bold image block with an optional title.' ),
+	description: __( 'Add a full-width image, and layer text over it -- great for headers.' ),
 
 	icon: 'cover-image',
 
@@ -183,8 +183,16 @@ export const settings = {
 			return (
 				<Fragment>
 					{ controls }
-					<ImagePlaceholder
-						{ ...{ className, icon, label, onSelectImage } }
+					<MediaPlaceholder
+						icon={ icon }
+						className={ className }
+						labels={ {
+							title: label,
+							name: __( 'an image' ),
+						} }
+						onSelect={ onSelectImage }
+						accept="image/*"
+						type="image"
 					/>
 				</Fragment>
 			);

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelRow, Dropdown } from '@wordpress/components';
+import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import { PostSchedule as PostScheduleForm, PostScheduleLabel, PostScheduleCheck } from '@wordpress/editor';
 
 /**
@@ -19,14 +19,15 @@ export function PostSchedule() {
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
-						<button
+						<Button
 							type="button"
-							className="edit-post-post-schedule__toggle button-link"
+							className="edit-post-post-schedule__toggle"
 							onClick={ onToggle }
 							aria-expanded={ isOpen }
+							isLink
 						>
 							<PostScheduleLabel />
-						</button>
+						</Button>
 					) }
 					renderContent={ () => <PostScheduleForm /> }
 				/>

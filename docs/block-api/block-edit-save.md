@@ -101,7 +101,7 @@ save() {
 ```
 {% end %}
 
-For most blocks, the return value of `save` should be an [instance of WordPress Element](https://github.com/WordPress/gutenberg/blob/master/element/README.md) representing how the block is to appear on the front of the site.
+For most blocks, the return value of `save` should be an [instance of WordPress Element](https://github.com/WordPress/gutenberg/blob/master/packages/element/README.md) representing how the block is to appear on the front of the site.
 
 _Note:_ While it is possible to return a string value from `save`, it _will be escaped_. If the string includes HTML markup, the markup will be shown on the front of the site verbatim, not as the equivalent HTML node content. If you must return raw HTML from `save`, use `wp.element.RawHTML`. As the name implies, this is prone to [cross-site scripting](https://en.wikipedia.org/wiki/Cross-site_scripting) and therefore is discouraged in favor of a WordPress Element hierarchy whenever possible.
 

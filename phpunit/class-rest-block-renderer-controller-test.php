@@ -301,6 +301,25 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
+
+
+	/**
+	 * Check success response for getting item with layout attribute provided.
+	 */
+	public function test_get_item_with_layout() {
+		wp_set_current_user( self::$user_id );
+
+		$attributes = array(
+			'layout' => 'foo',
+		);
+
+		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( 'attributes', $attributes );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+	}
+
 	/**
 	 * Test getting item with post context.
 	 */

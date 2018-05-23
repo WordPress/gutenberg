@@ -8,8 +8,8 @@ import { mount } from 'enzyme';
  */
 import Disabled from '../';
 
-jest.mock( '@wordpress/utils', () => {
-	const focus = require.requireActual( '@wordpress/utils' ).focus;
+jest.mock( '@wordpress/dom', () => {
+	const focus = require.requireActual( '@wordpress/dom' ).focus;
 
 	return {
 		focus: {

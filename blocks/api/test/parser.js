@@ -42,8 +42,8 @@ describe( 'block parser', () => {
 	};
 
 	beforeAll( () => {
-		// Load all hooks that modify blocks
-		require( 'editor/hooks' );
+		// Initialize the block store.
+		require( '../../store' );
 	} );
 
 	afterEach( () => {
@@ -235,7 +235,7 @@ describe( 'block parser', () => {
 						},
 					],
 				},
-				'<span class="wp-block-test-block">Bananas</span>',
+				'<span>Bananas</span>',
 				{},
 			);
 			expect( attributesAndInnerBlocks.attributes ).toEqual( { fruit: 'Bananas' } );
@@ -260,7 +260,7 @@ describe( 'block parser', () => {
 						},
 					],
 				},
-				'<span class="wp-block-test-block">Bananas</span>',
+				'<span>Bananas</span>',
 				{},
 				[ {
 					name: 'core/test-block',
@@ -301,7 +301,7 @@ describe( 'block parser', () => {
 						},
 					],
 				},
-				'<span class="wp-block-test-block">Bananas</span>',
+				'<span>Bananas</span>',
 				{},
 			);
 
@@ -396,7 +396,7 @@ describe( 'block parser', () => {
 
 			const block = createBlockWithFallback( {
 				blockName: 'core/test-block',
-				innerHTML: '<span class="wp-block-test-block">Bananas</span>',
+				innerHTML: '<span>Bananas</span>',
 				attrs: { fruit: 'Bananas' },
 			} );
 			expect( block.name ).toEqual( 'core/test-block' );

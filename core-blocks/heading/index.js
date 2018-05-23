@@ -1,28 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import { concatChildren, Fragment } from '@wordpress/element';
-import { PanelBody, Toolbar } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { concatChildren } from '@wordpress/element';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
-import {
-	RichText,
-	BlockControls,
-	InspectorControls,
-	AlignmentToolbar,
-} from '@wordpress/editor';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import './editor.scss';
+import edit from './edit';
 
 export const name = 'core/heading';
 
 export const settings = {
 	title: __( 'Heading' ),
 
-	description: __( 'Search engines use the headings to index the structure and content of your web pages.' ),
+	description: __( 'Insert a headline above your post or page content.' ),
 
 	icon: 'heading',
 
@@ -111,70 +105,7 @@ export const settings = {
 		};
 	},
 
-	edit( { attributes, setAttributes, mergeBlocks, insertBlocksAfter, onReplace, className } ) {
-		const { align, content, nodeName, placeholder } = attributes;
-
-		return (
-			<Fragment>
-				<BlockControls
-					controls={
-						'234'.split( '' ).map( ( level ) => ( {
-							icon: 'heading',
-							title: sprintf( __( 'Heading %s' ), level ),
-							isActive: 'H' + level === nodeName,
-							onClick: () => setAttributes( { nodeName: 'H' + level } ),
-							subscript: level,
-						} ) )
-					}
-				/>
-				<InspectorControls>
-					<PanelBody title={ __( 'Heading Settings' ) }>
-						<p>{ __( 'Level' ) }</p>
-						<Toolbar
-							controls={
-								'123456'.split( '' ).map( ( level ) => ( {
-									icon: 'heading',
-									title: sprintf( __( 'Heading %s' ), level ),
-									isActive: 'H' + level === nodeName,
-									onClick: () => setAttributes( { nodeName: 'H' + level } ),
-									subscript: level,
-								} ) )
-							}
-						/>
-						<p>{ __( 'Text Alignment' ) }</p>
-						<AlignmentToolbar
-							value={ align }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { align: nextAlign } );
-							} }
-						/>
-					</PanelBody>
-				</InspectorControls>
-				<RichText
-					wrapperClassName="wp-block-heading"
-					tagName={ nodeName.toLowerCase() }
-					value={ content }
-					onChange={ ( value ) => setAttributes( { content: value } ) }
-					onMerge={ mergeBlocks }
-					onSplit={
-						insertBlocksAfter ?
-							( before, after, ...blocks ) => {
-								setAttributes( { content: before } );
-								insertBlocksAfter( [
-									...blocks,
-									createBlock( 'core/paragraph', { content: after } ),
-								] );
-							} :
-							undefined
-					}
-					onRemove={ () => onReplace( [] ) }
-					style={ { textAlign: align } }
-					className={ className }
-					placeholder={ placeholder || __( 'Write heading…' ) }
-				/>
-			</Fragment>
-		);
-	},
+	edit,
 
 	save( { attributes } ) {
 		const { align, nodeName, content } = attributes;

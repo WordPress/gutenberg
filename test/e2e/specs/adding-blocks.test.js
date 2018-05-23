@@ -75,13 +75,14 @@ describe( 'adding blocks', () => {
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
 		await page.keyboard.type( 'code' );
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Code block' );
 
 		// Using the between inserter
 		await page.mouse.move( 200, 300 );
 		await page.mouse.move( 250, 350 );
-		const inserter = await page.$( '[data-type="core/quote"] .editor-block-list__insertion-point-inserter' );
+		const inserter = await page.$( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
 		await clickAtRightish( inserter );
 		await page.keyboard.type( 'Second paragraph' );
 

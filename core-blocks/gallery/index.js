@@ -7,18 +7,14 @@ import { filter, every } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	createBlock,
-	editorMediaUpload,
-} from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import { createBlock } from '@wordpress/blocks';
+import { RichText, editorMediaUpload } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import './editor.scss';
 import './style.scss';
-import { default as GalleryBlock, defaultColumnsNumber } from './block';
+import { default as edit, defaultColumnsNumber } from './edit';
 
 const blockAttributes = {
 	align: {
@@ -76,7 +72,7 @@ export const name = 'core/gallery';
 
 export const settings = {
 	title: __( 'Gallery' ),
-	description: __( 'Image galleries are a great way to share groups of pictures on your site.' ),
+	description: __( 'Display multiple images in an elegantly organized tiled layout.' ),
 	icon: 'format-gallery',
 	category: 'common',
 	keywords: [ __( 'images' ), __( 'photos' ) ],
@@ -135,11 +131,11 @@ export const settings = {
 				},
 				transform( files, onChange ) {
 					const block = createBlock( 'core/gallery' );
-					editorMediaUpload(
-						files,
-						( images ) => onChange( block.uid, { images } ),
-						'image'
-					);
+					editorMediaUpload( {
+						filesList: files,
+						onFileChange: ( images ) => onChange( block.uid, { images } ),
+						allowedType: 'image',
+					} );
 					return block;
 				},
 			},
@@ -165,7 +161,7 @@ export const settings = {
 		}
 	},
 
-	edit: GalleryBlock,
+	edit,
 
 	save( { attributes } ) {
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;

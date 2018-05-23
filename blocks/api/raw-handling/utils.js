@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { omit, mergeWith, includes } from 'lodash';
+import { omit, mergeWith, includes, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { unwrap, insertAfter, remove } from '@wordpress/utils';
+import { unwrap, insertAfter, remove } from '@wordpress/dom';
 
 /**
  * Browser dependencies
@@ -204,13 +204,23 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 
 					// Strip invalid classes.
 					if ( node.classList.length ) {
-						const newClasses = classes.filter( ( name ) =>
-							node.classList.contains( name )
-						);
+						const mattchers = classes.map( ( item ) => {
+							if ( typeof item === 'string' ) {
+								return ( className ) => className === item;
+							} else if ( item instanceof RegExp ) {
+								return ( className ) => item.test( className );
+							}
 
-						if ( newClasses.length ) {
-							node.setAttribute( 'class', newClasses.join( ' ' ) );
-						} else {
+							return noop;
+						} );
+
+						Array.from( node.classList ).forEach( ( name ) => {
+							if ( ! mattchers.some( ( isMatch ) => isMatch( name ) ) ) {
+								node.classList.remove( name );
+							}
+						} );
+
+						if ( ! node.classList.length ) {
 							node.removeAttribute( 'class' );
 						}
 					}
