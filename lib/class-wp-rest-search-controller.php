@@ -403,13 +403,6 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			'href' => rest_url( 'wp/v2/types/' . $post->post_type ),
 		);
 
-		if ( ! empty( $post->post_author ) ) {
-			$links['author'] = array(
-				'href'       => rest_url( 'wp/v2/users/' . $post->post_author ),
-				'embeddable' => true,
-			);
-		}
-
 		return $links;
 	}
 
