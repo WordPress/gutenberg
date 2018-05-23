@@ -44,7 +44,7 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { children, name, bubblesVirtually = false, fillProps = {}, SlotWrap } = this.props;
+		const { children, name, bubblesVirtually = false, fillProps = {}, SlotWrap = 'div' } = this.props;
 		const { getFills = noop } = this.context;
 		if ( bubblesVirtually ) {
 			return <div ref={ this.bindNode } />;
