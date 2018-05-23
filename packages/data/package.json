@@ -19,6 +19,7 @@
 	},
 	"main": "src/index.js",
 	"dependencies": {
+		"@wordpress/deprecated": "0.0.1",
 		"@wordpress/element": "0.0.1",
 		"@wordpress/is-shallow-equal": "1.0.2",
 		"equivalent-key-map": "0.2.0",
