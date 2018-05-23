@@ -809,33 +809,21 @@ export class RichText extends Component {
 						return;
 					}
 
-					let anchor;
+					const { value: href, ...params } = formatValue;
 
-					// Create only one undo level when inserting and modifying the link
-					this.editor.undoManager.transact( () => {
-						// Use built-in TinyMCE command to insert the link. This takes care of
-						// deleting any existing links within the selection
-						const { value: href, ...params } = formatValue;
-						this.editor.execCommand( 'mceInsertLink', false, {
-							href,
-							...params,
-							'data-wp-temp-link': 1,
-						} );
-
-						// mceInsertLink doesn't return the anchor it creates, so query for it
-						// using a temporary attribute
-						anchor = this.editor.getBody().querySelector( '[data-wp-temp-link]' );
-						anchor.removeAttribute( 'data-wp-temp-link' );
-
-						// If the newly created link has no text, set it to the URL
-						if ( ! anchor.innerText.trim() ) {
-							anchor.innerText = href;
-						}
-					} );
-
-					// Place the cursor immediately after the newly inserted link
-					this.editor.selection.select( anchor );
-					this.editor.selection.collapse();
+					if ( ! this.isFormatActive( 'link' ) && this.editor.selection.isCollapsed() ) {
+						// When no link or text is selected, insert a link with the URL as its text
+						const anchorHTML = this.editor.dom.createHTML(
+							'a',
+							{ href, ...params },
+							this.editor.dom.encode( href )
+						);
+						this.editor.insertContent( anchorHTML );
+					} else {
+						// Use built-in TinyMCE command turn the selection into a link. This takes
+						// care of deleting any existing links within the selection
+						this.editor.execCommand( 'mceInsertLink', false, { href, ...params } );
+					}
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}
