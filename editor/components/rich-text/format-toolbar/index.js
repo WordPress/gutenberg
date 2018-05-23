@@ -11,7 +11,6 @@ import {
 	withSpokenMessages,
 } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
-import { prependHTTP } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -147,7 +146,7 @@ class FormatToolbar extends Component {
 
 	submitLink( event ) {
 		event.preventDefault();
-		const value = prependHTTP( this.state.linkValue );
+		const value = this.state.linkValue;
 		this.props.onChange( { link: {
 			isAdding: false,
 			target: this.state.opensInNewWindow ? '_blank' : null,

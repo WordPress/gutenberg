@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle } from 'lodash';
+import { throttle, isNumber } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 import { stringify } from 'querystringify';
@@ -13,6 +13,7 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { Spinner, withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { prependHTTP } from '@wordpress/url';
 
 const { UP, DOWN, ENTER } = keycodes;
 
@@ -139,17 +140,19 @@ class UrlInput extends Component {
 				break;
 			}
 			case ENTER: {
-				if ( this.state.selectedSuggestion ) {
+				if ( isNumber( this.state.selectedSuggestion ) ) {
 					event.stopPropagation();
 					const post = this.state.posts[ this.state.selectedSuggestion ];
 					this.selectLink( post.link );
+				} else {
+					this.selectLink( this.props.value );
 				}
 			}
 		}
 	}
 
 	selectLink( link ) {
-		this.props.onChange( link );
+		this.props.onChange( prependHTTP( link ) );
 		this.setState( {
 			selectedSuggestion: null,
 			showSuggestions: false,
