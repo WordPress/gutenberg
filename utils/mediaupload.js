@@ -96,7 +96,7 @@ function createMediaFromFile( file, additionalData ) {
  * Utility used to preload an image before displaying it.
  *
  * @param   {string}  url Image Url.
- * @return {Promise}     Pormise resolved once the image is preloaded.
+ * @return {Promise}     Promise resolved once the image is preloaded.
  */
 export function preloadImage( url ) {
 	return new Promise( ( resolve ) => {
