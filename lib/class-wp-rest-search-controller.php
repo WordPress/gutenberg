@@ -80,6 +80,12 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 			'ignore_sticky_posts' => true,
 		);
 
+		// If a search term is given, order by relevance.
+		if ( ! empty( $request['search'] ) ) {
+			$query_args['orderby'] = 'relevance';
+			$query_args['order']   = 'ASC';
+		}
+
 		// Transform 'any' into actual post type list.
 		if ( in_array( 'any', $request['type'], true ) ) {
 			$query_args['post_type'] = array_keys( $this->get_allowed_post_types() );
