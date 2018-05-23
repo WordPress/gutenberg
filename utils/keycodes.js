@@ -75,9 +75,9 @@ export const displayShortcut = mapValues( modifiers, ( modifier ) => {
 		const isMac = _isMac();
 		const replacementKeyMap = {
 			[ ALT ]: isMac ? 'Option' : 'Alt',
-			[ CTRL ]: isMac ? 'Ctrl' : 'Ctrl',
+			[ CTRL ]: 'Ctrl',
 			[ COMMAND ]: '⌘',
-			[ SHIFT ]: isMac ? 'Shift' : 'Shift',
+			[ SHIFT ]: 'Shift',
 		};
 		const shortcut = [
 			...modifier( _isMac ).map( ( key ) => get( replacementKeyMap, key, key ) ),
