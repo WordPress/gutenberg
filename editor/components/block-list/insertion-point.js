@@ -31,7 +31,7 @@ class BlockInsertionPoint extends Component {
 							icon="insert"
 							className="editor-block-list__insertion-point-button"
 							onClick={ this.onClick }
-							aria-label={ __( 'Insert block' ) }
+							label={ __( 'Insert block' ) }
 						/>
 					</div>
 				) }
