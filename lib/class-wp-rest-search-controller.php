@@ -3,13 +3,13 @@
  * REST API: WP_REST_Search_Controller class
  *
  * @package gutenberg
- * @since 2.9.0
+ * @since 3.0.0
  */
 
 /**
  * Core class to search for posts across multiple post types via the REST API.
  *
- * @since 2.9.0
+ * @since 3.0.0
  *
  * @see WP_REST_Controller
  */
@@ -18,7 +18,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Constructor.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 */
 	public function __construct() {
 		$this->namespace = 'gutenberg/v1';
@@ -28,7 +28,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Registers the routes for the objects of the controller.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @see register_rest_route()
 	 */
@@ -52,7 +52,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Checks if a given request has access to search content.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @param  WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has search access, WP_Error object otherwise.
@@ -65,7 +65,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves a collection of search results.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
@@ -181,7 +181,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	 *
 	 * Correctly handles posts with the inherit status.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @param object $post Post object.
 	 * @return bool Whether the post can be read.
@@ -220,7 +220,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares a single search result for response.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @param WP_Post         $post    Post object.
 	 * @param WP_REST_Request $request Request object.
@@ -285,7 +285,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	 * "Protected: %s". As the REST API communicates the protected status of a post
 	 * in a machine readable format, we remove the "Protected: " prefix.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @return string Protected title format.
 	 */
@@ -296,7 +296,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves the item schema, conforming to JSON Schema.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @return array Item schema data.
 	 */
@@ -342,7 +342,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Retrieves the query params for the search results collection.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @return array Collection parameters.
 	 */
@@ -378,7 +378,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares links for the request.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @param WP_Post $post Post object.
 	 * @return array Links for the given post.
@@ -409,7 +409,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Attempts to detect the route to access a single item.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @param WP_Post $post Post object.
 	 * @return string REST route relative to the REST base URI, or empty string if not found.
@@ -434,7 +434,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Gets the post statuses allowed for search.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @return array List of post status objects, keyed by their name.
 	 */
@@ -453,7 +453,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	/**
 	 * Gets the post types allowed for search.
 	 *
-	 * @since 2.9.0
+	 * @since 3.0.0
 	 *
 	 * @return array List of post type objects, keyed by their name.
 	 */
