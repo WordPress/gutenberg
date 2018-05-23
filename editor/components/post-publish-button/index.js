@@ -28,7 +28,7 @@ export function PostPublishButton( {
 	onSubmit = noop,
 	forceIsSaving,
 } ) {
-	const isButtonEnabled = ! isSaving && isPublishable && isSaveable;
+	const isButtonEnabled = ! isSaving && ! isAutosaving && isPublishable && isSaveable;
 
 	let publishStatus;
 	if ( ! hasPublishAction ) {
