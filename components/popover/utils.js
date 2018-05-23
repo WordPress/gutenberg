@@ -6,30 +6,18 @@ const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
 const isMobileViewport = () => window.innerWidth < 782;
 
 /**
- * Utilitity used to compute the popover position and the content max width/height for a popover
- * given its anchor rect and its content size.
+ * Utilitity used to compute the popover position over the xAxis
  *
  * @param {Object} anchorRect       Anchor Rect.
  * @param {Object} contentSize      Content Size.
- * @param {string} position         Position.
+ * @param {string} xAxis            Desired xAxis.
  * @param {boolean} expandOnMobile  Whether to expand the popover on mobile or not.
  *
- * @return {Object} Popover position and constraints.
+ * @return {Object} Popover xAxis position and constraints.
  */
-export function computePopoverPosition( anchorRect, contentSize, position = 'top', expandOnMobile = false ) {
-	const { width, height } = contentSize;
+export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis ) {
+	const { width } = contentSize;
 	const popoverLeft = Math.round( anchorRect.left + ( anchorRect.width / 2 ) );
-	const [ yAxis, xAxis = 'center' ] = position.split( ' ' );
-
-	// y axis aligment choices
-	const topAlignment = {
-		popoverTop: anchorRect.top,
-		contentHeight: anchorRect.top - HEIGHT_OFFSET - height > 0 ? height : anchorRect.top - HEIGHT_OFFSET,
-	};
-	const bottomAlignment = {
-		popoverTop: anchorRect.bottom,
-		contentHeight: anchorRect.bottom + HEIGHT_OFFSET + height > window.innerHeight ? window.innerHeight - HEIGHT_OFFSET - anchorRect.bottom : height,
-	};
 
 	// x axis alignment choices
 	const centerAlignment = {
@@ -44,19 +32,6 @@ export function computePopoverPosition( anchorRect, contentSize, position = 'top
 	const rightAlignment = {
 		contentWidth: popoverLeft + width > window.innerWidth ? window.innerWidth - popoverLeft : width,
 	};
-
-	// Choosing the y axis
-	let chosenYAxis;
-	let contentHeight = null;
-	if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
-		chosenYAxis = 'top';
-	} else if ( yAxis === 'bottom' && bottomAlignment.contentHeight === height ) {
-		chosenYAxis = 'bottom';
-	} else {
-		chosenYAxis = topAlignment.contentHeight > bottomAlignment.contentHeight ? 'top' : 'bottom';
-		const chosenHeight = chosenYAxis === 'top' ? topAlignment.contentHeight : bottomAlignment.contentHeight;
-		contentHeight = chosenHeight !== height ? chosenHeight : null;
-	}
 
 	// Choosing the x axis
 	let chosenXAxis;
@@ -73,14 +48,78 @@ export function computePopoverPosition( anchorRect, contentSize, position = 'top
 		contentWidth = chosenWidth !== width ? chosenWidth : null;
 	}
 
+	return {
+		xAxis: chosenXAxis,
+		popoverLeft,
+		contentWidth,
+	};
+}
+
+/**
+ * Utilitity used to compute the popover position over the yAxis
+ *
+ * @param {Object} anchorRect       Anchor Rect.
+ * @param {Object} contentSize      Content Size.
+ * @param {string} yAxis            Desired yAxis.
+ * @param {boolean} expandOnMobile  Whether to expand the popover on mobile or not.
+ *
+ * @return {Object} Popover xAxis position and constraints.
+ */
+export function computePopoverYAxisPosition( anchorRect, contentSize, yAxis ) {
+	const { height } = contentSize;
+
+	// y axis aligment choices
+	const topAlignment = {
+		popoverTop: anchorRect.top,
+		contentHeight: anchorRect.top - HEIGHT_OFFSET - height > 0 ? height : anchorRect.top - HEIGHT_OFFSET,
+	};
+	const bottomAlignment = {
+		popoverTop: anchorRect.bottom,
+		contentHeight: anchorRect.bottom + HEIGHT_OFFSET + height > window.innerHeight ? window.innerHeight - HEIGHT_OFFSET - anchorRect.bottom : height,
+	};
+
+	// Choosing the y axis
+	let chosenYAxis;
+	let contentHeight = null;
+	if ( yAxis === 'top' && topAlignment.contentHeight === height ) {
+		chosenYAxis = 'top';
+	} else if ( yAxis === 'bottom' && bottomAlignment.contentHeight === height ) {
+		chosenYAxis = 'bottom';
+	} else {
+		chosenYAxis = topAlignment.contentHeight > bottomAlignment.contentHeight ? 'top' : 'bottom';
+		const chosenHeight = chosenYAxis === 'top' ? topAlignment.contentHeight : bottomAlignment.contentHeight;
+		contentHeight = chosenHeight !== height ? chosenHeight : null;
+	}
+
 	const popoverTop = chosenYAxis === 'top' ? topAlignment.popoverTop : bottomAlignment.popoverTop;
+
+	return {
+		yAxis: chosenYAxis,
+		popoverTop,
+		contentHeight,
+	};
+}
+
+/**
+ * Utilitity used to compute the popover position and the content max width/height for a popover
+ * given its anchor rect and its content size.
+ *
+ * @param {Object} anchorRect       Anchor Rect.
+ * @param {Object} contentSize      Content Size.
+ * @param {string} position         Position.
+ * @param {boolean} expandOnMobile  Whether to expand the popover on mobile or not.
+ *
+ * @return {Object} Popover position and constraints.
+ */
+export function computePopoverPosition( anchorRect, contentSize, position = 'top', expandOnMobile = false ) {
+	const [ yAxis, xAxis = 'center' ] = position.split( ' ' );
+
+	const xAxisPosition = computePopoverXAxisPosition( anchorRect, contentSize, xAxis );
+	const yAxisPosition = computePopoverYAxisPosition( anchorRect, contentSize, yAxis );
+
 	return {
 		isMobile: isMobileViewport() && expandOnMobile,
-		yAxis: chosenYAxis,
-		xAxis: chosenXAxis,
-		popoverTop,
-		popoverLeft,
-		contentHeight,
-		contentWidth,
+		...xAxisPosition,
+		...yAxisPosition,
 	};
 }

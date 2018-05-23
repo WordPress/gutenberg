@@ -1,9 +1,13 @@
 /**
  * Internal dependencies
  */
-import { computePopoverPosition } from '../utils';
+import {
+	computePopoverPosition,
+	computePopoverYAxisPosition,
+	computePopoverXAxisPosition,
+} from '../utils';
 
-describe( 'computePopoverPosition', () => {
+describe( 'computePopoverYAxisPosition', () => {
 	it( 'should leave the position as is there\'s enought space', () => {
 		const anchorRect = {
 			top: 10,
@@ -19,13 +23,9 @@ describe( 'computePopoverPosition', () => {
 			height: 300,
 		};
 
-		expect( computePopoverPosition( anchorRect, contentSize, 'bottom right' ) ).toEqual( {
+		expect( computePopoverYAxisPosition( anchorRect, contentSize, 'bottom' ) ).toEqual( {
 			contentHeight: null,
-			contentWidth: null,
-			isMobile: false,
-			popoverLeft: 20,
 			popoverTop: 30,
-			xAxis: 'right',
 			yAxis: 'bottom',
 		} );
 	} );
@@ -45,39 +45,9 @@ describe( 'computePopoverPosition', () => {
 			height: 300,
 		};
 
-		expect( computePopoverPosition( anchorRect, contentSize, 'top right' ) ).toEqual( {
+		expect( computePopoverYAxisPosition( anchorRect, contentSize, 'top' ) ).toEqual( {
 			contentHeight: null,
-			contentWidth: null,
-			isMobile: false,
-			popoverLeft: 20,
 			popoverTop: 30,
-			xAxis: 'right',
-			yAxis: 'bottom',
-		} );
-	} );
-
-	it( 'should switch to rights position if there\'s not enough space', () => {
-		const anchorRect = {
-			top: 10,
-			left: 10,
-			bottom: 30,
-			right: 30,
-			width: 20,
-			height: 20,
-		};
-
-		const contentSize = {
-			width: 200,
-			height: 300,
-		};
-
-		expect( computePopoverPosition( anchorRect, contentSize, 'top center' ) ).toEqual( {
-			contentHeight: null,
-			contentWidth: null,
-			isMobile: false,
-			popoverLeft: 20,
-			popoverTop: 30,
-			xAxis: 'right',
 			yAxis: 'bottom',
 		} );
 	} );
@@ -97,14 +67,56 @@ describe( 'computePopoverPosition', () => {
 			height: 500,
 		};
 
-		expect( computePopoverPosition( anchorRect, contentSize, 'right bottom' ) ).toEqual( {
+		expect( computePopoverYAxisPosition( anchorRect, contentSize, 'bottom' ) ).toEqual( {
 			contentHeight: 390,
-			contentWidth: null,
-			isMobile: false,
-			popoverLeft: 20,
 			popoverTop: 400,
-			xAxis: 'right',
 			yAxis: 'top',
+		} );
+	} );
+} );
+
+describe( 'computePopoverXAxisPosition', () => {
+	it( 'should leave the position as is there\'s enought space', () => {
+		const anchorRect = {
+			top: 10,
+			left: 10,
+			bottom: 30,
+			right: 30,
+			width: 20,
+			height: 20,
+		};
+
+		const contentSize = {
+			width: 200,
+			height: 300,
+		};
+
+		expect( computePopoverXAxisPosition( anchorRect, contentSize, 'right' ) ).toEqual( {
+			contentWidth: null,
+			popoverLeft: 20,
+			xAxis: 'right',
+		} );
+	} );
+
+	it( 'should switch to right position if there\'s not enough space', () => {
+		const anchorRect = {
+			top: 10,
+			left: 10,
+			bottom: 30,
+			right: 30,
+			width: 20,
+			height: 20,
+		};
+
+		const contentSize = {
+			width: 200,
+			height: 300,
+		};
+
+		expect( computePopoverXAxisPosition( anchorRect, contentSize, 'center' ) ).toEqual( {
+			contentWidth: null,
+			popoverLeft: 20,
+			xAxis: 'right',
 		} );
 	} );
 
@@ -123,14 +135,60 @@ describe( 'computePopoverPosition', () => {
 			height: 300,
 		};
 
-		expect( computePopoverPosition( anchorRect, contentSize, 'right bottom' ) ).toEqual( {
-			contentHeight: null,
+		expect( computePopoverXAxisPosition( anchorRect, contentSize, 'right' ) ).toEqual( {
 			contentWidth: 614,
-			isMobile: false,
 			popoverLeft: 410,
-			popoverTop: 30,
 			xAxis: 'right',
-			yAxis: 'bottom',
 		} );
+	} );
+} );
+
+describe( 'computePopoverPosition', () => {
+	it( 'should leave the position as is there\'s enought space', () => {
+		const anchorRect = {
+			top: 10,
+			left: 10,
+			bottom: 30,
+			right: 30,
+			width: 20,
+			height: 20,
+		};
+
+		const contentSize = {
+			width: 200,
+			height: 300,
+		};
+
+		expect( computePopoverPosition( anchorRect, contentSize, 'bottom right' ) ).toEqual( {
+			contentWidth: null,
+			popoverLeft: 20,
+			xAxis: 'right',
+			contentHeight: null,
+			popoverTop: 30,
+			yAxis: 'bottom',
+			isMobile: false,
+		} );
+	} );
+
+	it( 'should set isMobile to true on small viewPosts', () => {
+		const originalWidth = window.innerWidth;
+
+		const anchorRect = {
+			top: 10,
+			left: 10,
+			bottom: 30,
+			right: 30,
+			width: 20,
+			height: 20,
+		};
+
+		const contentSize = {
+			width: 200,
+			height: 300,
+		};
+
+		window.innerWidth = 200;
+		expect( computePopoverPosition( anchorRect, contentSize, 'bottom right', true ).isMobile ).toBe( true );
+		window.innerWidth = originalWidth;
 	} );
 } );
