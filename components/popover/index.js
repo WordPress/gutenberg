@@ -190,6 +190,7 @@ class Popover extends Component {
 			children,
 			className,
 			onClickOutside = onClose,
+			noArrow = false,
 			// Disable reason: We generate the `...contentProps` rest as remainder
 			// of props which aren't explicitly handled by this component.
 			/* eslint-disable no-unused-vars */
@@ -219,6 +220,7 @@ class Popover extends Component {
 			'is-' + xAxis,
 			{
 				'is-mobile': isMobile,
+				'no-arrow': noArrow,
 			}
 		);
 
