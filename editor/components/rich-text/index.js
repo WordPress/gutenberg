@@ -446,11 +446,10 @@ export class RichText extends Component {
 	getFocusPosition( position ) {
 		// The container is relatively positioned.
 		const containerPosition = this.containerRef.current.getBoundingClientRect();
-		const toolbarOffset = { top: 10, left: 0 };
 
 		return {
-			top: position.top - containerPosition.top + ( position.height ) + toolbarOffset.top,
-			left: position.left - containerPosition.left + ( position.width / 2 ) + toolbarOffset.left,
+			top: position.top - containerPosition.top + position.height,
+			left: position.left - containerPosition.left + ( position.width / 2 ),
 		};
 	}
 
