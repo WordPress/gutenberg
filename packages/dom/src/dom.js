@@ -396,6 +396,40 @@ export function documentHasSelection() {
 }
 
 /**
+ * Check whether the contents of the element have been entirely selected.
+ * Returns true if there is no possibility of selection.
+ *
+ * @param {Element} element The element to check.
+ *
+ * @return {boolean} True if entirely selected, false if not.
+ */
+export function isEntirelySelected( element ) {
+	if ( includes( [ 'INPUT', 'TEXTAREA' ], element.nodeName ) ) {
+		return element.selectionStart === 0 && element.value.length === element.selectionEnd;
+	}
+
+	if ( ! element.isContentEditable ) {
+		return true;
+	}
+
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+
+	if ( ! range ) {
+		return true;
+	}
+
+	const { startContainer, endContainer, startOffset, endOffset } = range;
+
+	return (
+		startContainer === element &&
+		endContainer === element &&
+		startOffset === 0 &&
+		endOffset === element.childNodes.length
+	);
+}
+
+/**
  * Given a DOM node, finds the closest scrollable container node.
  *
  * @param {Element} node Node from which to start.
