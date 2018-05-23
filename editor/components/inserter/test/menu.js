@@ -101,10 +101,10 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 
-		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Suggested' );
+		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
+		expect( activeCategory.text() ).toBe( 'Most Used' );
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
 		expect( visibleBlocks ).toHaveLength( 0 );
 	} );
 
@@ -120,7 +120,7 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
 		expect( visibleBlocks ).toHaveLength( 0 );
 	} );
 
@@ -136,7 +136,7 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
 		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Text' );
@@ -154,14 +154,17 @@ describe( 'InserterMenu', () => {
 				fetchSharedBlocks={ noop }
 			/>
 		);
-		const embedTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Embeds' && node.name() === 'button' );
+		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
+		activeTabs.forEach( ( tab ) => tab.simulate( 'click' ) );
+
+		const embedTab = wrapper.find( '.components-panel__body button.components-panel__body-toggle' )
+			.filterWhere( ( node ) => node.text() === 'Embeds' );
 		embedTab.simulate( 'click' );
 
-		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
+		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
 		expect( activeCategory.text() ).toBe( 'Embeds' );
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
 		expect( visibleBlocks ).toHaveLength( 2 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'YouTube' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
@@ -178,19 +181,22 @@ describe( 'InserterMenu', () => {
 				fetchSharedBlocks={ noop }
 			/>
 		);
-		const embedTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Shared' && node.name() === 'button' );
+		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
+		activeTabs.forEach( ( tab ) => tab.simulate( 'click' ) );
+
+		const embedTab = wrapper.find( '.components-panel__body button.components-panel__body-toggle' )
+			.filterWhere( ( node ) => node.text() === 'Shared' );
 		embedTab.simulate( 'click' );
 
-		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
+		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
 		expect( activeCategory.text() ).toBe( 'Shared' );
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
+		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
 		expect( visibleBlocks ).toHaveLength( 1 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My shared block' );
 	} );
 
-	it( 'should show all items except embeds and shared blocks in the blocks tab', () => {
+	it( 'should show the common category blocks', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
@@ -201,19 +207,21 @@ describe( 'InserterMenu', () => {
 				fetchSharedBlocks={ noop }
 			/>
 		);
-		const blocksTab = wrapper.find( '.editor-inserter__tab' )
-			.filterWhere( ( node ) => node.text() === 'Blocks' && node.name() === 'button' );
+		const activeTabs = wrapper.find( '.components-panel__body.is-opened button.components-panel__body-toggle' );
+		activeTabs.forEach( ( tab ) => tab.simulate( 'click' ) );
+
+		const blocksTab = wrapper.find( '.components-panel__body button.components-panel__body-toggle' )
+			.filterWhere( ( node ) => node.text() === 'Common Blocks' );
 		blocksTab.simulate( 'click' );
 
-		const activeCategory = wrapper.find( '.editor-inserter__tab button.is-active' );
-		expect( activeCategory.text() ).toBe( 'Blocks' );
+		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
+		expect( activeCategory.text() ).toBe( 'Common Blocks' );
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks ).toHaveLength( 4 );
+		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		expect( visibleBlocks ).toHaveLength( 3 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
-		expect( visibleBlocks.at( 3 ).text() ).toBe( 'More' );
 	} );
 
 	it( 'should disable items with `isDisabled`', () => {
@@ -228,7 +236,7 @@ describe( 'InserterMenu', () => {
 			/>
 		);
 
-		const disabledBlocks = wrapper.find( '.editor-inserter__block[disabled=true]' );
+		const disabledBlocks = wrapper.find( '.editor-inserter__item[disabled=true]' );
 		expect( disabledBlocks ).toHaveLength( 1 );
 		expect( disabledBlocks.at( 0 ).text() ).toBe( 'More' );
 	} );
@@ -244,16 +252,20 @@ describe( 'InserterMenu', () => {
 				fetchSharedBlocks={ noop }
 			/>
 		);
-		wrapper.setState( { filterValue: 'text' } );
+		wrapper.find( '.editor-inserter__search' ).simulate( 'change', { target: { value: 'text' } } );
 
-		const tabs = wrapper.find( '.editor-inserter__tab' );
-		expect( tabs ).toHaveLength( 0 );
+		// Two tabs
+		const tabs = wrapper.find( '.editor-inserter__results .components-panel__body' );
+		expect( tabs ).toHaveLength( 2 );
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks ).toHaveLength( 3 );
+		// The tab one is active
+		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
+		expect( activeCategory.text() ).toBe( 'Common Blocks' );
+
+		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		expect( visibleBlocks ).toHaveLength( 2 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
-		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
 	} );
 
 	it( 'should trim whitespace of search terms', () => {
@@ -267,16 +279,20 @@ describe( 'InserterMenu', () => {
 				fetchSharedBlocks={ noop }
 			/>
 		);
-		wrapper.setState( { filterValue: ' text' } );
+		wrapper.find( '.editor-inserter__search' ).simulate( 'change', { target: { value: ' text' } } );
 
-		const tabs = wrapper.find( '.editor-inserter__tab' );
-		expect( tabs ).toHaveLength( 0 );
+		// Two tabs
+		const tabs = wrapper.find( '.editor-inserter__results .components-panel__body' );
+		expect( tabs ).toHaveLength( 2 );
 
-		const visibleBlocks = wrapper.find( '.editor-inserter__block' );
-		expect( visibleBlocks ).toHaveLength( 3 );
+		// The tab one is active
+		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
+		expect( activeCategory.text() ).toBe( 'Common Blocks' );
+
+		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		expect( visibleBlocks ).toHaveLength( 2 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
-		expect( visibleBlocks.at( 2 ).text() ).toBe( 'A Text Embed' );
 	} );
 } );
 
