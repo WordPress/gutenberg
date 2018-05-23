@@ -611,7 +611,7 @@
 	opacity: 0;
 	transition: opacity 0.1s linear 0.1s;
 
-	&:hover {
+	&:hover, &.is-visible {
 		opacity: 1;
 	}
 }
