@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "2.8.0",
+	"version": "2.9.2",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -28,7 +28,7 @@
 		"dom-react": "2.2.1",
 		"dom-scroll-into-view": "1.2.1",
 		"element-closest": "2.0.2",
-		"equivalent-key-map": "0.1.1",
+		"equivalent-key-map": "0.2.0",
 		"escape-string-regexp": "1.0.5",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
 		"hpq": "1.2.0",
@@ -61,12 +61,12 @@
 		"uuid": "3.1.0"
 	},
 	"devDependencies": {
-		"@wordpress/babel-plugin-makepot": "1.0.0",
-		"@wordpress/babel-preset-default": "1.2.0",
-		"@wordpress/browserslist-config": "2.1.3",
-		"@wordpress/custom-templated-path-webpack-plugin": "1.0.0",
-		"@wordpress/jest-preset-default": "1.0.3",
-		"@wordpress/scripts": "1.1.0",
+		"@wordpress/babel-plugin-makepot": "1.0.1",
+		"@wordpress/babel-preset-default": "1.3.0",
+		"@wordpress/browserslist-config": "2.1.4",
+		"@wordpress/custom-templated-path-webpack-plugin": "1.0.2",
+		"@wordpress/jest-preset-default": "1.0.6",
+		"@wordpress/scripts": "1.1.6",
 		"autoprefixer": "8.2.0",
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
@@ -100,15 +100,9 @@
 		"webpack-cli": "2.1.3",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
 	},
-	"optionalDependencies": {
-		"fsevents": "1.2.4"
-	},
 	"babel": {
 		"presets": [
 			"@wordpress/default"
-		],
-		"plugins": [
-			"transform-async-generator-functions"
 		],
 		"env": {
 			"production": {
@@ -118,8 +112,7 @@
 						{
 							"output": "languages/gutenberg.pot"
 						}
-					],
-					"transform-async-generator-functions"
+					]
 				]
 			}
 		}

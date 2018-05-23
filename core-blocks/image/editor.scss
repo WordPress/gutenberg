@@ -59,22 +59,6 @@
 }
 /*!rtl:end:ignore*/
 
-.wp-core-ui .wp-block-audio__upload-button.button,
-.wp-core-ui .wp-block-image__upload-button.button,
-.wp-core-ui .wp-block-video__upload-button.button {
-	margin-right: 5px;
-
-	.dashicon {
-		vertical-align: middle;
-		margin-bottom: 3px;
-	}
-
-
-	&:hover {
-		color: $dark-gray-800;
-	}
-}
-
 .editor-block-list__block[data-type="core/image"][data-align="center"] {
 	.wp-block-image {
 		margin-left: auto;

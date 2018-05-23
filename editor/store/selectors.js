@@ -24,7 +24,6 @@ import createSelector from 'rememo';
  */
 import { serialize, getBlockType, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
 
 /***
@@ -354,12 +353,7 @@ export function getEditedPostExcerpt( state ) {
  * @return {string} Preview URL.
  */
 export function getEditedPostPreviewLink( state ) {
-	const link = state.currentPost.link;
-	if ( ! link ) {
-		return null;
-	}
-
-	return addQueryArgs( link, { preview: 'true' } );
+	return getCurrentPost( state ).preview_link || null;
 }
 
 /**

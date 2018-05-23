@@ -132,6 +132,26 @@
 
 	margin-bottom: $block-spacing;
 
+	/**
+	 * Notices
+	 */
+	 .components-placeholder .components-with-notices-ui {
+		margin: -10px 20px 12px 20px;
+		width: calc( 100% - 40px );
+	 }
+	 .components-with-notices-ui {
+		margin: 0 0 12px 0;
+		width: 100%;
+
+		.notice {
+			margin-left: 0px;
+			margin-right: 0px;
+
+			p {
+				font-size: $default-font-size;
+			}
+		}
+	 }
 
 	/**
 	 * Warnings
@@ -189,7 +209,7 @@
 		left: 0;
 
 		// use opacity to work in various editor styles
-		border-left: 1px solid $dark-opacity-light-500; 
+		border-left: 1px solid $dark-opacity-light-500;
 
 		.is-dark-theme & {
 			border-left-color: $light-opacity-light-500;
@@ -223,6 +243,7 @@
 			bottom: -$block-padding;
 			left: -$block-padding;
 			outline: 1px solid transparent;
+			pointer-events: none;
 		}
 
 	}
@@ -231,7 +252,7 @@
 	&.is-selected > .editor-block-list__block-edit:before {
 		// use opacity to work in various editor styles
 		outline: 1px solid $dark-opacity-light-500;
-	
+
 		.is-dark-theme & {
 			outline-color: $light-opacity-light-500;
 		}
@@ -259,7 +280,7 @@
 
 		// use opacity to work in various editor styles
 		mix-blend-mode: multiply;
-	
+
 		.is-dark-theme & {
 			mix-blend-mode: soft-light;
 		}
@@ -697,10 +718,10 @@
 	// use opacity to work in various editor styles
 	background-clip: padding-box;
 	box-sizing: padding-box;
-	border: 1px solid $dark-opacity-light-500; 
+	border: 1px solid $dark-opacity-light-500;
 
 	.is-dark-theme & {
-		border-color: $light-opacity-light-500; 
+		border-color: $light-opacity-light-500;
 	}
 
 	// this prevents floats from messing up the position

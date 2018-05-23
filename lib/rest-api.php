@@ -25,66 +25,6 @@ function gutenberg_register_rest_routes() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 
 /**
- * Includes the value for the custom field `post_type_capabities` inside the REST API response of user.
- *
- * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
- * once merged into Core.
- *
- * @since ?
- *
- * @param array           $user An array containing user properties.
- * @param string          $name The name of the custom field.
- * @param WP_REST_Request $request Full details about the REST API request.
- * @return object The Post Type capabilities.
- */
-function gutenberg_get_post_type_capabilities( $user, $name, $request ) {
-	$post_type = $request->get_param( 'post_type' );
-	$value     = new stdClass;
-
-	if ( ! empty( $user['id'] ) && $post_type && post_type_exists( $post_type ) ) {
-		// The Post Type object contains the Post Type's specific caps.
-		$post_type_object = get_post_type_object( $post_type );
-
-		// Loop in the Post Type's caps to validate the User's caps for it.
-		foreach ( $post_type_object->cap as $post_cap => $post_type_cap ) {
-			// Ignore caps requiring a post ID.
-			if ( in_array( $post_cap, array( 'edit_post', 'read_post', 'delete_post' ) ) ) {
-				continue;
-			}
-
-			// Set the User's post type capability.
-			$value->{$post_cap} = user_can( $user['id'], $post_type_cap );
-		}
-	}
-
-	return $value;
-}
-
-/**
- * Adds the custom field `post_type_capabities` to the REST API response of user.
- *
- * TODO: This is a temporary solution. Next step would be to edit the WP_REST_Users_Controller,
- * once merged into Core.
- *
- * @since ?
- */
-function gutenberg_register_rest_api_post_type_capabilities() {
-	register_rest_field( 'user',
-		'post_type_capabilities',
-		array(
-			'get_callback' => 'gutenberg_get_post_type_capabilities',
-			'schema'       => array(
-				'description' => __( 'Post Type capabilities for the user.', 'gutenberg' ),
-				'type'        => 'object',
-				'context'     => array( 'edit' ),
-				'readonly'    => true,
-			),
-		)
-	);
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_type_capabilities' );
-
-/**
  * Make sure oEmbed REST Requests apply the WP Embed security mechanism for WordPress embeds.
  *
  * @see  https://core.trac.wordpress.org/ticket/32522
@@ -488,6 +428,45 @@ function gutenberg_register_rest_api_post_revisions() {
 add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_revisions' );
 
 /**
+ * Get the preview link for the post object.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/4555
+ *
+ * @param WP_Post $post Post object.
+ * @return string
+ */
+function gutenberg_get_post_preview_link( $post ) {
+	return get_preview_post_link( $post['id'] );
+}
+
+/**
+ * Adds the 'preview_link' attribute to the REST API response of a post.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/4555
+ */
+function gutenberg_register_rest_api_post_preview_link() {
+	foreach ( get_post_types( array( 'show_in_rest' => true ), 'names' ) as $post_type ) {
+		if ( ! is_post_type_viewable( $post_type ) ) {
+			continue;
+		}
+		register_rest_field( $post_type,
+			'preview_link',
+			array(
+				'get_callback' => 'gutenberg_get_post_preview_link',
+				'schema'       => array(
+					'description' => __( 'Preview link for the post.', 'gutenberg' ),
+					'type'        => 'string',
+					'format'      => 'uri',
+					'context'     => array( 'edit' ),
+					'readonly'    => true,
+				),
+			)
+		);
+	}
+}
+add_action( 'rest_api_init', 'gutenberg_register_rest_api_post_preview_link' );
+
+/**
  * Ensure that the wp-json index contains the 'theme-supports' setting as
  * part of its site info elements.
  *
@@ -726,7 +705,7 @@ function gutenberg_filter_request_after_callbacks( $response, $handler, $request
 				}
 			}
 		}
-		// Handle POST /wp/v2/tags (and non-hiearchical taxonomies) when user
+		// Handle POST /wp/v2/tags (and non-hierarchical taxonomies) when user
 		// can assign_terms but not manage terms. Users should be able to create
 		// terms.
 		if ( 'rest_cannot_create' === $response->get_error_code()
