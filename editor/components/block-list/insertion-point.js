@@ -40,6 +40,7 @@ class BlockInsertionPoint extends Component {
 		const { layout, rootUID, index, ...props } = this.props;
 		props.insertDefaultBlock( { layout }, rootUID, index );
 		props.startTyping();
+		this.onBlurInserter();
 	}
 
 	render() {
