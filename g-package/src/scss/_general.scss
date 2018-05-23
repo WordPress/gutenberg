@@ -1,26 +1,10 @@
 body {
-	margin: 0px;
+	/* margin: 0px;
     font-size: 16px;
-    line-height: 1.8;
+    line-height: 1.8;*/
 
     * {
         font-family: inherit;
-    }
-
-    button, 
-    input, 
-    select, 
-    textarea {
-        // font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
-        margin: 1px;
-    }
-
-    ol, 
-    ul {
-        padding-left: 1.3em;
-        margin-left: 1.3em;
     }
 
     .gutenberg__editor {
@@ -29,6 +13,22 @@ body {
 
         * {
             box-sizing: border-box;
+        }
+
+        button, 
+        input, 
+        select, 
+        textarea {
+            // font-family: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            margin: 1px;
+        }
+
+        ol, 
+        ul {
+            padding-left: 1.3em;
+            margin-left: 1.3em;
         }
 
         .edit-post-layout {

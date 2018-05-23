@@ -6,7 +6,7 @@ import { FormToggle, withInstanceId } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, Fragment } from '@wordpress/element';
 
-function PostFooter( { onToggleFooter, hasFooter = false, instanceId } ) {
+function PostFooterToggle( { onToggleFooter, hasFooter = false, instanceId } ) {
 	const footerToggleId = 'footer-toggle-' + instanceId;
 
 	return (
@@ -36,5 +36,5 @@ export default compose( [
 		};
 	} ),
 	withInstanceId,
-] )( PostFooter );
+] )( PostFooterToggle );
 

@@ -6,7 +6,7 @@ import { FormToggle, withInstanceId } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, Fragment } from '@wordpress/element';
 
-function PostThemeStyle( { onToggleThemeStyle, themeStyle = false, instanceId } ) {
+function PostThemeStyleToggle( { onToggleThemeStyle, themeStyle = false, instanceId } ) {
 	const themeStyleToggleId = 'theme-style-toggle-' + instanceId;
 
 	return (
@@ -19,7 +19,7 @@ function PostThemeStyle( { onToggleThemeStyle, themeStyle = false, instanceId } 
 				id={ themeStyleToggleId }
 			/>
 
-			{ themeStyle && <link rel="stylesheet" href="http://localhost:3000/style.css" type="text/css" /> }
+			{ /* themeStyle && <link rel="stylesheet" href="http://localhost:3000/style.css" type="text/css" /> */ }
 		</Fragment>
 	);
 }
@@ -38,5 +38,5 @@ export default compose( [
 		};
 	} ),
 	withInstanceId,
-] )( PostThemeStyle );
+] )( PostThemeStyleToggle );
 

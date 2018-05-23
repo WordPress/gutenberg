@@ -11,9 +11,9 @@ import { PanelBody, PanelRow } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
-	PostFooter,
-	PostHeader,
-	PostThemeStyle,
+	PostFooterToggle,
+	PostHeaderToggle,
+	PostThemeStyleToggle,
 	PostTypeSupportCheck,
 } from '@wordpress/editor';
 
@@ -31,15 +31,15 @@ function TemplateSettingsPanel( { isOpened, onTogglePanel, postType } ) {
 				onToggle={ onTogglePanel }
 			>
 				<PanelRow>
-					<PostThemeStyle />
+					<PostThemeStyleToggle />
 				</PanelRow>
 
 				<PanelRow>
-					<PostHeader />
+					<PostHeaderToggle />
 				</PanelRow>
 
 				<PanelRow>
-					<PostFooter />
+					<PostFooterToggle />
 				</PanelRow>
 			</PanelBody>
 		</PostTypeSupportCheck>
