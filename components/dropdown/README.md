@@ -23,9 +23,11 @@ function MyDropdownMenu() {
 				</button>
 			) }
 			renderContent={ () => (
-				This is the content of the popover.
+				<div>
+					This is the content of the popover.
+				</div>
 			) }
-		>
+		/>
 	);
 }
 ```
@@ -43,7 +45,7 @@ className of the global container
 
 ### contentClassName
 
-If you want to target the dropdown menu for styling purposes, you need to provide a contentClassName because it's not being rendered as a children of the container nodee.
+If you want to target the dropdown menu for styling purposes, you need to provide a contentClassName because it's not being rendered as a children of the container node.
 
 - Type: `String`
 - Required: No
@@ -83,3 +85,11 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Type: `Boolean`
  - Required: No
  - Default: `false`
+
+ ## headerTitle
+
+ Set this to customize the text that is shown in the dropdown's header when
+ it is fullscreen on mobile.
+
+ - Type: `String`
+ - Required: No

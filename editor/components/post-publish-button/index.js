@@ -1,28 +1,19 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import classnames from 'classnames';
-import { flowRight, noop } from 'lodash';
+import { noop, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Button, withAPIData } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import './style.scss';
 import PublishButtonLabel from './label';
-import { editPost, savePost } from '../../actions';
-import {
-	isSavingPost,
-	isEditedPostBeingScheduled,
-	getEditedPostVisibility,
-	isEditedPostSaveable,
-	isEditedPostPublishable,
-} from '../../selectors';
 
 export function PostPublishButton( {
 	isSaving,
@@ -32,14 +23,14 @@ export function PostPublishButton( {
 	visibility,
 	isPublishable,
 	isSaveable,
-	user,
+	hasPublishAction,
 	onSubmit = noop,
+	forceIsSaving,
 } ) {
-	const isButtonEnabled = user.data && ! isSaving && isPublishable && isSaveable;
-	const isContributor = user.data && ! user.data.capabilities.publish_posts;
+	const isButtonEnabled = ! isSaving && isPublishable && isSaveable;
 
 	let publishStatus;
-	if ( isContributor ) {
+	if ( ! hasPublishAction ) {
 		publishStatus = 'pending';
 	} else if ( isBeingScheduled ) {
 		publishStatus = 'future';
@@ -49,10 +40,6 @@ export function PostPublishButton( {
 		publishStatus = 'publish';
 	}
 
-	const className = classnames( 'editor-post-publish-button', {
-		'is-saving': isSaving,
-	} );
-
 	const onClick = () => {
 		onSubmit();
 		onStatusChange( publishStatus );
@@ -61,38 +48,44 @@ export function PostPublishButton( {
 
 	return (
 		<Button
+			className="editor-post-publish-button"
 			isPrimary
 			isLarge
 			onClick={ onClick }
 			disabled={ ! isButtonEnabled }
-			className={ className }
+			isBusy={ isSaving }
 		>
-			<PublishButtonLabel />
+			<PublishButtonLabel forceIsSaving={ forceIsSaving } />
 		</Button>
 	);
 }
 
-const applyConnect = connect(
-	( state ) => ( {
-		isSaving: isSavingPost( state ),
-		isBeingScheduled: isEditedPostBeingScheduled( state ),
-		visibility: getEditedPostVisibility( state ),
-		isSaveable: isEditedPostSaveable( state ),
-		isPublishable: isEditedPostPublishable( state ),
+export default compose( [
+	withSelect( ( select, { forceIsSaving, forceIsDirty } ) => {
+		const {
+			isSavingPost,
+			isEditedPostBeingScheduled,
+			getEditedPostVisibility,
+			isEditedPostSaveable,
+			isEditedPostPublishable,
+			getCurrentPost,
+			getCurrentPostType,
+		} = select( 'core/editor' );
+		return {
+			isSaving: forceIsSaving || isSavingPost(),
+			isBeingScheduled: isEditedPostBeingScheduled(),
+			visibility: getEditedPostVisibility(),
+			isSaveable: isEditedPostSaveable(),
+			isPublishable: forceIsDirty || isEditedPostPublishable(),
+			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			postType: getCurrentPostType(),
+		};
 	} ),
-	{
-		onStatusChange: ( status ) => editPost( { status } ),
-		onSave: savePost,
-	}
-);
-
-const applyWithAPIData = withAPIData( () => {
-	return {
-		user: '/wp/v2/users/me?context=edit',
-	};
-} );
-
-export default flowRight( [
-	applyConnect,
-	applyWithAPIData,
+	withDispatch( ( dispatch ) => {
+		const { editPost, savePost } = dispatch( 'core/editor' );
+		return {
+			onStatusChange: ( status ) => editPost( { status } ),
+			onSave: savePost,
+		};
+	} ),
 ] )( PostPublishButton );

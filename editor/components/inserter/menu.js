@@ -3,268 +3,153 @@
  */
 import {
 	filter,
-	find,
-	findIndex,
-	flow,
 	groupBy,
-	includes,
-	pick,
+	map,
 	some,
+	flow,
 	sortBy,
+	findIndex,
+	find,
+	without,
 } from 'lodash';
-import { connect } from 'react-redux';
 
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Component, compose } from '@wordpress/element';
 import {
-	TabPanel,
-	TabbableContainer,
 	withInstanceId,
 	withSpokenMessages,
-	withContext,
+	PanelBody,
 } from '@wordpress/components';
-import { getCategories, getBlockTypes } from '@wordpress/blocks';
-import { keycodes } from '@wordpress/utils';
+import { getCategories, isSharedBlock } from '@wordpress/blocks';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import BlockPreview from '../block-preview';
+import ItemList from './item-list';
 
-import { getBlocks, getRecentlyUsedBlocks } from '../../selectors';
-import { showInsertionPoint, hideInsertionPoint } from '../../actions';
-import { default as InserterGroup } from './group';
-
-export const searchBlocks = ( blocks, searchTerm ) => {
+/**
+ * Filters an item list given a search term.
+ *
+ * @param {Array} items        Item list
+ * @param {string} searchTerm  Search term.
+ *
+ * @return {Array}             Filtered item list.
+ */
+export const searchItems = ( items, searchTerm ) => {
 	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
 	const matchSearch = ( string ) => string.toLowerCase().indexOf( normalizedSearchTerm ) !== -1;
 
-	return blocks.filter( ( block ) =>
-		matchSearch( block.title ) || some( block.keywords, matchSearch )
+	return items.filter( ( item ) =>
+		matchSearch( item.title ) || some( item.keywords, matchSearch )
 	);
 };
-
-/**
- * Module constants
- */
-const ARROWS = pick( keycodes, [ 'UP', 'DOWN', 'LEFT', 'RIGHT' ] );
 
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
-		this.nodes = {};
 		this.state = {
 			filterValue: '',
-			tab: 'recent',
+			hoveredItem: null,
+			sharedItems: [],
+			itemsPerCategory: {},
+			openPanels: [ 'frecent' ],
 		};
-		this.filter = this.filter.bind( this );
-		this.searchBlocks = this.searchBlocks.bind( this );
-		this.getBlocksForTab = this.getBlocksForTab.bind( this );
-		this.sortBlocks = this.sortBlocks.bind( this );
-		this.bindReferenceNode = this.bindReferenceNode.bind( this );
-		this.selectBlock = this.selectBlock.bind( this );
-
-		this.tabScrollTop = { recent: 0, blocks: 0, embeds: 0 };
-		this.switchTab = this.switchTab.bind( this );
+		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
+		this.onHover = this.onHover.bind( this );
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
-		const searchResults = this.searchBlocks( this.getBlockTypes() );
-		// Announce the blocks search results to screen readers.
-		if ( this.state.filterValue && !! searchResults.length ) {
-			this.props.debouncedSpeak( sprintf( _n(
-				'%d result found',
-				'%d results found',
-				searchResults.length
-			), searchResults.length ), 'assertive' );
-		} else if ( this.state.filterValue ) {
-			this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
-		}
+	componentDidMount() {
+		// This could be replaced by a resolver.
+		this.props.fetchSharedBlocks();
+		this.filter();
+	}
 
-		if ( this.state.tab !== prevState.tab ) {
-			this.tabContainer.scrollTop = this.tabScrollTop[ this.state.tab ];
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.items !== this.props.items ) {
+			this.filter( this.state.filterValue );
 		}
 	}
 
-	isDisabledBlock( blockType ) {
-		return blockType.useOnce && find( this.props.blocks, ( { name } ) => blockType.name === name );
+	onChangeSearchInput( event ) {
+		this.filter( event.target.value );
 	}
 
-	bindReferenceNode( nodeName ) {
-		return ( node ) => this.nodes[ nodeName ] = node;
-	}
-
-	filter( event ) {
+	onHover( item ) {
 		this.setState( {
-			filterValue: event.target.value,
+			hoveredItem: item,
 		} );
 	}
 
-	selectBlock( name ) {
+	onTogglePanel( panel ) {
 		return () => {
-			this.props.onSelect( name );
-			this.setState( {
-				filterValue: '',
-			} );
+			const isOpened = this.state.openPanels.indexOf( panel ) !== -1;
+			if ( isOpened ) {
+				this.setState( {
+					openPanels: without( this.state.openPanels, panel ),
+				} );
+			} else {
+				this.setState( {
+					openPanels: [
+						...this.state.openPanels,
+						panel,
+					],
+				} );
+			}
 		};
 	}
 
-	getBlockTypes() {
-		const { blockTypes } = this.props;
-
-		// If all block types disabled, return empty set
-		if ( ! blockTypes ) {
-			return [];
-		}
-
-		// Block types that are marked as private should not appear in the inserter
-		return getBlockTypes().filter( ( block ) => {
-			if ( block.isPrivate ) {
-				return false;
-			}
-
-			// Block types defined as either `true` or array:
-			//  - True: Allow
-			//  - Array: Check block name within whitelist
-			return (
-				! Array.isArray( blockTypes ) ||
-				includes( blockTypes, block.name )
-			);
-		} );
-	}
-
-	searchBlocks( blockTypes ) {
-		return searchBlocks( blockTypes, this.state.filterValue );
-	}
-
-	getBlocksForTab( tab ) {
-		const blockTypes = this.getBlockTypes();
-		// if we're searching, use everything, otherwise just get the blocks visible in this tab
-		if ( this.state.filterValue ) {
-			return blockTypes;
-		}
-
-		let predicate;
-		switch ( tab ) {
-			case 'recent':
-				predicate = ( block ) => find( this.props.recentlyUsedBlocks, { name: block.name } );
-				break;
-
-			case 'blocks':
-				predicate = ( block ) => block.category !== 'embed';
-				break;
-
-			case 'embeds':
-				predicate = ( block ) => block.category === 'embed';
-				break;
-		}
-
-		return filter( blockTypes, predicate );
-	}
-
-	sortBlocks( blockTypes ) {
-		if ( 'recent' === this.state.tab && ! this.state.filterValue ) {
-			return blockTypes;
-		}
-
+	filter( filterValue = '' ) {
+		const { items } = this.props;
+		const filteredItems = searchItems( items, filterValue );
+		const sharedItems = filter( filteredItems, { category: 'shared' } );
 		const getCategoryIndex = ( item ) => {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
 		};
-
-		return sortBy( blockTypes, getCategoryIndex );
-	}
-
-	groupByCategory( blockTypes ) {
-		return groupBy( blockTypes, ( blockType ) => blockType.category );
-	}
-
-	getVisibleBlocksByCategory( blockTypes ) {
-		return flow(
-			this.searchBlocks,
-			this.sortBlocks,
-			this.groupByCategory
-		)( blockTypes );
-	}
-
-	renderBlocks( blockTypes, separatorSlug ) {
-		const { instanceId } = this.props;
-		const labelledBy = separatorSlug === undefined ? null : `editor-inserter__separator-${ separatorSlug }-${ instanceId }`;
-		const blockTypesInfo = blockTypes.map( ( blockType ) => (
-			{ ...blockType, disabled: this.isDisabledBlock( blockType ) }
-		) );
-		return (
-			<InserterGroup blockTypes={ blockTypesInfo } labelledBy={ labelledBy }
-				bindReferenceNode={ this.bindReferenceNode }
-				selectBlock={ this.selectBlock }
-			/>
-		);
-	}
-
-	renderCategory( category, blockTypes ) {
-		const { instanceId } = this.props;
-		return blockTypes && (
-			<div key={ category.slug }>
-				<div
-					className="editor-inserter__separator"
-					id={ `editor-inserter__separator-${ category.slug }-${ instanceId }` }
-					aria-hidden="true"
-				>
-					{ category.title }
-				</div>
-				{ this.renderBlocks( blockTypes, category.slug ) }
-			</div>
-		);
-	}
-
-	renderCategories( visibleBlocksByCategory ) {
-		return getCategories().map(
-			( category ) => this.renderCategory( category, visibleBlocksByCategory[ category.slug ] )
-		);
-	}
-
-	switchTab( tab ) {
-		// store the scrollTop of the tab switched from
-		this.tabScrollTop[ this.state.tab ] = this.tabContainer.scrollTop;
-		this.setState( { tab } );
-	}
-
-	renderTabView( tab ) {
-		const blocksForTab = this.getBlocksForTab( tab );
-		if ( 'recent' === tab ) {
-			return this.renderBlocks( blocksForTab );
+		const itemsPerCategory = flow(
+			( itemList ) => filter( itemList, ( item ) => item.category !== 'shared' ),
+			( itemList ) => sortBy( itemList, getCategoryIndex ),
+			( itemList ) => groupBy( itemList, 'category' )
+		)( filteredItems );
+		let openPanels = this.state.openPanels;
+		if ( filterValue !== this.state.filterValue ) {
+			if ( ! filterValue ) {
+				openPanels = [ 'frecent' ];
+			} else if ( sharedItems.length ) {
+				openPanels = [ 'shared' ];
+			} else if ( filteredItems.length ) {
+				const firstCategory = find( getCategories(), ( { slug } ) => itemsPerCategory[ slug ] && itemsPerCategory[ slug ].length );
+				openPanels = [ firstCategory.slug ];
+			}
 		}
 
-		const visibleBlocks = this.getVisibleBlocksByCategory( blocksForTab );
-		if ( 'embed' === tab ) {
-			return this.renderBlocks( visibleBlocks.embed );
-		}
-
-		return this.renderCategories( visibleBlocks );
-	}
-
-	interceptArrows( event ) {
-		if ( includes( ARROWS, event.keyCode ) ) {
-			// Prevent cases of focus being unexpectedly stolen up in the tree,
-			// notably when using VisualEditorSiblingInserter, where focus is
-			// moved to sibling blocks.
-			//
-			// We don't need to stop the native event, which has its uses, e.g.
-			// allowing window scrolling.
-			event.stopPropagation();
-		}
+		this.setState( {
+			hoveredItem: null,
+			filterValue,
+			sharedItems,
+			itemsPerCategory,
+			openPanels,
+		} );
 	}
 
 	render() {
-		const { instanceId } = this.props;
-		const isSearching = this.state.filterValue;
+		const { instanceId, frecentItems, onSelect } = this.props;
+		const { hoveredItem, filterValue, sharedItems, itemsPerCategory, openPanels } = this.state;
+		const isSearching = !! filterValue;
+		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 
+		// Disable reason: The inserter menu is a modal display, not one which
+		// is always visible, and one which already incurs this behavior of
+		// autoFocus via Popover's focusOnMount.
+
+		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<TabbableContainer className="editor-inserter__menu" deep
-				onKeyDown={ this.interceptArrows }
-			>
+			<div className="editor-inserter__menu">
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search for a block' ) }
 				</label>
@@ -273,60 +158,78 @@ export class InserterMenu extends Component {
 					type="search"
 					placeholder={ __( 'Search for a block' ) }
 					className="editor-inserter__search"
-					onChange={ this.filter }
-					ref={ this.bindReferenceNode( 'search' ) }
+					autoFocus
+					onChange={ this.onChangeSearchInput }
 				/>
-				{ ! isSearching &&
-					<TabPanel className="editor-inserter__tabs" activeClass="is-active"
-						onSelect={ this.switchTab }
-						tabs={ [
-							{
-								name: 'recent',
-								title: __( 'Recent' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'blocks',
-								title: __( 'Blocks' ),
-								className: 'editor-inserter__tab',
-							},
-							{
-								name: 'embeds',
-								title: __( 'Embeds' ),
-								className: 'editor-inserter__tab',
-							},
-						] }
-					>
-						{ ( tabKey ) => (
-							<div ref={ ( ref ) => this.tabContainer = ref }>
-								{ this.renderTabView( tabKey ) }
-							</div>
-						) }
-					</TabPanel>
-				}
-				{ isSearching &&
-					<div role="menu" className="editor-inserter__search-results">
-						{ this.renderCategories( this.getVisibleBlocksByCategory( getBlockTypes() ) ) }
-					</div>
-				}
-			</TabbableContainer>
+
+				<div className="editor-inserter__results">
+					{ ! isSearching &&
+						<PanelBody
+							title={ __( 'Most Used' ) }
+							opened={ isPanelOpen( 'frecent' ) }
+							onToggle={ this.onTogglePanel( 'frecent' ) }
+						>
+							<ItemList items={ frecentItems } onSelect={ onSelect } onHover={ this.onHover } />
+						</PanelBody>
+					}
+
+					{ !! sharedItems.length && (
+						<PanelBody
+							title={ __( 'Shared' ) }
+							opened={ isPanelOpen( 'shared' ) }
+							onToggle={ this.onTogglePanel( 'shared' ) }
+						>
+							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
+						</PanelBody>
+					) }
+
+					{ map( getCategories(), ( category ) => {
+						const categoryItems = itemsPerCategory[ category.slug ];
+						if ( ! categoryItems || ! categoryItems.length ) {
+							return null;
+						}
+						return (
+							<PanelBody
+								key={ category.slug }
+								title={ category.title }
+								opened={ isPanelOpen( category.slug ) }
+								onToggle={ this.onTogglePanel( category.slug ) }
+							>
+								<ItemList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
+							</PanelBody>
+						);
+					} ) }
+
+					{ hoveredItem && isSharedBlock( hoveredItem ) &&
+						<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
+					}
+				</div>
+			</div>
 		);
+		/* eslint-enable jsx-a11y/no-autofocus */
 	}
 }
 
-const connectComponent = connect(
-	( state ) => {
+export default compose(
+	withSelect( ( select ) => {
+		const {
+			getBlockInsertionPoint,
+			getInserterItems,
+			getFrecentInserterItems,
+			getSupportedBlocks,
+			getEditorSettings,
+		} = select( 'core/editor' );
+		const { allowedBlockTypes } = getEditorSettings();
+		const { rootUID } = getBlockInsertionPoint();
+		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
 		return {
-			recentlyUsedBlocks: getRecentlyUsedBlocks( state ),
-			blocks: getBlocks( state ),
+			items: getInserterItems( supportedBlocks ),
+			frecentItems: getFrecentInserterItems( supportedBlocks ),
 		};
-	},
-	{ showInsertionPoint, hideInsertionPoint }
-);
-
-export default flow(
-	withInstanceId,
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
+	} ) ),
 	withSpokenMessages,
-	withContext( 'editor' )( ( settings ) => pick( settings, 'blockTypes' ) ),
-	connectComponent
+	withInstanceId
 )( InserterMenu );

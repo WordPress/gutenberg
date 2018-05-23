@@ -6,7 +6,9 @@ import {
 	getBlockAttributes,
 	asType,
 	createBlockWithFallback,
+	getAttributesAndInnerBlocksFromDeprecatedVersion,
 	default as parse,
+	parseWithAttributeSchema,
 } from '../parser';
 import {
 	registerBlockType,
@@ -22,7 +24,7 @@ describe( 'block parser', () => {
 				type: 'string',
 			},
 		},
-		save: ( { attributes } ) => attributes.fruit,
+		save: ( { attributes } ) => attributes.fruit || null,
 		category: 'common',
 		title: 'block title',
 	};
@@ -36,8 +38,13 @@ describe( 'block parser', () => {
 				source: 'html',
 			},
 		},
-		save: ( { attributes } ) => attributes.content,
+		save: ( { attributes } ) => attributes.content || null,
 	};
+
+	beforeAll( () => {
+		// Initialize the block store.
+		require( '../../store' );
+	} );
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
@@ -81,6 +88,20 @@ describe( 'block parser', () => {
 
 			expect( asType( obj, 'object' ) ).toBe( obj );
 			expect( asType( {}, 'object' ) ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'parseWithAttributeSchema', () => {
+		it( 'should return the matcher\'s attribute value', () => {
+			const value = parseWithAttributeSchema(
+				'<div>chicken</div>',
+				{
+					type: 'string',
+					source: 'text',
+					selector: 'div',
+				},
+			);
+			expect( value ).toBe( 'chicken' );
 		} );
 	} );
 
@@ -164,15 +185,142 @@ describe( 'block parser', () => {
 		} );
 	} );
 
+	describe( 'getAttributesAndInnerBlocksFromDeprecatedVersion', () => {
+		it( 'should return undefined if the block has no deprecated versions', () => {
+			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
+				defaultBlockSettings,
+				'<span class="wp-block-test-block">Bananas</span>',
+				{},
+			);
+			expect( attributesAndInnerBlocks ).toBeUndefined();
+		} );
+
+		it( 'should return undefined if no valid deprecated version found', () => {
+			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
+				{
+					name: 'core/test-block',
+					...defaultBlockSettings,
+					deprecated: [
+						{
+							save() {
+								return 'nothing';
+							},
+						},
+					],
+				},
+				'<span class="wp-block-test-block">Bananas</span>',
+				{},
+			);
+			expect( attributesAndInnerBlocks ).toBeUndefined();
+			expect( console ).toHaveErrored();
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should return the attributes parsed by the deprecated version', () => {
+			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
+				{
+					name: 'core/test-block',
+					...defaultBlockSettings,
+					save: ( props ) => <div>{ props.attributes.fruit }</div>,
+					deprecated: [
+						{
+							attributes: {
+								fruit: {
+									type: 'string',
+									source: 'text',
+									selector: 'span',
+								},
+							},
+							save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						},
+					],
+				},
+				'<span>Bananas</span>',
+				{},
+			);
+			expect( attributesAndInnerBlocks.attributes ).toEqual( { fruit: 'Bananas' } );
+		} );
+
+		it( 'should return the innerBlocks if they are passed', () => {
+			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
+				{
+					name: 'core/test-block',
+					...defaultBlockSettings,
+					save: ( props ) => <div>{ props.attributes.fruit }</div>,
+					deprecated: [
+						{
+							attributes: {
+								fruit: {
+									type: 'string',
+									source: 'text',
+									selector: 'span',
+								},
+							},
+							save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						},
+					],
+				},
+				'<span>Bananas</span>',
+				{},
+				[ {
+					name: 'core/test-block',
+					attributes: { aaa: 'bbb' },
+				} ]
+			);
+
+			expect( attributesAndInnerBlocks.innerBlocks ).toHaveLength( 1 );
+			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
+			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+		} );
+
+		it( 'should be able to migrate attributes and innerBlocks', () => {
+			const attributesAndInnerBlocks = getAttributesAndInnerBlocksFromDeprecatedVersion(
+				{
+					name: 'core/test-block',
+					...defaultBlockSettings,
+					save: ( props ) => <div>{ props.attributes.fruit }</div>,
+					deprecated: [
+						{
+							attributes: {
+								fruit: {
+									type: 'string',
+									source: 'text',
+									selector: 'span',
+								},
+							},
+							save: ( props ) => <span>{ props.attributes.fruit }</span>,
+							migrate: ( attributes ) => {
+								return [
+									{ newFruit: attributes.fruit },
+									[ {
+										name: 'core/test-block',
+										attributes: { aaa: 'bbb' },
+									} ],
+								];
+							},
+						},
+					],
+				},
+				'<span>Bananas</span>',
+				{},
+			);
+
+			expect( attributesAndInnerBlocks.attributes ).toEqual( { newFruit: 'Bananas' } );
+			expect( attributesAndInnerBlocks.innerBlocks ).toHaveLength( 1 );
+			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
+			expect( attributesAndInnerBlocks.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+		} );
+	} );
+
 	describe( 'createBlockWithFallback', () => {
 		it( 'should create the requested block if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = createBlockWithFallback(
-				'core/test-block',
-				'Bananas',
-				{ fruit: 'Bananas' }
-			);
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: 'Bananas',
+				attrs: { fruit: 'Bananas' },
+			} );
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
@@ -180,7 +328,10 @@ describe( 'block parser', () => {
 		it( 'should create the requested block with no attributes if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const block = createBlockWithFallback( 'core/test-block', '' );
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: '',
+			} );
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( {} );
 		} );
@@ -189,11 +340,11 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
-			const block = createBlockWithFallback(
-				'core/test-block',
-				'Bananas',
-				{ fruit: 'Bananas' }
-			);
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: 'Bananas',
+				attrs: { fruit: 'Bananas' },
+			} );
 			expect( block.name ).toBe( 'core/unknown-block' );
 			expect( block.attributes.content ).toContain( 'wp:test-block' );
 		} );
@@ -202,14 +353,57 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 			setUnknownTypeHandlerName( 'core/unknown-block' );
 
-			const block = createBlockWithFallback( null, 'content' );
+			const block = createBlockWithFallback( {
+				innerHTML: 'content',
+			} );
 			expect( block.name ).toEqual( 'core/unknown-block' );
-			expect( block.attributes ).toEqual( { content: 'content' } );
+			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
 
 		it( 'should not create a block if no unknown type handler', () => {
-			const block = createBlockWithFallback( 'core/test-block', '' );
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: '',
+			} );
 			expect( block ).toBeUndefined();
+		} );
+
+		it( 'should fallback to an older version of the block if the current one is invalid', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				save: ( { attributes } ) => <div>{ attributes.fruit }</div>,
+				deprecated: [
+					{
+						attributes: {
+							fruit: {
+								type: 'string',
+								source: 'text',
+								selector: 'span',
+							},
+						},
+						save: ( { attributes } ) => <span>{ attributes.fruit }</span>,
+						migrate: ( attributes ) => ( { fruit: 'Big ' + attributes.fruit } ),
+					},
+				],
+			} );
+
+			const block = createBlockWithFallback( {
+				blockName: 'core/test-block',
+				innerHTML: '<span>Bananas</span>',
+				attrs: { fruit: 'Bananas' },
+			} );
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
+			expect( block.isValid ).toBe( true );
+			expect( console ).toHaveErrored();
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

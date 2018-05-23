@@ -1,13 +1,13 @@
 /**
  * External Dependencies
  */
-import { connect } from 'react-redux';
-import { flowRight, filter } from 'lodash';
+import { filter, identity, includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { withAPIData } from '@wordpress/components';
+import { compose, Fragment } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,42 +15,34 @@ import { withAPIData } from '@wordpress/components';
 import './style.scss';
 import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
-import { getCurrentPostType } from '../../selectors';
 
-function PostTaxonomies( { postType, taxonomies } ) {
-	const availableTaxonomies = filter( taxonomies.data, ( taxonomy ) => taxonomy.types.indexOf( postType ) !== -1 );
-
-	return (
-		<div>
-			{ availableTaxonomies.map( ( taxonomy ) => {
-				const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
-				return (
-					<TaxonomyComponent
-						key={ taxonomy.slug }
-						label={ taxonomy.name }
-						restBase={ taxonomy.rest_base }
-						slug={ taxonomy.slug }
-					/>
-				);
-			} ) }
-		</div>
-	);
+export function PostTaxonomies( { postType, taxonomies, taxonomyWrapper = identity } ) {
+	const availableTaxonomies = filter( taxonomies, ( taxonomy ) => includes( taxonomy.types, postType ) );
+	const visibleTaxonomies = filter( availableTaxonomies, ( taxonomy ) => taxonomy.visibility.show_ui );
+	return visibleTaxonomies.map( ( taxonomy ) => {
+		const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
+		return (
+			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
+				{
+					taxonomyWrapper(
+						<TaxonomyComponent
+							restBase={ taxonomy.rest_base }
+							slug={ taxonomy.slug }
+						/>,
+						taxonomy
+					)
+				}
+			</Fragment>
+		);
+	} );
 }
 
-const applyConnect = connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			postType: getCurrentPostType( state ),
+			postType: select( 'core/editor' ).getCurrentPostType(),
+			taxonomies: select( 'core' ).getTaxonomies(),
 		};
-	},
-);
-
-const applyWithAPIData = withAPIData( () => ( {
-	taxonomies: '/wp/v2/taxonomies?context=edit',
-} ) );
-
-export default flowRight( [
-	applyConnect,
-	applyWithAPIData,
+	} ),
 ] )( PostTaxonomies );
 

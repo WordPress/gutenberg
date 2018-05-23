@@ -1,29 +1,47 @@
 /**
  * WordPress dependencies
  */
-import { Component, renderToString } from '@wordpress/element';
+import { Component, renderToString, createRef } from '@wordpress/element';
 
-export default class Sandbox extends Component {
+/**
+ * Internal dependencies
+ */
+import FocusableIframe from '../focusable-iframe';
+import withGlobalEvents from '../higher-order/with-global-events';
+
+class Sandbox extends Component {
 	constructor() {
 		super( ...arguments );
+
+		this.trySandbox = this.trySandbox.bind( this );
+		this.checkMessageForResize = this.checkMessageForResize.bind( this );
+
+		this.iframe = createRef();
+
 		this.state = {
 			width: 0,
 			height: 0,
 		};
-		this.trySandbox = this.trySandbox.bind( this );
-		this.checkMessageForResize = this.checkMessageForResize.bind( this );
+	}
+
+	componentDidMount() {
+		this.trySandbox();
+	}
+
+	componentDidUpdate() {
+		this.trySandbox();
 	}
 
 	isFrameAccessible() {
 		try {
-			return !! this.iframe.contentDocument.body;
+			return !! this.iframe.current.contentDocument.body;
 		} catch ( e ) {
 			return false;
 		}
 	}
 
 	checkMessageForResize( event ) {
-		const iframe = this.iframe;
+		const iframe = this.iframe.current;
 
 		// Attempt to parse the message data as JSON if passed as string
 		let data = event.data || {};
@@ -48,36 +66,21 @@ export default class Sandbox extends Component {
 		}
 	}
 
-	componentDidMount() {
-		window.addEventListener( 'message', this.checkMessageForResize, false );
-		this.trySandbox();
-	}
-
-	componentDidUpdate() {
-		this.trySandbox();
-	}
-
-	componentWillUnmount() {
-		window.removeEventListener( 'message', this.checkMessageForResize );
-	}
-
 	trySandbox() {
 		if ( ! this.isFrameAccessible() ) {
 			return;
 		}
 
-		const body = this.iframe.contentDocument.body;
+		const body = this.iframe.current.contentDocument.body;
 		if ( null !== body.getAttribute( 'data-resizable-iframe-connected' ) ) {
 			return;
 		}
 
-		// sandboxing video content needs to explicitly set the height of the sandbox
-		// based on a 16:9 ratio for the content to be responsive
-		const heightCalculation = 'video' === this.props.type ? 'clientBoundingRect.width / 16 * 9' : 'clientBoundingRect.height';
-
 		const observeAndResizeJS = `
 			( function() {
 				var observer;
+				var aspectRatio = false;
+				var iframe = false;
 
 				if ( ! window.MutationObserver || ! document.body || ! window.parent ) {
 					return;
@@ -85,10 +88,22 @@ export default class Sandbox extends Component {
 
 				function sendResize() {
 					var clientBoundingRect = document.body.getBoundingClientRect();
+					var height = aspectRatio ? Math.ceil( clientBoundingRect.width / aspectRatio ) : clientBoundingRect.height;
+
+					if ( iframe && aspectRatio ) {
+						// This is embedded content delivered in an iframe with a fixed aspect ratio,
+						// so set the height correctly and stop processing. The DOM mutation will trigger
+						// another event and the resize message will get posted.
+						if ( iframe.height != height ) {
+							iframe.height = height;
+							return;
+						}
+					}
+
 					window.parent.postMessage( {
 						action: 'resize',
 						width: clientBoundingRect.width,
-						height: ${ heightCalculation }
+						height: height,
 					}, '*' );
 				}
 
@@ -121,20 +136,36 @@ export default class Sandbox extends Component {
 				} );
 
 				document.body.style.position = 'absolute';
+				document.body.style.width = '100%';
 				document.body.setAttribute( 'data-resizable-iframe-connected', '' );
 
+				// Make embedded content in an iframe with a fixed size responsive,
+				// keeping the correct aspect ratio.
+				var potentialIframe = document.body.children[0];
+				if ( 'DIV' === potentialIframe.tagName || 'SPAN' === potentialIframe.tagName ) {
+						potentialIframe = potentialIframe.children[0];
+					}
+				if ( 'IFRAME' === potentialIframe.tagName ) {
+					if ( potentialIframe.width ) {
+						iframe = potentialIframe;
+						aspectRatio = potentialIframe.width / potentialIframe.height;
+						potentialIframe.width = '100%';
+					}
+				}					
+
 				sendResize();
+
+				// Resize events can change the width of elements with 100% width, but we don't
+				// get an DOM mutations for that, so do the resize when the window is resized, too.
+				window.addEventListener( 'resize', sendResize, true );
 		} )();`;
 
 		const style = `
 			body {
 				margin: 0;
 			}
-			body.video,
-			body.video > div,
-			body.video > div > iframe {
+			body > div > iframe {
 				width: 100%;
-				height: 100%;
 			}
 			body > div > * {
 				margin-top: 0 !important;	/* has to have !important to override inline styles */
@@ -160,9 +191,10 @@ export default class Sandbox extends Component {
 		// writing the document like this makes it act in the same way as if it was
 		// loaded over the network, so DOM creation and mutation, script execution, etc.
 		// all work as expected
-		this.iframe.contentWindow.document.open();
-		this.iframe.contentWindow.document.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
-		this.iframe.contentWindow.document.close();
+		const iframeDocument = this.iframe.current.contentWindow.document;
+		iframeDocument.open();
+		iframeDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
+		iframeDocument.close();
 	}
 
 	static get defaultProps() {
@@ -173,10 +205,12 @@ export default class Sandbox extends Component {
 	}
 
 	render() {
+		const { title } = this.props;
+
 		return (
-			<iframe
-				ref={ ( node ) => this.iframe = node }
-				title={ this.props.title }
+			<FocusableIframe
+				iframeRef={ this.iframe }
+				title={ title }
 				scrolling="no"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
 				onLoad={ this.trySandbox }
@@ -185,3 +219,9 @@ export default class Sandbox extends Component {
 		);
 	}
 }
+
+Sandbox = withGlobalEvents( {
+	message: 'checkMessageForResize',
+} )( Sandbox );
+
+export default Sandbox;

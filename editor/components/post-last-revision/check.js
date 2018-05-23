@@ -1,25 +1,27 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { connect } from 'react-redux';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { getCurrentPostLastRevisionId } from '../../selectors';
+import PostTypeSupportCheck from '../post-type-support-check';
 
-function PostLastRevisionCheck( { lastRevisionId, children } ) {
-	if ( ! lastRevisionId ) {
+export function PostLastRevisionCheck( { lastRevisionId, revisionsCount, children } ) {
+	if ( ! lastRevisionId || revisionsCount < 2 ) {
 		return null;
 	}
 
-	return children;
+	return <PostTypeSupportCheck supportKeys="revisions" >{ children }</PostTypeSupportCheck>;
 }
 
-export default connect(
-	( state ) => {
+export default withSelect(
+	( select ) => {
+		const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } = select( 'core/editor' );
 		return {
-			lastRevisionId: getCurrentPostLastRevisionId( state ),
+			lastRevisionId: getCurrentPostLastRevisionId(),
+			revisionsCount: getCurrentPostRevisionsCount(),
 		};
 	}
 )( PostLastRevisionCheck );

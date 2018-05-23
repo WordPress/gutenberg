@@ -14,7 +14,7 @@ import { Button, ClipboardButton } from '@wordpress/components';
  * Internal dependencies
  */
 import { Warning } from '../';
-import { getEditedPostContent } from '../../selectors';
+import { getEditedPostContent } from '../../store/selectors';
 
 class ErrorBoundary extends Component {
 	constructor() {
@@ -33,7 +33,7 @@ class ErrorBoundary extends Component {
 	}
 
 	reboot() {
-		this.props.onError( this.context.store.getState() );
+		this.props.onError();
 	}
 
 	getContent() {
@@ -49,21 +49,20 @@ class ErrorBoundary extends Component {
 		}
 
 		return (
-			<Warning>
-				<p>{ __(
-					'The editor has encountered an unexpected error.'
-				) }</p>
-				<p>
-					<Button onClick={ this.reboot } isLarge>
+			<Warning
+				actions={ [
+					<Button key="recovery" onClick={ this.reboot } isLarge>
 						{ __( 'Attempt Recovery' ) }
-					</Button>
-					<ClipboardButton text={ this.getContent } isLarge>
+					</Button>,
+					<ClipboardButton key="copy-post" text={ this.getContent } isLarge>
 						{ __( 'Copy Post Text' ) }
-					</ClipboardButton>
-					<ClipboardButton text={ error.stack } isLarge>
+					</ClipboardButton>,
+					<ClipboardButton key="copy-error" text={ error.stack } isLarge>
 						{ __( 'Copy Error' ) }
-					</ClipboardButton>
-				</p>
+					</ClipboardButton>,
+				] }
+			>
+				{ __( 'The editor has encountered an unexpected error.' ) }
 			</Warning>
 		);
 	}

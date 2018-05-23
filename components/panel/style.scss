@@ -22,7 +22,7 @@
 	border-bottom: 1px solid $light-gray-500;
 
 	h3 {
-		margin: 0 0 .5em 0;
+		margin: 0 0 .5em;
 	}
 
 	&.is-opened {
@@ -58,11 +58,12 @@
 	display: block;
 	padding: 0;
 	font-size: inherit;
+	margin-top: 0;
 	margin-bottom: 0;
 }
 .components-panel__body.is-opened > .components-panel__body-title {
 	margin: -1 * $panel-padding;
-	margin-bottom: 0;
+	margin-bottom: 5px;
 }
 
 .components-panel__body-toggle.components-button {
@@ -72,13 +73,29 @@
 	width: 100%;
 	font-weight: 600;
 	text-align: left;
+	color: $dark-gray-900;
+	@include menu-style__neutral;
+
+	&:focus:not(:disabled):not([aria-disabled="true"]) {
+		@include menu-style__focus;
+	}
 
 	.dashicon {
 		position: absolute;
-		right: 10px;
+		right: $item-spacing;
 		top: 50%;
 		transform: translateY( -50% );
 	}
+
+	// mirror the arrow horizontally in RTL languages
+	/* rtl:begin:ignore */
+	body.rtl & .dashicons-arrow-right {
+		transform: scaleX(-1);
+		-ms-filter: fliph;
+		filter: FlipH;
+		margin-top: -10px;
+	}
+	/* rtl:end:ignore */
 }
 
 .components-panel__body-toggle-icon {
@@ -104,11 +121,19 @@
 	align-items: center;
 	margin-top: 20px;
 
-	label {
-		margin-right: 10px;
+	select {
+		// Necessary for select to respond to flexbox
+		min-width: 0;
 	}
 
-	&:empty {
+	label {
+		margin-right: 10px;
+		flex-shrink: 0;
+		max-width: 75%;
+	}
+
+	&:empty,
+	&:first-of-type {
 		margin-top: 0;
 	}
 }

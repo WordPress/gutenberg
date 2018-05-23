@@ -14,19 +14,22 @@ function ToggleButton( { isVisible, toggleVisible } ) {
 	return (
 		<button onClick={ toggleVisible }>
 			Toggle Popover!
-			<Popover
-				isOpen={ isVisible }
-				onClose={ toggleVisible }
-				onClick={ ( event ) => event.stopPropagation() }
-			>
-				Popover is toggled!
-			</Popover>
+			{ isVisible && (
+				<Popover
+					onClose={ toggleVisible }
+					onClick={ ( event ) => event.stopPropagation() }
+				>
+					Popover is toggled!
+				</Popover>
+			) }
 		</button>
 	);
 }
 ```
 
-If you want Popover elementss to render to a specific location on the page to allow style cascade to take effect, you must render a `Popover.Slot` further up the element tree:
+If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
+
+If you want Popover elements to render to a specific location on the page to allow style cascade to take effect, you must render a `Popover.Slot` further up the element tree:
 
 ```jsx
 import { render } from '@wordpress/element';
@@ -48,17 +51,9 @@ render(
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
 
-### isOpen
+### focusOnMount
 
-As a controlled component, it is expected that you will pass `isOpen` to control whether the popover is visible. Refer to the `onClose` documentation for the complementary behavior for determining when this value should be toggled in your parent component state.
-
-- Type: `Boolean`
-- Required: No
-- Default: `false`
-
-### focusOnOpen
-
-By default, the popover will receive focus when it transitions from closed to open. To suppress this behavior, assign `focusOnOpen` to `true`. This should only be assigned when an appropriately accessible substitute behavior exists.
+By default, the popover will receive focus when it mounts. To suppress this behavior, assign `focusOnMount` to `false`. This should only be assigned when an appropriately accessible substitute behavior exists.
 
 - Type: `Boolean`
 - Required: No
@@ -86,24 +81,31 @@ An optional additional class name to apply to the rendered popover.
 - Type: `String`
 - Required: No
 
-## onClose
+### onClose
 
 A callback invoked when the popover should be closed.
 
 - Type: `Function`
 - Required: No
 
-## onClickOutside
+### onClickOutside
 
 A callback invoked when the user clicks outside the opened popover, passing the click event. The popover should be closed in response to this interaction. Defaults to `onClose`.
 
 - Type: `Function`
 - Required: No
 
-## expandOnMobile
+### expandOnMobile
 
 Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to avoid this behavior.
 
  - Type: `Boolean`
  - Required: No
  - Default: `false`
+
+ ## headerTitle
+
+ Set this to customize the text that is shown in popover's header when it is fullscreen on mobile.
+
+ - Type: `String`
+ - Required: No

@@ -1,32 +1,24 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ExternalLink } from '@wordpress/components';
+import { ExternalLink, TextareaControl } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal Dependencies
  */
 import './style.scss';
-import { getEditedPostExcerpt } from '../../selectors';
-import { editPost } from '../../actions';
 
 function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
-	const onChange = ( event ) => onUpdateExcerpt( event.target.value );
-
 	return (
-		<div>
-			<textarea
+		<div className="editor-post-excerpt">
+			<TextareaControl
+				label={ __( 'Write an excerpt (optional)' ) }
 				className="editor-post-excerpt__textarea"
-				onChange={ onChange }
+				onChange={ ( value ) => onUpdateExcerpt( value ) }
 				value={ excerpt }
-				placeholder={ __( 'Write an excerpt (optional)' ) }
-				aria-label={ __( 'Excerpt' ) }
 			/>
 			<ExternalLink href="https://codex.wordpress.org/Excerpt">
 				{ __( 'Learn more about manual excerpts' ) }
@@ -35,16 +27,15 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 	);
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			excerpt: getEditedPostExcerpt( state ),
+			excerpt: select( 'core/editor' ).getEditedPostExcerpt(),
 		};
-	},
-	{
+	} ),
+	withDispatch( ( dispatch ) => ( {
 		onUpdateExcerpt( excerpt ) {
-			return editPost( { excerpt } );
+			dispatch( 'core/editor' ).editPost( { excerpt } );
 		},
-	}
-)( PostExcerpt );
-
+	} ) ),
+] )( PostExcerpt );

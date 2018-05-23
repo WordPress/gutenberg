@@ -29,18 +29,10 @@ describe( 'validation', () => {
 		category: 'common',
 		title: 'block title',
 	};
-
-	/* eslint-disable no-console */
-	function expectError() {
-		expect( console.error ).toHaveBeenCalled();
-		console.error.mockClear();
-	}
-
-	function expectWarning() {
-		expect( console.warn ).toHaveBeenCalled();
-		console.warn.mockClear();
-	}
-	/* eslint-enable no-console */
+	beforeAll( () => {
+		// Initialize the block store
+		require( '../../store' );
+	} );
 
 	afterEach( () => {
 		setUnknownTypeHandlerName( undefined );
@@ -114,7 +106,7 @@ describe( 'validation', () => {
 				{ chars: 'a \n c \t b  ' },
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEqual ).toBe( false );
 		} );
 
@@ -200,6 +192,17 @@ describe( 'validation', () => {
 				expect( isEqual ).toBe( false );
 			} );
 		} );
+
+		describe( 'boolean attributes', () => {
+			it( 'returns true if both present', () => {
+				const isEqual = isEqualAttributesOfName.controls(
+					'true',
+					''
+				);
+
+				expect( isEqual ).toBe( true );
+			} );
+		} );
 	} );
 
 	describe( 'isEqualTagAttributePairs()', () => {
@@ -214,7 +217,7 @@ describe( 'validation', () => {
 				]
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEqual ).toBe( false );
 		} );
 
@@ -223,10 +226,12 @@ describe( 'validation', () => {
 				[
 					[ 'class', 'b   a c' ],
 					[ 'style', 'color: red;  background-image: url( "https://wordpress.org/img.png" );' ],
+					[ 'controls', '' ],
 				],
 				[
 					[ 'class', 'c  a b' ],
 					[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+					[ 'controls', 'true' ],
 				]
 			);
 
@@ -242,7 +247,7 @@ describe( 'validation', () => {
 					{ tagName: 'section' }
 				);
 
-				expectWarning();
+				expect( console ).toHaveWarned();
 				expect( isEqual ).toBe( false );
 			} );
 
@@ -263,7 +268,7 @@ describe( 'validation', () => {
 					}
 				);
 
-				expectWarning();
+				expect( console ).toHaveWarned();
 				expect( isEqual ).toBe( false );
 			} );
 
@@ -322,14 +327,14 @@ describe( 'validation', () => {
 				'<div>Hello <span class="a">World!</span></div>'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
 		it( 'should return true for effectively equivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
-				'<div>Hello<span   class="b a" id="foo"> World!</  span>  </div>',
-				'<div  >Hello\n<span id="foo" class="a  b">World!</span></div>'
+				'<div>&quot; Hello<span   class="b a" id="foo"> World!</  span>  "</div>',
+				'<div  >" Hello\n<span id="foo" class="a  b">World!</span>"</div>'
 			);
 
 			expect( isEquivalent ).toBe( true );
@@ -341,7 +346,7 @@ describe( 'validation', () => {
 				'<div>Hello'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -351,7 +356,7 @@ describe( 'validation', () => {
 				'<div>Hello</div>'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -388,7 +393,7 @@ describe( 'validation', () => {
 				'<input>'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -398,7 +403,7 @@ describe( 'validation', () => {
 				'<div>'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
 
@@ -408,8 +413,36 @@ describe( 'validation', () => {
 				'<div>'
 			);
 
-			expectWarning();
+			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return false when difference of boolean attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<video controls></video>',
+				'<video></video>'
+			);
+
+			expect( console ).toHaveWarned();
+			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return true when same boolean attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<video controls></video>',
+				'<video controls></video>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return true when effectively same boolean attribute', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<video controls></video>',
+				'<video controls=""></video>'
+			);
+
+			expect( isEquivalent ).toBe( true );
 		} );
 	} );
 
@@ -423,8 +456,8 @@ describe( 'validation', () => {
 				{ fruit: 'Bananas' }
 			);
 
-			expectWarning();
-			expectError();
+			expect( console ).toHaveWarned();
+			expect( console ).toHaveErrored();
 			expect( isValid ).toBe( false );
 		} );
 
@@ -442,7 +475,7 @@ describe( 'validation', () => {
 				{ fruit: 'Bananas' }
 			);
 
-			expectError();
+			expect( console ).toHaveErrored();
 			expect( isValid ).toBe( false );
 		} );
 

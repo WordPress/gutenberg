@@ -1,3 +1,7 @@
+$block-inserter-content-height: 350px;
+$block-inserter-tabs-height: 38px;
+$block-inserter-search-height: 38px;
+
 .editor-inserter {
 	display: inline-block;
 	background: none;
@@ -12,6 +16,13 @@
 	}
 }
 
+.editor-inserter__popover:not(.is-mobile) > .components-popover__content {
+	@include break-medium {
+		overflow-y: initial;
+		height: $block-inserter-content-height + $block-inserter-tabs-height + $block-inserter-search-height;
+	}
+}
+
 .editor-inserter__toggle {
 	display: inline-flex;
 	align-items: center;
@@ -21,33 +32,6 @@
 	border: none;
 	outline: none;
 	transition: color .2s ease;
-
-	.editor-layout__content & {
-		border-radius: $button-style__radius-round;
-	}
-}
-
-input[type="search"].editor-inserter__search {
-	display: block;
-	width: 100%;
-	margin: 0;
-	box-shadow: none;
-	padding: 8px 11px;
-	font-size: $default-font-size;
-	position: relative;
-	z-index: 1;
-	border: none;
-	box-shadow: 0 1px 0 0 $light-gray-500;
-
-	&:focus {
-		@include input-style__focus-active;
-	}
-}
-
-.editor-inserter__category-blocks {
-	display: flex;
-	flex-flow: row wrap;
-	padding: 8px;
 }
 
 .editor-inserter__menu {
@@ -56,8 +40,19 @@ input[type="search"].editor-inserter__search {
 	flex-direction: column;
 	height: 100%;
 	@include break-medium {
-		width: 300px;
-		height: 320px;
+		width: 350px;
+		position: relative;
+
+		.editor-block-preview {
+			border: 1px solid $light-gray-500;
+			box-shadow: $shadow-popover;
+			background: $white;
+			position: absolute;
+			left: 100%;
+			top: -1px;
+			bottom: -1px;
+			width: 300px;
+		}
 	}
 }
 
@@ -65,20 +60,61 @@ input[type="search"].editor-inserter__search {
 	border-bottom-color: $white;
 }
 
-.editor-inserter__block {
-	display: flex;
+input[type="search"].editor-inserter__search {
+	display: block;
+	width: 100%;
+	margin: 0;
+	padding: 11px 16px;
+	position: relative;
+	z-index: 1;
+	border: none;
+	box-shadow: 0 1px 0 0 $light-gray-500;
+	@include square-style__neutral;
+	outline-offset: -5px; // override outline offset included with @include above
+
+	// fonts smaller than 16px causes mobile safari to zoom
+	font-size: $mobile-text-min-font-size;
+	@include break-small {
+		font-size: $default-font-size;
+	}
+
+	&:focus {
+		@include square-style__focus;
+	}
+}
+
+.editor-inserter__results {
+	flex-grow: 1;
+	overflow: auto;
+
+	@include break-medium {
+		height: $block-inserter-content-height + $block-inserter-tabs-height;
+		box-shadow: inset 0 -5px 5px -4px rgba( $dark-gray-900, .1 );
+	}
+}
+
+.editor-inserter__item-list {
+	margin: 0 -8px;
+}
+
+.editor-inserter__item {
+	display: inline-flex;
 	flex-direction: column;
-	width: calc( 50% - 16px );
-	border-radius: $button-style__radius-roundrect;
+	width: calc( 33.3% - 8px );
+	margin: 0 4px 8px 4px;
 	font-size: $default-font-size;
-	color: $dark-gray-500;
-	margin: 8px;
-	padding: 12px 6px 6px 6px;
-	align-items: center;
+	color: $dark-gray-700;
+	padding: 0;
+	align-items: stretch;
+	justify-content: center;
 	cursor: pointer;
 	border: none;
-	line-height: 20px;
 	background: transparent;
+	overflow: hidden;
+	word-break: break-word;
+	border-radius: 3px;
+	border: 1px solid transparent;
+	transition: all 0.05s ease-in-out;
 
 	&:disabled {
 		@include button-style__disabled;
@@ -86,7 +122,16 @@ input[type="search"].editor-inserter__search {
 
 	&:not(:disabled) {
 		&:hover {
-			@include button-style__hover;
+			border-color: $light-gray-700;
+
+			.editor-inserter__item-icon {
+				color: $dark-gray-900;
+				border-radius: 3px 3px 0 0;
+			}
+
+			.editor-inserter__item-title {
+				color: $dark-gray-800;
+			}
 		}
 
 		&:focus,
@@ -94,73 +139,25 @@ input[type="search"].editor-inserter__search {
 		&.is-active {
 			@include button-style__focus-active;
 			position: relative;
+			outline: 1px solid $dark-gray-500;
 		}
 	}
 }
 
-.editor-inserter__separator {
-	border-top: 1px solid $light-gray-500;
-	background: rgba( $white, .8 );
-	text-align: center;
-	display: block;
-	margin: 0;
-	padding: 12px 14px 0 14px;
-	font-size: $default-font-size;
-	font-weight: 600;
-	margin-top: -1px;	// hide the first top border
-}
-
-.editor-inserter__search-results {
-	flex-grow: 1;
-	overflow: auto;
-}
-
-.editor-inserter__tabs {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	flex-grow: 1;
-	box-shadow: inset 0 -5px 5px -4px rgba( $dark-gray-900, .1 );
-	overflow: hidden;
-
-	.components-tab-panel__tab-content {
-		overflow: auto;
-	}
-
-	.components-tab-panel__tabs {
-		width: 100%;
-		display: flex;
-		justify-content: space-between;
-		position: relative;
-		background: $light-gray-300;
-		border-bottom: 1px solid $light-gray-500;
-		flex-shrink: 0;
-	}
-}
-
-.editor-inserter__tab {
-	border: none;
-	background: none;
-	border-bottom: 3px solid transparent;
-	border-top: 3px solid transparent;
-	font-size: $default-font;
-	padding: 8px 8px;
-	width: 100%;
-	border-radius: 0;
-	margin: 0;
+.editor-inserter__item-icon {
+	padding: 7px 20px;
+	background: $light-gray-200;
+	border-radius: 3px;
 	color: $dark-gray-500;
-	cursor: pointer;
+	transition: all 0.05s ease-in-out;
 
-	&.is-active {
-		font-weight: 600;
-		border-bottom-color: $blue-medium-500;
-		position: relative;
-		z-index: z-index( '.editor-inserter__tab.is-active' );
+	svg {
+		width: 22px;
+		height: 22px;
+		transition: all 0.15s ease-out;
 	}
+}
 
-	&:active,
-	&:focus {
-		z-index: z-index( '.editor-inserter__tab.is-active' );
-		@include tab-style__focus-active;
-	}
+.editor-inserter__item-title {
+	padding: 4px 2px;
 }

@@ -59,9 +59,9 @@ class Tooltip extends Component {
 	}
 
 	/**
-	 * Assigns DOM node of the rendered component as an instance property
+	 * Assigns DOM node of the rendered component as an instance property.
 	 *
-	 * @param {Element} ref Rendered component reference
+	 * @param {Element} ref Rendered component reference.
 	 */
 	bindNode( ref ) {
 		// Disable reason: Because render clones the child, we don't know what
@@ -72,7 +72,7 @@ class Tooltip extends Component {
 	}
 
 	/**
-	 * Disconnects any DOM observer attached to the rendered node
+	 * Disconnects any DOM observer attached to the rendered node.
 	 */
 	disconnectDisabledAttributeObserver() {
 		if ( this.observer ) {
@@ -82,7 +82,7 @@ class Tooltip extends Component {
 
 	/**
 	 * Adds a DOM observer to the rendered node, if supported and if the DOM
-	 * node exists, to monitor for application of a disabled attribute
+	 * node exists, to monitor for application of a disabled attribute.
 	 */
 	observeDisabledAttribute() {
 		if ( ! window.MutationObserver || ! this.node ) {
@@ -150,7 +150,7 @@ class Tooltip extends Component {
 	}
 
 	render() {
-		const { children, position, text } = this.props;
+		const { children, position, text, shortcut } = this.props;
 		if ( Children.count( children ) !== 1 ) {
 			if ( 'development' === process.env.NODE_ENV ) {
 				// eslint-disable-next-line no-console
@@ -171,15 +171,17 @@ class Tooltip extends Component {
 			onBlur: this.createToggleIsOver( 'onBlur' ),
 			children: concatChildren(
 				child.props.children,
-				<Popover
-					isOpen={ isOver }
-					focusOnOpen={ false }
-					position={ position }
-					className="components-tooltip"
-					aria-hidden="true"
-				>
-					{ text }
-				</Popover>,
+				isOver && (
+					<Popover
+						focusOnMount={ false }
+						position={ position }
+						className="components-tooltip"
+						aria-hidden="true"
+					>
+						{ text }
+						{ shortcut && <span className="components-tooltip__shortcut">{ shortcut }</span> }
+					</Popover>
+				),
 			),
 		} );
 	}

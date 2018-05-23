@@ -1,6 +1,6 @@
 # withAPIData
 
-`withAPIData` is a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html) for orechestrating REST API data fetching. Simply compose your component using `withAPIData` and a description of your component's data needs, and the requisite network requests will be performed automatically on your behalf.
+`withAPIData` is a React [higher-order component](https://facebook.github.io/react/docs/higher-order-components.html) for orchestrating REST API data fetching. Simply compose your component using `withAPIData` and a description of your component's data needs, and the requisite network requests will be performed automatically on your behalf.
 
 Out of the box, it includes:
 
@@ -15,7 +15,7 @@ Consider a post component which displays a placeholder message while it loads, a
 
 ```jsx
 function MyPost( { post } ) {
-	if ( post.isLoading ) {
+	if ( post.isLoading || 'undefined' === typeof post.data ) {
 		return <div>Loading...</div>;
 	}
 

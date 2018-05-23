@@ -1,25 +1,18 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { withAPIData } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { getCurrentPostType } from '../../selectors';
-
-export function PostStickyCheck( { postType, children, user } ) {
+export function PostStickyCheck( { hasStickyAction, postType, children } ) {
 	if (
 		postType !== 'post' ||
-		! user.data ||
-		! user.data.capabilities.publish_posts ||
-		! user.data.capabilities.edit_others_posts
+		! hasStickyAction
 	) {
 		return null;
 	}
@@ -27,21 +20,12 @@ export function PostStickyCheck( { postType, children, user } ) {
 	return children;
 }
 
-const applyConnect = connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
+		const post = select( 'core/editor' ).getCurrentPost();
 		return {
-			postType: getCurrentPostType( state ),
+			hasStickyAction: get( post, [ '_links', 'wp:action-sticky' ], false ),
+			postType: select( 'core/editor' ).getCurrentPostType(),
 		};
-	},
-);
-
-const applyWithAPIData = withAPIData( () => {
-	return {
-		user: '/wp/v2/users/me?context=edit',
-	};
-} );
-
-export default flowRight( [
-	applyConnect,
-	applyWithAPIData,
+	} ),
 ] )( PostStickyCheck );

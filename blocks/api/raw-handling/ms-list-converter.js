@@ -2,17 +2,12 @@
  * Browser dependencies
  */
 const { parseInt } = window;
-const { ELEMENT_NODE } = window.Node;
 
 function isList( node ) {
 	return node.nodeName === 'OL' || node.nodeName === 'UL';
 }
 
-export default function( node ) {
-	if ( node.nodeType !== ELEMENT_NODE ) {
-		return;
-	}
-
+export default function( node, doc ) {
 	if ( node.nodeName !== 'P' ) {
 		return;
 	}
@@ -43,7 +38,7 @@ export default function( node ) {
 		// See https://html.spec.whatwg.org/multipage/grouping-content.html#attr-ol-type.
 		const type = node.textContent.trim().slice( 0, 1 );
 		const isNumeric = /[1iIaA]/.test( type );
-		const newListNode = document.createElement( isNumeric ? 'ol' : 'ul' );
+		const newListNode = doc.createElement( isNumeric ? 'ol' : 'ul' );
 
 		if ( isNumeric ) {
 			newListNode.setAttribute( 'type', type );
@@ -54,7 +49,7 @@ export default function( node ) {
 
 	const listNode = node.previousElementSibling;
 	const listType = listNode.nodeName;
-	const listItem = document.createElement( 'li' );
+	const listItem = doc.createElement( 'li' );
 
 	let receivingNode = listNode;
 
@@ -78,7 +73,7 @@ export default function( node ) {
 
 	// Make sure we append to a list.
 	if ( ! isList( receivingNode ) ) {
-		receivingNode = receivingNode.appendChild( document.createElement( listType ) );
+		receivingNode = receivingNode.appendChild( doc.createElement( listType ) );
 	}
 
 	// Append the list item to the list.

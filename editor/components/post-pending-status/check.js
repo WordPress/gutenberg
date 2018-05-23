@@ -1,40 +1,29 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { withAPIData } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { isCurrentPostPublished } from '../../selectors';
-
-export function PostPendingStatusCheck( { isPublished, children, user } ) {
-	if ( isPublished || ! user.data || ! user.data.capabilities.publish_posts ) {
+export function PostPendingStatusCheck( { hasPublishAction, isPublished, children } ) {
+	if ( isPublished || ! hasPublishAction ) {
 		return null;
 	}
 
 	return children;
 }
 
-const applyConnect = connect(
-	( state ) => ( {
-		isPublished: isCurrentPostPublished( state ),
-	} ),
-);
-
-const applyWithAPIData = withAPIData( () => {
-	return {
-		user: '/wp/v2/users/me?context=edit',
-	};
-} );
-
-export default flowRight(
-	applyConnect,
-	applyWithAPIData
+export default compose(
+	withSelect( ( select ) => {
+		const { isCurrentPostPublished, getCurrentPostType, getCurrentPost } = select( 'core/editor' );
+		return {
+			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			isPublished: isCurrentPostPublished(),
+			postType: getCurrentPostType(),
+		};
+	} )
 )( PostPendingStatusCheck );

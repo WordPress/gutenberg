@@ -9,11 +9,14 @@ class Parsing_Test extends WP_UnitTestCase {
 	protected static $fixtures_dir;
 
 	function parsing_test_filenames() {
-		self::$fixtures_dir = dirname( dirname( __FILE__ ) ) . '/blocks/test/fixtures';
+		self::$fixtures_dir = dirname( dirname( __FILE__ ) ) . '/core-blocks/test/fixtures';
 
 		require_once dirname( dirname( __FILE__ ) ) . '/lib/parser.php';
 
-		$fixture_filenames = glob( self::$fixtures_dir . '/*.{json,html}', GLOB_BRACE );
+		$fixture_filenames = array_merge(
+			glob( self::$fixtures_dir . '/*.json' ),
+			glob( self::$fixtures_dir . '/*.html' )
+		);
 		$fixture_filenames = array_values( array_unique( array_map(
 			array( $this, 'clean_fixture_filename' ),
 			$fixture_filenames
@@ -58,7 +61,8 @@ class Parsing_Test extends WP_UnitTestCase {
 		$html            = self::strip_r( file_get_contents( $html_path ) );
 		$expected_parsed = json_decode( self::strip_r( file_get_contents( $parsed_json_path ) ), true );
 
-		$result = gutenberg_parse_blocks( $html );
+		$parser = new Gutenberg_PEG_Parser;
+		$result = $parser->parse( _gutenberg_utf8_split( $html ) );
 
 		$this->assertEquals(
 			$expected_parsed,

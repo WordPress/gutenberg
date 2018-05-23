@@ -1,65 +1,33 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-import { every, uniq, get, reduce, find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, Dashicon, IconButton, Toolbar, NavigableMenu } from '@wordpress/components';
-import { getBlockType, getBlockTypes, switchToBlockType, BlockIcon } from '@wordpress/blocks';
+import { getBlockType, getPossibleBlockTransformations, switchToBlockType } from '@wordpress/blocks';
+import { compose } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { replaceBlocks } from '../../actions';
-import { getBlock } from '../../selectors';
+import BlockIcon from '../block-icon';
 
 /**
  * Module Constants
  */
 const { DOWN } = keycodes;
 
-function BlockSwitcher( { blocks, onTransform } ) {
-	if ( ! blocks || ! blocks[ 0 ] ) {
+export function BlockSwitcher( { blocks, onTransform, isLocked } ) {
+	const allowedBlocks = getPossibleBlockTransformations( blocks );
+
+	if ( isLocked || ! allowedBlocks.length ) {
 		return null;
 	}
-	const isMultiBlock = blocks.length > 1;
+
 	const sourceBlockName = blocks[ 0 ].name;
-
-	if ( isMultiBlock && ! every( blocks, ( block ) => ( block.name === sourceBlockName ) ) ) {
-		return null;
-	}
-
 	const blockType = getBlockType( sourceBlockName );
-	const blocksToBeTransformedFrom = reduce( getBlockTypes(), ( memo, type ) => {
-		const transformFrom = get( type, 'transforms.from', [] );
-		const transformation = find(
-			transformFrom,
-			t => t.type === 'block' && t.blocks.indexOf( sourceBlockName ) !== -1 &&
-				( ! isMultiBlock || t.isMultiBlock )
-		);
-		return transformation ? memo.concat( [ type.name ] ) : memo;
-	}, [] );
-	const blocksToBeTransformedTo = get( blockType, 'transforms.to', [] )
-		.reduce(
-			( memo, transformation ) =>
-				memo.concat( ! isMultiBlock || transformation.isMultiBlock ? transformation.blocks : [] ),
-			[]
-		);
-	const allowedBlocks = uniq( blocksToBeTransformedFrom.concat( blocksToBeTransformedTo ) )
-		.reduce( ( memo, name ) => {
-			const type = getBlockType( name );
-			return !! type ? memo.concat( type ) : memo;
-		}, [] );
-
-	if ( ! allowedBlocks.length ) {
-		return null;
-	}
 
 	return (
 		<Dropdown
@@ -73,6 +41,7 @@ function BlockSwitcher( { blocks, onTransform } ) {
 						onToggle();
 					}
 				};
+				const label = __( 'Change block type' );
 
 				return (
 					<Toolbar>
@@ -82,7 +51,8 @@ function BlockSwitcher( { blocks, onTransform } ) {
 							onClick={ onToggle }
 							aria-haspopup="true"
 							aria-expanded={ isOpen }
-							label={ __( 'Change block type' ) }
+							label={ label }
+							tooltip={ label }
 							onKeyDown={ openOnArrowDown }
 						>
 							<Dashicon icon="arrow-down" />
@@ -126,18 +96,21 @@ function BlockSwitcher( { blocks, onTransform } ) {
 	);
 }
 
-export default connect(
-	( state, ownProps ) => {
+export default compose(
+	withSelect( ( select, ownProps ) => {
+		const { getBlock, getEditorSettings } = select( 'core/editor' );
+		const { templateLock } = getEditorSettings();
 		return {
-			blocks: ownProps.uids.map( ( uid ) => getBlock( state, uid ) ),
+			blocks: ownProps.uids.map( getBlock ),
+			isLocked: !! templateLock,
 		};
-	},
-	( dispatch, ownProps ) => ( {
+	} ),
+	withDispatch( ( dispatch, ownProps ) => ( {
 		onTransform( blocks, name ) {
-			dispatch( replaceBlocks(
+			dispatch( 'core/editor' ).replaceBlocks(
 				ownProps.uids,
 				switchToBlockType( blocks, name )
-			) );
+			);
 		},
-	} )
+	} ) ),
 )( BlockSwitcher );

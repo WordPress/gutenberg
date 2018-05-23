@@ -1,7 +1,24 @@
-export { createBlock, switchToBlockType, createReusableBlock } from './factory';
-export { default as parse, getBlockAttributes } from './parser';
-export { default as rawHandler } from './raw-handling';
-export { default as serialize, getBlockDefaultClassname, getBlockContent } from './serializer';
+export {
+	createBlock,
+	cloneBlock,
+	getPossibleBlockTransformations,
+	switchToBlockType,
+	getBlockTransforms,
+	findTransform,
+} from './factory';
+export {
+	default as parse,
+	getBlockAttributes,
+	parseWithAttributeSchema,
+} from './parser';
+export { default as rawHandler, getPhrasingContentSchema } from './raw-handling';
+export {
+	default as serialize,
+	getBlockContent,
+	getBlockDefaultClassName,
+	getBlockMenuDefaultClassName,
+	getSaveElement,
+} from './serializer';
 export { isValidBlock } from './validation';
 export { getCategories } from './categories';
 export {
@@ -11,8 +28,17 @@ export {
 	getUnknownTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
+	getDefaultBlockForPostFormat,
 	getBlockType,
 	getBlockTypes,
+	getBlockSupport,
 	hasBlockSupport,
+	isSharedBlock,
 } from './registration';
-
+export {
+	isUnmodifiedDefaultBlock,
+} from './utils';
+export {
+	doBlocksMatchTemplate,
+	synchronizeBlocksWithTemplate,
+} from './templates';

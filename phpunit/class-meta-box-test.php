@@ -112,55 +112,6 @@ class Meta_Box_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests for empty meta box.
-	 */
-	public function test_gutenberg_is_meta_box_empty_with_empty_meta_box() {
-		$context                              = 'side';
-		$post_type                            = 'post';
-		$meta_boxes                           = $this->meta_boxes;
-		$meta_boxes[ $post_type ][ $context ] = array();
-
-		$is_empty = gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type );
-		$this->assertTrue( $is_empty );
-	}
-
-	/**
-	 * Tests for non empty meta box area.
-	 */
-	public function test_gutenberg_is_meta_box_empty_with_non_empty_meta_box() {
-		$context    = 'normal';
-		$post_type  = 'post';
-		$meta_boxes = $this->meta_boxes;
-
-		$is_empty = gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type );
-		$this->assertFalse( $is_empty );
-	}
-
-	/**
-	 * Tests for non existant location.
-	 */
-	public function test_gutenberg_is_meta_box_empty_with_non_existant_location() {
-		$context    = 'test';
-		$post_type  = 'post';
-		$meta_boxes = $this->meta_boxes;
-
-		$is_empty = gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type );
-		$this->assertTrue( $is_empty );
-	}
-
-	/**
-	 * Tests for non existant page.
-	 */
-	public function test_gutenberg_is_meta_box_empty_with_non_existant_page() {
-		$context    = 'normal';
-		$post_type  = 'test';
-		$meta_boxes = $this->meta_boxes;
-
-		$is_empty = gutenberg_is_meta_box_empty( $meta_boxes, $context, $post_type );
-		$this->assertTrue( $is_empty );
-	}
-
-	/**
 	 * Test filtering of meta box data.
 	 */
 	public function test_gutenberg_filter_meta_boxes() {
@@ -234,5 +185,19 @@ class Meta_Box_Test extends WP_UnitTestCase {
 		$expected = $expected_meta_boxes;
 
 		$this->assertEquals( $expected, $actual );
+	}
+
+	/**
+	 * Test that a removed meta box remains empty after gutenberg_intercept_meta_box_render() fires.
+	 */
+	public function test_gutenberg_intercept_meta_box_render_skips_empty_boxes() {
+		global $wp_meta_boxes;
+
+		add_meta_box( 'test-intercept-box', 'Test Intercept box', '__return_empty_string', 'post', 'side', 'default' );
+		remove_meta_box( 'test-intercept-box', 'post', 'side' );
+
+		gutenberg_intercept_meta_box_render();
+
+		$this->assertFalse( $wp_meta_boxes['post']['side']['default']['test-intercept-box'] );
 	}
 }

@@ -1,20 +1,14 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { FormToggle, withInstanceId } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
 import PostStickyCheck from './check';
 
 export function PostSticky( { onUpdateSticky, postSticky = false, instanceId } ) {
@@ -27,29 +21,24 @@ export function PostSticky( { onUpdateSticky, postSticky = false, instanceId } )
 				key="toggle"
 				checked={ postSticky }
 				onChange={ () => onUpdateSticky( ! postSticky ) }
-				showHint={ false }
 				id={ stickyToggleId }
 			/>
 		</PostStickyCheck>
 	);
 }
 
-const applyConnect = connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
 		return {
-			postSticky: getEditedPostAttribute( state, 'sticky' ),
+			postSticky: select( 'core/editor' ).getEditedPostAttribute( 'sticky' ),
 		};
-	},
-	( dispatch ) => {
+	} ),
+	withDispatch( ( dispatch ) => {
 		return {
 			onUpdateSticky( postSticky ) {
-				dispatch( editPost( { sticky: postSticky } ) );
+				dispatch( 'core/editor' ).editPost( { sticky: postSticky } );
 			},
 		};
-	},
-);
-
-export default flowRight( [
-	applyConnect,
+	} ),
 	withInstanceId,
 ] )( PostSticky );

@@ -35,6 +35,10 @@ describe( 'normaliseBlocks', () => {
 		equal( normaliseBlocks( '<a href="#">test</a>' ), '<p><a href="#">test</a></p>' );
 	} );
 
+	it( 'should not break between inline siblings', () => {
+		equal( normaliseBlocks( '<strong>test</strong>&nbsp;is a test of&nbsp;<a href="#">test</a>&nbsp;using a&nbsp;<a href="#">test</a>.' ), '<p><strong>test</strong>&nbsp;is a test of&nbsp;<a href="#">test</a>&nbsp;using a&nbsp;<a href="#">test</a>.</p>' );
+	} );
+
 	it( 'should not append empty text nodes', () => {
 		equal( normaliseBlocks( '<p>test</p>\n' ), '<p>test</p>' );
 	} );

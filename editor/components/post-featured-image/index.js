@@ -1,93 +1,107 @@
 /**
  * External dependencies
  */
-import { connect } from 'react-redux';
-import { flowRight } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, Spinner, ResponsiveWrapper, withAPIData } from '@wordpress/components';
-import { MediaUploadButton } from '@wordpress/blocks';
+import { Button, Spinner, ResponsiveWrapper } from '@wordpress/components';
+import { compose } from '@wordpress/element';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import { getEditedPostAttribute } from '../../selectors';
-import { editPost } from '../../actions';
+import PostFeaturedImageCheck from './check';
+import MediaUpload from '../media-upload';
 
-function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media } ) {
+// Used when labels from post type were not yet loaded or when they are not present.
+const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
+const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove featured image' );
+
+function PostFeaturedImage( { featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
+	const postLabel = get( postType, [ 'labels' ], {} );
+
 	return (
-		<div className="editor-post-featured-image">
-			{ !! featuredImageId &&
-				<MediaUploadButton
-					buttonProps={ { className: 'button-link editor-post-featured-image__preview' } }
-					onSelect={ onUpdateImage }
-					type="image"
-				>
-					{ media && !! media.data &&
-						<ResponsiveWrapper
-							naturalWidth={ media.data.media_details.width }
-							naturalHeight={ media.data.media_details.height }
-						>
-							<img src={ media.data.source_url } alt={ __( 'Featured image' ) } />
-						</ResponsiveWrapper>
-					}
-					{ media && media.isLoading && <Spinner /> }
-				</MediaUploadButton>
-			}
-			{ !! featuredImageId && media && ! media.isLoading &&
-				<p className="editor-post-featured-image__howto">
-					{ __( 'Click the image to edit or update' ) }
-				</p>
-			}
-			{ ! featuredImageId &&
-				<MediaUploadButton
-					buttonProps={ { className: 'editor-post-featured-image__toggle button-link' } }
-					onSelect={ onUpdateImage }
-					type="image"
-				>
-					{ __( 'Set featured image' ) }
-				</MediaUploadButton>
-			}
-			{ !! featuredImageId &&
-				<Button className="editor-post-featured-image__toggle button-link" onClick={ onRemoveImage }>
-					{ __( 'Remove featured image' ) }
-				</Button>
-			}
-		</div>
+		<PostFeaturedImageCheck>
+			<div className="editor-post-featured-image">
+				{ !! featuredImageId &&
+					<MediaUpload
+						title={ postLabel.set_featured_image }
+						onSelect={ onUpdateImage }
+						type="image"
+						modalClass="editor-post-featured-image__media-modal"
+						render={ ( { open } ) => (
+							<Button className="editor-post-featured-image__preview" onClick={ open } isLink>
+								{ media &&
+									<ResponsiveWrapper
+										naturalWidth={ media.media_details.width }
+										naturalHeight={ media.media_details.height }
+									>
+										<img src={ media.source_url } alt={ __( 'Featured image' ) } />
+									</ResponsiveWrapper>
+								}
+								{ ! media && <Spinner /> }
+							</Button>
+						) }
+					/>
+				}
+				{ !! featuredImageId && media && ! media.isLoading &&
+					<p className="editor-post-featured-image__howto">
+						{ __( 'Click the image to edit or update' ) }
+					</p>
+				}
+				{ ! featuredImageId &&
+					<MediaUpload
+						title={ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+						onSelect={ onUpdateImage }
+						type="image"
+						modalClass="editor-post-featured-image__media-modal"
+						render={ ( { open } ) => (
+							<Button className="editor-post-featured-image__toggle" onClick={ open } isLink>
+								{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+							</Button>
+						) }
+					/>
+				}
+				{ !! featuredImageId &&
+					<Button className="editor-post-featured-image__toggle" onClick={ onRemoveImage } isLink>
+						{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
+					</Button>
+				}
+			</div>
+		</PostFeaturedImageCheck>
 	);
 }
 
-const applyConnect = connect(
-	( state ) => {
-		return {
-			featuredImageId: getEditedPostAttribute( state, 'featured_media' ),
-		};
-	},
-	{
-		onUpdateImage( image ) {
-			return editPost( { featured_media: image.id } );
-		},
-		onRemoveImage() {
-			return editPost( { featured_media: 0 } );
-		},
-	}
-);
-
-const applyWithAPIData = withAPIData( ( { featuredImageId } ) => {
-	if ( ! featuredImageId ) {
-		return {};
-	}
+const applyWithSelect = withSelect( ( select ) => {
+	const { getMedia, getPostType } = select( 'core' );
+	const { getEditedPostAttribute } = select( 'core/editor' );
+	const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 	return {
-		media: `/wp/v2/media/${ featuredImageId }`,
+		media: featuredImageId ? getMedia( featuredImageId ) : null,
+		postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		featuredImageId,
 	};
 } );
 
-export default flowRight(
-	applyConnect,
-	applyWithAPIData,
+const applyWithDispatch = withDispatch( ( dispatch ) => {
+	const { editPost } = dispatch( 'core/editor' );
+	return {
+		onUpdateImage( image ) {
+			editPost( { featured_media: image.id } );
+		},
+		onRemoveImage() {
+			editPost( { featured_media: 0 } );
+		},
+	};
+} );
+
+export default compose(
+	applyWithSelect,
+	applyWithDispatch,
 )( PostFeaturedImage );

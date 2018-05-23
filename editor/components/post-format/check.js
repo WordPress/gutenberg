@@ -1,40 +1,24 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-import { get, flowRight } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withAPIData } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { getCurrentPostType } from '../../selectors';
+import PostTypeSupportCheck from '../post-type-support-check';
 
-function PostFormatCheck( { postType, children } ) {
-	if ( ! get( postType.data, [ 'supports', 'post-formats' ] ) ) {
-		return null;
-	}
-
-	return children;
+function PostFormatCheck( { disablePostFormats, ...props } ) {
+	return ! disablePostFormats &&
+		<PostTypeSupportCheck { ...props } supportKeys="post-formats" />;
 }
 
-export default flowRight( [
-	connect(
-		( state ) => {
-			return {
-				postTypeSlug: getCurrentPostType( state ),
-			};
-		},
-	),
-	withAPIData( ( props ) => {
-		const { postTypeSlug } = props;
-
+export default withSelect(
+	( select ) => {
+		const editorSettings = select( 'core/editor' ).getEditorSettings();
 		return {
-			postType: `/wp/v2/types/${ postTypeSlug }?context=edit`,
+			disablePostFormats: editorSettings.disablePostFormats,
 		};
-	} ),
-] )( PostFormatCheck );
+	}
+)( PostFormatCheck );
+

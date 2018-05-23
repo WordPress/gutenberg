@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { flatMap } from 'lodash';
 
 /**
  * Internal dependencies
@@ -9,6 +10,36 @@ import classnames from 'classnames';
 import './style.scss';
 import IconButton from '../icon-button';
 
+/**
+ * Renders a toolbar with controls.
+ *
+ * The `controls` prop accepts an array of sets. A set is an array of controls.
+ * Controls have the following shape:
+ *
+ * ```
+ * {
+ *   icon: string,
+ *   title: string,
+ *   subscript: string,
+ *   onClick: Function,
+ *   isActive: boolean,
+ *   isDisabled: boolean
+ * }
+ * ```
+ *
+ * For convenience it is also possible to pass only an array of controls. It is
+ * then assumed this is the only set.
+ *
+ * Either `controls` or `children` is required, otherwise this components
+ * renders nothing.
+ *
+ * @param {?Array}        controls  The controls to render in this toolbar.
+ * @param {?ReactElement} children  Any other things to render inside the
+ *                                  toolbar besides the controls.
+ * @param {?string}       className Class to set on the container div.
+ *
+ * @return {ReactElement} The rendered toolbar.
+ */
 function Toolbar( { controls = [], children, className } ) {
 	if (
 		( ! controls || ! controls.length ) &&
@@ -25,16 +56,16 @@ function Toolbar( { controls = [], children, className } ) {
 
 	return (
 		<div className={ classnames( 'components-toolbar', className ) }>
-			{ controlSets.reduce( ( result, controlSet, setIndex ) => [
-				...result,
-				...controlSet.map( ( control, controlIndex ) => (
+			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
+				controlSet.map( ( control, indexOfControl ) => (
 					<div
-						key={ [ setIndex, controlIndex ].join() }
-						className={ setIndex > 0 && controlIndex === 0 ? 'has-left-divider' : null }
+						key={ [ indexOfSet, indexOfControl ].join() }
+						className={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
 					>
 						<IconButton
 							icon={ control.icon }
 							label={ control.title }
+							shortcut={ control.shortcut }
 							data-subscript={ control.subscript }
 							onClick={ ( event ) => {
 								event.stopPropagation();
@@ -48,8 +79,8 @@ function Toolbar( { controls = [], children, className } ) {
 						/>
 						{ control.children }
 					</div>
-				) ),
-			], [] ) }
+				) )
+			) ) }
 			{ children }
 		</div>
 	);
