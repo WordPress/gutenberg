@@ -804,7 +804,7 @@ export class RichText extends Component {
 	changeFormats( formats ) {
 		forEach( formats, ( formatValue, format ) => {
 			if ( format === 'link' ) {
-				if ( formatValue !== undefined ) {
+				if ( !! formatValue ) {
 					if ( formatValue.isAdding ) {
 						return;
 					}

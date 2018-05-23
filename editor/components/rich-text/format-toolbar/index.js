@@ -135,7 +135,7 @@ class FormatToolbar extends Component {
 	}
 
 	dropLink() {
-		this.props.onChange( { link: undefined } );
+		this.props.onChange( { link: null } );
 		this.setState( { linkValue: '' } );
 	}
 

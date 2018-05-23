@@ -3,6 +3,13 @@
 	z-index: z-index( ".components-popover" );
 	left: 50%;
 
+	&.is-mobile {
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+
 	&:not(.is-mobile) {
 		margin-left: 2px;
 
@@ -82,6 +89,7 @@
 		position: absolute;
 		min-width: 260px;
 		height: auto;
+		overflow-y: auto;
 	}
 
 	.components-popover:not(.is-mobile).is-top & {

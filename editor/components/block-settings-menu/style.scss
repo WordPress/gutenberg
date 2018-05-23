@@ -37,11 +37,9 @@
 .editor-block-settings-menu__toggle .dashicon {
 	transform: rotate( 90deg );
 }
-	
+
 // Popout menu
 .editor-block-settings-menu__popover {
-	z-index: z-index( '.editor-block-settings-menu__popover' );
-
 	&:before,
 	&:after {
 		margin-left: 2px;
