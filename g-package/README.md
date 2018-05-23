@@ -4,7 +4,7 @@ We made [Gutenberg](https://github.com/Wordpress/gutenberg) editor a little more
 
 Gutenberg editor can **be easly included in your apps** with this [package](https://github.com/front/gutenberg). Also you can customize blocks menu tabs, blocks categories, document panels and more! 
 
-This package is based on [Gutenberg v2.8.0](https://github.com/WordPress/gutenberg/releases/tag/v2.8.0).
+This package is based on [Gutenberg v2.9.2](https://github.com/WordPress/gutenberg/releases/tag/v2.9.2).
 
 ## Table of contents
 * [Installation](#installation)
@@ -16,6 +16,7 @@ This package is based on [Gutenberg v2.8.0](https://github.com/WordPress/gutenbe
         * [PUT post or page](#put-post-or-page)
         * [GET categories](#get-categories)
         * [GET /](#get-)
+        * [POST media](#post-media)
     * [url](#url)
 * [Customize your Gutenberg](#customize-your-gutenberg)
     * [Block Menu Tabs](#block-menu-tabs)
@@ -45,8 +46,8 @@ import './globals';
 import { initializeEditor } from '@frontkom/gutenberg';
 
 // Don't forget to import the style
-import '@frontkom/gutenberg/dist/css/blocks/style.css';
-import '@frontkom/gutenberg/dist/css/blocks/edit-blocks.css';
+import '@frontkom/gutenberg/dist/css/core-blocks/style.css';
+import '@frontkom/gutenberg/dist/css/core-blocks/edit-blocks.css';
 import '@frontkom/gutenberg/dist/css/style.css';
 
 // DOM element id where editor will be displayed
@@ -59,7 +60,7 @@ const page = {
         rendered: '<p>Hello</p>' 
     },
     templates: '', // feel free to create your own templates
-    title: { raw: 'My first page', rendered: '' },
+    title: { raw: 'My first page', rendered: 'My first page' },
     type: 'page', // or 'post'
     id: 12345,
     ...
@@ -205,7 +206,7 @@ The request to get all [categories](https://v2.wp-api.org/reference/categories/)
 
 #### GET /
 
-Gutenberg will ask for the [theme features](https://codex.wordpress.org/Theme_Features) through the index request (`\`). The response should be the following object.
+Gutenberg will ask for the [theme features](https://codex.wordpress.org/Theme_Features) through the index request (`/`). The response should be the following object.
 
 ```js
 {
@@ -214,6 +215,16 @@ Gutenberg will ask for the [theme features](https://codex.wordpress.org/Theme_Fe
         formats: [ 'standard', 'aside', 'image', 'video', 'quote', 'link', 'gallery', 'audio' ],
         'post-thumbnails': true,
     },
+    ...,
+}
+```
+
+#### POST media
+To do
+
+```js
+{
+    ...,
     ...,
 }
 ```
