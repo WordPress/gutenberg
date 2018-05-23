@@ -2,14 +2,14 @@
  * External dependencies
  */
 const { realpathSync } = require( 'fs' );
-const readPkgUp = require( 'read-pkg-up' );
+const { sync: readPkgUp } = require( 'read-pkg-up' );
 
 /**
  * Internal dependencies
  */
 const { getCurrentWorkingDirectory } = require( './process' );
 
-const { pkg, path: pkgPath } = readPkgUp.sync( {
+const { pkg, path: pkgPath } = readPkgUp( {
 	cwd: realpathSync( getCurrentWorkingDirectory() ),
 } );
 

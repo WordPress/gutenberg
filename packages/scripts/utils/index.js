@@ -22,6 +22,9 @@ const fromProjectRoot = ( fileName ) =>
 const hasProjectFile = ( fileName ) =>
 	existsSync( fromProjectRoot( fileName ) );
 
+const fromConfigRoot = ( fileName ) =>
+	path.join( path.dirname( __dirname ), 'config', fileName );
+
 const fromScriptsRoot = ( scriptName ) =>
 	path.join( path.dirname( __dirname ), 'scripts', `${ scriptName }.js` );
 
@@ -74,6 +77,7 @@ const spawnScript = ( scriptName, args = [] ) => {
 };
 
 module.exports = {
+	fromConfigRoot,
 	getCliArgs,
 	hasCliArg,
 	hasProjectFile,
