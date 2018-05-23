@@ -9,7 +9,7 @@ This package is based on [Gutenberg v2.9.2](https://github.com/WordPress/gutenbe
 ## Table of contents
 * [Installation](#installation)
 * [Usage](#usage)
-    * [getPostContent](#getpostcontent)
+    * [Gutenberg Stores](#gutenberg-stores)
 * [Global variables](#global-variables)
     * [apiRequest](#apirequest)
         * [GET types](#get-types)
@@ -17,6 +17,7 @@ This package is based on [Gutenberg v2.9.2](https://github.com/WordPress/gutenbe
         * [GET categories](#get-categories)
         * [GET /](#get-)
         * [POST media](#post-media)
+        * [GET media](#get-media)
     * [url](#url)
 * [Customize your Gutenberg](#customize-your-gutenberg)
     * [Block Menu Tabs](#block-menu-tabs)
@@ -81,16 +82,20 @@ initializeEditor( target, page, settings );
 
 **Note**: Gutenberg requires utf-8 encoding, so don't forget to add `<meta charset="utf-8">` tag to your html `<head>`.
 
-### getPostContent
+### Gutenberg Stores
 
-Additionally, after initializing the editor, you can get the content of the post, calling **Gutenberg by Frontkom** `getPostContent` method:
+Additionally, after initializing the editor, you can have access to Gutenberg stores (`core`, `core/blocks`, `core/data`, `core/edit-post`, `core/editor`, `core/viewport`) and respective actions using `select` and `dispatch` methods:
 
 ```js
-// Importing getPostContent method from @frontkom/gutenberg package
-import { getPostContent } from '@frontkom/gutenberg';
+// Importing select and dispatch methods from @frontkom/gutenberg package
+import { select, dispatch } from '@frontkom/gutenberg';
 
-console.log( getPostContent );
+// Use dispatch to change the state of something
+dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+dispatch( 'core/edit-post' ).closeGeneralSidebar();
 
+// Use select to get the state of something
+select( 'core/editor' ).getEditedPostContent();
 // <!-- wp:paragraph -->
 // <p>Hello</p>
 // <!-- /wp:paragraph -->
@@ -220,11 +225,33 @@ Gutenberg will ask for the [theme features](https://codex.wordpress.org/Theme_Fe
 ```
 
 #### POST media
-To do
+
+To save [media](https://v2.wp-api.org/reference/media/), Gutenberg makes a POST request to `/wp/v2/media` sending a `data` object. The response should be an object like this:
 
 ```js
 {
     ...,
+    id: 1527069591355,    
+    link: MEDIA_LINK_HERE,
+    source_url: MEDIA_URLHERE,
+    // Additionaly, you can add some data attributes for images for example
+    data: { entity_type: 'file', entity_uuid: 'e94e9d8d-4cf4-43c1-b95e-1527069591355' }
+    ...,
+}
+```
+
+#### GET media
+
+The request to retrieve a media [media](https://v2.wp-api.org/reference/media/) is `/wp/v2/media/[id]`. The response should be an object like this:
+
+```js
+{
+    ...,
+    id: 1527069591355,    
+    link: MEDIA_LINK_HERE,
+    source_url: MEDIA_URLHERE,
+    // Additionaly, you can add some data attributes for images for example
+    data: { entity_type: 'file', entity_uuid: 'e94e9d8d-4cf4-43c1-b95e-1527069591355' }
     ...,
 }
 ```
@@ -248,11 +275,11 @@ import { parse as parseQueryString, stringify } from 'querystring';
  * @return {String}       Updated URL
  */
 export function addQueryArgs( url, args ) {
-   const parsedURL = parse( url, true );
-   const query = { ...parsedURL.query, ...args };
-   delete parsedURL.search;
+    const parsedURL = parse( url, true );
+    const query = { ...parsedURL.query, ...args };
+    delete parsedURL.search;
 
-   return format( { ...parsedURL, query } );
+    return format( { ...parsedURL, query } );
 }
 ```
 
@@ -375,7 +402,7 @@ The **Post Block** is another kind of blocks created by **Gutenberg by Frontkom*
 
 ### Events (experimental)
 
-**Gutenberg by Frontkom** makes possible to define a callback (or effect) for Gutenberg actions. Since it is an experimental feature, we are only providing this for 'OPEN_GENERAL_SIDEBAR' and 'CLOSE_GENERAL_SIDEBAR' actions.
+**Gutenberg by Frontkom** makes possible to define callbacks (or effects) for Gutenberg actions. Since it is an experimental feature, we are only providing this for 'OPEN_GENERAL_SIDEBAR' and 'CLOSE_GENERAL_SIDEBAR' actions.
 
 ```js
 window.customGutenberg = {
