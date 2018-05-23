@@ -18,7 +18,7 @@ export function createSlotFill( name, slotWrap = 'div' ) {
 	FillComponent.displayName = name + 'Fill';
 
 	const SlotComponent = ( { children, ...props } ) => (
-		<Slot name={ name } { ...props } SlotWrap={slotWrap}>
+		<Slot name={ name } { ...props } SlotWrap={ slotWrap }>
 			{ children }
 		</Slot>
 	);
