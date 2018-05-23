@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import {
 	PanelBody,
 	ServerSideRender,
@@ -16,7 +16,7 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
-} from '@wordpress/blocks';
+} from '@wordpress/editor';
 
 class ArchivesBlock extends Component {
 	constructor() {
@@ -61,9 +61,9 @@ class ArchivesBlock extends Component {
 			</InspectorControls>
 		);
 
-		return [
-			inspectorControls,
-			isSelected && (
+		return (
+			<Fragment>
+				{ inspectorControls }
 				<BlockControls key="controls">
 					<BlockAlignmentToolbar
 						value={ align }
@@ -73,9 +73,9 @@ class ArchivesBlock extends Component {
 						controls={ [ 'left', 'center', 'right', 'full' ] }
 					/>
 				</BlockControls>
-			),
-			<ServerSideRender key="archives" block="core/archives" attributes={ this.props.attributes } />,
-		];
+				<ServerSideRender key="archives" block="core/archives" attributes={ this.props.attributes } />
+			</Fragment>
+		);
 	}
 }
 
