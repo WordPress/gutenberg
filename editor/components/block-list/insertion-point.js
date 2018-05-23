@@ -24,7 +24,11 @@ class BlockInsertionPoint extends Component {
 		this.onClick = this.onClick.bind( this );
 	}
 
-	onFocusInserter() {
+	onFocusInserter( event ) {
+		// We stop propagation of the focus event to avoid selecting the current block
+		// While we're trying to insert a new block
+		event.stopPropagation();
+
 		this.setState( {
 			isInserterFocused: true,
 		} );
