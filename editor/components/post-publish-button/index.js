@@ -41,10 +41,6 @@ export function PostPublishButton( {
 		publishStatus = 'publish';
 	}
 
-	const className = classnames( 'editor-post-publish-button', {
-		'is-saving': isSaving && ! isAutosaving,
-	} );
-
 	const onClick = () => {
 		onSubmit();
 		onStatusChange( publishStatus );
