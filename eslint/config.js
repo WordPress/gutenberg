@@ -160,4 +160,14 @@ module.exports = {
 		'valid-typeof': 'error',
 		yoda: 'off',
 	},
+	overrides: [
+		{
+			files: 'packages/**/*.js',
+			settings: {
+				react: {
+					pragma: 'createElement',
+				},
+			},
+		},
+	],
 };
