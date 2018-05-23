@@ -1,5 +1,4 @@
-Element
-=======
+# @wordpress/element
 
 Element is, quite simply, an abstraction layer atop [React](https://reactjs.org/).
 
@@ -14,7 +13,15 @@ On the `wp.element` global object, you will find the following, ordered roughly 
 - [`createElement`](https://reactjs.org/docs/react-api.html#createelement)
 - [`render`](https://reactjs.org/docs/react-dom.html#render)
 
-## Example
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/element@next --save
+```
+
+## Usage
 
 Let's render a customized greeting into an empty element:
 
@@ -62,3 +69,5 @@ If you've configured [Babel](http://babeljs.io/) for your project, you can opt i
 	]
 }
 ```
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

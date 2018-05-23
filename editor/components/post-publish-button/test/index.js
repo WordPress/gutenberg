@@ -130,6 +130,6 @@ describe( 'PostPublishButton', () => {
 			<PostPublishButton hasPublishAction={ true } isSaving />
 		);
 
-		expect( wrapper.hasClass( 'is-saving' ) ).toBe( true );
+		expect( wrapper.find( 'Button' ).prop( 'isBusy' ) ).toBe( true );
 	} );
 } );

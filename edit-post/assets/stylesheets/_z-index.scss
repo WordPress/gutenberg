@@ -3,8 +3,8 @@
 // value is designed to work with).
 
 $z-layers: (
+	'.editor-block-list__block-edit:before': 0,
 	'.editor-block-switcher__arrow': 1,
-	'.editor-block-list__block-edit:before': -1,
 	'.editor-block-list__block .wp-block-more:before': -1,
 	'.editor-block-list__block {core/image aligned left or right}': 20,
 	'.editor-block-list__block {core/image aligned wide or fullwide}': 20,
@@ -23,7 +23,6 @@ $z-layers: (
 	'.editor-format-toolbar__link-modal': 81, // should appear above block controls
 	'.editor-format-toolbar__link-container': 81, // link suggestions should also
 	'.core-blocks-gallery-item__inline-menu': 20,
-	'.editor-block-settings-menu__popover': 21, // Below the header, but above the block toolbar
 	'.editor-url-input__suggestions': 30,
 	'.edit-post-header': 30,
 	'.core-blocks-button__inline-link .editor-url-input__suggestions': 6, // URL suggestions for button block above sibling inserter

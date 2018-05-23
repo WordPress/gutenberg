@@ -64,6 +64,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 		const { hasMultiSelection, clearSelectedBlock } = this.props;
 		if ( hasMultiSelection ) {
 			clearSelectedBlock();
+			window.getSelection().removeAllRanges();
 		}
 	}
 

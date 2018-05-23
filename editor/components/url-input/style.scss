@@ -70,7 +70,7 @@ $input-size: 230px;
 
 	&:focus,
 	&.is-selected {
-		background: darken( $blue-medium-500, 15 ); // is overridden in _admin-schemes.scss to be theme dependant
+		background: color( theme( primary ) shade(15%) );
 		color: $white;
 		outline: none;
 	}

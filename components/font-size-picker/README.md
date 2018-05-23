@@ -14,7 +14,7 @@ function MyFontSizePicker() {
 	return (
 		<FontSizePicker
 			fontSizes={ [
-				{ shortName: 'S', size: 12 }
+				{ shortName: 'S', size: 12 },
 				{ shortName: 'M', size: 16 }
 			] }
 			fallbackFontSize={ fallbackFontSize }

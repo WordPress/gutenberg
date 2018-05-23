@@ -44,9 +44,7 @@ describe( 'PostTaxonomies', () => {
 
 		const wrapperOne = shallow(
 			<PostTaxonomies postType="book"
-				taxonomies={ {
-					data: [ genresTaxonomy, categoriesTaxonomy ],
-				} }
+				taxonomies={ [ genresTaxonomy, categoriesTaxonomy ] }
 			/>
 		);
 
@@ -54,15 +52,13 @@ describe( 'PostTaxonomies', () => {
 
 		const wrapperTwo = shallow(
 			<PostTaxonomies postType="book"
-				taxonomies={ {
-					data: [
-						genresTaxonomy,
-						{
-							...categoriesTaxonomy,
-							types: [ 'post', 'page', 'book' ],
-						},
-					],
-				} }
+				taxonomies={ [
+					genresTaxonomy,
+					{
+						...categoriesTaxonomy,
+						types: [ 'post', 'page', 'book' ],
+					},
+				] }
 			/>
 		);
 
@@ -83,9 +79,7 @@ describe( 'PostTaxonomies', () => {
 
 		const wrapperOne = shallow(
 			<PostTaxonomies postType="book"
-				taxonomies={ {
-					data: [ genresTaxonomy ],
-				} }
+				taxonomies={ [ genresTaxonomy ] }
 			/>
 		);
 
@@ -93,14 +87,12 @@ describe( 'PostTaxonomies', () => {
 
 		const wrapperTwo = shallow(
 			<PostTaxonomies postType="book"
-				taxonomies={ {
-					data: [
-						{
-							...genresTaxonomy,
-							visibility: { show_ui: false },
-						},
-					],
-				} }
+				taxonomies={ [
+					{
+						...genresTaxonomy,
+						visibility: { show_ui: false },
+					},
+				] }
 			/>
 		);
 
