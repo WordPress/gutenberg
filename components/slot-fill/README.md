@@ -1,4 +1,4 @@
-Slot Fill
+gSlot Fill
 =========
 
 Slot and Fill are a pair of components which enable developers to render elsewhere in a React element tree, a pattern often referred to as "portal" rendering. It is a pattern for component extensibility, where a single Slot may be occupied by an indeterminate number of Fills elsewhere in the application.
@@ -58,6 +58,15 @@ const Toolbar = () => (
 		<Slot />
 	</div>
 ); 
+```
+createSlotFill accepts an optional second parameter that allows customization of the element that wraps the items. It can accept an html tag or Component.
+
+```jsx
+// Wrap the items in a p tag
+const { Fill, Slot } = createSlotFill( 'Toolbar', 'p' );
+
+// Wrap the items in the <PanelRow/> component
+const { Fill, Slot } = createSlotFill( 'Toolbar', PanelRow );
 ```
 
 ## Props
