@@ -9,7 +9,7 @@ import { stringify } from 'querystring';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { TreeSelect, withAPIData, withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { TreeSelect, withAPIData, withInstanceId, withSpokenMessages, Button } from '@wordpress/components';
 import { buildTermsTree } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -251,14 +251,15 @@ class HierarchicalTermSelector extends Component {
 		return [
 			...this.renderTerms( availableTermsTree ),
 			! loading && hasCreateAction && (
-				<button
+				<Button
 					key="term-add-button"
 					onClick={ this.onToggleForm }
-					className="button-link editor-post-taxonomies__hierarchical-terms-add"
+					className="editor-post-taxonomies__hierarchical-terms-add"
 					aria-expanded={ showForm }
+					isLink
 				>
 					{ newTermButtonLabel }
-				</button>
+				</Button>
 			),
 			showForm && (
 				<form onSubmit={ this.onAddTerm } key="hierarchical-terms-form">
@@ -285,12 +286,13 @@ class HierarchicalTermSelector extends Component {
 							tree={ availableTermsTree }
 						/>
 					}
-					<button
+					<Button
+						isDefault
 						type="submit"
-						className="button editor-post-taxonomies__hierarchical-terms-submit"
+						className="editor-post-taxonomies__hierarchical-terms-submit"
 					>
 						{ newTermSubmitLabel }
-					</button>
+					</Button>
 				</form>
 			),
 		];

@@ -132,6 +132,26 @@
 
 	margin-bottom: $block-spacing;
 
+	/**
+	 * Notices
+	 */
+	 .components-placeholder .components-with-notices-ui {
+		margin: -10px 20px 12px 20px;
+		width: calc( 100% - 40px );
+	 }
+	 .components-with-notices-ui {
+		margin: 0 0 12px 0;
+		width: 100%;
+
+		.notice {
+			margin-left: 0px;
+			margin-right: 0px;
+
+			p {
+				font-size: $default-font-size;
+			}
+		}
+	 }
 
 	/**
 	 * Warnings
@@ -530,13 +550,13 @@
 /**
  * In-Canvas Inserter
  */
-
 .editor-block-list .editor-inserter {
 	margin: $item-spacing;
 	cursor: move;/* Fallback for IE/Edge < 14 */
 	cursor: grab;
 }
 
+// Insertion point (includes inbetween inserter and insertion indicator)
 .editor-block-list__insertion-point {
 	position: relative;
 	z-index: z-index( '.editor-block-list__insertion-point' );
@@ -544,7 +564,7 @@
 
 .editor-block-list__insertion-point-indicator {
 	position: absolute;
-	top: $block-padding - 1px; // Half the empty space between two blocks, minus the 2px height
+	top: calc( 50% - 1px);
 	height: 2px;
 	left: 0;
 	right: 0;
@@ -552,58 +572,57 @@
 }
 
 .editor-block-list__insertion-point-inserter {
+	display: flex;
 	position: absolute;
-	background: none;
-	border: none;
-	display: block;
 	top: 0;
+	bottom: auto;
+	left: 0;
+	right: 0;
 	height: $block-padding * 2; // Matches the whole empty space between two blocks
-	width: 100%;
-	cursor: pointer;
-	padding: 0;	// Unstyle inherited padding from core button
+	justify-content: center;
 
+	// Show a clickable plus
+	.editor-block-list__insertion-point-button {
+		margin-top: -4px;
+		border-radius: 50%;
+		color: $dark-gray-100;
+		background: $white;
+		height: $block-padding * 2 + 8px;
+		width: $block-padding * 2 + 8px;
+	
+		&:not(:disabled):not([aria-disabled="true"]):hover {
+			box-shadow: none;
+		}
+	
+	}
+
+	// Show a line indicator when hovering, but this is unclickable
 	&:before {
 		position: absolute;
-		top: $block-padding - 1px; // Half the empty space between two blocks, minus the 2px height
+		top: calc( 50% - 1px);
 		height: 2px;
-		left: $block-padding;
-		right: $block-padding;
+		left: 0;
+		right: 0;
 		background: $dark-gray-100;
 		content: '';
-		opacity: 0;
-		transition: opacity 0.1s linear 0.1s;
 	}
 
-	&:hover:before {
+	// Hide both the line and button until hovered
+	opacity: 0;
+	transition: opacity 0.1s linear 0.1s;
+
+	&:hover, &.is-visible {
 		opacity: 1;
-		transition: opacity 0.2s linear 0.5s;
-	}
-
-	&:focus {
-		outline: none;
-	}
-
-	// Show focus style when tabbing
-	&:focus:before {
-		opacity: 1;
-		transition: opacity 0.2s linear;
-		outline: 1px solid $dark-gray-300;
-		outline-offset: 2px;
-	}
-
-	// Don't show focus style when clicking
-	&:focus:active:before {
-		outline: none;
 	}
 }
 
 .editor-block-list__block > .editor-block-list__insertion-point {
 	position: absolute;
-	top: -$block-padding;
+	top: -$block-padding - $block-spacing / 2;
 	height: $block-padding * 2; // Matches the whole empty space between two blocks
 	bottom: auto;
-	left: 0;
-	right: 0;
+	left: -1px;
+	right: -1px;
 }
 
 .editor-block-list__block .editor-block-list__block-html-textarea {

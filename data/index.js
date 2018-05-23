@@ -15,7 +15,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import registerDataStore from './store';
 
-export { loadAndPersist, withRehydratation } from './persist';
+export { loadAndPersist, withRehydration, withRehydratation } from './persist';
 
 /**
  * Module constants

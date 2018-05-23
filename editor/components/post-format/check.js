@@ -14,8 +14,11 @@ function PostFormatCheck( { disablePostFormats, ...props } ) {
 }
 
 export default withSelect(
-	( select ) => ( {
-		disablePostFormats: select( 'core/editor' ).getEditorSettings(),
-	} )
+	( select ) => {
+		const editorSettings = select( 'core/editor' ).getEditorSettings();
+		return {
+			disablePostFormats: editorSettings.disablePostFormats,
+		};
+	}
 )( PostFormatCheck );
 

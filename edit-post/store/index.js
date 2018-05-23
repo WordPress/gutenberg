@@ -3,7 +3,7 @@
  */
 import {
 	registerStore,
-	withRehydratation,
+	withRehydration,
 	loadAndPersist,
 } from '@wordpress/data';
 
@@ -21,7 +21,7 @@ import * as selectors from './selectors';
 const STORAGE_KEY = `WP_EDIT_POST_PREFERENCES_${ window.userSettings.uid }`;
 
 const store = registerStore( 'core/edit-post', {
-	reducer: withRehydratation( reducer, 'preferences', STORAGE_KEY ),
+	reducer: withRehydration( reducer, 'preferences', STORAGE_KEY ),
 	actions,
 	selectors,
 } );
