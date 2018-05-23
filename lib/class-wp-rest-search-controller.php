@@ -344,7 +344,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 
 		$schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'search',
+			'title'      => 'search-result',
 			'type'       => 'object',
 			'properties' => array(
 				'id'    => array(
