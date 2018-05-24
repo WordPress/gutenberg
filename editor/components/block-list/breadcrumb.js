@@ -6,9 +6,9 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { compose, Component } from '@wordpress/element';
+import { compose, Component, Fragment } from '@wordpress/element';
 import { Toolbar } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -61,9 +61,11 @@ export class BlockBreadcrumb extends Component {
 			} ) }>
 				<Toolbar>
 					{ rootUID && (
-						<BlockTitle uid={ rootUID } />
+						<Fragment>
+							<BlockTitle uid={ rootUID } />
+							<span> &rarr; </span>
+						</Fragment>
 					) }
-					{ rootUID && ( <span> &rarr; </span> ) }
 					<BlockTitle uid={ uid } />
 				</Toolbar>
 			</div>
@@ -78,14 +80,6 @@ export default compose( [
 
 		return {
 			rootUID: getBlockRootUID( uid ),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const { rootUID } = ownProps;
-		const { selectBlock } = dispatch( 'core/editor' );
-
-		return {
-			selectRootBlock: () => selectBlock( rootUID ),
 		};
 	} ),
 ] )( BlockBreadcrumb );

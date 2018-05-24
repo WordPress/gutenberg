@@ -425,7 +425,6 @@ export class BlockListBlock extends Component {
 
 		// If the block is selected and we're typing the block should not appear.
 		// Empty paragraph blocks should always show up as unselected.
-		const isSelectedNotTyping = isSelected && ! isTypingWithinBlock;
 		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! showSideInserter && ( isSelected || hasSelectedInnerBlock ) && ! isTypingWithinBlock;
@@ -622,7 +621,6 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled,
 		getSelectedBlocksInitialCaretPosition,
 		getEditorSettings,
-		getBlockRootUID,
 		hasSelectedInnerBlock,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( uid );
@@ -653,9 +651,6 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		block,
 		isSelected,
 		hasFixedToolbar,
-		rootUIDOfRoot: getBlockRootUID( rootUID ),
-		orderOfRoot: getBlockIndex( rootUID, getBlockRootUID( rootUID ) ),
-		isSelected,
 	};
 } );
 
