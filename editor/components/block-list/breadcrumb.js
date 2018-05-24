@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { compose, Component, Fragment } from '@wordpress/element';
@@ -52,13 +47,10 @@ export class BlockBreadcrumb extends Component {
 	}
 
 	render( ) {
-		const { uid, rootUID, isHidden } = this.props;
-		const { isFocused } = this.state;
+		const { uid, rootUID } = this.props;
 
 		return (
-			<div className={ classnames( 'editor-block-list__breadcrumb', {
-				'is-visible': ! isHidden || isFocused,
-			} ) }>
+			<div className={ 'editor-block-list__breadcrumb' }>
 				<Toolbar>
 					{ rootUID && (
 						<Fragment>

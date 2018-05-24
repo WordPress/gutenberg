@@ -13,6 +13,10 @@
 
 	.components-toolbar {
 		border: none;
+	}
+
+	// Only show the left border if the Switcher is present
+	.editor-block-switcher + div > .components-toolbar {
 		border-left: 1px solid $light-gray-700;
 	}
 

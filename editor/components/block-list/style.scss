@@ -226,12 +226,6 @@
 		}
 	}
 
-
-	// Hover style
-	&.is-hovered > .editor-block-list__block-edit:before {
-		outline: 1px solid $blue-medium-300;
-	}
-
 	// Selected style
 	&.is-selected > .editor-block-list__block-edit:before {
 		// use opacity to work in various editor styles
@@ -242,6 +236,11 @@
 		.is-dark-theme & {
 			outline-color: $light-opacity-light-500;
 		}
+	}
+
+	// Hover style
+	&.is-hovered > .editor-block-list__block-edit:before {
+		outline: 1px solid $blue-medium-300;
 	}
 }
 
@@ -811,14 +810,11 @@
  .editor-block-list__breadcrumb {
 	position: absolute;
 	line-height: 1;
-	background: rgba( $white, .7 );
-	padding: 0px 4px 2px 4px;
 	z-index: z-index( '.editor-block-list__breadcrumb' );
 
 	// Position in the top right of the border
 	right: -$block-parent-side-ui-clearance - 1px;
-	top: -$block-padding - 4px;
-	background-color: $blue-medium-300;
+	top: -1px;
 
 	// Nested
 	.editor-block-list__block-edit & {
@@ -833,8 +829,15 @@
 		line-height: 1;
 		font-family: $default-font;
 		font-size: 11px;
-		color: $white;
 		cursor: default;
+		background: rgba( $white, .8 );
+		border: 1px solid $blue-medium-300;
+		padding: 2px 4px;
+	
+		// Animate in
+		.editor-block-list__block:hover & {
+			@include fade_in( .1s );
+		}
 	}
 }
 
