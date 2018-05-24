@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { parse as hpqParse } from 'hpq';
-import { castArray, mapValues, omit } from 'lodash';
+import { castArray, mapValues, omit, map, mapKeys, get, kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -128,6 +128,37 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'node':
 		case 'query':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
+
+			// get values for data attr as object
+			const data = get( attributeSchema.query, [ 'data' ] );
+
+			if ( data && data.type === 'object' ) {
+				// getting elements html
+				const schema = {
+					source: attributeSchema.source,
+					selector: attributeSchema.selector,
+					query: {
+						elements: {
+							source: 'html',
+							selector: data.parent,
+						},
+					},
+				};
+				const elements = parseWithAttributeSchema( innerHTML, schema );
+
+				value = map( value, ( attrs, k ) => {
+					// using jQuery to get data attrs easylly
+					const dataAttrs = jQuery( elements[ k ].elements ).data();
+
+					attrs.data = mapKeys( dataAttrs, ( v, key ) => {
+						// adding data suffix and changing from camelCase to dash
+						return `data-${ kebabCase( key ) }`;
+					} );
+
+					return attrs;
+				} );
+			}
+
 			break;
 	}
 

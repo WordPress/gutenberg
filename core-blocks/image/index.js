@@ -61,8 +61,8 @@ const blockAttributes = {
 		type: 'number',
 	},
 	data: {
-		type: 'array',
-		default: [],
+		type: 'object',
+		default: {},
 	},
 };
 

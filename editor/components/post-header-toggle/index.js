@@ -6,7 +6,7 @@ import { FormToggle, withInstanceId } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, Fragment } from '@wordpress/element';
 
-function PostHeader( { onToggleHeader, hasHeader = false, instanceId } ) {
+function PostHeaderToggle( { onToggleHeader, hasHeader = false, instanceId } ) {
 	const headerToggleId = 'header-toggle-' + instanceId;
 
 	return (
@@ -36,5 +36,5 @@ export default compose( [
 		};
 	} ),
 	withInstanceId,
-] )( PostHeader );
+] )( PostHeaderToggle );
 
