@@ -7,7 +7,7 @@ import { get, partial } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
+import { PanelBody, withFilters } from '@wordpress/components';
 import { PostFeaturedImage, PostFeaturedImageCheck } from '@wordpress/editor';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -57,4 +57,5 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 export default compose(
 	applyWithSelect,
 	applyWithDispatch,
+	withFilters( 'editor.FeaturedImage' ),
 )( FeaturedImage );
