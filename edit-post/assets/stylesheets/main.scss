@@ -200,11 +200,15 @@ body.gutenberg-editor-page {
 	}
 }
 
-@keyframes fade-in {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
+// Style the TinyMCE table resize handles
+.ephox-snooker-resizer-rows {
+	cursor: row-resize;
+}
+
+.ephox-snooker-resizer-cols {
+	cursor: col-resize;
+}
+
+.ephox-snooker-resizer-bar-dragging {
+	background: $blue-medium-500;
 }
