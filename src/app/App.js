@@ -1,6 +1,6 @@
 /** @format */
 
-import './globals';
+import '../globals';
 
 import { Provider } from 'react-redux';
 import { setupStore } from '../store';
