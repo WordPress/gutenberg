@@ -121,7 +121,8 @@ body.gutenberg-editor-page {
 // @todo submit as upstream patch as well
 .edit-post-sidebar,
 .editor-post-publish-panel,
-.editor-block-list__block {
+.editor-block-list__block,
+.components-popover {
 	.input-control, // upstream name is .regular-text
 	input[type=text],
 	input[type=search],
