@@ -26,24 +26,24 @@ $light-gray-100: #f8f9f9;
 $white: #fff;
 
 // Dark opacities, for use with light themes
-$dark-opacity-900: rgba( $dark-gray-900, .8 );
-$dark-opacity-800: rgba( $dark-gray-900, .75 );
-$dark-opacity-700: rgba( $dark-gray-900, .7 );
-$dark-opacity-600: rgba( $dark-gray-900, .65 );
-$dark-opacity-500: rgba( $dark-gray-900, .6 );
-$dark-opacity-400: rgba( $dark-gray-900, .55 );
-$dark-opacity-300: rgba( $dark-gray-900, .5 );
-$dark-opacity-200: rgba( $dark-gray-900, .45 );
-$dark-opacity-100: rgba( $dark-gray-900, .4 );
-$dark-opacity-light-900: rgba( $dark-gray-900, .35 );
-$dark-opacity-light-800: rgba( $dark-gray-900, .3 );
-$dark-opacity-light-700: rgba( $dark-gray-900, .25 );
-$dark-opacity-light-600: rgba( $dark-gray-900, .2 );
-$dark-opacity-light-500: rgba( $dark-gray-900, .15 );
-$dark-opacity-light-400: rgba( $dark-gray-900, .1 );
-$dark-opacity-light-300: rgba( $dark-gray-900, .075 );
-$dark-opacity-light-200: rgba( $dark-gray-900, .05 );
-$dark-opacity-light-100: rgba( $dark-gray-900, .025 );
+$dark-opacity-900: rgba( #000510, .9 );
+$dark-opacity-800: rgba( #00000a, .85 );
+$dark-opacity-700: rgba( #06060b, .8 );
+$dark-opacity-600: rgba( #000913, .75 );
+$dark-opacity-500: rgba( #0a1829, .7 );
+$dark-opacity-400: rgba( #0a1829, .65 );
+$dark-opacity-300: rgba( #0e1c2e, .6 );
+$dark-opacity-200: rgba( #162435, .55 );
+$dark-opacity-100: rgba(#223443, .5 );
+$dark-opacity-light-900: rgba( #304455, .45 );
+$dark-opacity-light-800: rgba( #425863, .4 );
+$dark-opacity-light-700: rgba( #667886, .35 );
+$dark-opacity-light-600: rgba( #7b86a2, .3 );
+$dark-opacity-light-500: rgba( #9197a2, .25 );
+$dark-opacity-light-400: rgba( #95959c, .2 );
+$dark-opacity-light-300: rgba( #829493, .15 );
+$dark-opacity-light-200: rgba( #8b8b96, .1 );
+$dark-opacity-light-100: rgba( #747474, .05 );
 
 // Light opacities, for use with dark themes
 $light-opacity-900: rgba( $white, 1 );
