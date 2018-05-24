@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { getSettings } from '@wordpress/date';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/element';
@@ -27,10 +26,10 @@ export function PostSchedule( { date, onUpdateDate } ) {
 			key="date-time-picker"
 			currentDate={ date }
 			utcOffset={ settings.timezone.offset }
-			todayButton={ __( 'Today' ) }
 			onChange={ onUpdateDate }
 			locale={ settings.l10n.locale }
 			is12Hour={ is12HourTime }
+			showTodayButton
 		/>
 	);
 }
