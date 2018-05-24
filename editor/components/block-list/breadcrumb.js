@@ -63,7 +63,7 @@ export class BlockBreadcrumb extends Component {
 					{ rootUID && (
 						<Fragment>
 							<BlockTitle uid={ rootUID } />
-							<span> &rarr; </span>
+							<span className="editor-block-list__descendant-arrow" />
 						</Fragment>
 					) }
 					<BlockTitle uid={ uid } />
