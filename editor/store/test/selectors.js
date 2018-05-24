@@ -3326,9 +3326,27 @@ describe( 'selectors', () => {
 						supportedBlocks: [ 'core/block1' ],
 					},
 				},
+				settings: {
+					allowedBlockTypes: false,
+				},
 			};
 
-			expect( getSupportedBlocks( state, 'block1', false ) ).toBe( false );
+			expect( getSupportedBlocks( state, 'block1' ) ).toBe( false );
+		} );
+		it( 'should return false if a template lock exists', () => {
+			const state = {
+				blockListSettings: {
+					block1: {
+						supportedBlocks: true,
+					},
+				},
+				settings: {
+					allowedBlockTypes: true,
+					templateLock: 'all',
+				},
+			};
+
+			expect( getSupportedBlocks( state, 'block1' ) ).toBe( false );
 		} );
 
 		it( 'should return the supportedBlocks of root block if all blocks are supported globally', () => {
@@ -3338,45 +3356,60 @@ describe( 'selectors', () => {
 						supportedBlocks: [ 'core/block1' ],
 					},
 				},
+				settings: {
+					allowedBlockTypes: true,
+				},
 			};
 
-			expect( getSupportedBlocks( state, 'block1', true ) ).toEqual( [ 'core/block1' ] );
+			expect( getSupportedBlocks( state, 'block1' ) ).toEqual( [ 'core/block1' ] );
 		} );
 
 		it( 'should return the globally supported blocks if all blocks are enable inside the root block', () => {
+			const supportedNestedBlocks = [ 'core/block1' ];
 			const state = {
 				blockListSettings: {
 					block1: {
 						supportedBlocks: true,
 					},
 				},
+				settings: {
+					allowedBlockTypes: supportedNestedBlocks,
+				},
 			};
 
-			expect( getSupportedBlocks( state, 'block1', [ 'core/block1' ] ) ).toEqual( [ 'core/block1' ] );
+			expect( getSupportedBlocks( state, 'block1' ) ).toEqual( supportedNestedBlocks );
 		} );
 
 		it( 'should return the globally supported blocks if the root block does not sets the supported blocks', () => {
+			const supportedNestedBlocks = [ 'core/block1' ];
 			const state = {
 				blockListSettings: {
 					block1: {
 						chicken: 'ribs',
 					},
 				},
+				settings: {
+					allowedBlockTypes: supportedNestedBlocks,
+				},
 			};
 
-			expect( getSupportedBlocks( state, 'block1', [ 'core/block1' ] ) ).toEqual( [ 'core/block1' ] );
+			expect( getSupportedBlocks( state, 'block1' ) ).toEqual( supportedNestedBlocks );
 		} );
 
 		it( 'should return the globally supported blocks if there are no settings for the root block', () => {
+			const supportedNestedBlocks = [ 'core/block1' ];
 			const state = {
 				blockListSettings: {
 					block1: {
 						supportedBlocks: true,
 					},
 				},
+				settings: {
+					allowedBlockTypes: supportedNestedBlocks,
+				},
 			};
 
-			expect( getSupportedBlocks( state, 'block2', [ 'core/block1' ] ) ).toEqual( [ 'core/block1' ] );
+			expect( getSupportedBlocks( state, 'block2' ) ).toEqual( supportedNestedBlocks );
 		} );
 
 		it( 'should return false if all blocks are disabled inside the root block ', () => {
@@ -3386,9 +3419,10 @@ describe( 'selectors', () => {
 						supportedBlocks: false,
 					},
 				},
+				settings: {},
 			};
 
-			expect( getSupportedBlocks( state, 'block1', [ 'core/block1' ] ) ).toBe( false );
+			expect( getSupportedBlocks( state, 'block1' ) ).toBe( false );
 		} );
 
 		it( 'should return the intersection of globally supported blocks with the supported blocks of the root block if both sets are defined', () => {
@@ -3398,9 +3432,12 @@ describe( 'selectors', () => {
 						supportedBlocks: [ 'core/block1', 'core/block2', 'core/block3' ],
 					},
 				},
+				settings: {
+					allowedBlockTypes: [ 'core/block2', 'core/block4', 'core/block5' ],
+				},
 			};
 
-			expect( getSupportedBlocks( state, 'block1', [ 'core/block2', 'core/block4', 'core/block5' ] ) ).toEqual(
+			expect( getSupportedBlocks( state, 'block1' ) ).toEqual(
 				[ 'core/block2' ]
 			);
 		} );

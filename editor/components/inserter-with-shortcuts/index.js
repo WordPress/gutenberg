@@ -8,7 +8,7 @@ import { filter, isEmpty } from 'lodash';
  */
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { compose } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { IconButton, ifCondition } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 
@@ -18,11 +18,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import BlockIcon from '../block-icon';
 import './style.scss';
 
-function InserterWithShortcuts( { items, isLocked, onInsert } ) {
-	if ( isLocked ) {
-		return null;
-	}
-
+function InserterWithShortcuts( { items, onInsert } ) {
 	const itemsWithoutDefaultBlock = filter( items, ( item ) =>
 		item.name !== getDefaultBlockName() || ! isEmpty( item.initialAttributes )
 	).slice( 0, 3 );
@@ -46,14 +42,13 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 
 export default compose(
 	withSelect( ( select, { rootUID } ) => {
-		const { getEditorSettings, getFrecentInserterItems, getSupportedBlocks } = select( 'core/editor' );
-		const { templateLock, allowedBlockTypes } = getEditorSettings();
-		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
+		const { getFrecentInserterItems, getSupportedBlocks } = select( 'core/editor' );
+		const supportedBlocks = getSupportedBlocks( rootUID );
 		return {
 			items: getFrecentInserterItems( supportedBlocks, 4 ),
-			isLocked: !! templateLock,
 		};
 	} ),
+	ifCondition( ( { items } ) => items.length > 0 ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const { uid, rootUID, layout } = ownProps;
 

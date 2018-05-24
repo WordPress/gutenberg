@@ -217,11 +217,9 @@ export default compose(
 			getInserterItems,
 			getFrecentInserterItems,
 			getSupportedBlocks,
-			getEditorSettings,
 		} = select( 'core/editor' );
-		const { allowedBlockTypes } = getEditorSettings();
 		const { rootUID } = getBlockInsertionPoint();
-		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
+		const supportedBlocks = getSupportedBlocks( rootUID );
 		return {
 			items: getInserterItems( supportedBlocks ),
 			frecentItems: getFrecentInserterItems( supportedBlocks ),
