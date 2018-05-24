@@ -151,3 +151,27 @@ body.gutenberg-editor-page .editor-block-list__block[data-align="full"] {
 You can use those editor widths to match those in your theme. You can use any CSS width unit, including `%` or `px`.
 
 Further reading: [Applying Styles with Stylesheets](https://wordpress.org/gutenberg/handbook/blocks/applying-styles-with-stylesheets/).
+
+## Styling blocks
+
+### Default block styles
+
+Core blocks come with default theme styles, but the styles are not enqueued by default. If you'd like to take advantage of these styles, simply add theme support for `wp_block_styles`, and the styles will be enqueued.
+
+```php
+add_theme_support( 'wp_block_styles' );
+```
+
+### Adding block styles
+
+Themes may add styles for individual block types. You can do this by adding a `blocks` folder and filling it with files named after the blocks you want to style.
+
+For example, if you want Verse blocks to be written in cursive, you can create a file named `core.verse.css` in your theme's `blocks` folder, and it will be enqueued for both the editor and the front end.
+
+```css
+.wp-block-verse {
+	font-family: cursive;
+}
+```
+
+NOTE: If both a child and a parent theme provide styles for the same block type, only the styles of the child will be used.

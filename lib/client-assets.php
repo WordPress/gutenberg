@@ -421,6 +421,15 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_style_add_data( 'wp-edit-blocks', 'rtl', 'replace' );
 
+	if ( get_theme_support( 'wp_block_styles' ) ) {
+		wp_register_style(
+			'wp-core-blocks-theme',
+			gutenberg_url( 'build/core-blocks/theme.css' ),
+			array( 'wp-core-blocks' ),
+			filemtime( gutenberg_dir_path() . 'build/core-blocks/theme.css' )
+		);
+	}
+
 	wp_register_script(
 		'wp-plugins',
 		gutenberg_url( 'build/plugins/index.js' ),
@@ -855,6 +864,72 @@ function gutenberg_enqueue_registered_block_scripts_and_styles() {
 }
 add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
+
+/**
+ * Enqueues block styles provided by the theme.
+ *
+ * @since 3.0.0
+ */
+function gutenberg_enqueue_theme_block_styles() {
+	$is_editor                     = 'enqueue_block_editor_assets' === current_action();
+	$core_block_style_dependencies = $is_editor ?
+		array( 'wp-core-blocks', 'wp-edit-blocks' ) :
+		array( 'wp-core-blocks' );
+	$block_registry                = WP_Block_Type_Registry::get_instance();
+
+	// Add child theme first to give precedence over parent theme.
+	$theme_directories = array( get_stylesheet_directory() => get_stylesheet_directory_uri() );
+
+	if ( get_template_directory() !== get_stylesheet_directory() ) {
+		$theme_directories[ get_template_directory() ] = get_template_directory_uri();
+	}
+
+	foreach ( $theme_directories as $directory => $directory_uri ) {
+		$block_themes_directory = $directory . '/blocks/';
+		$block_themes_uri       = $directory_uri . '/blocks/';
+
+		if (
+			file_exists( $block_themes_directory ) && (
+			$block_themes_handle = opendir( $block_themes_directory )
+		) ) {
+			while ( $filename = readdir( $block_themes_handle ) ) {
+				if (
+					is_file( $block_themes_directory . $filename ) &&
+					pathinfo( $filename, PATHINFO_EXTENSION ) === 'css'
+				) {
+					$block_name         = str_replace( '.', '/', pathinfo( $filename, PATHINFO_FILENAME ) );
+					$block_type         = $block_registry->get_registered( $block_name );
+					$block_style_handle = 'theme-block-style-' . $block_name;
+					$block_style_uri    = $block_themes_uri . $filename;
+
+					if ( ! wp_style_is( $block_style_handle ) ) {
+						if ( $block_type ) {
+							$theme_style_dependencies = array();
+
+							if ( ! empty( $block_type->style ) ) {
+								$theme_style_dependencies += $block_type->style;
+							}
+
+							if ( $is_editor && ! empty( $block_style->editor_style ) ) {
+								$theme_style_dependencies += $block_type->editor_style;
+							}
+
+							wp_enqueue_style(
+								$block_style_handle, $block_style_uri, $theme_style_dependencies
+							);
+						} elseif ( preg_match( '/^core\//', $block_name ) ) {
+							wp_enqueue_style(
+								$block_style_handle, $block_style_uri, $core_block_style_dependencies
+							);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+add_action( 'enqueue_block_assets', 'gutenberg_enqueue_theme_block_styles' );
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_theme_block_styles' );
 
 /**
  * The code editor settings that were last captured by
