@@ -30,7 +30,7 @@ module.exports = {
 	},
 	
 	output: {
-		filename: './build/[basename]/index.js',
+		filename: 'build/[name].js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
