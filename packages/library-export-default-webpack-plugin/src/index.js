@@ -14,7 +14,7 @@ module.exports = class LibraryExportDefaultPlugin {
 			const { mainTemplate, chunkTemplate } = compilation;
 
 			const onRenderWithEntry = ( source, chunk ) => {
-				if ( ! includes( this.entryPointNames, chunk.id ) ) {
+				if ( ! includes( this.entryPointNames, chunk.name ) ) {
 					return source;
 				}
 				return new ConcatSource( source, '["default"]' );
