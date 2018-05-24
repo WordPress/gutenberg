@@ -4,10 +4,6 @@
 	&.is-transient {
 		@include loading_fade;
 	}
-
-	.editor-rich-text {
-		display: inline-block;
-	}
 }
 
 .wp-block-file__richtext-wrapper {
@@ -20,6 +16,10 @@
 }
 
 .wp-block-file__textlink {
-	cursor: text;
 	text-decoration: underline;
+
+	&:focus {
+		box-shadow: none;
+		color: $blue-medium-700;
+	}
 }

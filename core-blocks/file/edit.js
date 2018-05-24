@@ -49,7 +49,6 @@ class FileEdit extends Component {
 			editing: ! href,
 			href,
 			attachmentPage: undefined,
-			isCompositing: false, // for filtering premature onChange events in CJK
 		};
 
 		if ( id !== undefined ) {
@@ -78,18 +77,6 @@ class FileEdit extends Component {
 					this.uploadFromFiles( [ file ] );
 					revokeBlobURL( href );
 				} );
-		}
-	}
-
-	componentDidUpdate() {
-		const { fileName } = this.props.attributes;
-
-		// Strip line breaks caused by typing Enter key in RichText
-		if ( typeof fileName === 'object' ) {
-			const strings = fileName.filter( ( el ) => typeof el === 'string' );
-			this.props.setAttributes( {
-				fileName: strings.join( '' ).trim(),
-			} );
 		}
 	}
 
@@ -143,7 +130,7 @@ class FileEdit extends Component {
 			id,
 		} = this.props.attributes;
 		const { setAttributes, noticeUI, noticeOperations } = this.props;
-		const { editing, href, attachmentPage, isCompositing } = this.state;
+		const { editing, href, attachmentPage } = this.state;
 
 		const classNames = [
 			this.props.className,
@@ -153,9 +140,7 @@ class FileEdit extends Component {
 
 		// Choose Media File or Attachment Page (when file is in Media Library)
 		const onChangeLinkDestinationOption = ( newHref ) => {
-			setAttributes( {
-				textLinkHref: newHref,
-			} );
+			setAttributes( { textLinkHref: newHref } );
 		};
 
 		const onChangeOpenInNewWindow = ( newValue ) => {
@@ -165,32 +150,17 @@ class FileEdit extends Component {
 		};
 
 		const onChangeShowDownloadButton = ( newValue ) => {
-			setAttributes( {
-				showDownloadButton: newValue,
-			} );
+			setAttributes( { showDownloadButton: newValue } );
 		};
 
-		// Extract filename from RichText content and update attribute
-		const onChangeFileName = ( newRichTextLink ) => {
-			if ( isCompositing ) {
-				return; // ignore onChange events while composing in CJK
-			}
+		const onChangeFileName = ( text ) => {
+			setAttributes( { fileName: text } );
+		};
 
-			if ( newRichTextLink.length === 0 ) {
-				this.props.setAttributes( { fileName: '' } );
-				return;
-			}
-
-			const firstNode = newRichTextLink[ 0 ];
-			let newFileName;
-
-			if ( typeof firstNode === 'string' ) {
-				newFileName = firstNode;
-			} else {
-				newFileName = firstNode.props.children;
-			}
-
-			this.props.setAttributes( { fileName: newFileName } );
+		// Make sure that fileName is string, not ['string'],
+		// so it gets correctly rendered in the download attribute of <a>
+		const castFileNameToString = () => {
+			onChangeFileName( fileName.toString() );
 		};
 
 		if ( editing ) {
@@ -211,7 +181,6 @@ class FileEdit extends Component {
 			);
 		}
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<Fragment>
 				<FileBlockInspector
@@ -242,41 +211,36 @@ class FileEdit extends Component {
 					</Toolbar>
 				</BlockControls>
 				<div className={ classNames }>
-					<div // listens if user is in the middle of compositing in CJK
+					<div
 						className="wp-block-file__richtext-wrapper"
-						onCompositionStart={ () => this.setState( { isCompositing: true } ) }
-						onCompositionEnd={ ( event ) => {
-							this.setState( { isCompositing: false } );
-							setAttributes( { fileName: event.target.innerText } );
-						} }
+						onBlur={ castFileNameToString }
 					>
 						<RichText
-							tagName="div" // must be div (not span) or else cursor disappears
+							tagName="a"
 							className="wp-block-file__textlink"
-							value={ fileName && [ this.buildRichTextLink( fileName ) ] }
+							value={ fileName }
 							formattingControls={ [] } // disable controls
 							placeholder={ __( 'Write file name…' ) }
-							keepPlaceholderOnFocus={ ! isCompositing } // hide when CJK typing starts
+							keepPlaceholderOnFocus
 							onChange={ onChangeFileName }
 						/>
 					</div>
 					{ showDownloadButton &&
 						<div className="wp-block-file__button-richtext-wrapper">
 							<RichText
-								tagName="div"
+								tagName="div" // must be block-level element or else cursor disappears
 								className="wp-block-file__button"
 								value={ buttonText }
 								formattingControls={ [] } // disable controls
-								onChange={ ( text ) => setAttributes( { buttonText: text } ) }
 								placeholder={ __( 'Add text…' ) }
 								keepPlaceholderOnFocus
+								onChange={ ( text ) => setAttributes( { buttonText: text } ) }
 							/>
 						</div>
 					}
 				</div>
 			</Fragment>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
 
