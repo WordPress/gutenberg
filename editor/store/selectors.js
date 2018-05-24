@@ -312,6 +312,11 @@ export function isPostAutosaveable( state ) {
 		return false;
 	}
 
+	// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
+	if ( ! isEditedPostSaveable( state ) ) {
+		return false;
+	}
+
 	// If we don't already have an autosave, the post is autosaveable.
 	if ( ! hasAutosave( state ) ) {
 		return true;
