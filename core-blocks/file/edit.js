@@ -35,7 +35,6 @@ class FileEdit extends Component {
 		} = this.props.attributes;
 
 		this.onSelectFile = this.onSelectFile.bind( this );
-		this.uploadFromFiles = this.uploadFromFiles.bind( this );
 
 		// Initialize default values if undefined
 		this.props.setAttributes( {
@@ -71,10 +70,15 @@ class FileEdit extends Component {
 	componentDidMount() {
 		const { href } = this.state;
 
+		// Upload a file drag-and-dropped into the editor
 		if ( this.isBlobURL( href ) ) {
 			getBlobByURL( href )
 				.then( ( file ) => {
-					this.uploadFromFiles( [ file ] );
+					editorMediaUpload( {
+						allowedType: '*',
+						filesList: [ file ],
+						onFileChange: ( [ media ] ) => this.onSelectFile( media ),
+					} );
 					revokeBlobURL( href );
 				} );
 		}
@@ -97,10 +101,6 @@ class FileEdit extends Component {
 				editing: false,
 			} );
 		}
-	}
-
-	uploadFromFiles( files ) {
-		editorMediaUpload( files, ( [ media ] ) => this.onSelectFile( media ), '*' );
 	}
 
 	isBlobURL( url = '' ) {

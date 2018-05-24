@@ -15,7 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Wrapper around mediaUpload() that injects the current post ID.
  *
  * @param   {Object}   $0                   Parameters object passed to the function.
- * @param   {string}   $0.allowedType       The type of media that can be uploaded.
+ * @param   {string}   $0.allowedType       The type of media that can be uploaded, or '*' to allow all.
  * @param   {?Object}  $0.additionalData    Additional data to include in the request.
  * @param   {Array}    $0.filesList         List of files.
  * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
