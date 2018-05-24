@@ -89,6 +89,9 @@ const {
 	isPermalinkEditable,
 	getPermalink,
 	getPermalinkParts,
+	INSERTER_UTILITY_HIGH,
+	INSERTER_UTILITY_MEDIUM,
+	INSERTER_UTILITY_LOW,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2918,7 +2921,7 @@ describe( 'selectors', () => {
 			expect( testBlockBItem.isDisabled ).toBe( true );
 		} );
 
-		it( 'should give common blocks a medium utility', () => {
+		it( 'should give common blocks a low utility', () => {
 			const state = {
 				editor: {
 					present: {
@@ -2939,10 +2942,10 @@ describe( 'selectors', () => {
 			};
 			const items = getInserterItems( state );
 			const testBlockBItem = items.find( ( item ) => item.id === 'core/test-block-b' );
-			expect( testBlockBItem.utility ).toBe( 1 );
+			expect( testBlockBItem.utility ).toBe( INSERTER_UTILITY_LOW );
 		} );
 
-		it( 'should give used blocks a high utility and set a frecency', () => {
+		it( 'should give used blocks a medium utility and set a frecency', () => {
 			const state = {
 				editor: {
 					present: {
@@ -2965,11 +2968,11 @@ describe( 'selectors', () => {
 			};
 			const items = getInserterItems( state );
 			const sharedBlock2Item = items.find( ( item ) => item.id === 'core/test-block-b' );
-			expect( sharedBlock2Item.utility ).toBe( 2 );
+			expect( sharedBlock2Item.utility ).toBe( INSERTER_UTILITY_MEDIUM );
 			expect( sharedBlock2Item.frecency ).toBe( 2.5 );
 		} );
 
-		it( 'should give contextual blocks the highest utility', () => {
+		it( 'should give contextual blocks a high utility', () => {
 			const state = {
 				editor: {
 					present: {
@@ -2994,7 +2997,7 @@ describe( 'selectors', () => {
 			};
 			const items = getInserterItems( state, 'block1' );
 			const testBlockCItem = items.find( ( item ) => item.id === 'core/test-block-c' );
-			expect( testBlockCItem.utility ).toBe( 3 );
+			expect( testBlockCItem.utility ).toBe( INSERTER_UTILITY_HIGH );
 		} );
 	} );
 

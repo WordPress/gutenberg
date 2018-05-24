@@ -32,6 +32,10 @@ import { deprecated } from '@wordpress/utils';
 const MAX_RECENT_BLOCKS = 9;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
+export const INSERTER_UTILITY_HIGH = 3;
+export const INSERTER_UTILITY_MEDIUM = 2;
+export const INSERTER_UTILITY_LOW = 1;
+export const INSERTER_UTILITY_NONE = 0;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -1336,13 +1340,13 @@ export const getInserterItems = createSelector(
 
 		const calculateUtility = ( category, count, isContextual ) => {
 			if ( isContextual ) {
-				return 3;
+				return INSERTER_UTILITY_HIGH;
 			} else if ( count > 0 ) {
-				return 2;
+				return INSERTER_UTILITY_MEDIUM;
 			} else if ( category === 'common' ) {
-				return 1;
+				return INSERTER_UTILITY_LOW;
 			}
-			return 0;
+			return INSERTER_UTILITY_NONE;
 		};
 
 		const calculateFrecency = ( time, count ) => {
