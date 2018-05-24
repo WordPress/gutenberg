@@ -22,6 +22,7 @@
 
 	<rule ref="PHPCompatibility.PHP.NewKeywords.t_namespaceFound">
 		<exclude-pattern>lib/class-wp-rest-block-renderer-controller.php</exclude-pattern>
+		<exclude-pattern>lib/class-wp-rest-search-controller.php</exclude-pattern>
 	</rule>
 	<!-- These special comments are markers for the build process -->
 	<rule ref="Squiz.Commenting.InlineComment.WrongStyle">

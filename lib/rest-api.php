@@ -18,6 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 function gutenberg_register_rest_routes() {
 	$controller = new WP_REST_Block_Renderer_Controller();
 	$controller->register_routes();
+
+	$controller = new WP_REST_Search_Controller();
+	$controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 
