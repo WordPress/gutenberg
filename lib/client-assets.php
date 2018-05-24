@@ -116,16 +116,16 @@ function gutenberg_register_scripts_and_styles() {
 
 	// Editor Scripts.
 	wp_register_script(
-		'wp-devtools',
-		gutenberg_url( 'build/devtools/index.js' ),
+		'wp-deprecated',
+		gutenberg_url( 'build/deprecated/index.js' ),
 		array(),
-		filemtime( gutenberg_dir_path() . 'build/devtools/index.js' ),
+		filemtime( gutenberg_dir_path() . 'build/deprecated/index.js' ),
 		true
 	);
 	wp_register_script(
 		'wp-data',
 		gutenberg_url( 'build/data/index.js' ),
-		array( 'wp-devtools', 'wp-element', 'wp-is-shallow-equal', 'lodash' ),
+		array( 'wp-deprecated', 'wp-element', 'wp-is-shallow-equal', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/data/index.js' ),
 		true
 	);
@@ -146,7 +146,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-utils',
 		gutenberg_url( 'build/utils/index.js' ),
-		array( 'lodash', 'wp-devtools', 'wp-dom' ),
+		array( 'lodash', 'wp-deprecated', 'wp-dom' ),
 		filemtime( gutenberg_dir_path() . 'build/utils/index.js' ),
 		true
 	);
@@ -213,7 +213,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-blocks',
 		gutenberg_url( 'build/blocks/index.js' ),
-		array( 'wp-devtools', 'wp-dom', 'wp-element', 'wp-utils', 'wp-hooks', 'wp-i18n', 'shortcode', 'wp-data', 'lodash' ),
+		array( 'wp-deprecated', 'wp-dom', 'wp-element', 'wp-utils', 'wp-hooks', 'wp-i18n', 'shortcode', 'wp-data', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/blocks/index.js' ),
 		true
 	);
@@ -241,7 +241,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-blocks',
 			'wp-components',
 			'wp-core-data',
-			'wp-devtools',
+			'wp-deprecated',
 			'wp-element',
 			'wp-editor',
 			'wp-i18n',
@@ -335,7 +335,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-core-data',
 			'wp-data',
 			'wp-date',
-			'wp-devtools',
+			'wp-deprecated',
 			'wp-dom',
 			'wp-i18n',
 			'wp-element',

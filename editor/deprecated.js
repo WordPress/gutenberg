@@ -7,7 +7,7 @@ import { forEach } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { deprecated } from '@wordpress/devtools';
+import deprecated from '@wordpress/deprecated';
 import { withSelect } from '@wordpress/data';
 
 import {

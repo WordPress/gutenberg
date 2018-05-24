@@ -1,14 +1,14 @@
 {
-	"name": "@wordpress/devtools",
+	"name": "@wordpress/deprecated",
 	"version": "0.0.1",
-	"description": "Devtools module for WordPress",
+	"description": "Deprecation utility for WordPress",
 	"author": "WordPress",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"devtools"
+		"deprecated"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/devtools/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/deprecated/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git"

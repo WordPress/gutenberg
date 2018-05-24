@@ -24,7 +24,7 @@ import {
 	getRectangleFromRange,
 	getScrollContainer,
 } from '@wordpress/dom';
-import { deprecated } from '@wordpress/devtools';
+import deprecated from '@wordpress/deprecated';
 import {
 	keycodes,
 	createBlobURL,

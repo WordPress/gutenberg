@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { deprecated } from '../';
+import deprecated from '../';
 
 describe( 'deprecated', () => {
 	it( 'should show a deprecation warning', () => {

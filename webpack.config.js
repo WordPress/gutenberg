@@ -137,7 +137,7 @@ const entryPointNames = [
 
 const gutenbergPackages = [
 	'date',
-	'devtools',
+	'deprecated',
 	'dom',
 	'element',
 ];
@@ -276,7 +276,7 @@ const config = {
 				return path;
 			},
 		} ),
-		new LibraryExportDefaultPlugin( [ 'dom-ready' ].map( camelCaseDash ) ),
+		new LibraryExportDefaultPlugin( [ 'deprecated', 'dom-ready' ].map( camelCaseDash ) ),
 	],
 	stats: {
 		children: false,

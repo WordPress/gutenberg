@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import * as dom from '@wordpress/dom';
-import { deprecated as originalDeprecated } from '@wordpress/devtools';
+import originalDeprecated from '@wordpress/deprecated';
 
 const wrapFunction = ( functionName, source = dom ) => ( ...args ) => {
 	originalDeprecated( 'wp.utils.' + functionName, {
@@ -40,7 +40,7 @@ export const unwrap = wrapFunction( 'unwrap' );
 export function deprecated( ...params ) {
 	originalDeprecated( 'wp.utils.deprecated', {
 		version: '3.2',
-		alternative: 'wp.devtools.deprecated',
+		alternative: 'wp.deprecated',
 		plugin: 'Gutenberg',
 	} );
 

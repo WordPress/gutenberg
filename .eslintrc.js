@@ -55,8 +55,8 @@ module.exports = {
 				message: 'Use @wordpress/date as import path instead.',
 			},
 			{
-				selector: 'ImportDeclaration[source.value=/^devtools$/]',
-				message: 'Use @wordpress/devtools as import path instead.',
+				selector: 'ImportDeclaration[source.value=/^deprecated/]',
+				message: 'Use @wordpress/deprecated as import path instead.',
 			},
 			{
 				selector: 'ImportDeclaration[source.value=/^dom$/]',
