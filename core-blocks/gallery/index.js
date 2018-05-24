@@ -54,8 +54,11 @@ const blockAttributes = {
 				selector: 'figcaption',
 			},
 			data: {
-				type: 'array',
-				default: [],
+				source: 'attribute',
+				selector: 'img',
+				parent: 'figure',
+				type: 'object',
+				default: {},
 			},
 		},
 	},
