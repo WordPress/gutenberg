@@ -63,7 +63,6 @@ class FormatToolbar extends Component {
 			settingsVisible: false,
 			opensInNewWindow: false,
 			linkValue: '',
-			popoverId: 1, // Used to force popover render to force recomputing the anchor
 		};
 
 		this.addLink = this.addLink.bind( this );
@@ -100,7 +99,6 @@ class FormatToolbar extends Component {
 				settingsVisible: false,
 				opensInNewWindow: !! nextProps.formats.link && !! nextProps.formats.link.target,
 				linkValue: '',
-				popoverId: this.state.popoverId + 1,
 			} );
 		}
 	}
@@ -169,8 +167,8 @@ class FormatToolbar extends Component {
 	}
 
 	render() {
-		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
-		const { linkValue, settingsVisible, opensInNewWindow, popoverId } = this.state;
+		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [], selectedNodeId } = this.props;
+		const { linkValue, settingsVisible, opensInNewWindow } = this.state;
 		const isAddingLink = formats.link && formats.link.isAdding;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
@@ -211,7 +209,11 @@ class FormatToolbar extends Component {
 				{ ( isAddingLink || formats.link ) && (
 					<Fill name="RichText.Siblings">
 						<div className="editor-format-toolbar__link-container" style={ { ...focusPosition } }>
-							<Popover position="bottom center" focusOnMount={ !! isAddingLink } key={ popoverId }>
+							<Popover
+								position="bottom center"
+								focusOnMount={ !! isAddingLink }
+								key={ selectedNodeId /* Used to force rerender on change */ }
+							>
 								{ isAddingLink && (
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
