@@ -32,7 +32,8 @@
     "react-dom": "^16.2.0",
     "react-native-sass-transformer": "^1.1.1",
     "react-test-renderer": "16.2.0",
-    "remote-redux-devtools": "^0.5.12"
+    "remote-redux-devtools": "^0.5.12",
+    "sprintf-js": "^1.1.1"
   },
   "scripts": {
     "start": "react-native start",
