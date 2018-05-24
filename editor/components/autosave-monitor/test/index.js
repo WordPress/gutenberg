@@ -23,13 +23,13 @@ describe( 'AutosaveMonitor', () => {
 
 	describe( '#componentDidUpdate()', () => {
 		it( 'should start autosave timer when having become dirty and saveable', () => {
-			wrapper.setProps( { isDirty: true, isAutosaveable: true, isAutosaveable: true } );
+			wrapper.setProps( { isDirty: true, isAutosaveable: true } );
 
 			expect( toggleTimer ).toHaveBeenCalledWith( true );
 		} );
 
 		it( 'should stop autosave timer when the autosave is up to date', () => {
-			wrapper.setProps( { isDirty: true, isAutosaveable: true, isAutosaveable: false } );
+			wrapper.setProps( { isDirty: true, isAutosaveable: false } );
 
 			expect( toggleTimer ).toHaveBeenCalledWith( false );
 		} );
@@ -48,7 +48,7 @@ describe( 'AutosaveMonitor', () => {
 			expect( toggleTimer ).toHaveBeenCalledWith( false );
 		} );
 
-		it( 'should stop autosave timer when having become not saveable', () => {
+		it( 'should stop autosave timer when having become not autosaveable', () => {
 			wrapper.setProps( { isDirty: true } );
 			toggleTimer.mockClear();
 			wrapper.setProps( { isAutosaveable: false } );
