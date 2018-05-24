@@ -125,7 +125,13 @@ $block-inserter-search-height: 38px;
 	display: flex;
 	align-items: center;
 
+<<<<<<< HEAD
 	h2 {
 		font-size: 13px;
+=======
+	svg {
+		fill: currentColor;
+		transition: all 0.15s ease-out;
+>>>>>>> Custom icons for Blocks
 	}
 }
