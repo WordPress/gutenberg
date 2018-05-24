@@ -4,8 +4,8 @@
  */
 
 // Gutenberg imports
-import { registerCoreBlocks } from '@gutenberg/blocks/library';
-import { createBlock } from '@gutenberg/blocks/api';
+import { registerCoreBlocks } from '@gutenberg/core-blocks';
+import { createBlock } from '@gutenberg/blocks';
 
 import { createStore } from 'redux';
 import { reducer } from './reducers';

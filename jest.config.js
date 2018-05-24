@@ -3,8 +3,10 @@
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
 if ( process.env.TEST_RN_PLATFORM ) {
+	// eslint-disable-next-line no-console
 	console.log( 'Setting RN platform to: ' + process.env.TEST_RN_PLATFORM );
 } else {
+	// eslint-disable-next-line no-console
 	console.log( 'Setting RN platform to: default (' + defaultPlatform + ')' );
 }
 
@@ -28,6 +30,8 @@ module.exports = {
 		'node',
 	],
 	moduleNameMapper: {
+		'@wordpress/blocks': '<rootDir>/gutenberg/blocks',
+		'@wordpress/editor': '<rootDir>/gutenberg/editor',
 		'@wordpress/element': '<rootDir>/gutenberg/element',
 		'@wordpress/hooks': '<rootDir>/wordpress/hooks',
 		'@wordpress/utils': '<rootDir>/gutenberg/utils',
