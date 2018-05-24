@@ -1713,7 +1713,9 @@ export function getBlockListSettings( state, uid ) {
  *
  * @return {string[]|boolean} Blocks that can be nested inside the block with the specified uid, or true/false to enable/disable all types.
  */
-export function getSupportedBlocks( state, uid ) {
+// Disable reason: We have to accept `globallyEnabledBlockTypes` so as to be backwards compatible
+// eslint-disable-next-line no-unused-vars
+export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
 	deprecated( 'getSupportedBlocks', {
 		version: '3.1',
 		alternative: 'canInsertBlockType',
