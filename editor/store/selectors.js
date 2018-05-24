@@ -1274,12 +1274,12 @@ export const canInsertBlockType = createSelector(
  * @param {Object} state Global application state.
  * @param {string} id    A string which identifies the insert, e.g. 'core/block/12'
  *
- * @return {{ time: ?number, count: number }} An object containing `time` which is when the last
+ * @return {?{ time: number, count: number }} An object containing `time` which is when the last
  *                                            insert occured as a UNIX epoch, and `count` which is
  *                                            the number of inserts that have occurred.
  */
 function getInsertUsage( state, id ) {
-	return state.preferences.insertUsage[ id ] || { time: undefined, count: 0 };
+	return state.preferences.insertUsage[ id ] || null;
 }
 
 /**
@@ -1384,7 +1384,7 @@ export const getInserterItems = createSelector(
 			}
 
 			const isContextual = isArray( blockType.parent );
-			const { time, count } = getInsertUsage( state, id );
+			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 
 			return {
 				id,
@@ -1428,7 +1428,7 @@ export const getInserterItems = createSelector(
 			const referencedBlock = getBlock( state, sharedBlock.uid );
 			const referencedBlockType = getBlockType( referencedBlock.name );
 
-			const { time, count } = getInsertUsage( state, id );
+			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const utility = calculateUtility( 'shared', count, false );
 			const frecency = calculateFrecency( time, count );
 
