@@ -4,16 +4,14 @@
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, revokeBlobURL } from '@wordpress/utils';
 import {
-	Button,
-	FormFileUpload,
 	IconButton,
-	Placeholder,
 	Toolbar,
-	DropZone,
+	withNotices,
 } from '@wordpress/components';
-import { Component, Fragment } from '@wordpress/element';
+import { Component, compose, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
+	MediaPlaceholder,
 	BlockControls,
 	RichText,
 	editorMediaUpload,
@@ -25,7 +23,7 @@ import {
 import './editor.scss';
 import FileBlockInspector from './inspector';
 
-export default class FileEdit extends Component {
+class FileEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -96,20 +94,18 @@ export default class FileEdit extends Component {
 	}
 
 	onSelectFile( media ) {
-		const { fileName } = this.props.attributes;
-
 		if ( media && media.url ) {
 			// sets the block's attributes and updates the edit component from the
 			// selected media, then switches off the editing UI
 			this.props.setAttributes( {
 				href: media.url,
-				fileName: media.title || fileName,
+				fileName: media.title,
 				textLinkHref: media.url,
 				id: media.id,
 			} );
 			this.setState( {
 				href: media.url,
-				fileName: media.title || fileName,
+				fileName: media.title,
 				attachmentPage: media.link,
 				editing: false,
 			} );
@@ -146,7 +142,7 @@ export default class FileEdit extends Component {
 			buttonText,
 			id,
 		} = this.props.attributes;
-		const { setAttributes } = this.props;
+		const { setAttributes, noticeUI, noticeOperations } = this.props;
 		const { editing, href, attachmentPage, isCompositing } = this.state;
 
 		const classNames = [
@@ -154,27 +150,6 @@ export default class FileEdit extends Component {
 			`${ this.props.className }__editing`,
 			this.isBlobURL( href ) ? 'is-transient' : '',
 		].join( ' ' );
-
-		const switchToEditing = () => {
-			this.setState( { editing: true } );
-		};
-
-		const onSelectUrl = ( event ) => {
-			event.preventDefault();
-
-			// if url was changed
-			if ( href && href !== this.props.attributes.href ) {
-				setAttributes( {
-					href,
-					textLinkHref: href,
-					id: undefined,
-				} );
-				this.setState( { attachmentPage: undefined } );
-			}
-
-			this.setState( { editing: false } );
-			return false;
-		};
 
 		// Choose Media File or Attachment Page (when file is in Media Library)
 		const onChangeLinkDestinationOption = ( newHref ) => {
@@ -220,46 +195,19 @@ export default class FileEdit extends Component {
 
 		if ( editing ) {
 			return (
-				<Placeholder
+				<MediaPlaceholder
 					icon="media-default"
-					label={ __( 'File' ) }
-					instructions={ __( 'Select a file from your library, or upload a new one' ) }
-					className={ classNames }>
-					<DropZone
-						onFilesDrop={ this.uploadFromFiles }
-					/>
-					<form onSubmit={ onSelectUrl }>
-						<input
-							type="url"
-							className="components-placeholder__input"
-							placeholder={ __( 'Enter URL of file here…' ) }
-							onChange={ ( event ) => this.setState( { href: event.target.value } ) }
-							value={ href || '' } />
-						<Button
-							isLarge
-							type="submit">
-							{ __( 'Use URL' ) }
-						</Button>
-					</form>
-					<FormFileUpload
-						isLarge
-						className="wp-block-file__upload-button"
-						onChange={ ( event ) => this.uploadFromFiles( event.target.files ) }
-						accept="*"
-					>
-						{ __( 'Upload' ) }
-					</FormFileUpload>
-					<MediaUpload
-						onSelect={ this.onSelectFile }
-						type="*"
-						value={ id }
-						render={ ( { open } ) => (
-							<Button isLarge onClick={ open }>
-								{ __( 'Media Library' ) }
-							</Button>
-						) }
-					/>
-				</Placeholder>
+					labels={ {
+						title: __( 'File' ),
+						name: __( 'a file' ),
+					} }
+					className={ classNames }
+					onSelect={ this.onSelectFile }
+					notices={ noticeUI }
+					onError={ noticeOperations.createErrorNotice }
+					accept="*"
+					type="*"
+				/>
 			);
 		}
 
@@ -278,11 +226,18 @@ export default class FileEdit extends Component {
 				/>
 				<BlockControls>
 					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit file' ) }
-							onClick={ switchToEditing }
-							icon="edit"
+						<MediaUpload
+							onSelect={ this.onSelectFile }
+							type="*"
+							value={ id }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-icon-button components-toolbar__control"
+									label={ __( 'Edit file' ) }
+									onClick={ open }
+									icon="edit"
+								/>
+							) }
 						/>
 					</Toolbar>
 				</BlockControls>
@@ -324,3 +279,7 @@ export default class FileEdit extends Component {
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 	}
 }
+
+export default compose( [
+	withNotices,
+] )( FileEdit );
