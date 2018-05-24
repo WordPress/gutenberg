@@ -1328,7 +1328,7 @@ export const getInserterItems = createSelector(
 		 */
 		if ( isBoolean( parentUID ) || isArray( parentUID ) ) {
 			deprecated( 'allowedBlockTypes', {
-				version: '3.1',
+				version: '3.2',
 				plugin: 'Gutenberg',
 			} );
 			parentUID = null;
@@ -1486,7 +1486,7 @@ export const getInserterItems = createSelector(
  */
 export function getFrecentInserterItems( state, allowedBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
 	deprecated( 'getFrecentInserterItems', {
-		version: '3.1',
+		version: '3.2',
 		alternative: 'getInserterItems',
 		plugin: 'Gutenberg',
 	} );
@@ -1717,7 +1717,7 @@ export function getBlockListSettings( state, uid ) {
 // eslint-disable-next-line no-unused-vars
 export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
 	deprecated( 'getSupportedBlocks', {
-		version: '3.1',
+		version: '3.2',
 		alternative: 'canInsertBlockType',
 		plugin: 'Gutenberg',
 	} );
