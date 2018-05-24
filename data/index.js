@@ -3,7 +3,6 @@
  */
 import { combineReducers, createStore } from 'redux';
 import { flowRight, without, mapValues, overEvery } from 'lodash';
-import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
@@ -14,7 +13,9 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 /**
  * Internal dependencies
  */
-export { loadAndPersist, withRehydratation } from './persist';
+import registerDataStore from './store';
+
+export { loadAndPersist, withRehydration, withRehydratation } from './persist';
 
 /**
  * Module constants
@@ -130,50 +131,29 @@ export function registerSelectors( reducerKey, newSelectors ) {
  * @param {Object} newResolvers Resolvers to register.
  */
 export function registerResolvers( reducerKey, newResolvers ) {
-	const createResolver = ( selector, key ) => {
+	const { hasStartedResolution } = select( 'core/data' );
+	const { startResolution, finishResolution } = dispatch( 'core/data' );
+
+	const createResolver = ( selector, selectorName ) => {
 		// Don't modify selector behavior if no resolver exists.
-		if ( ! newResolvers.hasOwnProperty( key ) ) {
+		if ( ! newResolvers.hasOwnProperty( selectorName ) ) {
 			return selector;
 		}
 
 		const store = stores[ reducerKey ];
 
 		// Normalize resolver shape to object.
-		let resolver = newResolvers[ key ];
+		let resolver = newResolvers[ selectorName ];
 		if ( ! resolver.fulfill ) {
 			resolver = { fulfill: resolver };
 		}
 
-		/**
-		 * To ensure that fulfillment occurs only once per arguments set
-		 * (even for deeply "equivalent" arguments), track calls.
-		 *
-		 * @type {EquivalentKeyMap}
-		 */
-		const fulfilledByEquivalentArgs = new EquivalentKeyMap();
-
-		/**
-		 * Returns true if resolver fulfillment has already occurred for an
-		 * equivalent set of arguments. Includes side effect when returning
-		 * false to ensure the next invocation returns true.
-		 *
-		 * @param {Array} args Arguments set.
-		 *
-		 * @return {boolean} Whether fulfillment has already occurred.
-		 */
-		function hasBeenFulfilled( args ) {
-			const hasArguments = fulfilledByEquivalentArgs.has( args );
-			if ( ! hasArguments ) {
-				fulfilledByEquivalentArgs.set( args, true );
-			}
-
-			return hasArguments;
-		}
-
 		async function fulfill( ...args ) {
-			if ( hasBeenFulfilled( args ) ) {
+			if ( hasStartedResolution( reducerKey, selectorName, args ) ) {
 				return;
 			}
+
+			startResolution( reducerKey, selectorName, args );
 
 			// At this point, selectors have already been pre-bound to inject
 			// state, it would not be otherwise provided to fulfill.
@@ -193,6 +173,8 @@ export function registerResolvers( reducerKey, newResolvers ) {
 					store.dispatch( maybeAction );
 				}
 			}
+
+			finishResolution( reducerKey, selectorName, args );
 		}
 
 		if ( typeof resolver.isFulfilled === 'function' ) {
@@ -485,3 +467,5 @@ export function toAsyncIterable( object ) {
 		}
 	}() );
 }
+
+registerDataStore();

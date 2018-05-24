@@ -1,6 +1,10 @@
 .editor-post-title {
 	position: relative;
 	padding: 5px 0;
+	
+	@include break-small() {
+		padding: 5px $block-side-ui-padding;
+	}
 
 	.editor-post-title__input {
 		display: block;
@@ -35,4 +39,9 @@
 	top: -35px;
 	left: 0;
 	right: 0;
+
+	@include break-small() {
+		left: $block-side-ui-padding;
+		right: $block-side-ui-padding;
+	}
 }

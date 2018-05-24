@@ -15,8 +15,8 @@ import {
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
-import { getBlobByURL, revokeBlobURL, viewPort } from '@wordpress/utils';
+import { Component, compose, Fragment } from '@wordpress/element';
+import { getBlobByURL, revokeBlobURL } from '@wordpress/utils';
 import {
 	Button,
 	ButtonGroup,
@@ -26,18 +26,20 @@ import {
 	TextControl,
 	TextareaControl,
 	Toolbar,
+	withNotices,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import {
 	RichText,
 	BlockControls,
 	InspectorControls,
-	ImagePlaceholder,
+	MediaPlaceholder,
 	MediaUpload,
 	BlockAlignmentToolbar,
 	UrlInputButton,
 	editorMediaUpload,
 } from '@wordpress/editor';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -77,13 +79,13 @@ class ImageEdit extends Component {
 			getBlobByURL( url )
 				.then(
 					( file ) =>
-						editorMediaUpload(
-							[ file ],
-							( [ image ] ) => {
+						editorMediaUpload( {
+							filesList: [ file ],
+							onFileChange: ( [ image ] ) => {
 								setAttributes( { ...image } );
 							},
-							'image'
-						)
+							allowedType: 'image',
+						} )
 				);
 		}
 	}
@@ -106,6 +108,15 @@ class ImageEdit extends Component {
 	}
 
 	onSelectImage( media ) {
+		if ( ! media ) {
+			this.props.setAttributes( {
+				url: undefined,
+				alt: undefined,
+				id: undefined,
+				caption: undefined,
+			} );
+			return;
+		}
 		this.props.setAttributes( {
 			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
 			width: undefined,
@@ -167,7 +178,7 @@ class ImageEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isSelected, className, maxWidth, toggleSelection } = this.props;
+		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection } = this.props;
 		const { url, alt, caption, align, id, href, width, height } = attributes;
 
 		const controls = (
@@ -202,11 +213,18 @@ class ImageEdit extends Component {
 			return (
 				<Fragment>
 					{ controls }
-					<ImagePlaceholder
-						className={ className }
+					<MediaPlaceholder
 						icon="format-image"
-						label={ __( 'Image' ) }
-						onSelectImage={ this.onSelectImage }
+						labels={ {
+							title: __( 'Image' ),
+							name: __( 'an image' ),
+						} }
+						className={ className }
+						onSelect={ this.onSelectImage }
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
+						accept="image/*"
+						type="image"
 					/>
 				</Fragment>
 			);
@@ -218,7 +236,7 @@ class ImageEdit extends Component {
 			'is-focused': isSelected,
 		} );
 
-		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && ( ! viewPort.isExtraSmall() );
+		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -300,6 +318,7 @@ class ImageEdit extends Component {
 		return (
 			<Fragment>
 				{ controls }
+				{ noticeUI }
 				<figure className={ classes }>
 					<ImageSize src={ url } dirtynessTrigger={ align }>
 						{ ( sizes ) => {
@@ -387,14 +406,18 @@ class ImageEdit extends Component {
 	}
 }
 
-export default withSelect( ( select, props ) => {
-	const { getMedia } = select( 'core' );
-	const { getEditorSettings } = select( 'core/editor' );
-	const { id } = props.attributes;
-	const { maxWidth } = getEditorSettings();
+export default compose( [
+	withSelect( ( select, props ) => {
+		const { getMedia } = select( 'core' );
+		const { getEditorSettings } = select( 'core/editor' );
+		const { id } = props.attributes;
+		const { maxWidth } = getEditorSettings();
 
-	return {
-		image: id ? getMedia( id ) : null,
-		maxWidth,
-	};
-} )( ImageEdit );
+		return {
+			image: id ? getMedia( id ) : null,
+			maxWidth,
+		};
+	} ),
+	withViewportMatch( { isLargeViewport: 'medium' } ),
+	withNotices,
+] )( ImageEdit );

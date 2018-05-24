@@ -7,7 +7,7 @@ ServerSideRender may also be used when a legacy block is provided as a backwards
 
 ServerSideRender should be regarded as a fallback or legacy mechanism, it is not appropriate for developing new features against.
 
-New blocks should be built in conjunction with any necessary REST API endpoints, so that JavaScript can be used for rendering client-side in the `edit` function. This gives the best user experience, instead of relying on using the PHP `render_callback`. The logic necessary for rendering should be included in the endpoint, so that both the client-side JavaScript and server-side PHP logic should require a mininal amount of differences.
+New blocks should be built in conjunction with any necessary REST API endpoints, so that JavaScript can be used for rendering client-side in the `edit` function. This gives the best user experience, instead of relying on using the PHP `render_callback`. The logic necessary for rendering should be included in the endpoint, so that both the client-side JavaScript and server-side PHP logic should require a minimal amount of differences.
 
 ## Usage
 

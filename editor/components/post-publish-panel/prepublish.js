@@ -21,6 +21,7 @@ import PostScheduleLabel from '../post-schedule/label';
 
 function PostPublishPanelPrepublish( {
 	hasPublishAction,
+	children,
 } ) {
 	return (
 		<div className="editor-post-publish-panel__prepublish">
@@ -40,6 +41,7 @@ function PostPublishPanelPrepublish( {
 					] }>
 						<PostSchedule />
 					</PanelBody>
+					{ children }
 				</Fragment>
 			) }
 		</div>

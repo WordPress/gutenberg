@@ -33,6 +33,21 @@ export function getBlockDefaultClassName( blockName ) {
 }
 
 /**
+ * Returns the block's default menu item classname from its name.
+ *
+ * @param {string} blockName The block name.
+ *
+ * @return {string} The block's default menu item class.
+ */
+export function getBlockMenuDefaultClassName( blockName ) {
+	// Generated HTML classes for blocks follow the `editor-block-list-item-{name}` nomenclature.
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+	const className = 'editor-block-list-item-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
+
+	return applyFilters( 'blocks.getBlockMenuDefaultClassName', className, blockName );
+}
+
+/**
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *

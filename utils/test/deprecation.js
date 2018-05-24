@@ -52,4 +52,17 @@ describe( 'deprecated', () => {
 			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead. See: https://en.wikipedia.org/wiki/Vegetarianism'
 		);
 	} );
+
+	it( 'should show a deprecation warning with a hint', () => {
+		deprecated( 'Eating meat', {
+			version: 'the future',
+			alternative: 'vegetables',
+			plugin: 'the earth',
+			hint: 'You may find it beneficial to transition gradually.',
+		} );
+
+		expect( console ).toHaveWarnedWith(
+			'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
+		);
+	} );
 } );

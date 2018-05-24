@@ -76,6 +76,8 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_register_vendor_scripts();
 
 	// WordPress packages.
+	wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array() );
+
 	wp_register_script(
 		'wp-dom-ready',
 		gutenberg_url( 'build/dom-ready/index.js' ),
@@ -130,7 +132,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-dom',
 		gutenberg_url( 'build/dom/index.js' ),
-		array( 'tinymce-latest', 'lodash' ),
+		array( 'wp-tinymce', 'lodash' ),
 		filemtime( gutenberg_dir_path() . 'build/dom/index.js' ),
 		true
 	);
@@ -226,7 +228,18 @@ function gutenberg_register_scripts_and_styles() {
 	wp_register_script(
 		'wp-core-blocks',
 		gutenberg_url( 'build/core-blocks/index.js' ),
-		array( 'wp-element', 'wp-components', 'wp-utils', 'wp-blocks', 'wp-editor', 'wp-i18n', 'editor', 'wp-core-data', 'lodash' ),
+		array(
+			'editor',
+			'lodash',
+			'wp-blocks',
+			'wp-components',
+			'wp-core-data',
+			'wp-element',
+			'wp-editor',
+			'wp-i18n',
+			'wp-utils',
+			'wp-viewport',
+		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/index.js' ),
 		true
 	);
@@ -320,7 +333,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-plugins',
 			'wp-utils',
 			'wp-viewport',
-			'tinymce-latest',
+			'wp-tinymce',
 			'tinymce-latest-lists',
 			'tinymce-latest-paste',
 			'tinymce-latest-table',
@@ -484,25 +497,21 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/moment@2.22.1/' . $moment_script,
 		array()
 	);
-	$tinymce_version = '4.7.2';
-	gutenberg_register_vendor_script(
-		'tinymce-latest',
-		'https://unpkg.com/tinymce@' . $tinymce_version . '/tinymce' . $suffix . '.js'
-	);
+	$tinymce_version = '4.7.11';
 	gutenberg_register_vendor_script(
 		'tinymce-latest-lists',
 		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/lists/plugin' . $suffix . '.js',
-		array( 'tinymce-latest' )
+		array( 'wp-tinymce' )
 	);
 	gutenberg_register_vendor_script(
 		'tinymce-latest-paste',
 		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/paste/plugin' . $suffix . '.js',
-		array( 'tinymce-latest' )
+		array( 'wp-tinymce' )
 	);
 	gutenberg_register_vendor_script(
 		'tinymce-latest-table',
 		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/table/plugin' . $suffix . '.js',
-		array( 'tinymce-latest' )
+		array( 'wp-tinymce' )
 	);
 	gutenberg_register_vendor_script(
 		'lodash',
@@ -956,6 +965,15 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		);
 	}
 
+	$max_upload_size = wp_max_upload_size();
+	if ( ! $max_upload_size ) {
+		$max_upload_size = 0;
+	}
+	// Initialize media settings.
+	wp_add_inline_script( 'wp-editor', 'window._wpMediaSettings = ' . wp_json_encode( array(
+		'maxUploadSize' => $max_upload_size,
+	) ), 'before' );
+
 	// Prepare Jed locale data.
 	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
 	wp_add_inline_script(
@@ -1082,7 +1100,26 @@ JS;
  * Remove this in Gutenberg 3.1
  */
 function polyfill_blocks_module_in_scripts() {
+	global $post;
+
+	if ( ! is_admin() ) {
+		return;
+	}
+
+	if ( get_current_screen()->base !== 'post' ) {
+		return;
+	}
+
+	if ( isset( $_GET['classic-editor'] ) ) {
+		return;
+	}
+
+	if ( ! gutenberg_can_edit_post( $post ) ) {
+		return;
+	}
+
 	wp_enqueue_script( 'wp-editor' );
 }
 
 add_action( 'enqueue_block_editor_assets', 'polyfill_blocks_module_in_scripts', 9 );
+add_action( 'enqueue_block_assets', 'polyfill_blocks_module_in_scripts', 9 );

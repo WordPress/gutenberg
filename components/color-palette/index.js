@@ -16,6 +16,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
+import Button from '../button';
 
 export default function ColorPalette( { colors, disableCustomColors = false, value, onChange } ) {
 	function applyOrUnset( color ) {
@@ -47,7 +48,7 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 			{ ! disableCustomColors &&
 				<Dropdown
 					className="components-color-palette__item-wrapper components-color-palette__custom-color"
-					contentClassName="components-color-palette__picker "
+					contentClassName="components-color-palette__picker"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Tooltip text={ customColorPickerLabel }>
 							<button
@@ -65,20 +66,20 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 						<ChromePicker
 							color={ value }
 							onChangeComplete={ ( color ) => onChange( color.hex ) }
-							style={ { width: '100%' } }
 							disableAlpha
 						/>
 					) }
 				/>
 			}
 
-			<button
-				className="button-link components-color-palette__clear"
+			<Button
+				className="components-color-palette__clear"
 				type="button"
 				onClick={ () => onChange( undefined ) }
+				isLink
 			>
 				{ __( 'Clear' ) }
-			</button>
+			</Button>
 		</div>
 	);
 }

@@ -43,7 +43,7 @@ Keep your tests in a `test` folder in your working directory. The test file shou
 
 Only test files (with at least one test case) should live directly under `/test`. If you need to add external mocks or fixtures, place them in a sub folder, for example:
 
-* `test/mocks/[file-name.js`
+* `test/mocks/[file-name].js`
 * `test/fixtures/[file-name].js`
 
 ### Importing tests

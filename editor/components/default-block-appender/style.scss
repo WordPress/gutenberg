@@ -9,7 +9,6 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		margin: 0;
 		max-width: none; // fixes a bleed issue from the admin
 		padding: $block-padding;
-		height: $empty-paragraph-height;
 		font-size: $editor-font-size;
 		font-family: $editor-font;
 		cursor: text;
@@ -17,6 +16,11 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 		font-family: $editor-font;
 		outline: 1px solid transparent;
 		transition: 0.2s outline;
+
+		// match the height of an empty paragraph
+		// to prevent margins from collapsing we add 1px padding top and bottom to both .editor-block-list__block and .editor-block-list__block-edit (coming to a total of 4px extra)
+		// @todo: revisit when we allow margins to collapse
+		height: $empty-paragraph-height + 4px;
 
 		// use opacity to work in various editor styles
 		color: $dark-opacity-300;

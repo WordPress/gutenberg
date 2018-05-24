@@ -31,17 +31,6 @@ export function terms( state = {}, action ) {
 				...state,
 				[ action.taxonomy ]: action.terms,
 			};
-
-		case 'SET_REQUESTED':
-			const { dataType, subType: taxonomy } = action;
-			if ( dataType !== 'terms' || state.hasOwnProperty( taxonomy ) ) {
-				return state;
-			}
-
-			return {
-				...state,
-				[ taxonomy ]: null,
-			};
 	}
 
 	return state;
@@ -113,7 +102,7 @@ export function themeSupports( state = {}, action ) {
 /**
  * Higher Order Reducer for a given entity config. It supports:
  *
- *  - Fetching a record by primariy key
+ *  - Fetching a record by primary key
  *
  * @param {Object} entityConfig  Entity config.
  *
