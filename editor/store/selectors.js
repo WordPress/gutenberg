@@ -1318,7 +1318,7 @@ function getInsertUsage( state, id ) {
  * @property {boolean}  isDisabled        Whether or not the user should be prevented from inserting
  *                                        this item.
  * @property {number}   utility           How useful we think this item is, between 0 and 3.
- * @property {number}   frecency          Hueristic that combines recency and frecency.
+ * @property {number}   frecency          Hueristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
 	( state, parentUID = null ) => {
