@@ -1,18 +1,19 @@
 // Link input
-$input-padding: 10px;
+$input-padding: 8px;
 $input-size: 230px;
 
 .editor-block-list__block .editor-url-input,
+.components-popover .editor-url-input,
 .editor-url-input {
 	width: 100%;
 	flex-grow: 1;
 	position: relative;
+	padding: 1px;
 
 	input[type=text] {
 		width: 100%;
 		padding: $input-padding;
 		border: none;
-		margin: 0;
 
 		&::-ms-clear {
 			display: none;
@@ -22,7 +23,7 @@ $input-size: 230px;
 	.spinner {
 		position: absolute;
 		right: 0;
-		top: 10px;
+		top: $input-padding;
 		margin: 0;
 	}
 }
