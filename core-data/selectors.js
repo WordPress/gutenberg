@@ -1,7 +1,31 @@
 /**
  * External dependencies
  */
+import createSelector from 'rememo';
 import { map } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { select } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { REDUCER_KEY } from './';
+
+/**
+ * Returns true if resolution is in progress for the core selector of the given
+ * name and arguments.
+ *
+ * @param {string} selectorName Core data selector name.
+ * @param {...*}   args         Arguments passed to selector.
+ *
+ * @return {boolean} Whether resolution is in progress.
+ */
+function isResolving( selectorName, ...args ) {
+	return select( 'core/data' ).isResolving( REDUCER_KEY, selectorName, ...args );
+}
 
 /**
  * Returns all the available terms for the given taxonomy.
@@ -36,7 +60,7 @@ export function getCategories( state ) {
  * @return {boolean} Whether a request is in progress for taxonomy's terms.
  */
 export function isRequestingTerms( state, taxonomy ) {
-	return state.terms[ taxonomy ] === null;
+	return isResolving( 'getTerms', taxonomy );
 }
 
 /**
@@ -47,8 +71,8 @@ export function isRequestingTerms( state, taxonomy ) {
  *
  * @return {boolean} Whether a request is in progress for categories.
  */
-export function isRequestingCategories( state ) {
-	return isRequestingTerms( state, 'categories' );
+export function isRequestingCategories() {
+	return isResolving( 'getCategories' );
 }
 
 /**
@@ -70,11 +94,14 @@ export function getAuthors( state ) {
  *
  * @return {Array} Users list.
  */
-export function getUserQueryResults( state, queryID ) {
-	const queryResults = state.users.queries[ queryID ];
+export const getUserQueryResults = createSelector(
+	( state, queryID ) => {
+		const queryResults = state.users.queries[ queryID ];
 
-	return map( queryResults, ( id ) => state.users.byId[ id ] );
-}
+		return map( queryResults, ( id ) => state.users.byId[ id ] );
+	},
+	( state, queryID ) => [ state.users.queries[ queryID ], state.users.byId ]
+);
 
 /**
  * Returns the Entity's record object by key.
@@ -88,6 +115,17 @@ export function getUserQueryResults( state, queryID ) {
  */
 export function getEntityRecord( state, kind, name, key ) {
 	return state.entities[ kind ][ name ].byKey[ key ];
+}
+
+/**
+ * Returns all the available taxonomies.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Taxonomies list.
+ */
+export function getTaxonomies( state ) {
+	return state.taxonomies;
 }
 
 /**

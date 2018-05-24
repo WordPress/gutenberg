@@ -1,6 +1,10 @@
 .editor-post-title {
 	position: relative;
 	padding: 5px 0;
+	
+	@include break-small() {
+		padding: 5px $block-side-ui-padding;
+	}
 
 	.editor-post-title__input {
 		display: block;
@@ -9,6 +13,7 @@
 		margin: 0;
 		box-shadow: none;
 		border: 1px solid transparent;
+		background: transparent;
 		font-family: $editor-font;
 		line-height: $default-line-height;
 
@@ -19,14 +24,24 @@
 
 	&.is-selected .editor-post-title__input,
 	.editor-post-title__input:hover {
-		border: 1px solid $light-gray-500;
+		// use opacity to work in various editor styles
+		border: 1px solid $dark-opacity-light-500;
+
+		.is-dark-theme & {
+			border-color: $light-opacity-light-500;
+		}
 	}
 }
 
 .editor-post-title .editor-post-permalink {
 	font-size: $default-font-size;
 	position: absolute;
-	top: -34px;
+	top: -35px;
 	left: 0;
 	right: 0;
+
+	@include break-small() {
+		left: $block-side-ui-padding;
+		right: $block-side-ui-padding;
+	}
 }

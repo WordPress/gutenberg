@@ -9,7 +9,7 @@ import { stringify } from 'querystring';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
-import { TreeSelect, withAPIData, withInstanceId, withSpokenMessages } from '@wordpress/components';
+import { TreeSelect, withAPIData, withInstanceId, withSpokenMessages, Button } from '@wordpress/components';
 import { buildTermsTree } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -216,7 +216,12 @@ class HierarchicalTermSelector extends Component {
 	}
 
 	render() {
-		const { slug, taxonomy, instanceId } = this.props;
+		const { slug, taxonomy, instanceId, hasCreateAction, hasAssignAction } = this.props;
+
+		if ( ! hasAssignAction ) {
+			return null;
+		}
+
 		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
@@ -245,15 +250,16 @@ class HierarchicalTermSelector extends Component {
 		/* eslint-disable jsx-a11y/no-onchange */
 		return [
 			...this.renderTerms( availableTermsTree ),
-			! loading && (
-				<button
+			! loading && hasCreateAction && (
+				<Button
 					key="term-add-button"
 					onClick={ this.onToggleForm }
-					className="button-link editor-post-taxonomies__hierarchical-terms-add"
+					className="editor-post-taxonomies__hierarchical-terms-add"
 					aria-expanded={ showForm }
+					isLink
 				>
 					{ newTermButtonLabel }
-				</button>
+				</Button>
 			),
 			showForm && (
 				<form onSubmit={ this.onAddTerm } key="hierarchical-terms-form">
@@ -280,12 +286,13 @@ class HierarchicalTermSelector extends Component {
 							tree={ availableTermsTree }
 						/>
 					}
-					<button
+					<Button
+						isDefault
 						type="submit"
-						className="button editor-post-taxonomies__hierarchical-terms-submit"
+						className="editor-post-taxonomies__hierarchical-terms-submit"
 					>
 						{ newTermSubmitLabel }
-					</button>
+					</Button>
 				</form>
 			),
 		];
@@ -301,7 +308,10 @@ export default compose( [
 		};
 	} ),
 	withSelect( ( select, ownProps ) => {
+		const { getCurrentPost } = select( 'core/editor' );
 		return {
+			hasCreateAction: get( getCurrentPost(), [ '_links', 'wp:action-create-' + ownProps.restBase ], false ),
+			hasAssignAction: get( getCurrentPost(), [ '_links', 'wp:action-assign-' + ownProps.restBase ], false ),
 			terms: select( 'core/editor' ).getEditedPostAttribute( ownProps.restBase ),
 		};
 	} ),

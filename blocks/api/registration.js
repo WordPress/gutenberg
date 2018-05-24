@@ -3,13 +3,14 @@
 /**
  * External dependencies
  */
-import { get, isFunction, some } from 'lodash';
+import { get, set, isFunction, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import { deprecated } from '@wordpress/utils';
 
 /**
  * Defined behavior of a block type.
@@ -135,6 +136,14 @@ export function registerBlockType( name, settings ) {
 	}
 	if ( ! settings.icon ) {
 		settings.icon = 'block-default';
+	}
+	if ( 'isPrivate' in settings ) {
+		deprecated( 'isPrivate', {
+			version: '3.1',
+			alternative: 'supports.inserter',
+			plugin: 'Gutenberg',
+		} );
+		set( settings, [ 'supports', 'inserter' ], ! settings.isPrivate );
 	}
 
 	dispatch( 'core/blocks' ).addBlockTypes( settings );

@@ -8,7 +8,7 @@
 /**
  * Tests for WP_Block_Type_Registry
  */
-class Gutenberg_REST_API_Test extends WP_UnitTestCase {
+class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	function setUp() {
 		parent::setUp();
 
@@ -220,6 +220,53 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Only returns term-related actions when current user can do so.
+	 */
+	function test_link_term_management_per_user() {
+		$contributor_post  = $this->factory->post->create( array(
+			'post_author' => $this->contributor,
+			'post_status' => 'draft',
+		) );
+		$author_post       = $this->factory->post->create( array(
+			'post_author' => $this->author,
+		) );
+		$create_tags       = 'https://api.w.org/action-create-tags';
+		$assign_tags       = 'https://api.w.org/action-assign-tags';
+		$create_categories = 'https://api.w.org/action-create-categories';
+		$assign_categories = 'https://api.w.org/action-assign-categories';
+		// Contributors can create and assign tags, but only assign categories.
+		wp_set_current_user( $this->contributor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $contributor_post );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertTrue( isset( $links[ $create_tags ] ) );
+		$this->assertTrue( isset( $links[ $assign_tags ] ) );
+		$this->assertFalse( isset( $links[ $create_categories ] ) );
+		$this->assertTrue( isset( $links[ $assign_categories ] ) );
+		// Authors can create and assign tags, but only assign categories.
+		wp_set_current_user( $this->author );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $author_post );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertTrue( isset( $links[ $create_tags ] ) );
+		$this->assertTrue( isset( $links[ $assign_tags ] ) );
+		$this->assertFalse( isset( $links[ $create_categories ] ) );
+		$this->assertTrue( isset( $links[ $assign_categories ] ) );
+		// Editors can do everything.
+		wp_set_current_user( $this->editor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $author_post );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_do_request( $request );
+		$links    = $response->get_links();
+		$this->assertTrue( isset( $links[ $create_tags ] ) );
+		$this->assertTrue( isset( $links[ $assign_tags ] ) );
+		$this->assertTrue( isset( $links[ $create_categories ] ) );
+		$this->assertTrue( isset( $links[ $assign_categories ] ) );
+	}
+
+	/**
 	 * Should include relevant data in the 'theme_supports' key of index.
 	 */
 	function test_theme_supports_index() {
@@ -246,6 +293,85 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertEquals( 200, $response->get_status() );
 		$this->assertCount( 0, $response->get_data() );
+	}
+
+	public function test_get_taxonomies_context_edit() {
+		wp_set_current_user( $this->contributor );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies' );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data       = $response->get_data();
+		$taxonomies = array();
+		foreach ( get_taxonomies( '', 'objects' ) as $taxonomy ) {
+			if ( ! empty( $taxonomy->show_in_rest ) ) {
+				$taxonomies[] = $taxonomy;
+			}
+		}
+		$this->assertEquals( count( $taxonomies ), count( $data ) );
+		$this->assertEquals( 'Categories', $data['category']['name'] );
+		$this->assertEquals( 'category', $data['category']['slug'] );
+		$this->assertEquals( true, $data['category']['hierarchical'] );
+		$this->assertEquals( 'Tags', $data['post_tag']['name'] );
+		$this->assertEquals( 'post_tag', $data['post_tag']['slug'] );
+		$this->assertEquals( false, $data['post_tag']['hierarchical'] );
+		$this->assertEquals( 'tags', $data['post_tag']['rest_base'] );
+	}
+
+	public function test_get_taxonomies_invalid_permission_for_context() {
+		wp_set_current_user( $this->subscriber );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies' );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_view', $response, 403 );
+	}
+
+	public function test_create_category_incorrect_permissions_author() {
+		wp_set_current_user( $this->author );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/categories' );
+		$request->set_param( 'name', 'Incorrect permissions' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_create', $response, 403 );
+	}
+
+	public function test_create_category_editor() {
+		wp_set_current_user( $this->editor );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/categories' );
+		$request->set_param( 'name', 'My Awesome Term' );
+		$request->set_param( 'description', 'This term is so awesome.' );
+		$request->set_param( 'slug', 'so-awesome' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 201, $response->get_status() );
+		$headers = $response->get_headers();
+		$data    = $response->get_data();
+		$this->assertContains( '/wp/v2/categories/' . $data['id'], $headers['Location'] );
+		$this->assertEquals( 'My Awesome Term', $data['name'] );
+		$this->assertEquals( 'This term is so awesome.', $data['description'] );
+		$this->assertEquals( 'so-awesome', $data['slug'] );
+	}
+
+	public function test_create_tag_incorrect_permissions_subscriber() {
+		wp_set_current_user( $this->subscriber );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/tags' );
+		$request->set_param( 'name', 'Incorrect permissions' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_create', $response, 403 );
+	}
+
+	public function test_create_tag_contributor() {
+		wp_set_current_user( $this->contributor );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/tags' );
+		$request->set_param( 'name', 'My Awesome Term' );
+		$request->set_param( 'description', 'This term is so awesome.' );
+		$request->set_param( 'slug', 'so-awesome' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 201, $response->get_status() );
+		$headers = $response->get_headers();
+		$data    = $response->get_data();
+		$this->assertContains( '/wp/v2/tags/' . $data['id'], $headers['Location'] );
+		$this->assertEquals( 'My Awesome Term', $data['name'] );
+		$this->assertEquals( 'This term is so awesome.', $data['description'] );
+		$this->assertEquals( 'so-awesome', $data['slug'] );
 	}
 
 	/**
@@ -318,5 +444,20 @@ class Gutenberg_REST_API_Test extends WP_UnitTestCase {
 		$this->assertEquals( 403, $response->get_status() );
 		$data = $response->get_data();
 		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
+	}
+
+	public function test_get_page_edit_context_includes_preview() {
+		wp_set_current_user( $this->editor );
+		$page_id = $this->factory->post->create( array(
+			'post_type'   => 'page',
+			'post_status' => 'draft',
+		) );
+		$page    = get_post( $page_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/pages/' . $page_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( 200, $response->get_status() );
+		$data = $response->get_data();
+		$this->assertEquals( get_preview_post_link( $page ), $data['preview_link'] );
 	}
 }

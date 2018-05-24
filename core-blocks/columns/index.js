@@ -44,7 +44,7 @@ export const settings = {
 		/* translators: Block title modifier */
 		__( '%1$s (%2$s)' ),
 		__( 'Columns' ),
-		__( 'Experimental' )
+		__( 'beta' )
 	),
 
 	icon: 'columns',

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -189,6 +194,11 @@ export const settings = {
 	save( { attributes } ) {
 		const { url, alt, caption, align, href, width, height, id } = attributes;
 
+		const classes = classnames( {
+			[ `align${ align }` ]: align,
+			'is-resized': width || height,
+		} );
+
 		const image = (
 			<img
 				src={ url }
@@ -200,7 +210,7 @@ export const settings = {
 		);
 
 		return (
-			<figure className={ align ? `align${ align }` : null }>
+			<figure className={ classes }>
 				{ href ? <a href={ href }>{ image }</a> : image }
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
@@ -208,6 +218,29 @@ export const settings = {
 	},
 
 	deprecated: [
+		{
+			attributes: blockAttributes,
+			save( { attributes } ) {
+				const { url, alt, caption, align, href, width, height, id } = attributes;
+
+				const image = (
+					<img
+						src={ url }
+						alt={ alt }
+						className={ id ? `wp-image-${ id }` : null }
+						width={ width }
+						height={ height }
+					/>
+				);
+
+				return (
+					<figure className={ align ? `align${ align }` : null } >
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+					</figure>
+				);
+			},
+		},
 		{
 			attributes: blockAttributes,
 			save( { attributes } ) {

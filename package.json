@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "2.8.0",
+	"version": "2.9.2",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -28,7 +28,7 @@
 		"dom-react": "2.2.1",
 		"dom-scroll-into-view": "1.2.1",
 		"element-closest": "2.0.2",
-		"equivalent-key-map": "0.1.1",
+		"equivalent-key-map": "0.2.0",
 		"escape-string-regexp": "1.0.5",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#1774343f6226052a46b081e01db3fca8793cc9f1",
 		"hpq": "1.2.0",
@@ -57,22 +57,23 @@
 		"showdown": "1.8.6",
 		"simple-html-tokenizer": "0.4.1",
 		"tinycolor2": "1.4.1",
+		"tinymce": "4.7.2",
 		"uuid": "3.1.0"
 	},
 	"devDependencies": {
-		"@wordpress/babel-plugin-makepot": "1.0.0",
-		"@wordpress/babel-preset-default": "1.2.0",
-		"@wordpress/browserslist-config": "2.1.3",
-		"@wordpress/custom-templated-path-webpack-plugin": "1.0.0",
-		"@wordpress/jest-preset-default": "1.0.3",
-		"@wordpress/scripts": "1.1.0",
+		"@wordpress/babel-plugin-makepot": "1.0.1",
+		"@wordpress/babel-preset-default": "1.3.0",
+		"@wordpress/browserslist-config": "2.1.4",
+		"@wordpress/custom-templated-path-webpack-plugin": "1.0.2",
+		"@wordpress/jest-preset-default": "1.0.6",
+		"@wordpress/scripts": "1.1.6",
 		"autoprefixer": "8.2.0",
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
 		"babel-loader": "7.1.4",
 		"babel-plugin-transform-async-generator-functions": "6.24.1",
 		"check-node-version": "3.1.1",
-		"codecov": "3.0.0",
+		"codecov": "3.0.2",
 		"concurrently": "3.5.0",
 		"core-js": "2.5.3",
 		"cross-env": "3.2.4",
@@ -83,7 +84,7 @@
 		"eslint-plugin-jsx-a11y": "6.0.2",
 		"eslint-plugin-react": "7.7.0",
 		"extract-text-webpack-plugin": "4.0.0-beta.0",
-		"node-sass": "4.7.2",
+		"node-sass": "git://github.com/sass/node-sass.git#v4.7.0",
 		"pegjs": "0.10.0",
 		"pegjs-loader": "0.5.4",
 		"phpegjs": "1.0.0-beta7",
@@ -95,17 +96,13 @@
 		"sass-loader": "6.0.7",
 		"sprintf-js": "1.1.1",
 		"style-loader": "0.20.3",
-		"tinymce": "4.7.2",
-		"webpack": "4.4.1",
-		"webpack-cli": "2.0.13",
+		"webpack": "4.8.3",
+		"webpack-cli": "2.1.3",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
 	},
 	"babel": {
 		"presets": [
 			"@wordpress/default"
-		],
-		"plugins": [
-			"transform-async-generator-functions"
 		],
 		"env": {
 			"production": {
@@ -115,8 +112,7 @@
 						{
 							"output": "languages/gutenberg.pot"
 						}
-					],
-					"transform-async-generator-functions"
+					]
 				]
 			}
 		}

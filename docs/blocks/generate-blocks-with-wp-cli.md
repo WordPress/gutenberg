@@ -83,9 +83,7 @@ function movie_block_init() {
 	wp_register_style(
 		'movie-block-editor',
 		plugins_url( $editor_css, __FILE__ ),
-		array(
-			'wp-blocks',
-		),
+		array(),
 		filemtime( "$dir/$editor_css" )
 	);
 
@@ -93,9 +91,7 @@ function movie_block_init() {
 	wp_register_style(
 		'movie-block',
 		plugins_url( $style_css, __FILE__ ),
-		array(
-			'wp-blocks',
-		),
+		array(),
 		filemtime( "$dir/$style_css" )
 	);
 

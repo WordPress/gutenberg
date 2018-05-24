@@ -9,6 +9,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	withSpokenMessages,
+	Popover,
 } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { prependHTTP } from '@wordpress/url';
@@ -59,11 +60,9 @@ class FormatToolbar extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
-			isAddingLink: false,
-			isEditingLink: false,
 			settingsVisible: false,
 			opensInNewWindow: false,
-			newLinkValue: '',
+			linkValue: '',
 		};
 
 		this.addLink = this.addLink.bind( this );
@@ -78,9 +77,15 @@ class FormatToolbar extends Component {
 
 	onKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
-			if ( this.state.isEditingLink || this.state.isAddingLink ) {
+			const link = this.props.formats.link;
+			const isAddingLink = link && link.isAdding;
+			if ( isAddingLink ) {
 				event.stopPropagation();
-				this.dropLink();
+				if ( ! link.value ) {
+					this.dropLink();
+				} else {
+					this.props.onChange( { link: { ...link, isAdding: false } } );
+				}
 			}
 		}
 		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
@@ -91,20 +96,15 @@ class FormatToolbar extends Component {
 	componentWillReceiveProps( nextProps ) {
 		if ( this.props.selectedNodeId !== nextProps.selectedNodeId ) {
 			this.setState( {
-				isEditingLink: false,
 				settingsVisible: false,
 				opensInNewWindow: !! nextProps.formats.link && !! nextProps.formats.link.target,
-				newLinkValue: '',
+				linkValue: '',
 			} );
 		}
-
-		this.setState( {
-			isAddingLink: !! nextProps.formats.link && nextProps.formats.link.isAdding,
-		} );
 	}
 
 	onChangeLinkValue( value ) {
-		this.setState( { newLinkValue: value } );
+		this.setState( { linkValue: value } );
 	}
 
 	toggleFormat( format ) {
@@ -131,28 +131,33 @@ class FormatToolbar extends Component {
 	}
 
 	addLink() {
-		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: '' } );
+		this.setState( { linkValue: '' } );
+		this.props.onChange( { link: { isAdding: true } } );
 	}
 
 	dropLink() {
-		this.props.onChange( { link: undefined } );
-		this.setState( { isEditingLink: false, isAddingLink: false, newLinkValue: '' } );
+		this.props.onChange( { link: null } );
+		this.setState( { linkValue: '' } );
 	}
 
 	editLink( event ) {
 		event.preventDefault();
-		this.setState( { isEditingLink: false, isAddingLink: true, newLinkValue: this.props.formats.link.value } );
+		this.props.onChange( { link: { ...this.props.formats.link, isAdding: true } } );
+		this.setState( { linkValue: this.props.formats.link.value } );
 	}
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.setState( { isEditingLink: false, isAddingLink: false, newLinkValue: '' } );
+		const value = prependHTTP( this.state.linkValue );
 		this.props.onChange( { link: {
-			value: prependHTTP( this.state.newLinkValue ),
+			isAdding: false,
 			target: this.state.opensInNewWindow ? '_blank' : null,
 			rel: this.state.opensInNewWindow ? 'noreferrer noopener' : null,
+			value,
 		} } );
-		if ( this.state.isAddingLink ) {
+
+		this.setState( { linkValue: value } );
+		if ( ! this.props.formats.link.value ) {
 			this.props.speak( __( 'Link added.' ), 'assertive' );
 		}
 	}
@@ -162,8 +167,9 @@ class FormatToolbar extends Component {
 	}
 
 	render() {
-		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
-		const { isAddingLink, isEditingLink, newLinkValue, settingsVisible, opensInNewWindow } = this.state;
+		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [], selectedNodeId } = this.props;
+		const { linkValue, settingsVisible, opensInNewWindow } = this.state;
+		const isAddingLink = formats.link && formats.link.isAdding;
 
 		const toolbarControls = FORMATTING_CONTROLS.concat( customControls )
 			.filter( ( control ) => enabledControls.indexOf( control.format ) !== -1 )
@@ -200,61 +206,67 @@ class FormatToolbar extends Component {
 			<div className="editor-format-toolbar">
 				<Toolbar controls={ toolbarControls } />
 
-				{ ( isAddingLink || isEditingLink || formats.link ) && (
+				{ ( isAddingLink || formats.link ) && (
 					<Fill name="RichText.Siblings">
 						<div className="editor-format-toolbar__link-container" style={ { ...focusPosition } }>
-							{ ( isAddingLink || isEditingLink ) && (
+							<Popover
+								position="bottom center"
+								focusOnMount={ !! isAddingLink }
+								key={ selectedNodeId /* Used to force rerender on change */ }
+							>
+								{ isAddingLink && (
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-								<form
-									className="editor-format-toolbar__link-modal"
-									onKeyPress={ stopKeyPropagation }
-									onKeyDown={ this.onKeyDown }
-									onSubmit={ this.submitLink }>
-									<div className="editor-format-toolbar__link-modal-line">
-										<UrlInput value={ newLinkValue } onChange={ this.onChangeLinkValue } />
-										<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-										<IconButton
-											className="editor-format-toolbar__link-settings-toggle"
-											icon="ellipsis"
-											label={ __( 'Link Settings' ) }
-											onClick={ this.toggleLinkSettingsVisibility }
-											aria-expanded={ settingsVisible }
-										/>
-									</div>
-									{ linkSettings }
-								</form>
+									<form
+										className="editor-format-toolbar__link-modal"
+										onKeyPress={ stopKeyPropagation }
+										onKeyDown={ this.onKeyDown }
+										onSubmit={ this.submitLink }>
+										<div className="editor-format-toolbar__link-modal-line">
+											<UrlInput value={ linkValue } onChange={ this.onChangeLinkValue } />
+											<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+											<IconButton
+												className="editor-format-toolbar__link-settings-toggle"
+												icon="ellipsis"
+												label={ __( 'Link Settings' ) }
+												onClick={ this.toggleLinkSettingsVisibility }
+												aria-expanded={ settingsVisible }
+											/>
+										</div>
+										{ linkSettings }
+									</form>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-							) }
+								) }
 
-							{ formats.link && ! isAddingLink && ! isEditingLink && (
+								{ formats.link && ! isAddingLink && (
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 								/* eslint-disable jsx-a11y/no-static-element-interactions */
-								<div
-									className="editor-format-toolbar__link-modal"
-									onKeyPress={ stopKeyPropagation }
-								>
-									<div className="editor-format-toolbar__link-modal-line">
-										<a
-											className="editor-format-toolbar__link-value"
-											href={ formats.link.value }
-											target="_blank"
-										>
-											{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
-										</a>
-										<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
-										<IconButton
-											className="editor-format-toolbar__link-settings-toggle"
-											icon="ellipsis"
-											label={ __( 'Link Settings' ) }
-											onClick={ this.toggleLinkSettingsVisibility }
-											aria-expanded={ settingsVisible }
-										/>
+									<div
+										className="editor-format-toolbar__link-modal"
+										onKeyPress={ stopKeyPropagation }
+									>
+										<div className="editor-format-toolbar__link-modal-line">
+											<a
+												className="editor-format-toolbar__link-value"
+												href={ formats.link.value }
+												target="_blank"
+											>
+												{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
+											</a>
+											<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
+											<IconButton
+												className="editor-format-toolbar__link-settings-toggle"
+												icon="ellipsis"
+												label={ __( 'Link Settings' ) }
+												onClick={ this.toggleLinkSettingsVisibility }
+												aria-expanded={ settingsVisible }
+											/>
+										</div>
+										{ linkSettings }
 									</div>
-									{ linkSettings }
-								</div>
 								/* eslint-enable jsx-a11y/no-static-element-interactions */
-							) }
+								) }
+							</Popover>
 						</div>
 					</Fill>
 				) }

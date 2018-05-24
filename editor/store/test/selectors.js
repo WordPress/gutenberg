@@ -7,7 +7,12 @@ import { filter, property, union } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { registerBlockType, unregisterBlockType, getBlockTypes } from '@wordpress/blocks';
+import {
+	getBlockTypes,
+	hasBlockSupport,
+	registerBlockType,
+	unregisterBlockType,
+} from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 import { registerCoreBlocks } from '@wordpress/core-blocks';
 
@@ -1060,14 +1065,14 @@ describe( 'selectors', () => {
 			expect( getEditedPostPreviewLink( state ) ).toBeNull();
 		} );
 
-		it( 'should return the correct url adding a preview parameter to the query string', () => {
+		it( 'should return the correct url when the post object has a preview_link', () => {
 			const state = {
 				currentPost: {
-					link: 'https://andalouses.com/beach',
+					preview_link: 'https://andalouses.com/?p=1&preview=true',
 				},
 			};
 
-			expect( getEditedPostPreviewLink( state ) ).toBe( 'https://andalouses.com/beach?preview=true' );
+			expect( getEditedPostPreviewLink( state ) ).toBe( 'https://andalouses.com/?p=1&preview=true' );
 		} );
 	} );
 
@@ -2627,7 +2632,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const blockTypes = getBlockTypes().filter( ( blockType ) => ! blockType.isPrivate );
+			const blockTypes = getBlockTypes().filter( ( blockType ) =>
+				hasBlockSupport( blockType, 'inserter', true )
+			);
 			expect( getInserterItems( state, true ) ).toHaveLength( blockTypes.length );
 		} );
 
@@ -2880,7 +2887,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			const sharedBlock = getSharedBlock( state, '358b59ee-bab3-4d6f-8445-e8c6971a5605' );
+			const sharedBlock = getSharedBlock( state, 123 );
 			expect( sharedBlock ).toBeNull();
 		} );
 	} );

@@ -31,7 +31,7 @@ describe( 'displayShortcut', () => {
 
 		it( 'should output shift+command symbols on MacOS', () => {
 			const shortcut = displayShortcut.primaryShift( 'm', isMacOSTrue );
-			expect( shortcut ).toEqual( '⇧shift+⌘M' );
+			expect( shortcut ).toEqual( 'Shift+⌘M' );
 		} );
 	} );
 
@@ -43,7 +43,7 @@ describe( 'displayShortcut', () => {
 
 		it( 'should output shift+option+command symbols on MacOS', () => {
 			const shortcut = displayShortcut.secondary( 'm', isMacOSTrue );
-			expect( shortcut ).toEqual( '⇧shift+⌥option+⌘M' );
+			expect( shortcut ).toEqual( 'Shift+Option+⌘M' );
 		} );
 	} );
 
@@ -55,7 +55,7 @@ describe( 'displayShortcut', () => {
 
 		it( 'should output control+option symbols on MacOS', () => {
 			const shortcut = displayShortcut.access( 'm', isMacOSTrue );
-			expect( shortcut ).toEqual( '⌃control+⌥option+M' );
+			expect( shortcut ).toEqual( 'Ctrl+Option+M' );
 		} );
 	} );
 } );
