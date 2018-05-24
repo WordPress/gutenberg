@@ -2824,43 +2824,69 @@ describe( 'selectors', () => {
 				blockListSettings: {},
 				settings: {},
 			};
-			expect( getInserterItems( state ) ).toEqual( [
-				{
-					id: 'core/test-block-b',
-					name: 'core/test-block-b',
-					initialAttributes: {},
-					title: 'Test Block B',
-					icon: 'test',
-					category: 'common',
-					keywords: [ 'testing' ],
-					isDisabled: false,
-					utility: 1,
-					frecency: 0,
+			const items = getInserterItems( state );
+			const testBlockAItem = items.find( ( item ) => item.id === 'core/test-block-a' );
+			expect( testBlockAItem ).toEqual( {
+				id: 'core/test-block-a',
+				name: 'core/test-block-a',
+				initialAttributes: {},
+				title: 'Test Block A',
+				icon: 'test',
+				category: 'formatting',
+				keywords: [ 'testing' ],
+				isDisabled: false,
+				utility: 0,
+				frecency: 0,
+			} );
+			const sharedBlockItem = items.find( ( item ) => item.id === 'core/block/1' );
+			expect( sharedBlockItem ).toEqual( {
+				id: 'core/block/1',
+				name: 'core/block',
+				initialAttributes: { ref: 1 },
+				title: 'Shared Block 1',
+				icon: 'test',
+				category: 'shared',
+				keywords: [],
+				isDisabled: false,
+				utility: 0,
+				frecency: 0,
+			} );
+		} );
+
+		it( 'should order items by descending utility and frecency', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-a' },
+						},
+						blockOrder: {},
+						edits: {},
+					},
 				},
-				{
-					id: 'core/test-block-a',
-					name: 'core/test-block-a',
-					initialAttributes: {},
-					title: 'Test Block A',
-					icon: 'test',
-					category: 'formatting',
-					keywords: [ 'testing' ],
-					isDisabled: false,
-					utility: 0,
-					frecency: 0,
+				sharedBlocks: {
+					data: {
+						1: { uid: 'block1', title: 'Shared Block 1' },
+						2: { uid: 'block1', title: 'Shared Block 2' },
+					},
 				},
-				{
-					id: 'core/block/1',
-					name: 'core/block',
-					initialAttributes: { ref: 1 },
-					title: 'Shared Block 1',
-					icon: 'test',
-					category: 'shared',
-					keywords: [],
-					isDisabled: false,
-					utility: 0,
-					frecency: 0,
+				currentPost: {},
+				preferences: {
+					insertUsage: {
+						'core/block/1': { count: 10, time: 1000 },
+						'core/block/2': { count: 20, time: 1000 },
+					},
 				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const itemIDs = getInserterItems( state ).map( ( item ) => item.id );
+			expect( itemIDs ).toEqual( [
+				'core/block/2',
+				'core/block/1',
+				'core/test-block-b',
+				'core/test-block-a',
 			] );
 		} );
 
