@@ -135,6 +135,6 @@ export async function pressWithModifier( modifier, key ) {
  *
  * @return {Promise} Promise resolving after the given timeout
  */
-export async function wait( timeout ) {
+export async function waitDurationYesImCertainWaitForSelectorIsNotABetterOption( timeout ) {
 	return new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
 }
