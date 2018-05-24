@@ -1035,7 +1035,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$editor_settings = array(
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
-		'availableTemplates'  => wp_get_theme()->get_page_templates( get_post( $post_to_edit['id'] ) ),
+		'availableTemplates'  => gutenberg_get_available_page_attributes_templates( $post_to_edit['id'] ),
 		'allowedBlockTypes'   => $allowed_block_types,
 		'disableCustomColors' => get_theme_support( 'disable-custom-colors' ),
 		'disablePostFormats'  => ! current_theme_supports( 'post-formats' ),
@@ -1092,6 +1092,26 @@ JS;
 	 * @since 0.4.0
 	 */
 	do_action( 'enqueue_block_editor_assets' );
+}
+
+/**
+ * Get available templates for a post.
+ *
+ * We wrap the WP_Theme::get_page_templates() method since we wish to support the
+ * `default_page_template_title` filter to change the name of the default template.
+ *
+ * @since TBD
+ *
+ * @param int $post_id The ID of the post being edited.
+ * @return array
+ *
+ * @see WP_Theme::get_page_templates()
+ */
+function gutenberg_get_available_page_attributes_templates( $post_id ) {
+	return array_merge(
+		array( '' => apply_filters( 'default_page_template_title', __( 'Default template' ), 'gutenberg' ), ),
+		wp_get_theme()->get_page_templates( get_post( $post_id ) )
+	);
 }
 
 /**
