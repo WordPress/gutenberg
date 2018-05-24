@@ -138,6 +138,7 @@ describe( 'selectors', () => {
 	} );
 
 	afterAll( () => {
+		unregisterBlockType( 'core/block' );
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
