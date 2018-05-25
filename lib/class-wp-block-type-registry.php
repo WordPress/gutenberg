@@ -31,7 +31,16 @@ final class WP_Block_Type_Registry {
 	 */
 	private static $instance = null;
 
-	/**
+    /**
+     * Factory for block asset loading
+     *
+     * @since 2.x.x
+     *
+     * @var WP_Block_Asset_Factory
+     */
+    protected $asset_factory;
+
+    /**
 	 * Registers a block type.
 	 *
 	 * @since 0.6.0
@@ -179,4 +188,37 @@ final class WP_Block_Type_Registry {
 
 		return self::$instance;
 	}
+
+    /**
+     * Handles registering and enqueueing block assets
+     *
+     * @since 2.x.x
+     *
+     * @param WP_Block_Type $block
+     */
+	protected function handle_block_assets( WP_Block_Type $block ){
+	    //Register block hooks
+        $register = $this->get_asset_factory()->registration( $block );
+        $register->add_hooks();
+
+        $enqueue = $this->get_asset_factory()->enqueue( $block );
+        $enqueue->add_hooks();
+    }
+
+    /**
+     * Get the asset factory
+     *
+     * @since 2.x.x
+     *
+     * @return WP_Block_Asset_Factory
+     */
+    protected function get_asset_factory(){
+        //Lazy-loader
+        //Hacky, but avoids a singleton, treats this singleton as a container for other types of objects, which is a new concern.
+        if( ! $this->asset_factory ){
+            $this->asset_factory = new WP_Block_Asset_Factory;
+        }
+
+        return $this->asset_factory;
+    }
 }
