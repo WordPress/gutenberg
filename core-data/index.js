@@ -21,8 +21,8 @@ export const REDUCER_KEY = 'core';
 
 const createEntityRecordGetter = ( source ) => entities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
-	const methodName = getMethodName( kind, name );
-	result[ methodName ] = ( state, key ) => source.getEntityRecord( state, kind, name, key );
+	result[ getMethodName( kind, name ) ] = ( state, key ) => source.getEntityRecord( state, kind, name, key );
+	result[ getMethodName( kind, name, 'get', true ) ] = ( state ) => source.getEntityRecords( state, kind, name );
 	return result;
 }, {} );
 

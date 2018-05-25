@@ -151,7 +151,7 @@ function onlyTextNode( node ) {
 }
 
 /**
- * Find the index of the last charater in the text that is whitespace.
+ * Find the index of the last character in the text that is whitespace.
  *
  * @param {string} text The text to search.
  *
@@ -535,18 +535,12 @@ export class Autocomplete extends Component {
 		event.stopPropagation();
 	}
 
-	getWordRect( { isLeft, isRight } ) {
+	getWordRect() {
 		const { range } = this.state;
 		if ( ! range ) {
 			return;
 		}
-		if ( isLeft ) {
-			const rects = range.getClientRects();
-			return rects[ 0 ];
-		} else if ( isRight ) {
-			const rects = range.getClientRects();
-			return rects[ rects.length - 1 ];
-		}
+
 		return range.getBoundingClientRect();
 	}
 

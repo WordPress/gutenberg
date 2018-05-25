@@ -59,22 +59,6 @@
 }
 /*!rtl:end:ignore*/
 
-.wp-block-audio__upload-button.components-button,
-.wp-block-image__upload-button.components-button,
-.wp-block-video__upload-button.components-button {
-	margin-right: 5px;
-
-	.dashicon {
-		vertical-align: middle;
-		margin-bottom: 3px;
-	}
-
-
-	&:hover {
-		color: $dark-gray-800;
-	}
-}
-
 .editor-block-list__block[data-type="core/image"][data-align="center"] {
 	.wp-block-image {
 		margin-left: auto;
@@ -114,7 +98,7 @@
 	}
 }
 
-.editor-block-list__block[data-type="core/image"] .editor-block-toolbar .editor-format-toolbar__link-modal {
+.editor-block-list__block[data-type="core/image"] .editor-block-toolbar .editor-url-input__button-modal {
 	position: absolute;
 	left: 0;
 	right: 0;

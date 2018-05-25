@@ -16,6 +16,7 @@ export {
 	default as serialize,
 	getBlockContent,
 	getBlockDefaultClassName,
+	getBlockMenuDefaultClassName,
 	getSaveElement,
 } from './serializer';
 export { isValidBlock } from './validation';

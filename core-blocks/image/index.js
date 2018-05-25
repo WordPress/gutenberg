@@ -198,8 +198,9 @@ export const settings = {
 	save( { attributes } ) {
 		const { url, alt, caption, align, href, width, height, id, data } = attributes;
 
-		const classes = classnames( align ? `align${ align }` : null, {
-			'is-resized': !! width || !! height,
+		const classes = classnames( {
+			[ `align${ align }` ]: align,
+			'is-resized': width || height,
 		} );
 
 		const image = (

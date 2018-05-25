@@ -104,7 +104,7 @@ class CodeEditor extends Component {
 	}
 
 	render() {
-		return <textarea ref={ ( ref ) => ( this.textarea = ref ) } value={ this.props.value } />;
+		return <textarea ref={ ( ref ) => ( this.textarea = ref ) } defaultValue={ this.props.value } />;
 	}
 }
 

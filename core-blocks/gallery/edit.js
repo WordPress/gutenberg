@@ -17,12 +17,13 @@ import {
 	SelectControl,
 	ToggleControl,
 	Toolbar,
+	withNotices,
 } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockAlignmentToolbar,
 	MediaUpload,
-	ImagePlaceholder,
+	MediaPlaceholder,
 	InspectorControls,
 	PostTypeSupportCheck,
 	editorMediaUpload,
@@ -45,7 +46,7 @@ export function defaultColumnsNumber( attributes ) {
 	return Math.min( 3, attributes.images.length );
 }
 
-export default class GalleryEdit extends Component {
+class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -136,16 +137,17 @@ export default class GalleryEdit extends Component {
 
 	addFiles( files ) {
 		const currentImages = this.props.attributes.images || [];
-		const { setAttributes } = this.props;
-		editorMediaUpload(
-			files,
-			( images ) => {
+		const { noticeOperations, setAttributes } = this.props;
+		editorMediaUpload( {
+			allowedType: 'image',
+			filesList: files,
+			onFileChange: ( images ) => {
 				setAttributes( {
 					images: currentImages.concat( images ),
 				} );
 			},
-			'image',
-		);
+			onError: noticeOperations.createErrorNotice,
+		} );
 	}
 
 	componentWillReceiveProps( nextProps ) {
@@ -159,7 +161,7 @@ export default class GalleryEdit extends Component {
 	}
 
 	render() {
-		const { attributes, isSelected, className } = this.props;
+		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
 		const dropZone = (
@@ -202,12 +204,19 @@ export default class GalleryEdit extends Component {
 			return (
 				<Fragment>
 					{ controls }
-					<ImagePlaceholder
-						className={ className }
+					<MediaPlaceholder
 						icon="format-gallery"
-						label={ __( 'Gallery' ) }
-						onSelectImage={ this.onSelectImages }
+						className={ className }
+						labels={ {
+							title: __( 'Gallery' ),
+							name: __( 'images' ),
+						} }
+						onSelect={ this.onSelectImages }
+						accept="image/*"
+						type="image"
 						multiple
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
 					/>
 				</Fragment>
 			);
@@ -239,6 +248,7 @@ export default class GalleryEdit extends Component {
 						/>
 					</PanelBody>
 				</InspectorControls>
+				{ noticeUI }
 				<ul className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 					{ dropZone }
 					{ images.map( ( img, index ) => (
@@ -275,3 +285,5 @@ export default class GalleryEdit extends Component {
 		);
 	}
 }
+
+export default withNotices( GalleryEdit );
