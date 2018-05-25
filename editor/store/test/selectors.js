@@ -566,6 +566,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostExcerpt( state ) ).toBe( 'sassel' );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should return the edited excerpt', () => {
@@ -581,6 +582,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostExcerpt( state ) ).toBe( 'youcha' );
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

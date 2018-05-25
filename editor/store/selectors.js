@@ -25,6 +25,7 @@ import createSelector from 'rememo';
 import { serialize, getBlockType, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { moment } from '@wordpress/date';
+import { deprecated } from '@wordpress/utils';
 
 /***
  * Module constants
@@ -298,7 +299,7 @@ export function isEditedPostSaveable( state ) {
 
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
-		!! getEditedPostExcerpt( state ) ||
+		!! getEditedPostAttribute( state, 'excerpt' ) ||
 		! isEditedPostEmpty( state )
 	);
 }
@@ -394,9 +395,13 @@ export function getDocumentTitle( state ) {
  * @return {string} Raw post excerpt.
  */
 export function getEditedPostExcerpt( state ) {
-	return state.editor.present.edits.excerpt === undefined ?
-		state.currentPost.excerpt :
-		state.editor.present.edits.excerpt;
+	deprecated( 'getEditedPostExcerpt', {
+		version: '3.1',
+		alternative: 'getEditedPostAttribute( state, \'excerpt\' )',
+		plugin: 'Gutenberg',
+	} );
+
+	return getEditedPostAttribute( state, 'excerpt' );
 }
 
 /**
