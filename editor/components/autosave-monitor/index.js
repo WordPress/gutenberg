@@ -49,8 +49,8 @@ export default compose( [
 		return {
 			isDirty: isEditedPostDirty(),
 			isAutosaveable: isPostAutosaveable(),
-			autosaveInterval: autosaveInterval,
 			isAutosaving: isAutosavingPost(),
+			autosaveInterval,
 		};
 	} ),
 
