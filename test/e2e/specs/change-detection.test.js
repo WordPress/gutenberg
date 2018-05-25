@@ -109,12 +109,14 @@ describe( 'Change detection', () => {
 
 		await page.setOfflineMode( true );
 
-		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'Mod', 'S' );
+		await Promise.all( [
+			// Keyboard shortcut Ctrl+S save.
+			pressWithModifier( 'Mod', 'S' ),
 
-		// Ensure save update fails and presents button.
-		await page.waitForXPath( '//p[contains(text(), \'Updating failed\')]' );
-		await page.waitForSelector( '.editor-post-save-draft' );
+			// Ensure save update fails and presents button.
+			page.waitForXPath( '//p[contains(text(), \'Updating failed\')]' ),
+			page.waitForSelector( '.editor-post-save-draft' ),
+		] );
 
 		// Need to disable offline to allow reload.
 		await page.setOfflineMode( false );
