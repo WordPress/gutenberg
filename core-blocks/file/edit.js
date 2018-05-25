@@ -45,7 +45,7 @@ class FileEdit extends Component {
 		// edit component has its own attributes in the state so it can be edited
 		// without setting the actual values outside of the edit UI
 		this.state = {
-			editing: ! href,
+			showPlaceholder: ! href,
 			href,
 			attachmentPage: undefined,
 		};
@@ -87,7 +87,7 @@ class FileEdit extends Component {
 	onSelectFile( media ) {
 		if ( media && media.url ) {
 			// sets the block's attributes and updates the edit component from the
-			// selected media, then switches off the editing UI
+			// selected media, then switches off the placeholder UI
 			this.props.setAttributes( {
 				href: media.url,
 				fileName: media.title,
@@ -98,7 +98,7 @@ class FileEdit extends Component {
 				href: media.url,
 				fileName: media.title,
 				attachmentPage: media.link,
-				editing: false,
+				showPlaceholder: false,
 			} );
 		}
 	}
@@ -129,14 +129,14 @@ class FileEdit extends Component {
 			buttonText,
 			id,
 		} = this.props.attributes;
-		const { setAttributes, noticeUI, noticeOperations } = this.props;
-		const { editing, href, attachmentPage } = this.state;
-
-		const classNames = [
-			this.props.className,
-			`${ this.props.className }__editing`,
-			this.isBlobURL( href ) ? 'is-transient' : '',
-		].join( ' ' );
+		const {
+			className,
+			isSelected,
+			setAttributes,
+			noticeUI,
+			noticeOperations,
+		} = this.props;
+		const { showPlaceholder, href, attachmentPage } = this.state;
 
 		// Choose Media File or Attachment Page (when file is in Media Library)
 		const onChangeLinkDestinationOption = ( newHref ) => {
@@ -163,7 +163,7 @@ class FileEdit extends Component {
 			onChangeFileName( fileName.toString() );
 		};
 
-		if ( editing ) {
+		if ( showPlaceholder ) {
 			return (
 				<MediaPlaceholder
 					icon="media-default"
@@ -171,7 +171,6 @@ class FileEdit extends Component {
 						title: __( 'File' ),
 						name: __( 'a file' ),
 					} }
-					className={ classNames }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
 					onError={ noticeOperations.createErrorNotice }
@@ -201,7 +200,7 @@ class FileEdit extends Component {
 							value={ id }
 							render={ ( { open } ) => (
 								<IconButton
-									className="components-icon-button components-toolbar__control"
+									className="components-toolbar__control"
 									label={ __( 'Edit file' ) }
 									onClick={ open }
 									icon="edit"
@@ -210,14 +209,15 @@ class FileEdit extends Component {
 						/>
 					</Toolbar>
 				</BlockControls>
-				<div className={ classNames }>
+				<div className={ this.isBlobURL( href ) ? 'is-transient' : '' }>
+					<div>
 					<div
-						className="wp-block-file__richtext-wrapper"
+						className={ `${ className }__richtext-wrapper` }
 						onBlur={ castFileNameToString }
 					>
 						<RichText
 							tagName="a"
-							className="wp-block-file__textlink"
+							className={ `${ className }__textlink` }
 							value={ fileName }
 							formattingControls={ [] } // disable controls
 							placeholder={ __( 'Write file name…' ) }
@@ -226,10 +226,10 @@ class FileEdit extends Component {
 						/>
 					</div>
 					{ showDownloadButton &&
-						<div className="wp-block-file__button-richtext-wrapper">
+						<div className={ `${ className }__button-richtext-wrapper` }>
 							<RichText
 								tagName="div" // must be block-level element or else cursor disappears
-								className="wp-block-file__button"
+								className={ `${ className }__button` }
 								value={ buttonText }
 								formattingControls={ [] } // disable controls
 								placeholder={ __( 'Add text…' ) }

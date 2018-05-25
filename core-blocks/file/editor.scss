@@ -1,25 +1,25 @@
-.wp-block-file__editing {
+.wp-block-file {
 	margin-bottom: 0;
 
 	&.is-transient {
 		@include loading_fade;
 	}
-}
 
-.wp-block-file__richtext-wrapper {
-	display: inline-block;
-}
+	&__richtext-wrapper {
+		display: inline-block;
+	}
 
-.wp-block-file__button-richtext-wrapper {
-	display: inline-block;
-	margin-left: 0.75em;
-}
+	&__button-richtext-wrapper {
+		display: inline-block;
+		margin-left: 0.75em;
+	}
 
-.wp-block-file__textlink {
-	text-decoration: underline;
+	&__textlink {
+		text-decoration: underline;
 
-	&:focus {
-		box-shadow: none;
-		color: $blue-medium-700;
+		&:focus {
+			box-shadow: none;
+			color: $blue-medium-700;
+		}
 	}
 }
