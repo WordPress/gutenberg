@@ -237,7 +237,7 @@ class FileEdit extends Component {
 							onBlur={ castFileNameToString }
 						>
 							<RichText
-								tagName="a"
+								tagName="div" // must be block-level or else placeholder will fail
 								className={ `${ className }__textlink` }
 								value={ fileName }
 								formattingControls={ [] } // disable controls
@@ -249,7 +249,7 @@ class FileEdit extends Component {
 						{ showDownloadButton &&
 							<div className={ `${ className }__button-richtext-wrapper` }>
 								<RichText
-									tagName="div" // must be block-level element or else cursor disappears
+									tagName="div" // must be block-level or else cursor disappears
 									className={ `${ className }__button` }
 									value={ buttonText }
 									formattingControls={ [] } // disable controls

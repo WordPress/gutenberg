@@ -20,9 +20,12 @@
 	&__textlink {
 		text-decoration: underline;
 
+		&[data-is-placeholder-visible="false"] {
+			color: $blue-medium-700;
+		}
+
 		&:focus {
 			box-shadow: none;
-			color: $blue-medium-700;
 		}
 	}
 
