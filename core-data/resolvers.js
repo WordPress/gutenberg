@@ -45,6 +45,13 @@ export async function* getEntityRecord( state, kind, name, key ) {
 	yield receiveEntityRecords( kind, name, record );
 }
 
+/**
+ * Requests the entity's records from the REST API.
+ *
+ * @param {Object} state  State tree
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ */
 export async function* getEntityRecords( state, kind, name ) {
 	const entity = getEntity( kind, name );
 	const records = await apiRequest( { path: `${ entity.baseUrl }?context=edit` } );
