@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, property, union } from 'lodash';
+import { filter, property, union, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -41,6 +41,7 @@ const {
 	isCurrentPostScheduled,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
+	isEditedPostAutosaveable,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
@@ -976,6 +977,107 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isEditedPostAutosaveable', () => {
+		it( 'should return false if the post is not saveable', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {
+					requesting: true,
+				},
+				autosave: {
+					title: 'sassel',
+				},
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if there is not yet an autosave', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {},
+				autosave: null,
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if none of title, excerpt, or content have changed', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: {},
+						blockOrder: {},
+						edits: {
+							content: 'foo',
+						},
+					},
+				},
+				currentPost: {
+					title: 'foo',
+					content: 'foo',
+					excerpt: 'foo',
+				},
+				saving: {},
+				autosave: {
+					title: 'foo',
+					content: 'foo',
+					excerpt: 'foo',
+				},
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if title, excerpt, or content have changed', () => {
+			for ( const variantField of [ 'title', 'excerpt', 'content' ] ) {
+				for ( const constantField of without( [ 'title', 'excerpt', 'content' ], variantField ) ) {
+					const state = {
+						editor: {
+							present: {
+								blocksByUID: {},
+								blockOrder: {},
+								edits: {
+									content: 'foo',
+								},
+							},
+						},
+						currentPost: {
+							title: 'foo',
+							content: 'foo',
+							excerpt: 'foo',
+						},
+						saving: {},
+						autosave: {
+							[ constantField ]: 'foo',
+							[ variantField ]: 'bar',
+						},
+					};
+
+					expect( isEditedPostAutosaveable( state ) ).toBe( true );
+				}
+			}
 		} );
 	} );
 

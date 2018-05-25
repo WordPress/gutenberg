@@ -336,17 +336,10 @@ export function isEditedPostAutosaveable( state ) {
 		return true;
 	}
 
-	const title = getEditedPostAttribute( state, 'title' );
-	const excerpt = getEditedPostExcerpt( state );
-	const content = getEditedPostContent( state );
-	const autosave = state.autosave;
-
 	// If the title, excerpt or content has changed, the post is autosaveable.
-	return (
-		( title !== autosave.title ) ||
-		( excerpt !== autosave.excerpt ) ||
-		( content !== autosave.content )
-	);
+	return [ 'title', 'excerpt', 'content' ].some( ( field ) => (
+		state.autosave[ field ] !== getEditedPostAttribute( state, field )
+	) );
 }
 
 /**
