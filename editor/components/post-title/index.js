@@ -3,6 +3,7 @@
  */
 import Textarea from 'react-autosize-textarea';
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { Component, compose } from '@wordpress/element';
 import { keycodes, decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { KeyboardShortcuts, withContext, withInstanceId, withFocusOutside } from '@wordpress/components';
+import { KeyboardShortcuts, withInstanceId, withFocusOutside } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -87,7 +88,7 @@ class PostTitle extends Component {
 	}
 
 	render() {
-		const { title, placeholder, instanceId } = this.props;
+		const { title, placeholder, instanceId, isPostTypeViewable } = this.props;
 		const { isSelected } = this.state;
 		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
 		const decodedPlaceholder = decodeEntities( placeholder );
@@ -95,7 +96,6 @@ class PostTitle extends Component {
 		return (
 			<PostTypeSupportCheck supportKeys="title">
 				<div className={ className }>
-					{ isSelected && <PostPermalink /> }
 					<KeyboardShortcuts
 						shortcuts={ {
 							'mod+z': this.redirectHistory,
@@ -116,6 +116,7 @@ class PostTitle extends Component {
 							onKeyPress={ this.onUnselect }
 						/>
 					</KeyboardShortcuts>
+					{ isSelected && isPostTypeViewable && <PostPermalink /> }
 				</div>
 			</PostTypeSupportCheck>
 		);
@@ -123,10 +124,15 @@ class PostTitle extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
+	const { getEditedPostAttribute, getEditorSettings } = select( 'core/editor' );
+	const { getPostType } = select( 'core' );
+	const postType = getPostType( getEditedPostAttribute( 'type' ) );
+	const { titlePlaceholder } = getEditorSettings();
 
 	return {
 		title: getEditedPostAttribute( 'title' ),
+		isPostTypeViewable: get( postType, [ 'viewable' ], false ),
+		placeholder: titlePlaceholder,
 	};
 } );
 
@@ -152,16 +158,9 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-const applyEditorSettings = withContext( 'editor' )(
-	( settings ) => ( {
-		placeholder: settings.titlePlaceholder,
-	} )
-);
-
 export default compose(
 	applyWithSelect,
 	applyWithDispatch,
-	applyEditorSettings,
 	withInstanceId,
 	withFocusOutside
 )( PostTitle );

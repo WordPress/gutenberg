@@ -1,5 +1,9 @@
 .editor-block-switcher {
 	position: relative;
+
+	.components-toolbar {
+		border-left: none;
+	}
 }
 
 .editor-block-switcher__toggle {
@@ -45,4 +49,13 @@
 		margin-right: 8px;
 		height: 20px;
 	}
+
+	&:hover:not(:disabled):not([aria-disabled="true"]) {
+		@include menu-style__neutral;
+	}
+
+	&:focus:not(:disabled):not([aria-disabled="true"]) {
+		@include menu-style__focus;
+	}
+
 }

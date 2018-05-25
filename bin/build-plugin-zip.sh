@@ -80,7 +80,7 @@ npm install
 status "Generating build..."
 npm run build
 status "Generating PHP file for wordpress.org to parse translations..."
-npm run pot-to-php
+npx pot-to-php ./languages/gutenberg.pot ./languages/gutenberg-translations.php gutenberg
 
 # Remove any existing zip file
 rm -f gutenberg.zip
@@ -91,14 +91,14 @@ rm -f gutenberg.zip
 php bin/generate-gutenberg-php.php > gutenberg.tmp.php
 mv gutenberg.tmp.php gutenberg.php
 
-build_files=$(ls **/build/*.{js,css})
+build_files=$(ls build/*/*.{js,css})
 
 # Generate the plugin zip file
 status "Creating archive..."
 zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
-	blocks/library/*/*.php \
+	core-blocks/*/*.php \
 	post-content.js \
 	$vendor_scripts \
 	$build_files \

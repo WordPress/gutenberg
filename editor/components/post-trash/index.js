@@ -1,24 +1,15 @@
 /**
- * External dependencies
- */
-import { connect } from 'react-redux';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Button, Dashicon } from '@wordpress/components';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
-import {
-	isEditedPostNew,
-	getCurrentPostId,
-	getCurrentPostType,
-} from '../../store/selectors';
-import { trashPost } from '../../store/actions';
 
 function PostTrash( { isNew, postId, postType, ...props } ) {
 	if ( isNew || ! postId ) {
@@ -28,20 +19,27 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 	const onClick = () => props.trashPost( postId, postType );
 
 	return (
-		<Button className="editor-post-trash button-link button-link-delete" onClick={ onClick }>
+		<Button isLink className="editor-post-trash button-link-delete" onClick={ onClick }>
 			{ __( 'Move to trash' ) }
 			<Dashicon icon="trash" />
 		</Button>
 	);
 }
 
-export default connect(
-	( state ) => {
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			isEditedPostNew,
+			getCurrentPostId,
+			getCurrentPostType,
+		} = select( 'core/editor' );
 		return {
-			isNew: isEditedPostNew( state ),
-			postId: getCurrentPostId( state ),
-			postType: getCurrentPostType( state ),
+			isNew: isEditedPostNew(),
+			postId: getCurrentPostId(),
+			postType: getCurrentPostType(),
 		};
-	},
-	{ trashPost }
-)( PostTrash );
+	} ),
+	withDispatch( ( dispatch ) => ( {
+		trashPost: dispatch( 'core/editor' ).trashPost,
+	} ) ),
+] )( PostTrash );

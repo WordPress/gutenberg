@@ -17,15 +17,13 @@ import {
  * the specified post object and editor settings.
  *
  * @param {Object} post     Post object.
- * @param {Object} settings Editor settings object.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post, settings ) {
+export function setupEditor( post ) {
 	return {
 		type: 'SETUP_EDITOR',
 		post,
-		settings,
 	};
 }
 
@@ -209,6 +207,28 @@ export function replaceBlock( uid, block ) {
 }
 
 /**
+ * Action creator creator which, given the action type to dispatch
+ * creates a prop dispatcher callback for
+ * managing block movement.
+ *
+ * @param {string}   type     Action type to dispatch.
+ *
+ * @return {Function} Prop dispatcher callback.
+ */
+function createOnMove( type ) {
+	return ( uids, rootUID ) => {
+		return {
+			uids: castArray( uids ),
+			type,
+			rootUID,
+		};
+	};
+}
+
+export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );
+export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
+
+/**
  * Returns an action object signalling that an indexed block should be moved
  * to a new index.
  *
@@ -337,6 +357,12 @@ export function savePost() {
 	};
 }
 
+export function refreshPost() {
+	return {
+		type: 'REFRESH_POST',
+	};
+}
+
 export function trashPost( postId, postType ) {
 	return {
 		type: 'TRASH_POST',
@@ -404,15 +430,15 @@ export function createUndoLevel() {
  * Returns an action object used in signalling that the blocks
  * corresponding to the specified UID set are to be removed.
  *
- * @param {string[]} uids           Block UIDs.
- * @param {boolean}  selectPrevious True if the previous block should be selected when a block is removed.
+ * @param {string|string[]} uids           Block UIDs.
+ * @param {boolean}         selectPrevious True if the previous block should be selected when a block is removed.
  *
  * @return {Object} Action object.
  */
 export function removeBlocks( uids, selectPrevious = true ) {
 	return {
 		type: 'REMOVE_BLOCKS',
-		uids,
+		uids: castArray( uids ),
 		selectPrevious,
 	};
 }
@@ -636,5 +662,35 @@ export function insertDefaultBlock( attributes, rootUID, index ) {
 	return {
 		...insertBlock( block, index, rootUID ),
 		isProvisional: true,
+	};
+}
+
+/**
+ * Returns an action object that changes the nested settings of a given block.
+ *
+ * @param {string} id       UID of the block whose nested setting.
+ * @param {Object} settings Object with the new settings for the nested block.
+ *
+ * @return {Object} Action object
+ */
+export function updateBlockListSettings( id, settings ) {
+	return {
+		type: 'UPDATE_BLOCK_LIST_SETTINGS',
+		id,
+		settings,
+	};
+}
+
+/*
+ * Returns an action object used in signalling that the editor settings have been updated.
+ *
+ * @param {Object} settings Updated settings
+ *
+ * @return {Object} Action object
+ */
+export function updateEditorSettings( settings ) {
+	return {
+		type: 'UPDATE_EDITOR_SETTINGS',
+		settings,
 	};
 }

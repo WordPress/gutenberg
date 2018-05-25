@@ -8,8 +8,8 @@ import { mount } from 'enzyme';
  */
 import Disabled from '../';
 
-jest.mock( '@wordpress/utils', () => {
-	const focus = require.requireActual( '@wordpress/utils' ).focus;
+jest.mock( '@wordpress/dom', () => {
+	const focus = require.requireActual( '@wordpress/dom' ).focus;
 
 	return {
 		focus: {
@@ -51,13 +51,18 @@ describe( 'Disabled', () => {
 		window.MutationObserver = MutationObserver;
 	} );
 
-	const Form = () => <form><input /><div contentEditable /></form>;
+	const Form = () => <form><input /><div contentEditable tabIndex="0" /></form>;
 
 	it( 'will disable all fields', () => {
 		const wrapper = mount( <Disabled><Form /></Disabled> );
 
-		expect( wrapper.find( 'input' ).getDOMNode().hasAttribute( 'disabled' ) ).toBe( true );
-		expect( wrapper.find( '[contentEditable]' ).getDOMNode().getAttribute( 'contenteditable' ) ).toBe( 'false' );
+		const input = wrapper.find( 'input' ).getDOMNode();
+		const div = wrapper.find( '[contentEditable]' ).getDOMNode();
+
+		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
+		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
+		expect( div.hasAttribute( 'tabindex' ) ).toBe( false );
+		expect( div.hasAttribute( 'disabled' ) ).toBe( false );
 	} );
 
 	it( 'should cleanly un-disable via reconciliation', () => {
@@ -73,8 +78,12 @@ describe( 'Disabled', () => {
 		const wrapper = mount( <MaybeDisable /> );
 		wrapper.setProps( { isDisabled: false } );
 
-		expect( wrapper.find( 'input' ).getDOMNode().hasAttribute( 'disabled' ) ).toBe( false );
-		expect( wrapper.find( '[contentEditable]' ).getDOMNode().getAttribute( 'contenteditable' ) ).toBe( 'true' );
+		const input = wrapper.find( 'input' ).getDOMNode();
+		const div = wrapper.find( '[contentEditable]' ).getDOMNode();
+
+		expect( input.hasAttribute( 'disabled' ) ).toBe( false );
+		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'true' );
+		expect( div.hasAttribute( 'tabindex' ) ).toBe( true );
 	} );
 
 	// Ideally, we'd have two more test cases here:

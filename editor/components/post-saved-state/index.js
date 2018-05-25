@@ -5,12 +5,15 @@ import { __ } from '@wordpress/i18n';
 import { Dashicon, IconButton, withSafeTimeout } from '@wordpress/components';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 import PostSwitchToDraftButton from '../post-switch-to-draft-button';
+
+const { displayShortcut } = keycodes;
 
 /**
  * Component showing whether the post is saved or not and displaying save links.
@@ -39,7 +42,7 @@ export class PostSavedState extends Component {
 		const { forceSavedMessage } = this.state;
 		if ( isSaving ) {
 			return (
-				<span className="editor-post-saved-state editor-post-saved-state__saving">
+				<span className="editor-post-saved-state is-saving">
 					<Dashicon icon="cloud" />
 					{ __( 'Saving' ) }
 				</span>
@@ -56,7 +59,7 @@ export class PostSavedState extends Component {
 
 		if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
 			return (
-				<span className="editor-post-saved-state">
+				<span className="editor-post-saved-state is-saved">
 					<Dashicon icon="saved" />
 					{ __( 'Saved' ) }
 				</span>
@@ -68,6 +71,7 @@ export class PostSavedState extends Component {
 				className="editor-post-save-draft"
 				onClick={ onSave }
 				icon="cloud-upload"
+				shortcut={ displayShortcut.primary( 's' ) }
 			>
 				{ __( 'Save Draft' ) }
 			</IconButton>

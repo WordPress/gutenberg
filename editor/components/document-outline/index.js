@@ -33,7 +33,7 @@ const multipleH1Headings = [
 	<em key="incorrect-message-multiple-h1">{ __( '(Multiple H1 headings are not recommended)' ) }</em>,
 ];
 
-const getHeadingLevel = heading => {
+const getHeadingLevel = ( heading ) => {
 	switch ( heading.attributes.nodeName ) {
 		case 'h1':
 		case 'H1':
@@ -81,7 +81,7 @@ const computeOutlineHeadings = ( blocks = [], path = [] ) => {
 	} );
 };
 
-const isEmptyHeading = heading => ! heading.attributes.content || heading.attributes.content.length === 0;
+const isEmptyHeading = ( heading ) => ! heading.attributes.content || heading.attributes.content.length === 0;
 
 export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupported } ) => {
 	const headings = computeOutlineHeadings( blocks );

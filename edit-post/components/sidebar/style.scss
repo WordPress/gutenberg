@@ -81,6 +81,13 @@
 	p + div.components-toolbar {
 		margin-top: -1em;
 	}
+
+	.editor-skip-to-selected-block:focus {
+		top: auto;
+		right: 10px;
+		bottom: 10px;
+		left: auto;
+	}
 }
 
 /* Visual and Text editor both */
@@ -125,6 +132,7 @@
 	padding-left: 0;
 	padding-right: $panel-padding / 2;
 	border-top: 0;
+	margin-top: 0;
 
 	.components-icon-button {
 		display: none;
@@ -149,11 +157,11 @@
 
 	&.is-active {
 		padding-bottom: 0;
-		border-bottom: 3px solid $blue-medium-500;
+		border-bottom: 3px solid theme( primary );
 		font-weight: 600;
 	}
 
 	&:focus {
-		@include square-style__focus-active;
+		@include square-style__focus;
 	}
 }

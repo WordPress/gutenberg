@@ -91,6 +91,13 @@ A class name to apply to the autocompletion popup menu.
 - Type: `String`
 - Required: No
 
+#### isDebounced
+
+Whether to apply debouncing for the autocompleter. Set to true to enable debouncing.
+
+- Type: `Boolean`
+- Required: No
+
 ### Examples
 
 The following is a contrived completer for fresh fruit.

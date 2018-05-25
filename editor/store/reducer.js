@@ -31,7 +31,7 @@ import { combineReducers } from '@wordpress/data';
  */
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
-import { PREFERENCES_DEFAULTS } from './defaults';
+import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 
 /**
@@ -200,7 +200,7 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  * Handles the following state keys:
  *  - edits: an object describing changes to be made to the current post, in
  *           the format accepted by the WP REST API
- *  - blocksByUid: post content blocks keyed by UID
+ *  - blocksByUID: post content blocks keyed by UID
  *  - blockOrder: object where each key is a UID, its value an array of uids
  *                representing the order of its inner blocks
  *
@@ -224,8 +224,8 @@ export const editor = flow( [
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.
 	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'RESET_POST' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
+		resetTypes: [ 'SETUP_EDITOR_STATE', 'UPDATE_POST' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST' ],
 	} ),
 ] )( {
 	edits( state = {}, action ) {
@@ -254,9 +254,14 @@ export const editor = flow( [
 
 				return state;
 
+			case 'UPDATE_POST':
 			case 'RESET_POST':
+				const getCanonicalValue = action.type === 'UPDATE_POST' ?
+					( key ) => action.edits[ key ] :
+					( key ) => getPostRawValue( action.post[ key ] );
+
 				return reduce( state, ( result, value, key ) => {
-					if ( value !== getPostRawValue( action.post[ key ] ) ) {
+					if ( value !== getCanonicalValue( key ) ) {
 						return result;
 					}
 
@@ -272,7 +277,7 @@ export const editor = flow( [
 		return state;
 	},
 
-	blocksByUid( state = {}, action ) {
+	blocksByUID( state = {}, action ) {
 		switch ( action.type ) {
 			case 'RESET_BLOCKS':
 			case 'SETUP_EDITOR_STATE':
@@ -774,16 +779,30 @@ export function isInsertionPointVisible( state = false, action ) {
  */
 export function template( state = { isValid: true }, action ) {
 	switch ( action.type ) {
-		case 'SETUP_EDITOR':
-			return {
-				...state,
-				template: action.settings.template,
-				lock: action.settings.templateLock,
-			};
 		case 'SET_TEMPLATE_VALIDITY':
 			return {
 				...state,
 				isValid: action.isValid,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the editor setting.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function settings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_EDITOR_SETTINGS':
+			return {
+				...state,
+				...action.settings,
 			};
 	}
 
@@ -1001,6 +1020,42 @@ export const sharedBlocks = combineReducers( {
 	},
 } );
 
+/**
+ * Reducer that for each block uid stores an object that represents its nested settings.
+ * E.g: what blocks can be nested inside a block.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const blockListSettings = ( state = {}, action ) => {
+	switch ( action.type ) {
+		// even if the replaced blocks have the same uid our logic should correct the state.
+		case 'REPLACE_BLOCKS' :
+		case 'REMOVE_BLOCKS': {
+			return omit( state, action.uids );
+		}
+		case 'UPDATE_BLOCK_LIST_SETTINGS': {
+			const { id } = action;
+			if ( id && ! action.settings ) {
+				return omit( state, id );
+			}
+			const blockSettings = state[ id ];
+			const updateIsRequired = ! isEqual( blockSettings, action.settings );
+			if ( updateIsRequired ) {
+				return {
+					...state,
+					[ id ]: {
+						...action.settings,
+					},
+				};
+			}
+		}
+	}
+	return state;
+};
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -1008,10 +1063,12 @@ export default optimist( combineReducers( {
 	blockSelection,
 	provisionalBlockUID,
 	blocksMode,
+	blockListSettings,
 	isInsertionPointVisible,
 	preferences,
 	saving,
 	notices,
 	sharedBlocks,
 	template,
+	settings,
 } ) );

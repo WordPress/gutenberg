@@ -2,12 +2,12 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
-import { Component } from '../../../element';
 import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { keycodes } from '@wordpress/utils';
 
 /**
@@ -159,8 +159,8 @@ describe( 'Autocomplete', () => {
 
 	const basicCompleter = {
 		options,
-		getOptionLabel: option => option.label,
-		getOptionKeywords: option => option.keywords,
+		getOptionLabel: ( option ) => option.label,
+		getOptionKeywords: ( option ) => option.keywords,
 	};
 
 	const slashCompleter = {
@@ -377,8 +377,8 @@ describe( 'Autocomplete', () => {
 				const itemWrappers = wrapper.find( 'button.components-autocomplete__result' );
 				expect( itemWrappers ).toHaveLength( 3 );
 
-				const expectedLabelContent = options.map( o => o.label );
-				const actualLabelContent = itemWrappers.map( itemWrapper => itemWrapper.text() );
+				const expectedLabelContent = options.map( ( o ) => o.label );
+				const actualLabelContent = itemWrappers.map( ( itemWrapper ) => itemWrapper.text() );
 				expect( actualLabelContent ).toEqual( expectedLabelContent );
 
 				done();
@@ -402,8 +402,8 @@ describe( 'Autocomplete', () => {
 				const itemWrappers = wrapper.find( 'button.components-autocomplete__result' );
 				expect( itemWrappers ).toHaveLength( 3 );
 
-				const expectedLabelContent = options.map( o => o.label );
-				const actualLabelContent = itemWrappers.map( itemWrapper => itemWrapper.text() );
+				const expectedLabelContent = options.map( ( o ) => o.label );
+				const actualLabelContent = itemWrappers.map( ( itemWrapper ) => itemWrapper.text() );
 				expect( actualLabelContent ).toEqual( expectedLabelContent );
 
 				done();
@@ -427,8 +427,8 @@ describe( 'Autocomplete', () => {
 				const itemWrappers = wrapper.find( 'button.components-autocomplete__result' );
 				expect( itemWrappers ).toHaveLength( 3 );
 
-				const expectedLabelContent = options.map( o => o.label );
-				const actualLabelContent = itemWrappers.map( itemWrapper => itemWrapper.text() );
+				const expectedLabelContent = options.map( ( o ) => o.label );
+				const actualLabelContent = itemWrappers.map( ( itemWrapper ) => itemWrapper.text() );
 				expect( actualLabelContent ).toEqual( expectedLabelContent );
 
 				done();

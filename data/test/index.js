@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { mount } from 'enzyme';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,6 +32,11 @@ import {
 jest.mock( '@wordpress/utils', () => ( {
 	deprecated: jest.fn(),
 } ) );
+
+// Mock data store to prevent self-initialization, as it needs to be reset
+// between tests of `registerResolvers` by replacement (new `registerStore`).
+jest.mock( '../store', () => () => {} );
+const registerDataStore = require.requireActual( '../store' ).default;
 
 describe( 'registerStore', () => {
 	it( 'should be shorthand for reducer, actions, selectors registration', () => {
@@ -79,6 +85,10 @@ describe( 'registerReducer', () => {
 } );
 
 describe( 'registerResolvers', () => {
+	beforeEach( () => {
+		registerDataStore();
+	} );
+
 	const unsubscribes = [];
 	afterEach( () => {
 		let unsubscribe;
@@ -91,6 +101,18 @@ describe( 'registerResolvers', () => {
 		const unsubscribe = subscribe( ...args );
 		unsubscribes.push( unsubscribe );
 		return unsubscribe;
+	}
+
+	function subscribeUntil( predicates ) {
+		predicates = castArray( predicates );
+
+		return new Promise( ( resolve ) => {
+			subscribeWithUnsubscribe( () => {
+				if ( predicates.every( ( predicate ) => predicate() ) ) {
+					resolve();
+				}
+			} );
+		} );
 	}
 
 	it( 'should not do anything for selectors which do not have resolvers', () => {
@@ -123,7 +145,81 @@ describe( 'registerResolvers', () => {
 		expect( resolver ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'should resolve action to dispatch', ( done ) => {
+	it( 'should support the object resolver definition', () => {
+		const resolver = jest.fn();
+
+		registerReducer( 'demo', ( state = 'OK' ) => state );
+		registerSelectors( 'demo', {
+			getValue: ( state ) => state,
+		} );
+		registerResolvers( 'demo', {
+			getValue: { fulfill: resolver },
+		} );
+
+		const value = select( 'demo' ).getValue( 'arg1', 'arg2' );
+		expect( value ).toBe( 'OK' );
+	} );
+
+	it( 'should use isFulfilled definition before calling the side effect', () => {
+		const fulfill = jest.fn().mockImplementation( ( state, page ) => {
+			return { type: 'SET_PAGE', page, result: [] };
+		} );
+
+		const store = registerReducer( 'demo', ( state = {}, action ) => {
+			switch ( action.type ) {
+				case 'SET_PAGE':
+					return {
+						...state,
+						[ action.page ]: action.result,
+					};
+			}
+
+			return state;
+		} );
+
+		store.dispatch( { type: 'SET_PAGE', page: 4, result: [] } );
+
+		registerSelectors( 'demo', {
+			getPage: ( state, page ) => state[ page ],
+		} );
+		registerResolvers( 'demo', {
+			getPage: {
+				fulfill,
+				isFulfilled( state, page ) {
+					return state.hasOwnProperty( page );
+				},
+			},
+		} );
+
+		select( 'demo' ).getPage( 1 );
+		select( 'demo' ).getPage( 2 );
+
+		expect( fulfill ).toHaveBeenCalledTimes( 2 );
+
+		select( 'demo' ).getPage( 1 );
+		select( 'demo' ).getPage( 2 );
+		select( 'demo' ).getPage( 3, {} );
+
+		// Expected: First and second page fulfillments already triggered, so
+		// should only be one more than previous assertion set.
+		expect( fulfill ).toHaveBeenCalledTimes( 3 );
+
+		select( 'demo' ).getPage( 1 );
+		select( 'demo' ).getPage( 2 );
+		select( 'demo' ).getPage( 3, {} );
+		select( 'demo' ).getPage( 4 );
+
+		// Expected:
+		//  - Fourth page was pre-filled. Necessary to determine via
+		//    isFulfilled, but fulfillment resolver should not be triggered.
+		//  - Third page arguments are not strictly equal but are equivalent,
+		//    so fulfillment should already be satisfied.
+		expect( fulfill ).toHaveBeenCalledTimes( 3 );
+
+		select( 'demo' ).getPage( 4, {} );
+	} );
+
+	it( 'should resolve action to dispatch', () => {
 		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;
 		} );
@@ -134,19 +230,17 @@ describe( 'registerResolvers', () => {
 			getValue: () => ( { type: 'SET_OK' } ),
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			try {
-				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
-				done();
-			} catch ( error ) {
-				done( error );
-			}
-		} );
+		const promise = subscribeUntil( [
+			() => select( 'demo' ).getValue() === 'OK',
+			() => select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
+		] );
 
 		select( 'demo' ).getValue();
+
+		return promise;
 	} );
 
-	it( 'should resolve mixed type action array to dispatch', ( done ) => {
+	it( 'should resolve mixed type action array to dispatch', () => {
 		registerReducer( 'counter', ( state = 0, action ) => {
 			return action.type === 'INCREMENT' ? state + 1 : state;
 		} );
@@ -160,16 +254,17 @@ describe( 'registerResolvers', () => {
 			],
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			if ( select( 'counter' ).getCount() === 2 ) {
-				done();
-			}
-		} );
+		const promise = subscribeUntil( [
+			() => select( 'counter' ).getCount() === 2,
+			() => select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
+		] );
 
 		select( 'counter' ).getCount();
+
+		return promise;
 	} );
 
-	it( 'should resolve generator action to dispatch', ( done ) => {
+	it( 'should resolve generator action to dispatch', () => {
 		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;
 		} );
@@ -182,19 +277,17 @@ describe( 'registerResolvers', () => {
 			},
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			try {
-				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
-				done();
-			} catch ( error ) {
-				done( error );
-			}
-		} );
+		const promise = subscribeUntil( [
+			() => select( 'demo' ).getValue() === 'OK',
+			() => select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
+		] );
 
 		select( 'demo' ).getValue();
+
+		return promise;
 	} );
 
-	it( 'should resolve promise action to dispatch', ( done ) => {
+	it( 'should resolve promise action to dispatch', () => {
 		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' ? 'OK' : state;
 		} );
@@ -205,16 +298,14 @@ describe( 'registerResolvers', () => {
 			getValue: () => Promise.resolve( { type: 'SET_OK' } ),
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			try {
-				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
-				done();
-			} catch ( error ) {
-				done( error );
-			}
-		} );
+		const promise = subscribeUntil( [
+			() => select( 'demo' ).getValue() === 'OK',
+			() => select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
+		] );
 
 		select( 'demo' ).getValue();
+
+		return promise;
 	} );
 
 	it( 'should resolve promise non-action to dispatch', ( done ) => {
@@ -241,7 +332,7 @@ describe( 'registerResolvers', () => {
 		} );
 	} );
 
-	it( 'should resolve async iterator action to dispatch', ( done ) => {
+	it( 'should resolve async iterator action to dispatch', () => {
 		registerReducer( 'counter', ( state = 0, action ) => {
 			return action.type === 'INCREMENT' ? state + 1 : state;
 		} );
@@ -255,16 +346,17 @@ describe( 'registerResolvers', () => {
 			},
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			if ( select( 'counter' ).getCount() === 2 ) {
-				done();
-			}
-		} );
+		const promise = subscribeUntil( [
+			() => select( 'counter' ).getCount() === 2,
+			() => select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
+		] );
 
 		select( 'counter' ).getCount();
+
+		return promise;
 	} );
 
-	it( 'should not dispatch resolved promise action on subsequent selector calls', ( done ) => {
+	it( 'should not dispatch resolved promise action on subsequent selector calls', () => {
 		registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 			return action.type === 'SET_OK' && state === 'NOTOK' ? 'OK' : 'NOTOK';
 		} );
@@ -275,17 +367,12 @@ describe( 'registerResolvers', () => {
 			getValue: () => Promise.resolve( { type: 'SET_OK' } ),
 		} );
 
-		subscribeWithUnsubscribe( () => {
-			try {
-				expect( select( 'demo' ).getValue() ).toBe( 'OK' );
-				done();
-			} catch ( error ) {
-				done( error );
-			}
-		} );
+		const promise = subscribeUntil( () => select( 'demo' ).getValue() === 'OK' );
 
 		select( 'demo' ).getValue();
 		select( 'demo' ).getValue();
+
+		return promise;
 	} );
 } );
 
@@ -309,7 +396,7 @@ describe( 'select', () => {
 } );
 
 describe( 'withSelect', () => {
-	let wrapper;
+	let wrapper, store;
 
 	const unsubscribes = [];
 	afterEach( () => {
@@ -325,7 +412,7 @@ describe( 'withSelect', () => {
 	} );
 
 	function subscribeWithUnsubscribe( ...args ) {
-		const unsubscribe = subscribe( ...args );
+		const unsubscribe = store.subscribe( ...args );
 		unsubscribes.push( unsubscribe );
 		return unsubscribe;
 	}
@@ -426,7 +513,7 @@ describe( 'withSelect', () => {
 		// until after the current listener stack is called, we don't attempt
 		// to setState on an unmounting `withSelect` component. It will fail if
 		// an attempt is made to `setState` on an unmounted component.
-		const store = registerReducer( 'counter', ( state = 0, action ) => {
+		store = registerReducer( 'counter', ( state = 0, action ) => {
 			if ( action.type === 'increment' ) {
 				return state + 1;
 			}
@@ -452,7 +539,7 @@ describe( 'withSelect', () => {
 	} );
 
 	it( 'should not rerun selection on unchanging state', () => {
-		const store = registerReducer( 'unchanging', ( state = {} ) => state );
+		store = registerReducer( 'unchanging', ( state = {} ) => state );
 
 		registerSelectors( 'unchanging', {
 			getState: ( state ) => state,

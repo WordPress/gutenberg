@@ -73,9 +73,10 @@
 	width: 100%;
 	font-weight: 600;
 	text-align: left;
+	color: $dark-gray-900;
 	@include menu-style__neutral;
 
-	&:focus {
+	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;
 	}
 

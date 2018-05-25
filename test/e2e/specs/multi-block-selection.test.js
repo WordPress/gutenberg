@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage } from '../support/utils';
+import { newPost, newDesktopBrowserPage, pressWithModifier } from '../support/utils';
 
 describe( 'Multi-block selection', () => {
 	beforeAll( async () => {
@@ -22,9 +22,11 @@ describe( 'Multi-block selection', () => {
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
 		await page.keyboard.type( 'Image' );
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
 		await page.keyboard.type( 'Quote' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Quote Block' );
@@ -62,9 +64,7 @@ describe( 'Multi-block selection', () => {
 
 		// Multiselect via keyboard
 		await page.click( 'body' );
-		await page.keyboard.down( 'Meta' );
-		await page.keyboard.press( 'a' );
-		await page.keyboard.up( 'Meta' );
+		await pressWithModifier( 'Mod', 'a' );
 
 		// Verify selection
 		expectMultiSelected( blocks, true );

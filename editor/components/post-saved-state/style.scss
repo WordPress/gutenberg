@@ -4,6 +4,10 @@
 	color: $dark-gray-500;
 	overflow: hidden;
 
+	&.is-saving {
+		animation: loading_fade .5s infinite;
+	}
+
 	.dashicon {
 		display: inline-block;
 	    flex: 0 0 auto;
@@ -29,8 +33,4 @@
 			margin-right: 4px;
 		}
 	}
-}
-
-.editor-post-saved-state__saving {
-	animation: loading_fade .5s infinite;
 }

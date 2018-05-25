@@ -8,7 +8,8 @@ import { cond, matchesProperty } from 'lodash';
  */
 import { NavigableMenu, KeyboardShortcuts } from '@wordpress/components';
 import { Component, findDOMNode } from '@wordpress/element';
-import { focus, keycodes } from '@wordpress/utils';
+import { focus } from '@wordpress/dom';
+import { keycodes } from '@wordpress/utils';
 
 /**
  * Browser dependencies
@@ -85,7 +86,8 @@ class NavigableToolbar extends Component {
 			>
 				<KeyboardShortcuts
 					bindGlobal
-					eventName="keyup"
+					// Use the same event that TinyMCE uses in the Classic block for its own `alt+f10` shortcut.
+					eventName="keydown"
 					shortcuts={ {
 						'alt+f10': this.focusToolbar,
 					} }
