@@ -890,6 +890,27 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
+				saving: {},
+			};
+
+			expect( isEditedPostSaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if the post has a title but save already in progress', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {
+					requesting: true,
+				},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( false );
@@ -907,6 +928,7 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
+				saving: {},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
@@ -924,6 +946,7 @@ describe( 'selectors', () => {
 				currentPost: {
 					excerpt: 'sassel',
 				},
+				saving: {},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
@@ -949,6 +972,7 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
+				saving: {},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );

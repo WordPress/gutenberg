@@ -282,6 +282,10 @@ export function isEditedPostPublishable( state ) {
  * @return {boolean} Whether the post can be saved.
  */
 export function isEditedPostSaveable( state ) {
+	if ( isSavingPost( state ) ) {
+		return false;
+	}
+
 	// TODO: Post should not be saveable if not dirty. Cannot be added here at
 	// this time since posts where meta boxes are present can be saved even if
 	// the post is not dirty. Currently this restriction is imposed at UI, but
