@@ -1067,7 +1067,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$script .= <<<JS
 		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
 			wp.api.init().then( function() {
-				wp.domReady.default( function() {
+				wp.domReady( function() {
 					resolve( wp.editPost.initializeEditor( 'editor', window._wpGutenbergPost, editorSettings ) );
 				} );
 			} );
