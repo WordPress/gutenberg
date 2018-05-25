@@ -1,5 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`ColorPalette Dropdown .renderContent should enable alpha channel inside color picker 1`] = `
+<Chrome
+  color="#f00"
+  disableAlpha={false}
+  hex="#ff0000"
+  hsl={
+    Object {
+      "a": 1,
+      "h": 0,
+      "l": 0.5,
+      "s": 1,
+    }
+  }
+  hsv={
+    Object {
+      "a": 1,
+      "h": 0,
+      "s": 1,
+      "v": 1,
+    }
+  }
+  oldHue={0}
+  onChange={[Function]}
+  onChangeComplete={[Function]}
+  rgb={
+    Object {
+      "a": 1,
+      "b": 0,
+      "g": 0,
+      "r": 255,
+    }
+  }
+/>
+`;
+
 exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
 <Chrome
   color="#f00"
