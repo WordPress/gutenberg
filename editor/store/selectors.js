@@ -1159,10 +1159,11 @@ export function didPostSaveRequestFail( state ) {
 }
 
 /**
- * Is the post autosaving?
+ * Returns true if the post is autosaving, or false otherwise.
  *
- * @param  {Object}  state Global application state
- * @return {boolean}       Whether the post is autosaving
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
 	return !! state.isAutosaving;
