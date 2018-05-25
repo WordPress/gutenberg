@@ -43,6 +43,21 @@ export function resetPost( post ) {
 }
 
 /**
+ * Returns an action object used in signalling that the latest autosave of the
+ * post has been received, by initialization or autosave.
+ *
+ * @param {Object} post Autosave post object.
+ *
+ * @return {Object} Action object.
+ */
+export function resetAutosave( post ) {
+	return {
+		type: 'RESET_AUTOSAVE',
+		post,
+	};
+}
+
+/**
  * Returns an action object used to setup the editor state when first opening an editor.
  *
  * @param {Object}  post            Post object.

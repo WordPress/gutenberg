@@ -27,6 +27,7 @@ import { speak } from '@wordpress/a11y';
 import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
 	setupEditorState,
+	resetAutosave,
 	resetPost,
 	receiveBlocks,
 	receiveSharedBlocks,
@@ -107,16 +108,10 @@ export default {
 			toSend.parent = post.id;
 			wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }/autosaves`, method: 'POST', data: toSend } ).then(
 				( autosave ) => {
-					dispatch( {
-						type: 'RESET_AUTOSAVE',
-						post: autosave,
-					} );
+					dispatch( resetAutosave( autosave ) );
 				},
 				() => {
-					dispatch( {
-						type: 'RESET_AUTOSAVE',
-						post: post,
-					} );
+					dispatch( resetAutosave( post ) );
 				} );
 		} else {
 			dispatch( {
