@@ -306,7 +306,7 @@ export function isEditedPostEmpty( state ) {
  *
  * @return {boolean} Whether the post can be autosaved.
  */
-export function isPostAutosaveable( state ) {
+export function isEditedPostAutosaveable( state ) {
 	// If the post is autosaving, it is not autosaveable.
 	if ( state.isAutosaving ) {
 		return false;

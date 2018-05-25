@@ -41,14 +41,14 @@ export default compose( [
 	withSelect( ( select ) => {
 		const {
 			isEditedPostDirty,
-			isPostAutosaveable,
+			isEditedPostAutosaveable,
 			getEditorSettings,
 			isAutosavingPost,
 		} = select( 'core/editor' );
 		const { autosaveInterval } = getEditorSettings();
 		return {
 			isDirty: isEditedPostDirty(),
-			isAutosaveable: isPostAutosaveable(),
+			isAutosaveable: isEditedPostAutosaveable(),
 			isAutosaving: isAutosavingPost(),
 			autosaveInterval,
 		};
