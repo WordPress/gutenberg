@@ -98,28 +98,37 @@ export default compose( [
 		} = select( 'core/editor' );
 		const { allowedBlockTypes, templateLock } = getEditorSettings();
 		const insertionPoint = getBlockInsertionPoint();
-		const { rootUID } = insertionPoint;
-		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
+		const {
+			rootUID: insertionPointRootUID,
+			index: insertionPointIndex,
+			layout: insertionPointLayout,
+		} = insertionPoint;
+		const supportedBlocks = getSupportedBlocks( insertionPointRootUID, allowedBlockTypes );
+		const selectedBlock = getSelectedBlock();
+		const selectedBlockUid = selectedBlock && selectedBlock.uid;
+		const blockIsUnmodifiedDefaultBlock = selectedBlock && isUnmodifiedDefaultBlock( selectedBlock );
 		return {
 			title: getEditedPostAttribute( 'title' ),
-			insertionPoint,
-			selectedBlock: getSelectedBlock(),
 			hasSupportedBlocks: true === supportedBlocks || ! isEmpty( supportedBlocks ),
 			isLocked: !! templateLock,
+			selectedBlockUid,
+			blockIsUnmodifiedDefaultBlock,
+			insertionPointRootUID,
+			insertionPointIndex,
+			insertionPointLayout,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
 		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
 		onInsertBlock: ( item ) => {
-			const { insertionPoint, selectedBlock } = ownProps;
-			const { index, rootUID, layout } = insertionPoint;
+			const { selectedBlockUid, blockIsUnmodifiedDefaultBlock, insertionPointIndex, insertionPointLayout, insertionPointRootUID } = ownProps;
 			const { name, initialAttributes } = item;
-			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
-			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
-				return dispatch( 'core/editor' ).replaceBlocks( selectedBlock.uid, insertedBlock );
+			const insertedBlock = createBlock( name, { ...initialAttributes, layout: insertionPointLayout } );
+			if ( blockIsUnmodifiedDefaultBlock ) {
+				return dispatch( 'core/editor' ).replaceBlocks( selectedBlockUid, insertedBlock );
 			}
-			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
+			return dispatch( 'core/editor' ).insertBlock( insertedBlock, insertionPointIndex, insertionPointRootUID );
 		},
 	} ) ),
 ] )( Inserter );
