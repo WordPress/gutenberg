@@ -55,6 +55,6 @@ export default compose( [
 	} ),
 
 	withDispatch( ( dispatch ) => ( {
-		autosave: dispatch( 'core/editor' ).doAutosave,
+		autosave: dispatch( 'core/editor' ).autosave,
 	} ) ),
 ] )( AutosaveMonitor );

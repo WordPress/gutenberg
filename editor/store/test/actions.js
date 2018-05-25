@@ -30,7 +30,7 @@ import {
 	savePost,
 	trashPost,
 	mergeBlocks,
-	doAutosave,
+	autosave,
 	redo,
 	undo,
 	removeBlocks,
@@ -270,9 +270,9 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'doAutosave', () => {
+	describe( 'autosave', () => {
 		it( 'should return AUTOSAVE action', () => {
-			expect( doAutosave() ).toEqual( {
+			expect( autosave() ).toEqual( {
 				type: 'AUTOSAVE',
 			} );
 		} );
