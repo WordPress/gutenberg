@@ -348,9 +348,9 @@ export function isEditedPostAutosaveable( state ) {
 
 	// If the title, excerpt or content has changed, the post is autosaveable.
 	return (
-		( title !== autosave.title.raw ) ||
-		( excerpt !== autosave.excerpt.raw ) ||
-		( content !== autosave.content.raw )
+		( title !== autosave.title ) ||
+		( excerpt !== autosave.excerpt ) ||
+		( content !== autosave.content )
 	);
 }
 

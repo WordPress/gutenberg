@@ -1065,14 +1065,21 @@ export const blockListSettings = ( state = {}, action ) => {
  *
  * @return {Object} Updated state.
  */
-export const autosave = ( state = null, action ) => {
+export function autosave( state = null, action ) {
 	switch ( action.type ) {
 		case 'RESET_AUTOSAVE':
-			return action.post;
+			const { post } = action;
+			const [ title, excerpt, content ] = [
+				'title',
+				'excerpt',
+				'content',
+			].map( ( field ) => getPostRawValue( post[ field ] ) );
+
+			return { title, excerpt, content };
 	}
 
 	return state;
-};
+}
 
 export default optimist( combineReducers( {
 	editor,
