@@ -48,6 +48,14 @@ describe( 'AutosaveMonitor', () => {
 			expect( toggleTimer ).toHaveBeenCalledWith( false );
 		} );
 
+		it( 'should stop autosave timer when autosave otherwise starts', () => {
+			wrapper.setProps( { isDirty: true, isAutosaveable: true, isAutosaving: false } );
+			toggleTimer.mockClear();
+			wrapper.setProps( { isAutosaving: true } );
+
+			expect( toggleTimer ).toHaveBeenCalledWith( false );
+		} );
+
 		it( 'should stop autosave timer when having become not autosaveable', () => {
 			wrapper.setProps( { isDirty: true } );
 			toggleTimer.mockClear();

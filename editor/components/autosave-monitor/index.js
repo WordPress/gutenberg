@@ -8,15 +8,12 @@ export class AutosaveMonitor extends Component {
 	componentDidUpdate( prevProps ) {
 		const { isDirty, isAutosaveable, isAutosaving } = this.props;
 
-		// Prevent autosaves if an autosave is in progress.
-		if ( isAutosaving ) {
-			return;
-		}
 		if (
 			prevProps.isDirty !== isDirty ||
-			prevProps.isAutosaveable !== isAutosaveable
+			prevProps.isAutosaveable !== isAutosaveable ||
+			prevProps.isAutosaving !== isAutosaving
 		) {
-			this.toggleTimer( isDirty && isAutosaveable );
+			this.toggleTimer( isDirty && isAutosaveable && ! isAutosaving );
 		}
 	}
 
