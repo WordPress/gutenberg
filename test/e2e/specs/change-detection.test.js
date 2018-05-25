@@ -117,6 +117,25 @@ describe( 'Change detection', () => {
 		await assertIsDirty( false );
 	} );
 
+	it( 'Should not save if all changes saved', async () => {
+		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		await Promise.all( [
+			// Wait for "Saved" to confirm save complete.
+			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
+
+			// Keyboard shortcut Ctrl+S save.
+			pressWithModifier( 'Mod', 'S' ),
+		] );
+
+		await interceptSave();
+
+		// Keyboard shortcut Ctrl+S save.
+		await pressWithModifier( 'Mod', 'S' );
+
+		expect( hadInterceptedSave ).toBe( false );
+	} );
+
 	it( 'Should prompt if save failed', async () => {
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
