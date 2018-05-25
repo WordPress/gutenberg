@@ -1,4 +1,7 @@
 .wp-block-file {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 	margin-bottom: 0;
 
 	&.is-transient {
@@ -21,5 +24,9 @@
 			box-shadow: none;
 			color: $blue-medium-700;
 		}
+	}
+
+	&__copy-url-button {
+		margin-left: 1em;
 	}
 }

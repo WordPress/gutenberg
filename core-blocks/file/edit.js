@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, revokeBlobURL } from '@wordpress/utils';
 import {
+	ClipboardButton,
 	IconButton,
 	Toolbar,
 	withNotices,
@@ -35,6 +36,7 @@ class FileEdit extends Component {
 		} = this.props.attributes;
 
 		this.onSelectFile = this.onSelectFile.bind( this );
+		this.onCopy = this.onCopy.bind( this );
 
 		// Initialize default values if undefined
 		this.props.setAttributes( {
@@ -48,6 +50,7 @@ class FileEdit extends Component {
 			showPlaceholder: ! href,
 			href,
 			attachmentPage: undefined,
+			showCopyConfirmation: false,
 		};
 
 		if ( id !== undefined ) {
@@ -84,6 +87,10 @@ class FileEdit extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		clearTimeout( this.dismissCopyConfirmation );
+	}
+
 	onSelectFile( media ) {
 		if ( media && media.url ) {
 			// sets the block's attributes and updates the edit component from the
@@ -101,6 +108,15 @@ class FileEdit extends Component {
 				showPlaceholder: false,
 			} );
 		}
+	}
+
+	onCopy() {
+		this.setState( { showCopyConfirmation: true } );
+
+		clearTimeout( this.dismissCopyConfirmation );
+		this.dismissCopyConfirmation = setTimeout( () => {
+			this.setState( { showCopyConfirmation: false } );
+		}, 4000 );
 	}
 
 	isBlobURL( url = '' ) {
@@ -137,6 +153,11 @@ class FileEdit extends Component {
 			noticeOperations,
 		} = this.props;
 		const { showPlaceholder, href, attachmentPage } = this.state;
+
+		const classNames = [
+			className,
+			this.isBlobURL( href ) ? 'is-transient' : '',
+		].join( ' ' );
 
 		// Choose Media File or Attachment Page (when file is in Media Library)
 		const onChangeLinkDestinationOption = ( newHref ) => {
@@ -209,34 +230,45 @@ class FileEdit extends Component {
 						/>
 					</Toolbar>
 				</BlockControls>
-				<div className={ this.isBlobURL( href ) ? 'is-transient' : '' }>
+				<div className={ classNames }>
 					<div>
-					<div
-						className={ `${ className }__richtext-wrapper` }
-						onBlur={ castFileNameToString }
-					>
-						<RichText
-							tagName="a"
-							className={ `${ className }__textlink` }
-							value={ fileName }
-							formattingControls={ [] } // disable controls
-							placeholder={ __( 'Write file name…' ) }
-							keepPlaceholderOnFocus
-							onChange={ onChangeFileName }
-						/>
-					</div>
-					{ showDownloadButton &&
-						<div className={ `${ className }__button-richtext-wrapper` }>
+						<div
+							className={ `${ className }__richtext-wrapper` }
+							onBlur={ castFileNameToString }
+						>
 							<RichText
-								tagName="div" // must be block-level element or else cursor disappears
-								className={ `${ className }__button` }
-								value={ buttonText }
+								tagName="a"
+								className={ `${ className }__textlink` }
+								value={ fileName }
 								formattingControls={ [] } // disable controls
-								placeholder={ __( 'Add text…' ) }
+								placeholder={ __( 'Write file name…' ) }
 								keepPlaceholderOnFocus
-								onChange={ ( text ) => setAttributes( { buttonText: text } ) }
+								onChange={ onChangeFileName }
 							/>
 						</div>
+						{ showDownloadButton &&
+							<div className={ `${ className }__button-richtext-wrapper` }>
+								<RichText
+									tagName="div" // must be block-level element or else cursor disappears
+									className={ `${ className }__button` }
+									value={ buttonText }
+									formattingControls={ [] } // disable controls
+									placeholder={ __( 'Add text…' ) }
+									keepPlaceholderOnFocus
+									onChange={ ( text ) => setAttributes( { buttonText: text } ) }
+								/>
+							</div>
+						}
+					</div>
+					{ isSelected &&
+						<ClipboardButton
+							isDefault
+							text={ href }
+							className={ `${ className }__copy-url-button` }
+							onCopy={ this.onCopy }
+						>
+							{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
+						</ClipboardButton>
 					}
 				</div>
 			</Fragment>
