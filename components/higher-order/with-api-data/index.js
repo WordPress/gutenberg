@@ -176,6 +176,9 @@ export default ( mapPropsToData ) => createHigherOrderComponent( ( WrappedCompon
 
 				result[ propName ] = {};
 
+				if ( window._apiEndpointMap ) {
+					path = path.replace( 'wp/v2/', window._apiEndpointMap );
+				}
 				const route = getRoute( this.schema, path );
 				if ( ! route ) {
 					return result;
