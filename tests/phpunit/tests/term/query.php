@@ -291,6 +291,41 @@ class Tests_Term_Query extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @ticket 44221
+	 */
+	public function test_all_with_object_id_should_return_term_objects() {
+		register_taxonomy( 'wptests_tax_1', 'post' );
+		$posts = self::factory()->post->create_many( 2 );
+		$t     = self::factory()->term->create( array( 'taxonomy' => 'wptests_tax_1' ) );
+
+		foreach ( $posts as $p ) {
+			wp_set_object_terms( $p, array( $t ), 'wptests_tax_1' );
+		}
+
+		$query = new WP_Term_Query();
+		$args = array(
+			'taxonomy'   => 'wptests_tax_1',
+			'object_ids' => $posts,
+			'fields'     => 'all_with_object_id',
+		);
+
+		$terms = $query->query( $args );
+		$this->assertNotEmpty( $terms );
+		foreach ( $terms as $term ) {
+			$this->assertInstanceOf( 'WP_Term', $term );
+			$this->assertObjectHasAttribute( 'object_id', $term );
+		}
+
+		// Run again to check the cached response.
+		$terms = $query->query( $args );
+		$this->assertNotEmpty( $terms );
+		foreach ( $terms as $term ) {
+			$this->assertInstanceOf( 'WP_Term', $term );
+			$this->assertObjectHasAttribute( 'object_id', $term );
+		}
+	}
+
+	/**
 	 * @ticket 37198
 	 * @group cache
 	 */
