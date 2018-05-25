@@ -1670,7 +1670,7 @@ describe( 'state', () => {
 	describe( 'saving()', () => {
 		it( 'should update when a request is started', () => {
 			const state = saving( null, {
-				type: 'REQUEST_POST_UPDATE',
+				type: 'REQUEST_POST_UPDATE_START',
 			} );
 			expect( state ).toEqual( {
 				requesting: true,

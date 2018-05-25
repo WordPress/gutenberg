@@ -265,6 +265,11 @@ export function isCurrentPostScheduled( state ) {
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
 
+	// TODO: Post being publishable should be superset of condition of post
+	// being saveable. Currently this restriction is imposed at UI.
+	//
+	//  See: <PostPublishButton /> (`isButtonEnabled` assigned by `isSaveable`)
+
 	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
 }
 
@@ -277,6 +282,16 @@ export function isEditedPostPublishable( state ) {
  * @return {boolean} Whether the post can be saved.
  */
 export function isEditedPostSaveable( state ) {
+	// TODO: Post should not be saveable if not dirty. Cannot be added here at
+	// this time since posts where meta boxes are present can be saved even if
+	// the post is not dirty. Currently this restriction is imposed at UI, but
+	// should be moved here.
+	//
+	//  See: `isEditedPostPublishable` (includes `isEditedPostDirty` condition)
+	//  See: <PostSavedState /> (`forceIsDirty` prop)
+	//  See: <PostPublishButton /> (`forceIsDirty` prop)
+	//  See: https://github.com/WordPress/gutenberg/pull/4184
+
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostExcerpt( state ) ||
@@ -1166,7 +1181,7 @@ export function didPostSaveRequestFail( state ) {
  * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
-	return !! state.isAutosaving;
+	return isSavingPost( state ) && state.saving.isAutosave;
 }
 
 /**

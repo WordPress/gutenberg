@@ -36,7 +36,6 @@ import {
 	createSuccessNotice,
 	createErrorNotice,
 	removeNotice,
-	savePost,
 	saveSharedBlock,
 	insertBlock,
 	removeBlocks,
@@ -50,7 +49,6 @@ import {
 	getCurrentPostType,
 	getEditedPostContent,
 	getPostEdits,
-	isEditedPostDirty,
 	isEditedPostAutosaveable,
 	isEditedPostSaveable,
 	getBlock,
@@ -112,50 +110,68 @@ export default {
 		};
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
 
+		dispatch( {
+			type: 'REQUEST_POST_UPDATE_START',
+			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
+			isAutosave,
+		} );
+
+		let request;
 		if ( isAutosave ) {
 			toSend.parent = post.id;
-			wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }/autosaves`, method: 'POST', data: toSend } ).then(
-				( autosave ) => {
-					dispatch( resetAutosave( autosave ) );
-				},
-				() => {
-					dispatch( resetAutosave( post ) );
-				} );
+
+			request = wp.apiRequest( {
+				path: `/wp/v2/${ basePath }/${ post.id }/autosaves`,
+				method: 'POST',
+				data: toSend,
+			} );
 		} else {
 			dispatch( {
 				type: 'UPDATE_POST',
 				edits: toSend,
-				optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
+				optimist: { id: POST_UPDATE_TRANSACTION_ID },
 			} );
+
 			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-			wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
-				( newPost ) => {
-					dispatch( resetPost( newPost ) );
-					dispatch( {
-						type: 'REQUEST_POST_UPDATE_SUCCESS',
-						previousPost: post,
-						post: newPost,
-						edits: toSend,
-						optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
-					} );
-				},
-				( err ) => {
-					dispatch( {
-						type: 'REQUEST_POST_UPDATE_FAILURE',
-						error: get( err, [ 'responseJSON' ], {
-							code: 'unknown_error',
-							message: __( 'An unknown error occurred.' ),
-						} ),
-						post,
-						edits,
-						optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
-					} );
-				}
-			);
+
+			request = wp.apiRequest( {
+				path: `/wp/v2/${ basePath }/${ post.id }`,
+				method: 'PUT',
+				data: toSend,
+			} );
 		}
+
+		request.then(
+			( newPost ) => {
+				const reset = isAutosave ? resetAutosave : resetPost;
+				dispatch( reset( newPost ) );
+
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_SUCCESS',
+					previousPost: post,
+					post: newPost,
+					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+					isAutosave,
+				} );
+			},
+			( error ) => {
+				error = get( error, [ 'responseJSON' ], {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} );
+
+				dispatch( {
+					type: 'REQUEST_POST_UPDATE_FAILURE',
+					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+					post,
+					edits,
+					error,
+				} );
+			},
+		);
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post } = action;
+		const { previousPost, post, isAutosave } = action;
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -165,8 +181,8 @@ export default {
 		let noticeMessage;
 		let shouldShowLink = true;
 
-		if ( ! isPublished && ! willPublish ) {
-			// If autosaving, or saving a non published post, don't show any notice
+		if ( isAutosave || ( ! isPublished && ! willPublish ) ) {
+			// If autosaving or saving a non-published post, don't show notice.
 			noticeMessage = null;
 		} else if ( isPublished && ! willPublish ) {
 			// If undoing publish status, show specific notice
@@ -321,21 +337,6 @@ export default {
 				...blocksWithTheSameType.slice( 1 ),
 			]
 		) );
-	},
-	AUTOSAVE( action, store ) {
-		const { getState, dispatch } = store;
-		const state = getState();
-
-		// A post must contain a title, an excerpt, or non-empty content to be valid for an autosave.
-		if ( ! isEditedPostSaveable( state ) ) {
-			return;
-		}
-
-		if ( ! isEditedPostDirty( state ) ) {
-			return;
-		}
-
-		dispatch( savePost( { autosave: true } ) );
 	},
 	SETUP_EDITOR( action, { getState } ) {
 		const { post } = action;

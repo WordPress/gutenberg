@@ -23,12 +23,11 @@ export function PostPublishButton( {
 	visibility,
 	isPublishable,
 	isSaveable,
-	isAutosaving,
 	hasPublishAction,
 	onSubmit = noop,
 	forceIsSaving,
 } ) {
-	const isButtonEnabled = ! isSaving && ! isAutosaving && isPublishable && isSaveable;
+	const isButtonEnabled = ! isSaving && isPublishable && isSaveable;
 
 	let publishStatus;
 	if ( ! hasPublishAction ) {
@@ -71,7 +70,6 @@ export default compose( [
 			isEditedPostPublishable,
 			getCurrentPost,
 			getCurrentPostType,
-			isAutosavingPost,
 		} = select( 'core/editor' );
 		return {
 			isSaving: forceIsSaving || isSavingPost(),
@@ -81,7 +79,6 @@ export default compose( [
 			isPublishable: forceIsDirty || isEditedPostPublishable(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			postType: getCurrentPostType(),
-			isAutosaving: isAutosavingPost(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

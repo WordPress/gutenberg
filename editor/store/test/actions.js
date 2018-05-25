@@ -30,7 +30,6 @@ import {
 	savePost,
 	trashPost,
 	mergeBlocks,
-	autosave,
 	redo,
 	undo,
 	removeBlocks,
@@ -266,14 +265,6 @@ describe( 'actions', () => {
 			expect( mergeBlocks( blockAUid, blockBUid ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
 				blocks: [ blockAUid, blockBUid ],
-			} );
-		} );
-	} );
-
-	describe( 'autosave', () => {
-		it( 'should return AUTOSAVE action', () => {
-			expect( autosave() ).toEqual( {
-				type: 'AUTOSAVE',
 			} );
 		} );
 	} );

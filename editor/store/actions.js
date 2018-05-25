@@ -416,9 +416,7 @@ export function mergeBlocks( blockAUid, blockBUid ) {
  * @return {Object} Action object.
  */
 export function autosave() {
-	return {
-		type: 'AUTOSAVE',
-	};
+	return savePost( { autosave: true } );
 }
 
 /**

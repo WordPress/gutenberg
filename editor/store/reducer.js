@@ -585,26 +585,6 @@ export function isTyping( state = false, action ) {
 }
 
 /**
- * Reducer returning autosave state. True if an autosave is currently occurring.
- *
- * @param  {boolean} state  Current state.
- * @param  {Object}  action Dispatched action.
- *
- * @return {boolean} Updated state.
- */
-export function isAutosaving( state = false, action ) {
-	switch ( action.type ) {
-		case 'REQUEST_POST_UPDATE':
-			const isAutosave = action.options && action.options.autosave;
-			return !! isAutosave;
-		case 'RESET_AUTOSAVE':
-			return false;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning the block selection's state.
  *
  * @param {Object} state  Current state.
@@ -886,14 +866,14 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  */
 export function saving( state = {}, action ) {
 	switch ( action.type ) {
-		case 'REQUEST_POST_UPDATE':
+		case 'REQUEST_POST_UPDATE_START':
 			return {
 				requesting: true,
 				successful: false,
 				error: null,
+				isAutosave: action.isAutosave,
 			};
 
-		case 'RESET_AUTOSAVE':
 		case 'REQUEST_POST_UPDATE_SUCCESS':
 			return {
 				requesting: false,
@@ -1096,7 +1076,6 @@ export const autosave = ( state = null, action ) => {
 
 export default optimist( combineReducers( {
 	editor,
-	isAutosaving,
 	currentPost,
 	isTyping,
 	blockSelection,
