@@ -1,35 +1,35 @@
-body {
-	/* margin: 0px;
-    font-size: 16px;
-    line-height: 1.8;*/
+// body {
+// 	/* margin: 0px;
+//     font-size: 16px;
+//     line-height: 1.8;*/
 
-    * {
-        font-family: inherit;
-    }
+//     * {
+//         font-family: inherit;
+//     }
 
     .gutenberg__editor {
         position: relative;
-        font-size: 13px;
+//         font-size: 13px;
 
         * {
             box-sizing: border-box;
         }
 
-        button, 
-        input, 
-        select, 
-        textarea {
-            // font-family: inherit;
-            font-size: inherit;
-            font-weight: inherit;
-            margin: 1px;
-        }
+//         button, 
+//         input, 
+//         select, 
+//         textarea {
+//             // font-family: inherit;
+//             font-size: inherit;
+//             font-weight: inherit;
+//             margin: 1px;
+//         }
 
-        ol, 
-        ul {
-            padding-left: 1.3em;
-            margin-left: 1.3em;
-        }
+//         ol, 
+//         ul {
+//             padding-left: 1.3em;
+//             margin-left: 1.3em;
+//         }
 
         .edit-post-layout {
             padding-top: 0;
@@ -42,38 +42,31 @@ body {
                 padding-top: 0;
             }
 
-            &.has-fixed-toolbar {
-                padding-top: 0;
+//             &.has-fixed-toolbar {
+//                 padding-top: 0;
 
-                @media (min-width: 960px) {
-                    padding-top: 0;
-                }
+//                 @media (min-width: 960px) {
+//                     padding-top: 0;
+//                 }
 
-                @media (min-width: 600px) {
-                    padding-top: 0;
-                }
+//                 @media (min-width: 600px) {
+//                     padding-top: 0;
+//                 }
+//             }
+
+            .edit-post-header,
+            .edit-post-sidebar,
+            .components-popover {
+                font-family: system-ui;
+                font-size: 13px;
             }
 
             .edit-post-header {
-                font-family: system-ui;
-
                 @media (min-width: 782px) {
                     position: sticky;
                     left: 0;
                     top: 0;
                 }
-            }
-
-            .edit-post-sidebar {
-                font-family: system-ui;
-
-                @media (min-width: 782px) {
-                    top: 56px;
-                }
-            }
-
-            .components-popover {            
-                font-family: system-ui;
             }
         }   
 
@@ -94,8 +87,8 @@ body {
         }
 
         .edit-post-visual-editor {
-            padding-left: 46px;
-            padding-right: 46px;
+//             padding-left: 46px;
+//             padding-right: 46px;
             font-family: inherit;
 
             p {
@@ -103,16 +96,23 @@ body {
             }
 
             .editor-post-title,
-            .editor-block-list__block,
-            .editor-default-block-appender {
+            .editor-block-list__block //,
+/*             .editor-default-block-appender */ {
                 max-width: initial;
             }
 
-            .editor-post-title,
-            .editor-block-list__layout {
-                padding-left: 0;
-                padding-right: 0;
+            .editor-post-title>div {
+                @media (min-width: 600px) {                    
+                    margin-left: 0;
+                    margin-right: 0;
+                }
             }
+
+//             .editor-post-title,
+//             .editor-block-list__layout {
+//                 padding-left: 0;
+//                 padding-right: 0;
+//             }
 
             .editor-post-title {
                 .editor-post-title__input {
@@ -120,50 +120,50 @@ body {
                 }
             }
 
-            .editor-block-list__layout {
-                .editor-block-list__block {
-                    padding-left: 0;
-                    padding-right: 0;
+//             .editor-block-list__layout {
+//                 .editor-block-list__block {
+//                     padding-left: 0;
+//                     padding-right: 0;
 
-                    .editor-block-list__block-draggable {
-                        left: 0;
-                        right: 0;
-                    }
+//                     .editor-block-list__block-draggable {
+//                         left: 0;
+//                         right: 0;
+//                     }
 
-                    .editor-block-list__block-edit {
-                        margin-left: 0;
-                        margin-right: 0;
-                    }
+//                     .editor-block-list__block-edit {
+//                         margin-left: 0;
+//                         margin-right: 0;
+//                     }
 
-                    &.is-selected,
-                    &.is-hovered {
-                        outline-width: 0;
-                        z-index: 1;
+//                     &.is-selected,
+//                     &.is-hovered {
+//                         outline-width: 0;
+//                         z-index: 1;
 
-                        .editor-block-list__block-edit {
-                            &::before {
-                                background: white;
-                            }
-                        }
+//                         .editor-block-list__block-edit {
+//                             &::before {
+//                                 background: white;
+//                             }
+//                         }
 
-                        .editor-block-mover {
-                            left: -44px;
-                            padding-right: 0;
-                        }
+//                         .editor-block-mover {
+//                             left: -44px;
+//                             padding-right: 0;
+//                         }
 
-                        .editor-block-settings-menu {
-                            right: -44px;
-                            padding-left: 0px;
-                        }
+//                         .editor-block-settings-menu {
+//                             right: -44px;
+//                             padding-left: 0px;
+//                         }
 
-                        .editor-block-contextual-toolbar, 
-                        .editor-block-list__breadcrumb {
-                            margin-left: 0;
-                            margin-right: 0;
-                        }
-                    }
-                }
-            }
+//                         .editor-block-contextual-toolbar, 
+//                         .editor-block-list__breadcrumb {
+//                             margin-left: 0;
+//                             margin-right: 0;
+//                         }
+//                     }
+//                 }
+//             }
         }
     }
-}
+// }
