@@ -326,11 +326,6 @@ export function isEditedPostEmpty( state ) {
  * @return {boolean} Whether the post can be autosaved.
  */
 export function isEditedPostAutosaveable( state ) {
-	// If the post is autosaving, it is not autosaveable.
-	if ( isAutosavingPost( state ) ) {
-		return false;
-	}
-
 	// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
 	if ( ! isEditedPostSaveable( state ) ) {
 		return false;
