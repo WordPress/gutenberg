@@ -51,6 +51,7 @@ import {
 	getEditedPostContent,
 	getPostEdits,
 	isEditedPostDirty,
+	isEditedPostAutosaveable,
 	isEditedPostSaveable,
 	getBlock,
 	getBlockCount,
@@ -94,6 +95,14 @@ export default {
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
+		const isAutosave = action.options && action.options.autosave;
+
+		// Prevent save if not saveable.
+		const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
+		if ( ! isSaveable( state ) ) {
+			return;
+		}
+
 		const post = getCurrentPost( state );
 		const edits = getPostEdits( state );
 		const toSend = {
@@ -102,7 +111,6 @@ export default {
 			id: post.id,
 		};
 		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
-		const isAutosave = action.options && action.options.autosave;
 
 		if ( isAutosave ) {
 			toSend.parent = post.id;

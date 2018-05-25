@@ -10,14 +10,22 @@ import '../support/bootstrap';
 import { newPost, newDesktopBrowserPage, pressWithModifier } from '../support/utils';
 
 describe( 'Change detection', () => {
-	let handleInterceptedRequest;
+	let handleInterceptedRequest, hadInterceptedSave;
 
 	beforeAll( async () => {
 		await newDesktopBrowserPage();
 	} );
 
 	beforeEach( async () => {
+		hadInterceptedSave = false;
+
 		await newPost();
+	} );
+
+	afterEach( () => {
+		if ( handleInterceptedRequest ) {
+			releaseSaveIntercept();
+		}
 	} );
 
 	async function assertIsDirty( isDirty ) {
@@ -45,7 +53,9 @@ describe( 'Change detection', () => {
 		await page.setRequestInterception( true );
 
 		handleInterceptedRequest = ( interceptedRequest ) => {
-			if ( ! interceptedRequest.url().includes( '/wp/v2/posts' ) ) {
+			if ( interceptedRequest.url().includes( '/wp/v2/posts' ) ) {
+				hadInterceptedSave = true;
+			} else {
 				interceptedRequest.continue();
 			}
 		};
@@ -55,7 +65,18 @@ describe( 'Change detection', () => {
 	async function releaseSaveIntercept() {
 		page.removeListener( 'request', handleInterceptedRequest );
 		await page.setRequestInterception( false );
+		hadInterceptedSave = false;
+		handleInterceptedRequest = null;
 	}
+
+	it( 'Should not save on new unsaved post', async () => {
+		await interceptSave();
+
+		// Keyboard shortcut Ctrl+S save.
+		await pressWithModifier( 'Mod', 'S' );
+
+		expect( hadInterceptedSave ).toBe( false );
+	} );
 
 	it( 'Should autosave post', async () => {
 		await page.type( '.editor-post-title__input', 'Hello World' );
