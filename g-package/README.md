@@ -191,8 +191,8 @@ To save a [post](https://v2.wp-api.org/reference/posts/) or a [page](https://v2.
     title: { 
         raw: 'Hello',
         rendered: 'Hello',
-    }
-    ...,
+    },
+    preview_link, permalink_template, ...,
 }
 ```
 

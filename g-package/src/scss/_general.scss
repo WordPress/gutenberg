@@ -68,6 +68,44 @@
                     top: 0;
                 }
             }
+
+            .components-notice-list {
+                @media (min-width: 782px) {
+                    left: 0;
+                }
+
+                .notice, 
+                div.error, 
+                div.updated {
+                    background: #fff;
+                    border-left: 4px solid #fff;
+                }
+
+                .notice-alt {
+                    box-shadow: none;
+                } 
+
+                .notice-success.notice-alt {
+                    background-color: #ecf7ed;
+                }
+
+                .notice-success, 
+                div.updated {
+                    border-left-color: #46b450;
+                }
+
+                .notice-dismiss {
+                    position: absolute;
+                    top: 0;
+                    right: 1px;
+                    border: none;
+                    margin: 5px;
+                    padding: 9px;
+                    background: 0 0;
+                    color: #72777c;
+                    cursor: pointer;
+                }    
+            }
         }   
 
         .screen-reader-text, 
@@ -96,8 +134,8 @@
             }
 
             .editor-post-title,
-            .editor-block-list__block //,
-/*             .editor-default-block-appender */ {
+            .editor-block-list__block,
+            .editor-default-block-appender {
                 max-width: initial;
             }
 

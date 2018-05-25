@@ -120,7 +120,7 @@ class ImageEdit extends Component {
 				alt: undefined,
 				id: undefined,
 				caption: undefined,
-				data:  undefined,
+				data: undefined,
 			} );
 			return;
 		}

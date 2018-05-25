@@ -21,7 +21,7 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sideb
 			className="edit-post-sidebar__panel-tabs"
 			closeLabel={ __( 'Close settings' ) }
 		>
-			<PostTypeSupportCheck supportKeys="document" defaultValue={ true }>			
+			<PostTypeSupportCheck supportKeys="document" defaultValue={ true }>
 				<button
 					onClick={ openDocumentSettings }
 					className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/document' ? 'is-active' : '' }` }

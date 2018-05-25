@@ -118,7 +118,6 @@ const entryPointNames = [
 	'blocks',
 	'components',
 	'editor',
-	'element',
 	'utils',
 	'data',
 	'viewport',

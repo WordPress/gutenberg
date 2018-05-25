@@ -15,7 +15,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-
+import { PostTypeSupportCheck } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
@@ -124,18 +124,20 @@ class MediaPlaceholder extends Component {
 				>
 					{ __( 'Upload' ) }
 				</FormFileUpload>
-				<MediaUpload
-					gallery={ multiple }
-					multiple={ multiple }
-					onSelect={ onSelect }
-					type={ type }
-					value={ value.id }
-					render={ ( { open } ) => (
-						<Button isLarge onClick={ open }>
-							{ __( 'Media Library' ) }
-						</Button>
-					) }
-				/>
+				<PostTypeSupportCheck supportKeys="media-library">
+					<MediaUpload
+						gallery={ multiple }
+						multiple={ multiple }
+						onSelect={ onSelect }
+						type={ type }
+						value={ value.id }
+						render={ ( { open } ) => (
+							<Button isLarge onClick={ open }>
+								{ __( 'Media Library' ) }
+							</Button>
+						) }
+					/>
+				</PostTypeSupportCheck>
 			</Placeholder>
 		);
 	}
