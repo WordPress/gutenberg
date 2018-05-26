@@ -8,25 +8,25 @@
 		@include loading_fade;
 	}
 
-	&__richtext-wrapper {
-		display: inline-block;
+	&__textlink {
+		color: $blue-medium-700;
+		min-width: 1em;
+		text-decoration: underline;
+
+		&:focus {
+			box-shadow: none;
+			color: $blue-medium-700;
+		}
+	}
+
+	&__textlink-placeholder {
+		opacity: .5;
+		text-decoration: underline;
 	}
 
 	&__button-richtext-wrapper {
 		display: inline-block;
 		margin-left: 0.75em;
-	}
-
-	&__textlink {
-		text-decoration: underline;
-
-		&[data-is-placeholder-visible="false"] {
-			color: $blue-medium-700;
-		}
-
-		&:focus {
-			box-shadow: none;
-		}
 	}
 
 	&__copy-url-button {

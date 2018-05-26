@@ -23,6 +23,7 @@ import {
  */
 import './editor.scss';
 import FileBlockInspector from './inspector';
+import FileBlockEditableLink from './editable-link';
 
 class FileEdit extends Component {
 	constructor() {
@@ -146,13 +147,6 @@ class FileEdit extends Component {
 			this.isBlobURL( href ) ? 'is-transient' : '',
 		].join( ' ' );
 
-		const copyLinkToClipboard = ( e ) => {
-			const selectedText = document.getSelection().toString();
-			const htmlLink = `<a href="${ textLinkHref }">${ selectedText }</a>`;
-			e.clipboardData.setData( 'text/plain', selectedText );
-			e.clipboardData.setData( 'text/html', htmlLink );
-		};
-
 		// Choose Media File or Attachment Page (when file is in Media Library)
 		const onChangeLinkDestinationOption = ( newHref ) => {
 			setAttributes( { textLinkHref: newHref } );
@@ -166,16 +160,6 @@ class FileEdit extends Component {
 
 		const onChangeShowDownloadButton = ( newValue ) => {
 			setAttributes( { showDownloadButton: newValue } );
-		};
-
-		const onChangeFileName = ( text ) => {
-			setAttributes( { fileName: text } );
-		};
-
-		// Make sure that fileName is string, not ['string'],
-		// so it gets correctly rendered in the download attribute of <a>
-		const castFileNameToString = () => {
-			onChangeFileName( fileName.toString() );
 		};
 
 		if ( showPlaceholder ) {
@@ -226,22 +210,13 @@ class FileEdit extends Component {
 				</BlockControls>
 				<div className={ classNames }>
 					<div>
-						<div
-							className={ `${ className }__richtext-wrapper` }
-							onBlur={ castFileNameToString }
-							onCopy={ copyLinkToClipboard }
-							onCut={ copyLinkToClipboard }
-						>
-							<RichText
-								tagName="div" // must be block-level or else placeholder will fail
-								className={ `${ className }__textlink` }
-								value={ fileName }
-								formattingControls={ [] } // disable controls
-								placeholder={ __( 'Write file name…' ) }
-								keepPlaceholderOnFocus
-								onChange={ onChangeFileName }
-							/>
-						</div>
+						<FileBlockEditableLink
+							className={ className }
+							placeholder={ __( 'Write file name…' ) }
+							text={ fileName }
+							href={ textLinkHref }
+							updateFileName={ ( text ) => setAttributes( { fileName: text } ) }
+						/>
 						{ showDownloadButton &&
 							<div className={ `${ className }__button-richtext-wrapper` }>
 								<RichText
