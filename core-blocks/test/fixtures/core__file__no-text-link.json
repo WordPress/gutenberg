@@ -4,9 +4,12 @@
         "name": "core/file",
         "isValid": true,
         "attributes": {
-            "href": "https://myexternaldocument.org/file.pdf"
+            "href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
+            "showDownloadButton": true,
+            "buttonText": "Download",
+            "id": 176
         },
         "innerBlocks": [],
-        "originalContent": "<div class=\"wp-block-file\"><a href=\"https://myexternaldocument.org/file.pdf\" class=\"wp-block-file__button\" download>Download</a></div>"
+        "originalContent": "<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" class=\"wp-block-file__button\" download=\"\">Download</a></div>"
     }
 ]

@@ -4,12 +4,15 @@
         "name": "core/file",
         "isValid": true,
         "attributes": {
-            "href": "https://myexternaldocument.org/file.pdf",
-            "fileName": "Document.pdf",
-            "textLinkHref": "https://myexternaldocument.org/file.pdf",
-            "openInNewWindow": "_blank"
+            "href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
+            "fileName": "6546",
+            "textLinkHref": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
+            "openInNewWindow": "_blank",
+            "showDownloadButton": true,
+            "buttonText": "Download",
+            "id": 176
         },
         "innerBlocks": [],
-        "originalContent": "<div class=\"wp-block-file\"><a href=\"https://myexternaldocument.org/file.pdf\" target=\"_blank\" rel=\"noreferrer noopener\">Document.pdf</a><a href=\"https://myexternaldocument.org/file.pdf\" class=\"wp-block-file__button\" download=\"Document.pdf\">Download</a></div>"
+        "originalContent": "<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" target=\"_blank\" rel=\"noreferrer noopener\">6546</a><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\" class=\"wp-block-file__button\" download=\"6546\">Download</a></div>"
     }
 ]
