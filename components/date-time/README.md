@@ -57,7 +57,7 @@ The function called when a new date or time has been selected. It is passed the 
 
 ### utcOffset
 
-The offset of current timezone.
+The offset of current timezone. This prop is required if `showTodayButton` is true.
 
 - Type: `integer`
 - Required: No
