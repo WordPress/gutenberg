@@ -15,15 +15,13 @@ import {
 export default class FileBlockInspector extends Component {
 	render() {
 		const {
-			href,
-			textLinkHref,
-			attachmentPage,
-			onChangeLinkDestinationOption,
 			openInNewWindow,
-			onChangeOpenInNewWindow,
 			showDownloadButton,
-			onChangeShowDownloadButton,
+			changeLinkDestinationOption,
+			changeOpenInNewWindow,
+			changeShowDownloadButton,
 		} = this.props;
+		const { href, textLinkHref, attachmentPage } = this.props.hrefs;
 
 		const linkDestinationOptions = ( () => {
 			if ( attachmentPage ) {
@@ -43,12 +41,12 @@ export default class FileBlockInspector extends Component {
 							label={ __( 'Link To' ) }
 							value={ textLinkHref }
 							options={ linkDestinationOptions }
-							onChange={ onChangeLinkDestinationOption }
+							onChange={ changeLinkDestinationOption }
 						/>
 						<ToggleControl
 							label={ __( 'Open in new window' ) }
 							checked={ openInNewWindow }
-							onChange={ onChangeOpenInNewWindow }
+							onChange={ changeOpenInNewWindow }
 						/>
 					</PanelBody>
 				</InspectorControls>
@@ -57,7 +55,7 @@ export default class FileBlockInspector extends Component {
 						<ToggleControl
 							label={ __( 'Show button' ) }
 							checked={ showDownloadButton }
-							onChange={ onChangeShowDownloadButton }
+							onChange={ changeShowDownloadButton }
 						/>
 					</PanelBody>
 				</InspectorControls>

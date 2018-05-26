@@ -148,17 +148,15 @@ class FileEdit extends Component {
 		].join( ' ' );
 
 		// Choose Media File or Attachment Page (when file is in Media Library)
-		const onChangeLinkDestinationOption = ( newHref ) => {
+		const changeLinkDestinationOption = ( newHref ) => {
 			setAttributes( { textLinkHref: newHref } );
 		};
-
-		const onChangeOpenInNewWindow = ( newValue ) => {
+		const changeOpenInNewWindow = ( newValue ) => {
 			setAttributes( {
 				openInNewWindow: newValue ? '_blank' : false,
 			} );
 		};
-
-		const onChangeShowDownloadButton = ( newValue ) => {
+		const changeShowDownloadButton = ( newValue ) => {
 			setAttributes( { showDownloadButton: newValue } );
 		};
 
@@ -182,14 +180,14 @@ class FileEdit extends Component {
 		return (
 			<Fragment>
 				<FileBlockInspector
-					href={ href }
-					textLinkHref={ textLinkHref }
-					attachmentPage={ attachmentPage }
-					onChangeLinkDestinationOption={ onChangeLinkDestinationOption }
-					openInNewWindow={ openInNewWindow }
-					onChangeOpenInNewWindow={ onChangeOpenInNewWindow }
-					showDownloadButton={ showDownloadButton }
-					onChangeShowDownloadButton={ onChangeShowDownloadButton }
+					hrefs={ { href, textLinkHref, attachmentPage } }
+					{ ...{
+						openInNewWindow,
+						showDownloadButton,
+						changeLinkDestinationOption,
+						changeOpenInNewWindow,
+						changeShowDownloadButton,
+					} }
 				/>
 				<BlockControls>
 					<Toolbar>
