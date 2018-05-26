@@ -226,6 +226,7 @@ class FileEdit extends Component {
 									formattingControls={ [] } // disable controls
 									placeholder={ __( 'Add text…' ) }
 									keepPlaceholderOnFocus
+									multiline="false"
 									onChange={ ( text ) => setAttributes( { buttonText: text } ) }
 								/>
 							</div>
