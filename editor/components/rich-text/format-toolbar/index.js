@@ -9,6 +9,7 @@ import {
 	ToggleControl,
 	Toolbar,
 	withSpokenMessages,
+	Popover,
 } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 
@@ -165,7 +166,7 @@ class FormatToolbar extends Component {
 	}
 
 	render() {
-		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [] } = this.props;
+		const { formats, focusPosition, enabledControls = DEFAULT_CONTROLS, customControls = [], selectedNodeId } = this.props;
 		const { linkValue, settingsVisible, opensInNewWindow } = this.state;
 		const isAddingLink = formats.link && formats.link.isAdding;
 
@@ -207,58 +208,64 @@ class FormatToolbar extends Component {
 				{ ( isAddingLink || formats.link ) && (
 					<Fill name="RichText.Siblings">
 						<div className="editor-format-toolbar__link-container" style={ { ...focusPosition } }>
-							{ isAddingLink && (
+							<Popover
+								position="bottom center"
+								focusOnMount={ !! isAddingLink }
+								key={ selectedNodeId /* Used to force rerender on change */ }
+							>
+								{ isAddingLink && (
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-								<form
-									className="editor-format-toolbar__link-modal"
-									onKeyPress={ stopKeyPropagation }
-									onKeyDown={ this.onKeyDown }
-									onSubmit={ this.submitLink }>
-									<div className="editor-format-toolbar__link-modal-line">
-										<UrlInput value={ linkValue } onChange={ this.onChangeLinkValue } />
-										<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-										<IconButton
-											className="editor-format-toolbar__link-settings-toggle"
-											icon="ellipsis"
-											label={ __( 'Link Settings' ) }
-											onClick={ this.toggleLinkSettingsVisibility }
-											aria-expanded={ settingsVisible }
-										/>
-									</div>
-									{ linkSettings }
-								</form>
+									<form
+										className="editor-format-toolbar__link-modal"
+										onKeyPress={ stopKeyPropagation }
+										onKeyDown={ this.onKeyDown }
+										onSubmit={ this.submitLink }>
+										<div className="editor-format-toolbar__link-modal-line">
+											<UrlInput value={ linkValue } onChange={ this.onChangeLinkValue } />
+											<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
+											<IconButton
+												className="editor-format-toolbar__link-settings-toggle"
+												icon="ellipsis"
+												label={ __( 'Link Settings' ) }
+												onClick={ this.toggleLinkSettingsVisibility }
+												aria-expanded={ settingsVisible }
+											/>
+										</div>
+										{ linkSettings }
+									</form>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-							) }
+								) }
 
-							{ formats.link && ! isAddingLink && (
+								{ formats.link && ! isAddingLink && (
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 								/* eslint-disable jsx-a11y/no-static-element-interactions */
-								<div
-									className="editor-format-toolbar__link-modal"
-									onKeyPress={ stopKeyPropagation }
-								>
-									<div className="editor-format-toolbar__link-modal-line">
-										<a
-											className="editor-format-toolbar__link-value"
-											href={ formats.link.value }
-											target="_blank"
-										>
-											{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
-										</a>
-										<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
-										<IconButton
-											className="editor-format-toolbar__link-settings-toggle"
-											icon="ellipsis"
-											label={ __( 'Link Settings' ) }
-											onClick={ this.toggleLinkSettingsVisibility }
-											aria-expanded={ settingsVisible }
-										/>
+									<div
+										className="editor-format-toolbar__link-modal"
+										onKeyPress={ stopKeyPropagation }
+									>
+										<div className="editor-format-toolbar__link-modal-line">
+											<a
+												className="editor-format-toolbar__link-value"
+												href={ formats.link.value }
+												target="_blank"
+											>
+												{ formats.link.value && filterURLForDisplay( decodeURI( formats.link.value ) ) }
+											</a>
+											<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
+											<IconButton
+												className="editor-format-toolbar__link-settings-toggle"
+												icon="ellipsis"
+												label={ __( 'Link Settings' ) }
+												onClick={ this.toggleLinkSettingsVisibility }
+												aria-expanded={ settingsVisible }
+											/>
+										</div>
+										{ linkSettings }
 									</div>
-									{ linkSettings }
-								</div>
 								/* eslint-enable jsx-a11y/no-static-element-interactions */
-							) }
+								) }
+							</Popover>
 						</div>
 					</Fill>
 				) }

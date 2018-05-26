@@ -151,7 +151,7 @@ function onlyTextNode( node ) {
 }
 
 /**
- * Find the index of the last charater in the text that is whitespace.
+ * Find the index of the last character in the text that is whitespace.
  *
  * @param {string} text The text to search.
  *

@@ -19,9 +19,7 @@ $z-layers: (
 	'.editor-block-contextual-toolbar': 21,
 	'.editor-block-switcher__menu': 5,
 	'.components-popover__close': 5,
-	'.editor-block-list__insertion-point': 82, // @todo, test that this new elevation doesn't cause issues, used to be 5, shoud now be above side UI
-	'.editor-format-toolbar__link-modal': 81, // should appear above block controls
-	'.editor-format-toolbar__link-container': 81, // link suggestions should also
+	'.editor-block-list__insertion-point': 5,
 	'.core-blocks-gallery-item__inline-menu': 20,
 	'.editor-url-input__suggestions': 30,
 	'.edit-post-header': 30,

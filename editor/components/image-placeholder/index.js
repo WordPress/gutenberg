@@ -15,7 +15,7 @@ import MediaPlaceholder from '../media-placeholder';
  */
 class ImagePlaceholder extends Component {
 	componentDidMount() {
-		deprecated( 'wp.editor.ImagePlacehoder', {
+		deprecated( 'wp.editor.ImagePlaceholder', {
 			version: '3.2',
 			alternative: 'wp.editor.MediaPlaceholder',
 			plugin: 'Gutenberg',
