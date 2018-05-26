@@ -37,7 +37,6 @@ class FileEdit extends Component {
 		} = this.props.attributes;
 
 		this.onSelectFile = this.onSelectFile.bind( this );
-		this.confirmCopyURL = this.confirmCopyURL.bind( this );
 
 		// Initialize default values if undefined
 		this.props.setAttributes( {
@@ -88,8 +87,11 @@ class FileEdit extends Component {
 		}
 	}
 
-	componentWillUnmount() {
-		clearTimeout( this.dismissCopyConfirmation );
+	componentDidUpdate( prevProps ) {
+		// Reset copy confirmation state when block is deselected
+		if ( prevProps.isSelected && ! this.props.isSelected ) {
+			this.setState( { showCopyConfirmation: false } );
+		}
 	}
 
 	onSelectFile( media ) {
@@ -109,15 +111,6 @@ class FileEdit extends Component {
 				showPlaceholder: false,
 			} );
 		}
-	}
-
-	confirmCopyURL() {
-		this.setState( { showCopyConfirmation: true } );
-
-		clearTimeout( this.dismissCopyConfirmation );
-		this.dismissCopyConfirmation = setTimeout( () => {
-			this.setState( { showCopyConfirmation: false } );
-		}, 4000 );
 	}
 
 	isBlobURL( url = '' ) {
@@ -146,6 +139,13 @@ class FileEdit extends Component {
 			className,
 			this.isBlobURL( href ) ? 'is-transient' : '',
 		].join( ' ' );
+
+		const confirmCopyURL = () => {
+			this.setState( { showCopyConfirmation: true } );
+		};
+		const resetCopyConfirmation = () => {
+			this.setState( { showCopyConfirmation: false } );
+		};
 
 		// Choose Media File or Attachment Page (when file is in Media Library)
 		const changeLinkDestinationOption = ( newHref ) => {
@@ -235,7 +235,8 @@ class FileEdit extends Component {
 							isDefault
 							text={ href }
 							className={ `${ className }__copy-url-button` }
-							onCopy={ this.confirmCopyURL }
+							onCopy={ confirmCopyURL }
+							onFinishCopy={ resetCopyConfirmation }
 						>
 							{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
 						</ClipboardButton>
