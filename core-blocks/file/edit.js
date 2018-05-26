@@ -36,7 +36,7 @@ class FileEdit extends Component {
 		} = this.props.attributes;
 
 		this.onSelectFile = this.onSelectFile.bind( this );
-		this.onCopy = this.onCopy.bind( this );
+		this.confirmCopyURL = this.confirmCopyURL.bind( this );
 
 		// Initialize default values if undefined
 		this.props.setAttributes( {
@@ -110,7 +110,7 @@ class FileEdit extends Component {
 		}
 	}
 
-	onCopy() {
+	confirmCopyURL() {
 		this.setState( { showCopyConfirmation: true } );
 
 		clearTimeout( this.dismissCopyConfirmation );
@@ -121,19 +121,6 @@ class FileEdit extends Component {
 
 	isBlobURL( url = '' ) {
 		return url.indexOf( 'blob:' ) === 0;
-	}
-
-	buildRichTextLink( innerText ) {
-		const { textLinkHref, openInNewWindow } = this.props.attributes;
-		return (
-			<a
-				href={ textLinkHref }
-				target={ openInNewWindow }
-				rel={ openInNewWindow ? 'noreferrer noopener' : false }
-			>
-				{ innerText }
-			</a>
-		);
 	}
 
 	render() {
@@ -158,6 +145,13 @@ class FileEdit extends Component {
 			className,
 			this.isBlobURL( href ) ? 'is-transient' : '',
 		].join( ' ' );
+
+		const copyLinkToClipboard = ( e ) => {
+			const selectedText = document.getSelection().toString();
+			const htmlLink = `<a href="${ textLinkHref }">${ selectedText }</a>`;
+			e.clipboardData.setData( 'text/plain', selectedText );
+			e.clipboardData.setData( 'text/html', htmlLink );
+		};
 
 		// Choose Media File or Attachment Page (when file is in Media Library)
 		const onChangeLinkDestinationOption = ( newHref ) => {
@@ -235,6 +229,8 @@ class FileEdit extends Component {
 						<div
 							className={ `${ className }__richtext-wrapper` }
 							onBlur={ castFileNameToString }
+							onCopy={ copyLinkToClipboard }
+							onCut={ copyLinkToClipboard }
 						>
 							<RichText
 								tagName="div" // must be block-level or else placeholder will fail
@@ -265,7 +261,7 @@ class FileEdit extends Component {
 							isDefault
 							text={ href }
 							className={ `${ className }__copy-url-button` }
-							onCopy={ this.onCopy }
+							onCopy={ this.confirmCopyURL }
 						>
 							{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
 						</ClipboardButton>
