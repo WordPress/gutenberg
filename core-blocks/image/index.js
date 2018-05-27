@@ -192,7 +192,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id } = attributes;
+		const { url, alt, caption, align, href, width, height, id, target } = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -211,7 +211,7 @@ export const settings = {
 
 		return (
 			<figure className={ classes }>
-				{ href ? <a href={ href }>{ image }</a> : image }
+				{href ? <a href={href} target={target}>{image}</a> : image}
 				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
