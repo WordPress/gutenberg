@@ -31,18 +31,24 @@ export default function editorMediaUpload( {
 } ) {
 	const postId = select( 'core/editor' ).getCurrentPostId();
 
-	const errorHandler = ( { file, sizeAboveLimit, generalError } ) => {
+	const errorHandler = ( { file, type } ) => {
 		let errorMsg;
-		if ( sizeAboveLimit ) {
-			errorMsg = sprintf(
-				__( '%s exceeds the maximum upload size for this site.' ),
-				file.name
-			);
-		} else if ( generalError ) {
-			errorMsg = sprintf(
-				__( 'Error while uploading file %s to the media library.' ),
-				file.name
-			);
+		switch ( type ) {
+			case 'SIZE_ABOVE_LIMIT':
+				errorMsg = sprintf(
+					__( '%s exceeds the maximum upload size for this site.' ),
+					file.name
+				);
+				break;
+			case 'MIME_TYPE_NOT_ALLOWED_FOR_USER':
+				errorMsg =
+					__( 'Sorry, this file type is not permitted for security reasons.' );
+				break;
+			default:
+				errorMsg = sprintf(
+					__( 'Error while uploading file %s to the media library.' ),
+					file.name
+				);
 		}
 		onError( errorMsg );
 	};

@@ -54,6 +54,20 @@ describe( 'mediaUpload', () => {
 			maxUploadFileSize: 512,
 			onError,
 		} );
-		expect( onError.mock.calls ).toEqual( [ [ { sizeAboveLimit: true, file: validMediaObj } ] ] );
+		expect( onError.mock.calls ).toEqual( [ [ { type: 'SIZE_ABOVE_LIMIT', file: validMediaObj } ] ] );
+	} );
+
+	it( 'should call error handler with the correct message if file type is not allowed for user', () => {
+		const onError = jest.fn();
+		global._wpMediaSettings = {
+			allowedMimeTypes: { aac: 'audio/aac' },
+		};
+		mediaUpload( {
+			allowedType: 'image',
+			filesList: [ validMediaObj ],
+			onFileChange,
+			onError,
+		} );
+		expect( onError.mock.calls ).toEqual( [ [ { type: 'MIME_TYPE_NOT_ALLOWED_FOR_USER', file: validMediaObj } ] ] );
 	} );
 } );

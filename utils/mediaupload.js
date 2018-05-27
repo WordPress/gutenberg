@@ -33,7 +33,16 @@ export function mediaUpload( {
 		filesSet[ idx ] = value;
 		onFileChange( compact( filesSet ) );
 	};
+
+	// Allowed type specified by consumer
 	const isAllowedType = ( fileType ) => startsWith( fileType, `${ allowedType }/` );
+
+	// Allowed types for the current WP_User
+	const allowedMimeTypesForUser = get( window, [ '_wpMediaSettings', 'allowedMimeTypes' ] );
+	const isAllowedMimeTypeForUser = ( fileType ) => {
+		return Object.values( allowedMimeTypesForUser ).includes( fileType );
+	};
+
 	files.forEach( ( mediaFile, idx ) => {
 		if ( ! isAllowedType( mediaFile.type ) ) {
 			return;
@@ -41,7 +50,13 @@ export function mediaUpload( {
 
 		// verify if file is greater than the maximum file upload size allowed for the site.
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
-			onError( { sizeAboveLimit: true, file: mediaFile } );
+			onError( { type: 'SIZE_ABOVE_LIMIT', file: mediaFile } );
+			return;
+		}
+
+		// verify if user is allowed to upload this mime type
+		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
+			onError( { type: 'MIME_TYPE_NOT_ALLOWED_FOR_USER', file: mediaFile } );
 			return;
 		}
 
@@ -66,7 +81,7 @@ export function mediaUpload( {
 			() => {
 				// Reset to empty on failure.
 				setAndUpdateFiles( idx, null );
-				onError( { generalError: true, file: mediaFile } );
+				onError( { type: 'GENERAL', file: mediaFile } );
 			}
 		);
 	} );

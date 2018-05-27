@@ -981,6 +981,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Initialize media settings.
 	wp_add_inline_script( 'wp-editor', 'window._wpMediaSettings = ' . wp_json_encode( array(
 		'maxUploadSize' => $max_upload_size,
+		'allowedMimeTypes' => get_allowed_mime_types(),
 	) ), 'before' );
 
 	// Prepare Jed locale data.
