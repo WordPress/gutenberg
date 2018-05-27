@@ -12,6 +12,12 @@ export default class FileBlockEditableLink extends Component {
 		};
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.text !== this.props.text ) {
+			this.setState( { showPlaceholder: ! this.props.text } );
+		}
+	}
+
 	render() {
 		const { className, placeholder, text, href, updateFileName } = this.props;
 		const { showPlaceholder } = this.state;
