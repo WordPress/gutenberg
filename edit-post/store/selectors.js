@@ -93,6 +93,7 @@ export function isPublishSidebarOpened( state ) {
  */
 export function isEditorSidebarPanelOpened( state, panel ) {
 	const panels = getPreference( state, 'panels' );
+    // console.log( panels, panel )
 	return panels ? !! panels[ panel ] : false;
 }
 

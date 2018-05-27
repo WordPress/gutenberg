@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import mapValues from 'lodash/mapValues';
 
 /**
  * WordPress dependencies
@@ -44,9 +45,9 @@ export const preferences = combineReducers( {
 	panels( state = PREFERENCES_DEFAULTS.panels, action ) {
 		if ( action.type === 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL' ) {
 			return {
-				...state,
-				[ action.panel ]: ! state[ action.panel ],
-			};
+                ...(mapValues(state, () => false)),
+                [ action.panel ]: ! state[ action.panel ],
+            };
 		}
 
 		return state;

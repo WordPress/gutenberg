@@ -91,14 +91,11 @@ export class InserterMenu extends Component {
 			const isOpened = this.state.openPanels.indexOf( panel ) !== -1;
 			if ( isOpened ) {
 				this.setState( {
-					openPanels: without( this.state.openPanels, panel ),
+					openPanels: [],
 				} );
 			} else {
 				this.setState( {
-					openPanels: [
-						...this.state.openPanels,
-						panel,
-					],
+					openPanels: [panel],
 				} );
 			}
 		};
