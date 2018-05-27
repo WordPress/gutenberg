@@ -10,7 +10,6 @@ import {
 	sortBy,
 	findIndex,
 	find,
-	without,
 } from 'lodash';
 
 /**
@@ -95,7 +94,7 @@ export class InserterMenu extends Component {
 				} );
 			} else {
 				this.setState( {
-					openPanels: [panel],
+					openPanels: [ panel ],
 				} );
 			}
 		};
