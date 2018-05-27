@@ -2,11 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import FootnotesEditor from './editor.js';
+import { orderFootnotes } from './footnotes-utils.js';
 import './style.scss';
 
 export const name = 'core/footnotes';
@@ -39,7 +41,10 @@ export const settings = {
 	edit: FootnotesEditor,
 
 	save( { attributes } ) {
-		const { footnotes } = attributes;
+		const orderedFootnoteUids = select( 'core/editor' ).getFootnotes();
+		const footnotes = orderedFootnoteUids && orderedFootnoteUids.length ?
+			orderFootnotes( attributes.footnotes, orderedFootnoteUids ) :
+			attributes.footnotes;
 
 		return (
 			<div>

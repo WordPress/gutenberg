@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { get, isEqual } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -14,40 +9,23 @@ import { RichText } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import { getFootnoteByUid, orderFootnotes } from './footnotes-utils.js';
 import './editor.scss';
 
 class FootnotesEditor extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 
-		this.setFootnotesInOrder( props.footnotesOrder );
 		this.state = {
 			editable: null,
 		};
 	}
 
-	setFootnotesInOrder( footnotesOrder ) {
-		const { attributes, setAttributes } = this.props;
-
-		const footnotes = footnotesOrder.map( ( { id } ) => {
-			return this.getFootnoteById( attributes.footnotes, id );
-		} );
-
-		setAttributes( { footnotes } );
-	}
-
-	getFootnoteById( footnotes, footnoteUid ) {
-		const filteredFootnotes = footnotes.filter(
-			( footnote ) => footnote.id === footnoteUid );
-
-		return get( filteredFootnotes, [ 0 ], { id: footnoteUid, text: '' } );
-	}
-
 	onChange( footnoteUid ) {
 		return ( nextValue ) => {
-			const { attributes, footnotesOrder, setAttributes } = this.props;
+			const { attributes, orderedFootnoteUids, setAttributes } = this.props;
 
-			const nextFootnotes = footnotesOrder.map( ( { id } ) => {
+			const nextFootnotes = orderedFootnoteUids.map( ( { id } ) => {
 				if ( id === footnoteUid ) {
 					return {
 						id,
@@ -55,7 +33,7 @@ class FootnotesEditor extends Component {
 					};
 				}
 
-				return this.getFootnoteById( attributes.footnotes, id );
+				return getFootnoteByUid( attributes.footnotes, id );
 			} );
 
 			setAttributes( {
@@ -70,22 +48,13 @@ class FootnotesEditor extends Component {
 		};
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		const { footnotesOrder } = this.props;
-		const nextFootnotesOrder = nextProps.footnotesOrder;
-
-		if ( ! isEqual( footnotesOrder, nextFootnotesOrder ) ) {
-			this.setFootnotesInOrder( nextFootnotesOrder );
-		}
-	}
-
 	render() {
-		const { attributes, editable, isSelected } = this.props;
-		const { footnotes } = attributes;
+		const { attributes, editable, orderedFootnoteUids, isSelected } = this.props;
+		const orderedFootnotes = orderFootnotes( attributes.footnotes, orderedFootnoteUids );
 
 		return (
 			<ol className="blocks-footnotes__footnotes-list">
-				{ footnotes.map( ( footnote ) => (
+				{ orderedFootnotes.map( ( footnote ) => (
 					<li key={ footnote.id }>
 						<RichText
 							tagName="span"
@@ -103,5 +72,5 @@ class FootnotesEditor extends Component {
 }
 
 export default withSelect( ( select ) => ( {
-	footnotesOrder: select( 'core/editor' ).getFootnotes(),
+	orderedFootnoteUids: select( 'core/editor' ).getFootnotes(),
 } ) )( FootnotesEditor );
