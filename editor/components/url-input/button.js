@@ -21,10 +21,18 @@ class UrlInputButton extends Component {
 		super(...arguments);
 		this.toggle = this.toggle.bind(this);
 		this.submitLink = this.submitLink.bind(this);
+		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind(this);
+
 		this.state = {
 			expanded: false,
+			settingsVisible: false,
 		};
 	}
+
+	// this.state = {
+	// 	opensInNewWindow: false,
+	// 	linkValue: '',
+	// };
 
 	toggle() {
 		this.setState({ expanded: !this.state.expanded });
@@ -33,6 +41,10 @@ class UrlInputButton extends Component {
 	submitLink(event) {
 		event.preventDefault();
 		this.toggle();
+	}
+
+	toggleLinkSettingsVisibility() {
+		this.setState((state) => ({ settingsVisible: !state.settingsVisible }));
 	}
 
 	render() {
@@ -66,7 +78,7 @@ class UrlInputButton extends Component {
 								className="editor-format-toolbar__link-settings-toggle"
 								icon="ellipsis"
 								label={__('Link Settings')}
-							// onClick={this.toggleLinkSettingsVisibility}
+								onClick={this.toggleLinkSettingsVisibility}
 							// aria-expanded={settingsVisible}
 							/>
 						</div>
