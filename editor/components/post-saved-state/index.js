@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -38,13 +43,20 @@ export class PostSavedState extends Component {
 	}
 
 	render() {
-		const { isNew, isPublished, isDirty, isSaving, isSaveable, onSave } = this.props;
+		const { isNew, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving } = this.props;
 		const { forceSavedMessage } = this.state;
 		if ( isSaving ) {
+			// TODO: Classes generation should be common across all return
+			// paths of this function, including proper naming convention for
+			// the "Save Draft" button.
+			const classes = classnames( 'editor-post-saved-state', 'is-saving', {
+				'is-autosaving': isAutosaving,
+			} );
+
 			return (
-				<span className="editor-post-saved-state is-saving">
+				<span className={ classes }>
 					<Dashicon icon="cloud" />
-					{ __( 'Saving' ) }
+					{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
 				</span>
 			);
 		}
@@ -88,6 +100,7 @@ export default compose( [
 			isSavingPost,
 			isEditedPostSaveable,
 			getCurrentPost,
+			isAutosavingPost,
 		} = select( 'core/editor' );
 		return {
 			post: getCurrentPost(),
@@ -96,6 +109,7 @@ export default compose( [
 			isDirty: forceIsDirty || isEditedPostDirty(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
+			isAutosaving: isAutosavingPost(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
