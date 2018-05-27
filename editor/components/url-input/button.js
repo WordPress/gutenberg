@@ -40,6 +40,8 @@ class UrlInputButton extends Component {
 		this.setState({ expanded: !this.state.expanded });
 	}
 
+
+
 	submitLink(event) {
 		event.preventDefault();
 		this.toggle();
@@ -51,7 +53,13 @@ class UrlInputButton extends Component {
 
 	setLinkTarget(opensInNewWindow) {
 		this.setState({ opensInNewWindow });
+		if (opensInNewWindow) {
+			console.log(this.props)
+
+			this.props.setAttributes({ target: '_blank' })
+		}
 	}
+
 
 	render() {
 		const { url, onChange } = this.props;
