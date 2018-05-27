@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import './style.scss';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
+import { IconButton, ToggleControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,15 +22,17 @@ class UrlInputButton extends Component {
 		this.toggle = this.toggle.bind(this);
 		this.submitLink = this.submitLink.bind(this);
 		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind(this);
+		this.setLinkTarget = this.setLinkTarget.bind(this);
 
 		this.state = {
 			expanded: false,
 			settingsVisible: false,
+			opensInNewWindow: false,
 		};
 	}
 
 	// this.state = {
-	// 	opensInNewWindow: false,
+	//
 	// 	linkValue: '',
 	// };
 
@@ -47,10 +49,24 @@ class UrlInputButton extends Component {
 		this.setState((state) => ({ settingsVisible: !state.settingsVisible }));
 	}
 
+	setLinkTarget(opensInNewWindow) {
+		this.setState({ opensInNewWindow });
+	}
+
 	render() {
 		const { url, onChange } = this.props;
-		const { expanded } = this.state;
+		const { expanded, settingsVisible, opensInNewWindow } = this.state;
 		const buttonLabel = url ? __('Edit Link') : __('Insert Link');
+
+		const linkSettings = settingsVisible && (
+			<div className="editor-format-toolbar__link-modal-line editor-format-toolbar__link-settings">
+				<ToggleControl
+					label={__('Open in new window')}
+					checked={opensInNewWindow}
+					onChange={this.setLinkTarget}
+				/>
+			</div>
+		);
 
 		return (
 			<div className="editor-url-input__button">
@@ -82,6 +98,7 @@ class UrlInputButton extends Component {
 							// aria-expanded={settingsVisible}
 							/>
 						</div>
+						{linkSettings}
 					</form>
 				}
 			</div>
