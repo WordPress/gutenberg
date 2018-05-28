@@ -41,10 +41,9 @@ class Inserter extends Component {
 			title,
 			children,
 			onInsertBlock,
-			isLocked,
 		} = this.props;
 
-		if ( items.length === 0 || isLocked ) {
+		if ( items.length === 0 ) {
 			return null;
 		}
 
@@ -88,10 +87,8 @@ export default compose( [
 			getEditedPostAttribute,
 			getBlockInsertionPoint,
 			getSelectedBlock,
-			getEditorSettings,
 			getInserterItems,
 		} = select( 'core/editor' );
-		const { templateLock } = getEditorSettings();
 		const insertionPoint = getBlockInsertionPoint();
 		const { rootUID } = insertionPoint;
 		return {
@@ -99,7 +96,6 @@ export default compose( [
 			insertionPoint,
 			selectedBlock: getSelectedBlock(),
 			items: getInserterItems( rootUID ),
-			isLocked: !! templateLock,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
