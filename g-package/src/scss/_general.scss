@@ -14,6 +14,10 @@
         * {
             box-sizing: border-box;
         }
+        
+        input {
+            margin: 1px;
+        }
 
 //         button, 
 //         input, 
@@ -106,7 +110,32 @@
                     cursor: pointer;
                 }    
             }
-        }   
+            
+            .edit-post-text-editor {
+                @media (min-width: 960px) {
+                    padding-left: 20px;
+                    padding-right: 20px;
+                }
+
+                .edit-post-text-editor__body {
+                    padding-top: 0px;
+
+                    @media (min-width: 782px) {
+                        padding-top: 0px;
+                    }
+
+                    @media (min-width: 600px) {
+                        padding-top: 0px;
+                    }
+
+                    .editor-post-title {
+                        @media (min-width: 600px) {
+                            padding: 5px 0;
+                        }
+                    }
+                }
+            }
+        }
 
         .screen-reader-text, 
         .screen-reader-text span, 
