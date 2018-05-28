@@ -6,6 +6,7 @@
 import React from 'react';
 import { Platform, Switch, Text, View, FlatList } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
+import RCTAztecView from 'react-native-aztec';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
@@ -30,7 +31,11 @@ type PropsType = BlockListType;
 type StateType = {
 	dataSource: DataSource,
 	showHtml: boolean,
+	aztectext: string,
+	aztecheight: number,
 };
+
+const _minHeight = 50;
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
 	_recycler = null;
@@ -40,6 +45,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.uid ),
 			showHtml: false,
+			aztectext: 'Some text rendered by Aztec',
+			aztecheight: _minHeight,
 		};
 	}
 
@@ -140,6 +147,22 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return (
 			<View style={ styles.container }>
 				<View style={ { height: 30 } } />
+				<View style={ styles[ 'aztec-container' ] }>
+					<Text>Aztec view below</Text>
+					<RCTAztecView
+						{ ...this.props }
+						style={ [
+							styles[ 'aztec-editor' ],
+							{ minHeight: Math.max( _minHeight, this.state.aztecheight ) },
+						] }
+						text={ this.state.aztectext }
+						onContentSizeChange={ ( event ) => {
+							this.setState( { ...this.state, aztecheight: event.nativeEvent.contentSize.height } );
+						} }
+						color={ 'black' }
+						maxImagesWidth={ 200 }
+					/>
+				</View>
 				<View style={ styles.switch }>
 					<Text>View html output</Text>
 					<Switch
