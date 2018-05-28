@@ -12,7 +12,7 @@ import { select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { REDUCER_KEY } from './';
+import { REDUCER_KEY } from './name';
 
 /**
  * Returns true if resolution is in progress for the core selector of the given

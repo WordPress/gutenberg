@@ -62,7 +62,11 @@ export async function* getEntityRecord( state, kind, name, key ) {
  * @param {string} name   Entity name.
  */
 export async function* getEntityRecords( state, kind, name ) {
-	const entity = getEntity( kind, name );
+	const entities = yield* getKindEntities( state, kind );
+	const entity = find( entities, { kind, name } );
+	if ( ! entity ) {
+		return;
+	}
 	const records = await apiRequest( { path: `${ entity.baseUrl }?context=edit` } );
 	yield receiveEntityRecords( kind, name, Object.values( records ) );
 }

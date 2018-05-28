@@ -6,7 +6,7 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getMethodName, default as entities, getKindEntities } from '../entities';
+import { getMethodName, defaultEntities, getKindEntities } from '../entities';
 import { addEntities } from '../actions';
 
 describe( 'getMethodName', () => {
@@ -35,10 +35,10 @@ describe( 'getMethodName', () => {
 	} );
 
 	it( 'Should include the kind in the method name', () => {
-		const id = entities.length;
-		entities[ id ] = { name: 'book', kind: 'postType' };
+		const id = defaultEntities.length;
+		defaultEntities[ id ] = { name: 'book', kind: 'postType' };
 		const methodName = getMethodName( 'postType', 'book' );
-		delete entities[ id ];
+		delete defaultEntities[ id ];
 
 		expect( methodName ).toEqual( 'getPostTypeBook' );
 	} );

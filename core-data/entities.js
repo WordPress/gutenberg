@@ -51,7 +51,7 @@ async function loadPostTypeEntities() {
  * @return {string} Method name
  */
 export const getMethodName = ( kind, name, prefix = 'get', usePlural = false ) => {
-	const entity = getEntity( kind, name );
+	const entity = find( defaultEntities, { kind, name } );
 	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
 	const nameSuffix = upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
 	const suffix = usePlural && entity.plural ? upperFirst( camelCase( entity.plural ) ) : nameSuffix;

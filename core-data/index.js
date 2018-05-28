@@ -11,13 +11,7 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
 import { defaultEntities, getMethodName } from './entities';
-
-/**
- * The reducer key used by core data in store registration.
- *
- * @type {string}
- */
-export const REDUCER_KEY = 'core';
+import { REDUCER_KEY } from './name';
 
 const createEntityRecordGetter = ( source ) => defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
