@@ -17,12 +17,13 @@ import { keycodes } from '@wordpress/utils';
 import './style.scss';
 import { computePopoverPosition } from './utils';
 import withFocusReturn from '../higher-order/with-focus-return';
+import withFocusContain from '../higher-order/with-focus-contain';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill } from '../slot-fill';
 
-const FocusManaged = withFocusReturn( ( { children } ) => children );
+const FocusManaged = withFocusContain( withFocusReturn( ( { children } ) => children ) );
 
 const { ESCAPE } = keycodes;
 
