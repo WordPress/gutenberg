@@ -121,8 +121,10 @@ function buildFileFor( file, silent, environment ) {
  */
 function buildPackage( packagePath ) {
 	const srcDir = path.resolve( packagePath, SRC_DIR );
-	const files = glob.sync( srcDir + '/**/*.js', { nodir: true } )
-		.filter( ( file ) => ! /\.test\.js/.test( file ) );
+	const files = glob.sync( `${ srcDir }/**/*.js`, {
+		ignore: `${ srcDir }/**/test/**/*.js`,
+		nodir: true,
+	} );
 
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
 
