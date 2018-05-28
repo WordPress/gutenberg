@@ -54,9 +54,11 @@ class UrlInputButton extends Component {
 	setLinkTarget(opensInNewWindow) {
 		this.setState({ opensInNewWindow });
 		if (opensInNewWindow) {
-			console.log(this.props)
 
-			this.props.setAttributes({ target: '_blank' })
+			this.props.setAttributes({
+				target: '_blank',
+				rel: opensInNewWindow ? 'noreferrer noopener' : null,
+			})
 		}
 	}
 
