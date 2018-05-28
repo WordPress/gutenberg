@@ -48,6 +48,18 @@ const blockAttributes = {
 		selector: 'figure > a',
 		attribute: 'href',
 	},
+	target: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'target',
+	},
+	rel: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'rel',
+	},
 	id: {
 		type: 'number',
 	},
