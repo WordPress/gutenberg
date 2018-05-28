@@ -270,7 +270,11 @@ function gutenberg_can_edit_post( $post ) {
 		return false;
 	}
 
-	return current_user_can( 'edit_post', $post->ID );
+	if( ! current_user_can( 'edit_post', $post->ID ) ) {
+		return false;
+	}
+
+	return apply_filters( 'gutenberg_can_edit_post', true, $post );
 }
 
 /**
