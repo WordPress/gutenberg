@@ -45,7 +45,7 @@ export async function* getAuthors() {
  * @param {number} key    Record's key
  */
 export async function* getEntityRecord( state, kind, name, key ) {
-	const entities = yield* getKindEntities( state, kind );
+	const entities = yield* await getKindEntities( state, kind );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;
@@ -62,7 +62,7 @@ export async function* getEntityRecord( state, kind, name, key ) {
  * @param {string} name   Entity name.
  */
 export async function* getEntityRecords( state, kind, name ) {
-	const entities = yield* getKindEntities( state, kind );
+	const entities = yield* await getKindEntities( state, kind );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity ) {
 		return;
