@@ -16,7 +16,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component, compose, Fragment } from '@wordpress/element';
-import { getBlobByURL, revokeBlobURL } from '@wordpress/utils';
+import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	Button,
 	ButtonGroup,

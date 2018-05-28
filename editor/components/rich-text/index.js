@@ -25,10 +25,8 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import deprecated from '@wordpress/deprecated';
-import {
-	keycodes,
-	createBlobURL,
-} from '@wordpress/utils';
+import { createBlobURL } from '@wordpress/blob';
+import { keycodes } from '@wordpress/utils';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
