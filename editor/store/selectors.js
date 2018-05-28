@@ -1192,12 +1192,22 @@ export function getTemplate( state ) {
 
 /**
  * Returns the defined block template lock
+ * in the context of a given root block or in the global context.
  *
  * @param {boolean} state
+ * @param {?string} rootUID Block UID.
+ *
  * @return {?string}        Block Template Lock
  */
-export function getTemplateLock( state ) {
-	return state.settings.templateLock;
+export function getTemplateLock( state, rootUID ) {
+	if ( ! rootUID ) {
+		return state.settings.templateLock;
+	}
+	const blockListSettings = getBlockListSettings( state, rootUID );
+	if ( ! blockListSettings ) {
+		return null;
+	}
+	return blockListSettings.templateLock;
 }
 
 /**
@@ -1358,15 +1368,15 @@ export const canInsertBlockType = createSelector(
 			return false;
 		}
 
-		const { allowedBlockTypes, templateLock } = getEditorSettings( state );
+		const { allowedBlockTypes } = getEditorSettings( state );
 
 		const isBlockAllowedInEditor = checkAllowList( allowedBlockTypes, blockName, true );
 		if ( ! isBlockAllowedInEditor ) {
 			return false;
 		}
 
-		const isEditorLocked = !! templateLock;
-		if ( isEditorLocked ) {
+		const isLocked = !! getTemplateLock( state, parentUID );
+		if ( isLocked ) {
 			return false;
 		}
 

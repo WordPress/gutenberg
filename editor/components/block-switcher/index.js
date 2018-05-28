@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { castArray, get, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -128,11 +128,10 @@ export class BlockSwitcher extends Component {
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlock, getEditorSettings } = select( 'core/editor' );
-		const { templateLock } = getEditorSettings();
+		const { getBlock, getBlockRootUID, getTemplateLock } = select( 'core/editor' );
 		return {
 			blocks: ownProps.uids.map( getBlock ),
-			isLocked: !! templateLock,
+			isLocked: some( castArray( ownProps.uids ), ( uid ) => !! getTemplateLock( getBlockRootUID( uid ) ) ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {

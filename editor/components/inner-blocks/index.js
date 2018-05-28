@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, get } from 'lodash';
+import { pick } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -43,15 +43,19 @@ class InnerBlocks extends Component {
 	updateNestedSettings() {
 		const {
 			blockListSettings,
-			allowedBlocks: nextAllowedBlocks,
+			allowedBlocks,
+			templateLock,
+			parentLock,
 			updateNestedSettings,
 		} = this.props;
 
-		const allowedBlocks = get( blockListSettings, [ 'allowedBlocks' ] );
-		if ( ! isShallowEqual( allowedBlocks, nextAllowedBlocks ) ) {
-			updateNestedSettings( {
-				allowedBlocks: nextAllowedBlocks,
-			} );
+		const newSettings = {
+			allowedBlocks,
+			templateLock: templateLock === undefined ? parentLock : templateLock,
+		};
+
+		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
+			updateNestedSettings( newSettings );
 		}
 	}
 
@@ -60,6 +64,7 @@ class InnerBlocks extends Component {
 			uid,
 			layouts,
 			allowedBlocks,
+			templateLock,
 			template,
 			isSmallScreen,
 			isSelectedBlockInRoot,
@@ -73,7 +78,7 @@ class InnerBlocks extends Component {
 			<div className={ classes }>
 				<BlockList
 					rootUID={ uid }
-					{ ...{ layouts, allowedBlocks, template } }
+					{ ...{ layouts, allowedBlocks, templateLock, template } }
 				/>
 			</div>
 		);
@@ -89,13 +94,16 @@ InnerBlocks = compose( [
 			hasSelectedInnerBlock,
 			getBlock,
 			getBlockListSettings,
+			getBlockRootUID,
+			getTemplateLock,
 		} = select( 'core/editor' );
 		const { uid } = ownProps;
-
+		const parentUID = getBlockRootUID( uid );
 		return {
 			isSelectedBlockInRoot: isBlockSelected( uid ) || hasSelectedInnerBlock( uid ),
 			block: getBlock( uid ),
 			blockListSettings: getBlockListSettings( uid ),
+			parentLock: getTemplateLock( parentUID ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
