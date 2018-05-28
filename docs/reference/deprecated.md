@@ -5,6 +5,9 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
  - `wp.data.withRehydratation` has been renamed to `wp.data.withRehydration`.
  - The `wp.editor.ImagePlaceholder` component is removed. Please use `wp.editor.MediaPlaceholder` instead.
  - `wp.utils.deprecated` function removed. Please use `wp.deprecated` instead.
+- `getInserterItems`: the `allowedBlockTypes` argument was removed and the `parentUID` argument was added.
+- `getFrecentInserterItems` selector removed. Please use `getInserterItems` instead.
+- `getSupportedBlocks` selector removed. Please use `canInsertBlockType` instead.
 
 ## 3.1.0
 

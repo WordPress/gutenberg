@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -41,15 +36,14 @@ class Inserter extends Component {
 
 	render() {
 		const {
+			items,
 			position,
 			title,
 			children,
 			onInsertBlock,
-			hasSupportedBlocks,
-			isLocked,
 		} = this.props;
 
-		if ( ! hasSupportedBlocks || isLocked ) {
+		if ( items.length === 0 ) {
 			return null;
 		}
 
@@ -80,7 +74,7 @@ class Inserter extends Component {
 						onClose();
 					};
 
-					return <InserterMenu onSelect={ onSelect } />;
+					return <InserterMenu items={ items } onSelect={ onSelect } />;
 				} }
 			/>
 		);
@@ -93,19 +87,15 @@ export default compose( [
 			getEditedPostAttribute,
 			getBlockInsertionPoint,
 			getSelectedBlock,
-			getSupportedBlocks,
-			getEditorSettings,
+			getInserterItems,
 		} = select( 'core/editor' );
-		const { allowedBlockTypes, templateLock } = getEditorSettings();
 		const insertionPoint = getBlockInsertionPoint();
 		const { rootUID } = insertionPoint;
-		const supportedBlocks = getSupportedBlocks( rootUID, allowedBlockTypes );
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			insertionPoint,
 			selectedBlock: getSelectedBlock(),
-			hasSupportedBlocks: true === supportedBlocks || ! isEmpty( supportedBlocks ),
-			isLocked: !! templateLock,
+			items: getInserterItems( rootUID ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
