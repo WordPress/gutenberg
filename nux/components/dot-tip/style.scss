@@ -50,25 +50,46 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 		}
 	}
 
+	// Position the dot 25px away from the button
 	&.is-left {
 		margin-left: -25px;
-
-		.components-popover__content {
-			margin-right: 20px;
-		}
 	}
-
 	&.is-right {
 		margin-left: 25px;
+	}
 
-		.components-popover__content {
-			margin-left: 20px;
+	// Position the tip content 20px away from the dot
+	&.is-top .components-popover__content {
+		margin-bottom: 20px;
+	}
+	&.is-bottom .components-popover__content {
+		margin-top: 20px;
+	}
+	&.is-middle.is-left .components-popover__content {
+		margin-right: 20px;
+	}
+	&.is-middle.is-right .components-popover__content {
+		margin-left: 20px;
+	}
+
+	// Extra specificity so that we can override the styles in .component-popover
+	&:not( .is-mobile ).is-left,
+	&:not( .is-mobile ).is-center,
+	&:not( .is-mobile ).is-right {
+
+		// Position tips above popovers
+		z-index: z-index( '.nux-dot-tip' );
+
+		// On mobile, always position the tip below the dot and fill the width of the viewport
+		@media ( max-width: $break-small ) {
+			.components-popover__content {
+				align-self: end;
+				left: 0;
+				margin: 20px 0 0 0;
+				max-width: none !important; // Override the inline style set by <Popover>
+				position: fixed;
+				width: 100%;
+			}
 		}
 	}
-}
-
-// Need extra specificity to override the z-index set by .component-popover
-.nux-dot-tip,
-.nux-dot-tip:not( .is-mobile ).is-bottom {
-	z-index: z-index( '.nux-dot-tip' );
 }
