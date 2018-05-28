@@ -14,15 +14,8 @@ function defaultGetBlockInsertionPoint() {
 	return select( 'core/editor' ).getBlockInsertionPoint();
 }
 
-function defaultGetInserterItems( parentUID ) {
-	// TODO: Update call to getInserterItems when the child block support PR is merged and that function simplified.
-	const {
-		getEditorSettings,
-		getSupportedBlocks,
-		getInserterItems,
-	} = select( 'core/editor' );
-	const supportedBlocks = getSupportedBlocks( parentUID, getEditorSettings().allowedBlockTypes );
-	return getInserterItems( supportedBlocks );
+function defaultGetInserterItems( { rootUID } ) {
+	return select( 'core/editor' ).getInserterItems( rootUID );
 }
 
 /**
