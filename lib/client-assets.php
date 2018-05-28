@@ -1042,13 +1042,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	 */
 	$allowed_block_types = apply_filters( 'allowed_block_types', true, $post );
 
+	// Get all available templates for the post/page attributes meta-box.
+	// The "Default template" array element should only be added if the array is
+	// not empty so we do not trigger the template select element without any options
+	// besides the default value.
 	$available_templates = wp_get_theme()->get_page_templates( $post_to_edit['id'] );
-	$available_templates = array_merge(
-		array(
-			'' => apply_filters( 'default_page_template_title', __( 'Default template', 'gutenberg' ), 'rest-api' ),
-		),
-		$available_templates
-	);
+	$available_templates = ! empty( $available_templates ) ? array_merge( array(
+		'' => apply_filters( 'default_page_template_title', __( 'Default template', 'gutenberg' ), 'rest-api' ),
+	), $available_templates ) : $available_templates;
 
 	$editor_settings = array(
 		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
