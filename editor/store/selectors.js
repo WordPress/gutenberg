@@ -36,6 +36,9 @@ export const INSERTER_UTILITY_HIGH = 3;
 export const INSERTER_UTILITY_MEDIUM = 2;
 export const INSERTER_UTILITY_LOW = 1;
 export const INSERTER_UTILITY_NONE = 0;
+const SECONDS_PER_HOUR = 3600;
+const SECONDS_PER_DAY = 24 * 3600;
+const SECONDS_PER_WEEK = 7 * 24 * 3600;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -1356,11 +1359,11 @@ export const getInserterItems = createSelector(
 
 			const duration = Date.now() - time;
 			switch ( true ) {
-				case duration < 3600:
+				case duration < SECONDS_PER_HOUR:
 					return count * 4;
-				case duration < ( 24 * 3600 ):
+				case duration < SECONDS_PER_DAY:
 					return count * 2;
-				case duration < ( 7 * 24 * 3600 ):
+				case duration < SECONDS_PER_WEEK:
 					return count / 2;
 				default:
 					return count / 4;
