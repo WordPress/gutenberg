@@ -36,6 +36,8 @@ const DONE = chalk.reset.inverse.bold.green( ' DONE ' );
  */
 const babelDefaultConfig = require( '@wordpress/babel-preset-default' );
 babelDefaultConfig.babelrc = false;
+// TODO: It should become the default value when all modules are moved to packages.
+babelDefaultConfig.plugins[ 1 ][ 1 ].pragma = 'createElement';
 const presetEnvConfig = babelDefaultConfig.presets[ 0 ][ 1 ];
 const babelConfigs = {
 	main: Object.assign(
