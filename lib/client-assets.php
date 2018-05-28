@@ -1082,14 +1082,14 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
 			wp.api.init().then( function() {
 				wp.domReady( function() {
-					resolve( wp.editPost.initializeEditor( 'editor', %d, "%s", editorSettings, window._wpGutenbergDefaultPost ) );
+					resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, editorSettings, window._wpGutenbergDefaultPost ) );
 				} );
 			} );
 		} );
 } )();
 JS;
 
-	$script = sprintf( $init_script, wp_json_encode( $editor_settings ), $post->ID, $post->post_type );
+	$script = sprintf( $init_script, wp_json_encode( $editor_settings ), $post->post_type, $post->ID );
 	wp_add_inline_script( 'wp-edit-post', $script );
 
 	/**

@@ -105,9 +105,11 @@ describe( 'getEntityRecords', () => {
 	it( 'should return an empty array by default', () => {
 		const state = deepFreeze( {
 			entities: {
-				root: {
-					postType: {
-						byKey: {},
+				data: {
+					root: {
+						postType: {
+							byKey: {},
+						},
 					},
 				},
 			},
@@ -118,11 +120,13 @@ describe( 'getEntityRecords', () => {
 	it( 'should return all the records', () => {
 		const state = deepFreeze( {
 			entities: {
-				root: {
-					postType: {
-						byKey: {
-							post: { slug: 'post' },
-							page: { slug: 'page' },
+				data: {
+					root: {
+						postType: {
+							byKey: {
+								post: { slug: 'post' },
+								page: { slug: 'page' },
+							},
 						},
 					},
 				},

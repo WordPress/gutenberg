@@ -28,15 +28,15 @@ window.jQuery( document ).on( 'heartbeat-tick', ( event, response ) => {
  * an unhandled error occurs, replacing previously mounted editor element using
  * an initial state from prior to the crash.
  *
- * @param {Object}  postId         ID of the post to edit.
  * @param {Object}  postType       Post type of the post to edit.
+ * @param {Object}  postId         ID of the post to edit.
  * @param {Element} target         DOM node in which editor is rendered.
  * @param {?Object} settings       Editor settings object.
  * @param {Object}  overridePost   Post properties to override.
  */
-export function reinitializeEditor( postId, postType, target, settings, overridePost ) {
+export function reinitializeEditor( postType, postId, target, settings, overridePost ) {
 	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind( null, postId, target, settings, overridePost );
+	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
 
 	render(
 		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } overridePost={ overridePost } recovery />,
@@ -51,14 +51,14 @@ export function reinitializeEditor( postId, postType, target, settings, override
  * call initializeEditor(). This is due to metaBox timing.
  *
  * @param {string}  id            Unique identifier for editor instance.
- * @param {Object}  postId        ID of the post to edit.
  * @param {Object}  postType      Post type of the post to edit.
+ * @param {Object}  postId        ID of the post to edit.
  * @param {?Object} settings      Editor settings object.
  * @param {Object}  overridePost  Post properties to override.
  *
  * @return {Object} Editor interface.
  */
-export function initializeEditor( id, postId, postType, settings, overridePost ) {
+export function initializeEditor( id, postType, postId, settings, overridePost ) {
 	if ( 'production' !== process.env.NODE_ENV ) {
 		// Remove with 3.0 release.
 		window.console.info(
@@ -69,7 +69,7 @@ export function initializeEditor( id, postId, postType, settings, overridePost )
 	}
 
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, postId, postType, target, settings, overridePost );
+	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
 
 	registerCoreBlocks();
 
