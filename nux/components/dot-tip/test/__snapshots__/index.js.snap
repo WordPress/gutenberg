@@ -1,32 +1,30 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DotTip should render correctly 1`] = `
-<React.Fragment>
-  <Popover
-    aria-label="New user tip"
-    aria-modal="true"
-    className="nux-dot-tip"
-    focusOnMount={true}
-    noArrow={true}
-    onClick={[Function]}
-    position="middle right"
-    role="dialog"
-  >
-    <p>
-      It looks like you’re writing a letter. Would you like help?
-    </p>
-    <p>
-      <Button
-        isLink={true}
-      >
-        Got it
-      </Button>
-    </p>
-    <IconButton
-      className="nux-dot-tip__disable"
-      icon="no-alt"
-      label="Disable guide"
-    />
-  </Popover>
-</React.Fragment>
+<Popover
+  aria-label="New user tip"
+  aria-modal="true"
+  className="nux-dot-tip"
+  focusOnMount={true}
+  noArrow={true}
+  onClick={[Function]}
+  position="middle right"
+  role="dialog"
+>
+  <p>
+    It looks like you’re writing a letter. Would you like help?
+  </p>
+  <p>
+    <Button
+      isLink={true}
+    >
+      Got it
+    </Button>
+  </p>
+  <IconButton
+    className="nux-dot-tip__disable"
+    icon="no-alt"
+    label="Disable guide"
+  />
+</Popover>
 `;

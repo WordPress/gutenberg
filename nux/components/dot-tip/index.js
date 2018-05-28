@@ -6,7 +6,7 @@ import { defer, partial } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createRef, Fragment, compose } from '@wordpress/element';
+import { Component, createRef, compose } from '@wordpress/element';
 import { Popover, Button, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -43,32 +43,30 @@ export class DotTip extends Component {
 		}
 
 		return (
-			<Fragment>
-				<Popover
-					ref={ this.popoverRef }
-					className="nux-dot-tip"
-					position="middle right"
-					noArrow
-					focusOnMount
-					role="dialog"
-					aria-modal="true"
-					aria-label={ __( 'New user tip' ) }
-					onClick={ ( event ) => event.stopPropagation() }
-				>
-					<p>{ children }</p>
-					<p>
-						<Button isLink onClick={ onDismiss }>
-							{ hasNextTip ? __( 'See next' ) : __( 'Got it' ) }
-						</Button>
-					</p>
-					<IconButton
-						className="nux-dot-tip__disable"
-						icon="no-alt"
-						label={ __( 'Disable guide' ) }
-						onClick={ onDisable }
-					/>
-				</Popover>
-			</Fragment>
+			<Popover
+				ref={ this.popoverRef }
+				className="nux-dot-tip"
+				position="middle right"
+				noArrow
+				focusOnMount
+				role="dialog"
+				aria-modal="true"
+				aria-label={ __( 'New user tip' ) }
+				onClick={ ( event ) => event.stopPropagation() }
+			>
+				<p>{ children }</p>
+				<p>
+					<Button isLink onClick={ onDismiss }>
+						{ hasNextTip ? __( 'See next' ) : __( 'Got it' ) }
+					</Button>
+				</p>
+				<IconButton
+					className="nux-dot-tip__disable"
+					icon="no-alt"
+					label={ __( 'Disable guide' ) }
+					onClick={ onDisable }
+				/>
+			</Popover>
 		);
 	}
 }
