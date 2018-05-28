@@ -142,6 +142,9 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	width: auto;
 	margin: -$block-padding;
 	margin-bottom: $block-padding;
+	position: sticky;
+	z-index: z-index( '.freeform-toolbar' );
+	top: 0;
 }
 
 .freeform-toolbar:empty {
