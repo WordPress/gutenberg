@@ -136,6 +136,7 @@ const entryPointNames = [
 ];
 
 const gutenbergPackages = [
+	'blob',
 	'date',
 	'deprecated',
 	'dom',
