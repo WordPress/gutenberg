@@ -45,7 +45,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.uid ),
 			showHtml: false,
-			aztectext: 'Some text rendered by Aztec',
+			aztectext: 'Some text <b>rendered by Aztec</b>',
 			aztecheight: _minHeight,
 		};
 	}
