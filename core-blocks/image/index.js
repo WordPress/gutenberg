@@ -54,6 +54,7 @@ const blockAttributes = {
 		source: 'attribute',
 		selector: 'figure > a',
 		attribute: 'target',
+		default: null,
 	},
 	rel: {
 		type: 'string',
