@@ -186,11 +186,11 @@ export class InserterMenu extends Component {
 				<div className="editor-inserter__results">
 					{ !! childItems.length &&
 						<div className="editor-inserter__child-blocks">
-							<div className="editor-inserter__child-blocks-title">
-								<BlockIcon icon={ rootBlockIcon } />
-								<h2>
-									{ rootBlockTitle }
-								</h2>
+							<div className="editor-inserter__parent-block-header">
+								<div className="editor-inserter__parent-block-icon">
+									<BlockIcon icon={ rootBlockIcon } />
+								</div>
+								<h2>{ rootBlockTitle }</h2>
 							</div>
 							<ItemList items={ childItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</div>
