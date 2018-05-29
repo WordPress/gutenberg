@@ -82,8 +82,8 @@ class UrlInputButton extends Component {
 	}
 
 	render() {
-		const { url, onChange } = this.props;
-		const { expanded, settingsVisible, opensInNewWindow } = this.state;
+		const { url, onChange, id } = this.props;
+		const { expanded, settingsVisible, opensInNewWindow, linkValue } = this.state;
 		const buttonLabel = url ? __( 'Edit Link' ) : __( 'Insert Link' );
 
 		const linkSettings = settingsVisible && (
@@ -97,7 +97,7 @@ class UrlInputButton extends Component {
 		);
 
 		return (
-			<div className="editor-url-input__button">
+			<div className="editor-url-input__button" >
 				<IconButton
 					icon="admin-links"
 					label={ buttonLabel }
@@ -106,17 +106,21 @@ class UrlInputButton extends Component {
 						'is-active': url,
 					} ) }
 				/>
-				{ expanded &&
+				{
+					expanded &&
 					<Popover
 						position="bottom center"
 						focusOnMount={ true }
+						key={ this.props.attributes.id }
 					>
 						<form
 							className="editor-url-input__button-modal"
 							onSubmit={ this.submitLink }
+							onKeyPress={ stopKeyPropagation }
+							onKeyDown={ this.onKeyDown }
 						>
 							<div className="editor-url-input__button-modal-line">
-								<UrlInput value={ url || '' } onChange={ onChange } data-test="UrlInput" />
+								<UrlInput value={ linkValue } onKeyPress={ stopKeyPropagation } onChange={ this.onChangeLinkValue } data-test="UrlInput" />
 								<IconButton
 									icon="editor-break"
 									label={ __( 'Submit' ) }
@@ -134,7 +138,7 @@ class UrlInputButton extends Component {
 						</form>
 					</Popover>
 				}
-			</div>
+			</div >
 		);
 	}
 }
