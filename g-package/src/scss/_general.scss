@@ -13,6 +13,10 @@
 
         * {
             box-sizing: border-box;
+
+            &:focus {
+                outline-width: 0;
+            }
         }
         
         input {
@@ -187,8 +191,8 @@
                 }
             }
 
-//             .editor-block-list__layout {
-//                 .editor-block-list__block {
+            .editor-block-list__layout {
+                .editor-block-list__block {
 //                     padding-left: 0;
 //                     padding-right: 0;
 
@@ -202,9 +206,9 @@
 //                         margin-right: 0;
 //                     }
 
-//                     &.is-selected,
-//                     &.is-hovered {
-//                         outline-width: 0;
+                    &.is-selected,
+                    &.is-hovered {
+                        outline-width: 0;
 //                         z-index: 1;
 
 //                         .editor-block-list__block-edit {
@@ -228,9 +232,9 @@
 //                             margin-left: 0;
 //                             margin-right: 0;
 //                         }
-//                     }
-//                 }
-//             }
+                    }
+               }
+            }
         }
     }
 // }
