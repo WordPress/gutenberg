@@ -22,14 +22,17 @@
 		font-weight: 600;
 	}
 
-	&.is-selected .editor-post-title__input,
-	.editor-post-title__input:hover {
+	&.is-selected .editor-post-title__input {
 		// use opacity to work in various editor styles
-		border: 1px solid $dark-opacity-light-500;
+		border-color: $light-opacity-light-500;
 
 		.is-dark-theme & {
 			border-color: $light-opacity-light-500;
 		}
+	}
+
+	.editor-post-title__input:hover {
+		border-color: $blue-medium-300;
 	}
 }
 

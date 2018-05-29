@@ -74,7 +74,7 @@ $empty-paragraph-height: $text-editor-font-size * 4;
 	right: $item-spacing;	// show on the right on mobile
 
 	@include break-small {
-		left: -$parent-block-side-ui-padding;
+		left: -$icon-button-size - $block-side-ui-clearance - $block-parent-side-ui-clearance;
 		right: auto;
 	}
 

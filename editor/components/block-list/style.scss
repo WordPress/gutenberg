@@ -63,8 +63,8 @@
 
 		// use smaller space for hovering/selecting/dragging on child blocks
 		.editor-block-list__layout & {
-			left: -$block-side-ui-width;
-			right: -$block-side-ui-width;
+			left: 0;
+			right: 0;
 		}
 
 		// Full width blocks don't have the place to expand on the side
@@ -81,10 +81,12 @@
 
 
 // Allow Drag & Drop when clicking on the empty area of the mover and the settings menu
-.editor-block-list__block .editor-block-mover,
-.editor-block-list__block .editor-block-settings-menu {
+.editor-block-list__layout .editor-block-list__block .editor-block-mover,
+.editor-block-list__layout .editor-block-list__block .editor-block-settings-menu {
 	pointer-events: none;
 
+	// Nested blocks don't have any side affordance for drag and drop
+	.editor-block-list__layout &,
 	> * {
 		pointer-events: auto;
 	}
@@ -127,8 +129,9 @@
 
 	@include break-small() {
 		// The block mover needs to stay inside the block to allow clicks when hovering the block
-		padding-left: $block-padding + $block-side-ui-padding;
-		padding-right: $block-padding + $block-side-ui-padding;
+		// subtract 1px for border width
+		padding-left: $block-padding + $block-side-ui-padding - 1px;
+		padding-right: $block-padding + $block-side-ui-padding - 1px;
 	}
 
 	// Prevent collapsing margins @todo try and revisit this, it's conducive to theming to allow these to collapse
@@ -377,47 +380,10 @@
 		z-index: z-index( '.editor-block-list__block {core/image aligned wide or fullwide}' );
 	}
 
-	// Wide
-	&[data-align="wide"] {
-		// compensate for main container padding
-		@include break-small() {
-			margin-left: $block-side-ui-padding;
-			margin-right: $block-side-ui-padding;
-		}
-	}
-
-	// Full-wide
+	// Wide and full-wide
+	&[data-align="wide"],
 	&[data-align="full"] {
-
-		// compensate for main container padding
-		@include break-small() {
-			margin-left: -$block-side-ui-padding;
-			margin-right: -$block-side-ui-padding;
-		}
-
-		> .editor-block-list__block-edit {
-			margin-left: -$block-padding;
-			margin-right: -$block-padding;
-
-			@include break-small() {
-				margin-left: -$block-side-ui-padding - $block-padding;
-				margin-right: -$block-side-ui-padding - $block-padding;
-			}
-
-			// this explicitly sets the width of the block, to override the fit-content from the image block
-			figure {
-				width: 100%;
-			}
-		}
-
-		> .editor-block-list__block-edit:before {
-			left: 0;
-			right: 0;
-			border-left-width: 0;
-			border-right-width: 0;
-		}
-
-		// Mover and settings in full-wide
+			// Mover and settings above
 		> .editor-block-mover,
 		> .editor-block-settings-menu {
 			top: -$block-side-ui-width - 1px; // move upwards the height of the button +1px for border
@@ -469,6 +435,38 @@
 		}
 	}
 
+	// Full-wide
+	&[data-align="full"] {
+
+		// compensate for main container padding, subtract border
+		@include break-small() {
+			margin-left: -$block-side-ui-padding + 1px;
+			margin-right: -$block-side-ui-padding + 1px;
+		}
+
+		> .editor-block-list__block-edit {
+			margin-left: -$block-padding;
+			margin-right: -$block-padding;
+
+			@include break-small() {
+				margin-left: -$block-side-ui-padding - $block-padding;
+				margin-right: -$block-side-ui-padding - $block-padding;
+			}
+
+			// this explicitly sets the width of the block, to override the fit-content from the image block
+			figure {
+				width: 100%;
+			}
+		}
+
+		> .editor-block-list__block-edit:before {
+			left: 0;
+			right: 0;
+			border-left-width: 0;
+			border-right-width: 0;
+		}
+	}
+
 	// Clear floats
 	&[data-clear="true"] {
 		float: none;
@@ -494,12 +492,9 @@
 	> .editor-block-mover {
 		position: absolute;
 		top: 0;
-		min-height: 50%; // stretch to fill half of the available space to increase hoverable area
 		width: $block-side-ui-width + $block-side-ui-clearance;
-
-		/* Necessary for drag indicator */
-		cursor: move;/* Fallback for IE/Edge < 14 */
-		cursor: grab;
+		height: 100%; // stretch to fill half of the available space to increase hoverable area
+		max-height: $block-side-ui-width * 4; // stretch to fill half of the available space to increase hoverable area
 	}
 
 	// Elevate when selected or hovered
@@ -758,19 +753,19 @@
 
 	@include break-small() {
 		// stack borders
-		margin-left: -$block-padding - $block-side-ui-padding - $block-parent-side-ui-clearance - 1px;
-		margin-right: -$block-padding - $block-side-ui-padding - $block-parent-side-ui-clearance - 1px;
+		margin-left: -$parent-block-padding - $block-side-ui-width - 1px;
+		margin-right: -$parent-block-padding - $block-side-ui-width - 1px;
 
-		// fixme nested
+		// position toolbar for nested
 		.editor-block-list__block & {
-			margin-left: -$block-padding - $block-side-ui-padding - 1px;
+			margin-left: -$block-padding - $block-side-ui-width - 1px;
 			margin-right: -$block-padding - $block-side-ui-padding - 1px;
 		}
 
 		// except for wide elements, this causes a horizontal scrollbar
 		[data-align="full"] & {
-			margin-left: -$block-padding - $block-side-ui-padding;
-			margin-right: -$block-padding - $block-side-ui-padding;
+			margin-left: -$block-padding - $block-side-ui-width;
+			margin-right: -$block-padding - $block-side-ui-width;
 		}
 	}
 
@@ -814,7 +809,7 @@
 
 	// Position in the top right of the border
 	right: -$block-parent-side-ui-clearance - 1px;
-	top: -1px;
+	top: 0;
 
 	// Nested
 	.editor-block-list__block-edit & {
@@ -825,14 +820,21 @@
 		padding: 0;
 		border: none;
 		background: transparent;
-		padding: 0px;
 		line-height: 1;
 		font-family: $default-font;
 		font-size: 11px;
-		cursor: default;
-		background: rgba( $white, .8 );
-		border: 1px solid $blue-medium-300;
-		padding: 2px 4px;
+		//cursor: default;
+		//background: rgba( $white, .8 );
+		//border: 1px solid $blue-medium-300;
+		padding: 4px 4px;
+		background: $light-gray-200;
+		color: $dark-gray-500;
+		margin: 4px;
+		border-radius: 4px;
+
+		// Drag indicator
+		cursor: move; /* Fallback for IE/Edge < 14 */
+		cursor: grab;
 	
 		// Animate in
 		.editor-block-list__block:hover & {
