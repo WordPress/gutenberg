@@ -50,15 +50,15 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 		}
 	}
 
-	// Position the dot 25px away from the button
+	// Position the dot right next to the edge of the button
 	&.is-left {
-		margin-left: -25px;
+		margin-left: -$dot-size / 2;
 	}
 	&.is-right {
-		margin-left: 25px;
+		margin-left: $dot-size / 2;
 	}
 
-	// Position the tip content 20px away from the dot
+	// Position the tip content away from the dot
 	&.is-top .components-popover__content {
 		margin-bottom: 20px;
 	}
