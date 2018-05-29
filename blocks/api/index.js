@@ -21,7 +21,14 @@ export {
 } from './serializer';
 export { isValidBlock } from './validation';
 export { getCategories } from './categories';
-export { getTabs, getDefaultTab, getTabByName } from './tabs';
+export {
+	SUGGESTED_PANEL,
+	SHARED_PANEL,
+	getDefaultOpenPanels,
+	isSuggestedPanelVisible,
+	isSharedPanelVisible,
+	getInserterMenuCats,
+} from './inserter_menu_panels';
 export {
 	registerBlockType,
 	unregisterBlockType,

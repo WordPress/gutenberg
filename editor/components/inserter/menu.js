@@ -11,6 +11,7 @@ import {
 	findIndex,
 	find,
 	without,
+	includes,
 } from 'lodash';
 
 /**
@@ -23,7 +24,15 @@ import {
 	withSpokenMessages,
 	PanelBody,
 } from '@wordpress/components';
-import { getCategories, isSharedBlock } from '@wordpress/blocks';
+import {
+	getInserterMenuCats as getCategories,
+	isSharedBlock,
+	SUGGESTED_PANEL,
+	SHARED_PANEL,
+	getDefaultOpenPanels,
+	isSuggestedPanelVisible,
+	isSharedPanelVisible,
+} from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 
 /**
@@ -48,7 +57,8 @@ export const searchItems = ( items, searchTerm ) => {
 	const matchSearch = ( string ) => string.toLowerCase().indexOf( normalizedSearchTerm ) !== -1;
 
 	return items.filter( ( item ) =>
-		matchSearch( item.title ) || some( item.keywords, matchSearch )
+		includes( map( getCategories(), 'slug' ), item.category ) &&
+		( matchSearch( item.title ) || some( item.keywords, matchSearch ) )
 	);
 };
 
@@ -58,10 +68,12 @@ export class InserterMenu extends Component {
 		this.state = {
 			filterValue: '',
 			hoveredItem: null,
+			isSuggestedVisible: isSuggestedPanelVisible(),
 			suggestedItems: [],
+			isSharedVisible: isSharedPanelVisible(),
 			sharedItems: [],
 			itemsPerCategory: {},
-			openPanels: [ 'suggested' ],
+			openPanels: getDefaultOpenPanels(), // [ SUGGESTED_PANEL ],
 		};
 		this.onChangeSearchInput = this.onChangeSearchInput.bind( this );
 		this.onHover = this.onHover.bind( this );
@@ -109,21 +121,22 @@ export class InserterMenu extends Component {
 
 	filter( filterValue = '' ) {
 		const { items } = this.props;
+		const { isSuggestedVisible, isSharedVisible } = this.state;
 		const filteredItems = searchItems( items, filterValue );
 
 		let suggestedItems = [];
-		if ( ! filterValue ) {
+		if ( isSuggestedVisible && ! filterValue ) {
 			const maxSuggestedItems = this.props.maxSuggestedItems || MAX_SUGGESTED_ITEMS;
 			suggestedItems = filter( items, ( item ) => item.utility > 0 ).slice( 0, maxSuggestedItems );
 		}
 
-		const sharedItems = filter( filteredItems, { category: 'shared' } );
+		const sharedItems = isSharedVisible ? filter( filteredItems, { category: SHARED_PANEL } ) : [];
 
 		const getCategoryIndex = ( item ) => {
 			return findIndex( getCategories(), ( category ) => category.slug === item.category );
 		};
 		const itemsPerCategory = flow(
-			( itemList ) => filter( itemList, ( item ) => item.category !== 'shared' ),
+			( itemList ) => filter( itemList, ( item ) => item.category !== SHARED_PANEL ),
 			( itemList ) => sortBy( itemList, getCategoryIndex ),
 			( itemList ) => groupBy( itemList, 'category' )
 		)( filteredItems );
@@ -131,9 +144,9 @@ export class InserterMenu extends Component {
 		let openPanels = this.state.openPanels;
 		if ( filterValue !== this.state.filterValue ) {
 			if ( ! filterValue ) {
-				openPanels = [ 'suggested' ];
+				openPanels = [ SUGGESTED_PANEL ];
 			} else if ( sharedItems.length ) {
-				openPanels = [ 'shared' ];
+				openPanels = [ SHARED_PANEL ];
 			} else if ( filteredItems.length ) {
 				const firstCategory = find( getCategories(), ( { slug } ) => itemsPerCategory[ slug ] && itemsPerCategory[ slug ].length );
 				openPanels = [ firstCategory.slug ];
@@ -152,7 +165,15 @@ export class InserterMenu extends Component {
 
 	render() {
 		const { instanceId, onSelect } = this.props;
-		const { hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
+		const {
+			hoveredItem,
+			suggestedItems,
+			isSuggestedVisible,
+			sharedItems,
+			isSharedVisible,
+			itemsPerCategory,
+			openPanels,
+		} = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 
 		// Disable reason: The inserter menu is a modal display, not one which
@@ -175,21 +196,21 @@ export class InserterMenu extends Component {
 				/>
 
 				<div className="editor-inserter__results">
-					{ !! suggestedItems.length &&
+					{ isSuggestedVisible && !! suggestedItems.length &&
 						<PanelBody
 							title={ __( 'Most Used' ) }
-							opened={ isPanelOpen( 'suggested' ) }
-							onToggle={ this.onTogglePanel( 'suggested' ) }
+							opened={ isPanelOpen( SUGGESTED_PANEL ) }
+							onToggle={ this.onTogglePanel( SUGGESTED_PANEL ) }
 						>
 							<ItemList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
 
-					{ !! sharedItems.length && (
+					{ isSharedVisible && !! sharedItems.length && (
 						<PanelBody
 							title={ __( 'Shared' ) }
-							opened={ isPanelOpen( 'shared' ) }
-							onToggle={ this.onTogglePanel( 'shared' ) }
+							opened={ isPanelOpen( SHARED_PANEL ) }
+							onToggle={ this.onTogglePanel( SHARED_PANEL ) }
 						>
 							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
