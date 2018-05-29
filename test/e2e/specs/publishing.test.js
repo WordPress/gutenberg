@@ -5,7 +5,6 @@ import '../support/bootstrap';
 import {
 	newPost,
 	newDesktopBrowserPage,
-	waitDurationYesImCertainWaitForSelectorIsNotABetterOption,
 } from '../support/utils';
 
 describe( 'Publishing', () => {
@@ -24,7 +23,8 @@ describe( 'Publishing', () => {
 		await page.click( '.editor-post-publish-panel__toggle' );
 
 		// Wait for a second ( wait for the animation )
-		await waitDurationYesImCertainWaitForSelectorIsNotABetterOption( 1000 );
+		// We should prefer waitForSelector when possible
+		await page.waitFor( 1000 );
 
 		// Publish the post
 		await page.click( '.editor-post-publish-button' );
