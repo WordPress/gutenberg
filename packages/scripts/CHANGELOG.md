@@ -1,4 +1,4 @@
-## 1.2.0 (2018-05-23)
+## 1.2.0 (2018-05-29)
 
 - Added support for `lint-pkg-json` script ([#128](https://github.com/WordPress/packages/pull/128))
 
