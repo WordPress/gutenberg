@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, find } from 'lodash';
+import { get, find, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,7 +27,7 @@ export const DEFAULT_CATEGORIES = get( window, [ 'customGutenberg', 'categories'
  * @return {Array} Categories list
  */
 function getInserterMenuCategories() {
-	const categories = get( window, [ 'customGutenberg', 'blocks', 'categories' ], DEFAULT_CATEGORIES );
+	const categories = get( window, [ 'customGutenberg', 'blocks', 'categories' ], map( DEFAULT_CATEGORIES, 'slug' ) );
 
 	if ( categories !== DEFAULT_CATEGORIES ) {
 		return categories.map( ( cat ) => {
