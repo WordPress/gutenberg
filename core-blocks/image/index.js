@@ -47,6 +47,7 @@ const blockAttributes = {
 		source: 'attribute',
 		selector: 'figure > a',
 		attribute: 'href',
+		default: null,
 	},
 	target: {
 		type: 'string',
@@ -76,18 +77,18 @@ const blockAttributes = {
 
 const imageSchema = {
 	img: {
-		attributes: ['src', 'alt'],
-		classes: ['alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/],
+		attributes: [ 'src', 'alt' ],
+		classes: [ 'alignleft', 'aligncenter', 'alignright', 'alignnone', /^wp-image-\d+$/ ],
 	},
 };
 
 const schema = {
 	figure: {
-		require: ['img'],
+		require: [ 'img' ],
 		children: {
 			...imageSchema,
 			a: {
-				attributes: ['href'],
+				attributes: [ 'href' ],
 				children: imageSchema,
 			},
 			figcaption: {
@@ -98,15 +99,15 @@ const schema = {
 };
 
 export const settings = {
-	title: __('Image'),
+	title: __( 'Image' ),
 
-	description: __('They\'re worth 1,000 words! Insert a single image.'),
+	description: __( 'They\'re worth 1,000 words! Insert a single image.' ),
 
 	icon: 'format-image',
 
 	category: 'common',
 
-	keywords: [__('photo')],
+	keywords: [ __( 'photo' ) ],
 
 	attributes: blockAttributes,
 
@@ -114,34 +115,34 @@ export const settings = {
 		from: [
 			{
 				type: 'raw',
-				isMatch: (node) => node.nodeName === 'FIGURE' && !!node.querySelector('img'),
+				isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'img' ),
 				schema,
-				transform: (node) => {
+				transform: ( node ) => {
 					// Search both figure and image classes. Alignment could be
 					// set on either. ID is set on the image.
-					const className = node.className + ' ' + node.querySelector('img').className;
-					const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec(className);
-					const align = alignMatches ? alignMatches[1] : undefined;
-					const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec(className);
-					const id = idMatches ? idMatches[1] : undefined;
-					const blockType = getBlockType('core/image');
-					const attributes = getBlockAttributes(blockType, node.outerHTML, { align, id });
-					return createBlock('core/image', attributes);
+					const className = node.className + ' ' + node.querySelector( 'img' ).className;
+					const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec( className );
+					const align = alignMatches ? alignMatches[ 1 ] : undefined;
+					const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec( className );
+					const id = idMatches ? idMatches[ 1 ] : undefined;
+					const blockType = getBlockType( 'core/image' );
+					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id } );
+					return createBlock( 'core/image', attributes );
 				},
 			},
 			{
 				type: 'files',
-				isMatch(files) {
-					return files.length === 1 && files[0].type.indexOf('image/') === 0;
+				isMatch( files ) {
+					return files.length === 1 && files[ 0 ].type.indexOf( 'image/' ) === 0;
 				},
-				transform(files) {
-					const file = files[0];
+				transform( files ) {
+					const file = files[ 0 ];
 					// We don't need to upload the media directly here
 					// It's already done as part of the `componentDidMount`
 					// int the image block
-					const block = createBlock('core/image', {
-						url: window.URL.createObjectURL(file),
-					});
+					const block = createBlock( 'core/image', {
+						url: window.URL.createObjectURL( file ),
+					} );
 
 					return block;
 				},
@@ -175,18 +176,18 @@ export const settings = {
 					},
 					id: {
 						type: 'number',
-						shortcode: ({ named: { id } }) => {
-							if (!id) {
+						shortcode: ( { named: { id } } ) => {
+							if ( ! id ) {
 								return;
 							}
 
-							return parseInt(id.replace('attachment_', ''), 10);
+							return parseInt( id.replace( 'attachment_', '' ), 10 );
 						},
 					},
 					align: {
 						type: 'string',
-						shortcode: ({ named: { align = 'alignnone' } }) => {
-							return align.replace('align', '');
+						shortcode: ( { named: { align = 'alignnone' } } ) => {
+							return align.replace( 'align', '' );
 						},
 					},
 				},
@@ -194,37 +195,37 @@ export const settings = {
 		],
 	},
 
-	getEditWrapperProps(attributes) {
+	getEditWrapperProps( attributes ) {
 		const { align, width } = attributes;
-		if ('left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align) {
-			return { 'data-align': align, 'data-resized': !!width };
+		if ( 'left' === align || 'center' === align || 'right' === align || 'wide' === align || 'full' === align ) {
+			return { 'data-align': align, 'data-resized': !! width };
 		}
 	},
 
 	edit,
 
-	save({ attributes }) {
+	save( { attributes } ) {
 		const { url, alt, caption, align, href, width, height, id, target, rel } = attributes;
 
-		const classes = classnames({
-			[`align${align}`]: align,
+		const classes = classnames( {
+			[ `align${ align }` ]: align,
 			'is-resized': width || height,
-		});
+		} );
 
 		const image = (
 			<img
-				src={url}
-				alt={alt}
-				className={id ? `wp-image-${id}` : null}
-				width={width}
-				height={height}
+				src={ url }
+				alt={ alt }
+				className={ id ? `wp-image-${ id }` : null }
+				width={ width }
+				height={ height }
 			/>
 		);
 
 		return (
-			<figure className={classes}>
-				{href ? <a href={href} target={target} rel={rel}>{image}</a> : image}
-				{caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={caption} />}
+			<figure className={ classes }>
+				{ href ? <a href={ href } target={ target } rel={ rel }>{ image }</a> : image }
+				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</figure>
 		);
 	},
@@ -232,46 +233,46 @@ export const settings = {
 	deprecated: [
 		{
 			attributes: blockAttributes,
-			save({ attributes }) {
+			save( { attributes } ) {
 				const { url, alt, caption, align, href, width, height, id } = attributes;
 
 				const image = (
 					<img
-						src={url}
-						alt={alt}
-						className={id ? `wp-image-${id}` : null}
-						width={width}
-						height={height}
+						src={ url }
+						alt={ alt }
+						className={ id ? `wp-image-${ id }` : null }
+						width={ width }
+						height={ height }
 					/>
 				);
 
 				return (
-					<figure className={align ? `align${align}` : null} >
-						{href ? <a href={href}>{image}</a> : image}
-						{caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={caption} />}
+					<figure className={ align ? `align${ align }` : null } >
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 					</figure>
 				);
 			},
 		},
 		{
 			attributes: blockAttributes,
-			save({ attributes }) {
+			save( { attributes } ) {
 				const { url, alt, caption, align, href, width, height } = attributes;
 				const extraImageProps = width || height ? { width, height } : {};
-				const image = <img src={url} alt={alt} {...extraImageProps} />;
+				const image = <img src={ url } alt={ alt } { ...extraImageProps } />;
 
 				let figureStyle = {};
 
-				if (width) {
+				if ( width ) {
 					figureStyle = { width };
-				} else if (align === 'left' || align === 'right') {
+				} else if ( align === 'left' || align === 'right' ) {
 					figureStyle = { maxWidth: '50%' };
 				}
 
 				return (
-					<figure className={align ? `align${align}` : null} style={figureStyle}>
-						{href ? <a href={href}>{image}</a> : image}
-						{caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={caption} />}
+					<figure className={ align ? `align${ align }` : null } style={ figureStyle }>
+						{ href ? <a href={ href }>{ image }</a> : image }
+						{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
 					</figure>
 				);
 			},
