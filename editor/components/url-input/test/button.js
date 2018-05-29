@@ -49,13 +49,7 @@ describe( 'UrlInputButton', () => {
 		wrapper.find( '[data-test=\'UrlInput\']' ).simulate( 'change' );
 		expect( onChangeMock ).toHaveBeenCalledTimes( 2 );
 	} );
-	it( 'should close the form when user clicks Close button', () => {
-		const wrapper = shallow( <UrlInputButton /> );
-		clickEditLink( wrapper );
-		expect( wrapper.state().expanded ).toBe( true );
-		wrapper.find( '.editor-url-input__back' ).simulate( 'click' );
-		expect( wrapper.state().expanded ).toBe( false );
-	} );
+
 	it( 'should close the form when user submits it', () => {
 		const wrapper = mount( <UrlInputButton /> );
 		clickEditLink( wrapper );
