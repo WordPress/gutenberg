@@ -64,6 +64,7 @@ class UrlInputButton extends Component {
 
 	submitLink( event ) {
 		event.preventDefault();
+		this.props.setAttributes( { href: this.state.linkValue } );
 		this.toggle();
 	}
 
