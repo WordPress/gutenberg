@@ -12,6 +12,7 @@ import { Component } from '@wordpress/element';
 import { IconButton, ToggleControl, Popover } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
 import { filterURLForDisplay } from '../../utils/url';
+import { prependHTTP } from '@wordpress/url';
 
 const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } = keycodes;
 
@@ -37,8 +38,8 @@ class UrlInputButton extends Component {
 			expanded: false,
 			isEditing: true,
 			settingsVisible: false,
-			opensInNewWindow: false,
-			linkValue: this.props.attributes.href,
+			opensInNewWindow: this.props.attributes.target === '_blank' ? true : false,
+			linkValue: this.props.url,
 		};
 	}
 
@@ -71,8 +72,11 @@ class UrlInputButton extends Component {
 
 	submitLink( event ) {
 		event.preventDefault();
-		this.props.setAttributes( { href: this.state.linkValue } );
-		this.setState( { isEditing: false } );
+		const value = prependHTTP( this.state.linkValue );
+		this.props.setAttributes( {
+			href: value,
+		} );
+		this.setState( { isEditing: false, linkValue: value } );
 	}
 
 	toggleLinkSettingsVisibility() {
@@ -80,11 +84,17 @@ class UrlInputButton extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
+		console.log( opensInNewWindow, 'opens' );
 		this.setState( { opensInNewWindow } );
 		if ( opensInNewWindow ) {
 			this.props.setAttributes( {
-				target: opensInNewWindow ? '_blank' : null,
-				rel: opensInNewWindow ? 'noreferrer noopener' : null,
+				target: '_blank',
+				rel: 'noreferrer noopener',
+			} );
+		} else {
+			this.props.setAttributes( {
+				target: null,
+				rel: null,
 			} );
 		}
 	}
