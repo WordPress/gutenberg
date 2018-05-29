@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { first, partial } from 'lodash';
+import { first, partial, castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -9,7 +9,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import { IconButton, withInstanceId } from '@wordpress/components';
-import { getBlockType, withEditorSettings } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 import { compose, Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -45,6 +45,7 @@ export class BlockMover extends Component {
 	render() {
 		const { onMoveUp, onMoveDown, isFirst, isLast, uids, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
 		const { isFocused } = this.state;
+		const blocksCount = castArray( uids ).length;
 		if ( isLocked ) {
 			return null;
 		}
@@ -78,7 +79,7 @@ export class BlockMover extends Component {
 				<span id={ `editor-block-mover__up-description-${ instanceId }` } className="editor-block-mover__description">
 					{
 						getBlockMoverDescription(
-							uids.length,
+							blocksCount,
 							blockType && blockType.title,
 							firstIndex,
 							isFirst,
@@ -90,7 +91,7 @@ export class BlockMover extends Component {
 				<span id={ `editor-block-mover__down-description-${ instanceId }` } className="editor-block-mover__description">
 					{
 						getBlockMoverDescription(
-							uids.length,
+							blocksCount,
 							blockType && blockType.title,
 							firstIndex,
 							isFirst,
@@ -106,12 +107,15 @@ export class BlockMover extends Component {
 
 export default compose(
 	withSelect( ( select, { uids, rootUID } ) => {
-		const { getBlock, getBlockIndex } = select( 'core/editor' );
-		const block = getBlock( first( uids ) );
+		const { getBlock, getBlockIndex, getEditorSettings } = select( 'core/editor' );
+		const firstUID = first( castArray( uids ) );
+		const block = getBlock( firstUID );
+		const { templateLock } = getEditorSettings();
 
 		return {
-			firstIndex: getBlockIndex( first( uids ), rootUID ),
+			firstIndex: getBlockIndex( firstUID, rootUID ),
 			blockType: block ? getBlockType( block.name ) : null,
+			isLocked: templateLock === 'all',
 		};
 	} ),
 	withDispatch( ( dispatch, { uids, rootUID } ) => {
@@ -119,13 +123,6 @@ export default compose(
 		return {
 			onMoveDown: partial( moveBlocksDown, uids, rootUID ),
 			onMoveUp: partial( moveBlocksUp, uids, rootUID ),
-		};
-	} ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock } = settings;
-
-		return {
-			isLocked: templateLock === 'all',
 		};
 	} ),
 	withInstanceId,

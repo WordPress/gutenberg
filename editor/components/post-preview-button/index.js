@@ -132,11 +132,11 @@ export default compose( [
 			isDirty: isEditedPostDirty(),
 			isNew: isEditedPostNew(),
 			isSaveable: isEditedPostSaveable(),
-			isViewable: get( postType, 'viewable', false ),
+			isViewable: get( postType, [ 'viewable' ], false ),
 			modified: getEditedPostAttribute( 'modified' ),
 		};
 	} ),
-	withDispatch( ( dispatch )=>( {
+	withDispatch( ( dispatch ) => ( {
 		autosave: dispatch( 'core/editor' ).autosave,
 	} ) ),
 	ifCondition( ( { isViewable } ) => isViewable ),

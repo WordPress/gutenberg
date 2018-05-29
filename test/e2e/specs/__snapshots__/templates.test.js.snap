@@ -15,13 +15,13 @@ exports[`Using a CPT with a predefined template Should add a custom post types w
 
 <!-- wp:columns -->
 <div class=\\"wp-block-columns has-2-columns\\">
-    <!-- wp:image {\\"layout\\":\\"column-1\\"} -->
-    <figure class=\\"wp-block-image layout-column-1\\"><img alt=\\"\\" /></figure>
-    <!-- /wp:image -->
+	<!-- wp:image {\\"layout\\":\\"column-1\\"} -->
+	<figure class=\\"wp-block-image layout-column-1\\"><img alt=\\"\\" /></figure>
+	<!-- /wp:image -->
 
-    <!-- wp:paragraph {\\"placeholder\\":\\"Add a inner paragraph\\",\\"layout\\":\\"column-2\\"} -->
-    <p class=\\"layout-column-2\\"></p>
-    <!-- /wp:paragraph -->
+	<!-- wp:paragraph {\\"placeholder\\":\\"Add a inner paragraph\\",\\"layout\\":\\"column-2\\"} -->
+	<p class=\\"layout-column-2\\"></p>
+	<!-- /wp:paragraph -->
 </div>
 <!-- /wp:columns -->"
 `;

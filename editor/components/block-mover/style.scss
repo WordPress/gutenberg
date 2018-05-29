@@ -14,17 +14,27 @@
 	border: none;
 	outline: none;
 	background: none;
-	color: $dark-gray-300;
 	cursor: pointer;
 	padding: 0;
 	width: $block-side-ui-width;
 	height: $block-side-ui-width;	// the side UI can be no taller than 2 * $block-side-ui-width, which matches the height of a line of text
 	border-radius: $button-style__radius-roundrect;
 
+	// use opacity to work in various editor styles
+	color: $dark-opacity-300;
+
+	.is-dark-theme & {
+		color: $light-opacity-300;
+	}
+
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: $light-gray-300;
 		pointer-events: none;
+		color: $dark-opacity-light-300; // use opacity to work in various editor styles
+
+		.is-dark-theme & {
+			color: $light-opacity-light-300;
+		}
 	}
 
 	svg {
@@ -51,15 +61,15 @@
 	}
 
 	// Hover, active and focus styles
-	&:not(:disabled):hover {
+	&:not( :disabled ):not( [aria-disabled="true"] ):hover {
 		@include button-style__hover;
 	}
 
-	&:not(:disabled):active {
+	&:not( :disabled ):not( [aria-disabled="true"] ):active {
 		@include button-style__active;
 	}
 
-	&:not(:disabled):focus {
+	&:not( :disabled ):not( [aria-disabled="true"] ):focus {
 		@include button-style__focus-active;
 	}
 }

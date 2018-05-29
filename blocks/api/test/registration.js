@@ -29,12 +29,12 @@ describe( 'blocks', () => {
 	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
 
 	beforeAll( () => {
-		// Load all hooks that modify blocks
-		require( 'blocks/hooks' );
+		// Initialize the block store.
+		require( '../../store' );
 	} );
 
 	afterEach( () => {
-		getBlockTypes().forEach( block => {
+		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
 		setUnknownTypeHandlerName( undefined );
@@ -88,14 +88,6 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				attributes: {
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
 			} );
 		} );
 
@@ -180,12 +172,6 @@ describe( 'blocks', () => {
 					ok: {
 						type: 'boolean',
 					},
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
 				},
 			} );
 		} );
@@ -201,14 +187,6 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes: {
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
 			} );
 		} );
 
@@ -247,14 +225,6 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: 'block-default',
-					attributes: {
-						className: {
-							type: 'string',
-						},
-						layout: {
-							type: 'string',
-						},
-					},
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -265,14 +235,6 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes: {
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -288,7 +250,7 @@ describe( 'blocks', () => {
 
 	describe( 'getUnknownTypeHandlerName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getUnknownTypeHandlerName() ).toBeUndefined();
+			expect( getUnknownTypeHandlerName() ).toBeNull();
 		} );
 	} );
 
@@ -302,7 +264,7 @@ describe( 'blocks', () => {
 
 	describe( 'getDefaultBlockName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getDefaultBlockName() ).toBeUndefined();
+			expect( getDefaultBlockName() ).toBeNull();
 		} );
 	} );
 
@@ -315,14 +277,6 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes: {
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
 			} );
 		} );
 
@@ -336,14 +290,6 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: 'block-default',
-				attributes: {
-					className: {
-						type: 'string',
-					},
-					layout: {
-						type: 'string',
-					},
-				},
 			} );
 		} );
 	} );
@@ -364,14 +310,6 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: 'block-default',
-					attributes: {
-						className: {
-							type: 'string',
-						},
-						layout: {
-							type: 'string',
-						},
-					},
 				},
 				{
 					name: 'core/test-block-with-settings',
@@ -380,14 +318,6 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: 'block-default',
-					attributes: {
-						className: {
-							type: 'string',
-						},
-						layout: {
-							type: 'string',
-						},
-					},
 				},
 			] );
 		} );

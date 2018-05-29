@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage } from '../support/utils';
+import { newPost, newDesktopBrowserPage, pressWithModifier } from '../support/utils';
 
 describe( 'Multi-block selection', () => {
 	beforeAll( async () => {
@@ -22,27 +22,29 @@ describe( 'Multi-block selection', () => {
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
 		await page.keyboard.type( 'Image' );
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
 		await page.keyboard.type( 'Quote' );
+		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Quote Block' );
 
 		const blocks = [ firstBlockSelector, secondBlockSelector, thirdBlockSelector ];
-		const expectMultiSelected = ( selectors, areMultiSelected ) => {
-			selectors.forEach( async ( selector ) => {
+		const expectMultiSelected = async ( selectors, areMultiSelected ) => {
+			for ( const selector of selectors ) {
 				const className = await page.$eval( selector, ( element ) => element.className );
 				if ( areMultiSelected ) {
 					expect( className ).toEqual( expect.stringContaining( multiSelectedCssClass ) );
 				} else {
 					expect( className ).not.toEqual( expect.stringContaining( multiSelectedCssClass ) );
 				}
-			} );
+			}
 		};
 
 		// Default: No selection
-		expectMultiSelected( blocks, false );
+		await expectMultiSelected( blocks, false );
 
 		// Multiselect via Shift + click
 		await page.mouse.move( 200, 300 );
@@ -52,27 +54,25 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.up( 'Shift' );
 
 		// Verify selection
-		expectMultiSelected( blocks, true );
+		await expectMultiSelected( blocks, true );
 
 		// Unselect
 		await page.click( secondBlockSelector );
 
 		// No selection
-		expectMultiSelected( blocks, false );
+		await expectMultiSelected( blocks, false );
 
 		// Multiselect via keyboard
 		await page.click( 'body' );
-		await page.keyboard.down( 'Meta' );
-		await page.keyboard.press( 'a' );
-		await page.keyboard.up( 'Meta' );
+		await pressWithModifier( 'Mod', 'a' );
 
 		// Verify selection
-		expectMultiSelected( blocks, true );
+		await expectMultiSelected( blocks, true );
 
 		// Unselect
 		await page.keyboard.press( 'Escape' );
 
 		// No selection
-		expectMultiSelected( blocks, false );
+		await expectMultiSelected( blocks, false );
 	} );
 } );

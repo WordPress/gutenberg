@@ -1,16 +1,14 @@
-import * as focus from './focus';
+/**
+ * Internal dependencies
+ */
 import * as keycodes from './keycodes';
-import * as viewPort from './viewport';
 import { decodeEntities } from './entities';
 
-export { focus };
-export { keycodes };
 export { decodeEntities };
+export { keycodes };
 
-export * from './blob-cache';
-export * from './dom';
 export * from './mediaupload';
 export * from './terms';
-export * from './deprecation';
 
-export { viewPort };
+// Deprecations
+export * from './deprecated';

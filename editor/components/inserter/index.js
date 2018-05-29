@@ -1,14 +1,9 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
-import { createBlock, isUnmodifiedDefaultBlock, withEditorSettings } from '@wordpress/blocks';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component, compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -41,21 +36,21 @@ class Inserter extends Component {
 
 	render() {
 		const {
+			items,
 			position,
 			title,
 			children,
 			onInsertBlock,
-			hasSupportedBlocks,
-			isLocked,
 		} = this.props;
 
-		if ( ! hasSupportedBlocks || isLocked ) {
+		if ( items.length === 0 ) {
 			return null;
 		}
 
 		return (
 			<Dropdown
 				className="editor-inserter"
+				contentClassName="editor-inserter__popover"
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
@@ -79,7 +74,7 @@ class Inserter extends Component {
 						onClose();
 					};
 
-					return <InserterMenu onSelect={ onSelect } />;
+					return <InserterMenu items={ items } onSelect={ onSelect } />;
 				} }
 			/>
 		);
@@ -87,11 +82,22 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
-		insertionPoint: select( 'core/editor' ).getBlockInsertionPoint(),
-		selectedBlock: select( 'core/editor' ).getSelectedBlock(),
-	} ) ),
+	withSelect( ( select ) => {
+		const {
+			getEditedPostAttribute,
+			getBlockInsertionPoint,
+			getSelectedBlock,
+			getInserterItems,
+		} = select( 'core/editor' );
+		const insertionPoint = getBlockInsertionPoint();
+		const { rootUID } = insertionPoint;
+		return {
+			title: getEditedPostAttribute( 'title' ),
+			insertionPoint,
+			selectedBlock: getSelectedBlock(),
+			items: getInserterItems( rootUID ),
+		};
+	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
 		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
@@ -106,12 +112,4 @@ export default compose( [
 			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootUID );
 		},
 	} ) ),
-	withEditorSettings( ( settings ) => {
-		const { allowedBlockTypes, templateLock } = settings;
-
-		return {
-			hasSupportedBlocks: true === allowedBlockTypes || ! isEmpty( allowedBlockTypes ),
-			isLocked: !! templateLock,
-		};
-	} ),
 ] )( Inserter );

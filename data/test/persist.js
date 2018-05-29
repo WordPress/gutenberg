@@ -6,7 +6,7 @@ import { createStore } from 'redux';
 /**
  * Internal dependencies
  */
-import { loadAndPersist, withRehydratation } from '../persist';
+import { loadAndPersist, withRehydration } from '../persist';
 
 describe( 'loadAndPersist', () => {
 	it( 'should load the initial value from the local storage integrating it into reducer default value.', () => {
@@ -17,7 +17,7 @@ describe( 'loadAndPersist', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
+		const store = createStore( withRehydration( reducer, 'preferences', storageKey ) );
 		loadAndPersist(
 			store,
 			reducer,
@@ -35,7 +35,7 @@ describe( 'loadAndPersist', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( withRehydratation( reducer, 'preferences', storageKey + 'change' ) );
+		const store = createStore( withRehydration( reducer, 'preferences', storageKey + 'change' ) );
 		loadAndPersist(
 			store,
 			reducer,
@@ -62,7 +62,7 @@ describe( 'loadAndPersist', () => {
 				preferences: { ribs: true },
 			};
 		};
-		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
+		const store = createStore( withRehydration( reducer, 'preferences', storageKey ) );
 		loadAndPersist(
 			store,
 			reducer,
@@ -90,7 +90,7 @@ describe( 'loadAndPersist', () => {
 		// store preferences without the `counter` default
 		window.localStorage.setItem( storageKey, JSON.stringify( {} ) );
 
-		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
+		const store = createStore( withRehydration( reducer, 'preferences', storageKey ) );
 		loadAndPersist(
 			store,
 			reducer,
@@ -120,7 +120,7 @@ describe( 'loadAndPersist', () => {
 
 		window.localStorage.setItem( storageKey, JSON.stringify( { counter: 1 } ) );
 
-		const store = createStore( withRehydratation( reducer, 'preferences', storageKey ) );
+		const store = createStore( withRehydration( reducer, 'preferences', storageKey ) );
 
 		loadAndPersist(
 			store,

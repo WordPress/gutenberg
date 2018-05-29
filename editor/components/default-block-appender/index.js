@@ -8,7 +8,7 @@ import { get } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/element';
-import { getDefaultBlockName, withEditorSettings } from '@wordpress/blocks';
+import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/utils';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -61,14 +61,18 @@ export default compose(
 		const {
 			getBlockCount,
 			getBlock,
+			getEditorSettings,
 		} = select( 'core/editor' );
 		const isEmpty = ! getBlockCount( ownProps.rootUID );
 		const lastBlock = getBlock( ownProps.lastBlockUID );
-		const isLastBlockDefault = get( lastBlock, 'name' ) === getDefaultBlockName();
+		const isLastBlockDefault = get( lastBlock, [ 'name' ] ) === getDefaultBlockName();
+		const { templateLock, bodyPlaceholder } = getEditorSettings();
 
 		return {
 			isVisible: isEmpty || ! isLastBlockDefault,
 			showPrompt: isEmpty,
+			isLocked: !! templateLock,
+			placeholder: bodyPlaceholder,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
@@ -88,14 +92,6 @@ export default compose(
 				insertDefaultBlock( attributes, rootUID );
 				startTyping();
 			},
-		};
-	} ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock, bodyPlaceholder } = settings;
-
-		return {
-			isLocked: !! templateLock,
-			placeholder: bodyPlaceholder,
 		};
 	} ),
 )( DefaultBlockAppender );

@@ -6,7 +6,13 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getTerms, isRequestingTerms, getMedia, getPostType } from '../selectors';
+import { getTerms, isRequestingCategories, getEntityRecord, getEntityRecords } from '../selectors';
+import { select } from '@wordpress/data';
+
+jest.mock( '@wordpress/data', () => ( {
+	...require.requireActual( '@wordpress/data' ),
+	select: jest.fn().mockReturnValue( {} ),
+} ) );
 
 describe( 'getTerms()', () => {
 	it( 'returns value of terms by taxonomy', () => {
@@ -24,71 +30,103 @@ describe( 'getTerms()', () => {
 	} );
 } );
 
-describe( 'isRequestingTerms()', () => {
+describe( 'isRequestingCategories()', () => {
+	beforeAll( () => {
+		select( 'core/data' ).isResolving = jest.fn().mockReturnValue( false );
+	} );
+
+	afterAll( () => {
+		select( 'core/data' ).isResolving.mockRestore();
+	} );
+
+	function setIsResolving( isResolving ) {
+		select( 'core/data' ).isResolving.mockImplementation(
+			( reducerKey, selectorName ) => (
+				isResolving &&
+				reducerKey === 'core' &&
+				selectorName === 'getCategories'
+			)
+		);
+	}
+
 	it( 'returns false if never requested', () => {
-		const state = deepFreeze( {
-			terms: {},
-		} );
-
-		const result = isRequestingTerms( state, 'categories' );
+		const result = isRequestingCategories();
 		expect( result ).toBe( false );
 	} );
 
-	it( 'returns false if terms received', () => {
-		const state = deepFreeze( {
-			terms: {
-				categories: [ { id: 1 } ],
-			},
-		} );
-
-		const result = isRequestingTerms( state, 'categories' );
+	it( 'returns false if categories resolution finished', () => {
+		setIsResolving( false );
+		const result = isRequestingCategories();
 		expect( result ).toBe( false );
 	} );
 
-	it( 'returns true if requesting', () => {
-		const state = deepFreeze( {
-			terms: {
-				categories: null,
-			},
-		} );
-
-		const result = isRequestingTerms( state, 'categories' );
+	it( 'returns true if categories resolution started', () => {
+		setIsResolving( true );
+		const result = isRequestingCategories();
 		expect( result ).toBe( true );
 	} );
 } );
 
-describe( 'getMedia', () => {
-	it( 'should return undefined for unknown media', () => {
+describe( 'getEntityRecord', () => {
+	it( 'should return undefined for unknown record\'s key', () => {
 		const state = deepFreeze( {
-			media: {},
-		} );
-		expect( getMedia( state, 1 ) ).toBe( undefined );
-	} );
-
-	it( 'should return a media element by id', () => {
-		const state = deepFreeze( {
-			media: {
-				1: { id: 1 },
+			entities: {
+				root: {
+					postType: {
+						byKey: {},
+					},
+				},
 			},
 		} );
-		expect( getMedia( state, 1 ) ).toEqual( { id: 1 } );
+		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toBe( undefined );
+	} );
+
+	it( 'should return a record by key', () => {
+		const state = deepFreeze( {
+			entities: {
+				root: {
+					postType: {
+						byKey: {
+							post: { slug: 'post' },
+						},
+					},
+				},
+			},
+		} );
+		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toEqual( { slug: 'post' } );
 	} );
 } );
 
-describe( 'getPostType', () => {
-	it( 'should return undefined for unknown post type', () => {
+describe( 'getEntityRecords', () => {
+	it( 'should return an empty array by default', () => {
 		const state = deepFreeze( {
-			postTypes: {},
-		} );
-		expect( getPostType( state, 'post' ) ).toBe( undefined );
-	} );
-
-	it( 'should return a post type by slug', () => {
-		const state = deepFreeze( {
-			postTypes: {
-				post: { slug: 'post' },
+			entities: {
+				root: {
+					postType: {
+						byKey: {},
+					},
+				},
 			},
 		} );
-		expect( getPostType( state, 'post' ) ).toEqual( { slug: 'post' } );
+		expect( getEntityRecords( state, 'root', 'postType' ) ).toEqual( [] );
+	} );
+
+	it( 'should return all the records', () => {
+		const state = deepFreeze( {
+			entities: {
+				root: {
+					postType: {
+						byKey: {
+							post: { slug: 'post' },
+							page: { slug: 'page' },
+						},
+					},
+				},
+			},
+		} );
+		expect( getEntityRecords( state, 'root', 'postType' ) ).toEqual( [
+			{ slug: 'post' },
+			{ slug: 'page' },
+		] );
 	} );
 } );

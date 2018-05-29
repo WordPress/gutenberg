@@ -32,17 +32,17 @@ describe( 'Managing links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let modal = await page.$( '.blocks-format-toolbar__link-modal' );
+		let modal = await page.$( '.editor-format-toolbar__link-modal' );
 		expect( modal ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		modal = await page.$( '.blocks-format-toolbar__link-modal' );
+		modal = await page.$( '.editor-format-toolbar__link-modal' );
 		expect( modal ).toBeNull();
 	} );
 
 	it( 'Pressing Left and Esc in Link Dialog in "Docked Toolbar" mode', async () => {
-		setFixedToolbar( false );
+		await setFixedToolbar( false );
 
 		await page.click( '.editor-default-block-appender' );
 		await page.keyboard.type( 'Text' );
@@ -55,12 +55,12 @@ describe( 'Managing links', () => {
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
-		let modal = await page.$( '.blocks-format-toolbar__link-modal' );
+		let modal = await page.$( '.editor-format-toolbar__link-modal' );
 		expect( modal ).not.toBeNull();
 
 		// Escape should close the dialog still.
 		await page.keyboard.press( 'Escape' );
-		modal = await page.$( '.blocks-format-toolbar__link-modal' );
+		modal = await page.$( '.editor-format-toolbar__link-modal' );
 		expect( modal ).toBeNull();
 	} );
 } );

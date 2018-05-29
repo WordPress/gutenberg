@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { find, get, includes, union } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { withInstanceId } from '@wordpress/components';
+import { withInstanceId, Button } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -30,9 +30,10 @@ const POST_FORMATS = [
 	{ id: 'chat', caption: __( 'Chat' ) },
 ];
 
-function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFormat, instanceId } ) {
+function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFormats, suggestedFormat, instanceId } ) {
 	const postFormatSelectorId = 'post-format-selector-' + instanceId;
-	const suggestion = find( POST_FORMATS, ( format ) => format.id === suggestedFormat );
+	const formats = POST_FORMATS.filter( ( format ) => includes( supportedFormats, format.id ) );
+	const suggestion = find( formats, ( format ) => format.id === suggestedFormat );
 
 	// Disable reason: We need to change the value immiediately to show/hide the suggestion if needed
 
@@ -47,7 +48,7 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFor
 						onChange={ ( event ) => onUpdatePostFormat( event.target.value ) }
 						id={ postFormatSelectorId }
 					>
-						{ POST_FORMATS.map( format => (
+						{ formats.map( ( format ) => (
 							<option key={ format.id } value={ format.id }>{ format.caption }</option>
 						) ) }
 					</select>
@@ -56,9 +57,9 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFor
 				{ suggestion && suggestion.id !== postFormat && (
 					<div className="editor-post-format__suggestion">
 						{ __( 'Suggestion:' ) }{ ' ' }
-						<button className="button-link" onClick={ () => onUpdatePostFormat( suggestion.id ) }>
+						<Button isLink onClick={ () => onUpdatePostFormat( suggestion.id ) }>
 							{ suggestion.caption }
-						</button>
+						</Button>
 					</div>
 				) }
 			</div>
@@ -70,8 +71,14 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', suggestedFor
 export default compose( [
 	withSelect( ( select ) => {
 		const { getEditedPostAttribute, getSuggestedPostFormat } = select( 'core/editor' );
+		const postFormat = getEditedPostAttribute( 'format' );
+		const themeSupports = select( 'core' ).getThemeSupports();
+		// Ensure current format is always in the set.
+		// The current format may not be a format supported by the theme.
+		const supportedFormats = union( [ postFormat ], get( themeSupports, [ 'formats' ], [] ) );
 		return {
-			postFormat: getEditedPostAttribute( 'format' ),
+			postFormat,
+			supportedFormats,
 			suggestedFormat: getSuggestedPostFormat(),
 		};
 	} ),

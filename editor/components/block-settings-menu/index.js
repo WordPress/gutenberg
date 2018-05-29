@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -54,7 +55,9 @@ export class BlockSettingsMenu extends Component {
 			isHidden,
 		} = this.props;
 		const { isFocused } = this.state;
-		const count = uids.length;
+		const blockUIDs = castArray( uids );
+		const count = blockUIDs.length;
+		const firstBlockUID = blockUIDs[ 0 ];
 
 		return (
 			<div
@@ -74,8 +77,8 @@ export class BlockSettingsMenu extends Component {
 							<IconButton
 								className={ toggleClassname }
 								onClick={ () => {
-									if ( uids.length === 1 ) {
-										onSelect( uids[ 0 ] );
+									if ( count === 1 ) {
+										onSelect( firstBlockUID );
 									}
 									onToggle();
 								} }
@@ -92,16 +95,20 @@ export class BlockSettingsMenu extends Component {
 						// Should this just use a DropdownMenu instead of a DropDown ?
 						<NavigableMenu className="editor-block-settings-menu__content">
 							{ renderBlockMenu( { onClose, children: [
-								count === 1 && <BlockModeToggle key="mode-toggle" uid={ uids[ 0 ] } onToggle={ onClose } role="menuitem" />,
-								count === 1 && <UnknownConverter key="unknown-converter" uid={ uids[ 0 ] } role="menuitem" />,
+								count === 1 && <BlockModeToggle key="mode-toggle" uid={ firstBlockUID } onToggle={ onClose } role="menuitem" />,
+								count === 1 && <UnknownConverter key="unknown-converter" uid={ firstBlockUID } role="menuitem" />,
 								<BlockDuplicateButton key="duplicate" uids={ uids } rootUID={ rootUID } role="menuitem" />,
-								count === 1 && <SharedBlockSettings key="shared-block" uid={ uids[ 0 ] } onToggle={ onClose } itemsRole="menuitem" />,
+								count === 1 && <SharedBlockSettings key="shared-block" uid={ firstBlockUID } onToggle={ onClose } itemsRole="menuitem" />,
 								<BlockTransformations key="transformations" uids={ uids } onClick={ onClose } itemsRole="menuitem" />,
 							] } ) }
 						</NavigableMenu>
 					) }
 				/>
-				<BlockRemoveButton uids={ uids } />
+				<BlockRemoveButton
+					uids={ uids }
+					onFocus={ this.onFocus }
+					onBlur={ this.onBlur }
+				/>
 			</div>
 		);
 	}

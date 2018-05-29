@@ -1,12 +1,3 @@
-$datepicker__background-color: $light-gray-300;
-$datepicker__border-color: $light-gray-500;
-$datepicker__highlighted-color: $blue-wordpress;
-$datepicker__muted-color: #ccc;
-$datepicker__selected-color: $blue-wordpress;
-$datepicker__text-color: $dark-gray-500;
-$datepicker__header-color: $black;
-$datepicker__navigation-disabled-color: lighten($datepicker__muted-color, 10%);
-
 $datepicker__border-radius: 0;
 $datepicker__day-margin: 0.166rem;
 $datepicker__font-size: 13px;
@@ -15,6 +6,13 @@ $datepicker__item-size: 28px;
 $datepicker__margin: 0.4rem;
 $datepicker__navigation-size: 6px;
 $datepicker__triangle-size: 6px;
+
+$datepicker__background-color: $light-gray-300;
+$datepicker__text-color: $dark-gray-500;
+$datepicker__header-color: $black;
+$datepicker__muted-color: #ccc;
+$datepicker__navigation-disabled-color: lighten($datepicker__muted-color, 10%);
+$datepicker__border-color: $light-gray-500;
 
 @import '~react-datepicker/src/stylesheets/datepicker';
 
@@ -29,7 +27,7 @@ $datepicker__triangle-size: 6px;
 
 .react-datepicker__navigation {
 	top: 12px;
-	
+
 	&--previous,
 	&--previous:hover {
 		border-right-color: $black;
@@ -72,4 +70,55 @@ $datepicker__triangle-size: 6px;
 		box-shadow: inset 0 2px 5px -3px $dark-gray-500;
 		transform: translateY(1px);
 	}
+}
+
+// Extending colors to use theme colors
+.react-datepicker__time-container {
+	.react-datepicker__time {
+		.react-datepicker__time-box {
+			ul.react-datepicker__time-list {
+				li.react-datepicker__time-list-item {
+					&--selected {
+						background-color: theme( primary );
+						&:hover {
+							background-color: theme( primary );
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+.react-datepicker__day {
+	&--highlighted {
+		background-color: theme( primary );
+		&:hover {
+			background-color: color( theme( primary ) shade(5%) );
+		}
+	}
+
+	&--selected,
+	&--in-selecting-range,
+	&--in-range {
+		background-color: theme( primary );
+		&:hover {
+			background-color: color( theme( primary ) shade(5%) );
+		}
+	}
+
+	&--keyboard-selected {
+		background-color: color( theme( primary ) tint(5%) );
+		&:hover {
+			background-color: color( theme( primary ) shade(5%) );
+		}
+	}
+
+	&--in-selecting-range:not(&--in-range) {
+		background-color: color( theme( primary ) a(50%) );
+	}
+}
+
+.react-datepicker__close-icon::after {
+	background-color: theme( primary );
 }

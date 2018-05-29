@@ -105,7 +105,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](https://wordpress.org/gutenberg/handbook/block-api/attributes/).**
+* **See: [Attributes](../docs/block-api/attributes.md).**
 
 #### Transforms (optional)
 
@@ -264,6 +264,19 @@ A once-only block can be inserted into each post, one time only. For example, th
 useOnce: true,
 ```
 
+#### parent (optional)
+
+* **Type:** `Array`
+
+Blocks can be inserted into other blocks as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+
+Setting `parent` lets a block require that it is only available when nested within the specified blocks.
+
+```js
+// Only allow this block when it is nested in a Columns block
+parent: [ 'core/columns' ],
+```
+
 #### supports (optional)
 
 * **Type:** `Object`
@@ -298,6 +311,13 @@ className: false,
 html: false,
 ```
 
+- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programatically, set `inserter` to `false`.
+
+```js
+// Hide this block from the inserter.
+inserter: false,
+```
+
 ## Edit and Save
 
-The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](https://wordpress.org/gutenberg/handbook/block-edit-save/).
+The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).

@@ -34,6 +34,8 @@ module.exports = {
 	},
 	rules: {
 		'array-bracket-spacing': [ 'error', 'always' ],
+		'arrow-parens': [ 'error', 'always' ],
+		'arrow-spacing': 'error',
 		'brace-style': [ 'error', '1tbs' ],
 		camelcase: [ 'error', { properties: 'never' } ],
 		'comma-dangle': [ 'error', 'always-multiline' ],

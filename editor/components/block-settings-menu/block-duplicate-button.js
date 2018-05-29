@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, noop, last, every, first } from 'lodash';
+import { flow, noop, last, every, first, castArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,10 +10,10 @@ import { __ } from '@wordpress/i18n';
 import { IconButton } from '@wordpress/components';
 import { compose } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { cloneBlock, getBlockType, withEditorSettings } from '@wordpress/blocks';
+import { cloneBlock, getBlockType } from '@wordpress/blocks';
 
 export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isLocked, small = false, role } ) {
-	const canDuplicate = every( blocks, block => {
+	const canDuplicate = every( blocks, ( block ) => {
 		const type = getBlockType( block.name );
 		return ! type.useOnce;
 	} );
@@ -37,13 +37,18 @@ export function BlockDuplicateButton( { blocks, onDuplicate, onClick = noop, isL
 }
 
 export default compose(
-	withSelect( ( select, { uids, rootUID } ) => ( {
-		blocks: select( 'core/editor' ).getBlocksByUID( uids ),
-		index: select( 'core/editor' ).getBlockIndex( last( uids ), rootUID ),
-	} ) ),
+	withSelect( ( select, { uids, rootUID } ) => {
+		const { getBlocksByUID, getBlockIndex, getEditorSettings } = select( 'core/editor' );
+		const { templateLock } = getEditorSettings();
+		return {
+			blocks: getBlocksByUID( uids ),
+			index: getBlockIndex( last( castArray( uids ) ), rootUID ),
+			isLocked: !! templateLock,
+		};
+	} ),
 	withDispatch( ( dispatch, { blocks, index, rootUID } ) => ( {
 		onDuplicate() {
-			const clonedBlocks = blocks.map( block => cloneBlock( block ) );
+			const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 			dispatch( 'core/editor' ).insertBlocks(
 				clonedBlocks,
 				index + 1,
@@ -54,11 +59,4 @@ export default compose(
 			}
 		},
 	} ) ),
-	withEditorSettings( ( settings ) => {
-		const { templateLock } = settings;
-
-		return {
-			isLocked: !! templateLock,
-		};
-	} ),
 )( BlockDuplicateButton );

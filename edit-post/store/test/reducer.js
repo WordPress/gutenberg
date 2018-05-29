@@ -22,6 +22,7 @@ describe( 'state', () => {
 				editorMode: 'visual',
 				panels: { 'post-status': true },
 				features: { fixedToolbar: false },
+				pinnedPluginItems: {},
 			} );
 		} );
 
@@ -33,6 +34,25 @@ describe( 'state', () => {
 			} );
 
 			expect( state.activeGeneralSidebar ).toBe( 'edit-post/document' );
+		} );
+
+		it( 'should save activeGeneralSidebar default value when serializing if the value was edit-post/block', () => {
+			const state = preferences( {
+				activeGeneralSidebar: 'edit-post/block',
+				editorMode: 'visual',
+				panels: { 'post-status': true },
+				features: { fixedToolbar: false },
+			}, {
+				type: 'SERIALIZE',
+			} );
+
+			expect( state ).toEqual( {
+				activeGeneralSidebar: 'edit-post/document',
+				editorMode: 'visual',
+				panels: { 'post-status': true },
+				features: { fixedToolbar: false },
+				pinnedPluginItems: {},
+			} );
 		} );
 
 		it( 'should does not update if sidebar is already set to value', () => {
@@ -94,6 +114,42 @@ describe( 'state', () => {
 			} );
 
 			expect( state.features ).toEqual( { chicken: false } );
+		} );
+
+		describe( 'pinnedPluginItems', () => {
+			const initialState = deepFreeze( {
+				pinnedPluginItems: {
+					'foo/enabled': true,
+					'foo/disabled': false,
+				},
+			} );
+
+			it( 'should disable a pinned plugin flag when the value does not exist', () => {
+				const state = preferences( initialState, {
+					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+					pluginName: 'foo/does-not-exist',
+				} );
+
+				expect( state.pinnedPluginItems[ 'foo/does-not-exist' ] ).toBe( false );
+			} );
+
+			it( 'should disable a pinned plugin flag when it is enabled', () => {
+				const state = preferences( initialState, {
+					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+					pluginName: 'foo/enabled',
+				} );
+
+				expect( state.pinnedPluginItems[ 'foo/enabled' ] ).toBe( false );
+			} );
+
+			it( 'should enable a pinned plugin flag when it is disabled', () => {
+				const state = preferences( initialState, {
+					type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+					pluginName: 'foo/disabled',
+				} );
+
+				expect( state.pinnedPluginItems[ 'foo/disabled' ] ).toBe( true );
+			} );
 		} );
 	} );
 

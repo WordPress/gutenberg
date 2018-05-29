@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { registerCoreBlocks } from '@wordpress/core-blocks';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 
 /**
@@ -53,9 +54,6 @@ export function reinitializeEditor( target, settings ) {
  * @return {Object} Editor interface.
  */
 export function initializeEditor( id, post, settings ) {
-	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, target, settings );
-
 	if ( 'production' !== process.env.NODE_ENV ) {
 		// Remove with 3.0 release.
 		window.console.info(
@@ -64,6 +62,11 @@ export function initializeEditor( id, post, settings ) {
 			'See updated docs: https://github.com/WordPress/gutenberg/blob/master/blocks/README.md#components.'
 		);
 	}
+
+	const target = document.getElementById( id );
+	const reboot = reinitializeEditor.bind( null, target, settings );
+
+	registerCoreBlocks();
 
 	render(
 		<Editor settings={ settings } onError={ reboot } post={ post } />,
@@ -77,5 +80,8 @@ export function initializeEditor( id, post, settings ) {
 	};
 }
 
+export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
+export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
+export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
 export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';

@@ -42,18 +42,17 @@ import {
 	createErrorNotice,
 	createWarningNotice,
 	removeNotice,
+	updateBlockListSettings,
 } from '../actions';
 
 describe( 'actions', () => {
 	describe( 'setupEditor', () => {
 		it( 'should return the SETUP_EDITOR action', () => {
 			const post = {};
-			const settings = {};
-			const result = setupEditor( post, settings );
+			const result = setupEditor( post );
 			expect( result ).toEqual( {
 				type: 'SETUP_EDITOR',
 				post,
-				settings,
 			} );
 		} );
 	} );
@@ -468,43 +467,48 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should take an optional id argument', () => {
-			const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-			expect( fetchSharedBlocks( id ) ).toEqual( {
+			expect( fetchSharedBlocks( 123 ) ).toEqual( {
 				type: 'FETCH_SHARED_BLOCKS',
-				id,
+				id: 123,
 			} );
 		} );
 	} );
 
 	describe( 'saveSharedBlock', () => {
-		const id = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( saveSharedBlock( id ) ).toEqual( {
-			type: 'SAVE_SHARED_BLOCK',
-			id,
+		it( 'should return the SAVE_SHARED_BLOCK action', () => {
+			expect( saveSharedBlock( 123 ) ).toEqual( {
+				type: 'SAVE_SHARED_BLOCK',
+				id: 123,
+			} );
 		} );
 	} );
 
 	describe( 'deleteSharedBlock', () => {
-		const id = 123;
-		expect( deleteSharedBlock( id ) ).toEqual( {
-			type: 'DELETE_SHARED_BLOCK',
-			id,
+		it( 'should return the DELETE_SHARED_BLOCK action', () => {
+			expect( deleteSharedBlock( 123 ) ).toEqual( {
+				type: 'DELETE_SHARED_BLOCK',
+				id: 123,
+			} );
 		} );
 	} );
 
 	describe( 'convertBlockToStatic', () => {
-		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( convertBlockToStatic( uid ) ).toEqual( {
-			type: 'CONVERT_BLOCK_TO_STATIC',
-			uid,
+		it( 'should return the CONVERT_BLOCK_TO_STATIC action', () => {
+			const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			expect( convertBlockToStatic( uid ) ).toEqual( {
+				type: 'CONVERT_BLOCK_TO_STATIC',
+				uid,
+			} );
 		} );
 	} );
 
 	describe( 'convertBlockToShared', () => {
-		const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
-		expect( convertBlockToShared( uid ) ).toEqual( {
-			type: 'CONVERT_BLOCK_TO_SHARED',
-			uid,
+		it( 'should return the CONVERT_BLOCK_TO_SHARED action', () => {
+			const uid = '358b59ee-bab3-4d6f-8445-e8c6971a5605';
+			expect( convertBlockToShared( uid ) ).toEqual( {
+				type: 'CONVERT_BLOCK_TO_SHARED',
+				uid,
+			} );
 		} );
 	} );
 
@@ -527,6 +531,24 @@ describe( 'actions', () => {
 			expect( toggleSelection( false ) ).toEqual( {
 				type: 'TOGGLE_SELECTION',
 				isSelectionEnabled: false,
+			} );
+		} );
+	} );
+
+	describe( 'updateBlockListSettings', () => {
+		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS with undefined settings', () => {
+			expect( updateBlockListSettings( 'chicken' ) ).toEqual( {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: 'chicken',
+				settings: undefined,
+			} );
+		} );
+
+		it( 'should return the UPDATE_BLOCK_LIST_SETTINGS action with the passed settings', () => {
+			expect( updateBlockListSettings( 'chicken', { chicken: 'ribs' } ) ).toEqual( {
+				type: 'UPDATE_BLOCK_LIST_SETTINGS',
+				id: 'chicken',
+				settings: { chicken: 'ribs' },
 			} );
 		} );
 	} );

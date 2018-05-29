@@ -63,8 +63,8 @@ import {
 	getSelectedBlock,
 	isBlockSelected,
 	getTemplate,
-	POST_UPDATE_TRANSACTION_ID,
 	getTemplateLock,
+	POST_UPDATE_TRANSACTION_ID,
 } from './selectors';
 
 /**
@@ -124,7 +124,7 @@ export default {
 			( err ) => {
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_FAILURE',
-					error: get( err, 'responseJSON', {
+					error: get( err, [ 'responseJSON' ], {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
 					} ),
@@ -176,7 +176,7 @@ export default {
 			) );
 		}
 
-		if ( get( window.history.state, 'id' ) !== post.id ) {
+		if ( get( window.history.state, [ 'id' ] ) !== post.id ) {
 			window.history.replaceState(
 				{ id: post.id },
 				'Post ' + post.id,
@@ -218,7 +218,7 @@ export default {
 				dispatch( {
 					...action,
 					type: 'TRASH_POST_FAILURE',
-					error: get( err, 'responseJSON', {
+					error: get( err, [ 'responseJSON' ], {
 						code: 'unknown_error',
 						message: __( 'An unknown error occurred.' ),
 					} ),
@@ -324,8 +324,11 @@ export default {
 
 		dispatch( savePost() );
 	},
-	SETUP_EDITOR( action ) {
-		const { post, settings } = action;
+	SETUP_EDITOR( action, { getState } ) {
+		const { post } = action;
+		const state = getState();
+		const template = getTemplate( state );
+		const templateLock = getTemplateLock( state );
 
 		// Parse content as blocks
 		let blocks;
@@ -335,12 +338,12 @@ export default {
 
 			// Unlocked templates are considered always valid because they act as default values only.
 			isValidTemplate = (
-				! settings.template ||
-				settings.templateLock !== 'all' ||
-				doBlocksMatchTemplate( blocks, settings.template )
+				! template ||
+				templateLock !== 'all' ||
+				doBlocksMatchTemplate( blocks, template )
 			);
-		} else if ( settings.template ) {
-			blocks = synchronizeBlocksWithTemplate( [], settings.template );
+		} else if ( template ) {
+			blocks = synchronizeBlocksWithTemplate( [], template );
 		} else if ( getDefaultBlockForPostFormat( post.format ) ) {
 			blocks = [ createBlock( getDefaultBlockForPostFormat( post.format ) ) ];
 		} else {
@@ -398,7 +401,7 @@ export default {
 		if ( id ) {
 			result = wp.apiRequest( { path: `/wp/v2/${ basePath }/${ id }` } );
 		} else {
-			result = wp.apiRequest( { path: `/wp/v2/${ basePath }` } );
+			result = wp.apiRequest( { path: `/wp/v2/${ basePath }?per_page=-1` } );
 		}
 
 		result.then(
@@ -464,7 +467,7 @@ export default {
 			( error ) => {
 				dispatch( { type: 'SAVE_SHARED_BLOCK_FAILURE', id } );
 				const message = __( 'An unknown error occurred.' );
-				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+				dispatch( createErrorNotice( get( error.responseJSON, [ 'message' ], message ), {
 					id: SHARED_BLOCK_NOTICE_ID,
 					spokenMessage: message,
 				} ) );
@@ -490,8 +493,8 @@ export default {
 
 		// Remove any other blocks that reference this shared block
 		const allBlocks = getBlocks( getState() );
-		const associatedBlocks = allBlocks.filter( block => isSharedBlock( block ) && block.attributes.ref === id );
-		const associatedBlockUids = associatedBlocks.map( block => block.uid );
+		const associatedBlocks = allBlocks.filter( ( block ) => isSharedBlock( block ) && block.attributes.ref === id );
+		const associatedBlockUids = associatedBlocks.map( ( block ) => block.uid );
 
 		const transactionId = uniqueId();
 
@@ -524,7 +527,7 @@ export default {
 					optimist: { type: REVERT, id: transactionId },
 				} );
 				const message = __( 'An unknown error occurred.' );
-				dispatch( createErrorNotice( get( error.responseJSON, 'message', message ), {
+				dispatch( createErrorNotice( get( error.responseJSON, [ 'message' ], message ), {
 					id: SHARED_BLOCK_NOTICE_ID,
 					spokenMessage: message,
 				} ) );
@@ -546,7 +549,7 @@ export default {
 		const sharedBlock = {
 			id: uniqueId( 'shared' ),
 			uid: parsedBlock.uid,
-			title: __( 'Untitled block' ),
+			title: __( 'Untitled shared block' ),
 		};
 
 		dispatch( receiveSharedBlocks( [ {
@@ -573,7 +576,7 @@ export default {
 	},
 
 	EDIT_POST( action, { getState } ) {
-		const format = get( action, 'edits.format' );
+		const format = get( action, [ 'edits', 'format' ] );
 		if ( ! format ) {
 			return;
 		}

@@ -1,6 +1,6 @@
 .components-draggable__clone {
 	& > .editor-block-list__block > .editor-block-list__block-draggable {
-		background: white;
+		background: $white; // @todo: ensure this works with themes that invert the color
 		box-shadow: $shadow-popover;
 
 		@include break-small {
@@ -33,8 +33,14 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-		background-color: $light-gray-200;
 		visibility: hidden;
+
+		// use opacity to work in various editor styles
+		background-color: $dark-opacity-light-200;
+
+		.is-dark-theme & {
+			background-color: $light-opacity-light-200;
+		}
 
 		@include break-small {
 			margin: 0 48px;
@@ -57,7 +63,7 @@
 	}
 
 
-	cursor: move;/* Fallback for IE/Edge < 14 */
+	cursor: move; // Fallback for IE/Edge < 14
 	cursor: grab;
 }
 
@@ -126,6 +132,26 @@
 
 	margin-bottom: $block-spacing;
 
+	/**
+	 * Notices
+	 */
+	 .components-placeholder .components-with-notices-ui {
+		margin: -10px 20px 12px 20px;
+		width: calc( 100% - 40px );
+	 }
+	 .components-with-notices-ui {
+		margin: 0 0 12px 0;
+		width: 100%;
+
+		.notice {
+			margin-left: 0px;
+			margin-right: 0px;
+
+			p {
+				font-size: $default-font-size;
+			}
+		}
+	 }
 
 	/**
 	 * Warnings
@@ -151,7 +177,7 @@
 		bottom: 0;
 		left: 0;
 		background-color: rgba( $white, 0.6 );
-		background-image: linear-gradient( to bottom, transparent, #fff );
+		background-image: linear-gradient( to bottom, transparent, $white );
 	}
 
 	/**
@@ -168,16 +194,26 @@
 		top: 10px;
 	}
 
-	&.is-selected > .editor-block-mover:before,
 	&.is-hovered > .editor-block-mover:before {
-		border-right: 1px solid $light-gray-500;
 		right: 0;
+
+		// use opacity to work in various editor styles
+		border-right: 1px solid $dark-opacity-light-500;
+
+		.is-dark-theme & {
+			border-right-color: $light-opacity-light-500;
+		}
 	}
 
-	&.is-selected > .editor-block-settings-menu:before,
 	&.is-hovered > .editor-block-settings-menu:before {
-		border-left: 1px solid $light-gray-500;
 		left: 0;
+
+		// use opacity to work in various editor styles
+		border-left: 1px solid $dark-opacity-light-500;
+
+		.is-dark-theme & {
+			border-left-color: $light-opacity-light-500;
+		}
 	}
 
 	&.is-typing .editor-block-list__empty-block-inserter,
@@ -207,13 +243,19 @@
 			bottom: -$block-padding;
 			left: -$block-padding;
 			outline: 1px solid transparent;
+			pointer-events: none;
 		}
 
 	}
 
 	// focused block-style
 	&.is-selected > .editor-block-list__block-edit:before {
-		outline: 1px solid $light-gray-500;
+		// use opacity to work in various editor styles
+		outline: 1px solid $dark-opacity-light-500;
+
+		.is-dark-theme & {
+			outline-color: $light-opacity-light-500;
+		}
 	}
 
 	/**
@@ -235,6 +277,13 @@
 
 	&.is-multi-selected .editor-block-list__block-edit:before {
 		background: $blue-medium-highlight;
+
+		// use opacity to work in various editor styles
+		mix-blend-mode: multiply;
+
+		.is-dark-theme & {
+			mix-blend-mode: soft-light;
+		}
 	}
 
 	/**
@@ -250,7 +299,12 @@
 	}
 
 	&.is-shared > .editor-block-list__block-edit:before {
-		outline: 1px dashed $light-gray-500;
+		// use opacity to work in various editor styles
+		outline: 1px dashed $dark-opacity-light-500;
+
+		.is-dark-theme & {
+			outline-color: $light-opacity-light-500;
+		}
 	}
 
 	/**
@@ -496,18 +550,13 @@
 /**
  * In-Canvas Inserter
  */
-
 .editor-block-list .editor-inserter {
 	margin: $item-spacing;
 	cursor: move;/* Fallback for IE/Edge < 14 */
 	cursor: grab;
-
-	.editor-inserter__toggle {
-		color: $dark-gray-300;
-		margin: 4px 0 0 -4px;	// align better with text blocks
-	}
 }
 
+// Insertion point (includes inbetween inserter and insertion indicator)
 .editor-block-list__insertion-point {
 	position: relative;
 	z-index: z-index( '.editor-block-list__insertion-point' );
@@ -515,66 +564,65 @@
 
 .editor-block-list__insertion-point-indicator {
 	position: absolute;
-	top: $block-padding - 1px; // Half the empty space between two blocks, minus the 2px height
+	top: calc( 50% - 1px);
 	height: 2px;
 	left: 0;
 	right: 0;
-	background: $blue-medium-500;
+	background: theme( primary );
 }
 
 .editor-block-list__insertion-point-inserter {
+	display: flex;
 	position: absolute;
-	background: none;
-	border: none;
-	display: block;
 	top: 0;
+	bottom: auto;
+	left: 0;
+	right: 0;
 	height: $block-padding * 2; // Matches the whole empty space between two blocks
-	width: 100%;
-	cursor: pointer;
-	padding: 0;	// Unstyle inherited padding from core button
+	justify-content: center;
 
+	// Show a clickable plus
+	.editor-block-list__insertion-point-button {
+		margin-top: -4px;
+		border-radius: 50%;
+		color: $dark-gray-100;
+		background: $white;
+		height: $block-padding * 2 + 8px;
+		width: $block-padding * 2 + 8px;
+	
+		&:not(:disabled):not([aria-disabled="true"]):hover {
+			box-shadow: none;
+		}
+	
+	}
+
+	// Show a line indicator when hovering, but this is unclickable
 	&:before {
 		position: absolute;
-		top: $block-padding - 1px; // Half the empty space between two blocks, minus the 2px height
+		top: calc( 50% - 1px);
 		height: 2px;
-		left: $block-padding;
-		right: $block-padding;
+		left: 0;
+		right: 0;
 		background: $dark-gray-100;
 		content: '';
-		opacity: 0;
-		transition: opacity 0.1s linear 0.1s;
 	}
 
-	&:hover:before {
+	// Hide both the line and button until hovered
+	opacity: 0;
+	transition: opacity 0.1s linear 0.1s;
+
+	&:hover, &.is-visible {
 		opacity: 1;
-		transition: opacity 0.2s linear 0.5s;
-	}
-
-	&:focus {
-		outline: none;
-	}
-
-	// Show focus style when tabbing
-	&:focus:before {
-		opacity: 1;
-		transition: opacity 0.2s linear;
-		outline: 1px solid $dark-gray-300;
-		outline-offset: 2px;
-	}
-
-	// Don't show focus style when clicking
-	&:focus:active:before {
-		outline: none;
 	}
 }
 
 .editor-block-list__block > .editor-block-list__insertion-point {
 	position: absolute;
-	top: -$block-padding;
+	top: -$block-padding - $block-spacing / 2;
 	height: $block-padding * 2; // Matches the whole empty space between two blocks
 	bottom: auto;
-	left: 0;
-	right: 0;
+	left: -1px;
+	right: -1px;
 }
 
 .editor-block-list__block .editor-block-list__block-html-textarea {
@@ -603,16 +651,33 @@
 
 .editor-block-contextual-toolbar,
 .editor-block-list__breadcrumb {
-	position: sticky;
 	z-index: z-index( '.editor-block-contextual-toolbar' );
 	white-space: nowrap;
 	text-align: left;
 	pointer-events: none;
 	height: $block-toolbar-height;
 
+	// Position toolbar below the block on mobile
+	position: absolute;
+	bottom: -$block-toolbar-height + 1px;
+	left: $block-padding;
+	right: $block-padding;
+	box-shadow: $shadow-below-only;
+
 	// Position the contextual toolbar above the block, add 1px to each to stack borders
-	margin-top: -$block-toolbar-height - 1px;
-	margin-bottom: $block-padding + 1px;
+	@include break-mobile() {
+		position: sticky;
+		bottom: auto;
+		left: auto;
+		right: auto;
+		box-shadow: none;
+		margin-top: -$block-toolbar-height - 1px;
+		margin-bottom: $block-padding + 1px;
+	}
+
+	@include break-small() {
+		top: -1px;	// stack borders
+	}
 
 	// Floated items have special needs for the contextual toolbar position
 	.editor-block-list__block[data-align="left"] &,
@@ -637,12 +702,6 @@
 		}
 	}
 
-	// on mobile, toolbars fix differently
-	top: $header-height - 1px; // stack borders
-	@include break-small() {
-		top: -1px;	// stack borders
-	}
-
 	// Reset pointer-events on children.
 	& > * {
 		pointer-events: auto;
@@ -652,9 +711,13 @@
 
 .editor-block-contextual-toolbar .editor-block-toolbar,
 .editor-block-list__breadcrumb .components-toolbar {
-	border: 1px solid $light-gray-500;
 	width: 100%;
 	background: $white;
+
+	// use opacity to work in various editor styles
+	background-clip: padding-box;
+	box-sizing: padding-box;
+	border: 1px solid $light-gray-500;
 
 	// this prevents floats from messing up the position
 	position: absolute;
@@ -663,11 +726,6 @@
 	.editor-block-list__block[data-align="right"] & {
 		left: auto;
 		right: 0;
-	}
-
-	// remove stacked borders in inline toolbar
-	> div:first-child {
-		margin-left: -1px;
 	}
 
 	@include break-small() {

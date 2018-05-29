@@ -2,27 +2,27 @@
  * External dependencies
  */
 import {
-	map,
+	castArray,
+	find,
 	first,
 	get,
 	has,
+	includes,
+	isArray,
+	isBoolean,
 	last,
+	map,
+	orderBy,
 	reduce,
 	size,
-	compact,
-	find,
-	unionWith,
-	includes,
-	values,
 } from 'lodash';
 import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes } from '@wordpress/blocks';
+import { serialize, getBlockType, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
 import { moment } from '@wordpress/date';
 import { deprecated } from '@wordpress/utils';
 
@@ -32,6 +32,13 @@ import { deprecated } from '@wordpress/utils';
 const MAX_RECENT_BLOCKS = 9;
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
+export const INSERTER_UTILITY_HIGH = 3;
+export const INSERTER_UTILITY_MEDIUM = 2;
+export const INSERTER_UTILITY_LOW = 1;
+export const INSERTER_UTILITY_NONE = 0;
+const SECONDS_PER_HOUR = 3600;
+const SECONDS_PER_DAY = 24 * 3600;
+const SECONDS_PER_WEEK = 7 * 24 * 3600;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -88,7 +95,7 @@ export function isEditedPostNew( state ) {
  * @return {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
-	return state.editor.isDirty;
+	return state.editor.isDirty || inSomeHistory( state, isEditedPostDirty );
 }
 
 /**
@@ -147,7 +154,7 @@ export function getCurrentPostId( state ) {
  * @return {number} Number of revisions.
  */
 export function getCurrentPostRevisionsCount( state ) {
-	return get( getCurrentPost( state ), 'revisions.count', 0 );
+	return get( getCurrentPost( state ), [ 'revisions', 'count' ], 0 );
 }
 
 /**
@@ -159,7 +166,7 @@ export function getCurrentPostRevisionsCount( state ) {
  * @return {?number} ID of the last revision.
  */
 export function getCurrentPostLastRevisionId( state ) {
-	return get( getCurrentPost( state ), 'revisions.last_id', null );
+	return get( getCurrentPost( state ), [ 'revisions', 'last_id' ], null );
 }
 
 /**
@@ -353,12 +360,7 @@ export function getEditedPostExcerpt( state ) {
  * @return {string} Preview URL.
  */
 export function getEditedPostPreviewLink( state ) {
-	const link = state.currentPost.link;
-	if ( ! link ) {
-		return null;
-	}
-
-	return addQueryArgs( link, { preview: 'true' } );
+	return getCurrentPost( state ).preview_link || null;
 }
 
 /**
@@ -392,7 +394,7 @@ export const getBlockDependantsCacheBust = createSelector(
  * @return {string} Block name.
  */
 export function getBlockName( state, uid ) {
-	const block = state.editor.present.blocksByUid[ uid ];
+	const block = state.editor.present.blocksByUID[ uid ];
 	return block ? block.name : null;
 }
 
@@ -409,7 +411,7 @@ export function getBlockName( state, uid ) {
  */
 export const getBlock = createSelector(
 	( state, uid ) => {
-		const block = state.editor.present.blocksByUid[ uid ];
+		const block = state.editor.present.blocksByUID[ uid ];
 		if ( ! block ) {
 			return null;
 		}
@@ -442,7 +444,7 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, uid ) => [
-		state.editor.present.blocksByUid[ uid ],
+		state.editor.present.blocksByUID[ uid ],
 		getBlockDependantsCacheBust( state, uid ),
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
@@ -474,7 +476,7 @@ export const getBlocks = createSelector(
 	},
 	( state ) => [
 		state.editor.present.blockOrder,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 	]
 );
 
@@ -490,29 +492,29 @@ export const getBlocks = createSelector(
 export const getGlobalBlockCount = createSelector(
 	( state, blockName ) => {
 		if ( ! blockName ) {
-			return size( state.editor.present.blocksByUid );
+			return size( state.editor.present.blocksByUID );
 		}
 		return reduce(
-			state.editor.present.blocksByUid,
+			state.editor.present.blocksByUID,
 			( count, block ) => block.name === blockName ? count + 1 : count,
 			0
 		);
 	},
 	( state ) => [
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 	]
 );
 
 export const getBlocksByUID = createSelector(
 	( state, uids ) => {
-		return map( uids, ( uid ) => getBlock( state, uid ) );
+		return map( castArray( uids ), ( uid ) => getBlock( state, uid ) );
 	},
 	( state ) => [
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 		state.editor.present.blockOrder,
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 	]
 );
 
@@ -584,6 +586,19 @@ export function hasSelectedBlock( state ) {
 }
 
 /**
+ * Returns the currently selected block UID, or null if there is no selected
+ * block.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?Object} Selected block UID.
+ */
+export function getSelectedBlockUID( state ) {
+	const { start, end } = state.blockSelection;
+	return start === end && start ? start : null;
+}
+
+/**
  * Returns the currently selected block, or null if there is no selected block.
  *
  * @param {Object} state Global application state.
@@ -591,12 +606,8 @@ export function hasSelectedBlock( state ) {
  * @return {?Object} Selected block.
  */
 export function getSelectedBlock( state ) {
-	const { start, end } = state.blockSelection;
-	if ( start !== end || ! start ) {
-		return null;
-	}
-
-	return getBlock( state, start );
+	const uid = getSelectedBlockUID( state );
+	return uid ? getBlock( state, uid ) : null;
 }
 
 /**
@@ -634,7 +645,7 @@ export function getBlockRootUID( state, uid ) {
 export function getAdjacentBlockUid( state, startUID, modifier = 1 ) {
 	// Default to selected block.
 	if ( startUID === undefined ) {
-		startUID = get( getSelectedBlock( state ), 'uid' );
+		startUID = get( getSelectedBlock( state ), [ 'uid' ] );
 	}
 
 	// Try multi-selection starting at extent based on modifier.
@@ -781,7 +792,7 @@ export const getMultiSelectedBlocks = createSelector(
 		state.editor.present.blockOrder,
 		state.blockSelection.start,
 		state.blockSelection.end,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
 	]
@@ -1059,7 +1070,7 @@ export function isValidTemplate( state ) {
  * @return {?Arary}        Block Template
  */
 export function getTemplate( state ) {
-	return state.template.template;
+	return state.settings.template;
 }
 
 /**
@@ -1069,7 +1080,7 @@ export function getTemplate( state ) {
  * @return {?string}        Block Template Lock
  */
 export function getTemplateLock( state ) {
-	return state.template.lock;
+	return state.settings.templateLock;
 }
 
 /**
@@ -1175,7 +1186,7 @@ export const getEditedPostContent = createSelector(
 	},
 	( state ) => [
 		state.editor.present.edits.content,
-		state.editor.present.blocksByUid,
+		state.editor.present.blocksByUID,
 		state.editor.present.blockOrder,
 	],
 );
@@ -1192,8 +1203,116 @@ export function getNotices( state ) {
 }
 
 /**
- * An item that appears in the inserter. Inserting this item will create a new
- * block. Inserter items encapsulate both regular blocks and shared blocks.
+ * Determines if the given block type is allowed to be inserted, and, if
+ * parentUID is provided, whether it is allowed to be nested within the given
+ * parent.
+ *
+ * @param {Object} state      Global application state.
+ * @param {string} blockName  The name of the given block type, e.g. 'core/paragraph'.
+ * @param {?string} parentUID The parent that the given block is to be nested within, or null.
+ *
+ * @return {boolean} Whether or not the given block type is allowed to be inserted.
+ */
+export const canInsertBlockType = createSelector(
+	( state, blockName, parentUID = null ) => {
+		const checkAllowList = ( list, item, defaultResult = null ) => {
+			if ( isBoolean( list ) ) {
+				return list;
+			}
+			if ( isArray( list ) ) {
+				return includes( list, item );
+			}
+			return defaultResult;
+		};
+
+		const blockType = getBlockType( blockName );
+		if ( ! blockType ) {
+			return false;
+		}
+
+		const { allowedBlockTypes, templateLock } = getEditorSettings( state );
+
+		const isBlockAllowedInEditor = checkAllowList( allowedBlockTypes, blockName, true );
+		if ( ! isBlockAllowedInEditor ) {
+			return false;
+		}
+
+		const isEditorLocked = !! templateLock;
+		if ( isEditorLocked ) {
+			return false;
+		}
+
+		const parentBlockListSettings = getBlockListSettings( state, parentUID );
+		const parentAllowedBlocks = get( parentBlockListSettings, [ 'supportedBlocks' ] );
+		const hasParentAllowedBlock = checkAllowList( parentAllowedBlocks, blockName );
+
+		const blockAllowedParentBlocks = blockType.parent;
+		const parentName = getBlockName( state, parentUID );
+		const hasBlockAllowedParent = checkAllowList( blockAllowedParentBlocks, parentName );
+
+		let isBlockAllowedInParent;
+		if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
+			isBlockAllowedInParent = hasParentAllowedBlock || hasBlockAllowedParent;
+		} else if ( hasParentAllowedBlock !== null ) {
+			isBlockAllowedInParent = hasParentAllowedBlock;
+		} else if ( hasBlockAllowedParent !== null ) {
+			isBlockAllowedInParent = hasBlockAllowedParent;
+		} else {
+			isBlockAllowedInParent = true;
+		}
+
+		if ( ! isBlockAllowedInParent ) {
+			return false;
+		}
+
+		return true;
+	},
+	( state, blockName, parentUID ) => [
+		state.blockListSettings[ parentUID ],
+		state.editor.present.blocksByUID[ parentUID ],
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+	],
+);
+
+/**
+ * Returns information about how recently and frequently a block has been inserted.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} id    A string which identifies the insert, e.g. 'core/block/12'
+ *
+ * @return {?{ time: number, count: number }} An object containing `time` which is when the last
+ *                                            insert occured as a UNIX epoch, and `count` which is
+ *                                            the number of inserts that have occurred.
+ */
+function getInsertUsage( state, id ) {
+	return state.preferences.insertUsage[ id ] || null;
+}
+
+/**
+ * Determines the items that appear in the the inserter. Includes both static
+ * items (e.g. a regular block type) and dynamic items (e.g. a shared block).
+ *
+ * Each item object contains what's necessary to display a button in the
+ * inserter and handle its selection.
+ *
+ * The 'utility' property indicates how useful we think an item will be to the
+ * user. There are 4 levels of utility:
+ *
+ * 1. Blocks that are contextually useful (utility = 3)
+ * 2. Blocks that have been previously inserted (utility = 2)
+ * 3. Blocks that are in the common category (utility = 1)
+ * 4. All other blocks (utility = 0)
+ *
+ * The 'frecency' property is a herustic (https://en.wikipedia.org/wiki/Frecency)
+ * that combines block usage frequenty and recency.
+ *
+ * Items are returned ordered descendingly by their 'utility' and 'frecency'.
+ *
+ * @param {Object} state     Global application state.
+ * @param {?string} parentUID The block we are inserting into, if any.
+ *
+ * @return {Editor.InserterItem[]} Items that appear in inserter.
  *
  * @typedef {Object} Editor.InserterItem
  * @property {string}   id                Unique identifier for the item.
@@ -1203,150 +1322,161 @@ export function getNotices( state ) {
  * @property {string}   icon              Dashicon for the item, as it appears in the inserter.
  * @property {string}   category          Block category that the item is associated with.
  * @property {string[]} keywords          Keywords that can be searched to find this item.
- * @property {boolean}  isDisabled        Whether or not the user should be prevented from inserting this item.
+ * @property {boolean}  isDisabled        Whether or not the user should be prevented from inserting
+ *                                        this item.
+ * @property {number}   utility           How useful we think this item is, between 0 and 3.
+ * @property {number}   frecency          Hueristic that combines frequency and recency.
  */
-
-/**
- * Given a regular block type, constructs an item that appears in the inserter.
- *
- * @param {Object}           state             Global application state.
- * @param {string[]|boolean} allowedBlockTypes Allowed block types, or true/false to enable/disable all types.
- * @param {Object}           blockType         Block type, likely from getBlockType().
- *
- * @return {Editor.InserterItem} Item that appears in inserter.
- */
-function buildInserterItemFromBlockType( state, allowedBlockTypes, blockType ) {
-	if ( ! allowedBlockTypes || ! blockType ) {
-		return null;
-	}
-
-	const blockTypeIsDisabled = Array.isArray( allowedBlockTypes ) && ! includes( allowedBlockTypes, blockType.name );
-	if ( blockTypeIsDisabled ) {
-		return null;
-	}
-
-	if ( blockType.isPrivate ) {
-		return null;
-	}
-
-	return {
-		id: blockType.name,
-		name: blockType.name,
-		initialAttributes: {},
-		title: blockType.title,
-		icon: blockType.icon,
-		category: blockType.category,
-		keywords: blockType.keywords,
-		isDisabled: !! blockType.useOnce && getBlocks( state ).some( block => block.name === blockType.name ),
-	};
-}
-
-/**
- * Given a shared block, constructs an item that appears in the inserter.
- *
- * @param {Object}           state             Global application state.
- * @param {string[]|boolean} allowedBlockTypes Allowed block types, or true/false to enable/disable all types.
- * @param {Object}           sharedBlock       Shared block, likely from getSharedBlock().
- *
- * @return {Editor.InserterItem} Item that appears in inserter.
- */
-function buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock ) {
-	if ( ! allowedBlockTypes || ! sharedBlock ) {
-		return null;
-	}
-
-	const blockTypeIsDisabled = Array.isArray( allowedBlockTypes ) && ! includes( allowedBlockTypes, 'core/block' );
-	if ( blockTypeIsDisabled ) {
-		return null;
-	}
-
-	const referencedBlock = getBlock( state, sharedBlock.uid );
-	if ( ! referencedBlock ) {
-		return null;
-	}
-
-	const referencedBlockType = getBlockType( referencedBlock.name );
-	if ( ! referencedBlockType ) {
-		return null;
-	}
-
-	return {
-		id: `core/block/${ sharedBlock.id }`,
-		name: 'core/block',
-		initialAttributes: { ref: sharedBlock.id },
-		title: sharedBlock.title,
-		icon: referencedBlockType.icon,
-		category: 'shared',
-		keywords: [],
-		isDisabled: false,
-	};
-}
-
-/**
- * Determines the items that appear in the the inserter. Includes both static
- * items (e.g. a regular block type) and dynamic items (e.g. a shared block).
- *
- * @param {Object}           state             Global application state.
- * @param {string[]|boolean} allowedBlockTypes Allowed block types, or true/false to enable/disable all types.
- *
- * @return {Editor.InserterItem[]} Items that appear in inserter.
- */
-export function getInserterItems( state, allowedBlockTypes ) {
-	if ( allowedBlockTypes === undefined ) {
-		allowedBlockTypes = true;
-		deprecated( 'getInserterItems with no allowedBlockTypes argument', {
-			version: '2.8',
-			alternative: 'getInserterItems with an explcit allowedBlockTypes argument',
-			plugin: 'Gutenberg',
-		} );
-	}
-
-	if ( ! allowedBlockTypes ) {
-		return [];
-	}
-
-	const staticItems = getBlockTypes().map( blockType =>
-		buildInserterItemFromBlockType( state, allowedBlockTypes, blockType )
-	);
-
-	const dynamicItems = getSharedBlocks( state ).map( sharedBlock =>
-		buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock )
-	);
-
-	const items = [ ...staticItems, ...dynamicItems ];
-	return compact( items );
-}
-
-function fillWithCommonBlocks( inserts ) {
-	// Filter out any inserts that are associated with a block type that isn't registered
-	const items = inserts.filter( insert => getBlockType( insert.name ) );
-
-	// Common blocks that we'll use to pad out our list
-	const commonInserts = getBlockTypes()
-		.filter( blockType => blockType.category === 'common' )
-		.map( blockType => ( { name: blockType.name } ) );
-
-	const areInsertsEqual = ( a, b ) => a.name === b.name && a.ref === b.ref;
-	return unionWith( items, commonInserts, areInsertsEqual );
-}
-
-function getItemsFromInserts( state, inserts, allowedBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
-	if ( ! allowedBlockTypes ) {
-		return [];
-	}
-
-	const items = fillWithCommonBlocks( inserts ).map( insert => {
-		if ( insert.ref ) {
-			const sharedBlock = getSharedBlock( state, insert.ref );
-			return buildInserterItemFromSharedBlock( state, allowedBlockTypes, sharedBlock );
+export const getInserterItems = createSelector(
+	( state, parentUID = null ) => {
+		/**
+		 * The second argument used to be {boolean|array} allowedBlockTypes but it is no
+		 * longer necessary.
+		 */
+		if ( isBoolean( parentUID ) || isArray( parentUID ) ) {
+			deprecated( 'allowedBlockTypes', {
+				version: '3.2',
+				plugin: 'Gutenberg',
+			} );
+			parentUID = null;
 		}
 
-		const blockType = getBlockType( insert.name );
-		return buildInserterItemFromBlockType( state, allowedBlockTypes, blockType );
-	} );
+		const calculateUtility = ( category, count, isContextual ) => {
+			if ( isContextual ) {
+				return INSERTER_UTILITY_HIGH;
+			} else if ( count > 0 ) {
+				return INSERTER_UTILITY_MEDIUM;
+			} else if ( category === 'common' ) {
+				return INSERTER_UTILITY_LOW;
+			}
+			return INSERTER_UTILITY_NONE;
+		};
 
-	return compact( items ).slice( 0, maximum );
-}
+		const calculateFrecency = ( time, count ) => {
+			if ( ! time ) {
+				return count;
+			}
+
+			const duration = Date.now() - time;
+			switch ( true ) {
+				case duration < SECONDS_PER_HOUR:
+					return count * 4;
+				case duration < SECONDS_PER_DAY:
+					return count * 2;
+				case duration < SECONDS_PER_WEEK:
+					return count / 2;
+				default:
+					return count / 4;
+			}
+		};
+
+		const shouldIncludeBlockType = ( blockType ) => {
+			if ( ! hasBlockSupport( blockType, 'inserter', true ) ) {
+				return false;
+			}
+
+			if ( ! canInsertBlockType( state, blockType.name, parentUID ) ) {
+				return false;
+			}
+
+			return true;
+		};
+
+		const buildBlockTypeInserterItem = ( blockType ) => {
+			const id = blockType.name;
+
+			let isDisabled = false;
+			if ( blockType.useOnce ) {
+				isDisabled = getBlocks( state ).some( ( block ) => block.name === blockType.name );
+			}
+
+			const isContextual = isArray( blockType.parent );
+			const { time, count = 0 } = getInsertUsage( state, id ) || {};
+
+			return {
+				id,
+				name: blockType.name,
+				initialAttributes: {},
+				title: blockType.title,
+				icon: blockType.icon,
+				category: blockType.category,
+				keywords: blockType.keywords,
+				isDisabled,
+				utility: calculateUtility( blockType.category, count, isContextual ),
+				frecency: calculateFrecency( time, count ),
+			};
+		};
+
+		const shouldIncludeSharedBlock = ( sharedBlock ) => {
+			if ( ! canInsertBlockType( state, 'core/block', parentUID ) ) {
+				return false;
+			}
+
+			const referencedBlock = getBlock( state, sharedBlock.uid );
+			if ( ! referencedBlock ) {
+				return false;
+			}
+
+			const referencedBlockType = getBlockType( referencedBlock.name );
+			if ( ! referencedBlockType ) {
+				return false;
+			}
+
+			if ( ! canInsertBlockType( state, referencedBlockType.name, parentUID ) ) {
+				return false;
+			}
+
+			return true;
+		};
+
+		const buildSharedBlockInserterItem = ( sharedBlock ) => {
+			const id = `core/block/${ sharedBlock.id }`;
+
+			const referencedBlock = getBlock( state, sharedBlock.uid );
+			const referencedBlockType = getBlockType( referencedBlock.name );
+
+			const { time, count = 0 } = getInsertUsage( state, id ) || {};
+			const utility = calculateUtility( 'shared', count, false );
+			const frecency = calculateFrecency( time, count );
+
+			return {
+				id,
+				name: 'core/block',
+				initialAttributes: { ref: sharedBlock.id },
+				title: sharedBlock.title,
+				icon: referencedBlockType.icon,
+				category: 'shared',
+				keywords: [],
+				isDisabled: false,
+				utility,
+				frecency,
+			};
+		};
+
+		const blockTypeInserterItems = getBlockTypes()
+			.filter( shouldIncludeBlockType )
+			.map( buildBlockTypeInserterItem );
+
+		const sharedBlockInserterItems = getSharedBlocks( state )
+			.filter( shouldIncludeSharedBlock )
+			.map( buildSharedBlockInserterItem );
+
+		return orderBy(
+			[ ...blockTypeInserterItems, ...sharedBlockInserterItems ],
+			[ 'utility', 'frecency' ],
+			[ 'desc', 'desc' ]
+		);
+	},
+	( state, editorAllowedBlockTypes, parentUID ) => [
+		state.blockListSettings[ parentUID ],
+		state.editor.present.blockOrder,
+		state.editor.present.blocksByUID,
+		state.preferences.insertUsage,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.sharedBlocks.data,
+	],
+);
 
 /**
  * Returns a list of items which the user is likely to want to insert. These
@@ -1362,37 +1492,16 @@ function getItemsFromInserts( state, inserts, allowedBlockTypes, maximum = MAX_R
  * @return {Editor.InserterItem[]} Items that appear in the 'Recent' tab.
  */
 export function getFrecentInserterItems( state, allowedBlockTypes, maximum = MAX_RECENT_BLOCKS ) {
-	if ( allowedBlockTypes === undefined ) {
-		allowedBlockTypes = true;
-		deprecated( 'getFrecentInserterItems with no allowedBlockTypes argument', {
-			version: '2.8',
-			alternative: 'getFrecentInserterItems with an explcit allowedBlockTypes argument',
-			plugin: 'Gutenberg',
-		} );
-	}
+	deprecated( 'getFrecentInserterItems', {
+		version: '3.2',
+		alternative: 'getInserterItems',
+		plugin: 'Gutenberg',
+	} );
 
-	const calculateFrecency = ( time, count ) => {
-		if ( ! time ) {
-			return count;
-		}
-
-		const duration = Date.now() - time;
-		switch ( true ) {
-			case duration < 3600:
-				return count * 4;
-			case duration < ( 24 * 3600 ):
-				return count * 2;
-			case duration < ( 7 * 24 * 3600 ):
-				return count / 2;
-			default:
-				return count / 4;
-		}
-	};
-
-	const sortedInserts = values( state.preferences.insertUsage )
-		.sort( ( a, b ) => calculateFrecency( b.time, b.count ) - calculateFrecency( a.time, a.count ) )
-		.map( ( { insert } ) => insert );
-	return getItemsFromInserts( state, sortedInserts, allowedBlockTypes, maximum );
+	const items = getInserterItems( state, allowedBlockTypes );
+	const usefulItems = items.filter( ( item ) => item.utility > 0 );
+	const sortedItems = orderBy( usefulItems, [ 'utility', 'frecency' ], [ 'desc', 'desc' ] );
+	return sortedItems.slice( 0, maximum );
 }
 
 /**
@@ -1557,7 +1666,7 @@ export function getPermalink( state ) {
  */
 export function getPermalinkParts( state ) {
 	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
-	const postName = getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'draft_slug' );
+	const postName = getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'generated_slug' );
 
 	const [ prefix, suffix ] = permalinkTemplate.split( PERMALINK_POSTNAME_REGEX );
 
@@ -1566,4 +1675,72 @@ export function getPermalinkParts( state ) {
 		postName,
 		suffix,
 	};
+}
+
+/**
+ * Returns true if an optimistic transaction is pending commit, for which the
+ * before state satisfies the given predicate function.
+ *
+ * @param {Object}   state     Editor state.
+ * @param {Function} predicate Function given state, returning true if match.
+ *
+ * @return {boolean} Whether predicate matches for some history.
+ */
+export function inSomeHistory( state, predicate ) {
+	const { optimist } = state;
+
+	// In recursion, optimist state won't exist. Assume exhausted options.
+	if ( ! optimist ) {
+		return false;
+	}
+
+	return optimist.some( ( { beforeState } ) => (
+		beforeState && predicate( beforeState )
+	) );
+}
+
+/**
+ * Returns the Block List settings of a block if any.
+ *
+ * @param {Object}  state Editor state.
+ * @param {?string} uid   Block UID.
+ *
+ * @return {?Object} Block settings of the block if set.
+ */
+export function getBlockListSettings( state, uid ) {
+	return state.blockListSettings[ uid ];
+}
+
+/**
+ * Determines the blocks that can be nested inside a given block. Or globally if a block is not specified.
+ *
+ * @param {Object}           state                     Global application state.
+ * @param {?string}          uid                       Block UID.
+ * @param {string[]|boolean} globallyEnabledBlockTypes Globally enabled block types, or true/false to enable/disable all types.
+ *
+ * @return {string[]|boolean} Blocks that can be nested inside the block with the specified uid, or true/false to enable/disable all types.
+ */
+// Disable reason: We have to accept `globallyEnabledBlockTypes` so as to be backwards compatible
+// eslint-disable-next-line no-unused-vars
+export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
+	deprecated( 'getSupportedBlocks', {
+		version: '3.2',
+		alternative: 'canInsertBlockType',
+		plugin: 'Gutenberg',
+	} );
+
+	return getBlockTypes()
+		.filter( ( blockType ) => canInsertBlockType( state, blockType.name, uid ) )
+		.map( ( blockType ) => blockType.name );
+}
+
+/*
+ * Returns the editor settings.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {Object} The editor settings object
+ */
+export function getEditorSettings( state ) {
+	return state.settings;
 }

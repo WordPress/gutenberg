@@ -73,7 +73,7 @@ export function toggleGeneralSidebarEditorPanel( panel ) {
 /**
  * Returns an action object used to toggle a feature flag.
  *
- * @param {string} feature Featurre name.
+ * @param {string} feature Feature name.
  *
  * @return {Object} Action object.
  */
@@ -88,6 +88,20 @@ export function switchEditorMode( mode ) {
 	return {
 		type: 'SWITCH_MODE',
 		mode,
+	};
+}
+
+/**
+ * Returns an action object used to toggle a plugin name flag.
+ *
+ * @param {string} pluginName Plugin name.
+ *
+ * @return {Object} Action object.
+ */
+export function togglePinnedPluginItem( pluginName ) {
+	return {
+		type: 'TOGGLE_PINNED_PLUGIN_ITEM',
+		pluginName,
 	};
 }
 
