@@ -24,11 +24,9 @@ import {
 	getRectangleFromRange,
 	getScrollContainer,
 } from '@wordpress/dom';
-import {
-	keycodes,
-	createBlobURL,
-	deprecated,
-} from '@wordpress/utils';
+import deprecated from '@wordpress/deprecated';
+import { createBlobURL } from '@wordpress/blob';
+import { keycodes } from '@wordpress/utils';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { rawHandler } from '@wordpress/blocks';
@@ -808,12 +806,21 @@ export class RichText extends Component {
 						return;
 					}
 
-					const anchor = this.editor.dom.getParent( this.editor.selection.getNode(), 'a' );
-					if ( ! anchor ) {
-						this.removeFormat( 'link' );
+					const { value: href, target } = formatValue;
+
+					if ( ! this.isFormatActive( 'link' ) && this.editor.selection.isCollapsed() ) {
+						// When no link or text is selected, insert a link with the URL as its text
+						const anchorHTML = this.editor.dom.createHTML(
+							'a',
+							{ href, target },
+							this.editor.dom.encode( href )
+						);
+						this.editor.insertContent( anchorHTML );
+					} else {
+						// Use built-in TinyMCE command turn the selection into a link. This takes
+						// care of deleting any existing links within the selection
+						this.editor.execCommand( 'mceInsertLink', false, { href, target } );
 					}
-					const { value: href, ...params } = formatValue;
-					this.applyFormat( 'link', { href, ...params }, anchor );
 				} else {
 					this.editor.execCommand( 'Unlink' );
 				}

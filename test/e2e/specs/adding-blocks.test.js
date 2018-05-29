@@ -50,6 +50,7 @@ describe( 'adding blocks', () => {
 
 		// Using the regular inserter
 		await page.click( '.edit-post-header [aria-label="Add block"]' );
+		await page.waitForSelector( '.editor-inserter__menu' );
 		await page.keyboard.type( 'code' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
