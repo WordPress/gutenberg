@@ -86,8 +86,8 @@ function Layout( {
 					onClose={ closePublishSidebar }
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
-					renderPrePublishExtension={ () => <PluginPrePublishPanel.Slot /> }
-					renderPostPublishExtension={ () => <PluginPostPublishPanel.Slot /> }
+					PrePublishExtension={ PluginPrePublishPanel.Slot }
+					PostPublishExtension={ PluginPostPublishPanel.Slot }
 				/>
 			) }
 			<DocumentSidebar />

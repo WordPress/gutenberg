@@ -39,6 +39,10 @@ module.exports = {
 				message: 'Path access on WordPress dependencies is not allowed.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^blob$/]',
+				message: 'Use @wordpress/blob as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^blocks$/]',
 				message: 'Use @wordpress/blocks as import path instead.',
 			},
@@ -47,8 +51,20 @@ module.exports = {
 				message: 'Use @wordpress/components as import path instead.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^data$/]',
+				message: 'Use @wordpress/data as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^date$/]',
 				message: 'Use @wordpress/date as import path instead.',
+			},
+			{
+				selector: 'ImportDeclaration[source.value=/^deprecated/]',
+				message: 'Use @wordpress/deprecated as import path instead.',
+			},
+			{
+				selector: 'ImportDeclaration[source.value=/^dom$/]',
+				message: 'Use @wordpress/dom as import path instead.',
 			},
 			{
 				selector: 'ImportDeclaration[source.value=/^editor$/]',
@@ -57,14 +73,6 @@ module.exports = {
 			{
 				selector: 'ImportDeclaration[source.value=/^element$/]',
 				message: 'Use @wordpress/element as import path instead.',
-			},
-			{
-				selector: 'ImportDeclaration[source.value=/^data$/]',
-				message: 'Use @wordpress/data as import path instead.',
-			},
-			{
-				selector: 'ImportDeclaration[source.value=/^dom$/]',
-				message: 'Use @wordpress/dom as import path instead.',
 			},
 			{
 				selector: 'ImportDeclaration[source.value=/^utils$/]',

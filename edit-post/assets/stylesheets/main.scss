@@ -121,7 +121,8 @@ body.gutenberg-editor-page {
 // @todo submit as upstream patch as well
 .edit-post-sidebar,
 .editor-post-publish-panel,
-.editor-block-list__block {
+.editor-block-list__block,
+.components-popover {
 	.input-control, // upstream name is .regular-text
 	input[type=text],
 	input[type=search],
@@ -171,16 +172,16 @@ body.gutenberg-editor-page {
 	textarea {
 		// use opacity to work in various editor styles
 		&::-webkit-input-placeholder {
-			color: $dark-opacity-300;
+			color: $dark-opacity-100;
 		}
 		&::-moz-placeholder {
-			color: $dark-opacity-300;
+			color: $dark-opacity-100;
 		}
 		&:-ms-input-placeholder {
-			color: $dark-opacity-300;
+			color: $dark-opacity-100;
 		}
 		&:-moz-placeholder {
-			color: $dark-opacity-300;
+			color: $dark-opacity-100;
 		}
 
 		.is-dark-theme & {
@@ -200,11 +201,15 @@ body.gutenberg-editor-page {
 	}
 }
 
-@keyframes fade-in {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
+// Style the TinyMCE table resize handles
+.ephox-snooker-resizer-rows {
+	cursor: row-resize;
+}
+
+.ephox-snooker-resizer-cols {
+	cursor: col-resize;
+}
+
+.ephox-snooker-resizer-bar-dragging {
+	background: $blue-medium-500;
 }

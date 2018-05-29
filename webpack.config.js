@@ -3,6 +3,7 @@
  */
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
 
@@ -10,6 +11,7 @@ const { basename } = require( 'path' );
  * WordPress dependencies
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
+const LibraryExportDefaultPlugin = require( './packages/library-export-default-webpack-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -134,7 +136,9 @@ const entryPointNames = [
 ];
 
 const gutenbergPackages = [
+	'blob',
 	'date',
+	'deprecated',
 	'dom',
 	'element',
 ];
@@ -273,6 +277,7 @@ const config = {
 				return path;
 			},
 		} ),
+		new LibraryExportDefaultPlugin( [ 'deprecated', 'dom-ready' ].map( camelCaseDash ) ),
 	],
 	stats: {
 		children: false,

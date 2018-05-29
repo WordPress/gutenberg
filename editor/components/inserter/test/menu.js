@@ -16,6 +16,7 @@ const textItem = {
 	title: 'Text',
 	category: 'common',
 	isDisabled: false,
+	utility: 1,
 };
 
 const advancedTextItem = {
@@ -25,6 +26,7 @@ const advancedTextItem = {
 	title: 'Advanced Text',
 	category: 'common',
 	isDisabled: false,
+	utility: 1,
 };
 
 const someOtherItem = {
@@ -34,6 +36,7 @@ const someOtherItem = {
 	title: 'Some Other Block',
 	category: 'common',
 	isDisabled: false,
+	utility: 1,
 };
 
 const moreItem = {
@@ -43,6 +46,7 @@ const moreItem = {
 	title: 'More',
 	category: 'layout',
 	isDisabled: true,
+	utility: 0,
 };
 
 const youtubeItem = {
@@ -53,6 +57,7 @@ const youtubeItem = {
 	category: 'embed',
 	keywords: [ 'google' ],
 	isDisabled: false,
+	utility: 0,
 };
 
 const textEmbedItem = {
@@ -62,6 +67,7 @@ const textEmbedItem = {
 	title: 'A Text Embed',
 	category: 'embed',
 	isDisabled: false,
+	utility: 0,
 };
 
 const sharedItem = {
@@ -71,6 +77,7 @@ const sharedItem = {
 	title: 'My shared block',
 	category: 'shared',
 	isDisabled: false,
+	utility: 0,
 };
 
 const items = [
@@ -93,19 +100,14 @@ describe( 'InserterMenu', () => {
 			<InserterMenu
 				position={ 'top center' }
 				instanceId={ 1 }
-				items={ [] }
-				frecentItems={ [] }
+				items={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
-				blockTypes
 			/>
 		);
 
 		const activeCategory = wrapper.find( '.components-panel__body.is-opened > .components-panel__body-title' );
 		expect( activeCategory.text() ).toBe( 'Most Used' );
-
-		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
-		expect( visibleBlocks ).toHaveLength( 0 );
 	} );
 
 	it( 'should show nothing if there are no items', () => {
@@ -114,7 +116,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ [] }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -124,13 +125,12 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks ).toHaveLength( 0 );
 	} );
 
-	it( 'should show frecently used items in the suggested tab', () => {
+	it( 'should show only high utility items in the suggested tab', () => {
 		const wrapper = mount(
 			<InserterMenu
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [ advancedTextItem, textItem, someOtherItem ] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -138,9 +138,25 @@ describe( 'InserterMenu', () => {
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
 		expect( visibleBlocks ).toHaveLength( 3 );
-		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Advanced Text' );
-		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Text' );
+		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
+		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
+	} );
+
+	it( 'should limit the number of items shown in the suggested tab', () => {
+		const wrapper = mount(
+			<InserterMenu
+				position={ 'top center' }
+				instanceId={ 1 }
+				items={ items }
+				debouncedSpeak={ noop }
+				fetchSharedBlocks={ noop }
+				maxSuggestedItems={ 2 }
+			/>
+		);
+
+		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
+		expect( visibleBlocks ).toHaveLength( 2 );
 	} );
 
 	it( 'should show items from the embed category in the embed tab', () => {
@@ -149,7 +165,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -176,7 +191,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -202,7 +216,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -230,11 +243,14 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ items }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
 		);
+
+		const layoutTab = wrapper.find( '.components-panel__body button.components-panel__body-toggle' )
+			.filterWhere( ( node ) => node.text() === 'Layout Elements' );
+		layoutTab.simulate( 'click' );
 
 		const disabledBlocks = wrapper.find( '.editor-inserter__item[disabled=true]' );
 		expect( disabledBlocks ).toHaveLength( 1 );
@@ -247,7 +263,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>
@@ -274,7 +289,6 @@ describe( 'InserterMenu', () => {
 				position={ 'top center' }
 				instanceId={ 1 }
 				items={ items }
-				frecentItems={ [] }
 				debouncedSpeak={ noop }
 				fetchSharedBlocks={ noop }
 			/>

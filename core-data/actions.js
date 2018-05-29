@@ -55,20 +55,6 @@ export function receiveEntityRecords( kind, name, records ) {
 }
 
 /**
- * Returns an action object used in signalling that taxonomies have been received.
- *
- * @param {Array} taxonomies Taxonomies received.
- *
- * @return {Object} Action object.
- */
-export function receiveTaxonomies( taxonomies ) {
-	return {
-		type: 'RECEIVE_TAXONOMIES',
-		taxonomies,
-	};
-}
-
-/**
  * Returns an action object used in signalling that the index has been received.
  *
  * @param {Object} index Index received.
