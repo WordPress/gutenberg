@@ -18,7 +18,7 @@ function render_block_core_archives( $attributes ) {
 	static $block_id = 0;
 	$block_id++;
 
-	$show_post_count = ! empty( $attributes['showPostCounts'] ) ? true : false;
+	$show_post_count = ! empty( $attributes['showPostCounts'] );
 	$class           = "wp-block-archives align{$attributes['align']}";
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {

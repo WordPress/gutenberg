@@ -70,7 +70,7 @@ class ArchivesBlock extends Component {
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
 						} }
-						controls={ [ 'left', 'center', 'right', 'full' ] }
+						controls={ [ 'left', 'center', 'right' ] }
 					/>
 				</BlockControls>
 				<ServerSideRender key="archives" block="core/archives" attributes={ this.props.attributes } />
