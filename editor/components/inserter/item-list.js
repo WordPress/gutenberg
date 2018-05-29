@@ -74,7 +74,15 @@ class ItemList extends Component {
 						<button
 							role="menuitem"
 							key={ item.id }
-							className={ classnames( 'editor-inserter__item', getBlockMenuDefaultClassName( item.id ) ) }
+							className={
+								classnames(
+									'editor-inserter__item',
+									getBlockMenuDefaultClassName( item.id ),
+									{
+										'editor-inserter__item-with-childs': item.hasChildBlocks,
+									}
+								)
+							}
 							onClick={ () => onSelect( item ) }
 							tabIndex={ isCurrent || item.isDisabled ? null : '-1' }
 							disabled={ item.isDisabled }

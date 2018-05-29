@@ -167,3 +167,28 @@ input[type="search"].editor-inserter__search {
 	padding: 24px;
 	text-align: center;
 }
+
+.editor-inserter__item-with-childs .editor-inserter__item-icon {
+    background: #7E70AF;
+    box-shadow: 3px 3px #AEA6CC;
+	margin-right: 3px;
+	color: white;
+}
+
+.editor-inserter__child-blocks {
+	padding: 16px;
+}
+
+.editor-inserter__child-blocks-title .dashicon {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+.editor-inserter__child-blocks-title h2 {
+	display: inline-block;
+}
+
+.editor-inserter__child-blocks .editor-inserter__item-icon {
+	background: 3px 3px #AEA6CC;
+	color: white;
+}

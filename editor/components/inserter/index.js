@@ -41,6 +41,7 @@ class Inserter extends Component {
 			title,
 			children,
 			onInsertBlock,
+			rootUID,
 		} = this.props;
 
 		if ( items.length === 0 ) {
@@ -74,7 +75,7 @@ class Inserter extends Component {
 						onClose();
 					};
 
-					return <InserterMenu items={ items } onSelect={ onSelect } />;
+					return <InserterMenu items={ items } onSelect={ onSelect } rootUID={ rootUID } />;
 				} }
 			/>
 		);
@@ -96,6 +97,7 @@ export default compose( [
 			insertionPoint,
 			selectedBlock: getSelectedBlock(),
 			items: getInserterItems( rootUID ),
+			rootUID,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
