@@ -38,7 +38,7 @@ class UrlInputButton extends Component {
 			isEditing: true,
 			settingsVisible: false,
 			opensInNewWindow: false,
-			linkValue: '',
+			linkValue: this.props.attributes.href,
 		};
 	}
 
@@ -73,7 +73,6 @@ class UrlInputButton extends Component {
 		event.preventDefault();
 		this.props.setAttributes( { href: this.state.linkValue } );
 		this.setState( { isEditing: false } );
-		this.toggle();
 	}
 
 	toggleLinkSettingsVisibility() {
@@ -91,7 +90,7 @@ class UrlInputButton extends Component {
 	}
 
 	render() {
-		const { url, onChange, id } = this.props;
+		const { url, attributes: { id } } = this.props;
 		const { expanded, settingsVisible, opensInNewWindow, linkValue, isEditing } = this.state;
 		const buttonLabel = url ? __( 'Edit Link' ) : __( 'Insert Link' );
 
@@ -120,7 +119,7 @@ class UrlInputButton extends Component {
 						<Popover
 							position="bottom center"
 							focusOnMount={ true }
-							key={ this.props.attributes.id }
+							key={ id }
 						>
 							{ isEditing && (
 								<form
@@ -158,10 +157,10 @@ class UrlInputButton extends Component {
 									<div className="editor-format-toolbar__link-modal-line">
 										<a
 											className="editor-format-toolbar__link-value"
-											href={ this.props.url }
+											href={ url }
 											target="_blank"
 										>
-											{ this.props.url && filterURLForDisplay( decodeURI( this.props.url ) ) }
+											{ url && filterURLForDisplay( decodeURI( url ) ) }
 										</a>
 										<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
 										<IconButton
