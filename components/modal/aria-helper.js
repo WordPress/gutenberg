@@ -23,11 +23,11 @@ export function hideApp( unhiddenElement ) {
 		return;
 	}
 	const elements = document.body.children;
-	forEach( elements, element => {
+	forEach( elements, ( element ) => {
 		if (
 			element === unhiddenElement ||
 			element.tagName === 'SCRIPT' ||
-			element.hasAttribute( 'aria-hidden', 'true')
+			element.hasAttribute( 'aria-hidden', 'true' )
 		) {
 			return;
 		}
@@ -45,7 +45,7 @@ export function showApp() {
 	if ( ! isHidden ) {
 		return;
 	}
-	forEach( hiddenElements, element => {
+	forEach( hiddenElements, ( element ) => {
 		element.removeAttribute( 'aria-hidden' );
 	} );
 	hiddenElements = [];
