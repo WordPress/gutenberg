@@ -224,7 +224,10 @@ class WritingFlow extends Component {
 
 			if ( ( navigateDown && nextBlockUid ) || ( navigateUp && previousBlockUid ) ) {
 				event.preventDefault();
-				this.moveSelection( navigateUp );
+				const focusedBlockUid = navigateUp ? previousBlockUid : nextBlockUid;
+				if ( focusedBlockUid ) {
+					this.props.onSelectBlock( focusedBlockUid );
+				}
 			}
 
 			// Special case when reaching the end of the blocks (navigate to the next tabbable outside of the writing flow)
