@@ -31,9 +31,11 @@ class UrlInputButton extends Component {
 		this.setLinkTarget = this.setLinkTarget.bind( this );
 		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.editLink = this.editLink.bind( this );
 
 		this.state = {
 			expanded: false,
+			isEditing: true,
 			settingsVisible: false,
 			opensInNewWindow: false,
 			linkValue: '',
@@ -55,6 +57,10 @@ class UrlInputButton extends Component {
 		this.setState( { linkValue: '', settingsVisible: false } );
 	}
 
+	editLink() {
+		this.setState( { isEditing: ! this.state.isEditing } );
+	}
+
 	toggle() {
 		this.setState( { expanded: ! this.state.expanded } );
 	}
@@ -66,6 +72,7 @@ class UrlInputButton extends Component {
 	submitLink( event ) {
 		event.preventDefault();
 		this.props.setAttributes( { href: this.state.linkValue } );
+		this.setState( { isEditing: false } );
 		this.toggle();
 	}
 
@@ -77,7 +84,7 @@ class UrlInputButton extends Component {
 		this.setState( { opensInNewWindow } );
 		if ( opensInNewWindow ) {
 			this.props.setAttributes( {
-				target: '_blank',
+				target: opensInNewWindow ? '_blank' : null,
 				rel: opensInNewWindow ? 'noreferrer noopener' : null,
 			} );
 		}
@@ -85,7 +92,7 @@ class UrlInputButton extends Component {
 
 	render() {
 		const { url, onChange, id } = this.props;
-		const { expanded, settingsVisible, opensInNewWindow, linkValue } = this.state;
+		const { expanded, settingsVisible, opensInNewWindow, linkValue, isEditing } = this.state;
 		const buttonLabel = url ? __( 'Edit Link' ) : __( 'Insert Link' );
 
 		const linkSettings = settingsVisible && (
@@ -115,7 +122,7 @@ class UrlInputButton extends Component {
 							focusOnMount={ true }
 							key={ this.props.attributes.id }
 						>
-							{ this.props.url === '' && (
+							{ isEditing && (
 								<form
 									className="editor-url-input__button-modal"
 									onSubmit={ this.submitLink }
@@ -141,7 +148,7 @@ class UrlInputButton extends Component {
 								</form>
 							) }
 
-							{ this.props.url && (
+							{ ! isEditing && (
 								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 								/* eslint-disable jsx-a11y/no-static-element-interactions */
 								<div
