@@ -38,7 +38,6 @@ import {
 	BlockAlignmentToolbar,
 	UrlInputButton,
 	editorMediaUpload,
-	withBlockEditContext,
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 
@@ -58,7 +57,6 @@ class ImageEdit extends Component {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
-		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
@@ -114,10 +112,6 @@ class ImageEdit extends Component {
 
 	onSetHref( value ) {
 		this.props.setAttributes( { href: value } );
-	}
-
-	onImageClick() {
-		this.props.setFocusedElement( null );
 	}
 
 	updateAlt( newAlt ) {
@@ -308,7 +302,7 @@ class ImageEdit extends Component {
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							const img = <img src={ url } alt={ alt } />;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
@@ -381,11 +375,6 @@ class ImageEdit extends Component {
 }
 
 export default compose( [
-	withBlockEditContext( ( { setFocusedElement } ) => {
-		return {
-			setFocusedElement,
-		};
-	} ),
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );

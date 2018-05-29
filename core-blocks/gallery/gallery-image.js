@@ -6,12 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress Dependencies
  */
-import { Component, compose } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { keycodes } from '@wordpress/utils';
 import { withSelect } from '@wordpress/data';
-import { RichText, withBlockEditContext } from '@wordpress/editor';
+import { RichText } from '@wordpress/editor';
 
 /**
  * Module constants
@@ -22,17 +22,12 @@ class GalleryImage extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onImageClick = this.onImageClick.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
 	}
 
 	bindContainer( ref ) {
 		this.container = ref;
-	}
-
-	onImageClick() {
-		this.props.setFocusedElement( null );
 	}
 
 	onKeyDown( event ) {
@@ -72,7 +67,7 @@ class GalleryImage extends Component {
 		// Disable reason: Image itself is not meant to be
 		// interactive, but should direct image selection and unfocus caption fields
 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
-		const img = url ? <img src={ url } alt={ alt } data-id={ id } onClick={ this.onImageClick } /> : <Spinner />;
+		const img = url ? <img src={ url } alt={ alt } data-id={ id } /> : <Spinner />;
 
 		const className = classnames( {
 			'is-selected': isSelected,
@@ -115,18 +110,11 @@ class GalleryImage extends Component {
 	}
 }
 
-export default compose( [
-	withBlockEditContext( ( { setFocusedElement } ) => {
-		return {
-			setFocusedElement,
-		};
-	} ),
-	withSelect( ( select, ownProps ) => {
-		const { getMedia } = select( 'core' );
-		const { id } = ownProps;
+export default withSelect( ( select, ownProps ) => {
+	const { getMedia } = select( 'core' );
+	const { id } = ownProps;
 
-		return {
-			image: id ? getMedia( id ) : null,
-		};
-	} ),
-] )( GalleryImage );
+	return {
+		image: id ? getMedia( id ) : null,
+	};
+} )( GalleryImage );
