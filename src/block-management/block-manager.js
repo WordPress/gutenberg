@@ -157,7 +157,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						] }
 						text={ this.state.aztectext }
 						onContentSizeChange={ ( event ) => {
+							console.log(event.nativeEvent.contentSize.height);
 							this.setState( { ...this.state, aztecheight: event.nativeEvent.contentSize.height } );
+						} }
+						onChange={ ( event ) => {
+							console.log(event.nativeEvent.text);
 						} }
 						color={ 'black' }
 						maxImagesWidth={ 200 }
