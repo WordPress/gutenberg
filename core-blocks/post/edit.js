@@ -28,7 +28,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	ContrastChecker,
-	ImagePlaceholder,
+	MediaPlaceholder,
 	InspectorControls,
 	MediaUpload,
 	PanelColor,
@@ -300,14 +300,19 @@ class PostEdit extends Component {
 		);
 
 		if ( ! url ) {
-			const icon = 'format-image';
-			const label = __( 'Post image' );
-
 			return (
 				<Fragment>
 					{ controls }
-					<ImagePlaceholder
-						{ ...{ className, icon, label, onSelectImage: this.onSelectImage } }
+					<MediaPlaceholder
+						icon="format-image"
+						className={ className }
+						labels={ {
+							title: __( 'Post image' ),
+							name: __( 'an image' ),
+						} }
+						onSelect={ this.onSelectImage }
+						accept="image/*"
+						type="image"
 					/>
 					{ richText }
 				</Fragment>
