@@ -96,7 +96,7 @@ function getBlockSettings( row ) {
 			);
 		},
 
-		save( ) {
+		save() {
 			return (
 				<div className={ 'wp-block-rows' }>
 					<InnerBlocks.Content />
