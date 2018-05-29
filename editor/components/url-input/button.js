@@ -84,7 +84,6 @@ class UrlInputButton extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
-		console.log( opensInNewWindow, 'opens' );
 		this.setState( { opensInNewWindow } );
 		if ( opensInNewWindow ) {
 			this.props.setAttributes( {
@@ -132,6 +131,8 @@ class UrlInputButton extends Component {
 							key={ id }
 						>
 							{ isEditing && (
+								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 								<form
 									className="editor-url-input__button-modal"
 									onSubmit={ this.submitLink }
