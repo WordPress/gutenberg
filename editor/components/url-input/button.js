@@ -10,29 +10,56 @@ import './style.scss';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton, ToggleControl, Popover } from '@wordpress/components';
+import { keycodes } from '@wordpress/utils';
+
+const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } = keycodes;
 
 /**
  * Internal dependencies
  */
 import UrlInput from './';
+const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 class UrlInputButton extends Component {
 	constructor() {
 		super( ...arguments );
 		this.toggle = this.toggle.bind( this );
 		this.submitLink = this.submitLink.bind( this );
+		this.dropLink = this.dropLink.bind( this );
 		this.toggleLinkSettingsVisibility = this.toggleLinkSettingsVisibility.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
+		this.onChangeLinkValue = this.onChangeLinkValue.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 
 		this.state = {
 			expanded: false,
 			settingsVisible: false,
 			opensInNewWindow: false,
+			linkValue: '',
 		};
+	}
+
+	onKeyDown( event ) {
+		if ( event.keyCode === ESCAPE ) {
+			this.dropLink();
+			this.toggle();
+		}
+		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
+			stopKeyPropagation( event );
+		}
+	}
+
+	dropLink() {
+		this.props.setAttributes( { href: null } );
+		this.setState( { linkValue: '', settingsVisible: false } );
 	}
 
 	toggle() {
 		this.setState( { expanded: ! this.state.expanded } );
+	}
+
+	onChangeLinkValue( value ) {
+		this.setState( { linkValue: value } );
 	}
 
 	submitLink( event ) {
