@@ -53,14 +53,12 @@ export function mediaUpload( {
 		return createMediaFromFile( mediaFile, additionalData ).then(
 			( savedMedia ) => {
 				const mediaObject = {
+					alt: savedMedia.alt_text,
+					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					id: savedMedia.id,
-					url: savedMedia.source_url,
 					link: savedMedia.link,
+					url: savedMedia.source_url,
 				};
-				const caption = get( savedMedia, [ 'caption', 'raw' ] );
-				if ( caption ) {
-					mediaObject.caption = [ caption ];
-				}
 				setAndUpdateFiles( idx, mediaObject );
 			},
 			() => {
