@@ -5809,9 +5809,9 @@ react-dom@^16.2.0:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-"react-native-aztec@git+https://github.com/wordpress-mobile/react-native-aztec.git#25d6b526e33e82a29b7226b9ce30708f60e8705f":
+"react-native-aztec@git+https://github.com/wordpress-mobile/react-native-aztec.git#db43c089962fcfb9300cb8f674f31845efb3f17f":
   version "0.0.1"
-  resolved "git+https://github.com/wordpress-mobile/react-native-aztec.git#25d6b526e33e82a29b7226b9ce30708f60e8705f"
+  resolved "git+https://github.com/wordpress-mobile/react-native-aztec.git#db43c089962fcfb9300cb8f674f31845efb3f17f"
   dependencies:
     prop-types "15.6.0"
 
