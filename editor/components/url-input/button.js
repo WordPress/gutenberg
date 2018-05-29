@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton, ToggleControl, Popover } from '@wordpress/components';
 import { keycodes } from '@wordpress/utils';
+import { filterURLForDisplay } from '../../utils/url';
 
 const { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } = keycodes;
 
@@ -108,36 +109,68 @@ class UrlInputButton extends Component {
 					} ) }
 				/>
 				{
-					expanded &&
-					<Popover
-						position="bottom center"
-						focusOnMount={ true }
-						key={ this.props.attributes.id }
-					>
-						<form
-							className="editor-url-input__button-modal"
-							onSubmit={ this.submitLink }
-							onKeyPress={ stopKeyPropagation }
-							onKeyDown={ this.onKeyDown }
+					expanded && (
+						<Popover
+							position="bottom center"
+							focusOnMount={ true }
+							key={ this.props.attributes.id }
 						>
-							<div className="editor-url-input__button-modal-line">
-								<UrlInput value={ linkValue } onKeyPress={ stopKeyPropagation } onChange={ this.onChangeLinkValue } data-test="UrlInput" />
-								<IconButton
-									icon="editor-break"
-									label={ __( 'Submit' ) }
-									type="submit"
-								/>
-								<IconButton
-									className="editor-format-toolbar__link-settings-toggle"
-									icon="ellipsis"
-									label={ __( 'Link Settings' ) }
-									onClick={ this.toggleLinkSettingsVisibility }
-									aria-expanded={ settingsVisible }
-								/>
-							</div>
-							{ linkSettings }
-						</form>
-					</Popover>
+							{ this.props.url === '' && (
+								<form
+									className="editor-url-input__button-modal"
+									onSubmit={ this.submitLink }
+									onKeyPress={ stopKeyPropagation }
+									onKeyDown={ this.onKeyDown }
+								>
+									<div className="editor-url-input__button-modal-line">
+										<UrlInput value={ linkValue } onKeyPress={ stopKeyPropagation } onChange={ this.onChangeLinkValue } data-test="UrlInput" />
+										<IconButton
+											icon="editor-break"
+											label={ __( 'Submit' ) }
+											type="submit"
+										/>
+										<IconButton
+											className="editor-format-toolbar__link-settings-toggle"
+											icon="ellipsis"
+											label={ __( 'Link Settings' ) }
+											onClick={ this.toggleLinkSettingsVisibility }
+											aria-expanded={ settingsVisible }
+										/>
+									</div>
+									{ linkSettings }
+								</form>
+							) }
+
+							{ this.props.url && (
+								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+								/* eslint-disable jsx-a11y/no-static-element-interactions */
+								<div
+									className="editor-format-toolbar__link-modal"
+									onKeyPress={ stopKeyPropagation }
+								>
+									<div className="editor-format-toolbar__link-modal-line">
+										<a
+											className="editor-format-toolbar__link-value"
+											href={ this.props.url }
+											target="_blank"
+										>
+											{ this.props.url && filterURLForDisplay( decodeURI( this.props.url ) ) }
+										</a>
+										<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ this.editLink } />
+										<IconButton
+											className="editor-format-toolbar__link-settings-toggle"
+											icon="ellipsis"
+											label={ __( 'Link Settings' ) }
+											onClick={ this.toggleLinkSettingsVisibility }
+											aria-expanded={ settingsVisible }
+										/>
+									</div>
+									{ linkSettings }
+								</div>
+								/* eslint-enable jsx-a11y/no-static-element-interactions */
+							) }
+						</Popover>
+					)
 				}
 			</div >
 		);
