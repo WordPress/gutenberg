@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/element';
@@ -12,7 +17,7 @@ import { PostTypeSupportCheck } from '@wordpress/editor';
 import './style.scss';
 import SidebarHeader from '../sidebar-header';
 
-const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sidebarName } ) => {
+const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, openExtrasSettings, sidebarName, postType } ) => {
 	// Do not display "0 Blocks".
 	count = count === 0 ? 1 : count;
 
@@ -37,14 +42,29 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sideb
 			>
 				{ sprintf( _n( 'Block', '%d Blocks', count ), count ) }
 			</button>
+			<PostTypeSupportCheck supportKeys="extras" defaultValue={ true }>
+				<button
+					onClick={ openExtrasSettings }
+					className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/extras' ? 'is-active' : '' }` }
+					aria-label={ __( 'Extras settings' ) }
+				>
+					{ get( postType, [ 'labels', 'extras' ], __( 'Extras' ) ) }
+				</button>
+			</PostTypeSupportCheck>
 		</SidebarHeader>
 	);
 };
 
 export default compose(
-	withSelect( ( select ) => ( {
-		count: select( 'core/editor' ).getSelectedBlockCount(),
-	} ) ),
+	withSelect( ( select ) => {
+		const { getPostType } = select( 'core' );
+		const { getSelectedBlockCount, getEditedPostAttribute } = select( 'core/editor' );
+		
+		return {
+			count: getSelectedBlockCount(),
+			postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		};
+	 } ),
 	withDispatch( ( dispatch ) => {
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 		const { clearSelectedBlock } = dispatch( 'core/editor' );
@@ -55,6 +75,9 @@ export default compose(
 			},
 			openBlockSettings() {
 				openGeneralSidebar( 'edit-post/block' );
+			},
+			openExtrasSettings() {
+				openGeneralSidebar( 'edit-post/extras' );
 			},
 		};
 	} ),

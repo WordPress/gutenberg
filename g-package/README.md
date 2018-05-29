@@ -152,6 +152,7 @@ When you initialize the editor, Gutenberg will request the settings related with
     labels: {
         ...,
         posts: 'Stories',
+        extras: 'Extras' // extra tab label in sidebar
         ...,
     },
     name: 'Posts',
@@ -168,6 +169,7 @@ When you initialize the editor, Gutenberg will request the settings related with
         'media-library': false,    // disable Media library from WordPress
         posts: true,               // add PostsPanel to sidebar
         'template-settings': true, // add TemplateSettingsPanel to sidebar
+        extras: true,              // show Extra tab in sidebar
         ...,
     },
     viewable: true,
