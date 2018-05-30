@@ -54,17 +54,17 @@ const MIN_SIZE = 20;
 
 class ImageEdit extends Component {
 	constructor() {
-		super(...arguments);
-		this.updateAlt = this.updateAlt.bind(this);
-		this.updateAlignment = this.updateAlignment.bind(this);
-		this.onFocusCaption = this.onFocusCaption.bind(this);
-		this.onImageClick = this.onImageClick.bind(this);
-		this.onSelectImage = this.onSelectImage.bind(this);
-		this.onSetHref = this.onSetHref.bind(this);
-		this.updateImageURL = this.updateImageURL.bind(this);
-		this.updateWidth = this.updateWidth.bind(this);
-		this.updateHeight = this.updateHeight.bind(this);
-		this.updateDimensions = this.updateDimensions.bind(this);
+		super( ...arguments );
+		this.updateAlt = this.updateAlt.bind( this );
+		this.updateAlignment = this.updateAlignment.bind( this );
+		this.onFocusCaption = this.onFocusCaption.bind( this );
+		this.onImageClick = this.onImageClick.bind( this );
+		this.onSelectImage = this.onSelectImage.bind( this );
+		this.onSetHref = this.onSetHref.bind( this );
+		this.updateImageURL = this.updateImageURL.bind( this );
+		this.updateWidth = this.updateWidth.bind( this );
+		this.updateHeight = this.updateHeight.bind( this );
+		this.updateDimensions = this.updateDimensions.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -75,19 +75,9 @@ class ImageEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { id, url = '', alt: fileName } = attributes;
 
-		if (!id && url.indexOf('blob:') === 0) {
-			getBlobByURL(url)
+		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
+			getBlobByURL( url )
 				.then(
-<<<<<<< HEAD
-					(file) =>
-						editorMediaUpload({
-							filesList: [file],
-							onFileChange: ([image]) => {
-								setAttributes({ ...image });
-							},
-							allowedType: 'image',
-						})
-=======
 					( file ) => {
 						file.name = fileName;
 						editorMediaUpload( {
@@ -98,96 +88,95 @@ class ImageEdit extends Component {
 							allowedType: 'image',
 						} );
 					}
->>>>>>> master
 				);
 		}
 	}
 
-	componentDidUpdate(prevProps) {
+	componentDidUpdate( prevProps ) {
 		const { id: prevID, url: prevUrl = '' } = prevProps.attributes;
 		const { id, url = '' } = this.props.attributes;
 
-		if (!prevID && prevUrl.indexOf('blob:') === 0 && id && url.indexOf('blob:') === -1) {
-			revokeBlobURL(url);
+		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
+			revokeBlobURL( url );
 		}
 	}
 
-	componentWillReceiveProps({ isSelected }) {
-		if (!isSelected && this.props.isSelected && this.state.captionFocused) {
-			this.setState({
+	componentWillReceiveProps( { isSelected } ) {
+		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
+			this.setState( {
 				captionFocused: false,
-			});
+			} );
 		}
 	}
 
-	onSelectImage(media) {
-		if (!media) {
-			this.props.setAttributes({
+	onSelectImage( media ) {
+		if ( ! media ) {
+			this.props.setAttributes( {
 				url: undefined,
 				alt: undefined,
 				id: undefined,
 				caption: undefined,
-			});
+			} );
 			return;
 		}
-		this.props.setAttributes({
-			...pick(media, ['alt', 'id', 'caption', 'url']),
+		this.props.setAttributes( {
+			...pick( media, [ 'alt', 'id', 'caption', 'url' ] ),
 			width: undefined,
 			height: undefined,
-		});
+		} );
 	}
 
-	onSetHref(value) {
-		this.props.setAttributes({ href: value });
+	onSetHref( value ) {
+		this.props.setAttributes( { href: value } );
 	}
 
 	onFocusCaption() {
-		if (!this.state.captionFocused) {
-			this.setState({
+		if ( ! this.state.captionFocused ) {
+			this.setState( {
 				captionFocused: true,
-			});
+			} );
 		}
 	}
 
 	onImageClick() {
-		if (this.state.captionFocused) {
-			this.setState({
+		if ( this.state.captionFocused ) {
+			this.setState( {
 				captionFocused: false,
-			});
+			} );
 		}
 	}
 
-	updateAlt(newAlt) {
-		this.props.setAttributes({ alt: newAlt });
+	updateAlt( newAlt ) {
+		this.props.setAttributes( { alt: newAlt } );
 	}
 
-	updateAlignment(nextAlign) {
-		const extraUpdatedAttributes = ['wide', 'full'].indexOf(nextAlign) !== -1 ?
+	updateAlignment( nextAlign ) {
+		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
 			{ width: undefined, height: undefined } :
 			{};
-		this.props.setAttributes({ ...extraUpdatedAttributes, align: nextAlign });
+		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
 	}
 
-	updateImageURL(url) {
-		this.props.setAttributes({ url, width: undefined, height: undefined });
+	updateImageURL( url ) {
+		this.props.setAttributes( { url, width: undefined, height: undefined } );
 	}
 
-	updateWidth(width) {
-		this.props.setAttributes({ width: parseInt(width, 10) });
+	updateWidth( width ) {
+		this.props.setAttributes( { width: parseInt( width, 10 ) } );
 	}
 
-	updateHeight(height) {
-		this.props.setAttributes({ height: parseInt(height, 10) });
+	updateHeight( height ) {
+		this.props.setAttributes( { height: parseInt( height, 10 ) } );
 	}
 
-	updateDimensions(width = undefined, height = undefined) {
+	updateDimensions( width = undefined, height = undefined ) {
 		return () => {
-			this.props.setAttributes({ width, height });
+			this.props.setAttributes( { width, height } );
 		};
 	}
 
 	getAvailableSizes() {
-		return get(this.props.image, ['media_details', 'sizes'], {});
+		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
 	}
 
 	render() {
@@ -197,45 +186,45 @@ class ImageEdit extends Component {
 		const controls = (
 			<BlockControls>
 				<BlockAlignmentToolbar
-					value={align}
-					onChange={this.updateAlignment}
+					value={ align }
+					onChange={ this.updateAlignment }
 				/>
 
 				<Toolbar>
 					<MediaUpload
-						onSelect={this.onSelectImage}
+						onSelect={ this.onSelectImage }
 						type="image"
-						value={id}
-						render={({ open }) => (
+						value={ id }
+						render={ ( { open } ) => (
 							<IconButton
 								className="components-toolbar__control"
-								label={__('Edit image')}
+								label={ __( 'Edit image' ) }
 								icon="edit"
-								onClick={open}
+								onClick={ open }
 							/>
-						)}
+						) }
 					/>
-					<UrlInputButton onChange={this.onSetHref} url={href} {...this.props} />
+					<UrlInputButton onChange={ this.onSetHref } url={ href } { ...this.props } />
 				</Toolbar>
 			</BlockControls>
 		);
 
 		const availableSizes = this.getAvailableSizes();
 
-		if (!url) {
+		if ( ! url ) {
 			return (
 				<Fragment>
-					{controls}
+					{ controls }
 					<MediaPlaceholder
 						icon="format-image"
-						labels={{
-							title: __('Image'),
-							name: __('an image'),
-						}}
-						className={className}
-						onSelect={this.onSelectImage}
-						notices={noticeUI}
-						onError={noticeOperations.createErrorNotice}
+						labels={ {
+							title: __( 'Image' ),
+							name: __( 'an image' ),
+						} }
+						className={ className }
+						onSelect={ this.onSelectImage }
+						notices={ noticeUI }
+						onError={ noticeOperations.createErrorNotice }
 						accept="image/*"
 						type="image"
 					/>
@@ -243,82 +232,82 @@ class ImageEdit extends Component {
 			);
 		}
 
-		const classes = classnames(className, {
-			'is-transient': 0 === url.indexOf('blob:'),
-			'is-resized': !!width || !!height,
+		const classes = classnames( className, {
+			'is-transient': 0 === url.indexOf( 'blob:' ),
+			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
-		});
+		} );
 
-		const isResizable = ['wide', 'full'].indexOf(align) === -1 && isLargeViewport;
+		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 
-		const getInspectorControls = (imageWidth, imageHeight) => (
+		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
-				<PanelBody title={__('Image Settings')}>
+				<PanelBody title={ __( 'Image Settings' ) }>
 					<TextareaControl
-						label={__('Textual Alternative')}
-						value={alt}
-						onChange={this.updateAlt}
-						help={__('Describe the purpose of the image. Leave empty if the image is not a key part of the content.')}
+						label={ __( 'Textual Alternative' ) }
+						value={ alt }
+						onChange={ this.updateAlt }
+						help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) }
 					/>
-					{!isEmpty(availableSizes) && (
+					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
-							label={__('Source Type')}
-							value={url}
-							options={map(availableSizes, (size, name) => ({
+							label={ __( 'Source Type' ) }
+							value={ url }
+							options={ map( availableSizes, ( size, name ) => ( {
 								value: size.source_url,
-								label: startCase(name),
-							}))}
-							onChange={this.updateImageURL}
+								label: startCase( name ),
+							} ) ) }
+							onChange={ this.updateImageURL }
 						/>
-					)}
+					) }
 					<div className="core-blocks-image__dimensions">
 						<p className="core-blocks-image__dimensions__row">
-							{__('Image Dimensions')}
+							{ __( 'Image Dimensions' ) }
 						</p>
 						<div className="core-blocks-image__dimensions__row">
 							<TextControl
 								type="number"
 								className="core-blocks-image__dimensions__width"
-								label={__('Width')}
-								value={width !== undefined ? width : ''}
-								placeholder={imageWidth}
-								onChange={this.updateWidth}
+								label={ __( 'Width' ) }
+								value={ width !== undefined ? width : '' }
+								placeholder={ imageWidth }
+								onChange={ this.updateWidth }
 							/>
 							<TextControl
 								type="number"
 								className="core-blocks-image__dimensions__height"
-								label={__('Height')}
-								value={height !== undefined ? height : ''}
-								placeholder={imageHeight}
-								onChange={this.updateHeight}
+								label={ __( 'Height' ) }
+								value={ height !== undefined ? height : '' }
+								placeholder={ imageHeight }
+								onChange={ this.updateHeight }
 							/>
 						</div>
 						<div className="core-blocks-image__dimensions__row">
-							<ButtonGroup aria-label={__('Image Size')}>
-								{[25, 50, 75, 100].map((scale) => {
-									const scaledWidth = Math.round(imageWidth * (scale / 100));
-									const scaledHeight = Math.round(imageHeight * (scale / 100));
+							<ButtonGroup aria-label={ __( 'Image Size' ) }>
+								{ [ 25, 50, 75, 100 ].map( ( scale ) => {
+									const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
+									const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
 
 									const isCurrent = width === scaledWidth && height === scaledHeight;
 
 									return (
 										<Button
-											key={scale}
+											key={ scale }
 											isSmall
-											isPrimary={isCurrent}
-											aria-pressed={isCurrent}
-											onClick={this.updateDimensions(scaledWidth, scaledHeight)}
+											isPrimary={ isCurrent }
+											aria-pressed={ isCurrent }
+											onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
 										>
-											{scale}%
+											{ scale }%
 										</Button>
 									);
-								})}
+								} ) }
 							</ButtonGroup>
 							<Button
 								isSmall
-								onClick={this.updateDimensions()}
+								onClick={ this.updateDimensions() }
 							>
-								{__('Reset')}
+								{ __( 'Reset' ) }
 							</Button>
 						</div>
 					</div>
@@ -330,11 +319,11 @@ class ImageEdit extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
 			<Fragment>
-				{controls}
-				{noticeUI}
-				<figure className={classes}>
-					<ImageSize src={url} dirtynessTrigger={align}>
-						{(sizes) => {
+				{ controls }
+				{ noticeUI }
+				<figure className={ classes }>
+					<ImageSize src={ url } dirtynessTrigger={ align }>
+						{ ( sizes ) => {
 							const {
 								imageWidthWithinContainer,
 								imageHeightWithinContainer,
@@ -345,12 +334,12 @@ class ImageEdit extends Component {
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={url} alt={alt} onClick={this.onImageClick} />;
+							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
 
-							if (!isResizable || !imageWidthWithinContainer) {
+							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
-									<div style={{ width, height }}>
-										{img}
+									<div style={ { width, height } }>
+										{ img }
 									</div>
 								);
 							}
@@ -364,7 +353,7 @@ class ImageEdit extends Component {
 
 							return (
 								<Fragment>
-									{getInspectorControls(imageWidth, imageHeight)}
+									{ getInspectorControls( imageWidth, imageHeight ) }
 									<ResizableBox
 										size={
 											width && height ? {
@@ -372,46 +361,46 @@ class ImageEdit extends Component {
 												height,
 											} : undefined
 										}
-										minWidth={minWidth}
-										maxWidth={maxWidth}
-										minHeight={minHeight}
-										maxHeight={maxWidth / ratio}
+										minWidth={ minWidth }
+										maxWidth={ maxWidth }
+										minHeight={ minHeight }
+										maxHeight={ maxWidth / ratio }
 										lockAspectRatio
-										handleClasses={{
+										handleClasses={ {
 											topRight: 'wp-block-image__resize-handler-top-right',
 											bottomRight: 'wp-block-image__resize-handler-bottom-right',
 											topLeft: 'wp-block-image__resize-handler-top-left',
 											bottomLeft: 'wp-block-image__resize-handler-bottom-left',
-										}}
-										enable={{ top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true }}
-										onResizeStart={() => {
-											toggleSelection(false);
-										}}
-										onResizeStop={(event, direction, elt, delta) => {
-											setAttributes({
-												width: parseInt(currentWidth + delta.width, 10),
-												height: parseInt(currentHeight + delta.height, 10),
-											});
-											toggleSelection(true);
-										}}
+										} }
+										enable={ { top: false, right: true, bottom: false, left: false, topRight: true, bottomRight: true, bottomLeft: true, topLeft: true } }
+										onResizeStart={ () => {
+											toggleSelection( false );
+										} }
+										onResizeStop={ ( event, direction, elt, delta ) => {
+											setAttributes( {
+												width: parseInt( currentWidth + delta.width, 10 ),
+												height: parseInt( currentHeight + delta.height, 10 ),
+											} );
+											toggleSelection( true );
+										} }
 									>
-										{img}
+										{ img }
 									</ResizableBox>
 								</Fragment>
 							);
-						}}
+						} }
 					</ImageSize>
-					{(caption && caption.length > 0) || isSelected ? (
+					{ ( caption && caption.length > 0 ) || isSelected ? (
 						<RichText
 							tagName="figcaption"
-							placeholder={__('Write caption…')}
-							value={caption || []}
-							onFocus={this.onFocusCaption}
-							onChange={(value) => setAttributes({ caption: value })}
-							isSelected={this.state.captionFocused}
+							placeholder={ __( 'Write caption…' ) }
+							value={ caption || [] }
+							onFocus={ this.onFocusCaption }
+							onChange={ ( value ) => setAttributes( { caption: value } ) }
+							isSelected={ this.state.captionFocused }
 							inlineToolbar
 						/>
-					) : null}
+					) : null }
 				</figure>
 			</Fragment>
 		);
@@ -419,18 +408,18 @@ class ImageEdit extends Component {
 	}
 }
 
-export default compose([
-	withSelect((select, props) => {
-		const { getMedia } = select('core');
-		const { getEditorSettings } = select('core/editor');
+export default compose( [
+	withSelect( ( select, props ) => {
+		const { getMedia } = select( 'core' );
+		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
 		const { maxWidth } = getEditorSettings();
 
 		return {
-			image: id ? getMedia(id) : null,
+			image: id ? getMedia( id ) : null,
 			maxWidth,
 		};
-	}),
-	withViewportMatch({ isLargeViewport: 'medium' }),
+	} ),
+	withViewportMatch( { isLargeViewport: 'medium' } ),
 	withNotices,
-])(ImageEdit);
+] )( ImageEdit );
