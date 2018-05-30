@@ -34,7 +34,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import './style.scss';
 import BlockPreview from '../block-preview';
 import ItemList from './item-list';
-import BlockIcon from '../block-icon';
+import ChildBlocks from './child-blocks';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -115,9 +115,7 @@ export class InserterMenu extends Component {
 		const { items, rootChildBlocks } = this.props;
 		const filteredItems = searchItems( items, filterValue );
 
-		const childItems = rootChildBlocks ?
-			filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) ) :
-			[];
+		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
 
 		let suggestedItems = [];
 		if ( ! filterValue ) {
@@ -184,17 +182,13 @@ export class InserterMenu extends Component {
 				/>
 
 				<div className="editor-inserter__results">
-					{ !! childItems.length &&
-						<div className="editor-inserter__child-blocks">
-							<div className="editor-inserter__parent-block-header">
-								<div className="editor-inserter__parent-block-icon">
-									<BlockIcon icon={ rootBlockIcon } />
-								</div>
-								<h2>{ rootBlockTitle }</h2>
-							</div>
-							<ItemList items={ childItems } onSelect={ onSelect } onHover={ this.onHover } />
-						</div>
-					}
+					<ChildBlocks
+						rootBlockIcon={ rootBlockIcon }
+						rootBlockTitle={ rootBlockTitle }
+						items={ childItems }
+						onSelect={ onSelect }
+						onHover={ this.onHover }
+					/>
 
 					{ !! suggestedItems.length &&
 						<PanelBody
