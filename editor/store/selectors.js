@@ -1358,7 +1358,10 @@ export const getInserterItems = createSelector(
 				return count;
 			}
 
+			// The selector is cached, which means Date.now() is the last time that the
+			// relevant state changed. This suits our needs.
 			const duration = Date.now() - time;
+
 			switch ( true ) {
 				case duration < MILLISECONDS_PER_HOUR:
 					return count * 4;
