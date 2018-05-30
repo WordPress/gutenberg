@@ -3,13 +3,13 @@
 	padding: 5px 0;
 	
 	@include break-small() {
-		padding: 5px $block-side-ui-padding;
+		padding: 5px $block-parent-side-ui-clearance;
 	}
 
 	.editor-post-title__input {
 		display: block;
 		width: 100%;
-		padding: #{ $block-padding + 5px } $block-padding;
+		padding: #{ $block-padding + 5px } $parent-block-padding;
 		margin: 0;
 		box-shadow: none;
 		border: 1px solid transparent;
@@ -24,7 +24,7 @@
 
 	&.is-selected .editor-post-title__input {
 		// use opacity to work in various editor styles
-		border-color: $light-opacity-light-500;
+		border-color: $dark-opacity-light-500;
 
 		.is-dark-theme & {
 			border-color: $light-opacity-light-500;
@@ -32,7 +32,7 @@
 	}
 
 	.editor-post-title__input:hover {
-		border-color: $blue-medium-300;
+		border-color: $blue-medium-focus;
 	}
 }
 
@@ -45,7 +45,7 @@
 	right: 0;
 
 	@include break-small() {
-		left: $block-side-ui-padding;
-		right: $block-side-ui-padding;
+		left: $block-parent-side-ui-clearance;
+		right: $block-parent-side-ui-clearance;
 	}
 }
