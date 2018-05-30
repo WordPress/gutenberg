@@ -71,12 +71,5 @@ describe( 'PostPublishPanelToggle', () => {
 			);
 			expect( wrapper.childAt( 0 ).text() ).toBe( 'Publish…' );
 		} );
-
-		it( 'should display Submit for Review… if not scheduled or publishable', () => {
-			const wrapper = shallow(
-				<PostPublishPanelToggle isPublishable isSaveable />
-			);
-			expect( wrapper.childAt( 0 ).text() ).toBe( 'Submit for Review…' );
-		} );
 	} );
 } );
