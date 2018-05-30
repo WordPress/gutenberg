@@ -90,33 +90,35 @@ class PostTitle extends Component {
 	render() {
 		const { title, placeholder, instanceId, isPostTypeViewable } = this.props;
 		const { isSelected } = this.state;
-		const className = classnames( 'editor-post-title', { 'is-selected': isSelected } );
+		const className = classnames( 'editor-post-title__block', { 'is-selected': isSelected } );
 		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
 			<PostTypeSupportCheck supportKeys="title">
-				<div className={ className }>
-					<KeyboardShortcuts
-						shortcuts={ {
-							'mod+z': this.redirectHistory,
-							'mod+shift+z': this.redirectHistory,
-						} }
-					>
-						<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
-							{ decodedPlaceholder || __( 'Add title' ) }
-						</label>
-						<Textarea
-							id={ `post-title-${ instanceId }` }
-							className="editor-post-title__input"
-							value={ title }
-							onChange={ this.onChange }
-							placeholder={ decodedPlaceholder || __( 'Add title' ) }
-							onFocus={ this.onSelect }
-							onKeyDown={ this.onKeyDown }
-							onKeyPress={ this.onUnselect }
-						/>
-					</KeyboardShortcuts>
-					{ isSelected && isPostTypeViewable && <PostPermalink /> }
+				<div className="editor-post-title">
+					<div className={ className }>
+						<KeyboardShortcuts
+							shortcuts={ {
+								'mod+z': this.redirectHistory,
+								'mod+shift+z': this.redirectHistory,
+							} }
+						>
+							<label htmlFor={ `post-title-${ instanceId }` } className="screen-reader-text">
+								{ decodedPlaceholder || __( 'Add title' ) }
+							</label>
+							<Textarea
+								id={ `post-title-${ instanceId }` }
+								className="editor-post-title__input"
+								value={ title }
+								onChange={ this.onChange }
+								placeholder={ decodedPlaceholder || __( 'Add title' ) }
+								onFocus={ this.onSelect }
+								onKeyDown={ this.onKeyDown }
+								onKeyPress={ this.onUnselect }
+							/>
+						</KeyboardShortcuts>
+						{ isSelected && isPostTypeViewable && <PostPermalink /> }
+					</div>
 				</div>
 			</PostTypeSupportCheck>
 		);

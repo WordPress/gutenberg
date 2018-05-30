@@ -15,6 +15,7 @@ import {
 	orderBy,
 	reduce,
 	size,
+	some,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -36,9 +37,9 @@ export const INSERTER_UTILITY_HIGH = 3;
 export const INSERTER_UTILITY_MEDIUM = 2;
 export const INSERTER_UTILITY_LOW = 1;
 export const INSERTER_UTILITY_NONE = 0;
-const SECONDS_PER_HOUR = 3600;
-const SECONDS_PER_DAY = 24 * 3600;
-const SECONDS_PER_WEEK = 7 * 24 * 3600;
+const MILLISECONDS_PER_HOUR = 3600 * 1000;
+const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
+const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -1250,19 +1251,12 @@ export const canInsertBlockType = createSelector(
 		const parentName = getBlockName( state, parentUID );
 		const hasBlockAllowedParent = checkAllowList( blockAllowedParentBlocks, parentName );
 
-		let isBlockAllowedInParent;
 		if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
-			isBlockAllowedInParent = hasParentAllowedBlock || hasBlockAllowedParent;
+			return hasParentAllowedBlock || hasBlockAllowedParent;
 		} else if ( hasParentAllowedBlock !== null ) {
-			isBlockAllowedInParent = hasParentAllowedBlock;
+			return hasParentAllowedBlock;
 		} else if ( hasBlockAllowedParent !== null ) {
-			isBlockAllowedInParent = hasBlockAllowedParent;
-		} else {
-			isBlockAllowedInParent = true;
-		}
-
-		if ( ! isBlockAllowedInParent ) {
-			return false;
+			return hasBlockAllowedParent;
 		}
 
 		return true;
@@ -1304,7 +1298,7 @@ function getInsertUsage( state, id ) {
  * 3. Blocks that are in the common category (utility = 1)
  * 4. All other blocks (utility = 0)
  *
- * The 'frecency' property is a herustic (https://en.wikipedia.org/wiki/Frecency)
+ * The 'frecency' property is a heuristic (https://en.wikipedia.org/wiki/Frecency)
  * that combines block usage frequenty and recency.
  *
  * Items are returned ordered descendingly by their 'utility' and 'frecency'.
@@ -1357,13 +1351,16 @@ export const getInserterItems = createSelector(
 				return count;
 			}
 
+			// The selector is cached, which means Date.now() is the last time that the
+			// relevant state changed. This suits our needs.
 			const duration = Date.now() - time;
+
 			switch ( true ) {
-				case duration < SECONDS_PER_HOUR:
+				case duration < MILLISECONDS_PER_HOUR:
 					return count * 4;
-				case duration < SECONDS_PER_DAY:
+				case duration < MILLISECONDS_PER_DAY:
 					return count * 2;
-				case duration < SECONDS_PER_WEEK:
+				case duration < MILLISECONDS_PER_WEEK:
 					return count / 2;
 				default:
 					return count / 4;
@@ -1375,11 +1372,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			if ( ! canInsertBlockType( state, blockType.name, parentUID ) ) {
-				return false;
-			}
-
-			return true;
+			return canInsertBlockType( state, blockType.name, parentUID );
 		};
 
 		const buildBlockTypeInserterItem = ( blockType ) => {
@@ -1387,7 +1380,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( blockType.useOnce ) {
-				isDisabled = getBlocks( state ).some( ( block ) => block.name === blockType.name );
+				isDisabled = some( getBlocks( state ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );
