@@ -3,13 +3,14 @@
  */
 import {
 	filter,
+	find,
+	findIndex,
+	flow,
 	groupBy,
+	isEmpty,
 	map,
 	some,
-	flow,
 	sortBy,
-	findIndex,
-	find,
 	without,
 } from 'lodash';
 
@@ -211,6 +212,10 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						);
 					} ) }
+
+					{ isEmpty( suggestedItems ) && isEmpty( sharedItems ) && isEmpty( itemsPerCategory ) && (
+						<p className="editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+					) }
 
 					{ hoveredItem && isSharedBlock( hoveredItem ) &&
 						<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
