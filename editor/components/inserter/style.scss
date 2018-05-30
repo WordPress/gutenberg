@@ -112,7 +112,7 @@ input[type="search"].editor-inserter__search {
 	background: transparent;
 	overflow: hidden;
 	word-break: break-word;
-	border-radius: 3px;
+	border-radius: 4px;
 	border: 1px solid transparent;
 	transition: all 0.05s ease-in-out;
 
@@ -126,7 +126,7 @@ input[type="search"].editor-inserter__search {
 
 			.editor-inserter__item-icon {
 				color: $dark-gray-900;
-				border-radius: 3px 3px 0 0;
+				border-radius: 4px 4px 0 0;
 			}
 
 			.editor-inserter__item-title {
@@ -145,9 +145,9 @@ input[type="search"].editor-inserter__search {
 }
 
 .editor-inserter__item-icon {
-	padding: 7px 20px;
+	padding: 15px 20px;
 	background: $light-gray-200;
-	border-radius: 3px;
+	border-radius: 4px;
 	color: $dark-gray-500;
 	transition: all 0.05s ease-in-out;
 
@@ -170,13 +170,11 @@ input[type="search"].editor-inserter__search {
 
 .editor-inserter__item-with-childs {
 	.editor-inserter__item-icon {
+	    box-shadow: 4px 4px rgba( $dark-gray-900, 0.3 );
+		margin-right: 3px;
 		position: relative;
 		top: -2px;
 		left: -2px;
-	    background: #7E70AF;
-	    box-shadow: 4px 4px #AEA6CC;
-		margin-right: 3px;
-		color: white;
 	}
 }
 
@@ -187,22 +185,17 @@ input[type="search"].editor-inserter__search {
 .editor-inserter__parent-block-header {
 	display: flex;
 	align-items: center;
+
+	h2 {
+		font-size: 13px;
+	}
 }
 
 .editor-inserter__parent-block-icon {
 	background: $light-gray-200;
-	border-radius: 3px;
+	border-radius: 4px;
 	display: flex;
 	margin-left: -2px;
 	margin-right: 10px;
 	padding: 0 8px;
-}
-
-.editor-inserter__parent-block-header h2 {
-	font-size: 13px;
-}
-
-.editor-inserter__child-blocks .editor-inserter__item-icon {
-	background: 3px 3px #AEA6CC;
-	color: white;
 }
