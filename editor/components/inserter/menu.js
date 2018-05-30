@@ -185,17 +185,6 @@ export class InserterMenu extends Component {
 							<ItemList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
-
-					{ !! sharedItems.length && (
-						<PanelBody
-							title={ __( 'Shared' ) }
-							opened={ isPanelOpen( 'shared' ) }
-							onToggle={ this.onTogglePanel( 'shared' ) }
-						>
-							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
-						</PanelBody>
-					) }
-
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
 						if ( ! categoryItems || ! categoryItems.length ) {
@@ -212,7 +201,16 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						);
 					} ) }
-
+					{ !! sharedItems.length && (
+						<PanelBody
+							title={ __( 'Shared' ) }
+							opened={ isPanelOpen( 'shared' ) }
+							onToggle={ this.onTogglePanel( 'shared' ) }
+							icon="controls-repeat"
+						>
+							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
+						</PanelBody>
+					) }
 					{ isEmpty( suggestedItems ) && isEmpty( sharedItems ) && isEmpty( itemsPerCategory ) && (
 						<p className="editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
 					) }
