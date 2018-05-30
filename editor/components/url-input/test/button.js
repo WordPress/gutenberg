@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { shallow } from 'enzyme';
 
 /**
  * Internal dependencies
