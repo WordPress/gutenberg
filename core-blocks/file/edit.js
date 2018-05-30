@@ -30,7 +30,6 @@ class FileEdit extends Component {
 		super( ...arguments );
 
 		const {
-			href,
 			showDownloadButton = true,
 			buttonText = __( 'Download' ),
 			id,
@@ -44,11 +43,7 @@ class FileEdit extends Component {
 			buttonText,
 		} );
 
-		// edit component has its own attributes in the state so it can be edited
-		// without setting the actual values outside of the edit UI
 		this.state = {
-			showPlaceholder: ! href,
-			href,
 			attachmentPage: undefined,
 			showCopyConfirmation: false,
 		};
@@ -71,7 +66,7 @@ class FileEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { href } = this.state;
+		const { href } = this.props.attributes;
 
 		// Upload a file drag-and-dropped into the editor
 		if ( this.isBlobURL( href ) ) {
@@ -96,8 +91,6 @@ class FileEdit extends Component {
 
 	onSelectFile( media ) {
 		if ( media && media.url ) {
-			// sets the block's attributes and updates the edit component from the
-			// selected media, then switches off the placeholder UI
 			this.props.setAttributes( {
 				href: media.url,
 				fileName: media.title,
@@ -105,10 +98,7 @@ class FileEdit extends Component {
 				id: media.id,
 			} );
 			this.setState( {
-				href: media.url,
-				fileName: media.title,
 				attachmentPage: media.link,
-				showPlaceholder: false,
 			} );
 		}
 	}
@@ -120,6 +110,7 @@ class FileEdit extends Component {
 	render() {
 		const {
 			fileName,
+			href,
 			textLinkHref,
 			openInNewWindow,
 			showDownloadButton,
@@ -133,7 +124,7 @@ class FileEdit extends Component {
 			noticeUI,
 			noticeOperations,
 		} = this.props;
-		const { showPlaceholder, href, attachmentPage } = this.state;
+		const { attachmentPage, showCopyConfirmation } = this.state;
 
 		const classNames = [
 			className,
@@ -160,7 +151,7 @@ class FileEdit extends Component {
 			setAttributes( { showDownloadButton: newValue } );
 		};
 
-		if ( showPlaceholder ) {
+		if ( ! href ) {
 			return (
 				<MediaPlaceholder
 					icon="media-default"
@@ -238,7 +229,7 @@ class FileEdit extends Component {
 							onCopy={ confirmCopyURL }
 							onFinishCopy={ resetCopyConfirmation }
 						>
-							{ this.state.showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
+							{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
 						</ClipboardButton>
 					}
 				</div>
