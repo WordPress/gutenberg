@@ -7,6 +7,7 @@ import {
 	ClipboardButton,
 	IconButton,
 	Toolbar,
+	withAPIData,
 	withNotices,
 } from '@wordpress/components';
 import { Component, compose, Fragment } from '@wordpress/element';
@@ -32,7 +33,6 @@ class FileEdit extends Component {
 		const {
 			showDownloadButton = true,
 			buttonText = __( 'Download' ),
-			id,
 		} = this.props.attributes;
 
 		this.onSelectFile = this.onSelectFile.bind( this );
@@ -44,25 +44,8 @@ class FileEdit extends Component {
 		} );
 
 		this.state = {
-			attachmentPage: undefined,
 			showCopyConfirmation: false,
 		};
-
-		if ( id !== undefined ) {
-			// Get Attachment Page URL
-			wp.apiRequest( {
-				path: `/wp/v2/media/${ id }`,
-				method: 'GET',
-			} )
-				.then(
-					( result ) => {
-						this.setState( { attachmentPage: result.link } );
-					},
-					() => {
-						this.setState( { attachmentPage: undefined } );
-					}
-				);
-		}
 	}
 
 	componentDidMount() {
@@ -96,10 +79,7 @@ class FileEdit extends Component {
 				fileName: media.title,
 				textLinkHref: media.url,
 				id: media.id,
-			} );
-			this.setState( {
-				attachmentPage: media.link,
-			} );
+			}, this.props.media.get /* refetch attachment page url */ );
 		}
 	}
 
@@ -123,8 +103,10 @@ class FileEdit extends Component {
 			setAttributes,
 			noticeUI,
 			noticeOperations,
+			media,
 		} = this.props;
-		const { attachmentPage, showCopyConfirmation } = this.state;
+		const { showCopyConfirmation } = this.state;
+		const attachmentPage = ( id !== undefined ) && media.data && media.data.link;
 
 		const classNames = [
 			className,
@@ -239,5 +221,8 @@ class FileEdit extends Component {
 }
 
 export default compose( [
+	withAPIData( ( props ) => ( {
+		media: `/wp/v2/media/${ props.attributes.id }`,
+	} ) ),
 	withNotices,
 ] )( FileEdit );
