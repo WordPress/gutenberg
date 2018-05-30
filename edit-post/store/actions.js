@@ -47,7 +47,7 @@ export function closePublishSidebar() {
 }
 
 /**
- * Returns an action object used in signalling that the user toggles the publish sidebar
+ * Returns an action object used in signalling that the user toggles the publish sidebar.
  *
  * @return {Object} Action object
  */
