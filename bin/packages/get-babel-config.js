@@ -12,6 +12,7 @@ const babelDefaultConfig = require( '@wordpress/babel-preset-default' );
 
 const plugins = map( babelDefaultConfig.plugins, ( plugin ) => {
 	if ( isArray( plugin ) && plugin[ 0 ] === babelPluginTransformReactJSX ) {
+		// TODO: It should become the default value when all modules are moved to packages.
 		return [ babelPluginTransformReactJSX, { pragma: 'createElement' } ];
 	}
 

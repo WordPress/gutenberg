@@ -26,6 +26,9 @@
 		"lodash": "4.17.5",
 		"redux": "3.7.2"
 	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
