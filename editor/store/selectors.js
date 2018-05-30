@@ -15,6 +15,7 @@ import {
 	orderBy,
 	reduce,
 	size,
+	some,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -1387,7 +1388,7 @@ export const getInserterItems = createSelector(
 
 			let isDisabled = false;
 			if ( blockType.useOnce ) {
-				isDisabled = getBlocks( state ).some( ( block ) => block.name === blockType.name );
+				isDisabled = some( getBlocks( state ), { name: blockType.name } );
 			}
 
 			const isContextual = isArray( blockType.parent );
