@@ -69,9 +69,7 @@ You can group a series of tips into a guide by calling the `triggerGuide` dispat
 A tip cannot be added to more than one guide.
 
 ```jsx
-domReady(() => {
-	dispatch( 'core/nux' ).triggerGuide( [ 'acme/product-info', 'acme/add-to-cart', 'acme/checkout' ] );
-} );
+dispatch( 'core/nux' ).triggerGuide( [ 'acme/product-info', 'acme/add-to-cart', 'acme/checkout' ] );
 ```
 
 ## Getting information about a guide
