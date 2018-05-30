@@ -15,21 +15,20 @@ import { keycodes, decodeEntities } from '@wordpress/utils';
 import { Spinner, withInstanceId, withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
 
-
 const { UP, DOWN, ENTER } = keycodes;
 
 // Since URLInput is rendered in the context of other inputs, but should be
 // considered a separate modal node, prevent keyboard events from propagating
 // as being considered from the input.
-const stopEventPropagation = (event) => event.stopPropagation();
+const stopEventPropagation = ( event ) => event.stopPropagation();
 
 class UrlInput extends Component {
 	constructor() {
-		super(...arguments);
-		this.onChange = this.onChange.bind(this);
-		this.onKeyDown = this.onKeyDown.bind(this);
-		this.bindListNode = this.bindListNode.bind(this);
-		this.updateSuggestions = throttle(this.updateSuggestions.bind(this), 200);
+		super( ...arguments );
+		this.onChange = this.onChange.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
+		this.bindListNode = this.bindListNode.bind( this );
+		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
 		this.suggestionNodes = [];
 		this.state = {
 			posts: [],
@@ -38,129 +37,129 @@ class UrlInput extends Component {
 		};
 	}
 
-	bindListNode(ref) {
+	bindListNode( ref ) {
 		this.listNode = ref;
 	}
 
-	bindSuggestionNode(index) {
-		return (ref) => {
-			this.suggestionNodes[index] = ref;
+	bindSuggestionNode( index ) {
+		return ( ref ) => {
+			this.suggestionNodes[ index ] = ref;
 		};
 	}
 
-	updateSuggestions(value) {
-		if (this.suggestionsRequest) {
+	updateSuggestions( value ) {
+		if ( this.suggestionsRequest ) {
 			this.suggestionsRequest.abort();
 		}
 
 		// Show the suggestions after typing at least 2 characters
 		// and also for URLs
-		if (value.length < 2 || /^https?:/.test(value)) {
-			this.setState({
+		if ( value.length < 2 || /^https?:/.test( value ) ) {
+			this.setState( {
 				showSuggestions: false,
 				selectedSuggestion: null,
 				loading: false,
-			});
+			} );
 
 			return;
 		}
 
-		this.setState({
+		this.setState( {
 			showSuggestions: true,
 			selectedSuggestion: null,
 			loading: true,
-		});
-		this.suggestionsRequest = wp.apiRequest({
-			path: `/wp/v2/posts?${stringify({
+		} );
+		this.suggestionsRequest = wp.apiRequest( {
+			path: `/wp/v2/posts?${ stringify( {
 				search: value,
 				per_page: 20,
 				orderby: 'relevance',
-			})}`,
-		});
+			} ) }`,
+		} );
 
 		this.suggestionsRequest
 			.then(
-				(posts) => {
-					this.setState({
+				( posts ) => {
+					this.setState( {
 						posts,
 						loading: false,
-					});
+					} );
 
-					if (!!posts.length) {
-						this.props.debouncedSpeak(sprintf(_n(
+					if ( !! posts.length ) {
+						this.props.debouncedSpeak( sprintf( _n(
 							'%d result found, use up and down arrow keys to navigate.',
 							'%d results found, use up and down arrow keys to navigate.',
 							posts.length
-						), posts.length), 'assertive');
+						), posts.length ), 'assertive' );
 					} else {
-						this.props.debouncedSpeak(__('No results.'), 'assertive');
+						this.props.debouncedSpeak( __( 'No results.' ), 'assertive' );
 					}
 				},
-				(xhr) => {
-					if (xhr.statusText === 'abort') {
+				( xhr ) => {
+					if ( xhr.statusText === 'abort' ) {
 						return;
 					}
-					this.setState({
+					this.setState( {
 						loading: false,
-					});
+					} );
 				}
 			);
 	}
 
-	onChange(event) {
-		const inputValue = prependHTTP(event.target.value);
+	onChange( event ) {
+		const inputValue = prependHTTP( event.target.value );
 
-		this.props.onChange(inputValue);
-		this.updateSuggestions(inputValue);
+		this.props.onChange( inputValue );
+		this.updateSuggestions( inputValue );
 	}
 
-	onKeyDown(event) {
+	onKeyDown( event ) {
 		const { showSuggestions, selectedSuggestion, posts, loading } = this.state;
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
-		if (!showSuggestions || !posts.length || loading) {
+		if ( ! showSuggestions || ! posts.length || loading ) {
 			return;
 		}
 
-		switch (event.keyCode) {
+		switch ( event.keyCode ) {
 			case UP: {
 				event.stopPropagation();
 				event.preventDefault();
-				const previousIndex = !selectedSuggestion ? posts.length - 1 : selectedSuggestion - 1;
-				this.setState({
+				const previousIndex = ! selectedSuggestion ? posts.length - 1 : selectedSuggestion - 1;
+				this.setState( {
 					selectedSuggestion: previousIndex,
-				});
+				} );
 				break;
 			}
 			case DOWN: {
 				event.stopPropagation();
 				event.preventDefault();
-				const nextIndex = selectedSuggestion === null || (selectedSuggestion === posts.length - 1) ? 0 : selectedSuggestion + 1;
-				this.setState({
+				const nextIndex = selectedSuggestion === null || ( selectedSuggestion === posts.length - 1 ) ? 0 : selectedSuggestion + 1;
+				this.setState( {
 					selectedSuggestion: nextIndex,
-				});
+				} );
 				break;
 			}
 			case ENTER: {
-				if (this.state.selectedSuggestion) {
+				if ( this.state.selectedSuggestion ) {
 					event.stopPropagation();
-					const post = this.state.posts[this.state.selectedSuggestion];
-					this.selectLink(post.link);
+					const post = this.state.posts[ this.state.selectedSuggestion ];
+					this.selectLink( post.link );
 				}
 			}
 		}
 	}
 
-	selectLink(link) {
-		this.props.onChange(link);
-		this.setState({
+	selectLink( link ) {
+		this.props.onChange( link );
+		this.setState( {
 			selectedSuggestion: null,
 			showSuggestions: false,
-		});
+		} );
 	}
 
 	componentWillUnmount() {
-		if (this.suggestionsRequest) {
+		if ( this.suggestionsRequest ) {
 			this.suggestionsRequest.abort();
 		}
 	}
@@ -169,15 +168,15 @@ class UrlInput extends Component {
 		const { showSuggestions, selectedSuggestion } = this.state;
 		// only have to worry about scrolling selected suggestion into view
 		// when already expanded
-		if (showSuggestions && selectedSuggestion !== null && !this.scrollingIntoView) {
+		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
 			this.scrollingIntoView = true;
-			scrollIntoView(this.suggestionNodes[selectedSuggestion], this.listNode, {
+			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.listNode, {
 				onlyScrollIfNeeded: true,
-			});
+			} );
 
-			setTimeout(() => {
+			setTimeout( () => {
 				this.scrollingIntoView = false;
-			}, 100);
+			}, 100 );
 		}
 	}
 
@@ -189,49 +188,49 @@ class UrlInput extends Component {
 			<Fragment>
 				<div className="editor-url-input">
 					<input
-						autoFocus={autoFocus}
+						autoFocus={ autoFocus }
 						type="text"
-						aria-label={__('URL')}
+						aria-label={ __( 'URL' ) }
 						required
-						value={value}
-						onChange={this.onChange}
-						onInput={stopEventPropagation}
-						placeholder={__('Paste URL or type')}
-						onKeyDown={this.onKeyDown}
+						value={ value }
+						onChange={ this.onChange }
+						onInput={ stopEventPropagation }
+						placeholder={ __( 'Paste URL or type' ) }
+						onKeyDown={ this.onKeyDown }
 						role="combobox"
-						aria-expanded={showSuggestions}
+						aria-expanded={ showSuggestions }
 						aria-autocomplete="list"
-						aria-owns={`editor-url-input-suggestions-${instanceId}`}
-						aria-activedescendant={selectedSuggestion !== null ? `editor-url-input-suggestion-${instanceId}-${selectedSuggestion}` : undefined}
+						aria-owns={ `editor-url-input-suggestions-${ instanceId }` }
+						aria-activedescendant={ selectedSuggestion !== null ? `editor-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
 					/>
 
-					{(loading) && <Spinner />}
+					{ ( loading ) && <Spinner /> }
 				</div>
 
-				{showSuggestions && !!posts.length &&
-					<Popover position="bottom" noArrow focusOnMount={false}>
+				{ showSuggestions && !! posts.length &&
+					<Popover position="bottom" noArrow focusOnMount={ false }>
 						<div
 							className="editor-url-input__suggestions"
-							id={`editor-url-input-suggestions-${instanceId}`}
-							ref={this.bindListNode}
+							id={ `editor-url-input-suggestions-${ instanceId }` }
+							ref={ this.bindListNode }
 							role="listbox"
 						>
-							{posts.map((post, index) => (
+							{ posts.map( ( post, index ) => (
 								<button
-									key={post.id}
+									key={ post.id }
 									role="option"
 									tabIndex="-1"
-									id={`editor-url-input-suggestion-${instanceId}-${index}`}
-									ref={this.bindSuggestionNode(index)}
-									className={classnames('editor-url-input__suggestion', {
+									id={ `editor-url-input-suggestion-${ instanceId }-${ index }` }
+									ref={ this.bindSuggestionNode( index ) }
+									className={ classnames( 'editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
-									})}
-									onClick={() => this.selectLink(post.link)}
-									aria-selected={index === selectedSuggestion}
+									} ) }
+									onClick={ () => this.selectLink( post.link ) }
+									aria-selected={ index === selectedSuggestion }
 								>
-									{decodeEntities(post.title.rendered) || __('(no title)')}
+									{ decodeEntities( post.title.rendered ) || __( '(no title)' ) }
 								</button>
-							))}
+							) ) }
 						</div>
 					</Popover>
 				}
@@ -241,4 +240,4 @@ class UrlInput extends Component {
 	}
 }
 
-export default withSpokenMessages(withInstanceId(UrlInput));
+export default withSpokenMessages( withInstanceId( UrlInput ) );
