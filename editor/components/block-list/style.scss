@@ -243,7 +243,7 @@
 
 	// Hover style
 	&.is-hovered > .editor-block-list__block-edit:before {
-		outline: 1px solid $blue-medium-300;
+		outline: 1px solid $blue-medium-focus;
 	}
 }
 
@@ -823,12 +823,12 @@
 	z-index: z-index( '.editor-block-list__breadcrumb' );
 
 	// Position in the top right of the border
-	right: -$block-parent-side-ui-clearance - 1px;
+	right: -$block-parent-side-ui-clearance;
 	top: 0;
 
 	// Nested
 	.editor-block-list__block-edit & {
-		right: $parent-block-padding - $block-padding - $block-parent-side-ui-clearance - 1px;
+		right: $parent-block-padding - $block-padding - $block-parent-side-ui-clearance;
 	}
 
 	.components-toolbar {
@@ -838,15 +838,10 @@
 		line-height: 1;
 		font-family: $default-font;
 		font-size: 11px;
-		//cursor: default;
-		//background: rgba( $white, .8 );
-		//border: 1px solid $blue-medium-300;
 		padding: 4px 4px;
-		background: $light-gray-200;
-		color: $dark-gray-500;
-		margin: 4px;
-		border-radius: 4px;
-
+		background: $blue-medium-focus;
+		color: $white;
+	
 		// Drag indicator
 		cursor: move; /* Fallback for IE/Edge < 14 */
 		cursor: grab;
