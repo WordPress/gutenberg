@@ -9,7 +9,7 @@ Webpack plugin for exporting default property for selected libraries. Implementa
 Install the module
 
 ```bash
-npm install @wordpress/library-export-default-webpack-plugin@next --save
+npm install @wordpress/library-export-default-webpack-plugin --save
 ```
 
 ## Usage

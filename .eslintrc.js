@@ -59,7 +59,7 @@ module.exports = {
 				message: 'Use @wordpress/date as import path instead.',
 			},
 			{
-				selector: 'ImportDeclaration[source.value=/^deprecated/]',
+				selector: 'ImportDeclaration[source.value=/^deprecated$/]',
 				message: 'Use @wordpress/deprecated as import path instead.',
 			},
 			{
