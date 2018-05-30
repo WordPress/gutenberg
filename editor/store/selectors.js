@@ -1305,7 +1305,7 @@ function getInsertUsage( state, id ) {
  * 3. Blocks that are in the common category (utility = 1)
  * 4. All other blocks (utility = 0)
  *
- * The 'frecency' property is a herustic (https://en.wikipedia.org/wiki/Frecency)
+ * The 'frecency' property is a heuristic (https://en.wikipedia.org/wiki/Frecency)
  * that combines block usage frequenty and recency.
  *
  * Items are returned ordered descendingly by their 'utility' and 'frecency'.
