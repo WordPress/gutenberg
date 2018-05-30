@@ -1067,7 +1067,7 @@ export function isValidTemplate( state ) {
  * Returns the defined block template
  *
  * @param {boolean} state
- * @return {?Arary}        Block Template
+ * @return {?Array}        Block Template
  */
 export function getTemplate( state ) {
 	return state.settings.template;
