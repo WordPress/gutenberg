@@ -5,7 +5,7 @@ import React from 'react';
 import jQuery from 'jquery';
 import tinymce from 'tinymce';
 import { parse, format } from 'url';
-import { memoize } from 'lodash';
+import memoize from 'memize';
 
 window.jQuery = window.jQuery || jQuery;
 window.tinymce = window.tinymce || tinymce;
