@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flatMap, filter, compact } from 'lodash';
+import { flatMap, filter, compact, flatten } from 'lodash';
 // Also polyfills Element#matches.
 import 'element-closest';
 
@@ -173,7 +173,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 
 		doc.body.innerHTML = piece;
 
-		return Array.from( doc.body.children ).map( ( node ) => {
+		return flatten( Array.from( doc.body.children ).map( ( node ) => {
 			const rawTransformation = findTransform( rawTransformations, ( { isMatch } ) => isMatch( node ) );
 
 			if ( ! rawTransformation ) {
@@ -199,6 +199,6 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 					node.outerHTML
 				)
 			);
-		} );
+		} ) );
 	} ) );
 }
