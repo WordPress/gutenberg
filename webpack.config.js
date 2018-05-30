@@ -156,6 +156,7 @@ const gutenbergPackages = [
 	'deprecated',
 	'dom',
 	'element',
+	'api-request',
 ];
 
 const wordPressPackages = [
@@ -164,10 +165,6 @@ const wordPressPackages = [
 	'hooks',
 	'i18n',
 	'is-shallow-equal',
-];
-
-const coreGlobals = [
-	'api-request',
 ];
 
 const externals = {
@@ -184,7 +181,6 @@ const externals = {
 	...entryPointNames,
 	...gutenbergPackages,
 	...wordPressPackages,
-	...coreGlobals,
 ].forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
