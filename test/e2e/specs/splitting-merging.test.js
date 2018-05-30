@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage } from '../support/utils';
+import { newPost, newDesktopBrowserPage, insertBlock } from '../support/utils';
 
 describe( 'splitting and merging blocks', () => {
 	beforeAll( async () => {
@@ -12,11 +12,7 @@ describe( 'splitting and merging blocks', () => {
 
 	it( 'Should split and merge paragraph blocks using Enter and Backspace', async () => {
 		//Use regular inserter to add paragraph block and text
-		await page.click( '.edit-post-header [aria-label="Add block"]' );
-		await page.keyboard.type( 'paragraph' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
+		await insertBlock( 'paragraph' );
 		await page.keyboard.type( 'FirstSecond' );
 
 		//Move caret between 'First' and 'Second' and press Enter to split paragraph blocks

@@ -39,6 +39,10 @@ module.exports = {
 				message: 'Path access on WordPress dependencies is not allowed.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^blob$/]',
+				message: 'Use @wordpress/blob as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^blocks$/]',
 				message: 'Use @wordpress/blocks as import path instead.',
 			},
@@ -105,6 +109,10 @@ module.exports = {
 			{
 				selector: 'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] Literal[value=/\\.{3}/]',
 				message: 'Use ellipsis character (…) in place of three dots',
+			},
+			{
+				selector: 'ImportDeclaration[source.value="lodash"] Identifier.imported[name="memoize"]',
+				message: 'Use memize instead of Lodash\'s memoize',
 			},
 		],
 	},
