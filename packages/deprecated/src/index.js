@@ -1,5 +1,5 @@
 /**
- * Logs a message to notify developpers about a deprecated feature.
+ * Logs a message to notify developers about a deprecated feature.
  *
  * @param {string}  feature             Name of the deprecated feature.
  * @param {?Object} options             Personalisation options
@@ -9,7 +9,7 @@
  * @param {?string} options.link        Link to documentation
  * @param {?string} options.hint        Additional message to help transition away from the deprecated feature.
  */
-export function deprecated( feature, { version, alternative, plugin, link, hint } = {} ) {
+export default function deprecated( feature, { version, alternative, plugin, link, hint } = {} ) {
 	const pluginMessage = plugin ? ` from ${ plugin }` : '';
 	const versionMessage = version ? `${ pluginMessage } in ${ version }` : '';
 	const useInsteadMessage = alternative ? ` Please use ${ alternative } instead.` : '';

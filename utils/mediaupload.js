@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { compact, forEach, get, startsWith } from 'lodash';
+import { compact, forEach, get, noop, startsWith } from 'lodash';
 
 /**
  *	Media Upload is used by audio, image, gallery and video blocks to handle uploading a media file
@@ -9,12 +9,22 @@ import { compact, forEach, get, startsWith } from 'lodash';
  *
  *	TODO: future enhancement to add an upload indicator.
  *
- * @param {Array}    filesList      List of files.
- * @param {Function} onFileChange   Function to be called each time a file or a temporary representation of the file is available.
- * @param {string}   allowedType    The type of media that can be uploaded.
- * @param {?Object}  additionalData Additional data to include in the request.
+ * @param   {Object}   $0                   Parameters object passed to the function.
+ * @param   {string}   $0.allowedType       The type of media that can be uploaded.
+ * @param   {?Object}  $0.additionalData    Additional data to include in the request.
+ * @param   {Array}    $0.filesList         List of files.
+ * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
+ * @param   {Function} $0.onError           Function called when an error happens.
+ * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  */
-export function mediaUpload( filesList, onFileChange, allowedType, additionalData = {} ) {
+export function mediaUpload( {
+	allowedType,
+	additionalData = {},
+	filesList,
+	maxUploadFileSize = get( window, [ '_wpMediaSettings', 'maxUploadSize' ], 0 ),
+	onError = noop,
+	onFileChange,
+} ) {
 	// Cast filesList to array
 	const files = [ ...filesList ];
 
@@ -29,6 +39,12 @@ export function mediaUpload( filesList, onFileChange, allowedType, additionalDat
 			return;
 		}
 
+		// verify if file is greater than the maximum file upload size allowed for the site.
+		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
+			onError( { sizeAboveLimit: true, file: mediaFile } );
+			return;
+		}
+
 		// Set temporary URL to create placeholder media file, this is replaced
 		// with final file from media gallery when upload is `done` below
 		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
@@ -37,20 +53,18 @@ export function mediaUpload( filesList, onFileChange, allowedType, additionalDat
 		return createMediaFromFile( mediaFile, additionalData ).then(
 			( savedMedia ) => {
 				const mediaObject = {
+					alt: savedMedia.alt_text,
+					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					id: savedMedia.id,
-					url: savedMedia.source_url,
 					link: savedMedia.link,
+					url: savedMedia.source_url,
 				};
-				const caption = get( savedMedia, [ 'caption', 'raw' ] );
-				if ( caption ) {
-					mediaObject.caption = [ caption ];
-				}
 				setAndUpdateFiles( idx, mediaObject );
 			},
 			() => {
 				// Reset to empty on failure.
-				// TODO: Better failure messaging
 				setAndUpdateFiles( idx, null );
+				onError( { generalError: true, file: mediaFile } );
 			}
 		);
 	} );
@@ -80,7 +94,7 @@ function createMediaFromFile( file, additionalData ) {
  * Utility used to preload an image before displaying it.
  *
  * @param   {string}  url Image Url.
- * @return {Promise}     Pormise resolved once the image is preloaded.
+ * @return {Promise}     Promise resolved once the image is preloaded.
  */
 export function preloadImage( url ) {
 	return new Promise( ( resolve ) => {

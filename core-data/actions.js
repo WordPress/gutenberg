@@ -41,7 +41,7 @@ export function receiveUserQuery( queryID, users ) {
  *
  * @param {string}       kind    Kind of the received entity.
  * @param {string}       name    Name of the received entity.
- * @param {Array|Object} records Recordds received.
+ * @param {Array|Object} records Records received.
  *
  * @return {Object} Action object.
  */
@@ -51,20 +51,6 @@ export function receiveEntityRecords( kind, name, records ) {
 		records: castArray( records ),
 		kind,
 		name,
-	};
-}
-
-/**
- * Returns an action object used in signalling that taxonomies have been received.
- *
- * @param {Array} taxonomies Taxonomies received.
- *
- * @return {Object} Action object.
- */
-export function receiveTaxonomies( taxonomies ) {
-	return {
-		type: 'RECEIVE_TAXONOMIES',
-		taxonomies,
 	};
 }
 

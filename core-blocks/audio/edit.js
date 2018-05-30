@@ -2,20 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	FormFileUpload,
-	IconButton,
-	Placeholder,
-	Toolbar,
-} from '@wordpress/components';
+import { IconButton, Toolbar } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import {
-	MediaUpload,
+	MediaPlaceholder,
 	RichText,
 	BlockControls,
-	editorMediaUpload,
-	PostTypeSupportCheck,
 } from '@wordpress/editor';
 
 /**
@@ -30,14 +22,13 @@ export default class AudioEdit extends Component {
 		// without setting the actual value outside of the edit UI
 		this.state = {
 			editing: ! this.props.attributes.src,
-			src: this.props.attributes.src,
 		};
 	}
 
 	render() {
-		const { caption, id } = this.props.attributes;
+		const { caption, src } = this.props.attributes;
 		const { setAttributes, isSelected, className } = this.props;
-		const { editing, src } = this.state;
+		const { editing } = this.state;
 		const switchToEditing = () => {
 			this.setState( { editing: true } );
 		};
@@ -49,59 +40,29 @@ export default class AudioEdit extends Component {
 				this.setState( { src: media.url, editing: false } );
 			}
 		};
-		const onSelectUrl = ( event ) => {
-			event.preventDefault();
-			if ( src ) {
-				// set the block's src from the edit component's state, and switch off the editing UI
-				setAttributes( { src } );
-				this.setState( { editing: false } );
+		const onSelectUrl = ( newSrc ) => {
+			// set the block's src from the edit component's state, and switch off the editing UI
+			if ( newSrc !== src ) {
+				setAttributes( { src: newSrc, id: undefined } );
 			}
-			return false;
+			this.setState( { editing: false } );
 		};
-		const setAudio = ( [ audio ] ) => onSelectAudio( audio );
-		const uploadFromFiles = ( event ) => editorMediaUpload( event.target.files, setAudio, 'audio' );
 
 		if ( editing ) {
 			return (
-				<Placeholder
+				<MediaPlaceholder
 					icon="media-audio"
-					label={ __( 'Audio' ) }
-					instructions={ __( 'Select an audio file from your library, or upload a new one' ) }
-					className={ className }>
-					<form onSubmit={ onSelectUrl }>
-						<input
-							type="url"
-							className="components-placeholder__input"
-							placeholder={ __( 'Enter URL of audio file here…' ) }
-							onChange={ ( event ) => this.setState( { src: event.target.value } ) }
-							value={ src || '' } />
-						<Button
-							isLarge
-							type="submit">
-							{ __( 'Use URL' ) }
-						</Button>
-					</form>
-					<FormFileUpload
-						isLarge
-						className="wp-block-audio__upload-button"
-						onChange={ uploadFromFiles }
-						accept="audio/*"
-					>
-						{ __( 'Upload' ) }
-					</FormFileUpload>
-					<PostTypeSupportCheck supportKeys="media-library">
-						<MediaUpload
-							onSelect={ onSelectAudio }
-							type="audio"
-							value={ id }
-							render={ ( { open } ) => (
-								<Button isLarge onClick={ open }>
-									{ __( 'Media Library' ) }
-								</Button>
-							) }
-						/>
-					</PostTypeSupportCheck>
-				</Placeholder>
+					labels={ {
+						title: __( 'Audio' ),
+						name: __( 'an audio' ),
+					} }
+					className={ className }
+					onSelect={ onSelectAudio }
+					onSelectUrl={ onSelectUrl }
+					accept="audio/*"
+					type="audio"
+					value={ this.props.attributes }
+				/>
 			);
 		}
 

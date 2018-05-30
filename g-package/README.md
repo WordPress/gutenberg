@@ -20,7 +20,7 @@ This package is based on [Gutenberg v2.9.2](https://github.com/WordPress/gutenbe
         * [GET media](#get-media)
     * [url](#url)
 * [Customize your Gutenberg](#customize-your-gutenberg)
-    * [Block Menu Tabs](#block-menu-tabs)
+    * [Inserter Menu (blocks)](#inserter-menu-blocks)
     * [Block Categories](#block-categories)
     * [Rows](#rows)
     * [Posts Panel](#posts-panel)
@@ -152,6 +152,7 @@ When you initialize the editor, Gutenberg will request the settings related with
     labels: {
         ...,
         posts: 'Stories',
+        extras: 'Extras' // extra tab label in sidebar
         ...,
     },
     name: 'Posts',
@@ -168,6 +169,7 @@ When you initialize the editor, Gutenberg will request the settings related with
         'media-library': false,    // disable Media library from WordPress
         posts: true,               // add PostsPanel to sidebar
         'template-settings': true, // add TemplateSettingsPanel to sidebar
+        extras: true,              // show Extra tab in sidebar
         ...,
     },
     viewable: true,
@@ -191,8 +193,8 @@ To save a [post](https://v2.wp-api.org/reference/posts/) or a [page](https://v2.
     title: { 
         raw: 'Hello',
         rendered: 'Hello',
-    }
-    ...,
+    },
+    preview_link, permalink_template, ...,
 }
 ```
 
@@ -295,50 +297,25 @@ As the other global variables, also `customGutenberg` should be defined **before
 
 Important to say that Gutenberg works perfectly without the settings of this object :)
 
-### Block Menu Tabs
+### Inserter Menu (blocks)
 
-You can customize the tabs are displayed on the editor *Add blocks popup*, like as which block categories they should display and how. By default, Gutenberg display `suggested`, `blocks`, `embeds` and `shared` tabs.
+You can customize the panels are displayed on the editor *Add block popup*, like as which block categories they should display. By default, Gutenberg display `suggested`, `shared` and categories panels.
 
 ```js
 window.customGutenberg = {
     ...,
-    tabs: [ 
-        {
-            options: { 
-                name: 'suggested', 
-                title: 'Suggested', 
-                className: 'editor-inserter__tab', 
-            },
-            tabScrollTop: 0, // scroll to top on opening
-            sortItems( items, state ) { // sorting blocks by usage
-                if ( ! state.filterValue ) {
-                    return items;
-                }
-             }, 
-             renderTabView( items ) { // don't render category headers
-                 return items;
-             },
-        },
-        {
-            options: { 
-                name: 'blocks', 
-                title: 'Blocks', 
-                className: 'editor-inserter__tab', 
-            },
-            tabScrollTop: 0,
-            getItemsForTab() { // rendering blocks from which categories
-                return ( item ) => item.category !== 'embed' && item.category !== 'shared';
-            },
-        },
-        ...,
-    ],
+    blocks: {
+        suggested: false,
+        shared: false,
+        categories: [ 'rows', 'common' ],
+    },
     ...,
 };
 ```
 
 ### Block Categories
 
-You can set which block categories and consequently which blocks will be displayed on your editor. By default, Gutenberg has `common`, `formatting`, `layout`, `widgets`, `embed` and `shared` blocks categories.
+You can set which block categories and consequently which blocks will be displayed on your editor. By default, Gutenberg has `common`, `formatting`, `layout`, `widgets`, `embed` and `shared` blocks categories and we added our [`rows`](#rows).
 
 ```js
 window.customGutenberg = {

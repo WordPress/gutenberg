@@ -61,12 +61,12 @@
 		"uuid": "3.1.0"
 	},
 	"devDependencies": {
-		"@wordpress/babel-plugin-makepot": "1.0.0",
-		"@wordpress/babel-preset-default": "1.2.0",
-		"@wordpress/browserslist-config": "2.1.3",
-		"@wordpress/custom-templated-path-webpack-plugin": "1.0.0",
-		"@wordpress/jest-preset-default": "1.0.3",
-		"@wordpress/scripts": "1.1.0",
+		"@wordpress/babel-plugin-makepot": "1.0.1",
+		"@wordpress/babel-preset-default": "1.3.0",
+		"@wordpress/browserslist-config": "2.1.4",
+		"@wordpress/custom-templated-path-webpack-plugin": "1.0.2",
+		"@wordpress/jest-preset-default": "1.0.6",
+		"@wordpress/scripts": "1.1.6",
 		"autoprefixer": "8.2.0",
 		"babel-core": "6.26.0",
 		"babel-eslint": "8.0.3",
@@ -104,9 +104,6 @@
 		"presets": [
 			"@wordpress/default"
 		],
-		"plugins": [
-			"transform-async-generator-functions"
-		],
 		"env": {
 			"production": {
 				"plugins": [
@@ -115,20 +112,21 @@
 						{
 							"output": "languages/gutenberg.pot"
 						}
-					],
-					"transform-async-generator-functions"
+					]
 				]
 			}
 		}
 	},
 	"scripts": {
 		"prebuild": "check-node-version --package",
-		"build": "cross-env NODE_ENV=production webpack",
+		"build:packages": "rimraf ./packages/*/build ./packages/*/build-module && node ./bin/packages/build.js",
+		"build": "npm run build:packages && cross-env NODE_ENV=production webpack",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
 		"predev": "check-node-version --package",
-		"dev": "cross-env webpack --watch",
+		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
+		"dev:packages": "node ./bin/packages/watch.js",
 		"test": "npm run lint && npm run test-unit",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"ci": "concurrently \"npm run lint && npm run build\" \"npm run test-unit:coverage-ci\"",
@@ -137,7 +135,7 @@
 		"fixtures:generate": "npm run fixtures:server-registered && cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"package-plugin": "./bin/build-plugin-zip.sh",
-		"postinstall": "lerna bootstrap --hoist",
+		"postinstall": "lerna bootstrap --hoist && npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"publish:check": "lerna updated",
 		"publish:dev": "lerna publish --npm-tag next",

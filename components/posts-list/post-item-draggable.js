@@ -28,6 +28,7 @@ class PostItemDraggable extends Component {
 			const block = createBlock( 'custom/post', {
 				title: [ post.title.rendered ],
 				id: post.featured_media,
+				link: post.link,
 				layout: '',
 			} );
 

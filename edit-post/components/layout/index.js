@@ -28,6 +28,7 @@ import { withViewportMatch } from '@wordpress/viewport';
 import './style.scss';
 import BlockSidebar from '../sidebar/block-sidebar';
 import DocumentSidebar from '../sidebar/document-sidebar';
+import ExtrasSidebar from '../sidebar/extras-sidebar';
 import Header from '../header';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -35,6 +36,8 @@ import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import MetaBoxes from '../meta-boxes';
 import { getMetaBoxContainer } from '../../utils/meta-boxes';
 import Sidebar from '../sidebar';
+import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
+import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 
 function Layout( {
 	mode,
@@ -84,10 +87,13 @@ function Layout( {
 					onClose={ closePublishSidebar }
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
+					PrePublishExtension={ PluginPrePublishPanel.Slot }
+					PostPublishExtension={ PluginPostPublishPanel.Slot }
 				/>
 			) }
 			<DocumentSidebar />
 			<BlockSidebar />
+			<ExtrasSidebar />
 			<Sidebar.Slot />
 			{
 				isMobileViewport && sidebarIsOpened && <ScrollLock />

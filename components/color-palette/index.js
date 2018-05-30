@@ -48,7 +48,7 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 			{ ! disableCustomColors &&
 				<Dropdown
 					className="components-color-palette__item-wrapper components-color-palette__custom-color"
-					contentClassName="components-color-palette__picker "
+					contentClassName="components-color-palette__picker"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Tooltip text={ customColorPickerLabel }>
 							<button
@@ -66,7 +66,6 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 						<ChromePicker
 							color={ value }
 							onChangeComplete={ ( color ) => onChange( color.hex ) }
-							style={ { width: '100%' } }
 							disableAlpha
 						/>
 					) }

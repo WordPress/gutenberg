@@ -68,6 +68,9 @@ const blockAttributes = {
 	customFontSize: {
 		type: 'number',
 	},
+	link: {
+		type: 'string',
+	},
 };
 
 export const name = 'custom/post';
@@ -99,6 +102,7 @@ export const settings = {
 			customBackgroundColor,
 			fontSize,
 			customFontSize,
+			link,
 		} = attributes;
 
 		// Image
@@ -132,7 +136,7 @@ export const settings = {
 			textAlign,
 		};
 
-		return (
+		const post = (
 			<div className={ className }>
 				<div
 					className={ imageClasses }
@@ -146,5 +150,7 @@ export const settings = {
 				/>
 			</div>
 		);
+
+		return ( link ? <a href={ link }>{ post }</a> : post );
 	},
 };

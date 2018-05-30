@@ -78,22 +78,6 @@
 			margin-right: -$block-side-ui-padding;
 		}
 	}
-
-
-	/*.editor-post-permalink {
-		left: $block-padding;
-		right: $block-padding;
-		color: $dark-gray-900;
-	}
-
-	@include break-small() {
-		padding: 5px #{ $block-side-ui-padding - 1px };	// subtract 1px border, because this is an outline
-
-		.editor-post-permalink {
-			left: $block-side-ui-padding;
-			right: $block-side-ui-padding;
-		}
-	}*/
 }
 
 // This is a focus style shown for blocks that need an indicator even when in an isEditing state
@@ -127,9 +111,4 @@
 			padding: 0 $block-padding;
 		}
 	}
-}
-
-.edit-post-visual-editor .editor-block-list__layout > .editor-block-list__insertion-point {
-	max-width: $content-width;
-	position: relative;
 }

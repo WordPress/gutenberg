@@ -1,50 +1,68 @@
 /**
  * WordPress dependencies
  */
+import * as blob from '@wordpress/blob';
 import * as dom from '@wordpress/dom';
+import originalDeprecated from '@wordpress/deprecated';
 
-/**
- * Internal dependencies
- */
-import { deprecated } from './deprecation';
+const wrapFunction = ( source, sourceName, version ) =>
+	( functionName ) => ( ...args ) => {
+		originalDeprecated( `wp.utils.${ functionName }`, {
+			version,
+			alternative: `wp.${ sourceName }.${ functionName }`,
+			plugin: 'Gutenberg',
+		} );
+		return source[ functionName ]( ...args );
+	};
 
-const wrapFunction = ( functionName, source = dom ) => ( ...args ) => {
-	deprecated( 'wp.utils.' + functionName, {
-		version: '3.1',
-		alternative: 'wp.dom.' + functionName,
-		plugin: 'Gutenberg',
-	} );
-	return source[ functionName ]( ...args );
-};
+// blob
+const wrapBlobFunction = wrapFunction( blob, 'blob', '3.2' );
+export const createBlobURL = wrapBlobFunction( 'createBlobURL' );
+export const getBlobByURL = wrapBlobFunction( 'getBlobByURL' );
+export const revokeBlobURL = wrapBlobFunction( 'revokeBlobURL' );
 
-export const computeCaretRect = wrapFunction( 'computeCaretRect' );
-export const documentHasSelection = wrapFunction( 'documentHasSelection' );
+// dom
+const wrapDomFunction = wrapFunction( dom, 'dom', '3.1' );
+export const computeCaretRect = wrapDomFunction( 'computeCaretRect' );
+export const documentHasSelection = wrapDomFunction( 'documentHasSelection' );
 export const focus = {
 	focusable: {
-		find: wrapFunction( 'find', dom.focus.focusable ),
+		find: wrapFunction( dom.focus.focusable, 'dom.focus.focusable', '3.1' )( 'find' ),
 	},
 	tabbable: {
-		find: wrapFunction( 'find', dom.focus.tabbable ),
-		isTabbableIndex: wrapFunction( 'isTabbableIndex', dom.focus.tabbable ),
+		find: wrapFunction( dom.focus.tabbable, 'dom.focus.tabbable', '3.1' )( 'find' ),
+		isTabbableIndex: wrapFunction( dom.focus.tabbable, 'dom.focus.tabbable', '3.1' )( 'isTabbableIndex' ),
 	},
 };
-export const getRectangleFromRange = wrapFunction( 'getRectangleFromRange' );
-export const getScrollContainer = wrapFunction( 'getScrollContainer' );
-export const insertAfter = wrapFunction( 'insertAfter' );
-export const isHorizontalEdge = wrapFunction( 'isHorizontalEdge' );
-export const isTextField = wrapFunction( 'isTextField' );
-export const isVerticalEdge = wrapFunction( 'isVerticalEdge' );
-export const placeCaretAtHorizontalEdge = wrapFunction( 'placeCaretAtHorizontalEdge' );
-export const placeCaretAtVerticalEdge = wrapFunction( 'placeCaretAtVerticalEdge' );
-export const remove = wrapFunction( 'remove' );
-export const replace = wrapFunction( 'replace' );
-export const replaceTag = wrapFunction( 'replaceTag' );
-export const unwrap = wrapFunction( 'unwrap' );
+export const getRectangleFromRange = wrapDomFunction( 'getRectangleFromRange' );
+export const getScrollContainer = wrapDomFunction( 'getScrollContainer' );
+export const insertAfter = wrapDomFunction( 'insertAfter' );
+export const isHorizontalEdge = wrapDomFunction( 'isHorizontalEdge' );
+export const isTextField = wrapDomFunction( 'isTextField' );
+export const isVerticalEdge = wrapDomFunction( 'isVerticalEdge' );
+export const placeCaretAtHorizontalEdge = wrapDomFunction( 'placeCaretAtHorizontalEdge' );
+export const placeCaretAtVerticalEdge = wrapDomFunction( 'placeCaretAtVerticalEdge' );
+export const remove = wrapDomFunction( 'remove' );
+export const replace = wrapDomFunction( 'replace' );
+export const replaceTag = wrapDomFunction( 'replaceTag' );
+export const unwrap = wrapDomFunction( 'unwrap' );
 
+// deprecated
+export function deprecated( ...params ) {
+	originalDeprecated( 'wp.utils.deprecated', {
+		version: '3.2',
+		alternative: 'wp.deprecated',
+		plugin: 'Gutenberg',
+	} );
+
+	return originalDeprecated( ...params );
+}
+
+// viewport
 export function isExtraSmall() {
-	deprecated( 'wp.utils.isExtraSmall', {
+	originalDeprecated( 'wp.utils.isExtraSmall', {
 		version: '3.1',
-		alternative: 'wp.viewport.*',
+		alternative: 'wp.viewport.isExtraSmall',
 		plugin: 'Gutenberg',
 	} );
 
