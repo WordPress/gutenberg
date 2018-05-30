@@ -178,7 +178,7 @@ const externals = {
 
 const config = {
 	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-
+	performance: { hints: false },
 	entry: Object.assign(
 		entryPointNames.reduce( ( memo, path ) => {
 			const name = camelCaseDash( path );
