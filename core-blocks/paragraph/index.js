@@ -455,8 +455,7 @@ export const settings = {
 	},
 
 	edit: compose( [
-		withColors( 'backgroundColor', 'customBackgroundColor', 'background-color' ),
-		withColors( 'textColor', 'customTextColor', 'color' ),
+		withColors( 'backgroundColor', { textColor: 'color' } ),
 		FallbackStyles,
 	] )( ParagraphBlock ),
 

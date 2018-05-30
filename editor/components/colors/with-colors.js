@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isFunction, upperFirst } from 'lodash';
+import { flatMap, get, isFunction, isString, kebabCase, pick, reduce, upperFirst } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,6 +9,7 @@ import { get, isFunction, upperFirst } from 'lodash';
 import { createHigherOrderComponent, Component, compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { deprecated } from '@wordpress/utils';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -22,20 +23,35 @@ const DEFAULT_COLORS = [];
  * Higher-order component, which handles color logic for class generation
  * color value, retrieval and color attribute setting.
  *
- * @param {string} colorAttributeName       Name of the attribute where named colors are stored.
- * @param {string} customColorAttributeName Name of the attribute where custom colors are stored.
- * @param {string} colorContext             Context/place where color is being used e.g: background, text etc...
+ * @param {...(object|string)} args The arguments can be strings or objects. If the argument is an object,
+ *                                  it should contain the color attribute name as key and the color context as value.
+ *                                  If the argument is a string the value should be the color attribute name,
+ *                                  the color context is computed by applying a kebab case transform to the value.
+ *
  *
  * @return {Function} Higher-order component.
  */
-export default ( colorAttributeName, customColorAttributeName, colorContext ) => {
-	if ( isFunction( colorAttributeName ) ) {
+export default ( ...args ) => {
+	if ( isFunction( args[ 0 ] ) ) {
 		deprecated( 'Using withColors( mapGetSetColorToProps ) ', {
-			version: '3.1',
-			alternative: 'withColors( colorAttributeName, customColorAttributeName, colorContext )',
+			version: '3.2',
+			alternative: 'withColors( colorAttributeName, { secondColorAttributeName: \'color-context\' }, ... )',
 		} );
-		return withColorsDeprecated( colorAttributeName );
+		return withColorsDeprecated( args[ 0 ] );
 	}
+
+	const colorMap = reduce( args, ( colorObj, arg ) => {
+		return {
+			...colorObj,
+			...( isString( arg ) ? { [ arg ]: kebabCase( arg ) } : arg ),
+		};
+	}, {} );
+
+	const relevantAttributeNames = flatMap(
+		colorMap,
+		( value, attributeName ) => [ attributeName, `custom${ upperFirst( attributeName ) }` ]
+	);
+
 	return createHigherOrderComponent(
 		compose( [
 			withSelect( ( select ) => {
@@ -52,34 +68,35 @@ export default ( colorAttributeName, customColorAttributeName, colorContext ) =>
 					}
 
 					static getDerivedStateFromProps( { attributes, colors, setAttributes }, prevState ) {
-						const colorName = attributes[ colorAttributeName ];
-						const customColor = attributes[ customColorAttributeName ];
+						const relevantAttributes = pick( attributes, relevantAttributeNames );
 						if (
-							colorName === prevState.colorName &&
-							customColor === prevState.customColor &&
 							colors === prevState.colors &&
-							setAttributes === prevState.setAttributes
+							setAttributes === prevState.setAttributes &&
+							isShallowEqual( relevantAttributes, prevState.relevantAttributes )
 						) {
 							return null;
 						}
 
-						const colorObject = {
-							name: attributes[ colorAttributeName ],
-							class: getColorClass( colorContext, colorName ),
-							value: getColorValue( colors, colorName, customColor ),
-						};
-
-						const colorSetter = setColorValue( colors, colorAttributeName, customColorAttributeName, setAttributes );
+						const mergeProps = reduce( colorMap, ( mergePropsAcc, colorContext, colorAttributeName ) => {
+							const ufColorAttrName = upperFirst( colorAttributeName );
+							const customColorAttributeName = `custom${ ufColorAttrName }`;
+							const colorName = attributes[ colorAttributeName ];
+							const customColor = attributes[ customColorAttributeName ];
+							mergePropsAcc[ colorAttributeName ] = {
+								name: colorName,
+								class: getColorClass( colorContext, colorName ),
+								value: getColorValue( colors, colorName, customColor ),
+							};
+							mergePropsAcc[ `set${ ufColorAttrName }` ] =
+								setColorValue( colors, colorAttributeName, customColorAttributeName, setAttributes );
+							return mergePropsAcc;
+						}, {} );
 
 						return {
-							colorName,
-							customColor,
+							relevantAttributes,
 							colors,
 							setAttributes,
-							mergeProps: {
-								[ colorAttributeName ]: colorObject,
-								[ 'set' + upperFirst( colorAttributeName ) ]: colorSetter,
-							},
+							mergeProps,
 						};
 					}
 

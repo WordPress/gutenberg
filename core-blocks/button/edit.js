@@ -142,6 +142,5 @@ class ButtonEdit extends Component {
 }
 
 export default compose( [
-	withColors( 'backgroundColor', 'customBackgroundColor', 'background-color' ),
-	withColors( 'textColor', 'customTextColor', 'color' ),
+	withColors( 'backgroundColor', { textColor: 'color' } ),
 ] )( ButtonEdit );
