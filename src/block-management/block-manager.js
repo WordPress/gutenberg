@@ -6,7 +6,6 @@
 import React from 'react';
 import { Platform, Switch, Text, View, FlatList } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
-import RCTAztecView from 'react-native-aztec';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
 
@@ -24,6 +23,7 @@ export type BlockListType = {
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
 	blocks: Array<BlockType>,
+	aztechtml: string,
 	refresh: boolean,
 };
 
@@ -31,11 +31,7 @@ type PropsType = BlockListType;
 type StateType = {
 	dataSource: DataSource,
 	showHtml: boolean,
-	aztectext: string,
-	aztecheight: number,
 };
-
-const _minHeight = 50;
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
 	_recycler = null;
@@ -45,8 +41,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.state = {
 			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.uid ),
 			showHtml: false,
-			aztectext: 'Some text <b>rendered by Aztec</b>',
-			aztecheight: _minHeight,
 		};
 	}
 
@@ -91,6 +85,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				const blockType = getBlockType( block.name );
 				if ( blockType ) {
 					return serialize( [ block ] ) + '\n\n';
+				} else if ( block.name === 'aztec' ) {
+					return '<aztec>' + block.attributes.content + '</aztec>\n\n';
 				}
 
 				return '<span>' + block.attributes.content + '</span>\n\n';
@@ -147,26 +143,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return (
 			<View style={ styles.container }>
 				<View style={ { height: 30 } } />
-				<View style={ styles[ 'aztec-container' ] }>
-					<Text>Aztec view below</Text>
-					<RCTAztecView
-						{ ...this.props }
-						style={ [
-							styles[ 'aztec-editor' ],
-							{ minHeight: Math.max( _minHeight, this.state.aztecheight ) },
-						] }
-						text={ this.state.aztectext }
-						onContentSizeChange={ ( event ) => {
-							console.log(event.nativeEvent.contentSize.height);
-							this.setState( { ...this.state, aztecheight: event.nativeEvent.contentSize.height } );
-						} }
-						onChange={ ( event ) => {
-							console.log(event.nativeEvent.text);
-						} }
-						color={ 'black' }
-						maxImagesWidth={ 200 }
-					/>
-				</View>
 				<View style={ styles.switch }>
 					<Text>View html output</Text>
 					<Switch
