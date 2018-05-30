@@ -146,16 +146,16 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                         if (hasFocus) {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecFocusEvent(
-                                            aztecText.getId()));
+                                            editText.getId()));
                         } else {
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecBlurEvent(
-                                            aztecText.getId()));
+                                            editText.getId()));
 
                             eventDispatcher.dispatchEvent(
                                     new ReactAztecEndEditingEvent(
-                                            aztecText.getId(),
-                                            editText.getText().toString()));
+                                            editText.getId(),
+                                            editText.toHtml(false)));
                         }
                     }
                 });

@@ -35,6 +35,7 @@ export default class example extends React.Component {
                               this.setState({height: event.nativeEvent.contentSize.height});
                           }}
                          onChange= {(event) => console.log(event.nativeEvent) }
+                         onEndEditing= {(event) => console.log(event.nativeEvent) }
                          color = {'black'}
                          maxImagesWidth = {200} />
                     }
