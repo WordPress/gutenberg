@@ -478,6 +478,21 @@
 		bottom: -3px;
 		margin: 0 $block-padding;
 	}
+
+	// Hide appender shortcuts in nested blocks
+	// This essentially duplicates the mobile styles for the appender component
+	// It would be nice to be able to use element queries in that component instead https://github.com/tomhodgins/element-queries-spec
+	.editor-block-list__layout {
+		.editor-inserter-with-shortcuts {
+			display: none;
+		}
+
+		.editor-block-list__empty-block-inserter,
+		.editor-default-block-appender .editor-inserter {
+			left: auto;
+			right: $item-spacing;
+		}
+	}
 }
 
 
