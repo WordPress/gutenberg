@@ -152,9 +152,9 @@ You can use those editor widths to match those in your theme. You can use any CS
 
 Further reading: [Applying Styles with Stylesheets](https://wordpress.org/gutenberg/handbook/blocks/applying-styles-with-stylesheets/).
 
-## Styling blocks
+## Default block styles
 
-Core blocks come with default styles. The styles are always enqueued for the editor but, by default, are not enqueued for the front end. If you'd like to take advantage of these styles on the front end, simply add theme support for `wp-block-styles`, and the styles will be enqueued.
+Core blocks include default styles. The styles are enqueued for editing but are not enqueued for viewing unless the theme opts-in to the core styles. If you'd like to use default styles in your theme, add theme support for `wp-block-styles`:
 
 ```php
 add_theme_support( 'wp-block-styles' );

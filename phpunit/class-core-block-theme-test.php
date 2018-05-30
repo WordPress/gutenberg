@@ -43,7 +43,7 @@ class Core_Block_Theme_Test extends WP_UnitTestCase {
 	}
 
 	function test_block_theme_in_editor_without_theme_support() {
-		// Confirm assumption.
+		// Confirm we are without theme support by default.
 		$this->assertFalse( current_theme_supports( 'wp-block-styles' ) );
 
 		gutenberg_register_scripts_and_styles();
@@ -63,7 +63,7 @@ class Core_Block_Theme_Test extends WP_UnitTestCase {
 	}
 
 	function test_no_block_theme_on_front_end_without_theme_support() {
-		// Confirm assumption.
+		// Confirm we are without theme support by default.
 		$this->assertFalse( current_theme_supports( 'wp-block-styles' ) );
 
 		gutenberg_register_scripts_and_styles();

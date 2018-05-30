@@ -437,7 +437,7 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'wp-components',
 			'wp-editor',
-			// Always include theme styles to avoid appearance of a broken editor.
+			// Always include visual styles so the editor never appears broken.
 			'wp-core-blocks-theme',
 		),
 		filemtime( gutenberg_dir_path() . 'build/core-blocks/edit-blocks.css' )
