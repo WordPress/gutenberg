@@ -27,7 +27,8 @@
 		"redux": "3.7.2"
 	},
 	"devDependencies": {
-		"deep-freeze": "0.0.1"
+		"deep-freeze": "0.0.1",
+		"enzyme": "3.3.0"
 	},
 	"publishConfig": {
 		"access": "public"
