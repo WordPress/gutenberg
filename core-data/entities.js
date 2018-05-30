@@ -5,7 +5,7 @@ import { find, upperFirst, camelCase } from 'lodash';
 
 const entities = [
 	{ name: 'postType', kind: 'root', key: 'slug', baseUrl: '/wp/v2/types' },
-	{ name: 'media', plural: 'mediaItems', kind: 'root', baseUrl: '/wp/v2/media' },
+	{ name: 'media', kind: 'root', baseUrl: '/wp/v2/media', plural: 'mediaItems' },
 	{ name: 'taxonomy', kind: 'root', key: 'slug', baseUrl: '/wp/v2/taxonomies', plural: 'taxonomies' },
 ];
 
