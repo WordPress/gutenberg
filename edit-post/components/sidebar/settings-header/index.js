@@ -59,12 +59,12 @@ export default compose(
 	withSelect( ( select ) => {
 		const { getPostType } = select( 'core' );
 		const { getSelectedBlockCount, getEditedPostAttribute } = select( 'core/editor' );
-		
+
 		return {
 			count: getSelectedBlockCount(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		};
-	 } ),
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 		const { clearSelectedBlock } = dispatch( 'core/editor' );
