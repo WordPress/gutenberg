@@ -127,14 +127,3 @@ export async function pressWithModifier( modifier, key ) {
 	await page.keyboard.press( key );
 	return page.keyboard.up( modifier );
 }
-
-/**
- * Promise setTimeout Wrapper.
- *
- * @param {number} timeout Timeout in milliseconds
- *
- * @return {Promise} Promise resolving after the given timeout
- */
-export async function wait( timeout ) {
-	return new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
-}
