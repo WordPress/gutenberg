@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { deprecated } from '@wordpress/utils';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * External dependencies

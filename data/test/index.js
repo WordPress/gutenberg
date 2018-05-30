@@ -29,10 +29,6 @@ import {
 	toAsyncIterable,
 } from '../';
 
-jest.mock( '@wordpress/utils', () => ( {
-	deprecated: jest.fn(),
-} ) );
-
 // Mock data store to prevent self-initialization, as it needs to be reset
 // between tests of `registerResolvers` by replacement (new `registerStore`).
 jest.mock( '../store', () => () => {} );

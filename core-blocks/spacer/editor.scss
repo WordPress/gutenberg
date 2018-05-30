@@ -1,14 +1,14 @@
 .editor-block-list__block[data-type="core/spacer"].is-selected .editor-block-list__block-edit {
 	background: $light-gray-200;
 
-	.wp-block-spacer__resize-handler-top,
-	.wp-block-spacer__resize-handler-bottom {
+	.block-spacer__resize-handler-top,
+	.block-spacer__resize-handler-bottom {
 		display: block;
 	}
 }
 
-.wp-block-spacer__resize-handler-top,
-.wp-block-spacer__resize-handler-bottom {
+.block-spacer__resize-handler-top,
+.block-spacer__resize-handler-bottom {
 	display: none;
 	border-radius: 50%;
 	border: 2px solid white;

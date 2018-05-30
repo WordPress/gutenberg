@@ -65,6 +65,17 @@ export async function newPost( postType ) {
 
 export async function newDesktopBrowserPage() {
 	global.page = await browser.newPage();
+
+	page.on( 'pageerror', ( error ) => {
+		// Disable reason: `jest/globals` doesn't include `fail`, but it is
+		// part of the global context supplied by the underlying Jasmine:
+		//
+		//  https://jasmine.github.io/api/3.0/global.html#fail
+
+		// eslint-disable-next-line no-undef
+		fail( error );
+	} );
+
 	await page.setViewport( { width: 1000, height: 700 } );
 }
 
@@ -79,6 +90,23 @@ export async function getHTMLFromCodeEditor() {
 	const textEditorContent = await page.$eval( '.editor-post-text-editor', ( element ) => element.value );
 	await switchToEditor( 'Visual' );
 	return textEditorContent;
+}
+
+/**
+ * Opens the inserter, searches for the given term, then selects the first
+ * result that appears.
+ *
+ * @param {string} searchTerm The text to search the inserter for.
+ */
+export async function insertBlock( searchTerm ) {
+	await page.click( '.edit-post-header [aria-label="Add block"]' );
+	// Waiting here is necessary because sometimes the inserter takes more time to
+	// render than Puppeteer takes to complete the 'click' action
+	await page.waitForSelector( '.editor-inserter__menu' );
+	await page.keyboard.type( searchTerm );
+	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'Tab' );
+	await page.keyboard.press( 'Enter' );
 }
 
 /**
@@ -98,15 +126,4 @@ export async function pressWithModifier( modifier, key ) {
 	await page.keyboard.down( modifier );
 	await page.keyboard.press( key );
 	return page.keyboard.up( modifier );
-}
-
-/**
- * Promise setTimeout Wrapper.
- *
- * @param {number} timeout Timeout in milliseconds
- *
- * @return {Promise} Promise resolving after the given timeout
- */
-export async function wait( timeout ) {
-	return new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
 }

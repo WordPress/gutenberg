@@ -717,11 +717,7 @@
 	// use opacity to work in various editor styles
 	background-clip: padding-box;
 	box-sizing: padding-box;
-	border: 1px solid $dark-opacity-light-500;
-
-	.is-dark-theme & {
-		border-color: $light-opacity-light-500;
-	}
+	border: 1px solid $light-gray-500;
 
 	// this prevents floats from messing up the position
 	position: absolute;
@@ -735,10 +731,6 @@
 	@include break-small() {
 		width: auto;
 	}
-}
-
-.editor-block-contextual-toolbar .editor-block-toolbar {
-	border-bottom: none;
 }
 
 .editor-block-list__breadcrumb .components-toolbar {

@@ -6,7 +6,7 @@
 	],
 	"moduleNameMapper": {
 		"@wordpress\\/(blocks|components|editor|data|utils|edit-post|viewport|plugins|core-data|core-blocks)$": "$1",
-		"@wordpress\\/(date|dom|element)$": "packages/$1/src"
+		"@wordpress\\/(blob|date|dom|deprecated|element)$": "packages/$1/src"
 	},
 	"preset": "@wordpress/jest-preset-default",
 	"setupFiles": [

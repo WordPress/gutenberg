@@ -10,7 +10,7 @@ import { get, set, isFunction, some } from 'lodash';
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
-import { deprecated } from '@wordpress/utils';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Defined behavior of a block type.
