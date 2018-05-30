@@ -22,8 +22,8 @@ describe( 'Publishing', () => {
 		// Opens the publish panel
 		await page.click( '.editor-post-publish-panel__toggle' );
 
-		// Wait for a second ( wait for the animation )
-		// We should prefer waitForSelector when possible
+		// Disable reason: Wait for a second ( wait for the animation )
+		// eslint-disable-next-line no-restricted-syntax
 		await page.waitFor( 1000 );
 
 		// Publish the post
