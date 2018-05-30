@@ -16,6 +16,7 @@
 		background: transparent;
 		font-family: $editor-font;
 		line-height: $default-line-height;
+		transition: border .1s ease-out;
 
 		// Match h1 heading
 		font-size: 2.441em;
