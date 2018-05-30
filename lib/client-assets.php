@@ -935,6 +935,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		wp_die( $post_to_edit->get_error_message() );
 	}
 
+	/**
+	 * Apply filter to modify WP_Post prior to sending it to Gutenberg.
+	 */
+	$post_to_edit = apply_filters( 'after_block_editor_gets_post_to_edit', $post_to_edit );
+
 	// Set initial title to empty string for auto draft for duration of edit.
 	// Otherwise, title defaults to and displays as "Auto Draft".
 	$is_new_post = 'auto-draft' === $post_to_edit['status'];
