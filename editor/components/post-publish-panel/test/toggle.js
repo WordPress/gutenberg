@@ -65,7 +65,7 @@ describe( 'PostPublishPanelToggle', () => {
 			expect( wrapper.childAt( 0 ).text() ).toBe( 'Schedule…' );
 		} );
 
-		it( 'should display Schedule… if able to be published', () => {
+		it( 'should display Publish… if able to be published', () => {
 			const wrapper = shallow(
 				<PostPublishPanelToggle isPublishable isSaveable hasPublishAction />
 			);
