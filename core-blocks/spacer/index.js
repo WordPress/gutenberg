@@ -47,8 +47,8 @@ export const settings = {
 						} }
 						minHeight="20"
 						handleClasses={ {
-							top: 'core-blocks-spacer__resize-handler-top',
-							bottom: 'core-blocks-spacer__resize-handler-bottom',
+							top: 'block-spacer__resize-handler-top',
+							bottom: 'block-spacer__resize-handler-bottom',
 						} }
 						enable={ {
 							top: true,
