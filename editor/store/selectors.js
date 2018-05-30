@@ -1251,19 +1251,12 @@ export const canInsertBlockType = createSelector(
 		const parentName = getBlockName( state, parentUID );
 		const hasBlockAllowedParent = checkAllowList( blockAllowedParentBlocks, parentName );
 
-		let isBlockAllowedInParent;
 		if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
-			isBlockAllowedInParent = hasParentAllowedBlock || hasBlockAllowedParent;
+			return hasParentAllowedBlock || hasBlockAllowedParent;
 		} else if ( hasParentAllowedBlock !== null ) {
-			isBlockAllowedInParent = hasParentAllowedBlock;
+			return hasParentAllowedBlock;
 		} else if ( hasBlockAllowedParent !== null ) {
-			isBlockAllowedInParent = hasBlockAllowedParent;
-		} else {
-			isBlockAllowedInParent = true;
-		}
-
-		if ( ! isBlockAllowedInParent ) {
-			return false;
+			return hasBlockAllowedParent;
 		}
 
 		return true;
