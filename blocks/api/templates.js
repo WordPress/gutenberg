@@ -1,12 +1,14 @@
 /**
  * External dependencies
  */
-import { every, map } from 'lodash';
+import { every, get, isString, map, mapValues } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { createBlock } from './factory';
+import { getBlockType } from '../api/registration';
+import { parseWithAttributeSchema } from '../api/parser';
 
 /**
  * Checks whether a list of blocks matches a template by comparing the block names.
@@ -51,9 +53,23 @@ export function synchronizeBlocksWithTemplate( blocks = [], template = [] ) {
 			return { ...block, innerBlocks };
 		}
 
+		const blockType = getBlockType( name );
+		const attributesParsed = mapValues( attributes, ( attributeValue, attributeName ) => {
+			if (
+				isString( attributeValue ) &&
+				'array' === get( blockType, [ 'attributes', attributeName, 'type' ] ),
+				'children' === get( blockType, [ 'attributes', attributeName, 'source' ] )
+			) {
+				return parseWithAttributeSchema( attributeValue, {
+					source: 'children',
+				} );
+			}
+			return attributeValue;
+		} );
+
 		return createBlock(
 			name,
-			attributes,
+			attributesParsed,
 			synchronizeBlocksWithTemplate( [], innerBlocksTemplate )
 		);
 	} );
