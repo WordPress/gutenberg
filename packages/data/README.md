@@ -9,7 +9,7 @@ The data module is built upon and shares many of the same core principles of [Re
 Install the module
 
 ```bash
-npm install @wordpress/data@next --save
+npm install @wordpress/data --save
 ```
 
 ## Registering a Store

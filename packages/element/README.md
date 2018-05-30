@@ -18,7 +18,7 @@ On the `wp.element` global object, you will find the following, ordered roughly 
 Install the module
 
 ```bash
-npm install @wordpress/element@next --save
+npm install @wordpress/element --save
 ```
 
 ## Usage
