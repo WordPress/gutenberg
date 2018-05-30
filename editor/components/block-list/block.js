@@ -431,7 +431,7 @@ export class BlockListBlock extends Component {
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
 		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
-		const shouldShowBreadcrumb = isHovered;
+		const shouldShowBreadcrumb = isHovered && ! isEmptyDefaultBlock;
 		const shouldShowContextualToolbar = ! showSideInserter && isSelected && ! isTypingWithinBlock && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
@@ -447,7 +447,7 @@ export class BlockListBlock extends Component {
 			'has-warning': ! isValid || !! error,
 			'is-selected': shouldAppearSelected,
 			'is-multi-selected': isMultiSelected,
-			'is-hovered': isHovered,
+			'is-hovered': isHovered && ! isEmptyDefaultBlock,
 			'is-shared': isSharedBlock( blockType ),
 			'is-hidden': dragging,
 			'is-typing': isTypingWithinBlock,
