@@ -1376,11 +1376,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			if ( ! canInsertBlockType( state, blockType.name, parentUID ) ) {
-				return false;
-			}
-
-			return true;
+			return canInsertBlockType( state, blockType.name, parentUID );
 		};
 
 		const buildBlockTypeInserterItem = ( blockType ) => {
