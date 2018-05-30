@@ -84,11 +84,12 @@ $dot-scale: 3;  // How much the pulse animation should scale up by in size
 		@media ( max-width: $break-small ) {
 			.components-popover__content {
 				align-self: end;
-				left: 0;
+				left: 5px;
 				margin: 20px 0 0 0;
 				max-width: none !important; // Override the inline style set by <Popover>
 				position: fixed;
-				width: 100%;
+				right: 5px;
+				width: auto;
 			}
 		}
 	}
