@@ -43,15 +43,19 @@ const getColumnLayouts = memoize( ( columns, widths ) => {
 
 	return times( columns, ( n ) => {
 		const startPostion = position;
-		position = position + widths[ n ];
+		position = position + widths[ `col${ n + 1 }` ];
 
 		return {
-			name: `col${ widths[ n ] } column-start${ startPostion }`,
+			name: `col${ getWidth( widths, n ) } column-start${ startPostion }`,
 			label: sprintf( __( 'Column %d' ), n + 1 ),
 			icon: 'columns',
 		};
 	} );
 } );
+
+const getWidth = ( widths, index ) => {
+	return widths.split( ',' )[ index ];
+};
 
 export const name = 'rows/dynamic';
 
@@ -68,8 +72,8 @@ export const settings = {
 			default: 2,
 		},
 		widths: {
-			type: 'array',
-			default: [ 6, 6 ],
+			type: 'string',
+			default: '6,6',
 		},
 	},
 
@@ -90,13 +94,13 @@ export const settings = {
 		};
 
 		const onWidthChange = ( index, nextWidth ) => {
-			const nextWidths = attributes.widths;
+			const nextWidths = attributes.widths.split( ',' );
 			nextWidths[ index ] = nextWidth;
 
-			console.log( 'nextWidths', nextWidths );
+			// console.log( 'nextWidths', nextWidths );
 
 			setAttributes( {
-				widths: nextWidths,
+				widths: nextWidths.join(),
 			} );
 		};
 
@@ -116,12 +120,14 @@ export const settings = {
 					</PanelBody>
 					{
 						times( columns, ( n ) => {
+							const colWidth = getWidth( widths, n );
+
 							const max = COLUMNS_TOTAL - ( partial + ( ( columns - 1 ) * MIN_COLUMNS ) );
 							const min = n === columns - 1 ? max : MIN_COLUMNS;
 
 							const availableWidths = range( min, max + 1 );
 
-							partial = partial + ( widths[ n ] - MIN_COLUMNS );
+							partial = partial + ( colWidth - MIN_COLUMNS );
 
 							if ( availableWidths.length === 1 ) {
 								onWidthChange( n, availableWidths[ 0 ] );
@@ -135,8 +141,8 @@ export const settings = {
 												<Button
 													key={ width }
 													isSmall
-													isPrimary={ widths[ n ] === width }
-													aria-pressed={ widths[ n ] === width }
+													isPrimary={ colWidth === width }
+													aria-pressed={ colWidth === width }
 													onClick={ () => onWidthChange( n, width ) }
 												>
 													{ width }
