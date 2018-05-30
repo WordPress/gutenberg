@@ -75,7 +75,7 @@ class EditorProvider extends Component {
 			[
 				APIProvider,
 				{
-					...wpApiSettings,
+					schema: wpApiSchema,
 					...pick( wp.api, [
 						'postTypeRestBaseMapping',
 						'taxonomyRestBaseMapping',

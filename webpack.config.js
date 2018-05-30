@@ -296,7 +296,7 @@ const config = {
 				return path;
 			},
 		} ),
-		new LibraryExportDefaultPlugin( [ 'deprecated', 'dom-ready' ].map( camelCaseDash ) ),
+		new LibraryExportDefaultPlugin( [ 'deprecated', 'dom-ready', 'api-request' ].map( camelCaseDash ) ),
 	],
 	stats: {
 		children: false,
