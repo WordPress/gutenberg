@@ -42,7 +42,12 @@ class Core_Block_Theme_Test extends WP_UnitTestCase {
 		parent::tearDown();
 	}
 
-	function test_block_theme_in_editor_without_theme_support() {
+	/**
+	 * Tests that visual block styles are enqueued in the editor even when there is not theme support for 'wp-block-styles'.
+	 *
+	 * Visual block styles should always be enqueued when editing to avoid the appearance of a broken editor.
+	 */
+	function test_block_styles_for_editing_without_theme_support() {
 		// Confirm we are without theme support by default.
 		$this->assertFalse( current_theme_supports( 'wp-block-styles' ) );
 
@@ -53,7 +58,12 @@ class Core_Block_Theme_Test extends WP_UnitTestCase {
 		$this->assertTrue( wp_style_is( 'wp-core-blocks-theme' ) );
 	}
 
-	function test_block_theme_in_editor_with_theme_support() {
+	/**
+	 * Tests that visual block styles are enqueued when there is theme support for 'wp-block-styles'.
+	 *
+	 * Visual block styles should always be enqueued when editing to avoid the appearance of a broken editor.
+	 */
+	function test_block_styles_for_editing_with_theme_support() {
 		add_theme_support( 'wp-block-styles' );
 		gutenberg_register_scripts_and_styles();
 
@@ -62,7 +72,13 @@ class Core_Block_Theme_Test extends WP_UnitTestCase {
 		$this->assertTrue( wp_style_is( 'wp-core-blocks-theme' ) );
 	}
 
-	function test_no_block_theme_on_front_end_without_theme_support() {
+	/**
+	 * Tests that visual block styles are not enqueued for viewing when there is no theme support for 'wp-block-styles'.
+	 *
+	 * Visual block styles should not be enqueued unless a theme opts in.
+	 * This way we avoid style conflicts with existing themes.
+	 */
+	function test_no_block_styles_for_viewing_without_theme_support() {
 		// Confirm we are without theme support by default.
 		$this->assertFalse( current_theme_supports( 'wp-block-styles' ) );
 
@@ -73,7 +89,12 @@ class Core_Block_Theme_Test extends WP_UnitTestCase {
 		$this->assertFalse( wp_style_is( 'wp-core-blocks-theme' ) );
 	}
 
-	function test_block_theme_on_front_end_with_theme_support() {
+	/**
+	 * Tests that visual block styles are enqueued for viewing when there is theme support for 'wp-block-styles'.
+	 *
+	 * Visual block styles should be enqueued when a theme opts in.
+	 */
+	function test_block_styles_for_viewing_with_theme_support() {
 		add_theme_support( 'wp-block-styles' );
 
 		gutenberg_register_scripts_and_styles();
