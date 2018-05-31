@@ -1,0 +1,18 @@
+.wp-block-audio figcaption {
+	margin-top: 0.5em;
+	color: $dark-gray-300;
+	text-align: center;
+	font-size: $default-font-size;
+}
+
+.wp-block-video figcaption {
+	margin-top: 0.5em;
+	color: $dark-gray-300;
+	text-align: center;
+	font-size: $default-font-size;
+}
+
+.wp-playlist audio {
+	display: inline-block !important;
+	width:100% !important;
+}

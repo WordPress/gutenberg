@@ -41,6 +41,7 @@ import * as table from './table';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as playlist from './playlist';
 
 export const registerCoreBlocks = () => {
 	[
@@ -56,6 +57,7 @@ export const registerCoreBlocks = () => {
 		// Register all remaining core blocks.
 		shortcode,
 		audio,
+		playlist,
 		button,
 		categories,
 		code,

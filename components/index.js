@@ -37,6 +37,7 @@ export { default as PanelColor } from './panel/color';
 export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
+export { default as MediaElement } from './media-element';
 export { default as Popover } from './popover';
 export { default as QueryControls } from './query-controls';
 export { default as RadioControl } from './radio-control';
