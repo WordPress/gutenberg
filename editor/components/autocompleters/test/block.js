@@ -54,7 +54,9 @@ describe( 'block', () => {
 	it( 'should render a block option label', () => {
 		const labelComponents = shallow( <div>
 			{ blockCompleter.getOptionLabel( {
-				icon: 'expected-icon',
+				icon: {
+					src: 'expected-icon',
+				},
 				title: 'expected-text',
 			} ) }
 		</div> ).children();
