@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, property, union, without } from 'lodash';
+import { filter, property, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -90,7 +90,6 @@ const {
 	isPermalinkEditable,
 	getPermalink,
 	getPermalinkParts,
-	hasAutosave,
 	INSERTER_UTILITY_HIGH,
 	INSERTER_UTILITY_MEDIUM,
 	INSERTER_UTILITY_LOW,
