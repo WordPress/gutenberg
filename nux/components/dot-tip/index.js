@@ -54,18 +54,18 @@ export class DotTip extends Component {
 				onClose={ onDismiss }
 				onClick={ ( event ) => event.stopPropagation() }
 			>
-				<p>{ children }</p>
-				<p>
-					<Button isLink onClick={ onDismiss }>
-						{ hasNextTip ? __( 'See next' ) : __( 'Got it' ) }
-					</Button>
-				</p>
 				<IconButton
 					className="nux-dot-tip__disable"
 					icon="no-alt"
 					label={ __( 'Disable guide' ) }
 					onClick={ onDisable }
 				/>
+				<p>{ children }</p>
+				<p>
+					<Button isLink onClick={ onDismiss }>
+						{ hasNextTip ? __( 'See next' ) : __( 'Got it' ) }
+					</Button>
+				</p>
 			</Popover>
 		);
 	}
