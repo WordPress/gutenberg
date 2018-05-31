@@ -25,7 +25,7 @@ import createSelector from 'rememo';
 import { serialize, getBlockType, getBlockTypes, hasBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { moment } from '@wordpress/date';
-import { deprecated } from '@wordpress/utils';
+import deprecated from '@wordpress/deprecated';
 
 /***
  * Module constants

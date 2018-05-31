@@ -24,7 +24,6 @@ import {
 	getRectangleFromRange,
 	getScrollContainer,
 } from '@wordpress/dom';
-import deprecated from '@wordpress/deprecated';
 import { createBlobURL } from '@wordpress/blob';
 import { keycodes } from '@wordpress/utils';
 import { withInstanceId, withSafeTimeout, Slot } from '@wordpress/components';
@@ -41,7 +40,6 @@ import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 import patterns from './patterns';
-import { EVENTS } from './constants';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
 
@@ -161,23 +159,6 @@ export class RichText extends Component {
 	onSetup( editor ) {
 		this.editor = editor;
 
-		EVENTS.forEach( ( name ) => {
-			if ( ! this.props.hasOwnProperty( 'on' + name ) ) {
-				return;
-			}
-
-			deprecated( 'Raw TinyMCE event handlers for RichText', {
-				version: '3.0',
-				alternative: (
-					'Documented props, ancestor event handler, or onSetup ' +
-					'access to the internal editor instance event hub'
-				),
-				plugin: 'gutenberg',
-			} );
-
-			editor.on( name, this.proxyPropHandler( name ) );
-		} );
-
 		editor.on( 'init', this.onInit );
 		editor.on( 'NewBlock', this.onNewBlock );
 		editor.on( 'nodechange', this.onNodeChange );
@@ -202,29 +183,6 @@ export class RichText extends Component {
 		if ( this.props.setFocusedElement ) {
 			this.props.setFocusedElement( this.props.instanceId );
 		}
-	}
-
-	/**
-	 * Allows prop event handlers to handle an event.
-	 *
-	 * Allow props an opportunity to handle the event, before default RichText
-	 * behavior takes effect. Should the event be handled by a prop, it should
-	 * `stopImmediatePropagation` on the event to stop continued event handling.
-	 *
-	 * @param {string} name The name of the event.
-	 *
-	 * @return {void} Void.
-	*/
-	proxyPropHandler( name ) {
-		return ( event ) => {
-			// Allow props an opportunity to handle the event, before default
-			// RichText behavior takes effect. Should the event be handled by a
-			// prop, it should `stopImmediatePropagation` on the event to stop
-			// continued event handling.
-			if ( 'function' === typeof this.props[ 'on' + name ] ) {
-				this.props[ 'on' + name ]( event );
-			}
-		};
 	}
 
 	onInit() {
