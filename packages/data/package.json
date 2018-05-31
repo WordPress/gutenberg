@@ -2,7 +2,7 @@
 	"name": "@wordpress/data",
 	"version": "1.0.0-alpha.0",
 	"description": "Data module for WordPress",
-	"author": "WordPress",
+	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
