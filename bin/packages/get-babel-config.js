@@ -20,26 +20,32 @@ const plugins = map( babelDefaultConfig.plugins, ( plugin ) => {
 } );
 
 const babelConfigs = {
-	main: {
-		...babelDefaultConfig,
-		babelrc: false,
-		plugins,
-		presets: map( babelDefaultConfig.presets, ( preset ) => {
-			if ( isArray( preset ) && preset[ 0 ] === babelPresetEnv ) {
-				return [ babelPresetEnv, Object.assign(
-					{},
-					preset[ 1 ],
-					{ modules: 'commonjs' }
-				) ];
-			}
-			return preset;
-		} ),
-	},
-	module: {
-		...babelDefaultConfig,
-		babelrc: false,
-		plugins,
-	},
+	main: Object.assign(
+		{},
+		babelDefaultConfig,
+		{
+			babelrc: false,
+			plugins,
+			presets: map( babelDefaultConfig.presets, ( preset ) => {
+				if ( isArray( preset ) && preset[ 0 ] === babelPresetEnv ) {
+					return [ babelPresetEnv, Object.assign(
+						{},
+						preset[ 1 ],
+						{ modules: 'commonjs' }
+					) ];
+				}
+				return preset;
+			} ),
+		}
+	),
+	module: Object.assign(
+		{},
+		babelDefaultConfig,
+		{
+			babelrc: false,
+			plugins,
+		}
+	),
 };
 
 function getBabelConfig( environment ) {
