@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import createSelector from 'rememo';
 import { includes, difference, keys } from 'lodash';
 
 /**
@@ -21,17 +22,23 @@ import { includes, difference, keys } from 'lodash';
  *
  * @return {?NUX.GuideInfo} Information about the associated guide.
  */
-export function getAssociatedGuide( state, tipId ) {
-	for ( const tipIds of state.guides ) {
-		if ( includes( tipIds, tipId ) ) {
-			const nonDismissedTips = difference( tipIds, keys( state.preferences.dismissedTips ) );
-			const [ currentTipId = null, nextTipId = null ] = nonDismissedTips;
-			return { tipIds, currentTipId, nextTipId };
+export const getAssociatedGuide = createSelector(
+	( state, tipId ) => {
+		for ( const tipIds of state.guides ) {
+			if ( includes( tipIds, tipId ) ) {
+				const nonDismissedTips = difference( tipIds, keys( state.preferences.dismissedTips ) );
+				const [ currentTipId = null, nextTipId = null ] = nonDismissedTips;
+				return { tipIds, currentTipId, nextTipId };
+			}
 		}
-	}
 
-	return null;
-}
+		return null;
+	},
+	( state ) => [
+		state.guides,
+		state.preferences.dismissedTips,
+	],
+);
 
 /**
  * Determines whether or not the given tip is showing. Tips are hidden if they
