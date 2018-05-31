@@ -50,20 +50,20 @@ export class DotTip extends Component {
 				noArrow
 				focusOnMount
 				role="dialog"
-				aria-label={ __( 'New user tip' ) }
+				aria-label={ __( 'Gutenberg tips' ) }
 				onClose={ onDismiss }
 				onClick={ ( event ) => event.stopPropagation() }
 			>
 				<IconButton
 					className="nux-dot-tip__disable"
 					icon="no-alt"
-					label={ __( 'Disable guide' ) }
+					label={ __( 'Disable tips' ) }
 					onClick={ onDisable }
 				/>
 				<p>{ children }</p>
 				<p>
 					<Button isLink onClick={ onDismiss }>
-						{ hasNextTip ? __( 'See next' ) : __( 'Got it' ) }
+						{ hasNextTip ? __( 'See next tip' ) : __( 'Got it' ) }
 					</Button>
 				</p>
 			</Popover>

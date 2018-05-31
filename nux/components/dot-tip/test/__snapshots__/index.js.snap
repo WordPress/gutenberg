@@ -2,7 +2,7 @@
 
 exports[`DotTip should render correctly 1`] = `
 <Popover
-  aria-label="New user tip"
+  aria-label="Gutenberg tips"
   className="nux-dot-tip"
   focusOnMount={true}
   noArrow={true}
@@ -13,7 +13,7 @@ exports[`DotTip should render correctly 1`] = `
   <IconButton
     className="nux-dot-tip__disable"
     icon="no-alt"
-    label="Disable guide"
+    label="Disable tips"
   />
   <p>
     It looks like you’re writing a letter. Would you like help?
