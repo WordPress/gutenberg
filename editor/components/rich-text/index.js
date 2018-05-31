@@ -684,6 +684,9 @@ export class RichText extends Component {
 			// Otherwise, position the Link UI below the cursor or text selection
 			rect = getRectangleFromRange( this.editor.selection.getRng() );
 		}
+		if ( ! rect ) {
+			return;
+		}
 		const focusPosition = this.getFocusPosition( rect );
 
 		this.setState( { formats, focusPosition, selectedNodeId: this.state.selectedNodeId + 1 } );
