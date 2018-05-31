@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { defer, partial } from 'lodash';
+import { defer } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -83,8 +83,12 @@ export default compose(
 	withDispatch( ( dispatch, { id } ) => {
 		const { dismissTip, disableTips } = dispatch( 'core/nux' );
 		return {
-			onDismiss: partial( dismissTip, id ),
-			onDisable: disableTips,
+			onDismiss() {
+				dismissTip( id );
+			},
+			onDisable() {
+				disableTips();
+			},
 		};
 	} ),
 )( DotTip );
