@@ -866,11 +866,12 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  */
 export function saving( state = {}, action ) {
 	switch ( action.type ) {
-		case 'REQUEST_POST_UPDATE':
+		case 'REQUEST_POST_UPDATE_START':
 			return {
 				requesting: true,
 				successful: false,
 				error: null,
+				isAutosave: action.isAutosave,
 			};
 
 		case 'REQUEST_POST_UPDATE_SUCCESS':
@@ -1056,6 +1057,30 @@ export const blockListSettings = ( state = {}, action ) => {
 	return state;
 };
 
+/**
+ * Reducer returning the most recent autosave.
+ *
+ * @param  {Object} state  The autosave object.
+ * @param  {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function autosave( state = null, action ) {
+	switch ( action.type ) {
+		case 'RESET_AUTOSAVE':
+			const { post } = action;
+			const [ title, excerpt, content ] = [
+				'title',
+				'excerpt',
+				'content',
+			].map( ( field ) => getPostRawValue( post[ field ] ) );
+
+			return { title, excerpt, content };
+	}
+
+	return state;
+}
+
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -1070,5 +1095,6 @@ export default optimist( combineReducers( {
 	notices,
 	sharedBlocks,
 	template,
+	autosave,
 	settings,
 } ) );

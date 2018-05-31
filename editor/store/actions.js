@@ -43,6 +43,21 @@ export function resetPost( post ) {
 }
 
 /**
+ * Returns an action object used in signalling that the latest autosave of the
+ * post has been received, by initialization or autosave.
+ *
+ * @param {Object} post Autosave post object.
+ *
+ * @return {Object} Action object.
+ */
+export function resetAutosave( post ) {
+	return {
+		type: 'RESET_AUTOSAVE',
+		post,
+	};
+}
+
+/**
  * Returns an action object used to setup the editor state when first opening an editor.
  *
  * @param {Object}  post            Post object.
@@ -351,9 +366,18 @@ export function editPost( edits ) {
 	};
 }
 
-export function savePost() {
+/**
+ * Returns an action object to save the post.
+ *
+ * @param {Object}  options          Options for the save.
+ * @param {boolean} options.autosave Perform an autosave if true.
+ *
+ * @return {Object} Action object.
+ */
+export function savePost( options ) {
 	return {
 		type: 'REQUEST_POST_UPDATE',
+		options,
 	};
 }
 
@@ -392,9 +416,7 @@ export function mergeBlocks( blockAUid, blockBUid ) {
  * @return {Object} Action object.
  */
 export function autosave() {
-	return {
-		type: 'AUTOSAVE',
-	};
+	return savePost( { autosave: true } );
 }
 
 /**

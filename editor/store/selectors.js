@@ -273,6 +273,11 @@ export function isCurrentPostScheduled( state ) {
 export function isEditedPostPublishable( state ) {
 	const post = getCurrentPost( state );
 
+	// TODO: Post being publishable should be superset of condition of post
+	// being saveable. Currently this restriction is imposed at UI.
+	//
+	//  See: <PostPublishButton /> (`isButtonEnabled` assigned by `isSaveable`)
+
 	return isEditedPostDirty( state ) || [ 'publish', 'private', 'future' ].indexOf( post.status ) === -1;
 }
 
@@ -285,9 +290,23 @@ export function isEditedPostPublishable( state ) {
  * @return {boolean} Whether the post can be saved.
  */
 export function isEditedPostSaveable( state ) {
+	if ( isSavingPost( state ) ) {
+		return false;
+	}
+
+	// TODO: Post should not be saveable if not dirty. Cannot be added here at
+	// this time since posts where meta boxes are present can be saved even if
+	// the post is not dirty. Currently this restriction is imposed at UI, but
+	// should be moved here.
+	//
+	//  See: `isEditedPostPublishable` (includes `isEditedPostDirty` condition)
+	//  See: <PostSavedState /> (`forceIsDirty` prop)
+	//  See: <PostPublishButton /> (`forceIsDirty` prop)
+	//  See: https://github.com/WordPress/gutenberg/pull/4184
+
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
-		!! getEditedPostExcerpt( state ) ||
+		!! getEditedPostAttribute( state, 'excerpt' ) ||
 		! isEditedPostEmpty( state )
 	);
 }
@@ -305,6 +324,41 @@ export function isEditedPostEmpty( state ) {
 		! getBlockCount( state ) &&
 		! getEditedPostAttribute( state, 'content' )
 	);
+}
+
+/**
+ * Returns true if the post can be autosaved, or false otherwise.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether the post can be autosaved.
+ */
+export function isEditedPostAutosaveable( state ) {
+	// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
+	if ( ! isEditedPostSaveable( state ) ) {
+		return false;
+	}
+
+	// If we don't already have an autosave, the post is autosaveable.
+	if ( ! hasAutosave( state ) ) {
+		return true;
+	}
+
+	// If the title, excerpt or content has changed, the post is autosaveable.
+	return [ 'title', 'excerpt', 'content' ].some( ( field ) => (
+		state.autosave[ field ] !== getEditedPostAttribute( state, field )
+	) );
+}
+
+/**
+ * Returns the true if there is an existing autosave, otherwise false.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether there is an existing autosave.
+ */
+export function hasAutosave( state ) {
+	return !! state.autosave;
 }
 
 /**
@@ -348,9 +402,13 @@ export function getDocumentTitle( state ) {
  * @return {string} Raw post excerpt.
  */
 export function getEditedPostExcerpt( state ) {
-	return state.editor.present.edits.excerpt === undefined ?
-		state.currentPost.excerpt :
-		state.editor.present.edits.excerpt;
+	deprecated( 'getEditedPostExcerpt', {
+		version: '3.1',
+		alternative: 'getEditedPostAttribute( state, \'excerpt\' )',
+		plugin: 'Gutenberg',
+	} );
+
+	return getEditedPostAttribute( state, 'excerpt' );
 }
 
 /**
@@ -1117,6 +1175,17 @@ export function didPostSaveRequestSucceed( state ) {
  */
 export function didPostSaveRequestFail( state ) {
 	return !! state.saving.error;
+}
+
+/**
+ * Returns true if the post is autosaving, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the post is autosaving.
+ */
+export function isAutosavingPost( state ) {
+	return isSavingPost( state ) && state.saving.isAutosave;
 }
 
 /**
