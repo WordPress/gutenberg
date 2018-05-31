@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage } from '../support/utils';
+import { newPost, newDesktopBrowserPage, insertBlock } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
@@ -49,12 +49,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Quote block' );
 
 		// Using the regular inserter
-		await page.click( '.edit-post-header [aria-label="Add block"]' );
-		await page.waitForSelector( '.editor-inserter__menu' );
-		await page.keyboard.type( 'code' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
+		await insertBlock( 'code' );
 		await page.keyboard.type( 'Code block' );
 
 		// Unselect blocks to avoid conflicts with the inbetween inserter

@@ -27,6 +27,7 @@ import { speak } from '@wordpress/a11y';
 import { getPostEditUrl, getWPAdminURL } from '../utils/url';
 import {
 	setupEditorState,
+	resetAutosave,
 	resetPost,
 	receiveBlocks,
 	receiveSharedBlocks,
@@ -35,7 +36,6 @@ import {
 	createSuccessNotice,
 	createErrorNotice,
 	removeNotice,
-	savePost,
 	saveSharedBlock,
 	insertBlock,
 	removeBlocks,
@@ -49,9 +49,7 @@ import {
 	getCurrentPostType,
 	getEditedPostContent,
 	getPostEdits,
-	isCurrentPostPublished,
-	isEditedPostDirty,
-	isEditedPostNew,
+	isEditedPostAutosaveable,
 	isEditedPostSaveable,
 	getBlock,
 	getBlockCount,
@@ -95,6 +93,14 @@ export default {
 	REQUEST_POST_UPDATE( action, store ) {
 		const { dispatch, getState } = store;
 		const state = getState();
+		const isAutosave = action.options && action.options.autosave;
+
+		// Prevent save if not saveable.
+		const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
+		if ( ! isSaveable( state ) ) {
+			return;
+		}
+
 		const post = getCurrentPost( state );
 		const edits = getPostEdits( state );
 		const toSend = {
@@ -102,41 +108,70 @@ export default {
 			content: getEditedPostContent( state ),
 			id: post.id,
 		};
+		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
 
 		dispatch( {
-			type: 'UPDATE_POST',
-			edits: toSend,
+			type: 'REQUEST_POST_UPDATE_START',
 			optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
+			isAutosave,
 		} );
-		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		const basePath = wp.api.getPostTypeRoute( getCurrentPostType( state ) );
-		wp.apiRequest( { path: `/wp/v2/${ basePath }/${ post.id }`, method: 'PUT', data: toSend } ).then(
+
+		let request;
+		if ( isAutosave ) {
+			toSend.parent = post.id;
+
+			request = wp.apiRequest( {
+				path: `/wp/v2/${ basePath }/${ post.id }/autosaves`,
+				method: 'POST',
+				data: toSend,
+			} );
+		} else {
+			dispatch( {
+				type: 'UPDATE_POST',
+				edits: toSend,
+				optimist: { id: POST_UPDATE_TRANSACTION_ID },
+			} );
+
+			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
+
+			request = wp.apiRequest( {
+				path: `/wp/v2/${ basePath }/${ post.id }`,
+				method: 'PUT',
+				data: toSend,
+			} );
+		}
+
+		request.then(
 			( newPost ) => {
-				dispatch( resetPost( newPost ) );
+				const reset = isAutosave ? resetAutosave : resetPost;
+				dispatch( reset( newPost ) );
+
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_SUCCESS',
 					previousPost: post,
 					post: newPost,
-					edits: toSend,
 					optimist: { type: COMMIT, id: POST_UPDATE_TRANSACTION_ID },
+					isAutosave,
 				} );
 			},
-			( err ) => {
+			( error ) => {
+				error = get( error, [ 'responseJSON' ], {
+					code: 'unknown_error',
+					message: __( 'An unknown error occurred.' ),
+				} );
+
 				dispatch( {
 					type: 'REQUEST_POST_UPDATE_FAILURE',
-					error: get( err, [ 'responseJSON' ], {
-						code: 'unknown_error',
-						message: __( 'An unknown error occurred.' ),
-					} ),
+					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
 					post,
 					edits,
-					optimist: { type: REVERT, id: POST_UPDATE_TRANSACTION_ID },
+					error,
 				} );
-			}
+			},
 		);
 	},
 	REQUEST_POST_UPDATE_SUCCESS( action, store ) {
-		const { previousPost, post } = action;
+		const { previousPost, post, isAutosave } = action;
 		const { dispatch } = store;
 
 		const publishStatus = [ 'publish', 'private', 'future' ];
@@ -145,8 +180,9 @@ export default {
 
 		let noticeMessage;
 		let shouldShowLink = true;
-		if ( ! isPublished && ! willPublish ) {
-			// If saving a non published post, don't show any notice
+
+		if ( isAutosave || ( ! isPublished && ! willPublish ) ) {
+			// If autosaving or saving a non-published post, don't show notice.
 			noticeMessage = null;
 		} else if ( isPublished && ! willPublish ) {
 			// If undoing publish status, show specific notice
@@ -301,28 +337,6 @@ export default {
 				...blocksWithTheSameType.slice( 1 ),
 			]
 		) );
-	},
-	AUTOSAVE( action, store ) {
-		const { getState, dispatch } = store;
-		const state = getState();
-		if ( ! isEditedPostSaveable( state ) ) {
-			return;
-		}
-
-		if ( ! isEditedPostNew( state ) && ! isEditedPostDirty( state ) ) {
-			return;
-		}
-
-		if ( isCurrentPostPublished( state ) ) {
-			// TODO: Publish autosave.
-			//  - Autosaves are created as revisions for published posts, but
-			//    the necessary REST API behavior does not yet exist
-			//  - May need to check for whether the status of the edited post
-			//    has changed from the saved copy (i.e. published -> pending)
-			return;
-		}
-
-		dispatch( savePost() );
 	},
 	SETUP_EDITOR( action, { getState } ) {
 		const { post } = action;

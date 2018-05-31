@@ -80,7 +80,7 @@
 		@include menu-style__focus;
 	}
 
-	.dashicon {
+	.components-panel__arrow {
 		position: absolute;
 		right: $item-spacing;
 		top: 50%;
@@ -96,6 +96,13 @@
 		margin-top: -10px;
 	}
 	/* rtl:end:ignore */
+}
+
+.components-panel__icon {
+	color: $dark-gray-400;
+	margin-right: 5px;
+	position: relative;
+	top: -2px;
 }
 
 .components-panel__body-toggle-icon {

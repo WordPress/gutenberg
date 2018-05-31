@@ -123,6 +123,9 @@ describe( 'InserterMenu', () => {
 
 		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
 		expect( visibleBlocks ).toHaveLength( 0 );
+
+		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
+		expect( noResultsMessage ).toHaveLength( 1 );
 	} );
 
 	it( 'should show only high utility items in the suggested tab', () => {
@@ -183,6 +186,9 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks ).toHaveLength( 2 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'YouTube' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'A Text Embed' );
+
+		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
+		expect( noResultsMessage ).toBeEmpty();
 	} );
 
 	it( 'should show shared items in the shared tab', () => {
@@ -208,6 +214,9 @@ describe( 'InserterMenu', () => {
 		const visibleBlocks = wrapper.find( '.editor-inserter__item' );
 		expect( visibleBlocks ).toHaveLength( 1 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'My shared block' );
+
+		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
+		expect( noResultsMessage ).toBeEmpty();
 	} );
 
 	it( 'should show the common category blocks', () => {
@@ -235,6 +244,9 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
 		expect( visibleBlocks.at( 2 ).text() ).toBe( 'Some Other Block' );
+
+		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
+		expect( noResultsMessage ).toBeEmpty();
 	} );
 
 	it( 'should disable items with `isDisabled`', () => {
@@ -281,6 +293,9 @@ describe( 'InserterMenu', () => {
 		expect( visibleBlocks ).toHaveLength( 2 );
 		expect( visibleBlocks.at( 0 ).text() ).toBe( 'Text' );
 		expect( visibleBlocks.at( 1 ).text() ).toBe( 'Advanced Text' );
+
+		const noResultsMessage = wrapper.find( '.editor-inserter__no-results' );
+		expect( noResultsMessage ).toBeEmpty();
 	} );
 
 	it( 'should trim whitespace of search terms', () => {

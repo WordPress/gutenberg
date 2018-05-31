@@ -1,15 +1,15 @@
 {
-	"name": "@wordpress/library-export-default-webpack-plugin",
+	"name": "@wordpress/data",
 	"version": "1.0.0-alpha.0",
-	"description": "Webpack plugin for exporting default property for selected libraries",
+	"description": "Data module for WordPress",
 	"author": "WordPress",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"webpack",
-		"webpack-plugin"
+		"data",
+		"redux"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/library-export-default-webpack-plugin/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/data/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git"
@@ -19,15 +19,16 @@
 	},
 	"main": "src/index.js",
 	"dependencies": {
+		"@wordpress/deprecated": "^1.0.0-alpha.0",
+		"@wordpress/element": "^1.0.0-alpha.0",
+		"@wordpress/is-shallow-equal": "1.0.2",
+		"equivalent-key-map": "0.2.0",
 		"lodash": "4.17.5",
-		"webpack-sources": "1.1.0"
+		"redux": "3.7.2"
 	},
 	"devDependencies": {
-		"rimraf": "2.6.2",
-		"webpack": "4.8.3"
-	},
-	"peerDependencies": {
-		"webpack": "^4.0.0"
+		"deep-freeze": "0.0.1",
+		"enzyme": "3.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

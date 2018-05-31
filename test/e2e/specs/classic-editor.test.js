@@ -18,7 +18,7 @@ describe( 'classic editor', () => {
 		// type some random text
 		await page.keyboard.type( 'Typing in classic editor' );
 
-		// Swtich to HTML mode
+		// Switch to HTML mode
 		await page.click( '#content-html' );
 
 		const textEditorContent = await page.$eval( '.wp-editor-area', ( element ) => element.value );

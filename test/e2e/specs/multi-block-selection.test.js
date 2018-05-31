@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import '../support/bootstrap';
-import { newPost, newDesktopBrowserPage, pressWithModifier } from '../support/utils';
+import { newPost, newDesktopBrowserPage, pressWithModifier, insertBlock } from '../support/utils';
 
 describe( 'Multi-block selection', () => {
 	beforeAll( async () => {
@@ -19,16 +19,8 @@ describe( 'Multi-block selection', () => {
 		// Creating test blocks
 		await page.click( '.editor-default-block-appender' );
 		await page.keyboard.type( 'First Paragraph' );
-		await page.click( '.edit-post-header [aria-label="Add block"]' );
-		await page.keyboard.type( 'Image' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
-		await page.click( '.edit-post-header [aria-label="Add block"]' );
-		await page.keyboard.type( 'Quote' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Enter' );
+		await insertBlock( 'Image' );
+		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'Quote Block' );
 
 		const blocks = [ firstBlockSelector, secondBlockSelector, thirdBlockSelector ];

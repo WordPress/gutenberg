@@ -249,7 +249,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-blocks',
 			'wp-components',
 			'wp-core-data',
-			'wp-deprecated',
 			'wp-element',
 			'wp-editor',
 			'wp-i18n',
@@ -1069,6 +1068,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
 		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
 		'isRTL'               => is_rtl(),
+		'autosaveInterval'    => 10,
 	);
 
 	if ( ! empty( $color_palette ) ) {
