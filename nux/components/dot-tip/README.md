@@ -21,7 +21,7 @@ The component accepts the following props:
 
 ### id
 
-An identifier that uniquely identifies the tip.
+A string that uniquely identifies the tip. Identifiers should be prefixed with the name of the plugin, followed by a `/`. For example, `acme/add-to-cart`.
 
 - Type: `string`
 - Required: Yes
