@@ -1,0 +1,36 @@
+{
+	"name": "@wordpress/data",
+	"version": "0.0.1",
+	"description": "Data module for WordPress",
+	"author": "WordPress",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"data",
+		"redux"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/data/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "src/index.js",
+	"dependencies": {
+		"@wordpress/deprecated": "0.0.1",
+		"@wordpress/element": "0.0.1",
+		"@wordpress/is-shallow-equal": "1.0.2",
+		"equivalent-key-map": "0.2.0",
+		"lodash": "4.17.5",
+		"redux": "3.7.2"
+	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1",
+		"enzyme": "3.3.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

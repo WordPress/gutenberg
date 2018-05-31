@@ -60,7 +60,7 @@ class PostPublishPanel extends Component {
 	}
 
 	render() {
-		const { isScheduled, onClose, forceIsDirty, forceIsSaving, renderPrePublishExtension, renderPostPublishExtension } = this.props;
+		const { isScheduled, onClose, forceIsDirty, forceIsSaving, PrePublishExtension, PostPublishExtension } = this.props;
 		const { loading, submitted } = this.state;
 		return (
 			<div className="editor-post-publish-panel">
@@ -84,13 +84,13 @@ class PostPublishPanel extends Component {
 				<div className="editor-post-publish-panel__content">
 					{ ! loading && ! submitted && (
 						<PostPublishPanelPrepublish>
-							{ renderPrePublishExtension() }
+							{ PrePublishExtension && <PrePublishExtension /> }
 						</PostPublishPanelPrepublish>
 					) }
 					{ loading && ! submitted && <Spinner /> }
 					{ submitted && (
 						<PostPublishPanelPostpublish>
-							{ renderPostPublishExtension() }
+							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishPanelPostpublish>
 					) }
 				</div>

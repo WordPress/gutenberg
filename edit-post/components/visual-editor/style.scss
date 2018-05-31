@@ -67,33 +67,30 @@
 }
 
 // The base width of the title should match that of blocks even if it isn't a block
-.edit-post-visual-editor .editor-post-title {
+.editor-post-title {
+	@include break-small() {
+		padding-left: $block-side-ui-padding;
+		padding-right: $block-side-ui-padding;
+	}
+}
+.edit-post-visual-editor .editor-post-title__block {
 	margin-left: auto;
 	margin-right: auto;
 	max-width: $content-width;
 
+	// stack borders
+	> div {
+		margin-left: -1px;
+		margin-right: -1px;
+	}
+
+	// include space for side UI on desktops
 	@include break-small() {
 		> div {
-			margin-left: -$block-side-ui-padding;
-			margin-right: -$block-side-ui-padding;
+			margin-left: -$block-side-ui-padding - 1px;
+			margin-right: -$block-side-ui-padding - 1px;
 		}
 	}
-
-
-	/*.editor-post-permalink {
-		left: $block-padding;
-		right: $block-padding;
-		color: $dark-gray-900;
-	}
-
-	@include break-small() {
-		padding: 5px #{ $block-side-ui-padding - 1px };	// subtract 1px border, because this is an outline
-
-		.editor-post-permalink {
-			left: $block-side-ui-padding;
-			right: $block-side-ui-padding;
-		}
-	}*/
 }
 
 // This is a focus style shown for blocks that need an indicator even when in an isEditing state

@@ -272,6 +272,7 @@ Block_Name_Part
   = $( [a-z][a-z0-9_-]* )
 
 Block_Attributes
+  "JSON-encoded attributes embedded in a block's opening comment"
   = attrs:$("{" (!("}" __ """/"? "-->") .)* "}")
   {
     /** <?php return json_decode( $attrs, true ); ?> **/

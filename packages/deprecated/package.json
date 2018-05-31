@@ -1,0 +1,23 @@
+{
+	"name": "@wordpress/deprecated",
+	"version": "0.0.1",
+	"description": "Deprecation utility for WordPress",
+	"author": "WordPress",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"deprecated"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/deprecated/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "src/index.js",
+	"publishConfig": {
+		"access": "public"
+	}
+}

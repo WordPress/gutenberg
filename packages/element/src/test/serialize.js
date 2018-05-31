@@ -6,7 +6,12 @@ import { noop } from 'lodash';
 /**
  * Internal dependencies
  */
-import { Component, Fragment, RawHTML } from '../';
+import {
+	Component,
+	createElement,
+	Fragment,
+	RawHTML,
+} from '../';
 import serialize, {
 	hasPrefix,
 	renderElement,

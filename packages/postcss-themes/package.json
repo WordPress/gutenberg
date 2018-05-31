@@ -5,6 +5,7 @@
 	"author": "WordPress",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
+		"wordpress",
 		"postcss",
 		"css",
 		"postcss-plugin",

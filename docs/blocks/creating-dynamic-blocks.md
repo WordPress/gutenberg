@@ -116,3 +116,69 @@ There are a few things to notice:
 * The edit function still shows a representation of the block in the editor's context (this could be very different from the rendered version, it's up to the block's author)
 * The save function just returns null because the rendering is performed server-side.
 * The server-side rendering is a function taking the block attributes as an argument and returning the markup (quite similar to shortcodes)
+
+## Live rendering in Gutenberg editor
+
+Gutenberg 2.8 added the [`<ServerSideRender>`](https://github.com/WordPress/gutenberg/tree/master/components/server-side-render) block which enables all the rendering to take place on the server using PHP rather than in JavaScript. Server-side render is meant as a fallback; client-side rendering in JavaScript is the preferred implementation. 
+
+{% codetabs %}
+{% ES5 %}
+```js
+// myblock.js
+
+var el = wp.element.createElement,
+	registerBlockType = wp.blocks.registerBlockType,
+	ServerSideRender = wp.components.ServerSideRender;
+
+registerBlockType( 'my-plugin/latest-post', {
+	title: 'Latest Post',
+	icon: 'megaphone',
+	category: 'widgets',
+
+	edit: function( props ) {
+		// ensure the block attributes matches this plugin's name
+		return (
+			el(ServerSideRender, {
+				block: "my-plugin/latest-post",
+				attributes:  props.attributes
+			})
+		);
+	},
+
+	save: function() {
+		// Rendering in PHP
+		return null;
+	},
+} );
+```
+{% ESNext %}
+```js
+// myblock.js
+
+const { registerBlockType } = wp.blocks;
+const { ServerSideRender } = wp.components;
+
+registerBlockType( 'my-plugin/latest-post', {
+	title: 'Latest Post',
+	icon: 'megaphone',
+	category: 'widgets',
+
+	edit: function( props ) {
+		// ensure the block attributes matches this plugin's name
+		return (
+			<ServerSideRender
+				block="my-plugin/latest-post"
+				attributes={ props.attributes }
+			/>
+		);
+	},
+
+	save() {
+		// Rendering in PHP
+		return null;
+	},
+} );
+```
+{% end %}
+
+The PHP code is the same as above and is automatically handled through the WP REST API.

@@ -1,19 +1,19 @@
 // Link input
-$input-padding: 10px;
+$input-padding: 8px;
 $input-size: 230px;
 
 .editor-block-list__block .editor-url-input,
-.editor-block-toolbar .editor-url-input {
+.components-popover .editor-url-input,
+.editor-url-input {
 	width: 100%;
 	flex-grow: 1;
 	position: relative;
-	width: $input-size;
+	padding: 1px;
 
 	input[type=text] {
 		width: 100%;
 		padding: $input-padding;
 		border: none;
-		margin: 0;
 
 		&::-ms-clear {
 			display: none;
@@ -23,24 +23,17 @@ $input-size: 230px;
 	.spinner {
 		position: absolute;
 		right: 0;
-		top: 10px;
+		top: $input-padding;
 		margin: 0;
 	}
 }
 
 // Suggestions
 .editor-url-input__suggestions {
-	position: absolute;
-	background: $white;
-	box-shadow: $shadow-popover;
-	border: 1px solid $light-gray-500;
 	max-height: 200px;
-	overflow-y: scroll;
 	transition: all .15s ease-in-out;
 	list-style: none;
-	margin: 0 -1px;
 	padding: 4px 0;
-	width: $input-size + $icon-button-size * 2 + 2px; // add borders
 }
 
 // Hide suggestions on mobile until we @todo find a better way to show them
@@ -96,7 +89,23 @@ $input-size: 230px;
 	}
 }
 
-.editor-url-input__button .editor-url-input__suggestions {
-	left: -40px;
-	right: -32px;
+.editor-url-input__button-modal {
+	box-shadow: $shadow-popover;
+	border: 1px solid $light-gray-500;
+	background: $white;
+}
+
+.editor-url-input__button-modal-line {
+	display: flex;
+	flex-direction: row;
+	flex-grow: 1;
+	flex-shrink: 1;
+	min-width: 0;
+	align-items: flex-start;
+
+	.components-button {
+		flex-shrink: 0;
+		width: $icon-button-size;
+		height: $icon-button-size;
+	}
 }

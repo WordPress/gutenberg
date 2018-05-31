@@ -7,7 +7,7 @@ import { castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/element';
+import { compose, createElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,10 +28,6 @@ import {
 	isIterable,
 	toAsyncIterable,
 } from '../';
-
-jest.mock( '@wordpress/utils', () => ( {
-	deprecated: jest.fn(),
-} ) );
 
 // Mock data store to prevent self-initialization, as it needs to be reset
 // between tests of `registerResolvers` by replacement (new `registerStore`).

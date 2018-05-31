@@ -264,6 +264,19 @@ A once-only block can be inserted into each post, one time only. For example, th
 useOnce: true,
 ```
 
+#### parent (optional)
+
+* **Type:** `Array`
+
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/editor/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+
+Setting `parent` lets a block require that it is only available when nested within the specified blocks.
+
+```js
+// Only allow this block when it is nested in a Columns block
+parent: [ 'core/columns' ],
+```
+
 #### supports (optional)
 
 * **Type:** `Object`
