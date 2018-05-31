@@ -159,8 +159,9 @@ export class InserterMenu extends Component {
 
 	render() {
 		const { instanceId, onSelect, rootUID } = this.props;
-		const { childItems, hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
+		const { childItems, filterValue, hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
+		const isSearching = !! filterValue;
 
 		// Disable reason: The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of
@@ -207,7 +208,7 @@ export class InserterMenu extends Component {
 							<PanelBody
 								key={ category.slug }
 								title={ category.title }
-								opened={ isPanelOpen( category.slug ) }
+								opened={ isSearching || isPanelOpen( category.slug ) }
 								onToggle={ this.onTogglePanel( category.slug ) }
 							>
 								<ItemList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
