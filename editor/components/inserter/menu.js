@@ -158,7 +158,7 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect, rootBlockIcon, rootBlockTitle } = this.props;
+		const { instanceId, onSelect, rootUID } = this.props;
 		const { childItems, hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 
@@ -183,8 +183,7 @@ export class InserterMenu extends Component {
 
 				<div className="editor-inserter__results">
 					<ChildBlocks
-						rootBlockIcon={ rootBlockIcon }
-						rootBlockTitle={ rootBlockTitle }
+						rootUID={ rootUID }
 						items={ childItems }
 						onSelect={ onSelect }
 						onHover={ this.onHover }
@@ -245,16 +244,12 @@ export default compose(
 	withSelect( ( select, { rootUID } ) => {
 		const {
 			getChildBlockNames,
-			getBlockType,
 		} = select( 'core/blocks' );
 		const {
 			getBlockName,
 		} = select( 'core/editor' );
 		const rootBlockName = getBlockName( rootUID );
-		const rootBlockType = getBlockType( rootBlockName );
 		return {
-			rootBlockTitle: rootBlockType && rootBlockType.title,
-			rootBlockIcon: rootBlockType && rootBlockType.icon,
 			rootChildBlocks: getChildBlockNames( rootBlockName ),
 		};
 	} ),

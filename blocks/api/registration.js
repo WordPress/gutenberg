@@ -288,6 +288,7 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 export function isSharedBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';
 }
+
 /**
  * Returns an array with the child blocks of a given block.
  *
@@ -295,7 +296,6 @@ export function isSharedBlock( blockOrType ) {
  *
  * @return {Array} Array of child block names.
  */
-
 export const getChildBlockNames = ( blockName ) => {
 	return select( 'core/blocks' ).getChildBlockNames( blockName );
 };

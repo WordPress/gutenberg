@@ -11,7 +11,7 @@ describe( 'selectors', () => {
 			expect( getChildBlockNames( state, 'parent1' ) ).toHaveLength( 0 );
 		} );
 
-		it( 'should return an empty array if no childs exist', () => {
+		it( 'should return an empty array if no children exist', () => {
 			const state = {
 				blockTypes: [
 					{
@@ -103,7 +103,7 @@ describe( 'selectors', () => {
 			expect( getChildBlockNames( state, 'parent1' ) ).toEqual( [ 'child1' ] );
 		} );
 
-		it( 'should return an array with the child block names even if childs have multiple parents', () => {
+		it( 'should return an array with the child block names even if children have multiple parents', () => {
 			const state = {
 				blockTypes: [
 					{

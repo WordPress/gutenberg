@@ -1,4 +1,11 @@
 /**
+ * WordPress dependencies
+ */
+import { compose } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
+import { ifCondition } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import './style.scss';
@@ -6,9 +13,6 @@ import ItemList from './item-list';
 import BlockIcon from '../block-icon';
 
 function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
-	if ( ! items || ! items.length ) {
-		return null;
-	}
 	return (
 		<div className="editor-inserter__child-blocks">
 			{ ( rootBlockIcon || rootBlockTitle ) && (
@@ -26,4 +30,20 @@ function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
 	);
 }
 
-export default ChildBlocks;
+export default compose(
+	ifCondition( ( { items } ) => items && items.length > 0 ),
+	withSelect( ( select, { rootUID } ) => {
+		const {
+			getBlockType,
+		} = select( 'core/blocks' );
+		const {
+			getBlockName,
+		} = select( 'core/editor' );
+		const rootBlockName = getBlockName( rootUID );
+		const rootBlockType = getBlockType( rootBlockName );
+		return {
+			rootBlockTitle: rootBlockType && rootBlockType.title,
+			rootBlockIcon: rootBlockType && rootBlockType.icon,
+		};
+	} ),
+)( ChildBlocks );

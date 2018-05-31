@@ -79,7 +79,7 @@ class ItemList extends Component {
 									'editor-inserter__item',
 									getBlockMenuDefaultClassName( item.id ),
 									{
-										'editor-inserter__item-with-childs': item.hasChildBlocks,
+										'editor-inserter__item-has-children': item.hasChildBlocks,
 									}
 								)
 							}
