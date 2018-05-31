@@ -118,12 +118,10 @@
 		}
 	},
 	"scripts": {
-		"prebuild": "check-node-version --package",
 		"build": "cross-env NODE_ENV=production webpack",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
-		"predev": "check-node-version --package",
 		"dev": "cross-env webpack --watch",
 		"test": "npm run lint && npm run test-unit",
 		"test-php": "npm run lint-php && npm run test-unit-php",
