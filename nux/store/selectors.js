@@ -4,16 +4,20 @@
 import { includes, difference, keys } from 'lodash';
 
 /**
- * Returns an object describing the guide, if any, that the given tip is a part
- * of.
- *
- * @param {Object} state Global application state.
- * @param {string} tipId The tip to query.
+ * An object containing information about a guide.
  *
  * @typedef {Object} NUX.GuideInfo
  * @property {string[]} tipIds       Which tips the guide contains.
  * @property {?string}  currentTipId The guide's currently showing tip.
  * @property {?string}  nextTipId    The guide's next tip to show.
+ */
+
+/**
+ * Returns an object describing the guide, if any, that the given tip is a part
+ * of.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} tipId The tip to query.
  *
  * @return {?NUX.GuideInfo} Information about the associated guide.
  */
