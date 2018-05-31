@@ -1538,6 +1538,7 @@ export const getInserterItems = createSelector(
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.sharedBlocks.data,
+		getBlockTypes(),
 	],
 );
 
