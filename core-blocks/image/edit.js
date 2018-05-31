@@ -57,18 +57,12 @@ class ImageEdit extends Component {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
-		this.onFocusCaption = this.onFocusCaption.bind( this );
-		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSetHref = this.onSetHref.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.updateWidth = this.updateWidth.bind( this );
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
-
-		this.state = {
-			captionFocused: false,
-		};
 	}
 
 	componentDidMount() {
@@ -101,14 +95,6 @@ class ImageEdit extends Component {
 		}
 	}
 
-	componentWillReceiveProps( { isSelected } ) {
-		if ( ! isSelected && this.props.isSelected && this.state.captionFocused ) {
-			this.setState( {
-				captionFocused: false,
-			} );
-		}
-	}
-
 	onSelectImage( media ) {
 		if ( ! media ) {
 			this.props.setAttributes( {
@@ -128,22 +114,6 @@ class ImageEdit extends Component {
 
 	onSetHref( value ) {
 		this.props.setAttributes( { href: value } );
-	}
-
-	onFocusCaption() {
-		if ( ! this.state.captionFocused ) {
-			this.setState( {
-				captionFocused: true,
-			} );
-		}
-	}
-
-	onImageClick() {
-		if ( this.state.captionFocused ) {
-			this.setState( {
-				captionFocused: false,
-			} );
-		}
 	}
 
 	updateAlt( newAlt ) {
@@ -334,7 +304,7 @@ class ImageEdit extends Component {
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							const img = <img src={ url } alt={ alt } />;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
@@ -395,9 +365,7 @@ class ImageEdit extends Component {
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption || [] }
-							onFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
-							isSelected={ this.state.captionFocused }
 							inlineToolbar
 						/>
 					) : null }

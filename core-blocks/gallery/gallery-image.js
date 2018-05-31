@@ -22,42 +22,12 @@ class GalleryImage extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onImageClick = this.onImageClick.bind( this );
-		this.onSelectCaption = this.onSelectCaption.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
-
-		this.state = {
-			captionSelected: false,
-		};
 	}
 
 	bindContainer( ref ) {
 		this.container = ref;
-	}
-
-	onSelectCaption() {
-		if ( ! this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: true,
-			} );
-		}
-
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
-		}
-	}
-
-	onImageClick() {
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
-		}
-
-		if ( this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: false,
-			} );
-		}
 	}
 
 	onKeyDown( event ) {
@@ -71,19 +41,11 @@ class GalleryImage extends Component {
 		}
 	}
 
-	componentWillReceiveProps( { isSelected, image, url } ) {
+	componentWillReceiveProps( { image, url } ) {
 		if ( image && ! url ) {
 			this.props.setAttributes( {
 				url: image.source_url,
 				alt: image.alt_text,
-			} );
-		}
-
-		// unselect the caption so when the user selects other image and comeback
-		// the caption is not immediately selected
-		if ( this.state.captionSelected && ! isSelected && this.props.isSelected ) {
-			this.setState( {
-				captionSelected: false,
 			} );
 		}
 	}
@@ -105,7 +67,7 @@ class GalleryImage extends Component {
 		// Disable reason: Image itself is not meant to be
 		// interactive, but should direct image selection and unfocus caption fields
 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events
-		const img = url ? <img src={ url } alt={ alt } data-id={ id } onClick={ this.onImageClick } /> : <Spinner />;
+		const img = url ? <img src={ url } alt={ alt } data-id={ id } /> : <Spinner />;
 
 		const className = classnames( {
 			'is-selected': isSelected,
@@ -115,7 +77,13 @@ class GalleryImage extends Component {
 		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 		return (
-			<figure className={ className } tabIndex="-1" onKeyDown={ this.onKeyDown } ref={ this.bindContainer }>
+			<figure
+				className={ className }
+				tabIndex="-1"
+				onFocus={ this.props.onSelect }
+				onKeyDown={ this.onKeyDown }
+				ref={ this.bindContainer }
+			>
 				{ isSelected &&
 					<div className="core-blocks-gallery-item__inline-menu">
 						<IconButton
@@ -132,9 +100,7 @@ class GalleryImage extends Component {
 						tagName="figcaption"
 						placeholder={ __( 'Write caption…' ) }
 						value={ caption }
-						isSelected={ this.state.captionSelected }
 						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-						onFocus={ this.onSelectCaption }
 						inlineToolbar
 					/>
 				) : null }

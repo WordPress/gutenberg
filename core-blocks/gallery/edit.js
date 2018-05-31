@@ -154,7 +154,6 @@ class GalleryEdit extends Component {
 		if ( ! nextProps.isSelected && this.props.isSelected ) {
 			this.setState( {
 				selectedImage: null,
-				captionSelected: false,
 			} );
 		}
 	}
