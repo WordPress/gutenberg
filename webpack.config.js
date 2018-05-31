@@ -146,6 +146,7 @@ const entryPointNames = [
 	'plugins',
 	'edit-post',
 	'core-blocks',
+	'nux',
 ];
 
 const gutenbergPackages = [

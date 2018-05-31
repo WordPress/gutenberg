@@ -68,6 +68,11 @@ export async function visitAdmin( adminPath, query ) {
 
 export async function newPost( postType ) {
 	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
+
+	// Disable new user tips so that their UI doesn't get in the way
+	await page.evaluate( () => {
+		wp.data.dispatch( 'core/nux' ).disableTips();
+	} );
 }
 
 export async function newDesktopBrowserPage() {

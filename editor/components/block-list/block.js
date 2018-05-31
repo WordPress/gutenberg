@@ -28,6 +28,7 @@ import { withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -414,6 +415,7 @@ export class BlockListBlock extends Component {
 			isEmptyDefaultBlock,
 			isPreviousBlockADefaultEmptyBlock,
 			hasSelectedInnerBlock,
+			hasTip,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -426,7 +428,7 @@ export class BlockListBlock extends Component {
 		// If the block is selected and we're typing the block should not appear.
 		// Empty paragraph blocks should always show up as unselected.
 		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
-		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
+		const showSideInserter = ( isSelected || isHovered || hasTip ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! showSideInserter && ( isSelected || hasSelectedInnerBlock ) && ! isTypingWithinBlock;
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
@@ -595,7 +597,11 @@ export class BlockListBlock extends Component {
 							<Inserter
 								position="top right"
 								onToggle={ this.selectOnOpen }
-							/>
+							>
+								<DotTip id="core/editor.inserter">
+									{ __( 'Welcome to the wonderful world of blocks! Click ‘Add block’ to insert different kinds of content—text, images, quotes, video, lists, and much more.' ) }
+								</DotTip>
+							</Inserter>
 						</div>
 					</Fragment>
 				) }
@@ -623,6 +629,9 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		getEditorSettings,
 		hasSelectedInnerBlock,
 	} = select( 'core/editor' );
+
+	const { isTipVisible } = select( 'core/nux' );
+
 	const isSelected = isBlockSelected( uid );
 	const isParentOfSelectedBlock = hasSelectedInnerBlock( uid );
 	const { templateLock, hasFixedToolbar } = getEditorSettings();
@@ -651,6 +660,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		block,
 		isSelected,
 		hasFixedToolbar,
+		hasTip: isTipVisible( 'core/editor.inserter' ),
 	};
 } );
 
