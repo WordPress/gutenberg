@@ -111,6 +111,7 @@ export class RichText extends Component {
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
+		this.onFocus = this.onFocus.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onNewBlock = this.onNewBlock.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
@@ -185,6 +186,7 @@ export class RichText extends Component {
 		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
 		editor.on( 'PastePreProcess', this.onPastePreProcess, true /* Add before core handlers */ );
 		editor.on( 'paste', this.onPaste, true /* Add before core handlers */ );
+		editor.on( 'focus', this.onFocus );
 		editor.on( 'input', this.onChange );
 		// The change event in TinyMCE fires every time an undo level is added.
 		editor.on( 'change', this.onCreateUndoLevel );
@@ -396,6 +398,30 @@ export class RichText extends Component {
 			} else {
 				this.splitContent( content, { paste: true } );
 			}
+		}
+	}
+
+	/**
+	 * Handles a focus event on the contenteditable field, calling the
+	 * `unstableOnFocus` prop callback if one is defined. The callback does not
+	 * receive any arguments.
+	 *
+	 * This is marked as a private API and the `unstableOnFocus` prop is not
+	 * documented, as the current requirements where it is used are subject to
+	 * future refactoring following `isSelected` handling.
+	 *
+	 * In contrast with `setFocusedElement`, this is only triggered in response
+	 * to focus within the contenteditable field, whereas `setFocusedElement`
+	 * is triggered on focus within any `RichText` descendent element.
+	 *
+	 * @see setFocusedElement
+	 *
+	 * @private
+	 */
+	onFocus() {
+		const { unstableOnFocus } = this.props;
+		if ( unstableOnFocus ) {
+			unstableOnFocus();
 		}
 	}
 

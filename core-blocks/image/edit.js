@@ -395,7 +395,7 @@ class ImageEdit extends Component {
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }
 							value={ caption || [] }
-							onFocus={ this.onFocusCaption }
+							unstableOnFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							isSelected={ this.state.captionFocused }
 							inlineToolbar
