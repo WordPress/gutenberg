@@ -50,7 +50,6 @@ export class DotTip extends Component {
 				noArrow
 				focusOnMount
 				role="dialog"
-				aria-modal="true"
 				aria-label={ __( 'New user tip' ) }
 				onClose={ onDismiss }
 				onClick={ ( event ) => event.stopPropagation() }

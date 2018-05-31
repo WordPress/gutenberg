@@ -3,7 +3,6 @@
 exports[`DotTip should render correctly 1`] = `
 <Popover
   aria-label="New user tip"
-  aria-modal="true"
   className="nux-dot-tip"
   focusOnMount={true}
   noArrow={true}
