@@ -8,21 +8,21 @@ import { includes, difference, keys } from 'lodash';
  * of.
  *
  * @param {Object} state Global application state.
- * @param {string} tipID The tip to query.
+ * @param {string} tipId The tip to query.
  *
  * @typedef {Object} NUX.GuideInfo
- * @property {string[]} tipIDs       Which tips the guide contains.
- * @property {?string}  currentTipID The guide's currently showing tip.
- * @property {?string}  nextTipID    The guide's next tip to show.
+ * @property {string[]} tipIds       Which tips the guide contains.
+ * @property {?string}  currentTipId The guide's currently showing tip.
+ * @property {?string}  nextTipId    The guide's next tip to show.
  *
  * @return {?NUX.GuideInfo} Information about the associated guide.
  */
-export function getAssociatedGuide( state, tipID ) {
-	for ( const tipIDs of state.guides ) {
-		if ( includes( tipIDs, tipID ) ) {
-			const nonDismissedTips = difference( tipIDs, keys( state.preferences.dismissedTips ) );
-			const [ currentTipID = null, nextTipID = null ] = nonDismissedTips;
-			return { tipIDs, currentTipID, nextTipID };
+export function getAssociatedGuide( state, tipId ) {
+	for ( const tipIds of state.guides ) {
+		if ( includes( tipIds, tipId ) ) {
+			const nonDismissedTips = difference( tipIds, keys( state.preferences.dismissedTips ) );
+			const [ currentTipId = null, nextTipId = null ] = nonDismissedTips;
+			return { tipIds, currentTipId, nextTipId };
 		}
 	}
 
@@ -49,7 +49,7 @@ export function isTipVisible( state, id ) {
 	}
 
 	const associatedGuide = getAssociatedGuide( state, id );
-	if ( associatedGuide && associatedGuide.currentTipID !== id ) {
+	if ( associatedGuide && associatedGuide.currentTipId !== id ) {
 		return false;
 	}
 

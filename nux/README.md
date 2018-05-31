@@ -78,7 +78,7 @@ dispatch( 'core/nux' ).triggerGuide( [ 'acme/product-info', 'acme/add-to-cart', 
 
 ```jsx
 const guide = select( 'core/nux' ).getAssociatedGuide( 'acme/add-to-cart' );
-console.log( 'Tips in this guide:', guide.tipIDs );
-console.log( 'Currently showing:', guide.currentTipID );
-console.log( 'Next to show:', guide.nextTipID );
+console.log( 'Tips in this guide:', guide.tipIds );
+console.log( 'Currently showing:', guide.currentTipId );
+console.log( 'Next to show:', guide.nextTipId );
 ```

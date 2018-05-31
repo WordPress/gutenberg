@@ -8,7 +8,7 @@ export function guides( state = [], action ) {
 		case 'TRIGGER_GUIDE':
 			return [
 				...state,
-				action.tipIDs,
+				action.tipIds,
 			];
 	}
 

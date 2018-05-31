@@ -77,7 +77,7 @@ export default compose(
 		const associatedGuide = getAssociatedGuide( id );
 		return {
 			isVisible: isTipVisible( id ),
-			hasNextTip: !! ( associatedGuide && associatedGuide.nextTipID ),
+			hasNextTip: !! ( associatedGuide && associatedGuide.nextTipId ),
 		};
 	} ),
 	withDispatch( ( dispatch, { id } ) => {

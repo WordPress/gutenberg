@@ -2,14 +2,14 @@
  * Returns an action object that, when dispatched, presents a guide that takes
  * the user through a series of tips step by step.
  *
- * @param {string[]} tipIDs Which tips to show in the guide.
+ * @param {string[]} tipIds Which tips to show in the guide.
  *
  * @return {Object} Action object.
  */
-export function triggerGuide( tipIDs ) {
+export function triggerGuide( tipIds ) {
 	return {
 		type: 'TRIGGER_GUIDE',
-		tipIDs,
+		tipIds,
 	};
 }
 

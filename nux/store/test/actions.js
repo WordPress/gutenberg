@@ -8,7 +8,7 @@ describe( 'actions', () => {
 		it( 'should return a TRIGGER_GUIDE action', () => {
 			expect( triggerGuide( [ 'test/tip-1', 'test/tip-2' ] ) ).toEqual( {
 				type: 'TRIGGER_GUIDE',
-				tipIDs: [ 'test/tip-1', 'test/tip-2' ],
+				tipIds: [ 'test/tip-1', 'test/tip-2' ],
 			} );
 		} );
 	} );

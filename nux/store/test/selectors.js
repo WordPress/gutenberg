@@ -29,25 +29,25 @@ describe( 'selectors', () => {
 
 		it( 'should return the associated guide', () => {
 			expect( getAssociatedGuide( state, 'test/tip-2' ) ).toEqual( {
-				tipIDs: [ 'test/tip-1', 'test/tip-2', 'test/tip-3' ],
-				currentTipID: 'test/tip-2',
-				nextTipID: 'test/tip-3',
+				tipIds: [ 'test/tip-1', 'test/tip-2', 'test/tip-3' ],
+				currentTipId: 'test/tip-2',
+				nextTipId: 'test/tip-3',
 			} );
 		} );
 
 		it( 'should indicate when there is no next tip', () => {
 			expect( getAssociatedGuide( state, 'test/tip-b' ) ).toEqual( {
-				tipIDs: [ 'test/tip-a', 'test/tip-b', 'test/tip-c' ],
-				currentTipID: 'test/tip-c',
-				nextTipID: null,
+				tipIds: [ 'test/tip-a', 'test/tip-b', 'test/tip-c' ],
+				currentTipId: 'test/tip-c',
+				nextTipId: null,
 			} );
 		} );
 
 		it( 'should indicate when there is no current or next tip', () => {
 			expect( getAssociatedGuide( state, 'test/tip-β' ) ).toEqual( {
-				tipIDs: [ 'test/tip-α', 'test/tip-β', 'test/tip-γ' ],
-				currentTipID: null,
-				nextTipID: null,
+				tipIds: [ 'test/tip-α', 'test/tip-β', 'test/tip-γ' ],
+				currentTipId: null,
+				nextTipId: null,
 			} );
 		} );
 	} );

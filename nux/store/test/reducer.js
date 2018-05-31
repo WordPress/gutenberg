@@ -12,7 +12,7 @@ describe( 'reducer', () => {
 		it( 'should add a guide when it is triggered', () => {
 			const state = guides( [], {
 				type: 'TRIGGER_GUIDE',
-				tipIDs: [ 'test/tip-1', 'test/tip-2' ],
+				tipIds: [ 'test/tip-1', 'test/tip-2' ],
 			} );
 			expect( state ).toEqual( [
 				[ 'test/tip-1', 'test/tip-2' ],
