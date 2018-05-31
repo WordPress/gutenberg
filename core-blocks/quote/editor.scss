@@ -1,12 +1,13 @@
-.wp-block-quote {
+.editor-block-list__block[data-type="core/image"] .wp-block-quote {
 	margin: 0;
 
 	cite {
 		display: block;
 	}
-}
 
-.wp-block-quote:not(.is-large) {
-	border-left: 4px solid $black;
-	padding-left: 1em;
+	&:not(.is-large) {
+		border-left: 4px solid $black;
+		padding-left: 1em;
+	}
+	
 }
