@@ -19,40 +19,47 @@ class ItemList extends Component {
 		const { items, onSelect, onHover } = this.props;
 
 		return (
-			<div className="editor-inserter__item-list">
+			/*
+			 * Disable reason: The `list` ARIA role is redundant but
+			 * Safari+VoiceOver won't announce the list otherwise.
+			 */
+			/* eslint-disable jsx-a11y/no-redundant-roles */
+			<ul role="list" className="editor-inserter__list">
 				{ items.map( ( item ) => {
 					return (
-						<button
-							key={ item.id }
-							className={
-								classnames(
-									'editor-inserter__item',
-									getBlockMenuDefaultClassName( item.id ),
-									{
-										'editor-inserter__item-has-children': item.hasChildBlocks,
-									}
-								)
-							}
-							onClick={ () => onSelect( item ) }
-							disabled={ item.isDisabled }
-							onMouseEnter={ () => onHover( item ) }
-							onMouseLeave={ () => onHover( null ) }
-							onFocus={ () => onHover( item ) }
-							onBlur={ () => onHover( null ) }
-							aria-label={ item.title } // Fix for IE11 and JAWS 2018.
-						>
-							<span className="editor-inserter__item-icon">
-								<BlockIcon icon={ item.icon } />
-								{ item.hasChildBlocks && <span className="editor-inserter__item-icon-stack" /> }
-							</span>
+						<li className="editor-inserter__list-item" key={ item.id }>
+							<button
+								className={
+									classnames(
+										'editor-inserter__item',
+										getBlockMenuDefaultClassName( item.id ),
+										{
+											'editor-inserter__item-has-children': item.hasChildBlocks,
+										}
+									)
+								}
+								onClick={ () => onSelect( item ) }
+								disabled={ item.isDisabled }
+								onMouseEnter={ () => onHover( item ) }
+								onMouseLeave={ () => onHover( null ) }
+								onFocus={ () => onHover( item ) }
+								onBlur={ () => onHover( null ) }
+								aria-label={ item.title } // Fix for IE11 and JAWS 2018.
+							>
+								<span className="editor-inserter__item-icon">
+									<BlockIcon icon={ item.icon } />
+									{ item.hasChildBlocks && <span className="editor-inserter__item-icon-stack" /> }
+								</span>
 
-							<span className="editor-inserter__item-title">
-								{ item.title }
-							</span>
-						</button>
+								<span className="editor-inserter__item-title">
+									{ item.title }
+								</span>
+							</button>
+						</li>
 					);
 				} ) }
-			</div>
+			</ul>
+			/* eslint-enable jsx-a11y/no-redundant-roles */
 		);
 	}
 }
