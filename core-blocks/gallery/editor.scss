@@ -34,6 +34,16 @@
 		width: calc( 100% - 8px );
 		left: 4px;
 		margin-top: -4px;
+
+		// if this inline toolbar has negative margin, it's hidden by the overflow that we need for scrolling long captions
+		.editor-rich-text__inline-toolbar {
+			top: 0;
+		}
+
+		// make extra space for the inline toolbar
+		figcaption {
+			padding-top: 48px;
+		}
 	}
 
 	.components-form-file-upload,
