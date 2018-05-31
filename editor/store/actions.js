@@ -338,7 +338,7 @@ export function setTemplateValidity( isValid ) {
 }
 
 /**
- * Returns an action object tocheck the template validity.
+ * Returns an action object to check the template validity.
  *
  * @return {Object} Action object.
  */
