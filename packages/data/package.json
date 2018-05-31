@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "0.0.1",
+	"version": "1.0.0-alpha.0",
 	"description": "Data module for WordPress",
 	"author": "WordPress",
 	"license": "GPL-2.0-or-later",
@@ -19,8 +19,8 @@
 	},
 	"main": "src/index.js",
 	"dependencies": {
-		"@wordpress/deprecated": "0.0.1",
-		"@wordpress/element": "0.0.1",
+		"@wordpress/deprecated": "^1.0.0-alpha.0",
+		"@wordpress/element": "^1.0.0-alpha.0",
 		"@wordpress/is-shallow-equal": "1.0.2",
 		"equivalent-key-map": "0.2.0",
 		"lodash": "4.17.5",
