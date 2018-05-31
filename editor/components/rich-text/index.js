@@ -42,6 +42,8 @@ import { pickAriaProps } from './aria';
 import patterns from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { domToFormat, valueToString } from './format';
+import { registerCoreTokens } from './core-tokens';
+import TokenUI from './tokens/ui';
 
 const { BACKSPACE, DELETE, ENTER, rawShortcut } = keycodes;
 
@@ -887,6 +889,12 @@ export class RichText extends Component {
 						{ formatToolbar }
 					</div>
 				) }
+				{ isSelected &&
+					<TokenUI
+						editor={ this.editor }
+						containerRef={ this.containerRef }
+					/>
+				}
 				<Autocomplete onReplace={ this.props.onReplace } completers={ autocompleters }>
 					{ ( { isExpanded, listBoxId, activeId } ) => (
 						<Fragment>
@@ -936,6 +944,8 @@ RichText.defaultProps = {
 	formatters: [],
 	format: 'element',
 };
+
+registerCoreTokens();
 
 const RichTextContainer = compose( [
 	withInstanceId,

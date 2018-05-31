@@ -37,6 +37,7 @@ import './style.scss';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
+import InserterResultsPortal from './results-portal';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -95,6 +96,12 @@ export class InserterMenu extends Component {
 		this.setState( {
 			hoveredItem: item,
 		} );
+
+		if ( item ) {
+			this.props.showInsertionPoint();
+		} else {
+			this.props.hideInsertionPoint();
+		}
 	}
 
 	bindPanel( name ) {
@@ -201,6 +208,8 @@ export class InserterMenu extends Component {
 				/>
 
 				<div className="editor-inserter__results" ref={ this.inserterResults }>
+					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+
 					<ChildBlocks
 						rootUID={ rootUID }
 						items={ childItems }
@@ -275,6 +284,8 @@ export default compose(
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
+		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
+		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
 	} ) ),
 	withSpokenMessages,
 	withInstanceId,
