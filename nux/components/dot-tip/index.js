@@ -52,6 +52,7 @@ export class DotTip extends Component {
 				role="dialog"
 				aria-modal="true"
 				aria-label={ __( 'New user tip' ) }
+				onClose={ onDismiss }
 				onClick={ ( event ) => event.stopPropagation() }
 			>
 				<p>{ children }</p>
