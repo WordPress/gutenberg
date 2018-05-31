@@ -1134,7 +1134,7 @@ describe( 'state', () => {
 				} );
 			} );
 
-			it( 'should ignore updates to non-existant block', () => {
+			it( 'should ignore updates to non-existent block', () => {
 				const original = deepFreeze( editor( undefined, {
 					type: 'RESET_BLOCKS',
 					blocks: [],
