@@ -2968,6 +2968,7 @@ describe( 'selectors', () => {
 				isDisabled: false,
 				utility: 0,
 				frecency: 0,
+				hasChildBlocks: false,
 			} );
 			const sharedBlockItem = items.find( ( item ) => item.id === 'core/block/1' );
 			expect( sharedBlockItem ).toEqual( {
