@@ -79,6 +79,8 @@ $block-inserter-search-height: 38px;
 .editor-inserter__results {
 	flex-grow: 1;
 	overflow: auto;
+	position: relative;
+	z-index: 1; // Necessary for the stacked card below parent blocks to show up.
 
 	@include break-medium {
 		height: $block-inserter-content-height + $block-inserter-tabs-height;
@@ -113,15 +115,15 @@ $block-inserter-search-height: 38px;
 	transition: all 0.05s ease-in-out;
 
 	&:disabled {
-		@include button-style__disabled();
+		@include block-style__disabled();
 	}
 
 	&:not(:disabled) {
 		&:hover {
 			.editor-inserter__item-icon {
-				color: $dark-gray-900;
-				@include button-style__hover();
+				@include block-style__hover();
 			}
+
 			.editor-inserter__item-title {
 				color: $dark-gray-900;
 			}
@@ -135,7 +137,7 @@ $block-inserter-search-height: 38px;
 			outline: none;
 
 			.editor-inserter__item-icon {
-				@include button-style__focus-active();
+				@include block-style__focus-active();
 			}
 
 			.editor-inserter__item-title {
@@ -171,11 +173,25 @@ $block-inserter-search-height: 38px;
 
 .editor-inserter__item-has-children {
 	.editor-inserter__item-icon {
-	    box-shadow: 4px 4px rgba( $dark-gray-900, 0.3 );
+		//box-shadow: 4px 4px rgba( $dark-gray-900, 0.3 ); // redo this
 		margin-right: 3px;
 		position: relative;
 		top: -2px;
 		left: -2px;
+
+		// Show a "stacked card" below an item that has children.
+		&:after {
+			content: "";
+			display: block;
+			background: rgba( $dark-gray-900, .3 );
+			width: 100%;
+			height: 100%;
+			position: absolute;
+			z-index: -1; // Show below the card as a shadow
+			bottom: -4px;
+			right: -4px;
+			border-radius: 4px;
+		}
 	}
 }
 

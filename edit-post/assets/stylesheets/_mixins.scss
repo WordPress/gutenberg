@@ -217,6 +217,23 @@ $float-margin: calc( 50% - #{ $content-width-padding / 2 } );
 	outline: 1px dotted $dark-gray-500;
 }
 
+// Blocks in the Inserter
+@mixin block-style__disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+@mixin block-style__hover {
+	box-shadow: inset 0 0 0 1px rgba( $dark-gray-900, .2 ), 0 1px 3px rgba( $dark-gray-900, .4 );
+}
+
+@mixin block-style__focus-active() {
+	box-shadow: inset 0 0 0 1px $dark-gray-300;
+
+	// Windows High Contrast mode will show this outline, but not the box-shadow
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+}
 
 /**
  * Applies editor left position to the selector passed as argument
