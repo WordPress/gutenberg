@@ -14,17 +14,14 @@ function PostsSearch( { postsList } ) {
 }
 
 export default withAPIData( ( props ) => {
-	const options = {
+	const postsListQuery = stringify( pickBy( {
 		category_id: props.options.categoryId || '',
-		s: props.options.term || '',
-		type: 'post',
+		search: props.options.term || '',
 		order: props.options.order || 'desc',
-		orderBy: props.options.orderBy || 'date',
+		orderby: props.options.orderBy || 'date',
 		per_page: 10,
 		datetime: Date.now(), // make postsList is always updated
-	};
-
-	const postsListQuery = stringify( pickBy( options, ( value ) => ! isUndefined( value ) ) );
+	}, ( value ) => ! isUndefined( value ) ) );
 
 	return {
 		postsList: `/wp/v2/posts?${ postsListQuery }`,
