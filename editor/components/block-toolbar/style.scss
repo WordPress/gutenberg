@@ -15,11 +15,6 @@
 		border: none;
 	}
 
-	// Only show the left border if the Switcher is present
-	.editor-block-switcher + div > .components-toolbar {
-		border-left: 1px solid $light-gray-700;
-	}
-
 	// this should probably have its own class
 	> div {
 		display: flex;
