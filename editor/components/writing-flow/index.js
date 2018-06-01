@@ -32,8 +32,7 @@ import {
 /**
  * Module Constants
  */
-
-const { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } = keycodes;
+const { UP, DOWN, LEFT, RIGHT, TAB, isKeyboardEvent } = keycodes;
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -54,8 +53,13 @@ class WritingFlow extends Component {
 
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.bindContainer = this.bindContainer.bind( this );
+		this.bindAppender = this.bindAppender.bind( this );
 		this.clearVerticalRect = this.clearVerticalRect.bind( this );
 		this.focusLastTextField = this.focusLastTextField.bind( this );
+		this.swithToEditMode = this.swithToEditMode.bind( this );
+
+		this.lastClientY = null;
+		this.lastClientX = null;
 
 		/**
 		 * Here a rectangle is stored while moving the caret vertically so
@@ -67,8 +71,34 @@ class WritingFlow extends Component {
 		this.verticalRect = null;
 	}
 
+	componentDidMount() {
+		window.addEventListener( 'mousemove', this.swithToEditMode );
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'mousemove', this.swithToEditMode );
+	}
+
+	swithToEditMode( { clientY, clientX } ) {
+		// Safari triggers mousemove even if we didn't really move the mouse
+		// On shift press for instance.
+		// To ensure we really moved the mouse, we compare the mouse position
+		if ( this.props.keyboardMode !== 'edit' &&
+			( this.lastClientX !== null && this.lastClientY !== null ) &&
+			( clientY !== this.lastClientY || clientX !== this.lastClientX )
+		) {
+			this.props.setKeyboardMode( 'edit' );
+		}
+		this.lastClientY = clientY;
+		this.lastClientX = clientX;
+	}
+
 	bindContainer( ref ) {
 		this.container = ref;
+	}
+
+	bindAppender( ref ) {
+		this.appender = ref;
 	}
 
 	clearVerticalRect() {
@@ -160,7 +190,10 @@ class WritingFlow extends Component {
 
 		if ( focusedBlockUid ) {
 			this.props.onSelectBlock( focusedBlockUid );
+			return true;
 		}
+
+		return false;
 	}
 
 	/**
@@ -180,9 +213,32 @@ class WritingFlow extends Component {
 	}
 
 	onKeyDown( event ) {
-		const { hasMultiSelection, onMultiSelect, blocks } = this.props;
-
+		const { hasMultiSelection, onMultiSelect, blocks, keyboardMode, nextBlockUid, previousBlockUid, selectedBlockUID } = this.props;
+		// selectedBlockUID, selectionStart, hasMultiSelection, keyboardMode, nextBlockUid, previousBlockUid
 		const { keyCode, target } = event;
+
+		// In navigation mode, tab and arrows navigate from block to blocks
+		if ( keyboardMode === 'navigation' ) {
+			const navigateUp = ( keyCode === TAB && event.shiftKey ) || keyCode === UP;
+			const navigateDown = ( keyCode === TAB && ! event.shiftKey ) || keyCode === DOWN;
+
+			if ( ( navigateDown && nextBlockUid ) || ( navigateUp && previousBlockUid ) ) {
+				event.preventDefault();
+				const focusedBlockUid = navigateUp ? previousBlockUid : nextBlockUid;
+				if ( focusedBlockUid ) {
+					this.props.onSelectBlock( focusedBlockUid );
+				}
+			}
+
+			// Special case when reaching the end of the blocks (navigate to the next tabbable outside of the writing flow)
+			if ( navigateDown && selectedBlockUID && ! nextBlockUid && [ UP, DOWN ].indexOf( keyCode ) === -1 ) {
+				this.props.clearSelectedBlock();
+				this.appender.focus();
+			}
+			return;
+		}
+
+		// In edit mode, tab is kept natural and arrows navigate the cursor
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
@@ -276,6 +332,7 @@ class WritingFlow extends Component {
 					{ children }
 				</div>
 				<div
+					ref={ this.bindAppender }
 					aria-hidden
 					tabIndex={ -1 }
 					onClick={ this.focusLastTextField }
@@ -299,6 +356,7 @@ export default compose( [
 			getLastMultiSelectedBlockUid,
 			hasMultiSelection,
 			getBlockOrder,
+			getKeyboardMode,
 		} = select( 'core/editor' );
 
 		const selectedBlockUID = getSelectedBlockUID();
@@ -310,17 +368,27 @@ export default compose( [
 			selectionStartUID,
 			selectionBeforeEndUID: getPreviousBlockUid( selectionEndUID || selectedBlockUID ),
 			selectionAfterEndUID: getNextBlockUid( selectionEndUID || selectedBlockUID ),
+			nextBlockUid: getNextBlockUid( selectionEndUID || selectedBlockUID ),
+			previousBlockUid: getPreviousBlockUid( selectionStartUID || selectedBlockUID ),
 			selectedFirstUid: getFirstMultiSelectedBlockUid(),
 			selectedLastUid: getLastMultiSelectedBlockUid(),
 			hasMultiSelection: hasMultiSelection(),
 			blocks: getBlockOrder(),
+			keyboardMode: getKeyboardMode(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { multiSelect, selectBlock } = dispatch( 'core/editor' );
+		const {
+			multiSelect,
+			selectBlock,
+			clearSelectedBlock,
+			setKeyboardMode,
+		} = dispatch( 'core/editor' );
 		return {
 			onMultiSelect: multiSelect,
 			onSelectBlock: selectBlock,
+			clearSelectedBlock,
+			setKeyboardMode,
 		};
 	} ),
 ] )( WritingFlow );

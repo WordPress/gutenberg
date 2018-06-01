@@ -17,7 +17,6 @@ import {
 } from '@wordpress/dom';
 import { keycodes } from '@wordpress/utils';
 import {
-	createBlock,
 	cloneBlock,
 	getBlockType,
 	getSaveElement,
@@ -52,7 +51,7 @@ import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
 import { createInnerBlockList } from '../../utils/block-list';
 
-const { BACKSPACE, DELETE, ENTER } = keycodes;
+const { BACKSPACE, DELETE, ENTER, ESCAPE } = keycodes;
 
 export class BlockListBlock extends Component {
 	constructor() {
@@ -68,7 +67,7 @@ export class BlockListBlock extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.preventDrag = this.preventDrag.bind( this );
 		this.onPointerDown = this.onPointerDown.bind( this );
-		this.deleteOrInsertAfterWrapper = this.deleteOrInsertAfterWrapper.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onBlockError = this.onBlockError.bind( this );
 		this.onTouchStart = this.onTouchStart.bind( this );
 		this.onClick = this.onClick.bind( this );
@@ -107,7 +106,7 @@ export class BlockListBlock extends Component {
 
 	componentDidMount() {
 		if ( this.props.isSelected ) {
-			this.focusTabbable();
+			this.focusTabbable( true );
 		}
 	}
 
@@ -145,10 +144,20 @@ export class BlockListBlock extends Component {
 	}
 
 	/**
-	 * When a block becomces selected, transition focus to an inner tabbable.
+	 * When a block becomes selected, transition focus to an inner tabbable.
+	 *
+	 * @param {boolean} forceInnerFocus Whether or not to force focus to inner content
 	 */
-	focusTabbable() {
-		const { initialPosition } = this.props;
+	focusTabbable( forceInnerFocus = false ) {
+		const { initialPosition, keyboardMode } = this.props;
+
+		// In navigation mode, we should select the parent node only
+		// This could be triggered when we remove a block from navigation mode (backspace)
+		// or when we shift tab from the sidebar
+		if ( ! forceInnerFocus && keyboardMode === 'navigation' ) {
+			this.wrapperNode.focus();
+			return;
+		}
 
 		// Focus is captured by the wrapper node, so while focus transition
 		// should only consider tabbables within editable display, since it
@@ -158,12 +167,21 @@ export class BlockListBlock extends Component {
 			return;
 		}
 
+		this.focusFirstTextFieldOrContainer( -1 === initialPosition );
+	}
+
+	/**
+	 * Function focusing the first text field of the current block when called.
+	 * Fallback to the block container if no text field
+	 *
+	 * @param {boolean} isReverse select begining or end of the current block
+	 */
+	focusFirstTextFieldOrContainer( isReverse ) {
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable.find( this.node ).filter( isTextField );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
-		const isReverse = -1 === initialPosition;
 		const target = ( isReverse ? last : first )( textInputs );
 
 		if ( ! target ) {
@@ -335,32 +353,37 @@ export class BlockListBlock extends Component {
 	}
 
 	/**
-	 * Interprets keydown event intent to remove or insert after block if key
+	 * Interprets keydown event intent to switch keyboard mode and remove or insert after block if key
 	 * event occurs on wrapper node. This can occur when the block has no text
 	 * fields of its own, particularly after initial insertion, to allow for
 	 * easy deletion and continuous writing flow to add additional content.
 	 *
 	 * @param {KeyboardEvent} event Keydown event.
 	 */
-	deleteOrInsertAfterWrapper( event ) {
+	onKeyDown( event ) {
 		const { keyCode, target } = event;
+		const { keyboardMode, onChangeKeyboardMode } = this.props;
 
-		if ( target !== this.wrapperNode || this.props.isLocked ) {
-			return;
-		}
+		const isWrapperFocused = target === this.wrapperNode;
 
+		// Keyboard navigation events
 		switch ( keyCode ) {
 			case ENTER:
-				// Insert default block after current block if enter and event
-				// not already handled by descendant.
-				this.props.onInsertBlocks( [
-					createBlock( 'core/paragraph' ),
-				], this.props.order + 1 );
-				event.preventDefault();
+				if ( isWrapperFocused && keyboardMode === 'navigation' ) {
+					event.preventDefault();
+					onChangeKeyboardMode( 'edit' );
+					this.focusFirstTextFieldOrContainer();
+				}
 				break;
-
+			case ESCAPE:
+				onChangeKeyboardMode( 'navigation' );
+				this.wrapperNode.focus();
+				break;
 			case BACKSPACE:
 			case DELETE:
+				if ( ! isWrapperFocused ) {
+					return;
+				}
 				// Remove block on backspace.
 				const { uid, onRemove, previousBlockUid, onSelect } = this.props;
 				onRemove( uid );
@@ -413,6 +436,7 @@ export class BlockListBlock extends Component {
 			isLargeViewport,
 			isEmptyDefaultBlock,
 			isPreviousBlockADefaultEmptyBlock,
+			keyboardMode,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
 		const { name: blockName, isValid } = block;
@@ -424,15 +448,16 @@ export class BlockListBlock extends Component {
 
 		// If the block is selected and we're typing the block should not appear.
 		// Empty paragraph blocks should always show up as unselected.
+		const isKeyboardEditMode = keyboardMode === 'edit';
 		const isSelectedNotTyping = isSelected && ! isTypingWithinBlock;
 		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! showEmptyBlockSideInserter && isSelectedNotTyping;
 		// We render block movers and block settings to keep them tabbale even if hidden
-		const shouldRenderMovers = ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
-		const shouldRenderBlockSettings = ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
+		const shouldRenderMovers = isKeyboardEditMode && ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
+		const shouldRenderBlockSettings = isKeyboardEditMode && ( isSelected || hoverArea === 'right' ) && ! isMultiSelecting && ! isMultiSelected && ! isTypingWithinBlock;
 		const shouldShowBreadcrumb = isHovered;
-		const shouldShowContextualToolbar = shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
-		const shouldShowMobileToolbar = shouldAppearSelected;
+		const shouldShowContextualToolbar = isKeyboardEditMode && shouldAppearSelected && isValid && ( ! hasFixedToolbar || ! isLargeViewport );
+		const shouldShowMobileToolbar = isKeyboardEditMode && shouldAppearSelected;
 		const { error, dragging } = this.state;
 
 		// Insertion point can only be made visible when the side inserter is
@@ -485,8 +510,10 @@ export class BlockListBlock extends Component {
 				onTouchStart={ this.onTouchStart }
 				onFocus={ this.onFocus }
 				onClick={ this.onClick }
-				onKeyDown={ this.deleteOrInsertAfterWrapper }
+				onKeyDown={ this.onKeyDown }
 				tabIndex="0"
+				aria-label={ blockLabel }
+				role="group"
 				childHandledEvents={ [
 					'onDragStart',
 					'onMouseDown',
@@ -544,7 +571,6 @@ export class BlockListBlock extends Component {
 					onDragStart={ this.preventDrag }
 					onMouseDown={ this.onPointerDown }
 					className="editor-block-list__block-edit"
-					aria-label={ blockLabel }
 					data-block={ uid }
 				>
 
@@ -620,6 +646,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isSelectionEnabled,
 		getSelectedBlocksInitialCaretPosition,
 		getEditorSettings,
+		getKeyboardMode,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( uid );
 	const { templateLock, hasFixedToolbar } = getEditorSettings();
@@ -643,6 +670,7 @@ const applyWithSelect = withSelect( ( select, { uid, rootUID } ) => {
 		isEmptyDefaultBlock: block && isUnmodifiedDefaultBlock( block ),
 		isPreviousBlockADefaultEmptyBlock: previousBlock && isUnmodifiedDefaultBlock( previousBlock ),
 		isLocked: !! templateLock,
+		keyboardMode: getKeyboardMode(),
 		previousBlockUid,
 		block,
 		isSelected,
@@ -660,6 +688,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		replaceBlocks,
 		editPost,
 		toggleSelection,
+		setKeyboardMode,
 	} = dispatch( 'core/editor' );
 
 	return {
@@ -692,6 +721,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
+		},
+		onChangeKeyboardMode( mode ) {
+			setKeyboardMode( mode );
 		},
 	};
 } );

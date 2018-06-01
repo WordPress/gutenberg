@@ -1808,3 +1808,14 @@ export function getSupportedBlocks( state, uid, globallyEnabledBlockTypes ) {
 export function getEditorSettings( state ) {
 	return state.settings;
 }
+
+/*
+ * Returns the current keyboard mode.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {string}      Keyboard Mode
+ */
+export function getKeyboardMode( state ) {
+	return state.keyboardMode;
+}

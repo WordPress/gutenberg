@@ -716,3 +716,17 @@ export function updateEditorSettings( settings ) {
 		settings,
 	};
 }
+
+/*
+ * Returns an action object used to set the keyboard mode
+ *
+ * @param {string} mode Keyboard mode
+ *
+ * @return {Object} Action object
+ */
+export function setKeyboardMode( mode ) {
+	return {
+		type: 'SET_KEYBOARD_MODE',
+		mode,
+	};
+}

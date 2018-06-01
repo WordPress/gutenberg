@@ -25,6 +25,9 @@ describe( 'adding blocks', () => {
 	}
 
 	it( 'Should insert content using the placeholder and the regular inserter', async () => {
+		// trigger the edit keyboard mode
+		await page.mouse.click( 200, 200 );
+
 		// Click below editor to focus last field (block appender)
 		await clickBelow( await page.$( '.editor-default-block-appender' ) );
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();

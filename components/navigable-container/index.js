@@ -118,7 +118,7 @@ class NavigableContainer extends Component {
 					'onlyBrowserTabstops',
 				] ) }
 				onKeyDown={ this.onKeyDown }
-				onFocus={ this.onFocus }>
+			>
 				{ children }
 			</div>
 		);

@@ -258,6 +258,7 @@ export default compose( [
 			stopMultiSelect,
 			multiSelect,
 			selectBlock,
+			clearSelectedBlock,
 		} = dispatch( 'core/editor' );
 
 		return {
@@ -265,6 +266,7 @@ export default compose( [
 			onStopMultiSelect: stopMultiSelect,
 			onMultiSelect: multiSelect,
 			onSelect: selectBlock,
+			clearSelectedBlock,
 		};
 	} ),
 ] )( BlockListLayout );
