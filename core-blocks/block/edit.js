@@ -11,6 +11,7 @@ import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEdit } from '@wordpress/editor';
+import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -72,14 +73,11 @@ class SharedBlockEdit extends Component {
 	}
 
 	save() {
-		const { sharedBlock, onUpdateTitle, updateAttributes, block, onSave } = this.props;
+		const { onChange, block, onSave } = this.props;
 		const { title, changedAttributes } = this.state;
 
-		if ( title !== sharedBlock.title ) {
-			onUpdateTitle( title );
-		}
-
-		updateAttributes( block.uid, changedAttributes );
+		const content = serialize( { ...block, attributes: { ...block.attributes, ...changedAttributes } } );
+		onChange( { title, content } );
 		onSave();
 
 		this.stopEditing();
@@ -138,7 +136,7 @@ export default compose( [
 			getSharedBlock,
 			isFetchingSharedBlock,
 			isSavingSharedBlock,
-			getBlock,
+			getParsedSharedBlock,
 		} = select( 'core/editor' );
 		const { ref } = ownProps.attributes;
 		const sharedBlock = getSharedBlock( ref );
@@ -147,22 +145,20 @@ export default compose( [
 			sharedBlock,
 			isFetching: isFetchingSharedBlock( ref ),
 			isSaving: isSavingSharedBlock( ref ),
-			block: sharedBlock ? getBlock( sharedBlock.uid ) : null,
+			block: getParsedSharedBlock( ref ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			fetchSharedBlocks,
-			updateBlockAttributes,
-			updateSharedBlockTitle,
+			updateSharedBlock,
 			saveSharedBlock,
 		} = dispatch( 'core/editor' );
 		const { ref } = ownProps.attributes;
 
 		return {
 			fetchSharedBlock: partial( fetchSharedBlocks, ref ),
-			updateAttributes: updateBlockAttributes,
-			onUpdateTitle: partial( updateSharedBlockTitle, ref ),
+			onChange: partial( updateSharedBlock, ref ),
 			onSave: partial( saveSharedBlock, ref ),
 		};
 	} ),

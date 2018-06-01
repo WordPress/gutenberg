@@ -22,7 +22,7 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks } from '@wordpress/blocks';
+import { parse, serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { moment } from '@wordpress/date';
 import deprecated from '@wordpress/deprecated';
@@ -1487,7 +1487,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			const referencedBlock = getBlock( state, sharedBlock.uid );
+			const referencedBlock = getParsedSharedBlock( state, sharedBlock.id );
 			if ( ! referencedBlock ) {
 				return false;
 			}
@@ -1507,7 +1507,7 @@ export const getInserterItems = createSelector(
 		const buildSharedBlockInserterItem = ( sharedBlock ) => {
 			const id = `core/block/${ sharedBlock.id }`;
 
-			const referencedBlock = getBlock( state, sharedBlock.uid );
+			const referencedBlock = getParsedSharedBlock( state, sharedBlock.id );
 			const referencedBlockType = getBlockType( referencedBlock.name );
 
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
@@ -1605,6 +1605,28 @@ export const getSharedBlock = createSelector(
 	},
 	( state, ref ) => [
 		state.sharedBlocks.data[ ref ],
+	],
+);
+
+/**
+ * Returns the parsed block saved as shared block with the given ID.
+ *
+ * @param {Object}        state Global application state.
+ * @param {number|string} ref   The shared block's ID.
+ *
+ * @return {Object} The parsed block.
+ */
+export const getParsedSharedBlock = createSelector(
+	( state, ref ) => {
+		const sharedBlock = getSharedBlock( state, ref );
+		if ( ! sharedBlock ) {
+			return null;
+		}
+
+		return parse( sharedBlock.content )[ 0 ];
+	},
+	( state, ref ) => [
+		get( state.sharedBlocks.data, [ ref, 'content' ] ),
 	],
 );
 
