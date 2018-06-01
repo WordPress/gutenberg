@@ -842,10 +842,6 @@
 		background: $blue-medium-focus;
 		color: $white;
 	
-		// Drag indicator
-		cursor: move; /* Fallback for IE/Edge < 14 */
-		cursor: grab;
-	
 		// Animate in
 		.editor-block-list__block:hover & {
 			@include fade_in( .1s );
