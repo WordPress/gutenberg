@@ -15,15 +15,12 @@
  * @return string Returns the post content with archives added.
  */
 function render_block_core_archives( $attributes ) {
-	static $block_id = 0;
-	$block_id++;
-
 	$show_post_count = ! empty( $attributes['showPostCounts'] );
 	$class           = "wp-block-archives align{$attributes['align']}";
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
 
-		$dropdown_id = esc_attr( 'wp-block-archives-' . $block_id );
+		$dropdown_id = esc_attr( uniqid( 'wp-block-archives-' ) );
 		$title       = __( 'Archives', 'gutenberg' );
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-archives.php */

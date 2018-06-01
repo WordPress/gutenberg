@@ -18,6 +18,8 @@ import {
 	BlockControls,
 } from '@wordpress/editor';
 
+import './editor.scss';
+
 class ArchivesBlock extends Component {
 	constructor() {
 		super( ...arguments );
