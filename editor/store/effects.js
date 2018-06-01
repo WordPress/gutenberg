@@ -174,6 +174,11 @@ export default {
 		const { previousPost, post, isAutosave } = action;
 		const { dispatch } = store;
 
+		// Autosaves are neither shown a notice nor redirected.
+		if ( isAutosave ) {
+			return;
+		}
+
 		const publishStatus = [ 'publish', 'private', 'future' ];
 		const isPublished = includes( publishStatus, previousPost.status );
 		const willPublish = includes( publishStatus, post.status );
@@ -181,8 +186,8 @@ export default {
 		let noticeMessage;
 		let shouldShowLink = true;
 
-		if ( isAutosave || ( ! isPublished && ! willPublish ) ) {
-			// If autosaving or saving a non-published post, don't show notice.
+		if ( ! isPublished && ! willPublish ) {
+			// If saving a non-published post, don't show notice.
 			noticeMessage = null;
 		} else if ( isPublished && ! willPublish ) {
 			// If undoing publish status, show specific notice

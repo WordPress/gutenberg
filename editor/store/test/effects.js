@@ -359,6 +359,19 @@ describe( 'effects', () => {
 				type: 'CREATE_NOTICE',
 			} ) );
 		} );
+
+		it( 'should do nothing if the updated post was autosaved', () => {
+			const dispatch = jest.fn();
+			const store = { dispatch };
+
+			const previousPost = getPublishedPost();
+			const post = { ...getPublishedPost(), id: defaultPost.id + 1 };
+
+			handler( { post, previousPost, isAutosave: true }, store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 0 );
+			expect( replaceStateSpy ).toHaveBeenCalledTimes( 0 );
+		} );
 	} );
 
 	describe( '.REQUEST_POST_UPDATE_FAILURE', () => {
