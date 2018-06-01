@@ -129,13 +129,13 @@ export default {
 			} );
 		} else {
 			dispatch( {
-			type: 'UPDATE_POST',
-			edits: toSend,
-				optimist: { id: POST_UPDATE_TRANSACTION_ID },
-		} );
+				type: 'UPDATE_POST',
+				edits: toSend,
+					optimist: { id: POST_UPDATE_TRANSACTION_ID },
+			} );
 
-		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
+			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
+			dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
 
 			request = wp.apiRequest( {
 				path: `/wp/v2/${ basePath }/${ post.id }`,
