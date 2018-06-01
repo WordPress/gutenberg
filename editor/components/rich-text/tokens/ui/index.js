@@ -9,14 +9,13 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import { InserterResultsPortal } from '../../inserter';
-import { getTokenSettings } from './registration';
+import { InserterResultsPortal } from '../../../inserter';
+import { getTokenSettings } from '../registration';
 
 export default class TokenUI extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.getInsertPosition = this.getInsertPosition.bind( this );
 		this.onHover = this.onHover.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onSave = this.onSave.bind( this );
@@ -68,7 +67,7 @@ export default class TokenUI extends Component {
 		return (
 			<Fragment>
 				<InserterResultsPortal
-					title={ __( 'Inline Rich Text Tokens' ) }
+					title={ __( 'Inline Elements' ) }
 					items={ this.items }
 					onSelect={ this.onSelect }
 					onHover={ this.onHover }
