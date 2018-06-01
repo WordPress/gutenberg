@@ -26,11 +26,12 @@ exports[`PluginPostPublishPanel renders fill properly 1`] = `
             type="button"
           >
             <Dashicon
+              className="components-panel__arrow"
               icon="arrow-up"
             >
               <svg
                 aria-hidden={true}
-                className="dashicon dashicons-arrow-up"
+                className="dashicon dashicons-arrow-up components-panel__arrow"
                 focusable="false"
                 height={20}
                 role="img"

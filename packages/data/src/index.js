@@ -7,7 +7,13 @@ import { flowRight, without, mapValues, overEvery } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createHigherOrderComponent, pure, compose } from '@wordpress/element';
+import {
+	Component,
+	compose,
+	createElement,
+	createHigherOrderComponent,
+	pure,
+} from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**

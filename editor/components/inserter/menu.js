@@ -3,14 +3,16 @@
  */
 import {
 	filter,
+	find,
+	findIndex,
+	flow,
 	groupBy,
+	isEmpty,
 	map,
 	some,
-	flow,
 	sortBy,
-	findIndex,
-	find,
 	without,
+	includes,
 } from 'lodash';
 
 /**
@@ -24,7 +26,7 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { getCategories, isSharedBlock } from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,6 +34,7 @@ import { withDispatch } from '@wordpress/data';
 import './style.scss';
 import BlockPreview from '../block-preview';
 import ItemList from './item-list';
+import ChildBlocks from './child-blocks';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -56,6 +59,7 @@ export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
+			childItems: [],
 			filterValue: '',
 			hoveredItem: null,
 			suggestedItems: [],
@@ -108,8 +112,10 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { items } = this.props;
+		const { items, rootChildBlocks } = this.props;
 		const filteredItems = searchItems( items, filterValue );
+
+		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
 
 		let suggestedItems = [];
 		if ( ! filterValue ) {
@@ -142,6 +148,7 @@ export class InserterMenu extends Component {
 
 		this.setState( {
 			hoveredItem: null,
+			childItems,
 			filterValue,
 			suggestedItems,
 			sharedItems,
@@ -151,9 +158,10 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { instanceId, onSelect } = this.props;
-		const { hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
+		const { instanceId, onSelect, rootUID } = this.props;
+		const { childItems, filterValue, hoveredItem, suggestedItems, sharedItems, itemsPerCategory, openPanels } = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
+		const isSearching = !! filterValue;
 
 		// Disable reason: The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of
@@ -175,6 +183,13 @@ export class InserterMenu extends Component {
 				/>
 
 				<div className="editor-inserter__results">
+					<ChildBlocks
+						rootUID={ rootUID }
+						items={ childItems }
+						onSelect={ onSelect }
+						onHover={ this.onHover }
+					/>
+
 					{ !! suggestedItems.length &&
 						<PanelBody
 							title={ __( 'Most Used' ) }
@@ -184,17 +199,6 @@ export class InserterMenu extends Component {
 							<ItemList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
-
-					{ !! sharedItems.length && (
-						<PanelBody
-							title={ __( 'Shared' ) }
-							opened={ isPanelOpen( 'shared' ) }
-							onToggle={ this.onTogglePanel( 'shared' ) }
-						>
-							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
-						</PanelBody>
-					) }
-
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
 						if ( ! categoryItems || ! categoryItems.length ) {
@@ -204,13 +208,26 @@ export class InserterMenu extends Component {
 							<PanelBody
 								key={ category.slug }
 								title={ category.title }
-								opened={ isPanelOpen( category.slug ) }
+								opened={ isSearching || isPanelOpen( category.slug ) }
 								onToggle={ this.onTogglePanel( category.slug ) }
 							>
 								<ItemList items={ categoryItems } onSelect={ onSelect } onHover={ this.onHover } />
 							</PanelBody>
 						);
 					} ) }
+					{ !! sharedItems.length && (
+						<PanelBody
+							title={ __( 'Shared' ) }
+							opened={ isPanelOpen( 'shared' ) }
+							onToggle={ this.onTogglePanel( 'shared' ) }
+							icon="controls-repeat"
+						>
+							<ItemList items={ sharedItems } onSelect={ onSelect } onHover={ this.onHover } />
+						</PanelBody>
+					) }
+					{ isEmpty( suggestedItems ) && isEmpty( sharedItems ) && isEmpty( itemsPerCategory ) && (
+						<p className="editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
+					) }
 
 					{ hoveredItem && isSharedBlock( hoveredItem ) &&
 						<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
@@ -223,6 +240,18 @@ export class InserterMenu extends Component {
 }
 
 export default compose(
+	withSelect( ( select, { rootUID } ) => {
+		const {
+			getChildBlockNames,
+		} = select( 'core/blocks' );
+		const {
+			getBlockName,
+		} = select( 'core/editor' );
+		const rootBlockName = getBlockName( rootUID );
+		return {
+			rootChildBlocks: getChildBlockNames( rootBlockName ),
+		};
+	} ),
 	withDispatch( ( dispatch ) => ( {
 		fetchSharedBlocks: dispatch( 'core/editor' ).fetchSharedBlocks,
 	} ) ),

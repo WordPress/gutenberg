@@ -7,7 +7,7 @@ Logs a message to notify developers about a deprecated feature.
 Install the module
 
 ```bash
-npm install @wordpress/deprecated@next --save
+npm install @wordpress/deprecated --save
 ```
 
 ## Usage

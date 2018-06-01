@@ -102,21 +102,6 @@
 }
 
 /**
- * Editor Width mixin
- *
- * This mixin seeks to take the vinegar out of the responsive alignments in the editor.
- */
-
-@mixin editor-width( $width ) {
-	@media ( min-width: #{ ( $width ) } ) {
-		@content;
-	}
-}
-
-$content-width-padding: $content-width + $block-side-ui-padding + $block-side-ui-padding;
-$float-margin: calc( 50% - #{ $content-width-padding / 2 } );
-
-/**
  * Button states and focus styles
  */
 

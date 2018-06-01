@@ -9,6 +9,7 @@ $z-layers: (
 	'.editor-block-list__block {core/image aligned left or right}': 20,
 	'.editor-block-list__block {core/image aligned wide or fullwide}': 20,
 	'.freeform-toolbar': 10,
+	'.editor-block-list__breadcrumb': 1,
 	'.editor-warning': 1,
 	'.components-form-toggle__input': 1,
 	'.editor-inserter__tabs': 1,
@@ -26,6 +27,10 @@ $z-layers: (
 	'.core-blocks-button__inline-link .editor-url-input__suggestions': 6, // URL suggestions for button block above sibling inserter
 	'.wp-block-image__resize-handlers': 1, // Resize handlers above sibling inserter
 
+	// Side UI active buttons
+	'.editor-block-settings-remove': 1,
+	'.editor-block-mover__control': 1,
+	
 	// Should have lower index than anything else positioned inside the block containers
 	'.editor-block-list__block-draggable': 0,
 
@@ -43,6 +48,10 @@ $z-layers: (
 	// Block controls, particularly in nested contexts, floats aside block and
 	// should overlap most block content.
 	'.editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}': 80,
+
+	// Small screen inner blocks overlay must be displayed above drop zone,
+	// settings menu, and movers.
+	'.editor-inner-blocks__small-screen-overlay:after': 120,
 
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }

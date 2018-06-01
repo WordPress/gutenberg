@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/library-export-default-webpack-plugin",
-	"version": "0.0.1",
+	"version": "1.0.0-alpha.0",
 	"description": "Webpack plugin for exporting default property for selected libraries",
 	"author": "WordPress",
 	"license": "GPL-2.0-or-later",
@@ -17,7 +17,7 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "src/index.js",
+	"main": "build/index.js",
 	"dependencies": {
 		"lodash": "4.17.5",
 		"webpack-sources": "1.1.0"
