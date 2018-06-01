@@ -131,7 +131,7 @@ export default {
 			dispatch( {
 				type: 'UPDATE_POST',
 				edits: toSend,
-					optimist: { id: POST_UPDATE_TRANSACTION_ID },
+				optimist: { id: POST_UPDATE_TRANSACTION_ID },
 			} );
 
 			dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
