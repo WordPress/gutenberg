@@ -106,38 +106,41 @@ $block-inserter-search-height: 38px;
 	align-items: stretch;
 	justify-content: center;
 	cursor: pointer;
-	border: none;
 	background: transparent;
-	overflow: hidden;
 	word-break: break-word;
 	border-radius: 4px;
 	border: 1px solid transparent;
 	transition: all 0.05s ease-in-out;
 
 	&:disabled {
-		@include button-style__disabled;
+		@include button-style__disabled();
 	}
 
 	&:not(:disabled) {
 		&:hover {
-			border-color: $light-gray-700;
-
 			.editor-inserter__item-icon {
 				color: $dark-gray-900;
-				border-radius: 4px 4px 0 0;
+				@include button-style__hover();
+			}
+			.editor-inserter__item-title {
+				color: $dark-gray-900;
+			}
+		}
+		&:active,
+		&.is-active,
+		&:focus {
+			position: relative;
+
+			// Show the focus style in the icon inside instead.
+			outline: none;
+
+			.editor-inserter__item-icon {
+				@include button-style__focus-active();
 			}
 
 			.editor-inserter__item-title {
-				color: $dark-gray-800;
+				color: $dark-gray-900;
 			}
-		}
-
-		&:focus,
-		&:active,
-		&.is-active {
-			@include button-style__focus-active;
-			position: relative;
-			outline: 1px solid $dark-gray-500;
 		}
 	}
 }
