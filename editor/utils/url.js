@@ -14,7 +14,8 @@ import { addQueryArgs } from '@wordpress/url';
  * @return {string} WPAdmin URL.
  */
 export function getWPAdminURL( page, query ) {
-	return addQueryArgs( page, query );
+	const url = ( window._wpAdminURL ) ? window._wpAdminURL + page : page;
+	return addQueryArgs( url, query );
 }
 
 /**
