@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flatMap, get, isFunction, isString, kebabCase, pick, reduce, upperFirst } from 'lodash';
+import { find, get, isFunction, isString, kebabCase, reduce, upperFirst } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,12 +9,11 @@ import { flatMap, get, isFunction, isString, kebabCase, pick, reduce, upperFirst
 import { createHigherOrderComponent, Component, compose } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { deprecated } from '@wordpress/utils';
-import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
-import { getColorValue, getColorClass, setColorValue } from './utils';
+import { getColorValue, getColorClass } from './utils';
 import { default as withColorsDeprecated } from './with-colors-deprecated';
 
 const DEFAULT_COLORS = [];
@@ -27,6 +26,9 @@ const DEFAULT_COLORS = [];
  *                                  it should contain the color attribute name as key and the color context as value.
  *                                  If the argument is a string the value should be the color attribute name,
  *                                  the color context is computed by applying a kebab case transform to the value.
+ *                                  Color context represents the context/place where the color is going to be used.
+ *                                  The class name of the color is generated using 'has' followed by the color name
+ *                                  and ending with the color context all in kebab case e.g: has-green-background-color.
  *
  *
  * @return {Function} Higher-order component.
@@ -47,11 +49,6 @@ export default ( ...args ) => {
 		};
 	}, {} );
 
-	const relevantAttributeNames = flatMap(
-		colorMap,
-		( value, attributeName ) => [ attributeName, `custom${ upperFirst( attributeName ) }` ]
-	);
-
 	return createHigherOrderComponent(
 		compose( [
 			withSelect( ( select ) => {
@@ -64,40 +61,57 @@ export default ( ...args ) => {
 				return class extends Component {
 					constructor( props ) {
 						super( props );
+
+						this.setters = this.createSetters();
+
 						this.state = {};
 					}
 
-					static getDerivedStateFromProps( { attributes, colors, setAttributes }, prevState ) {
-						const relevantAttributes = pick( attributes, relevantAttributeNames );
-						if (
-							colors === prevState.colors &&
-							setAttributes === prevState.setAttributes &&
-							isShallowEqual( relevantAttributes, prevState.relevantAttributes )
-						) {
-							return null;
-						}
-
-						const mergeProps = reduce( colorMap, ( mergePropsAcc, colorContext, colorAttributeName ) => {
+					createSetters() {
+						return reduce( colorMap, ( settersAcc, colorContext, colorAttributeName ) => {
 							const ufColorAttrName = upperFirst( colorAttributeName );
 							const customColorAttributeName = `custom${ ufColorAttrName }`;
-							const colorName = attributes[ colorAttributeName ];
-							const customColor = attributes[ customColorAttributeName ];
-							mergePropsAcc[ colorAttributeName ] = {
-								name: colorName,
-								class: getColorClass( colorContext, colorName ),
-								value: getColorValue( colors, colorName, customColor ),
-							};
-							mergePropsAcc[ `set${ ufColorAttrName }` ] =
-								setColorValue( colors, colorAttributeName, customColorAttributeName, setAttributes );
-							return mergePropsAcc;
+							settersAcc[ `set${ ufColorAttrName }` ] = this.createSetColor( colorAttributeName, customColorAttributeName );
+							return settersAcc;
 						}, {} );
+					}
 
-						return {
-							relevantAttributes,
-							colors,
-							setAttributes,
-							mergeProps,
+					createSetColor( colorAttributeName, customColorAttributeName ) {
+						return ( colorValue ) => {
+							const colorObj = find( this.props.colors, { color: colorValue } );
+							this.props.setAttributes( {
+								[ colorAttributeName ]: colorObj && colorObj.name ? colorObj.name : undefined,
+								[ customColorAttributeName ]: colorObj && colorObj.name ? undefined : colorValue,
+							} );
 						};
+					}
+
+					static getDerivedStateFromProps( { attributes, colors }, prevState ) {
+						return reduce( colorMap, ( newState, colorContext, colorAttributeName ) => {
+							const colorName = attributes[ colorAttributeName ];
+							const colorValue = getColorValue(
+								colors,
+								colorName,
+								attributes[ `custom${ upperFirst( colorAttributeName ) }` ]
+							);
+							const prevColorObject = prevState[ colorAttributeName ];
+							const prevColorValue = get( prevColorObject, [ 'value' ] );
+							/**
+							* && prevColorObject checks that a previous color object was already computed.
+							* At the start prevColorValue and colorValue are both equal to undefined
+							* bus as prevColorObject does not exist we should compute the object.
+							*/
+							if ( prevColorValue === colorValue && prevColorObject ) {
+								newState[ colorAttributeName ] = prevColorObject;
+							} else {
+								newState[ colorAttributeName ] = {
+									name: colorName,
+									class: getColorClass( colorContext, colorName ),
+									value: colorValue,
+								};
+							}
+							return newState;
+						}, {} );
 					}
 
 					render() {
@@ -106,7 +120,8 @@ export default ( ...args ) => {
 								{ ...{
 									...this.props,
 									colors: undefined,
-									...this.state.mergeProps,
+									...this.state,
+									...this.setters,
 								} }
 							/>
 						);

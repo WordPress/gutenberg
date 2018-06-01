@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, compose, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import {
 	Dashicon,
 	IconButton,
@@ -141,6 +141,4 @@ class ButtonEdit extends Component {
 	}
 }
 
-export default compose( [
-	withColors( 'backgroundColor', { textColor: 'color' } ),
-] )( ButtonEdit );
+export default withColors( 'backgroundColor', { textColor: 'color' } )( ButtonEdit );
