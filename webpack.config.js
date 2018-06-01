@@ -243,7 +243,7 @@ const config = {
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
-				test: /\/theme\.s?css$/,
+				test: /theme\.s?css$/,
 				include: [
 					/core-blocks/,
 				],
