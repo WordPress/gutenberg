@@ -28,12 +28,26 @@
 /**
  * External dependencies
  */
-import { isEmpty, castArray, omit, kebabCase } from 'lodash';
+import { isEmpty, castArray, omit, repeat, kebabCase } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import { Fragment, RawHTML } from './';
+
+/**
+ * Default options considered by `renderToString`.
+ *
+ * @property {Object}  context  Component context.
+ * @property {boolean} beautify Whether output should include indented newlines
+ *                              on non-inline element types.
+ *
+ * @type {Object}
+ */
+const DEFAULT_OPTIONS = {
+	context: {},
+	beautify: false,
+};
 
 /**
  * Valid attribute types.
@@ -68,6 +82,55 @@ const SELF_CLOSING_TAGS = new Set( [
 	'source',
 	'track',
 	'wbr',
+] );
+
+/**
+ * Inline element tags.
+ *
+ * Extracted from:
+ *
+ *   https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements
+ *
+ * Regenerate by:
+ *
+ *   [ ...document.querySelectorAll( '.threecolumns code' ) ]
+ *       .map( ( el ) => el.textContent.replace( /(^<|>$)/g, '' ) )
+ *
+ * @type {Set}
+ */
+const INLINE_TAGS = new Set( [
+	'a',
+	'abbr',
+	'acronym',
+	'b',
+	'bdo',
+	'big',
+	'br',
+	'button',
+	'cite',
+	'code',
+	'dfn',
+	'em',
+	'i',
+	'img',
+	'input',
+	'kbd',
+	'label',
+	'map',
+	'object',
+	'q',
+	'samp',
+	'script',
+	'select',
+	'small',
+	'span',
+	'strong',
+	'sub',
+	'sup',
+	'textarea',
+	'time',
+	'tt',
+	'var',
 ] );
 
 /**
@@ -332,20 +395,34 @@ function getNormalStyleValue( property, value ) {
 }
 
 /**
- * Serializes a React element to string.
+ * Returns an indentation at the given level, if greater than zero. Different
+ * from default repeat implementation in that an undefined level is treated as
+ * though it were passed as zero.
  *
- * @param {WPElement} element Element to serialize.
- * @param {?Object}   context Context object.
+ * @param {?number} level Level to indent. Default zero.
+ *
+ * @return {string} Indentation.
+ */
+function indent( level = 0 ) {
+	return repeat( '\t', level );
+}
+
+/**
+ * Serializes an element to string.
+ *
+ * @param {WPElement} element     Element to serialize.
+ * @param {?Object}   context     Context object.
+ * @param {?number}   indentLevel In recursion, level at which to indent.
  *
  * @return {string} Serialized element.
  */
-export function renderElement( element, context = {} ) {
+export function renderElement( element, context, indentLevel ) {
 	if ( null === element || undefined === element || false === element ) {
 		return '';
 	}
 
 	if ( Array.isArray( element ) ) {
-		return renderChildren( element, context );
+		return renderChildren( element, context, indentLevel );
 	}
 
 	switch ( typeof element ) {
@@ -360,7 +437,7 @@ export function renderElement( element, context = {} ) {
 
 	switch ( tagName ) {
 		case Fragment:
-			return renderChildren( props.children, context );
+			return renderChildren( props.children, context, indentLevel );
 
 		case RawHTML:
 			const { children, ...wrapperProps } = props;
@@ -371,20 +448,21 @@ export function renderElement( element, context = {} ) {
 					...wrapperProps,
 					dangerouslySetInnerHTML: { __html: children },
 				},
-				context
+				context,
+				indentLevel
 			);
 	}
 
 	switch ( typeof tagName ) {
 		case 'string':
-			return renderNativeComponent( tagName, props, context );
+			return renderNativeComponent( tagName, props, context, indentLevel );
 
 		case 'function':
 			if ( tagName.prototype && typeof tagName.prototype.render === 'function' ) {
-				return renderComponent( tagName, props, context );
+				return renderComponent( tagName, props, context, indentLevel );
 			}
 
-			return renderElement( tagName( props, context ), context );
+			return renderElement( tagName( props, context ), context, indentLevel );
 	}
 
 	return '';
@@ -393,52 +471,83 @@ export function renderElement( element, context = {} ) {
 /**
  * Serializes a native component type to string.
  *
- * @param {?string} type    Native component type to serialize, or null if
- *                          rendering as fragment of children content.
- * @param {Object}  props   Props object.
- * @param {?Object} context Context object.
+ * @param {string}  type        Native component type to serialize.
+ * @param {Object}  props       Props object.
+ * @param {?Object} context     Context object.
+ * @param {?number} indentLevel In recursion, level at which to indent.
  *
  * @return {string} Serialized element.
  */
-export function renderNativeComponent( type, props, context = {} ) {
-	let content = '';
+export function renderNativeComponent( type, props, context, indentLevel ) {
+	let childrenContent = '';
+
+	let childrenIndentLevel = indentLevel;
+	if ( ! isInlineTag ) {
+		childrenIndentLevel++;
+	}
+
 	if ( type === 'textarea' && props.hasOwnProperty( 'value' ) ) {
 		// Textarea children can be assigned as value prop. If it is, render in
 		// place of children. Ensure to omit so it is not assigned as attribute
 		// as well.
-		content = renderChildren( props.value, context );
+		childrenContent = renderChildren( props.value, context, childrenIndentLevel );
 		props = omit( props, 'value' );
 	} else if ( props.dangerouslySetInnerHTML &&
 			typeof props.dangerouslySetInnerHTML.__html === 'string' ) {
 		// Dangerous content is left unescaped.
-		content = props.dangerouslySetInnerHTML.__html;
+		childrenContent = props.dangerouslySetInnerHTML.__html;
 	} else if ( typeof props.children !== 'undefined' ) {
-		content = renderChildren( props.children, context );
+		childrenContent = renderChildren( props.children, context, childrenIndentLevel );
 	}
 
 	if ( ! type ) {
-		return content;
+		return childrenContent;
+	}
+
+	let content = '';
+
+	// Place non-inline tag on own line with indentation.
+	const isInlineTag = INLINE_TAGS.has( type );
+	if ( ! isInlineTag && indentLevel > 0 ) {
+		content += '\n' + indent( indentLevel );
 	}
 
 	const attributes = renderAttributes( props );
 
-	if ( SELF_CLOSING_TAGS.has( type ) ) {
-		return '<' + type + attributes + '/>';
+	if ( type ) {
+		content += '<' + type + attributes;
+
+		if ( SELF_CLOSING_TAGS.has( type ) ) {
+			return content + ' />';
+		}
+
+		content += '>';
 	}
 
-	return '<' + type + attributes + '>' + content + '</' + type + '>';
+	content += childrenContent;
+
+	// For closing tag, if non-inline element rendered its own children,
+	// closing tag should be placed on its own line.
+	if ( ! isInlineTag && type !== 'pre' && /\n\t./.test( childrenContent ) ) {
+		content += '\n' + indent( indentLevel );
+	}
+
+	content += '</' + type + '>';
+
+	return content;
 }
 
 /**
  * Serializes a non-native component type to string.
  *
- * @param {Function} Component Component type to serialize.
- * @param {Object}   props     Props object.
- * @param {?Object}  context   Context object.
+ * @param {Function} Component   Component type to serialize.
+ * @param {Object}   props       Props object.
+ * @param {?Object}  context     Context object.
+ * @param {?number}  indentLevel In recursion, level at which to indent.
  *
  * @return {string} Serialized element
  */
-export function renderComponent( Component, props, context = {} ) {
+export function renderComponent( Component, props, context, indentLevel ) {
 	const instance = new Component( props, context );
 
 	if ( typeof instance.componentWillMount === 'function' ) {
@@ -449,7 +558,7 @@ export function renderComponent( Component, props, context = {} ) {
 		Object.assign( context, instance.getChildContext() );
 	}
 
-	const html = renderElement( instance.render(), context );
+	const html = renderElement( instance.render(), context, indentLevel );
 
 	return html;
 }
@@ -457,12 +566,13 @@ export function renderComponent( Component, props, context = {} ) {
 /**
  * Serializes an array of children to string.
  *
- * @param {Array}   children Children to serialize.
- * @param {?Object} context  Context object.
+ * @param {Array}   children    Children to serialize.
+ * @param {?Object} context     Context object.
+ * @param {?number} indentLevel In recursion, level at which to indent.
  *
  * @return {string} Serialized children.
  */
-function renderChildren( children, context = {} ) {
+function renderChildren( children, context, indentLevel ) {
 	let result = '';
 
 	children = castArray( children );
@@ -470,7 +580,13 @@ function renderChildren( children, context = {} ) {
 	for ( let i = 0; i < children.length; i++ ) {
 		const child = children[ i ];
 
-		result += renderElement( child, context );
+		result += renderElement( child, context, indentLevel );
+
+		// If rendering children from top-level (e.g. fragment), avoid leading
+		// newline for first non-inline tag.
+		if ( i === 0 && indentLevel === 0 ) {
+			result = result.replace( /^\n/, '' );
+		}
 	}
 
 	return result;
@@ -564,4 +680,28 @@ export function renderStyle( style ) {
 	return result;
 }
 
-export default renderElement;
+/**
+ * Serializes an element to string, given options.
+ *
+ * @param {WPElement} element Element to serialize.
+ * @param {Object}    options Serialization options.
+ *
+ * @return {string} Serialized element.
+ */
+export function renderToString( element, options ) {
+	options = {
+		...DEFAULT_OPTIONS,
+		...options,
+	};
+
+	const { context, beautify } = options;
+
+	let indentLevel;
+	if ( beautify ) {
+		indentLevel = 0;
+	}
+
+	return renderElement( element, context, indentLevel );
+}
+
+export default renderToString;
