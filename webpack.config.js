@@ -3,6 +3,7 @@
  */
 const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
+
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
 
@@ -10,6 +11,7 @@ const { basename } = require( 'path' );
  * WordPress dependencies
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
+const LibraryExportDefaultPlugin = require( './packages/library-export-default-webpack-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -24,6 +26,11 @@ const editBlocksCSSPlugin = new ExtractTextPlugin( {
 // CSS loader for styles specific to blocks in general.
 const blocksCSSPlugin = new ExtractTextPlugin( {
 	filename: './build/core-blocks/style.css',
+} );
+
+// CSS loader for default visual block styles.
+const themeBlocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './build/core-blocks/theme.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -125,7 +132,6 @@ const entryPointNames = [
 	'components',
 	'editor',
 	'utils',
-	'data',
 	'viewport',
 	'core-data',
 	'plugins',
@@ -134,7 +140,10 @@ const entryPointNames = [
 ];
 
 const gutenbergPackages = [
+	'blob',
+	'data',
 	'date',
+	'deprecated',
 	'dom',
 	'element',
 ];
@@ -234,6 +243,13 @@ const config = {
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
+				test: /\/theme\.s?css$/,
+				include: [
+					/core-blocks/,
+				],
+				use: themeBlocksCSSPlugin.extract( extractConfig ),
+			},
+			{
 				test: /\.s?css$/,
 				exclude: [
 					/core-blocks/,
@@ -245,6 +261,7 @@ const config = {
 	plugins: [
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
+		themeBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
@@ -273,6 +290,7 @@ const config = {
 				return path;
 			},
 		} ),
+		new LibraryExportDefaultPlugin( [ 'deprecated', 'dom-ready' ].map( camelCaseDash ) ),
 	],
 	stats: {
 		children: false,

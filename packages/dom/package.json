@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom",
-	"version": "0.0.1",
+	"version": "1.0.0-alpha.0",
 	"description": "DOM utils module for WordPress",
 	"author": "WordPress",
 	"license": "GPL-2.0-or-later",
@@ -17,7 +17,8 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "src/index.js",
+	"main": "build/index.js",
+	"module": "build-module/index.js",
 	"dependencies": {
 		"element-closest": "2.0.2",
 		"lodash": "4.17.5",

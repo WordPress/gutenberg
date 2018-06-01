@@ -34,6 +34,8 @@ export {
 	getBlockSupport,
 	hasBlockSupport,
 	isSharedBlock,
+	getChildBlockNames,
+	hasChildBlocks,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,

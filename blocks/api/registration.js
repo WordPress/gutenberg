@@ -10,7 +10,7 @@ import { get, set, isFunction, some } from 'lodash';
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
-import { deprecated } from '@wordpress/utils';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Defined behavior of a block type.
@@ -288,3 +288,25 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 export function isSharedBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';
 }
+
+/**
+ * Returns an array with the child blocks of a given block.
+ *
+ * @param {string} blockName Block type name.
+ *
+ * @return {Array} Array of child block names.
+ */
+export const getChildBlockNames = ( blockName ) => {
+	return select( 'core/blocks' ).getChildBlockNames( blockName );
+};
+
+/**
+ * Returns a boolean indicating if a block has child blocks or not.
+ *
+ * @param {string} blockName Block type name.
+ *
+ * @return {boolean} True if a block contains child blocks and false otherwise.
+ */
+export const hasChildBlocks = ( blockName ) => {
+	return select( 'core/blocks' ).hasChildBlocks( blockName );
+};

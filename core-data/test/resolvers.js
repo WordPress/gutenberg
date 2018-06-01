@@ -6,7 +6,7 @@ import apiRequest from '@wordpress/api-request';
 /**
  * Internal dependencies
  */
-import { getCategories, getEntityRecord } from '../resolvers';
+import { getCategories, getEntityRecord, getEntityRecords } from '../resolvers';
 import { receiveTerms, receiveEntityRecords } from '../actions';
 
 jest.mock( '@wordpress/api-request' );
@@ -44,5 +44,26 @@ describe( 'getEntityRecord', () => {
 		const fulfillment = getEntityRecord( {}, 'root', 'postType', 'post' );
 		const received = ( await fulfillment.next() ).value;
 		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', POST_TYPE ) );
+	} );
+} );
+
+describe( 'getEntityRecords', () => {
+	const POST_TYPES = {
+		post: { slug: 'post' },
+		page: { slug: 'page' },
+	};
+
+	beforeAll( () => {
+		apiRequest.mockImplementation( ( options ) => {
+			if ( options.path === '/wp/v2/types?context=edit' ) {
+				return Promise.resolve( POST_TYPES );
+			}
+		} );
+	} );
+
+	it( 'yields with requested post type', async () => {
+		const fulfillment = getEntityRecords( {}, 'root', 'postType' );
+		const received = ( await fulfillment.next() ).value;
+		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', Object.values( POST_TYPES ) ) );
 	} );
 } );

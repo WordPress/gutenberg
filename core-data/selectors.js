@@ -118,15 +118,20 @@ export function getEntityRecord( state, kind, name, key ) {
 }
 
 /**
- * Returns all the available taxonomies.
+ * Returns the Entity's records.
  *
- * @param {Object} state Data state.
+ * @param {Object} state  State tree
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
  *
- * @return {Array} Taxonomies list.
+ * @return {Array} Records.
  */
-export function getTaxonomies( state ) {
-	return state.taxonomies;
-}
+export const getEntityRecords = createSelector(
+	( state, kind, name ) => {
+		return Object.values( state.entities[ kind ][ name ].byKey );
+	},
+	( state, kind, name ) => [ state.entities[ kind ][ name ].byKey ]
+);
 
 /**
  * Return theme suports data in the index.

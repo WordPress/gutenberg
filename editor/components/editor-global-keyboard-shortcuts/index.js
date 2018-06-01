@@ -99,6 +99,7 @@ export default compose( [
 			getMultiSelectedBlockUids,
 			hasMultiSelection,
 			getEditorSettings,
+			isEditedPostDirty,
 		} = select( 'core/editor' );
 		const { templateLock } = getEditorSettings();
 
@@ -107,25 +108,38 @@ export default compose( [
 			multiSelectedBlockUids: getMultiSelectedBlockUids(),
 			hasMultiSelection: hasMultiSelection(),
 			isLocked: !! templateLock,
+			isDirty: isEditedPostDirty(),
 		};
 	} ),
-	withDispatch( ( dispatch ) => {
+	withDispatch( ( dispatch, ownProps ) => {
 		const {
 			clearSelectedBlock,
 			multiSelect,
 			redo,
 			undo,
 			removeBlocks,
-			autosave,
+			savePost,
 		} = dispatch( 'core/editor' );
 
 		return {
+			onSave() {
+				// TODO: This should be handled in the `savePost` effect in
+				// considering `isSaveable`. See note on `isEditedPostSaveable`
+				// selector about dirtiness and meta-boxes. When removing, also
+				// remember to remove `isDirty` prop passing from `withSelect`.
+				//
+				// See: `isEditedPostSaveable`
+				if ( ! ownProps.isDirty ) {
+					return;
+				}
+
+				savePost();
+			},
 			clearSelectedBlock,
 			onMultiSelect: multiSelect,
 			onRedo: redo,
 			onUndo: undo,
 			onRemove: removeBlocks,
-			onSave: autosave,
 		};
 	} ),
 ] )( EditorGlobalKeyboardShortcuts );

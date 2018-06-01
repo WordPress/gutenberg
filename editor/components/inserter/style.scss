@@ -1,5 +1,5 @@
 $block-inserter-content-height: 350px;
-$block-inserter-tabs-height: 38px;
+$block-inserter-tabs-height: 44px;
 $block-inserter-search-height: 38px;
 
 .editor-inserter {
@@ -60,26 +60,18 @@ $block-inserter-search-height: 38px;
 	border-bottom-color: $white;
 }
 
-input[type="search"].editor-inserter__search {
+.components-popover input[type="search"].editor-inserter__search {
 	display: block;
-	width: 100%;
-	margin: 0;
+	margin: -1px;
 	padding: 11px 16px;
 	position: relative;
 	z-index: 1;
-	border: none;
-	box-shadow: 0 1px 0 0 $light-gray-500;
-	@include square-style__neutral;
-	outline-offset: -5px; // override outline offset included with @include above
+	border: 1px solid $light-gray-500;
 
 	// fonts smaller than 16px causes mobile safari to zoom
 	font-size: $mobile-text-min-font-size;
 	@include break-small {
 		font-size: $default-font-size;
-	}
-
-	&:focus {
-		@include square-style__focus;
 	}
 }
 
@@ -112,7 +104,7 @@ input[type="search"].editor-inserter__search {
 	background: transparent;
 	overflow: hidden;
 	word-break: break-word;
-	border-radius: 3px;
+	border-radius: 4px;
 	border: 1px solid transparent;
 	transition: all 0.05s ease-in-out;
 
@@ -126,7 +118,7 @@ input[type="search"].editor-inserter__search {
 
 			.editor-inserter__item-icon {
 				color: $dark-gray-900;
-				border-radius: 3px 3px 0 0;
+				border-radius: 4px 4px 0 0;
 			}
 
 			.editor-inserter__item-title {
@@ -145,19 +137,57 @@ input[type="search"].editor-inserter__search {
 }
 
 .editor-inserter__item-icon {
-	padding: 7px 20px;
+	padding: 15px 20px;
 	background: $light-gray-200;
-	border-radius: 3px;
+	border-radius: 4px;
 	color: $dark-gray-500;
 	transition: all 0.05s ease-in-out;
 
 	svg {
-		width: 22px;
-		height: 22px;
+		width: 20px;
+		height: 20px;
 		transition: all 0.15s ease-out;
 	}
 }
 
 .editor-inserter__item-title {
 	padding: 4px 2px;
+}
+
+.editor-inserter__no-results {
+	font-style: italic;
+	padding: 24px;
+	text-align: center;
+}
+
+.editor-inserter__item-has-children {
+	.editor-inserter__item-icon {
+	    box-shadow: 4px 4px rgba( $dark-gray-900, 0.3 );
+		margin-right: 3px;
+		position: relative;
+		top: -2px;
+		left: -2px;
+	}
+}
+
+.editor-inserter__child-blocks {
+	padding: 0 16px;
+}
+
+.editor-inserter__parent-block-header {
+	display: flex;
+	align-items: center;
+
+	h2 {
+		font-size: 13px;
+	}
+}
+
+.editor-inserter__parent-block-icon {
+	background: $light-gray-200;
+	border-radius: 4px;
+	display: flex;
+	margin-left: -2px;
+	margin-right: 10px;
+	padding: 0 8px;
 }

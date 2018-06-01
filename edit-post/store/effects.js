@@ -127,25 +127,28 @@ const effects = {
 			} )
 		);
 
-		// Collapse sidebar when viewport shrinks.
-		subscribe( onChangeListener(
-			() => select( 'core/viewport' ).isViewportMatch( '< medium' ),
-			( () => {
-				// contains the sidebar we close when going to viewport sizes lower than medium.
-				// This allows to reopen it when going again to viewport sizes greater than medium.
-				let sidebarToReOpenOnExpand = null;
-				return ( isSmall ) => {
-					if ( isSmall ) {
-						sidebarToReOpenOnExpand = getActiveGeneralSidebarName( store.getState() );
-						if ( sidebarToReOpenOnExpand ) {
-							store.dispatch( closeGeneralSidebar() );
-						}
-					} else if ( sidebarToReOpenOnExpand && ! getActiveGeneralSidebarName( store.getState() ) ) {
-						store.dispatch( openGeneralSidebar( sidebarToReOpenOnExpand ) );
+		const isMobileViewPort = () => select( 'core/viewport' ).isViewportMatch( '< medium' );
+		const adjustSidebar = ( () => {
+			// contains the sidebar we close when going to viewport sizes lower than medium.
+			// This allows to reopen it when going again to viewport sizes greater than medium.
+			let sidebarToReOpenOnExpand = null;
+			return ( isSmall ) => {
+				if ( isSmall ) {
+					sidebarToReOpenOnExpand = getActiveGeneralSidebarName( store.getState() );
+					if ( sidebarToReOpenOnExpand ) {
+						store.dispatch( closeGeneralSidebar() );
 					}
-				};
-			} )()
-		) );
+				} else if ( sidebarToReOpenOnExpand && ! getActiveGeneralSidebarName( store.getState() ) ) {
+					store.dispatch( openGeneralSidebar( sidebarToReOpenOnExpand ) );
+				}
+			};
+		} )();
+
+		adjustSidebar( isMobileViewPort() );
+
+		// Collapse sidebar when viewport shrinks.
+		// Reopen sidebar it if viewport expands and it was closed because of a previous shrink.
+		subscribe( onChangeListener( isMobileViewPort, adjustSidebar ) );
 	},
 
 };

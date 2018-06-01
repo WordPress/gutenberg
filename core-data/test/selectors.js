@@ -6,7 +6,7 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getTerms, isRequestingCategories, getEntityRecord } from '../selectors';
+import { getTerms, isRequestingCategories, getEntityRecord, getEntityRecords } from '../selectors';
 import { select } from '@wordpress/data';
 
 jest.mock( '@wordpress/data', () => ( {
@@ -94,5 +94,39 @@ describe( 'getEntityRecord', () => {
 			},
 		} );
 		expect( getEntityRecord( state, 'root', 'postType', 'post' ) ).toEqual( { slug: 'post' } );
+	} );
+} );
+
+describe( 'getEntityRecords', () => {
+	it( 'should return an empty array by default', () => {
+		const state = deepFreeze( {
+			entities: {
+				root: {
+					postType: {
+						byKey: {},
+					},
+				},
+			},
+		} );
+		expect( getEntityRecords( state, 'root', 'postType' ) ).toEqual( [] );
+	} );
+
+	it( 'should return all the records', () => {
+		const state = deepFreeze( {
+			entities: {
+				root: {
+					postType: {
+						byKey: {
+							post: { slug: 'post' },
+							page: { slug: 'page' },
+						},
+					},
+				},
+			},
+		} );
+		expect( getEntityRecords( state, 'root', 'postType' ) ).toEqual( [
+			{ slug: 'post' },
+			{ slug: 'page' },
+		] );
 	} );
 } );
