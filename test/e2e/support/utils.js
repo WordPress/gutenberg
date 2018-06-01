@@ -164,10 +164,7 @@ export async function insertBlock( searchTerm ) {
 	// Waiting here is necessary because sometimes the inserter takes more time to
 	// render than Puppeteer takes to complete the 'click' action
 	await page.waitForSelector( '.editor-inserter__menu' );
-	await page.keyboard.type( searchTerm );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Enter' );
+	await page.click( `button[aria-label="${ searchTerm }"]` );
 }
 
 /**

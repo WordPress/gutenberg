@@ -12,7 +12,7 @@ describe( 'splitting and merging blocks', () => {
 
 	it( 'Should split and merge paragraph blocks using Enter and Backspace', async () => {
 		//Use regular inserter to add paragraph block and text
-		await insertBlock( 'paragraph' );
+		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'FirstSecond' );
 
 		//Move caret between 'First' and 'Second' and press Enter to split paragraph blocks
