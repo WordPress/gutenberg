@@ -9,6 +9,7 @@ import {
 	getSaveElement,
 	registerBlockType,
 	serialize,
+	parse,
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import { renderToString } from '@wordpress/element';
@@ -106,6 +107,10 @@ describe( 'InnerBlocks', () => {
 		block.isValid = false;
 		block.originalContent = 'Original';
 
-		expect( serialize( block ) ).toMatchSnapshot();
+		const serialized = serialize( block );
+		expect( serialized ).toMatchSnapshot();
+		// Ensure beautification doesn't impact (trailing, leading whitespace)
+		// re-parsed content:
+		expect( parse( serialized )[ 0 ].attributes.content ).toEqual( block.attributes.content );
 	} );
 } );
