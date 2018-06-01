@@ -249,11 +249,11 @@ export class InserterMenu extends Component {
 					{ isEmpty( suggestedItems ) && isEmpty( sharedItems ) && isEmpty( itemsPerCategory ) && (
 						<p className="editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
 					) }
-
-					{ hoveredItem && isSharedBlock( hoveredItem ) &&
-						<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
-					}
 				</div>
+
+				{ hoveredItem && isSharedBlock( hoveredItem ) &&
+					<BlockPreview name={ hoveredItem.name } attributes={ hoveredItem.initialAttributes } />
+				}
 			</div>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
