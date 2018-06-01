@@ -31,6 +31,9 @@ describe( 'adding inline tokens', () => {
 		const testImagePath = path.join( __dirname, '..', 'assets', '10x10_e2e_test_image_z9T8jK.png' );
 		await inputElement.uploadFile( testImagePath );
 
+		// Wait for upload.
+		await page.waitForSelector( 'li[aria-label="10x10_e2e_test_image_z9T8jK"]' );
+
 		// Insert the uploaded image.
 		await page.click( 'button.media-button-select' );
 
