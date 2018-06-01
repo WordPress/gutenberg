@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, property } from 'lodash';
+import { filter, property, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,6 +35,7 @@ const {
 	isCurrentPostScheduled,
 	isEditedPostPublishable,
 	isEditedPostSaveable,
+	isEditedPostAutosaveable,
 	isEditedPostEmpty,
 	isEditedPostBeingScheduled,
 	getEditedPostPreviewLink,
@@ -58,6 +59,7 @@ const {
 	getPreviousBlockUid,
 	getNextBlockUid,
 	isBlockSelected,
+	hasSelectedInnerBlock,
 	isBlockWithinSelection,
 	hasMultiSelection,
 	isBlockMultiSelected,
@@ -589,6 +591,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostExcerpt( state ) ).toBe( 'sassel' );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should return the edited excerpt', () => {
@@ -604,6 +607,7 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostExcerpt( state ) ).toBe( 'youcha' );
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -914,6 +918,27 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
+				saving: {},
+			};
+
+			expect( isEditedPostSaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if the post has a title but save already in progress', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {
+					requesting: true,
+				},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( false );
@@ -931,6 +956,7 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
+				saving: {},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
@@ -948,6 +974,7 @@ describe( 'selectors', () => {
 				currentPost: {
 					excerpt: 'sassel',
 				},
+				saving: {},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
@@ -973,9 +1000,111 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
+				saving: {},
 			};
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isEditedPostAutosaveable', () => {
+		it( 'should return false if the post is not saveable', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {
+					requesting: true,
+				},
+				autosave: {
+					title: 'sassel',
+				},
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if there is not yet an autosave', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: {},
+						blockOrder: {},
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'sassel',
+				},
+				saving: {},
+				autosave: null,
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if none of title, excerpt, or content have changed', () => {
+			const state = {
+				editor: {
+					present: {
+						blocksByUID: {},
+						blockOrder: {},
+						edits: {
+							content: 'foo',
+						},
+					},
+				},
+				currentPost: {
+					title: 'foo',
+					content: 'foo',
+					excerpt: 'foo',
+				},
+				saving: {},
+				autosave: {
+					title: 'foo',
+					content: 'foo',
+					excerpt: 'foo',
+				},
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if title, excerpt, or content have changed', () => {
+			for ( const variantField of [ 'title', 'excerpt', 'content' ] ) {
+				for ( const constantField of without( [ 'title', 'excerpt', 'content' ], variantField ) ) {
+					const state = {
+						editor: {
+							present: {
+								blocksByUID: {},
+								blockOrder: {},
+								edits: {
+									content: 'foo',
+								},
+							},
+						},
+						currentPost: {
+							title: 'foo',
+							content: 'foo',
+							excerpt: 'foo',
+						},
+						saving: {},
+						autosave: {
+							[ constantField ]: 'foo',
+							[ variantField ]: 'bar',
+						},
+					};
+
+					expect( isEditedPostAutosaveable( state ) ).toBe( true );
+				}
+			}
 		} );
 	} );
 
@@ -2083,6 +2212,38 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'hasSelectedInnerBlock', () => {
+		it( 'should return false if the selected block is a child of the given UID', () => {
+			const state = {
+				blockSelection: { start: 5, end: 5 },
+				editor: {
+					present: {
+						blockOrder: {
+							4: [ 3, 2, 1 ],
+						},
+					},
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, 4 ) ).toBe( false );
+		} );
+
+		it( 'should return true if the selected block is a child of the given UID', () => {
+			const state = {
+				blockSelection: { start: 3, end: 3 },
+				editor: {
+					present: {
+						blockOrder: {
+							4: [ 3, 2, 1 ],
+						},
+					},
+				},
+			};
+
+			expect( hasSelectedInnerBlock( state, 4 ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'isBlockWithinSelection', () => {
 		it( 'should return true if the block is selected but not the last', () => {
 			const state = {
@@ -2840,6 +3001,7 @@ describe( 'selectors', () => {
 				isDisabled: false,
 				utility: 0,
 				frecency: 0,
+				hasChildBlocks: false,
 			} );
 			const sharedBlockItem = items.find( ( item ) => item.id === 'core/block/1' );
 			expect( sharedBlockItem ).toEqual( {

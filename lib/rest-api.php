@@ -18,6 +18,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 function gutenberg_register_rest_routes() {
 	$controller = new WP_REST_Block_Renderer_Controller();
 	$controller->register_routes();
+
+	foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+		$class = ! empty( $post_type->rest_controller_class ) ? $post_type->rest_controller_class : 'WP_REST_Posts_Controller';
+
+		// Check if the class exists and is a subclass of WP_REST_Controller.
+		if ( ! is_subclass_of( $class, 'WP_REST_Controller' ) ) {
+			continue;
+		}
+
+		if ( post_type_supports( $post_type->name, 'revisions' ) ) {
+			$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
+			$autosaves_controller->register_routes();
+		}
+	}
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom",
-	"version": "0.0.1",
+	"version": "1.0.0-alpha.0",
 	"description": "DOM utils module for WordPress",
 	"author": "WordPress",
 	"license": "GPL-2.0-or-later",

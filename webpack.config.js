@@ -28,6 +28,11 @@ const blocksCSSPlugin = new ExtractTextPlugin( {
 	filename: './build/core-blocks/style.css',
 } );
 
+// CSS loader for default visual block styles.
+const themeBlocksCSSPlugin = new ExtractTextPlugin( {
+	filename: './build/core-blocks/theme.css',
+} );
+
 // Configuration for the ExtractTextPlugin.
 const extractConfig = {
 	use: [
@@ -127,7 +132,6 @@ const entryPointNames = [
 	'components',
 	'editor',
 	'utils',
-	'data',
 	'viewport',
 	'core-data',
 	'plugins',
@@ -137,6 +141,7 @@ const entryPointNames = [
 
 const gutenbergPackages = [
 	'blob',
+	'data',
 	'date',
 	'deprecated',
 	'dom',
@@ -238,6 +243,13 @@ const config = {
 				use: editBlocksCSSPlugin.extract( extractConfig ),
 			},
 			{
+				test: /\/theme\.s?css$/,
+				include: [
+					/core-blocks/,
+				],
+				use: themeBlocksCSSPlugin.extract( extractConfig ),
+			},
+			{
 				test: /\.s?css$/,
 				exclude: [
 					/core-blocks/,
@@ -249,6 +261,7 @@ const config = {
 	plugins: [
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
+		themeBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {

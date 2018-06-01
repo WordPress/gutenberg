@@ -27,6 +27,7 @@ import './style.scss';
 import {
 	isBlockFocusStop,
 	isInSameBlock,
+	hasInnerBlocksContext,
 } from '../../utils/dom';
 
 /**
@@ -105,9 +106,20 @@ class WritingFlow extends Component {
 				return false;
 			}
 
-			// Prefer text fields, but settle for block focus stop.
-			if ( ! isTextField( node ) && ! isBlockFocusStop( node ) ) {
+			// Prefer text fields...
+			if ( isTextField( node ) ) {
+				return true;
+			}
+
+			// ...but settle for block focus stop.
+			if ( ! isBlockFocusStop( node ) ) {
 				return false;
+			}
+
+			// If element contains inner blocks, stop immediately at its focus
+			// wrapper.
+			if ( hasInnerBlocksContext( node ) ) {
+				return true;
 			}
 
 			// If navigating out of a block (in reverse), don't consider its
