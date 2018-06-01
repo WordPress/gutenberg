@@ -120,6 +120,14 @@ export default {
 		if ( isAutosave ) {
 			toSend.parent = post.id;
 
+			// Ensure autosaves contain all fields.
+			Object.assign( toSend,
+			{
+				title: post.title,
+				content: post.content,
+				excerpt: post.excerpt,
+			}, toSend );
+
 			request = wp.apiRequest( {
 				path: `/wp/v2/${ basePath }/${ post.id }/autosaves`,
 				method: 'POST',
