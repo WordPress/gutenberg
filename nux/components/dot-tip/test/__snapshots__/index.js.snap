@@ -13,7 +13,7 @@ exports[`DotTip should render correctly 1`] = `
   <IconButton
     className="nux-dot-tip__disable"
     icon="no-alt"
-    label="Disable tips"
+    label="Dismiss tip"
   />
   <p>
     It looks like you’re writing a letter. Would you like help?
