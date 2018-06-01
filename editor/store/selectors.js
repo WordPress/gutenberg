@@ -995,6 +995,18 @@ export function isBlockSelected( state, uid ) {
 }
 
 /**
+ * Returns true if one of the block's inner blocks is selected.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} uid   Block unique ID.
+ *
+ * @return {boolean} Whether the block as an inner block selected
+ */
+export function hasSelectedInnerBlock( state, uid ) {
+	return some( getBlockOrder( state, uid ), ( innerUID ) => isBlockSelected( state, innerUID ) );
+}
+
+/**
  * Returns true if the block corresponding to the specified unique ID is
  * currently selected but isn't the last of the selected blocks. Here "last"
  * refers to the block sequence in the document, _not_ the sequence of
