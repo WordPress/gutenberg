@@ -25,12 +25,16 @@ export class DotTip extends Component {
 
 	componentDidMount() {
 		if ( this.props.isVisible ) {
-			// Fix the tip not appearing next to the inserter toggle by forcing Popover
-			// to recalculate its size and position on the next frame
+			// Force the popover to recalculate its position on the next frame. This is a
+			// Temporary workaround to fix the tip not appearing next to the inserter
+			// toggle on page load. This happens because the popover calculates its
+			// position before <PostTitle> is made visible, resulting in the position
+			// being too high on the page.
 			defer( () => {
 				const popover = this.popoverRef.current;
 				const popoverSize = popover.updatePopoverSize();
 				popover.computePopoverPosition( popoverSize );
+				popover.focus();
 			} );
 		}
 	}
@@ -54,18 +58,18 @@ export class DotTip extends Component {
 				onClose={ onDismiss }
 				onClick={ ( event ) => event.stopPropagation() }
 			>
-				<IconButton
-					className="nux-dot-tip__disable"
-					icon="no-alt"
-					label={ __( 'Dismiss tip' ) }
-					onClick={ onDismiss }
-				/>
 				<p>{ children }</p>
 				<p>
 					<Button isLink onClick={ onDismiss }>
 						{ hasNextTip ? __( 'See next tip' ) : __( 'Got it' ) }
 					</Button>
 				</p>
+				<IconButton
+					className="nux-dot-tip__disable"
+					icon="no-alt"
+					label={ __( 'Dismiss tip' ) }
+					onClick={ onDismiss }
+				/>
 			</Popover>
 		);
 	}
