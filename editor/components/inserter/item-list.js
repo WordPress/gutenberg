@@ -94,7 +94,7 @@ class ItemList extends Component {
 						>
 							<span className="editor-inserter__item-icon">
 								<BlockIcon icon={ item.icon } />
-								{ item.hasChildBlocks ? <span className="editor-inserter__item-icon-stack"></span> : '' }
+								{ item.hasChildBlocks && <span className="editor-inserter__item-icon-stack" /> }
 							</span>
 
 							<span className="editor-inserter__item-title">
