@@ -22,7 +22,7 @@
   ],
   "engines": {
     "node": ">=8.0.0",
-    "npm": ">=5.0.0"
+    "npm": ">=6.0.0"
   },
   "dependencies": {
     "tinymce": "4.7.2"
@@ -33,5 +33,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "private": false
+  "private": false,
+  "devDependencies": {
+    "postcss-wrapper-loader": "0.0.2",
+    "string-replace-webpack-plugin": "^0.1.3"
+  }
 }

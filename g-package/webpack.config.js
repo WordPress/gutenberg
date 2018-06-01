@@ -12,6 +12,8 @@ const { basename, resolve } = require( 'path' );
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '../packages/library-export-default-webpack-plugin' );
+const PostCssWrapper = require( 'postcss-wrapper-loader' );
+const StringReplacePlugin = require( 'string-replace-webpack-plugin' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
@@ -214,7 +216,19 @@ const config = {
 				include: [
 					/core-blocks/,
 				],
-				use: editBlocksCSSPlugin.extract( extractConfig ),
+				use: editBlocksCSSPlugin.extract( {
+					use: [
+						...extractConfig.use,
+						{
+							loader: StringReplacePlugin.replace( {
+								replacements: [ {
+									pattern: /.gutenberg /ig,
+									replacement: () => ( '' ),
+								} ],
+							} ),
+						},
+					],
+				} ),
 			},
 			{
 				test: /\.s?css$/,
@@ -238,6 +252,8 @@ const config = {
 		blocksCSSPlugin,
 		editBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
+		new PostCssWrapper( './css/core-blocks/edit-blocks.css', '.gutenberg__editor' ),
+		new StringReplacePlugin(),
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',
