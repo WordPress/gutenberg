@@ -17,7 +17,7 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "src/index.js",
+	"main": "build/index.js",
 	"dependencies": {
 		"lodash": "4.17.5",
 		"webpack-sources": "1.1.0"

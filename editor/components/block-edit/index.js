@@ -34,6 +34,7 @@ export class BlockEdit extends Component {
 		} = this.props;
 
 		return {
+			uid,
 			BlockList: createInnerBlockList( uid ),
 			canUserUseUnfilteredHTML: get( user.data, [
 				'capabilities',
@@ -76,6 +77,7 @@ export class BlockEdit extends Component {
 }
 
 BlockEdit.childContextTypes = {
+	uid: noop,
 	BlockList: noop,
 	canUserUseUnfilteredHTML: noop,
 };

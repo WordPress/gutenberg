@@ -45,8 +45,8 @@
 
 	@include break-small() {
 		.editor-block-list__block-edit {
-			margin-left: -$block-side-ui-padding;
-			margin-right: -$block-side-ui-padding;
+			margin-left: -$block-side-ui-width;
+			margin-right: -$block-side-ui-width;
 		}
 
 		&[data-align="full"] > .editor-block-contextual-toolbar,
@@ -87,8 +87,8 @@
 	// include space for side UI on desktops
 	@include break-small() {
 		> div {
-			margin-left: -$block-side-ui-padding - 1px;
-			margin-right: -$block-side-ui-padding - 1px;
+			margin-left: -$block-side-ui-width;
+			margin-right: -$block-side-ui-width;
 		}
 	}
 }

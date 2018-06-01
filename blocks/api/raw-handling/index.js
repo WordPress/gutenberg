@@ -89,9 +89,12 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 	}
 
 	// Normalize unicode to use composed characters.
+	// Unsupported in IE.
 	// See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
 	// See https://core.trac.wordpress.org/ticket/30130
-	HTML = HTML.normalize();
+	if ( String.prototype.normalize ) {
+		HTML = HTML.normalize();
+	}
 
 	// Parse Markdown (and encoded HTML) if:
 	// * There is a plain text version.
