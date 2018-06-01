@@ -3,7 +3,7 @@ function httpV1Middleware( options, next ) {
 	if ( newOptions.method ) {
 		if ( [ 'PATCH', 'PUT', 'DELETE' ].indexOf( newOptions.method.toUpperCase() ) >= 0 ) {
 			if ( ! newOptions.headers ) {
-				options.headers = {};
+				newOptions.headers = {};
 			}
 			newOptions.headers[ 'X-HTTP-Method-Override' ] = newOptions.method;
 			newOptions.method = 'POST';

@@ -6,11 +6,11 @@ import jQuery from 'jquery';
 /**
  * Internal dependencies
  */
-import createNonceMiddleware from './nonce-middleware';
-import createRootURLMiddleware from './root-url-middleware';
-import createPreloadingMiddleware from './preloading-middleware';
-import namespaceEndpointMiddleware from './namespace-endpoint-middleware';
-import httpV1Middleware from './http-v1-middleware';
+import createNonceMiddleware from './middlewares/nonce';
+import createRootURLMiddleware from './middlewares/root-url';
+import createPreloadingMiddleware from './middlewares/preloading';
+import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
+import httpV1Middleware from './middlewares/http-v1';
 
 const middlewares = [];
 
